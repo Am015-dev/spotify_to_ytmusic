@@ -25,8 +25,28 @@ body:not(.hints-on):not(.learn) :is(.w4pv,.w4hb,.w4hbf,.w4inc,.w4vt,.w4rate,.w4n
 .en.w4drop{outline:4px solid #ffd36a!important;transform:scale(1.04);transition:transform .12s}
 .w4ghost{box-shadow:0 14px 30px rgba(0,0,0,.6)!important;opacity:.95}
 /* owner brief 8 Nov: no text under 14px on a phone */
-@media (max-width:1023px){html body :is(.art .ph,.hero i,.hero b,.top,.chip,.piles .chip,.en .nm,.bar b,.blkchip,.spkchip,.itip i,.stc span,.orb,.item,.item span,.item b,.refline,.intent,.intent span,.card .cb,.card .ct,.card .cx,.card .ck,.card .cty,.card .cn,.gx-set-nav .gx-chip,.w4pv i,.w4pv b,.w4hb,.w4inc,.w4vt,.w4ntag,.w4rate,.toast,.ec-say span,.ec-say b,.host p,.sub,.gx-dt,#dockmsg,.gx-dock-body,.enl,.energy em,.gxh-tx,.price,.card .cl,.w4inc){font-size:14px!important}}
-@media (min-width:1024px){html body :is(.blkchip,.spkchip,.price,.card .cl,.card .cb,.card .ct,.card .cx,.card .cty,.item,.item span,.item b,.reward .sub,.reward span,.over span,.over p,.res span,.res p,.w4vt,.w4ntag,.gxh-tx){font-size:16px!important}}
+@media (max-width:1023px){html body :is(.art .ph,.hero i,.hero b,.top,.chip,.piles .chip,.en .nm,.bar b,.blkchip,.spkchip,.itip i,.stc span,.orb,.item,.item span,.item b,.refline,.intent,.intent span,.card .cb,.card .ct,.card .cx,.card .ck,.card .cty,.card .cn,.gx-set-nav .gx-chip,.w4pv i,.w4pv b,.w4hb,.w4inc,.w4vt,.w4ntag,.w4rate,.toast,.ec-say span,.ec-say b,.host p,.sub,.gx-dt,#dockmsg,.gx-dock-body,.enl,.energy em,.gxh-tx,.price,.card .cl,.w4inc,.w4num i){font-size:14px!important}}
+@media (min-width:1024px){html body :is(.blkchip,.spkchip,.price,.card .cl,.card .cb,.card .ct,.card .cx,.card .cty,.item,.item span,.item b,.reward .sub,.reward span,.over span,.over p,.res span,.res p,.w4vt,.w4ntag,.gxh-tx,.rsec b,.rcard i,.w4num i){font-size:16px!important}}
+/* one focus, big art: the card picture fills the top of each hand card (the rule text needs only the lower half) */
+html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand.dense .card .cart{height:calc(var(--cw)*.62)!important}
+/* phone: the lifted card rises a little over its own row, never over the hero row or the pile chips */
+@media (max-width:1023px){html body .hand .card.sel{transform:translate(var(--sx,0px),-14px) scale(1.12)!important}}
+#end.btn,#end.btn.pulse{color:#1a0d05!important;text-shadow:none!important;font-weight:800}   /* audit B: End turn text contrast */
+/* R1: hero portrait on phone too, and Block as a big badge */
+@media (max-width:1023px){html body .heropan .art{display:block!important;width:52px!important;height:52px!important;aspect-ratio:1!important;border-radius:10px!important;flex:none}}
+.w4blk{display:inline-flex;align-items:center;gap:4px;background:#2f6fa8;color:#fff;font-weight:800;border-radius:10px;padding:2px 10px;font-size:18px!important;margin-left:8px;border:2px solid #9cc7f0}
+/* R1: text on the hero picker and result screen sits on a solid panel, not on the busy picture */
+#tscr .heroes .hero,#tscr .refline,#tscr .sub{background:rgba(16,11,8,.88)!important;border-radius:12px}
+#tscr .refline{padding:8px 14px;color:#f6ead8!important}
+.res,.rcard,.rsec{background-color:rgba(16,11,8,.9)}
+/* R1: result deck as small card faces; dim the busy picture behind result and hero picker */
+.rcard{display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:4px!important}.rcard .rart{width:100%;aspect-ratio:1;border-radius:6px;background-size:cover}
+.res .panelbg{filter:brightness(.38) blur(2px)}#tscr .bg{filter:brightness(.55)}
+.res .rsec,.res .cause,.res .rstat,.res .storyline{background:rgba(16,11,8,.9)!important;border-radius:12px;padding:10px 14px}
+/* R1 learn step 1: no hairline seams between the spotlight's dim cells */
+.gxt-cell{box-shadow:0 0 0 1px var(--gxt-dim)}
+/* R1 PC: a bigger fight, End turn beside the hand */
+@media (min-width:1024px){html body .en .art{width:min(100%,calc(var(--cw)*3))!important}html body .en{max-width:260px!important}.ctl{display:flex;align-items:center;justify-content:space-between;gap:16px}.w4endpc{min-width:180px;min-height:56px;font-size:20px!important}}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
@@ -192,7 +212,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 
 .gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:44px;min-height:44px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
 .gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
-.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn .gx-n{font-size:.875rem;opacity:.8}
 .gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
 .gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
 /* popups */
@@ -203,13 +223,13 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
-.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
 /* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
 @media (max-width:999px){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
-  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
   .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
   .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
   .gx-app.gx-dock-min .gx-dock-body{display:none}
@@ -234,20 +254,20 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-sec h3{margin:8px 0 6px;font-size:1.02em;letter-spacing:.02em}
 .gx-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 0}
 .gx-row-l{flex:1 1 9em;min-width:0;font-weight:600}
-.gx-row-l small{display:block;font-weight:400;opacity:.75;font-size:max(13px,.82em)}
+.gx-row-l small{display:block;font-weight:400;opacity:.75;font-size:max(14px,.82em)}
 .gx-row-k{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .gx-seg{display:inline-flex;flex-wrap:wrap;gap:4px}
 .gx-sb,.gx-tg,.gx-chip{appearance:none;font:inherit;color:inherit;min-height:44px;min-width:44px;padding:4px 12px;border-radius:10px;border:1px solid var(--gx-line);background:var(--gx-chip);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;white-space:nowrap}
 .gx-sb[aria-pressed=true],.gx-tg[aria-checked=true],.gx-chip[aria-pressed=true]{background:var(--gx-chip-on);border-color:transparent;color:#1d140b;font-weight:700}
 .gx-sb:disabled{opacity:.4;cursor:default}
 .gx-tg{min-width:64px}
-.gx-chip{min-height:36px;padding:2px 11px;border-radius:99px;font-size:max(13px,.88em)}
+.gx-chip{min-height:44px;padding:2px 11px;border-radius:99px;font-size:max(14px,.88em)}
 .gx-sb:focus-visible,.gx-tg:focus-visible,.gx-chip:focus-visible,.gx-ref-it:focus-visible,.gx-ref-q:focus-visible,.gx-recap button:focus-visible,.gx-sl input:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
 .gx-sl{display:inline-flex;align-items:center;gap:8px;min-height:44px}
 .gx-sl input{width:min(190px,44vw);accent-color:var(--gx-accent);height:28px}
 .gx-sl output{min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
 .gx-links{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
-.gx-small{font-size:max(13px,.85em);opacity:.8;margin:6px 0}
+.gx-small{font-size:max(14px,.85em);opacity:.8;margin:6px 0}
 .gx-about-n{font-weight:700;margin:4px 0}
 /* reference */
 .gx-ref-top{position:sticky;top:-10px;z-index:2;background:var(--gx-panel);margin:-10px -12px 6px;padding:10px 12px 6px;border-bottom:1px solid var(--gx-line)}
@@ -257,7 +277,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-chips::-webkit-scrollbar{display:none}
 .gx-chips>*{flex:none}
 .gx-ref-list[hidden],.gx-ref-big[hidden]{display:none}
-.gx-ref-n{font-size:max(13px,.82em);opacity:.75;padding-top:4px}
+.gx-ref-n{font-size:max(14px,.82em);opacity:.75;padding-top:4px}
 .gx-ref-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:8px}
 .gx-ref-it{appearance:none;font:inherit;color:inherit;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:12px;border:1px solid var(--gx-line);background:rgba(255,255,255,.35);cursor:pointer;min-height:64px}
 .gx-ref-it:hover{background:rgba(255,255,255,.55)}
@@ -266,15 +286,15 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-ref-pic.big{width:min(240px,62vw);margin:4px auto 8px;display:flex}
 .gx-ref-tx{min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
 .gx-ref-tx b{font-size:1em}
-.gx-ref-c{font-size:max(13px,.8em);font-weight:700;padding:0 6px;border-radius:99px;background:var(--gx-chip)}
-.gx-ref-m{font-size:max(13px,.8em);opacity:.75;flex-basis:100%}
-.gx-ref-d{font-size:max(13px,.86em);flex-basis:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gx-ref-c{font-size:max(14px,.8em);font-weight:700;padding:0 6px;border-radius:99px;background:var(--gx-chip)}
+.gx-ref-m{font-size:max(14px,.8em);opacity:.75;flex-basis:100%}
+.gx-ref-d{font-size:max(14px,.86em);flex-basis:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gx-ref-big h3{margin:4px 0 2px;text-align:center;font-size:1.25em}
 .gx-ref-big .gx-ref-m{text-align:center}
 .gx-ref-full{font-size:1.02em;line-height:1.5;max-width:40em;margin:10px auto}
-.gx-ref-x{max-width:40em;margin:8px auto;font-size:max(13px,.9em)}
+.gx-ref-x{max-width:40em;margin:8px auto;font-size:max(14px,.9em)}
 .gx-ref-big .gx-chips{justify-content:center;flex-wrap:wrap}
-.gx-tag{font-size:max(13px,.8em);padding:2px 9px;border-radius:99px;background:var(--gx-chip)}
+.gx-tag{font-size:max(14px,.8em);padding:2px 9px;border-radius:99px;background:var(--gx-chip)}
 .gx-ref-bh{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:-10px;background:var(--gx-panel);padding:6px 0;z-index:2}
 .gx-ref-nav{display:inline-flex;align-items:center;gap:6px}
 .gx-ref-big:focus{outline:none}
@@ -283,11 +303,11 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-recap[hidden]{display:none}
 .gx-recap-top{display:flex;align-items:stretch}
 .gx-recap-h{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font:inherit;color:inherit;background:transparent;border:0;padding:6px 10px;min-height:44px;text-align:left;cursor:pointer}
-.gx-recap-h b{white-space:nowrap;font-size:max(13px,.86em)}
-.gx-recap-n{font-size:max(13px,.75em);font-weight:700;min-width:1.6em;text-align:center;border-radius:99px;padding:1px 6px;background:var(--gx-accent);color:#1d140b}
-.gx-recap-1{flex:1;min-width:0;font-size:max(13px,.84em);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-recap-h b{white-space:nowrap;font-size:max(14px,.86em)}
+.gx-recap-n{font-size:max(14px,.75em);font-weight:700;min-width:1.6em;text-align:center;border-radius:99px;padding:1px 6px;background:var(--gx-accent);color:#1d140b}
+.gx-recap-1{flex:1;min-width:0;font-size:max(14px,.84em);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gx-recap-x{appearance:none;border:0;background:transparent;color:inherit;font-size:1.4em;min-width:44px;min-height:44px;cursor:pointer;border-radius:10px}
-.gx-recap-l{margin:0;padding:0 12px 8px 30px;font-size:max(13px,.86em);max-height:9.5em;overflow:auto;line-height:1.4}
+.gx-recap-l{margin:0;padding:0 12px 8px 30px;font-size:max(14px,.86em);max-height:9.5em;overflow:auto;line-height:1.4}
 /* update notice */
 .gx-update{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;appearance:none;font:inherit;font-weight:700;padding:10px 18px;min-height:48px;border-radius:99px;border:0;background:var(--gx-accent);color:#1d140b;box-shadow:var(--gx-shadow);cursor:pointer;max-width:calc(100vw - 24px)}
 /* left-handed: the dock and the drawers swap sides on wide screens; games can flip their own button rows with html.lefty */
@@ -306,23 +326,65 @@ html.gx-reduce *,html.gx-reduce *::before,html.gx-reduce *::after,html.gx-noanim
 .gx-cbm{display:none;font-style:normal}
 html.cb .gx-cbm{display:inline}
 
+/* ===== D0 shell polish: one type scale, one toast, one Goal card, calm motion ===== */
+:root{--gx-fs-min:14px;--gx-fs-body:16px;--gx-fs-lg:18px;--gx-fs-h2:22px;--gx-fs-h1:28px;--gx-tap:44px;--gx-sp:8px;
+  --gx-toast-bg:#241a10;--gx-toast-ink:#fff7e6;--gx-ease:cubic-bezier(.2,.7,.2,1)}
+.gx-drawer-body,.gx-dock-body,.gx-tx{font-size:calc(var(--gx-fs-body) * var(--gx-text,1));line-height:1.45}
+.gx-dock-head .gx-dt{font-size:var(--gx-fs-body)}
+.gx-drawer-head h2{font-size:var(--gx-fs-lg)}
+.gx-sec h3{font-size:var(--gx-fs-body)}
+/* secondary text keeps 4.5:1: lighten by size, not by opacity */
+.gx-row-l small,.gx-small,.gx-ref-m,.gx-ref-n,.gx-recap-1{opacity:.9}
+.gx-ibtn,.gx-sb,.gx-tg,.gx-chip,.gx-x,.gx-recap-x,.gx-recap-h,.gx-goal-go,.gx-toast{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.gx-ibtn:active,.gx-sb:active,.gx-tg:active{transform:translateY(1px)}
+/* toast (GX.toast): one at a time, bottom centre, clear of the dock; tap to close */
+.gx-toast{position:fixed;left:50%;bottom:calc(var(--gx-toast-y,16px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;box-sizing:border-box;
+  width:max-content;max-width:min(420px,calc(100vw - 32px));display:flex;flex-direction:column;gap:2px;padding:12px 16px;min-height:var(--gx-tap);
+  border-radius:var(--gx-radius);background:var(--gx-toast-bg);color:var(--gx-toast-ink);border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 10px 28px rgba(0,0,0,.5);font-size:var(--gx-fs-body);line-height:1.35;font-weight:500;cursor:pointer;animation:gx-toast-in .22s var(--gx-ease) both}
+.gx-toast.top{bottom:auto;top:calc(var(--gx-bar-h) + 10px + env(safe-area-inset-top,0px))}
+.gx-toast.good{border-left:4px solid #7ddc8a}.gx-toast.warn{border-left:4px solid #ffc861}
+.gx-toast.out{opacity:0;transition:opacity .16s}
+.gx-toast-t{font-size:var(--gx-fs-body);font-weight:800}
+.gx-toast-h{font-size:var(--gx-fs-min);font-weight:500;opacity:.8}
+.gx-toast:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+@media (max-width:999px){.gx-toast:not(.top){bottom:calc(var(--gx-toast-y,16px) + 8px + env(safe-area-inset-bottom,0px))}}
+@keyframes gx-toast-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translateX(-50%)}}
+/* Goal card (GX.goalCard / GX.goalHTML): one sentence, at most 3 bullets, one primary button */
+.gx-goal-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(5,3,6,.62);overscroll-behavior:contain}
+.gx-goal{box-sizing:border-box;width:min(380px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:20px 16px 16px;
+  border-radius:var(--gx-radius);background:var(--gx-panel);color:var(--gx-ink);border:2px solid var(--gx-accent);box-shadow:var(--gx-shadow);animation:gx-toast-in .22s var(--gx-ease) both;transform:none}
+.gx-goal-wrap .gx-goal{animation-name:gx-goal-in}
+.gx-goal-k{font-size:var(--gx-fs-min);font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.gx-goal-t{margin:0;font-size:var(--gx-fs-h2);line-height:1.15}
+.gx-goal-g{margin:0;font-size:var(--gx-fs-lg);line-height:1.35;font-weight:700}
+.gx-goal-b{margin:0;padding:0 0 0 20px;font-size:var(--gx-fs-body);line-height:1.4;display:flex;flex-direction:column;gap:4px}
+.gx-goal-p{display:flex;justify-content:center;max-height:28dvh}
+.gx-goal-p>img,.gx-goal-p>svg{max-width:100%;max-height:28dvh;height:auto;width:auto}
+.gx-goal-go{appearance:none;font:inherit;font-weight:800;font-size:var(--gx-fs-body);min-height:48px;padding:0 20px;border-radius:24px;border:0;background:var(--gx-accent);color:#1d140b;cursor:pointer}
+.gx-goal-go:focus-visible{outline:3px solid var(--gx-ink);outline-offset:2px}
+@keyframes gx-goal-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (max-height:620px){.gx-goal{gap:8px;padding:14px 14px 12px}.gx-goal-p{display:none}}
+@media (prefers-reduced-motion:reduce){.gx-toast,.gx-goal{animation:none}.gx-toast.out{transition:none}}
+html.gx-reduce .gx-toast,html.gx-noanim .gx-toast,html.gx-reduce .gx-goal,html.gx-noanim .gx-goal{animation:none}
+
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
 :root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
-.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(300px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
 .gxh-bub.on{visibility:visible}
 .gxh-bub *{box-sizing:border-box}
 .gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
-.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:14px}
 .gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
 .gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
 .gxh-bub .gxh-sp svg{width:100%;height:100%}
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
-.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 14px/1 var(--gxh-font);min-height:44px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
 /* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
 .gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px;margin-right:-6px}
-.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:44px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
 .gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
@@ -341,7 +403,7 @@ html.cb .gx-cbm{display:inline}
 .gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
 .gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
 .gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
-.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-x{position:absolute;right:4px;top:4px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
 .gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
 .gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
 .gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
@@ -356,22 +418,22 @@ html.cb .gx-cbm{display:inline}
 .gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
 .gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .gxh-pics svg{width:64px;height:64px}
-.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics figcaption{font:800 14px/1.1 var(--gxh-font);text-align:center;max-width:76px}
 .gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
 .gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
 .gxh-set>span{flex:1 0 90px;font-weight:700}
-.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button{min-height:44px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
 .gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
 @keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
 @media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
-@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
-.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
@@ -391,15 +453,15 @@ html.cb .gx-cbm{display:inline}
 .gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
-.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
 .gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
 .gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
 .gxt-n{opacity:.85;white-space:nowrap}
-.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
-.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:44px;padding:0 12px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 14px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
 .gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
 .gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
 .gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
@@ -411,7 +473,7 @@ html.cb .gx-cbm{display:inline}
 @keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
 @keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
-@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{min-height:44px}}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -427,7 +489,7 @@ html.cb .gx-cbm{display:inline}
 .gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
 .gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
 .gxc-dim{color:var(--gxc-dim)}
-.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-small{font-size:14px;margin:6px 0 0;text-align:center}
 .gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
 .gxc-row.wrap{flex-wrap:wrap}
 .gxc-btn{min-height:46px;min-width:88px;padding:8px 21px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
@@ -436,7 +498,7 @@ html.cb .gx-cbm{display:inline}
 .gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
 .gxc-btn.ghost{background:rgba(255,255,255,.22)}
 .gxc-ib{min-height:44px;min-width:44px;padding:4px 21px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap;flex:0 0 auto}
-.gxc-tag{display:inline-block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+.gxc-tag{display:inline-block;font-size:14px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
 /* portraits: image or emoji badge in a painted ring */
 .gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
@@ -463,7 +525,7 @@ html.cb .gx-cbm{display:inline}
 .gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
 .gxc-act b{font-size:14px;letter-spacing:.04em}
-.gxc-act small{font-size:13px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
+.gxc-act small{font-size:14px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
 .gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
 .gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
@@ -478,8 +540,8 @@ html.cb .gx-cbm{display:inline}
 .gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
 @keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
 .gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
-.gxc-node .gxc-st{font-size:13px}
-.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+.gxc-node .gxc-st{font-size:14px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:14px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
   background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
 .gxc-node.locked .gxc-lab{opacity:.65}
@@ -497,11 +559,11 @@ html.cb .gx-cbm{display:inline}
 @keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
 .gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
 .gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
 .gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
 .gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
 .gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
-.gxc-goal b,.gxc-twist b{font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-goal b,.gxc-twist b{font-size:14px;text-transform:uppercase;letter-spacing:.07em}
 .gxc-twist b{color:var(--gxc-a3)}
 .gxc-twist.big{font-size:16px;border-width:2px}
 .gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
@@ -513,7 +575,7 @@ html.cb .gx-cbm{display:inline}
 /* ---- story scene ---- */
 .gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
   background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;max-width:100%}
-.gxc-sc-title{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-title{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
 .gxc-sc-who{margin-bottom:8px}
 .gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
 .gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
@@ -525,19 +587,19 @@ html.cb .gx-cbm{display:inline}
 .gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
 .gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
 .gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
-.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:14px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 .gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
 .gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
 .gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
-.gxc-res-k{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res-k{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
-.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-quote b{font-size:14px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
 .gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
-.gxc-unl>b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl>b{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
 .gxc-unl-i{padding:3px 0;font-size:15px}
 /* short phones (375x553): tighter scene, smaller portraits */
 @media (max-height:600px){
@@ -752,8 +814,26 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 html body,html body *{font-family:var(--gx-body)!important}
 html body :is(h1,h2,h3,h4,.gx-title,.title,.logo,.ttl,.gxc-htitle,.gxc-htitle *,.gxc-title,.gxt-et){font-family:var(--gx-title)!important;font-weight:700;letter-spacing:.02em}
 /* menu text floor: the small print under a button and labels never go under 13 px */
-html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(13px,1em)}
-html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(13px,.9em)}
+html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(14px,1em)}
+html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(14px,.9em)!important}
+/* ===== D0: shared floors for every game (loaded last) ===== */
+/* type scale: 16 body on phones, nothing under 14; touch targets 44; calm motion */
+html:root body :is(.gx-ibtn,.gx-sb,.gx-tg,.gxc-btn,.gxc-ib,.gxh-set button,.gxt-b,.gx-goal-go,.gx-bar .gx-ibtn){min-height:44px;min-width:44px}
+html body :is(.gxc-lab,.gxc-st,.gxh-pics figcaption,.gxt-n,.gxt-skip,.gxt-pill){font-size:max(14px,1em)}
+html body :is(.gx-drawer-body p,.gx-drawer-body li,.gx-dock-body p,.gx-dock-body li){font-size:max(14px,1em)}
+html body :is(.gxc-sheet,.gxc-scene,.gxc-res,.gx-drawer) :is(p,li,small){color:inherit}
+/* text over painted art: a soft dark halo keeps 4.5:1 when the art is busy */
+html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
+html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* panels never swallow the art on phones: docks are capped, sheets slide not fade */
+@media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
+@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
+@media (prefers-reduced-motion:reduce){
+  html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
+  html body *{scroll-behavior:auto!important}
+}
+html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 </style>
 </head>
 <body>
@@ -1632,6 +1712,59 @@ const GX={key:'gx',open:null,
     if (!doc || doc.querySelector('.gx-update')) return;
     var b = btn('gx-update', text || 'A new version is ready — tap to reload', function () { try { root.location.reload(); } catch (e) { } });
     b.setAttribute('role', 'status'); doc.body.appendChild(b);
+  };
+
+  // ---- one toast / bubble component (owner brief: stays until tapped or 4 s + 1 s per 10 words, one at a time, none in Play with Hints off)
+  // GX.toast(text, {title, ms, sticky, kind:'info'|'good'|'warn', at:'bottom'|'top', onTap}) -> {close()} | null (when suppressed)
+  // Play mode is the class html.gx-play; the Hints toggle is html.gx-hints. A game sets them; with gx-play and no gx-hints nothing shows.
+  // Messages queue and show one after the other (max 4 waiting, the oldest dropped). A tap closes the current one.
+  var TQ = [], TCUR = null, TTIMER = 0;
+  GX.toastMs = function (text) { var w = String(text || '').trim().split(/\s+/).filter(Boolean).length; return 4000 + Math.ceil(w / 10) * 1000; };
+  GX.toastAllowed = function () { var c = doc && doc.documentElement.classList; return !(c && c.contains('gx-play') && !c.contains('gx-hints')); };
+  function toastNext() {
+    if (TCUR || !TQ.length || !doc) return;
+    var o = TQ.shift(), el = doc.createElement('div');
+    el.className = 'gx-toast' + (o.kind ? ' ' + o.kind : '') + (o.at === 'top' ? ' top' : '');
+    el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite'); el.tabIndex = 0;
+    if (o.title) { var t = doc.createElement('b'); t.className = 'gx-toast-t'; t.textContent = o.title; el.appendChild(t); }
+    var p = doc.createElement('span'); p.className = 'gx-toast-x'; p.textContent = o.text; el.appendChild(p);
+    var hint = doc.createElement('small'); hint.className = 'gx-toast-h'; hint.textContent = 'Tap to close'; el.appendChild(hint);
+    var done = function () {
+      if (TCUR !== h) return; clearTimeout(TTIMER); TCUR = null;
+      el.classList.add('out'); setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); toastNext(); }, GX.reduced() ? 0 : 160);
+    };
+    var h = { el: el, close: done, text: o.text };
+    el.addEventListener('click', function () { try { if (o.onTap) o.onTap(); } catch (e) { } done(); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); done(); } });
+    doc.body.appendChild(el); TCUR = h;
+    if (!o.sticky) TTIMER = setTimeout(done, o.ms || GX.toastMs(o.text));
+  }
+  GX.toast = function (text, o) {
+    o = o || {}; text = String(text == null ? '' : text); if (!doc || !text || !GX.toastAllowed()) return null;
+    if (TCUR && TCUR.text === text) return TCUR;
+    var item = { text: text, title: o.title, ms: o.ms, sticky: o.sticky, kind: o.kind, at: o.at, onTap: o.onTap };
+    TQ.push(item); if (TQ.length > 4) TQ.shift(); toastNext();
+    return { close: function () { var i = TQ.indexOf(item); if (i >= 0) TQ.splice(i, 1); else if (TCUR) TCUR.close(); } };
+  };
+  GX.toastClear = function () { TQ.length = 0; if (TCUR) TCUR.close(); };
+
+  // ---- Goal card: the one plain sentence that says how you win, plus at most 3 short score bullets.
+  // GX.goalCard({title, goal, bullets:[...], go:'Got it', onGo, pic:<html or Node>}) -> element (shown as a modal card). GX.goalHTML(o) -> markup only.
+  GX.goalHTML = function (o) {
+    o = o || {}; var esc = function (x) { return String(x == null ? '' : x).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var b = (o.bullets || []).slice(0, 3).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
+    return '<div class="gx-goal-k">' + esc(o.kicker || 'Your goal') + '</div>' + (o.title ? '<h2 class="gx-goal-t">' + esc(o.title) + '</h2>' : '') +
+      '<p class="gx-goal-g">' + esc(o.goal) + '</p>' + (b ? '<ul class="gx-goal-b">' + b + '</ul>' : '');
+  };
+  GX.goalCard = function (o) {
+    o = o || {}; if (!doc) return null;
+    var old = doc.querySelector('.gx-goal-wrap'); if (old && old.parentNode) old.parentNode.removeChild(old);
+    var w = doc.createElement('div'); w.className = 'gx-goal-wrap'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true');
+    var c = doc.createElement('div'); c.className = 'gx-goal'; c.innerHTML = GX.goalHTML(o);
+    if (o.pic) { var pc = doc.createElement('div'); pc.className = 'gx-goal-p'; if (typeof o.pic === 'string') pc.innerHTML = o.pic; else pc.appendChild(o.pic); c.insertBefore(pc, c.querySelector('.gx-goal-g')); }
+    var g = btn('gx-goal-go', o.go || 'Got it', function () { if (w.parentNode) w.parentNode.removeChild(w); try { if (o.onGo) o.onGo(); } catch (e) { } });
+    c.appendChild(g); w.appendChild(c); doc.body.appendChild(w); try { g.focus(); } catch (e) { }
+    return w;
   };
 
   try { GX.applyPrefs(); } catch (e) { }
@@ -4255,39 +4388,39 @@ window.EC_STORY = {
   coach: {
     start: 'Goal: climb to the top and beat its guardian. Attacks cut HP. Block stops hits.',
     rules: {
-      energy: 'You hold 3 energy a turn. A card costs the number in its corner.',
+      energy: 'You get 3 energy a turn. Cards cost the corner number.',
       intent: 'Above each enemy: its next move. Plan around it.',
       block: 'An attack is coming. Block cards soak damage until your next turn.',
-      endturn: 'No playable cards left: End turn. The enemy then acts step by step.',
-      target: 'Several enemies: after lifting an attack, tap the enemy you want to hit.',
+      endturn: 'No card fits your energy? Tap End turn.',
+      target: 'Many enemies: lift an attack, then tap your target.',
       vuln: 'Vulnerable: the next hit on it deals double.',
       weak: 'Weak: each hit deals 3 less.',
-      poison: 'Poison: 1 HP per token at the end of the turn, through Block. It stays.',
+      poison: 'Poison hits 1 HP per token each turn. It stays.',
       strength: 'Strength adds to every hit you make this fight.',
       power: 'A Power card lasts the whole fight. Play it early.',
       exhaust: 'Exhaust cards vanish for the rest of this fight once played.',
       die: 'Die cards roll 1-6: low, middle or high result.',
-      junk: 'Junk cards like Dazed can never be played. They just clog your hand.',
+      junk: 'Junk like Dazed can never be played. It clogs your hand.',
       piles: 'Your draw pile ran dry: your used cards were shuffled back in.',
-      potion: 'You carry a potion: free to use, one use. Tap it in the dock.',
-      reward: 'Each win: pick one card for your deck, or skip to keep it lean.',
+      potion: 'Potions are free, one use each. Tap one in the dock.',
+      reward: 'After a win, add one card or skip.',
       gold: 'Gold piles up. Spend it at shops.',
       relic: 'A relic: a lasting bonus for the whole climb.',
       map: 'Your path: glowing rooms are your next step. Pick one.',
       rest: 'Campfire: rest to heal, or smith to upgrade one card.',
-      shop: 'A shop: tap an item to read it, then Buy. You can also pay to remove a card.',
+      shop: 'Shop: tap an item, then Buy. You can also remove a card.',
       event: 'A ? room: a choice with a price or a prize.',
       elite: 'An elite: tougher than a normal foe, better loot.',
-      boss: 'The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead.',
+      boss: 'On the Spikes turn, block. Attacking then hurts you.',
       lose: 'If your HP hits 0, the climb ends.',
-      preview: 'Hints (top bar) on: lift a card and each foe shows the exact damage it would take, and you see the Block you would gain.',
+      preview: 'Hints on: lifting a card shows the damage to each foe.',
       frail: 'Frail: your Block cards give a quarter less while it lasts.',
-      acts: 'A full climb has three acts, each with its own foes and guardian, plus a final act. Each new act heals you fully.',
-      laststand: 'Last Stand: with two heroes in a boss fight, the first to fall stays at 1 HP. The second fall ends the climb.',
+      acts: 'A full climb has three acts plus a finale. Each heals you.',
+      laststand: 'Two heroes vs a boss: the first fall leaves 1 HP.',
       shiv: 'Shivs: 0-cost knives that hit for 3. At most 5 in hand.',
-      orbs: 'Orbs: Lightning zaps, Frost blocks, Dark grows. A full row fires the oldest.',
-      stance: 'Stances: Wrath adds 3 per hit but costs 3 HP at turn end; leaving Calm gives 2 energy.',
-      scry: 'Scry: look at the top cards of your draw pile and discard the ones you do not want.',
+      orbs: 'Orbs: Lightning zaps, Frost blocks, Dark grows.',
+      stance: 'Wrath hits 3 harder but costs 3 HP. Leaving Calm gives energy.',
+      scry: 'Scry: see your next cards and discard the ones you skip.',
       retain: 'Retain: this card stays in your hand when the turn ends.'
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
@@ -4353,7 +4486,7 @@ window.EC_STORY = {
   function goalCard(done) {
     var o = h('div', 'ec-goal'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Goal');
     var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top of the tower and defeat its guardian.'),
-      h('ul', '', null, [h('li', '', 'Spend energy on cards: attacks cut enemy HP, Block stops their hits.'), h('li', '', 'Each won fight adds a card, gold or a relic to your climb.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
+      h('ul', '', null, [h('li', '', 'Cards cost energy. Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
     var b = on(h('button', 'btn', 'Climb'), function () { o.remove(); if (done) done(); }); b.id = 'goal-go'; c.appendChild(b); o.appendChild(c); document.body.appendChild(o);
   }
   UI.goalCard = goalCard;
@@ -4366,7 +4499,8 @@ window.EC_STORY = {
   // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
-  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+  function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -4589,7 +4723,7 @@ window.EC_STORY = {
       else if (UI.sel >= 0) txt = 'Tap ' + E.eff(ch.hand[UI.sel]).name + ' again to play it.';
       else if (anyOk) txt = 'Tap a glowing card to pick it. You have ' + ch.en + ' energy.';
       else txt = 'No more cards you can play. Tap End turn.';
-      if (b.ph === 'p' && UI.endBtn) a.appendChild(UI.endBtn);
+      if (b.ph === 'p' && UI.endBtn && window.innerWidth < 1024) a.appendChild(UI.endBtn);   // PC: End turn stays by the hand (R1)
     }
     else if (g.scr === 'reward') { txt = 'Pick a card to add, or skip.'; ttl = 'Reward'; }
     else if (g.scr === 'rest') { txt = 'Rest, or smith a card.'; ttl = 'Campfire'; }
@@ -4706,7 +4840,7 @@ window.EC_STORY = {
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
       p.setAttribute('data-w', 'h' + i);
       p.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] }));
-      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.blk ? '  🛡 ' + hh.blk : '') + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
+      var inf = h('div', 'inf'); var nmr = h('div', 'nm', H.name.split(' ')[0] + (hh.stance !== 'n' ? '  ' + (hh.stance === 'w' ? 'Wrath' : 'Calm') : '')); if (hh.blk) nmr.appendChild(h('span', 'w4blk', '🛡 ' + hh.blk + ' Block')); if (hh.stance !== 'n') nmr.appendChild(A('stance-' + hh.stance, '', { noph: 1, cls: 'stanceart' })); inf.appendChild(nmr);
       inf.appendChild(h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)])); inf.querySelector('.bar i').style.width = (100 * hh.hp / hh.mhp) + '%';
       inf.appendChild(stChips(hh));
       var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); inf.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'Incoming ' + inc + ', blocked')); }
@@ -4722,7 +4856,7 @@ window.EC_STORY = {
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
       ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
-      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
+      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; if (window.innerWidth >= 1024) { eb.classList.add('w4endpc'); ctl.appendChild(eb); } try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
@@ -4821,7 +4955,8 @@ window.EC_STORY = {
   function playIt(ci, ti) {
     var g = G(), mv = { t: 'play', h: g.b.cur, c: ci }; if (ti != null) mv.e = ti;
     var hc0 = g.hs[g.b.cur], cc0 = hc0.hand[ci]; UI.lastName = whyOf(hc0, cc0, ti != null ? g.b.en[ti] : null); SFX('play'); UI.busy = true; flyCard(ci, ti, function () {
-      UI.busy = false; UI.sel = -1; var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
+      UI.busy = false; UI.sel = -1; g = G(); if (!g || !g.b || g.scr !== 'battle') { render(); return; }   // R1: the fight can end while the card flies
+      var tg = ti != null ? g.b.en[ti] : null, wasV = tg && tg.st.vuln > 0, wasD = tg && tg.dead;
       try { var pv = E.previewPlay && E.previewPlay(g.b.cur, ci, ti); if (pv && UI.fs) pv.en.forEach(function (x) { UI.fs.over += x ? x.over : 0; }); } catch (x) { }
       E.performMove(mv); render(); UI.lastName = ''; afterMove();
       try { if (UI.coachReact && tg) { if (!wasD && tg.dead) UI.coachReact('good', 'kill'); else if (wasV) UI.coachReact('good', 'double'); } } catch (e) { }
@@ -4863,6 +4998,7 @@ window.EC_STORY = {
       var nm = D.ENEMIES[e.id].name, P = intentParts(e), hh = g.hs[(e.intent && e.intent.tg) || 0] || g.hs[0], hp0 = hh.hp, bk0 = hh.blk;
       UI.actor = ei; UI.cap = nm + ' ' + P.map(function (p) { return p.cap || p.t; }).join(' and ') + '.'; render();
       setTimeout(function () {
+        var g1 = G(); if (!g1 || !g1.b || g1.scr !== 'battle') return done();   // R1: guard delayed callbacks
         E.step(); var g2 = G(); render();
         var lost = hp0 - hh.hp, soak = Math.max(0, Math.min(bk0, bk0 - hh.blk));
         if (g2.scr === 'battle' && (lost > 0 || soak > 0)) { UI.cap = (lost > 0 ? 'You lost ' + lost + ' HP' : 'No damage') + (soak > 0 ? ' (' + soak + ' blocked by your Block).' : '.'); var dm = document.getElementById('dockmsg'); if (dm) dm.textContent = UI.cap; }
@@ -4956,7 +5092,8 @@ window.EC_STORY = {
   // ---------- result screens (defeat + victory): cause, floors, deck (tap = large card), relics, Story stars; used for Quick and Story
   function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
   function resultScr(r, done) {
-    var g = G(), s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
+    var g = G(); try { hud(); } catch (e) { }   // R1: the top-bar HP must match the result (0 when fallen)
+    var s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
     s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
     var cause = h('div', 'cause');
@@ -4974,7 +5111,7 @@ window.EC_STORY = {
       (r.unlocks || []).forEach(function (u) { s.appendChild(h('div', 'runl', 'Unlocked: ' + u.text)); });
     }
     var dk = h('div', 'rsec'); dk.appendChild(h('b', '', 'Final deck (tap a card)'));
-    var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
+    var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
     dk.appendChild(gr); s.appendChild(dk);
     var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
     var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { toast(D.RELICS[id].name + ': ' + D.RELICS[id].t, 3200); }); t.setAttribute('aria-label', D.RELICS[id].name); rr.appendChild(t); });
@@ -5127,12 +5264,15 @@ window.EC_STORY = {
   var C = UI.coach = { on: false, seen: {}, q: [], last: {} };
   // ---- speech card: portrait + one line; tap it to dismiss; sits at the top, away from the hand and End turn
   UI.say = function (text, ms, who) {
-    var old = $('.ec-say'); if (old) old.remove(); if (!text) return null;
+    var old = $('.ec-say'); if (!text) { if (old) old.remove(); return null; }
+    // one message at a time: a bubble that has not been on screen long enough is never replaced; the new line waits its turn
+    if (old && Date.now() < (+old.getAttribute('data-until') || 0)) { C.q.push({ key: 'say', text: text, ms: ms }); return null; }
+    if (old) old.remove(); document.querySelectorAll('.toast').forEach(function (n) { n.remove(); });
     var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status');
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
     d.addEventListener('click', function (e) { e.stopPropagation(); d.remove(); });
-    document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, UI.readMs ? UI.readMs(text, ms) : (ms || 5200)); return sp;
+    var dur = UI.readMs ? UI.readMs(text, ms) : (ms || 5200); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, dur); return sp;
   };
   function speak(key, text, ms) { if (!text) return; C.q.push({ key: key, text: text, ms: ms }); pump(); }
   function pump() { if ($('.ec-say') || !C.q.length) return; var it = C.q.shift(); UI.say(it.text, it.ms); }
@@ -5215,9 +5355,9 @@ window.EC_STORY = {
     var tap = function (id) { return { type: 'tap', times: 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     return [
       { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Goal: reach the top and beat its guardian.\nThis rat shows its next move: a bite for 4.', wait: null, ready: battleP },
-      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Crack its hide with Anvil Blow: lift it, then play it.\nAfter that, the climb is yours.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Lift Anvil Blow, then tap the rat.\nAfter that, the climb is yours.', wait: { type: 'tap', times: 1, match: function (a) { return a.w === 'card' && a.id === 'w-hammer'; } }, ready: battleP },   // lifting the card ends the guided part, so the spotlight never blocks the enemy tap
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
-        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double. Play on your own; I speak up when something new matters.', 4600); UI.render(); }, 60); } }
+        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double.', 4600); UI.render(); }, 60); } }
     ];
   }
   function finish(play) {

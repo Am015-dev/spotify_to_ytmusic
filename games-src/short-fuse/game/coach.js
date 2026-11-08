@@ -13,7 +13,7 @@ function tutStart(o){const pro=!!(o&&o.prologue);try{const d=document.getElement
   UI.tut=false;UI.tutTok=(UI.tutTok||0)+1;kitReset();clearTimeout(UI.aiT);UI.aiT=null;UI.rt=false;UI.started=false;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;UI.camp=null;UI.brief=null;UI.aiNotBefore=0;UI.lastPrompt=null;UI.ghost={info:0,turn:0};
   UI.started=true;
   newGame({np:3,mission:67,seats:['human','ai','ai'],level:'easy',names:DEFNAMES.slice(0,3),realtime:false,captain:0,seed:7});
-  tutRebuild();UI.holder=0;UI.prev=snap();coAddSkip();coPush('goal');coPush('mine');coPush('crew');coPush('fuse');refresh()}
+  tutRebuild();UI.holder=0;UI.prev=snap();coAddSkip();{const c=UI.coach;clearTimeout(CO.t);c.seen={};c.q=[];c.curId=null;const o=document.getElementById('coach');if(o)o.remove()}coPush('goal');coPush('mine');coPush('crew');coPush('fuse');refresh()}
 function coAddSkip(){let b=document.getElementById('coachskip');if(!b){b=document.createElement('button');b.id='coachskip';b.type='button';b.setAttribute('data-help','');b.textContent=UI.coach&&UI.coach.pro?'Skip to map':'Skip tutorial';b.addEventListener('click',()=>coExit(false));document.body.appendChild(b)}}
 function coClear(){clearTimeout(CO.t);CO.cur=null;for(const id of ['coach','coachskip','coachend']){const e=document.getElementById(id);if(e)e.remove()}}
 function coExit(done){const pro=UI.coach&&UI.coach.pro;if(UI.coach){CO.last=Object.keys(UI.coach.seen)}CO.done=true;coClear();if(done||true){try{GXT.markDone(TUT_GAME)}catch(e){}}
@@ -25,8 +25,8 @@ function coNext(){const c=UI.coach;if(!c)return;clearTimeout(CO.t);const old=doc
   const txt=typeof d[2]==='function'?d[2]():d[2];
   const b=document.createElement('div');b.id='coach';b.className='coachcard co-'+d[0];b.setAttribute('data-help','');b.dataset.step=id;
   b.innerHTML='<div class="cop"></div><div class="cob"><div class="cot">'+esc(who+' · '+d[1])+'</div><div class="cox">'+esc(txt)+'</div></div><button type="button" class="coz" aria-label="Got it">Got it</button>';
-  document.body.appendChild(b);b.querySelector('.coz').addEventListener('click',()=>coNext());coPlace();
-  CO.t=setTimeout(coNext,Math.max(3200,txt.split(/\s+/).length*300)/Math.max(1,UI.speed||1))}
+  document.body.appendChild(b);try{scPaint()}catch(e){}b.dataset.pass='1';b.addEventListener('click',e=>{if(e.target.closest('.coz')){coNext();return}b.style.visibility='hidden';const u=document.elementFromPoint(e.clientX,e.clientY);coNext();if(u&&u!==b&&u.click)u.click()});coPlace();
+  CO.t=setTimeout(coNext,(typeof plRead==='function'?plRead(txt):4000+Math.ceil(txt.split(/\s+/).length/10)*1000)+2000)}
 function coPlace(){const b=document.getElementById('coach');const m=document.getElementById('mine');if(!b)return;const r=m?m.getBoundingClientRect():null;const h=b.offsetHeight;
   const top=r?Math.max(96,r.top-h-26):96;b.style.top=top+'px'}
 window.addEventListener('resize',()=>{try{coPlace()}catch(e){}});

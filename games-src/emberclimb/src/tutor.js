@@ -12,12 +12,15 @@
   var C = UI.coach = { on: false, seen: {}, q: [], last: {} };
   // ---- speech card: portrait + one line; tap it to dismiss; sits at the top, away from the hand and End turn
   UI.say = function (text, ms, who) {
-    var old = $('.ec-say'); if (old) old.remove(); if (!text) return null;
+    var old = $('.ec-say'); if (!text) { if (old) old.remove(); return null; }
+    // one message at a time: a bubble that has not been on screen long enough is never replaced; the new line waits its turn
+    if (old && Date.now() < (+old.getAttribute('data-until') || 0)) { C.q.push({ key: 'say', text: text, ms: ms }); return null; }
+    if (old) old.remove(); document.querySelectorAll('.toast').forEach(function (n) { n.remove(); });
     var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status');
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
     d.addEventListener('click', function (e) { e.stopPropagation(); d.remove(); });
-    document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, UI.readMs ? UI.readMs(text, ms) : (ms || 5200)); return sp;
+    var dur = UI.readMs ? UI.readMs(text, ms) : (ms || 5200); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, dur); return sp;
   };
   function speak(key, text, ms) { if (!text) return; C.q.push({ key: key, text: text, ms: ms }); pump(); }
   function pump() { if ($('.ec-say') || !C.q.length) return; var it = C.q.shift(); UI.say(it.text, it.ms); }
@@ -100,9 +103,9 @@
     var tap = function (id) { return { type: 'tap', times: 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     return [
       { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Goal: reach the top and beat its guardian.\nThis rat shows its next move: a bite for 4.', wait: null, ready: battleP },
-      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Crack its hide with Anvil Blow: lift it, then play it.\nAfter that, the climb is yours.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Lift Anvil Blow, then tap the rat.\nAfter that, the climb is yours.', wait: { type: 'tap', times: 1, match: function (a) { return a.w === 'card' && a.id === 'w-hammer'; } }, ready: battleP },   // lifting the card ends the guided part, so the spotlight never blocks the enemy tap
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
-        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double. Play on your own; I speak up when something new matters.', 4600); UI.render(); }, 60); } }
+        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double.', 4600); UI.render(); }, 60); } }
     ];
   }
   function finish(play) {

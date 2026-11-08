@@ -47,6 +47,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     else { bad++; console.log('FAIL', name, 'never tried a target card'); }
     if (!won) { bad++; console.log('FAIL', name, 'fight not won by ' + (touch ? 'touch' : 'mouse')); } else console.log('PASS', name, 'fight won by ' + (touch ? 'touch' : 'mouse'));
     if (errs.length) { bad++; console.log('FAIL', name, 'page errors', errs.slice(0, 2).join(' | ')); }
+    // Learn to play: the 3 guided steps by real touch / mouse, then the enemy tap must play the lifted card (R1: the spotlight blocked it)
+    await pg.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.tutStart(); }); await sleep(2500);
+    const lhp0 = await pg.evaluate(() => { const g = EC.E.G(); return g && g.b ? g.b.en.map(e => e.hp + e.blk).join(',') : ''; });
+    for (let k = 0; k < 8; k++) {
+      const st = await pg.evaluate(() => { try { const c = GXT.active() && GXT.current(); return c ? c.id : ''; } catch (e) { return ''; } });
+      if (!st || st === 'free') break;
+      const nx = await pg.$('.gxt-next'); if (nx && await nx.isVisible()) { await tapAt(nx); await sleep(600); continue; }
+      const ok = await pg.evaluate(() => { document.querySelectorAll('[data-spot]').forEach(x => x.removeAttribute('data-spot')); const c = GXT.current(), t = c && c.target && c.target(); if (t) t.setAttribute('data-spot', '1'); return !!t; });
+      if (ok) { await tapAt(await pg.$('[data-spot]')); await sleep(800); } else await sleep(400);
+    }
+    await sleep(500); const len = await pg.$('.en.glow');
+    if (!len) { bad++; console.log('FAIL', name, 'learn: no glowing enemy after the guided steps'); }
+    else { await tapAt(len); await sleep(1500); const lhp1 = await pg.evaluate(() => { const g = EC.E.G(); return g && g.b ? g.b.en.map(e => e.hp + e.blk).join(',') : 'done'; }); if (lhp1 !== lhp0) console.log('PASS', name, 'learn to play: guided steps then enemy tap by ' + (touch ? 'touch' : 'mouse')); else { bad++; console.log('FAIL', name, 'learn: enemy tap did nothing after the guided steps'); } }
     // drag the real card onto a foe (mouse on PC; touch drag via CDP on phone)
     await pg.evaluate(() => { EC.E.newGame({ heroes: ['w'], seed: 99 }); EC.E.performMove({ t: 'go', n: EC.E.validMoves()[0].n }); UI.mode = 'game'; UI.sel = -1; UI.busy = false; UI.render(); document.querySelectorAll('.gxh-card,.ec-goal').forEach(n => n.remove()); }); await sleep(900);
     const dc = await pg.evaluateHandle(() => [...document.querySelectorAll('.hand .card.ok')].find(n => { const g = EC.E.G(), h = g.hs[g.b.cur]; return EC.E.eff(h.hand[+n.getAttribute('data-c')]).tgt; }));

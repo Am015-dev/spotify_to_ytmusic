@@ -23,14 +23,14 @@ const HLP_STEPS={
 const HLP_RULES=[
   {phase:'pick',title:'Take one colour',text:'Pick a kiln and a colour. You take every tile of that colour. The rest slide to the middle.',pic:HPIC.kiln},
   {phase:'pick',title:'The middle',text:'Taking from the middle first also takes the Sun token. It costs floor points, but you start next round.',pic:HPIC.middle},
-  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, each full row sends one tile to your wall.',pic:HPIC.racks},
+  {phase:'pick',title:'Round end',text:'When every kiln and the middle are empty, the round ends. Each full row sends one tile to your wall.',pic:HPIC.racks},
   {phase:'pick',title:'Game end',text:'A full wall row ends the game. Bonuses: row +2, column +7, all five of a colour +10.',pic:HPIC.bonus},
   {phase:'rack',title:'One colour per row',text:'Row 3 holds three tiles of a single colour. You cannot mix colours in a row.',pic:HPIC.oneColour},
   {phase:'rack',title:'Blocked rows',text:'A row is blocked if its wall row already has that colour. Blocked and full rows do not glow.',pic:HPIC.blocked},
-  {phase:'rack',title:'The floor',text:'Extra tiles fall to the floor: −1, −1, −2, −2, −2, −3, −3 points. You can also drop tiles there.',pic:HPIC.floor},
-  {phase:'rack',title:'Touching scores',text:'A set tile scores 1 alone, or its row line plus its column line when it touches others.',pic:HPIC.wall},
+  {phase:'rack',title:'The floor',text:'Extra tiles fall to the floor. Floor spaces cost −1, −1, −2, −2, −2, −3, −3. You can also drop tiles there.',pic:HPIC.floor},
+  {phase:'rack',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
   {phase:'wall',title:'Pick the space',text:'On the grey wall choose any empty space in the row. No colour may repeat in a row or column.',pic:HPIC.wall},
-  {phase:'wall',title:'Touching scores',text:'A tile scores 1 alone, or the length of its row line plus its column line if it touches others.',pic:HPIC.wall},
+  {phase:'wall',title:'Touching scores',text:'A lone tile scores 1. A touching tile scores its row line plus its column line.',pic:HPIC.wall},
   {title:'The goal',text:'Fill your wall with tiles. Touching tiles score more. Most points wins.',pic:HPIC.goal}
 ];
 // ---------------------------------------------------------------- which phase is the player in?
@@ -61,7 +61,7 @@ function hlpSuggest(){const pl=hlpPlan();if(!pl)return null;const why=hlpWhy(pl.
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'sunglaze',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bf-row.ok .bf-rack,.bf-floor.ok .bf-fl,.bf-c.pick,.bf-k.can,.bf-pool.can,.bf-t.adv,.gxc-act,.gxc-node'})}
+  GXH.init({game:'sunglaze',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bf-row.ok .bf-rack,.bf-floor.ok .bf-fl,.bf-c.pick,.bf-k.can,.bf-pool.can,.bf-t.adv,.gxc-act,.gxc-node'})}
 function hlpAfter(){if(typeof GXH==='undefined')return;hlpInit();
   const b=document.getElementById('bulbbtn');if(b&&b!==hlpAfter._b){hlpAfter._b=b}
   if(b)GXH.bulb({el:b,suggest:hlpSuggest,rulesFor:hlpPhase});

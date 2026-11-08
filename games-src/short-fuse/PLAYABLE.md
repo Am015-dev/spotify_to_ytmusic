@@ -63,3 +63,12 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - Tests adjusted: coach-test starts from Learn to play; playable-test no longer expects banners or the flavour line; qa-bot's coached phase taps `offeryes` when present.
 - Look-check follow-up: the plate fix is now slice `30 42` with widths `5px 7px` (same corner scale both ways) instead of 6px 6px.
 - Coach bubbles (first-time help) are Learn-to-play only: off in Play and with Hints on.
+
+## Game feel (W469, 8 Nov 2026, BRIEF-GAMEFEEL)
+- Reading time: every caption, toast and coach bubble stays 4 s + 1 s per 10 words, or until tapped (tap the band or the table). The computer crew waits
+  for it (`plRead`/`plWait`/`plSkip` in playable.js); the rival's "points at" step is shown on the wire for 1 s, then one result caption.
+- Score pop is a number only (+2 / Fuse -1) that flies up to the counter; no second text box. Vibrate tick on pick-up, drop and every cut.
+- Goal card: one sentence + 3 short bullets. Learn to play opens on the goal bubble ("We win when all 15 wires are cut, before the fuse burns out").
+- Coach bubble fixed: it was half off-screen at 390 (transform overridden by its entry animation); now centred, tap it to dismiss, the tap passes through.
+- Text floor 14px on phone (16px on desktop) for plates, chips, gear names, tile corner values.
+- Shots: playable-shots/feel/ (390x844, 375x667, 1440x900). Script: game/feel-shots.js.

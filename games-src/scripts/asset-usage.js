@@ -52,7 +52,8 @@ function playOne(slug) {
   const worker = async () => {
     for (let slug; (slug = queue.shift());) {
       const ship = shipped(slug), r = ship.length ? await playOne(slug) : { loaded: new Set(), quick: null, secs: 0 };
-      const hit = ship.filter(f => r.loaded.has(f)), never = ship.filter(f => !r.loaded.has(f));
+      const stem = f => f.replace(/-lite\.glb$/i, '.glb'), seen = new Set([...r.loaded].map(stem));   // a -lite .glb counts as its model loaded (phones load the lite file)
+      const hit = ship.filter(f => r.loaded.has(f) || seen.has(stem(f))), never = ship.filter(f => !hit.includes(f));
       const glbShip = ship.filter(f => /\.glb$/i.test(f)), glbLoaded = hit.filter(f => /\.glb$/i.test(f));
       const pct = ship.length ? Math.round(1000 * hit.length / ship.length) / 10 : 100;
       const fail = ship.length > 0 && (pct < MIN || (glbShip.length > 0 && glbLoaded.length === 0));

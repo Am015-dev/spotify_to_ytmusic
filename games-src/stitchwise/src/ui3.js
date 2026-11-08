@@ -3,14 +3,15 @@ function logoHtml() { var cols = ['#c0527a', '#e0a82e', '#2a8a80', '#4a86b8', '#
 function firstTime() { try { return !localStorage.getItem('sw_seen'); } catch (e) { return true; } }
 function showStart(view) {
   var st = $('#start'); st.hidden = false; UI.started = UI.started && !!G; $('#rs').hidden = true; try { GX.close(); } catch (e) { } artBg(st, 'bg-title');
-  if (view === 'setup') return renderSetup(st);
+  if (view === 'setup') { artBg(st, 'bg-map'); st.style.backgroundSize = 'cover'; return renderSetup(st); }
   var camp = typeof campLine === 'function' ? campLine() : '';
-  var card = h('div.card', { html: logoHtml() + '<h1>Stitchwise</h1><p class="sub">A quilting duel for two. Buy patches, sew them on, run out the clock.</p>' });
+  var castRow = ''; try { var CA = (window.CAMPAIGN || {}).cast || {}; Object.keys(CA).forEach(function (k) { var st2 = (CA[k].portrait || '').replace(/\.webp$/, ''); if (st2 && artHas(st2)) castRow += '<img src="' + artUrl(st2) + '" alt="' + CA[k].name + '" title="' + CA[k].name + '">'; }); } catch (e) { }
+  var card = h('div.card', { html: logoHtml() + '<h1>Stitchwise</h1>' + (castRow ? '<div class="cast" aria-label="The quilters at the fair">' + castRow + '</div>' : '') + '<p class="sub">A quilting duel for two. Buy patches, sew them on, run out the clock.</p>' });
   var m = h('div.menu');
   if (hasSave()) m.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'resume' }, 'Continue your game', h('small', 'Pick up where you stopped')));
   if (window.CAMPAIGN && typeof GXC !== 'undefined') m.appendChild(h('button.btn' + (hasSave() ? '' : '.go'), { type: 'button', 'data-a': 'story' }, 'Story: The Quilter’s Year', h('small', camp || 'Three county fairs, ten stages, three champions')));
-  m.appendChild(h('button.btn', { type: 'button', 'data-a': 'quick' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
-  m.appendChild(h('button.btn' + (firstTime() ? '.go' : ''), { type: 'button', 'data-a': 'start', 'data-tut': '1' }, 'Learn: your first game', h('small', 'A real game; Aunt Wren coaches you as you play')));
+  m.appendChild(h('button.btn', { type: 'button', 'data-a': 'start' }, 'Quick game', h('small', 'Against the computer or a friend on this screen')));
+  m.appendChild(h('button.btn' + (firstTime() ? '.go' : ''), { type: 'button', 'data-a': 'learn', 'data-tut': '1' }, 'Learn: your first game', h('small', 'A real game; Aunt Wren coaches you as you play')));
   m.appendChild(h('button.btn.alt', { type: 'button', 'data-a': 'rules' }, 'How to play'));
   card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
   try { GX.showDock && 0; } catch (e) { }
@@ -28,9 +29,9 @@ function renderSetup(st) {
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
   if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'cancel') cancelSel();
-  else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
-  else if (a === 'resume') loadGame(); else if (a === 'quick') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
-  else if (a === 'story') storyOpen(); else if (a === 'start') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
+  else if (a === 'strip') { if (G && !UI.coach) { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else { t.classList.add('tapped'); setTimeout(function () { t.classList.remove('tapped'); }, 500); } }
+  else if (a === 'resume') loadGame(); else if (a === 'quick' || a === 'start') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
+  else if (a === 'story') storyOpen(); else if (a === 'learn') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
   else if (a === 'campfin') { $('#rs').hidden = true; }
 });
 function showOppQuilt(seat) { var d = $('#oppd .gx-drawer-body') || null; var body = h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:8px' }); var saved = UI.cs; UI.cs = Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)); var q = quiltEl(seat, 'opp'); body.appendChild(q); var sc = swScore(G, seat); body.appendChild(h('div', { html: '<b>' + nameOf(seat) + '</b>: ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ' per spot, ' + sc.empty + ' empty squares' })); UI.cs = saved;
@@ -89,8 +90,8 @@ function showResult(o) {
   var finishUp = function () {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
     var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
-    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); ban.innerHTML = '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
-    var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
+    ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); try { artImg('result-win'); artImg('result-lose'); } catch (e) { } /* both ready for the next game */ var ra = artHas(w === 0 || hot ? 'result-win' : 'result-lose') ? '<img class="rvart" alt="" src="' + artUrl(w === 0 || hot ? 'result-win' : 'result-lose') + '">' : ''; ban.innerHTML = ra + '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
+    var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK && UI.walkLine) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }

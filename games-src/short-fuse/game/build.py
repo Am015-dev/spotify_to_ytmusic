@@ -27,8 +27,8 @@ open(os.path.join(D,'debug.html'),'w',encoding='utf-8').write(b)
 SRC={'gx-scenario.js': os.path.join(SP, 'shell', 'gx-scenario.js'), 'scn.js': os.path.join(D,'scn.js'), 'shell.js':os.path.join(SP,'shell','shell.js'),'gx-skin.js':os.path.join(SP,'shell','gx-skin.js'),'gx-campaign.js':os.path.join(SP,'shell','gx-campaign.js'),'gx-viewport.js':os.path.join(SP,'shell','gx-viewport.js'),'gx-help.js':os.path.join(SP,'shell','gx-help.js'),'gx-tutor.js':os.path.join(SP,'shell','gx-tutor.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'short-fuse','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
-     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER = ['gx-scenario.js', 'scn.js', 'shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-skin.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','art-data.js','data.js','engine.js','ai.js','netstrip.js','texts.js','story.js','hlp.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','tbl.js','playable.js','scorecard.js','extras.js','tutor.js','coach.js','start.js']
+     'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js'),'gx-glb.js':os.path.join(SP,'shell','gx-glb.js'),'gx-glbsprite.js':os.path.join(SP,'shell','gx-glbsprite.js'),'three.min.js':os.path.join(SP,'node_modules','three','build','three.min.js')}
+ORDER = ['gx-scenario.js', 'scn.js', 'shell.js','gx-viewport.js','gx-help.js','gx-tutor.js','gx-skin.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','gx-glb.js','gx-glbsprite.js','art-data.js','data.js','engine.js','ai.js','netstrip.js','texts.js','story.js','hlp.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','tbl.js','playable.js','scorecard.js','extras.js','tutor.js','coach.js','start.js']
 h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))).replace('/*TABLE_CSS*/',rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(D,'table.css'))+'\n'+rd(os.path.join(SP,'shell','gx-skin.css'))+'\n'+rd(os.path.join(D,'skin.css')))
 body=rd(os.path.join(D,'body.html'))
 body=body.replace('<!--CREDITS-->',rd(os.path.join(SP,'short-fuse','audio','credits.html')))
@@ -36,6 +36,7 @@ for f in ORDER:
     tag=f'<script src="{f}"></script>';assert tag in body,f
     if f=='campaign-data.js':src='window.CAMPAIGN = '+json.dumps(json.load(open(os.path.join(SP,'short-fuse','campaign.json'),encoding='utf-8')),separators=(',',':'),ensure_ascii=False)+';'
     elif f=='art-data.js':src=art_js()
+    elif f=='three.min.js':t=rd(SRC[f]);src='!'+t[t.index('),')+2:]
     else:src=rd(SRC.get(f,os.path.join(D,f)))
     src=src.replace('</script','<\\/script')
     body=body.replace(tag,'<script>\n'+src+'\n</script>')
