@@ -10,6 +10,10 @@
 .host p{margin:0;font-size:15px;line-height:1.35;color:#f6ead8}
 @media (min-width:1024px){.host p{font-size:17px}.host .hostpic{width:80px;height:80px;flex-basis:80px}}
 .art.has[data-stem="enemy-mire-behemoth"],.art.has[data-stem="enemy-ashen-wraith"],.art.has[data-stem="enemy-gate-colossus"],.art.has[data-stem="enemy-ember-tyrant"],.art.has[data-stem="enemy-tomb-king"],.art.has[data-stem="enemy-skyclaw"]{background-size:cover;border:3px solid #c9a227;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 6px 22px rgba(0,0,0,.65),0 0 26px rgba(242,135,43,.35)}
+/* audit B: solid plates behind intent numbers and the campaign act header (the owner art is brighter than the old backgrounds) */
+.intent,.intent.atk,.intent.def,.intent.buf,.intent.deb{background:#140e0a!important}
+.intent>span{background:#140e0a;color:#fff1e6!important;text-shadow:none!important;border-radius:6px;padding:0 2px}
+.gxc-act{background:rgba(14,10,8,.9)!important;border-radius:10px}.gxc-act b{color:#f6ead8!important}.gxc-act small{opacity:1!important;color:#e9dcc6!important}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
@@ -312,7 +316,7 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 .intent.w4hot{border-color:#ff5a46!important;box-shadow:0 0 0 2px rgba(255,90,70,.5)}
 .intent.w4atk{animation:w4pulse 1.2s ease-in-out infinite}.intent.w4danger{animation:w4pulse2 .9s ease-in-out infinite}
 @keyframes w4pulse{50%{box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 12px rgba(255,90,70,.55)}}
-@keyframes w4pulse2{50%{transform:scale(1.1);box-shadow:0 0 0 5px rgba(255,60,40,.6),0 0 22px rgba(255,60,40,.85)}}
+@keyframes w4pulse2{50%{box-shadow:0 0 0 5px rgba(255,60,40,.6),0 0 22px rgba(255,60,40,.85)}}
 .turnban.win b{border-color:#f2c230;color:#fff4d6;box-shadow:0 0 40px rgba(242,194,48,.55),0 8px 30px #000a}.turnban.boss b{font-size:clamp(30px,8vw,56px)}
 .w4emb{position:fixed;inset:0;pointer-events:none;z-index:91;overflow:hidden}
 .w4emb i{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff6c8 0,#ffb340 45%,#ff5a1a 75%,transparent 100%);box-shadow:0 0 8px #ff8a2a}
