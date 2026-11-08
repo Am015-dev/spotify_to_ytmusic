@@ -58,6 +58,7 @@ function tutFix() {
   // day 2: Hask slips a red, a yellow and a purple into the bag, so each colour's power is seen by doing it: orange then red (+1), a white then yellow (sends it back),
   // then blue peeks at the purple (the right pick, and the hint agrees), which pays 1 point at the count
   if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; ['R1', 'Y1', 'P1'].forEach(k => CF._.give(G, me, k, true)); tutOrder(me, ['O1', 'R1', 'W1', 'Y1', 'B1', 'P1']); tutOrder(wy, ['W2']); }
+  if (G.round === 2 && T.d2 && !T.yb && me.pot.some(c => c.c === 'Y') && !me.q) { T.yb = 1; tutOrder(me, ['B1', 'P1']); }      // the white that yellow sent back must not land on top
 }
 // Wynne is scripted too: she takes a Wren Feather 2 from the card, draws 4 chips on day 1 and 1 on day 2, then stops; shopping and rubies are the normal computer's.
 function tutAI(Gx, seat) {
