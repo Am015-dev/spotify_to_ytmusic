@@ -36,3 +36,11 @@ Also: legal cards glow with a pulsing gold ring, covered cards lose colour (not 
 - **Points pop with the reason** ("+3 points for Open Stage (civic card)"), a **star** on the computer's best-value glowing card, and a one-line **rating after each of your turns** ("Good move: the best choice here." / "Okay move: selling X was a bit better." / "Poor move: ... was clearly better.").
 - **Guided game for bots and people**: while the coached game runs, the token and wonder pills and the score bar are dimmed and not tappable so the glowing card is the obvious target (class `ttguided`, not `coach*`).
 - Painted art (free-art/install.py --force, not committed): text sits on solid plates; ui-audit A-F 0 on phone, phone-s and pc with the art installed.
+
+## Round 4 (W429): a clean, picture-first Play screen (390x844)
+- Every pyramid card, wonder and science token shows its CC0 picture (`free-art/install.py --force`; `games/twin-thrones/media/` now committed so a rebuild fills all 126 slots).
+- Card face: name plate in the card colour (soft hyphens, never clipped), effect badge (red = shields, blue = points, green = science, resource icons), and on takeable cards YOUR price: green "Free" glow or a coin price (red if you cannot afford it). Covered cards are dimmed and spread so name + effect stay visible.
+- One instruction line + turn tracker (Age, cards left / danger), one goal line (tap: how to win), one line per player (portrait, coins, points, 4 wonder pictures). Tap points = breakdown, tap a wonder or token = picture + effect.
+- "+N card name" pops next to your points when you score. Hints (top bar, off by default) brings back the best-value star, move previews, ratings and the turn banner. The bottom panel only appears when it holds a choice. Cards moved from the top bar to Menu.
+- Result: picture banner, the scoring table for both sides, early-win note. Engine, data and AI untouched.
+- Gate: build OK, `rules-test.js 200` PASS, `smoke.js` PASS phone + pc (0 errors, run from games/twin-thrones/), playtest-ui quick p PASS (29 turns to the result by taps), tutorial-e2e p PASS. Shots: playable-shots/title, first-turn, mid-game, score-pop, result (.webp).
