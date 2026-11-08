@@ -94,5 +94,5 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 ## Modules of the original
 64. [NB] Championship (several races, points per place).
 65. [NB] Weather and road-condition event cards.
-66. [NB] Legends (automated opponents with their own rules).
-67. [NB] The original's garage upgrade cards (this game's own "Upgrades" mode is a different design: invariants checked in rules-test.js).
+66. [EXT] Legends (option `legends:k`, up to 3): automated cars with no hand or heat; each turn a Legend plays the next card of its pace deck, brakes to take every corner on its path without penalty, and takes a free slipstream boost when safe; it never gets the last-place boost. This game's own rules for the module, tested for self-consistency only.
+67. [EXT] Garage upgrades (option `garage:true`): a face-up market of 6 from a pile of 2 copies of each of the 6 upgrade types; the back of the grid chooses first, snake order, 2 picks each, market refilled after every pick; the picks are shuffled into the deck. Different from the 3-pick draft (`upg`). Own design, tested for self-consistency only.
