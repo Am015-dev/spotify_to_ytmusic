@@ -1047,7 +1047,7 @@
   "coach": {
    "start": [
     1,
-    "You win with the most points when time runs out. Buy a glowing patch, or tap Advance."
+    "You win with the most points when time runs out. Score is buttons minus 2 for each empty square. Buy a glowing patch, or tap Advance."
    ],
    "income_me": [
     2,
