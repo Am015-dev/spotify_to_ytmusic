@@ -108,7 +108,7 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
-function newGame(mode, o) {
+function newGame(mode, o) { try { ['result-win', 'result-lose'].forEach(function (k) { if (artHas(k)) artImg(k); }); } catch (e) { }
   o = o || {}; UI.seq++; clearTimeout(UI.tm.ai); UI.mode = mode === 'story' || mode === 'tutorial' ? 'vs' : mode; UI.tutorial = mode === 'tutorial'; UI.camp = (mode === 'story' && o.camp) || null; UI.sel = -1; UI.busy = 0; UI.newCells = {}; UI.lastWho = -1; UI.rate = ''; UI.again = ''; UI.peek = -1; UI.cap = ''; UI.fast = false; UI.coach = null; if (window.GXCOACH && !o.coach) GXCOACH.running = false; var QS = ((window.CAMPAIGN || {}).story || {}).quick; UI.flavor = mode === 'vs' && !o.camp && !o.coach && QS && QS.intro ? QS.intro[o.lvl || UI.lvl] || '' : ''; UI.lvl = o.lvl || UI.lvl;
   var seed = o.seed != null ? o.seed : (Math.random() * 1e9) | 0; rngUI = swRng(seed + 17); UI.seed = seed;
   G = swNew({ seed: seed, first: o.first != null ? o.first : (UI.mode === 'hot' || UI.tutorial || UI.camp ? 0 : seed % 2), ring: o.ring });

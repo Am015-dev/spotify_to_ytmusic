@@ -32,3 +32,11 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
   takes up to 62dvh in portrait (head.html).
 - Still open: visual baselines need the owner's --approve-visual; cars are small on phone (camera zoom), lights overlay sits on
   the board while turn 1 is already playable.
+
+## W475 round 2 (shelf/W475-redline-r2): reviewer R9 fixes
+- PC 1440x900: board fills the width; gears, hand and Go are one bottom dock (head.html, min-width 1000px).
+- Camera close (cam.s 0.75-1.3, cars ~70-100 px). sceneryLayer() in race.js: grass, trees, tents, stands, run-off sand and
+  tyre walls in the track art's flat style, drawn over the art with the road cut out.
+- Title: Quick game options collapsed everywhere; bg-title scaled 6% past cover so its white side bars fall off (titleBg).
+- Phone: bigger cards (13.8vw, slight overlap), Go is the big button, Boost/Swap small beside it.
+- Drag a card up to play it (lift, glow, drop zone, snap); tap still works. drag-test.js covers touch and mouse.

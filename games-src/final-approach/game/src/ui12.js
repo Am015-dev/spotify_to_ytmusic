@@ -60,13 +60,15 @@ function tutStart(o) {
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
   document.querySelectorAll('.fa-skip').forEach(e => e.remove());
-  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Skip the guided flight' }, 'Skip tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
+  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Exit the guided flight' }, 'Exit tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
   UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0, goal: true }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
   if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
-  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-coach,.fa-fin,.fa-skip').forEach(e => e.remove());
+  const lc = UI.fc && UI.fc.cur, left = lc ? Math.max(0, lc.need - (Date.now() - lc.at)) : 0;   // a line still being read fades after its reading time
+  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-fin,.fa-skip' + (left ? '' : ',.fa-coach')).forEach(e => e.remove());
+  if (left) setTimeout(() => document.querySelectorAll('.fa-coach').forEach(e => { if (!UI.fc) e.remove(); }), left);
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
   $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
@@ -128,16 +130,18 @@ function tsReact(text, who) {
 const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
 // one bubble only: [a rule that just became relevant] + [what to do now and why]. It never blocks input; x hides it until the situation changes.
 function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push(tsFill(T.coach[id])); }
-function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
+function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; F.shut = c.key; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
 function fcShow(key, txt, who, ms) {
-  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); try { c.el.remove(); } catch (e) { } }
+  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur && F.shut !== F.cur.key && Date.now() - F.cur.at < F.cur.need) return;   // the line on screen gets its reading time first
+  if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); } document.querySelectorAll('.fa-coach').forEach(e => e.remove());
   if (F.shut === key || !txt) return;
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
   F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
+  x.style.visibility = 'hidden'; setTimeout(() => { x.style.visibility = ''; }, readMs(txt));   // the line gets its reading time before it can be closed
 }
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
-function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
+function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended || (UI.flash && UI.flash.until > Date.now())) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
 const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
 function tutGoal() {
   if (typeof roHide === 'function') roHide();
@@ -171,7 +175,7 @@ function fcLine(m) {
 }
 function fcPoll() {
   const F = UI.fc; if (!F) return; if (!G || !UI.started || !tutGame()) return;
-  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; fcHide(); setTimeout(fcEnd, 1400); } return; }
+  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; const c = F.cur, wait = c ? Math.max(0, c.need - (Date.now() - c.at)) : 0; setTimeout(fcHide, wait); setTimeout(fcEnd, Math.max(1400, wait + 300)); } return; }
   const T = TS(), sl = G.slots, has = re => Object.keys(sl).some(k => re.test(k)), mine = G.phase === 'place' && !G.pend && G.turn === 0;
   // rules, the first time they matter (each said once)
   if (G.phase === 'place' && G.round === 0) { fcSay('seats'); fcSay('goal'); fcSay('turns'); }
@@ -192,6 +196,8 @@ function fcPoll() {
       let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
       UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
     }
+    const ik = G.round + ':' + n; if (!F.idle || F.idle.k !== ik) F.idle = { k: ik, t: Date.now() };
+    else if (Date.now() - F.idle.t > 15000) { F.idle.t = Date.now() + 60000; const m = tutAdvise(G, 0); if (m && m.t === 'place') { UI.sel = -1; try { commit(0, m); } catch (e) { } } }
     return;
   }
   UI.cpt = null;
@@ -206,7 +212,7 @@ function fcEnd() {
   const btn = (id, label, pri) => { const b = h('button.fb' + (pri ? '.pri' : ''), { type: 'button', 'data-fin': id }, label); return b; };
   const el = h('div.fa-fin', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Check ride result' },
     h('div.fc', tsPortrait(win ? 'chief' : 'pell'), h('h2', win ? 'Check ride passed' : 'Not this time'), h('p', T.endText[win ? 'win' : 'lose']),
-      h('h3', 'Your final check'), h('ul.fchk', ...rows), win ? null : h('p.why', lossText(G.result)),
+      h('h3', 'Your final check'), h('ul.fchk', ...rows), win ? null : h('p.why', (t => t.split(/\s+/).length <= 12 ? t : 'The flight ended. The checklist shows why.')(lossText(G.result))),
       h('div.fr', win && F.pro && F.first ? btn('chapter', 'Start chapter 1', 1) : btn(win ? 'menu' : 'again', win ? 'Back to menu' : 'Try again', 1), win ? btn('again', 'Fly it again') : btn('menu', 'Back to menu')),
       h('h3', 'Things you will meet later'), h('ul.flat', ...later.map(t => h('li', t)))));
   el.addEventListener('click', e => {

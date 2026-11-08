@@ -188,5 +188,31 @@ ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;
 @media (min-width:900px){#trk .score,#trk .score i{font-size:16px}}
 /* portrait phone: the dock fits its content (gears, hand, Go) so Go never drops below the screen; the board keeps the rest */
 @media (max-width:999px) and (orientation:portrait){html #game .gx-dock{max-height:62dvh}}
+/* ---- R9 round 2 ---- */
+/* Go is the one big button; Boost and Swap sit small beside it */
+#acts .go{flex:1 1 auto;min-height:54px;font-size:22px}
+#acts .bo,#acts .swapb{flex:0 0 auto;min-height:40px;font-size:14px;padding:0 8px;border-radius:10px}
+/* phone hand: bigger cards that overlap a little at the edges */
+@media (max-width:899px){:root{--cw:clamp(44px,13.8vw,62px)}#hand{gap:0}#hand .cd+.cd{margin-left:calc(var(--cw)*-.055)}.cd .t{font-size:14px}.cd .k{font-size:14px}}
+/* drag a card up to play it (tap still works): the card lifts and glows, the zone above the hand lights up, it snaps on drop */
+.cd{touch-action:none}
+.cd.lift{z-index:5;transition:none!important;box-shadow:0 0 0 3px var(--gold),0 14px 24px rgba(0,0,0,.6)!important;cursor:grabbing}
+#hand{position:relative}
+#hand.dropz::before{content:"Drop here to play";position:absolute;left:4px;right:4px;bottom:calc(100% + 4px);height:40px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--gold);border-radius:12px;color:var(--gold);font-weight:800;font-size:15px;background:rgba(20,16,4,.82);z-index:4;pointer-events:none}
+#hand.dropon::before{background:rgba(255,194,58,.28);color:#fff}
+.cd.snap{animation:cdSnap .22s ease-out}@keyframes cdSnap{0%{transform:translateY(-30px) scale(1.12)}100%{transform:translateY(-12px)}}
+/* PC: the board fills the screen; hand, gears and Go are one bottom dock (no cropped board, no empty side panel) */
+@media (min-width:1000px) and (min-height:521px){
+  html #game .gx-main{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important}
+  html #game .gx-dock{border-left:0;border-top:2px solid #324059;max-height:none;width:auto}
+  html #game .gx-dock-head{display:none}
+  html #game .gx-dock-body{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);grid-template-areas:"trk panel" "msg panel";align-items:center;column-gap:18px;padding:8px 18px 10px;overflow:visible}
+  html #game #trk{grid-area:trk;margin:0}html #game #msg{grid-area:msg;border:0;border-radius:10px;justify-content:flex-start;text-align:left}
+  html #game #panel{grid-area:panel;display:grid;grid-template-columns:auto minmax(0,1fr) 250px;grid-template-areas:"gears hand acts" "tray tray tray";align-items:center;gap:6px 16px;padding:0}
+  html #game #gears{grid-area:gears;display:grid;grid-template-columns:auto 84px 84px;grid-template-rows:auto auto;gap:6px}html #game #gears .gl{grid-row:1/3;width:58px;max-width:none}html #game #gears{background-position:left center;background-size:auto 80%}
+  html #game #hand{grid-area:hand;flex-wrap:nowrap}html #game #acts{grid-area:acts;flex-wrap:wrap}html #game #acts .go{flex:1 1 100%;order:-1;min-height:60px}html #game #acts .bo,html #game #acts .swapb{flex:1 1 0}
+  html #game #tray{grid-area:tray}
+  html #game #panel:not(:has(#gears)){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center}
+}
 </style>
 </head>
