@@ -16,3 +16,27 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Addendum 5: phase strip (Shift Play Move React Discard) + round/lap/deck/discard in the dock head; on-track preview (path, ghost car, corner colours, heat cost / SPIN, slipstream likely); reason pops ("-2 heat: 7 in a 5"); one-line round rating in the banner vs the computer's best play.
 - Tests: champ-test.js (championship to a champion), shoot-v3.js (v3 shots). Visual baselines (title/menu/board) still need the owner's --approve-visual.
 - Addendum 7: Play (default) is clean: board, hand, tracker (phase strip + round/lap/deck), one score line ("You 2nd of 5 · Kit leads by 3", tap = why), Goal card before turn 1. Hints toggle (top bar, off by default, saved in rr_hints) brings back the track preview, corner warnings, round rating, leaderboard, Suggest, the bulb and the engine tray. Learn to play = the coached game (Hints forced on there). Scenario rr-play checks the clean screen.
+
+## W475 (branch shelf/W475-redline-feel): race-feel check against BRIEF-GAMEFEEL
+- Fixed: speedometer read 0 while planning (now revs to the planned speed as you tap cards); gear lever ignored the gear you
+  pick (now follows it and slides through the H-gate); rival turn said "Oto is up" twice; on-track pops vanished in 1.5 s and
+  stacked (now one at a time, hold 3 s + 1 s fade); no vibrate tick (card/gear/boost/spin/lights buzz via navigator.vibrate);
+  13px text on phone (all now 14px; card labels kept on one line); tap outside no longer closes locked cards (Goal, Learn intro).
+- Learn to play: first tutor step 'How you win' (cross the line first after one lap + 3 short points, Next). Cards step
+  targets two real cards (tutCard), so taps on the highlight land and the tutorial finishes by touch with no Skip.
+- Feel gate (feel-audit.js --secs 120 on the local build): (a)-(e) all 0; Learn ends at the result on phone and PC, 0 skips.
+  Long coach/rules lines split to <= 12 words.
+- shoot-feel.js: whole race by touch (390x844) and mouse (1440x900), shots in playable-shots/feel/, small-text check after 10 turns.
+- r2-test.js guide check expects the old 7-step tutorial (replaced in 3154a433): stale before W475, left as is.
+- Phone dock: the merged shell capped it at 44dvh, which pushed Go below the screen in Learn to play at 390x763; the dock now
+  takes up to 62dvh in portrait (head.html).
+- Still open: visual baselines need the owner's --approve-visual; cars are small on phone (camera zoom), lights overlay sits on
+  the board while turn 1 is already playable.
+
+## W475 round 2 (shelf/W475-redline-r2): reviewer R9 fixes
+- PC 1440x900: board fills the width; gears, hand and Go are one bottom dock (head.html, min-width 1000px).
+- Camera close (cam.s 0.75-1.3, cars ~70-100 px). sceneryLayer() in race.js: grass, trees, tents, stands, run-off sand and
+  tyre walls in the track art's flat style, drawn over the art with the road cut out.
+- Title: Quick game options collapsed everywhere; bg-title scaled 6% past cover so its white side bars fall off (titleBg).
+- Phone: bigger cards (13.8vw, slight overlap), Go is the big button, Boost/Swap small beside it.
+- Drag a card up to play it (lift, glow, drop zone, snap); tap still works. drag-test.js covers touch and mouse.

@@ -1,11 +1,12 @@
 // ===================== Tidewake: our own texts =====================
 const RULES_HTML=`
 <h3>How a round goes</h3>
-<ol><li><b>Choose a start mark.</b> Before any tile is laid, each captain in turn puts their junk on a gold mark on the outer edge. Numbers 1 to 6 run along the edges; each number has two marks.</li>
-<li><b>Roll.</b> At the start of your turn two dice are rolled and added together. A total of <b>6, 7 or 8</b> wakes every leviathan (see below). Any other total does nothing, except that the Maelstrom, if it is in play, stirs.</li>
-<li><b>Place.</b> Pick one of your three tiles, turn it any of four ways and lay it on the empty square in front of your junk. A gold line on the board shows the exact route your junk will sail, with a flag where it stops (the line turns red if it sinks you).</li>
-<li><b>Sail.</b> Your junk follows the wake through the new tile and on through every tile already connected, until it reaches an empty square. Any other junk waiting at the same square sails too.</li>
-<li><b>Draw</b> back up to three tiles. The turn passes clockwise.</li></ol>
+<p><b>Last junk afloat wins the lantern.</b></p>
+<ol><li><b>Start:</b> put your junk on a gold mark at the edge.</li>
+<li><b>Roll:</b> two dice. A 6, 7 or 8 wakes the leviathans.</li>
+<li><b>Place:</b> lay one tile in front of your junk. Drag it, or tap Place.</li>
+<li><b>Sail:</b> your junk follows the new line to its end.</li>
+<li><b>Draw</b> back to three tiles. Next captain.</li></ol>
 <h3>The idea</h3>
 <p>Every captain steers one junk across a 6 by 6 sea chart. You never steer directly: you lay <b>current tiles</b>, and your junk is carried along the wake lines printed on them. Hazards: the edge of the chart, other junks, and <b>leviathans</b> that wander the board. <b>The last junk afloat wins.</b></p>
 <h3>What sinks a junk</h3>

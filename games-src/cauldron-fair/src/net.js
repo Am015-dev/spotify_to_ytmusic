@@ -150,8 +150,8 @@ function applyNet(o) {
 function onNetRej(msg) { if (!isClient() || msg.peer !== NET.hostPeer) return; const e = msg.data && typeof msg.data.e === 'string' ? msg.data.e.slice(0, 160) : ''; NET.pend = 0; if (e && G && !/moved on/.test(e)) toast(e); }
 // ---- client -> host ----
 function netAct(m) {
-  if (!NET.room || !NET.hostPeer || !G || G.phase === 'over') { toast('Not connected to the host yet.'); return false; }
-  if (NET.mySeat < 0) { toast('You are watching this game.'); return false; }
+  if (!NET.room || !NET.hostPeer || !G || G.phase === 'over') { say('Not connected yet.'); return false; }
+  if (NET.mySeat < 0) { say('You are watching this game.'); return false; }
   const p = G.players[NET.mySeat], key = p.ver;
   if (NET.pend === key + 1 && Date.now() - NET.pendT < 2500) return false;            // the last message of this version is still on its way
   NET.pend = key + 1; NET.pendT = Date.now(); NET.sent++;

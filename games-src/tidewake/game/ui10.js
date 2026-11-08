@@ -20,13 +20,13 @@ function tutStart(o){if(NET.on)return;const pro=!!(o&&o.prologue);
       ready:()=>!!G&&UI.started}],
     endTitle:'Your race begins',endText:'Play freely: every move is yours. Grandmother Osk speaks up when a rule first matters.',endButtons:[{id:'go',label:'Cast off'}],
     setup:()=>oskBegin(pro),
-    onDone:()=>{OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
+    onDone:()=>{OSK.ready=1;OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
     onExit:()=>{tutLeave();showStart()}})}
 function oskBegin(pro){OSK.prologue=pro;try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
   const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:1,wave:1,maelstrom:1,cannon:1};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
   UI.tut=1;OSK.starting=1;try{startGame(s,{seed:20261107})}finally{OSK.starting=0}oskRig();
-  Object.assign(OSK,{on:true,said:{},later:[],q:[],cur:null,t0:0,logI:G.logN,riv:0,rivN:0,myLays:0,walk:null});
+  Object.assign(OSK,{ready:typeof GXT==='undefined'?1:0,on:true,said:{},later:[],q:[],cur:null,t0:0,logI:G.logN,riv:0,rivN:0,myLays:0,walk:null});
   UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}
   clearInterval(OSK.tmr);OSK.tmr=setInterval(oskTick,250);render();oskTick()}
 // stack the piles (only order changes; every piece is a real one): Rift Gate in your hand, a cannon 3rd from the top, the wave and the Maelstrom rise early
@@ -50,17 +50,22 @@ function oskFill(id,v){const t=OSK_TEXT[id]||[id,''];v=v||{};const f=x=>String(x
 // queue a line; rule ids are spoken once. pri: lower goes first
 function oskSay(id,v,o){o=o||{};if(!OSK.on||OSK.walk)return;const rule=OSK_RULES.indexOf(id)>=0;if(rule&&(OSK.said[id]||OSK.q.some(x=>x.id===id)))return;
   const [title,line]=o.text||oskFill(id,v);if(rule)OSK.said[id]=OSK.said[id]||'queued';OSK.q.push({id,title,line,also:o.also||[],pri:o.pri||5,rival:!!o.rival});OSK.q.sort((a,b)=>a.pri-b.pri)}
-function oskShowNext(){if(!OSK.q.length)return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
+function oskTutBusy(){return typeof GXT!=='undefined'&&GXT.running&&GXT.running()}
+function oskCalm(){const pc=document.getElementById('pc');return !UI.busy&&!(pc&&!pc.hidden)&&!document.querySelector('.gxt-end,#twgoal,.gx-goal,[aria-modal="true"]:not([hidden]),.gx-drawer.open,.gx-drawer[open]')}
+function oskShowNext(){if(!OSK.q.length||oskTutBusy()||!oskCalm()||(typeof GXT!=='undefined'&&!OSK.ready))return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
   for(const id of [n.id].concat(n.also))if(OSK_RULES.indexOf(id)>=0)OSK.said[id]=G?'turn '+G.turn:'shown';oskPlace()}
 function oskHide(){OSK.cur=null;const e=document.getElementById('osk');if(e)e.remove()}
 function oskHTML(c){return `<div class="osk-p" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#2c4a5e" stroke="#e3b24b" stroke-width="2"/><path d="M9 33c2-7 6-10 11-10s9 3 11 10" fill="#cfd8dc"/><circle cx="20" cy="16" r="7" fill="#f1c9a5"/><path d="M12 15c1-7 15-7 16 0-3-3-13-3-16 0z" fill="#eceff1"/><circle cx="31" cy="9" r="3.4" fill="#ffcf5a"/></svg><span>Osk</span></div><div class="osk-t"><b>${esc(c.title)}</b><span>${esc(c.line)}</span></div><button type="button" class="osk-x" data-osk="x" aria-label="Dismiss Osk's tip">&times;</button>`}
-function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on){if(e)e.remove();return}
-  const host=PH.on?document.getElementById('ps'):(document.getElementById('main')||{}).parentNode;if(!host)return;
+function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on||oskTutBusy()){if(e)e.remove();return}
+  const vis=id=>{const x=document.getElementById(id);return x&&!x.hidden?x:null};
+  const host=PH.on?(vis('pc')||vis('ppop')||document.getElementById('ps')):(document.getElementById('main')||{}).parentNode;if(!host)return;
   if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
   if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival)}
   const ref=PH.on?host.firstChild:document.getElementById('main');if(e.parentNode!==host||(PH.on&&host.firstChild!==e))host.insertBefore(e,ref)}
+// keep the tip on top when a card or pop-up opens over the strip (it moves with them, so it is never covered)
+setInterval(()=>{try{if(OSK.on&&OSK.cur)oskPlace()}catch(e){}},100);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-osk]');if(!b)return;e.stopPropagation();
-  if(b.dataset.osk==='x'){oskHide();oskShowNext()}else oskWalkStep(b.dataset.osk)},true);
+  if(b.dataset.osk==='x'){oskHide();OSK.hideT=Date.now()}else oskWalkStep(b.dataset.osk)},true);
 {const _r=render;render=function(){const r=_r.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r}}
 // ---------------------------------------------------------------- when each rule first matters (polled; reads the game, never changes it)
@@ -99,7 +104,7 @@ function oskTick(){if(!OSK.on||!G||!UI.started){return}
   // show: nothing up -> next; a tip up for 6 s (rival lines 4 s) gives way to a waiting rule
   const age=Date.now()-OSK.t0;
   const need=4000+Math.ceil(String(OSK.cur?OSK.cur.title+' '+OSK.cur.line:'').split(/\s+/).length/10)*1000;
-  if(!OSK.cur)oskShowNext();else if(OSK.q.length&&age>need)oskShowNext();
+  if(!OSK.cur){if(Date.now()-(OSK.hideT||0)>1200)oskShowNext()}else if(OSK.q.length&&age>need)oskShowNext();
   else oskPlace();
   if(G.over&&!UI.busy&&!OSK.walk&&OSK.said.end&&OSK.cur&&OSK.cur.id==='end'&&age>2500)oskWalkOpen()}
 // one line on your move: good (it sinks Cobalt) or poor (your bow now faces a leviathan's arrow)

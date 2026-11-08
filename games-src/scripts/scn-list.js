@@ -3,7 +3,8 @@ const { chromium } = require('playwright'), gx = require('./gx-serve.js');
 (async () => {
   let own = null, base = process.env.GX_URL;
   if (!base || !(await fetch(base).then(() => true, () => false))) { own = await gx.startServer({ stage: process.env.GX_STAGE }); base = own.base; }
-  const browser = await chromium.launch({ args: ['--no-sandbox'] }), out = {};
+  const fs = require('fs'); let exe; try { if (!fs.existsSync(chromium.executablePath()) && fs.existsSync('/opt/pw-browsers/chromium')) exe = '/opt/pw-browsers/chromium'; } catch (e) { }   // installed playwright newer/older than the machine's browser
+  const browser = await chromium.launch({ args: ['--no-sandbox'], executablePath: exe }), out = {};
   for (const slug of process.argv.slice(2)) {
     const page = await browser.newPage();
     await page.goto(`${base.replace(/\/+$/, '')}/${slug}/?scn=list`, { waitUntil: 'load', timeout: 45000 }).catch(() => { });

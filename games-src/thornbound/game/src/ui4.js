@@ -54,10 +54,10 @@ function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;
       const isNew=!UI._bidSeen[s]&&bidNow&&s!==me;UI._bidSeen[s]=1;
       if(s===me&&!G.bidRev&&!ev)bc='';
       else if(up){const v=(G.bstr&&G.bstr[s]!=null&&G.bstr[s]>=0)?G.bstr[s]:(b>=0?cinfo(b).strength:'?');bc='<span class="bidc up'+flip+'" aria-label="Bid '+v+'"><b>'+v+'</b></span>'}
-      else bc='<span class="bidc back'+(isNew?' new':'')+'" aria-label="Face-down bid"></span>'}
+      else bc='<span class="bidc back'+(isNew?' new':'')+'" data-b="'+FK[P.fac]+'" aria-label="Face-down bid"></span>'}
     const sb=P.supp&&P.supp.b?'<span class="rv-s" title="Supporters at home" aria-label="'+P.supp.b+' Supporters">'+ico('users')+P.supp.b+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,22)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+ico('card')+P.hand.length+sb+'</small></span>'+bc+'<span class="rv-n" data-s="'+s+'">'+P.inf+'</span>'+favs+'</button>'}).join('');
+      '<span class="rv-e">'+emb(s,22)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+(UI.lowGfx?ico('crown'):'<img class="rv-crown" src="models/crown'+(innerWidth<700?'@512':'')+'.webp" alt="" draggable="false" onerror="this.remove()">')+'</span>':'')+'</b><small>'+ico('card')+P.hand.length+sb+'</small></span>'+bc+'<span class="rv-n" data-s="'+s+'">'+P.inf+'</span>'+favs+'</button>'}).join('');
   const h='<div class="race-c'+(n>2?' many':'')+(n>3?' four':'')+'">'+chips+'</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;if(typeof hideGloss==='function')hideGloss();UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof bfFinger==='function')bfFinger();if(typeof sfx==='function')sfx('tap')}
@@ -78,13 +78,13 @@ function sizePopCard(){const el=$('#ppop');const c=el&&el.querySelector('.pp-car
 function popCard(id,read){const s=vs();const i=cinfo(id);const mine=!read&&ownerOf(id)===s;const acts=mine?optsFor(s,id):[];const rec=mine&&UI._rec&&G.q?UI._rec:null;let h='';
   if(acts.length){h+='<div class="pp-act">';for(const m of acts.slice(0,10)){const isRec=UI._recShown&&rec&&rec.k===m.k;h+='<button class="btn'+(isRec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(actLabel(m))+(isRec?' (suggested)':'')+'</button>'}
     h+='</div>'}
-  else if(mine)h+='<p class="hint">Nothing to do with this card right now.</p>';
+  else if(mine&&UI.guide!=='off')h+='<p class="hint">You can\u2019t play this card now.</p>';
   h+='<div class="pp-row"><div class="pp-card" data-cid="'+id+'" data-owner="'+ownerOf(id)+'"'+(mine?' data-up="1"':'')+'></div><div class="pp-info"><h4>'+esc(i.name)+'</h4>'+cardDetail(id)+'</div></div>';
-  if(i.kind==='hq')h+='<p class="hint">'+gloss('An HQ card is not a card for your hand: once bought it stays in front of you as a permanent power.')+'</p>';
+  if(i.kind==='hq')h+='<p class="pp-note">'+gloss('An HQ card is not for your hand. Once bought, it stays in front of you as a permanent power.')+'</p>';
   return popShell(esc(i.name),h,'pc-b')}
 function popKC(n){const k=TB.kingdomInfo(n);let who='';for(const P of G.pl){P.ks.forEach((T,j)=>{if(T&&T.kc===n)who='Held by '+P.name+(T.occ!=null&&UI.V.pl[P.seat].ks[j].occ>=0&&false?'':'')+'.'});if(P.sup.includes(n))who='In '+P.name+'\'s Supply.'}
   if(G.road.includes(n))who='On the Great Road.';
-  return popShell(esc(k.name),'<div class="pp-row"><div class="pp-card" data-kc="'+n+'"></div><div class="pp-info"><h4>'+esc(k.name)+'</h4><p class="cd-tx">'+gloss(k.text)+'</p><p class="cd-stat">'+gloss(SUIT_N[k.suit]+' suit · '+({board:'sits on your board, with a card tucked under it',supply:'goes to your Supply',region:'placed on a region',loc:'placed on a location','none':'one-shot'}[k.place]||k.place))+'</p><p class="hint">'+who+'</p></div></div>')}
+  return popShell(esc(k.name),'<div class="pp-row"><div class="pp-card" data-kc="'+n+'"></div><div class="pp-info"><h4>'+esc(k.name)+'</h4><p class="cd-tx">'+gloss(k.text)+'</p><p class="cd-stat">'+gloss(SUIT_N[k.suit]+' suit · '+({board:'sits on your board over one of your cards',supply:'goes to your Supply',region:'placed on a region',loc:'placed on a location','none':'one-shot'}[k.place]||k.place))+'</p><p class="pp-note">'+who+'</p></div></div>')}
 function heraldChips(l){const o=G.pl.filter(p=>p.herald===l);return o.length?o.map(p=>'<span class="hchip" style="--fc:'+fcol(p.seat)+'">'+esc(shortName(p.seat))+'</span>').join(' '):'<em>none yet</em>'}
 function popLoc(l){const s=vs();const L=DD.LOCS[l],V=UI.V;const q=G.q;let h='';
   h+='<p class="lc-r">'+esc(REG[l>>1])+' · reward <b>+'+L[2]+' Influence</b></p>';
@@ -119,7 +119,7 @@ function popRival(s){const V=UI.V,P=V.pl[s],f=TBKit.FACTIONS[FK[P.fac]];let h=''
   h+='<p class="lc-h"><b>'+gloss('Favour')+' power:</b> '+esc(DD.FAVOUR[P.fac].nm)+': '+gloss(DD.FAVOUR[P.fac].txt)+'</p>';
   return popShell(esc(P.name),h,'rv-b')}
 function popKingdom(){const V=UI.V;let h='';
-  if(!UI.lowGfx)h+='<img class="thr3" src="models/throne@512.webp" alt="" width="110" height="110" draggable="false" decoding="async" aria-hidden="true" onerror="this.remove()">'; // 3D throne render (models/throne), the hero of the Kingdom sheet
+  if(!UI.lowGfx)h+='<img class="thr3" src="models/throne'+(innerWidth<700?'@512':'')+'.webp" alt="" width="110" height="110" draggable="false" decoding="async" aria-hidden="true" onerror="this.remove()">'; // 3D throne render (models/throne), the hero of the Kingdom sheet
   h+='<h5>The Great Road</h5><div class="road4">'+V.road.map(n=>n?'<button class="kcth" data-a="kc" data-n="'+n+'" aria-label="'+esc(TB.kingdomInfo(n).name)+'">'+kcEl(n,52).outerHTML+'</button>':'<span class="kcth empty"></span>').join('')+'</div><p class="hint">Kingdom Card deck: '+V.kdeck.length+' left. Tap a card to read it.</p>';
   h+='<h5>Councils</h5>';for(const c of DD.COUNCILS){const ids=V.council[c];h+='<p class="lc-h"><b>'+esc(DD.COUNCIL_NAMES[c])+'</b>: '+(ids.length?ids.map(id=>esc(TB.cardName(G,id))+' ('+esc(shortName(ownerOf(id)))+', '+cinfo(id).votes+')').join(', '):'<em>empty</em>')+'</p><p class="small">'+esc(DD.COUNCIL_TXT[c])+'</p>'}
   h+='<h5>Favour and order</h5><p class="lc-h">Favour: '+(V.fav.h>=0?esc(nameOf(V.fav.h))+' ('+V.fav.u+' uses left)':'on the Gleaning Meadow')+'</p><p class="lc-h">Order this round: '+V.order.map((s,i)=>(i+1)+'. '+esc(shortName(s))).join(', ')+'</p><p class="lc-h">Lost Pile: '+V.lost.length+' card'+(V.lost.length===1?'':'s')+'.</p>';
@@ -128,13 +128,13 @@ function popKingdom(){const V=UI.V;let h='';
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
 function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
-const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
-  herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
+const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first. The card you bid then sits under it and cannot fight.'],
+  herald:['Heralds','Your Herald is public. Win a region and claim the location where your Herald stands. You gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
   menu:['Actions','Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step.'],
-  clashOrder:['Clash order','The player with the least Influence chooses the order of the three Clashes.'],
-  location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
-  bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
+  clashOrder:['Clash order','The player with least Influence picks the order of the three Clashes.'],
+  location:['Winning','The winner claims one of the region\'s two locations. That gives its Influence and its bonus.'],
+  bidRes:['Your bid','Take a Kingdom Card from the Great Road. Or steal a rival\'s, if your bid beats the card under it. Or take your card back.']};
 function maybeTip(){return typeof coachGate==='function'&&coachGate()}
 function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;
   // events, news and bids are played on the board itself (see bfEvent); only the pass screen and the final result use the card layer
@@ -189,7 +189,9 @@ function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const m
   const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';const nmS=s=>(s===me&&(NET.on||humans().length===1))?'You ('+sideName(s)+')':shortName(s);
   const endImg='<img class="endart" src="media/end-'+((iWon||(!NET.on&&humans().length!==1))?'win':'lose')+'.webp" alt="" draggable="false" onerror="this.remove()">';
   const crown=UI.lowGfx?'':'<div class="crownrow" aria-hidden="true"><img class="crown3" src="models/crown'+(innerWidth<700?'@512':'')+'.webp" alt="" draggable="false" decoding="async" onerror="this.parentNode.remove()"></div>';
-  const body=endImg+crown+'<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(nmS(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
+  const por=s=>'<img class="ovp" src="media/'+(TB_LEAD[FK[G.pl[s].fac]]||'camp-ysolde')+'.webp" alt="" draggable="false" onerror="this.style.visibility=\'hidden\'">';
+  const card='<div class="ovcard">'+endImg+'<div class="ovwin" style="--fc:'+fcol(win)+'">'+crown+por(win)+'</div></div>';
+  const body=card+'<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?'. Tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order'):'')+'.</p><ol class="rank pic">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"'+(s===win?' class="w"':'')+'>'+por(s)+'<b>'+esc(nmS(s))+'</b><span class="rn">'+G.pl[s].inf+'</span>'+(o.bonus&&o.bonus[s]?'<small>+'+o.bonus[s]+' from the emptied Site of Power</small>':'')+'</li>').join('')+'</ol>'+(typeof overBreakdown==='function'?'<details class="ovwhy"><summary>Where the Influence came from</summary>'+overBreakdown()+'</details>':'');
   const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
-  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. Suggestions show in rounds 1 and 2; after that tap Suggest a move when you want one.')+'</p>':'';
+  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time, try a full game from Play. Choose the faction whose story you like. Pick 3 players, 5 rounds. Suggestions show in rounds 1 and 2. After that, tap Suggest a move when you want one.')+'</p>':'';
   return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}

@@ -28,20 +28,21 @@ function goOn() {
 }
 function showTitle() {
   clearTimeout(schedule.t); closeInsp(); UI.camp = null; if ($('#goal') && !$('#goal').hidden) { $('#goal').hidden = true; UI.busy = false; } const st = $('#start'), o = UI.opts, sv = hasSave(), first = !UI.prefs.played;
+  const learn = `<button type="button" class="${first ? 'tbtn primary' : 'tsb'}" data-a="tut">Learn to play</button>`, play = `<button type="button" class="${first ? 'tsb' : 'tbtn primary'}" data-a="start">Play</button>`;
+  const who = o.hot ? 'Friends on this device' : o.opp === 0 ? 'Solo vs a rival crew' : o.opp + ' computer ' + (o.opp === 1 ? 'rival' : 'rivals');
   st.innerHTML = `<div class="tbox">
     <h1 class="logo">Vinegrave</h1><p class="tag2">Dig the ruins. Wake the guardians. Reach the temple.</p>
-    ${first ? '<button type="button" class="tbtn primary" data-a="start">Learn to play</button><button type="button" class="tsb" data-a="quick">Start a game<small>skip the guided round</small></button>'
-      : '<button type="button" class="tbtn primary" data-a="quick">Play</button>' + (sv ? '<button type="button" class="tsb" data-a="loadsave">Continue<small>your saved expedition</small></button>' : '<button type="button" class="tsb" data-a="tut">Guided round<small>learn or refresh the rules</small></button>')}
-    <div class="lbl">Rivals</div>
-    <div class="seg">${[[1, '1'], [2, '2'], [3, '3'], [0, 'Solo']].map(([v, l]) => `<button type="button" class="chipb${o.opp === v ? ' on' : ''}" data-a="opt" data-k="opp" data-v="${v}" aria-pressed="${o.opp === v}">${l}</button>`).join('')}</div>
-    <div class="seg">${['easy', 'normal', 'hard'].map(v => `<button type="button" class="chipb${o.lvl === v ? ' on' : ''}" data-a="opt" data-k="lvl" data-v="${v}" aria-pressed="${o.lvl === v}">${v[0].toUpperCase() + v.slice(1)}</button>`).join('')}
-      <button type="button" class="chipb${o.hot ? ' on' : ''}" data-a="opt" data-k="hot" data-v="${o.hot ? 0 : 1}" aria-pressed="${!!o.hot}">Friends on this device</button></div>
-    <div class="trow2"><button type="button" class="tsb" data-a="story">Story<small>${esc(campLine() || '3 regions, 10 stages')}</small></button>
-      <button type="button" class="tsb" data-a="tut">How to play<small>Guided first round</small></button></div>
+    ${first ? learn + play : play + learn}${sv ? '<button type="button" class="tsb" data-a="loadsave">Continue your expedition</button>' : ''}
+    <button type="button" class="tsb" data-a="story">Story<small>${esc(campLine() || '3 regions, 10 stages')}</small></button>
+    <button type="button" class="tset" data-a="tset" aria-expanded="${!!UI.tset}">Game settings: ${esc(who)}, ${o.lvl}</button>
+    <div class="tsets" ${UI.tset ? '' : 'hidden'}><div class="lbl">Rivals</div>
+    <div class="seg">${[[1, '1'], [2, '2'], [3, '3'], [0, 'Solo']].map(([v, l]) => `<button type="button" class="chipb${o.opp === v && !o.hot ? ' on' : ''}" data-a="opt" data-k="opp" data-v="${v}" aria-pressed="${o.opp === v}">${l}</button>`).join('')}<button type="button" class="chipb${o.hot ? ' on' : ''}" data-a="opt" data-k="hot" data-v="${o.hot ? 0 : 1}" aria-pressed="${!!o.hot}">Friends</button></div>
+    <div class="lbl">Computer skill</div><div class="seg">${['easy', 'normal', 'hard'].map(v => `<button type="button" class="chipb${o.lvl === v ? ' on' : ''}" data-a="opt" data-k="lvl" data-v="${v}" aria-pressed="${o.lvl === v}">${v[0].toUpperCase() + v.slice(1)}</button>`).join('')}</div></div>
   </div>`;
   st.hidden = false; if (typeof artApply === 'function') artApply(st); musicSync();
 }
-UIACT.opt = t => { const k = t.dataset.k, v = t.dataset.v; UI.opts[k] = k === 'lvl' ? v : +v; if (k === 'hot') UI.opts.hot = !!+v; showTitle(); };
+UIACT.tset = () => { UI.tset = !UI.tset; showTitle(); };
+UIACT.opt = t => { const k = t.dataset.k, v = t.dataset.v; UI.opts[k] = k === 'lvl' ? v : +v; if (k === 'hot') UI.opts.hot = !!+v; if (k === 'opp') UI.opts.hot = false; showTitle(); };
 UIACT.quick = () => {
   const o = UI.opts;
   if (o.hot) return startGame('hot', { np: Math.max(2, o.opp + 1) });
@@ -62,12 +63,12 @@ function campBest(id, sc) {
 }
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
-function showGoal() {   /* one card before turn 1: the aim in one sentence, three ways to score; every number's why is in Scores */
+function showGoal() {   /* one card before turn 1: how you win in one sentence, three ways to score */
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
-  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><p class="gk">Goal</p><p class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Have the most points after ' + G.rounds + ' rounds.'}</p>
-    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track: higher rows and the temple score most.</span></li><li>${ic('idol', 'idol')}<span>Discover ruins: idols are 3 points, beaten guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards: many score points; each Dread card costs 1.</span></li></ul>
-    <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button><p class="gs">Tap Scores any time to see why each number is what it is.</p></div>`;
+  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
+    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Dread cards cost 1.</span></li></ul>
+    <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
 UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.busy = false; render(); turnBanner(); goOn(); };
@@ -77,34 +78,37 @@ function showPass(s) {
 }
 function closeRes() { $('#rs').hidden = true; }
 function rows(i) { const s = VG.score(G, i); return [['Research track', s.research], ['Temple tiles', s.temple], ['Idols (3 each)', s.idols], ['Empty shrine slots', s.slots], ['Guardians (5 each)', s.guards], ['Card points', s.cards], ['Dread (-1 each)', s.fear], ['Total', s.total]]; }
+const CATS = [['research', 'up', 'Research'], ['temple', 'star', 'Temple'], ['idols', 'idol', 'Idols'], ['slots', 'leaf', 'Shrines'], ['guards', 'guard', 'Guardians'], ['cards', 'card', 'Cards'], ['fear', 'exile', 'Dread']];
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
-  const names = G.p.map(p => p.name).concat(G.rival ? [G.rival.name] : []), cols = G.p.map((p, i) => rows(i));
-  const wn = G.winner === -1 ? 'A tie!' : G.winner === -2 ? G.rival.name + ' wins.' : (UI.humans.length === 1 && G.winner === UI.humans[0] ? 'You win!' : G.p[G.winner].name + ' wins.');
-  let t = `<table><tr><th></th>${names.map(n => `<th>${esc(n.split(' ').find(w => w.length > 2 && !/^(Dr|Mr|Mrs|Ms|Prof)\.?$/.test(w)) || n)}</th>`).join('')}</tr>`;
-  rows(0).forEach((row, k) => { t += `<tr><td>${row[0]}</td>${cols.map(c => `<td>${k === 7 ? '<b>' + c[k][1] + '</b>' : c[k][1]}</td>`).join('')}${G.rival ? `<td>${k === 7 ? '<b>' + VG.rivalScore(G) + '</b>' : k === 0 ? V.GLASS_VP[Math.min(V.TOP, G.rival.rows)] : k === 5 ? G.rival.vp : '—'}</td>` : ''}</tr>`; });
-  t += '</table>';
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
   const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
   const cWon = def ? campIsWon(G, def) : iWon, m = def ? campMetrics(G) : null;
   let goals = '', line = '';
-  if (def) {   /* Story: the goals met (the stars the map will show), the cast's line, and on a loss a clear message + Try again */
+  if (def) {   /* Story: the goals met (the stars the map will show), the cast's line */
     const got = def.stars.map((st, i) => cWon && (i === 0 || (GXC.testStar ? GXC.testStar(st.test, m) : false)));
     goals = `<div class="rstars" aria-label="${got.filter(Boolean).length} of 3 stars">${got.map(g => `<span class="${g ? 'on' : ''}">★</span>`).join('')}</div><ul class="rgoals">${def.stars.map((st, i) => `<li class="${got[i] ? 'on' : ''}">${got[i] ? '✓' : '·'} ${esc(st.text)}</li>`).join('')}</ul>`;
     const op = def.opponent || {}, q = cWon ? op.praise : op.taunt;
     if (q) line = `<p class="rquote"><b>${esc(op.name)}:</b> “${esc(q)}”</p>`;
   }
-  const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : 'Defeat';
-  const tots = G.p.map((p, i) => VG.score(G, i).total).concat(G.rival ? [VG.rivalScore(G)] : []), myT = tots[UI.humans[0] || 0], best = Math.max.apply(null, tots.filter((x, i) => i !== (UI.humans[0] || 0)));
-  const margin = UI.humans.length === 1 && tots.length > 1 ? (myT > best ? ` You won by ${myT - best}.` : myT < best ? ` You scored ${myT}: ${best - myT} short.` : '') : '';
-  const sub = def && !cWon ? (G.winner === 0 ? 'You won the game but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again: the stage stays open.' : esc(wn) + margin;
+  // everyone, winner first: a big total, then each kind of points with its icon
+  const P = G.p.map((p, i) => ({ i, name: i === UI.humans[0] && UI.humans.length === 1 ? 'You' : p.name, sc: VG.score(G, i) })).concat(G.rival ? [{ i: -2, name: G.rival.name, sc: { research: V.GLASS_VP[Math.min(V.TOP, G.rival.rows)], cards: G.rival.vp, total: VG.rivalScore(G) } }] : []);
+  P.sort((a, b) => (b.i === G.winner) - (a.i === G.winner) || b.sc.total - a.sc.total);
+  const me = UI.humans[0] || 0, myT = VG.score(G, me).total, best = Math.max.apply(null, P.filter(x => x.i !== me).map(x => x.sc.total).concat([0]));
+  const wn = G.winner === -1 ? 'A tie!' : G.winner === -2 ? short(-2) + ' wins.' : (UI.humans.length === 1 && G.winner === me ? 'You win!' : short(G.winner) + ' wins.');
+  const tied = P.length > 1 && P[1].sc.total === P[0].sc.total, tb = tied && G.winner !== -1 ? `Tie on ${P[0].sc.total}. ${G.winner === me ? 'You win' : short(G.winner) + ' wins'} the tiebreak.` : '';
+  const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : tied && myT === P[0].sc.total ? 'Close loss' : 'Defeat';
+  const sub = def && !cWon ? (G.winner === 0 ? 'You won, but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again.'
+    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
+  const blk = (x, k) => `<div class="rp${k === 0 ? ' first' : ''}"><div class="rph"><span class="crest" style="--pc:${x.i >= 0 ? HEX[x.i] : '#9a9486'}"></span><span class="rpn">${esc(x.name)}</span><span class="rpt"><b data-n="${x.sc.total}">${x.sc.total}</b> points</span></div>
+    <div class="rcats">${CATS.filter(c => x.sc[c[0]]).map(c => `<span class="rcat${x.sc[c[0]] < 0 ? ' neg' : ''}">${ic(c[1], c[2])}<b data-n="${x.sc[c[0]]}">${x.sc[c[0]]}</b><small>${c[2]}</small></span>`).join('') || '<span class="rcat"><small>No points yet</small></span>'}</div></div>`;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
     : '<button type="button" class="tbtn" data-a="again">Play again</button>';
-  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}"><div class="rart" data-art="${G.winner === 0 ? 'result-win' : 'result-lose'}" aria-hidden="true"></div><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}${t}
-    <div class="trow2">${btns}</div>
-    <div class="trow2"><button type="button" class="tsb" data-a="look">Look at the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div>`;
+  r.innerHTML = `<div class="tbox rbox ${cWon ? 'won' : 'lost'}${P.length > 2 ? ' many' : ''}"><div class="rart" data-art="${cWon ? 'result-win' : 'result-lose'}" aria-hidden="true"></div><p class="rban">${head}</p><p class="win">${sub}</p>${goals}${line}<div class="rplayers">${P.map(blk).join('')}</div>
+    <div class="rbtns"><div class="trow2">${btns}</div>
+    <div class="trow2"><button type="button" class="tsb" data-a="look">See the island</button>${def ? (cWon ? '' : '<button type="button" class="tsb" data-a="campfin">Story map</button>') : '<button type="button" class="tsb" data-a="title">Title screen</button>'}</div></div></div>`;
   if (!def && UI.mode !== 'tutorial') { const fl = document.createElement('p'); fl.className = 'rquote'; fl.textContent = cWon ? V.STORY.quick.win : V.STORY.quick.lose; const w = r.querySelector('.win'); if (w) w.after(fl); }
-  r.querySelectorAll('table tr:last-child b').forEach(b => { const n = +b.textContent; if (!isFinite(n) || UI.fast || reducedMo()) return; const t0 = performance.now(); b.textContent = '0'; const tick = t => { const k = Math.min(1, (t - t0) / 1100); b.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });   /* the final count climbs */
+  if (!UI.fast && !reducedMo()) r.querySelectorAll('[data-n]').forEach((b, k) => { const n = +b.dataset.n; if (!isFinite(n)) return; b.textContent = '0'; const t0 = performance.now() + 300 + k * 60; const tick = t => { const f = Math.max(0, Math.min(1, (t - t0) / 1000)); b.textContent = String(Math.round(n * (1 - Math.pow(1 - f, 3)))); if (f < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });   /* every number counts up */
   r.hidden = false; if (typeof artApply === 'function') artApply(r); $('#toast').classList.remove('on'); musicSync(); try { sfx.play(cWon ? 'win' : 'fear'); } catch (e) { }
   if (def && m) campBest(def.id, m.score);
   if (!UI.resDone && UI.mode !== 'tutorial' && !camp && window.GNS && GNS.result) { UI.resDone = true; try { GNS.result({ game: 'vinegrave', mode: UI.mode === 'hot' ? 'hot' : UI.mode === 'solo' ? 'solo' : 'vs', level: UI.opts.lvl, seats: G.p.map((p, i) => ({ name: p.name, me: UI.humans.indexOf(i) >= 0, ai: p.ai || undefined })), winner: G.winner, scores: G.p.map((p, i) => VG.score(G, i).total), turns: G.turns }); } catch (e) { } }
@@ -120,20 +124,20 @@ function scoresEl() {
 }
 function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}</div>`).join('') : ''; return d; }
 const RULES_HTML = `<div class="rules">
-<h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer plays.</li><li><b>Play a card</b> from your hand for its goods (coins, compasses).</li><li><b>Go to a site</b>: pay its travel icons with cards. Dig at a camp, or explore a ruin with compasses.</li><li><b>Buy a card</b> from the market: items cost coins, artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds the most points wins.</li></ol>
+<h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
-<h3>The goal</h3><p>Explore the island for 5 rounds. The most points wins: research track, temple tiles, idols, guardians overcome and card points, minus 1 for every Dread card.</p>
-<h3>Your turn</h3><p>Do ONE main action, then the next explorer goes. When you cannot or do not want to act, pass: you are out until the next round. The round ends when everybody has passed.</p>
-<ul><li><b>Play a card</b> for its effect. Artifacts played from your hand cost 1 tablet. Dread cards do nothing.</li>
-<li><b>Dig</b>: send an explorer (you have 2) to a free site and pay its travel icons, then gain its loot. Each card you hold pays one travel icon (shown top right) and is discarded: a Jeep or a Boat also pays a Boot (a Jeep and a Boat never pay each other); a Plane pays anything; 2 coins buy a Plane.</li>
-<li><b>Discover</b> a hidden ruin: pay 3 compasses (deep ruins: 6) plus its travel. Flip it, take an idol, gain its loot, and a <b>guardian wakes</b> there.</li>
-<li><b>Overcome</b> a guardian where your explorer stands: pay its cost, take it (5 points) and keep its boon for one free use later.</li>
-<li><b>Buy</b> from the market: items with coins (to the bottom of your deck), artifacts with compasses (they work at once).</li>
-<li><b>Research</b>: climb with your magnifier, or let the notebook follow it. Pay the row's cost, gain its bonus; the first magnifier to rows 2, 4, 6 and 7 also takes an extra reward. Only the magnifier enters the temple (earlier arrivals score more); there it buys temple tiles. Ties go to the first explorer into the temple.</li></ul>
-<h3>Free actions</h3><p>Any time on your turn: use a guardian's boon, or set one idol in a shrine for a one-time boon (idols score 3 either way). Your board has 4 shrine slots worth 1, 1, 1 and 2 points while they stay empty: each idol you set fills the next slot and loses its points.</p>
-<h3>End of a round</h3><p>Explorers come home. An explorer still sharing a site with a guardian brings back a Dread card (when the 19 Dread cards run out: a fear tile, -2). Played cards go to your discard; you keep unplayed cards and draw up to 5. The market shifts: the item and the artifact beside the divide leave, and one more artifact slot opens.</p>
-<h3>Solo</h3><p>A rival expedition plays one card after each of your actions: it camps on sites, takes market cards, climbs research and hunts guardians. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own (discovering costs 3 compasses for a ruin, 6 for a deep ruin).</li><li>One idol a turn into a shrine; 4 shrine slots; a shrine gives its boon at once.</li><li>No assistants, no bonus tiles on research rows (only first-arrival rewards), no expansion material or alternate board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
+<h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
+<h3>Your turn</h3><p>Do one action, then the next explorer goes. Pass to sit out.</p>
+<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread does nothing.</li>
+<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then is discarded. A Plane pays any icon.</li>
+<li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>
+<li><b>Fight</b> a guardian where your explorer stands. Pay its cost for 5 points and a boon.</li>
+<li><b>Buy</b>: items go under your deck. Artifacts work at once.</li>
+<li><b>Research</b>: climb the track. Pay each row's cost for its bonus.</li></ul>
+<h3>Free actions</h3><p>Use a boon, or set one idol in a shrine.</p>
+<h3>End of a round</h3><p>Explorers come home. Anyone with a guardian gains Dread.</p>
+<h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
+<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>One idol a turn into a shrine. 4 shrine slots. Boons come at once.</li><li>No helpers and no research bonus tiles. First arrivals get rewards.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -168,7 +172,7 @@ function menu() {
   GX.settings({ id: 'setd', title: 'Menu',
     game: S => { S.appendChild(GX.row('This game', [b('Restart', restartGame), b('Title', showTitle), b('Story map', storyOpen)])); },
     sound: S => { S.appendChild(GX.row('Sound effects', GX.onoff(UI.prefs.sound !== false, v => { UI.prefs.sound = v; savePrefs(); }))); S.appendChild(GX.row('Music', [GX.onoff(UI.prefs.music !== false, v => { UI.prefs.music = v; savePrefs(); musicSync(); }), b('Pick songs', () => { try { GXMUS.open(); } catch (e) { } })])); },
-    help: S => { S.appendChild(GX.row('Learn', [b('Rules', () => setTimeout(() => GX.show('rulesd'), 50)), b('Tutorial', () => tutStart()), b('All cards', () => setTimeout(() => cardsOpen(), 50))])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
+    help: S => { S.appendChild(GX.row('Hints', GX.onoff(!!UI.prefs.hints, v => { UI.prefs.hints = v; savePrefs(); try { GXH.setEnabled(hintsOn()); if (!hintsOn()) GXH.hide(); } catch (e) { } render(); }))); S.appendChild(GX.row('Learn', [b('Rules', () => setTimeout(() => GX.show('rulesd'), 50)), b('Tutorial', () => tutStart()), b('All cards', () => setTimeout(() => cardsOpen(), 50))])); if (window.GXH) { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'gx-row', btnClass: 'btn' }); S.appendChild(w); } },
     about: { name: 'Vinegrave', version: '1.0', text: 'An original jungle-expedition game for the Game Night Shelf. Temporary icons made by Lorc, Delapouite and Caro Asercion, game-icons.net, CC BY 3.0.' } });
 }
 // Restart: the same kind of game again (a Story stage restarts that stage)
@@ -185,7 +189,7 @@ function helpPhase() {
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'play') return $(`#hand .cd[data-i="${m.i}"]`); if (m.s != null) return $(`.site[data-i="${m.s}"]`); if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
-  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#acts .btn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`);
   if (m.t === 'ans') { if (G.q.h === 'site' && m.v != null) return $(`.site[data-i="${m.v}"]`); if (G.q.h === 'buy' && m.v != null) return $(`#row .cd[data-r="${m.v}"]`); return $('#qbox'); }
   return null;
 }
@@ -193,16 +197,16 @@ function helpInit() {
   if (!window.GXH) return;
   const P = (t) => () => `<svg viewBox="0 0 24 24" width="48" height="48"><use href="#s-${t}"/></svg>`;
   GXH.init({ game: 'vinegrave', defaultOn: false,
-    steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee at round end with a Dread card.', pic: P('guard') },
+    steps: { guard: { target: () => $('.site .gd'), title: 'A guardian wakes', text: 'Overcome it for 5 points, or flee and take a Dread card.', pic: P('guard') },
       idol: { target: () => $('#extra [data-a=idol]'), title: 'You found an idol', text: 'Worth 3 points. Set it in a shrine for a boon too.', pic: P('idol') },
-      'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards makes your deck stronger.', pic: P('exile') } },
-    rules: [{ title: 'How a turn works', text: 'One action, then the next explorer: play a card, go to a site, or buy a card. Nothing to do? Pass.', pic: P('star') },
-      { title: 'The goal', text: 'Five rounds. Points from research, temple, idols, guardians and cards. Dread costs 1 each.', pic: P('star') },
-      { title: 'Travel', text: 'Each card pays one travel icon. A Jeep or Boat pays a Boot too; a Plane pays anything; 2 coins buy a Plane.', pic: P('boot') },
-      { title: 'Discover', text: 'Three compasses and travel flip a hidden ruin: idol, loot, and a guardian wakes.', pic: P('compass') },
-      { phase: 'guard', title: 'Overcome', text: 'Pay the guardian\'s cost while your explorer is there: 5 points and a one-time boon.', pic: P('guard') },
-      { phase: 'idol', title: 'Shrines', text: 'One idol a turn into a shrine: an instant boon. It still scores 3.', pic: P('idol') }],
-    avoid: '.glow,#acts .btn,#qbox .btn,#insp' });
+      'q-exile': { target: () => $('#qbox'), title: 'Exile a card', text: 'Removing Dread cards helps your deck.', pic: P('exile') } },
+    rules: [{ title: 'How a turn works', text: 'One action, then the next explorer. Nothing to do? Pass.', pic: P('star') },
+      { title: 'The goal', text: 'Five rounds. Score from research, idols, guardians and cards. Dread costs 1.', pic: P('star') },
+      { title: 'Travel', text: 'Each card pays one travel icon. A Plane pays any icon.', pic: P('boot') },
+      { title: 'Discover', text: 'Three compasses flip a hidden ruin. You get an idol and loot.', pic: P('compass') },
+      { phase: 'guard', title: 'Overcome', text: 'Pay its cost while you are there: 5 points and a boon.', pic: P('guard') },
+      { phase: 'idol', title: 'Shrines', text: 'Set one idol a turn in a shrine for a boon.', pic: P('idol') }],
+    avoid: '.glow,#pacts .btn,#qbox .btn,#insp' });
   if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
 }
 // ---------------------------------------------------------------- music (silent until files exist in media/music)

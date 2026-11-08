@@ -74,9 +74,12 @@ function raceHud(now, W, H) {
     cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
     cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
     /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
-    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = c.gear;
+    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = (G.phase === 'plan' && c.i === UI.seat && !c.plan && !UI.busy) ? UI.gear : c.gear;   /* lever follows the gear you pick */
+    RACE.gk = RACE.gk == null || UI.fast || window.ANIM === false ? gear : RACE.gk + (gear - RACE.gk) * 0.25; if (Math.abs(RACE.gk - gear) < 0.02) RACE.gk = gear;
     cx.strokeStyle = '#59627a'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(gx, gy); cx.lineTo(gx, gy + gh); cx.moveTo(gx + gw, gy); cx.lineTo(gx + gw, gy + gh); cx.moveTo(gx, gy + gh / 2); cx.lineTo(gx + gw, gy + gh / 2); cx.stroke();
-    var kx = gx + (gear >= 3 ? gw : 0), ky = gy + (gear % 2 ? 0 : gh); cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
+    var gpos = function (g) { return [gx + (g >= 3 ? gw : 0), gy + (g % 2 ? 0 : gh)]; }, gf = Math.floor(RACE.gk), gt = Math.min(4, gf + 1), gq = RACE.gk - gf, pa = gpos(gf), pb = gpos(gt), kx, ky;
+    /* knob path through the H-gate: out to the middle bar, across, then in */
+    if (gq === 0) { kx = pa[0]; ky = pa[1]; } else { var mid = gy + gh / 2; if (gq < 0.33) { kx = pa[0]; ky = pa[1] + (mid - pa[1]) * gq / 0.33; } else if (gq < 0.66) { kx = pa[0] + (pb[0] - pa[0]) * (gq - 0.33) / 0.33; ky = mid; } else { kx = pb[0]; ky = mid + (pb[1] - mid) * (gq - 0.66) / 0.34; } } cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
     cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(R * 0.32) + 'px sans-serif'; cx.fillText(String(gear), kx, ky + 1);
     /* heat gauge: fills as engine heat is burned; red = close to a spin */
     var cap = ENGINE0 + (c.xh || 0), used = cap - c.eng, hx = gx + gw + 18, hw = R * 0.5, hy = by + 8, hh = R * 2 - 4, hf = Math.max(0, Math.min(1, used / cap));
@@ -164,7 +167,7 @@ function champResult() {
 /* ---------- Play mode: the "why" of the race order opens on tap only ---------- */
 function scoreWhy() {
   var rk = rankList(G), N = T(G).N, rows = rk.map(function (ci, k) { var c = G.cars[ci]; return '<tr class="' + (c.human ? 'you' : '') + '"><td>' + (k + 1) + '</td><td><i class="pc" style="background:' + COLS[c.col].hex + '"></i>' + esc(c.human && !G.hot ? 'You' : c.name) + '</td><td>' + (c.fin ? 'finished ' + ord(c.fin) : 'lap ' + Math.min(G.laps, Math.floor(c.pos / N) + 1) + ', ' + (total(G) - c.pos) + ' to go') + '</td><td>heat ' + c.eng + '</td></tr>'; }).join('');
-  modal('<h2>Race order</h2><p>The car furthest round the track is ahead. Two cars on one space: the one that got there first is ahead. The race ends when every car has crossed the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
+  modal('<h2>Race order</h2><p>The car furthest round the track is ahead. Two cars on one space? The first one there is ahead. The race ends when all cars finish ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
 }
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
@@ -178,4 +181,48 @@ function setHints(on) {
   var b = document.getElementById('hintT'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.firstChild.textContent = on ? 'Hints ✓' : 'Hints'; b.setAttribute('aria-label', 'Hints ' + (on ? 'on' : 'off')); b.classList.toggle('on', !!on); }
   var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
   if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
+}
+/* ---------- scenery (R9: "fill the infield, not a flat grey strip"): grass, trees, stands, run-off sand in the track art's
+   flat style, drawn over the art with the road cut out, so the art's road and kerbs stay on top. One cached layer per track. */
+var SCENE = {};
+function sceneryLayer(id) {
+  if (SCENE[id]) return SCENE[id];
+  var tk = TK[id], c = document.createElement('canvas'); c.width = 1000; c.height = 600; var g = c.getContext('2d'); g.scale(0.5, 0.5);
+  var seed = 7; for (var q = 0; q < id.length; q++) seed = (seed * 31 + id.charCodeAt(q)) >>> 0;
+  function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  function dRoad(x, y) { var m = 1e9; for (var i = 0; i < tk.dense.length; i += 2) { var p = tk.dense[i], d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y); if (d < m) m = d; } return Math.sqrt(m); }
+  /* grass with mowing stripes */
+  g.fillStyle = '#2d6a45'; g.fillRect(0, 0, 2000, 1200);
+  g.fillStyle = '#327550'; for (var sx = -1200; sx < 2000; sx += 120) { g.beginPath(); g.moveTo(sx, 1200); g.lineTo(sx + 60, 1200); g.lineTo(sx + 60 + 1200, 0); g.lineTo(sx + 1200, 0); g.closePath(); g.fill(); }
+  /* run-off sand on the outside of every corner */
+  tk.list.forEach(function (k) {
+    var a = tk.at(k.idx * tk.seg), ox = a.x - Math.sin(a.a) * 150, oy = a.y + Math.cos(a.a) * 150;
+    g.save(); g.translate(ox, oy); g.rotate(a.a); g.fillStyle = '#d9c08a'; g.beginPath(); g.ellipse(0, 0, 150, 58, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(160,130,80,.35)'; for (var t = 0; t < 14; t++) { g.beginPath(); g.arc((rnd() - .5) * 220, (rnd() - .5) * 70, 3, 0, 7); g.fill(); } g.restore();
+    /* tyre wall behind the sand */
+    var wx = a.x - Math.sin(a.a) * 222, wy = a.y + Math.cos(a.a) * 222;
+    for (var w = -5; w <= 5; w++) { var px = wx + Math.cos(a.a) * w * 22, py = wy + Math.sin(a.a) * w * 22; g.fillStyle = '#1b1e24'; g.beginPath(); g.arc(px, py, 10, 0, 7); g.fill(); g.fillStyle = w % 2 ? '#e8e4d8' : '#d23a2c'; g.beginPath(); g.arc(px, py, 4.5, 0, 7); g.fill(); }
+  });
+  /* grandstands along the start straight, on the outside */
+  [-3, -1.6, 1.6].forEach(function (o, n) {
+    var a = tk.at(o * tk.seg * 1.4), bx = a.x - Math.sin(a.a) * 205, by = a.y + Math.cos(a.a) * 205;
+    if (bx < 90 || bx > 1910 || by < 60 || by > 1140) return;
+    g.save(); g.translate(bx, by); g.rotate(a.a);
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(-106, -26, 220, 64); g.fillStyle = '#5a6478'; g.fillRect(-110, -32, 220, 64); g.fillStyle = '#c8352b'; g.fillRect(-110, -38, 220, 10);
+    var cols = ['#ffd24a', '#4a9bff', '#ff6b5a', '#f1f4fa', '#3ec47c', '#c08cff'];
+    for (var r = 0; r < 3; r++) for (var s = 0; s < 18; s++) { g.fillStyle = cols[(r * 7 + s * 3 + n) % cols.length]; g.beginPath(); g.arc(-100 + s * 11.8, -16 + r * 17, 4.6, 0, 7); g.fill(); }
+    g.restore();
+  });
+  /* trees and tents wherever there is room (not on or next to the road) */
+  for (var y = 60; y < 1160; y += 64) for (var x = 60; x < 1960; x += 64) {
+    var px = x + (rnd() - .5) * 44, py = y + (rnd() - .5) * 44, d = dRoad(px, py), r0 = rnd();
+    if (d < 175) continue;
+    if (r0 < 0.3) { var R = 22 + rnd() * 16; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(px + 7, py + 9, R, 0, 7); g.fill(); g.fillStyle = '#1f5a36'; g.beginPath(); g.arc(px, py, R, 0, 7); g.fill(); g.fillStyle = '#2b7646'; g.beginPath(); g.arc(px - R * .25, py - R * .25, R * .62, 0, 7); g.fill(); }
+    else if (r0 < 0.47 && d < 330) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(px - 26, py - 16, 58, 40); var tc = rnd() < .5 ? '#e8e4d8' : '#ffb347'; g.fillStyle = tc; g.beginPath(); g.moveTo(px - 30, py + 18); g.lineTo(px, py - 22); g.lineTo(px + 30, py + 18); g.closePath(); g.fill(); g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.moveTo(px, py - 22); g.lineTo(px + 30, py + 18); g.lineTo(px, py + 18); g.closePath(); g.fill(); }
+  }
+  /* cut the road out so the track art's road, kerbs and start line show through */
+  g.globalCompositeOperation = 'destination-out'; g.lineJoin = 'round'; g.lineCap = 'round'; g.lineWidth = 172; g.beginPath();
+  tk.dense.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.stroke();
+  g.globalCompositeOperation = 'source-over';
+  return (SCENE[id] = c);
 }

@@ -3,7 +3,7 @@ html.sk{--sk-ink:#2b1d0c;--sk-cream:#fdf1d4;--sk-num:#3b2706;--sk-num-done:#fff4
 html.sk .btn{display:inline-flex;flex-direction:column;align-items:center;border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 8px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .btn.pri,html.sk .btn.go,html.sk .btn.on{border-image-source:url(media/ui-button-go-c.webp);color:#2b1d0c}
 html.sk .btn:disabled{opacity:.5}
-html.sk .gx-bar .gx-ibtn{color:#fdf1d4}
+html.sk .gx-bar .gx-ibtn{color:#1f1408}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.9)}
 /* oxygen tanks, boss hearts, air label */
 html.sk-tank .tank{width:24px;height:40px;border:0;border-radius:0;background:url(media/icon-tank-empty.webp) center/contain no-repeat}
@@ -74,11 +74,13 @@ body:has(.gx-drawer.on) .gxh-bub:not(.gxt-bub),body:has(.gx-drawer.on) .gxh-ring
 #tskip{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:54;min-height:44px;min-width:120px;padding:0 14px;border-radius:22px;border:1px solid rgba(255,255,255,.35);background:rgba(8,16,36,.72);color:#fff;font:700 14px/1 inherit;cursor:pointer}
 #tend .tjobs{list-style:none;margin:0;padding:0;text-align:left;font-size:14px}#tend .tjobs li{padding:6px 8px;margin:3px 0;border-radius:8px;background:rgba(0,0,0,.07)}#tend .tjobs li.ok b{color:#2c7a43}#tend .tjobs li.bad b{color:#a63a26}
 #tend .tlater{text-align:left;font-size:14px}#tend .tlater summary{min-height:44px;display:flex;align-items:center;font-weight:800;cursor:pointer}#tend .tlater ul{margin:0;padding-left:18px}
-#hintstog.on{background:#ffd873;color:#14213d}#hintstog{padding:0 3px}#hintstog span{display:inline!important;font-size:14px;font-weight:800}#bulbbtn[hidden]{display:none!important}.goal{margin:6px 0;padding-left:20px;text-align:left}.goal li{margin:4px 0}
+#hintstog.on{background:#ffd873;color:#14213d}#hintstog{padding:0 11px;min-width:60px}#hintstog span{display:inline!important;font-size:14px;font-weight:800}#bulbbtn[hidden]{display:none!important}.goal{margin:6px 0;padding-left:20px;text-align:left}.goal li{margin:4px 0}
 .dbox p.lead{font-weight:800;font-size:17px;margin:4px 0 2px}
 
 /* ===== W479 feel pass: readable text, no dark-on-dark, one hand row that shows every card, a centred table on wide screens ===== */
-html .seat .nm,html .me .nm{background:#f3e6bf!important;color:#231a10!important;text-shadow:none!important;text-indent:0!important;padding:1px 7px;border-radius:7px;font-size:14px;line-height:1.25}
+html .seat:not(.drone) .top .nm,html .me .nm{display:flex;align-items:center;justify-content:center;aspect-ratio:192/72;box-sizing:border-box;padding:0 12px;min-width:64px;font-size:14px;line-height:1.1;text-indent:0!important}
+html:not(.sk-seat) .seat .nm,html:not(.sk-seat) .me .nm{background:#f3e6bf!important;color:#231a10!important;text-shadow:none!important;border-radius:7px}
+html.sk-seat .seat:not(.drone) .top .nm,html.sk-seat .me .nm{background:linear-gradient(#f3e6bf,#f3e6bf) center/calc(100% - 16px) calc(100% - 12px) no-repeat,url(media/ui-seat.webp) center/100% 100% no-repeat!important;color:#140c04!important;text-shadow:none!important;border-radius:0}
 html .seat .bdgs{flex-direction:column;align-items:flex-start;gap:2px}
 html .bdg{font-size:14px;height:22px;line-height:22px;gap:4px;padding:0 7px 0 5px}
 html .bdg .bl{font-size:14px;font-weight:700;color:var(--ink2)}
@@ -138,3 +140,17 @@ html .bdg b,html .bdg span,html .pbtn span,html .seat .bdg b,html .me .bdg b,htm
 @media (min-width:1024px){
   #start *,.ttl *,.gxt-menu *,.cpic figcaption,.ttl-in .logo span,.ttl-in .tag,.tbtn b,.tbtn span,.tbtn small,.gx-drawer *,.ppop *,#dlg *,.gxh-bub *,.gxt-bub *,#tskip,#tbub *{font-size:max(16px,1em)!important}
 }
+
+/* W479 deploy gate: painted cream drawers need dark headings, bar plates need dark ink, a busy tap on a card still answers */
+html.sk .gx-drawer h3,html.sk .gx-drawer .rules h3{color:#5a3306}
+html.sk .gx-drawer-head button{color:#fff;text-shadow:0 1px 3px #000;font-size:22px}
+.hc.nudge{animation:nudge .3s}
+@keyframes nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (min-width:1024px){
+  .gxc-screen *,.gxh-bd *,#setbody *,.gx-bar .gx-ibtn span,#hintstog span,.bdg b,.bdg span,.seat .nm,.me .nm,.mrow *{font-size:max(16px,1em)!important}
+}
+
+html.sk .gx-drawer h3{display:inline-block;background:#f3e6bf;color:#5a3306;padding:1px 10px;border-radius:7px}
+html.sk .gx-drawer-body{padding-left:26px;padding-right:26px}
+html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:none!important;border:2px solid #d9b04a;border-radius:50%;color:#fff}
+@media (min-width:1024px){.gxc-path *,.gxc-act *,.gxc-act small,.gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:max(16px,1em)!important}}

@@ -14,13 +14,13 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
-   <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
-   <div class="seg" role="group" aria-label="Computer level">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
+   <div class="seg" role="group" aria-label="Crew size"><span class="seglbl">Crew</span>${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
+   <div class="seg" role="group" aria-label="Computer level"><span class="seglbl">Computer</span>${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
       <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
-   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small><span class="cast" aria-hidden="true"><i class="c-brix"></i><i class="c-quill"></i><i class="c-mole"></i></span></button>
    <button class="btn wide" data-a="offeryes">${ico('book')}Learn to play<small>A coached first game</small></button>
    ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
-   <details class="more"${more?' open data-full="1"':''}><summary>More</summary>${more?`
+   <details class="more"${more?' open data-full="1"':''}><summary>More: seats, online play, all jobs <span aria-hidden="true">▾</span></summary>${more?`
     <div class="seg"><button class="btn small${seatMode(s)==='solo'?' on':''}" data-a="preset" data-v="solo">${ico('user')}Solo</button><button class="btn small${seatMode(s)==='hot'?' on':''}" data-a="preset" data-v="hot">${ico('four')}One phone</button><button class="btn small${seatMode(s)==='watch'?' on':''}" data-a="preset" data-v="watch">${ico('eye')}Watch</button></div>
     ${onlineBlock()}<h2>${ico('map')} All jobs</h2>${jobs}`:''}</details>
   </div></div>`;paintIcons($('#start'))}

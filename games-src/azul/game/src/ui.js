@@ -121,15 +121,19 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='star
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const lvAll=o.lv[1]||'normal';
   const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
-  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, tile your wall. Most stars wins.</p>
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>
    <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>${NET.on?'':'<div class="acts"><button class="btn" data-a="tutorial">Learn to play</button></div>'}
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
+   ${(()=>{const RO=sgRoster();if(!RO.length||NET.on)return '';const cur=o.rival||'tamsin';return `<div class="qrow sg-rvrow"><span>Rival</span><div class="sg-rivals" role="radiogroup" aria-label="Rival">${RO.map(r=>`<button class="sg-rv${r.id===cur?' on':''}" data-rival="${r.id}" role="radio" aria-checked="${r.id===cur}" aria-label="${esc(r.nm)}" title="${esc(r.nm)}"><img src="media/${r.pic}" alt="" loading="eager"></button>`).join('')}</div></div><div class="sg-rvname">${esc((RO.find(r=>r.id===cur)||RO[0]).nm)}</div>`})()}
    <div class="qrow"><span>Computer</span><div class="seg">${['easy','normal','hard'].map(l=>`<button class="${lvAll===l?'on':''}" data-alv="${l}">${l}</button>`).join('')}</div></div>
    ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">★ Story</button></div>'}
    <details class="more"><summary>More options</summary>
+   ${(()=>{const T=[['default','Courtyard'],['prism-light','Prism light'],['unmarked-slate','Slate'],['sun-palace','Sun palace']],B=[['default','Clay'],['guild-seal','Guild seal'],['lamplight','Lamplight']];const ct=o.table||'default',cb=o.back||'default';
+     return `<div class="qrow sg-look"><span>Table</span><div class="sg-thumbs">${T.map(([k,n])=>`<button class="sg-th${k===ct?' on':''}" data-tbl="${k}" aria-pressed="${k===ct}" aria-label="${n} table" title="${n}"><img src="media/table-${k}.webp" alt=""></button>`).join('')}</div></div>
+   <div class="qrow sg-look"><span>Tile back</span><div class="sg-thumbs">${B.map(([k,n])=>`<button class="sg-th sq${k===cb?' on':''}" data-back="${k}" aria-pressed="${k===cb}" aria-label="${n} tile back" title="${n}"><img src="media/back-${k}.webp" alt=""></button>`).join('')}</div></div>`})()}
    <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${seats}</div>
-   <div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
+   <div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>you choose the space. No glaze twice per row or column.</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
    ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}${NET.on||typeof tutBtn!=='function'?'':'<div class="acts">'+tutBtn('btn')+'</div>'}</details></div>`}
@@ -194,7 +198,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   if(d.slot){return on3DPick({k:'tile',sl:d.slot})}
   if(d.kiln!=null)return on3DPick({k:'kiln',i:+d.kiln});if(d.ctr!=null)return on3DPick({k:'ctr'});
   if(d.np||d.alv){const same=b.classList.contains('on');if(same){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash');sfx('click');return}}   // tapping the chosen option still answers: a short press flash
-  if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
+  if(d.tbl){UI.setup.table=d.tbl;try{localStorage.setItem('sgz_table',d.tbl)}catch(e){}sfx('click');render();return}if(d.back){UI.setup.back=d.back;try{localStorage.setItem('sgz_back',d.back)}catch(e){}sfx('click');render();return}if(d.rival){UI.setup.rival=d.rival;sfx('click');render();return}if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
   if(d.alv){for(let i=0;i<4;i++)UI.setup.lv[i]=d.alv;render();return}
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
@@ -209,8 +213,13 @@ function uiAct(a){switch(a){case 'start':if(typeof tutOffer==='function'&&tutOff
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
 function openStart(){UI.modal='start';render()}
+// W466: rivals are the story cast (owner portraits media/camp-*.webp); quick play lets you pick who you face
+try{UI.setup.table=localStorage.getItem('sgz_table')||'';UI.setup.back=localStorage.getItem('sgz_back')||''}catch(e){}   // W466: every table and tile back is choosable from the start (More options)
+function sgRoster(){try{const c=(window.CAMPAIGN||{}).cast||{};return Object.keys(c).filter(k=>k!=='guide').map(k=>({id:k,nm:String(c[k].name||k).replace(/^(Master|The) /,'').split(/[ ,]/)[0],pic:c[k].portrait||('camp-'+k+'.webp')}))}catch(e){return []}}
+function sgPicOf(nm){const r=sgRoster().find(x=>x.nm===nm);return r?r.pic:null}
 function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;const seats=o.seats.slice(0,o.np);
-  UI.modal=null;newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
+  UI.modal=null;const RO=sgRoster();const ri=Math.max(0,RO.findIndex(r=>r.id===(o.rival||'tamsin')));let k=0;const names=seats.map((s,i)=>s==='ai'&&RO.length?RO[(ri+(k++))%RO.length].nm:PNAMES[i]);
+  newGame({np:o.np,seats,names,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------

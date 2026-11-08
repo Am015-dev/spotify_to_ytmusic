@@ -5,7 +5,7 @@ const PH={on:false,land:false,pop:null,pd:null,zoom:false,zk:'',cur:null,mphHide
 const PH_REGION=[-4.02,4.02,-4.02,4.02];
 const PH_ICO={tile:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 4q0 8 8 8M4 14q6 0 6 6"/></svg>',mon:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c2-6 5-8 9-8 3 0 4-3 7-3-1 2-1 3 0 4-2 1-2 3-3 4 3 0 4 2 5 4-3-1-5-2-7-1-3 1-6 1-11 0zM9 12h.01"/></svg>',zoom:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',rl:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.5-5.4M5 4v4h4"/></svg>',rr:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.5-5.4M19 4v4h-4"/></svg>'};
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;if(innerWidth>=1024&&innerWidth>innerHeight)return true; /* desktop: the board-first layout too (board left, slim strip right) */let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
@@ -79,11 +79,11 @@ function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const c
   if(risk)return '<b>!</b> A leviathan may reach you.';
   try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
   try{const A=analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s});const hit=(A.others||[]).filter(o=>o.coll||o.st==='edge'||o.st==='mon');if(!A.bad&&hit.length)return '<b>Good move:</b> it sinks a rival!'}catch(e){}
-  if(safeNow)return 'Pick, turn, then Place.';
+  if(safeNow)return 'Drag a tile onto your junk.';
   if(safeTurn)return 'Press Turn to find a safe route.';
   return 'Every tile sinks you.'}
 // the goal in one sentence + 3 bullets (Learn to play first screen, Goal card, title)
-const TW_GOAL=['Be the last junk still afloat.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
+const TW_GOAL=['Last junk afloat wins the lantern.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
 function goalCardHTML(){return `<div class="gxt-endc twgoal"><div class="gxt-et">${TW_GOAL[0]}</div><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul><div class="gxt-eb"><button type="button" class="gxt-b pri" data-goalok>Got it</button></div></div>`}
 function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();return}const d=document.createElement('div');d.id='twgoal';d.className='gxt-end';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Goal');d.innerHTML=goalCardHTML();document.body.appendChild(d);
   const close=()=>{d.remove();document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',k);
@@ -138,7 +138,7 @@ function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
     else if(PH.pop==='info')h=phInfoHTML();
     else if(PH.pop==='start'){const d=sideToAct();h=d>=0&&G.seats[d].human&&G.phase==='setup'&&!G.q&&!UI.busy&&!mustPass(d)?phStartHTML():null}}
   if(!h){if(PH.pop){PH.pop=null;PH.pd=null}if(!el.hidden){el.hidden=true;el.innerHTML='';PH.pop_h=''}return}
-  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh)}}
+  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh);try{oskPlace()}catch(e){}}}
 function phClose(){PH.pop=null;PH.pd=null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 function phOpen(kind,pd){PH.pop=kind;PH.pd=pd||null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 // ---------- cards: coach tips, wake roll, Sunk!, interrupts, pass screen, end card ----------
@@ -218,3 +218,32 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
  document.addEventListener('pointerup',e=>{if(!down)return;down=false;if(!PH.on||PH.pop!=='tiles'||!UI.sel||UI.busy)return;const dx=e.clientX-sx,dy=e.clientY-sy;
    if(Math.abs(dx)>=36&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-st<900){PH.swipeT=Date.now();UI.sel.r=(UI.sel.r+(dx>0?1:3))%4;sfx('tile_rotate');render()}})}
 {let gxv1=true;const phRelayout=()=>{if(gxv1){gxv1=false;return}if(!G&&!PH.on&&!phDetect())return;const was=PH.on;phApply();if(PH.on||was){PH.zk='?';PH.strip='';PH.pop_h='';try{if(G&&UI.started)render();else phAfter()}catch(e){}}};if(window.GXV)GXV.watch(phRelayout);else window.addEventListener('resize',phRelayout)}
+// ---------- drag a hand tile onto your junk's bow square (phone and PC): the square glows, the tile snaps there, a vibrate tick, then it is laid ----------
+const DRG={on:false,t:-1,el:null,gh:null,tg:null,x0:0,y0:0,hot:false,eat:0};
+function drgTarget(){const c=phPlaceCtx?phPlaceCtx():null;if(!c||!UI.sel)return null;const S=G.ships[UI.sel.s];if(!S||S.x==null)return null;
+  const a=hproj(S.x-2.5,S.y-2.5),b=hproj(S.x-1.5,S.y-2.5);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
+function drgEnd(){if(DRG.gh)DRG.gh.remove();if(DRG.tg)DRG.tg.remove();if(DRG.el)DRG.el.classList.remove('dragsrc');Object.assign(DRG,{on:false,el:null,gh:null,tg:null,hot:false,t:-1})}
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-a=card]');if(!b||UI.busy||!UI.sel||e.button>0)return;
+  DRG.t=+b.dataset.t;DRG.el=b;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.on=false},true);
+document.addEventListener('pointermove',e=>{if(DRG.t<0||!DRG.el)return;const dx=e.clientX-DRG.x0,dy=e.clientY-DRG.y0;
+  if(!DRG.on){if(Math.hypot(dx,dy)<12)return;const T=drgTarget();if(!T){DRG.t=-1;return}DRG.on=true;DRG.T=T;
+    const src=DRG.el.querySelector('img,svg');const g=document.createElement('div');g.className='drgghost';g.setAttribute('aria-hidden','true');
+    const sz=Math.round(T.sq*1.05);g.style.width=g.style.height=sz+'px';if(src)g.appendChild(src.cloneNode(true));document.body.appendChild(g);DRG.gh=g;
+    const tg=document.createElement('div');tg.className='drgtgt';tg.setAttribute('aria-hidden','true');tg.style.width=tg.style.height=Math.round(T.sq)+'px';tg.style.left=T.x+'px';tg.style.top=T.y+'px';document.body.appendChild(tg);DRG.tg=tg;
+    DRG.el.classList.add('dragsrc');if(UI.sel.t!==DRG.t){try{phSelTile(DRG.t)}catch(x){UI.sel.t=DRG.t}}}
+  e.preventDefault();const T=DRG.T,d=Math.hypot(e.clientX-T.x,e.clientY-T.y),hot=d<T.sq*.9;
+  if(hot!==DRG.hot){DRG.hot=hot;DRG.tg.classList.toggle('hot',hot);if(hot){try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}}}
+  const px=hot?T.x:e.clientX,py=hot?T.y:e.clientY;DRG.gh.style.left=px+'px';DRG.gh.style.top=py+'px';DRG.gh.classList.toggle('snap',hot)},{capture:true,passive:false});
+document.addEventListener('pointerup',e=>{if(DRG.t<0)return;if(!DRG.on){DRG.t=-1;return}DRG.eat=Date.now();const hot=DRG.hot,t=DRG.t;drgEnd();
+  if(!hot){render();return}const d=sideToAct();UI.sel.t=t;const card=G.hands[d]&&G.hands[d][t];
+  if(isCur(card)){UI.sel.r=UI.sel.r||0;const m={a:'place',t,r:UI.sel.r,s:UI.sel.s};const er=legal(m,d);
+    if(er){sfx('error');PH.toast='That way sinks you. Turn it, then drop.';render();setTimeout(()=>{PH.toast='';render()},4500);return}
+    try{navigator.vibrate&&navigator.vibrate(18)}catch(x){}doPlace()}else render()},true);
+document.addEventListener('pointercancel',()=>{if(DRG.t>=0){drgEnd();render()}},true);
+// the click that ends a drag must not also select or turn the tile
+document.addEventListener('click',e=>{if(DRG.eat&&Date.now()-DRG.eat<400&&e.target.closest&&e.target.closest('[data-a=card]')){e.stopPropagation();e.preventDefault()}},true);
+
+// Osk's tip may sit inside #pc / #ppop: rescue it to the strip before they are emptied, then put it back on top
+{const resc=()=>{const o=document.getElementById('osk'),ps=document.getElementById('ps');if(o&&ps&&o.parentNode!==ps)ps.insertBefore(o,ps.firstChild)};
+ const _pp=phPopup;phPopup=function(){resc();const r=_pp.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r};
+ const _pc=phCards;phCards=function(){resc();const r=_pc.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r}}

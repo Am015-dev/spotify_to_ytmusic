@@ -60,6 +60,8 @@ const has=k=>!!G.inv.built[k];
 const tileAt=pos=>G.map[pos].tile!=null&&!G.map[pos].down?TILES.find(t=>t.no===G.map[pos].tile):null;
 function explored(){const s=new Set();for(const m of G.map){const t=tileAt(m.id);if(t&&!m.cov&&!m.fog&&!m.waste)s.add(t.terr)}return s}
 function campTile(){return tileAt(G.camp.pos)}
+// the weather dice by day: the scenario's table, or a gentler one for the Learn to play game (G.wxT, set by tutDeal)
+function wxTab(){return (G&&G.wxT)||SCENARIOS[G.scen].wx}
 function hasShelter(){return G.camp.shelter||!!(campTile()&&campTile().shelter)}
 function dist(from,to){if(from===to)return 0;const seen={[from]:0},q=[from];while(q.length){const a=q.shift();for(const b of MAP[a].adj){if(seen[b]!=null)continue;seen[b]=seen[a]+1;if(b===to)return seen[b];if(tileAt(b))q.push(b)}}return 99}
 function wood(){return G.res.wood}

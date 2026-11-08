@@ -1,8 +1,8 @@
 {
  "slug": "sands-of-qamar",
- "when": "2026-11-08T03:51Z",
- "secs": 90,
- "totalSecs": 361,
+ "when": "2026-11-08T06:33Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -31,28 +31,25 @@
    "detail": []
   }
  },
- "notes": [
-  "phone/learn: Learn to play not found",
-  "pc/learn: Learn to play not found"
- ],
+ "notes": [],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 90,
-   "turns": 221,
-   "clicks": 348,
+   "secs": 45,
+   "turns": 114,
+   "clicks": 174,
    "endedBy": "time",
-   "tutorialEnded": null,
+   "tutorialEnded": 3,
    "hintsOff": true,
    "messagesSeen": 20
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 90,
-   "turns": 205,
-   "clicks": 382,
+   "secs": 45,
+   "turns": 92,
+   "clicks": 168,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -61,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 90,
-   "turns": 246,
-   "clicks": 379,
+   "secs": 45,
+   "turns": 133,
+   "clicks": 193,
    "endedBy": "time",
-   "tutorialEnded": null,
+   "tutorialEnded": 3,
    "hintsOff": true,
-   "messagesSeen": 24
+   "messagesSeen": 11
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 90,
-   "turns": 230,
-   "clicks": 403,
+   "secs": 45,
+   "turns": 118,
+   "clicks": 193,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

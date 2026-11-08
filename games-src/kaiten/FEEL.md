@@ -37,3 +37,20 @@ for a moment at 390x844. The round-end "+N roll race" pops briefly cross the pla
 - (d) phone text is at least 14px (skin.css floor, card labels included).
 - (a) coach bubbles wait while a drawer, the score sheet or the reveal is up, and only speak when it is your move.
   A dismissed bubble disappears at once.
+
+## Reviewer R5 fixes (8 Nov)
+- No more 404s: GXSK.init no longer asks for story-map / ui-star-on/off / ui-act-banner-c (this game has none).
+- Owner portraits (media/camp-*.webp) now show in a Quick game: on the setup cards, in the table summary and in the Goal card (Suzu).
+  asset-usage went from 25/71 to 31/71, and all 6 camp files load.
+- Desktop reveal: the stage covers the whole board (no empty strip) with cards up to 210px. The score caption sits above the card,
+  wraps and is never cut off, so the card art and name stay clear. The remaining hand is drawn on the canvas layer and comes back after the pass.
+- Phone: the two hand rows have an 18px gap, so the score chips no longer cover names. Empty counters say "Nothing served yet".
+- The reveal never hides Suzu's bubble mid-sentence. The portrait letter is hidden once the picture loads.
+
+Why asset-usage cannot reach 95% / 4 of 4 glb in its headless run:
+- glb: gx-glb-boot skips software GL (SwiftShader in headless Chromium) unless ?glb=1. A 390px run also loads only the -lite
+  models, so plate.glb + plate-lite.glb + cloche.glb + cloche-lite.glb can never all load in one run. The pictures the
+  viewer swaps (models/plate@512.webp, models/cloche@512.webp) are wired and load.
+- Story-only art: back-* (chapter scenes), ui-node-* (story map). They load in Story mode, not in a Quick game.
+- Variant files: ui-button-*/ui-panel/ui-row/ui-nametag-*-c sources next to the -c files the skin uses; ui-bubble*
+  are the help-bubble skin, and help bubbles are off in Play by the brief.

@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T04:07Z",
+ "when": "2026-11-08T06:26Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -1698,25 +1698,23 @@
    }
   },
   "thornbound": {
-   "shipped": 83,
-   "loaded": 36,
-   "pct": 43.4,
+   "shipped": 84,
+   "loaded": 51,
+   "pct": 60.7,
    "glbShipped": 4,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 185,
+   "playedSecs": 184,
    "end": "cap",
-   "clicks": 595,
+   "clicks": 652,
    "fail": true,
    "neverLoaded": {
     "media/ui*": [
+     "media/ui-bubble-tail.webp",
      "media/ui-bubble.webp",
      "media/ui-button-cream.webp",
      "media/ui-button-go.webp",
      "media/ui-button-power.webp",
-     "media/ui-node-boss.webp",
-     "media/ui-node-done.webp",
-     "media/ui-node-locked.webp",
      "media/ui-panel.webp",
      "media/ui-round-shield.webp",
      "media/ui-row-c.webp",
@@ -1724,45 +1722,19 @@
      "media/ui-sheet-head-c.webp",
      "media/ui-sheet.webp"
     ],
-    "media/camp*": [
-     "media/camp-fennick.webp",
-     "media/camp-halvard.webp",
-     "media/camp-ida.webp",
-     "media/camp-orlen.webp",
-     "media/camp-quill.webp",
-     "media/camp-rook.webp",
-     "media/camp-sable.webp",
-     "media/camp-stag.webp",
-     "media/camp-tamsin.webp",
-     "media/camp-ysolde.webp"
-    ],
     "models/crown*": [
      "models/crown-lite.glb",
      "models/crown.glb",
-     "models/crown.webp",
-     "models/crown@512.webp"
+     "models/crown.webp"
     ],
     "models/throne*": [
      "models/throne-lite.glb",
      "models/throne.glb",
      "models/throne.webp"
     ],
-    "music/tavern*": [
-     "music/tavern-a.mp3",
-     "music/tavern-b.mp3",
-     "music/tavern-short-a.mp3"
-    ],
-    "media/back*": [
-     "media/back-council-seal.webp",
-     "media/back-moth-wing.webp"
-    ],
     "media/end*": [
      "media/end-lose.webp",
      "media/end-win.webp"
-    ],
-    "media/table*": [
-     "media/table-lantern-night.webp",
-     "media/table-throne-hall.webp"
     ],
     "music/defeat*": [
      "music/defeat-a.mp3",
@@ -1772,15 +1744,31 @@
      "music/main-a.mp3",
      "music/main-b.mp3"
     ],
+    "music/tavern*": [
+     "music/tavern-b.mp3",
+     "music/tavern-short-b.mp3"
+    ],
     "music/victory*": [
      "music/victory-a.mp3",
      "music/victory-b.mp3"
     ],
+    "media/back*": [
+     "media/back-moth-wing.webp"
+    ],
     "media/map*": [
      "media/map.webp"
     ],
+    "media/table*": [
+     "media/table-throne-hall.webp"
+    ],
     "media/title*": [
      "media/title.webp"
+    ],
+    "models/gx*": [
+     "models/gx3d.js"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
     ]
    }
   },
@@ -1901,6 +1889,19 @@
    "playedSecs": 185,
    "end": "cap",
    "clicks": 847,
+   "fail": false,
+   "neverLoaded": {}
+  },
+  "stitchwise": {
+   "shipped": 63,
+   "loaded": 63,
+   "pct": 100,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 188,
+   "end": "cap",
+   "clicks": 937,
    "fail": false,
    "neverLoaded": {}
   }

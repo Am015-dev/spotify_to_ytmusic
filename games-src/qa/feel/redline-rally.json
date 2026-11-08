@@ -1,8 +1,8 @@
 {
  "slug": "redline-rally",
- "when": "2026-11-08T02:32Z",
- "secs": 30,
- "totalSecs": 121,
+ "when": "2026-11-08T06:50Z",
+ "secs": 45,
+ "totalSecs": 181,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -16,401 +16,14 @@
    "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 8,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Pick gear 1-4 and play that many cards; their total is how far you move.",
-     "words": 15,
-     "at": 2003,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "End next to a car to slipstream; the last car gets +1 (adrenaline).",
-     "words": 13,
-     "at": 2003,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Two cars on one space: the one that got there first is ahead.",
-     "words": 13,
-     "at": 7002,
-     "where": "p."
-    },
-    {
-     "session": "phone/play",
-     "text": "The race ends when every car has crossed the line after 2 laps.",
-     "words": 13,
-     "at": 7003,
-     "where": "p."
-    },
-    {
-     "session": "pc/play",
-     "text": "Pick gear 1-4 and play that many cards; their total is how far you move.",
-     "words": 15,
-     "at": 2020,
-     "where": "li."
-    },
-    {
-     "session": "pc/play",
-     "text": "End next to a car to slipstream; the last car gets +1 (adrenaline).",
-     "words": 13,
-     "at": 2020,
-     "where": "li."
-    },
-    {
-     "session": "pc/play",
-     "text": "Two cars on one space: the one that got there first is ahead.",
-     "words": 13,
-     "at": 4008,
-     "where": "p."
-    },
-    {
-     "session": "pc/play",
-     "text": "The race ends when every car has crossed the line after 2 laps.",
-     "words": 13,
-     "at": 4008,
-     "where": "p."
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 47,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Short, one tap at a time, no reading",
-     "px": 13,
-     "at": 1002,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "why?",
-     "px": 13,
-     "at": 2001,
-     "where": "i."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Shift",
-     "px": 13,
-     "at": 2001,
-     "where": "li.on"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Play",
-     "px": 13,
-     "at": 2001,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Move",
-     "px": 13,
-     "at": 2001,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "React",
-     "px": 13,
-     "at": 2001,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Discard",
-     "px": 13,
-     "at": 2001,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Gear",
-     "px": 13,
-     "at": 2001,
-     "where": "span.gl"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Speed",
-     "px": 13,
-     "at": 2001,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/learn",
-     "text": "move 1",
-     "px": 13,
-     "at": 2001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "move 3",
-     "px": 13,
-     "at": 2001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "move 2",
-     "px": 13,
-     "at": 2001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "move 4",
-     "px": 13,
-     "at": 2001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Engine heat",
-     "px": 13,
-     "at": 2002,
-     "where": "em."
-    },
-    {
-     "session": "phone/learn",
-     "text": "6",
-     "px": 13,
-     "at": 2002,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Dead heat in hand",
-     "px": 13,
-     "at": 2002,
-     "where": "em."
-    },
-    {
-     "session": "phone/learn",
-     "text": "0",
-     "px": 13,
-     "at": 2002,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Tap any two cards. Their numbers add up to your speed.",
-     "px": 13.5,
-     "at": 4002,
-     "where": "div.gxh-tx"
-    },
-    {
-     "session": "phone/play",
-     "text": "Short, one tap at a time, no reading",
-     "px": 13,
-     "at": 1002,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "why?",
-     "px": 13,
-     "at": 2002,
-     "where": "i."
-    },
-    {
-     "session": "phone/play",
-     "text": "Shift",
-     "px": 13,
-     "at": 2002,
-     "where": "li.on"
-    },
-    {
-     "session": "phone/play",
-     "text": "Play",
-     "px": 13,
-     "at": 2002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Move",
-     "px": 13,
-     "at": 2002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "React",
-     "px": 13,
-     "at": 2002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Discard",
-     "px": 13,
-     "at": 2002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Gear",
-     "px": 13,
-     "at": 2002,
-     "where": "span.gl"
-    },
-    {
-     "session": "phone/play",
-     "text": "Speed",
-     "px": 13,
-     "at": 2002,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 1",
-     "px": 13,
-     "at": 2002,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Stress",
-     "px": 13,
-     "at": 2002,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "random",
-     "px": 13,
-     "at": 2002,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Heat",
-     "px": 13,
-     "at": 2002,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "dead",
-     "px": 13,
-     "at": 2002,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 2",
-     "px": 13,
-     "at": 2003,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Burst",
-     "px": 13,
-     "at": 2003,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 5",
-     "px": 13,
-     "at": 2003,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Total speed",
-     "px": 13,
-     "at": 8001,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "2",
-     "px": 13,
-     "at": 8001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "move 4",
-     "px": 13,
-     "at": 11001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "8",
-     "px": 13,
-     "at": 11001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "5",
-     "px": 13,
-     "at": 12001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "flipped",
-     "px": 13,
-     "at": 14002,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "7",
-     "px": 13,
-     "at": 14002,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "3",
-     "px": 13,
-     "at": 18001,
-     "where": "b."
-    },
-    {
-     "session": "phone/play",
-     "text": "Brake",
-     "px": 13,
-     "at": 19001,
-     "where": "span.k"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 0",
-     "px": 13,
-     "at": 19001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "move 3",
-     "px": 13,
-     "at": 19001,
-     "where": "span.t"
-    },
-    {
-     "session": "phone/play",
-     "text": "1",
-     "px": 13,
-     "at": 22001,
-     "where": "b."
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -423,20 +36,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 21,
-   "clicks": 0,
-   "endedBy": "time",
-   "tutorialEnded": null,
+   "secs": 45,
+   "turns": 164,
+   "clicks": 161,
+   "endedBy": "result",
+   "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 7
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 30,
-   "turns": 115,
-   "clicks": 115,
+   "secs": 45,
+   "turns": 181,
+   "clicks": 182,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -445,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 20,
-   "clicks": 0,
-   "endedBy": "time",
-   "tutorialEnded": null,
+   "secs": 45,
+   "turns": 186,
+   "clicks": 182,
+   "endedBy": "result",
+   "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 14
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 126,
-   "clicks": 126,
+   "secs": 45,
+   "turns": 197,
+   "clicks": 199,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

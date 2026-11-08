@@ -393,6 +393,9 @@ function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();
   V3.bombs=V3.bombs||{};const live=new Set((G.bombs||[]).map(t=>t.id));for(const id in V3.bombs)if(!live.has(id)){V3.root.remove(V3.bombs[id]);delete V3.bombs[id]}
   for(const t of (G.bombs||[]))if(!V3.bombs[t.id]){V3.bombs[t.id]=bombMesh(t);V3.root.add(V3.bombs[t.id])}
   for(const s of G.ships){let m=V3.ships[s.id];if(!m){m=V3.ships[s.id]=shipMesh(s);V3.root.add(m);m.position.copy(W(s.x,s.y));m.rotation.y=s.h}
+    // phone portrait (R5 review): ships read bigger and brighter on the small board: x1.35 and a soft side-coloured glow under each
+    {const R0=document.documentElement,php=R0.classList.contains('ph-p')&&!R0.classList.contains('ph-big');m.scale.setScalar(php?1.35:1);
+     if(!m.userData.halo){const h=glow(s.side?0xff6070:0x70d8ff,S3(B(s))*2.6,.5);h.position.y=1.2;h.renderOrder=-1;m.add(h);m.userData.halo=h}m.userData.halo.visible=php&&s.alive}
     m.visible=s.alive||(V3.anim[s.id]&&V3.anim[s.id].boom)||false;if(!V3.anim[s.id]){m.position.copy(W(s.x,s.y));m.rotation.y=s.h}}
   drainFx();drawGuides();tags3D()}
 // hits land when the bolt arrives: effects on a ship that was just shot at are delayed until then
@@ -490,7 +493,7 @@ function myPlanShip(s){return G.phase==='plan'&&isHuman(s.side)&&s.side===planSi
 // ---- labels ----
 function tags3D(){const box=document.getElementById('tags');if(!box)return;for(const s of G.ships){let el=V3.labels[s.id];if(!el){el=V3.labels[s.id]=document.createElement('div');el.className='tag s'+s.side;box.appendChild(el)}
     if(!s.alive){el.style.display='none';continue}const hp=s.hull-hullDmg(s);
-    el.title=s.name;el.innerHTML=`<b>${esc(typeof shortName==='function'?shortName(s):s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h" title="hull left">♥${hp}</em>${s.shMax?` <em class="sh" title="shields left">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
+    el.title=s.name;const nm0=typeof shortName==='function'?shortName(s):s.name,ph0=document.documentElement.classList.contains('ph-p')&&!document.documentElement.classList.contains('ph-big');el.innerHTML=`<b>${esc(ph0&&!/#/.test(nm0)?String(nm0).split(' ')[0]:nm0)}</b><span><em class="ps">${psOf(s)}</em> <em class="h" title="hull left">♥${hp}</em>${s.shMax?` <em class="sh" title="shields left">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
     el.classList.toggle('on',G.cur===s.id&&G.phase!=='plan');el.classList.toggle('sel',UI.sel===s.id);
     const tg=G.phase==='target'&&G.cur&&typeof humanTurn==='function'&&humanTurn()&&weaponsFor(ship(G.cur)).some(w=>w.targets.some(t=>t.id===s.id));el.classList.toggle('tgt',!!tg);if(tg)el.insertAdjacentHTML('beforeend','<em class="tgl">can be shot</em>')}}
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
@@ -642,7 +645,9 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   engineBed(nMove>0);
   const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
-  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}
+  // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
+  let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}
+  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);if(SB&&t.y-t.h<SB.b+2&&t.x+t.w/2>SB.l&&t.x-t.w/2<SB.r)t.y=SB.b+t.h+4;t.el.style.top=t.y+'px';done.push(t)}
   const ct=document.getElementById('coachtag');if(ct&&ct._v)placeEl(ct,ct._v);
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
 

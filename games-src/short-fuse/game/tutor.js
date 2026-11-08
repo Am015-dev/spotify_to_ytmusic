@@ -83,7 +83,7 @@ function tutSteps(){return tutStory([
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
  {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:()=>tq(innerWidth>=900?'#crew .sg':'#crew')(),wait:null},
- {id:'fuse',title:'The fuse',say:'A wrong cut burns one step. When none is left, or a red wire is cut, the bomb explodes.',target:tq('#fuse'),wait:null},
+ {id:'fuse',title:'The fuse',say:'A wrong cut burns one step. The bomb explodes when no step is left. It also explodes if a red wire is cut.',target:tq('#fuse'),wait:null},
  {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 3: a token tells the crew its number.',target:tutEl(0,8),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
  {id:'tokens2',title:'Their tokens',say:'Teal and Plum each showed a wire too. Tokens are clues the whole crew can use.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>!!G&&tutMyTurn()},
@@ -147,6 +147,6 @@ function tutOffer(){return false;if(typeof GXT==='undefined'||!firstTime()||GXT.
 (function(){const o=schedule;schedule=function(){if(UI.tut)return;return o()}})();
 (function(){const o=saveNow;saveNow=function(){if(UI.tut||UI.coach)return;return o()}})();
 (function(){const o=recordResult;recordResult=function(){if(UI.tut||UI.coach)return;return o()}})();
-(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut||UI.coach){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
+(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
 // while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();

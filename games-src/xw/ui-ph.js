@@ -5,16 +5,17 @@ var PHN={on:false,land:false,bs:0,pop:null,popSig:'',armed:null,ctx:'',focusOn:f
 const R=document.documentElement;
 const SVG=d=>`<svg class="ico" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const IC={focus:SVG('<circle cx="10" cy="10" r="3.2"/><circle cx="10" cy="10" r="7.2"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"/>'),plus:SVG('<path d="M10 4v12M4 10h12"/>'),minus:SVG('<path d="M4 10h12"/>'),fit:SVG('<path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/>')};
-const forced=()=>{if(window.TUTPH)return true;const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':null};
+// owner round 2 (8 Nov): every screen size plays on the board-first layer (the old button-grid dock only with ?phone=0)
+const forced=()=>{if(window.TUTPH)return true;const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':true};
 // inside the shelf's full-screen iframe the shelf already pads by the insets (and env() reads 0 there): count them exactly once
 const framed=()=>{try{return window.self!==window.top}catch(e){return true}};
 function insets(){if(framed()&&!/[?&]safe=/.test(location.search||''))return {t:0,r:0,b:0,l:0};const m=/[?&]safe=([\d.]+),([\d.]+),([\d.]+),([\d.]+)/.exec(location.search||'');if(m)return {t:+m[1],r:+m[2],b:+m[3],l:+m[4]};
   try{const d=document.createElement('div');d.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(d);const c=getComputedStyle(d);const r={t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0};d.remove();return r}catch(e){return {t:0,r:0,b:0,l:0}}}
 function apply(){const w=innerWidth,h=innerHeight,short=Math.min(w,h);let coarse=false;try{coarse=matchMedia('(pointer:coarse)').matches}catch(e){}
-  const f=forced();const on=f!=null?f:(short<=500||(coarse&&short<=600));const land=w>h;const was=PHN.on;
+  const f=forced();const on=f!=null?f:(short<=500||(coarse&&short<=600));const big=short>600;const land=w>h&&!big;R.classList.toggle('ph-big',on&&big);const was=PHN.on;
   R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);PHN.on=on;PHN.land=land;
   if(on){const sf=insets();const BAR=44,BARV=48,ROW=46,PANEL=210;const aw=w-sf.l-sf.r;let bs=land?Math.min(h-sf.t-sf.b,aw-BARV-300):Math.min(aw,h-sf.t-sf.b-BAR-ROW-PANEL);
-    if(!land)bs=Math.max(bs,Math.round(aw*.75));bs=Math.max(200,Math.floor(bs));PHN.bs=bs;
+    if(!land&&!big)bs=Math.max(bs,Math.round(aw*.75));bs=Math.max(200,Math.floor(bs));PHN.bs=bs;
     const st=R.style;st.setProperty('--bs',bs+'px');st.setProperty('--sat',sf.t+'px');st.setProperty('--sar',sf.r+'px');st.setProperty('--sab',sf.b+'px');st.setProperty('--sal',sf.l+'px')}
   else{['--bs','--sat','--sar','--sab','--sal'].forEach(k=>R.style.removeProperty(k))}
   if(on&&!was)PHN.build();if(on)PHN.placeCtl();
@@ -91,10 +92,13 @@ function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsF
   ${rows.map(o=>`<div class="pp-r${o===best?' rec':''}"><div class="dice-n"><b>${o.sd.atk}</b> attack dice <span class="vs">vs</span> <b>${o.sd.def}</b> defence</div><div class="small muted">${o.w.k==='P'?'Primary weapon':esc(o.w.n)} · expected ≈${o.e.toFixed(1)} damage</div></div>`).join('')}
   <ul class="pp-m">${mods.map(m=>`<li>${m}</li>`).join('')||'<li class="muted">No modifiers right now.</li>'}</ul></div>
   <div class="pp-f">${rows.map(o=>`<button class="btn ${o===best?'primary':''}" data-act="fire" data-w="${o.w.k}" data-t="${d.id}">🎯 Fire${o.w.k!=='P'?' '+esc(o.w.n):''}<small>${o.sd.atk} dice, range ${o.t.rg}</small></button>`).join('')}</div>`}
+// pilot portraits (owner art, media/camp-*.webp) on the ship card
+const PORTRAIT={kael:'kael',knife:'knife',hex:'hex',drill:'drill',slate:'drill',onyx:'hammer',nightjar:'wailer',ember:'sorin',cadet:'kira',brink:'quill'};
+function porHTML(s){const k=PORTRAIT[s.pilot];return k?`<img class="pp-por" src="media/camp-${k}.webp" alt="" width="44" height="44">`:''}
 function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-hullDmg(s);const col=FACTIONS[G.fac[s.side]].col;const tok=s.alive?shipTokens(s):'destroyed';
   const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
   let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
-  return `<div class="pp-h"><b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
+  return `<div class="pp-h">${porHTML(s)}<b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
   <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
   <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
   <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
@@ -131,7 +135,7 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
   const card=play?cardHTML():null;
   R.classList.toggle('ph-card',!!card);if(card||PHN.pop){const dk=document.querySelector('.gx-dock');if(dk&&dk.scrollTop)dk.scrollTop=0}
   if(pc){pc.hidden=!card;if(card){if(pc._k!==card.key||pc._h!==card.h){pc._k=card.key;pc._h=card.h;pc.innerHTML=card.h;pc.scrollTop=0}}else pc._k=null}
-  if(pp){const open=!!PHN.pop&&!card;pp.hidden=!open;R.classList.toggle('ph-pop',open);
+  if(pp){const open=!!PHN.pop&&!card;pp.hidden=!open;R.classList.toggle('ph-pop',open);R.classList.toggle('ph-info',open&&PHN.pop.kind==='info');
     if(open){const s=ship(PHN.pop.id);const k=PHN.pop.kind;if(k==='dial'){UI.sel=s.id;UI.hoverDial=null}
       const h=k==='dial'?dialPopHTML(s):k==='atk'?atkPopHTML(s):infoPopHTML(s);const keep=pp.querySelector('.pp-b');const sc=keep?keep.scrollTop:0;
       if(pp._h!==h){pp._h=h;pp.innerHTML=h;pp.className='pp pp-'+k;const nb=pp.querySelector('.pp-b');if(nb)nb.scrollTop=sc}}

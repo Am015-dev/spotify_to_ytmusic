@@ -146,7 +146,7 @@ function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);co
     item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
-  setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>Fly ▶</button>`);
+  setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
   if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');finger(BF.fingT)}
 function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
   if(BF.sub){const a=BF.sub;setHint(a.a==='TL'?'Tap the enemy to lock on':'Tap where to go');
@@ -196,7 +196,7 @@ function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.cl
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
-function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)} (round ${G.round}). Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span>`,1e9)};setHint('');
+function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';

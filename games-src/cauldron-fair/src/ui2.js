@@ -134,7 +134,7 @@ function renderRisk() {
     if (isPh()) { rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar); return; }
     rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar,
       h('div.rk', 'Next chip explodes it: ', h('span.big.' + lv, pct + '%'), h('span.sm', ' (' + nb + ' of ' + r.n + ' chips would explode)'), h('span.sm', ' · white total ' + r.ws + ' of ' + r.limit)), ...(limitNote(p) ? [h('div.rk.hi', limitNote(p) + '.')] : []), ...(here ? [here] : []));
-    const fl = p.flask ? (p.f.canFlask && p.pot.length && p.pot[p.pot.length - 1].c === 'W' ? 'The flask can put your last white chip back.' : 'Flask ready: it can put back a white chip you just drew.') : 'Flask used this day.';
+    const fl = p.flask ? (p.f.canFlask && p.pot.length && p.pot[p.pot.length - 1].c === 'W' ? 'The flask can put your last white chip back.' : 'Flask ready: it can put back a white chip you just drew.') : 'Flask used today.';
     rk.append(h('div.sm.fl', fl));
   } else {
     const cs = bagCounts(p), parts = Object.keys(cs).sort().map(k => h('span.cb', chipN(k, 20), '×' + cs[k]));
@@ -180,7 +180,7 @@ function renderQ(p, legal, qb) {
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
   if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + LASTD() : 'Day ' + G.round + ' of ' + LASTD();
-  bs.append(UI.camp ? h('button.dayn.gchip', { 'data-a': 'campgoal', type: 'button', 'aria-label': 'Day ' + G.round + '. Tap for the chapter goal' }, '\ud83c\udfaf ' + dtxt) : h('button.dayn.gchip', { type: 'button', 'aria-label': 'Day ' + G.round + '. Tap to see how you win' }, dtxt));
+  bs.append(UI.camp ? h('button.dayn.gchip', { 'data-a': 'campgoal', type: 'button', 'aria-label': 'Day ' + G.round + '. Tap for the chapter goal' }, '\ud83c\udfaf ' + dtxt) : isPh() ? h('button.dayn.gchip', { type: 'button', 'aria-label': 'Day ' + G.round + '. Tap to see the goal' }, dtxt) : h('span.dayn', dtxt));   // W471: a button on phones only (desktop bar keeps 5 buttons)
   const v0 = viewSeat(), f0 = focusSeat(), q0 = G.players[f0 >= 0 ? f0 : 0];
   if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, UI.camp ? null : h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }

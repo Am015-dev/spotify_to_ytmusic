@@ -1,41 +1,52 @@
 // ===================== part 5: drawers (scores, log, cards, rules, menu), start screens, events, phone mode, boot =====================
-function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + youText(G.log[i].t))); return e; }
+// W471: log lines read as short sentences (12 words or fewer). The engine's text is kept; only how it is shown changes.
+function logShort(t) {
+  t = t.replace(/^(.+?) (turns?) up the fortune card "([^"]+)": (.*)$/, (a, w, v, n, x) => w + ' ' + v + ' up "' + n + '". ' + x)
+    .replace(/^(.+?) (is|are) behind the leader on points \((\d+) rat tails?\), so the rat stone gives a head start of (\d+) spaces?\.$/, (a, w, v, n, k) => w + ' ' + v + ' behind by ' + n + ' rat tail' + (n === '1' ? '' : 's') + '. Head start: ' + k + ' space' + (k === '1' ? '' : 's') + '.')
+    .replace(/^Books: (.*)\.$/, (a, x) => 'Books: ' + x.replace(/ \d+(,|$)/g, '$1') + '.');
+  const out = []; for (let sen of t.split(/(?<=[.!?])\s+/)) {
+    let guard = 0; while (sen.split(/\s+/).length > 12 && guard++ < 4) { const w = sen.split(/\s+/), mid = Math.floor(w.length / 2); let best = -1; for (let k = 3; k < w.length - 3; k++) if (/[,:;]$/.test(w[k]) && (best < 0 || Math.abs(k - mid) < Math.abs(best - mid))) best = k; if (best < 0) break; out.push(w.slice(0, best + 1).join(' ').replace(/[,:;]$/, '.')); const r = w.slice(best + 1).join(' '); sen = r.charAt(0).toUpperCase() + r.slice(1); }
+    out.push(sen);
+  }
+  return out.join(' ');
+}
+function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + logShort(youText(G.log[i].t)))); return e; }
 function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const li = a => a.map(t => h('li', t));
   sec('How a turn works', h('ol', ...li([
-    'Draw chips from your bag one by one. Each lands that many spaces along the dotted path in your cauldron.',
-    'The white chips must add up to 7 or less. Over 7 and the cauldron explodes.',
-    'Stop whenever you like. Your last chip decides your space: the big number is coins, the small brown badge is victory points.',
-    'Then the day is counted: spend coins on new chips for your bag, spend rubies, and the next day begins.',
+    'Draw chips from your bag one by one. Each moves that many spaces.',
+    'White chips must add up to 7 or less. Over 7 and the pot explodes.',
+    'Stop whenever you like. Your last chip picks your space. Big number: coins. Brown badge: points.',
+    'Then the day is counted. Buy new chips with coins. Spend rubies. Next day.',
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
   sec('How a day goes', h('ol', ...li([
-    'The fair\'s seer turns up a fortune card. Purple cards happen at once, blue cards last all day.',
-    'From day 2, anyone behind the leader gets a rat stone: your first chip starts one space further for every rat tail between you and the leader on the score track.',
-    'Everybody brews at the same time. Draw a chip from your bag, it lands on the spiral as many spaces after the last chip as its number. Then decide: draw again, or stop.',
-    'When everyone has stopped, the day is counted: the bonus die, chip powers, rubies, points, shopping.',
-    'Spend rubies if you like, then the next day begins. Everything you drew goes back in your bag together with what you bought.'])));
-  sec('Brewing and explosions', h('p', 'The white chips (Fizzpods) are dangerous. If the white numbers in your cauldron add up to more than 7, the cauldron explodes. The last chip stays, you must stop, and you must choose later: take the victory points of your space or shop with its coins, not both. Only white chips count towards the limit.'),
-    h('p', 'Your flask can put the last white chip back into the bag (not the chip that exploded you), once per day. It stays empty until you refill it with 2 rubies.'),
-    h('p', 'In the last day everybody secretly chooses Draw or Stop, and all choices are revealed together (Stir!). You can also draw at the same moment on every other day: the computers draw while you think.'));
-  sec('The spiral', h('p', 'Your scoring space is the one right after your last chip. It shows coins (the big number, for shopping), victory points (the small brown number) and sometimes a ruby. Reach the last space and you get the spoon: 15 points and 35 coins.'));
+    'The fair\'A fortune card is drawn. Purple is instant. Blue lasts all day.',
+    'From day 2, players behind get a rat stone. Count rat tails between you and the leader. Your first chip starts that many spaces further.',
+    'Everybody brews at the same time. Each chip moves as many spaces as its number. Then draw again, or stop.',
+    'When everyone has stopped, the day is counted. Bonus die, powers, rubies, points, shop.',
+    'Spend rubies if you like. Then all your chips go back in the bag. A new day begins.'])));
+  sec('Brewing and explosions', h('p', 'White chips (Fizzpods) are dangerous. Only they count towards the limit. Past 7, your cauldron explodes. The last chip stays and you must stop. Later you take your points or your coins, not both.'),
+    h('p', 'Once a day, your flask puts your last white chip back. It cannot undo an explosion. Refill it with 2 rubies.'),
+    h('p', 'On the last day, everyone picks Draw or Stop in secret. Then all picks are shown at once. On other days the computers draw while you think.'));
+  sec('The spiral', h('p', 'You score the space right after your last chip. Big number: coins to shop. Brown number: points. Some spaces hold a ruby. The last space is the spoon: 15 points and 35 coins.'));
   sec('Counting the day', h('ol', ...li([
-    'Bonus die: among the cauldrons that did not explode, the one whose space has the most coins rolls the die (a tie on coins goes to the one further along the path; if even that is equal, they all roll). It gives 1 or 2 points, a ruby, one step further on for your droplet (your start marker), or a Marrow chip.',
-    'Chip powers: black, green and purple chips act now (books say how).',
+    'Bonus die: the safe cauldron with the most coins rolls it. On a tie, the one further along rolls. Still tied? They all roll. It gives 1 or 2 points, a ruby, a droplet step, or a Marrow chip.',
+    'Chip powers: black, green and purple chips work now.',
     'Rubies: a ruby on your scoring space gives you 1 ruby, even if you exploded.',
-    'Points: you score the victory points of your space (exploded players choose points or shopping).',
-    'Shopping: spend up to the coins of your space on one or two chips of different colours. Leftover coins are lost. Sold-out chips are gone.',
-    'Rubies: 2 rubies move your droplet one space (your first chip starts further along every day) or refill the flask.'])));
-  sec('The ingredient books', h('p', 'Orange and black are always in the shop. Green, blue and red come from the chosen set (1 to 4); yellow opens before day 2 and purple before day 3. Every colour has its own power: blue, red and yellow act when drawn, green, purple and black after the brew. Open the Cards drawer to read every book.'));
-  sec('The last day and the end', h('p', 'On day 9 there is no shopping: every 5 coins and every 2 rubies you hold become 1 victory point. The most points wins; a tie goes to the cauldron that reached furthest on day 9.'));
+    'Points: score your space\'s points. Exploded players pick points or shopping.',
+    'Shopping: buy one or two chips of different colours. Leftover coins are lost. Sold-out chips are gone.',
+    'Rubies: 2 rubies move your droplet one space, or refill the flask.'])));
+  sec('The ingredient books', h('p', 'Orange and black are always in the shop. Green, blue and red come from the chosen set. Yellow opens on day 2, purple on day 3. Blue, red and yellow act when drawn. Green, purple and black act after the brew. The Cards drawer lists every book.'));
+  sec('The last day and the end', h('p', 'Day 9 has no shop. Every 5 coins and every 2 rubies make 1 point. The most points wins. On a tie, the furthest cauldron on day 9 wins.'));
   sec('Playing it', h('ul', ...li([
-    'The ring on the spiral marks where you would score now. The box under the buttons shows the chance that the next chip explodes you.',
-    'The small cauldrons at the top are the other players: tap one to watch it. Hot-seat plays one cauldron after the other with a pass screen, online everybody brews in parallel and the host collects every stop.',
-    'The lightbulb at the top gives a hint for this very moment. The Menu switches the tips on or off and replays the Tutorial.'])));
+    'The ring shows where you would score now. The box under the buttons shows your explosion chance.',
+    'The small cauldrons at the top are the other players. Tap one to watch it. Hot-seat passes the device between players. Online, everybody brews at once.',
+    'The lightbulb gives a hint for right now. The Menu turns tips on or off.'])));
   root.appendChild(h('div', { html: typeof CF_CREDITS !== 'undefined' ? CF_CREDITS : '' }));
-  root.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the rules follow the box.'));
+  root.appendChild(h('p.sm', 'Cauldron Fair is an original game.'));
   return root;
 }
 // the card reference: every chip, book, fortune card, the track
@@ -44,21 +55,21 @@ function buildRef() {
   const sec = (t, open, ...k) => { const d = h('details.refsec', open ? { open: true } : {}, h('summary', t)); k.forEach(x => d.appendChild(x)); root.appendChild(d); return d; };
   const supply = [['W', 'W1', 'W2', 'W3'], ['O', 'O1'], ['G', 'G1', 'G2', 'G4'], ['B', 'B1', 'B2', 'B4'], ['R', 'R1', 'R2', 'R4'], ['Y', 'Y1', 'Y2', 'Y4'], ['P', 'P1'], ['K', 'K1']];
   const t1 = h('table.reft'); t1.appendChild(h('tr', h('th', 'Chip'), h('th', 'In the box'), h('th', 'Where it comes from')));
-  for (const row of supply) { const c = row[0]; t1.appendChild(h('tr', h('td', h('span.cb', chipN(c + (D.COLORS[c].vals[0]), 26), D.COLORS[c].name)), h('td', row.slice(1).map(k => k.slice(1) + ': ' + D.SUPPLY[k]).join(' · ')), h('td', c === 'W' ? 'Your starting bag (4 x 1, 2 x 2, 1 x 3) and a white 1 on day 6' : c === 'O' ? 'Shop, bonus die' : (c === 'Y' ? 'Shop from day 2' : c === 'P' ? 'Shop from day 3' : 'Shop')))); }
-  sec('Reading the cauldron', true, h('ul', ...[ 'The big number on a space is its coins (what you can spend in the shop).', 'The small brown badge is its victory points; no badge means none.', 'A pink space with a ruby gives you a ruby when it is your scoring space.', 'The dotted path with arrows runs from the droplet (start) outwards to the spoon (15 VP and 35 coins).', 'The gold ring is the space you score if you stop now. A chip lands as many spaces further along as its number.'].map(x => h('li', x))));
-  sec('Chips and how many exist (215)', true, h('p.sm', 'You start with 4 white 1, 2 white 2, 1 white 3, 1 Marrow and 1 Mossback. When a kind runs out it cannot be bought.'), t1);
+  for (const row of supply) { const c = row[0]; t1.appendChild(h('tr', h('td', h('span.cb', chipN(c + (D.COLORS[c].vals[0]), 26), D.COLORS[c].name)), h('td', row.slice(1).map(k => k.slice(1) + ': ' + D.SUPPLY[k]).join(' · ')), h('td', c === 'W' ? 'Start bag: four 1s, two 2s, one 3. Plus a white 1 on day 6' : c === 'O' ? 'Shop, bonus die' : (c === 'Y' ? 'Shop from day 2' : c === 'P' ? 'Shop from day 3' : 'Shop')))); }
+  sec('Reading the cauldron', true, h('ul', ...[ 'The big number on a space is its coins for the shop.', 'The brown badge is points. No badge means none.', 'Score a pink space with a ruby and you take a ruby.', 'The dotted path runs from the droplet out to the spoon.', 'The gold ring is the space you score if you stop now.'].map(x => h('li', x))));
+  sec('Chips and how many exist (215)', true, h('p.sm', 'You start with 4 white 1, 2 white 2, 1 white 3, 1 Marrow, 1 Mossback. Sold-out kinds cannot be bought.'), t1);
   const bk = h('div'); const sets = G ? G.sets : { G: 1, B: 1, R: 1, Y: 1, P: 1 };
   const bookRow = (c, set, active) => { const b = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][set]; const pr = b.price.map((x, i) => [1, 2, 4][i] + ': ' + x).join(' · '); return h('div.rcard', chipN(c + '1', 40), h('div.rt', h('b', D.COLORS[c].name + (c === 'O' || c === 'K' ? '' : ' · ' + D.SET_NAMES[set]) + ' — ' + b.title + (active ? ' (in this game)' : '')), h('div.sm', 'Costs ' + pr + ' coins'), h('div', b.text))); };
   bk.appendChild(h('p.sm', 'The books of this game' + (G ? '' : ' (set 1 shown)') + ':')); ['O', 'K', 'G', 'B', 'R', 'Y', 'P'].forEach(c => bk.appendChild(bookRow(c, sets[c] || 1, true)));
   sec('Ingredient books in this game', true, bk);
   for (let s = 1; s <= 4; s++) { const d = h('div'); ['G', 'B', 'R', 'Y', 'P'].forEach(c => d.appendChild(bookRow(c, s, G && sets[c] === s))); sec(D.SET_NAMES[s] + ': all five books', false, d); }
   const fc = h('div'); D.FORTUNE.forEach(c => fc.appendChild(h('div.rcard', h('span.rfort.' + c.kind, fortImg(c, 'rfimg'), h('i', c.kind === 'blue' ? 'DAY' : 'NOW')), h('div.rt', h('b', c.name + ' (1)'), h('div', c.text)))));
-  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day, purple cards happen at once. Options that name yellow or purple chips only work once that stall is open. ', h('a', { href: 'cards.html', target: '_blank', rel: 'noopener' }, 'See all 24 fortune paintings')), fc);
+  sec('Fortune cards (24: 11 blue, 13 purple)', false, h('p.sm', 'Blue cards last the whole day. Purple cards happen at once. Yellow or purple options need that stall open. ', h('a', { href: 'cards.html', target: '_blank', rel: 'noopener' }, 'See all 24 fortune paintings')), fc);
   const tt = h('table.reft'); tt.appendChild(h('tr', h('th', 'Space'), h('th', 'Coins'), h('th', 'VP'), h('th', 'Ruby')));
   for (let i = 1; i < D.TRACK_LEN; i++) tt.appendChild(h('tr', h('td', i === D.SPOON ? '53 (spoon)' : i), h('td', D.COINS[i]), h('td', D.VP[i]), h('td', D.RUBY[i] ? '◆' : '')));
-  sec('The cauldron spiral (spaces 1 to 53)', false, h('p.sm', 'Chips sit on spaces 1 to 52. Your scoring space is the one after your last chip. Past 52 the chip stays on 52 and you score the spoon.'), tt);
-  const dg = h('div.rcard', h('div.rt', h('b', 'The bonus die (6 faces)'), h('div', D.DIE.map(f => D.DIE_TEXT[f]).join(', ') + '.'), h('div.sm', 'Rolled by the cauldron on the highest coin number among those that did not explode.')));
-  sec('Bonus die and rat tails', false, dg, h('div.rcard', h('div.rt', h('b', 'Rat tails'), h('div', 'The score track has a rat tail after every even number of victory points. Count the tails between you and the leader: that many spaces ahead of the droplet is where your first chip starts (from day 2).'))));
+  sec('The cauldron spiral (spaces 1 to 53)', false, h('p.sm', 'Chips sit on spaces 1 to 52. You score the space after your last chip. Past 52, the chip stays on 52 and you score the spoon.'), tt);
+  const dg = h('div.rcard', h('div.rt', h('b', 'The bonus die (6 faces)'), h('div', D.DIE.map(f => D.DIE_TEXT[f]).join(', ') + '.'), h('div.sm', 'The safe cauldron with the most coins rolls it.')));
+  sec('Bonus die and rat tails', false, dg, h('div.rcard', h('div.rt', h('b', 'Rat tails'), h('div', 'The score track has a rat tail after every second point. Count the tails between you and the leader. From day 2, your first chip starts that much further.'))));
   return root;
 }
 function renderScores() {
@@ -85,6 +96,7 @@ function renderMenu() {
   const online = typeof NET !== 'undefined' && NET.on;
   const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
   const tog = (name, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': name, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
+  if (isPh()) row('Look up', h('button.btn', { 'data-gx': 'scored', type: 'button' }, 'Scores'), h('button.btn', { 'data-gx': 'rulesd', type: 'button' }, 'Rules'));   // W471: on a phone these live in the Menu, not the top bar
   if (online) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
@@ -97,10 +109,10 @@ function renderMenu() {
   b.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (character cards) / online ----------
-const SETCHOICES = [[1, 'Beginner set', 'Set 1: easiest to learn, recommended for a first game.'], [2, 'Set 2', 'Safe harbour, side pockets, double steps.'], [3, 'Set 3', 'Lucky sevens, pod pushers, roomier pots.'], [4, 'Set 4', 'Ruby treasure, upgrades, stretching roots.'], ['random', 'Random mix', 'Every colour gets a random set 1 to 4.']];
+const SETCHOICES = [[1, 'Beginner set', 'Easiest to learn. Best for a first game.'], [2, 'Set 2', 'Safe harbour, side pockets, double steps.'], [3, 'Set 3', 'Lucky sevens, pod pushers, roomier pots.'], [4, 'Set 4', 'Ruby treasure, upgrades, stretching roots.'], ['random', 'Random mix', 'Every colour gets a random set 1 to 4.']];
 function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { seats: DEF.seats.slice(), lvBy: Object.assign({}, DEF.lvBy) }); o.np = o.seats.length + 1; return o; }
 function setNp(n) { const o = optObj(), want = Math.max(1, Math.min(3, n - 1)); const st = o.seats.slice().filter(c => c !== o.me); while (st.length > want) st.pop(); for (let c = 0; c < 4 && st.length < want; c++) if (c !== o.me && st.indexOf(c) < 0) st.push(c); o.seats = st; o.np = st.length + 1; }
-function toggleChar(c) { const o = optObj(); if (c === o.me) return; const st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { toast('At least one other maker joins you.'); return; } } else { if (st.length >= 3) st.shift(); st.push(c); } o.seats = st; o.np = st.length + 1; }
+function toggleChar(c) { const o = optObj(); if (c === o.me) return; const st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { say('At least one other player joins you.'); return; } } else { if (st.length >= 3) st.shift(); st.push(c); } o.seats = st; o.np = st.length + 1; }
 function setMe(c) { const o = optObj(); if (c === o.me) return; o.me = c; o.seats = o.seats.filter(x => x !== c); for (let k = 0; k < 4 && o.seats.length < Math.max(1, o.np - 1); k++) if (k !== c && o.seats.indexOf(k) < 0) o.seats.push(k); o.np = o.seats.length + 1; }
 function logoSVG() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="9" fill="#2a8a80" stroke="#fff6dc" stroke-width="1.6"/><ellipse cx="12" cy="8.5" rx="8" ry="3" fill="#5fc6a8" stroke="#fff6dc" stroke-width="1.2"/><circle cx="9" cy="14.5" r="1.8" fill="#fff6dc"/><circle cx="14.5" cy="16.5" r="1.3" fill="#fff6dc"/><circle cx="15" cy="5.5" r="1.4" fill="#fff6dc" opacity=".8"/></svg>'; }
 function tableLine(o) { const nm = o.seats.map(c => PN[c]); return 'You (' + PN[o.me] + ') + ' + nameList(nm) + ' · ' + o.np + ' makers'; }
@@ -184,7 +196,7 @@ document.addEventListener('click', ev => {
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
-        if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
+        if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; UI.instrNote = { ver: pl.ver, text: 'Only one white chip. Tap the flask again to use it.' }; render(); try { instrBar(); } catch (e) { } document.querySelectorAll('.flb').forEach(fb => { fb.classList.add('armed'); fb.setAttribute('aria-label', 'Tap again to use the flask'); }); break; } }
         if (m.t === 'ratset' || m.t === 'draw') UI.ratOpen = false;
         if (m.t === 'draw') UI.drawT = Date.now();
         else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
@@ -228,7 +240,7 @@ document.addEventListener('click', ev => {
     case 'setme': setMe(+d.c); renderStart(); break;
     case 'gfx': setGfx && setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
-    case 'start': if (d.m === 'vs' && firstTime() && typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME) && typeof tutStart === 'function') { tutStart(); break; } newGame(d.m, optObj()); break;   // a first-time player's Play is the coached first game
+    case 'start': newGame(d.m, optObj()); break;   // W471: Play is always a clean game; Learn to play is the coached one
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
@@ -239,8 +251,8 @@ document.addEventListener('click', ev => {
     case 'mprev': musicPreview(d.s); renderMusic(); break;
     case 'mprevx': musicPreviewStop(); renderMusic(); break;
     case 'mmus': UI.prefs.music = UI.prefs.music === false; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (x) { } MUS.want = null; sndMusic(); renderMusic(); break;
-    case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
-    case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
+    case 'save': say(save() ? 'Game saved.' : 'Could not save.'); break;
+    case 'loadsave': if (!loadSave()) say('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;

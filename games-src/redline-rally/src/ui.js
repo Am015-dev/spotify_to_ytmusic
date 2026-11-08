@@ -29,15 +29,15 @@ function drawSetup() {
   chooser('#s-wx', WX_IDS.concat(['random']).map(function (w) { return { v: w, h: w === 'random' ? 'Random' : esc(WEATHER[w].name) }; }), 'wx');
   chooser('#s-sup', [{ v: true, h: 'On' }, { v: false, h: 'Off' }], 'sup');
   chooser('#s-diff', ['easy', 'normal', 'hard'].map(function (d) { return { v: d, h: d[0].toUpperCase() + d.slice(1) }; }), 'diff');
-  var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = innerHeight >= 880; $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
+  var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = false;   /* collapsed by default on every screen (R9) */ $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title')); titleBg();
 }
 function showTitle() { try { GX.close(); } catch (e) { } $('#title').hidden = false; $('#game').hidden = true; closeModal(); drawSetup(); }
-function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m) closeModal(); }; artApply(m); }
+function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m && !UI.lockModal) closeModal(); }; artApply(m); }
 function closeModal() { var m = $('#modal'); m.hidden = true; m.innerHTML = ''; m.onclick = null; }
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('#modal').hidden && !UI.lockModal) closeModal(); });
 function rulesFill() {
-  var h = ('<h3>How a turn works</h3><p>The strip in the side panel lights your phase: <b>Shift</b> (pick a gear), <b>Play</b> (pick the cards), <b>Move</b>, <b>React</b> (cooldown, boost, slipstream, corners), <b>Discard</b> (draw back to 7). Before you press Go, the track shows where you will land and what the corner costs.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
-    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out: all your engine heat is lost, you stop behind the corner in gear 1, and get 1 stress card (2 if you were in gear 3 or 4).</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 move and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
+  var h = ('<h3>How a turn works</h3><p>The strip in the panel lights your phase. <b>Shift</b>: pick a gear. <b>Play</b>: pick the cards. <b>Move</b>. <b>React</b>: cooldown, boost, slipstream, corners. <b>Discard</b>: draw back to 7. With Hints on, the track shows where you land.</p><ol class="turn5">' + STORY.turn.map(function (l) { return '<li>' + esc(l.replace(/^\d\. /, '')) + '</li>'; }).join('') + '</ol><h3>The rules in full</h3><p>Be first across the line after all laps. Each round you pick a <b>gear</b> and play that many cards. The total is your speed: you move that many spaces.</p>' +
+    '<h3>Each round</h3><ul><li><b>Gear 1-4</b>: shift one step free, or two steps for 1 heat. Gear = cards you play.</li><li><b>Corners</b> have a speed limit. Every point over costs 1 heat from your engine. Not enough heat? You spin out. You lose all engine heat. You stop behind the corner in gear 1. You get 1 Stress card, or 2 from gear 3 or 4.</li><li><b>Slipstream</b>: end next to or right behind another car and you may glide 2 more spaces. It does not count as speed.</li><li><b>Boost</b>: pay 1 heat to flip cards from your deck until a speed card shows, and add it.</li><li><b>Cooldown</b> (after your cards are shown): gear 1 sends up to 3 heat from your hand back to the engine, gear 2 sends 1.</li><li><b>Adrenaline</b>: the last car to move each round gets +1 move and +1 cooldown (the last two cars when 5 or more started).</li><li><b>Too few cards</b>: if your hand has fewer playable cards than your gear, you play them all, pay heat cards for the rest, do not move and drop to gear 1.</li><li><b>The finish</b>: no slipstream past the line. The race goes on until every car has finished; finishers are placed in the order they cross. Cars crossing in the same round: the one furthest past the line is ahead; on the same space, the one that got there first.</li></ul>' +
     '<h3>Cards</h3><ul><li>Speed 1, 2, 3, 4: three of each.</li><li>Stress (3): when played, flip your deck until a speed card shows and use it.</li><li>Heat (6 start in your engine): paying sends them to your discard pile. They clog your hand later and cannot be played.</li></ul>' +
     '<h3>Upgrades (optional)</h3><ul><li>Switch Upgrades on in setup. Before the race you pick 3 upgrade cards; they join your deck and are played like speed cards, each with a bonus (more cooling, higher corner limits, a big speed jump).</li></ul>' +
     '<h3>Starting upgrades (house values)</h3><ul><li>Every car shuffles a <b>Brake card</b> (speed 0), a <b>Burst card</b> (speed 5) and 1 extra heat card into its deck. The printed rules give no numbers for these, so these are this game\'s own fair values. A stress flip skips them. Switch off in setup.</li></ul>' +
@@ -123,6 +123,8 @@ function drawPlan() {
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
+  p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
+  if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
   $('#boostB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); UI.boost = !UI.boost; drawPlan(); };
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
@@ -130,7 +132,7 @@ function drawPlan() {
   else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + '. Press Go.', ''); }
   else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : '') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready) previewSet(null);
-  RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = ready && RACE.prev ? RACE.prev.sp : 0;
+  RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
   if (!ready && need === 0) $('#goB').disabled = false;
   var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · your turn'; if (RACE.rateShow && !G.hot && hintsOn()) { RACE.rateShow = 0; RACE.rateKeep = 1; banner(RACE.rate, RACE.rateK === 'good' ? 2 : RACE.rateK === 'poor' ? 0 : 3, 'plan rate'); } else if (!RACE.rateKeep) banner(G.hot ? c.name.split(' ')[0] + "'s turn" : STORY.yourTurn, c.col, 'plan');
   if (UI.swap && c.dsc !== G.round) swapMode(c);
@@ -195,7 +197,7 @@ async function runResolve() {
     var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
     if (G.pend) { var use = await askSlip(); if (G !== g0) return; ev = slipChoice(G, use); await playEvents(ev); if (G !== g0) return; }
   }
-  UI.busy = false; UI.pops = []; banner(''); RACE.spdT = 0; rateRound();
+  UI.busy = false; banner(''); RACE.spdT = 0; rateRound();
   if (G.over) { banner('Chequered flag!', null, 'round'); setMsg('Chequered flag!', 'good'); await wait(1100); banner(''); return showResult(); }
   if (window.__noPlan) return;
   UI.sel = []; UI.touchedGear = 0; RACE.ph = 'shift'; if (UI.mode === 'tutorial') tutStageRound(G.round); var nx = needPlans(G)[0]; setMsg('Round ' + G.round); if (nx != null) planFor(nx); else startRound();
@@ -209,7 +211,9 @@ function tween(i, to, ms) {
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
     v.p = from + dir * Math.min(Math.abs(to - from), i + e); if (k < 1) requestAnimationFrame(f); else { v.p = to; res(); } })(t0); });
 }
-function pop(txt, at, col, stem) { UI.pops.push({ txt: txt, p: at, t: performance.now(), col: col || '#fff', stem: stem }); setTimeout(function () { UI.pops.shift(); }, 1500); }
+/* one pop at a time; it holds 3 s, then fades for 1 s (brief: text stays long enough to read) */
+function pop(txt, at, col, stem) { var o = { txt: txt, p: at, t: performance.now(), col: col || '#fff', stem: stem }; UI.pops = [o]; setTimeout(function () { var k = UI.pops.indexOf(o); if (k >= 0) UI.pops.splice(k, 1); }, POPMS); }
+var POPMS = 4000;
 function ord(n) { return n + (n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th'); }
 async function playEvents(ev) {
   var gP = G;
@@ -219,7 +223,7 @@ async function playEvents(ev) {
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     if (UI.mode === 'tutorial') coachEvent(e, you);
-    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'is up') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' is up.'); await wait(750); }
+    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(750); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
     if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
@@ -275,7 +279,7 @@ var cv, cx, dpr = 1, trackCache = {};
 function sizeCanvas() {
   cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
-  UI.cam.s = Math.max(0.28, Math.min(0.62, Math.min(UI.W, UI.H * 1.15) / 880));
+  UI.cam.s = Math.max(0.75, Math.min(1.3, Math.min(UI.W, UI.H * 1.3) / 420));   /* close camera: cars ~90-100 px (R9) */
   UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
 }
 function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
@@ -323,6 +327,7 @@ function frame(now) {
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
   var shk = camShake(now); cx.save(); cx.translate(W / 2 + shk, H / 2 + shk * 0.5); cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
+  cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
   tk.list.forEach(function (kk) {
     var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98;
@@ -340,7 +345,7 @@ function frame(now) {
   });
   /* pops */
   UI.pops.forEach(function (o) {
-    var age = o.hold ? 0.15 : (now - o.t) / 1500; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0); cx.globalAlpha = 1 - age * age; var y = q.y - 50 - age * 60;
+    var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0); cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25); var y = q.y - 50 - Math.min(1, ms / 400) * 30;
     if (o.stem) artDraw(cx, o.stem, q.x - 50, y - 70, 100, 70, 'contain');
     cx.fillStyle = o.col; cx.font = '900 34px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = '#000'; cx.lineWidth = 7; cx.strokeText(o.txt, q.x, y); cx.fillText(o.txt, q.x, y); cx.globalAlpha = 1;
   });
@@ -374,3 +379,28 @@ UI.forceEnd = function () { if (!G) return; G.cars[0].pos = total(G); G.cars.for
 window.RR = { newGame: newGame, performMove: submitPlan, validMoves: validMoves, sideToAct: sideToAct, checkInvariants: checkInvariants, start: startGame };
 window.UI = UI;
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+
+/* the title picture has thin white bars at its sides: scale it 6% past cover so they fall off screen (R9) */
+function titleBg() { var t = $('#title'), im = ART.img['bg-title']; if (!t || !im) return; var k = Math.max(innerWidth / im.width, innerHeight / im.height) * 1.06; t.style.backgroundSize = Math.ceil(im.width * k) + 'px auto'; }
+window.addEventListener('resize', titleBg);
+
+/* drag a card up out of the hand to play it; a tap still works. The card lifts and follows the finger, the zone above the
+   hand glows, and on drop it snaps into the played row (the card's own tap handler does the rest: sound, buzz, redraw). */
+function cardDrag(b) {
+  b.addEventListener('pointerdown', function (ev) {
+    if (ev.button > 0 || UI.busy) return; var x0 = ev.clientX, y0 = ev.clientY, dr = false, h = $('#hand'), id = ev.pointerId;
+    function over(e) { var r = h.getBoundingClientRect(); return e.clientY < r.top - 4; }
+    function mv(e) {
+      if (e.pointerId !== id) return; var dx = e.clientX - x0, dy = e.clientY - y0;
+      if (!dr && Math.hypot(dx, dy) > 10) { dr = true; b.classList.add('lift'); h.classList.add('dropz'); try { b.setPointerCapture(id); } catch (er) { } }
+      if (dr) { b.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.12) rotate(' + Math.max(-12, Math.min(12, dx / 14)) + 'deg)'; h.classList.toggle('dropon', over(e)); e.preventDefault(); }
+    }
+    function up(e) {
+      if (e.pointerId !== id) return; document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+      if (!dr) return; h.classList.remove('dropz', 'dropon'); b.classList.remove('lift'); b.style.transform = ''; UI.dragT = Date.now(); UI.dragEl = b;
+      var j = +b.getAttribute('data-i'); if (e.type === 'pointerup' && over(e) && UI.sel.indexOf(j) < 0) { UI.snapI = j; UI.dragging = 1; b.onclick(); UI.dragging = 0; }
+    }
+    document.addEventListener('pointermove', mv, { passive: false }); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+  });
+  b.addEventListener('click', function (e) { if (!UI.dragging && UI.dragEl === b && Date.now() - UI.dragT < 400) {   /* only the click the browser fires at the end of this card's own drag */ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+}

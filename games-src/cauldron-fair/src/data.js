@@ -13,7 +13,7 @@ var RUBY = COINS.map(function (_, i) { return RUBY_AT.indexOf(i) >= 0 ? 1 : 0; }
 // ---- chips. Colour letters: W white, O orange, G green, B blue, R red, Y yellow, P purple, K black.
 // supply = how many chips of that (colour,value) exist in the box.
 var COLORS = {
-  W: { id: 'W', name: 'Fizzpod', plural: 'Fizzpods', css: '#f4efe2', ink: '#5b3a24', vals: [1, 2, 3], blurb: 'Explosive. Too many and the pot blows.' },
+  W: { id: 'W', name: 'Fizzpod', plural: 'Fizzpods', css: '#f4efe2', ink: '#5b3a24', vals: [1, 2, 3], blurb: 'Explosive. Too many and the pot explodes.' },
   O: { id: 'O', name: 'Marrow', plural: 'Marrows', css: '#f08a22', ink: '#fff', vals: [1] },
   G: { id: 'G', name: 'Mossback', plural: 'Mossbacks', css: '#3fa04a', ink: '#fff', vals: [1, 2, 4] },
   B: { id: 'B', name: 'Wren Feather', plural: 'Wren Feathers', css: '#3b82d6', ink: '#fff', vals: [1, 2, 4] },
@@ -30,69 +30,69 @@ var BOOK_ROUND = { O: 1, K: 1, G: 1, B: 1, R: 1, Y: 2, P: 3 };   // the first ro
 // ---- ingredient books. price = cost of the 1-chip, 2-chip, 4-chip (a single number: only a 1-chip exists).
 // eff = engine handler key. title/text are our own wording.
 var BOOKS = {
-  O: { 0: { price: [3], eff: 'none', title: 'Plain filler', text: 'No power. It just fills one space. The cheapest chip in the shop.' } },
+  O: { 0: { price: [3], eff: 'none', title: 'Plain filler', text: 'No power. It fills one space. The cheapest chip.' } },
   K: {
-    0: { price: [10], eff: 'black', title: 'Moth count', text: 'After everyone has stopped, compare black chips. 2 players: equal to your rival, droplet one space; more than your rival, droplet and a ruby. 3 or 4 players: more than the player on your left or on your right, droplet one space; more than both, droplet and a ruby. You need at least one black chip.' }
+    0: { price: [10], eff: 'black', title: 'Moth count', text: 'When everyone has stopped, compare black chips. You need at least one. Two players: tie your rival, droplet one space. Beat your rival: droplet and a ruby. Three or four: beat one neighbour, droplet one space. Beat both neighbours: droplet and a ruby.' }
   },
   G: {
-    1: { price: [4, 8, 14], eff: 'g1', title: 'Ruby moss', text: 'After the brew, take 1 ruby for each green chip that is your last or your second-to-last chip. Its number does not matter.' },
-    2: { price: [6, 11, 18], eff: 'g2', title: 'Gift moss', text: 'After the brew, for each green chip that is last or second-to-last put a free chip in your bag: a green 1 gives an orange 1; a green 2 gives a blue 1 or a red 1; a green 4 gives a yellow 1 or a purple 1 (only if that book is already out).' },
-    3: { price: [6, 11, 18], eff: 'g3', title: 'Lucky-seven moss', text: 'After the brew, if your white chips add up to exactly 7, add the numbers of all green chips in your pot and slide your last chip forward that many spaces.' },
-    4: { price: [4, 8, 14], eff: 'g4', title: 'Drip moss', text: 'After the brew, for each green chip that is last or second-to-last you may pay 1 ruby to move your droplet forward one space.' }
+    1: { price: [4, 8, 14], eff: 'g1', title: 'Ruby moss', text: 'After the brew, check your last two chips. Take 1 ruby per green chip there. Its number does not matter.' },
+    2: { price: [6, 11, 18], eff: 'g2', title: 'Gift moss', text: 'After the brew, check your last two chips. Each green chip there gives a free chip. Green 1: an orange 1. Green 2: a blue 1 or a red 1. Green 4: a yellow 1 or a purple 1. That book must be out already.' },
+    3: { price: [6, 11, 18], eff: 'g3', title: 'Lucky-seven moss', text: 'After the brew, are your white chips exactly 7? Add up your green chips. Slide your last chip forward that many spaces.' },
+    4: { price: [4, 8, 14], eff: 'g4', title: 'Drip moss', text: 'After the brew, check your last two chips. Per green chip there, pay 1 ruby to move your droplet.' }
   },
   B: {
-    1: { price: [5, 10, 19], eff: 'b1', title: 'Peek and pick', text: 'When it lands, draw as many extra chips from your bag as its number (1, 2 or 4). Place one of them as your next chip, with its power, or none. The rest go back into the bag.' },
-    2: { price: [5, 10, 19], eff: 'b2', title: 'Safe harbour', text: 'For the next chips after it (as many as its number: 1, 2 or 4), if your pot explodes you still get the victory points and the coins, but no bonus die. Covers do not add up: the longer remaining one counts.' },
+    1: { price: [5, 10, 19], eff: 'b1', title: 'Peek and pick', text: 'When it lands, draw that many extra chips: 1, 2 or 4. Place one as your next chip, or none. The rest go back into the bag.' },
+    2: { price: [5, 10, 19], eff: 'b2', title: 'Safe harbour', text: 'It covers your next 1, 2 or 4 chips. Explode while covered? Keep points and coins. You still skip the bonus die. Covers do not add up. The longest one counts.' },
     3: { price: [4, 8, 14], eff: 'b3', title: 'Ruby catcher', text: 'If it lands on a ruby space, take 1 ruby. Its number does not matter.' },
-    4: { price: [5, 10, 20], eff: 'b4', title: 'Ruby hoard', text: 'If it lands on a ruby space, score victory points equal to its number: 1, 2 or 4.' }
+    4: { price: [5, 10, 20], eff: 'b4', title: 'Ruby hoard', text: 'If it lands on a ruby space, score its number in points.' }
   },
   R: {
-    1: { price: [6, 10, 16], eff: 'r1', title: 'Marrow booster', text: 'It slides extra spaces by the number of orange chips already in your pot: 1 or 2 oranges give +1, 3 or more give +2.' },
-    2: { price: [4, 8, 14], eff: 'r2', title: 'Side pocket', text: 'Set it beside your pot instead. After you stop (even if exploded) you may add it after your last chip, moving by its number. Or keep it beside the pot for a later round, or put it back in the bag any time.' },
-    3: { price: [5, 9, 15], eff: 'r3', title: 'Pod pusher', text: 'If the chip just before it is white, add that white chip\'s number to this chip\'s move.' },
-    4: { price: [7, 11, 17], eff: 'r4', title: 'Pod skipper', text: 'Once a red chip is in your pot, every white 1 you draw later moves 2 spaces (it still counts only 1 for the explosion).' }
+    1: { price: [6, 10, 16], eff: 'r1', title: 'Marrow booster', text: 'It moves extra for orange chips already in your pot. One or two oranges: +1. Three or more: +2.' },
+    2: { price: [4, 8, 14], eff: 'r2', title: 'Side pocket', text: 'Set it beside your pot. After you stop, you may add it last. That works even if you exploded. Or keep it for a later round. You may put it back in the bag any time.' },
+    3: { price: [5, 9, 15], eff: 'r3', title: 'Pod pusher', text: 'Right after a white chip? It also moves that white chip\'s number.' },
+    4: { price: [7, 11, 17], eff: 'r4', title: 'Pod skipper', text: 'Once it is in your pot, later white 1s move 2 spaces. They still count 1 towards exploding.' }
   },
   Y: {
-    1: { price: [8, 12, 18], eff: 'y1', title: 'Kind cut', text: 'If it is drawn right after a white chip, you may put that white chip back in the bag. Its space stays empty and the yellow chip stays where it is.' },
+    1: { price: [8, 12, 18], eff: 'y1', title: 'Kind cut', text: 'Drawn right after a white chip? You may put that white back. Its space stays empty. The yellow chip stays put.' },
     2: { price: [9, 13, 19], eff: 'y2', title: 'Double step', text: 'The next chip you place moves twice as far as its number.' },
-    3: { price: [8, 12, 18], eff: 'y3', title: 'Roomier pot', text: 'With one yellow chip in your pot the explosion limit is 8, with three or more it is 9.' },
-    4: { price: [8, 12, 18], eff: 'y4', title: 'Sunroot stretch', text: 'Your 1st yellow chip in the pot moves 1 extra space, your 2nd moves 2 extra, your 3rd moves 3 extra. Later ones get nothing.' }
+    3: { price: [8, 12, 18], eff: 'y3', title: 'Roomier pot', text: 'One yellow chip in your pot: you explode past 8. Three or more: past 9.' },
+    4: { price: [8, 12, 18], eff: 'y4', title: 'Sunroot stretch', text: 'Your 1st yellow moves 1 extra space. Your 2nd moves 2 extra. Your 3rd moves 3 extra. Later ones get nothing.' }
   },
   P: {
-    1: { price: [9], eff: 'p1', title: 'Gentle sigh', text: 'After the brew, count purple chips: 1 gives 1 VP; 2 give 1 VP and a ruby; 3 or more give 2 VP and a droplet step. You may take a lower reward.' },
-    2: { price: [12], eff: 'p2', title: 'Trade wind', text: 'After the brew, hand in purple chips: 1 gives a black 1, 1 VP and a ruby; 2 give a green 1, a blue 2, 3 VP and a droplet step; 3 give a yellow 4, 6 VP, a ruby and two droplet steps. You may hand in fewer than you have, but not use the 2-reward twice.' },
-    3: { price: [10], eff: 'p3', title: 'Deep sigh', text: 'After the brew, each purple chip scores by its space: spaces 0-9 give 0 VP, 10-19 give 1, 20-29 give 2, 30 and up give 3.' },
-    4: { price: [11], eff: 'p4', title: 'Upgrade sigh', text: 'After the brew: 1 purple lets you swap one 1-chip of your pot for the 2-chip of the same colour; 2 purples swap a 2-chip for the 4-chip; 3 or more swap a 1-chip for a 4-chip. The new chip goes into your bag.' }
+    1: { price: [9], eff: 'p1', title: 'Gentle sigh', text: 'After the brew, count purple chips. One: 1 VP. Two: 1 VP and a ruby. Three or more: 2 VP and a droplet step. You may take less.' },
+    2: { price: [12], eff: 'p2', title: 'Trade wind', text: 'After the brew, you may hand in purple chips. One: a black 1, 1 VP and a ruby. Two: a green 1, a blue 2, 3 VP, a droplet step. Three: a yellow 4, 6 VP, a ruby, two droplet steps. You may hand in fewer. The two-chip reward works once.' },
+    3: { price: [10], eff: 'p3', title: 'Deep sigh', text: 'After the brew, each purple scores by its space. Spaces 0-9: 0 VP. 10-19: 1. 20-29: 2. 30 and up: 3.' },
+    4: { price: [11], eff: 'p4', title: 'Upgrade sigh', text: 'After the brew, upgrade one chip of the same colour. One purple: a 1-chip becomes a 2-chip. Two: a 2-chip becomes a 4-chip. Three or more: a 1-chip becomes a 4-chip. The new chip goes into your bag.' }
   }
 };
 var SET_NAMES = { 1: 'Beginner set', 2: 'Set 2', 3: 'Set 3', 4: 'Set 4' };
 
 // ---- fortune cards: kind 'blue' lasts the round, 'purple' happens at once. eff = engine key.
 var FORTUNE = [
-  { id: 'lucky7', kind: 'blue', name: 'Lucky Seven', text: 'If your white chips add up to exactly 7 when you stop, move your droplet one space.' },
-  { id: 'spilled', kind: 'blue', name: 'Spilled Brew', text: 'If your pot explodes this round, the player on your left takes any 2-chip from the shop.' },
-  { id: 'doover', kind: 'blue', name: 'Do-Over', text: 'Right after your 5th chip you may tip all your chips back into the bag and start the round again. Once.' },
-  { id: 'twice', kind: 'blue', name: 'Twice Rolled', text: 'Whoever rolls the bonus die this round rolls it twice and gets both results.' },
-  { id: 'thick', kind: 'blue', name: 'Thick Skin', text: 'The explosion limit is 9 this round instead of 7.' },
-  { id: 'marrowfair', kind: 'blue', name: 'Marrow Fair', text: 'This round every orange chip moves 1 extra space.' },
-  { id: 'peek', kind: 'blue', name: 'Peek and Pick', text: 'If you stop without exploding, draw up to 5 chips from your bag and place one of them.' },
-  { id: 'glint', kind: 'blue', name: 'Ruby Glint', text: 'If your scoring space shows a ruby, score 2 VP, even if your pot exploded.' },
-  { id: 'spring', kind: 'blue', name: 'Spring Water', text: 'At the end of the round every flask is refilled for free.' },
-  { id: 'froth', kind: 'blue', name: 'Frothing Pot', text: 'This round you may put the first white chip you draw back into the bag.' },
+  { id: 'lucky7', kind: 'blue', name: 'Lucky Seven', text: 'Stop with white chips at exactly 7? Move your droplet one space.' },
+  { id: 'spilled', kind: 'blue', name: 'Spilled Brew', text: 'If your pot explodes, the player on your left takes any 2-chip.' },
+  { id: 'doover', kind: 'blue', name: 'Do-Over', text: 'Right after your 5th chip, you may tip them all back. Then start the round again. Once.' },
+  { id: 'twice', kind: 'blue', name: 'Twice Rolled', text: 'Roll the bonus die today? Roll it twice and take both.' },
+  { id: 'thick', kind: 'blue', name: 'Thick Skin', text: 'The limit is 9 today instead of 7.' },
+  { id: 'marrowfair', kind: 'blue', name: 'Marrow Fair', text: 'Today every orange chip moves 1 extra space.' },
+  { id: 'peek', kind: 'blue', name: 'Peek and Pick', text: 'Stop safely? Draw up to 5 chips and place one of them.' },
+  { id: 'glint', kind: 'blue', name: 'Ruby Glint', text: 'Scoring space shows a ruby? Score 2 VP, even after exploding.' },
+  { id: 'spring', kind: 'blue', name: 'Spring Water', text: 'At the end of the day every flask refills free.' },
+  { id: 'froth', kind: 'blue', name: 'Frothing Pot', text: 'Today you may put your first white chip back in the bag.' },
   { id: 'spark', kind: 'blue', name: 'Red Spark', text: 'If your scoring space shows a ruby, take 1 extra ruby.' },
-  { id: 'pick', kind: 'purple', name: 'Pedlar\'s Pick', text: 'Take a black chip, or any 2-chip, or 3 rubies.' },
+  { id: 'pick', kind: 'purple', name: 'Pedlar\'s Pick', text: 'Take a black chip, any 2-chip, or 3 rubies.' },
   { id: 'slide', kind: 'purple', name: 'A Little Slide', text: 'Move your droplet forward one space.' },
   { id: 'swap', kind: 'purple', name: 'Swap Stall', text: 'You may trade 1 ruby for any 1-chip except purple and black.' },
-  { id: 'alms', kind: 'purple', name: 'Kind Alms', text: 'The player or players with the fewest rubies take 1 ruby.' },
-  { id: 'underdog', kind: 'purple', name: 'Underdog Gift', text: 'The player or players with the fewest victory points take a green 1.' },
-  { id: 'clear', kind: 'purple', name: 'Clear the Pods', text: 'Score 4 VP, or take one white 1 out of your bag.' },
-  { id: 'swarm', kind: 'purple', name: 'Rat Swarm', text: 'Count your rat tails again: move your rat stone that many extra spaces.' },
-  { id: 'dip', kind: 'purple', name: 'Lucky Dip', text: 'Everyone draws 5 chips. The lowest total takes a blue 2, everyone else takes a ruby. Chips go back.' },
-  { id: 'bribe', kind: 'purple', name: 'Rat Bribe', text: 'You may move your rat stone back 1 to 3 spaces and take that many rubies.' },
-  { id: 'bounty', kind: 'purple', name: 'Rat Bounty', text: 'Take any 4-chip, or score 1 VP for each rat tail you trail the leader by.' },
+  { id: 'alms', kind: 'purple', name: 'Kind Alms', text: 'Each player with the fewest rubies takes 1 ruby.' },
+  { id: 'underdog', kind: 'purple', name: 'Underdog Gift', text: 'Whoever has the fewest points takes a green 1.' },
+  { id: 'clear', kind: 'purple', name: 'Clear the Pods', text: 'Score 4 points, or take a white 1 out of your bag.' },
+  { id: 'swarm', kind: 'purple', name: 'Rat Swarm', text: 'Count your rat tails again. Move your rat stone that much further.' },
+  { id: 'dip', kind: 'purple', name: 'Lucky Dip', text: 'Everyone draws 5 chips. The lowest total takes a blue 2. The rest take a ruby. Chips go back.' },
+  { id: 'bribe', kind: 'purple', name: 'Rat Bribe', text: 'Move your rat stone back 1 to 3 spaces. Take that many rubies.' },
+  { id: 'bounty', kind: 'purple', name: 'Rat Bounty', text: 'Take any 4-chip. Or score 1 VP per rat tail behind the leader.' },
   { id: 'fork', kind: 'purple', name: 'Fork in the Road', text: 'Move your droplet 2 spaces, or take a purple chip.' },
   { id: 'dice', kind: 'purple', name: 'Fairground Dice', text: 'Everyone rolls the bonus die once and takes the result.' },
-  { id: 'haggle', kind: 'purple', name: 'Haggler\'s Hour', text: 'Draw 4 chips. You may swap one for the next higher chip of its colour; if none can, take a green 1. Chips go back.' }
+  { id: 'haggle', kind: 'purple', name: 'Haggler\'s Hour', text: 'Draw 4 chips. You may upgrade one to the next size. If none can, take a green 1. Chips go back.' }
 ];
 
 // ---- bonus die: six faces (one repeated; which one is repeated is a guess, see rules-notes)
@@ -101,10 +101,10 @@ var DIE_TEXT = { vp1: '1 victory point', vp2: '2 victory points', ruby: '1 ruby'
 
 // ---- the four fair-goers. Colours are the player colours of the box (green, yellow, blue, red).
 var CHARS = [
-  { id: 'wynne', name: 'Wynne', color: 'green', css: '#3fa04a', title: 'The Moss Herbalist', story: 'Wynne grows everything she brews on her own window sill and talks to each plant by name.', like: 'Choose Wynne if you like steady, patient play.' },
-  { id: 'odo', name: 'Odo', color: 'yellow', css: '#e8b425', title: 'The Root Dealer', story: 'Odo digs sunroots at dawn and sells them by noon, always with a story about how rare they are.', like: 'Choose Odo if you like a quick sale and a big pot.' },
-  { id: 'tamsin', name: 'Tamsin', color: 'blue', css: '#3b82d6', title: 'The Feather Seer', story: 'Tamsin reads the fair by the wren feathers that drift past her stall and is right more often than she admits.', like: 'Choose Tamsin if you like clever tricks.' },
-  { id: 'mirabel', name: 'Mirabel', color: 'red', css: '#d6392f', title: 'The Fire Brewer', story: 'Mirabel says a pot that never bubbles over is a pot that never tried.', like: 'Choose Mirabel if you like living dangerously.' }
+  { id: 'wynne', name: 'Wynne', color: 'green', css: '#3fa04a', title: 'The Moss Herbalist', story: 'Wynne grows every herb on her window sill. She names each plant.', like: 'Choose Wynne if you like steady, patient play.' },
+  { id: 'odo', name: 'Odo', color: 'yellow', css: '#e8b425', title: 'The Root Dealer', story: 'Odo digs sunroots at dawn. By noon he swears they are rare.', like: 'Choose Odo if you like a quick sale and a big pot.' },
+  { id: 'tamsin', name: 'Tamsin', color: 'blue', css: '#3b82d6', title: 'The Feather Seer', story: 'Tamsin reads the fair in drifting wren feathers. She is often right.', like: 'Choose Tamsin if you like clever tricks.' },
+  { id: 'mirabel', name: 'Mirabel', color: 'red', css: '#d6392f', title: 'The Fire Brewer', story: 'Mirabel says a pot that never bubbles over never tried.', like: 'Choose Mirabel if you like living dangerously.' }
 ];
 
 CF.DATA = {

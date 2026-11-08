@@ -9,12 +9,16 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DD=TB.DATA;
 const FK={nobility:'gilded',clans:'heath',uprising:'lantern',gathering:'choir'};
+// each faction's leader portrait (owner art, media/camp-*.webp): the same faces as the Basic-card fallback in ui13.js
+const TB_LEAD={gilded:'camp-halvard',heath:'camp-ysolde',lantern:'camp-rook',choir:'camp-orlen'};
+// each faction's painted card back (owner art): shown on that rival's face-down bid
+const TB_BACK={gilded:'back-court',heath:'back-default',lantern:'back-council-seal',choir:'back-moth-wing'};
 const FIDS=['nobility','clans','uprising','gathering'];
 const fk=seat=>FK[G.pl[seat].fac];
 const kf=seat=>TBKit.FACTIONS[fk(seat)];
 const fcol=seat=>kf(seat).main;
 var G=null;
-const UI={started:false,mode:'me',cfg:null,holder:0,busy:false,evq:[],card:null,pop:null,popArg:null,tip:{},seen:{},speed:1,guide:'full',
+const UI={started:false,mode:'me',cfg:null,holder:0,busy:false,evq:[],card:null,pop:null,popArg:null,tip:{},seen:{},speed:1,guide:'off',
   hand:null,clashRes:{},toast:'',lastLog:0,sel:{},watchPaused:false,aiSeed:0,mapQ:Promise.resolve(),pumping:false,rs0:null,placed:[],undo:null,phone:false,land:false,sound:true,music:false};
 var setSeed=n=>{UI.aiSeed=n},setAiSeed=n=>{UI.aiSeed=n};
 // ---------------------------------------------------------------- tiny helpers
@@ -44,7 +48,7 @@ const ART={ruse:{nobility:'herald',clans:'ravens',uprising:'mob',gathering:'moon
 const ARCH_TYPE={ruse:'ploy',trader:'trade',agent:'ploy',follower:'unit',cavalry:'unit',war_machine:'unit',captain:'unit',champion:'unit',heir:'unit'};
 const ARCH_LBL={ruse:'Ruse',trader:'Trader',agent:'Agent',follower:'Follower',cavalry:'Cavalry',war_machine:'War machine',captain:'Captain',champion:'Champion',heir:'Heir',scheme:'Scheme'};
 const TRAIT_N={inv:'Invulnerable',res:'Resilient',path:'Pathfinder'};
-const TRAIT_T={inv:'cannot be Eliminated',res:'if Eliminated it goes to your Discard Pile instead of the Lost Pile',path:'if it is used to Journey it goes to your Discard Pile, not the Lost Pile'};
+const TRAIT_T={inv:'cannot be Eliminated',res:'if Eliminated, goes to Discard, not the Lost Pile',path:'a Journey sends it to Discard, not the Lost Pile'};
 const CMD_N={ambush:'Ambush',retreat:'Retreat',flank:'Flank',rally:'Rally',deploy:'Deploy',deadly:'Deadly',ambret:'Ambush or Retreat'};
 const SUIT_N={relics:'Coin',secrets:'Whispers',oaths:'Pledges'};
 const SUIT_ART={relics:['tribute','merchant','chalice','feast'],secrets:['tome','key','oath','vigil'],oaths:['blade','banner','crown','oath']};
@@ -138,7 +142,7 @@ function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDon
   if(o.seatFactions)o.seatFactions.forEach((f,i)=>{if(seats[i])seats[i].faction=f});
   const cnt={};const pl=seats.map((s,i)=>{const base=DD.FSHORT[s.faction];
     return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+')':base,ai:s.human?null:s.level}});
-  cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'full');
+  cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'off');
   hookEngine();
   G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined),order:o.order});
   G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
@@ -148,7 +152,7 @@ function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=fal
 function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp||UI.cfg.tutorial)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
-function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}
+function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'off';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}
 // ---------------------------------------------------------------- applying moves
 function doMove(mv){if(!G||!G.q)return false;const was=G.round,l0=G.logN;
   const res=TB.apply(G,mv);

@@ -225,7 +225,9 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 .glow .pvb{font-size:max(14px,calc(14px/var(--sc,1)))}
 @media(min-width:1024px){#main{position:relative}#hand{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);margin:0;z-index:5}}
 /* result card: the title fits inside its ribbon, button words centred */
-#modal .card[aria-label=Result] h2,html.sk #modal .card[aria-label=Result] h2{font-size:19px!important;letter-spacing:0!important;padding-left:70px!important;padding-right:70px!important;white-space:nowrap}
+/* polish: the ribbon art's cream band is a quarter of its width, so the result title is a plain heading (no ornament over the words) */
+#modal .card[aria-label=Result] h2,html.sk #modal .card[aria-label=Result] h2{background:none!important;padding:4px 12px!important;font-size:26px!important;letter-spacing:.02em!important;color:#8e3a1c!important;text-shadow:none!important;white-space:normal}
+.coachcard h2{padding:0 34px;margin-top:10px;text-align:center;font-size:21px;line-height:1.2}
 #modal .card .btn{display:flex;align-items:center;justify-content:center;text-align:center}
 #status .tpic{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#f6ead2;border:2px solid var(--c);margin:-4px 2px -4px 0;flex:0 0 auto}
 [data-gxt-open] span{font-size:14px!important}
@@ -237,3 +239,11 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 #rules .raim,.drawer .raim{font:800 18px/1.3 var(--ff);margin:0 0 8px;color:#2a1608}
 @media(max-width:420px){#left small{display:none}}
 @media(min-width:1024px){#coach{bottom:184px}}
+/* polish: drag the tile from the tray; follower spots are 48px targets and their label is part of the button */
+#htile{touch-action:none}
+#htile.lifted .spin{opacity:.35}
+#dragtile{position:fixed;left:0;top:0;z-index:60;pointer-events:none;border:3px solid var(--c,#ffd24a);border-radius:6px;box-shadow:0 16px 28px rgba(0,0,0,.45);opacity:.94;overflow:hidden}
+#dragtile svg{display:block;width:100%;height:100%}
+.glow.dragover::after{border-color:#fff;box-shadow:0 0 0 calc(3px/var(--sc,1)) #ffd24a,0 0 calc(18px/var(--sc,1)) #ffd24a;animation:none}
+.fglow{width:48px!important;height:48px!important}
+.fglow .flab{pointer-events:auto;cursor:pointer}
