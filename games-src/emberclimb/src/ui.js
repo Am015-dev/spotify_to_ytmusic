@@ -51,7 +51,7 @@
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
   function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
-    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animationDuration = dur + 'ms'; d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -221,7 +221,7 @@
   UI.lockedRelics = lockedRelics;
   var ng0 = E.newGame; E.newGame = function (o) { E.lock(lockedRelics()); return ng0.call(E, o); };
   function quick() {
-    var s = h('div'); s.id = 'title';
+    var s = h('div', 'pick'); s.id = 'title';
     s.appendChild(BG('bg-title'));
     var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]); s.appendChild(t);
     var hs = h('div', 'heroes');
@@ -263,7 +263,7 @@
   }
   // dock: what to do now (one line) + End turn + potions
   function dock(g) {
-    var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = ''; var oldpi = a.parentNode.querySelector('.pcinfo'); if (oldpi) oldpi.remove();
+    var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = ''; a.parentNode.querySelectorAll('.pcinfo').forEach(function (n) { n.remove(); });
     var txt = '', ttl = 'Your move';
     if (g.scr === 'map') { txt = 'Pick a glowing room.'; ttl = 'Climb'; }
     else if (g.scr === 'battle') {
@@ -284,6 +284,8 @@
     m.textContent = txt; t.textContent = ttl; var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
+    // PC side panel: the deck you climb with, as small card pictures (R1 polish: fill the panel with something useful)
+    if (g.scr === 'battle' && window.innerWidth >= 1024) { var hd = g.hs[g.b && g.b.cur >= 0 ? g.b.cur : 0], cnt = {}, ord = []; hd.deck.forEach(function (c) { if (!cnt[c.id]) { cnt[c.id] = 0; ord.push(c); } cnt[c.id]++; }); var dp = h('div', 'pcinfo pcdeck', null, [h('b', '', 'Your deck (' + hd.deck.length + ')')]), dg = h('div', 'pcdg'); ord.forEach(function (c) { var t = h('div', 'pcdc', null, [A(c.id, '', { cls: 'pcda', kind: 'card', noph: 1 }), h('span', '', D.CARDS[c.id].name + (cnt[c.id] > 1 ? ' x' + cnt[c.id] : ''))]); dg.appendChild(t); }); dp.appendChild(dg); a.parentNode.appendChild(dp); }
     UI.endBtn = null;
   }
   var NODEG = { m: '⚔', e: '💀', r: '🔥', s: '🛒', v: '?', t: '🎁', b: '👑' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };

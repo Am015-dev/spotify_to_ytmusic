@@ -15,13 +15,13 @@
     "stag": { "name": "The Pale Stag-King", "portrait": "camp-stag.webp", "emoji": "🦌", "color": "#8e5bb5" }
   },
   "acts": [
-    { "act": 1, "title": "Spring on the Heath", "blurb": "Learn one thing at a time: clashes, Heralds, the Great Road, then Lore." },
+    { "act": 1, "title": "Spring on the Heath", "blurb": "Learn one thing at a time. Clashes, Heralds, the Great Road, then Lore." },
     { "act": 2, "title": "Summer of Knives", "blurb": "Three rivals at the table. Councils, the Favour and Deadly agents." },
-    { "act": 3, "title": "The Long Winter", "blurb": "The sharpest rivals, a boss rule in every crowning fight, and the Throne." }
+    { "act": 3, "title": "The Long Winter", "blurb": "The sharpest rivals. A boss rule in every crowning fight. Then the Throne." }
   ],
   "twists": [
-    { "id": "boss-lore", "where": "setup", "how": "Right after TB.newGame returns, set G.pl[bossSeat].lore = param (default 2); nothing else changes." },
-    { "id": "boss-first", "where": "setup", "how": "Pass order: [bossSeat, ...the other seats in random order] to TB.newGame so the boss starts first on the Order Track; later rounds re-sort by Influence as normal." },
+    { "id": "boss-lore", "where": "setup", "how": "After TB.newGame returns, set G.pl[bossSeat].lore = param (default 2). Nothing else changes." },
+    { "id": "boss-first", "where": "setup", "how": "Pass order [bossSeat, ...the other seats in random order] to TB.newGame. The boss starts first on the Order Track. Later rounds re-sort by Influence as normal." },
     { "id": "boss-favour", "where": "setup", "how": "Right after TB.newGame returns, set G.fav = { h: bossSeat, u: 3 } so the boss starts holding the Favour disc with three uses instead of it lying on the Gleaning Meadow." },
     { "id": "sharp-mind", "where": "ai", "how": "When the boss seat moves, call TB.AI.choose(G, bossSeat, 'hard', { budget: TB.AI.budgetMs * param }) so its rollouts get param times the normal thinking time (default 2)." }
   ],
@@ -31,7 +31,7 @@
       "boss": false,
       "intro": [
         { "who": "ysolde", "text": "Three regions, three fights each round. Put a card face-down by each one." },
-        { "who": "ysolde", "text": "When the cards flip, the bigger total takes the region and its Influence." },
+        { "who": "ysolde", "text": "Cards flip. The bigger total takes the region and its Influence." },
         { "who": "tamsin", "text": "I keep the Court's gate. Come and knock, little heir, if you dare." }
       ],
       "outro": [
@@ -57,14 +57,14 @@
       "boss": false,
       "intro": [
         { "who": "ysolde", "text": "Before the fights, stand your Herald on one Location. Everyone can see it." },
-        { "who": "ysolde", "text": "Win that region and pick that Location: +1 Influence, and 1 more from each rival there." },
+        { "who": "ysolde", "text": "Win that region and pick that Location. Gain +1 Influence, and 1 more from each rival there." },
         { "who": "tamsin", "text": "I will stand mine on the Cairn Field. Two Influence! Who could resist?" }
       ],
       "outro": [
         { "who": "ysolde", "text": "Your Herald is a promise. Back it with your strongest card." }
       ],
       "opponent": { "name": "Tamsin of the Gate", "portrait": "camp-tamsin.webp", "emoji": "🗝️", "cast": "tamsin",
-        "personality": "Always sends her Herald to the richest Location and forgets to defend it.",
+        "personality": "She always sends her Herald to the richest Location. She forgets to defend it.",
         "aiLevel": "easy", "aiStyle": "nobility" },
       "setup": { "np": 2, "length": "short", "faction": "clans", "seatFactions": ["clans", "nobility"], "seed": null },
       "twist": null,
@@ -75,7 +75,7 @@
         { "text": "Collect 4 Herald Rewards", "test": { "k": "heraldHits", "op": ">=", "v": 4 } },
         { "text": "Win by 4 or more", "test": { "k": "margin", "op": ">=", "v": 4 } }
       ],
-      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Tamsin plays more loosely and the coach points at the best Location for your Herald." },
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Tamsin plays more loosely. The coach points at the best Location for your Herald." },
       "unlock": [ { "type": "title", "id": "herald-caller", "text": "Title: Herald-Caller" } ]
     },
     {
@@ -83,7 +83,7 @@
       "boss": false,
       "intro": [
         { "who": "ysolde", "text": "Each spring you bid one card. The highest bid picks first from the Great Road." },
-        { "who": "ysolde", "text": "A Kingdom Card works every round, but the card you bid stays tucked under it." },
+        { "who": "ysolde", "text": "A Kingdom Card works every round. The card you bid stays tucked under it." },
         { "who": "fennick", "text": "The Choir collects what others leave behind. Bid low, friend. I'll wait." }
       ],
       "outro": [
@@ -109,7 +109,7 @@
       "id": "c4", "act": 1, "title": "The Seneschal's Toll",
       "boss": true,
       "intro": [
-        { "who": "ysolde", "text": "In autumn you may Journey: send away a card with scrolls and gain that much Lore." },
+        { "who": "ysolde", "text": "In autumn you may Journey. Send away a card with scrolls and gain that much Lore." },
         { "who": "ysolde", "text": "Spend Lore on your Site of Power. Those cards are stronger than anything you start with." },
         { "who": "halvard", "text": "The heath pays toll to the Court. Every card you send away is one fewer to fight me." }
       ],
@@ -118,13 +118,13 @@
         { "who": "ysolde", "text": "Spring is over. Now the other houses notice you." }
       ],
       "opponent": { "name": "Seneschal Halvard Crane", "portrait": "camp-halvard.webp", "emoji": "🏰", "cast": "halvard",
-        "personality": "Stiff and careful; defends the Cairn Field and never wastes a strong card.",
+        "personality": "Stiff and careful. Defends the Cairn Field. Never wastes a strong card.",
         "aiLevel": "easy", "aiStyle": "nobility",
         "taunt": "Tolls are paid in full. Come back when your cards have grown teeth.",
         "praise": "Well. A heath-born heir with a Site of Power. Pass, and be welcome." },
       "setup": { "np": 2, "length": "short", "faction": "clans", "seatFactions": ["clans", "nobility"], "seed": null },
       "twist": null,
-      "goal": { "type": "custom", "value": 1, "text": "Win, and buy at least 1 card from your Site of Power with Lore." },
+      "goal": { "type": "custom", "value": 1, "text": "Win, and buy 1 or more Site of Power cards with Lore." },
       "hints": true,
       "stars": [
         { "text": "Win and buy a Site of Power card", "test": { "k": "siteBought", "op": ">=", "v": 1 } },
@@ -142,7 +142,7 @@
       "boss": false,
       "intro": [
         { "who": "ysolde", "text": "Three houses at the table now. Each Council rewards cards with Votes on them." },
-        { "who": "ysolde", "text": "In autumn, Govern: place one card with a Vote in the Council of Coin, Whispers or Pledges." },
+        { "who": "ysolde", "text": "In autumn, Govern. Place a Vote card in the Council of Coin, Whispers or Pledges." },
         { "who": "quill", "text": "Votes are patient things, child. They pay long after the fighting is done." }
       ],
       "outro": [
@@ -153,7 +153,7 @@
         "aiLevel": "normal", "aiStyle": "gathering" },
       "setup": { "np": 3, "length": "standard", "faction": "clans", "seatFactions": ["clans", "gathering", "nobility"], "seed": null },
       "twist": null,
-      "goal": { "type": "custom", "value": 2, "text": "Win a 5-round game with 2 or more of your cards Governed into Councils." },
+      "goal": { "type": "custom", "value": 2, "text": "Win a 5-round game with 2 or more cards Governed into Councils." },
       "hints": false,
       "stars": [
         { "text": "Win with 2+ cards Governed", "test": { "k": "governs", "op": ">=", "v": 2 } },
@@ -167,15 +167,15 @@
       "id": "c6", "act": 2, "title": "The Meadow Favour",
       "boss": false,
       "intro": [
-        { "who": "ysolde", "text": "Win the Tablelands and take the Gleaning Meadow to claim the Kingdom's Favour." },
-        { "who": "ysolde", "text": "The Favour gives your house a special action three times, and wins every tie." },
+        { "who": "ysolde", "text": "Win the Tablelands and take the Gleaning Meadow. That claims the Kingdom's Favour." },
+        { "who": "ysolde", "text": "The Favour gives your house a special action three times. It wins every tie." },
         { "who": "rook", "text": "My ferrymen already carry some Lore aboard. Catch us on the water if you can." }
       ],
       "outro": [
         { "who": "rook", "text": "Fair winds. I'll want that disc back before the summer's out." }
       ],
       "opponent": { "name": "Captain Rook Ashby", "portrait": "camp-rook.webp", "emoji": "⛴️", "cast": "rook",
-        "personality": "Bold and fast; buys his Site of Power early and races for the Meadow.",
+        "personality": "Bold and fast. Buys his Site of Power early. Races for the Meadow.",
         "aiLevel": "normal", "aiStyle": "uprising" },
       "setup": { "np": 3, "length": "standard", "faction": "clans", "seatFactions": ["clans", "uprising", "gathering"], "seed": null },
       "twist": { "id": "boss-lore", "param": 2, "text": "Rule: Captain Rook starts with 2 Lore." },
@@ -202,7 +202,7 @@
         { "who": "ysolde", "text": "Summer ends. Winter brings the ones who want the Throne itself." }
       ],
       "opponent": { "name": "Sable, the Masked Heir", "portrait": "camp-sable.webp", "emoji": "🎭", "cast": "sable",
-        "personality": "Sly and theatrical; bluffs with Ruses, strikes with Deadly agents in the Sinks.",
+        "personality": "Sly and theatrical. Bluffs with Ruses. Strikes with Deadly agents in the Sinks.",
         "aiLevel": "normal", "aiStyle": "uprising",
         "taunt": "Every mask you tore off had another under it. Better luck in the dark.",
         "praise": "You read my masks like a printed broadsheet. Take the road north." },
@@ -300,7 +300,7 @@
         { "text": "Hold the Favour disc at the end", "test": { "k": "favourHeld" } },
         { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
       ],
-      "easier": { "aiLevel": "normal", "twist": null, "setup": { "length": "standard" }, "maxStars": 2, "text": "Five rounds, the Favour starts on the Meadow, and the rivals play at normal strength." },
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "length": "standard" }, "maxStars": 2, "text": "Five rounds. The Favour starts on the Meadow. Rivals play at normal strength." },
       "unlock": [
         { "type": "portrait", "id": "stag", "text": "The Pale Stag-King's portrait" },
         { "type": "title", "id": "thornbound-sovereign", "text": "Title: Thornbound Sovereign" },

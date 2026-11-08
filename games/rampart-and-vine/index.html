@@ -488,7 +488,9 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 .glow .pvb{font-size:max(14px,calc(14px/var(--sc,1)))}
 @media(min-width:1024px){#main{position:relative}#hand{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);margin:0;z-index:5}}
 /* result card: the title fits inside its ribbon, button words centred */
-#modal .card[aria-label=Result] h2,html.sk #modal .card[aria-label=Result] h2{font-size:19px!important;letter-spacing:0!important;padding-left:70px!important;padding-right:70px!important;white-space:nowrap}
+/* polish: the ribbon art's cream band is a quarter of its width, so the result title is a plain heading (no ornament over the words) */
+#modal .card[aria-label=Result] h2,html.sk #modal .card[aria-label=Result] h2{background:none!important;padding:4px 12px!important;font-size:26px!important;letter-spacing:.02em!important;color:#8e3a1c!important;text-shadow:none!important;white-space:normal}
+.coachcard h2{padding:0 34px;margin-top:10px;text-align:center;font-size:21px;line-height:1.2}
 #modal .card .btn{display:flex;align-items:center;justify-content:center;text-align:center}
 #status .tpic{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#f6ead2;border:2px solid var(--c);margin:-4px 2px -4px 0;flex:0 0 auto}
 [data-gxt-open] span{font-size:14px!important}
@@ -500,6 +502,14 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 #rules .raim,.drawer .raim{font:800 18px/1.3 var(--ff);margin:0 0 8px;color:#2a1608}
 @media(max-width:420px){#left small{display:none}}
 @media(min-width:1024px){#coach{bottom:184px}}
+/* polish: drag the tile from the tray; follower spots are 48px targets and their label is part of the button */
+#htile{touch-action:none}
+#htile.lifted .spin{opacity:.35}
+#dragtile{position:fixed;left:0;top:0;z-index:60;pointer-events:none;border:3px solid var(--c,#ffd24a);border-radius:6px;box-shadow:0 16px 28px rgba(0,0,0,.45);opacity:.94;overflow:hidden}
+#dragtile svg{display:block;width:100%;height:100%}
+.glow.dragover::after{border-color:#fff;box-shadow:0 0 0 calc(3px/var(--sc,1)) #ffd24a,0 0 calc(18px/var(--sc,1)) #ffd24a;animation:none}
+.fglow{width:48px!important;height:48px!important}
+.fglow .flab{pointer-events:auto;cursor:pointer}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -3651,7 +3661,7 @@ STORY.coachEnd={
   total:c=>c.win?`You ${c.me}, Hob ${c.hob}. You win the deeds!`:c.tie?`You ${c.me}, Hob ${c.hob}. A tie!`:`You ${c.me}, Hob ${c.hob}. Hob wins this time. Play again?`,
   later:'Rules to learn later'
 };
-STORY.coachLater={river:'The river: tiles that must continue the river. It cannot turn the same way twice.',inns:'Taverns: a finished road with a tavern scores double. Unfinished, it scores nothing. A basilica town scores triple.',goods:'Merchants: finish a town to take its goods. The most of each good scores 10. Masons give extra turns. Hogs make fields score more.',tie:'Ties: equal followers on a road, town or field each score in full.',majority:'Majority: the most followers takes the points. Others get nothing.',discard:'A tile that fits nowhere is set aside. You draw another.',banner:'Each banner adds 2 to a finished town.',score_road:'A finished road scores 1 per tile and its followers go home.',score_town:'A finished town scores 2 per tile and 2 per banner. Unfinished at the end, 1 per tile.',score_priory:'A priory with eight tiles around it scores 9. Unfinished at the end, 1 plus 1 per neighbour.'};
+STORY.coachLater={river:'River: each tile must continue the river.',inns:'Taverns: a finished tavern road scores double.',goods:'Merchants: the most of each good scores 10.',tie:'Ties: equal followers both score in full.',majority:'Most followers takes the points.',discard:'A tile that fits nowhere is swapped.',banner:'Each banner adds 2 to a finished town.',score_road:'A finished road scores 1 per tile.',score_town:'A finished town scores 2 per tile.',score_priory:'A priory with 8 neighbours scores 9.'};
 
 </script>
 <script>
@@ -3837,7 +3847,8 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     const pages = [['road', E.road({ a: me.sc.road, b: me.end.road })], ['town', E.town({ a: me.sc.town, b: me.end.town })], ['priory', E.priory({ a: me.sc.priory, b: me.end.priory })], ['field', E.field({ b: me.end.field })],
       ['total', E.total({ me: me.score, hob: hob.score, win: win.length === 1 && win[0] === 0, tie: win.length > 1 })]];
     let i = 0;
-    const later = ['river', 'inns', 'goods'].concat(['tie', 'majority', 'discard', 'banner', 'score_road', 'score_town', 'score_priory'].filter(k => !ex.includes(k)));
+    const later = ['tie', 'majority', 'discard', 'banner', 'score_road', 'score_town', 'score_priory'].filter(k => !ex.includes(k)).concat(['river', 'inns', 'goods']);
+    const shown = later.slice(0, 3);   // the card shows three short lines at most; every rule is also in How to play
     GXCOACH.later = later;
     const card = html => { const m = document.getElementById('modal'); m.innerHTML = '<div class="scrim"><div class="card coachcard" role="dialog" aria-label="Score summary">' + html + '</div></div>'; return m; };
     const finish = pro => {
@@ -3848,7 +3859,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     };
     const pro = !!UI.coachPro;
     const showLater = () => {
-      const m = card('<h2>' + STORY.coachEnd.later + '</h2><ul class="clater">' + later.map(k => '<li>' + STORY.coachLater[k] + '</li>').join('') + '</ul><button class="btn big" data-a="cgo">' + (pro ? 'Start chapter 1' : 'Play a real game') + '</button>');
+      const m = card('<h2>' + STORY.coachEnd.later + '</h2><ul class="clater">' + shown.map(k => '<li>' + STORY.coachLater[k] + '</li>').join('') + '</ul><button class="btn big" data-a="cgo">' + (pro ? 'Start chapter 1' : 'Play a real game') + '</button>');
       GXCOACH.done = true; m.querySelector('[data-a=cgo]').onclick = () => finish(pro);
     };
     const show = () => {
@@ -4063,7 +4074,7 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
 // follower spots stay hidden while the camera moves, so a button never slides away under a finger
 function figShow(){for(const e of document.querySelectorAll('#ov .fglow.wait'))e.classList.remove('wait')}
-function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=46;
+function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=52;
   for(let it=0;it<24;it++){let moved=false;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j];let dx=(b.x+b.ox)-(a.x+a.ox),dy=(b.y+b.oy)-(a.y+a.oy),d=Math.hypot(dx,dy);if(d>=D)continue;if(d<.01){dx=0;dy=1;d=1}const k=(D-d)/2/d;a.ox-=dx*k;a.oy-=dy*k;b.ox+=dx*k;b.oy+=dy*k;moved=true}if(!moved)break}
   for(const q of P)q.e.style.transform=`translate(${q.x+q.ox}px,${q.y+q.oy}px) translate(-50%,-50%)`}
 function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(24,Math.min(48,cell*.4));$('#ov').style.setProperty('--ms',ms+'px');
@@ -4111,13 +4122,24 @@ function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
   if(G.over||!G.cur){h.innerHTML=`<div id="hinfo"><span class="big">Valley complete</span></div>`;return}
   const mine=myTurn(),c=PCOL[G.cur.p];
   if(G.step==='place'){const t=G.cur.t;
-    if(!UI.handKey||UI.handKey!==G.turn){UI.handKey=G.turn;UI.deg=UI.rot*90;h.innerHTML=`<button id="htile" style="--c:${c}" aria-label="Turn the tile"><div class="spin">${tileSvg(t,0)}</div><span class="rot" aria-hidden="true"></span></button>${hname(t,G.cur.p)}`;$('#htile').classList.add('nospin');$('#htile').addEventListener('click',()=>{if(myTurn('place'))rotate()});setTimeout(()=>$('#htile')&&$('#htile').classList.remove('nospin'),30)}
+    if(!UI.handKey||UI.handKey!==G.turn){UI.handKey=G.turn;UI.deg=UI.rot*90;h.innerHTML=`<button id="htile" style="--c:${c}" aria-label="Turn the tile"><div class="spin">${tileSvg(t,0)}</div><span class="rot" aria-hidden="true"></span></button>${hname(t,G.cur.p)}`;$('#htile').classList.add('nospin');$('#htile').addEventListener('click',()=>{if(UI.dragJust&&Date.now()-UI.dragJust<450)return;if(myTurn('place'))rotate()});hookDrag($('#htile'));setTimeout(()=>$('#htile')&&$('#htile').classList.remove('nospin'),30)}
     const b=$('#htile');b.disabled=!myTurn('place');b.classList.toggle('mine',myTurn('place'));b.style.setProperty('--c',c);b.querySelector('.rot').hidden=!(myTurn('place')&&UI.rots.length>1);
     b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`;let hp=$('#hplace');const want=!!(UI.sel&&myTurn('place'));h.classList.toggle('hassel',want);
     if(want&&!hp){hp=document.createElement('button');hp.id='hplace';hp.type='button';hp.textContent='Place here';hp.addEventListener('click',()=>{if(UI.sel)placeAt(UI.sel.x,UI.sel.y)});h.appendChild(hp)}else if(!want&&hp)hp.remove()}
   else if(G.step==='fig'){UI.handKey=null;
     if(myTurn()){h.innerHTML=`<button id="hskip">Skip</button>`;$('#hskip').addEventListener('click',()=>onSkip())}
     else h.innerHTML=`<button id="htile" disabled style="--c:${c}">${tileSvg(G.tiles[G.cur.k].t,G.tiles[G.cur.k].r)}</button>${hname(G.tiles[G.cur.k].t,G.cur.p)}`}}
+// ---------- drag the real tile from the tray onto a glowing square (a tap still turns it) ----------
+function glowAt(x,y){for(const g of document.querySelectorAll('#world .glow')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom)return g}return null}
+function hookDrag(b){if(!b||b._dg)return;b._dg=1;
+  b.addEventListener('pointerdown',e=>{if(!myTurn('place')||UI.drag)return;UI.drag={id:e.pointerId,x0:e.clientX,y0:e.clientY,on:false};try{b.setPointerCapture(e.pointerId)}catch(x){}});
+  b.addEventListener('pointermove',e=>{const d=UI.drag;if(!d||d.id!==e.pointerId)return;
+    if(!d.on){if(Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<10)return;d.on=true;const gh=document.createElement('div');gh.id='dragtile';gh.style.setProperty('--c',PCOL[G.cur.p]);gh.innerHTML=tileSvg(G.cur.t,UI.rot);document.body.appendChild(gh);d.gh=gh;b.classList.add('lifted');sfx('click')}
+    const sz=Math.max(60,Math.min(120,UI.view.s*100));d.gh.style.width=d.gh.style.height=sz+'px';d.gh.style.transform=`translate(${e.clientX-sz/2}px,${e.clientY-sz/2}px)`;
+    const g=glowAt(e.clientX,e.clientY);if(g!==d.over){if(d.over)d.over.classList.remove('dragover');if(g){g.classList.add('dragover');buzz(6)}d.over=g}});
+  const end=e=>{const d=UI.drag;if(!d||d.id!==e.pointerId)return;UI.drag=null;b.classList.remove('lifted');if(!d.on)return;UI.dragJust=Date.now();if(d.gh)d.gh.remove();if(d.over)d.over.classList.remove('dragover');
+    if(e.type==='pointerup'&&d.over&&myTurn('place')){const x=+d.over.dataset.x,y=+d.over.dataset.y;if(isLegal({act:'place',x,y,r:UI.rot},sideToAct()))placeAt(x,y)}};
+  b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
   else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
@@ -4216,7 +4238,7 @@ function openMenu(){if($('#menu'))return closeMenu();const d=document.createElem
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
 function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
-function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
+function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
 function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
