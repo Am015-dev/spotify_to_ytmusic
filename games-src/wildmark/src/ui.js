@@ -12,6 +12,7 @@ function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
   var ln = $('#line'), st = $('#start'); e.style.top = ''; e.style.bottom = ''; if (!ln || !st || !st.hidden || !G) return;
+  var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
 function toast(t, ms) { var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
@@ -39,10 +40,12 @@ function tileSvg(tile, x, y, s, rot, opt) {
     out += '<polygon points="' + poly(x, y, s, [r + 3, r + 4, r + 5, r + 6]) + '" fill="url(#pt-' + tile.t[1] + ')"/>';
   }
   out += '<polygon points="' + poly(x, y, s, [0, 1, 2, 3, 4, 5]) + '" fill="none" stroke="' + (tile.key ? '#f2d27a' : 'rgba(20,30,20,.55)') + '" stroke-width="' + (tile.key ? s * 0.09 : s * 0.04) + '"/>';
-  if (opt.tok) out += tokenSvg(opt.tok, x, y, s * 0.46);
+  var zr = opt.map && UI.pan && UI.pan.z || 0;   // map only: keep portraits readable at phone zoom (36 px placed, 24 px slots), inside the hex
+  if (opt.tok) out += tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.66, Math.max(s * 0.46, 19 / zr)) : s * 0.46);
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
     if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
+    if (zr && !opt.big) rr = Math.min(s * (n === 1 ? 0.42 : 0.27), Math.max(rr, 12.5 / zr));
     tile.a.forEach(function (a, i) { out += tokenSvg(a, x + off[i][0] * s, y + off[i][1] * s, rr, ' sm'); });
   }
   return out;
@@ -55,6 +58,7 @@ function newGame(cfg) {
   var ai = [], names = [];
   for (var i = 0; i < cfg.np; i++) { ai.push(i < cfg.humans ? null : (cfg.lvBy && cfg.lvBy[i]) || cfg.ai); names.push(i < cfg.humans ? (cfg.humans > 1 ? 'Ranger ' + (i + 1) : 'You') : (cfg.names && cfg.names[i]) || WM.RIVALS[(i - cfg.humans) % WM.RIVALS.length]); }
   if (cfg.humans === 1) names[0] = 'You';
+  if (UI.mode === 'quick' && cfg.cards) { UI.prefs.variant = cfg.cards === 'mix' ? 1 : 0; savePrefs(); }   // Story follows the same switch
   var cards = cfg.cards === 'mix' ? (function () { var o = {}; WM.ANI.forEach(function (a) { o[a] = 'abcd'[1 + Math.floor(Math.random() * 3)]; }); return o; })() : (cfg.cards && typeof cfg.cards === 'object' ? cfg.cards : null);
   G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3, cards: cards });
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
@@ -89,7 +93,7 @@ function aiStep() {
   var m = WM.AI.choose(G);
   if (G.stage !== 'pick') { WM.apply(G, m); render(); step(); return; }
   var key = seat + ':' + G.seats[seat].done;
-  if (slow && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); banner(nm + "'s turn"); }
+  if (!UI.fast && UI.banKey !== key) { UI.banKey = key; UI.aiQuick = false; $('#toast').classList.remove('on'); var prev = (seat + G.np - 1) % G.np; banner(!G.seats[prev].ai && UI.humans === 1 ? 'Your turn is done: ' + nm + "'s turn" : nm + "'s turn"); }
   var col = m.t === 'take' ? [m.i, m.i] : m.t === 'free' ? [m.ti, m.ki] : null;
   if (slow && col) UI.showAI = { seat: UI.view, text: nm + ' takes the ' + terrText(G.market.tiles[col[0]]) + ' tile + ' + WM.ANI_NAME[G.market.toks[col[1]]] + (m.t === 'free' ? ' (acorn)' : '') };
   if (slow) render();
@@ -97,9 +101,9 @@ function aiStep() {
   UI.aiT = setTimeout(function () {
     if (!G || G.over) return;
     try { WM.apply(G, m); } catch (e) { console.error(e); return; }
-    if (m.t === 'wipe3' || m.t === 'wipe') { toast(nm + (m.t === 'wipe3' ? ' swept three matching animals.' : ' spent an acorn to replace animals.')); sfx('wipe'); UI.showAI = null; render(); step(); return; }
+    if (m.t === 'wipe3' || m.t === 'wipe') { rivalNote(nm + (m.t === 'wipe3' ? ' swept three matching animals.' : ' spent an acorn to replace animals.')); sfx('wipe'); UI.showAI = null; render(); step(); return; }
     var h = G.hold, mp = WM.AI.choose(G);
-    if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); toast(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.'), 1600); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
+    if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); rivalNote(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.')); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
     WM.apply(G, mp); UI.view = seat; UI.showAI = { seat: seat, text: nm + ' places the tile in their valley' }; fitView(); render(); sfx('place');
     setTimeout(function () { if (G && UI.view === seat) pop(mp.c, nm + "'s new tile", 'hab'); }, 60);
     UI.aiT = setTimeout(function () {
@@ -117,22 +121,23 @@ function showPass() {
 }
 // ---------------------------------------------------------------- human actions
 function act(m) {
-  var before = G.seats[G.cur], sc0 = WM.score(before.env, before.acorns), at = null;
+  var before = G.seats[G.cur], sc0 = pvScore(before.env, before.acorns), at = null;
   WM.apply(G, m);
-  if (m.t === 'place') { UI.ghost = null; sfx('place'); var sp = WM.score(before.env, before.acorns), g = sp.habT - sc0.habT; if (g > 0) { pop(m.c, '+' + g + ' habitat', 'hab'); var gt = WM.TER.filter(function (t) { return sp.hab[t] > sc0.hab[t]; })[0]; if (!before.ai && gt) toast('+' + g + ': your ' + WM.TER_NAME[gt] + ' grew to ' + sp.hab[gt] + ' joined tiles', 2600); } }
+  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); var sp = pvScore(before.env, before.acorns), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvText(hp), 'hab'); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
     if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
     if (m.t === 'tok') {
-      var sc1 = WM.score(before.env, before.acorns), best = null;
+      var sc1 = pvScore(before.env, before.acorns), best = null, tp = pvParts(sc0, sc1);
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
       var ta = G.last && G.last.acorn ? ' +1 acorn (keystone).' : '', tk = before.env[m.c] && before.env[m.c].tok;
-      if (tot > 0) { var info = {}; WM.scoreAnimal(before.env, best.a, info); UI.lit = { cells: info.lit, a: best.a, until: Date.now() + 1600 }; pop(m.c, '+' + tot + ' ' + cinfo(best.a).title, 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
-      else if (tot < 0) { pop(m.c, tot + ' points', 'neg'); sfx('tok'); } else sfx('tok');
-      if (!before.ai && tk) toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
+      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvText(tp), 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
+      else if (tot < 0) { pop(m.c, pvText(tp), 'neg'); sfx('tok'); } else sfx('tok');
+      if (!before.ai && tk && tot === 0 && UI.mode !== 'coach') toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
+    if (!before.ai) { pvTurnEnd(); if (!G.over && G.seats[G.cur].ai && UI.humans === 1 && !UI.fast) { UI.banKey = G.cur + ':' + G.seats[G.cur].done; banner('Your turn is done: ' + G.seats[G.cur].name + "'s turn"); } }   // the turn-over beat, right as you finish
     save();
   }
   render(); step();
@@ -160,7 +165,7 @@ function onMarket(kind, i) {
   if (!tutOK({ what: 'take', i: i })) return;
   take({ t: 'take', i: i });
 }
-function take(m) { UI.undo = WM.clone(G); sfx('tap'); WM.apply(G, m); UI.ghost = null; render(); fitView(); }
+function take(m) { UI.undo = WM.clone(G); sfx('tap'); pvTurnStart(m); UI.verdict = null; WM.apply(G, m); UI.ghost = null; render(); fitView(); }
 function onCell(c, isSpot) {
   var vx = G && G.seats[UI.view].env[c];
   if (vx && !isSpot && (!myTurn() || G.stage === 'pick' || (G.stage === 'tile' && !(UI.ghost && UI.ghost.c === c)))) { showBig('tile', vx, vx.tok); return; }
@@ -191,7 +196,7 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (G.np > 1 ? 106 : 62) + (UI.mode === 'coach' ? 44 : 0), padB = 70, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), padT = (G.np > 1 ? 156 : 110) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
@@ -224,17 +229,24 @@ function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(2.6, p.z
 function drawMap() {
   if (!G) return; var s = G.seats[UI.view], env = s.env, mine = myTurn(), out = '';
   var lit = UI.lit && UI.lit.until > Date.now() ? UI.lit.cells : [];
+  if (UI.whyA) { var wi = {}; WM.scoreAnimal(env, UI.whyA, wi, G.cards && G.cards[UI.whyA]); lit = lit.concat(wi.lit || []); }   // the card's scoring groups stay lit while its why is open
+  var pv = mine ? pvNow() : null, pvl = pv ? pv.lit : [], brk = pv && pv.broke || [], bad = '';
   var keys = Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; });
   keys.forEach(function (c) {
     var x = env[c], p = pix(c), tgt = mine && G.stage === 'tok' && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
-    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
+    if (tgt) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
+    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1 }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
-    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; });
+    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
     if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
   }
   var wh = boardWH();
-  $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '</g>';
+  pvl.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
+  brk.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring brk" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
+  if (UI.ghost && mine && G.stage === 'tile') { var gp = pix(UI.ghost.c); bad += pvBadge(gp[0], gp[1] - SZ * 0.62, pv ? pv.d : 0, UI.ghost.c, 0, 1); }
+  $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '<g class="pvbs">' + bad + '</g></g>';
+  pvStrip(pv);
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
   $('#map').classList.toggle('dimtok', mine && G.stage === 'tok' && WM.tokSpots(env, G.hold.tok).length > 0);
 }
@@ -261,10 +273,11 @@ function cset(a) { return G && G.cards && G.cards[a] || 'a'; }
 function cinfo(a) { return WM.cardInfo ? WM.cardInfo(a, cset(a)) : WM.CARDS[a]; }
 function tileName(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + ' tile' + (t.key ? ' (keystone)' : '') + ', accepts ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', '); }
 function renderDock() {
-  var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '';
+  var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '', gv = mine && !UI.wipe ? pvMarket() : null, gb = gv ? pvBestCol(gv) : -1;
   for (var i = 0; i < 4; i++) {
     var t = G.market.tiles[i], k = G.market.toks[i], fr = UI.free, sel = fr && (fr.ti === i), selk = fr && fr.ki === i, w = UI.wipe && UI.wipe.indexOf(i) >= 0;
-    h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + '" data-i="' + i + '">';
+    h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + (gv && i === gb && !UI.free ? ' top' : '') + '" data-i="' + i + '">';
+    if (gv && gv[i] != null && !UI.free) h += '<span class="gain' + (i === gb ? ' best' : gv[i] === 0 ? ' nil' : '') + '" title="Points this pair can add right now">' + (gv[i] > 0 ? 'up to +' + gv[i] : 'no points') + '</span>';
     h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : '<span class="mt gone"></span>';
     h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : '<span class="mk gone"></span>';
     h += '</div>';
@@ -291,7 +304,7 @@ function renderDock() {
   if (G.stage !== 'pick') UI.acornMenu = false;
   if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
-  $('#acorn').innerHTML = '<span class="acn" title="Acorns">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
+  $('#acorn').innerHTML = '<span class="acn" title="Acorns: 1 point each at the end, or spend one for a free pick or new animals">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
 function lineText() {
   if (!G) return '';
@@ -309,13 +322,23 @@ function lineText() {
 // first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
 var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
 function coachText() { return G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
+function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.forEach(function (s, j) { if (j !== i && (b < 0 || fin[j].total > fin[b].total)) b = j; }); return b; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
-  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, ' + sc.ani[a] + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
+  var ri = rivalOf(UI.view), rv = ri >= 0 ? fin[ri] : null;
+  function vs(m, r) { return r == null ? '' : '<span class="rv' + (r > m ? ' lead' : '') + '" aria-hidden="true">' + r + '</span>'; }
+  function cls(m, r) { return r != null && m > r ? ' ahead' : r != null && r > m ? ' behind' : ''; }
+  WM.ANI.forEach(function (a) { var r = rv ? rv.ani[a] : null; h += '<button type="button" class="cc' + cls(sc.ani[a], r) + '" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, you ' + sc.ani[a] + (rv ? ', ' + G.seats[ri].name + ' ' + r : '') + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b>' + vs(sc.ani[a], r) + '</span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
   $('#cards').innerHTML = h;
+  var th = '';
+  WM.TER.forEach(function (t) { var m = sc.hab[t], r = rv ? rv.hab[t] : null; th += '<span class="tc' + cls(m, r) + '" title="' + esc('Largest ' + WM.TER_NAME[t].toLowerCase() + ' area: you ' + m + (rv ? ', ' + G.seats[ri].name + ' ' + r : '')) + '"><i class="ti" data-art="ter-' + t + '" style="background-color:' + WM.TER_COL[t] + '" aria-hidden="true"></i><b>' + m + '</b>' + (rv ? '<i class="sep" aria-hidden="true">&middot;</i>' : '') + vs(m, r) + '</span>'; });
   var sh = '';
-  if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
+  if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '"><i class="dot' + (i === UI.view ? ' me' : i === rivalOf(UI.view) ? ' riv' : '') + '" aria-hidden="true"></i>' + esc(s.name) + ' <b>' + t + '</b></button>'; });
   $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
+  var tr = $('#terr'); if (!tr) { tr = document.createElement('button'); tr.type = 'button'; tr.id = 'terr'; tr.className = 'terr'; tr.setAttribute('data-gx', 'scored'); $('#board').appendChild(tr); }
+  tr.classList.toggle('solo', G.np < 2);
+  tr.setAttribute('aria-label', 'Largest area of each terrain' + (rv ? ', you vs ' + G.seats[ri].name : '') + ': open the score sheet');
+  tr.innerHTML = '<span class="tl">Largest area' + (rv ? '<small><b class="me">' + (UI.view === meSeat() ? 'you' : esc(G.seats[UI.view].name)) + '</b> &middot; <b class="riv">' + (ri === meSeat() ? 'you' : esc(G.seats[ri].name)) + '</b></small>' : '') + '</span>' + th;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
   var lt = lineText(), sm = /^Step (\d) of 3: (.*)$/.exec(lt), co = coachText();
@@ -325,21 +348,24 @@ function renderTop() {
 }
 function render() {
   if (!G) return;
-  renderDock(); renderTop(); drawMap();
+  renderDock(); renderTop(); drawMap(); cardWhyRender();
   if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
   if (typeof coachCheck === 'function') coachCheck();
 }
 UI.redraw = function () { if (G) render(); };
 // ---------------------------------------------------------------- drawers: scores, rules, cards
-function scoresHTML() {
-  var sc = G.over ? G.res : WM.final(G), h = '<table class="st"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>';
-  var best = function (vals) { var m = Math.max.apply(null, vals); return function (v) { return v === m && vals.filter(function (x) { return x === m; }).length < vals.length ? ' class="best"' : ''; }; };
-  WM.ANI.forEach(function (a) { var bf = best(sc.map(function (x) { return x.ani[a]; })); h += '<tr><td title="' + esc(cinfo(a).title + ': ' + cinfo(a).rule) + '">' + mkTok(a) + ' ' + esc(WM.ANI_NAME[a]) + '</td>' + sc.map(function (x) { return '<td' + bf(x.ani[a]) + '>' + x.ani[a] + '</td>'; }).join('') + '</tr>'; });
-  WM.TER.forEach(function (t) { var bt = best(sc.map(function (x) { return x.hab[t] + (x.bonus[t] || 0); })); h += '<tr><td><i class="sw" style="background:' + WM.TER_COL[t] + '"></i> ' + WM.TER_NAME[t] + '</td>' + sc.map(function (x) { return '<td' + bt(x.hab[t] + (x.bonus[t] || 0)) + '>' + x.hab[t] + (x.bonus[t] ? ' <small>+' + x.bonus[t] + '</small>' : '') + '</td>'; }).join('') + '</tr>'; });
-  h += '<tr><td>Acorns</td>' + sc.map(function (x) { return '<td>' + x.acorns + '</td>'; }).join('') + '</tr>';
-  h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td>' + x.total + '</td>'; }).join('') + '</tr></table>';
-  return h + '<p class="note">' + (G.solo ? 'Solo: a habitat of 7 or more tiles earns 2 extra points.' : 'The largest habitat of each terrain earns a bonus (shown +).') + '</p>';
+function scoresHTML() {   // every source with its why, you vs the rivals (also the end screen's walk-through)
+  var sc = G.over ? G.res : WM.final(G), h = '<table class="st why"><tr><th>Source</th>' + G.seats.map(function (s, i) { return '<th>' + esc(i === meSeat() ? 'You' : s.name) + '</th>'; }).join('') + '</tr>';
+  var best = function (vals) { var m = Math.max.apply(null, vals); return function (v) { return v === m && vals.filter(function (x) { return x === m; }).length < vals.length ? ' best' : ''; }; };
+  var cell = function (cls, v, why) { return '<td class="n' + cls + '"><b>' + v + '</b><small>' + esc(why) + '</small></td>'; };
+  WM.ANI.forEach(function (a) { var bf = best(sc.map(function (x) { return x.ani[a]; }));
+    h += '<tr><td class="src">' + mkTok(a) + '<span>' + esc(WM.ANI_NAME[a]) + '<small>' + esc(pvSetA(a) ? PV_TABLE[a] : cinfo(a).rule) + '</small></span></td>' + sc.map(function (x, i) { return cell(bf(x.ani[a]), x.ani[a], pvDesc(G.seats[i].env, a).text); }).join('') + '</tr>'; });
+  WM.TER.forEach(function (t) { var bt = best(sc.map(function (x) { return x.hab[t] + (x.bonus[t] || 0); }));
+    h += '<tr><td class="src"><i class="sw" style="background:' + WM.TER_COL[t] + '"></i><span>' + WM.TER_NAME[t] + '<small>1 point per tile in your largest joined area</small></span></td>' + sc.map(function (x) { var b = x.bonus[t] || 0; return cell(bt(x.hab[t] + b), x.hab[t] + b, 'largest area ' + x.hab[t] + (b ? ' + bonus ' + b + (G.solo ? ' (7 or more)' : ' (biggest' + (b === 1 && G.np === 2 ? ', tied' : '') + ')') : '')); }).join('') + '</tr>'; });
+  h += '<tr><td class="src"><span>Acorns<small>1 point each at the end</small></span></td>' + sc.map(function (x) { return cell('', x.acorns, pvPl(x.acorns, 'acorn', 'acorns') + ' kept'); }).join('') + '</tr>';
+  h += '<tr class="tot"><td>Total</td>' + sc.map(function (x) { return '<td><b>' + x.total + '</b><small>animals ' + x.aniT + ' + land ' + (x.habT + x.bonusT) + ' + acorns ' + x.acorns + '</small></td>'; }).join('') + '</tr></table>';
+  return h + '<p class="note">' + (G.solo ? 'Solo: a terrain area of 7 or more tiles earns 2 extra points.' : 'Bonus: the biggest area of a terrain earns ' + (G.np === 2 ? '+2 (a tie +1 each)' : '+3 first, +1 second') + '.') + '</p>';
 }
 function cardsHTML() {
   var h = '<div class="cards">';
@@ -350,9 +376,9 @@ var RULES_HTML = '<div class="howturn"><h3>How a turn works</h3><ol><li>Pick one
   '<h3>Keystones and acorns</h3><p>Keystone tiles (gold rim) have one terrain. An animal on a keystone earns an acorn. Spend an acorn to take any tile with any token, or to replace any tokens in the market. Each acorn left is 1 point at the end.</p>' +
   '<h3>Crowded market</h3><p>Four matching tokens are replaced at once. With three matching tokens you may replace those three once per turn, for free.</p>' +
   '<h3>Scoring</h3><p>Each animal scores by its card (below). Each terrain scores 1 point per tile in your largest connected habitat of it (edges must match). The largest habitat of each terrain earns a bonus: 2 players 2 (tie 1), 3-4 players 3 for first and 1 for second. Solo: 2 for a habitat of 7+.</p>' +
-  '<h3>Solo</h3><p>After each turn the rightmost tile and token left in the market are removed.</p>' +
+  '<h3>Solo</h3><p>After each turn the tile and the animal furthest from the stacks (rightmost) leave the game; the rest slide left toward the stacks and new ones fill in at the right.</p>' +
   '<h3>Ties</h3><p>Most acorns left wins a tie.</p>' +
-  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Elk lines are counted longest first (rarely a point less than the best split).</li><li>Solo: the rightmost tile and animal leave each turn and the rest slide right.</li><li>Mixed-card point values (cards B, C, D) are our own tables.</li></ul>';
+  '<h3>Simplified on purpose</h3><ul><li>The animals on each tile and the starting tiles are our own balanced set.</li><li>Elk lines are counted longest first (rarely a point less than the best split).</li><li>Variant cards (B, C, D) use our own house tables and are off unless you switch them on.</li></ul>';
 // ---------------------------------------------------------------- large view: tap a placed tile (when it is not a target) or hold a market tile/token
 function tileText(t, tok) {
   var h = '<p><b>' + t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + '</b> tile' + (t.key ? ', a <b>keystone</b>: an animal placed here earns an acorn.' : (t.t.length > 1 ? '. Each half counts for its own terrain; edges must match to join a habitat.' : '.')) + '</p>';
@@ -394,7 +420,7 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + scoresHTML() + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div></div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div>' + scoresHTML() + '</div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
   if (typeof coachEnd === 'function') coachEnd();
 }
@@ -408,7 +434,7 @@ function showTitle() {
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
       '<div class="lbl">Rival skill</div>' + seg('ai', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
       '<div class="lbl">Players on this device</div>' + seg('humans', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], c.humans) +
-      '<div class="lbl">Animal cards</div>' + seg('cards', [['a', 'First set'], ['mix', 'Mixed B-D']], c.cards || 'a') +
+      '<div class="lbl">Variant cards (house tables)</div>' + seg('cards', [['a', 'Off'], ['mix', 'On']], c.cards || 'a') +
       '<p class="sum">' + esc(setupSum(c)) + '</p><button type="button" class="big" id="goB">Start</button><button type="button" class="ab" id="backT">Back</button></div>';
     return;
   }
@@ -435,7 +461,7 @@ var TITLE_SCENE = '<svg class="tscene" viewBox="0 0 390 760" preserveAspectRatio
   [[30, 520, 1.3], [62, 540, 1], [330, 505, 1.4], [362, 530, 1.1], [300, 545, .9], [95, 575, .8]].map(function (t) { return '<g transform="translate(' + t[0] + ' ' + t[1] + ') scale(' + t[2] + ')"><path d="M0 -60 L18 -18 H8 L24 12 H-24 L-8 -18 H-18Z" fill="#1d3523"/><rect x="-3" y="12" width="6" height="10" fill="#3a2a1a"/></g>'; }).join('') +
   '<path d="M120 200 q10 -8 20 0 q10 -8 20 0" fill="none" stroke="#2a2a30" stroke-width="3" stroke-linecap="round"/>' +
   '<rect width="390" height="760" fill="url(#tsk)" opacity="0" /></svg>';
-function setupSum(c) { return (c.cards === 'mix' ? 'Mixed animal cards. ' : '') + (c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'); }
+function setupSum(c) { return (c.cards === 'mix' ? 'Variant cards with house point tables. ' : '') + (c.opp === 0 && c.humans === 1 ? 'Solo: 20 turns, beat your best score.' : (c.humans > 1 ? c.humans + ' players on this device' : 'You') + (c.opp ? ' vs ' + c.opp + ' ' + c.ai + ' rival' + (c.opp > 1 ? 's' : '') : '') + ', 20 turns each.'); }
 // ---------------------------------------------------------------- events
 document.addEventListener('click', function (e) {
   var t = e.target.closest && e.target.closest('button'); if (!t) return;
@@ -444,7 +470,7 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('mk')) return onMarket('k', +t.dataset.i);
   if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
   if (t.classList.contains('tsz')) { UI.setup.opp = +t.dataset.n - 1; UI.setup.humans = 1; showTitle(); return; }
-  if (t.classList.contains('cc')) { openCards(); return; }
+  if (t.classList.contains('cc')) { cardWhy(t.getAttribute('data-card')); return; }
   if (t.id === 'whatB') { var bb = document.getElementById('bulbbtn'); if (bb) bb.click(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
   switch (id) {
@@ -475,6 +501,17 @@ document.addEventListener('click', function (e) {
   }
 });
 document.addEventListener('keydown', function (e) { if (!G || !myTurn()) return; if (e.key === 'r' || e.key === 'R') rotate(); if (e.key === 'Enter' && UI.ghost) confirmPlace(); });
+// tap an animal chip: its pattern, your count = points with the table, the rival's line, and your scoring groups lit on the board
+function cardWhy(a) { UI.whyA = UI.whyA === a ? null : a; sfx('tap'); render(); }
+function cardWhyRender() {
+  var e = $('#whyp'); if (!e) { e = document.createElement('div'); e.id = 'whyp'; e.setAttribute('role', 'dialog'); e.setAttribute('aria-label', 'Why these points'); $('#board').appendChild(e); }
+  var a = UI.whyA; if (!a || !G || G.over) { e.hidden = true; e.innerHTML = ''; $$('.cc.on').forEach(function (c) { c.classList.remove('on'); }); return; }
+  var ri = rivalOf(UI.view), C = cinfo(a), rl = ri >= 0 ? pvCardLine(a, ri) : '';
+  if (rl.indexOf(' (') > 0) rl = rl.slice(0, rl.indexOf(' ('));
+  e.innerHTML = '<div class="wpat">' + (patSvg(a) || mkTok(a)) + '</div><div class="wtx"><h3>' + esc(WM.ANI_NAME[a] + ': ' + C.title) + '</h3><p>' + esc(C.rule) + '</p><p class="wl me">' + esc(pvCardLine(a, UI.view)) + '</p>' + (rl ? '<p class="wl riv">' + esc(rl) + '</p>' : '') + '<p class="wh">Lit on the board: the ' + ({ bear: 'bears', elk: 'elk', salmon: 'salmon', hawk: 'hawks', fox: 'foxes' })[a] + ' that score.</p><button type="button" class="ab" id="whyAll">All cards</button></div><button type="button" class="cx" id="whyX" aria-label="Close">&times;</button>';
+  e.hidden = false; $$('.cc').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-card') === a); });
+}
+document.addEventListener('click', function (ev) { var t = ev.target.closest && ev.target.closest('#whyX, #whyAll'); if (!t) return; UI.whyA = null; render(); if (t.id === 'whyAll') openCards(); });
 function openCards() { GX.drawer('cardsd', 'Scoring cards', null, false); $('#cardsd .gx-drawer-body').innerHTML = cardsHTML(); artApply($('#cardsd')); GX.show('cardsd'); }
 function fillRules() { var b = $('#rulesd .gx-drawer-body'); if (!b) return; b.innerHTML = RULES_HTML + '<h3>The animal cards</h3>' + cardsHTML(); artApply(b); b.scrollTop = 0; setTimeout(function () { b.scrollTop = 0; }, 0); }   // filled on every open (the drawer body is never empty, so an emptiness test left it blank)
 function openRules() { fillRules(); GX.show('rulesd'); }

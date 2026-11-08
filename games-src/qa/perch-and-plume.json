@@ -2,18 +2,36 @@
  "slug": "perch-and-plume",
  "size": "phone",
  "seed": 73801,
- "when": "2026-11-07T21:20Z",
+ "when": "2026-11-08T01:14Z",
  "tutorial": {
   "end": true,
-  "endButtons": 2
+  "coached": true,
+  "explained": 13,
+  "explainedIds": [
+   "welcome",
+   "play",
+   "feeder",
+   "food",
+   "chain",
+   "cache",
+   "rival",
+   "reroll",
+   "tray",
+   "cards",
+   "goal",
+   "final",
+   "tie"
+  ],
+  "bubblesClosed": 15,
+  "clicks": 63
  },
  "quick": {
   "result": "cap",
-  "clicks": 956
+  "clicks": 1104
  },
  "story": {
   "result": "cap",
-  "clicks": 582
+  "clicks": 711
  },
  "fuzz": {
   "taps": 300
@@ -23,305 +41,137 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "title",
-   "desc": "overlapping clickables: button.gx-ibtn \"⇥\" / button.btn \"Quick game\"",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under img.art.bgart",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "title",
-   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under span.art.ph.bgart",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-1.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under button.btn \"Quick game\"",
+   "where": "tutorial-board",
+   "desc": "element outside viewport div.bc.big x1 rect 386,702,748,947: \"Wetland\nSaffron Heron\n6\n\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
-  },
-  {
-   "sev": "BLOCKER",
-   "phase": "tutorial",
-   "where": "tutorial step 13/13 [goals] \"Each round ends with a goal. Rounds give 8, 7, 6, \"",
-   "desc": "spotlight target covered: top at centre is div.gxt-top \"13/13 Skip tutorial\", target is button#goalsbtn.gx-ibtn \"Goals and bonus cards\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-tut-13-2.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "element outside viewport div.bc.cant x1 rect 382,527,500,765: \"6\nSedge Egret\n+\n+\nWhen p\"",
+   "where": "tutorial-board",
+   "desc": "tap target 37px (<40) div.bc.mini x3: \"5\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-tutorial-end-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "element outside viewport span.art.ph x1 rect 384,529,498,585: \"\"",
+   "where": "tutorial-board",
+   "desc": "tap target 36px (<40) div.bc.on-board x3: \"2\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-tutorial-end-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-2.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
-   "where": "tutorial-end",
-   "desc": "tap target 34px (<40) span.art.ph x4: \"\"",
+   "where": "tutorial-board",
+   "desc": "element outside viewport div.bc.big x1 rect 386,590,748,805: \"Wetland\nSedge Egret\n6\npo\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-tutorial-end-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "overlapping clickables: button.gx-ibtn \"⇥\" / button.btn \"Quick game\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-14.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 36px (<40) div.bc.on-board x3: \"2\n2\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under span.art.ph.bgart",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-14.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: button.ract \"+2 food\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under button.btn \"Quick game\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-14.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: div.bc.on-board \"2 2\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 34px (<40) span.art.ph x4: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-15.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: div.bc.on-board \"1\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"rodent die\" / div.bc.on-board \"4\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: button.ract \"+2 eggs\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"rodent die\" / span.art.ph",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: div.bc.on-board \"1 1\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: div.bc \"5\" / div.bc.on-board \"4\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: button.ract \"+1 cards\" / div.bc.big.insp \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: div.bc \"3\" / div.bc.on-board \"6\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals and bonus cards\" under div#pop.pop \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.ract.glow \"+2 food\" / div.bc.on-board \"4\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.ract.glow \"+2 food\" / span.art.ph",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button.opp \"Pip 0★ · 8▣\" under span.art.ph.bgart",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): span.art.ph under span.art.ph.bgart",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-16.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"seed die\" / button.btn \"1\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"fish die\" / button.btn \"1\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"berry die\" / button.btn.on \"2\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.ract.glow \"+2 food\" / button.btn \"Easy\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: div.bc.on-board \"1\" / button.btn.on \"Normal\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.ract.glow \"+1 cards\" / button.btn.big.primary \"Start the year\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals and bonus cards\" under h2 \"Quick game\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-17.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 10.5px (<12px) in div.pwt.brown x4: \"Gain 1 rodent from the birdfee\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "text 10.5px (<12px) in div.pwt.pink x1: \"Between your turns, once: when\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 34px (<40) span.art.ph x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"seed die\" / div.bc.on \"6 Opal Kestrel + Gain 1 \"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"seed die\" / span.art.ph",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"berry die\" / div.bc.on \"6 Opal Kestrel + Gain 1 \"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.die \"berry die\" / span.art.ph",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-fuzz-screen-18.png"
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#pop.pop \"Wetland Saffron Coot 2 p\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases tutorial",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "title",
-   "desc": "overlapping clickables: button.gx-ibtn \"⇥\" / button.btn \"Quick game\"",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under img.art.bgart",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "title",
-   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under span.art.ph.bgart",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "title",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under button.btn \"Quick game\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-title-1.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "overlapping clickables: button#deckb.deck \"Bird deck\" / button.btn \"5\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-2.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "overlapping clickables: button.gx-ibtn \"⇥\" / button.btn \"Back\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-2.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-4.png"
   },
   {
    "sev": "MINOR",
@@ -329,119 +179,103 @@
    "where": "quick-board",
    "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals and bonus cards\" under h2 \"Quick game\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-2.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under div#setup.ovl \"Quick game Players 1 2 3\"",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under h2 \"Quick game\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-2.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "text 10.5px (<12px) in div.pwt.brown x2: \"Gain 1 berry from the birdfeed\"",
+   "desc": "text overflows its box (visible) in div.bk-pw.white x1: \"When played: draw 2 cards.\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "text 10.5px (<12px) in div.pwt.pink x1: \"Between your turns, once: when\"",
+   "desc": "text overflows its box (visible) in div.bk-pw.brown x3: \"When its row is used: tuck a c\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "text 10.5px (<12px) in div.pwt.white x2: \"When played: gain 2 fish from \"",
+   "desc": "text overflows its box (visible) in div.bk-pw.none x1: \"No power. Just points.\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 34px (<40) span.art.ph x1: \"\"",
+   "desc": "tap target 37px (<40) div.bc.mini x3: \"6\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.die \"grub die\" / div.bc.on \"3 Juniper Waxwing Gain 1\"",
+   "desc": "overlapping clickables: button.die \"rodent\" / div.bc.off.big \"Meadow Russet Meadowlark\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.die \"grub die\" / span.art.ph",
+   "desc": "overlapping clickables: button.die \"fish\" / div.bc.off.big \"Meadow Russet Meadowlark\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.die \"seed die\" / div.bc.on \"3 Juniper Waxwing Gain 1\"",
+   "desc": "overlapping clickables: button.die \"either\" / div.bc.off.big \"Forest Ember Nuthatch 2 \"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.die \"seed die\" / span.art.ph",
+   "desc": "overlapping clickables: button.die \"grub\" / div.bc.off.big \"Meadow Russet Meadowlark\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "clickable covered by another element (not tappable): span.art.ph under p \"Keep 5 things in total: \"",
+   "desc": "overlapping clickables: button.die \"seed\" / div.bc.off.big \"Meadow Russet Meadowlark\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "element outside viewport div.bc x1 rect 382,527,500,765: \"2\nLantern Plover\nTuck 1 \"",
+   "desc": "overlapping clickables: div.bc.mini \"6\" / div.bc.off.big \"Forest Ember Nuthatch 2 \"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-4.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick-board",
-   "desc": "element outside viewport span.art.ph x1 rect 384,529,498,585: \"\"",
+   "where": "quick click #1104 (Pantry Keeper Birds whose power caches f)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1104 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 36px (<40) span.art.ph x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-quick-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick click #956 (+1 cards)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 956 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
-   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-quick-noresult-6.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-quick-noresult-7.png"
   },
   {
    "sev": "MINOR",
@@ -449,7 +283,7 @@
    "where": "story-map",
    "desc": "overlapping clickables: button#goalsbtn.gx-ibtn \"Goals and bonus cards\" / button.gxc-ib \"Tutorial\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-map-8.png"
   },
   {
    "sev": "MINOR",
@@ -457,7 +291,7 @@
    "where": "story-map",
    "desc": "overlapping clickables: button.gx-ibtn \"Log\" / button.gxc-ib \"Tutorial\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-map-8.png"
   },
   {
    "sev": "MINOR",
@@ -465,7 +299,7 @@
    "where": "story-map",
    "desc": "overlapping clickables: button#rulesbtn.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-map-8.png"
   },
   {
    "sev": "MINOR",
@@ -473,7 +307,7 @@
    "where": "story-map",
    "desc": "overlapping clickables: button#menubtn.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-map-8.png"
   },
   {
    "sev": "MINOR",
@@ -481,7 +315,7 @@
    "where": "story-board",
    "desc": "overlapping clickables: button#goalsbtn.gx-ibtn \"Goals and bonus cards\" / button.gxc-ib \"Tutorial\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-8.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-9.png"
   },
   {
    "sev": "MINOR",
@@ -489,7 +323,7 @@
    "where": "story-board",
    "desc": "overlapping clickables: button.gx-ibtn \"Log\" / button.gxc-ib \"Tutorial\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-8.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-9.png"
   },
   {
    "sev": "MINOR",
@@ -497,7 +331,7 @@
    "where": "story-board",
    "desc": "overlapping clickables: button#rulesbtn.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-8.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-9.png"
   },
   {
    "sev": "MINOR",
@@ -505,7 +339,7 @@
    "where": "story-board",
    "desc": "overlapping clickables: button#menubtn.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-8.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-9.png"
   },
   {
    "sev": "MINOR",
@@ -513,80 +347,232 @@
    "where": "story-board",
    "desc": "overlapping clickables: button.gxc-node.a3.locked \"8 🔒 Wind on the Heath\" / button.gxc-btn.ghost \"Close\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-8.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-9.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "text 11.1px (<12px) in span.gk x1: \"GOAL\"",
+   "desc": "text overflows its box (visible) in div.bk-pw.brown x3: \"When its row is used: maybe tu\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport div.bc.cant x1 rect 382,571,500,809: \"4\nCobalt Tern\n+\n+\nCache \"",
+   "desc": "text overflows its box (visible) in div.bk-pw.white x2: \"When played: lay 1 egg on each\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport span.art.ph x1 rect 384,573,498,629: \"\"",
+   "desc": "tap target 37px (<40) div.bc.mini x3: \"4\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) span.art.ph x2: \"\"",
+   "desc": "overlapping clickables: button.die \"rodent\" / div.bc.off.big \"Wetland Saffron Heron 6 \"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 40px (<40) div.bc.on-board x1: \"2\n+1\"",
+   "desc": "overlapping clickables: button.die \"berry\" / div.bc.off.big \"Wetland Saffron Heron 6 \"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) span.art.ph x1: \"\"",
+   "desc": "overlapping clickables: div.bc.mini \"4\" / div.bc.off.big \"Wetland Lantern Bittern \"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-10.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport div.bc.cant x1 rect 382,527,500,765: \"4\nCobalt Tern\n+\n+\nCache \"",
+   "desc": "clickable covered by another element (not tappable): button#goalsbtn.gx-ibtn \"Goals and bonus cards\" under h2 \"Your starting hand\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-11.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport span.art.ph x1 rect 384,529,498,585: \"\"",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Log\" under h2 \"Your starting hand\"",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-screen-story-board-11.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-story-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story click #582 (seed die)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 582 clicks (state kept changing)",
+   "where": "story click #711 (Ledge Keeper Platform-nest birds holding)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 711 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/perch-and-plume/phone-story-noresult-12.png"
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-story-noresult-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#deckb.deck \"Bird deck\" under img.art.bgart",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"⇥\" under img.art.bgart",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-title-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#goalsbtn.gx-ibtn \"Goals and bonus cards\" / button.gxc-ib \"Tutorial\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-ibtn \"Log\" / button.gxc-ib \"Tutorial\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#rulesbtn.gx-ibtn \"How to play\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button#menubtn.gx-ibtn \"Menu\" / button.gxc-ib.gxc-score \"★ 0/30\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "element outside viewport div.bc.big x1 rect 386,655,748,849: \"Wetland\nSaffron Heron\n6\n\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 37px (<40) div.bc.mini x3: \"5\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 36px (<40) div.bc.on-board x3: \"2\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 32px (<40) button.coachx x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-14.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "element outside viewport div.bc.big x1 rect 386,673,748,867: \"Wetland\nSaffron Heron\n6\n\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.ract \"+2 food\" / div.turnban.me \"Your turn 3 actions left\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.on-board \"2\" / div.turnban.me \"Your turn 3 actions left\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.on-board \"1\" / div.turnban.me \"Your turn 3 actions left\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.ract \"+2 eggs\" / div.turnban.me \"Your turn 3 actions left\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: div.bc.on-board \"1 1\" / div.turnban.me \"Your turn 3 actions left\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): button.ract \"+2 food\" under b \"Your turn\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "clickable covered by another element (not tappable): div.bc.on-board \"2\" under b \"Your turn\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "element outside viewport div.bc.big x1 rect 386,497,748,724: \"Wetland\nSaffron Heron\n6\n\"",
+   "repro": "node games-src/scripts/qa-bot.js perch-and-plume --size phone --seed 73801 --phases fuzz",
+   "shot": "/tmp/claude-0/qa/perch-and-plume/phone-screen-fuzz-screen-16.png"
   }
  ],
- "secs": 369
+ "secs": 448
 }
