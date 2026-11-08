@@ -32,7 +32,7 @@ function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.oppo
 function layout() {
   document.documentElement.classList.toggle('sm', innerHeight < 640); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
-  if (wide) cs = Math.floor(Math.min((H - 20 - 12) / 9, (W * 0.55) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 26 - 30) / 9));
+  if (wide) cs = Math.floor(Math.min((H - 20 - 12) / 9, (W * 0.55) / 9)); else cs = Math.floor(Math.min((W - 16 - 10) / 9, (H - 12 - 46 - 56 - 22 - 26) / 9));
   cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
@@ -59,8 +59,8 @@ function thumb(seat) { var c = document.createElement('canvas'); c.width = c.hei
 function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
-    h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat)),
-    h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
+    h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat) + ' ' + sgn(sc.total) + (sc.total > swScore(G, 1 - seat).total ? ' \u2605' : '')),
+    h('span.st', h('span.bt', { html: btnIc() + '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span>', title: 'Buttons' }), h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }), h('span.bt.emp', { title: 'Empty squares (gaps), -2 each' }, sc.empty + ' gaps'), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 18; }
@@ -95,7 +95,7 @@ function render() {
   var q = quiltEl(vs, 'me'); UI.newCells = {}; if (UI.mode !== 'hot' && vs !== 0) q.appendChild(h('div.qlabel', nameOf(vs) + '\u2019s quilt'));
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
-  if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(sbar); qc.appendChild(q); }
+  if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(q); }
   var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
@@ -118,7 +118,7 @@ function best7(board, extra) { // most squares filled in any 7x7 block (extra = 
 function sgn(n) { return (n >= 0 ? '+' : '\u2212') + Math.abs(n); }
 function scoreBar() { // always visible: you vs the rival, leader marked
   var sc = [swScore(G, 0), swScore(G, 1)], lead = sc[0].total === sc[1].total ? -1 : sc[0].total > sc[1].total ? 0 : 1, bar = h('div#scorebar', { 'aria-label': 'Score now' });
-  [0, 1].forEach(function (s) { var c = sc[s]; bar.appendChild(h('span.sb' + (lead === s ? '.lead' : ''), h('b', (lead === s ? '\u2605 ' : '') + nameOf(s) + ' ' + sgn(c.total)), h('small', c.btn + ' buttons \u2212 ' + c.empty + '\u00D72 empty' + (c.bonus ? ' + 7' : '')))); });
+  [0, 1].forEach(function (s) { var c = sc[s]; bar.appendChild(h('span.sb' + (lead === s ? '.lead' : ''), h('b', (lead === s ? '\u2605 ' : '') + nameOf(s) + ' ' + sgn(c.total)), h('small', '(' + c.btn + ' \u2212 ' + c.empty + '\u00D72' + (c.bonus ? ' + 7' : '') + ')'))); });
   return bar; }
 function turnTracker(s) { // whose turn and why (the token further back moves), spaces left
   if (G.over) return 'Game over'; var o = 1 - s, left = SW.TRACK - G.pos[s], nm = 'Turn: ' + (UI.mode !== 'hot' && isHuman(s) ? 'you' : nameOf(s));
