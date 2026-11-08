@@ -114,7 +114,7 @@ function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs table')) || $('#opp');
   return [
-    { id: 'hand', title: 'Ch 1 · Landfall', say: 'The boat is gone and Tamsin is ashore. Trail Notes point inland: start with it.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+    { id: 'hand', title: 'Ch 1 · Landfall', say: 'Goal: have the most points after 5 rounds. Start by playing Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
     { id: 'play', title: 'Ch 1 · Landfall', say: 'Playing it gives +1 compass. That is your one action. After this, the island is yours to explore.', target: tq(tinsp('Play it')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()), onEnter: () => { CO.seen.play = 1; } },

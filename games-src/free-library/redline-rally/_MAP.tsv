@@ -21,24 +21,24 @@ ui-trophy	game-icons.net trophy-cup	CC BY 3.0 (author delapouite)	https://game-i
 ui-flag-checkered	game-icons.net checkered-flag	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/checkered-flag.html	real
 fx-heat-flame	game-icons.net fire	CC BY 3.0 (author sbed)	https://game-icons.net/1x1/sbed/fire.html	real
 fx-boost-flare	game-icons.net star-prominences	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/star-prominences.html	real
-bg-title	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-bg-podium	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-track-sunline	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-track-hairpin	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-crimson	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-azure	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-jade	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-amber	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-violet	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-car-graphite	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-kit	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-juno	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-dax	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-pia	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-oto	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-portrait-bex	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-ui-gear-dial	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-ui-engine-tray	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-ui-corner-sign	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-fx-spinout-smoke	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
-fx-slipstream-streaks	none (no CC0 top-down car/track/person source found; keep Kenney composite)	-	-	FALLBACK
+bg-title	game-icons.net race-car + steering-wheel	CC BY 3.0 (author skoll / delapouite)	https://game-icons.net/1x1/skoll/race-car.html ; https://game-icons.net/1x1/delapouite/steering-wheel.html	real
+bg-podium	game-icons.net podium-winner + laurels-trophy	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/podium-winner.html ; https://game-icons.net/1x1/delapouite/laurels-trophy.html	real
+track-sunline	game-icons.net road	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/road.html	real
+track-hairpin	game-icons.net horizon-road	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/horizon-road.html	real
+car-crimson	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+car-azure	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+car-jade	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+car-amber	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+car-violet	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+car-graphite	game-icons.net race-car	CC BY 3.0 (author skoll)	https://game-icons.net/1x1/skoll/race-car.html	real
+portrait-kit	game-icons.net full-motorcycle-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/full-motorcycle-helmet.html	real
+portrait-juno	game-icons.net steampunk-goggles	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/steampunk-goggles.html	real
+portrait-dax	game-icons.net robot-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/robot-helmet.html	real
+portrait-pia	game-icons.net plane-pilot	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/plane-pilot.html	real
+portrait-oto	game-icons.net astronaut-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/astronaut-helmet.html	real
+portrait-bex	game-icons.net spartan-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/spartan-helmet.html	real
+ui-gear-dial	procedural framed plate in the game palette (no external source)	-	-	real
+ui-engine-tray	procedural framed plate in the game palette (no external source)	-	-	real
+ui-corner-sign	procedural kerb-ring sign in the game palette (no external source)	-	-	real
+fx-spinout-smoke	game-icons.net smoke-bomb	CC BY 3.0 (author darkzaitzev)	https://game-icons.net/1x1/darkzaitzev/smoke-bomb.html	real
+fx-slipstream-streaks	game-icons.net wind-slap	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/wind-slap.html	real
