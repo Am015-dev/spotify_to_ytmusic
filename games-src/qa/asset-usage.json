@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T02:51Z",
+ "when": "2026-11-08T03:23Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -807,9 +807,9 @@
    "glbShipped": 2,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 186,
+   "playedSecs": 187,
    "end": "cap",
-   "clicks": 268,
+   "clicks": 216,
    "fail": true,
    "neverLoaded": {
     "media/ui*": [
@@ -820,7 +820,6 @@
      "media/ui-button-go.webp",
      "media/ui-button-power.webp",
      "media/ui-button-roll.webp",
-     "media/ui-node-done.webp",
      "media/ui-panel.webp",
      "media/ui-phrase.webp",
      "media/ui-row-c.webp",
@@ -861,8 +860,8 @@
      "music/defeat-b.mp3"
     ],
     "music/tavern*": [
-     "music/tavern-short-a.mp3",
-     "music/tavern-short-b.mp3"
+     "music/tavern-b.mp3",
+     "music/tavern-short-a.mp3"
     ],
     "music/victory*": [
      "music/victory-a.mp3",
@@ -870,6 +869,9 @@
     ],
     "music/fight*": [
      "music/fight-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-b.mp3"
     ]
    }
   },

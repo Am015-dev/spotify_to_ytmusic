@@ -1,616 +1,69 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T03:19Z",
+ "when": "2026-11-08T03:27Z",
  "secs": 120,
- "totalSecs": 378,
+ "totalSecs": 426,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 128,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "We win or crash together. Never say dice numbers. ×",
-     "words": 10,
-     "shownMs": 250,
-     "neededMs": 5000,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 6 goes on Axis. Tilt 3 left. Watch it! ×",
-     "words": 11,
-     "shownMs": 250,
-     "neededMs": 5100,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 3 goes on Axis. Keeps the plane level. ×",
-     "words": 10,
-     "shownMs": 250,
-     "neededMs": 5000,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Engines add both dice. Past a marker, we move closer. ×",
-     "words": 11,
-     "shownMs": 250,
-     "neededMs": 5100,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 3 goes on Axis. Keeps the plane level. ×",
-     "words": 10,
-     "shownMs": 436,
-     "neededMs": 5000,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 4 goes on Axis. Tilt 1 left. ×",
-     "words": 9,
-     "shownMs": 386,
-     "neededMs": 4900,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 4 goes on Axis. Tilt 1 left. ×",
-     "words": 9,
-     "shownMs": 414,
-     "neededMs": 4900,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 4 goes on Axis. Tilt 1 left. ×",
-     "words": 9,
-     "shownMs": 355,
-     "neededMs": 4900,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 2 goes on Engines. Engine die down. Yours adds to it. ×",
-     "words": 13,
-     "shownMs": 250,
-     "neededMs": 5300,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 3 goes on Axis. Axis die down. Yours decides "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "That space belongs to the co-pilot. ×",
-      "Your 2 goes on Axis. Axis die down. Yours decides "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Space 3: 1 plane ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Space 2: 0 planes ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "That space belongs to the co-pilot. ×",
-      "Your 2 goes on Axis. Tilt 1 right. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 4731,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Round 1 of 4: axis and engines. Tap Roll. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Airport: 0 planes ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Space 3: 1 plane ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 500,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "We win or crash together. Never say dice numbers. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 741,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Space 1: 0 planes ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 966,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 492,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Axis die down. Yours decides "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 883,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 780,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1958,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 502,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 2 goes on Axis. Axis die down. Yours decides "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 755,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Blue spaces are yours, orange are Ravi's, grey are"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 436,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1199,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 458,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1466,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Landing gear 1 is taken. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Landing gear 1 is taken. ×",
-      "Your 6 goes on Engines. Speed 8: moves 1 space. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 521,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 6 goes on Engines. Speed 8: moves 1 space. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 470,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Landing gear 2 needs 3 or 4 (your die shows 6). ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Landing gear 2 needs 3 or 4 (your die shows 6). ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 758,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 6 goes on Engines. Speed 8: moves 1 space. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "To land: clear runway, gear and flaps down, wings "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 766,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "One die each in turn. Fill axis and engines every "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 819,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Space 1: 0 planes ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Space 1: 0 planes ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 798,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 744,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1251,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Axis and Engines still empty. Tap again. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 3 goes on Axis. Keeps the plane level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 407,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Engines add both dice. Past a marker, we move clos"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1031,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Gear takes 1-2, 3-4 or 5-6. All three must drop. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 882,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2102,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 670,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Pick a die first. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1191,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Coffee is taken. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Coffee is taken. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1336,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1027,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2107,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Round 1 of 4: axis and engines. Tap Roll. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×",
-      "Your 4 goes on Axis. Tilt 1 left. ×"
-     ]
-    }
-   ]
-  },
-  "b": {
    "status": "PASS",
    "count": 0,
    "detail": []
   },
-  "c": {
+  "b": {
    "status": "FAIL",
-   "count": 2,
+   "count": 4,
    "detail": [
     {
-     "session": "phone/learn",
-     "text": "Try your 5 on Engines: Engines: you set half the speed, your partner adds the rest.",
-     "words": 16,
-     "at": 70076,
-     "where": "div."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Try your 3 on Engines: Engines total 5: the plane moves 1 space.",
-     "words": 13,
-     "at": 83041,
-     "where": "div."
-    }
-   ]
-  },
-  "d": {
-   "status": "FAIL",
-   "count": 2,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Keep it level",
-     "px": 13,
-     "at": 45055,
-     "where": "div.gxc-sc-title"
+     "session": "phone/play",
+     "text": "Space 2: 0 planes",
+     "ms": 994,
+     "cls": "on",
+     "tag": "div"
     },
     {
      "session": "phone/play",
-     "text": "Keep it level",
-     "px": 13,
-     "at": 4002,
-     "where": "div.gxc-sc-title"
+     "text": "Pick a die first.",
+     "ms": 5274,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "6000 ft · round 1 of 7",
+     "ms": 431,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick a die first.",
+     "ms": 1792,
+     "cls": "on",
+     "tag": "div"
     }
    ]
   },
+  "c": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
+  "d": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  },
   "e": {
    "status": "FAIL",
-   "count": 11,
+   "count": 16,
    "detail": [
     {
      "session": "phone/learn",
-     "k": "Axis|first",
-     "at": 15675,
+     "k": "Axis|level",
+     "at": 20701,
      "a": "Axis",
-     "b": "first",
+     "b": "level",
      "ra": [
       101,
       280,
@@ -618,54 +71,16 @@
       14
      ],
      "rb": [
-      100,
+      99,
       289,
-      23,
-      15
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Speed|stay",
-     "at": 15675,
-     "a": "Speed",
-     "b": "stay",
-     "ra": [
-      95,
-      348,
-      33,
-      14
-     ],
-     "rb": [
-      100,
-      357,
-      23,
-      15
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Radio|empty",
-     "at": 15675,
-     "a": "Radio",
-     "b": "empty",
-     "ra": [
-      12,
-      416,
-      31,
-      14
-     ],
-     "rb": [
-      9,
-      425,
-      37,
+      27,
       15
      ]
     },
     {
      "session": "phone/learn",
      "k": "Coffee|coffee",
-     "at": 15675,
+     "at": 20701,
      "a": "Coffee",
      "b": "coffee",
      "ra": [
@@ -683,8 +98,27 @@
     },
     {
      "session": "phone/learn",
+     "k": "Axis|SPIN",
+     "at": 27222,
+     "a": "Axis",
+     "b": "SPIN",
+     "ra": [
+      101,
+      280,
+      23,
+      14
+     ],
+     "rb": [
+      97,
+      289,
+      29,
+      15
+     ]
+    },
+    {
+     "session": "phone/learn",
      "k": "Axis|right",
-     "at": 28238,
+     "at": 39922,
      "a": "Axis",
      "b": "right",
      "ra": [
@@ -701,11 +135,49 @@
      ]
     },
     {
-     "session": "phone/learn",
-     "k": "Radio|clear",
-     "at": 28238,
+     "session": "phone/play",
+     "k": "Axis|first",
+     "at": 119987,
+     "a": "Axis",
+     "b": "first",
+     "ra": [
+      101,
+      280,
+      23,
+      14
+     ],
+     "rb": [
+      100,
+      289,
+      23,
+      15
+     ]
+    },
+    {
+     "session": "phone/play",
+     "k": "Speed|first",
+     "at": 119987,
+     "a": "Speed",
+     "b": "first",
+     "ra": [
+      95,
+      348,
+      33,
+      14
+     ],
+     "rb": [
+      100,
+      357,
+      23,
+      15
+     ]
+    },
+    {
+     "session": "phone/play",
+     "k": "Radio|empty",
+     "at": 119987,
      "a": "Radio",
-     "b": "clear",
+     "b": "empty",
      "ra": [
       12,
       416,
@@ -713,16 +185,35 @@
       14
      ],
      "rb": [
-      14,
+      9,
       425,
-      28,
+      37,
+      15
+     ]
+    },
+    {
+     "session": "phone/play",
+     "k": "Coffee|coffee",
+     "at": 119987,
+     "a": "Coffee",
+     "b": "coffee",
+     "ra": [
+      124,
+      547,
+      34,
+      14
+     ],
+     "rb": [
+      124,
+      555,
+      35,
       15
      ]
     },
     {
      "session": "pc/learn",
      "k": "Axis|SPIN",
-     "at": 41457,
+     "at": 29701,
      "a": "Axis",
      "b": "SPIN",
      "ra": [
@@ -741,7 +232,7 @@
     {
      "session": "pc/learn",
      "k": "Speed|+1",
-     "at": 41458,
+     "at": 29701,
      "a": "Speed",
      "b": "+1",
      "ra": [
@@ -760,7 +251,7 @@
     {
      "session": "pc/learn",
      "k": "Radio|empty",
-     "at": 41458,
+     "at": 29701,
      "a": "Radio",
      "b": "empty",
      "ra": [
@@ -779,7 +270,7 @@
     {
      "session": "pc/learn",
      "k": "Gear|↓",
-     "at": 41458,
+     "at": 29701,
      "a": "Gear",
      "b": "↓",
      "ra": [
@@ -798,7 +289,7 @@
     {
      "session": "pc/learn",
      "k": "Coffee|coffee",
-     "at": 41458,
+     "at": 29701,
      "a": "Coffee",
      "b": "coffee",
      "ra": [
@@ -813,6 +304,63 @@
       30,
       13
      ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Axis|right",
+     "at": 42706,
+     "a": "Axis",
+     "b": "right",
+     "ra": [
+      386,
+      472,
+      26,
+      16
+     ],
+     "rb": [
+      387,
+      467,
+      24,
+      13
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Speed|stay",
+     "at": 42706,
+     "a": "Speed",
+     "b": "stay",
+     "ra": [
+      380,
+      566,
+      38,
+      16
+     ],
+     "rb": [
+      389,
+      561,
+      20,
+      13
+     ]
+    },
+    {
+     "session": "pc/learn",
+     "k": "Brake|2",
+     "at": 42706,
+     "a": "Brake",
+     "b": "2",
+     "ra": [
+      30,
+      547,
+      36,
+      16
+     ],
+     "rb": [
+      40,
+      526,
+      16,
+      34
+     ]
     }
    ]
   }
@@ -821,50 +369,49 @@
   "phone/learn: Learn to play not found",
   "phone/play: Play button not found",
   "pc/learn: Learn to play not found",
-  "pc/play: Play button not found",
-  "pc/play: stuck"
+  "pc/play: Play button not found"
  ],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 219,
-   "clicks": 295,
-   "endedBy": "result",
+   "secs": 121,
+   "turns": 131,
+   "clicks": 162,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 103
+   "messagesSeen": 11
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 34,
-   "turns": 46,
-   "clicks": 71,
-   "endedBy": "result",
+   "secs": 120,
+   "turns": 171,
+   "clicks": 227,
+   "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 4
   },
   {
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 125,
-   "clicks": 198,
+   "turns": 138,
+   "clicks": 191,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 111
+   "messagesSeen": 23
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 104,
-   "turns": 115,
-   "clicks": 160,
-   "endedBy": "stuck",
+   "secs": 64,
+   "turns": 80,
+   "clicks": 120,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
