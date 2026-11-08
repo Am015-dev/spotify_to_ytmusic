@@ -124,7 +124,7 @@ test('guided first dive (W504): the scripted line teaches follow, win, never for
   const G = LD.newGame({ players: 3, seed: 5, names: ['You', 'Dag', 'Sumi'], ai: [null, 'normal', 'normal'], mission: { kind: 'free', jobs: [53, 78] }, stack: { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true } });
   const go = (s, m) => { const r = LD.apply(G, s, m); if (!r.ok) throw new Error(JSON.stringify(m) + ' ' + r.error); };
   ok(G.cap === 0); go(0, { t: 'take', i: 0 }); go(1, { t: 'take', i: 1 }); go(0, { t: 'dist', on: false });
-  go(0, { t: 'ping', c: C('K3'), k: 'low' }); go(1, { t: 'nosig' }); go(2, { t: 'ping', c: C('T8'), k: 'high' }); go(1, { t: 'nosig' }); ok(G.phase === 'play');
+  ok(G.phase === 'play'); go(2, { t: 'ping', c: C('T8'), k: 'high' }); go(0, { t: 'ping', c: C('K3'), k: 'low' });   // no signal order: Sumi first, then the Captain
   go(0, { t: 'play', c: C('K3') }); ok(LD.playable(G, 1).every(c => D.suitOf(c) === 2)); go(1, { t: 'play', c: C('K7') }); go(2, { t: 'play', c: C('K2') });
   ok(G.tricks[0].w === 1 && G.tasks[1].st === 1);
   go(1, { t: 'play', c: C('C4') }); go(2, { t: 'play', c: C('C8') }); ok(LD.playable(G, 0).length === 3); go(0, { t: 'play', c: C('C2') }); ok(G.tricks[1].w === 2);
@@ -135,7 +135,7 @@ test('tutorial deal: attempt 1 breaks Dag\'s job on trick 1, attempt 2 (same dea
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1))), C = t => h(t)[0];
   const mk = () => LD.newGame({ players: 3, seed: 5, names: ['You', 'Dag', 'Sumi'], ai: [null, 'normal', 'normal'], mission: { kind: 'log', id: 1 }, stack: { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true } });
   const ap = (G, s, m) => { const r = LD.apply(G, s, m); if (!r.ok) throw new Error(JSON.stringify(m) + ' ' + r.error); };
-  const pre = (G, ping, sumi) => { ap(G, 0, { t: 'take', i: 0 }); ap(G, 1, { t: 'take', i: 1 }); ap(G, 0, { t: 'dist', on: false }); ap(G, 0, { t: 'ping', c: C(ping[0]), k: ping[1] }); ap(G, 1, { t: 'nosig' }); if (sumi) { ap(G, 2, { t: 'ping', c: C('K9'), k: 'high' }); ap(G, 1, { t: 'nosig' }); } else ap(G, 2, { t: 'nosig' }); };
+  const pre = (G, ping, sumi) => { ap(G, 0, { t: 'take', i: 0 }); ap(G, 1, { t: 'take', i: 1 }); ap(G, 0, { t: 'dist', on: false }); ap(G, 0, { t: 'ping', c: C(ping[0]), k: ping[1] }); if (sumi) ap(G, 2, { t: 'ping', c: C('K9'), k: 'high' }); };
   const G = mk(); eq(G.cap, 0); eq(G.tasks.map(t => t.id).join(), '53,78');
   pre(G, ['C9', 'high'], true); eq(G.phase, 'play'); eq(G.trick.turn, 0);
   ap(G, 0, { t: 'play', c: C('C9') }); ap(G, 1, { t: 'play', c: C('C5') }); ap(G, 2, { t: 'play', c: C('C3') });

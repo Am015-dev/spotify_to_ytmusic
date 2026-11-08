@@ -248,10 +248,12 @@ function legalCards(v) {
   if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
   return null;
 }
+// before trick 1 a computer leader waits until you signal or tap Ready (signals have no order; nobody is rushed past the first window)
+function preWait() { const v = viewSeat(); return !!G && UI.mode !== 'tutorial' && !NET.on && v >= 0 && G.phase === 'play' && G.tricks.length === 0 && G.trick.plays.length === 0 && !UI.preReady && LD.canPing(G, v) && G.players[G.trick.turn].ai; }
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
 // the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
 function pingSpots(v) {
-  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || !iMustAct()) return m;
+  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || (G.phase === 'signal' && !iMustAct())) return m;   // between tricks any diver may signal, turn or not
   if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
   return m;
 }
@@ -352,7 +354,8 @@ function actModel(v) {
         M.p = helper ? 'Tap a drone card.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play a card.');
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
           if (UI.ab) { M.p = 'Every card breaks a ' + (UI.ab.job >= 0 ? 'job.' : 'rule.'); M.warn = 1; } }
-      } else M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : '';
+      } else if (preWait()) { M.cls = 'mine'; M.p = 'Signal now, or tap Ready.'; btn('Ready', 'ready', { cls: 'go' }); }
+      else M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : '';
       return M;
     }
   }

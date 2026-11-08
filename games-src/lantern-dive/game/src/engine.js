@@ -528,8 +528,8 @@ function nextSignal(G, from) {
 function curseAt(G, n) { return G.boss && G.boss.sched ? G.boss.sched[n] || '' : ''; }
 function startPlay(G) {
   ev(G, { t: 'start' });
-  if (G.comm === 'none' || G.mission.m23) { beginTricks(G); return; }
-  startSignal(G);
+  // signals have no fixed order (W504): every diver may signal whenever no trick is in progress, before trick 1 included (pingWindow)
+  beginTricks(G);
 }
 function beginTricks(G) {
   G.phase = 'play'; G.trick = { n: G.tricks.length, lead: G.tricks.length ? G.trick.lead : G.cap, turn: G.tricks.length ? G.trick.turn : G.cap, plays: [], ls: -1, cu: curseAt(G, G.tricks.length) };

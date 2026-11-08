@@ -31,7 +31,7 @@ async function playDive(p, tag, shots) {
       if (res || await p.evaluate(() => UI.overShown)) { resultSeen = true; if (shots) await p.screenshot({ path: shots + '-result.png' }); if (GP && tag === 'quick') { await sleep(600); await p.screenshot({ path: path.join(GP, 'result.png') }); } return true; }
       await sleep(400); continue;
     }
-    let a = await tap(p, 'button', '^(Next|Got it|Continue|OK|Dive)$');
+    let a = await tap(p, 'button', '^(Next|Got it|Continue|OK|Dive|Ready)$');
     if (!a && s.must && !s.busy) {
       if (s.ph === 'assign') a = await tap(p, '.jcard.glow');
       else if (s.ph === 'distress') a = await tap(p, '#acts button', 'No flare|No|Skip');

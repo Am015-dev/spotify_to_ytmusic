@@ -154,3 +154,7 @@ html.sk .gx-drawer h3{display:inline-block;background:#f3e6bf;color:#5a3306;padd
 html.sk .gx-drawer-body{padding-left:26px;padding-right:26px}
 html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:none!important;border:2px solid #d9b04a;border-radius:50%;color:#fff}
 @media (min-width:1024px){.gxc-path *,.gxc-act *,.gxc-act small,.gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:max(16px,1em)!important}}
+#rstep{position:fixed;inset:0;z-index:70}
+#rstep .rsd{position:fixed;background:rgba(8,4,10,.62);pointer-events:none}
+#rstep .rsh{position:fixed;border-radius:12px;box-shadow:0 0 0 3px #f2c14e,0 0 18px 4px rgba(242,193,78,.6);pointer-events:none}
+#rstep .rsb{position:fixed;transform:none;width:min(340px,calc(100vw - 24px));max-width:none;box-sizing:border-box}

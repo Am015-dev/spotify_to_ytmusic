@@ -19,18 +19,21 @@ const tutBox = sel => () => {
 // the scripted crewmates: [phase, seat, trick, move, the step that must be finished first]
 const TUT_AI = [
   ['assign', 1, 0, { t: 'take', i: 1 }, 'take'],
-  ['signal', 2, 0, { t: 'ping', c: 'T8', k: 'high' }, 'ping'],
-  ['signal', 1, 0, { t: 'nosig' }, 'ping', () => !G.pings.some(p => p.seat === 2)], ['signal', 1, 0, { t: 'nosig' }, 'readping'],
+  ['play', 2, 0, { t: 'ping', c: 'T8', k: 'high' }, 'ping'],   // a signal out of turn: signals have no fixed order
   ['play', 1, 0, { t: 'play', c: 'K7' }, 'lead'], ['play', 2, 0, { t: 'play', c: 'K2' }, 'follow1'],
   ['play', 1, 1, { t: 'play', c: 'C4' }, 'done1'], ['play', 2, 1, { t: 'play', c: 'C8' }, 'done1'],
   ['play', 2, 2, { t: 'play', c: 'T3' }, 'nowin'], ['play', 1, 2, { t: 'play', c: 'T9' }, 'trump']
 ];
 const tutIdx = id => tutSteps().findIndex(s => s.id === id);
+const tutPingRow = () => G && G.phase === 'play' && G.trick.plays.length === 0 && TUT_AI.find(r => r[3].t === 'ping' && r[2] === G.trick.n && !G.players[r[1]].pingUsed);
+const tutGateOk = id => !(typeof GXT !== 'undefined' && GXT.active() && GXT.index() <= tutIdx(id));
+function tutPingDue() { const r = tutPingRow(); return !!r && tutGateOk(r[4]); }
 function tutAiStep() {
   if (!G || G.phase === 'over') return false;
+  { const r = tutPingRow(); if (r) { if (!tutGateOk(r[4])) return false; return LD.apply(G, r[1], { t: 'ping', c: tcard(r[3].c), k: r[3].k }).ok; } }
   const s = LD.pending(G)[0]; if (s === undefined || !G.players[s].ai) return false;
   const n = G.trick ? G.trick.n : 0;
-  const row = TUT_AI.find(r => r[0] === G.phase && r[1] === s && (G.phase !== 'play' || r[2] === n) && (!r[5] || r[5]()));
+  const row = TUT_AI.find(r => r[3].t !== 'ping' && r[0] === G.phase && r[1] === s && (G.phase !== 'play' || r[2] === n) && (!r[5] || r[5]()));
   if (!row) { if (G.phase === 'signal') return LD.apply(G, s, { t: 'nosig' }).ok; return LD.AI.step(G); }
   if (typeof GXT !== 'undefined' && GXT.active() && GXT.index() <= tutIdx(row[4])) return false;   // wait until the step that sets this move up is finished
   const m = Object.assign({}, row[3]); if (typeof m.c === 'string') m.c = tcard(m.c);
@@ -50,7 +53,7 @@ const TUT_RULES = [
   ['theirs', 'Jobs are taken in turn; each job has one owner'],
   ['lose', 'One failed job loses the dive for everyone'],
   ['flare', 'Distress flare: optional card pass, costs an attempt'],
-  ['ping', 'Signal once per dive: highest, lowest or only card of a colour'],
+  ['ping', 'Signal once per dive, any time between tricks, in no fixed order: highest, lowest or only card of a colour'],
   ['readping', 'Reading a crewmate\'s signal token'],
   ['lead', 'The Captain leads trick one; the leader plays any card'],
   ['follow1', 'Everyone must follow the colour led if they can'],
@@ -72,9 +75,9 @@ function tutSteps() {
     tutNext('theirs', 'Dag took the other job: win the first trick.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
     tutNext('lose', 'One failed job, and the whole crew loses the dive.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutTap('flare', 'A flare swaps cards but costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
-    tutTap('ping', 'Once per dive, show your highest, lowest or only colour card.', tq('#hand .pspot[data-id="' + tcard('K3') + '"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => G.phase === 'signal' && tutMy()),
+    tutTap('ping', 'Signal anytime between tricks: your highest, lowest or only colour card.', tq('#hand .pspot[data-id="' + tcard('K3') + '"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed),
     tutNext('readping', 'Sumi\'s top token: Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
-    tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && tutMy()),
+    tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && G.pings.some(p => p.seat === 2) && tutMy()),
     tutNext('follow1', 'Dag follows Kelp. Everyone must follow the colour led, if able.', tq('#felt'), () => pl(0) && T().plays.length === 2 && tutFree()),
     tutNext('win1', 'The highest card of the colour led wins. Dag takes it.', tutSeat(1), () => G.tricks.length >= 1 && tutFree()),
     tutNext('done1', 'Dag\'s job is done. A done job cannot fail now.', tutSeat(1), () => G.tricks.length >= 1 && tutFree()),
@@ -112,3 +115,53 @@ function tutLeave() {
   clearTimeout(UI.tm); UI.seq++; UI.busy = false; UI.fz = null; UI.rq = []; UI.cards = []; UI.started = false;
   try { GXT.stop(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }
 }
+// ---------------------------------------------------------------- special dive rules: one guided step the first time each appears (W504)
+// One sentence (<= 12 words), a spotlight on the part of the table it is about, one tap on it (or OK) to go on. The game waits meanwhile.
+// Seen ids are remembered per device ('ld-rulesteps'). rulestep-test.js starts one dive per rule and checks the step shows once.
+const RULE_STEPS = [
+  { id: 'vote', when: () => G.phase === 'assign' && G.as.mode === 'vote', say: 'Crew vote: tap the diver who should take every job.', target: '#opp .seat, #me' },
+  { id: 'handover', when: () => G.phase === 'assign' && G.as.mode === 'cmd', say: 'Captain keeps every job, or hands them all to a volunteer.', target: '#pool' },
+  { id: 'volunteer', when: () => G.phase === 'assign' && (G.as.mode === 'vol' || G.as.mode === 'split'), say: 'Volunteers take every job. Say yes or no when asked.', target: '#pool' },
+  { id: 'predict', when: () => G.phase === 'predict', say: 'Predict exactly how many tricks this job\'s owner will win.', target: '#acts' },
+  { id: 'murky', when: () => G.phase === 'play' && G.comm === 'murky', say: 'Murky water: a signal shows the card, but no token.', target: '#hand' },
+  { id: 'narc', when: () => G.phase === 'play' && G.comm === 'narc', say: 'Deep narcosis: shared tokens. Anyone may grab one between tricks.', target: '#hand' },
+  { id: 'clock', when: () => G.phase === 'play' && !!G.clock, say: 'The clock is running. Finish every job before time runs out.', target: '#clk' },
+  { id: 'drone', when: () => !!G.two && G.phase !== 'over', say: 'The drone is a third hand. The Captain plays its top cards.', target: '.seat.drone' }
+];
+function ruleSeen() { try { return JSON.parse(localStorage.getItem('ld-rulesteps') || '{}') || {}; } catch (e) { return UI.rsMem || (UI.rsMem = {}); } }
+function ruleMark(id) { const o = ruleSeen(); o[id] = 1; UI.rsMem = o; try { localStorage.setItem('ld-rulesteps', JSON.stringify(o)); } catch (e) { } }
+function ruleStepCheck() {   // true while a rule step is up (the turn driver waits)
+  if (UI.rstep) return true;
+  if (!G || UI.mode === 'tutorial' || NET.on || UI.busy || UI.fz || UI.cards.length || UI.dlg || G.phase === 'over') return false;
+  const seen = ruleSeen();
+  for (const r of RULE_STEPS) { let on = false; try { on = !seen[r.id] && r.when(); } catch (e) { } if (on && ruleStepShow(r)) return true; }
+  return false;
+}
+function ruleBox(sel) {
+  const rs = Array.from(document.querySelectorAll(sel)).map(e => e.getBoundingClientRect()).filter(r => r.width > 4 && r.height > 4 && r.bottom > 0 && r.top < innerHeight); if (!rs.length) return null;
+  const l = Math.max(2, Math.min(...rs.map(r => r.left)) - 4), t = Math.max(2, Math.min(...rs.map(r => r.top)) - 4), r2 = Math.min(innerWidth - 2, Math.max(...rs.map(r => r.right)) + 4), b = Math.min(innerHeight - 2, Math.max(...rs.map(r => r.bottom)) + 4);
+  return { left: l, top: t, width: r2 - l, height: b - t };
+}
+function ruleStepShow(r) {
+  const box = ruleBox(r.target); if (!box) return false;
+  UI.rstep = r.id;
+  const o = document.createElement('div'); o.id = 'rstep'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'New rule'); o.dataset.rule = r.id;
+  o.innerHTML = '<div class="rsh"></div><div class="rsb gxh-bub gxt-bub on"><div class="gxh-bd"><div class="gxh-tt">New rule</div><div class="gxh-tx"></div></div><div class="gxh-row2"><button type="button" class="gxh-ok rsok">OK</button></div></div>';
+  o.querySelector('.gxh-tx').textContent = r.say;
+  const hole = o.querySelector('.rsh'), bub = o.querySelector('.rsb');
+  Object.assign(hole.style, { left: box.left + 'px', top: box.top + 'px', width: box.width + 'px', height: box.height + 'px' });
+  [[0, 0, innerWidth, box.top], [0, box.top + box.height, innerWidth, innerHeight - box.top - box.height], [0, box.top, box.left, box.height], [box.left + box.width, box.top, innerWidth - box.left - box.width, box.height]]
+    .forEach(q => { const d = document.createElement('div'); d.className = 'rsd'; Object.assign(d.style, { left: q[0] + 'px', top: q[1] + 'px', width: Math.max(0, q[2]) + 'px', height: Math.max(0, q[3]) + 'px' }); o.insertBefore(d, hole); });
+  document.body.appendChild(o);
+  const bh = bub.offsetHeight || 120, below = box.top + box.height + 10, above = box.top - bh - 10;
+  bub.style.top = Math.round(below + bh < innerHeight - 6 ? below : Math.max(6, above)) + 'px'; bub.style.left = Math.round((innerWidth - bub.offsetWidth) / 2) + 'px';
+  const at = Date.now();
+  o.addEventListener('click', e => {
+    e.stopPropagation(); e.preventDefault(); if (Date.now() - at < 500) return;
+    const x = e.clientX, y = e.clientY, inHole = x >= box.left && x <= box.left + box.width && y >= box.top && y <= box.top + box.height;
+    if (inHole || (e.target.closest && e.target.closest('.rsok'))) ruleStepDone();
+    else { bub.classList.remove('gxt-shake'); void bub.offsetWidth; bub.classList.add('gxt-shake'); }
+  }, true);
+  return true;
+}
+function ruleStepDone() { const id = UI.rstep; if (!id) return; ruleMark(id); UI.rstep = null; const e = document.getElementById('rstep'); if (e) e.remove(); try { render(); } catch (x) { } schedule(); }

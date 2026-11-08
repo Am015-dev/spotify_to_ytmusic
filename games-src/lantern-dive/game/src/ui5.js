@@ -204,6 +204,7 @@ document.addEventListener('click', ev => {
     case 'signal': if (canAct() && LD.pingMoves(G, viewSeat()).length) { UI.pingSel = true; UI.sel = -1; render(); } break;
     case 'noping': UI.pingSel = false; UI.sel = -1; render(); break;
     case 'doping': { const m = myMoves().find(x => x.t === 'ping' && x.c === UI.sel); if (m && canAct()) doMove(m); break; }
+    case 'ready': UI.preReady = true; render(); schedule(); break;
     case 'nosig': { const m = myMoves().find(x => x.t === 'nosig'); if (m && canAct()) doMove(m); break; }
     case 'pool': tapJob(+d.i); break;
     case 'pingc': tapPing(+d.id); break;
