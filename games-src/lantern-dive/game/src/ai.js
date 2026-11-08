@@ -116,7 +116,7 @@ function fillWorld(W, V, B, hands) {
     }
     p.hand = hands[s].slice().sort((a, b) => a - b);
   });
-  // the Commander's helper in a 2-diver game when I am the Commander: I can see the face-up cards and not the others (handled above)
+  // the Captain's helper in a 2-diver game when I am the Captain: I can see the face-up cards and not the others (handled above)
   W.trick = V.trick ? { n: V.trick.n, lead: V.trick.lead, turn: V.trick.turn, plays: V.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: V.trick.ls, cu: V.trick.cu || '' } : null;
 }
 function cloneW(W) {
@@ -268,7 +268,7 @@ function chooseAssign(V, me, level, moves) {
   const takes = moves.filter(m => m.t === 'take');
   const find = t => moves.find(m => m.t === t);
   if (A.mode === 'vote') {
-    // vote for myself when the jobs fit my hand better than an average seat; otherwise for the Commander
+    // vote for myself when the jobs fit my hand better than an average seat; otherwise for the Captain
     const all = V.tasks.map((t, i) => i); const sc = rateAll(V, me, level);
     const f = sc.mine >= Math.max(.3, sc.oth) ? me : V.cap; return moves.find(m => m.f === f) || moves[0];
   }

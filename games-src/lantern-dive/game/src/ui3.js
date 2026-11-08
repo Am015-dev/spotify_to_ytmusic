@@ -21,7 +21,7 @@ function resetUI(mode, cfg) {
 }
 function newGame(mode, o) {
   o = o || {};
-  const opt = Object.assign({}, DEF, UI.opt || {}, o);
+  const opt = Object.assign({}, DEF, { mission: startDive() }, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
   if (mode === 'tutorial') { np = 3; opt.kind = 'log'; opt.mission = 1; opt.seats = [3, 2]; }   // the staged tutorial (ui12.js): you, Dag and Sumi
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
@@ -82,6 +82,7 @@ function schedule() {
   if (UI.mode === 'tutorial' && tutPaused()) { UI.tm = setTimeout(schedule, 200); return; }
   try { if (storyCheck()) return; } catch (e) { console.error(e); }
   if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
+  if (UI.pingSel && !NET.on && UI.mode !== 'tutorial' && canSigNow(viewSeat())) return;   // the computers wait while you pick a card to signal
   if (preWait() && !(G.players.some(p => p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)))) { try { coachCheck(); } catch (e) { } return; }   // the computer leader waits for your Ready
   if (aiWants()) {
     const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.25 + .6 * Math.random()));
@@ -125,7 +126,7 @@ function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
   if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); else { const el = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (el) { el.classList.add('nudge'); setTimeout(() => el.classList.remove('nudge'), 350); } } return; }
   const v = viewSeat(), ph = G.phase;
-  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (UI.pingSel) { const ok = pingSpots(v).has(id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } if (tutOn() && !GXT.act({ type: 'tap', what: 'pingsel', c: id })) return; UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
   if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('You cannot pass Lanterns.'); return; } UI.giveSel = id; doMove(m); return; }
   if (ph === 'play') {
     const T = G.trick, turn = T.turn;
@@ -149,10 +150,16 @@ function playSel() {
 // tap a job card on the table: it flies to your seat
 function tapJob(i) {
   if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
-  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Commander cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Captain cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
   doMove(m);
 }
 // tap a ping spot on a card of your hand
+function sigStart() {
+  const v = viewSeat(); if (!canAct() || !canSigNow(v)) return;
+  if (tutOn() && !GXT.act({ type: 'tap', what: 'signal' })) return;
+  UI.pingSel = true; UI.sel = -1; fingerDone(); render();
+}
+function sigOk() { if (UI.sel < 0) { toast('Pick a glowing card first.'); return; } const id = UI.sel; tapPing(id); }
 function tapPing(id) {
   if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
   if (!m) { snd('error'); toast('You cannot show that card.'); return; }

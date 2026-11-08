@@ -19,7 +19,7 @@ const tutBox = sel => () => {
 // the scripted crewmates: [phase, seat, trick, move, the step that must be finished first]
 const TUT_AI = [
   ['assign', 1, 0, { t: 'take', i: 1 }, 'take'],
-  ['play', 2, 0, { t: 'ping', c: 'T8', k: 'high' }, 'ping'],   // a signal out of turn: signals have no fixed order
+  ['play', 2, 0, { t: 'ping', c: 'T8', k: 'high' }, 'pingok'],   // a signal out of turn: signals have no fixed order
   ['play', 1, 0, { t: 'play', c: 'K7' }, 'lead'], ['play', 2, 0, { t: 'play', c: 'K2' }, 'follow1'],
   ['play', 1, 1, { t: 'play', c: 'C4' }, 'done1'], ['play', 2, 1, { t: 'play', c: 'C8' }, 'done1'],
   ['play', 2, 2, { t: 'play', c: 'T3' }, 'nowin'], ['play', 1, 2, { t: 'play', c: 'T9' }, 'trump']
@@ -44,6 +44,7 @@ const tutMy = () => tutFree() && iMustAct();
 const tutHand = t => tq('#hand .hc[data-id="' + tcard(t) + '"]');
 const tutSeat = s => tutBox('#opp .seat[data-seat="' + s + '"], #opp [data-a="seat"][data-seat="' + s + '"]');
 const tutNext = (id, say, target, ready) => ({ id, say, target, wait: null, ready });
+const tutUi = (id, say, target, match, ready) => ({ id, say, target, wait: { type: 'tap', match: a => !a.mv && match(a) }, ready });
 const tutTap = (id, say, target, match, ready) => ({ id, say, target, wait: { type: 'tap', match: a => !!a.mv && match(a.mv) }, ready });
 // every core rule, in the order the steps teach it (tutor-test.js checks each step is reached and each sentence is <= 12 words)
 const TUT_RULES = [
@@ -51,7 +52,7 @@ const TUT_RULES = [
   ['take', 'Lantern 4 = Captain; the Captain picks a job first'],
   ['mine', 'A job is met by the tricks its owner wins'],
   ['theirs', 'Jobs are taken in turn; each job has one owner'],
-  ['lose', 'One failed job loses the dive for everyone'],
+  ['lose', 'One failed job fails the attempt for everyone; the crew tries again'],
   ['flare', 'Distress flare: optional card pass, costs an attempt'],
   ['ping', 'Signal once per dive, any time between tricks, in no fixed order: highest, lowest or only card of a colour'],
   ['readping', 'Reading a crewmate\'s signal token'],
@@ -73,9 +74,11 @@ function tutSteps() {
     tutTap('take', 'Lantern 4 makes you Captain. Captains pick first: take this job.', tq('#pool .jcard[data-i="0"]'), m => m.t === 'take' && m.i === 0, () => G.phase === 'assign' && tutMy()),
     tutNext('mine', 'Your job: win the trick that holds Lantern 3.', tutBox('#me .jcard, #me [data-a="job"], [data-a="job"][data-i="0"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutNext('theirs', 'Dag took the other job: win the first trick.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
-    tutNext('lose', 'One failed job, and the whole crew loses the dive.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
+    tutNext('lose', 'One failed job fails the attempt. The crew then tries again.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutTap('flare', 'A flare swaps cards but costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
-    tutTap('ping', 'Signal anytime between tricks: your highest, lowest or only colour card.', tq('#hand .pspot[data-id="' + tcard('K3') + '"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed),
+    tutUi('ping', 'Signal once per dive, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
+    tutUi('pingpick', 'Only a highest, lowest or only colour card. Tap Kelp 3.', tutHand('K3'), a => a.what === 'pingsel' && a.c === tcard('K3'), () => UI.pingSel && UI.sel < 0 && tutFree()),
+    tutTap('pingok', 'Kelp 3 is your lowest Kelp. Tap Show it.', tq('#acts [data-a="pingok"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => UI.pingSel && UI.sel === tcard('K3') && tutFree()),
     tutNext('readping', 'Sumi\'s top token: Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
     tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && G.pings.some(p => p.seat === 2) && tutMy()),
     tutNext('follow1', 'Dag follows Kelp. Everyone must follow the colour led, if able.', tq('#felt'), () => pl(0) && T().plays.length === 2 && tutFree()),

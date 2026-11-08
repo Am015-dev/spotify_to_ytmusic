@@ -4,7 +4,7 @@
 //   LD.nextAttempt(G, {same:bool}) -> G (same G object, a new attempt: new deal, same or new job cards, distress flare stays lit)
 //   LD.moves(G, seat) -> [{t:..., ...}]   LD.apply(G, seat, move) -> {ok:true}|{ok:false,error}   LD.pending(G) -> seats that must act now
 //   LD.stripView(G, seat) / LD.checkInvariants(G) / LD.text(G)
-// 2 players: a third seat, the drone "Echo", plays 14 cards laid out in a double row (face-up top, face-down underneath). The Commander flies it.
+// 2 players: a third seat, the drone "Echo", plays 14 cards laid out in a double row (face-up top, face-down underneath). The Captain flies it.
 // Cards: 0..35 colour cards (suit*9 + value-1), 36..39 Lanterns 1..4 (trumps). Seats are clockwise: seat i+1 sits to the left of seat i.
 (function (g) {
 'use strict';
@@ -315,7 +315,7 @@ function startAttempt(G, o) {
   G.events = []; G.pl = new Array(40).fill(0); G.pings = []; G.tricks = [];
   Object.assign(G, { phase: 'assign', result: null, trick: null, left: -1, offered: false, ntr: ntrOf(G.np), firstW: -1, lastCard: -1, clockRun: false });
   ev(G, { t: 'deal', att: G.att, cap: G.cap, comm: G.comm, unk: G.unk, tasks: G.tasks.map(t => t.id) });
-  lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + sv(G, G.cap, 'holds', 'hold') + ' Lantern 4 and ' + (G.players[G.cap].name === 'You' ? 'are' : 'is') + ' the Commander.');
+  lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + sv(G, G.cap, 'holds', 'hold') + ' Lantern 4 and ' + (G.players[G.cap].name === 'You' ? 'are' : 'is') + ' the Captain.');
   initAssign(G);
 }
 // a fixed deal for the guided first dive: stack = { tasks: [job ids], hands: [[card ids] per seat] }, used again on every retry
@@ -341,11 +341,11 @@ function initAssign(G) {
   if (m.sel === 'free') { A.mode = 'free'; }
   if (A.mode === 'draft' || A.mode === 'free') A.actor = A.order[0];
   if (K === 0) { endAssign(G); return; }
-  if (A.mode === 'draft' && K < G.np && !(G.stack && G.stack.nopass)) A.pass = true;   // the guided deal cannot be passed: the Commander takes the one job
+  if (A.mode === 'draft' && K < G.np && !(G.stack && G.stack.nopass)) A.pass = true;   // the guided deal cannot be passed: the Captain takes the one job
 }
-// the hardest job the diver `s` may take (the Commander never takes a Commander-comparison job); without s: the hardest of all
+// the hardest job the diver `s` may take (the Captain never takes a Captain-comparison job); without s: the hardest of all
 function hardest(G, s) { const col = G.np - 3, R = rem(G).filter(i => s == null || canTake(G, s, i)); let b = -1; for (const i of R) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return R.filter(i => TASKS[G.tasks[i].id].d[col] === b); }
-// the Commander may not take a Commander-comparison job, and neither may the drone he or she flies
+// the Captain may not take a Captain-comparison job, and neither may the drone he or she flies
 function canTake(G, s, i) { return G.tasks[i].owner < 0 && !((s === G.cap || G.players[s].helper) && !TASKS[G.tasks[i].id].cap); }
 function assignMoves(G, c) {
   const A = G.as, out = [];
@@ -356,7 +356,7 @@ function assignMoves(G, c) {
     case 'draft': {
       const tk = R.filter(i => canTake(G, act, i));
       for (const i of tk) out.push(Object.assign({ t: 'take', i }, as));
-      // may pass only if the divers still to come this round can take what is left (the drone and the Commander cannot take Commander-comparison jobs)
+      // may pass only if the divers still to come this round can take what is left (the drone and the Captain cannot take Captain-comparison jobs)
       const after = A.order.slice((A.i % A.order.length) + 1).filter(q => R.some(i => canTake(G, q, i))).length;
       if (A.pass && (R.length <= after || !tk.length)) out.push(Object.assign({ t: 'pass' }, as));
       else if (!tk.length) out.push(Object.assign({ t: 'pass' }, as));
@@ -477,7 +477,7 @@ function predMoves(G, c) {
   const out = []; for (let n = 0; n <= G.ntr; n++) out.push(Object.assign({ t: 'predict', i, n }, G.players[o].helper ? { as: o } : {})); return out;
 }
 
-// ---------- signalling (the ping tokens) ----------
+// ---------- signalling (the signal tokens) ----------
 function pingWindow(G) {
   if (G.comm === 'none') return false;
   if (G.mission.m23 && G.tricks.length < 1) return false;
@@ -722,7 +722,7 @@ function stripView(G, seat) {
   const v = clone(G); v.rng = 0; v.seed = 0; v.tdeck = G.tdeck.length;  // the order of the job deck is hidden
   v.tdisc = G.tdisc.length;
   seat = Number.isInteger(seat) && seat >= 0 && seat < G.np ? seat : -1;
-  const mine = seat >= 0 ? ctl(G, seat) : -1;     // the Commander also controls the drone
+  const mine = seat >= 0 ? ctl(G, seat) : -1;     // the Captain also controls the drone
   v.players.forEach((p, i) => {
     if (p.helper) { p.stacks = p.stacks.map(st => [st[0], st[1] >= 0 ? -3 : st[1]]); p.hand = p.hand.map(x => x); const up = p.stacks.map(st => st[0]).filter(x => x >= 0).sort((a, b) => a - b); const hidden = p.hand.length - up.length; p.hand = up.concat(new Array(Math.max(0, hidden)).fill(-1)); }
     else if (i !== seat) { p.hand = p.hand.map(() => -1); p.mem = {}; }
