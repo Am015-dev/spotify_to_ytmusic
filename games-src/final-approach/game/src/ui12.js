@@ -133,10 +133,11 @@ function fcShow(key, txt, who, ms) {
   if (F.shut === key || !txt) return;
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
-  F.cur = { el, key, at: Date.now(), t: ms ? setTimeout(fcHide, ms) : 0 }; fcMute();
+  F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
 }
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
 function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
+const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
 function fcPump() { }
 function fcFeedback() { }
 // "Put your 4 on Engines: ..." from the coach's advice
@@ -163,7 +164,7 @@ function fcPoll() {
   if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, (F.queue.shift() || '') + ' Tap the dice you want to roll again, then confirm, or keep them all.', 'ravi'); return; }
   if (mine) {
     const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = 'p' + G.round + ':' + n + ':' + (sel == null ? '' : sel);
-    if (F.cur && F.cur.key.charAt(0) === 'w' && Date.now() - F.cur.at < 4500) return;   // let a rule line be read first
+    if (F.cur && F.cur.key.charAt(0) === 'w' && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
     if (!F.cur || F.cur.key !== key) {
       let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
       UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
@@ -171,7 +172,7 @@ function fcPoll() {
     return;
   }
   UI.cpt = null;
-  if (F.queue.length && (!F.cur || F.cur.key.charAt(0) !== 'w' || Date.now() - F.cur.at > 4500)) fcShow('w' + G.round + n, F.queue.shift(), 'ravi', 9000);
+  if (F.queue.length && (!F.cur || F.cur.key.charAt(0) !== 'w' || Date.now() - F.cur.at > F.cur.need)) fcShow('w' + G.round + n, F.queue.shift(), 'ravi', 9000);
 }
 // the end: the landing check rule by rule with the real numbers, then what did not come up
 function fcEnd() {

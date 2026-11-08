@@ -113,7 +113,7 @@ function aiChip(m, seat) {
   }
   return null;
 }
-function showChip(k, text) { UI.chip = { k, text, until: Date.now() + 2600 }; clearTimeout(UI.chipT); UI.chipT = setTimeout(() => { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); }, 2650); }
+function showChip(k, text) { UI.chip = { k, text, until: Date.now() + 5000 }; clearTimeout(UI.chipT); UI.chipT = setTimeout(() => { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); }, 5050); }
 function chipEl(r) {
   const c = UI.chip; if (!c || c.until < Date.now() || !r[c.k]) return null; const q = r[c.k], txt = clamp8(c.text);
   const e = h('div.rchip', { 'aria-hidden': 'true', style: 'left:' + Math.round(q.x + q.w / 2) + 'px;top:' + Math.round(Math.max(2, q.y - 6)) + 'px' }, txt);

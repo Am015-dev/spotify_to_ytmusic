@@ -32,8 +32,8 @@ const clamp8 = t => { const w = String(t).trim().split(/\s+/); return w.length >
 // Addendum 7 (owner, 8 Nov 2026): three modes. Learn to play = the coached flight (bubbles live only there). Play = clean. Hints = top-bar toggle, off by default.
 const hintsMode = () => !!(UI.prefs && UI.prefs.hints) || !!(UI.fc && !UI.fc.ended);
 function toast(t) {
-  if (UI.started && G && !G.result && !hintsMode() && $('#prompt')) { UI.flash = { t: String(t), until: Date.now() + 2600 }; try { renderDock(); } catch (e) { } clearTimeout(toast.f); toast.f = setTimeout(() => { UI.flash = null; try { renderDock(); } catch (e) { } }, 2650); return; }   // Play: no floating toasts, the reason takes the one line
-  const e = $('#toast'); if (!e) return; t = clamp8(t); e.textContent = t; e.dataset.n = String((+e.dataset.n || 0) + 1); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2600); }
+  if (UI.started && G && !G.result && !hintsMode() && $('#prompt')) { UI.flash = { t: String(t), until: Date.now() + 5000 }; try { renderDock(); } catch (e) { } clearTimeout(toast.f); toast.f = setTimeout(() => { UI.flash = null; try { renderDock(); } catch (e) { } }, 5050); return; }   // Play: no floating toasts, the reason takes the one line
+  const e = $('#toast'); if (!e) return; t = clamp8(t); e.textContent = t; e.dataset.n = String((+e.dataset.n || 0) + 1); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 5000); }
 // ---------- names, wording ----------
 const SEATN = ['Pilot', 'Co-pilot'], SEATC = ['#2f6fd0', '#e8821f'];
 const SAYT = { adv0: 'Hold position this round', adv1: 'Move one space', adv2: 'Move two spaces', plane: 'Clear the traffic', level: 'Level the axis', gear: 'Landing gear next', flaps: 'Flaps next', brakes: 'Brakes soon', coffee: 'We need coffee', slow: 'Keep the speed low', fuel: 'Watch the fuel', trainee: 'Train the trainee', first: 'I would like to go first', ok: 'All good here' };

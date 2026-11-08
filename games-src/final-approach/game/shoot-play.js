@@ -9,6 +9,7 @@ const [W, H] = (process.argv[3] || '390x763').split('x').map(Number), sleep = ms
   await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
   await p.goto('https://gns.test/' + (ph ? '?phone=1' : '')); await sleep(800); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('fa_offer', '1'); localStorage.setItem('fa_prefs', JSON.stringify({ won: { g1: 1 } })); }); await p.reload(); await sleep(1200);
+  if (process.argv[5]) await p.screenshot({ path: process.argv[5] });
   const click = s => p.evaluate(s => { const e = [...document.querySelectorAll(s)].find(e => e.offsetWidth); if (e) e.click(); return !!e; }, s);
   await p.evaluate(() => { const e = [...document.querySelectorAll('#start button')].find(b => b.textContent.trim() === 'Computer'); e && e.click(); }); await sleep(900); await click('#start [data-a=start][data-m=vs]'); await sleep(1500);
   const goal = await p.evaluate(() => (document.querySelector('.fa-goal,.stbox .fgoal') || {}).textContent || '');
