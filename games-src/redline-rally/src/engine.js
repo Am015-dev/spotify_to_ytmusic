@@ -9,17 +9,23 @@ function newGame(o) {
   var G = { v: 1, track: trk.id, laps: o.laps || 2, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, cars: [], round: 1, phase: 'plan', pend: null, order: [], ri: 0, adr: [], tick: 0, over: false, rank: [], finN: 0, diff: o.diff || 'normal', hot: o.humans > 1, upg: !!o.upg, drafting: false, pool: null, cl: o.climit || 0, cmp: o.cmp || null };
   var humans = Math.max(0, Math.min(n, o.humans == null ? 1 : o.humans));
   var di = []; for (var d = 0; d < DRIVERS.length; d++) di.push(d); shuffle(G, di);
+  var nl = Math.max(0, Math.min(LEGEND_MAX, o.legends | 0)), tot = n + nl;
   for (var i = 0; i < n; i++) {
     var deck = []; for (var v = 1; v <= 4; v++) for (var k = 0; k < 3; k++) deck.push(String(v)); deck.push('X', 'X', 'X');
     var dr = DRIVERS[i < humans ? i : di[i % 6]];
     var c = { i: i, col: i, upg: [], name: dr.name, drv: dr.id, human: i < humans, deck: shuffle(G, deck), hand: [], disc: [], played: [], eng: ENGINE0, gear: 1, pos: 0, plan: null, tie: 0, stats: { heat: 0, spins: 0, slips: 0, boosts: 0 } };
     G.cars.push(c);
   }
+  for (var li = 0; li < nl; li++) {   /* Legends: automated cars (see LEGEND_PACE); no deck, no heat to pay */
+    var pace = shuffle(G, LEGEND_PACE[li % LEGEND_PACE.length].slice());
+    G.cars.push({ i: n + li, col: (n + li) % 6, upg: [], name: LEGEND_NAMES[li % LEGEND_NAMES.length], drv: 'legend' + li, human: false, legend: true, pace: pace, deck: [], hand: [], disc: [], played: [], eng: ENGINE0, gear: 1, pos: 0, plan: null, tie: 0, stats: { heat: 0, spins: 0, slips: 0, boosts: 0 } });
+  }
   /* grid: two cars per row, pole at the front. Humans start mid-pack-ish: seat order is the grid order shuffled. */
-  var grid = []; for (i = 0; i < n; i++) grid.push(i); shuffle(G, grid);
-  grid.forEach(function (ci, k) { G.cars[ci].pos = Math.ceil(n / 2) - 1 - Math.floor(k / 2); G.cars[ci].tie = k; });
-  G.tick = n;
+  var grid = []; for (i = 0; i < tot; i++) grid.push(i); shuffle(G, grid);
+  grid.forEach(function (ci, k) { G.cars[ci].pos = Math.ceil(tot / 2) - 1 - Math.floor(k / 2); G.cars[ci].tie = k; });
+  G.tick = tot;
   if (o.lowheat) G.cars.forEach(function (c) { if (c.human) { c.eng = ENGINE0 - 2; c.disc.push('H', 'H'); } });   /* campaign twist: you start with 4 heat, 2 heat cards already in the discard */
+  if (o.garage) { G.upg = true; garageSetup(G); garageRun(G); return G; }
   if (G.upg) {   /* upgrade draft: humans pick first (the UI calls draftPick / draftDone), then the computer drivers, then the decks are shuffled and dealt */
     G.pool = {}; UPG_IDS.forEach(function (id) { G.pool[id] = UPG_COPIES; });
     if (humans > 0) { G.drafting = true; return G; }
@@ -27,6 +33,29 @@ function newGame(o) {
   }
   G.cars.forEach(function (c) { draw(G, c, HAND); });
   return G;
+}
+/* ---- garage (optional): face-up market, snake order from the back of the grid ---- */
+function garageSetup(G) {
+  var pile = []; UPG_IDS.forEach(function (id) { for (var k = 0; k < GARAGE_COPIES; k++) pile.push(id); }); shuffle(G, pile);
+  var back = G.cars.filter(function (c) { return !c.legend; }).sort(function (a, b) { return b.tie - a.tie; }).map(function (c) { return c.i; }), order = [];
+  for (var r = 0; r < GARAGE_PICKS; r++) order = order.concat(r % 2 ? back.slice().reverse() : back);
+  G.garage = { pile: pile, market: [], order: order, pi: 0 }; garageRefill(G);
+}
+function garageRefill(G) { var g = G.garage; while (g.market.length < GARAGE_MARKET && g.pile.length) g.market.push(g.pile.pop()); }
+function garagePick(G, ci, id) {
+  var g = G.garage; if (!g || g.pi >= g.order.length || g.order[g.pi] !== ci) return 'turn';
+  var j = g.market.indexOf(id); if (j < 0) return 'pick';
+  g.market.splice(j, 1); G.cars[ci].upg.push(id); g.pi++; garageRefill(G); garageRun(G); return '';
+}
+function garageRun(G) {   /* computer drivers choose at once; stops at a human's turn; when every pick is made the decks are built */
+  var g = G.garage, W = { rocket: 3, tuned: 2.6, grip: 2.2, coolant: 2, brakes: 1.7, pit: 1 };
+  while (g.pi < g.order.length) {
+    var c = G.cars[g.order[g.pi]]; if (c.human) { G.drafting = true; return; }
+    var best = null; g.market.forEach(function (id) { var s = W[id] - (c.upg.indexOf(id) >= 0 ? 1.5 : 0) + rnd(G) * (G.diff === 'easy' ? 3 : G.diff === 'hard' ? 0.2 : 1.2); if (!best || s > best.s) best = { s: s, id: id }; });
+    if (!best) { g.pi++; continue; }
+    g.market.splice(g.market.indexOf(best.id), 1); c.upg.push(best.id); g.pi++; garageRefill(G);
+  }
+  draftDone(G);
 }
 function draftPick(G, ci, id) {
   var c = G.cars[ci]; if (!G.drafting || !G.pool || !(G.pool[id] > 0) || c.upg.length >= DRAFT_PICKS) return 'pick';
@@ -41,8 +70,8 @@ function aiDraft(G, c) {
 }
 function draftDone(G) {   /* computer picks, then every deck gets its upgrades, is shuffled and a hand is dealt */
   G.drafting = false;
-  G.cars.forEach(function (c) { if (!c.human) aiDraft(G, c); });
-  G.cars.forEach(function (c) { c.deck = shuffle(G, c.deck.concat(c.upg.map(function (id) { return 'u:' + id; }))); c.hand = []; draw(G, c, HAND); });
+  if (!G.garage) G.cars.forEach(function (c) { if (!c.human) aiDraft(G, c); });
+  G.cars.forEach(function (c) { if (c.legend) return; c.deck = shuffle(G, c.deck.concat(c.upg.map(function (id) { return 'u:' + id; }))); c.hand = []; draw(G, c, HAND); });
 }
 function T(G) { return TK[G.track]; }
 function climit(G, l) { return Math.max(1, l + (G.cl || 0)); }   /* campaign twist: corner limits shifted for the whole chapter */
@@ -80,7 +109,7 @@ function rankList(G) {   /* car ids, best first: finishers in finishing order (s
 }
 function racing(G) { return rankList(G).filter(function (i) { return !G.cars[i].fin; }); }
 function adrenalineFor(G) {   /* last car to move each round gets it; the last two when 5+ cars started (rulebook: counted from starting cars) */
-  var r = racing(G), k = G.cars.length >= 5 ? 2 : 1; return r.slice(Math.max(0, r.length - k));
+  var r = racing(G).filter(function (i) { return !G.cars[i].legend; }), k = G.cars.filter(function (c) { return !c.legend; }).length >= 5 ? 2 : 1; return r.slice(Math.max(0, r.length - k));
 }
 function discardOptional(G, ci, idxs) {   /* replenish step: discard chosen non-heat, non-stress cards face up, then draw back to a full hand. Plan phase, once per round, before the plan */
   var c = G.cars[ci]; if (G.phase !== 'plan' || c.plan || c.dsc === G.round) return 'phase';
@@ -118,6 +147,7 @@ function resolveNext(G) {
   var ev = [];
   if (G.ri >= G.order.length) { endRound(G, ev); return ev; }
   var c = G.cars[G.order[G.ri]];
+  if (c.legend) return legendTurn(G, c);
   if (!c.plan) c.plan = aiPlan(G, c);
   var pl = c.plan, from = c.pos, cost;
   if (pl.cards.length < pl.gear) {   /* not enough playable cards: play them all, fill with heat from the hand, do not move, back to gear 1 */
@@ -152,6 +182,20 @@ function resolveNext(G) {
     var use = aiSlip(G, c, from, L0, L1, speed, lim); ev.push({ t: 'slipq', car: c.i, use: use }); return ev.concat(finishMove(G, c, use, ev));
   }
   return ev.concat(finishMove(G, c, false, ev));
+}
+function legendTurn(G, c) {   /* a Legend's whole turn: next pace card, brake for corners, slipstream when safe */
+  var from = c.pos, ev = [];
+  if (!c.pace.length) c.pace = shuffle(G, LEGEND_PACE[c.i % LEGEND_PACE.length].slice());
+  var speed = c.pace.pop();
+  while (speed > 1 && cornerCost(G, from, from + speed, speed) > 0) speed--;
+  var L0 = landing(G, c, from + speed), N = T(G).N;
+  ev.push({ t: 'play', car: c.i, cards: [{ card: 'L', v: speed }], speed: speed }, { t: 'move', car: c.i, from: from, to: L0 });
+  var L1 = L0 + 2 >= total(G) ? L0 : landing(G, c, L0 + 2);
+  var near = L1 > L0 && G.cars.some(function (o) { return o !== c && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
+  var use = near && cornerCost(G, from, L1, speed) === 0;
+  c.pl2 = { speed: speed, from: from, L0: L0, lim: 0 };
+  if (near) ev.push({ t: 'slipq', car: c.i, use: use });
+  return ev.concat(finishMove(G, c, use, ev));
 }
 function slipChoice(G, use) {
   var p = G.pend; if (!p) return []; G.pend = null; var c = G.cars[p.car]; return finishMove(G, c, !!use, []);
@@ -191,6 +235,7 @@ function endRound(G, ev) {
 function checkInvariants(G) {
   var bad = [], N = T(G).N;
   G.cars.forEach(function (c) {
+    if (c.legend) { if (c.eng !== ENGINE0) bad.push('legend heat car ' + c.i); return; }
     var cnt = c.deck.length + c.disc.length + c.hand.length + (c.plan ? c.plan.cards.length : 0);
     var heatCards = c.deck.concat(c.disc, c.hand).filter(function (x) { return x === 'H'; }).length;
     if (c.eng + heatCards !== ENGINE0) bad.push('heat not conserved car ' + c.i + ' eng ' + c.eng + ' cards ' + heatCards);

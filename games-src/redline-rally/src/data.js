@@ -36,4 +36,10 @@ var UPG = {
   tuned: { sn: 'Tuned', name: 'Tuned Engine', sp: 3, cool: 1, lim: 0, stress: 0, txt: 'Speed 3. Cools 1 heat.' }
 };
 var UPG_IDS = ['coolant', 'pit', 'grip', 'brakes', 'rocket', 'tuned'], DRAFT_PICKS = 3, UPG_COPIES = 4;
+/* Legends (optional): automated cars with their own rules. No hand, no engine heat, no stress. Each turn a Legend turns up the next card of its pace deck and moves
+   that many spaces, braking just enough to take every corner on its path without penalty, and it always takes a slipstream boost when one is free and safe. */
+var LEGEND_NAMES = ['Legend Ash', 'Legend Vale', 'Legend Crest'], LEGEND_PACE = [[3, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 9], [4, 5, 5, 6, 6, 6, 7, 7, 8, 8, 9, 10], [5, 6, 6, 7, 7, 7, 8, 8, 9, 9, 10, 11]], LEGEND_MAX = 3;
+/* Garage (optional, replaces the draft): a face-up market of GARAGE_MARKET upgrades from a pile with GARAGE_COPIES of each type; the car at the back of the grid chooses first, then the order runs
+   forward, then back again (snake), GARAGE_PICKS times. A choice is taken from the market and the market is refilled from the pile. */
+var GARAGE_MARKET = 6, GARAGE_COPIES = 2, GARAGE_PICKS = 2;
 function upgId(x) { return x && x.charAt(1) === ':' && x.charAt(0) === 'u' ? x.slice(2) : null; }
