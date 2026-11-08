@@ -20,7 +20,7 @@ function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span c
 function opsHTML(ops) { return `<span class="sm">${esc(V.opText(ops))}</span>`; }
 function effShort(c) {   /* a card's effect in 1-4 words for the card face ("+1 compass", "draw 2") */
   if (c.t === 'fear') return 'No effect';
-  const one = o => o.g ? Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ') : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
+  const one = o => o.g ? (Object.keys(o.g).length > 2 ? '+' + Object.values(o.g).reduce((a, b) => a + b, 0) + ' goods' : Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ')) : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
   const ops = (c.ops || []).map(one).filter(Boolean); if (ops.indexOf('trade') >= 0) return 'Trade'; if (ops.indexOf('choose') >= 0) return 'Choose one';
   const u = []; ops.forEach(o => { const f = u.find(x => x.o === o); if (f) f.n++; else u.push({ o, n: 1 }); });
   return u.slice(0, 2).map(x => x.n > 1 ? x.o + ' twice' : x.o).join(', ');
