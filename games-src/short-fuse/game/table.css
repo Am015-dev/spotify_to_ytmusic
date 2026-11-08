@@ -213,6 +213,7 @@ button.plate{cursor:pointer;font-family:inherit}
 #tb.land #mine{--tw:44px}
 
 #mine .mh{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap}
+#mine.mrow .sg{flex-direction:row;justify-content:center;gap:10px}   /* short landscape: plate beside my stand so the crew keeps its rows */
 .chip.sm{min-height:36px;padding:2px 11px;font-size:.88rem;border-radius:11px;border-width:2px;box-shadow:0 2px 0 #14163a}
 
 html.short #strip{height:36px;padding:2px 8px}

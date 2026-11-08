@@ -14,8 +14,8 @@ const AUDIT = `(() => {
   if (Math.max(de.scrollWidth, document.body.scrollWidth) > W + 1) bad.push('hscroll ' + de.scrollWidth + '>' + W);
   const tb = document.getElementById('tb'), tr = tb.getBoundingClientRect(); if (tr.height < 100 || tr.width < W - 4) bad.push('table collapsed ' + Math.round(tr.width) + 'x' + Math.round(tr.height));
   if (H > W && 100 * tr.height / H < 55) bad.push('table ' + Math.round(100 * tr.height / H) + '%');
-  if (tr.bottom > H + 1) bad.push('table taller than the screen');
   const animating = document.querySelector('#tb .snap,#tb .buzz,#tb .aim,#tb .lift,#tb .sel,#tb.shake');
+  if (tr.bottom > H + 1 && getComputedStyle(tb).transform === 'none') bad.push('table taller than the screen');   // a burn or the boom shakes the table by a pixel or two: not a layout bug
   if (!animating) for (const e of document.querySelectorAll('#tb .tile')) { const r = e.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('tile off screen'); }
   const crew = document.getElementById('crew').getBoundingClientRect(), mine = document.getElementById('mine').getBoundingClientRect();
   if (mine.height > 0 && crew.bottom > mine.top + 2) bad.push('crew overlaps my stand');

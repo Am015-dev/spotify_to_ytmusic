@@ -163,7 +163,7 @@ function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
   document.documentElement.classList.toggle('short',window.innerHeight<640);
-  const land=W>H*1.15&&W>=600;const big=W>=900&&H>=700;tb.classList.toggle('land',land);
+  const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
   const plate=window.innerHeight<640?20:24;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
   const ms=[...mine.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length);
@@ -181,6 +181,9 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
   for(let i=0;i<24;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',Math.round(t1*1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=22)break;t1-=1}
+  // still too tall at the smallest crew tile (short landscape, 4+ players): my stand gives up height until the crew fits, so no crew wire hides under it
+  if(ms.length&&land&&crew.scrollHeight>crew.clientHeight+1){mine.classList.add('mrow');setMine(tm);balance(crew,t1,3)}   // first: my name plate moves beside my stand
+  while(ms.length&&tm>24&&crew.scrollHeight>crew.clientHeight+1){tm-=2;setMine(tm);balance(crew,t1,3)}
   if(t1<30&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
   if(t1>=34&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
