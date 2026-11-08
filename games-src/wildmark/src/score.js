@@ -42,8 +42,8 @@ function pvParts(s0, s1) {
 }
 // one card in words: "Bears: you have 2 pairs = 11 points (pairs 1, 2, 3, 4 = 4, 11, 19, 27)"
 function pvCardLine(a, seat) {
-  var s = G.seats[seat], w = pvDesc(s.env, a), v = WM.scoreAnimal(s.env, a, null, G.cards && G.cards[a]), who = seat === meSeat() ? 'you have' : s.name + ' has';
-  return ({ bear: 'Bears', elk: 'Elk', salmon: 'Salmon', hawk: 'Hawks', fox: 'Foxes' })[a] + ': ' + who + ' ' + w.text + ' = ' + pvPl(v, 'point', 'points') + '.';
+  var s = G.seats[seat], w = pvDesc(s.env, a), v = WM.scoreAnimal(s.env, a, null, G.cards && G.cards[a]), who = seat === meSeat() ? 'You' : s.name;
+  return who + ': ' + w.text + ' = ' + pvPl(v, 'point', 'points') + '.';
 }
 var PV_SHORT = { bear: 'Bear pair', elk: 'Elk line', salmon: 'Salmon run', hawk: 'lone Hawk', fox: 'Fox neighbours' };
 function pvPop(p) { return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }

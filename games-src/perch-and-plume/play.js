@@ -108,9 +108,12 @@ async function playOut(p, label, maxMs) {
     await p.evaluate(() => { localStorage.removeItem('pp-played'); localStorage.removeItem('gxt-perch-and-plume'); });
     await p.goto(URL); await p.waitForTimeout(600);
     await tap(p, '[data-gxt-open]'); await p.waitForTimeout(800);
+    // Learn to play is now the COACHED first game (coach.js, mode 'tutfree'): play it by touch like any game; Skip is never pressed
+    const coached = await p.evaluate(() => UI.mode === 'tutfree');
+    if (coached) await playOut(p, 'learn to play (coached game by touch, no Skip)', 300000);
     // follow every step: tap the spotlighted target, or Next
     const t0 = Date.now(); let steps = 0, lastId = '', same = 0;
-    while (Date.now() - t0 < 180000) {
+    while (!coached && Date.now() - t0 < 180000) {
       const s = await p.evaluate(() => { if (!GXT.active()) return { done: true }; const c = GXT.current(); return { id: c && c.id, next: !!document.querySelector('.gxt-next:not([hidden]),[data-gxt-next]') }; });
       if (s.done) break;
       if (s.id === lastId) same++; else { same = 0; lastId = s.id; steps++; }
@@ -134,7 +137,7 @@ async function playOut(p, label, maxMs) {
       await p.waitForTimeout(can ? 300 : 250);
     }
     const end = await p.evaluate(() => !GXT.active() || /know (the basics|how a turn works)|finish this year/i.test(document.body.innerText));
-    log(end, 'tutorial reached its end card (' + steps + ' steps seen)');
+    if (!coached) log(end, 'tutorial reached its end card (' + steps + ' steps seen)');
     await p.screenshot({ path: `shots/play-${SIZE}-tutorial-end.png` });
   }
   if (WHAT === 'story' || WHAT === 'all') {

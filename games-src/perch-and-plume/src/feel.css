@@ -14,3 +14,11 @@ html.gxf-dragging #dockbody{overflow:hidden}
 @media (hover:hover){.die[data-gxf-drag]:hover,.bc[data-a="tray"][data-gxf-drag]:hover,#deckb[data-gxf-drag]:hover{box-shadow:0 0 0 3px #ffe28a,0 8px 14px rgba(0,0,0,.4)}
   .ract:hover,.a4:hover{filter:brightness(1.08)}}
 .sr::after{display:none!important}
+
+/* one voice at a time: the turn rating waits while a coach speaks */
+body:has(.coachb) #rate,body:has(.saycard) #rate{display:none!important}
+/* no label under 14 px anywhere in play */
+#bd small,#dock small,#pop small,.reveal small,#setup small{font-size:max(14px,.85em)}
+/* starting hand: a card's power text stays inside its card */
+#setup .bc{overflow:hidden}
+#setup .bc .bk-pw,#setup .bc .pwt{overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}

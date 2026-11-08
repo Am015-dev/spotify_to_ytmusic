@@ -379,3 +379,6 @@ html.gx-reduce #acts .htok{animation:none}
 #rs .st small,#rs .st.why small,#rs .st td.src small{color:#e3e6da!important;opacity:1!important}
 
 .ptn{display:inline-block;margin:0 6px 2px 0;white-space:nowrap}
+
+/* Learn: one voice at a time (the Hints verdict waits while Rowan speaks) */
+#board:has(#coachb:not([hidden])) #pv{display:none!important}

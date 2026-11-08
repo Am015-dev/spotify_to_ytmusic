@@ -150,9 +150,9 @@ function promptText(mine) {
   if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
   switch (Q.h) {
-    case 'die': return 'Tap a glowing food die in the feeder to take it (' + n + ' left).';
-    case 'egg': return 'Tap a glowing bird on your board to lay an egg on it (' + n + ' left).';
-    case 'draw': return 'Tap a glowing bird in the tray, or the deck, to take a card (' + n + ' left).';
+    case 'die': return 'Take a glowing food die (' + n + ' left).';
+    case 'egg': return 'Lay an egg on a glowing bird (' + n + ' left).';
+    case 'draw': return 'Take a bird from the tray or the deck (' + n + ' left).';
     case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';
