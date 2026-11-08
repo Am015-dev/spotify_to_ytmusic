@@ -72,13 +72,15 @@ function capture(){if(!UI.fx.length)return;const keep=[];for(const f of UI.fx){
 function speedUp(){if(BF.aid==null){BF.aid=AIDELAY;AIDELAY=Math.min(AIDELAY,90)}}
 function slowDown(){if(BF.aid!=null){AIDELAY=BF.aid;BF.aid=null}}
 function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const ids=w.order.filter(id=>V3.ships[id]);
-  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(900,Math.min(1500,w.dur||1000)):0;BF.flyUntil=performance.now()+reveal+D+150;
-  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+D);
+  // ships fly ONE AT A TIME in activation order (lowest pilot skill first), like revealing dials around the table
+  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(800,Math.min(1300,w.dur||1000)):0,step=ids.length>1?Math.round(D*.8):0,tot=D+step*Math.max(0,ids.length-1);BF.flyUntil=performance.now()+reveal+tot+150;BF.flyOrder=ids.slice();
+  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+tot);
   if(ids.length)sfx('lock');
-  const go=()=>{const now=performance.now();for(const id of ids){const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:now,dur:Math.max(1,D)}}if(ids.length)sfx('engine');
-    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;render()};if(D)setTimeout(land,D+60);else land()};
+  const fly=(id,k)=>{const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:performance.now(),dur:Math.max(1,D)};if(k===0||ANIM)sfx('engine')};
+  const go=()=>{ids.forEach((id,k)=>{if(step)setTimeout(()=>fly(id,k),k*step);else fly(id,k)});
+    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;render()};if(tot)setTimeout(land,tot+60);else land()};
   if(reveal)setTimeout(go,reveal);else go();
-  if(ids.length>1)banner('<b>Ships move!</b>',reveal+D*.6)}
+  if(ids.length>1)banner('<b>Ships move</b><span>Lowest skill first</span>',reveal+tot*.6)}
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
 // ---- one-line text, banners, pops ----
 function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
@@ -138,7 +140,7 @@ function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.win
 function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0=me();const hp=side=>alive().filter(s=>s.side===side).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);
   const n=side=>alive().filter(s=>s.side===side).length;const h=`<span class="y">You <b>${n(k0)}</b>✈ ♥${hp(k0)}</span><span class="vs">vs</span><span class="e">Enemy <b>${n(1-k0)}</b>✈ ♥${hp(1-k0)}</span>`;if(top._h!==h){top._h=h;top.innerHTML=h}}
 // ---- the guided first game: a ghost finger shows the one thing to tap ----
-function finger(el){BF.fing=guided()&&el?el:null}
+function finger(el){BF.fing=(guided()||(typeof TUT!=='undefined'&&TUT.coach&&typeof tutStaged==='function'&&tutStaged()))&&el?el:null}
 // ---- screens ----
 function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<div data-keep><b class="na-gt">Goal: destroy ${foe===1?'the enemy ship':'every enemy ship'} before they get yours.</b><ul class="na-goal"><li>Pick a secret move for each ship.</li><li>Fly, then shoot enemies in front of you.</li><li>Hits break shields first, then the hull.</li></ul><span>Yours ${G.ships.filter(s=>s.side===k0).length>1?'are':'is'} at the bottom. Theirs at the top.</span></div>`,1e9);
   setBtns(`<button class="btn" data-bf="briefset" aria-label="Place the asteroids and your ship yourself">Set up myself</button><button class="btn primary big" data-bf="brief">Start ▶</button>`);finger(btns.querySelector('.primary'))}
@@ -150,17 +152,17 @@ function planUI(){dropLoose();const ps=planSide();const my=alive().filter(s=>s.s
   for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);const gp=ghostW(s,m,exColor(s,m).c,true),lp=add(gp,mul(leftOf(gp.h),B(s)*1.05));item(mvLabel(m),'bfm small set '+exColor(s,m).c,{x:lp.x,y:lp.y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
     if(s.id!==BF.sel){const it=item('','bfring'+(pk==null?' need':' done'),{ship:s.id,data:{bfship:s.id},label:s.name+(pk==null?': plan its move':': change its move'),ring:true});if(pk==null&&!BF.fingT){BF.fingT=it.el}}}
   if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
-  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];
+  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=(UI.hints||(typeof tutStaged==='function'&&tutStaged()))?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
       const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
-      if(sug===i&&pick==null)BF.fingT=it.el});
+      if(sug===i&&(pick==null||(pick!==sug&&typeof tutStaged==='function'&&tutStaged())))BF.fingT=it.el});
     item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
   setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
   if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');finger(BF.fingT)}
 // ---- the secret dial: a big wheel you spin with your thumb; the move in the window is the one you fly ----
-function dialOn(){return !/[?&]dial=0/.test(location.search||'')&&!(typeof tutOn==='function'&&tutOn())}
+function dialOn(){return !/[?&]dial=0/.test(location.search||'')&&!(typeof tutOn==='function'&&tutOn())&&!(typeof tutStaged==='function'&&tutStaged())}
 function dialList(s){const dk=m=>m.s*10+(m.t==='K'?5:m.t==='S'?2:m.t==='B'?(m.d<0?1:3):(m.d<0?0:4));return dialOf(s).map((m,i)=>({m,i})).filter(o=>!(exColor(s,o.m).c==='r'&&s.stress)).sort((a,b)=>dk(a.m)-dk(b.m))}
 function dialEl(){if(BF.dial)return BF.dial;const el=document.createElement('div');el.id='bfdial';el.hidden=true;el.innerHTML='<div class="dwin" aria-live="polite"></div><div class="dface" role="slider" aria-label="Maneuver dial: spin to choose a move"></div><div class="dhub"></div>';ov.appendChild(el);BF.dial=el;
   const face=el.querySelector('.dface');let D=null;
@@ -250,7 +252,7 @@ function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach(
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
-function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
+function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}if(typeof tutAllow==='function'&&!tutAllow(ds)){e.preventDefault();e.stopPropagation();try{GX.buzz(30)}catch(_){}if(BF.fing)BF.fing.classList.add('na-nudge');return}if(typeof tutStaged==='function'&&tutStaged()&&typeof NCH!=='undefined'&&NCH.cur)try{coachHide()}catch(_){}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
   if(ds.bf==='dlock'||ds.bf==='dclose'){BF.sel=null;if(BF.dial)BF.dial.hidden=true;sfx('token');try{GX.buzz(18)}catch(e){}render();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
@@ -282,7 +284,7 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup|
   return false};
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
 function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
-function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;if(typeof NCH!=='undefined'&&NCH.cur&&BF.fing&&BF.fing.offsetParent)(NCH.fs=NCH.fs||{})[NCH.cur]=1;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
   const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=shownXY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
       if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86);const base=y<Ht-230?Math.PI/2:-Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}

@@ -37,6 +37,16 @@ const TUT_DICE=()=>[{k:'a',f:['hit','focus','blank']},{k:'d',f:['blank','blank',
 const TUT_REROLL=[3,0];
 // Kael's moves: round 1 straight 2, round 2 straight 1 (both green)
 const TUT_ME=[{s:2,t:'S'},{s:1,t:'S'}];
+// Kael's actions in the scripted lesson: round 1 focus (so the focus rule comes up), round 2 target lock (lock + reroll)
+const TUT_ACT=['F','TL'];
+// the scripted lesson: only the taught move and action are accepted, everything else stays a real tap on the real board
+const tutStaged=()=>!!(TUT.on&&!TUT.free&&G&&G.tut&&G.round<=2);
+const tutScripted=()=>!!(TUT.on&&!TUT.free&&G&&G.tut);
+function tutAllow(ds){if(!tutStaged()||!TUT.coach)return true;const s=ship('s1');if(!s)return true;
+  if(ds.bfm!=null)return +ds.bfm===dialIx(s,TUT_ME[tutRound()-1]);
+  if(ds.bfa!=null)return ds.bfa===TUT_ACT[tutRound()-1];
+  return true}
+{const o=recAct;recAct=function(s){if(tutStaged()&&s&&s.side===0)return TUT_ACT[tutRound()-1];return o.apply(this,arguments)}}
 const dialIx=(s,m)=>dialOf(s).findIndex(x=>x.s===m.s&&x.t===m.t&&(m.d==null||x.d===m.d));
 const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
 {const o=rollN;rollN=function(faces,n){if(TUT.on&&!TUT.free&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
@@ -55,7 +65,7 @@ function tutStage(){
   window.TUTPH=true;try{PHN.apply()}catch(e){}   // every step points at the board-first layer: desktop and tablets get it for the lesson
   try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
-  TUT.on=true;TUT.free=true;TUT.dice=[];coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
+  TUT.on=true;TUT.free=false;TUT.dice=TUT_DICE();TUT.force=null;coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
   Object.assign(UI,{mode:'solo',camp:null,info:false,stats:false,rules:false,build:null,draft:{},pass:null,sel:null,sugCache:null,autoSetup:false,advOpen:false,hints:false,hold:null,holdK:[],paused:false,sumSeen:0});
   newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'easy'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
   G.tut=1;G.rocks.push(Object.assign({},TUT_ROCK,{k:TUT_ROCK.k.slice()}));
@@ -75,9 +85,9 @@ const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdl
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
 function tutSteps(){return tutStory([
- {id:'goal0',title:'How you win',say:'Destroy Slate’s ship before he gets yours.\n• Pick a secret move for your ship.\n• Fly, then shoot enemies in front of you.\n• Hits break shields first, then the hull.',wait:null,target:shipRect('s2'),side:'bottom',ready:()=>tutPlan()&&!!shipRect('s2')()},
+ {id:'goal0',title:'How you win',say:'Destroy Slate’s ship before he destroys yours.',wait:null,target:shipRect('s2'),side:'bottom',ready:()=>tutPlan()&&!!shipRect('s2')()},
  {id:'ship',title:'Plan in secret',say:'Touch your ship to see where it can fly.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
- {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv('.bfm:not(.set)'),also:tqAll('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
+ {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv(`.bfm[data-bfm="${tutIx(0)}"]`)||hv('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'&&a.i===tutIx(0)},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
 ])}
 function tutStory(steps){for(const st of steps){const L=LORE.tut[st.id];if(L){st.title=L.t;st.say=L.s}}return steps}
 // ---------------------------------------------------------------- the kit hooks
@@ -98,21 +108,24 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
 const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
 // for external checks (qa-bot coached mode): running = the free-play part is on, explained = rule ids spoken so far, done = the result card was shown
 window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
-function coachReset(){NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
-function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
-function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
-function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
+function coachReset(){NCH.log=[];NCH.fs={};NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{BF.key='';BF.fkey=''}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
+function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);
+  // the scripted lesson keeps pace with the board: a rule line replaces a taunt at once, or any line that has been up a moment
+  if(NCH.cur&&tutScripted()&&LORE.coach[id].rule&&(!LORE.coach[NCH.cur].rule||LORE.coach[id].act||performance.now()-(NCH.curAt||0)>1800)){coachHide();if(LORE.coach[id].act)coachPump();return}coachPump()}
+function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;(NCH.log=NCH.log||[]).push(id);NCH.curAt=performance.now();let e=document.getElementById('na-coach');
   if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
   e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
   clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70,4000+(L.t+' '+L.s).split(/\s+/).length*100))}
 function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
 // rules that came up are explained at that moment; this runs after every render
-function coachTick(){if(!NCH.on||!G||!G.tut)return;const me=G.ships.find(x=>x.side===0);if(!me)return;
+function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NCH.q.length&&performance.now()-(NCH.curAt||0)>1800)coachHide();const me=G.ships.find(x=>x.side===0);if(!me)return;
   if(G.winner){coachEnd();return}
   const ht=humanTurn(),ph=G.phase;
-  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2)coachSay('marks')}
+  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2&&document.querySelector('.bfm'))coachSay('marks')}
   if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
-  if(ph==='action'&&ht){coachSay('action');try{if(actionsFor(me).some(a=>a.a==='TL'))coachSay('lock')}catch(e){}}
+  const idle=!(BF.flyUntil>performance.now())&&!BF.wave;
+  if(ph==='action'&&ht&&idle&&document.querySelector('.bfact')){coachSay('action');coachSay('moves');if(G.round>=2)coachSay('lock')}
   if(ph==='target'&&ht)coachSay('shoot');
   if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
   if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}

@@ -6,9 +6,9 @@ const LORE={
   // tutorial prologue "Convoy Run": chapters open with a title line, the payoff comes with the next step's first words
   tut:{
     goal:{t:'Ch 1 · Scramble',s:'Slate is raiding our convoy. Smash his ship before it reaches the freighters. Yours is at the bottom.'},
-    ship:{t:'Brecken: Plan first',s:'Pilots plan in secret, Varro. Slate is doing it right now. Touch your ship to see where it can fly.'},
+    ship:{t:'Brecken: Plan in secret',s:'Tap your ship to plan its move in secret.'},
     marks:{t:'Brecken: Red and rocks',s:'Red moves strain the engines: stress token. A ! marks paths through the rock, which hurts and skips your action.'},
-    dial:{t:'Brecken: Choose a line',s:'Number is speed, arrow is direction, green is easy. Fly the green straight 2 to meet him head on.'},
+    dial:{t:'Brecken: Choose a line',s:'Tap the green straight 2. Green moves are easy.'},
     fly:{t:'Brecken: Dials are secret',s:'Neither of you can peek. When you are set, reveal the dials and let the ships move together.'},
     order:{t:'Ch 2 · First Contact',s:'Slate shows his hand! Lowest skill moves first: Slate (3), then you (8). Highest shoots first, so you do.'},
     action:{t:'Brecken: One action',s:'After flying, every ship gets one action. Sharpen your aim with a focus token before you fire.'},
@@ -36,28 +36,29 @@ const LORE={
   turn:{plan:['Round {r}: plan','Choose a move for each of your ships.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
 
 // coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
-LORE.coachIntro={title:'Your move, pilot',text:'From here you fly free: every legal move is yours. Brecken speaks up when a rule matters.',btn:'Fly free'};
+LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One rule at a time.',btn:'Start'};
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
 LORE.laterShort=['Barrel roll and boost: extra sideways moves.','Bumping a ship skips your action.','Flying off the mat destroys your ship.'];
 LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
 LORE.coach={
-  goal:{rule:1,t:'Brecken: Your goal',s:'Slate is raiding our convoy. Destroy his ship; yours is at the bottom.'},
-  fly0:{t:'Brecken: Free flight',s:'Your move is set. Plan, then reveal the dials with Fly. I will call out rules as they matter.'},
-  fly:{rule:1,t:'Brecken: Dials are secret',s:'Neither of you can peek. Reveal the dials with Fly and the ships move together.'},
-  marks:{rule:1,t:'Brecken: Red and rocks',s:'Red moves strain the engines: a stress token. A ! marks paths through a rock: it hurts and skips your action.'},
-  order:{rule:1,t:'Brecken: Who goes first',s:'Lowest pilot skill moves first: Slate (3), then you (8). The highest shoots first, so you do.'},
-  action:{rule:1,t:'Brecken: One action',s:'After flying, every ship gets one action. Focus sharpens your next shot.'},
-  lock:{rule:1,t:'Brecken: Target lock',s:'A lock lets you reroll attack dice against that enemy. Take it if you want a surer shot.'},
-  shoot:{rule:1,t:'Brecken: In your sights',s:'Pick a glowing enemy in your arc. Range 1 adds an attack die; range 3 adds a defence die.'},
-  dice:{rule:1,t:'Brecken: Read the dice',s:'Hits and crits hurt him. A focus face does nothing, unless you spend your focus token.'},
-  usefocus:{rule:1,t:'Brecken: Spend focus',s:'Your focus token turns a focus face into a hit. Spend it before you roll.'},
-  res1:{rule:1,t:'Brecken: Hits minus evades',s:'Each evade cancels one hit. Defence dice and evade tokens are how a ship dodges.'},
-  defend:{rule:1,t:'Brecken: Pilot power',s:'Kael can turn one focus result into an evade. Use it when you defend.'},
-  res2:{rule:1,t:'Brecken: Shields first',s:'Damage strips shields before hull. Crits are dealt face up with lasting effects.'},
-  goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Stay in his arc and keep the pressure on.'},
-  gothit:{t:'Slate: Got you!',s:'Ouch. Stay out of his front arc. Or take an evade token first.'},
-  stress:{rule:1,t:'Brecken: Stress',s:'A stressed ship can not act. No red moves until it flies green.',who:'brecken'},
-  endround:{rule:1,t:'Brecken: Round end',s:'At the end of each round unused focus and evade tokens vanish. Target locks stay.'}};
+  goal:{rule:1,t:'Brecken: Your goal',s:'Destroy Slate’s ship before he destroys yours.'},
+  fly0:{t:'Brecken: Your first battle',s:'Tap the glowing thing each time. I explain as we go.'},
+  fly:{rule:1,act:1,t:'Brecken: Secret dials',s:'Both dials stay hidden. Tap Fly to reveal them.'},
+  order:{rule:1,t:'Brecken: Who moves first',s:'Lowest pilot skill moves first. Slate is 3, you are 8.'},
+  action:{rule:1,act:1,t:'Brecken: One action',s:'After moving, take one action. Focus first.'},
+  moves:{rule:1,t:'Brecken: Boost and roll',s:'Some ships can also boost forward or barrel roll sideways.'},
+  shoot:{rule:1,act:1,t:'Brecken: Arc, range, order',s:'Highest skill fires first. Shoot an enemy in your arc, range 1-3.'},
+  dice:{rule:1,t:'Brecken: Read the dice',s:'Hit and crit hurt. Focus needs a token. Blank misses.'},
+  usefocus:{rule:1,act:1,t:'Brecken: Spend focus',s:'Spend your focus token: focus faces become hits.'},
+  res1:{rule:1,t:'Brecken: Range 3 and evades',s:'Range 3 gave him a defence die. Each evade cancels a hit.'},
+  defend:{rule:1,t:'Brecken: Pilot power',s:'Kael turns one focus result into an evade.'},
+  res2:{rule:1,t:'Brecken: Shields first',s:'Damage takes shields first, then hull. Crits are face-up cards.'},
+  goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Keep him in your arc.'},
+  gothit:{t:'Slate: Got you!',s:'Stay out of my front arc next time.'},
+  stress:{rule:1,t:'Brecken: Stress',s:'Red move means stress: no action, no red until green.'},
+  marks:{rule:1,act:1,t:'Brecken: Rocks',s:'A path through a rock hurts and skips your action.'},
+  lock:{rule:1,act:1,t:'Brecken: Target lock',s:'Lock on: you may reroll attack dice against him.'},
+  endround:{rule:1,t:'Brecken: Round end',s:'Unused focus and evade tokens vanish. Locks stay.'}};
 // the speaker's portrait on a tutorial bubble: the title starts with the speaker's name
 (function(){if(typeof MutationObserver==='undefined'||!document.body)return;
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;const b=n.matches&&n.matches('.gxt-bub')?n:(n.querySelector&&n.querySelector('.gxt-bub'));if(!b)continue;
