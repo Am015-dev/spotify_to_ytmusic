@@ -59,7 +59,7 @@
     setup: function () {
       begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 11 }); var c = G.cars[0], k = T(G).list[1]; c.pos = k.idx - 1; c.eng = 0; c.gear = 1; UI.vis[0].p = c.pos; UI.focus = 0;
       RACE.spdT = RACE.spd = 11; raceSpin({ car: 0, to: c.pos }); RACE.flashHold = 1; UI.pops.push({ txt: 'SPIN: 11 in a ' + climit(G, k.limit), p: c.pos, t: performance.now(), col: '#ff4d3a', stem: 'fx-spinout-smoke', hold: 1 });
-      hud(); setMsg('You spin out: not enough heat.', 'warn'); setPhase('react'); snapCam(); var sb = function () { banner('You spin out: lose all heat, back to gear 1', 0, 'turn'); }; sb(); setTimeout(sb, 900); setTimeout(sb, 2400);
+      drawPlan(); hud(); setMsg('You spin out: not enough heat.', 'warn'); setPhase('react'); snapCam(); var sb = function () { banner('You spin out: lose all heat, back to gear 1', 0, 'turn'); }; sb(); setTimeout(sb, 900); setTimeout(sb, 2400);
       return new Promise(function (r) { setTimeout(r, 400); });
     },
     checks: [{ kind: 'fn', name: 'skid marks', fn: function () { return RACE.skids.length > 0 || 'no skids'; } }]
