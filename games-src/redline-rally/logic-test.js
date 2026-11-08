@@ -129,7 +129,29 @@ R[61] = () => { const G = mk(3, { laps: 1 }); const a = G.cars[0], b = G.cars[1]
 R[62] = () => { const G = mk(4); G.cars[0].fin = 1; G.cars[0].pos = 100; G.cars[1].pos = 10; G.cars[2].pos = 30; G.cars[3].pos = 20; return eq([0, 2, 3, 1], X.rankList(G)); };
 R[63] = () => { const G = mk(3); G.cars[1].pos = 30; G.cars[2].pos = 30; G.cars[1].tie = 5; G.cars[2].tie = 2; G.cars[0].pos = 5; return eq([2, 1, 0], X.rankList(G)); };
 
-const NB = { 64: 'Championship', 65: 'Weather and road-condition cards', 66: 'Legends', 67: 'Original garage upgrades' };
+/* ---- Legends (option legends:k, house design of the module) ---- */
+const legendTurn = (G, li, pos, pace) => { const L = G.cars[li]; L.pos = pos; L.pace = [pace]; G.cars.forEach(c => { if (c !== L) c.pos = 30 + c.i * 3; }); G.phase = 'resolve'; G.order = [li]; G.ri = 0; G.adr = []; X.resolveNext(G); return L; };
+R[66] = () => {
+  const G = X.newGame({ track: 'sunline', laps: 2, n: 3, humans: 0, seed: 2, legends: 2 }); const L = G.cars[3];
+  const a = eq([5, true, 0, 0, 6], [G.cars.length, G.cars.slice(3).every(c => c.legend), L.hand.length, L.deck.length, L.eng]); if (a !== true) return a;
+  const free = legendTurn(X.newGame({ track: 'sunline', laps: 2, n: 3, humans: 0, seed: 2, legends: 1 }), 3, 0, 3);       /* open road: moves exactly the pace card */
+  const b = eq(3, free.pos); if (b !== true) return b;
+  const G2 = X.newGame({ track: 'sunline', laps: 2, n: 3, humans: 0, seed: 2, legends: 1 }), brk = legendTurn(G2, 3, CR - 4, 9);   /* pace 9 before a limit-5 corner: brakes to 5, no heat, no spin */
+  const c = eq([CR - 4 + CL, 6, 0, 0, 0], [brk.pos, brk.eng, brk.hand.length, brk.stats.spins, brk.stats.heat]); if (c !== true) return c;
+  const G3 = X.newGame({ track: 'sunline', laps: 2, n: 2, humans: 0, seed: 2, legends: 1 }); G3.cars.forEach(k => { k.pos = k.legend ? 0 : 30; }); G3.phase = 'resolve';
+  return eq([], X.adrenalineFor(G3).filter(i => G3.cars[i].legend)); };   /* a Legend never gets the last-place boost */
+/* ---- Original-style garage (option garage:true, replaces the draft) ---- */
+R[67] = () => {
+  const G = X.newGame({ track: 'sunline', laps: 2, n: 3, humans: 0, seed: 5, garage: true }); const own = G.cars.map(c => c.upg.length);
+  const a = eq([2, 2, 2, 7], [...own.slice(0, 2), own[2], G.cars[0].hand.length]); if (a !== true) return a;
+  const tot = {}; G.cars.forEach(c => c.upg.forEach(u => tot[u] = (tot[u] || 0) + 1)); const b = eq(true, Object.values(tot).every(v => v <= 2)); if (b !== true) return b;   /* two copies of each type only */
+  const H = X.newGame({ track: 'sunline', laps: 2, n: 3, humans: 1, seed: 5, garage: true }), g = H.garage;
+  const turn = g.order[g.pi], other = [0, 1, 2].find(i => i !== turn);
+  const c = eq(['turn', true, 6], [X.garagePick(H, other, g.market[0]), H.drafting, g.market.length]); if (c !== true) return c;
+  const picked = g.order.slice(0, g.pi).every(i => H.cars[i].tie > H.cars[0].tie);   /* the back of the grid chooses before the human here */
+  const id = g.market[0], n0 = g.pi, r = X.garagePick(H, turn, id);
+  return eq([true, '', true, 6], [picked, r, g.pi > n0 && H.cars[turn].upg.indexOf(id) >= 0, g.market.length]); };
+const NB = { 64: 'Championship', 65: 'Weather and road-condition cards' };
 let pass = 0, fail = 0;
 Object.keys(R).map(Number).sort((a, b) => a - b).forEach(n => {
   let r; try { r = R[n](); } catch (e) { r = ['no exception', 'threw ' + e.message]; }

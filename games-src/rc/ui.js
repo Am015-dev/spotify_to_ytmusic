@@ -153,7 +153,7 @@ const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const seg=(label,items)=>`<div class="qrow"><span class="ql">${label}</span><div class="seg" role="group" aria-label="${label}">${items.map(([a,v,t,on])=>`<button class="sg ${on?'on':''}" data-${a}="${v}" aria-pressed="${!!on}">${esc(t)}</button>`).join('')}</div></div>`;
   const ALLC=Object.keys(CHARS).filter(k=>!CHARS[k].npc);
-  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Survive together on a wild island.</p>
+  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Shipwrecked. Work together, stay alive, and get rescued.</p>
    <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
    <div class="quick"><h3>Quick game</h3>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}

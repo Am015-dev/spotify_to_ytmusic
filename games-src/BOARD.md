@@ -21,7 +21,7 @@ rules-logic test, asset gate (>=90% of shipped art loads) and phone look all pas
 | kaiten-kitchen | - | W443 | W410 | old build |
 | lantern-dive | W409 (resumed) | W444 | W410 | old build |
 | nebula-aces | - | W445 | W410 | old build |
-| deep-signal | - | W446 | W410 | old build |
+| deep-signal | STOPPED 02:20: same game as lantern-dive (owner) | - | - | old build stays |
 | rampart-and-vine | W426 | W447 | W410 | old build |
 | shipwreck-isle | - | W448 | W410 | old build |
 | short-fuse | W423 | W449 | W410 | old build |
@@ -38,3 +38,10 @@ W463 kaiten, W464 tidewake, W465 nebula, W466 sunglaze, W467 crown-city, W468 sh
 W471 cauldron, W472 doorkick, W473 thornbound, W474 deep-signal, W475 redline, W476 rampart (all new), plus W456 wildmark+perch,
 W457 hollowbough, W458 vale, W429 twin, W420 emberclimb, W427 vinegrave, W425 final-approach, W408 sands, W409 lantern.
 Art wiring: W459-W461. Rules fixes: W462. Free art: W410. Deploy gate: rules test + asset-usage + impeccable/design-review >= 7.
+Reviewers (games-src/BRIEF-REVIEW.md, Opus): R1 session_01RR7mnahe5suP3xNPk5RzuZ, R2 session_01RR7mnXYmDMDL6qf8uWCwMr,
+R3 session_01RR7mnZ5ujJ5BU5ke5G5813, R4 session_01RR7mnbrAaCXvYMQjCAPFvd. Each DONE game goes to the next free reviewer;
+PASS -> orchestrator deploys; FAIL -> fix list straight to the game worker.
+Helpers 02:22: S1 feel-audit gate (sonnet) session_01RR7mnYfss3qN7ubbKnuCzp; C1/C2 copy audits (sonnet) 01RR7mnXkXtACfC68PcbYX6b,
+01RR7mnbKHhtz3Y3eieafdZv; H1-H4 status sweeps (haiku); R5 01RR7mnXkYd51MsSJRSVN1ec, R6 01RR7mnb9b3xUSvbEEN9eA33 pre-screen reviewers.
+Design 02:23 (sonnet): D0 shell design system 01RR7mnaYG31yxpo8B8jpNu2; D1-D6 per-game impeccable + design-review audits ->
+games-src/<dir>/DESIGN-FIX.md for the game-feel workers to apply.

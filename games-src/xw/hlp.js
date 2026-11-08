@@ -154,7 +154,7 @@ function hlpSuggest(){try{const ph=hlpPhase();if(!ph||!G)return null;const bf=ty
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false,_hlpT=0;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'nebula-aces',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'#bfhint,.bfm.sug,.bfm.on,.bfact,.bftgt,.bfring.need,.bfspot.rec,#bfbtns .btn,#bfdice .die.pick,.mv.sugg,.rec,.ps-chip.need,#prompt .btn.primary'});
+  GXH.init({game:'nebula-aces',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'#bfhint,.bfm.sug,.bfm.on,.bfact,.bftgt,.bfring.need,.bfspot.rec,#bfbtns .btn,#bfdice .die.pick,.mv.sugg,.rec,.ps-chip.need,#prompt .btn.primary'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const m=document.getElementById('more');if(m&&!m.querySelector('.gxh-set'))m.insertAdjacentHTML('beforeend',GXH.settingsHTML({rowClass:'gxh-mrow',btnClass:'btn'}));
   setInterval(hlpAfter,300);setInterval(hlpFollow,250)}

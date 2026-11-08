@@ -49,10 +49,11 @@ function campCard(){const g=G.cmp.goal;const cp=campParts();const d=typeof campD
   return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p>${st}</div>`}
 function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return campCard();const S=SCENARIOS[G.scen];let how='',btn='';
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
-    how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
+    how=`<ul class="gl"><li>${has('fire')?'Fire: built ✓':'Build <b>Fire</b>. It is a Build job.'}</li><li>Add wood to the <b>signal pile</b> once a day: 1, then 2, 3, 4, 5.</li><li>The pile must be full (15) on day 10, 11 or 12.</li></ul>`;
     const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
   else how=esc(S.x);
-  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b>${esc(SC().goal?SC().goal():S.x)}</b><p>${how}</p>${btn?`<div class="gb">${btn}</div>`:''}</div>`}
+  const win=G.scen==='marooned'?'You win if a ship sees your signal fire and everyone is alive.':'You win if you meet this goal and everyone is alive.';
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b><div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';

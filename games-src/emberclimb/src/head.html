@@ -9,7 +9,7 @@
 .host .hostpic{width:64px;height:64px;flex:0 0 64px;border-radius:50%;background-size:cover;border:2px solid var(--ember2,#f2872b);box-shadow:0 2px 10px rgba(0,0,0,.5)}
 .host p{margin:0;font-size:15px;line-height:1.35;color:#f6ead8}
 @media (min-width:1024px){.host p{font-size:17px}.host .hostpic{width:80px;height:80px;flex-basis:80px}}
-.art.has[data-stem="enemy-mire-behemoth"],.art.has[data-stem="enemy-ashen-wraith"],.art.has[data-stem="enemy-gate-colossus"],.art.has[data-stem="enemy-ember-tyrant"],.art.has[data-stem="enemy-tomb-king"],.art.has[data-stem="enemy-skyclaw"]{background-size:cover;border:3px solid #c9a227;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 6px 22px rgba(0,0,0,.65),0 0 26px rgba(242,135,43,.35)}
+.en .art.has,.heropan .art.has,.hero .art.has{background-size:cover;border:3px solid #c9a227;box-shadow:0 0 0 2px rgba(0,0,0,.6),0 6px 22px rgba(0,0,0,.65),0 0 26px rgba(242,135,43,.35)}
 /* audit B: solid plates behind intent numbers and the campaign act header (the owner art is brighter than the old backgrounds) */
 .intent,.intent.atk,.intent.def,.intent.buf,.intent.deb{background:#140e0a!important}
 .intent>span{background:#140e0a;color:#fff1e6!important;text-shadow:none!important;border-radius:6px;padding:0 2px}
@@ -22,6 +22,23 @@ body:not(.hints-on):not(.learn) :is(.w4pv,.w4hb,.w4hbf,.w4inc,.w4vt,.w4rate,.w4n
 .ec-goalc h2{font:700 24px/1.2 Cinzel,serif;margin:0 0 6px;color:#8a2e14}.ec-goalc .lead{font:700 17px/1.35 'Alegreya Sans',sans-serif;margin:0 0 8px}
 .ec-goalc li{font:400 15px/1.4 'Alegreya Sans',sans-serif;margin:4px 0}.ec-goalc ul{padding-left:18px;margin:0 0 14px}.ec-goalc .btn{width:100%}
 @media (min-width:1024px){.ec-goalc li{font-size:17px}.ec-goalc .lead{font-size:19px}}
+.en.w4drop{outline:4px solid #ffd36a!important;transform:scale(1.04);transition:transform .12s}
+.w4ghost{box-shadow:0 14px 30px rgba(0,0,0,.6)!important;opacity:.95}
+/* owner brief 8 Nov: no text under 14px on a phone */
+@media (max-width:1023px){html body :is(.art .ph,.hero i,.hero b,.top,.chip,.piles .chip,.en .nm,.bar b,.blkchip,.spkchip,.itip i,.stc span,.orb,.item,.item span,.item b,.refline,.intent,.intent span,.card .cb,.card .ct,.card .cx,.card .ck,.card .cty,.card .cn,.gx-set-nav .gx-chip,.w4pv i,.w4pv b,.w4hb,.w4inc,.w4vt,.w4ntag,.w4rate,.toast,.ec-say span,.ec-say b,.host p,.sub,.gx-dt,#dockmsg,.gx-dock-body,.enl,.energy em,.gxh-tx,.price,.card .cl,.w4inc,.w4num i){font-size:14px!important}}
+@media (min-width:1024px){html body :is(.blkchip,.spkchip,.price,.card .cl,.card .cb,.card .ct,.card .cx,.card .cty,.item,.item span,.item b,.reward .sub,.reward span,.over span,.over p,.res span,.res p,.w4vt,.w4ntag,.gxh-tx,.rsec b,.rcard i,.w4num i){font-size:16px!important}}
+/* one focus, big art: the card picture fills the top of each hand card (the rule text needs only the lower half) */
+html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand.dense .card .cart{height:calc(var(--cw)*.62)!important}
+/* phone: the lifted card rises a little over its own row, never over the hero row or the pile chips */
+@media (max-width:1023px){html body .hand .card.sel{transform:translate(var(--sx,0px),-14px) scale(1.12)!important}}
+#end.btn,#end.btn.pulse{color:#1a0d05!important;text-shadow:none!important;font-weight:800}   /* audit B: End turn text contrast */
+/* R1: hero portrait on phone too, and Block as a big badge */
+@media (max-width:1023px){html body .heropan .art{display:block!important;width:52px!important;height:52px!important;aspect-ratio:1!important;border-radius:10px!important;flex:none}}
+.w4blk{display:inline-flex;align-items:center;gap:4px;background:#2f6fa8;color:#fff;font-weight:800;border-radius:10px;padding:2px 10px;font-size:18px!important;margin-left:8px;border:2px solid #9cc7f0}
+/* R1: text on the hero picker and result screen sits on a solid panel, not on the busy picture */
+#tscr .heroes .hero,#tscr .refline,#tscr .sub{background:rgba(16,11,8,.88)!important;border-radius:12px}
+#tscr .refline{padding:8px 14px;color:#f6ead8!important}
+.res,.rcard,.rsec{background-color:rgba(16,11,8,.9)}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}

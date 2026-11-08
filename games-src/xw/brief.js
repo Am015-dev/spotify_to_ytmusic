@@ -5,7 +5,7 @@
 (function(){
 const R=document.documentElement,MAXW=8,KEEP=7;
 const words=t=>(t||'').replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(w=>/[a-z][a-z]/i.test(w));
-const SKIP='button,a,input,select,textarea,svg,.die,[data-a],[data-act],[data-ph],[data-ship],[data-start],[data-mode],canvas,.gx-dock-head,.roadmap';
+const SKIP='button,a,input,select,textarea,svg,.die,[data-a],[data-act],[data-ph],[data-ship],[data-start],[data-mode],canvas,.gx-dock-head,.roadmap,[data-keep],[data-keep] *';
 function cut(text,n){const toks=text.trim().split(/\s+/);let out=[],c=0;for(const t of toks){if(/[a-z][a-z]/i.test(t.replace(/[^a-zA-Z]/g,'')))c++;if(c>n)break;out.push(t)}return out.join(' ').replace(/[·,;:\-–—]+$/,'')+'…'}
 function clamp(){if(!R.classList.contains('ph'))return;
   const roots=document.querySelectorAll('.gx-dock,#bf,#notice,#coach,.gxbanner,#banner');

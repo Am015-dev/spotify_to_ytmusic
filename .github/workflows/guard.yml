@@ -3,9 +3,7 @@ name: Cost guard
 # Fails a push to the work branch that brings back big files, built artefacts or new override layer files.
 # Same script the build runs: games-src/scripts/guard.py (one-line fix hints in the log).
 on:
-  push:
-    branches: [alex/brave-carson-rbpmlk]
-  workflow_dispatch:
+  workflow_dispatch:   # manual only: build-all.py already runs guard.py; no failure emails to the owner
 
 jobs:
   guard:
