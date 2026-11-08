@@ -1,6 +1,6 @@
 # G6 strict gameplay review (8 Nov 2026)
 
-Scored by games-src/reviews/GAMEPLAY-RUBRIC.md. Phone touch play at 390x844 and 375x667 on each branch build. shipwreck-isle and cauldron-fair sections follow when their playtests finish.
+Scored by games-src/reviews/GAMEPLAY-RUBRIC.md. Phone touch play at 390x844 and 375x667 on each branch build. Sections: short-fuse, cauldron-fair, shipwreck-isle.
 
 ## short-fuse (branch shelf/W488-short-fuse-sprites)
 
@@ -62,3 +62,32 @@ Played: the tutorial by touch to "Now a real game" at 390x844 (57 s of taps) and
 - **Row 3 (good):** The title screen and the first-game goal card are clear in under 10 seconds. Screenshots: games-src/reviews/G6-shots/cauldron-1-title.png, games-src/reviews/G6-shots/cauldron-2-goal-card.png
 - **Row 2 (good):** The tutorial finishes on "You know every rule. Your first real game starts now." with a "Play a real game" button. Screenshot: games-src/reviews/G6-shots/cauldron-4-tut-end.png
 - **Row 4 (good):** Fortune card choices are clear, with a recommended option tagged "best". Screenshot: games-src/reviews/G6-shots/cauldron-11-fortune-choice.png
+
+## shipwreck-isle (branch shelf/W468-shipwreck-lean)
+
+Built with `games-src/rc/build.py` (three.js from games-src/node_modules), served next to `games/shipwreck-isle/*`. Played by touch only (Playwright, hasTouch, isMobile): the full guided tutorial (52 steps) at 390x844, then three full games of the default setup (Marooned, 2 players, Easy island). One at normal speed at 390x844 (rescued on day 12, 224 s, 154 taps). Two at fast animation, at 375x667 (rescued day 10) and 390x844 (rescued day 11, 3 fights, life 8/13). Every game reached the result screen. No page errors and no stuck states.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 6 | The six phases, pawns (1 pawn rolls, 2 pawns are a sure success), night (eat 1 food or take 2 wounds, 1 wound with no shelter), roof against rain, threat cards, hunting (weapon against strength) and the fire plus 15-wood goal all match the published rules. But three full games drew no adventure card and no mystery card, and only 1 of 12 beat kinds touched those decks. The adventure decks are a core rule. The default game also has a "Hammer and Nails" pawn that nothing explains. |
+| 2 | Tutorial teaches | 7 | It teaches goal, death, phases, morale, production, explore, dice against sure, shelter, invention, weather, night, wounds, event, threat, gather, rest, hunt and arranging the camp. Each step is one short line and one highlighted tap, in rule order, and then you keep playing a real game. Two problems: on step 1 the big Continue button does nothing (only the glowing chip answers, and the screen never says so), and no dice roll or adventure card ever happens in it. |
+| 3 | First 10 seconds | 7 | The menu is clean, Play and Learn are obvious, and the goal chip reads "Light a fire and stack 15 wood". The first-time pop-up gives a different goal ("everyone is alive when the rescue ship comes"). |
+| 4 | Turn clarity | 6 | The phase banner ("YOUR TURN: PLAN THE DAY / Carpenter: tap a glowing place") and the sure/risky labels on actions are good. Several things are never explained: the coloured pawn dots on action chips, the ⏩ and ⏭ buttons, the floating "+1"/"+2" chip, and the "Hammer and Nails" and Dog pawns. Resource chips sometimes show the old value until the next scene. |
+| 5 | Phone play | 6 | At 390 the board comes first and buttons are 44 px or more. But tile labels (for example "3 Mountains") are tappable and only 20 px tall. Pawn names are cut off ("Carpen…", "Hamm…"). At 375x667 action chips overlap each other and the tile labels, "+1" sits on the zoom-out button, and "Mountains 8 Camp" labels collide. In the tutorial the coach bubble covers half the action rows in the camp pop-up. |
+| 6 | AI and pacing | 6 | This is a co-op game, so the "rival" is the island. A new player wins on the default level, but too easily: following ✨ every day wins all three games, with life never below 8 of 13 and no real choices needed. One game lasts 12 days and about 4 to 8 minutes, which is a good length. Story scenes play briskly. |
+| 7 | Feel | 7 | Floating +1 wood and -1 food, a "built" badge, the night darkening the board, falling rain, a beast card for the hunt, and an illustrated rescue result screen. Pawns jump to their jobs. It feels like a game, but the long chains of Continue taps (about 13 per day) flatten it. |
+| 8 | Bugs | 6 | 0 page errors and 0 stuck states in 4 full runs. One 404: `art/beast-birds.webp` is missing. Continue is a dead tap on tutorial steps 1 and 2. |
+| | **Total** | **6.4** | |
+| | **Verdict** | **FAIL** | Rows 1, 4, 5, 6 and 8 are below 7. Nothing stops play, so there is no cap. |
+
+### Findings
+- **Row 8 / 2:** Tapped "New here? Learn in 5 minutes", then the big "Continue ▶" button on step 1/52 (and again on 2/52). Nothing happened. Only tapping the glowing Day chip (drawn on the canvas) moves the step on, and no text says to tap it. Screenshot: games-src/reviews/G6-shots/shipwreck-2-tut-continue-dead.png
+- **Row 5:** Tutorial step 16/52 ("Build a shelter…"). The coach bubble sits over the middle of the camp pop-up and hides the action rows under it. Screenshot: games-src/reviews/G6-shots/shipwreck-3-tut-bubble-covers-rows.png
+- **Row 2:** Finished all 52 steps and reached the "You know the rules!" end card with Keep playing / New game. This works well. Screenshot: games-src/reviews/G6-shots/shipwreck-4-tut-end.png
+- **Row 4 / 5:** First real game, day 1 plan at 390x844. There are 7 pawns, including "Hammer and Nails" and Dog, with no explanation. The pawn names are cut off ("Carpen…", "Hamm…") in about 12 px text. Screenshot: games-src/reviews/G6-shots/shipwreck-5-plan-truncated-pawns.png
+- **Row 5:** At 375x667 on day 4, the Build chip overlaps the Gather chip and the "River" label at the top edge. The "+1" chip covers the zoom-out button, and "Mountains 8 Camp" labels run into each other. Screenshot: games-src/reviews/G6-shots/shipwreck-6-375-chips-overlap.png
+- **Row 1:** In three full default games (beats seen: intro, act, night, daysum, weather, prod, finds, threat, event, morning, fight, over) no adventure or mystery card was drawn. The published game draws adventure cards from risky actions and tokens all the time. Evidence: the day 12 night of the normal-speed game, with explore actions all game and no adventure scene. Screenshot: games-src/reviews/G6-shots/shipwreck-7-night.png
+- **Row 7:** The hunt shows a beast card ("Hunt: Tapir") and a choice to use a weapon item or fight. This is clear and has some drama. Screenshot: games-src/reviews/G6-shots/shipwreck-8-fight.png
+- **Row 6:** Following ✨ Plan it for me every day won every game: day 10, 11 and 12, with life 11, 8 and 9 of 13. A new player never has to make a decision to win on the default level. Screenshot: games-src/reviews/G6-shots/shipwreck-9-result.png
+- **Row 3:** The first-time "New here?" pop-up says "You win if everyone is alive when the rescue ship comes", but the actual goal is a fire and a 15-wood pile. The menu itself is clean. Screenshot: games-src/reviews/G6-shots/shipwreck-1-menu.png
+- **Row 8:** Console error: 404 for `art/beast-birds.webp`, a missing beast picture, seen during the fast 390x844 game. No screenshot (network log only).
