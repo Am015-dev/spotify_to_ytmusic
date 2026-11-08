@@ -1,14 +1,22 @@
-# Lantern Dive: tutorial coverage (W409, 8 Nov 2026)
+# Lantern Dive: tutorial coverage (W504, 8 Nov 2026)
 
-The tutorial is now a COACHED FIRST DIVE (`game/src/ui12.js`): ONE forced tap (take a job, spotlight from shell/gx-tutor.js), then the kit is stopped and
-the dive is a real free game on the stacked deal (data.js `tutorial`) against the normal computer divers. Brack (one bubble at a time, never blocks a tap,
-x dismisses, "Skip tutorial" always visible) explains each rule the first time it matters: jobs, flare, signals and reading a ping, lead/Captain, follow suit,
-void and trumps, who wins a trick, Last, and reacts when a job is done (good) or broken (poor). The end card walks the real result (jobs done/broken with
-the reason, tricks won) and lists "Things you'll meet later": every rule that did not come up in that dive plus the special dives (hand-over/vote, murky
-water, narcosis, clock, predictions, drone). A lost dive offers "Dive again" on the same deal.
-Proof: `game/playable-tutorial-end.js [sizes] [seed]` plays random legal moves by touch taps through the UI at 390x763 and 1440x860 to the end card and asserts
-<= 2 forced taps, one bubble at a time, every rule explained in play or listed on the end card: PASS (seeds 5, 7, 11, 21).
-(The chapters/steps list below is the OLD 21-step tutorial, kept for the rule wording.)
+The tutorial is a GUIDED FIRST DIVE (`game/src/ui12.js`): 18 steps on a fixed deal (data.js `tutorial`), each one sentence of 12 words or fewer
+plus one highlighted tap (a card, a job, a button, or Next on a spotlit part of the table). The crewmates are scripted (`TUT_AI`), so the dive always
+goes: take a job, skip the flare, signal, lead low so Dag wins trick one, follow suit without winning, trump with a Lantern, dive won after trick 3.
+The end card's "Play a real game" starts a real dive at once (or chapter 1 from Story). No "learn later" list.
+
+Step order (every core rule, in order; `TUT_RULES` in ui12.js):
+goal (crew wins together) - take (Lantern 4 = Captain, picks first) - mine (a job is met by its owner's tricks) - theirs (one owner per job) -
+lose (one failed job loses the dive) - flare (optional card pass, costs an attempt) - ping (one signal: highest/lowest/only) - readping (reading a token) -
+lead (Captain leads trick one, any card) - follow1 (follow the colour led) - win1 (highest of the colour led wins) - done1 (a done job stays done) -
+winlead (winner leads next) - nowin (never forced to win) - void (no card of the colour: play any) - trump (Lanterns are trumps) -
+trumpwin (a Lantern beats any colour, higher Lantern beats lower) - won (all jobs done ends the dive at once).
+
+Proof: `game/tutor-test.js 390x844,375x667` walks it by touch taps (clean, rotate, leave/restart, skip, story prologue): every step <= 12 words,
+every TUT_RULES step reached in order, wrong taps never advance, end card starts a real game. `rules-test.js` replays the scripted line headlessly.
+Not in the tutorial (special dives, they live in the Rules drawer): hand-over/vote/volunteer dives, murky water, deep narcosis, the clock, predictions, the drone.
+
+(Older notes below.)
 
 ## Rules checklist (step that teaches each: by doing = D, by seeing = S)
 - [x] The crew wins or loses together; every job done = dive won ................ goal (S), won (S)

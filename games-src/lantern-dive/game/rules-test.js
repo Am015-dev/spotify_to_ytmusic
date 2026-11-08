@@ -118,7 +118,19 @@ test('audit: jobs 57/58 need a re-deal when one diver holds all four Lanterns an
 test('audit: conflict pairs: most tricks x most tricks, 3+ nines x exactly two nines, exactly 2 x exactly 3 Lanterns', () => { ok(LD.conflict(J.moreEach, J.moreAll)); ok(LD.conflict(J.moreEach, J.moreEach)); ok(LD.conflict(J.ge3x9, J.ex2x9)); ok(LD.conflict(J.twoL, J.threeL)); ok(!LD.conflict(J.oneL, J.threeL), '1 + 3 Lanterns can be split'); ok(!LD.conflict(J.moreEach, J.fewerEach)); });
 test('audit: with fewer jobs than divers a conflicting pair is never drawn (each job goes to a different diver)', () => { let n = 0; for (let sd = 1; sd < 300; sd++) { const G = LD.newGame({ players: 4, seed: sd, mission: { kind: 'log', id: 5 } }); const ids = G.tasks.map(t => t.id); if (ids.length < 4) { n++; for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) ok(!LD.conflict(ids[i], ids[j]), 'conflicting pair ' + ids[i] + ',' + ids[j]); } } ok(n > 10, 'too few cases ' + n); const G4 = LD.newGame({ players: 4, seed: 1, mission: { kind: 'log', id: 5 } }); ok(!LD.splitOK(G4, [77, 78]), 'first trick x first two tricks cannot go to two divers'); });
 test('audit: a dive limit makes impossible jobs undrawable (dive 8: no job 21, 23, and 25 at 4+ divers)', () => { for (let sd = 1; sd < 300; sd++) for (const np of [3, 4, 5]) { const G = LD.newGame({ players: np, seed: sd, mission: { kind: 'log', id: 8 } }); for (const t of G.tasks) { ok(t.id !== J.ge3x9 && t.id !== J.all9s, 'job ' + t.id + ' on dive 8'); if (np >= 4) ok(t.id !== J.ex2x9, 'job 25 on dive 8 with ' + np); } } });
-test('audit: job 49 text says no Lanterns', () => { ok(/no Lanterns/.test(D.tasks[J.sum2223].t)); });
+test('audit: job 49 text says no Lanterns', () => { ok(/no Lanterns/i.test(D.tasks[J.sum2223].t)); });
+test('guided first dive (W504): the scripted line teaches follow, win, never forced to win, void, trump and ends won after trick 3', () => {
+  const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1))), C = t => h(t)[0];
+  const G = LD.newGame({ players: 3, seed: 5, names: ['You', 'Dag', 'Sumi'], ai: [null, 'normal', 'normal'], mission: { kind: 'free', jobs: [53, 78] }, stack: { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true } });
+  const go = (s, m) => { const r = LD.apply(G, s, m); if (!r.ok) throw new Error(JSON.stringify(m) + ' ' + r.error); };
+  ok(G.cap === 0); go(0, { t: 'take', i: 0 }); go(1, { t: 'take', i: 1 }); go(0, { t: 'dist', on: false });
+  go(0, { t: 'ping', c: C('K3'), k: 'low' }); go(1, { t: 'nosig' }); go(2, { t: 'ping', c: C('T8'), k: 'high' }); go(1, { t: 'nosig' }); ok(G.phase === 'play');
+  go(0, { t: 'play', c: C('K3') }); ok(LD.playable(G, 1).every(c => D.suitOf(c) === 2)); go(1, { t: 'play', c: C('K7') }); go(2, { t: 'play', c: C('K2') });
+  ok(G.tricks[0].w === 1 && G.tasks[1].st === 1);
+  go(1, { t: 'play', c: C('C4') }); go(2, { t: 'play', c: C('C8') }); ok(LD.playable(G, 0).length === 3); go(0, { t: 'play', c: C('C2') }); ok(G.tricks[1].w === 2);
+  go(2, { t: 'play', c: C('T3') }); ok(LD.playable(G, 0).length === G.players[0].hand.length); go(0, { t: 'play', c: C('L3') }); go(1, { t: 'play', c: C('T9') });
+  ok(G.phase === 'over' && G.result.ok && G.tricks.length === 3 && G.tricks[2].w === 0);
+});
 test('tutorial deal: attempt 1 breaks Dag\'s job on trick 1, attempt 2 (same deal) is won in three tricks with the scripted line', () => {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1))), C = t => h(t)[0];
   const mk = () => LD.newGame({ players: 3, seed: 5, names: ['You', 'Dag', 'Sumi'], ai: [null, 'normal', 'normal'], mission: { kind: 'log', id: 1 }, stack: { tasks: D.tutorial.tasks.slice(), hands: D.tutorial.hands.map(h), nopass: true } });

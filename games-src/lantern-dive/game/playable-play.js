@@ -4,6 +4,9 @@
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(process.env.HTML || path.join(__dirname, 'lantern-dive.html'));
+const [VW, VH] = (process.env.SIZE || '390x844').split('x').map(Number), LIVE = path.join(__dirname, '..', '..', '..', 'games', 'lantern-dive');
+// GAMEPLAY=1: the quick game writes ../playable-shots/gameplay/first-turn.png, mid-game.png, result.png
+const GP = process.env.GAMEPLAY ? path.join(__dirname, '..', 'playable-shots', 'gameplay') : null;
 const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
 // tap a point of the first matching element that is really on top there (so a covered button is never "tapped")
 async function tap(p, sel, filter) {
@@ -25,7 +28,7 @@ async function playDive(p, tag, shots) {
     if (s.ph === 'over') { // the result button / sheet
       if (await tap(p, '#acts button, #rs button, .sheet button, button', '^(Result|Show result)$')) { await sleep(700); }
       const res = await p.evaluate(() => { const e = document.querySelector('#rs, .rs, .result'); return e && e.getBoundingClientRect().width > 0 ? e.innerText.slice(0, 80) : ''; });
-      if (res || await p.evaluate(() => UI.overShown)) { resultSeen = true; if (shots) await p.screenshot({ path: shots + '-result.png' }); return true; }
+      if (res || await p.evaluate(() => UI.overShown)) { resultSeen = true; if (shots) await p.screenshot({ path: shots + '-result.png' }); if (GP && tag === 'quick') { await sleep(600); await p.screenshot({ path: path.join(GP, 'result.png') }); } return true; }
       await sleep(400); continue;
     }
     let a = await tap(p, 'button', '^(Next|Got it|Continue|OK|Dive)$');
@@ -38,13 +41,14 @@ async function playDive(p, tag, shots) {
       else if (s.ph === 'play') { a = await tap(p, '#hand .hc.glow'); if (a) cards++; }
     }
     if (shots && a && s.ph === 'play' && (cards === 1 || cards === 3)) { await sleep(500); await p.screenshot({ path: shots + '-turn' + cards + '.png' }); }
+    if (GP && tag === 'quick' && a && s.ph === 'play' && (cards === 1 || cards === 2)) { await sleep(500); await p.screenshot({ path: path.join(GP, cards === 1 ? 'first-turn.png' : 'mid-game.png') }); }
     await sleep(a ? 450 : 250);
   }
   probs.push(tag + ': no result screen after the move budget'); return false;
 }
 async function boot(browser) {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 763 }, isMobile: true, hasTouch: true });
-  await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+  const ctx = await browser.newContext({ viewport: { width: VW, height: VH }, isMobile: true, hasTouch: true });
+  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); if (u.pathname === '/') return r.fulfill({ status: 200, contentType: 'text/html', body: html }); const f = path.join(LIVE, decodeURIComponent(u.pathname)); return fs.existsSync(f) ? r.fulfill({ path: f }) : r.fulfill({ status: 404, body: '' }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000); let errs = 0;
   p.on('pageerror', e => { errs++; probs.push('PAGE ERROR ' + e.message); }); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(m.text())) { errs++; probs.push('console ' + m.text().slice(0, 120)); } });
   await p.goto('https://gns.test/?phone=1'); await sleep(900); await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } }); await p.reload(); await sleep(1200);
