@@ -11,16 +11,16 @@ function lightsStart() {
   setTimeout(function () { sfx('lightsgo'); }, 420 * 5 + 300);
   setTimeout(function () { RACE.lights = null; }, 420 * 5 + 1300);
 }
-function lightsDraw(now, W) {
+function lightsDraw(now, W, H) {
   var L = RACE.lights; if (!L) return; var t = L.freeze != null ? L.freeze : now - L.t0, on = Math.min(5, Math.floor((t - 200) / 420) + 1), out = t > 420 * 5 + 300;
-  var r = Math.max(9, Math.min(18, W / 26)), gap = r * 2.6, w = gap * 5 + 16, x0 = W / 2 - w / 2, y0 = W < 500 ? 104 : 64;
+  var shortB = H && H < 380, r = Math.max(9, Math.min(shortB ? 11 : 18, W / 26)), gap = r * 2.6, w = gap * 5 + 16, x0 = shortB ? 8 : W / 2 - w / 2, y0 = shortB ? 8 : W < 500 ? 104 : 64;   /* short phone board: a small strip top-left, clear of your car (W496) */
   cx.fillStyle = 'rgba(10,12,18,.92)'; rr(x0, y0, w, r * 2 + 18, 12); cx.fill(); cx.strokeStyle = '#3a4152'; cx.lineWidth = 2; cx.stroke();
   for (var i = 0; i < 5; i++) {
     var lit = !out && i < on; cx.beginPath(); cx.arc(x0 + 8 + gap * i + gap / 2, y0 + 9 + r, r, 0, 7);
     cx.fillStyle = out ? '#2fd36b' : lit ? '#ff2a2a' : '#3b1416'; cx.shadowColor = lit ? '#ff2a2a' : out ? '#2fd36b' : 'transparent'; cx.shadowBlur = lit || out ? 16 : 0; cx.fill(); cx.shadowBlur = 0;
   }
   cx.font = '900 ' + Math.round(r * 1.1) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'top'; cx.fillStyle = out ? '#2fd36b' : '#fff';
-  cx.strokeStyle = '#000'; cx.lineWidth = 4; var tx = out ? 'GO!' : 'Lights...'; cx.strokeText(tx, W / 2, y0 + r * 2 + 24); cx.fillText(tx, W / 2, y0 + r * 2 + 24);
+  cx.strokeStyle = '#000'; cx.lineWidth = 4; var tx = out ? 'GO!' : 'Lights...'; var tX = shortB ? x0 + w / 2 : W / 2; cx.strokeText(tx, tX, y0 + r * 2 + 24); cx.fillText(tx, tX, y0 + r * 2 + 24);
 }
 
 /* ---------- world layer (inside the camera transform): skid marks, move preview ---------- */
@@ -103,7 +103,7 @@ function raceHud(now, W, H) {
     }
   }
   if (RACE.flash) { var fa = RACE.flashHold ? 0.7 : 1 - (now - RACE.flash) / 700; if (fa > 0) { cx.fillStyle = 'rgba(255,30,20,' + (0.45 * fa).toFixed(2) + ')'; cx.fillRect(0, 0, W, H); } else RACE.flash = 0; }
-  lightsDraw(now, W);
+  lightsDraw(now, W, H);
 }
 function camShake(now) { if (!RACE.shake || RACE.flashHold) return 0; var a = 1 - (now - RACE.shake) / 500; if (a <= 0) { RACE.shake = 0; return 0; } return Math.sin(now / 18) * 10 * a; }
 function raceSpin(e) { RACE.flash = performance.now(); RACE.shake = RACE.flash; RACE.skids.push({ p: e.to + 1, lane: laneOf(e.car), t: RACE.flash }); sfx('skid'); }
@@ -135,7 +135,7 @@ function tracker() {
 }
 /* the computer's best plan for this hand, as a yardstick for the round rating */
 function rateStart(c) {
-  try { var g2 = JSON.parse(JSON.stringify(G)), p = aiPlan(g2, g2.cars[c.i]), sp = 0, avg = avgSpeed(c); p.cards.forEach(function (x) { var u = upgId(x); sp += u ? UPG[u].sp : x === 'X' ? avg : +x; }); if (p.boost) sp += avg; RACE.best = { sp: Math.round(sp) }; } catch (e) { RACE.best = null; }
+  try { var g2 = JSON.parse(JSON.stringify(G)); g2.diff = 'hard'; var p = aiPlan(g2, g2.cars[c.i]), sp = 0, avg = avgSpeed(c); p.cards.forEach(function (x) { var u = upgId(x); sp += u ? UPG[u].sp : x === 'X' ? avg : +x; }); if (p.boost) sp += avg; RACE.best = { sp: Math.round(sp) }; } catch (e) { RACE.best = null; }
   RACE.start = { pos: c.pos, heat: c.stats.heat, spins: c.stats.spins, ci: c.i };
 }
 function rateRound() {

@@ -18,7 +18,7 @@ var TUT_CH = [
   { pos: 0, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], kit: [3, ['2', '2']], juno: [2, ['2', '1']] },   /* you start last: adrenaline */
   { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '4', '1', '2', '3'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 4+4 = 8 in a limit-5 corner: burn 3 */
   { pos: 14, gear: 2, eng: 3, hand: ['1', '4', '2', '4', '2', '1', '3'], kit: [12, ['2', '2']], juno: [9, ['1', '1']] },   /* 4+4 into the limit-4 corner with 3 heat: spin out */
-  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', '3'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* one playable card in gear 2: stall */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', 'X'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* the spin's Stress card is the one playable card; gear 2 needs two: stall */
   { pos: 14, gear: 1, eng: 0, hand: ['H', 'X', 'H', 'H', 'H', 'H', '2'], top: ['2'], kit: [21, ['1', '1']], juno: [16, ['2', '1']] },   /* gear 1 + stress: cool down, adrenaline */
   { pos: 17, gear: 1, eng: 4, hand: ['2', '4', '1', '3', '1', '4', '3'], kit: [23, ['1', '1']], juno: [19, ['2', '1']] },   /* gear 1 -> 3 for 1 heat, beside Juno: slipstream, then discard */
   { pos: 24, gear: 3, eng: 3, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['3'], kit: [25, ['1', '1']], juno: [22, ['2', '1']] }   /* 4+2+1, boost after the reveal: finish */
@@ -83,10 +83,10 @@ function tutSteps() {
     card('c34', 3, '4', 'Tap a 4.'),
     card('c34b', 3, '4', 'Tap the other 4: speed 8 into a limit-4 corner.'),
     go('go3', 3, 'Tap Go: with too little heat to pay, you spin out.', 'spin'),
-    info('spun', 4, 'Spun out: stopped before the corner, gear 1, a stress card.', null),
-    { id: 'heatcard', rule: 'heatcards', say: 'Burned heat returns as dead cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
+    info('spun', 4, 'Spun out: stopped before the corner, gear 1, plus a Stress card.', null),
+    { id: 'heatcard', rule: 'heatcards', say: 'Spent heat comes back as dead Heat cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
     gear('g42', 4, 2, 'Tap gear 2, though you hold just one playable card.', 'stall'),
-    card('c43', 4, '3', 'Tap the 3, your only card that is not heat.'),
+    card('c43', 4, 'X', 'Tap the Stress card, your only card that is not heat.'),
     go('go4', 4, 'Tap Go: too few cards means a stall, no move.'),
     gear('gear1', 5, 1, 'Stay in gear 1: it cools up to 3 heat cards.', 'cooldown'),
     card('c5x', 5, 'X', 'Tap the Stress card: it flips a random speed card.', 'stress'),

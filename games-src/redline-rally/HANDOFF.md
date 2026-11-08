@@ -48,3 +48,15 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - PC gears: disabled gears stay readable (dashed, #9aa7bd); name tag is a dark pill ahead of the car in its lane, drawn last.
 - drag-test.js: real CDP touch drag + real mouse drag; asserts lift (scale), gold glow, drop zone, snap class, play; tap works.
 - tut-test.js: waits 700 ms before forced-step taps (the shell now ignores taps in a step's first 600 ms).
+
+## W496 fix round (shelf/W496-redline-gameplay): reviewer G5 (4.0 FAIL, stopper)
+- Stopper: tutorial questions (boost, slipstream, discard) that the current step does not teach are never shown (ui.js askBoost/askSlip/askDiscard);
+  answered questions leave the screen at once. tut-test.js watches for question buttons that stay visible but untappable (dead taps).
+- Rules: computer cars commit gear and cards in startResolve (simultaneous, face down, start-of-round board); boost decided in their own react
+  step (ai.js aiBoost). logic-test R70-R72; RULES-CHECKLIST 69-70.
+- Pacing: rival turns ~1 s (UI.rival scales waits/tweens; shift/cool/done steps only update the HUD); tap = faster still. Discard step keeps all after 5 s.
+- Difficulty: Easy is the default; easy rivals never use gear 4 or boost and are heat-shy. Suggest always plans at hard strength.
+  Sim (200 races, 5 cars, 2 laps): careful newcomer bot podium 67% on easy, following Suggest 75%; normal/hard unchanged.
+- Small screens: top bar fits 375 (pill words hidden < 390), pops drawn in screen space inside the board and clear of the minimap,
+  opaque minimap, start lights a small strip top-left on short boards, podium title on a dark plate, place-aware losing line.
+- Tutorial spin-out: the Stress card now shows in hand; the stall uses it as the one playable card. race-touch.js = full default race by touch.

@@ -1,13 +1,13 @@
 /* Redline Rally UI: title, canvas track (follow camera, animated cars), hand/gear panel, hot-seat, result. */
 var G = null;
-var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y: 0, s: 0.4 }, vis: [], pops: [], focus: 0, fast: /[?&]fast=1/.test(location.search), flash: null, tipShown: false, set: { track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', upg: false, wx: 'dry', sup: true } };
+var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y: 0, s: 0.4 }, vis: [], pops: [], focus: 0, fast: /[?&]fast=1/.test(location.search), flash: null, tipShown: false, set: { track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'easy', upg: false, wx: 'dry', sup: true } };
 UI.hints = lsGet0('rr_hints') === '1';
 function lsGet0(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function hintsOn() { return !!UI.hints || UI.mode === 'tutorial'; }
 window.ANIM = true; window.AIDELAY = 1;
 var $ = function (s) { return document.querySelector(s); };
 function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
-function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1) * (UI.pace || 1) * (UI.skipStep ? 0.12 : 1)); }); }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, (UI.fast || window.ANIM === false) ? Math.min(ms, 8) : ms * (window.AIDELAY || 1) * (UI.rival ? UI.rival : (UI.pace || 1)) * (UI.skipStep ? 0.12 : 1)); }); }
 function setSeed(n) { if (G) G.rs = n >>> 0; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
@@ -166,7 +166,7 @@ function cardHtml(x, sel, dead, j, cls) {
   return '<button class="cd ' + kind + (sel ? ' sel' : '') + (dead ? ' dead' : '') + (cls ? ' ' + cls : '') + '" data-art="' + stem + '" data-i="' + j + '" aria-label="' + esc(cardText(x)) + '" title="' + esc(cardText(x)) + '">' + cardFace(x) + '</button>';
 }
 function suggest() {
-  var c = you(), g2 = JSON.parse(JSON.stringify(G)), p = aiPlan(g2, g2.cars[c.i]);
+  var c = you(), g2 = JSON.parse(JSON.stringify(G)); g2.diff = 'hard'; var p = aiPlan(g2, g2.cars[c.i]);   /* Suggest always plans at full strength */
   UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is asked after the reveal */
 }
 function commit() {
@@ -191,7 +191,7 @@ function banner(txt, col, kind) {
 }
 async function runResolve() {
   var g0 = G; hud(); UI.lastCar = -1; UI.skipStep = false;
-  banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(900);
+  banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(550);
   while (G.phase === 'resolve') {
     var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
     while (G.pend) {   /* the human's questions in rulebook order: boost (react, after the reveal), slipstream, discard (after moving) */
@@ -210,7 +210,7 @@ async function runResolve() {
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  ms = ms * (window.AIDELAY || 1) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(0.35, UI.rival) : 1) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
   return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
     var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
@@ -227,6 +227,9 @@ async function playEvents(ev) {
     var e = ev[k], c = G.cars[e.car]; if (e.car != null && !c) return; var
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
+    /* brisk rivals: a computer car's whole turn plays in about 1.2 s (tap anywhere: faster still); your own move keeps its full pace */
+    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? 0.4 : 0.26) : 0;
+    if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(750); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
@@ -246,7 +249,7 @@ async function playEvents(ev) {
     else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(450); }
     hud();
   }
-  UI.redraw();
+  UI.rival = 0; UI.redraw();
 }
 function showPlayed(e) {
   var h = '<div class="who" style="color:' + COLS[G.cars[e.car].col].hex + '">' + esc(carName(e.car) === 'You' ? 'You play' : carName(e.car) + ' plays') + '</div><div class="reveal">'; e.cards.forEach(function (x) {
@@ -256,17 +259,21 @@ function showPlayed(e) {
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
 function askBoost() {   /* react step: the cards are revealed (panel), now boost or not */
-  var p = G.pend; setPhase('react'); setMsg('Speed ' + p.speed + '. Boost: 1 heat for a flipped card?');
+  var p = G.pend;
+  /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
+  if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
+  setPhase('react'); setMsg('Speed ' + p.speed + '. Boost: 1 heat for a flipped card?');
   var old = $('#bq'); if (old) old.remove();
   $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y" id="boostY">Boost -1 heat</button></div>');
   return new Promise(function (res) {
-    $('#boostY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); res(true); };
-    $('#boostN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boostno' })) return; res(false); };
-    if (UI.fast) setTimeout(function () { res(false); }, 10);
-    if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) setTimeout(function () { res(false); }, 300 * (window.AIDELAY || 1));
+    var fin = function (v) { var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
+    $('#boostY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); fin(true); };
+    $('#boostN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boostno' })) return; fin(false); };
+    if (UI.fast) setTimeout(function () { fin(false); }, 10);
   });
 }
 function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
+  if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
   var c = G.cars[G.pend.car], sel = [], done = null; setPhase('discard');
   var paint = function () {
     var h = '<div class="who">Discard step</div><div id="hand">';
@@ -282,21 +289,29 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
     $('#discN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discno' })) return; done([]); };
   };
   return new Promise(function (res) {
-    done = res; paint();
+    done = function (v) { clearInterval(UI.discT); var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
+    /* the discard step keeps everything by itself after 5 s unless you touch a card (one tap fewer each round) */
+    if (!tutOn()) { var left = 5; UI.discT = setInterval(function () { if (sel.length) { clearInterval(UI.discT); var b0 = $('#discN'); if (b0) b0.textContent = 'Keep all'; return; } left--; var b = $('#discN'); if (b) b.textContent = 'Keep all · ' + left; if (left <= 0) done([]); }, 1000); var b1 = $('#discN'); if (b1) b1.textContent = 'Keep all · 5'; }
     if (UI.fast) setTimeout(function () { res([]); }, 10);
-    if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) setTimeout(function () { res([]); }, 300 * (window.AIDELAY || 1));
   });
 }
 function askSlip() {
   if (UI.mode === 'tutorial') coachSay('slip');
+  if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); return wait(700).then(function () { return false; }); }   /* no dead buttons */
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
   var sn = p.L1 - p.L0; setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
   $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +' + sn + (spin ? ' (spin!)' : '') + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
-  return new Promise(function (res) { $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
+  return new Promise(function (r0) { var res = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); r0(v); }; $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
 }
 
 /* ================= result ================= */
+function loseLine() {   /* the line fits the place you got: podium praise, or one concrete tip */
+  var me = G.cars.filter(function (c) { return c.human; })[0], k = me ? G.rank.indexOf(me.i) + 1 : 0;
+  if (G.hot || !k) return pickLine(STORY.quickLose);
+  if (k <= 3) return 'You made the podium in ' + ord(k) + '. One cleaner corner and it is yours.';
+  return 'You finished ' + ord(k) + '. Gear down before corners and keep heat for the last lap.';
+}
 function showResult() {
   if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
   if (UI.mode === 'tutorial') return coachFinish();
@@ -307,7 +322,7 @@ function showResult() {
     rows += '<div class="stand' + (c.human ? ' you' : '') + '"><span class="n">' + (k + 1) + '</span><span class="pt" style="border-color:' + col + '" data-art="portrait-' + c.drv + '">' + (c.drv ? c.name[0] : '★') + '</span><div style="flex:1"><b>' + esc(c.name) + '</b><small>Heat burned ' + c.stats.heat + ' · spin-outs ' + c.stats.spins + ' · slipstreams ' + c.stats.slips + '</small></div></div>';
   });
   var w = G.cars[G.rank[0]]; sfx(w.human ? 'win' : 'lose');
-  var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + pickLine(STORY.quickLose);
+  var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + loseLine();
   modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
   $('#mx').hidden = true; $('#again').onclick = function () { UI.lockModal = false; startGame(); }; $('#home').onclick = function () { UI.lockModal = false; showTitle(); };
 }
@@ -387,18 +402,23 @@ function frame(now) {
     cx.fillStyle = 'rgba(10,14,22,.86)'; rr(tx - tw / 2, ty - 15, tw, 30, 15); cx.fill(); cx.lineWidth = 3; cx.strokeStyle = COLS[c.col].hex; cx.stroke();
     cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(lb, tx, ty + 1);
   });
-  /* pops */
-  UI.pops.forEach(function (o) {
-    var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0); cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25); var y = q.y - 50 - Math.min(1, ms / 400) * 30;
-    if (o.stem) artDraw(cx, o.stem, q.x - 50, y - 70, 100, 70, 'contain');
-    cx.fillStyle = o.col; cx.font = '900 34px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = '#000'; cx.lineWidth = 7; cx.strokeText(o.txt, q.x, y); cx.fillText(o.txt, q.x, y); cx.globalAlpha = 1;
-  });
+  var popT = cx.getTransform();   /* pops are drawn after the minimap, in screen space, kept inside the board (W496: no clipped pop) */
   cx.restore();
   /* minimap */
   var mw = Math.min(110, W * 0.3), mh = mw * 0.6, mx = W - mw - 6, my = 6, sc = mw / 2000;
-  cx.fillStyle = 'rgba(8,12,20,.6)'; rr(mx - 3, my - 3, mw + 6, mh + 6, 8); cx.fill();
+  cx.fillStyle = 'rgba(8,12,20,.93)'; rr(mx - 3, my - 3, mw + 6, mh + 6, 8); cx.fill();   /* opaque: scenery no longer shows through the minimap */
   cx.beginPath(); tk.dense.forEach(function (p, i) { if (i) cx.lineTo(mx + p[0] * sc, my + p[1] * sc); else cx.moveTo(mx + p[0] * sc, my + p[1] * sc); }); cx.closePath(); cx.strokeStyle = '#8b97ad'; cx.lineWidth = 3; cx.stroke();
   G.cars.forEach(function (c) { var q = tk.space(UI.vis[c.i].p, 0); cx.fillStyle = COLS[c.col].hex; cx.beginPath(); cx.arc(mx + q.x * sc, my + q.y * sc, c.human ? 3.6 : 2.6, 0, 7); cx.fill(); if (c.human) { cx.strokeStyle = '#fff'; cx.lineWidth = 1.2; cx.stroke(); } });
+  var base = cx.getTransform(), inv = base.inverse(), zoom = popT.a / (base.a || 1);
+  UI.pops.forEach(function (o) {
+    var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0), wy = q.y - 50 - Math.min(1, ms / 400) * 30;
+    var sp = inv.transformPoint(popT.transformPoint(new DOMPoint(q.x, wy))), fs = Math.max(20, Math.min(30, 34 * zoom)), ah = fs * 2;
+    cx.font = '900 ' + fs + 'px sans-serif'; var tw = cx.measureText(o.txt).width + 10, x = Math.max(6 + tw / 2, Math.min(W - 6 - tw / 2, sp.x)), y = Math.max(fs + 8 + (o.stem ? ah : 0), Math.min(H - 8, sp.y));
+    if (x + tw / 2 > mx - 4 && y - fs < my + mh + 6) y = my + mh + 10 + fs + (o.stem ? ah : 0);   /* never under the minimap */
+    cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25);
+    if (o.stem) artDraw(cx, o.stem, x - ah * 0.7, y - fs - ah, ah * 1.4, ah, 'contain');
+    cx.fillStyle = o.col; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = '#000'; cx.lineWidth = Math.max(4, fs / 5); cx.strokeText(o.txt, x, y); cx.fillText(o.txt, x, y); cx.globalAlpha = 1;
+  });
   raceHud(now, W, H);
 }
 UI.redraw = function () { };
