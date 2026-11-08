@@ -8,13 +8,13 @@ const fs=require('fs');const html=fs.readFileSync(__dirname+'/sands.html');
 const mode='coach';const [W,H]=(process.argv[2]||'390x763').split('x').map(Number);const SH=process.argv[3]||'';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{if(probs.length<30)probs.push(m)};
 (async()=>{const b=await PW.chromium.launch();const mob=W<700;
- const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:mob,hasTouch:true,serviceWorkers:'block'});
+ const MOUSE=W>=700||!!process.env.MOUSE;const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:mob&&!MOUSE,hasTouch:!MOUSE,serviceWorkers:'block'});
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
- const p=await ctx.newPage();p.setDefaultTimeout(15000);
+ const p=await ctx.newPage();p.setDefaultTimeout(15000);const tapXY=(x,y)=>MOUSE?p.mouse.click(x,y):p.touchscreen.tap(x,y);   // W>=700 or MOUSE=1: plain mouse clicks only
  p.on('pageerror',e=>note('PAGE ERROR '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note('console error '+m.text().slice(0,140))});
  await p.goto('https://gns.test/');await sleep(900);await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('soq_tutoffer','1');localStorage.setItem('soq_fing','99')}catch(e){}});await p.reload();await sleep(900);
  const shot=async n=>{if(SH){fs.mkdirSync(SH,{recursive:true});await sleep(350);await p.screenshot({path:`${SH}/${mode}-${n}-${W}.png`})}};
- const tapEl=async sel=>{const c=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===e||e.contains(t)||t.contains(e))}},sel);if(!c)return false;if(!c.ok)note('covered: '+sel);await p.touchscreen.tap(c.x,c.y);return true};
+ const tapEl=async sel=>{const c=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===e||e.contains(t)||t.contains(e))}},sel);if(!c)return false;if(!c.ok)note('covered: '+sel);await tapXY(c.x,c.y);return true};
  await shot('title');
  await tapEl('#modal [data-coach-entry]');await sleep(900);if(process.env.COACH_FAST)await p.evaluate(()=>{ANIM=0});   // COACH_FAST=1: machine speed (animation off)
  if(await p.evaluate(()=>!G||!G.coach))note('the coached game did not start from the title menu');
@@ -29,17 +29,17 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
     if(await p.evaluate(()=>!!document.querySelector('.gxc-node.next')&&!document.querySelector('.gxc-sheet'))){await sleep(600);await tapEl('.gxc-node.next .gxc-disc');await sleep(700);continue}
     const hit=await p.evaluate(()=>{const bs=[...document.querySelectorAll('[class*=gxc] button:not(.gxc-node):not(.gxc-back),[class*=gxc] [role=button]:not(.gxc-node),.gxc-go,.gxc-next')].filter(e=>{const r=e.getBoundingClientRect();if(!r.width||getComputedStyle(e).visibility==='hidden')return false;const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return t&&(t===e||e.contains(t))});
       const pick=bs.find(e=>e.classList.contains('go'))||bs.find(e=>/start|play|next|continue|meet|begin|go|chapter/i.test(e.textContent))||bs[0];if(!pick)return null;const r=pick.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2,t:pick.textContent.trim().slice(0,20)}});
-    if(hit){await p.touchscreen.tap(hit.x,hit.y);await sleep(450)}else await sleep(300);continue}
+    if(hit){await tapXY(hit.x,hit.y);await sleep(450)}else await sleep(300);continue}
   if(!startedChapter){startedChapter=true;await sleep(500);await shot('first')}
   if(!st.me){if(!sawRival&&st.ph.startsWith('turn')&&!shots.r){sawRival=true}await sleep(250);if(!shots.r&&await p.evaluate(()=>G.phase==='turn'&&!me())){shots.r=1;await sleep(500);await shot('rival')}continue}
-  if(st.modal&&st.modal!=='over'){const h=await p.evaluate(()=>{const e=document.querySelector('#modal .btn.go,#modal .btn');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(h){await p.touchscreen.tap(h.x,h.y);await sleep(300)}else await sleep(200);continue}
+  if(st.modal&&st.modal!=='over'){const h=await p.evaluate(()=>{const e=document.querySelector('#modal .btn.go,#modal .btn');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(h){await tapXY(h.x,h.y);await sleep(300)}else await sleep(200);continue}
   for(let w=0;w<20&&await p.evaluate(()=>{const e=document.getElementById('coach');return !!e&&e.classList.contains('on')});w++){lastT=Date.now();await sleep(500)}   // a player reads the bubble until it goes (4 s + 1 s per 10 words)
   const tgt=await p.evaluate(()=>{let el=null;try{const m=hlpAdvice();if(UI.chz){const i=UI.chz.opts.findIndex(o=>same(o.m,m));el=document.querySelector('#chz [data-chz="'+(i<0?0:i)+'"]')}else if(m)el=fingerEl(m)}catch(e){}
     if(!el)el=document.querySelector('#chz .chb')||[...document.querySelectorAll('#acts [data-mv]')].find(b=>!/"act":"undo"/.test(b.dataset.mv))||document.querySelector('#grid .glow')||document.querySelector('.sp-b.glow')||[...document.querySelectorAll('#acts button')].find(b=>/skip|done|end|sell/i.test(b.textContent)&&!b.disabled)||document.querySelector('#mkt .glow');
     if(!el)return null;el.scrollIntoView({block:'nearest'});const r=el.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,ok:!!t&&(t===el||el.contains(t)||t.contains(el)),what:el.id||el.className}});
   if(!tgt){await sleep(250);continue}
   if(!tgt.ok){note('hint target covered '+tgt.what);}
-  await p.touchscreen.tap(tgt.x,tgt.y);turns++;await sleep(220);
+  await tapXY(tgt.x,tgt.y);turns++;await sleep(220);
   if(turns===30&&!shots.s){shots.s=1;await shot('mid')}
  }
  // the final count: walk the pages with real taps, check the numbers and the rest card

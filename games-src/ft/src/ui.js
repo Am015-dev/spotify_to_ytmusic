@@ -40,7 +40,7 @@ function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').sl
   const s=sideToAct(),p=s>=0?P(s):null;if(!p)return '';const hp=me();
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
-  if(G.phase==='bid'){const two=hp.markers>1;return two?`Bid ${Math.min(2,G.bids.filter(b=>b.mk.p===hp.i).length+1)} of 2: pick a spot`:'Pick your turn-order spot'}
+  if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
   switch(G.step){
   case 'move':return !G.move?'Tap a glowing tile':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
   case 'tribe':return {assassin:'Tap who to remove',builder:'Masons earn coins',merchant:'Traders fetch goods',vizier:'Advisors join you',elder:'Sages join you',artisan:'Crafters join you'}[G.act.color]||'';
