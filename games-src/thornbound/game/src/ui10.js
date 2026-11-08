@@ -26,7 +26,7 @@ function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
 const cardDriven=M=>!!M&&(M.kind==='bid'||M.kind==='place'||M.kind==='tie');
 // tap a card: it lifts and its targets glow; tap it again (or the glowing spot) to play it
 function handTap(id){const M=UI.bf;
-  if(M&&M.aut&&autMoves(id).length){if(UI.autCard===id&&Date.now()-(UI._autT||0)<500)return;UI._autT=Date.now();UI.autCard=UI.autCard===id?null:id;UI.hand=UI.autCard;if(typeof sfx==='function')sfx('tap');renderAll();return}
+  if(M&&M.aut&&autMoves(id).length){if(UI.autCard===id&&Date.now()-(UI._autT||0)<500)return;UI._autT=Date.now();UI.autCard=UI.autCard===id?null:id;if(typeof sfx==='function')sfx('tap');renderAll();return}
   const cm=M&&M.kind?cardMoves(id):[];
   if(!cm.length){UI.hand=null;openPop('card',{id});return}
   if(cardDriven(M)){

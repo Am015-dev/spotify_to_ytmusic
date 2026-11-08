@@ -93,7 +93,7 @@ function tutSteps(){
  {id:'round',title:'Winter',say:()=>'Winter: played cards are discarded. You '+myInf()+', the Court '+rivInf()+'.',target:tq('#rivals'),wait:null,
    hold:c=>c.kind==='event'&&c.ev.t==='summary',onNext:()=>evDone(),
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')||!!(G&&G.over&&!UI.card)},
- {id:'end',title:'Your game',say:'A real game repeats this round five times. Your turn!',
+ {id:'end',title:'Your game',say:'A real game plays four to six of these rounds. Your turn!',
    target:tq('#rivals'),wait:null,ready:()=>!!(G&&G.over&&!UI.card)}
   ]}
 // ---------------------------------------------------------------- the kit hooks
