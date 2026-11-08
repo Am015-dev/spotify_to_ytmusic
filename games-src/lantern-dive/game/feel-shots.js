@@ -13,7 +13,7 @@ async function tap(p, sel, filter) {
   for (const [W, H] of [[390, 844], [1440, 900]]) {
     const m = W < 700, tag = W + 'x' + H, sh = n => path.join(OUT, n + '-' + tag + '.png');
     const ctx = await br.newContext({ viewport: { width: W, height: H }, isMobile: m, hasTouch: true, deviceScaleFactor: m ? 2 : 1 });
-    await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+    await ctx.route('**/*', async r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); if (u.pathname === '/' || u.pathname === '') return r.fulfill({ status: 200, contentType: 'text/html', body: html }); const f = require('path').join('/home/user/spotify_to_ytmusic/games/lantern-dive', u.pathname); try { r.fulfill({ status: 200, body: require('fs').readFileSync(f), contentType: u.pathname.endsWith('.js') ? 'text/javascript' : u.pathname.endsWith('.webp') ? 'image/webp' : u.pathname.endsWith('.mp3') ? 'audio/mpeg' : 'application/octet-stream' }); } catch (e) { r.abort(); } });
     const p = await ctx.newPage(); await p.goto('https://gns.test/' + (m ? '?phone=1' : '')); await sleep(900); await p.evaluate(() => localStorage.clear()); await p.reload(); await sleep(1200);
     await p.evaluate(() => showStart()); await sleep(500); await p.screenshot({ path: sh('1-title') });
     await p.evaluate(() => document.querySelector('#start [data-gxt-open]').click()); await sleep(2500); await p.screenshot({ path: sh('2-learn-first') });
