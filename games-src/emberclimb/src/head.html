@@ -32,6 +32,13 @@ html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand
 /* phone: the lifted card rises a little over its own row, never over the hero row or the pile chips */
 @media (max-width:1023px){html body .hand .card.sel{transform:translate(var(--sx,0px),-14px) scale(1.12)!important}}
 #end.btn,#end.btn.pulse{color:#1a0d05!important;text-shadow:none!important;font-weight:800}   /* audit B: End turn text contrast */
+/* R1: hero portrait on phone too, and Block as a big badge */
+@media (max-width:1023px){html body .heropan .art{display:block!important;width:52px!important;height:52px!important;aspect-ratio:1!important;border-radius:10px!important;flex:none}}
+.w4blk{display:inline-flex;align-items:center;gap:4px;background:#2f6fa8;color:#fff;font-weight:800;border-radius:10px;padding:2px 10px;font-size:18px!important;margin-left:8px;border:2px solid #9cc7f0}
+/* R1: text on the hero picker and result screen sits on a solid panel, not on the busy picture */
+#tscr .heroes .hero,#tscr .refline,#tscr .sub{background:rgba(16,11,8,.88)!important;border-radius:12px}
+#tscr .refline{padding:8px 14px;color:#f6ead8!important}
+.res,.rcard,.rsec{background-color:rgba(16,11,8,.9)}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
