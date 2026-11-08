@@ -1,42 +1,14 @@
 {
  "slug": "tidewake",
- "when": "2026-11-08T06:42Z",
- "secs": 45,
- "totalSecs": 111,
+ "when": "2026-11-08T06:58Z",
+ "secs": 120,
+ "totalSecs": 272,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 3,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Osk The Maelstrom It moves on calm rolls. It swallows whatever it enters. ×",
-     "words": 14,
-     "shownMs": 250,
-     "neededMs": 5400,
-     "cls": "osk-card"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Osk The Maelstrom It moves on calm rolls. It swallows whatever it enters. ×",
-     "words": 14,
-     "shownMs": 250,
-     "neededMs": 5400,
-     "cls": "osk-card"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Osk Dice at dawn Each turn starts with two dice. 2+6=8: a 6, 7 or 8 wakes the leviathans. ×",
-     "words": 20,
-     "shownMs": 250,
-     "neededMs": 6000,
-     "cls": "osk-card"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "PASS",
@@ -64,19 +36,19 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 46,
-   "turns": 56,
-   "clicks": 60,
+   "secs": 121,
+   "turns": 112,
+   "clicks": 123,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 7,
    "hintsOff": true,
-   "messagesSeen": 12
+   "messagesSeen": 14
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 9,
-   "turns": 5,
+   "secs": 13,
+   "turns": 4,
    "clicks": 6,
    "endedBy": "result",
    "tutorialEnded": null,
@@ -86,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 45,
-   "turns": 43,
-   "clicks": 49,
+   "secs": 122,
+   "turns": 80,
+   "clicks": 86,
    "endedBy": "result",
-   "tutorialEnded": 6,
+   "tutorialEnded": 10,
    "hintsOff": true,
-   "messagesSeen": 15
+   "messagesSeen": 11
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 10,
-   "turns": 6,
-   "clicks": 6,
+   "secs": 16,
+   "turns": 7,
+   "clicks": 7,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
