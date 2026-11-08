@@ -45,7 +45,7 @@ function newGame(opts){if(typeof opts==='string'){const m=opts;opts={players:m==
   for(const k in KONT)delete KONT[k];
   G={v:2,seed,rng:seed>>>0,round:0,turn:0,phase:'setup',step:0,log:[],ships:[],rocks:[],deck:[],disc:[],winner:null,winText:'',
     fac:opts.fac||[0,1],players:(opts.players||[{human:true,lvl:'normal'},{human:false,lvl:'normal'}]).map(p=>Object.assign({human:false,lvl:'normal'},p)),
-    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,bombs:[],nb:0,q:null,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{},pendS:[],inCombat:false,bonus:null,again:false};
+    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,bombs:[],nb:0,q:null,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{},pendS:[],inCombat:false,bonus:null,again:false,close:!!opts.close};
   if(LVMIX)G.players.forEach((p,k)=>{p.lvl=LVMIX[k%LVMIX.length];p.human=false});
   G.deck=shuffle(buildDamageDeck());
   const z=opts.sizeK&&SIZES.find(z=>z.k===opts.sizeK);const squads=opts.squads||(z?[z.squad(G.fac[0],G.ex),z.squad(G.fac[1],G.ex)]:[defaultSquad(G.fac[0]),defaultSquad(G.fac[1])]);
@@ -74,7 +74,8 @@ function placeRocks(k){const n=G.ex.noRocks?0:6;const shapes=[];for(let i=0;i<n;
     if(isHuman(pl)){const sp=rockSpots(o,pl);if(sp.length)return ask(pl,'rock',`Place asteroid ${i} of ${n}`,'Choose a spot (outlined on the mat; hover a button to highlight it): columns A-E from your left, rows 1-5 from your edge. Asteroids stay beyond range 2 of every edge and beyond range 1 of each other.',sp,a=>{const c=sp.find(c=>c.k===a);o.x=c.p.x;o.y=c.p.y;G.rocks.push(o);lg(pl,`${sideName(pl)} places an asteroid.`);next()})}
     aiPlace(o);next()};
   next()}
-const DEPLOY_Y=s=>s.side===0?RANGE-B(s)/2-5:MAT-RANGE+B(s)/2+5;// the whole base inside range 1 of its own edge
+const CLOSE_MM=150;// first-game option (G.close): both squads start this far further in, so the dogfight begins in round 2
+const DEPLOY_Y=s=>{const c=G&&G.close?CLOSE_MM:0;return s.side===0?RANGE-B(s)/2-5+c:MAT-RANGE+B(s)/2+5-c};// the whole base inside range 1 of its own edge (less the first-game push in)
 function deploySpots(){for(const side of [0,1]){const mine=G.ships.filter(s=>s.side===side),n=mine.length;
   mine.forEach((s,k)=>Object.assign(s,{x:MAT/2+(k-(n-1)/2)*Math.min(170,(MAT-160)/Math.max(1,n)),y:DEPLOY_Y(s),h:side===0?Math.PI/2:-Math.PI/2}))}}
 function deploy(k){const I=s=>s.side===G.init?0:1;const order=G.ships.slice().sort((a,b)=>(psOf(a)-psOf(b))||(I(a)-I(b)));const placed=[];// ascending pilot skill, initiative first on ties
@@ -356,8 +357,9 @@ function checkWin(){if(G.winner)return true;const a=[0,1].map(k=>G.ships.some(s=
   if(a[0]&&a[1])return missionCheck();
   if(!a[0]&&!a[1]){const w=G.init;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: both squadrons were destroyed together, and ${sideName(w)} has initiative.`}else{const w=a[0]?0:1;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: every enemy ship is destroyed.`}
   G.phase='over';G.step=5;lg(-1,G.winText);return true}
-function missionCheck(){if(G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));const w=sc[0]===sc[1]?-1:sc[0]>sc[1]?0:1;
-    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?'Time: a draw on points destroyed.':`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
+function missionCheck(){if(G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));const hp=k=>G.ships.filter(s=>s.side===k&&s.alive).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);// health left: breaks a tie on points
+    const w=sc[0]!==sc[1]?(sc[0]>sc[1]?0:1):hp(0)!==hp(1)?(hp(0)>hp(1)?0:1):-1,byHp=sc[0]===sc[1];
+    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?'Time: a draw on points destroyed.':byHp?`Time: ${sideName(w)} wins with more health left (${hp(w)} to ${hp(1-w)}).`:`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
 function endPhase(){G.phase='end';G.step=4;G.inCombat=false;for(const s of alive())if(s.flags.doomed&&hullDmg(s)>=s.hull)destroy(s,`${sname(s)} finally breaks apart.`);if(checkWin()){refresh();return}
   for(const s of alive()){if(!exKeepFocus(s))s.focus=0;else if(s.focus)mark('kite');s.evade=0;s.flags.juke=false;s.flags.dead=false;s.flags.allin=false;s.flags.psT=null}// [R13] unused focus/evade tokens are removed; target locks stay
   exEndPhase(()=>{G.phase='end';if(!checkWin()){lg(-1,`End of round ${G.round}.`);if(ANIM)setTimeout(()=>{if(G&&!G.winner)startRound()},AIDELAY*.8);else startRound()}refresh()})}

@@ -1,8 +1,8 @@
 // ---------- interface ----------
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'normal',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
-try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'normal',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
+Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'easy',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
+try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'easy',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
 function saveSetup(){try{localStorage.setItem('na_setup',JSON.stringify({lvl:UI.lvl,size:UI.size,fac:UI.fac,ex:UI.ex}))}catch(e){}}
 function announce(t){const el=$('live');if(el)el.textContent=t}
 // which human side is planning right now (hot-seat hides the other side's dials behind a pass screen)
@@ -267,7 +267,7 @@ function startGame(mode,sortie){try{boot3D()}catch(e){}if(typeof NET!=='undefine
   const squads=customSquads();
   if(sortie!=null&&SORTIES[sortie]){const so=SORTIES[sortie];UI.mode='solo';
     newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{})});G.sortie=sortie}
-  else{const first=mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads;newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex),close:first});if(first)G.sortie=0}
+  else{const first=mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads;newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads:first?FIRST_GAME.sq.map(q=>q.map(e=>({p:e.p,u:e.u.slice()}))):squads,ex:Object.assign({},UI.ex,first?FIRST_GAME.ex:{}),close:first});if(first){G.sortie=0;lg(-1,'Time limit: 8 rounds. Then more points destroyed wins, or more health left.')}}
   resetGuide();if(bothHuman())UI.pass=0;camView('tilt');render()}
 // the squads built in the squad builder (battle size "custom"), checked; null = use the battle size's squads
 function customSquads(){const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
