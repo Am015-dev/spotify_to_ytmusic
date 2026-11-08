@@ -223,6 +223,7 @@ function goalCard(inStory) {
     h('ul', h('li', 'Axis: both dice close, or the plane tilts. Tilt 3 crashes.'),
       h('li', 'Engines: your two dice add up. Fast enough moves you closer.'),
       h('li', 'Spare dice: clear planes, gear, flaps, brakes.'), h('li', 'The checklist shows what is left.')),
+    (ap => ap ? h('p.fwx', wxImg('wx-' + ap.wx, ap.wx), wxImg('time-' + ap.tod, ap.tod), ap.name + ': ' + ap.wx + ', ' + ap.tod + '.') : null)(D.airports[scenOf().ap]),
     mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
 }
 function goalShow() {
@@ -269,7 +270,7 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     '@media (min-width:1024px){#pz .slot .sword,.ck .cw{font-size:16px}}' +
     '.fa-skip{position:fixed;right:10px;bottom:calc(var(--fa-skipb,150px));z-index:9981;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #fff;background:#1b2230;color:#fff;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.45)}html:not(.ph) .fa-skip{top:64px;bottom:auto;right:auto;left:16px;font-size:16px}html.ph .fa-skip{top:auto;bottom:auto;top:52px;right:8px;min-height:36px;font-size:14px;padding:0 12px}html.ph body:has(.fa-skip) .fa-coach{top:94px}' +
     'html.ph #pz .slot .pw small,html.ph #pz .slot .pw b,html.ph .tbtn span,html.ph .ttut span,html.ph .gxc-sheet *,html.ph .gxc-head *,html.ph .gxc-path *,html.ph #says *,html.ph .rsbox *,html.ph .fa-ro *,html.ph .gx-drawer *{font-size:max(14px,1em)!important}.gxc-node.locked{pointer-events:none}' +
-    '#barstat{display:none!important}html.ph #fprev{display:none!important}' +
+    '.fwx{display:flex;align-items:center;gap:6px;margin:6px 0 0}.fwx .wxi{width:28px;height:28px}#barstat{display:none!important}html.ph #fprev{display:none!important}' +
     '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
     '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
     '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +
