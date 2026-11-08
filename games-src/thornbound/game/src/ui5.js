@@ -89,13 +89,13 @@ function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slic
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
+   (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Hints</span>'+seg('gdset',UI.guide,[['full','On'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button><button class="btn" data-a="music">Pick the songs…</button></div>'+
    (()=>{let c='default';try{c=localStorage.getItem('tb_back')==='court'?'court':'default'}catch(e){}const st=GXC&&GXC.unlocked?GXC.unlocked().some(x=>x.type==='cardback'):false;return '<div class="mrow"><span>Card back</span><button class="btn" data-a="cback" data-v="default" aria-pressed="'+(c==='default')+'">Thorn crown</button><button class="btn" data-a="cback" data-v="court" aria-pressed="'+(c==='court')+'">Crowned stag</button>'+(st?'<span class="small">An unlocked story back is used while you have one.</span>':'')+'</div>'})()+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
-   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original: pictures painted by Am015-dev, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Music by Am015-dev.</p>'}
+   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original. Pictures painted by Am015-dev, plus procedural drawings. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo). Licence: SIL Open Font License 1.1. The game rules follow a published game family. Every name and text here is our own wording. Music by Am015-dev.</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
   const P=UI.V.pl[s];let h=popRival(s).replace(/^<div class="pp-h">.*?<\/div><div class="pp-b[^"]*">/,'<div>');h=h.replace(/<\/div>$/,'');
   h+='<h5>Site of Power</h5><div class="piles">'+P.site.map(id=>'<div class="sitec"><button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1">'+cardEl(id,64).outerHTML+'</button><small>cost '+cinfo(id).cost+'</small></div>').join('')+'</div>';
@@ -110,7 +110,7 @@ const RULES_HTML=()=>`<div class="rules">
 <li><b>Clash:</b> cards flip. The highest total in a region wins it.</li>
 <li><b>Autumn, Winter:</b> optional Govern or Journey, then a new round.</li></ol>
 <p><b>Goal:</b> hold the most <b>Influence</b> when the last round ends. Ties go to the Favour holder.</p>
-<p><b>Simplified on purpose:</b> starting hand is 6; the solo mode and the optional advanced setup of the board game are not built.</p>
+<p><b>Simplified on purpose:</b> Your starting hand is 6 cards.</p>
 <p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>

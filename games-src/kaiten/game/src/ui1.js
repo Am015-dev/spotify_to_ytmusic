@@ -53,6 +53,8 @@ const backN = w => artNode('b|' + w, () => KIT.backSVG({ w }));
 const plateS = (type, d, on) => cached('p|' + type + '|' + d + '|' + (on || ''), () => KIT.plateSVG(type, on ? { d, on } : { d }));
 const avatarC = (c, size) => cached('a|' + c + '|' + size, () => KIT.avatarSVG(c % 5, { size }));
 const avatarS = (i, size) => avatarC(chefOf(i), size);
+// the painted portrait of chef c (media/camp-<name>.webp) inside el; el keeps the drawn avatar until the picture has loaded
+function campPic(el, c) { const im = new Image(); im.alt = ''; im.className = 'campp'; im.decoding = 'async'; im.onload = () => { el.replaceChildren(im); }; im.src = 'media/camp-' + PN[c % 5].toLowerCase() + '.webp'; return el; }
 const iconS = (name, size, type) => cached('i|' + name + '|' + size + '|' + (type || ''), () => KIT.iconSVG(name, type ? { size, type } : { size }));
 const counterURL = s => { const seat = chefOf(s); return KIT.ART.counter ? 'linear-gradient(180deg,rgba(42,18,12,.16),rgba(42,18,12,0) 22%),linear-gradient(0deg,' + KIT.PLAYERS[seat % 5].c + ' 6px,transparent 6px),url("' + KIT.ART.counter + '") 0 0/auto 170% repeat-x' : cached('c|' + seat, () => 'url("' + KIT.dataURL(KIT.counterSVG({ w: 360, h: 120, seat, standalone: true }).replace('<svg ', '<svg preserveAspectRatio="none" ')) + '") center/100% 100%'); };
 function cardNode(type, w, on) { return KIT.cardEl(type, on ? { w, variant: 'nigiri', on } : { w }); }

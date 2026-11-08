@@ -68,7 +68,7 @@ function previewHTML(P,title){if(!P)return '';const me=vs();let h='<div class="p
   for(const d of P.dead)h+='<p class="pv-n warn">'+ico('eye')+'<span>At Night: '+gloss(plain(d.t))+'.</span></p>';
   for(const d of P.saved)h+='<p class="pv-n">'+ico('eye')+'<span>'+gloss(plain(TB.cardName(G,d.id)+' is Invulnerable: it survives the Night'))+'.</span></p>';
   if(P.hidden)h+='<p class="pv-n">'+P.hidden+' face-down card'+(P.hidden>1?'s':'')+' added by Ambush will be revealed before the Night.</p>';
-  if(P.watcher)h+='<p class="pv-n">'+gloss('A Rite of the Watcher is in this Clash: the lowest Strength above 0 wins.')+'</p>';
+  if(P.watcher)h+='<p class="pv-n">'+gloss('A Rite of the Watcher is in this Clash. The lowest Strength above 0 wins.')+'</p>';
   const w=P.win;h+='<p class="pv-r">'+(w.length>1?'As it stands: a tie.':w[0]===me?'As it stands: <b>you win</b> this Clash.':'As it stands: <b>'+esc(sideName(w[0]))+'</b> wins this Clash.')+(G.q&&G.q.t==='menu'?' Rivals may still act.':'')+'</p>';
   return h+'</div>'}
 function outcome(P,me){if(!P)return 0;return P.win.length===1?(P.win[0]===me?2:0):(P.win.includes(me)?1:0)}
@@ -84,19 +84,19 @@ function advise(s,mv){if(!G||!G.q||!mv||!mv.length)return null;const q=G.q,k=q.k
   const coach=typeof coachRec==='function'?coachRec(s,mv):null;if(coach)return {m:coach,why:whyFor(s,coach)};
   if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?adviseDay(s,mv):adviseMenu(s,mv,ph)}
   if(k==='occupier'){const ids=mv.filter(m=>m.id!=null).map(m=>m.id);if(!ids.length)return null;const sc=id=>{const i=cinfo(id);return i.strength*10+i.votes+i.lore};const w=ids.slice().sort((a,b)=>sc(a)-sc(b))[0];const m=mv.find(x=>x.id===w);
-    return {m,why:cinfo(w).name+' ('+cinfo(w).strength+') is your weakest card: a card under a Kingdom Card cannot fight. (A stronger one would make the Kingdom Card harder to steal.)'}}
+    return {m,why:cinfo(w).name+' ('+cinfo(w).strength+') is your weakest card. A card under a Kingdom Card cannot fight. (A stronger one would make the Kingdom Card harder to steal.)'}}
   if(k==='slot'||k==='order'||k==='applause'||k==='discardDown'||k==='discardPick')return null;
   if(k==='clashOrder')return adviseOrder(s,mv);
   const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return why?{m,why}:null}
 function reasonFor(s,m){const q=G.q,k=q.kind;
   if(['bid','herald','place','tie','bidRes','location'].includes(k))return whyFor(s,m);
-  if(k==='siteBuy'){if(m.t==='seldone')return 'Keep your Lore: '+(q.chosen&&q.chosen.length?'you have bought enough for now.':'nothing here is worth it yet.');const i=cinfo(m.v);return i.kind==='hq'?i.name+' is an HQ: a permanent power that stays in front of you (it never goes to your hand). '+lcFirst(i.text)+'.':i.name+' goes to your hand: Strength '+i.strength+(i.text?', and '+lcFirst(i.text):'')+'.'}
-  if(k==='castle'||k==='wilderness'){if(m.skip)return 'Keep the card: it is worth more in your hand than this bonus.';return whyFor(s,m)}
-  if(k==='harvest')return m.yes?'The Favour lets you use '+DD.FAVOUR[G.pl[s].fac].nm+' up to three times, and it breaks a tie at the end.':'';
+  if(k==='siteBuy'){if(m.t==='seldone')return 'Keep your Lore: '+(q.chosen&&q.chosen.length?'you have bought enough for now.':'nothing here is worth it yet.');const i=cinfo(m.v);return i.kind==='hq'?i.name+' is an HQ. It is a permanent power in front of you. It never goes to your hand. '+lcFirst(i.text)+'.':i.name+' goes to your hand: Strength '+i.strength+(i.text?', and '+lcFirst(i.text):'')+'.'}
+  if(k==='castle'||k==='wilderness'){if(m.skip)return 'Keep the card. It is worth more in your hand than this bonus.';return whyFor(s,m)}
+  if(k==='harvest')return m.yes?'The Favour lets you use '+DD.FAVOUR[G.pl[s].fac].nm+' up to three times. It also breaks a tie at the end.':'';
   if(k==='helm')return m.yes?'Your eliminated card comes back to your hand instead of staying lost.':'';
   if(k==='placeLoc')return 'Whenever anyone claims '+LOCN[m.loc]+', you gain 1 Influence.';
-  if(k==='flank'){const r=m.r;return 'The card moves to '+REG[r]+', which has not fought yet; it adds its Strength there.'}
-  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') comes back to your hand instead of going to the discard pile in Winter.'}
+  if(k==='flank'){const r=m.r;return 'The card moves to '+REG[r]+'. It has not fought yet. Its Strength still counts there.'}
+  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') returns to your hand in Winter, not the discard pile.'}
   if(q.t==='sel'&&(k==='shrine'||k==='ossuary')&&m.t==='seldone')return 'Keep your cards: nothing here needs to go.';
   if(k==='councilOut')return m.to==='hand'?'Back in your hand, the card can fight again next round.':'';
   return ''}   // not sure: no suggestion
@@ -104,11 +104,11 @@ function adviseOrder(s,mv){const me=s,V=UI.V;const known=r=>{let t=0;for(const i
   const rs=[0,1,2].sort((a,b)=>known(b)-known(a));const m=mv.find(x=>x.order&&x.order.join()===rs.join());if(!m)return null;
   return {m,why:'Your strongest region fights first ('+rs.map(r=>REG[r].replace('The ','')+' '+known(r)).join(', then ')+'), so a win there comes before rivals can move cards.'}}
 function tacUses(seat,id){const i=DD.TACTICS[G.pl[seat].fac].findIndex(t=>t.id===id);if(i<0)return '';const def=DD.TACTICS[G.pl[seat].fac][i],t=G.pl[seat].tac[i];return def.mk>0?t.mk+' use'+(t.mk===1?'':'s')+' left, once a round':'once per game'}
-const CPLAIN={relics:'when you claim your Herald Reward you may cash in your cards here for Influence equal to their votes.',secrets:'in Autumn you place markers on locations; four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote (one more if you have the most votes there).'};
+const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get Influence equal to their votes.',secrets:'in Autumn you place markers on locations. Four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote. Get one more for the most votes there.'};
 function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a)))return null;const a=m.a||'';
   // the last Autumn: only Influence still counts
   if(ph==='Autumn'&&G.round>=G.rounds&&m.t==='act'&&!/Influence/.test(m.label||'')&&!(a==='journey'&&!G.pl[s].site.length)){const d=mv.find(x=>x.t==='done');const inf=mv.find(x=>x.t==='act'&&/Influence/.test(x.label||'')&&taught(actKind(x.a)));
-    if(inf)return {m:inf,why:'This is the last round: only Influence counts now. '+actWhy(s,inf)};return d?{m:d,why:'This is the last round: only Influence counts now, and nothing here gives Influence.'}:null}
+    if(inf)return {m:inf,why:'This is the last round: only Influence counts now. '+actWhy(s,inf)};return d?{m:d,why:'This is the last round. Only Influence counts now, and nothing here gives Influence.'}:null}
   if(m.t==='done')return {m,why:ph==='Spring'?'Nothing here is worth spending this round.':'Nothing here gains you more than it costs.'};
   if(a==='supp'){const r=m.p.r,n=m.p.n;const mine=UI.V.reg[r].down.filter(id=>id>=0&&ownerOf(id)===s).map(id=>cinfo(id).strength);
     return {m,why:'Send '+n+' Supporter'+(n>1?'s':'')+' to '+REG[r]+': +'+n+' Strength in its first Clash'+(mine.length?' (your hidden card there has Strength '+mine.join('+')+')':'')+'. Supporters on the map go to the Lost Pile in Winter.'}}
@@ -118,27 +118,27 @@ function actWhy(s,m){const a=m.a||'',L=(m.label||'').replace(/^[^:]*:\s*/,'');
   if(a.startsWith('fav:'))return 'Your Favour ('+(G.fav.h===s?G.fav.u+' uses left':'')+'): '+lcFirst(L)+'.';
   if(a==='journey'){const id=m.p.id,l=cinfo(id).lore,P=G.pl[s];const mn=P.site.length?Math.min(...P.site.map(x=>cinfo(x).cost)):0;return '+'+l+' Lore (you would have '+(P.lore+l)+')'+(P.site.length?'; your cheapest Site of Power card costs '+mn+'.':'.')}
   if(a==='govern'){const c=m.p.c;return cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes>1?'s':'')+' into the '+DD.COUNCIL_NAMES[c]+': '+CPLAIN[c]}
-  if(a==='cmd:rally')return 'Rally: the card goes back to your hand instead of the discard pile in Winter.';
-  if(a==='cmd:deploy')return 'Deploy: the card stays on the map through Winter and fights there next round.';
+  if(a==='cmd:rally')return 'Rally: in Winter the card returns to hand, not the discard pile.';
+  if(a==='cmd:deploy')return 'Deploy: the card stays on the map through Winter. It fights there next round.';
   if(a==='council:oaths')return 'Council of Pledges: Supporters come back to your board for next round.';
   return lcFirst(L)?L.replace(/^./,c=>c.toUpperCase()).replace(/\.?$/,'.'):''}
 function adviseDay(s,mv){const me=s;const P0=preview();if(!P0)return null;const o0=outcome(P0,me);const done=mv.find(m=>m.t==='done');
   const vsTxt=P=>youFirst(Object.keys(P.tot).map(Number)).map(x=>(x===me?'you ':sideName(x)+' ')+P.tot[x]).join(' vs ');
-  if(o0===2)return done?{m:done,why:'You win this Clash as it stands ('+vsTxt(P0)+'), so keep your powers for later.'}:null;
+  if(o0===2)return done?{m:done,why:'You win this Clash as it stands ('+vsTxt(P0)+'). Keep your powers for later.'}:null;
   const acts=visibleActs(mv).filter(m=>m.t==='act');let best=null;
   for(const m of acts){if(/^fav:/.test(m.a)&&G.pl[me].fac==='clans')continue;const r=simDay(m);if(!r)continue;const o=outcome(r.P,me);if(o<=o0)continue;
     const cost=/discard|Discard/.test(m.label)?1:0;const sc=o*100-cost*5+(r.P.tot[me]||0)/100;if(!best||sc>best.sc)best={sc,m,P:r.P,sub:r.sub}}
   if(best){const name=(best.m.label||'').replace(/:.*$/,'');return {m:best.m,why:name+' changes this Clash: '+vsTxt(P0)+' now, '+vsTxt(best.P)+' after it'+(outcome(best.P,me)===2?' (you would win)':' (a tie)')+(best.sub&&best.sub.label?' ('+best.sub.label.replace(/^Move to /,'move to ')+')':'')+'.',P:best.P}}
   const dead=P0.dead.filter(d=>ownerOf(d.id)===me);
-  const ret=acts.find(m=>m.a==='cmd:retreat');if(ret&&dead.length)return {m:ret,why:'You lose this Clash as it stands ('+vsTxt(P0)+') and '+TB.cardName(G,dead[0].id)+' would be eliminated: Retreat takes cards back to your hand.'};
-  const fl=acts.find(m=>m.a==='cmd:flank'||m.a==='t:cln_t2');if(fl&&o0===0&&[0,1,2].some(r=>r!==G.clash.r&&!G.reg[r].done))return {m:fl,why:'You cannot win here ('+vsTxt(P0)+'): Flank moves the card to a region that has not fought yet, where it still counts.'};
+  const ret=acts.find(m=>m.a==='cmd:retreat');if(ret&&dead.length)return {m:ret,why:'You lose this Clash as it stands ('+vsTxt(P0)+').'+' '+TB.cardName(G,dead[0].id)+' would be eliminated. Retreat takes cards back to your hand.'};
+  const fl=acts.find(m=>m.a==='cmd:flank'||m.a==='t:cln_t2');if(fl&&o0===0&&[0,1,2].some(r=>r!==G.clash.r&&!G.reg[r].done))return {m:fl,why:'You cannot win here ('+vsTxt(P0)+'). Flank moves the card to a region yet to fight. It still counts there.'};
   return done?{m:done,why:'Nothing you can do here changes the result ('+vsTxt(P0)+').',P:P0}:null}
 // ---------------------------------------------------------------- confirm sheet: anything that resolves at once and can hurt shows "your N vs their M" first
 function stealPreview(s,m){const P=G.pl[s],V=G.pl[m.s2],T=V.ks[m.j];if(!T)return '';const bid=G.bstr[s],crew=G.pl[s].ks.some(x=>x&&x.kc===9)?3:0;const theirs=cinfo(T.occ).strength+(V.ks.some(x=>x&&x.kc===5)?5:0);
   const zero=P.bid!=null&&cinfo(P.bid).text&&/treat the Occupying card's Strength as 0/.test(cinfo(P.bid).text);
-  return 'Your bid '+bid+(crew?' + 3 (Cutthroat Crew) = '+(bid+crew):'')+' vs their '+esc(cinfo(T.occ).name)+' '+(zero?'0 (your card ignores it)':theirs)+': you take '+esc(TB.kingdomInfo(T.kc).name)+'. Their '+esc(cinfo(T.occ).name)+' goes back to their hand, and your bid card is tucked under it.'}
+  return 'Your bid '+bid+(crew?' + 3 (Cutthroat Crew) = '+(bid+crew):'')+' vs their '+esc(cinfo(T.occ).name)+' '+(zero?'0 (your card ignores it)':theirs)+': you take '+esc(TB.kingdomInfo(T.kc).name)+'. Their '+esc(cinfo(T.occ).name)+' goes back to their hand. Your bid card is tucked under it.'}
 function confirmHTML(k){const s=viewSeatForQ();if(s==null)return '';const m=legal(s).find(x=>x.k===k);if(!m)return '';let body='';
   if(m.t==='steal')body='<p class="cf-p">'+stealPreview(s,m)+'</p>';
-  else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders (a Tactic, once per game): take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand; you tuck a card from your hand under it.')+'</p>'}
+  else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders is a Tactic, once per game. Take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand. You tuck a card from your hand under it.')+'</p>'}
   else body='<p class="cf-p">'+esc(m.label)+'</p>';
   return popShell('Before you do it','<div class="cf">'+body+'<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(k)+'">'+esc(m.t==='steal'?'Steal it':'Do it')+'</button><button class="btn" data-a="pclose">Not now</button></div></div>','cf-b')}
