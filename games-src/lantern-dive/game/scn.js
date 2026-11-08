@@ -11,7 +11,7 @@
   function table(seed) {
     try { GXH.setEnabled(false); } catch (e) { }
     try { GX.close(); } catch (e) { }
-    UI.seed = seed; newGame('vs'); try { UI.coach.level = 'off'; } catch (e) { }
+    UI.seed = seed; newGame('vs', { noGoal: 1 }); try { UI.coach.level = 'off'; } catch (e) { }
     try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     render();
     return GXS.wait(function () { return UI.started && G.phase === 'assign' && $('#pool .jcard') && $('#hand .card, #hand > *') && !UI.busy && !UI.cards.length; }, 12000).then(function () { return idle(1200); });

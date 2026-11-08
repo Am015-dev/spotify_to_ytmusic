@@ -131,8 +131,11 @@ function coachBegin(pro, first) {
   clearInterval(COACH.iv); clearTimeout(COACH.tm);
   Object.assign(COACH, { q: [], cur: null, seen: {}, on: true, pro, first, rounds: {}, poorN: 0, pick: null });
   Object.assign(window.GXCOACH, { running: true, explained: [], later: [], done: false });
+  goalCard(() => setTimeout(coachPump, 250));   // ui10: the Goal card is the first screen; Suzu waits for it
   COACH.iv = setInterval(coachPoll, 450); coachSay('intro');
 }
+// the shared tutor kit's running()/state() also report the coached game, so audits see Learn to play as running (free choices, no steps)
+if (typeof GXT !== 'undefined') { const r0 = GXT.running, s0 = GXT.state; GXT.running = () => r0() || coachOn(); GXT.state = () => (!r0() && coachOn() ? { active: true, phase: 'end', coached: true } : s0()); }
 function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
 function coachSay(id, n) {
   if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
@@ -140,12 +143,14 @@ function coachSay(id, n) {
 }
 function rivalName() { return G ? pname(1) : 'Odile'; }
 function coachPump() {
-  if (COACH.cur || !COACH.q.length) return; const m = COACH.q.shift(); COACH.cur = m;
+  if (COACH.cur || !COACH.q.length || goalOpen() || !G || G.phase === 'over') return;
+  if (document.querySelector('.gx-drawer.on') || UI.rsOpen || UI.busy || (G.phase === 'pick' && !canPick())) { clearTimeout(COACH.wt); COACH.wt = setTimeout(coachPump, 600); return; }   // wait: a drawer or the reveal would hide the bubble at once; speak when it is your move
+  const m = COACH.q.shift(); COACH.cur = m;
   let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
   const who = m.w === 'o' ? { name: pname(1), color: '#e0a31c', portrait: 'camp-odile.webp' } : null;
   const kx = h('button.kx', { type: 'button', 'aria-label': 'Dismiss' }, '\u00d7'); kx.addEventListener('click', () => coachNext());
   g.replaceChildren(portraitEl(who, 40), h('div.kgt', h('b', (who || KK.STORY.guide).name), h('span', m.t)), kx); g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
-  clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(5200, m.t.length * 75));
+  clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(5200, 5200 + Math.ceil(m.t.split(/\s+/).length / 10) * 1000));   // 4 s + 1 s per 10 words, plus the fade
 }
 function coachNext() { clearTimeout(COACH.tm); COACH.cur = null; const g = $('#kkguide'); if (g) g.classList.remove('on'); setTimeout(coachPump, 350); }
 // situations: checked every ~0.5 s while nobody is mid-animation

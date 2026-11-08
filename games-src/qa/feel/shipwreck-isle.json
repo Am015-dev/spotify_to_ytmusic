@@ -1,507 +1,81 @@
 {
  "slug": "shipwreck-isle",
- "when": "2026-11-08T02:34Z",
- "secs": 30,
- "totalSecs": 136,
+ "when": "2026-11-08T04:14Z",
+ "secs": 120,
+ "totalSecs": 482,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 20,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Cook Our ship is gone. Light a fire and stack 15 wood by day 12: a ship will see it. Pick a pawn, then a glowing place. ✕",
-     "words": 28,
-     "shownMs": 6078,
-     "neededMs": 6800,
-     "cls": "coachb"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 1 (eat 2) 🪵 Wood 0 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 3718,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 800,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 1 (eat 2) 🪵 Wood 0 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Morale moves our determination each morning. "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Day 1 of 12 🍖 Food 2 (eat 2) 🪵 Wood 1 ♥ Life 13 ",
-      "Cook Our ship is gone. Light a fire and stack 15 w"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
-   "status": "FAIL",
-   "count": 3,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Day 1 of 12 🍖 Food 0 (eat 2) 🪵 Wood 0 ♥ Life 13 No shelter",
-     "ms": 13439,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Day 1 of 12 🍖 Food 1 (eat 2) 🪵 Wood 1 ♥ Life 13 No shelter",
-     "ms": 11417,
-     "cls": "",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Day 1 of 12 🍖 Food 0 (eat 2) 🪵 Wood 0 ♥ Life 13 No shelter",
-     "ms": 23723,
-     "cls": "",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 2,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Light a fire and stack 15 wood by day 12: a ship will see it.",
-     "words": 15,
-     "at": 21976,
-     "where": "span.ct"
-    },
-    {
-     "session": "pc/learn",
-     "text": "Light a fire and stack 15 wood by day 12: a ship will see it.",
-     "words": 15,
-     "at": 35075,
-     "where": "span.ct"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 29,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "3",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Unknown",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pt.unk"
-    },
-    {
-     "session": "phone/learn",
-     "text": "7",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "8",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Camp",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pt"
-    },
-    {
-     "session": "phone/learn",
-     "text": "12",
-     "px": 13,
-     "at": 11121,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "of 12",
-     "px": 13,
-     "at": 11121,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "(eat 2)",
-     "px": 13,
-     "at": 11121,
-     "where": "small."
-    },
-    {
-     "session": "phone/learn",
-     "text": "The island’s turn: morale",
-     "px": 13,
-     "at": 11121,
-     "where": "small.bfb.isl"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Your turn: plan the day",
-     "px": 13,
-     "at": 15636,
-     "where": "small.bfb.you"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Carpenter",
-     "px": 13,
-     "at": 15636,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "2",
-     "px": 13,
-     "at": 15636,
-     "where": "sub."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Cook",
-     "px": 13,
-     "at": 15636,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Friday",
-     "px": 13,
-     "at": 15636,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/play",
-     "text": "of 12",
-     "px": 13,
-     "at": 5838,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "(eat 2)",
-     "px": 13,
-     "at": 5838,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "A new day",
-     "px": 13,
-     "at": 5839,
-     "where": "small.bfb.isl"
-    },
-    {
-     "session": "phone/play",
-     "text": "3",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/play",
-     "text": "Unknown",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pt.unk"
-    },
-    {
-     "session": "phone/play",
-     "text": "7",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/play",
-     "text": "8",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/play",
-     "text": "Camp",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pt"
-    },
-    {
-     "session": "phone/play",
-     "text": "12",
-     "px": 13,
-     "at": 14387,
-     "where": "s.pn"
-    },
-    {
-     "session": "phone/play",
-     "text": "The island’s turn: morale",
-     "px": 13,
-     "at": 18572,
-     "where": "small.bfb.isl"
-    },
-    {
-     "session": "phone/play",
-     "text": "Carpenter",
-     "px": 13,
-     "at": 21348,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/play",
-     "text": "2",
-     "px": 13,
-     "at": 21349,
-     "where": "sub."
-    },
-    {
-     "session": "phone/play",
-     "text": "Cook",
-     "px": 13,
-     "at": 21349,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/play",
-     "text": "Friday",
-     "px": 13,
-     "at": 21349,
-     "where": "em.bfpn"
-    },
-    {
-     "session": "phone/play",
-     "text": "Your turn: plan the day",
-     "px": 13,
-     "at": 22520,
-     "where": "small.bfb.you"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
-   "status": "N/A",
+   "status": "PASS",
    "count": 0,
    "detail": []
   }
  },
- "notes": [
-  "phone/learn: Learn to play not found",
-  "pc/learn: Learn to play not found",
-  "(e) <10 turns reached: phone/learn=5 phone/play=9 pc/learn=0 pc/play=3"
- ],
+ "notes": [],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 31,
-   "turns": 5,
-   "clicks": 10,
+   "secs": 120,
+   "turns": 24,
+   "clicks": 181,
    "endedBy": "time",
-   "tutorialEnded": null,
-   "hintsOff": true,
-   "messagesSeen": 4
-  },
-  {
-   "size": "phone",
-   "mode": "play",
-   "secs": 31,
-   "turns": 9,
-   "clicks": 17,
-   "endedBy": "time",
-   "tutorialEnded": null,
+   "tutorialEnded": 8,
    "hintsOff": true,
    "messagesSeen": 2
   },
   {
-   "size": "pc",
-   "mode": "learn",
-   "secs": 41,
-   "turns": 0,
-   "clicks": 0,
+   "size": "phone",
+   "mode": "play",
+   "secs": 121,
+   "turns": 37,
+   "clicks": 198,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 4
+   "messagesSeen": 0
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 121,
+   "turns": 28,
+   "clicks": 110,
+   "endedBy": "time",
+   "tutorialEnded": 13,
+   "hintsOff": true,
+   "messagesSeen": 3
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 34,
-   "turns": 3,
-   "clicks": 3,
+   "secs": 121,
+   "turns": 26,
+   "clicks": 124,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 1
+   "messagesSeen": 0
   }
  ]
 }

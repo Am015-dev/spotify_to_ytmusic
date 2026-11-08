@@ -187,7 +187,7 @@
     if (m.t === 'beat') { var z = G.sites[m.s], gd = V.GUARD[z.guard]; pay(p, gd.cost); p.guards.push({ id: z.guard, used: false }); log(G, s, nm(G, s) + ' overcomes ' + gd.name + '! +' + V.GUARD_VP + ' points and a boon.', { k: 'beat', site: m.s, guard: z.guard }); z.guard = null; endTurn(G); return { ok: true }; }
     if (m.t === 'buy') {
       var bid = G.row[m.r], bc = card(bid); pay(p, cardCost(bid)); G.row[m.r] = null; refillRow(G);
-      if (bc.t === 'item') { p.deck.push(bid); log(G, s, nm(G, s) + ' buys ' + bc.name + ' (to the bottom of the deck).', { k: 'buy', card: bid }); endTurn(G); }
+      if (bc.t === 'item') { p.deck.push(bid); log(G, s, nm(G, s) + ' buys ' + bc.name + ' (under the deck).', { k: 'buy', card: bid }); endTurn(G); }
       else { p.play.push(bid); log(G, s, nm(G, s) + ' takes the artifact ' + bc.name + ' and uses it at once.', { k: 'buy', card: bid }); runOps(G, s, bc.ops, true); }
       return { ok: true };
     }

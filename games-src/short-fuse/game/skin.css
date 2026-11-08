@@ -188,3 +188,16 @@ div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
 .card2.briefc,.card2.briefc *{pointer-events:auto}
 @media (max-width:1023px){.btn.small,#start small,.btn small,#coach .coz,#coachskip,.tk{font-size:14px!important}}
 .eqk .en,#tb .eqk .en{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-height:1.1em}
+/* W469 feel gate (e): nothing overlaps on a tile or a gear card */
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.24))}
+.tile:has(.nt):not(:has(.coin)) .f{transform:translateY(calc(var(--tw)*.14))}
+.tile .coin{height:calc(var(--tw)*.42);min-width:calc(var(--tw)*.42)}
+.eqk.locked .en,#tb .eqk.locked .en{display:none}
+.say span,.pvb,.tile .nt,#tb .tile .nt{font-size:14px!important}
+.tile .coin,.side .coin{font-size:max(14px,calc(var(--tw)*.3))!important}
+.tile:has(.coin):not(:has(.nt)) .f{transform:translateY(calc(var(--tw)*-.34))}
+details:not([open])>:not(summary){display:none!important}
+@media (max-width:1023px){.eqc .ex,.eqc .es,.eqc .tm,span.tm{font-size:14px!important}}
+.tile:has(.nt):has(.coin) .f{font-size:calc(var(--tw)*.4)}
+@media (max-width:1023px){body :is(.lbl,kbd,.gxt-menu span){font-size:14px!important}}
+@media (max-width:1023px){.mw,.mix,.mix b,.tag,.rule p{font-size:14px!important}.mw{width:auto;min-width:20px;padding:0 2px}}
