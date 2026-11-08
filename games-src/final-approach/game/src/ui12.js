@@ -139,7 +139,7 @@ function fcShow(key, txt, who, ms) {
   x.style.visibility = 'hidden'; setTimeout(() => { x.style.visibility = ''; }, readMs(txt));   // the line gets its reading time before it can be closed
 }
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
-function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
+function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended || (UI.flash && UI.flash.until > Date.now())) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
 const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
 function tutGoal() {
   if (typeof roHide === 'function') roHide();
@@ -173,7 +173,7 @@ function fcLine(m) {
 }
 function fcPoll() {
   const F = UI.fc; if (!F) return; if (!G || !UI.started || !tutGame()) return;
-  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; fcHide(); setTimeout(fcEnd, 1400); } return; }
+  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; const c = F.cur, wait = c ? Math.max(0, c.need - (Date.now() - c.at)) : 0; setTimeout(fcHide, wait); setTimeout(fcEnd, Math.max(1400, wait + 300)); } return; }
   const T = TS(), sl = G.slots, has = re => Object.keys(sl).some(k => re.test(k)), mine = G.phase === 'place' && !G.pend && G.turn === 0;
   // rules, the first time they matter (each said once)
   if (G.phase === 'place' && G.round === 0) { fcSay('seats'); fcSay('goal'); fcSay('turns'); }
