@@ -73,12 +73,17 @@
     opt = opt || {}; var ks = (opt.heroes && opt.heroes.length ? opt.heroes : ['w']).slice(0, 2);
     G = { v: 2, seed: opt.seed == null ? (Math.random() * 1e9) | 0 : opt.seed, uid: 0, q: [], msg: '', hs: [], gold: 99, relics: [], pots: [], pslots: 3, scr: 'map', b: null, rw: null, shop: null, evn: null, rest: null, at: -1, map: [], lucky: 0, revived: 0, floor: 0, wins: 0 };
     G.rs = G.seed | 0; G.pslots = 3 * ks.length;
+    G.asc = Math.max(0, Math.min(13, opt.asc | 0));   // Ascension (optional): 1 potion limit 2 each, 2 lose 5 max HP, 3 start with Regret, 4 smaller heal after an act boss, 5 dearer removal, 6 start at 90% HP. Levels 7-13 are not built.
+    if (G.asc >= 1) G.pslots = 2 * ks.length;
     ks.forEach(function (k) {
       var H = D.H[k], h = { k: k, hp: H.hp, mhp: H.hp, deck: H.start.map(function (id) { return mk(id); }), dead: 0 };
       G.hs.push(h); G.relics.push(H.relic);
     });
+    if (G.asc >= 2) G.hs.forEach(function (h) { h.mhp -= 5; h.hp = h.mhp; });
+    if (G.asc >= 3) G.hs.forEach(function (h) { h.deck.push(mk('regret')); });
+    if (G.asc >= 6) G.hs.forEach(function (h) { h.hp = Math.ceil(h.mhp * 0.9); });
     G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
-    G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; G.acts = Math.max(1, Math.min(3, opt.acts || 1)); G.act = 1;
+    G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; G.acts = opt.acts === 4 ? 4 : Math.max(1, Math.min(3, opt.acts || 1)); /* 4 = the optional Act IV; larger values fall back to the three standard acts */ G.act = 1;
     // final act (act 4, optional): one more climb to the Ember Tyrant after act 3. startAct: a story chapter set in a later act
     if (opt.final && G.acts === 3) G.acts = 4; if (opt.startAct > 1) { G.act = Math.min(4, opt.startAct | 0); G.acts = Math.max(G.acts, G.act); }
     if (G.acts > 1 && !opt.boss) G.boss = D.ACTBOSS[G.act]; G.lastStand = opt.lastStand === 0 ? 0 : 1;
@@ -262,7 +267,11 @@
   }
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
-    var ids = pool[ri(pool.length)];
+    var ids = pool[ri(pool.length)].slice();
+    if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
+      while (ids.length > G.hs.length) ids.pop();
+      for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
+    }
     resetCombat();
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
     G.b.en.forEach(function (e, i) { e.row = i % G.hs.length; });
@@ -463,7 +472,7 @@
     // 3 relics + 3 potions; the first (top-left) of each is one price step (15 gold) cheaper
     pickRelics('cu', 3).forEach(function (r, j) { items.push({ t: 'relic', id: r, p: (D.RELICS[r].rar === 'u' ? 220 : 150) - (j === 0 ? 25 : 0), sold: 0 }); });
     var pk = Object.keys(D.POTIONS); for (var j = 0; j < 3; j++) items.push({ t: 'pot', id: pk[ri(pk.length)], p: 50 - (j === 0 ? 25 : 0), sold: 0 });
-    G.shop = { items: items, rm: 75, removed: 0, remh: [] }; G.scr = 'shop';   // removed = every hero has used their removal; remh = heroes who did
+    G.shop = { items: items, rm: (G.asc >= 5 ? 100 : 75), removed: 0, remh: [] }; G.scr = 'shop';   // removed = every hero has used their removal; remh = heroes who did
   }
   function leaveNode() {
     if (G.at < 0) G.at = G.map.filter(function (n) { return n.f === 1; })[0].id;
@@ -471,7 +480,7 @@
     G.rw = null; G.shop = null; G.evn = null; G.rest = null;
     if (G.map[G.at].t === 'b') {
       if ((G.act || 1) < (G.acts || 1)) {   // next act: full heal, new map and boss, tougher foes
-        G.act++; G.hs.forEach(function (h) { h.hp = h.mhp; }); G.boss = D.ACTBOSS[G.act]; G.fights = 0; genMap(); G.at = -1; G.floor = 0; G.scr = 'map'; return;
+        G.act++; G.hs.forEach(function (h) { h.hp = G.asc >= 4 ? Math.min(h.mhp, h.hp + Math.ceil((h.mhp - h.hp) * 0.75)) : h.mhp; }); G.boss = D.ACTBOSS[G.act]; G.fights = 0; genMap(); G.at = -1; G.floor = 0; G.scr = 'map'; return;
       }
       G.scr = 'over'; G.won = 1; return;
     }
@@ -514,7 +523,7 @@
     else if (G.scr === 'event') {
       if (G.evn.res) m.push({ t: 'leave' });
       else D.EVENTS[G.evn.id].o.forEach(function (o, i) { if (!o.cost || G.gold >= o.cost) m.push({ t: 'opt', i: i }); });
-      if (G.evn.pend) { m.length = 0; G.hs[0].deck.forEach(function (c, i) { if (G.evn.pend === 'rem' || (!c.u && D.CARDS[c.id].ops.length)) m.push({ t: 'evpick', c: i }); }); }
+      if (G.evn.pend) { m.length = 0; G.hs[0].deck.forEach(function (c, i) { if (G.evn.pend === 'rem' || (G.evn.pend === 'xform' && D.CARDS[c.id].hero !== 'z') || (G.evn.pend === 'upg' && !c.u && D.CARDS[c.id].ops.length)) m.push({ t: 'evpick', c: i }); }); }
     }
     return m;
   }
@@ -542,9 +551,9 @@
       case 'opt':
         var ev = D.EVENTS[G.evn.id], o = ev.o[mv.i];
         if (o.roll) { var v = roll(), eff2 = o.roll.length === 3 ? o.roll[v <= 2 ? 0 : v <= 4 ? 1 : 2] : o.roll[v - 1]; applyEff(eff2); G.evn.res = 'Rolled ' + v + '.'; }
-        else { var dd = o.do; if (dd.upg || dd.rem) { applyEff({ hp: dd.hp || 0 }); G.evn.pend = dd.upg ? 'upg' : 'rem'; break; } applyEff(dd); G.evn.res = o.t; }
+        else { var dd = o.do; if (dd.upg || dd.rem || dd.xform) { applyEff({ hp: dd.hp || 0 }); G.evn.pend = dd.upg ? 'upg' : dd.xform ? 'xform' : 'rem'; break; } applyEff(dd); G.evn.res = o.t; }
         break;
-      case 'evpick': if (G.evn.pend === 'upg') G.hs[0].deck[mv.c].u = 1; else G.hs[0].deck.splice(mv.c, 1); G.evn.pend = null; G.evn.res = 'Done.'; break;
+      case 'evpick': if (G.evn.pend === 'upg') G.hs[0].deck[mv.c].u = 1; else if (G.evn.pend === 'xform') { G.hs[0].deck.splice(mv.c, 1); G.hs[0].deck.push(mk(drawReward(G.hs[0].k, 0))); /* transform: remove a non-curse card, gain the top card of the rewards deck */ } else G.hs[0].deck.splice(mv.c, 1); G.evn.pend = null; G.evn.res = 'Done.'; break;
     }
     return true;
   }
