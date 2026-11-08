@@ -1,9 +1,9 @@
 // ---------- Sands of Qamar: components (numbers from the research in ../rules.md; names are original) ----------
 const MNAME={vizier:'Advisor',elder:'Sage',merchant:'Trader',builder:'Mason',assassin:'Shadow',artisan:'Crafter'};
 const MPLUR={vizier:'Advisors',elder:'Sages',merchant:'Traders',builder:'Masons',assassin:'Shadows',artisan:'Crafters'};
-const MHELP={vizier:'Keep them. 1 point each, and 10 more for every rival with fewer Advisors.',elder:'Keep them. 2 points each; spend them to summon djinns.',
-  merchant:'Take that many goods cards from the front of the market row.',builder:'Earn coins: Masons × blue tiles in the 3×3 around the tile (+1 per Mystic you add).',
-  assassin:'Remove one person within that many steps (+1 per Mystic), or one Advisor or Sage kept by a rival.',artisan:'Keep them and draw that many items: keep 1, discard the rest.'};
+const MHELP={vizier:'Keep them. 1 point each, plus 10 per rival you outnumber.',elder:'Keep them. 2 points each; spend them to summon djinns.',
+  merchant:'Take that many goods cards from the front of the market row.',builder:'Earn coins: Masons × nearby blue tiles. Each Mystic adds a Mason.',
+  assassin:'Remove a nearby person or rival Advisor or Sage. Mystics add range.',artisan:'Keep them and draw that many items: keep 1, discard the rest.'};
 const MEEPLE_COUNT={vizier:16,elder:20,merchant:18,builder:18,assassin:18};
 // tiles: k, name, colour (blue counts for Masons), value, count, set
 const TILEDEF={
@@ -16,7 +16,7 @@ const TILEDEF={
   exchange:{n:'Spice Exchange',blue:false,x:'You may pay 4 coins for any 1 face-up goods card.'},
   ravine:{n:'Ravine',blue:false,x:'Impassable. Nothing may ever stand here.',block:1},
   lake:{n:'Great Lake',blue:true,x:'Impassable. Palms and palaces on tiles touching it score double.',block:1},
-  city:{n:'Wonder City',blue:true,x:'A city of wonders: the more of them you hold, the more they are worth (5 / 20 / 45 / 80 / 125).'}};
+  city:{n:'Wonder City',blue:true,x:'Worth more the more you hold: 5 / 20 / 45 / 80 / 125.'}};
 const TILESET=[['village',5,5],['sacred',6,4],['sacred',10,1],['sacred',12,1],['sacred',15,1],['oasis',8,6],['small',6,8],['large',4,4]];
 const TILESET_ART=[['workshop',5,3],['exchange',10,2],['ravine',0,1]];
 const TILESET_WHIM=[['city',5,3,'blue'],['city',5,2,'red'],['lake',0,1]];
@@ -34,7 +34,7 @@ const ITEMS={
   gem5:{n:'Silver Bangle',kind:'precious',vp:5,cp:3,x:'Worth 5 points at the end.'},
   gem7:{n:'Jade Casket',kind:'precious',vp:7,cp:3,x:'Worth 7 points at the end.'},
   gem9:{n:'Sun Diadem',kind:'precious',vp:9,cp:3,x:'Worth 9 points at the end.'},
-  carpet:{n:'Wind Rug',kind:'magic',cp:2,x:'This turn your last person may be dropped on any tile holding its colour, ignoring distance and mountains.'},
+  carpet:{n:'Wind Rug',kind:'magic',cp:2,x:'Your last person may land on any tile of its colour.'},
   lamp:{n:'Brass Lamp',kind:'magic',cp:2,x:'Take one face-up djinn for free.'},
   flute:{n:'Reed Pipe',kind:'magic',cp:2,x:'Before your move, bring up to 5 people from neighbouring tiles onto one tile.'},
   scimitar:{n:'Ember Blade',kind:'magic',cp:1,x:'Remove any 2 people from the board; you claim tiles this empties.'},

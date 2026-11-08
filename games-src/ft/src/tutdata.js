@@ -47,4 +47,4 @@ function tutBuild(){
 function tutNew(){const keep=DEFSEED;setSeed(TUT_SEED);
   try{newGame({np:2,seats:['human','ai'],lv:['normal','normal'],mode:'x',names:['You','Farid'],coach:true})}finally{DEFSEED=keep}
   tutBuild();for(const p of G.pl)p.camels=3;   // three camels each: a coached game is over in a few rounds
-  lg('The coached bazaar opens.','big')}
+  lg('The coached game begins.','big')}
