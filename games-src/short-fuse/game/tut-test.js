@@ -16,10 +16,11 @@ const RULES = [
   ['opening info token', ['token', 'tokens2']],
   ['dual cut: point at a wire, name a value you hold', ['point', 'name']],
   ['correct: both wires cut; one cut per turn', ['hit', 'crew1']],
+  ['twin probe: two wires, one number, once per job', ['probe', 'wrong1b']],
   ['wrong: fuse advances, a token shows the true value', ['wrong1', 'wrong2', 'wrongres']],
   ['equipment unlocks after two cuts, works once', ['hit', 'gear']],
   ['yellow matches only yellow', ['yellow1', 'yellow2']],
-  ['red: never point at it, only-reds reveal', ['red']],
+  ['red: tap it, never point at it, only-reds reveal', ['red', 'win']],
   ['solo cut: you hold every one left', ['solo']],
   ['win together', ['win']],
 ];
