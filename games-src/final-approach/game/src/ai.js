@@ -89,9 +89,10 @@ function expMin(costs, k) {
 }
 function faceCosts(costFn, coffee) { const o = []; for (let v = 1; v <= 6; v++) { let b = 1e9; for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) { const x = costFn(v + c) + Math.abs(c) * 0.12; if (x < b) b = x; } o.push(b); } return o; }
 
-// ---------- last round: can the brakes still be raised to stop a landing speed s? (brakes may be set after the engine dice; judged at round end) ----------
+// ---------- last round: can the brakes still be raised to stop a landing speed s? (brakes only count if set BEFORE the second engine die) ----------
 // returns the probability (1 = already slow enough, 0 = impossible). The pilot sets the brakes; seen from the pilot its own dice are known exactly.
 function brakeFix(S, me, s) {
+  if (S.landBrake >= 0) return FA.slowOk(S, s) ? 1 : 0;   // engines already down: the brake value was frozen then (published timing)
   const br = FA.brakeVal(S); if (br >= 2 && s <= br) return 1;
   if (S.mods.ice || S.autoBrake || !hasBrakes(S)) return 0;
   const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2], need = [];
@@ -319,7 +320,7 @@ function sayCodes(G, seat) {
   const near = V.planes.slice(pos - 1, pos + 1).reduce((s, x) => s + x, 0); if (near > 0) out.push('plane');
   if (Math.abs(V.pl.axis) >= 1) out.push('level');
   const rem = D.rounds - V.row0 - V.round;
-  if (FA.isFinal(V)) { out.push('brakes'); out.push('slow'); }
+  if (FA.isFinal(V)) { if (!V.mods.ice && !V.autoBrake && V.pl.sw.br.some(x => !x)) out.push('brakes'); out.push('slow'); }
   else if (rem <= 3) { if (V.pl.sw.fl.some(x => !x)) out.push('flaps'); if (V.pl.sw.lg.some(x => !x)) out.push('gear'); if (V.pl.sw.br[0] + V.pl.sw.br[1] === 0 && !V.mods.ice) out.push('brakes'); }
   if (V.mods.intern && V.intern.length > rem * 1.5) out.push('trainee');
   if (V.mods.kero || V.mods.leak) if (V.pl.kero < 10) out.push('fuel');

@@ -169,115 +169,118 @@ This file is generated from the test: `node game/logic-test.js --md > RULES-CHEC
 | 103 | R | Last round: a speed EQUAL to the brake value lands (speed 2 with the brakes at 2). |
 | 104 | R | Brake value 4 allows speed up to 4 and no more; speed 5 fails. |
 | 105 | R | Brake value 6 allows speed up to 6 and no more; speed 7 fails. |
-| 106 | R | Brakes are required: with no brake set, even the lowest speed (2) is a loss. |
-| 107 | R | Landing needs ALL landing gear green: with one gear missing the landing fails. |
-| 108 | R | Landing needs ALL flaps green: with one flap missing the landing fails. |
-| 109 | R | Landing needs a level axis: a tilt of 1 at the end of the last round fails the landing. |
-| 110 | R | Landing needs an empty approach track: any plane token left on any space fails the landing. |
-| 111 | R | A plane token on the airport space itself also fails the landing (any space counts). |
-| 112 | R | The landing is judged only at the END of the last round: the round is not decided until all dice are placed (or none remain). |
-| 113 | R | A fully correct landing wins: all conditions true together gives a win and ends the game. |
-| 114 | R | In the last round gear, flaps and brakes can still be set before landing is judged (a die placed in the last round counts). |
-| 115 | R | A tilt of 3 in the last round is a spin, not a failed landing. |
-| 116 | U | The last round engine dice are still mandatory: missing engine dice in the last round is a loss. |
-| 117 | R | After the 7th round ends the game is over: the landing is decided, there is no 8th round. |
+| 106 | R | Timing: the speed is compared with the brakes WHEN THE SECOND ENGINE DIE IS PLACED. Speed 4 with brakes at 2 loses right then; a brake 4 offered afterwards is refused (the flight is over). |
+| 107 | R | Timing: a brake set BEFORE the second engine die counts. One engine die, then brake 4, then the other engine die: speed 4 against brakes 4 lands. |
+| 108 | R | Timing: the brake value is frozen at the second engine die; the landing checklist reports that frozen value, not a later one. |
+| 109 | R | Brakes are required: with no brake set, even the lowest speed (2) is a loss. |
+| 110 | R | Landing needs ALL landing gear green: with one gear missing the landing fails. |
+| 111 | R | Landing needs ALL flaps green: with one flap missing the landing fails. |
+| 112 | R | Landing needs a level axis: a tilt of 1 at the end of the last round fails the landing. |
+| 113 | R | Landing needs an empty approach track: any plane token left on any space fails the landing. |
+| 114 | R | A plane token on the airport space itself also fails the landing (any space counts). |
+| 115 | R | The landing is judged only at the END of the last round: the round is not decided until all dice are placed (or none remain). |
+| 116 | R | A fully correct landing wins: all conditions true together gives a win and ends the game. |
+| 117 | R | In the last round gear, flaps and brakes can still be set before landing is judged (a die placed in the last round counts). |
+| 118 | R | A tilt of 3 in the last round is a spin, not a failed landing. |
+| 119 | U | The last round engine dice are still mandatory: missing engine dice in the last round is a loss. |
+| 120 | R | After the 7th round ends the game is over: the landing is decided, there is no 8th round. |
 
 ## Fuel
 
 | # | Src | Rule |
 |---|---|---|
-| 118 | R | Fuel watch: the marker starts at 20 and the shared fuel space takes a die of any value, burning that many units. |
-| 119 | R | If nobody used the fuel space during a round, the marker drops by 6 at the end of that round. |
-| 120 | R | If the fuel space was used, there is no extra -6 at the end of the round. |
-| 121 | R | Fuel below 0 is a loss; exactly 0 is still alive. |
-| 122 | R | Running dry through the end-of-round -6 also loses (fuel 5 -> -1). |
+| 121 | R | Fuel watch: the marker starts at 20 and the shared fuel space takes a die of any value, burning that many units. |
+| 122 | R | If nobody used the fuel space during a round, the marker drops by 6 at the end of that round. |
+| 123 | R | If the fuel space was used, there is no extra -6 at the end of the round. |
+| 124 | R | Fuel below 0 is a loss; exactly 0 is still alive. |
+| 125 | R | Running dry through the end-of-round -6 also loses (fuel 5 -> -1). |
 
 ## Leak
 
 | # | Src | Rule |
 |---|---|---|
-| 123 | R | Fuel leak: when both engine dice are down, lose the DIFFERENCE of the two dice plus 1 (no fuel space in this variant). |
-| 124 | R | Leak with equal engine dice still costs 1; a leak taking fuel below 0 loses. |
+| 126 | R | Fuel leak: when both engine dice are down, lose the DIFFERENCE of the two dice plus 1 (no fuel space in this variant). |
+| 127 | R | Leak with equal engine dice still costs 1; a leak taking fuel below 0 loses. |
 
 ## Wind
 
 | # | Src | Rule |
 |---|---|---|
-| 125 | R | Tail wind: a 20-position dial starts at position 10 (modifier +3). |
-| 126 | R | Wind modifier table by dial position: 9-11:+3; 7,8,12,13:+2; 6,14:+1; 5,15:0; 4,16:-1; 2,3,17,18:-2; 0,1,19:-3. |
-| 127 | R | After the axis resolves each round, the dial advances by the current axis tilt (and goes backwards for negative tilt). |
-| 128 | R | The dial wraps around at 20 (position 19 + 1 -> 0, position 0 - 1 -> 19), and an unchanged axis still moves the dial by the tilt every round. |
-| 129 | R | The wind modifier is added to the engine sum: at +3 a dice sum of 2 gives speed 5 and advances 1. |
-| 130 | R | The wind modifier also applies in the last round: speed = dice sum + wind modifier compared with the brakes. |
+| 128 | R | Tail wind: a 20-position dial starts at position 10 (modifier +3). |
+| 129 | R | Wind modifier table by dial position: 9-11:+3; 7,8,12,13:+2; 6,14:+1; 5,15:0; 4,16:-1; 2,3,17,18:-2; 0,1,19:-3. |
+| 130 | R | After the axis resolves each round, the dial advances by the current axis tilt (and goes backwards for negative tilt). |
+| 131 | R | The dial wraps around at 20 (position 19 + 1 -> 0, position 0 - 1 -> 19), and an unchanged axis still moves the dial by the tilt every round. |
+| 132 | R | The wind modifier is added to the engine sum: at +3 a dice sum of 2 gives speed 5 and advances 1. |
+| 133 | R | The wind modifier also applies in the last round: speed = dice sum + wind modifier compared with the brakes. |
 
 ## Trainee
 
 | # | Src | Rule |
 |---|---|---|
-| 131 | R | Trainee: six tokens valued 1-6 in a random row; each player has a trainee space of their colour. |
-| 132 | R | The trainee space takes a die of any value EXCEPT the value of the next token in that player's end of the row. |
-| 133 | R | The Pilot takes the token from the left end of the row, the Co-pilot from the right end. |
-| 134 | R | The token taken is placed immediately as a die of its value on any legal free space of the same colour (not concentration, not the trainee spaces); coffee cannot change it. |
-| 135 | U | A token with no legal space goes back to the end of the row it came from and does not count as trained. |
-| 136 | R | All six trainee tokens must be used by the end of the game; otherwise the landing fails. |
+| 134 | R | Trainee: six tokens valued 1-6 in a random row; each player has a trainee space of their colour. |
+| 135 | R | The trainee space takes a die of any value EXCEPT the value of the next token in that player's end of the row. |
+| 136 | R | The Pilot takes the token from the left end of the row, the Co-pilot from the right end. |
+| 137 | R | The token taken is placed immediately as a die of its value on any legal free space of the same colour (not concentration, not the trainee spaces); coffee cannot change it. |
+| 138 | U | A token with no legal space goes back to the end of the row it came from and does not count as trained. |
+| 139 | R | All six trainee tokens must be used by the end of the game; otherwise the landing fails. |
 
 ## Ice
 
 | # | Src | Rule |
 |---|---|---|
-| 137 | R | Icy runway replaces the brakes with four columns valued 2, 3, 4, 5; each has a Pilot-only upper space and a lower space for either player. |
-| 138 | R | Only the NEXT column can be used: column 2 is closed until column 1 is finished. |
-| 139 | R | A column is finished only when both its dice are placed in the same round; then the brake value becomes the column number. |
-| 140 | R | Several columns may be finished in one round, in order (2 then 3). |
-| 141 | U | A lone die in a column is wasted at the end of the round: the column is empty again next round. |
-| 142 | R | All four columns must be finished for the landing; with one column missing the landing fails. |
-| 143 | R | With all four columns done the brake value is 5; speed up to 5 lands, 6 fails. |
-| 144 | R | With only column 1 done the brake value is 2. |
+| 140 | R | Icy runway replaces the brakes with four columns valued 2, 3, 4, 5; each has a Pilot-only upper space and a lower space for either player. |
+| 141 | R | Only the NEXT column can be used: column 2 is closed until column 1 is finished. |
+| 142 | R | A column is finished only when both its dice are placed in the same round; then the brake value becomes the column number. |
+| 143 | R | Several columns may be finished in one round, in order (2 then 3). |
+| 144 | U | A lone die in a column is wasted at the end of the round: the column is empty again next round. |
+| 145 | R | All four columns must be finished for the landing; with one column missing the landing fails. |
+| 146 | R | With all four columns done the brake value is 5; speed up to 5 lands, 6 fails. |
+| 147 | R | With only column 1 done the brake value is 2. |
 
 ## Real-time
 
 | # | Src | Rule |
 |---|---|---|
-| 145 | R | Against the clock: when the timer runs out unplaced dice are ignored; if axis or engine dice are missing the crew loses. |
-| 146 | R | Against the clock: if all four mandatory dice are down when the timer ends, the round ends normally and the game goes on. |
+| 148 | R | Against the clock: when the timer runs out unplaced dice are ignored; if axis or engine dice are missing the crew loses. |
+| 149 | R | Against the clock: if all four mandatory dice are down when the timer ends, the round ends normally and the game goes on. |
 
 ## Abilities
 
 | # | Src | Rule |
 |---|---|---|
-| 147 | R | A scenario names how many ability cards you may take (0 to 2); a setup with unknown, duplicate or too many cards keeps only valid ones up to that count. |
-| 148 | R | Second Look: once per round the first player may reroll one of their dice before placing their first die; not the second player. |
-| 149 | R | Second Look is no longer available once the first player has placed a die. |
-| 150 | R | Flip Side: once per game each player may turn one unplaced die to 7 minus its value, at any time (also off turn); each player only once. |
-| 151 | R | Flip Side is once per GAME, not once per round: the use is remembered into later rounds. |
-| 152 | R | Twin Thrust: equal engine dice earn a reroll token, if one is left in the box. |
-| 153 | R | Twin Thrust gives nothing when the engine dice differ. |
-| 154 | R | Steady Hands: equal axis dice earn a coffee token, if one is left. |
-| 155 | R | Steady Hands gives nothing when the axis dice differ, and never above 3 coffee. |
-| 156 | R | Cross-Check: once per round, once a gear die and a flap die are down, the traffic die is rolled and the Co-pilot places it as an extra action on any empty space of either colour. |
-| 157 | R | Cross-Check happens only once per round. |
-| 158 | R | Hand-Over: once per round either player puts an unplaced die there, the other must too, and the two values are swapped. |
+| 150 | R | A scenario names how many ability cards you may take (0 to 2); a setup with unknown, duplicate or too many cards keeps only valid ones up to that count. |
+| 151 | R | Second Look: once per round the first player may reroll one of their dice before placing their first die; not the second player. |
+| 152 | R | Second Look is no longer available once the first player has placed a die. |
+| 153 | R | Flip Side: once per game each player may turn one unplaced die to 7 minus its value, at any time (also off turn); each player only once. |
+| 154 | R | Flip Side is once per GAME, not once per round: the use is remembered into later rounds. |
+| 155 | R | Twin Thrust: equal engine dice earn a reroll token, if one is left in the box. |
+| 156 | R | Twin Thrust gives nothing when the engine dice differ. |
+| 157 | R | Steady Hands: equal axis dice earn a coffee token, if one is left. |
+| 158 | R | Steady Hands gives nothing when the axis dice differ, and never above 3 coffee. |
+| 159 | R | Cross-Check: once per round, once a gear die and a flap die are down, the traffic die is rolled and the Co-pilot places it as an extra action on any empty space of either colour. |
+| 160 | R | Cross-Check happens only once per round. |
+| 161 | R | Hand-Over: once per round either player puts an unplaced die there, the other must too, and the two values are swapped. |
 
 ## General
 
 | # | Src | Rule |
 |---|---|---|
-| 159 | R | Both players win or lose together: a loss ends the game for both and offers no further moves. |
-| 160 | R | All 21 scenarios of the box exist (6 green, 7 yellow, 5 red, 3 black) and each can be started. |
-| 161 | R | Approach tracks have 5 to 8 spaces and never more than 12 plane tokens at setup. |
-| 162 | R | The engine's own invariant check agrees after a full play of random legal moves for every scenario (no impossible state: coffee 0-3, dice 1-6, tilt within -2..2 while alive). |
+| 162 | R | Both players win or lose together: a loss ends the game for both and offers no further moves. |
+| 163 | R | All 21 scenarios of the box exist (6 green, 7 yellow, 5 red, 3 black) and each can be started. |
+| 164 | R | Approach tracks have 5 to 8 spaces and never more than 12 plane tokens at setup. |
+| 165 | R | The engine's own invariant check agrees after a full play of random legal moves for every scenario (no impossible state: coffee 0-3, dice 1-6, tilt within -2..2 while alive). |
 
 ## Order
 
 | # | Src | Rule |
 |---|---|---|
-| 163 | R | Landing is judged at the end of the last round, so brakes may be set AFTER the engine dice in the same round (engines first, then brake 4 with speed 2 still lands). |
-| 164 | R | Landing is judged at the end of the last round: a speed above the brakes is only a loss once the round is over (a brake placed later can still fix it: speed 4, brake 6 placed after the engines). |
-| 165 | R | A gear die placed before the engine dice raises the blue marker for that round's speed (gear 1 first: speed 5 advances 0). |
-| 166 | R | A gear die placed AFTER the engine dice does not change that round's advance (speed 5 advances 1 this round). |
-| 167 | R | Engine dice placed BEFORE the axis dice use the axis as it still stands: a corridor tab is checked against the old axis. |
-| 168 | R | A radio die placed AFTER the engines is too late for this round's collision (the collision already happened). |
-| 169 | R | A coffee token earned by concentration earlier in the round can be spent later in the same round. |
+| 166 | R | Other placements after the engines still happen in the last round: with speed 2 already within brakes 2, a later brake 4 is legal and the flight lands; the speed check used the brakes at the engine die (2). |
+| 167 | R | A speed above the brakes at the second engine die is lost at once, before the round ends: speed 5 with brakes 4 loses even though a 6 for brake 6 is still in hand. |
+| 168 | R | A gear die placed before the engine dice raises the blue marker for that round's speed (gear 1 first: speed 5 advances 0). |
+| 169 | R | A gear die placed AFTER the engine dice does not change that round's advance (speed 5 advances 1 this round). |
+| 170 | R | Engine dice placed BEFORE the axis dice use the axis as it still stands: a corridor tab is checked against the old axis. |
+| 171 | R | A radio die placed AFTER the engines is too late for this round's collision (the collision already happened). |
+| 172 | R | A coffee token earned by concentration earlier in the round can be spent later in the same round. |
 
 ## Not implemented / out of scope
 

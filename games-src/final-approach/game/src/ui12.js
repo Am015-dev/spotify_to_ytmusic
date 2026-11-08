@@ -68,10 +68,10 @@ function tutSteps() {
     tPlace('brakes', 'Brakes take exactly 2, then 4, then 6, in order.', 2, 3, 'br0'),
     // round 4, 0 ft: the landing
     tRoll('final', 'Landing round: the plane stops moving. Tap Roll.', 3),
-    tPlace('speed', 'Brake 4 next. Landing speed may equal the brakes, not more.', 3, 0, 'br1'),
+    tPlace('speed', 'Brake 4. Speed is checked when the 2nd engine die lands.', 3, 0, 'br1'),
     tPlace('axis', "Match Ravi's 3. We must land with level wings.", 3, 1, 'ax0'),
-    tPlace('speed', "Your 2 plus Ravi's 2 makes speed 4.", 3, 2, 'en0'),
-    tPlace('brakes', 'Brake 6 makes speed 4 safe. Last die, then we land.', 3, 3, 'br2'),
+    tPlace('brakes', 'Brake 6 now. Brakes set after the engines come too late.', 3, 3, 'br2'),
+    tPlace('speed', "Your 2 plus Ravi's 2 is speed 4. Brakes 6: slow enough.", 3, 2, 'en0'),
     { id: 'win', rule: 'win', say: 'Landed! Runway clear, gear, flaps, level wings, slow enough.', target: tq('#pz'), wait: null, ready: () => !!G && !!G.result && !!G.result.win }
   ];
 }
