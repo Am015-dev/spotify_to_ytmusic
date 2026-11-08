@@ -280,3 +280,20 @@ html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!impo
 #bd.pv.tall .pv-board .tile.pv-spec .pv-sw span{display:none}
 #bd.pv.tall .pv-board .pv-sw b,#bd.pv.tall .pv-board .pv-sw span{line-height:1.05}
 #bd.pv.tall .pv-board .tile.t-haven .pv-sw span{display:none!important}
+/* W482 polish: plates at most 2 lines, a small "shared" tag on the clearing, full player names */
+#bd.pv.tall .pv-board .pv-shtag{position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:14px;font-weight:800;line-height:1;padding:2px 6px;border-radius:8px;background:#3f6a2a;color:#fff;z-index:2;white-space:nowrap}
+#bd.pv.tall .pv-board .pv-cell{width:34%}
+#bd.pv.tall .pv-board .pv-tin{max-width:124px}
+#bd.pv.tall .pvch-n{overflow:visible;text-overflow:clip}
+#bd.pv.tall .chips .chip{gap:4px;padding-left:6px;padding-right:6px}
+#bd.pv.tall .pvch-pt{font-size:20px}
+#bd.pv.tall .pv-board-s .pv-cell{width:25%}
+#bd.pv.tall .pv-board-s .tile::before{width:36px;height:36px;border-width:2px}
+#bd.pv.tall .pv-board-s .pv-tin{max-width:92px;padding:1px 3px;margin-top:-5px}
+#bd.pv.tall .pv-board-s .pv-shtag{top:-8px;padding:1px 4px}
+#bd.pv.tall .pv-board .pv-sw b .pv-it{display:inline;white-space:nowrap;font:inherit}
+#bd.pv.tall .pv-board .tile .pv-sw b .pv-it{display:inline!important}
+#bd.pv.tall .pvch-n{font-size:14px}#bd.pv.tall .pvch-pt{font-size:18px;flex:none}#bd.pv.tall .pvch-t{min-width:0}
+#bd.pv.tall .pvch-pt{font-size:17px;margin-left:auto;padding-left:3px}#bd.pv.tall .pvch-star{font-size:14px}
+#bd.pv.tall .chip .pawnw{transform:scale(.85);margin:0 -2px}
+#bd.pv.tall .pvsea b{font-size:14px}

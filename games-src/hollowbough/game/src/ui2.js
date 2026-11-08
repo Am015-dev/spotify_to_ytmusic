@@ -510,6 +510,7 @@ const PV_SPECIAL = {
   forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a place', '+ 1 card', 'copy'],
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
+const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow: play 1 cheaper' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
   if (kind === 'basic') { const o = join(basicItems(i)); if (D.basic[i].shared) o.sub = o.sub ? o.sub + ' · shared' : 'shared'; return o; }
@@ -633,6 +634,13 @@ function pvRender() {
     const e = h('button.tile.t-' + kind + (small ? '.pv-small' : ''), { 'data-zoom': 'tile:' + kind + ':' + i, 'data-k': kind, 'data-i': i, type: 'button', 'aria-label': (info.name || '') + ': ' + w.main + (w.sub ? ', ' + w.sub : '') });
     { const key = kind === 'basic' ? D.basic[i].key : kind === 'forest' ? D.forest[G.forest[i]].key : kind === 'bev' ? D.basicEvents[G.bev[i].k].key : kind === 'sev' ? D.specialEvents[G.sev[i].k].key : kind;
       const ph = key && HBKit.paintedHref ? HBKit.paintedHref(key) : null; if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the place's own painting
+    if (tall && (kind === 'basic' || kind === 'forest' || kind === 'haven')) {   // phone board plate: at most 2 short lines, "shared" as a small tag
+      const fk = kind === 'forest' ? D.forest[G.forest[i]].key : '', sh = /shared/.test(w.sub || '');
+      const short = PV_BOARD[fk] || (kind === 'haven' ? '2 cards for any 1' : [w.main.replace(/ \+ /g, ', '), (w.sub || '').replace(/\s*·?\s*shared/, '')].filter(Boolean).join(', '));
+      const parts = short.split(', '); e.appendChild(h('span.pv-tin', h('span.pv-sw', h('b', parts.length < 2 ? short : parts.flatMap((t, j) => j ? [' ', h('span.pv-it', t + (j < parts.length - 1 ? ',' : ''))] : [h('span.pv-it', t + (parts.length > 1 ? ',' : ''))])))));   // each item stays whole on its line
+      if (sh) e.appendChild(h('span.pv-shtag', 'shared'));
+      if (kind === 'haven' && HBKit.paintedHref) { const ph = HBKit.paintedHref('general_store'); if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the haven has no painting of its own: the trading post card fits it
+    } else
     e.appendChild(h('span.pv-tin', h('span.pv-sico', ic(w.ico, small ? 22 : 26)), h('span.pv-sw', h('b', w.main), w.sub ? h('span', w.sub) : null)));
     const legal = tg && okw.has(tg);
     if (legal) { e.classList.add('glow'); regTg(tg, e); }
@@ -648,8 +656,9 @@ function pvRender() {
   for (let i = 0; i < G.forest.length; i++) cell(tile('forest', i));
   cell(tile('haven', 0));
   // phone: the places are round clearings on the painted tree-stump table (owner art), not a grid of boxes; staggered so it reads as a board
-  if (tall) { spots.classList.add('pv-board'); const n = spots.children.length, rows = Math.ceil(n / 3);
-    Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / 3), col = k % 3; c.style.left = [19, 50, 81][col] + '%'; c.style.top = (13 + r * 74 / Math.max(1, rows - 1) + (col === 1 ? 2 : -1)) + '%'; }); }
+  if (tall) { const short = H < 640, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones: 4 across, 3 rows
+    const n = spots.children.length, rows = Math.ceil(n / nc), y0 = short ? 15 : 13, yr = short ? 66 : 74;
+    Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (y0 + r * yr / Math.max(1, rows - 1) + (col % 2 ? 2 : -1)) + '%'; }); }
   // ---- goals (events): their own panel, so Places fits one screen
   const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
   if (tall) gl.appendChild(h('div.pv-sub', 'Goals score points. Have the cards one needs? Send a worker to claim it.'));
