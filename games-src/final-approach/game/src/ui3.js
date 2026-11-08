@@ -27,7 +27,7 @@ function commit(seat, m) {
   if (!G || G.result) return false;
   const was = { round: G.round, phase: G.phase, slots: Object.assign({}, G.slots), axis: G.pl.axis, pos: G.pl.pos, planes: FA.planesOnTrack(G), sw: JSON.stringify(G.pl.sw) };
   UI.lastPlace = m.t === 'place' ? { seat, to: m.to, d: m.d } : null;
-  let chip = null; UI.lastWhy = ''; if (m.t === 'place') { try { chip = aiChip(m, seat); UI.lastWhy = chip || ''; } catch (e) { } } if (G.ai[seat]) chip = null;   // the rival's reason goes on its banner (ui8 tbAfter), not a second chip
+  let chip = null; UI.lastWhy = ''; if (m.t === 'place') { try { chip = aiChip(m, seat); UI.lastWhy = chip || ''; } catch (e) { } } if (G.ai[seat] || (UI.fc && !UI.fc.ended)) chip = null;   // the rival's reason goes on its banner (ui8 tbAfter), not a second chip
   const r = FA.performMove(G, m, seat); if (!r.ok) { if (mayAct(seat)) toast(r.error); return false; }
   if (chip) showChip(m.to, chip);
   if (!(UI.fc && !UI.fc.ended)) { UI.cpt = null; UI.askWhy = null; }

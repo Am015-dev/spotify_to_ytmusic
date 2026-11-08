@@ -61,7 +61,7 @@ function tutStart(o) {
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
   document.querySelectorAll('.fa-skip').forEach(e => e.remove());
   const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Skip the guided flight' }, 'Skip tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
-  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: ['intro'], done: false }; UI.fc.seen.intro = true; UI.cpt = null; clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
+  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
@@ -74,8 +74,7 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
   // a first-time player's Play starts the coached flight (Learn to play); a clear Skip button leaves it for the chapter map
-  if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer() || UI._storyAsked) return false;
-  UI._storyAsked = true; tutStart({ prologue: true }); return true;
+  return false;   // feel gate (8 Nov): Play is a clean game; Learn to play is its own title button
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
   tutStart({ prologue: true }); return true;
 }
@@ -145,10 +144,11 @@ function fcFeedback() { }
 // "Put your 4 on Engines: ..." from the coach's advice
 function fcLine(m) {
   if (!m) return '';
-  if (m.t === 'toss') return 'Nothing takes your ' + dv(m.d) + ': throw it away (it still counts as your turn).';
-  if (m.t !== 'place') return capW(hlpWhy(m, 0), 18);
-  const v = dv(m.d), c = m.c || 0, why = hlpWhy(m, 0), where = slotName(m.to);
-  return (c ? 'Spend ' + Math.abs(c) + ' coffee to turn your ' + v + ' into a ' + (v + c) + ', then put it on ' + where : 'Put your ' + v + ' on ' + where) + (why ? ' (green ring). ' + why : ' (green ring).');
+  if (m.t === 'toss') return 'Your ' + dv(m.d) + ' fits nowhere. Throw it away.';
+  if (m.t !== 'place') return capW(hlpWhy(m, 0), 12) || 'Your move.';
+  const v = dv(m.d), c = m.c || 0, where = slotName(m.to); let why = ''; try { why = aiChip(m, 0) || ''; } catch (e) { }
+  const head = c ? 'Coffee makes your ' + v + ' a ' + (v + c) + '. Put it on ' + where + '.' : 'Your ' + v + ' goes on ' + where + '.';
+  const all = head + (why ? ' ' + why : ''); return all.split(/\s+/).length <= 12 ? all : head;
 }
 function fcPoll() {
   const F = UI.fc; if (!F) return; if (!G || !UI.started || !tutGame()) return;
@@ -162,11 +162,11 @@ function fcPoll() {
   if (G.round >= 2) { fcSay('flaps'); fcSay('brakes'); } if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
   if (FA.isFinal(G) && G.phase === 'place') fcSay('final');
   const R = T.rounds || [], n = Object.keys(sl).length;
-  if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, (G.round === 0 ? tsFill(T.coach.intro) + ' ' : '') + tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
-  if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, (F.queue.shift() || '') + ' Tap the dice you want to roll again, then confirm, or keep them all.', 'ravi'); return; }
+  if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
+  if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, 'Tap dice to roll again, or keep them all.', 'ravi'); return; }
   if (mine) {
     const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = 'p' + G.round + ':' + n + ':' + (sel == null ? '' : sel);
-    if (F.cur && F.cur.key.charAt(0) === 'w' && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
+    if (F.cur && /^[wt]/.test(F.cur.key) && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
     if (!F.cur || F.cur.key !== key) {
       let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
       UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();

@@ -241,8 +241,8 @@ function goalEl() { return goalStrip(); }
 function behind() {
   if (G.result || FA.isFinal(G)) return ''; const rl = D.rounds - G.row0 - G.round, fl = G.pl.sw.fl.indexOf(0), gl = G.pl.sw.lg.filter(x => !x).length, fLeft = fl < 0 ? 0 : 4 - fl;
   const FV = ['1-2', '2-3', '4-5', '5-6'], out = [];
-  if (fLeft && fLeft >= rl - 1) out.push('Flaps ' + (4 - fLeft) + '/4 with ' + rl + ' rounds left: ' + (UI.seat === 1 && UI.mode !== 'hot' ? 'you need' : name(1) + ' needs') + ' a ' + FV[fl] + ' for the next flap (they go in order). Coffee tokens can bend a die into range.');
-  if (gl && gl >= rl - 1) out.push('Gear ' + (3 - gl) + '/3 with ' + rl + ' rounds left: ' + (UI.seat === 0 && UI.mode !== 'hot' ? 'you need' : name(0) + ' needs') + ' the missing gear values (1-2, 3-4, 5-6).');
+  if (fLeft && fLeft >= rl - 1) out.push('Flaps ' + (4 - fLeft) + '/4, ' + rl + ' rounds left. Next flap: ' + FV[fl] + '.');
+  if (gl && gl >= rl - 1) out.push('Gear ' + (3 - gl) + '/3, ' + rl + ' rounds left.');
   return out.join(' ');
 }
 // placing this die here ends the flight at once (collision, overshoot, spin, too fast, missing Axis/Engines): try it on a copy of the public state

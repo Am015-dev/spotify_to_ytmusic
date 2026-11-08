@@ -32,6 +32,7 @@ const clamp8 = t => { const w = String(t).trim().split(/\s+/); return w.length >
 // Addendum 7 (owner, 8 Nov 2026): three modes. Learn to play = the coached flight (bubbles live only there). Play = clean. Hints = top-bar toggle, off by default.
 const hintsMode = () => !!(UI.prefs && UI.prefs.hints) || !!(UI.fc && !UI.fc.ended);
 function toast(t) {
+  if (UI.fc && !UI.fc.ended && typeof fcShow === 'function') { UI.fc.lastId = 'why'; fcShow('t' + Date.now(), String(t), 'chief', readMs(t)); return; }
   if (UI.started && G && !G.result && !hintsMode() && $('#prompt')) { UI.flash = { t: String(t), until: Date.now() + 5000 }; try { renderDock(); } catch (e) { } clearTimeout(toast.f); toast.f = setTimeout(() => { UI.flash = null; try { renderDock(); } catch (e) { } }, 5050); return; }   // Play: no floating toasts, the reason takes the one line
   const e = $('#toast'); if (!e) return; t = clamp8(t); e.textContent = t; e.dataset.n = String((+e.dataset.n || 0) + 1); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 5000); }
 // ---------- names, wording ----------

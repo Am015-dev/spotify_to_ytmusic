@@ -15,7 +15,7 @@ function renderStart() {
 // a first-time Play goes straight to chapter 1 of the flight school; everybody else picks a flight
 function playNow() { if (newPlayer()) { try { GXC.play('c1'); return; } catch (e) { } } UI.sv = 'setup'; renderStart(); }
 // the kit's menu button as an element (title, setup and in-game menu)
-function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typeof tutBtn === 'function' ? tutBtn(cls) : ''; return w.firstChild; }
+function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typeof tutBtn === 'function' ? tutBtn(cls) : ''; const b = w.firstChild; if (b && b.setAttribute) b.setAttribute('data-a', 'offeryes'); return b; }   // data-a: the Learn hook test drivers look for (no game action of its own)
 // tall phone: the painted portrait title (media/title-phone.webp); the landscape art stays the fallback
 function ttlSrc(land) { try { return matchMedia('(max-aspect-ratio:4/5)').matches ? 'media/title-phone.webp' : land; } catch (e) { return land; } }
 function ttlImg(land) { const im = h('img.ttl-bg', { src: ttlSrc(land), alt: '' }); im.addEventListener('error', () => { if (im.src.indexOf('title-phone') > -1) im.src = land; }); return im; }
