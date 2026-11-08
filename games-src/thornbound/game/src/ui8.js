@@ -2,7 +2,8 @@
 // ---------------------------------------------------------------- teaching layers (guided game only; normal games show the full rules)
 // round 1: cards, bids, Herald, hidden cards, Supporters, clashes, claiming. round 2 adds Lore, Sites of Power, Autumn and card abilities.
 // round 3 adds Tactics, the Favour, Councils (Govern) and Kingdom Card powers.
-const LAYER={1:{},2:{lore:1,site:1,autumn:1,cmd:1},3:{lore:1,site:1,autumn:1,cmd:1,tactic:1,favour:1,council:1,govern:1,kc:1}};
+// Govern and Journey (Autumn) are the table game's core loop, so they are taught from round 1 (the tutorial teaches Journey)
+const LAYER={1:{lore:1,autumn:1,govern:1},2:{lore:1,site:1,autumn:1,cmd:1,govern:1},3:{lore:1,site:1,autumn:1,cmd:1,tactic:1,favour:1,council:1,govern:1,kc:1}};
 function layer(){if(!isGuided()||!G)return null;return LAYER[Math.min(3,Math.max(1,G.round))]}
 function taught(kind){const L=layer();return !L||kind==='supp'||!!L[kind]}
 function actKind(a){a=a||'';if(a==='supp')return 'supp';if(a==='journey')return 'lore';if(a==='govern')return 'govern';const p=a.split(':')[0];

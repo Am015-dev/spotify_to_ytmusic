@@ -58,7 +58,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   else if(UI.card&&UI.card.kind!=='pass'){key='card';html='<span class="tbt-chip wt">Watch</span><span class="tbt-line">Watch the board. Tap to go on.</span>'}
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
-    if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});key='me'+k+(G.q.t||'');const line=(k==='menu'||G.q.t==='menu')?(ask.menu):ask[k];
+    if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});const mph=(k==='menu'||G.q.t==='menu')?menuPhase(G.q):'';key='me'+k+(G.q.t||'')+mph+(UI.autCard!=null?'c':'');const line=mph?(UI.autCard!=null&&ask.menuAutumnCard?ask.menuAutumnCard:(ask['menu'+mph]||ask.menu)):ask[k];
       const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>'}
     else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));html='<span class="tbt-chip rv">'+esc2(poss(shortName(a)))+' turn</span><span class="tbt-line">Watch the board.</span>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}

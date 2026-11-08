@@ -121,6 +121,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(!s.wait){const nx=info.next;await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
     else{
       const before=await state();
+      {const age=Date.now()-(before.shownAt||0);if(age<700)await sleep(700-age)}   // the kit ignores taps in the first 600 ms of a step (a person reads first)
       await p.touchscreen.tap(h.cx,h.cy);
       const t1=Date.now();let moved=false;
       while(Date.now()-t1<1800){await sleep(60);const a=await state();if(a.i!==before.i||a.count!==before.count||a.phase!=='show'){moved=true;break}}

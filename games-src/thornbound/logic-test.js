@@ -236,6 +236,16 @@ R(NB+23,'A bold Kingdom Card (Veiled Patron) discards the Bidding card and goes 
 R(NB+24,'Winning a Clash gives the Location Reward only for the CHOSEN Location: the other Location of that Region gets nothing.',()=>{const G=game(2);winAt(G,LOC.harvest,{harvest:mv=>mv.find(m=>!m.yes)});expect([G.pl[0].inf,G.fav],[1,{h:-1,u:3}])});
 R(NB+25,'Region reward is per Clash: a player may win several Regions in one Summer and collect each reward.',()=>{const G=game(2);emptyHands(G);scene(G,{place:{0:[c(0,C9),null,null],1:[c(1,F1),null,null]}});scene(G,{place:{1:[c(0,C9+0)]}});G.reg[1].down=[];T.put(G,c(0,C8),'down',1);T.put(G,c(1,F1),'down',1);T.put(G,c(0,C7),'down',2);T.put(G,c(1,F1),'down',2);G.reg[2].down=G.reg[2].down.filter((v,i,a)=>a.indexOf(v)===i);summer(G,[0,1,2],{location:pick(3)});truth(G.pl[0].inf>=3,'three Regions won, at least 1+2+1',G.pl[0].inf)});
 
+S('O. The round in table order');
+R(NB+26,'One round runs in the table order: secret bids, bids resolve, Heralds, face-down cards, Spring actions, Clash Markers, Clashes (claim a Location), Autumn actions, then Winter and the next Round.',()=>{const G=game(2,{length:'short'});const seen=[];
+  const rec=g=>{const p=TB.pending(g);if(!p)return;const k=(p.kind==='menu'?g.phase+'-menu':p.kind);if(seen[seen.length-1]!==k&&!seen.includes(k))seen.push(k)};
+  for(let i=0;i<900&&G.round<2&&G.phase!=='over';i++){rec(G);const p=TB.pending(G);if(!p)break;const seat=p.seats[0];const mv=TB.moves(G,seat);const m=done(mv)||mv.find(x=>x.pass)||mv.find(x=>x.skip)||mv.find(x=>x.yes===0)||mv[0];const r=TB.apply(G,m);if(!r.ok)throw new Error('move refused '+m.k)}
+  const want=['bid','bidRes','herald','place','spring-menu','clashOrder','location','autumn-menu'];const got=want.filter(k=>seen.includes(k));
+  expect({order:seen.filter(k=>want.includes(k)),round:G.round},{order:want,round:2})});
+R(NB+27,'Autumn: the same Action Step offers both Govern (a card with Votes) and Journey (a card with Lore); each is used once.',()=>{const G=game(2);setHand(G,0,[c(0,TRADER),c(0,C6)]);autumn(G,0);
+  const mv=TB.moves(G,0);const g=mv.filter(m=>m.a==='govern').length>0,j=mv.filter(m=>m.a==='journey').length>0;ans(G,0,mv.find(m=>m.a==='journey'&&m.p.id===c(0,C6)).k);
+  const mv2=TB.moves(G,0);expect({g,j,govAfter:mv2.some(m=>m.a==='govern'),jouAfter:mv2.some(m=>m.a==='journey')},{g:true,j:true,govAfter:true,jouAfter:false})});
+
 // ================================================================== runner
 if(process.argv.includes('--md')){
   const out=['# Rules checklist: The Thornbound Throne (published base game, own words)','',

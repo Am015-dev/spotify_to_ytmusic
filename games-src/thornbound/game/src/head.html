@@ -394,6 +394,7 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 /* the tray: action row + the hand fan */
 .gx-dock-body{border-top:0}
 #act{flex:0 0 auto;display:flex;gap:8px;align-items:center;justify-content:center;padding:1px 8px;min-height:46px;box-sizing:border-box;border:0;background:transparent}
+#act:has(.autc){flex-wrap:wrap;padding:4px 8px}#act .autc{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 100%}#act .autc .btn{flex:1 1 46%;min-height:44px;font-size:15px}
 #act:empty{display:flex}
 #act .btn{flex:0 1 auto;min-width:92px;min-height:44px;padding:4px 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 #act .btn.pri{flex:1 1 auto;max-width:280px}

@@ -150,6 +150,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
    case 'clashOrder':{M.nextRegs().forEach(r=>hr.push(r));if(rm&&rm.order){const nx=rm.order[(UI.ord||[]).length];if(nx!=null)recT.reg=nx}
      if((UI.ord||[]).length)f+='<button class="btn" data-a="ordundo">'+ico('x')+'<span>Undo</span></button>';break}
    case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
+     if(M.aut){if(UI.autCard!=null&&!M.use.has(UI.autCard))UI.autCard=null;if(UI.autCard!=null)f+='<div class="autc" role="group" aria-label="Autumn choices">'+autMoves(UI.autCard).map(m=>'<button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'" data-aut="'+m.a+'">'+esc(autLabel(m))+'</button>').join('')+'</div>'}else UI.autCard=null;
      if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
      if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
        if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}

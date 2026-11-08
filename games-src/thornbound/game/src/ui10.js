@@ -8,9 +8,14 @@ function bfModel(s,mv,rm){const q=G.q,k=q.kind;const M={s,q,mv,rec:rm,kind:'othe
   else if(k==='bid'||k==='bidRes'||k==='place'||k==='tie'||k==='clashOrder')M.kind=k;
   else if(k==='herald'||k==='location'){M.kind=k;M.locs=mv.filter(m=>m.loc!=null).map(m=>m.loc)}
   if(M.kind!=='bid'&&M.kind!=='place'&&M.kind!=='tie'&&M.kind!=='other')M.use=new Set();
+  // Autumn on the table: the hand cards that can Govern or Journey glow; tap one for its choices (UI.cfg.oldAutumn = the Powers list only)
+  if(autOn()&&M.kind==='menu'&&menuPhase(q)==='Autumn'){M.aut=true;for(const m of mv)if(m.t==='act'&&(m.a==='govern'||m.a==='journey')&&m.p&&m.p.id!=null)M.use.add(m.p.id);M.powers=M.powers.filter(m=>m.a!=='govern'&&m.a!=='journey')}
   M.regsFor=id=>{const o=[];for(const m of mv){if(m.id!==id)continue;if(k==='place'&&m.r!=null)o.push(m.r);else if(k==='tie'&&G.clash)o.push(G.clash.r)}return [...new Set(o)]};
   M.nextRegs=()=>{const o=UI.ord||[];const set=new Set();for(const m of mv)if(m.order&&o.every((r,i)=>m.order[i]===r)&&m.order.length>o.length)set.add(m.order[o.length]);return [...set]};
   return M}
+const autOn=()=>!(UI.cfg&&UI.cfg.oldAutumn);
+function autMoves(id){const M=UI.bf;if(!M||!M.aut)return [];return M.mv.filter(m=>m.t==='act'&&(m.a==='govern'||m.a==='journey')&&m.p&&m.p.id===id)}
+function autLabel(m){if(m.a==='journey')return 'Journey: +'+cinfo(m.p.id).lore+' Lore';return 'Govern: '+((D.COUNCIL_NAMES&&D.COUNCIL_NAMES[m.p.c])||m.p.c)}
 function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
   for(const m of M.mv){if(m.id!==id&&!(typeof m.v==='number'&&m.v===id))continue;
     if(M.kind==='bid')out.push({type:'spot',k:m.k});
@@ -20,7 +25,9 @@ function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
   return out}
 const cardDriven=M=>!!M&&(M.kind==='bid'||M.kind==='place'||M.kind==='tie');
 // tap a card: it lifts and its targets glow; tap it again (or the glowing spot) to play it
-function handTap(id){const M=UI.bf;const cm=M&&M.kind?cardMoves(id):[];
+function handTap(id){const M=UI.bf;
+  if(M&&M.aut&&autMoves(id).length){if(typeof tutOn==='function'&&tutOn()&&UI.autCard!==id&&!GXT.act({type:'tap',what:'select',id}))return;UI.autCard=UI.autCard===id?null:id;UI.hand=UI.autCard;if(typeof sfx==='function')sfx('tap');renderAll();return}
+  const cm=M&&M.kind?cardMoves(id):[];
   if(!cm.length){UI.hand=null;openPop('card',{id});return}
   if(cardDriven(M)){
     if(UI.hand===id){if(cm.length===1){commitCard(id,cm[0]);return}UI.hand=null;renderAll();return}
@@ -193,7 +200,10 @@ function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?f
   try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:Infinity,easing:'ease-in-out'})}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
 function bfAfter(){bfFinger();if(typeof hlpAfter==='function')hlpAfter()}
 // the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
-function autoSkip(h){if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;
+// Crown's Edict asks only when it changes who picks first (your bid already first: using it would only waste it)
+function edictPointless(){try{if(!G.q||G.q.kind!=='edict')return false;const s=G.q.seats[0],b=G.bstr||[];return G.order.filter(x=>G.pl[x].bid!=null).sort((a,c)=>b[c]-b[a]||G.order.indexOf(a)-G.order.indexOf(c))[0]===s}catch(e){return false}}
+function autoSkip(h){if(!NET.on&&!hotSeat()&&G&&G.q&&G.q.kind==='edict'&&edictPointless()){const no=legal(h).find(m=>m.yes===0);if(no)return humanMoveAuto(no.k)}
+  if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;
   const mv=legal(h);const acts=visibleActs(mv).filter(m=>m.t==='act');const d=mv.find(m=>m.t==='done');if(!d||acts.length)return false;
   return humanMoveAuto(d.k)}
 // a move the game makes for you (a season with nothing to use): not a tap, so the tutorial does not gate it
