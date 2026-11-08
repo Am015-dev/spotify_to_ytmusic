@@ -39,29 +39,30 @@ function coachText(id,who){const L=LORE.coach[id];if(!L)return '';const a=cAct()
   if(id==='take'&&a){const c=who==='me'?L.say:L.rival;return c(a.n,a.n>1?MPLUR[a.color]:MNAME[a.color])}
   return who==='rival'&&L.rival?L.rival:(typeof L.say==='function'?L.say():L.say)}
 function coachEl(){let e=document.getElementById('coach');if(!e){e=document.createElement('div');e.id='coach';e.className='coach';e.setAttribute('data-help','');e.setAttribute('role','status');
-  e.innerHTML='<i></i><span></span><button type="button" aria-label="Dismiss" data-help>✕</button>';document.body.appendChild(e);e.querySelector('button').addEventListener('click',ev=>{ev.stopPropagation();coachHide()})}return e}
-function coachHide(){clearTimeout(COACH.t);COACH.cur=null;const e=document.getElementById('coach');if(e)e.classList.remove('on')}
-function coachShow(id,text,name,face){const e=coachEl();e.querySelector('i').textContent=face;e.querySelector('span').innerHTML='<b>'+esc(name)+'</b> '+esc(text);
-  let bot=0;for(const id of ['line','trk','trk2']){const x=document.getElementById(id);if(x&&!x.hidden){const r=x.getBoundingClientRect();if(r.bottom>bot)bot=r.bottom}}e.style.top=Math.max(40,bot?bot+4:96)+'px';
-  void e.offsetWidth;e.classList.add('on');COACH.cur=id;COACH.shownAt=Date.now();COACH.text=text;clearTimeout(COACH.t);
-  const w=text.split(' ').length;COACH.t=setTimeout(coachHide,ANIM?4000+w*100+600:500)}
+  e.innerHTML='<i></i><span></span><button type="button" aria-label="Got it" data-help>Got it</button>';const tb=document.getElementById('table');if(tb&&tb.parentNode)tb.parentNode.insertBefore(e,tb);else document.body.appendChild(e);e.querySelector('button').addEventListener('click',ev=>{ev.stopPropagation();coachHide()})}return e}
+function coachHide(){clearTimeout(COACH.t);COACH.cur=null;const e=document.getElementById('coach');if(e)e.classList.remove('on');try{fit()}catch(x){}}
+const coachMin=()=>ANIM?4600+(COACH.words||8)*100:50;   // a message stays at least 4 s + 1 s per 10 words
+function coachShow(id,text,name,face){const e=coachEl();e.querySelector('i').textContent=face;e.querySelector('span').innerHTML='<b>'+esc(name)+'</b>'+esc(text);
+  const w=text.split(' ').length;COACH.words=w;const tc=document.getElementById('turnover');if(tc)tc.classList.remove('on');
+  e.classList.add('on');COACH.cur=id;COACH.shownAt=Date.now();COACH.text=text;clearTimeout(COACH.t);try{fit()}catch(x){}
+  COACH.t=setTimeout(coachHide,ANIM?9000+w*150:500)}
 function coachBegin(){COACH.seen={};COACH.log=[];COACH.react=null;COACH.tStart=null;COACH.lastAct=null;COACH.done=false;COACH.pg=-1;COACH.prevCur=-1;coachHide();const o=document.getElementById('coachend');if(o)o.remove()}
 function coachEnd(){coachHide();const o=document.getElementById('coachend');if(o)o.remove();COACH.pg=-1}
 function coachSee(id,text){COACH.seen[id]=1;(COACH.log=COACH.log||[]).push(id)}
 // what happened on your turn: a good or poor move gets one line of why
 function coachReact(){if(!G||!G.coach||G.over)return;const a=cAct();if(cMine()){if(COACH.tStart==null)COACH.tStart=shownTotal(G.pl[0]);if(a)COACH.lastAct={n:a.n,c:a.color}}
   else if(COACH.tStart!=null&&G.phase==='turn'&&G.cur===1){const d=shownTotal(G.pl[0])-COACH.tStart;const la=COACH.lastAct;COACH.tStart=null;COACH.lastAct=null;let t='';
-    if(la&&la.n===1)t='Only one '+MNAME[la.c]+' this time. Look for a tile where your last walker lands among several of its colour.';
+    if(la&&la.n===1)t='Only one '+MNAME[la.c]+'. Land on tiles with several of its colour.';
     else if(la&&la.n>=3)t='Well walked: '+la.n+' '+MPLUR[la.c]+' in one go.';
-    else if(d>=8)t='A fine turn, +'+d+' points. Coins and goods add up.';
-    else if(d<=0)t='No points this turn. That is fine early: build land and goods first.';
+    else if(d>=8)t='Good turn: +'+d+' points.';
+    else if(d<=0)t='No points this turn. Early on, build land and goods first.';
     /* the rating card (score.js) now says this; no separate reaction */}
   else if(G.phase==='bid')COACH.tStart=null}
 function coachAfter(){if(!G||!G.coach){coachHide();return}
   if(G.over){coachFinal();return}
   coachReact();
   if(UI.modal||GX.open){return}
-  if(COACH.cur)return;   // one message at a time; it stays 4 s plus 1 s per 10 words, or until tapped away
+  if(COACH.cur&&Date.now()-COACH.shownAt<coachMin())return;   // a new rule waits until the one on screen has been readable long enough
   if(COACH.react&&G.phase==='turn'){const t=COACH.react;COACH.react=null;coachShow('react',t,LORE.guide.name,LORE.guide.face);return}
   for(const [id,when] of RULES){if(COACH.seen[id])continue;let w=false;try{w=when()}catch(e){w=false}
     if(w){coachSee(id);const rv=w==='rival';coachShow(id,coachText(id,w),rv?LORE.rival.name:LORE.guide.name,rv?LORE.rival.face:LORE.guide.face);return}}}
@@ -77,7 +78,7 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
    {t:'People',h:hd+row('Sages',a.sages,b.sages,'2 points each. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
    {t:'Djinns and goods',h:hd+row('Djinns',a.djinns,b.djinns,'You hold '+pa.dj.length+', Farid '+pb.dj.length+'; each scores its own points.')+row('Goods',a.goods,b.goods,'Sets of different kinds score 1, 3, 7, 13. Your goods: '+pa.res.filter(r=>r!=='fakir').length+' cards in '+gs({res:pa.res.filter(r=>r!=='fakir')})+' kinds.')},
    {t:'The count',h:hd+row('Total',a.total,b.total,esc(plName(G.winText)))}];
-  const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(LORE.coachLater.map(x=>'<li>'+esc(x)+'</li>')).join('');
+  const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).slice(0,6).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(['Everything else is in How to play.']).map(x=>x.startsWith('<li>')?x:'<li>'+esc(x)+'</li>').join('');
   pages.push({t:"Things you'll meet later",h:'<ul class="ce-l">'+later+'</ul>',last:1});return pages}
 function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let o=document.getElementById('coachend');
   if(!o){const pages=coachPages();COACH.pages=pages;COACH.pg=0;o=document.createElement('div');o.id='coachend';o.className='coachend';o.setAttribute('data-help','');document.body.appendChild(o);

@@ -43,7 +43,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tile.m7{--k:.82}.tile.m10{--k:.66}
 .tile.blk{background:repeating-linear-gradient(45deg,#8d7c68,#8d7c68 6px,#7d6c58 6px,#7d6c58 12px);border-color:#4a3e30;cursor:default}.tile.blk.k-lake{background:linear-gradient(#7fc4e8,#2f7fb5);border-color:#1d5b88}.tile.blk .tn{color:#fff}.tile.blk .ti{opacity:.6}
 .tile.cur{z-index:2;outline:3px solid #fff;outline-offset:-2px;box-shadow:0 0 0 2px #ff7a3a,0 4px 10px rgba(0,0,0,.4)}
-#grid.dim .tile:not(.glow):not(.blk){opacity:.7;filter:saturate(.75)}
+#grid.dim .tile:not(.glow):not(.blk){opacity:1;filter:saturate(.4) brightness(.7)}
 .tile.glow{outline:3px solid #ffd45a;outline-offset:-3px;animation:glowt 1.15s ease-in-out infinite;z-index:1}
 @keyframes glowt{0%,100%{filter:brightness(1);outline-color:#ffd45a}50%{filter:brightness(1.12);outline-color:#fff6c2}}
 .tile.nope{animation:shake .3s}@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
@@ -301,7 +301,57 @@ html.ti .mbox.start canvas.t3d,.mbox canvas.t3d{display:block;width:88px;height:
 /* painted art everywhere now: numbers and names sit on solid chips */
 .deckback b{background:#fff6dc;color:#3b1c0e;border-radius:8px;padding:1px 5px}@media (min-width:1024px){.deckback b{font-size:16px}}
 .spot small.ord{background:#fff6dc!important;color:#3b1c0e!important}
+
+/* ===== W480 feel pass (sands): readable text, calm messages, clean seats, no rectangles ===== */
+#bd>.coach,#bd>.turnover{position:static;transform:none;left:auto;top:auto;width:auto;max-width:none;margin:2px 0;display:none;opacity:1;pointer-events:auto;z-index:auto;flex:0 0 auto;transition:none}
+#bd>.coach.on,#bd>.turnover.on{display:flex}
+.coach span,.turnover span{display:block;font-size:15px;line-height:1.3}.coach span b,.turnover span b{display:block;font-size:14px;color:#8e3a1c}
+.coach button,.turnover button{width:auto;min-width:68px;height:44px;border-radius:12px;padding:0 12px;font:800 15px system-ui}
+#pchip,.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.sch .s4,.sch .st,.sch .pp,.trk,.trk i,.trk b,.trk2,.tile .tn,.tile .tc,.mcard .mn,.deckback,.sp-b,.spot .ord,.spot .sp-c,.dcard,.dcard b,.dcard .dv,.tile .gain,.asrow figure,.ce-h b,.reftip,.gx-drawer small,.gx-drawer .muted{font-size:14px!important}
+.tile .tv{min-width:24px;height:24px;line-height:20px;font-size:16px!important;border:2px solid #4a2a05;box-shadow:0 1px 3px rgba(0,0,0,.45);padding:0 3px}
+html.sk-icons .ri,html.sk-ic2 .e2,html.sk-gd .mcard .mi,html.sk-gd .fl .mi,html.sp3 .tok,html.sk-tk:not(.sp3) .tok,html.sk-tk .own,html.sp3 .own.cam,.dcard .thi{font-size:14px!important;text-indent:-300px;overflow:hidden;white-space:nowrap;line-height:1}
+.sch .w{display:none;font-style:normal}#seats[data-n="2"] .w,#seats[data-n="3"] .w{display:inline}.sch .s2{flex-wrap:wrap;gap:0 8px}
+@media (max-width:700px){.sch .s3,.sch .s4{display:none}.sch .sn small{display:none}}
+.mbox.start{position:relative}
+.mbox.start h2{white-space:normal;font-size:clamp(26px,8.4vw,36px);line-height:1.05;margin-top:6px;padding-right:0}
+html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46px;right:10px;width:84px;height:84px;margin:0}
+.tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
+#gw{overflow:visible}#grid{margin-top:6px}
+.coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
+.plpop{pointer-events:none}.plpop span{display:none}
+html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 1px rgba(30,15,5,.85))}
+.tile .tv{top:-3px;right:-3px}
+@media (min-width:1024px){.coach{flex-wrap:wrap}.coach span{flex:1 1 150px}.coach button{flex:1 1 100%}}
 @media (max-width:1023px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:14px}}
 @media (min-width:1024px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:16px}}
 @keyframes plin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .plpop{animation:plin .3s ease both!important}
+
+/* drag the real piece */
+#grid [data-tile]{touch-action:none}
+.dragghost{position:fixed;z-index:80;pointer-events:none;display:flex;transform:translate(-50%,-70%) scale(1.5);filter:drop-shadow(0 6px 5px rgba(0,0,0,.55))}
+.dragover{outline:4px solid #ffd35a;outline-offset:-2px;box-shadow:0 0 18px 6px rgba(255,200,70,.85);transform:scale(1.04);z-index:5}
+.snap{animation:snapin .28s ease-out}@keyframes snapin{0%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
+html.dragging,html.dragging *{cursor:grabbing!important;user-select:none}
+@media (prefers-reduced-motion:reduce){.snap{animation:none}}
+
+/* W480 r2: desktop goods cards with names (the middle column is wider), no see-through dimming (it showed the table under the tiles as a ghost layer) */
+html.land .gx-board{grid-template-columns:minmax(0,1fr) 236px 250px}
+html.land .mrow{grid-template-columns:repeat(2,minmax(0,1fr))}html.land .mcard{height:44px}
+html.land .mcard:not(.empty) .mn{display:block;flex:1;width:auto;text-align:left;font-size:15px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;padding:0}
+
+/* W480 r2: the top bar says what each icon is (captions), the game name steps aside on a phone */
+@media (max-width:700px){.gx-bar h1{display:none}.gx-bar .gx-ibtn{flex-direction:column;gap:0;min-height:46px;padding:2px 6px}.gx-bar .gx-ibtn>span{display:block!important;font:700 14px/1.1 var(--ff-b,system-ui)!important}.gx-bar .gx-sp{flex:1 1 auto}}
+
+/* W480 r2: ui-audit A (16px on desktop) and B (text on busy art gets a plate) */
+@media (min-width:1024px){html body .pchip,html body .sch,html body .sch *,html body .gx-drawer-body p,html body .gx-drawer-body small,html body .gx-drawer-body li,html body .card h4 small,html body .gxc-act small,html body .gxc-lab,html body .reftip,html body .trk,html body .trk *,html body .trk2,html body .crown,html body .spot small,html body .dcard .dv,html body .mbox small,html body .mbox .lede,html body .mbox .acts .btn span,html body .mcard .mn,html body .tile .tn,html body .deckback,html body .sp-b,html body .ce-h b,html body .gxc-act small,html body .gxc-act b,html body .gxc-path small{font-size:16px!important}}
+/*old*/@media (min-width:99999px){.pchip,.sch,.sch *,.gx-drawer-body p,.gx-drawer-body small,.gx-drawer-body li,.card h4 small,.gxc-act small,.gxc-lab,.reftip,.trk,.trk *,.trk2,.crown,.spot small,.dcard .dv,.mbox small,.mbox .lede,.mbox .acts .btn span,.mcard .mn,.tile .tn,.deckback,.sp-b,.ce-h b{font-size:16px!important}}
+.tile .tv{background:#2a1500!important;color:#fff3c8!important;border:0!important;box-shadow:0 0 0 2px #e8b84a,0 2px 4px rgba(0,0,0,.5)!important;min-width:26px;height:26px;line-height:26px!important;padding:0 2px!important;text-shadow:none!important}.tile .tv::before{display:none!important}
+html body .spot .ord{background:#fff6de!important;color:#3b1c0e!important;border-radius:4px;padding:0 5px}
+html body .dcard .dv{background:#2a1a40!important;color:#fff!important;border-radius:9px;min-width:24px;text-align:center}
+.gx-drawer-body :is(p,li,h3,h4){background:#fff7e4!important;border-radius:6px;padding:2px 6px;color:#2f1809}
+html body .gx-drawer-body .card p{background:#fff7e4!important;display:block}
+html body .gxc-lab,html body .gxc-act small,html body .gxc-act b{background:#fff7e4!important;color:#2f1809;padding:2px 6px;border-radius:8px}
+@media (min-width:1024px){html body #bd #seats .sch,html body #bd #seats .sch *,html body #pchip,html body #bd .mcard .mn,html body #bd .tile .tn,html body #bd .trk *,html body .gx-drawer-body p,html body .gxc-act small{font-size:16px!important}}
+html body .mcard .mn{background:#fff6dc!important}
+@media (min-width:1024px){html body #bd .drow .dcard,html body #bd .drow .dcard *,html body #bd .bidt .spot,html body #bd .bidt .spot *,html body .gx-drawer-body p.small,html body .gx-drawer-body p.muted{font-size:16px!important}}

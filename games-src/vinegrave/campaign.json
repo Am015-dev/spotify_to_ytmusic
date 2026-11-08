@@ -178,7 +178,7 @@
     "aiLevel": "easy",
     "twist": null,
     "maxStars": 2,
-    "text": "The rivals play a little gentler."
+    "text": "Rivals play a little easier."
    }
   },
   {
@@ -289,7 +289,7 @@
    "twist": {
     "id": "woken",
     "param": 2,
-    "text": "Boss rule: two guardians are already awake on the ruins."
+    "text": "Boss rule: two guardians start awake."
    },
    "goal": {
     "type": "win",
@@ -495,7 +495,7 @@
    "intro": [
     {
      "who": "pell",
-     "text": "Storms ground the planes. Flying now costs 3 coins, not 2."
+     "text": "Storms ground planes. A Plane now costs 3 coins."
     },
     {
      "who": "mira",
@@ -599,7 +599,7 @@
    "twist": {
     "id": "rich",
     "param": 2,
-    "text": "Boss rule: the twins start with 2 extra coins and compasses each."
+    "text": "Boss rule: each twin starts with 2 extra coins and compasses."
    },
    "goal": {
     "type": "win",
@@ -730,7 +730,7 @@
     },
     {
      "who": "pell",
-     "text": "Vane's hired crew is tearing through the ruins. Alone, you must outscore them."
+     "text": "Vane's crew is racing through the ruins. Outscore them alone."
     }
    ],
    "outro": [

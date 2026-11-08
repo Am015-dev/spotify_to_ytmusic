@@ -96,7 +96,7 @@ function aiTurn() {
 function commit(seat, mv) {
   if (!G || G.phase === 'over') return false;
   const r = LD.apply(G, seat, mv);
-  if (!r.ok) { snd('error'); toast(r.error || 'That did not work.'); return false; }
+  if (!r.ok) { snd('error'); toast(r.error || 'Could not do that.'); return false; }
   const evs = G.events.slice(); const v = viewSeat();
   if (seat === v) { UI.sel = -1; UI.job = -1; UI.pingSel = false; UI.giveSel = -1; UI.hint = null; UI.predN = -1; }
   if (hotSeat()) { const nx = LD.pending(G).filter(s => !G.players[s].ai); if (!nx.includes(UI.holder)) UI.holder = -1; }
@@ -120,14 +120,14 @@ function doMove(mv) {
 }
 function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
-  if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); return; }
+  if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); else { const el = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (el) { el.classList.add('nudge'); setTimeout(() => el.classList.remove('nudge'), 350); } } return; }
   const v = viewSeat(), ph = G.phase;
-  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
-  if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = id; doMove(m); return; }
+  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('You cannot pass Lanterns.'); return; } UI.giveSel = id; doMove(m); return; }
   if (ph === 'play') {
     const T = G.trick, turn = T.turn;
     if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
-    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
+    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'You cannot lead that card.'); return; }
     UI.sel = id; UI.hint = null; playSel(); return;
   }
   toast('Not your turn yet.');
@@ -146,13 +146,13 @@ function playSel() {
 // tap a job card on the table: it flies to your seat
 function tapJob(i) {
   if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
-  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'Not for the Commander.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Commander cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
   doMove(m);
 }
 // tap a ping spot on a card of your hand
 function tapPing(id) {
   if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
-  if (!m) { snd('error'); toast('That card cannot be shown.'); return; }
+  if (!m) { snd('error'); toast('You cannot show that card.'); return; }
   UI.pxPing = viewSeat(); doMove(m);
 }
 // ---------- hot-seat ----------

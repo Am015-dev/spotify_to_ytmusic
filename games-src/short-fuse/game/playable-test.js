@@ -27,7 +27,7 @@ const probs=[];const note=(m)=>{if(probs.length<40)probs.push(m)};
   if(end&&(!end.line||!end.stat))note('result card lacks the story line / stats');
   if(false&&![...ev.ban].some(t=>t==='Your turn'))note('no "Your turn" banner was shown');
   if(false&&![...ev.ban].some(t=>/'s turn$/.test(t)&&t!=='Your turn'))note('no rival turn banner was shown');
-  if(!ev.rivalCap)note('no rival step caption was shown');if(!ev.pop)note('no score pop was shown');if(ev.small)note('instruction line under 14px: '+ev.small);
+  if(ev.rivalCap)note('rival play-by-play shown in the instruction line ('+ev.rivalCap+'); decision 8 Nov: rival moves show on the board only');if(!ev.pop)note('no score pop was shown');if(ev.small)note('instruction line under 14px: '+ev.small);
   console.log('quick game:',r.over?'PASS':'FAIL','taps',r.taps,'banners',[...ev.ban].join('|'),'captions',ev.rivalCap,'pops',ev.pop,'end',JSON.stringify(end));
   // ---- 2) Story stage 1
   await p.evaluate(()=>{localStorage.setItem('gxt-short-fuse',JSON.stringify({done:1}));localStorage.setItem('sf_played','1');try{showStart()}catch(e){}});await p.reload();await sleep(1200);

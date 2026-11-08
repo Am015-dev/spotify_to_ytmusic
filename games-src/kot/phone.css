@@ -142,7 +142,7 @@ html.ph .dlg .btn,html.ph .dlg button,html.ph .dlg summary{min-height:44px}
 html.ph .dlg .btn.mini{min-width:44px;padding:.2rem .6rem;font-size:13px}
 html.ph #choice .recchip{font-size:13px}
 html.ph .chip{font-size:13px;line-height:1.35}
-html.ph .mon>b i,html.ph .mon .mc i,html.ph .mc i{font-size:13px}
+html.ph .mon>b i,html.ph .mon .mc i,html.ph .mc i{font-size:14px}
 html.ph .mon .st2,html.ph .mon .small{font-size:13px}
 html.ph-l #moment{right:auto;left:calc(var(--sal,0px) + 8px);width:calc(var(--ph-bw,50vw) - 16px);top:calc(var(--sat,0px) + 8px)}
 html.ph .pcard .pct .why b{display:inline;font:900 13px/1.25 Nunito,sans-serif;letter-spacing:0}

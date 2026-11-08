@@ -306,5 +306,14 @@ html.sm .offer .of{background:#fffaf0!important}
 .pstrip{height:auto!important}
 .rvart{width:100%;max-width:100%;height:72px;max-height:72px;object-fit:cover;border-radius:10px}
 .gx-row-l small{background:#fffaf0;color:#3a2a1a;border-radius:6px;padding:1px 5px;display:inline-block}
+/* W470: PC dock: three big patch cards, art first */
+@media (min-width:1024px){#offers{flex-direction:column!important;gap:10px!important;align-items:stretch}
+#offers .offer{max-width:none!important;width:100%;flex-direction:row!important;min-height:150px;padding:10px 14px!important;gap:14px!important;justify-content:flex-start;display:grid!important;grid-template-columns:1fr auto;grid-template-rows:auto 1fr;align-items:center}
+#offers .offer .onm{grid-column:1/3;justify-self:start;font-size:18px!important}
+#offers .offer .shape{grid-column:1;justify-self:center}
+#offers .offer .ofx{grid-column:2;display:flex!important;flex-direction:column;width:auto!important;gap:6px!important}
+#offers .offer .of{min-width:84px;padding:5px 8px!important}#offers .offer .of b{font-size:22px}#offers .offer .of img.ic,#offers .offer .of svg{width:24px!important;height:24px!important}
+#offers .offer.cant::after{grid-column:1/3}}
+#bd.wide .pstrip{flex:0 0 auto!important}#bd.wide .pstrip .dot{display:none}
 </style>
 </head>

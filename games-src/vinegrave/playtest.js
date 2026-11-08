@@ -62,8 +62,8 @@ const MARK2 = () => { const m = window.__m, i = UI.mv.findIndex(x => VG.same(x, 
       turns++; if (turns === 12 && !shot++) await page.screenshot({ path: `shots/play-${name}.png` });
       await page.waitForTimeout(60);
     }
-    await page.waitForSelector('#rs:not([hidden]) table', { timeout: 15000 }).catch(() => { });
-    const res = await page.locator('#rs:not([hidden]) table').count(); await page.screenshot({ path: `shots/full-result-${name}.png` });
+    await page.waitForSelector('#rs:not([hidden]) .rplayers', { timeout: 15000 }).catch(() => { });
+    const res = await page.locator('#rs:not([hidden]) .rplayers').count(); await page.screenshot({ path: `shots/full-result-${name}.png` });
     const sc = await page.evaluate(() => G && G.p.map((p, i) => p.name + ' ' + VG.score(G, i).total).join(', '));
     console.log(name, res ? 'PASS full game to result' : 'FAIL no result', 'my taps', turns, '|', sc); if (!res) fails++;
     // ---- 3) Story stages 1 and 2: open the map, start, play 4 turns by taps

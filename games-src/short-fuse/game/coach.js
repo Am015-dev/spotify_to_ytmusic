@@ -60,3 +60,8 @@ function coCount(d){const ns=[...d.querySelectorAll('.cn')];ns.forEach((e,i)=>{c
 (function(){const o=refresh;refresh=function(){o();if(UI.coach){try{coWatch();if(G&&G.over)coEnd()}catch(e){console.error(e)}}}})();
 (function(){const o=applyMove;applyMove=function(m,seat){if(!UI.coach||!G||G.over)return o(m,seat);const n0=G.logN,c0=plCut(),d0=G.dial;const r=o(m,seat);
   try{if(r&&r.success!==false)coAfter(m,seat,plLines(n0),plCut()-c0,G.dial!=null&&d0!=null&&G.dial<d0)}catch(e){console.error(e)}return r}})();
+// Learn to play is a coached FREE game, not a staged spotlight tutorial: outside tools that ask the shared tutor (GXT) whether a
+// tutorial is running see "yes, and its staged part is over" while the coach is on, so they play it as free play (no forced taps).
+(function(){if(typeof GXT==='undefined'||!GXT.running||GXT._coachShim)return;GXT._coachShim=1;const r=GXT.running,s=GXT.state;
+  GXT.running=function(){return !!(UI&&UI.coach)||r.apply(GXT,arguments)};
+  if(s)GXT.state=function(){if(UI&&UI.coach&&!r.call(GXT))return {phase:'end',coached:true,shown:false};return s.apply(GXT,arguments)}})();

@@ -3,7 +3,7 @@ Object.assign(UI,{notes:{},flowG:null,sumSeen:0,roadInfo:null,hold:null,holdK:[]
 const PHASES=[
   {n:'Planning',sub:'set dials',t:'<b>Planning:</b> every pilot secretly picks one maneuver on its dial. Nobody moves yet.'},
   {n:'Activation',sub:'move + act',t:'<b>Activation:</b> one ship at a time reveals its dial and moves, <b>lowest pilot skill first</b>. After moving, each ship takes one action.'},
-  {n:'Combat',sub:'shoot',t:'<b>Combat:</b> one ship at a time may shoot an enemy inside its arc at range 1-3, <b>highest pilot skill first</b>.'},
+  {n:'Combat',sub:'shoot',t:'<b>Combat:</b> ships shoot one at a time, <b>highest pilot skill first</b>. Targets must be in the arc at range 1-3.'},
   {n:'End',sub:'summary',t:'<b>End:</b> unused focus and evade tokens are removed (target locks and stress stay). Then the next round starts.'}];
 function flowReset(){Object.assign(UI,{notes:{},hpAt:{},flowG:G,sumSeen:G&&G.round>=2?G.round-1:0,roadInfo:null,hold:null,holdK:[],resSeen:0,draftR:null})}
 function flowSync(){if(G&&UI.flowG!==G)flowReset()}
@@ -38,7 +38,7 @@ function queueData(){if(!G||G.round===0||G.winner||sumPending())return null;cons
   if(!G.order)return null;const ids=G.order;const cur=G.oi<ids.length?ids[G.oi]:null;const R=G.round;const N=UI.notes[R]||[];
   if(st===2)return {title:'Activation order',rule:'lowest skill first',ids,cur,done:i=>i<G.oi,
     tag:(s,i)=>{const n=N.find(x=>x.id===s.id&&x.lost);return n?'no action':i<G.oi?'moved ✓':i===G.oi?'now':''},
-    why:'Lowest pilot skill moves first, so the best pilots move last and can react'+tieText(ids.map(ship))+'.'};
+    why:'Lowest pilot skill moves first. The best pilots move last and react'+tieText(ids.map(ship))+'.'};
   if(st===3)return {title:'Combat order',rule:'highest skill first',ids,cur,done:i=>i<G.oi,
     tag:(s,i)=>{if(!s.alive)return 'destroyed';const n=N.find(x=>x.id===s.id&&x.kind==='noshot');return n?'no shot':i<G.oi?(s.fired?'fired ✓':'done'):i===G.oi?'now':''},
     why:'Highest pilot skill shoots first. A ship destroyed by a higher-skill pilot never gets to shoot'+tieText(ids.map(ship))+'.'};
@@ -56,7 +56,7 @@ function flowLog(side,t){let m;const by=n=>byName(n,side);
   if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'bump',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} bumped into ${esc(m[2])}: action lost.</b> Why: its move ended on top of ${esc(m[2])}, so it stopped short and skips its action. Ships that touch can't shoot each other this round.`,tip:'Next time pick a shorter, longer or sideways move so the bases do not overlap.'});return}
   if(m=t.match(/^(.+) is stressed and can't take an action/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'stressed',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} is stressed: action lost.</b> Why: a ship with a stress token (from a red move) can't take actions.`,tip:'Fly a green move (straight or gentle bank) to clear the stress.'});return}
   if(m=t.match(/^(.+) (flies through|lands on) an asteroid: rolls (\w+)/)){const s=by(m[1]);if(!s)return;const on=m[2]==='lands on',f=m[3];
-    addNote({id:s.id,kind:'rock',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} ${on?'landed on':'flew through'} an asteroid: action lost.</b> It rolled a damage die: <b>${f}</b> (${f==='hit'?'1 damage':f==='crit'?'1 damage and a damage card':'no damage'})${on?', and a ship sitting on an asteroid can\'t shoot this round':''}.`,tip:'Check the ghost before you lock: a template that touches a rock costs your action.'});return}
+    addNote({id:s.id,kind:'rock',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} ${on?'landed on':'flew through'} an asteroid: action lost.</b> It rolled a damage die: <b>${f}</b> (${f==='hit'?'1 damage':f==='crit'?'1 damage and a damage card':'no damage'})${on?'. A ship sitting on an asteroid can\'t shoot this round':''}.`,tip:'Check the ghost before you lock. Touching a rock costs your action.'});return}
   if(m=t.match(/^(.+) flies a red maneuver and takes a stress/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'red',t:`${nm(s)}${youTag(s)} flew a red move and got a <b>stress token</b>: no action while stressed, and no red moves until a green move clears it.`});return}
   if(m=t.match(/^(.+) flies a green maneuver and clears/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'green',t:`${nm(s)}${youTag(s)} flew a green move and cleared a stress token.`});return}
   if(m=t.match(/^(.+) is stressed and can't fly the red (.+?); (.+) picks (.+) instead/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'forced',hold:true,t:`<b>${nm(s)}${youTag(s)} was stressed and could not fly its red ${esc(m[2])}.</b> The other side picked ${esc(m[4])} for it instead. Stressed ships can't fly red moves.`});return}
@@ -116,12 +116,12 @@ function planHTML(ps){const my=alive().filter(s=>s.side===ps);if(!UI.sel||!my.fi
   const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[s.id];const ord=psOrder(true);
   const title=all?`Planning · all ${my.length>1?my.length+' dials':'dials'} set: lock them in`:`Planning · ship ${idx+1} of ${my.length}: choose a maneuver`;
   let h=`<p class="head">${title}</p>${stepList(my.map((x,i)=>`${esc(shortName(x))}${my.length>1?'':': pick a move'}`).concat(['Lock in']),all?my.length:idx)}`;
-  if(g)h+=`<p class="now-t">${all?`Press <b>Lock in dials</b>. Then <b>Activation</b> starts: ships reveal their dials and move one by one, lowest pilot skill first (${ord.map(x=>esc(shortName(x))+' '+psOf(x)).join(' → ')}).`
+  if(g)h+=`<p class="now-t">${all?`Press <b>Lock in dials</b>. Then <b>Activation</b> starts: ships reveal dials and move one by one. Order: ${ord.map(x=>esc(shortName(x))+' '+psOf(x)).join(', ')}.`
     :`Tap a maneuver on <b>${nm(s)}</b>'s dial below. A ghost appears on the board where the ship would end.`}</p>`;
   else h+=`<p class="now-t">${all?'Press <b>Lock in dials</b>.':`Choose ${nm(s)}'s maneuver.`}</p>`;
   if(my.length>1)h+=`<div class="shipTabs">${my.map((x,i)=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">Ship ${i+1}: ${esc(shortName(x))} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>`;
   if(s.stress)h+=`<p class="warn small"><b>${nm(s)} is stressed:</b> red moves are blocked, and it gets no action this round unless a green move clears the stress first.</p>`;
-  h+=`<div class="dlegend" aria-label="Dial colours"><span class="sw g"></span>green = easy (clears stress) <span class="sw w"></span>white = normal <span class="sw r"></span>red = hard (gives stress)</div>`;
+  h+=`<div class="dlegend" aria-label="Dial colours"><span class="sw g"></span>green: easy, clears stress. <span class="sw w"></span>white: normal. <span class="sw r"></span>red: hard, gives stress.</div>`;
   h+=`<div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><span class="dname"><b>${nm(s)}</b> · pilot skill ${psOf(s)}${s.rev&&G.round>1?` · last round: ${mvWords(s.rev)}`:''}</span>
     <p class="small mvread">${di!=null?moveRead(s,di):g?'Tap (or hover) a maneuver to see where it goes. The number is the speed, the arrow the direction.':'Choose a maneuver.'}</p></div></div>`;
   h+=recBox(s,sug);if(g&&!all)h+=`<p class="small muted">The enemy is choosing too, in secret, so it may not stay where it is. Nobody moves until every dial is locked.</p>`;
@@ -131,7 +131,7 @@ function moveRead(s,i){const m=dialOf(s)[i],c=exColor(s,m).c;return `<b>${mvWord
 function inArcOf(s,p){const b=B(s);p=p||s;return enemiesOf(s).map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((a,b)=>a.rg-b.rg)}
 function arcsOnMe(s,p){const b=B(s);p=p||s;return enemiesOf(s).map(e=>{const q=arcReach(e,B(e),p,b,e.arc);return q&&rangeOf(q.d)<=3?{e,rg:rangeOf(q.d)}:null}).filter(Boolean).sort((a,b)=>a.rg-b.rg)}
 function actNow(s,o,a){const mi=inArcOf(s),th=arcsOnMe(s);
-  if(o.a==='F')return mi.length?`Now: ${nm(mi[0].e)} is in your arc at range ${mi[0].rg}. When you shoot, every ◉ focus result becomes a hit (or an evade if you are shot).`:`Now: nobody is in your arc to shoot, but focus still turns ◉ results into evades if you are shot.`;
+  if(o.a==='F')return mi.length?`Now: ${nm(mi[0].e)} is in your arc at range ${mi[0].rg}. When you shoot, every ◉ focus result becomes a hit (or an evade if you are shot).`:`Now: nobody is in your arc. Focus still turns ◉ into evades when shot.`;
   if(o.a==='E')return th.length?`Now: you are in ${nm(th[0].e)}'s arc (range ${th[0].rg}). The evade token cancels one of its hits.`:'Now: no enemy has you in its arc, so it may go unused (it is removed at the end of the round).';
   if(o.a==='TL'){const t=ship(o.arg);if(!t)return '';const rg=rangeOf(baseDist(s,B(s),t,B(t)));const ina=mi.some(x=>x.e===t);return `Lock ${nm(t)} (range ${rg}): when you attack it you may reroll any attack dice. The lock stays until you use it.${ina?'':' It is not in your arc right now.'}`}
   if(o.p&&/^(BR|BO|EH|DD)$/.test(o.a)){const mi2=inArcOf(s,o.p),th2=arcsOnMe(s,o.p);return `${o.a==='BO'?'Surge forward':o.a==='DD'?'Turn hard':'Slide sideways'} (hover to see the ghost). Ends ${mi2.length?`with ${nm(mi2[0].e)} in your arc at range ${mi2[0].rg}`:'with nobody in your arc'}${th2.length?`, in ${nm(th2[0].e)}'s arc`:', outside every enemy arc'}.`}
@@ -140,7 +140,7 @@ function recAct(s){const acts=actionsFor(s);if(acts.some(a=>/^RP\d/.test(a.a)))r
   if(!mi.length&&th.length&&has('E'))return 'E';if(has('F'))return 'F';if(has('E'))return 'E';return null}
 function actionHTML(s){const acts=actionsFor(s);const g=guided();const rec=recAct(s);const ord=G.order||[];const i=ord.indexOf(s.id);
   let h=`<p class="head">Activation · ${esc(shortName(s))}: choose one action</p>${stepList([`Reveal and move: ${s.rev?mvWords(s.rev):'moved'}`,'Choose one action'],1)}`;
-  if(g)h+=`<p class="now-t"><b>${nm(s)}</b> moved ${i===ord.length-1?'last':'now'}: ships move from lowest to highest pilot skill, and its skill is ${psOf(s)}. After moving it may take <b>one action</b>. Each button says what it does right now; ★ is recommended.</p>`;
+  if(g)h+=`<p class="now-t"><b>${nm(s)}</b> moved ${i===ord.length-1?'last':'now'}. Its pilot skill is ${psOf(s)}; low skill moves first. Now it may take <b>one action</b>. Each button says what it does. ★ is recommended.</p>`;
   else h+=`<p class="now-t">You flew <b>${s.rev?mvWords(s.rev):''}</b>. Take one action.</p>`;
   h+='<div class="acts col">'+actOpts(s,acts).sort((x,y)=>(/^RP\d/.test(y.a)?1:0)-(/^RP\d/.test(x.a)?1:0)).map(o=>{const a=acts.find(x=>x.a===o.a);const r=o.a===rec&&(o.a!=='TL')?' rec':'';
     if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep${r}" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">${r?'★ ':''}🔧 Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
@@ -158,7 +158,7 @@ function targetHTML(s){const g=guided();const ws=weaponsFor(s);const opts=[];for
   h+=`<button class="btn ghost" data-act="fire" data-w="skip">Hold fire<small>Skip this attack.</small></button></div>`;
   if(cant.length)h+=`<p class="small muted">Can't shoot: ${cant.map(e=>`${nm(e)} is ${whyNot(s,e)}`).join('; ')}.</p>`;
   return h}
-const DLEG='<p class="dleg">✹ hit = 1 damage · ✸ crit = 1 damage + a damage card · ◉ focus = a hit (or evade) only if you spend a focus token · ✦ evade = cancels 1 hit · blank = nothing</p>';
+const DLEG='<p class="dleg">✹ hit: 1 damage. ✸ crit: 1 damage and a damage card. ◉ focus: a hit or evade if you spend focus. ✦ evade: cancels 1 hit. Blank: nothing.</p>';
 function diceRows(A){const a=ship(A.a),d=ship(A.d);return `<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))} rolled ${A.dice.length}</span><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div>`+
   (A.step==='dmod'?`<div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))} rolled ${A.def.length}</span><div class="dice">${A.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:'')}
 function diceHead(A){const a=ship(A.a),d=ship(A.d);const def=G.phase==='dmod'||G.phase==='damod';const iDef=humanTurn()&&def&&mine(d)&&!mine(a);
