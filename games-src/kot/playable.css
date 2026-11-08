@@ -113,11 +113,11 @@ html:not(.ph-l) #ob #pacts [data-act="resolve"]:active{transform:scale(.96)}
 html:not(.ph-l) #ob #pacts [data-act="resolve"] .bl{font-size:22px;max-width:none}
 /* W386e: the turn tracker ("Roll 1 of 3 · Tap dice to keep them") is always at the top, under the score strip, above every bubble */
 html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{display:block;position:fixed;left:50%;top:calc(var(--sat,0px) + var(--ph-bar,52px) + 6px);bottom:auto;transform:translateX(-50%);z-index:2147482000;max-width:calc(100vw - 16px);white-space:normal;text-align:center}
-html.ph-p .gxh-bub{margin-top:30px}
+html.ph-p .gxh-bub:not(.gxt-bub){margin-top:30px}
 html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{font:900 14px/1.15 Nunito,sans-serif;padding:4px 10px}
-html.ph-p .gxh-bub{margin-top:36px}
+html.ph-p .gxh-bub:not(.gxt-bub){margin-top:36px}
 html.pp-mine-roll #ob #preview,html.pp-mine-roll #preview{display:none}
-html.ph-p.pp-nobub .gxh-bub{display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
+html.ph-p.pp-nobub .gxh-bub:not(.gxt-bub){display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;box-sizing:border-box}
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]) .btn{width:auto;min-width:0;box-sizing:border-box;flex:none}
 

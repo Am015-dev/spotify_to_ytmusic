@@ -36,16 +36,14 @@ function tutFirst(){try{return !localStorage.getItem(TOUR)&&!GXT.status(TUT_GAME
 const TUT_SCRIPT=[
   ['3','3','E','H','C','1'],  // you: two 3s to keep
   ['3','E','E','2'],          // reroll of dice 2-5: a third 3 and two energy
-  ['E'],                      // the last reroll: one more energy
+  ['E','E'],                  // the last reroll: the freed energy die and the 2 -> three energy
   ['C','C','1','2','2','H'],  // Squidrik: two claws, no triple
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['C','C','H','E','E','1'],  // you in Downtown: claws, a heart that cannot heal, two energy
+  ['1','2','3','E','E','3'],  // Shroomhulk (2 hearts): nothing scores, no healing
+  ['C','C','H','E','E','1'],  // you in Downtown: claws knock Shroomhulk out, a heart that cannot heal, two energy
   ['C','C','C','1','2','H'],  // Squidrik: three claws
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
   ['H','C','C','3','3','E'],  // you outside: a heart that heals, claws that hit Downtown
   ['C','1','2','H','H','3'],  // Squidrik (now in Downtown): one claw
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['3','3','3','3','C','C']]; // you, chapter 4: four 3s (3 stars + 1 for the extra die)
+  ['3','3','3','3','C','C']]; // you, some turns later: four 3s (3 stars + 1 for the extra die)
 const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','mend'];   // cards for sale; then (popped in this order) what a refill and the sweep deal
 (function(){
   // the dice: only the real throws read the script (the computer's look-ahead calls faceOf too and must stay random)
@@ -66,7 +64,7 @@ const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','men
   const _cs=campSetup;campSetup=function(){const r=_cs.apply(this,arguments);if(UI.tutNext)tutTable();return r};
 })();
 function tutTable(){UI.tutNext=false;G.tut=1;G.mode='solo';
-  [0,1,3].forEach((m,i)=>{const p=G.pl[i];p.m=m;p.human=i===0;p.lvl='easy';p.hp=10;p.vp=0;p.en=0;p.edeck=shuffle(evoDeckOf(m))});
+  [0,1,3].forEach((m,i)=>{const p=G.pl[i];p.m=m;p.human=i===0;p.lvl='easy';p.hp=i===2?2:10;p.vp=0;p.en=0;p.edeck=shuffle(evoDeckOf(m))});
   const all=TUT_BUY.concat(TUT_NEXT);G.deck=G.deck.concat(G.market,G.disc).filter(c=>!all.includes(c));G.market=TUT_BUY.slice();G.disc=[];
   G.deck.push(...TUT_NEXT.slice().reverse());G.ncards=cardTotal();G.log=[];lg(-1,'Tutorial: a short staged game.');
   TUT.script=TUT_SCRIPT.map(f=>f.slice());TUT.hold=false;TUT.ends=0}
@@ -90,85 +88,77 @@ const myBuy=()=>myTurn()&&G.phase==='buy'&&!tBusy();
 const isAct=a=>x=>x.what==='act'&&x.act===a;
 const isDie=(f,n)=>x=>x.what==='die'&&x.f===f&&!x.kept&&(n==null||x.k===n);
 const nm=i=>mname(P(i));
+// core rule -> the step that teaches it (in play order). tut-walk.js walks the tutorial by touch and checks every one was shown.
+const TUT_RULES=[['goal: 20 stars or last standing','goal'],['keep dice','keep'],['three rolls','roll1'],['three of a kind, pair scores nothing','third'],
+  ['energy','energy'],['kept dice can be rerolled','rekeep'],['resolve the dice','done1'],['empty Downtown: move in, +1 star','score1'],
+  ['buy a power card','buy'],['energy is saved, end turn','end1'],['rivals take turns; outside claws hit Downtown','rivals'],['stay when hit','stay'],
+  ['start in Downtown: +2 stars','bonus'],['Downtown claws hit everyone; stop early','done2'],['0 hearts: knocked out; no healing in Downtown','ko'],
+  ['sweep the cards for 2 energy','sweep'],['yield Downtown','yield'],['outside: hearts heal, claws hit Downtown','done3'],
+  ['extra matching die adds 1 star','later'],['20 stars win at the end of the turn','win20'],['how the game is won','result']];
 function tutSteps(){
   const phone=obTwo();   // touch: tap a card to read it, tap again to buy (a mouse buys with one click)
   const S=[
- {id:'goal',title:'Your goal',say:'Smash your way to 20 ★. The last monster standing wins too.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
- {id:'keep',title:'Keep your 3s',say:'Dice you tap stay put when you roll again. Tap both 3s.',target:tDie(0),also:tDie(1),wait:{type:'tap',times:2,match:isDie('3')},
+ {id:'goal',title:'Your goal',say:'Win with 20 ★, or be the last monster standing.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
+ {id:'keep',title:'Keep dice',say:'Tap both 3s. Kept dice stay put when you roll.',target:tDie(0),also:tDie(1),wait:{type:'tap',times:2,match:isDie('3')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.k).length<2},
- {id:'roll1',title:'Roll the rest',say:'You roll up to three times. Tap Roll to throw the other dice.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
+ {id:'roll1',title:'Roll again',say:'You get three rolls. Tap Roll to throw the rest.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice[0].k&&G.dice[1].k},
- {id:'third',title:'Three of a kind',say:'Two 3s score nothing. Three score 3 ★. Tap the new 3.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
+ {id:'third',title:'Three of a kind',say:'Three 3s score 3 ★. A pair scores nothing. Keep it.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].f==='3'&&!G.dice[2].k},
- {id:'energy',title:'Keep the energy',say:'Each ⚡ gives 1 energy to spend on power cards. Keep both.',target:tDie(3),also:tDie(4),wait:{type:'tap',times:2,match:isDie('E')},
+ {id:'energy',title:'Energy',say:'Each ⚡ is 1 energy for power cards. Keep both.',target:tDie(3),also:tDie(4),wait:{type:'tap',times:2,match:isDie('E')},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].k&&G.dice.filter(d=>d.k&&d.f==='E').length<2},
- {id:'roll2',title:'Last roll',say:'One roll left. Throw the last die.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
-   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===5},
- {id:'done1',title:'Smash!',say:'No rolls left. Tap SMASH! over the city to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'rekeep',title:'Change your mind',say:'Kept dice can be rerolled too. Tap this ⚡ to free it.',target:tDie(4),wait:{type:'tap',match:x=>x.what==='die'&&x.k===4&&x.kept},
+   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===5&&G.dice[4].k},
+ {id:'roll2',title:'Last roll',say:'One roll left. Tap Roll.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
+   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===4&&!G.dice[4].k},
+ {id:'done1',title:'Smash!',say:'No rolls left. Tap SMASH! to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&G.rolls===0},
- {id:'score1',title:'Stars and energy',say:()=>'Three 3s score 3 ★, three ⚡ give 3 energy. Downtown was empty, so you moved in: +1 ★. You have '+P(0).vp+' ★.',target:tMe,wait:null,
+ {id:'score1',title:'Downtown',say:'Downtown was empty, so you moved in: +1 ★.',target:tMe,wait:null,
    ready:()=>myBuy()&&inCity(0)},
   ];
-  if(phone)S.push({id:'shop',title:'Power cards',say:()=>'Spend energy on power cards. Tap '+CARDS[base(G.market[0])].n+' to read it.',target:tShop(0),wait:{type:'tap',match:x=>x.what==='shopsel'&&x.k===0},
+  if(phone)S.push({id:'shop',title:'Power cards',say:'Spend energy on power cards. Tap this card to read it.',target:tShop(0),wait:{type:'tap',match:x=>x.what==='shopsel'&&x.k===0},
     ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3});
   S.push(
- {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy it for ':'Buy it for ')+costOf(P(0),G.market[0])+' ⚡. A PERMANENT card stays with you all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
+ {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy. ':'Click to buy. ')+'PERMANENT cards stay all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
    ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||BF.sel===0)},
- {id:'end1',title:'End your turn',say:'Saved energy carries over. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'end1',title:'End your turn',say:'Unspent energy is saved. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
- {id:'rivals',title:'Rivals play too',say:()=>nm(1)+' rolls like you. Its claws hit the monster in Downtown: you. Computers keep, roll and buy too.',
+ {id:'rivals',title:'Rivals play',say:()=>nm(1)+' rolls too. Claws from outside hit Downtown: you.',
    target:tfirst('#dice','#pchips .pchip[data-pm="1"]','#pchips'),wait:null,onNext:()=>tutRelease(),
    ready:()=>!tBusy()&&G.active===1&&G.phase==='roll'&&G.dice.length===6&&!UI.choice},
- {id:'stay',title:'Stay or yield?',say:()=>'Hit in Downtown? Stay to earn 2 ★ next turn, or yield and run. Tap Stay.',target:tOpt('stay'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='stay'},
+ {id:'stay',title:'Stay or yield?',say:'Hit in Downtown: stay, or yield and leave. Tap Stay.',target:tOpt('stay'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='stay'},
    ready:()=>tChoice(/^Stay or yield/)},
- {id:'bonus',title:'Downtown pays',say:()=>'You started in Downtown: +2 ★. You have '+P(0).vp+' ★. But hearts cannot heal you there.',target:tMe,wait:null,
+ {id:'bonus',title:'Downtown pays',say:'Starting your turn in Downtown pays +2 ★.',target:tMe,wait:null,
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
- {id:'done2',title:'Claws hit everyone',say:'From Downtown your claws hit every rival. You may stop rolling any time. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done2',title:'Hit everyone',say:'From Downtown, claws hit every rival. Stop early: tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
- {id:'score2',title:'Smash!',say:()=>'Two claws hit both rivals. Two ⚡ gained. The heart did nothing: no healing in Downtown.',target:tChips,wait:null,
-   ready:()=>myBuy()&&inCity(0)},
- {id:'sweep',title:'New cards',say:'Not happy with the cards? Pay 2 ⚡ to swap all three for new ones.',target:tSweep,wait:{type:'tap',match:isAct('sweep')},
+ {id:'ko',title:'Knocked out',say:()=>nm(2)+' hit 0 ♥ and is out. No healing in Downtown.',target:tChips,wait:null,
+   ready:()=>myBuy()&&inCity(0)&&!P(2).alive},
+ {id:'sweep',title:'New cards',say:'Pay 2 ⚡ to swap all three cards. Tap Sweep.',target:tSweep,wait:{type:'tap',match:isAct('sweep')},
    ready:()=>myBuy()&&P(0).en>=2},
  {id:'end2',title:'End your turn',say:'Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&!G.market.includes(TUT_BUY[1])},
- {id:'yield',title:'Yield the city',say:()=>nm(1)+' hit you again. Yield to leave Downtown: it moves in, but you stop taking hits. Tap Yield.',target:tOpt('yield'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='yield'},
+ {id:'yield',title:'Yield',say:()=>'Hit again. Yield: '+nm(1)+' takes Downtown. Tap Yield.',target:tOpt('yield'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='yield'},
    ready:()=>tChoice(/^Stay or yield/)},
- {id:'done3',title:'Outside the city',say:'Outside, hearts heal you and claws hit whoever holds Downtown. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done3',title:'Outside',say:'Outside, hearts heal and claws hit Downtown. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&!inCity(0)&&G.rolls===2},
- {id:'score3',title:'Heal and hit',say:()=>'A heart healed you: '+Math.max(0,P(0).hp)+' ♥. Your claws hit '+nm(1)+' in Downtown.',target:tChips,wait:null,
-   ready:()=>myBuy()&&!inCity(0)},
- {id:'end3',title:'End your turn',say:'Tap End turn. The rivals play on while you watch.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'end3',title:'End your turn',say:()=>'Healed to '+Math.max(0,P(0).hp)+' ♥. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&!inCity(0)&&P(0).vp<16},
- {id:'later',title:'Four of a kind',say:()=>'Some turns later you have '+P(0).vp+' ★. Four 3s score 3 ★ plus 1 for the extra die. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'later',title:'Four of a kind',say:'Four 3s: 3 ★ plus 1 for the extra die. SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    onEnter:()=>{try{P(0).vp=16;refresh()}catch(e){}},
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
- {id:'win20',title:'Reach 20 stars',say:()=>'You have '+P(0).vp+' ★. Reach 20 and end your turn to win. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
-   ready:()=>myBuy()&&P(0).vp>=20},
- {id:'result',title:'The result',say:'The first to 20 ★ wins at once. You also win if every rival is K.O. (0 hearts). Tap Finish.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+ {id:'win20',title:'Twenty stars',say:'20 ★! You win when your turn ends. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&P(0).vp>=20&&!G.winner},
+ {id:'result',title:'You win',say:'First to 20 ★ or last standing wins. Now play for real.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
    ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
-  // the story layer (tut-story.js): the words, Dot's reactions and the chapter beats; the rules and actions above are untouched
-  const FIRST={goal:1,rivals:2,done3:3,later:4}, LAST={end1:1,yield:2,end3:3,result:4};
-  const H=()=>({vp:P(0).vp,hp:Math.max(0,P(0).hp),rival:nm(1),card:G.market[0]!==undefined?CARDS[base(G.market[0])].n:'the card',cost:G.market[0]!==undefined?costOf(P(0),G.market[0]):0});
-  S.forEach(x=>{const t=TUT_STORY.steps[x.id];if(!t)return;
-    if(typeof t.say==='function'){const f=t.say;x.say=()=>f(H())}else x.say=t.say;
-    const react=t.react,first=FIRST[x.id],last=LAST[x.id],B=TUT_STORY.beats;
-    const oe=x.onEnter;x.onEnter=()=>{if(oe)oe();if(first&&typeof ppBeat==='function')ppBeat('Chapter '+first+' · '+B[first].name,B[first].intro)};
-    const od=x.onDone;x.onDone=()=>{if(od)od();if(typeof ppBeat!=='function')return;if(react&&!last)ppBeat(null,react);if(last&&x.id!=='result')ppBeat('Chapter '+last+' done',(react?react+' ':'')+B[last].outro)}});
-  const CH={goal:1,keep:1,roll1:1,third:1,energy:1,roll2:1,done1:1,score1:1,shop:1,buy:1,end1:1,rivals:2,stay:2,bonus:2,done2:2,score2:2,sweep:2,end2:2,yield:2,done3:3,score3:3,end3:3,later:4,win20:4,result:4};
-  S.forEach(x=>{if(CH[x.id])x.title=CH[x.id]+' · '+x.title});
+  // every rule the tutorial teaches, in order: TUT_RULES (tut-walk.js checks each one appears)
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){   // coached first game (Addendum 4): a real game, free choices from turn 1, Dot speaks just in time (playable.js, tut-story.js)
-  try{localStorage.setItem('gxt-'+TUT_GAME,JSON.stringify({open:true,step:1,seen:true}))}catch(e){}
-  try{GXH.hide()}catch(e){}try{if(GX.open)GX.close()}catch(e){}try{if(typeof GXC!=='undefined'&&GXC.close)GXC.close()}catch(e){}
-  clearTimeout(UI.statsT);UI.info=false;UI.choice=null;UI.stats=false;UI.intro=false;UI.coach=-1;UI.adv=false;UI.paused=false;UI.pending=false;UI.busy=false;UI.camp=null;UI.campNext=false;UI.tutNext=true;
-  const sv={n:UI.n,mon:UI.mon,xp:UI.xp,evo:UI.evo,ex:UI.ex,lvl:UI.lvl};UI.n=3;UI.mon=0;UI.xp='base';UI.evo=false;UI.ex={};UI.lvl='easy';
-  try{setSeed(5);newGame('solo',3,0)}finally{Object.assign(UI,sv)}
-  TUT.hints=UI.hints;UI.hints=false;UI.intro=false;if(G){G.tut=1;G.goal=6;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
+function tutStart(o){tutStartScripted(o)}   // the guided first game: one sentence and one highlighted tap per step, then a real game
 function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',
+    endTitle:'You know the rules',endText:pro?'Now the Story begins.':'Now a real game.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{tutLeave();const c=r&&r.choice;

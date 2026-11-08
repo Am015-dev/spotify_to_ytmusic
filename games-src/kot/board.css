@@ -199,7 +199,8 @@ html.sk #pacts .btn .bl{background:rgba(50,14,0,.85)}
 html.sk #pacts .btn small{background:rgba(50,14,0,.85);border-radius:6px;padding:0 6px;color:#fff;text-shadow:none}
 html.ph .pchip span em{background:#fffdf5!important}
 /* Play with Hints off: no first-time help bubbles or tooltips (one instruction line only) */
-html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail),html:not(.pp-hints) .gxh-tt:not(#arttail *){display:none!important}
+html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail):not(.gxt-bub),html:not(.pp-hints) .gxh-tt:not(#arttail *):not(.gxt-bub *){display:none!important}
+html.gxt-on #bline,html.gxt-on #pppreview{display:none!important}   /* the guided tutorial: its bubble is the one sentence on screen */
 /* desktop: secondary text 16px */
 html:not(.ph) :is(.menu .btn small,#title small,details.custom .small,#modal p.small,.gxc-act small){font-size:16px!important}
 /* campaign header art at its natural scale (it was stretched 2-3x) */

@@ -1,4 +1,38 @@
-# Tutorial coverage: Crown City Smash (W386, 7 Nov 2026) - COACHED FIRST GAME
+# Tutorial coverage: Crown City Smash (W500, 8 Nov 2026) - GUIDED FIRST GAME
+
+Learn to play starts a guided first game (`tutor.js`, `tutStart` -> `tutStartScripted`): you, Squidrik and Shroomhulk, scripted dice, every rule in play
+order, one sentence of 12 words or fewer and one highlighted tap (or Next) per step, played to a real 20-star win; the end card then starts a real game.
+No "learn later" list. Proof: `node tut-walk.js 390 844` (and 375 667) taps every spotlit target by touch and checks each step's words, the TUT_RULES order,
+the guided win and the real game after it. The coached free-play game (below) is no longer started.
+
+| # | Rule (TUT_RULES) | Step | Sentence |
+|---|---|---|---|
+| 1 | 20 stars or last standing | goal | Win with 20 ★, or be the last monster standing. |
+| 2 | keep dice | keep | Tap both 3s. Kept dice stay put when you roll. |
+| 3 | three rolls | roll1 | You get three rolls. Tap Roll to throw the rest. |
+| 4 | three of a kind, a pair scores nothing | third | Three 3s score 3 ★. A pair scores nothing. Keep it. |
+| 5 | energy | energy | Each ⚡ is 1 energy for power cards. Keep both. |
+| 6 | kept dice can be rerolled | rekeep | Kept dice can be rerolled too. Tap this ⚡ to free it. |
+| 7 | resolve | roll2, done1 | One roll left. Tap Roll. / No rolls left. Tap SMASH! to use your dice. |
+| 8 | empty Downtown: move in, +1 ★ | score1 | Downtown was empty, so you moved in: +1 ★. |
+| 9 | buy a power card | shop, buy | Spend energy on power cards. Tap this card to read it. / Tap it again to buy. PERMANENT cards stay all game. |
+| 10 | energy is saved, end turn | end1 | Unspent energy is saved. Tap End turn. |
+| 11 | rivals; outside claws hit Downtown | rivals | Squidrik rolls too. Claws from outside hit Downtown: you. |
+| 12 | stay | stay | Hit in Downtown: stay, or yield and leave. Tap Stay. |
+| 13 | start in Downtown: +2 ★ | bonus | Starting your turn in Downtown pays +2 ★. |
+| 14 | Downtown claws hit everyone; stop early | done2 | From Downtown, claws hit every rival. Stop early: tap SMASH! |
+| 15 | 0 hearts: knocked out; no healing in Downtown | ko | Shroomhulk hit 0 ♥ and is out. No healing in Downtown. |
+| 16 | sweep for 2 energy | sweep, end2 | Pay 2 ⚡ to swap all three cards. Tap Sweep. |
+| 17 | yield | yield | Hit again. Yield: Squidrik takes Downtown. Tap Yield. |
+| 18 | outside: hearts heal, claws hit Downtown | done3, end3 | Outside, hearts heal and claws hit Downtown. Tap SMASH! |
+| 19 | extra matching die +1 ★ | later | Four 3s: 3 ★ plus 1 for the extra die. SMASH! |
+| 20 | 20 ★ wins at the end of the turn | win20 | 20 ★! You win when your turn ends. Tap End turn. |
+| 21 | how the game is won | result | First to 20 ★ or last standing wins. Now play for real. |
+
+Not taught (not core in a 3-monster game): the Harbor (5-6 monsters only), card-specific powers (each card says what it does), the options in Customise.
+
+---- older coached version (W386, no longer started) ----
+
 
 The tutorial is a real game (you, Squidrik, Shroomhulk; fixed seed 5) with free choices from turn 1. No forced taps: Dot Inkwell, the Clarion's
 reporter, speaks once per rule the first time it matters (`tut-story.js` COACH_TIPS, shown by `playable.js`), one bubble at a time, never blocking input,
