@@ -5,3 +5,5 @@ Public domain: plates from Ernst Haeckel, "Kunstformen der Natur" (1899-1904), s
 CC BY 3.0 (credit required): icons from game-icons.net, https://game-icons.net. Icons made by delapouite, lorc, quoting. Available on https://game-icons.net, licensed CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). Recoloured by this library.
 
 Per icon author and page: see _MAP.tsv.
+
+fx-ping is a procedural soft ring glow made here (no third-party source). Stamps are glyph-on-frame ink looks made here from the glyphs above.
