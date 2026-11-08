@@ -167,8 +167,16 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();
   // a guided game ("Teach me as I play", or a story chapter with hints): every bubble shows again
   if(G&&G.learn&&UI.hlpLearn!==G.gid){UI.hlpLearn=G.gid;GXH.reset();GXH.setEnabled(true)}
   GXH.phase(hlpPhase())}
-(function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){UI.lastErr='hlp '+e}return r}})();
+// a help bubble never covers a glowing target: glows change after the bubble was placed (a card picked up lights new spots), so look again;
+// re-place it, and if there is still no free spot the glowing spots speak for themselves: the bubble goes
+const HLP_CORE='.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse';
+function hlpCovers(){const bs=[...document.querySelectorAll('.gxh-bub.on')];if(!bs.length)return false;
+  const cs=[...document.querySelectorAll(HLP_CORE)].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<innerWidth&&q.top<innerHeight)
+    .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}});
+  return bs.some(b=>{const r=b.getBoundingClientRect();return cs.some(c=>r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t)})}
+function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(hlpCovers())GXH.hide()}
+(function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter();hlpUncover()}catch(e){UI.lastErr='hlp '+e}return r}})();
 // pick-ups, asks and overlays change the phase without a render: look again now and then (cheap, idempotent)
-(function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit)GXH.phase(hlpPhase())}catch(e){}return r}})();
-setInterval(()=>{try{if(_hlpInit&&G){hlpClean();GXH.phase(hlpPhase())}}catch(e){}},400);
+(function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit){GXH.phase(hlpPhase());hlpUncover()}}catch(e){}return r}})();
+setInterval(()=>{try{if(_hlpInit&&G){hlpClean();GXH.phase(hlpPhase());hlpUncover()}}catch(e){}},250);
 hlpAfter();
