@@ -11,7 +11,9 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html'); const TAG 
     const until = async (fn, ms) => { for (let t = 0; t < ms; t += 100) { if (await page.evaluate(fn)) return true; await page.waitForTimeout(100); } return false; };
     await page.goto(URL); await page.evaluate(() => { localStorage.clear(); try { GXT.markDone('vale-of-banners'); } catch (e) { } }); await page.reload(); await page.waitForTimeout(500);
     await page.evaluate(() => startGame({ n: 2, ai: 'normal', seed: 5 }));
-    await until(() => myTurn() && !UI.busy, 20000); await page.waitForTimeout(1800); await shot('1yourturn');
+    await page.waitForTimeout(600); await shot('0goal'); const gb = page.locator('#goalB'); if (await gb.count()) await tap(gb);
+    await until(() => myTurn() && !UI.busy, 20000); await page.waitForTimeout(1800); await until(() => !document.querySelector('#beat.on') && !document.querySelector('#tbanner.on'), 4000); await page.waitForTimeout(1300); await shot('1play');
+    await tap(page.locator('#hintT')); await page.waitForTimeout(400); await shot('1hints');
     // stack a buildable tile next to home so the build preview shows
     await page.evaluate(() => { const p = G.P[0]; const land = Object.keys(p.estate).map(Number); const cand = VB.CELLS.filter(c => !p.estate[c.i] && ['mine', 'ship', 'castle'].includes(c.col) && c.nb.some(n => p.estate[n]));
       const c = cand[0] || VB.CELLS.filter(c => !p.estate[c.i] && c.nb.some(n => p.estate[n]))[0]; p.store = [{ id: 'shot1', t: c.col === 'pas' || c.col === 'bld' || c.col === 'know' ? 'mine' : c.col }]; if (p.store[0].t !== c.col) p.store[0].t = 'mine';

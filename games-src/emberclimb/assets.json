@@ -10,7 +10,8 @@
    "alpha": false,
    "wave": 1,
    "slot": "Title screen",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a lone glowing tower of dark stone rising into an ember-lit stormy sky, tiny campfire at its foot, a winding path leading up, empty sky area in the upper third. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a lone glowing tower of dark stone rising into an ember-lit stormy sky, tiny campfire at its foot, a winding path leading up, empty sky area in the upper third. No characters, no UI.",
+   "owner": "doorkick-dungeon/title-phone.webp"
   },
   {
    "stem": "bg-map",
@@ -21,7 +22,8 @@
    "alpha": false,
    "wave": 1,
    "slot": "Map screen",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a vertical parchment-and-slate map of a mountain climb, faded paths and ink-stained clouds, calm empty centre where nodes sit. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a vertical parchment-and-slate map of a mountain climb, faded paths and ink-stained clouds, calm empty centre where nodes sit. No characters, no UI.",
+   "owner": "doorkick-dungeon/table-tavern-phone.webp"
   },
   {
    "stem": "bg-battle-1",
@@ -32,7 +34,8 @@
    "alpha": false,
    "wave": 1,
    "slot": "Fight 1 (floors 1,4,7)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a torchlit mossy dungeon hall seen head-on, stone floor and two pillars, empty centre for combatants. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a torchlit mossy dungeon hall seen head-on, stone floor and two pillars, empty centre for combatants. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-skygrif-boss.mp4"
   },
   {
    "stem": "bg-battle-2",
@@ -43,7 +46,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Fight 2 (floors 2,5,8)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a damp swamp ruin with broken arches and glowing mushrooms, empty centre for combatants. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a damp swamp ruin with broken arches and glowing mushrooms, empty centre for combatants. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-pharaoh-boss.mp4"
   },
   {
    "stem": "bg-battle-3",
@@ -54,7 +58,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Fight 3 (floors 3,6,9)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a high rope-bridge terrace at dusk between two stone towers, empty centre for combatants. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a high rope-bridge terrace at dusk between two stone towers, empty centre for combatants. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-tentacles-boss.mp4"
   },
   {
    "stem": "bg-elite",
@@ -65,7 +70,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Elite fights",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a red-lit arena of cracked obsidian with chains hanging from above, ominous, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a red-lit arena of cracked obsidian with chains hanging from above, ominous, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-dread-boss.mp4"
   },
   {
    "stem": "bg-boss-mire-behemoth",
@@ -76,7 +82,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Boss: mire behemoth",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a vast sunken marsh cavern with giant reeds and pale lights in the fog, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a vast sunken marsh cavern with giant reeds and pale lights in the fog, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-tentacles-boss.mp4"
   },
   {
    "stem": "bg-boss-ashen-wraith",
@@ -87,7 +94,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Boss: ashen wraith",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a burnt cathedral nave full of drifting ash and tiny candle flames, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a burnt cathedral nave full of drifting ash and tiny candle flames, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-dread-boss.mp4"
   },
   {
    "stem": "bg-boss-gate-colossus",
@@ -98,7 +106,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Boss: gate colossus",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a colossal stone gateway courtyard with glowing runes in the walls, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a colossal stone gateway courtyard with glowing runes in the walls, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/doorkick-wyrm-boss.mp4"
   },
   {
    "stem": "bg-reward",
@@ -109,7 +118,8 @@
    "alpha": false,
    "wave": 2,
    "slot": "Reward and treasure screens",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a quiet stone alcove with a draped table and a soft golden light from above, dark edges, calm empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: a quiet stone alcove with a draped table and a soft golden light from above, dark edges, calm empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/table-golden-vault.webp"
   },
   {
    "stem": "bg-rest",
@@ -153,7 +163,8 @@
    "alpha": false,
    "wave": 3,
    "slot": "Win screen",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: sunrise breaking over the tower summit, golden clouds and a banner, hopeful, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: sunrise breaking over the tower summit, golden clouds and a banner, hopeful, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/end-win.webp"
   },
   {
    "stem": "bg-defeat",
@@ -164,7 +175,8 @@
    "alpha": false,
    "wave": 3,
    "slot": "Lose screen",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: the tower base at night with a dying campfire and falling ash, sorrowful, empty centre. No characters, no UI."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Vertical background scene: the tower base at night with a dying campfire and falling ash, sorrowful, empty centre. No characters, no UI.",
+   "owner": "doorkick-dungeon/end-lose.webp"
   },
   {
    "stem": "hero-w",
@@ -296,7 +308,8 @@
    "alpha": false,
    "wave": 1,
    "slot": "Draw pile icon, card back",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Back of a playing card, symmetrical ornate ember-and-tower emblem on dark leather, portrait 5:7, full bleed."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Back of a playing card, symmetrical ornate ember-and-tower emblem on dark leather, portrait 5:7, full bleed.",
+   "owner": "doorkick-dungeon/back-door.webp"
   },
   {
    "stem": "w-strike",
@@ -1638,7 +1651,8 @@
    "alpha": true,
    "wave": 2,
    "slot": "Battle enemy: Mire Behemoth (boss)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of colossal swamp creature of mud and reeds with a wide mouth, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of colossal swamp creature of mud and reeds with a wide mouth, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+   "owner": "doorkick-dungeon/doorkick-tentacles-boss.mp4"
   },
   {
    "stem": "enemy-ashen-wraith",
@@ -1649,7 +1663,8 @@
    "alpha": true,
    "wave": 2,
    "slot": "Battle enemy: Ashen Wraith (boss)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of tall ghost of burnt cloth and ash with six floating candles, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of tall ghost of burnt cloth and ash with six floating candles, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+   "owner": "doorkick-dungeon/doorkick-dread-boss.mp4"
   },
   {
    "stem": "enemy-gate-colossus",
@@ -1660,7 +1675,8 @@
    "alpha": true,
    "wave": 2,
    "slot": "Battle enemy: Gate Colossus (boss)",
-   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of colossal armoured stone guardian shaped like a castle gate, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+   "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Enemy creature portrait of colossal armoured stone guardian shaped like a castle gate, menacing facing the viewer, on a flat plain white background, one single object centred with generous margin, no ground shadow.",
+   "owner": "doorkick-dungeon/doorkick-wyrm-boss.mp4"
   },
   {
    "stem": "relic-ember-brand",
@@ -2519,6 +2535,158 @@
    "wave": 3,
    "slot": "Effect over a target",
    "prompt": "Hand-painted 2D dark-fantasy storybook illustration for a deck-building card game, warm ember-orange and deep charcoal palette with cool blue accents, bold readable silhouettes, soft painterly shading, clean confident edges, flat 2D view (no 3D render, no photo), absolutely no text, no letters, no numbers, no watermark. Effect sprite: a round orange fire burst, on a flat plain white background, one single object centred with generous margin, no ground shadow."
+  },
+  {
+   "stem": "bg-title-wide",
+   "kind": "bg",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/title.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "bg-map-wide",
+   "kind": "bg",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/table-tavern.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "cast-guide",
+   "kind": "portrait",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/camp-hobb.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "cast-rival",
+   "kind": "portrait",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/camp-grub.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "cast-merchant",
+   "kind": "portrait",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/camp-tansy.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "cast-healer",
+   "kind": "portrait",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/camp-pip.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "cast-teller",
+   "kind": "portrait",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/camp-morwen.webp",
+   "ext": "webp"
+  },
+  {
+   "stem": "bg-boss-ember-tyrant",
+   "kind": "bg",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-inferno-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "bg-boss-tomb-king",
+   "kind": "bg",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-pharaoh-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "bg-boss-skyclaw",
+   "kind": "bg",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-skygrif-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "enemy-ember-tyrant",
+   "kind": "enemy",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-inferno-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "enemy-tomb-king",
+   "kind": "enemy",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-pharaoh-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "enemy-skyclaw",
+   "kind": "enemy",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-skygrif-boss.mp4",
+   "ext": "webp"
+  },
+  {
+   "stem": "boss-mire-behemoth",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-tentacles-boss.mp4",
+   "ext": "mp4"
+  },
+  {
+   "stem": "boss-ashen-wraith",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-dread-boss.mp4",
+   "ext": "mp4"
+  },
+  {
+   "stem": "boss-gate-colossus",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-wyrm-boss.mp4",
+   "ext": "mp4"
+  },
+  {
+   "stem": "boss-ember-tyrant",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-inferno-boss.mp4",
+   "ext": "mp4"
+  },
+  {
+   "stem": "boss-tomb-king",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-pharaoh-boss.mp4",
+   "ext": "mp4"
+  },
+  {
+   "stem": "boss-skyclaw",
+   "kind": "video",
+   "wave": 3,
+   "slot": "owner art reused from doorkick-dungeon",
+   "owner": "doorkick-dungeon/doorkick-skygrif-boss.mp4",
+   "ext": "mp4"
   }
  ]
 }

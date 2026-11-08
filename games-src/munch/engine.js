@@ -1,7 +1,7 @@
 // ---------- Doorkick Dungeon engine: all rules live here. State is G (plain JSON); every move goes through gameAct(ds, seat). ----------
 // Rule ids [R..]/[H..] refer to rules-notes.md.
 var ANIM=1, AIDELAY=600, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
-const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CAP:400,THEFT:4,MAXTURN:600};
+const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CHARM_MIN:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
 let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};
 // ---- random ----
@@ -373,7 +373,7 @@ function sellValue(p,ids){let t=ids.reduce((a,id)=>a+(cd(id).g||0),0);if(isRace(
 function abilityMoves(s){const p=P(s),cb=G.cb,mv=[];if(!p.hand.length)return mv;const inFight=s===cb.who||s===cb.help;
   if(isCls(p,'warrior')&&inFight&&(cb.used['b'+s]||0)<R.BERSERK&&!special(cb,'lvlonly'))for(const id of p.hand)mv.push({act:'berserk',card:id});
   if(isCls(p,'cleric')&&inFight&&(cb.used['t'+s]||0)<R.TURN&&cb.mons.some(m=>mdef(m).undead))for(const id of p.hand)mv.push({act:'turn',card:id});
-  if(isCls(p,'wizard')&&inFight&&!cb.used['c'+s])cb.mons.forEach((m,j)=>mv.push({act:'charm',tgt:j}));
+  if(isCls(p,'wizard')&&inFight&&!cb.used['c'+s]&&p.hand.length>=R.CHARM_MIN)cb.mons.forEach((m,j)=>mv.push({act:'charm',tgt:j}));
   if(isCls(p,'wizard')&&inFight&&!winning(cb)&&(cb.used['f'+s]||0)<R.FLIGHT)for(const id of p.hand)mv.push({act:'flight',card:id});
   if(isCls(p,'thief'))for(const t of fighters(cb))if(t.i!==s&&!cb.used['s'+s+'_'+t.i])for(const id of p.hand)mv.push({act:'backstab',card:id,tgt:t.i});
   return mv}

@@ -5,17 +5,17 @@ for (const f of ['data', 'djinns', 'engine', 'ai']) vm.runInContext(fs.readFileS
 const run = s => vm.runInContext(s, C); run('UI.sim=true;');
 const N = +process.argv[2] || 200, fails = [];
 const T = (n, f) => { try { const r = f(); if (r !== true) fails.push(n + ': ' + r); } catch (e) { fails.push(n + ': threw ' + e.message); } };
-run(`function playOne(sd,np,ex){ DEFSEED=sd; newGame({np:np,ex:ex||{},seats:Array.from({length:np},function(){return {human:false}})}); var g=0, trig=null, after=0, palmMax=0, palMax=0;
+run(`function playOne(sd,np,ex){ DEFSEED=sd; newGame({np:np,ex:ex||{},seats:Array.from({length:np},function(){return {human:false}})}); var g=0, rem=0, trig=null, after=0, palmMax=0, palMax=0;
   while(!G.over && g++<30000){ var s=sideToAct(), m=aiMove(s); if(!m) return {stuck:'nomove '+G.phase+' '+G.step}; var was=G.endTrig; performMove(m,s);
-    if(G.endTrig && !was) trig=G.turn; if(trig!=null && G.turn>trig) after++;
+    if(G.endTrig && !was){ trig=G.turn; rem=G.order.length-1-G.turnIdx; } if(trig!=null && G.turn>trig) after++;
     var pm=0,pl=0; G.board.forEach(function(t){pm+=t.palm||0;pl+=t.pal||0}); palmMax=Math.max(palmMax,pm); palMax=Math.max(palMax,pl); }
-  return {over:!!G.over, trig:trig, after:after, turn:G.turn, palmMax:palmMax, palMax:palMax}; }`);
-T('game-ends-at-end-of-the-turn-of-the-last-camel', () => {
-  let seen = 0; for (let sd = 1; sd <= 60; sd++) { const r = run(`playOne(${sd},${2 + sd % 3})`); if (r.stuck) return r.stuck; if (!r.over) return 'not over seed ' + sd; if (r.trig != null) { seen++; if (r.after) return 'turns continued after the last camel, seed ' + sd; } }
+  return {over:!!G.over, trig:trig, rem:rem, after:after, turn:G.turn, palmMax:palmMax, palMax:palMax}; }`);
+T('game-ends-after-the-round-of-the-last-camel', () => {
+  let seen = 0; for (let sd = 1; sd <= 60; sd++) { const r = run(`playOne(${sd},${2 + sd % 3})`); if (r.stuck) return r.stuck; if (!r.over) return 'not over seed ' + sd; if (r.trig != null) { seen++; if (r.turn - r.trig !== r.rem) return 'rest of the round not played after the last camel: ' + (r.turn - r.trig) + ' turns vs ' + r.rem + ' seed ' + sd; } }
   return seen > 0 || 'no game reached the camel ending';
 });
 T('palm-and-palace-supply-is-finite', () => {
-  for (let sd = 1; sd <= 60; sd++) { const r = run(`playOne(${sd},${2 + sd % 3})`); if (r.palmMax > 22 || r.palMax > 10) return 'over supply seed ' + sd + ' ' + r.palmMax + '/' + r.palMax; }
+  for (let sd = 1; sd <= 60; sd++) { const r = run(`playOne(${sd},${2 + sd % 3})`); if (r.palmMax > 12 || r.palMax > 10) return 'over supply seed ' + sd + ' ' + r.palmMax + '/' + r.palMax; }
   return run(`(function(){ newGame({np:2,seats:[{human:false},{human:false}]}); G.sup={palm:0,pal:0}; var t=G.board.find(function(t){return !t.block}); var a=placeMoves(G.pl[0],t,'palm'), b=placeMoves(G.pl[0],t,'pal'); var k=G.board.find(function(t){return t.k==='oasis'}); placePalm(G.pl[0],k.i); return a.length===1&&a[0].skip&&b.length===1&&b[0].skip&&!k.palm; })()`);
 });
 let stuck = 0, bad = 0;

@@ -27,6 +27,7 @@ function renderRival(seat) {
   const p = G.players[seat], sc = score(seat);
   b.appendChild(h('div.rhead', pawn(seat, 28), h('div', h('b', p.name), h('div.sm', (p.ai ? 'Computer (' + p.ai + ')' : 'Player') + ' · ' + SEASN[p.season] + (p.passed ? ' · passed' : '')))));
   b.appendChild(h('div.kv', h('span', 'Points so far'), h('b', sc.total)));
+  [['Cards in the city', sc.cards, 'the points printed on your buildings and critters'], ['Point tokens', sc.tokens, 'tokens earned on cards and places'], ['Events', sc.events, 'flags you claimed (3 each for basic events)'], ['Bonus cards', sc.bonus, 'prosperity bonuses'], ['Journey', sc.journey, 'workers sent on the Long Road']].forEach(r => { if (r[1] || r[0] === 'Cards in the city') b.appendChild(h('div.kv.why', h('span', r[0] + ': ' + r[2]), h('b', '+' + r[1]))); });
   b.appendChild(h('div.kv', h('span', 'Workers'), h('b', availW(p) + ' free of ' + p.workers)));
   b.appendChild(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
   const rr = h('div.rrow'); RESK.forEach(k => rr.appendChild(h('span.rs', ic(k, 20), h('b', p.res[k])))); rr.appendChild(h('span.rs', ic('point', 20), h('b', p.pts))); b.appendChild(rr);
