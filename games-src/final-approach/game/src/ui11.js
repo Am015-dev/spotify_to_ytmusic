@@ -219,12 +219,14 @@ function roPoll() {
   if (!G || !UI.started) { FT.round = -1; return; }
   if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); return; }
   if (G.result) { roHide(); FT.round = G.round; return; }
+  if (FT.ro && G.phase !== 'brief') roHide();   // the card lives in the briefing only: rolling the dice puts the board first again
   if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net') roShow(a); FT.snap = roSnap(); }
 }
 setInterval(() => { try { roPoll(); } catch (e) { } }, 300);
 // ---------- after every render: tracker, preview, slot needs and reasons, the coach's pointer ----------
 function ftAfter() {
   if (!G || !UI.started) return;
+  if (typeof fcMute === 'function') fcMute();
   const db = $('#dockbody'); if (db) { const old = $('#ftrk'); const t = trackerEl(); if (old) old.replaceWith(t); else db.insertBefore(t, db.firstChild); }
   const v = actSeat(), sel = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (UI.sel === 'p' || (typeof UI.sel === 'number' && UI.sel >= 0));
   let pv = $('#fprev'); if (!pv && db) { pv = h('div#fprev', { 'aria-live': 'polite' }); const pd = $('#promptDock'); if (pd && pd.nextSibling) db.insertBefore(pv, pd.nextSibling); else db.appendChild(pv); }

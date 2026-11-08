@@ -124,14 +124,16 @@ function tsReact(text, who) {
 const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
 // one bubble only: [a rule that just became relevant] + [what to do now and why]. It never blocks input; x hides it until the situation changes.
 function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push(tsFill(T.coach[id])); }
-function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } }, 250); }
+function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
 function fcShow(key, txt, who, ms) {
   const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); try { c.el.remove(); } catch (e) { } }
   if (F.shut === key || !txt) return;
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
-  F.cur = { el, key, at: Date.now(), t: ms ? setTimeout(fcHide, ms) : 0 };
+  F.cur = { el, key, at: Date.now(), t: ms ? setTimeout(fcHide, ms) : 0 }; fcMute();
 }
+// while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
+function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
 function fcPump() { }
 function fcFeedback() { }
 // "Put your 4 on Engines: ..." from the coach's advice
