@@ -3,7 +3,7 @@
 function phPrompt() {
   if (!G) return '';
   if (UI.flash && UI.flash.until > Date.now()) return UI.flash.t;
-  if (G.result) return endWords();
+  if (G.result) return document.querySelector('#fx .endb') ? '' : endWords();   // the end banner already says it: say it once
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
   if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
   if (G.pend) {
