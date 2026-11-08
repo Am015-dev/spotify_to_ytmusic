@@ -18,7 +18,7 @@
 - Start: 1 silver, 1-4 workers by starting order, 3 random goods, home keep on the centre space.
 
 ## Guessed / simplified (say so if the owner wants them changed)
-- Stall size: 2/3/4 tiles per stall for 2/3/4 players, drawn at random from one 148-tile pool; back lane 4 random tiles.
+- Stall size: 2/3/4 tiles per stall for 2/3/4 players, drawn at random from the 124 normal tiles; the back lane (4/6/8) is drawn only from the 40 black-backed tiles.
 - Colour bonus: 2p 6/2, 3p 7/4/1, 4p 8/5/2.
 - Sale points: (players + 1) per tile.
 - Estate layout: our own map in the standard 37-space hexagon (keep 3, mine 3, lore 6, buildings 11, pasture 8, water 6).
@@ -38,3 +38,9 @@ Checked against a rules summary of the official rulebook (rulespal.com rulebook 
 - Lore tiles stay our own 26 (the published set is copyrighted text; ours bend similar kinds of rules).
 - No open-source implementation of this game with a usable licence was found (search of GitHub and the web: only a closed digital
   edition, a hosted browser version and a solo module for the card game), so no third-party code is used.
+
+## W437 follow-up: components of the original (8 Nov 2026)
+- Tile mix is now the published one: 164 tiles = 26 barges, 12 mines, 16 keeps, 26 lore, 28 pastures (7 per animal kind), 56 buildings (7 per kind). Before: 22 barges, 12 keeps, 36 pastures.
+- 40 tiles are black-backed (6 barges, 2 mines, 2 keeps, 6 lore, 8 pastures, 16 buildings) and feed only the back lane; the six stalls never get one.
+- Animals per tile (2/2/3/3/3/4/4 per kind) is our guess; the published split was not found.
+- Not confirmed, so not changed: whether leftover tiles stay on the stalls at season end; whether a meadow may hold two animal kinds.

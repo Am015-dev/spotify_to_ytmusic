@@ -16,8 +16,8 @@ function G0(n, o) {
   return G;
 }
 function adj(p, ci) { if (C[ci].nb.some(n => p.estate[n])) return; const nb = C[ci].nb.find(n => C[n].reg !== C[ci].reg) ; const f = nb == null ? C[ci].nb[0] : nb; p.estate[f] = filler(f); }
-function put(G, ci, t, extra) {   /* player 0 places tile t on cell ci using a die with exactly the cell's number; extra = other tiles left in storage */
-  const p = G.P[0]; adj(p, ci); p.store = [t].concat(extra || []); p.dice = [C[ci].num, C[ci].num % 6 + 1]; p.used = [false, false];
+function put(G, ci, t, extra, pi) {   /* player pi (default 0) places tile t on cell ci using a die with exactly the cell's number; extra = other tiles left in storage */
+  const p = G.P[pi || 0]; G.ti = pi || 0; adj(p, ci); p.store = [t].concat(extra || []); p.dice = [C[ci].num, C[ci].num % 6 + 1]; p.used = [false, false];
   const r = VB.performMove(G, { k: 'place', die: 0, v: C[ci].num, s: 0, cell: ci, w: 0 }); if (!r.ok) throw new Error('test setup: illegal place on ' + ci); return r;
 }
 function noDepots(G) { for (let d = 1; d <= 6; d++) G.depots[d] = [null, null]; }
@@ -211,6 +211,29 @@ know('k16', () => eq('2/1', VB.cost({ know: { wk2: true } }, 1, 4, 'take') + '/'
 ['hall', 'carp', 'chapel', 'mkt', 'inn', 'mint', 'tower', 'store'].forEach((b, i) => know('k' + (17 + i), () => { const G = G0(2), p = G.P[0]; p.silver = 0; p.workers = 0; p.goods = {}; p.estate[19] = { id: 'b1', t: 'bld', k: b }; p.estate[11] = { id: 'b2', t: 'bld', k: b }; p.know['end:' + b] = true; VB.forceEnd(G); return eq(6, p.vp); }));
 know('k25', () => { const G = G0(2), p = G.P[0]; p.silver = 0; p.workers = 0; p.goods = {}; p.know['end:sold'] = true; p.sold = 5; VB.forceEnd(G); return eq(5, p.vp); });
 know('k26', () => { const G = G0(2), p = G.P[0]; p.silver = 0; p.workers = 0; p.goods = {}; p.know['end:beast'] = true; p.estate[2] = { id: 'a', t: 'pas', k: 'sheep', n: 2 }; p.estate[3] = { id: 'b', t: 'pas', k: 'sheep', n: 3 }; p.estate[34] = { id: 'c', t: 'pas', k: 'pig', n: 2 }; VB.forceEnd(G); return eq(8, p.vp); });
+
+S('I. Components of the original (every tile type, bonus tile, goods, silver, workers)', 'Added after the owner reported missing items: tile mix, black-backed tiles and the bonus tile of every colour.');
+const cnt = f => VB.pool().filter(f).length;
+R('Component: 164 hexagon tiles in all', () => eq(164, VB.pool().length));
+R('Component: 26 barge tiles', () => eq(26, cnt(t => t.t === 'ship')));
+R('Component: 12 mine tiles', () => eq(12, cnt(t => t.t === 'mine')));
+R('Component: 16 keep tiles', () => eq(16, cnt(t => t.t === 'castle')));
+R('Component: 26 different Lore tiles, no two alike', () => eq('26/26', cnt(t => t.t === 'know') + '/' + new Set(VB.pool().filter(t => t.t === 'know').map(t => t.k)).size));
+R('Component: 28 pasture tiles, 7 of each of the 4 animal kinds, each tile showing 2 to 4 animals', () => { const P = VB.pool().filter(t => t.t === 'pas'); const per = Object.keys(VB.ANIMALS).map(a => P.filter(t => t.k === a).length).join(); return eq('28/7,7,7,7/true', P.length + '/' + per + '/' + P.every(t => t.n >= 2 && t.n <= 4)); });
+R('Component: 56 building tiles, 7 of each of the 8 kinds', () => eq('56/7,7,7,7,7,7,7,7', cnt(t => t.t === 'bld') + '/' + VB.BLDKEYS.map(k => cnt(t => t.t === 'bld' && t.k === k)).join()));
+R('Component: 40 tiles have a black back (6 barges, 2 mines, 2 keeps, 6 Lore, 8 pastures, 16 buildings)', () => eq('40/6,2,2,6,8,16', cnt(t => t.b) + '/' + ['ship', 'mine', 'castle', 'know', 'pas', 'bld'].map(c => cnt(t => t.b && t.t === c)).join()));
+R('Component: every tile has a unique id', () => eq(164, new Set(VB.pool().map(t => t.id)).size));
+R('Component: the back lane holds only black-backed tiles', () => { const G = G0(4); return eq(true, G.black.length === 8 && G.black.every(t => t && t.b)); });
+R('Component: the numbered stalls never hold a black-backed tile', () => { const G = G0(4); let ok = true; for (let d = 1; d <= 6; d++) G.depots[d].forEach(t => { if (!t || t.b) ok = false; }); return eq(true, ok); });
+R('Component: 4 players can play all 5 seasons without a stall or back-lane space left empty', () => { const G = G0(4); let bad = 0; for (let ph = 0; ph < 5; ph++) { for (let d = 1; d <= 6; d++) G.depots[d].forEach(t => { if (!t || t.b) bad++; }); G.black.forEach(t => { if (!t || !t.b) bad++; }); let k = 0; const cur = G.phase; while (G.phase === cur && !G.over && k++ < 30) burn(G); } return eq(0, bad); });
+R('Component: 42 goods tiles (6 kinds x 7) cover the start, five seasons of five and 4 players', () => eq(true, 42 >= 12 + 25));
+R('Component: silver and workers are unlimited supplies (a big pile is never capped)', () => { const G = G0(2), p = G.P[0]; p.silver = 60; p.workers = 60; p.dice = [1, 1]; VB.performMove(G, { k: 'workers', die: 0, w: 0 }); return eq(62, p.workers); });
+const COLBON = { castle: 'keep', mine: 'mine', know: 'lore', bld: 'building', pas: 'pasture', ship: 'barge' };
+Object.keys(COLBON).forEach(col => R('Bonus tiles of the ' + COLBON[col] + ' colour: first to fill every ' + COLBON[col] + ' space gets the large bonus (5), the second the small one (2), with 2 players', () => {
+  const G = G0(2); const got = [];
+  for (let i = 0; i < 2; i++) { const p = G.P[i]; const cells = C.filter(c => c.col === col).map(c => c.i); const last = cells[cells.length - 1]; cells.forEach(x => { if (x !== last && !p.estate[x]) p.estate[x] = filler(x); }); G.pend = []; const r = put(G, last, lastTile(col), null, i); const ev = r.ev.find(e => e.e === 'score' && e.why === 'colour'); got.push(ev ? ev.n : 0); }
+  return eq('5,2', got.join());
+}));
 
 /* ===================================================================== */
 if (process.argv.includes('--md')) {

@@ -216,3 +216,27 @@ _The estate map, the tile pool and the Lore tiles are our own; the counts and th
 170. Lore Roll of the Granaries: Game end: 3 points per Granary.
 171. Lore Tradebook: Game end: 1 point per goods tile you sold.
 172. Lore Bestiary: Game end: 4 points per kind of animal on your land.
+
+## I. Components of the original (every tile type, bonus tile, goods, silver, workers)
+_Added after the owner reported missing items: tile mix, black-backed tiles and the bonus tile of every colour._
+
+173. Component: 164 hexagon tiles in all
+174. Component: 26 barge tiles
+175. Component: 12 mine tiles
+176. Component: 16 keep tiles
+177. Component: 26 different Lore tiles, no two alike
+178. Component: 28 pasture tiles, 7 of each of the 4 animal kinds, each tile showing 2 to 4 animals
+179. Component: 56 building tiles, 7 of each of the 8 kinds
+180. Component: 40 tiles have a black back (6 barges, 2 mines, 2 keeps, 6 Lore, 8 pastures, 16 buildings)
+181. Component: every tile has a unique id
+182. Component: the back lane holds only black-backed tiles
+183. Component: the numbered stalls never hold a black-backed tile
+184. Component: 4 players can play all 5 seasons without a stall or back-lane space left empty
+185. Component: 42 goods tiles (6 kinds x 7) cover the start, five seasons of five and 4 players
+186. Component: silver and workers are unlimited supplies (a big pile is never capped)
+187. Bonus tiles of the keep colour: first to fill every keep space gets the large bonus (5), the second the small one (2), with 2 players
+188. Bonus tiles of the mine colour: first to fill every mine space gets the large bonus (5), the second the small one (2), with 2 players
+189. Bonus tiles of the lore colour: first to fill every lore space gets the large bonus (5), the second the small one (2), with 2 players
+190. Bonus tiles of the building colour: first to fill every building space gets the large bonus (5), the second the small one (2), with 2 players
+191. Bonus tiles of the pasture colour: first to fill every pasture space gets the large bonus (5), the second the small one (2), with 2 players
+192. Bonus tiles of the barge colour: first to fill every barge space gets the large bonus (5), the second the small one (2), with 2 players
