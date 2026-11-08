@@ -4,7 +4,7 @@
   <h1>Sands of Qamar</h1>
   <span id="pchip" class="pchip" role="status"></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
+  <button class="gx-ibtn" id="hintsbtn" data-help type="button" aria-pressed="false" aria-label="Hints"><i data-ic="hint"></i><span>Hints</span></button>
   <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false" aria-label="Players score list"><i data-ic="camel"></i><span>Players</span></button>
   <button class="gx-ibtn" data-gx="djd" aria-expanded="false" aria-label="Djinns (help)"><i data-ic="lamp"></i><span>Djinns</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log"><i data-ic="scroll"></i><span>Log</span></button>
@@ -21,6 +21,7 @@
   <main class="gx-board" id="bd">
     <div id="seats"></div>
     <div id="line" role="status" aria-live="polite"></div>
+    <button id="whatbtn" class="btn sm" type="button" data-help hidden>What should I do?</button>
     <div id="table" data-board><div id="gw"><div id="grid"></div><div id="chz" hidden></div></div><div id="mkt"></div><div id="mine"></div><div id="acts"></div></div>
   </main>
 </div>
@@ -51,6 +52,8 @@
 <script src="gameaudio.js"></script>
 <script src="audio-data.js"></script>
 <script src="trystero.min.js"></script>
+<script src="three.min.js"></script>
+<script src="gx-glb.js"></script>
 <script src="netroom.js"></script>
 <script src="data.js"></script>
 <script src="djinns.js"></script>
@@ -70,5 +73,9 @@
 <script src="lore.js"></script>
 <script src="playable.js"></script>
 <script src="coach.js"></script>
+<script src="score.js"></script>
+<script src="assetlist.js"></script>
+<script src="assets.js"></script>
+<script src="models3d.js"></script>
 </body>
 </html>

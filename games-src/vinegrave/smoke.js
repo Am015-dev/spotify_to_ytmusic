@@ -11,6 +11,7 @@ const { chromium } = require('playwright'), serve = require('./serve.js');
     const tap = async loc => touch ? loc.tap() : loc.click();
     await page.waitForSelector('#start .tbtn'); await page.screenshot({ path: `shots/title-${name}.png` });
     await tap(page.locator('#start .tbtn').first());
+    await page.waitForTimeout(300); if (await page.locator('#goal:not([hidden]) .tbtn').count()) await tap(page.locator('#goal .tbtn'));
     try { await page.evaluate(() => { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } }); } catch (e) { }
     for (let t = 0; t < 3; t++) {
       await page.waitForFunction(() => window.G && typeof myTurn === 'function' && myTurn(), null, { timeout: 20000 });

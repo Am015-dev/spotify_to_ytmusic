@@ -122,7 +122,7 @@ function rateStart(c) {
 }
 function rateRound() {
   var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
-  if (sp) { k = 'poor'; t = 'Poor: you spun out. Use a lower gear or smaller cards before a corner.'; }
+  if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
   else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
   else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
   else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }
@@ -169,7 +169,7 @@ function scoreWhy() {
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Pick gear 1-4 and play that many cards; their total is how far you move.</li><li><b>Corners burn heat.</b> Each point over a corner\'s limit costs 1 engine heat. No heat left: you spin out.</li><li><b>Free spaces.</b> End next to a car to slipstream; the last car gets +1 (adrenaline).</li></ul>' +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast with no heat? You spin.</li></ul>' +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }

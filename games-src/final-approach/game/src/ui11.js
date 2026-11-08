@@ -113,9 +113,161 @@ function aiChip(m, seat) {
   }
   return null;
 }
-function showChip(k, text) { UI.chip = { k, text, until: Date.now() + 2600 }; clearTimeout(UI.chipT); UI.chipT = setTimeout(() => { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); }, 2650); }
+function showChip(k, text) { UI.chip = { k, text, until: Date.now() + 5000 }; clearTimeout(UI.chipT); UI.chipT = setTimeout(() => { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); }, 5050); }
 function chipEl(r) {
   const c = UI.chip; if (!c || c.until < Date.now() || !r[c.k]) return null; const q = r[c.k], txt = clamp8(c.text);
   const e = h('div.rchip', { 'aria-hidden': 'true', style: 'left:' + Math.round(q.x + q.w / 2) + 'px;top:' + Math.round(Math.max(2, q.y - 6)) + 'px' }, txt);
   return e;
 }
+
+// ---------- what to do now (turn tracker, preview before you place, round-over card with a rating, slot needs and reasons) 
+// Owner, 8 Nov 2026: "not explaining well what the player has to do". Every screen of a flight answers: which round, how high, whose turn, how many dice are left,
+// what a die would do before it is placed, why the round ended and how it went. Text is plain and short; numbers come from the engine (never guessed).
+const FT = { snap: null, round: -1, sid: null, ro: null, hover: null };
+// ---------- what each space needs (shown as the slot's tooltip / label, and as the reason when it cannot take the selected die) ----------
+function slotNeedLong(k) {
+  const S = FA.SLOT[k], own = S.s === 0 ? 'Pilot' : S.s === 1 ? 'Co-pilot' : 'Either', o = S.s === 0 ? name(1) : name(0);
+  switch (S.grp) {
+    case 'axis': return own + ': any die. Must match ' + o + "'s axis die within 1, or the plane tilts.";
+    case 'engines': return own + ': any die. Both engine dice add up to the speed.';
+    case 'radio': return own + ': any die. Clears a plane that many spaces ahead (' + (S.s === 0 ? 'counting this space as 1' : 'counting from the next space') + ').';
+    case 'gear': return own + ': ' + S.vals.join(' or ') + '. Lowers this gear and lifts the blue marker by 1.';
+    case 'flaps': return own + ': ' + S.vals.join(' or ') + (S.ix ? ', after flap ' + S.ix : '') + '. Lifts the orange marker by 1.';
+    case 'brakes': return own + ': exactly ' + S.vals[0] + (S.ix ? ', after the ' + FA.SLOT['br' + (S.ix - 1)].vals[0] : '') + '. Sets the landing speed limit to ' + S.vals[0] + '.';
+    case 'conc': return 'Either: any die. Earns a coffee token (nudge a later die by 1).';
+    case 'kero': return 'Either: any die. Burns that much fuel (skipping it burns ' + D.keroSkip + ').';
+    case 'intern': return own + ': any die but the next token value. Trains the trainee.';
+    case 'ice': return (S.row ? 'Either' : 'Pilot') + ': exactly ' + S.vals[0] + '. Both spaces of a column in one round set the brakes.';
+  }
+  return own + ': ' + slotNeed(k) + '.';
+}
+// why the selected die cannot go on k (same words as the toast on a tap), or '' when it can
+function whyNot(k, v) {
+  if (G.slots[k]) return slotName(k) + ' is already used this round.';
+  const S = FA.SLOT[k]; if (S.s !== null && S.s !== v) return 'Only the ' + (S.s === 0 ? 'pilot' : 'co-pilot') + ' can use ' + slotName(k) + '.';
+  if (UI.sel === -1 || UI.sel == null) return '';
+  if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === UI.sel && x.to === k && (x.c || 0) === (UI.cof || 0))) return '';
+  const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + (UI.cof || 0);
+  if (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) return 'Flaps go in order: flap ' + S.ix + ' first.';
+  if (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) return 'Brakes go in order: 2, then 4, then 6.';
+  if (S.vals) return slotName(k) + ' ' + slotNeed(k) + '; your die shows ' + val + '.';
+  return 'That die does not fit here.';
+}
+// ---------- the preview: what this die would do on space k, plus the landing conditions met so far ----------
+function landMet() { const L = FA.checklist(G); return L.filter(x => x.ok).length + '/' + L.length; }
+function previewText(k, v) {
+  const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + (UI.cof || 0), S = FA.SLOT[k], o = 1 - v, last = FA.isFinal(G), wm = FA.windMod(G);
+  let t = '';
+  switch (S.grp) {
+    case 'axis': { const x = G.slots['ax' + o]; if (!x) { t = 'Axis: your ' + val + ' goes first; ' + name(o) + "'s die sets the tilt"; break; }
+      const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); t = 'Axis after: ' + (Math.abs(nx) >= 3 ? 'tilt ' + Math.abs(nx) + ', a spin: the flight ends' : nx === 0 ? 'level' : 'tilt ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right') + (Math.abs(nx) === 2 ? ' (one more is a spin)' : '')); break; }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) { t = 'Engines: ' + val + ' + ' + name(o) + "'s die = speed (stay up to " + G.pl.aeroB + ', 1 space up to ' + G.pl.aeroO + ', else 2)'; break; }
+      const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm <= br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
+      const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2, to = G.pl.pos + adv, n = trackOf().sp.length;
+      t = 'Speed ' + sm + ': ' + (adv ? 'advance ' + adv + ' (to ' + (to >= n ? 'the airport' : 'space ' + to) + ')' : 'stay on space ' + G.pl.pos) + (to > n ? ', past the airport: crash' : ''); break; }
+    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; t = n ? 'Radio: clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) : 'Radio: no plane on ' + (at > G.planes.length ? 'that space' : 'space ' + at) + ', nothing cleared'; break; }
+    case 'gear': t = G.pl.sw.lg[S.ix] ? 'Gear ' + (S.ix + 1) + ' is down already: no effect' : 'Gear down: blue marker ' + G.pl.aeroB + ' → ' + Math.min(7, G.pl.aeroB + 1); break;
+    case 'flaps': t = G.pl.sw.fl[S.ix] ? 'Flap already out: no effect' : 'Flap out: orange marker ' + G.pl.aeroO + ' → ' + Math.min(12, G.pl.aeroO + 1); break;
+    case 'brakes': t = G.pl.sw.br[S.ix] ? 'Brake already set: no effect' : 'Brakes ' + FA.brakeVal(G) + ' → ' + S.vals[0] + ': landing speed may be up to ' + S.vals[0]; break;
+    case 'conc': t = G.coffee >= D.coffeeMax ? 'Coffee: already ' + G.coffee + ' tokens, the die is just spent' : 'Coffee: tokens ' + G.coffee + ' → ' + (G.coffee + 1); break;
+    default: t = slotName(k) + ': ' + slotNeedLong(k);
+  }
+  return t + ' · Landing ' + landMet() + ' met';
+}
+// which space to preview: the one under the pointer, else the coach's, else the best legal one
+function previewKey(v) {
+  const leg = selectedLegal(); if (!leg.length) return null;
+  if (FT.hover && leg.includes(FT.hover)) return FT.hover;
+  if (UI.cpt && leg.includes(UI.cpt.k)) return UI.cpt.k;
+  try { const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (m && m.t === 'place' && m.d === UI.sel && leg.includes(m.to)) return m.to; } catch (e) { }
+  return leg[0];
+}
+// ---------- the tracker: round x of y, altitude, whose turn, dice left as tokens ----------
+function trackerEl() {
+  const rows = altRows(), n = rows.length - G.row0, R = rows[G.round + G.row0], v = actSeat(), me = typeof v === 'number' && v >= 0 ? v : 0;
+  const turn = G.result ? (G.result.win ? 'Landed' : 'Flight over') : G.phase === 'brief' ? 'Briefing: ' + who(R[1]) + (who(R[1]) === 'You' ? ' go' : ' goes') + ' first' : G.pend && G.pend.h === 'rr' ? 'Reroll' : (who(G.turn) === 'You' ? 'Your turn' : name(G.turn) + "'s turn") + ' (' + pname(G.turn) + ')';
+  const toks = s => { const tot = G.dice[s].length, left = G.phase === 'brief' && !G.result ? tot : FA.unusedDice(G, s).length; const w = h('span.ftd.' + (s ? 'c' : 'p'), { 'aria-label': (who(s) === 'You' ? 'You' : name(s)) + ': ' + left + ' of ' + tot + ' dice left' }, h('em', who(s) === 'You' ? 'You' : name(s)));
+    for (let i = 0; i < tot; i++) w.appendChild(h('i' + (i < left ? '.on' : ''), '')); return w; };
+  return h('div#ftrk', { 'aria-live': 'polite' }, h('b.ftr', 'Round ' + (G.round + 1) + ' of ' + n), h('span.fta', R[0] + ' ft'), h('span.ftt.' + (G.phase === 'place' && !G.result ? (G.turn ? 'c' : 'p') : 'n'), turn), toks(me), toks(1 - me));
+}
+// ---------- round-over card: why the round ended, what changed, one-line rating ----------
+function roSnap() { return { r: G.round, pos: G.pl.pos, axis: G.pl.axis, planes: FA.planesOnTrack(G), lg: G.pl.sw.lg.reduce((a, b) => a + b, 0), fl: G.pl.sw.fl.reduce((a, b) => a + b, 0), br: FA.brakeVal(G), cof: G.coffee }; }
+function roRating(a, b) {
+  const n = trackOf().sp.length, rows = D.rounds - G.row0, left = rows - 1 - b.r, need = n - b.pos, tilt = Math.abs(b.axis);
+  if (tilt >= 2) return ['poor', 'The plane is tilted ' + tilt + ': next round the axis dice must lean the other way.'];
+  if (need > 2 * left) return ['poor', need + ' spaces to go with ' + left + ' round' + (left === 1 ? '' : 's') + ' left: more engine speed next round.'];
+  if (b.planes > 0 && b.pos < n && G.planes.slice(b.pos - 1, b.pos + 1).some(x => x > 0)) return ['okay', 'A plane is right ahead: use the radio before you fly on.'];
+  if (tilt === 1 || need > left) return ['okay', tilt ? 'A small tilt to fix: keep the axis dice close.' : need + ' spaces to go in ' + left + ' round' + (left === 1 ? '' : 's') + ': a little behind, aim for speed above the blue marker.'];
+  return ['good', 'Level and on schedule' + (b.lg + b.fl > a.lg + a.fl ? ', and more switches green' : '') + '.'];
+}
+function roShow(a) {
+  const b = roSnap(), n = trackOf().sp.length, mv = b.pos - a.pos, rt = roRating(a, b), sp = G.log.slice().reverse().find(l => /speed|Speed/.test(typeof l === 'string' ? l : (l.t || '')));
+  const lines = [
+    'Plane: ' + (mv ? 'moved ' + mv + ' space' + (mv > 1 ? 's' : '') : 'stayed put') + ' → ' + (b.pos >= n ? 'on the airport' : 'space ' + b.pos + ' of ' + n),
+    'Axis: ' + (b.axis === 0 ? 'level' : 'tilted ' + Math.abs(b.axis) + (b.axis < 0 ? ' left' : ' right')),
+    a.planes !== b.planes ? 'Planes cleared: ' + (a.planes - b.planes) + ' (' + b.planes + ' left)' : b.planes ? 'Planes on the track: ' + b.planes : 'No planes on the track',
+    'Gear ' + b.lg + '/3 · Flaps ' + b.fl + '/4 · Brakes ' + b.br + ' · Coffee ' + b.cof];
+  roHide();
+  const el = h('div.fa-ro.' + (hintsMode() ? rt[0] : 'good'), { role: 'dialog', 'aria-label': 'Round ' + (a.r + 1) + ' over' },
+    h('div.rh', h('b', 'Round ' + (a.r + 1) + ' over'), h('span', 'Why: all 8 dice are placed.')), h('ul', ...lines.map(t => h('li', t))),
+    hintsMode() ? h('p.rr', h('b', rt[0] === 'good' ? 'Good' : rt[0] === 'okay' ? 'Okay' : 'Watch out'), ' ' + rt[1]) : null, h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Next round'));
+  el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) roHide(); });
+  document.body.appendChild(el); FT.ro = el; clearTimeout(FT.roT); FT.roT = setTimeout(roHide, UI.fc && !UI.fc.ended ? 14000 : 8000);
+}
+// ---------- the Goal, one card before turn 1 (Addendum 7): the win condition in one sentence and three bullets on how you get there ----------
+function goalCard(inStory) {
+  const n = D.rounds - G.row0, mods = scenOf().mods.map(m => D.mods[m] && D.mods[m].name).filter(Boolean);
+  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together in round ' + n + '.'),
+    h('ul', h('li', 'Axis: both dice close, or the plane tilts. Tilt 3 crashes.'),
+      h('li', 'Engines: your two dice add up. Fast enough moves you closer.'),
+      h('li', 'Spare dice: clear planes, lower gear and flaps, set brakes. The checklist shows what is left.')),
+    mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
+}
+function goalShow() {
+  roHide(); const el = h('div.fa-ro.fa-goal', { role: 'dialog', 'aria-label': 'Goal' }, goalCard(false), h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Got it'));
+  el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) roHide(); }); document.body.appendChild(el); FT.ro = el; clearTimeout(FT.roT);
+}
+function roHide() { clearTimeout(FT.roT); if (FT.ro) { const e = FT.ro; FT.ro = null; e.classList.add('out'); setTimeout(() => { try { e.remove(); } catch (er) { } }, 220); } }
+function roPoll() {
+  if (!G || !UI.started) { FT.round = -1; return; }
+  if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); if (isPh() && G.round === 0 && G.phase === 'brief' && !(UI.cfg && UI.cfg.tutorial) && !UI.camp && UI.mode === 'vs' && !G.lad && !/[?&]scn=/.test(location.search)) goalShow(); return; }   // ?scn= states skip menus and cards
+  if (G.result) { roHide(); FT.round = G.round; return; }
+  if (FT.ro && G.phase !== 'brief') roHide();   // the card lives in the briefing only: rolling the dice puts the board first again
+  if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net') roShow(a); FT.snap = roSnap(); }
+}
+setInterval(() => { try { roPoll(); } catch (e) { } }, 300);
+// ---------- after every render: tracker, preview, slot needs and reasons, the coach's pointer ----------
+function ftAfter() {
+  if (!G || !UI.started) return;
+  if (typeof fcMute === 'function') fcMute();
+  const db = $('#dockbody'); if (db) { const old = $('#ftrk'); const t = trackerEl(); if (old) old.replaceWith(t); else db.insertBefore(t, db.firstChild); }
+  const v = actSeat(), sel = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (UI.sel === 'p' || (typeof UI.sel === 'number' && UI.sel >= 0));
+  let pv = $('#fprev'); if (!pv && db) { pv = h('div#fprev', { 'aria-live': 'polite' }); const pd = $('#promptDock'); if (pd && pd.nextSibling) db.insertBefore(pv, pd.nextSibling); else db.appendChild(pv); }
+  if (pv) { const k = sel && hintsMode() ? previewKey(v) : null; pv.hidden = !k && !UI.askWhy; pv.textContent = k ? previewText(k, v) : UI.askWhy || ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
+  // Hints on: the "What should I do?" button joins the actions on your turn (Addendum 7)
+  const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.pend && G.turn === v && !G.result;
+  if (ac && UI.prefs.hints && mineNow && !(UI.fc && !UI.fc.ended) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask' }, 'What should I do?'));
+  $$('#pz .slot[data-slot]').forEach(e => { const k = e.dataset.slot; if (!FA.SLOT[k]) return; const why = sel && !e.classList.contains('legal') ? whyNot(k, v) : '';
+    e.title = why || slotNeedLong(k); e.classList.toggle('nofit', !!why); e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.k === k)); });
+  $$('#pz .die[data-s="0"]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && String(UI.cpt.d) === e.dataset.d && UI.sel !== UI.cpt.d)));
+}
+document.addEventListener('pointerover', e => { if (!hintsMode()) return; const s = e.target.closest && e.target.closest('#pz .slot[data-slot]'); const k = s ? s.dataset.slot : null; if (k !== FT.hover) { FT.hover = k; try { const v = actSeat(); const pv = $('#fprev'); if (pv && k && typeof v === 'number' && v >= 0 && (UI.sel === 'p' || UI.sel >= 0)) { const why = whyNot(k, v); if (why) { pv.hidden = false; pv.textContent = why; pv.classList.add('bad'); } else if (selectedLegal().includes(k)) { pv.hidden = false; pv.textContent = previewText(k, v); pv.classList.toggle('bad', /crash|ends|spin|too fast/i.test(pv.textContent)); } } } catch (er) { } } });
+(function () {
+  const st = document.createElement('style');
+  st.textContent = '#ftrk{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 8px;margin:0 0 6px;border-radius:10px;background:#0f1a26;color:#fff;font-size:15px;line-height:1.25;font-weight:700}' +
+    '#ftrk .ftr{font-weight:900}#ftrk .fta{color:#ffe08a}#ftrk .ftt{padding:1px 8px;border-radius:8px;background:#334}#ftrk .ftt.p{background:#1d4f9a}#ftrk .ftt.c{background:#a24a0b}' +
+    '#ftrk .ftd{display:inline-flex;align-items:center;gap:3px}#ftrk .ftd em{font-style:normal;font-size:14px;margin-right:2px}#ftrk .ftd i{width:11px;height:11px;border-radius:3px;border:1.5px solid rgba(255,255,255,.55);opacity:.45}' +
+    '#ftrk .ftd.p i.on{background:#3d7fe0;border-color:#cfe0ff;opacity:1}#ftrk .ftd.c i.on{background:#f08a24;border-color:#ffe0c0;opacity:1}' +
+    '#fprev{margin:4px 0;padding:6px 10px;border-radius:10px;background:#e9f6ea;color:#0d2a12;border:2px solid #2e8b45;font-size:15px;line-height:1.3;font-weight:700}#fprev.bad{background:#fde9e6;color:#5c0f08;border-color:#c0392b}' +
+    'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
+    '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
+    '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
+    '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
+    '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
+    '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +
+    '.fa-ro.okay{border-color:#c98a12}.fa-ro.poor{border-color:#b3261e}.fa-ro.out{opacity:0;transition:opacity .2s}.fa-ro .rh b{display:block;font-size:20px}.fa-ro .rh span{display:block;font-size:14px;color:#4a3d27}' +
+    '.fa-ro ul{margin:8px 0;padding:0 0 0 18px}.fa-ro li{margin:2px 0}.fa-ro .rr{margin:6px 0 10px;font-weight:700}.fa-ro .rgo{width:100%;min-height:46px;border-radius:12px;border:0;background:#1d4f9a;color:#fff;font-size:16px;font-weight:800}' +
+    '@keyframes fa-roin{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}@media (min-width:1024px){#ftrk,#fprev,.fa-ro,.fa-ro .rh span,#ftrk .ftd em{font-size:16px}}' +
+    '@media (prefers-reduced-motion:reduce){#pz .slot.cpt,.fa-ro{animation:none}}';
+  document.head.appendChild(st);
+})();
