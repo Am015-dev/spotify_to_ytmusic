@@ -1,55 +1,70 @@
-// Coached-game proof (W407): fresh storage, plays ANY legal moves through the UI (real mouse/touch taps on visible, uncovered tiles and racks)
-// to the end card, at 390x763 and 1440x860. Asserts: every rule id in TUTORIAL-COVERAGE.md was either said in play or is listed on the end card,
-// never two bubbles at once, the bubble never intercepts taps, the end card lists exactly the unsaid rules, no console errors.
-// node tutor-e2e.js [390x763,1440x860] [seed-count]
+// Guided first game proof (W501): fresh storage, real touch taps only (page.touchscreen.tap at the glowing spot), at 390x844 and 375x667.
+// 1. Title -> Learn to play -> walks every step of the guided game by tapping the highlighted hole the kit reports.
+//    Asserts: every rule step in TUT_RULES is shown, in order; each sentence has 12 words or fewer; each step shows exactly one hole;
+//    the staged scoring comes out as planned (58 to Tamsin's total); the end card offers a real game.
+// 2. Play a real game -> plays a FULL game by touch (tile, then rack) to the result. Asserts 0 page/console errors, invariants hold.
+// node tutor-e2e.js [390x844,375x667]     SHOTS=1 also writes playable-shots/gameplay/ (tut-N, first-turn, mid-game, result) at 390x844
 const PW=(()=>{try{return require('playwright')}catch(e){return require('../../node_modules/playwright')}})();
-const fs=require('fs');
-const html=fs.readFileSync(__dirname+'/sunglaze.html');
-const SIZES=(process.argv[2]||'390x763,1440x860').split(',').map(s=>s.split('x').map(Number));
+const fs=require('fs');const path=require('path');
+const html=fs.readFileSync(__dirname+'/sunglaze.html');const LIVE=path.join(__dirname,'../../../games/sunglaze');
+const SIZES=(process.argv[2]||'390x844,375x667').split(',').map(s=>s.split('x').map(Number));
+const SHOT=path.join(__dirname,'../playable-shots/gameplay');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let fail=0;const P=(ok,m)=>{console.log((ok?'PASS ':'FAIL ')+m);if(!ok)fail++};
-(async()=>{const browser=await PW.chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
-const need=[...fs.readFileSync(__dirname+'/../TUTORIAL-COVERAGE.md','utf8').matchAll(/`([a-z0-9_]+)`/g)].map(m=>m[1]);
-for(const [W,H] of SIZES){const desk=W>800,tag=W+'x'+H;
- const ctx=await browser.newContext({viewport:{width:W,height:H},isMobile:!desk,hasTouch:!desk});
- await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+(async()=>{const browser=await PW.chromium.launch(Object.assign({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']},fs.existsSync('/opt/pw-browsers/chromium')?{executablePath:'/opt/pw-browsers/chromium'}:{}));
+for(const [W,H] of SIZES){const tag=W+'x'+H,shots=process.env.SHOTS&&W===390&&H===844;if(shots)fs.mkdirSync(SHOT,{recursive:true});
+ const ctx=await browser.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true,deviceScaleFactor:shots?2:1});
+ await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();if(u.pathname==='/')return r.fulfill({status:200,contentType:'text/html',body:html});
+  const f=path.join(LIVE,decodeURIComponent(u.pathname));return fs.existsSync(f)?r.fulfill({body:fs.readFileSync(f)}):r.fulfill({status:404,body:''})});
  const p=await ctx.newPage();p.setDefaultTimeout(15000);const errs=[];
- p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))errs.push(m.text())});
- const tap=async(x,y)=>desk?p.mouse.click(x,y):p.touchscreen.tap(x,y);
- // tap an element only when its centre really hits it (uncovered by anything but the pass-through bubble)
- const tapSel=async sel=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const b=e.getBoundingClientRect();if(b.width<2||b.height<2)return null;const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return h&&(e===h||e.contains(h))?{x,y}:{covered:h?(h.className&&h.className.baseVal!==undefined?h.className.baseVal:String(h.className)):'none'}},sel);
-  if(!r||r.x===undefined)return r?'covered:'+r.covered:false;await tap(r.x,r.y);return true};
- await p.goto('https://gns.test/'+(desk?'':'?phone=1'));await sleep(800);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(1500);
- await p.evaluate(()=>{window.bfD=ms=>ms*.25});
- const b=await p.$('#modal [data-ui=start]');const bb=await b.boundingBox();await tap(bb.x+bb.width/2,bb.y+bb.height/2);await sleep(600);
- const lb=await p.$('.gxt-end [data-offer=learn]');if(!lb){P(false,tag+' no tutorial offer');continue}
- const lbb=await lb.boundingBox();await tap(lbb.x+lbb.width/2,lbb.y+lbb.height/2);await sleep(1200);
- let ended=false,moves=0,twoBubbles=0,intercept=0,covered=0,stuck=Date.now(),lastSig='';
- for(let it=0;it<1500&&!ended;it++){
-  const s=await p.evaluate(()=>{const e=document.querySelector('.gxt-end[aria-label="Tutorial finished"]');const bs=document.querySelectorAll('.cg-b');let pe=0;bs.forEach(x=>{if(getComputedStyle(x).pointerEvents!=='none')pe++});
-   return {end:!!e,bubbles:bs.length,pe,has:typeof G!=='undefined'&&!!G,cur:typeof G!=='undefined'&&G?sideToAct():-9,phase:typeof G!=='undefined'&&G?G.phase:'',sel:!!UI.sel,hold:typeof bfHold==='function'&&bfHold(),sig:typeof G!=='undefined'&&G?G.turn+'/'+G.round+'/'+G.phase+(UI.sel?'s':''):''}});
-  if(process.env.SHOTS&&(s.bubbles||s.end)){const tx=await p.evaluate(()=>{const b=document.querySelector('.cg-b');return b?b.textContent.slice(0,30):(document.querySelector('.gxt-end')?'END':'')});if(tx&&tx!==(globalThis.__lt||'')&&(globalThis.__n=(globalThis.__n||0)+1)<=14){globalThis.__lt=tx;fs.mkdirSync(process.env.SHOTS,{recursive:true});await p.screenshot({path:process.env.SHOTS+'/'+tag+'-'+String(globalThis.__n).padStart(2,'0')+'.png'})}}
-  if(s.bubbles>1)twoBubbles++;if(s.pe>0)intercept++;
+ p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon|404/.test(m.text()))errs.push(m.text())});
+ const tap=(x,y)=>p.touchscreen.tap(x,y);
+ const tapEl=async sel=>{const r=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const b=e.getBoundingClientRect();if(b.width<2)return null;const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return {x,y,ok:!!h&&(h===e||e.contains(h))}},sel);
+  if(!r||!r.ok)return false;await tap(r.x,r.y);return true};
+ await p.goto('https://gns.test/');await sleep(800);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(2000);
+ await p.evaluate(()=>{window.bfD=ms=>ms*.3});
+ P(await tapEl('#modal [data-a=tutorial]'),tag+' title has a Learn to play button that takes a touch');
+ // ---- 1. the guided game
+ const seen=[],says={},holes={};let last='',stuck=Date.now(),ended=false,n=0;
+ for(let it=0;it<2000;it++){
+  const s=await p.evaluate(()=>{const st=GXT.state();const end=document.querySelector('.gxt-end [data-gxt-end]');const b=document.querySelector('.gxt-bub .gxh-tx');
+   return {st:{active:st.active,phase:st.phase,id:st.id,shown:st.shown,i:st.i},end:!!end,say:b?b.textContent:'',holes:(st.holes||[]).length,hole:st.hole?{x:st.hole.cx,y:st.hole.cy}:(st.holes&&st.holes[0]?{x:st.holes[0].cx,y:st.holes[0].cy}:null)}});
   if(s.end){ended=true;break}
-  if(s.sig!==lastSig){lastSig=s.sig;stuck=Date.now()}
-  if(Date.now()-stuck>40000){P(false,tag+' stuck at '+s.sig);break}
-  if(!s.has||s.cur!==0||s.phase!=='offer'||s.hold){await sleep(120);continue}
-  if(!s.sel){
-   const k=await p.evaluate(()=>{const m=validMoves(0);const mv=m[Math.floor(Math.random()*m.length)];const a=mv.src<0?G.ctr:G.fac[mv.src];const idx=a.indexOf(mv.c);window.__mv=mv;return (mv.src<0?'c':'f'+mv.src)+'_'+idx});
-   const r=await tapSel(`.bf-t[data-k="${k}"]`);if(r!==true){if(r){const ck=k+'|'+(s.sig||'');globalThis.__ck=globalThis.__ck||{};globalThis.__ck[ck]=(globalThis.__ck[ck]||0)+1;if(globalThis.__ck[ck]===6){covered++;console.log('  covered (persistent): '+r+' '+k)}}await sleep(200)}else await sleep(300);continue}
-  const line=await p.evaluate(()=>{const ms=movesFor(UI.sel);const mv=ms.find(x=>x.line===window.__mv.line)||ms[Math.floor(Math.random()*ms.length)];return mv.line});
-  const r=await tapSel(line<5?`[data-bfrow="${line}"] .bf-rack`:'.bf-fl');if(r===true){moves++;await sleep(350)}else{if(r){const ck='row'+line+'|'+s.sig;globalThis.__ck=globalThis.__ck||{};globalThis.__ck[ck]=(globalThis.__ck[ck]||0)+1;if(globalThis.__ck[ck]===6){covered++;console.log('  covered (persistent): '+r+' row '+line)}}await sleep(200)}
- }
- await sleep(300);
- P(ended,tag+' coached game played to the end card with random legal UI taps ('+moves+' moves)');
- P(covered===0,tag+' every tap target was uncovered'+(covered?' ('+covered+')':''));
- P(twoBubbles===0,tag+' never more than one bubble at a time');
- P(intercept===0,tag+' the bubble never intercepts taps (pointer-events none)');
- const fin=await p.evaluate(()=>({e:window.__cgEnd||null,li:[...document.querySelectorAll('.cg-later li')].length,steps:Object.keys((window.__cg||{}).said||{})}));
- if(fin.e){const acc=need.filter(i=>!(fin.e.said[i]||fin.e.later.includes(i)));P(acc.length===0,tag+' every coverage rule said in play or on the end card'+(acc.length?' missing '+acc.join(','):''));
-  P(fin.li===fin.e.later.length,tag+' end card lists exactly the '+fin.e.later.length+' rules not met');
-  const said=Object.keys(fin.e.said);P(['goal','kilns','take','tiling','roundend'].every(i=>said.includes(i)),tag+' core rules explained in play ('+said.length+' said: '+said.join(',')+')')}
- else P(false,tag+' no end-card data');
- P(errs.length===0,tag+' 0 console errors'+(errs.length?' '+errs.slice(0,2).join(' | '):''));
+  if(s.st.id&&s.st.id!==last){last=s.st.id;stuck=Date.now()}
+  if(Date.now()-stuck>30000){P(false,tag+' guided game stuck at step '+last+' phase '+s.st.phase);break}
+  if(!(s.st.active&&s.st.phase==='show'&&s.st.shown&&s.hole)){await sleep(100);continue}
+  if(!seen.includes(s.st.id)){seen.push(s.st.id);says[s.st.id]=s.say;holes[s.st.id]=s.holes;await sleep(650);   // a tap in the first 600 ms is ignored by the kit (gesture tail)
+   if(shots){n++;await p.screenshot({path:path.join(SHOT,'tut-'+n+'.png')})}}
+  const before=s.st.i;await tap(s.hole.x,s.hole.y);await sleep(250);
+  const after=await p.evaluate(()=>GXT.state().i);if(after===before)await sleep(300)}
+ P(ended,tag+' guided game reaches its end card by touch');
+ const want=await p.evaluate(()=>TUT_RULES);
+ P(JSON.stringify(seen)===JSON.stringify(want),tag+' every rule step shown in order ('+seen.length+'/'+want.length+')'+(JSON.stringify(seen)===JSON.stringify(want)?'':' got '+seen.join(',')));
+ const long=Object.entries(says).filter(([k,t])=>t.trim().split(/\s+/).length>12);P(!long.length,tag+' every step is one sentence of 12 words or fewer'+(long.length?' '+JSON.stringify(long):''));
+ const multi=Object.entries(holes).filter(([k,v])=>v!==1);P(!multi.length,tag+' every step highlights exactly one tap'+(multi.length?' '+JSON.stringify(multi):''));
+ const sc=await p.evaluate(()=>G&&G.over?G.pl.map(x=>x.score):null);P(sc&&sc[0]===58,tag+' staged scoring ends as taught (you '+(sc&&sc[0])+', Tamsin '+(sc&&sc[1])+')');
+ const later=await p.evaluate(()=>document.body.textContent.includes('meet later'));P(!later,tag+' no "learn later" list');
+ // ---- 2. the real game that follows
+ P(await tapEl('.gxt-end [data-gxt-end=play]'),tag+' end card: Play a real game takes a touch');await sleep(1500);
+ const fresh=await p.evaluate(()=>!!G&&!UI.tut&&G.turn===0&&G.pl[0].wall.every(r=>r.every(v=>v<0)));P(fresh,tag+' a fresh real game starts');
+ let moves=0,bad=0,inv=[],firstShot=false,midShot=false;stuck=Date.now();let sig='';
+ for(let it=0;it<6000;it++){
+  const s=await p.evaluate(()=>({over:!!(G&&G.over),me:!!G&&!G.over&&G.phase==='offer'&&sideToAct()===0&&!BF.busy&&!BF.q.length,sel:!!UI.sel,sig:G?G.turn+'/'+G.round:'',r:G?G.round:0,inv:checkInvariants()}));
+  if(s.inv.length)inv=s.inv;if(s.over)break;
+  if(s.sig!==sig){sig=s.sig;stuck=Date.now()}if(Date.now()-stuck>45000){P(false,tag+' real game stuck at '+s.sig);break}
+  if(!s.me){await sleep(120);continue}
+  if(shots&&!firstShot){firstShot=true;await sleep(500);await p.screenshot({path:path.join(SHOT,'first-turn.png')})}
+  if(shots&&!midShot&&s.r>=3){midShot=true;await sleep(500);await p.screenshot({path:path.join(SHOT,'mid-game.png')})}
+  const m=await p.evaluate(()=>{const m=aiMove(0);window.__mv=m;const a=m.src<0?G.ctr:G.fac[m.src];return {k:(m.src<0?'c':'f'+m.src)+'_'+a.indexOf(m.c),line:m.line}});
+  if(!s.sel){if(!(await tapEl(`.bf-table [data-k="${m.k}"]`))){bad++;await sleep(200);continue}await sleep(200)}
+  const ok=await p.evaluate(()=>!!UI.sel&&UI.sel.src===window.__mv.src&&UI.sel.c===window.__mv.c);if(!ok){bad++;await p.evaluate(()=>{UI.sel=null});await sleep(150);continue}
+  const t0=await p.evaluate(()=>G.turn);
+  if(!(await tapEl(m.line<5?`[data-bfrow="${m.line}"] .bf-rack`:'.bf-fl'))){bad++;await sleep(200);continue}
+  await sleep(250);if(await p.evaluate(t=>G.turn>t||!!G.over,t0))moves++;else bad++}
+ const over=await p.evaluate(()=>G&&G.over?G.winText:null);
+ if(shots&&over){await p.waitForSelector('.bf-ov:not([hidden])',{timeout:40000}).catch(()=>{});await sleep(1500);await p.screenshot({path:path.join(SHOT,'result.png')})}
+ P(!!over,tag+' a full real game played by touch to the end ('+moves+' of your moves): '+over);
+ P(bad<=moves/4,tag+' taps that missed: '+bad);P(!inv.length,tag+' invariants hold'+(inv.length?' '+inv.join('; '):''));
+ P(!errs.length,tag+' 0 page errors'+(errs.length?' '+errs.slice(0,3).join(' | '):''));
  await ctx.close()}
-await browser.close();process.exit(fail?1:0)})();
+await browser.close();console.log(fail?fail+' FAILED':'ALL PASS');process.exit(fail?1:0)})();
