@@ -21,7 +21,7 @@ await shot('4-first-turn');
 await p.evaluate(()=>{AIDELAY=0;ANIM=0});
 
 let mid=0,rival=0;
-for(let i=0;i<3000;i++){if(rival===1&&await p.evaluate(()=>UI._tbHold>Date.now()&&viewSeatForQ()==null)){rival=2;await p.waitForTimeout(700);await shot('6-rival');await p.evaluate(()=>{AIDELAY=0;ANIM=0;UI._tbHold=0;try{pump()}catch(e){}})}
+for(let i=0;i<3000;i++){if(rival===1&&await p.evaluate(()=>!UI.card&&G.q&&viewSeatForQ()==null&&whoActs().ai.length>0)){rival=2;await p.waitForTimeout(700);await shot('6-rival');await p.evaluate(()=>{AIDELAY=0;ANIM=0;try{pump()}catch(e){}})}
  const st=await p.evaluate(()=>({card:UI.card&&UI.card.kind,over:!!G.over,s:viewSeatForQ(),r:G.round}));
  if(st.over)break;
  if(st.card){await p.evaluate(()=>{const b=document.querySelector('#pc [data-a=evok],#pc [data-a=tipok],#pc [data-a=take]');b&&b.click()})}

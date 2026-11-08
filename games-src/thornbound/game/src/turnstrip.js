@@ -10,6 +10,7 @@ const css=document.createElement('style');css.textContent=`
 #tbturn .tbt-line{flex:1 1 auto;min-width:0;max-height:60px;overflow:hidden;color:#f8efd6;font:600 16px/1.25 'EB Garamond',Georgia,serif}
 #tbturn .tbt-line.sm{font-size:14px;line-height:1.2}
 html.bf-w #tbturn{height:auto;min-height:72px}
+@media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-chip{padding:5px 8px}}
 #tbturn .tbt-goal{flex:0 0 auto;min-height:44px;min-width:56px;padding:0 10px;border-radius:8px;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 14px Cinzel,Georgia,serif}
 #tbgoal{position:fixed;inset:0;z-index:9998;display:grid;place-items:center;background:rgba(10,6,14,.82);padding:16px}
 #tbgoal .gc{max-width:420px;width:100%;background:#24152f;border:2px solid #f0c860;border-radius:14px;padding:22px 20px 18px;color:#f8efd6;font:500 17px/1.4 'EB Garamond',Georgia,serif;box-shadow:0 12px 40px rgba(0,0,0,.6)}
@@ -48,31 +49,36 @@ function clearVoice(){vq=[];vNow=null;clearTimeout(vT)}
 function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.card.kind==='over'){e.hidden=true;return}e.hidden=false;
   let html='',cls='',key='';
   if(vNow){const c=cast(vNow.who);key='v'+vNow.text;cls='voice';e.style.setProperty('--c',c.color);html='<span class="tbt-face" aria-hidden="true">'+esc2(c.emoji)+'</span><span class="tbt-line"><span class="sr">'+esc2(c.name)+': </span>'+esc2(vNow.text)+'</span>'}
-  else if(UI._tbHold&&UI._tbHold>Date.now()&&UI._tbCap){const s=UI._tbCap.s;key='c'+UI._tbCap.t;e.style.setProperty('--c',fcol(s));html='<span class="tbt-chip rv">'+esc2(poss(shortName(s)))+' turn</span><span class="tbt-line">'+esc2(UI._tbCap.t)+'</span>'}
-  else if(UI.card&&UI.card.kind!=='pass'){const m=cardMsg(UI.card);key='card'+m.t;if(m.s!=null&&m.s>=0)e.style.setProperty('--c',fcol(m.s));html='<span class="tbt-chip '+(m.s!=null&&m.s>=0?'rv':'wt')+'">'+esc2(m.s!=null&&m.s>=0?(m.s===vs()?'You':shortName(m.s)):'Watch')+'</span><span class="tbt-line">'+esc2(m.t)+'</span>'}
+  else if(false){const s=UI._tbCap.s;key='c'+UI._tbCap.t;e.style.setProperty('--c',fcol(s));html='<span class="tbt-chip rv">'+esc2(poss(shortName(s)))+' turn</span><span class="tbt-line">'+esc2(UI._tbCap.t)+'</span>'}
+  else if(UI.card&&UI.card.kind!=='pass'){key='card';html='<span class="tbt-chip wt">Watch</span><span class="tbt-line">Watch the board. Tap to go on.</span>'}
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
     if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});key='me'+k+(G.q.t||'');const line=(k==='menu'||G.q.t==='menu')?(ask.menu):ask[k];
       const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+esc2(t)+'</span>'}
-    else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));html='<span class="tbt-chip rv">'+esc2(poss(shortName(a)))+' turn</span><span class="tbt-line">'+esc2(ST().wait?ST().wait.replace('{n}',shortName(a)):'Waiting for '+shortName(a)+'...')+'</span>'}
+    else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));html='<span class="tbt-chip rv">'+esc2(poss(shortName(a)))+' turn</span><span class="tbt-line">Watch the board.</span>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
   if(!G.over&&!coachOn())html+='<button class="tbt-goal" data-tbgoal type="button" aria-label="Show the goal">Goal</button>';
   if(coachOn()&&!G.over)html+='<button class="tbt-skip" data-gxt-skip type="button" aria-label="Skip tutorial">Skip tutorial</button>';
   if(e.dataset.key!==key&&/^me/.test(key)&&UI.pop&&UI._popRival){try{closePop(true)}catch(x){}}   // an info card opened during the rival's turn must not cover your own move
-  if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+' pulse';e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&ln.scrollHeight>ln.clientHeight+1)ln.classList.add('sm')}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
+  if(cls==='voice')e.removeAttribute('data-fa-skip');else e.setAttribute('data-fa-skip','');
+  if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+(cls==='voice'?' pulse':'');e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&ln.scrollHeight>ln.clientHeight+1)ln.classList.add('sm')}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 // the full text of the message on screen (news, clash, bids, round end): shown whole in the strip, timed by its length
 function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.big&&c.items.every(infK))return {t:newsHead(c.items[0],c.items)+'.',s:null};const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,3).map(x=>plain(x.text)).join(' ');return {t:it,s:c.items[0].s}}
   if(c.kind==='event'){const e=c.ev;if(e.t==='bids')return {t:'Bids flip. The highest bid picks first.',s:null};if(e.t==='clash')return {t:UI._clashLine||('The Clash in '+REG[e.r]),s:null};if(e.t==='summary')return {t:e.last?'The last round is over.':'Round '+e.round+' is over.',s:null}}}catch(x){}
   return {t:'Watch the board. Tap to go on.',s:null}}
 window.tbPaint=paint;
-(function(){const o=openPop;openPop=function(){UI._popRival=!!(G&&G.q&&viewSeatForQ()==null);return o.apply(this,arguments)}})();window.tbVoice=voice;
+(function(){const o=openPop;openPop=function(){UI._popRival=!!(G&&G.q&&viewSeatForQ()==null);const r=o.apply(this,arguments);
+  // the zoomed card face is a picture: its printed words repeat the readable text beside it (name, effect, suit), so the face is decoration
+  return r}})();
+(function(){const mark=()=>{try{document.querySelectorAll('#ppop .pp-card,#ppop [data-kc]').forEach(e=>{if(!e.hasAttribute('data-fa-skip')){e.setAttribute('data-fa-skip','');e.setAttribute('aria-hidden','true')}})}catch(x){}};
+  const go=()=>{const pp=document.getElementById('ppop');if(!pp){setTimeout(go,200);return}new MutationObserver(mark).observe(pp,{childList:true,subtree:true});mark()};go()})();window.tbVoice=voice;
 (function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{paint()}catch(e){console.error('tbturn '+e.message)}try{if(window.tbCoachCheck)window.tbCoachCheck()}catch(e){}return r}})();
 // ---- the rival's step is announced in one plain caption, then held ~1.3 s so it can be read (tap the strip to skip)
 (function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],l0=G.logN;const r=o.apply(this,arguments);
   try{let t=null;for(let i=G.log.length-1;i>=0&&G.log[i].i>l0;i--){if(G.log[i].s===s||G.log[i].s==null||G.log[i].s===undefined){t=G.log[i].t;break}}
     if(!t&&UI.nowT&&UI.nowT.at===G.logN)t=UI.nowT.t;if(!t&&G.log.length&&G.logN>l0)t=G.log[G.log.length-1].t;
-    if(t){t=plain(t);if(/ bids /.test(t)&&G.q&&(G.q.kind==='bid'||G.q.kind==='bidRes'))t=t.replace(/ bids .*$/,' bids in secret.');const w2=t.split(/\s+/);UI._tbCap={s,t};const hm=readMs(t);UI._tbHold=Date.now()+(window.ANIM?hm:0);
+    if(t){t=plain(t);if(/ bids /.test(t)&&G.q&&(G.q.kind==='bid'||G.q.kind==='bidRes'))t=t.replace(/ bids .*$/,' bids in secret.');const w2=t.split(/\s+/);UI._tbCap={s,t};const hm=readMs(t);UI._tbHold=0;
       if(viewSeatForQ()!=null||UI.evq&&UI.evq.some(x=>x.t==='news'||x.t==='event')){UI._tbHold=0}else paint();   // your own decision is open, or a news card follows: no caption hold   // a news card follows: it carries the message (one message at a time)
       if(window.ANIM)setTimeout(()=>{if(UI._tbHold&&UI._tbHold<=Date.now()){UI._tbHold=0;paint()}},hm+50)}}catch(e){}
   return r}})();
@@ -134,7 +140,7 @@ function tbEnd(){UI._tbEnd=1;if(TBCOACH.seen.indexOf('round')<0)TBCOACH.seen.pus
   box.addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(!b)return;box.remove();tutLeave();UI.coachOn=0;if(b.dataset.e==='chapter'&&first&&typeof GXC!=='undefined'){showStart();GXC.play(first.id)}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}})}
 // start of the coached game (called by tutStart in ui12.js)
 window.tbCoachStart=function(o){const pro=!!(o&&o.prologue);TBCOACH.seen=[];lastSig='';UI._tbEnd=0;const old=document.getElementById('tbcend');if(old)old.remove();
-  try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial');UI.coachOn=1;UI.coachPro=pro;clearVoice();renderAll();showGoal(true)};
+  try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial');UI.coachOn=1;UI.coachPro=pro;clearVoice();showGoal(true);renderAll()};
 // for qa-bot: the coached game's state
 window.GXCOACH={get running(){try{return coachOn()&&!G.over&&!UI._tbEnd}catch(e){return false}},get explained(){return TBCOACH.seen.slice()},get done(){try{return !!UI._tbEnd||GXT.isDone('thornbound')}catch(e){return false}}};
 // ---- the Goal card: the first screen of Learn to play, the start of a quick game, and the Goal button. One sentence, three bullets; stays until tapped.
@@ -154,4 +160,11 @@ window.tbShowGoal=showGoal;
     ms=Math.max(ms,readMs(tx)*(typeof spd==='function'?spd():1))}return o.call(this,c,ms)}})();
 // ---- the rival's next step waits until its caption has been read (tap the strip to go on)
 (function(){const o=pump;pump=function(){try{if(document.getElementById('tbgoal')&&G&&UI.started&&viewSeatForQ()==null){clearTimeout(_pumpT);_pumpT=setTimeout(pump,250);return}if(window.ANIM&&G&&UI.started&&!UI.card&&UI._tbHold&&UI._tbHold>Date.now()&&viewSeatForQ()==null&&!(typeof NET!=='undefined'&&NET.on)){clearTimeout(_pumpT);if(UI._tbHeldAt!==UI._tbHold){UI._tbHeldAt=UI._tbHold;try{renderAll()}catch(x){}}_pumpT=setTimeout(pump,Math.max(30,UI._tbHold-Date.now()+30));return}}catch(e){}return o.apply(this,arguments)}})();
+// ---- the header status stays steady: it names whose turn it is, never the rival's play-by-play (that is on the board)
+(function(){const o=statusText;statusText=function(){const t=o.apply(this,arguments);try{const c=UI.card;if(G&&!G.over&&c&&(c.kind==='news'||c.kind==='event'))return {text:'Round '+Math.max(1,G.round)+' of '+G.rounds,seat:-1};if(G&&!G.over&&!c&&G.q&&viewSeatForQ()==null){const w=whoActs();if(w.ai&&w.ai.length)return {text:poss(shortName(w.ai[0]))+' turn',seat:w.ai[0]}}}catch(e){}return t}})();
+(function(){const o=renderBar;renderBar=function(){const r=o.apply(this,arguments);try{const b=document.getElementById('barstat');if(b)b.setAttribute('data-fa-skip','')}catch(e){}return r}})();
+// ---- Learn to play is the coached free-play game (no spotlight steps): report it to the shared tutor API as a running tutor whose steps are done
+(function(){if(typeof GXT==='undefined')return;const run=()=>{try{return coachOn()&&!G.over&&!UI._tbEnd}catch(e){return false}};
+  const r=GXT.running,st=GXT.state;GXT.running=function(){return r.apply(GXT,arguments)||run()};
+  GXT.state=function(){if(!r.call(GXT)&&run())return {active:false,phase:'end',coach:true};return st.apply(GXT,arguments)}})();
 })();

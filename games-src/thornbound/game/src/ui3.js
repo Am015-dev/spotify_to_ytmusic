@@ -5,13 +5,13 @@ function roadIdx(){const st=G.step,ph=G.phase;if(ph==='over')return 6;if(ph==='w
   if(ph==='summer'||['clashorder','reveal','day','night','tally'].includes(st))return 4;
   if(st==='springActions')return 3;if(st==='place')return 2;if(st==='herald')return 1;return 0}
 const STEP_HELP=[
- 'Spring, Bids. Everyone secretly picks one card from their hand as a bid. Highest bid chooses first: take a Kingdom Card, steal a rival\'s, or take your card back. A card you bid under a Kingdom Card stays there while you keep it.',
- 'Spring, Heralds. In turn, put your Herald on one of the six locations. Everyone sees it. If you win a clash and claim that location you gain 1 Influence and steal 1 from every rival Herald on it.',
- 'Spring, Cards. Secretly play one face-down card next to each of the three regions. The strongest total in a region wins its clash, so decide where your big cards go.',
- 'Spring, Actions. In turn order you may use Spring abilities, such as sending Supporters (+1 Strength each) to a region. Skip it if you have nothing to do.',
- 'Summer, Clashes. Regions are resolved one by one. Cards are revealed, Day and Night abilities fire, the strongest total wins and claims one of the region\'s two locations.',
- 'Autumn. Once each you may Govern (move a hand card with votes into a Council) and Journey (spend a hand card for Lore to buy Site of Power cards), plus any Autumn abilities.',
- 'Winter. Heralds go home, Supporters are lost, played cards go to the discard pile, and the next round starts. Running out of deck shrinks your hand size (Attrition).'];
+ 'Spring, Bids. Everyone secretly picks one card from their hand as a bid. Highest bid chooses first. Take a Kingdom Card, steal a rival\'s, or take your card back. Your bid card stays under that Kingdom Card while you keep it.',
+ 'Spring, Heralds. In turn, put your Herald on one of the six locations. Everyone sees it. Win a clash and claim that location. Gain 1 Influence. Steal 1 from every rival Herald on it.',
+ 'Spring, Cards. Secretly play one face-down card next to each of the three regions. The strongest total in a region wins its clash. Decide where your big cards go.',
+ 'Spring, Actions. In turn order you may use Spring abilities. One example: send Supporters (+1 Strength each) to a region. Skip it if you have nothing to do.',
+ 'Summer, Clashes. Regions are resolved one by one. Cards are revealed and Day and Night abilities fire. The strongest total wins. It claims one of the region\'s two locations.',
+ 'Autumn. Once each, you may Govern and Journey. Govern: move a hand card with votes into a Council. Journey: spend a hand card for Lore. Lore buys Site of Power cards. You may also use Autumn abilities.',
+ 'Winter. Heralds go home and Supporters are lost. Played cards go to the discard pile. The next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
 function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
@@ -59,25 +59,25 @@ const recK=()=>UI._recShown&&UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
   if(k==='bid'){const i=cinfo(mv.id);const hand=G.pl[s].hand.map(id=>cinfo(id).strength).sort((a,b)=>b-a);
     const rank=hand.indexOf(i.strength)+1;
-    return i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid ('+i.strength+') chooses early, but this card then sits under the Kingdom Card and cannot fight.':
-      rank>=hand.length-1?'A cheap bid ('+i.strength+') keeps your strong cards for the Clashes. You may choose late; you can always take your card back.':
-      'A middle bid ('+i.strength+') can still win a good Kingdom Card while your strongest cards stay free for the Clashes.'}
+    return i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid ('+i.strength+') chooses early. But this card then sits under the Kingdom Card and cannot fight.':
+      rank>=hand.length-1?'A cheap bid ('+i.strength+') keeps your strong cards for the Clashes. You may choose late. You can always take your card back.':
+      'A middle bid ('+i.strength+') can still win a good Kingdom Card. Your strongest cards stay free for the Clashes.'}
   if(k==='herald'){const l=mv.loc,inf=DD.LOCS[l][2];const riv=G.pl.filter(p=>p.seat!==s&&p.herald===l).map(p=>shortName(p.seat));
     return LOCN[l]+' pays +'+inf+' Influence'+(DD.LOCS[l][3]?' and '+lcFirst(DD.LOCS[l][3]):'')+'. '+(riv.length?riv.join(', ')+(riv.length>1?' have':' has')+' a Herald here: win here and you take 1 Influence from each.':'Win this region and claim it, and your Herald earns +1.')}
   if(k==='place'||k==='tie'){if(mv.pass)return 'Passing keeps your cards. If everyone passes, nobody wins this region.';const i=cinfo(mv.id);const r=mv.r!=null?REG[mv.r]:'the tied region';
     const hr=G.pl[s].herald>=0?G.pl[s].herald>>1:-1;return 'Strength '+i.strength+' in '+r+(mv.r===hr?' (your Herald waits here)':'')+(i.strength>=7?': a strong card where the prize is worth it.':i.strength<=2?': a cheap card, a bluff that saves better ones.':': a solid middle card.')}
-  if(k==='bidRes'){if(mv.t==='return')return 'Nothing on offer is worth a card: take it back and keep your hand full.';if(mv.t==='steal')return 'Stealing takes a Kingdom Card from a rival; their card under it goes back to their hand.';const kk=TB.kingdomInfo(mv.kc);return 'It works for you every round you keep it: '+lcFirst(kk.text)+'.'}
-  if(k==='location'){return LOCN[mv.loc]+' pays +'+DD.LOCS[mv.loc][2]+' Influence'+(DD.LOCS[mv.loc][3]?' and '+lcFirst(DD.LOCS[mv.loc][3]):'')+'.'+(G.pl[s].herald===mv.loc?' Your Herald is here: +1 more, and you take 1 from each rival Herald here.':'')}
+  if(k==='bidRes'){if(mv.t==='return')return 'Nothing on offer is worth a card? Take it back and keep your hand full.';if(mv.t==='steal')return 'Stealing takes a Kingdom Card from a rival. Their card under it goes back to their hand.';const kk=TB.kingdomInfo(mv.kc);return 'It works for you every round you keep it: '+lcFirst(kk.text)+'.'}
+  if(k==='location'){return LOCN[mv.loc]+' pays +'+DD.LOCS[mv.loc][2]+' Influence'+(DD.LOCS[mv.loc][3]?' and '+lcFirst(DD.LOCS[mv.loc][3]):'')+'.'+(G.pl[s].herald===mv.loc?' Your Herald is here: +1 more. You also take 1 from each rival Herald here.':'')}
   if(k==='clashOrder')return 'Your strongest region fights first.';
   if(G.q.t==='menu')return menuWhy(mv);
   if(G.q.t==='sel'){if(mv.t==='seldone')return 'Nothing more here is worth it right now.';
-    if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards; buying one now makes your deck better for the rest of the game.';
-    if(k==='shrine')return 'Cards at the bottom of your deck come back later, after a reshuffle; weak cards there leave room for better draws.';
+    if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards. Buying one now improves your deck for the rest of the game.';
+    if(k==='shrine')return 'Cards at the bottom of your deck come back after a reshuffle. Weak cards there leave room for better draws.';
     if(k==='ossuary')return 'It brings a useful card back from your discard pile.';
     if(k==='rally'||k==='brine')return 'Taking strong cards back to your hand saves them from Winter\'s discard.';
     return 'Of the choices here this one gains you the most.'}
   if(k==='occupier')return 'The card under a Kingdom Card cannot fight.';
-  if(k==='slot')return 'The Kingdom Card you replace is the one that helps you least now.';
+  if(k==='slot')return 'Replace the Kingdom Card that helps you least now.';
   if(k==='councilOut')return 'A card back in your hand can fight again next round.';
   if(k==='flank'||k==='journeyDest')return 'Your card does more good there.';
   if(k==='castle'||k==='wilderness')return mv.skip||/^Skip/.test(mv.label||'')?'No card here is worth giving up.':'This card is worth less in your hand than what you gain.';
@@ -86,7 +86,7 @@ function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
 function menuWhy(m){if(m.t==='done')return 'Nothing else here helps right now, so finish this step.';const a=m.a||'';
   if(a==='supp')return 'Each Supporter adds +1 Strength in that region\'s first Clash. Supporters on the map go to the Lost Pile in Winter.';
   if(a==='govern')return 'A card in a Council gives a lasting bonus every round.';
-  if(a==='journey')return 'Lore buys your faction\'s Site of Power cards: stronger cards for later rounds.';
+  if(a==='journey')return 'Lore buys your faction\'s Site of Power cards. They are stronger cards for later rounds.';
   if(a.startsWith('t:'))return 'A Tactic of your faction ('+tacUses(vs(),a.slice(2))+').';
   if(a.startsWith('fav:'))return 'Your Favour power has limited uses; this is a good one.';
   if(a.startsWith('council:'))return 'Your Council cards allow this once a round.';
@@ -204,9 +204,9 @@ function rowInfo(s,m){const a=m.a||'',lab=m.label||'';const i=lab.indexOf(':');l
   else if(/then discard this card|discard it\b|discard it and|discard this card/i.test(lab))cost='the Kingdom Card is used up';
   return {title,eff:eff.replace(/^./,c=>c.toUpperCase()),cost,gain}}
 function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.gain;
-  if(day){const r=simCached(m);if(r&&r.P)g='then: '+youFirst(Object.keys(r.P.tot).map(Number)).map(x=>(x===s?'you ':sideName(x)+' ')+r.P.tot[x]).join(' vs ')}
+  if(day){const r=simCached(m);if(r&&r.P)g='Then '+youFirst(Object.keys(r.P.tot).map(Number)).map(x=>(x===s?'you ':sideName(x)+' ')+r.P.tot[x]).join(' vs ')}
   const conf=m.a==='t:cln_t3';
-  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?' · ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
+  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?'. ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
@@ -215,7 +215,7 @@ function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day'
   for(const [g,nmG] of GORD){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+L.map(m=>rowHTML(s,m,day)).join('')}
   return {h,f:''}}
 function selHTML(s,mv,rm,q,pulse){const items=mv.filter(m=>m.t==='sel'),dn=mv.find(m=>m.t==='seldone');let h='',f='';
-  const ch=(q.chosen||[]).map(v=>chipFor(v));h+=(ch.length?'<p class="chosen">Chosen: '+ch.join(' ')+'</p>':'')+(q.max!=null&&q.max<items.length+ch.length?'<p class="hint">Choose up to '+q.max+(q.min?' (at least '+q.min+')':'')+'.</p>':'');
+  const ch=(q.chosen||[]).map(v=>chipFor(v));h+=(ch.length?'<p class="chosen">Chosen: '+ch.join(' ')+'</p>':'')+(q.max!=null&&q.max<items.length+ch.length?'<p class="pp-note">Choose up to '+q.max+(q.min?' (at least '+q.min+')':'')+'.</p>':'');
   h+='<div class="opts">'+items.map(m=>optBtn(m,'',typeof m.v==='number'&&m.v<10000&&ownerOf(m.v)===s?'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(m.v,44).outerHTML+'</span>':'')).join('')+'</div>';
   if(dn)f+='<button class="btn'+(rm&&rm.k===dn.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(dn.k)+'">'+esc(dn.label)+'</button>';
   if(rm&&rm.t==='sel')f+=pbtn(rm,recBtnText(rm),pulse);
