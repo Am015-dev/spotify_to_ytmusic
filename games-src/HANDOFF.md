@@ -191,3 +191,10 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Fixed and archived: stitchwise, vale, short-fuse. R1 re-review (those 3): session_01RR7mnXrTLHozUcvFKKnXVN, branch review/R1-gameplay.
 - Round 2 sent: tidewake (hand at 375, replay speed, Rogue Wave/Deck Cannon), wildmark (salmon D rules case).
 - Next: batch fixed games 3 per fresh re-reviewer (R2, R3...), same rubric; only PASS games go to the owner.
+
+## 20:01 UTC update
+- R1: stitchwise 6.9, vale 4.0 (stopper at 375), short-fuse 7.3, all FAIL. F2 fixers: stitchwise session_01RR7mnXfX1dLT1mFJrehys9, vale session_01RR7mnYVzoTezWpE54DwGdF, short-fuse session_01RR7mnZqEiW4qnZ2dCBkBid.
+- R3: cauldron 7.1, shipwreck 6.4, redline 6.3, all FAIL. F2 fixers: cauldron session_01RR7mnXk95RsBJXHDfeF1wD, shipwreck session_01RR7mnYhLw1DfnEfpNZSgcU, redline session_01RR7mnXSsW29UsNgB7a7CMV.
+- Lesson: fixers' sim/bot claims (taps, win rates) were wrong twice; demand touch-measured numbers.
+- Running reviewers: R2 (vinegrave, thornbound, wildmark) session_01RR7mnYeN67c3gxAPrhaNx1; R4 (hollowbough, rampart, final-approach) session_01RR7mnXTEKxqpPJVQtBoHJc; R5 (tidewake, sands, lantern) session_01RR7mnaA15Nj5vtwBiWPHpw.
+- Waiting for a reviewer: sunglaze. First-round fixers still running: crown, kaiten, twin, nebula, perch; r2: doorkick, emberclimb.
