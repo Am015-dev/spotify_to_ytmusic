@@ -521,28 +521,31 @@ function pvSpot(kind, i) {
 // ---- card faces: name, painted art, cost as big icons with numbers, points
 // painted art is keyed by card key (every card has one); the drawn kit art is only a fallback
 function pvArt(sp) { const a = h('div.pvc-art'); const u = HBKit.paintedHref && (HBKit.paintedHref(sp.key) || HBKit.paintedHref(sp.art)); if (u) a.style.backgroundImage = 'url("' + u + '")'; else { const g = HBKit.art(sp.art, 200); g.setAttribute('width', '100%'); g.setAttribute('height', '100%'); g.setAttribute('preserveAspectRatio', 'xMidYMid slice'); a.appendChild(g); } return a; }
-function pvCost(cost, px) {
-  const w = h('span.pvc-cost'); let any = false;
-  for (const r of RESK) if (cost && cost[r]) { any = true; w.appendChild(h('span.pvc-ci', { 'data-r': r }, ic(r, px), h('b', cost[r]))); }
+function pvCost(cost, px, lead) {
+  const w = h('span.pvc-cost'); let any = false, said = [];
+  if (lead) w.appendChild(h('span.pvc-lead', 'Costs'));
+  for (const r of RESK) if (cost && cost[r]) { any = true; said.push(cost[r] + ' ' + rname(r, cost[r])); w.appendChild(h('span.pvc-ci', { 'data-r': r }, ic(r, px), h('b', cost[r]), h('span.pvc-w', rname(r, cost[r])))); }   // words, not icon soup: "2 twigs"
   if (!any) w.appendChild(h('span.pvc-free', 'Free'));
+  w.setAttribute('aria-label', any ? 'Costs ' + said.join(', ') : 'Free');
   return w;
 }
+const pvPts = (n, cls) => h('span.' + cls, { title: n + (n === 1 ? ' point' : ' points') }, h('b', n), h('span.pvc-w', n === 1 ? 'pt' : 'pts'));
 function pvNeed(cost, res) { const a = []; for (const r of RESK) { const d = (cost && cost[r] || 0) - (res[r] || 0); if (d > 0) a.push(d + ' ' + rname(r, d)); } return a; }
 function pvFace(id, o) {
   o = o || {}; const sp = spec(id), T = (HBKit.TYPES && HBKit.TYPES[sp.type]) || { c: '#a67c52', d: '#6b4a2a' };
   const f = h('div.pvc' + (o.small ? '.small' : ''), { style: `--tc:${T.c};--td:${T.d}` });
   f.appendChild(h('div.pvc-name', sp.name));
   const art = pvArt(sp); f.appendChild(art);
-  art.appendChild(h('span.pvc-pts', { title: (sp.points || 0) + ' points' }, h('b', sp.points || 0)));
-  if (o.small) art.appendChild(pvCost(sp.cost, 17));
-  else { f.appendChild(h('div.pvc-row', pvCost(sp.cost, 26))); f.appendChild(h('div.pvc-type', (TYPEN[sp.type] || '') + (sp.unique ? ' · unique' : ''))); }
+  art.appendChild(pvPts(sp.points || 0, 'pvc-pts'));
+  if (o.small) f.appendChild(pvCost(sp.cost, 13));
+  else { f.appendChild(h('div.pvc-row', pvCost(sp.cost, 24, true))); f.appendChild(h('div.pvc-type', (TYPEN[sp.type] || '') + (sp.unique ? ' · unique' : ''))); }
   if (o.state) f.appendChild(h('div.pvc-aff.' + o.state[0], o.state[1]));
   return f;
 }
 function pvMini(id, entry) {
   const sp = spec(id), T = (HBKit.TYPES && HBKit.TYPES[sp.type]) || { c: '#a67c52' };
   const f = h('div.pvm', { style: `--tc:${T.c}` }); const art = pvArt(sp); f.appendChild(art);
-  f.appendChild(h('span.pvm-pts', h('b', sp.points || 0)));
+  f.appendChild(pvPts(sp.points || 0, 'pvm-pts'));
   if (entry && (entry.tok || entry.w)) f.appendChild(h('span.pvm-x', (entry.tok ? '+' + entry.tok : '') + (entry.w ? ' ⚑' + entry.w : '')));
   f.appendChild(h('span.pvm-name', sp.name)); return f;
 }
@@ -606,12 +609,13 @@ function pvRender() {
     const sea = h('span.pvsea', { title: SEASN[me.season] }, seasonIcon(me.season, 30), h('b', SEASN[me.season])); c.appendChild(sea);
     hud.appendChild(c); }
   { const r = h('div.resrow'), show = v >= 0 || watching();
-    for (const k of RESK) r.appendChild(h('span.rs' + (show && me.res[k] ? '' : '.zero'), { 'data-res': k, title: rname(k, 2) }, ic(k, 30), h('b', show ? me.res[k] : '?')));
-    if (me.pts) r.appendChild(h('span.rs.tok', { 'data-res': 'ptok', title: 'point tokens' }, ic('point', 24), h('b', me.pts)));
+    // each pile says what it is: icon, big number, and the word under it ("3 / twigs")
+    for (const k of RESK) { const n = show ? me.res[k] : 0; r.appendChild(h('span.rs' + (show && me.res[k] ? '' : '.zero'), { 'data-res': k, title: rname(k, 2), 'aria-label': (show ? n : 'hidden') + ' ' + rname(k, n === 1 ? 1 : 2) }, ic(k, 24), h('b', show ? n : '?'), h('i.rsw', rname(k, n === 1 ? 1 : 2)))); }
+    if (me.pts) r.appendChild(h('span.rs.tok', { 'data-res': 'ptok', title: 'point tokens' }, ic('point', 22), h('b', me.pts), h('i.rsw', me.pts === 1 ? 'token' : 'tokens')));
     const wk = h('span.rs.wk' + (me.workers > 3 ? '.many' : ''), { 'data-res': 'worker' }), free = availW(me), canW = mine && okw.size > 0 && !G.q && !UI.sel;
     // at most 4 meeples drawn; the count says the rest
-    for (let i = 0; i < Math.min(me.workers, 4); i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
-    wk.appendChild(h('b.pv-wn', free + ' left'));
+    for (let i = 0; i < Math.min(me.workers, tall ? 3 : 4); i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
+    wk.appendChild(h('span.pv-wn', h('b', free), h('i.rsw', free === 1 ? 'worker' : 'workers')));
     if (canW) wk.setAttribute('title', 'Drag a worker to a glowing place');
     r.appendChild(wk); hud.appendChild(r); }
   // ---- tabs (phone)
@@ -663,7 +667,7 @@ function pvRender() {
     if (blocked.indexOf(mi) >= 0) { e.classList.add('blocked'); e.appendChild(h('span.lock', '⛔')); }
     mead.appendChild(e);
   });
-  mead.appendChild(h('div.pv-deck', { role: 'img', 'aria-label': 'Draw pile: ' + G.deck.length + ' cards' }, h('b', G.deck.length + ' left')));
+  mead.appendChild(h('div.pv-deck', { role: 'img', 'aria-label': 'Draw pile: ' + G.deck.length + ' cards' }, h('b', G.deck.length + ' cards left')));
   mead.addEventListener('scroll', () => { UI.pvMx = mead.scrollLeft; }, { passive: true });
   // ---- city: 15 slots that fill with the cards' art
   const pCi = panel('city', 'My city'), vis = visitList();
@@ -695,7 +699,7 @@ function pvRender() {
   // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
   // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
   const gapH = 6, fits = nH * ((tall ? 84 : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (84 + gapH)));
-  const cw = !tall ? 118 : fits ? 84 : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 92) * 1.36) : Math.round(cw * 1.22);
+  const cw = !tall ? 118 : fits ? 84 : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 92) * 1.5) : Math.round(cw * 1.22);
   hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
   hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
   const x0 = fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8;
@@ -721,6 +725,7 @@ function pvRender() {
   else if (myNow && !UI.pvMine) UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places');
   else if (mine && (G.q || UI.sel) && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
   UI.pvMine = myNow;
+  if (UI.tutTab && typeof tutOn === 'function' && tutOn()) UI.pvTab = UI.tutTab;   // Learn: the panel the current step points at stays in front
   if (!UI.pvTab) UI.pvTab = 'places';
   for (const [k] of PV_TABS) if (glowIn(k)) tabEl[k].classList.add('hot');
   // ---- action row / choice tray (shared with the old board)

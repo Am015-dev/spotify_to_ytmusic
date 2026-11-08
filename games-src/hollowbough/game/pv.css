@@ -221,3 +221,33 @@ html[data-bench] #bd.pv .pv-mead{background:url(media/bench.webp) center bottom/
 #bd.pv .tile.pv-painted{background:linear-gradient(90deg,var(--pv-paper) 0%,rgba(248,237,210,.96) 46%,rgba(248,237,210,.25) 78%,rgba(248,237,210,0) 100%),var(--pa) right center/62% auto no-repeat,var(--pv-paper2)}
 #bd.pv .tile.t-forest.pv-painted{background:linear-gradient(90deg,#e6efcf 0%,rgba(230,239,207,.96) 46%,rgba(230,239,207,.25) 78%,rgba(230,239,207,0) 100%),var(--pa) right center/62% auto no-repeat,#cfdfae}
 #bd.pv .tile.pv-painted .pv-sw b,#bd.pv .tile.pv-painted .pv-sw span{text-shadow:0 0 4px #f8edd2,0 0 2px #f8edd2}
+/* W482: words with every icon. Goods: icon + big number, the word under it. Cards: "2 twigs" cost lines, "3 pts" points. */
+#bd.pv .rs{display:inline-grid;grid-template-columns:auto auto;align-items:center;justify-items:center;column-gap:3px;row-gap:0}
+#bd.pv .rs .rsw{grid-column:1/3;font-style:normal;font-size:14px;font-weight:700;line-height:1;color:var(--pv-ink);white-space:nowrap}
+#bd.pv .rs.zero{opacity:1}#bd.pv .rs.zero>svg,#bd.pv .rs.zero>b{opacity:.5}
+#bd.pv .rs.wk{display:inline-flex;grid-template-columns:none}
+#bd.pv .pv-wn{display:inline-grid;justify-items:center;margin-left:4px}
+#bd.pv .pv-wn b{font-size:22px;font-weight:800;line-height:1}
+#bd.pv .pvc-w{font-size:14px;font-weight:700;margin-left:2px}
+#bd.pv .pvc-lead{font-size:14px;font-weight:700;color:var(--pv-ink);margin-right:2px}
+#bd.pv .pvc-pts,.pv-ghost .pvc-pts{border-radius:14px!important;padding:0 7px;width:auto}
+#bd.pv .pvc-pts .pvc-w,.pv-ghost .pvc-pts .pvc-w{font-size:14px;color:#3b2a1c}
+#bd.pv .pvc.small .pvc-cost,.pv-ghost .pvc.small .pvc-cost{position:static;order:3;display:flex;flex-direction:column;align-items:flex-start;gap:0;background:var(--pv-paper);border-radius:0;padding:1px 4px 3px}
+#bd.pv .pvc.small .pvc-ci,.pv-ghost .pvc.small .pvc-ci{gap:2px;line-height:1.1}
+#bd.pv .pvc.small .pvc-pts,.pv-ghost .pvc.small .pvc-pts{height:22px;padding:0 5px}
+#bd.pv .pvm-pts{display:inline-flex;align-items:baseline;gap:1px}
+#bd.pv .pvm-pts .pvc-w{font-size:14px}
+/* W482: one steady instruction line in the bar (never two lines over the buttons); one hint button on phones */
+html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:1!important;display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #bulbbtn{display:none!important}
+/* W482: coach bubble and small labels at 14px+ on phones (feel gate d) */
+html.ph .gxt-bub .gxh-tx{font-size:15px;line-height:1.3}
+html.ph .gxt-bub .gxh-tt{font-size:15px}
+html.ph .gxt-bub .gxt-next{font-size:15px;min-height:32px;padding:4px 14px}
+#bd.pv .strip.hand .scount{font-size:14px}
+.gx-drawer .sm,#rivald .sm,.rc .sm,.rhead .sm{font-size:14px}
+#bd.pv.wide .pvc{overflow:hidden}#bd.pv.wide .pvc-lead{display:none}
+html.ph .pcard span,html.ph .pcard b,html.ph .gx-drawer b,html.ph .gx-drawer .sm,html.ph .pcard .sm{font-size:max(14px,1em)}
+#bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{font-size:14px!important}
+html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!important}
+#bd.pv.wide .pvc-aff{white-space:normal!important;overflow:hidden}

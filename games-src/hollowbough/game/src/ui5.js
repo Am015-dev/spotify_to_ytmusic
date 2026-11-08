@@ -9,7 +9,7 @@ const DEF = { np: 2, level: 'normal', solo: 1 };
 function newGame(mode, o) {
   mode = mode || 'vs'; o = Object.assign({}, UI.opt || DEF, o || {});
   const cfg = { mode, np: o.np || 2, level: o.level || 'normal', solo: o.solo || 1, names: o.names };
-  if (mode === 'tutorial') { cfg.tutorial = true; cfg.coached = true; } else { try { localStorage.setItem('hb_played', '1'); } catch (e) { } }
+  if (mode === 'tutorial') { cfg.tutorial = true; cfg.coached = false; }   // Learn: the step-by-step coach (GXT), one exact target at a time else { try { localStorage.setItem('hb_played', '1'); } catch (e) { } }
   let players, solo = null;
   if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
   else if (mode === 'tutorial') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }

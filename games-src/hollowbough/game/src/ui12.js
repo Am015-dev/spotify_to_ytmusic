@@ -69,7 +69,7 @@ function tutReact(txt, ms) {
 }
 function tutSteps() {
   const S = HBS.steps, L = [
-    { id: 'goal', title: () => 'Ch 1 · Hazel', say: tsay('goal'), target: tq('#bd .chips'), wait: null, ready: myTurn },
+    { id: 'goal', title: S.goal.title, say: tsay('goal'), target: tq('#bd .chips'), wait: null, ready: myTurn },
     { id: 'places', title: S.places.title, say: tsay('places'), target: tutUnion('#bd .tile.t-basic, #bd .tile.t-forest'), wait: null, ready: myTurn },
     { id: 'twig', title: S.twig.title, say: tsay('twig'), target: tgEl('w:basic:4'), wait: tapIs('w:basic:4'), ready: () => myTurn() && !!tgEl('w:basic:4')() },
     { id: 'stock', title: S.stock.title, say: () => tsay('stock', G.players[0].res.twig), target: tq('#bd .resrow'), wait: null,
@@ -77,7 +77,7 @@ function tutSteps() {
     { id: 'rival', title: S.rival.title, say: () => tsay('rival', pname(1)), target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
       ready: () => G.players[1].dep.length === 1 && myTurn() },
     { id: 'resin', title: S.resin.title, say: tsay('resin'), target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
-    { id: 'hand', title: () => 'Ch 2 · Building', say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
+    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
     { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
     { id: 'city', title: S.city.title, say: () => tsay('city', G.players[0].city.length), target: tq('#bd .strip.city'), wait: null,
@@ -86,7 +86,7 @@ function tutSteps() {
       ready: () => myTurn() && !!tgEl('prep')() },
     { id: 'spring', title: S.spring.title, say: () => tsay('spring', G.players[0].workers, G.players[0].res.berry), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].season === 1 && !UI.cards.length },
-    { id: 'berry', title: () => 'Ch 3 · Sharing', say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
+    { id: 'berry', title: S.berry.title, say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
     { id: 'toad', title: S.toad.title, say: tsay('toad'), target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
       wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'barge_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
     { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
@@ -94,23 +94,22 @@ function tutSteps() {
     { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
     { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
-    { id: 'pass', title: () => 'Ch 4 · Winter ends', say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
+    { id: 'pass', title: S.pass.title, say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
       ready: () => myTurn() && !!tgEl('pass')() },
-    { id: 'score', title: S.score.title, say: () => tsay('score', sc0()), target: tq('#pc .kv.tot'), wait: null,
+    { id: 'score', title: S.score.title, say: () => tsay('score', sc0(), pname(1), G.over.scores[1].total), target: tq('#pc table.vs'), wait: null,
       hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
-      ready: () => /^Final score: You/.test(cardTitle('over-score')) },
-    { id: 'rscore', title: S.rscore.title, say: () => tsay('rscore', pname(1), G.over.scores[1].total), target: tq('#pc .kv.tot'), wait: null,
-      hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
-      ready: () => new RegExp('^Final score: ' + pname(1)).test(cardTitle('over-score')) },
+      ready: () => !!cardTitle('over-score') && !!document.querySelector('#pc:not([hidden]) table.vs') },
     { id: 'end', title: S.end.title, say: () => tsay('end', G.over.winner === 0, G.over.scores[0].total, G.over.scores[1].total),
-      target: tq('#pc .kv.tot'), wait: null, hold: c => c.kind === 'over', ready: () => !!cardTitle('over') }
+      target: tq('#pc:not([hidden]) > :first-child'), wait: null, hold: c => c.kind === 'over', ready: () => !!cardTitle('over') && !!tq('#pc:not([hidden])')() }
   ];
   // reaction beat after each action, and the next step waits until it has been read
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
-    st.onEnter = () => { UI.tutLog.push(st.id); };
-    if (r) st.onDone = () => { tutReact(r, st.id === 'resin' || st.id === 'forest' ? 3000 : 2300); };
-    st.ready = () => (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd());
+    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city' }[st.id];
+    st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
+    st.ready = () => { if (tab && G && UI.pvTab !== tab && HB.actor(G) === 0 && !UI.cards.length) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } }
+      try { const el = st.target && st.target(); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
+      return (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd()); };
   });
   return L;
 }
@@ -119,8 +118,13 @@ function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return fa
 function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
   const pro = !!(o && o.prologue);
-  try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutLog = []; UI.coachDone = {}; UI.coachUntil = 0; UI.coachT0 = Date.now(); UI.coachPro = pro; UI.coachActs = 0; UI.coachKey = 0; UI.coachEnd = 0; UI.coachSnap = null; UI.fbLog = []; UI.fbQ = []; UI.seed = TUT_SEED; window.GXCOACH = { running: true, explained: [], done: false };
+  try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutTab = null; UI.tutLog = []; UI.coachDone = {}; UI.coachUntil = 0; UI.coachT0 = Date.now(); UI.coachPro = pro; UI.coachActs = 0; UI.coachKey = 0; UI.coachEnd = 0; UI.coachSnap = null; UI.fbLog = []; UI.fbQ = []; UI.seed = TUT_SEED; window.GXCOACH = { running: true, explained: [], done: false };
   newGame('tutorial');
+  // Learn to play: one step at a time. Each step names the exact thing to tap, glows it, and waits for that tap.
+  if (typeof GXT !== 'undefined') GXT.start({ game: TUT_GAME, steps: tutSteps(), endTitle: 'You know the rules', endText: HBS.end.text,
+    endButtons: pro && window.CAMPAIGN && window.CAMPAIGN.chapters ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    onDone: o => { tutLeave(); const c = o && o.choice; if (c === 'chapter' || c === 'story') { const f = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0]; if (c === 'chapter' && f && typeof GXC !== 'undefined') GXC.play(f.id); else campOpen(); } else showStart(); },
+    onExit: () => { tutLeave(); showStart(); } });
 }
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave() { clearTimeout(UI.tm); clearTimeout(UI.tr); UI.started = false; UI.cards = []; UI.sel = null; UI.cfg = null; G = null; fxClear(); try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }

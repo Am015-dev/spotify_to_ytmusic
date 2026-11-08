@@ -145,6 +145,8 @@ function goalCard() {
 }
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {
+  if (UI.cfg && UI.cfg.tutorial) return;   // Learn: the coach bubble is the only message
+  if (id === 'hbpop' && !hintsActive()) return;   // Play with Hints off: points show on the board, no toast
   const say = document.getElementById('hbsay'); if (say && say.classList.contains('on') && id !== 'hbsay') return;   // one message at a time
   if (id === 'hbpop' && G && G.phase === 'over') return;   // the result card says the score
   let e = document.getElementById(id);

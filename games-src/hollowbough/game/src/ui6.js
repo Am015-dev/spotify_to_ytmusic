@@ -39,7 +39,7 @@ function renderRival(seat) {
 }
 function rowCard(id, e) {
   const c = cdef(id); const bits = []; if (e) { if (e.occ) bits.push('occupied'); if (e.tok) bits.push(e.tok + ' tokens'); if (e.w) bits.push(e.w + ' workers'); if (e.pris && e.pris.length) bits.push(e.pris.length + ' prisoners'); }
-  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), h('div.sm', c.text)));
+  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), ...textLines(c.text).map(t => h('div.sm', t))));
 }
 function renderDrawers() {
   if (!GX.open || !G) return;
@@ -72,6 +72,8 @@ function renderStart() {
   s.appendChild(card);
 }
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
+// card text in short lines (one idea per line, ~12 words): split at ; and at sentence ends, then at commas when still long
+function textLines(t) { const out = []; String(t || '').split(/;\s*|(?<=\.)\s+/).forEach(s => { s = s.trim(); if (!s) return; if (s.split(/\s+/).length <= 12) { out.push(s); return; } let cur = ''; s.split(/,\s*/).forEach(c => { const n = cur ? cur + ', ' + c : c; if (cur && n.split(/\s+/).length > 12) { out.push(cur + ','); cur = c; } else cur = n; }); if (cur) out.push(cur); }); return out.flatMap(s => { const w = s.split(/\s+/); if (w.length <= 12) return [s]; const r = []; for (let i = 0; i < w.length; i += 10) r.push(w.slice(i, i + 10).join(' ')); return r; }); }
 // ---- events
 document.addEventListener('click', ev => {
   if (UI.zoomAt && Date.now() - UI.zoomAt < 450) { ev.preventDefault(); return; }
