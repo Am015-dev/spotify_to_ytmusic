@@ -9,8 +9,19 @@ const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (be
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
 // a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
-// "Easy island" (the default first real game, and Easy afterwards): the same kind deal, without the coach. Normal keeps the full rules.
-function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;const t=G.tut;tutDeal();if(!t)delete G.tut}
+// "Easy island" (the default first real game, and Easy afterwards): easyDeal below, a gentler but real game. Normal keeps the full rules.
+// Easy island is a real challenge (owner review G6: the old kind deal won every time with life never under 8): full adventure and mystery decks,
+// an event deck of the milder cards with newGame's book / "?" split (Easy: 4 + 8, so adventures come up every game), the friendly tile order
+// (mountains for the fire come early), no weather dice. Knobs: harsh (swap out the N harshest), wx 2 + rain/snow (gentle weather table).
+// Measured (adv-test, ✨ followed blindly every day, 20 games): about 55% rescued, 4-11 adventure cards a game; the rest miss the rescue.
+var EASYK=typeof EASYK!=='undefined'?EASYK:{harsh:0,tiles:1,res:3,wx:0,mild:14,beasts:1};
+function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.tiles)G.tileDeck=[4,5,10,6,3,1,2,7,9,11];if(EASYK.res){G.res.food=Math.max(EASYK.res,G.res.food);G.res.wood=Math.max(EASYK.res,G.res.wood)}if(!EASYK.wx)G.wxT={};else if(EASYK.wx===2){G.wxT={};for(let r=EASYK.rain||4;r<=12;r++)G.wxT[r]=r>=EASYK.snow?['rain','snow']:['rain']}
+  const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const book=k=>CARD[k].icon==='book';
+  const harsh=new Set([...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(a)-harm(b)).slice(0,EASYK.harsh));
+  const spare=shuffle([...new Set(EVENTS.map(e=>e.k))].filter(k=>!harsh.has(k)&&!G.ev.deck.includes(k)));
+  G.ev.deck=G.ev.deck.map(k=>{if(!harsh.has(k))return k;const i=spare.findIndex(x=>book(x)===book(k));return i<0?k:spare.splice(i,1)[0]});
+  if(EASYK.mild){const all=[...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(b)-harm(a)),n=G.ev.deck.length,nb=G.ev.deck.filter(book).length,half=Math.ceil(EASYK.mild/2);   // the mildest cards, same book / "?" split as the real deck
+    const pick=(f,k,m)=>shuffle(all.filter(f).slice(0,m)).slice(0,k);G.ev.deck=shuffle(pick(book,nb,Math.max(nb,half)).concat(pick(k=>!book(k),n-nb,Math.max(n-nb,half))))}if(EASYK.beasts)G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
 function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const mild=[...new Set(EVENTS.map(e=>e.k))].filter(k=>k!=='chillrain').sort((a,b)=>harm(b)-harm(a)).slice(0,14);
   G.ev.deck=['chillrain'].concat(shuffle(mild)).slice(0,G.ev.deck.length);G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
@@ -122,7 +133,7 @@ function tutStoryGate(){if(typeof GXT==='undefined'||GXT.isDone(TUT_GAME))return
 // a first-time player tapping Play is offered the tutorial once
 function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return false;
   const d=document.createElement('div');d.className='gxt-end tutoffer';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex"><b>You win if everyone is alive when the rescue ship comes.</b></div><div class="gxt-ex">Learn by playing: 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Play anyway</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex"><b>Light a fire and stack 15 wood by day 12, and keep everyone alive.</b></div><div class="gxt-ex">Learn by playing: 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Play anyway</button></div></div>';
   document.body.appendChild(d);
   d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();
     try{localStorage.setItem('swi_tutoffer','1')}catch(err){}

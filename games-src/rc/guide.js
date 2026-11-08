@@ -97,13 +97,15 @@ function gAdvance(){try{if(typeof V3!=='undefined'){V3.pts&&V3.pts.clear();V3.dr
 function gHide(){const e=gdq('#coachb');if(e&&e.classList.contains('guide')){e.hidden=true;e.classList.remove('guide')}const r=gdq('#tutring');if(r)r.hidden=true;document.body.classList.remove('guiding')}
 function gShow(s,el){const e=gEl();const r=gRing();e.classList.add('guide');e.hidden=false;e.dataset.rule=s.rule;e.dataset.step=s.id;e.dataset.kind='guide';
   const n=GUIDE.i+1,N=GUIDE_STEPS.length;
-  e.innerHTML='<b class="cn">'+n+'/'+N+'</b><span class="ct"></span>'+(el?'':'<button type="button" class="gnext" data-guide="next">Next ▶</button>');e.querySelector('.ct').textContent=s.say;
+  e.innerHTML='<b class="cn">'+n+'/'+N+'</b><span class="ct"></span>'+(el&&s.kind!=='info'?'':'<button type="button" class="gnext" data-guide="next">Next ▶</button>');e.querySelector('.ct').textContent=s.say;
   if(el&&el.closest&&el.closest('#ppop')){try{el.scrollIntoView({block:'center'})}catch(err){}}
   const tgt=el||e.querySelector('.gnext');const tr=tgt.getBoundingClientRect();const pad=6;
   r.hidden=false;r.style.left=(tr.left-pad)+'px';r.style.top=(tr.top-pad)+'px';r.style.width=(tr.width+pad*2)+'px';r.style.height=(tr.height+pad*2)+'px';
   document.body.classList.add('guiding');
   // the bubble sits away from the highlight
-  if(el){const h=innerHeight;if(tr.top+tr.height/2<h*0.55){e.style.top=Math.min(h-180,Math.max(180,tr.bottom+16))+'px';e.style.bottom='auto'}else{e.style.top='auto';e.style.bottom=Math.max(12,h-tr.top+16)+'px'}}
+  const pp=el&&el.closest&&el.closest('#ppop');   // G6 review: inside a place's job list the bubble sits outside the list, never over its rows
+  if(pp){const h=innerHeight,pr=pp.getBoundingClientRect();if(pr.top>110){e.style.top='auto';e.style.bottom=(h-pr.top+8)+'px'}else{e.style.bottom='auto';e.style.top=Math.min(h-120,pr.bottom+8)+'px'}}
+  else if(el){const h=innerHeight;if(tr.top+tr.height/2<h*0.55){e.style.top=Math.min(h-180,Math.max(180,tr.bottom+16))+'px';e.style.bottom='auto'}else{e.style.top='auto';e.style.bottom=Math.max(12,h-tr.top+16)+'px'}}
   else{e.style.top='38%';e.style.bottom='auto';const t2=e.querySelector('.gnext').getBoundingClientRect();r.style.left=(t2.left-pad)+'px';r.style.top=(t2.top-pad)+'px';r.style.width=(t2.width+pad*2)+'px';r.style.height=(t2.height+pad*2)+'px'}}
 function gTick(){try{
   if(!GUIDE.on)return;if(!G){guideStop();return}
@@ -124,6 +126,8 @@ function gPt(ev){const t=ev.changedTouches&&ev.changedTouches[0]||ev.touches&&ev
 function gGate(ev){if(!GUIDE.on||!GUIDE.shown)return;const s=gCur();if(!s||GUIDE.shown!==s.id)return;
   const t=ev.target;if(t&&t.closest&&(t.closest('#coachskip')||t.closest('#coachb button')||t.closest('.gx-top,.gx-bar,#topbar')&&false))return;
   const [x,y]=gPt(ev);const el=s.kind==='info'&&!s.tgt?null:gTarget(s);
+  // G6 review: the big Continue button is where a new player taps first; on an info step it moves the step on too (never a dead tap)
+  const nx=s.kind==='info'?gNext():null;if(nx&&gInside(x,y,nx,2)){ev.stopPropagation();if(ev.type==='click'){ev.preventDefault();gAdvance()}return}
   if(el&&gInside(x,y,el)){if(ev.type==='click'){if(s.kind==='info'){ev.stopPropagation();ev.preventDefault();gAdvance()}else if(s.kind==='pass'){GUIDE.tapped=true;setTimeout(gTick,60)}}
     else if(s.kind==='info'){ev.stopPropagation()}   // an info tap never reaches the board under it
     return}

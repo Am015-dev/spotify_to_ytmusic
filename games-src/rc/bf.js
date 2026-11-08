@@ -101,8 +101,8 @@ BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
-function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
+function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=p.x?pawnLabel(p).split(' ')[0]:pawnLabel(p);
+  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}${p.x&&p.t?E(': a helper pawn, it can only '+p.t.map(t=>(TNAME[t]||t).toLowerCase()).join(' or ')):''}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:p.x&&p.t?`<br><i>helper</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${optHtml(o.l)}</button>`).join('')}</div>`}
@@ -132,17 +132,21 @@ function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chips
   BF.place()}
 BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const tr=Math.round(p.x-26)+','+Math.round(p.y-26);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-26)+'px';g.style.top=Math.round(p.y-26)+'px'}}
   const host=q('#bfchips');if(!host)return;const hr=host.getBoundingClientRect();const busy=[];
-  for(const l of document.querySelectorAll('.tl:not([hidden])')){const r=l.getBoundingClientRect();if(r.width)busy.push({l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top})}
-  const hit=(a,b)=>a.l<b.r+2&&a.r>b.l-2&&a.t<b.b+2&&a.b>b.t-2;
+  for(const l of document.querySelectorAll('.tl:not([hidden])')){const r=l.getBoundingClientRect();if(r.width)busy.push({l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top})}const nl=busy.length;
+  const hit=(a,b)=>a.l<b.r+2&&a.r>b.l-2&&a.t<b.b+2&&a.b>b.t-2;const sr=q('#bfres');const top=Math.max(2,sr?Math.round(sr.getBoundingClientRect().bottom-hr.top+4):2);
   const gs=[...host.children].map(g=>({g,p:tilePt(+g.dataset.t)})).filter(o=>{if(!o.p){o.g.style.visibility='hidden';return false}o.g.style.visibility='';return true}).sort((a,b)=>a.p.y-b.p.y);
-  for(const {g,p} of gs){const w=g.offsetWidth,h=g.offsetHeight;let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=Math.max(2,Math.min(p.h-h-2,p.y+8));
+  for(const {g,p} of gs){const w=g.offsetWidth,h=g.offsetHeight;let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=Math.max(top,Math.min(p.h-h-58,p.y+8));
     // slide down past whatever it would cover (other plates first, then labels); if it runs off the bottom, go above the place instead
-    for(let n=0;n<12;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;y=o.b+3;if(y+h>p.h-2){y=Math.max(2,p.y-h-30);break}}
+    for(let n=0;n<12;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;y=o.b+3;if(y+h>p.h-58){y=Math.max(top,p.y-h-30);break}}
+    // G6 review: still on top of another plate or a label (top edge, crowded camp)? try going up, then sideways, before giving up
+    for(let n=0;n<10;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;const up=o.t-h-3;if(up>=top&&n<5){y=up;continue}const rx=o.r+3,lx=o.l-w-3;if(rx+w<=p.w-2){x=rx}else if(lx>=2){x=lx}else break}
     busy.push({l:x,t:y,r:x+w,b:y+h});const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
+  // a label still under a plate after all that steps aside (the plate names the job there; the label comes back when the plate moves)
+  const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>hit(me,b)))}
   BF.ghostPlace()};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
-  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
+  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-72,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
 function deltas(A,B){const o=[];if(!A||!B)return o;
   for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a})}
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
