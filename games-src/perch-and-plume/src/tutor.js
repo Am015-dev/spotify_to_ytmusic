@@ -41,32 +41,16 @@ function tutPrep(Gx) {
   Gx.feeder = ['seed', 'fish', 'berry', 'grub', 'rodent'];
   Gx.fx = [];
 }
-var tq = function (sel) { return function () { var e = document.querySelector(sel); return e && e.getBoundingClientRect().width ? e : null; }; };
-var tmine = function () { return G && myTurn() && !UI.busy; };
-function tutSteps() {
-  var T = TUT.ids;
-  var handOf = function (id) { return function () { var i = G.pl[0].hand.indexOf(id); return i >= 0 ? document.querySelector('#hand .bc[data-i="' + i + '"]') : null; }; };
-  // One real, short game (1 round of 8 actions vs Pip) in 5 chapters. Action steps advance only when the exact spotlit element is
-  // tapped; "see" steps (Next) explain a rule the board is showing right then. Coverage list: TUTORIAL-COVERAGE.md (ids = step ids).
-  var pt = function (t) { return function () { return tmine() && t(); }; };
-  return [
-    { id: 'forest', title: 'Ottilie \u00b7 Dawn in the Larchwood', say: 'Dawn, and your notebook is empty. Each turn you do ONE thing. Start by gathering food: the green Forest button.', target: tq('.ract[data-h="0"]'), wait: { type: 'tap', match: function (a) { return a.what === 'ract' && a.h === 0; } }, ready: tmine },
-    { id: 'die', title: 'Aunt Ottilie', say: 'Pick 2 food from the feeder (each die is one food). Then watch your forest birds use their powers, right to left.', target: tq('.die.glow'), wait: { type: 'tap', match: function (a) { return a.what === 'die'; }, times: 2 }, ready: function () { return tmine() && G.q && G.q.h === 'die'; } }
-  ];
-}
-function tutStart() {   // the coached first game: 2 guided taps for the very first action, then free play; Ottilie explains each rule when it first matters (coach.js)
-  if (typeof GXT === 'undefined') { showConfig(); return; }
+function tutStart() {   // the coached first game: 1 round of 4 turns vs Pip, every choice free; Ottilie teaches one action per turn (coach.js)
   TUT.ids = tutPick();
   ['title', 'setup', 'result', 'pass'].forEach(function (id) { $('#' + id).hidden = true; });
   try { if (window.GXC) GXC.close(); } catch (e) { }
   try { GX.close(); } catch (e) { }
-  var T = TUT.ids;
-  GXT.start({ game: 'perch-and-plume', story: true,
-    setup: function () { startGame({ seats: [{ name: 'You', kind: 'human', face: 'you' }, { name: 'Pip', kind: 'ai', lvl: 'easy', face: 'pip' }], mode: 'tutorial', tutorial: true, seed: 42, rounds: 2, cubes: [8, 7],
-      hands: { 0: [T.play, T.h2, T.h3, T.w1, null].filter(Boolean) }, first: 0, goals: ['birds-G', 'eggs-F'], prep: tutPrep }); },
-    steps: tutSteps(),
-    endTitle: STORY.tutEnd.title, endText: STORY.tutEnd.text, endButtons: [{ id: 'play', label: 'Play on' }, { id: 'story', label: 'Skip to the story' }],
-    onDone: function (r) { try { localStorage.setItem('pp-played', '1'); } catch (e) { } if (r && r.choice === 'story') { stopTimers(); openStory(); return; }
-      UI.mode = 'tutfree'; UI.turnKey = null; coachReset(); ['welcome', 'food', 'feeder', 'chain'].forEach(function (k) { COACH.done[k] = 1; }); render(); pump(); },
-    onExit: function () { stopTimers(); showTitle(); } });
+  try { if (typeof GXT !== 'undefined' && GXT.active && GXT.active()) GXT.stop && GXT.stop(); } catch (e) { }
+  var T = TUT.ids; RATE.last = null; RATE.k = null;
+  startGame({ seats: [{ name: 'You', kind: 'human', face: 'you' }, { name: 'Pip', kind: 'ai', lvl: 'easy', face: 'pip' }], mode: 'tutfree', tutorial: true, seed: 42, rounds: 1, cubes: [4],
+    hands: { 0: [T.play, T.h2, T.h3, T.w1, null].filter(Boolean) }, first: 0, goals: ['birds-G'], prep: tutPrep });
+  try { localStorage.setItem('pp-played', '1'); } catch (e) { }
+  try { if (typeof GXT !== 'undefined' && GXT.markDone) GXT.markDone('perch-and-plume'); } catch (e) { }
+  coachReset(); render();
 }

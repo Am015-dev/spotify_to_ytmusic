@@ -42,7 +42,7 @@ async function run(browser, W, H, mode) {
     await p.evaluate(() => { UI.sv = 'title'; renderStart(); }); await sleep(200);
   }
   // start it with a finger, from the menu (or Story)
-  const tb = await p.evaluate(mode => { const b = document.querySelector(/story/.test(mode) ? '#start .tbtn.story' : '#start [data-gxt-open]'); const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, mode);
+  const tb = await p.evaluate(mode => { const b = document.querySelector(/story/.test(mode) ? '#start [data-a=story]' : '#start [data-gxt-open]'); const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, mode);
   await p.touchscreen.tap(tb[0], tb[1]); await sleep(600);
   await p.evaluate(m => { if (m !== 'anim') { UI.pullMs = 0; window.AIDELAY = 60; } }, mode);
   const state = () => p.evaluate(() => GXT.state());
@@ -190,7 +190,7 @@ async function run(browser, W, H, mode) {
     const st2 = await p.evaluate(() => JSON.parse(localStorage.getItem('gxt-cauldron-fair') || '{}')); if (!st2.done) note(tag, 'prologue not remembered as done');
     // second time: Story goes straight to the chapter map; the chapter list has a Tutorial button
     await p.evaluate(() => { GXC.close(); showStart(); }); await sleep(250);
-    const sb = await p.evaluate(() => { const b = document.querySelector('#start .tbtn.story'); const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); await p.touchscreen.tap(sb[0], sb[1]); await sleep(600);
+    const sb = await p.evaluate(() => { const b = document.querySelector('#start [data-a=story]'); const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }); await p.touchscreen.tap(sb[0], sb[1]); await sleep(600);
     const m = await p.evaluate(() => ({ run: GXT.running(), map: !!document.querySelector('.gxc-map-on'), rep: [...document.querySelectorAll('.gxc-head button')].some(b => /Tutorial/.test(b.textContent)) }));
     if (m.run) note(tag, 'a finished player was sent through the tutorial again'); if (!m.map) note(tag, 'Story did not open the chapter map after the tutorial'); if (!m.rep) note(tag, 'no "Tutorial" (replay) button in the chapter list');
   }

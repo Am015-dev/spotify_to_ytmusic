@@ -3,6 +3,12 @@ name: Python package
 on:
   push:
     branches: [main, alex/brave-carson-rbpmlk]   # worker review branches (nr/*) are not linted on every push; they are checked when merged here
+    paths:   # only the Python app; game deploys must not run (and email) this
+      - 'spotify2ytmusic/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - '.github/workflows/main.yml'
 
 jobs:
   build:

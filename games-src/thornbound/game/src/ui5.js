@@ -103,12 +103,14 @@ function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=
   const lost=UI.V.lost;h+='<h5>Lost Pile ('+lost.length+', shared)</h5><div class="piles">'+lost.map(id=>'<span class="th">'+cardEl(id,48).outerHTML+'</span>').join('')+'</div>';
   el.innerHTML=h}
 const RULES_HTML=()=>`<div class="rules">
-<div class="quick"><h3>In two minutes</h3><p><b>Goal:</b> hold the most <b>Influence</b> (points) when the last round ends.</p><ol>
-<li><b>Bid</b> a hand card in secret. The highest bid picks a <b>Kingdom Card</b>: a lasting power.</li>
-<li>Put your <b>Herald</b> on one of six locations. It pays only if you win there.</li>
-<li><b>Hide one card</b> at each of the three regions. Send <b>Supporters</b> (+1 each) if you like.</li>
-<li><b>Clashes:</b> cards flip; the highest total Strength in a region wins and claims one of its two locations (its Influence, plus +1 and a steal if your Herald stands there).</li>
-<li><b>Autumn, then Winter:</b> optional Govern and Journey, then played cards are discarded and a new round begins.</li></ol>
+<div class="quick"><h3>How a turn works</h3><ol>
+<li><b>Bid</b> one card in secret. The highest bid picks a Kingdom Card first.</li>
+<li><b>Herald:</b> stand on a location. It pays only if you win its region.</li>
+<li><b>Hide</b> one card at each region, and add Supporters (+1 each).</li>
+<li><b>Clash:</b> cards flip. The highest total in a region wins it.</li>
+<li><b>Autumn, Winter:</b> optional Govern or Journey, then a new round.</li></ol>
+<p><b>Goal:</b> hold the most <b>Influence</b> when the last round ends. Ties go to the Favour holder.</p>
+<p><b>Simplified on purpose:</b> starting hand is 6; the solo mode and the optional advanced setup of the board game are not built.</p>
 <p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
