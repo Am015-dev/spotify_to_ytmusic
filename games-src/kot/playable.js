@@ -14,7 +14,7 @@
   // ---- 2) turn banner
   let key = '', hideT = 0;
   function banner() {
-    if (!(typeof G!=='undefined'&&G) || G.winner || UI.intro || quiet() || (window.GX && GX.open) || /[?&]scn=/.test(location.search)) return;   // scenarios build one exact state: no transient overlay
+    if (!(typeof G!=='undefined'&&G) || G.winner || UI.intro || quiet() || (window.GX && GX.open) || /[?&]scn=/.test(location.search) || !(window.ppHintsOn && ppHintsOn())) return;   // scenarios build one exact state: no transient overlay
     const k = G.gid + '/' + G.tid + '/' + G.active; if (k === key) return; key = k;
     let el = $('ccbanner'); if (!el) { el = document.createElement('div'); el.id = 'ccbanner'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
     const p = cur(), me = typeof humanTurn === 'function' && humanTurn();
@@ -112,8 +112,10 @@
   }
   function preview() {
     const dw = $('dicewrap') || $('dice'); if (!dw) return;
-    let el = $('pppreview'); if (!el) { el = document.createElement('div'); el.id = 'pppreview'; el.setAttribute('aria-live', 'polite'); dw.insertBefore(el, dw.firstChild) }
-    const show = mine() && G.phase === 'roll' && G.dice.length && !document.querySelector('.gx-dock[data-bf="resolving"]');
+    let el = $('pppreview'); if (!el) { el = document.createElement('div'); el.id = 'pppreview'; el.setAttribute('aria-live', 'polite'); (dw.parentNode || dw).insertBefore(el, dw) }   // ABOVE the tray, never over the dice
+    const show = ppHintsOn() && mine() && G.phase === 'roll' && G.dice.length && !document.querySelector('.gx-dock[data-bf="resolving"]');
+    document.documentElement.classList.toggle('pp-mine-roll', !!show);
+    document.documentElement.classList.toggle('pp-nobub', !!show && !/[?&]scn=/.test(location.search));   // the old text strip under the tray repeats the preview
     if (!show) { el.classList.remove('on'); return }
     const h = `<i>If you smash now:</i> ${pvHTML()}`; if (el.dataset.h !== h) { el.dataset.h = h; el.innerHTML = h } el.classList.add('on');
   }
@@ -150,7 +152,7 @@
     const lines = body.split(/,\s*/).map(friendly).filter(Boolean);
     let rating = '';
     try {
-      if (T.first) {
+      if (T.first && ppHintsOn()) {
         const act = val(scoreDice(p, G.dice.filter(d => !d.t).map(d => ({ f: d.f })))), g = greedy(p, T.first.faces, T.first.re), d = act - g;
         const word = d >= 1 ? 'GOOD' : d >= -1.5 ? 'OKAY' : 'POOR';
         rating = `<em class="${word.toLowerCase()}">${word}</em> turn: you scored ${act.toFixed(1)} points of value; a greedy keep averages ${g.toFixed(1)}.`;
@@ -159,8 +161,10 @@
     } catch (e) { }
     T.first = null;
     let el = $('pppop'); if (!el) { el = document.createElement('div'); el.id = 'pppop'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
-    el.innerHTML = `<b>You smashed:</b><ul>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>${rating ? `<p>${rating}</p>` : ''}`;
-    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 4200);
+    el.classList.toggle('short', !(window.ppHintsOn && ppHintsOn()));
+    el.innerHTML = `${window.ppHintsOn && ppHintsOn() ? '<b>You smashed:</b>' : ''}<ul>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>${rating ? `<p>${rating}</p>` : ''}`;
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), (window.ppHintsOn && ppHintsOn()) ? 4200 : 2600);
+    if (!el._tap) { el._tap = 1; el.addEventListener('click', () => { try { GX.show('dr-log') } catch (e) { } }) }
   }
   // ---- score strip: the leader is marked; the best-value card wears a badge
   function strip() {
@@ -176,8 +180,42 @@
     }
     document.querySelectorAll('#pchips .pchip').forEach(c => { const k = +c.dataset.pm; c.classList.toggle('lead', top > 0 && leaders.length === 1 && leaders[0].i === k) });
     document.querySelectorAll('#pshop [data-shop], #buymini [data-card]').forEach(e => e.classList.remove('pp-best'));
-    if (mine() && G.phase === 'buy' && !G.tut) { let k = -1; try { k = suggestCard(cur()) } catch (e) { } if (k >= 0) { const e = document.querySelector(`#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`); if (e) e.classList.add('pp-best') } }
+    if (ppHintsOn() && mine() && G.phase === 'buy' && !G.tut) { let k = -1; try { k = suggestCard(cur()) } catch (e) { } if (k >= 0) { const e = document.querySelector(`#pshop [data-shop="${k}"], #buymini [data-card="${k}"]`); if (e) e.classList.add('pp-best') } }
   }
   const _after = window.ppAfter;
   window.ppAfter = function () { _after && _after.apply(this, arguments); try { track(); preview(); strip() } catch (e) { console.error('ppAfter ' + e.message) } };
+})();
+
+
+// ===== Addendum 7 (W386f): three modes. LEARN = the coached game (the only place with bubbles). PLAY = clean (board, hand, tracker, one score line, a short "+N reason" pop).
+// HINTS = the top-bar bulb, OFF by default: previews, BEST VALUE badge, good/poor rating, "What should I do?". =====
+(function () {
+  const KEY = 'cc_hints2', R = document.documentElement;
+  const PPH = window.PPH = { on: false, pass: false };
+  try { PPH.on = localStorage.getItem(KEY) === '1' } catch (e) { }
+  window.ppHintsOn = () => PPH.on || !!(typeof G !== 'undefined' && G && G.tut && window.PPC && PPC.on);
+  const paint = () => {
+    R.classList.toggle('pp-hints', ppHintsOn());
+    const b = document.getElementById('bulbbtn'); if (b) { b.setAttribute('aria-pressed', PPH.on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (PPH.on ? 'on' : 'off') + '. Tap to switch'); b.title = 'Hints ' + (PPH.on ? 'on' : 'off') }
+    try { UI.hints = ppHintsOn() } catch (e) { }
+  };
+  window.ppHintsPaint = paint;
+  // the bulb toggles Hints; "What should I do?" (shown only with Hints on) opens the old advice panel through the same button
+  document.addEventListener('click', e => {
+    const w = e.target.closest && e.target.closest('[data-pp-what]');
+    if (w) { PPH.pass = true; const b = document.getElementById('bulbbtn'); if (b) b.click(); PPH.pass = false; return }
+    const b = e.target.closest && e.target.closest('#bulbbtn'); if (!b || PPH.pass) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    PPH.on = !PPH.on; try { localStorage.setItem(KEY, PPH.on ? '1' : '0') } catch (x) { }
+    paint(); try { render() } catch (x) { }
+  }, true);
+  window.addEventListener('load', () => { try { GXH.setEnabled(false) } catch (e) { } setTimeout(paint, 400) });
+  // turn the pieces on and off: the previous features read ppHintsOn()
+  const _after = window.ppAfter; window.ppAfter = function () { _after && _after.apply(this, arguments); try { paint(); what() } catch (e) { } };
+  function what() {
+    let el = document.getElementById('ppwhat');
+    const show = ppHintsOn() && !(G && G.tut) && G && !G.winner && G.active === G.pl.findIndex(p => p.human) && !UI.intro && !UI.choice;
+    if (!el) { el = document.createElement('button'); el.id = 'ppwhat'; el.type = 'button'; el.setAttribute('data-pp-what', ''); el.textContent = 'What should I do?'; document.body.appendChild(el) }
+    el.style.display = show ? 'block' : 'none';
+  }
 })();
