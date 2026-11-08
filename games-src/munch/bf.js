@@ -65,7 +65,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?(who===me?'It hits you at once.':'It hits '+esc(P(who).nm)+', not you.'):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' own':''}${who!==me?' them':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):4200;let opened=false;
+  document.body.appendChild(o);if(typeof tbFitNames==='function')tbFitNames([...o.querySelectorAll('.card')]);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):mine?3000:1500;let opened=false;
   const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
   const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
     if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
@@ -74,7 +74,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   BF.revClose=()=>{if(!o.isConnected)return;o.remove();bfHold(0)};
   E.door0=performance.now();o.classList.add('door');
   if(dimg){dimg.addEventListener('animationend',()=>{E.door1=performance.now();open()},{once:true});setTimeout(()=>{if(!opened&&dimg.isConnected&&!E.door1)open()},1400)}else{E.door1=performance.now();open()}
-  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur+800);
+  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur+300);
 }
 // ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are kicked open in a game ----
 // The clip IS the reveal: the door card opens into the video, which fills the table (soft vignette edges, no box), the monster's name and level
@@ -139,7 +139,7 @@ function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const a
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
   if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
     const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,bfCap('Lost: '+lost.map(cname).join(', '),7),'bad');
-    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,bfCap(`Not worn: ${w||'no free slot'}`,8),'bad')}}
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Not worn: ${(w||'no free slot').replace('your race, class or sex can’t use it','wrong race or class').replace(/^you already wear /,'already wearing ').replace('your hands are full','hands full')}`,'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -186,7 +186,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
     if(G&&!G.cb&&G.phase==='setup'&&(me>=0&&P(me).human||G.mode==='ai'||me<0||curPl().i!==me)){const mineS=me>=0&&P(me).human&&sideToAct()===me;const p=mineS?P(me):curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div>${mineS?'':`<div class="bfcap">${esc(p.nm.split(/[ ,]/)[0])} gears up…</div>`}</div>`}
     if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=132;
-      return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
+      return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'Into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
     return _arena.apply(this,arguments)};
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
@@ -262,3 +262,8 @@ document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkg
   if(e.target.closest&&e.target.closest(document.documentElement.classList.contains('ph')?'#phchip':'#phchip,#docktitle')&&!document.querySelector('.gxh-bub,.gxh-card,#bfrev')&&typeof G!=='undefined'&&G)dkGoal()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
 (function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
+
+// tap to skip: during a rival's turn a tap on the table (not on a button, card or panel) closes the door reveal and runs the rest of that turn fast
+document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net')return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
+  const t=e.target;if(t.closest&&t.closest('button,[data-mv],[data-a],[data-card],[data-opp],.gx-drawer,#modal,.gx-bar,.gxh-bub,.gxh-rules,#dkgoal,.hand'))return;
+  UI.ff=G.turn;UI.hold=0;if(BF.revClose)BF.revClose();if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(x){}},true);

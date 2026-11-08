@@ -44,7 +44,8 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
 // ---- panels ----
 // key art behind the title and end screens (CSS reads the class; media/ files are deployed beside the page)
 function modalArt(k){const m=$('#modal');if(!m)return;['title','win','lose'].forEach(n=>m.classList.toggle('art-'+n,k===n))}
-function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netRender==='function')netRender();
+function render(){const root=$('#app');if(!root)return;syncMenu();if(!G&&typeof dkGoalClose==='function')dkGoalClose();  // back at the menu: no leftover goal card over the Start button
+  if(typeof netRender==='function')netRender();
   document.documentElement.classList.toggle('dk-title',!G);
   if(!G){if(typeof musicSync==='function')musicSync();setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;modalArt('title');if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
   scanLog();if(typeof musicSync==='function')musicSync();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
@@ -236,7 +237,7 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    ${open?`<div class="qopts"><h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
    ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" id="hintsBlearn" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Hints while I play</button></div>`}
-   ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
+   ${online?'':`<button class="btn primary pulse dkstart" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
    <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>

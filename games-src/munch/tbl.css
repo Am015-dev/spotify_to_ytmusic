@@ -313,7 +313,7 @@ html:not(.ph) .card .kind{box-sizing:border-box;padding-right:22px;overflow:hidd
 html:not(.ph) .card .cx{margin-top:8px}
 /* phone fight row: a bonus card's +N is already on the score line; a monster keeps its level gem with a one-line name */
 html.ph .arena .card:not(.t-monster) .tag{display:none!important}
-html.ph .arena .card.t-monster .cn{-webkit-line-clamp:1!important}
+html.ph .arena .card.t-monster .cn{-webkit-line-clamp:2!important;overflow-wrap:normal;word-break:normal;hyphens:none}
 /* portrait phone, 6+ cards: the overlapping fan; a covered card shows its art and number, the top card shows everything */
 html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:none!important}
 /* PC: the price tag sits clear of the kind line */
@@ -335,3 +335,9 @@ html.ph-p .bfrev{align-content:start;padding-top:calc(var(--ph-bar,44px) + 64px)
 html.ph-p .bfrev .bfrc .card{--w:min(42vw,200px,24dvh)}
 .bfrev.them.k-curse .bfban{font-size:clamp(24px,8vw,40px);text-align:center;max-width:92vw}
 @media (max-height:700px){html.ph-p .bfrev{padding-top:calc(var(--ph-bar,44px) + 36px)}html.ph-p .bfrev .bfrc .card{--w:min(36vw,170px,20dvh)}}
+/* quick-game menu: Start sticks to the bottom of the menu, so it is visible without scrolling on any phone */
+.dlg .dkstart{position:sticky;bottom:0;z-index:3;box-shadow:0 -8px 14px rgba(40,20,6,.35),0 4px 0 #5a2a0c}
+/* phone fight: the hero's name sits clear below the portrait frame's gem */
+html.ph .arena:has(>.vs) .score.hero .sl{margin-top:10px!important}
+/* phone: the stage captions wrap inside the table, never cut */
+html.ph .bfstage .bfcap{white-space:normal!important;overflow:visible;text-overflow:clip;max-width:calc(100% - 8px);line-height:1.15}
