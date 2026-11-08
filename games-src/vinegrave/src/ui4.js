@@ -90,9 +90,9 @@ function coachEvent(e, s) {   /* events: guardian wakes, round end, fleeing, the
 }
 function coachRival(m) {   /* a short lesson on every rival move */
   if (!coachOn() || !m) return; coachSay('rival'); if (m.t === 'pass') { coachSay('pass'); return; }
-  const L = { dig: 'Tamsin dug a camp: that site is closed to you until the round ends.', disc: 'Tamsin explored a ruin: an idol for her, and a guardian now sits with her explorer.',
-    beat: 'Tamsin overcame a guardian: 5 points and a boon for her.', buy: 'Tamsin bought from the market: a new card slides in.', play: 'Tamsin played a card for its goods.',
-    res: 'Tamsin climbed the research track: those rows score at the end.', temple: 'Tamsin bought a temple tile: big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
+  const L = { dig: 'Tamsin dug a camp. It is closed to you this round.', disc: 'Tamsin explored a ruin. She gets an idol, and a guardian wakes.',
+    beat: 'Tamsin overcame a guardian: 5 points and a boon.', buy: 'Tamsin bought a card. A new one slides in.', play: 'Tamsin played a card.',
+    res: 'Tamsin climbed the research track. Those rows score at the end.', temple: 'Tamsin bought a temple tile for big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
   if (L[m.t]) coachSay(null, L[m.t]);
 }
 window.GXCOACH = { get running() { return !!(G && UI.mode === 'tutorial' && UI.coachFree); }, get explained() { return Object.keys(CO.seen).filter(id => CO.seen[id]); }, get done() { return !!CO.over || (typeof GXT !== 'undefined' && GXT.isDone(TUT_GAME)); } };
@@ -116,7 +116,7 @@ function tutSteps() {
   return [
     { id: 'hand', title: 'Ch 1 · Landfall', say: 'Goal: have the most points after 5 rounds. Start by playing Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
-    { id: 'play', title: 'Ch 1 · Landfall', say: 'Playing it gives +1 compass. That is your one action. After this, the island is yours to explore.', target: tq(tinsp('Play it')),
+    { id: 'play', title: 'Ch 1 · Landfall', say: 'It gives +1 compass. That is your one action.', target: tq(tinsp('Play it')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()), onEnter: () => { CO.seen.play = 1; } },
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
       onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
@@ -135,7 +135,7 @@ function tutStart(o) {
   CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0; CO.over = false;
   UI.coachFree = false;
   TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a whole expedition. Now the coast, and Tamsin, are waiting."' : 'Pell: "A whole expedition, start to count. A real game is 5 rounds. The lightbulb helps any time."',
+    endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a full expedition. Now the coast awaits."' : 'Pell: "That was one round. A real game has 5."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
     onDone: r => { const c = r && r.choice; coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
@@ -168,7 +168,7 @@ function boot() {
   const q = new URLSearchParams(location.search); UI.fast = q.get('fast') === '1';
   // the Story map's locked stages and header buttons answer every tap (a short note), never a dead tap
   document.addEventListener('click', e => { const n = e.target.closest && e.target.closest('.gxc-node.locked,.gxc-head .gxc-ib'); if (!n) return; if (n.classList.contains('locked')) { e.stopPropagation(); e.preventDefault(); }
-    toast(n.classList.contains('locked') ? 'Win the stage before it to open this one.' : /star/i.test(n.getAttribute('aria-label') || n.textContent) ? 'Win stages to earn stars and unlock portraits.' : /back/i.test(n.textContent) ? 'Back to the title.' : 'One moment…', 1800); }, true);
+    toast(n.classList.contains('locked') ? 'Win the stage before it to unlock this one.' : /star/i.test(n.getAttribute('aria-label') || n.textContent) ? 'Win stages to earn stars and portraits.' : /back/i.test(n.textContent) ? 'Back to the title.' : 'One moment…', 1800); }, true);
   // Escape leaves the guided round
   document.addEventListener('keydown', e => { if (e.key !== 'Escape') return;
     if (typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial') { try { GXT.stop(); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; showTitle(); return; }

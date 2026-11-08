@@ -27,7 +27,7 @@ function refreshInsp() {
     h += '</div></div>';
     L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
     if (q && q.h === 'buy' && I.kind === 'row') VG.moves(G).forEach(m => { if (m.v === I.x) add(m, 'Buy it ' + q.d.o + ' cheaper'); });
-    if (!btns.length && myTurn() && !q) h += `<p class="sm">${I.kind === 'row' ? 'You cannot pay for it yet.' : c.t === 'fear' ? 'Dread does nothing when played: use it for travel.' : c.t === 'art' ? 'You need a tablet to play it.' : ''}</p>`;
+    if (!btns.length && myTurn() && !q) h += `<p class="sm">${I.kind === 'row' ? 'You cannot pay for it yet.' : c.t === 'fear' ? 'Dread does nothing. Use it to pay travel.' : c.t === 'art' ? 'You need a tablet to play it.' : ''}</p>`;
   } else if (I.kind === 'track') {
     h += `<h3>Research track</h3><p class="sm">Your magnifier ${ic('up')} climbs first; your notebook may follow but never pass it, and never enters the temple. Each row costs what it shows and gives a bonus; the first magnifier to some rows takes an extra reward. The top row is the temple.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Pts</th></tr>`;
     for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' 🔍' : ''}${me.note === r ? ' 📓' : ''}</td><td>${resHTML(V.TRACK[r].cost)}</td><td>${resHTML(V.TRACK[r].bonus)}${V.FIRST[r] ? `<br><span class="sm">first: ${G.firstTaken && G.firstTaken[r] ? 'taken' : ''}</span>${G.firstTaken && G.firstTaken[r] ? '' : resHTML(V.FIRST[r])}` : ''}</td><td>${V.NOTE_VP[r]}/${V.GLASS_VP[r]}</td></tr>`;
@@ -47,10 +47,10 @@ function refreshInsp() {
 }
 function whyNotSite(x) {
   const me = G.p[UI.view];
-  if (x.occ !== -1) return 'Someone is already here this round.';
-  if (!me.ex) return 'Both your explorers are out this round.';
+  if (x.occ !== -1) return 'Someone is already here.';
+  if (!me.ex) return 'Both explorers are already out.';
   if (!x.tile && me.res.compass < V.DISC[x.lvl]) return 'You need ' + V.DISC[x.lvl] + ' compasses to discover it.';
-  return 'Your hand cannot pay this travel (2 coins buy a plane).';
+  return 'You cannot pay this travel. 2 coins buy a Plane.';
 }
 // ---------------------------------------------------------------- input
 document.addEventListener('click', e => {
@@ -77,7 +77,7 @@ function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
   const human = isHuman(VG.actor(G)), evb = human && !m.free && m.t !== 'ans' && m.t !== 'pass' ? evalMoves().slice() : null, main = human && !m.free && m.t !== 'ans';
   let rating = null, lbl = ''; try { rating = evb ? rateMove(m, evb) : null; lbl = main ? shortLabel(m) : ''; } catch (x) { }   /* before the move: hand indices still match */ const s = VG.actor(G), b = snapS(s), el0 = moveEl(m, s), from = el0 && el0.getBoundingClientRect(), html = el0 && el0.classList.contains('cd') ? el0.outerHTML : '', r = VG.apply(G, m);
-  if (!r.ok) { toast('That move is not allowed now.'); render(); return; }
+  if (!r.ok) { toast('You cannot do that now.'); render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, from, html, b); if (best) coachMove(m, best);
@@ -186,7 +186,7 @@ function showEvents(s) {
   ev.forEach(e => {
     if (typeof coachEvent === 'function') coachEvent(e, s);
     if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); note(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
-    if (e.k === 'guardian') { wait = Math.max(wait, 4800); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
+    if (e.k === 'guardian') { wait = Math.max(wait, 4800); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Beat it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
     if (e.k === 'beat') { wait = Math.max(wait, 4800); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
@@ -240,7 +240,7 @@ function previewText(m) {
   if (!hintsOn()) return ''; const e = evalMoves().find(x => sameMv(x.m, m)); if (!e) return '';
   const p = []; if (e.d.vp) p.push((e.d.vp > 0 ? '+' : '') + e.d.vp + (Math.abs(e.d.vp) === 1 ? ' point' : ' points') + (e.d.why.length ? ' (' + e.d.why.join(', ') + ')' : ''));
   if (e.d.rs > 0) p.push('+' + e.d.rs + ' research step' + (e.d.rs > 1 ? 's' : '')); p.push(...e.d.res.slice(0, 3));
-  return p.length ? 'You get: ' + p.join(', ') : 'No goods now: it sets up later turns';
+  return p.length ? 'You get: ' + p.join(', ') : 'No goods now. It helps later turns.';
 }
 function shortLabel(m) {
   const me = G.p[UI.view];
@@ -256,13 +256,13 @@ function bestBadges() {   /* gold badges: the strongest site and the strongest m
 }
 function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest move */
   if (!ev || !ev.length) return null; const i = ev.findIndex(x => sameMv(x.m, m)), best = ev[0];
-  if (i === 0) return { k: 'good', t: 'Good move: the strongest option this turn.' };
+  if (i === 0) return { k: 'good', t: 'Good move: the best option this turn.' };
   const gap = i < 0 ? 99 : best.v - ev[i].v;
   return gap <= 2.5 || i === 1 ? { k: 'okay', t: 'Okay move. Slightly better: ' + shortLabel(best.m) + '.' } : { k: 'poor', t: 'Weak move. Much better was: ' + shortLabel(best.m) + '.' };
 }
 function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
   if (!hintsOn() || UI.fast || !G || G.phase === 'over' || (typeof GXT !== 'undefined' && GXT.running && GXT.running())) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
-  const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
+  const why = m.t === 'pass' ? 'You passed. You sit out until the round ends.' : 'Turn over: you used your action (' + (lbl || 'your move') + ').';
   e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
   try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }
   e.className = 'on'; clearTimeout(turnOver.t); turnOver.t = setTimeout(() => { e.className = ''; }, readMs(e.textContent)); e.onclick = () => { e.className = ''; };

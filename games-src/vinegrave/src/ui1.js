@@ -104,7 +104,7 @@ function renderDock(L, q, me, actor) {
   $('#docktitle').innerHTML = `<span class="trk">Round ${G.round} of ${G.rounds}</span> <b>${esc(who0)}</b>` + (over ? '' : ` <span class="tok${mine ? ' on' : ''}" title="main actions left this turn">${mine ? '1 action left' : 'waiting'}</span>`);
   $('#dock').classList.toggle('mine', !!mine && !over);
   document.body.classList.toggle('vg-pick', !!mine && !over && !q && L.some(m => m.t !== 'pass' && !m.free));
-  $('#prompt').textContent = over ? 'The expedition is over.' : !mine ? (actor < 0 ? 'The round is ending.' : G.p[actor].name + ' is choosing. Tap to speed up.') : q ? qPrompt(q) : promptLine(L);
+  $('#prompt').textContent = over ? 'The expedition is over.' : !mine ? (actor < 0 ? 'The round is ending.' : G.p[actor].name + ' is choosing. Tap to skip ahead.') : q ? qPrompt(q) : promptLine(L);
   $('#myres').innerHTML = V.RES.map(k => `<span class="chip"><span class="num">${me.res[k]}</span>${ic(k)}</span>`).join('') + `<span class="chip"><span class="num">${me.ex}</span><span class="ic" aria-label="explorers ready"><svg viewBox="0 0 20 28" style="color:${HEX[UI.view]}"><use href="#s-meep"/></svg></span></span>`;
   const qb = $('#qbox');
   if (q) { qb.hidden = false; qb.innerHTML = qHTML(q); } else { qb.hidden = true; qb.innerHTML = ''; }
@@ -121,10 +121,10 @@ function renderDock(L, q, me, actor) {
 function showTab(t) { if (!t || UI.tab === t) return; UI.tab = t; document.body.dataset.vtab = t; document.querySelectorAll('#vtabs [data-t]').forEach(b => { b.classList.toggle('on', b.dataset.t === t); b.setAttribute('aria-selected', String(b.dataset.t === t)); }); }
 const tabOf = el => !el ? null : el.closest('#rowwrap') ? 'row' : el.closest('#track') || el.id === 'track' ? 'track' : el.closest('#map') ? 'map' : null;
 function promptLine(L) {
-  if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
+  if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });
   if (k.play) bits.push('play a card'); if (k.dig || k.disc || k.beat) bits.push('go to a site'); if (k.buy) bits.push('buy a card'); if (k.res || k.temple) bits.push('research');
-  let bestTxt = ''; if (hintsOn()) try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) bestTxt = ' Best now: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
+  let bestTxt = ''; if (hintsOn()) try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) bestTxt = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
   return 'One action: ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' or ' + bits[bits.length - 1] : bits[0]) + '.' + (bestTxt || ' Tap what glows.');
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Pick a card to buy cheaper.', site: 'Pick a site to dig for free.' }[q.h] || 'Choose.'; }
