@@ -182,6 +182,7 @@ function pvRender() {
     if (blocked.indexOf(mi) >= 0) { e.classList.add('blocked'); e.appendChild(h('span.lock', '⛔')); }
     mead.appendChild(e);
   });
+  mead.appendChild(h('div.pv-deck', { role: 'img', 'aria-label': 'Draw pile: ' + G.deck.length + ' cards' }, h('b', G.deck.length + ' left')));
   mead.addEventListener('scroll', () => { UI.pvMx = mead.scrollLeft; }, { passive: true });
   // ---- city: 15 slots that fill with the cards' art
   const pCi = panel('city', 'My city'), vis = visitList();

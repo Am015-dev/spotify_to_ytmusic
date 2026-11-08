@@ -1,6 +1,6 @@
 // ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
 const SAVEKEY = 'hb_save1';
-function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 2600); }
+function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 4000 + 100 * String(t).split(/\s+/).length); }   // readable: 4 s + 1 s per 10 words
 function turnBanner(txt, rv) { if (!hintsActive()) return; const e = document.getElementById('hbturn') || (() => { const d = document.createElement('div'); d.id = 'hbturn'; d.setAttribute('role', 'status'); document.body.appendChild(d); return d; })();
   e.textContent = txt; e.classList.toggle('rv', !!rv); e.classList.add('on'); clearTimeout(UI.tbt); UI.tbt = setTimeout(() => e.classList.remove('on'), 1100); }
 function setSeed(n) { UI.seed = n >>> 0; }
