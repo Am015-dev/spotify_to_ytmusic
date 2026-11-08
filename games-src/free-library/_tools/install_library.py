@@ -5,6 +5,11 @@ appends the library credits to free-art/CREDITS.md once, then runs free-art/inst
 Slots marked FALLBACK in _MAP.tsv keep their existing art."""
 import sys, os, glob, shutil, subprocess, re
 slug = sys.argv[1]; dry = '--dry' in sys.argv
+# Owner rule (8 Nov 2026): never replace, overwrite or unwire the owner's own art. These games have owner art (assets-inbox/).
+OWNER_GAMES = {'cauldron-fair','crown-city-smash','doorkick-dungeon','final-approach','hollowbough','kaiten-kitchen','lantern-dive',
+               'nebula-aces','rampart-and-vine','sands-of-qamar','emberclimb','deep-signal','shipwreck-isle','short-fuse','sunglaze','thornbound','tidewake','mainhattan-nightrun'}
+if slug in OWNER_GAMES or os.path.isdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'assets-inbox', slug)):
+    sys.exit(f'REFUSED: {slug} has owner art in assets-inbox/; free art may not be installed there')
 root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 lib = os.path.join(root, 'free-library', slug)
 fa = [p for p in glob.glob(os.path.join(root, '**', 'free-art'), recursive=True) if p.split(os.sep)[-2] == slug or f'{os.sep}{slug}{os.sep}' in p][0] if False else None

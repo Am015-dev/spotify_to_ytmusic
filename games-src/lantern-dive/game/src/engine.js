@@ -111,7 +111,7 @@ const KIND = {
     if (d.only) {
       const cu = L1 + d.only - 1, got = w.includes(cu), other = w.some(x => x !== cu), wb = wonBy(S, cu);
       if (other || (wb >= 0 && wb !== o)) return -1;
-      if (got) return 1; return end ? -1 : 0;
+      if (got) return end || remL === 0 ? 1 : 0; return end ? -1 : 0;
     }
     if (w.length > d.n || w.length + remL < d.n) return -1;
     if (end) return w.length === d.n ? 1 : -1; return w.length === d.n && remL === 0 ? 1 : 0;

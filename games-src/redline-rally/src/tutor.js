@@ -51,7 +51,10 @@ var COACH_LATER = {
   stall: 'Too few playable cards for your gear? You play them all, pay heat cards for the rest, do not move and drop to gear 1.',
   swap: 'Swap cards (before you pick): throw away speed cards you do not want and draw back to 7, once per round.',
   upgrades: 'Upgrades mode: draft 3 bonus cards before the race. They play like speed cards with a bonus.',
-  tie: 'Ties on the finish: the car that arrived first wins. The race goes on until every car has finished.'
+  tie: 'Ties on the finish: the car that arrived first wins. The race goes on until every car has finished.',
+  sup: 'Starting upgrades: in a normal race your deck also holds a Brake card (speed 0), a Burst card (speed 5) and 1 extra heat card.',
+  weather: 'Weather (optional): rain lowers corner limits, a heatwave starts you hotter, a tailwind makes slipstream 3 spaces.',
+  champ: 'Championship: three tracks in a row, points for every place (9, 6, 4, 3, 2, 1).'
 };
 var COACH = { on: false, seen: {}, q: [], cur: null, timer: 0 };
 var COACH_TXT = {

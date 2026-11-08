@@ -407,7 +407,7 @@
     ]
   });
 
-  // owner media that only shows at the end of a game or on a boss: one scenario each, so the runtime audit (scripts/asset-usage.js) and the owner can open them
+  // owner media that only shows at the end of a game or on a boss: one scenario each, so the runtime audit (scripts/play-usage.js) and the owner can open them
   ['Pip', 'Morwen', 'Grub', 'Tansy'].forEach(function (hero, i) {
     GXS.add({
       id: 'dk-win-' + hero.toLowerCase(), name: hero + ' wins: the 3D hero on the end screen', ask: 'Does ' + hero + ' stand on the end screen?', ls: { dkd_offer: '1' }, seed: 60 + i, when: booted, group: 'Art',

@@ -1,0 +1,887 @@
+{
+ "slug": "tidewake",
+ "when": "2026-11-08T03:06Z",
+ "secs": 120,
+ "totalSecs": 294,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 4,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Cobalt's turn (computer)",
+     "words": 3,
+     "shownMs": 250,
+     "neededMs": 4300,
+     "cls": "ps-msg"
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Your turn: tap a gold mark on the edge to start.",
+      "Be the last junk still afloat. • Lay a tile, sail "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Osk Rogue Wave! A junk in its band rolls a die: me",
+      "Your turn: tap a gold mark on the edge to start."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Osk The Maelstrom It moves only on calm rolls and ",
+      "Your turn: tap a gold mark on the edge to start."
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "FAIL",
+   "count": 92,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "Cobalt's turn (computer)",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 449,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 491,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 505,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 496,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 492,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 498,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 473,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 480,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 483,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 456,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 467,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 497,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 501,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 460,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 505,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 468,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 465,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 509,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 506,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 510,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 465,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 506,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 509,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 495,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 515,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 456,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 488,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 513,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 476,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 420,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 443,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 459,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 475,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 476,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 506,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 488,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 472,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 454,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 497,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 428,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 468,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 489,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 507,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 439,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 528,
+     "cls": "ps-msg",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn: tap a gold mark on the edge to start.",
+     "ms": 250,
+     "cls": "ps-msg",
+     "tag": "div"
+    }
+   ]
+  },
+  "c": {
+   "status": "FAIL",
+   "count": 37,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
+     "words": 15,
+     "at": 2290,
+     "where": "p.tiny"
+    },
+    {
+     "session": "phone/learn",
+     "text": "A junk in its band rolls a die: meet its strength or capsize.",
+     "words": 13,
+     "at": 5571,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
+     "words": 15,
+     "at": 2521,
+     "where": "p.tiny"
+    },
+    {
+     "session": "phone/play",
+     "text": "the dice may wake the leviathans, then you lay one current tile at your bow and sail along it.",
+     "words": 19,
+     "at": 6802,
+     "where": "li."
+    },
+    {
+     "session": "phone/play",
+     "text": "off the chart's edge, on a leviathan, or sharing a wake with another junk.",
+     "words": 14,
+     "at": 6802,
+     "where": "li."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
+     "words": 15,
+     "at": 2504,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/learn",
+     "text": "The computers play by themselves; you only act on your turn, in step 2 (Place).",
+     "words": 15,
+     "at": 17085,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/learn",
+     "text": "2+6=8: 6, 7 or 8 wakes the leviathans: each swims a square or turns.",
+     "words": 14,
+     "at": 18036,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 1 current and stops at column 2, row 4 (the flag on the board).",
+     "words": 17,
+     "at": 34106,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 1 current and stops at column 3, row 5 (the flag on the board).",
+     "words": 17,
+     "at": 35186,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Lay it, or keep it to escape to a rolled square when you would sink.",
+     "words": 15,
+     "at": 37160,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Never end on the same line as another junk: two junks on one wake both sink.",
+     "words": 16,
+     "at": 44158,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "When a leviathan would sink you, fire it: the beast is gone for good.",
+     "words": 14,
+     "at": 50098,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Later you can fire it at a leviathan that is about to sink you, even on someone else's turn.",
+     "words": 19,
+     "at": 50099,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/learn",
+     "text": "You may keep it, or show it and discard it to draw a different tile instead.",
+     "words": 16,
+     "at": 50099,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 1 current and stops at column 4, row 5 (the flag on the board).",
+     "words": 17,
+     "at": 62074,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails into the Rift Gate and is thrown to a rolled square.",
+     "words": 14,
+     "at": 72090,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 1 current and stops at column 5, row 5 (the flag on the board).",
+     "words": 17,
+     "at": 74144,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 2 currents and stops at column 5, row 6 (the flag on the board).",
+     "words": 17,
+     "at": 75120,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Your junk sails 1 current and stops at column 4, row 4 (the flag on the board).",
+     "words": 17,
+     "at": 83062,
+     "where": "p."
+    },
+    {
+     "session": "pc/learn",
+     "text": "rolled 4: moves south and smashes the tile at column 6, row 2",
+     "words": 13,
+     "at": 100058,
+     "where": "li.now"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Bigger games add captains, teams that share a win, and a solo race.",
+     "words": 13,
+     "at": 117304,
+     "where": "li."
+    },
+    {
+     "session": "pc/learn",
+     "text": "A portal tile that rescues a junk or flings pieces across the sea.",
+     "words": 13,
+     "at": 120302,
+     "where": "small."
+    },
+    {
+     "session": "pc/play",
+     "text": "Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.",
+     "words": 15,
+     "at": 2254,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/play",
+     "text": "The computers play by themselves; you only act on your turn, in step 2 (Place).",
+     "words": 15,
+     "at": 5427,
+     "where": "p.tiny"
+    },
+    {
+     "session": "pc/play",
+     "text": "A portal tile that rescues a junk or flings pieces across the sea.",
+     "words": 13,
+     "at": 6261,
+     "where": "small."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your junk sails 1 current and stops at column 4, row 5 (the flag on the board).",
+     "words": 17,
+     "at": 17265,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your junk sails 1 current and stops at column 3, row 5 (the flag on the board).",
+     "words": 17,
+     "at": 29503,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your junk sails 1 current and stops at column 3, row 4 (the flag on the board).",
+     "words": 17,
+     "at": 42982,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "If the leviathans wake (dice total 6 to 8) and it rolls 1, it moves onto you and you sink (about 7% each turn).",
+     "words": 24,
+     "at": 42982,
+     "where": "span.warn-l.thr"
+    },
+    {
+     "session": "pc/play",
+     "text": "rolled 3: moves west and smashes the tile at column 5, row 5",
+     "words": 13,
+     "at": 56916,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your junk sails 1 current and stops at column 4, row 4 (the flag on the board).",
+     "words": 17,
+     "at": 56916,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "Saltshade swam onto the square it was on (or its tile) and crushed it.",
+     "words": 14,
+     "at": 68814,
+     "where": "p."
+    },
+    {
+     "session": "pc/play",
+     "text": "rolled 3: moves west and smashes the tile at column 4, row 5: Jade's junk sinks!",
+     "words": 16,
+     "at": 68814,
+     "where": "li.bad"
+    },
+    {
+     "session": "pc/play",
+     "text": "rolled 3: moves west and smashes the tile at column 3, row 5",
+     "words": 13,
+     "at": 69866,
+     "where": "li."
+    },
+    {
+     "session": "pc/play",
+     "text": "If the leviathans wake (dice total 6 to 8) and it rolls 4, it moves onto you and you sink (about 7% each turn).",
+     "words": 24,
+     "at": 69866,
+     "where": "span.warn-l.thr"
+    },
+    {
+     "session": "pc/play",
+     "text": "Your junk sails 1 current and stops at column 4, row 3 (the flag on the board).",
+     "words": 17,
+     "at": 70757,
+     "where": "p."
+    }
+   ]
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 12,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Hint",
+     "px": 13,
+     "at": 2289,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Crews",
+     "px": 13,
+     "at": 2289,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Log",
+     "px": 13,
+     "at": 2289,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Rules",
+     "px": 13,
+     "at": 2289,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Menu",
+     "px": 13,
+     "at": 2289,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "New here? Play one real game against Cobalt; Grandmother Osk",
+     "px": 13.6,
+     "at": 2290,
+     "where": "p.tiny"
+    },
+    {
+     "session": "phone/play",
+     "text": "Hint",
+     "px": 13,
+     "at": 2520,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Crews",
+     "px": 13,
+     "at": 2520,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Log",
+     "px": 13,
+     "at": 2520,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Rules",
+     "px": 13,
+     "at": 2520,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Menu",
+     "px": 13,
+     "at": 2520,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "New here? Play one real game against Cobalt; Grandmother Osk",
+     "px": 13.6,
+     "at": 2521,
+     "where": "p.tiny"
+    }
+   ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [
+  "phone/learn: stuck",
+  "phone/play: stuck"
+ ],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 47,
+   "turns": 4,
+   "clicks": 89,
+   "endedBy": "stuck",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 91
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 47,
+   "turns": 3,
+   "clicks": 93,
+   "endedBy": "stuck",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 92
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 121,
+   "turns": 188,
+   "clicks": 206,
+   "endedBy": "result",
+   "tutorialEnded": 5,
+   "hintsOff": true,
+   "messagesSeen": 16
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 79,
+   "turns": 125,
+   "clicks": 144,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 0
+  }
+ ]
+}

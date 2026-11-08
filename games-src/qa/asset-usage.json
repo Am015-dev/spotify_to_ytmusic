@@ -1,0 +1,1972 @@
+{
+ "when": "2026-11-08T02:39Z",
+ "view": "390x844",
+ "secs": 180,
+ "min": 90,
+ "games": {
+  "cauldron-fair": {
+   "shipped": 100,
+   "loaded": 41,
+   "pct": 41,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 187,
+   "end": "cap",
+   "clicks": 493,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-iconbtn-k.webp",
+     "media/ui-node-boss-k.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done-k.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked-k.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-node-open-k.webp",
+     "media/ui-panel.webp",
+     "media/ui-row.webp",
+     "media/ui-stall-locked.webp",
+     "media/ui-stall.webp"
+    ],
+    "media/fortune*": [
+     "media/fortune-alms.webp",
+     "media/fortune-bribe.webp",
+     "media/fortune-clear.webp",
+     "media/fortune-dice.webp",
+     "media/fortune-dip.webp",
+     "media/fortune-fork.webp",
+     "media/fortune-froth.webp",
+     "media/fortune-haggle.webp",
+     "media/fortune-lucky7.webp",
+     "media/fortune-peek.webp",
+     "media/fortune-pick.webp",
+     "media/fortune-spark.webp",
+     "media/fortune-spilled.webp",
+     "media/fortune-swap.webp",
+     "media/fortune-thick.webp"
+    ],
+    "media/camp*": [
+     "media/camp-hask.webp",
+     "media/camp-mirabel.webp",
+     "media/camp-odo.webp",
+     "media/camp-tamsin.webp",
+     "media/camp-vesper.webp",
+     "media/camp-wynne.webp"
+    ],
+    "models/bag*": [
+     "models/bag-lite.glb",
+     "models/bag.glb",
+     "models/bag@512.webp"
+    ],
+    "models/chip*": [
+     "models/chip-lite.glb",
+     "models/chip.glb",
+     "models/chip@512.webp"
+    ],
+    "media/pass*": [
+     "media/pass-phone.webp",
+     "media/pass.webp"
+    ],
+    "media/table*": [
+     "media/table-judges-tent.webp",
+     "media/table-market-cloth.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-short-a.mp3",
+     "music/tavern-short-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/awning*": [
+     "media/awning.webp"
+    ],
+    "media/btn*": [
+     "media/btn-draw.webp"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
+    ]
+   }
+  },
+  "crown-city-smash": {
+   "shipped": 286,
+   "loaded": 40,
+   "pct": 14,
+   "glbShipped": 28,
+   "glbLoaded": 13,
+   "anyGlb": true,
+   "playedSecs": 196,
+   "end": "cap",
+   "clicks": 68,
+   "fail": true,
+   "neverLoaded": {
+    "media/pc*": [
+     "media/pc-acid.webp",
+     "media/pc-alpha.webp",
+     "media/pc-barbed.webp",
+     "media/pc-battery.webp",
+     "media/pc-brain.webp",
+     "media/pc-c_astro.webp",
+     "media/pc-c_cheer.webp",
+     "media/pc-c_clown.webp",
+     "media/pc-c_devil.webp",
+     "media/pc-c_ghost.webp",
+     "media/pc-c_pirate.webp",
+     "media/pc-c_prin.webp",
+     "media/pc-c_robot.webp",
+     "media/pc-c_statue.webp",
+     "media/pc-c_vamp.webp",
+     "media/pc-c_witch.webp",
+     "media/pc-c_zombie.webp",
+     "media/pc-carrion.webp",
+     "media/pc-cell.webp",
+     "media/pc-chameleon.webp",
+     "media/pc-cosmic.webp",
+     "media/pc-cyclone.webp",
+     "media/pc-egg.webp",
+     "media/pc-evo11.webp",
+     "media/pc-evo12.webp",
+     "media/pc-evo13.webp",
+     "media/pc-evo14.webp",
+     "media/pc-evo15.webp",
+     "media/pc-evo16.webp",
+     "media/pc-evo17.webp",
+     "media/pc-evo18.webp",
+     "media/pc-evo21.webp",
+     "media/pc-evo22.webp",
+     "media/pc-evo23.webp",
+     "media/pc-evo24.webp",
+     "media/pc-evo25.webp",
+     "media/pc-evo26.webp",
+     "media/pc-evo27.webp",
+     "media/pc-evo28.webp",
+     "media/pc-evo31.webp",
+     "media/pc-evo32.webp",
+     "media/pc-evo33.webp",
+     "media/pc-evo34.webp",
+     "media/pc-evo35.webp",
+     "media/pc-evo36.webp",
+     "media/pc-evo37.webp",
+     "media/pc-evo38.webp",
+     "media/pc-evo41.webp",
+     "media/pc-evo42.webp",
+     "media/pc-evo43.webp",
+     "media/pc-evo44.webp",
+     "media/pc-evo45.webp",
+     "media/pc-evo46.webp",
+     "media/pc-evo47.webp",
+     "media/pc-evo48.webp",
+     "media/pc-evo51.webp",
+     "media/pc-evo52.webp",
+     "media/pc-evo53.webp",
+     "media/pc-evo54.webp",
+     "media/pc-evo55.webp",
+     "media/pc-evo56.webp",
+     "media/pc-evo57.webp",
+     "media/pc-evo58.webp",
+     "media/pc-evo61.webp",
+     "media/pc-evo611.webp",
+     "media/pc-evo612.webp",
+     "media/pc-evo613.webp",
+     "media/pc-evo614.webp",
+     "media/pc-evo615.webp",
+     "media/pc-evo616.webp",
+     "media/pc-evo617.webp",
+     "media/pc-evo618.webp",
+     "media/pc-evo62.webp",
+     "media/pc-evo621.webp",
+     "media/pc-evo622.webp",
+     "media/pc-evo623.webp",
+     "media/pc-evo624.webp",
+     "media/pc-evo625.webp",
+     "media/pc-evo626.webp",
+     "media/pc-evo627.webp",
+     "media/pc-evo628.webp",
+     "media/pc-evo63.webp",
+     "media/pc-evo631.webp",
+     "media/pc-evo632.webp",
+     "media/pc-evo633.webp",
+     "media/pc-evo634.webp",
+     "media/pc-evo635.webp",
+     "media/pc-evo636.webp",
+     "media/pc-evo637.webp",
+     "media/pc-evo638.webp",
+     "media/pc-evo64.webp",
+     "media/pc-evo65.webp",
+     "media/pc-evo66.webp",
+     "media/pc-evo67.webp",
+     "media/pc-evo68.webp",
+     "media/pc-flame.webp",
+     "media/pc-gourmand.webp",
+     "media/pc-growth.webp",
+     "media/pc-healray.webp",
+     "media/pc-hiccup.webp",
+     "media/pc-jetsq.webp",
+     "media/pc-kidfan.webp",
+     "media/pc-kiosk.webp",
+     "media/pc-lab.webp",
+     "media/pc-lurker.webp",
+     "media/pc-m_alloy.webp",
+     "media/pc-m_ances.webp",
+     "media/pc-m_bold.webp",
+     "media/pc-m_bug.webp",
+     "media/pc-m_cryst.webp",
+     "media/pc-m_dysf.webp",
+     "media/pc-m_earm.webp",
+     "media/pc-m_evade.webp",
+     "media/pc-m_free.webp",
+     "media/pc-m_gift.webp",
+     "media/pc-m_legend.webp",
+     "media/pc-m_maxe.webp",
+     "media/pc-m_mirac.webp",
+     "media/pc-m_nobrain.webp",
+     "media/pc-m_offp.webp",
+     "media/pc-m_petal.webp",
+     "media/pc-m_scept.webp",
+     "media/pc-m_shell.webp",
+     "media/pc-m_spat.webp",
+     "media/pc-m_strange.webp",
+     "media/pc-m_trap.webp",
+     "media/pc-m_treas.webp",
+     "media/pc-m_unrel.webp",
+     "media/pc-m_whip.webp",
+     "media/pc-mend.webp",
+     "media/pc-meta.webp",
+     "media/pc-militia.webp",
+     "media/pc-mimic.webp",
+     "media/pc-mind.webp",
+     "media/pc-needle.webp",
+     "media/pc-nova.webp",
+     "media/pc-omni.webp",
+     "media/pc-opp.webp",
+     "media/pc-pack.webp",
+     "media/pc-para.webp",
+     "media/pc-patch.webp",
+     "media/pc-plated.webp",
+     "media/pc-probe.webp",
+     "media/pc-pspit.webp",
+     "media/pc-quills.webp",
+     "media/pc-reactor.webp",
+     "media/pc-refinery.webp",
+     "media/pc-regrow.webp",
+     "media/pc-rubber.webp",
+     "media/pc-rush.webp",
+     "media/pc-scorch.webp",
+     "media/pc-shrink.webp",
+     "media/pc-sirens.webp",
+     "media/pc-skull.webp",
+     "media/pc-skydive.webp",
+     "media/pc-smoke.webp",
+     "media/pc-spree.webp",
+     "media/pc-street.webp",
+     "media/pc-sun.webp",
+     "media/pc-surge.webp",
+     "media/pc-tanks.webp",
+     "media/pc-thick.webp",
+     "media/pc-train.webp",
+     "media/pc-tunnel.webp",
+     "media/pc-twist.webp",
+     "media/pc-underdog.webp",
+     "media/pc-vjets.webp",
+     "media/pc-w_anti.webp",
+     "media/pc-w_cyb.webp",
+     "media/pc-w_dev.webp",
+     "media/pc-w_eter.webp",
+     "media/pc-w_lair.webp",
+     "media/pc-w_panic.webp",
+     "media/pc-w_regen.webp",
+     "media/pc-w_skul.webp",
+     "media/pc-w_sky.webp",
+     "media/pc-w_tire.webp",
+     "media/pc-wings.webp"
+    ],
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-ghost.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-pink.webp",
+     "media/ui-button-power.webp",
+     "media/ui-button-yellow.webp",
+     "media/ui-dice-tray.webp",
+     "media/ui-hud-chip.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row.webp"
+    ],
+    "models/tower*": [
+     "models/tower-a.glb",
+     "models/tower-a.webp",
+     "models/tower-a@512.webp",
+     "models/tower-b.glb",
+     "models/tower-b.webp",
+     "models/tower-b@512.webp",
+     "models/tower-c.glb",
+     "models/tower-c.webp",
+     "models/tower-c@512.webp",
+     "models/tower-d.glb",
+     "models/tower-d.webp",
+     "models/tower-d@512.webp"
+    ],
+    "models/token*": [
+     "models/token-energy.glb",
+     "models/token-energy.webp",
+     "models/token-energy@512.webp",
+     "models/token-heart.glb",
+     "models/token-heart.webp",
+     "models/token-heart@512.webp",
+     "models/token-star.glb",
+     "models/token-star.webp",
+     "models/token-star@512.webp"
+    ],
+    "models/clampede*": [
+     "models/clampede-lite.glb",
+     "models/clampede.glb",
+     "models/clampede.webp",
+     "models/clampede@512.webp"
+    ],
+    "media/crown*": [
+     "media/crown-ch10-boss.mp4",
+     "media/crown-ch4-boss.mp4",
+     "media/crown-ch7-boss.mp4"
+    ],
+    "models/dot*": [
+     "models/dot.glb",
+     "models/dot.webp",
+     "models/dot@512.webp"
+    ],
+    "models/fountain*": [
+     "models/fountain.glb",
+     "models/fountain.webp",
+     "models/fountain@512.webp"
+    ],
+    "media/back*": [
+     "media/back-brass-beetle.webp",
+     "media/back-bulletin.webp"
+    ],
+    "media/icon*": [
+     "media/icon-energy.webp",
+     "media/icon-heart.webp"
+    ],
+    "media/table*": [
+     "media/table-harbor-night.webp",
+     "media/table-spire-gold.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/media*": [
+     "media/media.json"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "models/bramblebat*": [
+     "models/bramblebat.glb"
+    ],
+    "models/cortexa*": [
+     "models/cortexa.glb"
+    ],
+    "models/glacyx*": [
+     "models/glacyx.glb"
+    ],
+    "models/squidrik*": [
+     "models/squidrik.glb"
+    ],
+    "music/fight*": [
+     "music/fight-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3"
+    ]
+   }
+  },
+  "deep-signal": {
+   "shipped": 37,
+   "loaded": 37,
+   "pct": 100,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 319,
+   "fail": false,
+   "neverLoaded": {}
+  },
+  "doorkick-dungeon": {
+   "shipped": 102,
+   "loaded": 29,
+   "pct": 28.4,
+   "glbShipped": 12,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 187,
+   "end": "cap",
+   "clicks": 873,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-clash-monster.webp",
+     "media/ui-ledger-head.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row.webp",
+     "media/ui-slot-body.webp",
+     "media/ui-slot-class.webp",
+     "media/ui-slot-feet.webp",
+     "media/ui-slot-hands.webp",
+     "media/ui-slot-race.webp",
+     "media/ui-swords.webp"
+    ],
+    "models/hero*": [
+     "models/hero-grub-lite.glb",
+     "models/hero-grub.glb",
+     "models/hero-grub.webp",
+     "models/hero-grub@512.webp",
+     "models/hero-morwen-lite.glb",
+     "models/hero-morwen.glb",
+     "models/hero-morwen.webp",
+     "models/hero-morwen@512.webp",
+     "models/hero-pip-lite.glb",
+     "models/hero-pip.glb",
+     "models/hero-pip.webp",
+     "models/hero-pip@512.webp",
+     "models/hero-tansy-lite.glb",
+     "models/hero-tansy.glb",
+     "models/hero-tansy.webp",
+     "models/hero-tansy@512.webp"
+    ],
+    "media/camp*": [
+     "media/camp-bodkin.webp",
+     "media/camp-grub.webp",
+     "media/camp-hobb.webp",
+     "media/camp-morwen.webp",
+     "media/camp-pip.webp",
+     "media/camp-tansy.webp",
+     "media/camp-wrenna.webp"
+    ],
+    "media/doorkick*": [
+     "media/doorkick-dread-boss.mp4",
+     "media/doorkick-inferno-boss.mp4",
+     "media/doorkick-pharaoh-boss.mp4",
+     "media/doorkick-skygrif-boss.mp4",
+     "media/doorkick-tentacles-boss.mp4",
+     "media/doorkick-wyrm-boss.mp4"
+    ],
+    "models/die*": [
+     "models/die-lite.glb",
+     "models/die.glb",
+     "models/die.webp",
+     "models/die@512.webp"
+    ],
+    "models/door*": [
+     "models/door-lite.glb",
+     "models/door.glb",
+     "models/door.webp",
+     "models/door@512.webp"
+    ],
+    "media/table*": [
+     "media/table-golden-vault.webp",
+     "media/table-tavern.webp",
+     "media/table-vault-stone.webp"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3",
+     "music/main-short-b.mp3"
+    ],
+    "media/end*": [
+     "media/end-lose.webp",
+     "media/end-win.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3",
+     "music/fight-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/pile*": [
+     "media/pile-treasure.webp"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/classic*": [
+     "music/classic.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3"
+    ]
+   }
+  },
+  "emberclimb": {
+   "shipped": 211,
+   "loaded": 23,
+   "pct": 10.9,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 184,
+   "end": "cap",
+   "clicks": 614,
+   "fail": true,
+   "neverLoaded": {
+    "media/a*": [
+     "media/a-ball-lightning.webp",
+     "media/a-barrier-pulse.webp",
+     "media/a-beam-cell.webp",
+     "media/a-biased-core.webp",
+     "media/a-capacitor.webp",
+     "media/a-charge-up.webp",
+     "media/a-compile-strike.webp",
+     "media/a-cool-circuit.webp",
+     "media/a-core-breach.webp",
+     "media/a-darkness.webp",
+     "media/a-defend.webp",
+     "media/a-defrag.webp",
+     "media/a-dualcast.webp",
+     "media/a-glacier.webp",
+     "media/a-hyperbeam.webp",
+     "media/a-meteor-strike.webp",
+     "media/a-multicast.webp",
+     "media/a-overclock.webp",
+     "media/a-reactor.webp",
+     "media/a-static-jolt.webp",
+     "media/a-strike.webp",
+     "media/a-sweeping-beam.webp",
+     "media/a-tempest.webp",
+     "media/a-zap.webp"
+    ],
+    "media/m*": [
+     "media/m-bow.webp",
+     "media/m-crush-joints.webp",
+     "media/m-cut-through.webp",
+     "media/m-defend.webp",
+     "media/m-deva-form.webp",
+     "media/m-empty-fist.webp",
+     "media/m-eruption.webp",
+     "media/m-flying-sleeves.webp",
+     "media/m-inner-peace.webp",
+     "media/m-judgment.webp",
+     "media/m-mental-fort.webp",
+     "media/m-palm-flurry.webp",
+     "media/m-pressure-point.webp",
+     "media/m-roll-with-it.webp",
+     "media/m-rushdown.webp",
+     "media/m-sash-whip.webp",
+     "media/m-sky-hammer.webp",
+     "media/m-still-water.webp",
+     "media/m-strike.webp",
+     "media/m-third-eye.webp",
+     "media/m-vigilance.webp",
+     "media/m-wheel-kick.webp",
+     "media/m-windmill.webp",
+     "media/m-zen-burst.webp"
+    ],
+    "media/s*": [
+     "media/s-afterimage.webp",
+     "media/s-backstab.webp",
+     "media/s-blade-fan.webp",
+     "media/s-catalyst.webp",
+     "media/s-choking-cloud.webp",
+     "media/s-cripple.webp",
+     "media/s-dagger-spray.webp",
+     "media/s-defend.webp",
+     "media/s-dodge-roll.webp",
+     "media/s-envenom.webp",
+     "media/s-final-flourish.webp",
+     "media/s-hidden-knives.webp",
+     "media/s-knife-rain.webp",
+     "media/s-lucky-pick.webp",
+     "media/s-needle-rain.webp",
+     "media/s-noxious.webp",
+     "media/s-pinprick.webp",
+     "media/s-plague-doctor.webp",
+     "media/s-quick-stab.webp",
+     "media/s-slip-away.webp",
+     "media/s-snap-cut.webp",
+     "media/s-strike.webp",
+     "media/s-toxic-vial.webp",
+     "media/s-venom-storm.webp"
+    ],
+    "media/w*": [
+     "media/w-berserk-roll.webp",
+     "media/w-body-check.webp",
+     "media/w-bulwark-bash.webp",
+     "media/w-cleave.webp",
+     "media/w-colossus-slam.webp",
+     "media/w-double-down.webp",
+     "media/w-final-gambit.webp",
+     "media/w-iron-skin.webp",
+     "media/w-kindle.webp",
+     "media/w-plate-up.webp",
+     "media/w-pyre-heart.webp",
+     "media/w-reapers-edge.webp",
+     "media/w-roar.webp",
+     "media/w-second-wind.webp",
+     "media/w-skull-rap.webp",
+     "media/w-slow-burn.webp",
+     "media/w-sunder.webp",
+     "media/w-twin-slash.webp",
+     "media/w-warm-up.webp",
+     "media/w-whirlwind.webp",
+     "media/w-wild-swing.webp"
+    ],
+    "media/enemy*": [
+     "media/enemy-ash-imp.webp",
+     "media/enemy-ash-wisp.webp",
+     "media/enemy-ashen-wraith.webp",
+     "media/enemy-bile-blob.webp",
+     "media/enemy-bone-caller.webp",
+     "media/enemy-cinder-hound.webp",
+     "media/enemy-ember-tyrant.webp",
+     "media/enemy-gape-grub.webp",
+     "media/enemy-gate-colossus.webp",
+     "media/enemy-grave-knight.webp",
+     "media/enemy-iron-warden.webp",
+     "media/enemy-mire-behemoth.webp",
+     "media/enemy-skyclaw.webp",
+     "media/enemy-sleeper-statue.webp",
+     "media/enemy-smoke-hexer.webp",
+     "media/enemy-snare-vine.webp",
+     "media/enemy-thorn-brute.webp",
+     "media/enemy-tomb-king.webp",
+     "media/enemy-warden-captain.webp"
+    ],
+    "media/relic*": [
+     "media/relic-bag-of-marbles.webp",
+     "media/relic-candle-stub.webp",
+     "media/relic-clover-dice.webp",
+     "media/relic-dawnstone.webp",
+     "media/relic-gale-cloak.webp",
+     "media/relic-gold-tooth.webp",
+     "media/relic-healing-moss.webp",
+     "media/relic-iron-bangle.webp",
+     "media/relic-lantern.webp",
+     "media/relic-lucky-coin.webp",
+     "media/relic-oak-heart.webp",
+     "media/relic-phoenix-ash.webp",
+     "media/relic-pocket-satchel.webp",
+     "media/relic-prayer-beads.webp",
+     "media/relic-smoking-censer.webp",
+     "media/relic-spark-core.webp",
+     "media/relic-tin-flute.webp",
+     "media/relic-whetstone-ring.webp"
+    ],
+    "media/bg*": [
+     "media/bg-battle-2.webp",
+     "media/bg-battle-3.webp",
+     "media/bg-boss-ashen-wraith.webp",
+     "media/bg-boss-ember-tyrant.webp",
+     "media/bg-boss-gate-colossus.webp",
+     "media/bg-boss-mire-behemoth.webp",
+     "media/bg-boss-skyclaw.webp",
+     "media/bg-boss-tomb-king.webp",
+     "media/bg-boss-warden-captain.webp",
+     "media/bg-elite.webp",
+     "media/bg-event.webp",
+     "media/bg-map-wide.webp",
+     "media/bg-rest.webp",
+     "media/bg-reward.webp",
+     "media/bg-shop.webp",
+     "media/bg-title-wide.webp",
+     "media/bg-victory.webp"
+    ],
+    "media/pot*": [
+     "media/pot-block-brew.webp",
+     "media/pot-energy-vial.webp",
+     "media/pot-fire-flask.webp",
+     "media/pot-fortune-die.webp",
+     "media/pot-frost-gas.webp",
+     "media/pot-healing-draught.webp",
+     "media/pot-strength-tonic.webp",
+     "media/pot-swift-draught.webp",
+     "media/pot-venom-vial.webp"
+    ],
+    "media/boss*": [
+     "media/boss-ashen-wraith.mp4",
+     "media/boss-ember-tyrant.mp4",
+     "media/boss-gate-colossus.mp4",
+     "media/boss-mire-behemoth.mp4",
+     "media/boss-skyclaw.mp4",
+     "media/boss-tomb-king.mp4"
+    ],
+    "media/event*": [
+     "media/event-back-alley-gambler.webp",
+     "media/event-ember-shrine.webp",
+     "media/event-mirror-pool.webp",
+     "media/event-stranded-caravan.webp",
+     "media/event-wandering-tinker.webp",
+     "media/event-whispering-well.webp"
+    ],
+    "media/cast*": [
+     "media/cast-guide.webp",
+     "media/cast-healer.webp",
+     "media/cast-merchant.webp",
+     "media/cast-rival.webp",
+     "media/cast-teller.webp"
+    ],
+    "media/n*": [
+     "media/n-bandage.webp",
+     "media/n-finesse.webp",
+     "media/n-good-instincts.webp",
+     "media/n-hand-of-greed.webp",
+     "media/n-panic-button.webp"
+    ],
+    "media/burn*": [
+     "media/burn.webp"
+    ],
+    "media/calm*": [
+     "media/calm-spark.webp"
+    ],
+    "media/card*": [
+     "media/card-back.webp"
+    ],
+    "media/dazed*": [
+     "media/dazed.webp"
+    ],
+    "media/doubt*": [
+     "media/doubt.webp"
+    ],
+    "media/injury*": [
+     "media/injury.webp"
+    ],
+    "media/regret*": [
+     "media/regret.webp"
+    ],
+    "media/shiv*": [
+     "media/shiv.webp"
+    ],
+    "media/slimed*": [
+     "media/slimed.webp"
+    ],
+    "media/wound*": [
+     "media/wound.webp"
+    ]
+   }
+  },
+  "final-approach": {
+   "shipped": 74,
+   "loaded": 35,
+   "pct": 47.3,
+   "glbShipped": 2,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 387,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-altbar.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-button-roll.webp",
+     "media/ui-panel.webp",
+     "media/ui-phrase.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp",
+     "media/ui-sheet.webp"
+    ],
+    "media/icon*": [
+     "media/icon-time-day.webp",
+     "media/icon-time-dusk.webp",
+     "media/icon-time-night.webp",
+     "media/icon-wx-clear.webp",
+     "media/icon-wx-fog.webp",
+     "media/icon-wx-haze.webp",
+     "media/icon-wx-rain.webp",
+     "media/icon-wx-storm.webp"
+    ],
+    "media/camp*": [
+     "media/camp-castlemoor.webp",
+     "media/camp-foxmere.webp",
+     "media/camp-orrin.webp",
+     "media/camp-palmreach.webp",
+     "media/camp-spires.webp"
+    ],
+    "media/table*": [
+     "media/table-default.webp",
+     "media/table-night-lake.webp",
+     "media/table-storm.webp",
+     "media/table-valley.webp"
+    ],
+    "models/plane*": [
+     "models/plane-lite.glb",
+     "models/plane.glb",
+     "models/plane.webp",
+     "models/plane@512.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-b.mp3"
+    ]
+   }
+  },
+  "hollowbough": {
+   "shipped": 70,
+   "loaded": 31,
+   "pct": 44.3,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 186,
+   "end": "cap",
+   "clicks": 648,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble-tail.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-iconbtn-k.webp",
+     "media/ui-node-boss-k.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done-k.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked-k.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-node-open-k.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp"
+    ],
+    "media/camp*": [
+     "media/camp-fern.webp",
+     "media/camp-grimbeard.webp",
+     "media/camp-quill.webp",
+     "media/camp-thistle.webp"
+    ],
+    "media/table*": [
+     "media/table-elderheart.webp",
+     "media/table-frostwood.webp",
+     "media/table-woodland.webp"
+    ],
+    "models/ever*": [
+     "models/ever-tree-lite.glb",
+     "models/ever-tree.glb",
+     "models/ever-tree.webp"
+    ],
+    "models/worker*": [
+     "models/worker-lite.glb",
+     "models/worker.glb",
+     "models/worker.webp"
+    ],
+    "music/tavern*": [
+     "music/tavern-b.mp3",
+     "music/tavern-short-a.mp3",
+     "music/tavern-short-b.mp3"
+    ],
+    "media/back*": [
+     "media/back-frost.webp",
+     "media/back-sprout.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/victory*": [
+     "music/victory-b.mp3"
+    ]
+   }
+  },
+  "kaiten-kitchen": {
+   "shipped": 70,
+   "loaded": 26,
+   "pct": 37.1,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 782,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble-tail.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-nametag-gold-c.webp",
+     "media/ui-nametag-green-c.webp",
+     "media/ui-nametag-purple-c.webp",
+     "media/ui-nametag-red-c.webp",
+     "media/ui-nametag-teal-c.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp"
+    ],
+    "media/camp*": [
+     "media/camp-kofi.webp",
+     "media/camp-mina.webp",
+     "media/camp-odile.webp",
+     "media/camp-pip.webp",
+     "media/camp-suzu.webp",
+     "media/camp-taro.webp"
+    ],
+    "media/back*": [
+     "media/back-custard.webp",
+     "media/back-golden.webp",
+     "media/back-lunch-belt.webp"
+    ],
+    "models/cloche*": [
+     "models/cloche-lite.glb",
+     "models/cloche.glb",
+     "models/cloche.webp"
+    ],
+    "models/plate*": [
+     "models/plate-lite.glb",
+     "models/plate.glb",
+     "models/plate.webp"
+    ],
+    "media/table*": [
+     "media/table-dinner-counter.webp",
+     "media/table-midnight-belt.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3",
+     "music/fight-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/belt*": [
+     "media/belt.webp"
+    ],
+    "music/tavern*": [
+     "music/tavern-short-b.mp3"
+    ]
+   }
+  },
+  "lantern-dive": {
+   "shipped": 65,
+   "loaded": 32,
+   "pct": 49.2,
+   "glbShipped": 2,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 328,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble-tail.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp",
+     "media/ui-seat-c.webp",
+     "media/ui-trick-pad.webp"
+    ],
+    "media/camp*": [
+     "media/camp-brack.webp",
+     "media/camp-bram.webp",
+     "media/camp-dag.webp",
+     "media/camp-echo.webp",
+     "media/camp-lampless.webp",
+     "media/camp-maze.webp",
+     "media/camp-nerea.webp",
+     "media/camp-sumi.webp",
+     "media/camp-undertow.webp"
+    ],
+    "models/lantern*": [
+     "models/lantern-lite.glb",
+     "models/lantern.glb",
+     "models/lantern.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "media/table*": [
+     "media/table-tunnel-glow-phone.webp"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-b.mp3"
+    ]
+   }
+  },
+  "nebula-aces": {
+   "shipped": 93,
+   "loaded": 39,
+   "pct": 41.9,
+   "glbShipped": 10,
+   "glbLoaded": 5,
+   "anyGlb": true,
+   "playedSecs": 191,
+   "end": "cap",
+   "clicks": 81,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-iconbtn-k.webp",
+     "media/ui-node-boss-k.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done-k.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked-k.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-node-open-k.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp"
+    ],
+    "models/na*": [
+     "models/na-lancer.glb",
+     "models/na-lancer.webp",
+     "models/na-lancer@512.webp",
+     "models/na-rock-a.glb",
+     "models/na-rock-a.webp",
+     "models/na-rock-a@512.webp",
+     "models/na-rock-b.glb",
+     "models/na-rock-b.webp",
+     "models/na-rock-b@512.webp",
+     "models/na-rock-c.glb",
+     "models/na-rock-c.webp",
+     "models/na-rock-c@512.webp",
+     "models/na-talon.glb",
+     "models/na-talon.webp",
+     "models/na-talon@512.webp"
+    ],
+    "media/camp*": [
+     "media/camp-brecken.webp",
+     "media/camp-castigan.webp",
+     "media/camp-drill.webp",
+     "media/camp-hammer.webp",
+     "media/camp-hex.webp",
+     "media/camp-kael.webp",
+     "media/camp-kira.webp",
+     "media/camp-knife.webp",
+     "media/camp-quill.webp",
+     "media/camp-sorin.webp",
+     "media/camp-wailer.webp"
+    ],
+    "media/table*": [
+     "media/table-default.webp",
+     "media/table-nebula7.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/back*": [
+     "media/back-rift-crown.webp"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3"
+    ]
+   }
+  },
+  "perch-and-plume": {
+   "shipped": 186,
+   "loaded": 135,
+   "pct": 72.6,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 876,
+   "fail": true,
+   "neverLoaded": {
+    "media/bonus*": [
+     "media/bonus-angler.webp",
+     "media/bonus-bargain.webp",
+     "media/bonus-berry-picker.webp",
+     "media/bonus-big-wings.webp",
+     "media/bonus-bowl-keeper.webp",
+     "media/bonus-brood.webp",
+     "media/bonus-flock-friend.webp",
+     "media/bonus-ground-keeper.webp",
+     "media/bonus-grub-digger.webp",
+     "media/bonus-hoarder.webp",
+     "media/bonus-hollow-keeper.webp",
+     "media/bonus-ledge-keeper.webp",
+     "media/bonus-marsh.webp",
+     "media/bonus-mouser.webp",
+     "media/bonus-prairie.webp",
+     "media/bonus-seed-saver.webp",
+     "media/bonus-small-wings.webp",
+     "media/bonus-woodland.webp"
+    ],
+    "media/goal*": [
+     "media/goal-birds-F.webp",
+     "media/goal-birds-G.webp",
+     "media/goal-birds-W.webp",
+     "media/goal-eggs-F.webp",
+     "media/goal-eggs-G.webp",
+     "media/goal-eggs-W.webp",
+     "media/goal-nest-bowl.webp",
+     "media/goal-nest-cavity.webp",
+     "media/goal-nest-ground.webp",
+     "media/goal-nest-platform.webp",
+     "media/goal-sets.webp",
+     "media/goal-total.webp"
+    ],
+    "media/portrait*": [
+     "media/portrait-barnaby.webp",
+     "media/portrait-corvin.webp",
+     "media/portrait-delphine.webp",
+     "media/portrait-mags.webp",
+     "media/portrait-ottilie.webp",
+     "media/portrait-tobias.webp",
+     "media/portrait-you.webp"
+    ],
+    "media/ui*": [
+     "media/ui-cube.webp",
+     "media/ui-feeder.webp",
+     "media/ui-tray.webp",
+     "media/ui-trophy.webp"
+    ],
+    "media/fx*": [
+     "media/fx-chain-spark.webp",
+     "media/fx-egg-pop.webp",
+     "media/fx-food-pop.webp"
+    ],
+    "media/bg*": [
+     "media/bg-map.webp",
+     "media/bg-result.webp"
+    ],
+    "media/board*": [
+     "media/board-mat.webp"
+    ],
+    "media/card*": [
+     "media/card-back.webp"
+    ],
+    "media/food*": [
+     "media/food-any.webp"
+    ],
+    "media/nest*": [
+     "media/nest-star.webp"
+    ],
+    "media/token*": [
+     "media/token-egg.webp"
+    ]
+   }
+  },
+  "rampart-and-vine": {
+   "shipped": 113,
+   "loaded": 66,
+   "pct": 58.4,
+   "glbShipped": 8,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 121,
+   "fail": true,
+   "neverLoaded": {
+    "media/camp*": [
+     "media/camp-baron.webp",
+     "media/camp-corvin.webp",
+     "media/camp-dulcie.webp",
+     "media/camp-ferro.webp",
+     "media/camp-garnet.webp",
+     "media/camp-hob.webp",
+     "media/camp-isolde.webp",
+     "media/camp-mabry.webp",
+     "media/camp-ostrand.webp",
+     "media/camp-quill.webp",
+     "media/camp-tamsin.webp",
+     "media/camp-wren.webp"
+    ],
+    "models/piece*": [
+     "models/piece-champ-lite.glb",
+     "models/piece-champ.glb",
+     "models/piece-champ.webp",
+     "models/piece-hog-lite.glb",
+     "models/piece-hog.glb",
+     "models/piece-hog.webp",
+     "models/piece-mason-lite.glb",
+     "models/piece-mason.glb",
+     "models/piece-mason.webp",
+     "models/piece-meeple-lite.glb",
+     "models/piece-meeple.glb",
+     "models/piece-meeple.webp"
+    ],
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp"
+    ],
+    "media/piece*": [
+     "media/piece-champ.webp",
+     "media/piece-hog.webp",
+     "media/piece-mason.webp",
+     "media/piece-meeple.webp"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3",
+     "music/tavern-short-a.mp3",
+     "music/tavern-short-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "music/defeat*": [
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3"
+    ]
+   }
+  },
+  "sands-of-qamar": {
+   "shipped": 202,
+   "loaded": 89,
+   "pct": 44.1,
+   "glbShipped": 10,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 743,
+   "fail": true,
+   "neverLoaded": {
+    "media/djinn*": [
+     "media/djinn-burhan.webp",
+     "media/djinn-dalil.webp",
+     "media/djinn-dukkan.webp",
+     "media/djinn-fath.webp",
+     "media/djinn-hafiz.webp",
+     "media/djinn-harith.webp",
+     "media/djinn-hikma.webp",
+     "media/djinn-jamal.webp",
+     "media/djinn-jawhar.webp",
+     "media/djinn-khanjar.webp",
+     "media/djinn-majlis.webp",
+     "media/djinn-nakhla.webp",
+     "media/djinn-qasra.webp",
+     "media/djinn-qirsh.webp",
+     "media/djinn-rawda.webp",
+     "media/djinn-ruya.webp",
+     "media/djinn-sadim.webp",
+     "media/djinn-sana.webp",
+     "media/djinn-suqra.webp",
+     "media/djinn-tariq.webp",
+     "media/djinn-wahha.webp",
+     "media/djinn-wazira.webp",
+     "media/djinn-zarifa.webp"
+    ],
+    "media/ui*": [
+     "media/ui-act-banner.webp",
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-djinn-bar.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row.webp",
+     "media/ui-seat-chip.webp",
+     "media/ui-trophy.webp"
+    ],
+    "media/camp*": [
+     "media/camp-farid.webp",
+     "media/camp-hadiya.webp",
+     "media/camp-layla.webp",
+     "media/camp-marwan.webp",
+     "media/camp-nimr.webp",
+     "media/camp-qadira.webp",
+     "media/camp-qays.webp",
+     "media/camp-sabah.webp",
+     "media/camp-tahir.webp",
+     "media/camp-you.webp",
+     "media/camp-yusra.webp",
+     "media/camp-zubaida.webp"
+    ],
+    "media/token*": [
+     "media/token-camel-0.webp",
+     "media/token-camel-1.webp",
+     "media/token-camel-2.webp",
+     "media/token-camel-3.webp",
+     "media/token-camel-4.webp",
+     "media/token-palace.webp",
+     "media/token-palm.webp",
+     "media/token-tent-1.webp",
+     "media/token-tent-2.webp",
+     "media/token-tent-3.webp",
+     "media/token-tent-4.webp"
+    ],
+    "media/item*": [
+     "media/item-carpet.webp",
+     "media/item-flute.webp",
+     "media/item-gem5.webp",
+     "media/item-gem7.webp",
+     "media/item-gem9.webp",
+     "media/item-horn.webp",
+     "media/item-lamp.webp",
+     "media/item-scimitar.webp",
+     "media/item-talisman.webp"
+    ],
+    "media/thief*": [
+     "media/thief-artisan.webp",
+     "media/thief-assassin.webp",
+     "media/thief-builder.webp",
+     "media/thief-elder.webp",
+     "media/thief-merchant.webp",
+     "media/thief-vizier.webp"
+    ],
+    "media/glyph*": [
+     "media/glyph-city.webp",
+     "media/glyph-exchange.webp",
+     "media/glyph-lake.webp",
+     "media/glyph-workshop.webp"
+    ],
+    "media/table*": [
+     "media/table-court.webp",
+     "media/table-night.webp",
+     "media/table-palace.webp",
+     "media/table-workshop.webp"
+    ],
+    "models/lamp*": [
+     "models/lamp-lite.glb",
+     "models/lamp.glb",
+     "models/lamp.webp",
+     "models/lamp@512.webp"
+    ],
+    "media/good*": [
+     "media/good-gold.webp",
+     "media/good-silk.webp",
+     "media/good-spice.webp"
+    ],
+    "models/camel*": [
+     "models/camel-lite.glb",
+     "models/camel.glb",
+     "models/camel.webp"
+    ],
+    "models/meeple*": [
+     "models/meeple-lite.glb",
+     "models/meeple.glb",
+     "models/meeple.webp"
+    ],
+    "models/palace*": [
+     "models/palace-lite.glb",
+     "models/palace.glb",
+     "models/palace.webp"
+    ],
+    "models/palm*": [
+     "models/palm-lite.glb",
+     "models/palm.glb",
+     "models/palm.webp"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3",
+     "music/tavern-short-b.mp3"
+    ],
+    "media/back*": [
+     "media/back-copper.webp",
+     "media/back-lamp.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3",
+     "music/fight-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ]
+   }
+  },
+  "shipwreck-isle": {
+   "shipped": 127,
+   "loaded": 49,
+   "pct": 38.6,
+   "glbShipped": 22,
+   "glbLoaded": 11,
+   "anyGlb": true,
+   "playedSecs": 189,
+   "end": "cap",
+   "clicks": 189,
+   "fail": true,
+   "neverLoaded": {
+    "models/sw*": [
+     "models/sw-carpenter.glb",
+     "models/sw-carpenter.webp",
+     "models/sw-carpenter@512.webp",
+     "models/sw-cook.glb",
+     "models/sw-cook.webp",
+     "models/sw-cook@512.webp",
+     "models/sw-explorer.glb",
+     "models/sw-explorer.webp",
+     "models/sw-explorer@512.webp",
+     "models/sw-fire.glb",
+     "models/sw-fire.webp",
+     "models/sw-fire@512.webp",
+     "models/sw-friday.glb",
+     "models/sw-friday.webp",
+     "models/sw-friday@512.webp",
+     "models/sw-palisade.glb",
+     "models/sw-palisade.webp",
+     "models/sw-palisade@512.webp",
+     "models/sw-palm-a.glb",
+     "models/sw-palm-a.webp",
+     "models/sw-palm-a@512.webp",
+     "models/sw-palm-b.glb",
+     "models/sw-palm-b.webp",
+     "models/sw-palm-b@512.webp",
+     "models/sw-palm-c.glb",
+     "models/sw-palm-c.webp",
+     "models/sw-palm-c@512.webp",
+     "models/sw-raft.glb",
+     "models/sw-raft.webp",
+     "models/sw-raft@512.webp",
+     "models/sw-shelter.glb",
+     "models/sw-shelter.webp",
+     "models/sw-shelter@512.webp"
+    ],
+    "media/camp*": [
+     "media/camp-ada.webp",
+     "media/camp-altar.webp",
+     "media/camp-carpenter.webp",
+     "media/camp-cook.webp",
+     "media/camp-explorer.webp",
+     "media/camp-friday.webp",
+     "media/camp-gale.webp",
+     "media/camp-horizon.webp",
+     "media/camp-hunger.webp",
+     "media/camp-log.webp",
+     "media/camp-prowlers.webp",
+     "media/camp-rain.webp",
+     "media/camp-shroud.webp",
+     "media/camp-soldier.webp",
+     "media/camp-undertow.webp",
+     "media/camp-whisper.webp",
+     "media/camp-winter.webp"
+    ],
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble-tail.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp"
+    ],
+    "media/table*": [
+     "media/table-beach-phone.webp",
+     "media/table-beach.webp",
+     "media/table-homestead.webp",
+     "media/table-temple-ruins.webp"
+    ],
+    "media/back*": [
+     "media/back-cross.webp",
+     "media/back-lifeboat.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/fight*": [
+     "music/fight-b.mp3"
+    ]
+   }
+  },
+  "short-fuse": {
+   "shipped": 74,
+   "loaded": 42,
+   "pct": 56.8,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 715,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-eq-frame.webp",
+     "media/ui-job-sheet.webp",
+     "media/ui-nameplate.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-rack.webp",
+     "media/ui-row.webp"
+    ],
+    "media/camp*": [
+     "media/camp-mole.webp",
+     "media/camp-quill.webp",
+     "media/camp-rig.webp"
+    ],
+    "media/table*": [
+     "media/table-clockface.webp",
+     "media/table-tower-floor.webp",
+     "media/table-workbench.webp"
+    ],
+    "models/pliers*": [
+     "models/pliers-lite.glb",
+     "models/pliers.glb",
+     "models/pliers.webp"
+    ],
+    "models/bomb*": [
+     "models/bomb-lite.glb",
+     "models/bomb.glb"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/title*": [
+     "media/title-phone.webp"
+    ],
+    "media/wire*": [
+     "media/wire-tile-frame.webp"
+    ],
+    "music/main*": [
+     "music/main-a.mp3"
+    ]
+   }
+  },
+  "sunglaze": {
+   "shipped": 76,
+   "loaded": 28,
+   "pct": 36.8,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 777,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-iconbtn-k.webp",
+     "media/ui-node-boss-k.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done-k.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked-k.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-node-open-k.webp",
+     "media/ui-panel.webp",
+     "media/ui-rack-frame.webp",
+     "media/ui-row.webp"
+    ],
+    "media/camp*": [
+     "media/camp-bram.webp",
+     "media/camp-cobb.webp",
+     "media/camp-garnet.webp",
+     "media/camp-iris.webp",
+     "media/camp-nell.webp",
+     "media/camp-ochre.webp",
+     "media/camp-saffra.webp",
+     "media/camp-tamsin.webp",
+     "media/camp-twins.webp",
+     "media/camp-umbra.webp",
+     "media/camp-vesper.webp"
+    ],
+    "media/table*": [
+     "media/table-default.webp",
+     "media/table-prism-light.webp",
+     "media/table-sun-palace.webp",
+     "media/table-unmarked-slate.webp"
+    ],
+    "models/plate*": [
+     "models/plate-lite.glb",
+     "models/plate.glb",
+     "models/plate.webp",
+     "models/plate@512.webp"
+    ],
+    "models/sun*": [
+     "models/sun-lite.glb",
+     "models/sun.glb",
+     "models/sun.webp",
+     "models/sun@512.webp"
+    ],
+    "media/back*": [
+     "media/back-guild-seal.webp",
+     "media/back-lamplight.webp"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-b.mp3"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3"
+    ]
+   }
+  },
+  "thornbound": {
+   "shipped": 83,
+   "loaded": 36,
+   "pct": 43.4,
+   "glbShipped": 4,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 595,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-panel.webp",
+     "media/ui-round-shield.webp",
+     "media/ui-row-c.webp",
+     "media/ui-row.webp",
+     "media/ui-sheet-head-c.webp",
+     "media/ui-sheet.webp"
+    ],
+    "media/camp*": [
+     "media/camp-fennick.webp",
+     "media/camp-halvard.webp",
+     "media/camp-ida.webp",
+     "media/camp-orlen.webp",
+     "media/camp-quill.webp",
+     "media/camp-rook.webp",
+     "media/camp-sable.webp",
+     "media/camp-stag.webp",
+     "media/camp-tamsin.webp",
+     "media/camp-ysolde.webp"
+    ],
+    "models/crown*": [
+     "models/crown-lite.glb",
+     "models/crown.glb",
+     "models/crown.webp",
+     "models/crown@512.webp"
+    ],
+    "models/throne*": [
+     "models/throne-lite.glb",
+     "models/throne.glb",
+     "models/throne.webp"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3",
+     "music/tavern-short-a.mp3"
+    ],
+    "media/back*": [
+     "media/back-council-seal.webp",
+     "media/back-moth-wing.webp"
+    ],
+    "media/end*": [
+     "media/end-lose.webp",
+     "media/end-win.webp"
+    ],
+    "media/table*": [
+     "media/table-lantern-night.webp",
+     "media/table-throne-hall.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/main*": [
+     "music/main-a.mp3",
+     "music/main-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/map*": [
+     "media/map.webp"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ]
+   }
+  },
+  "tidewake": {
+   "shipped": 73,
+   "loaded": 28,
+   "pct": 38.4,
+   "glbShipped": 4,
+   "glbLoaded": 2,
+   "anyGlb": true,
+   "playedSecs": 188,
+   "end": "cap",
+   "clicks": 334,
+   "fail": true,
+   "neverLoaded": {
+    "media/ui*": [
+     "media/ui-bubble-c.webp",
+     "media/ui-bubble.webp",
+     "media/ui-button-cream.webp",
+     "media/ui-button-go.webp",
+     "media/ui-button-power.webp",
+     "media/ui-iconbtn-k.webp",
+     "media/ui-nametag.webp",
+     "media/ui-node-boss-k.webp",
+     "media/ui-node-boss.webp",
+     "media/ui-node-done-k.webp",
+     "media/ui-node-done.webp",
+     "media/ui-node-locked-k.webp",
+     "media/ui-node-locked.webp",
+     "media/ui-node-open-k.webp",
+     "media/ui-panel.webp",
+     "media/ui-row.webp"
+    ],
+    "media/camp*": [
+     "media/camp-brann.webp",
+     "media/camp-crown.webp",
+     "media/camp-harrow.webp",
+     "media/camp-osk.webp",
+     "media/camp-sabel.webp",
+     "media/camp-saltshade.webp",
+     "media/camp-vey.webp",
+     "media/camp-wick.webp",
+     "media/camp-ysolde.webp"
+    ],
+    "media/table*": [
+     "media/table-dawn.webp",
+     "media/table-default.webp",
+     "media/table-lantern.webp",
+     "media/table-storm.webp"
+    ],
+    "models/junk*": [
+     "models/junk.glb",
+     "models/junk.webp",
+     "models/junk@512.webp"
+    ],
+    "models/leviathan*": [
+     "models/leviathan.glb",
+     "models/leviathan.webp",
+     "models/leviathan@512.webp"
+    ],
+    "media/back*": [
+     "media/back-night.webp",
+     "media/back-scales.webp"
+    ],
+    "music/defeat*": [
+     "music/defeat-a.mp3",
+     "music/defeat-b.mp3"
+    ],
+    "music/tavern*": [
+     "music/tavern-a.mp3",
+     "music/tavern-b.mp3"
+    ],
+    "music/victory*": [
+     "music/victory-a.mp3",
+     "music/victory-b.mp3"
+    ],
+    "media/title*": [
+     "media/title.webp"
+    ],
+    "music/fight*": [
+     "music/fight-a.mp3"
+    ]
+   }
+  },
+  "vale-of-banners": {
+   "shipped": 92,
+   "loaded": 92,
+   "pct": 100,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 165,
+   "fail": false,
+   "neverLoaded": {}
+  },
+  "vinegrave": {
+   "shipped": 170,
+   "loaded": 170,
+   "pct": 100,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 186,
+   "end": "cap",
+   "clicks": 730,
+   "fail": false,
+   "neverLoaded": {}
+  },
+  "wildmark": {
+   "shipped": 47,
+   "loaded": 47,
+   "pct": 100,
+   "glbShipped": 0,
+   "glbLoaded": 0,
+   "anyGlb": false,
+   "playedSecs": 185,
+   "end": "cap",
+   "clicks": 847,
+   "fail": false,
+   "neverLoaded": {}
+  }
+ }
+}

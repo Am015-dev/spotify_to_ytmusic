@@ -10,7 +10,7 @@ Every run first executes guard.py (stops on a failure) and modmap.py (refreshes 
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
-Nothing is written under games/ unless --deploy is given. No AI is used.
+Nothing is written under games/ unless --deploy is given. ASSET_GATE=1 with --deploy also runs scripts/asset-usage.js on the deployed games (exit 1 if one ships art it never loads). No AI is used.
 """
 import argparse, json, os, pathlib, re, shutil, subprocess, sys, time
 
@@ -289,6 +289,13 @@ def main():
     else:
         for s in ok: status[s] = "PASS" if a.no_check else status[s]
 
+    if a.quick and os.environ.get("FEEL_GATE") == "1" and not a.no_check:  # 3d. feel audit (BRIEF-GAMEFEEL points 3-5): FEEL_GATE=1, FEEL_SECS per session (default 60)
+        for s in [x for x in ok if status[x] == "PASS"]:
+            r = subprocess.run(["node", str(SCRIPTS / "feel-audit.js"), s, "--gate", "--secs", os.environ.get("FEEL_SECS", "60")], env=dict(env, NODE_PATH=env.get("NODE_PATH", "/opt/node-tools/node_modules")), capture_output=True, text=True)
+            lines = [l for l in r.stdout.splitlines() if l.startswith(("PASS", "FAIL", "N/A"))]
+            for l in lines: print("[feel] " + l, flush=True)
+            if r.returncode != 0: status[s], why[s] = "FAIL", "feel-audit: " + "; ".join(l.split(" ", 2)[2][:40] for l in lines if l.startswith("FAIL"))[:160] if lines else "feel-audit crashed"
+
     if a.deploy and not a.no_look:  # 3b. look check + axe: only NEW severe findings block. "New" = not in look-known/<slug>.json (committed, rewritten on every successful deploy; no live re-measurement)
         env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
         mode = "all" if a.full else "phone"
@@ -394,12 +401,20 @@ def main():
         try: subprocess.run([sys.executable, str(SCRIPTS / "game-status.py")], check=False, timeout=120)
         except Exception as e: print("game-status skipped:", e)
 
+    gate_bad = False
+    if deployed and not a.suffix and os.environ.get("ASSET_GATE") == "1":  # optional: asset-usage gate (shipped art/models/music must load in a played game); needs ~3 min per game
+        todo = [s for s in deployed if not re.match(r"(asset-viewer|look|mainhattan-)", s)]
+        if todo:
+            r = subprocess.run(["node", str(SCRIPTS / "asset-usage.js"), *todo, "--jobs", "3"], env={k: v for k, v in os.environ.items() if k not in ("GX_URL", "GX_STAGE")})
+            gate_bad = r.returncode != 0
+            print("[asset-gate] " + ("BELOW THE GATE (see games-src/qa/asset-usage.json); the files are already deployed" if gate_bad else "ok"))
+
     print("\n== result ==")
     for s in slugs:
         print(f"{status[s]:5} {s:18} {why[s]}" + ("   -> deployed" if s in deployed else ""))
     npass = sum(status[s] == "PASS" for s in slugs)
     print(f"{npass}/{len(slugs)} PASS; staged in {out}" + (f"; deployed {len(deployed)}" if a.deploy else "; nothing deployed (use --deploy)"))
-    return 0 if npass == len(slugs) else 1
+    return 0 if npass == len(slugs) and not gate_bad else 1
 
 if __name__ == "__main__":
     sys.exit(main())

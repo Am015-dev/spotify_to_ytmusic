@@ -138,7 +138,7 @@
     ]
   });
 
-  // the owner's 3D plane on the landing screen (runtime audit: scripts/asset-usage.js)
+  // the owner's 3D plane on the landing screen (runtime audit: scripts/play-usage.js)
   GXS.add({
     id: 'fa-end', name: 'Landing screen with the 3D plane', ask: 'Is the plane drawn big on the landing screen?', seed: 9, ls: { fa_prefs: '{"prefs":{"gfx":"high"}}' }, when: booted, group: 'Art',
     setup: function () {

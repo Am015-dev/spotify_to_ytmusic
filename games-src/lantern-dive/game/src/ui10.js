@@ -6,7 +6,7 @@ function fingerDone() {
 }
 function fingerTarget() {
   if (!G || !UI.started || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || G.phase === 'over' || viewSeat() < 0 || !iMustAct()) return null;
-  if (!UI.fingerOn) return null;
+  if (!UI.fingerOn || !UI.prefs.hints || UI.mode === 'tutorial') return null;   // the pointing finger belongs to Hints (addendum 7)
   const v = viewSeat(), ph = G.phase;
   if (ph === 'assign') {
     if (!myMoves().some(m => m.t === 'take')) return null;

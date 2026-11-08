@@ -132,7 +132,7 @@
     ]
   });
 
-  // owner 3D models (throne, crown) at the moments they show: the Kingdom sheet and the end card (runtime audit: scripts/asset-usage.js)
+  // owner 3D models (throne, crown) at the moments they show: the Kingdom sheet and the end card (runtime audit: scripts/play-usage.js)
   GXS.add({
     id: 'tb-throne', name: 'Kingdom sheet with the 3D throne', ask: 'Is the throne on the Kingdom sheet?', seed: 7, when: booted, group: 'Art',
     setup: function () { return table(7).then(function () { openPop('kingdom'); renderAll(); return new Promise(function (r) { setTimeout(r, 1200); }); }); },

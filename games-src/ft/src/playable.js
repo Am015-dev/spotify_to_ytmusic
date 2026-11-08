@@ -5,11 +5,14 @@ const plEl=(id,cls)=>{let e=document.getElementById(id);if(!e){e=document.create
 function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length===1){const nm=hs[0].nm;t=t.split(nm+"'s").join('Your').split(nm).join('You')}
   const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring'};
   return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings)\b/g,(m,v)=>'You '+V[v])}
-function plBanner(title,sub,cls){const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
-function plPop(i,d,why){const s=typeof seatEl==='function'?seatEl(i):null;if(!s)return;const r=s.getBoundingClientRect();if(!r.width)return;
+function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the coach and the tracker say it
+  const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
+const PLQ=[];let PLQB=false;
+function plPop(i,d,why){PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
+function plPopNext(){if(PLQB||!PLQ.length)return;const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
-  e.innerHTML='<b>'+(d>0?'+':'−')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);
-  const w=e.offsetWidth;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';e.style.top=(r.bottom-2+(PL.pops++%3)*28)+'px';setTimeout(()=>{e.remove();PL.pops=Math.max(0,PL.pops-1)},ANIM?2300:100)}
+  e.innerHTML='<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);PLQB=true;
+  const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;e.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';e.style.top=(tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
