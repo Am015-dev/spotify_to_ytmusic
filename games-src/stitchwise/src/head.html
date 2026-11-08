@@ -420,5 +420,21 @@ html.sm #offers.ring>.offer:not(.up) .of small{letter-spacing:-.4px}
 /* W491 fix: the rival's quilt stays on screen on phones (a live thumbnail on their plate; tap it for the big view) */
 @media (max-width:600px){.pstrip[data-seat="1"] .thumb{display:block!important;width:34px!important;height:34px!important;border-radius:4px;flex:none;box-shadow:0 0 0 1px #0004}.pstrip[data-seat="1"]{gap:6px!important;padding-left:6px!important}}
 
+html.ph #offers.ring>.offer:not(.up){flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:2px!important}
+html.ph #offers.ring>.offer:not(.up)>.shape,html.ph #offers.ring>.offer:not(.up)>.ofx{position:static!important;transform:none!important;margin:0!important}
+html.ph #offers.ring>.offer:not(.up) .ofx{width:100%!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;padding:0!important;background:none!important}
+html.ph #offers.ring>.offer:not(.up) .of{justify-content:center!important;padding:0 2px!important;gap:3px!important;background:none!important}
+html.ph #offers.ring>.offer:not(.up) .of b{min-width:0!important;font-size:15px!important}
+html.ph #offers.ring>.offer:not(.up){padding:4px 3px!important;min-height:0!important;height:auto!important}
+html.ph #offers.ring>.offer:not(.up) canvas,html.ph #offers.ring>.offer:not(.up) .pshape,html.ph #offers.ring>.offer:not(.up)>div:first-child{max-height:34px}
+html.ph #offers.ring>.offer:not(.up) .of small{letter-spacing:-.4px}
+/* R2: phone portrait. One-row player pills; while placing (or sewing leather) the track steps aside so the quilt gets the room; the prompt sits in the sheet's title row */
+html.ph #pills .pstrip{flex-wrap:nowrap!important;height:44px!important;min-height:44px!important;padding:2px 8px!important;display:flex!important;align-items:center!important}
+html.ph #pills .pstrip b{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html.ph #pills .pstrip{gap:8px!important}html.ph #pills .pstrip .thumb{flex:0 0 30px!important;width:30px!important;height:30px!important}html.ph #pills .pstrip .st{margin-left:auto!important;flex:0 0 auto!important}
+html.ph.swplace #bd:not(.wide) #side{display:none!important}
+html.ph #trhead .trl{display:none}
+html.ph .gx-dock-head{padding:2px 8px!important}html.ph #prompt:not(.t2hide){height:48px}html.ph #offers.ring{padding-top:6px!important;padding-bottom:2px!important}html.ph #pills .pstrip{padding:2px 6px!important;gap:6px!important}html.ph #pills .pstrip{flex:1 1 auto!important}html.ph #pills .pstrip b{flex:0 1 auto!important;min-width:2.4em!important}html.ph #pills .pstrip .thumb{flex-basis:26px!important;width:26px!important;height:26px!important}
+html.ph .gx-dock:has(#prompt:not(.t2hide)) .gx-dock-head .gx-dt{visibility:hidden}
+html.ph #prompt:not(.t2hide){position:absolute!important;top:0;left:58px;right:56px;height:55px;display:flex!important;align-items:center;margin:0!important;padding:0 4px!important;z-index:3;background:none!important;border:0!important;line-height:1.2;overflow:hidden}
 </style>
 </head>

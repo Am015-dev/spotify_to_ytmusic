@@ -11,6 +11,8 @@ var SVG_TIME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 2h10M5 1
 var SVG_LEA = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" fill="#8a5a3a" stroke="#4a2a12" stroke-width="1.2"/><rect x="6" y="6" width="8" height="8" fill="none" stroke="#f0d9b0" stroke-width="1.2" stroke-dasharray="2 1.5"/></svg>';
 function leaIc() { var i = artImg('icon-leather', 'ic'); return i ? i.outerHTML : SVG_LEA; }
 function bonusIc() { var i = artImg('icon-bonus', 'ic'); return i ? i.outerHTML : '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="8" r="6" fill="#e0a82e" stroke="#7a5410" stroke-width="1.3"/><path d="M6 13l-2 6 6-3 6 3-2-6" fill="#c8553d"/></svg>'; }
+document.addEventListener('error', function (e) { var t = e.target; if (!t || t.tagName !== 'IMG' || !t.getAttribute('data-stem')) return; /* R2: a picture that fails to load falls back to the drawn icon, never a broken-image mark */
+  var st = t.getAttribute('data-stem'), fb = st === 'icon-button' ? SVG_BTN : st === 'icon-leather' ? SVG_LEA : ''; var p = t.parentNode; if (p && p.classList) p.classList.remove('hasimg'); if (fb) { var w = document.createElement('span'); w.innerHTML = fb; t.replaceWith(w.firstChild || w); } else t.remove(); }, true);
 function btnIc() { var i = artImg('icon-button', 'ic'); return i ? i.outerHTML : SVG_BTN; }
 function timeIc() { var i = artImg('icon-hourglass', 'ic'); return i ? i.outerHTML : SVG_TIME; }
 // ---------- sound: small synth, off-able; respects the shelf volume sliders
@@ -30,10 +32,11 @@ function nameOf(s) { return UI.names[s] || (s === 0 ? 'You' : 'Computer'); }
 function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.opponent.aiLevel : UI.lvl); }
 // ---------- layout (board sized to the space the shell leaves)
 function layout() {
-  document.documentElement.classList.toggle('sm', innerHeight < 700); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
+  document.documentElement.classList.toggle('sm', innerHeight < 700); var de = document.documentElement, ph = innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('ph', ph); /* R2: phone portrait, the quilt is the hero */
+  de.classList.toggle('swplace', ph && !!G && !G.over && isHuman(swWho(G)) && (UI.sel >= 0 || !!G.pend) && UI.peek < 0); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
   var fr = artHas('quilt-frame') ? (wide ? 20 : 8) : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr) / 9, (H - 12 - 46 - 56 - 22 - 26 - (innerHeight < 800 ? -12 : 60) - fr) / 9)); /* W484: room for the track header */
-  cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
+  cs = Math.max(18, Math.min(72, cs)); if (!wide && UI.csFit) cs = Math.max(18, Math.min(UI.csFit, Math.floor((W - 16 - 10 - fr) / 9))); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
 // ---------- quilt
@@ -104,14 +107,16 @@ function trackInfo() {
   return 'Gold spot (income) in ' + (nb == null ? '-' : nb - pos) + ' \u00B7 free patch in ' + (nl == null ? '-' : nl - pos);
 }
 // ---------- render everything
-function render() {
-  if (!G) return; renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
+function render(fit) {
+  if (!G) return; if (!fit) UI.csFit = 0; var svNew = fit ? null : Object.assign({}, UI.newCells); renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
   var q = quiltEl(vs, 'me'); UI.newCells = {}; var qf = h('div.qframe'); if (artBg(qf, 'quilt-frame')) { qf.style.backgroundSize = '100% 100%'; qf.classList.add('art'); } if (UI.mode !== 'hot' && vs !== 0) q.appendChild(h('div.qlabel', nameOf(vs) + '\u2019s quilt'));
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
   qf.appendChild(q); if (UI.wide) { qc.appendChild(qf); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(qf); }
   sd.appendChild(trackHead()); var tr = renderTrack(); sd.appendChild(tr);
   if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
+  if (!fit && !UI.wide) { try { var bdE = $('#bd'), top = bdE.getBoundingClientRect().top, low = 0; Array.prototype.forEach.call(bdE.querySelectorAll('#qcol > *, #side > *'), function (e) { var r = e.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom - top); }); /* R2: fit the quilt to the real free height, measured */
+    var nc = UI.cs + Math.floor((bdE.clientHeight - low - 6) / 9); if (low && nc !== UI.cs) { UI.csFit = Math.max(18, nc); UI.newCells = svNew; return render(true); } } catch (e) { } }
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }

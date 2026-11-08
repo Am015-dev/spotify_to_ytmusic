@@ -66,11 +66,11 @@ function act(m) {
   if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
-  UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(700), fin); else fin(); });
+  UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(150), fin); else fin(); });
 }
 function floatText(txt, el, color, wide) { var mm = String(txt).match(/^[+\u2212-]?\d+(?: pts| buttons?)?/); if (!mm) return; txt = mm[0]; /* W470: only a short number flies */ var r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 }; var f = h('div.flt' + (wide ? '.r' : ''), txt); f.style.left = (wide ? Math.max(120, Math.min(innerWidth - 120, r.left + r.width / 2)) : r.left + r.width / 2 - 18) + 'px'; f.style.top = (r.top) + 'px'; if (color) f.style.color = color; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1800); }
 function playEvents(evs, before, done) {
-  var t = 0, step = amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
+  var t = 0, step = evs.length && evs[0].s != null && !isHuman(evs[0].s) && UI.mode !== 'hot' ? sp(210) : amt(380), spots = 0; if (!step) { evs.forEach(function (e) { if (e.k === 'bonus') toast(nameOf(e.s) + ' completed a 7×7 square: +7 bonus!'); }); return done(); }
   evs.forEach(function (e) {
     if (e.k === 'place') { later(t, function () { sfx('place'); if (e.cost != null) floatText('+' + (e.cells.length * 2) + ' pts: ' + e.cells.length + ' squares covered, \u2212' + e.cost + ' button' + (e.cost === 1 ? '' : 's'), $('.pstrip[data-seat="' + e.s + '"]') || $('#quilt'), '#ffe9a0', true); else floatText('Free 1\u00D71 patch', $('#quilt'), '#ffe9a0', true); var q = $('#quilt'), c0 = e.cells[0]; if (q && c0) { var r = q.getBoundingClientRect(); fxImg('fx-stitch', r.left + q.clientLeft + (c0[0] + .5) * UI.cs, r.top + q.clientTop + (c0[1] + .5) * UI.cs, UI.cs * 1.6); } }); t += step * 1.2; }
     if (e.k === 'move') {
@@ -87,7 +87,7 @@ function incomeMoment(seat, spot, inc, i) { // coins fly from the button spot to
   floatText('+' + inc + ' button' + (inc === 1 ? '' : 's') + ': gold spot income', cell, '#ffe9a0', true); fxImg('fx-sparkle', a.left + a.width / 2, a.top + a.height / 2, 44);
 }
 function fxImg(stem, x, y, size) { var i = artImg(stem, 'fx'); if (!i) return; i.style.cssText = 'position:fixed;z-index:60;pointer-events:none;width:' + size + 'px;height:' + size + 'px;left:' + (x - size / 2) + 'px;top:' + (y - size / 2) + 'px;animation:flt 1s ease-out forwards'; document.body.appendChild(i); setTimeout(function () { i.remove(); }, 1100); }
-function afterMove() { if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
+function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
 function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#turnban'); document.body.appendChild(b); } return; var ms = amt(4000); if (!ms) return; b.className = opp ? 'opp' : ''; b.textContent = txt; if (sub) b.appendChild(h('small', sub)); void b.offsetWidth; b.classList.add('on'); clearTimeout(banner.t); banner.t = setTimeout(function () { b.classList.remove('on'); }, ms); }
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
@@ -102,16 +102,16 @@ function schedule() {
   clearTimeout(UI.tm.ai); if (!G) return; if (G.over) { return later(amt(500), finish); }
   turnCheck();
   var s = swWho(G); if (UI.tutorial && !UI.tutAi) return; if (isHuman(s)) { if (typeof hlpPhaseUpdate === 'function') hlpPhaseUpdate(); return; }
-  if (UI.goal) return; UI.tm.ai = later(Math.max(120, Math.min(AIDELAY, 500), sp(450)), aiStep); /* R1: about 2 s per rival move, tap to skip */
+  if (UI.goal) return; UI.tm.ai = later(Math.max(80, Math.min(AIDELAY, sp(150))), aiStep); /* R1: about 2 s per rival move, tap to skip */
 }
 function aiStep() { // the rival's turn, one visible step at a time (caption, flash, then the move on their quilt)
-  if (!G || G.over || UI.busy || UI.goal) return; var s = swWho(G); if (isHuman(s)) return; var m = UI.tutorial && !G.pend ? { t: 'adv' } : aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);
+  if (!G || G.over || UI.busy || UI.goal) return; var s = swWho(G); if (isHuman(s)) return; UI.fast = UI.fast || UI.rvPrev === s; UI.rvPrev = s; /* R2: a rival's 2nd move in a row plays at speed */ var m = UI.tutorial && !G.pend ? { t: 'adv' } : aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);
   if (!amt(1)) return act(m);
   var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
   if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; UI.cap = nm + ' buys ' + p.name + ' for ' + pl(p.cost, 'button'); UI.peek = s; render(); var o = $$('#offers .offer')[m.k]; if (o) o.classList.add('flash'); sfx('pick'); UI.busy++;
-    later(sp(1100), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
-  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(900), function () { UI.busy--; act(m); }); }
-  else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(800), function () { UI.busy--; act(m); }); }
+    later(sp(420), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
+  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(320), function () { UI.busy--; act(m); }); }
+  else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(450), function () { UI.busy--; act(m); }); }
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
 // ---------- start / finish
