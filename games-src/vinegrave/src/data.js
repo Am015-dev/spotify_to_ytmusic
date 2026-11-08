@@ -236,7 +236,7 @@
       slots: 'Empty shrine slots score points. Setting an idol fills one.',
       overcome: 'You can pay its price now: 5 points and a boon.',
       boon: 'A boon is free and works once, any time on your turn.',
-      research: 'Research glows. Pay a row's cost to climb. Higher rows score more.',
+      research: 'Research glows. Pay a row\u2019s cost to climb. Higher rows score more.',
       notebook: 'Your notebook can climb behind the magnifier.',
       temple: 'Your magnifier is in the temple. Buy tiles for big points.',
       buyitem: 'Coins buy items. They go under your deck.',

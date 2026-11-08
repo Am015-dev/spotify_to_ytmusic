@@ -25,7 +25,7 @@ function campInit() {
 function storyOpen() { if (typeof GXC === 'undefined') return; closeInsp(); if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else { $('#start').hidden = true; GXC.open(); } }
 UIACT.story = () => storyOpen();
 UIACT.tut = () => { try { GX.close(); } catch (e) { } tutStart(); };
-UIACT.start = () => UIACT.tut();   /* first launch: the primary button starts the coached first game */
+UIACT.start = () => UIACT.quick();   /* Play: a quick game with the chosen settings */
 // ---------------------------------------------------------------- the guided first round
 // A real game with a fixed hand and market: you play a card, discover a ruin (idol + guardian), buy an item, see the research track, pass,
 // and watch the round end bring a Dread card home. Tamsin (the computer) only digs at camp sites, then passes. Nothing is saved.
@@ -55,15 +55,16 @@ function coachSay(id, text) {   /* one bubble at a time; never blocks input; × 
   CO.q.push({ id, text: text || V.STORY.coach[id] }); coachPump();
 }
 function coachPump() {
-  if (CO.cur || !CO.q.length) return; const it = CO.q.shift(); CO.cur = it; if (it.id) CO.seen[it.id] = 1;
+  if (CO.cur || !CO.q.length) return; if ((!$('#fx').hidden) || $('#toast.on') || document.querySelector('.gxt-bub') || UI.busy || (G && !myTurn() && G.phase === 'play')) { clearTimeout(CO.w); CO.w = setTimeout(coachPump, 600); return; }
+  const it = CO.q.shift(); CO.cur = it; if (it.id) CO.seen[it.id] = 1;
   let e = $('#coach'); if (!e) { e = document.createElement('div'); e.id = 'coach'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
   e.innerHTML = `<span class="cpor" aria-hidden="true">${esc(V.STORY.guide.mark)}</span><span class="ctx"><b>${esc(V.STORY.guide.short)}</b> ${esc(it.text)}</span><button type="button" class="cx" aria-label="Dismiss tip">×</button>`;
   e.className = 'on'; e.querySelector('.cx').onclick = coachHide;
   try { const d = $('#dock').getBoundingClientRect(), b = $('#board').getBoundingClientRect(), ph = innerWidth < 1000;   /* phone: just above the hand tray; desktop: top of the board */
     e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : b.top + 8) + 'px'; e.style.left = (ph ? innerWidth / 2 : b.left + b.width / 2) + 'px'; } catch (x) { }
-  clearTimeout(CO.t); CO.t = setTimeout(coachHide, CO.q.length > 1 ? 2600 : Math.max(3400, it.text.length * 55));   /* a backlog moves faster */
+  clearTimeout(CO.t); CO.t = setTimeout(coachHide, readMs('Pell ' + it.text) + 600);   /* readable: 4 s + 1 s per 10 words; × closes it sooner */
 }
-function coachHide() { clearTimeout(CO.t); const e = $('#coach'); if (e) e.className = ''; CO.cur = null; setTimeout(coachPump, 350); }
+function coachHide() { clearTimeout(CO.t); const e = $('#coach'); if (e) e.className = ''; CO.cur = null; setTimeout(coachPump, 500); }
 function coachCheck(L) {   /* called from render: explain a rule the first time it is a real option for you */
   if (!coachOn() || !myTurn() || UI.busy) return; const t = {}; L.forEach(m => { t[m.t] = 1; });
   const me = G.p[UI.view];
@@ -101,7 +102,7 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
   const same = VG.same ? VG.same(m, best) : JSON.stringify(m) === JSON.stringify(best);
   let why = ''; try { why = VAI.why(G, best) || ''; } catch (x) { }
   if (same) coachSay(null, V.STORY.coachGood + (why || 'that was the strongest option.'));
-  else if (best.t !== 'pass') coachSay(null, V.STORY.coachTip + 'next time consider this: ' + (why || 'look at what each glowing thing gives.'));
+  else if (best.t !== 'pass') coachSay(null, V.STORY.coachTip + (why || 'see what each glowing thing gives.'));
 }
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
@@ -112,20 +113,21 @@ function coachScoreStart() {   /* game over in the coached game: a second tutor 
 }
 function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
-  const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs table')) || $('#opp');
+  const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs .rplayers')) || $('#opp');
   return [
-    { id: 'hand', title: 'Ch 1 · Landfall', say: 'Goal: have the most points after 5 rounds. Start by playing Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
-      wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
-    { id: 'play', title: 'Ch 1 · Landfall', say: 'It gives +1 compass. That is your one action.', target: tq(tinsp('Play it')),
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.insp && tinsp('Play it')()), onEnter: () => { CO.seen.play = 1; } },
+    { id: 'goal', title: 'How to win', say: 'Most points after the last round wins. Score with research, ruins and cards.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
+    { id: 'hand', title: 'Your first move', say: 'Each turn you do one thing. Tap Trail Notes in your hand.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+      wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
+    { id: 'play', title: 'Your first move', say: 'It gives 1 compass. Tap it again, or drag it up.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.sel && UI.sel.k === 'hand' && $('#hand .cd.sel')), onEnter: () => { CO.seen.play = 1; } },
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
       onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
-    { id: 'score1', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research}, Tamsin ${b.research}. Temple tiles: ${a.temple} vs ${b.temple}. Higher on the track, more points.`; },
+    { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
       target: tq(scoreTarget), wait: null, ready: () => true },
-    { id: 'score2', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); return `Idols ${a.idols} vs ${b.idols}, empty shrine slots ${a.slots} vs ${b.slots}, guardians ${a.guards} vs ${b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
-    { id: 'score3', title: 'Ch 2 · The count', say: () => { const [a, b] = sc(); CO.seen.tiebreak = CO.seen.rounds = 1; const r = window.coachReport();
-        TUTCFG.endText = (a.total >= b.total ? V.STORY.endWin : V.STORY.endLose) + (r.later.length ? ' Things you’ll meet later: ' + r.later.map(id => V.STORY.coach[id]).join(' ') : '') + ' A full game is 5 rounds.';
-        return `Cards ${a.cards} vs ${b.cards}, Dread ${a.fear} vs ${b.fear}. Total: you ${a.total}, Tamsin ${b.total}. Ties go to the first into the temple.`; }, target: tq(scoreTarget), wait: null, ready: () => true }
+    { id: 'score2', title: 'The count', say: () => { const [a, b] = sc(); return `Idols, shrines and guardians: you ${a.idols + a.slots + a.guards}, Tamsin ${b.idols + b.slots + b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
+    { id: 'score3', title: 'The count', say: () => { const [a, b] = sc(); CO.seen.tiebreak = CO.seen.rounds = 1;
+        TUTCFG.endText = `You ${a.total}, Tamsin ${b.total}. ${a.total >= b.total ? 'Well played!' : 'Close one!'} A full game has 5 rounds.`;
+        return `Cards and Dread: you ${a.cards + a.fear}, Tamsin ${b.cards + b.fear}. Total: you ${a.total}, Tamsin ${b.total}.`; }, target: tq(scoreTarget), wait: null, ready: () => true }
   ];
 }
 let TUTCFG = null;
