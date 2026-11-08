@@ -90,11 +90,9 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard()},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard()!=null},
  {id:'autumn2',title:'Journey',say:'Journey trades the card for Lore. Lore buys stronger cards.',target:tfirst('#act .autc [data-aut=journey]','#act .autc .btn'),
    wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&(a.mv.a==='journey'||a.mv.a==='govern')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc .btn')},
- {id:'autumn3',title:'Autumn ends',say:'Tap Done to end Autumn.',target:tfirst('#act [data-a=mv]:not([data-aut])'),
-   wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.t==='done'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&!!document.querySelector('#act [data-a=mv]:not([data-aut])')},
  {id:'round',title:'Winter',say:()=>'Winter: played cards are discarded. You '+myInf()+', the Court '+rivInf()+'.',target:tq('#rivals'),wait:null,
    hold:c=>c.kind==='event'&&c.ev.t==='summary',onNext:()=>evDone(),
-   ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')},
+   ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')||!!(G&&G.over&&!UI.card)},
  {id:'end',title:'Your game',say:'A real game repeats this round five times. Your turn!',
    target:tq('#rivals'),wait:null,ready:()=>!!(G&&G.over&&!UI.card)}
   ]}
