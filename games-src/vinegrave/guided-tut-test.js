@@ -32,7 +32,6 @@ const RULES = ['goal', 'g-play', 'g-play2', 'g-plane', 'g-plane2', 'g-disc', 'g-
     ok(!dead.length, `${w}x${h}: every highlighted target responds to one tap${dead.length ? ' (dead: ' + dead.join(', ') + ')' : ''}`);
     ok(ended, `${w}x${h}: reaches the end card by highlighted taps only (${Math.round((Date.now() - t0) / 1000)} s)`);
     ok(nextOnly.length <= 5, `${w}x${h}: at most 5 Next-only steps (${nextOnly.length}: ${nextOnly.join(',')})`);
-    ok(nextOnly.length <= 5, `${w}x${h}: at most 5 Next-only steps (${nextOnly.length}: ${nextOnly.join(',')})`);
     ok(errs === 0, `${w}x${h}: no page errors (${errs})`);
     if (process.env.DBG) console.log('  seen', seen.join(' '));
     await ctx.close();
