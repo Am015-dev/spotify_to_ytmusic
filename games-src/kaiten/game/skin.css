@@ -160,3 +160,9 @@ html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}
 #toast.on{pointer-events:auto;cursor:pointer}
 .sh .av .sc,html.ph .sh .av .sc{font-size:20px!important;min-width:34px;height:34px;line-height:28px;border-radius:17px;top:-10px;right:-12px}
 html.sk-kki .sh .av .sc{min-width:38px;height:38px;line-height:38px;top:-12px;right:-14px}
+/* phone text floor (feel gate d): nothing under 14px */
+@media (max-width:1023px){
+  .ctr .grp .hn,.ctr .grp .bg,.ppop .sm,div.sm,.kb,.seat .sh .nm,.sh .nm,.slot .st,.st.rd,.ptag,#kkguide .kgt b,.tbtn span,.sbtn span,#start .tbtn small{font-size:14px!important}
+  svg text[textLength][font-size^="10"],svg text[textLength][font-size^="11"],svg text[textLength][font-size^="12"],svg text[textLength][font-size^="13"]{font-size:14px}
+}
+#kkguide .av i,#kkguide i{font-size:16px}

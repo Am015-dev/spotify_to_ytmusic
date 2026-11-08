@@ -134,6 +134,8 @@ function coachBegin(pro, first) {
   goalCard(() => setTimeout(coachPump, 250));   // ui10: the Goal card is the first screen; Suzu waits for it
   COACH.iv = setInterval(coachPoll, 450); coachSay('intro');
 }
+// the shared tutor kit's running()/state() also report the coached game, so audits see Learn to play as running (free choices, no steps)
+if (typeof GXT !== 'undefined') { const r0 = GXT.running, s0 = GXT.state; GXT.running = () => r0() || coachOn(); GXT.state = () => (!r0() && coachOn() ? { active: true, phase: 'end', coached: true } : s0()); }
 function coachStop() { COACH.on = false; clearInterval(COACH.iv); clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; window.GXCOACH.running = false; guideHide(); }
 function coachSay(id, n) {
   if (COACH.seen[id] || !KK.STORY.coach[id]) return; COACH.seen[id] = 1; window.GXCOACH.explained.push(id);
@@ -141,7 +143,9 @@ function coachSay(id, n) {
 }
 function rivalName() { return G ? pname(1) : 'Odile'; }
 function coachPump() {
-  if (COACH.cur || !COACH.q.length || goalOpen()) return; const m = COACH.q.shift(); COACH.cur = m;
+  if (COACH.cur || !COACH.q.length || goalOpen()) return;
+  if (document.querySelector('.gx-drawer.on') || UI.rsOpen) { clearTimeout(COACH.wt); COACH.wt = setTimeout(coachPump, 600); return; }   // wait: a drawer would hide the bubble at once
+  const m = COACH.q.shift(); COACH.cur = m;
   let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
   const who = m.w === 'o' ? { name: pname(1), color: '#e0a31c', portrait: 'camp-odile.webp' } : null;
   const kx = h('button.kx', { type: 'button', 'aria-label': 'Dismiss' }, '\u00d7'); kx.addEventListener('click', () => coachNext());
