@@ -15,7 +15,7 @@ function setHints(on){UI.hints=!!on;try{localStorage.setItem('rv_hints',on?'1':'
 const myTurn=step=>{if(!G||G.over||!G.cur)return false;const s=sideToAct();return s>=0&&P(s).human&&(!step||G.step===step)};
 const seatName=p=>p.human&&G.pl.filter(q=>q.human).length===1?'You':p.nm;
 function say(t,tn,rc){const el=$('#status');const p=G&&G.cur&&!G.over?P(G.cur.p):null;el.style.setProperty('--c',p?PCOL[p.i]:'#e0a83a');
-  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`+(rc?`<span class="rc">${esc(rc)}</span>`:'');el.classList.toggle('mine',myTurn());{const sr=$('#srlive'),tx=(tn?tn+'. ':'')+t;if(sr&&sr.textContent!==tx)sr.textContent=tx}if(G)try{keepPops();layoutTags();layoutFlabs()}catch(e){}}
+  el.innerHTML=(tn?`<b class="tn"><i class="tdot"></i>${esc(tn)}</b>`:'')+`<span class="ins">${esc(t)}</span>`+(rc?`<span class="rc">${esc(rc)}</span>`:'');el.classList.toggle('mine',myTurn());{const sr=$('#srlive'),tx=(tn?tn+'. ':'')+t;if(sr&&sr.textContent!==tx)sr.textContent=tx}if(G)try{spreadFigs();keepPops();layoutTags();layoutFlabs()}catch(e){}}
 // rival steps: a short caption per step (what it drew, where it put it, what it claimed, what it scored), shown ~1.4 s each
 function lastFig(){for(const e of G.log.slice(0,8)){const m=e.t.match(/^(.+?) (?:sets|puts) a .*on the (\w+)\.$/);if(m)return {nm:m[1],ty:m[2],p:G.pl.findIndex(p=>p.nm===m[1])}}return null}
 function readMs(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
@@ -36,7 +36,7 @@ function setView(v){UI.view=v;applyView()}
 function applyView(){const v=UI.view,w=$('#world');w.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.s})`;boardEl().style.setProperty('--sc',v.s);placeOverlay()}
 function toScreen(wx,wy){return [wx*UI.view.s+UI.view.x,wy*UI.view.s+UI.view.y]}
 function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;UI.twTo=to;const a=Object.assign({},UI.view);if(!ms||UI.reduce){setView(to);return}UI.tw=true;const t0=performance.now();
-  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible();if(UI.afterTw){const f=UI.afterTw;UI.afterTw=null;f()}}};UI.tween=requestAnimationFrame(step)}
+  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible();figShow()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=botSafe();return {s,x:m.W/2-cx*100*s,y:top+(m.H-top-bot)/2-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
@@ -48,7 +48,7 @@ function ensureGlowVisible(){if(!myTurn('place')||UI.tw||UI.user)return;if([...d
   const g=UI.legal.filter(q=>q.r===UI.rot);if(!g.length)return;const last=unkey(G.order[G.order.length-1]);g.sort((a,b)=>Math.hypot(a.x-last[0],a.y-last[1])-Math.hypot(b.x-last[0],b.y-last[1]));
   const m=measure();tweenView(viewFor({c:Math.max(MINC,UI.view.s*100),cx:g[0].x+.5,cy:g[0].y+.5},m),300)}
 function refit(anim){if(!G||!G.order.length)return;UI.user=false;tweenView(fitTarget(),anim?420:0)}
-function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max(UI.view.s*100,Math.min(m.W*(ph?.44:.2),(m.H-topSafe()-botSafe())*.4,ph?170:220));tweenView(focusView(x+.5,y+.5,c),anim?520:0)}
+function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max(UI.view.s*100,Math.min(m.W*(ph?.44:.2),(m.H-topSafe()-botSafe())*.4,ph?170:220));tweenView(focusView(x+.5,y+.5,c),anim?380:0)}
 // ---------- camera follow (W426): frame the spots near the last tile, zoom in on the chosen spot, ease back out, follow the rival ----------
 const PHONE=()=>innerWidth<700;
 function topSafe(){const s=$('#status'),b=boardEl();if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
@@ -94,11 +94,16 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
     b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}layoutTags()}
 // ---------- overlay: followers on the map, follower spots, ghost finger, pops (screen-sized items that follow the map) ----------
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
+// follower spots stay hidden while the camera moves, so a button never slides away under a finger
+function figShow(){for(const e of document.querySelectorAll('#ov .fglow.wait'))e.classList.remove('wait')}
+function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=46;
+  for(let it=0;it<24;it++){let moved=false;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j];let dx=(b.x+b.ox)-(a.x+a.ox),dy=(b.y+b.oy)-(a.y+a.oy),d=Math.hypot(dx,dy);if(d>=D)continue;if(d<.01){dx=0;dy=1;d=1}const k=(D-d)/2/d;a.ox-=dx*k;a.oy-=dy*k;b.ox+=dx*k;b.oy+=dy*k;moved=true}if(!moved)break}
+  for(const q of P)q.e.style.transform=`translate(${q.x+q.ox}px,${q.y+q.oy}px) translate(-50%,-50%)`}
 function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(24,Math.min(48,cell*.4));$('#ov').style.setProperty('--ms',ms+'px');
   for(const el of $('#ov').children){const o=el._o;if(!o)continue;const [sx,sy]=toScreen(o.wx,o.wy);el.style.transform=`translate(${sx+o.dx}px,${sy+o.dy}px) translate(-50%,-50%)`;
     if(o.cull){const r=o.r||0;const vis=sx>pad+r&&sx<m.W-pad-r&&sy>pad+r+28&&sy<m.H-pad-r;el.style.visibility=vis?'':'hidden'}}
   // glows must lie fully inside the board so none is half cut off or under the bars
-  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}keepPops();layoutTags();layoutFlabs()}
+  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}spreadFigs();keepPops();layoutTags();layoutFlabs()}
 function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100+sp[0],y*100+sp[1]]}
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
@@ -107,12 +112,13 @@ function renderMeeples(){const live={};
   for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
   placeOverlay()}
 function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
-  UI.figs=[];if(!myTurn('fig'))return;if(UI.tw&&!UI.sim){UI.afterTw=renderFigSpots;clearTimeout(UI.afT);UI.afT=setTimeout(()=>{if(UI.afterTw===renderFigSpots){UI.afterTw=null;renderFigSpots()}},900);return}   // spots appear once the camera has settled, so they never move under a fingerconst p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
+  UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
     ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
       b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{let nm='';try{nm=hintsOn()?prevFig(l):(FEATW[G.fd[find(T.s0+ +l)].ty]||'')}catch(e){const sg=TSEG[T.t][+l];nm=sg?FEATW[sg.ty]:''}if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
-      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
+      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;if(UI.tw&&!UI.sim)b.classList.add('wait');UI.figs.push(b)})}
+  clearTimeout(UI.figT);UI.figT=setTimeout(figShow,700);
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
 function hintOn(){return false}   // no advice on its own: the lightbulb (hlp.js) gives it on demand, coach bubbles only the first time

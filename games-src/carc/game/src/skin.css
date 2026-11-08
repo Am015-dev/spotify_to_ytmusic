@@ -220,10 +220,13 @@ html .tl{box-shadow:inset calc(1.2px/var(--sc)) calc(1.2px/var(--sc)) 0 rgba(255
 #htile .rot::before{content:'\21BB'}
 #left small{font-size:14px}
 #coach .ctxt span{-webkit-line-clamp:unset;display:block}
-html #hinfo .big,html.sk #hinfo .big{color:#2a1608!important;font-weight:800;text-shadow:0 1px 0 rgba(255,246,220,.7)}
+html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;text-shadow:0 1px 2px #1a0e05,0 0 6px #1a0e05}
 #musicm .mchip,#musicm .mrow2 h5,#musicm small{font-size:14px!important}
 .glow .pvb{font-size:max(14px,calc(14px/var(--sc,1)))}
 @media(min-width:1024px){#main{position:relative}#hand{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);margin:0;z-index:5}}
 /* result card: the title fits inside its ribbon, button words centred */
-#modal .card[aria-label=Result] h2{font-size:20px;padding-left:64px;padding-right:64px;white-space:nowrap}
+#modal .card[aria-label=Result] h2,html.sk #modal .card[aria-label=Result] h2{font-size:19px!important;letter-spacing:0!important;padding-left:70px!important;padding-right:70px!important;white-space:nowrap}
 #modal .card .btn{display:flex;align-items:center;justify-content:center;text-align:center}
+#status .tpic{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#f6ead2;border:2px solid var(--c);margin:-4px 2px -4px 0;flex:0 0 auto}
+[data-gxt-open] span{font-size:14px!important}
+.fglow.wait{visibility:hidden;pointer-events:none}
