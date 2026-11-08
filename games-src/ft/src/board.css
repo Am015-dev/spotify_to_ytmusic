@@ -301,3 +301,7 @@ html.ti .mbox.start canvas.t3d,.mbox canvas.t3d{display:block;width:88px;height:
 /* painted art everywhere now: numbers and names sit on solid chips */
 .deckback b{background:#fff6dc;color:#3b1c0e;border-radius:8px;padding:1px 5px}@media (min-width:1024px){.deckback b{font-size:16px}}
 .spot small.ord{background:#fff6dc!important;color:#3b1c0e!important}
+@media (max-width:1023px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:14px}}
+@media (min-width:1024px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:16px}}
+@keyframes plin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.plpop{animation:plin .3s ease both!important}
