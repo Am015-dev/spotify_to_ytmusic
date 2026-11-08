@@ -18,6 +18,6 @@ function artApply(root) {   /* DOM: any [data-art] element gets the file as its 
 }
 function artLoad(done) {
   ART.have.forEach(function (s) {
-    var im = new Image(); im.onload = function () { ART.img[s] = im; artApply(); if (window.UI && UI.redraw) UI.redraw(); }; im.src = 'media/' + s + '.webp';
+    var im = new Image(); im.onload = function () { ART.img[s] = im; artApply(); if (window.titleBg) titleBg(); if (window.UI && UI.redraw) UI.redraw(); }; im.src = 'media/' + s + '.webp';
   });
 }

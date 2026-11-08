@@ -127,6 +127,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Rampart and Vine https://am015-dev.github.io/spotify_to_ytmusic/rampart-and-vine/ (R3 PASS 04:43, live 04:52, feel-audit live all pass)
 - Lantern Dive https://am015-dev.github.io/spotify_to_ytmusic/lantern-dive/ (R6 PASS 04:27, live 04:59, feel-audit live all pass)
 - Vinegrave https://am015-dev.github.io/spotify_to_ytmusic/vinegrave/ (R3 PASS 05:16, live 05:20, feel-audit live all pass)
+- Kaiten Kitchen https://am015-dev.github.io/spotify_to_ytmusic/kaiten-kitchen/ (R3 PASS 05:56, live 06:16, feel-audit live all pass; Story stage 1 UI-tap test stuck = known, W463 fixing)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).

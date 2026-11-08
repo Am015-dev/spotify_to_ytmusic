@@ -127,3 +127,19 @@ html body .gxc-path .gxc-act small{font-size:16px!important}
 .gx-drawer .btn:not(.pri) b,.gx-drawer .btn:not(.pri) span,.gx-drawer .btn:not(.pri) small{color:#10262d!important;text-shadow:none!important}
 .gx-drawer .lbl{color:#3a2a12!important}
 #rulesbody p,#rulesbody li,#rulesbody h3{background:#f6ecd0}
+
+/* Learn to play: only the suggested start mark glows */
+.opip.dim{opacity:.4;animation:none!important;box-shadow:none!important}
+/* desktop (>= 1024 wide) uses the board-first layout: board left at full height, a play strip right with big tiles and 16px+ text */
+@media (min-width:1024px){
+  html.ph-l .gx-app{grid-template-columns:var(--bs) minmax(380px,1fr)}
+  html.ph-l .ps-main{flex-direction:column;align-items:stretch;gap:12px}
+  html.ph-l .ps-tiles{flex-direction:row;gap:14px;justify-content:flex-start}
+  html.ph-l .pt{width:120px;height:120px}
+  html.ph-l .ps-ctl{width:auto;flex-wrap:nowrap;gap:10px}
+  html.ph-l .ps-ctl .pb.pri{flex:0 0 auto;min-width:140px}
+  html.ph #ps,html.ph #ps .ps-line,html.ph .ps-turn,html.ph .ps-stat,html.ph .ps-goal,html.ph .ps-feed li,html.ph .ps-riv,html.ph .ps-intro{font-size:17px!important}
+  html.ph .ps-feed h5,html.ph .pb .lbl,html.ph .chip small,html.ph .chip b,html.ph .gx-bar .gx-ibtn>span,html.ph .otag,html.ph .ostop span,html.ph .ostart span,html.ph .omark span,html.ph .omark b,html.ph .pt .bd,html.ph .tiny,html.ph small{font-size:16px!important}
+  html.ph #ps{padding:14px 18px;max-width:560px}
+  html.ph .osk-card{font-size:17px}
+}

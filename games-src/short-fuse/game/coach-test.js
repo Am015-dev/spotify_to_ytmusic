@@ -17,16 +17,16 @@ const URL_=process.argv[2]||'http://localhost:8765/';const probs=[];const note=m
   const r=await U.playToEnd(p,{touch,maxMs:400000,log:probs,beforeTap:async()=>{for(let i=0;i<40&&await p.evaluate(()=>!!document.getElementById('coach'));i++)await sleep(200)}});clearInterval(watch);
   if(!r.over)note(tag+' coached game did not finish '+JSON.stringify(r).slice(0,150));
   await sleep(800);
-  const e=await p.evaluate(()=>{const d=document.getElementById('coachend');if(!d)return null;return {score:d.querySelector('.coscore').textContent,later:[...d.querySelectorAll('.colater li')].map(l=>l.textContent),seen:Object.keys(UI.coach.seen),btns:[...d.querySelectorAll('[data-ce]')].map(x=>x.dataset.ce),saved:!!localStorage.getItem(SAVE),done:JSON.parse(localStorage.getItem('gxt-short-fuse')||'{}').done}});
+  const e=await p.evaluate(()=>{const d=document.querySelector('#over .card2.end');if(!d||d.closest('[hidden]'))return null;const cut=G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0),tot=G.st.reduce((a,s)=>a+s.w.length,0);return {score:(d.querySelector('.endstat')||{}).textContent||'',want:cut+'/'+tot+' wires cut',miss:(G.stats.miss||0),later:[],seen:Object.keys(UI.coach.seen),btns:[...d.querySelectorAll('[data-ce]')].map(x=>x.dataset.ce),saved:!!localStorage.getItem(SAVE),done:JSON.parse(localStorage.getItem('gxt-short-fuse')||'{}').done}});
   if(!e){note(tag+' no end card');continue}
   if(multi)note(tag+' more than one bubble at once');if(blocking)note(tag+' a bubble blocked input (tappable bubbles must pass the tap through: data-pass=1)');
-  if(!/Guesses that hit/.test(e.score)||!/Fuse left/.test(e.score))note(tag+' scoring walk-through missing');
+  if(!e.score.includes(e.want)||!e.score.includes(e.miss+' miss'))note(tag+' end card numbers wrong: '+e.score+' (engine: '+e.want+', '+e.miss+' miss)');if(!e.btns.length)note(tag+' end card has no Learn buttons');
   const gx=await p.evaluate(()=>({d:GXCOACH.done,r:GXCOACH.running,x:GXCOACH.explained.length}));if(!gx.d||gx.r||gx.x!==e.seen.length)note(tag+' GXCOACH wrong '+JSON.stringify(gx));
   if(e.saved)note(tag+' staged game was saved');if(!e.done)note(tag+' tutorial not remembered as done');
   const rules=['goal','mine','crew','fuse','token','tokens2','point','hit','miss','solo','crew1','crew2','check','gear','probe','yellow','red','rmiss'];
   const doc=fs.readFileSync(path.join(__dirname,'..','TUTORIAL-COVERAGE.md'),'utf8');
   for(const id of rules){if(!doc.includes('`'+id+'`'))note(tag+' coverage doc lacks '+id);}
-  const unseen=rules.filter(id=>!e.seen.includes(id));if(e.later.length!==unseen.length)note(tag+' later card ('+e.later.length+') does not list exactly the unexplained rules ('+unseen.join(',')+')');
+  const unseen=rules.filter(id=>!e.seen.includes(id));   // review R1 (8 Nov): no "later" list on the end card; the real result card is used
   console.log(tag,'coached game',r.win?'WON':'LOST','taps',r.taps,'explained',e.seen.join(','),'| later:',unseen.join(',')||'none');
   await ctx.close()}
  await b.close();console.log(probs.length?'PROBLEMS '+probs.length+'\n  '+probs.join('\n  '):'PROBLEMS 0');process.exit(probs.length?1:0)})();
