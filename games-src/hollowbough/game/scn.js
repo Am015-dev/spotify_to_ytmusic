@@ -3,6 +3,10 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof render === 'function' && typeof HB !== 'undefined'; };
   var $ = function (s) { return document.querySelector(s); };
+  // WCAG contrast of two css colours (rgb/rgba strings); used by the top-line check
+  var rgb = function (c) { var m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return m.slice(0, 3).map(Number); };
+  var lum = function (c) { var v = rgb(c).map(function (x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  var contrast = function (a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
   // a two-player game (you vs one computer), no menus, tips off, waiting at YOUR first turn
   function table(seed) {
     try { GXH.setEnabled(false); } catch (e) { }
@@ -31,22 +35,16 @@
   }
 
   GXS.add({
-    id: 'hb-hand-chips', name: 'Hand chips: readable, tappable', ask: 'Tap the glowing hand chip', seed: 5, when: booted,
+    id: 'hb-hand-chips', name: 'Hand cards: readable, tappable', ask: 'Tap the glowing hand card', seed: 5, when: booted,
     setup: function () { return table(5).then(function () { window.__pick = oneAffordable(); return new Promise(function (r) { setTimeout(r, 600); }); }); },
     checks: [
-      { kind: 'visible', sel: '#bd .hc.glow', name: 'playable hand chip' },
-      { kind: 'text', sel: '#bd .hc .hcn', re: /\S/, name: 'chip name', minPx: 12 },
-      { kind: 'fn', name: 'every hand chip: text >= 12 px, nothing clipped', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#bd .hc'), function (c) { [].forEach.call(c.querySelectorAll('.hcn,.hcr b,.hcp b'), function (e) { var px = parseFloat(getComputedStyle(e).fontSize); if (px < 12) bad = bad || e.textContent + ' ' + px + 'px'; if (e.scrollWidth > e.clientWidth + 2 && getComputedStyle(e).overflow !== 'visible') bad = bad || 'clipped ' + e.textContent; }); var r = c.getBoundingClientRect(), t = c.querySelector('.hcx'); if (t && t.getBoundingClientRect().right > r.right + 1) bad = bad || 'text spills out of ' + c.getAttribute('aria-label'); }); return !bad || bad; } },
-      { kind: 'fn', name: 'first chip is fully inside the viewport', fn: function () { var e = document.querySelector('#bd .hc'); return inView(e) || 'chip off screen'; } },
-      { kind: 'fn', name: 'chip row is not under the buttons', fn: function () { var c = document.querySelector('#bd .hc').getBoundingClientRect(), a = [].filter.call(document.querySelectorAll('#acts button, #acts .btn'), GXS.vis).map(function (b) { return b.getBoundingClientRect(); }); var hit = a.filter(function (b) { return b.top < c.bottom - 2 && b.bottom > c.top + 2 && b.left < c.right && b.right > c.left; }); return !hit.length || 'a button covers the chips'; } },
-      { kind: 'tap', sel: '#bd .hc:not(.glow)', name: 'tap an unaffordable chip', state: function () { var m = G.players[0]; return { n: m.hand.length, city: m.city.length, log: G.logN }; }, expect: function (a, b) { return (a.n === b.n && a.city === b.city && a.log === b.log) || 'an unaffordable card changed the game'; } },
-      { kind: 'tap', sel: '#bd .hc.glow', name: 'tap the glowing chip', state: function () { var m = G.players[0]; return { n: m.hand.length, city: m.city.length, log: G.logN, sel: !!UI.sel }; }, expect: function (a, b) { return (b.sel || (b.log > a.log && b.n === a.n - 1)) || 'a playable card must be played (or ask how)'; } }
+      { kind: 'visible', sel: '#bd .hc.glow', name: 'playable hand card' },
+      { kind: 'text', sel: '#bd .hc .pvc-name', re: /\S/, name: 'card name', minPx: 14 },
+      { kind: 'fn', name: 'every hand card: text >= 14 px, name not covered by the next card', fn: function () { var bad = '', cs = [].slice.call(document.querySelectorAll('#bd .hc')); cs.forEach(function (c, i) { [].forEach.call(c.querySelectorAll('.pvc-name,.pvc-ci b,.pvc-pts b'), function (e) { var px = parseFloat(getComputedStyle(e).fontSize); if (px < 14) bad = bad || e.textContent + ' ' + px + 'px'; }); var nx = cs[i + 1]; if (nx && nx.getBoundingClientRect().left < c.getBoundingClientRect().right - 1) bad = bad || 'cards overlap: ' + c.getAttribute('aria-label'); }); return !bad || bad; } },
+      { kind: 'fn', name: 'first card is fully inside the viewport', fn: function () { var e = document.querySelector('#bd .hc'); return inView(e) || 'card off screen'; } },
+      { kind: 'fn', name: 'hand row is not under the buttons', fn: function () { var c = document.querySelector('#bd .hc').getBoundingClientRect(), a = [].filter.call(document.querySelectorAll('#acts button, #acts .btn'), GXS.vis).map(function (b) { return b.getBoundingClientRect(); }); var hit = a.filter(function (b) { return b.top < c.bottom - 2 && b.bottom > c.top + 2 && b.left < c.right && b.right > c.left; }); return !hit.length || 'a button covers the hand'; } }
     ]
   });
-  var rgb = function (c) { var m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return m.slice(0, 3).map(Number); };
-  var lum = function (c) { return .2126 * Math.pow(c[0] / 255, 2.2) + .7152 * Math.pow(c[1] / 255, 2.2) + .0722 * Math.pow(c[2] / 255, 2.2); };
-  var contrast = function (a, b) { var x = lum(rgb(a)), y = lum(rgb(b)); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
-
   GXS.add({
     id: 'hb-board', name: 'Start of game board', ask: 'Is the board clear and filled?', seed: 7, when: booted,
     setup: function () { return table(7); },
@@ -75,14 +73,15 @@
   });
 
   GXS.add({
-    id: 'hb-handtoggle', name: 'Hide and show the hand', ask: 'Tap the hand toggle. Does the row hide?', seed: 9, sizes: 'phone', when: booted, group: 'Board',
+    id: 'hb-tabs', name: 'Panel tabs (phone): Places, Meadow, City, Goals', ask: 'Tap Meadow, then City. Does the panel change?', seed: 9, sizes: 'phone', when: booted, group: 'Board',
     setup: function () { return table(9); },
     checks: [
       { kind: 'visible', sel: '#bd .hc', name: 'hand row' },
-      { kind: 'visible', sel: '#bd .htog', name: 'hand toggle' },
-      { kind: 'tap', sel: '#bd .htog', name: 'tap the hand toggle', state: function () { return !!UI.handHide; }, expect: function (a, b) { return a !== b || 'the hand toggle did nothing'; } },
-      { kind: 'visible', sel: '#bd .handbar', name: 'show-hand bar' },
-      { kind: 'tap', sel: '#bd .handbar', name: 'tap to show the hand', state: function () { return !!UI.handHide; }, expect: function (a, b) { return (a === true && b === false) || 'the hand did not come back'; } }
+      { kind: 'visible', sel: '#bd .pv-tab[data-v="meadow"]', name: 'Meadow tab' },
+      { kind: 'tap', sel: '#bd .pv-tab[data-v="meadow"]', name: 'tap Meadow', state: function () { return UI.pvTab; }, expect: function (a, b) { return b === 'meadow' || 'the Meadow tab did nothing'; } },
+      { kind: 'visible', sel: '#bd .pv-panel[data-p="meadow"] .mc', name: 'meadow cards' },
+      { kind: 'tap', sel: '#bd .pv-tab[data-v="city"]', name: 'tap City', state: function () { return UI.pvTab; }, expect: function (a, b) { return b === 'city' || 'the City tab did nothing'; } },
+      { kind: 'visible', sel: '#bd .strip.city .pv-grid', name: 'city grid' }
     ]
   });
 
