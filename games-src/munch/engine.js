@@ -21,7 +21,7 @@ function discard(id){if(id==null)return;const c=cd(id);(c.d==='door'?G.dd:G.td).
 // a card arriving in a hand; some cards act the moment you get them [R: Treasure Pile!, Heavenly Favor]
 function gain(p,id){if(id==null)return;const c=cd(id);
   if(c.sp==='hoard'){lg(p.i,`${p.nm} finds ${c.n} and draws 3 more treasures!`);discard(id);for(let i=0;i<3;i++)gain(p,drawOne('treasure'));return}
-  if(c.sp==='divine'){discard(id);lg(p.i,`${p.nm} reveals ${c.n}: every Cleric goes up a level!`);for(const o of alive())if(isCls(o,'cleric'))gainLv(o,1,c.n,true);return}
+  if(c.sp==='divine'){discard(id);lg(p.i,`${p.nm} reveals ${c.n}. Every Cleric goes up a level!`);for(const o of alive())if(isCls(o,'cleric'))gainLv(o,1,c.n,true);return}
   p.hand.push(id)}
 function drawTo(p,deck,n){for(let i=0;i<n;i++){const id=drawOne(deck);if(id==null)break;gain(p,id)}}
 // ---- player helpers ----
@@ -80,7 +80,7 @@ function newGame(mode,n){n=n||DEFN;const seed=DEFSEED!=null?DEFSEED:Math.floor(M
 const HERO_NAMES=['Pip','Morwen','Grub','Tansy','Bodkin','Wrenna'];
 // ---- levels and victory [R §12] ----
 function gainLv(p,n,why,canWin){if(n<=0||p.dead)return 0;const cap=canWin?R.WIN:R.WIN-1;const before=p.lvl;p.lvl=Math.max(before,Math.min(cap,p.lvl+n));const got=p.lvl-before;if(got>0){p.st.levels+=got;fx('lvl',p.i)}
-  if(got<n&&!canWin&&p.lvl===R.WIN-1)lg(p.i,`${p.nm} stays at level ${R.WIN-1}: the last level only comes from killing a monster.`);
+  if(got<n&&!canWin&&p.lvl===R.WIN-1)lg(p.i,`${p.nm} stays at level ${R.WIN-1}. The last level needs a monster kill.`);
   if(p.lvl>=R.WIN&&!G.winner){G.winner='P'+(p.i+1);G.winText=`${p.nm} reaches level ${R.WIN} by ${why}!`;lg(p.i,G.winText);fx('win',p.i)}return got}
 function loseLv(p,n){const b=p.lvl;p.lvl=Math.max(1,p.lvl-n);return b-p.lvl}
 // ---- choices: anything a player must decide mid-effect becomes G.q (humans answer through validMoves, the AI through aiPick) ----
@@ -152,7 +152,7 @@ function slugNext(){const s=G.slug;if(!s)return;const p=P(s.p);while(s.left>0&&(
 // Tax Collector [R card]
 function taxStart(p,src){const pool=p.eq.map(e=>e.id);if(!pool.length){lg(p.i,`${p.nm} has no items, so nobody pays tax.`);return}choose(p.i,'taxpay',pool,{k:'tax0',p:p.i},'Choose an item to discard for the tax.')}
 function taxOthers(v,val){for(const o of alive()){if(o.i===v)continue;const pool=o.eq.map(e=>e.id);const tot=pool.reduce((a,id)=>a+(cd(id).g||0),0);
-  if(tot<val){pool.forEach(id=>loseCard(o,id,'tax'));if(val>0){const l=loseLv(o,1);lg(o.i,`${o.nm} can't pay ${val} gold of tax: loses all items${l?' and a level':''}.`)}continue}
+  if(tot<val){pool.forEach(id=>loseCard(o,id,'tax'));if(val>0){const l=loseLv(o,1);lg(o.i,`${o.nm} can't pay ${val} gold of tax. Loses all items${l?' and a level':''}.`)}continue}
   let need=val;const by=pool.slice().sort((x,y)=>itemWorth(o,x)/((cd(x).g||1))-itemWorth(o,y)/((cd(y).g||1)));for(const id of by){if(need<=0)break;if(!cd(id).g)continue;need-=cd(id).g;loseCard(o,id,'tax')}}}
 const CONT={
   lose:(c,v)=>{if(v!=null)loseCard(P(c.p),v)},
@@ -212,9 +212,9 @@ function startCombat(who,id,how){G.cb=newCb(who,how);G.phase='combat';G.fought=t
   enterMonster(id,who,true)}
 // a monster joins the fight; "will not attack" and "before combat" effects [R §5.4]
 function enterMonster(id,by,first){const cb=G.cb;const c=cd(id);const f=P(cb.who);cb.mons.push({id,enh:[]});
-  if(c.sp==='amazon'&&fighters(cb).some(x=>x.sex==='f')){cb.mons.pop();lg(cb.who,`${c.n} won't fight a woman: she hands over 1 treasure and leaves.`);gain(f,drawOne('treasure'));discard(id);return checkEmpty()}
+  if(c.sp==='amazon'&&fighters(cb).some(x=>x.sex==='f')){cb.mons.pop();lg(cb.who,`${c.n} won't fight a woman. She hands over 1 treasure.`);gain(f,drawOne('treasure'));discard(id);return checkEmpty()}
   if(c.sp==='lawyer'&&isCls(f,'thief')){cb.mons.pop();discard(id);lg(cb.who,`${c.n} won't sue a fellow Thief and walk away.`);const tr=f.hand.filter(x=>cd(x).d==='tr');if(tr.length>=2&&f.human){G.q={who:f.i,kind:'lawyer'};return}if(tr.length>=2&&aiLawyerSwap(f))lawyerSwap(f);return checkEmpty()}
-  if(c.sp==='nohelp'&&cb.help>=0){lg(cb.help,`${P(cb.help).nm} has to leave: nobody can help against ${c.n}.`);cb.help=-1;cb.offer=0}
+  if(c.sp==='nohelp'&&cb.help>=0){lg(cb.help,`${P(cb.help).nm} has to leave. Nobody can help against ${c.n}.`);cb.help=-1;cb.offer=0}
   if(c.sp==='nohelp')cb.nohelp=true;
   if(c.sp==='tongue'&&first){const pool=f.eq.map(e=>e.id);if(pool.length){lg(cb.who,`${c.n} demands an item before the fight.`);choose(f.i,'lose',pool,{k:'tongue',p:f.i},'Discard one item before fighting the Slobber Fiend.')}}}
 function lawyerSwap(f){const tr=f.hand.filter(x=>cd(x).d==='tr').sort((a,b)=>cardValue(f,a)-cardValue(f,b)).slice(0,2);tr.forEach(x=>{f.hand.splice(f.hand.indexOf(x),1);discard(x)});drawTo(f,'treasure',2);lg(f.i,`${f.nm} swaps 2 treasures for 2 new ones.`)}
@@ -251,7 +251,7 @@ function nextRun(){const cb=G.cb;if(!cb)return;const r=cb.runs.find(x=>!x.done);
   // fleeing costs levels even when it works [card: Pharaoh, Grave Twins, Rattlebones]
   if(!r.pen){r.pen=true;if(c.sp==='escape2'&&p.lvl>3){const l=loseLv(p,2);if(l)lg(p.i,`${p.nm} loses ${l} levels just for fleeing ${c.n}.`)}if(c.sp==='escape1'){const l=loseLv(p,1);if(l)lg(p.i,`${p.nm} loses a level fleeing ${c.n}.`)}}
   if(c.sp==='noescape'){r.ok=false;lg(r.w,`Nobody gets away from ${c.n}!`);return finishRun(r)}
-  if(c.nop&&p.lvl<=c.nop&&!(c.sp==='nopNotElf'&&isRace(p,'elf'))){r.ok=true;lg(r.w,`${c.n} won't chase anyone of level ${c.nop} or lower: ${p.nm} walks away.`);return finishRun(r)}
+  if(c.nop&&p.lvl<=c.nop&&!(c.sp==='nopNotElf'&&isRace(p,'elf'))){r.ok=true;lg(r.w,`${c.n} won't chase level ${c.nop} or lower. ${p.nm} walks away.`);return finishRun(r)}
   if(r.auto){r.ok=true;lg(r.w,`${p.nm} gets away from ${c.n}.`);return finishRun(r)}
   if(c.sp==='fetch'&&!r.fetchAsked){r.fetchAsked=true;const pole=p.eq.find(e=>tagged(e.id,'pole'));if(pole){if(p.human){G.q={who:p.i,kind:'fetch',run:cb.runs.indexOf(r),card:pole.id};return}loseCard(p,pole.id,'thrown for the hound');r.ok=true;lg(p.i,`${c.n} chases the stick instead.`);return finishRun(r)}}
   roll(r)}
@@ -264,9 +264,9 @@ function rescueOpts(p,r){const c=mdef(runMon(r));const o=[];for(const id of p.ha
 // after a successful escape, a holder of Sticky Paste may force a reroll
 function finishRun(r){const cb=G.cb;
   if(r.ok&&!r.glued){const holders=alive().filter(o=>o.i!==r.w&&o.hand.some(id=>cd(id).sp==='glue'));for(const o of holders){if(o.human){G.q={who:o.i,kind:'glue',run:cb.runs.indexOf(r)};return}if(aiGlue(o,r)){useGlue(o,r);return}}}
-  r.done=true;if(!r.ok){const p=P(r.w),c=mdef(runMon(r));lg(p.i,`Bad Stuff from ${c.n}: ${c.badt}`);fx('bad',p.i);queue(p,c.bad||[],runMon(r).id);G.then='run';runOps();return}
+  r.done=true;if(!r.ok){const p=P(r.w),c=mdef(runMon(r));lg(p.i,`Bad Stuff from ${c.n}. ${c.badt}`);fx('bad',p.i);queue(p,c.bad||[],runMon(r).id);G.then='run';runOps();return}
   nextRun()}
-function useGlue(o,r){const id=o.hand.find(x=>cd(x).sp==='glue');o.hand.splice(o.hand.indexOf(id),1);discard(id);r.glued=true;r.auto=false;lg(o.i,`${o.nm} throws ${cd(id).n}: ${P(r.w).nm} is stuck and must roll again!`);roll(r)}
+function useGlue(o,r){const id=o.hand.find(x=>cd(x).sp==='glue');o.hand.splice(o.hand.indexOf(id),1);discard(id);r.glued=true;r.auto=false;lg(o.i,`${o.nm} throws ${cd(id).n}. ${P(r.w).nm} is stuck and must roll again!`);roll(r)}
 // ---- turn flow [R §4] ----
 function curPl(){return P(G.active)}
 function nextTurn(){const n=G.pl.length;let i=G.active;do{i=(i+1)%n}while(P(i).gone&&i!==G.active);G.active=i;G.turn++;const p=curPl();
@@ -281,7 +281,7 @@ function takeKicked(p,id,res){const kv=res?'reaches into the discards':'kicks op
   if(c.t==='monster'){startCombat(p.i,id,'kick');return}
   if(c.t==='curse'){lg(p.i,`${p.nm} ${kv}… a curse!`);G.phase='after';applyCurse(p,id,p.i,true);return}
   if(c.sp==='divine'){lg(p.i,`${p.nm} ${kv}…`);G.phase='after';gain(p,id);G.kicked=null;return}
-  lg(p.i,`${p.nm} ${res?'takes back':'kicks open the door and finds'} ${c.n}, which goes to hand.`);p.hand.push(id);G.phase='after'}
+  lg(p.i,`${p.nm} ${res?'takes back':'kicks the door and finds'} ${c.n}. It goes to hand.`);p.hand.push(id);G.phase='after'}
 function lootRoom(){const p=curPl();const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} loots the room and draws a face-down door card.`)}G.phase='post'}
 function endTurn(){const p=curPl();if(p.hand.length>handLimit(p)&&!p.dead){G.phase='charity';return}afterEnd()}
 function afterEnd(){if(G.winner)return;nextTurn()}
@@ -401,7 +401,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   switch(m.act){
   case 'ready':G.setupI++;if(G.setupI>=G.setupOrd.length){G.phase='main';lg(G.active,`— ${curPl().nm}'s turn (level ${curPl().lvl}) —`);openWindow()}break;
   case 'kick':kick();break;
-  case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards instead of kicking a new door.`);takeKicked(p,id,1);break}
+  case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards. No new door.`);takeKicked(p,id,1);break}
   case 'loot':lootRoom();break;
   case 'trouble':p.hand.splice(p.hand.indexOf(m.card),1);startCombat(s,m.card,'trouble');break;
   case 'end':endTurn();break;
@@ -412,7 +412,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'join':p.hand.splice(p.hand.indexOf(m.card),1);lg(s,`${p.nm} adds undead ${cname(m.card)} to the fight.`);enterMonster(m.card,s,false);reopen();break;
   case 'give':{p.hand.splice(p.hand.indexOf(m.card),1);P(m.tgt).hand.push(m.card);lg(s,`${p.nm} gives a card to ${P(m.tgt).nm} (charity).`);if(p.hand.length<=handLimit(p))afterEnd();break}
   case 'toss':{p.hand.splice(p.hand.indexOf(m.card),1);discard(m.card);lg(s,`${p.nm} discards ${cname(m.card)} (charity).`);if(p.hand.length<=handLimit(p))afterEnd();break}
-  case 'ask':{cb.asked.push(m.tgt);const allure=eqItems(p).some(x=>cd(x).sp==='allure');lg(s,`${p.nm} asks ${P(m.tgt).nm} for help${allure?' (the Charming Kneepads leave no choice)':`, offering ${m.opt} treasure${m.opt===1?'':'s'}`}.`);
+  case 'ask':{cb.asked.push(m.tgt);const allure=eqItems(p).some(x=>cd(x).sp==='allure');lg(s,`${p.nm} asks ${P(m.tgt).nm} for help${allure?' (Charming Kneepads: no choice)':`, offering ${m.opt} treasure${m.opt===1?'':'s'}`}.`);
     if(allure){cb.help=m.tgt;cb.offer=0;reopen();break}G.q={who:m.tgt,kind:'help',from:s,n:m.opt};break}
   case 'opt':answer(m.opt,s);break;
   case 'pick':{const q=G.q;G.q=null;resume(q.cont,q.opts[m.opt]);break}
@@ -428,10 +428,10 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'turn':spend(p,m.card);cb.used['t'+s]=(cb.used['t'+s]||0)+1;cb.turnB+=R.TURN_B;lg(s,`${p.nm} turns the undead (+${R.TURN_B}).`);after(s);break;
   case 'flight':spend(p,m.card);cb.used['f'+s]=(cb.used['f'+s]||0)+1;lg(s,`${p.nm} readies a flight spell (+1 to run away).`);after(s);break;
   case 'charm':{const n=p.hand.length;while(p.hand.length)discard(p.hand.pop());const mm=cb.mons.splice(m.tgt,1)[0];cb.used['c'+s]=1;cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});
-    lg(s,`${p.nm} discards ${n} card${n===1?'':'s'} and charms ${cname(mm.id)}: it wanders off and leaves its treasure.`);if(!checkEmpty())reopen();break}
+    lg(s,`${p.nm} discards ${n} card${n===1?'':'s'} and charms ${cname(mm.id)}. It wanders off and leaves its treasure.`);if(!checkEmpty())reopen();break}
   case 'backstab':spend(p,m.card);note(m.tgt,s,'stab');cb.used['s'+s+'_'+m.tgt]=1;cb.pb-=2;lg(s,`${p.nm} backstabs ${P(m.tgt).nm} (-2).`);after(s);break;
   case 'steal':{spend(p,p.hand.slice().sort((a,b)=>cardValue(p,a)-cardValue(p,b))[0]);const v=P(m.tgt);const r=d6()+persMod(p,'die');G.stole=true;G.lastRoll={v:r,mod:0,need:R.THEFT,who:s,ok:r>=R.THEFT,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'steal'};
-    if(r>=R.THEFT){const e=v.eq.find(e=>e.id===m.card);v.eq.splice(v.eq.indexOf(e),1);if(e.cheat!=null)discard(e.cheat);p.eq.push({id:m.card,on:false});lg(s,`${p.nm} rolls ${r} and steals ${cname(m.card)} from ${v.nm}!`);fixBig(p)}else{loseLv(p,1);lg(s,`${p.nm} rolls ${r}, gets caught stealing from ${v.nm} and is whacked down a level.`)}break}
+    if(r>=R.THEFT){const e=v.eq.find(e=>e.id===m.card);v.eq.splice(v.eq.indexOf(e),1);if(e.cheat!=null)discard(e.cheat);p.eq.push({id:m.card,on:false});lg(s,`${p.nm} rolls ${r} and steals ${cname(m.card)} from ${v.nm}!`);fixBig(p)}else{loseLv(p,1);lg(s,`${p.nm} rolls ${r} and gets caught stealing from ${v.nm}. Down a level.`)}break}
   }
   checkEnd()}
 function after(s){const cb=G.cb;if(cb&&s!==cb.who&&cb.stage==='others')reopen()}
@@ -466,13 +466,13 @@ function playCard(p,id,tgt,opt){const c=cd(id);const cb=G.cb;const s=p.i;
     gainLv(t,1,c.n,false);lg(s,`${p.nm} plays ${c.n}: ${t===p?'':t.nm+' '}go${t===p?'':'es'} up a level.`);if(cb)reopen();break}
   case 'enh':{const m=cb.mons[tgt];if(c.sp==='mate'){cb.mons.push({id,enh:[],like:m.like!=null?m.like:m.id,src:m.id,snap:m.enh.slice()});lg(s,`${p.nm} plays ${c.n}: ${cname(m.like!=null?m.like:m.id)} brings a date!`);fx('monster',id)}
     else{m.enh.push(id);if(c.b>0&&s!==cb.who&&s!==cb.help)note(cb.who,s,'boost');lg(s,`${p.nm} makes ${mdef(m).n} ${c.b>0?'tougher':'weaker'} with ${c.n} (${c.b>0?'+':''}${c.b}).`)}reopen();break}
-  case 'item':{const e={id,on:false};p.eq.push(e);if(!equipWhy(p,id)){e.on=true;lg(s,`${p.nm} puts on ${c.n}.`)}else lg(s,`${p.nm} puts ${c.n} into play, carried (${equipWhy(p,id)}).`);fixBig(p);break}
+  case 'item':{const e={id,on:false};p.eq.push(e);if(!equipWhy(p,id)){e.on=true;lg(s,`${p.nm} puts on ${c.n}.`)}else lg(s,`${p.nm} carries ${c.n}. Not worn: ${equipWhy(p,id)}.`);fixBig(p);break}
   case 'oneshot':playOneShot(p,id,c,tgt);break;
   case 'special':
     switch(c.sp){
     case 'half':p.half=id;lg(s,`${p.nm} plays ${c.n}: two races allowed.`);revalidate(p);break;
     case 'super':p.sup=id;lg(s,`${p.nm} plays ${c.n}: two classes allowed.`);revalidate(p);break;
-    case 'wander':{discard(id);p.hand.splice(p.hand.indexOf(tgt),1);lg(s,`${p.nm} sends in ${cname(tgt)} (level ${cd(tgt).lvl}) as an uninvited guest!`);fx('monster',tgt);enterMonster(tgt,s,false);reopen();break}
+    case 'wander':{discard(id);p.hand.splice(p.hand.indexOf(tgt),1);lg(s,`${p.nm} sends in ${cname(tgt)}, level ${cd(tgt).lvl}. An uninvited guest!`);fx('monster',tgt);enterMonster(tgt,s,false);reopen();break}
     case 'cheat':{const e=p.eq.find(e=>e.id===tgt);e.cheat=id;e.on=true;lg(s,`${p.nm} finds a loophole: ${cname(tgt)} is worn against the rules.`);break}
     case 'illusion':{discard(id);const mm=cb.mons[tgt];discard(mm.id);mm.enh.forEach(discard);p.hand.splice(p.hand.indexOf(opt),1);cb.mons.splice(tgt,1);lg(s,`${p.nm}: smoke and mirrors! ${cname(mm.id)} becomes ${cname(opt)}.`);enterMonster(opt,s,false);reopen();break}
     case 'lunch':{discard(id);lg(s,`${p.nm} plays ${c.n}: the monsters leave. ${P(cb.who).nm} draws 2 treasures.`);const f=P(cb.who);for(const m of cb.mons){discard(m.id);m.enh.forEach(discard)}cb.mons=[];drawTo(f,'treasure',2);endCombat();break}
@@ -490,7 +490,7 @@ function playOneShot(p,id,c,tgt){const cb=G.cb;const s=p.i;
   case 'dbl':cb.dbl++;cb.os.push({id,side:'p'});lg(s,`${p.nm} uses ${c.n}: their strength is doubled.`);after(s);return;
   case 'wall':cb.os.push({id,side:'p'});cb.wall=true;lg(s,`${p.nm} throws up ${c.n}!`);startRun();return;
   case 'elfwater':cb.water++;cb.os.push({id,side:'p'});lg(s,`${p.nm} pours ${c.n}: +2 for each Elf.`);after(s);return;
-  case 'poly':{discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});lg(s,`${p.nm} throws ${c.n}: ${mdef(mm).n} becomes a parrot and flies off, leaving its treasure.`);if(!checkEmpty())reopen();return}
+  case 'poly':{discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});lg(s,`${p.nm} throws ${c.n}. ${mdef(mm).n} becomes a parrot and flies off. It leaves its treasure.`);if(!checkEmpty())reopen();return}
   case 'lamp':{discard(id);const only=cb.mons.length===1&&!cb.killed.length;const mm=cb.mons.splice(tgt,1)[0];if(only)cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:false});else{discard(mm.id);mm.enh.forEach(discard)}lg(s,`${p.nm} rubs ${c.n}: ${mdef(mm).n} vanishes${only?', leaving its treasure':''}!`);if(!checkEmpty())reopen();return}
   case 'transfer':{discard(id);const t=P(tgt);cb.thief=t.i===s?s:-1;lg(s,`${p.nm} uses ${c.n}: ${t.nm} now has to fight!`);cb.who=t.i;cb.help=-1;cb.offer=0;cb.asked=[];cb.transfer=true;cb.used={};cb.bers=0;cb.turnB=0;cb.dbl=0;reopen();return}
   case 'garlic':if(typeof tgt==='number'){discard(id);const mm=cb.mons.splice(tgt,1)[0];cb.killed.push({id:mm.id,def:mdef(mm),tr:monTr(mm,cb),enh:mm.enh,kill:true});lg(s,`${p.nm} gargles garlic: ${mdef(mm).n} keels over!`);if(!checkEmpty())reopen();return}break;
@@ -498,11 +498,11 @@ function playOneShot(p,id,c,tgt){const cb=G.cb;const s=p.i;
   const b=c.b||0;if(tgt==='p')cb.pb+=b;else{cb.mb+=b;if(b>0&&s!==cb.who&&s!==cb.help)note(cb.who,s,'boost')}cb.os.push({id,side:tgt});if(tgt==='p'&&tagged(id,'fire'))cb.fire=true;
   lg(s,`${p.nm} throws ${c.n}: +${b} for ${tgt==='p'?'the heroes':'the monsters'}.`);fx('shot',s);
   if(s!==cb.who||tgt==='m')reopen()}
-function revalidate(p){for(const e of p.eq)if(e.on&&e.cheat==null&&!reqOK(p,cd(e.id))){e.on=false;lg(p.i,`${p.nm} can no longer use ${cd(e.id).n} and carries it instead.`)}fixBig(p)}
+function revalidate(p){for(const e of p.eq)if(e.on&&e.cheat==null&&!reqOK(p,cd(e.id))){e.on=false;lg(p.i,`${p.nm} can no longer use ${cd(e.id).n}. It is carried instead.`)}fixBig(p)}
 function doSell(p,ids){let g=sellValue(p,ids);const half=isRace(p,'halfling')&&!p.halfT;if(half)p.halfT=true;
   ids.forEach(id=>{const e=p.eq.findIndex(x=>x.id===id);if(e>=0){const x=p.eq.splice(e,1)[0];if(x.cheat!=null)discard(x.cheat)}else p.hand.splice(p.hand.indexOf(id),1);discard(id)});
   const lv=Math.floor(g/R.SELL);const got=gainLv(p,lv,'selling',false);p.soldT=true;fixBig(p);
-  lg(p.i,`${p.nm} sells ${ids.map(cname).join(', ')} for ${g} gold${half?' (Halfling: one item at double price)':''}: +${got} level${got===1?'':'s'}.`)}
+  lg(p.i,`${p.nm} sells ${ids.length===1?cname(ids[0]):ids.length+' items'} for ${g} gold${half?' (Halfling double price)':''}. +${got} level${got===1?'':'s'}.`)}
 // ---- invariants and test hooks ----
 function checkInvariants(){if(!G)return[];const v=[];const seen={};const note=(id,z)=>{if(seen[id]!==undefined)v.push(`card ${id} in ${z} and ${seen[id]}`);seen[id]=z};
   G.door.forEach(i=>note(i,'door'));G.tr.forEach(i=>note(i,'tr'));G.dd.forEach(i=>note(i,'dd'));G.td.forEach(i=>note(i,'td'));
