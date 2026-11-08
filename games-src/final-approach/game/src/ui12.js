@@ -3,11 +3,24 @@
 // (two gears, one flap, the 2 brake), you hold one reroll token, the dice are made up (TUT_SCRIPT) and the co-pilot is scripted (TUT_AI), so every control has a die to teach with.
 // Each step spotlights one thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act). Nothing of it is saved.
 const TUT_GAME = 'final-approach';
-// dice per round [pilot x4, co-pilot x4]; the pilot's first die in the landing round is a 2 that the reroll turns into a 5 (TUT_SETUP.pre.rrScript)
-const TUT_SCRIPT = [[[3, 5, 2, 1], [5, 2, 6, 4]], [[2, 3, 5, 1], [2, 5, 3, 1]]];
-const TUT_SETUP = { scenario: 'tt', seed: 23, row0: 5, pre: { lg: [1, 1, 0], fl: [1, 0, 0, 0], br: [1, 0, 0], rr: 1, script: TUT_SCRIPT, rrScript: [[5, 0, 0, 0], [0, 0, 0, 0]] } };
-// the co-pilot's placements, in order: [slot, index of the die]
-const TUT_AI = [[['ax1', 0], ['fl1', 1], ['en1', 2], ['fl2', 3]], [['en1', 0], ['ax1', 2], ['fl3', 1], ['co0', 3]]];
+// The coached first flight (owner, 8 Nov 2026: "the tutorial is not teaching the game"): the last four rounds at Port Alder (3000 ft to the runway) on an easy 4-space
+// strip with one plane on space 3. Each round brings one system: 1 axis and engines (spare dice to Coffee), 2 radio and landing gear (plus the reroll token),
+// 3 flaps and brakes, 4 the landing. The dice are made up (TUT_SCRIPT, checked by tut-sim.js: following the coach lands the plane); every legal move stays allowed.
+// dice per round [pilot x4, co-pilot x4]
+const TUT_SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 3, 6, 1], [2, 4, 5, 1]]];
+const TUT_SETUP = { scenario: 'tt', seed: 23, row0: 3, pre: { script: TUT_SCRIPT } };
+// the systems the coach (and the computer co-pilot) use each round; the player may still use anything legal
+const TUT_ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
+// the coach's advice: the computer's own judgement (AI.cost) over the moves of this round's systems; fair: only what this seat may know
+function tutAdvise(g, seat, die) {
+  let al = TUT_ALLOW[Math.min(g.round, 3)], best = null, bc = 1e9; const V = FA.stripView(g, seat); V.nolog = true;
+  if (g.round === 0 && (!g.slots['ax' + seat] || !g.slots['en' + seat])) al = ['axis', 'engines'];   // round 1 teaches the two must-fill controls first
+  if (g.phase === 'place' && !g.pend) for (const m of FA.validMoves(V, seat)) {
+    if (m.t !== 'place' || m.d === 'p' || (al && !al.includes(FA.SLOT[m.to].grp)) || (die != null && m.d !== die)) continue;
+    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) + Math.abs(m.c || 0) * 0.02; if (c < bc) { bc = c; best = m; }
+  }
+  try { return best || FA.AI.move(g, seat, 'normal', { noMC: true }); } catch (e) { return null; }
+}
 const tutGame = () => !!(UI.cfg && UI.cfg.tutorial && UI.started && G && G.sid === 'tt');
 const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && tutGame();
 const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart });
@@ -17,7 +30,8 @@ function tutAI(g, seat) {
   if (!tutGame() || seat !== 1 || !g || g.result) return null;
   if (g.phase === 'brief') { if (!g.ready[1]) { if (g.round === 0 && !g.say[1].length) return { t: 'say', c: 'adv2' }; return { t: 'ready' }; } return null; }
   if (g.pend && g.pend.h === 'rr') return g.pend.d.m[1] ? null : { t: 'rrpick', m: [false, false, false, false] };
-  return null;   // placements are the real computer's: the first game is free play
+  if (g.phase === 'place' && !g.pend && g.turn === 1) return tutAdvise(g, 1);   // the co-pilot sticks to this round's systems too
+  return null;
 }
 (function () { const o = FA.AI.move; FA.AI.move = function (g, seat, level, opt) { const m = tutAI(g, seat); return m || o.apply(this, arguments); }; })();
 // ---------------------------------------------------------------- where each step points
@@ -45,27 +59,30 @@ function tutStart(o) {
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
-  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: [], done: false }; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
+  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: ['intro'], done: false }; UI.fc.seen.intro = true; UI.cpt = null; clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
   if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
-  clearInterval(UI.fcT); UI.fc = null; document.querySelectorAll('.fa-coach,.fa-fin').forEach(e => e.remove());
+  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-coach,.fa-fin').forEach(e => e.remove());
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
   $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
+  // Addendum 7: Play is a clean game. A new player is asked once: learn in 4 rounds (the coached flight) or just play (the chapter map)
+  if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer() || UI._storyAsked) return false;
+  UI._storyAsked = true; tutOffer(() => GXC.open()); return true;
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
   tutStart({ prologue: true }); return true;
 }
 // a first-time Play: offer the tutorial once ("New here? Learn in 5 minutes"), or just play
-function tutOffer() {
+function tutOffer(onPlay) {
   try { localStorage.setItem('fa_offer', '1'); } catch (e) { }
   const d = document.createElement('div'); d.className = 'gxt-end'; d.setAttribute('data-help', ''); d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', 'New here?');
-  d.innerHTML = '<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn every control in about 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play">Just play</button></div></div>';
-  d.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-offer]'); if (!b) return; d.remove(); if (b.dataset.offer === 'learn') tutStart(); else playNow(); });
+  d.innerHTML = '<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A short guided landing: four rounds, one new control each round.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="offeryes">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play" data-a="offerno">Just play</button></div></div>';
+  d.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-offer]'); if (!b) return; d.remove(); if (b.dataset.offer === 'learn') tutStart({ prologue: !!onPlay }); else if (onPlay) onPlay(); else playNow(); });
   document.body.appendChild(d);
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
@@ -108,27 +125,54 @@ function tsReact(text, who) {
 // A real game from turn 1, every legal move allowed (the dice are stacked, the computer is the real one). Voss speaks just-in-time, one bubble at a time, never blocking input;
 // text lives in campaign.json tutorial.coach. Each rule is said the first time it matters; rules that never came up go to "Things you'll meet later" at the end.
 const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
-function fcSay(id) {
-  const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push({ id, text: T.coach[id] }); fcPump();
+// one bubble only: [a rule that just became relevant] + [what to do now and why]. It never blocks input; x hides it until the situation changes.
+function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push(tsFill(T.coach[id])); }
+function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
+function fcShow(key, txt, who, ms) {
+  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); try { c.el.remove(); } catch (e) { } }
+  if (F.shut === key || !txt) return;
+  const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
+  const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
+  F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
 }
-function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } }, 250); setTimeout(fcPump, 450); }
-function fcPump() {
-  const F = UI.fc; if (!F || F.cur || !F.queue.length || F.ended) return; const q = F.queue.shift(), txt = tsFill(q.text);
-  const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); fcHide(); });
-  const el = h('div.fa-coach', { role: 'status', 'data-coach': q.id }, tsPortrait(q.fb ? 'ravi' : 'chief'), h('span.t', txt), x); document.body.appendChild(el);
-  const words = txt.split(/\s+/).length; F.cur = { el, id: q.id, t: setTimeout(fcHide, Math.max(5500, words * 380)) };
+// while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
+function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
+const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
+function fcPump() { }
+function fcFeedback() { }
+// "Put your 4 on Engines: ..." from the coach's advice
+function fcLine(m) {
+  if (!m) return '';
+  if (m.t === 'toss') return 'Nothing takes your ' + dv(m.d) + ': throw it away (it still counts as your turn).';
+  if (m.t !== 'place') return capW(hlpWhy(m, 0), 18);
+  const v = dv(m.d), c = m.c || 0, why = hlpWhy(m, 0), where = slotName(m.to);
+  return (c ? 'Spend ' + Math.abs(c) + ' coffee to turn your ' + v + ' into a ' + (v + c) + ', then put it on ' + where : 'Put your ' + v + ' on ' + where) + (why ? ' (green ring). ' + why : ' (green ring).');
 }
-function fcFeedback(text) { const F = UI.fc; if (!F || F.cur || F.queue.length || F.ended || !text) return; F.queue.push({ id: 'fb', text: 'Your move: ' + text, fb: 1 }); fcPump(); }
 function fcPoll() {
   const F = UI.fc; if (!F) return; if (!G || !UI.started || !tutGame()) return;
-  if (G.result) { if (!F.ended) { F.ended = true; fcHide(); setTimeout(fcEnd, 1400); } return; }
-  const sl = G.slots, has = re => Object.keys(sl).some(k => re.test(k)), mine = G.phase === 'place' && !G.pend && G.turn === 0;
-  if (G.pend && G.pend.h === 'rr') fcSay('reroll');
+  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; fcHide(); setTimeout(fcEnd, 1400); } return; }
+  const T = TS(), sl = G.slots, has = re => Object.keys(sl).some(k => re.test(k)), mine = G.phase === 'place' && !G.pend && G.turn === 0;
+  // rules, the first time they matter (each said once)
   if (G.phase === 'place' && G.round === 0) { fcSay('seats'); fcSay('goal'); fcSay('turns'); }
-  if (has(/^ax/)) fcSay('axis'); if (has(/^ra/) || (mine && F.seen.turns && planeAt() > 0 && G.planes.some(n => n > 0))) fcSay('radio');
-  if (has(/^en/)) fcSay('engines'); if (has(/^lg/)) fcSay('gear'); if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
-  if (has(/^co/) || G.coffee > 0 && mine) fcSay('coffee'); if (G.rrHand > 0 && mine && Object.keys(sl).length >= 2) fcSay('reroll');
-  if (G.round >= 1) fcSay('rounds'); if (FA.isFinal(G) && G.phase === 'place') { fcSay('final'); fcSay('brakes'); }
+  if (has(/^ax/)) fcSay('axis'); if (has(/^en/)) fcSay('engines'); if (has(/^co/) || G.coffee > 0 && mine) fcSay('coffee');
+  if (G.round >= 1) { fcSay('rounds'); fcSay('radio'); fcSay('gear'); }
+  if (has(/^ra/)) fcSay('radio'); if (has(/^lg/)) fcSay('gear'); if (G.pend && G.pend.h === 'rr' || G.rrHand > 0 && mine) fcSay('reroll');
+  if (G.round >= 2) { fcSay('flaps'); fcSay('brakes'); } if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
+  if (FA.isFinal(G) && G.phase === 'place') fcSay('final');
+  const R = T.rounds || [], n = Object.keys(sl).length;
+  if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, (G.round === 0 ? tsFill(T.coach.intro) + ' ' : '') + tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
+  if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, (F.queue.shift() || '') + ' Tap the dice you want to roll again, then confirm, or keep them all.', 'ravi'); return; }
+  if (mine) {
+    const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = 'p' + G.round + ':' + n + ':' + (sel == null ? '' : sel);
+    if (F.cur && F.cur.key.charAt(0) === 'w' && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
+    if (!F.cur || F.cur.key !== key) {
+      let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
+      UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
+    }
+    return;
+  }
+  UI.cpt = null;
+  if (F.queue.length && (!F.cur || F.cur.key.charAt(0) !== 'w' || Date.now() - F.cur.at > F.cur.need)) fcShow('w' + G.round + n, F.queue.shift(), 'ravi', 9000);
 }
 // the end: the landing check rule by rule with the real numbers, then what did not come up
 function fcEnd() {
