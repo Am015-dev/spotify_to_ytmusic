@@ -30,7 +30,7 @@ KK.STORY = {
   },
   // per step: s = the story reason + the action (2 lines max), r = Suzu's reaction after the player acts, t = bubble title
   tut: {
-    goal: { t: 'Welcome, Mina', s: 'I\'m Auntie Suzu. Today you cook up the most points at lunch.' },
+    goal: { t: 'Welcome, Mina', s: 'Have the most points after the meal. That wins.' },
     chef: { t: 'Odile', s: 'Odile bet a custard against you. She plays by the same rules.' },
     belt: { t: 'Your plates', s: 'You get a hand of plates. Take one, pass the rest to Odile.' },
     pick1: { t: 'Take one dish', s: 'Start with a Crispy Prawn. Prawns love company.', r: 'Nice. Both covers lift, and the hands swap!' },

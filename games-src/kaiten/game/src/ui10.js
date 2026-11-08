@@ -63,9 +63,39 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'kaiten-kitchen', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#belt .hc[data-up="1"],#tbl .grp.usable,#rs .btn,#acts .btn,#labacts .lbtn' });
+  GXH.init({ game: 'kaiten-kitchen', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#belt .hc[data-up="1"],#tbl .grp.usable,#rs .btn,#acts .btn,#labacts .lbtn' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() || 'pick' });
 }
 function hlpAfter() { hlpInit(); if (typeof GXH !== 'undefined') GXH.phase(hlpPhase()); }
 hlpInit(); setInterval(() => { try { hlpAfter(); } catch (e) { } }, 450);
 { const _ng = newGame; newGame = function (mode) { if (mode === 'guided' && typeof GXH !== 'undefined') { hlpInit(); GXH.reset(); GXH.setEnabled(true); } return _ng.apply(this, arguments); }; }
+// ---- game feel (8 Nov): the Goal card, readable messages, a vibrate tick ----
+// Nothing here changes the rules. The Goal card says how you win in one sentence and three short bullets. It opens first in
+// Learn to play, at the start of a Quick game, and whenever the round label in the top bar is tapped. It stays until tapped.
+const GOAL = {
+  win: 'Have the most points after three rounds.',
+  how: [
+    ['tempura', 'Take one dish, then pass your hand on.'],
+    ['sashimi', 'Dishes score in sets: two prawns make 5.'],
+    ['pudding', 'Custard counts at the end: most cups wins 6.']
+  ]
+};
+function goalOpen() { return !!document.querySelector('#kkgoal.on'); }
+function goalCard(after) {
+  let o = $('#kkgoal'); if (o) o.remove();
+  const close = () => { o.classList.remove('on'); setTimeout(() => o.remove(), 200); snd('click', { vol: .4 }); if (after) after(); };
+  const list = h('ul.kgl', ...GOAL.how.map(([k, t]) => h('li', h('span.kgp', cardNode(k, 44)), h('span', t))));
+  const go = h('button.btn.kgo', { type: 'button', 'data-a': 'goalok' }, 'Got it');
+  const card = h('div.kgc', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'kkgoalt' },
+    h('div.kgk', 'How you win'), h('h2#kkgoalt', GOAL.win), list, go);
+  o = h('div#kkgoal', card);
+  o.addEventListener('click', e => { if (e.target === o || e.target.closest('.kgo')) close(); });
+  o.addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); close(); } });
+  document.body.appendChild(o); void o.offsetWidth; o.classList.add('on'); setTimeout(() => { try { go.focus(); } catch (e) { } }, 60);
+}
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#barstat') && G) goalCard(); });
+{ const b = $('#barstat'); if (b) { b.setAttribute('role', 'button'); b.setAttribute('tabindex', '0'); b.setAttribute('aria-label', 'Show how you win'); b.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && G) { e.preventDefault(); goalCard(); } }); } }
+// tap a message to close it early
+document.addEventListener('click', e => { const el = $('#toast'); if (el && el.classList.contains('on') && e.target.closest && e.target.closest('#toast')) { clearTimeout(toast.t); el.classList.remove('on'); } });
+// A short vibrate tick when a dish snaps onto your tray, and a softer one when you lift it.
+const buzz = ms => { try { if (navigator.vibrate && !pxRM()) navigator.vibrate(ms); } catch (e) { } };

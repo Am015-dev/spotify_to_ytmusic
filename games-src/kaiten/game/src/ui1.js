@@ -145,7 +145,8 @@ function whyPick(ids) {
   return '';
 }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
-function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
+// a message stays 4 s plus 1 s per 10 words, or until tapped; a new one replaces the old (one at a time)
+function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 4000 + Math.ceil(String(t).trim().split(/\s+/).length / 10) * 1000); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }

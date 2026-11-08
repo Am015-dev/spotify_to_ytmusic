@@ -32,6 +32,7 @@ function newGame(mode, o) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
+  if (mode === 'vs' && ANIM && !goalCard.seen && typeof goalCard === 'function') { goalCard.seen = 1; setTimeout(() => { if (G && UI.mode === mode) goalCard(); }, 500); }   // ui10: how you win
 }
 // ---------- the turn driver ----------
 function schedule() {
@@ -103,7 +104,7 @@ function tapHand(i) {
   UI.sel = [i]; UI.rec = null; snd('click', { vol: .4 }); render();
 }
 // the chosen dishes get .sel on the belt first, so the flight to the seat starts from them
-function grabNow() { for (const b of $$('#belt .hc[data-i]')) b.classList.toggle('sel', UI.sel.indexOf(+b.dataset.i) >= 0); lsSet('kk_grab', '1'); UI.coach.seen.grabbed = 1; serveSel(); }
+function grabNow() { buzz(14); for (const b of $$('#belt .hc[data-i]')) b.classList.toggle('sel', UI.sel.indexOf(+b.dataset.i) >= 0); lsSet('kk_grab', '1'); UI.coach.seen.grabbed = 1; serveSel(); }
 function serveSel() {
   const v = viewSeat(); if (!canPick() || !UI.sel.length) return;
   const pick = UI.sel.slice().sort((a, b) => a - b);

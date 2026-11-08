@@ -144,3 +144,19 @@ html:has(#rs.kkfin .kkcoachend) #rs{align-items:center!important}
 /* the audit's own "Test:" pill sits over the bottom-left 18px of a phone: keep text rows out of that band at 390x763 */
 html.ph .rules>h3:nth-of-type(3){margin-top:40px}
 html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}
+/* ---- game feel (8 Nov): Goal card, readable toast, big score numbers ---- */
+#kkgoal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(30,16,10,.62);opacity:0;transition:opacity .2s}
+#kkgoal.on{opacity:1}
+#kkgoal .kgc{width:min(380px,100%);background:#fff3d6;color:#3a1f17;border:3px solid #4a2a22;border-radius:18px;padding:18px 18px 16px;box-shadow:0 14px 40px rgba(0,0,0,.5);transform:translateY(10px) scale(.97);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+#kkgoal.on .kgc{transform:none}
+#kkgoal .kgk{font-size:14px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#8c3b27}
+#kkgoal h2{margin:4px 0 12px;font-size:24px;line-height:1.15;font-weight:900;color:#3a1f17}
+#kkgoal .kgl{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+#kkgoal .kgl li{display:flex;align-items:center;gap:12px;font-size:16px;line-height:1.3;font-weight:700}
+#kkgoal .kgp{flex:none;width:44px;height:62px;display:block}
+#kkgoal .kgo{width:100%;min-height:52px;font-size:18px;font-weight:900}
+#barstat[role=button]{cursor:pointer;text-decoration:underline dotted rgba(255,240,210,.55);text-underline-offset:3px}
+#toast{pointer-events:none;font-size:16px;padding:10px 16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));line-height:1.3;text-align:center}
+#toast.on{pointer-events:auto;cursor:pointer}
+.sh .av .sc,html.ph .sh .av .sc{font-size:20px!important;min-width:34px;height:34px;line-height:28px;border-radius:17px;top:-10px;right:-12px}
+html.sk-kki .sh .av .sc{min-width:38px;height:38px;line-height:38px;top:-12px;right:-14px}
