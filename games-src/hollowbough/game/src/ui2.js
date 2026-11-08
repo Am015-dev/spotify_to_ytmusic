@@ -249,6 +249,7 @@ function renderBoard() {
     e.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.w}px;height:${t.h}px`;
     e.appendChild(tileFace(t, big));
     UI.tiles[t.kind + ':' + t.i] = { x: t.x, y: t.y, w: t.w, h: t.h };
+    if (kind === 'haven' || (kind === 'forest' && PV_SPECIAL[D.forest[G.forest[i]].key])) e.classList.add('pv-spec');   // board plate: the short name only; long-press tells the rest
     const legal = tg && okw.has(tg);
     if (legal) { e.classList.add('glow'); regTg(tg, e); }
     else if (tg && qLoc.has(tg)) { e.classList.add('glow'); regTg('q:' + qLoc.get(tg), e); qShown.add(qLoc.get(tg)); }
@@ -467,6 +468,7 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
+  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : 'Build, Prepare or Pass';   // phone: one short line
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
   return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build, Prepare or Pass.' : 'play a card, Prepare or Pass.'));
 }
@@ -645,6 +647,9 @@ function pvRender() {
   for (let i = 0; i < D.basic.length; i++) cell(tile('basic', i));
   for (let i = 0; i < G.forest.length; i++) cell(tile('forest', i));
   cell(tile('haven', 0));
+  // phone: the places are round clearings on the painted tree-stump table (owner art), not a grid of boxes; staggered so it reads as a board
+  if (tall) { spots.classList.add('pv-board'); const n = spots.children.length, rows = Math.ceil(n / 3);
+    Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / 3), col = k % 3; c.style.left = [19, 50, 81][col] + '%'; c.style.top = (13 + r * 74 / Math.max(1, rows - 1) + (col === 1 ? 2 : -1)) + '%'; }); }
   // ---- goals (events): their own panel, so Places fits one screen
   const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
   if (tall) gl.appendChild(h('div.pv-sub', 'Goals score points. Have the cards one needs? Send a worker to claim it.'));

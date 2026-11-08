@@ -253,3 +253,30 @@ html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!impo
 #bd.pv.wide .pvc-aff{white-space:normal!important;overflow:hidden}
 /* five piles (tokens too) on a phone: the worker count keeps its number and word, the meeple pictures step aside */
 #bd.pv.tall .resrow.r5 .pv-meeple{display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:0}
+/* W482 round 2: phone Places = the painted tree-stump table (owner art media/table-woodland-phone.webp) with round clearings on it */
+#bd.pv.tall .pv-spots.pv-board{display:block;position:relative;height:100%;padding:0;gap:0;border-radius:18px;overflow:hidden;background:#6b5233 url(media/table-woodland-phone.webp) center/cover no-repeat;box-shadow:inset 0 0 0 2px #3b2a1c}
+#bd.pv.tall .pv-board .pv-cell{position:absolute;width:32%;transform:translate(-50%,-50%);display:block}
+#bd.pv.tall .pv-board .tile,#bd.pv.tall .pv-board .tile.pv-painted,#bd.pv.tall .pv-board .tile.t-forest.pv-painted{display:flex;flex-direction:column;align-items:center;width:100%;min-height:0;height:auto;padding:0;background:none!important;border:0!important;box-shadow:none!important;overflow:visible}
+#bd.pv.tall .pv-board .tile::before{content:'';display:block;width:58px;height:58px;border-radius:50%;background:var(--pa,none) center/cover no-repeat,radial-gradient(circle,#e9dcb4,#b99a62);border:3px solid #5b4026;box-shadow:0 3px 6px rgba(0,0,0,.45);flex:none}
+#bd.pv.tall .pv-board .tile.t-forest::before{border-color:#3f6a2a}
+#bd.pv.tall .pv-board .tile.glow::before{box-shadow:0 0 0 4px #ffd24a,0 0 16px 6px rgba(255,214,90,.85)}
+#bd.pv.tall .pv-board .tile.glow{animation:none}
+#bd.pv.tall .pv-board .tile.taken::before,#bd.pv.tall .pv-board .tile.no::before{filter:grayscale(.6) brightness(.82)}
+#bd.pv.tall .pv-board .pv-tin{display:block;margin-top:-6px;padding:2px 6px;background:#f8edd2;border:2px solid #5b4026;border-radius:9px;text-align:center;box-shadow:0 2px 3px rgba(0,0,0,.35);max-width:100%}
+#bd.pv.tall .pv-board .pv-sico{display:none}
+#bd.pv.tall .pv-board .pv-sw b{display:block;font-size:14px;line-height:1.1;text-shadow:none!important}
+#bd.pv.tall .pv-board .pv-sw span{display:block;font-size:14px;line-height:1.1;font-weight:600;text-shadow:none!important}
+#bd.pv.tall .pv-board .pw{position:absolute;top:-4px;right:6px;left:auto;bottom:auto}
+#bd.pv.tall .pv-board .pv-taken{left:50%;top:18px;transform:translateX(-50%)}
+#bd.pv.tall .pv-board .tile .pv-tin{position:relative!important;inset:auto!important;left:auto;top:auto;transform:none;width:auto;min-width:0;z-index:1}
+#bd.pv.tall .pv-board .tile .pv-sw{display:block;position:static}
+#bd.pv.tall .pv-board .tile{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important}
+#bd.pv.tall .pv-board .tile .pv-tin{min-height:0!important;margin-top:-8px;padding:1px 6px}
+#bd.pv.tall .pv-board .tile::before{order:0!important}#bd.pv.tall .pv-board .tile .pv-tin{order:1!important}#bd.pv.tall .pv-board .tile .pw{order:2}
+#bd.pv.tall .pv-board .tile::before{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;transform:none!important;opacity:1!important}
+#bd.pv.tall .pv-board .tile::after{display:none!important}
+#bd.pv.tall .pv-board .tile::before{width:50px;height:50px}
+#bd.pv.tall .pv-board .pv-cell{width:33%}
+#bd.pv.tall .pv-board .tile.pv-spec .pv-sw span{display:none}
+#bd.pv.tall .pv-board .pv-sw b,#bd.pv.tall .pv-board .pv-sw span{line-height:1.05}
+#bd.pv.tall .pv-board .tile.t-haven .pv-sw span{display:none!important}

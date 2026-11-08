@@ -83,7 +83,7 @@ function aiStep() {
   if (!ANIM) { go(null); return; }
   // one thing at a time: banner (first rival step of a turn run), caption saying what the rival is about to do, a beat, then the move flies
   if (UI.bannerFor !== a + ':' + G.turn) { UI.bannerFor = a + ':' + G.turn; if (!(UI.cfg && UI.cfg.tutorial)) turnBanner(HBS.turn.rival(p.name), true); }
-  UI.animBusy = true; UI.aiCap = p.name + ': ' + String(m.label || 'plays').split(' - ')[0].replace(/^[^:]*:\s*/, ''); render();
+  UI.animBusy = true; UI.aiCap = isPh() ? p.name + ' is playing' : p.name + ': ' + String(m.label || 'plays').split(' - ')[0].replace(/^[^:]*:\s*/, ''); render();
   UI.tm = setTimeout(() => { if (tok !== UI.animTok) return; aiFly(m, a, go); }, Math.round(AIDELAY * .9));
 }
 // the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
