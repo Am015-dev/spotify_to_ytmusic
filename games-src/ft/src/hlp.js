@@ -23,10 +23,10 @@ const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const hadv=(...sels)=>()=>{try{const e=hlpEl(hlpAdvice());if(e&&e.getBoundingClientRect().width)return e}catch(x){}return hfirst(...sels)()};   // the advised tile when there is one
 const HLP_STEPS={
- bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Dearer spots play earlier; free spots cost nothing.',pic:()=>HP.spot('3🪙')},
+ bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Pricier spots play earlier.',pic:()=>HP.spot('3🪙')},
  lift:{target:hadv('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
- drop:{target:hadv('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there. The last must match a colour.',pic:()=>HP.meeple('builder')},
- collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. The power chips below are optional extras.',pic:()=>HP.meeple('vizier')},
+ drop:{target:hadv('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there.',pic:()=>HP.meeple('builder')},
+ collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. Power chips below are optional.',pic:()=>HP.meeple('vizier')},
  mason:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Choose your pay',text:'Masons earn coins for blue tiles around you. A Mystic adds one Mason.',pic:()=>HP.coin('+')},
  shadow:{target:hfirst('#grid .tile.glow','#seats .sch.glow','#acts .ab.go'),title:'Remove a person',text:'Tap a glowing tile or rival to remove someone there.',pic:()=>HP.meeple('assassin')},
  hamlet:{target:hfirst('#grid .tile.glow','#acts .ab.go'),title:'Build a palace',text:'Tap the glowing spot to build. A palace scores 5 points for the tile’s holder.',pic:()=>HP.icon('🏰')},
@@ -45,35 +45,35 @@ const HLP_STEPS={
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
- {title:'The goal',text:'Most points when the game ends wins. Points come from tiles, palaces, palms, djinns, goods, Advisors and coins.',pic:()=>hpics([['tile','oasis'],['djinn'],['coin',1],'>',['pts',null,'Winner']])},
+ {title:'The goal',text:'Most points at the end wins. Almost everything you own scores.',pic:()=>hpics([['tile','oasis'],['djinn'],['coin',1],'>',['pts',null,'Winner']])},
  {title:'A turn in short',text:'Bid for turn order, lift a group, drop it tile by tile, then use your colour and tile.',pic:()=>hpics([['spot','1st'],'>',['meeple','merchant','Lift'],'>',['tile','small','Act']])},
  {phase:'bid',title:'Turn order',text:'Each round starts with a bid. Tap a glowing spot on the track to claim your place in line.',pic:()=>hpics([['spot','1st'],'>',['meeple','vizier','You']])},
- {phase:'bid',title:'Price of a spot',text:'Early spots cost coins, late ones are free. Coins are also worth one point each at the end.',pic:()=>hpics([['coin',8,'Early'],['coin',0,'Late']])},
- {phase:'bid',title:'Why go first?',text:'Playing earlier lets you grab tiles, goods and djinns before your rivals can.',pic:()=>hpics([['meeple','vizier','You'],'>',['tile','sacred','First']])},
+ {phase:'bid',title:'Price of a spot',text:'Early spots cost coins, late ones are free. Coins score too.',pic:()=>hpics([['coin',8,'Early'],['coin',0,'Late']])},
+ {phase:'bid',title:'Why go first?',text:'Playing earlier lets you grab the best things first.',pic:()=>hpics([['meeple','vizier','You'],'>',['tile','sacred','First']])},
  {phase:'lift',title:'Pick up a group',text:'Tap a tile with people on it. You lift all of them at once.',pic:()=>hpics([['tile','small','Tap'],'>',['meeple','merchant'],['meeple','builder']])},
- {phase:'lift',title:'Only some tiles glow',text:'A tile glows only if you can finish a legal move from it. Plan where your last person lands.',pic:()=>hpics([['tile','village','Glows'],['tile','lake','No']])},
- {phase:'lift',title:'The six colours',text:'Yellow and white are kept for points. Green buys goods, blue earns coins, red removes people, purple makes items.',pic:()=>hpics([['meeple','vizier'],['meeple','elder'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
+ {phase:'lift',title:'Only some tiles glow',text:'A tile glows only if you can finish a move from it.',pic:()=>hpics([['tile','village','Glows'],['tile','lake','No']])},
+ {phase:'lift',title:'The six colours',text:'Yellow, white: points. Green: goods. Blue: coins. Red: removes people. Purple: items.',pic:()=>hpics([['meeple','vizier'],['meeple','elder'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
  {phase:'drop',title:'Walk and drop',text:'Drop one person on each tile you pass, moving up, down, left or right. No stepping straight back.',pic:()=>hpics([['tile','oasis','1'],'>',['tile','small','2'],'>',['tile','village','3']])},
- {phase:'drop',title:'The last drop',text:'Your last person must land on a tile that already holds their colour. You then take all of that colour.',pic:()=>hpics([['meeple','merchant'],'>',['tile','large','Same colour']])},
+ {phase:'drop',title:'The last drop',text:'Land your last person on their own colour, then take them all.',pic:()=>hpics([['meeple','merchant'],'>',['tile','large','Same colour']])},
  {phase:'drop',title:'Try another route',text:'Use the undo button to put people back and try again before you finish.',pic:()=>hpics([['meeple','builder'],'>',['tap']])},
  {phase:'collect',title:'Each colour acts',text:'Advisors and Sages are kept. Traders fetch goods. Masons earn coins. Shadows remove people. Crafters make items.',pic:()=>hpics([['meeple','vizier'],['meeple','merchant'],['meeple','builder'],['meeple','assassin']])},
  {phase:'collect',title:'Then the tile',text:'After the tribe, the tile you ended on has its own action: build, plant, summon or buy.',pic:()=>hpics([['meeple','merchant'],'>',['tile','small']])},
- {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target if it asks for one.',pic:()=>hpics([['chip','✨ Power'],'>',['tap']])},
- {phase:'mason',title:'Blue tiles pay',text:'Coins equal your Masons times the blue tiles in the 3 by 3 square around you.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
+ {phase:'collect',title:'Optional powers',text:'Djinn and item chips are optional. Tap one, then a glowing target.',pic:()=>hpics([['chip','✨ Power'],'>',['tap']])},
+ {phase:'mason',title:'Blue tiles pay',text:'Each Mason earns 1 coin per blue tile within one step.',pic:()=>hpics([['meeple','builder','×'],['tile','sacred','blue'],'>',['coin','+']])},
  {phase:'mason',title:'Mystic Mason',text:'Spending a Mystic card adds one Mason to the count, but the card is gone.',pic:()=>hpics([['goods','fakir'],'>',['meeple','builder','+1']])},
- {phase:'shadow',title:'Reach',text:'A Shadow removes one person up to its count of steps away, or a rival’s Advisor or Sage.',pic:()=>hpics([['meeple','assassin'],'>',['meeple','vizier','Rival']])},
- {phase:'shadow',title:'Empty tiles',text:'If a tile empties, you claim it with a camel, so a removal can win you land.',pic:()=>hpics([['tile','small','Empty'],'>',['camel']])},
+ {phase:'shadow',title:'Reach',text:'Shadows remove a nearby person, or a rival’s Advisor or Sage.',pic:()=>hpics([['meeple','assassin'],'>',['meeple','vizier','Rival']])},
+ {phase:'shadow',title:'Empty tiles',text:'Empty a tile and your camel claims it.',pic:()=>hpics([['tile','small','Empty'],'>',['camel']])},
  {phase:'shadow',title:'Mystic reach',text:'Each Mystic you spend adds one step of reach.',pic:()=>hpics([['goods','fakir'],'>',['meeple','assassin','+1 step']])},
  {phase:'hamlet',title:'Palace',text:'A palace scores 5 points for whoever holds the tile. Placing it is required.',pic:()=>hpics([['tile','village'],'>',['pts',5]])},
- {phase:'hamlet',title:'Holding a tile',text:'A camel marks who holds a tile. Tile value, palaces and palms all score for the holder.',pic:()=>hpics([['camel',null,'Holder'],'>',['pts','+']])},
+ {phase:'hamlet',title:'Holding a tile',text:'Your camel marks a tile as yours. Its points all go to you.',pic:()=>hpics([['camel',null,'Holder'],'>',['pts','+']])},
  {phase:'hamlet',title:'Next to the lake',text:'Palaces and palms on tiles touching the Great Lake score double.',pic:()=>hpics([['tile','lake'],['tile','village','×2']])},
  {phase:'oasis',title:'Palm',text:'A palm scores 3 points for whoever holds the tile. Planting it is required.',pic:()=>hpics([['tile','oasis'],'>',['pts',3]])},
- {phase:'oasis',title:'Holding a tile',text:'A camel marks who holds a tile. Tile value, palaces and palms all score for the holder.',pic:()=>hpics([['camel',null,'Holder'],'>',['pts','+']])},
+ {phase:'oasis',title:'Holding a tile',text:'Your camel marks a tile as yours. Its points all go to you.',pic:()=>hpics([['camel',null,'Holder'],'>',['pts','+']])},
  {phase:'oasis',title:'Next to the lake',text:'Palaces and palms on tiles touching the Great Lake score double.',pic:()=>hpics([['tile','lake'],['tile','oasis','×2']])},
- {phase:'shrine',title:'Summon a djinn',text:'Pay 2 Sages, or 1 Sage and 1 Mystic, to take a face-up djinn. Spent Sages stop scoring.',pic:()=>hpics([['meeple','elder','×2'],'>',['djinn']])},
- {phase:'shrine',title:'What a djinn gives',text:'Each djinn is worth points and has a power, either always on or used by paying Sages.',pic:()=>hpics([['djinn'],'>',['pts','+'],['chip','Power']])},
+ {phase:'shrine',title:'Summon a djinn',text:'Pay 2 Sages, or a Sage and a Mystic. Paid Sages stop scoring.',pic:()=>hpics([['meeple','elder','×2'],'>',['djinn']])},
+ {phase:'shrine',title:'What a djinn gives',text:'Each djinn scores points and has a power.',pic:()=>hpics([['djinn'],'>',['pts','+'],['chip','Power']])},
  {phase:'shrine',title:'Not worth it?',text:'You may skip. Tap Skip if no djinn is worth the Sages you would spend.',pic:()=>hpics([['pass',null,'Skip']])},
- {phase:'goods',title:'Goods make sets',text:'Different kinds of goods make sets: 1, 3, 7, 13, 21 points for 1 to 5 kinds, and more beyond.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
+ {phase:'goods',title:'Goods make sets',text:'Sets of different goods score 1, 3, 7, 13, 21 points.',pic:()=>hpics([['goods','gold'],['goods','silk'],['goods','spice'],'>',['pts',7]])},
  {phase:'goods',title:'What it costs',text:'Stall: 3 coins for one of the first 3. Bazaar: 6 coins for two. Exchange: 4 coins for any.',pic:()=>hpics([['tile','small','3'],['tile','large','6'],['tile','exchange','4']])},
  {phase:'goods',title:'Mystic cards',text:'Mystic cards boost Masons and Shadows and pay for djinns. They never join a set.',pic:()=>hpics([['goods','fakir']])},
  {phase:'workshop',title:'Items',text:'Pay 1 Crafter or 2 Mystics to take the top item. Items give points or one-off powers.',pic:()=>hpics([['meeple','artisan','×1'],'>',['icon','🪄',null,'#9a5bd0']])},
@@ -140,7 +140,7 @@ function hlpWhy(m,hp){let t='';
   switch(m.act){
    case 'bid':{const c=G.track[m.spot].cost;t=m.fk?'A Mystic makes this spot cost '+bidPrice(hp,m.spot,m.fk)+' coins.':c?c+' coins buys an earlier turn.':'A free spot keeps your coins for later.';break}
    case 'start':{const o=HPL.plan&&HPL.plan.o;if(o&&o.s===m.tile){const n=o.n;t='Ends on the '+TSHORT[G.board[o.e].k]+', taking '+n+' '+(n>1?MPLUR[o.c]:MNAME[o.c])+'. '+HTAIL[o.c]}break}
-   case 'step':t=G.move.hand.length===1?'Last drop: land on its colour to finish.':'This follows the best route to a good finish.';break;
+   case 'step':t=G.move.hand.length===1?'Last drop: land on its colour to finish.':'This is the best route to finish.';break;
    case 'tribe':{if(m.none){t='No target in range: carry on.';break}const k=m.kill;
      if(k){t=k.pl!=null?'Removes a '+MNAME[k.c]+' from '+P(k.pl).nm+'.':'Clears people off this tile.';break}
      const c=G.act.color;t=c==='builder'?'Masons earn coins from blue tiles.':'Collect your '+MPLUR[c]+'. '+HTAIL[c];break}

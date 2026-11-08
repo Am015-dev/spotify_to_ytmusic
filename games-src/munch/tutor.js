@@ -88,7 +88,7 @@ function tutSteps(){
    ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
  {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
- {id:'powers',title:'Races and classes',say:'Your Elf runs better. Classes add powers too: Warriors win ties, Wizards flee, Thieves stab, Clerics fight undead.',target:tq('.mine .gear'),wait:null,
+ {id:'powers',title:'Races and classes',say:'Your Elf runs away better. Classes add powers too.',target:tq('.mine .gear'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&P(0).race.length>0},
  {id:'bucket',title:'Wear an item',say:()=>'Items go on by themselves and add to your strength. Tap the Bucket, then your hero.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bucket'},from:()=>tcard('bucket'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('bucket')&&!!document.querySelector('.bfbig')},
@@ -117,7 +117,7 @@ function tutSteps(){
  {id:'meddle',title:'Meddle in her fight',say:'Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
- {id:'rivals',title:'The computer plays too',say:'Morwen and Grub follow the same rules: they kick doors, fight, run, curse and ask for help.',target:tq('#phopps','#app .opps'),wait:null,
+ {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
  {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
@@ -135,8 +135,8 @@ function tutSteps(){
  {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
    ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins, and the last level needs a monster kill. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
-   ready:()=>G.active!==0&&!G.winner}
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. The last level needs a monster. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
+   ready:()=>!G.winner&&(G.active!==0||tclear())}
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutSetup(){try{GX.close()}catch(e){}
