@@ -133,6 +133,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Redline Rally https://am015-dev.github.io/spotify_to_ytmusic/redline-rally/ (R9 PASS 06:35, live 06:47, feel-audit live all pass)
 - Short Fuse https://am015-dev.github.io/spotify_to_ytmusic/short-fuse/ (R4 PASS 06:50, live 06:56, feel-audit live all pass)
 - Crown City Smash https://am015-dev.github.io/spotify_to_ytmusic/crown-city-smash/ (R6 PASS 06:54, live 07:05, feel-audit live all pass)
+- Sunglaze https://am015-dev.github.io/spotify_to_ytmusic/sunglaze/ (R9 PASS 07:23, live 07:29, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
