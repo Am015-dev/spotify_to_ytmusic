@@ -1,0 +1,58 @@
+// Guided tutorial walked by real touch taps at 390x844 and 375x667 (phone) and mouse at 1440x900: every step's glowing target must be on
+// screen and uncovered (elementFromPoint), every line one sentence of 12 words or fewer, every core rule must appear in order, then
+// "Play a real game" must start a real 5-season game. SHOTS=1 saves playable-shots/gameplay/tut-N.png (390x844). node tut-walk.js
+const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
+const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html');
+const RULES = ['dice', 'goal', 'take', 'storage', 'build', 'region', 'end', 'order', 'white', 'sell', 'workers', 'kinds', 'bend', 'wrap', 'back', 'keep',
+  'building', 'hall', 'pasture', 'lore', 'barge', 'discard', 'colour', 'season', 'final', 'tie'];
+const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
+(async () => {
+  const b = await chromium.launch(); let bad = 0;
+  for (const [name, vp, touch] of [['phone', { width: 390, height: 844 }, true], ['phone-s', { width: 375, height: 667 }, true], ['pc', { width: 1440, height: 900 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
+    const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }), page = await ctx.newPage(), errs = [], fails = [];
+    page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });   // picture slots without a local file are expected
+    await page.goto(URL); await page.evaluate(() => localStorage.clear()); await page.reload(); await page.waitForTimeout(500);
+    const tapXY = async (x, y) => { if (touch) await page.touchscreen.tap(x, y); else await page.mouse.click(x, y); };
+    const tb = await page.evaluate(() => { const e = document.getElementById('tutB'); const r = e && e.getBoundingClientRect(); return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; });
+    if (!tb) { console.log(name, 'FAIL no tutorial button'); bad++; continue; } await tapXY(tb.x, tb.y); await page.waitForTimeout(900);
+    const seen = [], rulesSeen = []; let shot = 0, guard = 0;
+    while (guard++ < 2500) {
+      const st = await page.evaluate(() => {
+        if (document.querySelector('.gxt-end')) return { end: true };
+        if (!GXT.running()) return { done: true };
+        const s0 = GXT.state(), c = GXT.current(); if (!c || s0.phase !== 'show') return { wait: true };
+        const bub = document.querySelector('.gxt-bub .gxh-tx, .gxh-tx'), say = typeof c.say === 'function' ? c.say() : c.say;
+        if (!c.wait) { const nb = document.querySelector('.gxt-next'); if (!nb) return { wait: true }; const r = nb.getBoundingClientRect(); return { id: c.id, rule: c.rule, say, x: r.left + r.width / 2, y: r.top + r.height / 2, ok: true, next: true }; }
+        const t = c.target && c.target(); if (!t) return { wait: true };
+        const r = t.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, hit = document.elementFromPoint(x, y);
+        const inView = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight;
+        return { id: c.id, rule: c.rule, say, x, y, ok: inView && !!hit && (hit === t || t.contains(hit)), hit: hit ? (hit.id || hit.className) : 'none' };
+      });
+      if (st.end || st.done) break; if (st.wait) { if (guard % 40 === 39 && process.env.DBG) console.log(name, 'waiting', await page.evaluate(() => { const c = GXT.current(); return (c && c.id) + ' ' + GXT.state().phase + ' busy ' + UI.busy + ' actor ' + VB.actor(G) + ' tab ' + UI.tab + ' tv ' + !document.getElementById('tv').hidden; })); await page.waitForTimeout(150); continue; }
+      if (seen[seen.length - 1] !== st.id) {
+        seen.push(st.id); if (rulesSeen[rulesSeen.length - 1] !== st.rule) rulesSeen.push(st.rule);
+        const w = String(st.say || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length, sent = (String(st.say).match(/[.!?](\s|$)/g) || []).length;
+        if (w > 12) fails.push(st.id + ' line has ' + w + ' words'); if (sent > 2) fails.push(st.id + ' more than two sentences');
+        if (!st.ok) fails.push(st.id + ' target covered by ' + st.hit);
+        if (name === 'phone' && process.env.SHOTS) { await page.waitForTimeout(250); fs.mkdirSync(SHOTDIR, { recursive: true }); await page.screenshot({ path: path.join(SHOTDIR, 'tut-' + (++shot) + '.png') }); }
+      }
+      await tapXY(st.x, st.y); await page.waitForTimeout(st.next ? 700 : 450);
+    }
+    const missing = RULES.filter(r => rulesSeen.indexOf(r) < 0); if (missing.length) fails.push('rules never taught: ' + missing.join(','));
+    const order = RULES.filter(r => rulesSeen.indexOf(r) >= 0).map(r => rulesSeen.indexOf(r)); if (order.some((v, i) => i && v < order[i - 1])) fails.push('rules out of order: ' + rulesSeen.join(','));
+    const endOk = await page.evaluate(() => !!document.querySelector('.gxt-end'));
+    if (!endOk) fails.push('end card not reached (last step ' + seen[seen.length - 1] + ')');
+    else {
+      if (name === 'phone' && process.env.SHOTS) await page.screenshot({ path: path.join(SHOTDIR, 'tut-' + (++shot) + '.png') });
+      const p = await page.evaluate(() => { const e = document.querySelector('[data-gxt-end="play"]'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      await tapXY(p.x, p.y); await page.waitForTimeout(1500);
+      const real = await page.evaluate(() => ({ mode: UI.mode, phases: G.nPhases, phase: G.phase, round: G.round, over: G.over }));
+      if (real.mode !== 'quick' || real.phases !== 5 || real.phase !== 0 || real.round !== 0) fails.push('real game did not start: ' + JSON.stringify(real));
+      const later = await page.evaluate(() => /meet later/i.test(document.body.innerText)); if (later) fails.push('a "learn later" list is shown');
+    }
+    if (errs.length) fails.push('errors: ' + errs.slice(0, 3).join(' | '));
+    console.log(name, fails.length ? 'FAIL' : 'PASS', seen.length + ' steps, rules in order: ' + rulesSeen.join(' > '), fails.length ? '\n  ' + fails.join('\n  ') : '');
+    if (fails.length) bad++; await ctx.close();
+  }
+  await b.close(); process.exit(bad ? 1 : 0);
+})();

@@ -1,10 +1,11 @@
 // Plays a whole Quick game by DRAGGING pieces (dice onto stalls/spaces/goods, tiles onto spaces, workers onto dice) with real pointer moves.
-// Taps are used only for buttons (End turn, workers, pop-up choices). node drag-play.js ; phone 390x844 and PC 1440x900.
+// Taps are used only for buttons (End turn, workers, pop-up choices). SHOTS=1 saves playable-shots/gameplay/first-turn, mid-game, result (390x844). node drag-play.js ; phones 390x844 + 375x667 (touch) and PC 1440x900.
 const { chromium } = require('playwright'); const path = require('path');
 const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1';
 (async () => {
   const b = await chromium.launch(); let fails = 0;
-  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]]) {
+  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['phone-s-touch', { width: 375, height: 667 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]]) {
+    const SHOT = process.env.SHOTS && name === 'phone-touch' ? path.join(__dirname, 'playable-shots', 'gameplay') : null, shots = {}; if (SHOT) require('fs').mkdirSync(SHOT, { recursive: true });
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), page = await ctx.newPage(), errs = [];
     const cdp = touch ? await ctx.newCDPSession(page) : null; let tp = { x: 0, y: 0 };
     const tch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
@@ -21,6 +22,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       const st = await page.evaluate(() => ({ over: G.over, mine: !G.over && G.seats[VB.actor(G)].human && !UI.busy, tv: !document.getElementById('tv').hidden, top: !!pend() }));
       if (st.over) break;
       if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await tapSel(b1.first()); else await tapSel(page.locator('#tvClose')); taps++; continue; }
+      if (SHOT && st.mine && !st.tv && !st.top) { const k = await page.evaluate(() => G.phase + '/' + G.round); if (k === '0/0' && !shots.first) { shots.first = 1; await page.waitForTimeout(400); await page.screenshot({ path: SHOT + '/first-turn.png' }); } if (k === '2/2' && !shots.mid) { shots.mid = 1; await page.evaluate(() => { if (L.tabs) { UI.tab = 'estate'; render(); } }); await page.waitForTimeout(400); await page.screenshot({ path: SHOT + '/mid-game.png' }); } }
       if (!st.mine) { await page.waitForTimeout(25); if (++stuck > 4000) { console.log(name, 'FAIL waiting'); break; } continue; } stuck = 0;
       const plan = await page.evaluate(() => {
         if (pend()) return { k: 'tap' };
@@ -51,6 +53,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
     }
     await page.waitForSelector('#rs:not([hidden]) #again', { timeout: 30000 }).catch(() => { });
     const done = await page.locator('#rs:not([hidden]) #again').count();
+    if (SHOT && done) { await page.waitForTimeout(1500); await page.screenshot({ path: SHOT + '/result.png' }); }
     console.log(name, done ? 'PASS full game by drag' : 'FAIL no result', JSON.stringify(drags), 'button taps', taps, 'missed drops', missed, 'combo-take-only', combo1, 'scores', await page.evaluate(() => G.P.map(p => p.vp).join('/')), 'errors', errs.length, errs[0] || '');
     if (!done || errs.length || drags.combo + drags.build + drags.take < 10) fails++;
     await ctx.close();

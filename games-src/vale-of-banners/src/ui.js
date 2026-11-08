@@ -314,6 +314,21 @@ function layout() {
   L.s = Math.max(14, s);
   es.style.cssText = 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px';
 }
+function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls in one row) until the market sits fully above the dock */
+  var mk = $('#mk'); if (!L.tabs || UI.tab !== 'market' || mk.style.display === 'none') { mk.classList.remove('six'); return; }
+  var limit = L.ey + L.eh, hx = parseInt(mk.style.getPropertyValue('--hex'), 10) || 44, best = null;
+  function bottom() { return mk.getBoundingClientRect().top - $('#bd').getBoundingClientRect().top + mk.scrollHeight; }
+  [false, true].forEach(function (six) {
+    if (best && best.fit) return;
+    mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,1fr)' : 'repeat(3,1fr)';
+    var h0 = hx; mk.style.setProperty('--hex', h0 + 'px');
+    while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
+    var r = { six: six, hex: h0, fit: bottom() <= limit };
+    if (!best || (r.fit && !best.fit) || (r.fit === best.fit && r.hex > best.hex)) best = r;
+  });
+  mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,1fr)' : 'repeat(3,1fr)'; mk.style.setProperty('--hex', best.hex + 'px');
+  L.mkFit = best;
+}
 function phoneTabs() { var b = $('#bd'); return b.clientWidth <= 640 && b.clientWidth <= b.clientHeight * 1.15; }
 function ensureTabs(y, pad) {
   var t = $('#tabs'); if (!t) { t = h('div', { id: 'tabs', role: 'tablist' }); $('#bd').appendChild(t); }
@@ -347,7 +362,7 @@ function cellXY(c, s, w, hgt) { var x = s * 1.732 * (c.q + c.r / 2), y = s * 1.5
 function render() {
   if (!G) return;
   document.body.classList.toggle('gx-myturn', !!myTurn()); document.body.classList.toggle('gx-selecting', UI.sel != null && !!myTurn());
-  layout(); renderBar(); renderOpp(); renderMarket(); fitEstate(); renderEstate(); renderDock(); renderScores();
+  layout(); renderBar(); renderOpp(); renderMarket(); fitMarket(); fitEstate(); renderEstate(); renderDock(); renderScores();
   if (L.tabs) { ensureTabs(parseInt($('#tabs').style.top, 10) || 50, 6); renderRival(); }
   try { artApply(); } catch (e) { }
   toastPos();
@@ -697,7 +712,7 @@ function onTurnChange() {
   }
   var humans = G.seats.filter(function (s) { return s.human; }).length;
   if (humans > 1 && isHuman(a) && UI.lastHuman !== a) toast('Pass the device to ' + G.seats[a].name, 2000);
-  UI.bump = {}; if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && !UI.pinTab) UI.tab = 'estate'; if (UI.mode === 'tutorial' && G.round >= 1 && G.round <= 4 && UI.stacked !== G.round) { UI.stacked = G.round; try { tutStack(G.round + 1); } catch (e) { } } }
+  UI.bump = {}; if (isHuman(a)) { UI.lastHuman = a; UI.quick = false; UI.cap = ''; if (L.tabs && !UI.pinTab) UI.tab = 'estate'; }
   beatsRun(turnBanner);
 }
 function schedule() {
@@ -735,10 +750,8 @@ function showResult() {
   if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
     var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
     [['Points during the game', G.P[0].vpPlay], ['Silver, 1 each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods, 1 each', e0.goods], ['Workers, 1 per 2 (' + G.P[0].workers + ')', e0.workers], ['Lore scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });
-    ul0.appendChild(h('li', { text: 'Total: ' + G.P[0].vp + '. A tie goes to the fuller estate.' }));
+    ul0.appendChild(h('li', { text: 'Total: ' + G.P[0].vp + '. A tie goes to the emptier estate.' }));
     c.appendChild(h('h3', { text: 'How your score adds up' })); c.appendChild(ul0); UI.seen = UI.seen || {}; UI.seen.final = 1; UI.seen.tie = 1;
-    var lat = Object.keys(VSTORY.coach).filter(function (k) { return !UI.seen[k]; }); UI.later = lat;
-    if (lat.length) { c.appendChild(h('h3', { text: VSTORY.laterTitle })); var ul1 = h('ul.walk'); lat.forEach(function (k) { ul1.appendChild(h('li', { text: VSTORY.coach[k].later })); }); c.appendChild(ul1); }
     c.appendChild(h('p.voice', {}, [h('b', { text: VSTORY.guide.name + ': ' }), document.createTextNode(won ? VSTORY.tut.result.win : VSTORY.tut.result.lose)]));
     try { GXT.markDone('vale-of-banners'); } catch (e) { }
   }
@@ -824,7 +837,7 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
   '<p>First to fill every space of one colour gets 5 to 7 points. Second gets 2 to 4.</p>' +
   '<p>Each round the white die puts new goods on its stall.</p>' +
-  '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the fuller estate.</p>' +
+  '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the emptier estate.</p>' +
   '<h3>Solo and teams</h3>' +
   '<p><b>Solo</b>: 25 rounds. You win only if you build all 37 spaces. <b>Teams</b> (4 players): partners share silver, workers and goods.</p>' +
   '<h3>Our own changes</h3><ul><li>The estate map and its numbers are ours.</li><li>All tiles come from one shuffled pile.</li><li>The 26 lore tiles are ours.</li><li>A fourth kind of goods does not fit and is lost.</li><li>Goods come from one bag.</li></ul></div>';
@@ -875,77 +888,112 @@ function helpInit() {
 function tutDone() { try { return GXT.isDone('vale-of-banners'); } catch (e) { return false; } }
 function tutSetup() {
   UI.seen = {}; UI.cq = []; UI.cBusy = false; UI.coachLog = 0; UI.stacked = 0;
-  startGame({ n: 2, seed: 77, phases: 1, rounds: 3, ai: 'easy', mode: 'tutorial', names: { 1: VSTORY.rival.name } });
-  var p = G.P[0], home = VB.CELLS[VB.HOME];
-  /* a pasture space next to home; the stored sheep fits it; die 1 = that number; die 2 matches a stall holding a Moot Hall */
-  var nb = home.nb.map(function (i) { return VB.CELLS[i]; }).filter(function (c) { return c.col === 'pas' || c.col === 'bld' || c.col === 'ship'; })[0] || VB.CELLS[home.nb[0]];
-  var tl = { id: 'tut1', t: nb.col }; if (nb.col === 'pas') { tl.k = 'sheep'; tl.n = 3; } if (nb.col === 'bld') tl.k = 'tower';
-  G.bag.push(tl); p.store = [tl]; G.bag.pop();
-  var sd = nb.num === 4 ? 2 : 4; G.depots[sd][0] = { id: 'tut2', t: 'mine' };
-  p.dice = [sd, nb.num]; p.used = [false, false]; p.workers = 2;
-  G.order = [0, 1]; G.ti = 0; UI.tut = { stall: sd, cell: nb.i, mc: 12 };
-  G.bag = G.bag.filter(function (t) { return t.id !== 'tut1' && t.id !== 'tut2'; });
-  render();
+  startGame({ n: 2, seed: 77, phases: 2, rounds: 5, ai: 'easy', mode: 'tutorial', names: { 1: VSTORY.rival.name } });
+  G.P[0].arr = 2; G.P[1].arr = 1; G.P[0].workers = 1; G.P[1].workers = 2; G.order = [0, 1]; G.ti = 0;   /* you start, as the first player */
+  UI.tut = {}; tutStage(1);
 }
-/* The tutorial is one real, short game (1 season = 3 rounds) against the real easy AI. Before each of your turns the table is
-   stacked (tiles moved between the bag and the stalls, your dice set) so every case comes up once. TUTORIAL-COVERAGE.md lists them. */
+/* The tutorial is a guided first game: every core rule in order, one short line and one glowing tap per step (TUT_STEPS).
+   Before each of your turns the table is staged (your dice, storage, goods, stalls) so the rule of that step comes up.
+   The rival plays real turns in between. After the last step a real game starts. TUTORIAL-COVERAGE.md lists the steps. */
 function fromBag(f) { for (var i = 0; i < G.bag.length; i++) if (f(G.bag[i])) return G.bag.splice(i, 1)[0]; return null; }
+function fromBagB(f) { var b = G.bagB || []; for (var i = 0; i < b.length; i++) if (f(b[i])) return b.splice(i, 1)[0]; return null; }
 function putStall(d, k, f) { var t = fromBag(f); if (!t) return null; var old = G.depots[d][k]; if (old) G.bag.push(old); G.depots[d][k] = t; return t; }
-function adjTo(set, c) { return VB.CELLS[c].nb.some(function (n) { return set[n]; }); }
-function tutStack(n) {
-  var p = G.P[0], T = UI.tut; p.used = [false, false];
-  if (n === 2) { p.dice = [3, 5]; var kinds = Object.keys(p.goods).filter(function (g) { return +g !== 3; }).slice(0, 2), ng = { 3: 2 }; kinds.forEach(function (g) { ng[g] = p.goods[g]; }); p.goods = ng; }
-  if (n === 3) {
-    var land = {}; Object.keys(p.estate).forEach(function (k) { land[k] = 1; });
-    var kc = VB.placeTargets(p, { t: 'castle' }, 0)[0]; T.kc = kc; land[kc] = 1;
-    var hc = null, cc = null, cols = ['know', 'pas', 'ship'];
-    VB.placeTargets(Object.assign({}, p, { estate: Object.assign({}, p.estate, (function () { var o = {}; o[kc] = { t: 'castle' }; return o; })()) }), { t: 'bld', k: 'hall' }, 0).some(function (h1) {
-      var l2 = Object.assign({}, land); l2[h1] = 1;
-      for (var ci = 0; ci < cols.length; ci++) for (var i = 0; i < VB.CELLS.length; i++) { var c = VB.CELLS[i]; if (c.col === cols[ci] && !l2[i] && adjTo(l2, i) && c.num !== 2) { hc = h1; cc = i; return true; } }
-      return false; });
-    T.hc = hc; T.cc = cc; var kn = VB.CELLS[kc].num, x = kn === 1 ? 3 : 1; T.bend = x % 6 + 1; p.dice = [x, kn];
-    putStall(T.bend, 0, function (t) { return t.t === 'castle'; }); T.free = T.bend === 6 ? 5 : T.bend + 1;
-    putStall(T.free, 0, function (t) { return t.t === 'bld' && t.k === 'hall'; });
-    var col = VB.CELLS[cc].col; var bt = fromBag(function (t) { return t.t === col; }); if (bt) { if (G.black[0]) G.bag.push(G.black[0]); G.black[0] = bt; }
-    p.workers = Math.max(1, p.workers); p.silver = Math.max(2, p.silver); p.bought = false;
-  }
-  if (n === 4 && T.hc != null) { p.dice = [VB.CELLS[T.hc].num, VB.CELLS[T.mc].num]; }
-  if (n === 5) { p.dice = [4, 6]; putStall(4, 0, function (t) { return t.t === 'pas'; }); }
+function setStore(fs) { var p = G.P[0]; p.store.forEach(function (t) { G.bag.push(t); }); p.store = []; fs.forEach(function (f) { var t = fromBag(f); if (t) p.store.push(t); }); }
+function storeIdx(f) { var s = G.P[0].store; for (var i = 0; i < s.length; i++) if (f(s[i])) return i; return -1; }
+function tutStage(n) {   /* stage your next turn so this lesson's rule comes up */
+  var p = G.P[0]; p.used = [false, false]; p.bought = false; UI.bump = {}; UI.sel = null; UI.die = null;
+  var is = function (t, k) { return function (x) { return x.t === t && (!k || x.k === k); }; };
+  if (n === 1) { p.dice = [4, 2]; putStall(4, 0, is('mine')); setStore([]); p.goods = { 3: 2, 1: 1 }; p.silver = 1; }
+  if (n === 2) { p.dice = [3, 5]; p.goods = { 3: 2, 1: 1 }; }
+  if (n === 3) { p.dice = [1, 3]; putStall(2, 0, is('castle')); setStore([is('pas', 'sheep')]); p.silver = Math.max(2, p.silver); p.workers = Math.max(2, p.workers);
+    var hb = fromBagB(is('bld', 'hall')) || fromBag(is('bld', 'hall')); if (hb) { if (G.black[0]) (G.bagB || G.bag).push(G.black[0]); G.black[0] = hb; } }
+  if (n === 4) { p.dice = [1, 4]; setStore([is('know'), is('ship')]); var gk = VB.goodsTypes(p); p.goods = {}; gk.slice(0, 1).forEach(function (g) { p.goods[g] = 1; });
+    for (var d = 1; d <= 6; d++) if (G.goodsAt[d].length) { UI.tut.gd = d; break; } if (!UI.tut.gd) { UI.tut.gd = 2; G.goodsAt[2] = [4, 5]; } }
+  if (n === 5) { p.dice = [5, 3]; setStore([is('castle'), is('bld', 'tower'), is('bld', 'mint')]); putStall(3, 0, is('pas')); }
   render();
 }
-function rivalThen(n) {   /* real rival turns (captions, banner), then stack your next turn */
+function rivalThen(n) {   /* real rival turns (captions, banner), then stage your next turn */
   return function () {
     UI.tutAi = true;
     return new Promise(function (res) {
       schedule();
       (function poll() {
-        if (!G || G.over) { UI.tutAi = false; res(); return; }
-        if (isHuman(VB.actor(G)) && !UI.busy) { UI.tutAi = false; if (n) tutStack(n); res(); return; }
+        if (!G || G.over || (n === 'season' && G.phase >= 1 && isHuman(VB.actor(G)) && !UI.busy)) { UI.tutAi = false; res(); return; }
+        if (n !== 'season' && isHuman(VB.actor(G)) && !UI.busy) { UI.tutAi = false; if (n) tutStage(n); res(); return; }
         setTimeout(poll, 250);
       })();
     });
   };
 }
+/* every step: one sentence of 12 words or fewer + one glowing tap. rule = the core rule it teaches (tut-walk.js checks them all). */
+function tutSteps() {
+  var tapW = function (what, f) { return { type: 'tap', match: function (a) { return a.what === what && (!f || f(a)); } }; };
+  var ev = function (what) { return { type: 'event', match: function (a) { return a.what === what; } }; };
+  var btn = function (txt) { return function () { var b = [].slice.call(document.querySelectorAll('#tv .acts .btn:not(.alt)')); return b.filter(function (x) { return !txt || x.textContent.indexOf(txt) >= 0; })[0] || null; }; };
+  var id = function (s) { return function () { return document.getElementById(typeof s === 'function' ? s() : s); }; };
+  var st = function (f) { return function () { var i = storeIdx(f); return i < 0 ? null : document.getElementById('st-' + i); }; };
+  var stw = function (f) { return tapW('store', function (a) { return a.s === storeIdx(f); }); };
+  var is = function (t, k) { return function (x) { return x.t === t && (!k || x.k === k); }; };
+  return [
+    { id: 'dice', rule: 'dice', tab: 'estate', say: 'You rolled two dice. Each die is one action.', target: id('dicerow'), wait: null },
+    { id: 'goal', rule: 'goal', tab: 'estate', say: 'Build your estate. Most points after five seasons wins.', target: id('es'), wait: null },
+    { id: 'take', rule: 'take', tab: 'market', say: 'Your 4 takes a tile from stall 4. Tap the mine.', target: id('mt-4-0'), wait: tapW('market', function (a) { return a.d === 4; }) },
+    { id: 'take2', rule: 'take', tab: 'market', say: 'Tap Take. It goes into your storage.', target: btn('Take'), wait: ev('take') },
+    { id: 'store', rule: 'storage', tab: 'estate', say: 'Storage holds three tiles. Tap your mine to build it.', target: st(is('mine')), wait: stw(is('mine')) },
+    { id: 'build', rule: 'build', tab: 'estate', say: 'Build next to your land: same colour, same number as a die.', target: id('ec-12'), wait: tapW('cell', function (a) { return a.cell === 12; }) },
+    { id: 'region', rule: 'region', tab: 'estate', say: 'A full outlined region scores. Early seasons pay a bigger bonus.', target: id('r-vp'), wait: null },
+    { id: 'end1', rule: 'end', tab: 'estate', say: 'Both dice used. Tap End turn.', target: id('endB'), wait: ev('end') },
+    { id: 'order', rule: 'order', tab: 'estate', say: 'Your rival played. Higher on the banner track plays first.', target: id('opp'), wait: null, ai: rivalThen(2) },
+    { id: 'white', rule: 'white', tab: 'market', say: 'Each round the white die puts a goods crate on a stall.', target: function () { return document.getElementById('gs-' + G.white); }, wait: null },
+    { id: 'sell', rule: 'sell', tab: 'estate', say: 'Your 3 can sell your kind-3 goods. Tap them.', target: id('gd-3'), wait: tapW('goods', function (a) { return a.g === 3; }) },
+    { id: 'sell2', rule: 'sell', tab: 'estate', say: 'Sell all of them: one silver, two points each.', target: btn('Sell'), wait: ev('sell') },
+    { id: 'workers', rule: 'workers', tab: 'estate', say: 'Any die can become two workers. Tap your 5.', target: id('wk1'), wait: ev('workers') },
+    { id: 'end2', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
+    { id: 'kinds', rule: 'kinds', tab: 'estate', say: 'You can keep at most three kinds of goods.', target: id('goods'), wait: null, ai: rivalThen(3) },
+    { id: 'bend', rule: 'bend', tab: 'market', say: 'A worker moves a die one step. Tap the keep.', target: id('mt-2-0'), wait: tapW('market', function (a) { return a.d === 2; }) },
+    { id: 'bend2', rule: 'bend', tab: 'market', say: 'Pay one worker: your 1 becomes a 2.', target: btn('die 1'), wait: ev('take') },
+    { id: 'wrap', rule: 'wrap', tab: 'estate', say: 'Six and one are neighbours too: a worker turns 6 into 1.', target: id('r-workers'), wait: null },
+    { id: 'buy', rule: 'back', tab: 'market', say: 'The back lane costs two silver, no die. Tap it.', target: id('bl-0'), wait: tapW('black', function (a) { return a.k === 0; }) },
+    { id: 'buy2', rule: 'back', tab: 'market', say: 'Buy it. Only one back-lane tile per turn.', target: btn('Buy'), wait: ev('buy') },
+    { id: 'keep', rule: 'keep', tab: 'estate', say: 'Tap your keep. Keeps give one free action.', target: st(is('castle')), wait: stw(is('castle')) },
+    { id: 'keep2', rule: 'keep', tab: 'estate', say: 'Build it on the glowing 3.', target: id('ec-17'), wait: tapW('cell', function (a) { return a.cell === 17; }) },
+    { id: 'free', rule: 'keep', tab: 'estate', say: 'Free action, any number: tap your Moot Hall.', target: st(is('bld', 'hall')), wait: stw(is('bld', 'hall')) },
+    { id: 'free2', rule: 'building', tab: 'estate', say: 'Build it here. Any number works for a free action.', target: id('ec-11'), wait: tapW('cell', function (a) { return a.cell === 11; }) },
+    { id: 'bld', rule: 'building', tab: 'estate', say: 'Buildings act once when built. No two alike per region.', target: id('ec-11'), wait: null },
+    { id: 'hall', rule: 'hall', tab: 'estate', say: 'Moot Hall builds one more tile now. Tap your sheep.', target: st(is('pas')), wait: stw(is('pas')) },
+    { id: 'pas', rule: 'pasture', tab: 'estate', say: 'Pastures score their animals. Build it on the glow.', target: id('ec-13'), wait: tapW('cell', function (a) { return a.cell === 13; }) },
+    { id: 'pas2', rule: 'pasture', tab: 'estate', say: 'Later sheep in this meadow score these sheep again.', target: id('ec-13'), wait: null },
+    { id: 'end3', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
+    { id: 'lore', rule: 'lore', tab: 'estate', say: 'Lore tiles bend one rule for you. Tap yours.', target: st(is('know')), wait: stw(is('know')), ai: rivalThen(4) },
+    { id: 'lore2', rule: 'lore', tab: 'estate', say: 'Build it on the glowing 1.', target: id('ec-23'), wait: tapW('cell', function (a) { return a.cell === 23; }) },
+    { id: 'barge', rule: 'barge', tab: 'estate', say: 'Barges carry goods and move you up the track. Tap it.', target: st(is('ship')), wait: stw(is('ship')) },
+    { id: 'barge2', rule: 'barge', tab: 'estate', say: 'Build it on the glowing 4.', target: id('ec-22'), wait: tapW('cell', function (a) { return a.cell === 22; }) },
+    { id: 'barge3', rule: 'barge', tab: 'market', say: 'Take every crate from one stall. Tap the glowing crates.', target: function () { return document.querySelector('.stgoods.glow'); }, wait: ev('ship') },
+    { id: 'end4', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
+    { id: 'full', rule: 'discard', tab: 'market', say: 'Storage is full. Take this tile anyway with your 3.', target: id('mt-3-0'), wait: tapW('market', function (a) { return a.d === 3; }), ai: rivalThen(5) },
+    { id: 'full2', rule: 'discard', tab: 'market', say: 'Tap Take.', target: btn('Take'), wait: ev('take') },
+    { id: 'discard', rule: 'discard', tab: 'estate', say: 'Too many tiles: throw one away. Tap the mint.', target: st(is('bld', 'mint')), wait: stw(is('bld', 'mint')) },
+    { id: 'discard2', rule: 'discard', tab: 'estate', say: 'Throw it away. Lost tiles score nothing.', target: btn('Throw'), wait: ev('discard') },
+    { id: 'colour', rule: 'colour', tab: 'estate', say: 'Tap your keep. It fills every keep space you have.', target: st(is('castle')), wait: stw(is('castle')) },
+    { id: 'colour2', rule: 'colour', tab: 'estate', say: 'Build it on the glowing 5 for a colour bonus.', target: id('ec-24'), wait: tapW('cell', function (a) { return a.cell === 24; }) },
+    { id: 'colour3', rule: 'colour', tab: 'estate', say: 'First to fill a colour gets 5 points, second gets 2.', target: id('r-vp'), wait: null },
+    { id: 'hire', rule: 'keep', tab: 'estate', say: 'Another free action. Take two workers this time.', target: id('wkxB'), wait: ev('workers') },
+    { id: 'end5', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
+    { id: 'season', rule: 'season', tab: 'estate', say: 'Five rounds end a season. Each mine pays one silver.', target: id('r-silver'), wait: null, ai: rivalThen('season') },
+    { id: 'refill', rule: 'season', tab: 'market', say: 'New season: fresh tiles fill every stall. Crates stay.', target: id('mk'), wait: null },
+    { id: 'final', rule: 'final', tab: 'estate', say: 'At the end, silver, goods and worker pairs score one each.', target: id('resrow'), wait: null },
+    { id: 'tie', rule: 'tie', tab: 'estate', say: 'A tie goes to the estate with more empty spaces.', target: id('es'), wait: null }
+  ];
+}
 function tutStart(o) {
   if (typeof GXT === 'undefined') return;
   $('#start').hidden = true;
-  var tapW = function (what, f) { return { type: 'tap', match: function (a) { return a.what === what && (!f || f(a)); } }; };
-  var ev = function (what) { return { type: 'event', match: function (a) { return a.what === what; } }; };
-  var tv = function () { return $('#tv .acts .btn'); }, my = function () { return myTurn(); };
-  var st = function (k) { return function () { return $('#st-' + k); }; }, ec = function (f) { return function () { return $('#ec-' + f()); }; };
-  var steps = [   /* only the very first action is spotlit (2 steps); then the game is free and Odo coaches */
-    { id: 'take', title: '', say: '', target: function () { return $('#mt-' + UI.tut.stall + '-0'); }, wait: tapW('market', function (a) { return a.d === UI.tut.stall; }) },
-    { id: 'take2', title: '', say: '', target: tv, wait: tapW('do-take') },
-    { id: 'go', title: '', say: '', target: function () { return null; }, wait: null, onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } UI.tab = 'estate'; render(); coach('build'); schedule(); }, 0); } }
-  ];
-  steps.forEach(function (stp) {   /* story text: VSTORY.tut (src/story.js) */
-    var tx = VSTORY.tut[stp.id]; if (!tx || stp.id === 'go') return; stp.title = tx.t; stp.say = tx.say;
-    if (stp.pending) stp.pending = VSTORY.rival.name + ' is at work: watch the captions';
-    if (stp.id === 'result') stp.pending = 'The bells ring for the harvest moot...';
-    var mkStep = ['take', 'take2', 'bend', 'bend2', 'free', 'free2', 'buy', 'buy2', 'pas', 'pas2'].indexOf(stp.id) >= 0, en0 = stp.onEnter;
-    stp.onEnter = function () { UI.tab = mkStep ? 'market' : 'estate'; if (G) render(); if (en0) en0(); };
-    stp.ready = (function (r0) { return function () { if (G && L.tabs && UI.tab !== (mkStep ? 'market' : 'estate') && !G.over) { UI.tab = mkStep ? 'market' : 'estate'; render(); } return r0 ? r0() : true; }; })(stp.ready);
-    stp.onDone = function () { var r = tx.react; if (r) say(r); };
+  var steps = tutSteps();
+  steps.forEach(function (stp) {
+    var en0 = stp.onEnter, tab = stp.tab;
+    stp.title = '';
+    stp.onEnter = function () { if (L.tabs) UI.tab = tab; if (G) render(); if (en0) en0(); };
+    stp.ready = function () { if (!G || UI.busy) return false; if (L.tabs && UI.tab !== tab && !G.over && !tvOpen()) { UI.tab = tab; render(); } return true; };
   });
   GXT.start({ game: 'vale-of-banners', story: true, endTitle: VSTORY.endTitle, endText: VSTORY.endText, setup: tutSetup, steps: steps, onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }

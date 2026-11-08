@@ -67,7 +67,6 @@ window.VSTORY = {
   coachGood: { chain: 'Two builds from one die. Nice.', region: 'Lovely. That filled a region.' },
   coachPoor: { workers: 'You could have built there. Tiles beat workers.' },
   coachRival: { region: 'Tobin filled a region. He goes for small ones.', sell: 'Tobin sold goods. That also gave him silver.', chain: 'Tobin built twice in one go.' },
-  laterTitle: 'Things you\'ll meet later',
   endTitle: 'You know how to play',
   endText: 'That was the whole game. Ready for a real one?',
   /* Quick game: one flavour line at the start, one result line */

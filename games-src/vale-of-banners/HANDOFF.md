@@ -84,3 +84,13 @@ Spending (after fixes): hard ends with 3.8 silver / 3.0 workers, normal 7.9 / 7.
 - Tests: `node drag-play.js` = a whole game by drag at 390x844 and 1440x900 (checks every drop changed the game). Shots: playable-shots/v4-*.
 - Not done: build-all --quick could not run here (games-src/node_modules/.bin/playwright missing); shared FEEL.md did not exist yet.
   build-all rewrote games-src/nightrun/MODULES-COMPACT.md as a side effect; left uncommitted (not mine to change).
+
+## W505: gameplay gate (branch shelf/W505-vale-gameplay, not deployed)
+- Rules re-checked against the full rulebook text + two rules pages. Fixed: goods crates stay on the stalls between seasons; tie-break is
+  MORE empty estate spaces (rulebook translation error). logic-test 192/192. Still different: the original's colour-coded stall spaces
+  (layout not found), see rules-notes.md.
+- Phone market: `fitMarket()` (ui.js) shrinks the stalls or lays the six in one row until the market sits above the dock (375x667 had the
+  back lane hidden under the dock). Drag play by touch passes at 390x844, 375x667 and PC (`node drag-play.js`).
+- Tutorial rebuilt as a guided first game: 48 steps, one line of 12 words or fewer + one glowing tap each, every core rule in order, then a
+  real game; the "Things you'll meet later" list is gone. `node tut-walk.js` (tut-end.js removed). TUTORIAL-COVERAGE.md lists the steps.
+- Shots: playable-shots/gameplay/ (tut-1..49, first-turn, mid-game, result; `SHOTS=1 node tut-walk.js` / `SHOTS=1 node drag-play.js`).
