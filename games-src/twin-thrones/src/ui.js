@@ -176,7 +176,7 @@ var TT_TEST = {};
     for (var i = -9; i <= 9; i++) { var a = Math.abs(i); h += '<div class="c ' + (i === 0 ? 'mid' : a <= 2 ? 'z1' : a <= 5 ? 'z2' : a <= 8 ? 'z3' : 'z4') + '"></div>'; }
     h += '</div>'; var pos = function (v) { return (4 + 92 * (v + 9.5) / 19); };
     [-6, -3, 3, 6].forEach(function (v) { h += '<span class="tg" id="tg' + v + '" style="left:' + pos(v) + '%">' + (Math.abs(v) === 3 ? '2' : '5') + '$</span>'; });
-    h += '<div id="pawn" class="art-host">' + slot('military-pawn') + '<i></i></div>';
+    h += '<span class="mend l">' + esc(U.mode === 'cpu' ? 'Rival wins' : name(1) + ' wins') + '</span><span class="mend r">' + esc(U.mode === 'cpu' ? 'You win' : name(0) + ' wins') + '</span><div id="pawn" class="art-host">' + slot('military-pawn') + '<i></i></div>';
     m.innerHTML = h; fillArt(m); bgSlot($('board'), 'table-wood'); bgSlot($('pyr'), 'table-bg'); bgSlot(m, 'military-board');
   }
   function layoutDims() {
@@ -195,9 +195,9 @@ var TT_TEST = {};
     el.classList.toggle('act', cur);
     var h = '<div class="plate"><span class="pt">' + slot('portrait-p' + (p + 1)) + '</span><button class="who" data-city="' + p + '" aria-label="' + esc(name(p)) + ': city">' + esc(p === 0 && U.mode === 'cpu' ? 'You' : name(p)) + '</button>';
     h += '<span class="coins" id="coins' + p + '" title="coins">' + slot('coin') + '<b>' + P.coins + '</b></span><button class="pts" id="pts' + p + '" data-score="' + p + '" aria-label="Points: tap for the breakdown"><b>' + sc.total + '</b> pts</button>';
-    var sci = E.sciCounts(G, p); h += '<span class="scis">'; Object.keys(sci).forEach(function (k) { h += '<span class="sci" title="' + k + '">' + slot('sci-' + k) + (sci[k] > 1 ? '<b>' + sci[k] + '</b>' : '') + '</span>'; }); h += '</span>';
+    var sci = E.sciCounts(G, p); h += '<span class="scis">'; Object.keys(sci).forEach(function (k) { h += '<span class="sci" title="' + k + '">' + slot('sci-' + k) + (sci[k] > 1 ? '<b>' + sci[k] + '</b>' : '') + '</span>'; }); h += (Object.keys(sci).length ? '<em class="sc6">' + Object.keys(sci).length + '/6</em>' : '') + '</span>';
     h += '<div class="wrow">'; P.wonders.forEach(function (w) {
-      var d = BY[w.id]; h += '<button class="wt' + (w.card ? ' built' : G.built >= 7 ? ' dead' : '') + '" data-wonder="' + w.id + '" aria-label="Wonder: ' + esc(d.nm) + (w.card ? ' (built)' : '') + '">' + slot(d.stem) + '</button>';
+      var d = BY[w.id], wc = !w.card && G.built < 7 && G.phase === 'play' && !isAI(p) ? E.wonderInfo(G, p, w.id).coins : -1; h += '<button class="wt' + (w.card ? ' built' : G.built >= 7 ? ' dead' : '') + '" data-wonder="' + w.id + '" aria-label="Wonder: ' + esc(d.nm) + (w.card ? ' (built)' : '') + '">' + slot(d.stem) + (wc >= 0 ? '<span class="wc' + (wc > P.coins ? ' no' : '') + '">' + wc + '</span>' : '') + '</button>';
     });
     for (var k = P.wonders.length; k < 4; k++) h += '<span class="wt empty"></span>'; h += '</div></div>';
     var by = {}; P.cards.forEach(function (id) { var c = BY[id]; (by[c.col] = by[c.col] || []).push(c); });
@@ -254,7 +254,7 @@ var TT_TEST = {};
   }
   function renderTokens() {
     var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; h += '<button class="tok" data-tok="' + t + '" aria-label="Science bonus: ' + esc(d.nm) + '">' + slot(d.stem) + '</button>'; });
-    $('tokrow').innerHTML = '<span class="tl">Science bonus</span>' + h + '<span class="tsp"></span><span id="bank" aria-label="Bank: sell cards here">' + slot('coin', 'b1') + slot('coin', 'b2') + slot('coin', 'b3') + '<em>Bank</em></span>'; fillArt($('tokrow'));
+    $('tokrow').innerHTML = '<span class="tl">Science bonus</span>' + h + '<span class="tsp"></span><span id="bank" aria-label="Bank: sell cards here">' + slot('coin', 'b1') + slot('coin', 'b2') + slot('coin', 'b3') + '<em>Sell +' + (U.G.phase === 'play' ? E.discardGain(U.G, U.mode === 'two' ? E.sideToAct(U.G) : 0) : 2) + '</em></span>'; fillArt($('tokrow'));
   }
   function renderPyr(flips) {
     var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
@@ -346,14 +346,24 @@ var TT_TEST = {};
       return '<' + tag + ' class="place k-' + q.m.t + (q.ok ? ' ok' : ' no') + '" ' + a + ' style="left:' + r.l + 'px;top:' + r.t + 'px;width:' + r.w + 'px;height:' + r.h + 'px"><span class="pl">' + q.h + '</span></' + tag + '>';
     }).join('');
   }
+  // tap a card: it lifts big with what you pay, one plain line on what it does, and three big buttons (Build / Sell / Wonder); your wonders glow on the table too
   function zoomRender() {
     var z = $('zoom'), G = U.G; if (!z) return;
     if (!G || U.sel == null || G.over || G.phase !== 'play' || G.pend.length || !canAct()) { if (!z.hidden) { z.hidden = true; z.innerHTML = ''; } return; }
-    var p = E.sideToAct(G), cell = G.pyr[U.sel], c = BY[cell.id], zs = dropZones(cell.i);
-    var pr = $('pyr').getBoundingClientRect(), cw = Math.min(150, Math.round(pr.width * 0.4)), ch = Math.round(cw * 1.4);
-    var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - cw / 2) + 'px;top:' + Math.max(pr.top + 6, pr.top + pr.height / 2 - ch / 2 - 24) + 'px;width:' + cw + 'px"><div class="zcard" id="zcard" style="height:' + ch + 'px"></div><p class="lt">' + esc(cap(describe(c))) + '</p></div>';
-    h += placesHtml(zs, 'button', function (q) { return 'data-a="' + (q.m.t === 'discard' ? 'discard' : q.m.t) + '"' + (q.m.w ? ' data-w="' + q.m.w + '"' : '') + (q.ok ? '' : ' disabled') + ' aria-label="' + esc(q.h.replace(/<[^>]+>/g, ' ')) + '"'; });
-    z.innerHTML = h; z.hidden = false; var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
+    var p = E.sideToAct(G), cell = G.pyr[U.sel], c = BY[cell.id], zs = dropZones(cell.i), bi = E.buildInfo(G, p, c), M = E.validMoves(G), gain = E.discardGain(G, p);
+    var okB = M.some(function (m) { return m.t === 'build' && m.i === cell.i; }), wz = zs.filter(function (q) { return q.m.t === 'wonder'; }), wok = wz.filter(function (q) { return q.ok; });
+    var pr = $('pyr').getBoundingClientRect(), cw = Math.min(140, Math.round(pr.width * 0.38)), ch = Math.round(cw * 1.4), bw = Math.min(pr.width - 12, 360);
+    var free = bi.chain || !bi.coins, pay = free ? '<span class="pay fr">Free</span>' : '<span class="pay' + (okB ? '' : ' no') + '">' + slot('coin') + '<b>' + bi.coins + '</b></span>';
+    var why = free ? (bi.chain ? 'Free: you own its chain card.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' to buy what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
+    var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
+    var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - bw / 2) + 'px;top:' + top + 'px;width:' + bw + 'px"><div class="zcard" id="zcard" style="width:' + cw + 'px;height:' + ch + 'px">' + pay + '</div>';
+    h += '<p class="lt"><b>' + esc(cap(describe(c))) + '.</b> ' + esc(why) + '</p><div class="zb3">';
+    h += '<button class="btn zb" data-a="build"' + (okB ? '' : ' disabled') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
+    h += '<button class="btn zb sell" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
+    var w0 = wok[0];
+    h += '<button class="btn zb won" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' disabled') + '>Wonder<small>' + (w0 ? (wok.length > 1 ? 'or tap one below' : esc(BY[w0.m.w].nm)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
+    if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
+    z.innerHTML = h; z.hidden = false; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   function closeZoom() { if (U.sel == null) return; U.sel = null; renderPyr(); dock(); }
@@ -607,7 +617,7 @@ var TT_TEST = {};
     if ((b = q('[data-token]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: b.dataset.token }) === false) return; step({ t: 'token', id: b.dataset.token }); return; }
     if ((b = q('[data-destroy]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'destroy' }) === false) return; step({ t: 'destroy', id: b.dataset.destroy }); return; }
     if ((b = q('[data-revive]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; step({ t: 'revive', id: b.dataset.revive }); return; }
-    if (q('[data-zclose]') || t.id === 'zoom' || q('#zoom .lift')) { if (window.GXT && GXT.act({ type: 'tap', kind: 'other' }) === false) return; closeZoom(); return; }
+    if (q('[data-zclose]') || t.id === 'zoom' || (q('#zoom .lift') && !q('button'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'other' }) === false) return; closeZoom(); return; }
     if ((b = q('[data-a]'))) { if (b.disabled || U.sel == null) return; var a = b.dataset.a; if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: a, w: b.dataset.w || null }) === false) return; step(a === 'wonder' ? { t: 'wonder', i: U.sel, w: b.dataset.w } : { t: a, i: U.sel }); return; }
     if ((b = q('.card.av')) && canAct() && !U.G.pend.length && U.G.phase === 'play') {
       var i = +b.id.slice(1); if (window.GXT && GXT.act({ type: 'tap', kind: 'card', i: i }) === false) return;

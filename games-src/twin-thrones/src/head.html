@@ -451,4 +451,33 @@ html,body{background:#3a1f0e}
 #start .btn.go{box-shadow:0 3px 0 #8a6a12,0 8px 16px rgba(0,0,0,.45)}
 @media (max-height:700px){.strip .tab{min-height:40px}.stk{height:38px}.stk .mc{width:27px;height:37px}.strip .plate{min-height:30px}.strip .pt{display:none}#start .lid{aspect-ratio:16/8}}
 @media (min-width:1000px){.strip .tab{min-height:70px}.stk{height:66px;width:calc(46px + (var(--n) - 1) * 13px)}.stk .mc{width:46px;height:64px;left:calc(var(--j) * 13px)}.strip .wt{flex-basis:72px;width:72px;height:52px}.strip .sci{width:34px;height:34px}}
+/* W483 benchmark pass: the lifted card with its price, a plain line, three big buttons; wonder costs; sell value; track ends */
+#zoom .lift{display:flex;flex-direction:column;align-items:center}
+#zoom .zcard{position:relative;margin:0 auto}
+#zoom .zcard .pay{position:absolute;left:-18px;top:40%;z-index:5;display:inline-flex;align-items:center;gap:2px;height:40px;min-width:40px;padding:0 8px 0 4px;border-radius:20px;background:#3a2c08;border:2px solid #f2c230;color:#ffe08a;font-weight:900;font-size:20px;box-shadow:0 4px 8px rgba(0,0,0,.6)}
+#zoom .zcard .pay .art{position:relative;display:block;width:26px;height:26px}
+#zoom .zcard .pay.fr{background:#1f5a32;border-color:#6fe38a;color:#eafff0;font-size:16px;padding:0 10px}
+#zoom .zcard .pay.no{background:#5a1d17;border-color:#ff9a8a;color:#ffd0c8}
+#zoom .lt{max-width:340px;font-size:15px}
+#zoom .lt b{color:#ffe08a}
+.zb3{display:flex;gap:8px;width:100%;margin-top:10px}
+.zb3 .zb{flex:1 1 0;min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:18px;font-weight:900;border-radius:12px;background:#f2c230;color:#231a05;border:0;box-shadow:0 3px 0 #8a6a12,0 8px 14px rgba(0,0,0,.5)}
+.zb3 .zb small{font-size:14px;font-weight:700}
+.zb3 .zb.sell{background:#e8d6ae;color:#2b1d0e;box-shadow:0 3px 0 #8f7e58,0 8px 14px rgba(0,0,0,.5)}
+.zb3 .zb.won{background:#3b6fb5;color:#fff;box-shadow:0 3px 0 #1d3a63,0 8px 14px rgba(0,0,0,.5)}
+.zb3 .zb[disabled]{background:#4a3a2a;color:#d8ccb4;box-shadow:none;opacity:1}
+.strip .wt{flex-basis:54px;width:54px;height:38px;overflow:visible}
+.strip .wt .art{border-radius:3px;overflow:hidden}
+.strip .wt .wc{position:absolute;left:-6px;top:-7px;z-index:3;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:#f2c230;color:#231a05;font-size:14px;font-weight:900;box-shadow:0 1px 3px rgba(0,0,0,.6)}
+.strip .wt .wc.no{background:#7a2a20;color:#ffd0c8}
+.strip .sc6{font-style:normal;font-weight:800;font-size:14px;color:#9fe3b0;margin-left:3px}
+.card.v4.cov:not(.down):not(.taken){filter:brightness(.82) saturate(.75)}
+#mil .mend{position:absolute;top:-1px;z-index:3;font-size:14px;font-weight:800;line-height:1;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000}
+#mil .mend.l{left:6px}#mil .mend.r{right:6px}
+@media (max-width:400px){.strip .wt{flex-basis:46px;width:46px;height:34px}}
+/* choices that still use the panel (who starts, progress token, discard, revive): a wooden tray, gold and parchment buttons */
+.gx-dock{background:linear-gradient(#2a160a,#1a0d06)!important;border-top:2px solid #7a5428!important;color:#f6e3b8}
+.gx-dock .btn{background:#f2c230;color:#231a05;border:0;box-shadow:0 3px 0 #8a6a12,0 6px 12px rgba(0,0,0,.45);font-weight:800;min-height:48px}
+.gx-dock .btn.alt,.gx-dock .tk{background:#e8d6ae;color:#2b1d0e;border:0;box-shadow:0 3px 0 #8f7e58,0 6px 12px rgba(0,0,0,.45)}
+.gx-dock .gx-ibtn{background:#3b2414;color:#f6e3b8;border:1px solid #7a5428}
 </style></head>
