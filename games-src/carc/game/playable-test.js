@@ -5,7 +5,7 @@
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const URL = process.env.URL || 'file://' + path.join(__dirname, 'rampart.html');
-const W = 390, H = 763, which = process.argv[2] || 'both';
+const [W, H] = (process.env.SIZE || '390x763').split('x').map(Number), which = process.argv[2] || 'both';
 const OUT = process.env.SHOTS || path.join(__dirname, '..', 'playtest');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const probs = [], note = m => { if (probs.length < 40) probs.push(m) };

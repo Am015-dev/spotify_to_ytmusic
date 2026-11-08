@@ -58,8 +58,11 @@ function renderSheet() {   // PLAY: one score line (you vs rivals); tap it for w
   const rt = hintsOn() ? UI.rating : null, w = rt ? rt.word.toLowerCase() : '';
   const chip = '<span class="schip ' + w + '">' + (rt ? rt.word : 'Why') + '<em aria-hidden="true">' + (UI.sheetOpen ? '▴' : '▾') + '</em></span>';
   const bd = cat.map(([k, nm]) => '<span class="sc"><i>' + nm + '</i>' + G.pl.map(p => '<b style="--c:' + PCOL[p.i] + '">' + (p.sc[k] + p.end[k]) + '</b>').join('<u>–</u>') + '</span>').join('');
-  const drawer = UI.sheetOpen ? '<div class="srate ' + w + '"><div class="srow">' + bd + '</div>' + (rt ? '<div><b>' + rt.word + ':</b> ' + esc(rt.text) + '</div>' : '') + '</div>' : '';
+  const fl = '<span class="sc"><img class="sico" src="media/icon-follower.webp" alt=""><i>Followers left</i>' + G.pl.map(p => '<b style="--c:' + PCOL[p.i] + '">' + p.sup.f + '</b>').join('<u>–</u>') + '</span><span class="sc"><img class="sico" src="media/icon-tile.webp" alt=""><i>Tiles left</i><b>' + tilesLeft() + '</b></span>';
+  const head = '<div class="shead"><img class="sico" src="media/icon-score.webp" alt=""><span>' + G.pl.map(p => esc(seatName(p)) + ' <b style="--c:' + PCOL[p.i] + '">' + p.score + '</b>').join(' <u>–</u> ') + '</span></div>';
+  const drawer = UI.sheetOpen ? '<div class="srate ' + w + '">' + head + '<div class="srow">' + bd + fl + '</div>' + (rt ? '<div><b>' + rt.word + ':</b> ' + esc(rt.text) + '</div>' : '') + '</div>' : '';
   el.innerHTML = '<button type="button" class="sbtn" aria-expanded="' + !!UI.sheetOpen + '" aria-label="Scores; tap for where the points came from">' + tot + chip + '</button>' + drawer;
+  if (!el._seatTap) { el._seatTap = 1; const st = document.getElementById('seats'); if (st) { st.setAttribute('role', 'button'); st.tabIndex = 0; st.setAttribute('aria-label', 'Scores; tap for where the points came from'); st.addEventListener('click', () => el.firstChild && el.firstChild.click()); } }
   el.firstChild.onclick = () => { UI.sheetOpen = !UI.sheetOpen; clearTimeout(UI.sheetT); if (UI.sheetOpen) UI.sheetT = setTimeout(() => { UI.sheetOpen = false; renderSheet(); }, 6000); renderSheet(); };
 }
 // ---------- rating the move ----------

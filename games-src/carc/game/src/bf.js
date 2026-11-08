@@ -26,7 +26,7 @@ function capRemain(){if(!UI.capCur)return 0;return Math.max(0,(UI.cap?UI.cap.unt
 function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
-  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' & ');
+  const ws=d.win&&d.win.length?d.win:[d.by||0],who=ws.length>2?ws.length+' players':ws.length===2?(ws.some(i=>P(i).human)?'You both':'Both'):seatName(P(ws[0]));   // a shared score stays short
   const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
@@ -52,7 +52,7 @@ function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max
 // ---------- camera follow (W426): frame the spots near the last tile, zoom in on the chosen spot, ease back out, follow the rival ----------
 const PHONE=()=>innerWidth<700;
 function topSafe(){const s=$('#status'),b=boardEl();if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
-function botSafe(){const h=$('#hand');if(!h||getComputedStyle(h).position!=='absolute')return 0;return h.offsetHeight+18}
+function botSafe(){const h=$('#hand'),rc=$('#recentre'),rh=rc&&rc.offsetHeight&&getComputedStyle(rc).bottom!=='auto'?rc.offsetHeight+14:0;if(!h||getComputedStyle(h).position!=='absolute')return rh;return h.offsetHeight+18+rh}   // keep glows clear of the Recentre button too
 function frameCells(cells,cmin,cmax){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const top=topSafe(),bot=botSafe(),aw=m.W-24,ah=m.H-top-bot-12,c=Math.max(cmin,Math.min(cmax,Math.min(aw/(x1-x0+1),ah/(y1-y0+1)))),s=c/100;return {s,x:m.W/2-(x0+x1+1)/2*100*s,y:top+ah/2-(y0+y1+1)/2*100*s}}
 function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal.filter(q=>q.r===UI.rot).map(q=>{let rk=0;try{rk=pvRank(prevCalc(q.x,q.y,UI.rot))}catch(e){}return {q,rk,d:Math.hypot(q.x-last[0],q.y-last[1])}}).sort((a,b)=>a.d-b.d);
@@ -72,10 +72,15 @@ function camArea(k,ms){if(UI.user||!G)return;camValley(null,unkey(k),ms)}
 function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else camAim()}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
 function selSpot(x,y){UI.sel={x,y,r:UI.rot};sfx('click');UI.user=false;renderGlows();renderHand();if(hintsOn())try{pvHighlight(prevCalc(x,y,UI.rot).hl)}catch(e){}renderStatus();camSpot(x,y)}
 // ---------- drawing a tile (rotated by its placement) ----------
-const tileInner=(t,r)=>`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;
+const tileInner=(t,r)=>{TXR=r|0;const o=`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;TXR=0;return o};
 function tileSvg(t,r){return `<svg viewBox="0 0 100 100" aria-hidden="true">${tileInner(t,r)}</svg>`}
 // ---------- world: tiles, glowing placement spots ----------
+function renderGround(w){let g=w.querySelector('#ground');if(!g){g=document.createElement('div');g.id='ground';g.setAttribute('aria-hidden','true');w.insertBefore(g,w.firstChild)}   // empty spots inside the valley show bare earth, not the table
+  const seen={},out=[];for(const k of G.order){const [x,y]=unkey(k);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,nk=nx+','+ny;if(G.tiles[nk]||G.tiles[key(nx,ny)]||seen[nk])continue;seen[nk]=1;
+    let n=0;for(const [ex,ey] of [[1,0],[-1,0],[0,1],[0,-1]])if(G.tiles[key(nx+ex,ny+ey)])n++;if(n>=2)out.push([nx,ny])}}
+  const sig=out.join(';');if(g._sig===sig)return;g._sig=sig;g.innerHTML=out.map(([x,y])=>`<i style="left:${x*100}px;top:${y*100}px"></i>`).join('')}
 function renderTiles(){const w=$('#world');
+  try{renderGround(w)}catch(e){}
   for(const k in UI.tl)if(!G.tiles[k]){UI.tl[k].remove();delete UI.tl[k]}
   const lastK=G.step==='fig'&&G.cur?G.cur.k:G.order[G.order.length-1];
   for(const k of G.order){const T=G.tiles[k];let e=UI.tl[k];const [x,y]=unkey(k);
@@ -136,8 +141,8 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
-  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b><small>left</small>`}
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
+  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function hname(t,p){const mine=P(p).human;return `<div class="hname"><b>${mine?'Your tile':esc(P(p).nm)+'’s tile'}</b><span>${esc(TT[t].n)}</span></div>`}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
@@ -164,14 +169,14 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
-  else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
+  else if(G.over){tn='Game over';t='Counting the points…'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
     else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
     else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap again to place.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
-    else t=(c&&!UI.cap.intro?c:'')||`Watch ${p.nm} play a tile.`}
+    else t=(c&&!UI.cap.intro?c:'')||'Watch their tile go down.'}
   say(t,tn,'')}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
