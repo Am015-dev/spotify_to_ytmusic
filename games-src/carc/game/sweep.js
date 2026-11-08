@@ -94,7 +94,7 @@ async function helpFlow(p, tag, st, o) {
   if (!ph) return false;
   const tipsOn = await p.evaluate(() => GXH.enabled());
   // 1) the first-time bubble of this phase
-  if (tipsOn && !st.seen.has(ph)) { st.seen.add(ph);
+  if (tipsOn && !st.seen.has(ph) && /^fig/.test(ph)) { st.seen.add(ph);   // place/river/bonus/nofig bubbles are pre-seen: the turn strip says it
     let b = null; const t1 = Date.now();
     while (Date.now() - t1 < 3000) { b = await p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, ph).catch(() => null); if (b) break; await sleep(80); }

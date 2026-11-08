@@ -6,7 +6,7 @@ const PHO={on:false,land:false,pop:null,popSig:'',zoom:false,tmr:0,st:''};
 const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
 const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function detect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  return true}   // board-first (the guided turn: banner, one instruction line, glowing places) at every size; ?phone=0 gives the old desktop table
 function insets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
@@ -21,7 +21,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
   let bw,bh,rail=0;
   if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
-  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.3),h-I.t-I.b-BAR-46-150)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.3),h-I.t-I.b-BAR-64-178)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
   // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
   const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');
@@ -36,7 +36,7 @@ function state(){if(!G||typeof UI==='undefined')return 'none';if(UI.modal==='sta
 function lowLife(){let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded')continue;if(c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m}
 function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter(),mo:G.morale}});
   const bad=(c,t)=>`<i class="${c?'bad':''}">${t}</i>`;
-  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}${o.mo<0?bad(true,'☹'+o.mo):`<i class="c-x">☂${o.roof}</i>`}`,
+  return {h:`<b>Day ${o.d} of ${o.r}</b>`,
     a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Morale ${o.mo}${o.mo<0?': the first player loses determination each morning, and wounds when they can’t pay':''}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
 // the goal, short enough for the bar under the island
 function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():null;if(cp){const by=G.cmp.goal.value.byDay;return cp.map(([l,h,n])=>n===true?`${l} ${h?'✓':'✗'}`:`${l} ${Math.min(h,n)}/${n}`).join(' · ')+(by?` · by day ${by}`:'')}
@@ -46,7 +46,7 @@ function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f
 PHO.sync=function(){if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
-    const lb=q('#phlabel');if(lb)lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
+    const lb=q('#phlabel');if(lb&&!(typeof BF!=='undefined'&&BF.on))lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
   // the game-over report and the setup screen are cards in the free zone
   const m=q('#modal');if(m){m.classList.toggle('phcard',st==='over');const r=dock.getBoundingClientRect();const R=document.documentElement;R.style.setProperty('--dz-t',Math.round(r.top)+'px');R.style.setProperty('--dz-l',Math.round(r.left)+'px');R.style.setProperty('--dz-w',Math.round(r.width)+'px');R.style.setProperty('--dz-h',Math.round(r.height)+'px')}
   buildStrip();
