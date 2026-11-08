@@ -62,17 +62,17 @@
     {
       "act": 1,
       "title": "Calm Shallows",
-      "blurb": "Learn to lay currents, keep off the edge and dodge your first leviathans."
+      "blurb": "Lay currents and dodge your first leviathans."
     },
     {
       "act": 2,
       "title": "Open Water",
-      "blurb": "Deck Cannons, Rift Gates and the long night watch. The captains stop going easy."
+      "blurb": "Cannons, Rift Gates and sharper captains."
     },
     {
       "act": 3,
       "title": "The Deep Reach",
-      "blurb": "Rogue Waves, the Maelstrom and the Admiral who rules the haunted archipelago."
+      "blurb": "Rogue Waves, the Maelstrom and the Admiral."
     }
   ],
   "twists": [

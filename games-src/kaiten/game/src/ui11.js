@@ -203,7 +203,7 @@ function coachEnd() {
   const btns = [h('button.btn.go', { type: 'button', 'data-a': 'coachplay' }, 'Play a real game')];
   if (COACH.pro && COACH.first) btns.unshift(h('button.btn.go', { type: 'button', 'data-a': 'coachchapter' }, 'Start chapter 1')); else if (window.CAMPAIGN) btns.push(h('button.btn.alt', { type: 'button', 'data-a': 'coachstory' }, 'Story mode'));
   rs.replaceChildren(h('div.rsbox.bar.kkcoachend', h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', win ? 'You know the rules, Mina!' : 'You know the rules!'), h('span', win ? 'Odile owes you a custard.' : 'Odile keeps the custard. For now.'))),
-    h('ol.kkrs', ...order.map(s => h('li' + ((G.winners || []).indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v ? ' (you)' : '')), h('span.p', tot[s] + ' pts')))),
+    h('ol.kkrs', ...order.map(s => h('li' + ((G.winners || []).indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v && pname(s) !== 'You' ? ' (you)' : '')), h('span.p', tot[s] + ' pts')))),
     lat.length ? h('div.kklater', h('b', 'Things you will meet later'), h('ul', ...lat.map(k => h('li', KK.STORY.coach[k].t)))) : null), ...btns));
   rs.classList.add('kkfin'); rs.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', () => {
     coachStop(); rs.hidden = true; rs.innerHTML = ''; rs.classList.remove('kkfin'); UI.rsOpen = false; const a = b.dataset.a;

@@ -304,3 +304,19 @@ html.ph .card.bfghost :is(.kind,.cx){display:none!important}
 html.ph .card.bfghost .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
 html.ph .card.bfghost :is(.gold,.tag){font-size:14px!important}
 html.ph .sl,html.ph span.small,html.ph .small{font-size:14px!important}
+/* phone: cards flying in from the decks (gfx.js .ghost) */
+html.ph .ghost .card :is(.kind,.cx){display:none!important}
+html.ph .ghost .card .cn{font-size:14px!important;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+html.ph .ghost .card :is(.gold,.tag){font-size:14px!important}
+/* PC: the kind line never runs under the price tag in the art's corner */
+html:not(.ph) .card .kind{box-sizing:border-box;padding-right:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html:not(.ph) .card .cx{margin-top:8px}
+/* phone fight row: a bonus card's +N is already on the score line; a monster keeps its level gem with a one-line name */
+html.ph .arena .card:not(.t-monster) .tag{display:none!important}
+html.ph .arena .card.t-monster .cn{-webkit-line-clamp:1!important}
+/* portrait phone, 6+ cards: the overlapping fan; a covered card shows its art and number, the top card shows everything */
+html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:none!important}
+/* PC: the price tag sits clear of the kind line */
+html:not(.ph) .card .aw .gold{translate:0 -8px}
+/* phone hand names: up to 3 lines, long words break, so no name is cut */
+html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:anywhere;hyphens:auto}

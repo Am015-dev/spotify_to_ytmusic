@@ -6,10 +6,10 @@ function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;co
   hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
   const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
   // portrait phone, 5+ cards: a fan hides every name, so the hand becomes a row of whole, readable cards that scrolls sideways
-  if(document.documentElement.classList.contains('ph-p')&&n>=1){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
-    // up to 4 cards always fit: shrink them a little instead of scrolling (names stay 14px)
-    if(n<=4){const fw=Math.floor((avail+12-gap*(n-1))/n);if(fw<100)hd.style.setProperty('--hw',Math.max(80,fw)+'px')}
-    hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*(wN+gap)>avail+18);hd.classList.remove('tight');cs.forEach(c=>{const m=c.querySelector('.cn');if(m)m.style.fontSize=''});return}
+  if(document.documentElement.classList.contains('ph-p')&&n<=5){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
+    // up to 5 cards always fit: shrink them a little instead of scrolling (names stay 14px); 6+ use the overlapping fan below
+    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100)hd.style.setProperty('--hw',Math.max(64,fw)+'px')}
+    hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*wN+(n-1)*gap>room);hd.classList.remove('tight');cs.forEach(c=>{const m=c.querySelector('.cn');if(m)m.style.fontSize=''});return}
   // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
   let w=w0;if(n>1){const fit=avail-MS*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
   const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<MS,step=sc?MS:Math.min(w*.8,need);
