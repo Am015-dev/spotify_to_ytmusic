@@ -11,10 +11,10 @@ const URL = process.env.URL || 'http://localhost:8765/stitchwise/index.html';
   const click = async s => { const e = await pg.$(s); const bb = await e.boundingBox(); if (touch) await pg.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); else await pg.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); };
   await pg.goto(URL); await pg.waitForTimeout(900); await shot('1title'); await click('[data-a=rules]'); await pg.waitForTimeout(600); await shot('1help'); await pg.reload(); await pg.waitForTimeout(700);
   // tutorial
-  const tb = await pg.$("#start [data-a=start]"); if (tb) { await click("#start [data-a=start]"); await pg.waitForTimeout(1500); await shot("2coach1"); const c = await pg.$("#offers .offer.can"); if (c) { await click("#offers .offer.can"); await pg.waitForTimeout(500); await shot("2coach2"); } }
+  const tb = await pg.$("#start [data-a=learn]"); if (tb) { await click("#start [data-a=learn]"); await pg.waitForTimeout(1500); await shot("2coach1"); const c = await pg.$("#offers .offer.can"); if (c) { await click("#offers .offer.can"); await pg.waitForTimeout(500); await shot("2coach2"); } }
   // quick game
   await pg.goto(URL); await pg.evaluate(() => { localStorage.setItem('sw_seen', '1'); }); await pg.reload(); await pg.waitForTimeout(700);
-  await click('[data-a=quick]'); await pg.waitForTimeout(300); const nc = await pg.$('text=Normal computer'); if (nc) { await nc.click(); await pg.waitForTimeout(300); }
+  await click('[data-a=start]'); await pg.waitForTimeout(300); const nc = await pg.$('text=Normal computer'); if (nc) { await nc.click(); await pg.waitForTimeout(300); }
   const st = await pg.$('text=Start the game'); if (st) { await st.click(); }
   await pg.waitForTimeout(500); await shot('3goal'); if (await pg.$('#goalcard')) await click('#goalcard [data-a=goalok]');
   await pg.waitForTimeout(1500); await shot('3first');

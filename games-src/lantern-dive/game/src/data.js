@@ -164,12 +164,12 @@ const MISSIONS = [
 const DEEP = { start: 18, sel: 'free', note: 'After dive 32: start at difficulty 18 and raise it by one for every dive you complete. Open briefing every time. Attempts are no longer counted; only whether the distress flare was used.' };
 const NAMES = ['Nerea', 'Bram', 'Sumi', 'Dag', 'Lio'];
 const BLURBS = [
-  { story: 'Nerea trained as a harbour pilot and counts everything twice: air, minutes, and the cards on the table.', enjoy: 'Choose Nerea if you like a careful teammate who plans the whole dive.', lv: 'hard' },
-  { story: 'Bram fixes pumps for a living and trusts his hands more than maps. He plays his cards and hopes for the best.', enjoy: 'Choose Bram if you like a steady teammate who rarely panics.', lv: 'normal' },
-  { story: 'Sumi studies deep-sea fish and signals the moment she sees something useful. She loves a good ping.', enjoy: 'Choose Sumi if you like a teammate who talks with her tokens.', lv: 'normal' },
-  { story: 'Dag is new to diving and gets every job he can carry. He is learning, and he is cheerful about it.', enjoy: 'Choose Dag if you want a relaxed first dive with room for mistakes.', lv: 'easy' }
+  { story: 'Nerea was a harbour pilot. She counts everything twice.', enjoy: 'Pick Nerea for a careful teammate who plans ahead.', lv: 'hard' },
+  { story: 'Bram fixes pumps and trusts his hands. He plays and hopes for the best.', enjoy: 'Choose Bram if you like a steady teammate who rarely panics.', lv: 'normal' },
+  { story: 'Sumi studies deep-sea fish. She pings the moment she sees something useful.', enjoy: 'Choose Sumi if you like a teammate who talks with her tokens.', lv: 'normal' },
+  { story: 'Dag is new to diving and takes every job he can. He is cheerful about it.', enjoy: 'Pick Dag for a relaxed first dive.', lv: 'easy' }
 ];
-const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in a double row; the Commander flies it.' };
+const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in two rows. The Commander flies it.' };
 const DATA = {
   // the staged tutorial's fixed deal (ui12 / tutor.js): you are the Commander (Lantern 4). Jobs: you "Win the Lantern 3", Dag "Win the first trick".
   tutorial: { tasks: [53, 78], hands: ['L4 L3 C2 C6 C9 K3 K5 K8 S1 S2 S4 S7 S9', 'L2 C4 C5 C7 T2 T4 T6 T9 K4 K7 S3 S5 S6', 'L1 C1 C3 C8 T1 T3 T5 T7 T8 K1 K2 K6 K9 S8'] },
