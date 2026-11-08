@@ -60,7 +60,7 @@ function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'Score now ' + sc.total, 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat) + (sc.total > swScore(G, 1 - seat).total ? ' \u2605' : ''), h('span.pts', ' ' + sc.total + ' pts')),
-    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons \u00B7', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares (gaps), -2 each' }, sc.empty + ' gaps'), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
+    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons \u00B7', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares (gaps), -2 each' }, sc.empty + ' empty'), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 18; }
@@ -77,7 +77,7 @@ function renderTrack() {
   return t;
 }
 function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[0] > G.stamp[1] ? 0 : 1, last = UI.tokPos || G.pos.slice(); UI.tokPos = G.pos.slice();
-  function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - 8 + (G.pos[0] === G.pos[1] ? (s === 0 ? -5 : 5) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - 8) + 'px'; }
+  function at(k, cellI, s) { var c = $('.tc[data-i="' + cellI + '"]', t); if (!k || !c) return; var hw = (k.offsetWidth || 20) / 2; k.style.left = (c.offsetLeft + c.offsetWidth / 2 - hw + (G.pos[0] === G.pos[1] ? (s === 0 ? -6 : 6) : 0)) + 'px'; k.style.top = (c.offsetTop + c.offsetHeight / 2 - hw) + 'px'; }
   [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', t); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (last[s] !== G.pos[s] && amt(1)) { k.style.transition = 'none'; at(k, last[s], s); void k.offsetWidth; k.style.transition = ''; } at(k, G.pos[s], s); }); }
 function markLanding() {
   var t = $('#track'); if (!t || !G) return; $$('.tc.land,.tc.next', t).forEach(function (e) { e.classList.remove('land', 'next'); }); var s = swWho(G); if (s < 0) s = 0; var pos = G.pos[s], nx = null;
@@ -96,7 +96,8 @@ function render() {
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
   if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(q); }
-  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
+  var tr = renderTrack(); sd.appendChild(tr);
+  if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
@@ -107,7 +108,7 @@ function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.
   for (var y = 0; y <= ht; y++) for (var x = 0; x <= w; x++) { var e = h('i.sc' + (set[x + ',' + y] ? '' : '.e')); e.style.width = e.style.height = oc + 'px'; if (set[x + ',' + y] && artHas(fabricStem(pid))) { var sz = Math.max(w + 1, ht + 1) * oc; e.style.backgroundImage = 'url(media/' + fabricStem(pid) + '.webp)'; e.style.backgroundSize = sz + 'px ' + sz + 'px'; e.style.backgroundPosition = (-x * oc) + 'px ' + (-y * oc) + 'px'; } s.appendChild(e); }
   return s; }
 function facts(p) { return '<span class="bt" title="Cost in buttons">' + btnIc() + p.cost + '</span><span class="bt" title="Time it takes">' + timeIc() + p.time + '</span><span class="bt" title="Buttons earned at each button spot">' + btnIc() + '×' + p.inc + '</span>'; }
-function offerFacts(p) { return '<span class="of oc"><b>' + p.cost + '</b><small>cost</small></span><span class="of ot"><b>' + p.time + '</b><small>time</small></span><span class="of oi"><b>+' + p.inc + '</b><small>earn</small></span>'; }
+function offerFacts(p) { return '<span class="of oc" title="Price in buttons">' + btnIc() + '<b>' + p.cost + '</b></span><span class="of ot" title="Time: spaces you move">' + timeIc() + '<b>' + p.time + '</b></span><span class="of oi" title="Buttons it pays at each gold spot"><b>+' + p.inc + '</b>' + btnIc() + '</span>'; }
 // W381c: see how you score. Value of a patch for a seat = 2 per square covered (each empty square costs 2) - its button cost + its buttons x gold spots still ahead.
 // W381 Addendum 7: Play is clean by default; Hints (top-bar toggle, off by default) or the Learn-to-play game show previews, badges and ratings.
 UI.hints = (function () { try { return localStorage.getItem('sw_hints') === '1'; } catch (e) { return false; } })();
@@ -124,9 +125,11 @@ function scoreBar() { // always visible: you vs the rival, leader marked
   [0, 1].forEach(function (s) { var c = sc[s]; bar.appendChild(h('span.sb' + (lead === s ? '.lead' : ''), h('b', (lead === s ? '\u2605 ' : '') + nameOf(s) + ' ' + sgn(c.total)), h('small', '(' + c.btn + ' \u2212 ' + c.empty + '\u00D72' + (c.bonus ? ' + 7' : '') + ')'))); });
   return bar; }
 function turnTracker(s) { // whose turn and why (the token further back moves), spaces left
-  if (G.over) return 'Game over'; var o = 1 - s, left = SW.TRACK - G.pos[s], nm = 'Turn: ' + (UI.mode !== 'hot' && isHuman(s) ? 'you' : nameOf(s));
-  var why = G.pend ? 'free patch' : G.pos[s] < G.pos[o] ? 'behind by ' + (G.pos[o] - G.pos[s]) : G.pos[o] >= SW.TRACK ? 'rival finished' : 'tied, on top';
-  return nm + ' \u00B7 ' + why + ' \u00B7 ' + left + ' left'; }
+  if (G.over) return 'Game over'; var o = 1 - s, me = UI.mode !== 'hot' && isHuman(s), nm = me ? 'You' : nameOf(s), d = G.pos[o] - G.pos[s], sp = function (n) { return n + ' space' + (n === 1 ? '' : 's'); };
+  if (G.pend) return nm + (me ? ' get' : ' gets') + ' a free 1\u00D71 patch';
+  if (G.pos[o] >= SW.TRACK) return nm + (me ? ' go' : ' goes') + ': ' + nameOf(o) + ' has finished';
+  if (d > 0) return nm + (me ? ' are ' : ' is ') + sp(d) + ' behind, so ' + (me ? 'you go' : 'goes') + ' next';
+  return 'Level: ' + (me ? 'you' : nameOf(s)) + ' landed on top, so ' + (me ? 'you go' : 'goes') + ' next'; }
 function rateMove(m) { // compare the human's move with the best value on offer (the solver's yardstick)
   var s = swWho(G), off = swOffer(G), opts = [];
   off.forEach(function (pid, k) { var p = PATCHES[pid]; if (G.btn[s] >= p.cost && swPlacements(G.board[s], p).length) opts.push({ k: k, name: p.name, v: patchValue(s, pid).net }); });
@@ -184,7 +187,7 @@ function setHints(on) { UI.hints = !!on; try { localStorage.setItem('sw_hints', 
 function showGoal() { // one card before turn 1 in Play: the aim in one sentence, 3 ways to score
   UI.goal = true; clearTimeout(UI.tm.ai); UI.seq++; var ov = h('div#goalcard.ov', { role: 'dialog', 'aria-label': 'Goal' }), c = h('div.gcard');
   c.appendChild(h('h2', 'Win with the most points when time runs out.'));
-  var ul = h('ul'); ['Each empty square on your quilt costs 2 points.', 'Every button you keep is 1 point.', 'Fill a 7\u00D77 block first: +7 points.'].forEach(function (t) { ul.appendChild(h('li', t)); }); c.appendChild(ul);
+  var ul = h('ul'); ['Score = your buttons, minus 2 for each empty square.', 'Cover squares with patches. Buttons pay for them.', 'Fill a 7\u00D77 block first: +7 points.'].forEach(function (t, i) { var li = h('li', t); if (i === 2 && typeof bonusTileHtml === 'function') li.insertAdjacentHTML('afterbegin', bonusTileHtml()); ul.appendChild(li); }); c.appendChild(ul);
   var b = h('button.btn.go.grow', { type: 'button', 'data-a': 'goalok' }, 'Start'); c.appendChild(b); ov.appendChild(c); document.body.appendChild(ov);
 }
 function closeGoal() { var g = $('#goalcard'); if (g) g.remove(); UI.goal = false; schedule(); }

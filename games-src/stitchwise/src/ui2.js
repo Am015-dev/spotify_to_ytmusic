@@ -59,7 +59,7 @@ function act(m) {
   if (!G || G.over) return; if (isHuman(swWho(G)) && UI.mode !== 'hot' && (m.t === 'buy' || m.t === 'adv')) { try { UI.rate = rateMove(m); } catch (e) { UI.rate = ''; } } if (isHuman(swWho(G))) { UI.flavor = ''; var tb = $('#turnban'); if (tb) tb.classList.remove('on'); } var s = swWho(G), before = { pos: G.pos.slice(), btn: G.btn.slice(), bonus: G.bonus };
   var r = swApply(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed (' + r.why + ').'); render(); return; }
   var evs = G.ev.slice(); evs.forEach(function (e) { if (e.k === 'place') e.cells.forEach(function (c) { UI.newCells[e.s + ':' + (c[1] * 9 + c[0])] = 1; }); });
-  UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(800), fin); else fin(); });
+  UI.busy++; saveGame(); render(); playEvents(evs, before, function () { var fin = function () { UI.peek = -1; UI.cap = ''; UI.busy--; afterMove(); }; if (UI.peek >= 0 && amt(1)) later(sp(2000), fin); else fin(); });
 }
 function floatText(txt, el, color, wide) { var mm = String(txt).match(/^[+\u2212-]?\d+(?: pts| buttons?)?/); if (!mm) return; txt = mm[0]; /* W470: only a short number flies */ var r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 }; var f = h('div.flt' + (wide ? '.r' : ''), txt); f.style.left = (wide ? Math.max(120, Math.min(innerWidth - 120, r.left + r.width / 2)) : r.left + r.width / 2 - 18) + 'px'; f.style.top = (r.top) + 'px'; if (color) f.style.color = color; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1800); }
 function playEvents(evs, before, done) {
@@ -101,9 +101,9 @@ function aiStep() { // the rival's turn, one visible step at a time (caption, fl
   if (!G || G.over || UI.busy || UI.goal) return; var s = swWho(G); if (isHuman(s)) return; var m = aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);
   if (!amt(1)) return act(m);
   var pl = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
-  if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; UI.cap = nm + ' buys ' + p.name + ' for ' + pl(p.cost, 'button'); renderDock(); var o = $$('#offers .offer')[m.k]; if (o) o.classList.add('flash'); sfx('pick'); UI.busy++;
-    later(sp(1900), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
-  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(1700), function () { UI.busy--; act(m); }); }
+  if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; UI.cap = nm + ' buys ' + p.name + ' for ' + pl(p.cost, 'button'); UI.peek = s; render(); var o = $$('#offers .offer')[m.k]; if (o) o.classList.add('flash'); sfx('pick'); UI.busy++;
+    later(sp(2200), function () { UI.peek = s; UI.cap = nm + ' sews it on and moves ' + pl(p.time, 'space'); UI.busy--; act(m); }); }
+  else if (m.t === 'adv') { var st = swAdvSteps(G, s); UI.cap = nm + ' advances ' + pl(st, 'space') + ' and takes ' + pl(st, 'button'); renderDock(); UI.busy++; later(sp(2000), function () { UI.busy--; act(m); }); }
   else { UI.peek = s; UI.cap = nm + ' sews a free 1\u00D71 patch'; render(); UI.busy++; later(sp(1500), function () { UI.busy--; act(m); }); }
 }
 document.addEventListener('pointerdown', function () { if (G && !G.over && !isHuman(swWho(G))) UI.fast = true; }, true);
