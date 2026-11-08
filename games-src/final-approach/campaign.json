@@ -1690,12 +1690,12 @@
    "final": "Landing round: speed must not beat the brakes."
   },
   "later": [
-   "Traffic die: some airports add planes each round (Story chapter 7).",
-   "Corridor tabs: some strips make the axis match a marker (chapter 9).",
-   "Fuel: a fuel space burns the die value; below 0 you lose (chapter 8).",
-   "Wind dial, trainee tokens, icy runway, the 60-second clock (chapters 11 to 15).",
-   "Crew cards, hand-over, flip side and cross-check (chapter 10).",
-   "A die that fits nowhere is thrown away and counts as your turn."
+   "Traffic die: some airports add planes (chapter 7).",
+   "Corridor tabs: the axis must match a marker (chapter 9).",
+   "Fuel: each die burns fuel; below 0 you lose (chapter 8).",
+   "Wind, trainee, icy runway and the clock (chapters 11 to 15).",
+   "Crew cards, hand-over, flip side, cross-check (chapter 10).",
+   "A die that fits nowhere is thrown away."
   ],
   "endText": {
    "win": "Pell lowers his pen: \"...Passed.\" Green Wings stays open.",
