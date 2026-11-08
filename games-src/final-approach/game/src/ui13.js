@@ -103,7 +103,7 @@ function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   ['back-default', 'back-spires'].forEach(preImg);
   tableApply();
-  try { GXSK.init({ sets: { 'sk-phrase': ['ui-phrase-c'], 'sk-roll': ['ui-button-roll-c'], 'sk-sheet': ['ui-sheet-c'], 'sk-alt': ['ui-altbar-c'], 'sk-check': ['ui-check'] } }); } catch (e) { }
+  try { GXSK.init({ map: true, stars: true, banner: true, sets: { 'sk-phrase': ['ui-phrase-c'], 'sk-roll': ['ui-button-roll-c'], 'sk-sheet': ['ui-sheet-c'], 'sk-alt': ['ui-altbar-c'], 'sk-check': ['ui-check'] } }); } catch (e) { }
   setInterval(() => { try { musicSync(); tableApply(); tableRetry(); } catch (e) { } }, 800);
 }
 // weather / time-of-day badge (painted); vanishes if the file is missing

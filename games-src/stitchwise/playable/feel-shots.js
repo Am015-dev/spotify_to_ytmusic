@@ -21,9 +21,9 @@ const URL = process.env.URL || 'http://localhost:8765/stitchwise/index.html';
   };
   await pg.goto(URL); await pg.evaluate(() => { try { localStorage.clear(); } catch (e) { } }); await pg.reload(); await pg.waitForTimeout(1200);
   await shot('1-title');
-  if (await click('[data-a=start]')) { await pg.waitForTimeout(2200); await shot('2-learn'); }
+  if (await click('[data-a=learn]')) { await pg.waitForTimeout(2200); await shot('2-learn'); }
   await pg.goto(URL); await pg.evaluate(() => { localStorage.setItem('sw_seen', '1'); }); await pg.reload(); await pg.waitForTimeout(900);
-  await click('[data-a=quick]'); await pg.waitForTimeout(400); const nc = await pg.$('text=Normal computer'); if (nc) { const bb = await nc.boundingBox(); await tapXY(bb.x + bb.width / 2, bb.y + bb.height / 2); await pg.waitForTimeout(400); }
+  await click('[data-a=start]'); await pg.waitForTimeout(400); const nc = await pg.$('text=Normal computer'); if (nc) { const bb = await nc.boundingBox(); await tapXY(bb.x + bb.width / 2, bb.y + bb.height / 2); await pg.waitForTimeout(400); }
   const st = await pg.$('text=Start the game'); if (st) { const bb = await st.boundingBox(); await tapXY(bb.x + bb.width / 2, bb.y + bb.height / 2); }
   await pg.waitForTimeout(700); await shot('3-goal'); await click('#goalcard [data-a=goalok]');
   await humanTurn(); await pg.waitForTimeout(1500); await shot('4-first');
