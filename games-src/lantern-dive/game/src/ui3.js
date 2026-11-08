@@ -43,8 +43,9 @@ function newGame(mode, o) {
   G.noProg = mode === 'tutorial' || (mission.kind !== 'log' && mission.kind !== 'deep');
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.news = [];
-  UI.coach = { level: mode === 'tutorial' ? 'off' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
+  UI.coach = { level: mode === 'tutorial' || !UI.prefs.hints ? 'off' : 'light', seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
+  if (mode === 'vs' && !NET.on && !o.noGoal) UI.dlg = { who: 'mara', title: 'Goal', body: ['Every job card must be done, by the diver who holds it, or the whole crew loses.', 'A job is met by the tricks its diver wins.', 'Follow the colour led; the highest of that colour wins; a Lantern beats every colour.', 'Done jobs show a green tick; one broken job ends the dive.'], btn: 'Dive' }, drawDlg();
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function tutorialStack() {

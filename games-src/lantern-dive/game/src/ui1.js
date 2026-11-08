@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, seq: 0, over: null, overShown: false,
-  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0, fingerOn: false, holdJobs: null, stampSeen: {}, geo: null };
+  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', hints: false, timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0, fingerOn: false, holdJobs: null, stampSeen: {}, geo: null };
 const D = LD.DATA, TASKS = D.tasks, KIT = LDKit;
 const suitOf = D.suitOf, valOf = D.valOf;
 // painted art: LD_ART (data URIs made by build.py) -> blob URLs so the card <svg>s carry short links. Without blob URLs (jsdom) the kit keeps its own vector drawings.

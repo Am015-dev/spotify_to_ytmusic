@@ -129,7 +129,7 @@ function drawDlg() {
   const who = CHAR[d.who] || CHAR.mara;
   el.append(h('div.dbox' + (d.curse ? '.curse' : '') + (d.who !== 'mara' ? '.bossd' : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': d.title || who.name },
     h('div.dtop2', h('span.dpt', { html: portraitSVG(d.who || 'mara', 76) }), h('div', h('b', who.name), h('small', who.role))),
-    d.title ? h('h3', d.title) : null, h('p', d.body),
+    d.title ? h('h3', d.title) : null, Array.isArray(d.body) ? h('ul.goal', d.body.map(x => h('li', x))) : h('p', d.body),
     h('div.cbtns', h('button.btn.go', { 'data-a': 'dlgok', type: 'button' }, d.btn || 'OK'))));
 }
 function dlgOk() { const d = UI.dlg; UI.dlg = null; drawDlg(); if (d && d.then) try { d.then(); } catch (e) { console.error(e); } render(); schedule(); }
