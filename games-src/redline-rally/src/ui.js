@@ -29,7 +29,7 @@ function drawSetup() {
   chooser('#s-wx', WX_IDS.concat(['random']).map(function (w) { return { v: w, h: w === 'random' ? 'Random' : esc(WEATHER[w].name) }; }), 'wx');
   chooser('#s-sup', [{ v: true, h: 'On' }, { v: false, h: 'Off' }], 'sup');
   chooser('#s-diff', ['easy', 'normal', 'hard'].map(function (d) { return { v: d, h: d[0].toUpperCase() + d.slice(1) }; }), 'diff');
-  var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = innerHeight >= 880; $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title'));
+  var qt = $('#quickT'); if (qt && !qt._set) { qt._set = 1; var op = false;   /* collapsed by default on every screen (R9) */ $('#quickBody').hidden = !op; qt.setAttribute('aria-expanded', op ? 'true' : 'false'); qt.onclick = function () { var h = !$('#quickBody').hidden; $('#quickBody').hidden = h; qt.setAttribute('aria-expanded', h ? 'false' : 'true'); }; } $('#tutSlot').innerHTML = tutBtn('ghostb'); $('#storyLine').innerHTML = typeof campLine === 'function' ? campLine() : ''; $('#title').setAttribute('data-art', 'bg-title'); artApply($('#title')); titleBg();
 }
 function showTitle() { try { GX.close(); } catch (e) { } $('#title').hidden = false; $('#game').hidden = true; closeModal(); drawSetup(); }
 function modal(html) { var m = $('#modal'); m.innerHTML = '<div class="sheet"><button class="xb" aria-label="Close" id="mx">✕</button>' + html + '</div>'; m.hidden = false; $('#mx').onclick = closeModal; m.onclick = function (e) { if (e.target === m && !UI.lockModal) closeModal(); }; artApply(m); }
@@ -123,6 +123,8 @@ function drawPlan() {
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
+  p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
+  if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
   $('#boostB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); UI.boost = !UI.boost; drawPlan(); };
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
@@ -277,7 +279,7 @@ var cv, cx, dpr = 1, trackCache = {};
 function sizeCanvas() {
   cv = cv || $('#cv'); cx = cx || cv.getContext('2d'); var r = $('#cvw').getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1);
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
-  UI.cam.s = Math.max(0.28, Math.min(0.62, Math.min(UI.W, UI.H * 1.15) / 880));
+  UI.cam.s = Math.max(0.75, Math.min(1.3, Math.min(UI.W, UI.H * 1.3) / 420));   /* close camera: cars ~90-100 px (R9) */
   UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
 }
 function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
@@ -325,6 +327,7 @@ function frame(now) {
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
   var shk = camShake(now); cx.save(); cx.translate(W / 2 + shk, H / 2 + shk * 0.5); cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
+  cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
   tk.list.forEach(function (kk) {
     var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98;
@@ -376,3 +379,28 @@ UI.forceEnd = function () { if (!G) return; G.cars[0].pos = total(G); G.cars.for
 window.RR = { newGame: newGame, performMove: submitPlan, validMoves: validMoves, sideToAct: sideToAct, checkInvariants: checkInvariants, start: startGame };
 window.UI = UI;
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+
+/* the title picture has thin white bars at its sides: scale it 6% past cover so they fall off screen (R9) */
+function titleBg() { var t = $('#title'), im = ART.img['bg-title']; if (!t || !im) return; var k = Math.max(innerWidth / im.width, innerHeight / im.height) * 1.06; t.style.backgroundSize = Math.ceil(im.width * k) + 'px auto'; }
+window.addEventListener('resize', titleBg);
+
+/* drag a card up out of the hand to play it; a tap still works. The card lifts and follows the finger, the zone above the
+   hand glows, and on drop it snaps into the played row (the card's own tap handler does the rest: sound, buzz, redraw). */
+function cardDrag(b) {
+  b.addEventListener('pointerdown', function (ev) {
+    if (ev.button > 0 || UI.busy) return; var x0 = ev.clientX, y0 = ev.clientY, dr = false, h = $('#hand'), id = ev.pointerId;
+    function over(e) { var r = h.getBoundingClientRect(); return e.clientY < r.top - 4; }
+    function mv(e) {
+      if (e.pointerId !== id) return; var dx = e.clientX - x0, dy = e.clientY - y0;
+      if (!dr && Math.hypot(dx, dy) > 10) { dr = true; b.classList.add('lift'); h.classList.add('dropz'); try { b.setPointerCapture(id); } catch (er) { } }
+      if (dr) { b.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.12) rotate(' + Math.max(-12, Math.min(12, dx / 14)) + 'deg)'; h.classList.toggle('dropon', over(e)); e.preventDefault(); }
+    }
+    function up(e) {
+      if (e.pointerId !== id) return; document.removeEventListener('pointermove', mv); document.removeEventListener('pointerup', up); document.removeEventListener('pointercancel', up);
+      if (!dr) return; h.classList.remove('dropz', 'dropon'); b.classList.remove('lift'); b.style.transform = ''; UI.dragT = Date.now(); UI.dragEl = b;
+      var j = +b.getAttribute('data-i'); if (e.type === 'pointerup' && over(e) && UI.sel.indexOf(j) < 0) { UI.snapI = j; UI.dragging = 1; b.onclick(); UI.dragging = 0; }
+    }
+    document.addEventListener('pointermove', mv, { passive: false }); document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+  });
+  b.addEventListener('click', function (e) { if (!UI.dragging && UI.dragEl === b && Date.now() - UI.dragT < 400) {   /* only the click the browser fires at the end of this card's own drag */ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+}

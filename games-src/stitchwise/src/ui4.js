@@ -35,7 +35,7 @@ function coachSay(key, vars, now) {
   if (now) { C.q.unshift(it); coachNext(); } else { C.q.push(it); if (!C.line || C.fresh <= 0) coachNext(); }
 }
 function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); GXCOACH.explained.push(n.k); coachRender(); }
-function coachRender() {
+function coachRender() { try { if (UI.coach && UI.coach.line) { clearTimeout(toast.t); $('#toast').classList.remove('on'); } } catch (e) { } /* W470: one message at a time */
   var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : '';
   var sk = $('#skipmap'); if (UI.coach && UI.prologue && G && !G.over) { if (!sk) { sk = h('button#skipmap.btn.alt.sm', { type: 'button', 'data-a': 'skipmap' }, 'Skip to map'); var db = $('#dockbody'); if (db) db.appendChild(sk); } } else if (sk) sk.remove();
   el.hidden = !txt || !G || G.over; if (el.hidden) { el.dataset.k = ''; return; } var key = txt + '|' + (C ? C.ch : ''); if (el.dataset.k === key) return; el.dataset.k = key; el.innerHTML = '';

@@ -11,8 +11,8 @@ await p.evaluate(()=>{AIDELAY=30;try{UI.speed=8;TWKit.setSpeed(8)}catch(e){}});
 const cdp=PHN?await c.newCDPSession(p):null;
 const drag=async(a,z)=>{const N=10;if(PHN){await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:a.x,y:a.y}]});for(let k=1;k<=N;k++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:a.x+(z.x-a.x)*k/N,y:a.y+(z.y-a.y)*k/N}]});await p.waitForTimeout(16)}await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]})}
   else{await p.mouse.move(a.x,a.y);await p.mouse.down();for(let k=1;k<=N;k++){await p.mouse.move(a.x+(z.x-a.x)*k/N,a.y+(z.y-a.y)*k/N);await p.waitForTimeout(16)}await p.mouse.up()}};
-const tapEl=async sel=>{const l=p.locator(sel+':visible').first();if(!await l.count())return false;const bb=await l.boundingBox();if(PHN)await p.touchscreen.tap(bb.x+bb.width/2,bb.y+bb.height/2);else await p.mouse.click(bb.x+bb.width/2,bb.y+bb.height/2);return true};
-await tapEl('#quickgo');await p.waitForTimeout(800);
+const tapEl=async sel=>{const l=p.locator(sel+':visible').first();if(!await l.count())return false;const bb=await l.boundingBox();if(!bb)return false;if(PHN)await p.touchscreen.tap(bb.x+bb.width/2,bb.y+bb.height/2);else await p.mouse.click(bb.x+bb.width/2,bb.y+bb.height/2);return true};
+await p.locator('#quickgo').click();await p.waitForTimeout(800);
 let drags=0,fails=0,glow=0;const t0=Date.now();
 while(Date.now()-t0<180000){
   const st=await p.evaluate(()=>({over:!!G.over,me:sideToAct(),busy:UI.busy,ph:G.phase,q:!!G.q,alive:G.ships[0].alive}));

@@ -228,3 +228,44 @@
   GXT.running = function () { return run0.apply(this, arguments) || coached() || !!(window.PPC && PPC.ended && typeof G !== 'undefined' && G && G.tut) };
   GXT.state = function () { if (run0.apply(this, arguments)) return st0.apply(this, arguments); if (typeof G !== 'undefined' && G && G.tut && G.winner) return { phase: 'end' }; return null };
 })();
+
+// W467 review R6: the result card. As soon as someone wins: who won, one plain line why, your stars and place, Play again.
+// The newspaper with every number is one tap away ("Full results"); the coached first game keeps its own final card.
+(function () {
+  const ordn = n => n + (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+  function ccResult() {
+    const R = document.documentElement; let el = document.getElementById('ccres');
+    const on = typeof G !== 'undefined' && G && G.winner && !G.tut && !UI.stats && !UI.info;
+    R.classList.toggle('cc-over', !!on);
+    if (!on) { if (el) el.hidden = true; return }
+    clearTimeout(UI.statsT);
+    const board = document.querySelector('.gx-board'); if (!board) return;
+    if (!el) { el = document.createElement('div'); el.id = 'ccres'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'Result');
+      el.addEventListener('click', e => { if (e.target.closest('[data-ccpaper]')) { UI.stats = true; render() } }); }
+    if (el.parentNode !== board) board.appendChild(el);
+    const me = G.pl.find(p => p.human), w = G.winner === 'draw' ? null : G.pl[+String(G.winner).slice(1) - 1];
+    const rank = G.pl.slice().sort((a, b) => ((b === w) - (a === w)) || (b.alive - a.alive) || (b.vp - a.vp)), place = me ? rank.indexOf(me) + 1 : 0;
+    const why = !w ? 'Everyone fell at once. The city wins.' : w.vp >= GOAL() ? `${w === me ? 'You' : mname(w)} reached ${w.vp} ★ first.` : `${w === me ? 'You were' : mname(w) + ' was'} the last monster standing.`;
+    const html = `<div class="ccres-card nocut">${w ? `<div class="face">${monFace(w.m)}</div>` : ''}<h2>${w ? (w === me ? 'You win!' : esc(mname(w)) + ' wins!') : 'Nobody wins'}</h2>
+      <p class="why">${esc(why)}</p>${me ? `<p class="mine"><span>You:</span> <b>${me.vp} ★</b> <span>· ${ordn(place)} of ${G.pl.length}</span></p>` : ''}
+      <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-ccpaper>Full results</button></div></div>`;
+    if (el.dataset.k !== html) { el.innerHTML = html; el.dataset.k = html }
+    el.hidden = false;
+  }
+  window.ccResult = ccResult;
+  if (typeof render === 'function') { const _r = render; render = function () { _r.apply(this, arguments); try { ccResult() } catch (e) { console.error(e) } } }
+})();
+
+// W467 R6: card art preloads while the game is idle (a few at a time), so a newly dealt card shows its owner art at once instead of popping in.
+// Classic games load the deck's art; evolution art loads only when evolutions are on.
+(function () {
+  let started = false;
+  function go() {
+    if (started || typeof G === 'undefined' || !G || typeof CPIC === 'undefined' || typeof CARDS === 'undefined') return; started = true;
+    const list = [...CPIC].filter(b => CARDS[b] || (G.evoOn && /^evo/.test(b))).map(b => 'media/pc-' + b + '.webp');
+    const idle = f => setTimeout(f, 80);   // idle callbacks starve while the 3D loop runs, so a short timer paces the loads
+    let i = 0; const next = () => { if (i >= list.length) return; const img = new Image(); img.decoding = 'async'; img.onload = img.onerror = () => idle(next); img.src = list[i++] };
+    setTimeout(() => { for (let k = 0; k < 3; k++) idle(next) }, 4000);
+  }
+  if (typeof render === 'function') { const _r = render; render = function () { _r.apply(this, arguments); try { go() } catch (e) { } } }
+})();
