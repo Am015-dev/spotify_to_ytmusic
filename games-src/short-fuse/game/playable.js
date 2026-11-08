@@ -65,3 +65,23 @@ function plClip(){document.querySelectorAll('.gx-drawer.open .gx-drawer-body,.gx
   body.querySelectorAll('*').forEach(e=>{const q=e.getBoundingClientRect();if(!q.height)return;const out=q.top>=r.bottom-1||q.bottom<=r.top+1;const h=e.style.visibility==='hidden';if(out&&!h)e.style.visibility='hidden';else if(!out&&h)e.style.visibility=''})})}
 document.addEventListener('scroll',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('gx-drawer-body'))plClip()},true);
 setInterval(plClip,300);
+// ---------- the middle of the table: the rig and the race (cut / total), in the biggest empty gap between the stands ----------
+function plCenter(){const tb=document.getElementById('tb');if(!tb)return;let c=document.getElementById('midc');
+  const off=()=>{if(c)c.hidden=true};if(!G||!UI.started||G.over||UI.brief)return off();
+  const b=tb.getBoundingClientRect();if(!b.height)return off();
+  const rows=[...tb.querySelectorAll('#crew .sg,#gear,#mine')].map(e=>e.getBoundingClientRect()).filter(r=>r.height>4).sort((x,y)=>x.top-y.top);
+  const say=document.getElementById('say');let top=say?say.getBoundingClientRect().bottom:b.top,best=null;
+  let k=0;for(const r of rows){const g=r.top-top;const w=g+(k>0&&g>=120?1000:0);if(w>(best?best.w:0))best={y:top,h:g,w};top=Math.max(top,r.bottom);k++}
+  let side=null;if(!best||best.h<120){best=null;const cr=[...tb.querySelectorAll('#crew .sg')].map(e=>e.getBoundingClientRect()).filter(r=>r.height>4).sort((x,y)=>x.left-y.left);
+    for(let i=1;i<cr.length;i++){const p=cr[i-1],q=cr[i];if(Math.min(p.bottom,q.bottom)-Math.max(p.top,q.top)<20)continue;const w=q.left-p.right;if(w>=200&&(!side||w>side.w))side={x:p.right,w,y:Math.max(p.top,q.top),h:Math.min(p.bottom,q.bottom)-Math.max(p.top,q.top)}}
+    if(!side)return off()}
+  if(side){const h=Math.min(side.h,side.w*.42,180),tot=G.st.reduce((a,s)=>a+s.w.length,0),cut=plCut();
+    if(!c){c=document.createElement('div');c.id='midc';c.setAttribute('aria-hidden','true');c.innerHTML='<i></i><div><b></b><span>wires cut</span></div>';tb.appendChild(c)}
+    c.hidden=false;c.style.left=(side.x-b.left+12)+'px';c.style.right=(b.right-side.x-side.w+12)+'px';c.style.top=(side.y-b.top+(side.h-h)/2)+'px';c.style.height=h+'px';c.style.setProperty('--mh',h+'px');
+    const t=cut+' / '+tot;if(c.querySelector('b').textContent!==t){c.querySelector('b').textContent=t;c.classList.remove('bump');void c.offsetWidth;if(cut)c.classList.add('bump')}return}
+  const h=Math.min(best.h-16,Math.max(120,b.width>900?230:170)),tot=G.st.reduce((a,s)=>a+s.w.length,0),cut=plCut();
+  if(!c){c=document.createElement('div');c.id='midc';c.setAttribute('aria-hidden','true');c.innerHTML='<i></i><div><b></b><span>wires cut</span></div>';tb.appendChild(c)}
+  c.hidden=false;c.style.left='0';c.style.right='0';c.style.top=(best.y-b.top+(best.h-h)/2)+'px';c.style.height=h+'px';c.style.setProperty('--mh',h+'px');
+  const t=cut+' / '+tot;if(c.querySelector('b').textContent!==t){c.querySelector('b').textContent=t;c.classList.remove('bump');void c.offsetWidth;if(cut)c.classList.add('bump')}}
+(function(){const o=refresh;refresh=function(){o();try{plCenter()}catch(e){console.error(e)}}})();
+setInterval(()=>{try{plCenter()}catch(e){}},700);

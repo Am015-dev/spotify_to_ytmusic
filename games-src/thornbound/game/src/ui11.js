@@ -29,7 +29,7 @@ const HLP_STEPS={
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
  place:{target:hq('#handw'),title:'Hide a card',text:'Tap a card, then tap a region. It stays hidden until the Clash.',pic:()=>HP.region()},
  tie:{target:hfirst('#act .btn','#handw'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
- spring:{target:hfirst('.tbx-pan g.rglow rect','#act .btn'),title:'Send Supporters',text:'Tap a region to send a Supporter: +1 Strength in its first Clash. Then tap Done.',pic:()=>HP.supp()},
+ spring:{target:hfirst('.tbx-pan g.rglow rect','#act .btn'),title:'Send Supporters',text:'Tap a region to send a Supporter. It adds +1 Strength in its first Clash. Then tap Done.',pic:()=>HP.supp()},
  day:{target:hfirst('#act .btn.pri','#act .btn'),title:'The Clash',text:'The cards are face up. Highest total Strength wins. Tap Done to fight.',pic:()=>HP.swords()},
  autumn:{target:hfirst('#act [data-a=powers]','#act .btn.pri','#act .btn'),title:'Autumn options',text:'Optional: Govern or Journey with a card. Tap Powers to look, or Done to skip.',pic:()=>HP.scroll()},
  clashOrder:{target:hfirst('.tbx-pan g.rglow rect'),title:'Order the Clashes',text:'Tap the regions in the order they will fight.',pic:()=>HP.swords()},
@@ -41,22 +41,22 @@ const HLP_STEPS={
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
  {title:'The goal',text:'Hold the most Influence when the last round ends. Influence is your score.',pic:()=>hpics([['star','Influence'],'>',['crown','Winner']])},
- {title:'One round',text:'Bid for a Kingdom Card, place your Herald, hide cards, send Supporters, fight the Clashes.',pic:()=>hpics([['back','Bid'],'>',['herald','Herald'],'>',['swords','Clash']])},
+ {title:'One round',text:'Bid for a Kingdom Card. Place your Herald. Hide cards. Send Supporters. Fight the Clashes.',pic:()=>hpics([['back','Bid'],'>',['herald','Herald'],'>',['swords','Clash']])},
  {phase:'bid',title:'Bid in secret',text:'Pick one hand card as your secret bid. The highest bid chooses a Kingdom Card first.',pic:()=>hpics([['card','Your card',5],'>',['back','Secret bid']])},
- {phase:'bid',title:'The bid goes under',text:'Your bid card is tucked under the Kingdom Card you take, so it cannot fight this round.',pic:()=>hpics([['back','Bid'],'>',['kc','Kingdom Card']])},
+ {phase:'bid',title:'The bid goes under',text:'Your bid card is tucked under the Kingdom Card you take. It cannot fight this round.',pic:()=>hpics([['back','Bid'],'>',['kc','Kingdom Card']])},
  {phase:'bid',title:'Cheap or strong?',text:'A cheap bid keeps your strong cards for the Clashes. A high bid picks first.',pic:()=>hpics([['card','Cheap',1],['card','Strong',9]])},
  {phase:'bidRes',title:'A lasting power',text:'A Kingdom Card works for you every round you keep it. Tap a glowing one to read it.',pic:()=>hpics([['kc','Kingdom Card'],'>',['star','Power']])},
- {phase:'bidRes',title:'Nothing good?',text:'Tap Keep my card to take your bid back, or steal a Kingdom Card from a rival.',pic:()=>hpics([['back','Your bid'],'>',['hand','Back to hand']])},
+ {phase:'bidRes',title:'Nothing good?',text:'Tap Keep my card to take your bid back. Or steal a Kingdom Card from a rival.',pic:()=>hpics([['back','Your bid'],'>',['hand','Back to hand']])},
  {phase:'occupier',title:'Tuck a card under',text:'The card under your Kingdom Card cannot fight. Choose your weakest one.',pic:()=>hpics([['card','Weak',1],'>',['kc','Kingdom Card']])},
- {phase:'occupier',title:'A strong card is safer',text:'A stronger card under it makes your Kingdom Card harder for rivals to steal.',pic:()=>hpics([['card','Strong',9],'>',['kc','Harder to steal']])},
+ {phase:'occupier',title:'A strong card is safer',text:'A stronger card under it makes your Kingdom Card harder to steal.',pic:()=>hpics([['card','Strong',9],'>',['kc','Harder to steal']])},
  {phase:'herald',title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that location\'s region.',pic:()=>hpics([['herald','Herald'],'>',['loc','Location']])},
- {phase:'herald',title:'Win there, earn more',text:'Win the region and claim the location: +1 Influence, and take 1 from each rival Herald there.',pic:()=>hpics([['swords','Win'],'>',['loc','Claim','+1']])},
+ {phase:'herald',title:'Win there, earn more',text:'Win the region and claim the location. Gain +1 Influence, and take 1 from each rival Herald there.',pic:()=>hpics([['swords','Win'],'>',['loc','Claim','+1']])},
  {phase:'place',title:'Hide a card',text:'Tap a card, then tap a region (or drag it there). It stays face down until the Clash.',pic:()=>hpics([['card','Pick',5],'>',['region','Region']])},
  {phase:'place',title:'The highest total wins',text:'At the Clash all cards flip. The highest total Strength in a region wins it.',pic:()=>hpics([['back','Flip'],'>',['swords','Compare']])},
  {phase:'place',title:'Or pass',text:'Pass keeps your cards in your hand. If everyone passes, nobody wins that region.',pic:()=>hpics([['pass','Pass'],'>',['hand','Keep cards']])},
  {phase:'tie',title:'A tie!',text:'The totals are equal. Each side may add one more hidden card, or pass.',pic:()=>hpics([['swords','Equal'],'>',['card','One more']])},
  {phase:'tie',title:'No extra card?',text:'If nobody adds a card, nobody wins this region.',pic:()=>hpics([['pass','Nobody wins']])},
- {phase:'spring',title:'Send Supporters',text:'Tap a region to send a Supporter: +1 Strength there in its first Clash.',pic:()=>hpics([['supp','Supporter'],'>',['region','Region']])},
+ {phase:'spring',title:'Send Supporters',text:'Tap a region to send a Supporter. It adds +1 Strength in its first Clash.',pic:()=>hpics([['supp','Supporter'],'>',['region','Region']])},
  {phase:'spring',title:'They do not last',text:'Supporters on the map are lost in Winter. Tap Done when you are finished.',pic:()=>hpics([['supp','Used'],'>',['pass','Lost in Winter']])},
  {phase:'day',title:'The Clash',text:'The cards are face up. The highest total Strength wins the region. Tap Done to fight it.',pic:()=>hpics([['card','Yours',5],['swords','vs'],['card','Theirs',3]])},
  {phase:'day',title:'Powers first',text:'Some cards and Tactics can act now, before the result. Tap Powers to look.',pic:()=>hpics([['star','Power'],'>',['swords','Clash']])},
@@ -66,11 +66,11 @@ const HLP_RULES=[
  {phase:'clashOrder',title:'Order the Clashes',text:'Tap the regions in the order they fight. Your strongest region first is a good start.',pic:()=>hpics([['region','1st'],'>',['region','2nd'],'>',['region','3rd']])},
  {phase:'clashOrder',title:'One Clash per region',text:'Each region fights once per round. The winner claims one of its two locations.',pic:()=>hpics([['swords','Clash'],'>',['loc','Claim']])},
  {phase:'location',title:'Claim a location',text:'You won the region! Tap one of its two locations to claim its Influence.',pic:()=>hpics([['region','Won'],'>',['loc','Claim']])},
- {phase:'location',title:'Herald bonus',text:'If your Herald stands there you gain 1 more, and take 1 from each rival Herald.',pic:()=>hpics([['herald','Herald'],'>',['loc','Bonus','+1']])},
+ {phase:'location',title:'Herald bonus',text:'If your Herald stands there, gain 1 more. Take 1 from each rival Herald.',pic:()=>hpics([['herald','Herald'],'>',['loc','Bonus','+1']])},
  {phase:'bonus',title:'Location bonus',text:'Some locations give an optional extra. Choose an option, or skip it.',pic:()=>hpics([['loc','Location'],'>',['star','Bonus']])},
  {phase:'bonus',title:'Read before you pick',text:'Tap an option to read it. Skipping is always allowed, and keeps your cards.',pic:()=>hpics([['scroll','Read it'],'>',['pass','Skip']])},
  {phase:'siteBuy',title:'Spend your Lore',text:'Lore buys Site of Power cards. A card with Strength goes to your hand.',pic:()=>hpics([['scroll','Lore'],'>',['card','New card',6]])},
- {phase:'siteBuy',title:'HQ cards',text:'An HQ card is a permanent power that stays in front of you.',pic:()=>hpics([['kc','HQ'],'>',['star','Always on']])},
+ {phase:'siteBuy',title:'HQ cards',text:'An HQ card is a permanent power in front of you.',pic:()=>hpics([['kc','HQ'],'>',['star','Always on']])},
  {phase:'discardDown',title:'Too many cards',text:'Your hand is over its size limit. Discard cards down to the limit.',pic:()=>hpics([['hand','Too many'],'>',['pass','Discard']])},
  {phase:'discardDown',title:'Pick the weakest',text:'Keep your strong cards for the Clashes. Discard the weakest ones.',pic:()=>hpics([['card','Keep',9],['card','Discard',1]])}
 ];
@@ -86,7 +86,7 @@ const hlpPhase=()=>{try{return hlpPhaseOf(UI.bf)}catch(e){return null}};
 function capW(t,n){const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):''}
 function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
   if(k==='bid'){const i=cinfo(m.id);const hand=G.pl[s].hand.map(id=>cinfo(id).strength).sort((a,b)=>b-a);const rank=hand.indexOf(i.strength)+1;
-    t=i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid picks first, but this card then cannot fight.':rank>=hand.length-1?'A cheap bid keeps your strong cards for the Clashes.':'A middle bid can still win a good card and keeps your best free.'}
+    t=i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid picks first, but this card then cannot fight.':rank>=hand.length-1?'A cheap bid keeps your strong cards for the Clashes.':'A middle bid can still win a good card. It keeps your best free.'}
   else if(k==='bidRes'){t=m.t==='return'?'Nothing on offer is worth a card: take yours back.':m.t==='steal'?'Steal a Kingdom Card: their bid card returns to their hand.':'This Kingdom Card works for you every round you keep it.'}
   else if(k==='herald'){const l=m.loc,inf=DD.LOCS[l][2];const riv=G.pl.some(p=>p.seat!==s&&p.herald===l);t=LOCN[l]+' pays +'+inf+' Influence. '+(riv?'Win it to take 1 from each rival Herald.':'Win its region for +1 more.')}
   else if(k==='location'){const l=m.loc;t=LOCN[l]+' pays +'+DD.LOCS[l][2]+' Influence.'+(G.pl[s].herald===l?' Your Herald is here: +1 more.':'')}

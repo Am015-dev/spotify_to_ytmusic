@@ -62,7 +62,7 @@ function coachAfter(){if(!G||!G.coach){coachHide();return}
   if(G.over){coachFinal();return}
   coachReact();
   if(UI.modal||GX.open){return}
-  if(COACH.cur&&Date.now()-COACH.shownAt<coachMin())return;   // a new rule waits until the one on screen has been readable long enough
+  if((COACH.cur&&Date.now()-COACH.shownAt<coachMin())||(typeof PLQB!=='undefined'&&PLQB))return;   // a new rule waits until the one on screen has been readable long enough and no score pop is up
   if(COACH.react&&G.phase==='turn'){const t=COACH.react;COACH.react=null;coachShow('react',t,LORE.guide.name,LORE.guide.face);return}
   for(const [id,when] of RULES){if(COACH.seen[id])continue;let w=false;try{w=when()}catch(e){w=false}
     if(w){coachSee(id);const rv=w==='rival';coachShow(id,coachText(id,w),rv?LORE.rival.name:LORE.guide.name,rv?LORE.rival.face:LORE.guide.face);return}}}
