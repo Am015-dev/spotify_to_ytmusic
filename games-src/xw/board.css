@@ -148,3 +148,26 @@ html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cove
 html.ph.ph-p .road .ph{height:44px;min-height:44px}
 html .gx-bar .gxh-bulb,html .gx-bar .na-guide{min-width:44px;width:44px;min-height:44px;height:44px;margin:0}
 html .gxt-skip{min-height:44px;min-width:44px;padding-top:0;padding-bottom:0;top:4px}
+/* ---- round 3: readable on wide desktops (>= 16 px), solid backings behind text over pictures ---- */
+@media (min-width:1024px){
+  html .gx-dock *,html #modal .dlg *,html .gxc *,html #tags .tag *,html .viewbar *,html .gxt-top *,html .gxh-bub *,html .gx-bar *,html .roadmap *,html .legend *{font-size:max(16px,1em)!important}
+}
+.ph-chip i.you{background:#1d1530;color:#ffd27a;border-radius:6px;padding:0 6px}
+.gxc-head .gxc-htitle b,.gxc-path .gxc-act b,.gxc-path .gxc-act small{background:rgba(24,16,40,.92);color:#fff;padding:2px 8px;border-radius:6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.gx-dock-head .gx-ibtn,.gx-dock-head .gx-ibtn *{color:#fff!important}.gx-dock-head .gx-ibtn{background:#1c2340}
+button.mv em.rs,button.mv small{background:rgba(10,12,34,.92);color:#fff;border-radius:4px;padding:0 4px}
+#phchip.ph-chip{background:rgba(12,10,30,.95);border-radius:8px;padding:2px 6px}
+/* round 3b */
+.gxc-head{background-size:auto 88px!important;background-repeat:repeat-x!important}
+.dlg.start button,.dlg.start label{scroll-margin-top:84px;scroll-margin-bottom:16px}
+.gx-dock .btn.primary,.gx-dock .btn.primary *,#prompt .btn.primary{color:#2a0a00!important;text-shadow:none!important}
+.gx-dock-head .gx-ibtn{background:#0c1128}
+html.sk-cards .mv.w,html.sk-cards .mv.g{color:#10131f!important}
+
+/* round 3c */
+.mvic{display:inline-block;background:rgba(10,12,34,.9);color:#fff;border-radius:6px;padding:0 6px;line-height:1.25;font-style:normal}
+.na-tap{filter:brightness(1.3)}
+.gx-dock .btn.primary[disabled],.gx-dock .btn.primary[disabled] *,#prompt .btn.primary[disabled],#prompt .btn.primary[disabled] *{color:#fff!important}
+.gx-dock .btn.primary small{background:rgba(20,10,0,.88);color:#fff!important;border-radius:4px;padding:0 6px}
+.gx-dock-head .gx-ibtn,.gx-dock-head .gx-ibtn *{opacity:1!important;color:#fff!important}
+.gx-dock-head .gx-ibtn{background:#04061a!important}
