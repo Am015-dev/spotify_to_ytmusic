@@ -11,3 +11,12 @@ Changed (layout, words, motion only; engine untouched, logic-test 146/146, rules
 
 Not done: desktop dock text (13 px tips, low-contrast "Voltusk (you)"), ui-audit B 32 / C 1 / D 3 / F 1 (shared help-kit tooltip), visual baselines need owner approval.
 Shots: playable-shots/feel/ (mid-game shots are from the previous build of this pass).
+
+## Feel gate (feel-audit.js --secs 120, after merging the base): FAIL
+(a) 15 · (b) 16 · (c) 13 · (d) 41 · (e) 1 (baseline in qa/feel/SUMMARY.md: 13 / 5 / 7 / 28 / n/a; this run drove further, 150 turns vs 30).
+Next steps, in order:
+1. The board flashes ("Squidrik +3★", "Fast forward ⏩", BF.flash in board.js) show in Play with Hints off and last under 1 s. Hide them when Hints is off, or move them into the race line.
+2. The audit finds neither Learn nor Play. Learn is the ppCoach game, not GXT, so GXT.running() is false. "▶ Play now" does not match the audit's play regex. Add data-a hooks the audit knows, and expose a GXT-like running() for the coach.
+3. Coach lines over 12 words: rewrite COACH_TIPS in tut-story.js and the ui.js tips; the aim sentence is 15 words, so split it.
+4. 13px text in the monster/card drawers (div.small.muted, .st2, small).
+5. (e) The ★20 and ⚡0 numbers overlap on the result chip.
