@@ -50,3 +50,10 @@ Weather and legends modules, online play, campaign. Tracks are 2; a track editor
 - Cooldown happens in the React step (after the cards are played), then boost.
 - Weather (optional): Dry; Rain = corner limits -1, never below 2; Heatwave = 1 engine heat starts in the discard; Tailwind = slipstream 3.
 - Championship: Sunline, Hairpin Hill, Harbour Ring (new track); points 9-6-4-3-2-1; ties: more wins, then the better last race.
+
+## W496 rules check (against the printed rulebook text)
+- CHANGED: adrenaline +1 is speed and counts at corners; optional (skipped when it would cost more heat). Was: +1 space, ignored at corners.
+- CHANGED: the race runs until every car has finished; finishers leave the track at the end of their round. Was: stop after the first finisher's round.
+- CHANGED to CORE: too few playable cards = fill with heat from the hand (to the discard), no move, gear 1, skip cooldown and boost (already built that way).
+- VERIFIED: spin out pays all engine heat, 1 stress (gear 1-2) or 2 (gear 3-4), gear 1, back behind the corner; slipstream 2, not speed, never across the line; boost once, 1 heat, counts at corners; cooldown 3/1/0/0.
+- STILL DIFFERENT: boost is chosen with the cards before the reveal (the rulebook decides it in the react step after the reveal); the optional discard is done at the start of your next plan instead of right after moving (same cards, one turn later).

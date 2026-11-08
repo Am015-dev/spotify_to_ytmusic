@@ -98,7 +98,8 @@ function flipSpeed(G, c, flips) {   /* reveal until a speed card shows; others g
 function avgSpeed(c) { var s = 0, n = 0; c.deck.concat(c.disc).forEach(function (x) { if (isSpeed(x)) { s += +x; n++; } }); return n ? s / n : 2.5; }
 
 /* ---- helpers ---- */
-function occ(G, p, except) { var N = T(G).N, k = 0; G.cars.forEach(function (c) { if (c !== except && c.pos % N === p % N) k++; }); return k; }
+function gone(G, c) { return !!c.fin && c.fin < G.round; }   /* finishers are lifted off the track at the end of the round they cross */
+function occ(G, p, except) { var N = T(G).N, k = 0; G.cars.forEach(function (c) { if (c !== except && !gone(G, c) && c.pos % N === p % N) k++; }); return k; }
 function landing(G, c, target) { var t = target; while (t > c.pos && occ(G, t, c) >= 2) t--; return t; }
 function cornersIn(G, a, b) {   /* corner lines crossed moving from space a to space b */
   var tk = T(G), out = []; for (var p = a + 1; p <= b && p <= total(G); p++) { var lim = tk.corners[p % tk.N]; if (lim) out.push({ p: p, idx: p % tk.N, limit: climit(G, lim) }); } return out;
@@ -172,12 +173,16 @@ function resolveNext(G) {
   if (pl.boost && c.eng >= 1) { c.eng--; c.disc.push('H'); c.stats.heat++; c.stats.boosts++; var fb = []; var bv = flipSpeed(G, c, fb); speed += bv; ev.push({ t: 'boost', car: c.i, flips: fb, add: bv, speed: speed }); }
   c.disc = c.disc.concat(pl.cards);   /* played cards reach the discard only now: a boost flip must not reshuffle them into the deck */
   for (var sx = 0; sx < addX; sx++) c.disc.push('X');
-  var adr = G.adr.indexOf(c.i) >= 0 ? 1 : 0; if (adr) ev.push({ t: 'adr', car: c.i });
-  var move = speed + adr, L0 = landing(G, c, from + move);
+  var adr = 0;
+  if (G.adr.indexOf(c.i) >= 0) {   /* adrenaline: +1 speed (it counts at corners) and +1 cooldown above; the speed is optional: taken unless it costs more corner heat */
+    var cNo = cornerCost(G, from, landing(G, c, from + speed), speed, lim), cYes = cornerCost(G, from, landing(G, c, from + speed + 1), speed + 1, lim);
+    adr = cYes <= cNo ? 1 : 0; ev.push({ t: 'adr', car: c.i, used: adr }); speed += adr;
+  }
+  var L0 = landing(G, c, from + speed);
   c.pl2 = { speed: speed, from: from, L0: L0, lim: lim };
   /* 5 slipstream offer */
   var L1 = L0 + slipN(G) >= total(G) ? L0 : landing(G, c, L0 + slipN(G)), N = T(G).N;   /* slipstream may not carry a car across the finish line */
-  var near = L1 > L0 && G.cars.some(function (o) { return o !== c && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
+  var near = L1 > L0 && G.cars.some(function (o) { return o !== c && !gone(G, o) && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
   ev.push({ t: 'move', car: c.i, from: from, to: L0 });
   if (near) {
     if (c.human) { G.pend = { t: 'slip', car: c.i, from: from, L0: L0, L1: L1, speed: speed, lim: lim }; return ev; }
@@ -193,7 +198,7 @@ function legendTurn(G, c) {   /* a Legend's whole turn: next pace card, brake fo
   var L0 = landing(G, c, from + speed), N = T(G).N;
   ev.push({ t: 'play', car: c.i, cards: [{ card: 'L', v: speed }], speed: speed }, { t: 'move', car: c.i, from: from, to: L0 });
   var L1 = L0 + 2 >= total(G) ? L0 : landing(G, c, L0 + 2);
-  var near = L1 > L0 && G.cars.some(function (o) { return o !== c && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
+  var near = L1 > L0 && G.cars.some(function (o) { return o !== c && !gone(G, o) && (o.pos % N === L0 % N || o.pos % N === (L0 + 1) % N); });
   var use = near && cornerCost(G, from, L1, speed) === 0;
   c.pl2 = { speed: speed, from: from, L0: L0, lim: 0 };
   if (near) ev.push({ t: 'slipq', car: c.i, use: use });
@@ -226,10 +231,20 @@ function finishMove(G, c, slip, evSoFar) {
   ev.push({ t: 'done', car: c.i }); G.ri++;
   return ev;
 }
+function runOut(G) {   /* computer cars only: play the remaining rounds without animation */
+  for (var guard = 0; guard < 400 && racing(G).length; guard++) {
+    G.round++; G.phase = 'plan'; startResolve(G);
+    for (var k = 0; k < 40 && G.phase === 'resolve' && G.ri < G.order.length; k++) { if (G.pend) slipChoice(G, false); else resolveNext(G); }
+    G.cars.forEach(function (c) { c.plan = null; });
+  }
+  G.phase = 'resolve';
+}
 function endRound(G, ev) {
-  var fin = G.cars.some(function (c) { return c.fin; });   /* the round in which the first car crosses is played to the end, then the race is over */
   G.cars.forEach(function (c) { c.plan = null; });
-  if (fin) { G.phase = 'over'; G.over = true; G.rank = rankList(G); ev.push({ t: 'over', rank: G.rank }); }
+  /* the race goes on until every car has finished (finishers leave the track at the end of their round). Once no human is still racing, the computer cars run out the race at once. */
+  var left = racing(G), humansLeft = left.some(function (i) { return G.cars[i].human; });
+  if (left.length && !humansLeft && G.cars.some(function (c) { return c.fin; }) && !G.noRunOut) runOut(G);
+  if (!racing(G).length || G.round > 400) { G.phase = 'over'; G.over = true; G.rank = rankList(G); ev.push({ t: 'over', rank: G.rank }); }
   else { G.round++; G.phase = 'plan'; G.order = []; G.ri = 0; ev.push({ t: 'round', round: G.round }); }
 }
 
@@ -246,7 +261,7 @@ function checkInvariants(G) {
     if (c.hand.length > HAND + 3) bad.push('hand too big');
     if (!G.drafting) { var ups = c.deck.concat(c.disc, c.hand, c.plan ? c.plan.cards : []).filter(function (x) { return upgId(x); }).length; if (ups !== c.upg.length + (c.sup ? c.sup.length : 0)) bad.push('upgrade cards ' + ups + ' car ' + c.i); }
   });
-  var per = {}; G.cars.forEach(function (c) { var k = c.pos % N; per[k] = (per[k] || 0) + 1; if (per[k] > 2) bad.push('3 cars on space ' + k); });
+  var per = {}; G.cars.forEach(function (c) { if (gone(G, c)) return; var k = c.pos % N; per[k] = (per[k] || 0) + 1; if (per[k] > 2) bad.push('3 cars on space ' + k); });
   return bad;
 }
 function validMoves(G, ci) {   /* every legal (gear, boost) with the playable cards; the UI picks cards */
