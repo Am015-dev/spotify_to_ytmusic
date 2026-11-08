@@ -19,7 +19,7 @@
     id: 'rr-corner', name: 'Corner: brake or push', ask: 'Does the corner warning show?', seed: 9, when: booted,
     setup: function () {
       begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 9 });
-      var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; UI.gear = 3; UI.sel = [0, 1, 3]; drawPlan();
+      UI.hints = true; var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; UI.gear = 3; UI.sel = [0, 1, 3]; drawPlan();
       return new Promise(function (r) { setTimeout(r, 400); });
     },
     checks: [
@@ -37,6 +37,14 @@
     ]
   });
   GXS.add({
+    id: 'rr-play', name: 'Play: clean screen', ask: 'Only board, hand, tracker, one score line and the top bar?', seed: 5, when: booted,
+    setup: function () { UI.hints = false; begin({ track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', seed: 5 }); return new Promise(function (r) { setTimeout(r, 400); }); },
+    checks: [
+      { kind: 'visible', sel: '#scoreL', name: 'score line' },
+      { kind: 'fn', name: 'no hint clutter', fn: function () { return (!document.querySelector('#sugB') && !document.querySelector('#tray') && !document.querySelector('#coach') && document.getElementById('bulbbtn').hidden) || 'hint UI visible in Play'; } }
+    ]
+  });
+  GXS.add({
     id: 'rr-lights', name: 'Start lights', ask: 'Do the start lights show?', seed: 5, when: booted,
     setup: function () { begin({ track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', seed: 5 }); RACE.lights = { t0: 0, freeze: 1600 }; return new Promise(function (r) { setTimeout(r, 300); }); },
     checks: [{ kind: 'fn', name: 'lights on', fn: function () { return !!RACE.lights || 'no lights'; } }, { kind: 'visible', sel: '#trk', name: 'turn tracker' }]
@@ -45,7 +53,7 @@
     id: 'rr-preview', name: 'Preview before Go', ask: 'Do you see where you land and what the corner costs?', seed: 9, when: booted,
     setup: function () {
       begin({ track: 'hairpin', laps: 1, opp: 3, hum: 1, diff: 'normal', seed: 9 }); G.round = 4; RACE.rate = 'Good: 7 spaces for 0 heat.'; RACE.rateK = 'good'; RACE.rateShow = 1;
-      var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; c.eng = 4; G.cars[1].pos = 15; UI.gear = 3; UI.sel = [0, 2, 4]; UI.touchedGear = 1; drawPlan();
+      UI.hints = true; var c = G.cars[0]; c.pos = 7; c.hand = ['4', '4', '3', '4', '2', '1', '3']; c.gear = 2; c.eng = 4; G.cars[1].pos = 15; UI.gear = 3; UI.sel = [0, 2, 4]; UI.touchedGear = 1; drawPlan();
       return new Promise(function (r) { setTimeout(r, 400); });
     },
     checks: [

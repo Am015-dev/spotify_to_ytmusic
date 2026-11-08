@@ -53,7 +53,8 @@ function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
   RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
   /* leaderboard, top-left */
-  var rk = rankList(G), fs = W < 500 ? 13 : 15, rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn();
+  if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
   var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
   cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
   rk.forEach(function (ci, k) {
@@ -61,6 +62,7 @@ function raceHud(now, W, H) {
     cx.textAlign = 'left'; cx.fillStyle = o.human ? '#ffd24a' : '#fff'; var nm = (k + 1) + ' ' + (o.human && !G.hot ? 'You' : o.name.split(' ')[0]); cx.fillText(nm, lx + 14, y);
     cx.textAlign = 'right'; cx.fillStyle = '#c9d2e3'; cx.fillText(o.fin ? 'FIN' : 'L' + Math.min(G.laps, Math.floor(o.pos / T(G).N) + 1), lx + bw - 5, y);
   });
+  }
   /* dashboard, bottom-left: speedometer, gear lever, heat gauge */
   var R = W < 500 ? 30 : 42, bx = 8, by = H - R * 2 - 18, dw = R * 2 + R * 1.3 + R * 0.9 + 34;
   if (H > 240) {
@@ -106,10 +108,12 @@ function tracker() {
   if (!G) return; var me = G.cars[UI.seat] || G.cars[0], lap = Math.min(G.laps, Math.floor(me.pos / T(G).N) + 1);
   var mine = G.phase === 'plan' || (curCar(G) && curCar(G).i === me.i) || G.pend;
   var dt = document.getElementById('dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · Lap ' + lap + '/' + G.laps + ' · Deck ' + me.deck.length + ' · Discard ' + me.disc.length + (G.wx && G.wx !== 'dry' ? ' · ' + WEATHER[G.wx].name : '');
-  var h = '<ol class="phs" aria-label="Your turn phases">';
+  var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
+  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap ? nm(ld) + ' leads by ' + gap : 'level with ' + nm(ld));
+  var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
   PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
   h += '</ol>';
-  d.innerHTML = h;
+  d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
 }
 /* the computer's best plan for this hand, as a yardstick for the round rating */
 function rateStart(c) {
@@ -155,4 +159,23 @@ function champResult() {
   $('#mx').hidden = true;
   if (over) { champSave(null); $('#cNew').onclick = function () { UI.lockModal = false; champStart(true); }; } else $('#cNext').onclick = function () { UI.lockModal = false; champStart(false); };
   $('#home').onclick = function () { UI.lockModal = false; UI.champ = null; showTitle(); };
+}
+
+/* ---------- Play mode: the "why" of the race order opens on tap only ---------- */
+function scoreWhy() {
+  var rk = rankList(G), N = T(G).N, rows = rk.map(function (ci, k) { var c = G.cars[ci]; return '<tr class="' + (c.human ? 'you' : '') + '"><td>' + (k + 1) + '</td><td><i class="pc" style="background:' + COLS[c.col].hex + '"></i>' + esc(c.human && !G.hot ? 'You' : c.name) + '</td><td>' + (c.fin ? 'finished ' + ord(c.fin) : 'lap ' + Math.min(G.laps, Math.floor(c.pos / N) + 1) + ', ' + (total(G) - c.pos) + ' to go') + '</td><td>heat ' + c.eng + '</td></tr>'; }).join('');
+  modal('<h2>Race order</h2><p>The car furthest round the track is ahead. Two cars on one space: the one that got there first is ahead. The race ends when every car has crossed the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
+}
+/* ---------- Play mode: one "Goal" card before turn 1 ---------- */
+function goalCard(then) {
+  UI.lockModal = true;
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Pick gear 1-4 and play that many cards; their total is how far you move.</li><li><b>Corners burn heat.</b> Each point over a corner\'s limit costs 1 engine heat. No heat left: you spin out.</li><li><b>Free spaces.</b> End next to a car to slipstream; the last car gets +1 (adrenaline).</li></ul>' +
+    (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
+  $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
+}
+function setHints(on) {
+  UI.hints = !!on; lsSet('rr_hints', on ? '1' : '0');
+  var b = document.getElementById('hintT'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.firstChild.textContent = 'Hints: ' + (on ? 'On' : 'Off'); b.classList.toggle('on', !!on); }
+  var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
+  if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
 }

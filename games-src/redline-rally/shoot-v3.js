@@ -4,7 +4,7 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] }); let errsAll = 0;
   for (const [n, vp, t] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
-    for (const [sc, id] of [['lights', 'rr-lights'], ['preview', 'rr-preview'], ['spin', 'rr-spin'], ['podium', 'rr-result']]) {
+    for (const [sc, id] of [['play', 'rr-play'], ['lights', 'rr-lights'], ['preview', 'rr-preview'], ['spin', 'rr-spin'], ['podium', 'rr-result']]) {
       const c = await b.newContext({ viewport: vp, hasTouch: t, isMobile: t, deviceScaleFactor: 1 }), p = await c.newPage(), errs = [];
       p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
       await p.addInitScript(() => { localStorage.setItem('gxt-redline-rally', JSON.stringify({ done: 1 })); localStorage.setItem('rr_seen', '1'); });

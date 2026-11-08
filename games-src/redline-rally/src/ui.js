@@ -1,6 +1,9 @@
 /* Redline Rally UI: title, canvas track (follow camera, animated cars), hand/gear panel, hot-seat, result. */
 var G = null;
 var UI = { sel: [], gear: 1, boost: false, busy: false, seat: 0, cam: { x: 0, y: 0, s: 0.4 }, vis: [], pops: [], focus: 0, fast: /[?&]fast=1/.test(location.search), flash: null, tipShown: false, set: { track: 'sunline', laps: 2, opp: 4, hum: 1, diff: 'normal', upg: false, wx: 'dry', sup: true } };
+UI.hints = lsGet0('rr_hints') === '1';
+function lsGet0(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function hintsOn() { return !!UI.hints || UI.mode === 'tutorial'; }
 window.ANIM = true; window.AIDELAY = 1;
 var $ = function (s) { return document.querySelector(s); };
 function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
@@ -54,14 +57,15 @@ function startGame(o) {
   if (o && o.tut) { [['kit', 'Kit Marlow'], ['juno', 'Juno Vega']].forEach(function (d, k) { G.cars[k + 1].drv = d[0]; G.cars[k + 1].name = d[1]; }); }
   window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
   UI.vis = G.cars.map(function (c) { return { p: c.pos, rot: 0, glow: 0 }; });
-  UI.focus = 0; $('#title').hidden = true; $('#game').hidden = false; closeModal();
+  UI.focus = 0; var blb = $('#bulbbtn'); if (blb) blb.hidden = !hintsOn(); $('#title').hidden = true; $('#game').hidden = false; closeModal();
   $('#tTrk').textContent = TK[G.track].name;
   sizeCanvas(); var f = UI.vis[0]; snapCam(); UI.redraw();
-  RACE.rate = ''; RACE.rateKeep = 0; RACE.rateShow = 0; RACE.flashHold = 0; RACE.lights = null; RACE.skids = []; RACE.spd = RACE.spdT = 0; RACE.prev = null; RACE.ph = 'shift'; lightsStart(); sfx('go');
-  if (G.wx !== 'dry') setTimeout(function () { if (G && G.round === 1) banner(WEATHER[G.wx].name + ': ' + WEATHER[G.wx].txt, null, 'round'); }, 2600);
+  RACE.rate = ''; RACE.rateKeep = 0; RACE.rateShow = 0; RACE.flashHold = 0; RACE.lights = null; RACE.skids = []; RACE.spd = RACE.spdT = 0; RACE.prev = null; RACE.ph = 'shift';
+  if (!UI.fast && window.ANIM !== false && !(o && (o.tut || o.cmp)) && !G.drafting) goalCard(function () { lightsStart(); sfx('go'); }); else { lightsStart(); sfx('go'); }
+  if (G.wx !== 'dry' && hintsOn()) setTimeout(function () { if (G && G.round === 1) banner(WEATHER[G.wx].name + ': ' + WEATHER[G.wx].txt, null, 'round'); }, 2600);
   if (o && o.tut) stageTutorial();
   if (G.drafting) { $('#panel').innerHTML = ''; setMsg('Pick your upgrade cards'); return runDraft(function () { UI.lockModal = false; closeModal(); planFor(needPlans(G)[0]); }); }
-  if (!o || !(o.cmp || o.tut)) { var g0 = G; setTimeout(function () { if (G === g0 && G.round === 1 && G.phase === 'plan') { banner(pickLine(STORY.quickIntro.filter(function (l) { return G.wx === 'rain' || !/rain/i.test(l); })), 0, 'plan'); setTimeout(function () { if (G === g0 && G.phase === 'plan') banner(STORY.yourTurn, 0, 'plan'); }, 2200); } }, 0); }
+  if (hintsOn() && (!o || !(o.cmp || o.tut))) { var g0 = G; setTimeout(function () { if (G === g0 && G.round === 1 && G.phase === 'plan') { banner(pickLine(STORY.quickIntro.filter(function (l) { return G.wx === 'rain' || !/rain/i.test(l); })), 0, 'plan'); setTimeout(function () { if (G === g0 && G.phase === 'plan') banner(STORY.yourTurn, 0, 'plan'); }, 2200); } }, 0); }
   planFor(needPlans(G)[0]);
 }
 /* Upgrade draft: each human picks DRAFT_PICKS cards one at a time from what is left in the shared pool; then the computer drivers pick and decks are dealt. */
@@ -111,23 +115,24 @@ function drawPlan() {
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
-  h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button><button id="sugB">Suggest</button>' + (G.phase === 'plan' && c.dsc !== G.round && !G.hot && !tutOn() ? '<button type="button" id="swapB" class="swapb" title="Throw away cards you do not want and draw back to 7 (once a round)">' + (UI.swap ? 'Cancel' : 'Swap') + '</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  h += '</div><div id="acts"><button class="bo' + (UI.boost ? ' on' : '') + '" id="boostB"' + (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1 ? ' disabled' : '') + '>Boost -1</button>' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + (G.phase === 'plan' && c.dsc !== G.round && !G.hot && !tutOn() ? '<button type="button" id="swapB" class="swapb" title="Throw away cards you do not want and draw back to 7 (once a round)">' + (UI.swap ? 'Cancel' : 'Swap') + '</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
-  h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
+  if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
   p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   $('#boostB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); UI.boost = !UI.boost; drawPlan(); };
-  $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
+  if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.' : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
+  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + '. Press Go.', ''); }
   else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : '') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = ready && RACE.prev ? RACE.prev.sp : 0;
   if (!ready && need === 0) $('#goB').disabled = false;
-  var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · your turn'; if (RACE.rateShow && !G.hot) { RACE.rateShow = 0; RACE.rateKeep = 1; banner(RACE.rate, RACE.rateK === 'good' ? 2 : RACE.rateK === 'poor' ? 0 : 3, 'plan rate'); } else if (!RACE.rateKeep) banner(G.hot ? c.name.split(' ')[0] + "'s turn" : STORY.yourTurn, c.col, 'plan');
+  var dt = $('#dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · your turn'; if (RACE.rateShow && !G.hot && hintsOn()) { RACE.rateShow = 0; RACE.rateKeep = 1; banner(RACE.rate, RACE.rateK === 'good' ? 2 : RACE.rateK === 'poor' ? 0 : 3, 'plan rate'); } else if (!RACE.rateKeep) banner(G.hot ? c.name.split(' ')[0] + "'s turn" : STORY.yourTurn, c.col, 'plan');
   if (UI.swap && c.dsc !== G.round) swapMode(c);
   else if (UI.mode === 'tutorial') coachPlan(c, ready ? curveInfo() : null);
   var sw = $('#swapB'); if (sw) sw.onclick = function () { UI.swap = !UI.swap; UI.sel = []; drawPlan(); };
@@ -354,7 +359,7 @@ function boot() {
   GX.init({ key: 'rr' }); GX.drawer('rulesd', 'How to play', (function () { var d = document.createElement('div'); d.id = 'rulesbody'; return d; })());
   GX.onShow = function (id) { if (id === 'rulesd') rulesFill(); }; rulesFill();
   GX.onResize(function () { if (G && !$('#game').hidden) sizeCanvas(); });
-  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; $('#champB').onclick = function () { champStart(false); }; soundBoot(); if (typeof helpBoot === 'function') helpBoot();
+  $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; $('#champB').onclick = function () { champStart(false); }; $('#hintT').onclick = function () { sfx('tap'); setHints(!UI.hints); }; setHints(UI.hints); soundBoot(); if (typeof helpBoot === 'function') helpBoot();
   $('#menuB').onclick = function () { modal('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="ghostb" id="m1">How to play</button><button class="ghostb" id="m4">Guide: learn by doing</button><button class="ghostb" data-snd id="m5"></button><button class="ghostb" id="m2">Quit to title</button><button class="big" id="m3">Keep racing</button></div>'); $('#m1').onclick = howTo; $('#m4').onclick = function () { closeModal(); chapterMenu(); }; $('#m2').onclick = function () { showTitle(); }; $('#m3').onclick = closeModal; $('#m5').textContent = sndLabel(); $('#m5').onclick = function () { setSound(!SND.on); }; };
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();
