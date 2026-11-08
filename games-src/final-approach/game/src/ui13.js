@@ -12,7 +12,8 @@ function pxFitBg() {
   s.width = tw * k; s.height = th * k; s.x = (PX.w - s.width) / 2; s.y = (PX.h - s.height) / 2;
 }
 function tableApply() {
-  const R = document.documentElement, id = unl('table'), skin = id && /^(night-lake|storm|valley)$/.test(id);
+  const ap = typeof G !== 'undefined' && G && UI.started && D.airports[scenOf().ap], byAp = ap ? (ap.wx === 'storm' || ap.wx === 'rain' ? 'storm' : ap.ter === 'mountain' ? 'valley' : ap.tod === 'night' && (ap.ter === 'plain' || ap.ter === 'water' || ap.ter === 'ice') ? 'night-lake' : '') : '';   // the desk follows the airport's weather
+  const R = document.documentElement, id = unl('table') || byAp, skin = id && /^(night-lake|storm|valley)$/.test(id);
   const f = skin ? 'table-' + id : 'table-default' + (innerHeight > innerWidth ? '-phone' : '');   // no unlock yet: the painted default desk (a portrait file on a phone held upright)
   const key = f; if (key === tblCur) return;
   const im = new Image();

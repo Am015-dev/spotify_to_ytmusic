@@ -133,11 +133,12 @@ function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || 
 function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; F.shut = c.key; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
 function fcShow(key, txt, who, ms) {
   const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur && F.shut !== F.cur.key && Date.now() - F.cur.at < F.cur.need) return;   // the line on screen gets its reading time first
+  if ([...document.querySelectorAll('.fa-coach')].some(e => e.dataset.k !== F.shut && Date.now() - (+e.dataset.at || 0) < (+e.dataset.need || 0))) return;   // any line on screen gets its reading time first
   if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); } document.querySelectorAll('.fa-coach').forEach(e => e.remove());
   if (F.shut === key || !txt) return;
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
-  F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
+  F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute(); el.dataset.at = String(F.cur.at); el.dataset.need = String(F.cur.need); el.dataset.k = key;
   x.style.visibility = 'hidden'; setTimeout(() => { x.style.visibility = ''; }, readMs(txt));   // the line gets its reading time before it can be closed
 }
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
