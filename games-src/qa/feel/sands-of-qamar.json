@@ -1,0 +1,1594 @@
+{
+ "slug": "sands-of-qamar",
+ "when": "2026-11-08T02:33Z",
+ "secs": 30,
+ "totalSecs": 121,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 165,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "🧓 Hadiya Welcome, child. Most points when the bazaar closes takes the throne. Coins, land, people, goods and djinns all count. Play freely; I will whisper the ",
+     "words": 32,
+     "shownMs": 2569,
+     "neededMs": 7200,
+     "cls": "coach on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "🧓 Hadiya Welcome, child. Most points when the bazaar closes takes the throne. Coins, land, people, goods and djinns all count. Play freely; I will whisper the ",
+     "words": 32,
+     "shownMs": 2551,
+     "neededMs": 7200,
+     "cls": "coach on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Farid claims Shrine B3",
+     "words": 4,
+     "shownMs": 250,
+     "neededMs": 4400,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Farid summons Hikma",
+     "words": 3,
+     "shownMs": 250,
+     "neededMs": 4300,
+     "cls": ""
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/play",
+     "text": "Farid claims Oasis B6",
+     "words": 4,
+     "shownMs": 250,
+     "neededMs": 4400,
+     "cls": ""
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 2569,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot",
+      "🧓 Hadiya Welcome, child. Most points when the baz"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 2253,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot",
+      "🧓 Hadiya First, bid for turn order. Dearer spots "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 996,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 499,
+     "texts": [
+      "Round 1",
+      "You bid 18 coins for turn order"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Bid 2 of 2: pick a spot",
+      "🧓 Hadiya Two players, so two markers each: place "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "You bid 5 coins for turn order",
+      "🧓 Hadiya Two players, so two markers each: place "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to start",
+      "🧓 Hadiya Two players, so two markers each: place "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Two players, so two markers each: place "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 501,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Leave one person on each tile you cross:"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1257,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to start",
+      "🧓 Hadiya Tap a glowing tile to lift everyone on i"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Tap a glowing tile to lift everyone on i"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1746,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Last one: land on its colour",
+      "🧓 Hadiya Your last walker must land on a tile tha"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1492,
+     "texts": [
+      "Round 1",
+      "Last one: land on its colour"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "Sages join you",
+      "🧓 Hadiya You took 2 Sages. You always take every "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Sages join you",
+      "🧓 Hadiya Five tribes crowd the bazaar, three to a"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Buy two goods for 6🪙"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "Buy two goods for 6🪙",
+      "🧓 Hadiya Grand Bazaar: pay 6 coins for two of the"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Sell goods or end turn",
+      "🧓 Hadiya Grand Bazaar: pay 6 coins for two of the"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "Sell goods or end turn"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Sell goods or end turn",
+      "🧓 Hadiya A Mystic never scores itself. It is a wi"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Farid is choosing",
+      "🧓 Hadiya A Mystic never scores itself. It is a wi"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Farid is choosing"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Farid lifts 3 people off Oasis D2",
+      "🧓 Hadiya No points this turn. That is fine early:"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Farid's 4 Masons earn 20 coins (5 blue tiles aroun",
+      "🧓 Hadiya No points this turn. That is fine early:"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to start"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Palaces: each is worth 5 points to the h"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile",
+      "🧓 Hadiya A mixed hand: you choose who stays on th"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 761,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1167,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1505,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Pick who stays on this tile"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 2504,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Last one: land on its colour"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Sages join you",
+      "🧓 Hadiya Sages score 2 points each, and pay for d"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 752,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot",
+      "🧓 Hadiya Welcome, child. Most points when the baz"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot",
+      "🧓 Hadiya First, bid for turn order. Dearer spots "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 463,
+     "texts": [
+      "Round 1",
+      "Bid 1 of 2: pick a spot"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 500,
+     "texts": [
+      "Round 1",
+      "You bid 12 coins for turn order"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Bid 2 of 2: pick a spot",
+      "🧓 Hadiya Two players, so two markers each: place "
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 1262,
+     "texts": [
+      "Round 1",
+      "Bid 2 of 2: pick a spot"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 483,
+     "texts": [
+      "Round 1",
+      "You bid 1 coin for turn order"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to start"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Tap a glowing tile to lift everyone on i"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 513,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 750,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one",
+      "🧓 Hadiya Leave one person on each tile you cross:"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Round 1",
+      "Tap a glowing tile to drop one"
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "FAIL",
+   "count": 67,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Welcome, child. Most points when the bazaar closes takes the throne. Coins, land, people, goods and djinns all count. Play freely; I will whisper the ",
+     "ms": 752,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya First, bid for turn order. Dearer spots play earlier, but coins are points, so every coin you spend is a point lost. Tap a spot on the track. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bid 1 of 2: pick a spot",
+     "ms": 1489,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You bid 12 coins for turn order",
+     "ms": 500,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Two players, so two markers each: place your next one too. Same price? The later bidder plays first. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bid 2 of 2: pick a spot",
+     "ms": 1512,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You bid 1 coin for turn order",
+     "ms": 483,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to start",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Tap a glowing tile to lift everyone on it. You then walk them out across the bazaar. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left. ✕",
+     "ms": 750,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 1750,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick who stays on this tile",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya A mixed hand: you choose who stays on this tile. Keep the colour you want for your final step. ✕",
+     "ms": 752,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick who stays on this tile",
+     "ms": 492,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 727,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick who stays on this tile",
+     "ms": 475,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 2000,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick who stays on this tile",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 749,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Pick who stays on this tile",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 750,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Your last walker must land on a tile that already has their colour. Then you take every person of that colour there. ✕",
+     "ms": 500,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Last one: land on its colour",
+     "ms": 3000,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya You took 2 Shadows. You always take every person of that colour on the last tile, so aim for a crowded one. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Tap who to remove",
+     "ms": 1000,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows. Each colour has its own gift. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Oasis: you must plant a palm tree here. A palm is worth 3 points to whoever holds the tile. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "A palm grows here",
+     "ms": 7249,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "🧓 Hadiya Palms: each palm on a tile you hold is worth 3 points at the end. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Round 1",
+     "ms": 26489,
+     "cls": "pchip",
+     "tag": "span"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sell goods or end turn",
+     "ms": 2963,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bid 1 of 2: pick a spot",
+     "ms": 999,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Welcome, child. Most points when the bazaar closes takes the throne. Coins, land, people, goods and djinns all count. Play freely; I will whisper the ",
+     "ms": 683,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You bid nothing for turn order",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Bid 2 of 2: pick a spot",
+     "ms": 1232,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "You bid 18 coins for turn order",
+     "ms": 503,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Tap a glowing tile to start",
+     "ms": 250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Tap a glowing tile to lift everyone on it. You then walk them out across the bazaar. ✕",
+     "ms": 601,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left. ✕",
+     "ms": 709,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Tap a glowing tile to drop one",
+     "ms": 2383,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Your last walker must land on a tile that already has their colour. Then you take every person of that colour there. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Last one: land on its colour",
+     "ms": 492,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya You took 3 Traders. You always take every person of that colour on the last tile, so aim for a crowded one. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows. Each colour has its own gift. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Traders fetch goods",
+     "ms": 1250,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Bazaar Stall: pay 3 coins for one of the first three goods in the row. Mystics never score, but boost Masons. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Keep different goods together: a set of 1, 2, 3 or 4 kinds scores 1, 3, 7 or 13. A repeated kind starts a new set. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Buy a good for 3🪙",
+     "ms": 959,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Sell goods or end turn",
+     "ms": 500,
+     "cls": "mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya Well walked: 3 Traders in one go. ✕",
+     "ms": 250,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid is choosing",
+     "ms": 500,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid lifts 3 people off Shrine C3",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya The track sets the order: You, Farid, Farid, You. Dearer spots first; at the same price the later bidder goes first. ✕",
+     "ms": 527,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid summons Hikma",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid is choosing",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧒 Farid Farid emptied a tile and laid a camel on it. Held tiles score their printed number. ✕",
+     "ms": 430,
+     "cls": "coach on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid lifts 3 people off Oasis D5",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Farid claims Oasis B6",
+     "ms": 250,
+     "cls": "",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "🧓 Hadiya A djinn joined the game. Tap a djinn card to read its power; each one also scores points. ✕",
+     "ms": 520,
+     "cls": "coach on",
+     "tag": "div"
+    }
+   ]
+  },
+  "c": {
+   "status": "FAIL",
+   "count": 14,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Dearer spots play earlier, but coins are points, so every coin you spend is a point lost.",
+     "words": 17,
+     "at": 6007,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left.",
+     "words": 22,
+     "at": 11017,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows.",
+     "words": 17,
+     "at": 17003,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Grand Bazaar: pay 6 coins for two of the first six goods in the row.",
+     "words": 15,
+     "at": 18004,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left.",
+     "words": 22,
+     "at": 9004,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Your last walker must land on a tile that already has their colour.",
+     "words": 13,
+     "at": 16004,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows.",
+     "words": 17,
+     "at": 20006,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Dearer spots play earlier, but coins are points, so every coin you spend is a point lost.",
+     "words": 17,
+     "at": 6003,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left.",
+     "words": 22,
+     "at": 11003,
+     "where": "span."
+    },
+    {
+     "session": "pc/learn",
+     "text": "Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows.",
+     "words": 17,
+     "at": 17010,
+     "where": "span."
+    },
+    {
+     "session": "pc/play",
+     "text": "Leave one person on each tile you cross: up, down, left or right, never straight back to the tile you just left.",
+     "words": 22,
+     "at": 8043,
+     "where": "span."
+    },
+    {
+     "session": "pc/play",
+     "text": "Your last walker must land on a tile that already has their colour.",
+     "words": 13,
+     "at": 10012,
+     "where": "span."
+    },
+    {
+     "session": "pc/play",
+     "text": "Five tribes crowd the bazaar, three to a tile: Traders, Masons, Sages, Advisors and the red Shadows.",
+     "words": 17,
+     "at": 11033,
+     "where": "span."
+    },
+    {
+     "session": "pc/play",
+     "text": "Tap a djinn card to read its power; each one also scores points.",
+     "words": 13,
+     "at": 15034,
+     "where": "span."
+    }
+   ]
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 130,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "📜",
+     "px": 0,
+     "at": 1002,
+     "where": "i.ri"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Round 1",
+     "px": 13,
+     "at": 3007,
+     "where": "span.pchip"
+    },
+    {
+     "session": "phone/learn",
+     "text": "You",
+     "px": 13,
+     "at": 3007,
+     "where": "b.sn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🪙",
+     "px": 0,
+     "at": 3007,
+     "where": "i.e2"
+    },
+    {
+     "session": "phone/learn",
+     "text": "50",
+     "px": 13,
+     "at": 3007,
+     "where": "span.st"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🐪",
+     "px": 0,
+     "at": 3007,
+     "where": "i.e2"
+    },
+    {
+     "session": "phone/learn",
+     "text": "3",
+     "px": 13,
+     "at": 3007,
+     "where": "span.st"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Farid",
+     "px": 13,
+     "at": 3007,
+     "where": "b.sn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "cpu",
+     "px": 13,
+     "at": 3007,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Shrine",
+     "px": 13,
+     "at": 3007,
+     "where": "span.tn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "12",
+     "px": 13,
+     "at": 3007,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "10",
+     "px": 13,
+     "at": 3007,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Oasis",
+     "px": 13,
+     "at": 3007,
+     "where": "span.tn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "8",
+     "px": 13,
+     "at": 3007,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hamlet",
+     "px": 13,
+     "at": 3008,
+     "where": "span.tn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "5",
+     "px": 13,
+     "at": 3008,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Bazaar",
+     "px": 13,
+     "at": 3008,
+     "where": "span.tn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "4",
+     "px": 13,
+     "at": 3008,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Stall",
+     "px": 13,
+     "at": 3008,
+     "where": "span.tn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "6",
+     "px": 13,
+     "at": 3008,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "15",
+     "px": 13,
+     "at": 3008,
+     "where": "b.tv"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🐟",
+     "px": 0,
+     "at": 3009,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Fish",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🌾",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wheat",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🧣",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Silk",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🏺",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Pottery",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🔮",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Mystic",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🌶️",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Spice",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "💎",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Jewels",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Papyrus",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "🥇",
+     "px": 0,
+     "at": 3010,
+     "where": "span.mi"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Gold",
+     "px": 13,
+     "at": 3010,
+     "where": "span.mn"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Nakhla",
+     "px": 13,
+     "at": 3010,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Wazira",
+     "px": 13,
+     "at": 3010,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Hikma",
+     "px": 13,
+     "at": 3010,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "1st",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "18🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "2nd",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "12🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "3rd",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "8🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "4th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "5🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "5th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "3🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "6th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "1🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "7th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "0🪙",
+     "px": 13,
+     "at": 3010,
+     "where": "button.sp-b.glow"
+    },
+    {
+     "session": "phone/learn",
+     "text": "8th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "9th",
+     "px": 13,
+     "at": 3010,
+     "where": "small.ord"
+    },
+    {
+     "session": "phone/learn",
+     "text": "32",
+     "px": 13,
+     "at": 9001,
+     "where": "span.st"
+    },
+    {
+     "session": "phone/learn",
+     "text": "42",
+     "px": 13,
+     "at": 9001,
+     "where": "span.st"
+    },
+    {
+     "session": "phone/learn",
+     "text": "27",
+     "px": 13,
+     "at": 10004,
+     "where": "span.st"
+    }
+   ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [
+  "phone/learn: Learn to play not found",
+  "phone/play: Play button not found",
+  "pc/learn: Learn to play not found",
+  "pc/play: Play button not found"
+ ],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 48,
+   "clicks": 84,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 44
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 30,
+   "turns": 56,
+   "clicks": 102,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 32
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 69,
+   "clicks": 94,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 45
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 30,
+   "turns": 60,
+   "clicks": 107,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 35
+  }
+ ]
+}

@@ -19,7 +19,8 @@ const TNAME={threat:'Face a threat',hunt:'Hunt',build:'Build',gather:'Gather',ex
 const RES=['food','pfood','wood','fur'];const RNAME={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
-  const sk=o.scen||DEFSCEN;const S=SCENARIOS[sk];let keys=o.chars||DEFCHARS||['carpenter','cook'];
+  const sk=o.scen||DEFSCEN;const S=SCENARIOS[sk];let keys=(o.chars||DEFCHARS||['carpenter','cook']).slice();
+  if(keys.length<3&&keys.includes('soldier')){const sub=['carpenter','cook','explorer'].filter(k=>CHARS[k]&&!keys.includes(k));keys=keys.map(k=>k==='soldier'?sub.shift():k).filter(Boolean)}   // rule A16: the Soldier is not used in 1- or 2-player games
   G={v:1,rng:seed,seed,scen:sk,round:1,rounds:S.rounds,phase:'start',first:0,log:[],stk:[],q:null,over:null,
     chars:[],fri:null,dog:false,morale:0,res:{food:0,pfood:0,wood:0,fur:0},fut:{food:0,pfood:0,wood:0,fur:0},
     camp:{pos:START_POS,shelter:false,roof:0,pal:0,moved:null},weapon:0,map:MAP.map(m=>({id:m.id,tile:null,down:false,tok:{},exh:{},cov:false})),
