@@ -62,3 +62,4 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - Shots: `playable-shots/a7-play-390.webp` (clean Play), `a7-goal-390.webp`, `a7-hints-390.webp`, `a7-play-1440.webp`.
 - Tests adjusted: coach-test starts from Learn to play; playable-test no longer expects banners or the flavour line; qa-bot's coached phase taps `offeryes` when present.
 - Look-check follow-up: the plate fix is now slice `30 42` with widths `5px 7px` (same corner scale both ways) instead of 6px 6px.
+- Coach bubbles (first-time help) are Learn-to-play only: off in Play and with Hints on.
