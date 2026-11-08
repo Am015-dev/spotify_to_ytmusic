@@ -75,7 +75,9 @@ function diveLabel() {
   if (UI.mode === 'descent' && G.desc && typeof DESC !== 'undefined') { const Z = DESC[G.desc.zi]; return Z.name + ' · ' + (G.boss ? CHAR[G.boss.id].name : 'dive ' + (G.desc.si + 1) + ' of 3') + (G.desc.tryN > 1 ? ' · try ' + G.desc.tryN : ''); }
   const m = G.mission; if (m.kind === 'log') return 'Dive ' + m.id; if (m.kind === 'deep') return 'Deep dive ' + m.d; return m.name;
 }
-function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2400); }
+function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), readMs(t)); }
+// how long a message stays (BRIEF-GAMEFEEL 3): 4 s plus 1 s per 10 words
+function readMs(t) { return 4000 + 100 * String(t || '').trim().split(/\s+/).length; }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('ld_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed != null) AIDELAY = p.speed; } catch (e) { } }

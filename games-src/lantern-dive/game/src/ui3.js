@@ -45,7 +45,7 @@ function newGame(mode, o) {
   UI.news = [];
   UI.coach = { level: mode === 'tutorial' || !UI.prefs.hints ? 'off' : 'light', seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
-  if (mode === 'vs' && !NET.on && !o.noGoal) UI.dlg = { who: 'mara', title: 'Goal', body: ['Do every job card and the crew wins.', 'A job is met by the tricks its diver wins.', 'Follow the colour led. A Lantern beats every colour.', 'One broken job loses it for everyone.'], btn: 'Dive' }, drawDlg();
+  if (mode === 'vs' && !NET.on && !o.noGoal) UI.dlg = { who: 'mara', title: 'Goal', lead: 'The crew wins when every job card is done.', body: ['A diver meets a job by winning the right tricks.', 'Follow the colour led. The highest of it wins.', 'A Lantern beats every colour. One broken job loses.'], btn: 'Dive' }, drawDlg();
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function tutorialStack() {
@@ -249,7 +249,8 @@ async function playEvs(evs) {
       if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
     }
   } catch (e) { console.error(e); UI.fz = null; }
-  UI.busy = false; UI.fz = null; UI.holdJobs = null; UI.fastT = false; cap('');
+  UI.busy = false; UI.fz = null; UI.holdJobs = null; UI.fastT = false;
+  { const el = document.getElementById('cap'), tx = el ? el.textContent : ''; if (tx) setTimeout(() => { const e2 = document.getElementById('cap'); if (e2 && e2.textContent === tx && !UI.busy) cap(''); }, readMs(tx)); }   // the last line stays long enough to read
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);

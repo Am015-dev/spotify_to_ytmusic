@@ -22,7 +22,7 @@ const tutBox = sel => () => {
 // the only forced step: take a job (any job). Then the kit is stopped (a trailing never-ready step keeps it from showing its own end card).
 function tutSteps() {
   return [
-    { id: 'take', title: 'Saltmere Bay', say: 'The nets are tangled; the crew dives as one. Lantern 4 makes you Captain: pick a job first. Tap one.',
+    { id: 'take', title: 'Welcome aboard', say: 'The crew wins when every job card is done. Lantern 4 makes you Captain. Tap a job.',
       target: tutBox('#pool .jcard'), wait: { type: 'tap', match: a => a.mv && a.mv.t === 'take' },
       ready: () => G && G.phase === 'assign' && iMustAct() && !UI.busy && !!document.querySelector('#pool .jcard'),
       onDone: () => setTimeout(() => { try { GXT.stop(); } catch (e) { } tutBegin(); }, 0) },
@@ -79,7 +79,7 @@ function tutBubble(t) {
   tutHideBub(); const e = document.createElement('div'); e.id = 'tbub'; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); e.dataset.tip = t.id; e.className = t.good ? 'good' : t.poor ? 'poor' : '';
   e.innerHTML = '<span class="tg" aria-hidden="true">Brack</span><span class="tx"></span><button type="button" class="tx2" aria-label="Dismiss">×</button>';
   e.querySelector('.tx').textContent = t.text; e.querySelector('.tx2').addEventListener('click', ev => { ev.stopPropagation(); tutHideBub(); });
-  document.body.appendChild(e); UI.tc.cur = t; UI.tc.at = Date.now(); tutPlaceBub();
+  document.body.appendChild(e); t.ms = readMs(t.text); UI.tc.cur = t; UI.tc.at = Date.now(); tutPlaceBub();
 }
 function tutPlaceBub() {   // just under the rival seats, over the empty top of the table
   const e = document.getElementById('tbub'); if (!e) return; let bot = 54;
@@ -102,11 +102,10 @@ function tutTick() {
   }
   if (!UI.busy && !UI.fz && G.phase !== 'over') for (const t of tutTips()) { if (!C.seen[t.id] && t.when()) { C.seen[t.id] = 1; C.q.push({ id: t.id, text: t.say(), until: t.until }); } }
   const age = Date.now() - C.at;
-  if (C.cur && (age > 9500 || (C.cur.until && age > 1500 && !C.cur.until()))) tutHideBub();
+  if (C.cur && age > C.cur.ms) tutHideBub();   // a bubble stays 4 s + 1 s per 10 words, or until tapped away
   if (!C.cur && C.q.length && age > 600) { const t = C.q.shift(); if (!t.until || t.until() || t.good || t.poor) tutBubble(t); else delete C.seen[t.id]; }
-  else if (C.cur && C.q.length && age > 3500) { tutBubble(C.q.shift()); }
   else if (C.cur) tutPlaceBub();
-  if (G.phase === 'over' && UI.overShown && !UI.busy && !UI.fz && !C.ended && !C.q.length && (!C.cur || age > 3500)) tutEnd();
+  if (G.phase === 'over' && UI.overShown && !UI.busy && !UI.fz && !C.ended && !C.q.length && (!C.cur || age > C.cur.ms)) tutEnd();
 }
 // ---------------------------------------------------------------- the end: the scoring, rule by rule, with the real numbers
 function tutEnd() {
