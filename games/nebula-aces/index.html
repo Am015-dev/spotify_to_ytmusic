@@ -716,7 +716,7 @@ html.bf #tags .tag .tgl{display:none}
 
 .dlg.rules .turn5{background:rgba(255,200,107,.1);border:1px solid #ffc86b;border-radius:12px;padding:6px 14px 8px;margin-bottom:10px}.dlg.rules .turn5 h3{margin:4px 0}.dlg.rules .turn5 ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35}
 /* readable: dark text on the orange start plates (white was 3.5:1) ; move-card swatches keep their aspect */
-.dlg.start .btn.primary,.dlg.start .btn.primary *,.dlg.start [data-gxt-open],.dlg.start [data-gxt-open] *{color:#2a0a00!important;text-shadow:none!important}
+.dlg.start .launchbar .btn.primary,.dlg.start .launchbar .btn.primary *,.dlg.start [data-gxt-open],.dlg.start [data-gxt-open] *,.dlg.start [data-a=story],.dlg.start [data-a=story] *{color:#2a0a00!important;text-shadow:none!important}
 html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cover!important;background-position:center top!important}
 
 /* coached game: one non-blocking bubble under the top bar */
@@ -728,6 +728,34 @@ html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cove
 #na-coach .na-cx{pointer-events:auto;flex:0 0 44px;height:44px;margin:-6px -6px 0 0;border:0;background:transparent;color:#7a2236;font:800 20px/1 sans-serif}
 .na-later{margin:4px 0 0;padding-left:18px;text-align:left;font-size:14px;line-height:1.3}
 #na-coach .na-lv{pointer-events:auto;display:block;margin-top:2px;padding:6px 0;border:0;background:transparent;color:#7a2236;font:700 14px/1 "Exo 2",sans-serif;text-decoration:underline}
+/* touch targets: every tappable thing is at least 44 px */
+.bfm.small{width:44px;height:44px}
+html.ph.ph-p .road .ph{height:44px;min-height:44px}
+html .gx-bar .gxh-bulb,html .gx-bar .na-guide{min-width:44px;width:44px;min-height:44px;height:44px;margin:0}
+html .gxt-skip{min-height:44px;min-width:44px;padding-top:0;padding-bottom:0;top:4px}
+/* ---- round 3: readable on wide desktops (>= 16 px), solid backings behind text over pictures ---- */
+@media (min-width:1024px){
+  html .gx-dock *,html #modal .dlg *,html .gxc *,html #tags .tag *,html .viewbar *,html .gxt-top *,html .gxh-bub *,html .gx-bar *,html .roadmap *,html .legend *{font-size:max(16px,1em)!important}
+}
+.ph-chip i.you{background:#1d1530;color:#ffd27a;border-radius:6px;padding:0 6px}
+.gxc-head .gxc-htitle b,.gxc-path .gxc-act b,.gxc-path .gxc-act small{background:rgba(24,16,40,.92);color:#fff;padding:2px 8px;border-radius:6px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.gx-dock-head .gx-ibtn,.gx-dock-head .gx-ibtn *{color:#fff!important}.gx-dock-head .gx-ibtn{background:#1c2340}
+button.mv em.rs,button.mv small{background:rgba(10,12,34,.92);color:#fff;border-radius:4px;padding:0 4px}
+#phchip.ph-chip{background:rgba(12,10,30,.95);border-radius:8px;padding:2px 6px}
+/* round 3b */
+.gxc-head{background-size:auto 88px!important;background-repeat:repeat-x!important}
+.dlg.start button,.dlg.start label{scroll-margin-top:84px;scroll-margin-bottom:16px}
+.gx-dock .btn.primary,.gx-dock .btn.primary *,#prompt .btn.primary{color:#2a0a00!important;text-shadow:none!important}
+.gx-dock-head .gx-ibtn{background:#0c1128}
+html.sk-cards .mv.w,html.sk-cards .mv.g{color:#10131f!important}
+
+/* round 3c */
+.mvic{display:inline-block;background:rgba(10,12,34,.9);color:#fff;border-radius:6px;padding:0 6px;line-height:1.25;font-style:normal}
+.na-tap{filter:brightness(1.3)}
+.gx-dock .btn.primary[disabled],.gx-dock .btn.primary[disabled] *,#prompt .btn.primary[disabled],#prompt .btn.primary[disabled] *{color:#fff!important}
+.gx-dock .btn.primary small{background:rgba(20,10,0,.88);color:#fff!important;border-radius:4px;padding:0 6px}
+.gx-dock-head .gx-ibtn,.gx-dock-head .gx-ibtn *{opacity:1!important;color:#fff!important}
+.gx-dock-head .gx-ibtn{background:#04061a!important}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -1083,12 +1111,12 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
 <header class="gx-bar">
   <h1>Nebula Aces</h1>
   <button class="btn gx-tb" data-gx="d-squads" aria-expanded="false" title="Every ship's card: stats, upgrades, damage">🛩 Squads</button>
-  <button class="btn gx-tb" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
   <button class="btn" data-a="rules">❔ Rules</button>
   <span class="gx-sp"></span>
   <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="btn gx-gear" data-a="menu" aria-expanded="false" aria-controls="more" aria-label="More controls">⚙</button>
   <div class="gx-more" id="more">
+  <button class="btn" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
   <button class="btn" data-a="new">✦ New</button>
   <button class="btn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
   <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
@@ -3491,7 +3519,7 @@ function flareTex(){if(V3.ft)return V3.ft;V3.ft=canvasTex(128,128,(x,w,h)=>{x.tr
 function puffTex(){if(V3.pt)return V3.pt;const S=128;V3.pt=canvasTex(S,S,(x)=>{const img=x.createImageData(S,S);for(let j=0;j<S;j++)for(let i=0;i<S;i++){const dx=i/S-.5,dy=j/S-.5,r=Math.hypot(dx,dy)*2;const n=fbm3(i/18,j/18,3.3,4);const a=Math.max(0,1-r*(1.05-.5*n))*Math.min(1,(1-r)*3);const k=(j*S+i)*4;const v=180+75*n;img.data[k]=img.data[k+1]=img.data[k+2]=v;img.data[k+3]=Math.max(0,Math.min(255,a*a*255))}x.putImageData(img,0,0)});return V3.pt}
 // ---- image-based lighting: a small "space studio" (nebula-tinted gradient, a warm key softbox, magenta and cyan panels) through PMREM ----
 function makeEnv(){const r=V3.r;const es=new THREE.Scene();
-  es.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  es.add(new THREE.Mesh(new THREE.SphereGeometry(50,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,opacity:.4/* env bake only, never drawn on screen; opacity unused */,depthWrite:false,vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:'varying vec3 vP;void main(){float y=vP.y;vec3 top=vec3(.06,.07,.2),hor=vec3(.35,.14,.34),gnd=vec3(.03,.02,.06);vec3 c=y>0.?mix(hor,top,smoothstep(0.,.7,y)):mix(hor,gnd,smoothstep(0.,-.4,y));c+=vec3(.9,.3,.5)*pow(max(0.,dot(vP,normalize(vec3(1.,.1,-.5)))),6.)*.8;c+=vec3(.2,.5,1.)*pow(max(0.,dot(vP,normalize(vec3(-.7,.2,-.8)))),6.)*.7;gl_FragColor=vec4(c,1.);}'})));
   const panel=(col,i,w,h,pos)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(col).multiplyScalar(i),side:THREE.DoubleSide}));m.position.copy(pos);m.lookAt(0,0,0);es.add(m)};
   panel(0xfff0dc,9,22,14,new THREE.Vector3(-8,30,24));panel(0xff4f9a,3.5,10,26,new THREE.Vector3(30,8,-18));panel(0x40b8ff,3,10,22,new THREE.Vector3(-26,6,-20));panel(0xffffff,1.6,40,5,new THREE.Vector3(0,36,-4));
@@ -3542,7 +3570,7 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
     gl_FragColor=vec4(c*.9,1.);}`,1024,512);
   const planet=V3.planet=new THREE.Mesh(new THREE.SphereGeometry(760,96,64),new THREE.MeshStandardMaterial({map:pl,roughness:.85,metalness:0,envMapIntensity:0}));
   planet.position.set(-900,-980,-1500);planet.rotation.set(.35,.4,.25);planet.renderOrder=-7;sc.add(planet);
-  const atm=new THREE.Mesh(new THREE.SphereGeometry(800,96,64),new THREE.ShaderMaterial({uniforms:{L:{value:V3.key.position.clone().sub(V3.key.target.position).normalize()},col:{value:new THREE.Color(.35,.75,1.)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.FrontSide,
+  const atm=new THREE.Mesh(new THREE.SphereGeometry(800,96,64),new THREE.ShaderMaterial({uniforms:{L:{value:V3.key.position.clone().sub(V3.key.target.position).normalize()},col:{value:new THREE.Color(.35,.75,1.)}},transparent:true,opacity:.4,/* translucent glow shell: not a textured body */depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.FrontSide,
     vertexShader:'varying vec3 vN,vV;void main(){vec4 w=modelMatrix*vec4(position,1.);vN=normalize(mat3(modelMatrix)*normal);vV=normalize(cameraPosition-w.xyz);gl_Position=projectionMatrix*viewMatrix*w;}',
     fragmentShader:'uniform vec3 L,col;varying vec3 vN,vV;void main(){float f=1.-max(0.,dot(vN,vV));float lit=smoothstep(-.35,.6,dot(vN,L));float a=pow(f,2.6)*lit*1.8+pow(f,6.)*.25;gl_FragColor=vec4(col*a,1.);\n#include <colorspace_fragment>\n}'}));
   V3.atm=atm;atm.position.copy(planet.position);atm.renderOrder=-6;sc.add(atm);
@@ -3550,7 +3578,7 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
   const moon=V3.moon=new THREE.Mesh(new THREE.SphereGeometry(60,48,32),new THREE.MeshStandardMaterial({map:mt,roughness:.95,metalness:0,envMapIntensity:0}));moon.position.set(1250,-420,-1500);moon.renderOrder=-7;sc.add(moon)}
 // ---- the play mat: a dark glass plate with a holographic range grid, deployment bands, ruler ticks, a glowing frame and corner emitters ----
 function playMat(){const g=new THREE.Group();const M=91.4;
-  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x04050c,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x2f374d,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
   plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.renderOrder=-3;plate.receiveShadow=true;g.add(plate);
   const grid=V3.gridMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},c0:{value:new THREE.Color(0xff8a3a)},c1:{value:new THREE.Color(0xff3050)},cg:{value:new THREE.Color(0x5fb8ff)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
@@ -3573,8 +3601,8 @@ function playMat(){const g=new THREE.Group();const M=91.4;
   // PlaneGeometry is centred: shift its positions so vP runs 0..M along x and 0..M from the far edge (board y = MAT - z)
   gp.geometry.translate(M/2,M/2,0);gp.position.set(0,.015,M);gp.renderOrder=-1;g.add(gp);
   // glowing frame bars and corner emitters
-  const fm=new THREE.MeshStandardMaterial({color:0x10131f,roughness:.3,metalness:.9,emissive:0x2f7fd0,emissiveIntensity:.9});
-  const cm=new THREE.MeshStandardMaterial({color:0x2a2418,roughness:.25,metalness:1,emissive:0xffb35a,emissiveIntensity:.6});
+  const fm=new THREE.MeshStandardMaterial({color:0x2c3550,roughness:.3,metalness:.9,emissive:0x2f7fd0,emissiveIntensity:.9});
+  const cm=new THREE.MeshStandardMaterial({color:0x4a3f2c,roughness:.25,metalness:1,emissive:0xffb35a,emissiveIntensity:.6});
   for(const [x,z,w,d] of [[M/2,-.6,M+1.2,.35],[M/2,M+.6,M+1.2,.35],[-.6,M/2,.35,M+1.2],[M+.6,M/2,.35,M+1.2]]){const b=new THREE.Mesh(new THREE.BoxGeometry(w,.35,d),fm);b.position.set(x,.05,z);g.add(b)}
   for(const [x,z] of [[0,0],[M,0],[0,M],[M,M]]){const e=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.4,.9,6),cm);e.position.set(x+(x?.6:-.6),.2,z+(z?.6:-.6));g.add(e);const l=glow(0xffc070,5,.55);l.position.set(e.position.x,1.1,e.position.z);g.add(l)}
   return g}
@@ -3597,14 +3625,14 @@ function hullMaps(){if(V3.hm)return V3.hm;const S=512,H=new Float32Array(S*S),A=
   const col=canvasTex(S,S,(x)=>{const img=x.createImageData(S,S);for(let i=0;i<S*S;i++){const v=Math.max(0,Math.min(1,A[i]))*255;img.data[i*4]=v;img.data[i*4+1]=v;img.data[i*4+2]=v*1.01;img.data[i*4+3]=255}x.putImageData(img,0,0)});
   const rough=grayTex(Rg,S,true),nor=normalFromHeight(H,S,5);[col,rough,nor].forEach(t=>{t.wrapS=t.wrapT=THREE.RepeatWrapping});V3.hm={col,rough,nor};return V3.hm}
 // faction material sets (cached): painted hull, secondary panels, faction trim paint, gunmetal, glass canopy, engine glow
-const FACCOL=[{hull:0xe6dccb,hull2:0x9c9486,trim:0xe8732a,eng:0xffa24f,glass:0x0b2a3a,base:'#f08a3a'},{hull:0x565e6e,hull2:0x2e3440,trim:0xc2203a,eng:0xff4f6a,glass:0x2a0608,base:'#e0304a'},{hull:0x8a7a52,hull2:0x4c4432,trim:0x3fc28a,eng:0x7dffb0,glass:0x08281a,base:'#39c27f'}];
+const FACCOL=[{hull:0xe6dccb,hull2:0x9c9486,trim:0xe8732a,eng:0xffa24f,glass:0x428cb3,base:'#f08a3a'},{hull:0x565e6e,hull2:0x2e3440,trim:0xc2203a,eng:0xff4f6a,glass:0x8c363b,base:'#e0304a'},{hull:0x8a7a52,hull2:0x4c4432,trim:0x3fc28a,eng:0x7dffb0,glass:0x3b8866,base:'#39c27f'}];
 function facMats(c){V3.fm=V3.fm||{};const k=c.hull+':'+c.trim;if(V3.fm[k])return V3.fm[k];const H=hullMaps();
   const paint=(color,o)=>new THREE.MeshStandardMaterial(Object.assign({color,map:H.col,roughnessMap:H.rough,normalMap:H.nor,normalScale:new THREE.Vector2(.6,.6),roughness:1,metalness:.25,envMapIntensity:1},o||{}));
   const M={hull:paint(c.hull),hull2:paint(c.hull2,{metalness:.45}),trim:paint(c.trim,{metalness:.15,roughness:.8}),
     metal:new THREE.MeshStandardMaterial({color:0x3a3d44,roughness:.32,metalness:.95,normalMap:H.nor,normalScale:new THREE.Vector2(.3,.3)}),
-    dark:new THREE.MeshStandardMaterial({color:0x15171c,roughness:.55,metalness:.6}),
+    dark:new THREE.MeshStandardMaterial({color:0x30343f,roughness:.55,metalness:.6}),
     glass:new THREE.MeshPhysicalMaterial({color:c.glass,roughness:.04,metalness:.2,clearcoat:1,clearcoatRoughness:.02,emissive:c.glass,emissiveIntensity:.35,envMapIntensity:2.2}),
-    nozzle:new THREE.MeshStandardMaterial({color:0x2a2622,roughness:.35,metalness:1}),
+    nozzle:new THREE.MeshStandardMaterial({color:0x4a443c,roughness:.35,metalness:1}),
     hot:new THREE.MeshBasicMaterial({color:new THREE.Color(c.eng).multiplyScalar(2.2)}),
     lamp:new THREE.MeshBasicMaterial({color:new THREE.Color(c.eng).multiplyScalar(2.5)}),
     white:new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1).multiplyScalar(2.2)})};
@@ -3759,7 +3787,7 @@ function bombMesh(t){const g=new THREE.Group();const mine=t.k==='mine';const H=h
   const l=glow(mine?0x66ccff:0xff7733,3.2,.8);l.position.y=1.9;g.add(l);g.userData.lamp=l;g.position.copy(W(t.x,t.y));g.userData.bomb=t.id;return g}
 function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[FACTIONS[G.fac[s.side]].col];
   const blob=new THREE.Mesh(new THREE.PlaneGeometry(b*1.7,b*1.7),new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.8}));blob.rotation.x=-PI/2;blob.position.y=.02;g.add(blob);
-  const plastic=new THREE.MeshPhysicalMaterial({color:0x0b0c10,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15});
+  const plastic=new THREE.MeshPhysicalMaterial({color:0x30323c,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15});
   const base=new THREE.Mesh(baseGeo(b),plastic);base.castShadow=true;base.receiveShadow=true;g.add(base);
   const tok=new THREE.Mesh(new THREE.PlaneGeometry(b-.5,b-.5),new THREE.MeshStandardMaterial({map:tokenTex(s),roughness:.55,metalness:0}));tok.rotation.x=-PI/2;tok.rotation.z=0;tok.position.y=.53;tok.receiveShadow=true;g.add(tok);
   const rimC=new THREE.Color(fc.eng);const rim=new THREE.Mesh(new THREE.PlaneGeometry(b*1.45,b*1.45),new THREE.MeshBasicMaterial({map:ringTex(),color:rimC.clone().multiplyScalar(1.2),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));rim.rotation.x=-PI/2;rim.position.y=.06;g.add(rim);
@@ -4058,7 +4086,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
 // on rock textures and shader compilation (about a second on slow GPUs). No game state is touched.
 function warm3D(){if(G||!V3.on||!V3.r)return;const g=new THREE.Group();
   try{const box=new THREE.BoxGeometry(1,1,1);const mk=m=>{const o=new THREE.Mesh(box,m);o.castShadow=true;o.receiveShadow=true;g.add(o);return o};
-    mk(new THREE.MeshPhysicalMaterial({color:0x0b0c10,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15}));
+    mk(new THREE.MeshPhysicalMaterial({color:0x30323c,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15}));
     mk(new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false}));
     mk(new THREE.MeshStandardMaterial({map:ringTex(),roughness:.55,metalness:0}));
     mk(new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.8}));
@@ -4223,6 +4251,7 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers;const r=netRemote();
    ${host?`<p class="small muted">To change factions, size or expansions, close this box (✕), change them on the start screen, then come back.</p><div class="acts"><button class="btn primary" data-a="netstart">Start the battle${r.length?'':'<small>against the computer until a friend joins</small>'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the battle…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return '<p class="small muted">🌐 Online play is hidden while you are offline.</p>';
   if(!netAvail())return '<p class="small muted">🌐 Online play needs a recent browser with WebRTC (any current Chrome, Edge, Firefox or Safari).</p>';
   if(NET.on)return `<div class="online on"><p class="small">You are in online room <b class="code">${esc(NET.code)}</b>.</p><div class="row"><button class="btn primary" data-a="netopen">🌐 Back to the lobby</button><button class="btn" data-a="netleave">Leave the room</button></div></div>`;
   return `<div class="online ${UI.netOpen?'hl':''}" id="onlinebox"><p class="small muted">Free and direct: your browsers connect to each other. Host a battle and send a friend the code or link. You fly the first faction below, your friend the second.</p>
@@ -4232,7 +4261,7 @@ function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=d
 // the modal: the lobby, or "the host left"
 function netModalHTML(){if(!NET.on)return '';if(NET.inLobby&&!NET.lobbyMin)return lobbyHTML();
   if(isClient()&&NET.hostGone&&G&&!G.winner)return `<div class="dlg" role="dialog" aria-modal="true"><h2>The host left. The game is over.</h2><p class="small muted">The host’s page was running the battle, so it can’t go on without it.</p><div class="acts"><button class="btn primary" data-a="netleave">Back to the menu</button></div></div>`;return ''}
-function netClick(a){if(a==='nethost'){netJoin('host',NetRoom.newCode());return true}if(a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return true}
+function netClick(a){if(a==='nethost'){{const ob=document.getElementById('onlinebox');if(ob&&!ob.querySelector('.netwait'))ob.insertAdjacentHTML('beforeend','<p class="small netwait" role="status">Opening a room… you will get a code to share.</p>')}netJoin('host',NetRoom.newCode());return true}if(a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return true}
   if(a==='netstart'){netStart();return true}if(a==='netleave'){netLeave();return true}if(a==='netcopy'){netCopy();return true}if(a==='netmin'){NET.lobbyMin=true;render();return true}
   if(a==='netopen'){NET.lobbyMin=false;if(!NET.inLobby)UI.info=false;render();return true}if(a==='netlobby'){netToLobby();return true}return false}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value;if(e.target&&e.target.id==='netname'&&typeof NetRoom!=='undefined')NET.myName=NetRoom.setName(e.target.value)});
@@ -5489,7 +5518,7 @@ function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=C
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
   for(let sp=5;sp>=1;sp--){let row='';let any=false;for(const [t,dd,ic] of COLS){const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);
       if(i<0){row+='<td></td>';continue}any=true;const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;
-      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}">${ic}<small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
+      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${ic}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 // the result line for the player reading it: "You win/lose: …" in a solo or online game, the neutral line in hot-seat or watch
@@ -7156,7 +7185,9 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
     onExit:()=>{tutLeave();UI.info=true;render()}})}
 // ---------------------------------------------------------------- the coached game: free play, the guide speaks when a rule first matters
 const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
-function coachReset(){NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+// for external checks (qa-bot coached mode): running = the free-play part is on, explained = rule ids spoken so far, done = the result card was shown
+window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
+function coachReset(){NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
 function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}coachSay('goal');coachSay('fly0');render()}
 function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
 function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
@@ -7185,7 +7216,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
     if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else startGame('solo')}},true);
 // the end: the real numbers walked through, then what did not come up
-function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.done=Object.keys(NCH.shown);
+function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
   const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t+': '+LORE.coach[k].s));
@@ -7213,6 +7244,9 @@ function tutMenu(){const m=document.getElementById('more');if(!m||typeof GXT==='
 {const o=toggleMenu;toggleMenu=function(open){try{tutMenu()}catch(e){}return o.apply(this,arguments)}}
 try{tutMenu()}catch(e){}
 {const o=startGame;startGame=function(){if(!TUT.on)lsPlayed();return o.apply(this,arguments)}}
+
+// press feedback on every button (a short flash): the player sees the tap landed, even when the effect is on the 3D board
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(!b)return;b.classList.add('na-tap');setTimeout(()=>b.classList.remove('na-tap'),350)},true);
 
 </script>
 <script>window.GXLAB_CSS="/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */\n#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}\n#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}\n#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}\n#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}\n#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}\n#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}\n#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}\n#gxlab-bar .gxl-r{display:flex;gap:3px}\n.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}\n.gxl-panel[hidden]{display:none}\n@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}\n.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}\n.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.gxl-panel button{min-height:40px}\n.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}\n.gxl-tools button{flex:1 1 auto}\n.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}\n.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}\n.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}\n.gxl-row{display:flex;gap:8px;align-items:center}\n.gxl-row .gxl-t{flex:1;min-width:0}\n.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}\n.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}\n.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}\n.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}\n.gxl-rate{display:flex;gap:6px;margin-top:6px}\n.gxl-rate button{flex:1;padding:0 4px}\n.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}\n.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}\n.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}\n.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}\n.gxl-item .gxl-top .gxl-ask{flex:1}\n.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}\n.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}\n.gxl-ed b{color:#f4ead8}\n.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}\n.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}\n.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}\n.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}\n";</script>
