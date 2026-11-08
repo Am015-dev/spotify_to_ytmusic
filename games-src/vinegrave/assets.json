@@ -1870,6 +1870,105 @@
    "wave": 3,
    "slot": "Campaign map, act 3",
    "prompt": "Top-down painted campaign region map of misty temple highlands with terraces and a vine-choked temple on a peak, calm open areas for markers."
+  },
+  {
+   "stem": "card-whistle",
+   "kind": "card",
+   "w": 400,
+   "h": 300,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Card picture for Bone Whistle (item card, frame and numbers drawn by the game)",
+   "prompt": "A 1920s expedition item, a Bone Whistle, shown close up on a wooden crate at a jungle camp, canvas tents, ferns and lantern light behind."
+  },
+  {
+   "stem": "card-lantern",
+   "kind": "card",
+   "w": 400,
+   "h": 300,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Card picture for Storm Lantern (item card, frame and numbers drawn by the game)",
+   "prompt": "A 1920s expedition item, a Storm Lantern, shown close up on a wooden crate at a jungle camp, canvas tents, ferns and lantern light behind."
+  },
+  {
+   "stem": "card-sling",
+   "kind": "card",
+   "w": 400,
+   "h": 300,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Card picture for Pocket Sling (item card, frame and numbers drawn by the game)",
+   "prompt": "A 1920s expedition item, a Pocket Sling, shown close up on a wooden crate at a jungle camp, canvas tents, ferns and lantern light behind."
+  },
+  {
+   "stem": "card-hatchet",
+   "kind": "card",
+   "w": 400,
+   "h": 300,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Card picture for Trail Hatchet (item card, frame and numbers drawn by the game)",
+   "prompt": "A 1920s expedition item, a Trail Hatchet, shown close up on a wooden crate at a jungle camp, canvas tents, ferns and lantern light behind."
+  },
+  {
+   "stem": "card-sledge",
+   "kind": "card",
+   "w": 400,
+   "h": 300,
+   "ratio": "4:3",
+   "alpha": false,
+   "wave": 2,
+   "slot": "Card picture for Rock Sledge (item card, frame and numbers drawn by the game)",
+   "prompt": "A 1920s expedition item, a Rock Sledge, shown close up on a wooden crate at a jungle camp, canvas tents, ferns and lantern light behind."
+  },
+  {
+   "stem": "idol-turtle",
+   "kind": "token",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Turtle Idol token (shrine slot and score area)",
+   "prompt": "A small carved ancient idol of a turtle with a patterned shell, in jade and gold stone with moss in the grooves, seen from the front. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+  },
+  {
+   "stem": "idol-crane",
+   "kind": "token",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Crane Idol token (shrine slot and score area)",
+   "prompt": "A small carved ancient idol of a crane with long folded wings, in jade and gold stone with moss in the grooves, seen from the front. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+  },
+  {
+   "stem": "idol-ram",
+   "kind": "token",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Ram Idol token (shrine slot and score area)",
+   "prompt": "A small carved ancient idol of a ram with curled horns, in jade and gold stone with moss in the grooves, seen from the front. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
+  },
+  {
+   "stem": "idol-moth",
+   "kind": "token",
+   "w": 256,
+   "h": 256,
+   "ratio": "1:1",
+   "alpha": true,
+   "wave": 2,
+   "slot": "Moth Idol token (shrine slot and score area)",
+   "prompt": "A small carved ancient idol of a moth with wide patterned wings, in jade and gold stone with moss in the grooves, seen from the front. One single object centred on a flat plain white background, nothing else, no shadow on the ground."
   }
  ]
 }
