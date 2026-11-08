@@ -60,7 +60,7 @@ function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||
   const vis=id=>{const x=document.getElementById(id);return x&&!x.hidden?x:null};
   const host=PH.on?(vis('pc')||vis('ppop')||document.getElementById('ps')):(document.getElementById('main')||{}).parentNode;if(!host)return;
   if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
-  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival)}
+  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival);e.classList.add('fresh');clearTimeout(OSK.fT);OSK.fT=setTimeout(()=>e.classList.remove('fresh'),350)}
   const ref=PH.on?host.firstChild:document.getElementById('main');if(e.parentNode!==host||(PH.on&&host.firstChild!==e))host.insertBefore(e,ref)}
 // keep the tip on top when a card or pop-up opens over the strip (it moves with them, so it is never covered)
 setInterval(()=>{try{if(OSK.on&&OSK.cur)oskPlace()}catch(e){}},100);

@@ -30,11 +30,12 @@ function lpShow(el) {
   if (k.indexOf('chip:') === 0) { const key = k.slice(5); icon = chipHTML(key, 40); title = D.COLORS[key[0]].name; text = chipShort(key); }
   else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; icon = '<img class="lpimg" src="media/fortune-' + c.id + '.webp" alt="" onerror="this.remove()">' + icon; }
   else return;
+  if (UI.rsOpen && !el.closest('#rs')) return;   // W471: never on top of the day report
   lpHide(); const b = h('div#lpb', { role: 'dialog', 'aria-modal': 'true', 'aria-label': title }, h('span.lpi', { html: icon }), h('div.lpt', h('b', title), h('div', text), full && full !== text ? h('div.lpfull', full) : null));
   document.body.appendChild(b);
   const r = el.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight; let x = r.left + r.width / 2 - bw / 2, y = r.top - bh - 8; if (y < 6) y = r.bottom + 8;
   x = Math.max(8, Math.min(innerWidth - bw - 8, x)); y = Math.max(6, Math.min(innerHeight - bh - 6, y)); b.style.left = x + 'px'; b.style.top = y + 'px';
-  LP.hide = setTimeout(lpHide, 5000);
+  LP.src = el;   // W471: stays until the next tap (owner rule: no message leaves before it can be read)
 }
 (function () {
   const clr = () => { clearTimeout(LP.t); LP.t = 0; };
