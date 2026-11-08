@@ -1,8 +1,8 @@
 {
  "slug": "redline-rally",
- "when": "2026-11-08T06:50Z",
- "secs": 45,
- "totalSecs": 181,
+ "when": "2026-11-08T07:36Z",
+ "secs": 120,
+ "totalSecs": 446,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,21 +36,21 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 45,
-   "turns": 164,
-   "clicks": 161,
+   "secs": 120,
+   "turns": 475,
+   "clicks": 474,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 7
+   "messagesSeen": 10
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 45,
-   "turns": 181,
-   "clicks": 182,
-   "endedBy": "time",
+   "secs": 103,
+   "turns": 429,
+   "clicks": 429,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
@@ -58,21 +58,21 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 45,
-   "turns": 186,
-   "clicks": 182,
+   "secs": 120,
+   "turns": 520,
+   "clicks": 513,
    "endedBy": "result",
-   "tutorialEnded": 5,
+   "tutorialEnded": 10,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 16
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 45,
-   "turns": 197,
-   "clicks": 199,
-   "endedBy": "time",
+   "secs": 103,
+   "turns": 463,
+   "clicks": 468,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
