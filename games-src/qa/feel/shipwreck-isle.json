@@ -1,8 +1,8 @@
 {
  "slug": "shipwreck-isle",
- "when": "2026-11-08T04:14Z",
+ "when": "2026-11-08T04:55Z",
  "secs": 120,
- "totalSecs": 482,
+ "totalSecs": 483,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -21,9 +21,108 @@
    "detail": []
   },
   "d": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 14,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "★ first player",
+     "px": 13.6,
+     "at": 34684,
+     "where": "span.fp"
+    },
+    {
+     "session": "phone/learn",
+     "text": "☠",
+     "px": 13,
+     "at": 34684,
+     "where": "i."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Spend 1 wood fewer on one action this round.",
+     "px": 12,
+     "at": 34684,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Reroll one build die of your action.",
+     "px": 12,
+     "at": 34684,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Look at 5 invention cards. Put one of them on the board.",
+     "px": 12,
+     "at": 34684,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "An extra pawn for one build action this round.",
+     "px": 12,
+     "at": 34684,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Discard 1 food to heal 2 wounds, split as you like.",
+     "px": 12,
+     "at": 34684,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "★ first player",
+     "px": 13.6,
+     "at": 42624,
+     "where": "span.fp"
+    },
+    {
+     "session": "phone/play",
+     "text": "☠",
+     "px": 13,
+     "at": 42624,
+     "where": "i."
+    },
+    {
+     "session": "phone/play",
+     "text": "Spend 1 wood fewer on one action this round.",
+     "px": 12,
+     "at": 42624,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Reroll one build die of your action.",
+     "px": 12,
+     "at": 42624,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Look at 5 invention cards. Put one of them on the board.",
+     "px": 12,
+     "at": 42624,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "An extra pawn for one build action this round.",
+     "px": 12,
+     "at": 42624,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Discard 1 food to heal 2 wounds, split as you like.",
+     "px": 12,
+     "at": 42624,
+     "where": "span."
+    }
+   ]
   },
   "e": {
    "status": "PASS",
@@ -36,20 +135,20 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 24,
-   "clicks": 181,
+   "secs": 121,
+   "turns": 32,
+   "clicks": 128,
    "endedBy": "time",
-   "tutorialEnded": 8,
+   "tutorialEnded": 9,
    "hintsOff": true,
-   "messagesSeen": 2
+   "messagesSeen": 3
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 121,
-   "turns": 37,
-   "clicks": 198,
+   "secs": 120,
+   "turns": 27,
+   "clicks": 171,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -59,8 +158,8 @@
    "size": "pc",
    "mode": "learn",
    "secs": 121,
-   "turns": 28,
-   "clicks": 110,
+   "turns": 35,
+   "clicks": 113,
    "endedBy": "time",
    "tutorialEnded": 13,
    "hintsOff": true,
@@ -70,8 +169,8 @@
    "size": "pc",
    "mode": "play",
    "secs": 121,
-   "turns": 26,
-   "clicks": 124,
+   "turns": 28,
+   "clicks": 129,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,

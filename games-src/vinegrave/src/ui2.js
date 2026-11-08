@@ -123,7 +123,7 @@ function doMove(m) {
 }
 function after() {
   if (!G) return; render();
-  if (G.phase === 'over') { clearSave(); setTimeout(() => { showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
+  if (G.phase === 'over') { clearSave(); setTimeout(() => { try { if (typeof CO !== 'undefined') { CO.q.length = 0; coachHide(); } } catch (x) { } showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
   if (s !== UI.view) { if (UI.humans.length > 1) showPass(s); else { UI.view = s; render(); } }
