@@ -101,16 +101,21 @@ BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
+// the advisor's pick on a choice (the same aiChoose the bulb uses), worked out on a copy so the game is untouched; cached per question
+function recAns(qq){if(n2(qq.opts)<2||allAI())return -1;const key=G.logN+'|'+qq.title+'|'+qq.opts.length;if(BF.recQ&&BF.recQ.k===key)return BF.recQ.v;let v=-1;const save=JSON.stringify(G);UI.recBusy=1;try{v=aiChoose(qq.title,qq.opts,G.chars[qq.who],qq);if(typeof v!=='number')v=-1}catch(e){v=-1}finally{G=JSON.parse(save);UI.recBusy=0}BF.recQ={k:key,v};return v}
+const n2=a=>a?a.length:0;
+// one plain line that says what the helper pawns do (G6 r2: Hammer and Dog were never explained)
+function helpLine(){let xs=[];try{xs=extraPawns()}catch(e){}if(!xs.length)return '';const t=x=>x.id==='dog'?'Dog: helps hunt or explore, no wounds':x.id==='hammer'?'Hammer: an extra pawn for one build':`${x.n.split(' ')[0]}: an extra pawn for ${x.t.map(k=>(TNAME[k]||k).toLowerCase()).join(' or ')}`;return `<div class="bfhelp">${xs.map(x=>E(t(x))).join(' · ')}</div>`}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=p.x?pawnLabel(p).split(' ')[0]:pawnLabel(p);
   return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}${p.x&&p.t?E(': a helper pawn, it can only '+p.t.map(t=>(TNAME[t]||t).toLowerCase()).join(' or ')):''}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:p.x&&p.t?`<br><i>helper</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
-    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${optHtml(o.l)}</button>`).join('')}</div>`}
+    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;const rk=recAns(qq);return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt${j===rk?' rec':''}" data-ans="${j}">${j===rk?'<span class="recb" title="The advisor would pick this">✨</span>':''}${optHtml(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
     if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div>${helpLine()}<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
@@ -142,7 +147,7 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
     for(let n=0;n<10;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;const up=o.t-h-3;if(up>=top&&n<5){y=up;continue}const rx=o.r+3,lx=o.l-w-3;if(rx+w<=p.w-2){x=rx}else if(lx>=2){x=lx}else break}
     busy.push({l:x,t:y,r:x+w,b:y+h});const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
   // a label still under a plate after all that steps aside (the plate names the job there; the label comes back when the plate moves)
-  const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>hit(me,b)))}
+  const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t))}
   BF.ghostPlace()};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
