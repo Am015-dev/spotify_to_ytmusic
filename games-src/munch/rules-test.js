@@ -1,7 +1,7 @@
 // scenario tests: each builds a tiny position and checks one rule from rules.md
 const {JSDOM}=require('jsdom');const fs=require('fs');const html=fs.readFileSync('doorkick.html','utf8');
 let pass=0,fail=0;const out=[];
-function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',url:'http://localhost/'});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
+function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/',beforeParse(w){w.matchMedia=w.matchMedia||(()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}))}});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
   // ui=true keeps the real render(), so a test can look at the dock and click its buttons
   w.eval(ui?'ANIM=0;AIDELAY=0;schedule=function(){};setSeed(5);newGame("hot",4);UI.lastSeat=0;UI.pass=null':'ANIM=0;AIDELAY=0;render=function(){};schedule=function(){};refresh=function(){};setSeed(5);newGame("hot",4)');
   // helpers inside the page: give(seat,key) moves a card instance of key into a zone; fresh() clears hands

@@ -237,6 +237,10 @@ R('Special','Rummaging Rod: take any card from the discard piles.','const a=inst
 R('Special','Uninvited Guest can only be played during a fight, with a monster from your hand.','const g=give(0,"uninvited");give(0,"toads");return E(false,validMoves(0).some(m=>m.card===g))');
 R('Special','Sticky Paste: a hero who gets away must roll again.','P(0).lvl=1;fightNow(0,"hatmuncher");give(1,"paste");rig(6);act({act:"run"},0);return E("glue",G.q&&G.q.kind)');
 R('Special','Porter can be played at any time, even in a fight.','fightNow(0,"imp");const p=give(0,"porter");act({act:"play",card:p},0);return E(p,P(0).hire)');
+// ============================ TURN FLOW (gameplay gate, Nov 2026) ============================
+R('Turn','With no monster met you must loot the room or look for trouble: ending the turn is not offered yet.','G.door.push(inst("elf"));act({act:"kick"},0);const v=validMoves(0);return ALL(E("after",G.phase),E(false,v.some(m=>m.act==="end")),E(true,v.some(m=>m.act==="loot")))');
+R('Turn','A curse kicked from the door still leaves the room to loot afterwards.','P(0).lvl=3;G.door.push(inst("hexlvl"));act({act:"kick"},0);const lv=P(0).lvl,n=P(0).hand.length;act({act:"loot"},0);return ALL(E(2,lv),E(n+1,P(0).hand.length),E("post",G.phase))');
+R('Turn','After a won fight the turn goes straight to tidy-up: no loot and no trouble.','P(0).lvl=5;fightNow(0,"imp");act({act:"fight"},0);for(let k=0;k<20&&G.cb;k++){const t=sideToAct();const m=validMoves(t).find(x=>x.act==="pass"||x.act==="fight");if(!m)break;act(m,t)}const v=validMoves(0);return ALL(E(false,v.some(m=>m.act==="loot"||m.act==="trouble")),E(true,v.some(m=>m.act==="end")))');
 
 // ============================ harness ============================
 function run(){

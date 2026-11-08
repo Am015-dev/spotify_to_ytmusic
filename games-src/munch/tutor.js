@@ -16,7 +16,8 @@
 //   win: levels + treasure (Treasure Pile draws 3) ................. win
 //   run away: roll 5 or 6, Elf +1, fail = Bad Stuff (even death) ... run, bad
 //   curses can be played on anyone, before their door .............. curse
-//   no monster behind the door: loot a card or look for trouble ..... trouble (do), text names loot
+//   a curse behind the door hits at once ............................ kick3, doorcurse
+//   no monster behind the door: loot a card or look for trouble ..... trouble (do), loot (do)
 //   charity: hand limit 5, extras go to the lowest level ............ charity
 //   what the computer does: kicks, fights, runs, curses by the same rules . curse step text, meddle (watch Morwen), finale
 //   how the game ends (level 10 by a monster) ....................... finale
@@ -42,6 +43,9 @@ function tutDeal(){
 function tutStackTreasure(){const take=key=>{const i=G.tr.findIndex(id=>G.C[id]===key);return i>=0?G.tr.splice(i,1)[0]:null};
   const order=['jerkin','snooze','sour','pile','shiv'].map(take).filter(x=>x!=null);   // pushed last = drawn first: shiv (first draw), pile, sour, snooze, jerkin
   for(const id of order)G.tr.push(id)}
+// a curse for your third door (Rotten Luck: lose a level), and a harmless door card for the computer heroes' second round
+function tutTopCurse(){for(const k of ['hexlvl','hexgoose','hexgust'])if(tutTop(k))return true;return false}
+function tutTopSafe(){const i=G.door.findIndex(id=>{const c=cd(id);return c.t!=='monster'&&c.t!=='curse'&&c.sp!=='divine'});if(i<0)return false;G.door.push(G.door.splice(i,1)[0]);return true}
 function tutTop(key){const i=G.door.findIndex(id=>G.C[id]===key);if(i<0)return false;const id=G.door.splice(i,1)[0];G.door.push(id);return true}
 // the die: find a generator state whose next d6 is v (rnd() adds 0x6D2B79F5 to G.rng first)
 function tutRoll(v){for(let r=1;r<5000;r++){let t=r+0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);if(1+Math.floor(((t^t>>>14)>>>0)/4294967296*6)===v){G.rng=r;return true}}return false}
@@ -51,7 +55,7 @@ function tutAI(s){if(!tutOn()||!G||s===0)return null;const vm=validMoves(s),p=P(
   switch(G.phase){
     case 'setup':{const pl=vm.find(m=>(m.act==='play'||m.act==='equip')&&m.card!=null&&(cd(m.card).t==='item'||(cd(m.card).t==='race'&&!p.race.length))&&!(cd(m.card).t==='item'&&cd(m.card).req&&!!equipWhy(p,m.card)));return pl||by('ready')}
     case 'window':return by('pass');
-    case 'main':if(s===1)tutTop('imp');else tutTop('double');return by('kick');
+    case 'main':if(G.turn>3)tutTopSafe();else if(s===1)tutTop('imp');else tutTop('double');return by('kick');
     case 'after':return by('loot');
     case 'post':return by('end');
     case 'charity':return vm.slice().sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];
@@ -87,58 +91,64 @@ function tAskOpen(){if(BF.ask||!G.cb||G.cb.help>=0||!tcanAsk()||!tclear())return
 // ---------------------------------------------------------------- the steps
 function tutSteps(){
   return [
- {id:'goal',title:'Race to level 10',say:'Be the first hero to reach level 10. Beat monsters or sell gear to go up. Level 10 only comes from a monster.',target:tq('.bfbig','.mine .top'),wait:null,
+ {id:'goal',title:'Race to level 10',say:'First hero to level 10 wins. The last level needs a monster.',target:tq('.bfbig','.mine .top'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&!!document.querySelector('.bfbig')},
- {id:'elf',title:'Play your race',say:'Tap your Elf, then tap your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
+ {id:'elf',title:'Play your race',say:'Tap your Elf, then your hero. Races give powers.',target:tq('.bfbig'),also:()=>tcard('elf'),pick:tpick('elf'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
- {id:'powers',title:'Races and classes',say:'Your Elf runs away better. Classes add powers too.',target:tq('.mine .gear'),wait:null,
+ {id:'powers',title:'Races and classes',say:'Elves run away better. Classes give other powers.',target:tq('.mine .gear'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&P(0).race.length>0},
- {id:'bucket',title:'Wear an item',say:()=>'Items go on by themselves and add to your strength. Tap the Bucket, then your hero.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
+ {id:'bucket',title:'Wear an item',say:()=>'Tap the Bucket, then your hero. Worn items add strength.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bucket'},from:()=>tcard('bucket'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('bucket')&&!!document.querySelector('.bfbig')},
  {id:'ready',title:'Ready!',say:'Everyone gears up before the first door. Tap Ready.',target:tq(mv('ready')),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ready'},ready:()=>G.phase==='setup'&&tmine()&&P(0).eq.some(e=>e.on)&&BF.pick==null},
- {id:'sellbtn',title:'Sell for a level',say:'Every 1,000 gold of items you sell buys a level. Tap Sell.',target:tq('#prompt [data-a="sellmode"]'),
+ {id:'sellbtn',title:'Sell for a level',say:'Sell 1,000 gold of items for one level. Tap Sell.',target:tq('#prompt [data-a="sellmode"]'),
    wait:{type:'tap',match:a=>a.what==='sellmode'},ready:()=>G.phase==='main'&&G.active===0&&tmine()&&!UI.sell},
  {id:'sellpick',title:'Pick what to sell',say:()=>'Tap the Rod: it is worth '+cd(myId('rod')).g.toLocaleString('en')+' gold.',target:()=>tcard('rod'),
    wait:{type:'tap',match:a=>a.what==='sellpick'&&kdef(a.id)==='rod'},ready:()=>tmine()&&!!UI.sell&&!!tcard('rod')},
- {id:'sellconfirm',title:'Cash it in',say:'That is over 1,000 gold. Tap Sell for a free level.',target:tq('.sellbar .btn.primary'),
+ {id:'sellconfirm',title:'Cash it in',say:'Over 1,000 gold. Tap Sell for a free level.',target:tq('.sellbar .btn.primary'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='sell'},ready:()=>tmine()&&!!UI.sell&&UI.sell.length>0&&!!tq('.sellbar .btn.primary:not([disabled])')()},
- {id:'kick',title:'Kick open the door',say:'Tap the door and see what is behind it!',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+ {id:'kick',title:'Kick open the door',say:'Tap the door to kick it open.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&tmine()&&P(0).lvl>=2&&!!document.querySelector('.bfdoor')&&(tutTop('hatmuncher'),true)},
- {id:'potion',title:'A monster! Fight it',say:()=>{const [a,b]=nowStr();return 'Monster '+b+', you '+a+'. The higher number wins. Tap your potion, then your side.'},target:tq('.arena .score.hero'),also:()=>tcard('fizz'),pick:tpick('fizz'),
+ {id:'potion',title:'Strength vs level',say:()=>{const [a,b]=nowStr();return 'Its level '+b+', your strength '+a+'. Tap potion, then your side.'},target:tq('.arena .score.hero'),also:()=>tcard('fizz'),pick:tpick('fizz'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='fizz'&&a.z==='fh'},from:()=>tcard('fizz'),
    ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
- {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();return 'Still '+a+' against '+b+'. You lose. Run away: roll 5 or 6 to escape (Elves get +1).'},target:tq('.fbtns .runb'),
+ {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();return a+' against '+b+': you lose. Tap Run. 5 or 6 escapes.'},target:tq('.fbtns .runb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
- {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+'. A failed run means the monster’s Bad Stuff: it ate your hat. Some even kill you.',target:tq('.mine .gear','.mine .top'),wait:null,
+ {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+': caught! Its Bad Stuff ate your hat.',target:tq('.mine .gear','.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
- {id:'end1',title:'End your turn',say:'You may wear or sell more now. Then tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
+ {id:'end1',title:'End your turn',say:'Nothing more to do. Tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
    ready:()=>G.phase==='post'&&tmine()},
- {id:'curse',title:'Curse a rival',say:'Before Morwen kicks, you may curse her. Anyone can curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
+ {id:'curse',title:'Curse a rival',say:'Anyone may curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='hexlvl'&&a.z==='p1'},from:()=>tcard('hexlvl'),
    ready:()=>G.phase==='window'&&G.active===1&&tmine()&&BF.pick==null&&!!tcard('hexlvl')&&!!tchip(1)()},
- {id:'meddle',title:'Meddle in her fight',say:'Morwen fights alone. Anyone may interfere! Tap Gargantuan, then her monster: +10 for it.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
+ {id:'meddle',title:'Meddle in her fight',say:'Anyone may meddle in fights. Tap Gargantuan, then her monster.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
  {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
- {id:'kick2',title:'Your turn again',say:'Kick the door. Not every door hides a monster.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+ {id:'kick2',title:'Your turn again',say:'Your turn. Kick the door again.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
- {id:'trouble',title:'Look for trouble',say:'No monster. Loot a free card, or fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
+ {id:'trouble',title:'Look for trouble',say:'No monster? Fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='lizards'},from:()=>tcard('lizards'),
    ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('lizards')},
- {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': you lose. Ask a rival to join you. Tap Help.'},target:tq('.fbtns .helpb'),
+ {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': too strong. Tap Help.'},target:tq('.fbtns .helpb'),
    wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&tcanAsk()&&!!document.querySelector('.fbtns .helpb')},
- {id:'who',title:'Pick a helper',say:'Morwen is an Elf, so she helps for free. Others want treasure. Tap Morwen.',target:()=>{tAskOpen();return tchip(1)()},
+ {id:'who',title:'Pick a helper',say:'Helpers want a treasure share. Elves help for a level. Tap Morwen.',target:()=>{tAskOpen();return tchip(1)()},
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>{tAskOpen();return !!BF.ask&&!!tchip(1)()}},
- {id:'fight',title:'Fight!',say:()=>{const [a,b]=nowStr();return 'Together you have '+a+' against '+b+'. Higher wins, ties go to the monster. Tap Fight!'},target:tstable('.fbtns .fightb'),
+ {id:'fight',title:'Fight!',say:()=>{const [a,b]=nowStr();return 'Together '+a+' against '+b+'. Ties go to the monster. Tap Fight!'},target:tstable('.fbtns .fightb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='fight'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.help===1&&tmine()&&!!document.querySelector('.fbtns .fightb')},
- {id:'win',title:'Victory!',say:'You beat it: +1 level, and you drew the treasure. A Treasure Pile gave 3 more cards. Tap End turn.',target:tq(mv('end')),
+ {id:'win',title:'Victory!',say:'You won: +1 level and its treasure. Tap End turn.',target:tq(mv('end')),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&G.out.won&&tmine()},
- {id:'charity',title:'Too many cards',say:'You may keep 5 cards. Give the extras to the lowest-level hero: tap the Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
+ {id:'charity',title:'Too many cards',say:'Keep 5 cards; give extras to the lowest. Tap Halfling, then Morwen.',target:tchip(1),also:()=>tcard('halfling'),pick:tpick('halfling'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='halfling'&&a.z==='p1'},from:()=>tcard('halfling'),
    ready:()=>G.phase==='charity'&&tmine()&&BF.pick==null&&!!tcard('halfling')&&!!tchip(1)()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. The last level needs a monster. You are level '+P(0).lvl+'. Go and win!',target:tq('.mine .top'),wait:null,
+ {id:'kick3',title:'One more door',say:'Kick again. A door can hide a curse too.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
+   ready:()=>G.phase==='main'&&G.active===0&&G.turn>4&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTopCurse(),true)},
+ {id:'doorcurse',title:'Cursed!',say:'A curse from the door hits you at once.',target:tq('.mine .top'),wait:null,
+   ready:()=>G.phase==='after'&&G.active===0&&tmine()},
+ {id:'loot',title:'Loot the room',say:'No fight this turn, so loot the room. Tap Loot.',target:tq(mv('loot')),
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='loot'},ready:()=>G.phase==='after'&&G.active===0&&tmine()&&!!tq(mv('loot'))()},
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. You are level '+P(0).lvl+'. Go win!',target:tq('.mine .top'),wait:null,
    ready:()=>!G.winner&&(G.active!==0||tclear())}
   ]}
 // ---------------------------------------------------------------- the kit hooks
@@ -155,7 +165,7 @@ function tutLeave(){TUTG=false;UI.pause=false;clearTimeout(aiTimer);aiTimer=null
   try{GXH.hide()}catch(e){}G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;UI.pass=null;DEFSEED=null;render()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Gear up, kick, fight, run, help, curse, sell, charity. Now the Story begins.':'Gear up, kick, fight, run, help, curse, sell, charity. The lightbulb explains the rest.',
+    endTitle:'You know the rules',endText:o?'Gear up, kick, fight, run, help, curse, loot, sell, charity. Now the Story begins.':'Gear up, kick, fight, run, help, curse, loot, sell, charity. Now play a real game.',
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{const c=r&&r.choice;tutLeave();
