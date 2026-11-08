@@ -44,7 +44,7 @@ function coachHide(){clearTimeout(COACH.t);COACH.cur=null;const e=document.getEl
 function coachShow(id,text,name,face){const e=coachEl();e.querySelector('i').textContent=face;e.querySelector('span').innerHTML='<b>'+esc(name)+'</b> '+esc(text);
   let bot=0;for(const id of ['line','trk','trk2']){const x=document.getElementById(id);if(x&&!x.hidden){const r=x.getBoundingClientRect();if(r.bottom>bot)bot=r.bottom}}e.style.top=Math.max(40,bot?bot+4:96)+'px';
   void e.offsetWidth;e.classList.add('on');COACH.cur=id;COACH.shownAt=Date.now();COACH.text=text;clearTimeout(COACH.t);
-  const w=text.split(' ').length;COACH.t=setTimeout(coachHide,ANIM?Math.min(11000,Math.max(4500,2400+w*300)):500)}
+  const w=text.split(' ').length;COACH.t=setTimeout(coachHide,ANIM?4000+w*100+600:500)}
 function coachBegin(){COACH.seen={};COACH.log=[];COACH.react=null;COACH.tStart=null;COACH.lastAct=null;COACH.done=false;COACH.pg=-1;COACH.prevCur=-1;coachHide();const o=document.getElementById('coachend');if(o)o.remove()}
 function coachEnd(){coachHide();const o=document.getElementById('coachend');if(o)o.remove();COACH.pg=-1}
 function coachSee(id,text){COACH.seen[id]=1;(COACH.log=COACH.log||[]).push(id)}
@@ -61,7 +61,7 @@ function coachAfter(){if(!G||!G.coach){coachHide();return}
   if(G.over){coachFinal();return}
   coachReact();
   if(UI.modal||GX.open){return}
-  if(COACH.cur&&Date.now()-COACH.shownAt<(ANIM?2600:50))return;   // a new rule replaces the one on screen once it has been readable for 2.6 s
+  if(COACH.cur)return;   // one message at a time; it stays 4 s plus 1 s per 10 words, or until tapped away
   if(COACH.react&&G.phase==='turn'){const t=COACH.react;COACH.react=null;coachShow('react',t,LORE.guide.name,LORE.guide.face);return}
   for(const [id,when] of RULES){if(COACH.seen[id])continue;let w=false;try{w=when()}catch(e){w=false}
     if(w){coachSee(id);const rv=w==='rival';coachShow(id,coachText(id,w),rv?LORE.rival.name:LORE.guide.name,rv?LORE.rival.face:LORE.guide.face);return}}}

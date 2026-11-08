@@ -16,7 +16,7 @@ function tutHold(){return false}
 // opened through the shared tutor kit: ONE intro step (tap Next) and its card (tap "Cast off") are the only forced taps; then the real game is free
 function tutStart(o){if(NET.on)return;const pro=!!(o&&o.prologue);
   if(typeof GXT==='undefined'){oskBegin(pro);return}
-  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:OSK_TEXT.goal[0],say:'Cobalt swears the Reach is his. Last junk afloat keeps the lantern.',target:()=>document.getElementById('board'),wait:null,
+  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:TW_GOAL[0],say:TW_GOAL.slice(1).map(x=>'\u2022 '+x).join('\n'),target:()=>document.getElementById('board'),wait:null,
       ready:()=>!!G&&UI.started}],
     endTitle:'Your race begins',endText:'Play freely: every move is yours. Grandmother Osk speaks up when a rule first matters.',endButtons:[{id:'go',label:'Cast off'}],
     setup:()=>oskBegin(pro),
