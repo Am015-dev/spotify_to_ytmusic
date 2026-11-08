@@ -72,7 +72,7 @@ function raceHud(now, W, H) {
     cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
     cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
     /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
-    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 10, gh = R * 2 - 8, gear = c.gear;
+    var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = c.gear;
     cx.strokeStyle = '#59627a'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(gx, gy); cx.lineTo(gx, gy + gh); cx.moveTo(gx + gw, gy); cx.lineTo(gx + gw, gy + gh); cx.moveTo(gx, gy + gh / 2); cx.lineTo(gx + gw, gy + gh / 2); cx.stroke();
     var kx = gx + (gear >= 3 ? gw : 0), ky = gy + (gear % 2 ? 0 : gh); cx.fillStyle = '#ffd24a'; cx.beginPath(); cx.arc(kx, ky, R * 0.26, 0, 7); cx.fill();
     cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(R * 0.32) + 'px sans-serif'; cx.fillText(String(gear), kx, ky + 1);

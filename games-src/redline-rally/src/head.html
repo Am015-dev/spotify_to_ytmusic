@@ -169,5 +169,14 @@ table.champ{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
 table.champ th,table.champ td{padding:5px 6px;text-align:left;border-bottom:1px solid #2e3a50}
 table.champ tr.you td{color:var(--gold);font-weight:700}
 @media (min-width:900px){#trk .trk1,#trk .phs li,#trk .rate,table.champ,.pod3 .ps{font-size:16px}}
+
+/* W424: card labels sit on a solid chip so they stay readable over any card art */
+.cd .k,.cd .t{left:3px;right:3px;background:rgba(12,15,22,.88);color:#fff!important;border-radius:4px;text-shadow:none}
+.cd .v{text-shadow:none}.cd .v:not(:has(svg)){left:50%;right:auto;transform:translateX(-50%);min-width:1.3em;padding:0 .12em;background:rgba(12,15,22,.88);color:#fff;border-radius:8px;height:1.1em;top:calc(var(--ch)*.28)}
+.gxc-node .gxc-lock{background:#0d1018;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;filter:none;color:#fff}
+#rulesbody b{color:inherit}
+
+#modal .sheet>.row:last-child{position:sticky;bottom:-1px;z-index:2;background:var(--panel);padding:8px 0 4px;margin-bottom:0!important}
+@media (max-width:600px){.pod3 .p1 .blk{height:50px}.pod3 .p2 .blk{height:36px}.pod3 .p3 .blk{height:26px}.pod3 .blk{font-size:18px;padding-top:3px}.stand{padding:4px 6px;margin:4px 0}.stand .pt{width:34px;height:34px}.podium{padding:30px 12px 26px}}
 </style>
 </head>
