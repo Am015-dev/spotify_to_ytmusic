@@ -13,6 +13,16 @@ function plain(t){const me=plSeat();t=String(t||'');
   return t.replace(new RegExp("one of "+n+"'s wires",'g'),'one of your wires').replace(new RegExp("of "+n+"'s wires",'g'),'of your wires')
     .replace(new RegExp('^'+n+' (points|cuts|uses)','g'),(m,a)=>'You '+({points:'point',cuts:'cut',uses:'use'})[a]).replace(new RegExp('(; |, )'+n+' cuts','g'),'$1you cut')
     .replace(/^You point(.*) and says/,'You point$1 and say').replace(new RegExp('^'+n+"'s",'g'),'Your').replace(new RegExp(n+"'s",'g'),'your').replace(new RegExp('\\b'+n+'\\b','g'),'you')}
+// ---------- reading time (owner, 8 Nov): a caption stays 4 s + 1 s per 10 words, or until you tap; the crew waits for it ----------
+function plRead(t){const w=String(t||'').trim().split(/\s+/).filter(Boolean).length;const ms=4000+Math.ceil(w/10)*1000;return (UI.speed||1)>=3?Math.max(400,ms/UI.speed):ms}
+function plTick(ms){try{if(navigator.vibrate)navigator.vibrate(ms||12)}catch(e){}}
+function plWait(){if(!ANIM||!TBL.sayT)return;UI.aiNotBefore=Math.max(UI.aiNotBefore||0,TBL.sayT);clearTimeout(PL.rt);PL.rt=setTimeout(()=>{try{if(Date.now()>=TBL.sayT)refresh()}catch(e){}},TBL.sayT-Date.now()+40);
+  if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}}
+function plSkip(){if(!TBL.sayT||Date.now()>=TBL.sayT)return false;TBL.sayT=0;UI.aiNotBefore=0;const el=document.getElementById('say');if(el)el.classList.remove('hot','badc','goodc');
+  const s=decider();if(s>=0&&isHuman(s))return true;   // your own turn: the tap goes on to the wire; the next refresh shows the instruction
+  if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null}try{refresh();schedule()}catch(e){}return true}
+// a short vibrate tick when you pick up or drop a piece (phones that support it)
+(function(){if(typeof sfx!=='function')return;const o=sfx;sfx=function(k){try{if(k==='select'||k==='click')plTick(k==='select'?8:14)}catch(e){}return o.apply(this,arguments)}})();
 function plCut(){return G?G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0):0}
 // ---------- (a) the banner ----------
 function plBanner(txt,col){const tb=document.getElementById('fx');if(!tb)return;let b=document.getElementById('turnb');if(!b){b=document.createElement('div');b.id='turnb';b.setAttribute('aria-hidden','true');b.setAttribute('data-help','');tb.appendChild(b)}
@@ -25,19 +35,19 @@ function plTurnWatch(){if(!G||!UI.started||G.over||UI.brief||G.phase!=='turn'||G
 (function(){const o=refresh;refresh=function(){o();try{plTurnWatch()}catch(e){console.error(e)}}})();
 // ---------- (c)+(e) captions: before the move (announce) and after it (the log lines the engine just wrote) ----------
 (function(){const o=announce;announce=function(m,seat){o(m,seat);try{if(m&&m.a==='dual'&&G&&G.st[m.st]){const ow=ownerOf(m.st),who=ow===plSeat()?'one of your wires':'one of '+nm(ow)+"'s wires";
-    const v=m.v==='Y'?'yellow':m.v;setSay(plain(nm(seat)+' points at '+who+' and says '+v+(m.v2!=null?' or '+(m.v2==='Y'?'yellow':m.v2):'')),Math.max(900,1500/(UI.speed||1)))}}catch(e){}}})();
+    void who}}catch(e){}}})();
 function plLines(n0){const out=[];for(const e of G.log){if(e.i<=n0)break;if(e.c==='turn'||/opening token|fuse is lit/i.test(e.t))continue;out.unshift(e)}return out}
 (function(){const o=applyMove;applyMove=function(m,seat){if(!G||G.over)return o(m,seat);const n0=G.logN,c0=plCut(),d0=G.dial;const r=o(m,seat);
   try{if(r&&r.success!==false&&G){const L=plLines(n0);if(L.length&&!(m.a==='q'&&!L.length)){const first=L[0],bad=L.some(e=>e.c==='bad'),good=L.some(e=>e.c==='good');
-      let t=plain(L.slice(0,2).map(e=>e.t).join(' '));if(t.length>84){const rs=L.find(e=>/^(Hit|Miss)/.test(e.t));t=plain((rs||L[0]).t)}let hold=Math.max(1400,2200/(UI.speed||1));if(m.a==='q'||!L.length)hold=0;
+      let t=plain(L.slice(0,2).map(e=>e.t).join(' '));if(t.length>84){const rs=L.find(e=>/^(Hit|Miss)/.test(e.t));t=plain((rs||L[0]).t)}let hold=plRead(t);if(m.a==='q'||!L.length)hold=0;
       if(hold){const say=document.getElementById('say');TBL.sayT=0;setSay(t,hold);if(say){say.classList.toggle('badc',bad&&!good);say.classList.toggle('goodc',good&&!bad);setTimeout(()=>say.classList.remove('badc','goodc'),hold)}}
       const dc=plCut()-c0;let pop=null;
       if(dc>0)pop=['+'+dc,dc>=3?'wires cut':(m.a==='solo'?'solo cut: no guessing needed':'a match: both wires cut'),'good'];
       else if(G.dial!=null&&d0!=null&&G.dial<d0)pop=['Fuse −'+(d0-G.dial),'a miss: nobody cut','bad'];
-      if(pop)plPop(pop[0],pop[1],pop[2])}}}catch(e){console.error(e)}return r}})();
+      if(pop)plPop(pop[0],pop[1],pop[2]);if(hold)plWait()}}}catch(e){console.error(e)}return r}})();
 // ---------- (d) the score pop ----------
 function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tut&&false)return;let p=document.getElementById('spop');if(!p){p=document.createElement('div');p.id='spop';p.setAttribute('aria-hidden','true');p.setAttribute('data-help','');tb.appendChild(p)}
-  p.className='';p.innerHTML='<b>'+esc(big)+'</b><span>'+esc(why)+'</span>';void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1700/(UI.speed||1)))}
+  p.className='';p.innerHTML='<b>'+esc(big)+'</b>';if(cls==='good')plTick(18);void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1500/(UI.speed||1)))}
 // ---------- (b) the one instruction line, in plain words ----------
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(!G||G.over||UI.brief||!V||V.seat<0)return t;const me=V.seat,s=decider();if(UI.tut)return t;
   if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return 'Show a wire: tap one of yours.';
@@ -46,6 +56,7 @@ function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tu
     if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a glowing crew wire to guess it.';
     if(!sel&&t==='Tap your glowing wires')return 'Your turn: you hold every one left. Tap them to cut.'}
   if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+"'s turn: thinking...";return t}})();
+document.addEventListener('pointerdown',e=>{if(!G||!UI.started||!e.target.closest)return;if(e.target.closest('#say')||e.target.closest('#tb'))plSkip()},true);
 // ---------- tap the table while the computer crew plays to speed it up ----------
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||G.over||UI.brief||UI.tut||!e.target.closest||!e.target.closest('#tb'))return;const s=decider();if(s<0||isHuman(s)||UI._boost)return;
   UI._boost=UI.speed;UI.speed=Math.max(UI.speed,3);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}},true);

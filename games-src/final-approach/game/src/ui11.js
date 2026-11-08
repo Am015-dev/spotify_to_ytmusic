@@ -13,9 +13,11 @@ const CK_TICK = '<svg viewBox="0 0 16 16"><path d="M3 8.500l3.200 3.200L13 4.500
 const CK_CROSS = '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="#fff" stroke-width="2.800" stroke-linecap="round"/></svg>';
 function ckNum(it) { return it.k === 'gear' ? String(it.n) : it.k === 'flaps' ? String(it.n) : it.k === 'planes' ? (it.n ? String(it.n) : '') : it.k === 'speed' ? '≤' + it.n : it.k === 'air' ? (it.n ? String(it.n) : '') : ''; }
 function ckLabel(it) { return CK_NAME[it.k] + ': ' + (it.ok ? 'yes' : 'not yet') + (it.k === 'speed' ? ' (brakes ' + it.n + ')' : it.k === 'planes' && it.n ? ' (' + it.n + ' left)' : it.k === 'air' && it.n ? ' (' + it.n + ' spaces to go)' : it.k === 'gear' || it.k === 'flaps' ? ' (' + it.n + ')' : ''); }
+const CK_WORD = it => it.k === 'axis' ? 'Level' : it.k === 'gear' ? 'Gear ' + it.n + '/3' : it.k === 'flaps' ? 'Flaps ' + it.n + '/4' : it.k === 'planes' ? (it.n ? it.n + ' plane' + (it.n > 1 ? 's' : '') : 'No planes') : it.k === 'speed' ? 'Speed ≤' + it.n : it.k === 'air' ? (it.n ? it.n + ' to go' : 'At airport') : it.k === 'intern' ? 'Trainee' : it.k === 'ice' ? 'Ice ' + it.n + '/4' : '';
 function ckChips() {
-  return FA.checklist(G).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
-    h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24">' + (CK_ICO[it.k] || '') + '</svg>' }), ckNum(it) ? h('b.nn', ckNum(it)) : null, h('i.mk', { 'aria-hidden': 'true', html: it.ok ? CK_TICK : CK_CROSS })));
+  // phones: the landing-speed chip waits for the landing round (it cannot be met before), so the words fit on one row
+  return FA.checklist(G).filter(it => !(it.k === 'speed' && isPh() && !FA.isFinal(G))).map(it => h('span.ck.' + (it.ok ? 'ok' : 'no'), { 'data-k': it.k, 'aria-label': ckLabel(it), title: ckLabel(it) },
+    h('b.cw', CK_WORD(it)), h('i.mk', { 'aria-hidden': 'true', html: it.ok ? CK_TICK : CK_CROSS })));
 }
 // the dock strip: the checklist and one info button (the board is the screen; this is the one place to look to know if you are winning)
 function goalStrip() {
@@ -159,9 +161,9 @@ function previewText(k, v) {
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + (UI.cof || 0), S = FA.SLOT[k], o = 1 - v, last = FA.isFinal(G), wm = FA.windMod(G);
   let t = '';
   switch (S.grp) {
-    case 'axis': { const x = G.slots['ax' + o]; if (!x) { t = 'Axis: your ' + val + ' goes first; ' + name(o) + "'s die sets the tilt"; break; }
-      const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); t = 'Axis after: ' + (Math.abs(nx) >= 3 ? 'tilt ' + Math.abs(nx) + ', a spin: the flight ends' : nx === 0 ? 'level' : 'tilt ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right') + (Math.abs(nx) === 2 ? ' (one more is a spin)' : '')); break; }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) { t = 'Engines: ' + val + ' + ' + name(o) + "'s die = speed (stay up to " + G.pl.aeroB + ', 1 space up to ' + G.pl.aeroO + ', else 2)'; break; }
+    case 'axis': { const x = G.slots['ax' + o]; if (!x) { t = 'Axis: ' + name(o) + "'s die decides the tilt"; break; }
+      const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); t = 'Axis after: ' + (Math.abs(nx) >= 3 ? 'tilt ' + Math.abs(nx) + ': crash' : nx === 0 ? 'level' : 'tilt ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right') + (Math.abs(nx) === 2 ? ' (one more is a spin)' : '')); break; }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) { t = 'Speed: ' + val + ' plus ' + name(o) + "'s die"; break; }
       const sm = val + x.v + wm; if (last) { const br = FA.brakeVal(G); t = 'Landing speed ' + sm + ' vs brakes ' + br + ': ' + (sm <= br && br >= 2 ? 'slow enough' : 'too fast, the flight ends'); break; }
       const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2, to = G.pl.pos + adv, n = trackOf().sp.length;
       t = 'Speed ' + sm + ': ' + (adv ? 'advance ' + adv + ' (to ' + (to >= n ? 'the airport' : 'space ' + to) + ')' : 'stay on space ' + G.pl.pos) + (to > n ? ', past the airport: crash' : ''); break; }
@@ -172,7 +174,7 @@ function previewText(k, v) {
     case 'conc': t = G.coffee >= D.coffeeMax ? 'Coffee: already ' + G.coffee + ' tokens, the die is just spent' : 'Coffee: tokens ' + G.coffee + ' → ' + (G.coffee + 1); break;
     default: t = slotName(k) + ': ' + slotNeedLong(k);
   }
-  return t + ' · Landing ' + landMet() + ' met';
+  return t.split(/\s+/).length <= 9 ? t + ' · Landing ' + landMet() : t;
 }
 // which space to preview: the one under the pointer, else the coach's, else the best legal one
 function previewKey(v) {
@@ -220,7 +222,8 @@ function goalCard(inStory) {
   return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together in round ' + n + '.'),
     h('ul', h('li', 'Axis: both dice close, or the plane tilts. Tilt 3 crashes.'),
       h('li', 'Engines: your two dice add up. Fast enough moves you closer.'),
-      h('li', 'Spare dice: clear planes, lower gear and flaps, set brakes. The checklist shows what is left.')),
+      h('li', 'Spare dice: clear planes, gear, flaps, brakes.'), h('li', 'The checklist shows what is left.')),
+    (ap => ap ? h('p.fwx', wxImg('wx-' + ap.wx, ap.wx), wxImg('time-' + ap.tod, ap.tod), ap.name + ': ' + ap.wx + ', ' + ap.tod + '.') : null)(D.airports[scenOf().ap]),
     mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
 }
 function goalShow() {
@@ -233,7 +236,7 @@ function roPoll() {
   if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); if (isPh() && G.round === 0 && G.phase === 'brief' && !(UI.cfg && UI.cfg.tutorial) && !UI.camp && UI.mode === 'vs' && !G.lad && !/[?&]scn=/.test(location.search)) goalShow(); return; }   // ?scn= states skip menus and cards
   if (G.result) { roHide(); FT.round = G.round; return; }
   if (FT.ro && G.phase !== 'brief') roHide();   // the card lives in the briefing only: rolling the dice puts the board first again
-  if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net') roShow(a); FT.snap = roSnap(); }
+  if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net' && !(UI.fc && !UI.fc.ended)) roShow(a); FT.snap = roSnap(); }
 }
 setInterval(() => { try { roPoll(); } catch (e) { } }, 300);
 // ---------- after every render: tracker, preview, slot needs and reasons, the coach's pointer ----------
@@ -262,6 +265,12 @@ document.addEventListener('pointerover', e => { if (!hintsMode()) return; const 
     'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
     '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
     '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
+    '#pz .slot .sword{display:block;font-size:14px;line-height:1.1;font-weight:800;letter-spacing:-.3px;color:#fff;background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;white-space:nowrap}html.ph #pz .slot.hasv .sl{background:rgba(10,18,30,.9);border-radius:5px;padding:0 3px;color:#fff}html.ph #pz .slot .r1{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.4;pointer-events:none;z-index:0}html.ph #pz .slot .sword,html.ph #pz .slot .sl{position:relative;z-index:1}html.ph #pz .slot.hasv .sl{font-size:14px;line-height:1.05}' +
+    '.ck .cw{font-size:14px;font-weight:800;white-space:nowrap;padding:0 3px}html.ph .gstrip.chk .ckrow{gap:5px;flex-wrap:nowrap;padding-right:0}html.ph .ck{padding:0 1px}html.ph .gstrip.chk .gi{display:none}html.ph .gstrip.chk{padding:2px 4px}'+
+    '@media (min-width:1024px){#pz .slot .sword,.ck .cw{font-size:16px}}' +
+    '.fa-skip{position:fixed;right:10px;bottom:calc(var(--fa-skipb,150px));z-index:9981;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #fff;background:#1b2230;color:#fff;font-size:15px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.45)}html:not(.ph) .fa-skip{top:64px;bottom:auto;right:auto;left:16px;font-size:16px}html.ph .fa-skip{top:auto;bottom:auto;top:52px;right:8px;min-height:36px;font-size:14px;padding:0 12px}html.ph body:has(.fa-skip) .fa-coach{top:94px}' +
+    'html.ph #pz .slot .pw small,html.ph #pz .slot .pw b,html.ph .tbtn span,html.ph .ttut span,html.ph .gxc-sheet *,html.ph .gxc-head *,html.ph .gxc-path *,html.ph #says *,html.ph .rsbox *,html.ph .fa-ro *,html.ph .gx-drawer *{font-size:max(14px,1em)!important}.gxc-node.locked{pointer-events:none}' +
+    '.fa-ro{pointer-events:none}.fa-ro .rgo{pointer-events:auto}#pz .slot.pvw .sword,#pz .slot.pvw .r1,#pz .slot.pvw .sl{display:none!important}.fwx{display:flex;align-items:center;gap:6px;margin:6px 0 0}.fwx .wxi{width:28px;height:28px}#barstat{display:none!important}html.ph #fprev{display:none!important}' +
     '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
     '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
     '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +

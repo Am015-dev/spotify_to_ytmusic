@@ -87,7 +87,7 @@ function scPaint(){const sc=document.getElementById('sc'),pv=document.getElement
   if(show){const h=scTrackerHTML(V)+scScoreHTML(V);if(h!==SC.schtml){SC.schtml=h;sc.innerHTML=h}}
   let ph='',cls='';
   if(show&&SC.why){ph=`<div class="ln"><b>Why:</b> ${esc(SC.lastWhy||'No move yet.')}</div><div class="ln">A match cuts 2 wires; a miss burns the fuse. Tap here to close.</div>`;cls='card'}
-  else if(show&&hintsOn()){if(SC.card){ph=SC.card.h;cls='card '+SC.card.cls}
+  else if(show&&hintsOn()&&!document.getElementById('coach')){if(SC.card){ph=SC.card.h;cls='card '+SC.card.cls}
     else{const pr=scPreview(V);if(pr){ph=pr.h;cls='pre '+pr.cls}
       else{const b=scBest(V);if(b&&b.m&&b.p!=null&&(!UI.sel)){ph=`<b>Best now</b> ${esc(scMoveText(V,b.m))}: ${b.m.a==='solo'?'cannot miss':scPct(b.p)+' hit'}. <button type="button" class="wsd" data-wsd>What should I do?</button>`;cls='pre mid'}
       else if(!UI.sel&&V.legal&&decider()===V.seat&&!G.q){ph='<button type="button" class="wsd" data-wsd>What should I do?</button>';cls='pre mid'}}}}

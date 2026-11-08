@@ -60,7 +60,7 @@ const W=innerWidth,H=innerHeight;const me=document.querySelector('.bf-me');const
   const w=Math.min(W-16,r&&r.width>200?Math.max(300,Math.min(r.width,400)):360);e.style.width=w+'px';
   let left=r&&r.width>200?Math.min(r.left,W-w-8):(W-w)/2;e.style.left=Math.max(8,left)+'px';
   const h=e.getBoundingClientRect().height;
-  const hn=document.querySelector('.bf-hint');const hr=hn&&hn.getBoundingClientRect();const anchor=hr&&hr.height>8&&hr.top>100?hr.top:(r&&r.height>60?r.top:0);   // sit above the instruction line, never on it
+  const hn=document.querySelector('.bf-line');const hr=hn&&hn.getBoundingClientRect();const anchor=hr&&hr.height>8&&hr.top>100?hr.top:(r&&r.height>60?r.top:0);   // sit above the instruction line, never on it
   if(anchor&&anchor-h-6>44){e.style.top=Math.round(anchor-h-4)+'px'}else e.style.top='40px'}
 function cgHide(){clearTimeout(CG.timer);CG.timer=null;if(CG.el){CG.el.remove();CG.el=null}CG.cur=null;clearInterval(CG.pi);CG.pi=null;setTimeout(cgNext,250)}
 function cgNext(){if(CG.cur||!UI.cg||!CG.q.length)return;const n=CG.q.shift();cgShow(n.text,n.o,true)}
@@ -69,7 +69,7 @@ function cgSay(id,text,o){o=o||{};if(!UI.cg||!text)return false;if(id&&CG.said[i
   if(CG.cur&&Date.now()-CG.shownAt>3200&&!o.hold){cgShow(text,o,true);return true}   // never two at once: a stale one is replaced, a fresh one makes this wait
   if(CG.cur){if(CG.q.length>=2)CG.q.shift();CG.q.push({text,o});return true}
   cgShow(text,o,true);return true}
-function cgShow(text,o,force){o=o||{};cgCss();clearTimeout(CG.timer);if(CG.el)CG.el.remove();
+function cgShow(text,o,force){o=o||{};text=sgShort(text);cgCss();clearTimeout(CG.timer);if(CG.el)CG.el.remove();
   const e=document.createElement('div');e.className='cg-b cg-coach'+(o.kind?' '+o.kind:'');e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('data-cg','1');
   e.innerHTML='<div class="cg-t"><b>'+(o.who||'Mother Ochre')+'</b>'+text.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div><button type="button" class="cg-x" aria-label="Dismiss the guide">&times;</button>';
   e.querySelector('.cg-x').addEventListener('click',ev=>{ev.stopPropagation();cgHide()});
@@ -84,8 +84,8 @@ function cgInfo(m,s){const a=m.src<0?G.ctr:G.fac[m.src];const n=a.filter(t=>t===
 const cgAfterKey=['open','hint'];
 function cgOpen(){CG.said={};CG.q.length=0;CG.moves=0;CG.lastPraise=-9;cgCss();
   setTimeout(()=>{if(!tutOn()||G.turn>0)return;CG.said.goal=1;CG.said.kilns=1;CG.said.take=1;
-    cgSay(null,'Welcome, apprentice. You and Tamsin tile the Sun King\'s wall; most stars wins. Each kiln holds four tiles. Tap one tile: you take every tile of that colour.')},900);
-  setTimeout(()=>{if(tutOn()&&G.turn===0&&sideToAct()===0)cgSay(null,'Free play from here: any kiln, any row. One hint: the lone Frost completes your top row, your Frost column and all five Frost.')},9500)}
+    cgSay(null,'Goal: have the most stars when a wall row is full.\n• Tap a tile: you take every tile of that colour.\n• Put them on a row. Full rows move to your wall.\n• Touching wall tiles score more. Extras cost points.')},900);
+  setTimeout(()=>{if(tutOn()&&G.turn===0&&sideToAct()===0)cgSay(null,'Your turn: any kiln, any row.\nTip: the lone Frost fills your top row.')},9500)}
 function cgPick(s){if(!UI.sel||UI.sel.src!==s.src||UI.sel.c!==s.c)return;const p=P(0);const nm=cgName(s.c);
   const a=s.src<0?G.ctr:G.fac[s.src];const n=a.filter(t=>t===s.c).length;
   if(s.src<0&&G.markerIn==='ctr')cgSay('middle','The middle: the first player to take from it also takes the Sun token, which costs a floor space. Not always bad, but know it.');
@@ -97,15 +97,15 @@ function cgPick(s){if(!UI.sel||UI.sel.src!==s.src||UI.sel.c!==s.c)return;const p
 function cgBefore(m,s){const I=cgInfo(m,s);CG.moves++;const name=cgName(m.c);const you=s===0;
   if(you){
     if(m.line===5){cgSay('floor','Straight to the floor: each floor space costs stars when the round ends: −1, −1, −2, −2, −2, −3, −3.',{kind:'po'});if(CG.said.floor>1&&CG.moves-CG.lastPraise>1){CG.lastPraise=CG.moves;cgSay(null,'Poor: '+I.n+' tiles straight to the floor is '+I.pen+' stars.',{kind:'po'})}}
-    else if(I.over>0){cgSay('overflow','Row '+(m.line+1)+' holds '+cap(m.line)+', so '+cgPl(I.over,'tile')+' crack onto the floor. Floor spaces cost −1, −1, −2, −2, −2, −3, −3 when the round ends.',{kind:'po'});
+    else if(I.over>0){cgSay('overflow','Row '+(m.line+1)+' holds '+cap(m.line)+', so '+cgPl(I.over,'tile')+' crack onto the floor. At round end, floor spaces cost −1, −1, −2, −2, −2, −3, −3.',{kind:'po'});
       CG.said.floor=CG.said.floor||1;
       if(CG.said.overflow>1&&CG.moves-CG.lastPraise>1){CG.lastPraise=CG.moves;cgSay(null,'Poor: '+cgPl(I.over,'tile')+' crack ('+I.pen+'). Look for a row that fits all '+I.n+'.',{kind:'po'})}}
-    else if(m.line===0&&I.wallFull===4&&I.fill){cgSay('gameend','This tile fills your last gap in a wall row: when a wall row is complete the game ends after this round.',{kind:'pr'})}
+    else if(m.line===0&&I.wallFull===4&&I.fill){cgSay('gameend','This tile completes a wall row. The game ends after this round.',{kind:'pr'})}
     else if(I.fill){if(!CG.said.rows)cgSay('rows','Row '+(m.line+1)+' holds exactly '+(m.line+1)+' tiles of one colour, and you filled it. At round end one tile goes to your wall.',{kind:'pr'});
       else if(CG.moves-CG.lastPraise>2){CG.lastPraise=CG.moves;cgSay(null,'Good: a perfect fit, no cracks.',{kind:'pr'})}}
     else{cgSay('keep','Row '+(m.line+1)+' is not full yet ('+(cap(m.line)-I.space+I.n)+' of '+cap(m.line)+'). It keeps its tiles for the next round; nothing is lost.');
       CG.said.rows=CG.said.rows||1}
-    if(I.sun)cgSay('sun','You took from the middle first: the Sun token sits on your floor (−1), but you open the next round.');
+    if(I.sun)cgSay('sun','You took from the middle first. The Sun token sits on your floor (−1). But you open the next round.');
   }else{const who='Tamsin';const where=m.src<0?'the middle':'a kiln';
     if(!CG.said.rival)cgSay('rival',who+' takes '+cgPl(I.n,name+' tile')+' from '+where+(I.rest?'. The '+I.rest+' she leaves slide to the middle.':'.'),{who:'Tamsin plays'});
     else if(I.sun&&!CG.said.sun)cgSay('sun',who+' took the Sun token: it costs her a floor space, but she opens the next round.',{who:'Tamsin plays'});
@@ -115,7 +115,7 @@ function cgAfter(m,s){const I=CG.I;if(!I)return;if(s===0&&m.src>=0&&I.rest>0)cgS
   if(!CG.said.rival&&s===0&&G.phase==='offer'&&G.cur===1)CG.rivalWait=1}
 // ---------------------------------------------------------------- the round-end beats (the board waits inside the animation queue)
 function cgBeat(name,x){const p=P(0);const R=G.rsum&&G.rsum[0];
-  if(name==='tiling'){CG.said.roundend=CG.said.roundend||0;return {id:'roundend',text:'Every kiln and the middle are empty: the round is over. Each full row sends ONE tile to your wall; the other tiles of that row go to the shard box. Rows that are not full keep their tiles.',also:['tiling']}}
+  if(name==='tiling'){CG.said.roundend=CG.said.roundend||0;return {id:'roundend',text:'Every kiln and the middle are empty: the round is over. Each full row sends ONE tile to your wall. The rest of that row go to the shard box. Rows that are not full keep their tiles.',also:['tiling']}}
   if(/^wall\d$/.test(name)){if(!x||x.p!==0)return null;const rr=x.run||[1,1];const H=rr[0],V=rr[1];
     if(x.pts===1&&H===1&&V===1)return {id:'alone',text:'This tile touches no other tile, so it scores 1 star. Everyone starts small.',also:['tiling']};
     const parts=[];if(H>1)parts.push(H);if(V>1)parts.push(V);
@@ -141,14 +141,14 @@ function tutRelease(){const r=TUT.res;TUT.at=null;TUT.res=null;if(r)r()}
 function cgRound(){if(!tutOn())return;const p=P(0);
   const part=p.lines.map((L,r)=>[L.length,r]).filter(([n,r])=>n>0&&n<cap(r));
   if(part.length)cgSay('keep','Row '+(part[0][1]+1)+' keeps its '+part[0][0]+' tile'+(part[0][0]>1?'s':'')+' from last round and needs '+(cap(part[0][1])-part[0][0])+' more.');
-  if(G.first===0&&G.round>1)cgSay('sun','You hold the Sun token, so you take the first turn this round.')}
+  if(G.first===0&&G.round>1)cgSay('sun','You hold the Sun token. You take the first turn this round.')}
 // ---------------------------------------------------------------- the end card: what was never met, then the choices
 function cgEnd(){const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Tutorial finished');
   const later=Object.keys(CG_RULES).filter(k=>!CG.said[k]);const pro=TUT.pro;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   const btn=[];if(pro&&first)btn.push(['chapter','Start chapter 1']);if(pro)btn.push(['map','Story map']);btn.push(['play',pro?'Just play':'Play a real game']);btn.push(['again','Play the guide again']);
   window.__cgEnd={later:later.slice(),said:Object.assign({},CG.said)};cgSync();window.GXCOACH.done=true;
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">Well fired</div><div class="gxt-ex">Mother Ochre: "You read the kilns like a master."'+(later.length?' Things you\'ll meet later:':'')+'</div>'
-    +(later.length?'<ul class="cg-later">'+later.map(k=>'<li>'+CG_RULES[k]+'</li>').join('')+'</ul>':'')
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">Well fired</div><div class="gxt-ex">Mother Ochre: you read the kilns like a master.'+(later.length?' Things you\'ll meet later:':'')+'</div>'
+    +(later.length?'<ul class="cg-later">'+later.map(k=>'<li>'+CG_RULES[k].replace(/([^.!?])$/,'$1.')+'</li>').join('')+'</ul>':'')
     +'<div class="gxt-eb">'+btn.map((b,i)=>'<button type="button" class="gxt-b'+(i?'':' pri')+'" data-cg-end="'+b[0]+'">'+b[1]+'</button>').join('')+'</div></div>';
   d.addEventListener('click',e=>{const b=e.target.closest('[data-cg-end]');if(!b)return;const c=b.dataset.cgEnd;d.remove();
     try{GXT.markDone(TUT_GAME)}catch(er){}tutLeave();
@@ -177,10 +177,21 @@ function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefin
 function tutOffer(){if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
   try{localStorage.setItem('sgz_offer','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Play one coached game: a guide explains each rule just as it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn">Play the coached game</button><button type="button" class="gxt-b" data-offer="play">Just play</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b" data-offer="play" data-a="play">Play now</button></div></div>';
   d.addEventListener('click',e=>{const b=e.target.closest('[data-offer]');if(!b)return;d.remove();if(b.dataset.offer==='learn')tutStart();else beginGame()});
   document.body.appendChild(d);return true}
 // ---------------------------------------------------------------- the coach watches every move (before it is applied); input is never blocked
 (function(){const o=pickSel;pickSel=function(s){const r=o.apply(this,arguments);if(tutOn()){try{cgPick(s)}catch(e){console.error('tutor',e)}}return r}})();
 (function(){const o=go;go=function(m){let I=null;if(tutOn()){const s=sideToAct();if(s>=0&&P(s)&&m&&m.act==='take'){try{I=cgInfo(m,s);CG.I=I;cgBefore(m,s)}catch(e){console.error('tutor',e)}}}
   const s0=sideToAct();const r=o.apply(this,arguments);if(tutOn()&&I){try{cgAfter(m,s0)}catch(e){}}return r}})();
+// W466: the coached game is our own (not a GXT step list); report it through the shared tutor API so test drivers
+// (feel-audit, qa-bot) can follow it: the highlighted target is the ghost-finger move, or else any glowing piece.
+if(typeof GXT!=='undefined'){const _run=GXT.running,_st=GXT.state;
+  const cgOn=()=>!!(UI.tut&&G&&BF&&BF.on);
+  const cgHole=()=>{let el=null;try{const hp=me();if(hp&&!BF.busy&&!BF.q.length)el=bfFingerTarget(hp)}catch(e){}
+    if(!el&&BF.root&&!BF.busy){const q=s=>BF.root.querySelector(s);el=G.phase==='wall'?q('.bf-c.pick'):UI.sel?(q('.bf-row.ok .bf-rack')||q('.bf-floor.ok .bf-fl')||q('.bf-floor .bf-fl')):(q('.bf-table .bf-t[role=button]:not(.nofit)')||q('.bf-table .bf-t[role=button]'))}
+    const r=el&&el.getBoundingClientRect();return r&&r.width?{left:r.left,top:r.top,width:r.width,height:r.height,cx:r.left+r.width/2,cy:r.top+r.height/2}:null};
+  GXT.running=function(){return _run.apply(this,arguments)||cgOn()||!!(UI.tut&&G&&G.over)};
+  GXT.state=function(){if(_run.call(GXT)||!(UI.tut&&G))return _st.apply(this,arguments);
+    if(G.over)return {active:false,phase:'end',i:G.logN,count:0,shown:false,wait:null};
+    const h=cgHole();return {active:true,phase:'show',i:G.logN,id:'coached',count:UI.sel?1:0,shown:!!h,wait:'tap',hole:h,holes:h?[h]:[]}}}
