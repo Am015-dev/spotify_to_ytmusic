@@ -12,6 +12,7 @@ function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
   var ln = $('#line'), st = $('#start'); e.style.top = ''; e.style.bottom = ''; if (!ln || !st || !st.hidden || !G) return;
+  var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
 function toast(t, ms) { var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
@@ -117,22 +118,23 @@ function showPass() {
 }
 // ---------------------------------------------------------------- human actions
 function act(m) {
-  var before = G.seats[G.cur], sc0 = WM.score(before.env, before.acorns), at = null;
+  var before = G.seats[G.cur], sc0 = WM.score(before.env, before.acorns, G.cards), at = null;
   WM.apply(G, m);
-  if (m.t === 'place') { UI.ghost = null; sfx('place'); var sp = WM.score(before.env, before.acorns), g = sp.habT - sc0.habT; if (g > 0) { pop(m.c, '+' + g + ' habitat', 'hab'); var gt = WM.TER.filter(function (t) { return sp.hab[t] > sc0.hab[t]; })[0]; if (!before.ai && gt) toast('+' + g + ': your ' + WM.TER_NAME[gt] + ' grew to ' + sp.hab[gt] + ' joined tiles', 2600); } }
+  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); var sp = WM.score(before.env, before.acorns, G.cards), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvText(hp), 'hab'); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
     if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
     if (m.t === 'tok') {
-      var sc1 = WM.score(before.env, before.acorns), best = null;
+      var sc1 = WM.score(before.env, before.acorns, G.cards), best = null, tp = pvParts(sc0, sc1);
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
       var ta = G.last && G.last.acorn ? ' +1 acorn (keystone).' : '', tk = before.env[m.c] && before.env[m.c].tok;
-      if (tot > 0) { var info = {}; WM.scoreAnimal(before.env, best.a, info); UI.lit = { cells: info.lit, a: best.a, until: Date.now() + 1600 }; pop(m.c, '+' + tot + ' ' + cinfo(best.a).title, 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
-      else if (tot < 0) { pop(m.c, tot + ' points', 'neg'); sfx('tok'); } else sfx('tok');
-      if (!before.ai && tk) toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
+      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvText(tp), 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
+      else if (tot < 0) { pop(m.c, pvText(tp) + ': pattern broken', 'neg'); sfx('tok'); } else sfx('tok');
+      if (!before.ai && tk && tot === 0 && UI.mode !== 'coach') toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
+    if (!before.ai) pvTurnEnd();
     save();
   }
   render(); step();
@@ -160,7 +162,7 @@ function onMarket(kind, i) {
   if (!tutOK({ what: 'take', i: i })) return;
   take({ t: 'take', i: i });
 }
-function take(m) { UI.undo = WM.clone(G); sfx('tap'); WM.apply(G, m); UI.ghost = null; render(); fitView(); }
+function take(m) { UI.undo = WM.clone(G); sfx('tap'); pvTurnStart(m); UI.verdict = null; WM.apply(G, m); UI.ghost = null; render(); fitView(); }
 function onCell(c, isSpot) {
   var vx = G && G.seats[UI.view].env[c];
   if (vx && !isSpot && (!myTurn() || G.stage === 'pick' || (G.stage === 'tile' && !(UI.ghost && UI.ghost.c === c)))) { showBig('tile', vx, vx.tok); return; }
@@ -191,7 +193,7 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (G.np > 1 ? 106 : 62) + (UI.mode === 'coach' ? 44 : 0), padB = 70, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), padT = 106 + (UI.mode === 'coach' ? 44 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
@@ -224,17 +226,23 @@ function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(2.6, p.z
 function drawMap() {
   if (!G) return; var s = G.seats[UI.view], env = s.env, mine = myTurn(), out = '';
   var lit = UI.lit && UI.lit.until > Date.now() ? UI.lit.cells : [];
+  var pv = mine ? pvNow() : null, pvl = pv ? pv.lit : [], brk = pv && pv.broke || [], bad = '';
   var keys = Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; });
   keys.forEach(function (c) {
     var x = env[c], p = pix(c), tgt = mine && G.stage === 'tok' && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
-    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
+    if (tgt) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
+    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
-    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; });
+    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
     if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
   }
   var wh = boardWH();
-  $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '</g>';
+  pvl.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
+  brk.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring brk" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
+  if (UI.ghost && mine && G.stage === 'tile') { var gp = pix(UI.ghost.c); bad += pvBadge(gp[0], gp[1] - SZ * 0.62, pv ? pv.d : 0, UI.ghost.c, 0, 1); }
+  $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '<g class="pvbs">' + bad + '</g></g>';
+  pvStrip(pv);
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
   $('#map').classList.toggle('dimtok', mine && G.stage === 'tok' && WM.tokSpots(env, G.hold.tok).length > 0);
 }
@@ -261,10 +269,11 @@ function cset(a) { return G && G.cards && G.cards[a] || 'a'; }
 function cinfo(a) { return WM.cardInfo ? WM.cardInfo(a, cset(a)) : WM.CARDS[a]; }
 function tileName(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + ' tile' + (t.key ? ' (keystone)' : '') + ', accepts ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', '); }
 function renderDock() {
-  var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '';
+  var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '', gv = mine && !UI.wipe ? pvMarket() : null, gb = gv ? pvBestCol(gv) : -1;
   for (var i = 0; i < 4; i++) {
     var t = G.market.tiles[i], k = G.market.toks[i], fr = UI.free, sel = fr && (fr.ti === i), selk = fr && fr.ki === i, w = UI.wipe && UI.wipe.indexOf(i) >= 0;
-    h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + '" data-i="' + i + '">';
+    h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + (gv && i === gb && !UI.free ? ' top' : '') + '" data-i="' + i + '">';
+    if (gv && gv[i] != null && !UI.free) h += '<span class="gain' + (i === gb ? ' best' : gv[i] === 0 ? ' nil' : '') + '" title="Points this pair can add right now">' + (gv[i] > 0 ? 'up to +' + gv[i] : 'no points') + '</span>';
     h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : '<span class="mt gone"></span>';
     h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : '<span class="mk gone"></span>';
     h += '</div>';
@@ -309,13 +318,19 @@ function lineText() {
 // first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
 var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
 function coachText() { return G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
+function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.forEach(function (s, j) { if (j !== i && (b < 0 || fin[j].total > fin[b].total)) b = j; }); return b; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
-  WM.ANI.forEach(function (a) { h += '<button type="button" class="cc" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, ' + sc.ani[a] + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b></span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
+  var ri = rivalOf(UI.view), rv = ri >= 0 ? fin[ri] : null;
+  function vs(m, r) { return r == null ? '' : '<span class="rv' + (r > m ? ' lead' : '') + '" aria-hidden="true">' + r + '</span>'; }
+  function cls(m, r) { return r != null && m > r ? ' ahead' : r != null && r > m ? ' behind' : ''; }
+  WM.ANI.forEach(function (a) { var r = rv ? rv.ani[a] : null; h += '<button type="button" class="cc' + cls(sc.ani[a], r) + '" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, you ' + sc.ani[a] + (rv ? ', ' + G.seats[ri].name + ' ' + r : '') + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b>' + vs(sc.ani[a], r) + '</span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
   $('#cards').innerHTML = h;
+  var th = '';
+  WM.TER.forEach(function (t) { var m = sc.hab[t] + (sc.bonus && sc.bonus[t] || 0), r = rv ? rv.hab[t] + (rv.bonus && rv.bonus[t] || 0) : null; th += '<span class="tc' + cls(m, r) + '" style="border-left-color:' + WM.TER_COL[t] + '" title="' + esc('Largest ' + WM.TER_NAME[t].toLowerCase() + ' (with bonus): you ' + m + (rv ? ', ' + G.seats[ri].name + ' ' + r : '')) + '"><b>' + m + '</b>' + vs(m, r) + '</span>'; });
   var sh = '';
-  if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '">' + esc(s.name) + ' <b>' + t + '</b></button>'; });
-  $('#seats').innerHTML = sh; $('#seats').hidden = G.np < 2;
+  if (G.np > 1) G.seats.forEach(function (s, i) { var t = fin[i].total; sh += '<button type="button" class="seat' + (i === UI.view ? ' on' : '') + (i === G.cur ? ' cur' : '') + '" data-seat="' + i + '"><i class="dot' + (i === UI.view ? ' me' : i === rivalOf(UI.view) ? ' riv' : '') + '" aria-hidden="true"></i>' + esc(s.name) + ' <b>' + t + '</b></button>'; });
+  $('#seats').innerHTML = sh + '<button type="button" class="terr" data-gx="scored" aria-label="Largest habitats' + (rv ? ', you vs ' + esc(G.seats[ri].name) : '') + ': open the score sheet"><span class="tl">Land</span>' + th + '</button>'; $('#seats').hidden = false;
   var turn = Math.min(G.turns, G.seats[G.cur].done + 1);
   $('#barstat').innerHTML = '<span class="pill">Turn <b>' + turn + '/' + G.turns + '</b></span>' + (G.np > 1 ? '' : '<span class="pill">Score <b>' + sc.total + '</b></span>');
   var lt = lineText(), sm = /^Step (\d) of 3: (.*)$/.exec(lt), co = coachText();

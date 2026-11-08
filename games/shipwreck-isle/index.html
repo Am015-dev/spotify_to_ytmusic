@@ -436,7 +436,7 @@ html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
 html.ph .gx-bar .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-radius:10px}
 html.ph .gx-bar .gx-ibtn span{display:none}
 html.ph .gx-bar .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-html.ph.ph-p .gx-bar [data-gx="campd"]{display:none}
+html.ph .gx-bar [data-gx="campd"]{display:none}
 html.ph.ph-p .gx-board{grid-row:2;grid-column:1}
 html.ph.ph-p #phview{grid-row:3;grid-column:1}
 html.ph.ph-p .gx-dock{grid-row:4;grid-column:1}
@@ -468,7 +468,9 @@ html.ph #phview #phchip{flex:1 1 auto}
 html.ph #chip{display:none}
 html.ph #labels .tl{pointer-events:none;padding:0;border:0;background:none;box-shadow:none;min-width:0;opacity:.95}
 html.ph #labels .tl::after{display:none}
-html.ph #labels .tl b{font-size:0;display:block}
+html.ph #labels .tl b{font-size:0;display:flex;align-items:center;gap:2px}
+html.ph #labels .tl .pt{font:700 13px/20px var(--sans);padding:0 7px;border-radius:10px;background:rgba(20,14,6,.86);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5);white-space:nowrap;text-decoration:none}
+html.ph #labels .tl .pt.unk{background:rgba(60,40,90,.88);color:#f0e4ff}
 html.ph #labels .tl .pn{font:700 13px/20px var(--sans);min-width:20px;height:20px;padding:0 3px;margin:0;border-radius:50%;text-align:center;background:rgba(20,14,6,.78);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5)}
 html.ph #labels .tl.far .pn{background:rgba(10,18,28,.75);color:#ffe7b8}
 html.ph #labels .tl.sel .pn,html.ph #labels .tl.pulse .pn{background:var(--amber);color:#2b1a05;transform:scale(1.35)}
@@ -586,11 +588,15 @@ html.ph #ps .pw{min-height:44px;padding:3px 6px;gap:5px}html.ph #ps .pw span{fon
 #bf,#bfzoom,#bfgh{display:none}
 html.bf #bf{display:flex;flex-direction:column;gap:8px;justify-content:center;min-height:0;overflow:auto;padding:8px 10px calc(8px + var(--sab,0px));background:linear-gradient(var(--paper),var(--paper2));border-top:2px solid #b99f67;color:#2a2014;position:relative;z-index:3}
 html.bf .gx-dock,html.bf .gx-reopen{display:none!important}
-html.ph.bf.ph-p .gx-app,html.ph.bf.ph-p .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhb,var(--bh)) 46px minmax(0,1fr)}
+html.ph.bf.ph-p .gx-app,html.ph.bf.ph-p .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhb,var(--bh)) 64px minmax(0,1fr)}
 html.ph.bf.ph-p #bf{grid-row:4;grid-column:1}
 html.ph.bf.ph-l #bf{grid-row:3;grid-column:2;border-left:1px solid #b99f67;border-top:0}
-html.bf #phview:not([hidden]){min-height:46px;padding:0 4px 0 12px;gap:6px;background:#0b1620}
-html.bf #phview #phlabel{flex:1;min-width:0;padding:0;font:700 17px/1.15 var(--sans);color:#fff4d8;white-space:normal;overflow:hidden;text-overflow:clip;display:flex;align-items:center;max-height:46px}
+html.bf #phview:not([hidden]){min-height:64px;padding:0 4px 0 12px;gap:6px;background:#0b1620}
+html.bf #phview #phlabel{flex:1;min-width:0;padding:0;font:700 17px/1.15 var(--sans);color:#fff4d8;white-space:normal;overflow:hidden;text-overflow:clip;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;max-height:64px}
+html.bf #phview #phlabel .bft{display:block;font:700 17px/1.15 var(--sans);color:#fff4d8}
+html.bf #phview #phlabel .bfb{display:inline-block;font:800 13px/1.2 var(--sans);letter-spacing:.04em;text-transform:uppercase;padding:1px 8px;margin-bottom:2px;border-radius:9px;color:#1b1206;background:#f2b35a}
+html.bf #phview #phlabel .bfb.isl{background:#9fc7ef}
+html.bf #phview #phlabel .bfb.end{background:#e8d8b0}
 html.ph.bf.ph-l #phview #phlabel{display:flex}
 html.bf #phview .bf-i{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border-color:var(--line);background:var(--slate);color:var(--ink);flex:0 0 auto}
 html.bf #phview .bf-i svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
@@ -742,6 +748,50 @@ sub{font-size:13px!important}@media (min-width:1024px){.gx-dock i,#panel i,.gx-d
 .gx-bar .gxh-bulb{border-image:none;border:1px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(0,0,0,.25);padding:0}
 .gx-bar .gxh-bulb svg{width:20px;height:20px}
 @media (min-width:700px){body:has(.gx-drawer.on) .gx-dock{visibility:hidden}}
+.bfpc{display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-width:0;flex:1 1 0;max-width:68px}
+html.bf .pawnrow.bf-pw{flex-wrap:nowrap;gap:2px;width:100%}
+html.bf .bfpc .bfpw{width:44px;height:44px;min-width:44px}
+.bfpn{font:700 13px/1.1 var(--sans);font-style:normal;color:#2a2014;text-align:center;max-width:70px}
+.bfpn i{font-style:normal;font-weight:600;color:#5a4630}
+#bfres{display:none}
+html.bf #bfres{display:flex;flex-wrap:wrap;gap:2px 12px;position:absolute;left:0;right:0;top:0;z-index:4;padding:4px 12px;background:rgba(11,22,32,.94);border-bottom:1px solid rgba(242,179,90,.4);font:700 14px/1.25 var(--sans);color:#fff4d8;pointer-events:none}
+html.bf #bfres b{font-size:16px;color:#ffd98a}html.bf #bfres small{font:600 13px var(--sans);color:#cdd8e2}html.bf #bfres .bad{color:#ffb4a8}html.bf #bfres .bad b{color:#ffb4a8}
+html.bf #phchip{display:none!important}
+html.bf .bfa .bfw{font:700 13px/1 var(--sans);color:inherit;margin:0 2px}
+html.bf .bfa em{font:700 13px/1 var(--sans);white-space:nowrap}
+html.bf .bfa{white-space:nowrap}
+@media (min-width:1024px){html.bf #bfres{font-size:16px;padding:6px 14px}html.bf #bfres b{font-size:18px}html.bf #bfres small{font-size:15px}html.bf #phview #phlabel .bft{font-size:19px}html.bf #phview #phlabel .bfb{font-size:14px}html.ph #labels .tl .pt,html.ph #labels .tl .pn{font-size:15px}.bfpn{font-size:15px;max-width:96px}html.bf .bfa .bfw,html.bf .bfa em{font-size:15px}}
+@media (min-width:1024px){#moremenu button,#moremenu span,#moremenu b,#tutset *,#hlpset *{font-size:16px!important}}
+#coachb{position:fixed;left:10px;right:10px;top:142px;z-index:30;max-width:520px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:#fff6dc;color:#2a2014;border:2px solid #c99a3e;box-shadow:0 6px 18px rgba(0,0,0,.45);font:600 15px/1.3 var(--sans);pointer-events:none}
+#coachb[hidden]{display:none}#coachb .cn{font-weight:800;color:#7a3b12}#coachb .ct{flex:1 1 200px}#coachb ul{margin:4px 0 0 18px;padding:0;width:100%;font-weight:500;font-size:14px}
+#coachb .walk{font-weight:600}#coachb .cbs{display:flex;gap:8px;width:100%}#coachb .cb{background:#8a2a2a;color:#fff;border-radius:12px;margin:4px 0 0;padding:0 14px;font:700 15px var(--sans)}
+#coachb[data-kind=final]{top:96px;max-height:calc(100vh - 110px);overflow:auto;pointer-events:auto}
+#coachskip{position:fixed;right:8px;top:94px;z-index:31;min-height:44px;padding:0 12px;border-radius:22px;border:1px solid #c99a3e;background:#fff6dc;color:#2a2014;font:700 14px var(--sans)}
+#coachb button{pointer-events:auto;min-width:44px;min-height:44px;margin:-8px -6px 0 0;border:0;background:none;font-size:18px;color:#2a2014;cursor:pointer}
+/* ui-audit: solid panel backgrounds behind text (no images, no gradients), dark ink by specificity (not !important: the audit hides text with !important) */
+html body #modal .gxt-menu,html body #modal .gxt-menu b,html body #modal .gxt-menu span,html body #modal [data-a=story],html body #modal details.morep summary{color:#2a2014;text-shadow:none}
+html body #modal details.morep summary{background:#fff6dc;border-radius:10px;padding:8px 12px}
+#modal .gxt-menu,#modal [data-a=story]{background:#fff6dc!important}
+html body #rulesd .gx-drawer-head,html body #rulesd .gx-drawer-body,html body #rulesd .gx-drawer-body *,html body #rulesd .gx-drawer-head *{color:#2a2014;text-shadow:none}
+html body #rulesd .gx-drawer-body b{color:#7a3b12}
+#rulesd .gx-drawer-head,#rulesd .gx-drawer-body,#rulesd .gx-drawer-body *,#rulesd .gx-drawer-head *{background-color:#fff6dc!important;background-image:none!important}
+html body #moremenu,html body #moremenu *{text-shadow:none}
+html body #moremenu .gxh-set,html body #moremenu .tutset,html body #moremenu .hlpset,html body #tutset button,html body #hlpset button,html body #moremenu button span,html body #moremenu .gxh-set span{color:#2a2014}
+#moremenu .gxh-set,#moremenu .tutset,#moremenu .hlpset,#tutset button,#hlpset button,#moremenu button,#moremenu button span{background-color:#fff6dc!important;background-image:none!important}
+html body .gxc-head .gxc-htitle b,html body .gxc-head .gxc-ib{color:#fff4d8;text-shadow:none}
+.gxc-head{background:#1b1208!important}
+.gxc-head .gxc-ib{background:#2a1d0e!important;background-image:none!important}
+.gxc-act{background:rgba(27,18,8,.96)!important;padding:4px 8px;border-radius:8px}
+html body .gxc-act b,html body .gxc-act small{color:#fff4d8;text-shadow:none}
+html body .gxc-lab{color:#fff4d8;text-shadow:none}
+.gxc-lab{background:rgba(27,18,8,.94)!important;padding:1px 6px;border-radius:8px}
+#moremenu .tapf,.gxh-set .tapf{display:inline-block;width:8px;height:8px;margin-left:6px;border-radius:50%;background:#f2b35a}
+#modal details.morep,#modal details.morep *{transition:none!important;animation:none!important}
+#rulesd *,#moremenu *,#tutset *,#hlpset *{background-image:none!important}
+.gxc-act,.gxc-act *{opacity:1!important;filter:none!important}
+html body .gxc .gxc-path .gxc-node .gxc-lab,html body .gxc .gxc-path .gxc-act b,html body .gxc .gxc-path .gxc-act small,html body .gxc .gxc-screen .gxc-head .gxc-htitle b,html body .gxc .gxc-screen .gxc-head button.gxc-ib{color:#fff4d8;text-shadow:none}
+@media (min-width:1024px){html body .gxc .gxc-path .gxc-node .gxc-lab,html body .gxc .gxc-path .gxc-act b,html body .gxc .gxc-path .gxc-act small{font-size:16px}}
+@media (min-width:1024px){html.bf #phview #phlabel small.bfb{font-size:16px}}
 </style>
 <style>
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
@@ -1108,6 +1158,7 @@ html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,
 html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(13px,.9em)}
 </style>
 </head>
+
 <body>
 <div class="gx-app">
 <header class="gx-bar">
@@ -1615,10 +1666,10 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'visible', sel: '.gx-board', name: 'board' },
       { kind: 'fn', name: 'board fills the screen', fn: function () { var r = $('.gx-board').getBoundingClientRect(), f = r.width * r.height / (innerWidth * innerHeight); return f > .5 || 'board only ' + Math.round(f * 100) + '% of the screen'; } },
       { kind: 'fn', name: 'top line is shown and readable', fn: function () { var e = PHO.on ? $('#phlabel') : $('#dockt'); if (!e || !GXS.vis(e)) return 'top line not visible'; if (!/\S/.test(e.textContent)) return 'blank'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px + 'px'; } },
-      { kind: 'fn', name: 'phone: food / wood / hearts chip is shown', fn: function () { var c = $('#phchip'); if (!PHO.on) return true; return (c && GXS.vis(c) && inView(c)) || 'no resource chip'; } },
-      { kind: 'eq', name: 'day number', a: function () { var c = $('#phchip'); return c && GXS.vis(c) ? GXS.num('#phchip b') : +(/day (\d+)/i.exec($('#dockt').textContent) || [0, NaN])[1]; }, b: function () { return G.round; } },
-      { kind: 'eq', name: 'food (phone chip)', a: function () { return PHO.on ? GXS.num('#phchip i:nth-of-type(1)') : G.res.food; }, b: function () { return G.res.food; } },
-      { kind: 'eq', name: 'wood (phone chip)', a: function () { return PHO.on ? GXS.num('#phchip i:nth-of-type(2)') : G.res.wood; }, b: function () { return G.res.wood; } },
+      { kind: 'fn', name: 'phone: food / wood / hearts chip is shown', fn: function () { var c = $('#bfres'); if (!PHO.on) return true; return (c && GXS.vis(c) && inView(c)) || 'no resource chip'; } },
+      { kind: 'eq', name: 'day number', a: function () { var c = $('#bfres'); return c && GXS.vis(c) ? GXS.num('#bfres span:nth-child(1) b') : +(/day (\d+)/i.exec($('#dockt').textContent) || [0, NaN])[1]; }, b: function () { return G.round; } },
+      { kind: 'eq', name: 'food (phone chip)', a: function () { return PHO.on ? GXS.num('#bfres span:nth-child(2) b') : G.res.food; }, b: function () { return G.res.food; } },
+      { kind: 'eq', name: 'wood (phone chip)', a: function () { return PHO.on ? GXS.num('#bfres span:nth-child(3) b') : G.res.wood; }, b: function () { return G.res.wood; } },
       { kind: 'fn', name: 'the main green button is on screen and not covered', fn: function () { var b = [].filter.call(document.querySelectorAll('#bf .bf-main .btn.go, .gx-dock .btn.go'), GXS.vis)[0]; if (!b) return 'no green button'; if (!inView(b)) return 'green button off screen'; var r = b.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return (t && (t === b || b.contains(t))) || 'covered by ' + (t && (t.id || t.className)); } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#phlabel, #dockt, #phchip, #roadmap *, #dockmsg'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin
@@ -2430,7 +2481,7 @@ const GX={key:'gx',open:null,
 
   // ------------------------------------------------------------------ validation (node-safe)
   var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
-  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter', 'relic'];
   function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
   GXC.validate = function (data) {
     var bad = [], add = function (m) { bad.push(m); };
@@ -3479,9 +3530,9 @@ const CHARS={
   {k:'keeneye',n:'Keen Eye',c:3,x:'Draw 2 discovery tokens, keep one.'}]},
  soldier:{n:'Soldier',die:12,arrows:[4,8],inv:'spear',skills:[
   {k:'track',n:'Tracker',c:2,x:'Look at the top beast of the hunting deck; leave it on top or put it at the bottom.'},
-  {k:'fortify',n:'Fortify',c:2,x:'Palisade +1 or weapon +1.'},
+  {k:'fortify',n:'Fortify',c:3,x:'Palisade +1 or weapon +1.'},
   {k:'rage',n:'Battle Rage',c:3,x:'+3 weapon for your next fight this round.'},
-  {k:'drive',n:'Drive the Game',c:4,x:'Shuffle the top card of the beast deck into the hunting deck.'}]}};
+  {k:'drive',n:'Drive the Game',c:4,x:'Put the top card of the beast deck on top of the hunting deck, unseen.'}]}};
 const FRIDAY={n:'Friday',die:4};
 // inventions: t = terrain needed, it = items needed, r = resources {wood,fur,food}, alt = pay one of; kind: start | normal | personal
 const INVENTIONS={
@@ -3850,6 +3901,14 @@ function cardText(c){const o=[];
 <script>
 // ---------- How to play (an original summary of the rules as this game applies them) ----------
 const RULES_HTML=`<h2>How to play</h2>
+<h3>How a turn works</h3>
+<ol class="turn5"><li><b>The island acts.</b> An event card, morale and the camp's food and wood arrive. Read each scene, then tap Continue.</li>
+<li><b>You plan.</b> Tap a pawn, then a glowing place on the island to send it to work there.</li>
+<li><b>Two pawns are safe.</b> One pawn rolls dice and can fail or get hurt; two pawns never roll.</li>
+<li><b>Tap Start day.</b> The jobs play out one by one: you see each result as it happens.</li>
+<li><b>Weather and night.</b> Everyone eats 1 food. Without a shelter everyone is wounded. Survive until rescue.</li></ol>
+<h3>Simplified here, on purpose</h3>
+<ul><li>Scenarios 4, 5 and 7 are not offered (they need lava, village fights and a bonus sheet).</li><li>The first wreckage is always the food crates; the random-wreckage variant is not offered.</li><li>You may pick any castaways. The board game limits two-player and solo games to the Carpenter, Cook and Explorer.</li><li>Healing and moving camp at night are optional prompts; skills are used from the Camp tab. The rules timing is the same.</li></ul>
 <p>You are castaways on a wild island. Everyone wins or loses together. Finish the scenario's goal before the last round ends, and keep every castaway alive: if anyone dies (Friday aside), you all lose.</p>
 <h3>A round, in six phases</h3>
 <ol><li><b>Event</b> (not in round 1). Draw an event card: its effect happens now, and the card becomes a <b>threat</b> in the right-hand slot. The older threat slides left; a threat pushed off the left slot fires its <i>if ignored</i> effect. Cards with a book icon trigger the scenario's book effect; the others put a "?" marker on the build, gather or explore action.</li>
@@ -4634,7 +4693,7 @@ function useSkill(ci,k){const why=skillWhy(ci,k);if(why)return why;const c=P(ci)
   case 'recon':{const top=G.tileDeck.slice(0,3);ask(ci,'Scout Ahead: which tile goes on top?',top.map(n=>({l:`Tile ${n}: ${TILES.find(t=>t.no===n).terr}${TILES.find(t=>t.no===n).src.length?' ('+TILES.find(t=>t.no===n).src.join(', ')+')':''}`,frames:[{f:'fn',k:'tileTop',n}]})),{kind:'tiles',force:1});break}
   case 'track':{const k2=G.hunt[0];ask(ci,`Tracker: the next beast is ${cname(k2)} (strength ${BEAST[k2].str}).`,[{l:'Leave it on top',frames:[]},{l:'Put it at the bottom',ops:[['huntTopBottom']]}],{kind:'track',force:1,beast:k2});break}
   case 'fortify':{const o=[{l:'Weapon +1',ops:[['weapon',1]]}];if(hasShelter())o.unshift({l:'Palisade +1',ops:[['pal',1]]});ask(ci,'Fortify',o,{kind:'fortify'});break}
-  case 'drive':{const k2=G.beast.shift();G.hunt.push(k2);shuffle(G.hunt);lg('Another beast is driven into the hunting grounds.');break}}
+  case 'drive':{const k2=G.beast.shift();G.hunt.unshift(k2);lg('Another beast is driven to the top of the hunting grounds.');break}}
   run();R();return null}
 FN.keepDisc=fr=>{G.own.push({k:fr.k1,fut:false});if(fr.k2)G.discs.push(fr.k2);lg(`Kept: ${discName(fr.k1)}.`,'good')};
 FN.tileTop=fr=>{const i=G.tileDeck.indexOf(fr.n);G.tileDeck.splice(i,1);G.tileDeck.unshift(fr.n);lg(`Tile ${fr.n} will be the next one found.`)};
@@ -6223,7 +6282,7 @@ function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=h
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
 function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s></b>`:''}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Unknown'}</s></b>`:''}
     else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
@@ -7002,7 +7061,7 @@ const PHO={on:false,land:false,pop:null,popSig:'',zoom:false,tmr:0,st:''};
 const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
 const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function detect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  return true}   // board-first (the guided turn: banner, one instruction line, glowing places) at every size; ?phone=0 gives the old desktop table
 function insets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
@@ -7017,7 +7076,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
   let bw,bh,rail=0;
   if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
-  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.3),h-I.t-I.b-BAR-46-150)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.3),h-I.t-I.b-BAR-64-178)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
   // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
   const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');
@@ -7032,7 +7091,7 @@ function state(){if(!G||typeof UI==='undefined')return 'none';if(UI.modal==='sta
 function lowLife(){let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded')continue;if(c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m}
 function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter(),mo:G.morale}});
   const bad=(c,t)=>`<i class="${c?'bad':''}">${t}</i>`;
-  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}${o.mo<0?bad(true,'☹'+o.mo):`<i class="c-x">☂${o.roof}</i>`}`,
+  return {h:`<b>Day ${o.d} of ${o.r}</b>`,
     a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Morale ${o.mo}${o.mo<0?': the first player loses determination each morning, and wounds when they can’t pay':''}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
 // the goal, short enough for the bar under the island
 function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():null;if(cp){const by=G.cmp.goal.value.byDay;return cp.map(([l,h,n])=>n===true?`${l} ${h?'✓':'✗'}`:`${l} ${Math.min(h,n)}/${n}`).join(' · ')+(by?` · by day ${by}`:'')}
@@ -7042,7 +7101,7 @@ function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f
 PHO.sync=function(){if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
-    const lb=q('#phlabel');if(lb)lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
+    const lb=q('#phlabel');if(lb&&!(typeof BF!=='undefined'&&BF.on))lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
   // the game-over report and the setup screen are cards in the free zone
   const m=q('#modal');if(m){m.classList.toggle('phcard',st==='over');const r=dock.getBoundingClientRect();const R=document.documentElement;R.style.setProperty('--dz-t',Math.round(r.top)+'px');R.style.setProperty('--dz-l',Math.round(r.left)+'px');R.style.setProperty('--dz-w',Math.round(r.width)+'px');R.style.setProperty('--dz-h',Math.round(r.height)+'px')}
   buildStrip();
@@ -7285,7 +7344,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
    ${seg('Difficulty',[['easy','Easy'],['standard','Standard'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
-   <details class="morep"><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
+   <details class="morep" open><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
   if(t==='events')list=EVENTS.concat(WRECKS).map(c=>({n:c.n,tag:c.k==='crates'||WRECKS.includes(c)?'wreckage':c.icon==='book'?'book event':c.icon+' event',cp:c.cp||1,x:cardText(c)}));
@@ -7513,7 +7572,7 @@ const FINGER='<u class="rg"></u><span class="fg">👆</span>';
 function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q('.gx-board'),view=q('.gx-board .view');if(!app||!board)return;
   const tray=document.createElement('div');tray.id='bf';tray.setAttribute('role','region');tray.setAttribute('aria-label','Your move');app.appendChild(tray);
   const ov=document.createElement('div');ov.id='bfov';ov.innerHTML='<div id="bfglow"></div><div id="bfchips"></div>';(view||board).appendChild(ov);
-  const pp=q('#ppop');if(pp)board.appendChild(pp);
+  const rs=document.createElement('div');rs.id='bfres';rs.setAttribute('role','status');rs.setAttribute('aria-label','Shared supplies');board.appendChild(rs);const pp=q('#ppop');if(pp)board.appendChild(pp);
   const pv=q('#phview');const bz=document.createElement('div');bz.id='bfzoom';board.appendChild(bz);if(pv)for(const b of [...pv.querySelectorAll('[data-ph=in],[data-ph=out],[data-ph=camp]')])bz.appendChild(b);
   if(pv&&!pv.querySelector('.bf-i')){const i=document.createElement('button');i.className='gx-ibtn bf-i';i.dataset.bf='info';i.setAttribute('aria-label','Details');i.innerHTML='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/></svg>';pv.appendChild(i)}
   const gh=document.createElement('div');gh.id='bfgh';gh.hidden=true;gh.setAttribute('aria-hidden','true');gh.innerHTML='<div class="f">'+FINGER+'</div>';document.body.appendChild(gh);
@@ -7570,11 +7629,22 @@ BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=n
   if(st==='plan'||st==='plan2')return w8(planCap(st));if(st==='over')return G.over&&G.over.win?'Rescued!':'Lost on the island';
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};
 BF.say=function(t,ms){BF.msg={t:w8(t),until:Date.now()+(ms||3000)};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},(ms||3000)+30)};
-BF.paint=function(){const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();if(lb.textContent!==s)lb.textContent=s};
+// whose turn it is: a small banner above the one instruction line (owner 7 Nov: "if I cannot understand it in a minute it is unplayable")
+function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you','Your turn: plan the day'];if(st==='over')return ['end','Game over'];
+  if(st==='story'){const i=storyIdx();if(i<0)return ['isl',''];const last=i>=UI.beats.length-1;if(last&&humanQ())return ['you','Your choice'];const k=UI.beats[i].kind;
+    if(['go','act','finds','adventure','mystery','fight'].includes(k))return ['you','Your castaways at work'];
+    if(['event','threat','morning','weather','night','daysum'].includes(k))return ['isl','The island’s turn: '+({event:'event card',threat:'threat',morning:'morale',weather:'weather',night:'night',daysum:'day summary'})[k]];
+    return ['isl','A new day']}
+  return ['isl','The island’s turn']}
+function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
+  const c=(bad,t)=>`<span class="${bad?'bad':''}">${t}</span>`;
+  return c(false,`<b>Day ${o.d}</b><small> of ${o.r}</small>`)+c(o.f<o.need,`🍖 Food <b>${o.f}</b><small> (eat ${o.need})</small>`)+c(false,`🪵 Wood <b>${o.w}</b>`)+c(o.low<=3,`♥ Life <b>${o.low}</b>`)+(o.sh?c(false,'🏠 Shelter'):c(true,'No shelter'))}
+BF.paint=function(){const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
+  lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button>`}
+  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
@@ -7589,14 +7659,14 @@ function trayHtml(st){
 function actPos(a){let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:G.camp.pos}
 function chipsFor(st){const out=[];
   if(st==='plan'||st==='plan2'){for(const a of G.plan.acts){if(!a.pw.length)continue;const n=actNeed(a);const k=a.pw.length;const risk=k<n.need?'warn':(n.roll&&k<n.max)?'dice':'sure';
-    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`+${n.need-k}`:risk==='dice'?'🎲':'✔',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
+    out.push({pos:actPos(a),a,risk,badge:risk==='warn'?`needs +${n.need-k}`:risk==='dice'?'🎲 risky':'✔ sure',rm:a.pw[a.pw.length-1],cur:UI.lastAct===a.id,done:false})}return out}
   if(st==='story'){const i=storyIdx();if(i<0)return out;const b=UI.beats[i];if(!['go','act','finds'].includes(b.kind))return out;const s=beatState(i);if(!s||!s.plan)return out;
     for(const a of s.plan.acts){if(!a.pw.length)continue;const here=b.kind==='act'&&b.data.id===a.id;out.push({pos:(()=>{let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:s.camp.pos})(),a,risk:'sure',badge:a.done&&!here?'✓':'',rm:null,cur:here,done:!!a.done&&!here})}return out}
   return out}
 function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chipsFor(st);
   const sig=JSON.stringify(cs.map(c=>[c.pos,c.a.id,c.a.type,c.a.pw,c.risk,c.cur,c.done]))+st;if(host.dataset.s===sig)return;host.dataset.s=sig;
   const g={};cs.forEach((c,j)=>{(g[c.pos]=g[c.pos]||[]).push([c,j])});
-  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
+  host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><b class="bfw">${E((TNAME[c.a.type]||c.a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</b><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
     const cls=`bfa ${c.risk} ${c.cur?'cur':''} ${c.done?'done':''}`;const lab=`${E(actLabel(c.a))}${c.rm?' (tap to take back)':''}`;
     return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}</div>`).join('');
   BF.place()}
@@ -7606,7 +7676,7 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
   BF.ghostPlace()};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
-  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(60,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
+  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
 function deltas(A,B){const o=[];if(!A||!B)return o;
   for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a})}
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
@@ -7717,6 +7787,17 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(st==='over'&&bd){const r=bd.getBoundingClientRect();const top=Math.round(r.top+r.height*.28);R.style.setProperty('--dz-t',top+'px');R.style.setProperty('--dz-l','0px');R.style.setProperty('--dz-w',innerWidth+'px');R.style.setProperty('--dz-h',(innerHeight-top)+'px')}
   BF.ghostPlace()};
 })();
+
+
+// toggles are real switches: role=switch + aria-checked follow the state, and every tap leaves a visible trace (Reset tips says so)
+(function(){const sw=()=>{try{const m=document.getElementById('musbtn'),s=document.getElementById('speedbtn'),n=document.getElementById('sndbtn');
+  const set=(e,v)=>{if(!e)return;if(e.getAttribute('role')!=='switch')e.setAttribute('role','switch');if(e.getAttribute('aria-checked')!==String(v))e.setAttribute('aria-checked',String(v))};
+  set(m,typeof musicOn==='function'?!!musicOn():false);set(s,!!(typeof UI!=='undefined'&&UI.quick));set(n,!(typeof UI!=='undefined'&&UI.mute));
+  for(const t of document.querySelectorAll('.gxh-set [data-gxh=tips]')){if(t.getAttribute('role')!=='radio')t.setAttribute('role','radio');if(t.getAttribute('aria-checked')!==String(t.getAttribute('aria-pressed')==='true'))t.setAttribute('aria-checked',String(t.getAttribute('aria-pressed')==='true'))}}catch(e){}};
+  setInterval(sw,500);
+  document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#musbtn,#speedbtn,#sndbtn,.gxh-set button');if(!t)return;
+    t.setAttribute('data-tapn',String((+t.getAttribute('data-tapn')||0)+1));setTimeout(sw,80);
+    if(t.dataset.gxh==='reset'&&!t.dataset.rs){t.dataset.rs=1;const o=t.textContent;t.textContent='Tips reset ✓';setTimeout(()=>{t.textContent=o;delete t.dataset.rs},1800)}},true)})();
 
 </script>
 <script>
@@ -7881,81 +7962,10 @@ setInterval(()=>{try{if(typeof G!=='undefined'&&G&&!document.hidden)hlpAfter()}c
 // weather and a skill, the end. Each step spotlights ONE thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act).
 // The scenes of the day play by themselves, except the ones a step explains: tutClaimed() keeps those on screen until the step's Next.
 const TUT_GAME='shipwreck-isle',TUT_SEED=7,TUT_FOG=6;
-let TUT_STEPS=[];const TUT_KEEP={};
-const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!(G&&G.tut);
+const TUT_KEEP={};
+const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (below) replaced it
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 function tutDeal(){G.tut=1;G.res.food=1;G.tileDeck=[4,10,6,1,3,2,5,7,9,11];G.ev.threat=[null,null];G.ev.deck=['chillrain'].concat(G.ev.deck.filter(k=>k!=='chillrain'))}
-// ---------------------------------------------------------------- where each step points
-const tpt=(id,sz)=>()=>{try{const p=BF.tilePt(id);return p?{left:p.ox+p.x-sz/2,top:p.oy+p.y-sz/2,width:sz,height:sz}:null}catch(e){return null}};
-const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
-const tcur=()=>{try{const c=curPawn();return c&&c.id}catch(e){return null}};
-const tplan=r=>!!(G&&G.tut&&BF.on&&PHO.st==='plan2'&&!PHO.pop&&!UI.confirm&&!UI.modal&&G.round===r);
-// a job row in the pop-up of a place; the pop-up list scrolls, so the row is brought into view first
-function tutRow(type,pred){const pop=document.querySelector('#ppop');if(!pop||pop.hidden)return null;
-  for(const r of pop.querySelectorAll('.bfr[data-place]')){let o=null;try{o=JSON.parse(decodeURIComponent(r.dataset.place))}catch(e){}
-    if(!o||o.type!==type||(pred&&!pred(o)))continue;
-    const sc=pop.querySelector('.pp-b')||pop,a=sc.getBoundingClientRect(),b=r.getBoundingClientRect();
-    if(b.top<a.top+2||b.bottom>a.bottom-2){sc.scrollTop+=(b.top+b.bottom)/2-(a.top+a.bottom)/2}
-    const c=r.getBoundingClientRect();return c.width&&c.top>=a.top-1&&c.bottom<=a.bottom+1?r:null}
-  return null}
-// a scene of the day, on screen now
-const tbeat=pred=>()=>{try{if(!G||!G.tut||PHO.st!=='story')return false;const i=storyIdx();const b=i>=0&&UI.beats[i];return !!b&&!!pred(b)}catch(e){return false}};
-const bAct=(r,type)=>b=>b.kind==='act'&&b.round===r&&!!b.data&&b.data.type===type;
-const bKind=(r,k)=>b=>b.kind===k&&b.round===r;
-const tcamp=()=>tpt(G.camp.pos,64)();
-const tutNext=()=>{try{storyNext()}catch(e){}};
-// a scene that a step (this one or a later one) explains is held until its Next; the others play by themselves
-function tutClaimed(i){if(!tutOn())return false;const b=UI.beats[i];if(!b)return false;const n=Math.max(0,GXT.index());
-  for(let j=n;j<TUT_STEPS.length;j++){const s=TUT_STEPS[j];if(s.beat&&s.beat(b))return true}return false}
-// ---------------------------------------------------------------- the steps, in the order the rules come up
-function tutSteps(){return [
- {id:'goal',title:'Your goal',say:'Have a signal fire and a 15-wood pile in days 10 to 12. A ship then rescues you.',target:tcamp,wait:null,ready:()=>tplan(1)},
- {id:'lose',title:'You lose if',say:'Anyone dies, or no ship comes by day 12. Life ♥, food 🍖 and wood 🪵 are shared.',target:tcamp,wait:null,ready:()=>tplan(1)},
- {id:'day',title:'One day',say:'A day: event card, camp makes 1 food and 1 wood, you plan, jobs play out, weather, night.',target:tq('#phlabel'),wait:null,ready:()=>tplan(1)},
- {id:'pawns',title:'Your castaways',say:'Carpenter builds. Cook gathers food and heals. Each has two pawns; a pawn does one job. Friday helps.',target:tq('#bf .pawnrow'),wait:null,ready:()=>tplan(1)},
- {id:'explore',title:'Explore',say:'Send the Carpenter to explore the glowing place next to camp.',target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(1)&&tcur()==='c0_0'&&!G.plan.acts.length},
- {id:'dice',title:'Dice or sure',say:'One pawn rolls 3 dice: it can fail or get hurt. Two pawns never roll.',target:tq('#bfchips .bfg[data-t="11"] .bfa'),wait:null,
-   ready:()=>tplan(1)&&!!document.querySelector('#bfchips .bfg[data-t="11"] .bfa')},
- {id:'second',title:'Add a pawn',say:'Tap the same place to send the second Carpenter. Now it is sure.',target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(1)&&tcur()==='c0_1'},
- {id:'camp1',title:'The camp',say:'Now the Cook. Tap the camp to see its jobs.',target:()=>tcamp(),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===G.camp.pos},ready:()=>tplan(1)&&tcur()==='c1_0'},
- {id:'camp2',title:'Arrange the camp',say:'This earns determination ✊ for skills, and raises morale. Tap it.',target:()=>tutRow('camp'),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='camp'},ready:()=>G&&G.tut&&G.round===1&&!!PHO.pop&&!!tutRow('camp')},
- {id:'go1',title:'Start the day',say:'Every castaway has a job. Tap Start day.',target:tq('#bf .btn.go'),
-   wait:{type:'tap',match:a=>a.what==='go'},ready:()=>tplan(1)&&!planProblems().length&&!!document.querySelector('#bf .btn.go')},
- {id:'found',title:'New land',say:()=>{const t=tileAt(11);return t?'Found '+t.terr+' with '+t.src.join(' and ')+'. You can gather there tomorrow.':'New land found.'},target:tpt(11,56),wait:null,
-   beat:bAct(1,'explore'),ready:tbeat(bAct(1,'explore')),onNext:tutNext},
- {id:'night1',title:'Night',say:'Everyone eats 1 food. With no shelter, each castaway takes 1 wound.',target:tcamp,wait:null,
-   beat:bKind(1,'night'),ready:tbeat(bKind(1,'night')),onNext:tutNext},
- {id:'daysum1',title:'Wounds',say:'Each wound costs 1 life ♥. Resting heals 1. Tomorrow we build a shelter.',target:tcamp,wait:null,
-   beat:bKind(1,'daysum'),ready:tbeat(bKind(1,'daysum')),onNext:tutNext},
- {id:'event',title:'Event card',say:()=>{const b=UI.beats[storyIdx()];const c=b&&b.data&&CARD[b.data.card];return 'A new event card each morning. '+(c?c.n:'It')+' adds a rain cloud tonight.'},target:tq('#bfcard'),wait:null,
-   beat:bKind(2,'event'),ready:()=>tbeat(bKind(2,'event'))()&&!!document.querySelector('#bfcard')},
- {id:'threat',title:'A threat',say:'The card left a threat at camp. Deal with it within two days, or it strikes.',target:tcamp,wait:null,
-   beat:bKind(2,'event'),ready:tbeat(bKind(2,'event')),onNext:tutNext},
- {id:'fog',title:'Fog',say:'Fog covers this place: jobs there need one extra pawn, and a fogged camp makes nothing.',target:tpt(TUT_FOG,56),wait:null,
-   onEnter:()=>{try{G.map[TUT_FOG].fog=1;UI.sel=null;refresh()}catch(e){}},ready:()=>tplan(2)},
- {id:'build1',title:'Build',say:'Carpenter builds a shelter. Tap the camp.',target:()=>tcamp(),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===G.camp.pos},ready:()=>tplan(2)&&tcur()==='c0_0'},
- {id:'build2',title:'A shelter',say:'A shelter costs 2 wood and stops night wounds. Tap it.',target:()=>tutRow('build',o=>o.tgt&&o.tgt.k==='shelter'),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='build'&&a.tgt&&a.tgt.k==='shelter'},ready:()=>G&&G.tut&&G.round===2&&!!PHO.pop&&!!tutRow('build',o=>o.tgt&&o.tgt.k==='shelter')},
- {id:'gather1',title:'Gather',say:'Cook gathers food at the hills. Tap that place.',target:tpt(11,56),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.id===11},ready:()=>tplan(2)&&tcur()==='c1_0'},
- {id:'gather2',title:'Fish',say:'Tap Fish. The second Cook joins: two pawns make it sure.',target:()=>tutRow('gather',o=>o.tgt&&o.tgt.i===1),
-   wait:{type:'tap',match:a=>a.what==='place'&&a.kind==='gather'&&a.tgt&&a.tgt.i===1},ready:()=>G&&G.tut&&G.round===2&&!!PHO.pop&&!!tutRow('gather',o=>o.tgt&&o.tgt.i===1)},
- {id:'go2',title:'Start the day',say:'Shelter and food are planned. Tap Start day.',target:tq('#bf .btn.go'),
-   wait:{type:'tap',match:a=>a.what==='go'},ready:()=>tplan(2)&&!planProblems().length&&!!document.querySelector('#bf .btn.go')},
- {id:'weather',title:'Weather',say:'Each cloud above your roof ruins 1 food and 1 wood. Your roof is zero.',target:tcamp,wait:null,
-   beat:bKind(2,'weather'),ready:tbeat(bKind(2,'weather'))},
- {id:'skill',title:'Use a skill',say:'Spend 3 determination ✊: the Cook ignores the rain cloud. Tap it.',target:tq('#bf [data-ans="1"]'),
-   wait:{type:'tap',match:a=>a.what==='answer'&&a.i===1},ready:()=>PHO.st==='story'&&!!G.q&&/Moonshine/.test(G.q.title||'')&&!!document.querySelector('#bf [data-ans="1"]')},
- {id:'night2',title:'Night',say:'The shelter protects everyone: no wounds. Everyone eats 1 food.',target:tcamp,wait:null,
-   beat:bKind(2,'night'),ready:tbeat(bKind(2,'night')),onNext:tutNext},
- {id:'end',title:'The game ends',say:'Real games last 12 days. Fire plus 15 wood wins. A death, or no rescue, loses.',target:tcamp,wait:null,
-   beat:bKind(2,'daysum'),ready:tbeat(bKind(2,'daysum'))}
-]}
 // ---------------------------------------------------------------- the staged game starts and stops
 function tutBegin(){try{GX.close()}catch(e){}try{closeMenu()}catch(e){}
   TUT_KEEP.auto=UI.auto;TUT_KEEP.ghost=BF.ghostDone;UI.auto=false;UI.pause=false;BF.ghostDone=true;
@@ -7969,16 +7979,85 @@ function tutLeave(){clearTimeout(BF.autoT);BF.autoT=null;try{BF.cardClear()}catc
   if(TUT_KEEP.auto!=null)UI.auto=TUT_KEEP.auto;if(TUT_KEEP.ghost!=null)BF.ghostDone=TUT_KEEP.ghost;TUT_KEEP.auto=TUT_KEEP.ghost=null;
   try{PHO.closePop(true)}catch(e){}
   G=null;UI.beats.length=0;UI.shown=-1;UI.sel=null;UI.tileSel=null;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};try{render()}catch(e){console.error(e)}}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];TUT_STEPS=tutSteps();
-  GXT.start({game:TUT_GAME,steps:TUT_STEPS,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'Jobs, dice, camp, weather, wounds, skills. Now the Story begins.':'Jobs, dice, camp, weather, wounds, skills. A real game lasts 12 days.',
-    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
-    setup:tutBegin,
-    onDone:r=>{tutLeave();const c=r&&r.choice;
-      if(c==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
-      else if(c==='story'&&typeof GXC!=='undefined')campOpen();
-      else openStart()},
-    onExit:()=>{tutLeave();openStart();if(pro&&typeof GXC!=='undefined')campOpen()}})}   // skipping the Story prologue goes on to the chapter map
+
+// ---------------------------------------------------------------- COACHED FIRST GAME (flag ?coach=1, off by default; owner 7 Nov addendum 4)
+// A real game from turn 1 (all legal moves free; stacked seed and deck only make the cases come up). The Cook speaks just in time: one bubble at a time,
+// never blocks input, dismissible. Each rule is explained the first time it matters; the rest go on a "Things you'll meet later" card. No forced taps.
+const COACH={timer:0,done:{},cur:null,later:0,pro:false,forced:{},finished:false};
+window.GXCOACH={get running(){return !!(G&&G.coach)},get explained(){return Object.keys(COACH.done).filter(k=>k!=='later')},get done(){return !!COACH.finished}};
+const cbeat=()=>{try{if(!G||PHO.st!=='story')return null;const i=storyIdx();return i>=0?UI.beats[i]:null}catch(e){return null}};
+const cplan=()=>!!(G&&(PHO.st==='plan'||PHO.st==='plan2')&&!PHO.pop&&!UI.modal);
+const cact=t=>{try{return G.plan.acts.find(a=>a.pw.length&&a.type===t)}catch(e){return null}};
+const ccard=k=>{try{return CARD[k].n}catch(e){return 'the card'}};
+const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
+// kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
+const COACH_RULES=[
+ {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Light a fire and stack 15 wood by day 12: a ship will see it. Pick a pawn, then a glowing place."},
+ {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
+ {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
+ {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
+ {id:'explore',when:()=>cplan()&&!!cact('explore'),say:"Exploring finds new land; we can gather there from tomorrow."},
+ {id:'build',when:()=>cplan()&&!!cact('build'),say:"Building costs wood. A shelter costs 2 wood and ends night wounds."},
+ {id:'gather',when:()=>cplan()&&!!cact('gather'),say:"Food and wood arrive after all the jobs are done, not before."},
+ {id:'camp',when:()=>cplan()&&!!cact('camp'),say:"Tidying the camp earns determination ✊ for skills and lifts morale."},
+ {id:'ready',kind:'move',when:()=>cplan()&&G.plan.acts.some(a=>a.pw.length)&&(()=>{try{return planProblems().length===0}catch(e){return false}})(),say:"Good plan: everyone has a job. Tap Start day when you are ready."},
+ {id:'noshelter',kind:'move',when:()=>cplan()&&G.round>=2&&!hasShelter()&&!cact('build'),say:"Poor move: no shelter and no build planned. Tonight everyone takes a wound."},
+ {id:'nofood',kind:'move',when:()=>cplan()&&G.round>=2&&food()<eatersNeed()&&!cact('gather')&&!cact('hunt'),say:"Poor move: food is short for tonight and nobody gathers. Hunger costs 2 wounds."},
+ {id:'prod',when:()=>{const b=cbeat();return b&&b.kind==='prod'},say:"Each morning the camp's sources give 1 food or 1 wood."},
+ {id:'event',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='event'},say:()=>{const b=cbeat();return 'The island moves: “'+ccard(b&&b.data&&b.data.card)+'”. Its effect happens now, then it waits as a threat.'}},
+ {id:'threat',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='threat'||cplan()&&G.ev&&G.ev.threat&&G.ev.threat.some(Boolean)},say:"A threat sits at camp. Deal with it in time, or the card strikes."},
+ {id:'morning',when:()=>{const b=cbeat();return b&&b.kind==='morning'},say:"Morale moves our determination each morning. Low morale costs wounds."},
+ {id:'found',when:()=>{const b=cbeat();return b&&b.kind==='finds'},say:"The day's haul reaches camp. New land is now ours to use."},
+ {id:'fight',when:()=>{const b=cbeat();return b&&(b.kind==='fight'||b.kind==='adventure'||b.kind==='mystery')},say:"Adventures, mysteries and beasts are risky: weapons and dice decide."},
+ {id:'weather',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:()=>{const w=cwx(),n=(w.rain||0)+(w.snow||0);return (n?'The weather brings '+n+' cloud'+(n>1?'s':'')+'. ':'The sky is calm. ')+'Clouds above our roof (level '+G.camp.roof+') ruin 1 food and 1 wood each.'}},
+ {id:'night',when:()=>{const b=cbeat();return b&&b.kind==='night'},say:"Night: everyone eats 1 food (or takes 2 wounds). No shelter means a wound each."},
+ {id:'wounds',when:()=>{const b=cbeat();return b&&b.kind==='daysum'},say:"Each wound costs a life ♥. Resting heals one. Build a shelter soon."},
+ {id:'skill',when:()=>cplan()&&G.round>=2&&G.chars.some(c=>!c.npc&&c.det>=2),say:"We have determination ✊. Open the Camp tab and use a skill: once per round, and it can turn a bad roll."},
+ {id:'fog',when:()=>cplan()&&G.map.some(m=>m.fog),say:"Fog hides a place: work there needs one more pawn, and a fogged camp makes nothing."}
+];
+const COACH_LATER=[
+ ["Hunting","Hunt beasts for food and fur; your weapon level decides the fight."],["Resting","A rest job heals 1 wound."],
+ ["Distance","Places two tiles from camp need one extra pawn."],["Items and inventions","Build inventions for lasting help; some become items."],
+ ["Snow and storms","Winter clouds cost wood; a storm hits last."],["Healing at night","Pot, fire and rum can heal before sleep."],
+ ["Moving camp","Move camp at night; it halves your roof and palisade."],["Other scenarios","Hexed Isle, Stranded Friend and Settlers add their own goals."]];
+const TUT_KEY='gxt-'+TUT_GAME;
+const coachMark=p=>{try{const o=JSON.parse(localStorage.getItem(TUT_KEY)||'{}');Object.assign(o,p);localStorage.setItem(TUT_KEY,JSON.stringify(o))}catch(e){}};
+function coachEl(){let e=document.getElementById('coachb');if(!e){e=document.createElement('div');e.id='coachb';e.className='coachb';e.setAttribute('role','status');document.body.appendChild(e);
+  e.addEventListener('click',ev=>{const b=ev.target.closest('[data-coach]');if(!b)return;const k=b.dataset.coach;if(k==='x')coachHide();else coachFinish(k)})}return e}
+function coachSkipEl(){let e=document.getElementById('coachskip');if(!e){e=document.createElement('button');e.id='coachskip';e.className='coachskip';e.type='button';e.textContent='Skip tutorial';e.setAttribute('aria-label','Skip the tutorial and leave this game');document.body.appendChild(e);
+  e.addEventListener('click',()=>coachFinish('skip'))}return e}
+function coachHide(){const e=document.getElementById('coachb');if(e)e.hidden=true;COACH.cur=null}
+function coachShow(id,say,kind){const e=coachEl();COACH.cur=id;COACH.shownAt=Date.now();e.hidden=false;e.dataset.rule=id;e.dataset.kind=kind||'rule';e.innerHTML='<b class="cn">Cook</b><span class="ct"></span><button type="button" data-coach="x" aria-label="Dismiss">✕</button>';e.querySelector('.ct').textContent=say}
+// the end of the coached game: the final scoring walked through rule by rule with the player's real numbers, then what comes later
+function coachFinal(){COACH.finished=true;const over=!!G.over,w=!!(G.over&&G.over.win);const alive=G.chars.filter(c=>!c.npc&&!c.dead).length,tot=G.chars.filter(c=>!c.npc).length;
+  const fire=has('fire'),pile=(G.sc&&G.sc.pile)||0;
+  const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
+  const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
+  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
+  e.innerHTML='<b class="cn">Cook: '+(over?(w?'rescued!':'we did not make it'):'you have the hang of it')+'</b><span class="ct">'+(over?'Here is how it scored, rule by rule:':'Here is how the goal stands, rule by rule:')+'</span><ul class="walk">'+walk.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><span class="ct">Things you’ll meet later:</span><ul>'+COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';
+  coachMark({done:1,open:0,step:0})}
+function coachFinish(k){if(k==='keep'){coachStop();try{delete G.tut;delete G.coach;refresh()}catch(e){}return}coachStop();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  if(k==='skip')coachMark({skipped:1,open:0});
+  tutLeave();
+  if(k==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);
+  else if(k==='story'&&typeof GXC!=='undefined')campOpen();
+  else{openStart();if(k==='skip'&&COACH.pro&&typeof GXC!=='undefined')campOpen()}}
+function coachTick(){try{
+  if(!G||!G.coach){coachStop();return}
+  if(G.over){if(!COACH.done.later){COACH.done.later=1;coachFinal()}return}
+  // make the situations come up once: fog on a place and determination for a skill, from day 2
+  if(cplan()&&G.round>=2){if(!COACH.forced.fog&&!G.map.some(m=>m.fog)){COACH.forced.fog=1;try{G.map[TUT_FOG].fog=1;refresh()}catch(e){}}
+    if(!COACH.forced.det){COACH.forced.det=1;for(const c of G.chars)if(!c.npc)c.det=Math.max(c.det||0,3);try{refresh()}catch(e){}}}
+  if(!COACH.done.later&&cplan()&&G.round>=4&&COACH.done.fog&&COACH.done.skill&&COACH.done.ready&&Object.keys(COACH.done).length>=14){COACH.done.later=1;coachFinal();return}
+  if(COACH.cur&&Date.now()-COACH.shownAt>9000)coachHide();
+  if(COACH.cur)return;
+  for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;let t=r.say;try{if(typeof t==='function')t=t()}catch(e){t=''}if(t){coachShow(r.id,t,r.kind);return}}}
+ }catch(e){console.error(e)}}
+function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();const k=document.getElementById('coachskip');if(k)k.remove()}
+function coachStart(){COACH.finished=false;COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
+window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
+
+function tutStart(o){COACH.pro=!!(o&&o.prologue);coachStart()}
 // ---------------------------------------------------------------- menus: the title, the in-game menu, the chapter list, the first Play and the first Story tap
 const tutFirst=()=>{try{return typeof GXT!=='undefined'&&!GXT.status(TUT_GAME).seen&&!localStorage.getItem(SAVE)&&!localStorage.getItem('swi_ghost')&&!localStorage.getItem('swi_tutoffer')}catch(e){return false}};
 function tutBlock(pos){if(typeof GXT==='undefined')return '';const f=tutFirst();
@@ -7999,21 +8078,6 @@ function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return f
     try{localStorage.setItem('swi_tutoffer','1')}catch(err){}
     if(b.dataset.tutoffer==='learn')tutStart();else{UI.guide.on=false;UI.cmpDef=null;beginGame()}});
   return true}
-// ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
-(function(){const o=on3DTile;on3DTile=function(id){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'tile',id}))return;UI._tutIn=1;try{return o(id)}finally{UI._tutIn=0}}
-  return o(id)}})();
-// the second pawn of a castaway joins the same job by itself (the pair is taught once, on day 1)
-function tutJoin(type,tgt,alt){try{const c=curPawn();if(!c||c.c==null||!/_1$/.test(c.id))return;const e=place(c.id,type,tgt,alt);if(!e){sfx('place');UI.sel=null;wizPlaced();refresh()}}catch(e){console.warn('tutJoin',e)}}
-(function(){const o=doPlace;doPlace=function(type,tgt,alt){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'place',kind:type,tgt,alt}))return;UI._tutIn=1;try{o(type,tgt,alt);tutJoin(type,tgt,alt)}finally{UI._tutIn=0}return}
-  return o(type,tgt,alt)}})();
-(function(){const o=tryStart;tryStart=function(force){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'go'}))return;UI._tutIn=1;try{return o(force)}finally{UI._tutIn=0}}
-  return o(force)}})();
-(function(){const o=answer;answer=function(i){
-  if(tutOn()&&!UI._tutIn){if(!GXT.act({type:'tap',what:'answer',i}))return;UI._tutIn=1;try{return o(i)}finally{UI._tutIn=0}}
-  return o(i)}})();
 
 </script>
 <script>

@@ -54,6 +54,10 @@ STORY.coach={
   rival_score:{who:'rival',t:c=>`Ha, +${c.pts} for me. Watch what I build next, friend.`},
   discard:{who:'guide',t:'That tile fits nowhere, so it is set aside and a new one is drawn. No harm done.'},
   nofig:{who:'guide',t:'No followers left. They come home when a road, town or priory they hold is finished.'},
+  preview:{who:'guide',t:'The tags on the glowing squares show the points each spot scores right now. Press and hold one to see the feature it joins.'},
+  rate_good:{who:'guide',t:'Good move: that was the best score on the board. Your last move is rated in the sheet above.'},
+  rate_okay:{who:'guide',t:'Okay: a better spot was open. The sheet above says which, so you can compare next turn.'},
+  rate_poor:{who:'guide',t:'A poor choice this time: a much better spot was open. The tags on the squares show the difference.'},
   last:{who:'guide',t:'The last tiles. When the final one is placed, the game ends and unfinished features score a point per tile.'}
 };
 STORY.coachEnd={

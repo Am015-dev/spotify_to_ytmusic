@@ -216,7 +216,7 @@ body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
 .card.down .dn{inset:auto;left:5%;right:5%;top:36%;padding:3px 0;border-radius:6px;background:#0d1a2a;color:#fff;font-weight:800;font-size:max(13px,var(--fmin))}
 .gxc-lock{display:none}
 /* short phones (375x553): the instruction line carries the text, so the dock keeps only its head + one status line, and the token row is one tight line */
-@media (max-height:640px){#sub{display:none}#dockbody{padding:0 10px 4px}#msg{margin:0}.tokrow{min-height:30px;gap:3px}.tok{height:30px;font-size:13px;line-height:1;white-space:nowrap;padding:0 2px}.tok span{display:block;-webkit-line-clamp:unset;overflow:hidden;text-overflow:ellipsis}#instr{min-height:30px;padding:2px 8px}#bd{gap:2px}.strip{padding:2px 6px}.strip .pt{display:none}#mil{height:46px}#mil .cells{top:16px}#mil .nm{top:30px}#pawn{top:9px}}
+@media (max-height:640px){#sub{display:none}#dockbody{padding:0 10px 4px}#msg{margin:0}.tokrow{min-height:38px;gap:3px}.tok{height:38px;font-size:13px;line-height:1;white-space:normal;padding:0 2px}.tok span{display:block;-webkit-line-clamp:unset;overflow:visible;text-overflow:clip;word-break:normal}#instr{min-height:30px;padding:2px 8px}#bd{gap:2px}.strip{padding:2px 6px}.strip .pt{display:none}#mil{height:46px}#mil .cells{top:16px}#mil .nm{top:30px}#pawn{top:9px}}
 #instr{height:48px;box-sizing:border-box}
 @media (max-height:640px){#instr{height:42px}}
 .card.down .dn{top:14%}
@@ -244,4 +244,5 @@ body.gxdrawer .gx-app,body.gxdrawer #start{visibility:hidden}
 #coach .cx{background:#d9ceb0;color:#231a0a;font-size:1.3rem}#coach .cn{background:#2c7a52;color:#fff;padding:0 14px}
 #res tr.hl td{background:#f2c230;color:#231a0a;font-weight:800}
 .gxt-endc.later{max-height:84vh;overflow:auto}.gxt-endc.later ul{text-align:left;margin:8px 0;padding-left:20px;font-size:max(14px,var(--fmin));line-height:1.35}
+.card.xs .band{white-space:normal;overflow:visible;text-overflow:clip;display:flex;max-height:none;letter-spacing:-.07em}.card.xs .glyph{display:none}
 </style></head>
