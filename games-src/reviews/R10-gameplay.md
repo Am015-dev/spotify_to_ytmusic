@@ -39,3 +39,51 @@ Total: 6.6 — FAIL (rows 2, 4, 6 and 7 are below 7; no stopper)
 - Row 4 — did: Shadow kill in the tutorial — happened: the chooser shows a white, a red and a yellow figure, each with "+1🔮" and no words, so you cannot tell that the kill costs a Mystic for extra reach — shot: games-src/reviews/R10-shots/sands-tut-shadows-tiletap-390.jpg
 - Row 8 (minor) — did: won a game at 390 — happened: the result card says "You win!", but the top line under it reads "Onyx wins" (your seat colour name) — shot: games-src/reviews/R10-shots/sands-g5-result-390.jpg
 - Row 3 (works) — did: opened the title and the guided game at both sizes — happened: one big Learn button, one bubble, a glowing 44 px target at every step, and a win with a 3-page count that ends on "Play a real game" — shots: games-src/reviews/R10-shots/sands-title-375.jpg, games-src/reviews/R10-shots/sands-tut-count-2-390.jpg
+
+---
+
+## hollowbough (branch shelf/W482-hollowbough @ f182091e, fix 010f1f69): 7.0 FAIL
+
+Build: build-all.py hollowbough PASS, served next to games/hollowbough/{media,models,music,cards}. Played with Playwright touch only (isMobile, hasTouch, page.touchscreen.tap, CDP touch drags for some workers). Before every tap I checked the target with elementFromPoint. Tutorial to the end card at 390x844 (49 s of taps) and 375x667 (48 s): 27/27 steps, 0 errors, every target took the first tap. Two full games vs computer from the title ("vs computer" → Play → Play now → Start) to the result screen, as a new player who follows the hint about 65% of the time and picks a random legal glowing target otherwise. At 390x844 I lost 26-31 (88 s, 41 taps, 7 drags). At 375x667 I won 55-50 (145 s, 76 taps, 5 drags). 0 page errors, 0 console errors, 0 stuck states. Rival waits: median 1.1 s, max 3.3 s at 390. At 375 one wait was 15.3 s, in Autumn. Rules checked against the published rules online (notes are local only).
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Matches the rules: 2 workers to start, then +1 Spring, +1 Summer, +2 Autumn. 3 forest places at 2 players, 8 meadow cards, hand of 8, city of 15, unique/common, paired critters, Haven 2:1, Journey 5/4/3/2 in Autumn only (exactly 5 cards for the 5 spot), 4 special events dealt, Belfry repeats a basic or forest place before recall, ties go to most events. I saw nothing broken in play. |
+| 2 | Tutorial teaches | 7 | 27 one-line steps in rule order, one tap each, ending on "You know the rules → Play a real game". Unique vs common is now taught (step 9). Still: you start with 3 cards and 6 points you never earned, Next is 68x38 (under 44), a tap 150 ms after a bubble appears is ignored with no feedback (400 ms works), and at 375 the bubble covers the tabs and the top row of places. |
+| 3 | First 10 seconds | 7 | A clear painted goal card ("Win the Elderheart Oak", 3 short lines, Start), then "Place a worker" with the places glowing. The title's mode chip defaults to "Guided", so Play first asks "Learn in 5 minutes / Play now". That is one more screen, but a fair one. |
+| 4 | Turn clarity | 7 | Fixed: the prompt is dark brown on cream, 9.1:1 contrast, 14 px. Belfry lights both legal places. Discard shows "1 of 5 discarded". Header and City tab agree (13/15). Still: the prompt is a small pill in the top-left corner. "Tap more, or Done" shows when exactly 5 are needed and there is no Done button. The Inn discount says "Do not pay 1 resin" on a card that costs berries. On your turn your chip grows over the rival chip and hides your own score. |
+| 5 | Phone play | 6 | Card names no longer cut, and hand cards are 86x129 / 90x135. Places are 90x65 at 375 and 127x87 at 390. But many labels are under the 14 px bar. Place names are 11 px at 375 and 12 px at 390. Place rewards ("3 twigs", "2 cards, 1 point") are 12 px, "shared" tags 11-12 px, chip city counts 11-12 px, goal lines 13 px. Tabs are 85-89 x 40 and tutorial Next is 38 px tall. At 375 the fourth city row is half hidden behind the hand bar, and the enlarged "You" chip covers the rival chip and your score. |
+| 6 | AI and pacing | 7 | The rival is brisk (about 1 s a turn) and sensible. A half-random new player lost 26-31 and won 55-50 against the default level. Full games took 1.5-2.5 min, short for this kind of game but it is a full year. One 15 s rival pause at 375. |
+| 7 | Feel | 7 | Fixed: the places are framed painted scenes with names, and the worker meeple stands on the place it took. Cards fly to the city, there is a "+2 points" pill, and the result has painted art and a breakdown table. The "+2 points" pill still lands on the tab bar and city header, not on the score. |
+| 8 | Bugs | 7 | 2 tutorials and 2 full games: 0 errors, 0 stuck, 0 dead taps on real targets. Display bugs: the chip overlap hides your score, and the discard prompt promises a Done button that is not there. (A console "AI error … reading 'cost'" appeared only after I put a Belfry into the city from the console. It is not counted.) |
+| | **Total** | **7.0 FAIL** | Row 5 is below 7. |
+
+### Earlier findings (R4)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 4: prompt pale yellow on cream, about 1.2:1 | **Fixed.** rgb(110,50,5) on rgb(255,244,220) = 9.1:1, 14 px, at both sizes. | games-src/reviews/R10-shots/hb-game-390-q-waive.jpg, games-src/reviews/R10-shots/hb-belfry-390.jpg |
+| Row 4: Belfry draws a legal place as "Taken" | **Fixed.** With workers on Twig Heap and Resin Pool, both glow and every other place dims. "Skip: repeat nothing" is a full-width button. | games-src/reviews/R10-shots/hb-belfry-390.jpg |
+| Row 8: city count header vs City tab disagree | **Fixed.** The header chip, the tab and "13 of 15 · 36 points" agree in every check. | games-src/reviews/R10-shots/hb-game-375-m04.jpg |
+| Row 5: card names cut at 375/390 | **Fixed** (no cut words found). The fix shrinks labels instead: place names 11 px at 375, rewards 12 px. | games-src/reviews/R10-shots/hb-game-375-m04.jpg, games-src/reviews/R10-shots/hb-tut-375-03.jpg |
+| Row 5: goal names cut | **Fixed.** Goals are now 2 columns and the full names show, but the lines are 13 px. | games-src/reviews/R10-shots/hb-game-390-q-discard.jpg |
+| Row 5: "+1 point" fly-up over the tabs | **Partly fixed.** It is now a "+2 points" pill, but it still sits over the tab bar and city header. | games-src/reviews/R10-shots/hb-game-375-m04.jpg |
+| Row 7: places are identical discs with no names; worker stands beside the tile | **Fixed.** Framed painted places with name plates, and the meeple stands on the place. | games-src/reviews/R10-shots/hb-tut-390-03.jpg, games-src/reviews/R10-shots/hb-belfry-390.jpg |
+| Row 4: no discard counter | **Fixed** ("0 of 5 discarded"). The copy still says "or Done" when exactly 5 are needed. | games-src/reviews/R10-shots/hb-game-390-q-discard.jpg |
+| Row 2: taps in the first ~1 s ignored | **Mostly fixed.** Ignored at 150 ms, works at 400 ms. Still silent. | games-src/reviews/R10-shots/hb-tut-390-01.jpg |
+| Row 2: Next 38 px tall | **Not fixed** (68x38). | games-src/reviews/R10-shots/hb-tut-390-01.jpg |
+| Row 2: starts with a 3-card city and 6 unearned points; unique vs common never taught | **Half fixed.** Unique/common is taught at step 9. The 3 prebuilt cards and 6 points remain ("Your city: 4 of 15" after your first build). | games-src/reviews/R10-shots/hb-tut-390-01.jpg, games-src/reviews/R10-shots/hb-tut-390-09.jpg |
+| Row 5: tutorial Prepare button squeezed to 3-4 lines at 375; rival box cut | **Fixed.** "Prepare after 2 more workers" on 2 lines in a 363x50 button. The rival chip reads "0/15". | games-src/reviews/R10-shots/hb-tut-375-03.jpg |
+| Row 5: top row of places clipped at 375, Haven without a shared tag | **Fixed** in play (the rows fit, and Barter Burrow is tagged shared). In the tutorial at 375 the bubble covers the top row. | games-src/reviews/R10-shots/hb-tut-375-03.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 | Read the board at 375x667 and 390x844 | Place names are 11 px (375) / 12 px (390). Rewards, "shared" tags and chip city counts are 11-12 px, and goal lines 13 px: dozens of play labels under the 14 px bar. | games-src/reviews/R10-shots/hb-tut-375-03.jpg, games-src/reviews/R10-shots/hb-game-375-m04.jpg |
+| 4/5 | Had a choice open on my turn (Journey discard at 390, "Two effects at once" at 375) | My chip grows and slides under the rival chip, so my own score is cut ("★ 1…", "★ 4…") and "twigs" is covered. | games-src/reviews/R10-shots/hb-game-390-q-discard.jpg, games-src/reviews/R10-shots/hb-game-375-q-trigger.jpg |
+| 5 | Filled my city to 15 at 375x667 | The fourth city row is half hidden behind the "Hand" bar while a trigger choice points into it. | games-src/reviews/R10-shots/hb-game-375-q-trigger.jpg |
+| 4 | Put a worker on the 5-point Journey spot | The prompt says "0 of 5 discarded. Tap more, or Done.", but exactly 5 are needed and there is no Done button. Only the undo button shows. | games-src/reviews/R10-shots/hb-game-390-q-discard.jpg, games-src/reviews/R10-shots/hb-game-375-q-discard.jpg |
+| 4 | Used the Inn on Goodwife Vole (costs 2 berries) holding 0 berries and 2 resin | The card says "Need 2 berries" in red, and the only button reads "Do not pay 1 resin". That makes no sense to a new player. The meadow panel shows one card beside a big empty dashed slot. | games-src/reviews/R10-shots/hb-game-390-q-waive.jpg |
+| 6 | Played vs computer at 375x667 | One rival turn in Autumn took 15.3 s. Every other turn took 1-3 s. | games-src/reviews/R10-shots/hb-game-375-result.jpg |
+| 7 | Scored points from a card | The "+2 points" pill sits on the tab bar and city header and does not fly to the score chip. | games-src/reviews/R10-shots/hb-game-375-m04.jpg |
+| 3 (works) | Opened the title, then started a game | One big Play button, then a painted goal card with 3 short lines and Start. The first turn says "Place a worker" with the places glowing. | games-src/reviews/R10-shots/hb-title-390.jpg, games-src/reviews/R10-shots/hb-game-390-first.jpg |
+| 6/7 (works) | Finished both games | The result names the winner and shows a per-category table. The 390 loss was explained (Bramble had purple bonuses 3 and goals 3 to my 0 and 0). | games-src/reviews/R10-shots/hb-game-390-result.jpg, games-src/reviews/R10-shots/hb-game-375-result.jpg |
