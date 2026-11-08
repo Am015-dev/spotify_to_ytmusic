@@ -178,8 +178,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   if(d.sell){const i=UI.sellSel.indexOf(d.sell);if(i>=0)UI.sellSel.splice(i,1);else UI.sellSel.push(d.sell);render();return}
   if(d.pw){const w=JSON.parse(d.pw);UI.pendDj=UI.pendDj&&same(UI.pendDj,w)?null:w;UI.pendItem=null;render();return}
   if(d.pi){UI.pendItem=UI.pendItem&&UI.pendItem.k===d.pi?null:{k:d.pi};UI.pendDj=null;render();return}
-  if(d.np){UI.setup.np=+d.np;render();return}if(d.seatset!=null){const i=+d.seatset;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
-  if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
+  if(d.np){UI.setup.np=+d.np;render();return}if(d.seatset!=null){const i=+d.seatset;UI.setup.seats[i]=d.v||(UI.setup.seats[i]==='human'?'ai':'human');render();return}
+  if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=d.v||L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}
   if(d.ui)return uiAct(d.ui);
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':if(online()){UI.modal='lobby';render();return}openStart();return}});
@@ -189,7 +189,7 @@ document.addEventListener('pointerdown',e=>{const tp=document.getElementById('ti
 document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th],[data-help]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
-  switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
+  switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}

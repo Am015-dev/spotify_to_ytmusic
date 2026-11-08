@@ -37,7 +37,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
   const featName = t => /priory/.test(t) ? 'priory' : /town/.test(t) ? 'town' : /field/.test(t) ? 'field' : 'road';
   window.coachTick = function () {   // after every render: situations that matter now
     if (!UI.coach || !G || G.over) return; ensureUI();
-    if (myTurn('place')) { say('goal'); say('match'); if (TT[G.cur.t].C.some(c => c.p)) say('banner'); if (tilesLeft() <= 2) say('last'); }
+    if (myTurn('place')) { say('goal'); say('match'); say('preview'); if (TT[G.cur.t].C.some(c => c.p)) say('banner'); if (tilesLeft() <= 2) say('last'); }
     if (myTurn('fig')) { say('follower'); if (P(G.cur.p).sup.f === 0) say('nofig'); }
   };
   window.coachFx = function (f) {   // one engine event (called from playFx)

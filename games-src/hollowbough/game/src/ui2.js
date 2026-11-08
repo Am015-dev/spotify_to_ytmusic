@@ -93,7 +93,7 @@ function boardLayout(W, H) {
     R.scene = { x: 0, y: 0, w: W, h: m.sceneB }; R.tbl = { x: 0, y: m.sceneB, w: W, h: H - m.sceneB };
     R.city = { x: pad, y: m.cityY, w: W - 2 * pad, h: m.city }; R.hand = { x: pad, y: m.handY, w: W - 2 * pad, h: m.hand }; R.acts = { x: pad, y: m.actsY, w: W - 2 * pad, h: m.acts };
     R.slots = true; R.fan = true; R.col = col; if (col) R.hbar = { x: pad, y: m.barY, w: W - 2 * pad, h: m.bar };
-    const cw0 = Math.max(10, Math.min(40, Math.floor((m.city - 6) / CARD_AR))), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
+    const cw0 = Math.max(24, Math.min(40, Math.floor((m.city - 6) / CARD_AR))), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
     R.fanDrop = tight ? 7 : 9;
     R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 70), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
@@ -303,9 +303,11 @@ function renderBoard() {
     const fit = R.strip.city, n = cityList.length;
     if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
     strip.appendChild(h('span.scount', { 'data-a': 'city' }, (me.city.length) + '/15'));
-    const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
+    const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); if (R.slots) { open.style.left = (cityBox.x + cityBox.w - 48) + 'px'; open.style.width = '48px'; } open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
+    // target size: every city card keeps >= 24 css px of its own width uncovered (WCAG 2.2 target-size), even when the 15 slots are tighter
+    const cStep = R.slots && n > 1 ? Math.max(fit.step, Math.min(24, (cityBox.w - fit.x0 - fit.cw - 40) / (n - 1))) : fit.step;
     cityList.forEach((it, i) => {
-      const p = R.slots ? { x: fit.x0 + i * fit.step, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
+      const p = R.slots ? { x: fit.x0 + i * cStep, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
       const b = h('button.sc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, fit.cw, { entry: it.e }));
       if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 16)));
       b.style.cssText = `left:${cityBox.x + p.x}px;top:${cityBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
@@ -327,14 +329,14 @@ function renderBoard() {
     if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     // readable chips in a sideways-scrolling row: picture thumbnail + name + cost + points (tap = zoom)
-    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), x0 = vert ? 4 : 40, gapc = 4; let chW = vert ? handBox.w - 8 : thW + 160; if (!vert && n * (chW + gapc) + x0 > handBox.w) { const k = Math.max(1, Math.floor((handBox.w - x0) / (chW + gapc))); chW = Math.max(thW + 96, Math.floor((handBox.w - x0) / k) - gapc); }   // whole cards only: the last visible card is never cut by the scroller edge
-    const hs = placeBox(h('div.hscroll'), handBox), hin = h('div.hin'); hin.style.cssText = vert ? `width:${handBox.w}px;height:${n * (chH + gapc) + 22}px` : `width:${x0 + n * (chW + gapc) + 2}px;height:${handBox.h}px`; if (vert) hs.classList.add('vert'); hs.appendChild(hin); bd.appendChild(hs);
+    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), x0 = vert ? 4 : 56, gapc = 4; let chW = vert ? handBox.w - 8 : thW + 160; if (!vert && n * (chW + gapc) + x0 > handBox.w) { const k = Math.max(1, Math.floor((handBox.w - x0) / (chW + gapc))); chW = Math.max(thW + 96, Math.floor((handBox.w - x0) / k) - gapc); }   // whole cards only: the last visible card is never cut by the scroller edge
+    const hs = placeBox(h('div.hscroll'), handBox), hin = h('div.hin'); hin.style.cssText = vert ? `width:${handBox.w}px;height:${n * (chH + gapc) + 32}px` : `width:${x0 + n * (chW + gapc) + 2}px;height:${handBox.h}px`; if (vert) hs.classList.add('vert'); hs.appendChild(hin); bd.appendChild(hs);
     hand.forEach((id, i) => {
       const tg = 'p:hand:' + id, sp = spec(id);
       const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) });
       const th = cardEl(id, thW); th.classList.add('hct'); b.appendChild(th);
       b.appendChild(h('span.hcx', h('b.hcn', sp.name), h('span.hcr', costEl(sp.cost, 14), h('span.hcp', ic('point', 13), h('b', sp.points || 0)))));
-      const left = vert ? x0 : x0 + i * (chW + gapc), top = vert ? 20 + i * (chH + gapc) : 2;
+      const left = vert ? x0 : x0 + i * (chW + gapc), top = vert ? 30 + i * (chH + gapc) : 2;
       b.style.cssText += `;left:${left}px;top:${top}px;width:${chW}px;height:${chH}px;z-index:${i + 2}`;
       UI.cr['h' + id] = { x: handBox.x + left, y: handBox.y + top, w: chW, h: chH };
       if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }

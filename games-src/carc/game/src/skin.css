@@ -142,3 +142,16 @@ body:has(#menu) #status{visibility:hidden}
 #musicm .mchip.on{background:#3a2412!important;color:#fff4d8!important}
 #musicm .mchip{min-height:36px;padding:2px 9px}#musicm .mrow2{margin:0 0 2px}#musicm .mrow2 h5{padding:1px 12px!important;margin:0 0 2px;line-height:1.2}#musicm .card{padding-top:8px;padding-bottom:8px}
 #musicm .card .btn{position:relative;isolation:isolate}#musicm .card .btn::before{content:"";position:absolute;inset:0;background:rgba(40,12,0,.38);border-radius:inherit;z-index:-1;pointer-events:none}
+/* addendum 5: points preview, highlighted feature, score sheet, rating */
+.glow{position:absolute}
+.glow .pvb{position:absolute;left:50%;top:4px;transform:translateX(-50%);z-index:2;background:#281b12;color:#fff3dc;border:2px solid #ffd24a;border-radius:9px;padding:2px 7px;font:800 14px/1.1 var(--ff);white-space:nowrap;pointer-events:none}
+.glow .pvb.good{background:#1f4a14;border-color:#9be07a}.glow .pvb.bad{background:#6b1d12;border-color:#ff9a7a}
+#world .pvhl{outline:4px solid #ffd24a;outline-offset:-4px;box-shadow:0 0 0 3px #281b12,0 0 18px #ffd24a;z-index:3;animation:pulse 1s ease-in-out infinite}
+#sheet{flex:0 0 auto;background:#281b12;color:#fff3dc;padding:4px 10px 5px;border-bottom:2px solid var(--gold,#b5883a);font:600 14px/1.3 var(--ff)}
+#sheet .srow{display:flex;gap:4px 10px;flex-wrap:wrap;justify-content:space-between}
+#sheet .sc{display:inline-flex;align-items:baseline;gap:4px;white-space:nowrap}#sheet .sc i{font-style:normal;color:#ffe2a6;font-weight:700}
+#sheet .sc b{color:#fff3dc;font-weight:800;border-bottom:3px solid var(--c)}#sheet .sc u{text-decoration:none;opacity:.7}
+#sheet .srate{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#sheet .srate b{font-weight:800}
+#sheet .srate.good b{color:#9be07a}#sheet .srate.okay b{color:#ffd24a}#sheet .srate.poor b{color:#ff9a7a}
+@media(min-width:1024px){#sheet,#sheet .srate{font-size:16px}.glow .pvb{font-size:16px}}
+.fglow .flab{font-size:14px;padding:3px 8px}
