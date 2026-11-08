@@ -118,6 +118,7 @@ function tutSteps() {
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
     const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', inn: 'city', special: 'goals' }[st.id];
+    if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
     st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
     st.ready = () => { if (tab && G && UI.pvTab !== tab && HB.actor(G) === 0 && !UI.cards.length) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } }
       try { const el = st.target && st.target(); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
@@ -130,6 +131,14 @@ function tutLook(id, target, isIt) {
   const S = HBS.steps;
   return { id, title: S[id].title, say: tsay(id), target, look: isIt, wait: tapIs('look:' + id), ready: () => myTurn() && !!target() };
 }
+// one spotlight: a single box-shadow hole that follows the kit's ring (the kit's tiled dim cells leave 1px seams on phones)
+(function spot() {
+  requestAnimationFrame(spot);
+  let s = document.getElementById('hbspot'); const r = typeof GXT !== 'undefined' && GXT.running() && document.querySelector('.gxt-cell') ? document.querySelector('.gxt-ring') : null;
+  if (!r) { if (s) s.remove(); return; }
+  if (!s) { s = document.createElement('div'); s.id = 'hbspot'; s.setAttribute('aria-hidden', 'true'); document.body.appendChild(s); }
+  const k = r.style.left + r.style.top + r.style.width + r.style.height; if (s._k !== k) { s._k = k; s.style.left = r.style.left; s.style.top = r.style.top; s.style.width = r.style.width; s.style.height = r.style.height; }
+})();
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
 function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }

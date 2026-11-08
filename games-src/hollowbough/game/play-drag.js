@@ -9,7 +9,7 @@ const fs=require('fs');const html=fs.readFileSync(__dirname+'/hollowbough.html')
 const which='quick',TOUCH=process.argv[2]==='touch';const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function game(b,kind){const probs=[];const t0=Date.now();
   const ctx=await b.newContext(TOUCH?{viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1}:{viewport:{width:390,height:763},deviceScaleFactor:1});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const f=require('path').join(__dirname,'../../../games/hollowbough',decodeURIComponent(u.pathname));if(u.pathname!=='/'&&require('fs').existsSync(f)&&require('fs').statSync(f).isFile())return r.fulfill({status:200,path:f});return r.fulfill({status:200,contentType:'text/html',body:html})});   // the built page served next to the real media (games/hollowbough)
   const p=await ctx.newPage();p.setDefaultTimeout(6000);
   p.on('pageerror',e=>probs.push('page error '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))probs.push('console '+m.text().slice(0,140))});
   await p.goto('https://gns.test/');await sleep(600);await p.evaluate(()=>{localStorage.clear();localStorage.setItem('hb_played','1');localStorage.setItem('hb_offer','1');localStorage.setItem('gxt-hollowbough',JSON.stringify({done:1}))});await p.reload();await sleep(900);

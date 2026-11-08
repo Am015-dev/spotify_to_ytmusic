@@ -109,11 +109,12 @@ function fxPost(pre, m, src) {
 }
 function ctr0() { const R = UI.lay; return R ? { x: R.W / 2 - 10, y: R.H / 2 - 10, w: 20, h: 20 } : null; }
 function fxSeason(s, mine) {
+  // a brief banner at the top of the board (fades in and out in about 1 s), never a sticker over the cards
   const L = fxLayer(); if (!L || !ANIM || !mine) return;
-  const e = h('div.fxseason', HBKit.season(SEAS[s], 110), h('b', SEASN[s])); L.appendChild(e);
-  const an = animate(e, [{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 1100, fill: 'both' });
+  const e = h('div.fxseason', HBKit.season(SEAS[s], 28), h('b', SEASN[s])); L.appendChild(e);
+  const an = animate(e, [{ opacity: 0, transform: 'translate(-50%,-6px)' }, { opacity: 1, transform: 'translate(-50%,0)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,0)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-6px)' }], { duration: 1000, easing: 'ease-out' });
   if (an) an.onfinish = () => e.remove(); else e.remove();
-  setTimeout(() => e.remove(), 1500);
+  setTimeout(() => e.remove(), 1200);
 }
 // after a move was applied and drawn: pieces land where they went
 function fxLand(m, seat, src, preChip) {

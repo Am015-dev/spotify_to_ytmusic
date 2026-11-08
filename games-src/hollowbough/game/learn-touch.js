@@ -19,7 +19,7 @@ const totals={steps:0,wrong:0,runs:0,ids:[]};
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const f=require('path').join(__dirname,'../../../games/hollowbough',decodeURIComponent(u.pathname));if(u.pathname!=='/'&&require('fs').existsSync(f)&&require('fs').statSync(f).isFile())return r.fulfill({status:200,path:f});return r.fulfill({status:200,contentType:'text/html',body:html})});   // the built page served next to the real media (games/hollowbough)
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(t))note(tag,'console error '+t.slice(0,160))});
