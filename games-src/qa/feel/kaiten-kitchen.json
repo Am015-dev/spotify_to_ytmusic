@@ -1,8 +1,8 @@
 {
  "slug": "kaiten-kitchen",
- "when": "2026-11-08T05:22Z",
- "secs": 120,
- "totalSecs": 262,
+ "when": "2026-11-08T06:18Z",
+ "secs": 45,
+ "totalSecs": 113,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,13 +36,13 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 228,
-   "clicks": 280,
+   "secs": 45,
+   "turns": 75,
+   "clicks": 107,
    "endedBy": "result",
    "tutorialEnded": 3,
    "hintsOff": true,
-   "messagesSeen": 10
+   "messagesSeen": 6
   },
   {
    "size": "phone",
@@ -58,18 +58,18 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 284,
-   "clicks": 332,
+   "secs": 45,
+   "turns": 67,
+   "clicks": 89,
    "endedBy": "result",
    "tutorialEnded": 3,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 6
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 13,
+   "secs": 14,
    "turns": 28,
    "clicks": 30,
    "endedBy": "result",
