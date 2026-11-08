@@ -1,8 +1,8 @@
 {
  "slug": "rampart-and-vine",
- "when": "2026-11-08T05:09Z",
- "secs": 120,
- "totalSecs": 263,
+ "when": "2026-11-08T05:35Z",
+ "secs": 45,
+ "totalSecs": 113,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -39,9 +39,9 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 120,
-   "turns": 309,
-   "clicks": 412,
+   "secs": 45,
+   "turns": 107,
+   "clicks": 138,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -61,9 +61,9 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 334,
-   "clicks": 449,
+   "secs": 45,
+   "turns": 121,
+   "clicks": 160,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
