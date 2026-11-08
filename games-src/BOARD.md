@@ -32,3 +32,9 @@ rules-logic test, asset gate (>=90% of shipped art loads) and phone look all pas
 
 Shared: W428 asset-usage gate (all games).
 Shared: W456 game feel kit (drag, zoom, motion, haptics, sound) on wildmark + perch, then roll out.
+
+## Round 8 Nov 02:10 UTC: every game has a game-feel worker on games-src/BRIEF-GAMEFEEL.md
+W463 kaiten, W464 tidewake, W465 nebula, W466 sunglaze, W467 crown-city, W468 shipwreck, W469 short-fuse, W470 stitchwise,
+W471 cauldron, W472 doorkick, W473 thornbound, W474 deep-signal, W475 redline, W476 rampart (all new), plus W456 wildmark+perch,
+W457 hollowbough, W458 vale, W429 twin, W420 emberclimb, W427 vinegrave, W425 final-approach, W408 sands, W409 lantern.
+Art wiring: W459-W461. Rules fixes: W462. Free art: W410. Deploy gate: rules test + asset-usage + impeccable/design-review >= 7.

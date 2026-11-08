@@ -36,6 +36,11 @@ var SFX = {
   clean: function () { tone(740, 0.08, { type: 'triangle', v: 0.1 }); tone(990, 0.1, { type: 'triangle', v: 0.1, at: 0.07 }); },
   spin: function () { tone(1100, 0.7, { type: 'sawtooth', v: 0.14, to: 160 }); noise(0.7, { f: 3500, fto: 600, q: 3, v: 0.18 }); },
   boost: function () { tone(300, 0.35, { type: 'sawtooth', v: 0.16, to: 1100 }); noise(0.3, { f: 800, fto: 4000, v: 0.14 }); },
+  beep: function () { tone(440, 0.18, { type: 'square', v: 0.12 }); },
+  lightsgo: function () { tone(880, 0.4, { type: 'square', v: 0.14 }); tone(70, 0.8, { type: 'sawtooth', v: 0.16, to: 260, at: 0.05 }); },
+  engine: function () { tone(85, 0.7, { type: 'sawtooth', v: 0.13, to: 240 }); tone(170, 0.6, { type: 'square', v: 0.04, to: 420 }); },
+  tick: function () { tone(1400, 0.02, { type: 'square', v: 0.03 }); },
+  skid: function () { noise(0.9, { f: 4200, fto: 1400, q: 6, v: 0.22 }); tone(900, 0.6, { type: 'triangle', v: 0.06, to: 500 }); },
   slip: function () { noise(0.4, { f: 600, fto: 3500, q: 1.5, v: 0.2 }); },
   win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.28, { type: 'triangle', v: 0.2, at: i * 0.11 }); }); tone(1047, 0.7, { type: 'sine', v: 0.15, at: 0.5 }); },
   lose: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.3, { type: 'triangle', v: 0.18, at: i * 0.16 }); }); }
