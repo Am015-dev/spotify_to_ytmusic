@@ -125,10 +125,10 @@
     var s = G.seats[G.cur]; s.done++; G.hold = null; G.used3 = false; G.stage = 'pick';
     if (G.solo) {   // solo: the rightmost remaining tile and the rightmost remaining token leave the game
       for (var i = 3; i >= 0; i--) if (G.market.tiles[i]) { G.market.tiles[i] = null; break; }
-      for (i = 3; i >= 0; i--) if (G.market.toks[i]) { G.bag[G.market.toks[i]]++; G.market.toks[i] = null; break; }
+      for (i = 3; i >= 0; i--) if (G.market.toks[i]) { G.lostToks = G.lostToks || {}; G.lostToks[G.market.toks[i]] = (G.lostToks[G.market.toks[i]] || 0) + 1; G.market.toks[i] = null; break; }   // rules: removed from the game, not returned to the bag
     }
-    // rules: market items never move; the taken tile and token are refilled in place (solo keeps its documented slide toward the far end)
-    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.unshift(null); G.market[f] = l; });
+    // rules: market items never move; the taken tile and token are refilled in place (solo: survivors slide toward the stack, new pairs arrive at the far end)
+    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.push(null); G.market[f] = l; });   // survivors slide toward the stack (slot 0); the far slots refill
     for (i = 0; i < 4; i++) { if (!G.market.tiles[i]) G.market.tiles[i] = G.supply.length ? G.supply.pop() : null; if (!G.market.toks[i]) G.market.toks[i] = drawTok(G); }
     overpop(G);
     if (G.seats.every(function (x) { return x.done >= G.turns; })) { finish(G); return; }
@@ -155,16 +155,26 @@
     else if (a === 'hawk') { var h = cells.filter(function (x) { return !nb(x).some(function (y) { return tokAt(env, y, 'hawk'); }); }); lit = h; v = pts[Math.min(h.length, 8)]; }
     else if (a === 'salmon') { comps(env, function (x) { return x.tok === 'salmon'; }).forEach(function (g) { var ok = g.every(function (x) { return nb(x).filter(function (y) { return tokAt(env, y, 'salmon'); }).length <= 2; }); if (ok) { v += pts[Math.min(g.length, 7)]; lit = lit.concat(g); } }); }
     else if (a === 'fox') { cells.forEach(function (x) { var s = {}; nb(x).forEach(function (y) { if (env[y] && env[y].tok) s[env[y].tok] = 1; }); var f = Object.keys(s).length; v += f; if (f) lit.push(x); }); }
-    else if (a === 'elk') {   // greedy: longest straight lines first (3 axes), each elk used once, lines capped at 4
-      var used = {}, lines = [];
-      cells.forEach(function (x) { [0, 1, 5].forEach(function (d) { var p = pk(x), b = k(p[0] - DIRS[d][0], p[1] - DIRS[d][1]); if (tokAt(env, b, 'elk')) return; var l = [x], q = p; for (;;) { q = [q[0] + DIRS[d][0], q[1] + DIRS[d][1]]; if (tokAt(env, k(q[0], q[1]), 'elk')) l.push(k(q[0], q[1])); else break; } lines.push(l); }); });
-      lines.sort(function (p, q) { return q.length - p.length; });
-      for (;;) {
-        var best = null, bl = 0;
-        lines.forEach(function (l) { var run = [], br = []; l.forEach(function (x) { if (used[x]) { if (run.length > br.length) br = run; run = []; } else run.push(x); }); if (run.length > br.length) br = run; if (br.length > bl) { bl = br.length; best = br; } });
-        if (!best) break;
-        var take = best.slice(0, 4); take.forEach(function (x) { used[x] = 1; }); v += pts[take.length]; lit = lit.concat(take);
-      }
+    else if (a === 'elk') {   // exact: split the elk into straight lines (3 axes, 1-4 long, each elk in one line) for the highest total
+      var left = {}, memo = {}, budget = 40000;
+      cells.forEach(function (x) { left[x] = 1; });
+      var rec = function (rem) {
+        var ks = Object.keys(rem); if (!ks.length) return 0;
+        var mk = ks.sort().join('|'); if (memo[mk] != null) return memo[mk];
+        if (--budget < 0) return 2 * ks.length;   // safety valve on huge blobs: every elk at least a single
+        var first = ks[0], p0 = pk(first), best = -1;
+        [0, 1, 5].forEach(function (d) {
+          for (var len = 4; len >= 1; len--) for (var off = 0; off < len; off++) {
+            var line = [], okL = true;
+            for (var q = -off; q < len - off; q++) { var ck = k(p0[0] + q * DIRS[d][0], p0[1] + q * DIRS[d][1]); if (!rem[ck]) { okL = false; break; } line.push(ck); }
+            if (!okL || (len === 1 && d !== 0)) continue;
+            var nr = {}; ks.forEach(function (x) { if (line.indexOf(x) < 0) nr[x] = 1; });
+            var tot = pts[len] + rec(nr); if (tot > best) best = tot;
+          }
+        });
+        return (memo[mk] = best);
+      };
+      v = rec(left); lit = cells.slice();
     }
     if (info) info.lit = lit;
     return v;
