@@ -20,9 +20,9 @@ const GD=(()=>{
    {id:'lastcolour',who:'me',m:D(27,'merchant'),say:'The last one must land on its own colour.'},
    {id:'take',who:'note',say:'You take every Trader there. Emptied tile: your camel claims it.'},
    {id:'traders',who:'me',m:{act:'tribe'},say:'Traders bring goods from the front of the row. Collect.'},
-   {id:'stall',who:'me',m:{act:'tile',take:[0]},say:'Bazaar Stall: 3 coins buys one of the first three. Take this.'},
+   {id:'stall',who:'me',m:{act:'tile',take:[2]},say:'Bazaar Stall: 3 coins buys one of the first three. Take this.'},
    {id:'mystics',who:'note',say:'Mystics help Masons, Shadows and shrines. They never score.'},
-   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Sell them.'},
+   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','silk','wheat']},say:'Three different goods sell for 7 coins. Sell them.'},
    {id:'done',who:'me',m:{act:'end'},say:'Selling is the last part of a turn. Tap End turn.'},
    {id:'sages',who:'note',ms:[S(11),D(10,'elder'),D(9,'elder'),D(8,'elder'),{act:'tribe'}],say:'Farid takes four Sages. Each Sage is worth 2 points.'},
    {id:'shrine',who:'note',ms:[{act:'tile',dj:'wazira',pay:{el:2,fk:0}},{act:'end'}],say:'At a Shrine two Sages summon a djinn: points and a power.'},
@@ -36,10 +36,11 @@ const GD=(()=>{
    {id:'advisors',who:'note',ms:[S(5),D(4,'vizier'),D(3,'vizier'),D(2,'vizier'),{act:'tribe'}],say:'Advisors: 1 point each, plus 10 per rival with fewer.'},
    {id:'oasis',who:'note',ms:[{act:'tile',place:2},{act:'end'}],say:'Oasis: a palm tree must grow there. Palms score 3.'},
    {id:'round',who:'note',say:'Round over: goods and djinns refill. Bid again in play order.'},
-   {id:'bid2',who:'me',m:B(5),say:'Pay 1 coin again to play first.'},
-   {id:'r2a',who:'auto',ms:[B(6)]},
-   {id:'bid3',who:'me',m:B(7),say:'Your second marker takes a free spot.'},
-   {id:'r2b',who:'auto',ms:[B(8)]},
+   {id:'bid2',who:'me',m:B(6),say:'This time take a free spot.'},
+   {id:'r2a',who:'auto',ms:[B(7)]},
+   {id:'bid3',who:'me',m:B(8),say:'Your second marker takes the last free spot.'},
+   {id:'zeros',who:'note',ms:[B(5)],say:'Only three free spots: Farid must pay, so he plays first.'},
+   {id:'bazaar',who:'note',ms:[S(12),D(13,'builder'),D(19,'assassin'),D(18,'merchant'),{act:'tribe'},{act:'tile',take:[0,1]},{act:'end'}],say:'Grand Bazaar: Farid pays 6 coins for two of the first six.'},
    {id:'lift3',who:'me',m:S(29),say:'Lift these three. A Shadow will end on Shadows.'},
    {id:'s1',who:'me',m:D(28,'vizier'),say:'The Advisor drops here.'},
    {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
@@ -48,14 +49,15 @@ const GD=(()=>{
    {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'Shadows kill one person in reach, or a rival’s Advisor. Tap Farid.'},
    {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
    {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},
-   {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'wahha',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},
-   {id:'lift4',who:'me',m:S(1),say:'Last turn. Lift this tile and walk right.'},
-   {id:'t1',who:'me',m:D(2,'elder'),say:'Your people may cross Farid’s tiles.'},
-   {id:'t2',who:'me',m:D(3,'assassin'),say:'Keep walking right.'},
-   {id:'t3',who:'me',m:D(4,'vizier'),say:'An Advisor lands on Advisors.'},
-   {id:'advisors2',who:'me',m:{act:'tribe'},say:'You keep your Advisors in front of you.'},
-   {id:'bazaar',who:'me',m:{act:'tile',take:[1,3]},say:'Grand Bazaar: 6 coins buys two of the first six.'},
-   {id:'keep',who:'me',m:{act:'end'},say:'Keep these goods: sets also score at the end. End turn.'}];
+   {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'nakhla',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},
+   {id:'lift4',who:'me',m:S(1),say:'Last turn. Lift this tile.'},
+   {id:'t1',who:'me',m:D(7,'vizier'),say:'Drop the Advisor here.'},
+   {id:'t2',who:'me',m:D(13,'assassin'),say:'Drop the Shadow here.'},
+   {id:'t3',who:'me',m:D(14,'elder'),say:'The Sage lands on a Shrine holding a Sage.'},
+   {id:'sages2',who:'me',m:{act:'tribe'},say:'You keep Sages: 2 points each, and they pay for djinns.'},
+   {id:'summon',who:'me',m:{act:'tile',dj:'wahha',pay:{el:2,fk:0}},say:'Summon Wahha with your two Sages.'},
+   {id:'power',who:'me',m:{act:'djinn',k:'wahha',t:22,pay:{el:0,fk:1}},say:'Use its power once per turn: pay your Mystic, plant a palm.'},
+   {id:'last',who:'me',m:{act:'end'},say:'Tap End turn. The round ends, then the game.'}];
   return {STEPS,i:0,on:false,busy:false};
 })();
 const gdStep=()=>GD.on&&G&&G.coach&&!G.over?GD.STEPS[GD.i]||null:null;
@@ -74,6 +76,7 @@ function gdPlay(ms,done){GD.busy=true;const q=ms==='ai'?null:ms.slice();
 function gdTarget(st){if(!st)return null;const q=s=>document.querySelector(s);
   if(st.who!=='me')return q('#coach button');
   const m=st.m;if(UI.chz){const j=UI.chz.opts.findIndex(o=>gdEq(o.m,m));if(j>=0)return q(`[data-chz="${j}"]`)}
+  if(m.act==='djinn'){if(UI.pendDj&&UI.pendDj.k===m.k)return tileEl(m.t);return [...document.querySelectorAll('[data-pw]')].find(b=>{try{return JSON.parse(b.dataset.pw).k===m.k}catch(e){return false}})||null}
   if(m.act==='tribe'&&m.kill){if(m.kill.pl!=null)return q(`[data-seat="${m.kill.pl}"]`);return tileEl(m.kill.tile)}
   let el=null;try{el=fingerEl(m)}catch(e){}
   if(!el&&m.act==='sell'){el=[...document.querySelectorAll('[data-mv]')].find(b=>{try{const x=JSON.parse(b.dataset.mv);return x.act==='sell'&&gdEq(x,m)}catch(e){return false}})||null;

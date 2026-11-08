@@ -14,7 +14,7 @@ All story text lives in two data files: `src/lore.js` (tutorial prologue, result
 
 ## Prologue (tutorial) in four chapters
 Each step has a story reason from the guide, then the action, then a reaction (shown as a small portrait card, ~2.5 s). The glow shows where to tap; the words never say "click".
-1. **Empty Throne**: the throne is empty, five tribes, bidding for the walk order. Payoff: Farid's first walk wins a djinn.
+1. **Empty Throne**: the throne is empty, the tribes, bidding for the walk order. Payoff: Farid's first walk wins a djinn.
 2. **First Walk**: lift, drop, land on your colour, Traders, claim with a camel, buy at the Stall, sell a set. Payoff: "Thirteen coins. The throne feels closer!"
 3. **Rival Moves**: Farid plants a palm with his Advisors; you walk Advisors and a Mason, earn coins, raise a palace.
 4. **The Count**: the final count with everything that scores, the other tile gifts, Shadows, how a real game ends.
