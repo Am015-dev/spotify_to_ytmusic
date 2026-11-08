@@ -141,14 +141,14 @@
   // ---------------- turns and rounds
   function startRound(G) {
     G.phase = 'play';
-    G.pl.forEach(function (p) { p.cubes = G.cubes[G.round]; p.pink = false; if (p.auto) autoDeal(G, p); });
+    G.pl.forEach(function (p) { p.cubes = G.cubes[G.round]; p.pink = false; birds(p).forEach(function (x) { x.s.pk = false; }); if (p.auto) autoDeal(G, p); });
     G.cur = G.first; G.turn++;
     log(G, 'Round ' + (G.round + 1) + ' begins. Goal: ' + GOL[G.goals[G.round]].n + '.');
     fx(G, { k: 'round', r: G.round });
     beginTurn(G);
   }
   function beginTurn(G) {
-    var p = G.pl[G.cur]; p.pink = false; G.q = null;
+    var p = G.pl[G.cur]; p.pink = false; birds(p).forEach(function (x) { x.s.pk = false; }); G.q = null;
     if (p.kind === 'automa') { G.q = { seat: G.cur, h: 'automa', d: {} }; }
   }
   function endTurn(G) {
@@ -332,7 +332,7 @@
       case 'layNest': { var n = 0; birds(p).forEach(function (y) { if (nestIs(y.b, x[0]) && y.s.eggs < y.b.e) { y.s.eggs++; n++; } }); ev.txt = '+' + n + ' egg' + (n === 1 ? '' : 's'); ev.egg = n; break; }
       case 'draw1': { var d1 = drawCard(G); if (d1) { p.hand.push(d1); ev.txt = 'drew a card'; ev.card = 1; } break; }
       case 'hunt': { var top = drawCard(G); if (top) { if (B[top].ws < +x[0]) { s.tuck++; ev.txt = 'caught it! (' + B[top].ws + ' cm)'; ev.tuck = 1; } else { G.disc.push(top); ev.txt = 'missed (' + B[top].ws + ' cm)'; } ev.seen = top; } break; }
-      case 'huntDie': { var out = 5 - G.feeder.length, hit = false, faces = []; for (var k = 0; k < out; k++) { var fc = FACES[Math.floor(rnd(G) * 6)]; faces.push(fc); if (fc === x[0]) hit = true; } if (hit) { s.cache++; ev.txt = 'caught a ' + x[0] + '!'; ev.f = x[0]; } else ev.txt = out ? 'no luck' : 'no dice to roll'; ev.faces = faces; break; }
+      case 'huntDie': { var out = 5 - G.feeder.length, hit = false, faces = []; for (var k = 0; k < out; k++) { var fc = FACES[Math.floor(rnd(G) * 6)]; faces.push(fc); if (fc === x[0] || (fc === 'gs' && (x[0] === 'grub' || x[0] === 'seed'))) hit = true; } if (hit) { s.cache++; ev.txt = 'caught a ' + x[0] + '!'; ev.f = x[0]; } else ev.txt = out ? 'no luck' : 'no dice to roll'; ev.faces = faces; break; }
       case 'allFood': G.pl.forEach(function (q) { if (!q.auto) q.food[x[0]]++; }); ev.txt = 'everyone +1 ' + x[0]; ev.f = x[0]; break;
       case 'allDraw': G.pl.forEach(function (q) { if (!q.auto) { var c2 = drawCard(G); if (c2) q.hand.push(c2); } }); ev.txt = 'everyone draws 1'; ev.card = 1; break;
       case 'tuckDraw': case 'tuckEgg': case 'tuckFood':
@@ -368,23 +368,20 @@
   // pink: queued for each other player when the active player takes the matching action; resolves once between that player's turns
   function queuePinks(G, actor, kind, hab) {
     G.pl.forEach(function (q, seat) {
-      if (seat === actor || q.auto || q.pink) return;
-      var hit = null;
-      birds(q).some(function (x) {
-        var pw = power(x.s.id); if (pw.col !== 'pink') return false;
-        if ((pw.k === 'pEgg' && kind === 'eggs') || (pw.k === 'pFood' && kind === 'food') || (pw.k === 'pTuck' && kind === 'play' && 'FGW'.indexOf(pw.x[0]) === hab)) { hit = x; return true; }
-        return false;
+      if (seat === actor || q.auto) return;
+      birds(q).forEach(function (x) {
+        var pw = power(x.s.id); if (pw.col !== 'pink' || x.s.pk) return;
+        if ((pw.k === 'pEgg' && kind === 'eggs') || (pw.k === 'pFood' && kind === 'food') || (pw.k === 'pTuck' && kind === 'play' && 'FGW'.indexOf(pw.x[0]) === hab)) G.work.push({ k: 'pink', seat: seat, h: x.h, c: x.c });   // each pink bird: once between its owner's turns
       });
-      if (hit) G.work.push({ k: 'pink', seat: seat, h: hit.h, c: hit.c });
     });
   }
   function pink(G, t) {
-    var q = G.pl[t.seat]; if (q.pink) return; var s = cell(G, t.seat, t.h, t.c); if (!s) return;
+    var q = G.pl[t.seat]; var s = cell(G, t.seat, t.h, t.c); if (!s || s.pk) return;
     var pw = power(s.id), ev = { k: 'pw', seat: t.seat, h: t.h, c: t.c, id: s.id, pink: 1, txt: '' };
     if (pw.k === 'pEgg') { if (s.eggs < B[s.id].e) { s.eggs++; ev.txt = '+1 egg'; ev.egg = 1; } else return; }
     if (pw.k === 'pFood') { q.food[pw.x[0]]++; ev.txt = '+1 ' + pw.x[0]; ev.f = pw.x[0]; }
     if (pw.k === 'pTuck') { if (drawCard(G)) { s.tuck++; ev.txt = 'tucked a card'; ev.tuck = 1; } else return; }
-    q.pink = true;
+    s.pk = true;
     log(G, nameOf(G, t.seat) + ' (between turns): ' + B[s.id].n + ' - ' + ev.txt + '.');
     fx(G, ev);
   }
@@ -497,6 +494,7 @@
         if (d !== 'gs' && m.f && m.f !== d) return err('wrong face');
         G.feeder.splice(m.i, 1); p.food[f]++;
         fx(G, { k: 'food', seat: seat, f: f, n: 1, die: m.i });
+        if (!G.feeder.length) rollAll(G);   // an emptied birdfeeder is thrown again at once
         var left = q.d.n - 1; G.q = null;
         if (left > 0) G.work.unshift({ k: 'die', seat: seat, n: left });
         run(G); return { ok: true };

@@ -1,0 +1,18 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"story-scene-phone.json",
+"sw-advance-phone.json",
+"sw-board-phone.json",
+"sw-income-phone.json",
+"sw-leather-phone.json",
+"sw-place-phone.json",
+"sw-result-phone.json",
+"sw-torn-phone.json",
+"sw-zoom-phone.json"
+]
+}
+}

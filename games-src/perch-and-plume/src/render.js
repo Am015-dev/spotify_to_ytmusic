@@ -9,7 +9,7 @@ function isHuman(s) { return G && G.pl[s] && G.pl[s].kind === 'human'; }
 function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'human' ? i : -1; }).filter(function (i) { return i >= 0; }) : []; }
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
 function q() { return G && G.q; }
-function toast(t, ms) { var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
+function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
 function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
@@ -74,7 +74,7 @@ function renderGoalbar() {
   el.setAttribute('aria-label', 'Chapter goal. ' + r.label + ': ' + r.cur + (r.met ? ', met' : ''));
 }
 function renderOpps(cur) {   // the always-visible score breakdown: every player, leader marked
-  $('#opps').innerHTML = scoreHTML();
+  $('#opps').innerHTML = hintsOn() ? scoreHTML() : scoreLineHTML();
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
 function renderMid() {
@@ -108,6 +108,8 @@ function renderDock(p, vs, cur) {
   if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = UI.animSeat === UI.view && humans().length === 1 ? 'Your birds are working' : G.pl[UI.animSeat].name + ' is playing';
   $('#dt').textContent = who;
   $('#trk').innerHTML = trackerHTML();
+  var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
+  hintsBtn();
   if (!mine || Q) UI.pickBird = false;
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
   document.body.classList.toggle('idle4', !!idle);
@@ -118,14 +120,14 @@ function renderDock(p, vs, cur) {
   $('#foodrow').innerHTML = '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
     (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : '');
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var bp = mine && !Q ? bestPlay(G, vs) : null;
+  var bp = mine && !Q && hintsOn() ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
   $('#hand').innerHTML = p.hand.length ? order.map(function (i) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : 'Drag to a row or tap: +' + b.p) + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Drag to a row or tap: +' + b.p : 'Drag to your board or tap') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');

@@ -36,6 +36,8 @@ async function dragger(p, ctx, touch) {
     const frames = [], shot = async tag => { if (pass === 'measure') { console.log('  t=' + await p.evaluate(() => Math.round(performance.now())) + ' ' + tag); return; } const f = path.join(SHOTS, `f-${name}-${frames.length}.png`); await p.screenshot({ path: f }); frames.push([f, tag]); };
     const drag = await dragger(p, ctx, touch); let ok = true;
     try {
+      const closeGoal = () => p.evaluate(() => { const x = document.querySelector('#pop:not([hidden]) [data-a="popx"]'); if (x) x.click(); });
+      await p.waitForTimeout(1500); await closeGoal();
       await p.waitForFunction(() => myTurn() && !UI.busy && !G.q && document.querySelector('#hand .bc[data-gxf-drag]'), null, { timeout: 15000 });
       await p.waitForTimeout(400);
       const hi = await p.evaluate(() => { var e = document.querySelector('#hand .bc[data-gxf-drag]'); e.scrollIntoView({ block: 'nearest' }); return +e.dataset.i; });
@@ -52,7 +54,7 @@ async function dragger(p, ctx, touch) {
       // my turn: get food, then drag a die into the food row
       await p.waitForFunction(() => myTurn() && !UI.busy && !G.q, null, { timeout: 30000 });
       await p.waitForTimeout(300);
-      await p.locator('#act4 .a4-food, .ract[data-h="0"]').first().click();
+      await closeGoal(); await p.locator('#act4 .a4-food, .ract[data-h="0"]').first().click();
       await p.waitForFunction(() => G.q && (G.q.h === 'die' || G.q.h === 'bonus') && !UI.busy, null, { timeout: 15000 });
       if (await p.evaluate(() => G.q.h === 'bonus')) await p.evaluate(() => { const b = [...document.querySelectorAll('#acts [data-a="mv"]')].find(x => JSON.parse(x.dataset.m).yes === false); b.click(); });
       await p.waitForFunction(() => G.q && G.q.h === 'die' && document.querySelector('.die[data-gxf-drag]'), null, { timeout: 15000 }).catch(async e => { throw new Error('die wait: ' + await p.evaluate(() => JSON.stringify([G.q, UI.busy, myTurn(), document.querySelectorAll('.die').length, document.querySelectorAll('[data-gxf-drag]').length]))); });

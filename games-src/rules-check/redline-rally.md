@@ -55,3 +55,9 @@ Counts: WRONG 4, MISSING 4, SIMPLIFIED 3
 - MISSING slipstream/corners past the finish line -> fixed; test "no-slipstream-past-finish-line".
 - MISSING starting upgrade cards: left, the booklet text gives no values (unverified).
 - SIMPLIFIED lines (unlimited stress reserve, no starting upgrades, cooldown at shift time) added to the rules drawer.
+
+## Fixed (W424, branch shelf/W424-redline)
+- MISSING starting upgrade cards -> built with HOUSE VALUES (Brake 0, Burst 5, +1 heat card; the booklet gives no numbers); setup "Starting upgrades" On by default, off in the coached race. Tests "starting-upgrades-in-deck", "starting-upgrade-values-play", "stress-flip-skips-starting-upgrade".
+- SIMPLIFIED cooldown at shift time -> cooldown now runs in the React step after the cards are played. Test "cooldown-in-react-step-after-play".
+- Weather module (own design, house rules) and a 3-track championship (house points) added. Full list: games-src/redline-rally/RULES-COVERAGE.md.
+- Still SIMPLIFIED: unlimited stress/heat reserve (listed in Help).

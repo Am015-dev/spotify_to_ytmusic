@@ -54,3 +54,12 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - Look-check: `button.btn.wide` plate (`ui-row-c.webp`) was drawn at two aspects (border-image-width 5px 7px on a uniform slice 30); now 6px 6px in `skin.css`.
 - Shots: `playable-shots/a5-390-*.webp`, `a5-1440-*.webp` (coach bubbles hidden in the shots so the tracker is visible).
 - Known: while a coach bubble is open it can sit over the tracker (the shell places it); "Got it" closes it. Odds are exact only for hidden wires the solver can sample (80 samples); known wires show 100% / 0%.
+
+## Addendum 7 (8 Nov 2026): three modes, a clean game
+- LEARN TO PLAY: title button (`data-a=offeryes`), the coached game; the only place with coach bubbles. Play no longer forces it on first launch and the "New here?" offer is off.
+- PLAY (default): board, hand, tracker, one score line, a one-card "Goal" before turn 1 (win sentence + 3 bullets), the "+N reason" pop. No banners, bubbles, previews, badges, ratings or turn-over cards. Tap the tracker/score line for "Why" (last turn, how points work).
+- HINTS: the bulb in the top bar is the toggle (off by default, remembered, lit when on). On: previews, odds badges, turn-over card with Good/Okay/Poor, turn banner, first-time bubbles and a "What should I do?" button (the old advisor).
+- Shots: `playable-shots/a7-play-390.webp` (clean Play), `a7-goal-390.webp`, `a7-hints-390.webp`, `a7-play-1440.webp`.
+- Tests adjusted: coach-test starts from Learn to play; playable-test no longer expects banners or the flavour line; qa-bot's coached phase taps `offeryes` when present.
+- Look-check follow-up: the plate fix is now slice `30 42` with widths `5px 7px` (same corner scale both ways) instead of 6px 6px.
+- Coach bubbles (first-time help) are Learn-to-play only: off in Play and with Hints on.

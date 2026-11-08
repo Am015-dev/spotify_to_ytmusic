@@ -334,6 +334,22 @@ html.wm-coach #pv{bottom:10px}
 .st.why small{color:#3d3220!important;opacity:1!important}
 .st.why td.src{display:table-cell}.st.why td.src svg,.st.why td.src .sw{float:left;margin:2px 6px 0 0}
 #whyp{right:64px!important;margin:0!important}@media (min-width:1000px){#whyp{left:50%!important;right:auto!important;transform:translateX(-50%);width:620px}}
+
+/* A7: clean Play. Without Hints the board shows only the score line (seats), the tracker line, the board and the market */
+html.wm-clean #cards,html.wm-clean #terr,html.wm-clean #pv,html.wm-clean #bulbbtn,html.wm-clean .gain,html.wm-clean #whyp{display:none!important}
+html.wm-clean .pair.top{box-shadow:none}
+html.wm-clean #seats{top:8px}
+.hintsw.on{background:#e6b04f;color:#1d2420}
+.hintsw svg{fill:none;stroke:currentColor;stroke-width:2}
+#goal{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;background:rgba(10,8,5,.55);padding:16px}
+#goal[hidden]{display:none}
+#goal .gcard{background:#f6efdc;color:#1d2420;border-radius:16px;padding:18px 20px;max-width:440px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#goal h2{margin:0 0 6px;font-size:22px}#goal .g1{font-size:17px;font-weight:800;margin:0 0 8px}
+#goal ul{margin:0 0 8px;padding-left:20px}#goal li{font-size:15px;line-height:1.35;margin:4px 0}#goal .g2{font-size:14px;margin:0 0 12px;color:#3c4a40}
+@media (min-width:1000px){#goal li,#goal .g2{font-size:16px}#goal .g1{font-size:18px}}
+#goal{pointer-events:none}#goal .gcard{pointer-events:auto}
+.gone.back{cursor:pointer;border:2px dashed rgba(230,176,79,.7)!important;border-radius:12px;min-width:44px;min-height:44px}
+.gone.back svg{opacity:.45}.gone.back i{font-style:normal}
 /* feel layer (gx-feel.css + src/feel.js): dragged pair, held animal, keyboard focus */
 .wmf-pair{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .wmf-pair>svg{width:78%;height:auto}

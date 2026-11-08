@@ -11,7 +11,7 @@ let fails = 0, CDP = null, DRAGS = 0; const log = (ok, m) => { if (!ok) fails++;
 async function tap(p, sel) {
   const el = typeof sel === 'string' ? await p.$(sel) : sel; if (!el) throw new Error('no element ' + sel);
   if (!(await el.evaluate(e => !!e.closest('.gxc')).catch(() => false))) await el.scrollIntoViewIfNeeded().catch(() => { });   // story sheets are not scrolled: a real player taps what is on screen
-  if (TOUCH) await el.tap({ timeout: 5000 }); else await el.click({ timeout: 5000 });
+  try { if (TOUCH) await el.tap({ timeout: 5000 }); else await el.click({ timeout: 5000 }); } catch (e) { throw new Error((typeof sel === 'string' ? sel : 'element') + ': ' + e.message.split('\n')[0]); }
 }
 async function drag(p, fromSel, toSel) {
   const a0 = await p.$(fromSel), b0 = await p.$(toSel); if (!a0 || !b0) throw new Error('no drag element ' + fromSel + ' -> ' + toSel);
@@ -31,6 +31,7 @@ async function step(p) {
     const vis = s => { const e = document.querySelector(s); return e && !e.hidden && e.getBoundingClientRect().width > 0; };
     if (vis('#result')) return { k: 'result' };
     if (vis('#pass')) return { k: 'pass' };
+    if (vis('#pop') && document.querySelector('#pop .goalc [data-a="popx"]')) return { k: 'sel', s: '#pop [data-a="popx"]' };   // the Goal card before turn 1
     if (vis('#setup') && document.getElementById('keepgo')) return { k: 'keep' };
     if (document.querySelector('.gxc') && getComputedStyle(document.querySelector('.gxc')).display !== 'none' && document.querySelector('.gxc').offsetParent !== null) return { k: 'gxc' };
     if (!G || G.phase === 'over') return { k: 'wait' };

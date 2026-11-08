@@ -155,3 +155,48 @@ body:has(#menu) #status{visibility:hidden}
 #sheet .srate.good b{color:#9be07a}#sheet .srate.okay b{color:#ffd24a}#sheet .srate.poor b{color:#ff9a7a}
 @media(min-width:1024px){#sheet,#sheet .srate{font-size:16px}.glow .pvb{font-size:16px}}
 .fglow .flab{font-size:14px;padding:3px 8px}
+/* W426 phone clarity: tags stay 14px on screen at any zoom, never overlap, solid backing */
+.glow .pvb{top:calc(4px/var(--sc,1));font-size:calc(14px/var(--sc,1));padding:calc(2px/var(--sc,1)) calc(7px/var(--sc,1));border-width:calc(2px/var(--sc,1));border-radius:calc(8px/var(--sc,1))}
+@media(min-width:1024px){.glow .pvb{font-size:calc(16px/var(--sc,1))}}
+.glow .pvb.off,.fglow .flab.off{display:none}
+.glow.sel svg{opacity:.95}
+.glow.sel::after{border-color:#fff;box-shadow:0 0 0 calc(3px/var(--sc,1)) #ffd24a,0 0 calc(16px/var(--sc,1)) #ffd24a;animation:none}
+.fglow{animation:fpulse 1.2s ease-in-out infinite}
+@keyframes fpulse{50%{box-shadow:0 0 4px #ffd24a}}
+.fglow .flab{background:#281b12;font-size:14px;z-index:3}
+.fglow .flab[data-pos=t]{top:auto;bottom:100%;transform:translate(-50%,-4px)}
+.fglow .flab[data-pos=r]{top:50%;left:100%;transform:translate(4px,-50%)}
+.fglow .flab[data-pos=l]{top:50%;left:auto;right:100%;transform:translate(-4px,-50%)}
+.pop small{font-size:14px;background:#281b12}
+#recentre{position:absolute;right:10px;bottom:10px;z-index:7;display:flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;border:2px solid #e0a83a;border-radius:999px;background:#281b12;color:#fff3dc;font:800 14px/1 var(--ff);box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer}
+#recentre:active{transform:translateY(1px)}
+body:has(#modal .scrim) #recentre{display:none}
+#hplace{border:0;border-radius:999px;background:var(--terra,#b5532f);color:#fff8ec;font:800 17px var(--ff);padding:13px 22px;min-height:48px;box-shadow:0 3px 0 #7d3418,0 0 0 3px #ffd99a;white-space:nowrap}
+#hand.hassel .hname{display:none}
+#sheet{position:relative;z-index:8;padding:0}
+#sheet .sbtn{display:flex;width:100%;min-height:44px;align-items:center;justify-content:space-between;gap:6px;padding:5px 10px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;flex-wrap:nowrap;overflow:hidden}
+#sheet .sc{font-size:14px;gap:3px}
+#sheet .schip{flex:0 0 auto;font:800 14px/1.2 var(--ff);padding:2px 6px;border-radius:7px;border:1.5px solid #8a6a40;color:#ffe2a6;white-space:nowrap}
+#sheet .schip em{font-style:normal;margin-left:3px}
+#sheet .schip.good{color:#9be07a;border-color:#9be07a}#sheet .schip.okay{color:#ffd24a;border-color:#ffd24a}#sheet .schip.poor{color:#ff9a7a;border-color:#ff9a7a}
+#sheet .srate{position:absolute;left:0;right:0;top:100%;margin:0;padding:8px 16px 10px;background:#281b12;border-bottom:2px solid var(--gold,#b5883a);white-space:normal;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,.4)}
+@media(max-width:380px){#sheet .sbtn{padding:5px 8px;gap:4px}#sheet .sc{gap:2px}}
+@media(min-width:1024px){#sheet .sc,#sheet .schip,#sheet .srate,#recentre{font-size:16px}}
+body:has(#menu) #sheet,body:has(.menu) #sheet{visibility:hidden}
+body:has(#coach .cbub:not([hidden])) #recentre{bottom:auto;top:76px}
+body:has(.gxh-bub) #recentre{visibility:hidden}
+@media(max-width:699px){.pop{transition:opacity .85s}}
+/* Addendum 7: clean Play, Hints toggle, Goal card */
+#hintsbtn{min-height:40px;padding:0 5px;border-radius:10px;border:1.5px solid #e0a83a;letter-spacing:-.01em;background:#281b12;color:#fff3dc;font:800 14px/1 var(--ff);white-space:nowrap;flex:0 0 auto}
+#hintsbtn[aria-pressed=true]{background:#e0a83a;color:#281b12}
+html:not(.hints) #bulbbtn{display:none}
+#sheet .stot{display:flex;gap:6px;align-items:baseline;flex-wrap:nowrap;overflow:hidden}
+#sheet .stot .sc i{max-width:9ch;overflow:hidden;text-overflow:ellipsis}
+#sheet .srate .srow{display:flex;flex-wrap:wrap;gap:4px 14px;margin-bottom:4px}
+#goal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;width:min(340px,calc(100% - 32px));background:#f6ead2;color:#2a1608;border:3px solid #b5883a;border-radius:16px;padding:16px 18px;box-shadow:0 8px 24px rgba(0,0,0,.5);font:600 15px/1.35 var(--ff)}
+#goal h2{margin:0 0 6px;font:800 22px/1.1 var(--ff-h,var(--ff));color:#7d3418}
+#goal p{margin:0 0 8px}#goal ul{margin:0 0 8px;padding-left:20px}#goal li{margin:2px 0}#goal .gsub{font-size:14px;color:#4a3420}
+#goal button{display:block;width:100%;min-height:46px;border:0;border-radius:12px;background:#b5532f;color:#fff8ec;font:800 17px var(--ff);box-shadow:0 3px 0 #7d3418}
+@media(min-width:1024px){#hintsbtn,#goal .gsub{font-size:16px}}
+#top #hintsbtn span{font:inherit;font-size:inherit}
+@media(min-width:1024px){html #top #hintsbtn,html #top #hintsbtn span{font-size:16px}}

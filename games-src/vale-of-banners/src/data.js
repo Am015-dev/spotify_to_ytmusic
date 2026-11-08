@@ -60,15 +60,20 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   V.MINE = { name: 'Mine', text: 'At the end of every season, take 1 silver.' };
   V.SHIP = { name: 'Barge', text: 'Take all goods from one market stall, and move 1 step up the banner track.' };
   V.PAS = { name: 'Pasture', text: 'Score the animals of this kind in this meadow (this tile included).' };
-  /* Tile pool (164, enough for 4 players x 5 seasons): 12 keeps, 12 mines, 26 lore, 56 buildings (7 each), 36 pastures (4 kinds x 2/3/4 animals x 3), 22 barges */
+  /* Tile pool: the published mix of 164 hexagon tiles. 26 barges, 12 mines, 16 keeps, 26 lore, 28 pastures (7 per kind), 56 buildings (7 per kind).
+     40 of them have a black back (b:true) and are only dealt to the back lane: 6 barges, 2 mines, 2 keeps, 6 lore, 8 pastures, 16 buildings.
+     The six numbered stalls are filled from the other 124 (24 per season at 4 players, 120 in all). */
+  V.BLACKKNOW = ['k2', 'k7', 'k12', 'k17', 'k22', 'k26'];
+  V.PASNUMS = [2, 2, 3, 3, 3, 4, 4];   /* animals on the 7 tiles of each kind; the first and last are black-backed */
   V.pool = function () {
-    var t = [], id = 0, i, k;
-    for (i = 0; i < 12; i++) t.push({ id: 't' + (id++), t: 'castle' });
-    for (i = 0; i < 12; i++) t.push({ id: 't' + (id++), t: 'mine' });
-    V.KNOW.forEach(function (kn) { t.push({ id: 't' + (id++), t: 'know', k: kn.id }); });
-    V.BLDKEYS.forEach(function (b) { for (i = 0; i < 7; i++) t.push({ id: 't' + (id++), t: 'bld', k: b }); });
-    Object.keys(V.ANIMALS).forEach(function (a) { [2, 3, 4].forEach(function (n) { for (k = 0; k < 3; k++) t.push({ id: 't' + (id++), t: 'pas', k: a, n: n }); }); });
-    for (i = 0; i < 22; i++) t.push({ id: 't' + (id++), t: 'ship' });
+    var t = [], id = 0, i;
+    function add(o, black) { o.id = 't' + (id++); if (black) o.b = true; t.push(o); }
+    for (i = 0; i < 16; i++) add({ t: 'castle' }, i < 2);
+    for (i = 0; i < 12; i++) add({ t: 'mine' }, i < 2);
+    V.KNOW.forEach(function (kn) { add({ t: 'know', k: kn.id }, V.BLACKKNOW.indexOf(kn.id) >= 0); });
+    V.BLDKEYS.forEach(function (b) { for (i = 0; i < 7; i++) add({ t: 'bld', k: b }, i < 2); });
+    Object.keys(V.ANIMALS).forEach(function (a) { V.PASNUMS.forEach(function (n, j) { add({ t: 'pas', k: a, n: n }, j === 0 || j === 6); }); });
+    for (i = 0; i < 26; i++) add({ t: 'ship' }, i < 6);
     return t;
   };
   V.tileName = function (x) {

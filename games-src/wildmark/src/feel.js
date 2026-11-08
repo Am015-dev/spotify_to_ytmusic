@@ -118,7 +118,7 @@ var WMF = (function () {
       else F.hop(h);
       var after = WM.final(G)[seat], best = null;
       WM.ANI.forEach(function (a) { var d = after.ani[a] - before.ani[a]; if (d > 0 && (!best || d > best.d)) best = { a: a, d: d }; });
-      if (best) setTimeout(function () { var chip = $('#cards .cc[data-card="' + best.a + '"]'); F.points(cellRect(m.c), chip, '+' + best.d); F.buzz('score'); }, F.ms(380));
+      if (best) setTimeout(function () { var chip = $('#cards .cc[data-card="' + best.a + '"]'); if (!chip || !chip.offsetParent) chip = $('#seats .seat[data-seat="' + seat + '"] b') || $('#barstat'); F.points(cellRect(m.c), chip, '+' + best.d); F.buzz('score'); }, F.ms(380));   // clean Play hides the animal chips: fly to your score
     }
     return r;
   };

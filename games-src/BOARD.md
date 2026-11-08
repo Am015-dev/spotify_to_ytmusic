@@ -6,12 +6,12 @@ rules-logic test, asset gate (>=90% of shipped art loads) and phone look all pas
 | Game | UI/feel worker | Rules-logic worker | Free art | Live state |
 |---|---|---|---|---|
 | sands-of-qamar | W408 (owner art wiring) | W430 | owner art | old build |
-| wildmark | W416 done | W431 | W410 | live 01:24 (rules fixes) |
+| wildmark | W416 done, W456 feel | W431 | W410 | live 01:24 (rules fixes) |
 | redline-rally | W424 | W432 | W410 | old build |
 | final-approach | W425 | W433 | W410 | old build |
 | emberclimb | W420 | W434 | W410 | old build |
 | twin-thrones | W429 (Opus rebuild) | W435 | W410 | old build |
-| perch-and-plume | W422 | W436 | W410 | old build |
+| perch-and-plume | W422 done, W456 feel | W436 | W410 | live 01:30 (readable cards) |
 | vale-of-banners | W421 | W437 | W410 | old build |
 | vinegrave | W427 | W438 | W410 | old build |
 | cauldron-fair | (merged W398) | W439 | W410 | old build |
@@ -31,3 +31,10 @@ rules-logic test, asset gate (>=90% of shipped art loads) and phone look all pas
 | tidewake | - | W453 | W410 | old build |
 
 Shared: W428 asset-usage gate (all games).
+Shared: W456 game feel kit (drag, zoom, motion, haptics, sound) on wildmark + perch, then roll out.
+
+## Round 8 Nov 02:10 UTC: every game has a game-feel worker on games-src/BRIEF-GAMEFEEL.md
+W463 kaiten, W464 tidewake, W465 nebula, W466 sunglaze, W467 crown-city, W468 shipwreck, W469 short-fuse, W470 stitchwise,
+W471 cauldron, W472 doorkick, W473 thornbound, W474 deep-signal, W475 redline, W476 rampart (all new), plus W456 wildmark+perch,
+W457 hollowbough, W458 vale, W429 twin, W420 emberclimb, W427 vinegrave, W425 final-approach, W408 sands, W409 lantern.
+Art wiring: W459-W461. Rules fixes: W462. Free art: W410. Deploy gate: rules test + asset-usage + impeccable/design-review >= 7.

@@ -10,8 +10,8 @@ var PPF = (function () {
   var cam = F.camera($('#board'), $('#bd'), { max: 2.4, ignore: '[data-gxf-drag], .bc, .die, button, [data-a]' });
   function canDrag() { return myTurn() && !UI.busy && UI.mode !== 'tutorial' && !(window.GXT && GXT.running && GXT.running()); }
   function legal() { return PP.validMoves(G, UI.view); }
-  function myScore() { return $('.sr[data-s="' + UI.view + '"] .st b'); }
-  function scoreOf(s) { return $('.sr[data-s="' + s + '"] .st b') || $('.sr[data-s="' + s + '"]'); }
+  function scoreOf(s) { var l = $$('.sline .sl')[s]; return (l && l.querySelector('b')) || $('.sr[data-s="' + s + '"] .st b') || $('#opps'); }   // the one compact score line (clean Play)
+  function myScore() { return scoreOf(UI.view); }
   function node(html, cls) { var d = document.createElement('div'); d.className = 'ppf-n ' + (cls || ''); d.innerHTML = html; return d; }
   function cardBack() { return node('<span>&#10022;</span>', 'ppf-back'); }
 
@@ -144,7 +144,7 @@ var PPF = (function () {
   var render0 = window.render;
   window.render = function () {
     var r = render0.apply(this, arguments);
-    try { mark(); $$('.sr[data-s]').forEach(function (e) { var b = e.querySelector('.st b'); if (b) b.setAttribute('data-gxf-roll', 'pp' + e.dataset.s); }); F.rollAll($('#opps')); } catch (e) { }
+    try { mark(); $$('.sline .sl').forEach(function (e, i) { var b = e.querySelector('b'); if (b) b.setAttribute('data-gxf-roll', 'pp' + i); }); $$('.sr[data-s]').forEach(function (e) { var b = e.querySelector('.st b'); if (b) b.setAttribute('data-gxf-roll', 'pp' + e.dataset.s); }); F.rollAll($('#opps')); } catch (e) { }
     return r;
   };
   render = window.render;
