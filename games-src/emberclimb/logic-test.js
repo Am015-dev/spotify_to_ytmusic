@@ -129,5 +129,13 @@ rule(64, () => { E.newGame({ heroes: ['w'], seed: 64 }); const g = E.G(); g.gold
 rule(65, () => { E.newGame({ heroes: ['w'], seed: 65 }); const g = E.G(); g.scr = 'event'; g.evn = { id: 'forge-spirit', res: null }; E.performMove({ t: 'opt', i: 0 }); const pend = g.evn.pend, ms = E.validMoves(); E.performMove(ms[0]); return [['upg', true, 1], [pend, ms.every(m => m.t === 'evpick'), g.hs[0].deck[ms[0].c].u]]; });
 rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 3/.test(u), /bless: 1/.test(u)]]; });
 
+// ---------- G3 review fixes
+// Iron Bangle: the start-of-fight Block survives into round 1 and is cleared at the start of round 2
+rule(67, () => { E.newGame({ heroes: ['w'], seed: 67 }); const g0 = E.G(); g0.relics.push('iron-bangle'); go1(); const g = E.G(), b1 = g.hs[0].blk, t1 = g.b.turn;
+  g.hs[0].hp = g.hs[0].mhp = 999; g.b.en.forEach(e => { e.intent = { atk: 0, tg: 0 }; }); E.performMove({ t: 'end' }); for (let k = 0; k < 20 && g.b && g.b.ph === 'e'; k++) E.step(); return [[1, 4, 2, 0], [t1, b1, g.b && g.b.turn, g.hs[0].blk]]; });
+// an enemy action resolves top to bottom: its hit lands first, then the Vulnerable it applies (8 into 10 Block = 0 damage, not 16)
+rule(68, () => { const g = F(['w'], 68); const h = g.hs[0]; h.hand.forEach(c => { c.id = 'w-defend'; }); g.b.en[0].intent = { atk: 8, vuln: 2, tg: 0 }; h.blk = 10; const pv = E.previewHit(0, 0);
+  E.performMove({ t: 'end' }); g.b.ph === 'e' && E.step(); return [[8, 999, 2], [pv, h.hp, h.st.vuln || 0]]; });
+
 console.log('RULES passing ' + pass + ' / ' + total + (fails.length ? '   failing: ' + fails.join(',') : ''));
 process.exit(fails.length ? 1 : 0);

@@ -542,4 +542,11 @@ html body.ec-stagemap #dockact{flex-wrap:wrap!important;gap:6px 12px}
 @media (max-width:480px){#hud{flex-wrap:wrap;row-gap:2px;align-content:center;overflow:visible}#hud .chip{font-size:12.5px!important;line-height:1.1!important;padding:1px 6px!important;min-height:0!important}}
 .shopdet .card.big{height:auto!important;min-height:0!important}
 .shopdet .card.big .cb{min-height:0!important;height:auto!important;flex:0 0 auto!important;padding-bottom:8px}
+/* G3: short phones (375x667): figures shrink so the enemy intent badge always sits below the potion / relic bar */
+@media (max-height:760px){html body.ec-stage #stage .en .art,html body.ec-stage #stage .w485fig .art{max-width:max(110px,calc(100dvh - 500px))!important;margin-left:auto!important;margin-right:auto!important}}
+/* card names wrap only between words (no "Sweepin g"), shrinking instead */
+html body .card .ct{overflow-wrap:normal!important;word-break:normal!important;hyphens:manual}
+html body .card .cl.stb{color:#1f6b1f;font-weight:800}
+/* G3: the result screen scrolls, so the relic row is never under the sticky Play again / Title bar */
+html body .over.res{justify-content:flex-start!important;overflow-y:auto!important;min-height:0;max-height:100%}
 </style></head>

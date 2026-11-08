@@ -154,10 +154,10 @@
     sv.querySelector('.w485ap').setAttribute('d', 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + x + ' ' + (y - 10)); sv.classList.toggle('hit', !!hit);
     if (gh) gh.style.opacity = '.55';
   }
-  function holdPeek(el, c) {
+  function holdPeek(el, c, o) {
     var t = 0, x0 = 0, y0 = 0;
     function stop() { if (t) { clearTimeout(t); t = 0; } }
-    el.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; stop(); t = setTimeout(function () { t = 0; UI.peeked = Date.now(); var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); var close = function (e2) { if (e2) { e2.stopPropagation(); } pk.remove(); }; pk.addEventListener('pointerdown', close); document.body.appendChild(pk); }, 450); });
+    el.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; stop(); t = setTimeout(function () { t = 0; UI.peeked = Date.now(); var pk = h('div', 'peek'); pk.appendChild(cardEl(c, o)); var close = function (e2) { if (e2) { e2.stopPropagation(); } pk.remove(); }; pk.addEventListener('pointerdown', close); document.body.appendChild(pk); }, 450); });
     el.addEventListener('pointermove', function (ev) { if (Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 12) stop(); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { el.addEventListener(n, stop); });
     el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
@@ -170,7 +170,7 @@
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
-    var cb = h('div', 'cb'); E.lines(e).forEach(function (l) { cb.appendChild(h('span', 'cl', l)); }); el.appendChild(cb);
+    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb);
     // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
@@ -388,7 +388,8 @@
     t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
+    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
     return w;
   }
   // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
@@ -477,9 +478,9 @@
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
     if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
-      var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
+      var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
-      el.setAttribute('data-c', i); holdPeek(el, c); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
+      el.setAttribute('data-c', i); holdPeek(el, c, co); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
     st.appendChild(hand);
@@ -733,7 +734,7 @@
     s.appendChild(cause);
     var QS = (window.EC_STORY || {}).quick; if (QS && !UI.camp && !window.EC_NOSAVE) s.appendChild(h('div', 'storyline', g.won ? QS.won : QS.lost));
     var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
-    s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F) + ' / ' + g.F + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
+    s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F + 1) + ' / ' + (g.F + 1) + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
     if (r) {
       var sr = h('div', 'rstars'); for (var i = 0; i < 3; i++) sr.appendChild(h('span', i < r.stars ? 'on' : '', '★'));
       s.appendChild(h('div', 'storyline', null, [sr, h('span', '', (r.def.title || 'Story') + (r.won ? ' · best ' + (r.best || r.stars) + ' of ' + (r.def.maxStars || 3) + ' stars' : ' · not cleared yet'))]));

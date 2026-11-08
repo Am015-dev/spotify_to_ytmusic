@@ -24,6 +24,10 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
       if (seen[seen.length - 1] !== s.id) { seen.push(s.id); says[s.id] = s.bub; if (shots) { n++; await sleep(250); await pg.screenshot({ path: path.join(OUT, 'tut-' + n + '.png') }); } }
       if (s.next) { await sleep(650); const c = await centre('.gxt-next'); if (c) await tapXY(c.x, c.y); continue; }
       await sleep(650);
+      // every spotlit target must answer one tap: each element under a hole must be live (not a dim cell); on the room step, tap the LAST glowing room
+      const dead = await pg.evaluate(() => { const st = GXT.current(); const els = [st.target && st.target()].concat(st.also ? st.also() : []).filter(Boolean); return els.filter(e => { const r = e.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !(h && (h === e || e.contains(h))); }).length; });
+      if (dead) fail(name + ': step ' + s.id + ' has ' + dead + ' highlighted target(s) that ignore a tap');
+      if (s.id === 'go') { const g = await pg.evaluate(() => { const ns = document.querySelectorAll('#map .node.glow'); const e = ns[ns.length - 1]; if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, n: ns.length, t: e.className }; }); if (g) { console.log(name + ': room step, ' + g.n + ' glowing, tapping ' + g.t); await tapXY(g.x, g.y); continue; } }
       const c = await pg.evaluate(() => { const st = GXT.current(); const t = st && st.target && st.target(); if (!t || !t.getBoundingClientRect) return null; const r = t.getBoundingClientRect(); return { x: r.left + r.width / 2, y: Math.min(r.top + r.height / 2, innerHeight - 4) }; });
       if (c) await tapXY(c.x, c.y);
     }

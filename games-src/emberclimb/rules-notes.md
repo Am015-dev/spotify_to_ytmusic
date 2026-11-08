@@ -99,3 +99,9 @@ Differences found and fixed:
   the 1-act choice stays on the title.
 - Tutorial only forced 2 steps, then left rules to chance: now a guided first fight + map walk teaching every core rule (TUTORIAL-COVERAGE.md).
 Not changed (owner baseline = tabletop numbers): rest heals 9 (video game 30%), 9 floors per act (video game 15), ? rooms are always events.
+
+## G3 review re-check (8 Nov 2026)
+Re-checked against the tabletop rulebook text (online copy): Campfire Rest heals 3 HP (x SCALE = 9); Vulnerable doubles a hit; Weak is -1 per hit
+(x SCALE = 3); a Weak attacker on a Vulnerable target cancels both; one token used per whole attack; card / enemy text resolves top to bottom.
+All match the engine, so the numbers stay. Fixed: an enemy's debuff now lands after its own hit (logic rule 68); start-of-fight Block
+(Iron Bangle) lasts through round 1 (logic rule 67). In-game text now says what each status does ("Vulnerable 1: takes double damage").
