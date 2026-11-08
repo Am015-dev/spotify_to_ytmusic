@@ -372,7 +372,7 @@ body.vg-b2 #map{display:block;position:relative;min-height:250px;border-radius:1
   background:radial-gradient(ellipse at 50% 50%,rgba(250,236,196,.0),rgba(60,40,10,.18));overflow:visible}
 body.vg-b2 #map .trails{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 body.vg-b2 #map .trails path{fill:none;stroke:#6a4318;stroke-width:1.1;stroke-dasharray:1.6 1.8;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-width:3;opacity:.75}
-body.vg-b2 .msign{position:absolute;left:-4px;writing-mode:vertical-rl;transform:rotate(180deg);font:800 11px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 2px;letter-spacing:.03em;pointer-events:none;z-index:1;box-shadow:0 2px 3px rgba(0,0,0,.35)}
+body.vg-b2 .msign{position:absolute;left:-4px;writing-mode:vertical-rl;transform:rotate(180deg);font:800 14px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 2px;letter-spacing:.03em;pointer-events:none;z-index:1;box-shadow:0 2px 3px rgba(0,0,0,.35)}
 /* a site = a painted round place, its name on a banner, travel cost and loot as tokens */
 body.vg-b2 .site{--sd:56px;position:absolute;width:var(--sd);height:var(--sd);max-width:none;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f4e6c0;padding:0;overflow:visible;background:#3c5a3f;
   box-shadow:0 0 0 2px #5a3a14,0 6px 10px rgba(0,0,0,.55);flex:none;z-index:2}
@@ -382,8 +382,8 @@ body.vg-b2 .site.l2{--sd:58px}
 body.vg-b2 .site .cost{left:-8px;top:-6px;bottom:auto;transform:none;flex-direction:column;padding:1px 3px;border-radius:9px;border:1px solid #6a4318;z-index:3}
 body.vg-b2 .site .cost .ic{width:14px;height:14px}
 body.vg-b2 .site .rew{left:auto;right:-10px;top:-8px;bottom:auto;width:auto;flex-wrap:nowrap;border-radius:10px;padding:0 4px;line-height:18px;background:#2a1a08;border:1.5px solid #f4e6c0;z-index:3}
-body.vg-b2 .site .rew b{font-size:14px}.body.vg-b2 .site .rew .ic{width:14px;height:14px}
-body.vg-b2 .site .nm{display:block;position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);white-space:normal;text-align:center;width:max-content;font:800 11px/1.1 var(--gx-font,Georgia,serif);color:#3a240c;background:#f4e6c0;border:1px solid #6a4318;border-radius:3px;padding:0 5px;z-index:3;max-width:74px}
+body.vg-b2 .site .rew b{font-size:14px}body.vg-b2 .site .rew .ic{width:14px;height:14px}
+body.vg-b2 .site .nm{display:block;position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);white-space:normal;text-align:center;width:max-content;font:800 14px/1.05 var(--gx-font,Georgia,serif);color:#3a240c;background:#f4e6c0;border:1px solid #6a4318;border-radius:3px;padding:0 4px;z-index:3;max-width:88px}
 body.vg-b2 .site.hid .nm{display:none}
 body.vg-b2 .site.hid .rew{right:auto;left:50%;transform:translateX(-50%);top:auto;bottom:-9px}
 body.vg-b2 .site .occ{right:-14px;left:auto;top:auto;bottom:4px;width:30px;height:38px;z-index:4;filter:drop-shadow(0 3px 2px rgba(0,0,0,.6))}
@@ -398,7 +398,7 @@ body.vg-b2 .site.drophover{transform:translate(-50%,-50%) scale(1.18);z-index:6}
 body.vg-b2.vg-pick #map .site:not(.glow){filter:saturate(.7) brightness(.8)}
 /* research: a vertical path, the temple at the top, your notebook and magnifier climb it */
 body.vg-b2 #track{flex-direction:column;padding:4px 3px;border-radius:14px;background:linear-gradient(rgba(30,22,10,.55),rgba(30,22,10,.55)),url(media/track-bg.webp) center/cover;border:2px solid #c9a35a;gap:2px}
-body.vg-b2 #track .tl{display:block;font-size:11px;padding:0 2px;letter-spacing:0;background:none}
+body.vg-b2 #track .tl{display:block;font-size:14px;padding:0 2px;letter-spacing:0;background:none}
 body.vg-b2 #track .tcs{display:flex;flex-direction:column-reverse;gap:2px;flex:1}
 body.vg-b2 .tc{flex:1;min-height:0;border-radius:8px;background:rgba(244,230,192,.16);padding:1px 0;justify-content:center;flex-direction:row;flex-wrap:wrap;gap:1px}
 body.vg-b2 .tc .tn{font-size:13px;line-height:15px;width:100%}
@@ -424,7 +424,7 @@ body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
 @media (max-height:720px) and (max-width:999px){
   body.vg-b2 #map{min-height:220px}
   body.vg-b2 .site{--sd:52px}body.vg-b2 .site.l0{--sd:48px}body.vg-b2 .site.l2{--sd:54px}
-  body.vg-b2 .site .nm{font-size:11px}
+  body.vg-b2 .site .nm{font-size:14px}
   body.vg-b2 #track .tc{min-height:0}body.vg-b2 #track .tl{display:none!important}
 }
 @media (min-width:1000px){
@@ -438,3 +438,6 @@ body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
   body.vg-b2 .tc .tn{font-size:16px}body.vg-b2 .tc .tm i{width:20px;height:20px}
   body.vg-b2 #row .tl{display:block}
 }
+/* G2 review R4: guided steps: only the target glows */
+body.vg-guided .glow.gq{box-shadow:none!important;animation:none!important;outline:none!important}
+body.vg-guided.vg-pick #map .site.gq,body.vg-guided.vg-pick #row .cd.gq,body.vg-guided.vg-pick #hand .cd.gq{filter:saturate(.55) brightness(.68)}

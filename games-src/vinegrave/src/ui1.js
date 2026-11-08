@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render (one board: sites, research track, market; your tray below) =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, tut: null, sel: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'easy', hot: false }, prefs: {}, tut: null, sel: null };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -70,9 +70,9 @@ function movesFor(k, x) {
 const B2 = !/[?&]b2=0\b/.test(location.search);
 if (B2) document.body.classList.add('vg-b2');
 const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
-  0: [[15, 73], [33, 85], [51, 73], [69, 85], [87, 73]],
-  1: [[15, 41], [33, 53], [51, 41], [69, 53], [87, 41]],
-  2: [[21, 11], [42, 23], [63, 11], [84, 23]]
+  0: [[15, 68], [33, 79], [51, 68], [69, 79], [87, 68]],   /* camp sits higher so its name labels stay on the map at 375x667 */
+  1: [[15, 38], [33, 49], [51, 38], [69, 49], [87, 38]],
+  2: [[21, 9], [42, 20], [63, 9], [84, 20]]
 };
 function mapB2(gS, S) {
   const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
@@ -82,7 +82,7 @@ function mapB2(gS, S) {
   per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
   per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
   const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
-  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep ruins', 2) + sign('Ruins', 36) + sign('Camp', 69)
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep ruins', 2) + sign('Ruins', 33) + sign('Camp', 62)
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
@@ -187,7 +187,7 @@ function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) retur
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return 'Your turn: one action. Tap or drag what glows.' + best;
+  return 'Your turn: one main action. Starting cards are free. Tap or drag what glows.' + best;
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {

@@ -121,6 +121,7 @@ function guidedSteps() {
   const step = (id, title, say, target, wait, extra) => Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {});
   const site = lv => tsel('.site.l' + lv + '.glow');
   const isSite = lv => a => a.what === 'site' && G.sites[a.x] && G.sites[a.x].lvl === lv;
+  const site2 = () => $('.site.l2') || $('#map');
   const selSite = () => tq(() => $('.site.sel'));
   const mine = id => (G.sites.findIndex(x => x.occ === 0 && x.guard) === -1 ? null : $(`.site[data-i="${G.sites.findIndex(x => x.occ === 0 && x.guard)}"]`));
   const artNoQ = () => {   /* put an artifact whose effect asks nothing in the last market slot, so the next step can follow at once */
@@ -128,16 +129,18 @@ function guidedSteps() {
     for (const id of ids) { const H = VG.clone(G); H.row[5] = id; const pp = H.p[0]; pp.res.compass = 9; const m = VG.moves(H).find(x => x.t === 'buy' && x.r === 5); if (!m) continue; VG.apply(H, m); if (!H.q) { const k = G.arts.indexOf(id); if (k >= 0) G.arts[k] = G.row[5]; G.row[5] = id; return V.CARDS[id].cost; } }
     return 3; };
   return [
-    step('g-turn', 'One action', 'Each turn: one action, then Tamsin moves.', tq('#opp'), null),
-    step('g-play', 'Play a card', 'Tap Trail Notes in your hand.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
-    step('g-play2', 'Play a card', 'Tap it again to play it: plus 1 compass.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+    step('g-play', 'Free cards', 'Starting cards are free to play. Tap Trail Notes.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
+    step('g-play2', 'Free cards', 'Tap it again: plus 1 compass. Your turn goes on.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
       { ready: () => tmine() && !!$('#hand .cd.sel') }),
-    step('g-travel', 'Travel', 'Sites show travel icons. Each card pays one icon.', tq('#map'), null),
+    step('g-turn', 'One main action', 'Then one main action, like a dig. Then Tamsin moves.', tq('#opp'), null),
+    step('g-travel', 'Travel', 'Each card pays one icon; Jeep or Boat also pay a Boot.', tq('#map'), null),
+    step('g-plane', 'Plane', 'No matching card? 2 coins buy a Plane: any icon.', tq('#map'), null),
     step('g-dig', 'Dig at a camp', 'Tap a glowing camp site to send an explorer.', site(0), { type: 'tap', match: isSite(0) }, { ready: () => tmine() && !!$('.site.l0.glow') }),
     step('g-dig2', 'Dig at a camp', 'Tap it again: your card pays, you take its goods.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'dig' }),
     step('g-disc', 'Discover a ruin', 'Ruins cost 3 compasses plus travel. Tap a glowing ruin.', site(1), { type: 'tap', match: isSite(1) },
       { onEnter: () => TOP_UP({ compass: 3, coin: 2 }), ready: () => tmine() && !!$('.site.l1.glow') }),
     step('g-disc2', 'Discover a ruin', 'Tap it again to explore it.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }),
+    step('g-deep', 'Deep ruins', 'Deep ruins, at the top, cost 6 compasses to discover.', tq(site2), null),
     step('g-idol', 'Idols', 'You found an idol: 3 points, and a gift now.', tq('#extra'), null),
     step('g-guard', 'A guardian wakes', 'A guardian woke here. Beat it, or take Dread later.', tq(mine), null),
     step('g-beat', 'Overcome it', 'Pay its cost to beat it. Tap the guardian site.', tq(mine), { type: 'tap', match: a => a.what === 'site' },
@@ -153,7 +156,7 @@ function guidedSteps() {
     step('g-art2', 'Buy an artifact', 'Tap again to buy it and use it now.', tq(() => $('#row .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }),
     step('g-res', 'Research', 'Pay to climb the magnifier. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
       { onEnter: () => TOP_UP(V.TRACK[G.p[0].glass + 1].cost) }),
-    step('g-res2', 'Research', 'Tap again: up one row, take its bonus.', tq(() => $('#gobtn') || $('#track')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' }),
+    step('g-res2', 'Research', 'Tap the Climb button: up one row, take its bonus.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' }, { ready: () => tmine() && !!$('#gobtn') }),
     step('g-note', 'Notebook', 'The notebook follows, but never passes the magnifier.', tq('#track'), null),
     step('g-temple', 'Temple', 'At the top, buy temple tiles for big points.', tq('#track'), null),
     step('g-fear', 'Dread', 'Beside a guardian at round end? Take a Dread card.', tq('#hand'), null),
@@ -167,9 +170,9 @@ function tutSteps() {
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs .rplayers')) || $('#opp');
   return [
     { id: 'goal', title: 'How to win', say: 'Most points after the last round wins.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
-    { id: 'hand', title: 'Your first move', say: 'Each turn you do one thing. Tap Trail Notes in your hand.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+    { id: 'hand', title: 'Your first move', say: 'Starting cards are free to play. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
-    { id: 'play', title: 'Your first move', say: 'It gives 1 compass. Tap it again, or drag it up.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
+    { id: 'play', title: 'Your first move', say: 'Tap it again: plus 1 compass. Your turn goes on.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.sel && UI.sel.k === 'hand' && $('#hand .cd.sel')), onEnter: () => { CO.seen.play = 1; } },
     ...(GUIDED ? guidedSteps() : []),
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
@@ -233,3 +236,11 @@ function boot() {
 }
 window.UI = UI; Object.defineProperty(window, 'G', { get: () => G, configurable: true });
 boot();
+/* G2 review R4: in a guided step only the step's target glows; every other glow goes quiet (class gq) so one thing asks for the tap */
+setInterval(() => {
+  const on = typeof GXT !== 'undefined' && UI.mode === 'tutorial' && GXT.active() && !UI.coachFree;
+  document.body.classList.toggle('vg-guided', !!on);
+  let t = null; if (on) { try { const st = GXT.current(); t = st && typeof st.target === 'function' ? st.target() : null; } catch (x) { t = null; } }
+  document.querySelectorAll('.glow').forEach(e => e.classList.toggle('gq', !!on && !(t && (t === e || t.contains(e) || e.contains(t)))));
+  if (!on) document.querySelectorAll('.gq').forEach(e => e.classList.remove('gq'));
+}, 200);

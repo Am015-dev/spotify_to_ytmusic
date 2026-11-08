@@ -1,5 +1,5 @@
 /* Vinegrave computer explorers: one-step simulation of every legal move scored by a value function (points now + resources + deck + position).
-   easy = noisy, short-sighted · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
+   easy = noisy (2.6: a sensible new player wins ~half, bench-newplayer.js) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
@@ -57,7 +57,7 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 1.6 : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 2.6 : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];

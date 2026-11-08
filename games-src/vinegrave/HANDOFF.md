@@ -1,3 +1,12 @@
+# G2 fix (8 Nov 2026): review G2-gameplay 5.9 FAIL fixes (not deployed)
+- Rule: starting coin / compass cards (t:'basic') are FREE actions (engine.js apply + moves `free:true`); logic-test B1/B2/B3/B11/H1 updated, H1b/H1c added (112/112).
+- Tutorial: g-play steps say "Starting cards are free"; g-turn = one main action; new g-plane (2 coins = any icon), g-deep (6 compasses), Jeep/Boat pay Boot;
+  g-res2 spotlights and names the Climb button (was a dead "Tap again"). Guided steps: only the target glows (ui4 interval adds .gq to other glows).
+- Default rival = easy (UI.opts.lvl); easy noise 1.6 -> 2.6. `node bench-newplayer.js 200 easy`: sensible new player wins 52% (was 34%; normal 26%).
+- Phone: site names, research label, Camp/Ruins signs 14px (were 11px); map sites moved up so camp labels stay on the map; hand fits at 375x667.
+- guided-tut-test now also checks every highlighted target answers ONE tap (waits out the tutor's 600 ms ghost-tap guard like a person).
+- Left: market cards on the board still show icons only (no words) at phone size.
+
 # W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
 - Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,
   tidewake (`python3 reuse-art.py`; table in ASSETS.md). Guardians renamed to match their new figures (data.js GU names).

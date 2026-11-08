@@ -13,7 +13,7 @@ Deck-building + worker placement jungle expedition, 1-4 explorers, 5 rounds.
   temple (row 8) the research action buys temple tiles (11 / 6 / 2 points).
 - Free actions: guardian boons (once each), one idol per turn into a shrine (instant boon; idols score 3 either way, each slot once).
 - End of round: explorers return; one still sharing a site with an unbeaten guardian brings home a Dread card (to discard).
-  Played cards to discard, unplayed cards stay in hand, draw up to 5. Market of 6: round r has 6-r items then artifacts; at round end
+  Played cards are shuffled and put under the deck (engine endRound; logic-test B11), unplayed cards stay in hand, draw up to 5. Market of 6: round r has 6-r items then artifacts; at round end
   the item and the artifact beside the divide leave (exiled) and the row refills with one more artifact slot.
 - Research: magnifier first, notebook follows but never passes it and never enters the temple row; only the magnifier reaches the temple.
 - Temple tiles: 6 points (2 tablets + 1 jewel, 8 tiles), 6 points (1 jewel + 2 arrowheads, 8), 11 points (all of it, 4).
@@ -35,7 +35,7 @@ Checked against a rulebook summary page found online (no rulebook text or art co
 starting resources by turn order; idols always score 3 (shrine use is a free one-time boon, each slot once); the notebook may not
 enter the temple row; magnifier temple points by order of arrival; three temple stacks (6 / 6 / 11, the 11 needs both 6-point costs);
 at round end the item AND the artifact beside the moon-staff divide leave; tie-break = first into the temple, then research.
-Confirmed as built: 5 rounds, one main action then pass, keep or discard hand cards (we keep all: the rulebook calls discarding rarely
+Confirmed as built: 5 rounds, one main action then pass (the two starting coin / compass cards are free actions: logic-test H1, H1b), keep or discard hand cards (we keep all: the rulebook calls discarding rarely
 useful), Dread for each explorer taken back from a guardian's site, guardians 5 points, bought items to the bottom of the deck, artifacts
 to the play area with a free use, artifacts from hand cost their tablet, 2 Dread in each starting deck.
 Now built: first-arrival research rewards (only the first magnifier on rows 2, 4, 6, 7; every arrival still gets the row bonus) and the
