@@ -8,12 +8,12 @@ const SHIPS={
   talon:{n:'Talon light fighter',model:'shard',atk:2,agi:3,hull:3,sh:0,acts:['F','BR','E'],dial:dialFrom([[0,0,0,0,0,0],[1,0,0,0,1,0],[1,2,2,2,1,0],[1,1,2,1,1,3],[0,0,1,0,0,3],[0,0,1,0,0,0]])}};
 // ability keys (ab) are implemented in engine hooks; t is the card text shown to players
 const PILOTS={
-  kael:{n:'Kael Varro',ship:'lancer',ps:8,pts:28,u:['T','Tp','M'],uniq:1,uid:'kael',ab:'kael',t:'When defending, you may change 1 of your focus results to an evade result.'},
-  brink:{n:'Tomas Brink',ship:'lancer',ps:5,pts:25,u:['Tp','M'],uniq:1,ab:'brink',t:'Other friendly ships at range 1 cannot be attacked if the attacker could attack you instead.'},
+  kael:{n:'Kael Varro',ship:'lancer',ps:8,pts:28,u:['T','Tp','M'],uniq:1,uid:'kael',ab:'kael',t:'When defending, you may turn 1 focus result into an evade.'},
+  brink:{n:'Tomas Brink',ship:'lancer',ps:5,pts:25,u:['Tp','M'],uniq:1,ab:'brink',t:'Friends at range 1 are safe if the attacker could hit you instead.'},
   ember:{n:'Ember Squadron Pilot',ship:'lancer',ps:4,pts:23,u:['Tp','M']},
   cadet:{n:'Cadet Pilot',ship:'lancer',ps:2,pts:21,u:['Tp','M']},
   knife:{n:'"Knifepoint"',ship:'talon',ps:7,pts:17,u:['T'],uniq:1,ab:'knife',t:'When attacking at range 1, roll 1 additional attack die.'},
-  hex:{n:'"Hex"',ship:'talon',ps:6,pts:16,u:[],uniq:1,ab:'hex',t:'When defending, ships attacking you cannot spend focus tokens or reroll attack dice.'},
+  hex:{n:'"Hex"',ship:'talon',ps:6,pts:16,u:[],uniq:1,ab:'hex',t:'When you defend, attackers cannot spend focus or reroll dice.'},
   nightjar:{n:'"Nightjar"',ship:'talon',ps:5,pts:15,u:[],uniq:1,ab:'nightjar',t:'After you fly a green maneuver, you may take a free focus action.'},
   onyx:{n:'Onyx Squadron Pilot',ship:'talon',ps:4,pts:14,u:['T']},
   slate:{n:'Slate Squadron Pilot',ship:'talon',ps:3,pts:13,u:[]},
@@ -65,10 +65,10 @@ const SIZES=[
   {k:'std',n:'Standard 100',d:'random 100-point squadrons',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))},
   {k:'custom',n:'Custom squads',d:'build both squadrons yourself (100 points)',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))}];
 var RULES_HTML=`<p>Each round has four steps. The step bar shows where you are.</p>
-<h3>1. Plan</h3><p>Secretly choose a maneuver for every ship on its dial. White is normal, <b>green</b> is easy (clears a stress token), <b>red</b> is hard (gives a stress token). A stressed ship can't fly red maneuvers or take actions.</p>
-<h3>2. Move</h3><p>Ships reveal and fly their maneuvers from the <b>lowest pilot skill up</b>, so skilled pilots react to what they see. After moving, each ship takes one action: focus, evade, target lock, barrel roll or boost. Bumping into a ship stops you short and skips your action; flying through an asteroid rolls a damage die and skips your action; leaving the battlefield destroys you.</p>
-<h3>3. Combat</h3><p>From the <b>highest pilot skill down</b>, each ship may attack one enemy in its firing arc at range 1-3. Roll attack dice equal to the weapon value (+1 at range 1); the defender rolls agility (+1 at range 3 or when an asteroid is in the way). Focus turns focus results into hits or evades; a target lock lets you reroll. Each evade cancels a hit (hits before crits). Damage strips shields first, then hull; crits are dealt face up with lasting effects.</p>
+<h3>1. Plan</h3><p>Secretly pick a maneuver for every ship on its dial. White moves are normal. <b>Green</b> is easy and clears a stress token. <b>Red</b> is hard and gives a stress token. A stressed ship can't fly red or take actions.</p>
+<h3>2. Move</h3><p>Ships reveal and fly, <b>lowest pilot skill first</b>. So skilled pilots react to what they see. After moving, each ship takes one action. Actions: focus, evade, target lock, barrel roll or boost. Bumping a ship stops you short and skips your action. Flying through an asteroid rolls a damage die. It also skips your action. Leaving the battlefield destroys your ship.</p>
+<h3>3. Combat</h3><p>Ships shoot <b>highest pilot skill first</b>. Each may attack one enemy in its arc at range 1-3. Roll attack dice equal to the weapon value, +1 at range 1. The defender rolls agility dice. Add 1 at range 3 or past an asteroid. Focus turns focus results into hits or evades. A target lock lets you reroll. Each evade cancels a hit, hits before crits. Damage takes shields first, then hull. Crits are dealt face up with lasting effects.</p>
 <h3>4. End</h3><p>Unused focus and evade tokens are removed; target locks stay.</p>
-<p>Destroy every enemy ship to win. Pilot skill ties: the side with initiative (fewer squad points; on equal points the second-named side) moves and fires first.</p>
-<p><b>Kept simple:</b> asteroids go on fixed grid spots, ships deploy from set positions facing the enemy, a barrel roll slides in five steps, a battle ends after 100 rounds, and the computer picks the weakest maneuver for your stressed ship.</p>
-<p><b>Controls:</b> drag the view to orbit, right-drag or two fingers to pan, wheel or pinch to zoom, T for top-down, Enter for the highlighted button, 1-9 for listed choices, S to skip.</p>`;
+<p>Destroy every enemy ship to win. Tied pilot skill: the side with initiative goes first. Initiative goes to fewer squad points. On equal points, the second side has it.</p>
+<p><b>Kept simple:</b> asteroids go on fixed grid spots. Ships start in set spots facing the enemy. A barrel roll slides in five steps. A battle ends after 100 rounds. The computer picks the weakest move for a stressed ship.</p>
+<p><b>Controls:</b> drag to orbit. Right-drag or two fingers to pan. Wheel or pinch to zoom. T for top-down, Enter for the lit button. 1-9 pick listed choices, S skips.</p>`;

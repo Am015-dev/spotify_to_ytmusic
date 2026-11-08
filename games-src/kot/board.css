@@ -34,7 +34,7 @@ html.ph #btip p{margin:3px 0 0;font-size:14px;line-height:1.3}
 html.ph .pchip.bump{animation:chipBump .55s ease-out}
 html.ph .pchip.bump-h em.h,html.ph .pchip.bump-v em.v,html.ph .pchip.bump-e em.e{animation:numPop .55s ease-out}
 @keyframes chipBump{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
-@keyframes numPop{0%{transform:scale(1)}35%{transform:scale(1.7)}100%{transform:scale(1)}}
+@keyframes numPop{0%{transform:none;filter:none}35%{transform:translateY(-4px);filter:brightness(1.6)}100%{transform:none;filter:none}}
 html.ph .pchip em{display:inline-block}
 /* the reroll: dice tumble in and land one by one */
 html.ph .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
@@ -176,3 +176,47 @@ html.ph-p #bfrace .l{color:#c9f0ff;overflow:hidden;text-overflow:ellipsis;min-wi
   html .dlg.paper .mast span,html .dlg.paper .cols p{font-size:14px}
 }
 html.ph-p header.gx-bar .pchip span em::first-letter{font-size:11px;letter-spacing:0}
+
+/* W467 round 2: phone text floor 14px (drawers, choices, monster cards); the crown icon hides its emoji text instead of a 0px font */
+:is(html.ph .small,html.ph small,html.ph .st2,html.ph .mc,html.ph .muted,html.ph #choice p,html.ph .pchip i,html.ph .pcard small):not(.menu *):not(#title *){font-size:max(14px,1em)!important}
+html.sk-crown .crn,html.sk-crown .pchip .crn{font-size:14px!important;line-height:15px;overflow:hidden;text-indent:40px;white-space:nowrap;color:transparent}
+/* Play with Hints off is clean on desktop too: the side panel's tips show only with Hints on */
+html:not(.pp-hints) #pmsg,html.cc-tut #pmsg{display:none}
+
+/* W467: card text clauses, one per line */
+.cl{display:block}
+html.ph .pchip.ko span,html.ph .pchip span{font-size:max(14px,1em)!important}
+/* W467 round 2: ui-audit B/E/F/A/C */
+/* 2D board (no-WebGL fallback): every label gets a halo against the busy map, no faded text */
+svg#map text{opacity:1!important;paint-order:stroke fill;stroke:#fffaf0;stroke-width:4px;stroke-linejoin:round}
+svg#map text[fill="#fff"],svg#map text[fill="#ffd23f"],svg#map text[fill="#4cff9f"],svg#map text[fill="#fff3cf"],svg#map text[fill="#e0c3ff"],svg#map text[fill="#4cc9f0"],svg#map text[fill="#ffb3a7"],svg#map text[fill="#f2e4c9"],svg#map text[fill="#2ec27e"],svg#map text[fill="#f4a300"],svg#map text[fill="#e63946"],svg#map text[fill="#ff5a5f"],svg#map text[fill="#3a86ff"]{stroke:#1a1320}
+/* menu rows on the painted skin: text sits on a solid plate, toggles are ink on cream */
+html.sk .menu .btn.mrow>span,html.sk .menu .btn.mrow>small,html.sk .menu .btn>small,html.sk .menu .btn>span,html.sk #gxhset .mrow>span{background:#1a1320;border-radius:6px;padding:0 5px;color:#fff7dd}
+.menu .mrow span .btn{background:#fff7dd!important;color:#1a1320!important;text-shadow:none!important}
+html.sk #gxhset .btn{color:#fff7dd!important;text-shadow:0 0 3px #000,0 0 3px #000!important}
+/* action buttons: the count under the label gets the same dark plate as the label */
+html.sk #pacts .btn .bl{background:rgba(50,14,0,.85)}
+html.sk #pacts .btn small{background:rgba(50,14,0,.85);border-radius:6px;padding:0 6px;color:#fff;text-shadow:none}
+html.ph .pchip span em{background:#fffdf5!important}
+/* Play with Hints off: no first-time help bubbles or tooltips (one instruction line only) */
+html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail),html:not(.pp-hints) .gxh-tt:not(#arttail *){display:none!important}
+/* desktop: secondary text 16px */
+html:not(.ph) :is(.menu .btn small,#title small,details.custom .small,#modal p.small,.gxc-act small){font-size:16px!important}
+/* campaign header art at its natural scale (it was stretched 2-3x) */
+.gxc .gxc-head{background-size:auto 88px!important;background-repeat:repeat-x!important;background-position:center bottom!important}
+html.sk #pacts .btn{color:#fff}
+html:not(.ph) #obact #pacts .btn,html:not(.ph) #pacts .btn{text-shadow:0 0 4px #000,0 0 4px #000,0 0 2px #000}
+.gx-dock-head .gx-ibtn{color:#1a1320!important}
+#dockbody #banner b{color:#1a1320}
+html.ph .pchip span em{font-variant-emoji:text}
+html:not(.ph) .btn small{font-size:16px!important}
+.menu,.menu *,#title .btn span,.pchip em{font-variant-emoji:text}
+.menu .mrow span .btn,html.sk #gxhset .btn{border-image-source:none!important;border-color:#1a1320!important;background:#fff7dd!important;color:#1a1320!important;text-shadow:none!important}
+/* W467 desktop: goal card, preview line and panel title readable at 1440 */
+html:not(.ph) #choice .intro .goal .aim{font-size:20px;font-weight:800;margin:4px 0 8px}
+html:not(.ph) #choice .intro .goal .how{margin:0;padding:0 0 0 4px;list-style:none;display:grid;gap:6px}
+html:not(.ph) #choice .intro .goal .how li{position:relative;padding-left:22px;font-size:17px;line-height:1.35}
+html:not(.ph) #choice .intro .goal .how li::before{content:'';position:absolute;left:4px;top:.45em;width:10px;height:10px;border-radius:50%;background:#ffd23f;box-shadow:0 0 0 2px #1a1320}
+html:not(.ph) #choice .intro .you span{font-size:18px}
+html:not(.ph) #ob #preview{font-size:16px}
+html:not(.ph) .gx-dock-head .gx-dt{background:rgba(26,19,32,.88);color:#fff7dd;border-radius:8px;padding:3px 8px}

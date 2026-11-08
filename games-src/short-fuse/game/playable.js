@@ -40,11 +40,11 @@ function plLines(n0){const out=[];for(const e of G.log){if(e.i<=n0)break;if(e.c=
 (function(){const o=applyMove;applyMove=function(m,seat){if(!G||G.over)return o(m,seat);const n0=G.logN,c0=plCut(),d0=G.dial;const r=o(m,seat);
   try{if(r&&r.success!==false&&G){const L=plLines(n0);if(L.length&&!(m.a==='q'&&!L.length)){const first=L[0],bad=L.some(e=>e.c==='bad'),good=L.some(e=>e.c==='good');
       let t=plain(L.slice(0,2).map(e=>e.t).join(' '));if(t.length>84){const rs=L.find(e=>/^(Hit|Miss)/.test(e.t));t=plain((rs||L[0]).t)}let hold=plRead(t);if(m.a==='q'||!L.length)hold=0;
-      if(hold){const say=document.getElementById('say');TBL.sayT=0;setSay(t,hold);if(say){say.classList.toggle('badc',bad&&!good);say.classList.toggle('goodc',good&&!bad);setTimeout(()=>say.classList.remove('badc','goodc'),hold)}}
+      if(hold&&ANIM){hold=0;UI.aiNotBefore=Math.max(UI.aiNotBefore||0,Date.now()+Math.max(300,1600/(UI.speed||1)))}void bad;void good;void t;
       const dc=plCut()-c0;let pop=null;
       if(dc>0)pop=['+'+dc,dc>=3?'wires cut':(m.a==='solo'?'solo cut: no guessing needed':'a match: both wires cut'),'good'];
       else if(G.dial!=null&&d0!=null&&G.dial<d0)pop=['Fuse −'+(d0-G.dial),'a miss: nobody cut','bad'];
-      if(pop)plPop(pop[0],pop[1],pop[2]);if(hold)plWait()}}}catch(e){console.error(e)}return r}})();
+      if(pop)plPop(pop[0],pop[1],pop[2]);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}}}}catch(e){console.error(e)}return r}})();
 // ---------- (d) the score pop ----------
 function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tut&&false)return;let p=document.getElementById('spop');if(!p){p=document.createElement('div');p.id='spop';p.setAttribute('aria-hidden','true');p.setAttribute('data-help','');tb.appendChild(p)}
   p.className='';p.innerHTML='<b>'+esc(big)+'</b>';if(cls==='good')plTick(18);void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1500/(UI.speed||1)))}

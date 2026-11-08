@@ -256,3 +256,11 @@ const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(thi
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
+// the open "More" menu sits on a dim backdrop: the page behind reads as covered, a tap on the backdrop closes the menu
+{const o=toggleMenu;toggleMenu=function(open){const r=o.apply(this,arguments);try{const m=document.getElementById('more');if(!m)return r;let bk=document.getElementById('na-moreback');
+  if(m.classList.contains('open')){let z=parseInt(getComputedStyle(m).zIndex,10);if(!(z>1)){z=60;m.style.zIndex=z}
+    if(!bk){bk=document.createElement('div');bk.id='na-moreback';bk.setAttribute('aria-hidden','true');bk.addEventListener('click',e=>{e.stopPropagation();toggleMenu(false)});document.body.appendChild(bk)}
+    bk.style.cssText='position:fixed;inset:0;background:rgba(4,4,14,.55);z-index:'+(z-1);if(m.parentElement&&getComputedStyle(m.parentElement).zIndex!=='auto'){const pz=parseInt(getComputedStyle(m.parentElement).zIndex,10);bk.style.zIndex=String(Math.max(0,pz-1))}bk.hidden=false}
+  else if(bk)bk.hidden=true}catch(e){}return r}}
+// a timed banner closes on the player's first tap (owner rule: "stays until tapped, or 4 s + 1 s per 10 words"), so it never hides the moves
+document.addEventListener('pointerdown',()=>{const b=document.getElementById('bfban');if(b&&!b.hidden&&BF.banMs<1e9){clearTimeout(BF.banT);b.hidden=true;BF.banUntil=0;BF.banQ=[]}},true);

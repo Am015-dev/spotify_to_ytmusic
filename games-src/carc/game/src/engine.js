@@ -21,7 +21,7 @@ const isRiver=t=>TT[t].V.length>0;
 const FIGN={f:'follower',big:'champion',bld:'mason',pig:'hog'};
 const ROLE={C:'follower',R:'follower',M:'follower',F:'farmer'};
 const FEAT={C:'town',R:'road',M:'priory',F:'field'};
-const SETN={base:'Base game',river:'The Riverlands',ic:'Taverns & Basilicas',tb:'Merchants & Masons'};
+const SETN={base:'Base game',river:'River',ic:'Taverns',tb:'Merchants'};
 const GOODS=['wine','grain','cloth'];
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);const ex=Object.assign({river:false,ic:false,tb:false},o.ex||{});
@@ -37,9 +37,9 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
     if(d.set==='river'&&ex.river){if(d.spring)spring=t;else if(d.lake)lake=t;else for(let c=0;c<d.c;c++)river.push(t)}});
   G.stack=shuffle(main);G.total=main.length+(ex.river?river.length+2:1);
   if(o.stack){G.stack=o.stack.slice();G.total=o.stack.length+1}   // the staged tutorial: a fixed tile order
-  if(ex.river){G.rstack=shuffle(river);G.lake=lake;place(spring,0,0,0);G.rv={x:0,y:0,d:1,lt:0};lg('The river rises at its spring. River tiles come first; each must carry the river on, and it may not turn the same way twice in a row.','big')}
+  if(ex.river){G.rstack=shuffle(river);G.lake=lake;place(spring,0,0,0);G.rv={x:0,y:0,d:1,lt:0};lg('The river rises at its spring. River tiles come first. Each must continue the river. It cannot turn the same way twice.','big')}
   else place(start,0,0,0);
-  G.cur={p:G.np-1};lg(`A new valley waits for ${np} settlers${exList()}.`,'big');nextPlayer(true);if(typeof refresh==='function')refresh()}
+  G.cur={p:G.np-1};lg(`A new game for ${np} players${exList()}.`,'big');nextPlayer(true);if(typeof refresh==='function')refresh()}
 function exList(){const l=Object.keys(G.ex).filter(k=>G.ex[k]).map(k=>SETN[k]);return l.length?' with '+l.join(', '):''}
 // ---------- union-find over segments ----------
 function find(a){let r=a;while(G.par[r]!==r)r=G.par[r];while(G.par[a]!==r){const n=G.par[a];G.par[a]=r;a=n}return r}
@@ -82,18 +82,18 @@ function nextPlayer(first){const p=first?0:(G.cur.p+1)%G.np;startTurn(p,false)}
 function startTurn(p,bonus){if(G.over)return;let t;
   while(true){t=drawNext();if(t==null){finish();return}
     if(legalPlacements(t).length)break;
-    if(isRiver(t)&&G.rstack.length&&G.rstack.some(x=>x!==t)){G.rstack.push(t);lg(`The river tile “${TT[t].n}” fits nowhere yet; it goes back under the river pile.`);continue}
-    G.disc.push(t);G.stats.discards++;lg(`No legal place for “${TT[t].n}”: it is set aside and a new tile is drawn.`,'bad');fx('discard')}
+    if(isRiver(t)&&G.rstack.length&&G.rstack.some(x=>x!==t)){G.rstack.push(t);lg(`The river tile “${TT[t].n}” fits nowhere yet. It goes back in the river pile.`);continue}
+    G.disc.push(t);G.stats.discards++;lg(`“${TT[t].n}” fits nowhere. It is set aside and you draw again.`,'bad');fx('discard')}
   G.turn++;G.cur={p,t,bonus:!!bonus,k:null,bonusEarned:false,figPlaced:null,scored:[]};G.step='place';
   if(!G.halfway&&tilesLeft()<=Math.floor(G.total/2)){G.halfway=true;storyBeat('half')}
-  lg(`— ${P(p).nm}${bonus?' (mason’s extra turn)':''} draws “${TT[t].n}” —`,'turn');fx('turn',p)}
+  lg(`${P(p).nm} draws “${TT[t].n}”${bonus?' (extra turn)':''}.`,'turn');fx('turn',p)}
 function doPlace(m){const c=G.cur,p=P(c.p),t=c.t;const wasRv=isRiver(t)&&G.rv?riverTurn(t,m.r):null;
   place(t,m.r,m.x,m.y);c.k=key(m.x,m.y);G.step='fig';
   if(wasRv){if(TT[t].V[0].length===1)G.rv=null;else G.rv={x:m.x,y:m.y,d:wasRv.nd,lt:wasRv.lt||G.rv.lt}}
-  if(TT[t].lake){lg('The river reaches its pond. Now the ordinary tiles begin.','big')}
+  if(TT[t].lake){lg('The river ends at the pond. Normal tiles come next.','big')}
   lg(`${p.nm} places “${TT[t].n}”.`);fx('place',c.k);
   // mason: does this tile extend the road/town that holds my mason?
-  if(G.ex.tb&&!c.bonus){const b=G.figs.find(f=>f.p===c.p&&f.k==='bld');if(b){const T=G.tiles[c.k];const br=find(b.s);if(TSEG[t].some((s,i)=>(s.ty==='C'||s.ty==='R')&&find(T.s0+i)===br)){c.bonusEarned=true;lg(`🔨 ${p.nm}’s mason works on: an extra turn after this one.`,'good')}}}
+  if(G.ex.tb&&!c.bonus){const b=G.figs.find(f=>f.p===c.p&&f.k==='bld');if(b){const T=G.tiles[c.k];const br=find(b.s);if(TSEG[t].some((s,i)=>(s.ty==='C'||s.ty==='R')&&find(T.s0+i)===br)){c.bonusEarned=true;lg(`${p.nm}’s mason earns an extra turn after this one.`,'good')}}}
   if(!figMoves(c.p).some(x=>x.act==='fig')){finishTurn()}}
 function figMoves(pi){const c=G.cur,p=P(pi),T=G.tiles[c.k],o=[{act:'skip'}];if(!T)return o;
   TSEG[T.t].forEach((s,i)=>{const root=find(T.s0+i),fs=figsIn(root);
@@ -104,7 +104,7 @@ function figMoves(pi){const c=G.cur,p=P(pi),T=G.tiles[c.k],o=[{act:'skip'}];if(!
   return o}
 function figsIn(root){return G.figs.filter(f=>find(f.s)===root)}
 function doFig(m){const c=G.cur,p=P(c.p),T=G.tiles[c.k];const s=TSEG[T.t][m.l];p.sup[m.k]--;G.figs.push({p:c.p,k:m.k,s:T.s0+m.l});c.figPlaced={k:m.k,l:m.l};
-  lg(`${p.nm} sets a ${m.k==='f'?ROLE[s.ty]:FIGN[m.k]+(m.k==='big'?' ('+ROLE[s.ty]+')':'')} on the ${FEAT[s.ty]}.`);fx('fig',c.k);finishTurn()}
+  lg(`${p.nm} puts a ${m.k==='f'?ROLE[s.ty]:FIGN[m.k]+(m.k==='big'?' ('+ROLE[s.ty]+')':'')} on the ${FEAT[s.ty]}.`);fx('fig',c.k);finishTurn()}
 function finishTurn(){const c=G.cur;scoreAfter();G.step=null;
   if(c.bonusEarned&&tilesLeft()>0){G.stats.bonus++;startTurn(c.p,true);return}
   nextPlayer(false)}
@@ -123,17 +123,17 @@ function complete(r){const F=G.fd[r];F.done=1;const fs=figsIn(r),win=majority(fs
   const cat=F.ty==='C'?'town':F.ty==='R'?'road':'priory';G.stats.scored[cat+(F.cat?'+basilica':F.inn?'+tavern':'')]=(G.stats.scored[cat+(F.cat?'+basilica':F.inn?'+tavern':'')]||0)+1;
   const what=F.ty==='C'?`town of ${F.tiles.length} tile${F.tiles.length>1?'s':''}${F.pen?` and ${F.pen} banner${F.pen>1?'s':''}`:''}${F.cat?' with a basilica':''}`:F.ty==='R'?`road of ${F.tiles.length} tile${F.tiles.length>1?'s':''}${F.inn?' with a tavern':''}`:'priory';
   for(const w of win){P(w).score+=pts;P(w).sc[cat==='priory'?'priory':cat]+=pts}
-  if(win.length){lg(`✔ The ${what} is finished: ${win.map(w=>P(w).nm).join(' and ')} score${win.length>1?'':'s'} ${pts}.`,'good');fx('score',{r,pts,win,by:c.p,fs:fs.map(f=>[f.p,f.k])})}
-  else if(F.ty!=='M')lg(`The ${what} is finished, but nobody stands in it.`);
+  if(win.length){lg(`The ${what} is finished. ${win.map(w=>P(w).nm).join(' and ')} score${win.length>1?'':'s'} ${pts}.`,'good');fx('score',{r,pts,win,by:c.p,fs:fs.map(f=>[f.p,f.k])})}
+  else if(F.ty!=='M')lg(`The ${what} is finished. Nobody has a follower there.`);
   if(F.ty==='C'&&win.length&&pts>=16)storyBeat('bigtown',{win,pts});
   // merchants: whoever closes a town takes its goods
-  if(F.ty==='C'&&G.ex.tb){const got=GOODS.filter(g=>F.gd[g]);if(got.length){const p=P(c.p);for(const g of GOODS)p.goods[g]+=F.gd[g];lg(`🧺 ${p.nm} closed it and takes ${got.map(g=>F.gd[g]+' '+g).join(', ')}.`,'good');fx('goods',c.p)}}
+  if(F.ty==='C'&&G.ex.tb){const got=GOODS.filter(g=>F.gd[g]);if(got.length){const p=P(c.p);for(const g of GOODS)p.goods[g]+=F.gd[g];lg(`${p.nm} finished it and takes ${got.map(g=>F.gd[g]+' '+g).join(', ')}.`,'good');fx('goods',c.p)}}
   // everyone standing in it goes home (masons too)
   for(const f of fs){P(f.p).sup[f.k]++;G.figs.splice(G.figs.indexOf(f),1)}
   if(fs.length)fx('home',r);c.scored.push({r,pts,win,ty:F.ty})}
 function storyBeat(kind,d){let t='';
   if(kind==='half')t='Half the tiles are down. Smoke rises from new hearths, and the valley is starting to look like a country.';
-  if(kind==='bigtown')t=`The walls of the great town close: ${d.win.map(w=>P(w).nm).join(' and ')}’s followers claim ${d.pts} points.`;
+  if(kind==='bigtown')t=`A big town is finished. ${d.win.map(w=>P(w).nm).join(' and ')} score ${d.pts} points.`;
   G.story.push({t,n:G.turn});lg('📜 '+t,'story');fx('story',t)}
 // ---------- final scoring ----------
 function fieldCities(F){const s=new Set();for(const c of F.ct){const r=find(c);if(G.fd[r].done)s.add(r)}return s}
@@ -149,10 +149,10 @@ function finish(){if(G.over)return;G.step=null;const {add,det}=finalScores();
     else{const F=G.fd[d.r];const k='end-'+(d.ty==='C'?'town':d.ty==='R'?'road':'priory');G.stats.scored[k]=(G.stats.scored[k]||0)+1;if(F.cat||F.inn)G.stats.scored[k+'-zero']=(G.stats.scored[k+'-zero']||0)+1}}
   if(G.ex.tb&&G.pl.some(p=>GOODS.some(g=>p.goods[g])))G.stats.scored['goods-majority']=1;
   for(const p of G.pl){const a=add[p.i];p.end=a;for(const k in a)p.score+=a[k]}
-  lg('The last tile is down. Unfinished roads, towns and priories score, then the farmers are counted.','big');
+  lg('The last tile is down. Unfinished roads, towns and priories score. Then farmers score.','big');
   for(const p of G.pl){const a=p.end;const bits=Object.entries(a).filter(([k,v])=>v).map(([k,v])=>`${k} ${v}`);lg(`${p.nm}: ${bits.length?bits.join(', '):'nothing more'} → ${p.score}.`)}
   const top=Math.max(...G.pl.map(p=>p.score));const w=G.pl.filter(p=>p.score===top);
-  G.over={win:w.map(p=>p.i),scores:G.pl.map(p=>p.score)};G.winner=w.map(p=>p.nm).join(' & ');G.winText=`${G.winner} ${w.length>1?'share the valley':'wins'} with ${top} points.`;lg('🏆 '+G.winText,'big');fx('win')}
+  G.over={win:w.map(p=>p.i),scores:G.pl.map(p=>p.score)};G.winner=w.map(p=>p.nm).join(' & ');G.winText=`${G.winner} ${w.length>1?'tie':'wins'} with ${top} points.`;lg('🏆 '+G.winText,'big');fx('win')}
 // ---------- probe: what a placement would do, without changing anything (for the computer, previews and tests) ----------
 function probe(t,r,x,y){const k=key(x,y),segs=TSEG[t],n=segs.length;const par=[];const node={};let nn=n;for(let i=0;i<n;i++)par.push(i);
   const nodeOf=root=>{if(node[root]==null){node[root]=nn++;par.push(node[root])}return node[root]};
