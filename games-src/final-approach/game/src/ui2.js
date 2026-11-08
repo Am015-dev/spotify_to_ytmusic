@@ -72,9 +72,12 @@ function render() {
       const R = rows[G.round + G.row0];
       w.classList.add('altc');
       const tm = rtEl();
-      w.appendChild(h('div.altnow', h('b', R[0] + ' ft'), tm, h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1]) + ' first')));
-      // one dot per round: blue = Pilot first, orange = Co-pilot first (the line above says the name)
-      const dots = h('div.altdots', { title: 'Round ' + (G.round + 1) + ' of ' + n }); for (let i = 0; i < n; i++) { const Q = rows[i + G.row0]; dots.appendChild(h('i.ad.' + (Q[1] ? 'c' : 'p') + (i === G.round ? '.cur' : i < G.round ? '.past' : '') + (Q[2] ? '.rr' : ''), '')); } w.appendChild(dots);
+      // the turn tracker on phones: round x of y and altitude, whose turn, then each crew's dice left as tokens (owner, 8 Nov 2026)
+      const tt = G.result ? '' : G.phase === 'brief' ? fw(R[1]) + ' first' : who(G.turn) === 'You' ? 'Your turn' : name(G.turn) + "'s turn";
+      w.appendChild(h('div.altnow', h('b', 'R' + (G.round + 1) + '/' + n + ' · ' + R[0] + ' ft'), tm, tt ? h('span.fp.' + ((G.phase === 'brief' ? R[1] : G.turn) ? 'c' : 'p'), tt) : null));
+      const dots = h('div.altdots.ftk', { 'aria-label': 'Dice left: ' + [0, 1].map(s => name(s) + ' ' + FA.unusedDice(G, s).length).join(', ') });
+      for (const s of [0, 1]) { const left = G.phase === 'brief' ? 4 : FA.unusedDice(G, s).length; for (let i = 0; i < G.dice[s].length; i++) dots.appendChild(h('i.dk.' + (s ? 'c' : 'p') + (i < left ? '.on' : ''), '')); if (!s) dots.appendChild(h('i.dsep', '')); }
+      w.appendChild(dots);
     } else {
       const cw = r.alt.w / n;
       for (let i = 0; i < n; i++) { const R = rows[i + G.row0]; const el = h('div.ar' + (i === G.round ? '.cur' : (i < G.round ? '.past' : '')), { style: 'left:' + i * cw + 'px;width:' + cw + 'px;top:' + (isPh() ? 3 : 12) + 'px;bottom:0' }, h('span', String(R[0]), h('u', ' ft'), R[2] ? h('i.rr', { title: 'reroll token' }) : null), h('small', h('i.fpd.' + (R[1] ? 'c' : 'p')), h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1])))); w.appendChild(el); }
@@ -127,6 +130,7 @@ function render() {
   renderDock(); renderBar(); phPost();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
+  if (typeof ftAfter === 'function') try { ftAfter(); } catch (e) { }   // tracker, preview, slot needs, coach pointer (ui11.js)
 }
 function pendLabel() { const p = G.pend; return p.h === 'rr' ? 'Reroll: choose dice' : p.h === 'intern' ? 'Trainee token' : p.h === 'sync' ? 'Cross-check die' : 'Hand-over'; }
 // ---------- what just happened: a short line per move in the dock (the partner's placements included), a slot flash, the plane held back while the speed

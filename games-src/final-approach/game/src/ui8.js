@@ -64,6 +64,7 @@ function roundFx(r, info) {
 function hintsOn() { return !!G && !G.result && (!!UI.hint || UI.mode === 'guided' || (UI.camp ? !!UI.camp.hints : !Object.keys(UI.won || {}).length && G.round < 1)); }
 function ghostPlan() {
   if (typeof tutOn === 'function' && tutOn()) return null;   // the tutorial kit shows its own finger
+  if (UI.fc && !UI.fc.ended) return null;   // the coached flight points with its own glow (part 14)
   const v = actSeat(); if (!hintsOn() || typeof v !== 'number' || v < 0 || !mayAct(v) || G.phase !== 'place' || G.pend || G.turn !== v || UI.dragging) return null;
   const key = G.sid + ':' + G.seed + ':' + G.round + ':' + Object.keys(G.slots).length + ':' + (UI.mode || '');
   if (UI.gk !== key) { UI.gk = key; UI.gm = null; try { const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (m && m.t === 'place' && typeof m.d === 'number') UI.gm = m; } catch (e) { } }
