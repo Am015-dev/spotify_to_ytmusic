@@ -30,6 +30,7 @@ function commit(seat, m) {
   let chip = null; if (m.t === 'place') { try { chip = aiChip(m, seat); } catch (e) { } }
   const r = FA.performMove(G, m, seat); if (!r.ok) { if (mayAct(seat)) toast(r.error); return false; }
   if (chip) showChip(m.to, chip);
+  if (!(UI.fc && !UI.fc.ended)) { UI.cpt = null; UI.askWhy = null; }
   sfxFor(m, was); UI.sel = -1; UI.cof = 0; UI.hint = null; if (m.t === 'rrpick') UI.rrm = [false, false, false, false];
   if (G.round !== was.round) { UI.rt = G.mods.real ? { left: 60000, last: 0 } : null; UI.sel = -1; }
   saveGame(); if (typeof netPush === 'function') netPush(); coachTick(); render(); schedule();

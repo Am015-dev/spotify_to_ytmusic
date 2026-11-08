@@ -71,6 +71,7 @@ function tutLeave() {
 }
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
+  return false;   // Addendum 7: Play is a clean game; the coached flight is only behind the title's Learn button
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
   tutStart({ prologue: true }); return true;
 }

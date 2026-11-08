@@ -186,7 +186,7 @@ function previewKey(v) {
 function trackerEl() {
   const rows = altRows(), n = rows.length - G.row0, R = rows[G.round + G.row0], v = actSeat(), me = typeof v === 'number' && v >= 0 ? v : 0;
   const turn = G.result ? (G.result.win ? 'Landed' : 'Flight over') : G.phase === 'brief' ? 'Briefing: ' + who(R[1]) + (who(R[1]) === 'You' ? ' go' : ' goes') + ' first' : G.pend && G.pend.h === 'rr' ? 'Reroll' : (who(G.turn) === 'You' ? 'Your turn' : name(G.turn) + "'s turn") + ' (' + pname(G.turn) + ')';
-  const toks = s => { const left = FA.unusedDice(G, s).length, tot = G.dice[s].length; const w = h('span.ftd.' + (s ? 'c' : 'p'), { 'aria-label': (who(s) === 'You' ? 'You' : name(s)) + ': ' + left + ' of ' + tot + ' dice left' }, h('em', who(s) === 'You' ? 'You' : name(s)));
+  const toks = s => { const tot = G.dice[s].length, left = G.phase === 'brief' && !G.result ? tot : FA.unusedDice(G, s).length; const w = h('span.ftd.' + (s ? 'c' : 'p'), { 'aria-label': (who(s) === 'You' ? 'You' : name(s)) + ': ' + left + ' of ' + tot + ' dice left' }, h('em', who(s) === 'You' ? 'You' : name(s)));
     for (let i = 0; i < tot; i++) w.appendChild(h('i' + (i < left ? '.on' : ''), '')); return w; };
   return h('div#ftrk', { 'aria-live': 'polite' }, h('b.ftr', 'Round ' + (G.round + 1) + ' of ' + n), h('span.fta', R[0] + ' ft'), h('span.ftt.' + (G.phase === 'place' && !G.result ? (G.turn ? 'c' : 'p') : 'n'), turn), toks(me), toks(1 - me));
 }
@@ -208,16 +208,29 @@ function roShow(a) {
     a.planes !== b.planes ? 'Planes cleared: ' + (a.planes - b.planes) + ' (' + b.planes + ' left)' : b.planes ? 'Planes on the track: ' + b.planes : 'No planes on the track',
     'Gear ' + b.lg + '/3 · Flaps ' + b.fl + '/4 · Brakes ' + b.br + ' · Coffee ' + b.cof];
   roHide();
-  const el = h('div.fa-ro.' + rt[0], { role: 'dialog', 'aria-label': 'Round ' + (a.r + 1) + ' over' },
+  const el = h('div.fa-ro.' + (hintsMode() ? rt[0] : 'good'), { role: 'dialog', 'aria-label': 'Round ' + (a.r + 1) + ' over' },
     h('div.rh', h('b', 'Round ' + (a.r + 1) + ' over'), h('span', 'Why: all 8 dice are placed.')), h('ul', ...lines.map(t => h('li', t))),
-    h('p.rr', h('b', rt[0] === 'good' ? 'Good' : rt[0] === 'okay' ? 'Okay' : 'Watch out'), ' ' + rt[1]), h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Next round'));
+    hintsMode() ? h('p.rr', h('b', rt[0] === 'good' ? 'Good' : rt[0] === 'okay' ? 'Okay' : 'Watch out'), ' ' + rt[1]) : null, h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Next round'));
   el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) roHide(); });
   document.body.appendChild(el); FT.ro = el; clearTimeout(FT.roT); FT.roT = setTimeout(roHide, UI.fc && !UI.fc.ended ? 14000 : 8000);
+}
+// ---------- the Goal, one card before turn 1 (Addendum 7): the win condition in one sentence and three bullets on how you get there ----------
+function goalCard(inStory) {
+  const n = D.rounds - G.row0, mods = scenOf().mods.map(m => D.mods[m] && D.mods[m].name).filter(Boolean);
+  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together at the end of round ' + n + ': on the airport, wings level, gear and flaps down, no planes in the way, speed within the brakes.'),
+    h('ul', h('li', 'Axis: you each put a die on it every round; the plane tilts by the difference (3 = spin).'),
+      h('li', 'Engines: your two dice add up to the speed; beating a marker moves you toward the airport.'),
+      h('li', 'Spare dice clear planes (radio), lower gear and flaps, set brakes or earn coffee. The checklist at the bottom shows what is still missing.')),
+    mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
+}
+function goalShow() {
+  roHide(); const el = h('div.fa-ro.fa-goal', { role: 'dialog', 'aria-label': 'Goal' }, goalCard(false), h('button.rgo', { type: 'button', 'data-ro': 'go' }, 'Got it'));
+  el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) roHide(); }); document.body.appendChild(el); FT.ro = el; clearTimeout(FT.roT);
 }
 function roHide() { clearTimeout(FT.roT); if (FT.ro) { const e = FT.ro; FT.ro = null; e.classList.add('out'); setTimeout(() => { try { e.remove(); } catch (er) { } }, 220); } }
 function roPoll() {
   if (!G || !UI.started) { FT.round = -1; return; }
-  if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); return; }
+  if (FT.sid !== G.seed + ':' + G.sid) { FT.sid = G.seed + ':' + G.sid; FT.round = G.round; FT.snap = roSnap(); roHide(); if (isPh() && G.round === 0 && G.phase === 'brief' && !(UI.cfg && UI.cfg.tutorial) && !UI.camp && UI.mode === 'vs' && !G.lad && !/[?&]scn=/.test(location.search)) goalShow(); return; }   // ?scn= states skip menus and cards
   if (G.result) { roHide(); FT.round = G.round; return; }
   if (FT.ro && G.phase !== 'brief') roHide();   // the card lives in the briefing only: rolling the dice puts the board first again
   if (G.round !== FT.round) { const a = FT.snap; FT.round = G.round; if (a && G.round === a.r + 1 && UI.mode !== 'net') roShow(a); FT.snap = roSnap(); }
@@ -230,12 +243,15 @@ function ftAfter() {
   const db = $('#dockbody'); if (db) { const old = $('#ftrk'); const t = trackerEl(); if (old) old.replaceWith(t); else db.insertBefore(t, db.firstChild); }
   const v = actSeat(), sel = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.result && (UI.sel === 'p' || (typeof UI.sel === 'number' && UI.sel >= 0));
   let pv = $('#fprev'); if (!pv && db) { pv = h('div#fprev', { 'aria-live': 'polite' }); const pd = $('#promptDock'); if (pd && pd.nextSibling) db.insertBefore(pv, pd.nextSibling); else db.appendChild(pv); }
-  if (pv) { const k = sel ? previewKey(v) : null; pv.hidden = !k; pv.textContent = k ? previewText(k, v) : ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
+  if (pv) { const k = sel && hintsMode() ? previewKey(v) : null; pv.hidden = !k && !UI.askWhy; pv.textContent = k ? previewText(k, v) : UI.askWhy || ''; pv.classList.toggle('bad', !!k && /crash|ends|spin|too fast/i.test(pv.textContent)); }
+  // Hints on: the "What should I do?" button joins the actions on your turn (Addendum 7)
+  const ac = $('#acts'), mineNow = typeof v === 'number' && v >= 0 && mayAct(v) && G.phase === 'place' && !G.pend && G.turn === v && !G.result;
+  if (ac && UI.prefs.hints && mineNow && !(UI.fc && !UI.fc.ended) && !ac.querySelector('[data-a=ask]')) ac.appendChild(h('button.btn.ask', { type: 'button', 'data-a': 'ask' }, 'What should I do?'));
   $$('#pz .slot[data-slot]').forEach(e => { const k = e.dataset.slot; if (!FA.SLOT[k]) return; const why = sel && !e.classList.contains('legal') ? whyNot(k, v) : '';
     e.title = why || slotNeedLong(k); e.classList.toggle('nofit', !!why); e.classList.toggle('cpt', !!(UI.cpt && UI.cpt.k === k)); });
   $$('#pz .die[data-s="0"]').forEach(e => e.classList.toggle('cpt', !!(UI.cpt && String(UI.cpt.d) === e.dataset.d && UI.sel !== UI.cpt.d)));
 }
-document.addEventListener('pointerover', e => { const s = e.target.closest && e.target.closest('#pz .slot[data-slot]'); const k = s ? s.dataset.slot : null; if (k !== FT.hover) { FT.hover = k; try { const v = actSeat(); const pv = $('#fprev'); if (pv && k && typeof v === 'number' && v >= 0 && (UI.sel === 'p' || UI.sel >= 0)) { const why = whyNot(k, v); if (why) { pv.hidden = false; pv.textContent = why; pv.classList.add('bad'); } else if (selectedLegal().includes(k)) { pv.hidden = false; pv.textContent = previewText(k, v); pv.classList.toggle('bad', /crash|ends|spin|too fast/i.test(pv.textContent)); } } } catch (er) { } } });
+document.addEventListener('pointerover', e => { if (!hintsMode()) return; const s = e.target.closest && e.target.closest('#pz .slot[data-slot]'); const k = s ? s.dataset.slot : null; if (k !== FT.hover) { FT.hover = k; try { const v = actSeat(); const pv = $('#fprev'); if (pv && k && typeof v === 'number' && v >= 0 && (UI.sel === 'p' || UI.sel >= 0)) { const why = whyNot(k, v); if (why) { pv.hidden = false; pv.textContent = why; pv.classList.add('bad'); } else if (selectedLegal().includes(k)) { pv.hidden = false; pv.textContent = previewText(k, v); pv.classList.toggle('bad', /crash|ends|spin|too fast/i.test(pv.textContent)); } } } catch (er) { } } });
 (function () {
   const st = document.createElement('style');
   st.textContent = '#ftrk{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 8px;margin:0 0 6px;border-radius:10px;background:#0f1a26;color:#fff;font-size:15px;line-height:1.25;font-weight:700}' +
@@ -244,6 +260,8 @@ document.addEventListener('pointerover', e => { const s = e.target.closest && e.
     '#ftrk .ftd.p i.on{background:#3d7fe0;border-color:#cfe0ff;opacity:1}#ftrk .ftd.c i.on{background:#f08a24;border-color:#ffe0c0;opacity:1}' +
     '#fprev{margin:4px 0;padding:6px 10px;border-radius:10px;background:#e9f6ea;color:#0d2a12;border:2px solid #2e8b45;font-size:15px;line-height:1.3;font-weight:700}#fprev.bad{background:#fde9e6;color:#5c0f08;border-color:#c0392b}' +
     'html.ph #ftrk{display:none!important}.altdots.ftk{gap:2px}.altdots .dk{width:10px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.6);opacity:.4}.altdots .dk.p.on{background:#3d7fe0;opacity:1}.altdots .dk.c.on{background:#f08a24;opacity:1}.altdots .dsep{width:4px}html.ph #fprev{font-size:14px;padding:4px 8px;margin:2px 0}' +
+    '.fa-goal{border-color:#1d4f9a}.fa-goal b,.fa-goal h3{display:block;font-size:17px;line-height:1.3;margin:0 0 6px}.fa-goal ul{margin:6px 0 10px}.fgoal ul{padding-left:18px}.fgoal li{margin:3px 0}.stbox .fgoal{background:#e8f0fb;color:#10223a;border-radius:12px;padding:10px 14px;margin:0 0 10px}' +
+    '#acts .btn.ask{background:#fff4d6;color:#3a2a00;border:2px solid #c98a12}.gxh-bulb.hon{box-shadow:0 0 0 3px #ffd46b,0 0 14px #ffd46b}' +
     '#pz .slot.nofit{filter:grayscale(.85) brightness(.75)}#pz .slot.cpt{outline:4px solid #6dffb0;outline-offset:3px;box-shadow:0 0 0 7px rgba(109,255,176,.35);animation:fa-cpt 1.1s ease-in-out infinite}#pz .die.cpt{outline:4px dashed #6dffb0;outline-offset:3px}' +
     '@keyframes fa-cpt{50%{outline-color:rgba(109,255,176,.35)}}' +
     '.fa-ro{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9970;width:min(380px,calc(100vw - 24px));padding:14px 16px;border-radius:16px;background:#f3ead4;color:#1f1a12;border:3px solid #2e8b45;box-shadow:0 12px 32px rgba(0,0,0,.55);font-size:15px;line-height:1.35;animation:fa-roin .25s ease-out both}' +

@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.goto('https://gns.test/' + (ph ? '?phone=1' : '')); await sleep(800); await p.evaluate(() => localStorage.clear()); await p.reload(); await sleep(1000);
     const tap = async sel => { const r = await p.evaluate(s => { const e = [...document.querySelectorAll(s)].find(e => { const q = e.getBoundingClientRect(); if (q.width < 5 || q.height < 5) return false; const t = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return t && (t === e || e.contains(t)); }); if (!e) return null; const q = e.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; }, sel); if (!r) return false; if (ph) await p.touchscreen.tap(r.x, r.y); else await p.mouse.click(r.x, r.y); return true; };
     const shot = n => p.screenshot({ path: path.join(OUT, PRE + '-' + W + '-' + n + '.png') });
-    await tap('#start .tbtn.story'); await sleep(1500);
+    await tap('#start .ttut'); await sleep(1500);
     const got = {}; const t0 = Date.now();
     while (Date.now() - t0 < 240000) {
       const s = await p.evaluate(() => ({ fin: !!document.querySelector('.fa-fin'), ro: !!document.querySelector('.fa-ro:not(.out)'), r: G && G.round, ph: G && G.phase, turn: G && G.turn, pend: !!(G && G.pend), sel: UI.sel, res: !!(G && G.result),

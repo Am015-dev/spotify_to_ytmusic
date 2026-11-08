@@ -2,6 +2,7 @@
 // The board is the screen. The dock holds a thin goal strip, ONE line of at most 8 words, and one row of buttons. Explanations, the log and the phrases live in the drawers.
 function phPrompt() {
   if (!G) return '';
+  if (UI.flash && UI.flash.until > Date.now()) return UI.flash.t;
   if (G.result) return endWords();
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
   if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
@@ -61,7 +62,7 @@ function roundFx(r, info) {
 }
 // ---------- ghost finger: one hand shows the first move (die, then the space) while hints are on ----------
 // the ghost finger shows the move on the first round of a first flight (and on the guided flight), later only after the Hint button
-function hintsOn() { return !!G && !G.result && (!!UI.hint || UI.mode === 'guided' || (UI.camp ? !!UI.camp.hints : !Object.keys(UI.won || {}).length && G.round < 1)); }
+function hintsOn() { return !!G && !G.result && (!!(UI.prefs && UI.prefs.hints) || UI.mode === 'guided'); }   // the ghost finger is a Hint (Addendum 7)
 function ghostPlan() {
   if (typeof tutOn === 'function' && tutOn()) return null;   // the tutorial kit shows its own finger
   if (UI.fc && !UI.fc.ended) return null;   // the coached flight points with its own glow (part 14)

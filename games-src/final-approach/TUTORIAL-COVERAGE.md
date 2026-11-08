@@ -32,3 +32,14 @@ Code: `game/src/ui12.js` (`tutAdvise`, `fcPoll`, `fcLine`, `fcEnd`), dice `TUT_S
 | Traffic die, corridor tabs, fuel, wind, trainee, ice, clock, crew cards, hand-over, flip side, cross-check, die that fits nowhere | `tutorial.later` | end card | later card only (honest: not demonstrated) |
 
 Limits: four rounds, not seven; the modules are taught in Story chapters 7 to 15 (their intro scenes name the new rule). A free-play loss is possible and is explained on the end card with "Try again".
+
+## Three modes (Addendum 7)
+- **Learn to play** (title button "New here? Learn"): the coached flight above. The only place with coach bubbles, pointing rings and previews by default.
+- **Play** (Play / Quick game, the default): clean screen. Board, dice tray, turn tracker (round x of y, altitude, whose turn, dice left), the landing
+  checklist line, one instruction line, the top bar. A one-card Goal before turn 1 (phones: a card over the board that closes on Got it or Roll; wide:
+  on top of the flight story card). After each placement a short chip says what it did. The round-over card says why the round ended and what changed
+  (no rating). No coach bubbles, no ghost finger, no floating toasts (a refused tap puts its reason on the one line). Every "why" is on tap: the checklist
+  strip opens the full checklist, a refused space says why on the line, the drawers hold the log and rules. Story no longer forces the coached flight.
+- **Hints** (the bulb in the top bar, off by default): previews on each glowing slot and in the dock, the good/okay/poor line on the round-over card,
+  the ghost finger, and a "What should I do?" button on your turn that rings the suggested slot and die and says why.
+Check: `game/shoot-play.js <png> 390x763` plays a Quick game to the first own turn and fails if a bubble, preview, toast, ghost or card is on screen.
