@@ -29,7 +29,7 @@ and fails if a core rule step is missing or out of order, or any line is over 12
 | 20 | All gear down | Gear 3-4 | Your 3 drops the last gear. All three are down. |
 | 21 | Brakes 2, 4, 6 in order | Brake 2 | Brakes take exactly 2, then 4, then 6, in order. |
 | 22 | Landing round: plane stops | Roll | Landing round: the plane stops moving. Tap Roll. |
-| 23 | Speed must be BELOW the brakes | Brake 4 | Brake 4 next. Landing speed must stay below the brakes. |
+| 23 | Speed may equal the brakes, not more | Brake 4 | Brake 4 next. Landing speed may equal the brakes, not more. |
 | 24 | Land level | Axis | Match Ravi's 3. We must land with level wings. |
 | 25 | Landing speed = engine sum | Speed | Your 2 plus Ravi's 2 makes speed 4. |
 | 26 | Brake 6 | Brake 6 | Brake 6 makes speed 4 safe. Last die, then we land. |
