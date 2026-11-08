@@ -55,7 +55,7 @@ function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tu
     if(sel&&sel.mode==='dual'&&!sel.tool&&!sel.two){if(sel.tg.length&&sel.v==null)return 'Now tap one of your own numbers to say it.';if(sel.v!=null&&!sel.tg.length)return 'Now tap the crew wire you think matches.'}
     if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a glowing crew wire to guess it.';
     if(!sel&&t==='Tap your glowing wires')return 'Your turn: you hold every one left. Tap them to cut.'}
-  if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+"'s turn: thinking...";return t}})();
+  if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+' is thinking…';return t}})();
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||!e.target.closest)return;if(e.target.closest('#say')||e.target.closest('#tb'))plSkip()},true);
 // ---------- tap the table while the computer crew plays to speed it up ----------
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||G.over||UI.brief||UI.tut||!e.target.closest||!e.target.closest('#tb'))return;const s=decider();if(s<0||isHuman(s)||UI._boost)return;
