@@ -150,3 +150,8 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 ## 09:20 owner feedback (awake)
 - Redline: speed limits were off-screen (close camera). FIXED live 09:12: always-on next-corner signs (limit + distance, red + heat warning).
 - Hollowbough: owner says coached game unplayable on phone (icon soup, can't follow, coach mistakes). Opus W482 session_01RR7mnb2G2Kj8PASRKq2B5j rebuilding phone screen + coach. R4 review findings go to W482.
+
+## 10:10 OWNER STOP
+Owner: "Stop spending so much time, your review is horrible, none of the games is playable and understandable."
+All workers and reviewers interrupted; sweep and leftover DONE triggers deleted. Nothing runs. Do not restart the
+fleet. Next work only on the owner's word: one game at a time, judged by the owner's own phone play, not by reviewer scores.
