@@ -274,18 +274,18 @@ html.wm-coach #pv{bottom:10px}
 .gain.best{background:#e6b04f;color:#1d2420;border-color:#fff3c8}
 .gain.nil{background:#3a3d3a;color:#e6e6e0}
 .pair.top{box-shadow:inset 0 0 0 3px #e6b04f}
-.cc small{font-size:13px;font-weight:700;color:#c9cfc6;margin-left:1px}
-.cc small.lead{color:#ffb4a8}
+.cc .rv{font-size:13px;font-weight:700;color:#c9cfc6;margin-left:1px}
+
 .cc.ahead{box-shadow:inset 0 -3px 0 #7fc28a}.cc.behind{box-shadow:inset 0 -3px 0 #e07a68}
 .terr{display:flex;gap:4px;margin-left:auto}
 .tc{display:flex;align-items:center;gap:3px;background:rgba(18,32,25,.86);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:2px 6px;min-height:40px;font-size:15px}
 .tc .sw{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.4)}
-.tc b{font-size:15px}.tc small{font-size:13px;color:#c9cfc6}.tc small.lead{color:#ffb4a8}
+.tc b{font-size:15px}.tc .rv{font-size:13px;font-weight:700}
 .tc.ahead{box-shadow:inset 0 -3px 0 #7fc28a}.tc.behind{box-shadow:inset 0 -3px 0 #e07a68}
-@media (max-width:999px){.seat{padding:4px 8px}.terr{gap:2px}.tc{padding:2px 4px;gap:2px}.tc .sw{width:9px;height:9px}#pv{right:8px}.vd{font-size:14px}}
-@media (min-width:1000px){.vd{font-size:16px}.gain{font-size:16px}.cc small,.tc small{font-size:16px}.tc,.tc b{font-size:16px}}
+@media (max-width:999px){.seat{padding:4px 8px}.terr{gap:2px}.tc{padding:2px 4px;gap:2px}.tc .sw{width:9px;height:9px}.vd{font-size:14px}}
+@media (min-width:1000px){.vd{font-size:16px}.gain{font-size:16px}.cc .rv,.tc .rv{font-size:16px!important}.tc,.tc b{font-size:16px}}
 /* colour legend: your numbers gold, the rival's rust (the seat chips carry the same dots) */
-.cc b,.tc b{color:#ffd88a}.cc small,.tc small,.cc small.lead,.tc small.lead{color:#ff9f8a}
+.cc b,.tc b{color:#ffd88a}.cc .rv,.tc .rv{color:#ff9f8a}
 .seat .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:0;background:#888}
 .seat .dot.me{background:#e6b04f;box-shadow:0 0 0 1.5px #1d2420}.seat .dot.riv{background:#e0705a}
 .tc{border-left:5px solid #888;padding-left:4px}
@@ -293,3 +293,5 @@ html.wm-coach #pv{bottom:10px}
 .terr{background:none;border:0;padding:0;color:inherit;font:inherit;cursor:pointer;align-items:center}
 .terr .tl{font-size:13px;font-weight:700;color:#e9efe4;margin-right:2px}
 @media (min-width:1000px){.terr .tl{font-size:16px}}
+.pvring{fill:none;stroke:#ffe08a;stroke-width:4;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,224,138,.9))}
+.pvring.brk{stroke:#ff8a75;stroke-dasharray:8 5}

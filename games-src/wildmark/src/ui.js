@@ -12,6 +12,7 @@ function savePrefs() { try { localStorage.setItem('wm-prefs', JSON.stringify(UI.
 function an(a) { return (/^[AEIOU]/.test(WM.ANI_NAME[a]) ? 'an ' : 'a ') + WM.ANI_NAME[a]; }
 function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, just above the instruction line (never over the score chips)
   var ln = $('#line'), st = $('#start'); e.style.top = ''; e.style.bottom = ''; if (!ln || !st || !st.hidden || !G) return;
+  var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
 function toast(t, ms) { var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
@@ -237,6 +238,8 @@ function drawMap() {
     if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
   }
   var wh = boardWH();
+  pvl.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
+  brk.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring brk" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
   if (UI.ghost && mine && G.stage === 'tile') { var gp = pix(UI.ghost.c); bad += pvBadge(gp[0], gp[1] - SZ * 0.62, pv ? pv.d : 0, UI.ghost.c, 0, 1); }
   $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '<g class="pvbs">' + bad + '</g></g>';
   pvStrip(pv);
@@ -319,7 +322,7 @@ function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.fo
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
   var ri = rivalOf(UI.view), rv = ri >= 0 ? fin[ri] : null;
-  function vs(m, r) { return r == null ? '' : '<small class="' + (r > m ? 'lead' : '') + '" aria-hidden="true">' + r + '</small>'; }
+  function vs(m, r) { return r == null ? '' : '<span class="rv' + (r > m ? ' lead' : '') + '" aria-hidden="true">' + r + '</span>'; }
   function cls(m, r) { return r != null && m > r ? ' ahead' : r != null && r > m ? ' behind' : ''; }
   WM.ANI.forEach(function (a) { var r = rv ? rv.ani[a] : null; h += '<button type="button" class="cc' + cls(sc.ani[a], r) + '" data-card="' + a + '" aria-label="' + esc(WM.ANI_NAME[a] + ': ' + cinfo(a).title) + ' card, you ' + sc.ani[a] + (rv ? ', ' + G.seats[ri].name + ' ' + r : '') + ' points"><span class="ccr">' + mkTok(a) + '<b>' + sc.ani[a] + '</b>' + vs(sc.ani[a], r) + '</span><i>' + esc(WM.ANI_NAME[a]) + '</i></button>'; });
   $('#cards').innerHTML = h;

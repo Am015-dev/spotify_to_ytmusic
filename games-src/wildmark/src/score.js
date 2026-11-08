@@ -6,10 +6,13 @@ function pvScore(env) { return WM.score(env, 0, G.cards); }
 // the parts of a score change, biggest first: [{d, a|t, label}]
 function pvParts(s0, s1) {
   var p = [];
-  WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d) p.push({ d: d, a: a, label: (d > 0 ? '+' : '') + d + ' ' + WM.ANI_NAME[a] }); });
+  WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d) p.push({ d: d, a: a, label: (d > 0 ? '+' : '') + d + ' ' + pvWhy(a, d) }); });
   WM.TER.forEach(function (t) { var d = s1.hab[t] - s0.hab[t]; if (d) p.push({ d: d, t: t, label: (d > 0 ? '+' : '') + d + ' largest ' + WM.TER_NAME[t].toLowerCase() }); });
   return p.sort(function (x, y) { return Math.abs(y.d) - Math.abs(x.d); });
 }
+// what the animal's card rewards, in two or three words (set A); other sets name their card
+var PV_WHY = { bear: ['Bear pair', 'Bear pair broken'], elk: ['Elk line', 'Elk line broken'], salmon: ['Salmon run', 'Salmon run broken'], hawk: ['lone Hawk', 'Hawk no longer alone'], fox: ['Fox neighbours', 'Fox neighbours'] };
+function pvWhy(a, d) { return (G.cards && G.cards[a] || 'a') === 'a' ? PV_WHY[a][d < 0 ? 1 : 0] : WM.ANI_NAME[a] + ' (' + cinfo(a).title + ')'; }
 function pvSum(p) { return p.reduce(function (n, x) { return n + x.d; }, 0); }
 function pvText(p) { return p.length ? p.map(function (x) { return x.label; }).join(', ') : 'no points now'; }
 // cells to light for a part (the pattern the move completes, or the habitat it grows)
@@ -33,6 +36,7 @@ function pvTile(env, tile, c, rot) {
 function pvTok(env, c, a) {
   var x = env[c], s0 = pvScore(env), i0 = {}; WM.scoreAnimal(env, a, i0, G.cards && G.cards[a]);
   x.tok = a; var s1 = pvScore(env), p = pvParts(s0, s1), lit = pvLit(env, p);
+  if (x.key) p.push({ d: 1, label: '+1 acorn (keystone)' });
   var broke = []; if (pvSum(p) < 0) { var i1 = {}; WM.scoreAnimal(env, a, i1, G.cards && G.cards[a]); broke = (i0.lit || []).filter(function (y) { return (i1.lit || []).indexOf(y) < 0; }); }
   x.tok = null; return { d: pvSum(p), parts: p, lit: lit, broke: broke };
 }
@@ -65,18 +69,22 @@ function pvTurnStart(m) {
   var v = pvMarket().slice(), b = pvBestCol(v), s = G.seats[G.cur], sol = -1;
   try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }
   var ci = m.t === 'take' ? m.i : m.ti;
-  PV.turn = { v: v, best: b >= 0 ? v[b] : 0, bestI: b, sol: sol, chosen: ci, s0: pvScore(s.env), seat: G.cur };
+  var names = G.market.toks.map(function (k) { return k ? WM.ANI_NAME[k] : ''; });
+  PV.turn = { v: v, best: b >= 0 ? v[b] : 0, bestI: b, sol: sol, chosen: ci, s0: pvScore(s.env), ac0: s.acorns + (m.t === 'free' ? 1 : 0), seat: G.cur, names: names };
 }
 function pvColName(i) { var t = G.market.tiles[i], k = G.market.toks[i]; return 'column ' + (i + 1) + (k ? ' (' + WM.ANI_NAME[k] + ')' : ''); }
 function pvTurnEnd() {
   var T = PV.turn; PV.turn = null; if (!T) return null;
-  var s = G.seats[T.seat], s1 = pvScore(s.env), p = pvParts(T.s0, s1), got = pvSum(p), best = Math.max(T.best, got);
-  var why = p.length ? pvText(p.slice(0, 2)) : 'nothing scored';
+  var s = G.seats[T.seat], s1 = pvScore(s.env), p = pvParts(T.s0, s1);
+  if (s.acorns > T.ac0) p.push({ d: s.acorns - T.ac0, label: '+' + (s.acorns - T.ac0) + ' acorn' });
+  var got = pvSum(p), best = Math.max(T.best, got), col = function (i) { return 'the ' + T.names[i] + ' column'; };
+  var why = p.length ? pvText(p) : 'nothing scored';
   var tag = got >= best - 0.5 ? 'good' : got >= best - 2 || got >= best * 0.6 ? 'okay' : 'poor';
-  var alt = T.bestI >= 0 && T.bestI !== T.chosen ? ' Best was column ' + (T.bestI + 1) + ' for up to +' + T.best + '.' : '';
-  var hint = T.sol >= 0 && T.sol !== T.chosen && T.sol !== T.bestI ? ' The hint liked column ' + (T.sol + 1) + ' for later turns.' : '';
-  var head = tag === 'good' ? 'Good move: +' + got : tag === 'okay' ? 'Okay move: +' + got : 'Poor move: ' + (got >= 0 ? '+' : '') + got;
-  var text = head + ' (' + why + ').' + (tag === 'good' ? (got > 0 ? ' The best this turn.' : ' Nothing scored more.') : alt + hint);
+  var alt = T.bestI >= 0 && T.bestI !== T.chosen ? ' Best was ' + col(T.bestI) + ' for up to +' + T.best + '.' : '';
+  var hint = T.sol >= 0 && T.sol !== T.chosen && T.sol !== T.bestI ? ' The hint liked ' + col(T.sol) + ' for later turns.' : '';
+  var pts = got > 0 ? '+' + got : got < 0 ? String(got) : 'no points';
+  var head = (tag === 'good' ? 'Good move: ' : tag === 'okay' ? 'Okay move: ' : 'Poor move: ') + pts;
+  var text = head + (p.length ? ' (' + why + ').' : '.') + (tag === 'good' ? (got > 0 ? ' The best this turn.' : ' Nothing scored more.') : alt + hint);
   UI.verdict = { tag: tag, text: text };
   if (window.GXH && GXH.log) try { GXH.log(text); } catch (e) { }
   return UI.verdict;
@@ -106,6 +114,7 @@ function pvStrip(pv) {
   else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();
   e.innerHTML = h; e.hidden = !h;
   var ln = $('#line'), lh = ln && getComputedStyle(ln).display !== 'none' ? ln.offsetHeight : 0; e.style.bottom = (lh ? lh + 18 : 10) + 'px';   // sits just above the instruction line
+  var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);
 }
 // mouse: hovering a spot or an animal target previews it (touch: the badges on every spot and the ghost tile do the same)
 (function () {
