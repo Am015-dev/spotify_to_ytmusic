@@ -114,7 +114,7 @@ function tutStoryGate(){if(typeof GXT==='undefined'||GXT.isDone(TUT_GAME))return
 // a first-time player tapping Play is offered the tutorial once
 function tutOffer(){if(!tutFirst()||document.querySelector('.tutoffer'))return false;
   const d=document.createElement('div');d.className='gxt-end tutoffer';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn the rules in 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Play anyway</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex"><b>You win if everyone is alive when the rescue ship comes.</b></div><div class="gxt-ex">Learn by playing: 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-tutoffer="play">Play anyway</button></div></div>';
   document.body.appendChild(d);
   d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();
     try{localStorage.setItem('swi_tutoffer','1')}catch(err){}
