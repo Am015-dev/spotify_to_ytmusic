@@ -17,7 +17,7 @@
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
     d.addEventListener('click', function (e) { e.stopPropagation(); d.remove(); });
-    document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, ms || 5200); return sp;
+    document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, UI.readMs ? UI.readMs(text, ms) : (ms || 5200)); return sp;
   };
   function speak(key, text, ms) { if (!text) return; C.q.push({ key: key, text: text, ms: ms }); pump(); }
   function pump() { if ($('.ec-say') || !C.q.length) return; var it = C.q.shift(); UI.say(it.text, it.ms); }
@@ -64,8 +64,8 @@
   function finale() {
     if (C.done) return; C.done = 1; var G = g(), h = G.hs[0];
     var lines = [(G.won ? 'Climb won! ' : 'The climb ends here. ') + 'Floors climbed: ' + (G.floor || 0) + ' of ' + ((G.F || 5) + 1) + '.', 'HP left: ' + Math.max(0, h.hp) + ' of ' + h.mhp + '. Gold: ' + G.gold + '. Deck: ' + h.deck.length + ' cards. Relics: ' + G.relics.length + '.'];
-    C.q = []; lines.forEach(function (l, i) { setTimeout(function () { UI.say(l, 2600); }, i * 2800); });
-    setTimeout(endCard, lines.length * 2800 + 200);
+    C.q = []; var at = 0; lines.forEach(function (l) { setTimeout(function () { UI.say(l); }, at); at += (UI.readMs ? UI.readMs(l) : 4000) + 300; });   // each line stays long enough to read
+    setTimeout(endCard, at + 200);
   }
   function endCard() {
     var later = Object.keys(CO.rules).filter(function (k) { return !C.seen[k]; });
@@ -99,7 +99,7 @@
   function steps() {
     var tap = function (id) { return { type: 'tap', times: 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     return [
-      { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'The summit ember is fading. Climb, Garrick!\nThis Gnawer shows its next move: a bite for 4.', wait: null, ready: battleP },
+      { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Goal: reach the top and beat its guardian.\nThis rat shows its next move: a bite for 4.', wait: null, ready: battleP },
       { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Crack its hide with Anvil Blow: lift it, then play it.\nAfter that, the climb is yours.', wait: tap('w-hammer'), ready: battleP },
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
         onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double. Play on your own; I speak up when something new matters.', 4600); UI.render(); }, 60); } }
