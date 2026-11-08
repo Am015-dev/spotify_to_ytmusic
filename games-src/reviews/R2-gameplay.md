@@ -8,6 +8,7 @@ Screenshots are in `R2-shots/`.
 |---|---|---|---|---|---|
 | vinegrave | shelf/W490-vinegrave-bench (586a64bd) | 5.9 | **5.6** | **FAIL** | Tutorial 5, Turn clarity 5, Phone 5, AI 5 |
 | thornbound | shelf/W489-thornbound-rules (546c2244) | 4.0 | **4.0** (raw 4.8, capped) | **FAIL** | AI 3, Bugs 3, Tutorial 4, Feel 4 |
+| wildmark | shelf/W507-wildmark-gameplay (0c0f1d68) | 6.3 | **7.1** | **FAIL** | Phone play 6, Feel 6 |
 
 ## 1. vinegrave (branch shelf/W490-vinegrave-bench, 586a64bd)
 
@@ -111,3 +112,64 @@ How I tested: real touch taps only (touchscreen.tap) at 390x844 and 375x667. I d
 - **Row 1, rules spot-check.** The real game includes the secret bid, taking a Kingdom Card, Herald placement, one hidden card per region, Supporters (+1), clash order, the clash, the location choice, the Herald bonus and steal, Govern, Journey with a Lore buy, an attrition discard, Winter cleanup and a 5-round end. The fixer's 165 rule tests all pass. The bid prompt only ever says "Tap a glowing Kingdom Card to take it". But my own bid card also glows next to the Kingdom Cards. Tapping it seems to take the bid back, with no label saying so; my glow-following run ended up with no Kingdom Cards that way. I never saw the steal option offered.
 
 Rules coverage: the engine matches the published turn order. Gaps are in what the player is shown and taught. The tutorial never teaches a tied clash (play another card or pass), the steal and take-back bid options, that the last player picks the clash order, buying with Lore, or using the Favour. Attrition and the tiebreak are only one line of text each.
+
+## 3. wildmark (branch shelf/W507-wildmark-gameplay, 0c0f1d68)
+
+| # | Row | Score |
+|---|-----|-------|
+| 1 | Rules fidelity | 8 |
+| 2 | Tutorial teaches | 7 |
+| 3 | First 10 seconds | 7 |
+| 4 | Turn clarity | 7 |
+| 5 | Phone play | 6 |
+| 6 | AI and pacing | 8 |
+| 7 | Feel | 6 |
+| 8 | Bugs | 8 |
+| | **Total** | **7.1** |
+| | **Result** | **FAIL** (no stopper, but Phone play and Feel are under 7) |
+
+How I tested: I did the tutorial to the end by touch at 390x844 and 375x667. I played two full 20-turn games on the title's
+default Play button (rival: Gentle) to the result screen. At 390x844 I played well, tapping the move the game's planner rated best.
+At 375x667 I played carelessly, always taking the first column, the first spot and the first animal target. I got 0 page errors and
+0 console errors in all runs.
+
+### First-review findings
+
+1. **R6, default rival too strong: FIXED.** The default rival is now Gentle. Playing well I won 91-54. Playing carelessly I lost
+   54-68, a close and fair loss. The rival's turn took about 3.1 s on average. A new player can win.
+   Shots: `R2-shots/wm-g-result.jpg`, `R2-shots/wm-h-result.jpg`.
+2. **R5, unreadable result screen: FIXED.** The winner and both totals now sit at the top in large type ("Bram wins! 68 / 54"), with
+   a one-line reason. The table rows below are light text on the dark panel and are readable. Shot: `R2-shots/wm-h-result.jpg`.
+3. **R5, small hex targets: FIXED.** I measured every placement spot and the Place button in both games. The smallest was 44 px (10%
+   were 46 px or less), and tutorial spots were 57-73 px at both sizes.
+4. **R3/R4, goals not on screen, previews off: PARTLY.** Every market column now shows an "up to +N" badge. A "What should I do?"
+   button and a per-turn verdict ("No points this turn. Poor move. Best was the Fox column for up to +6") tell you how you did.
+   How each animal scores is still only in the book icon, and the goal line reads "Grow the wildest one".
+   Shots: `R2-shots/wm-h-first.jpg`, `R2-shots/wm-h-turn15.jpg`.
+5. **R5/R7, "+2 River Runs" pop and banners over the tiles: NOT FIXED.** At 375x667 the verdict card and the step card cover the
+   lower half of the board every turn, and the score pop floats behind them over the tiles ("+2 River Runs" at turn 15). A grey
+   "Bear settled, no points yet..." note also sits over the board. Shots: `R2-shots/wm-h-turn15.jpg`, `R2-shots/wm-g-turn5.jpg`.
+6. **R2, only one acorn power taught: PARTLY.** "Free pick" is now done by tap. "Replace animals" is a Next-only line and you
+   never try it.
+7. **R4, rival view mid-turn with no way back: FIXED.** I tapped Bram's chip while holding a tile. The line now reads "Bram's valley:
+   tap You to go back to the turn". Shot: `R2-shots/wm-g-rivalview.jpg`.
+8. **R7, painted terrains hard to tell apart: NOT FIXED.** At 375 the tutorial's tiles are about 37-55 px across. "Forest meets forest"
+   is still easier to read from the step text than from the art. Shot: `R2-shots/wm-s-tut09.jpg`.
+9. **R8, acorn counter does nothing when tapped: FIXED.** Tapping it now opens an explanation. Shot: `R2-shots/wm-g-acorntap.jpg`.
+
+### New findings
+
+- **Row 2 (good).** The tutorial took 42 steps in about 60 s at both sizes: 33 steps where you do the move and 9 Next steps. Every
+  step moved on with a single tap (0 repeats). The game then offers "Play a real game", with a "You win! 35-25" walk through the
+  score. Shots: `R2-shots/wm-a-tut09.jpg`, `R2-shots/wm-s-tutend.jpg`.
+- **Row 5. Text under 14px.** The top animal-count chips (Bear, Elk, Salmon, Hawk, Fox and their numbers) are 13px on every
+  screen, including the result. Shot: `R2-shots/wm-h-first.jpg`.
+- **Row 7. Your own turn feels flat.** Your turn is: tap a column, tap a spot, tap Place, tap an animal target, then read a
+  2-3 line verdict card. The rival's turn plays out with motion and pops. Yours has no drag and no snap, and the verdict text
+  dominates the screen.
+- **Row 6. Gentle may be soft for a careful player.** I won by 37 points playing the best move each turn. That is fine for the first
+  game. Make sure the level step after Gentle is easy to find.
+- **Row 1.** Rules unchanged since G5 (8), plus the salmon card D fix (runs of 3+ only), which matches the published card. Market of
+  four pairs, the four-alike auto wipe, the once-a-turn three-alike wipe, both acorn powers, the 20 turns, the 2-player largest-area
+  bonus (+2, or +1 each on a tie) and the acorn tie-break all match.
+
