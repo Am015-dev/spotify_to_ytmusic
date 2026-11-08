@@ -15,11 +15,11 @@ All sources are CC0 / public domain. No AI-generated, NC, ND or SA material. Col
 - Bell | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/504526
 - Bird ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310555
 - Book cover | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/202457
-- Bowl | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/734
 - Cave of Pan, near Sunium, Greece | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/660902
 - Celt (votive axe) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316288
 - Ceremonial Axe | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313715
 - Cihuateotl | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307634
+- Cliff House and Seal Rock | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/264900
 - Column | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310540
 - Compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/191253
 - Cuneiform tablet: Utukku lemnutu, tablet 3 | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/321841
@@ -29,6 +29,7 @@ All sources are CC0 / public domain. No AI-generated, NC, ND or SA material. Col
 - Double Bat-Head Figure Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307790
 - Earflare Frontal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312508
 - Earflare Frontal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312509
+- Earflare Set | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317430
 - Eye idol | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/324147
 - Feather Symbol | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/319050
 - Feathered serpent ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310648
@@ -97,10 +98,19 @@ All sources are CC0 / public domain. No AI-generated, NC, ND or SA material. Col
 - Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188834
 - Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188858
 - Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188848
+- Portrait of a General Officer | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437463
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436480
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437893
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437843
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436521
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437465
 - Pottery Whistle | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/502954
 - Prayer Book | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/924757
+- Purgatory Cliff | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/11906
 - Rain god mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313255
 - Ritual object | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313337
+- Roman Ruins, from "Roman Ruins" | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/360679
+- Ruins of a round building, from "Roman Ruins" | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/360675
 - Serpent Stamp | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313373
 - Serpent labret with articulated tongue | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/321343
 - Shipwreck off Nantucket (Wreck off Nantucket after a Storm) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/10209
@@ -116,16 +126,15 @@ All sources are CC0 / public domain. No AI-generated, NC, ND or SA material. Col
 - Telescope stand | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/202025
 - Temple Model | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316873
 - The Mouth of a Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437470
+- Tropical Scenery, Cliff - Limon Bay | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/286041
 - Urn | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/195013
 - Valdemar Hjartvar Købke (1813–1893), the Artist's Brother | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436825
+- View in the Jungle, Bengal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/287849
 - View of Fingal's Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/363808
 - Waterfall at Terni | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/438635
 - Waterfall | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/12845
-- [Studio Portrait: Man Carrying Shovel and Basket of Greens] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764761
-- [Studio Portrait: Man Holding Basket of Oysters?, Venice] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764759
-- [Studio Portrait: Man Seated on Wooden Box ] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764821
-- [Studio Portrait: Man Seated with Swords] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764803
-- [Studio Portrait: Man Standing with Swollen Leg and Foot Cau | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764806
-- [Studio Portrait: Man Wearing Top Hat Seated with 2 Indigeno | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764817
+- [Abbey Ruins] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/269012
+- [Roman Ruins] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/270620
 - [Studio Portrait: Man with Walking Stick Begging (?)] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764838
+- [View of the Jungle, Bengal] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/287859
 - [Waterfall] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/288554
