@@ -162,3 +162,4 @@ Plan: REF session (Sonnet, session_01RR7mnav4DFPVkBnCbhLMfS) writes games-src/RE
 apps lay out each genre). W482 hollowbough + W483 twin resumed, time-capped, shots only, no deploy. Then waves of 3 games
 (Sonnet, Opus only after a failed try), each copying the REFERENCE-UI genre rules. No reviewer fleet. Owner sees phone
 shots per game before anything goes live. No 20-min sweep loop.
+- Deep Signal = old name of Lantern Dive (owner). Never work on deep-signal; it is not a separate game.
