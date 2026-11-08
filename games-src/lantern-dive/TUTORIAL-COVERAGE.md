@@ -1,14 +1,14 @@
-# Lantern Dive: tutorial coverage (W390, 7 Nov 2026)
+# Lantern Dive: tutorial coverage (W409, 8 Nov 2026)
 
-The tutorial (`game/src/ui12.js`, shell/gx-tutor.js) is one real, short dive against the real divers' rules: 21 steps, two attempts
-(attempt 1 is lost on purpose, attempt 2 is won in three tricks), ending in the "You know the rules" card and then a real game
-or the Story. Leave and resume: a reload mid-way offers Restart / Exit; Skip tutorial works at any step.
-Proved by `game/playable-tutorial-end.js` (fresh storage, touch tap on the centre of each spotlit element, `elementFromPoint` there
-must not be a kit overlay, every step id below must be shown, end card reached) at 390x763 and 1440x860: PASS, 21/21.
-The older `game/tutor-test.js` adds wrong-tap, rotation, leave/return and skip checks.
-
-Chapters (the step list shows 21 dots; these are the natural breaks): 1 Your first turn (goal..lead), 2 Scoring a trick and a
-broken job (win1, lost), 3 Second try: pings, last trick, following (ping2..win3), 4 Trumps and the end (trump..won).
+The tutorial is now a COACHED FIRST DIVE (`game/src/ui12.js`): ONE forced tap (take a job, spotlight from shell/gx-tutor.js), then the kit is stopped and
+the dive is a real free game on the stacked deal (data.js `tutorial`) against the normal computer divers. Brack (one bubble at a time, never blocks a tap,
+x dismisses, "Skip tutorial" always visible) explains each rule the first time it matters: jobs, flare, signals and reading a ping, lead/Captain, follow suit,
+void and trumps, who wins a trick, Last, and reacts when a job is done (good) or broken (poor). The end card walks the real result (jobs done/broken with
+the reason, tricks won) and lists "Things you'll meet later": every rule that did not come up in that dive plus the special dives (hand-over/vote, murky
+water, narcosis, clock, predictions, drone). A lost dive offers "Dive again" on the same deal.
+Proof: `game/playable-tutorial-end.js [sizes] [seed]` plays random legal moves by touch taps through the UI at 390x763 and 1440x860 to the end card and asserts
+<= 2 forced taps, one bubble at a time, every rule explained in play or listed on the end card: PASS (seeds 5, 7, 11, 21).
+(The chapters/steps list below is the OLD 21-step tutorial, kept for the rule wording.)
 
 ## Rules checklist (step that teaches each: by doing = D, by seeing = S)
 - [x] The crew wins or loses together; every job done = dive won ................ goal (S), won (S)

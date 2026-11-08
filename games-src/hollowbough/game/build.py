@@ -24,7 +24,7 @@ SRC={'gx-scenario.js':os.path.join(SP,'shell','gx-scenario.js'),'scn.js':os.path
 if os.path.exists(audio):SRC['audio-data.js']=audio
 else:print('NOTE: audio-data.js missing, silent build',file=sys.stderr)
 ORDER=['gx-scenario.js','scn.js','shell.js','gx-kit.js','gx-viewport.js','gx-skin.js','gx-help.js','gx-tutor.js','gx-campaign.js','campaign-data.js','perfhud.js','trystero.min.js','netroom.js','art-data.js','kit.js','data.js','refdata.js','engine.js','ai.js','netstrip.js','gameaudio.js','audio-data.js','net.js','ui.js']
-h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-kit.css'))+'\n'+rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))+'\n'+rd(os.path.join(SP,'shell','gx-skin.css'))+'\n'+rd(os.path.join(D,'skin.css')))
+h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-kit.css'))+'\n'+rd(os.path.join(SP,'shell','gx-campaign.css'))+'\n'+rd(os.path.join(SP,'shell','gx-help.css'))+'\n'+rd(os.path.join(SP,'shell','gx-tutor.css'))+'\n'+rd(os.path.join(SP,'shell','gx-skin.css'))+'\n'+rd(os.path.join(D,'skin.css'))+'\n'+rd(os.path.join(D,'pv.css')))
 body=rd(os.path.join(D,'body.html'))
 if 'audio-data.js' in SRC:body=body.replace('<script src="ui.js"></script>','<script src="audio-data.js"></script>\n<script src="ui.js"></script>')
 for f in ORDER:
