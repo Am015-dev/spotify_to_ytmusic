@@ -1,582 +1,29 @@
 {
  "slug": "sunglaze",
- "when": "2026-11-08T02:35Z",
- "secs": 30,
- "totalSecs": 103,
+ "when": "2026-11-08T03:28Z",
+ "secs": 120,
+ "totalSecs": 347,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 19,
-   "detail": [
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "×1 Tap a glowing row",
-      "MOTHER OCHRE You take every Cobalt tile on a kiln "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "×1 Tap a glowing row",
-      "MOTHER OCHRE Cobalt is already on wall row 1, so t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Tamsin is choosing…",
-      "MOTHER OCHRE Welcome, apprentice. You and Tamsin t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Tamsin is choosing…",
-      "MOTHER OCHRE Row 3 is not full yet (1 of 3). It ke"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Tamsin's turn",
-      "TAMSIN PLAYS Tamsin takes 2 Frost tiles from a kil"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Tamsin takes 2 Frost",
-      "MOTHER OCHRE The 3 tiles you left slid to the midd"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Your turn: tap a colour",
-      "MOTHER OCHRE The 3 tiles you left slid to the midd"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "×2 Tap a glowing row",
-      "MOTHER OCHRE The middle holds what the kilns left "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "×3 Tap a glowing row",
-      "MOTHER OCHRE The middle holds what the kilns left "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Round over: tiling!",
-      "MOTHER OCHRE Every kiln and the middle are empty: "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Row 2: +4",
-      "MOTHER OCHRE This tile touches 2 tiles across and "
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Tamsin tiles row 3",
-      "MOTHER OCHRE Your floor held 4 spaces: -6 stars. F"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "×4 Tap a glowing row",
-      "MOTHER OCHRE Garnet is already on wall row 1, so t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "×4 Tap a glowing row",
-      "MOTHER OCHRE Welcome, apprentice. You and Tamsin t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 510,
-     "texts": [
-      "×4 Tap a glowing row",
-      "MOTHER OCHRE Welcome, apprentice. You and Tamsin t"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "×4 Tap a glowing row",
-      "MOTHER OCHRE Frost is already on wall row 2, so th"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 362,
-     "texts": [
-      "×4 Tap a glowing row",
-      "MOTHER OCHRE Frost is already on wall row 2, so th"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 250,
-     "texts": [
-      "Your turn: tap a colour",
-      "MOTHER OCHRE Frost is already on wall row 2, so th"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/play",
-     "ms": 276,
-     "texts": [
-      "Your turn: tap a colour",
-      "MOTHER OCHRE Frost is already on wall row 2, so th"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
-   "status": "FAIL",
-   "count": 10,
-   "detail": [
-    {
-     "session": "phone/play",
-     "text": "Your turn: tap a colour",
-     "ms": 250,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "×1 Tap a glowing row",
-     "ms": 250,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "Extra tiles break: minus points.",
-     "ms": 2253,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "phone/play",
-     "text": "☀ costs 1, but you start next.",
-     "ms": 3751,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn: tap a colour",
-     "ms": 486,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "MOTHER OCHRE Welcome, apprentice. You and Tamsin tile the Sun King's wall; most stars wins. Each kiln holds four tiles. Tap one tile: you take every tile of tha",
-     "ms": 2328,
-     "cls": "cg-b cg-coach",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "×4 Tap a glowing row",
-     "ms": 4872,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "MOTHER OCHRE Frost is already on wall row 2, so that row is closed to Frost: a glaze appears once per wall row. ×",
-     "ms": 2259,
-     "cls": "cg-b cg-coach",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Your turn: tap a colour",
-     "ms": 1261,
-     "cls": "bf-hint",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "×1 Tap a glowing row",
-     "ms": 771,
-     "cls": "bf-hint",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 12,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Cobalt is already on wall row 1, so that row is closed to Cobalt: a glaze appears once per wall row.",
-     "words": 21,
-     "at": 4002,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The 3 tiles you left slid to the middle: anyone may take them from there.",
-     "words": 15,
-     "at": 7001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Each full row sends ONE tile to your wall; the other tiles of that row go to the shard box.",
-     "words": 20,
-     "at": 24001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Play one coached game: a guide explains each rule just as it matters.",
-     "words": 13,
-     "at": 2001,
-     "where": "div.gxt-ex"
-    },
-    {
-     "session": "phone/play",
-     "text": "Tap a colour on a kiln (or in the middle): you take every tile of it.",
-     "words": 16,
-     "at": 11001,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "When every kiln and the middle are empty, each full rack sends one tile to your wall and scores.",
-     "words": 19,
-     "at": 11002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Each round you draft glazed tiles, dry them on your racks and set them into your mosaic.",
-     "words": 17,
-     "at": 11002,
-     "where": "p.lede"
-    },
-    {
-     "session": "phone/play",
-     "text": "Points come from tiles that touch other tiles, and from finished rows, columns and glazes at the end.",
-     "words": 18,
-     "at": 11002,
-     "where": "p.lede"
-    },
-    {
-     "session": "phone/play",
-     "text": "Each is loaded with 4 tiles from the clay sack at the start of a round.",
-     "words": 16,
-     "at": 11002,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "rack 5 holds 5), a 5×5 , and a line of 7 spaces.",
-     "words": 13,
-     "at": 11002,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Garnet is already on wall row 1, so that row is closed to Garnet: a glaze appears once per wall row.",
-     "words": 21,
-     "at": 30099,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "pc/play",
-     "text": "Frost is already on wall row 2, so that row is closed to Frost: a glaze appears once per wall row.",
-     "words": 21,
-     "at": 28301,
-     "where": "div.cg-t"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
-   "status": "FAIL",
-   "count": 32,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "−1",
-     "px": 13.4,
-     "at": 3001,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "−2",
-     "px": 13.4,
-     "at": 3001,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "−3",
-     "px": 13.4,
-     "at": 3001,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "floor",
-     "px": 13,
-     "at": 3001,
-     "where": "span.bf-fll"
-    },
-    {
-     "session": "phone/learn",
-     "text": "✗",
-     "px": 13,
-     "at": 4002,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/learn",
-     "text": "−1",
-     "px": 13,
-     "at": 4002,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Mother Ochre",
-     "px": 13,
-     "at": 4002,
-     "where": "b."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Cobalt is already on wall row 1, so that row is closed to Co",
-     "px": 13.5,
-     "at": 4002,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Welcome, apprentice. You and Tamsin tile the Sun King's wall",
-     "px": 13.5,
-     "at": 5001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Row 3 is not full yet (1 of 3). It keeps its tiles for the n",
-     "px": 13.5,
-     "at": 6001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The 3 tiles you left slid to the middle: anyone may take the",
-     "px": 13.5,
-     "at": 7001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+5",
-     "px": 13,
-     "at": 8008,
-     "where": "span.bf-pj.up"
-    },
-    {
-     "session": "phone/learn",
-     "text": "−6",
-     "px": 13,
-     "at": 9007,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+4",
-     "px": 13,
-     "at": 12003,
-     "where": "span.bf-pj.up"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+3",
-     "px": 13,
-     "at": 12004,
-     "where": "span.bf-bd.good"
-    },
-    {
-     "session": "phone/learn",
-     "text": "−8",
-     "px": 13,
-     "at": 12004,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/learn",
-     "text": "The middle holds what the kilns left over. Take all of one c",
-     "px": 13.5,
-     "at": 13004,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+4",
-     "px": 13.4,
-     "at": 14001,
-     "where": "em."
-    },
-    {
-     "session": "phone/learn",
-     "text": "−5",
-     "px": 13,
-     "at": 14001,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/learn",
-     "text": "−2",
-     "px": 13,
-     "at": 15001,
-     "where": "span.bf-pj.dn"
-    },
-    {
-     "session": "phone/learn",
-     "text": "+8",
-     "px": 13,
-     "at": 17001,
-     "where": "span.bf-pj.up"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Every kiln and the middle are empty: the round is over. Each",
-     "px": 13.5,
-     "at": 24001,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Your floor held 4 spaces: -6 stars. Floor spaces cost −1, −1",
-     "px": 13.5,
-     "at": 27002,
-     "where": "div.cg-t"
-    },
-    {
-     "session": "phone/play",
-     "text": "Most ★ wins",
-     "px": 13.5,
-     "at": 4001,
-     "where": "small."
-    },
-    {
-     "session": "phone/play",
-     "text": "−1",
-     "px": 13.4,
-     "at": 4001,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "−2",
-     "px": 13.4,
-     "at": 4001,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "−3",
-     "px": 13.4,
-     "at": 4001,
-     "where": "span."
-    },
-    {
-     "session": "phone/play",
-     "text": "floor",
-     "px": 13,
-     "at": 4001,
-     "where": "span.bf-fll"
-    },
-    {
-     "session": "phone/play",
-     "text": "−1",
-     "px": 13,
-     "at": 6011,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/play",
-     "text": "+1",
-     "px": 13.4,
-     "at": 8001,
-     "where": "em."
-    },
-    {
-     "session": "phone/play",
-     "text": "−2",
-     "px": 13,
-     "at": 9001,
-     "where": "span.bf-bd.bad"
-    },
-    {
-     "session": "phone/play",
-     "text": "+1",
-     "px": 13,
-     "at": 11002,
-     "where": "span.bf-pj.up"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -584,54 +31,51 @@
    "detail": []
   }
  },
- "notes": [
-  "phone/learn: Learn to play not found",
-  "pc/learn: Learn to play not found"
- ],
+ "notes": [],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 30,
-   "turns": 66,
-   "clicks": 112,
+   "secs": 120,
+   "turns": 158,
+   "clicks": 166,
    "endedBy": "result",
-   "tutorialEnded": null,
+   "tutorialEnded": 23,
    "hintsOff": true,
-   "messagesSeen": 44
+   "messagesSeen": 37
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 12,
-   "turns": 12,
+   "secs": 11,
+   "turns": 17,
    "clicks": 31,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 4
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 30,
-   "turns": 4,
-   "clicks": 5,
-   "endedBy": "time",
-   "tutorialEnded": null,
+   "secs": 122,
+   "turns": 68,
+   "clicks": 60,
+   "endedBy": "result",
+   "tutorialEnded": 47,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 12
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 30,
-   "turns": 7,
-   "clicks": 7,
-   "endedBy": "time",
+   "secs": 94,
+   "turns": 53,
+   "clicks": 57,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 6
+   "messagesSeen": 0
   }
  ]
 }

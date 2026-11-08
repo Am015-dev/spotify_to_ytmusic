@@ -26,7 +26,7 @@ html.bf-land .bf-say{font-size:15px}
 html.bf-land .bf-mid{flex-direction:row}
 html.bf-land .bf-table{margin:4px 0 4px 6px}
 html.bf-land .bf-side{justify-content:center;padding:4px 8px}
-.bf-hint{height:44px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:100%}
+.bf-line{height:44px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:100%}
 .bf-say{display:flex;align-items:center;gap:6px;min-width:0;flex:0 1 auto;overflow:hidden;font:800 17px var(--ff);color:#fff1c8;text-shadow:0 1px 2px #000;white-space:nowrap}
 .bf-say>span{overflow:hidden;text-overflow:ellipsis}
 .bf-tipl{color:#ffe08a;font-size:15px;white-space:normal;line-height:1.1;animation:bfTipIn .3s}
@@ -312,8 +312,8 @@ async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
     p.score+=add;bfScore(p.i,p.score);bfChipPop(p.i,'+'+add,'good');await bfWait(300)}}
 // ---------- drawing ----------
 function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
-  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-hint" role="status" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
-  document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-hint');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
+  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
+  document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-line');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
   r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
 function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
   let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,46):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
@@ -468,3 +468,9 @@ function bfDragUp(e){const d=BF.dg;if(!d||e.pointerId!==d.id)return;BF.dg=null;i
   const u=document.elementFromPoint(e.clientX,e.clientY);const row=u&&u.closest&&u.closest('[data-bfrow]');if(row&&UI.sel)bfClick({target:row,clientX:e.clientX,clientY:e.clientY,preventDefault(){},__bfdrag:1})}
 document.addEventListener('pointermove',bfDragMove,{passive:false});document.addEventListener('pointerup',bfDragUp);document.addEventListener('pointercancel',e=>{const d=BF.dg;if(d&&d.g)d.g.remove();BF.dg=null});
 {const _g=go;go=function(m){const r=_g.apply(this,arguments);if(BF.on&&m&&(m.act==='take'||m.act==='wall'))bfTick(m.line===5?[10,40,10]:16);return r}}
+
+// W466: the desktop side panel and the log say short sentences too (text-node level, so markup is untouched)
+function sgShortDom(root){if(!root||typeof sgShortS!=='function')return;const tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const ns=[];while(tw.nextNode())ns.push(tw.currentNode);
+  for(const n of ns){const t=n.nodeValue;if(!t||t.trim().split(/\s+/).length<=12)continue;const u=t.split(/(?<=[.!?…])(\s+)/).map(x=>/^\s+$/.test(x)?x:sgShortS(x)).join('');if(u!==t)n.nodeValue=u}}
+{const _rd=renderDock;renderDock=function(){const r=_rd.apply(this,arguments);try{sgShortDom(document.querySelector('.gx-dock'))}catch(e){}return r};
+ const _rp=renderPopups;renderPopups=function(){const r=_rp.apply(this,arguments);try{for(const id of ['logbody','plrd','refd','rulesd'])sgShortDom(document.getElementById(id))}catch(e){}return r}}
