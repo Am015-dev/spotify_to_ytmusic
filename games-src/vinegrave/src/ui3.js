@@ -127,7 +127,7 @@ const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
 <h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
-<h3>Your turn</h3><p>Do one action, then the next explorer goes. Pass to sit out.</p>
+<h3>Your turn</h3><p>Do one main action, then the next explorer goes. Playing a starting coin or compass card is free. Pass to sit out.</p>
 <ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread does nothing.</li>
 <li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then is discarded. A Plane pays any icon.</li>
 <li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>

@@ -13,10 +13,11 @@ const has = (G, pred) => VG.moves(G).some(pred);
 const find = (G, pred) => VG.moves(G).find(pred);
 const cnt = (p, id) => p.deck.concat(p.hand, p.play, p.disc).filter(c => c === id).length;
 const bootHand = p => { p.hand = ['grant', 'grant', 'trail', 'trail', 'grant']; };
+const itemHand = p => { p.hand = ['machete', 'machete', 'machete', 'machete', 'machete']; };   /* item cards: playing one IS the main action */
 const passAll = G => { let n = 0; const r0 = G.round; while (G.phase === 'play' && G.round === r0 && n++ < 20) go(G, { t: 'pass' }); };
 // p0 discovers level-1 site 5 (needs 2 boots); then p1 plays a card, so it is p0's turn again with the explorer standing at a guarded ruin
 function afterDisc() {
-  const G = G2(11), p = G.p[0]; p.res.compass = 3; bootHand(p); G.p[1].hand = ['grant', 'grant', 'grant', 'grant', 'grant'];
+  const G = G2(11), p = G.p[0]; p.res.compass = 3; bootHand(p); G.p[1].hand = ['machete', 'machete', 'machete', 'machete', 'machete'];
   G.d0 = cnt(p, 'dread'); go(G, { t: 'disc', s: 5 }); G.sites[5].guard = 'rootback-boar'; go(G, { t: 'play', i: 0 }); return G;
 }
 
@@ -39,9 +40,9 @@ rule('A15', 'Component count: 40 item cards.', () => eq(40, V.ITEMS.length));
 rule('A16', 'Component count: 35 artifact cards.', () => eq(35, V.ARTS.length));
 
 sec('B. Rounds and turns');
-rule('B1', 'A turn is exactly one main action (play a card), then play passes to the next explorer.', () => { const G = G2(); G.p[0].hand = ['trail', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
-rule('B2', 'Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).', () => { const G = G2(1, 3); G.p.forEach(bootHand); const t = []; go(G, { t: 'pass' }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); return eq([1, 2, 1], t); });
-rule('B3', 'If everyone else has passed, the last player takes turns one after another.', () => { const G = G2(); G.p.forEach(bootHand); go(G, { t: 'pass' }); go(G, { t: 'play', i: 0 }); const a = G.turn; go(G, { t: 'play', i: 0 }); return eq([1, 1], [a, G.turn]); });
+rule('B1', 'A turn is exactly one main action (play an item card), then play passes to the next explorer.', () => { const G = G2(); G.p[0].hand = ['machete', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
+rule('B2', 'Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).', () => { const G = G2(1, 3); G.p.forEach(itemHand); const t = []; go(G, { t: 'pass' }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); return eq([1, 2, 1], t); });
+rule('B3', 'If everyone else has passed, the last player takes turns one after another.', () => { const G = G2(); G.p.forEach(itemHand); go(G, { t: 'pass' }); go(G, { t: 'play', i: 0 }); const a = G.turn; go(G, { t: 'play', i: 0 }); return eq([1, 1], [a, G.turn]); });
 rule('B4', 'The round ends when all players have passed: next round starts, explorers return to the board owners.', () => { const G = G2(); bootHand(G.p[0]); go(G, { t: 'dig', s: 0 }); go(G, { t: 'pass' }); const mid = G.round; go(G, { t: 'pass' }); return eq([1, 2, 2, -1], [mid, G.round, G.p[0].ex, G.sites[0].occ]); });
 rule('B5', 'Free actions (a guardian boon) do not end the turn.', () => { const G = G2(); G.p[0].guards = [{ id: 'stone-ape', used: false }]; G.p[0].deck = ['grant', 'grant', 'grant']; go(G, { t: 'boon', k: 0 }); return eq([0, 7], [G.turn, G.p[0].hand.length]); });
 rule('B6', 'The starting marker passes one seat each round: round 2 starts with seat 1.', () => { const G = G2(); passAll(G); return eq([2, 1], [G.round, G.turn]); });
@@ -52,7 +53,7 @@ rule('B10', 'A played card goes to the play area and stays there until the end o
 rule('B11', 'End of round: the play area is shuffled and put on the BOTTOM of the deck (no separate discard pile, no reshuffle of the whole deck).', () => {
   const G = G2(), p = G.p[0], q = G.p[1], old = ['lamp', 'rope', 'tarp', 'ledger', 'kettle', 'satchel', 'pickaxe'];
   p.deck = old.slice(); p.hand = ['grant', 'trail', 'grant', 'grant', 'grant']; q.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; p.disc = []; p.play = [];
-  go(G, { t: 'play', i: 0 }); go(G, { t: 'play', i: 0 }); go(G, { t: 'play', i: 0 }); go(G, { t: 'pass' }); go(G, { t: 'pass' });
+  go(G, { t: 'play', i: 0 }); go(G, { t: 'play', i: 0 }); go(G, { t: 'pass' }); go(G, { t: 'pass' });   /* two free starting cards, then both pass */
   return eq({ head: old.slice(2), tail: ['grant', 'trail'], disc: 0 }, { head: p.deck.slice(0, 5), tail: p.deck.slice(5).sort(), disc: p.disc.length });
 });
 rule('B12', 'Items bought this round sit above the shuffled play area in the deck (deck order: old deck, bought items, then the played cards).', () => {
@@ -124,7 +125,9 @@ rule('G6', 'When a card stack is empty, that slot is not refilled (no card of th
 rule('G7', 'Bought artifact effects that need a choice pause for the answer, then the turn ends.', () => { const G = G2(), p = G.p[0]; G.row[5] = 'bone-dice'; p.res.compass = 5; go(G, { t: 'buy', r: 5 }); const q = G.q && G.q.h; go(G, { t: 'ans', v: 0 }); return eq(['or', 1, 1], [q, G.turn, p.res.tablet]); });
 
 sec('H. Play a card');
-rule('H1', 'Playing a card gives its effect and uses the main action (funding card: +1 coin).', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; const c = p.res.coin; go(G, { t: 'play', i: 0 }); return eq([c + 1, 1], [p.res.coin, G.turn]); });
+rule('H1', 'Playing a starting coin card gives its effect as a FREE action: +1 coin, still your turn.', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; const c = p.res.coin; go(G, { t: 'play', i: 0 }); return eq([c + 1, 0], [p.res.coin, G.turn]); });
+rule('H1b', 'Playing a starting compass card is free too; you can play both and still take a main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'trail', 'machete', 'grant', 'grant']; const c = p.res.compass, k = p.res.coin; go(G, { t: 'play', i: 1 }); go(G, { t: 'play', i: 0 }); const t0 = G.turn; go(G, { t: 'play', i: 0 }); return eq([c + 2, k + 2, 0, 1], [p.res.compass, p.res.coin, t0, G.turn]); });
+rule('H1c', 'Playing an item card for its effect uses the main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['machete', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
 rule('H2', 'Dread cards have no effect and cannot be played.', () => { const G = G2(), p = G.p[0]; p.hand = ['dread', 'dread', 'dread', 'dread', 'dread']; return eq(0, VG.moves(G).filter(m => m.t === 'play').length); });
 rule('H3', 'Exile removes a card from the game for good (hand card exiled, then the rest of the effect).', () => { const G = G2(), p = G.p[0]; p.hand = ['tarp', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); go(G, { t: 'ans', v: { z: 'hand', i: 0 } }); return eq({ ex: ['grant'], hand: 3, compass: 1, turn: 1 }, { ex: p.exiled, hand: p.hand.length, compass: p.res.compass, turn: G.turn }); });
 rule('H4', 'Exile can also take a card from your PLAY area (including the card just played).', () => { const G = G2(), p = G.p[0]; p.hand = ['tarp', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(true, VG.moves(G).some(m => m.t === 'ans' && m.v && m.v.z === 'play')); });

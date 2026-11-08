@@ -103,7 +103,7 @@
     if (p.idols.some(function (d) { return !d.used; }) && p.idols.filter(function (d) { return d.used; }).length < V.SLOTS)
       p.idols.forEach(function (d, k) { if (!d.used) V.SHRINE.forEach(function (sh, j) { out.push({ t: 'idol', k: k, sh: j, free: true }); }); });
     // main actions
-    p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push({ t: 'play', i: i }); });
+    p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push(c.t === 'basic' ? { t: 'play', i: i, free: true } : { t: 'play', i: i }); });   /* rulebook: the starting coin / compass cards are free actions */
     if (p.ex > 0) G.sites.forEach(function (x, i) {
       if (x.occ !== -1) return;
       if (x.lvl === 0 || x.tile) { if (payPlan(G, s, x.cost)) out.push({ t: 'dig', s: i }); }
@@ -166,6 +166,7 @@
     if (m.t === 'ans') { answer(G, s, m.v); return { ok: true }; }
     if (m.t === 'boon') { var g = p.guards[m.k]; g.used = true; log(G, s, nm(G, s) + ' uses the boon of ' + V.GUARD[g.id].name + '.', { k: 'boon' }); runOps(G, s, V.GUARD[g.id].boon, false); return { ok: true }; }
     if (m.t === 'idol') { var d = p.idols[m.k], sh = V.SHRINE[m.sh]; d.used = true; p.idolTurn = true; log(G, s, nm(G, s) + ' sets the ' + V.IDOL[d.id].name + ' in a shrine: ' + sh.text + '.', { k: 'idol' }); runOps(G, s, sh.ops, false); return { ok: true }; }
+    if (m.t === 'play' && card(p.hand[m.i]).t === 'basic') { var bid0 = p.hand.splice(m.i, 1)[0], b0 = card(bid0); p.play.push(bid0); log(G, s, nm(G, s) + ' plays ' + b0.name + ' (free).', { k: 'play', card: bid0, free: true }); runOps(G, s, b0.ops, false); return { ok: true }; }
     G.turns++;
     if (m.t === 'pass') { p.passed = true; log(G, s, nm(G, s) + ' passes.', { k: 'pass' }); endTurn(G, true); return { ok: true }; }
     if (m.t === 'play') {

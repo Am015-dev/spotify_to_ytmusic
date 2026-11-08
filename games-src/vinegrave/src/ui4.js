@@ -121,6 +121,7 @@ function guidedSteps() {
   const step = (id, title, say, target, wait, extra) => Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {});
   const site = lv => tsel('.site.l' + lv + '.glow');
   const isSite = lv => a => a.what === 'site' && G.sites[a.x] && G.sites[a.x].lvl === lv;
+  const site2 = () => $('.site.l2') || $('#map');
   const selSite = () => tq(() => $('.site.sel'));
   const mine = id => (G.sites.findIndex(x => x.occ === 0 && x.guard) === -1 ? null : $(`.site[data-i="${G.sites.findIndex(x => x.occ === 0 && x.guard)}"]`));
   const artNoQ = () => {   /* put an artifact whose effect asks nothing in the last market slot, so the next step can follow at once */
@@ -131,15 +132,15 @@ function guidedSteps() {
   const inspOpen = () => tmine() && !$('#insp').hidden;
   const toTemple = () => { const me = G.p[0]; if (me.glass < V.TOP) { me.glass = V.TOP; G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(0) < 0) G.templeOrder.push(0); } TOP_UP(V.TEMPLE[0].cost); };
   return [
-    step('g-play', 'Play a card', 'Tap Trail Notes in your hand.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
-    step('g-play2', 'Play a card', 'Tap it again to play it: plus 1 compass.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+    step('g-play', 'Free cards', 'Starting cards are free to play. Tap Trail Notes.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
+    step('g-play2', 'Free cards', 'Tap it again: plus 1 compass. Your turn goes on.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
       { ready: () => tmine() && !!$('#hand .cd.sel') }),
     step('g-plane', 'Travel by Plane', 'This camp needs a Boat. No Boat card? Tap it.', tsel('.site[data-i="2"].glow'), { type: 'tap', match: a => a.what === 'site' && a.x === 2 },
       { onEnter: () => TOP_UP({ coin: 2 }), ready: () => tmine() && !!$('.site[data-i="2"].glow') }),
     step('g-plane2', 'Travel by Plane', 'Tap again: 2 coins buy a Plane. Take its goods.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'dig' }),
-    step('g-disc', 'Discover a ruin', 'Ruins cost 3 compasses plus travel. Tap a glowing ruin.', site(1), { type: 'tap', match: isSite(1) },
+    step('g-disc', 'Discover a ruin', 'Ruins cost 3 compasses, deep ruins 6, plus travel. Tap one.', site(1), { type: 'tap', match: isSite(1) },
       { onEnter: () => TOP_UP({ compass: 3 }), ready: () => tmine() && !!$('.site.l1.glow') }),
-    step('g-disc2', 'Dread pays travel', 'Tap again. Your Dread cards pay the boots.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }),
+    step('g-disc2', 'Dread pays travel', 'Tap again. Dread cards pay boots; Jeeps and Boats can too.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }),
     step('g-idol', 'Idols', 'You found an idol: 3 points. Tap it.', tq(() => $('#extra [data-a=idol]')), { type: 'tap', match: a => a.what === 'idol' },
       { ready: () => tmine() && !!$('#extra [data-a=idol]') }),
     step('g-shrine', 'Shrines', 'Set it in a shrine: a free bonus now.', tinsp('Shrine'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'idol' }, { ready: inspOpen }),
@@ -171,10 +172,10 @@ function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs .rplayers')) || $('#opp');
   return [
-    { id: 'goal', title: 'How to win', say: 'Most points after 5 rounds wins. One action per turn.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
-    { id: 'hand', title: 'Your first move', say: 'Each turn you do one thing. Tap Trail Notes in your hand.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+    { id: 'goal', title: 'How to win', say: 'Most points after 5 rounds wins. One main action per turn.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
+    { id: 'hand', title: 'Your first move', say: 'Starting cards are free to play. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
-    { id: 'play', title: 'Your first move', say: 'It gives 1 compass. Tap it again, or drag it up.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
+    { id: 'play', title: 'Your first move', say: 'Tap it again: plus 1 compass. Your turn goes on.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.sel && UI.sel.k === 'hand' && $('#hand .cd.sel')), onEnter: () => { CO.seen.play = 1; } },
     ...(GUIDED ? guidedSteps() : []),
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
@@ -239,3 +240,11 @@ function boot() {
 }
 window.UI = UI; Object.defineProperty(window, 'G', { get: () => G, configurable: true });
 boot();
+/* G2 review R4: in a guided step only the step's target glows; every other glow goes quiet (class gq) so one thing asks for the tap */
+setInterval(() => {
+  const on = typeof GXT !== 'undefined' && UI.mode === 'tutorial' && GXT.active() && !UI.coachFree;
+  document.body.classList.toggle('vg-guided', !!on);
+  let t = null; if (on) { try { const st = GXT.current(); t = st && typeof st.target === 'function' ? st.target() : null; } catch (x) { t = null; } }
+  document.querySelectorAll('.glow').forEach(e => e.classList.toggle('gq', !!on && !(t && (t === e || t.contains(e) || e.contains(t)))));
+  if (!on) document.querySelectorAll('.gq').forEach(e => e.classList.remove('gq'));
+}, 200);

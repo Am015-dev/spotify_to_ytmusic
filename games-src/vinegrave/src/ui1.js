@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render (one board: sites, research track, market; your tray below) =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, tut: null, sel: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'easy', hot: false }, prefs: {}, tut: null, sel: null };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -192,7 +192,7 @@ function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) retur
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return 'Your turn: one action. Tap or drag what glows.' + best;
+  return 'Your turn: one main action. Starting cards are free. Tap or drag what glows.' + best;
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {
