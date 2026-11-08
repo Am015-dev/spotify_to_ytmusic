@@ -42,7 +42,10 @@ const TUT_SCRIPT=[
   ['C','C','H','E','E','1'],  // you in Downtown: claws, a heart that cannot heal, two energy
   ['C','C','C','1','2','H'],  // Squidrik: three claws
   ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['H','C','C','3','3','E']]; // you outside: a heart that heals, claws that hit Downtown
+  ['H','C','C','3','3','E'],  // you outside: a heart that heals, claws that hit Downtown
+  ['C','1','2','H','H','3'],  // Squidrik (now in Downtown): one claw
+  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
+  ['3','3','3','3','C','C']]; // you, chapter 4: four 3s (3 stars + 1 for the extra die)
 const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','mend'];   // cards for sale; then (popped in this order) what a refill and the sweep deal
 (function(){
   // the dice: only the real throws read the script (the computer's look-ahead calls faceOf too and must stay random)
@@ -58,7 +61,7 @@ const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','men
   const _sv=save;save=function(){if(G&&G.tut)return;return _sv.apply(this,arguments)};
   const _sg=suggestCard;suggestCard=function(p){if(G&&G.tut)return -1;return _sg.apply(this,arguments)};
   // the board's ghost finger and the help kit's bubbles stay quiet: the tutorial is the only teacher
-  const _bf=bfFinger;bfFinger=function(){if(tutOn()){const f=document.getElementById('bfinger');if(f)f.classList.remove('on');return}return _bf.apply(this,arguments)};
+  const _bf=bfFinger;bfFinger=function(){if(tutOn()||(G&&G.tut&&window.PPC&&PPC.on)){const f=document.getElementById('bfinger');if(f)f.classList.remove('on');return}return _bf.apply(this,arguments)};
   // the staged table is built inside newGame, before the first turn
   const _cs=campSetup;campSetup=function(){const r=_cs.apply(this,arguments);if(UI.tutNext)tutTable();return r};
 })();
@@ -134,13 +137,38 @@ function tutSteps(){
    ready:()=>myRoll()&&!inCity(0)&&G.rolls===2},
  {id:'score3',title:'Heal and hit',say:()=>'A heart healed you: '+Math.max(0,P(0).hp)+' ♥. Your claws hit '+nm(1)+' in Downtown.',target:tChips,wait:null,
    ready:()=>myBuy()&&!inCity(0)},
- {id:'finish',title:'How it ends',say:'The first monster to 20 ★ wins, or the last one standing. Now play a real game!',target:tChips,wait:null,ready:()=>myBuy()});
+ {id:'end3',title:'End your turn',say:'Tap End turn. The rivals play on while you watch.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&!inCity(0)&&P(0).vp<16},
+ {id:'later',title:'Four of a kind',say:()=>'Some turns later you have '+P(0).vp+' ★. Four 3s score 3 ★ plus 1 for the extra die. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+   onEnter:()=>{try{P(0).vp=16;refresh()}catch(e){}},
+   ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
+ {id:'win20',title:'Reach 20 stars',say:()=>'You have '+P(0).vp+' ★. Reach 20 and end your turn to win. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&P(0).vp>=20},
+ {id:'result',title:'The result',say:'The first to 20 ★ wins at once. You also win if every rival is K.O. (0 hearts). Tap Finish.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+   ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
+  // the story layer (tut-story.js): the words, Dot's reactions and the chapter beats; the rules and actions above are untouched
+  const FIRST={goal:1,rivals:2,done3:3,later:4}, LAST={end1:1,yield:2,end3:3,result:4};
+  const H=()=>({vp:P(0).vp,hp:Math.max(0,P(0).hp),rival:nm(1),card:G.market[0]!==undefined?CARDS[base(G.market[0])].n:'the card',cost:G.market[0]!==undefined?costOf(P(0),G.market[0]):0});
+  S.forEach(x=>{const t=TUT_STORY.steps[x.id];if(!t)return;
+    if(typeof t.say==='function'){const f=t.say;x.say=()=>f(H())}else x.say=t.say;
+    const react=t.react,first=FIRST[x.id],last=LAST[x.id],B=TUT_STORY.beats;
+    const oe=x.onEnter;x.onEnter=()=>{if(oe)oe();if(first&&typeof ppBeat==='function')ppBeat('Chapter '+first+' · '+B[first].name,B[first].intro)};
+    const od=x.onDone;x.onDone=()=>{if(od)od();if(typeof ppBeat!=='function')return;if(react&&!last)ppBeat(null,react);if(last&&x.id!=='result')ppBeat('Chapter '+last+' done',(react?react+' ':'')+B[last].outro)}});
+  const CH={goal:1,keep:1,roll1:1,third:1,energy:1,roll2:1,done1:1,score1:1,shop:1,buy:1,end1:1,rivals:2,stay:2,bonus:2,done2:2,score2:2,sweep:2,end2:2,yield:2,done3:3,score3:3,end3:3,later:4,win20:4,result:4};
+  S.forEach(x=>{if(CH[x.id])x.title=CH[x.id]+' · '+x.title});
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){   // coached first game (Addendum 4): a real game, free choices from turn 1, Dot speaks just in time (playable.js, tut-story.js)
+  try{localStorage.setItem('gxt-'+TUT_GAME,JSON.stringify({open:true,step:1,seen:true}))}catch(e){}
+  try{GXH.hide()}catch(e){}try{if(GX.open)GX.close()}catch(e){}try{if(typeof GXC!=='undefined'&&GXC.close)GXC.close()}catch(e){}
+  clearTimeout(UI.statsT);UI.info=false;UI.choice=null;UI.stats=false;UI.intro=false;UI.coach=-1;UI.adv=false;UI.paused=false;UI.pending=false;UI.busy=false;UI.camp=null;UI.campNext=false;UI.tutNext=true;
+  const sv={n:UI.n,mon:UI.mon,xp:UI.xp,evo:UI.evo,ex:UI.ex,lvl:UI.lvl};UI.n=3;UI.mon=0;UI.xp='base';UI.evo=false;UI.ex={};UI.lvl='easy';
+  try{setSeed(5);newGame('solo',3,0)}finally{Object.assign(UI,sv)}
+  TUT.hints=UI.hints;UI.hints=false;UI.intro=false;if(G){G.tut=1;G.goal=6;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
+function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'Roll, keep, smash, hold Downtown, buy cards. Now the Story begins.':'Roll, keep, smash, hold Downtown, buy cards. Time for a real game.',
+    endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{tutLeave();const c=r&&r.choice;
@@ -157,7 +185,7 @@ function tutSetup(){document.documentElement.classList.add('gxt-on');try{GXH.hid
   try{newGame('solo',3,0)}finally{Object.assign(UI,sv)}
   UI.intro=false;if(G){G.tut=1}render()}
 // leave the staged game: nothing of it was saved, the board goes quiet behind the menu
-function tutLeave(){document.documentElement.classList.remove('gxt-on');if(TUT.hints!==undefined){UI.hints=TUT.hints;TUT.hints=undefined}TUT.hold=false;TUT.script=[];clearTimeout(UI.statsT);UI.pending=false;UI.busy=false;UI.choice=null;UI.intro=false;
+function tutLeave(){try{if(typeof ppCoachStop==='function')ppCoachStop()}catch(e){}document.documentElement.classList.remove('gxt-on');if(TUT.hints!==undefined){UI.hints=TUT.hints;TUT.hints=undefined}TUT.hold=false;TUT.script=[];clearTimeout(UI.statsT);UI.pending=false;UI.busy=false;UI.choice=null;UI.intro=false;
   try{GXH.hide()}catch(e){}try{const f=document.getElementById('bfinger');if(f)f.classList.remove('on')}catch(e){}
   G=null;UI.info=true;try{if(typeof BF!=='undefined')BF.sel=-1}catch(e){}render();tutMenus()}
 function tutMenus(){const s=document.getElementById('gxtset');if(s)s.innerHTML=tutBtn('btn mrow');
