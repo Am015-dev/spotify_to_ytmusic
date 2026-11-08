@@ -1,14 +1,24 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T04:20Z",
+ "when": "2026-11-08T04:46Z",
  "secs": 120,
- "totalSecs": 418,
+ "totalSecs": 407,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 1,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Your 4 goes on Axis. Wings tilt 1. Three would crash. ×",
+     "words": 12,
+     "shownMs": 365,
+     "neededMs": 5200,
+     "cls": "fa-coach out"
+    }
+   ]
   },
   "b": {
    "status": "PASS",
@@ -16,24 +26,9 @@
    "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 2,
-   "detail": [
-    {
-     "session": "pc/learn",
-     "text": "Routine landing · snow, dawn · Ines (Pilot, blue) and Ravi (Co-pilot, orange)",
-     "words": 13,
-     "at": 114003,
-     "where": "p.sm.muted"
-    },
-    {
-     "session": "pc/play",
-     "text": "Routine landing · fog, night · Ines (Pilot, blue) and Ravi (Co-pilot, orange)",
-     "words": 13,
-     "at": 37003,
-     "where": "p.sm.muted"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
    "status": "PASS",
@@ -41,124 +36,9 @@
    "detail": []
   },
   "e": {
-   "status": "FAIL",
-   "count": 6,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "k": "=|✓",
-     "at": 120249,
-     "a": "=",
-     "b": "✓",
-     "ra": [
-      72,
-      409,
-      7,
-      15
-     ],
-     "rb": [
-      67,
-      414,
-      18,
-      20
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "same|✓",
-     "at": 120249,
-     "a": "same",
-     "b": "✓",
-     "ra": [
-      60,
-      425,
-      31,
-      15
-     ],
-     "rb": [
-      67,
-      414,
-      18,
-      20
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Gear|✓",
-     "at": 120249,
-     "a": "Gear",
-     "b": "✓",
-     "ra": [
-      111,
-      409,
-      25,
-      14
-     ],
-     "rb": [
-      115,
-      414,
-      18,
-      20
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "3-4|✓",
-     "at": 120249,
-     "a": "3-4",
-     "b": "✓",
-     "ra": [
-      115,
-      425,
-      17,
-      14
-     ],
-     "rb": [
-      115,
-      414,
-      18,
-      20
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "Flap|✓",
-     "at": 120244,
-     "a": "Flap",
-     "b": "✓",
-     "ra": [
-      207,
-      409,
-      23,
-      14
-     ],
-     "rb": [
-      210,
-      414,
-      18,
-      20
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "1-2|✓",
-     "at": 120244,
-     "a": "1-2",
-     "b": "✓",
-     "ra": [
-      211,
-      425,
-      16,
-      14
-     ],
-     "rb": [
-      210,
-      414,
-      18,
-      20
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   }
  },
  "notes": [
@@ -172,19 +52,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 244,
-   "clicks": 296,
-   "endedBy": "time",
+   "turns": 191,
+   "clicks": 284,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 3
+   "messagesSeen": 13
   },
   {
    "size": "phone",
    "mode": "play",
    "secs": 120,
-   "turns": 256,
-   "clicks": 334,
+   "turns": 235,
+   "clicks": 294,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -194,19 +74,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 172,
-   "clicks": 290,
-   "endedBy": "time",
+   "turns": 170,
+   "clicks": 278,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 0
+   "messagesSeen": 8
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 57,
-   "turns": 119,
-   "clicks": 154,
+   "secs": 45,
+   "turns": 73,
+   "clicks": 119,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
