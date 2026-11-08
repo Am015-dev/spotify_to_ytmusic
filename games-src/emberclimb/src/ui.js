@@ -27,13 +27,27 @@
   window.EC_A = A;
   // owner art has landscape versions (<stem>-wide) for wide screens; phones keep the portrait picture
   function BG(stem) { var w = window.innerWidth > window.innerHeight * 1.1 && (window.MEDIA_PRESENT || []).indexOf(stem + '-wide') >= 0; return A(w ? stem + '-wide' : stem, '', { cls: 'bg', kind: 'bg' }); }
+  // Addendum 7: three modes. Learn to play = the coached game (bubbles); Play = clean (default); Hints = top-bar toggle, off by default
+  function learnOn() { try { return !!((window.GXT && GXT.active()) || (UI.coachOn && UI.coachOn())); } catch (e) { return false; } }
+  try { UI.hints = localStorage.getItem('emberclimb.hints') === '1'; } catch (e) { UI.hints = false; }
+  function modeCls() { var b = document.body; b.classList.toggle('hints-on', !!UI.hints); b.classList.toggle('learn', learnOn()); var hb = document.getElementById('hintsB'); if (hb) { hb.setAttribute('aria-pressed', String(!!UI.hints)); hb.setAttribute('aria-label', 'Hints: ' + (UI.hints ? 'on' : 'off')); hb.classList.toggle('on', !!UI.hints); } }
+  UI.setHints = function (v) { UI.hints = !!v; try { localStorage.setItem('emberclimb.hints', UI.hints ? '1' : '0'); } catch (e) { } modeCls(); render(); };
+  document.addEventListener('click', function (e) { var b = e.target && e.target.closest && e.target.closest('#hintsB'); if (b) { e.stopPropagation(); UI.setHints(!UI.hints); } }, true);
+  // one-card Goal before turn 1 of a Play game (not in Learn to play or Story, which have their own intros)
+  function goalCard(done) {
+    var o = h('div', 'ec-goal'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Goal');
+    var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top of the tower and defeat its guardian.'),
+      h('ul', '', null, [h('li', '', 'Spend energy on cards: attacks cut enemy HP, Block stops their hits.'), h('li', '', 'Each won fight adds a card, gold or a relic to your climb.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
+    var b = on(h('button', 'btn', 'Climb'), function () { o.remove(); if (done) done(); }); b.id = 'goal-go'; c.appendChild(b); o.appendChild(c); document.body.appendChild(o);
+  }
+  UI.goalCard = goalCard;
   // the room's host (owner portraits): a face and one line of speech under the room title
   function host(stem, line) { var d = h('div', 'host'); d.appendChild(A(stem, '', { noph: 1, cls: 'hostpic', kind: 'portrait' })); d.appendChild(h('p', '', line)); return d; }
   var GLY = { atk: '⚔', def: '🛡', buf: '✦', deb: '☠', sleep: '💤', big: '⚔' };
   var TONE = { w: '#a8431f', s: '#2f7a46', a: '#2f6fa8', m: '#a8861c', n: '#777', z: '#555' };
   // ---------- helpers
   function G() { return E.G(); }
-  function toast(t, ms) { var d = h('div', 'toast', t); if (ms) d.style.animationDuration = ms + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, ms || 1400); }
+  function toast(t, ms) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var d = h('div', 'toast', t); if (ms) d.style.animationDuration = ms + 'ms'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, ms || 1400); }
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -124,7 +138,7 @@
   }
   // ---------- screens
   function render() {
-    var g = G(); app.innerHTML = ''; tscr.innerHTML = '';
+    var g = G(); app.innerHTML = ''; tscr.innerHTML = ''; modeCls();
     if (UI.mode === 'title' || !g) { gameEl.hidden = true; tscr.hidden = false; try { GX.close(); } catch (e) { } try { GXH.hide(); } catch (e) { } return title(); }
     tscr.hidden = true; gameEl.hidden = false;
     if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
@@ -202,7 +216,7 @@
   }
   UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); }
+  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
@@ -263,7 +277,7 @@
       else b.disabled = true;
       m.appendChild(b);
     });
-    var QI = (window.EC_STORY || {}).quick; if (QI && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
+    var QI = (window.EC_STORY || {}).quick; if (QI && UI.hints && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
     app.appendChild(m);
   }
   // ---------- battle
@@ -364,7 +378,7 @@
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
     if (b.ph === 'p') {
-      ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
+      ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
       var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
@@ -416,7 +430,7 @@
   }
   function whyOf(h0, c, tg) { var m = whyMods(h0, c, tg); return E.eff(c).name + (m ? ' ' + m.replace('x2 Vuln', 'x2 Vulnerable') : ''); }
   function dealIn(hand) {
-    var cs = hand.querySelectorAll('.card'); if (!cs.length) return; SFX('draw'); if (!moOk()) return;
+    var cs = hand.querySelectorAll('.card'); if (!cs.length) return; SFX('draw'); if (!moOk()) return; UI.dealT = Date.now() + 360 + cs.length * 70 + 80;   // cards fly from the Draw chip: a tap there opens no pile meanwhile
     var dp = document.getElementById('drawpile'), pr = dp && dp.getBoundingClientRect();
     [].forEach.call(cs, function (c, i) {
       if (!c.animate) return; var r = c.getBoundingClientRect(), dx = pr ? pr.left + pr.width / 2 - (r.left + r.width / 2) : -160, dy = pr ? pr.top + pr.height / 2 - (r.top + r.height / 2) : 0;

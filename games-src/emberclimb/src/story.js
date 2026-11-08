@@ -88,7 +88,7 @@ window.EC_STORY = {
       elite: 'An elite: tougher than a normal foe, better loot.',
       boss: 'The boss repeats a pattern. On its Spikes turn, attacks hurt you: block instead.',
       lose: 'If your HP hits 0, the climb ends.',
-      preview: 'Lift a card: each foe shows the exact damage it would take, and you see the Block you would gain.',
+      preview: 'Hints (top bar) on: lift a card and each foe shows the exact damage it would take, and you see the Block you would gain.',
       frail: 'Frail: your Block cards give a quarter less while it lasts.',
       acts: 'A full climb has three acts, each with its own foes and guardian, plus a final act. Each new act heals you fully.',
       laststand: 'Last Stand: with two heroes in a boss fight, the first to fall stays at 1 HP. The second fall ends the climb.',

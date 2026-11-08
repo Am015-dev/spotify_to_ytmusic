@@ -123,5 +123,6 @@
     try { if (GXT.active()) UI.render(); } catch (e) { }
   };
   UI.tutFree = function () { return false; };
+  UI.coachOn = function () { return !!C.on; };   // Addendum 7: bubbles only in Learn to play
   window.EC_TUT_STEPS = steps;
 })();

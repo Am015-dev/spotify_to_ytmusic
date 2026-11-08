@@ -8,12 +8,130 @@
   "endButtons": 0
  },
  "quick": {
-  "result": null
+  "result": "cap",
+  "clicks": 711
  },
  "story": {
-  "result": null
+  "result": "cap",
+  "clicks": 463
  },
- "fuzz": {},
- "bugs": [],
- "secs": 4
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #711 (Hits 5)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 711 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-quick-noresult-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button#mute.chip.tap \"🔊\" / button.gxc-node.a3.locked \"7 🔒 Wraith Stair\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-story-map-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#mute.chip.tap \"🔊\" / button.gxc-node.a3.locked \"7 🔒 Wraith Stair\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gxc-node.a3.locked \"7 🔒 Wraith Stair\" / button.gxc-btn.go \"Play\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-story-board-9.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 38px (<40) button.pot.full x1: \"Venom Vial\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-story-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #463 (End turn)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 463 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases story",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-story-noresult-13.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.gx-chip x6: \"Game\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 28px (<40) input x3: \"Master volume\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.chip \"Used 5\" / input \"Master volume\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Game\" / button#m-restart.gx-sb \"Restart\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Sound\" / button#m-restart.gx-sb \"Restart\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Sound\" / button#m-leave.gx-sb \"Leave run\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Speed\" / button#m-leave.gx-sb \"Leave run\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.gx-chip \"Help\" / button#m-leave.gx-sb \"Leave run\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size phone --seed 27157 --phases fuzz",
+   "shot": "/tmp/claude-0/qa-shots2/emberclimb/phone-screen-fuzz-screen-17.png"
+  }
+ ],
+ "secs": 427,
+ "tutorialIn": {}
 }
