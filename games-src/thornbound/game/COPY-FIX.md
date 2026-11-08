@@ -3,7 +3,7 @@ Game: thornbound. Date: 2026-11-08.
 
 ## Goal card
 The aim is stated in one sentence in most places, but the wording drifts and some versions carry extra clauses. The title card says: "Win by holding the most Influence when the last round ends." The coach line says: "Influence is your score. The most when the last round ends wears the crown." (vague: "the most" what, and "wears the crown" is flowery). The quick rules say it in two sentences plus a tie rule.
-Verdict: fixed. Use ONE sentence everywhere: "Hold the most Influence when the last round ends." (Tie rule lives in the full rules only.)
+Verdict: fixed. Use ONE sentence everywhere: "Influence is your score. Most Influence after the last round wins." is two, so use "Hold the most Influence when the last round ends." (Tie rule lives in the full rules only.)
 
 Old goal lines are in the table below: story.js (coach goal, tutorial goal), ui7.js (title card), ui12.js (retired goal step).
 
@@ -43,10 +43,10 @@ Old goal lines are in the table below: story.js (coach goal, tutorial goal), ui7
 | story.js:41 | A tie goes to the higher on the Order Track. | A tie goes to whoever is higher on the Order Track. |
 | story.js:42 | The winner takes a Kingdom Card, a favour you keep all game. Your bid card goes under it. | The bid winner keeps a Kingdom Card. Your bid goes under it. |
 | story.js:43 | Place your Herald on a location. It pays only if you win that region; stand where Tamsin stands to steal from her. | Place your Herald. It pays if you win that region. |
-| story.js:44 | Hide one card at each region, face down. Your Heir and your biggest cards belong where it matters. | Hide one card per region. Put big cards where you want to win. |
+| story.js:44 | Hide one card at each region, face down. Your Heir and your biggest cards belong where it matters. | Hide one card per region. Put big ones where it counts. |
 | story.js:45 | Supporters add +1 each in a region this round. Tap a region to send one, then Done. | Each Supporter adds +1. Tap a region to send one, then Done. |
 | story.js:46 | You choose which region fights first. Tap the regions in order. | Choose which region fights first. Tap the regions in order. |
-| story.js:48 | Winner of a region claims one of its two locations: its Influence, plus +1 and a steal if your Herald stands there. | The winner claims one location and its Influence. A Herald there adds +1. |
+| story.js:48 | Winner of a region claims one of its two locations: its Influence, plus +1 and a steal if your Herald stands there. | The winner claims a location and its Influence. A Herald adds +1. |
 | story.js:49 | Scoring: you have '+myInf()+', Tamsin '+rivInf()+'. Location reward, Herald bonus and steals all count. | Score: you '+myInf()+', Tamsin '+rivInf()+'. Location, Herald bonus and steals all count. |
 | story.js:50 | The round ends: Supporters go home, played cards are discarded, a new round begins. Real games last 4 to 6 rounds. | Round over. Supporters leave and played cards are discarded. |
 | story.js:54 | Tap a card to bid it in secret. The highest bid picks first. | Tap a card to bid it in secret. High bid picks first. |
@@ -77,19 +77,19 @@ Old goal lines are in the table below: story.js (coach goal, tutorial goal), ui7
 | ui11.js:72 | Lore buys Site of Power cards. A card with Strength goes to your hand. | Lore buys Site of Power cards. Strength cards go to your hand. |
 | ui11.js:74 | Your hand is over its size limit. Discard cards down to the limit. | You have too many cards. Discard down to the limit. |
 | ui11.js:75 | Keep your strong cards for the Clashes. Discard the weakest ones. | Keep strong cards for the Clashes. Discard the weakest. |
-| ui5.js:113 | <b>Simplified on purpose:</b> starting hand is 6; the solo mode and the optional advanced setup of the board game are not built. | <b>Simplified on purpose:</b> you start with 6 cards. No solo mode or advanced setup. |
+| ui5.js:113 | <b>Simplified on purpose:</b> starting hand is 6; the solo mode and the optional advanced setup of the board game are not built. | <b>Simplified on purpose:</b> 6 starting cards, no solo mode, no advanced setup. |
 | ui5.js:114 | Underlined words in the game can be tapped for their meaning. | Tap underlined words to see what they mean. |
-| ui4.js:131 | Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight. | Bid in secret. High bid picks first. Your bid card goes under it. |
+| ui4.js:131 | Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight. | Bid in secret. High bid picks first. Your bid goes under it. |
 | ui4.js:132 | Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there. | Everyone sees your Herald. Win there for +1 Influence and steals. |
-| ui4.js:133 | You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere. | Hide one card per region. Put big cards where the prize is best. |
+| ui4.js:133 | You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere. | Hide one card per region. Put big ones where prizes are best. |
 | ui4.js:134 | Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step. | Each Supporter adds +1 Strength. Open the list for more actions. |
 | ui4.js:135 | The player with the least Influence chooses the order of the three Clashes. | The player with least Influence picks the Clash order. |
 | ui4.js:136 | The winner claims one of the region\'s two locations: its Influence and its bonus. | The winner claims one location, with its Influence and bonus. |
 | ui4.js:137 | Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back. | Take a Kingdom Card, steal one, or take your card back. |
 | ui4.js:147 | Everyone else look away. | Everyone else, look away. |
-| ui4.js:194 | You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. Suggestions show in rounds 1 and 2; after that tap Suggest a move when you want one. | You finished a game. Next, try a full game: 3 players, 5 rounds. |
-| ui3.js:8 | Spring, Bids. Everyone secretly picks one card from their hand as a bid. Highest bid chooses first: take a Kingdom Card, steal a rival\'s, or take your card back. A card you bid under a Kingdom Card stays there while you keep it. | Spring, Bids. Pick one card as a secret bid. High bid chooses first. |
-| ui3.js:9 | Spring, Heralds. In turn, put your Herald on one of the six locations. Everyone sees it. If you win a clash and claim that location you gain 1 Influence and steal 1 from every rival Herald on it. | Spring, Heralds. Place your Herald on a location. Win there for a bonus. |
+| ui4.js:194 | You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. Suggestions show in rounds 1 and 2; after that tap Suggest a move when you want one. | You finished a game. Next, try 3 players and 5 rounds. |
+| ui3.js:8 | Spring, Bids. Everyone secretly picks one card from their hand as a bid. Highest bid chooses first: take a Kingdom Card, steal a rival\'s, or take your card back. A card you bid under a Kingdom Card stays there while you keep it. | Spring, Bids. Bid one card in secret. High bid picks first. |
+| ui3.js:9 | Spring, Heralds. In turn, put your Herald on one of the six locations. Everyone sees it. If you win a clash and claim that location you gain 1 Influence and steal 1 from every rival Herald on it. | Spring, Heralds. Place your Herald. Win there for a bonus. |
 | ui3.js:10 | Spring, Cards. Secretly play one face-down card next to each of the three regions. The strongest total in a region wins its clash, so decide where your big cards go. | Spring, Cards. Hide one card at each region. Highest total wins. |
 | ui3.js:11 | Spring, Actions. In turn order you may use Spring abilities, such as sending Supporters (+1 Strength each) to a region. Skip it if you have nothing to do. | Spring, Actions. Send Supporters (+1 Strength each) or use abilities. |
 | ui3.js:12 | Summer, Clashes. Regions are resolved one by one. Cards are revealed, Day and Night abilities fire, the strongest total wins and claims one of the region\'s two locations. | Summer, Clashes. Regions fight one by one. The highest total wins. |
