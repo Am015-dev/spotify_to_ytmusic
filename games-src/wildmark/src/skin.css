@@ -295,3 +295,6 @@ html.wm-coach #pv{bottom:10px}
 @media (min-width:1000px){.terr .tl{font-size:16px}}
 .pvring{fill:none;stroke:#ffe08a;stroke-width:4;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,224,138,.9))}
 .pvring.brk{stroke:#ff8a75;stroke-dasharray:8 5}
+/* W416: the wooden table is back (owner: "polished digital board game"); a soft vignette keeps the tiles' rims readable on it */
+.gx-board.hasart{background:radial-gradient(ellipse at 50% 42%,rgba(0,0,0,0) 35%,rgba(10,6,3,.55) 100%),url(media/table-bg.webp) center/cover #3b2717!important}
+#map .hx polygon:first-child{filter:drop-shadow(0 3px 3px rgba(0,0,0,.45))}
