@@ -36,9 +36,9 @@ function aiChoose(title,opts,c,extra){const kind=extra&&extra.kind;const val=o=>
   case 'fortify':return hasShelter()&&G.camp.pal<G.weapon?0:opts.length-1;
   case 'reclaim':return 0;
   default:return best(val)}}
-function weatherAhead(){const S=SCENARIOS[G.scen];for(let r=G.round;r<=Math.min(G.rounds,G.round+2);r++)if((S.wx[r]||[]).length)return true;return false}
+function weatherAhead(){const S=SCENARIOS[G.scen];for(let r=G.round;r<=Math.min(G.rounds,G.round+2);r++)if((wxTab()[r]||[]).length)return true;return false}
 // how many clouds the roof should hold in the next rounds
-function cloudsAhead(){const S=SCENARIOS[G.scen];let m=0;for(let r=G.round;r<=Math.min(G.rounds,G.round+3);r++){const d=S.wx[r]||[];let c=0;if(d.includes('rain'))c+=1.5;if(d.includes('snow'))c+=1.7;m=Math.max(m,c)}return m+G.wx.rain+G.wx.snow}
+function cloudsAhead(){const S=SCENARIOS[G.scen];let m=0;for(let r=G.round;r<=Math.min(G.rounds,G.round+3);r++){const d=wxTab()[r]||[];let c=0;if(d.includes('rain'))c+=1.5;if(d.includes('snow'))c+=1.7;m=Math.max(m,c)}return m+G.wx.rain+G.wx.snow}
 const INV_BASE={fire:5,knife:7,rope:7,shovel:5,pot:5,medicine:3,map:3,bricks:4,dam:4,snare:9,fireplace:4,shortcut:6,spear:5,basket:5,sack:5,bed:2,belts:3,bow:4,cellar:3,corral:5,diary:3,drums:4,furnace:2,lantern:3,moat:3,pit:3,raft:3,shield:2,sling:3,wall:3,
   hatchet:5,mast:8,cross:10,bell:3,jraft:13,lifeboat:22,fence:3,garden:4};
 function invValue(k){if(!k)return 0;let v=INV_BASE[k]||2;const I=invReq(k)||{};
@@ -68,9 +68,9 @@ function aiCandidates(st){const o=[];const ex=explored();const np=living().lengt
     const own=INVENTIONS[k]&&INVENTIONS[k].kind==='personal'?G.chars.find(c=>c.k===INVENTIONS[k].owner&&!c.dead):null;if(INVENTIONS[k]&&INVENTIONS[k].kind==='personal'&&!own)continue;add('build',{k},invValue(k),{forC:own||undefined,owner:own?own.i:null})}
   if(G.scen==='hexed'){for(const m of G.map){if(tileAt(m.id)&&!G.sc.crosses.includes(m.id))add('build',{k:'cross',cross:m.id},10-(m.fog?2:0)+(G.round>6?4:0))}}
   // gathering
-  const rainNow=(SCENARIOS[G.scen].wx[G.round]||[]).filter(d=>d!=='animals').length*1.5+G.wx.rain+G.wx.snow;const soak=Math.max(0,Math.round(rainNow)-G.camp.roof);
+  const rainNow=(wxTab()[G.round]||[]).filter(d=>d!=='animals').length*1.5+G.wx.rain+G.wx.snow;const soak=Math.max(0,Math.round(rainNow)-G.camp.roof);
   const fneed=Math.max(0,eatersNeed()+soak-st.food);
-  const wdef=(hasShelter()?0:2)+Math.max(0,Math.ceil(cl)-G.camp.roof)*2+soak+((SCENARIOS[G.scen].wx[G.round]||[]).includes('snow')?2:0)+(G.scen==='marooned'&&G.sc.pile<15?2:0)+(G.scen==='hexed'?2:0)-st.wood;
+  const wdef=(hasShelter()?0:2)+Math.max(0,Math.ceil(cl)-G.camp.roof)*2+soak+((wxTab()[G.round]||[]).includes('snow')?2:0)+(G.scen==='marooned'&&G.sc.pile<15?2:0)+(G.scen==='hexed'?2:0)-st.wood;
   for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos)continue;for(const s of srcs(m.id)){if(s.ex)continue;const d=dist(G.camp.pos,m.id);const pen=d>=2?1.5:0;
     if(s.s==='wood')add('gather',{pos:m.id,i:s.i},AIW.wood+Math.max(0,Math.min(4,wdef))*.9-pen*.5);
     else add('gather',{pos:m.id,i:s.i},(fneed>0?AIW.food+2*fneed:has('cellar')?1.5:.6)-pen*.5)}}
@@ -125,7 +125,7 @@ function aiPlan(forChars){if(!planOpen())return;forChars=forChars||G.chars.filte
   if(G.plan.acts.some(a=>a.type==='build')&&living().some(c=>forChars.includes(c.i)&&c.k==='carpenter'&&!skillWhy(c.i,'thrifty')&&c.det>=4))useSkill(living().find(c=>c.k==='carpenter').i,'thrifty')}
 // cheap boosts before planning: tokens, items, skills, the signal pile
 function aiPrePlan(forChars){const hum=forChars.some(i=>P(i)&&P(i).human);for(let i=G.own.length-1;i>=0&&!hum;i--){const k=G.own[i]&&G.own[i].k;if(!k||k==='leaves'||k==='veggies'&&!living().some(c=>c.w>=3))continue;if(!discWhy(i))discUse(i);if(!planOpen())return}
-  for(const it of G.items.slice()){if(it.k==='biscuits'&&food()<eatersNeed())useItem('biscuits');if(it.k==='bottle')useItem('bottle');if(it.k==='pipe')useItem('pipe');if(it.k==='stormglass'&&!G.wxEarly&&(SCENARIOS[G.scen].wx[G.round]||[]).length)useItem('stormglass')}
+  for(const it of G.items.slice()){if(it.k==='biscuits'&&food()<eatersNeed())useItem('biscuits');if(it.k==='bottle')useItem('bottle');if(it.k==='pipe')useItem('pipe');if(it.k==='stormglass'&&!G.wxEarly&&(wxTab()[G.round]||[]).length)useItem('stormglass')}
   for(const c of living().filter(c=>forChars.includes(c.i)&&!c.npc)){const tr=[['peptalk',()=>G.morale<2&&c.det>=5],['broth',()=>c.det>=4&&food()<eatersNeed()],['remedy',()=>living().some(x=>x.w>=4)&&c.det>=3],['keeneye',()=>c.det>=6],['fortify',()=>c.det>=5],['drive',()=>c.det>=7&&G.weapon>=4],['idea',()=>c.det>=6&&G.inv.deck.length]];
     // for a human castaway (💡 Suggest) only skills that need no answer: a question would stop the plan half-made
     for(const [k,f] of tr)if(!skillWhy(c.i,k)&&f()&&!(c.human&&['idea','keeneye','recon','track','fortify','remedy'].includes(k))){useSkill(c.i,k);if(!planOpen())return}}
