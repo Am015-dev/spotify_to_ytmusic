@@ -46,15 +46,15 @@ function stageTutorial() { tutStageRound(1); }
 /* ============ the coach: just-in-time bubbles, one at a time, never blocking input, dismissable ============ */
 var COACH_RULES = ['goal', 'gear', 'cards', 'shift2', 'corner', 'burn', 'heatcards', 'stress', 'cooldown', 'rivals', 'adrenaline', 'slip', 'boost', 'finish'];
 var COACH_LATER = {
-  spin: 'Spin out: not enough heat for a corner means you stop behind it, lose ALL engine heat, take 1 stress card (2 from gear 3 or 4).',
-  pushback: 'Two cars fit on a space. If the space you aim for is full, you stop on the first free space behind.',
-  stall: 'Too few playable cards for your gear? You play them all, pay heat cards for the rest, do not move and drop to gear 1.',
-  swap: 'Swap cards (before you pick): throw away speed cards you do not want and draw back to 7, once per round.',
+  spin: 'Spin out: too little heat for a corner. You stop behind it. You lose all engine heat. You take 1 Stress card, or 2 in gear 3 or 4.',
+  pushback: 'Two cars fit on a space. Space full? You stop on the free space behind.',
+  stall: 'Too few playable cards for your gear? You play them all. Heat cards fill the rest. You do not move and drop to gear 1.',
+  swap: 'Swap once a round, before you pick. Throw away cards you do not want. Then draw back to 7.',
   upgrades: 'Upgrades mode: draft 3 bonus cards before the race. They play like speed cards with a bonus.',
   tie: 'Ties on the finish: the car that arrived first wins. The race goes on until every car has finished.',
-  sup: 'Starting upgrades: in a normal race your deck also holds a Brake card (speed 0), a Burst card (speed 5) and 1 extra heat card.',
-  weather: 'Weather (optional): rain lowers corner limits, a heatwave starts you hotter, a tailwind makes slipstream 3 spaces.',
-  champ: 'Championship: three tracks in a row, points for every place (9, 6, 4, 3, 2, 1).'
+  sup: 'Starting upgrades: a normal deck also holds a Brake card (speed 0). It holds a Burst card (speed 5) and 1 extra heat card.',
+  weather: 'Weather is optional. Rain lowers corner limits. A heatwave starts you hotter. A tailwind makes slipstream 3 spaces.',
+  champ: 'Championship: three tracks in a row. Places score 9, 6, 4, 3, 2, 1.'
 };
 var COACH = { on: false, seen: {}, q: [], cur: null, timer: 0 };
 var COACH_TXT = {
@@ -65,7 +65,7 @@ var COACH_TXT = {
   corner: ['Coach Mara', 'Corner ahead. Its sign is the speed limit. Faster than the limit burns engine heat.'],
   burn: ['Coach Mara', 'You are over the limit: each point over burns 1 heat from your engine. Brake or pay?'],
   heatcards: ['Coach Mara', 'Dark Heat cards are dead weight in your hand. Gear 1 or 2 cools them back into the engine.'],
-  stress: ['Coach Mara', 'Purple Stress card: when played, it flips a random speed card from your deck.'],
+  stress: ['Coach Mara', 'Purple Stress card: it flips a random speed card from your deck.'],
   cooldown: ['Coach Mara', 'Cooled! Heat cards from your hand went back into the engine. Fuel restored.'],
   rivals: ['Coach Mara', 'Now every rival drives in turn, leader first. Watch how Kit and Juno handle the corners.'],
   adrenaline: ['Coach Mara', 'Adrenaline: the last car to move gets +1 space and +1 cool-down. Free help.'],
@@ -112,6 +112,7 @@ function coachEvent(e, you) {   /* called from playEvents */
 }
 function coachFinish() {   /* result screen of the tutorial: score rule by rule with the player's numbers, then "things you'll meet later" */
   var me = G.cars[0], place = G.rank.indexOf(0) + 1, st = me.stats;
+  COACH.seen.finish = COACH.seen.finish || 1;   /* the first row below teaches the finish rule with the player's own place */
   COACH.later = COACH_RULES.concat(Object.keys(COACH_LATER)).filter(function (k) { return !COACH.seen[k]; });
   var rows = '<ol class="walk"><li><b>Finish:</b> you came ' + ord(place) + ' of ' + G.cars.length + '. Finishers rank by crossing order; the rest by distance. Ties go to whoever arrived first.</li><li><b>Heat burned:</b> ' + st.heat + ' in corners, shifts and boosts. Less heat spent means more left for the next push.</li><li><b>Spin-outs:</b> ' + st.spins + '. A spin-out loses all your heat.</li><li><b>Slipstreams:</b> ' + st.slips + ' (' + (st.slips ? 'free spaces' : 'none this time') + ').</li><li><b>Boosts:</b> ' + st.boosts + '.</li></ol>';
   UI.lockModal = true;
@@ -131,19 +132,20 @@ function tutLeave(skipped) {
   try { GXT.markDone(TUT_GAME); } catch (e) { }
   closeModal(); if (skipped) showTitle();
 }
+function tutCard(n) {   /* the n-th playable card in hand: the two holes of the cards step, so each tap lands on a new card */
+  var c = G && G.cars[UI.seat], ok = []; if (!c) return $('#hand');
+  document.querySelectorAll('#hand .cd').forEach(function (e) { var j = +e.getAttribute('data-i'); if (c.hand[j] !== 'H') ok.push(e); });
+  return ok[n] || $('#hand');
+}
 function tutSteps() {   /* only the very first action is forced (2 steps); the rest is free play with the coach */
   var gearT = function () { return document.querySelector('.gb[data-g="2"]'); };
   return [
-    { id: 'gear', title: 'Coach Mara', say: 'Kit Marlow wants your seat. Win one lap. Your gear is how many cards you play: take gear 2.', target: gearT, ready: function () { return G && G.phase === 'plan' && !UI.busy && !!document.querySelector('.gb[data-g="2"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === 2; } }, wrong: 'Take gear 2.', side: 'top' },
-    { id: 'cards', title: 'Coach Mara', say: 'Tap any two cards. Their numbers add up to your speed.', target: function () { return $('#hand'); }, wait: { type: 'tap', times: 2, match: function (a) { return a.what === 'card'; } }, wrong: 'Tap two cards.', side: 'top', onDone: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } COACH.on = true; coachPlan(you(), null); drawPlan(); }, 30); } }
+    { id: 'aim', title: 'How you win', say: 'Cross the line first after one lap. Gear 2 means you play 2 cards. Card numbers add up to how far you drive. Corners have a speed limit: go over and you burn heat.', target: function () { return $('#cvw'); }, wait: null, ready: function () { return G && G.phase === 'plan' && !UI.busy; } },
+    { id: 'gear', title: 'Coach Mara', say: 'Kit Marlow wants your seat. Take gear 2.', target: gearT, ready: function () { return G && G.phase === 'plan' && !UI.busy && !!document.querySelector('.gb[data-g="2"]'); }, wait: { type: 'tap', match: function (a) { return a.what === 'gear' && a.g === 2; } }, wrong: 'Take gear 2.', side: 'top' },
+    { id: 'cards', title: 'Coach Mara', say: 'Tap any two cards. Their numbers add up to your speed.', target: function () { return tutCard(0); }, also: function () { return tutCard(1); }, wait: { type: 'tap', times: 2, match: function (a) { return a.what === 'card'; } }, wrong: 'Tap two cards.', side: 'top', onDone: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } COACH.on = true; coachPlan(you(), null); drawPlan(); }, 30); } }
   ];
 }
-function tutStart(o) {   /* first screen of Learn to play: how you win in one sentence, three bullets, then drive */
-  UI.lockModal = true;
-  modal('<h2>Win: cross the line first after one lap.</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 2 means you play 2 cards.</li><li><b>Cards add up.</b> Their numbers are how far you drive.</li><li><b>Corners have a limit.</b> Go faster and you burn heat.</li></ul><p class="lede">Coach Mara shows you one tap at a time.</p><button class="big" id="tutGo" style="width:100%">Let\'s drive</button>');
-  $('#mx').hidden = true; $('#tutGo').onclick = function () { UI.lockModal = false; tutBegin(o); };
-}
-function tutBegin(o) {
+function tutStart(o) {   /* the first step (aim) says how you win; then the coached game */
   closeModal(); UI.cmpDef = null; o = o || {}; COACH.seen = {}; COACH.q = []; COACH.cur = null; COACH.later = null; COACH.laterShown = false;
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },

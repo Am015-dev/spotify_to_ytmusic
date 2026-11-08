@@ -22,7 +22,10 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
   pick (now follows it and slides through the H-gate); rival turn said "Oto is up" twice; on-track pops vanished in 1.5 s and
   stacked (now one at a time, hold 3 s + 1 s fade); no vibrate tick (card/gear/boost/spin/lights buzz via navigator.vibrate);
   13px text on phone (all now 14px; card labels kept on one line); tap outside no longer closes locked cards (Goal, Learn intro).
-- New Learn-to-play first screen: "Win: cross the line first after one lap." + 3 bullets, then the coached game.
+- Learn to play: first tutor step 'How you win' (cross the line first after one lap + 3 short points, Next). Cards step
+  targets two real cards (tutCard), so taps on the highlight land and the tutorial finishes by touch with no Skip.
+- Feel gate (feel-audit.js --secs 120 on the local build): (a)-(e) all 0; Learn ends at the result on phone and PC, 0 skips.
+  Long coach/rules lines split to <= 12 words.
 - shoot-feel.js: whole race by touch (390x844) and mouse (1440x900), shots in playable-shots/feel/, small-text check after 10 turns.
 - r2-test.js guide check expects the old 7-step tutorial (replaced in 3154a433): stale before W475, left as is.
 - Phone dock: the merged shell capped it at 44dvh, which pushed Go below the screen in Learn to play at 390x763; the dock now

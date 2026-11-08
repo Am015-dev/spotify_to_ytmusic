@@ -19,13 +19,13 @@ const OUT = path.join(__dirname, 'playable-shots', 'feel'), SHOTS = !process.arg
     await p.evaluate(() => { try { localStorage.setItem('gxt-redline-rally', JSON.stringify({ done: 1 })); } catch (e) {} }); await p.reload({ waitUntil: 'load' }); await p.waitForTimeout(800);
     await tap('#playB'); await p.waitForTimeout(1200);
     if (await p.$('#goalB')) { await shot('3-goal'); await tap('#goalB'); }
-    await p.evaluate(() => { window.AIDELAY = 0.15; });
+    await p.evaluate(() => { window.AIDELAY = 0.04; });
     let turns = 0, rivalShot = false, stuck = 0, last = '';
     for (let i = 0; i < 2500; i++) {
-      await p.waitForTimeout(400);
+      await p.waitForTimeout(150);
       const st = await p.evaluate(() => ({ ph: G.phase, busy: UI.busy, over: !!G.over, modal: !document.getElementById('modal').hidden, r: G.round }));
       if (st.over) break;
-      if (st.busy) { if (!rivalShot && turns === 2) { await p.waitForTimeout(900); await shot('6-rival'); rivalShot = true; await p.evaluate(() => { window.AIDELAY = 0.15; }); } continue; }
+      if (st.busy) { if (!rivalShot && turns === 2) { await p.waitForTimeout(900); await shot('6-rival'); rivalShot = true; await p.evaluate(() => { window.AIDELAY = 0.04; }); } continue; }
       if (st.modal) { const ok = await tap('#modal button.big') || await tap('#modal .gx-x') || await tap('#mx'); await p.waitForTimeout(300); if (!ok) stuck++; continue; }
       if (st.ph === 'plan' && await p.$('#goB')) {
         // pick gear 2 if allowed (or 1), then tap needed cards by touch
@@ -35,7 +35,7 @@ const OUT = path.join(__dirname, 'playable-shots', 'feel'), SHOTS = !process.arg
         if (turns === 4) await shot('5-mid');
         if (await p.$('#goB[disabled]')) { await tap('.gb[data-g="1"]'); await p.waitForTimeout(150); if (await p.$('#goB[disabled]')) await tap('#hand .cd:not(.on)'); }
         if (turns === 10) { const small = await p.evaluate(() => [...document.querySelectorAll('body *')].filter(e => { if (!e.childNodes.length || ![...e.childNodes].some(x => x.nodeType === 3 && x.textContent.trim())) return false; const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width && r.height && cs.visibility !== 'hidden' && parseFloat(cs.fontSize) < 14 && r.bottom > 0 && r.top < innerHeight; }).map(e => (e.id || e.className || e.tagName) + ':' + getComputedStyle(e).fontSize + ':' + e.textContent.trim().slice(0, 18))); console.log('SMALL ' + n + ' ' + small.length + ' ' + small.slice(0, 30).join(' | ')); }
-        await p.evaluate(t => { window.AIDELAY = t === 2 ? 1 : 0.15; }, turns); console.log('turn ' + n + ' ' + turns);
+        await p.evaluate(t => { window.AIDELAY = t === 2 ? 1 : 0.04; }, turns); console.log('turn ' + n + ' ' + turns);
         await tap('#goB'); turns++; stuck = 0; continue;
       }
       // React step or other buttons in panel
