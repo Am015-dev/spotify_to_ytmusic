@@ -62,6 +62,9 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
   for(const g of UI.legal){if(g.r!==UI.rot)continue;const b=document.createElement('button');b.className='glow';b.style.left=g.x*100+'px';b.style.top=g.y*100+'px';b.setAttribute('aria-label','Place tile here');
     b.dataset.x=g.x;b.dataset.y=g.y;b.innerHTML='<svg viewBox="0 0 100 100"><use href="#gp"/></svg>';
     if(UI.hint&&UI.hint.x===g.x&&UI.hint.y===g.y&&UI.hint.r===UI.rot)b.classList.add('hintspot');
+    try{const pv=prevCalc(g.x,g.y,UI.rot);if(pv.badge)b.insertAdjacentHTML('beforeend',`<span class="pvb ${pv.kind||''}">${esc(pv.badge)}</span>`)}catch(e){}
+    const gx=g.x,gy=g.y;b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')pvShow(b,gx,gy)});b.addEventListener('pointerdown',()=>pvShow(b,gx,gy));
+    b.addEventListener('pointerleave',()=>pvHide());b.addEventListener('pointercancel',()=>pvHide());
     b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}}
 // ---------- overlay: followers on the map, follower spots, ghost finger, pops (screen-sized items that follow the map) ----------
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
@@ -82,7 +85,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
     ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
-      b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{const sg=TSEG[T.t][+l];const nm=sg?FEATW[sg.ty]:'';if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
+      b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{let nm='';try{nm=prevFig(l)}catch(e){const sg=TSEG[T.t][+l];nm=sg?FEATW[sg.ty]:''}if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
       addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
@@ -120,6 +123,7 @@ function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
+    else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Follow the river: tap a glow.':(UI.rots&&UI.rots.length>1?'Turn, then place: tap a glow.':'Place your tile: tap a glow.');
     else if(me)t='Add a follower, or Skip.';
     else t=(c&&!UI.cap.intro?c:'')||(G.step==='fig'?`${p.nm} is choosing a follower spot…`:`${p.nm} is drawing a tile…`)}
@@ -133,14 +137,14 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else if(myTurn('fig')){UI.legal=[];UI.hintFig=hintOn()?bestFigNow(G.cur.p,'normal'):null;if(!UI.user)zoomTile(G.cur.k,true)}
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;if(G.step==='place'){UI.user=false;refit(true)}}}
 // ---------- the main render ----------
-function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
+function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();renderSheet();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
 function save(){if(UI.tut||UI.coach)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(UI.coach)try{coachTick()}catch(e){console.error(e)}if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
 function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');renderGlows();updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
-function onGlow(x,y){if(UI.moved||!myTurn('place'))return;const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;if(!tutGate({what:'place',x,y}))return;UI.hint=null;UI.humanTurns++;performMove(m,sideToAct())}
-function onFig(m){if(UI.moved||!myTurn('fig'))return;if(!tutGate({what:'fig',k:m.k,l:m.l}))return;UI.hintFig=null;performMove(m,sideToAct());markSeen()}
-function onSkip(){if(!myTurn('fig'))return;if(!tutGate({what:'skip'}))return;UI.hintFig=null;performMove({act:'skip'},sideToAct());markSeen()}
+function onGlow(x,y){if(UI.moved||!myTurn('place'))return;const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;if(!tutGate({what:'place',x,y}))return;UI.hint=null;UI.humanTurns++;pvHide();ratingBegin(x,y,UI.rot);performMove(m,sideToAct())}
+function onFig(m){if(UI.moved||!myTurn('fig'))return;if(!tutGate({what:'fig',k:m.k,l:m.l}))return;UI.hintFig=null;ratingFig(m);performMove(m,sideToAct());ratingEnd();markSeen()}
+function onSkip(){if(!myTurn('fig'))return;if(!tutGate({what:'skip'}))return;UI.hintFig=null;ratingFig(null);performMove({act:'skip'},sideToAct());ratingEnd();markSeen()}
 function markSeen(){if(UI.first&&UI.humanTurns>=2){UI.first=false;try{localStorage.setItem('rv_seen','1')}catch(e){}}}
 // ---------- computer turns: show its tile, then place, then the follower, each about half a second ----------
 function aiAct(){UI.aiT=0;if(!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;const m=aiMove(s);if(!m)return;const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)}

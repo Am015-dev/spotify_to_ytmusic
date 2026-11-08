@@ -24,7 +24,7 @@ var TT_TEST = {};
     var b = $('banner'); if (!b) return; ms = ms || Math.max(560, delay() * 1.05); b.className = 'k-' + kind; b.textContent = text; b.style.display = 'block'; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = 'bann ' + ms + 'ms ease forwards';
     clearTimeout(banner.t); banner.t = setTimeout(function () { b.style.display = 'none'; }, ms + 30);
   }
-  function stepMs() { return U.fast ? 70 : Math.max(60, delay() * 0.85); }
+  function stepMs() { return U.fast ? 70 : Math.max(60, delay() * (U.tut ? 0.5 : 0.85)); }
   function narrate(items, done) {
     var i = 0, seq = U.seq; U.narr = true; U.fast = false; clearTimeout(U.nt);
     function next() {
@@ -363,6 +363,7 @@ var TT_TEST = {};
       '<button class="btn go big" data-start="1">Quick game</button>' +
       '<div class="tgrid"><button class="btn alt sm" data-story="1"><b>Story</b><span>' + esc(prog) + '</span></button>' + tutBtn() + '<button class="btn alt sm" data-start="2">Two players</button><button class="btn alt sm" data-start="0">Watch</button><button class="btn alt sm" data-gx="rulesd">How to play</button><button class="btn alt sm snd" data-snd="1" aria-label="Sound">' + sndLabel() + '</button></div>';
     U.tut = false; SND.sync();
+    var tb = s.querySelector('[data-gxt-open]'); if (tb) tb.setAttribute('data-a', 'start');   // the coached first game is the title's "start" for tutorial bots
   }
   function sndLabel() { return 'Sound: ' + (SND.isOn() ? 'on' : 'off'); }
   function firstTime() { try { return !localStorage.getItem('tt_seen') && !GXT.isDone('twin-thrones'); } catch (e) { return false; } }
