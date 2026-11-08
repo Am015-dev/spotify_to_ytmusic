@@ -179,3 +179,5 @@ html.ph .ctr .none{display:block;font-size:14px}
   #stage .sgain{top:auto;bottom:calc(100% + 10px);transform:translate(-50%,0);white-space:nowrap}
   #stage .sgain small{white-space:normal;max-width:min(320px,80vw);overflow:visible;text-overflow:clip;font-size:16px;padding:4px 12px;background:rgba(42,23,16,.92)}
 }
+.kkport i{font-size:16px}
+.kkport:has(img) i{display:none}
