@@ -78,12 +78,12 @@ function recHTML(K,d,pl,full){const m=recMove(d);if(!m)return '';const a=UI.recA
 // ---------- why a junk sank ----------
 function causeOf(why){const w=String(why||'');let m;
   if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart.'};
-  if(/collided/.test(w))return {k:'collision',t:'two junks ended on the same wake heading the same way, so both went down together (a head-on collision).'};
-  if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom, the whirlpool, moved onto its square and swallowed it.'};
+  if(/collided/.test(w))return {k:'collision',t:'two junks met on one wake. Both went down.'};
+  if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom whirlpool swallowed it.'};
   if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it. Its capsize roll was too low.`}}
-  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`${m[1]} blocked its path. It had nowhere to go.`};
-  if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`its wake ended in the square of ${m[1]}.`};
-  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`${m[1]} swam onto it and crushed it.`};
+  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`the leviathan ${m[1]} blocked its path.`};
+  if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`it sailed into the leviathan ${m[1]}.`};
+  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`the leviathan ${m[1]} swam onto it.`};
   if(/rift/.test(w))return {k:'rift',t:'the Rift Gate could not find it a safe landing.'};
   return {k:'other',t:w+'.'}}
 const youSeat=()=>{try{return viewSeat()}catch(e){return -1}};

@@ -1099,6 +1099,22 @@
    "mut": 0
   },
   {
+   "id": "sq-feel",
+   "name": "Plates, words and no overlap on the painted board",
+   "ask": "Can you read the numbers on the tiles and the seat counters?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sq-take",
+   "name": "Buying two goods: the finger moves on to the next card",
+   "ask": "Does the hint stop pointing at a card you already picked?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
    "id": "sq-chips",
    "name": "Bid chips and score chips",
    "ask": "Are the bid numbers big enough?",

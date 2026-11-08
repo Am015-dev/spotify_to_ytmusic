@@ -51,6 +51,8 @@ function instrBar() {
   const html = '<b>' + i.who.replace(/</g, '&lt;') + '</b><span>' + i.text.replace(/</g, '&lt;') + '</span>'; if (e.dataset.h !== html) { e.dataset.h = html; e.innerHTML = html; }
   const db = $('#dockbody'), pd = $('#promptDock'), vis = pd && pd.getBoundingClientRect().width > 0;
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
+  if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
+  if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
   const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
 }
 // ---- the turn banner: slides in when the turn changes hands
@@ -68,7 +70,7 @@ function turnBanner() {
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
   b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
 }
-setInterval(() => { try { rfScan(); instrBar(); turnBanner(); } catch (e) { } }, 200);
+setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble
 (function () {
   const ts = tutSteps; tutSteps = function () {
@@ -99,7 +101,7 @@ const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null
 const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach.coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
 const cMe = () => G && G.players[0];
 const COACH_RULES = [
-  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Have the most points after two days. \u2022 Tap the bag to drop chips in your pot. \u2022 Stop before the white chips pass 7. \u2022 Your last space pays coins and points.'],
+  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Have the most points after two days. \u2022 Chips from your bag fill your pot. \u2022 Stop before the white chips pass 7. \u2022 Your last space pays coins and points.'],
   ['fortune', () => cMe().q && cMe().q.h === 'pick', 'Fortune card', 'Each day starts with a fortune card. Purple ones happen now. Pick any reward.'],
   ['draw', () => G.phase === 'brew' && cMe().st === 'draw' && !cMe().q && cMe().pot.length === 0 && G.round === 1, 'Your bag', 'Tap the bag to pull a chip. It moves as many spaces as its number.'],
   ['spiral', () => G.phase === 'brew' && cMe().pot.length >= 1 && G.round === 1, 'The spiral', () => 'Your chip is on space ' + cMe().pot[cMe().pot.length - 1].pos + '. Stop now to keep its coins and points.'],
@@ -109,7 +111,7 @@ const COACH_RULES = [
   ['boom', () => cMe().boom && G.round === 1, 'Boom!', 'Boom! Today you get points or coins, not both. No bonus die either.'],
   ['stopped', () => cMe().st === 'done' && !cMe().boom && G.round === 1 && G.phase === 'brew', 'Safe stop', 'Good, you keep your space. Safe pots may roll the bonus die.'],
   ['rival2', () => G.players[1] && G.players[1].st === 'done' && !G.players[1].boom && G.round === 1 && G.phase === 'brew', 'Wynne', 'Wynne stopped early. Safe, but a smaller score.'],
-  ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Wynne\'s pot exploded. That is the price of pushing your luck.'],
+  ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Wynne\'s pot exploded. She went over the limit.'],
   ['report', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 1, 'Counting the day', 'Now each pot is counted. Coins, points, and a die for safe pots.'],
   ['shop', () => cMe().q && cMe().q.h === 'shop', 'The stalls', 'Spend coins on up to two chips of different colours. Hold a chip to read its power.'],
   ['rubies', () => cMe().q && cMe().q.h === 'shop' && cMe().rubies >= 2, 'Rubies', 'Two rubies move your droplet on, or refill your flask.'],
@@ -120,7 +122,7 @@ const COACH_RULES = [
 ];
 Object.defineProperty(window, 'GXCOACH', { get: () => ({ running: !!COACH.on, explained: COACH.shown.filter(i => i !== 'end'), later: COACH.later, done: !!COACH.finished }), configurable: true });
 COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
-const COACH_LATER = [['The purple book (days 3+) and the black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: trailing players start the stone ahead', 'rat'], ['Nine days, and ties go to the furthest last chip', 'ties']];
+const COACH_LATER = [['Purple chips (from day 3) and black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: players behind start further ahead', 'rat'], ['A full game lasts 9 days. Ties go to the furthest chip', 'ties']];
 function coachShow(id, title, text) {
   const b = coachBox(), t = typeof text === 'function' ? text() : text;
   const tp = t.replace(/</g, '&lt;').split(' \u2022 '), body = '<span>' + tp[0] + '</span>' + (tp.length > 1 ? '<ul class="cxl">' + tp.slice(1).map(x => '<li>' + x + '</li>').join('') + '</ul>' : '');
@@ -145,7 +147,7 @@ function coachEnd() {
   const lines = COACH_RULES.filter(r => COACH.later.indexOf(r[0]) >= 0).map(r => r[2]).concat(COACH_LATER.map(x => x[0]));
   const win = G.winner === 0 ? 'You win ' + a.vp + ' to ' + b.vp + '!' : G.winner < 0 ? 'A tie, ' + a.vp + ' each!' : b.name + ' wins ' + b.vp + ' to ' + a.vp + '.';
   const d = h('div#coachend', { role: 'dialog', 'aria-label': 'Tutorial finished' });
-  d.innerHTML = '<div class="ce"><img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><h3>' + win + '</h3><p>You made ' + a.vp + ' points. ' + b.name + ' made ' + b.vp + '.</p><p>On the last day, 5 coins or 2 rubies made 1 point.</p><h4>Things you\'ll meet later</h4><ul>' + lines.map(l => '<li>' + l.replace(/</g, '&lt;') + '</li>').join('') + '</ul><p>Hask: "Tomorrow it is for real."</p><div class="cb">' + (COACH.prologue ? '<button type="button" data-ce="chapter">Start chapter 1</button>' : '') + '<button type="button" data-ce="play">Play a game</button></div></div>';
+  d.innerHTML = '<div class="ce"><img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><h3>' + win + '</h3><p>You made ' + a.vp + ' points. ' + b.name + ' made ' + b.vp + '.</p><p>On the last day, 5 coins or 2 rubies made 1 point.</p><h4>Rules you have not seen yet</h4><ul>' + lines.map(l => '<li>' + l.replace(/</g, '&lt;') + '</li>').join('') + '</ul><p>Hask: "Tomorrow it is for real."</p><div class="cb">' + (COACH.prologue ? '<button type="button" data-ce="chapter">Start chapter 1</button>' : '') + '<button type="button" data-ce="play">Play a game</button></div></div>';
   document.body.appendChild(d); d.addEventListener('click', ev => { const k = ev.target.closest('[data-ce]'); if (k) coachFinish(k.dataset.ce); });
 }
 function coachClean() { COACH.on = false; clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; ['#coach', '#coachend'].forEach(s => { const e = $(s); if (e) e.remove(); }); }
@@ -165,7 +167,7 @@ function goalCard() {
   let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
-  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Tap the bag. Each chip moves along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
   e.addEventListener('click', () => { e.remove(); });
   document.body.appendChild(e);
 }
@@ -186,3 +188,46 @@ document.addEventListener('click', ev => { const d = ev.target.closest && ev.tar
   if (document.body) go(); else addEventListener('DOMContentLoaded', go);
   addEventListener('resize', () => { if (!t) t = setTimeout(run, 120); });
 })();
+// ---- W471 round 2: drag the real card or chip onto its target. Choice cards go into the cauldron, shop chips into the bag.
+// Picking one up makes the target glow; a drop on it snaps in with a vibrate tick and does exactly what a tap does. A miss flies back. Taps still work.
+const DRAG = { on: null };
+const dragSpec = el => {
+  if (!el || !el.closest) return null;
+  const card = el.closest('#qbox [data-a=mv]:not([disabled])'); if (card) return { el: card, target: () => document.querySelector('#cwrap') };
+  const tok = el.closest('#rs .tok:not([disabled])'); if (tok) return { el: tok, target: () => document.querySelector('#rs .sbimg') };
+  return null;
+};
+function dragEnd(drop) {
+  const d = DRAG.on; DRAG.on = null; if (!d) return;
+  const t = d.target(); if (t) t.classList.remove('droptgt', 'dropover'); d.el.classList.remove('dragsrc');
+  if (!d.ghost) return;
+  const tr = t && t.getBoundingClientRect(), g = d.ghost, gr = g.getBoundingClientRect();
+  const hit = drop && tr && d.x >= tr.left - 12 && d.x <= tr.right + 12 && d.y >= tr.top - 12 && d.y <= tr.bottom + 12;
+  const to = hit ? { x: tr.left + tr.width / 2 - gr.width / 2, y: tr.top + tr.height / 2 - gr.height / 2, s: .35 } : { x: d.r0.left, y: d.r0.top, s: 1 };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || ANIM === 0;
+  const fin = () => { g.remove(); if (hit) { DRAG.skipUntil = 0; d.el.click(); } };
+  if (hit) { try { navigator.vibrate && navigator.vibrate(12); } catch (e) { } snd('plop'); }
+  if (reduce) { fin(); return; }
+  try { const a = g.animate([{ transform: g.style.transform }, { transform: 'translate(' + to.x + 'px,' + to.y + 'px) scale(' + to.s + ')', opacity: hit ? .2 : 1 }], { duration: hit ? 180 : 220, easing: 'ease-out', fill: 'forwards' }); a.onfinish = fin; } catch (e) { fin(); }
+}
+document.addEventListener('pointerdown', ev => {
+  if (ev.button > 0 || DRAG.on) return; const s = dragSpec(ev.target); if (!s) return;
+  DRAG.on = Object.assign(s, { x0: ev.clientX, y0: ev.clientY, x: ev.clientX, y: ev.clientY, r0: s.el.getBoundingClientRect(), ghost: null, id: ev.pointerId });
+}, true);
+document.addEventListener('pointermove', ev => {
+  const d = DRAG.on; if (!d || ev.pointerId !== d.id) return; d.x = ev.clientX; d.y = ev.clientY;
+  if (!d.ghost) {
+    if (Math.hypot(d.x - d.x0, d.y - d.y0) < 10) return;
+    const t = d.target(); if (!t) { DRAG.on = null; return; }
+    d.ghost = d.el.cloneNode(true); d.ghost.removeAttribute('data-a'); d.ghost.classList.add('dragghost'); d.ghost.style.width = d.r0.width + 'px'; d.ghost.style.height = d.r0.height + 'px';
+    document.body.appendChild(d.ghost); d.el.classList.add('dragsrc'); t.classList.add('droptgt'); try { navigator.vibrate && navigator.vibrate(6); } catch (e) { }
+  }
+  const t = d.target(), tr = t && t.getBoundingClientRect();
+  if (tr) t.classList.toggle('dropover', d.x >= tr.left - 12 && d.x <= tr.right + 12 && d.y >= tr.top - 12 && d.y <= tr.bottom + 12);
+  d.ghost.style.transform = 'translate(' + (d.r0.left + d.x - d.x0) + 'px,' + (d.r0.top + d.y - d.y0) + 'px) scale(1.06)';
+  ev.preventDefault();
+}, { capture: true, passive: false });
+document.addEventListener('pointerup', ev => { const d = DRAG.on; if (!d || ev.pointerId !== d.id) return; if (d.ghost) DRAG.skipUntil = Date.now() + 400; dragEnd(true); }, true);
+document.addEventListener('pointercancel', () => dragEnd(false), true);
+// the click that the browser sends after a drag is not a tap
+document.addEventListener('click', ev => { if (DRAG.skipUntil && Date.now() < DRAG.skipUntil && ev.isTrusted) { ev.stopPropagation(); ev.preventDefault(); } }, true);

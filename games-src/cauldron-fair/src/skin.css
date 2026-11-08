@@ -105,7 +105,7 @@ html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbt
 .gx-drawer .gx-drawer-body,#setbody,#setbody .mrow,.gx-drawer .rules{background:#fff4d6!important}
 #setbody .btn{background:#f3dcab!important}
 #setbody .btn.alt{background:#fff9e8!important}
-.tbtn.gxt-menu,.tbtn.gxt-menu b,.tbtn.gxt-menu span{background-color:#1d5e2c!important;color:#fff!important;text-shadow:none!important}
+.tbtn.gxt-menu{background:#1f5a3a!important;background-image:none!important;color:#fff7e0!important}.tbtn.gxt-menu b,.tbtn.gxt-menu span{background:transparent!important;color:#fff7e0!important;text-shadow:none!important}.tbtn.gxt-menu b{font-size:18px!important;font-weight:700!important}.tbtn.gxt-menu span{font-size:14px!important}
 .tbtn.gxt-menu{border-color:#0f3d1b!important}
 .bagn,.bagwrap .bagn{background:#2b1a12!important;color:#fff6df!important}
 #fortchip,#fortchip b,#fortchip .fk,#fort .fk,#fort.blue .fk{background:#1d3f66!important;color:#fff!important}
@@ -146,3 +146,64 @@ html.ph #barstat .bfl{display:none}
 html.ph #barstat .bav{display:none}
 html.ph #barstat{flex-shrink:0;overflow:visible}
 .flb.armed{outline:3px solid #f2b81e;outline-offset:2px;animation:flarm 0.8s ease-in-out infinite alternate}@keyframes flarm{to{outline-color:#fff6dc}}@media (prefers-reduced-motion:reduce){.flb.armed{animation:none}}
+/* W471 round 2: drag cards and chips */
+#qbox [data-a=mv],#rs .tok{touch-action:none;cursor:grab}
+.dragghost{position:fixed!important;left:0;top:0;margin:0!important;z-index:200;pointer-events:none;box-shadow:0 12px 26px rgba(0,0,0,.45)!important;cursor:grabbing}
+.dragsrc{opacity:.35}
+.droptgt{outline:4px dashed #f2b81e;outline-offset:6px;border-radius:50%;animation:dropglow .9s ease-in-out infinite alternate}
+#rs .sbimg.droptgt{border-radius:16px}
+.droptgt.dropover{outline-style:solid;outline-color:#fff6dc;filter:drop-shadow(0 0 18px rgba(242,184,30,.9))}
+@keyframes dropglow{to{outline-color:#fff6dc}}
+@media (prefers-reduced-motion:reduce){.droptgt{animation:none}}
+/* W471 round 2: the day report fills the screen: taller rows, then the points race */
+.stg-tally .rsbody{display:flex;flex-direction:column;gap:12px;min-height:0;flex:1}
+.stg-tally .dtable{display:flex;flex-direction:column;gap:10px}
+.drace{background:rgba(36,23,48,.88);border:2px solid #f2b81e;border-radius:16px;padding:12px 14px;color:#fff6df;display:flex;flex-direction:column;gap:10px;font:700 16px/1.25 system-ui,sans-serif}
+.drh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.drh b{font-size:18px;font-weight:900}.drh span{color:#ffd774}
+.drrow{display:grid;grid-template-columns:32px minmax(44px,auto) 1fr 40px 36px;align-items:center;gap:8px}
+.drrow .drav svg,.drrow .drav img{width:32px;height:32px;display:block}
+.drnm{font-size:16px;white-space:nowrap}.drrow.me .drnm{color:#ffd774}
+.drbar{position:relative;height:18px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}
+.drbar i{position:absolute;left:0;top:0;bottom:0;border-radius:9px}
+.drold{background:#8a6a3a}.drnew{background:linear-gradient(90deg,#f2b81e,#ffd774);width:var(--w1)}
+.drace.grow .drnew{animation:drgrow .9s .1s ease-out both}
+@keyframes drgrow{from{width:var(--w0)}to{width:var(--w1)}}
+.drn{font-size:22px;font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+.drg{font-size:16px;color:#9fe39f;font-weight:900}
+@media (prefers-reduced-motion:reduce){.drace.grow .drnew{animation:none}}
+@media (min-width:900px){.drace{max-width:640px;align-self:center;width:100%}}
+.stg-tally .ds{max-height:300px}.stg-tally .dtable{flex:1 1 auto}
+.stg-tally .ds{max-height:220px}.stg-tally .drace{flex:1 0 auto;justify-content:center;gap:14px}.stg-tally .drbar{height:24px;border-radius:12px}.stg-tally .drn{font-size:26px}.stg-tally .drrow{grid-template-columns:40px minmax(48px,auto) 1fr 44px 40px}.stg-tally .drrow .drav svg,.stg-tally .drrow .drav img{width:40px;height:40px}
+.drhero{display:flex;align-items:center;gap:14px}
+.drhl{display:flex;flex-direction:column;gap:4px}.drhl b{font-size:18px;font-weight:900}.drhl span{color:#ffd774;font-size:20px;font-weight:900}
+.drpor{width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--rc,#f2b81e);box-shadow:0 0 0 3px #f2b81e,0 6px 18px rgba(0,0,0,.5);flex:0 0 auto;animation:drpor .5s ease-out both}
+@keyframes drpor{from{transform:scale(.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.drpor{animation:none}}
+@media (max-height:700px){.drpor{width:64px;height:64px}}
+/* W471 round 2: desktop legend and own-pot strip at 16px */
+html:not(.ph) #legend,html:not(.ph) #legend .lgb,html:not(.ph) #legend .lgn,html:not(.ph) #legend .lg{font-size:16px}
+html:not(.ph) #legend .lg{min-height:30px;padding:2px 10px 2px 6px}html:not(.ph) #legend .lgn{min-width:28px}
+html:not(.ph) #me,html:not(.ph) #me *:not(svg):not(path){font-size:16px}
+/* W471 round 2 (DESIGN-FIX 5): choice cards in two even columns, 56px high, an odd last card spans both */
+#qbox .opts.g2 .btn{min-height:56px}
+#qbox .opts.g2 .btn:last-child:nth-child(odd){grid-column:1 / -1;justify-content:center}
+#qbox .sug .best,#qbox .best,.btn .best{font-size:12px;background:#2b1a12;color:#ffd774}
+.sug::after,.rt.sug::after{font:900 12px/18px system-ui,sans-serif!important;background:#2b1a12!important;color:#ffd774!important;border:1px solid #ffd774}
+html.ph .gx-bar [data-gx=scored],html.ph .gx-bar [data-gx=rulesd]{display:none!important}html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
+.dpick .dpl{display:block;font:800 14px/1.1 system-ui,sans-serif;color:inherit;margin-top:2px}.rsfoot .btn.go:not(.off){background:#c4602a!important;color:#fff7e0!important}
+@media (max-height:760px){.dpick .dpl{display:none}}
+/* W471 round 2: desktop text >= 16px on the title button sublines and the Goal card label */
+html:not(.ph) .tbtn span,html:not(.ph) .tbtn.gxt-menu span{font-size:16px!important}
+html:not(.ph) #goalcard .gck{font-size:16px}
+@media (max-height:700px){.stg-tally .drace{flex:0 0 auto;gap:6px;padding:8px 10px}.drpor{display:none}.stg-tally .drbar{height:16px}.stg-tally .drn{font-size:20px}}
+@media (min-width:900px){.stg-tally .drace{flex:0 0 auto;margin:auto 0}}
+#instr.indock{position:static;left:auto;right:auto;bottom:auto;max-width:none;width:auto;margin:0;flex:0 0 auto;order:-1}
+/* W471 (R5 fix 3): desktop day report reads like the phone one: a centred table, solid row backing, bigger tiles */
+@media (min-width:900px){
+  .stg .dtable{max-width:760px;width:100%;margin:0 auto}
+  .stg .ds.lit,.stg .ds{background:rgba(20,10,8,.78)!important;border-color:rgba(255,240,210,.55)}
+  .stg .ds.me{border-color:#f2b81e}
+  .stg .ds .dp{font-size:24px;min-height:38px}
+  .stg .ds .dn,.stg .ds .dtot,.stg .ds .drb{font-size:18px;color:#fff6df}
+  .stg .ds .dp.dim{opacity:.6;filter:grayscale(.5)}
+}

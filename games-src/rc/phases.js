@@ -202,7 +202,7 @@ FN.endActions=fr=>{for(const q of (G.inv.pending||[])){G.inv.built[q.k]=1;doInv(
   for(const a of G.plan.acts){if(a.pw.includes('hammer')){const it=G.items.find(i=>i.k==='hammer');if(it)it.uses--}}
   G.items=G.items.filter(i=>i.uses>0);G.plan.acts.forEach(a=>a.done=true);G.phase='actdone';SC().afterActions&&SC().afterActions()};
 // ---------- weather ----------
-FN.weather=fr=>{G.phase='weather';beat('weather');const S=SCENARIOS[G.scen];const dice=(S.wx[G.round]||[]).slice();if(G.wx.animals)dice.push('animals');
+FN.weather=fr=>{G.phase='weather';beat('weather');const S=SCENARIOS[G.scen];const dice=(wxTab()[G.round]||[]).slice();if(G.wx.animals)dice.push('animals');
   let rain=G.wx.rain,snow=G.wx.snow;const out=[];const roll=G.wxEarly||{};
   for(const d of new Set(dice)){if(d==='rain'){const f=roll.rain||DICE['weather-rain'][rnd(6)];out.push('rain die: '+f);if(f==='1 rain')rain++;else if(f==='2 rain')rain+=2;else snow++}
     if(d==='snow'){const f=roll.snow||DICE['weather-winter'][rnd(6)];out.push('winter die: '+f);if(f==='1 snow')snow++;else if(f==='2 snow')snow+=2;else rain+=2}

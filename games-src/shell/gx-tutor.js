@@ -143,7 +143,11 @@
   }
   // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
   function draw() {   // (re)build the visible pieces for the current step at the current layout
-    var st = S.step, hs = holesOf(st); clearVisuals();
+    var st = S.step, hs = holesOf(st);
+    // a redraw for the same step keeps its bubble element (it only moves): a rebuilt bubble reads as a message that vanished unread
+    var keep = hs && S.bub && S.bub.dataset.step === String(st.id || S.i) && S.say === stepText(st, 'say') ? S.bub : null;
+    if (keep) S.vis = (S.vis || []).filter(function (e) { return e !== keep; });
+    clearVisuals();
     var v = vp();
     if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
     var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
@@ -156,6 +160,7 @@
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
@@ -181,7 +186,7 @@
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
-      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
       return;
@@ -199,6 +204,7 @@
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
+    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -216,6 +222,8 @@
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
+    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }

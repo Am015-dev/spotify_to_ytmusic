@@ -27,7 +27,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 
 .gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:44px;min-height:44px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
 .gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
-.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn .gx-n{font-size:.875rem;opacity:.8}
 .gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
 .gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
 /* popups */
@@ -38,13 +38,13 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
 .gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
-.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:44px;min-height:44px;border-radius:10px}
 .gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
 /* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
 @media (max-width:999px){
   .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
-  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-dock{max-height:var(--gx-sheet-h,40dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
   .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
   .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
   .gx-app.gx-dock-min .gx-dock-body{display:none}
@@ -335,9 +335,9 @@ html.ph #ps{display:flex;flex-direction:column;gap:6px;padding:6px 8px;flex:1 1 
 html.ph .ps-main{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 html.ph .ps-tiles{display:flex;gap:6px}
 html.ph .ps-ctl{display:flex;gap:6px;align-items:center}
-html.ph .ps-msg{flex:1 1 140px;min-width:0;font:600 1rem/1.2 var(--fb);color:#fff2c4}
-html.ph .ps-banner{font:600 .95rem/1.25 var(--fb);color:#fff2c4;background:#0c3a44;border:1px solid #d9a21b;border-radius:10px;padding:5px 9px;margin:0 0 6px;text-align:center}html.ph .ps-banner b{color:#ffd76a;font-weight:800}html.ph .ps-banner span{color:#e8f4f1}
-html.ph .ps-hint{font:600 .9rem/1.25 var(--fb);color:#cfe9e4;text-align:center;min-height:1.2em}
+html.ph .ps-stat{flex:1 1 140px;min-width:0;font:600 1rem/1.2 var(--fb);color:#fff2c4}
+html.ph .ps-turn{font:600 .95rem/1.25 var(--fb);color:#fff2c4;background:#0c3a44;border:1px solid #d9a21b;border-radius:10px;padding:5px 9px;margin:0 0 6px;text-align:center}html.ph .ps-turn b{color:#ffd76a;font-weight:800}html.ph .ps-turn span{color:#e8f4f1}
+html.ph .ps-line{font:600 .9rem/1.25 var(--fb);color:#cfe9e4;text-align:center;min-height:1.2em}
 html.ph .ps-x{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 html.ph .ps-x:empty{display:none}
 html.ph .pt{position:relative;width:clamp(48px,calc((100vw - 200px)/3),66px);height:clamp(48px,calc((100vw - 200px)/3),66px);padding:0;border:3px solid transparent;border-radius:12px;background:none;cursor:pointer;flex:0 0 auto;line-height:0;display:block}
@@ -362,8 +362,8 @@ html.ph-l .ps-tiles{flex-direction:column;gap:7px}
 html.ph-l .pt{width:56px;height:56px}
 html.ph-l .ps-ctl{flex-wrap:wrap;width:150px;align-items:stretch;align-content:flex-start}
 html.ph-l .ps-ctl .pb.pri{flex:1 1 100%}
-html.ph-l .ps-msg{flex:1 1 auto}
-html.ph-l .ps-hint{text-align:left}
+html.ph-l .ps-stat{flex:1 1 auto}
+html.ph-l .ps-line{text-align:left}
 /* pop-ups live in the free zone (dock area), never over the board */
 html.ph .ppop,html.ph .pcard{position:absolute;inset:0;z-index:5;overflow:auto;overscroll-behavior:contain}
 html.ph .pcard{bottom:0;color:#14232b;box-shadow:0 8px 18px rgba(0,0,0,.5)}
@@ -463,7 +463,7 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 .gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
 .gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
 .gxc-dim{color:var(--gxc-dim)}
-.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-small{font-size:14px;margin:6px 0 0;text-align:center}
 .gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
 .gxc-row.wrap{flex-wrap:wrap}
 .gxc-btn{min-height:46px;min-width:88px;padding:8px 21px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
@@ -472,7 +472,7 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 .gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
 .gxc-btn.ghost{background:rgba(255,255,255,.22)}
 .gxc-ib{min-height:44px;min-width:44px;padding:4px 21px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap;flex:0 0 auto}
-.gxc-tag{display:inline-block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+.gxc-tag{display:inline-block;font-size:14px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
 /* portraits: image or emoji badge in a painted ring */
 .gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
@@ -499,7 +499,7 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 .gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
 .gxc-act b{font-size:14px;letter-spacing:.04em}
-.gxc-act small{font-size:13px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
+.gxc-act small{font-size:14px;line-height:1.25;opacity:.85;white-space:normal;max-width:100%;padding:0 18px}
 .gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
 .gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
   background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
@@ -514,8 +514,8 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 .gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
 @keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
 .gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
-.gxc-node .gxc-st{font-size:13px}
-.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+.gxc-node .gxc-st{font-size:14px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:14px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
   background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
 .gxc-node.locked .gxc-lab{opacity:.65}
@@ -533,11 +533,11 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 @keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
 .gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
 .gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
 .gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
 .gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
 .gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
-.gxc-goal b,.gxc-twist b{font-size:13px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-goal b,.gxc-twist b{font-size:14px;text-transform:uppercase;letter-spacing:.07em}
 .gxc-twist b{color:var(--gxc-a3)}
 .gxc-twist.big{font-size:16px;border-width:2px}
 .gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
@@ -549,7 +549,7 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 /* ---- story scene ---- */
 .gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
   background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto;overflow-x:hidden;box-sizing:border-box;max-width:100%}
-.gxc-sc-title{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-title{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
 .gxc-sc-who{margin-bottom:8px}
 .gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
 .gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
@@ -561,19 +561,19 @@ html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 .gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
 .gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
 .gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
-.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:14px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
 .gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
 .gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
 .gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
 /* ---- result ---- */
 .gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
 .gxc-res-on.has-art{background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.72)),var(--gxc-art) center/cover no-repeat}
-.gxc-res-k{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res-k{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
 .gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
 .gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
-.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-quote b{font-size:14px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
 .gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
-.gxc-unl>b{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl>b{display:block;font-size:14px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
 .gxc-unl-i{padding:3px 0;font-size:15px}
 /* short phones (375x553): tighter scene, smaller portraits */
 @media (max-height:600px){
@@ -592,20 +592,20 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
    Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
 :root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
-.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(300px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
 .gxh-bub.on{visibility:visible}
 .gxh-bub *{box-sizing:border-box}
 .gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
-.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:14px}
 .gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
 .gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
 .gxh-bub .gxh-sp svg{width:100%;height:100%}
 .gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
-.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 14px/1 var(--gxh-font);min-height:44px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
 .gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
 /* 44 px tap box, same 32 px look: the extra 6 px is a transparent border pulled back with negative margin */
 .gxh-bub .gxh-ok{box-sizing:border-box;min-height:44px;border:6px solid transparent;background-clip:padding-box;margin-top:-6px;margin-bottom:-6px;margin-right:-6px}
-.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:44px;display:inline-flex;align-items:center}
 .gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
 .gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
 .gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
@@ -624,7 +624,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
 .gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
 .gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
-.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-x{position:absolute;right:4px;top:4px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
 .gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
 .gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
 .gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
@@ -639,22 +639,22 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
 .gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
 .gxh-pics svg{width:64px;height:64px}
-.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics figcaption{font:800 14px/1.1 var(--gxh-font);text-align:center;max-width:76px}
 .gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
 .gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
 .gxh-set>span{flex:1 0 90px;font-weight:700}
-.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button{min-height:44px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
 .gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
 @keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
 @media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
-@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
-.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:14px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
@@ -674,15 +674,15 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
-.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
 .gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
 .gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
 .gxt-n{opacity:.85;white-space:nowrap}
-.gxt-skip{flex:0 0 auto;min-height:28px;padding:0 10px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);cursor:pointer}
-.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 13px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
+.gxt-skip{flex:0 0 auto;min-height:44px;padding:0 12px;border-radius:14px;border:1px solid rgba(243,230,191,.5);background:transparent;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);cursor:pointer}
+.gxt-pill{position:fixed;left:50%;top:54px;transform:translateX(-50%);z-index:calc(var(--gxt-z) + 5);padding:6px 14px;border-radius:16px;background:rgba(22,11,17,.9);color:#f3e6bf;border:1px solid rgba(201,154,53,.6);font:700 14px/1.2 var(--gxh-font,inherit);pointer-events:none;white-space:nowrap}
 .gxt-end{position:fixed;inset:0;z-index:calc(var(--gxt-z) + 10);display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(5,3,6,.7);box-sizing:border-box}
 .gxt-endc{box-sizing:border-box;width:min(340px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center;padding:18px 16px 16px;border-radius:18px;background:var(--gxh-bg,#f3e6bf);color:var(--gxh-ink,#231a10);border:3px solid var(--gxh-accent,#c99a35);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font,inherit)}
 .gxt-ek{align-self:center;width:46px;height:46px;border-radius:50%;background:var(--gxh-btn,#7a1f31);color:var(--gxh-btn-ink,#fff6dc);font:800 28px/46px var(--gxh-font,inherit)}
@@ -694,7 +694,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @keyframes gxt-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.025);opacity:.75}}
 @keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
-@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{height:30px}}
+@media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{min-height:44px}}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -781,7 +781,7 @@ html.sk-frame #ov{z-index:6}
 html.sk .gx-bar .gx-ibtn,html.sk .gx-dock .gx-ibtn{border-image-width:4px}
 .gx-drawer details:not([open])>*:not(summary){display:none}
 /* Grandmother Osk, the coached first game (ui10.js): one tip at a time, in the panel flow (never over the board) */
-#osk{display:flex;align-items:flex-start;gap:10px;margin:6px 8px;padding:8px 8px 8px 10px;background:#fbf3df;color:#2a1d10;border:2px solid #c9952e;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.35);position:relative;z-index:2;animation:oskIn .3s ease-out}
+#osk{display:flex;align-items:flex-start;gap:10px;margin:6px 8px;padding:8px 8px 8px 10px;background:#fbf3df;color:#2a1d10;border:2px solid #c9952e;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.35);position:relative;z-index:2;}
 #osk.riv{border-color:#3d6fa8;background:#eef4fb}
 #osk .osk-p{flex:0 0 44px;text-align:center;font:700 13px/1.1 inherit;color:#5a3b10}
 #osk .osk-p svg{width:44px;height:44px;display:block}
@@ -813,6 +813,114 @@ html.sk .gx-bar .gx-ibtn,html.sk .gx-dock .gx-ibtn{border-image-width:4px}
 .ps-intro{margin:10px 12px;padding:10px 12px 10px 30px;background:#fbf3df;color:#2a1d10;border-radius:10px;font-size:15px;line-height:1.35}
 .ps-intro li{margin:4px 0}
 
+/* W464 feel pass: the goal first, the hand big, the rival's lines stay, setup folded away */
+.stgoal{margin:6px 24px 4px;padding:12px 16px;border-radius:14px;background:rgba(11,42,51,.86);border:2px solid var(--gold2,#c9a24a);color:#f6efd8;cursor:pointer}
+.stgoal b{display:block;font:700 1.35rem/1.2 var(--fd,inherit);color:#ffe7a3;margin-bottom:4px}
+.stgoal ul{margin:0;padding-left:1.1em;font-size:1.02rem;line-height:1.45}
+.stmore{margin:10px 0}
+.stmore-t{display:block;width:100%;text-align:left;cursor:pointer;padding:12px 14px;min-height:48px;border-radius:12px;background:rgba(243,230,191,.96);color:var(--ink,#14232b);border:2px solid var(--gold2,#c9a24a);font-weight:700;font-size:1rem}
+.twgoal .gxt-et{font-size:1.45rem}
+.twgoal ul{text-align:left;margin:8px auto 14px;padding-left:1.2em;max-width:22em;font-size:1.06rem;line-height:1.5}
+.gxt-bub[data-step="goal"] .gxh-tx{white-space:pre-line;font-size:1rem;line-height:1.45}
+html.ph .ps-goal{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px;width:calc(100% - 8px);margin:8px 4px 0;padding:8px 10px;min-height:44px;border-radius:12px;border:1.5px solid rgba(227,178,75,.55);background:rgba(8,32,40,.7);font:600 1rem/1.3 var(--fb);color:#e8f4f1;cursor:pointer}
+html.ph .ps-goal .gl{color:#ffe7a3}
+html.ph .ps-goal s{opacity:.7;margin-left:6px}
+html.ph-p .pt{width:clamp(64px,26vw,104px);height:clamp(64px,26vw,104px)}
+html.ph-p .ps-main{flex-wrap:wrap;justify-content:center}
+html.ph .ps-riv{margin:10px 6px 0;padding:10px 12px 10px 30px;border-radius:12px;background:rgba(8,32,40,.7);color:#e8f4f1;font:500 1rem/1.4 var(--fb)}
+html.ph .ps-riv li{margin:3px 0}
+html.ph .ps-riv li:last-child{color:#ffe7a3;font-weight:700}
+@media (orientation:portrait) and (max-height:740px){
+  html.ph-p .pt{width:clamp(56px,18vw,70px);height:clamp(56px,18vw,70px)}
+  html.ph-p .ps-ctl .pb .lbl{display:none}
+  html.ph-p .ps-line:empty{display:none}
+  html.ph .ps-goal{margin-top:4px;padding:6px 8px;min-height:44px}
+}
+
+.goal[data-goal]{cursor:pointer;font-size:max(1rem,16px)}.goal[data-goal] u{color:#0f5d66;font-weight:700}
+
+/* W464 round 2: phone text >= 14px */
+html.ph .gx-bar .gx-ibtn>span{font-size:14px!important}
+html.ph .tiny,html.ph small{font-size:max(14px,.875rem)}
+.ps-intro{padding:10px 14px}.ps-intro ul{padding-left:1.2em;margin:4px 0 0}
+
+html.ph .otag,html.ph .otag.ship,html.ph .otag.ship.me,html.ph .ostop span,html.ph .ostart span,html.ph .opip,html.ph .omark span{font-size:14px!important}
+html.ph .pt .bd{min-width:22px;height:22px;font-size:14px;line-height:18px}
+html.ph .pb .lbl,html.ph .chip small,html.ph .chip b{font-size:14px!important}
+html.ph .ps-feed h5{font-size:14px}html.ph .ps-feed li,html.ph .ps-feed .tiny{font-size:15px}
+html.ph #pc b,html.ph #pc .btn{font-size:max(14px,1em)}
+html.ph .omark b{font-size:14px!important}
+
+/* drawers and the Menu: solid button faces and text backing (contrast on the painted art) */
+.gx-drawer .btn:not(.pri),.gx-drawer .seg button,#pc .btn:not(.pri){border-image:none!important;background:#f6ecd0!important;border:2px solid #8a6a2a!important;color:#10262d!important;text-shadow:none!important;filter:none!important}
+.gx-drawer .seg button.on,.gx-drawer .btn.on{background:#1d6f78!important;color:#fff!important}
+#rulesbody{background:#f6ecd0;color:#1c140a}
+@media (min-width:1024px){.gxc-act small{font-size:17px!important}}
+/* drag-to-place */
+[data-a=card]{touch-action:none}
+[data-a=card].dragsrc{opacity:.35}
+.drgghost{position:fixed;z-index:60;pointer-events:none;translate:-50% -50%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55));transition:scale .12s ease-out;scale:1.08}
+.drgghost.snap{scale:1;transition:left .08s ease-out,top .08s ease-out,scale .12s ease-out}
+.drgghost>img,.drgghost>svg{width:100%;height:100%;display:block;border-radius:10px}
+.drgtgt{position:fixed;z-index:59;pointer-events:none;translate:-50% -50%;border-radius:12px;border:3px solid #ffd24a;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 18px 6px rgba(255,210,74,.65);animation:drgpulse 1s ease-in-out infinite}
+.drgtgt.hot{border-color:#fff;box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 26px 10px rgba(255,240,170,.9);animation:none}
+@keyframes drgpulse{50%{box-shadow:0 0 0 3px rgba(11,42,51,.8),0 0 8px 2px rgba(255,210,74,.4)}}
+@media (prefers-reduced-motion:reduce){.drgtgt{animation:none}.drgghost{transition:none}}
+[data-a=card] img,[data-a=card] svg{-webkit-user-drag:none;user-select:none;pointer-events:none}
+
+/* phone top bar: Hint and Menu only; How to play, Crews and Log live in Menu */
+html.ph .gx-bar [data-gx=crewd],html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=rulesd]{display:none!important}
+html:not(.ph) .phonly{display:none}
+/* selected toggles: darker teal for contrast */
+.seg button.on,#start .seg button.on,.gx-drawer .btn.on,.gx-drawer .seg button.on{background:#12606b!important;color:#fff!important}
+/* desktop board-first: a narrower side panel, so the board gets the screen */
+@media (min-width:1024px){:root{--gx-dock-w:clamp(300px,24vw,360px)}}
+.mph .mh .tiny{display:block;margin-top:2px}
+html body .gxc-path .gxc-act small{font-size:16px!important}
+.gx-drawer .btn:not(.pri) b,.gx-drawer .btn:not(.pri) span,.gx-drawer .btn:not(.pri) small{color:#10262d!important;text-shadow:none!important}
+.gx-drawer .lbl{color:#3a2a12!important}
+#rulesbody p,#rulesbody li,#rulesbody h3{background:#f6ecd0}
+
+/* Learn to play: only the suggested start mark glows */
+.opip.dim{opacity:.4;animation:none!important;box-shadow:none!important}
+/* desktop (>= 1024 wide) uses the board-first layout: board left at full height, a play strip right with big tiles and 16px+ text */
+@media (min-width:1024px){
+  html.ph-l .gx-app{grid-template-columns:var(--bs) minmax(380px,1fr)}
+  html.ph-l .ps-main{flex-direction:column;align-items:stretch;gap:12px}
+  html.ph-l .ps-tiles{flex-direction:row;gap:14px;justify-content:flex-start}
+  html.ph-l .pt{width:120px;height:120px}
+  html.ph-l .ps-ctl{width:auto;flex-wrap:nowrap;gap:10px}
+  html.ph-l .ps-ctl .pb.pri{flex:0 0 auto;min-width:140px}
+  html.ph #ps,html.ph #ps .ps-line,html.ph .ps-turn,html.ph .ps-stat,html.ph .ps-goal,html.ph .ps-feed li,html.ph .ps-riv,html.ph .ps-intro{font-size:17px!important}
+  html.ph .ps-feed h5,html.ph .pb .lbl,html.ph .chip small,html.ph .chip b,html.ph .gx-bar .gx-ibtn>span,html.ph .otag,html.ph .ostop span,html.ph .ostart span,html.ph .omark span,html.ph .omark b,html.ph .pt .bd,html.ph .tiny,html.ph small{font-size:16px!important}
+  html.ph #ps{padding:14px 18px;max-width:560px}
+  html.ph .osk-card{font-size:17px}
+}
+
+/* Osk's tip slides in once per new tip; moving it between the strip and a card must not replay the fade */
+#osk.fresh{animation:oskIn .3s ease-out}
+
+/* captain cards under the board on rival turns and at the start */
+html.ph .ps-crews{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:10px 6px 0}
+html.ph .ps-crews .crew{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(8,32,40,.72);border:1.5px solid rgba(227,178,75,.35);color:#e8f4f1}
+html.ph .ps-crews .crew i{grid-row:1/3;width:22px;height:22px;border-radius:50%;border:2px solid #fff}
+html.ph .ps-crews .crew b{font:700 17px/1.2 var(--fb);color:#fff2c4}
+html.ph .ps-crews .crew span{font:500 15px/1.3 var(--fb);color:#cfe9e4}
+html.ph .ps-crews .crew.now{border-color:#ffd24a;box-shadow:0 0 0 2px rgba(255,210,74,.35)}
+html.ph .ps-crews .crew.sunk{opacity:.6}html.ph .ps-crews .crew.sunk b{text-decoration:line-through}
+/* the first Learn bubble sits under the board: push the strip's own lines below it */
+html.ph:has(.gxt-bub) #ps{padding-top:190px}
+/* Story map: the title wraps between words only; Act captions grow to fit instead of clipping */
+.gxc-htitle{overflow-wrap:normal!important;word-break:normal!important;hyphens:none}
+@media (max-width:500px){.gxc-htitle{font-size:17px}}
+.gxc-act{height:auto!important;min-height:38px;padding:4px 0;gap:2px}
+.gxc-map{padding-top:6px}
+/* desktop top bar: Hint and Menu keep their labels */
+@media (min-width:1024px){html.ph .gx-bar .gx-ibtn{min-width:76px;height:auto;min-height:48px;padding:4px 10px}html.ph .gx-bar .gx-ibtn>span{white-space:nowrap;overflow:visible}}
+/* result card: its buttons do not cover the captain list */
+html.ph #pc .row:has(>.btn[data-a=again]),html.ph #pc .row:has(>.btn.pri){position:static;box-shadow:none;margin:8px 0 0}
+@media (min-width:1024px){html.ph .gx-bar .gx-ibtn{flex-direction:row!important;gap:6px;min-height:40px}html.ph .gx-bar .gx-ibtn>span{margin-top:0!important;background:none!important}}
+
 </style>
 <script>/* painted sea + compass for the board paint (kit patch 9): TW_ART.water is set only when all four tiles loaded */
 window.TW_ART={};(function(){function ld(f,cb){var i=new Image();i.onload=function(){cb(i)};i.src='media/'+f+'.webp'}
@@ -822,8 +930,26 @@ var W=[],n=0;['a','b','c','d'].forEach(function(k,j){ld('tile-water-'+k,function
 html body,html body *{font-family:var(--gx-body)!important}
 html body :is(h1,h2,h3,h4,.gx-title,.title,.logo,.ttl,.gxc-htitle,.gxc-htitle *,.gxc-title,.gxt-et){font-family:var(--gx-title)!important;font-weight:700;letter-spacing:.02em}
 /* menu text floor: the small print under a button and labels never go under 13 px */
-html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(13px,1em)}
-html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(13px,.9em)}
+html body :is(.gxt-menu span,.gxt-menu small,.menu .btn small,.modal .btn small,.modal p,.modal li,.modal label){font-size:max(14px,1em)}
+html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-size:max(14px,.9em)!important}
+/* ===== D0: shared floors for every game (loaded last) ===== */
+/* type scale: 16 body on phones, nothing under 14; touch targets 44; calm motion */
+html:root body :is(.gx-ibtn,.gx-sb,.gx-tg,.gxc-btn,.gxc-ib,.gxh-set button,.gxt-b,.gx-goal-go,.gx-bar .gx-ibtn){min-height:44px;min-width:44px}
+html body :is(.gxc-lab,.gxc-st,.gxh-pics figcaption,.gxt-n,.gxt-skip,.gxt-pill){font-size:max(14px,1em)}
+html body :is(.gx-drawer-body p,.gx-drawer-body li,.gx-dock-body p,.gx-dock-body li){font-size:max(14px,1em)}
+html body :is(.gxc-sheet,.gxc-scene,.gxc-res,.gx-drawer) :is(p,li,small){color:inherit}
+/* text over painted art: a soft dark halo keeps 4.5:1 when the art is busy */
+html.sk .gx-bar .gx-ibtn,html.sk .gx-bar{text-shadow:0 1px 2px rgba(0,0,0,.75)}
+html.sk .gxc-act b,html.sk .gxc-act small{text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* panels never swallow the art on phones: docks are capped, sheets slide not fade */
+@media (max-width:999px) and (orientation:portrait){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),44dvh)}}
+@media (max-width:999px) and (orientation:landscape){.gx-dock{max-height:min(var(--gx-sheet-h,40dvh),34dvh)}}
+/* calm motion: no looping pulses for people who asked for less, nothing flashes faster than ~1 Hz */
+@media (prefers-reduced-motion:reduce){
+  html body :is(.gxh-ring,.gxt-ring,.gxc-node.next .gxc-disc,.gxh-bub,.gxt-bub){animation:none!important}
+  html body *{scroll-behavior:auto!important}
+}
+html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 </style>
 </head>
 <body>
@@ -1345,7 +1471,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'the tile row is fully on screen', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll(pick('.ps-tiles .pt', 'button[data-a=card]')), function (e) { if (!bad && GXS.vis(e) && !inView(e)) bad = 'tile off screen'; }); return !bad || bad; } },
       { kind: 'eq', name: 'turn number', a: function () { var e = $('.chip .c2 b') || $('#barstat .lg b'); return +/\d+/.exec(e.textContent)[0]; }, b: function () { return G.turn; } },
       { kind: 'eq', name: 'tiles left in the pile', a: function () { var e = $('.chip .c2 small'); return e ? +/(\d+) tiles/.exec(e.textContent)[1] : GXS.num('#barstat .lg[title^=Current] b'); }, b: function () { return G.deck.length; } },
-      { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { if (!ph()) return true; var bad = ''; [].forEach.call(document.querySelectorAll('#ps *, #ps-msg, #pc *, #res *, #main *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { if (!ph()) return true; var bad = ''; [].forEach.call(document.querySelectorAll('#ps *, #ps-stat, #pc *, #res *, #main *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       skin,
       { kind: 'tap', get sel() { return pick('.ps-main [data-a=place]', 'button[data-a=place]'); }, name: 'tap Place', state: function () { return JSON.stringify([G.logN, G.turn, G.step]); }, expect: function (a, b) { return a !== b || 'Place did nothing'; } }
     ]
@@ -2692,7 +2818,7 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
-window.CAMPAIGN = {"game":"tidewake","title":"The Lantern Reach","version":1,"cast":{"osk":{"name":"Grandmother Osk","portrait":"camp-osk.webp","emoji":"🏮","color":"#d9a21b"},"wick":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","color":"#2f6fb5"},"harrow":{"name":"Gull Harrow","portrait":"camp-harrow.webp","emoji":"🦅","color":"#7b4fb5"},"brann":{"name":"Brann Ashkeel","portrait":"camp-brann.webp","emoji":"💥","color":"#c0392b"},"saltshade":{"name":"Saltshade","portrait":"camp-saltshade.webp","emoji":"🐙","color":"#1fa3a3"},"sabel":{"name":"Sabel Riftwright","portrait":"camp-sabel.webp","emoji":"🌀","color":"#2e9c6a"},"vey":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","color":"#2a2f3a"},"crown":{"name":"The Abyssal Crown","portrait":"camp-crown.webp","emoji":"🐉","color":"#1b3a5c"},"ysolde":{"name":"Admiral Ysolde","portrait":"camp-ysolde.webp","emoji":"⚓","color":"#e8e1cf"}},"acts":[{"act":1,"title":"Calm Shallows","blurb":"Learn to lay currents, keep off the edge and dodge your first leviathans."},{"act":2,"title":"Open Water","blurb":"Deck Cannons, Rift Gates and the long night watch. The captains stop going easy."},{"act":3,"title":"The Deep Reach","blurb":"Rogue Waves, the Maelstrom and the Admiral who rules the haunted archipelago."}],"twists":[{"id":"boss-first","where":"setup","how":"Pass newGame option first = the boss seat (1), so the boss picks its start mark first and takes the first turn."},{"id":"boss-cannon","where":"setup","how":"After newGame has dealt the hands (exp.cannon must be 1), move param Deck Cannons (max 2) from G.deck into the boss hand, sending the same number of its currents to the bottom of G.deck."},{"id":"deep-stir","where":"setup","how":"In newGame, schedule setupMon with n = min(10, LEV_AT_START[np] + param), so param extra leviathans rise at set-up."},{"id":"wave-early","where":"setup","how":"With exp.wave = 1, move WAVE_ID to the front of G.mdeck in newGame before setupMon runs, so the Rogue Wave rises during set-up."},{"id":"harrier","where":"ai","how":"When the boss seat decides, call decide() with a copy of AILV.hard whose push = param (e.g. 30), so evalPos rewards leaving rival junks next to the edge."}],"chapters":[{"id":"c1","act":1,"title":"Lantern Lit","boss":false,"intro":[{"who":"osk","text":"Your first junk, child. Hang the lantern and lay a current in front of your bow."},{"who":"osk","text":"Your ship follows the line to its end. Never let that line run off the board."},{"who":"wick","text":"Race you round the shallows! No sea monsters today, promise."}],"outro":[{"who":"osk","text":"You read the water well. Wick ran off the edge, not you."},{"who":"wick","text":"Next time I am watching my own lines!"}],"opponent":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","cast":"wick","personality":"Cheerful cabin hand who lays whatever tile is on top of the hand.","aiLevel":"easy","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Wick"],"variant":null,"noMon":true,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"win","value":null,"text":"Win: be the last junk afloat (no leviathans in this chapter)."},"hints":true,"stars":[{"text":"Be the last junk afloat","test":{"k":"won"}},{"text":"Sink Wick with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 12 turns in total","test":{"k":"turns","op":"<=","v":12}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Wick sails gently and Grandmother Osk shows the safest move every turn."},"unlock":[{"type":"portrait","id":"wick","text":"Wick's portrait"},{"type":"title","id":"deckhand","text":"Title: Deckhand"}]},{"id":"c2","act":1,"title":"Leviathan Bay","boss":false,"intro":[{"who":"osk","text":"Now the deep wakes. Each roll of 6, 7 or 8 makes every leviathan move."},{"who":"osk","text":"A leviathan in front of your bow on your turn sinks you. Keep two squares between you."},{"who":"wick","text":"I counted six of them. Six! Stay away from my side of the bay."}],"outro":[{"who":"osk","text":"You kept your distance and the leviathans went hungry."},{"who":"wick","text":"One ate my current right under me. Not fair."}],"opponent":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","cast":"wick","personality":"Cheerful cabin hand who forgets the leviathans exist.","aiLevel":"easy","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Wick"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"win","value":null,"text":"Win with the six leviathans awake."},"hints":true,"stars":[{"text":"Win with the leviathans awake","test":{"k":"won"}},{"text":"Win using the hint at most 3 times","test":{"k":"hintsUsed","op":"<=","v":3}},{"text":"Win within 10 turns in total","test":{"k":"turns","op":"<=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Same sea, but the hint is free and only two stars are on offer."},"unlock":[{"type":"cardback","id":"scales","text":"Leviathan-scale tile back"}]},{"id":"c3","act":1,"title":"Harrow's Toll","boss":true,"intro":[{"who":"harrow","text":"Three junks, one channel, and I collect the toll. Pay or swim."},{"who":"osk","text":"When your current moves his junk too, you steer him. Steer him into the edge."},{"who":"wick","text":"I'll sail with you this time. Well, near you."}],"outro":[{"who":"osk","text":"You sank a captain with your own current. Now you are a true pilot."},{"who":"harrow","text":"Keep the toll. I will be watching the Open Water."}],"opponent":{"name":"Gull Harrow","portrait":"camp-harrow.webp","emoji":"🦅","cast":"harrow","personality":"Swaggering toll-taker who loves crowding rivals toward the corners.","aiLevel":"easy","aiStyle":"default","taunt":"Ha! Into the corner with you. Pay the toll next time.","praise":"Hm. You steer like a harbour pilot. Pass, then."},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Gull Harrow","Wick"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"custom","value":1,"text":"Win and sink at least 1 rival with a current you laid."},"hints":true,"stars":[{"text":"Win and sink at least 1 rival with your current","test":{"k":"sunk","op":">=","v":1}},{"text":"Sink both rivals with your currents","test":{"k":"sunk","op":">=","v":2}},{"text":"Win using the hint at most 2 times","test":{"k":"hintsUsed","op":"<=","v":2}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"players":2,"seats":["human","ai"],"names":["You","Gull Harrow"]},"maxStars":2,"text":"Wick stays in port: it is just you and Harrow."},"unlock":[{"type":"portrait","id":"harrow","text":"Gull Harrow's portrait"},{"type":"act","id":"act2","text":"Act 2: Open Water"},{"type":"table","id":"dawn","text":"Dawn-shallows board skin"}]},{"id":"c4","act":2,"title":"Cannon Smoke","boss":false,"intro":[{"who":"brann","text":"Smell that? Powder. My Deck Cannons blow leviathans back to the deep."},{"who":"osk","text":"Cannons are in the pile now. Keep one and fire it when a leviathan is about to sink you."},{"who":"osk","text":"No more hints from me. You know the water."}],"outro":[{"who":"brann","text":"Fine shooting. Or fine dodging. Either way, I am out of powder."},{"who":"osk","text":"A cannon kept is a life kept."}],"opponent":{"name":"Brann Ashkeel","portrait":"camp-brann.webp","emoji":"💥","cast":"brann","personality":"Loud cannoneer who keeps every Deck Cannon and fires at the first leviathan in reach.","aiLevel":"normal","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Brann"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"win","value":null,"text":"Win with Deck Cannons in the pile."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Fire at least 1 Deck Cannon","test":{"k":"cannons","op":">=","v":1}},{"text":"Sink Brann with a current you laid","test":{"k":"sunk","op":">=","v":1}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Brann plays like a deckhand and loses track of his cannons."},"unlock":[{"type":"portrait","id":"brann","text":"Brann's portrait"}]},{"id":"c5","act":2,"title":"The Long Watch","boss":false,"intro":[{"who":"osk","text":"A night watch alone. No rivals, only the leviathans and the dark."},{"who":"saltshade","text":"...the water is cold, little lantern. Stay. Stay a while."},{"who":"osk","text":"Stay afloat for 18 turns. Keep a cannon if one comes."}],"outro":[{"who":"osk","text":"Dawn. You kept the lantern burning all night."},{"who":"saltshade","text":"...another night, then."}],"opponent":{"name":"Saltshade","portrait":"camp-saltshade.webp","emoji":"🐙","cast":"saltshade","personality":"A patient leviathan that drifts close and waits for you to run out of room.","aiLevel":"normal","aiStyle":"default"},"setup":{"players":1,"seats":["human"],"names":["You"],"variant":"easysolo","goalTurns":18,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"survive","value":18,"text":"Stay afloat for 18 turns."},"hints":false,"stars":[{"text":"Stay afloat for 18 turns","test":{"k":"won"}},{"text":"Never press the hint button","test":{"k":"hintsUsed","op":"<=","v":0}},{"text":"Finish without firing a Deck Cannon","test":{"k":"cannons","op":"<=","v":0}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"goalTurns":12},"maxStars":2,"text":"A shorter watch: stay afloat for 12 turns."},"unlock":[{"type":"cardback","id":"night","text":"Night-watch tile back"},{"type":"portrait","id":"saltshade","text":"Saltshade's portrait"}]},{"id":"c6","act":2,"title":"The Riftwright","boss":true,"intro":[{"who":"sabel","text":"I open doors in the sea. Step through one and you land wherever the dice say."},{"who":"osk","text":"A Rift Gate is in the pile. Play it instead of a tile, or to escape when you are about to sink."},{"who":"brann","text":"She hid a cannon in her sleeve, I swear it."}],"outro":[{"who":"sabel","text":"You walked through my door and came out ahead. Impressive."},{"who":"osk","text":"Past the Rift lies the Deep Reach. The Admiral waits there."}],"opponent":{"name":"Sabel Riftwright","portrait":"camp-sabel.webp","emoji":"🌀","cast":"sabel","personality":"Calm navigator who saves the Rift Gate for her own escape and fires cannons late.","aiLevel":"normal","aiStyle":"default","taunt":"The door was open. You simply chose the wrong side.","praise":"Take the gate-key, captain. You have earned the Deep Reach."},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Sabel","Brann"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":0,"maelstrom":0,"cannon":1}},"twist":{"id":"boss-cannon","param":1,"text":"Boss rule: Sabel starts with a Deck Cannon in her hand."},"goal":{"type":"win","value":null,"text":"Win against Sabel and Brann with the Rift Gate in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 1 rival with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 16 turns in total","test":{"k":"turns","op":"<=","v":16}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Sabel keeps no hidden cannon and both captains sail gently."},"unlock":[{"type":"portrait","id":"sabel","text":"Sabel's portrait"},{"type":"act","id":"act3","text":"Act 3: The Deep Reach"},{"type":"title","id":"navigator","text":"Title: Navigator"}]},{"id":"c7","act":3,"title":"Rogue Water","boss":false,"intro":[{"who":"vey","text":"The Admiral pays me to keep pilots out of the Reach. Nothing personal."},{"who":"osk","text":"A Rogue Wave sweeps a whole row. In its row, roll the die and beat its strength or capsize."},{"who":"osk","text":"Its strength grows each round. Stay out of its row when it is strong."}],"outro":[{"who":"vey","text":"You rode the wave and I did not. Lucky."},{"who":"osk","text":"Not luck. You read the row."}],"opponent":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","cast":"vey","personality":"Cold corsair who plans a turn ahead and steers rivals toward the wave.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Vey"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":1,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"win","value":null,"text":"Win against Vey with the Rogue Wave in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink Vey with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 10 turns in total","test":{"k":"turns","op":"<=","v":10}}],"easier":{"aiLevel":"normal","twist":null,"setup":{},"maxStars":2,"text":"Vey stops looking ahead and plays one turn at a time."},"unlock":[{"type":"portrait","id":"vey","text":"Vey's portrait"}]},{"id":"c8","act":3,"title":"Maelstrom Row","boss":false,"intro":[{"who":"osk","text":"The Maelstrom turns on calm rolls, when the leviathans rest. It swallows tiles whole."},{"who":"brann","text":"Every toy at once: gates, cannons, wave and whirlpool. Lovely."},{"who":"vey","text":"Two of us against one lantern. Sail fast."}],"outro":[{"who":"osk","text":"Every hazard of the sea, and you came through all of them."},{"who":"brann","text":"I am buying new powder. Lots of it."}],"opponent":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","cast":"vey","personality":"Cold corsair who plans a turn ahead; Brann sails beside him.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Vey","Brann"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":1,"maelstrom":1,"cannon":1}},"twist":{"id":"boss-first","param":null,"text":"Boss rule: Vey picks his start mark first and takes the first turn."},"goal":{"type":"win","value":null,"text":"Win with the Rift Gate, Deck Cannons, Rogue Wave and Maelstrom all in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 1 rival with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{},"maxStars":2,"text":"Both captains play one turn at a time and you pick your start first."},"unlock":[{"type":"table","id":"storm","text":"Storm-reach board skin"}]},{"id":"c9","act":3,"title":"Hunt of the Crown","boss":false,"intro":[{"who":"osk","text":"The Abyssal Crown leads the leviathans. Outlast every one of them and the Reach is open."},{"who":"crown","text":"...ten of us rise. One lantern. The sea is patient."},{"who":"osk","text":"Alone again. Ten leviathans, and every one must leave the board."}],"outro":[{"who":"osk","text":"The last leviathan sank into the deep. Only the Admiral remains."},{"who":"crown","text":"...for now."}],"opponent":{"name":"The Abyssal Crown","portrait":"camp-crown.webp","emoji":"🐉","cast":"crown","personality":"The eldest leviathan: slow, relentless, never alone.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":1,"seats":["human"],"names":["You"],"variant":"solo","noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"survive","value":null,"text":"Outlast all 10 leviathans: win when none are left to rise or on the board."},"hints":false,"stars":[{"text":"Outlast all 10 leviathans","test":{"k":"won"}},{"text":"Fire at least 2 Deck Cannons","test":{"k":"cannons","op":">=","v":2}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"variant":"easysolo","goalTurns":20},"maxStars":2,"text":"Stay afloat for 20 turns instead of outlasting every leviathan."},"unlock":[{"type":"portrait","id":"crown","text":"The Abyssal Crown's portrait"}]},{"id":"c10","act":3,"title":"The Drowned Admiral","boss":true,"intro":[{"who":"ysolde","text":"So the little lantern reached my waters. Every captain here sails for me."},{"who":"osk","text":"She herds ships toward the edge. Keep your bow in the middle of the board."},{"who":"sabel","text":"Vey and I owe her. We sail against you, but we will not cheat."}],"outro":[{"who":"ysolde","text":"The Reach is yours, lantern-bearer. Keep the light burning."},{"who":"osk","text":"The archipelago has a new pilot. I could not be prouder."}],"opponent":{"name":"Admiral Ysolde","portrait":"camp-ysolde.webp","emoji":"⚓","cast":"ysolde","personality":"Ruthless admiral who looks ahead and pins rival junks against the board edge.","aiLevel":"hard","aiStyle":"default","taunt":"Off the edge, like all the others. The Reach keeps its own.","praise":"You held the middle. The Reach and its lanterns are yours."},"setup":{"players":4,"seats":["human","ai","ai","ai"],"names":["You","Admiral Ysolde","Vey","Sabel"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":1,"maelstrom":1,"cannon":1}},"twist":{"id":"harrier","param":30,"text":"Boss rule: the Admiral steers every rival junk toward the board edge."},"goal":{"type":"win","value":null,"text":"Win against the Admiral, Vey and Sabel with every hazard in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 2 rivals with your currents","test":{"k":"sunk","op":">=","v":2}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Admiral Ysolde","Vey"]},"maxStars":2,"text":"Sabel stays out of it and the Admiral stops herding you to the edge."},"unlock":[{"type":"portrait","id":"ysolde","text":"Admiral Ysolde's portrait"},{"type":"title","id":"reach-pilot","text":"Title: Pilot of the Reach"},{"type":"table","id":"lantern","text":"Lantern-night board skin"}]}]};
+window.CAMPAIGN = {"game":"tidewake","title":"The Lantern Reach","version":1,"cast":{"osk":{"name":"Grandmother Osk","portrait":"camp-osk.webp","emoji":"🏮","color":"#d9a21b"},"wick":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","color":"#2f6fb5"},"harrow":{"name":"Gull Harrow","portrait":"camp-harrow.webp","emoji":"🦅","color":"#7b4fb5"},"brann":{"name":"Brann Ashkeel","portrait":"camp-brann.webp","emoji":"💥","color":"#c0392b"},"saltshade":{"name":"Saltshade","portrait":"camp-saltshade.webp","emoji":"🐙","color":"#1fa3a3"},"sabel":{"name":"Sabel Riftwright","portrait":"camp-sabel.webp","emoji":"🌀","color":"#2e9c6a"},"vey":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","color":"#2a2f3a"},"crown":{"name":"The Abyssal Crown","portrait":"camp-crown.webp","emoji":"🐉","color":"#1b3a5c"},"ysolde":{"name":"Admiral Ysolde","portrait":"camp-ysolde.webp","emoji":"⚓","color":"#e8e1cf"}},"acts":[{"act":1,"title":"Calm Shallows","blurb":"Lay currents and dodge your first leviathans."},{"act":2,"title":"Open Water","blurb":"Cannons, Rift Gates and sharper captains."},{"act":3,"title":"The Deep Reach","blurb":"Rogue Waves, the Maelstrom and the Admiral."}],"twists":[{"id":"boss-first","where":"setup","how":"Pass newGame option first = the boss seat (1), so the boss picks its start mark first and takes the first turn."},{"id":"boss-cannon","where":"setup","how":"After newGame has dealt the hands (exp.cannon must be 1), move param Deck Cannons (max 2) from G.deck into the boss hand, sending the same number of its currents to the bottom of G.deck."},{"id":"deep-stir","where":"setup","how":"In newGame, schedule setupMon with n = min(10, LEV_AT_START[np] + param), so param extra leviathans rise at set-up."},{"id":"wave-early","where":"setup","how":"With exp.wave = 1, move WAVE_ID to the front of G.mdeck in newGame before setupMon runs, so the Rogue Wave rises during set-up."},{"id":"harrier","where":"ai","how":"When the boss seat decides, call decide() with a copy of AILV.hard whose push = param (e.g. 30), so evalPos rewards leaving rival junks next to the edge."}],"chapters":[{"id":"c1","act":1,"title":"Lantern Lit","boss":false,"intro":[{"who":"osk","text":"Your first junk, child. Hang the lantern and lay a current in front of your bow."},{"who":"osk","text":"Your ship follows the line to its end. Never let that line run off the board."},{"who":"wick","text":"Race you round the shallows! No sea monsters today, promise."}],"outro":[{"who":"osk","text":"You read the water well. Wick ran off the edge, not you."},{"who":"wick","text":"Next time I am watching my own lines!"}],"opponent":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","cast":"wick","personality":"Cheerful cabin hand who lays whatever tile is on top of the hand.","aiLevel":"easy","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Wick"],"variant":null,"noMon":true,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"win","value":null,"text":"Win: be the last junk afloat (no leviathans in this chapter)."},"hints":true,"stars":[{"text":"Be the last junk afloat","test":{"k":"won"}},{"text":"Sink Wick with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 12 turns in total","test":{"k":"turns","op":"<=","v":12}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Wick sails gently and Grandmother Osk shows the safest move every turn."},"unlock":[{"type":"portrait","id":"wick","text":"Wick's portrait"},{"type":"title","id":"deckhand","text":"Title: Deckhand"}]},{"id":"c2","act":1,"title":"Leviathan Bay","boss":false,"intro":[{"who":"osk","text":"Now the deep wakes. Each roll of 6, 7 or 8 makes every leviathan move."},{"who":"osk","text":"A leviathan in front of your bow on your turn sinks you. Keep two squares between you."},{"who":"wick","text":"I counted six of them. Six! Stay away from my side of the bay."}],"outro":[{"who":"osk","text":"You kept your distance and the leviathans went hungry."},{"who":"wick","text":"One ate my current right under me. Not fair."}],"opponent":{"name":"Wick","portrait":"camp-wick.webp","emoji":"🕯️","cast":"wick","personality":"Cheerful cabin hand who forgets the leviathans exist.","aiLevel":"easy","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Wick"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"win","value":null,"text":"Win with the six leviathans awake."},"hints":true,"stars":[{"text":"Win with the leviathans awake","test":{"k":"won"}},{"text":"Win using the hint at most 3 times","test":{"k":"hintsUsed","op":"<=","v":3}},{"text":"Win within 10 turns in total","test":{"k":"turns","op":"<=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Same sea, but the hint is free and only two stars are on offer."},"unlock":[{"type":"cardback","id":"scales","text":"Leviathan-scale tile back"}]},{"id":"c3","act":1,"title":"Harrow's Toll","boss":true,"intro":[{"who":"harrow","text":"Three junks, one channel, and I collect the toll. Pay or swim."},{"who":"osk","text":"When your current moves his junk too, you steer him. Steer him into the edge."},{"who":"wick","text":"I'll sail with you this time. Well, near you."}],"outro":[{"who":"osk","text":"You sank a captain with your own current. Now you are a true pilot."},{"who":"harrow","text":"Keep the toll. I will be watching the Open Water."}],"opponent":{"name":"Gull Harrow","portrait":"camp-harrow.webp","emoji":"🦅","cast":"harrow","personality":"Swaggering toll-taker who loves crowding rivals toward the corners.","aiLevel":"easy","aiStyle":"default","taunt":"Ha! Into the corner with you. Pay the toll next time.","praise":"Hm. You steer like a harbour pilot. Pass, then."},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Gull Harrow","Wick"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":0}},"twist":null,"goal":{"type":"custom","value":1,"text":"Win and sink at least 1 rival with a current you laid."},"hints":true,"stars":[{"text":"Win and sink at least 1 rival with your current","test":{"k":"sunk","op":">=","v":1}},{"text":"Sink both rivals with your currents","test":{"k":"sunk","op":">=","v":2}},{"text":"Win using the hint at most 2 times","test":{"k":"hintsUsed","op":"<=","v":2}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"players":2,"seats":["human","ai"],"names":["You","Gull Harrow"]},"maxStars":2,"text":"Wick stays in port: it is just you and Harrow."},"unlock":[{"type":"portrait","id":"harrow","text":"Gull Harrow's portrait"},{"type":"act","id":"act2","text":"Act 2: Open Water"},{"type":"table","id":"dawn","text":"Dawn-shallows board skin"}]},{"id":"c4","act":2,"title":"Cannon Smoke","boss":false,"intro":[{"who":"brann","text":"Smell that? Powder. My Deck Cannons blow leviathans back to the deep."},{"who":"osk","text":"Cannons are in the pile now. Keep one and fire it when a leviathan is about to sink you."},{"who":"osk","text":"No more hints from me. You know the water."}],"outro":[{"who":"brann","text":"Fine shooting. Or fine dodging. Either way, I am out of powder."},{"who":"osk","text":"A cannon kept is a life kept."}],"opponent":{"name":"Brann Ashkeel","portrait":"camp-brann.webp","emoji":"💥","cast":"brann","personality":"Loud cannoneer who keeps every Deck Cannon and fires at the first leviathan in reach.","aiLevel":"normal","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Brann"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"win","value":null,"text":"Win with Deck Cannons in the pile."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Fire at least 1 Deck Cannon","test":{"k":"cannons","op":">=","v":1}},{"text":"Sink Brann with a current you laid","test":{"k":"sunk","op":">=","v":1}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Brann plays like a deckhand and loses track of his cannons."},"unlock":[{"type":"portrait","id":"brann","text":"Brann's portrait"}]},{"id":"c5","act":2,"title":"The Long Watch","boss":false,"intro":[{"who":"osk","text":"A night watch alone. No rivals, only the leviathans and the dark."},{"who":"saltshade","text":"...the water is cold, little lantern. Stay. Stay a while."},{"who":"osk","text":"Stay afloat for 18 turns. Keep a cannon if one comes."}],"outro":[{"who":"osk","text":"Dawn. You kept the lantern burning all night."},{"who":"saltshade","text":"...another night, then."}],"opponent":{"name":"Saltshade","portrait":"camp-saltshade.webp","emoji":"🐙","cast":"saltshade","personality":"A patient leviathan that drifts close and waits for you to run out of room.","aiLevel":"normal","aiStyle":"default"},"setup":{"players":1,"seats":["human"],"names":["You"],"variant":"easysolo","goalTurns":18,"noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"survive","value":18,"text":"Stay afloat for 18 turns."},"hints":false,"stars":[{"text":"Stay afloat for 18 turns","test":{"k":"won"}},{"text":"Never press the hint button","test":{"k":"hintsUsed","op":"<=","v":0}},{"text":"Finish without firing a Deck Cannon","test":{"k":"cannons","op":"<=","v":0}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"goalTurns":12},"maxStars":2,"text":"A shorter watch: stay afloat for 12 turns."},"unlock":[{"type":"cardback","id":"night","text":"Night-watch tile back"},{"type":"portrait","id":"saltshade","text":"Saltshade's portrait"}]},{"id":"c6","act":2,"title":"The Riftwright","boss":true,"intro":[{"who":"sabel","text":"I open doors in the sea. Step through one and you land wherever the dice say."},{"who":"osk","text":"A Rift Gate is in the pile. Play it instead of a tile, or to escape when you are about to sink."},{"who":"brann","text":"She hid a cannon in her sleeve, I swear it."}],"outro":[{"who":"sabel","text":"You walked through my door and came out ahead. Impressive."},{"who":"osk","text":"Past the Rift lies the Deep Reach. The Admiral waits there."}],"opponent":{"name":"Sabel Riftwright","portrait":"camp-sabel.webp","emoji":"🌀","cast":"sabel","personality":"Calm navigator who saves the Rift Gate for her own escape and fires cannons late.","aiLevel":"normal","aiStyle":"default","taunt":"The door was open. You simply chose the wrong side.","praise":"Take the gate-key, captain. You have earned the Deep Reach."},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Sabel","Brann"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":0,"maelstrom":0,"cannon":1}},"twist":{"id":"boss-cannon","param":1,"text":"Boss rule: Sabel starts with a Deck Cannon in her hand."},"goal":{"type":"win","value":null,"text":"Win against Sabel and Brann with the Rift Gate in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 1 rival with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 16 turns in total","test":{"k":"turns","op":"<=","v":16}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Sabel keeps no hidden cannon and both captains sail gently."},"unlock":[{"type":"portrait","id":"sabel","text":"Sabel's portrait"},{"type":"act","id":"act3","text":"Act 3: The Deep Reach"},{"type":"title","id":"navigator","text":"Title: Navigator"}]},{"id":"c7","act":3,"title":"Rogue Water","boss":false,"intro":[{"who":"vey","text":"The Admiral pays me to keep pilots out of the Reach. Nothing personal."},{"who":"osk","text":"A Rogue Wave sweeps a whole row. In its row, roll the die and beat its strength or capsize."},{"who":"osk","text":"Its strength grows each round. Stay out of its row when it is strong."}],"outro":[{"who":"vey","text":"You rode the wave and I did not. Lucky."},{"who":"osk","text":"Not luck. You read the row."}],"opponent":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","cast":"vey","personality":"Cold corsair who plans a turn ahead and steers rivals toward the wave.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":2,"seats":["human","ai"],"names":["You","Vey"],"variant":null,"noMon":false,"exp":{"rift":0,"wave":1,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"win","value":null,"text":"Win against Vey with the Rogue Wave in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink Vey with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win within 10 turns in total","test":{"k":"turns","op":"<=","v":10}}],"easier":{"aiLevel":"normal","twist":null,"setup":{},"maxStars":2,"text":"Vey stops looking ahead and plays one turn at a time."},"unlock":[{"type":"portrait","id":"vey","text":"Vey's portrait"}]},{"id":"c8","act":3,"title":"Maelstrom Row","boss":false,"intro":[{"who":"osk","text":"The Maelstrom turns on calm rolls, when the leviathans rest. It swallows tiles whole."},{"who":"brann","text":"Every toy at once: gates, cannons, wave and whirlpool. Lovely."},{"who":"vey","text":"Two of us against one lantern. Sail fast."}],"outro":[{"who":"osk","text":"Every hazard of the sea, and you came through all of them."},{"who":"brann","text":"I am buying new powder. Lots of it."}],"opponent":{"name":"Corsair Vey","portrait":"camp-vey.webp","emoji":"🏴‍☠️","cast":"vey","personality":"Cold corsair who plans a turn ahead; Brann sails beside him.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Vey","Brann"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":1,"maelstrom":1,"cannon":1}},"twist":{"id":"boss-first","param":null,"text":"Boss rule: Vey picks his start mark first and takes the first turn."},"goal":{"type":"win","value":null,"text":"Win with the Rift Gate, Deck Cannons, Rogue Wave and Maelstrom all in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 1 rival with a current you laid","test":{"k":"sunk","op":">=","v":1}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{},"maxStars":2,"text":"Both captains play one turn at a time and you pick your start first."},"unlock":[{"type":"table","id":"storm","text":"Storm-reach board skin"}]},{"id":"c9","act":3,"title":"Hunt of the Crown","boss":false,"intro":[{"who":"osk","text":"The Abyssal Crown leads the leviathans. Outlast every one of them and the Reach is open."},{"who":"crown","text":"...ten of us rise. One lantern. The sea is patient."},{"who":"osk","text":"Alone again. Ten leviathans, and every one must leave the board."}],"outro":[{"who":"osk","text":"The last leviathan sank into the deep. Only the Admiral remains."},{"who":"crown","text":"...for now."}],"opponent":{"name":"The Abyssal Crown","portrait":"camp-crown.webp","emoji":"🐉","cast":"crown","personality":"The eldest leviathan: slow, relentless, never alone.","aiLevel":"hard","aiStyle":"default"},"setup":{"players":1,"seats":["human"],"names":["You"],"variant":"solo","noMon":false,"exp":{"rift":0,"wave":0,"maelstrom":0,"cannon":1}},"twist":null,"goal":{"type":"survive","value":null,"text":"Outlast all 10 leviathans: win when none are left to rise or on the board."},"hints":false,"stars":[{"text":"Outlast all 10 leviathans","test":{"k":"won"}},{"text":"Fire at least 2 Deck Cannons","test":{"k":"cannons","op":">=","v":2}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"variant":"easysolo","goalTurns":20},"maxStars":2,"text":"Stay afloat for 20 turns instead of outlasting every leviathan."},"unlock":[{"type":"portrait","id":"crown","text":"The Abyssal Crown's portrait"}]},{"id":"c10","act":3,"title":"The Drowned Admiral","boss":true,"intro":[{"who":"ysolde","text":"So the little lantern reached my waters. Every captain here sails for me."},{"who":"osk","text":"She herds ships toward the edge. Keep your bow in the middle of the board."},{"who":"sabel","text":"Vey and I owe her. We sail against you, but we will not cheat."}],"outro":[{"who":"ysolde","text":"The Reach is yours, lantern-bearer. Keep the light burning."},{"who":"osk","text":"The archipelago has a new pilot. I could not be prouder."}],"opponent":{"name":"Admiral Ysolde","portrait":"camp-ysolde.webp","emoji":"⚓","cast":"ysolde","personality":"Ruthless admiral who looks ahead and pins rival junks against the board edge.","aiLevel":"hard","aiStyle":"default","taunt":"Off the edge, like all the others. The Reach keeps its own.","praise":"You held the middle. The Reach and its lanterns are yours."},"setup":{"players":4,"seats":["human","ai","ai","ai"],"names":["You","Admiral Ysolde","Vey","Sabel"],"variant":null,"noMon":false,"exp":{"rift":1,"wave":1,"maelstrom":1,"cannon":1}},"twist":{"id":"harrier","param":30,"text":"Boss rule: the Admiral steers every rival junk toward the board edge."},"goal":{"type":"win","value":null,"text":"Win against the Admiral, Vey and Sabel with every hazard in play."},"hints":false,"stars":[{"text":"Win","test":{"k":"won"}},{"text":"Sink at least 2 rivals with your currents","test":{"k":"sunk","op":">=","v":2}},{"text":"Win using no hints","test":{"k":"hintsUsed","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"players":3,"seats":["human","ai","ai"],"names":["You","Admiral Ysolde","Vey"]},"maxStars":2,"text":"Sabel stays out of it and the Admiral stops herding you to the edge."},"unlock":[{"type":"portrait","id":"ysolde","text":"Admiral Ysolde's portrait"},{"type":"title","id":"reach-pilot","text":"Title: Pilot of the Reach"},{"type":"table","id":"lantern","text":"Lantern-night board skin"}]}]};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -4871,11 +4997,12 @@ function netStrip(G0,seat){
 // ===================== Tidewake: our own texts =====================
 const RULES_HTML=`
 <h3>How a round goes</h3>
-<ol><li><b>Choose a start mark.</b> Before any tile is laid, each captain in turn puts their junk on a gold mark on the outer edge. Numbers 1 to 6 run along the edges; each number has two marks.</li>
-<li><b>Roll.</b> At the start of your turn two dice are rolled and added together. A total of <b>6, 7 or 8</b> wakes every leviathan (see below). Any other total does nothing, except that the Maelstrom, if it is in play, stirs.</li>
-<li><b>Place.</b> Pick one of your three tiles, turn it any of four ways and lay it on the empty square in front of your junk. A gold line on the board shows the exact route your junk will sail, with a flag where it stops (the line turns red if it sinks you).</li>
-<li><b>Sail.</b> Your junk follows the wake through the new tile and on through every tile already connected, until it reaches an empty square. Any other junk waiting at the same square sails too.</li>
-<li><b>Draw</b> back up to three tiles. The turn passes clockwise.</li></ol>
+<p><b>Last junk afloat wins the lantern.</b></p>
+<ol><li><b>Start:</b> put your junk on a gold mark at the edge.</li>
+<li><b>Roll:</b> two dice. A 6, 7 or 8 wakes the leviathans.</li>
+<li><b>Place:</b> lay one tile in front of your junk. Drag it, or tap Place.</li>
+<li><b>Sail:</b> your junk follows the new line to its end.</li>
+<li><b>Draw</b> back to three tiles. Next captain.</li></ol>
 <h3>The idea</h3>
 <p>Every captain steers one junk across a 6 by 6 sea chart. You never steer directly: you lay <b>current tiles</b>, and your junk is carried along the wake lines printed on them. Hazards: the edge of the chart, other junks, and <b>leviathans</b> that wander the board. <b>The last junk afloat wins.</b></p>
 <h3>What sinks a junk</h3>
@@ -4920,24 +5047,24 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
 // {me} {riv} {n} {why} are filled in from the real game. The ids are the rule ids in TUTORIAL-COVERAGE.md.
 const OSK_TEXT={
  goal:['The Lantern Race','Cobalt swears the Reach is his. Last junk afloat keeps the lantern. Pick a gold mark.'],
- reloc:['Your berth','If a leviathan blocks your start before you sail, move to another free mark on that edge.'],
+ reloc:['Your berth','A leviathan blocks your start? Move to another free mark there.'],
  roll:['Dice at dawn','Each turn starts with two dice. {n}: {wake}'],
  lay:['Lay a current','Pick a tile, Turn it, Place it at your bow. SAFE floats; SINKS means off the chart.'],
- sail:['Well sailed!','Your junk rode the current to its end. Now you draw back up to three tiles.'],
- chain:['Cobalt moves','{riv} laid a current. You may ride his tiles too, joined to yours.'],
- collide:['Mind his wake','Never end on the same line as another junk: two junks on one wake both sink.'],
- levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns. Arrows show where it can go.'],
- levsink:['Leviathans bite','A leviathan entering your square sinks you. Keep your bow away from its arrows.'],
- cannon:['A Deck Cannon!','Keep it. When a leviathan would sink you, fire it: the beast is gone for good.'],
- wave:['Rogue Wave!','A junk in its band rolls a die: meet its strength or capsize. It grows as it rolls.'],
- gate:['A Rift Gate','The violet tile is a Rift Gate. Lay it, or keep it to escape to a rolled square when you would sink.'],
- mael:['The Maelstrom','It moves only on calm rolls and swallows any tile, junk or leviathan it enters.'],
- swap:['Sink him, gain tiles','If your tile sinks Cobalt, you may swap tiles with his hand before you draw.'],
+ sail:['Well sailed!','Your junk rode the current to its end. Now draw back to three.'],
+ chain:['Cobalt moves','{riv} laid a current. His tiles join yours. You can ride them.'],
+ collide:['Mind his wake','Never stop on another junk\'s line. Two junks on one wake both sink.'],
+ levmove:['The deep stirs','A leviathan swims one square along an arrow, or turns.'],
+ levsink:['Leviathans bite','A leviathan entering your square sinks you. Stay clear of its arrows.'],
+ cannon:['A Deck Cannon!','Keep it. If a leviathan would sink you, fire. It is gone.'],
+ wave:['Rogue Wave!','Junks in its row roll a die. Roll low and you capsize.'],
+ gate:['A Rift Gate','The violet tile is a Rift Gate. Keep it to escape a sinking.'],
+ mael:['The Maelstrom','It moves on calm rolls. It swallows whatever it enters.'],
+ swap:['Sink him, gain tiles','Sink Cobalt with your tile, and you may swap hands.'],
  good:['Good move!','{why}'],
  poor:['Careful','{why}'],
  end:['The lantern','{why}'],
- tie:['A shared fate','If the last junks sink together, nobody wins: it is a draw.'],
- more:['Teams and solo','Bigger games add captains, teams that share a win, and a solo race.']
+ tie:['A shared fate','If the last junks sink together, it is a draw.'],
+ more:['Teams and solo','Bigger games add more captains, teams, and a solo race.']
 };
 // rival comments (Osk on Cobalt's moves), picked in turn; {riv} {n}
 const OSK_RIVAL=['{riv} sailed {n} square(s). Watch where his line ends: never end on it.','{riv} hugs the middle: leviathans have fewer arrows to reach him there.','{riv} is getting bold. A tile that sinks him wins you the lantern.','{riv} turned his tile to dodge the edge. Turn yours too when you see SINKS.'];
@@ -5648,7 +5775,7 @@ function kitSync(){if(!G||!kitOk())return;
   for(const id in KS.ships)if(!G.ships[+id.slice(1)]){TWKit.removeShip(id);delete KS.ships[id]}
 }
 // ===================== part 2: replay one move, one beat at a time =====================
-function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};renderRes();const l=$('#live');if(l)l.textContent=text}
+function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};if(text&&UI.busy){UI.rivLines=UI.rivLines||[];const t=String(text);if(UI.rivLines[UI.rivLines.length-1]!==t)UI.rivLines.push(t)}renderRes();const l=$('#live');if(l)l.textContent=text}
 async function kitWait(p,max){if(!p||!p.then)return;await Promise.race([p,sleep(max||2500)])}
 function stepsLen(steps){return steps.length}
 async function playEvents(evs,gen){
@@ -5659,7 +5786,7 @@ async function playEvents(evs,gen){
 }
 async function playEv(e,gen){
   switch(e.t){
-  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');const riv=UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;await sleep(riv?Math.max(1000,e.c==='bad'?1100:0):e.c==='bad'?950:560)}break}
+  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');const riv=UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;await sleep(riv?(e.c==='bad'?1800:1400):e.c==='bad'?950:560)}break}
   case 'turn':{UI.curTurn=e.seat;UI.curTurnN=e.n;renderRoad();renderBar();break}
   case 'dice':{const nx=UI.mphNext;if(nx&&nx.d[0]===e.d[0]&&nx.d[1]===e.d[1]){UI.mph=nx;UI.mphNext=null}if(!UI.mph||UI.mph.d!==e.d&&(UI.mph.d[0]!==e.d[0]||UI.mph.d[1]!==e.d[1]))UI.mph={d:e.d.slice(),total:e.d[0]+e.d[1],wake:e.d[0]+e.d[1]>=6&&e.d[0]+e.d[1]<=8,lines:[],seat:e.seat,shown:0};
     UI.mph.roll=true;UI.mph.shown=0;UI.trig.roll=1;sfx('dice_roll');renderRes();await sleep(600);UI.mph.roll=false;renderRes();sfx(UI.mph.wake?'leviathan_roar':'click');await sleep(UI.mph.wake?900:450);break}
@@ -5696,7 +5823,7 @@ async function playEv(e,gen){
 }
 
 // a tap on the board or the caption during a rival's turn skips the current step (the next one still plays)
-document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-hint,.ps-msg,#res'))sleepFlush()},true);
+document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-line,.ps-stat,#res'))sleepFlush()},true);
 // ===================== part 3: analysis and the dock =====================
 function traceSteps(B,x,y,e,over){const st=[];let cx=x,cy=y,ce=e,n=0;
   for(;;){const cell=(cx===x&&cy===y&&over)?over:B.bd[cy*BW+cx];if(!cell)break;const q=exitPort(cell,ce);st.push({c:cx,r:cy,from:ce,to:q});
@@ -5712,8 +5839,8 @@ function analyse(K,seat,m){const S=K.ships[m.s],tile=K.hands[seat][m.t];const si
 function outcomeHTML(K,seat,m,A){const S=K.ships[m.s],who=m.s===seat?'Your junk':nm(m.s)+"'s junk";const o=[];
   if(A.st==='edge')o.push(`<span class="warn-l">This tile sends ${who.toLowerCase()==='your junk'?'you':nm(m.s)} off the edge: ${who} would sink.</span>`);
   else if(A.st==='mon')o.push(`<span class="warn-l">This current runs into ${levName(A.mon)}: ${who} would sink.</span>`);
-  else if(A.st==='gate')o.push(`${who} sails into the Rift Gate and is thrown to a rolled square.`);
-  else o.push(`${who} sails ${A.n} current${A.n>1?'s':''} and stops at column ${A.end[0]+1}, row ${A.end[1]+1} (the flag on the board).`);
+  else if(A.st==='gate')o.push(`${who} enters the Rift Gate. It throws the junk far.`);
+  else o.push(`${who} sails ${A.n} current${A.n>1?'s':''} and stops at the flag.`);
   if(A.coll)o.push(`<span class="warn-l">Two junks would end on one wake: both sink.</span>`);
   for(const x of A.others)o.push(x.coll?`<span class="warn-l">${nm(x.i)} also sails here and would crash.</span>`:x.st==='edge'||x.st==='mon'?`${nm(x.i)} also sails and would sink.`:`${nm(x.i)} also sails on.`);
   return o.join('<br>')}
@@ -5730,19 +5857,20 @@ function viewSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;const h=humans()
 function mustPass(d){if(NET.on)return !!G.seats[d].human&&d!==NET.mySeat;return hotSeat()&&G.seats[d].human&&UI.holder!==d}
 function handStrip(vs,interactive,sel,rot){if(vs<0||!G.ships[vs].alive&&!G.hands[vs].length)return '';const hd=G.hands[vs];if(!hd.length)return '';
   return `<div class="hand" data-hand="${vs}">${hd.map((c,t)=>cardBtn(c,t,{up:true,owner:vs,sel:interactive&&sel&&sel.t===t,rot})).join('')}</div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-startlist]');if(b){e.stopPropagation();UI.startList=!UI.startList;render()}},true);
 function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d,info);const by={};for(const o of info)(by[o.edge+o.idx]=by[o.edge+o.idx]||[]).push(o);
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
   return `<div class="prompt">
-  <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
+  ${adv&&you?`<button class="btn pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}">Safe start for me</button> `:''}<button type="button" class="btn small" data-startlist aria-expanded="${UI.startList?'true':'false'}">${UI.startList?'Hide the list':'All marks as a list'}</button>${UI.startList?`<div class="startpick" style="grid-template-columns:auto repeat(6,1fr);margin-top:6px">${g}</div>`:''}</div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
   if(q.kind==='bonus'&&G.cur===d&&G.pool.length)extra=`<p class="tiny">Sunken crews' tiles (numbered):</p><div class="hand">${G.pool.map((c,j)=>isCur(c)?`<span class="hc"><span class="n">${j+1}</span><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'pl'+j,size:96})}"></span>`:`<span class="hc sp"><span class="n">${j+1}</span>${isGate(c)?gateArt():cannonArt()}</span>`).join('')}</div>`;
   const timed=UI.qTime>0&&q.kind==='doom'||NET.on&&q.kind==='doom';
   let title=String(q.title).replace(/^You drew/,(you?'You':nm(d))+' drew');
-  if(q.kind==='cannonDraw'){const n=G.hands[d].filter(isCannon).length;extra=`<p class="tiny">A <b>Deck Cannon</b> is an optional tile you can hold (two at most). Later you can fire it at a leviathan that is about to sink you, even on someone else's turn. You may keep it, or show it and discard it to draw a different tile instead${n?` (you already hold ${n})`:''}.</p>`}
+  if(q.kind==='cannonDraw'){const n=G.hands[d].filter(isCannon).length;extra=`<p>It shoots a leviathan that would sink you. Keep it, or swap it for a new tile?${n?` You hold ${n}.`:''}</p>`}
   if(q.kind==='doom')extra=`<p class="warn-l">If you do nothing, your junk sinks. Pick a rescue below, or accept.</p>`+extra;
-  return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4><p>${esc(title)}</p>${extra}<div class="opts">${q.opts.map((o,i)=>`<button class="btn${/Accept/.test(o.l)?' warn':''}" data-a="q" data-i="${i}">${esc(o.l)}</button>`).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
+  return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4>${q.kind==='cannonDraw'?'':`<p>${esc(title)}</p>`}${extra}<div class="opts">${q.opts.map((o,i)=>`<button class="btn${/Accept/.test(o.l)?' warn':''}" data-a="q" data-i="${i}">${esc(o.l)}</button>`).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
 function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='place'),gts=mv.filter(m=>m.a==='gate'),cns=mv.filter(m=>m.a==='cannon'),pas=mv.find(m=>m.a==='pass');
   const hand=K.hands[d];let sel=UI.sel;const fronts=[...new Set(pl.map(m=>m.s))];
   if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const own=pl.filter(m=>m.s===d);let f=own[0]||pl[0];
@@ -5759,10 +5887,10 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   const thr=threatHTML(K,d,m,A);
   const rot=pl.length?`<div class="hacts"><button class="btn small" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">&#10226; Left</button><span class="rotl">turned ${(sel.r||0)*90}&deg;</span><button class="btn small" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">&#10227; Right</button></div>`:'';
   const nT=hand.length;
-  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'tap a tile, turn it, then Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
+  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'drag one onto your junk, or turn it and Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
   let h=`<div class="prompt"><h4>${multi?esc(nm(d))+': lay a current':'Your turn: lay a current'}</h4>${fr}`;
   if(outcome)h+=`<p style="margin:6px 0 4px">${outcome}</p>`;if(thr)h+=`<p style="margin:2px 0">${thr}</p>`;
-  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. The rule: you may not pick a placement that sinks you while any other placement does not. Tap the bulb for the safest move.</p>`;
+  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. You may not sink yourself while a safe move exists. Tap the bulb for the safest move.</p>`;
   const cm={};for(const c of cns){const k=c.m+':'+c.s;if(!cm[k])cm[k]=c}const nc=hand.filter(isCannon).length;
   if(Object.keys(cm).length)h+=`<div class="optrow"><div class="tiny"><b>Deck Cannon</b> (optional, instead of laying a tile; you hold ${nc}):</div><div class="row">${Object.values(cm).map(c=>`<button class="btn warn" data-a="cannon" data-t="${c.t}" data-m="${c.m}" data-s="${c.s}">Fire at ${esc(levName(c.m))}${nc>1?' (x'+nc+' held)':''}</button>`).join('')}</div></div>`;
   else if(nc&&full)h+=`<p class="tiny">You hold a Deck Cannon. It can be fired when a leviathan is next to your front square or about to sink you.</p>`;
@@ -5776,22 +5904,23 @@ function overHTML(){const o=G.over,w=o.win||[];const me=viewSeat();const hs=huma
   const watch=NET.on?me<0:!hs.length;const multi=!NET.on&&hs.length>1;
   const meWin=me>=0&&w.includes(me);let head,cls='';
   if(watch||multi){head=w.length?(w.length>1?'Game over: shared win':'Game over'):'Game over'}
-  else if(meWin){head=w.length>1?'Shared victory!':'Victory!'}else{head='Defeat';cls='alert'}
+  else if(meWin){head=w.length>1?'Shared victory!':'You win!'}else{head='Defeat';cls='alert'}
   const names=w.map(i=>dot(i)+' <b>'+esc(nm(i))+'</b>').join(', ');
-  let h=`<div class="prompt ${cls}" data-over="1"><h4>${head}</h4><p>${esc(o.why)}</p>`;
+  const why=(meWin&&!watch&&!multi)?String(o.why||'').split(nm(me)+' is the last').join('Yours is the last'):o.why;
+  let h=`<div class="prompt ${cls}" data-over="1"><h4>${head}</h4><p>${esc(why)}</p>`;
   if(me>=0&&!watch&&!multi&&!G.ships[me].alive){const c=causeOf(G.ships[me].out);h+=`<p class="warn-l"><b>You were sunk:</b> ${esc(c.t)}</p>`}
-  h+=`<p>${w.length?(solo?'':(w.length>1?'Winners: ':'Winner: ')+names):'Nobody survived.'}</p>`;
+  h+=`<p>${w.length?(solo||(meWin&&w.length===1&&!watch&&!multi)?'':(w.length>1?'Winners: ':'Winner: ')+names):'Nobody survived.'}</p>`;
   if(G.np>1||solo)h+=`<ul class="crews">${G.order.map(i=>{const s=G.ships[i];return `<li>${dot(i)} ${esc(nm(i))}${G.team?' (team '+'AB'[G.team[i]]+')':''}: ${s.alive?'afloat':'sunk ('+({edge:'sailed off the edge',collision:'head-on collision',wave:'capsized by the Rogue Wave',maelstrom:'swallowed by the Maelstrom',block:'blocked in by a leviathan',mon:'ran into a leviathan',crush:'crushed by a leviathan',rift:'lost in the rift'}[causeOf(s.out).k]||'sunk')+')'}</li>`}).join('')}</ul>`;
-  h+=`<p class="tiny">${G.turn} turns, ${G.ships.filter(s=>s.alive).length} junk(s) afloat, ${G.stats.levMove||0} leviathan moves.</p>`;
+  h+=`<p class="tiny">${G.turn} turns, ${(n=>n+(n===1?' junk':' junks'))(G.ships.filter(s=>s.alive).length)} afloat, ${G.stats.levMove||0} leviathan moves.</p>`;
   if(!meWin&&!watch&&!multi&&UI.guided)h+=`<p class="tiny">Next time: keep your junk off the edges and corners, and tap the <b>bulb</b> when you are unsure.</p>`;
   if(isClient())h+=`<p class="tiny">Waiting for the host to start another game.</p><div class="row"><button class="btn" data-a="netleave">Leave</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   else h+=`<div class="row">${!meWin&&!watch&&!multi&&UI.snap&&!NET.on?'<button class="btn pri" data-a="rewind">Rewind to my last move</button>':''}${UI.guided&&!meWin&&!watch?'<button class="btn" data-a="guided">Try the guided game again</button>':''}<button class="btn${meWin||watch||multi||!UI.snap?' pri':''}" data-a="again">Play again</button><button class="btn" data-a="newgame">New game</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   return h+'</div>'}
 function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;
-  return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves; you only act on your turn, in step 2 (Place).</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
+  return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves.</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
-  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return ''}
+  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return `<div class="goal" data-goal role="button" tabindex="0"><b>Goal:</b> last junk afloat wins. <u>How?</u></div>`}
 function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over&&!UI.busy||!h?h:gh+h}
 function mainHTML0(){
   if(G.over&&!UI.busy)return overHTML();const d=sideToAct(),vs=viewSeat();
@@ -5853,7 +5982,7 @@ function qTimerSync(){const q=G&&G.q;if(!q||q.kind!=='doom'||(UI.qTime<=0&&!NET.
 setInterval(()=>{try{if(!G||!UI.qKey||UI.pause)return;const q=G.q;if(!q){UI.qKey=null;return}const QT=UI.qTime>0?UI.qTime:25;const el=(Date.now()-UI.qT0)/1000*(UI.tickRate||1),left=QT-el;const b=$('#qbar');if(b)b.style.width=Math.max(0,left/QT*100)+'%';const tx=$('#qtxt');if(tx)tx.textContent=Math.max(0,Math.ceil(left))+' s left to decide, then the computer\'s best advice is used.';
   if(left<=0){if(isClient())return;UI.qKey=null;const who=q.who;let m=null;try{m=aiMove(who,'hard')}catch(e){}if(!m||m.a!=='q')m={a:'q',i:q.opts.length-1};say('Time is up: the computer chose for '+nm(who)+'.','bad');NET.autoDecl++;actAs(m,who)}}catch(e){console.error(e)}},200);
 // ---------- acting ----------
-function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;
+function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;if(G.seats[seat]&&G.seats[seat].human)UI.rivLines=[];
   if(!NET.on&&G.seats[seat]&&G.seats[seat].human&&humans().length===1&&m.a!=='q'){try{UI.snap={json:JSON.stringify(G)}}catch(e){}}
   if(G.seats[seat]&&G.seats[seat].human){UI.sunk=[];UI.marks=[];UI.mph=null}
   UI.rec=[];UI.acting=1;UI.actor=seat;let r;try{r=performMove(m,seat)}finally{UI.acting=0}const evs=UI.rec;UI.rec=null;
@@ -5930,7 +6059,7 @@ function renderCrew(){const b=$('#crewbody');if(!G){b.innerHTML='<p>Start a game
   if(watch)h+=`<p><button class="swt${UI.xray?' on':''}" data-a="xray"><i></i>Show every hand (watch mode)</button></p>`;
   h+=`<h3>Piles</h3><table class="lg2"><tr><td>Current pile</td><td>${G.deck.length} tiles</td></tr><tr><td>Leviathans on the board</td><td>${L}${G.mons.some(m=>m.k==='M')?' + Maelstrom':''}</td></tr><tr><td>Leviathan pile</td><td>${G.mdeck.length}</td></tr><tr><td>Gone for good</td><td>${G.mgone.length} leviathans, ${G.gone.length} tiles</td></tr>${G.gates.length?'<tr><td>Rift Gate</td><td>on column '+(G.gates[0].x+1)+', row '+(G.gates[0].y+1)+'</td></tr>':''}${G.wave?'<tr><td>Rogue Wave</td><td>column '+(G.wave.x+1)+', row '+(G.wave.y+1)+', strength '+waveStr()+'</td></tr>':''}</table>`;b.innerHTML=h}
 function renderSettings(){const g=(()=>{try{return TWKit.getQuality()}catch(e){return {pref:'auto',active:'2d'}}})();const on3=!!(TWKit._K&&TWKit._K.on);const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very fast']];
-  $('#setbody').innerHTML=`<div class="setgrid">
+  $('#setbody').innerHTML=`<div class="setgrid"><div class="phonly"><div class="lbl">Game info</div><div class="row"><button type="button" class="btn" data-gx="rulesd">How to play</button><button type="button" class="btn" data-gx="crewd">Crews</button><button type="button" class="btn" data-gx="logd">Log</button></div></div>
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd">Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus">Music ${SND.music?'on':'off'}</button><button class="btn" data-a="musicpick">Songs…</button></div></div>
   <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button></div></div>
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D chart: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div><p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot" class="row">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
@@ -5958,17 +6087,20 @@ function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSe
   const sv=(i)=>{const x=s.seats[i];if(onl&&i<nOnl)return `<div class="seat" data-seat="${i}"><span class="sw" style="background:${COL[x.col].sail}"></span><select data-a="col" data-i="${i}" aria-label="Colour of seat ${i+1}">${COL.map((c,k)=>`<option value="${k}"${k===x.col?' selected':''}>${c.name}</option>`).join('')}</select><span class="tag">Online: <b>${esc((onPlan&&onPlan.hum&&onPlan.hum[i]&&onPlan.hum[i].nm)||'Player')}</b></span></div>`;return `<div class="seat" data-seat="${i}"><span class="sw" style="background:${COL[x.col].sail}"></span><select data-a="col" data-i="${i}" aria-label="Colour of seat ${i+1}">${COL.map((c,k)=>`<option value="${k}"${k===x.col?' selected':''}>${c.name}</option>`).join('')}</select>
     <span class="seg">${[['1','Human'],['0','Computer']].map(([v,l])=>`<button data-a="seath" data-i="${i}" data-v="${v}" class="${(x.h?'1':'0')===v?'on':''}">${l}</button>`).join('')}</span>
     ${x.h?'<span></span>':`<select data-a="lv" data-i="${i}" aria-label="Level of seat ${i+1}">${['easy','normal','hard'].map(l=>`<option value="${l}"${x.lv===l?' selected':''}>${l}</option>`).join('')}</select>`}</div>`};
-  const ex=[['rift','Rift Gate','A portal tile that rescues a junk or flings pieces across the sea.'],['wave','Rogue Wave','A wave that sweeps a row or column and can capsize junks.'],['maelstrom','Maelstrom','A whirlpool that moves on calm turns and destroys what it enters.'],['cannon','Deck Cannon','Five cannons in the tile pile: shoot a leviathan about to sink you.']];
+  const ex=[['rift','Rift Gate','A portal tile. It can rescue a junk or fling it.'],['wave','Rogue Wave','A wave that sweeps a row or column and can capsize junks.'],['maelstrom','Maelstrom','A whirlpool that moves on calm turns and destroys what it enters.'],['cannon','Deck Cannon','Five cannons in the pile. Shoot a leviathan that would sink you.']];
   const cont=savedGame();
-  el.innerHTML=`<div class="stin"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans. 1 to 8 captains, computers and hot-seat.</p>
-  <div class="stcard"><h2>Quick start</h2>${NET.on||typeof tutBtn!=='function'?'':'<div class="row" style="margin-bottom:8px">'+tutBtn(firstTime()?'btn pri bigb':'btn')+'</div>'}${NET.on||typeof GXC==='undefined'||!window.CAMPAIGN?'':'<div class="row" style="margin-bottom:8px"><button class="btn'+(firstTime()?'':' pri bigb')+'" data-a="story" id="storybtn" style="flex:1;min-height:52px;font-size:16px">&#9875; Story: The Lantern Reach <small style="display:block;font-weight:400">'+campLine()+'</small></button></div>'}<div class="row">${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">${(()=>{const n=s.variant==='solo'||s.variant==='easysolo'?1:teamN(s);const c=s.seats.slice(0,n).filter(x=>!x.h).length;return n===1?'Quick game (solo)':c===n-1?`Quick game: you vs ${c} computer${c>1?'s':''}`:'Quick game (settings below)'})()}</button></div><p class="tiny">${NET.on?'':'New here? Play one real game against Cobalt; Grandmother Osk explains each rule as it comes up.'}</p></div>
+  el.innerHTML=`<div class="stin"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">A sea race with leviathans. 1 to 8 captains.</p>
+  <div class="stgoal" data-goal role="button" tabindex="0"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+  <div class="stcard"><h2>Quick start</h2>${NET.on||typeof tutBtn!=='function'?'':'<div class="row" style="margin-bottom:8px">'+tutBtn(firstTime()?'btn pri bigb':'btn')+'</div>'}${NET.on||typeof GXC==='undefined'||!window.CAMPAIGN?'':'<div class="row" style="margin-bottom:8px"><button class="btn'+(firstTime()?'':' pri bigb')+'" data-a="story" id="storybtn" style="flex:1;min-height:52px;font-size:16px">&#9875; Story: The Lantern Reach <small style="display:block;font-weight:400">'+campLine()+'</small></button></div>'}<div class="row">${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">${(()=>{const n=s.variant==='solo'||s.variant==='easysolo'?1:teamN(s);const c=s.seats.slice(0,n).filter(x=>!x.h).length;return n===1?'Quick game (solo)':c===n-1?`Quick game: you vs ${c} computer${c>1?'s':''}`:'Quick game (settings below)'})()}</button></div></div>
   <div class="stcard"><h2>Play with friends</h2>${onlineBlock()}</div>
+  <div class="stmore"><button type="button" class="stmore-t" data-more aria-expanded="${UI.moreOpen?'true':'false'}">${UI.moreOpen?'&#9662;':'&#9656;'} Custom game: players, variants, extras</button>${UI.moreOpen?'':'</div>'}${UI.moreOpen?`
   <div class="stcols"><div class="stcard"><h2>How to play</h2><div class="row">${onl?'<span class="tiny">Online game: captains take seats in join order.</span>':seg('mode',mode,[['me','Me vs computers'],['hot','Hot-seat'],['watch','Watch']])}</div><p class="tiny">${onl?'Seats without an online captain are computers.':mode==='me'?'You are the first captain; the others are computers.':mode==='hot'?'Everyone shares this screen. Hands are hidden between players behind a pass screen.':'The computers play each other. Sit back.'}</p>
-   <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams (every other seat); you may lay a tile for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
+   <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams, every other seat. You may lay for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
    <label class="opt"><input type="checkbox" data-a="nomon" ${s.noMon?'checked':''}><span>No leviathans (calm seas)<small>The official "no monsters" option.</small></span></label></div>
   <div class="stcard"><h2>Expansions: Deepwater Perils</h2><p class="tiny">Four optional extra pieces that make the sea nastier. <b>Recommended for a first game: none.</b> Add them one at a time later.</p>${ex.map(([k,l,d])=>`<label class="opt"><input type="checkbox" data-a="exp" data-k="${k}" ${s.exp[k]?'checked':''}><span><b>${l}</b><small>${d}</small></span></label>`).join('')}</div></div>
   <div class="stcard"><h2>Captains ${solo?'(solo: one junk)':''}</h2>${solo?'':`<div class="row" style="margin-bottom:6px"><span>Players:</span>${seg('np',n,(s.variant==='teams'?[4,6,8]:[2,3,4,5,6,7,8]).map(k=>[k,k]))}</div>`}${Array.from({length:Math.max(n,nOnl)},(_,i)=>sv(i)).join('')}</div>
-  <div class="row"><button class="btn pri" data-a="start" id="startbtn">Set sail</button><button class="btn" data-gx="rulesd">Rules</button><button class="btn" data-gx="piecesd">Pieces</button><button class="btn" data-gx="credd">Credits</button></div></div>`}
+  <div class="row"><button class="btn pri" data-a="start" id="startbtn">Set sail</button><button class="btn" data-gx="rulesd">Rules</button><button class="btn" data-gx="piecesd">Pieces</button><button class="btn" data-gx="credd">Credits</button></div></div>`:''}</div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-more]');if(b){e.stopPropagation();UI.moreOpen=!UI.moreOpen;renderStart()}},true);
 function showStart(){if(isClient()){hideStart();return}UI.started=false;clearTimeout(UI.tm);UI.gen++;UI.busy=false;try{sndLoop('sea_loop',false);musicStop(.4);TWKit.setLegal([]);TWKit.ghost(null)}catch(e){}$('#start').hidden=false;GX.close();renderStart()}
 function hideStart(){$('#start').hidden=true}
 function startAction(a,t){const s=UI.setup=UI.setup||defaultSetup();const D=t.dataset;
@@ -6050,7 +6182,7 @@ function pw(c,r,p){const w=TWKit.portWorld(c,r,p);return [w[0],w[1]]}
 function routeDesc(A,S){if(!A||!A.steps||!A.steps.length)return null;let pts=[];
   for(const st of A.steps){const a=pw(st.c,st.r,st.from),b=pw(st.c,st.r,st.to),c=sqW(st.c,st.r);const seg=bez(a,c,b,8);if(pts.length)seg.shift();pts.push(...seg)}
   const last=A.steps[A.steps.length-1],dd=DIR[last.to>>1];let stop,label;
-  if(A.st==='ok'&&A.end){stop=pw(A.end[0],A.end[1],MATE[last.to]);label=`Stop: column ${A.end[0]+1}, row ${A.end[1]+1}`}
+  if(A.st==='ok'&&A.end){stop=pw(A.end[0],A.end[1],MATE[last.to]);label='Stop'}
   else if(A.st==='edge'){const b=pw(last.c,last.r,last.to);stop=[b[0]+dd[0]*.4,b[1]+dd[1]*.4];label='Off the edge'}
   else{stop=sqW(last.c+dd[0],last.r+dd[1]);label=A.st==='mon'?`Hits ${levName(A.mon)}`:'Rift Gate'}
   pts.push(stop);
@@ -6073,7 +6205,7 @@ function threatHTML(K,seat,m,A){const S=K.ships[m?m.s:seat];if(!S||S.x==null&&!S
   const when=A?'where you stop':'you';
   return ids.map(id=>{const mo=K.mons.find(q=>q.id===id&&q.k==='L');if(!mo)return '';const f=monHits(mo,sqs);
     const pc=Math.round(16/36*f.length/6*100);
-    return `<span class="warn-l thr" data-mon="${id}">${esc(levName(id))} is next to ${when}. `+(f.length?`If the leviathans wake (dice total 6 to 8) and it rolls ${f.join(' or ')}, it moves onto you and you sink (about ${pc}% each turn).`:`It cannot move onto you right now (its arrows point elsewhere).`)+`</span>`}).filter(Boolean).join('<br>')}
+    return `<span class="warn-l thr" data-mon="${id}">${esc(levName(id))} is next to ${when}. `+(f.length?`A ${f.join(' or ')} on its roll sinks you. About ${pc}% each turn.`:`It cannot reach you now.`)+`</span>`}).filter(Boolean).join('<br>')}
 // ---------- the Safest-move advisor: the hard computer's own evaluation (ai.js: scoreMove, hypo, safeOpts, drawSafe, mcRisk) plus a 2-turn look-ahead ----------
 // chance (over the tile I will draw) that I can still sail safely this coming turn AND the one after, ignoring leviathan moves: the "am I being trapped" look-ahead
 function surv2(B,seat,after){const S=B.ships[seat];if(!S||!S.alive||S.x==null)return .5;let tot=0;
@@ -6111,13 +6243,13 @@ function recHTML(K,d,pl,full){const m=recMove(d);if(!m)return '';const a=UI.recA
   return `<div class="rec"><b>Safest move:</b> ${lab}.${full?` <span class="tiny">${why}</span>`:''}${m.a==='place'?` <button class="btn small" data-a="sugg">Show me the safest move</button>`:''}</div>`}
 // ---------- why a junk sank ----------
 function causeOf(why){const w=String(why||'');let m;
-  if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart. A current that points out of the 6 by 6 sea sinks the junk riding it.'};
-  if(/collided/.test(w))return {k:'collision',t:'two junks ended on the same wake heading the same way, so both went down together (a head-on collision).'};
-  if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom, the whirlpool, moved onto its square and swallowed it.'};
-  if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it: it was in the wave's band and its capsize roll was too low${ww?` (the wave is on ${(ww.r&1)?'column '+(ww.x+1):'row '+(ww.y+1)}, strength ${waveStr()})`:''}.`}}
-  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`${m[1]} sat on the square in front of it when its turn began and nothing could save it.`};
-  if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`its wake ended in the square of ${m[1]}.`};
-  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`${m[1]} swam onto the square it was on (or its tile) and crushed it.`};
+  if(/off the edge|sailing off/.test(w))return {k:'edge',t:'its wake ran off the edge of the chart.'};
+  if(/collided/.test(w))return {k:'collision',t:'two junks met on one wake. Both went down.'};
+  if(/Maelstrom/.test(w))return {k:'maelstrom',t:'the Maelstrom whirlpool swallowed it.'};
+  if(/Rogue Wave|capsized/.test(w)){const ww=G&&G.wave;return {k:'wave',t:`the Rogue Wave caught it. Its capsize roll was too low.`}}
+  if(m=/blocked in by (.+)$/.exec(w))return {k:'block',t:`the leviathan ${m[1]} blocked its path.`};
+  if(m=/ran into (.+)$/.exec(w))return {k:'mon',t:`it sailed into the leviathan ${m[1]}.`};
+  if(m=/crushed by (.+)$/.exec(w))return {k:'crush',t:`the leviathan ${m[1]} swam onto it.`};
   if(/rift/.test(w))return {k:'rift',t:'the Rift Gate could not find it a safe landing.'};
   return {k:'other',t:w+'.'}}
 const youSeat=()=>{try{return viewSeat()}catch(e){return -1}};
@@ -6144,7 +6276,7 @@ function mphBuild(evs){let mp=null;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:`rolled ${e.die}: ${txt}`,nm:nmx})}
     else if(mp&&e.t==='arrive'&&(e.spawn||e.k==='M')){const pr=evs[i-1];const txt=pr&&pr.t==='log'?pr.text:(e.k==='M'?'The Maelstrom moves':levName(e.id)+' rises');if(pr&&pr.t==='log')pr.skip=true;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:txt.replace(/\.$/,''),nm:'',plain:1,maelstrom:e.k==='M'})}
-    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=` and smashes the tile at column ${e.x+1}, row ${e.y+1}`}
+    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=`, smashing a tile`}
     else if(mp&&mp.lines.length&&e.t==='sink'){const l=mp.lines[mp.lines.length-1];l.txt+=`: ${e.seat===youSeat()&&!hotSeat()?'your':nm(e.seat)+"'s"} junk sinks!`;l.bad=1}
     else if(mp&&e.t==='log'&&/^The Maelstrom (churns|drains)/.test(e.text)){e.skip=true;mp.lines.push({id:-1,txt:e.text.replace(/\.$/,''),nm:'',plain:1});e.ln=mp.lines.length-1}}
   return mp}
@@ -6166,7 +6298,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
-  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);for(const o of info)D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e,wx:o.w[0],wz:o.w[1],t:o.lab})}
+  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=UI.tutBest.m}
+    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best})}}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
@@ -6185,7 +6318,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
     else{const e=document.createElement('div');
       if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
-      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
@@ -6215,7 +6348,7 @@ const PH={on:false,land:false,pop:null,pd:null,zoom:false,zk:'',cur:null,mphHide
 const PH_REGION=[-4.02,4.02,-4.02,4.02];
 const PH_ICO={tile:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 4q0 8 8 8M4 14q6 0 6 6"/></svg>',mon:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c2-6 5-8 9-8 3 0 4-3 7-3-1 2-1 3 0 4-2 1-2 3-3 4 3 0 4 2 5 4-3-1-5-2-7-1-3 1-6 1-11 0zM9 12h.01"/></svg>',zoom:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',rl:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.5-5.4M5 4v4h4"/></svg>',rr:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.5-5.4M19 4v4h-4"/></svg>'};
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;if(innerWidth>=1024&&innerWidth>innerHeight)return true; /* desktop: the board-first layout too (board left, slim strip right) */let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
@@ -6255,16 +6388,16 @@ function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+
 // ---------- the control strip ----------
 var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
-  if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-stat"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
-  if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
-  if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-msg">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
-  if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
-  if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
-  if(G.phase==='setup'){const best='';
-    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()?'':'<ol class="ps-intro introcard"><li><b>Goal:</b> be the last junk afloat.</li><li><b>Each turn:</b> the dice may wake the leviathans, then you lay one current tile at your bow and sail along it.</li><li><b>You sink</b> off the chart\'s edge, on a leviathan, or sharing a wake with another junk.</li></ol>'}`}
+  if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
+  if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-stat">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
+  if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
+  if(G.q)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
+  if(G.phase==='setup'){let best='';try{const m=!hotSeat()||humans().length===1?aiMove(d,'hard'):null;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}">Safe start for me</button>`}catch(e){}
+    return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
@@ -6274,8 +6407,8 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
-  return `<div class="ps-banner">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+phFeed()):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+  return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?phCrews():phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
@@ -6289,18 +6422,31 @@ function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const c
   if(risk)return '<b>!</b> A leviathan may reach you.';
   try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
   try{const A=analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s});const hit=(A.others||[]).filter(o=>o.coll||o.st==='edge'||o.st==='mon');if(!A.bad&&hit.length)return '<b>Good move:</b> it sinks a rival!'}catch(e){}
-  if(safeNow)return 'Pick, turn, then Place.';
+  if(safeNow)return 'Drag a tile onto your junk.';
   if(safeTurn)return 'Press Turn to find a safe route.';
   return 'Every tile sinks you.'}
+// the goal in one sentence + 3 bullets (Learn to play first screen, Goal card, title)
+const TW_GOAL=['Last junk afloat wins the lantern.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
+function goalCardHTML(){return `<div class="gxt-endc twgoal"><div class="gxt-et">${TW_GOAL[0]}</div><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul><div class="gxt-eb"><button type="button" class="gxt-b pri" data-goalok>Got it</button></div></div>`}
+function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();return}const d=document.createElement('div');d.id='twgoal';d.className='gxt-end';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Goal');d.innerHTML=goalCardHTML();document.body.appendChild(d);
+  const close=()=>{d.remove();document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',k);
+  d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-goalok]')){e.stopPropagation();close()}});const b=d.querySelector('[data-goalok]');try{b.focus()}catch(e){}}
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('[data-goal]');if(g){e.stopPropagation();g.setAttribute('aria-expanded',g.getAttribute('aria-expanded')==='true'?'false':'true');openGoal()}},true);
+// what the rival did this turn: lines are added and stay until your turn (nothing is animated away before it can be read)
+function phRivalFeed(){const L=UI.rivLines||[];if(!L.length)return '';return `<ol class="ps-riv">${L.slice(-5).map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`}
+// captain cards: every crew with its colour, name, afloat or sunk and tiles in hand (fills the strip on rival turns and at the start)
+function phCrews(){if(!G||!UI.started||!PH.on)return '';const me=youSeat();
+  return `<div class="ps-crews">${G.order.map(i=>{const S=G.ships[i],h=(G.hands[i]||[]).length,now=(UI.busy&&UI.curTurn===i)||(!UI.busy&&sideToAct()===i);
+    return `<div class="crew${S.alive?'':' sunk'}${now?' now':''}"><i style="background:${colOf(i).sail}"></i><b>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}</b><span>${S.alive?(G.phase==='setup'&&S.x==null?'Choosing a start':'Afloat · '+h+' tile'+(h===1?'':'s')):'Sunk'}</span></div>`}).join('')}</div>`}
 // the goal and the race, always on screen: who is still afloat
-function phGoal(){if(!G||!UI.started||UI.busy||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
-  if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal">${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
+function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
+  if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal" data-goal>${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
   const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
-  return `<div class="ps-goal">Last junk afloat wins. <b>Afloat:</b>${up.map(lab).join('')}${dn.length?` &middot; <b>Sunk:</b><s>${dn.map(lab).join('')}</s>`:''}</div>`}
+  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal: last junk afloat</span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
-  const keep=L.slice(-6),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
+  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
   return `<div class="ps-feed"><h5>Since your last move</h5><ol>${keep.map(l=>`<li class="${l.c==='bad'?'bad':l.c==='big'?'big':''}">${you(l.t)}</li>`).join('')}</ol>${more?`<p class="tiny">${more} earlier line${more>1?'s':''} in the Log.</p>`:''}</div>`}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
@@ -6328,7 +6474,7 @@ function phInfoData(pd){if(!G||!pd)return null;
   const m=G.mons.find(x=>x.x===pd.x&&x.y===pd.y);
   if(pd.k==='mon'){if(!m||m.k!=='L')return null;return phMonInfo(m)}
   if(pd.k==='mael'){if(!m||m.k!=='M')return null;return {t:'Maelstrom',at:[m.x,m.y],h:`<p><b>A whirlpool.</b> On a calm wake roll it moves: 1 east, 2 south, 3 west, 4 north, 5 or 6 stays. It destroys the tile and junk it enters.</p>`}}
-  if(pd.k==='gate'){if(!G.gates.some(g=>g.x===pd.x&&g.y===pd.y))return null;return {t:'Rift Gate',at:[pd.x,pd.y],h:`<p><b>A rift in the sea.</b> It stays on its square. A junk or leviathan that touches it is thrown to a rolled square.</p>`}}
+  if(pd.k==='gate'){if(!G.gates.some(g=>g.x===pd.x&&g.y===pd.y))return null;return {t:'Rift Gate',at:[pd.x,pd.y],h:`<p><b>A rift in the sea.</b> It stays on its square. Whatever touches it is thrown to a rolled square.</p>`}}
   if(pd.k==='wave'){const w=G.wave;if(!w)return null;return {t:'Rogue Wave',at:[w.x,w.y],h:`<p><b>A rogue wave</b> sweeping ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, heading ${DNAME[w.r]}, strength ${waveStr()}. Any junk in that band rolls a die and capsizes if it does not reach ${waveStr()}.</p>`}}
   return null}
 function phInfoHTML(){const I=phInfoData(PH.pd);if(!I)return null;return `<div class="ph-head"><b>${esc(I.t)}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body">${I.h}</div>`}
@@ -6339,7 +6485,7 @@ function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
     else if(PH.pop==='info')h=phInfoHTML();
     else if(PH.pop==='start'){const d=sideToAct();h=d>=0&&G.seats[d].human&&G.phase==='setup'&&!G.q&&!UI.busy&&!mustPass(d)?phStartHTML():null}}
   if(!h){if(PH.pop){PH.pop=null;PH.pd=null}if(!el.hidden){el.hidden=true;el.innerHTML='';PH.pop_h=''}return}
-  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh)}}
+  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh);try{oskPlace()}catch(e){}}}
 function phClose(){PH.pop=null;PH.pd=null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 function phOpen(kind,pd){PH.pop=kind;PH.pd=pd||null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 // ---------- cards: coach tips, wake roll, Sunk!, interrupts, pass screen, end card ----------
@@ -6378,7 +6524,7 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
    if(G.phase==='setup'){el.innerHTML='<span class="chip" aria-label="Choose start marks"><b>Setup</b></span>';return}
    const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length,es=G.variant==='easysolo',so=G.variant==='solo';
    const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
-   el.innerHTML=`<span class="chip" role="status" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${L} monster${L===1?'':'s'}${so?' (+'+toRise+')':''} &middot; ${G.deck.length} tiles</small></span></span>`};
+   el.innerHTML=`<span class="chip" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${G.deck.length} tiles${so?' &middot; '+toRise+' to rise':''}</small></span></span>`};
  const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;phAfter()}return r};
  const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(!PH.on)return _onPick(p);phPick(p)}}
 function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kind!=='coach'&&PH.cur.kind!=='mph'&&PH.cur.kind!=='sunk'&&PH.cur.kind!=='q')return;
@@ -6419,6 +6565,35 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
  document.addEventListener('pointerup',e=>{if(!down)return;down=false;if(!PH.on||PH.pop!=='tiles'||!UI.sel||UI.busy)return;const dx=e.clientX-sx,dy=e.clientY-sy;
    if(Math.abs(dx)>=36&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-st<900){PH.swipeT=Date.now();UI.sel.r=(UI.sel.r+(dx>0?1:3))%4;sfx('tile_rotate');render()}})}
 {let gxv1=true;const phRelayout=()=>{if(gxv1){gxv1=false;return}if(!G&&!PH.on&&!phDetect())return;const was=PH.on;phApply();if(PH.on||was){PH.zk='?';PH.strip='';PH.pop_h='';try{if(G&&UI.started)render();else phAfter()}catch(e){}}};if(window.GXV)GXV.watch(phRelayout);else window.addEventListener('resize',phRelayout)}
+// ---------- drag a hand tile onto your junk's bow square (phone and PC): the square glows, the tile snaps there, a vibrate tick, then it is laid ----------
+const DRG={on:false,t:-1,el:null,gh:null,tg:null,x0:0,y0:0,hot:false,eat:0};
+function drgTarget(){const c=phPlaceCtx?phPlaceCtx():null;if(!c||!UI.sel)return null;const S=G.ships[UI.sel.s];if(!S||S.x==null)return null;
+  const a=hproj(S.x-2.5,S.y-2.5),b=hproj(S.x-1.5,S.y-2.5);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
+function drgEnd(){if(DRG.gh)DRG.gh.remove();if(DRG.tg)DRG.tg.remove();if(DRG.el)DRG.el.classList.remove('dragsrc');Object.assign(DRG,{on:false,el:null,gh:null,tg:null,hot:false,t:-1})}
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-a=card]');if(!b||UI.busy||!UI.sel||e.button>0)return;
+  DRG.t=+b.dataset.t;DRG.el=b;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.on=false},true);
+document.addEventListener('pointermove',e=>{if(DRG.t<0||!DRG.el)return;const dx=e.clientX-DRG.x0,dy=e.clientY-DRG.y0;
+  if(!DRG.on){if(Math.hypot(dx,dy)<12)return;const T=drgTarget();if(!T){DRG.t=-1;return}DRG.on=true;DRG.T=T;
+    const src=DRG.el.querySelector('img,svg');const g=document.createElement('div');g.className='drgghost';g.setAttribute('aria-hidden','true');
+    const sz=Math.round(T.sq*1.05);g.style.width=g.style.height=sz+'px';if(src)g.appendChild(src.cloneNode(true));document.body.appendChild(g);DRG.gh=g;
+    const tg=document.createElement('div');tg.className='drgtgt';tg.setAttribute('aria-hidden','true');tg.style.width=tg.style.height=Math.round(T.sq)+'px';tg.style.left=T.x+'px';tg.style.top=T.y+'px';document.body.appendChild(tg);DRG.tg=tg;
+    DRG.el.classList.add('dragsrc');if(UI.sel.t!==DRG.t){try{phSelTile(DRG.t)}catch(x){UI.sel.t=DRG.t}}}
+  e.preventDefault();const T=DRG.T,d=Math.hypot(e.clientX-T.x,e.clientY-T.y),hot=d<T.sq*.9;
+  if(hot!==DRG.hot){DRG.hot=hot;DRG.tg.classList.toggle('hot',hot);if(hot){try{navigator.vibrate&&navigator.vibrate(8)}catch(x){}}}
+  const px=hot?T.x:e.clientX,py=hot?T.y:e.clientY;DRG.gh.style.left=px+'px';DRG.gh.style.top=py+'px';DRG.gh.classList.toggle('snap',hot)},{capture:true,passive:false});
+document.addEventListener('pointerup',e=>{if(DRG.t<0)return;if(!DRG.on){DRG.t=-1;return}DRG.eat=Date.now();const hot=DRG.hot,t=DRG.t;drgEnd();
+  if(!hot){render();return}const d=sideToAct();UI.sel.t=t;const card=G.hands[d]&&G.hands[d][t];
+  if(isCur(card)){UI.sel.r=UI.sel.r||0;const m={a:'place',t,r:UI.sel.r,s:UI.sel.s};const er=legal(m,d);
+    if(er){sfx('error');PH.toast='That way sinks you. Turn it, then drop.';render();setTimeout(()=>{PH.toast='';render()},4500);return}
+    try{navigator.vibrate&&navigator.vibrate(18)}catch(x){}doPlace()}else render()},true);
+document.addEventListener('pointercancel',()=>{if(DRG.t>=0){drgEnd();render()}},true);
+// the click that ends a drag must not also select or turn the tile
+document.addEventListener('click',e=>{if(DRG.eat&&Date.now()-DRG.eat<400&&e.target.closest&&e.target.closest('[data-a=card]')){e.stopPropagation();e.preventDefault()}},true);
+
+// Osk's tip may sit inside #pc / #ppop: rescue it to the strip before they are emptied, then put it back on top
+{const resc=()=>{const o=document.getElementById('osk'),ps=document.getElementById('ps');if(o&&ps&&o.parentNode!==ps)ps.insertBefore(o,ps.firstChild)};
+ const _pp=phPopup;phPopup=function(){resc();const r=_pp.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r};
+ const _pc=phCards;phCards=function(){resc();const r=_pc.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r}}
 
 // ===================== part 8: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
 // Each chapter is a normal game with its own crew and (at most) one twist. Twists live only here: boss-cannon (engine option bossCannon), boss-first (newGame first:1), harrier (ai.js CAMP_PUSH).
@@ -6561,10 +6736,10 @@ function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
+  GXH.init({game:'tidewake',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb:not(.zoom),#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
-function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||(typeof tutOn==='function'&&tutOn()))return;GXH.phase(hlpPhase())}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet||UI.tut||!GXH.enabled()||document.querySelector('.gxt-end,.gxt-bub')||(typeof GXT!=='undefined'&&GXT.running&&GXT.running())||(typeof tutOn==='function'&&tutOn()))return;GXH.phase(hlpPhase())}
 {const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
 hlpInit();
@@ -6586,17 +6761,17 @@ function tutHold(){return false}
 // opened through the shared tutor kit: ONE intro step (tap Next) and its card (tap "Cast off") are the only forced taps; then the real game is free
 function tutStart(o){if(NET.on)return;const pro=!!(o&&o.prologue);
   if(typeof GXT==='undefined'){oskBegin(pro);return}
-  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:OSK_TEXT.goal[0],say:'Cobalt swears the Reach is his. Last junk afloat keeps the lantern.',target:()=>document.getElementById('board'),wait:null,
+  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:TW_GOAL[0],say:TW_GOAL.slice(1).map(x=>'\u2022 '+x).join('\n'),target:()=>document.getElementById('board'),wait:null,
       ready:()=>!!G&&UI.started}],
     endTitle:'Your race begins',endText:'Play freely: every move is yours. Grandmother Osk speaks up when a rule first matters.',endButtons:[{id:'go',label:'Cast off'}],
     setup:()=>oskBegin(pro),
-    onDone:()=>{OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
+    onDone:()=>{OSK.ready=1;OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
     onExit:()=>{tutLeave();showStart()}})}
 function oskBegin(pro){OSK.prologue=pro;try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
   const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:1,wave:1,maelstrom:1,cannon:1};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
   UI.tut=1;OSK.starting=1;try{startGame(s,{seed:20261107})}finally{OSK.starting=0}oskRig();
-  Object.assign(OSK,{on:true,said:{},later:[],q:[],cur:null,t0:0,logI:G.logN,riv:0,rivN:0,myLays:0,walk:null});
+  Object.assign(OSK,{ready:typeof GXT==='undefined'?1:0,on:true,said:{},later:[],q:[],cur:null,t0:0,logI:G.logN,riv:0,rivN:0,myLays:0,walk:null});
   UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}
   clearInterval(OSK.tmr);OSK.tmr=setInterval(oskTick,250);render();oskTick()}
 // stack the piles (only order changes; every piece is a real one): Rift Gate in your hand, a cannon 3rd from the top, the wave and the Maelstrom rise early
@@ -6620,17 +6795,22 @@ function oskFill(id,v){const t=OSK_TEXT[id]||[id,''];v=v||{};const f=x=>String(x
 // queue a line; rule ids are spoken once. pri: lower goes first
 function oskSay(id,v,o){o=o||{};if(!OSK.on||OSK.walk)return;const rule=OSK_RULES.indexOf(id)>=0;if(rule&&(OSK.said[id]||OSK.q.some(x=>x.id===id)))return;
   const [title,line]=o.text||oskFill(id,v);if(rule)OSK.said[id]=OSK.said[id]||'queued';OSK.q.push({id,title,line,also:o.also||[],pri:o.pri||5,rival:!!o.rival});OSK.q.sort((a,b)=>a.pri-b.pri)}
-function oskShowNext(){if(!OSK.q.length)return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
+function oskTutBusy(){return typeof GXT!=='undefined'&&GXT.running&&GXT.running()}
+function oskCalm(){const pc=document.getElementById('pc');return !UI.busy&&!(pc&&!pc.hidden)&&!document.querySelector('.gxt-end,#twgoal,.gx-goal,[aria-modal="true"]:not([hidden]),.gx-drawer.open,.gx-drawer[open]')}
+function oskShowNext(){if(!OSK.q.length||oskTutBusy()||!oskCalm()||(typeof GXT!=='undefined'&&!OSK.ready))return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
   for(const id of [n.id].concat(n.also))if(OSK_RULES.indexOf(id)>=0)OSK.said[id]=G?'turn '+G.turn:'shown';oskPlace()}
 function oskHide(){OSK.cur=null;const e=document.getElementById('osk');if(e)e.remove()}
 function oskHTML(c){return `<div class="osk-p" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#2c4a5e" stroke="#e3b24b" stroke-width="2"/><path d="M9 33c2-7 6-10 11-10s9 3 11 10" fill="#cfd8dc"/><circle cx="20" cy="16" r="7" fill="#f1c9a5"/><path d="M12 15c1-7 15-7 16 0-3-3-13-3-16 0z" fill="#eceff1"/><circle cx="31" cy="9" r="3.4" fill="#ffcf5a"/></svg><span>Osk</span></div><div class="osk-t"><b>${esc(c.title)}</b><span>${esc(c.line)}</span></div><button type="button" class="osk-x" data-osk="x" aria-label="Dismiss Osk's tip">&times;</button>`}
-function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on){if(e)e.remove();return}
-  const host=PH.on?document.getElementById('ps'):(document.getElementById('main')||{}).parentNode;if(!host)return;
+function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on||oskTutBusy()){if(e)e.remove();return}
+  const vis=id=>{const x=document.getElementById(id);return x&&!x.hidden?x:null};
+  const host=PH.on?(vis('pc')||vis('ppop')||document.getElementById('ps')):(document.getElementById('main')||{}).parentNode;if(!host)return;
   if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
-  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival)}
+  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival);e.classList.add('fresh');clearTimeout(OSK.fT);OSK.fT=setTimeout(()=>e.classList.remove('fresh'),350)}
   const ref=PH.on?host.firstChild:document.getElementById('main');if(e.parentNode!==host||(PH.on&&host.firstChild!==e))host.insertBefore(e,ref)}
+// keep the tip on top when a card or pop-up opens over the strip (it moves with them, so it is never covered)
+setInterval(()=>{try{if(OSK.on&&OSK.cur)oskPlace()}catch(e){}},100);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-osk]');if(!b)return;e.stopPropagation();
-  if(b.dataset.osk==='x'){oskHide();oskShowNext()}else oskWalkStep(b.dataset.osk)},true);
+  if(b.dataset.osk==='x'){oskHide();OSK.hideT=Date.now()}else oskWalkStep(b.dataset.osk)},true);
 {const _r=render;render=function(){const r=_r.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r};
  const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r}}
 // ---------------------------------------------------------------- when each rule first matters (polled; reads the game, never changes it)
@@ -6642,7 +6822,7 @@ function oskTick(){if(!OSK.on||!G||!UI.started){return}
   // new log lines since the last look
   const fresh=G.log.filter(l=>l.i>OSK.logI).reverse();OSK.logI=G.logN;
   for(const l of fresh){const t=l.t;let m;
-    if((m=t.match(/rolls (\d)\+(\d)=(\d+)/))){const n=+m[3];oskSay('roll',{n:m[1]+'+'+m[2]+'='+n,wake:n>=6&&n<=8?'6, 7 or 8 wakes the leviathans: each swims a square or turns.':'calm, the leviathans sleep. Only a 6, 7 or 8 wakes them.'},{pri:2})}
+    if((m=t.match(/rolls (\d)\+(\d)=(\d+)/))){const n=+m[3];oskSay('roll',{n:m[1]+'+'+m[2]+'='+n,wake:n>=6&&n<=8?'a 6, 7 or 8 wakes the leviathans.':'calm. The leviathans sleep.'},{pri:2})}
     if(/ moves | turns |swims/.test(t)&&/^(?!The Maelstrom)/.test(t)&&!/Rogue Wave/.test(t)&&G.mons.some(x=>t.indexOf(levName(x.id))===0))oskSay('levmove',null,{pri:3});
     if(/torn from the sea|ran into|crushed|blocked by/.test(t))oskSay('levsink',null,{pri:2});
     if(/Rogue Wave rises/.test(t))oskSay('wave',null,{pri:1});
@@ -6668,13 +6848,14 @@ function oskTick(){if(!OSK.on||!G||!UI.started){return}
   if(G.over&&!UI.busy){oskSay('end',{why:oskEndWhy()},{pri:0})}
   // show: nothing up -> next; a tip up for 6 s (rival lines 4 s) gives way to a waiting rule
   const age=Date.now()-OSK.t0;
-  if(!OSK.cur)oskShowNext();else if(OSK.q.length&&age>3000&&(OSK.q[0].pri<=OSK.cur.pri||age>5000))oskShowNext();
+  const need=4000+Math.ceil(String(OSK.cur?OSK.cur.title+' '+OSK.cur.line:'').split(/\s+/).length/10)*1000;
+  if(!OSK.cur){if(Date.now()-(OSK.hideT||0)>1200)oskShowNext()}else if(OSK.q.length&&age>need)oskShowNext();
   else oskPlace();
   if(G.over&&!UI.busy&&!OSK.walk&&OSK.said.end&&OSK.cur&&OSK.cur.id==='end'&&age>2500)oskWalkOpen()}
 // one line on your move: good (it sinks Cobalt) or poor (your bow now faces a leviathan's arrow)
 function oskJudge(){try{const S=G.ships[0],R=G.ships[1];
   if(!R.alive&&S.alive){oskSay('good'+G.turn,null,{pri:2,text:oskFill('good',{why:'Your current sank '+nm(1)+'. A tile that ends a rival is the strongest move there is.'})});return}
-  if(S.alive&&S.x!=null&&adjMons(G,S).length)oskSay('poor'+G.turn,null,{pri:4,text:oskFill('poor',{why:'Your junk now sits next to a leviathan. If its arrow points at you, a 6, 7 or 8 can sink you.'})})}catch(e){}}
+  if(S.alive&&S.x!=null&&adjMons(G,S).length)oskSay('poor'+G.turn,null,{pri:4,text:oskFill('poor',{why:'Your junk now sits next to a leviathan. Its arrow points at you? A 6, 7 or 8 can sink you.'})})}catch(e){}}
 function oskEndWhy(){const w=(G.over&&G.over.win)||[];if(!w.length)return 'Both junks went down together, so nobody keeps the lantern.';
   return w.indexOf(0)>=0?'Yours is the last junk afloat: the lantern is yours, child.':nm(1)+' is the last junk afloat, so he keeps the lantern. Tomorrow we race again.'}
 // ---------------------------------------------------------------- the end: walk through the result with the real numbers, then "Things you'll meet later"

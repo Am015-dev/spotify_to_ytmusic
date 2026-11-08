@@ -95,11 +95,11 @@
       "intro": [
         {
           "who": "hask",
-          "text": "Welcome to Bramblemere Fair, apprentice. Your bag, your cauldron, nine days of brewing."
+          "text": "Welcome to Bramblemere Fair. You have a bag, a pot and nine days."
         },
         {
           "who": "hask",
-          "text": "Draw a chip, lay it down, then choose: draw again or stop. Too many Fizzpods and it blows."
+          "text": "Draw a chip, then draw again or stop. Too many Fizzpods and it explodes."
         },
         {
           "who": "wynne",
@@ -131,7 +131,7 @@
         "type": "score",
         "value": 15,
         "winNotNeeded": true,
-        "text": "Score at least 15 points (winning is not needed)."
+        "text": "Score 15 points or more. Winning is optional."
       },
       "stars": [
         {
@@ -182,7 +182,7 @@
       "intro": [
         {
           "who": "hask",
-          "text": "Coins are not points. Spend them: every chip you buy makes your next brew go further."
+          "text": "Coins are not points. Spend them on chips for your bag."
         },
         {
           "who": "hask",
@@ -196,7 +196,7 @@
       "outro": [
         {
           "who": "hask",
-          "text": "A fuller bag, a longer brew. Now you see why the shop matters."
+          "text": "A fuller bag scores more. The shop matters."
         }
       ],
       "opponent": {
@@ -217,7 +217,7 @@
         "type": "custom",
         "value": 8,
         "winNotNeeded": true,
-        "text": "Buy at least 8 new chips over the fair (winning is not needed)."
+        "text": "Buy 8 or more chips. Winning is optional."
       },
       "stars": [
         {
@@ -272,11 +272,11 @@
         },
         {
           "who": "hask",
-          "text": "Odo always draws one chip too many. Let his pot blow; keep yours whole."
+          "text": "Odo always draws one chip too many. Let his pot explode."
         },
         {
           "who": "hask",
-          "text": "From day 2, whoever trails gets a rat stone head start. Falling behind is not the end."
+          "text": "From day 2, whoever is behind gets a rat stone. Falling behind is okay."
         }
       ],
       "outro": [
@@ -366,7 +366,7 @@
       "intro": [
         {
           "who": "hask",
-          "text": "New day, new ingredient books. The colours brew differently now; read the stall cards."
+          "text": "New chip books today. The colours work differently. Read the stall cards."
         },
         {
           "who": "tamsin",
@@ -374,7 +374,7 @@
         },
         {
           "who": "hask",
-          "text": "No more coach in your ear. Trust what you learned."
+          "text": "No more tips from here on."
         }
       ],
       "outro": [
@@ -400,7 +400,7 @@
       "goal": {
         "type": "win",
         "value": null,
-        "text": "Win the fair with the second set of ingredient books."
+        "text": "Win using chip set 2."
       },
       "stars": [
         {
@@ -455,7 +455,7 @@
       "intro": [
         {
           "who": "hask",
-          "text": "Three cauldrons today. The leader gives everyone else rat stones, so stay close."
+          "text": "Three pots today. Rat stones help whoever is behind, so stay close."
         },
         {
           "who": "odo",
@@ -648,7 +648,7 @@
         },
         {
           "who": "hask",
-          "text": "Mirabel plays sharp now. The fourth book set: red chips pay off after reds land."
+          "text": "Mirabel plays sharper now. Set 4: red chips pay off after reds land."
         },
         {
           "who": "hask",
@@ -737,7 +737,7 @@
         },
         {
           "who": "hask",
-          "text": "One more Fizzpod 1 from the start. The flask and Wren Feathers matter more now."
+          "text": "You start with one extra Fizzpod 1. The flask and Wren Feathers matter more."
         },
         {
           "who": "hask",
@@ -947,7 +947,7 @@
         "aiLevel": "hard",
         "aiStyle": "standard",
         "taunt": "Ten fairs, ten ladles. Come back next year, apprentice.",
-        "praise": "Exact, patient, unafraid. Take the Ladle; you earned it."
+        "praise": "Exact, patient, unafraid. Take the Ladle. You earned it."
       },
       "setup": {
         "players": 2,
