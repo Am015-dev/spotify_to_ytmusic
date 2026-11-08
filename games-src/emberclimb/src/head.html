@@ -533,4 +533,12 @@ html body.ec-stage #stage .en .spkchip{top:40%}
 html body.ec-stagemap #dockact{flex-wrap:wrap!important;gap:6px 12px}
 /* W494: the guided tutorial has 30 steps, so on a phone the dot row would run under Skip: keep only the "n/30" count */
 @media (max-width:700px){.gxt-dots{display:none}.gxt-prog{min-width:0}}
+/* W494 polish: one dim layer around the spotlight (the shared kit's dim cells left 1px seams where their rounded edges meet); the cells
+   stay as invisible input blockers. Top bar: on narrow phones the three pills wrap to two rows so HP, gold and Act all show in full.
+   Shop preview card: the text box fits its text instead of a fixed tall area. */
+.gxt-cell{background:transparent!important}
+.gxt-ring:not(.soft){outline:200vmax solid var(--gxt-dim,rgba(8,4,10,.62));outline-offset:0}
+@media (max-width:480px){#hud{flex-wrap:wrap;row-gap:2px;align-content:center;overflow:visible}#hud .chip{font-size:12.5px!important;line-height:1.1!important;padding:1px 6px!important;min-height:0!important}}
+.shopdet .card.big{height:auto!important;min-height:0!important}
+.shopdet .card.big .cb{min-height:0!important;height:auto!important;flex:0 0 auto!important;padding-bottom:8px}
 </style></head>

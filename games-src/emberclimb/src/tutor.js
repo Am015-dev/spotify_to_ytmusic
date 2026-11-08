@@ -140,7 +140,7 @@
       info('elite', node('e'), 'Elite: a tough foe that drops a relic.', scr('map')),
       info('boss', node('b'), 'The act boss waits on top. Beat it, pick a relic.', scr('map')),
       info('acts', node('b'), 'A full run is three acts, each with its own boss.', scr('map')),
-      { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, also: function () { var xs = document.querySelectorAll('#map .node.glow'); return xs[1] || null; }, say: 'Tap a glowing room. The run is yours now.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
+      { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, say: 'Tap a glowing room. The run is yours now.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
         onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; ['intent', 'vuln', 'energy', 'block', 'endturn', 'weak', 'poison', 'strength', 'power', 'exhaust', 'potion', 'reward', 'gold', 'map', 'rest', 'shop', 'event', 'elite', 'boss', 'acts', 'relic'].forEach(function (k) { C.seen[k] = 1; }); UI.render(); }, 60); } }
     ];
