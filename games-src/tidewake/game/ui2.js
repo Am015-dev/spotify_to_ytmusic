@@ -1,5 +1,5 @@
 // ===================== part 2: replay one move, one beat at a time =====================
-function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};renderRes();const l=$('#live');if(l)l.textContent=text}
+function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};if(text&&UI.busy){UI.rivLines=UI.rivLines||[];const t=String(text);if(UI.rivLines[UI.rivLines.length-1]!==t)UI.rivLines.push(t)}renderRes();const l=$('#live');if(l)l.textContent=text}
 async function kitWait(p,max){if(!p||!p.then)return;await Promise.race([p,sleep(max||2500)])}
 function stepsLen(steps){return steps.length}
 async function playEvents(evs,gen){
@@ -10,7 +10,7 @@ async function playEvents(evs,gen){
 }
 async function playEv(e,gen){
   switch(e.t){
-  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');const riv=UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;await sleep(riv?Math.max(1000,e.c==='bad'?1100:0):e.c==='bad'?950:560)}break}
+  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');const riv=UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;await sleep(riv?(e.c==='bad'?1800:1400):e.c==='bad'?950:560)}break}
   case 'turn':{UI.curTurn=e.seat;UI.curTurnN=e.n;renderRoad();renderBar();break}
   case 'dice':{const nx=UI.mphNext;if(nx&&nx.d[0]===e.d[0]&&nx.d[1]===e.d[1]){UI.mph=nx;UI.mphNext=null}if(!UI.mph||UI.mph.d!==e.d&&(UI.mph.d[0]!==e.d[0]||UI.mph.d[1]!==e.d[1]))UI.mph={d:e.d.slice(),total:e.d[0]+e.d[1],wake:e.d[0]+e.d[1]>=6&&e.d[0]+e.d[1]<=8,lines:[],seat:e.seat,shown:0};
     UI.mph.roll=true;UI.mph.shown=0;UI.trig.roll=1;sfx('dice_roll');renderRes();await sleep(600);UI.mph.roll=false;renderRes();sfx(UI.mph.wake?'leviathan_roar':'click');await sleep(UI.mph.wake?900:450);break}
@@ -47,4 +47,4 @@ async function playEv(e,gen){
 }
 
 // a tap on the board or the caption during a rival's turn skips the current step (the next one still plays)
-document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-hint,.ps-msg,#res'))sleepFlush()},true);
+document.addEventListener('pointerdown',e=>{if(!UI.busy||!G||UI.curTurn==null||!G.seats[UI.curTurn]||G.seats[UI.curTurn].human)return;const t=e.target;if(t&&t.closest&&t.closest('#board,.ps-line,.ps-stat,#res'))sleepFlush()},true);
