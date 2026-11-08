@@ -127,7 +127,7 @@ function renderDock(p, vs, cur) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? (UI.pend ? 'Chosen: tap Play to confirm' : 'Now tap a glowing space on your board') : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
@@ -136,6 +136,13 @@ function renderDock(p, vs, cur) {
   if (UI.hix == null || UI.hix >= p.hand.length) UI.hix = 0;
   handScrollSync(); handPager();
   var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
+  if (mine && (UI.pend || UI.gsDie != null || (Q && $('#acts .btn')))) dockToActs();
+}
+// keep the step's buttons (Play / Other food / Cancel, Skip, No thanks) just under the sticky prompt, never scrolled out of sight
+function dockToActs() {
+  var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || db.scrollHeight <= db.clientHeight) return;
+  var d = ac.getBoundingClientRect().top - (db.getBoundingClientRect().top + pr.offsetHeight + 6);
+  if (Math.abs(d) > 2) db.scrollTop += d;
 }
 function promptText(mine) {
   if (!G) return '';
@@ -144,7 +151,7 @@ function promptText(mine) {
   if (!mine && isHuman(UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat) && humans().length <= 1) return UI.animSeat === UI.view && UI.busy ? 'Your birds are at work, one by one.' : 'Your turn is starting.';
   if (!mine) return UI.busy ? (UI.animSeat === UI.view ? 'Your birds are at work, one by one.' : G.pl[UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat].name + ' is playing.') : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
   var Q = G.q;
-  if (UI.pend) return 'Play ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '?';
+  if (UI.pend) return 'Tap Play to put ' + B[G.pl[UI.view].hand[UI.pend.i]].n + ' in your ' + HABN[UI.pend.h] + '.';
   if (UI.gsDie != null) return 'Grub or seed?';
   if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
@@ -206,7 +213,7 @@ function glow() {
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
   var m = $('#mat'); if (!m || !m.clientHeight) return;
   var rh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rh')) || 64, rowH = (m.clientHeight - 8) / 3, w = (m.clientWidth - rh - 30) / 5;
-  m.style.setProperty('--sw', Math.max(40, Math.floor(Math.min(w, rowH * .78))) + 'px');
+  m.style.setProperty('--sw', Math.max(44, Math.floor(Math.min(w, rowH * .78))) + 'px');
 }
 // big card view (tap to inspect): the same readable card, larger, plus nest and egg facts
 function showCard(id, st, extra) { hideHelp();

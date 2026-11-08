@@ -19,6 +19,7 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   const open = await p.$('[data-gxt-open]'); ok(!!open, 'tutorial button on the title (fresh storage)');
   await open.scrollIntoViewIfNeeded(); const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2);
   const seen = [], words = []; let pinkEgg = 0, tucked = 0, blocked = null, idle = Date.now(), real = false, later = false;
+  let lastStep = null, lastAt = Date.now(); const lat = {};
   while (Date.now() - idle < 30000) {
     const st = await p.evaluate(() => {
       if (typeof UI === 'undefined' || !G) return { wait: 1 };
@@ -26,11 +27,12 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
       const b = document.querySelector('.coachb'), t = [...document.querySelectorAll('.tutpoint')];
       return { step: window.GXCOACH && GXCOACH.step, bub: b ? b.dataset.rule : null, txt: b ? b.querySelector('.saytx').childNodes[1].textContent : '', n: t.length, later: !!document.querySelector('.later') };
     });
+    if (st.step && st.step !== lastStep) { lastStep = st.step; lastAt = Date.now(); }
     if (st.mode) { real = ['solo', 'vs', 'hot'].includes(st.mode) && await p.evaluate(() => G.rounds === 4 && !!document.querySelector('#keepgo')); break; }
     if (st.later) later = true;
     if (st.wait || !st.bub || st.n === 0 || st.bub !== st.step) { await p.waitForTimeout(200); continue; }
     if (seen[seen.length - 1] !== st.step) {
-      seen.push(st.step); words.push([st.step, st.txt.trim().split(/\s+/).length, st.n]);
+      lat[st.step] = Date.now() - lastAt; seen.push(st.step); words.push([st.step, st.txt.trim().split(/\s+/).length, st.n]);
       if (st.step === 'pink') pinkEgg = await p.evaluate(() => G.pl[1].board.flat().filter(b => b.id === TUT.ids.pk).reduce((a, b) => a + b.eggs, 0));
       if (st.step === 'cache') tucked = await p.evaluate(() => G.pl[0].board[0].reduce((a, b) => a + b.tuck + b.cache, 0));
       if (SHOTS) { await p.waitForTimeout(250); await p.screenshot({ path: path.join(SHOTS, 'tut-' + seen.length + '.png') }); }
@@ -52,6 +54,8 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   ok(real, `the last step starts a real 4-round game at its starting hand (${taps} taps)`);
   ok(JSON.stringify(seen) === JSON.stringify(RULES), `every rule step appears, in order (${seen.length}/${RULES.length})` + (seen.length !== RULES.length ? ' missing ' + RULES.filter(r => !seen.includes(r)).join(',') : ''));
   const long = words.filter(w => w[1] > 12), multi = words.filter(w => w[2] !== 1);
+  const slow = ['white', 'cache', 'pink'].filter(k => !(lat[k] <= 2000));   // a "see" step's marker shows within 2 s of the step starting, its power's own animation included (G4 review); goalr waits for Pip's last turn and shows a 'watch' line meanwhile
+  ok(slow.length === 0, 'see-step markers appear within 2 s: ' + ['white', 'cache', 'pink', 'goalr'].map(k => k + ' ' + lat[k] + ' ms').join(', '));
   ok(long.length === 0, 'one sentence of 12 words or fewer per step' + (long.length ? ': ' + long.map(w => w[0] + '=' + w[1]).join(',') : ''));
   ok(multi.length === 0, 'exactly one highlighted tap per step' + (multi.length ? ': ' + multi.map(w => w[0] + '=' + w[2]).join(',') : ''));
   ok(blocked === true, 'a tap away from the highlighted target is blocked');

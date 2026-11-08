@@ -13,8 +13,8 @@ Proof: `tests/tutorial-end.js phone|small|pc` taps only the highlighted target o
 in this order, with one sentence of 12 words or fewer and exactly one highlight, then that the last tap starts a real game.
 
 ## Steps (rule id = the step; logic: `src/coach.js` TSTEPS)
-1. step `goal`: most points after 4 rounds wins (tap the score line).
-2. step `turns`: one action per turn; rounds give 8, 7, 6, 5 actions (tap the turn tracker).
+1. step `goal`: most points wins; the practice is one short round (tap the score line).
+2. step `turns`: one action per turn; practice has 4 actions, real games 4 rounds (tap the turn tracker).
 3. step `play`: action 1, play a bird (tap Play a bird).
 4. step `cost`: a bird's food cost is paid from your supply (tap the bird).
 5. step `slot`: the leftmost empty space of its habitat (tap the glowing space).

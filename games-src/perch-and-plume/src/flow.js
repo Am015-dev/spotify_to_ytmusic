@@ -11,6 +11,13 @@ document.addEventListener('click', function (e) {
   if (a === 'opp') { openOpp(s); return; }
   if (!G) return;
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
+  // your choice is pending but your birds are still animating: keep the tap and apply it the moment they finish (never a dead tap)
+  if (!mine && UI.busy && Q && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv)$/.test(a) && !t.closest('#pop')) {
+    var sel = '[data-a="' + a + '"]' + ['i', 'h', 'c', 'm'].map(function (k) { return t.dataset[k] != null ? '[data-' + k + '="' + String(t.dataset[k]).replace(/["\\]/g, '\\$&') + '"]' : ''; }).join(''), n = 0;
+    t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse');
+    (function later() { if (UI.busy && n++ < 60) { setTimeout(later, 80); return; } var x = myTurn() && document.querySelector(sel); if (x) x.click(); })();
+    return;
+  }
   sfx('tap');
   if (a === 'zoom') { showCard(p.hand[i]); return; }
   if (a === 'die' && !(mine && Q && Q.h === 'die')) { toast('Feeder: ' + (G.feeder[i] === 'gs' ? 'grub or seed' : G.feeder[i]) + ' die. Get food takes dice from here.', 0, 1); return; }
@@ -57,7 +64,8 @@ document.addEventListener('click', function (e) {
   human(m2);
 });
 $('#deckb').dataset.a = 'deck';
-$('#pop').addEventListener('click', function (e) { if (!e.target.closest('.acts button')) e.currentTarget.hidden = true; });   // tap anywhere on the big card to close it
+(function () { var pp = $('#pop'); new MutationObserver(function () { if (!pp.hidden) pp._t = Date.now(); }).observe(pp, { attributes: true, attributeFilter: ['hidden'] }); })();
+$('#pop').addEventListener('click', function (e) { if (Date.now() - (e.currentTarget._t || 0) < 450) return; if (!e.target.closest('.acts button')) e.currentTarget.hidden = true; });   // tap anywhere on the big card to close it (not a tap that began before it opened)   // tap anywhere on the big card to close it
 function whyCant(id) {
   var b = B[id], p = G.pl[UI.view];
   var room = [0, 1, 2].filter(function (h) { return b.h.indexOf(HABC[h]) >= 0 && p.board[h].length < 5; });
@@ -180,6 +188,7 @@ function pump() {
   if (G.phase === 'over') { gameOver(); return; }
   var s = PP.sideToAct(G);
   if (G.phase === 'setup') { if (isHuman(s)) { if (humans().length > 1 && s !== UI.view) { askPass(s, function () { showKeep(s); }); return; } UI.view = s; showKeep(s); return; } apply(PPAI.setup(G, s), s); return; }
+  if (!isHuman(s) && G.phase === 'play' && typeof coachHold === 'function' && coachHold()) { UI.pumpT = setTimeout(pump, 250); return; }   // tutorial: the rival waits while a "see" step is shown
   var tk = s + ':' + G.round + ':' + G.pl[s].cubes;
   if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; if (!isHuman(s)) UI.speed = 1; turnBanner(s); return; }
   if (isHuman(s)) {

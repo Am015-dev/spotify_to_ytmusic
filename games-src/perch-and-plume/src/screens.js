@@ -1,6 +1,6 @@
 // ===================== part 3: title, quick-game setup, starting hand, result, drawers, menu =====================
 var NAMES = ['Fern', 'Rowan', 'Hazel', 'Linnet', 'Bram'], FACES = ['pip', 'mags', 'tobias', 'pip', 'mags'];
-var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal', side: 'green', first: 'you' };
+var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'easy', side: 'green', first: 'you' };
 try { var c0 = JSON.parse(localStorage.getItem('pp-cfg') || 'null'); if (c0 && c0.n) CFG = c0; } catch (e) { }
 function firstTime() { try { return !localStorage.getItem('pp-played'); } catch (e) { return true; } }
 function tutBtn() { try { return typeof GXT !== 'undefined' ? GXT.menuHTML({ game: 'perch-and-plume', first: firstTime(), cls: 'btn', launch: tutStart }) : ''; } catch (e) { return ''; } }
@@ -65,7 +65,7 @@ function showKeep(s) { hideHelp();
   var K = UI.keep;
   function draw() {
     var n = K.birds.length + K.food.length;
-    var h = '<h2>' + (humans().length > 1 ? esc(p.name) + ': your' : 'Your') + ' starting hand</h2>' + (UI.camp && UI.camp.goal ? '<p class="goalline"><b>Chapter goal:</b> ' + esc(UI.camp.goal.text) + '</p>' : '') + '<p>Keep 5 things in total: birds and food. We picked a good start; tap to change it.</p>' +
+    var h = '<h2>' + (humans().length > 1 ? esc(p.name) + ': your' : 'Your') + ' starting hand</h2>' + (UI.camp && UI.camp.goal ? '<p class="goalline"><b>Chapter goal:</b> ' + esc(UI.camp.goal.text) + '</p>' : '') + (UI.camp && UI.camp.goal || UI.mode === 'tutfree' || UI.mode === 'tutorial' ? '' : '<p class="goalline"><b>Goal:</b> most points after ' + G.rounds + ' rounds. Birds, eggs, round goals and your bonus card score.</p>') + '<p>Keep 5 things in total: birds and food. We picked a good start; tap to change it.</p>' +
       '<div class="keepgrid">' + off.birds.map(function (id, i) { return cardHTML(id, 'hand', null, 'data-kb="' + i + '" role="button" tabindex="0"').replace('class="bc ', 'class="bc ' + (K.birds.indexOf(i) >= 0 ? 'on ' : 'off ')); }).join('') + '</div>' +
       '<div class="keepgrid">' + PP.FOODS.map(function (f) { return '<button type="button" class="fbtn ' + (K.food.indexOf(f) >= 0 ? 'on' : 'off') + '" data-kf="' + f + '" aria-label="keep ' + f + '">' + foodIcon(f) + '</button>'; }).join('') + '</div>' +
       '<p><b>' + K.birds.length + ' bird' + (K.birds.length === 1 ? '' : 's') + ' + ' + K.food.length + ' food = ' + n + '</b>' + (n === 5 ? ' ✓' : ' (need 5)') + '</p>' +

@@ -82,7 +82,7 @@ document.addEventListener('click', function (e) {
 function handGo(i) {
   var h = $('#hand'); if (!h) return; var n = h.querySelectorAll('.bc').length; if (!n) return;
   i = Math.max(0, Math.min(n - 1, i)); UI.hix = i;
-  try { var db = $('#dockbody'), sc = db && db.closest('.gx-dock-body,.gx-dock'); [db, sc].forEach(function (x) { if (x && x.scrollHeight > x.clientHeight) x.scrollTop = h.offsetTop - x.offsetTop - 50; }); h.scrollIntoView({ block: 'nearest' }); } catch (e) { }
+  try { var db = $('#dockbody'), pr = $('#prompt'); if (db && db.scrollHeight > db.clientHeight) db.scrollTop += h.getBoundingClientRect().top - (db.getBoundingClientRect().top + (pr ? pr.offsetHeight : 0) + 2); } catch (e) { }   // the hand starts right under the sticky prompt
   var c = h.querySelectorAll('.bc')[i]; if (c) h.scrollTo({ left: c.offsetLeft - h.offsetLeft - 6, behavior: UI.fast ? 'auto' : 'smooth' });
   handPager();
 }
@@ -133,7 +133,7 @@ var RATE = { k: null };
 function rateStart() {   // called when your turn begins (no question pending)
   if (!G || !myTurn() || G.q) return;
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
-  if (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0]) goalCard();
+  // the goal now sits on the starting-hand screen: no pop-up here, so the first tap of the game always lands on what you tap
   try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
   RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }

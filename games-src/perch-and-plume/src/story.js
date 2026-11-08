@@ -21,8 +21,8 @@ var STORY = {
   },
   // the guided first game: one line per step, in teaching order (ids = TUTORIAL-COVERAGE.md, steps in coach.js). Max 12 words each.
   coach: {
-    goal: 'Most points after 4 rounds wins. Tap the score.',
-    turns: 'One action per turn. Rounds give 8, 7, 6, then 5.',
+    goal: 'Most points wins. This practice is one short round. Tap the score.',
+    turns: 'One action per turn. Practice: 4 actions. Real games: 4 rounds.',
     play: 'Action one: play a bird. Tap this button.',
     cost: 'This bird costs one food from your supply. Tap it.',
     slot: 'Birds fill the leftmost empty space in their habitat.',
