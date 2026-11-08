@@ -128,16 +128,20 @@ function tableGeo() {
   // trick area
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
-  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side || (row3 && !ph) ? 3.8 : 4.4)); const cwMax = ph ? 88 : (W >= 1100 ? 176 : 112);
-  if (!side && k >= 3 && !row3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2 + (ph && !side && k >= 3 && H < 470 ? 14 : 0), cx = side ? (zl + zr) / 2 : W / 2;
+  let cw = Math.floor(zoneH / (side || (row3 && !ph) ? 3.8 : (row3 ? 3.75 : (k === 2 && ph ? 3.5 : 4.4)))); const cwMax = ph ? (row3 ? 112 : 92) : (W >= 1100 ? 176 : 112);   // G4: phone trick cards bigger, the trick fills the felt
+  const tight = ph && !side && k >= 3 && !row3 && drone < 0;   // G4: short phone, seats on both sides: a tighter diamond so the cards can be bigger
+  if (tight) cw = Math.min(Math.floor((zoneH - 24) / 3.64), Math.floor((W / 2 - seatW - 8) / 1.42));
+  else if (!side && k >= 3 && !row3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
   if (row3) cw = Math.min(cw, Math.floor((W / 2 - 6) / 1.6));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
   geo.pl = side ? zl : ((k >= 3 && !row3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 && !row3 || drone >= 0) ? W - seatW - 8 : W - 6);
   geo.cw = cw; geo.ch = ch; geo.cx = cx; geo.cy = cy; geo.top = top; geo.zoneH = zoneH;
-  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : (row3 && !ph ? .84 : 1.0)));
-  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry)]); }
+  const rx = Math.round(cw * (side ? 1.5 : (row3 && ph ? 1.1 : (tight ? .92 : 1.05)))), ry = Math.round(ch * (side ? .86 : (row3 ? (ph ? .8 : .84) : (tight ? .8 : 1.0))));
+  geo.rx = rx; geo.ry = ry;
+  geo.tight = tight; const oy = n === 3 && !side ? Math.round(ry * .25) : 0;   // G4: three slots form a triangle; centre it on the pad
+  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry - oy)]); }
   // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
   const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
   geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
@@ -188,6 +192,7 @@ function renderFelt(v) {
   const assign = G.phase === 'assign';
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = !(G.phase === 'play' || G.phase === 'over' || UI.fz);
   try { lanternReveal(geo); } catch (e) { }
+  { const tp0 = $('#tpad'); if (tp0 && !pool.hidden) tp0.hidden = true; }
   { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
@@ -204,6 +209,10 @@ function renderFelt(v) {
     });
     return renderLead(lead, pile, v);
   }
+  { let tp = $('#tpad'); if (!tp) { tp = h('div#tpad', { 'aria-hidden': 'true' }); felt.insertBefore(tp, felt.firstChild); }
+    tp.hidden = slots.hidden; tp.style.visibility = PX && PX.on ? 'hidden' : '';   /* the Pixi table paints the same pad at this rect (pxDrawFelt) */
+    if (!tp.hidden) { const pw = Math.min(geo.W - 8, 2 * (geo.rx || geo.cw) + geo.cw + 44), ph2 = Math.min(geo.zoneH + 20, 2 * (geo.ry || geo.ch) + geo.ch + 64);
+      Object.assign(tp.style, { left: geo.cx + 'px', top: (geo.cy + 10) + 'px', width: pw + 'px', height: ph2 + 'px' }); } }
   const n = G.np, shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
   felt.style.setProperty('--cw', geo.cw + 'px');
@@ -220,7 +229,10 @@ function renderFelt(v) {
 function renderLead(lead, pile, v) {
   const geo = UI.geo;
   lead.style.left = (geo ? geo.cx : 0) + 'px'; lead.style.top = (geo ? geo.cy : 0) + 'px';
-  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns' : D.suits[ls].name)); lead.classList.add('on'); }
+  if (geo && geo.tight) { const tp = $('#tpad'), r = tp && tp.style.width ? { w: parseFloat(tp.style.width), h: parseFloat(tp.style.height) } : null;   // G4: no room in the middle: the colour led sits in the pad's top-left corner
+    if (r) { lead.style.left = Math.round((geo.cx - r.w / 2 + 22 + geo.cx - geo.cw / 2) / 2) + 'px'; lead.style.top = Math.round(geo.cy + 10 - r.h / 2 + 34) + 'px'; } }
+  lead.classList.toggle('tight', !!(geo && geo.tight));
+  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns (trump)' : D.suits[ls].name)); lead.classList.add('on'); }
   else lead.classList.remove('on');
   if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last', 'aria-label': 'Last trick' }, h('span', { html: KIT.iconSVG('book', 20) }), h('span', 'Last')));
 }
