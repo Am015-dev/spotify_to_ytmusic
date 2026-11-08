@@ -50,7 +50,7 @@ const key = id => HB.cardKey(id);
 const FILL = n => { const a = []; const pool = ['farm', 'farm', 'farm', 'farm', 'farm', 'farm', 'farm', 'farm', 'mine', 'mine', 'mine', 'resin_refinery', 'resin_refinery', 'resin_refinery', 'twig_barge']; for (let i = 0; i < n; i++) a.push(pool[i]); return a; };
 const J8 = ['twig_barge', 'twig_barge', 'twig_barge', 'general_store', 'general_store', 'general_store', 'resin_refinery', 'resin_refinery'];
 const prepare = (G, s) => { T.cur(G, s); return T.act(G, s, m => m.type === 'prepare'); };
-const passMv = (G, s) => { T.cur(G, s); return T.act(G, s, m => m.type === 'pass'); };
+const passMv = (G, s) => { T.cur(G, s); return T.pass(G, s); };
 const withFreeWorkersUsed = (G, s) => { const p = P(G, s); while (p.workers - p.dep.length > 0) p.dep.push({ k: 'basic', i: 0 }); };
 const meadowSet = (G, slot, key) => T.meadow(G, slot, key);
 const bonusOf = (G, s, k) => { const e = E(G, s, k); const d = score(G, s).detail.find(x => x.card === e.id); return d ? d.bonus : 0; };
@@ -302,6 +302,8 @@ R('Solo: he claims any basic event his city qualifies for at game end.', () => {
 R('Solo: Old Grimbeard has no city limit.', () => { const G = T.solo(1); const [f] = hand(G, 0, ['twig_barge']); res(G, 0, { twig: 1, pebble: 1 }); G.grim.city = FILL(15).map(k => T.take(G, k)); play(G, 0, f); eq(G.grim.city.length, 16); });
 R('Solo: Echo/Miner Mole may copy a Production card in his city.', () => { const G = T.solo(1); G.grim.city = [T.take(G, 'twig_barge')]; const [m] = hand(G, 0, ['miner_mole']); res(G, 0, { berry: 3 }); play(G, 0, m); chL(G, /Copy/); eq(P(G).res.twig, 2); });
 R('Solo: anything you must give a rival (Post Office cards, Monk berries) is simply discarded/lost.', () => { const G = T.solo(1); city(G, 0, ['post_office']); hand(G, 0, ['farm', 'mine']); const d0 = G.discard.length; wDest(G, 0, 'post_office'); chL(G, /Give/); chL(G, /Give/); eq(G.discard.length - d0 >= 2, true); });
+
+R('Passing is allowed only in Autumn: in Winter, Spring and Summer the year goes on (no Pass move).', () => { const G = mk(2); const canPass = () => HB.moves(G, 0).some(m => m.type === 'pass'); T.cur(G, 0); const seen = []; for (let s = 0; s < 4; s++) { P(G).season = s; seen.push(canPass()); } eq(seen, [false, false, false, true]); });
 
 // ============================================================ RUNNER
 if (process.argv.includes('--md')) {

@@ -54,6 +54,7 @@ T.act = (G, seat, pred) => {
   return m;
 };
 T.q = (G, pred) => T.act(G, G.q ? G.q.who : G.cur, pred);
+T.pass = (G, seat) => { const p = G.players[seat]; if (p.season < 3 && !G.tale) p.season = 3; return T.act(G, seat, m => m.type === 'pass'); };   // end-of-game tests: the player is in Autumn, the only season you may pass in
 T.pending = G => G.q ? G.q.kind : null;
 T.finish = (G) => { // resolve any pending decisions by always picking the first option (guarded)
   let n = 0; while (G.q && n++ < 200) { const m = HB.moves(G, G.q.who)[0]; HB.apply(G, m); } return G;
