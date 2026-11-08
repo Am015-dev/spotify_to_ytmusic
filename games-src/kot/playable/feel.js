@@ -1,7 +1,7 @@
 // W467 game-feel shots: title, Learn first screen, Goal card, first turn, rival turn, mid-game, result. UI taps only (touch on phone).
 // Usage: node feel.js <url> <w> <h> <shotsDir>   -> prints PASS/FAIL plus small-text / overlap findings
 const L = require('./lib.js'); const [url, W, H, SH] = [process.argv[2], +process.argv[3] || 390, +process.argv[4] || 844, process.argv[5]];
-const shot = (p, n) => { console.error('shot', n, Math.round(process.uptime())); return SH ? p.screenshot({ path: `${SH}/${n}-${W}x${H}.png`, timeout: 20000 }).catch(e => console.log('shot fail', n)) : 0 };
+const shot = (p, n) => { console.error('shot', n, Math.round(process.uptime())); return SH ? p.screenshot({ path: `${SH}/${n}-${W}x${H}.png`, timeout: 90000 }).catch(e => console.log('shot fail', n)) : 0 };
 const st = p => p.evaluate(() => ({ me: G.pl.findIndex(x => x.human), a: G.active, ph: G.phase, w: !!G.winner, intro: !!UI.intro, ch: !!UI.choice, turn: G.turn, dice: G.dice.length }));
 // visible text under 14px, and visible text boxes that overlap each other
 const lint = p => p.evaluate(() => {
