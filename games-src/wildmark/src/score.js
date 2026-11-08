@@ -45,6 +45,8 @@ function pvCardLine(a, seat) {
   var s = G.seats[seat], w = pvDesc(s.env, a), v = WM.scoreAnimal(s.env, a, null, G.cards && G.cards[a]), who = seat === meSeat() ? 'you have' : s.name + ' has';
   return ({ bear: 'Bears', elk: 'Elk', salmon: 'Salmon', hawk: 'Hawks', fox: 'Foxes' })[a] + ': ' + who + ' ' + w.text + ' = ' + pvPl(v, 'point', 'points') + (pvSetA(a) ? ' (' + PV_TABLE[a] + ')' : ' (' + cinfo(a).rule + ')');
 }
+var PV_SHORT = { bear: 'Bear pair', elk: 'Elk line', salmon: 'Salmon run', hawk: 'lone Hawk', fox: 'Fox neighbours' };
+function pvPop(p) { if (hintsOn()) return pvText(p); return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }
 function pvSum(p) { return p.reduce(function (n, x) { return n + x.d; }, 0); }
 function pvText(p) { return p.length ? p.map(function (x) { return x.label; }).join(', ') : 'no points now'; }
 // cells to light for a part (the pattern the move completes, or the habitat it grows)
@@ -145,6 +147,7 @@ function pvBadge(x, y, d, c, spot, ghost) {
 function pvStrip(pv) {
   var e = $('#pv'); if (!e) { e = document.createElement('div'); e.id = 'pv'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); }
   var h = '';
+  if (!hintsOn()) { e.innerHTML = ''; e.hidden = true; return; }
   if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
   else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();
   else if (UI.rivalMsg && !G.over && !myTurn()) h = '<div class="vd okay riv"><span>' + esc(UI.rivalMsg) + '</span></div>';
@@ -161,3 +164,18 @@ function pvStrip(pv) {
     if (c === UI.hov) return; UI.hov = c; drawMap();
   });
 })();
+
+// ---- A7: the one-card Goal before turn 1 of a Play or Story game (never in Learn to play)
+function goalShow() {
+  if (!G || UI.mode === 'coach' || G.seats[0].done > 0 || UI.fast || /[?&](scn|fast)=/.test(location.search)) return;   // scenario and fast test states start straight on the board
+  var e = $('#goal'); if (!e) { e = document.createElement('div'); e.id = 'goal'; $('#board').appendChild(e); }
+  var riv = G.np > 1 ? G.seats.filter(function (s, i) { return i !== 0; }).map(function (s) { return s.name; }).join(' and ') : '';
+  e.innerHTML = '<div class="gcard" role="dialog" aria-label="Goal"><h2>Goal</h2><p class="g1">' + esc(riv ? 'Have more points than ' + riv + ' after ' + G.turns + ' turns.' : 'Score as many points as you can in ' + G.turns + ' turns.') + '</p><ul>' +
+    '<li><b>Animals</b> score by their card: bears in pairs, elk in lines, salmon in runs, lone hawks, foxes next to different animals.</li>' +
+    '<li><b>Land</b>: each terrain scores 1 point per tile in your largest joined area' + (riv ? ', +2 if yours is the biggest.' : ', +2 at 7 or more.') + '</li>' +
+    '<li><b>Acorns</b> from gold keystone tiles: 1 point each at the end.</li></ul>' +
+    '<p class="g2">Each turn: take a tile with its animal, add the tile, place the animal. Tap Scores any time to see why.</p><button type="button" class="big" id="goalGo">Start</button></div>';
+  e.hidden = false;
+}
+document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; }, true);   // never blocks: any tap outside the card (or Start) closes it and still acts
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = !UI.prefs.hints; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });

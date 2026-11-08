@@ -15,9 +15,11 @@ function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, j
   var pv = $('#pv'); if (pv && !pv.hidden && pv.offsetHeight) ln = pv;   // above the points strip when it shows
   var r = ln.getBoundingClientRect(); if (r.height && r.top > 200) { e.style.top = 'auto'; e.style.bottom = Math.round(innerHeight - r.top + 8) + 'px'; }
 }
-function toast(t, ms) { var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
+function toast(t, ms) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
+function hintsOn() { return UI.mode === 'coach' || !!UI.prefs.hints; }   // A7: Play is clean unless the top-bar Hints switch is on
+function hintsSync() { var on = hintsOn(); document.documentElement.classList.toggle('wm-clean', !on); var b = document.getElementById('hintsB'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); var l = b.querySelector('span'); if (l) l.textContent = on ? 'Hints on' : 'Hints'; } }
 function sfxVol() { try { var p = GX.pref ? GX.pref() : {}; return (p.master == null ? 1 : p.master) * (p.sfx == null ? 0.8 : p.sfx); } catch (e) { return 0.8; } }
 function sfx(kind) {
   if (UI.prefs.mute) return; var v = sfxVol(); if (!v) return;
@@ -63,7 +65,7 @@ function newGame(cfg) {
   G = WM.newGame({ np: cfg.np, seed: cfg.seed, ai: ai, names: names, turns: cfg.turns, acorns: cfg.acorns, no3: cfg.no3, cards: cards });
   UI.cfg = cfg; UI.humans = cfg.humans; UI.view = 0; UI.lastHuman = 0; UI.ghost = null; UI.free = null; UI.wipe = null; UI.undo = null; UI.lit = null; UI.userPan = 0; UI.passed = -1;
   $('#start').hidden = true; document.documentElement.classList.remove('wm-title'); $('#rs').hidden = true; try { GX.close(); } catch (e) { }
-  fitView(true); render(); step(); save(); musicSync();
+  fitView(true); render(); step(); save(); musicSync(); goalShow();
   var q = window.CAMPAIGN && CAMPAIGN.quick; if (q && q.intro && UI.mode === 'quick' && !UI.fast) setTimeout(function () { toast(q.intro[Math.floor(Math.random() * q.intro.length)], 2600); }, 500);   // one-line flavour (text in campaign.json)
   return G;
 }
@@ -123,7 +125,7 @@ function showPass() {
 function act(m) {
   var before = G.seats[G.cur], sc0 = pvScore(before.env, before.acorns), at = null;
   WM.apply(G, m);
-  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); var sp = pvScore(before.env, before.acorns), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvText(hp), 'hab'); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
+  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); var sp = pvScore(before.env, before.acorns), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvPop(hp), 'hab'); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
     if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
@@ -132,8 +134,8 @@ function act(m) {
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
       var ta = G.last && G.last.acorn ? ' +1 acorn (keystone).' : '', tk = before.env[m.c] && before.env[m.c].tok;
-      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvText(tp), 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
-      else if (tot < 0) { pop(m.c, pvText(tp), 'neg'); sfx('tok'); } else sfx('tok');
+      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvPop(tp), 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
+      else if (tot < 0) { pop(m.c, pvPop(tp), 'neg'); sfx('tok'); } else sfx('tok');
       if (!before.ai && tk && tot === 0 && UI.mode !== 'coach') toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
       if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
     } else sfx('tap');
@@ -154,6 +156,8 @@ function pop(c, text, cls) {   // floating points at a map cell (DOM, readable s
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
 function onMarket(kind, i) {
+  if (myTurn() && G.stage === 'tile' && UI.undo && G.hold && (G.hold.ti === i || G.hold.ki === i)) { undoTake(); return; }   // tapping the slot you took from puts the pair back
+  if (myTurn() && G.stage === 'tile' && UI.undo && !UI.free && !UI.wipe && G.market.tiles[i] && G.market.toks[i]) { G = UI.undo; UI.undo = null; UI.ghost = null; }   // changed your mind: tapping another pair swaps the pick (same as Back + pick)
   if (!myTurn() || G.stage !== 'pick') return;
   if (UI.wipe) { if (!G.market.toks[i]) return; if (!tutOK({ what: 'wsel', i: i })) return; var j = UI.wipe.indexOf(i); if (j >= 0) UI.wipe.splice(j, 1); else UI.wipe.push(i); sfx('tap'); render(); return; }
   if (UI.free) {
@@ -196,7 +200,7 @@ function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (G.np > 1 ? 156 : 110) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), padT = (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
@@ -230,21 +234,21 @@ function drawMap() {
   if (!G) return; var s = G.seats[UI.view], env = s.env, mine = myTurn(), out = '';
   var lit = UI.lit && UI.lit.until > Date.now() ? UI.lit.cells : [];
   if (UI.whyA) { var wi = {}; WM.scoreAnimal(env, UI.whyA, wi, G.cards && G.cards[UI.whyA]); lit = lit.concat(wi.lit || []); }   // the card's scoring groups stay lit while its why is open
-  var pv = mine ? pvNow() : null, pvl = pv ? pv.lit : [], brk = pv && pv.broke || [], bad = '';
+  var hon = hintsOn(), pv = mine && hon ? pvNow() : null, pvl = pv ? pv.lit : [], brk = pv && pv.broke || [], bad = '';
   var keys = Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; });
   keys.forEach(function (c) {
     var x = env[c], p = pix(c), tgt = mine && G.stage === 'tok' && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
-    if (tgt) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
+    if (tgt && hon) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
     out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1 }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
-    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
+    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; if (hon) bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
     if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
   }
   var wh = boardWH();
   pvl.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
   brk.forEach(function (c) { var q = pix(c); bad = '<polygon class="pvring brk" points="' + poly(q[0], q[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' + bad; });
-  if (UI.ghost && mine && G.stage === 'tile') { var gp = pix(UI.ghost.c); bad += pvBadge(gp[0], gp[1] - SZ * 0.62, pv ? pv.d : 0, UI.ghost.c, 0, 1); }
+  if (UI.ghost && mine && hon && G.stage === 'tile') { var gp = pix(UI.ghost.c); bad += pvBadge(gp[0], gp[1] - SZ * 0.62, pv ? pv.d : 0, UI.ghost.c, 0, 1); }
   $('#map').innerHTML = terrainDefs() + '<rect class="bgr" x="0" y="0" width="' + wh[0] + '" height="' + wh[1] + '" fill="transparent"/><g id="vp">' + out + '<g class="pvbs">' + bad + '</g></g>';
   pvStrip(pv);
   $('#map').setAttribute('viewBox', '0 0 ' + wh[0] + ' ' + wh[1]); applyPan();
@@ -273,13 +277,13 @@ function cset(a) { return G && G.cards && G.cards[a] || 'a'; }
 function cinfo(a) { return WM.cardInfo ? WM.cardInfo(a, cset(a)) : WM.CARDS[a]; }
 function tileName(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join(' and ') + ' tile' + (t.key ? ' (keystone)' : '') + ', accepts ' + t.a.map(function (a) { return WM.ANI_NAME[a]; }).join(', '); }
 function renderDock() {
-  var mk = $('#mk'), mine = myTurn() && G.stage === 'pick', s = G.seats[G.cur], h = '', gv = mine && !UI.wipe ? pvMarket() : null, gb = gv ? pvBestCol(gv) : -1;
+  var swap = myTurn() && G.stage === 'tile' && !!UI.undo && !UI.free && !UI.wipe, mk = $('#mk'), mine = myTurn() && G.stage === 'pick' || swap, s = G.seats[G.cur], h = '', gv = mine && !UI.wipe && hintsOn() ? pvMarket() : null, gb = gv ? pvBestCol(gv) : -1;
   for (var i = 0; i < 4; i++) {
     var t = G.market.tiles[i], k = G.market.toks[i], fr = UI.free, sel = fr && (fr.ti === i), selk = fr && fr.ki === i, w = UI.wipe && UI.wipe.indexOf(i) >= 0;
     h += '<div class="pair' + (mine && !UI.free && !UI.wipe ? ' live' : '') + (gv && i === gb && !UI.free ? ' top' : '') + '" data-i="' + i + '">';
     if (gv && gv[i] != null && !UI.free) h += '<span class="gain' + (i === gb ? ' best' : gv[i] === 0 ? ' nil' : '') + '" title="Points this pair can add right now">' + (gv[i] > 0 ? 'up to +' + gv[i] : 'no points') + '</span>';
-    h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : '<span class="mt gone"></span>';
-    h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : '<span class="mk gone"></span>';
+    h += t ? '<button type="button" class="mt' + (sel ? ' sel' : '') + '" data-i="' + i + '" aria-label="' + esc(tileName(t)) + '"' + (mine && !UI.wipe ? '' : ' disabled') + '>' + mkTile(t, 30) + '</button>' : swap && G.hold && G.hold.ti === i ? '<button type="button" class="mt gone back" data-i="' + i + '" aria-label="Put the tile back">' + mkTile(G.hold.tile, 30) + '</button>' : '<span class="mt gone"></span>';
+    h += k ? '<button type="button" class="mk' + (selk ? ' sel' : '') + (w ? ' wsel' : '') + '" data-i="' + i + '" aria-label="' + esc(WM.ANI_NAME[k]) + ' token"' + (mine ? '' : ' disabled') + '>' + mkTok(k) + '<i>' + esc(WM.ANI_NAME[k]) + '</i></button>' : swap && G.hold && G.hold.ki === i ? '<button type="button" class="mk gone back" data-i="' + i + '" aria-label="Put the animal back">' + mkTok(G.hold.tok) + '<i>Put back</i></button>' : '<span class="mk gone"></span>';
     h += '</div>';
   }
   mk.innerHTML = h;
@@ -302,7 +306,7 @@ function renderDock() {
     }
   }
   if (G.stage !== 'pick') UI.acornMenu = false;
-  if (myTurn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
+  if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
   $('#acorn').innerHTML = '<span class="acn" title="Acorns: 1 point each at the end, or spend one for a free pick or new animals">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
 }
@@ -321,7 +325,7 @@ function lineText() {
 }
 // first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
 var COACH = { pick: 'Each column is one choice: the tile on top and the animal under it come together.', tile: 'Tiles must touch your valley. Matching edges join terrain: 1 point per joined tile.', tok: 'Animals score by their card (the chips on top). A tile shows which animals it accepts.' };
-function coachText() { return G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
+function coachText() { return hintsOn() && G && !G.over && UI.mode === 'quick' && myTurn() && (UI.prefs.coachN || 0) < 3 && !UI.wipe && !UI.free ? COACH[G.stage] || '' : ''; }
 function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.forEach(function (s, j) { if (j !== i && (b < 0 || fin[j].total > fin[b].total)) b = j; }); return b; }
 function renderTop() {
   var me = G.seats[UI.view], fin = G.over ? G.res : WM.final(G), sc = fin[UI.view], h = '';   // one honest score: live totals include the habitat bonuses (as the Scores drawer and result)
@@ -348,7 +352,7 @@ function renderTop() {
 }
 function render() {
   if (!G) return;
-  renderDock(); renderTop(); drawMap(); cardWhyRender();
+  hintsSync(); renderDock(); renderTop(); drawMap(); cardWhyRender();
   if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
   if (typeof coachCheck === 'function') coachCheck();
