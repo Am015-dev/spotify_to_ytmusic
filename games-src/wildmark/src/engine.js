@@ -123,12 +123,13 @@
   };
   function endTurn(G) {
     var s = G.seats[G.cur]; s.done++; G.hold = null; G.used3 = false; G.stage = 'pick';
-    if (G.solo) {   // solo: the rightmost remaining tile and the rightmost remaining token leave the game
+    if (G.solo) {   // solo: the stacks sit at the left (slot 1); the remaining tile and token furthest from them (rightmost) leave the game
       for (var i = 3; i >= 0; i--) if (G.market.tiles[i]) { G.market.tiles[i] = null; break; }
       for (i = 3; i >= 0; i--) if (G.market.toks[i]) { G.lostToks = G.lostToks || {}; G.lostToks[G.market.toks[i]] = (G.lostToks[G.market.toks[i]] || 0) + 1; G.market.toks[i] = null; break; }   // rules: removed from the game, not returned to the bag
     }
-    // rules: market items never move; the taken tile and token are refilled in place (solo: survivors slide toward the stack, new pairs arrive at the far end)
-    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.push(null); G.market[f] = l; });   // survivors slide toward the stack (slot 0); the far slots refill
+    // rules: market items never move; the taken tile and token are refilled in place, pairs stay as dealt.
+    // solo: the rest slide TOWARD the stacks (left) and the refill enters at the far end (right)
+    if (G.solo) ['tiles', 'toks'].forEach(function (f) { var l = G.market[f].filter(function (x) { return x; }); while (l.length < 4) l.push(null); G.market[f] = l; });
     for (i = 0; i < 4; i++) { if (!G.market.tiles[i]) G.market.tiles[i] = G.supply.length ? G.supply.pop() : null; if (!G.market.toks[i]) G.market.toks[i] = drawTok(G); }
     overpop(G);
     if (G.seats.every(function (x) { return x.done >= G.turns; })) { finish(G); return; }
@@ -156,7 +157,7 @@
     else if (a === 'salmon') { comps(env, function (x) { return x.tok === 'salmon'; }).forEach(function (g) { var ok = g.every(function (x) { return nb(x).filter(function (y) { return tokAt(env, y, 'salmon'); }).length <= 2; }); if (ok) { v += pts[Math.min(g.length, 7)]; lit = lit.concat(g); } }); }
     else if (a === 'fox') { cells.forEach(function (x) { var s = {}; nb(x).forEach(function (y) { if (env[y] && env[y].tok) s[env[y].tok] = 1; }); var f = Object.keys(s).length; v += f; if (f) lit.push(x); }); }
     else if (a === 'elk') {   // exact: split the elk into straight lines (3 axes, 1-4 long, each elk in one line) for the highest total
-      var left = {}, memo = {}, budget = 40000;
+      var left = {}, memo = {}, pick = {}, budget = 40000;
       cells.forEach(function (x) { left[x] = 1; });
       var rec = function (rem) {
         var ks = Object.keys(rem); if (!ks.length) return 0;
@@ -169,12 +170,13 @@
             for (var q = -off; q < len - off; q++) { var ck = k(p0[0] + q * DIRS[d][0], p0[1] + q * DIRS[d][1]); if (!rem[ck]) { okL = false; break; } line.push(ck); }
             if (!okL || (len === 1 && d !== 0)) continue;
             var nr = {}; ks.forEach(function (x) { if (line.indexOf(x) < 0) nr[x] = 1; });
-            var tot = pts[len] + rec(nr); if (tot > best) best = tot;
+            var tot = pts[len] + rec(nr); if (tot > best) { best = tot; pick[mk] = { len: len, nr: nr }; }
           }
         });
         return (memo[mk] = best);
       };
       v = rec(left); lit = cells.slice();
+      for (var cur = left, ck2 = Object.keys(cur).sort().join('|'); pick[ck2]; ) { if (info) (info.lines = info.lines || []).push(pick[ck2].len); cur = pick[ck2].nr; ck2 = Object.keys(cur).sort().join('|'); }   // line lengths of the best split, for the UI
     }
     if (info) info.lit = lit;
     return v;
