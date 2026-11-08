@@ -131,7 +131,7 @@ function tutStartOld(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.pro
       else showStart()},
     onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map
 // the first time a player taps Play, offer the tutorial once
-function tutOffer(){if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GAME)||lsGet('sf_offered',0)||GXT.status(TUT_GAME).open)return false;
+function tutOffer(){return false;if(typeof GXT==='undefined'||!firstTime()||GXT.isDone(TUT_GAME)||lsGet('sf_offered',0)||GXT.status(TUT_GAME).open)return false;
   lsSet('sf_offered',1);const d=document.createElement('div');d.id='offer';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn every rule in about 5 minutes, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-a="offeryes">Learn in 5 minutes</button><button type="button" class="gxt-b" data-a="offerno">Just play</button></div></div>';
   document.body.appendChild(d);return true}
