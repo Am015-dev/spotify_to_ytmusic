@@ -15,12 +15,13 @@ const OUT = process.argv[2] || 'shots';
     [ctx, p] = await mk(true);
     await p.goto(S.url); await p.waitForSelector('#start .tbtn'); await tap(p, '#start .tbtn'); await p.waitForTimeout(800); await p.screenshot({ path: `${OUT}/goal-${name}.png` });
     await tap(p, '#goal .tbtn'); await p.waitForFunction(() => myTurn() && !UI.busy, null, { timeout: 20000 }); await p.waitForTimeout(900); await p.screenshot({ path: `${OUT}/first-turn-${name}.png` });
-    await p.evaluate(() => { const m = VAI.choose(G, 'normal'); doMove(m); }); await p.waitForTimeout(1600); await p.screenshot({ path: `${OUT}/rival-turn-${name}.png` });
+    await tap(p, '.site.l0.glow'); await p.waitForTimeout(500); await p.screenshot({ path: `${OUT}/select-${name}.png` }); await tap(p, '.site.sel'); await p.waitForFunction(() => myTurn() && !UI.busy, null, { timeout: 30000 }); await p.waitForTimeout(600);
+    await p.evaluate(() => { const m = VAI.choose(G, 'normal'); act(m); }); await p.waitForFunction(() => !myTurn() && UI.busy, null, { timeout: 20000 }).catch(() => { }); await p.waitForTimeout(2300); await p.screenshot({ path: `${OUT}/rival-turn-${name}.png` });
     await p.waitForFunction(() => myTurn() && !UI.busy, null, { timeout: 30000 });
     await p.evaluate(() => { UI.fast = true; let n = 0; while (G.phase === 'play' && G.round < 3 && n++ < 400) VG.apply(G, VAI.choose(G, 'normal')); UI.fast = false; render(); });
     await p.waitForTimeout(800); await p.screenshot({ path: `${OUT}/mid-game-${name}.png` }); await ctx.close();
     [ctx, p] = await mk(true);
-    await p.goto(S.url + '?scn=vg-result'); await p.waitForSelector('#rs:not([hidden]) table', { timeout: 30000 }); await p.waitForTimeout(3500); await p.screenshot({ path: `${OUT}/result-${name}.png` }); await ctx.close();
+    await p.goto(S.url + '?scn=vg-result'); await p.waitForSelector('#rs:not([hidden]) .rplayers', { timeout: 30000 }); await p.waitForTimeout(3500); await p.screenshot({ path: `${OUT}/result-${name}.png` }); await ctx.close();
   }
   console.log(bad ? 'FAIL feel shots, page errors ' + bad : 'PASS feel shots'); await b.close(); S.close();
 })();
