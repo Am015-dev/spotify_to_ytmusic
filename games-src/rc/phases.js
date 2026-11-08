@@ -101,7 +101,8 @@ function planProblems(){const pr=[];const placed=placedIds();
   for(const a of G.plan.acts){const n=actNeed(a);const ps=a.pw.map(pawnInfo).filter(Boolean);const lead=ps.find(p=>p.c!=null)||ps.find(p=>p.f);
     if(!lead)pr.push(`${actLabel(a)} needs a character (or Friday) to lead it.`);
     if(ps.length<n.need)pr.push(`${actLabel(a)} needs ${n.need} pawn${n.need>1?'s':''}.`);
-    const why=targetWhy(a.type,a.tgt,a.alt,lead&&lead.c!=null?P(lead.c):null);if(why&&why!=='already planned')pr.push(`${actLabel(a)}: ${why}.`);
+    // a planned hunt counts itself: N beasts allow N hunts (targetWhy asks whether ONE MORE fits)
+    const why=a.type==='hunt'?(G.hunt.length?(G.plan.acts.filter(x=>x.type==='hunt'&&x.pw.length>=2).length>G.hunt.length?'no more beasts to hunt':null):'no beasts in the hunting grounds yet'):targetWhy(a.type,a.tgt,a.alt,lead&&lead.c!=null?P(lead.c):null);if(why&&why!=='already planned')pr.push(`${actLabel(a)}: ${why}.`);
     if(!afford(a))pr.push(`${actLabel(a)}: not enough resources.`)}
   return pr}
 function actLabel(a){switch(a.type){case 'threat':return `Threat: ${CARD[G.ev.threat[a.tgt]]?CARD[G.ev.threat[a.tgt]].th.n:'?'}`;case 'build':return `Build ${buildName(a.tgt)}`;case 'gather':{const t=tileAt(a.tgt.pos);const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);return `Gather ${s?(s.s==='wood'?'wood':'food'):'?'} at place ${a.tgt.pos+1}${t?' ('+t.terr+')':''}`}

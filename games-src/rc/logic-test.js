@@ -107,6 +107,7 @@ R('E13',E,'You cannot plan a build you cannot pay for.','refused with "not enoug
 R('E14',E,'Resources are reserved while planning: 2 wood cannot pay for a shelter (2) and a weapon (1) at once.','second build refused',()=>{mk();G.res.wood=2;place('c0_0','build',{k:'shelter'});return eq(typeof place('c1_0','build',{k:'weapon'}),'string')});
 R('E15',E,'Pawns of different castaways can join one action.','2 pawns from 2 different castaways on one action',()=>{mk();tile(6,1);tile(5,4);const a=pl('gather',{pos:5,i:0},['c0_0','c1_0']);return eq([a.pw.length,[...new Set(a.pw.map(x=>pawnInfo(x).c))].sort()],[2,[0,1]])});
 R('E16',E,'A planned action can be taken back.','pawn free again',()=>{mk();tile(6,1);pl('gather',{pos:6,i:0},['c0_0']);unplace('c0_0');return eq([G.plan.acts.length,placedIds().has('c0_0')],[0,false])});
+R('E17',E,'You may hunt as many times as there are beasts in the Hunting deck: 1 beast allows 1 full hunt, a second hunt is refused.','1 hunt with 2 pawns has no plan problem; a 2nd hunt refused',()=>{mk();G.hunt=['bear'];place('c0_0','hunt',null);place('c0_1','hunt',null);const ok=!planProblems().some(s=>/beast/.test(s));const second=typeof placeWhy('c1_0','hunt',null);return eq([G.plan.acts.filter(a=>a.type==='hunt').length,ok,second],[1,true,'string'])});
 
 // ======================================================================= F. RESOLVING ORDER
 const F='Resolving actions';
