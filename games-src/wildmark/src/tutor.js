@@ -33,9 +33,10 @@ function tutSteps() {
     { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
     { say: 'Settle the elk on its new tile.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
-    // turn 4: spend an acorn (free pick; replace is the other power), salmon runs
+    // turn 4: spend an acorn (both powers shown: replace animals, then a free pick is tried), salmon runs
     { r: 'acornSpend', say: 'You have an acorn. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
-    { r: 'acornReplace', say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
+    { r: 'acornReplace', say: 'Replace animals, the other acorn power, swaps market animals for new ones.', hl: 'next' },
+    { say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
     { r: 'salmon', say: 'Salmon score in runs. Tap the river tile.', hl: 'col:0', ok: 'freet:0', done: function () { return UI.free && UI.free.ti === 0 || G.stage === 'tile'; } },
     { say: 'Now tap the salmon from another column.', hl: 'tok:2', ok: 'freek:2', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot next to your river.', hl: 'spot', pick: 'nearRiver', ok: 'spot', done: function () { return !!UI.ghost; } },
@@ -173,7 +174,7 @@ function coachFinalHTML() {
 }
 function coachEnd() {   // after the result is drawn: the tutorial counts as done, and the main button starts a real 20-turn game
   if (UI.mode !== 'coach') return; try { GXT.markDone(TUT_GAME); } catch (e) { } coachHide(); UI.tut = null;
-  var pro = UI.coachPrologue; UI.mode = 'quick'; UI.cfg = { np: 2, humans: 1, ai: 'normal', turns: 20 };
+  var pro = UI.coachPrologue; UI.mode = 'quick'; UI.cfg = { np: 2, humans: 1, ai: 'gentle', turns: 20 };
   var a = $('#againB'); if (a) a.textContent = 'Play a real game';
   if (pro && window.GXC && CAMPAIGN.chapters[0]) { var t = $('#titleB'); if (t) { t.textContent = 'Start the story'; t.id = 'coachStory'; } }
 }

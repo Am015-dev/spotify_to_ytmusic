@@ -178,4 +178,7 @@ function goalShow() {
   e.hidden = false;
 }
 document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; }, true);   // never blocks: any tap outside the card (or Start) closes it and still acts
-document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = !UI.prefs.hints; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = hintsOn() ? 0 : 1; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });
+
+// G5: the acorn counter is a button (touch has no hover title): one line on what acorns do
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#acornCt'); if (!b || !G) return; sfx('tap'); var e = $('#toast'); e.textContent = 'Acorns: 1 point each at the end. Before you pick, spend one to take any tile with any animal, or to replace market animals.'; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, 4200); });
