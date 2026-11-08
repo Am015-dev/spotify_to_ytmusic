@@ -10,7 +10,7 @@ const L=(ref,n,x,o)=>Object.assign({ref,d:'tr',t:'level',n,x:x||'Go up a level. 
 const CARDS=[
 // ---- classes and races (generic fantasy archetypes keep their plain names) ----
 {ref:'dk-warrior',k:'warrior',d:'door',t:'class',cls:'warrior',n:'Warrior',art:'warrior',cp:3,x:'Berserk: in a fight, discard up to 3 cards, +1 each. You win ties.'},
-{ref:'dk-wizard',k:'wizard',d:'door',t:'class',cls:'wizard',n:'Wizard',art:'wizard',cp:3,x:'Flight: discard up to 3 cards, +1 each to run away. Charm: discard your whole hand to send one lone monster away and take its treasure (no level).'},
+{ref:'dk-wizard',k:'wizard',d:'door',t:'class',cls:'wizard',n:'Wizard',art:'wizard',cp:3,x:'Flight: discard up to 3 cards, +1 each to run away. Charm: discard your whole hand (3+ cards) to send one monster away and take its treasure (no level).'},
 {ref:'dk-thief',k:'thief',d:'door',t:'class',cls:'thief',n:'Thief',art:'thief',cp:3,x:'Backstab: discard a card to give a fighter -2 (once per victim per fight). Steal: discard a card to try for a small item: roll 4+, or lose a level.'},
 {ref:'dk-cleric',k:'cleric',d:'door',t:'class',cls:'cleric',n:'Cleric',art:'cleric',cp:3,x:'Resurrection: instead of kicking a new door, take the top door discard and discard a card. Turning: discard up to 3 cards against undead, +3 each.'},
 {ref:'dk-elf',k:'elf',d:'door',t:'race',race:'elf',n:'Elf',art:'elf',cp:3,x:'+1 to run away. Go up a level for each monster you help someone kill.'},
