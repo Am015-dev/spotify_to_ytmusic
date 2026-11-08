@@ -4,7 +4,7 @@ const V3={on:false,t:0,tiles:{},pawns:{},parts:[],tweens:[],fx:[],weather:{rain:
   q:'high',pref:'auto',busy:true,U:{time:{value:0},wind:{value:.35}},mist:{}};
 const HEXR=2.05,HEXH=.55,HR0=HEXR*.955,HAP=HR0*Math.sqrt(3)/2,TOPY=HEXH/2;
 // ---------- graphics quality: High (bloom + grade, 2k soft shadows), Medium (1k shadows, no post), Low (no shadows, no post, lighter water and mist) ----------
-const GFX={high:{pr:2,sh:2048,post:true,mist:3,rain:2400,nm:'High'},med:{pr:1.5,sh:1024,post:false,mist:2,rain:1600,nm:'Medium'},low:{pr:1,sh:0,post:false,lite:true,mist:1,rain:800,nm:'Low'}};
+const GFX={high:{pr:2,sh:2048,post:true,mist:3,rain:2400,nm:'High'},med:{pr:2,sh:1024,post:false,mist:2,rain:1600,nm:'Medium'},low:{pr:1.5,sh:0,post:false,lite:true,mist:1,rain:800,nm:'Low'}};
 const GFXQ=['high','med','low'];
 function gfxAuto(){let small=false;try{small=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return small?'med':'high'}
 function gfxPref(){try{const v=localStorage.getItem('swi_gfx');return GFX[v]?v:'auto'}catch(e){return 'auto'}}
@@ -599,9 +599,9 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   // day, storm and night light; the moon takes the sun's place at night
   const sky=V3.skyM.uniforms;sky.uStorm.value=S;V3.veil.visible=S>.03&&V3.q!=='low';V3.veil.position.set(V3.look.x,Math.min(9,V3.orbit.d*.45),V3.look.z);sky.uNight.value=N;sky.uFlash.value=fl;V3.sky.position.copy(V3.cam.position);
   const c=V3.center||V3.look;const sd=new THREE.Vector3(-.62,.62,.47).normalize(),md=new THREE.Vector3(.45,.72,-.55).normalize();const ld=sd.clone().lerp(md,N).normalize();V3.sun.position.copy(c).addScaledVector(ld,40);
-  V3.sun.color.setRGB(1-.25*S-.45*N,.88-.18*S-.28*N,.72-.08*S+.25*N);V3.sun.intensity=(2.7-S*1.9)*(1-N*.78);
-  V3.hemi.intensity=(V3.hemiBase||.62)*(1-N*.6-S*.35)+(V3.q==='low'?fl*1.6:0);V3.hemi.color.setRGB(.8-.5*N,.86-.45*N,.94-.25*N);V3.hemi.groundColor.setRGB(.36-.28*N,.3-.22*N,.22-.12*N);V3.rim.intensity=.9-S*.3-N*.4;
-  V3.boltL.intensity=fl*3.2;V3.r.toneMappingExposure=.92-N*.14-S*.1;
+  V3.sun.color.setRGB(1-.25*S-.45*N,.88-.18*S-.28*N,.72-.08*S+.25*N);V3.sun.intensity=(2.7-S*1.9)*(1-N*.5);
+  V3.hemi.intensity=(V3.hemiBase||.62)*(1-N*.3-S*.3)+(V3.q==='low'?fl*1.6:0);V3.hemi.color.setRGB(.8-.35*N,.86-.3*N,.94-.15*N);V3.hemi.groundColor.setRGB(.36-.18*N,.3-.14*N,.22-.08*N);V3.rim.intensity=.9-S*.3-N*.4;
+  V3.boltL.intensity=fl*3.2;V3.r.toneMappingExposure=.92-N*.04-S*.08;
   const fogC=new THREE.Color().setRGB(.55-.3*S-.5*N,.6-.32*S-.53*N,.62-.3*S-.5*N);V3.scene.fog.color.copy(fogC);sky.uFog.value.copy(fogC);
   const sw=V3.seaM.uniforms;sw.uAmp.value=.16+S*.34;sw.uStorm.value=S;sw.uNight.value=N;sw.uFlash.value=fl;sw.uSunD.value.copy(ld);sw.uSunC.value.copy(V3.sun.color).multiplyScalar(V3.sun.intensity*.5);sw.uSky.value.setRGB(.42-.22*S-.38*N,.5-.26*S-.44*N,.56-.26*S-.44*N);sw.uFogC.value.copy(fogC);sw.uFogN.value=V3.scene.fog.near;sw.uFogF.value=V3.scene.fog.far;
   // the mist: fades off explored tiles, thins under the pointer on a tile you can explore, and glows faintly with lightning
