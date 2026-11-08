@@ -195,7 +195,9 @@ function marketEl(p, q) {
   const stalls = h('div.stalls');
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
+    const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
+    st.appendChild(h('div.sdo', bk ? bk.title : ''));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -208,6 +210,8 @@ function marketEl(p, q) {
   }
   if (p.rubies >= D.rubySpend && G.round < LASTD()) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
   wrap.appendChild(stalls);
+  { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
+    wrap.appendChild(h('div.sinfo', bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];

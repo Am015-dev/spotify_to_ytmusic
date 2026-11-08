@@ -209,3 +209,16 @@ html:not(.ph) #goalcard .gck{font-size:16px}
 }
 #goalcard .gck,#goalcard h3{padding:0 8px}#goalcard ul{padding-left:28px;padding-right:8px}
 html.ph{--gx-bar-h:48px}html.ph .gx-bar{height:48px;min-height:48px;overflow:visible}html.ph .gx-bar .gx-ibtn{box-sizing:border-box;height:44px;min-height:44px}
+/* G6 fix: shop stalls say what each chip does; prices sit inside their own chip column and never overlap */
+.stall .sdo{flex:none;min-height:15px;font-size:13px;line-height:1.1;color:#ffe9a8;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.85);margin:-2px 0 1px}
+.mkt .sinfo{font-size:14px;line-height:1.25;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:4px 8px;max-height:3.9em;overflow:auto}
+.mkt .sinfo b{color:#ffe9a8}
+.tokw{overflow:visible}.tok .pc{max-width:100%;box-sizing:border-box;white-space:nowrap;padding:0 3px;gap:1px}
+.tok .pc svg{width:13px!important;height:13px!important;flex:none}
+/* G6 fix: on phones the instruction bar floats just above the panel; the cauldron shrinks so the bar never covers the bottom ring */
+html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:border-box}
+#instr span{overflow-wrap:anywhere}
+.btn.confirm.busy{transform:translateY(2px) scale(.97);filter:brightness(.85);pointer-events:none}
+@media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:13px;max-height:2.6em;padding:2px 8px}}
+.tsegs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
+@media (max-height:500px){.tsegs .tseg+.tseg{display:none}}   /* short landscape: rival levels stay in More options */

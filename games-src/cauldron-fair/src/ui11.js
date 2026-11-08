@@ -116,7 +116,7 @@ function tutSteps() {
     { id: 'day2', target: tfirst('#fortchip', '#fort'), wait: null, ready: () => tbrew() && G.round === 2 && !!document.querySelector('#ratchip') },
     { id: 'rat', target: tq('#ratchip'), wait: null, ready: () => tbrew() && G.round === 2 && !!document.querySelector('#ratchip') },
     { id: 'd2draw', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && G.round === 2 && tp().pot.length === 0 },
-    { id: 'peek', target: tmove(m => m.t === 'crow' && m.idx === 0),
+    { id: 'peek', target: tmove(m => m.t === 'crow' && m.idx === 0), also: () => document.querySelector('#qbox'),   // the whole peek card stays clear of the bubble
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'crow' && a.m.idx === 0 }, ready: () => !!(tp() && tp().q && tp().q.h === 'crow') },
     { id: 'd2stop', target: tq('#acts .stopb:not(.off)'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'stop' }, wrong: 'Tap Stop.', ready: () => tbrew() && G.round === 2 && tp().pot.length === 2 },
