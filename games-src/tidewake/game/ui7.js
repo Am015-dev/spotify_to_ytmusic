@@ -46,12 +46,12 @@ function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+
 var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-stat"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${now>=0?dot(now)+' '+phWhose(now)+dangerHTML():'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
   if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-stat">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
-  if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
+  if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small>${dangerHTML()}</div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){let best='';try{const m=!hotSeat()||humans().length===1?aiMove(d,'hard'):null;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}">Safe start for me</button>`}catch(e){}
     return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
@@ -64,7 +64,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
-  return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
+  return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span>${dangerHTML()}</div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
 function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?phCrews():phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
@@ -73,7 +73,11 @@ function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)s
 function phRot(t){return (UI.rots&&UI.rots[t])||0}
 function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
 // whose turn it is, in plain words
-function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>"}
+// the danger warning: a leviathan one move from your bow square or your tile (it strikes only on a roll of 6, 7 or 8)
+function dangerMons(){const me=youSeat();if(me<0||hotSeat()||!G||G.phase!=='play'||UI.tut)return [];const S=G.ships[me];if(!S||!S.alive||S.x==null)return [];
+  const sq=[[S.x,S.y]];if(S.on)sq.push(S.on);return G.mons.filter(m=>m.k==='L'&&monHits(m,sq).length)}
+function dangerHTML(){const d=dangerMons();if(!d.length)return '';return `<span class="warn-l" data-danger="1"> &#9888; Danger: ${d.map(m=>esc(levName(m.id))).join(' and ')} can reach your junk if the dice show 6, 7 or 8.</span>`}
+function phWhose(i){const me=youSeat();return (i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>")}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
 function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
   if(risk)return '<b>!</b> A leviathan may reach you.';

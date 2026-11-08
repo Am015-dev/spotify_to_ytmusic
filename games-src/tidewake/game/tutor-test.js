@@ -12,7 +12,7 @@ const SHOTS=process.argv[3]||null;
 let fail=0;const bad=m=>{fail++;console.log('FAIL',m)};
 const words=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
 (async()=>{
-  const url=await gx.url('tidewake',{file:FILE,query:'?2d'});const b=await PW.chromium.launch();
+  const url=await gx.url('tidewake',{file:FILE,query:'?2d'});const b=await PW.chromium.launch(process.env.PW_EXE?{executablePath:process.env.PW_EXE}:{});
   for(const [W,H] of SIZES){const tag=W+'x'+H;const shoot=SHOTS&&W===SIZES[0][0]&&H===SIZES[0][1];if(shoot)fs.mkdirSync(SHOTS,{recursive:true});
     const c=await b.newContext({viewport:{width:W,height:H},hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];
     p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text())&&errs.push(m.text()));

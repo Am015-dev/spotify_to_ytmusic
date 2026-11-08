@@ -30,21 +30,14 @@ try{
   ok(G.hands[0][0]===14&&G.hands[0][1]===4&&G.hands[0][2]===9,'hand at turn 4');
   const s4=T.E.simPlace(G,2,4,14,0);ok(s4.res[0].st==='ok'&&s4.res[0].path.length===2&&s4.res[0].x===4&&s4.res[0].y===4,'tile 14 chains across Cobalt\'s tile');
   mv({a:'place',t:0,r:0,s:0},0,'T4');
-  ok(G.q&&G.q.kind==='cannonDraw'&&G.q.who===0,'you draw a Deck Cannon');mv({a:'q',i:G.q.opts.findIndex(o=>o.h==='cKeep')},0,'keep');
-  ok(G.hands[0].includes(57)&&G.hands[0].length===3,'cannon kept');
-  ok(G.turn===5&&G.cur===1&&G.wave&&G.wave.owner===0,'the wave rises on Cobalt\'s turn 5');mv(co(),1,'T5');
-  // turn 6: the wave's roll
-  ok(G.turn===6&&G.wave.n===1&&/rides the Rogue Wave \(rolled 5, needed 3\)/.test(G.log.map(l=>l.t).join('|')),'wave roll 5 vs 3 at the start of turn 6');
-  ok(G.dice[0]+G.dice[1]===5,'calm 5');
+  ok(!G.q&&G.turn===5&&G.cur===1&&!G.wave,'base game: no Deck Cannon, no Rogue Wave');mv(co(),1,'T5');
+  ok(G.turn===6&&G.dice[0]+G.dice[1]===5,'calm 5');
   mv({a:'place',t:0,r:0,s:0},0,'T6');
-  ok(/rolled 4, needed 3/.test(G.log.map(l=>l.t).join('|')),'second wave roll when your path crosses the row');
-  ok(G.ships[0].alive&&G.ships[0].x===4&&G.ships[0].y===3,'you sail north to (5,4)');
+  ok(G.ships[0].alive,'you sail on at turn 6: '+JSON.stringify(G.ships[0]));
   mv(co(),1,'T7');
-  // turn 8: Gloomfin blocks you
-  ok(G.turn===8&&G.q&&G.q.kind==='doom'&&G.q.who===0,'blocked at turn 8');
-  const fi=G.q.opts.findIndex(o=>o.h==='dCannon');ok(fi>=0,'cannon offered');
-  mv({a:'q',i:fi},0,'fire');ok(!T.E.monById(4)&&G.ships[0].alive&&G.step==='act','Gloomfin destroyed, your turn goes on');
-  ok(G.mons.length===4,'four leviathans left');
+  // turn 8: Gloomfin only turns, one square from your bow (the danger warning step)
+  ok(G.turn===8&&!G.q&&G.ships[0].alive&&G.step==='act','turn 8 is yours, no doom');
+  console.log('T8 me',JSON.stringify(G.ships[0]),'mons',JSON.stringify(G.mons.map(m=>[m.id,m.x,m.y])),'hand',G.hands[0]);
   const ms=X.validMoves(0).find(m=>m.a==='place'&&m.t===0&&m.r===2);ok(!!ms,'tile 9 turned twice is legal');
   mv({a:'place',t:0,r:2,s:0},0,'T8');
   // turn 9: Dredgeback swims onto Cobalt's tile

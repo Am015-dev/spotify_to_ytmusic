@@ -63,6 +63,7 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   const nT=hand.length;
   UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'drag one onto your junk, or turn it and Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
   let h=`<div class="prompt"><h4>${multi?esc(nm(d))+': lay a current':'Your turn: lay a current'}</h4>${fr}`;
+  {const dh=typeof dangerHTML==='function'?dangerHTML():'';if(dh)h+=`<p style="margin:4px 0">${dh}</p>`}
   if(outcome)h+=`<p style="margin:6px 0 4px">${outcome}</p>`;if(thr)h+=`<p style="margin:2px 0">${thr}</p>`;
   if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. You may not sink yourself while a safe move exists. Tap the bulb for the safest move.</p>`;
   const cm={};for(const c of cns){const k=c.m+':'+c.s;if(!cm[k])cm[k]=c}const nc=hand.filter(isCannon).length;

@@ -34,9 +34,9 @@ async function drive(p,name,maxMs){const t0=Date.now();let idle=0,last='';const 
   bad(name+': timeout '+JSON.stringify(seen));return {ok:false,seen}}
 (async()=>{
   const url=await gx.url('tidewake',{file:FILE,query:'?2d'});
-  const b=await PW.chromium.launch();
+  const b=await PW.chromium.launch(process.env.PW_EXE?{executablePath:process.env.PW_EXE}:{});
   for(const mode of ['quick','story']){
-    const c=await b.newContext({viewport:{width:390,height:763},hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
+    const c=await b.newContext({viewport:{width:+(process.env.VW||390),height:+(process.env.VH||763)},hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
     await p.goto(url);await p.waitForTimeout(1500);
     try{await p.evaluate(()=>{localStorage.setItem('tw_played','1');localStorage.setItem('tw_offered','1');localStorage.setItem('gxt-tidewake','{"done":1}')});await p.reload();await p.waitForTimeout(1500)}catch(e){}
     if(mode==='quick'){const pl=p.getByText('Quick game: you vs 2 computers');await pl.tap();await p.waitForTimeout(800)}
