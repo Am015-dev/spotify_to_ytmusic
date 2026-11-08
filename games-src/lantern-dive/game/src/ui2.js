@@ -27,7 +27,7 @@ function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
   if (G && UI.started) {
     bs.append(h('span', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att)));
-    if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
+    if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'The flare is lit' }));
     if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
   }
   placePrompt();
@@ -54,7 +54,7 @@ function jobChip(i, o) {
 // ---- the divers (and the drone) ----
 function pingTok(s, size) {
   const p = G.players[s]; if (p.helper) return null;
-  if (G.comm === 'none') return h('span.tok', { html: KIT.pingSVG({ size, spent: true }), title: 'No signalling in this dive' });
+  if (G.comm === 'none') return h('span.tok', { html: KIT.pingSVG({ size, spent: true }), title: 'No signals in this dive' });
   if (G.comm === 'narc') return null;
   return h('span.tok', { html: KIT.pingSVG({ size, spent: !!p.pingUsed }), title: p.pingUsed ? 'Ping used' : 'Ping ready' });
 }
@@ -257,7 +257,7 @@ function pingSpots(v) {
 }
 function renderHand(v) {
   const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
-  if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? '' : (watching() ? 'Watching the divers.' : 'Take the device.'))); return; }
+  if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? '' : (watching() ? 'Watching the other divers.' : 'Take the device.'))); return; }
   const hand = G.players[v].hand; if (!hand.length) { box.append(h('div.handnote', '')); return; }
   const legal = legalCards(v), pinged = new Set(G.pings.filter(p => p.seat === v && !G.pl[p.c]).map(p => p.c)); const pk = new Map(G.pings.filter(p => p.seat === v).map(p => [p.c, p.k]));
   const spots = pingSpots(v);
@@ -302,16 +302,16 @@ function actModel(v) {
   switch (ph) {
     case 'assign': {
       const A = G.as;
-      if (A.mode === 'vote') { M.cls = must && mv.length ? 'mine' : ''; M.p = must && mv.length ? 'Tap who takes every job.' : 'Waiting for the votes…'; return M; }
-      if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' decides…' : ' is choosing…') : 'Handing out the jobs…'; return M; }
+      if (A.mode === 'vote') { M.cls = must && mv.length ? 'mine' : ''; M.p = must && mv.length ? 'Tap who takes every job.' : 'Waiting for votes…'; return M; }
+      if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' decides…' : ' is choosing…') : 'Handing out jobs…'; return M; }
       M.cls = 'mine';
       if (A.mode === 'cmd') {
-        if (A.stage === 'keep') { M.p = 'Keep every job, or offer?'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them', 'offer'); }
+        if (A.stage === 'keep') { M.p = 'Keep every job, or offer them?'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them', 'offer'); }
         else { M.p = 'Take every job?'; btn('Yes', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
         return M;
       }
       if (A.mode === 'vol') { M.p = A.need === 1 ? 'Take every job? Yes or no.' : 'Volunteer with a partner?'; btn('Yes', 'yes', { cls: 'go' }); if (mv.some(m => m.t === 'no')) btn('No', 'no', { cls: 'alt' }); return M; }
-      if (A.mode === 'free') M.p = 'Take your jobs, then Done.';
+      if (A.mode === 'free') M.p = 'Take your jobs, then tap Done.';
       else if (A.mode === 'hardfirst') M.p = 'Take the hardest job first.';
       else if (A.mode === 'split') M.p = 'Share the jobs fairly.';
       else M.p = G.players[act] && G.players[act].helper ? 'Tap a job for the drone.' : 'Tap a job to take it.';
@@ -320,7 +320,7 @@ function actModel(v) {
       return M;
     }
     case 'distress': {
-      if (!must) { M.p = who === 'You' ? 'Decide about the flare…' : who + ' decides on the flare…'; return M; }
+      if (!must) { M.p = who === 'You' ? 'Use the flare?' : who + ' decides on the flare…'; return M; }
       M.cls = 'mine'; const lit = G.distress;
       M.p = lit ? 'Pass cards again?' : 'Light the distress flare?';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });

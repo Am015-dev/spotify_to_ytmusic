@@ -77,7 +77,7 @@ function tutSkipBtn() {
 }
 function tutBubble(t) {
   tutHideBub(); const e = document.createElement('div'); e.id = 'tbub'; e.setAttribute('role', 'status'); e.setAttribute('aria-live', 'polite'); e.dataset.tip = t.id; e.className = t.good ? 'good' : t.poor ? 'poor' : '';
-  e.innerHTML = '<span class="tg" aria-hidden="true">Brack</span><span class="tx"></span><button type="button" class="tx2" aria-label="Dismiss">×</button>';
+  e.innerHTML = '<span class="tg" aria-hidden="true"><img class="tgp" src="media/camp-brack.webp" alt="" width="40" height="40"><br>Brack</span><span class="tx"></span><button type="button" class="tx2" aria-label="Dismiss">×</button>';
   e.querySelector('.tx').textContent = t.text; e.querySelector('.tx2').addEventListener('click', ev => { ev.stopPropagation(); tutHideBub(); });
   document.body.appendChild(e); t.ms = readMs(t.text); UI.tc.cur = t; UI.tc.at = Date.now(); tutPlaceBub();
 }
