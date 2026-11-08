@@ -57,3 +57,11 @@ html.sk .gx-drawer{background-color:#e9d7a8}
 #setbody .mrow>button.btn>span{background:#f6ecd2;color:#2a1808;padding:0 6px;border-radius:4px}
 #setbody p.small{background:#2a1838;color:#f6ecd2;padding:6px 8px;border-radius:6px}
 .rules .quick p{background:#2a1838;color:#f6ecd2;padding:6px 8px;border-radius:6px}
+/* phone text floor (owner, 8 Nov 2026: no text under 14px on a phone) */
+@media (max-width:700px){
+  .st-c,.kn,.gxc-lab,.rv-s,#rivals b,#rivals small,#start .tbtn span,.gxt-menu span,.mrow small,.tac small,small,.sbtn span,#start button span,#start button b,#pc button span,#ppop button span,#act .btn b,#act .btn span,#act .btn small{font-size:14px!important}
+}
+/* the round badge: the number sits clear of the ROUND label */
+#mapbox text[font-size="46"]{transform:translateY(7px)}
+.pp-note{font-size:.9rem;opacity:.85;margin:6px 0}
+@media (max-height:620px) and (max-width:700px){.kcb .kn{line-height:.95!important}.kcb{gap:0!important}}

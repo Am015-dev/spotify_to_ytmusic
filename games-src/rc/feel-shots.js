@@ -5,7 +5,7 @@ const [W,H]=(process.argv[2]||'390x844').split('x').map(Number);const OUT=path.j
 const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{const br=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ph=W<600;const ctx=await br.newContext({viewport:{width:W,height:H},isMobile:ph,hasTouch:true});
- await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host==='swi.test'){if(u.pathname==='/'||u.pathname.endsWith('.html'))return r.fulfill({status:200,contentType:'text/html',body:html});const f=path.join(__dirname,decodeURIComponent(u.pathname));return fs.existsSync(f)?r.fulfill({path:f}):r.fulfill({status:404,body:''})}return r.abort()});
+ await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host==='swi.test'){if(u.pathname==='/'||u.pathname.endsWith('.html'))return r.fulfill({status:200,contentType:'text/html',body:html});const rel=decodeURIComponent(u.pathname);let f=path.join(__dirname,rel);if(!fs.existsSync(f))f=path.join(__dirname,'..','..','games','shipwreck-isle',rel);return fs.existsSync(f)?r.fulfill({path:f}):r.fulfill({status:404,body:''})}return r.abort()});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
  await p.goto('https://swi.test/');await sleep(800);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(2500);
  const cdp=await ctx.newCDPSession(p);const shot=async n=>{const r=await cdp.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(OUT,n+'-'+W+'.png'),Buffer.from(r.data,'base64'));console.log('shot',n)};

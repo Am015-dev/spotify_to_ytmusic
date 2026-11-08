@@ -67,7 +67,7 @@ function showGoal() {   /* one card before turn 1: how you win in one sentence, 
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
   g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
-    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with points. Dread cards cost 1.</span></li></ul>
+    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Dread cards cost 1.</span></li></ul>
     <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
@@ -99,7 +99,7 @@ function showResult() {
   const tied = P.length > 1 && P[1].sc.total === P[0].sc.total, tb = tied && G.winner !== -1 ? `Tie on ${P[0].sc.total}. ${G.winner === me ? 'You win' : short(G.winner) + ' wins'} the tiebreak.` : '';
   const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : tied && myT === P[0].sc.total ? 'Close loss' : 'Defeat';
   const sub = def && !cWon ? (G.winner === 0 ? 'You won, but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again.'
-    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} points.` : myT < best ? `${esc(wn)} You were ${best - myT} points short.` : esc(wn)) : esc(wn);
+    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
   const blk = (x, k) => `<div class="rp${k === 0 ? ' first' : ''}"><div class="rph"><span class="crest" style="--pc:${x.i >= 0 ? HEX[x.i] : '#9a9486'}"></span><span class="rpn">${esc(x.name)}</span><span class="rpt"><b data-n="${x.sc.total}">${x.sc.total}</b> points</span></div>
     <div class="rcats">${CATS.filter(c => x.sc[c[0]]).map(c => `<span class="rcat${x.sc[c[0]] < 0 ? ' neg' : ''}">${ic(c[1], c[2])}<b data-n="${x.sc[c[0]]}">${x.sc[c[0]]}</b><small>${c[2]}</small></span>`).join('') || '<span class="rcat"><small>No points yet</small></span>'}</div></div>`;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')

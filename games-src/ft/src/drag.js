@@ -10,11 +10,11 @@ document.addEventListener('pointerdown',e=>{
   if(e.button>0||!G||G.over||UI.modal||UI.chz||!me()||G.phase!=='turn'||G.step!=='move'||(G.q))return;
   const t=e.target.closest&&e.target.closest('#grid [data-tile]');if(!t)return;const i=+t.dataset.tile;
   const ok=G.move?G.move.at===i:UI.pick.includes(i);if(!ok)return;
-  try{document.documentElement.setPointerCapture(e.pointerId)}catch(x){}   // the grid is redrawn on lift: keep the events
   DRG.pid=e.pointerId;DRG.on=true;DRG.from=i;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.moved=false;DRG.over=-1},true);
 document.addEventListener('pointermove',e=>{
   if(!DRG.on)return;
-  if(!DRG.moved){if(Math.hypot(e.clientX-DRG.x0,e.clientY-DRG.y0)<10)return;DRG.moved=true;document.documentElement.classList.add('dragging');
+  if(!DRG.moved){if(Math.hypot(e.clientX-DRG.x0,e.clientY-DRG.y0)<10)return;DRG.moved=true;try{document.documentElement.setPointerCapture(e.pointerId)}catch(x){}   // only now (the grid is redrawn on lift); a plain click never captures
+    document.documentElement.classList.add('dragging');
     if(!G.move){onTile(DRG.from)}      // lift everyone: the glowing tiles are now the first drops
     if(!G.move){drgClear();return}}
   const g=drgGhost();g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';

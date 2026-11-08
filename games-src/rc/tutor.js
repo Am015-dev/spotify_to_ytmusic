@@ -34,7 +34,8 @@ const ccard=k=>{try{return CARD[k].n}catch(e){return 'the card'}};
 const cwx=()=>{try{return (viewState()||G).lastWx||{}}catch(e){return {}}};
 // kind: 'rule' (first time it matters), 'move' (a good or poor choice, one line why), 'rival' (what the island just did to us)
 const COACH_RULES=[
- {id:'goal',when:()=>cplan()&&G.round===1,say:"Our ship is gone. Build a fire and stack 15 wood. A ship will see it by day 12. Pick a pawn, then a glowing place."},
+ {id:'goal',when:()=>!!G&&G.round===1,say:"Our ship is gone. Build a fire and stack 15 wood by day 12. A ship will see it."},
+ {id:'pick',when:()=>cplan()&&G.round===1&&!!COACH.done.goal,say:"Pick a pawn, then a glowing place. ✨ shows a good plan."},
  {id:'pawns',when:()=>cplan()&&G.round===1&&G.plan.acts.some(a=>a.pw.length),say:"Each pawn does one job. I cook and heal, the Carpenter builds, Friday helps."},
  {id:'dice',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length===1&&actNeed(a).roll),say:"One pawn alone rolls dice and can fail or get hurt. A second pawn makes it sure."},
  {id:'sure',kind:'move',when:()=>cplan()&&!!G.plan.acts.find(a=>a.pw.length>=2),say:"Good move: two pawns, no dice. A sure thing."},
@@ -48,7 +49,7 @@ const COACH_RULES=[
  {id:'prod',when:()=>{const b=cbeat();return b&&b.kind==='prod'},say:"Each morning the camp's sources give 1 food or 1 wood."},
  {id:'event',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='event'},say:()=>{const b=cbeat();return 'The island moves: “'+ccard(b&&b.data&&b.data.card)+'”. Its effect happens now, then it waits as a threat.'}},
  {id:'threat',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='threat'||cplan()&&G.ev&&G.ev.threat&&G.ev.threat.some(Boolean)},say:"A threat sits at camp. Deal with it in time, or the card strikes."},
- {id:'morning',when:()=>{const b=cbeat();return b&&b.kind==='morning'},say:"Morale moves our determination each morning. Low morale costs wounds."},
+ {id:'morning',when:()=>{const b=cbeat();return !!COACH.done.goal&&b&&b.kind==='morning'},say:"Morale moves our determination each morning. Low morale costs wounds."},
  {id:'found',when:()=>{const b=cbeat();return b&&b.kind==='finds'},say:"The day's haul reaches camp. New land is now ours to use."},
  {id:'fight',when:()=>{const b=cbeat();return b&&(b.kind==='fight'||b.kind==='adventure'||b.kind==='mystery')},say:"Adventures, mysteries and beasts are risky: weapons and dice decide."},
  {id:'weather',kind:'rival',when:()=>{const b=cbeat();return b&&b.kind==='weather'},say:()=>{const w=cwx(),n=(w.rain||0)+(w.snow||0);return (n?'The weather brings '+n+' cloud'+(n>1?'s':'')+'. ':'The sky is calm. ')+'Clouds above our roof (level '+G.camp.roof+') ruin 1 food and 1 wood each.'}},
@@ -76,7 +77,8 @@ function coachFinal(){COACH.finished=true;const over=!!G.over,w=!!(G.over&&G.ove
   const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
   const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
   const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
-  e.innerHTML='<b class="cn">Cook: '+(over?(w?'rescued!':'we did not make it'):'you have the hang of it')+'</b><span class="ct">'+(over?'Here is how it scored, rule by rule:':'Here is how the goal stands, rule by rule:')+'</span><ul class="walk">'+walk.map(x=>'<li><b>'+x[0]+':</b> '+x[1]+'</li>').join('')+'</ul><span class="ct">Things you’ll meet later:</span><ul>'+COACH_LATER.map(x=>'<li><b>'+x[0]+'.</b> '+x[1]+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';
+  const lines=[fire?'Fire: lit ✓':'Fire: not lit',`Wood pile: ${pile} of 15`,`Alive: ${alive} of ${tot}`];
+  e.innerHTML='<b class="cn">'+(over?(w?'Rescued!':'We did not make it.'):'You have the hang of it.')+'</b><ul class="walk">'+lines.map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';document.body.classList.add('coachfin');
   coachMark({done:1,open:0,step:0})}
 function coachFinish(k){if(k==='keep'){coachStop();try{delete G.tut;delete G.coach;refresh()}catch(e){}return}coachStop();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   if(k==='skip')coachMark({skipped:1,open:0});
@@ -95,7 +97,7 @@ function coachTick(){try{
   if(COACH.cur)return;
   for(const r of COACH_RULES){if(COACH.done[r.id])continue;let ok=false;try{ok=!!r.when()}catch(e){}if(ok){COACH.done[r.id]=1;let t=r.say;try{if(typeof t==='function')t=t()}catch(e){t=''}if(t){coachShow(r.id,t,r.kind);return}}}
  }catch(e){console.error(e)}}
-function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();const k=document.getElementById('coachskip');if(k)k.remove()}
+function coachStop(){clearInterval(COACH.timer);COACH.timer=0;coachHide();document.body.classList.remove('coachfin');const k=document.getElementById('coachskip');if(k)k.remove()}
 function coachStart(){COACH.finished=false;COACH.done={};COACH.cur=null;COACH.later=0;COACH.forced={};tutBegin();G.coach=1;coachMark({open:1,done:0,skipped:0});coachSkipEl();clearInterval(COACH.timer);COACH.timer=setInterval(coachTick,600);coachTick()}
 window.COACHX={rules:COACH_RULES.map(r=>r.id),done:()=>Object.keys(COACH.done),state:COACH};
 
