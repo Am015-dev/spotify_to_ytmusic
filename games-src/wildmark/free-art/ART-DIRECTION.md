@@ -28,3 +28,4 @@ animals = ANI_COL (bear #7a4e2d, elk #c08a4a, salmon #d8576b, hawk #4f6fa3, fox 
 
 **Why:** the owner rejected glyph-on-gradient art. Kenney's flat vector family covers hex terrain, animals, people and frames in
 one consistent hand, reads at 120 px, and is CC0. Rebuild: `PACKS=<dir> python3 compose.py` (see the header of compose.py).
+- Round 3b (W416b): ter-peak calmed after the render (3x3-wrapped blur 1.2, contrast 0.55, colour 0.8, brightness 1.06); repeat that grade if the peak is re-rendered.
