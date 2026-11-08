@@ -1,4 +1,13 @@
-# Wildmark art direction (free kit, round 2)
+# Wildmark art direction (free kit, round 3: 3D terrain + plates)
+
+**Round 3 (replaces ter-*, tok-*, card-*, table-bg; the rest below still applies):** terrain is a 3D render (three.js, KayKit Medieval Hexagon
+Pack glTF, CC0): oblique orthographic, warm sun, soft shadows, seamless 4x6 hex lattice with trees, mountains, hills, reeds, lilies.
+Animals are public-domain 19th-century natural-history plates (Audubon elk, fox, bear, hawk; a period fish plate for salmon), cropped and
+put through one parchment grade. Tokens: round portrait on a cream disc with a thin animal-colour rim. Cards: same layout as before (picture
+window, colour band, free cream area); the plates sit as pinned paper cards on the terrain render. Table: procedural walnut planks, low contrast.
+Rebuild: `render/README.md`. Sources: `CREDITS.md`.
+
+# (round 2, kept for the files compose.py still makes)
 
 **Style:** one family only, Kenney flat vector (CC0): soft flat colour, no outlines, rounded shapes, gentle top-light.
 Everything is rendered from the packs' own **vector** files at 4-7x (Chromium, bevel filters stripped), then downsampled,
@@ -19,3 +28,4 @@ animals = ANI_COL (bear #7a4e2d, elk #c08a4a, salmon #d8576b, hawk #4f6fa3, fox 
 
 **Why:** the owner rejected glyph-on-gradient art. Kenney's flat vector family covers hex terrain, animals, people and frames in
 one consistent hand, reads at 120 px, and is CC0. Rebuild: `PACKS=<dir> python3 compose.py` (see the header of compose.py).
+- Round 3b (W416b): ter-peak calmed after the render (3x3-wrapped blur 1.2, contrast 0.55, colour 0.8, brightness 1.06); repeat that grade if the peak is re-rendered.

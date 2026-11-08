@@ -37,7 +37,7 @@ let fails = 0, RANDOM = false; const ok = (c, m) => { if (!c) { fails++; console
   async function playToEnd(label) { let n = 0, shotR = false; while (n++ < 120) { if (!(await humanTurn())) break; if (!shotR && n === 2) { shotR = true; } } ok(n < 120, label + ': game did not end'); }
   await pg.goto(URL); await pg.waitForTimeout(800);
   if (MODE === 'tut') { // coached first game: free play from turn 1, any legal move chosen through the UI, Aunt Wren must explain every rule
-    await tap('#start [data-gxt-open]', 'Tutorial button'); await pg.waitForTimeout(900);
+    await tap('#start [data-a=start]', 'Learn: your first game'); await pg.waitForTimeout(900);
     ok(await pg.evaluate(() => !!G && !G.over && !!UI.coach && !(typeof GXT !== 'undefined' && GXT.active())), 'tutorial is a real game with the coach, no forced steps');
     ok(await pg.evaluate(() => !document.querySelector('#guide').hidden && document.querySelectorAll('#offers .offer.can').length > 0), 'Aunt Wren speaks and the legal patches glow on turn 1');
     await pg.screenshot({ path: path.join(OUT, tag + '-turn1.png') }); RANDOM = true; let shotG = 0;

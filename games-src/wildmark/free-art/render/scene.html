@@ -1,0 +1,63 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#000">
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const loader = new GLTFLoader(); const cache = {};
+const load = n => cache[n] ||= new Promise((res, rej) => loader.load('pack/' + n + '.gltf', g => res(g.scene), undefined, rej));
+const rnd = (s => () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+// spec: {tint:[r,g,b], base:'tiles/base/hex_grass', props:[[name,prob,scale,yoff]...], period:2, seed, rim}
+window.probe = async n => { const o = await load(n); const b = new THREE.Box3().setFromObject(o); return [b.min.toArray(), b.max.toArray()]; };
+window.renderTerrain = async (spec, px) => {
+  const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  R.setSize(px, px); R.setPixelRatio(1); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+  R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = spec.exposure || 1.05;
+  document.body.appendChild(R.domElement);
+  const sc = new THREE.Scene();
+  const bb = await window.probe('tiles/base/hex_grass');
+  const W = bb[1][0] - bb[0][0], D = bb[1][2] - bb[0][2];          // footprint of one tile
+  const pointy = W < D;                                               // pointy-top has x extent < z extent
+  // lattice: rectangular period contains 2 tiles (one per row pair). cols step = across-flats, row step = 0.75*point-to-point
+  const flats = Math.min(W, D), pts = Math.max(W, D);
+  const sx = pointy ? flats : pts * 0.75, sz = pointy ? pts * 0.75 : flats;
+  const perX = pointy ? flats : pts * 1.5, perZ = pointy ? pts * 1.5 : flats;    // exact rectangular period
+  const KX = 4, KZ = 6;                                             // content period: 4 tiles across x 6 rows (24 tile slots)
+  const viewW = flats * KX, viewH = sz * KZ;                        // ground-plane period (pointy-top lattice)
+  const tilt = Math.acos(viewW / viewH);                            // oblique ortho angle that makes the image period exactly square
+  const cam = new THREE.OrthographicCamera(-viewW / 2, viewW / 2, viewW / 2, -viewW / 2, 0.1, 400);
+  cam.position.set(0, 100 * Math.cos(tilt), 100 * Math.sin(tilt)); cam.lookAt(0, 0, 0);
+  // slight tilt for 3D feel: tilt camera ~ 12 deg toward south using a shear-free move (keeps orthographic seamlessness only if scene periodic -> we stay top-down)
+  const hemi = new THREE.HemisphereLight(0xfff1dc, 0x6b5a46, spec.hemi ?? 1.0); sc.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffe2b8, spec.sun ?? 2.6); sun.position.set(-18, 30, 14); sc.add(sun);
+  sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; sun.shadow.radius = 4;
+  const ext = Math.max(viewW, viewH) * 1.1; Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 1, far: 120 }); sun.shadow.camera.updateProjectionMatrix();
+  const tint = new THREE.Color(...(spec.tint || [1, 1, 1]));
+  const prep = (o, isBase) => { o = o.clone(true); o.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; m.material = m.material.clone(); if (isBase) { const bc = spec.baseColors && spec.baseColors[isBase]; if (bc) { m.material.map = null; m.material.color.set(bc); } else m.material.color.multiply(tint); } } }); return o; };
+  const r = rnd(spec.seed || 1);
+  // periodic content: decide props per (i mod P, j mod Q) cell so the whole scene is translation periodic
+    const cellProps = {};
+  const rows = 16, cols = 16;
+  const jobs = [];
+  for (let j = -rows; j <= rows; j++) for (let i = -cols; i <= cols; i++) {
+    // axial-ish offset layout
+    let x, z;
+    if (pointy) { x = i * flats + (((j % 2) + 2) % 2) * flats / 2; z = j * sz; }
+    else { z = j * flats + (((i % 2) + 2) % 2) * flats / 2; x = i * sx; }
+    if (Math.abs(x) > viewW / 2 + pts * 1.6 || Math.abs(z) > viewH / 2 + pts * 2.2) continue;
+    const ci = ((i % KX) + KX) % KX, cj = ((j % KZ) + KZ) % KZ;
+    // pattern repeats every 2 tiles in each axis => equals the rectangular period for both orientations
+    const key = ci + ',' + cj;
+    if (!cellProps[key]) { const L = []; if (spec.pick) { const tot = spec.pick.reduce((a, p) => a + p[1], 0); let t = r() * tot, ch = spec.pick[0]; for (const p of spec.pick) { if ((t -= p[1]) < 0) { ch = p; break; } } if (ch[0]) L.push({ n: ch[0], s: ch[2] || 1, rot: Math.floor(r() * 6) * Math.PI / 3, dx: 0, dz: 0, y: ch[3] || 0 }); } for (const p of (spec.props || [])) if (r() < p[1]) L.push({ n: p[0], s: p[2] * (0.9 + r() * 0.25), rot: Math.floor(r() * 6) * Math.PI / 3, dx: (r() - .5) * (p[4] || 0), dz: (r() - .5) * (p[4] || 0), y: p[3] || 0 }); const bases = spec.bases; cellProps[key] = { L, base: bases[Math.floor(r() * bases.length)], rb: Math.floor(r() * 6) * Math.PI / 3 }; }
+    jobs.push([x, z, cellProps[key]]);
+  }
+  for (const [x, z, c] of jobs) {
+    const b = prep(await load(c.base), c.base); b.position.set(x, 0, z); b.rotation.y = c.rb; sc.add(b);
+    const top = spec.topY ?? 0;
+    for (const p of c.L) { const o = prep(await load(p.n)); o.position.set(x + p.dx, top + p.y, z + p.dz); o.scale.setScalar(p.s); o.rotation.y = p.rot; sc.add(o); }
+  }
+  if (spec.fog) { sc.background = new THREE.Color(spec.fog); }
+  R.render(sc, cam);
+  const url = R.domElement.toDataURL('image/png'); R.dispose(); R.domElement.remove(); return { url, view: [viewW, viewH], flats, pts, pointy, tilt };
+};
+window.ready = true;
+</script>

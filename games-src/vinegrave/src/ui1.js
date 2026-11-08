@@ -62,7 +62,9 @@ function render() {
   const actor = VG.actor(G);
   $('#barstat').textContent = G.phase === 'over' ? 'Game over' : (UI.camp ? 'Stage ' + UI.camp.id.slice(1) + ' · ' : '') + 'Round ' + G.round + '/' + G.rounds;
   // opponents strip
-  $('#opp').innerHTML = G.p.map((p, i) => `<button type="button" class="op${actor === i ? ' now' : ''}${p.passed ? ' passed' : ''}" data-gx="scored" aria-label="${esc(p.name)}: ${VG.score(G, i).total} points${p.passed ? ', passed' : ''}"><span class="dot" style="background:${HEX[i]}"></span><span>${esc(p.name)}</span><span class="vp">${VG.score(G, i).total}</span>${ic('star', 'points')}<span class="chip">${p.ex}<span class="ic" aria-label="explorers"><svg viewBox="0 0 20 28" style="color:${HEX[i]}"><use href="#s-meep"/></svg></span></span></button>`).join('')
+  const tots = G.p.map((p, i) => VG.score(G, i).total), topT = Math.max.apply(null, tots), lead = tots.filter(t => t === topT).length === 1 ? tots.indexOf(topT) : -1;
+  const brk = i => { const sc = VG.score(G, i), parts = [['Track', sc.research + sc.temple], ['Idols', sc.idols + sc.slots], ['Guard', sc.guards], ['Cards', sc.cards + sc.fear]].filter(x => x[1] || x[0] !== 'Guard'); return parts.map(x => x[0] + ' ' + x[1]).join(' · '); };
+  $('#opp').innerHTML = G.p.map((p, i) => `<button type="button" class="op${actor === i ? ' now' : ''}${p.passed ? ' passed' : ''}${lead === i ? ' lead' : ''}" data-gx="scored" aria-label="${esc(p.name)}: ${VG.score(G, i).total} points${lead === i ? ', leading' : ''}${p.passed ? ', passed' : ''}. ${brk(i)}"><span class="dot" style="background:${HEX[i]}"></span><span>${esc(p.name.split(' ')[0])}</span><span class="vp">${VG.score(G, i).total}</span>${ic('star', 'points')}${lead === i ? '<span class="ld">leads</span>' : ''}<small class="sb">${brk(i)}</small><span class="chip">${p.ex}<span class="ic" aria-label="explorers"><svg viewBox="0 0 20 28" style="color:${HEX[i]}"><use href="#s-meep"/></svg></span></span></button>`).join('')
     + (G.rival ? `<button type="button" class="op" data-gx="scored" aria-label="${esc(G.rival.name)}: ${VG.rivalScore(G)} points"><span class="dot" style="background:#888"></span><span>${esc(G.rival.name)}</span><span class="vp">${VG.rivalScore(G)}</span>${ic('star', 'points')}</button>` : '');
   // map
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = 1; });
@@ -86,13 +88,15 @@ function render() {
   // dock
   renderDock(L, q, me, actor);
   if (typeof artApply === 'function') artApply();
+  if (typeof bestBadges === 'function') try { bestBadges(); } catch (x) { }
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
   if (UI.insp) refreshInsp();
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
 }
 function renderDock(L, q, me, actor) {
   const over = G.phase === 'over', mine = myTurn();
-  $('#docktitle').textContent = over ? 'Expedition over' : mine ? (G.p.length > 1 && UI.humans.length > 1 ? me.name + ', your turn' : 'Your turn') : (actor < 0 ? 'Round end' : G.p[actor].name + '\u2019s turn');
+  const who0 = over ? 'Expedition over' : mine ? (G.p.length > 1 && UI.humans.length > 1 ? me.name + ', your turn' : 'Your turn') : (actor < 0 ? 'Round end' : G.p[actor].name + '\u2019s turn');
+  $('#docktitle').innerHTML = `<span class="trk">Round ${G.round} of ${G.rounds}</span> <b>${esc(who0)}</b>` + (over ? '' : ` <span class="tok${mine ? ' on' : ''}" title="main actions left this turn">${mine ? '1 action left' : 'waiting'}</span>`);
   $('#dock').classList.toggle('mine', !!mine && !over);
   document.body.classList.toggle('vg-pick', !!mine && !over && !q && L.some(m => m.t !== 'pass' && !m.free));
   $('#prompt').textContent = over ? 'The expedition is over.' : !mine ? (actor < 0 ? 'The round is ending.' : G.p[actor].name + ' is choosing. Tap to speed up.') : q ? qPrompt(q) : promptLine(L);
@@ -115,7 +119,8 @@ function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
   const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });
   if (k.play) bits.push('play a card'); if (k.dig || k.disc || k.beat) bits.push('go to a site'); if (k.buy) bits.push('buy a card'); if (k.res || k.temple) bits.push('research');
-  return 'One action: ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' or ' + bits[bits.length - 1] : bits[0]) + '. Tap what glows.';
+  let bestTxt = ''; try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) bestTxt = ' Best now: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
+  return 'One action: ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' or ' + bits[bits.length - 1] : bits[0]) + '.' + (bestTxt || ' Tap what glows.');
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Pick a card to buy cheaper.', site: 'Pick a site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {

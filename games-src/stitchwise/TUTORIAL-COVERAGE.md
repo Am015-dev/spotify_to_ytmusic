@@ -1,7 +1,7 @@
 # Stitchwise tutorial coverage (W381, ADDENDUM 4: a coached first game)
 
 The tutorial is the story's prologue and a **real game with free choices from turn 1** against Marden (fixed seed 4242 and patch ring
-so the situations come up; easy AI). No forced spotlight steps at all (0 of the allowed 2): every legal move works, the glow shows them.
+so the situations come up; easy AI). It is a **short fair**: both tokens start at space 26 (halfway), so a first game takes about half as long; 5 gold spots and 3 leather scraps are still ahead. No forced spotlight steps at all (0 of the allowed 2): every legal move works, the glow shows them.
 **Aunt Wren** (guide, portrait when art exists) speaks just in time in one line in the panel: when a rule first matters, when you make a
 good or poor first buy, and when Marden does something worth learning. One line at a time, never blocks input, × dismisses it.
 Rules that did not come up are listed on a **"Things you'll meet later"** card at the judging; the judging walks your score through
@@ -14,7 +14,7 @@ All text: `campaign.json` → `story` (coach lines, later card, final lines). Pr
 
 | Rule (rules-notes.md + rules-check) | Explained when | Coach key | Story beat / reaction |
 |---|---|---|---|
-| Setup: 9x9 quilt, 5 buttons each, both on space 0; buy one of the 3 patches; or Advance | turn 1 | `start` | "Marden swears no newcomer wins a ribbon. Buy any glowing patch, or Advance" |
+| Setup: 9x9 quilt, 5 buttons each (normal games start on space 0; the tutorial starts halfway); buy one of the 3 patches; or Advance | turn 1 | `start` | "Marden swears no newcomer wins a ribbon. Buy any glowing patch, or Advance" |
 | Place without overlap (rotate/flip); empty squares −2 | first patch picked | `pick` | "Lay it on your quilt, then Sew it on" |
 | Pay buttons, move by time; what makes a buy good | first buy | `buy_good` / `buy_big` / `buy_cheap` / `buy_poor` | one line why it was good or poor |
 | The player further back moves next | Marden's first turn | `who_next` | "Now that is Marden: watch" |

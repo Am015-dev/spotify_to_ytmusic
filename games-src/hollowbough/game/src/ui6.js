@@ -53,10 +53,13 @@ function renderStart() {
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
   const modes = (firstTime() ? [['guided', 'Guided']] : []).concat([['vs', 'vs computer'], ['solo', 'Solo'], ['hot', 'Hot-seat'], ['ai', 'Watch']]).concat(window.CAMPAIGN ? [['story', 'Story']] : []);
   const mode = o.mode || (firstTime() ? 'guided' : 'vs');
+  const playBtn = h('button.sbtn.big', { 'data-start': 'play', 'data-a': 'play', type: 'button' }, h('b', mode === 'story' ? 'Play the story' : 'Play'));
+  const learnBtn = typeof GXT !== 'undefined' ? h('button.btn.learn', { 'data-a': 'learn', type: 'button' }, tutDone() ? 'Replay the coached first game' : 'New here? Learn in 5 minutes') : null;
+  const startBtns = firstTime() && !tutDone() && learnBtn ? [learnBtn, playBtn] : [playBtn, learnBtn];   // first visit: the coached first game comes first
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Outlast the winter.'),
-    h('button.sbtn.big', { 'data-start': 'play', 'data-a': 'play', type: 'button' }, h('b', mode === 'story' ? 'Play the story' : 'Play')),
+    startBtns,
     h('div.opts',
       h('div.seg', h('span.lbl', 'Mode'), modes.map(m => h('button.chipb' + (mode === m[0] ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'mode', 'data-v': m[0], type: 'button' }, m[1]))),
       mode === 'vs' || mode === 'hot' ? seg('Players', 'np', [2, 3, 4]) : null,
@@ -96,6 +99,7 @@ document.addEventListener('click', ev => {
     case 'campfin': campFinish(); break;
     case 'start': if (d.m !== 'ai' && tutOffer(() => newGame(d.m))) break; newGame(d.m); break;
     case 'play': { const m = (UI.opt && UI.opt.mode) || (firstTime() ? 'guided' : 'vs'); if (m === 'guided') { if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break; } if (m === 'story') { storyOpen(); break; } if (m !== 'ai' && tutOffer(() => newGame(m))) break; newGame(m); break; }
+    case 'learn': tutStart(); break;
     case 'guided': if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
@@ -112,6 +116,8 @@ document.addEventListener('click', ev => {
     UI.lp = false; lpS = { x: e.clientX, y: e.clientY }; clearTimeout(lpT);
     lpT = setTimeout(() => { UI.lp = true; openZoom(z.dataset.zoom); try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } }, 430);
   });
+  // a plain tap on the draw pile / discards / seasons tile (nothing to play there) opens the same big view
+  document.addEventListener('click', e => { const z = e.target.closest('.tile[data-zoom]'); if (z && ['deck', 'disc', 'tree'].includes(z.dataset.k) && !UI.lp && !z.classList.contains('glow')) openZoom(z.dataset.zoom); });
   document.addEventListener('pointermove', e => { if (lpS && Math.hypot(e.clientX - lpS.x, e.clientY - lpS.y) > 12) clearTimeout(lpT); });
   ['pointerup', 'pointercancel'].forEach(n => document.addEventListener(n, () => { clearTimeout(lpT); lpS = null; }));
   document.addEventListener('contextmenu', e => { if (e.target.closest('[data-zoom]')) e.preventDefault(); });

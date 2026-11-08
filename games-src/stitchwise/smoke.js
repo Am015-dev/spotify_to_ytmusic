@@ -50,7 +50,7 @@ const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m); } else log.pus
     await pg.evaluate(() => { GX.show('rulesd'); }); await pg.waitForTimeout(250); ok(await pg.evaluate(() => document.querySelector('#rulesd').classList.contains('on')), 'rules drawer opens'); await pg.keyboard.press('Escape');
   }
   if (TUT) {   // the tutorial is a coached first game (playable/play.js tut plays it to the end)
-    await tapSel('[data-gxt-open]'); await pg.waitForTimeout(600);
+    await tapSel('#start [data-a=start]'); await pg.waitForTimeout(600);
     ok(await pg.evaluate(() => !!G && !!UI.coach && !G.over), 'tutorial starts a coached game');
     for (let i = 0; i < 3; i++) { const k = await turn(); if (k === 'over') break; }
     ok(await pg.evaluate(() => UI.coach.shown.length >= 3), 'Aunt Wren explained at least 3 things in 3 turns');

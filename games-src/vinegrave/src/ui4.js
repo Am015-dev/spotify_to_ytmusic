@@ -36,7 +36,7 @@ const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $(
 function tutAI() { return null; }   /* coached game: Tamsin is the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
-  startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 2 });
+  startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
   const me = G.p[0], tm = G.p[1];
   me.hand = ['trail', 'dread', 'grant', 'dread', 'trail']; me.deck = ['grant'];
   me.res = { coin: 2, compass: 2, tablet: 1, arrow: 0, jewel: 1 };

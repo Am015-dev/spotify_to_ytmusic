@@ -40,6 +40,7 @@ const planeAt = () => G.planes.findIndex(n => n > 0) + 1;
 const placeStep = (id, title, say, round, n, d, k, extra) => Object.assign({ id, title, say, target: tSlot(k), also: tDie(0, d), from: tDie(0, d),
   wait: { type: 'drag', match: a => a.what === 'slot' && a.ok && a.k === k }, ready: () => myMove(round, n) && tutPick(d) }, extra || {});
 // ---------------------------------------------------------------- the kit hooks
+if (!window.GXCOACH) window.GXCOACH = { running: false, explained: [], done: false };
 function tutStart(o) {
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
