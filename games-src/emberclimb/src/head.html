@@ -29,6 +29,8 @@ body:not(.hints-on):not(.learn) :is(.w4pv,.w4hb,.w4hbf,.w4inc,.w4vt,.w4rate,.w4n
 @media (min-width:1024px){html body :is(.blkchip,.spkchip,.price,.card .cl,.card .cb,.card .ct,.card .cx,.card .cty,.item,.item span,.item b,.reward .sub,.reward span,.over span,.over p,.res span,.res p,.w4vt,.w4ntag,.gxh-tx,.rsec b,.rcard i,.w4num i){font-size:16px!important}}
 /* one focus, big art: the card picture fills the top of each hand card (the rule text needs only the lower half) */
 html body .hand .card .cart{height:calc(var(--cw)*.72)!important}html body .hand.dense .card .cart{height:calc(var(--cw)*.62)!important}
+/* phone: the lifted card rises a little over its own row, never over the hero row or the pile chips */
+@media (max-width:1023px){html body .hand .card.sel{transform:translate(var(--sx,0px),-14px) scale(1.12)!important}}
 /* end W420 owner art */
 
 :root{--bg:#14100e;--panel:#241a15;--line:#4a3426;--ember:#f2872b;--ember2:#ffb35c;--ink:#f5e9d8;--mute:#b79f86;--hp:#c93a3a;--blk:#4a8fd8;--nrg:#f2c230;--atk:#c8472b;--skl:#3d8fd0;--pwr:#9a5fd0;--cw:clamp(58px,min(17vw,15.5vh),124px);--safe:env(safe-area-inset-bottom,0px)}
