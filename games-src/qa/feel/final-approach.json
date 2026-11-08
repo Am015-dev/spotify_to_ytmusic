@@ -1,18 +1,18 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T05:12Z",
+ "when": "2026-11-08T05:36Z",
  "secs": 120,
- "totalSecs": 481,
+ "totalSecs": 467,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 8,
+   "count": 9,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Your 4 goes on Axis. Close dice keep the wings level. ×",
+     "text": "Your 3 goes on Axis. Close dice keep the wings level. ×",
      "words": 12,
      "shownMs": 250,
      "neededMs": 5200,
@@ -21,16 +21,7 @@
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Your 2 goes on Landing gear 1. ×",
-     "words": 8,
-     "shownMs": 250,
-     "neededMs": 4800,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 5 goes on Engines. ×",
+     "text": "Your 4 goes on Engines. ×",
      "words": 6,
      "shownMs": 250,
      "neededMs": 4600,
@@ -39,10 +30,37 @@
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Your 3 goes on Axis. Same as Ravi: wings level. ×",
-     "words": 11,
+     "text": "Your 4 goes on Radio. Nothing to clear there. ×",
+     "words": 10,
      "shownMs": 250,
-     "neededMs": 5100,
+     "neededMs": 5000,
+     "cls": "fa-coach out"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Your 3 goes on Axis. Close dice keep the wings level. ×",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
+     "cls": "fa-coach out"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Your 4 goes on Axis. Wings tilt 1. Three would crash. ×",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
+     "cls": "fa-coach"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Your 2 goes on Axis. Wings tilt 1. Three would crash. ×",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
      "cls": "fa-coach"
     },
     {
@@ -66,448 +84,18 @@
     {
      "kind": "too-short",
      "session": "pc/learn",
-     "text": "Your 2 goes on Axis. Wings tilt 1. Three would crash. ×",
-     "words": 12,
+     "text": "Your 3 goes on Engines. ×",
+     "words": 6,
      "shownMs": 250,
-     "neededMs": 5200,
+     "neededMs": 4600,
      "cls": "fa-coach"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 2448,
-     "texts": [
-      "Space 1: 0 planes",
-      "Your 3 goes on Axis. Close dice keep the wings lev"
-     ]
     }
    ]
   },
   "b": {
-   "status": "FAIL",
-   "count": 64,
-   "detail": [
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 1750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 3750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 747,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 1500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 1500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 1250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 1250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 3000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 997,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 2250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 2500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 2000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 501,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 6: 2 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 2000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 1500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 6: 2 planes",
-     "ms": 2000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 5: 1 plane",
-     "ms": 3500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 1005,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 1250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 1500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 764,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 1033,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 1: 0 planes",
-     "ms": 750,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Airport: 2 planes",
-     "ms": 1250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 3: 1 plane",
-     "ms": 250,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 4: 2 planes",
-     "ms": 500,
-     "cls": "on",
-     "tag": "div"
-    },
-    {
-     "session": "pc/play",
-     "text": "Space 2: 0 planes",
-     "ms": 1000,
-     "cls": "on",
-     "tag": "div"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "c": {
    "status": "PASS",
@@ -536,20 +124,20 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 180,
-   "clicks": 286,
+   "turns": 214,
+   "clicks": 282,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 26
+   "messagesSeen": 35
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 251,
-   "clicks": 308,
-   "endedBy": "time",
+   "secs": 111,
+   "turns": 226,
+   "clicks": 275,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
@@ -558,23 +146,23 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 183,
-   "clicks": 291,
+   "turns": 201,
+   "clicks": 271,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 17
+   "messagesSeen": 24
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 120,
-   "turns": 175,
-   "clicks": 447,
-   "endedBy": "time",
+   "secs": 115,
+   "turns": 248,
+   "clicks": 291,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 64
+   "messagesSeen": 0
   }
  ]
 }
