@@ -140,6 +140,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Cauldron Fair https://am015-dev.github.io/spotify_to_ytmusic/cauldron-fair/ (R5 PASS 07:46, live 08:39, feel-audit live all pass)
 - Nebula Aces https://am015-dev.github.io/spotify_to_ytmusic/nebula-aces/ (R3 PASS 08:45, live 09:00, feel-audit live all pass)
 - Twin Thrones https://am015-dev.github.io/spotify_to_ytmusic/twin-thrones/ (R6 PASS 09:26, live 09:33, feel-audit live all pass)
+- Stitchwise https://am015-dev.github.io/spotify_to_ytmusic/stitchwise/ (R8 PASS 09:48, live 09:56, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
