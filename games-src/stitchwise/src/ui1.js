@@ -154,7 +154,7 @@ function renderDock() {
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(), pv = patchValue(s, pid), gc = ok ? (curCells() || []).map(function (c) { return (UI.gy + c[1]) * 9 + UI.gx + c[0]; }) : [];
     pr.textContent = hintsOn() ? (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net) : ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';
-    dt.innerHTML = '<b>' + sgn(pv.pts) + '</b> ' + pv.sq + ' squares \u00B7 <b>\u2212' + pv.cost + '</b> cost \u00B7 <b>+' + pv.incv + '</b> income (' + pv.inc + '\u00D7' + pv.spots + ' gold spots) \u00B7 time ' + p.time + ' \u00B7 7\u00D77 ' + best7(G.board[s], gc) + '/49'; if ((!UI.wide && UI.camp) || !hintsOn()) dt.innerHTML = '';
+    dt.innerHTML = '<b>' + sgn(pv.pts) + '</b> for ' + pv.sq + ' squares \u00B7 <b>\u2212' + pv.cost + '</b> cost \u00B7 <b>+' + pv.incv + '</b> income \u00B7 time ' + p.time; if ((!UI.wide && UI.camp) || !hintsOn()) dt.innerHTML = '';
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'rot', 'aria-label': 'Rotate' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>' }), 'Rotate'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'flip', 'aria-label': 'Flip' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L3 12l5 5zM16 7l5 5-5 5z"/></svg>' }), 'Flip'));
     ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: ok ? null : 'disabled' }, 'Sew it on'));
@@ -175,7 +175,7 @@ function showScoreDrawer() {
   [0, 1].forEach(function (s) { var c = swScore(G, s); w.appendChild(h('div.sdp', h('b', nameOf(s) + ': ' + sgn(c.total)),
     h('div', c.btn + ' buttons = ' + c.btn + ' points (buttons are money and score)'),
     h('div', c.empty + ' gaps \u00D7 \u22122 = \u2212' + c.empty * 2 + ' (every empty square costs 2)'),
-    h('div', (c.bonus ? '+7 for the first full 7\u00D77 block' : '7\u00D77 bonus: not yet (+7 to the first to fill one; best block ' + best7(G.board[s]) + '/49)')),
+    h('div', (c.bonus ? '+7 for the first full 7\u00D77 block' : '7\u00D77 bonus: nobody yet. Your best block: ' + best7(G.board[s]) + '/49.')),
     h('div', 'Income +' + G.inc[s] + ': paid at each gold spot passed (' + spotsAhead(G.pos[s]) + ' still ahead)'))); });
   var ob = h('button.btn.alt.sm', { type: 'button' }, 'See ' + nameOf(1) + '\u2019s quilt'); ob.onclick = function () { GX.close(); showOppQuilt(1); }; w.appendChild(ob);
   GX.drawer('scored', 'Score', w); var dr = $('#scored .gx-drawer-body'); if (dr) { dr.innerHTML = ''; dr.appendChild(w); } GX.show('scored');
