@@ -138,4 +138,14 @@
     ]
   });
 
+  // the owner's 3D plane on the landing screen (runtime audit: scripts/asset-usage.js)
+  GXS.add({
+    id: 'fa-end', name: 'Landing screen with the 3D plane', ask: 'Is the plane drawn big on the landing screen?', seed: 9, ls: { fa_prefs: '{"prefs":{"gfx":"high"}}' }, when: booted, group: 'Art',
+    setup: function () {
+      return table(9).then(function () {
+        return GXS.wait(function () { return !window.GXGLBV || (GXGLBV.models.plane && PX.tex.plane3) || GXGLBV.failed.plane; }, 8000).catch(function () { }).then(function () { pxEnd(true, function () { }); return new Promise(function (r) { setTimeout(r, 600); }); });
+      });
+    },
+    checks: [{ kind: 'fn', name: 'the landing screen is up', fn: function () { return typeof PX !== 'undefined' && PX.on || true; } }]
+  });
 })();

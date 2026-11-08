@@ -12,3 +12,13 @@ Kit files `ui-row`, `ui-bubble-tail` are unused by Final Approach, Thornbound, L
 - **All games**: `ui-iconbtn` and `ui-node-*` ship with an opaque white blob in the hanging loop. `crop-kit.py` writes `-k` keyed copies;
   Short Fuse uses them, the shared `gx-skin.css` still uses the originals (the loop is hidden by the 9-slice there). Ask for fixed originals.
 - Sweeps need media: serve `games/<slug>/media` next to the page (Thornbound, Kaiten sweeps now do); `file://` pages log harmless audio-fetch errors.
+
+## W461: owner 3D models as the real pieces (8 Nov 2026)
+- `shell/gx-glb-boot.js` (inlined) loads `models/gx3d.js` (three + gx-glb + `shell/gx-glb-view.js`; rebuild with `scripts/make-gx3d.py <slug>...`) after page load.
+  Every `<img src="models/<name>[@512].webp">` whose `models/<name>[-lite].glb` exists becomes a live canvas on the same box; the hidden img stays as the fallback.
+  No WebGL, a weak device (<= 2 cores / 2 GB / Save-Data) or a software GL (SwiftShader) keeps the @512 pictures. `?glb=0` off, `?glb=1` forces it.
+  Wired: doorkick-dungeon, hollowbough (module only: no screen code touched, W457), thornbound, kaiten-kitchen, lantern-dive, cauldron-fair. final-approach draws the plane as a Pixi texture from `GXGLBV.snapshot('plane')`.
+- Runtime proof: `node games-src/scripts/asset-usage.js --scn --desktop --verbose <slug>...` plays a quick game at 390x844 (computer vs computer), visits every `?scn=` state and a 1280x800 pass, logs media/models/music requests and lists what never loaded.
+  New scenarios for the end-of-game art: `dk-win-<hero>`, `dk-boss-<boss>`, `tb-throne`, `tb-over`, `fa-end`.
+- Story map extras (`map`, `stars`, `banner`) switched on in doorkick-dungeon, kaiten-kitchen, final-approach, cauldron-fair and (map, stars) lantern-dive. Banner breaks Lantern Dive's "text under frame art" check, so it stays off there.
+- Still never loaded in play: rival portraits (`camp-*`) and alternate tables for later chapters, `ui-node-done/locked/boss` (need campaign progress), hollowbough `ever-tree` (end card), `lantern-dive/camp-shallows.webp` is requested but not shipped (404).

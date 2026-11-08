@@ -406,4 +406,27 @@
       { kind: 'fn', name: 'hand count line keeps its words (>= 12 px)', fn: function () { var e = document.querySelector('.mine .str'); return !e || parseFloat(getComputedStyle(e).fontSize) >= 12 || 'strength line ' + getComputedStyle(e).fontSize; } }
     ]
   });
+
+  // owner media that only shows at the end of a game or on a boss: one scenario each, so the runtime audit (scripts/asset-usage.js) and the owner can open them
+  ['Pip', 'Morwen', 'Grub', 'Tansy'].forEach(function (hero, i) {
+    GXS.add({
+      id: 'dk-win-' + hero.toLowerCase(), name: hero + ' wins: the 3D hero on the end screen', ask: 'Does ' + hero + ' stand on the end screen?', ls: { dkd_offer: '1' }, seed: 60 + i, when: booted, group: 'Art',
+      setup: function () {
+        table(60 + i); P(0).nm = hero; P(0).lvl = 10; G.winner = 'P1'; G.winText = hero + ' reaches level 10!'; UI.pause = true; render();
+        return new Promise(function (r) { setTimeout(r, 900); });
+      },
+      checks: [{ kind: 'fn', name: hero + ' is on the end dialog (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('#modal .win3d') || 'no hero on the end dialog'; } }]
+    });
+  });
+  ['inferno', 'tentacles', 'pharaoh', 'skygrif', 'dread'].forEach(function (k, i) {
+    GXS.add({
+      id: 'dk-boss-' + k, name: 'Boss clip: ' + k, ask: 'Does the ' + k + ' boss clip play?', ls: { dkd_offer: '1' }, seed: 70 + i, when: booted, group: 'Art',
+      setup: function () {
+        table(70 + i); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
+        var boss = idOf(k); pull(boss); G.door.push(boss); G.phase = 'main'; G.active = 0; UI.pause = true; render();
+        return new Promise(function (r) { setTimeout(function () { var d = document.querySelector('.bfdoor'); if (d) d.click(); setTimeout(r, 500); }, 300); });
+      },
+      checks: [{ kind: 'fn', name: 'the ' + k + ' clip element is there', fn: function () { return !!document.getElementById('bfclip') || document.querySelector('.arena .row.mons .card') ? true : 'neither clip nor monster card'; } }]
+    });
+  });
 })();
