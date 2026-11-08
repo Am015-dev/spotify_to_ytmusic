@@ -54,8 +54,8 @@ LORE.coach={
   defend:{rule:1,t:'Brecken: Pilot power',s:'Kael can turn one focus result into an evade. Use it when you defend.'},
   res2:{rule:1,t:'Brecken: Shields first',s:'Damage strips shields before hull. Crits are dealt face up with lasting effects.'},
   goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Stay in his arc and keep the pressure on.'},
-  gothit:{t:'Slate: Got you!',s:'Ouch. Keep out of his front arc, or use an evade token before he shoots.'},
-  stress:{rule:1,t:'Brecken: Stress',s:'A stressed ship can not act, and can not fly red until it flies a green move.',who:'brecken'},
+  gothit:{t:'Slate: Got you!',s:'Ouch. Stay out of his front arc. Or take an evade token first.'},
+  stress:{rule:1,t:'Brecken: Stress',s:'A stressed ship can not act. No red moves until it flies green.',who:'brecken'},
   endround:{rule:1,t:'Brecken: Round end',s:'At the end of each round unused focus and evade tokens vanish. Target locks stay.'}};
 // the speaker's portrait on a tutorial bubble: the title starts with the speaker's name
 (function(){if(typeof MutationObserver==='undefined'||!document.body)return;
