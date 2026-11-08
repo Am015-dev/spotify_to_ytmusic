@@ -260,7 +260,7 @@ html.ph-p .mine .hand.row .card .cn{width:auto;max-width:none;font-size:14px!imp
 html.ph-p .mine .hand.row .card .tag{font-size:15px;font-weight:800}
 html.ph-p .mine .hand.row .card .tag small{display:none}
 html.ph-p .mine .hand.row .card .gold{font-size:14px}
-html.ph-p .opps .seat .snm{font-size:15px}
+html.ph-p .opps .seat .snm{font-size:14px;letter-spacing:0}
 html.ph-p .opps .seat .sw{font-size:15px}
 html.ph-p .opps .seat .lb{font-size:14px}
 html.ph-p .opps .seat .sg{display:none}

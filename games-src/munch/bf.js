@@ -256,6 +256,6 @@ function dkGoal(){if(document.getElementById('dkgoal'))return;const o=document.c
   document.body.appendChild(o);UI.goalAt=Date.now()}
 function dkGoalClose(){const o=document.getElementById('dkgoal');if(o)o.remove()}
 document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkgoal');if(o&&Date.now()-(UI.goalAt||0)>250){e.preventDefault();e.stopPropagation();setTimeout(dkGoalClose,0);return}
-  if(e.target.closest&&e.target.closest('#phchip,#docktitle')&&typeof G!=='undefined'&&G)dkGoal()},true);
+  if(e.target.closest&&e.target.closest(document.documentElement.classList.contains('ph')?'#phchip':'#phchip,#docktitle')&&!document.querySelector('.gxh-bub,.gxh-card,#bfrev')&&typeof G!=='undefined'&&G)dkGoal()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
-(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'){UI.goalGid=G.gid;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)setTimeout(dkGoal,400)}}catch(e){}return x}})();
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
