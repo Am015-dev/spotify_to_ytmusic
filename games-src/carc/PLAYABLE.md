@@ -42,3 +42,14 @@ Also: Help opens with "How a turn works" (5 short lines) and a "House rules" car
 - ui-audit A-F is 0 on phone, phone-s and pc (was A0/0/1 B5/8/4 C9/10/10 E0/0/1): solid backings behind text, painted menu rows drawn with `cover` instead of stretched,
   tutorial/campaign header buttons solid, the music panel made compact so nothing sits below the fold, contrast overlays on the big buttons.
 - `build-all --quick`, coach-test (390x763 and 1440x860), playable-test (Quick and Story by taps): PASS.
+
+## Round 3 (Addendum 5, 8 Nov 00:00 UTC): the player sees how they score
+All numbers come from the engine's own `probe()` and `featPoints()` (`game/src/preview.js`), so the preview is exactly what scoring will do.
+- **Before placing a tile:** every glowing square carries a tag when it matters: `+4` (finishes your feature, green), `Hob +6` (would hand the rival points, red), `grows` (extends your feature) or `feeds`.
+  Press and hold a square (or hover on a computer) for the full line in the turn strip ("Finishes your road: +4 for you.", "Grows your town to 3 tiles: +8 when finished.") and the feature's tiles light up.
+- **Before placing a follower:** each spot says what it is worth: "road +4 now", "town +6 if closed", "priory: 9 when ringed", "field: 3 per town at end".
+- **Points pop with the reason:** unchanged (pop "+4 town", strip "You +4: finished town, 2 tiles").
+- **Always-visible score sheet** under the top bar: Roads, Towns, Priories, Fields, one number per player (you first, colour-underlined), live.
+- **Move rating:** after every turn of yours one line in the sheet: "Good: the best score available." / "Okay: finishing the road was better." / "Poor: ...", from the computer's own best plan versus what you played (placement + follower).
+- **Coached game:** same previews and sheet; Tamsin adds `preview` (what the tags mean) and `rate_good/okay/poor` the first time each applies.
+- Shots (phone): `playable-shots/preview-hold.webp`, `fig-spot-points.webp`, `score-sheet-rating.webp`.

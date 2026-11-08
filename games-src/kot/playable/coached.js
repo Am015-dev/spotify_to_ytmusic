@@ -2,7 +2,7 @@
 // until the result. Asserts: every coverage rule was explained (bubble shown) or listed on the final "Things you'll meet later" card, one bubble at a time,
 // the bubble never blocks a tap (elementFromPoint at the bubble's body is the thing below), the game reached a winner. Usage: CHR=.. node coached.js <url> <w> <h> [shots]
 const L = require('./lib.js'); const [url, W, H, SH] = [process.argv[2], +process.argv[3] || 390, +process.argv[4] || 763, process.argv[5]];
-const RULES = ['setup', 'goal', 'roll3', 'faces', 'keep', 'rekeep', 'pair', 'triple', 'extra', 'energy', 'hearts', 'noheal', 'claws', 'stop', 'enter', 'start2', 'cards', 'types', 'sweep', 'endturn', 'rivals', 'yield', 'ko', 'win20', 'final'];
+const RULES = ['setup', 'goal', 'roll3', 'faces', 'preview', 'keep', 'rekeep', 'pair', 'triple', 'extra', 'energy', 'hearts', 'noheal', 'claws', 'stop', 'enter', 'start2', 'cards', 'types', 'sweep', 'endturn', 'rivals', 'yield', 'ko', 'win20', 'final'];
 let seed = 12345; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
 (async () => {
   const b = await L.launch(), { ctx, p } = await L.open(b, W, H, url); const bad = [];

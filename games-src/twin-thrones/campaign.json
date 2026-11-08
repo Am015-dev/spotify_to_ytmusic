@@ -1219,7 +1219,7 @@
   },
   "coach": {
    "draft": "Wonders give points and a power. You and Pell take four each, turn by turn.",
-   "pyramid": "Age I. Glowing cards are free to take; cards under others must wait. Taking one can uncover a card for Pell.",
+   "pyramid": "Age I. Glowing cards are free to take. Tap one to see it big, then build, sell or raise a wonder. Cards are small: the big card is your reading view.",
    "tension": "Pell took a card you uncovered. Before you take a card, check what it frees for him.",
    "free": "A free card costs nothing. Production cards give you that resource every turn.",
    "coin": "Yellow cards pay coins at once, and make selling better later.",

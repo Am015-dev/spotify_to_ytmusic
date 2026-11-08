@@ -34,3 +34,11 @@ for the human's own result was not added. Monster names are not drawn over the 3
 - The coached game is short: it ends at 6 stars (`G.goal`, real games stay at 20; rules test covers it). qa-bot tutorial phase: coached game finished (GXCOACH.done), 0 blockers, 0 majors.
 - ui-audit (phone / phone-s / pc): A 0/0/0, F 0/0/0; B 12/12/17, C 1/1/0, D 2/4/2, E 1/0/1 (NOT zero). Done this round: plates behind the fallback board's SVG text, dark numerals on cream dice, dark plates under story-map headings, lighter dark meshes. Left: some fallback-board labels the audit still measures low, the shared story bar image (drawn 2.3x), a monster body mesh, a 1px label sprite, the shared help kit's 'Got it'.
 - 1440x860 after-shots added to `playable-shots/` (desktop-*.webp).
+
+## Addendum 5 (W386d): see how you score
+- Live preview line above the dice ("If you smash now: +3★ · +2⚡ · −2♥ hits Squidrik · +1★ Downtown is empty"), updated on every keep and roll; the coached game explains it (tip `preview`).
+- After a smash a reason pop lists each gain in plain words ("+3★ for three 3s") and one line rates the turn GOOD / OKAY / POOR against what a greedy keep averages from the same first roll (120 simulated turns).
+- Score strip: the leader is marked (gold outline and bar on the phone chips; on desktop a standings strip, you vs rivals with ★ ♥ and ▲ on the leader).
+- Best-value badge on the card the advisor picks in the buy step (`BEST VALUE`; off inside the coached game, where the advisor is quiet).
+- Proof: `playable/score.js` PASS at 390x763 and 1440x860 (preview text, pop with rating line, leader mark). Shots: `playable-shots/score-*.webp`.
+- Not measured: the best-value badge was not seen in a shot (needs an affordable good card at a buy step); the rating is a simple value model (2 per star, 1 per energy or heal, 1.5 per damage when it can hit), not a solver.
