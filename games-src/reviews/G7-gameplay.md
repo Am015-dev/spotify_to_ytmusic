@@ -1,6 +1,12 @@
 # G7 gameplay review (strict, 8 Nov 2026)
 
-Phone touch play at 390x844 and 375x667 on each game's branch build. Scored by games-src/reviews/GAMEPLAY-RUBRIC.md. Sections for the other games are added when their play is done.
+Phone touch play at 390x844 and 375x667 on each game's branch build (tutorial to the end, then full games to the result screen). Scored by games-src/reviews/GAMEPLAY-RUBRIC.md.
+
+| Game | Total | Result |
+|---|---|---|
+| vale-of-banners | 6.6 | FAIL |
+| crown-city-smash | 6.9 | FAIL |
+| tidewake | 4.0 (stopper cap; 6.0 uncapped) | FAIL |
 
 ## vale-of-banners
 
@@ -58,3 +64,30 @@ Total: 6.9 (FAIL: rows 4, 5 and 6 are below 7; no stopper)
 - Row 6: did: played three full default-level games as a newcomer. happened: lost all three (3rd with 1 ★, then 2nd with 14 ★ twice). One rival won with 21 ★, another as the last monster standing. Pace is good (4.5 to 5.5 min). shot: games-src/reviews/G7-shots/crown-result-390.png, games-src/reviews/G7-shots/crown-result-375.png
 - Row 2 (works): the tutorial walks every core rule one tap at a time and ends on "Play a real game". The stay step and the end card are clean. shot: games-src/reviews/G7-shots/crown-tut-stay.png, games-src/reviews/G7-shots/crown-tut-end.png
 - Row 3/4 (works): clear title and goal; the stay/yield dialog spells out the cost and gain of each choice. shot: games-src/reviews/G7-shots/crown-title.png, games-src/reviews/G7-shots/crown-stay-prompt.png, games-src/reviews/G7-shots/crown-turn-390.png
+
+## tidewake
+
+Build: branch shelf/W498-tidewake-gameplay (merge 7ced92b3), built with build-all.py, served beside games/tidewake/media. Played by touch: the tutorial to its end at 390x844 and at 375x667 (about 150 s each), then three Quick games against 2 computers on the default level, all to the result screen. 390x844: lost on turn 31 after 15 placements (5.5 min). 375x667: lost on turn 4, then won on turn 20 (4.5 min). 0 console errors and 0 page errors in all runs.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 7 | The core turn matches the published game: roll 2 dice, 6/7/8 wakes every leviathan, one die each (5 arrows, a 6 raises a new one), lay a tile at your bow, sail the line along with any other junk on it, draw back to 3. Edge and leviathan sinkings, the elimination swap bonus, the minimum of 3 leviathans and last-junk-wins are all in. The 6x6 board, the repeated tiles and the leviathan arrows are guesses, and they are documented. The title screen says "Two junks meet: both sink", but the source rule is that junks pass each other; the engine only sinks two junks forced onto one wake in the same direction. |
+| 2 | Tutorial teaches | 5 | Its form is right: 33 steps, one short line and one tap each, a real game at the end. But three times it stops for about 20 s with no bubble while the roll card shows a Continue button that ignores taps. The lesson also teaches Rogue Wave and Deck Cannon, which are expansion pieces and do not appear in the default Quick game. The elimination bonus gets one line, and the real game then asks you to choose swaps blind. |
+| 3 | First 10 seconds | 8 | The title gives the goal in 4 short lines, the big "New here? Learn in 5 minutes" button is the obvious tap, and Quick game first asks "Learn to play / Just play". "Safe start for me" places your first junk. |
+| 4 | Turn clarity | 6 | Laying a tile is clear: ✓/✗ badges on each hand tile, a gold start→Stop route preview, Turn/Place buttons, a "Your turn" line and a numbered roll card. The elimination bonus is not: you get up to 10 buttons like "Swap your tile #1 for pool tile #2" with no picture of either tile, and "Keep your hand" sits below the fold. On game over the panel still says "Your turn: the dice roll first". |
+| 5 | Phone play | 5 | The board fills the top half and all targets are at least 44 px. At 375x667 the result screen's button row overlaps: "See the board" covers "Play again" and "New game", and the row runs past the bottom of the screen. At 375x667, tutorial step 10/33 pushes the hand tiles off the bottom and the bubble covers them. The bonus list needs a scroll to reach "Keep your hand". |
+| 6 | AI and pacing | 6 | The computers play sensibly. A new player can win (1 of 3 games) and a game lasts 4-6 min. But every round has a 15-25 s wait while the computers' moves and leviathan lines replay one at a time. One game ended on turn 4 after a single placement, with nothing I could do: dice luck the game does not soften. |
+| 7 | Feel | 7 | A painted 3D sea chart, dice that tumble, junks that glide along the lines, leviathans that move with an arrow cue, torn tiles, a sunk card, sound and music. It feels like a game. |
+| 8 | Bugs | 4 | 0 errors and no stuck state, but there are dead taps. During each tutorial wait, the Continue button is covered by an invisible tutor cell (DIV.gxt-cell gxt-clear, checked with elementFromPoint), so 7-11 taps in a row on it do nothing. On game over the status line is stale. |
+
+Total: 6.0, capped to 4.0 by the stopper (a dead tap on a visible Continue button). FAIL
+
+### Findings
+- Row 8 / Row 2 (stopper). Did: in the tutorial, after "A leviathan on your start square?" (step 6/33), and again at steps 31/33 and 40/33, tapped the Continue button on the "Your roll" card. Happened: the tap lands on an invisible tutor cell (DIV.gxt-cell gxt-clear). Nothing happens for 7-11 taps over about 20 s, and no bubble explains the wait. Shot: games-src/reviews/G7-shots/tide-dead-continue-375.png, games-src/reviews/G7-shots/tide-tut-wait-390.png
+- Row 5. Did: won a Quick game at 375x667. Happened: on the result screen "See the board" sits on top of "Play again" and "New game", and the button row is cut off at the bottom of the screen. Shot: games-src/reviews/G7-shots/tide-result-overlap-375.png (390x844 is fine: games-src/reviews/G7-shots/tide-result-390.png)
+- Row 4 / Row 5. Did: sank a rival with my tile on turn 18 (375x667). Happened: "Elimination bonus" lists "Swap your tile #1 for pool tile #1/#2/#3…" with no picture of either tile, so the choice is blind, and "Keep your hand" is below the fold. Shot: games-src/reviews/G7-shots/tide-bonus-blind-375.png
+- Row 5. Did: tutorial at 375x667, step 10/33 "These are your three tiles. This one would sink you." Happened: the hand tiles are pushed off the bottom of the screen (the target ring is only 27 px tall) and the bubble covers them. Shot: games-src/reviews/G7-shots/tide-tut-hand-cut-375.png
+- Row 2 / Row 1. Did: followed the tutorial. Happened: it teaches the expansion Rogue Wave and Deck Cannon (steps 22-33), which the default Quick game does not use, while elimination swaps get one line. Shot: games-src/reviews/G7-shots/tide-tut-wave-390.png
+- Row 1. Did: read the title screen. Happened: "Two junks meet: both sink" overstates the rule. The source rule says junks pass each other; only a forced same-wake, same-direction ending sinks both. Shot: games-src/reviews/G7-shots/tide-title-390.png
+- Row 6. Did: played three default Quick games. Happened: there is a 15-25 s wait between my turns while every computer move and leviathan line replays. The 375 game ended on turn 4 after one placement, with no decision of mine involved. Shot: games-src/reviews/G7-shots/tide-turn-390.png
+- Row 8 / Row 4. Did: got sunk off the edge on turn 31 (390x844). Happened: with the game already over, the panel still reads "Your turn: the dice roll first" with a Skip button, until the result card appears. Shot: games-src/reviews/G7-shots/tide-stale-status-390.png
