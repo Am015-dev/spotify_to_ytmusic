@@ -231,6 +231,7 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
 #fortchip{min-height:44px;border-radius:22px;box-sizing:border-box}
 /* R3 fix (375x667 shop): rows size to their content, so a price is never cut under the next awning; the short stall line stays; the list scrolls if it must */
 @media (max-height:760px) and (orientation:portrait){
+  .mkt .stalls .rbar{order:-1}   /* rubies first: they never hide below the scroll */
   .mkt .stalls{grid-auto-rows:auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
   .stall .sdo{display:block;font-size:12px;min-height:14px;margin:-1px 0 0}
   html.sk-stall .stall{border-width:26px 12px 8px;border-image-width:26px 12px 8px}
