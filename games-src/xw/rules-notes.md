@@ -74,7 +74,7 @@ The original publisher's official PDFs and the board-game catalogue site were bl
 ## Damage deck (33 cards; names and texts are original [orig]; effects follow 1e)
 - 7 × Hull Rupture (counts 2 damage).
 - 2 each of:
-  - Flash Blindness (next attack rolls no dice);
+  - Flash Blindness (the next attack's dice can't be modified);
   - Cockpit Fire (roll each combat phase; repairable);
   - Shattered Canopy (pilot skill 0 from the next round);
   - Engine Stutter (turns are red);
@@ -138,7 +138,7 @@ The original publisher's official PDFs and the board-game catalogue site were bl
 Every ship has 1 modification slot; ships with a title card also get a title slot.
 
 **Rules that come with them:**
-- **Ion:** an ionised ship flies a white straight 1 instead of its dial. A large ship needs 2 ion tokens [R15].
+- **Ion:** an ionised ship flies a white straight 1 instead of its dial and takes no action (W445). A large ship needs 2 ion tokens [R15].
 - **Turrets and rear arcs** use the 1e arc shapes. The Warden gunship's rear (auxiliary) arc is for its primary weapon only; its cannons, missiles and torpedoes fire from the front arc. A turret ship's *firing arc* (for "Shiv") is its front arc. **Large bases:** 80 mm, same templates.
 - **Bombs:** dropped behind the ship with the straight-1 template. Quake charges and plasma bombs detonate at the end of the Activation phase (range 1). A plasma bomb deals its faceup card straight to the ship, past its shields. A contact mine detonates when a base or template touches it (3 attack dice).
 - **One of each action per round:** a ship can't perform the same action twice in a round, including free actions (a free focus, Wing Leader's or Lark Castellan's gift, Tarn Vessor's move, Snap Roll's barrel roll, Redline).

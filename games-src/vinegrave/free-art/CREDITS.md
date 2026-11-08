@@ -177,3 +177,147 @@ https://opengameart.org/content/toon-characters-1). No picture contains text. No
 | tr-plane.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
 | tr-ship.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
 | track-bg.webp | original flat-vector drawing (vg.py / vg2.py), CC0 by this project |
+
+## Temporary free library (W410)
+
+Replaces the earlier flat art until the final images exist. Per-slot sources: games-src/free-library/vinegrave/_MAP.tsv
+
+
+All sources are CC0 / public domain. No AI-generated, NC, ND or SA material. Colour grade (one gradient map + vignette) applied by this library.
+
+- Metropolitan Museum of Art, Open Access (CC0, isPublicDomain=true via the keyless collection API), object pages listed in _MAP.tsv.
+- Frederick Catherwood, "Views of Ancient Monuments in Central America, Chiapas and Yucatan" (1844), public domain, via Wikimedia Commons / Cleveland Museum of Art Open Access (CC0).
+
+## Per object
+
+-  | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/503542
+- A Brazilian Landscape | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437323
+- Abergele, Tan-yr-ogo Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/260068
+- At the Waterfall | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/11270
+- Axe | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313385
+- Bell | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/504526
+- Bird ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310555
+- Book cover | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/202457
+- Cave of Pan, near Sunium, Greece | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/660902
+- Celt (votive axe) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316288
+- Ceremonial Axe | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313715
+- Cihuateotl | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307634
+- Cliff House and Seal Rock | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/264900
+- Column | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310540
+- Compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/191253
+- Cuneiform tablet: Utukku lemnutu, tablet 3 | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/321841
+- Cup | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/455542
+- David at the Cave of Adullam | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436940
+- Dice | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/449310
+- Double Bat-Head Figure Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307790
+- Earflare Frontal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312508
+- Earflare Frontal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312509
+- Earflare Set | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317430
+- Eye idol | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/324147
+- Feather Symbol | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/319050
+- Feathered serpent ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310648
+- Feathered serpent ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313344
+- Feathered serpent ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313345
+- Feathered serpent ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313346
+- Figure of a lady holding a dragon boat model | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/61575
+- Figure-top spoon | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188279
+- File:Altar and Stela D. Copán.jpg | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Altar_and_Stela_D._Cop%C3%A1n.jpg
+- File:Catherwood stela d.jpg | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Catherwood_stela_d.jpg
+- File:Catherwood's views of ancient monuments in Central Amer | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Catherwood%27s_views_of_ancient_monuments_in_Central_America_%26_Yucatan._Gateway_at_Labnah_LCCN2003680006.jpg
+- File:Frederick Catherwood - Views of Ancient Monuments in Ce | CC0 (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Frederick_Catherwood_-_Views_of_Ancient_Monuments_in_Central_America,_Chiapas_and_Yucatan,_Pl._20-_-_2011.488_-_Cleveland_Museum_of_Art.tif
+- File:Stela F. Copán.jpg | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Stela_F._Cop%C3%A1n.jpg
+- File:Uxmal nunnery by Catherwood 02.jpg | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Uxmal_nunnery_by_Catherwood_02.jpg
+- File:Well and Building at Sabactsche Yucatan by F Catherwood | Public domain (Wikimedia Commons) | https://commons.wikimedia.org/wiki/File:Well_and_Building_at_Sabactsche_Yucatan_by_F_Catherwood_B.jpg
+- Frog pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316661
+- Frog | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307751
+- Frog | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307753
+- Funerary staff | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313054
+- Gold Double Frog Ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310482
+- Gold Face Mask Ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/315153
+- Gold Necklace Ornament | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312879
+- Hair Comb | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/16809
+- Hammered Gold Ornament Fragment | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/309068
+- Hammered Gold Ornament Fragment | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/308907
+- Heart of the Andes | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/10481
+- Horn | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/501077
+- Horn | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/500875
+- Interior of a Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/695277
+- Jade Inlay | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317373
+- Jade Inlay | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317374
+- Jade Ornament with Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310713
+- Jade Ornament with Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310714
+- Jaguar Bell | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313120
+- Jaguar Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316666
+- Jaguar Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313115
+- Jar | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316875
+- Kero (beaker) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313267
+- Lamp | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/4699
+- Lamp | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/449338
+- Landscape with a Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/435857
+- Mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313266
+- Mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316699
+- Mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312736
+- Mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/312759
+- Mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310486
+- Miniature female effigy | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/309944
+- Miniature headdress with owl | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313402
+- Miniature male effigy | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/309943
+- Model Boat | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/546315
+- Modified celt-pendant with incised motifs | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/310467
+- Necklace with frog-shaped beads | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317878
+- Obsidian Mirror | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/314189
+- Ornament in the shape of a mammal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313149
+- Owl | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/315110
+- Paccha (ritual vessel) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/314954
+- Paccha (ritual vessel) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/314955
+- Pair of Earflares | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316287
+- Pair of candlesticks | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/198843
+- Pair of dressing table candlesticks | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/204983
+- Pair of earflare frontals | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316299
+- Pair of earflares | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/318668
+- Palms | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/15589
+- Pendant | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/701645
+- Plate with the god Chahk | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/718242
+- Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188834
+- Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188858
+- Portable compass dial | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/188848
+- Portrait of a General Officer | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437463
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436480
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437893
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437843
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436521
+- Portrait of a Man | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437465
+- Pottery Whistle | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/502954
+- Prayer Book | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/924757
+- Purgatory Cliff | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/11906
+- Rain god mask | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313255
+- Ritual object | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313337
+- Roman Ruins, from "Roman Ruins" | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/360679
+- Ruins of a round building, from "Roman Ruins" | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/360675
+- Serpent Stamp | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/313373
+- Serpent labret with articulated tongue | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/321343
+- Shipwreck off Nantucket (Wreck off Nantucket after a Storm) | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/10209
+- Sky – Northern Cuba | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/816789
+- Spring | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/777898
+- Stamp, Birds | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307742
+- Stamp, Monkey | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307748
+- Stamp, Monkey | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/307744
+- Stone Celt | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/317174
+- Stone Figure | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/315798
+- Stone Penate Figure | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/315674
+- Stone Penate Figure | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/315673
+- Telescope stand | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/202025
+- Temple Model | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/316873
+- The Mouth of a Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/437470
+- Tropical Scenery, Cliff - Limon Bay | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/286041
+- Urn | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/195013
+- Valdemar Hjartvar Købke (1813–1893), the Artist's Brother | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/436825
+- View in the Jungle, Bengal | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/287849
+- View of Fingal's Cave | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/363808
+- Waterfall at Terni | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/438635
+- Waterfall | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/12845
+- [Abbey Ruins] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/269012
+- [Roman Ruins] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/270620
+- [Studio Portrait: Man with Walking Stick Begging (?)] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/764838
+- [View of the Jungle, Bengal] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/287859
+- [Waterfall] | CC0 (Met Open Access) | https://www.metmuseum.org/art/collection/search/288554

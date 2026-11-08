@@ -38,8 +38,8 @@ mk.stance = 'w'; t0 = G.b.en[0]; playId(G, 'm-strike', 0); ok(t0.hp === 200 - 6 
 G.b.en[0].intent = { atk: 10, tg: 0 }; ok(E.previewHit(0, 0) === 10, 'R06 wrath does not raise damage taken (previewHit)');
 mk.hand = []; const hpw = mk.hp; E.performMove({ t: 'end' }); ok(mk.hp === hpw - SC, 'R06 ending the turn in wrath costs ' + SC + ' HP');
 // R07 monk relic: Miracles, no calm start, no calm spark
-G = fresh(['m'], 14); mk = G.hs[0]; ok(mk.mir === 2 && !mk.hand.some(c => c.id === 'calm-spark') && mk.stance === 'n', 'R07 monk relic: Miracle tokens, no Calm, no Calm Spark');
-mk.en = 6; ok(E.validMoves().some(m => m.t === 'mir'), 'R07 mir move offered'); E.performMove({ t: 'mir' }); ok(mk.en === 7 && mk.mir === 1, 'R07 miracle: +1 energy, may pass the cap');
+G = fresh(['m'], 14); mk = G.hs[0]; ok(mk.mir === 1 && !mk.hand.some(c => c.id === 'calm-spark') && mk.stance === 'n', 'R07 monk relic: Miracle tokens, no Calm, no Calm Spark');
+mk.en = 6; ok(E.validMoves().some(m => m.t === 'mir'), 'R07 mir move offered'); E.performMove({ t: 'mir' }); ok(mk.en === 7 && mk.mir === 0, 'R07 miracle: +1 energy, may pass the cap');
 // R18 energy cap 6
 mk.en = 6; mk.stance = 'c'; playId(G, 'm-empty-fist', 0); ok(mk.en === 6, 'R18 energy cap 6 (calm exit +2 capped)');
 mk.en = 3; mk.stance = 'c'; mk.hand.push(E.mk('m-empty-fist')); E.performMove({ t: 'play', h: 0, c: mk.hand.length - 1, e: 0 }); ok(mk.en === 4, 'R06 calm exit still gives 2 energy');
@@ -88,10 +88,29 @@ E.performMove({ t: 'skip', h: 0 }); ok(G.rd.w.length === rd0, 'R16 skipped cards
 // R22 acts: full heal and a new map at the next act
 E.newGame({ heroes: ['w'], seed: 27, acts: 2 }); G = E.G(); G.at = G.map.length - 1; G.scr = 'reward'; G.rw = { gold: 0, cards: {}, relics: null, took: {} }; G.hs[0].hp = 10;
 E.performMove({ t: 'leave' }); ok(G.act === 2 && G.scr === 'map' && G.hs[0].hp === G.hs[0].mhp && G.at === -1, 'R22 act 2: full heal, new map');
+// R24 per-act encounter decks: act 2/3/4 fights draw from their own decks; one fixed guardian per act
+E.newGame({ heroes: ['w'], seed: 31, acts: 3 }); G = E.G(); ok(G.boss === D.ACTBOSS[1], 'R24 multi-act climb: act 1 guardian is fixed');
+G.at = G.map.length - 1; G.scr = 'reward'; G.rw = { gold: 0, cards: {}, relics: null, took: {} }; E.performMove({ t: 'leave' });
+ok(G.act === 2 && G.boss === D.ACTBOSS[2], 'R24 act 2 guardian');
+E.performMove({ t: 'go', n: E.validMoves()[0].n }); const a2ids = Object.keys(D.ENCA[2]).reduce((a, k) => a.concat(...D.ENCA[2][k]), []);
+ok(G.scr === 'battle' && G.b.en.every(e => a2ids.indexOf(e.id) >= 0), 'R24 act 2 fight comes from the act 2 deck');
+ok(G.b.en[0].mhp >= Math.round(D.ENEMIES[G.b.en[0].id].hp[0] * 1.25), 'R22 act 2 foes have +25% HP');
+// R25 final act: opt.final adds act 4 and the Ember Tyrant
+E.newGame({ heroes: ['w'], seed: 32, acts: 3, final: 1 }); G = E.G(); ok(G.acts === 4, 'R25 final act makes 4 acts');
+E.newGame({ heroes: ['w'], seed: 33, startAct: 4 }); G = E.G(); ok(G.act === 4 && G.boss === 'ember-tyrant', 'R25 a chapter can start in the final act');
+E.performMove({ t: 'go', n: E.validMoves()[0].n }); const a4ids = Object.keys(D.ENCA[4]).reduce((a, k) => a.concat(...D.ENCA[4][k]), []); ok(G.b.en.every(e => a4ids.indexOf(e.id) >= 0), 'R25 final-act fights use the act 4 deck');
+// R26 frail: an enemy applies Frail, block cards give 25% less while it lasts
+E.newGame({ heroes: ['w'], seed: 34, startAct: 2 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.hs[0].st = { frail: 1 }; G.hs[0].blk = 0; playId(G, 'w-iron-skin'); ok(G.hs[0].blk === 6, 'R26 frail: 8 block becomes 6');
+ok(D.ENEMIES['ash-wisp'].pat[0].frail === 2 && D.ENEMIES['tomb-king'].pat[0].frail === 2, 'R26 act 2/3 foes apply Frail');
+// R27 last stand: boss fight, 2 heroes, the first fall leaves that hero at 1 HP with Weak 3; the second fall loses
+E.newGame({ heroes: ['w', 's'], seed: 35, boss: 'mire-behemoth' }); G = E.G(); E.debug.boss();
+ok(G.b && G.b.kind === 'b', 'R27 boss fight starts'); E.debug.hurt(0, 999); ok(G.scr === 'battle' && G.hs[0].hp === 1 && G.hs[0].st.weak === 3, 'R27 last stand: first fall keeps 1 HP, Weak 3');
+E.debug.hurt(1, 999); ok(G.scr === 'over' && !G.won, 'R27 second fall loses');
+E.newGame({ heroes: ['w'], seed: 36, boss: 'mire-behemoth' }); G = E.G(); E.debug.boss(); E.debug.hurt(0, 999); ok(G.scr === 'over' && !G.won, 'R27 solo: no last stand, any fall loses');
 // R23 merchant: 3 cards per hero, 3 relics + 3 potions, first relic/potion one step cheaper
 E.newGame({ heroes: ['w', 'm'], seed: 28 }); E.debug.shop(); G = E.G(); const its = G.shop.items, rel = its.filter(x => x.t === 'relic'), pts = its.filter(x => x.t === 'pot');
 ok(its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'w').length === 3 && its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'm').length === 3 && rel.length === 3 && pts.length === 3, 'R23 merchant: 3 cards per hero, 3 relics, 3 potions');
-ok(pts[0].p === pts[1].p - 15 && rel[0].p === (D.RELICS[rel[0].id].rar === 'u' ? 205 : 135), 'R23 merchant: first relic and potion 15 cheaper');
+ok(pts[0].p === pts[1].p - 25 && rel[0].p === (D.RELICS[rel[0].id].rar === 'u' ? 195 : 125), 'R23 merchant: first relic and potion 25 (one gold unit) cheaper');
 // UI contract: plain-word keyword lines
 const ln = id => E.lines(E.eff({ id, u: 0 })).join(' ');
 ok(/Retain/.test(ln('m-judgment')) && /Scry 3/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && /Shivs \(3-damage/.test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');
@@ -115,6 +134,8 @@ const snap = JSON.stringify(E.G()); ok(JSON.stringify(JSON.parse(snap)) === snap
 let long = 0; D.ORDER.forEach(id => { [0, 1].forEach(u => { E.lines(E.eff({ id, u })).forEach(l => { if (l.replace(/[^A-Za-z0-9']+/g, ' ').trim().split(' ').length > 8) long++; }); }); }); ok(long === 0, 'every card text line is 8 words or fewer (' + long + ' long)');
 // every upgraded card differs from the base
 let same = 0; D.ORDER.forEach(id => { const c = D.CARDS[id]; if (!c.ops.length) return; const u = E.eff({ id, u: 1 }); if (JSON.stringify([u.ops, u.cost]) === JSON.stringify([c.ops, c.cost])) same++; }); ok(same === 0, 'every card improves when upgraded (' + same + ' unchanged)');
+// full climbs (3 acts + final act): never stuck, no invariant error
+{ let fs = 0, fw = 0; for (let i = 0; i < 12; i++) { const r = E.autoplay({ heroes: [['w'], ['s'], ['a'], ['m'], ['w', 's'], ['a', 'm']][i % 6], seed: 5000 + i, acts: 3, final: 1 }); if (r.stuck || r.bad) fs++; if (r.won) fw++; } ok(fs === 0, 'R22/R25 full 4-act climbs: none stuck (' + fw + '/12 won)'); }
 console.log('targeted checks', bad ? 'FAIL' : 'PASS');
 // --- bot games
 const N = +process.argv[2] || 300, sets = [['w'], ['s'], ['a'], ['m'], ['w', 'a'], ['s', 'm']], stat = {};

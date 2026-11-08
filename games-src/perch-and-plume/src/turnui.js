@@ -38,11 +38,11 @@ function actInfo(G, s) {
   var room = eggRoom(p), lay = Math.min(ye.n, room), bp = bestPlay(G, s), nPl = PP.playable(G, s).reduce(function (a, x) { a[x.i] = 1; return a; }, {}); nPl = Object.keys(nPl).length;
   var stuck = p.hand.length - nPl;   // birds you hold but cannot afford yet
   out.food = { h: 0, ok: true, v: Math.min(yf.n, 3) * (stuck > 0 ? .9 : .35), what: 'take ' + yf.n + ' from the feeder', gain: '+' + yf.n + ' food' };
-  out.eggs = { h: 1, ok: lay > 0, v: lay, what: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' = +' + lay + ' pts', gain: '+' + lay + ' pts', why: room ? '' : 'No bird has room for an egg' };
+  out.eggs = { h: 1, ok: lay > 0, v: lay, plain: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' on your birds', what: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' = +' + lay + ' pts', gain: '+' + lay + ' pts', why: room ? '' : 'No bird has room for an egg' };
   if (lay > 0 && lay < ye.n) out.eggs.what = '+' + lay + ' eggs (nests full) = +' + lay + ' pts';
   var cardsCan = G.deck.length + G.tray.filter(Boolean).length > 0;
   out.cards = { h: 2, ok: cardsCan, v: yd.n * (p.hand.length <= 2 ? .8 : p.hand.length >= 6 ? .1 : .4), what: '+' + yd.n + (yd.n === 1 ? ' card' : ' cards'), gain: '+' + yd.n + ' cards', why: cardsCan ? '' : 'No cards left' };
-  out.play = { h: -1, ok: nPl > 0, v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
+  out.play = { h: -1, ok: nPl > 0, plain: 'pick from ' + nPl + ' you can pay for', v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
     why: p.hand.length ? 'Not enough food or eggs yet. Get food first.' : 'No birds in hand. Draw birds first.' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
   out.best = best;
@@ -64,16 +64,16 @@ function actIcon(k) {
 function act4HTML() {
   var inf = actInfo(G, UI.view), tp = tutPoint();
   return '<div id="act4" role="group" aria-label="Choose one action">' + ACTDEF.map(function (d) {
-    var a = inf[d.k], best = !tp && inf.best === d.k;
+    var a = inf[d.k], best = !tp && hintsOn() && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
     return '<button type="button" class="a4 a4-' + d.k + (best ? ' best' : '') + (tp === d.k ? ' tutpoint' : '') + '" data-a="a4" data-k="' + d.k + '"' + (a.ok ? '' : ' aria-disabled="true"') + ' data-val="' + a.v.toFixed(2) + '">' +
-      '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(a.ok ? a.what : a.why) + '</span></span>' +
+      '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(txt) + '</span></span>' +
       (best ? '<em class="bestb">Best</em>' : '') + '</button>';
   }).join('') + '</div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="a4"]'); if (!t || !G || !myTurn() || G.q) return;
   var k = t.dataset.k, inf = actInfo(G, UI.view)[k];
-  if (!inf.ok) { toast(inf.why); return; }
+  if (!inf.ok) { toast(inf.why, 0, 1); return; }
   if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); toast('Swipe your birds. Tap a glowing one to play it.'); return; }
   if (!tutGate({ type: 'tap', what: 'ract', h: inf.h })) return;
   UI.sel = null; UI.pickBird = false; human({ t: 'act', a: k });
@@ -126,13 +126,14 @@ function scoreHTML() {
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;
   var s = PP.scoreOf(G, UI.view);
-  toast('Birds ' + s.birds + ' + eggs ' + s.eggs + ' + goals ' + s.goals + ' + bonus ' + s.bonus + ' + stored food ' + s.cache + ' + tucked ' + s.tuck + ' = ' + s.total, 4200);
+  showScore(); return; toast('Birds ' + s.birds + ' + eggs ' + s.eggs + ' + goals ' + s.goals + ' + bonus ' + s.bonus + ' + stored food ' + s.cache + ' + tucked ' + s.tuck + ' = ' + s.total, 4200);
 });
 // ---------------- the rating after each of your turns
 var RATE = { k: null };
 function rateStart() {   // called when your turn begins (no question pending)
   if (!G || !myTurn() || G.q) return;
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
+  if (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0]) goalCard();
   try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
   RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }
@@ -159,8 +160,52 @@ function pl(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
 function cap1(t) { t = String(t || ''); return t.charAt(0).toUpperCase() + t.slice(1); }
 function showRate() {
   var el = $('#rate'); if (!el) return;
-  if (!RATE.last || !G || G.phase === 'over') { el.hidden = true; return; }
+  if (!RATE.last || !G || G.phase === 'over' || !hintsOn()) { el.hidden = true; return; }
   el.hidden = false; el.className = 'rate r-' + RATE.last.g; el.innerHTML = '<b>' + ({ good: '&#10003;', okay: '~', poor: '!' })[RATE.last.g] + '</b><span>' + esc(RATE.last.t) + '</span>';
 }
 // the tutorial's pointer: which big button Ottilie points at right now (coach.js sets COACH.point)
 function tutPoint() { try { return coachOn() ? COACH.point || null : null; } catch (e) { return null; } }
+
+// ---------------- Addendum 7: three modes. PLAY is clean (board, hand, tracker, one score line, a Goal card, short pops);
+// HINTS (top-bar toggle, off by default) adds previews, Best badges, the turn rating, toasts and "What should I do?";
+// LEARN TO PLAY (tutfree) is the coached game and always shows them.
+function hintsPref() { try { return localStorage.getItem('pp-hints') === '1'; } catch (e) { return false; } }
+function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
+UI.hintPref = hintsPref();
+function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('#bulbbtn')) return;
+  if (UI.mode === 'tutfree') { toast('Learn to play always shows hints.', 0, 1); return; }
+  UI.hintPref = !UI.hintPref; try { localStorage.setItem('pp-hints', UI.hintPref ? '1' : '0'); } catch (x) { }
+  render(); toast(UI.hintPref ? 'Hints on: previews, Best badges and a rating after each turn.' : 'Hints off.', 0, 1);
+});
+// one compact score line: you vs the rival(s), leader starred; tap = the score drawer
+function scoreLineHTML() {
+  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), top = Math.max.apply(null, sc), one = sc.filter(function (v) { return v === top; }).length === 1 && top > 0;
+  return '<button type="button" class="sline" data-a="mysc" aria-label="Score: ' + esc(G.pl.map(function (p, i) { return (i === UI.view ? 'you' : p.name) + ' ' + sc[i]; }).join(', ')) + '. Tap for how it adds up">' +
+    G.pl.map(function (p, i) { return '<span class="sl' + (i === UI.view ? ' me' : '') + '">' + (one && sc[i] === top ? '<em aria-hidden="true">&#9733;</em>' : '') + esc(i === UI.view && humans().length === 1 ? 'You' : p.name) + ' <b>' + sc[i] + '</b></span>'; }).join('<i>vs</i>') +
+    '<span class="slw">why?</span></button>';
+}
+// the score drawer: every number's why, for every player
+function showScore() {
+  var rows = [['birds', 'Birds', 'points printed on birds played'], ['eggs', 'Eggs', '1 point each'], ['goals', 'Round goals', 'judged at each round end'], ['bonus', 'Bonus card', 'your secret card'], ['cache', 'Stored food', '1 point each'], ['tuck', 'Tucked cards', '1 point each']];
+  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); });
+  var h = '<div class="card scored" role="dialog" aria-label="How the score adds up"><h3>How the score adds up</h3><table class="sctab"><tr><th></th>' + G.pl.map(function (p, i) { return '<th>' + esc(i === UI.view ? 'You' : p.name) + '</th>'; }).join('') + '</tr>' +
+    rows.map(function (r) { return '<tr><td><b>' + r[1] + '</b><small>' + r[2] + '</small></td>' + sc.map(function (s) { return '<td>' + s[r[0]] + '</td>'; }).join('') + '</tr>'; }).join('') +
+    '<tr class="tot"><td><b>Total</b></td>' + sc.map(function (s) { return '<td>' + s.total + '</td>'; }).join('') + '</tr></table>' +
+    '<div class="acts"><button type="button" class="btn pri" data-a="popx">Close</button></div></div>';
+  var el = $('#pop'); el.innerHTML = h; el.hidden = false;
+}
+// before turn 1 of a Play game: one card with the aim and how points are earned
+function goalCard() {
+  if (!G || UI.mode === 'tutfree' || UI.goalShown === G.seed + ':' + UI.started || UI.fast) return;
+  UI.goalShown = G.seed + ':' + UI.started;
+  var el = $('#pop');
+  el.innerHTML = '<div class="card goalc" role="dialog" aria-label="Goal"><h3>Goal: have the most points after ' + G.rounds + ' rounds</h3><ul>' +
+    '<li><b>Birds</b> score the points printed on them. Play birds by paying their food.</li>' +
+    '<li><b>Eggs</b> are 1 point each. Lay them on your birds.</li>' +
+    '<li><b>Round goals</b> and your secret <b>bonus card</b> add more.</li></ul>' +
+    '<p>Each turn you do one thing. Tap the score line any time to see how it adds up.</p>' +
+    '<div class="acts"><button type="button" class="btn pri" data-a="popx">Start</button></div></div>';
+  el.hidden = false;
+}

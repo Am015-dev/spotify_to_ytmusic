@@ -32,7 +32,7 @@
     o = o || {};
     var n = o.n === 1 ? 1 : Math.max(2, Math.min(4, o.n || 2)), teams = !!o.teams && n === 4;
     var G = { v: 1, rs: (o.seed == null ? (Date.now() & 0x7fffffff) : o.seed) >>> 0, n: n, nPhases: o.phases || 5, phase: 0, round: 0,
-      seats: [], P: [], depots: {}, goodsAt: {}, black: [], bag: [], gbag: [], rg: [], white: 1, order: [], ti: 0, pend: [], arrc: 0,
+      seats: [], P: [], depots: {}, goodsAt: {}, black: [], bag: [], bagB: [], gbag: [], rg: [], white: 1, order: [], ti: 0, pend: [], arrc: 0,
       colTaken: {}, over: false, log: [], noBlack: !!o.noBlack, turn: 0, seq: 0, winner: null, solo: n === 1, teams: teams };
     if (o.rounds && o.rounds < 5) G.nRounds = o.rounds;   /* short coached game: fewer rounds per season */
     G.seed0 = G.rs;
@@ -40,7 +40,7 @@
       var s = (o.seats && o.seats[i]) || {};
       G.seats.push({ name: s.name || (i === 0 ? 'You' : V.SEATNAME[i]), human: s.human != null ? !!s.human : i === 0, ai: s.ai || 'normal', style: s.style || null });
     }
-    G.bag = shuffle(G, V.pool());
+    var all = V.pool(); G.bag = shuffle(G, all.filter(function (x) { return !x.b; })); G.bagB = shuffle(G, all.filter(function (x) { return x.b; }));   /* black-backed tiles feed only the back lane */
     for (var g = 1; g <= 6; g++) for (var k = 0; k < 7; k++) G.gbag.push(g);
     shuffle(G, G.gbag);
     var first = []; for (i = 0; i < n; i++) first.push(i); shuffle(G, first);
@@ -72,7 +72,7 @@
   V.blackSize = function (G) { return G.n <= 2 ? 4 : G.n === 3 ? 6 : 8; };
   function startPhase(G) {
     for (var d = 1; d <= 6; d++) { G.depots[d] = []; G.goodsAt[d] = []; for (var k = 0; k < V.depotSize(G); k++) G.depots[d].push(G.bag.length ? G.bag.pop() : null); }
-    G.black = []; for (k = 0; k < V.blackSize(G); k++) G.black.push(G.bag.length && !G.noBlack ? G.bag.pop() : null);
+    var bb = G.bagB || G.bag; G.black = []; for (k = 0; k < V.blackSize(G); k++) G.black.push(bb.length && !G.noBlack ? bb.pop() : null);
     G.rg = []; for (k = 0; k < 5; k++) G.rg.push(G.gbag.length ? G.gbag.pop() : 0);
     G.round = 0; startRound(G);
   }
@@ -210,9 +210,11 @@
         if (p.know['wkSil']) { p.silver++; ev.push({ e: 'silver', p: s, n: 1 }); }
         break;
       case 'ship':
-        G.pend.pop(); var got = G.goodsAt[m.v].splice(0), lost = 0;
-        got.forEach(function (g) { if (!addGoods(p, g)) lost++; });
-        ev.push({ e: 'goods', p: s, from: m.v, goods: got, lost: lost });
+        /* a goods tile that does not fit (a 4th kind) stays on the stall, as in the published rules */
+        G.pend.pop(); var all = G.goodsAt[m.v].splice(0), got = [], left = [];
+        all.forEach(function (g) { if (addGoods(p, g)) got.push(g); else left.push(g); });
+        G.goodsAt[m.v] = left;
+        ev.push({ e: 'goods', p: s, from: m.v, goods: got, lost: 0, left: left.length });
         break;
       case 'skip': break;
       case 'end': endTurn(G); ev.push({ e: 'end', p: s }); break;
@@ -322,7 +324,7 @@
 
   /* ---------- invariants + text ---------- */
   V.checkInvariants = function (G) {
-    var n = G.bag.length + (G.discard || 0), ids = {};
+    var n = G.bag.length + (G.bagB ? G.bagB.length : 0) + (G.discard || 0), ids = {};
     function seen(t, where) { if (!t) return null; if (ids[t.id]) return 'dup ' + t.id + ' ' + where; ids[t.id] = 1; return null; }
     for (var d = 1; d <= 6; d++) G.depots[d].forEach(function (t) { if (t) n++; });
     G.black.forEach(function (t) { if (t) n++; });

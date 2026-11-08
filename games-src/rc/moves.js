@@ -13,7 +13,9 @@ function place(pid,type,tgt,alt,pay){const why=placeWhy(pid,type,tgt,alt);if(why
   // never plan something the camp can't pay for (the plan would only be refused at Start the day)
   if(!a.pw.length&&!afford(a)){const c=actCost(a);G.plan.acts.splice(G.plan.acts.indexOf(a),1);const m=committed(a.id);return `not enough resources: it needs ${Object.entries(c).filter(([r,v])=>v).map(([r,v])=>v+' '+RNAME[r]).join(' + ')} and you have ${G.res.wood-m.wood} wood, ${G.res.fur-m.fur} fur free`}
   // a character goes on top (acts); extra pawns only help
-  const p=pawnInfo(pid);if(p.c!=null)a.pw.unshift(pid);else a.pw.push(pid);UI.lastAct=a.id;return null}
+  const p=pawnInfo(pid);const own=a.type==='build'&&a.tgt&&INVENTIONS[a.tgt.k]&&INVENTIONS[a.tgt.k].kind==='personal'?INVENTIONS[a.tgt.k].owner:null;
+  const ownerLeads=own&&p.c!=null&&P(p.c).k!==own&&a.pw.some(q=>{const o=pawnInfo(q);return o&&o.c!=null&&P(o.c).k===own});   // a personal item can only be made by its owner: the owner stays the one taking the action
+  if(p.c!=null&&!ownerLeads)a.pw.unshift(pid);else a.pw.push(pid);UI.lastAct=a.id;return null}
 function unplace(pid){for(const a of G.plan.acts){const i=a.pw.indexOf(pid);if(i>=0){a.pw.splice(i,1);if(!a.pw.length){G.plan.acts.splice(G.plan.acts.indexOf(a),1);if(G.plan.thrifty===a.id)G.plan.thrifty=null}return true}}return false}
 function clearPlan(onlyFor){for(const a of G.plan.acts.slice()){const other=onlyFor&&a.pw.some(id=>{const q=pawnInfo(id);return q&&q.c!=null&&!onlyFor.includes(q.c)});for(const pid of a.pw.slice()){const p=pawnInfo(pid);if(!onlyFor||(p&&p.c!=null&&onlyFor.includes(p.c))||(p&&p.c==null&&!other))unplace(pid)}}}
 function setPay(id,pay){const a=G.plan.acts.find(x=>x.id===id);if(a){a.pay=pay}}
@@ -33,7 +35,7 @@ function thriftyTarget(){let best=null,bw=0;for(const a of G.plan.acts){if(a.typ
 function useSkill(ci,k){const why=skillWhy(ci,k);if(why)return why;const c=P(ci);const s=CHARS[c.k].skills.find(x=>x.k===k);c.det-=s.c;c.used[k]=1;lg(`${c.nm} uses ${s.n}.`,'step');fx('skill',ci);
   switch(k){
   case 'thrifty':{const t=thriftyTarget();lg(`${actLabel(t)} costs 1 wood less.`,'good');G.plan.thrifty=t.id;break}
-  case 'idea':{const top=G.inv.deck.slice(0,5);ask(ci,'Bright Idea: put one invention on the board',top.map(x=>({l:`${INVENTIONS[x].n}: ${INVENTIONS[x].x}`,art:'inv-'+x,frames:[{f:'fn',k:'addInv',key:x}]})),{kind:'inv',force:1});break}
+  case 'idea':{invRefill();const top=G.inv.deck.slice(0,5);ask(ci,'Bright Idea: put one invention on the board',top.map(x=>({l:`${INVENTIONS[x].n}: ${INVENTIONS[x].x}`,art:'inv-'+x,frames:[{f:'fn',k:'addInv',key:x},{f:'fn',k:'setAside',keys:top.filter(y=>y!==x)}]})),{kind:'inv',force:1});break}
   case 'hands':G.plan.hands=1;lg('An extra pawn for a build action this round.','good');break;
   case 'remedy':{pay('food',1,[],true);const o=living().filter(x=>x.w>0).map(x=>({l:`${x.nm} heals 2`,ops:[['heal',x.i,2]]}));if(living().filter(x=>x.w>0).length>1)o.push({l:'Split: 1 each to the two most hurt',ops:living().filter(x=>x.w>0).sort((a,b)=>b.w-a.w).slice(0,2).map(x=>['heal',x.i,1])});ask(ci,'Home Remedy: who is treated?',o,{kind:'heal'});break}
   case 'broth':gain('food',1,{});break;
@@ -44,7 +46,9 @@ function useSkill(ci,k){const why=skillWhy(ci,k);if(why)return why;const c=P(ci)
   case 'fortify':{const o=[{l:'Weapon +1',ops:[['weapon',1]]}];if(hasShelter())o.unshift({l:'Palisade +1',ops:[['pal',1]]});ask(ci,'Fortify',o,{kind:'fortify'});break}
   case 'drive':{const k2=G.beast.shift();G.hunt.unshift(k2);lg('Another beast is driven to the top of the hunting grounds.');break}}
   run();R();return null}
-FN.keepDisc=fr=>{G.own.push({k:fr.k1,fut:false});if(fr.k2)G.discs.push(fr.k2);lg(`Kept: ${discName(fr.k1)}.`,'good')};
+FN.keepDisc=fr=>{G.own.push({k:fr.k1,fut:false});lg(`Kept: ${discName(fr.k1)}. The other token is removed from the game.`,'good')};
+FN.setAside=fr=>{for(const k of fr.keys){const i=G.inv.deck.indexOf(k);if(i>=0)G.inv.deck.splice(i,1)}G.inv.aside=(G.inv.aside||[]).concat(fr.keys);lg('The other 4 ideas are set aside.')};
+function invRefill(){if(!G.inv.deck.length&&(G.inv.aside||[]).length){G.inv.deck=shuffle(G.inv.aside);G.inv.aside=[];lg('The set-aside ideas are shuffled into a new invention deck.')}}
 FN.tileTop=fr=>{const i=G.tileDeck.indexOf(fr.n);G.tileDeck.splice(i,1);G.tileDeck.unshift(fr.n);lg(`Tile ${fr.n} will be the next one found.`)};
 function discText(k){const d=DISCS[k];if(d.sc!=null)return SCENARIOS[G.scen].finds[d.sc].x;return d.x}
 // ---------- starting items ----------

@@ -2,7 +2,7 @@
 (function () {
   if (!window.GXS) return;
   var booted = function () { return window.EC && EC.E && window.UI && UI.render; };
-  var E = function () { return EC.E; }, G = function () { return EC.E.G(); };
+  var E = function () { return EC.E; }, G = function () { return EC.E.G(); }, D_ = function () { return EC.D; };
   function begin(heroes, seed) { try { var sk = document.querySelector('[data-gxt-skip]'); if (sk) sk.click(); GX.close(); if (window.GXC) GXC.close(); } catch (e) { } window.EC_NOSAVE = 0; UI.camp = null; UI.mode = 'game'; UI.sel = -1; window.ANIM = false; E().newGame({ heroes: heroes, seed: seed || 11 }); }
   function fight(heroes, seed, one) {
     begin(heroes, seed); E().performMove({ t: 'go', n: E().validMoves()[0].n });
@@ -34,6 +34,11 @@
     checks: [{ kind: 'visible', sel: '#rest-heal', name: 'Rest button' }, { kind: 'tap', sel: '#rest-heal', name: 'rest', state: function () { return G().hs[0].hp; }, expect: function (b, a) { return a > b; } }] });
   GXS.add({ id: 'ec-event', name: 'Event: make a choice', ask: 'Choose an option', seed: 10, when: booted,
     setup: function () { begin(['s'], 10); E().debug.event('ember-shrine'); UI.render(); }, checks: [{ kind: 'visible', sel: '.opts .btn', name: 'event option' }] });
+  // W420: boss intro overlay (video when listed in MEDIA_VIDEO, else the zooming still) with Skip
+  GXS.add({ id: 'bossintro', name: 'Boss intro', ask: 'Does the boss intro show its name and a Skip button?', seed: 13, when: booted,
+    setup: function () { begin(['w'], 13); var g = G(), bn = g.map.filter(function (n) { return n.t === 'b'; })[0], pre = g.map.filter(function (n) { return n.nx.indexOf(bn.id) >= 0; })[0]; g.at = pre.id; g.floor = pre.f; E().performMove({ t: 'go', n: bn.id }); UI.render(); var be = G().b && G().b.en.filter(function (e) { return D_().ENEMIES[e.id].boss; })[0]; UI.bossIntro(be ? be.id : G().boss, function () { }); },
+    checks: [{ kind: 'visible', sel: '.w4boss .w4bt h1', name: 'boss name' }, { kind: 'visible', sel: '#boss-skip', name: 'Skip button' },
+      { kind: 'tap', sel: '#boss-skip', name: 'skip the intro', state: function () { return !!document.querySelector('.w4boss'); }, expect: function (b, a) { return b && !a; } }] });
   GXS.add({ id: 'ec-result', name: 'Result screen', ask: 'Can you start a new climb?', seed: 12, when: booted,
     setup: function () { begin(['w'], 12); E().debug.over(true); UI.render(); }, checks: [{ kind: 'visible', sel: '#again', name: 'Play again button' }] });
 })();
