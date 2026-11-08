@@ -257,3 +257,24 @@ html.sk .gx-drawer-body>button.btn,html.sk .gx-drawer-body>button.btn.go{backgro
 .gxc-act small{color:#2b1306!important}.gxc-lab{display:inline-block}
 .mcard .mn{display:block;width:calc(100% - 4px);text-align:center;padding:0 1px;line-height:1.15;overflow:hidden}
 .mbox .exsum{width:auto;min-width:0;justify-content:flex-start;gap:8px}
+/* score.js: turn tracker, preview line, gain badges, leader, breakdown, turn-over card */
+.trk{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;margin:1px 0;padding:1px 10px;border-radius:10px;background:#fff6dc;color:#3b1c0e;border:2px solid #b0702a;font:700 13px/1.2 var(--ff-b,system-ui)}
+.trk[hidden],.trk2[hidden]{display:none}.trk .trk-w.me{color:#9a3a14}.trk-p{display:flex;gap:3px;margin-left:auto}.trk-p i{font-style:normal;padding:1px 6px;border-radius:8px;background:#ead9b0;color:#4a2410}.trk-p i.on{background:#9a3a14;color:#fff}.trk-p i.done{background:#c9b27c}
+.trk2{margin:0;padding:1px 10px;font:700 13px/1.25 var(--ff-b,system-ui);color:#3b1c0e;background:#ffe9a8;border-radius:8px}
+#grid .tile{position:relative}.tile .gain{position:absolute;left:3px;bottom:3px;z-index:3;pointer-events:none;font:800 13px/1 var(--ff-b,system-ui);font-style:normal;background:#fff6dc;color:#3b1c0e;border:2px solid #8a5a1e;border-radius:9px;padding:2px 5px}.tile .gain.star{background:#ffd75a;border-color:#9a3a14}
+.sch.lead{box-shadow:0 0 0 2px #e0a800}.sch .crown{font-style:normal;margin-right:3px}.sch .s4{grid-column:1/-1;font:700 13px/1.2 var(--ff-b,system-ui);white-space:nowrap}
+.turnover{position:fixed;left:50%;top:110px;z-index:2147482100;transform:translate(-50%,-8px);opacity:0;pointer-events:none;display:flex;gap:8px;align-items:center;background:#fff6dc;color:#3b1c0e;border:2px solid #b0702a;border-radius:14px;padding:6px 8px 6px 10px;width:min(94vw,520px);box-sizing:border-box;font:600 14px/1.3 var(--ff-b,system-ui);box-shadow:0 5px 14px rgba(60,20,5,.4)}
+.turnover.on{opacity:1;transform:translate(-50%,0);transition:opacity .25s,transform .25s}.turnover i{font-style:normal;font-size:24px}.turnover span{flex:1}.turnover button{pointer-events:auto;flex:none;width:36px;height:36px;border-radius:50%;border:2px solid #8a5a1e;background:#fff;color:#4a2410;font:800 16px/1 system-ui}
+@media (min-width:1024px){.trk,.trk2,.sch .s4,.tile .gain,.turnover{font-size:16px}}
+.trk-p i,.trk-p i.done{background:none;color:#3b1c0e;padding:0 4px}.trk-p i.on{background:none;color:#8a2a0c;font-weight:800;text-decoration:underline;text-underline-offset:3px}.trk-p i.done{opacity:.75}
+.trk2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.short .trk2,html.short .sch .s4{display:none}html.short .trk{padding:0 8px}
+html.short .sch .s4{display:block}html.short .sch .s3{display:none}
+.plban{top:42%}
+.trk-p{margin-left:0}.trk .trk-r{margin-left:auto}
+.trk,.trk2{position:relative;z-index:2147483600}
+.trk .trk-w.me{color:#3b1c0e;text-decoration:underline;text-underline-offset:3px}
+.trk .trk-p{margin-left:auto}.trk .trk-r{margin-left:0}html.short .trk .trk-r{display:none}
+.trk .trk-p{margin-left:0}.trk .trk-r{margin-left:auto}
+html.land .gx-board{grid-template-rows:auto auto auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt trk" "gw mkt trk2" "gw mkt ." "gw mine acts"}
+html.land #trk{grid-area:trk;flex-wrap:wrap;align-self:start}html.land #trk2{grid-area:trk2;white-space:normal;align-self:start}
