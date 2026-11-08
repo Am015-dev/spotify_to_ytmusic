@@ -356,3 +356,21 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
   body[data-vtab="row"] #row .cd .cn{flex:none}
 }
 @media (max-width:999px){#hand .cd{height:min(138px,37vw)}body[data-vtab="map"] .site{max-height:60px}body[data-vtab="map"] #map{gap:19px;padding-top:18px}#dockbody{gap:4px}}
+/* W378c: turn tracker, leader + breakdown, previews, best badges, turn-over card */
+#docktitle{display:flex;align-items:center;gap:6px;flex-wrap:wrap;white-space:normal}
+#docktitle .trk{font-size:14px;font-weight:700;color:#5a4a2a}
+#docktitle .tok{font-size:13px;font-weight:800;padding:2px 8px;border-radius:999px;border:2px solid #b9a77a;color:#7a6a4a;background:#efe4c6}
+#docktitle .tok.on{background:#ffd36a;border-color:#c98a2e;color:#22190d}
+#docktitle .tok.ex{background:#e3efe6;border-color:#7fa58a;color:#1d4430}
+.op{flex-wrap:wrap;row-gap:0}.op .sb{flex-basis:100%;font-size:13px;line-height:1.1;color:#c9c2a8;text-align:left;white-space:normal}
+.op.lead{border-color:#ffd36a!important;box-shadow:0 0 0 2px rgba(255,211,106,.5)}.op .ld{font-size:13px;font-weight:800;color:#22190d;background:#ffd36a;border-radius:6px;padding:0 4px;margin-left:2px}
+.btn .pv{display:block;font-size:13px;font-weight:700;opacity:.9;margin-top:2px}
+[data-badge]{position:relative}[data-badge]::after{content:attr(data-badge);position:absolute;left:50%;top:-8px;transform:translateX(-50%);z-index:6;background:#ffd36a;color:#22190d;border:2px solid #22190d;border-radius:8px;padding:0 5px;font:800 13px/16px var(--gx-font,Georgia,serif);white-space:nowrap;pointer-events:none}
+#turnover{position:fixed;left:50%;top:70px;transform:translate(-50%,8px);z-index:95;width:min(420px,calc(100vw - 16px));display:flex;flex-direction:column;gap:3px;padding:8px 12px;border-radius:14px;background:#22190d;color:#fff3d6;border:2px solid #e2a63b;box-shadow:0 8px 22px rgba(0,0,0,.5);font-size:15px;line-height:1.25;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#turnover.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#turnover .rt{font-weight:700}#turnover .rt.good{color:#9be3a8}#turnover .rt.okay{color:#ffd36a}#turnover .rt.poor{color:#ffb3a8}#turnover .nx{font-size:14px;color:#c9c2a8}
+.op{height:auto!important;min-height:44px;flex-wrap:wrap;align-content:center;padding-top:3px;padding-bottom:3px}
+.op .sb{order:9;flex:1 0 100%}
+.btn:has(.pv){flex-wrap:wrap;justify-content:center;text-align:center}.btn .pv{flex:1 0 100%}
+#docktitle{flex-wrap:nowrap;overflow:hidden}#docktitle .trk{white-space:nowrap}#docktitle b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gxt-end) #turnover{display:none}
