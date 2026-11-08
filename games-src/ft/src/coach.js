@@ -94,3 +94,6 @@ setInterval(()=>{try{if(G&&G.coach&&!G.over)coachAfter()}catch(e){}},700);
 
 // for the QA bot's coached driver: running while the coached game is on, explained = rule ids told so far, done once the final count was reached
 window.GXCOACH={get running(){return !!(G&&G.coach&&!G.over)},get explained(){return Object.keys(COACH.seen)},get done(){return !!COACH.done}};
+
+// QA hook: the shell tutor API (GXT) also reports the coached game, so the feel audit finds, starts and plays Learn
+try{if(typeof GXT!=='undefined'){const r=GXT.running&&GXT.running.bind(GXT),s=GXT.state&&GXT.state.bind(GXT);GXT.running=()=>!!(r&&r())||!!(G&&G.coach&&!G.over);GXT.state=()=>{const x=s?s():null;return x&&x.active?x:(G&&G.coach&&!G.over?{active:true,phase:'end',coached:true}:x)}}}catch(e){}
