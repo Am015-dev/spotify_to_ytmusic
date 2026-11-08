@@ -4,19 +4,23 @@ const { chromium } = require('playwright'); const path = require('path');
 const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1';
 (async () => {
   const b = await chromium.launch(); let fails = 0;
-  for (const [name, vp] of [['phone', { width: 390, height: 844 }], ['pc', { width: 1440, height: 900 }]]) {
-    const ctx = await b.newContext({ viewport: vp }), page = await ctx.newPage(), errs = [];
+  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]]) {
+    const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), page = await ctx.newPage(), errs = [];
+    const cdp = touch ? await ctx.newCDPSession(page) : null; let tp = { x: 0, y: 0 };
+    const tch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
+    const P = touch ? { move: async (x, y, o) => { const n = (o && o.steps) || 1, x0 = tp.x, y0 = tp.y; for (let i = 1; i <= n; i++) { tp.x = x0 + (x - x0) * i / n; tp.y = y0 + (y - y0) * i / n; if (tp.down) await tch('touchMove', tp.x, tp.y); } tp.x = x; tp.y = y; }, down: async () => { tp.down = true; await tch('touchStart', tp.x, tp.y); }, up: async () => { tp.down = false; await tch('touchEnd'); } } : page.mouse;
+    const tapSel = async l => { if (touch) await l.tap(); else await l.click(); };
     page.on('pageerror', e => errs.push(String(e)));
     await page.goto(URL); await page.evaluate(() => { localStorage.clear(); GXT.markDone('vale-of-banners'); }); await page.reload(); await page.waitForTimeout(300);
-    await page.click('#quickB'); await page.click('#goB');
+    await tapSel(page.locator('#quickB')); await tapSel(page.locator('#goB'));
     const ctr = sel => page.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; }, sel);
-    const glide = async (to, steps = 6) => { await page.mouse.move(to.x, to.y, { steps }); };
-    const drag = async (fromSel, path2) => { const a = await ctr(fromSel); if (!a) return false; await page.mouse.move(a.x, a.y); await page.mouse.down(); await page.mouse.move(a.x + 14, a.y - 14, { steps: 3 }); for (const st of path2) { if (st.wait) { await page.waitForTimeout(st.wait); continue; } const t = await ctr(st.sel); if (!t) { await page.mouse.up(); return false; } await glide(t); } await page.mouse.up(); await page.waitForTimeout(40); return true; };
+    const glide = async (to, steps = 6) => { await P.move(to.x, to.y, { steps }); };
+    const drag = async (fromSel, path2) => { const a = await ctr(fromSel); if (!a) return false; await P.move(a.x, a.y); await P.down(); await P.move(a.x + 14, a.y - 14, { steps: 3 }); for (const st of path2) { if (st.wait) { await page.waitForTimeout(st.wait); continue; } const t = await ctr(st.sel); if (!t) { await P.up(); return false; } await glide(t); } await P.up(); await page.waitForTimeout(40); return true; };
     let missed = 0, combo1 = 0, drags = { combo: 0, take: 0, build: 0, sell: 0, worker: 0 }, taps = 0, guard = 0, stuck = 0;
     while (guard++ < 3000) {
       const st = await page.evaluate(() => ({ over: G.over, mine: !G.over && G.seats[VB.actor(G)].human && !UI.busy, tv: !document.getElementById('tv').hidden, top: !!pend() }));
       if (st.over) break;
-      if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await b1.first().click(); else await page.locator('#tvClose').click(); taps++; continue; }
+      if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await tapSel(b1.first()); else await tapSel(page.locator('#tvClose')); taps++; continue; }
       if (!st.mine) { await page.waitForTimeout(25); if (++stuck > 4000) { console.log(name, 'FAIL waiting'); break; } continue; } stuck = 0;
       const plan = await page.evaluate(() => {
         if (pend()) return { k: 'tap' };
@@ -35,11 +39,11 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       else if (plan.k === 'build') { ok = await drag(Math.random() < .5 ? '#die-' + plan.die : '#st-' + plan.s, [...await onTab('estate'), { sel: '#ec-' + plan.cell }]); if (ok) drags.build++; }
       else if (plan.k === 'sell') { ok = await drag('#die-' + plan.die, [{ sel: '#gd-' + plan.g }]); if (ok) drags.sell++; }
       else if (plan.k === 'take') { ok = await drag('#die-' + plan.die, [...await onTab('market'), { sel: `#mt-${plan.d}-${plan.slot}` }, { sel: '#store' }]); if (ok) drags.take++; }
-      else if (plan.k === 'worker') { const r = await page.evaluate(i => { const e = document.querySelector('#die-' + i).getBoundingClientRect(); return { l: e.left, w: e.width, y: e.top + e.height / 2 }; }, plan.die); const a = await ctr('#r-workers'); await page.mouse.move(a.x, a.y); await page.mouse.down(); await page.mouse.move(a.x + 12, a.y - 12, { steps: 3 }); await page.mouse.move(r.l + r.w * (plan.sign > 0 ? .8 : .2), r.y, { steps: 6 }); await page.mouse.up(); ok = await page.evaluate(i => !!bumpOf(i), plan.die); if (ok) drags.worker++; }
+      else if (plan.k === 'worker') { const r = await page.evaluate(i => { const e = document.querySelector('#die-' + i).getBoundingClientRect(); return { l: e.left, w: e.width, y: e.top + e.height / 2 }; }, plan.die); const a = await ctr('#r-workers'); await P.move(a.x, a.y); await P.down(); await P.move(a.x + 12, a.y - 12, { steps: 3 }); await P.move(r.l + r.w * (plan.sign > 0 ? .8 : .2), r.y, { steps: 6 }); await P.up(); ok = await page.evaluate(i => !!bumpOf(i), plan.die); if (ok) drags.worker++; }
       if (ok && plan.k !== 'worker') { await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); await page.waitForTimeout(plan.k === 'combo' ? 120 : 0); await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); const seq1 = await page.evaluate(() => G.seq); if (seq1 === seq0) { drags[plan.k]--; missed++; ok = false; } else if (plan.k === 'combo' && seq1 - seq0 < 2) { combo1++; } }
       if (!ok || plan.k === 'tap') {
         const order = ['#endB', '#es .glow', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#tabs .tab.has', '#acts .btn.alt'].map(x => x + ' >> visible=true');
-        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { await l.first().click(); taps++; did = true; break; } }
+        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { await tapSel(l.first()); taps++; did = true; break; } }
         if (!did) { console.log(name, 'FAIL nothing to do', plan.k); fails++; break; }
       }
       await page.waitForTimeout(20);

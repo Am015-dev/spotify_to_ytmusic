@@ -64,8 +64,9 @@ function toast(msg, ms) {   /* toast lane = the dock title row: it never covers 
   if (r && r.width) { t.style.left = (r.left + 4) + 'px'; t.style.top = (r.top + 1) + 'px'; t.style.width = (r.width - 8) + 'px'; t.style.height = Math.max(26, r.height - 2) + 'px'; }
   if (typeof G !== 'undefined' && G && !G.over && !isHuman(VB.actor(G))) { setCap(msg); return; }
   var dh = document.querySelector('.gx-dock-head');
-  t.textContent = msg; t.classList.add('on'); dh && dh.classList.add('toasting'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); dh && dh.classList.remove('toasting'); }, ms || 1800);
+  t.textContent = msg; ms = Math.max(ms || 0, readMs(msg)); t.classList.add('on'); dh && dh.classList.add('toasting'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); dh && dh.classList.remove('toasting'); }, ms || 1800);
 }
+function readMs(txt) { return 4000 + 100 * String(txt || '').split(/\s+/).length; }   /* owner: a message stays 4 s + 1 s per 10 words */
 function countUp(tb) {   /* totals tick up from 0 so the result lands as a beat (instant with fast / reduced motion) */
   if (UI.fast || document.documentElement.classList.contains('gx-reduce')) return;
   [].slice.call(tb.querySelectorAll('td:last-child')).forEach(function (td) { var n = +td.textContent, t0 = Date.now(); td.textContent = '0'; (function f() { var k = Math.min(1, (Date.now() - t0) / 900); td.textContent = String(Math.round(n * k)); if (k < 1) requestAnimationFrame(f); })(); });
@@ -233,7 +234,7 @@ function rateLine() {
 function beat(title, line, cls, ms) { UI.beats = UI.beats || []; UI.beats.push({ title: title, line: line, cls: cls || '', ms: ms }); }
 function beatsRun(then) {   /* show queued beat cards one after another; the next turn waits for them */
   var q = UI.beats || []; UI.beats = []; if (UI.fast || QS.get('scn') || !q.length) { q.forEach(function (b) { UI.lastBeat = b; }); then && then(); return 0; }
-  var total = 0; q.forEach(function (b) { b.ms = animMs(b.ms || 1700); total += b.ms; });
+  var total = 0; q.forEach(function (b) { b.ms = animMs(Math.max(b.ms || 0, readMs(b.title + ' ' + (b.line || '')))); total += b.ms; });
   UI.hold = Date.now() + total + animMs(1000);
   var el = $('#beat'); if (!el) { el = h('div', { id: 'beat', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(el); el.addEventListener('click', function () { UI.beatSkip && UI.beatSkip(); }); }
   var i = 0;
@@ -459,17 +460,16 @@ function renderDock() {
   var gt = VB.goodsTypes(p); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods' }));
   gt.forEach(function (g) {
     var ok = mt && VB.validMoves(G).some(function (m) { return m.k === 'sell' && m.v === g; });
-    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', sell with a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span', { text: '×' + p.goods[g] })]));
+    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', sell with a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span.gw', { text: p.goods[g] + ' ' + VB.GOODS[g] })]));
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
   var RESTIP = { silver: 'Silver buys back-lane tiles. 1 point each at the end.', workers: 'Drag a worker onto a die to change it by one.', vp: 'Your points so far.', pos: 'Banner track. Barges move you up and first.' };
   function resTap(k) { return function () { toast(RESTIP[k], 2600); }; }
-  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('i', { text: '🪙' }), String(p.silver)]));
+  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('span.rw', { text: p.silver + ' silver' })]));
   var wl = p.workers - (mt ? bumpUsed() : 0);
-  rr.appendChild(h('span.res.meep' + (mt && wl > 0 ? '.can' : ''), { id: 'r-workers', title: 'Workers', 'data-drag': mt && wl > 0 ? 'meeple' : null, 'data-idx': 0, 'aria-label': RESTIP.workers + ' You have ' + wl + '.', onclick: resTap('workers') }, [h('i', { html: MEEPLE }), String(wl)]));
-  rr.appendChild(h('span.res', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('i', { text: '⭐' }), String(p.vp)]));
-  rr.appendChild(h('span.res', { title: 'Banner track', 'aria-label': RESTIP.pos, onclick: resTap('pos') }, [h('i', { text: '🚩' }), String(p.pos)]));
+  rr.appendChild(h('span.res.meep' + (mt && wl > 0 ? '.can' : ''), { id: 'r-workers', title: 'Workers', 'data-drag': mt && wl > 0 ? 'meeple' : null, 'data-idx': 0, 'aria-label': RESTIP.workers + ' You have ' + wl + '.', onclick: resTap('workers') }, [h('i', { html: MEEPLE }), h('span.rw', { text: wl + (wl === 1 ? ' worker' : ' workers') })]));
+  rr.appendChild(h('span.res.vpchip', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('span.rw', { text: p.vp + ' pts' })]));
   /* actions */
   var ac = $('#acts'); ac.innerHTML = '';
   if (G.over) { ac.appendChild(h('button.btn', { type: 'button', id: 'resB', text: 'See the result', onclick: showResult })); return; }
@@ -623,7 +623,7 @@ function fly(from, toId, tile) {
   requestAnimationFrame(function () { e.style.transform = 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) + 'px) scale(' + sc + ')'; });
   return wait(ms + 40).then(function () { e.remove(); });
 }
-function popAt(r, txt) { if (!r || UI.fast) return; var e = h('div.popn', { text: txt, style: 'left:' + Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px;top:' + (r.top) + 'px' }); document.body.appendChild(e); setTimeout(function () { e.remove(); }, 1700); }
+function popAt(r, txt) { if (!r || UI.fast) return; var n = document.querySelectorAll('.popn').length; var e = h('div.popn', { text: txt, style: 'left:' + Math.max(90, Math.min(innerWidth - 90, r.left + r.width / 2)) + 'px;top:' + Math.max(60, r.top - n * 34) + 'px' }); document.body.appendChild(e); setTimeout(function () { e.remove(); }, 4000); }
 function ribbon(a, b) {
   if (!a || !b || UI.fast) return; var x1 = a.left + a.width / 2, y1 = a.top + a.height / 2, x2 = b.left + b.width / 2, y2 = b.top + b.height / 2;
   var len = Math.hypot(x2 - x1, y2 - y1), ang = Math.atan2(y2 - y1, x2 - x1);
@@ -637,8 +637,7 @@ function doMove(m) {
   try { if (hints()) rateBefore(m); } catch (e) { }
   var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed.'); render(); return Promise.resolve(); }
   r.ev.forEach(function (ev) { if (ev.e === 'score') { srcAdd(ev.p, ev.why, ev.n); srcLogAdd(ev); } });
-  if (m.k === 'end' && isHuman(s)) { var rl = rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints()) beat('Turn over', rl.t, 'turn ' + rl.k, 2600); else beat('Turn over', '', 'turn', 1100); }
-  else if (m.k === 'end') beat(G.seats[s].name + ' is done', '', 'rv', 1000);
+  if (m.k === 'end' && isHuman(s)) { var rl = rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints()) beat('Turn over', rl.t, 'turn ' + rl.k); }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   if (UI.bump && typeof m.die === 'number' && G.P[s].used[m.die]) delete UI.bump[m.die]; if (m.k === 'end') UI.bump = {};
   UI.busy = true; UI.sel = null;
@@ -1004,7 +1003,7 @@ function boot() {
     var n = e.target.closest && e.target.closest('.gxc-node,.gxc-ib'); if (!n) return;
     var lab = n.getAttribute('aria-label') || n.textContent || ''; n.setAttribute('data-tapped', '1');
     setTimeout(function () { var m = [].slice.call(document.querySelectorAll('.gxc-node,.gxc-ib')).filter(function (x) { return x.getAttribute('aria-label') === lab || x.textContent === n.textContent; })[0]; if (m) m.setAttribute('data-tapped', String(Date.now() % 100000)); }, 80);
-    setTimeout(function () { toast(/lock/i.test(lab) || n.disabled || n.classList.contains('locked') ? 'Win the chapter before to open this one' : lab.split(',')[0].trim()); }, 30);
+    setTimeout(function () { toast(/lock/i.test(lab) || n.disabled || n.classList.contains('locked') ? 'Win the previous chapter to open this one' : lab.split(',')[0].trim()); }, 30);
   }, true);
   document.addEventListener('pointerdown', function () { try { GA.unlock(); } catch (e) { } musSync(); }, { once: true });
   document.addEventListener('pointerdown', function () { if (typeof G !== 'undefined' && G && !G.over && !isHuman(VB.actor(G)) && !UI.quick) { UI.quick = true; } }, true);
