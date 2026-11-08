@@ -10,7 +10,7 @@ Every run first executes guard.py (stops on a failure) and modmap.py (refreshes 
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
-Nothing is written under games/ unless --deploy is given. No AI is used.
+Nothing is written under games/ unless --deploy is given. ASSET_GATE=1 with --deploy also runs scripts/asset-usage.js on the deployed games (exit 1 if one ships art it never loads). No AI is used.
 """
 import argparse, json, os, pathlib, re, shutil, subprocess, sys, time
 
@@ -394,12 +394,20 @@ def main():
         try: subprocess.run([sys.executable, str(SCRIPTS / "game-status.py")], check=False, timeout=120)
         except Exception as e: print("game-status skipped:", e)
 
+    gate_bad = False
+    if deployed and not a.suffix and os.environ.get("ASSET_GATE") == "1":  # optional: asset-usage gate (shipped art/models/music must load in a played game); needs ~3 min per game
+        todo = [s for s in deployed if not re.match(r"(asset-viewer|look|mainhattan-)", s)]
+        if todo:
+            r = subprocess.run(["node", str(SCRIPTS / "asset-usage.js"), *todo, "--jobs", "3"], env={k: v for k, v in os.environ.items() if k not in ("GX_URL", "GX_STAGE")})
+            gate_bad = r.returncode != 0
+            print("[asset-gate] " + ("BELOW THE GATE (see games-src/qa/asset-usage.json); the files are already deployed" if gate_bad else "ok"))
+
     print("\n== result ==")
     for s in slugs:
         print(f"{status[s]:5} {s:18} {why[s]}" + ("   -> deployed" if s in deployed else ""))
     npass = sum(status[s] == "PASS" for s in slugs)
     print(f"{npass}/{len(slugs)} PASS; staged in {out}" + (f"; deployed {len(deployed)}" if a.deploy else "; nothing deployed (use --deploy)"))
-    return 0 if npass == len(slugs) else 1
+    return 0 if npass == len(slugs) and not gate_bad else 1
 
 if __name__ == "__main__":
     sys.exit(main())

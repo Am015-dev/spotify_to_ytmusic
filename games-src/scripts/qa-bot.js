@@ -6,7 +6,7 @@
 // Output: games-src/qa/<slug>.json (bugs: sev BLOCKER|MAJOR|MINOR, phase, where, desc, seed, shot). Shots go to $QA_SHOTS (default $TMPDIR/qa-shots), not the repo.
 // Env: PLAYWRIGHT_BROWSERS_PATH if the browser build differs. --scale multiplies every time limit (default 1).
 const fs = require('fs'), path = require('path'), os = require('os');
-const ROOT = path.resolve(__dirname, '..', '..'), QA = path.join(ROOT, 'games-src', 'qa');
+const ROOT = path.resolve(__dirname, '..', '..'), QA = process.env.QA_DIR || path.join(ROOT, 'games-src', 'qa');   // QA_DIR: write results elsewhere (asset-usage.js)
 
 // ------------------------------------------------------------------ report mode
 if (process.argv[2] === '--report') { report(); process.exit(0); }
@@ -142,7 +142,7 @@ addEventListener('unhandledrejection', e => window.__qaErr.push('unhandledreject
 const NOISE = /NotAllowedError|AudioContext|autoplay|play\(\) failed|ResizeObserver|play\(\) request|The play\(\)|Failed to load resource: net::ERR_(FAILED|BLOCKED|INTERNET|NAME|ABORTED)|favicon|GPU stall|WebGL|requestFullscreen|Fullscreen|Permissions policy|vibrate|Failed to execute 'vibrate'|manifest|Service worker|serviceWorker/i;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 async function freshPage(browser, url, phase, ctxInfo) {
-  const ctx = await browser.newContext(PHONE ? { viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: UA } : { viewport: { width: 1280, height: 800 } });
+  const ctx = await browser.newContext(PHONE ? { viewport: { width: 390, height: +process.env.QA_VIEW_H || 763 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: UA } : { viewport: { width: 1280, height: 800 } });
   await ctx.route(u => !/^(http:\/\/127\.0\.0\.1|data:|blob:|about:)/.test(u.href || String(u)), r => r.abort());
   await ctx.addInitScript(PAGE);
   const page = await ctx.newPage();
@@ -152,6 +152,7 @@ async function freshPage(browser, url, phase, ctxInfo) {
   page.on('console', m => { if (m.type() !== 'error') return; const t = m.text(); if (NOISE.test(t)) return; bug('MINOR', phase, ctxInfo.where(), 'console.error: ' + t.split('\n')[0]); });
   page.on('requestfailed', r => { if (!/^http:\/\/127\.0\.0\.1/.test(r.url())) return; const f = r.failure(); if (f && /ABORTED|aborted/.test(f.errorText)) return; bug('MINOR', phase, ctxInfo.where(), 'request failed: ' + r.url().replace(/^http:\/\/[^/]+/, '') + ' ' + (f && f.errorText)); });
   page.on('response', r => { if (r.status() >= 400 && /^http:\/\/127\.0\.0\.1/.test(r.url())) bug('MINOR', phase, ctxInfo.where(), `HTTP ${r.status()}: ${r.url().replace(/^http:\/\/[^/]+/, '')}`); });
+  if (process.env.QA_REQ_LOG) page.on('request', r => { const m = /^http:\/\/127\.0\.0\.1:\d+(\/[^?#]*)/.exec(r.url()); if (m && /\/(media|models|music)\//.test(m[1])) try { fs.appendFileSync(process.env.QA_REQ_LOG, decodeURIComponent(m[1]) + '\n'); } catch (e) { } });   // asset-usage.js
   page.on('dialog', d => d.dismiss().catch(() => { }));
   page.on('popup', p => p.close().catch(() => { }));
   await page.goto(url, { waitUntil: 'load', timeout: 45000 });
