@@ -320,3 +320,7 @@ html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:no
 html:not(.ph) .card .aw .gold{translate:0 -8px}
 /* phone hand names: up to 3 lines, long words break, so no name is cut */
 html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:anywhere;hyphens:auto}
+
+/* a coach bubble with no free spot lets taps through to the glowing target under it (hlp.js hlpUncover) */
+.gxh-bub.gxh-thru{pointer-events:none;opacity:.6}
+.gxh-bub.gxh-thru .gxh-ok{pointer-events:auto}

@@ -91,8 +91,8 @@ const PAGE = `(() => {
       // help kit: bubbles stay on screen and never cover a glowing target; with tips off no coach bubble appears
       { const hb = [...document.querySelectorAll('.gxh-bub.on')]; if (!GXH.enabled() && hb.some(b => b.dataset.phase)) bad.push('a coach bubble with tips off');
         const cores = [...document.querySelectorAll('.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse')].filter(e => !e.closest('[data-help]') && vis(e)).map(e => e.getBoundingClientRect()).filter(q => q.right > 0 && q.bottom > 0 && q.left < W && q.top < H).map(q => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; });
-        for (const b of hb) { const r = b.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) bad.push('help bubble outside the screen');
-          for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push('help bubble covers a glowing target in phase ' + (typeof hlpPhase === 'function' ? hlpPhase() : '?') + ' ' + JSON.stringify(c)); break; } } }
+        for (const b of hb) { const r = b.getBoundingClientRect(); const thru = getComputedStyle(b).pointerEvents === 'none';   /* a see-through bubble lets taps reach the target below */ if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) bad.push('help bubble outside the screen');
+          if (!thru) for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push('help bubble covers a glowing target in phase ' + (typeof hlpPhase === 'function' ? hlpPhase() : '?') + ' ' + JSON.stringify(c)); break; } } }
       return bad;
     }
   };
