@@ -136,6 +136,7 @@ function fcShow(key, txt, who, ms) {
   const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
   const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
   F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
+  x.style.visibility = 'hidden'; setTimeout(() => { x.style.visibility = ''; }, readMs(txt));   // the line gets its reading time before it can be closed
 }
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
 function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
