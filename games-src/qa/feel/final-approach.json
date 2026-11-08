@@ -1,368 +1,196 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T03:27Z",
+ "when": "2026-11-08T03:41Z",
  "secs": 120,
- "totalSecs": 426,
+ "totalSecs": 409,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
+   "status": "FAIL",
+   "count": 13,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Your 3 goes on Axis. Same as Ravi: wings level. ×",
+     "words": 11,
+     "shownMs": 250,
+     "neededMs": 5100,
+     "cls": "fa-coach out"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Your 6 goes on Axis. Wings tilt 3. Three would crash. ×",
+     "words": 12,
+     "shownMs": 250,
+     "neededMs": 5200,
+     "cls": "fa-coach out"
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 6 goes on Axis. Close dice keep the wings lev"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 2 goes on Axis. Wings tilt 1. Three would cra"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Space 3: 1 plane ×",
+      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 3 goes on Axis. Close dice keep the wings lev"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "That space belongs to the co-pilot. ×",
+      "Your 6 goes on Engines. Speed 8: we move 1. ×"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "That space belongs to the co-pilot. ×",
+      "Your 4 goes on Axis. Wings tilt 1. Three would cra"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 453,
+     "texts": [
+      "Pick a die first. ×",
+      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "pc/learn",
+     "ms": 250,
+     "texts": [
+      "Axis still empty. Tap again. ×",
+      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
+     ]
+    }
+   ]
+  },
+  "b": {
    "status": "PASS",
    "count": 0,
    "detail": []
   },
-  "b": {
+  "c": {
    "status": "FAIL",
    "count": 4,
    "detail": [
     {
-     "session": "phone/play",
-     "text": "Space 2: 0 planes",
-     "ms": 994,
-     "cls": "on",
-     "tag": "div"
+     "session": "phone/learn",
+     "text": "Ines (Pilot) had no die on the Axis at the end of the round.",
+     "words": 14,
+     "at": 46754,
+     "where": "p.why"
     },
     {
-     "session": "phone/play",
-     "text": "Pick a die first.",
-     "ms": 5274,
-     "cls": "on",
-     "tag": "div"
+     "session": "phone/learn",
+     "text": "Fuel: a fuel space burns the die value; below 0 you lose (chapter 8).",
+     "words": 14,
+     "at": 46754,
+     "where": "li."
     },
     {
-     "session": "phone/play",
-     "text": "6000 ft · round 1 of 7",
-     "ms": 431,
-     "cls": "on",
-     "tag": "div"
+     "session": "phone/learn",
+     "text": "Wind dial, trainee tokens, icy runway, the 60-second clock (chapters 11 to 15).",
+     "words": 13,
+     "at": 46754,
+     "where": "li."
     },
     {
-     "session": "phone/play",
-     "text": "Pick a die first.",
-     "ms": 1792,
-     "cls": "on",
-     "tag": "div"
+     "session": "pc/learn",
+     "text": "Names, text and art are original; audio credits are in How to play.",
+     "words": 13,
+     "at": 7504,
+     "where": "p.sm"
     }
    ]
   },
-  "c": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
-  },
   "d": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
-  },
-  "e": {
    "status": "FAIL",
-   "count": 16,
+   "count": 2,
    "detail": [
     {
      "session": "phone/learn",
-     "k": "Axis|level",
-     "at": 20701,
-     "a": "Axis",
-     "b": "level",
-     "ra": [
-      101,
-      280,
-      23,
-      14
-     ],
-     "rb": [
-      99,
-      289,
-      27,
-      15
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Coffee|coffee",
-     "at": 20701,
-     "a": "Coffee",
-     "b": "coffee",
-     "ra": [
-      124,
-      547,
-      34,
-      14
-     ],
-     "rb": [
-      124,
-      555,
-      35,
-      15
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Axis|SPIN",
-     "at": 27222,
-     "a": "Axis",
-     "b": "SPIN",
-     "ra": [
-      101,
-      280,
-      23,
-      14
-     ],
-     "rb": [
-      97,
-      289,
-      29,
-      15
-     ]
-    },
-    {
-     "session": "phone/learn",
-     "k": "Axis|right",
-     "at": 39922,
-     "a": "Axis",
-     "b": "right",
-     "ra": [
-      101,
-      280,
-      23,
-      14
-     ],
-     "rb": [
-      98,
-      289,
-      28,
-      15
-     ]
+     "text": "Ines (Pilot) had no die on the Axis at the end of the round.",
+     "px": 13,
+     "at": 46754,
+     "where": "p.why"
     },
     {
      "session": "phone/play",
-     "k": "Axis|first",
-     "at": 119987,
-     "a": "Axis",
-     "b": "first",
-     "ra": [
-      101,
-      280,
-      23,
-      14
-     ],
-     "rb": [
-      100,
-      289,
-      23,
-      15
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "Speed|first",
-     "at": 119987,
-     "a": "Speed",
-     "b": "first",
-     "ra": [
-      95,
-      348,
-      33,
-      14
-     ],
-     "rb": [
-      100,
-      357,
-      23,
-      15
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "Radio|empty",
-     "at": 119987,
-     "a": "Radio",
-     "b": "empty",
-     "ra": [
-      12,
-      416,
-      31,
-      14
-     ],
-     "rb": [
-      9,
-      425,
-      37,
-      15
-     ]
-    },
-    {
-     "session": "phone/play",
-     "k": "Coffee|coffee",
-     "at": 119987,
-     "a": "Coffee",
-     "b": "coffee",
-     "ra": [
-      124,
-      547,
-      34,
-      14
-     ],
-     "rb": [
-      124,
-      555,
-      35,
-      15
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Axis|SPIN",
-     "at": 29701,
-     "a": "Axis",
-     "b": "SPIN",
-     "ra": [
-      386,
-      472,
-      26,
-      16
-     ],
-     "rb": [
-      386,
-      467,
-      26,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Speed|+1",
-     "at": 29701,
-     "a": "Speed",
-     "b": "+1",
-     "ra": [
-      380,
-      566,
-      38,
-      16
-     ],
-     "rb": [
-      394,
-      561,
-      10,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Radio|empty",
-     "at": 29701,
-     "a": "Radio",
-     "b": "empty",
-     "ra": [
-      30,
-      472,
-      36,
-      16
-     ],
-     "rb": [
-      32,
-      467,
-      32,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Gear|↓",
-     "at": 29701,
-     "a": "Gear",
-     "b": "↓",
-     "ra": [
-      298,
-      453,
-      29,
-      16
-     ],
-     "rb": [
-      304,
-      432,
-      18,
-      34
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Coffee|coffee",
-     "at": 29701,
-     "a": "Coffee",
-     "b": "coffee",
-     "ra": [
-      407,
-      660,
-      39,
-      16
-     ],
-     "rb": [
-      412,
-      654,
-      30,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Axis|right",
-     "at": 42706,
-     "a": "Axis",
-     "b": "right",
-     "ra": [
-      386,
-      472,
-      26,
-      16
-     ],
-     "rb": [
-      387,
-      467,
-      24,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Speed|stay",
-     "at": 42706,
-     "a": "Speed",
-     "b": "stay",
-     "ra": [
-      380,
-      566,
-      38,
-      16
-     ],
-     "rb": [
-      389,
-      561,
-      20,
-      13
-     ]
-    },
-    {
-     "session": "pc/learn",
-     "k": "Brake|2",
-     "at": 42706,
-     "a": "Brake",
-     "b": "2",
-     "ra": [
-      30,
-      547,
-      36,
-      16
-     ],
-     "rb": [
-      40,
-      526,
-      16,
-      34
-     ]
+     "text": "Keep it level",
+     "px": 13,
+     "at": 5254,
+     "where": "div.gxc-sc-title"
     }
    ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   }
  },
  "notes": [
@@ -376,41 +204,41 @@
    "size": "phone",
    "mode": "learn",
    "secs": 121,
-   "turns": 131,
-   "clicks": 162,
-   "endedBy": "time",
+   "turns": 139,
+   "clicks": 176,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 11
+   "messagesSeen": 29
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 120,
-   "turns": 171,
-   "clicks": 227,
+   "secs": 121,
+   "turns": 168,
+   "clicks": 214,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 4
+   "messagesSeen": 0
   },
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 120,
-   "turns": 138,
-   "clicks": 191,
+   "secs": 121,
+   "turns": 97,
+   "clicks": 146,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 23
+   "messagesSeen": 34
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 64,
-   "turns": 80,
-   "clicks": 120,
+   "secs": 47,
+   "turns": 53,
+   "clicks": 85,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
