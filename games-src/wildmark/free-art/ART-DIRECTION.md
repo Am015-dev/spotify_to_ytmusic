@@ -1,4 +1,13 @@
-# Wildmark art direction (free kit, round 2)
+# Wildmark art direction (free kit, round 3: 3D terrain + plates)
+
+**Round 3 (replaces ter-*, tok-*, card-*, table-bg; the rest below still applies):** terrain is a 3D render (three.js, KayKit Medieval Hexagon
+Pack glTF, CC0): oblique orthographic, warm sun, soft shadows, seamless 4x6 hex lattice with trees, mountains, hills, reeds, lilies.
+Animals are public-domain 19th-century natural-history plates (Audubon elk, fox, bear, hawk; a period fish plate for salmon), cropped and
+put through one parchment grade. Tokens: round portrait on a cream disc with a thin animal-colour rim. Cards: same layout as before (picture
+window, colour band, free cream area); the plates sit as pinned paper cards on the terrain render. Table: procedural walnut planks, low contrast.
+Rebuild: `render/README.md`. Sources: `CREDITS.md`.
+
+# (round 2, kept for the files compose.py still makes)
 
 **Style:** one family only, Kenney flat vector (CC0): soft flat colour, no outlines, rounded shapes, gentle top-light.
 Everything is rendered from the packs' own **vector** files at 4-7x (Chromium, bevel filters stripped), then downsampled,

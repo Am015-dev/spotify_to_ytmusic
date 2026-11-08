@@ -48,3 +48,9 @@ Every game needs, before it counts as ready:
 - choice badges in markets and hands showing the best gain;
 - one line after each turn rating the move good, okay or poor, and saying why, compared with the solver's best move.
 - Owner on Vale (8 Nov 00:12): "not easy to understand what I have to do, how I collect points, when my turn ends and why". Add a permanent turn tracker (round x of y, whose turn, actions or dice left shown as spendable tokens), a "Turn over: why" card when the turn ends, and one plain next-step line that names the exact action.
+
+## Addendum 6 (owner, 8 Nov 00:31): all the rules, and a game that feels real
+Owner on Redline Rally and Emberclimb: "not all rules are applied", "not covering anything to make the game real", "looks very boring". Before a game counts as ready:
+- every rule in its rules notes and rules-check is built and tested, listed found -> built in RULES-COVERAGE.md;
+- the full campaign or modes are there;
+- it feels like the real thing, with movement and animation, sound, a clear goal, and a satisfying end screen.

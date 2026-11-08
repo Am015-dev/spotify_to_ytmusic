@@ -19,7 +19,9 @@ function netInit() {
 }
 function netIdle() { clearTimeout(UI.tm); clearTimeout(UI.tr); G = null; UI.started = false; UI.cards = []; UI.after = []; UI.pop = null; UI.overShown = false; closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } try { GX.close(); } catch (e) { } }
 async function netJoin(role, code) {
-  if (NET.busy || !NET.lobby) return; NET.err = ''; code = NetRoom.cleanCode(code);
+  if (NET.busy) return;
+  if (!NET.lobby) { NET.err = 'Online play is not connected right now. Check your internet connection and try again.'; netRender(); return; }
+  NET.err = ''; code = NetRoom.cleanCode(code);
   if (!code) { NET.err = 'Type the invite code first.'; netRender(); return; }
   NET.busy = true; netRender(); let room;
   try { if (NET.room) { try { await NET.room.leave(); } catch (e) { } NET.room = null; } room = await NET.lobby.join('hb-' + code); } catch (e) { NET.busy = false; NET.err = 'Could not open the game room.'; netRender(); return; }
