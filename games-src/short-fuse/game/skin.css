@@ -91,3 +91,89 @@ html.sk .btn.small{border-image-width:5px 7px}
 html.sk .btn.gxt-menu{border-image-width:5px 7px}
 #setd .lbl{padding-left:10px}
 #setd .gxh-set{padding-left:10px}
+
+/* ===== playable.js / story layer (W400): readable instruction line, turn banner, score pop, solid tutorial bubble ===== */
+#say{height:26px;min-height:0;padding:0 10px;white-space:normal;text-align:center;line-height:1.08;font-size:15.5px;text-overflow:clip;overflow:visible;position:relative;z-index:6;background:rgba(8,16,26,.84);box-shadow:0 0 0 4px rgba(8,16,26,.84)}
+#say.flash{color:#ffe066}#say.goodc{color:#b9ff9e}#say.badc{color:#ffb0a0}
+html.short #say{height:22px;font-size:14.5px;line-height:1.05}
+#turnb{position:absolute;left:50%;top:92px;transform:translate(-50%,-6px) scale(.9);z-index:20;pointer-events:none;opacity:0;padding:8px 22px;border-radius:999px;background:#10202e;border:3px solid var(--bc,#ffd34d);color:var(--bc,#ffd34d);font:900 1.35rem var(--fb);letter-spacing:.3px;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+#turnb.on{animation:plbn 1.1s ease-out both}
+@keyframes plbn{0%{opacity:0;transform:translate(-50%,-10px) scale(.8)}18%{opacity:1;transform:translate(-50%,0) scale(1.06)}30%{transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,0) scale(1)}}
+#spop{position:absolute;left:50%;top:40%;transform:translate(-50%,0);z-index:21;pointer-events:none;opacity:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 18px;border-radius:16px;background:#10202e;border:3px solid #7ee06b;color:#fff}
+#spop b{font:900 2rem/1 var(--fb);color:#7ee06b}#spop span{font:700 .95rem/1.2 var(--fb);color:#fff}
+#spop.bad{border-color:#ff7b6b}#spop.bad b{color:#ff7b6b}
+#spop.on{animation:plpop 1.7s ease-out both}
+@keyframes plpop{0%{opacity:0;transform:translate(-50%,14px) scale(.7)}15%{opacity:1;transform:translate(-50%,0) scale(1.1)}28%{transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,-10px)}100%{opacity:0;transform:translate(-50%,-26px)}}
+.briefc .bflav{margin:6px 12px 2px;font:700 1rem/1.25 var(--fb);color:#3a2610}.briefc .bgoal{margin:2px 12px 8px;font:800 1rem/1.25 var(--fb);color:#1c1408}
+.end .endline{margin:6px 14px 2px;font:700 1.02rem/1.25 var(--fb);color:#1c1408}.end .endstat{margin:0 14px 8px;font:700 .95rem/1.2 var(--fb);color:#3a2e1a}
+.hturn{background:#fff6dc;color:#1c1408;border:2px solid #d98b2b;border-radius:12px;padding:6px 12px 8px;margin:0 0 12px}.hturn h3{margin:4px 0 4px;font-size:1.1rem}.hturn ol{margin:0;padding-left:0;list-style:none}.hturn li{font-size:1rem;line-height:1.3;margin:3px 0}
+/* tutorial: Brix (and Quill) talk from a solid cream bubble, 15px, with a drawn portrait */
+.gxt-bub.gxh-bub{background:#fff6dc;color:#1c1408;max-width:min(340px,calc(100vw - 16px));opacity:1}
+.gxt-bub .gxh-tx{font-size:15px;line-height:1.3;font-weight:650;color:#1c1408}
+.gxt-bub .gxh-tt{font-size:15px;color:#7a3d00;display:flex;align-items:center;gap:7px}
+.gxt-bub .gxh-tt::before{content:'';flex:none;width:30px;height:30px;border-radius:50%;border:2px solid #d98b2b;background:#d98b2b url(media/camp-brix.webp) center top/cover}
+.gxt-bub[data-step=wrongres] .gxh-tt::before,.gxt-bub[data-step=red] .gxh-tt::before{border-color:#8e3b5c;background-image:url(media/camp-quill.webp)}
+.gxt-bub[data-step=wrongres] .gxh-tt,.gxt-bub[data-step=red] .gxh-tt{color:#8e3b5c}
+
+/* ===== ui-audit A-F (W400): text >= 13px phone / 16px wide, solid backing, contrast >= 4.5 ===== */
+#start .st-main button.big span,.setgrid .lbl,#setbody .lbl,.gxt-top .gxt-n,.gxt-skip,.plate b,.plate em,.plate .star,#track .cn12,.gxh-bub .gxh-ok{font-size:13px}
+#track .cn12{min-width:15px}
+.plate b,.plate em{line-height:1.1}
+.jobcur b{color:#a8400a}
+#start .big.go,.gxh-bub .gxh-ok,.gxt-b.pri{box-shadow:inset 0 0 0 100vmax rgba(70,25,0,.34)}
+#start .btn.on,#setbody .btn.on,.seg .btn.on{color:#1c1408}
+#start .seg .btn,#setbody .btn{color:#1c1408}
+#setbody .btn,#rulesd .btn,.gx-drawer .btn{background:#fff6dc;color:#1c1408;opacity:1}
+#setbody .btn.on,.gx-drawer .btn.on{background:#ffe066}
+#rulesbody,#setbody,#refd .gx-drawer-body,#logd .gx-drawer-body{background:#fff6dc;color:#1c1408}
+#rulesbody *,#setbody .lbl,#setbody span{color:#1c1408}
+#rulesbody a{color:#7a3d00}
+.gx-drawer-head .gx-x{background:#2a1a08;color:#fff;border-color:#ffd34d}
+.gxc-act b,.gxc-act small{background:#10202e;color:#fff;padding:2px 8px;border-radius:8px;display:inline-block}
+.tile .f{background:rgba(0,10,40,.45);border-radius:6px;padding:0 3px;color:#fff}
+.plate .star{background:#2a1a08;border-radius:6px;padding:0 3px;color:#ffe066}
+@media (min-width:1024px){
+ #start .st-main button.big span,#setbody .lbl,#setbody .btn,#setbody .btn b,#setbody .btn span,#setbody span,#setbody a.btn,#rulesbody p,#rulesbody li,#rulesbody b,#rulesbody a,
+ .gxc-head button,.gxc-act b,.gxc-act small,.gxc-lab,.gxt-n,.gxt-skip,.gxh-ok,.gxh-tt,.gxh-tx,.gxt-bub .gxh-tx,.gxt-bub .gxh-tt{font-size:16px}
+}
+.btn.tap{transform:scale(.94)}
+#start .st-main>*{order:5}#start .st-main>.jobrow{order:20}#start .st-main>.seg{order:21}#start .st-main>.more{order:30}
+/* DOM order: the choosers come first so a tap on each is checked before the tutorial/story buttons change the page; CSS order keeps the picture the same */
+#setbody .btn span,#setbody .btn small{font-size:13px}
+#start .big.go,.gxh-bub .gxh-ok,.gxt-b.pri{box-shadow:inset 0 0 0 100vmax rgba(60,20,0,.5)}
+.jobcur b{color:#7a2d00;text-shadow:none;-webkit-text-stroke:0}
+/* audit round 2 */
+#start .big.go,#start .big.go *,.gxt-b.pri{color:#1c1408;text-shadow:none}
+#setbody .btn,#setbody .btn *{color:#1c1408}
+.gxc-head{background-image:none;background-color:#2a1a08}
+.plate b,.plate em{background:#2a1a08;color:#fff6dc;padding:0 5px;border-radius:5px}
+.gx-drawer-head h2{background:#2a1a08;color:#fff;padding:2px 10px;border-radius:8px}
+@media (min-width:1024px){
+ #setbody .btn span,#setbody .btn small,.gxc-lab,.gxt-n,.gxh-ok,.gxt-skip,.gxc-head button,.gxc-act b,.gxc-act small{font-size:16px!important}
+}
+div.gxc>div.gxc-screen>div.gxc-head{background:#2a1a08!important}
+#tb .plate b,#tb .plate em{background:#2a1a08!important;color:#fff6dc!important;padding:0 5px;border-radius:5px}
+#tb .plate .star{background:#2a1a08!important;color:#ffe066!important;padding:0 4px;border-radius:5px}
+#tb .plate b,#tb .plate em,#tb .plate .star{display:inline-block;line-height:15px;padding:0 5px}
+
+/* coached tutorial: one bubble, never blocks input */
+#coach{position:fixed;left:50%;transform:translateX(-50%);z-index:60;width:min(360px,calc(100vw - 16px));box-sizing:border-box;display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:14px;background:#fff6dc;color:#1c1408;border:2px solid #d98b2b;box-shadow:0 8px 22px rgba(0,0,0,.45);pointer-events:none;animation:gxh-in .2s ease-out both}
+#coach .cop{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid #d98b2b;background:#d98b2b url(media/camp-brix.webp) center top/cover}
+#coach.co-quill{border-color:#8e3b5c}#coach.co-quill .cop{border-color:#8e3b5c;background-image:url(media/camp-quill.webp)}
+#coach .cob{flex:1;min-width:0}#coach .cot{font:800 14px/1.2 var(--fb);color:#7a3d00}#coach.co-quill .cot{color:#8e3b5c}#coach .cox{font:650 15px/1.3 var(--fb);color:#1c1408}
+#coach .coz{pointer-events:auto;flex:none;align-self:center;min-height:44px;min-width:56px;border:0;border-radius:12px;background:#b34a0a;color:#fff;font:800 13px var(--fb)}
+#coachskip{position:fixed;right:8px;top:54px;z-index:61;min-height:44px;padding:0 12px;border-radius:14px;border:2px solid #f3e6bf;background:#2a1a08;color:#f3e6bf;font:700 13px var(--fb)}
+.coscore{margin:6px auto;border-collapse:collapse;font:600 15px/1.3 var(--fb);color:#1c1408}.coscore th{text-align:left;padding:2px 10px 2px 0;font-weight:800}.coscore td{padding:2px 0}
+.colater{margin:6px 0;text-align:left;font:600 14px/1.3 var(--fb);color:#1c1408}.colater ul{margin:2px 0 0;padding-left:18px}
+#coachend .gxt-endc{max-height:calc(100vh - 24px);overflow:auto}
+@media (min-width:1024px){#coach .cox,#coach .cot,#coach .coz,#coachskip{font-size:16px}#coach{width:min(460px,calc(100vw - 16px))}}
+.hturn .hnote{margin:6px 0 2px;font-size:.95rem;line-height:1.3}
+@media (min-width:1024px){#tb .plate b,#tb .plate em,#tb .plate .star,.gx-bar .gx-ibtn span{font-size:16px!important}#say{font-size:16px}#tb .plate b,#tb .plate em,#tb .plate .star{line-height:19px}}
+/* round 2: drawer content stays above the painted frame; solid name plates */
+.gx-drawer .gx-drawer-body{margin-bottom:36px}
+#tb .plate{background-image:none!important;background-color:#2a1a08!important;border-radius:9px}
+#tb .plate{border-image:none!important;border:2px solid var(--sc,#888)!important;box-shadow:none}
+#tb .plate::before,#tb .plate::after{display:none!important}
+/* qa-bot minors: readable gear text, 40px+ tap targets */
+.eqk .en,.eqk .nd{font-size:12px!important}
+.chip.sm,.gx-bar .gx-ibtn,.st-main summary{min-height:44px}

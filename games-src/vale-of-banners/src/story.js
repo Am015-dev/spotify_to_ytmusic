@@ -38,6 +38,34 @@ window.VSTORY = {
     end5:   { t: 'Harvest eve', say: 'End the day. The season closes, the mine pays, and the Vale counts.', react: 'The bells ring. Count it all!' },
     result: { t: 'The harvest moot', say: '+1 per silver, crate, 2 workers, lore. Ties: fuller estate, then further back.', win: 'The banner is yours, steward. This is only the start.', lose: 'Tobin by a whisker. Next spring, we take it back.' }
   },
+
+  /* coached first game (tutorial): each rule is explained the first time it matters; unseen ones go on the "later" card */
+  coach: {
+    build:   { say: 'That tile wants a home: same colour, a die\'s number, touching your land. The glow shows where.', later: 'Build: a stored tile goes on an empty space of its colour with a die\'s number, touching your land.' },
+    end:     { say: 'Both dice spent. End your turn (the back lane can still sell you a tile for silver).', later: 'End your turn when both dice are used.' },
+    rival:   { say: 'Tobin\'s turn. The banner track decides who goes first each round. Watch what he takes.', later: 'Turn order follows the banner track.' },
+    white:   { say: 'See the white die? It sent this round\'s goods crates to the stall with its number.', later: 'The white die puts each round\'s goods on its stall.' },
+    sell:    { say: 'You can sell! All crates of one number with a matching die: points per crate and a silver.', later: 'Sell all goods of one number with a matching die: 2/3/4 points per crate (2/3/4 players) and 1 silver.' },
+    kinds:   { say: 'Your barn holds three kinds of goods. A fourth kind would be lost, so sell soon.', later: 'You hold at most 3 kinds of goods.' },
+    workers: { say: 'Workers! Each one nudges a die up or down by 1, and 6 and 1 touch.', later: 'Any die can take 2 workers; each worker turns a die up or down by 1 (6 and 1 touch).' },
+    bend:    { say: 'Tiles marked with a worker are one pip off your dice: spend a worker to take them.', later: 'A worker bends a die by 1 to reach a tile or space.' },
+    back:    { say: 'You have 2 silver: the back lane sells any one tile per turn, no die needed.', later: 'Back lane: once per turn buy a tile for 2 silver, no die.' },
+    keep:    { say: 'A keep! It gives you one free action right now, with any number.', later: 'Keep (dark green): one free extra action with any number.' },
+    bld:     { say: 'Buildings act the moment they land. Never two of one kind in the same quarter.', later: 'Buildings (tan): instant effect; never two of a kind in one quarter.' },
+    hall:    { say: 'Moot Hall: build again at once, any number. Chains win games.', later: 'Moot Hall: build again at once with any number (chain).' },
+    lore:    { say: 'Lore bends one rule for you for the rest of the game. Tap it to read which.', later: 'Lore (yellow): bends one rule for you all game.' },
+    mine:    { say: 'A mine pays you a silver at every season\'s end.', later: 'Mine (grey): 1 silver at each season end.' },
+    pas:     { say: 'Pastures score every animal of that kind in the same meadow, this one included.', later: 'Pasture (light green): scores all animals of that kind in that meadow.' },
+    barge:   { say: 'A barge loads every crate from one stall and moves your banner up the track.', later: 'Barge (blue): take all goods of one stall and move up the banner track.' },
+    region:  { say: 'A whole region filled! Size points plus a season bonus: early regions pay best.', later: 'Fill a whole region of one colour: 1/3/6/10/15/21/28/36 points by size plus 10/8/6/4/2 by season.' },
+    colour:  { say: 'Every space of one colour filled: the first to do it gets a colour bonus.', later: 'Colour bonus: first and second to fill every space of a colour score extra.' },
+    discard: { say: 'Storage is full: drop one tile to make room.', later: 'Storage holds 3 tiles; a fourth makes you drop one.' },
+    season:  { say: 'The season ends: mines pay out. After the last season comes the final count.', later: 'Each season is 5 rounds; the game ends after the last one.' }
+  },
+  coachGood: { chain: 'Chain! Two builds from one die. That is how estates grow fast.', region: 'Lovely: that closed a region.' },
+  coachPoor: { workers: 'A build was possible there. A tile on the board is usually worth more than 2 workers.' },
+  coachRival: { region: 'Tobin just filled a region. Watch his estate: he chases the small ones.', sell: 'Tobin sold goods. Selling also pays a silver.', chain: 'Tobin chained builds with a Moot Hall or Keep.' },
+  laterTitle: 'Things you\'ll meet later',
   endTitle: 'The banner is raised',
   endText: 'Spring is done and you know every trade of the Vale. The real valley waits.',
   /* Quick game: one flavour line at the start, one result line */

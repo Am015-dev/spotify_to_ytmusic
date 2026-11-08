@@ -95,3 +95,6 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
   W391 rules engine fixes for 9 games; W377 QA bot; W385 free CC0 art kit. Integrate only what passes qa-bot + rules + screenshot review.
 - Owner (7 Nov 21:25): "Less talking, more work. I have ADHD." Reports to the owner: max 3 short lines, results + links only.
 - Owner (7 Nov 22:07): never report a game as "ready to test" unless it is fully done: coached tutorial, readable phone layout, real art (not sloppy HTML look), QA bot clean. No intermediate updates.
+
+## Lesson (8 Nov 00:25): bot gates are not "ready"
+Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still found all three unplayable: unreadable cards, no idea what to do, how points come in, or when a turn ends. Before telling the owner any game is ready, the orchestrator must look at the phone shots as a first-time player (title, turn 1, a card, scoring), and Addendum 5 plus the turn tracker must be in. Never report ready on bot results alone.

@@ -53,17 +53,17 @@
   {
    "act": 1,
    "title": "The Pyramid",
-   "blurb": "Learn to build."
+   "blurb": "Two empty thrones, one apprentice who wants them."
   },
   {
    "act": 2,
    "title": "Open Roads",
-   "blurb": "Rivals who plan."
+   "blurb": "Traders, generals and a queen by the river."
   },
   {
    "act": 3,
    "title": "The Twin Throne",
-   "blurb": "Two moves ahead."
+   "blurb": "The old king was never dead."
   }
  ],
  "twists": [
@@ -87,17 +87,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Welcome to Twin Thrones. Two cities, one pyramid of cards."
+     "text": "The old king is dead. Two thrones stand empty, and the one who builds the greater city wears both crowns."
+    },
+    {
+     "who": "pell",
+     "text": "I am only the apprentice, but I want that crown. Show me you deserve it."
     },
     {
      "who": "guide",
-     "text": "I will walk you through your first duel step by step."
+     "text": "Out-build Pell in a fair duel. No tricks yet: just cards."
     }
    ],
    "outro": [
     {
      "who": "guide",
-     "text": "You read the pyramid well."
+     "text": "The first stones are laid. Pell goes pale, but the Quarry master has heard of you."
     }
    ],
    "opponent": {
@@ -150,7 +154,17 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "pell",
+     "text": "Beginner luck! Next time I will not sell my best cards."
+    },
+    {
+     "who": "guide",
+     "text": "Do not be discouraged. Study what you uncover, and try again."
+    }
+   ]
   },
   {
    "id": "c2",
@@ -160,17 +174,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Coins buy missing resources, so trade posts matter."
+     "text": "Orrin of the Quarry hoards stone and sells it dear. Your coins will matter."
     },
     {
      "who": "guide",
-     "text": "Score 40 points or more to show you can build a city."
+     "text": "Reach 40 points: a real city, not a camp."
+    },
+    {
+     "who": "pell",
+     "text": "Orrin owes me a favour. Beat him and I will tell you what I know."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "A fine, full treasury."
+     "who": "orrin",
+     "text": "Hmph. A builder who counts her coins. Take the stone road to the gate."
     }
    ],
    "opponent": {
@@ -223,7 +241,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "orrin",
+     "text": "Your city is thin. Come back with more trade and more wonders."
+    }
+   ]
   },
   {
    "id": "c3",
@@ -233,17 +257,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Warden Brannoc holds the gate. He starts with extra coins."
+     "text": "Warden Brannoc keeps the only gate to the hill. He starts with extra coins."
     },
     {
      "who": "brannoc",
-     "text": "No city passes my wall."
+     "text": "No city passes my wall. Not yours. Not anyone's."
+    },
+    {
+     "who": "guide",
+     "text": "He builds red and pushes the pawn. Do not let him march."
     }
    ],
    "outro": [
     {
      "who": "guide",
-     "text": "The gate is open. Act two awaits."
+     "text": "The gate stands open. Beyond it, roads you have never seen. Act two begins."
     }
    ],
    "opponent": {
@@ -302,7 +330,17 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "brannoc",
+     "text": "Back to your tents. The wall holds."
+    },
+    {
+     "who": "guide",
+     "text": "Walls fall to patience. Try the pawn yourself."
+    }
+   ]
   },
   {
    "id": "c4",
@@ -312,17 +350,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Act two. The rivals plan ahead now."
+     "text": "Out on the open roads, rivals plan ahead and trade on every corner."
     },
     {
      "who": "maro",
-     "text": "Every card you free is a gift to me."
+     "text": "Every card you free is a gift to me. Thank you in advance."
+    },
+    {
+     "who": "guide",
+     "text": "Mind what each card uncovers. Maro always does."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "You mind what you uncover."
+     "who": "maro",
+     "text": "You free nothing for free. Impressive. Keep the road."
     }
    ],
    "opponent": {
@@ -375,7 +417,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "maro",
+     "text": "I ate every card you uncovered. Delicious. Again?"
+    }
+   ]
   },
   {
    "id": "c5",
@@ -385,17 +433,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Armies matter. Finish with the conflict pawn on your side of the track."
+     "text": "General Kest has been marching since dawn. Finish with the conflict pawn on your side."
+    },
+    {
+     "who": "kest",
+     "text": "Ground is held by whoever stands on it."
     },
     {
      "who": "guide",
-     "text": "The pawn only counts if it ends on your side."
+     "text": "Shields move the pawn. Count them as carefully as coins."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "Well marched."
+     "who": "kest",
+     "text": "You held the ground. I will remember it."
     }
    ],
    "opponent": {
@@ -448,7 +500,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "kest",
+     "text": "The ground was mine. Come back stronger."
+    }
+   ]
   },
   {
    "id": "c6",
@@ -458,17 +516,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Queen Seren has the pawn two steps toward your capital."
+     "text": "The river city belongs to Queen Seren, and her army is already two steps from your capital."
     },
     {
      "who": "seren",
-     "text": "My army is already at your door."
+     "text": "Kneel, challenger. The Teal Throne has a queen."
+    },
+    {
+     "who": "guide",
+     "text": "Push the pawn back or lose coins to her looting."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "The throne yields. One age left."
+     "who": "seren",
+     "text": "The throne yields. You have earned the right to ask the final question."
     }
    ],
    "opponent": {
@@ -527,7 +589,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "seren",
+     "text": "Your city is not ready for the Teal Throne. Return when it is."
+    }
+   ]
   },
   {
    "id": "c7",
@@ -537,17 +605,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Act three. The rivals read the board two moves ahead."
+     "text": "Act three. The old rivals return, and now they read the board two moves ahead."
+    },
+    {
+     "who": "orrin",
+     "text": "I have learned from you, builder. Stone, wonders, patience."
     },
     {
      "who": "guide",
-     "text": "Take your time: look at what each card uncovers."
+     "text": "Take your time. Check every card before you free it."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "You out-thought them."
+     "who": "orrin",
+     "text": "You out-thought a quarry master. The scholars are waiting."
     }
    ],
    "opponent": {
@@ -600,7 +672,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "orrin",
+     "text": "Hard ground, hard lessons. Go again."
+    }
+   ]
   },
   {
    "id": "c8",
@@ -610,17 +688,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Six different science symbols win at once. Watch the shelves."
+     "text": "Sevra the Sage keeps the Long Library. Six different science symbols win outright."
+    },
+    {
+     "who": "sevra",
+     "text": "Knowledge is a crown. I am only lending it."
     },
     {
      "who": "guide",
-     "text": "Science symbols and tokens can end the game early."
+     "text": "Count her symbols and block the last one."
     }
    ],
    "outro": [
     {
-     "who": "guide",
-     "text": "Knowledge is power."
+     "who": "sevra",
+     "text": "You read the shelves like a book. Now the last army."
     }
    ],
    "opponent": {
@@ -673,7 +755,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "sevra",
+     "text": "You counted symbols poorly. The Library is patient."
+    }
+   ]
   },
   {
    "id": "c9",
@@ -683,17 +771,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "Win by the pawn or by science: no points race this time."
+     "text": "General Kest and Sevra stand together: win by the pawn or by science. Points do not count."
+    },
+    {
+     "who": "kest",
+     "text": "Armies and scrolls: you cannot stop both."
     },
     {
      "who": "guide",
-     "text": "Points do not count here: push the pawn or collect symbols."
+     "text": "Pick one road and run down it."
     }
    ],
    "outro": [
     {
      "who": "guide",
-     "text": "A swift, clean victory."
+     "text": "Clean and swift. Only one throne-holder remains."
     }
    ],
    "opponent": {
@@ -746,7 +838,13 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "kest",
+     "text": "Steel and scroll together. Not today, builder."
+    }
+   ]
   },
   {
    "id": "c10",
@@ -756,17 +854,21 @@
    "intro": [
     {
      "who": "guide",
-     "text": "King Vael has held both thrones for years. He starts rich."
+     "text": "King Vael was never dead. He has held both thrones in secret and starts rich."
     },
     {
      "who": "vael",
-     "text": "Two thrones, one king. Kneel."
+     "text": "Two thrones, one king. Kneel before the only crown that matters."
+    },
+    {
+     "who": "guide",
+     "text": "Everything you learned in this war ends here. Build, march and out-think him."
     }
    ],
    "outro": [
     {
      "who": "guide",
-     "text": "Both thrones are yours."
+     "text": "Both thrones are yours. The river city and the hill city cheer one name: yours."
     }
    ],
    "opponent": {
@@ -825,7 +927,342 @@
     "setup": {},
     "maxStars": 2,
     "text": "The rival plays gently and the boss rule is off."
-   }
+   },
+   "outroLose": [
+    {
+     "who": "vael",
+     "text": "You were so close. The crowns stay with me."
+    },
+    {
+     "who": "guide",
+     "text": "Rest. Rebuild. The Twin Thrones will still be waiting."
+    }
+   ]
   }
- ]
+ ],
+ "prologue": {
+  "rival": "pell",
+  "guide": "guide",
+  "chapters": [
+   {
+    "title": "The Crowns",
+    "open": [
+     {
+      "who": "guide",
+      "text": "The old king is dead. Two thrones stand empty, and the greater city wears both crowns."
+     },
+     {
+      "who": "pell",
+      "text": "I am only the apprentice, but I want that crown. Let us see who builds better."
+     },
+     {
+      "who": "guide",
+      "text": "Before any cards: choose the wonders that will mark your city."
+     }
+    ],
+    "close": [
+     {
+      "who": "guide",
+      "text": "Four wonders each. Now the real work begins: the pyramid of Age I."
+     }
+    ]
+   },
+   {
+    "title": "First Turns",
+    "open": [
+     {
+      "who": "guide",
+      "text": "The first age: raw stone, rough roads, and a pyramid of cards between you and Pell."
+     },
+     {
+      "who": "pell",
+      "text": "I will take whatever you uncover. Fair warning."
+     }
+    ],
+    "close": [
+     {
+      "who": "guide",
+      "text": "You built, bought, sold and raised a wonder. The years begin to turn."
+     },
+     {
+      "who": "pell",
+      "text": "Wait, you can do all that? Show-off."
+     }
+    ]
+   },
+   {
+    "title": "The Years Turn",
+    "open": [
+     {
+      "who": "guide",
+      "text": "Age II. The marks you collected last age now open doors."
+     },
+     {
+      "who": "pell",
+      "text": "Marks? Doors? I just wanted a nice castle."
+     }
+    ],
+    "close": [
+     {
+      "who": "guide",
+      "text": "Chains, pairs, tokens: a scholar's city. One age remains."
+     }
+    ]
+   },
+   {
+    "title": "The Last Card",
+    "open": [
+     {
+      "who": "guide",
+      "text": "Age III. The final cards of the war. Everything you own will be counted."
+     },
+     {
+      "who": "pell",
+      "text": "Sixty cards later and I am still not king..."
+     }
+    ],
+    "close": [
+     {
+      "who": "guide",
+      "text": "Count the crown. The tutorial ends, but the story does not."
+     }
+    ]
+   }
+  ],
+  "steps": {
+   "crowns": {
+    "title": "Ione: your city",
+    "say": "Gold banners mark your city, teal marks Pell's. Four wonders will rise in each.",
+    "react": null
+   },
+   "draft": {
+    "title": "Ione: wonders",
+    "say": "Great works bring points and a power. Claim the glowing wonder before Pell does.",
+    "react": "Claimed! Pell frowns and eyes the next wonder."
+   },
+   "pyramid": {
+    "title": "Ione: the pyramid",
+    "say": "Age I begins. Glowing cards are free to take; cards under others must wait their turn.",
+    "react": null
+   },
+   "take-free": {
+    "title": "Ione: first card",
+    "say": "The river is rising. Rock Face costs nothing. Take it.",
+    "react": null
+   },
+   "build-free": {
+    "title": "Ione: build",
+    "say": "Build it: stone for your walls, every turn, forever.",
+    "react": "Stone for the walls: free, and yours for good."
+   },
+   "take-inn": {
+    "title": "Ione: coins",
+    "say": "Pell's tax men eye your purse. Take the Roadside Inn.",
+    "react": null
+   },
+   "build-inn": {
+    "title": "Ione: coin card",
+    "say": "Build it. Yellow cards pay coins at once.",
+    "react": "Four coins in the purse. Gold feeds every plan."
+   },
+   "take-red": {
+    "title": "Ione: shields",
+    "say": "Pell is gathering troops. The red Lookout carries a shield.",
+    "react": null
+   },
+   "build-red": {
+    "title": "Ione: build red",
+    "say": "Build it for 1 coin. A shield pushes the pawn toward Pell.",
+    "react": "The pawn marches toward Pell's city!"
+   },
+   "pawn": {
+    "title": "Ione: the pawn",
+    "say": "Nine steps toward a capital wins at once. Marked spaces loot your rival's coins.",
+    "react": null
+   },
+   "take-buy": {
+    "title": "Ione: missing parts",
+    "say": "The Herb Garden needs glass, and you have none. The bank sells it.",
+    "react": null
+   },
+   "build-buy": {
+    "title": "Ione: buying",
+    "say": "Build it. A missing resource costs 2 coins plus what Pell produces.",
+    "react": "Glass bought for coins. And a science symbol: the wheel."
+   },
+   "take-chain": {
+    "title": "Ione: chains",
+    "say": "The Remedy Shop gives a science symbol and a chain mark.",
+    "react": null
+   },
+   "build-chain": {
+    "title": "Ione: chain mark",
+    "say": "Build it. Chain marks make matching Age II cards free.",
+    "react": "Chain mark gained: the flask. A later card will cost nothing."
+   },
+   "take-sell": {
+    "title": "Ione: unwanted cards",
+    "say": "Some cards do not suit you. Take one anyway to keep it from Pell.",
+    "react": null
+   },
+   "sell": {
+    "title": "Ione: sell",
+    "say": "Sell it: 2 coins, plus 1 for each yellow card you own.",
+    "react": "Coins in hand. Now watch what it uncovered."
+   },
+   "tension": {
+    "title": "Ione: be careful",
+    "say": "Pell grabbed the card you uncovered. Always check what a card frees for him.",
+    "react": null
+   },
+   "take-wonder": {
+    "title": "Ione: a wonder",
+    "say": "A card can raise a wonder instead: points and a power. Take this one.",
+    "react": null
+   },
+   "wonder": {
+    "title": "Ione: raise it",
+    "say": "Pick the wonder you can pay for. The card goes under it.",
+    "react": "The first wonder rises over your city!"
+   },
+   "years": {
+    "title": "Ione: Age II",
+    "say": "Seasons turn. Whoever trails on the conflict track picks who starts each age.",
+    "react": null
+   },
+   "take-pair": {
+    "title": "Ione: free by chain",
+    "say": "Herbarium shows the flask mark you own. Take it.",
+    "react": null
+   },
+   "build-pair": {
+    "title": "Ione: chain build",
+    "say": "Build it free. Its wheel matches the one in your city.",
+    "react": "A second wheel: a pair! Choose your reward."
+   },
+   "token": {
+    "title": "Ione: progress token",
+    "say": "A pair earns a progress token: a bonus you keep all game. Choose one.",
+    "react": "A token for the whole game. Pell scowls."
+   },
+   "sci": {
+    "title": "Ione: science win",
+    "say": "Six different science symbols win the game on the spot. Keep counting yours.",
+    "react": null
+   },
+   "take-chain2": {
+    "title": "Ione: another chain",
+    "say": "Star Gazers opens with your leaf mark. Take it.",
+    "react": null
+   },
+   "build-chain2": {
+    "title": "Ione: new symbol",
+    "say": "Build it free. A new symbol: one step toward six.",
+    "react": "A third symbol. Six different would end it all."
+   },
+   "age3": {
+    "title": "Ione: Age III",
+    "say": "The last age. Guild cards score from the richer city. Pell has left one for you.",
+    "react": null
+   },
+   "take-guild": {
+    "title": "Ione: the guild",
+    "say": "The Builders' Lodge rewards wonders. Take it.",
+    "react": null
+   },
+   "build-guild": {
+    "title": "Ione: guild build",
+    "say": "Build it. Guilds score at the very end.",
+    "react": "The Lodge is yours. Now count everything."
+   },
+   "scoring": {
+    "title": "Ione: the count",
+    "say": "Civic, science, trade, guilds, wonders, tokens, coins and conflict: every point is counted.",
+    "react": null
+   },
+   "verdict": {
+    "title": "Ione: the verdict",
+    "say": "Most points wins. A tie goes to the most civic (blue) points.",
+    "react": null
+   }
+  },
+  "pell": {
+   "free": "Pell: A lookout? Lucky.",
+   "freed": "Pell: You uncovered that for me? Thank you!",
+   "sell": "Pell: Needs must. Sold!"
+  },
+  "end": {
+   "title": "The first crown is claimed",
+   "text": "You drafted, built, bought, sold, raised wonders, chained, paired and counted. Time for a real duel."
+  },
+  "intro": [
+   {
+    "who": "guide",
+    "text": "The old king is dead. Two thrones stand empty, and the greater city wears both crowns."
+   },
+   {
+    "who": "pell",
+    "text": "I am only the apprentice, but I want that crown. Let us see who builds better."
+   },
+   {
+    "who": "guide",
+    "text": "This is a real duel, and every move is yours. I will speak up when something new matters."
+   }
+  ],
+  "first": [
+   "Ione: first move",
+   "Great works bring points and a power. Claim the glowing wonder. After that, every move is yours."
+  ],
+  "playon": {
+   "title": "Your move, always",
+   "text": "From here the duel is real. Ione will chip in when a rule first matters. Tap the x to hush her."
+  },
+  "coach": {
+   "draft": "Wonders give points and a power. You and Pell take four each, turn by turn.",
+   "pyramid": "Age I. Glowing cards are free to take. Tap one to see it big, then build, sell or raise a wonder. Cards are small: the big card is your reading view.",
+   "tension": "Pell took a card you uncovered. Before you take a card, check what it frees for him.",
+   "free": "A free card costs nothing. Production cards give you that resource every turn.",
+   "coin": "Yellow cards pay coins at once, and make selling better later.",
+   "paid": "You paid coins for that. Missing resources are bought for 2 coins plus what Pell produces of them.",
+   "shield": "A shield pushes the conflict pawn toward Pell. Nine steps wins the game on the spot.",
+   "loot": "The pawn passed a marked space: coins are looted from the loser. Reach step 9 and the duel ends.",
+   "chain-mark": "That card has a chain mark. Later cards with the same mark are free for you.",
+   "chain": "Built free by chain! Chains are the cheapest way to grow.",
+   "sci": "A science symbol. Two of the same earn a progress token; six different win the game at once.",
+   "pair": "A pair of one symbol! Pick a progress token: a bonus you keep all game.",
+   "sell": "Sold for 2 coins, plus 1 for each yellow card you own. Sell what you cannot use.",
+   "sell-poor": "You sold a card you could build for free. Selling is best for cards you cannot use.",
+   "wonder": "A wonder rises. Its card goes underneath, and you get its points and power.",
+   "age": "A new age. The player behind on the conflict track chooses who starts; at a tie, whoever took the last card.",
+   "guild": "A guild scores at the very end from the richer city. Big points for the right city."
+  },
+  "later": {
+   "trade": "Yellow trade posts make buying a resource cost only 1 coin instead of 2 plus.",
+   "cap": "Only seven wonders can ever be built in total; the last one is discarded.",
+   "powers": "Wonders can also play again, steal coins, discard a rival card or revive a thrown-away one.",
+   "tokens": "Every progress token has its own effect: tap one in the row to read it.",
+   "tie": "A tie on points goes to the player with the most civic (blue) points.",
+   "science": "Six different science symbols win the game at once.",
+   "military": "Nine steps on the conflict track win at once; the marked spaces loot coins.",
+   "draftorder": "The wonder draft runs 1-2-2-1 then 2-1-1-2 so nobody gets a long head start."
+  },
+  "walk": {
+   "blue": "Civic: the points printed on your blue cards.",
+   "green": "Science: points on green cards, and the sets of symbols.",
+   "yellow": "Trade: points from yellow cards.",
+   "guild": "Guilds: purple cards score from the richer city.",
+   "wonder": "Wonders: the points on the wonders you raised.",
+   "token": "Tokens: progress tokens score their own points.",
+   "coins": "Coins: 1 point for every 3 coins you kept.",
+   "mil": "Conflict: points for where the pawn ended.",
+   "total": "Total: the most points wins; a tie goes to the most civic points."
+  }
+ },
+ "quick": {
+  "intro": [
+   "Two thrones stand empty. Draft your wonders, then out-build the rival.",
+   "The river city and the hill city both claim the crown. Prove yours is greater.",
+   "One pyramid, two rulers. Take smart, and leave the rival nothing."
+  ]
+ }
 }

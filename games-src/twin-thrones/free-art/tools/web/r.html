@@ -1,0 +1,29 @@
+<!doctype html><meta charset=utf-8><body style="margin:0;background:#0000">
+<script type="importmap">{"imports":{"three":"./three/build/three.module.js","three/addons/":"./three/examples/jsm/"}}</script>
+<script type="module">
+import * as T from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+const L=new GLTFLoader(); const cache={};
+const load=async p=>{ if(!cache[p]) cache[p]=await L.loadAsync('kk/'+p+'.gltf'); return cache[p].scene.clone(true); };
+const R=new T.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true}); R.shadowMap.enabled=true; R.shadowMap.type=T.PCFSoftShadowMap; R.outputColorSpace=T.SRGBColorSpace;
+R.toneMapping=T.NoToneMapping;
+window.render=async(spec)=>{
+  const W=spec.w||900,H=spec.h||900; R.setSize(W,H,false); R.setPixelRatio(1); R.domElement.width=W;R.domElement.height=H;
+  const sc=new T.Scene(); const g=new T.Group(); sc.add(g);
+  for(const o of spec.objs){ const m=await load(o.m); m.position.set(...(o.p||[0,0,0])); m.rotation.y=(o.r||0)*Math.PI/180; m.scale.set(o.s||1,(o.s||1)*(o.sy||1),o.s||1);
+    m.traverse(n=>{ if(n.isMesh){n.castShadow=true;n.receiveShadow=true; if(n.material&&n.material.map) n.material.map.anisotropy=8; if(spec.tint&&o.tint){} }}); g.add(m); }
+  sc.add(new T.HemisphereLight(0xffffff,0x8a7a66,1.15));
+  const d=new T.DirectionalLight(0xfff4e0,2.2); d.position.set(-6,10,7); d.castShadow=true; d.shadow.mapSize.set(2048,2048); const sh=d.shadow.camera; sh.left=-8;sh.right=8;sh.top=8;sh.bottom=-8;sh.near=1;sh.far=40; d.shadow.bias=-0.0005; d.shadow.radius=3; sc.add(d);
+  const az=(spec.az??38)*Math.PI/180, el=(spec.el??34)*Math.PI/180; 
+  const dir=new T.Vector3(Math.sin(az)*Math.cos(el),Math.sin(el),Math.cos(az)*Math.cos(el));
+  const cam=new T.OrthographicCamera(-1,1,1,-1,0.1,200); cam.position.copy(dir).multiplyScalar(40); cam.lookAt(0,0,0); cam.updateMatrixWorld(); sc.updateMatrixWorld(true);
+  // fit: project bbox of all meshes (excluding pad when spec.fitSkip) into camera space
+  const box=new T.Box3(); g.children.forEach((c,i)=>{ if(spec.objs[i].nofit) return; box.expandByObject(c); });
+  const pts=[]; for(const x of [box.min.x,box.max.x]) for(const y of [box.min.y,box.max.y]) for(const z of [box.min.z,box.max.z]) pts.push(new T.Vector3(x,y,z).applyMatrix4(cam.matrixWorldInverse));
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; pts.forEach(p=>{x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)});
+  const mg=spec.margin??0.04; let cx=(x0+x1)/2, cy=(y0+y1)/2, hw=(x1-x0)/2*(1+mg*2), hh=(y1-y0)/2*(1+mg*2); const a=W/H; if(hw/hh<a) hw=hh*a; else hh=hw/a;
+  cam.left=cx-hw;cam.right=cx+hw;cam.top=cy+hh;cam.bottom=cy-hh; cam.updateProjectionMatrix();
+  R.setClearColor(0x000000,0); R.render(sc,cam); return R.domElement.toDataURL('image/png');
+};
+window.ready=true;
+</script>

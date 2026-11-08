@@ -97,7 +97,7 @@ button.plate{cursor:pointer;font-family:inherit}
 .tile.known.y{background:linear-gradient(#ffe455,#ffb300);color:#14163a}.tile.known.y .wr{background:linear-gradient(90deg,#d99100,#fff0a0,#d99100)}
 .tile.known.y .f{text-shadow:none}
 .tile small{position:absolute;left:2px;top:1px;font:800 max(7px,calc(var(--tw)*.2))/1 var(--fb);opacity:.85;text-shadow:none}
-.tile .nt{position:absolute;left:0;right:0;top:1px;text-align:center;font:800 max(7px,calc(var(--tw)*.2))/1 var(--fb);font-style:normal;color:#ffd0d0;text-shadow:0 1px 0 #000}
+.tile .nt{position:absolute;left:0;right:0;top:1px;text-align:center;white-space:nowrap;overflow:hidden;background:rgba(0,0,0,.6);border-radius:4px;font:800 max(12px,calc(var(--tw)*.2))/1.1 var(--fb);font-style:normal;color:#ffd0d0;text-shadow:0 1px 0 #000}
 .tile.mine .nt{color:#fff}
 .tile .coin{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);min-width:calc(var(--tw)*.5);height:calc(var(--tw)*.5);border-radius:50%;background:#fff;color:#14163a;border:2px solid #14163a;font:900 calc(var(--tw)*.3)/calc(var(--tw)*.5 - 4px) var(--fd);text-align:center;font-style:normal;box-sizing:border-box;padding:0 2px;box-shadow:0 1px 0 rgba(0,0,0,.5)}
 .tile .coin+.coin{left:auto;right:1px;transform:none;bottom:calc(var(--tw)*.55)}
@@ -235,7 +235,7 @@ html.short .nc{height:24px;min-width:18px}
 #gear.mini .mkr{padding:0 3px;font-size:.7rem}
 
 /* help kit colours */
-:root{--gxh-bg:#fff6e2;--gxh-ink:#1c1838;--gxh-accent:#ff8a1f;--gxh-glow:#ffc928;--gxh-btn:#e8681c;--gxh-btn-ink:#fff;--gxh-font:var(--fb)}
+:root{--gxh-bg:#fff6e2;--gxh-ink:#1c1838;--gxh-accent:#ff8a1f;--gxh-glow:#ffc928;--gxh-btn:#b34a0a;--gxh-btn-ink:#fff;--gxh-font:var(--fb)}
 .gx-bar .gxh-bulb{background:linear-gradient(#3a3f86,#2b2f63);border:2px solid #14163a;box-shadow:0 3px 0 #14163a;min-height:40px;min-width:40px;border-radius:12px}
 /* tutorial entry in the menus (shell/gx-tutor.js) */
 .big.gxt-menu{flex-direction:column;gap:0;line-height:1.15}.big.gxt-menu span{font:800 .75rem var(--fb);opacity:.9;text-shadow:none}

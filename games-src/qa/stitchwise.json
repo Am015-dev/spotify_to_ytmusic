@@ -1,0 +1,235 @@
+{
+ "slug": "stitchwise",
+ "size": "phone",
+ "seed": 90748,
+ "when": "2026-11-08T00:02Z",
+ "tutorial": {
+  "end": false,
+  "coached": true,
+  "explained": 6,
+  "explainedIds": [
+   "start",
+   "pick",
+   "buy_cheap",
+   "who_next",
+   "income_opp",
+   "adv_me"
+  ],
+  "bubblesClosed": 2525,
+  "clicks": 25
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 1199
+ },
+ "story": {
+  "result": "cap",
+  "clicks": 737
+ },
+ "fuzz": {
+  "taps": 300
+ },
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 26px (<40) button.gx-x.gclose x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.pstrip \"Marden 3 income +4\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "overlapping clickables: button.pstrip \"Marden 10 income +4\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-quick-board-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #1199 (Marden 10 income +4)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 1199 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases quick",
+   "shot": "/tmp/qa-shots/stitchwise/phone-quick-noresult-12.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 26px (<40) button.gx-x.gclose x1: \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pstrip \"Marden 5 income +0\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.pstrip \"Marden 2 income +1\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-21.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Wave Patch 3 cost 2 time\" / button.btn.alt \"How to play\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-23.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Ruler Strip 4 cost 2 tim\" / button.btn.alt \"How to play\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-23.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.offer.can \"Hook Patch 4 cost 6 time\" / button.btn.alt \"How to play\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases fuzz",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-fuzz-screen-23.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Patches\" under div#start.ov \"Stitchwise A quilting du\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases tutorial",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MAJOR",
+   "phase": "tutorial",
+   "where": "tutorial click #25 (×)",
+   "desc": "coached game: GXCOACH.done never became true within 720 s (25 clicks, 6 rules explained)",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases tutorial",
+   "shot": "/tmp/qa-shots/stitchwise/phone-coach-notdone-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.gx-x.gclose \"×\" / button.btn \"Learn: your first game A\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.offer.can \"Bias Binding 2 cost 2 ti\" / button.gxc-node.a3.locked \"7 🔒 Grand Gates\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.adv.grow \"Advance +1 button\" / button.gxc-node.a3.locked \"7 🔒 Grand Gates\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button#skipmap.btn.alt.sm \"Skip to map\" / button.gxc-node.a3.locked \"8 🔒 Head Start\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn.go \"Story: The Quilter’s Yea\" / button.gxc-node.a1.boss \"🔒 The Parish Champion\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "overlapping clickables: button.btn \"Quick game Against the c\" / button.gxc-node.a2.locked \"4 🔒 County Gate\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-map-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.gx-x.gclose \"×\" / button.btn \"Learn: your first game A\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.offer.can \"Bias Binding 2 cost 2 ti\" / button.gxc-node.a3.locked \"7 🔒 Grand Gates\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.btn.adv.grow \"Advance +1 button\" / button.gxc-node.a3.locked \"7 🔒 Grand Gates\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button#skipmap.btn.alt.sm \"Skip to map\" / button.gxc-node.a3.locked \"8 🔒 Head Start\"",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-screen-story-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #737 (×)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 737 clicks (state kept changing)",
+   "repro": "node games-src/scripts/qa-bot.js stitchwise --size phone --seed 90748 --phases story",
+   "shot": "/tmp/qa-shots/stitchwise/phone-story-noresult-9.png"
+  }
+ ],
+ "secs": 870
+}

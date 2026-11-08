@@ -1,14 +1,17 @@
 // ===================== part 1: state, drawing helpers, render =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, hints: true, tut: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, hints: true, tut: null, tab: 'map' };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
 function savePrefs() { try { localStorage.setItem(PREFKEY, JSON.stringify(UI.prefs)); } catch (e) { } }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const RICON = { coin: 'coin', compass: 'compass', tablet: 'tablet', arrow: 'arrow', jewel: 'jewel' };
-function ic(k, label) { const art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
+// Free-kit pictures for these slots are the same blank hexagon, less clear than the code-drawn boot / jeep / plane / arrowhead / jewel:
+// keep the code glyph (the slot names stay in assets.json; delete an entry here when its real art arrives).
+const WEAK_ART = { 'tr-boot': 1, 'tr-car': 1, 'tr-plane': 1, 'res-arrow': 1, 'res-jewel': 1 };
+function ic(k, label) { let art = RICON[k] ? 'res-' + k : (V.TRAVEL.indexOf(k) >= 0 ? 'tr-' + k : ''); if (WEAK_ART[art]) art = ''; return `<i class="ic" ${art ? 'data-art="' + art + '"' : ''} role="img" aria-label="${esc(label || V.RNAME[k] || V.TNAME[k] || k)}"><svg><use href="#s-${k}"/></svg></i>`; }
 function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span class="num">${r[k]}</span>${ic(k)}</span>`).join(''); }
 function opsHTML(ops) {
   return (ops || []).map(o => {
@@ -30,7 +33,7 @@ function cardHTML(id, o) {
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="ct"><span class="chip">${cost}</span>${ic(c.tr)}</span>
     <span class="cn">${esc(c.name).split(' ').map(w => w.length > 7 ? w.slice(0, Math.ceil(w.length / 2)) + '&shy;' + w.slice(Math.ceil(w.length / 2)) : w).join(' ')}</span>
-    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span><span class="ptx">${esc(c.t === 'fear' ? 'No effect. -1 point.' : c.text)}</span></span>
+    <span class="pic" data-art="card-${id}"><span class="ph" aria-hidden="true"><svg class="pg"><use href="#s-${CARD_GLYPH[c.t] || c.tr}"/></svg><span class="pn">${esc(c.name)}</span><span class="pt">${CARD_KIND[c.t] || 'Starter'}</span></span></span><span class="ptx">${esc(c.t === 'fear' ? 'No effect. -1 point.' : c.text)}</span>
     ${c.vp ? `<span class="vp">${c.vp > 0 ? c.vp : c.vp}</span>` : ''}
     <span class="fx">${c.t === 'fear' ? '<span class="sm" style="color:#f6e6e6">no effect</span>' : opsHTML(c.ops)}</span></button>`;
 }
@@ -76,11 +79,16 @@ function render() {
   // market row
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   $('#row').innerHTML = G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r] }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('');
+  // phone tabs: one big area at a time (map / market / research); a dot marks a tab holding something you can do now
+  const hasT = { map: Object.keys(gS).length > 0, row: Object.keys(gR).length > 0, track: trG };
+  document.querySelectorAll('#vtabs [data-t]').forEach(b => { const t = b.dataset.t; b.classList.toggle('on', UI.tab === t); b.classList.toggle('has', !!hasT[t] && myTurn()); b.setAttribute('aria-selected', String(UI.tab === t)); });
+  document.body.dataset.vtab = UI.tab;
   // dock
   renderDock(L, q, me, actor);
   if (typeof artApply === 'function') artApply();
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
   if (UI.insp) refreshInsp();
+  if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
 }
 function renderDock(L, q, me, actor) {
   const over = G.phase === 'over', mine = myTurn();
@@ -94,13 +102,15 @@ function renderDock(L, q, me, actor) {
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q })).join('') : '<span class="sm">No cards left in your hand.</span>';
   const ps = L.find(m => m.t === 'pass');
-  $('#acts').innerHTML = (mine && !q && ps ? mvBtn(ps, 'Pass (end my round)', 'alt') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '');
+  $('#acts').innerHTML = (mine && !q && ps ? mvBtn(ps, 'Pass (end my round)', 'alt') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '') + (UI.coachFree && UI.mode === 'tutorial' && !over ? '<button type="button" class="btn alt" data-a="tutleave">Leave tutorial</button>' : '');
   // guardians and idols you hold (free actions)
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}">${ic('guard', 'guardian')}<span>${g.used ? 'used' : 'Boon'}</span></button>`; });
   me.idols.forEach((d, k) => { ex += `<button type="button" class="tag" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'set' : 'Idol'}</span></button>`; });
   $('#extra').innerHTML = ex;
 }
+function showTab(t) { if (!t || UI.tab === t) return; UI.tab = t; document.body.dataset.vtab = t; document.querySelectorAll('#vtabs [data-t]').forEach(b => { b.classList.toggle('on', b.dataset.t === t); b.setAttribute('aria-selected', String(b.dataset.t === t)); }); }
+const tabOf = el => !el ? null : el.closest('#rowwrap') ? 'row' : el.closest('#track') || el.id === 'track' ? 'track' : el.closest('#map') ? 'map' : null;
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
   const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });

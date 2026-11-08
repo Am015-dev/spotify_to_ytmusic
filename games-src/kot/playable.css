@@ -1,0 +1,98 @@
+/* Playable pass (W386): dice words, turn banner, steadier chips, readable lines. Every rule is additive. */
+.die[data-lab]::after{content:attr(data-lab);position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);padding:1px 6px 2px;border-radius:7px;background:#1a1320;color:#fff;font:900 13px/14px Nunito,sans-serif;letter-spacing:.04em;white-space:nowrap;pointer-events:none;z-index:2}
+.die.kept[data-lab]::after{background:#ffd23f;color:#1a1320}
+#dice .die{position:relative}
+html.ph #ob #dice{row-gap:16px}
+#ccbanner{position:fixed;left:50%;top:30%;z-index:60;transform:translate(-50%,-30px) scale(.85);opacity:0;pointer-events:none;text-align:center;padding:12px 26px 10px;border:4px solid #1a1320;border-radius:16px;background:var(--bc,#ffd23f);box-shadow:6px 6px 0 #1a1320;max-width:calc(100vw - 24px);box-sizing:border-box}
+#ccbanner b{display:block;white-space:nowrap;font:400 30px/1 Bangers,Impact,sans-serif;letter-spacing:.05em;color:#fff;-webkit-text-stroke:1.5px #1a1320;paint-order:stroke fill;text-shadow:2px 2px 0 #1a1320}
+#ccbanner span{display:block;margin-top:4px;font:900 15px/1.2 Nunito,sans-serif;color:#1a1320;background:rgba(255,255,255,.88);border-radius:8px;padding:2px 8px}
+#ccbanner.me{--bc:#ffd23f}#ccbanner.me b{color:#e63946}
+#ccbanner.on{animation:ccBan 1.1s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes ccBan{0%{opacity:0;transform:translate(-50%,-30px) scale(.8)}22%{opacity:1;transform:translate(-50%,0) scale(1.04)}30%{transform:translate(-50%,0) scale(1)}80%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,10px) scale(.95)}}
+@media (prefers-reduced-motion:reduce){#ccbanner.on{animation:none;opacity:1;transform:translate(-50%,0)}}
+.gxh-tx{white-space:pre-line}
+ol.hat{margin:.2rem 0 .6rem 1.2rem;padding:0;font-weight:700}
+html.ph-p header.gx-bar .pchip.me b{padding-right:0}
+html.ph-p header.gx-bar .pchip b{letter-spacing:0}
+html.ph #bline{font-size:15px;white-space:normal;line-height:1.2;max-width:calc(100% - 16px)}
+/* the tutorial's top strip: 25 steps now, so the dots shrink and the Skip button keeps its own room (13px text, 32px tall) */
+.gxt-dots{gap:2px}.gxt-dots i{width:5px;height:5px}
+.gxt-prog{gap:6px;font-size:13px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-skip{font-size:13px;min-height:32px;margin-left:8px;white-space:nowrap}
+
+/* the guide's story beats (tutorial): portrait + 2 short lines on a solid card, above the kit, never takes taps */
+#ppbeat{position:fixed;left:50%;top:92px;z-index:2147483000;transform:translate(-50%,-12px);opacity:0;pointer-events:none;display:flex;gap:10px;align-items:center;width:min(360px,calc(100vw - 24px));box-sizing:border-box;padding:8px 12px 8px 8px;border:3px solid #1a1320;border-radius:14px;background:#fff7dd;box-shadow:4px 4px 0 #1a1320}
+#ppbeat img,#ppbeat i{flex:0 0 52px;width:52px;height:52px;border-radius:50%;border:3px solid var(--bc,#e8c547);background:#fff;object-fit:cover;font:normal 30px/46px sans-serif;text-align:center}
+#ppbeat b{display:block;font:900 14px/1.1 Nunito,sans-serif;color:#7a2a12;letter-spacing:.02em}
+#ppbeat span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
+#ppbeat.on{animation:ppIn 4.2s ease both}
+@keyframes ppIn{0%{opacity:0;transform:translate(-50%,-12px)}8%{opacity:1;transform:translate(-50%,0)}88%{opacity:1}100%{opacity:0}}
+
+/* coached first game: one speech bubble, never blocks play (only its own buttons take taps) */
+#ppcoach{position:fixed;left:50%;top:96px;z-index:2147483000;transform:translate(-50%,-10px);opacity:0;pointer-events:none;display:flex;gap:10px;align-items:flex-start;width:min(380px,calc(100vw - 20px));box-sizing:border-box;padding:8px 8px 8px 8px;border:3px solid #1a1320;border-radius:14px;background:#fff7dd;box-shadow:4px 4px 0 #1a1320;transition:opacity .25s,transform .25s}
+#ppcoach.on{opacity:1;transform:translate(-50%,0)}
+#ppcoach img,#ppcoach>i{flex:0 0 48px;width:48px;height:48px;border-radius:50%;border:3px solid var(--bc,#e8c547);background:#fff;object-fit:cover;font:normal 28px/42px sans-serif;text-align:center}
+#ppcoach>div{flex:1;min-width:0}
+#ppcoach b{display:block;font:900 14px/1.1 Nunito,sans-serif;color:#7a2a12}
+#ppcoach span{display:block;margin-top:2px;font:800 14px/1.25 Nunito,sans-serif;color:#1a1320}
+#ppcoach small{display:block;margin-top:4px;font:700 13px/1.25 Nunito,sans-serif;color:#4a3a2a}
+#ppcoach [data-pp-x]{pointer-events:auto;flex:0 0 32px;width:32px;height:32px;border-radius:50%;border:2px solid #1a1320;background:#fff;color:#1a1320;font:900 18px/1 Nunito,sans-serif;cursor:pointer;padding:0}
+#ppcoach.on [data-pp-play],#ppcoach.on [data-pp-story],#ppcoach.on [data-pp-skip]{pointer-events:auto}
+#ppcoach .pp-row{display:flex;gap:8px;margin-top:6px}
+#ppcoach .pp-row button{pointer-events:auto;min-height:36px;padding:4px 12px;border-radius:10px;border:2px solid #1a1320;background:#ff7a21;color:#fff;font:900 14px/1 Nunito,sans-serif;cursor:pointer}
+#ppcoach.on{pointer-events:none}
+html.ph .pchip em,html.ph-p header.gx-bar .pchip span em{font-size:13px}
+
+.pchip{cursor:pointer;font-family:Nunito,sans-serif;-webkit-tap-highlight-color:transparent}
+/* title: the tutorial offer is a secondary button, Play now is the one big primary */
+.menu .gxt-menu.tutmini,.dlg .gxt-menu,.dlg [data-gxt-open]{font-size:16px}
+.dlg .gxt-menu.gxt-first{font-size:16px}
+/* contrast: the big orange button carries white text, so the orange is darker (>= 4.5:1) */
+.dlg .btn.primary.big,.dlg [data-start="solo"]{background-color:#a82f05}
+.dlg .btn.primary.big small,.dlg [data-start="solo"] small{color:#fff}
+/* desktop: shared kit text is 16px or more */
+@media (min-width:1024px){.gxc-lab,.gxh-tt,.gxh-tx,.gxc-act b,.gxc-act small,.gx-ibtn,.dlg .small,details.custom summary span,.acts .btn small{font-size:16px}}
+/* audit round 2: title button texts >= 14px with a dark backing, desktop kit text 16px, desktop SVG board text 16px */
+html .dlg .acts .btn span,html .dlg .acts .btn small{font-size:14px}
+html.sk .dlg .acts .btn.primary span,html.sk .dlg .acts .btn.primary small{background:rgba(70,20,0,.72);border-radius:6px;padding:1px 6px;display:inline-block}
+html.sk #pacts .btn.primary .bl,html.sk #pacts .btn .bl{text-shadow:0 0 3px #000,0 1px 2px #000}
+@media (min-width:1024px){
+ html .gxc-lab,html .gxh-tt,html .gxh-tx,html .gx-ibtn,html .gxc-act b,html .gxc-act small{font-size:16px!important}
+ html svg#map text{font-size:16px}
+}
+@media (min-width:1024px){html .dlg .acts .btn span,html .dlg .acts .btn small{font-size:16px}}
+/* audit round 3: text over painted art gets a solid backing or a hard shadow */
+#ppcoach .pp-row button{background:#8f2d00}
+html.sk .dlg .acts .btn.primary{text-shadow:0 0 3px #4a1500,0 0 3px #4a1500,0 1px 2px #000}
+html.sk #pacts .btn.primary,html.sk #pacts .btn{text-shadow:0 0 3px #000,0 0 3px #000}
+html.ph-p header.gx-bar .pchip b{background:rgba(255,253,245,.92);border-radius:4px;padding-left:2px;padding-right:2px}
+html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-1.2px}
+html.ph-p header.gx-bar .pchip span em{background:rgba(255,253,245,.92);border-radius:3px;padding:0}
+/* round 3: story map headings sit on a dark plate */
+html .gxc-htitle b{color:#fff7dd;text-shadow:0 0 3px #000,0 0 3px #000,0 1px 2px #000}
+html .gxc-act b,html .gxc-act small{background:rgba(20,10,40,.78);color:#fff;border-radius:6px;padding:1px 8px;display:inline-block}
+html .gxc-htitle b{background:rgba(20,10,40,.8);border-radius:8px;padding:1px 10px;display:inline-block}
+html.sk #pacts .btn .bl{background:rgba(70,20,0,.62);border-radius:8px;padding:0 8px}
+/* Addendum 5: live preview, reason pop, leader mark, best-value badge */
+#pppreview{display:none;margin:0 6px 14px;padding:5px 10px;border-radius:12px;background:rgba(26,19,32,.92);border:2px solid #ffd23f;color:#fff;font:800 14px/1.25 Nunito,sans-serif;text-align:center}
+#pppreview.on{display:block}
+#pppreview i{font-style:normal;color:#ffd23f}
+#pppreview b{padding:0 3px;border-radius:5px;background:#fff;color:#1a1320}
+#pppreview b.v{color:#9a5b00}#pppreview b.e{color:#0b6b3a}#pppreview b.h{color:#b01e2f}#pppreview b.c{color:#b01e2f}#pppreview b.n{background:#4a3a5c;color:#fff}
+#pppop{position:fixed;left:50%;top:34%;z-index:2147483000;transform:translate(-50%,-14px) scale(.9);opacity:0;pointer-events:none;width:min(340px,calc(100vw - 24px));box-sizing:border-box;padding:10px 14px;border:4px solid #1a1320;border-radius:16px;background:#fff7dd;box-shadow:6px 6px 0 #1a1320}
+#pppop b{display:block;font:400 26px/1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:#e63946;-webkit-text-stroke:1px #1a1320;paint-order:stroke fill}
+#pppop ul{margin:6px 0 0 18px;padding:0;font:900 16px/1.35 Nunito,sans-serif;color:#1a1320}
+#pppop p{margin:8px 0 0;font:800 14px/1.3 Nunito,sans-serif;color:#1a1320;border-top:2px dashed #1a1320;padding-top:6px}
+#pppop em{font-style:normal;font-weight:900;padding:1px 7px;border-radius:6px;color:#fff;background:#6b7280}
+#pppop em.good{background:#1f8a4c}#pppop em.okay{background:#b27300}#pppop em.poor{background:#b01e2f}
+#pppop.on{animation:ppPop 4.2s ease both}
+@keyframes ppPop{0%{opacity:0;transform:translate(-50%,-14px) scale(.9)}8%{opacity:1;transform:translate(-50%,0) scale(1.03)}12%{transform:translate(-50%,0) scale(1)}88%{opacity:1}100%{opacity:0}}
+.pchip.lead{outline:3px solid #ffd23f;outline-offset:-1px;box-shadow:inset 0 -5px 0 #ffd23f}
+
+.pp-best{position:relative}
+.pp-best::before{content:'BEST VALUE';position:absolute;left:50%;top:-10px;transform:translateX(-50%);padding:1px 8px;border-radius:8px;background:#1f8a4c;color:#fff;font:900 13px/16px Nunito,sans-serif;white-space:nowrap;z-index:6;pointer-events:none;box-shadow:0 0 0 2px #fff}
+#ppstand{display:none;position:fixed;left:12px;top:64px;z-index:20;flex-direction:column;gap:3px;pointer-events:none}
+#ppstand span{padding:3px 10px;border-radius:9px;background:rgba(26,19,32,.88);border:2px solid #4a3a5c;color:#fff;font:800 16px/1.2 Nunito,sans-serif;white-space:nowrap}
+#ppstand span.me{border-color:#ffd23f}
+#ppstand span.lead{background:#ffd23f;color:#1a1320;border-color:#fff}
+#ppstand span.ko{opacity:.5;text-decoration:line-through}

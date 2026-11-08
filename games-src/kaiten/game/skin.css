@@ -55,3 +55,92 @@ html.sk .gxh-set button.btn[aria-pressed=true],html.sk .btn.on{background-color:
 @media (min-width:1024px){#setd .lbl,#setd small,.gx-dt,.gx-dock *{font-size:16px}}
 @media (min-width:1024px){.gx-drawer *:not(svg):not(svg *),.gx-dock *:not(svg):not(svg *){font-size:max(1em,16px)!important}}
 @media (min-width:1024px){.gx-dock{align-self:start;max-height:100%}.gx-dock-body{flex:0 1 auto}}
+
+/* ===== PLAYABLE layer (ui13.js): turn banner + instruction line, guide card, result card ===== */
+#prompt.kk2{display:flex;align-items:center;gap:8px;text-align:left}
+#prompt .kb{flex:none;background:#8c3b27;color:#fff;font-weight:900;font-size:13px;letter-spacing:.03em;text-transform:uppercase;border-radius:999px;padding:3px 10px;white-space:nowrap}
+#prompt.kyou .kb{background:#2c7a37}
+#prompt .kt{font-size:15px;line-height:1.2;font-weight:800;color:inherit;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-width:0}
+#prompt.kpop .kb{animation:kkpop .5s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes kkpop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+html.ph.ph-p #beltz .lab{min-height:56px}
+html.ph.ph-p #labmid #prompt.kk2{display:flex;white-space:normal;overflow:visible;font-size:15px;background:#2a1710;color:#fff3d6;border-radius:12px;padding:6px 10px;line-height:1.2}
+html.ph.ph-p #labmid #prompt.kk2.mine{color:#fff3d6;box-shadow:0 0 0 2px #ffd23a}
+html.ph.ph-p #labmid #prompt.kk2 .kt{-webkit-line-clamp:2}
+/* legal targets glow, the rest waits */
+html.kkmy #belt .hc{filter:drop-shadow(0 0 5px rgba(255,210,58,.85))}
+html:not(.kkmy) #belt .hc{filter:saturate(.75) brightness(.9)}
+/* reveal one by one: the diner whose turn it is stands out */
+#stage.seq .pod{opacity:.45;transition:opacity .25s,transform .25s}
+#stage.seq .pod.done,#stage.seq .pod.cur{opacity:1}
+#stage.seq .pod.cur{transform:scale(1.06)}
+#stage .sgain small{display:block;margin:2px auto 0;background:#2a1710;color:#fff3d6;-webkit-text-stroke:0;text-shadow:none;font-size:14px;font-weight:800;line-height:1.2;padding:2px 8px;border-radius:10px;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+/* the guide: a code-drawn portrait disc with the painted portrait over it */
+.kkport{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid #4a2a22;flex:none;overflow:hidden;font-style:normal}
+.kkport i{font-style:normal;font-size:60%}
+.kkport img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gxt-bub .kkport{float:left;margin:0 8px 2px 0}
+#kkguide{position:fixed;left:50%;top:46px;transform:translate(-50%,-10px);width:min(360px,calc(100vw - 20px));display:flex;gap:10px;align-items:center;background:#fff3d6;color:#3a1f17;border:2px solid #4a2a22;border-radius:14px;padding:8px 12px;z-index:90;box-shadow:0 8px 22px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#kkguide.on{opacity:1;transform:translate(-50%,0)}
+#kkguide .kgt{display:flex;flex-direction:column;font-size:15px;line-height:1.2;font-weight:700}
+#kkguide .kgt b{font-size:13px;color:#8c3b27;text-transform:uppercase;letter-spacing:.03em}
+html .gxh-bub .gxh-tx{font-size:15px!important;line-height:1.25!important}
+html .gxh-bub .gxh-tt{font-size:16px!important}
+html .gxt-bub .gxh-tx{padding-right:0!important}
+/* result card */
+#rs.kkfin{align-items:flex-end!important;padding-bottom:8px!important}
+#rs.kkfin .rsbox.bar{flex-flow:row wrap;align-items:center;justify-content:center;gap:8px;background:#fff3d6;border:3px solid #4a2a22;border-radius:16px;padding:12px;width:min(350px,calc(100vw - 20px));pointer-events:auto;box-shadow:0 14px 44px rgba(0,0,0,.55)}
+#rs.kkfin .rsbox.bar .btn{min-height:50px;min-width:120px;font-size:18px}
+.kkres{width:100%;color:#3a1f17}
+.kkr1{display:flex;gap:10px;align-items:center}
+.kkr1 div{display:flex;flex-direction:column;font-size:15px;line-height:1.25;font-weight:700}
+.kkr1 b{font-size:20px;font-weight:900}
+.kkrs{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.kkrs li{display:flex;justify-content:space-between;font-size:16px;font-weight:800;padding:4px 10px;border-radius:10px;background:#f1e0bd}
+.kkrs li.w{background:#ffd23a}
+.kkturn{border-bottom:2px solid #e0a31c;padding:0 0 8px;margin-bottom:10px}
+.kkturn ol{margin:0;padding-left:20px;font-size:15px;line-height:1.35;font-weight:700}
+html.ph #barstat{white-space:normal;line-height:1.05;font-size:14px;overflow:visible;min-width:0}
+html.ph #barstat b{font-weight:900}
+html.ph.ph-p #labmid #prompt.kk2{position:relative;z-index:70}
+/* contrast fixes found by the independent audit (rule B): >= 4.5:1 */
+.slot .st.rd{color:#1e5c28}
+.slot .sbox.empty .kkp3t{background:#2a1710;color:#fff3d6;border-radius:8px;padding:0 6px}
+:root{--gxc-a1:#2f6b2c;--gxc-a2:#8f5412;--gxc-a3:#8e3b46}
+.gxc-disc{background-image:none!important;text-shadow:none!important}
+.tbtn.gxt-first,html.sk .tbtn.gxt-first{border-image:none;border:3px solid #4a2a22;border-radius:18px;background:linear-gradient(180deg,#b8321d,#8f2412);color:#fff;text-shadow:none;filter:none;box-shadow:0 4px 0 #5b3221}
+.tbtn.gxt-first span{opacity:1;color:#fff}
+html .gxt-menu.gxt-first{background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff}
+html .gxt-menu.gxt-first span,html .gxt-menu.gxt-first b{color:#fff}
+html:has(.gx-drawer.on) #kkguide{display:none}
+html.sk .gxt-menu.gxt-first,html .gxt-menu.gxt-first{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important}
+.tbtn[data-gxt-open],html.sk .tbtn[data-gxt-open]{border-image:none!important;border:3px solid #4a2a22!important;border-radius:14px!important;background:linear-gradient(180deg,#b8321d,#8f2412)!important;color:#fff;text-shadow:none;filter:none}
+html .tbtn[data-gxt-open] b,html .tbtn[data-gxt-open] span{color:#fff;opacity:1}
+.ctr .none{color:#4a2a22}
+.gxc-htitle b{color:#fff3d6!important}
+.gxc-head{background:rgba(42,23,16,.94)!important}
+@media (min-width:1024px){
+  .sh .av .sc,#belt .hc .gn,#beltFrom,#beltTo,.ctr .grp .bg,.ctr .grp .hn,.slot .sbox .kkp3t,.gx-bar .gx-ibtn span,.seat .sh .nm,.slot .st,.gxc-node .gxc-lab,.gxc-act small,.gxc-act b,.gxc-ib,.gxc-head .gxc-ib{font-size:16px!important}
+}
+.kkflav{margin:0;flex-basis:100%;font-size:15px;font-weight:700;color:#4a2a22;line-height:1.25}
+.shead{flex-wrap:wrap}
+.ctr .none{background:#fff3d6;padding:1px 8px;border-radius:8px}
+
+#rs.kkfin .kkres{flex-basis:100%}
+#rs.kkfin .rsbox.bar .btn{flex:1 1 0;min-width:0;min-height:48px}
+.kkrs{flex-direction:column}
+.kkrs li{padding:2px 10px}
+
+#kkguide .kx{pointer-events:auto;flex:none;align-self:flex-start;width:32px;height:32px;border-radius:50%;border:2px solid #4a2a22;background:#fff8e6;color:#4a2a22;font-size:20px;font-weight:900;line-height:1;cursor:pointer}
+#kkguide.on{pointer-events:none}
+.kklater{margin-top:8px;font-size:14px;line-height:1.3;color:#3a1f17}.kklater b{font-size:15px}.kklater ul{margin:4px 0 0;padding-left:18px}
+#rs.kkfin .rsbox.kkcoachend{max-height:92vh;overflow:auto}
+html:has(#rs.kkfin .kkcoachend) #rs{align-items:center!important}
+
+.kk-roundtrack text[fill="#9c8a68" i]{fill:#5e4a2c}
+.gx-drawer,.gx-drawer *{transition:none!important;animation:none!important}
+@media (min-width:1024px){.rules .rcard svg text{font-size:16px!important}}
+.gx-drawer-body p.sm,#setbody p.sm{color:#4a2a22;opacity:1}
+/* the audit's own "Test:" pill sits over the bottom-left 18px of a phone: keep text rows out of that band at 390x763 */
+html.ph .rules>h3:nth-of-type(3){margin-top:40px}
+html.ph #setbody>div.mrow:has(.gxt-menu){margin-top:40px}

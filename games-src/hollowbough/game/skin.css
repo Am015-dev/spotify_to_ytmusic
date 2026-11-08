@@ -35,3 +35,26 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 #hbturn.on{opacity:1;transform:translate(-50%,0) scale(1)}
 #hbturn.rv{background:#2f5e8e;color:#fff;border-color:#10253d}
 @media (min-width:1024px){.rules h3{font-size:17px}.rules p,.rules li{font-size:16px}}
+
+/* ui-audit fixes (W406b): contrast on photos, no stretched images, readable help on wide screens */
+.btn:not(.alt):not(.on):not(.dis){background:linear-gradient(180deg,#437430,#315c24);color:#fff;text-shadow:none}
+.sbtn.big,.sbtn.big b{color:#fff}.sbtn.big{background:linear-gradient(180deg,#437430,#2c5420)}
+.it b.bd{background:#2a1f19;border-radius:6px;padding:0 3px;text-shadow:none;color:#fff}
+.scount{background:rgba(42,31,25,.88);color:#fff!important;opacity:1;border-radius:7px;padding:1px 6px;text-shadow:none}
+.chip{background:#fff8e6}.chip .cn,.chip .cl{color:#2a1f19}
+.online{background:#fbf4e2;color:#2a1f19}.online p,.online summary{color:#2a1f19;opacity:1}
+#start.art .skylogo{width:max-content;max-width:92%;margin:0 auto;padding:6px 18px;border-radius:14px;background:rgba(25,35,18,.78);color:#fff}
+#start.art .skylogo small{color:#fff}
+.gxc-head{background-size:auto 88px!important;background-repeat:repeat-x!important;background-color:#3b2a1a}
+.gxc-htitle b{background:rgba(25,35,18,.82);color:#fff;padding:2px 10px;border-radius:10px}
+#acts .btn span{color:inherit}
+@media (min-width:1024px){.gx-drawer-body .rules,.gx-drawer-body .rules *{font-size:16px!important}}
+#start .sbtn.big{background:linear-gradient(180deg,#437430,#2c5420)!important;color:#fff!important}#start .sbtn.big b{color:#fff!important;text-shadow:none}
+#bd .btn:not(.alt):not(.on):not(.dis){background:linear-gradient(180deg,#437430,#2c5420)!important;color:#fff!important;text-shadow:none}
+#bd .btn:not(.alt):not(.on) span,#bd .btn:not(.alt):not(.on) b{color:#fff!important}
+.chip{background:#fff8e6!important}.gx-x{background:#fff8e6!important;color:#2a1f19!important}
+.sc.hc .hcp b,.sc.hc .ci b,.cost .ci b{color:#2a1f19!important;text-shadow:none!important}
+@media (min-width:1024px){#bd .it b,#bd .chip .cn b,#bd .chip .cl,#bd .chip .cp,#bd .cost b,#bd .resrow b,#bd .hcp b,#bd .tile .nm,.gx-bar .gx-ibtn span,.gx-set-nav button,.gx-set h3,.gx-set .gx-row-l,.gx-set .gx-row-l small,.gx-set button,.gx-set output,.gxc-act b,.gxc-act small{font-size:16px!important}}
+.online{background:#fbf4e2!important;color:#2a1f19!important}.online .sm{opacity:1!important;color:#2a1f19!important}
+.btn.on span,.btn.on b{color:#2a1f19!important}
+.it img.ri,.its img.ri,img.ri{pointer-events:none!important}

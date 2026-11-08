@@ -116,7 +116,7 @@ function showRound(sc, ge) {
   (async () => {
     let done = false; try { done = await runTally(sc, last, tok); } catch (e) { console.error(e); done = true; }
     if (!done || tok !== UI.seq || !UI.rsOpen) return;
-    UI.rsInfo.done = true; F.msg = null;
+    UI.rsInfo.done = true; F.msg = null; try { if (!last) coachWalk(sc); } catch (e) { }
     if (last) {
       F.crown = true; markWinners();
       if (campOn()) { renderDock(); await tw(1500); if (tok === UI.seq && UI.rsOpen) afterRound(ge); }
@@ -140,6 +140,16 @@ function showFinal() {
   if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
   rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Result' }, bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
+  try {
+    if (UI.mode !== 'tutorial' && !UI.camp) {
+      const box = rs.querySelector('.rsbox');
+      const ws2 = G.winners || [], v2 = viewSeat(), win = ws2.indexOf(v2) >= 0, tie = ws2.length > 1, rv = pname(ws2.find(s => s !== v2) != null ? ws2.find(s => s !== v2) : (v2 === 0 ? 1 : 0));
+      const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
+      const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
+      box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
+        h('ol.kkrs', ...order.map(s => h('li' + (ws2.indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v2 ? ' (you)' : '')), h('span.p', String(tot[s]) + ' pts'))))), box.firstChild); rs.classList.add('kkfin');
+    }
+  } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');

@@ -1,6 +1,6 @@
 // ===================== part 3: title, quick-game setup, starting hand, result, drawers, menu =====================
 var NAMES = ['Fern', 'Rowan', 'Hazel', 'Linnet', 'Bram'], FACES = ['pip', 'mags', 'tobias', 'pip', 'mags'];
-var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal' };
+var CFG = { n: 2, kinds: ['human', 'ai', 'ai', 'ai', 'ai'], lvl: 'normal', side: 'green', first: 'you' };
 try { var c0 = JSON.parse(localStorage.getItem('pp-cfg') || 'null'); if (c0 && c0.n) CFG = c0; } catch (e) { }
 function firstTime() { try { return !localStorage.getItem('pp-played'); } catch (e) { return true; } }
 function tutBtn() { try { return typeof GXT !== 'undefined' ? GXT.menuHTML({ game: 'perch-and-plume', first: firstTime(), cls: 'btn', launch: tutStart }) : ''; } catch (e) { return ''; } }
@@ -28,12 +28,16 @@ function showConfig() { hideHelp();
     if (CFG.n === 1) h += '<p style="text-align:left">Solo: you play against the Rival Flock, a simple deck-driven rival that grabs dice, lays eggs and races you for the round goals.</p>';
     h += '<div class="seatrow"><span class="nm">You</span><span>always a person</span></div>';
     for (var i = 1; i < CFG.n; i++) h += '<div class="seatrow"><span class="nm">' + NAMES[i - 1] + '</span><div class="seg">' + ['ai', 'human'].map(function (k) { return '<button type="button" class="btn' + (CFG.kinds[i] === k ? ' on' : '') + '" data-k="' + i + ':' + k + '">' + (k === 'ai' ? 'Computer' : 'Person (pass the device)') + '</button>'; }).join('') + '</div></div>';
-    h += '<div class="lab">Computer skill</div><div class="seg">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" class="btn' + (CFG.lvl === l ? ' on' : '') + '" data-l="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div></div>';
+    h += '<div class="lab">Computer skill</div><div class="seg">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" class="btn' + (CFG.lvl === l ? ' on' : '') + '" data-l="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
+      '<div class="lab">Round goals</div><div class="seg">' + [['green', 'Race (most wins)'], ['blue', '1 point each, max 5']].map(function (o) { return '<button type="button" class="btn' + ((CFG.side || 'green') === o[0] ? ' on' : '') + '" data-side="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="lab">Who starts</div><div class="seg">' + [['you', 'You'], ['random', 'Random']].map(function (o) { return '<button type="button" class="btn' + ((CFG.first || 'you') === o[0] ? ' on' : '') + '" data-first="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div></div>';
     h += '<div class="tmenu"><button type="button" class="btn big primary" data-go="1">Start the year</button><button type="button" class="btn" data-back="1">Back</button></div>';
     el.innerHTML = h;
     $$('[data-n]', el).forEach(function (b) { b.onclick = function () { CFG.n = +b.dataset.n; draw(); }; });
     $$('[data-k]', el).forEach(function (b) { b.onclick = function () { var x = b.dataset.k.split(':'); CFG.kinds[+x[0]] = x[1]; draw(); }; });
     $$('[data-l]', el).forEach(function (b) { b.onclick = function () { CFG.lvl = b.dataset.l; draw(); }; });
+    $$('[data-side]', el).forEach(function (b) { b.onclick = function () { CFG.side = b.dataset.side; draw(); }; });
+    $$('[data-first]', el).forEach(function (b) { b.onclick = function () { CFG.first = b.dataset.first; draw(); }; });
     $('[data-back]', el).onclick = function () { el.hidden = true; showTitle(); };
     $('[data-go]', el).onclick = function () { try { localStorage.setItem('pp-cfg', JSON.stringify(CFG)); } catch (e) { } quickStart(); };
   }
@@ -41,6 +45,7 @@ function showConfig() { hideHelp();
 }
 // Restart: the same players and settings from a fresh deal (story chapters restart the chapter)
 function restartGame() {
+  if (UI.mode === 'tutfree') { quickStart(); return; }   // after the guided year, Play again is a real quick game
   if (!G || UI.mode === 'tutorial') { tutStart(); return; }
   if (UI.camp) { campStart(UI.camp); return; }
   startGame({ seats: G.pl.map(function (p) { return { name: p.name, kind: p.kind, lvl: p.lvl, face: p.face }; }), mode: UI.mode });
@@ -50,7 +55,8 @@ function quickStart() {
   if (CFG.n === 1) seats.push({ name: 'Rival Flock', kind: 'automa', lvl: CFG.lvl, face: 'corvin' });
   for (var i = 1; i < CFG.n; i++) seats.push({ name: NAMES[i - 1], kind: CFG.kinds[i] === 'human' ? 'human' : 'ai', lvl: CFG.lvl, face: FACES[i - 1] });
   if (seats.filter(function (s) { return s.kind === 'human'; }).length > 1) seats[0].name = 'Player 1';
-  startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs' });
+  setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
+  startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs', goalSide: CFG.side === 'blue' ? 'blue' : 'green', first: CFG.first === 'random' ? 'random' : 0 });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards
 function showKeep(s) { hideHelp();
@@ -80,18 +86,22 @@ function gameOver() { hideHelp();
   try { localStorage.setItem('pp-played', '1'); } catch (e) { }
   if (UI.mode === 'tutorial') return;
   var me = humans()[0] || 0, sc = G.final, win = G.winner, winners = Array.isArray(win) ? win : [win];
-  try { if (window.GNS && UI.mode !== 'tutorial') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
+  try { if (window.GNS && UI.mode !== 'tutorial' && UI.mode !== 'tutfree') GNS.result({ game: 'perch-and-plume', mode: UI.camp ? 'campaign' : UI.mode, level: (G.pl.find(function (p) { return p.kind !== 'human'; }) || {}).lvl, seats: G.pl.map(function (p, i) { return { name: p.name, me: i === me, ai: p.kind !== 'human' ? p.lvl : undefined }; }), winner: Array.isArray(win) ? win : win, scores: sc.map(function (s) { return s.total; }), turns: G.turn, ms: Date.now() - UI.started }); } catch (e) { }
   var gwin, el = $('#result'), order = sc.map(function (s, i) { return i; }).sort(function (a, b) { return sc[b].total - sc[a].total; });
   var line = winners.length > 1 ? 'A tie at the top!' : isHuman(winners[0]) ? (humans().length > 1 ? G.pl[winners[0]].name + ' wins the year!' : 'You win the year!') : G.pl[winners[0]].name + ' wins the year.';
-  var goalHTML = '';
+  var goalHTML = '', voice = '';
+  var iWon = winners.indexOf(me) >= 0, sayB = function (w) { var c = (STORY.cast[w[0]] || { name: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).name || w[0], color: (window.CAMPAIGN && CAMPAIGN.cast[w[0]] || {}).color || '#4f7a45' }); return '<div class="saybox">' + faceHTML(w[0], c) + '<span class="saytx"><b>' + esc(c.name) + '</b>' + esc(w[1]) + '</span></div>'; };
+  if (UI.mode === 'tutfree') voice = '<p class="voice">' + esc(iWon ? STORY.tutResult.win : STORY.tutResult.lose) + '</p>' + coachResultHTML(sc, me);
+  else if (!UI.camp) voice = '<p class="voice">' + esc(winners.length > 1 ? STORY.quickResult.tie : iWon || humans().length > 1 ? STORY.quickResult.win : STORY.quickResult.lose) + '</p>';
   if (UI.camp && UI.camp.goal) {   // story: say plainly whether the chapter goal was met, with the count, and what the stars need
     var gr = campGoalLive(G, UI.camp), gm = campMetrics(G), gwin = campIsWon(G, UI.camp);
     var sl = (UI.camp.stars || []).map(function (st, i) { var ok = i === 0 ? gwin : (gwin && GXC.testStar(st.test, gm)); return '<li class="' + (ok ? 'on' : '') + '"><i>\u2605</i> ' + esc(st.text) + '</li>'; }).join('');
     goalHTML = '<div class="goalres ' + (gwin ? 'met' : 'miss') + '"><b>' + (gwin ? 'Chapter goal met!' : 'Chapter goal missed') + '</b><span>' + esc(UI.camp.goal.text) + (gr.need != null ? ' You had ' + gr.cur + '.' : '') + '</span>' +
       (gwin ? '' : '<span>' + (win === 0 || winners.indexOf(me) >= 0 ? 'You won the year, but this chapter is only cleared when its goal is met. Try again!' : 'Try again: the goal is shown at the top of the board.') + '</span>') +
       '<ul class="goalstars">' + sl + '</ul>' + (gwin ? '' : '<small>Stars are earned once the goal is met.</small>') + '</div>';
+    var cid = UI.camp.id; if (!gwin && STORY.lose[cid]) voice = sayB(STORY.lose[cid]); else if (gwin && STORY.bossWin[cid]) voice = sayB(STORY.bossWin[cid]);
   }
-  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
+  var h = artHTML('bg-result', 'bgart', '') + (UI.camp && UI.camp.goal ? '<h2>' + esc(gwin ? 'Goal met!' : 'Goal missed') + '</h2><p class="yr">' + esc(line) + '</p>' + goalHTML : '<h2>' + esc(line) + '</h2>') + voice + '<table class="stand"><tr><th>Player</th><th>Birds</th><th>Bonus</th><th>Goals</th><th>Eggs</th><th>Food</th><th>Tucked</th><th>Total</th></tr>' +
     order.map(function (i) { var s = sc[i]; return '<tr class="' + (winners.indexOf(i) >= 0 ? 'win' : '') + '"><td>' + esc(G.pl[i].name) + '</td><td>' + s.birds + '</td><td>' + s.bonus + '</td><td>' + s.goals + '</td><td>' + s.eggs + '</td><td>' + s.cache + '</td><td>' + s.tuck + (s.lead ? '+' + s.lead : '') + '</td><td><b data-engine="G.final[' + i + '].total">' + s.total + '</b></td></tr>'; }).join('') + '</table>';
   h += '<p>Birds = card points. Food = food cached on birds. Ties go to the most food left over.</p><div class="tmenu">' +
     (UI.camp ? '<button type="button" class="btn big primary" id="again">Continue the story</button>' : '<button type="button" class="btn big primary" id="again">Play again</button><button type="button" class="btn" id="totitle">Title screen</button>') + '</div>';
@@ -100,6 +110,7 @@ function gameOver() { hideHelp();
     el.hidden = false; $('#toast').innerHTML = '';
     $('#again').onclick = function () { el.hidden = true; if (UI.camp) { try { GXC.finish(G); } catch (e) { showTitle(); } } else quickStart(); };
     var tt = $('#totitle'); if (tt) tt.onclick = function () { el.hidden = true; showTitle(); };
+    if (UI.mode === 'tutfree' && !UI.fast) $$('.stand b[data-engine]', el).forEach(function (bb) { var v = +bb.textContent, t0 = Date.now(); bb.textContent = '0'; var iv = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / 1100); bb.textContent = Math.round(v * k); if (k >= 1) clearInterval(iv); }, 40); });   // the prologue's climax: the totals count up
   }, aMs(700));
 }
 // ---------------- drawers: rules, goals, log, opponent board
@@ -117,7 +128,8 @@ var RULES = [
 ];
 function rulesBody() {
   var d = document.createElement('div'); d.className = 'dr';
-  d.innerHTML = RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
+  d.innerHTML = '<h3>How a turn works</h3><ol class="howturn"><li>On your turn you do ONE thing.</li><li>Play a bird from your hand into a row (pay the food on the card).</li><li>Or tap a row button: forest = food, grassland = eggs, wetland = cards.</li><li>Every bird in that row then uses its power, right to left.</li><li>After 4 rounds, most points wins: birds, eggs, goals, bonus cards.</li></ol>' + RULES.map(function (r) { return '<h3>' + r[0] + '</h3><p>' + r[1] + '</p>'; }).join('') +
+    '<h3>Simplified on purpose</h3><ul><li>Food and eggs you pay for a bird are picked for you (cheapest first).</li><li>The solo Rival Flock is this game\'s own simple deck.</li><li>120 birds, 18 bonus cards and 12 goals, all original.</li><li>A row\'s trade (card for food, food for egg, egg for card) is offered before the row\'s gain, not after.</li><li>Row yields: forest and wetland 1,1,2,2,3,3; grassland 2,2,3,3,4,4; a trade on every second space.</li><li>The 4 round goals never repeat a family.</li><li>When the feeder dice all match and a power wants a food that is not there, the dice are rerolled for you.</li></ul>' +
     '<h3>Row actions by birds in the row</h3><p>Forest food: 1, 1+trade, 2, 2+trade, 3, 3+trade. Grassland eggs: 2, 2+trade, 3, 3+trade, 4, 4+trade. Wetland cards: 1, 1+trade, 2, 2+trade, 3, 3+trade.</p>' +
     '<div class="tmenu" style="margin:10px 0"><button type="button" class="btn" id="rtut">Play the tutorial</button><button type="button" class="btn" id="rref">All cards</button></div>';
   setTimeout(function () { var t = $('#rtut', d); if (t) t.onclick = function () { GX.close(); tutStart(); }; var r = $('#rref', d); if (r) r.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } }; }, 0);

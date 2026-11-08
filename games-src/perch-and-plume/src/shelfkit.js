@@ -50,7 +50,7 @@ function moveTarget(m) {
 function helpInit() {
   if (!window.GXH) return;
   try {
-    GXH.init({ game: 'perch-and-plume', defaultOn: true, avoid: '.glow,#acts .btn,#feeder,#tray',
+    GXH.init({ game: 'perch-and-plume', defaultOn: false, avoid: '.glow,#acts .btn,#feeder,#tray',
       steps: {
         act: { target: function () { return $('.ract[data-h="0"]'); }, title: 'One action a turn', text: 'Use a habitat row, or play a bird from your hand.' },
         play: { target: function () { return $('.slot.next.glow') || $('#mat'); }, title: 'Place your bird', text: 'A bird goes in the leftmost free space. Spaces further right cost eggs.' },

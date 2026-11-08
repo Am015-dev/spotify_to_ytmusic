@@ -121,6 +121,11 @@ function anim(el, kf, o) { if (!el.animate) return Promise.resolve(); const a = 
 // ---- the reveal stage: every diner's covered dish in a row in the middle of the table, a drum roll, all covers up at once
 function stageOK() { return !!$('#tbl') && !!document.body.animate && !pxRM(); }
 function stageClear() { const s = $('#stage'); if (s) s.remove(); }
+const cap1 = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+function revealCaption(sd, l) {
+  const me = sd === viewSeat(), nm = me ? 'You' : pname(sd), served = l ? l.served : 'a dish', d = l ? l.d : 0;
+  return (me ? 'Your turn' : pname(sd) + '\'s turn') + '|' + nm + (me ? ' serve ' : ' serves ') + served + '.' + (d > 0 ? ' +' + d : '');
+}
 async function stageReveal(picks, tok, gains) {
   stageClear();
   const bd = $('#bd'), tbl = $('#tbl'), B = bd.getBoundingClientRect(), T = tbl.getBoundingClientRect();
@@ -155,13 +160,18 @@ async function stageReveal(picks, tok, gains) {
   for (let k = 0; k < rolls; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(190); if (tok !== UI.seq) return stageClear(); }
   st.classList.remove('wob'); st.classList.add('up'); UI.fz.slots = picks.map(p => ({ mode: 'faces', cards: p.cards })); renderDock(); renderLabActs();
   snd('cloche');
-  await Promise.all(covers.map(c => c.lift({ delay: 0 })));
-  if (tok !== UI.seq) return stageClear();
-  // what each dish just did to its diner's score, big, over the dish (the reveal's payoff)
-  if (gains) { let best = 0; pods.forEach(p => { best = Math.max(best, gains[p.s] || 0); });
-    pods.forEach((p, i) => { const d = gains[p.s] || 0; const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + (d > 0 && d === best ? '.top' : ''), d > 0 ? '+' + d : d < 0 ? '−' + -d : '+0'); g.style.animationDelay = (i * 90) + 'ms'; p.host.appendChild(g); });
-    if (best > 0) snd('coin', { vol: .5 }); }
-  await wait(rolls > 1 ? 800 : 650); if (tok !== UI.seq) return stageClear();
+  // ONE BY ONE: each diner's cover lifts in turn, the dish is named in the caption line, its points pop with the plain reason (tap to hurry)
+  st.classList.add('seq'); const news0 = UI.fz && UI.fz.news0, stp = G.turn <= 3 && G.round === 1 ? 1 : .8;
+  for (let i = 0; i < pods.length; i++) {
+    const p = pods[i], l = news0 && news0.lines.find(x => x.s === p.s), d = gains ? (gains[p.s] || 0) : 0;
+    pods.forEach((q, j) => q.pod.classList.toggle('cur', j === i)); if (UI.fz) UI.fz.msg = revealCaption(p.s, l); renderDock();
+    snd('cloche'); await covers[i].lift({ delay: 0 }); if (tok !== UI.seq) return stageClear();
+    const why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
+    const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', h('small', d !== 0 && why ? why : 'no points yet'));
+    p.host.appendChild(g); p.pod.classList.add('done'); if (d > 0) snd('coin', { vol: .5 });
+    await wait(1000 * stp); if (tok !== UI.seq) return stageClear();
+  }
+  pods.forEach(q => q.pod.classList.remove('cur')); st.classList.remove('seq');
   // each dish goes home to its diner's counter
   UI.fz.slots = picks.map(() => ({ mode: 'gone' }));
   await Promise.all(pods.map((p, i) => {
@@ -233,3 +243,16 @@ function passDone() {
   const b = $('#belt'); if (b) b.style.visibility = '';
   if (UI.passKeep) { const k = UI.passKeep; UI.passKeep = null; setTimeout(() => k.forEach(e => e.remove()), 120); }
 }
+// ---- the guide card: a portrait and two short lines (the tutorial reaction beats, the quick game opening, the result)
+function portraitEl(who, px) {
+  const w = who || ST.guide, el = h('span.kkport', { style: 'width:' + px + 'px;height:' + px + 'px;background:' + w.color }, h('i', w.name.replace(/^Auntie /, '').charAt(0)));
+  const im = new Image(); im.alt = ''; im.src = MEDIA + w.portrait; im.onload = () => { el.appendChild(im); }; return el;
+}
+function guideSay(text, ms, who) {
+  let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
+  clearTimeout(guideSay.t); g.replaceChildren(portraitEl(who, 40), h('div.kgt', h('b', (who || ST.guide).name), h('span', text))); g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
+  guideSay.t = setTimeout(() => g.classList.remove('on'), ms || 3200);
+}
+function guideHide() { const g = $('#kkguide'); if (g) g.classList.remove('on'); }
+// the tutorial bubble gets the guide's portrait (code-drawn disc, painted portrait on top when the file is there)
+new MutationObserver(() => { const b = document.querySelector('.gxt-bub'); if (b && !b.querySelector('.kkport')) b.insertBefore(portraitEl(null, 40), b.firstChild); }).observe(document.body, { childList: true, subtree: true });
