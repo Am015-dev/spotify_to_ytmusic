@@ -2,9 +2,9 @@
 // element (.tuthl). Checks per step: exactly one highlighted target, it is not covered (elementFromPoint), Rowan's sentence is one sentence
 // of at most 12 words, and a wrong tap (another market column) is refused. At the end: every rule in COACH_RULES was taught in order,
 // the result screen shows the walk-through, the tutorial is marked done, and its main button starts a real 20-turn game.
-// Usage: node tutorial-end.js [shots dir]   (phone 390x844 and 375x667; shots tut-N.png at 390x844 when a dir is given)
+// Usage: [WM_URL=file://.../games/wildmark/x.html] node tutorial-end.js [shots dir]  (WM_URL: a copy next to games/wildmark/media so art loads)   (phone 390x844 and 375x667; shots tut-N.png at 390x844 when a dir is given)
 const { chromium } = require('playwright');
-const URL = 'file://' + __dirname + '/wildmark.html', SHOTS = process.argv[2] || '';
+const URL = process.env.WM_URL || 'file://' + __dirname + '/wildmark.html', SHOTS = process.argv[2] || '';
 (async () => {
   const b = await chromium.launch(); let allOk = true;
   for (const [name, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]]) {
