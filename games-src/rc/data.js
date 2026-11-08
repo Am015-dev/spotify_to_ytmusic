@@ -25,7 +25,7 @@ const CHARS={
   {k:'keeneye',n:'Keen Eye',c:3,x:'Draw 2 discovery tokens, keep one.'}]},
  soldier:{n:'Soldier',die:12,arrows:[4,8],inv:'spear',skills:[
   {k:'track',n:'Tracker',c:2,x:'Look at the top beast of the hunting deck; leave it on top or put it at the bottom.'},
-  {k:'fortify',n:'Fortify',c:3,x:'Palisade +1 or weapon +1.'},
+  {k:'fortify',n:'Fortify',c:2,x:'Palisade +1 or weapon +1.'},
   {k:'rage',n:'Battle Rage',c:3,x:'+3 weapon for your next fight this round.'},
   {k:'drive',n:'Drive the Game',c:4,x:'Put the top card of the beast deck on top of the hunting deck, unseen.'}]}};
 const FRIDAY={n:'Friday',die:4};
