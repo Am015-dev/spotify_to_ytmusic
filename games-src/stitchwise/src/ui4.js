@@ -38,10 +38,10 @@ function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = 
 function coachRender() {
   var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.wide ? UI.flavor || '' : '';
   var sk = $('#skipmap'); if (UI.coach && UI.prologue && G && !G.over) { if (!sk) { sk = h('button#skipmap.btn.alt.sm', { type: 'button', 'data-a': 'skipmap' }, 'Skip to map'); var db = $('#dockbody'); if (db) db.appendChild(sk); } } else if (sk) sk.remove();
-  el.hidden = !txt || !G || G.over; if (el.hidden) return; el.innerHTML = '';
+  el.hidden = !txt || !G || G.over; if (el.hidden) { el.dataset.k = ''; return; } var key = txt + '|' + (C ? C.ch : ''); if (el.dataset.k === key) return; el.dataset.k = key; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
   el.appendChild(h('span.gface', { style: 'background:' + (C ? cast.color || '#3b7a8c' : '#a8432f'), 'aria-hidden': 'true' }, C ? (cast.emoji || '\u{1F9F5}') : '\u{1F380}')); var pim = C && artHas('portrait-wren') ? artImg('portrait-wren') : null; if (pim) { var gf = el.lastChild; gf.textContent = ''; pim.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover'; gf.appendChild(pim); }
-  if (C) { var xb = h('button.gx-x.gclose', { type: 'button', 'aria-label': 'Hide Aunt Wren' }, '\u00D7'); xb.onclick = function (e) { e.stopPropagation(); C.line = ''; coachRender(); }; el.appendChild(xb); }
+  if (C) { var xb = h('button.gx-x.gclose', { type: 'button', 'aria-label': 'Hide Aunt Wren' }, '\u00D7'); xb.addEventListener('pointerdown', function (e) { e.preventDefault(); e.stopPropagation(); C.line = ''; coachRender(); }); el.appendChild(xb); }
   el.insertBefore(h('span.gtx', C ? h('b', (cast.name || 'Aunt Wren') + (chn ? ' \u00B7 Ch. ' + C.ch + ' ' + chn : '')) : null, h('span', txt)), C ? el.lastChild : null);
 }
 function coachCheck() { // after every move: what just happened for the first time?
