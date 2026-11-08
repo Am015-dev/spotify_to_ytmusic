@@ -26,7 +26,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms)); const errs = [];
     await sleep(200);
     const r = await p.evaluate(() => { const V = UI.V; if (!V || G.over) return 'over'; const tot = G.st.reduce((a, s) => a + s.w.length, 0), cut = G.st.reduce((a, s) => a + s.w.filter(x => x.cut).length, 0);
       const s = decider(); const say = document.getElementById('say'); const hold = Date.now() < (TBL.sayT || 0);
-      if (s !== V.seat) return (s >= 0 && hold && cut / tot > .2) ? 'rivalcap' : 'wait';
+      if (s !== V.seat) return (s >= 0 && document.querySelector('#fx .say') && cut / tot > .2) ? 'rivalcap' : 'wait';
       if (cut / tot > .45 && !G.q && !UI.sel && !hold) return 'mid';
       if (hold) { TBL.sayT = 0; UI.aiNotBefore = 0; refresh(); return 'read' } const m = aiMove(V.seat); if (m && !legal(m, V.seat)) act(m, V.seat); return 'act' });
     if (r === 'over') break;
