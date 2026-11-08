@@ -10,6 +10,7 @@ const OUT = process.argv[2] || 'shots';
     const tap = async loc => touch ? loc.tap() : loc.click();
     await page.goto(S.url, { waitUntil: 'load' }); await page.waitForSelector('#start .tbtn');
     await tap(page.locator('#start .tbtn').first());
+    await page.waitForTimeout(300); if (await page.locator('#goal:not([hidden]) .tbtn').count()) await tap(page.locator('#goal .tbtn'));
     await page.waitForFunction(() => window.G && myTurn() && !UI.busy, null, { timeout: 20000 }); await page.waitForTimeout(900);
     await page.screenshot({ path: `${OUT}/d-turn1-${name}.png` });
     await tap(page.locator('.glow').first()); await page.waitForTimeout(500); await page.screenshot({ path: `${OUT}/e-insp-${name}.png` });

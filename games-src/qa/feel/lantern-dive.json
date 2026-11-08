@@ -1,0 +1,1343 @@
+{
+ "slug": "lantern-dive",
+ "when": "2026-11-08T02:30Z",
+ "secs": 30,
+ "totalSecs": 103,
+ "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
+ "checks": {
+  "a": {
+   "status": "FAIL",
+   "count": 95,
+   "detail": [
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 832,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "You play Coral 9",
+     "words": 4,
+     "shownMs": 913,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Dag's turn",
+     "words": 2,
+     "shownMs": 497,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Dag plays Coral 5",
+     "words": 4,
+     "shownMs": 687,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Sumi's turn",
+     "words": 2,
+     "shownMs": 420,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Sumi plays Coral 3",
+     "words": 4,
+     "shownMs": 641,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1836,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Job broken: The first trick Dag's job - the crew must dive again.",
+     "words": 13,
+     "shownMs": 1588,
+     "neededMs": 5300,
+     "cls": "on bad tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1544,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "You play Coral 2",
+     "words": 4,
+     "shownMs": 873,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Dag's turn",
+     "words": 2,
+     "shownMs": 378,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Dag plays Coral 7",
+     "words": 4,
+     "shownMs": 689,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Sumi's turn",
+     "words": 2,
+     "shownMs": 250,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Sumi plays Coral 1",
+     "words": 4,
+     "shownMs": 628,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 2505,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Job done: The first trick Dag's job - one step closer.",
+     "words": 11,
+     "shownMs": 1397,
+     "neededMs": 5100,
+     "cls": "on good tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Dag plays Kelp 4",
+     "words": 4,
+     "shownMs": 963,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/learn",
+     "text": "Sumi's turn",
+     "words": 2,
+     "shownMs": 250,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Nerea wins the trick with Kelp 9 Highest card of the led colour wins.",
+     "words": 14,
+     "shownMs": 250,
+     "neededMs": 5400,
+     "cls": "on good tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Nerea's turn",
+     "words": 2,
+     "shownMs": 449,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "phone/play",
+     "text": "Bram's turn",
+     "words": 2,
+     "shownMs": 460,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 608,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1646,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "You play Coral 9",
+     "words": 4,
+     "shownMs": 994,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Dag's turn",
+     "words": 2,
+     "shownMs": 603,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Dag plays Coral 5",
+     "words": 4,
+     "shownMs": 535,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Sumi's turn",
+     "words": 2,
+     "shownMs": 500,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Sumi plays Coral 3",
+     "words": 4,
+     "shownMs": 627,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 2603,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 2072,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Job broken: The first trick Dag's job - the crew must dive again.",
+     "words": 13,
+     "shownMs": 1556,
+     "neededMs": 5300,
+     "cls": "on bad tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Watch the board",
+     "words": 3,
+     "shownMs": 1303,
+     "neededMs": 4300,
+     "cls": "gxt-pill"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "You play Coral 2",
+     "words": 4,
+     "shownMs": 1041,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Dag's turn",
+     "words": 2,
+     "shownMs": 250,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Dag plays Coral 7",
+     "words": 4,
+     "shownMs": 976,
+     "neededMs": 4400,
+     "cls": "on tap"
+    },
+    {
+     "kind": "too-short",
+     "session": "pc/learn",
+     "text": "Sumi's turn",
+     "words": 2,
+     "shownMs": 250,
+     "neededMs": 4200,
+     "cls": "on"
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Your turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Your turn",
+      "Sumi signals Sumi pings her Kelp 9, her highest Ke"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 497,
+     "texts": [
+      "Dag's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 687,
+     "texts": [
+      "Dag plays Coral 5",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 420,
+     "texts": [
+      "Sumi's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 641,
+     "texts": [
+      "Sumi plays Coral 3",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "You win the trick with Coral 9 Highest card of the",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "You win the trick with Coral 9 Highest card of the",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1588,
+     "texts": [
+      "Job broken: The first trick Dag's job - the crew m",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Your turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Dag's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 689,
+     "texts": [
+      "Dag plays Coral 7",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Sumi's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 628,
+     "texts": [
+      "Sumi plays Coral 1",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Dag wins the trick with Coral 7 Highest card of th",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Dag wins the trick with Coral 7 Highest card of th",
+      "Dag cheers Dag's Coral 7 is highest: \"Ha, thanks!\""
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 1397,
+     "texts": [
+      "Job done: The first trick Dag's job - one step clo",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Dag's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Sumi's turn",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/learn",
+     "ms": 250,
+     "texts": [
+      "Sumi plays Kelp 9",
+      "Watch the board"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 362,
+     "texts": [
+      "Your turn",
+      "Not your turn yet."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 250,
+     "texts": [
+      "Your turn",
+      "Not your turn yet.",
+      "7 7 You lead Tap a glowing card to play it. Everyo"
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 397,
+     "texts": [
+      "You play Kelp 8",
+      "Not your turn yet."
+     ]
+    },
+    {
+     "kind": "two-at-once",
+     "session": "phone/play",
+     "ms": 416,
+     "texts": [
+      "You play Kelp 8",
+      "One moment…"
+     ]
+    }
+   ]
+  },
+  "b": {
+   "status": "FAIL",
+   "count": 40,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "Pick a job Tap a glowing job card. Got it",
+     "ms": 250,
+     "cls": "gxh-bub gxh-a-bottom on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Not your turn yet.",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 505,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Not your turn yet.",
+     "ms": 3072,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Lanterns cannot be passed.",
+     "ms": 1258,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Not your turn yet.",
+     "ms": 1545,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 1500,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn",
+     "ms": 640,
+     "cls": "on mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "7 7 You lead Tap a glowing card to play it. Everyone follows its colour. Got it",
+     "ms": 250,
+     "cls": "gxh-bub gxh-a-bottom on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Not your turn yet.",
+     "ms": 1121,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "You play Kelp 8",
+     "ms": 884,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 416,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea's turn",
+     "ms": 499,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Wait for Nerea.",
+     "ms": 752,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea plays Kelp 9",
+     "ms": 747,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 686,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram's turn",
+     "ms": 672,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram plays Kelp 3",
+     "ms": 670,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Wait for Bram.",
+     "ms": 1250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sumi's turn",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Wait for Sumi.",
+     "ms": 760,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sumi plays Kelp 1",
+     "ms": 761,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea wins the trick with Kelp 9 Highest card of the led colour wins.",
+     "ms": 250,
+     "cls": "on good tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea's turn",
+     "ms": 449,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea plays Sunstar 9",
+     "ms": 978,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram's turn",
+     "ms": 460,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 2487,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram plays Sunstar 4",
+     "ms": 953,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sumi's turn",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sumi plays Sunstar 8",
+     "ms": 985,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "One moment…",
+     "ms": 3012,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "Your turn",
+     "ms": 1503,
+     "cls": "on mine",
+     "tag": "div"
+    },
+    {
+     "session": "phone/play",
+     "text": "6 6 Follow the colour Play the colour that was led. Dim cards are blocked. Highest of that colour wins. Got it",
+     "ms": 978,
+     "cls": "gxh-bub gxh-a-bottom on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Not your turn yet.",
+     "ms": 2613,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "One moment…",
+     "ms": 250,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Not your turn yet.",
+     "ms": 1328,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Sumi plays Coral 3",
+     "ms": 752,
+     "cls": "on tap",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "One moment…",
+     "ms": 2571,
+     "cls": "on",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "Your turn",
+     "ms": 1957,
+     "cls": "on mine",
+     "tag": "div"
+    },
+    {
+     "session": "pc/play",
+     "text": "6 6 Follow the colour Play the colour that was led. Dim cards are blocked. Highest of that colour wins. Got it",
+     "ms": 1237,
+     "cls": "gxh-bub gxh-a-bottom on",
+     "tag": "div"
+    }
+   ]
+  },
+  "c": {
+   "status": "FAIL",
+   "count": 2,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "You, Dag and Sumi dive as one crew; each job is one diver's.",
+     "words": 13,
+     "at": 4079,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "pc/learn",
+     "text": "Dag grabs the first-trick job: \"Don't you dare win it!\" Both jobs must be done to win.",
+     "words": 17,
+     "at": 9752,
+     "where": "div.gxh-tx"
+    }
+   ]
+  },
+  "d": {
+   "status": "FAIL",
+   "count": 70,
+   "detail": [
+    {
+     "session": "phone/learn",
+     "text": "Short, one tap at a time, no reading",
+     "px": 13.3,
+     "at": 1251,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Dag",
+     "px": 13,
+     "at": 4078,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "13",
+     "px": 13,
+     "at": 4078,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "0",
+     "px": 13,
+     "at": 4078,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sumi",
+     "px": 13,
+     "at": 4078,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "14",
+     "px": 13,
+     "at": 4078,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "You",
+     "px": 13,
+     "at": 4078,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Brack here. The bay nets are tangled. You, Dag and Sumi dive",
+     "px": 13.5,
+     "at": 4079,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Lantern 3",
+     "px": 12.5,
+     "at": 6002,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/learn",
+     "text": "The first trick",
+     "px": 13,
+     "at": 7002,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/learn",
+     "text": "9▲",
+     "px": 12,
+     "at": 9008,
+     "where": "span.spill"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Sumi pings her Kelp 9, her highest Kelp. Everyone pings once",
+     "px": 13.5,
+     "at": 10023,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Coral",
+     "px": 12,
+     "at": 11052,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "12",
+     "px": 13,
+     "at": 13081,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Last",
+     "px": 13,
+     "at": 14001,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "You win!",
+     "px": 13,
+     "at": 15001,
+     "where": "span.wtag"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Highest card of the led colour wins.",
+     "px": 13,
+     "at": 15002,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Dag's job - the crew must dive again.",
+     "px": 13,
+     "at": 16005,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "1",
+     "px": 13,
+     "at": 16005,
+     "where": "b."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Same cards, new plan. Ping your lowest Coral, the 2: tell Da",
+     "px": 13.5,
+     "at": 20002,
+     "where": "div.gxh-tx"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Dag wins",
+     "px": 13,
+     "at": 25257,
+     "where": "span.wtag"
+    },
+    {
+     "session": "phone/learn",
+     "text": "Dag's job - one step closer.",
+     "px": 13,
+     "at": 27251,
+     "where": "small."
+    },
+    {
+     "session": "phone/learn",
+     "text": "Kelp",
+     "px": 12,
+     "at": 29263,
+     "where": "span."
+    },
+    {
+     "session": "phone/learn",
+     "text": "11",
+     "px": 13,
+     "at": 29263,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Short, one tap at a time, no reading",
+     "px": 13.3,
+     "at": 1001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "You + Nerea, Bram and Sumi · difficulty 2",
+     "px": 13,
+     "at": 4001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "10 m",
+     "px": 13,
+     "at": 4001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "40 m",
+     "px": 13,
+     "at": 4001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "200 m",
+     "px": 13,
+     "at": 4001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "4000 m",
+     "px": 13,
+     "at": 4001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Nerea",
+     "px": 13,
+     "at": 5743,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/play",
+     "text": "10",
+     "px": 13,
+     "at": 5743,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "0",
+     "px": 13,
+     "at": 5743,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Bram",
+     "px": 13,
+     "at": 5743,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/play",
+     "text": "Sumi",
+     "px": 13,
+     "at": 5743,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/play",
+     "text": "You",
+     "px": 13,
+     "at": 5743,
+     "where": "span.nm"
+    },
+    {
+     "session": "phone/play",
+     "text": "No Lanterns",
+     "px": 13,
+     "at": 8020,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "Coral 3",
+     "px": 12.5,
+     "at": 8020,
+     "where": "span.t"
+    },
+    {
+     "session": "phone/play",
+     "text": "New",
+     "px": 13,
+     "at": 11032,
+     "where": "span.gotb"
+    },
+    {
+     "session": "phone/play",
+     "text": "Diver",
+     "px": 13,
+     "at": 13001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Cards in hand",
+     "px": 13.5,
+     "at": 13001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "10",
+     "px": 13.5,
+     "at": 13001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Tricks won",
+     "px": 13.5,
+     "at": 13001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "0",
+     "px": 13.5,
+     "at": 13001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Ping",
+     "px": 13.5,
+     "at": 13001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Used",
+     "px": 13.5,
+     "at": 13001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Showed",
+     "px": 13.5,
+     "at": 13001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Tide 7 (highest)",
+     "px": 13.5,
+     "at": 13001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "9▲",
+     "px": 12,
+     "at": 14001,
+     "where": "span.spill"
+    },
+    {
+     "session": "phone/play",
+     "text": "Job card",
+     "px": 13,
+     "at": 14001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Taken by",
+     "px": 13.5,
+     "at": 14001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "You",
+     "px": 13.5,
+     "at": 14001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Difficulty (4 divers)",
+     "px": 13.5,
+     "at": 14001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "1",
+     "px": 13.5,
+     "at": 14001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "State",
+     "px": 13.5,
+     "at": 14001,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "Open",
+     "px": 13.5,
+     "at": 14001,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "3▲",
+     "px": 12,
+     "at": 15143,
+     "where": "span.spill"
+    },
+    {
+     "session": "phone/play",
+     "text": "Kelp",
+     "px": 12,
+     "at": 16014,
+     "where": "span."
+    },
+    {
+     "session": "phone/play",
+     "text": "9",
+     "px": 13,
+     "at": 18080,
+     "where": "b."
+    },
+    {
+     "session": "phone/play",
+     "text": "Computer diver (hard)",
+     "px": 13,
+     "at": 18080,
+     "where": "div.sm"
+    }
+   ]
+  },
+  "e": {
+   "status": "PASS",
+   "count": 0,
+   "detail": []
+  }
+ },
+ "notes": [
+  "phone/play: Play button not found",
+  "pc/play: Play button not found"
+ ],
+ "sessions": [
+  {
+   "size": "phone",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 14,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 36
+  },
+  {
+   "size": "phone",
+   "mode": "play",
+   "secs": 27,
+   "turns": 51,
+   "clicks": 59,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 33
+  },
+  {
+   "size": "pc",
+   "mode": "learn",
+   "secs": 30,
+   "turns": 12,
+   "clicks": 0,
+   "endedBy": "time",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 23
+  },
+  {
+   "size": "pc",
+   "mode": "play",
+   "secs": 16,
+   "turns": 22,
+   "clicks": 27,
+   "endedBy": "result",
+   "tutorialEnded": null,
+   "hintsOff": true,
+   "messagesSeen": 7
+  }
+ ]
+}

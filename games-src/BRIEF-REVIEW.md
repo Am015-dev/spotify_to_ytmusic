@@ -22,10 +22,18 @@ A game goes live only if you pass it.
 8 Owner art used, one style (`node games-src/scripts/asset-usage.js <slug>`: 95%+ owner pictures, all glb)
 9 impeccable critique score
 10 design-review score
-Rules: `node games-src/<dir>/logic-test.js` must pass.
+Rules: `node games-src/<dir>/logic-test.js` must pass. Feel: `node games-src/scripts/feel-audit.js <slug> --secs 120` (a)-(e) all 0, and Learn finishes by touch without Skip.
 
 ## Verdict
 PASS only if every score is 7 or more and the rules pass. Send the orchestrator (session_01MS7iGyBWDerEAyagJ6ir4U) one
 trigger "[REVIEW <slug>] PASS|FAIL" with the 10 scores, the 3 worst problems, and 4 shot paths you made
 (games-src/<dir>/playable-shots/review/). On FAIL also send the same fix list straight to the game's worker session if
 the message gives it. Then wait for the next game.
+
+## Speed (owner): you are a machine, play at 100x-1000x human speed
+- Run Playwright headless with animations sped up: page.clock / a game ?fast=1 or speed flag if it exists, else inject CSS
+  `*{animation-duration:0s!important;transition-duration:0s!important}` and stub setTimeout delays for AI turns.
+- Drive the engine directly for rules and full-game checks (thousands of games in seconds); use the browser only for
+  touch/mouse proof and screenshots. Run phone and PC checks in parallel browser contexts.
+- Only the pop-up timing check runs at real speed, and only for the messages you are timing.
+- A full review should take minutes, not an hour.
