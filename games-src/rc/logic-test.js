@@ -5,7 +5,8 @@
 //        node logic-test.js --md       (rewrite RULES-CHECKLIST.md from this table)
 const fs=require('fs'),vm=require('vm');
 const files=['data-gen.js','data.js','cards-ev.js','cards-adv.js','text.js','engine.js','phases.js','scen.js','moves.js','ai.js'];
-const SRC=files.map(f=>fs.readFileSync(__dirname+'/'+f,'utf8')).join('\n')+';UI.pause=true;';
+const TUT=fs.readFileSync(__dirname+'/tutor.js','utf8');   // Easy island's deal (easyDeal) lives in tutor.js
+const SRC=files.map(f=>fs.readFileSync(__dirname+'/'+f,'utf8')).join('\n')+'\n'+TUT.slice(TUT.indexOf('var EASYK'),TUT.indexOf('function tutDeal('))+';UI.pause=true;';
 // helpers that run inside the engine context
 const PRE=`
 function refresh(){}
@@ -107,6 +108,7 @@ R('E13',E,'You cannot plan a build you cannot pay for.','refused with "not enoug
 R('E14',E,'Resources are reserved while planning: 2 wood cannot pay for a shelter (2) and a weapon (1) at once.','second build refused',()=>{mk();G.res.wood=2;place('c0_0','build',{k:'shelter'});return eq(typeof place('c1_0','build',{k:'weapon'}),'string')});
 R('E15',E,'Pawns of different castaways can join one action.','2 pawns from 2 different castaways on one action',()=>{mk();tile(6,1);tile(5,4);const a=pl('gather',{pos:5,i:0},['c0_0','c1_0']);return eq([a.pw.length,[...new Set(a.pw.map(x=>pawnInfo(x).c))].sort()],[2,[0,1]])});
 R('E16',E,'A planned action can be taken back.','pawn free again',()=>{mk();tile(6,1);pl('gather',{pos:6,i:0},['c0_0']);unplace('c0_0');return eq([G.plan.acts.length,placedIds().has('c0_0')],[0,false])});
+R('E17',E,'You may hunt as many times as there are beasts in the Hunting deck: 1 beast allows 1 full hunt, a second hunt is refused.','1 hunt with 2 pawns has no plan problem; a 2nd hunt refused',()=>{mk();G.hunt=['bear'];place('c0_0','hunt',null);place('c0_1','hunt',null);const ok=!planProblems().some(s=>/beast/.test(s));const second=typeof placeWhy('c1_0','hunt',null);return eq([G.plan.acts.filter(a=>a.type==='hunt').length,ok,second],[1,true,'string'])});
 
 // ======================================================================= F. RESOLVING ORDER
 const F='Resolving actions';
@@ -213,6 +215,8 @@ R('M2',M,'A wound face costs 1 wound even when the action succeeds.','wound 1 an
 R('M3',M,'A failure face (no success) gives 2 determination to the actor.','det 2, no wood',()=>{mk();tile(6,1);dice('gather',0,0,0);pl('gather',{pos:6,i:0},['c0_0']);go(true);return eq([P(0).det,G.fut.wood],[2,0])});
 R('M4',M,'The adventure face draws from the matching deck: build, gather, explore.','decks build, gather, explore',()=>{const r=[];for(const [d,t] of [['build',{k:'weapon'}],['gather',{pos:6,i:0}],['explore',2]]){mk();tile(6,1);G.res.wood=1;dice(d,0,1,1);G.adv[d]=[advKey(d)];pl(d,t,['c0_0']);go(true);r.push(CARD[G.lastAdv].deck)}return eq(r,['build','gather','explore'])});
 R('M5',M,'An Adventure token plus an adventure face draws only one card.','deck 3 -> 2, token gone',()=>{mk();tile(6,1);dice('gather',0,1,1);G.adv.gather=[advKey('gather'),'g_tracks','g_shortage'];G.tok.gather.adv=1;pl('gather',{pos:6,i:0},['c0_0']);go(true);return eq([G.adv.gather.length,!!G.tok.gather.adv],[2,false])});
+R('M5b',M,'An Adventure token draws a card even when two pawns make the action sure (no dice).','no roll, deck 2 -> 1, token gone',()=>{mk();tile(6,1);dice('gather',0,1,0);G.adv.gather=[advKey('gather'),'g_shortage'];G.tok.gather.adv=1;pl('gather',{pos:6,i:0},['c0_0','c0_1']);go(true);return eq([G.log.some(l=>/ rolls for /.test(l.t)),G.adv.gather.length,!!G.tok.gather.adv],[false,1,false])});
+R('M5c',M,'Easy island keeps the adventure rules: the deal keeps newGame\'s book / "?" split (Easy: 4 book + 8 "?" marker cards), adventure and mystery decks full.','4+8 events, decks full',()=>{mk();G.diff='easy';G.ev.deck=[];newGame({scen:'marooned',chars:['carpenter','cook'],mode:'ai',friday:true,dog:true,items:4,diff:'easy'});const a=G.adv.build.length;easyDeal();return eq([G.ev.deck.filter(k=>CARD[k].icon==='book').length,G.ev.deck.filter(k=>CARD[k].icon!=='book').length,G.adv.build.length===a&&a>0,G.mys.deck.length>0],[4,8,true,true])});
 R('M6',M,'An Adventure token draws a card even with 2 pawns (no roll), then is discarded.','deck 3 -> 2, token gone',()=>{mk();tile(6,1);G.adv.gather=[advKey('gather'),'g_tracks','g_shortage'];G.tok.gather.adv=1;pl('gather',{pos:6,i:0},['c0_0','c1_0']);go(true);return eq([G.adv.gather.length,!!G.tok.gather.adv],[2,false])});
 R('M7',M,'Reroll Success token: a success on the next roll is rerolled (here to a failure), then the token is discarded.','no wood, token gone',()=>{mk();tile(6,1);DICE['gather-wound']=Array(6).fill('blank');DICE['gather-adventure']=Array(6).fill('blank');DICE['gather-success']=['success','2 determination','success','success','success','success'];const seq=[0,0,0,1];let i=0;rnd=()=>seq[i++%4];G.tok.gather.reroll=1;pl('gather',{pos:6,i:0},['c0_0']);go(true);return eq([G.fut.wood,!!G.tok.gather.reroll],[0,false])});
 R('M8',M,'Minus 1 Pawn token: the next action of that type needs 1 more pawn, then the token is discarded.','needs 2 pawns, token gone',()=>{mk();tile(6,1);G.tok.gather.time=1;const n=actNeed({type:'gather',tgt:{pos:6,i:0}}).need;pl('gather',{pos:6,i:0},['c0_0','c1_0']);go(true);return eq([n,!!G.tok.gather.time],[2,false])});

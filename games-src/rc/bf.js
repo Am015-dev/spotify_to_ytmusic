@@ -101,16 +101,21 @@ BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs
   lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
-function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:''}</em></span>`}
+// the advisor's pick on a choice (the same aiChoose the bulb uses), worked out on a copy so the game is untouched; cached per question
+function recAns(qq){if(n2(qq.opts)<2||allAI())return -1;const key=G.logN+'|'+qq.title+'|'+qq.opts.length;if(BF.recQ&&BF.recQ.k===key)return BF.recQ.v;let v=-1;const save=JSON.stringify(G);UI.recBusy=1;try{v=aiChoose(qq.title,qq.opts,G.chars[qq.who],qq);if(typeof v!=='number')v=-1}catch(e){v=-1}finally{G=JSON.parse(save);UI.recBusy=0}BF.recQ={k:key,v};return v}
+const n2=a=>a?a.length:0;
+// one plain line that says what the helper pawns do (G6 r2: Hammer and Dog were never explained)
+function helpLine(){let xs=[];try{xs=extraPawns()}catch(e){}if(!xs.length)return '';const t=x=>x.id==='dog'?'Dog: helps hunt or explore, no wounds':x.id==='hammer'?'Hammer: an extra pawn for one build':`${x.n.split(' ')[0]}: an extra pawn for ${x.t.map(k=>(TNAME[k]||k).toLowerCase()).join(' or ')}`;return `<div class="bfhelp">${xs.map(x=>E(t(x))).join(' · ')}</div>`}
+function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=p.x?pawnLabel(p).split(' ')[0]:pawnLabel(p);
+  return `<span class="bfpc">`+`<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}${p.x&&p.t?E(': a helper pawn, it can only '+p.t.map(t=>(TNAME[t]||t).toLowerCase()).join(' or ')):''}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"">${(()=>{const k=p.c!=null&&P(p.c)?P(p.c).k:p.f?'friday':null;return k?`<img class="bfpic" src="media/camp-${k}.webp" alt="" onerror="this.remove()">`:''})()}<b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${AI(a.type)}</u>`:''}</button><em class="bfpn">${E(nm)}${a?`<br><i>${E((TNAME[a.type]||a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</i>`:p.x&&p.t?`<br><i>helper</i>`:''}</em></span>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
-    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${optHtml(o.l)}</button>`).join('')}</div>`}
+    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;const rk=recAns(qq);return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt${j===rk?' rec':''}" data-ans="${j}">${j===rk?'<span class="recb" title="The advisor would pick this">✨</span>':''}${optHtml(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
     if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div>${helpLine()}<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
@@ -122,19 +127,31 @@ function chipsFor(st){const out=[];
     for(const a of s.plan.acts){if(!a.pw.length)continue;const here=b.kind==='act'&&b.data.id===a.id;out.push({pos:(()=>{let p=null;try{p=pawnSpot(a)}catch(e){}return p!=null&&MAP[p]?p:s.camp.pos})(),a,risk:'sure',badge:a.done&&!here?'✓':'',rm:null,cur:here,done:!!a.done&&!here})}return out}
   return out}
 function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chipsFor(st);
-  const sig=JSON.stringify(cs.map(c=>[c.pos,c.a.id,c.a.type,c.a.pw,c.risk,c.cur,c.done]))+st;if(host.dataset.s===sig)return;host.dataset.s=sig;
+  const sig=JSON.stringify(cs.map(c=>[c.pos,c.a.id,c.a.type,c.a.pw,c.risk,c.cur,c.done]))+st+'|'+BF.exp;if(host.dataset.s===sig)return;host.dataset.s=sig;
   const g={};cs.forEach((c,j)=>{(g[c.pos]=g[c.pos]||[]).push([c,j])});
+  // one plate per place: several jobs collapse to the first (or the one playing now) plus a "+N" button that opens the rest (W493 polish)
+  for(const pos in g){const L=g[pos];if(L.length<2||BF.exp===+pos)continue;const k=Math.max(0,L.findIndex(([c])=>c.cur));g[pos]=[L[k]];g[pos].more=L.length-1}
   host.innerHTML=Object.keys(g).map(pos=>`<div class="bfg" data-t="${pos}" data-below="${+pos===G.camp.pos?1:0}">${g[pos].map(([c,j])=>{const dots=c.a.pw.map(pid=>`<i style="--pc:${pcol(pid)}"></i>`).join('');const inner=`<s>${AI(c.a.type)}</s><b class="bfw">${E((TNAME[c.a.type]||c.a.type).replace('Arrange the camp','Camp').replace('Face a threat','Threat'))}</b><span class="dots">${dots}</span>${c.badge?`<em>${c.badge}</em>`:''}`;
     const cls=`bfa ${c.risk} ${c.cur?'cur':''} ${c.done?'done':''}`;const lab=`${E(actLabel(c.a))}${c.rm?' (tap to take back)':''}`;
-    return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}</div>`).join('');
+    return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}${g[pos].more?`<button class="bfmore" data-exp="${pos}" aria-label="${g[pos].more} more job${g[pos].more>1?'s':''} here: show them">+${g[pos].more}</button>`:''}</div>`).join('');
   BF.place()}
 BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const tr=Math.round(p.x-26)+','+Math.round(p.y-26);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-26)+'px';g.style.top=Math.round(p.y-26)+'px'}}
-  const host=q('#bfchips');if(!host)return;for(const g of host.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const w=g.offsetWidth,h=g.offsetHeight;
-    const below=+g.dataset.t===(G&&G.camp?G.camp.pos:-1)&&g.children.length>0&&g.dataset.below==='1';let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=below?Math.min(p.h-h-2,p.y+16):Math.max(2,Math.min(p.h-h-2,p.y-h-4));const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
+  const host=q('#bfchips');if(!host)return;const hr=host.getBoundingClientRect();const busy=[];
+  for(const l of document.querySelectorAll('.tl:not([hidden])')){const r=l.getBoundingClientRect();if(r.width)busy.push({l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top})}const nl=busy.length;
+  const hit=(a,b)=>a.l<b.r+2&&a.r>b.l-2&&a.t<b.b+2&&a.b>b.t-2;const sr=q('#bfres');const top=Math.max(2,sr?Math.round(sr.getBoundingClientRect().bottom-hr.top+4):2);
+  const gs=[...host.children].map(g=>({g,p:tilePt(+g.dataset.t)})).filter(o=>{if(!o.p){o.g.style.visibility='hidden';return false}o.g.style.visibility='';return true}).sort((a,b)=>a.p.y-b.p.y);
+  for(const {g,p} of gs){const w=g.offsetWidth,h=g.offsetHeight;let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=Math.max(top,Math.min(p.h-h-58,p.y+8));
+    // slide down past whatever it would cover (other plates first, then labels); if it runs off the bottom, go above the place instead
+    for(let n=0;n<12;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;y=o.b+3;if(y+h>p.h-58){y=Math.max(top,p.y-h-30);break}}
+    // G6 review: still on top of another plate or a label (top edge, crowded camp)? try going up, then sideways, before giving up
+    for(let n=0;n<10;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;const up=o.t-h-3;if(up>=top&&n<5){y=up;continue}const rx=o.r+3,lx=o.l-w-3;if(rx+w<=p.w-2){x=rx}else if(lx>=2){x=lx}else break}
+    busy.push({l:x,t:y,r:x+w,b:y+h});const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
+  // a label still under a plate after all that steps aside (the plate names the job there; the label comes back when the plate moves)
+  const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t))}
   BF.ghostPlace()};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
-  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-12,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
+  el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-72,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
 function deltas(A,B){const o=[];if(!A||!B)return o;
   for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a})}
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})});
@@ -274,3 +291,5 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   document.addEventListener('click',e=>{if(Date.now()<swallow){swallow=0;e.stopPropagation();e.preventDefault()}},true);
   // a small tick when a job lands in the plan, however it was placed
   let n=-1;setInterval(()=>{try{if(!BF.on||!G||!G.plan)return;const k=G.plan.acts.reduce((s,a)=>s+a.pw.length,0);if(n>=0&&k>n)buzz();n=k}catch(e){}},200)})();
+
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#bfchips .bfmore');if(!b)return;e.stopPropagation();const k=+b.dataset.exp;BF.exp=BF.exp===k?null:k;try{renderChips(PHO.st)}catch(err){}},true);
