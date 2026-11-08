@@ -35,7 +35,7 @@ var TT_TEST = {};
     }
     U.skipNarr = function () { U.fast = true; next(); }; next();
   }
-  function readMs(t) { var w = String(t || '').split(/\s+/).length; return 4000 + 1000 * Math.ceil(w / 10); }
+  function readMs(t) { var w = String(t || '').split(/\s+/).length; return Math.min(2600, 1000 + 120 * w); } // W492: was 4-6 s per line, a round took ~30 s of waiting
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
   function snapState() { var G = U.G; return { av: E.available(G).map(function (c) { return c.i; }), sc: [E.score(G, 0).total, E.score(G, 1).total], coins: [G.players[0].coins, G.players[1].coins] }; }
   // the plain sentences of one move, in the order they are shown: what happened, why it scored, what moved, what is free now
@@ -441,7 +441,7 @@ var TT_TEST = {};
     });
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
     if (G.over) return;
-    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); if (!U.tut) { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
     narrate(items, function () { U.busy = false; after(); });
   }
   function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
@@ -454,7 +454,8 @@ var TT_TEST = {};
       U.busy = true; render0(); var seq = U.seq;
       U.aiTimer = setTimeout(function () {
         if (seq !== U.seq || U.G !== G) return;
-        var rng = function () { return E.rnd(G); }, lv = U.lvl, m = AI.pick(G, lv, rng);
+        if (U.tut && window.TT_TUTOR && TT_TUTOR.holdRival && TT_TUTOR.holdRival()) { U.busy = false; U.aiTimer = setTimeout(function () { if (seq === U.seq && U.G === G) after(); }, 300); return; } // the guided game: the rival waits while a rule bubble is up
+        var rng = function () { return E.rnd(G); }, lv = U.lvl, m = (U.tut && window.TT_TUTOR && TT_TUTOR.rivalMove && TT_TUTOR.rivalMove(G)) || AI.pick(G, lv, rng);
         if (!m) { U.busy = false; return; }
         narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
           function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); });
@@ -486,7 +487,7 @@ var TT_TEST = {};
   function tutBtn() { return window.GXT ? GXT.menuHTML({ game: 'twin-thrones', first: firstTime(), cls: 'btn alt sm', launch: function () { GX.close && GX.close(); if (window.TT_TUTOR) TT_TUTOR.start(); } }) : ''; }
   var FLAVOUR = (window.CAMPAIGN && CAMPAIGN.quick && CAMPAIGN.quick.intro) || ['Two thrones stand empty. Draft your wonders, then out-build the rival.'];
   function newGame(mode, seed, camp) {
-    try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
+    try { localStorage.setItem('tt_seen', '1'); } catch (e) { } U.mode = mode; U.ai = [mode === 'watch', mode !== 'two']; U.G = E.newGame({ seed: seed, first: U.tut ? 0 : undefined }); U.camp = camp || null; U.finished = false; U.logs = []; var tw = camp && camp.twist; if (tw) { if (tw.id === 'extra-coins') U.G.players[1].coins += tw.param; if (tw.id === 'head-start') U.G.mil = -tw.param; } U.sel = null; U.fingerDone = false; U.busy = false; U.seq++; U.narr = false; U.lastSide = null; clearTimeout(U.nt); if (!U.tut) U.rivalName = null;
     $('start').hidden = true; $('res').hidden = true; buildBoard(); render();
     var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
     if (U.tut) { after(); return; }
@@ -613,7 +614,7 @@ var TT_TEST = {};
     if ((b = q('[data-tok]'))) { peekItem(b.dataset.tok, 't'); return; }
     if ((b = q('[data-wonder]'))) { peekItem(b.dataset.wonder, 'w'); return; }
     if ((b = q('[data-pick]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'pick', id: b.dataset.pick }) === false) return; step({ t: 'pick', w: b.dataset.pick }); return; }
-    if ((b = q('[data-first]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'first' }) === false) return; step({ t: 'first', who: +b.dataset.first }); return; }
+    if ((b = q('[data-first]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'first', who: +b.dataset.first }) === false) return; step({ t: 'first', who: +b.dataset.first }); return; }
     if ((b = q('[data-token]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: b.dataset.token }) === false) return; step({ t: 'token', id: b.dataset.token }); return; }
     if ((b = q('[data-destroy]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'destroy' }) === false) return; step({ t: 'destroy', id: b.dataset.destroy }); return; }
     if ((b = q('[data-revive]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; step({ t: 'revive', id: b.dataset.revive }); return; }
