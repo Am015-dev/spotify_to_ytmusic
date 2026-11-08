@@ -36,6 +36,7 @@ def net(url, cache_name=None, tries=4):
         return p
     url = urllib.parse.quote(url, safe=':/?&=%@+,;~')
     wiki = 'wikimedia.org' in url
+    if wiki and os.environ.get('VG_NOWIKI'): raise RuntimeError('wikimedia skipped (VG_NOWIKI) ' + url[-40:])
     if wiki: tries = max(tries, 7)
     for i in range(tries):
         try:
@@ -247,7 +248,7 @@ def met_img(oid, big=False, idx=None):
         url = o['additionalImages'][idx]
     return load(url), o
 
-def commons_img(title, width=1400):
+def commons_img(title, width=900):
     """Wikimedia Commons file -> thumb URL (checks licence via extmetadata; only PD / CC0 accepted)."""
     key = 'wc_' + hashlib.md5(title.encode()).hexdigest()
     jp = os.path.join(SRC, key + '.json')
@@ -393,8 +394,8 @@ MANIFEST = {
  # ---- item cards: expedition gear (parchment family)
  'card-sextant':    ('io', M(923639)), 'card-theodolite': ('io', M(8030)), 'card-spyglass': ('io', M(102501), .86),
  'card-lamp':       ('io', M(4741)),   'card-camera': ('ip', M(631211), (0, 0, 1, 1), 0),   'card-radio': ('io', M(8484)),
- 'card-dinghy':     ('io', M(241307)), 'card-rope': ('io', M(551077), .88), 'card-machete': ('io', M(315670)),
- 'card-pickaxe':    ('io', M(322851), .86), 'card-chisel': ('io', M(43632)), 'card-canteen': ('io', M(205024)),
+ 'card-dinghy':     ('io', M(241307)), 'card-rope': ('io', M(551077), .88), 'card-machete': ('io', M(31629)),
+ 'card-pickaxe':    ('io', M(322851), .86), 'card-chisel': ('io', M(43632)), 'card-canteen': ('io', M(751524)),
  'card-kettle':     ('io', M(207823)), 'card-satchel': ('io', M(87665), .86), 'card-crate': ('io', M(191179), .86),
  'card-lockbox':    ('io', M(187132)), 'card-jeepkey': ('io', M(206349), .86), 'card-scale': ('io', M(629597)),
  'card-ledger':     ('io', M(20365)),  'card-quiver': ('io', M(34069)),    'card-flares': ('io', M(471625), .86),
@@ -622,8 +623,8 @@ def b_map(slot, rec, size):
     out = a * .8 + (a * par / 255.0) * .2          # fold a little paper mottling into the ink
     return finish_big(Image.fromarray(out.clip(0, 255).astype(np.uint8)), slot), info
 
-def build_one(slot):
-    rec = MANIFEST[slot]
+def build_one(slot, rec=None):
+    rec = rec or MANIFEST[slot]
     k = rec[0]
     p = os.path.join(HERE, slot + '.webp')
     size = Image.open(p).size if os.path.exists(p) else None
@@ -645,7 +646,61 @@ def build_one(slot):
     if k == 'mp': return b_map(slot, rec, size)
     raise ValueError(k)
 
+W = lambda t: ('wc', 'File:' + t)
+# natural-history plates (Wikimedia Commons, public domain / CC0 tags only).  If a download fails the earlier
+# museum-object recipe (kept in GUARD_FALLBACK) is used so the slot is never empty.
+GUARD_PLATES = {
+ 'guard-ash-jaguar':   ('sc', W('Felis Onca, Linn. The Jaguar. Female.jpg'), (.03, .08, .97, .92), (.4, .5)),
+ 'guard-bone-heron':   ('sc', W('Audubon Reformatted plate 211 Great blue Heron.jpg'), (.18, 0, .82, 1), (.5, .45)),
+ 'guard-glass-moth':   ('sc', W('Automeris io Titian Peale 1833.jpg'), (0, .0, 1, .62), (.4, .4)),
+ 'guard-tide-serpent': ('sc', W('Albertus Seba Thesaurus Tab. LXII.jpg'), (.22, .08, 1, .96), (.5, .5)),
+ 'guard-canopy-wyrm':  ('sc', W('Haeckel Lacertilia.jpg'), (0, .05, 1, .75), (.5, .4)),
+ 'guard-stone-ape':    ('sc', W('Junger Orang-Utan-drawing.jpg'), (.12, .04, .88, .96), (.5, .45)),
+ 'guard-howl-bat':     ('sc', W('Haeckel Chiroptera Chrotopterus auritus.jpg'), (0, 0, 1, 1), (.5, .5)),
+ 'guard-thunder-toad': ('sc', W('Haeckel Batrachia L lineatus.jpg'), (0, 0, 1, 1), (.5, .5)),
+ 'guard-vine-widow':   ('sc', W('Hahn 1833 Die Arachniden fig. 75 Mygale avicularia.jpg'), (0, 0, 1, 1), (.5, .5)),
+ 'guard-mire-crawler': ('sc', W('Brehms Tierleben (Plate- Panzerechsen I) (6139675091).jpg'), (0, 0, 1, 1), (.5, .5)),
+ 'guard-ember-hound':  ('sc', W('Red Texan Wolf (Canis lupus) from the viviparous quadrupeds of North America (1845) illustrated by John Woodhouse Audubon (1812-1862).jpg'), (0, 0, 1, 1), (.5, .5)),
+ 'guard-rootback-boar': ('sc', W('Collared Peccary, Dycoteles Torquatus, F. Cuv. 4-7 Natural Size, Male - DPLA - 0186698b348a7ecb46c1400922575392.jpg'), (0, 0, 1, 1), (.5, .5)),
+}
+GUARD_FALLBACK = {k: MANIFEST[k] for k in GUARD_PLATES}
+MANIFEST.update(GUARD_PLATES)
+
+def _clean(t):
+    import re, html
+    return html.unescape(re.sub(r'<[^>]+>', '', str(t or ''))).replace('|', '/').strip()[:90] or 'unknown'
+
+def write_credits(done):
+    rows = ['# Vinegrave picture credits', '',
+            'Every picture is built by `vg3.py` from the public-domain / CC0 sources listed here (Met Open Access = CC0; Library of Congress items carry no known restrictions;',
+            'Wikimedia Commons files are only used where the file page tags them Public domain or CC0).  Pictures are cropped, colour-graded and framed; nothing is added to them but grain, vignette and a printed border.', '',
+            '| file | source page | creator | licence |', '|---|---|---|---|']
+    for slot in sorted(done):
+        d = done[slot]
+        rows.append('| %s.webp | %s | %s | %s |' % (slot, d.get('page', '-'), _clean(d.get('creator')), 'CC0' if 'CC0' in str(d.get('lic')) else 'Public domain'))
+    for slot, why in sorted(KEPT.items()):
+        rows.append('| %s.webp | kept from vg.py / vg2.py (own vector drawing) | drawn in-house | CC0 (original drawing) |' % slot)
+    open(os.path.join(HERE, 'CREDITS.md'), 'w').write('\n'.join(rows) + '\n')
+
+def contact_sheet(out=None, cols=14, T=150):
+    import glob
+    fs = sorted(glob.glob(os.path.join(HERE, '*.webp')))
+    out = out or os.path.join(HERE, 'review', 'contact-sheet-v4.webp')
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    rows = (len(fs) + cols - 1) // cols
+    sh = Image.new('RGB', (cols * T, rows * (T + 11)), (58, 58, 58)); d = ImageDraw.Draw(sh)
+    for k, f in enumerate(fs):
+        im = Image.open(f).convert('RGBA'); bg = Image.new('RGBA', im.size, (104, 104, 104, 255)); bg.alpha_composite(im)
+        im = bg.convert('RGB'); im.thumbnail((T - 2, T - 2))
+        x, y = (k % cols) * T, (k // cols) * (T + 11)
+        sh.paste(im, (x + 1, y + 11)); d.text((x + 2, y + 1), os.path.basename(f)[:-5][:24], fill=(255, 235, 120))
+    for q in (62, 50, 40, 32):
+        sh.save(out, 'WEBP', quality=q, method=6)
+        if os.path.getsize(out) <= 400 * 1024: break
+    print('contact sheet %d slots, %d KB' % (len(fs), os.path.getsize(out) // 1024))
+
 def main():
+    if '--sheet' in sys.argv: return contact_sheet()
     only = None; mf = os.path.join(HERE, 'manifest.json')
     for i, a in enumerate(sys.argv):
         if a == '--only': only = set(sys.argv[i + 1].split(','))
@@ -654,7 +709,11 @@ def main():
     for slot in sorted(MANIFEST):
         if only and slot not in only and not any(slot.startswith(o) for o in only): continue
         try:
-            im, info = build_one(slot)
+            try:
+                im, info = build_one(slot)
+            except Exception as e:
+                if slot not in GUARD_FALLBACK: raise
+                print('  fallback %s: %r' % (slot, e)[:140]); im, info = build_one(slot, GUARD_FALLBACK[slot])
             path = os.path.join(HERE, slot + '.webp')
             big = im.size[0] * im.size[1] > 400 * 420
             kb = None if slot.startswith('card-frame') or slot == 'card-back' else (250 if big else 60)
@@ -667,6 +726,7 @@ def main():
         except Exception as e:
             bad += 1; print('FAIL %s: %r' % (slot, e))
     json.dump(done, open(mf, 'w'), indent=1, default=str)
+    write_credits(done)
     print('built %d, failed %d' % (ok, bad))
 
 if __name__ == '__main__':

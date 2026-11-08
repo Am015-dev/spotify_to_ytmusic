@@ -80,12 +80,12 @@
   "kind": "ip"
  },
  "card-canteen": {
-  "title": "Pocket canteen (traveling set)",
-  "creator": "Charles Overing",
+  "title": "Double-lobed polychrome canteen",
+  "creator": "Tewa (San Ildefonso Pueblo), Native American",
   "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/205024",
+  "page": "https://www.metmuseum.org/art/collection/search/751524",
   "src": [
-   "('met', 205024, {})"
+   "('met', 751524, {})"
   ],
   "kind": "io"
  },
@@ -330,12 +330,12 @@
   "kind": "io"
  },
  "card-machete": {
-  "title": "Copper Knife Blade",
-  "creator": "Peruvian",
+  "title": "Knife (Kukri)",
+  "creator": "Indian or Nepalese, Gurkha",
   "lic": "CC0",
-  "page": "https://www.metmuseum.org/art/collection/search/315670",
+  "page": "https://www.metmuseum.org/art/collection/search/31629",
   "src": [
-   "('met', 315670, {})"
+   "('met', 31629, {})"
   ],
   "kind": "io"
  },
