@@ -208,7 +208,9 @@ function sparks(el,n,col){const f=document.getElementById('fx'),tb=document.getE
 function pop(el,txt,cls){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;
   p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top-4)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
 // 3D sprites (rendered from the full-detail models): pliers snip at a cut wire, the bomb wobbles on a miss and swells on the boom
-function sprite3(name,cls,cx,cy,size,ms){if(LOWGFX)return;const f=document.getElementById('fx');if(!f)return;const i=document.createElement('img');i.className='s3 '+cls;i.alt='';i.decoding='async';i.src='models/'+name+(size<=300?'@512':'')+'.webp';
+const SPG={};   // owner bomb/pliers .glb models drawn once to a sprite (gx-glbsprite.js); models/<name>@512.webp stays the fallback
+['bomb','pliers'].forEach(n=>{try{GXSPR.use('models/'+n,{size:256,pitch:.4}).then(u=>{if(u)SPG[n]=u})}catch(e){}});
+function sprite3(name,cls,cx,cy,size,ms){if(LOWGFX)return;const f=document.getElementById('fx');if(!f)return;const i=document.createElement('img');i.className='s3 '+cls;i.alt='';i.decoding='async';i.src=SPG[name]||'models/'+name+(size<=300?'@512':'')+'.webp';
   i.style.cssText=`left:${cx-size/2}px;top:${cy-size/2}px;width:${size}px;height:${size}px`;i.onerror=()=>i.remove();f.appendChild(i);setTimeout(()=>i.remove(),ms)}
 function centerOf(el){const tb=document.getElementById('tb');if(!el||!tb)return null;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();return{x:r.left-b.left+r.width/2,y:r.top-b.top+r.height/2,w:b.width,h:b.height}}
 function flushFx(){const q=TBL.fxq;TBL.fxq=[];if(!ANIM||!q.length)return;const tb=document.getElementById('tb');

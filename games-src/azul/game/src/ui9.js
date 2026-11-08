@@ -88,7 +88,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-t.gone{animation:bfGone .6s ease-in both;animation-delay:var(--d,0ms)}
 @keyframes bfGone{30%{transform:scale(1.15) rotate(-6deg)}100%{transform:translateY(160%) rotate(40deg) scale(.5);opacity:0}}
 /* the table */
-.bf-k{position:absolute;border-radius:50%;background:radial-gradient(circle at 42% 36%,#e07a52,#b44a2c 55%,#8a3420);box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55);cursor:pointer}
+.bf-sun{width:1.5em;height:1.5em;vertical-align:-.4em;pointer-events:none}\n.bf-k{position:absolute;border-radius:50%;background:radial-gradient(circle at 42% 36%,#e07a52,#b44a2c 55%,#8a3420);box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55);cursor:pointer}
 .bf-k::before{content:'';position:absolute;inset:9%;border-radius:50%;border:1.5px dashed rgba(255,230,180,.45)}
 .bf-k.can{box-shadow:0 0 0 3px #ffd66b,0 0 0 5px #7a4a20,0 0 18px 4px rgba(255,214,107,.6)}
 .bf-k.empty{opacity:.55}
@@ -157,6 +157,9 @@ const bfQ=s=>BF.root&&BF.root.querySelector(s);
 const bfEl=k=>bfQ(`[data-k="${k}"]`);
 const bfSlot=k=>bfQ(`[data-s="${k}"]`)||bfEl(k);
 function bfR(el){if(!el)return null;const r=el.getBoundingClientRect();return r.width>0?{left:r.left,top:r.top,width:r.width,height:r.height}:null}
+const BFSUN={u:null};   // owner sun model (models/sun.glb) drawn once to a sprite; the plain sun glyph is the fallback
+try{GXSPR.use('models/sun',{size:192,lie:1,pitch:.85}).then(u=>{if(u){BFSUN.u=u;try{bfDraw()}catch(e){}}})}catch(e){}
+function bfSun(){return BFSUN.u?`<img class="bf-sun" src="${BFSUN.u}" alt="first player" draggable="false">`:'☀'}
 function bfTile(c,key,cls){return `<i class="bf-t${cls?' '+cls:''}${key&&BF.hide.has(key)?' hid':''}"${key?` data-k="${key}"`:''}>${bfUse(c)}</i>`}
 function bfClone(g){return JSON.parse(JSON.stringify({fac:g.fac,ctr:g.ctr,markerIn:g.markerIn,round:g.round,phase:g.phase,first:g.first,np:g.np,ex:g.ex,lid:[],
   pl:g.pl.map(p=>({i:p.i,nm:p.nm,score:p.score,lines:p.lines,wall:p.wall,floor:p.floor}))}))}
@@ -353,7 +356,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
   return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?'<em>☀</em>':''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em>${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
@@ -371,7 +374,7 @@ function bfOvHTML(){if(!G)return '';
   if(BF.busy)return '';
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
     return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${typeof tutBtn==='function'?tutBtn('bf-mi',false):''}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('music','Choose songs','data-a="musicpick"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'bf-set',btnClass:'bf-mi'}):''}</div>`}
-  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?'<em>☀</em>':''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
+  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?`<em>${bfSun()}</em>`:''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
   if(G.over&&!BF.resHide&&!UI.tut){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
     return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="sg-endart ${you?'win':'lose'}" aria-hidden="true"></div><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
       <div class="bf-rk"><span>tiles</span><span>broken</span><span>bonus</span></div>
