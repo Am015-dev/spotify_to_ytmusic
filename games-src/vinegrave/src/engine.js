@@ -27,10 +27,11 @@
     V.SLOT2.forEach(function (c) { G.sites.push({ id: 'l2-' + G.sites.length, lvl: 2, cost: c.slice(), tile: null, occ: -1, guard: null }); });
     for (var r = 0; r < V.ROW; r++) G.row.push(null);
     refillRow(G);
+    if (o.solo) { G.p[0].res.coin = 1; G.p[0].res.compass = 1; }   /* solo: you play second with 1 coin 1 compass */
     if (o.solo) G.rival = { name: o.rivalName || 'Rival expedition', lvl: o.rivalLevel || 'normal', vp: o.rivalLevel === 'hard' ? 2 : 0, rows: 0, deck: [], played: [], log: [] };
     applyTwist(G, o.twist, o);
     G.p.forEach(function (p) { draw(G, p, V.HAND); });
-    if (G.rival) rivalDeal(G);
+    if (G.rival) { rivalDeal(G); rivalTurn(G); }   /* the rival is the starting player every round */
     log(G, -1, 'Round 1 begins.');
     return G;
   }
@@ -50,7 +51,7 @@
   }
   function refillRow(G) {
     var nItems = Math.max(1, V.ROW - G.round);
-    for (var r = 0; r < V.ROW; r++) if (!G.row[r]) { var src = r < nItems ? G.items : G.arts; if (!src.length) src = r < nItems ? G.arts : G.items; if (src.length) G.row[r] = src.pop(); }
+    for (var r = 0; r < V.ROW; r++) if (!G.row[r]) { var src = r < nItems ? G.items : G.arts; if (src.length) G.row[r] = src.pop(); }
   }
   function draw(G, p, n) {
     var got = 0;
@@ -99,7 +100,7 @@
     if (G.q) return answers(G, s);
     // free actions
     p.guards.forEach(function (g, k) { if (!g.used) out.push({ t: 'boon', k: k, free: true }); });
-    if (!p.idolTurn && p.idols.some(function (d) { return !d.used; }) && p.idols.filter(function (d) { return d.used; }).length < V.SLOTS)
+    if (p.idols.some(function (d) { return !d.used; }) && p.idols.filter(function (d) { return d.used; }).length < V.SLOTS)
       p.idols.forEach(function (d, k) { if (!d.used) V.SHRINE.forEach(function (sh, j) { out.push({ t: 'idol', k: k, sh: j, free: true }); }); });
     // main actions
     p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push({ t: 'play', i: i }); });
@@ -120,7 +121,7 @@
   }
   function answers(G, s) {
     var q = G.q, p = G.p[s], out = [];
-    if (q.h === 'exile') { p.hand.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'hand', i: i } }); }); p.disc.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'disc', i: i } }); }); out.push({ t: 'ans', v: null }); }
+    if (q.h === 'exile') { p.hand.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'hand', i: i } }); }); p.disc.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'disc', i: i } }); }); p.play.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'play', i: i } }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'or') q.d.opts.forEach(function (o, i) { if (canOps(p, o)) out.push({ t: 'ans', v: i }); });
     if (q.h === 'buy') { G.row.forEach(function (id, r) { if (!id) return; var c = card(id); if ((q.d.k === 'i') !== (c.t === 'item')) return; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - q.d.o); if (has(p, need)) out.push({ t: 'ans', v: r }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'site') { G.sites.forEach(function (x, i) { if (freeSite(G, s, i)) out.push({ t: 'ans', v: i }); }); out.push({ t: 'ans', v: null }); }
@@ -137,7 +138,7 @@
       else if (o.p) { if (!has(p, o.p)) return finishOps(G, s, main); pay(p, o.p); }
       else if (o.d) { var n = draw(G, p, o.d); log(G, s, nm(G, s) + ' draws ' + n + ' card' + (n === 1 ? '' : 's') + '.'); }
       else if (o.r) { stepFree(G, s, o.r); }
-      else if (o.x) { if (p.hand.length || p.disc.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
+      else if (o.x) { if (p.hand.length || p.disc.length || p.play.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
       else if (o.or) { G.q = { h: 'or', seat: s, ops: rest, main: main, d: { opts: o.or } }; if (!answers(G, s).length) { G.q = null; continue; } return; }
       else if (o.b) { G.q = { h: 'buy', seat: s, ops: rest, main: main, d: { k: o.b, o: o.o } }; if (answers(G, s).length <= 1) { G.q = null; continue; } return; }
       else if (o.fd) { if (p.ex > 0 && G.sites.some(function (x, j) { return freeSite(G, s, j); })) { G.q = { h: 'site', seat: s, ops: rest, main: main, d: {} }; return; } }
@@ -196,7 +197,7 @@
   }
   function answer(G, s, v) {
     var q = G.q, p = G.p[s], rest = q.ops, main = q.main; G.q = null;
-    if (q.h === 'exile' && v) { var id = v.z === 'hand' ? p.hand.splice(v.i, 1)[0] : p.disc.splice(v.i, 1)[0]; if (id === 'dread' && G.dread != null) G.dread++; else p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + (id === 'dread' ? ' (back to the supply)' : '') + '.', { k: 'exile', card: id }); }
+    if (q.h === 'exile' && v) { var id = (v.z === 'hand' ? p.hand : v.z === 'play' ? p.play : p.disc).splice(v.i, 1)[0]; if (id === 'dread' && G.dread != null) G.dread++; else p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + (id === 'dread' ? ' (back to the supply)' : '') + '.', { k: 'exile', card: id }); }
     if (q.h === 'or') { return runOps(G, s, q.d.opts[v].concat(rest), main); }
     if (q.h === 'buy' && v != null) {
       var bid = G.row[v], bc = card(bid), cost = cardCost(bid), k = Object.keys(cost)[0]; p.res[k] -= Math.max(0, cost[k] - q.d.o); G.row[v] = null; refillRow(G);
@@ -210,23 +211,23 @@
   // ------------------------------------------------------------ turn / round flow
   function endTurn(G, passed) {
     var cur = G.turn; G.p[cur].idolTurn = false;
-    if (G.rival && cur === 0 && !passed) rivalTurn(G);
+    if (G.rival && cur === 0) { if (!passed) rivalTurn(G); else while (G.rival.deck.length) rivalTurn(G); }   /* after you pass the rival plays out its stack */
     if (G.p.every(function (p) { return p.passed; })) return endRound(G);
     for (var k = 1; k <= G.np; k++) { var n = (cur + k) % G.np; if (!G.p[n].passed) { G.turn = n; return; } }
   }
   function endRound(G) {
     G.sites.forEach(function (x) {
-      if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'disc'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
+      if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'play'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
       x.occ = -1;
     });
-    G.p.forEach(function (p) { p.disc = p.disc.concat(p.play); p.play = []; p.passed = false; p.idolTurn = false; });
+    G.p.forEach(function (p) { p.deck = p.deck.concat(shuf(G, p.play.concat(p.disc))); p.disc = []; p.play = []; p.passed = false; p.idolTurn = false; });   /* rulebook: the play area is shuffled and put under the deck (items bought this round stay above it) */
     if (G.round >= G.rounds) return endGame(G);
     // the card row shifts: the last item before the artifacts leaves; an artifact takes its place
     var nItems = Math.max(1, V.ROW - G.round); G.row[nItems - 1] = null; if (nItems < V.ROW) G.row[nItems] = null;
     G.round++; refillRow(G);
     G.p.forEach(function (p) { draw(G, p, Math.max(0, V.HAND - p.hand.length)); });
     G.first = (G.first + 1) % G.np; G.turn = G.first;
-    if (G.rival) rivalDeal(G);
+    if (G.rival) { rivalDeal(G); rivalTurn(G); }
     log(G, -1, 'Round ' + G.round + ' begins.', { k: 'round', round: G.round });
   }
   // a Dread card from the supply (to the discard pile or deck); when the supply is empty, a fear tile (-2 points) instead. Returns true for a tile.
@@ -258,8 +259,8 @@
   function rivalTurn(G) {
     var R = G.rival; if (!R.deck.length) return; var id = R.deck.shift(), c = V.RIVAL.filter(function (x) { return x.id === id; })[0]; R.played.push(id);
     var a = c.a, said = '';
-    if (a === 'hunt') { var gs = G.sites.filter(function (x) { return x.guard && x.occ !== 0; }); if (gs.length) { var g = gs[0]; said = 'overcomes ' + V.GUARD[g.guard].name + ' (+4)'; R.vp += 4; G.ev.push({ s: -2, k: 'rivalbeat', site: G.sites.indexOf(g) }); g.guard = null; } else a = 'buyi'; }
-    if (a === 'scout') { var un = G.sites.filter(function (x) { return x.lvl === 1 && !x.tile && x.occ === -1; }); if (un.length && G.s1.length) { var u = un[Math.floor(rng(G) * un.length)]; u.tile = G.s1.pop(); u.occ = -2; R.vp += 2; if (G.guards.length) u.guard = G.guards.pop(); said = 'discovers ' + V.SITE[u.tile].name + ' (+2)' + (u.guard ? '; ' + V.GUARD[u.guard].name + ' wakes' : ''); G.ev.push({ s: -2, k: 'discover', site: G.sites.indexOf(u), tile: u.tile }); } else a = 'study'; }
+    if (a === 'hunt') { var gs = G.sites.filter(function (x) { return x.guard && x.occ !== 0; }); if (gs.length) { var g = gs[0]; said = 'overcomes ' + V.GUARD[g.guard].name + ' (+' + V.GUARD_VP + ')'; R.vp += V.GUARD_VP; G.ev.push({ s: -2, k: 'rivalbeat', site: G.sites.indexOf(g) }); g.guard = null; } else a = 'buyi'; }
+    if (a === 'scout') { var un = G.sites.filter(function (x) { return x.lvl === 1 && !x.tile && x.occ === -1; }); if (un.length && G.s1.length) { var u = un[Math.floor(rng(G) * un.length)]; u.tile = G.s1.pop(); u.occ = -2; R.vp += V.IDOL_VP; if (G.guards.length) u.guard = G.guards.pop(); said = 'discovers ' + V.SITE[u.tile].name + ' (+' + V.IDOL_VP + ')' + (u.guard ? '; ' + V.GUARD[u.guard].name + ' wakes' : ''); G.ev.push({ s: -2, k: 'discover', site: G.sites.indexOf(u), tile: u.tile }); } else a = 'study'; }
     if (a === 'camp') { var cs = G.sites.filter(function (x) { return x.occ === -1 && (x.lvl === 0 || x.tile); }); if (cs.length) { var cc = cs[0]; cc.occ = -2; said = 'camps at ' + V.SITE[cc.tile].name; } else a = 'study'; }
     if (a === 'study') { if (R.rows < V.TOP) { R.rows++; said = 'climbs to research row ' + R.rows; } else { R.vp += 2; said = 'studies the temple (+2)'; } }
     if (a === 'buyi' || a === 'buya') {

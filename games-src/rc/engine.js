@@ -19,7 +19,8 @@ const TNAME={threat:'Face a threat',hunt:'Hunt',build:'Build',gather:'Gather',ex
 const RES=['food','pfood','wood','fur'];const RNAME={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
-  const sk=o.scen||DEFSCEN;const S=SCENARIOS[sk];let keys=o.chars||DEFCHARS||['carpenter','cook'];
+  const sk=o.scen||DEFSCEN;const S=SCENARIOS[sk];let keys=(o.chars||DEFCHARS||['carpenter','cook']).slice();
+  if(keys.length<3&&keys.includes('soldier')){const sub=['carpenter','cook','explorer'].filter(k=>CHARS[k]&&!keys.includes(k));keys=keys.map(k=>k==='soldier'?sub.shift():k).filter(Boolean)}   // rule A16: the Soldier is not used in 1- or 2-player games
   G={v:1,rng:seed,seed,scen:sk,round:1,rounds:S.rounds,phase:'start',first:0,log:[],stk:[],q:null,over:null,
     chars:[],fri:null,dog:false,morale:0,res:{food:0,pfood:0,wood:0,fur:0},fut:{food:0,pfood:0,wood:0,fur:0},
     camp:{pos:START_POS,shelter:false,roof:0,pal:0,moved:null},weapon:0,map:MAP.map(m=>({id:m.id,tile:null,down:false,tok:{},exh:{},cov:false})),
@@ -136,8 +137,8 @@ function doOp(op,ctx){const [k,a,b,c2]=op;const who=w=>whoList(w,ctx);
   case 'pawnMinusNext':for(const c of who(a)){c.pmNext=1;lg(`${c.nm} will have only 1 pawn next round.`,'bad')}break;
   case 'noSkills':for(const c of who(a)){c.noSkills=true;lg(`${c.nm} can't use skills this round.`,'bad')}break;
   case 'discardInv':{const n=Math.min(a,G.inv.deck.length);G.inv.deck.splice(0,n);lg(`${n} invention idea${n===1?' is':'s are'} lost from the invention deck.`,'bad');break}
-  case 'drawInv':{for(let i=0;i<a&&G.inv.deck.length;i++){const k2=G.inv.deck.shift();G.inv.board.push(k2);lg(`New idea: ${INVENTIONS[k2].n} is added to the inventions.`,'good')}break}
-  case 'pickInv':{const o=G.inv.deck.slice(0,99).map(k2=>({l:INVENTIONS[k2].n,frames:[{f:'fn',k:'addInv',key:k2}]}));if(o.length)ask('team','Choose a new invention for the board',o,{kind:'inv'});break}
+  case 'drawInv':{invRefill();for(let i=0;i<a&&G.inv.deck.length;i++){const k2=G.inv.deck.shift();G.inv.board.push(k2);lg(`New idea: ${INVENTIONS[k2].n} is added to the inventions.`,'good')}break}
+  case 'pickInv':{invRefill();const o=G.inv.deck.slice(0,99).map(k2=>({l:INVENTIONS[k2].n,frames:[{f:'fn',k:'addInv',key:k2}]}));if(o.length)ask('team','Choose a new invention for the board',o,{kind:'inv'});break}
   case 'loseItem':{const built=Object.keys(G.inv.built).filter(x=>G.inv.built[x]&&INVENTIONS[x]);if(!built.length){if(!b)for(const c of living())wound(c,1,'no item to lose');break}
     for(let i=0;i<a;i++)push({f:'fn',k:'askLoseItem'});break}
   case 'itemsAway':G.itemsAway=1;lg('All items are out of reach this round.','bad');break;
@@ -229,7 +230,8 @@ FN.doMove=fr=>{const built=G.camp.shelter;G.camp.moved={roof:G.camp.roof,pal:G.c
   if(built){G.camp.roof=Math.floor(G.camp.roof/2);G.camp.pal=Math.floor(G.camp.pal/2)}else{G.camp.roof=0;G.camp.pal=0}
   // camp tokens (+1 wood/food from items) move with the camp
   const old=G.map[G.camp.pos].tok;const nt=G.map[fr.p].tok;for(const t of ['wood','food'])if(old['c_'+t]){delete old['c_'+t];nt['c_'+t]=1}
-  G.camp.pos=fr.p;G.shortcut=null;lg(`The camp moves to place ${fr.p+1}. Roof ${G.camp.roof}, palisade ${G.camp.pal}.`,'big');fx('move')};
+  if(G.shortcut!=null||G.inv.built.shortcut){G.shortcut=null;delete G.inv.built.shortcut}
+  G.camp.pos=fr.p;lg(`The camp moves to place ${fr.p+1}. Roof ${G.camp.roof}, palisade ${G.camp.pal}.`,'big');fx('move')};
 // ---------- discovery tokens ----------
 function drawDisc(ctx){if(!G.discs.length)return;const k=G.discs.shift();if(G.kept.m_backpack&&ctx&&ctx.explore&&G.discs.length){const k2=G.discs.shift();const best=[k,k2].sort((a,b)=>discValue(b)-discValue(a));G.discs.push(best[1]);G.own.push({k:best[0],fut:!!(ctx&&ctx.fut)});lg(`Found: ${discName(best[0])} (the backpack helps you pick).`,'good');return}
   G.own.push({k,fut:!!(ctx&&ctx.fut)});lg(`Found: ${discName(k)}${ctx&&ctx.fut?' (usable after the actions)':''}.`,'good')}
@@ -260,8 +262,9 @@ function invWhy(k,forC){const I=invReq(k);if(!I)return 'unknown';if(has(k)&&!I.m
   if(I.kind==='personal'&&!G.chars.some(c=>c.k===I.owner&&!c.dead))return 'nobody here can make it';
   return null}
 function invCost(k){const I=invReq(k);return I.alt?I.alt[0]:(I.r||{})}
-function completeInv(k,builder,free){const I=invReq(k);if(I.multi){SC().built&&SC().built(k,builder);return}
-  G.inv.built[k]=1;G.stats.built++;lg(`🔨 ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');doInv(k);
+// defer: an item made during the Action phase goes to the future space; it works from the end of the phase (rulebook: Building)
+function completeInv(k,builder,free,defer){const I=invReq(k);if(I.multi){SC().built&&SC().built(k,builder);return}
+  G.stats.built++;lg(`🔨 ${I.n} is made${free?' (for free)':''}!`,'big');fx('build');if(defer){(G.inv.pending=G.inv.pending||[]).push({k})}else{G.inv.built[k]=1;doInv(k)}
   if(I.kind==='personal'&&builder!=null)gainDet(P(builder),2)}
 function doInv(k){switch(k){case 'bricks':case 'fire':roofPal('pal',1);break;case 'wall':case 'moat':roofPal('pal',2);break;case 'knife':weapon(1);break;case 'bow':case 'spear':weapon(3);break;case 'sling':weapon(2);break;
   case 'dam':gain('pfood',2,{});break;case 'snare':G.map[G.camp.pos].tok.c_food=1;break;case 'hatchet':G.map[G.camp.pos].tok.c_wood=1;break;

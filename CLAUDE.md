@@ -8,13 +8,14 @@ Old rules: `games-src/RULES-ARCHIVE.md`.
 - Never write an original game's, publisher's or designer's name in the repo or on the site. No model names, no Co-Authored-By,
   Claude-Session or other AI attribution in files, commits or PRs.
 - Don't edit Mainhattan Overdrive. Nightrun belongs to this orchestrator. Ticket to Ride is on hold.
+- Game workers: first load Skills boardgame-builder, fun-game-design, impeccable; read board-first-play.md.
 - Never replace/unwire owner art (assets-inbox/<game>); free art fills empty slots only.
 - Before pushing: `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push; `git add` explicit paths only.
-- If a command is blocked, stop and tell the owner. Never ask a worker question you could decide yourself; never wait.
+- If a command is blocked, stop and tell the owner. Decide, never ask; never wait.
 - Screenshots vs benchmarks (URLs); no visual deploy unless every critic row >= 7 and the orchestrator saw the shots.
 - Nightrun RELEASE (owner, 31 Oct): make it playable and sellable at $5. Freeze lifted for WORKER-RULES.md 19; rules 15-18 stay.
 
-## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
+## How we work (owner, 14 Oct 2026)
 - Workers: owner wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line).
 - One task = ~30 min and ONE deliverable, fully briefed up front (games-src/BRIEF-TEMPLATE.md). Then 5 report lines and stop.
   No idle workers, no self-wake-ups, no follow-up messages except the owner's new bug reports.
@@ -25,7 +26,7 @@ Old rules: `games-src/RULES-ARCHIVE.md`.
 - Push only what passes: phone-check + the change's key ?scn= tests on a full build before push; unfinished work is switched off
   by default (flag), so nothing gets reverted.
 - Done = the independent audit passes (games-src/scripts/ui-audit.spec.js), never a worker's self-report.
-- Quiet workers: print only pass/fail lines; one message at the end.
+- Quiet workers: pass/fail lines, one message at the end.
 - Orchestrator: deploys at most every 30 min, stays under 100k tokens of context (hand off with a HANDOFF note), reports to the
   owner once per round with live times in UTC.
 - Read less: start from `games-src/scripts/find.sh --maps` and the game's MODULES.md; read only the line ranges you change; never

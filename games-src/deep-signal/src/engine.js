@@ -144,7 +144,7 @@ function playCard(G, c) {
   G.tricks.push({ cards: G.trick.slice(), winner: w, lead: G.lead }); G.won[w]++; G.trick = []; G.lead = G.turn = w;
   var newly = G.tasks.filter(function (t) { return !t.done && cards.indexOf(t.card) >= 0; });
   newly.forEach(function (t) { t.done = true; t.wonBy = w; t.trick = G.tricks.length; });
-  newly.sort(function (a, b) { return tokRank(a.tok) - tokRank(b.tok); });
+  newly = orderNewly(G, newly);
   newly.forEach(function (t) { G.done.push(G.tasks.indexOf(t)); });
   var why = null;
   newly.forEach(function (t) { if (!why && t.wonBy !== t.owner) why = cardName(t.card) + ' was won by ' + seatName(G, t.wonBy).replace(/^You$/, 'you') + ', not ' + seatName(G, t.owner).replace(/^You$/, 'you'); });
@@ -169,6 +169,13 @@ function playCard(G, c) {
   }
   if (out) { G.result = { ok: false, why: !allDone ? 'A task card was never won' : /onetrick/.test(G.mission.sp) ? seatName(G, G.chosen) + ' had to win exactly one trick' : 'The sonar goal was not met' }; G.phase = 'over'; log(G, 'Mission lost'); }
   return true;
+}
+/* tasks completed in the same trick count as simultaneous: lay them out in the most favourable order (numbered tokens on their exact place, then arrows low to high, untokened, the final seal last) */
+function orderNewly(G, newly) {
+  var s0 = G.done.length, m = newly.length, slots = [], rest = [];
+  newly.forEach(function (t) { var i = /^\d$/.test(t.tok || '') ? +t.tok - 1 - s0 : -1; if (i >= 0 && i < m && !slots[i]) slots[i] = t; else rest.push(t); });
+  rest.sort(function (a, b) { return tokRank(a.tok) - tokRank(b.tok); });
+  var out = [], k = 0; for (var i = 0; i < m; i++) out.push(slots[i] || rest[k++]); return out;
 }
 function tokRank(t) { if (!t) return 50; if (/^\d$/.test(t)) return +t; if (t[0] === '>') return 10 + t.length; if (t === 'O') return 99; return 50; }
 /* order rules: numbered tokens = absolute place in the completion order; arrows = relative order; omega = last task completed */

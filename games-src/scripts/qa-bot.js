@@ -6,7 +6,7 @@
 // Output: games-src/qa/<slug>.json (bugs: sev BLOCKER|MAJOR|MINOR, phase, where, desc, seed, shot). Shots go to $QA_SHOTS (default $TMPDIR/qa-shots), not the repo.
 // Env: PLAYWRIGHT_BROWSERS_PATH if the browser build differs. --scale multiplies every time limit (default 1).
 const fs = require('fs'), path = require('path'), os = require('os');
-const ROOT = path.resolve(__dirname, '..', '..'), QA = path.join(ROOT, 'games-src', 'qa');
+const ROOT = path.resolve(__dirname, '..', '..'), QA = process.env.QA_DIR || path.join(ROOT, 'games-src', 'qa');   // QA_DIR: write results elsewhere (asset-usage.js)
 
 // ------------------------------------------------------------------ report mode
 if (process.argv[2] === '--report') { report(); process.exit(0); }
@@ -142,7 +142,7 @@ addEventListener('unhandledrejection', e => window.__qaErr.push('unhandledreject
 const NOISE = /NotAllowedError|AudioContext|autoplay|play\(\) failed|ResizeObserver|play\(\) request|The play\(\)|Failed to load resource: net::ERR_(FAILED|BLOCKED|INTERNET|NAME|ABORTED)|favicon|GPU stall|WebGL|requestFullscreen|Fullscreen|Permissions policy|vibrate|Failed to execute 'vibrate'|manifest|Service worker|serviceWorker/i;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 async function freshPage(browser, url, phase, ctxInfo) {
-  const ctx = await browser.newContext(PHONE ? { viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: UA } : { viewport: { width: 1280, height: 800 } });
+  const ctx = await browser.newContext(PHONE ? { viewport: { width: 390, height: +process.env.QA_VIEW_H || 763 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: UA } : { viewport: { width: 1280, height: 800 } });
   await ctx.route(u => !/^(http:\/\/127\.0\.0\.1|data:|blob:|about:)/.test(u.href || String(u)), r => r.abort());
   await ctx.addInitScript(PAGE);
   const page = await ctx.newPage();
@@ -152,6 +152,7 @@ async function freshPage(browser, url, phase, ctxInfo) {
   page.on('console', m => { if (m.type() !== 'error') return; const t = m.text(); if (NOISE.test(t)) return; bug('MINOR', phase, ctxInfo.where(), 'console.error: ' + t.split('\n')[0]); });
   page.on('requestfailed', r => { if (!/^http:\/\/127\.0\.0\.1/.test(r.url())) return; const f = r.failure(); if (f && /ABORTED|aborted/.test(f.errorText)) return; bug('MINOR', phase, ctxInfo.where(), 'request failed: ' + r.url().replace(/^http:\/\/[^/]+/, '') + ' ' + (f && f.errorText)); });
   page.on('response', r => { if (r.status() >= 400 && /^http:\/\/127\.0\.0\.1/.test(r.url())) bug('MINOR', phase, ctxInfo.where(), `HTTP ${r.status()}: ${r.url().replace(/^http:\/\/[^/]+/, '')}`); });
+  if (process.env.QA_REQ_LOG) page.on('request', r => { const m = /^http:\/\/127\.0\.0\.1:\d+(\/[^?#]*)/.exec(r.url()); if (m && /\/(media|models|music)\//.test(m[1])) try { fs.appendFileSync(process.env.QA_REQ_LOG, decodeURIComponent(m[1]) + '\n'); } catch (e) { } });   // asset-usage.js
   page.on('dialog', d => d.dismiss().catch(() => { }));
   page.on('popup', p => p.close().catch(() => { }));
   await page.goto(url, { waitUntil: 'load', timeout: 45000 });
@@ -277,7 +278,7 @@ async function driveTutorial(page, ci, P, ms, sumObj) {   // taps through a runn
 }
 async function phaseCoached(page, ci, P) {   // coached free-play first game (window.GXCOACH = {running, explained:[ids], done}); real taps only
   console.log('  coached game detected (GXCOACH)'); summary.tutorial.coached = true; const T = lim('coach');
-  const started = await ev(page, () => { const e = document.querySelector('[data-a=start]'); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+  const started = await ev(page, () => { const e = (document.querySelector('[data-a=offeryes]')||document.querySelector('[data-a=start]')); if (!e || !window.__qa.vis(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
   if (started) await tap(page, started.x, started.y); else if (!(await ev(page, () => window.GXCOACH && window.GXCOACH.running))) await goTo(page, '^(learn|new here|first game|coached|guided|vs\\.?\\s*(the\\s*)?(computer|cpu|ai|bot)|solo|single|1 player|play|start|begin|new game|new run|quick|battle|deal|enter)');
   await sleep(1500);
   const b0 = bugs.length, opt = { minClicks: 4, coach: true, prefer: '^(start|play|begin|new game|deal|vs|quick)' };

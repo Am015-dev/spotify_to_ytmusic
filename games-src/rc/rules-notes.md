@@ -97,7 +97,7 @@ These were researched from the 1st-edition English rulebook, card scans and fan 
 - **Marooned weather:** the rain die starts in round 4 (scenario sheet). One fan app starts it in round 5.
 - **"Discard invention cards":** taken from the top of the invention deck.
 - **Wreckage:** "Food Crates" always starts on the right threat slot. The random-wreckage variant is not offered.
-- **Soldier:** uses the 2nd-printing skill order and costs (Tracker 2, Fortify 2, Battle Rage 3, Drive the Game 4).
+- **Soldier:** skill costs Tracker 2, Fortify 2, Battle Rage 3, Drive the Game 4. The rulebook advises against the Soldier with 1-2 players; the engine allows it (open rule A16 in `RULES-CHECKLIST.md`).
 - **Hungry-animals fight (strength 3):** every castaway takes the shortfall, as the rulebook's unfulfilled-demand note says.
 - **Settlers weather:** the "−N food" icons are read as discarding N food in the weather phase.
 - **Stranded Friend:** a "?" on the rescue roll is a wound, not an adventure, as the raft card shows.
@@ -142,6 +142,7 @@ Games usually run to round 6–9 before hunger and weather win. These numbers ar
 |---|---|---|
 | `gauntlet.js` | Headless AI games in every scenario | 0 errors, 0 invariant breaks |
 | `force.js` | Forces every event, adventure and mystery card's effects in 12 game states | 2,520 runs, 0 failures |
+| `logic-test.js` | One headless assertion per numbered rule in `RULES-CHECKLIST.md`, against the real engine (forced dice, exact results). Run `node logic-test.js`. | 273 of 274 pass; A16 (no Soldier with 1-2 players) is open, see below |
 | `rules-test.js` | 24 rule scenarios, including the rulebook's own weather example, hunger, spoilage, pawn needs, costs, threat slides, morale, camp moves, personal inventions, Friday, the signal pile, every scenario's win and loss, solo morale, hunting, save/load | 24 pass |
 | `click.js` | A random clicker plays the real page in jsdom (2D map fallback), through the start screen, priorities, job categories, every story scene type and every choice | 0 errors in 6 games |
 | `watch.js` | All-computer game with the story on auto-play, to the end | 0 errors |

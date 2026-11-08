@@ -21,7 +21,7 @@ function tileName(t){return `${TILEDEF[t.k].n} ${tileCoord(t.i)}`}
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);const np=o.np||(o.seats?o.seats.length:2);
   const ex=Object.assign({artisans:false,sultan:false,thieves:false,promos:false},o.ex||{});if(np===5)ex.sultan=true;
-  G={v:1,sup:{palm:22,pal:10},rng:seed,seed,np,ex,tut:o.tut?1:0,coach:o.coach?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
+  G={v:1,sup:{palm:12,pal:10},rng:seed,seed,np,ex,tut:o.tut?1:0,coach:o.coach?1:0,round:1,phase:'bid',log:[],logN:0,q:null,over:null,winner:null,winText:'',turn:0,W:6,H:5,walls:{},
     pl:[],board:[],market:[],rdeck:[],rdisc:[],djRow:[],djDeck:[],djDisc:[],bag:[],items:[],itemDisc:[],thRow:[],thDeck:[],
     bids:[],bidQueue:[],order:[],nextBid:[],turnIdx:0,cur:null,step:null,move:null,act:null,turnFx:{},endTrig:false,stats:{kills:0,djinns:0,moves:0}};
   const names=o.names||PNAMES;
@@ -71,7 +71,7 @@ function doBid(m){const mk=G.bidQueue.shift();const p=P(mk.p);const pr=Math.min(
 function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G.turn++;const p=P(mk.p);p.used={};p.itemUsed=0;G.turnFx={};G.move=null;G.act=null;G.step='move';
   lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
 function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;
-  if(G.endTrig&&!G.tut){lg('The last camel has been placed: the game ends now, at the end of that turn.','big');return finish()}   // end of that turn, not the round (two of three rule summaries; W391)
+   // rulebook: the game ends at the end of the TURN (= round) in which the last camel is dropped, after every player has acted; endRound() finishes it
 if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
   if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
@@ -108,7 +108,7 @@ function claimTile(p,e,how){const t=G.board[e];if(t.camel!=null||t.tent!=null)re
   if(how==='auto'&&p.tent&&(!p.human||UI.sim)&&aiWantsTent(p,e))how='tent';
   if(how==='tent'&&p.tent){p.tent=0;t.tent=p.i;lg(`⛺ ${p.nm} pitches the tent on ${tileName(t)}.`,'good');fx('camel',e);return}
   if(p.camels<=0){lg(`${p.nm} has no camels left to claim ${tileName(t)}.`);return}t.camel=p.i;p.camels--;lg(`🐪 ${p.nm} claims ${tileName(t)}.`,'good');fx('camel',e);
-  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} has placed the last camel: the game ends at the end of this turn.`,'big')}}
+  if(p.camels===0&&!G.endTrig){G.endTrig=true;lg(`${p.nm} has placed the last camel: the game ends once every player has played this turn.`,'big')}}
 QH.claim=d=>claimTile(P(d.p),d.e,d.how);
 function owner(t){return t.camel!=null?t.camel:t.tent!=null?t.tent:null}
 // ---------- tribe actions ----------
@@ -143,11 +143,11 @@ function tileMoves(p){const a=G.act;const t=G.board[a.tile];const o=[];
   case 'village':return placeMoves(p,t,'pal');case 'oasis':return placeMoves(p,t,'palm');
   case 'sacred':{for(const k of G.djRow)for(const pay of summonPays(p))o.push({act:'tile',dj:k,pay});if(G.ex.thieves)for(const k of G.thRow)for(const pay of summonPays(p))o.push({act:'tile',thief:k,pay});break}
   case 'small':if(p.coins>=3)for(let j=0;j<Math.min(3,G.market.length);j++)o.push({act:'tile',take:[j]});break;
-  case 'large':if(p.coins>=6){const n=Math.min(6,G.market.length);for(let x=0;x<n;x++)for(let y=x+1;y<n;y++)o.push({act:'tile',take:[x,y]})}break;
+  case 'large':if(p.coins>=6){const n=Math.min(6,G.market.length);if(n===1)o.push({act:'tile',take:[0]});for(let x=0;x<n;x++)for(let y=x+1;y<n;y++)o.push({act:'tile',take:[x,y]})}break;   // one card left: still pay 6 to take it (rulebook)
   case 'workshop':if(G.items.length){if(p.art>=1)o.push({act:'tile',work:'art'});if(p.fk>=2)o.push({act:'tile',work:'fk'})}break;
   case 'exchange':if(p.coins>=4)for(let j=0;j<G.market.length;j++)o.push({act:'tile',take:[j],ex:1});break}
   o.push({act:'tile',skip:1});return o}
-function SUP(){return G.sup||(G.sup={palm:22,pal:10})}   // finite piece supply (22 palms, 10 palaces: counts believed, not sourced)
+function SUP(){return G.sup||(G.sup={palm:12,pal:10})}   // finite piece supply: 12 palm trees, 10 palaces (rulebook component list)
 function placeMoves(p,t,what){if(SUP()[what]<1)return [{act:'tile',skip:true}];const flag=what==='pal'?'burhan':'rawda';const o=[{act:'tile',place:t.i}];if(G.turnFx[flag])for(const j of nbr(t.i))if(!G.board[j].block)o.push({act:'tile',place:j});return o}
 function summonPays(p){const o=[];if(p.el>=2)o.push({el:2,fk:0});if(p.el>=1&&p.fk>=1)o.push({el:1,fk:1});return o}
 function doTile(m){const a=G.act;const p=P(G.cur);const t=G.board[a.tile];a.tileDone=true;G.step='sell';if(m.skip)return;

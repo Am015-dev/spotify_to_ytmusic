@@ -1,64 +1,75 @@
-// Runtime asset usage: plays a quick game on a 390x844 phone, logs every media/ and models/ request, lists shipped owner files that never loaded.
-// Run: NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/asset-usage.js <slug> [seconds] [shotPrefix]
-const fs = require('fs'), path = require('path'), { chromium } = require('playwright'), gx = require('./gx-serve.js');
-const ROOT = path.resolve(__dirname, '..', '..');
+// Asset-usage gate: how much of the art/models/music a game ships is actually requested in a played game?
+//   node games-src/scripts/asset-usage.js <slug...>      |      node games-src/scripts/asset-usage.js --all
+//   options: --secs 180 (play time per game)  --jobs 2 (games in parallel)  --min 90 (pass mark in %)  --no-write (skip qa/asset-usage.json)
+// Per game: runs qa-bot.js's quick phase (same driver: "Just play"/quick start, UI-only bot to the result screen or the time cap) at 390x844,
+// served from games/ by gx-serve.js, and logs every request under media/, models/ and music/ (hook: QA_REQ_LOG in qa-bot.js).
+// Output: games-src/qa/asset-usage.json + one line per game. Exit 1 if a game is below --min % or loads 0 .glb while it ships .glb.
+// --all = every games/<slug>/ with an index.html and media/models/music, except asset-viewer, look and mainhattan-*.
+// qa-bot's own results go to a scratch dir (QA_DIR), so qa/<slug>.json is not touched.
+const fs = require('fs'), path = require('path'), os = require('os'), { spawn } = require('child_process');
+const ROOT = path.resolve(__dirname, '..', '..'), GAMES = path.join(ROOT, 'games'), OUT = path.join(ROOT, 'games-src', 'qa', 'asset-usage.json');
+const args = process.argv.slice(2), opt = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
+const SECS = +opt('secs', 180), JOBS = Math.max(1, +opt('jobs', 2)), MIN = +opt('min', 90), WRITE = !args.includes('--no-write');
+const SKIP = /^(asset-viewer|look|mainhattan-.*)$/, DIRS = ['media', 'models', 'music'];
+const flagVals = new Set(['--secs', '--jobs', '--min']);
+const slugsArg = args.filter((a, i) => !a.startsWith('--') && !flagVals.has(args[i - 1]));
+if (!slugsArg.length && !args.includes('--all')) { console.log('usage: node asset-usage.js <slug...> | --all  [--secs 180] [--jobs 2] [--min 90] [--no-write]'); process.exit(2); }
+
+function walk(dir, base, out) {
+  let ents; try { ents = fs.readdirSync(dir, { withFileTypes: true }); } catch (e) { return out; }
+  for (const e of ents) { const p = path.join(dir, e.name); if (e.isDirectory()) walk(p, base, out); else if (e.isFile()) out.push(path.relative(base, p).split(path.sep).join('/')); }
+  return out;
+}
+const shipped = slug => DIRS.flatMap(d => walk(path.join(GAMES, slug, d), path.join(GAMES, slug), [])).sort();
+const prefix = f => { const [d, ...r] = f.split('/'); if (r.length > 1) return d + '/' + r[0] + '/'; const m = /^([A-Za-z]+)/.exec(r[0]); return d + '/' + (m ? m[1] : r[0]) + '*'; };   // media/camp-farid.webp -> media/camp*
+const group = list => { const g = {}; for (const f of list) (g[prefix(f)] = g[prefix(f)] || []).push(f); return Object.fromEntries(Object.entries(g).sort((a, b) => b[1].length - a[1].length)); };
+
+function allSlugs() {
+  return fs.readdirSync(GAMES, { withFileTypes: true }).filter(e => e.isDirectory() && !SKIP.test(e.name) && fs.existsSync(path.join(GAMES, e.name, 'index.html')) && shipped(e.name).length).map(e => e.name).sort();
+}
+
+function playOne(slug) {
+  return new Promise(resolve => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'asset-usage-')), log = path.join(tmp, 'req.log'); fs.writeFileSync(log, '');
+    const env = Object.assign({}, process.env, { QA_REQ_LOG: log, QA_DIR: tmp, QA_VIEW_H: '844', QA_SHOTS: path.join(tmp, 'shots') });
+    const scale = (SECS / 220).toFixed(3);   // qa-bot's quick phase cap is 220 s at --scale 1
+    const t0 = Date.now(), p = spawn('node', [path.join(__dirname, 'qa-bot.js'), slug, '--size', 'phone', '--phases', 'quick', '--scale', scale], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let tail = ''; p.stdout.on('data', d => { tail = (tail + d).slice(-600); }); p.stderr.on('data', d => { tail = (tail + d).slice(-600); });
+    const kill = setTimeout(() => p.kill('SIGKILL'), (SECS + 150) * 1000);
+    p.on('close', () => {
+      clearTimeout(kill);
+      const loaded = new Set(fs.readFileSync(log, 'utf8').split('\n').filter(Boolean).map(u => u.replace(/^\/[^/]+\//, '')));   // strip "/<slug>/"
+      let quick = null; try { quick = JSON.parse(fs.readFileSync(path.join(tmp, slug + '.json'), 'utf8')).quick; } catch (e) { }
+      fs.rmSync(tmp, { recursive: true, force: true });
+      resolve({ loaded, quick, secs: Math.round((Date.now() - t0) / 1000), tail });
+    });
+  });
+}
+
 (async () => {
-  const slug = process.argv[2], secs = +process.argv[3] || 60, shot = process.argv[4];
-  const url = await gx.url(slug, { file: process.env.HTML || path.join(ROOT, 'games', slug, 'index.html') });
-  const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
-  const got = new Map(), errs = [];
-  // three short sessions share one request log: a quick game, the story/campaign screens, and the learn/tutor flow
-  const MODES = [['play', /^(just play|play|start|new game|vs|solo|begin|deal|ok|got it|next|continue|skip|close|done|end turn|confirm|roll|pass|draw|take|place|use|cut|let.?s)/i],
-    ['story', /^(story|chapter|campaign|continue|next|ok|got it|close|start|begin|play|go|fight|deal|done|skip)|^\d|node/i],
-    ['campaign', /^(story|chapter|campaign|continue|next|ok|got it|close|start|begin|play|go|fight|deal|done|skip|unlock|table|portrait|cast)|^\d|node/i, true],
-    ['learn', /^(learn|new here|tutorial|got it|next|ok|continue|skip|close|done|place|take|draw|use|cut)/i]];
-  let n = 0, page;
-  for (const [mode, PRI, done] of MODES) {
-  page = await ctx.newPage();
-  page.on('response', r => { const m = /\/(media|models)\/([^?#]+)/.exec(r.url()); if (m) got.set(m[1] + '/' + decodeURIComponent(m[2]), r.status()); });
-  page.on('pageerror', e => errs.push(String(e.stack || e).split('\n').slice(0, 3).join(' | ').slice(0, 260)));
-  await page.goto(url + (url.includes('?') ? '&' : '?') + (process.env.Q || ''), { waitUntil: 'load' });
-  if (done) {   // a finished campaign: every chapter beaten and every reward unlocked, so portraits, nodes, tables and tile backs can show
-    await page.evaluate(() => { try { const D = window.CAMPAIGN; if (!D) return; const p = { v: 1, ch: {}, unlocked: [], last: null };
-      (D.chapters || []).forEach(c => { p.ch[c.id] = { beaten: true, stars: 3, best: null, tries: 1, losses: 0, easy: false }; (c.unlock || []).forEach(u => p.unlocked.push(u.type + ':' + (u.id || u.text))); });
-      localStorage.setItem('gns-campaign-' + D.game, JSON.stringify(p)); } catch (e) { } });
-    await page.reload({ waitUntil: 'load' });
+  const slugs = args.includes('--all') ? allSlugs() : slugsArg;
+  const results = {}, queue = slugs.slice();
+  const worker = async () => {
+    for (let slug; (slug = queue.shift());) {
+      const ship = shipped(slug), r = ship.length ? await playOne(slug) : { loaded: new Set(), quick: null, secs: 0 };
+      const hit = ship.filter(f => r.loaded.has(f)), never = ship.filter(f => !r.loaded.has(f));
+      const glbShip = ship.filter(f => /\.glb$/i.test(f)), glbLoaded = hit.filter(f => /\.glb$/i.test(f));
+      const pct = ship.length ? Math.round(1000 * hit.length / ship.length) / 10 : 100;
+      const fail = ship.length > 0 && (pct < MIN || (glbShip.length > 0 && glbLoaded.length === 0));
+      results[slug] = { shipped: ship.length, loaded: hit.length, pct, glbShipped: glbShip.length, glbLoaded: glbLoaded.length, anyGlb: glbLoaded.length > 0,
+        playedSecs: r.secs, end: r.quick ? r.quick.result : null, clicks: r.quick ? r.quick.clicks : null, fail, neverLoaded: group(never) };
+      const top = Object.entries(results[slug].neverLoaded).slice(0, 4).map(([k, v]) => `${k}(${v.length})`).join(' ');
+      console.log(`${fail ? 'FAIL' : 'PASS'} ${slug.padEnd(18)} ${String(hit.length).padStart(4)}/${String(ship.length).padEnd(4)} ${String(pct).padStart(5)}%  glb ${glbLoaded.length}/${glbShip.length}  end ${results[slug].end}  ${r.secs}s${top ? '  never: ' + top : ''}`);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(JOBS, slugs.length) }, worker));
+  const sorted = Object.fromEntries(Object.entries(results).sort());
+  if (WRITE) {
+    let prev = {}; try { prev = JSON.parse(fs.readFileSync(OUT, 'utf8')).games || {}; } catch (e) { }   // a partial run keeps the other games' last result
+    fs.mkdirSync(path.dirname(OUT), { recursive: true });
+    fs.writeFileSync(OUT, JSON.stringify({ when: new Date().toISOString().slice(0, 16) + 'Z', view: '390x844', secs: SECS, min: MIN, games: Object.assign(prev, sorted) }, null, 1) + '\n');
   }
-  const end = Date.now() + secs * 1000 / MODES.length;
-  while (Date.now() < end) {
-    n++;
-    const acts = await page.evaluate(() => {
-      const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 6 && r.height > 6 && s.visibility !== 'hidden' && s.display !== 'none' && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth && s.pointerEvents !== 'none'; };
-      return [...document.querySelectorAll('button,[role=button],[data-act],[onclick],.tile,.cell,.slot,.opt,.card')].filter(vis).map(e => { const r = e.getBoundingClientRect(); return { t: (e.innerText || e.getAttribute('aria-label') || '').trim().slice(0, 30), x: r.x + r.width / 2, y: r.y + r.height / 2, c: String(e.className).slice(0, 30), d: !!e.disabled }; }).filter(a => !a.d);
-    }).catch(() => []);
-    const pri = acts.filter(a => PRI.test(a.t));
-    const pick = pri.length ? pri[n % pri.length] : acts.length ? acts[(n * 7) % acts.length] : { x: 100 + (n * 53) % 200, y: 200 + (n * 97) % 400 };
-    if (/rules|settings|quit|menu|reset|exit|home|sound|music|mute/i.test(pick.t) && acts.length > 1) continue;
-    await page.touchscreen.tap(pick.x, pick.y).catch(() => {});
-    await page.waitForTimeout(250);
-    if (shot && mode === 'play' && n === 14) await page.screenshot({ path: shot + '-mid.png' });
-  }
-  if (shot && mode === 'play') await page.screenshot({ path: shot + '.png' });
-  if (shot) await page.screenshot({ path: shot + '-' + mode + '.png' });
-  await page.close();
-  }
-  // scenario screens (?scn=<id>): jump to the title, story scene, start sheet, art page and 3D board the way a player reaches them
-  const SCN = (process.env.SCN || 'menu,story-scene,ui-start,ui-3d,sg-art,rv-art,sf-art,ui-menu').split(',');
-  for (const vp of [{ width: 390, height: 844 }]) for (const id of SCN) {
-    const c2 = await b.newContext({ viewport: vp, deviceScaleFactor: 1, hasTouch: true, isMobile: true }), pg = await c2.newPage();
-    pg.on('response', r => { const m = /\/(media|models)\/([^?#]+)/.exec(r.url()); if (m) got.set(m[1] + '/' + decodeURIComponent(m[2]), r.status()); });
-    await pg.goto(url + (url.includes('?') ? '&' : '?') + 'scn=' + id, { waitUntil: 'load' }).catch(() => { });
-    await pg.waitForTimeout(2500); await c2.close();
-  }
-  const shipped = []; for (const d of ['media', 'models']) { const dir = path.join(ROOT, 'games', slug, d); if (fs.existsSync(dir)) for (const f of fs.readdirSync(dir)) shipped.push(d + '/' + f); }
-  const art = shipped.filter(f => /\.(webp|png|jpg|glb)$/.test(f));
-  // a file counts as loaded if it, or its @512/-lite/-c/-k sibling-variant of the same stem, was fetched
-  const stem = f => f.replace(/(@512|-lite|-c|-k)?\.(webp|png|jpg|glb)$/, '');
-  const loadedStems = new Set([...got.keys()].map(stem));
-  const miss = art.filter(f => !got.has(f) && !loadedStems.has(stem(f)));
-  const models = art.filter(f => f.startsWith('models/') && f.endsWith('.glb') && !f.includes('-lite')), mLoaded = models.filter(f => got.has(f) || got.has(f.replace('.glb', '-lite.glb')));
-  const pics = art.filter(f => f.startsWith('media/')), pLoaded = pics.filter(f => got.has(f) || loadedStems.has(stem(f)));
-  console.log(JSON.stringify({ slug, taps: n, models: mLoaded.length + '/' + models.length, pictures: pLoaded.length + '/' + pics.length, notLoaded: miss, bad: [...got].filter(([k, v]) => v >= 400).map(x => x[0]), errs: errs.slice(0, 3) }, null, 1));
-  await b.close(); process.exit(0);
+  const bad = Object.keys(sorted).filter(s => sorted[s].fail);
+  console.log(bad.length ? `asset-usage: ${bad.length} below the gate: ${bad.join(', ')}` : 'asset-usage: all games pass');
+  process.exit(bad.length ? 1 : 0);
 })();

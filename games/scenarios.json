@@ -1031,6 +1031,38 @@
    "sizes": "all",
    "group": "UI",
    "mut": 0
+  },
+  {
+   "id": "rr-play",
+   "name": "Play: clean screen",
+   "ask": "Only board, hand, tracker, one score line and the top bar?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rr-lights",
+   "name": "Start lights",
+   "ask": "Do the start lights show?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "rr-preview",
+   "name": "Preview before Go",
+   "ask": "Do you see where you land and what the corner costs?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rr-spin",
+   "name": "Spin out",
+   "ask": "Is the spin-out loud and clear?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
   }
  ],
  "sands-of-qamar": [
