@@ -60,7 +60,7 @@ function tutStart(o) {
   try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
   document.querySelectorAll('.fa-skip').forEach(e => e.remove());
-  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Skip the guided flight' }, 'Skip tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
+  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Exit the guided flight' }, 'Exit tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
   UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0, goal: true }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
