@@ -121,7 +121,7 @@ function scoreBar() { // always visible: you vs the rival, leader marked
   [0, 1].forEach(function (s) { var c = sc[s]; bar.appendChild(h('span.sb' + (lead === s ? '.lead' : ''), h('b', (lead === s ? '\u2605 ' : '') + nameOf(s) + ' ' + sgn(c.total)), h('small', c.btn + ' buttons \u2212 ' + c.empty + '\u00D72 empty' + (c.bonus ? ' + 7' : '')))); });
   return bar; }
 function turnTracker(s) { // whose turn and why (the token further back moves), spaces left
-  if (G.over) return 'Game over'; var o = 1 - s, left = SW.TRACK - G.pos[s], nm = UI.mode === 'hot' ? nameOf(s) + '\u2019s turn' : isHuman(s) ? 'Your turn' : nameOf(s) + '\u2019s turn';
+  if (G.over) return 'Game over'; var o = 1 - s, left = SW.TRACK - G.pos[s], nm = 'Turn: ' + (UI.mode !== 'hot' && isHuman(s) ? 'you' : nameOf(s));
   var why = G.pend ? 'free patch' : G.pos[s] < G.pos[o] ? 'behind by ' + (G.pos[o] - G.pos[s]) : G.pos[o] >= SW.TRACK ? 'rival finished' : 'tied, on top';
   return nm + ' \u00B7 ' + why + ' \u00B7 ' + left + ' left'; }
 function rateMove(m) { // compare the human's move with the best value on offer (the solver's yardstick)
