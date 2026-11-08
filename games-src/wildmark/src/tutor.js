@@ -1,4 +1,4 @@
-/* Wildmark tutorial = a COACHED FIRST GAME (owner, 7 Nov: "not tap-tap"). A real 8-turn game against Bram with free choices from turn 1.
+/* Wildmark tutorial = a COACHED FIRST GAME (owner, 7 Nov: "not tap-tap"). A real 6-turn game against Bram with free choices from turn 1.
    Ward Elder Rowan explains each rule the first time it matters (one non-blocking bubble at a time, dismissable), praises or corrects a move
    in one line, and walks through the final score with the player's real numbers. Rules that never came up are listed at the end.
    Words: campaign.json prologue.coach[id]. Coverage list: TUTORIAL-COVERAGE.md. Proof: tutorial-end.js (plays any legal moves by UI taps). */
@@ -22,13 +22,12 @@ function coachHide() { var b = $('#coachb'); if (b) b.hidden = true; }
 // called after every render: say the rule that just became relevant (first match wins, so one bubble at a time)
 function coachCheck() {
   if (!coachOn() || G.over) return; var C = UI.coach, me = G.seats[0], mine = myTurn();
-  var sc = WM.score(me.env, me.acorns);
+  var sc = WM.score(me.env, me.acorns, G.cards);
   if (me.done > C.done) {   // the player's turn just ended: one line on the move
     var d = sc.aniT - C.ani, best = null; WM.ANI.forEach(function (a) { var x = sc.ani[a] - C.aniBy[a]; if (x > 0 && (!best || x > best.x)) best = { a: a, x: x }; });
     C.done = me.done;
     if (G.last && G.last.acorn && G.last.seat === 0 && coachSay('keystone')) { }
-    else if (d > 0 && C.fb < 3 && best) { C.fb++; coachSay('good', { n: best.x, card: WM.ANI_NAME[best.a] + 's (' + cinfo(best.a).title + ')' }, true); }
-    else if (d <= 0 && C.fb < 3 && me.done <= 4) { C.fb++; coachSay('poor', null, true); }
+    // good / okay / poor: the verdict strip says it with the real points (score.js), so Rowan stays quiet here
   }
   C.ani = sc.aniT; WM.ANI.forEach(function (a) { C.aniBy[a] = sc.ani[a]; });
   if (sc.habT > C.hab && !C.seen.habitat) { C.hab = sc.habT; coachSay('habitat'); return; } C.hab = sc.habT;
@@ -97,7 +96,7 @@ function tutStart(o) {
   UI.coach = { seen: {}, shown: [], fixed: {}, done: 0, ani: 0, aniBy: {}, hab: 0, w4: 0, fb: 0 };
   WM.ANI.forEach(function (a) { UI.coach.aniBy[a] = 0; });
   window.GXCOACH = { running: true, explained: [], done: false };
-  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'easy', seed: TUT_SEED, turns: P.turns || 8, names: [null, 'Bram'] }); UI.mode = 'coach';
+  UI.mode = 'coach'; newGame({ np: 2, humans: 1, ai: 'easy', seed: TUT_SEED, turns: P.turns || 6, names: [null, 'Bram'] }); UI.mode = 'coach';
   tutFix(); coachCheck();
 }
 document.addEventListener('click', function (e) { var t = e.target.closest && e.target.closest('#coachX, #coachStory'); if (!t) return; if (t.id === 'coachX') coachHide(); else { $('#rs').hidden = true; showTitle(); GXC.play(CAMPAIGN.chapters[0].id); } });
