@@ -134,6 +134,18 @@ function markWinners() {
   if (!G || G.phase !== 'over') return;
   for (const s of G.winners || []) { const av = document.querySelector('#tbl .seat[data-seat="' + s + '"] .av'); if (av && !av.classList.contains('win')) { av.classList.add('win'); av.appendChild(h('span.crown', { html: KIT.iconSVG('crown', { size: 26 }) })); } }
 }
+// the result table: one column per diner (winner first); points by round, by dish and from custard, then the total
+function breakdownEl(order, ws, v, tot) {
+  const F = G.final, sum = (s, k) => G.rs.reduce((a, r) => a + (r[s][k] || 0), 0);
+  const rows = [['Round 1', s => G.rs[0] ? G.rs[0][s].total : 0], ['Round 2', s => G.rs[1] ? G.rs[1][s].total : 0], ['Round 3', s => G.rs[2] ? G.rs[2][s].total : 0], null,
+    ['Rolls', s => sum(s, 'maki')], ['Prawns', s => sum(s, 'tempura')], ['Fish', s => sum(s, 'sashimi')], ['Buns', s => sum(s, 'dumpling')], ['Nigiri', s => sum(s, 'nigiri') + sum(s, 'wasabi')], null,
+    ['Custard', s => F.puddingPts[s], s => F.pudding[s] + ' cup' + (F.pudding[s] === 1 ? '' : 's')]];
+  const nm = s => s === v ? 'You' : pname(s), sg = n => n > 0 ? '+' + n : n < 0 ? '\u2212' + -n : '0';
+  const head = h('tr', h('th'), ...order.map(s => h('th' + (ws.indexOf(s) >= 0 ? '.w' : ''), h('span.who', nm(s)), ws.indexOf(s) >= 0 ? h('span.cr', 'winner') : null)));
+  const body = rows.map(r => r ? h('tr', h('th', r[0]), ...order.map(s => { const n = r[1](s); return h('td' + (n < 0 ? '.neg' : n === 0 ? '.z' : ''), r[0] === 'Custard' ? sg(n) : String(n), r[2] ? h('small', r[2](s)) : null); })) : h('tr.sep', h('td', { colspan: order.length + 1 })));
+  const tr = h('tr.tot', h('th', 'Total'), ...order.map(s => h('td' + (ws.indexOf(s) >= 0 ? '.w' : ''), String(tot[s]))));
+  return h('table.kkbd', { 'aria-label': 'Points by round, by dish and from custard' }, h('thead', head), h('tbody', body, tr));
+}
 function showFinal() {
   const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
   const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
@@ -147,12 +159,13 @@ function showFinal() {
       const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
       const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
       box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
-        h('ol.kkrs', ...order.map(s => h('li' + (ws2.indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v2 && pname(s) !== 'You' ? ' (you)' : '')), h('span.p', String(tot[s]) + ' pts'))))), box.firstChild); rs.classList.add('kkfin');
+        breakdownEl(order, ws2, v2, tot)), box.firstChild); rs.classList.add('kkfin');
     }
   } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');
+  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', '1');
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {

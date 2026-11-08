@@ -134,7 +134,7 @@ function tutStart(o) {
     setup: () => { try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS(); newGame('tutorial', { np: 2, seats: [2] }); },
     onDone: r => { tutLeave(); try { lsSet('kk_done', '1'); } catch (e) { } const c = r && r.choice;
       if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
-      else { showStart(); newGame('vs', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] }); } },
+      else { goalCard.seen = 1; showStart(); newGame('vs', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] }); } },
     onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } };
   Object.defineProperty(cfg, 'endText', { get: () => G && G.final ? 'You won ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '. Now a real meal!' : 'Now a real three-round meal!' });
   GXT.start(cfg);
