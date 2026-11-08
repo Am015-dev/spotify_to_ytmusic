@@ -14,7 +14,7 @@ function drawGhost() { try { markLanding(); } catch (e) { }
   Array.prototype.forEach.call(q.querySelectorAll('.qc'), function (e, i) { e.classList.toggle('lg', !!lg[i]); });
 }
 function bestPlacement(pid, seat) { return aiBestPlace(G.board[seat], PATCHES[pid]); }
-function selectOffer(k) { if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
+function selectOffer(k) { if (UI.cdAt && Date.now() - UI.cdAt < 500) return; /* W484: the click that ends a card drag */ if (UI.coach) setTimeout(function () { if (UI.sel >= 0) coachSay('pick', null, true); }, 0);
   var s = swWho(G); if (G.over || UI.busy || !isHuman(s) || G.pend) return; var pid = swOffer(G)[k], p = PATCHES[pid]; if (pid == null) return;
   if (!tutAct({ what: 'offer', k: k })) return;
   if (UI.sel === k) { showPatch(pid); return; }
@@ -49,6 +49,12 @@ function bindQuilt() {
   var up = function (ev) { if (!DR.on) return; DR.on = false; var ok = ghostOk(); if (!ok) { snapNear(false); drawGhost(); } tutAct({ what: 'drop', valid: ghostOk() }); renderDockLight(); sfx('tick'); try { if (ghostOk() && navigator.vibrate) navigator.vibrate(12); } catch (e) { } };
   bd.addEventListener('pointerup', up); bd.addEventListener('pointercancel', up);
 }
+/* W484: drag a patch straight from its card onto the quilt (the benchmark app's first-turn gesture); a plain tap still selects */
+var CD = null;
+document.addEventListener('pointerdown', function (ev) { var b = ev.target.closest && ev.target.closest('#offers .offer.can'); CD = b && !UI.tutorial && UI.sel < 0 ? { k: +b.dataset.k, x: ev.clientX, y: ev.clientY, on: false } : null; });
+document.addEventListener('pointermove', function (ev) { if (!CD) return; if (!CD.on) { if (Math.abs(ev.clientX - CD.x) + Math.abs(ev.clientY - CD.y) < 14) return; selectOffer(CD.k); if (UI.sel !== CD.k) { CD = null; return; } CD.on = true; DR.touch = ev.pointerType === 'touch'; } dragTo(ev); ev.preventDefault(); }, { passive: false });
+var cdUp = function () { if (!CD) return; var was = CD.on; CD = null; if (!was) return; UI.cdAt = Date.now(); if (!ghostOk()) { snapNear(false); drawGhost(); } renderDockLight(); render(); sfx('tick'); try { if (ghostOk() && navigator.vibrate) navigator.vibrate(12); } catch (e) { } };
+document.addEventListener('pointerup', cdUp); document.addEventListener('pointercancel', cdUp);
 function dragTo(ev) { var c = cellAt(ev), cc = curCells(); if (!c || !cc) return; var b = bbox(cc); UI.gx = c[0] - Math.floor(b[0] / 2); UI.gy = c[1] - Math.floor(b[1] / 2) - (DR.touch ? 2 : 0); clampG(); var g = $('#ghost'); if (g) { var cs = UI.cs; g.style.left = UI.gx * cs + 'px'; g.style.top = UI.gy * cs + 'px'; var ok = ghostOk(); g.classList.toggle('ok', ok); g.classList.toggle('bad', !ok); } renderDockLight(); }
 document.addEventListener('keydown', function (e) { if (!G || UI.sel < 0 || GX.open || !UI.started) return; var k = e.key; if (k === 'r' || k === 'R') { rotate(); e.preventDefault(); } else if (k === 'f' || k === 'F') { flip(); e.preventDefault(); } else if (k === 'Enter') { confirmSew(); e.preventDefault(); } else if (k === 'Escape') { cancelSel(); } else if (k.indexOf('Arrow') === 0) { UI.gx += k === 'ArrowRight' ? 1 : k === 'ArrowLeft' ? -1 : 0; UI.gy += k === 'ArrowDown' ? 1 : k === 'ArrowUp' ? -1 : 0; clampG(); drawGhost(); e.preventDefault(); } });
 // ---------- moves
