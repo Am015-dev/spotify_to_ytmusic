@@ -178,3 +178,32 @@ Gameplay gate (every game, before any looks work counts): read the real rules + 
 - Queue for gameplay gate, waves of ~4 as workers free: twin-thrones, shipwreck-isle, emberclimb, short-fuse (these 4 had only looks/benchmark rounds), then redline-rally, sands-of-qamar, tidewake, kaiten-kitchen, crown-city-smash, sunglaze, doorkick-dungeon, cauldron-fair, lantern-dive, vale-of-banners, final-approach, wildmark, perch-and-plume.
 - 13:37 Gameplay wave 2 started: redline W496 (session_01RR7mnZcmsJ1AziSmytZLss), sands W497 (session_01RR7mnbfxvE3DYS9T9GDU7X), tidewake W498 (session_01RR7mnZFiLzPyAcPzorCAtf), kaiten W499 (session_01RR7mnaCmmgYB2W2rGw1wjt). Passed gameplay gate, waiting owner yes: stitchwise PR262, thornbound PR261, rampart PR263, vinegrave PR264, twin-thrones PR255, emberclimb PR258 (polish). Still running: hollowbough W482, nebula W486, shipwreck W493, short-fuse W495. Wave 3 next: crown-city-smash, sunglaze, doorkick-dungeon, cauldron-fair, lantern-dive, vale, final-approach, wildmark, perch.
 - 13:39 OWNER "use multiple workers": wave 3 started all at once: crown W500 (..aJSLMnN8WBDwXhAWZ), sunglaze W501 (..Z6uXDX6RatbMpESrk), doorkick W502 (..b17ZdbgJaeRq2RK84), cauldron W503 (..aL16EzmoUS75sired), lantern W504 (..bF5Sz88zQkVmDD1AH), vale W505 (..Xu46gXqfD3HYComUX), final-approach W506 (..YcEqT6NGeAgEFLaeW), wildmark W507 (..aQQ1mfzjWYcsu5gMx), perch W508 (..bbz3PjX6MELouaqi2). Session prefix session_01RR7mn. Every live/new game now has a gameplay worker or has passed.
+
+## 15:47 GAMEPLAY GATE STATUS (owner must say yes before any deploy)
+Passed, waiting owner yes (branch/PR): stitchwise W491 PR262, thornbound W489 PR261, rampart W487 PR263, vinegrave W490 PR264, twin-thrones shelf/W483-twin PR255, nebula W486 PR260, emberclimb shelf/W485 PR258, kaiten W499 PR268, sunglaze W501 PR270, perch W508 PR271, sands W497 PR267, lantern W504 PR266, redline W496 PR265, wildmark W507 PR273, final-approach W506 PR269, shipwreck shelf/W468-shipwreck-lean PR256, cauldron W503 PR274, short-fuse shelf/W488 PR259, crown W500 PR272, tidewake W498 PR276, vale W505 PR277, doorkick W502 PR275.
+Running: hollowbough W509 (session_01RR7mnaDzgd2f6tQ2xrJQ97) on shelf/W482-hollowbough PR254 (old W482 sat waiting for "go" 12:03-15:32; never let workers ask).
+Shared shell fix committed (tutor dots under Skip): ships with the next build of each game; deploy all approved games in ONE build-all call.
+Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
+- 18:10 OWNER "run strict reviewers on gameplay and score them": 8 Opus reviewers G1-G8 (review/G<n>-gameplay, rubric games-src/reviews/GAMEPLAY-RUBRIC.md), 23 games. Sessions: G1 ..XKkNsmqtMGRReDni1, G2 ..Ysx9Tw5deqp7qSojW, G3 ..ZmgedzzG91eed3N7N, G4 ..bm4kTbhEYwiQpXzaT, G5 ..Z6d9Pp8CXwGzrvk1u, G6 ..ZXYLxq5J7mweiNUXg, G7 ..YsFyM6u5HYDCGgj8r, G8 ..YqFBKektxQacoKyHn (prefix session_01RR7mn). Compile a score table for the owner; FAILs go back to a fixer worker.
+
+## 19:20 UTC update
+- G4: perch 4.0 (stopper), sands 6.5, lantern 7.0, all FAIL. Fixers: F-perch session_01RR7mnYuasbfM6BQnvnc28o, F-sands session_01RR7mnYd3DLgPyALbQAynK8, F-lantern session_01RR7mnYW9jTP3TVUbFP2gwm.
+- Fixed and archived: stitchwise, vale, short-fuse. R1 re-review (those 3): session_01RR7mnXrTLHozUcvFKKnXVN, branch review/R1-gameplay.
+- Round 2 sent: tidewake (hand at 375, replay speed, Rogue Wave/Deck Cannon), wildmark (salmon D rules case).
+- Next: batch fixed games 3 per fresh re-reviewer (R2, R3...), same rubric; only PASS games go to the owner.
+
+## 20:01 UTC update
+- R1: stitchwise 6.9, vale 4.0 (stopper at 375), short-fuse 7.3, all FAIL. F2 fixers: stitchwise session_01RR7mnXfX1dLT1mFJrehys9, vale session_01RR7mnYVzoTezWpE54DwGdF, short-fuse session_01RR7mnZqEiW4qnZ2dCBkBid.
+- R3: cauldron 7.1, shipwreck 6.4, redline 6.3, all FAIL. F2 fixers: cauldron session_01RR7mnXk95RsBJXHDfeF1wD, shipwreck session_01RR7mnYhLw1DfnEfpNZSgcU, redline session_01RR7mnXSsW29UsNgB7a7CMV.
+- Lesson: fixers' sim/bot claims (taps, win rates) were wrong twice; demand touch-measured numbers.
+- Running reviewers: R2 (vinegrave, thornbound, wildmark) session_01RR7mnYeN67c3gxAPrhaNx1; R4 (hollowbough, rampart, final-approach) session_01RR7mnXTEKxqpPJVQtBoHJc; R5 (tidewake, sands, lantern) session_01RR7mnaA15Nj5vtwBiWPHpw.
+- Waiting for a reviewer: sunglaze. First-round fixers still running: crown, kaiten, twin, nebula, perch; r2: doorkick, emberclimb.
+- 20:04: perch fixed (stopper gone), waits with sunglaze for a reviewer. NOTE: shelf/W508-perch-gameplay merge commit 9d8868f0 has the container default author; when integrating perch, squash it (never force-push).
+
+## 20:41 UTC update
+- R2: vinegrave 5.6, thornbound 4.0 (stopper, dead taps). F2: thornbound session_01RR7mnaCnm2BxASv5LYf5bp, vinegrave session_01RR7mnaK3J3MR4wBDnaNAX7. R2 still scoring wildmark (session_01RR7mnYeN67c3gxAPrhaNx1).
+- R4: hollowbough 6.5, rampart 6.9, final-approach 4.0. F2: hollowbough session_01RR7mnZtXQUadm8SabpwQCd, rampart session_01RR7mnborBQnkrcUNcWGJiw; final-approach fixed (brake frozen at 2nd engine die, rule quoted) -> R6.
+- R5: tidewake 7.0, sands 6.5, lantern 6.9. F2: tidewake session_01RR7mnYyABfvTarj4FQBF8T, sands session_01RR7mnY6FJi6HojBs7QXSWp, lantern session_01RR7mnZmYxdcCW9TuxCFZW5.
+- R6 (sunglaze, perch, final-approach) session_01RR7mnY9XjyFfPRsVjbpyUq. R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW.
+- Other fixers: F2 cauldron/shipwreck/redline (redline on r2), F2 vale, F2 short-fuse, doorkick r2, kaiten, twin, nebula.
+- No game has passed a re-review yet (12 re-reviewed).
