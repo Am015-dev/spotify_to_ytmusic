@@ -147,6 +147,6 @@ function tutOffer(){return false;if(typeof GXT==='undefined'||!firstTime()||GXT.
 (function(){const o=schedule;schedule=function(){if(UI.tut)return;return o()}})();
 (function(){const o=saveNow;saveNow=function(){if(UI.tut||UI.coach)return;return o()}})();
 (function(){const o=recordResult;recordResult=function(){if(UI.tut||UI.coach)return;return o()}})();
-(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut||UI.coach){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
+(function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
 // while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();

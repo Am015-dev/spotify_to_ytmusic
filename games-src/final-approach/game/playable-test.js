@@ -49,7 +49,7 @@ async function tutorial(browser, W, H, dismissMode) {
   let maxBub = 0, blocked = 0; const seenBub = new Set();
   const watch = setInterval(async () => { try { const r = await p.evaluate(() => { const bs = [...document.querySelectorAll('.fa-coach')]; return { n: bs.length, ids: bs.map(b => b.dataset.coach), pe: bs.map(b => getComputedStyle(b).pointerEvents) }; }); maxBub = Math.max(maxBub, r.n); r.ids.forEach(i => seenBub.add(i)); if (r.pe.some(x => x !== 'none')) blocked++; } catch (e) { } }, 250);
   if (dismissMode) {
-    await tapSel(c, '.fa-goal [data-ro=go]'); await sleep(900); const x = await tapSel(c, '.fa-coach .x'); await sleep(500);
+    await tapSel(c, '.fa-goal [data-ro=go]'); await sleep(900); for (let i = 0; i < 40 && !(await p.evaluate(() => { const b = document.querySelector('.fa-coach .x'); return !!b && getComputedStyle(b).visibility !== 'hidden'; })); i++) await sleep(250); const x = await tapSel(c, '.fa-coach .x'); await sleep(500);
     const gone = await p.evaluate(() => !document.querySelector('.fa-coach:not(.out)') || document.querySelector('.fa-coach').dataset.coach !== 'intro');
     clearInterval(watch); if (x !== true || !gone) note(tag, 'coach bubble could not be dismissed'); else lines.push('PASS coach bubble dismiss ' + tag); await c.p.context().close(); return;
   }

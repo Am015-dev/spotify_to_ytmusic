@@ -70,7 +70,7 @@ function bfDice(){const sp=BF.spin,now=bfNow();document.querySelectorAll('#dice 
   else{el.classList.remove('bfroll');el.style.animationDelay=''}})}
 // ---- flights ----
 function bfFly(html,from,to,o){o=o||{};const L=$bf('bfx');if(!L||!from||!to||!bfAnim()){if(o.land)o.land();return}
-  const el=document.createElement('div');el.className='bfly '+(o.cls||'');el.innerHTML=html;L.appendChild(el);const s=o.size||44;el.style.width=el.style.height=s+'px';
+  const el=document.createElement('div');el.className='bfly '+(o.cls||'');el.innerHTML=html;el.setAttribute('aria-hidden','true');el.querySelectorAll('*').forEach(n=>[...n.childNodes].forEach(c=>{if(c.nodeType===3&&c.textContent.trim()){const s=document.createElement('i');s.className='gt';s.dataset.t=c.textContent;c.replaceWith(s)}}));L.appendChild(el);const s=o.size||44;el.style.width=el.style.height=s+'px';
   const dx=to.x-from.x,dy=to.y-from.y,lift=o.arc==null?-Math.min(90,40+Math.hypot(dx,dy)*.25):o.arc,sc=o.end||.7;
   const kf=[{transform:`translate(${from.x-s/2}px,${from.y-s/2}px) scale(1) rotate(0deg)`,opacity:1},
     {transform:`translate(${from.x+dx*.5-s/2}px,${Math.min(from.y,to.y)+lift-s/2}px) scale(1.35) rotate(${o.spin==null?200:o.spin/2}deg)`,opacity:1,offset:.45},

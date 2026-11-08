@@ -182,3 +182,47 @@ function setHints(on) {
   var bl = document.getElementById('bulbbtn'); if (bl) bl.hidden = !hintsOn();
   if (G && G.phase === 'plan' && !UI.busy && !$('#game').hidden && G.cars[UI.seat] && !G.cars[UI.seat].plan) drawPlan(); else tracker();
 }
+/* ---------- scenery (R9: "fill the infield, not a flat grey strip"): grass, trees, stands, run-off sand in the track art's
+   flat style, drawn over the art with the road cut out, so the art's road and kerbs stay on top. One cached layer per track. */
+var SCENE = {};
+function sceneryLayer(id) {
+  if (SCENE[id]) return SCENE[id];
+  var tk = TK[id], c = document.createElement('canvas'); c.width = 1000; c.height = 600; var g = c.getContext('2d'); g.scale(0.5, 0.5);
+  var seed = 7; for (var q = 0; q < id.length; q++) seed = (seed * 31 + id.charCodeAt(q)) >>> 0;
+  function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  function dRoad(x, y) { var m = 1e9; for (var i = 0; i < tk.dense.length; i += 2) { var p = tk.dense[i], d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y); if (d < m) m = d; } return Math.sqrt(m); }
+  /* grass with mowing stripes */
+  g.fillStyle = '#2d6a45'; g.fillRect(0, 0, 2000, 1200);
+  g.fillStyle = '#327550'; for (var sx = -1200; sx < 2000; sx += 120) { g.beginPath(); g.moveTo(sx, 1200); g.lineTo(sx + 60, 1200); g.lineTo(sx + 60 + 1200, 0); g.lineTo(sx + 1200, 0); g.closePath(); g.fill(); }
+  /* run-off sand on the outside of every corner */
+  tk.list.forEach(function (k) {
+    var a = tk.at(k.idx * tk.seg), ox = a.x - Math.sin(a.a) * 150, oy = a.y + Math.cos(a.a) * 150;
+    g.save(); g.translate(ox, oy); g.rotate(a.a); g.fillStyle = '#d9c08a'; g.beginPath(); g.ellipse(0, 0, 150, 58, 0, 0, 7); g.fill();
+    g.fillStyle = 'rgba(160,130,80,.35)'; for (var t = 0; t < 14; t++) { g.beginPath(); g.arc((rnd() - .5) * 220, (rnd() - .5) * 70, 3, 0, 7); g.fill(); } g.restore();
+    /* tyre wall behind the sand */
+    var wx = a.x - Math.sin(a.a) * 222, wy = a.y + Math.cos(a.a) * 222;
+    for (var w = -5; w <= 5; w++) { var px = wx + Math.cos(a.a) * w * 22, py = wy + Math.sin(a.a) * w * 22; g.fillStyle = '#1b1e24'; g.beginPath(); g.arc(px, py, 10, 0, 7); g.fill(); g.fillStyle = w % 2 ? '#e8e4d8' : '#d23a2c'; g.beginPath(); g.arc(px, py, 4.5, 0, 7); g.fill(); }
+  });
+  /* grandstands along the start straight, on the outside */
+  [-3, -1.6, 1.6].forEach(function (o, n) {
+    var a = tk.at(o * tk.seg * 1.4), bx = a.x - Math.sin(a.a) * 205, by = a.y + Math.cos(a.a) * 205;
+    if (bx < 90 || bx > 1910 || by < 60 || by > 1140) return;
+    g.save(); g.translate(bx, by); g.rotate(a.a);
+    g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(-106, -26, 220, 64); g.fillStyle = '#5a6478'; g.fillRect(-110, -32, 220, 64); g.fillStyle = '#c8352b'; g.fillRect(-110, -38, 220, 10);
+    var cols = ['#ffd24a', '#4a9bff', '#ff6b5a', '#f1f4fa', '#3ec47c', '#c08cff'];
+    for (var r = 0; r < 3; r++) for (var s = 0; s < 18; s++) { g.fillStyle = cols[(r * 7 + s * 3 + n) % cols.length]; g.beginPath(); g.arc(-100 + s * 11.8, -16 + r * 17, 4.6, 0, 7); g.fill(); }
+    g.restore();
+  });
+  /* trees and tents wherever there is room (not on or next to the road) */
+  for (var y = 60; y < 1160; y += 64) for (var x = 60; x < 1960; x += 64) {
+    var px = x + (rnd() - .5) * 44, py = y + (rnd() - .5) * 44, d = dRoad(px, py), r0 = rnd();
+    if (d < 175) continue;
+    if (r0 < 0.3) { var R = 22 + rnd() * 16; g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(px + 7, py + 9, R, 0, 7); g.fill(); g.fillStyle = '#1f5a36'; g.beginPath(); g.arc(px, py, R, 0, 7); g.fill(); g.fillStyle = '#2b7646'; g.beginPath(); g.arc(px - R * .25, py - R * .25, R * .62, 0, 7); g.fill(); }
+    else if (r0 < 0.47 && d < 330) { g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(px - 26, py - 16, 58, 40); var tc = rnd() < .5 ? '#e8e4d8' : '#ffb347'; g.fillStyle = tc; g.beginPath(); g.moveTo(px - 30, py + 18); g.lineTo(px, py - 22); g.lineTo(px + 30, py + 18); g.closePath(); g.fill(); g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.moveTo(px, py - 22); g.lineTo(px + 30, py + 18); g.lineTo(px, py + 18); g.closePath(); g.fill(); }
+  }
+  /* cut the road out so the track art's road, kerbs and start line show through */
+  g.globalCompositeOperation = 'destination-out'; g.lineJoin = 'round'; g.lineCap = 'round'; g.lineWidth = 172; g.beginPath();
+  tk.dense.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath(); g.stroke();
+  g.globalCompositeOperation = 'source-over';
+  return (SCENE[id] = c);
+}

@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T05:15Z",
+ "when": "2026-11-08T06:26Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -1906,33 +1906,16 @@
   },
   "stitchwise": {
    "shipped": 63,
-   "loaded": 57,
-   "pct": 90.5,
+   "loaded": 63,
+   "pct": 100,
    "glbShipped": 0,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 184,
+   "playedSecs": 188,
    "end": "cap",
-   "clicks": 948,
+   "clicks": 937,
    "fail": false,
-   "neverLoaded": {
-    "media/result*": [
-     "media/result-lose.webp",
-     "media/result-win.webp"
-    ],
-    "media/icon*": [
-     "media/icon-bonus.webp"
-    ],
-    "media/patch*": [
-     "media/patch-leather.webp"
-    ],
-    "media/quilt*": [
-     "media/quilt-frame.webp"
-    ],
-    "media/torn*": [
-     "media/torn-square.webp"
-    ]
-   }
+   "neverLoaded": {}
   }
  }
 }

@@ -6,7 +6,7 @@ function showStart(view) {
   if (view === 'setup') { artBg(st, 'bg-map'); st.style.backgroundSize = 'cover'; return renderSetup(st); }
   var camp = typeof campLine === 'function' ? campLine() : '';
   var castRow = ''; try { var CA = (window.CAMPAIGN || {}).cast || {}; Object.keys(CA).forEach(function (k) { var st2 = (CA[k].portrait || '').replace(/\.webp$/, ''); if (st2 && artHas(st2)) castRow += '<img src="' + artUrl(st2) + '" alt="' + CA[k].name + '" title="' + CA[k].name + '">'; }); } catch (e) { }
-  var card = h('div.card', { html: logoHtml() + '<h1>Stitchwise</h1>' + (castRow ? '<div class="cast" aria-label="The quilters at the fair">' + castRow + '</div>' : '') + '<p class="sub">A quilting duel for two. Buy patches, sew them on, run out the clock.</p>' });
+  var card = h('div.card', { html: logoHtml() + '<h1>Stitchwise</h1>' + (castRow ? '<div class="cast" aria-label="The quilters at the fair">' + castRow + '</div>' : '') + '<p class="sub">Most points wins: your buttons, minus 2 per empty square.</p>' });
   var m = h('div.menu');
   if (hasSave()) m.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'resume' }, 'Continue your game', h('small', 'Pick up where you stopped')));
   if (window.CAMPAIGN && typeof GXC !== 'undefined') m.appendChild(h('button.btn' + (hasSave() ? '' : '.go'), { type: 'button', 'data-a': 'story' }, 'Story: The Quilter’s Year', h('small', camp || 'Three county fairs, ten stages, three champions')));
