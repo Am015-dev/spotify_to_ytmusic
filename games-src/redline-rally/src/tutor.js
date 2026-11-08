@@ -112,7 +112,7 @@ function tutStart(o) {
   closeModal(); UI.cmpDef = null; UI.tutOver = false; o = o || {};
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
-    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against two rivals.',
+    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against four rivals. Tap Suggest any time you are unsure.',
     onDone: function (r) { tutLeave(false); if (r && r.choice === 'story' && typeof GXC !== 'undefined') GXC.open(); else if (o.then) o.then(); else startGame(); },
     onExit: function () { tutLeave(true); }
   });

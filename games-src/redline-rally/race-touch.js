@@ -1,14 +1,14 @@
 /* W496 gate: a whole default race (Quick game, defaults) by real touch at 390x844 and 375x667, real speed (no AIDELAY).
    Asserts: the race ends; 0 page errors; every tap gets a response within 1.2 s (no dead taps); at every decision each visible enabled button
    in the game screen is on screen and takes the tap (not covered); rival turns are brisk (< 1.5 s per rival car on
-   average, timed in the page); the race takes under 5 min. Prints the finishing place.  Usage: node race-touch.js */
-const path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
+   average, timed in the page); the race takes under 5 min. Prints the finishing place.  Usage: node race-touch.js   (SUGGEST=1: tap Suggest every round and take its boost/slip advice; SEED=n) */
+const SUG = process.env.SUGGEST === '1', SEED = process.env.SEED || '11', path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] }); let bad = 0;
   for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]]) {
     const c = await b.newContext({ viewport: vp, hasTouch: true, isMobile: true }), p = await c.newPage(), errs = [], probs = [];
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-    await p.goto(url + (url.includes('?') ? '&' : '?') + 'seed=11', { waitUntil: 'load' });
+    await p.goto(url + (url.includes('?') ? '&' : '?') + 'seed=' + SEED, { waitUntil: 'load' });
     await p.evaluate(() => { try { localStorage.setItem('gxt-redline-rally', JSON.stringify({ done: 1 })); localStorage.setItem('rr_seen', '1'); localStorage.removeItem('rr_set'); } catch (e) {} }); await p.reload({ waitUntil: 'load' }); await p.waitForTimeout(800);
     const sig = () => p.evaluate(() => document.querySelector('#game').innerHTML.length + '|' + (window.G ? G.phase + G.round + (G.pend ? G.pend.t : '') + UI.sel.length + UI.gear : '') + '|' + document.querySelector('#modal').hidden);
     const tap = async (sel, need) => { const el = await p.$(sel); if (!el) return false; const bb = await el.boundingBox(); if (!bb) return false; const s0 = await sig();
@@ -33,6 +33,7 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
       if (st.ph === 'plan' && st.go && !st.busy) {
         if (goAt) { const r = await p.evaluate(() => ({ cars: G.cars.filter(c => !c.human && !c.fin).length })); waits.push({ ms: Date.now() - goAt, cars: r.cars }); goAt = 0; }
         await scan('plan');
+        if (SUG && await p.$('#sugB')) { await tap('#sugB', false); await tap('#goB'); goAt = Date.now(); turns++; stuck = 0; continue; }
         const g = await p.evaluate(() => { const c = G.cars.find(x => x.human); return Math.min(4, Math.max(1, c.gear + (c.pos % 48 > 30 ? -1 : 1))); });
         if (!(await tap(`.gb[data-g="${g}"]:not([disabled])`, false))) await tap('.gb:not([disabled])', false);
         for (let k = 0; k < 5 && await p.$('#goB[disabled]'); k++) { if (!(await tap('#hand .cd:not(.on):not(.dim):not(.H)'))) break; }
@@ -41,7 +42,8 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
       }
       if (st.q) {
         await scan('question ' + st.pend);
-        if (st.pend === 'boost') await tap('#boostN'); else if (st.pend === 'slip') await tap('#slipY'); else if (st.pend === 'disc') { if (turns % 2) await tap('#discN'); else await p.waitForTimeout(5600); }
+        if (SUG && st.pend !== 'disc') { const y = await p.evaluate(t => t === 'boost' ? suggestBoost(G, G.cars[G.pend.car]) : suggestSlip(G, G.cars[G.pend.car]), st.pend); await tap(st.pend === 'boost' ? (y ? '#boostY' : '#boostN') : (y ? '#slipY' : '#slipN')); }
+        else if (st.pend === 'boost') await tap('#boostN'); else if (st.pend === 'slip') await tap('#slipY'); else if (st.pend === 'disc') { if (turns % 2) await tap('#discN'); else await p.waitForTimeout(5600); }
         continue;
       }
       if (++stuck > 900) { probs.push('stuck'); break; }
