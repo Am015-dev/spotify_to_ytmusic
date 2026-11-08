@@ -42,7 +42,7 @@ const STORY={
 
 STORY.coach={
  // id:[speaker,title,text]. Just-in-time: shown the first time the rule matters, one at a time, never blocking.
- goal:['brix','Prologue',()=>'Quill taped a ticking rig to the shop door. Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires together before the fuse dies. Play it your way.'],
+ goal:['brix','Prologue',()=>'We win when all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires are cut, before the fuse burns out. Quill rigged the shop door. Let\'s go.'],
  mine:['brix','Your wires','Rookie, the wires at the bottom are yours. Only you see the numbers, lowest on the left.'],
  crew:['brix','Your crew','Teal and Plum hold the rest. You see their backs, they never see yours. Trust them.'],
  fuse:['brix','The fuse','Three steps stand between us and Quill. A wrong cut burns one. A red wire ends it.'],
