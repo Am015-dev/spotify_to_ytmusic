@@ -79,6 +79,9 @@
     });
     G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
     G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; G.acts = Math.max(1, Math.min(3, opt.acts || 1)); G.act = 1;
+    // final act (act 4, optional): one more climb to the Ember Tyrant after act 3. startAct: a story chapter set in a later act
+    if (opt.final && G.acts === 3) G.acts = 4; if (opt.startAct > 1) { G.act = Math.min(4, opt.startAct | 0); G.acts = Math.max(G.acts, G.act); }
+    if (G.acts > 1 && !opt.boss) G.boss = D.ACTBOSS[G.act]; G.lastStand = opt.lastStand === 0 ? 0 : 1;
     G.rd = {}; G.rr = {}; G.hs.forEach(function (h) { G.rd[h.k] = rewardPool(h.k, 0); G.rr[h.k] = rewardPool(h.k, 1); }); if (opt.relic && G.relics.indexOf(opt.relic) < 0) G.relics.push(opt.relic);
     genMap(); resetCombat();
     return G;
@@ -130,7 +133,7 @@
     if ((k === 'vuln' || k === 'weak') && o.st[k] > CAP.deb) o.st[k] = CAP.deb;
     if (k === 'str' && o.k && o.st[k] > CAP.str) o.st[k] = CAP.str;
   }
-  function gainBlk(h, n) { h.blk = Math.min(CAP.blk, h.blk + n); }
+  function gainBlk(h, n) { if (!(n > 0)) return; h.blk = Math.min(CAP.blk, h.blk + n); }   // negative Focus can push an orb below 0: never take block away
   function gainEn(h, n) { h.en = Math.max(h.en, Math.min(CAP.en, h.en + n)); }
   function poisonTotal() { var t = 0; G.b.en.forEach(function (e) { if (!e.dead) t += e.st.poison || 0; }); return t; }
   function addPoison(e, n) { if (!e || e.dead) return 0; n = Math.max(0, Math.min(n, CAP.poison - poisonTotal())); if (n) e.st.poison = (e.st.poison || 0) + n; return n; }
@@ -158,6 +161,8 @@
   }
   function killHero(h) {
     if (has('phoenix-ash') && !G.revived) { G.revived = 1; h.hp = Math.max(1, Math.floor(h.mhp * 0.3)); fx('revive', 'h' + G.hs.indexOf(h), h.hp); return; }
+    // last stand (tabletop optional boss rule, shelf version): in a boss fight with 2 heroes the FIRST hero to fall stays at 1 HP with Weak 3
+    if (G.lastStand && G.b && G.b.kind === 'b' && G.hs.length > 1 && !G.b.ls) { G.b.ls = 1; h.hp = 1; h.st.weak = CAP.deb; fx('laststand', 'h' + G.hs.indexOf(h), 1); return; }
     // tabletop: if ANY hero reaches 0 HP the party loses at once
     h.dead = 1; fx('dead', 'h' + G.hs.indexOf(h), 0);
     G.killer = G.lastHit || 'self'; G.killIn = G.b ? G.b.kind : ''; G.scr = 'over'; G.won = 0; G.b = null; ATK = null;
@@ -256,7 +261,7 @@
     var tg = e.row; if (!G.hs[tg] || G.hs[tg].dead) tg = G.hs.indexOf(aliveHs()[0]); e.intent.tg = tg;
   }
   function startBattle(kind) {
-    var pool = kind === 'e' ? D.ENC.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? D.ENC.weak : D.ENC.strong);
+    var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)];
     resetCombat();
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
@@ -466,8 +471,7 @@
     G.rw = null; G.shop = null; G.evn = null; G.rest = null;
     if (G.map[G.at].t === 'b') {
       if ((G.act || 1) < (G.acts || 1)) {   // next act: full heal, new map and boss, tougher foes
-        G.act++; G.hs.forEach(function (h) { h.hp = h.mhp; }); var ob = G.boss, bl = D.ENC.boss.map(function (x) { return x[0]; }).filter(function (b) { return b !== ob; });
-        G.boss = bl[ri(bl.length)]; genMap(); G.at = -1; G.floor = 0; G.scr = 'map'; return;
+        G.act++; G.hs.forEach(function (h) { h.hp = h.mhp; }); G.boss = D.ACTBOSS[G.act]; G.fights = 0; genMap(); G.at = -1; G.floor = 0; G.scr = 'map'; return;
       }
       G.scr = 'over'; G.won = 1; return;
     }
@@ -561,12 +565,29 @@
   function load() { try { var s = localStorage.getItem('emberclimb.save'); if (!s) return null; G = JSON.parse(s); return G; } catch (e) { return null; } }
   function clear() { try { localStorage.removeItem('emberclimb.save'); } catch (e) { } }
   function begin() { G.fights = 0; }
+  // W420 previewPlay: dry-run one card play on a deep copy of the state; returns per-enemy damage/kill and block/heal per hero. Restores everything.
+  function previewPlay(hi, ci, ti) {
+    if (!G || !G.b) return null; var h0 = G.hs[hi], c0 = h0 && h0.hand[ci]; if (!c0) return null;
+    var keep = G, kA = ATK, kS = SPK_CARD, out = null;
+    try {
+      G = JSON.parse(JSON.stringify(keep)); G.q = []; var en = G.b.en, b0 = en.map(function (e) { return { hp: e.hp, blk: e.blk, dead: e.dead }; }), hp0 = G.hs.map(function (x) { return x.hp; });
+      var e0 = eff(c0); play(hi, ci, e0.tgt ? ti : null);
+      var blk = G.hs.map(function () { return 0; }), heal = G.hs.map(function () { return 0; });
+      var fd = en.map(function () { return 0; }); G.q.forEach(function (f) { if (f.k === 'dmg' && f.w && f.w[0] === 'e' && f.x !== 'poison') fd[+f.w.slice(1)] += f.n; });
+      G.q.forEach(function (f) { if (f.w && f.w[0] === 'h') { var k = +f.w.slice(1); if (f.k === 'blk') blk[k] += f.n; else if (f.k === 'heal') heal[k] += f.n; } });
+      out = { en: en.map(function (e, i) { var b = b0[i]; var dd = Math.max(0, (b.hp + b.blk) - (Math.max(0, e.hp) + e.blk)), kl = !b.dead && !!e.dead; return { dmg: kl ? Math.max(dd, fd[i]) : dd, hpLoss: Math.max(0, b.hp - Math.max(0, e.hp)), stripped: Math.max(0, b.blk - e.blk), kill: kl, over: kl ? Math.max(0, fd[i] - b.hp - b.blk) : 0 }; }),
+        blk: blk, heal: heal, selfHp: G.hs.map(function (x, i) { return hp0[i] - x.hp; }), won: G.scr === 'reward', lost: G.scr === 'over', rnd: JSON.stringify(e0.ops).indexOf('"roll"') >= 0 };
+    } catch (x) { out = null; }
+    G = keep; ATK = kA; SPK_CARD = kS; return out;
+  }
+  // end W420 previewPlay
   EC.E = {
     lock: function (a) { LOCK = a || []; },
     newGame: function (o) { var g = newGame(o); g.fights = 0; return g; }, G: function () { return G; }, set: function (g) { G = g; },
     validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,
-    eff: eff, lines: lines, previewHit: previewHit, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
+    eff: eff, lines: lines, previewHit: previewHit, previewPlay: previewPlay, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
     debug: {
+      boss: function () { enterNode(G.map.length - 1); }, hurt: function (hi, n) { hurtHero(G.hs[hi], n, 1); },
       win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); winBattle(); } },
       shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
       rest: function () { G.at = G.map.filter(function (n) { return n.f === 9; })[0].id; G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },

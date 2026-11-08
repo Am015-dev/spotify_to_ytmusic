@@ -1,0 +1,6 @@
+stem	source_file	licence	source_url	flag
+story-map	KayKit City Builder Bits (rendered) on a procedural ground	CC0 1.0	https://kaylousberg.itch.io/city-builder-bits	real (switch off in game: GXSK map flag not set)
+ui-star-on	own drawing (PIL, supersampled)	CC0-equivalent (own work)	-	real (switch off in game: GXSK stars/banner flag not set)
+ui-star-off	own drawing (PIL, supersampled)	CC0-equivalent (own work)	-	real (switch off in game: GXSK stars/banner flag not set)
+ui-act-banner-c	own drawing (PIL, supersampled)	CC0-equivalent (own work)	-	real (switch off in game: GXSK stars/banner flag not set)
+(every other stem in games/crown-city-smash/media/)	owner-delivered painted art, kept	-	-	FALLBACK

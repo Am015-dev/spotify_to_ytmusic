@@ -457,6 +457,14 @@
    "mut": 0
   },
   {
+   "id": "bossintro",
+   "name": "Boss intro",
+   "ask": "Does the boss intro show its name and a Skip button?",
+   "sizes": "all",
+   "group": "Bosses",
+   "mut": 0
+  },
+  {
    "id": "ec-result",
    "name": "Result screen",
    "ask": "Can you start a new climb?",
@@ -1205,6 +1213,88 @@
    "sizes": "all",
    "group": "UI",
    "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "stitchwise": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sw-board",
+   "name": "Quilt, offers and time track",
+   "ask": "Can you see your quilt and 3 patches?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "sw-place",
+   "name": "Pick a patch and sew it on",
+   "ask": "Tap a patch, then Sew it on",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 2
+  },
+  {
+   "id": "sw-advance",
+   "name": "Advance the time token",
+   "ask": "Tap Advance. Do you gain buttons?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 2
+  },
+  {
+   "id": "sw-income",
+   "name": "Button income moment",
+   "ask": "Pass a button spot. Do coins fly?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "sw-leather",
+   "name": "Free leather patch",
+   "ask": "Tap an empty square for the leather patch",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sw-zoom",
+   "name": "Patch shown large",
+   "ask": "Tap a patch twice. Can you read it?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "sw-result",
+   "name": "Result screen",
+   "ask": "Does the result add up?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "sw-torn",
+   "name": "Torn squares twist",
+   "ask": "See 3 torn squares in your quilt?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
   },
   {
    "id": "story-scene",

@@ -75,3 +75,11 @@ readable. Gate re-run with the kit installed: same results as below.
 - Score chips under the tracker: you vs rival, ★ leads, points by source (regions, goods, animals, ...). Region pops say why: "+11 region filled (size 1: 1 + spring bonus 10)".
 - Coached game: 1 season of 3 rounds (engine option `rounds`); Odo explains the preview badges and the turn-over card the first time they show.
 - Shots: playable-shots/v3-{phone,pc}-{1yourturn,2preview,3market,4turnover,5rival,6roundend,7result}.webp (`node shoot-v3.js`).
+
+## Three modes (Addendum 7) + polish (W421b)
+- PLAY (title primary "▶ Play"): clean screen. A one-card Goal before turn 1 (win condition + 3 ways to score). Then only the board, the dock (dice, storage, goods, actions), the turn tracker and one score line.
+  No coach bubbles, no ratings, no start toasts. Pops are short ("+11 region filled"); every why is behind a tap (score chip -> score drawer with the latest reasons).
+- HINTS: star toggle in the top bar, OFF by default and remembered (`vob_hints`). When on: +N/2-4 previews on spaces, the ★ best spot and ★ Best market badge, points by source under the score line,
+  the good/okay/poor turn rating, the "What should I do?" bulb and the gx-help coach.
+- LEARN TO PLAY (title "Learn to play"): the coached 3-round game, the only mode with Odo's bubbles; it always shows the hint layer.
+- Polish: the rival's dice are shown in the dock during its turn ("Azure's dice", greyed); empty spaces carry a faint printed texture taken from the tile art; market worker-cost badges no longer cover tile names.

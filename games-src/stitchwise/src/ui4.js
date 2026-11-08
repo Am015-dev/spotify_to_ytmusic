@@ -36,7 +36,7 @@ function coachSay(key, vars, now) {
 }
 function coachNext() { var C = UI.coach; if (!C || !C.q.length) return; var n = C.q.shift(); C.seen[n.k] = 1; C.line = n.t; C.ch = n.ch; C.fresh = 2; C.shown.push(n.k); GXCOACH.explained.push(n.k); coachRender(); }
 function coachRender() {
-  var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : UI.wide ? UI.flavor || '' : '';
+  var el = $('#guide'); if (!el) return; var C = UI.coach, txt = C && C.line ? C.line : '';
   var sk = $('#skipmap'); if (UI.coach && UI.prologue && G && !G.over) { if (!sk) { sk = h('button#skipmap.btn.alt.sm', { type: 'button', 'data-a': 'skipmap' }, 'Skip to map'); var db = $('#dockbody'); if (db) db.appendChild(sk); } } else if (sk) sk.remove();
   el.hidden = !txt || !G || G.over; if (el.hidden) { el.dataset.k = ''; return; } var key = txt + '|' + (C ? C.ch : ''); if (el.dataset.k === key) return; el.dataset.k = key; el.innerHTML = '';
   var cast = ((window.CAMPAIGN || {}).cast || {}).wren || {}, chn = C ? (coachData().chapters || {})[C.ch] : '';
@@ -107,6 +107,7 @@ function campInit() {
 }
 // ---------- help bulb: suggests the computer's best move for you, with the why
 function hlpPhase() { if (!G || G.over || UI.busy || !UI.started || !isHuman(swWho(G)) || (UI.camp ? false : false)) return null; return G.pend ? 'leather' : UI.sel >= 0 ? 'place' : 'choose'; }
+function whatDo() { var sg = hlpSuggest(); if (!sg) return; var t = sg.target && sg.target(); if (t) { t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); } var dt = $('#detail'); if (dt) dt.textContent = 'Try this: ' + sg.why; }
 function hlpSuggest() {
   if (!G || G.over || !isHuman(swWho(G)) || G.pend) return null; var m = aiMove(G, 'hard', function () { return .5; }), s = swWho(G);
   if (m.t === 'buy') { var p = PATCHES[swOffer(G)[m.k]]; return { target: function () { return $$('#offers .offer')[m.k]; }, why: p.name + ' fits well and is worth ' + p.n * 2 + ' points of squares.' }; }
@@ -120,7 +121,7 @@ function hlpInit() {
   GXH.init({ game: 'stitchwise', defaultOn: false, avoid: '.offer,#acts button,#quilt',
     steps: { choose: { target: function () { return $('#offers'); }, title: 'Choose a patch', text: 'Tap one of three patches to buy it, or Advance to earn buttons.' }, place: { target: function () { return $('#quilt'); }, title: 'Place it', text: 'Drag it on your quilt, rotate if needed, then Sew it on.' }, leather: { target: function () { return $('#quilt'); }, title: 'Free leather patch', text: 'Tap any empty square for your free 1 by 1 patch.' } },
     rules: [{ title: 'Buy or advance', text: 'Buy a patch with buttons, or advance your token to earn buttons.', pic: svgPatch('#c0527a') }, { title: 'Time decides turns', text: 'The token further back plays. Big patches take more time.', pic: svgPatch('#2a8a80') }, { title: 'Button spots', text: 'Passing a gold spot pays the buttons printed on your patches.', pic: svgPatch('#e0a82e') }, { title: 'Score', text: 'Buttons plus 7 bonus, minus 2 per empty square.', pic: svgPatch('#4a86b8') }] });
-  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: function () { return hlpPhase() || 'choose'; } });
+  var bb = $('#bulbbtn'); if (bb) { bb.removeAttribute('data-help'); bb.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); setHints(!UI.hints); }, true); } setHints(UI.hints);
 }
 // ---------- music: five slots, silent until files exist
 var MUS_SLOTS = [['tavern', 'Menu'], ['main', 'Game'], ['fight', 'Last stretch'], ['victory', 'Victory'], ['defeat', 'Defeat']];
