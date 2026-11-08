@@ -167,3 +167,13 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 
 /* kick order: board copy of the drawn card hidden until the door has opened */
 html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mons{visibility:hidden}
+/* Goal card (bf.js dkGoal) */
+#dkgoal{position:fixed;inset:0;z-index:140;display:grid;place-items:center;padding:16px;background:rgba(10,5,2,.62);animation:bfIn .2s ease-out}
+#dkgoal .dkg{max-width:340px;width:100%;padding:20px 22px 18px;border-radius:14px;color:#2a1a0e;box-shadow:0 18px 50px rgba(0,0,0,.55);text-align:left}
+#dkgoal .dkgk{margin:0 0 4px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#7a2f1c;font-weight:700}
+#dkgoal .dkgw{margin:0 0 12px;font-size:22px;line-height:1.25;font-weight:700}
+#dkgoal ul{margin:0 0 12px;padding-left:20px;font-size:16px;line-height:1.4}
+#dkgoal li{margin:4px 0}
+#dkgoal .dkgy{margin:0 0 14px;font-size:16px}
+#dkgoal .btn{width:100%;min-height:48px;font-size:17px;justify-content:center;text-align:center}
+#phchip,#docktitle{cursor:pointer}
