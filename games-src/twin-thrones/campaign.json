@@ -972,7 +972,7 @@
     "open": [
      {
       "who": "guide",
-      "text": "The first age: raw stone, rough roads, and a pyramid of cards between you and Pell."
+      "text": "The first age. A pyramid of cards sits between you and Pell."
      },
      {
       "who": "pell",
@@ -1042,7 +1042,7 @@
    },
    "pyramid": {
     "title": "Ione: the pyramid",
-    "say": "Age I begins. Glowing cards are free to take; cards under others must wait their turn.",
+    "say": "Age I begins. Glowing cards are free to take. Covered cards must wait.",
     "react": null
    },
    "take-free": {
@@ -1077,7 +1077,7 @@
    },
    "pawn": {
     "title": "Ione: the pawn",
-    "say": "Nine steps toward a capital wins at once. Marked spaces loot your rival's coins.",
+    "say": "Nine steps toward a capital ends it at once. Marked spaces loot your rival's coins.",
     "react": null
    },
    "take-buy": {
@@ -1177,12 +1177,12 @@
    },
    "scoring": {
     "title": "Ione: the count",
-    "say": "Civic, science, trade, guilds, wonders, tokens, coins and conflict: every point is counted.",
+    "say": "Every point is counted now. Cards, wonders, science, coins and war.",
     "react": null
    },
    "verdict": {
     "title": "Ione: the verdict",
-    "say": "Most points wins. A tie goes to the most civic (blue) points.",
+    "say": "Most points takes the crown. A tie goes to the most civic (blue) points.",
     "react": null
    }
   },
@@ -1198,7 +1198,7 @@
   "intro": [
    {
     "who": "guide",
-    "text": "You win with the most points after 3 ages. Or win early by war or science."
+    "text": "The most points after 3 ages takes the crown. War or science end it early."
    },
    {
     "who": "guide",
@@ -1219,32 +1219,32 @@
   },
   "coach": {
    "draft": "Wonders give points and a power. You and Pell take four each, turn by turn.",
-   "pyramid": "Age I. Glowing cards are free to take. Tap one to see it big, then build, sell or raise a wonder. Cards are small: the big card is your reading view.",
+   "pyramid": "Age I. Glowing cards are free to take. Tap one to see it big. Then build it, sell it or raise a wonder.",
    "tension": "Pell took a card you uncovered. Before you take a card, check what it frees for him.",
    "free": "A free card costs nothing. Production cards give you that resource every turn.",
    "coin": "Yellow cards pay coins at once, and make selling better later.",
-   "paid": "You paid coins for that. Missing resources are bought for 2 coins plus what Pell produces of them.",
-   "shield": "A shield pushes the conflict pawn toward Pell. Nine steps wins the game on the spot.",
+   "paid": "You paid coins for that. Missing resources cost 2 coins, plus what Pell makes.",
+   "shield": "A shield pushes the conflict pawn toward Pell. Nine steps ends the game on the spot.",
    "loot": "The pawn passed a marked space: coins are looted from the loser. Reach step 9 and the duel ends.",
    "chain-mark": "That card has a chain mark. Later cards with the same mark are free for you.",
    "chain": "Built free by chain! Chains are the cheapest way to grow.",
-   "sci": "A science symbol. Two of the same earn a progress token; six different win the game at once.",
+   "sci": "A science symbol. Two the same earn a bonus token. Six different win at once.",
    "pair": "A pair of one symbol! Pick a progress token: a bonus you keep all game.",
    "sell": "Sold for 2 coins, plus 1 for each yellow card you own. Sell what you cannot use.",
    "sell-poor": "You sold a card you could build for free. Selling is best for cards you cannot use.",
    "wonder": "A wonder rises. Its card goes underneath, and you get its points and power.",
-   "age": "A new age. The player behind on the conflict track chooses who starts; at a tie, whoever took the last card.",
+   "age": "A new age. Whoever is behind on the war track picks who starts.",
    "guild": "A guild scores at the very end from the richer city. Big points for the right city."
   },
   "later": {
-   "trade": "Yellow trade posts make buying a resource cost only 1 coin instead of 2 plus.",
-   "cap": "Only seven wonders can ever be built in total; the last one is discarded.",
-   "powers": "Wonders can also play again, steal coins, discard a rival card or revive a thrown-away one.",
-   "tokens": "Every progress token has its own effect: tap one in the row to read it.",
-   "tie": "A tie on points goes to the player with the most civic (blue) points.",
+   "trade": "Yellow trade cards make a resource cost just 1 coin.",
+   "cap": "Only seven wonders can be built in total. The last one is lost.",
+   "powers": "Some wonders give another turn, steal coins, or wreck a rival card.",
+   "tokens": "Every bonus token has its own power. Tap one to read it.",
+   "tie": "A tie on points goes to whoever has more civic points.",
    "science": "Six different science symbols win the game at once.",
-   "military": "Nine steps on the conflict track win at once; the marked spaces loot coins.",
-   "draftorder": "The wonder draft runs 1-2-2-1 then 2-1-1-2 so nobody gets a long head start."
+   "military": "Nine steps on the war track win at once. Marked spaces steal coins.",
+   "draftorder": "The wonder draft goes 1-2-2-1, then 2-1-1-2. Nobody gets a long head start."
   },
   "walk": {
    "blue": "Civic: the points printed on your blue cards.",
@@ -1255,7 +1255,7 @@
    "token": "Tokens: progress tokens score their own points.",
    "coins": "Coins: 1 point for every 3 coins you kept.",
    "mil": "Conflict: points for where the pawn ended.",
-   "total": "Total: the most points wins; a tie goes to the most civic points."
+   "total": "Total: the most points takes the crown. A tie goes to more civic points."
   }
  },
  "quick": {

@@ -44,11 +44,11 @@ var TT_TEST = {};
     var who = function (q) { return U.mode === 'cpu' && q === 0 ? 'You' : name(q); }, verb = function (q, a, b) { return (U.mode === 'cpu' && q === 0) ? a : b; };
     evs.forEach(function (ev) {
       var k = kindOf(ev.p != null ? ev.p : p), tg = who(ev.p != null ? ev.p : p);
-      if (ev.t === 'pick') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.w].nm + ': ' + BY[ev.w].text + '.' });
+      if (ev.t === 'pick') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.w].nm, BY[ev.w].text) });
       else if (ev.t === 'build') { var c = BY[ev.id]; it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' build ', ' builds ') + c.nm + (ev.paid ? ', paying ' + plural(ev.paid, 'coin') + '.' : ev.chain ? ' free (chain symbol).' : ' free.') + ' ' + cap(describe(c)) + '.' }); }
       else if (ev.t === 'discard') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' sell ', ' sells ') + BY[ev.id].nm + ' for +' + plural(ev.n, 'coin') + '.' });
-      else if (ev.t === 'wonder') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' raise ', ' raises ') + BY[ev.w].nm + '! ' + BY[ev.w].text + '.' });
-      else if (ev.t === 'token') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.id].nm + ': ' + BY[ev.id].text + '.' });
+      else if (ev.t === 'wonder') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' raise ', ' raises ') + BY[ev.w].nm, BY[ev.w].text) });
+      else if (ev.t === 'token') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.id].nm, BY[ev.id].text) });
       else if (ev.t === 'destroy') it.push({ tag: tg, kind: k, text: BY[ev.id].nm + ' is thrown away from ' + who(ev.p) + (ev.p === 0 && U.mode === 'cpu' ? 'r city.' : "'s city.") });
       else if (ev.t === 'revive') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' rebuild ', ' rebuilds ') + BY[ev.id].nm + ' for free.' });
       else if (ev.t === 'first') it.push({ tag: tg, kind: kindOf(ev.who), text: who(ev.who) + verb(ev.who, ' will start ', ' will start ') + 'the new age.' });
@@ -66,11 +66,13 @@ var TT_TEST = {};
         if (fresh.length) it.push({ tag: 'Pyramid', kind: 'info', text: 'Now free to take: ' + fresh.slice(0, 3).map(function (i) { return BY[G.pyr[i].id].nm; }).join(', ') + (fresh.length > 3 ? '...' : '') + '.', fn: function () { fresh.forEach(function (i) { var e = $('c' + i); if (e) { e.classList.add('newfree'); setTimeout(function () { e.classList.remove('newfree'); }, 1400); } }); } });
       }
     }
-    evs.forEach(function (ev) { if (ev.t === 'age') it.push({ tag: 'Age ' + AGE[ev.age], kind: 'info', text: 'Age ' + AGE[ev.age] + ' begins: a fresh pyramid.', fn: function () { banner('Age ' + AGE[ev.age], 'info'); } }); });
+    evs.forEach(function (ev) { if (ev.t === 'age') it.push({ tag: 'Age ' + AGE[ev.age], kind: 'info', text: 'Age ' + AGE[ev.age] + ' begins: a fresh pyramid.', }); });
     if (U.tut && window.TT_TUTOR && TT_TUTOR.takeReaction) { var rx = TT_TUTOR.takeReaction(); if (rx) it.push({ tag: rx.tag, kind: rx.tag === 'Pell' ? 'rival' : 'info', text: rx.text, extra: 500 }); }
     if (!it.length) it.push({ tag: who(p), kind: kindOf(p), text: '...' });
     return it;
   }
+  function wtx(t) { return String(t).replace(/play again/g, 'take another turn'); }
+  function fit(a, b) { b = wtx(b); var t = a + ': ' + b; return t.split(/\s+/).length <= 12 ? t + '.' : a + '.'; }
   function cap(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
   // the rival's intention, said before it acts (the card is lifted while this shows)
   function intentLine(G, p, m) {
@@ -169,7 +171,7 @@ var TT_TEST = {};
 
   // ---------- board skeleton (built once per game so the pawn can slide)
   function buildBoard() {
-    var bd = $('bd'); bd.innerHTML = '<div id="instr" data-k="you" role="status" aria-live="polite"><span class="tg"></span><span class="tx"></span><span class="trk" id="trk"></span></div><button id="goal" data-goal="1"><b>Goal:</b> most points, or win early by war or science</button><div class="strip" id="s1"></div><div id="mil"></div><div class="tokrow" id="tokrow"></div><div id="pyr"></div><div class="strip" id="s0"></div>';
+    var bd = $('bd'); bd.innerHTML = '<div id="instr" data-k="you" aria-live="polite"><span class="tg"></span><span class="tx"></span><span class="trk" id="trk"></span></div><button id="goal" data-goal="1"><b>Goal:</b> most points, or win early by war or science</button><div class="strip" id="s1"></div><div id="mil"></div><div class="tokrow" id="tokrow"></div><div id="pyr"></div><div class="strip" id="s0"></div>';
     var m = $('mil'), h = '<div class="cells">';
     for (var i = -9; i <= 9; i++) { var a = Math.abs(i); h += '<div class="c ' + (i === 0 ? 'mid' : a <= 2 ? 'z1' : a <= 5 ? 'z2' : a <= 8 ? 'z3' : 'z4') + '"></div>'; }
     h += '</div>'; var pos = function (v) { return (4 + 92 * (v + 9.5) / 19); };
@@ -278,7 +280,7 @@ var TT_TEST = {};
     var d = document.createElement('div'); d.id = 'draft';
     G.draft.avail.forEach(function (id) {
       var w = BY[id], b = document.createElement('button'); b.className = 'wcard' + (human ? ' go' : ''); b.dataset.pick = id; if (!human) b.disabled = true;
-      b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(w.text) + '</small><div class="costs">' + costHtml(w.cost, true) + '</div>'; d.appendChild(b);
+      b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(wtx(w.text)) + '</small><div class="costs">' + costHtml(w.cost, true) + '</div>'; d.appendChild(b);
     });
     P.appendChild(d); fillArt(d);
   }
@@ -306,11 +308,11 @@ var TT_TEST = {};
       msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
       acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
-      msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder for your city. A wonder gives points and a power. You get 4.');
+      msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder. You get 4.');
     } else if (U.sel != null) {
       var cell = G.pyr[U.sel], c = BY[cell.id], bi = E.buildInfo(G, p, c), has = function (t, w) { return M.some(function (m) { return m.t === t && m.i === cell.i && (w == null || m.w === w); }); };
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
-      instr(p, 'Choose: Build it, Sell it for coins, or use it for a Wonder.');
+      instr(p, 'Build it, sell it, or use it for a wonder.');
     } else {
       msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, U.hintsOn ? 'Tap a glowing card. The star is best.' : 'Tap or drag a glowing card.');
     }
@@ -409,11 +411,10 @@ var TT_TEST = {};
   function after() {
     var G = U.G; if (G.over) return;
     var p = E.sideToAct(G); clearTimeout(U.aiTimer);
-    if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; if (U.hintsOn || U.tut) banner(whoTag(p), isAI(p) ? 'rival' : 'you'); }
+    if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; if (U.hintsOn) banner(whoTag(p), isAI(p) ? 'rival' : 'you'); }
     if (G.phase === 'play' && G.pend.length && U.lastSide !== p) U.lastSide = p;
     if (isAI(p)) {
       U.busy = true; render0(); var seq = U.seq;
-      setInstr(whoTag(p), 'rival', name(p) + ' is thinking...');
       U.aiTimer = setTimeout(function () {
         if (seq !== U.seq || U.G !== G) return;
         var rng = function () { return E.rnd(G); }, lv = U.lvl, m = AI.pick(G, lv, rng);
@@ -438,10 +439,10 @@ var TT_TEST = {};
     try { if (window.GXC && window.CAMPAIGN) { var p = GXC.progress(), n = window.CAMPAIGN.chapters.filter(function (c) { return p.ch[c.id] && p.ch[c.id].beaten; }).length; prog = n ? n + ' of ' + window.CAMPAIGN.chapters.length + ' chapters done' : 'The Twin Crowns: 10 chapters'; } } catch (e) { }
     s.innerHTML = '<h1>Twin Thrones</h1><p>Two rival cities, one pyramid of cards. Out-build, out-think, or out-march your rival.</p>' +
       '<div class="seg" id="lvls">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === lv ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === lv) + '">' + l + '</button>'; }).join('') + '</div>' +
-      '<button class="btn go big" data-start="1">Quick game</button>' +
+      '<button class="btn go big" data-start="1" data-a="play">Quick game</button>' +
       '<div class="tgrid"><button class="btn alt sm" data-story="1"><b>Story</b><span>' + esc(prog) + '</span></button>' + tutBtn() + '<button class="btn alt sm" data-start="2">Two players</button><button class="btn alt sm" data-start="0">Watch</button><button class="btn alt sm" data-gx="rulesd">How to play</button><button class="btn alt sm snd" data-snd="1" aria-label="Sound">' + sndLabel() + '</button></div>';
     U.tut = false; SND.sync();
-    var tb = s.querySelector('[data-gxt-open]'); if (tb) tb.setAttribute('data-a', 'start');   // the coached first game is the title's "start" for tutorial bots
+    var tb = s.querySelector('[data-gxt-open]'); if (tb) tb.setAttribute('data-a', 'learn');   // Learn to play, for tutorial bots (feel-audit)
   }
   function sndLabel() { return 'Sound: ' + (SND.isOn() ? 'on' : 'off'); }
   function firstTime() { try { return !localStorage.getItem('tt_seen') && !GXT.isDone('twin-thrones'); } catch (e) { return false; } }
@@ -453,7 +454,7 @@ var TT_TEST = {};
     var fl = camp ? 'Goal: ' + camp.goal.text + (tw ? ' ' + tw.text : '') : FLAVOUR[Math.floor(Math.random() * FLAVOUR.length)];
     if (U.tut) { after(); return; }
     if (!camp && delay() >= 300) { U.busy = true; peek(goalHtml() + '<button class="btn" data-goalgo="1">Start the duel</button>', true); return; }
-    banner(camp ? camp.title : 'The duel begins', 'info', camp ? 4000 : 1100); U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
+    U.busy = true; narrate([{ tag: 'The duel', kind: 'info', text: fl, extra: camp ? 1500 : 500 }], function () { U.busy = false; after(); });
   }
   // the climax: totals count up row by row (tap anywhere on the table to jump to the end)
   function countUp(r) {
@@ -521,24 +522,25 @@ var TT_TEST = {};
     b.innerHTML = '<div class="mrow"><button class="btn" data-menu="rules">Rules</button>' + tutBtn() + '<button class="btn alt" data-menu="cards">All cards</button><button class="btn alt" data-menu="restart">Restart game</button><button class="btn alt" data-snd="1">' + sndLabel() + '</button>' + (SND.hasMusic() ? '<button class="btn alt" data-menu="music">Music</button>' : '') + '<button class="btn alt" data-menu="title">Back to title</button></div>';
   }
   function rulesRender() {
-    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>How a turn works</h3><ol class="turn5"><li>Look for the glowing cards. Only those are free to take.</li><li>Tap one to see it big, with its cost.</li><li>Choose <b>Build</b> (pay its cost), <b>Sell</b> (take coins) or <b>Wonder</b> (tuck it under a wonder).</li><li>Watch what happens: the card moves, points and coins pop up, the pawn may march.</li><li>Then your rival does the same, one step at a time. Tap the board to speed it up.</li></ol><h3>The goal</h3><p>Win by marching the conflict pawn to the rival capital, by collecting six different science symbols, or by having the most points after Age III.</p><h3>Your turn</h3><p>Take one uncovered card from the pyramid. <b>Build</b> it by paying its cost (missing resources are bought from the bank at 2 coins plus what your rival produces), <b>sell</b> it for 2 coins plus 1 per trade card you own, or <b>use it to raise a wonder</b>. Face-down cards flip when nothing covers them.</p><h3>Chains</h3><p>A card with an infinity mark is free when you own the matching symbol.</p><h3>Conflict</h3><p>Shields push the pawn toward your rival. Passing the marked spaces loots coins from them.</p><h3>Science</h3><p>A matching pair of symbols lets you pick a progress token.</p><h3>Wonders</h3><p>Four each, but only seven can ever be built in total.</p>';
+    $('rulesbox').innerHTML = '<div class="mrow">' + tutBtn() + '</div><h3>The goal</h3><p>Have the most points after Age III. War or 6 science symbols win at once.</p><h3>A turn</h3><ol class="turn5"><li>Take one glowing card. Covered cards must wait.</li><li>Tap it, or drag it to Build, Sell or a wonder.</li><li><b>Build</b>: pay its cost. Missing resources cost coins.</li><li><b>Sell</b>: get 2 coins, plus 1 per yellow card.</li><li><b>Wonder</b>: tuck the card under one of your wonders.</li></ol><h3>Chains</h3><p>A chain mark makes a later card free.</p><h3>War</h3><p>Shields push the pawn toward your rival. Marked spaces steal coins.</p><h3>Science</h3><p>Two matching symbols earn a bonus token.</p><h3>Wonders</h3><p>Four each. Only seven can be built in total.</p>';
   }
+
   function showCity(p) {
     var G = U.G, b = $('cityd').querySelector('.gx-drawer-body'), h = '<h3>' + esc(name(p)) + '</h3><div class="ref" id="cityref"></div>'; b.innerHTML = h; var c = $('cityref');
     G.players[p].cards.concat(G.players[p].wonders.filter(function (w) { return w.card; }).map(function (w) { return w.id; })).forEach(function (id) { var w = document.createElement('div'); w.className = 'rc'; w.appendChild(cardEl(BY[id], 86)); c.appendChild(w); });
     if (!c.children.length) c.textContent = 'No cards yet.'; GX.show('cityd');
   }
 
-  function goalHtml() { return '<h3>How to win</h3><p class="gl">Have the most points after 3 ages.</p><ul class="gb"><li>Cards and wonders give points.</li><li>Shields push the pawn. Reach their city: you win.</li><li>Collect 6 science symbols: you win.</li></ul>'; }
+  function goalHtml() { return '<h3>How to win</h3><p class="gl">Have the most points after 3 ages.</p><ul class="gb"><li>Cards and wonders give points.</li><li>Shields push the pawn. Reach their city to end it early.</li><li>6 different science symbols also end it early.</li></ul>'; }
   function peek(html, noX) { var b = $('peek'); if (!b) { b = document.createElement('div'); b.id = 'peek'; document.body.appendChild(b); } b.innerHTML = '<div class="pk" role="dialog" aria-modal="true">' + html + (noX ? '' : '<button class="btn pkx" data-peekx="1">Close</button>') + '</div>'; b.hidden = false; fillArt(b); }
   function peekScore() {
     var G = U.G, a = sbreak(G, 0), b = sbreak(G, 1), rows = [['Civic and trade cards, guilds', 'civ'], ['Science cards and tokens', 'sci'], ['War: pawn on their side', 'war'], ['Wonders', 'won'], ['Coins (1 point per 3)', 'coin']];
     var h = '<h3>How the points add up</h3><table class="pkt"><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
     rows.forEach(function (r) { h += '<tr><td>' + r[0] + '</td><td' + (a[r[1]] > b[r[1]] ? ' class="lead"' : '') + '>' + a[r[1]] + '</td><td' + (b[r[1]] > a[r[1]] ? ' class="lead"' : '') + '>' + b[r[1]] + '</td></tr>'; });
-    peek(h + '<tr class="tt"><td>Total</td><td>' + a.tot + '</td><td>' + b.tot + '</td></tr></table><p>Most points after Age III wins. A war win (pawn reaches a capital) or 6 different science symbols ends the game at once.</p>');
+    peek(h + '<tr class="tt"><td>Total</td><td>' + a.tot + '</td><td>' + b.tot + '</td></tr></table><p>Most points after Age III takes the crown. War or 6 science symbols end it early.</p>');
   }
   function peekItem(id, kind) {
-    var d = BY[id], G = U.G, h = '<div class="pkh">' + slot(d.stem, 'pka ' + kind) + '<div><h3>' + esc(d.nm) + '</h3><span class="zt">' + (kind === 'w' ? 'Wonder' : 'Science bonus') + '</span></div></div><p>' + esc(d.text) + '</p>';
+    var d = BY[id], G = U.G, h = '<div class="pkh">' + slot(d.stem, 'pka ' + kind) + '<div><h3>' + esc(d.nm) + '</h3><span class="zt">' + (kind === 'w' ? 'Wonder' : 'Science bonus') + '</span></div></div><p>' + esc(wtx(d.text)) + '</p>';
     if (kind === 'w') { var own = G.players[0].wonders.some(function (w) { return w.id === id; }) ? 0 : 1, w = G.players[own].wonders.filter(function (x) { return x.id === id; })[0]; h += '<p class="zc">' + (w && w.card ? 'Built.' : G.built >= 7 ? 'Can no longer be built (7 wonders are up).' : 'Cost: ' + esc(costWords(d.cost)) + '. Build it by tucking any pyramid card under it.') + '</p>'; }
     else h += '<p class="zc">Get one by owning 2 matching science symbols.</p>';
     peek(h);

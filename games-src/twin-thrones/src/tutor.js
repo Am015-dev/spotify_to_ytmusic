@@ -110,7 +110,7 @@
     clearInterval(T.iv); T.iv = setInterval(function () { if (my !== RUN) return; pump(); }, 600);
     var first = PRO.first || ['Ione', 'Claim the glowing wonder.'];
     GXT.start({ game: GAME, story: false, endTitle: (PRO.playon && PRO.playon.title) || 'Your move, always', endText: (PRO.playon && PRO.playon.text) || '', endButtons: [{ id: 'go', label: 'Play on' }],
-      steps: [{ id: 'first', title: first[0], say: first[1], onEnter: function () { T.seen.first = 1; }, target: function () { return document.querySelector('.wcard.go'); },
+      steps: [{ id: 'goal', title: 'How to win', say: 'Most points after 3 ages takes the crown. War or science can end it early.', target: function () { return document.getElementById('instr'); }, wait: null, ready: function () { return !!U.G && !!document.getElementById('instr'); } }, { id: 'first', title: first[0], say: first[1], onEnter: function () { T.seen.first = 1; }, target: function () { return document.querySelector('.wcard.go'); },
         wait: { type: 'tap', match: function (a) { return a.kind === 'pick'; } }, ready: function () { return !!U.G && !U.busy && !U.narr && E.sideToAct(U.G) === 0 && U.G.phase === 'draft' && !!document.querySelector('.wcard.go'); } }],
       setup: function () { },
       onDone: function () { },
@@ -119,7 +119,7 @@
   function start(o) {
     T.then = (o && o.then) || null; var my = ++RUN; U.lvl = 'easy';
     $('res').hidden = true; $('start').hidden = true;
-    scene(PRO.intro, my).then(function (ok) { if (ok) begin(); });
+    begin();
   }
   function coverage() { return { all: CORE.concat(Object.keys(LATER)).concat(['first']), seen: Object.keys(T.seen), later: T.laterShown.slice() }; }
   Object.defineProperty(window, 'GXCOACH', { configurable: true, get: function () { return { running: !!T.active, explained: Object.keys(T.seen).filter(function (k) { return !/^ch\d/.test(k); }), done: !!T.finished }; } });
