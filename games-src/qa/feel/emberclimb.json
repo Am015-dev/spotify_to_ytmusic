@@ -1,240 +1,14 @@
 {
  "slug": "emberclimb",
- "when": "2026-11-08T03:28Z",
+ "when": "2026-11-08T03:35Z",
  "secs": 120,
- "totalSecs": 291,
+ "totalSecs": 288,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
-   "status": "FAIL",
-   "count": 25,
-   "detail": [
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "🔥 Warden Ashgrove Weak: each hit deals 3 less.",
-     "words": 9,
-     "shownMs": 250,
-     "neededMs": 4900,
-     "cls": "ec-say"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2250,
-     "texts": [
-      "🔥 Warden Ashgrove It is Vulnerable now: your next",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
-     "texts": [
-      "🔥 Warden Ashgrove It is Vulnerable now: your next",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
-     "texts": [
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1740,
-     "texts": [
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Use in a fight",
-      "🔥 Warden Ashgrove An attack is coming. Block card"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
-     "texts": [
-      "🔥 Warden Ashgrove An attack is coming. Block card",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1750,
-     "texts": [
-      "🔥 Warden Ashgrove An attack is coming. Block card",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1000,
-     "texts": [
-      "🔥 Warden Ashgrove An attack is coming. Block card",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "🔥 Warden Ashgrove An attack is coming. Block card",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2250,
-     "texts": [
-      "Use in a fight",
-      "🔥 Warden Ashgrove You carry a potion: free to use"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "🔥 Warden Ashgrove You carry a potion: free to use",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 1500,
-     "texts": [
-      "🔥 Warden Ashgrove You carry a potion: free to use",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 500,
-     "texts": [
-      "Use in a fight",
-      "🔥 Warden Ashgrove Hints (top bar) on: lift a card"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 6250,
-     "texts": [
-      "🔥 Warden Ashgrove Hints (top bar) on: lift a card",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2750,
-     "texts": [
-      "Relic: Pocket Satchel",
-      "🔥 Warden Ashgrove Exhaust cards vanish for the re"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 2250,
-     "texts": [
-      "🔥 Warden Ashgrove The climb ends here. Floors cli",
-      "Sound off"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 750,
-     "texts": [
-      "Sound off",
-      "🔥 Warden Ashgrove HP left: 0 of 80. Gold: 198. De"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 3000,
-     "texts": [
-      "🔥 Warden Ashgrove It is Vulnerable now: your next",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 1750,
-     "texts": [
-      "🔥 Warden Ashgrove It is Vulnerable now: your next",
-      "Use in a fight"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 746,
-     "texts": [
-      "Use in a fight",
-      "🔥 Warden Ashgrove You hold 3 energy a turn. A car"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 3000,
-     "texts": [
-      "🔥 Warden Ashgrove An attack is coming. Block card",
-      "Relic: Iron Bangle"
-     ]
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "b": {
    "status": "PASS",
@@ -242,80 +16,9 @@
    "detail": []
   },
   "c": {
-   "status": "FAIL",
-   "count": 10,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Hints (top bar) on: lift a card and each foe shows the exact damage it would take, and you see the Block you would gain.",
-     "words": 25,
-     "at": 29002,
-     "where": "span."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Each won fight adds a card, gold or a relic to your climb.",
-     "words": 13,
-     "at": 70001,
-     "where": "li."
-    },
-    {
-     "session": "phone/play",
-     "text": "Each won fight adds a card, gold or a relic to your climb.",
-     "words": 13,
-     "at": 5001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Hints (top bar) on: lift a card and each foe shows the exact damage it would take, and you see the Block you would gain.",
-     "words": 25,
-     "at": 29001,
-     "where": "span."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Several enemies: after lifting an attack, tap the enemy you want to hit.",
-     "words": 13,
-     "at": 43001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "A full climb has three acts, each with its own foes and guardian, plus a final act.",
-     "words": 17,
-     "at": 43001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Last Stand: with two heroes in a boss fight, the first to fall stays at 1 HP.",
-     "words": 17,
-     "at": 43001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Stances: Wrath adds 3 per hit but costs 3 HP at turn end; leaving Calm gives 2 energy.",
-     "words": 18,
-     "at": 43001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Scry: look at the top cards of your draw pile and discard the ones you do not want.",
-     "words": 18,
-     "at": 43001,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Each won fight adds a card, gold or a relic to your climb.",
-     "words": 13,
-     "at": 44001,
-     "where": "li."
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "d": {
    "status": "PASS",
@@ -333,13 +36,13 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 296,
-   "clicks": 370,
+   "secs": 120,
+   "turns": 234,
+   "clicks": 297,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 35
+   "messagesSeen": 15
   },
   {
    "size": "phone",
@@ -356,19 +59,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 321,
-   "clicks": 392,
+   "turns": 334,
+   "clicks": 414,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 12
+   "messagesSeen": 8
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 45,
+   "secs": 42,
    "turns": 95,
-   "clicks": 125,
+   "clicks": 121,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
