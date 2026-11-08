@@ -1,0 +1,64 @@
+stem	source_file	licence	source_url	flag
+bg-map	coverlet/12.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13602	real
+bg-table	coverlet/00.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/853595	real
+bg-title	metquilt/13.jpg | Crazy Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/19724	real
+bonus-tile	S_spool/07.jpg | Ear Spool (approximate stand-in)	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/312694	FALLBACK
+fabric-01	calico/08.jpg | George Washington Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13863	real
+fabric-02	coverlet/10.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13643	real
+fabric-03	calico/12.jpg | Piece	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/229350	real
+fabric-04	coverlet/12.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13602	real
+fabric-05	metquilt/08.jpg | Signature Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/700692	real
+fabric-06	calico/01.jpg | Chintz appliqued quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13870	real
+fabric-07	embroidery/06.jpg | Embroidery Fragment	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/478975	real
+fabric-08	metquilt/10.jpg | Honeycomb Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13878	real
+fabric-09	metquilt/00.jpg | Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/229936	real
+fabric-10	metpattern/06.jpg | Wild Tulip	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/375808	real
+fabric-11	coverlet/00.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/853595	real
+fabric-12	calico/11.jpg | Star of Lemoyne Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13906	real
+fabric-13	calico/03.jpg | Quilt, Star of Bethlehem pattern variation	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13880	real
+fabric-14	metquilt/03.jpg | Quilt, pieced	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/855671	real
+fabric-15	metquilt/02.jpg | Crib Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/854563	real
+fabric-16	coverlet/07.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/14794	real
+fabric-17	metquilt/06.jpg | Cat quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/834757	real
+fabric-18	metquilt/04.jpg | Quilt, pieced	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/854567	real
+fabric-19	metpattern/04.jpg | Pink and Rose	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/337071	real
+fabric-20	brocade/09.jpg | Brocade	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/447746	real
+fabric-21	embroidery/00.jpg | Embroidery	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/213196	real
+fabric-22	metpattern/00.jpg | Daisy	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/384017	real
+fabric-23	metpattern/05.jpg | Trellis	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/384020	real
+fabric-24	metquilt/01.jpg | Quilt, appliqued	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/855672	real
+fabric-25	metpattern/12.jpg | Willow Bough	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/384022	real
+fabric-26	damask/11.jpg | Fragment of damask with marriage emblems	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/227205	real
+fabric-27	metquilt/05.jpg | Tulip Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/16295	real
+fabric-28	coverlet/06.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13642	real
+fabric-29	calico/00.jpg | Feathered Star pattern quilt with chintz appliques	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13873	real
+fabric-30	coverlet/08.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13640	real
+fabric-31	calico/10.jpg | Thirteen-patch block quilt with Japanesque backing fabric	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/814560	real
+fabric-32	calico/05.jpg | Crib Quilt, Mill Wheel pattern	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13650	real
+fabric-33	coverlet/11.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13603	real
+fx-sparkle	generated	n/a (own work)	-	FALLBACK
+fx-stitch	generated	n/a (own work)	-	FALLBACK
+icon-bonus	S_thimble/02.jpg | Thimble (approximate stand-in)	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/202999	FALLBACK
+icon-button	S_spool/07.jpg | Ear Spool (approximate stand-in)	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/312694	FALLBACK
+icon-hourglass	S_hourglass/00.jpg | Hourglass	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/202374	real
+icon-leather	generated (procedural leather)	n/a (own work)	-	FALLBACK
+patch-leather	generated (procedural leather)	n/a (own work)	-	FALLBACK
+portrait-aurelia	p_knitting/02.jpg | Young Woman Knitting	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/437159	real
+portrait-bram	p_knitting/03.jpg | A Peasant Girl Knitting	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/435774	real
+portrait-fernsby	p_lacemaker/00.jpg | The Lacemaker	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/436816	real
+portrait-hester	p_spinner/02.jpg | The Spinner	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/435771	real
+portrait-ivo	p_woman_sewing/05.jpg | Old Woman Cutting Her Nails	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/437412	real
+portrait-marguerite	p_woman_sewing/03.jpg | A Woman Spinning Flax	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/343149	real
+portrait-odette	p_woman_sewing/02.jpg | Embroidery; The Artist's Mother	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/334652	real
+portrait-poppy	p_woman_sewing/11.jpg | A Young Woman Ruffling, Plate 2 from "Five Feminine Occupati	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/387970	real
+portrait-tilly	p_embroiderer/00.jpg | The Embroiderer	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/368433	real
+portrait-tobias	p_knitting/01.jpg | Shepherdess Knitting	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/371522	real
+portrait-wren	p_seamstress/01.jpg | The Seamstress	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/371552	real
+quilt-frame	calico/03.jpg | Quilt, Star of Bethlehem pattern variation	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13880	real
+result-lose	metpattern/12.jpg | Willow Bough	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/384022	real
+result-win	metquilt/05.jpg | Tulip Quilt	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/16295	real
+token-me	S_spool/01.jpg | Spool	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/447353	real
+token-opp	S_spool/02.jpg | Spool	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/447352	real
+torn-square	coverlet/12.jpg | Coverlet + generated torn hole mask	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/13602	real
+track-frame	coverlet/02.jpg | Coverlet	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/15507	real
+ui-offer-card	metquilt/00.jpg | Quilt + drawn stitch border	CC0 (Met Open Access)	https://www.metmuseum.org/art/collection/search/229936	real
