@@ -65,6 +65,7 @@ function newsLines(first) {
   UI.newsN = G.logN;
   const nm = G.players[v].name, out = G.log.filter(l => l.i > from && l.round === G.round && (l.t.indexOf(nm) >= 0 || /^Day \d/.test(l.t)) && !/ draws a | has decided| places the | stops\.$|^Stir!|^Everyone brews/.test(l.t)).map(l => youText(l.t));
   if (!out.length) return;
+  if (!UI.newsToast) return;   // W471: one line of text at a time. The news is on the board, the fortune chip and in the Log.
   if (isPh()) {   // phones: a short headline, the full lines stay in the log
     const sh = out.map(t => { let m = /fortune card "([^"]+)"/.exec(t); if (m) return '\u2728 ' + m[1]; m = /head start of (\d+) space/.exec(t); if (m) return '\ud83d\udc00 Head start +' + m[1]; if (/^Day \d/.test(t)) return ''; return t.length <= 48 ? t : ''; }).filter(Boolean);
     if (sh.length) toast(sh.slice(-3).join('  \u00b7  ')); return;
@@ -80,8 +81,8 @@ function playEvents(first) {
         case 'draw': if (e.how !== 'side') snd('draw'); break;
         case 'place': if (typeof bfEvent === 'function') bfEvent(e); { const dl = typeof PX !== 'undefined' && e.chip && typeof PX.flyIds[e.chip.i] === 'number' ? PX.flyIds[e.chip.i] : 0; const rb = e.ruby; setTimeout(() => snd(rb ? 'ruby' : 'plop'), dl); setTimeout(() => snd('splash'), 120 + dl); } if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'side': if (typeof pxEvent === 'function') pxEvent(e); break;
-        case 'boom': if (!(typeof bfAnim === 'function' && bfAnim() && (isMine(e.seat) || e.seat === focusSeat()))) snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
-        case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.'); break;
+        case 'boom': if (!(typeof bfAnim === 'function' && bfAnim() && (isMine(e.seat) || e.seat === focusSeat()))) snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Your pot exploded, but Safe harbour keeps your points. ' : 'Your pot exploded. ') + 'Your whites total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
+        case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('The white chip is back in your bag. Refill the flask with rubies after the day.'); break;
         case 'restart': snd('page'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'die': snd('die'); break;
         case 'gain': if (e.k === 'ruby') snd('ruby'); else if (e.k === 'vp') snd('coin'); else if (e.k === 'drop') snd('plop'); if (typeof pxEvent === 'function') pxEvent(e); break;

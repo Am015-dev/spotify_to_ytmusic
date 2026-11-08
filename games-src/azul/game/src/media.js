@@ -7,11 +7,11 @@ const pre=(f,cb)=>{if(IMG_OK[f]!==undefined){cb&&IMG_OK[f]&&cb();return}IMG_OK[f
 const phone=()=>!!(window.matchMedia&&matchMedia('(max-width:700px)').matches);
 const TBL={'prism-light':1,'unmarked-slate':1,'sun-palace':1};
 function artVars(){const set=(k,f)=>pre(f,()=>R.style.setProperty(k,'url('+MEDIA+f+'.webp)'));
-  {const u=unl('cardback'),bf=u==='guild-seal'||u==='lamplight'?'back-'+u:'back-default';pre(bf,()=>{R.style.setProperty('--sg-back','url('+MEDIA+bf+'.webp)');R.dataset.sgback='1'})}
+  {const ch=typeof UI!=='undefined'&&UI.setup&&UI.setup.back,u=ch&&ch!=='default'?ch:ch==='default'?null:unl('cardback'),bf=u==='guild-seal'||u==='lamplight'?'back-'+u:'back-default';pre(bf,()=>{R.style.setProperty('--sg-back','url('+MEDIA+bf+'.webp)');R.dataset.sgback='1'})}
   set('--sg-title',phone()?'title-phone':'title');set('--sg-table',tableFile()||(innerHeight>innerWidth?'table-default-phone':'table-default'));set('--sg-end-win','end-win');set('--sg-end-lose','end-lose')}
 // ---- 3D table: a painted top laid on the walnut (the unlocked table replaces the default); plain walnut while loading and on Low graphics
 let skinPl=null,skinFile='',skinKey='';
-function tableFile(){const u=unl('table');if(u&&TBL[u])return 'table-'+u;return null}
+function tableFile(){const ch=typeof UI!=='undefined'&&UI.setup&&UI.setup.table;if(ch==='default')return null;if(ch&&TBL[ch])return 'table-'+ch;const u=unl('table');if(u&&TBL[u])return 'table-'+u;return null}
 function skin(){if(typeof V3==='undefined'||!V3.table||!V3.scene||typeof THREE==='undefined'||!V3.table.geometry.attributes.position)return;
   const bb=new THREE.Box3().setFromObject(V3.table);if(!isFinite(bb.max.x))return;const w=bb.max.x-bb.min.x,d=bb.max.z-bb.min.z;if(w<5||d<5)return;
   const f=tableFile()||(d>w*1.05?'table-default-phone':'table-default');
@@ -38,6 +38,7 @@ function sgPaint(){const want={kiln:['kiln-disc'],kilne:['kiln-disc-empty'],pool
 function boot(){
   try{GXSK.init({sets:{'sk-cells':['ui-rack-cell','ui-floor-cell','ui-wall-cell'],'sk-rackf':['ui-rack-frame-c'],'sk-tail':['ui-bubble-tail'],'sk-row':['ui-row-c']}})}catch(e){}
   sgPaint();
+  try{if(!localStorage.getItem('sgz_mpick'))localStorage.setItem('sgz_mpick',JSON.stringify({victory:'shuffle',defeat:'shuffle'}))}catch(e){}   // W466: both versions of the end songs take turns, game by game
   try{GXMUS.init({key:'sgz',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}

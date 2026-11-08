@@ -26,3 +26,18 @@ Rows copied from `audio/ASSETS.md` (every row whose "used as" column names `sung
 | `music-jingles/Pizzicato jingles/jingles_PIZZI16.ogg` | [Kenney Music Jingles](https://kenney.nl/assets/music-jingles) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | trimmed silence, normalised (~-16 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | sunglaze/sun |
 | `ui-audio/click3.ogg` | [Kenney UI Audio](https://kenney.nl/assets/ui-audio) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | trimmed silence, normalised (~-20 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | sands/click, crown/click, nebula/click, shipwreck/click, doorkick/click, sunglaze/click, rampart/click |
 | `ui-audio/rollover2.ogg` | [Kenney UI Audio](https://kenney.nl/assets/ui-audio) | Kenney (Kenney Vleugels) | CC0 1.0 | https://creativecommons.org/publicdomain/zero/1.0/ | 2026-09-30 | trimmed silence, normalised (~-24 LUFS target, -1 dBFS peak limit), mono MP3 64 kbps | sands/hover, crown/hover, nebula/hover, shipwreck/hover, doorkick/hover, sunglaze/hover, rampart/hover |
+
+## Owner art: where every shipped file shows (W466, 8 Nov 2026)
+asset-usage.js has no exclusion list, so nothing is removed from games/sunglaze. Status per file that a Quick game may not request:
+
+| File(s) | Where it shows | Status |
+|---|---|---|
+| media/table-default, -prism-light, -unmarked-slate, -sun-palace | Title > More options > Table picker (thumbnails); the chosen table is the play-table painting. table-default-phone on phone portrait. | wired, reachable from the start |
+| media/back-default, -guild-seal, -lamplight | Title > More options > Tile back picker; the chosen back is on the sack chip (tiles left) in play | wired, reachable from the start |
+| media/camp-* (11) | Title rival picker (10 portraits) and the rival's score chip; camp-ochre and camp-tamsin in the coached-game bubble | wired |
+| media/ui-node-boss, -locked, -done, ui-bubble-c | Story map nodes and story scene text (shell gx-skin.css) | wired, reachable in Story |
+| music/victory-a/b, defeat-a/b | end songs; both versions take turns game by game (default pick "shuffle") | wired, one per game |
+| music/fight-a/b, main, tavern | loop pool ("all songs") | wired |
+| models/plate.glb, plate-lite.glb, sun.glb, sun-lite.glb | bowl beside the floor row; sun token (sprites rendered from the models) | wired |
+| models/plate.webp, plate@512.webp, sun.webp, sun@512.webp | sprite fallback renders (shown only when WebGL fails); not referenced by game code | source/dup |
+| media/ui-bubble, ui-button-cream, ui-button-go, ui-button-power, ui-iconbtn-k, ui-node-*-k (4), ui-node-boss/done/locked raw, ui-panel, ui-rack-frame, ui-row | raw sources of the processed -c / -k files that are in use; not referenced by any code | source/dup |
