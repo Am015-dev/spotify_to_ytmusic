@@ -357,6 +357,13 @@ function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[
   const base=new THREE.Mesh(baseGeo(b),plastic);base.castShadow=true;base.receiveShadow=true;g.add(base);
   const tok=new THREE.Mesh(new THREE.PlaneGeometry(b-.5,b-.5),new THREE.MeshStandardMaterial({map:tokenTex(s),roughness:.55,metalness:0}));tok.rotation.x=-PI/2;tok.rotation.z=0;tok.position.y=.53;tok.receiveShadow=true;g.add(tok);
   const rimC=new THREE.Color(fc.eng);const rim=new THREE.Mesh(new THREE.PlaneGeometry(b*1.45,b*1.45),new THREE.MeshBasicMaterial({map:ringTex(),color:rimC.clone().multiplyScalar(1.2),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));rim.rotation.x=-PI/2;rim.position.y=.06;g.add(rim);
+  // table look: a round faction-coloured stand rim under the square base, and the firing arc painted on the mat as a coloured wedge
+  {const T0=SHIPS[s.type]||{},arc=T0.arc||'F',big=s.base==='L',half=(big?84.05:80.9)/2*PI/180,ec=new THREE.Color(fc.eng);
+    const disc=new THREE.Mesh(new THREE.RingGeometry(b*.74,b*.86,48),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.85,depthWrite:false}));disc.rotation.x=-PI/2;disc.position.y=.04;g.add(disc);
+    const dm=new THREE.Mesh(new THREE.CircleGeometry(b*.74,48),new THREE.MeshBasicMaterial({color:0x07080f,transparent:true,opacity:.7,depthWrite:false}));dm.rotation.x=-PI/2;dm.position.y=.03;g.add(dm);
+    const wm=new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.26,depthWrite:false,side:THREE.DoubleSide});const wedge=(rot)=>{const w=new THREE.Mesh(new THREE.RingGeometry(b*.87,b*1.75,24,1,rot-half,2*half),wm);w.rotation.x=-PI/2;w.position.y=.035;g.add(w);
+      const e=new THREE.Mesh(new THREE.RingGeometry(b*1.7,b*1.78,24,1,rot-half,2*half),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide}));e.rotation.x=-PI/2;e.position.y=.036;g.add(e)};
+    if(arc==='T'){const r=new THREE.Mesh(new THREE.RingGeometry(b*1.2,b*1.28,48),wm.clone());r.material.opacity=.5;r.rotation.x=-PI/2;r.position.y=.035;g.add(r);wedge(0)}else{wedge(0);if(arc==='A')wedge(PI)}}
   const acr=new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false});
   const sock=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.3,16),plastic);sock.position.y=.66;g.add(sock);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,3.2,12),acr);peg.position.y=2.2;g.add(peg);
@@ -645,7 +652,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   const anyAnim=Object.keys(V3.anim).length>0;
   V3.busy=!!(anyAnim||easing||V3.fxq.length||V3.later.length||V3.ez||V3.drag||V3.shake>0||V3.flashT>0||PH&&PH.testing);
   engineBed(nMove>0);
-  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
+  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){{const low=document.documentElement.classList.contains('bf')&&V3.view==='top';placeEl(el,m.position.clone().add(low?new THREE.Vector3(0,.5,S3(B(s))*.98*(Math.cos(V3.cam.yaw||0)<0?-1:1)):new THREE.Vector3(0,8.4,0)))}if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
   // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
   let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}

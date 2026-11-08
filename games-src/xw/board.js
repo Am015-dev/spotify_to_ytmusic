@@ -21,7 +21,7 @@ let ov,svg,lay,bar,hint,btns,dice,top,ban,fing;
 function build(){if(ov)return;const st=$('stage');if(!st)return;ov=document.createElement('div');ov.id='bf';
   ov.innerHTML='<svg id="bfsvg" aria-hidden="true"></svg><div id="bfl"></div><div id="bftop" aria-live="polite"></div><div id="bfdice" hidden></div><div id="bfban" hidden></div><div id="bffing" hidden aria-hidden="true">👆</div><div id="bfbar"><p id="bfhint" aria-live="polite"></p><div id="bfbtns"></div></div>';
   st.appendChild(ov);svg=$('bfsvg');lay=$('bfl');bar=$('bfbar');hint=$('bfhint');btns=$('bfbtns');dice=$('bfdice');top=$('bftop');ban=$('bfban');fing=$('bffing');
-  ov.addEventListener('click',onClick);requestAnimationFrame(loop)}
+  ov.addEventListener('click',onClick);ov.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');BF.pd=t?{t,x:e.clientX,y:e.clientY,at:performance.now()}:null},true);ov.addEventListener('pointerup',e=>{const d=BF.pd;BF.pd=null;if(!d||!document.body.contains(d.t)||performance.now()-d.at>700||Math.hypot(e.clientX-d.x,e.clientY-d.y)>14)return;const u=document.elementFromPoint(e.clientX,e.clientY);if(u&&d.t.contains(u))return;BF.pdHit=d.t;BF.pdSup=performance.now();setTimeout(()=>{if(BF.pdHit===d.t){BF.pdHit=null;d.t.click()}},0)},true);requestAnimationFrame(loop)}
 // ---- projection ----
 function px(x,y,h){const v=W(x,y,h||0).project(V3.camera);const c=V3.r.domElement;return [(v.x+1)/2*c.clientWidth,(1-v.y)/2*c.clientHeight,v.z]}
 function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b=px(s.x+f.x*B(s)/2,s.y+f.y*B(s)/2);return Math.max(14,Math.hypot(a[0]-b[0],a[1]-b[1]))}
@@ -29,8 +29,8 @@ function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b
 function shownXY(s){const m=V3.ships[s.id];if(!m)return {x:s.x,y:s.y};return {x:m.position.x*10,y:MAT-m.position.z*10}}
 // ---- camera: frame the points that matter, inside the part of the board that is not under the bars ----
 function rayGround(sx,sy){const c=V3.r.domElement;const v=new THREE.Vector2(sx/c.clientWidth*2-1,-(sy/c.clientHeight)*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.camera);const p=new THREE.Vector3();return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),p)?p:null}
-function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10,sd=side||12;minW=minW||230;
+function fit(pts,minW,side,topPad,botPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10+(botPad||0),sd=side||12;minW=minW||230;
   let a=1e9,b=-1e9,d=1e9,e=-1e9;for(const p of pts){a=Math.min(a,p.x);b=Math.max(b,p.x);d=Math.min(d,p.y);e=Math.max(e,p.y)}
   if(b-a<minW){const m=(a+b)/2;a=m-minW/2;b=m+minW/2}if(e-d<minW){const m=(d+e)/2;d=m-minW/2;e=m+minW/2}
   const box=[{x:a,y:d},{x:b,y:d},{x:a,y:e},{x:b,y:e}];C.tx=S3((a+b)/2);C.tz=S3(MAT-(d+e)/2);
@@ -42,10 +42,10 @@ function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,c
 const XY=s=>({x:s.x,y:s.y});
 function around(s,r){r=r||B(s)*1.2;return [{x:s.x-r,y:s.y-r},{x:s.x+r,y:s.y+r}]}
 function framePts(k){const all=alive();const pts=[];const add=a=>{for(const p of a)pts.push(p)};
-  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return {pts,min:200,sd:30,tp:104}}
+  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return dialOn()?{pts,min:200,sd:20,tp:60,bp:Math.round(Math.min(340,innerWidth*.92)*.5+60)}:{pts,min:200,sd:30,tp:104}}
   if(k==='action'||k==='sub'){const s=ship(G.cur);add(around(s,B(s)*1.6));if(k==='sub'&&BF.sub){if(BF.sub.opts)BF.sub.opts.forEach(o=>o.p&&add(around(o.p,B(s)*.8)));if(BF.sub.targets)BF.sub.targets.forEach(id=>add(around(ship(id))))}return {pts,min:400}}
   if(k==='target'){const s=ship(G.cur);add(around(s));for(const w of weaponsFor(s))for(const t of w.targets)add(around(ship(t.id)));return {pts,min:380}}
-  if(k==='dice'&&G.atk){add(around(ship(G.atk.a)));add(around(ship(G.atk.d)));all.forEach(s=>add(around(s)));return {pts,min:380}}
+  if(k==='dice'&&G.atk){add(around(ship(G.atk.a),B(ship(G.atk.a))*1.3));add(around(ship(G.atk.d),B(ship(G.atk.d))*1.3));return {pts,min:240,tp:60,bp:Math.min(300,Math.round(innerHeight*.34))}}
   if(k==='setup'&&G.q){G.q.opts.forEach(o=>o.p&&pts.push(XY(o.p)));all.forEach(s=>add(around(s)));return {pts,min:300}}
   all.forEach(s=>add(around(s)));return {pts,min:300}}
 // ---- what is going on ----
@@ -92,7 +92,7 @@ function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;c
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
 // ---- render: rebuild the overlay when the situation changes ----
 function legend(h){const el=document.createElement('div');el.className='bfleg';el.innerHTML=h;ov.appendChild(el);BF.leg=el}
-function clear(){if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
+function clear(){if(BF.dial&&!(G&&G.phase==='plan'&&BF.sel))BF.dial.hidden=true;if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
 function setBtns(h){if(btns&&btns._h!==h){btns._h=h;btns.innerHTML=h}}
 function item(html,cls,o){const el=document.createElement(o&&o.tag||'button');if(el.tagName==='BUTTON')el.type='button';el.className=cls;el.innerHTML=html;for(const k in (o&&o.data)||{})el.dataset[k]=o.data[k];if(o&&o.label)el.setAttribute('aria-label',o.label);el.style.visibility='hidden';lay.appendChild(el);const it=Object.assign({el},o||{});BF.items.push(it);return it}
 function pathW(pts,cls,h){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('class',cls);svg.appendChild(p);BF.paths.push({el:p,pts,h:h||.4});return p}
@@ -104,7 +104,7 @@ let GHM=null;
 function ghost3D(){const want=BF.g3w||[];BF.g3w=[];const key=want.map(g=>g.id+':'+g.p.x.toFixed(1)+','+g.p.y.toFixed(1)+','+g.p.h.toFixed(2)).join('|');if(BF.g3k===key)return;BF.g3k=key;
   for(const o of (BF.g3||[]))if(o.parent)o.parent.remove(o);BF.g3=[];if(!v3()||typeof W!=='function')return;
   if(!GHM)GHM=new THREE.MeshBasicMaterial({color:0xaee9ff,transparent:true,opacity:.38,depthWrite:false});
-  for(const g of want){const src=V3.ships[g.id];if(!src||!src.parent)continue;const c=src.clone(true);c.traverse(o=>{if(o.isMesh){o.material=GHM;o.castShadow=false;o.receiveShadow=false}else if(o.isSprite||o.isPoints||o.isLight)o.visible=false});
+  for(const g of want){const src=V3.ships[g.id];if(!src||!src.parent||!src.userData.mdl)continue;const mdl=src.userData.mdl,c=new THREE.Group(),mc=mdl.clone(true);mc.position.copy(mdl.position);mc.rotation.copy(mdl.rotation);mc.scale.copy(mdl.scale);c.add(mc);c.traverse(o=>{if(o.isMesh){o.material=GHM;o.castShadow=false;o.receiveShadow=false}else if(o.isSprite||o.isPoints||o.isLight)o.visible=false});
     c.position.copy(W(g.p.x,g.p.y));c.rotation.y=g.p.h;c.userData.bfGhost=1;src.parent.add(c);BF.g3.push(c)}}
 function sideCol(s){return s.side===me()?'mine':'foe'}
 function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('bf',on);if(!on){R.classList.remove('bf-play','bf-sheet');if(ov)ov.hidden=true;if(BF.wave)release()}requestAnimationFrame(()=>{try{resize3D()}catch(e){}BF.key='';BF.fkey='';if(BF.on)bfRender()})}
@@ -123,7 +123,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
   const sheet=k==='ask'||(!!PHN.pop&&PHN.pop.kind==='info');R.classList.toggle('bf-sheet',sheet);
   topLine(k);
-  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp))}
+  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp,f.bp))}
   if(key===BF.key)return;BF.key=key;clear();dice.hidden=true;
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
@@ -145,10 +145,11 @@ function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
   setBtns(`<button class="btn big" data-a="autoplace">✨ Auto-place all</button>`)}
-function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+function planUI(){dropLoose();const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
   if(BF.sel&&!my.some(s=>s.id===BF.sel))BF.sel=null;
   for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);const gp=ghostW(s,m,exColor(s,m).c,true),lp=add(gp,mul(leftOf(gp.h),B(s)*1.05));item(mvLabel(m),'bfm small set '+exColor(s,m).c,{x:lp.x,y:lp.y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
     if(s.id!==BF.sel){const it=item('','bfring'+(pk==null?' need':' done'),{ship:s.id,data:{bfship:s.id},label:s.name+(pk==null?': plan its move':': change its move'),ring:true});if(pk==null&&!BF.fingT){BF.fingT=it.el}}}
+  if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
   if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
       const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
@@ -158,6 +159,30 @@ function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);co
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
   setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
   if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');finger(BF.fingT)}
+// ---- the secret dial: a big wheel you spin with your thumb; the move in the window is the one you fly ----
+function dialOn(){return !/[?&]dial=0/.test(location.search||'')&&!(typeof tutOn==='function'&&tutOn())}
+function dialList(s){const dk=m=>m.s*10+(m.t==='K'?5:m.t==='S'?2:m.t==='B'?(m.d<0?1:3):(m.d<0?0:4));return dialOf(s).map((m,i)=>({m,i})).filter(o=>!(exColor(s,o.m).c==='r'&&s.stress)).sort((a,b)=>dk(a.m)-dk(b.m))}
+function dialEl(){if(BF.dial)return BF.dial;const el=document.createElement('div');el.id='bfdial';el.hidden=true;el.innerHTML='<div class="dwin" aria-live="polite"></div><div class="dface" role="slider" aria-label="Maneuver dial: spin to choose a move"></div><div class="dhub"></div>';ov.appendChild(el);BF.dial=el;
+  const face=el.querySelector('.dface');let D=null;
+  const ang=e=>{const r=face.getBoundingClientRect();return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))};
+  face.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();try{face.setPointerCapture(e.pointerId)}catch(_){}D={a0:ang(e),r0:BF.drot||0,x:e.clientX,y:e.clientY,moved:false,it:e.target.closest('.ditem')}});
+  face.addEventListener('pointermove',e=>{if(!D)return;e.stopPropagation();let da=ang(e)-D.a0;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;if(Math.hypot(e.clientX-D.x,e.clientY-D.y)>8)D.moved=true;if(!D.moved)return;BF.drot=D.r0+da;D.a0=ang(e);D.r0=BF.drot;dialSpin(false)});
+  const up=e=>{if(!D)return;e.stopPropagation();const d0=D;D=null;if(!d0.moved&&d0.it){const k=+d0.it.dataset.k;BF.drot=-k*BF.dstep}dialSpin(true)};
+  face.addEventListener('pointerup',up);face.addEventListener('pointercancel',up);face.addEventListener('click',e=>e.stopPropagation());return el}
+function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return;const n=L.length,st=BF.dstep;let k=Math.round(-BF.drot/st);k=((k%n)+n)%n;if(snap)BF.drot=-Math.round(-BF.drot/st)*st;
+  el.querySelectorAll('.ditem').forEach(it=>{const a=+it.dataset.k*st+BF.drot;it.style.transform=`rotate(${a}rad) translateY(calc(-1 * var(--dr))) rotate(${-a}rad)`;it.classList.toggle('on',+it.dataset.k===k)});
+  el.querySelector('.dface').style.setProperty('--rot',BF.drot+'rad');
+  const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
+function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
+  if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
+  const el=dialEl(),face=el.querySelector('.dface'),key=s.id+':'+L.map(o=>o.i).join(',');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
+  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  el.hidden=false;dialSpin(false);
+  const m=dialOf(s)[pick],c=exColor(s,m).c,rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
+  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m)}</span><span class="dwd">${esc(mvWords(m))}${rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
+  pathW(tplPoints(s,b,m,4),'bfp on '+c);ghostW(s,m,c+' on',true);item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
+  setHint(`Spin the dial for ${esc(shortName(s))}`);
+  setBtns(`<button class="btn" data-bf="dclose" aria-label="Close the dial">✕</button><button class="btn primary big" data-bf="dlock">Lock move ✓</button>`);finger(null)}
 function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
   if(BF.sub){const a=BF.sub;setHint(a.a==='TL'?'Tap the enemy to lock on':'Tap where to go');
     if(a.targets)a.targets.forEach(id=>{const t=ship(id);const it=item('<span>⌖</span><i>Lock</i>','bftgt lock',{ship:id,data:{bfarg:id},label:'Lock onto '+t.name});finger(it.el)});
@@ -187,7 +212,7 @@ function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:
   <div class="bfd-out">${out}</div>
   <div class="bfd-r def"><span class="who">DODGE</span><div class="dice">${res?res.def.map(f=>die(f,'def')).join(''):dd||(rolled?'<i class="muted">no dice</i>':'<i class="muted">rolls next</i>')}</div></div>`}
 function shotLine(aId,dId){const a=ship(aId),d=ship(dId);if(!a||!d)return;pathW([shownXY(a),shownXY(d)],'bfshot fire',2.5)}
-function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
+function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==A.a+'>'+A.d+G.round)dropLoose();BF.looseK=A.a+'>'+A.d+G.round;const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
   if(G.phase==='ask'){const q=G.q;setHint(esc(q.title));
     // picking dice to reroll: tap the dice themselves
     if(q.key==='dice'){const row=dice.querySelector(/Defen/.test(q.opts[0]&&q.opts[0].l)?'.def .dice':'.atk .dice');const els=row?row.querySelectorAll('.die'):[];
@@ -205,7 +230,17 @@ function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(
   finger(btns.querySelector('.rec')||btns.querySelector('.primary'))}
 const modIco=k=>/focus/i.test(k)?'◉':/tl|lock|rr|reroll/i.test(k)?'⌖':/evade/i.test(k)?'✦':'★';
 function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
-function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
+// dice stay where they landed, loose on the mat beside the target, until the next attack; crit cards flip face-up
+function dropLoose(){if(!BF.loose)return;for(const it of BF.loose)it.el.remove();BF.items=BF.items.filter(x=>!BF.loose.includes(x));BF.loose=null;BF.looseT=0}
+function looseDice(R){if(BF.looseT===R.t)return;dropLoose();BF.looseT=R.t;BF.loose=[];const a=ship(R.a),d=ship(R.d);if(!a||!d||typeof die!=='function')return;
+  const bd=B(d),toA=Math.atan2(a.y-d.y,a.x-d.x);let seed=(R.t%9973)||7;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const put=(list,k,base)=>list.forEach((f,i)=>{const n=list.length,ang=base+(i-(n-1)/2)*.42+(rr()-.5)*.18,dist=bd*(1.25+rr()*.4);const x=d.x+Math.cos(ang)*dist,y=d.y+Math.sin(ang)*dist;
+    const it=item(`<i style="transform:rotate(${Math.round(rr()*80-40)}deg);animation-delay:${(i*.08).toFixed(2)}s">${die(f,k)}</i>`,'bfloose '+k,{x,y,tag:'div',tmp:true});BF.loose.push(it)});
+  put(R.dice||[],'atk',toA);put(R.def||[],'def',toA+Math.PI)}
+function critCards(R){if(!R.crits||!R.crits.length||BF.critT===R.t||typeof DAMAGE==='undefined')return;BF.critT=R.t;R.crits.forEach((c,i)=>{const D=DAMAGE[c];if(!D)return;
+  const it=item(`<div class="in" style="animation-delay:${(.45+i*.5).toFixed(2)}s"><div class="cb">✦</div><div class="cf"><b>${esc(D.n)}</b><span>${esc(String(D.t).split('. ')[0].slice(0,70))}</span></div></div>`,'bfcard',{ship:R.d,dy:-1.9-i*1.2,tag:'div',tmp:true});
+  setTimeout(()=>{it.el.remove();BF.items=BF.items.filter(x=>x!==it)},5200)})}
+function resUI(){const R=UI.hold.R;try{looseDice(R);critCards(R)}catch(e){console.error(e)}{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
@@ -217,6 +252,7 @@ function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for 
 // ---- taps ----
 function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
+  if(ds.bf==='dlock'||ds.bf==='dclose'){BF.sel=null;if(BF.dial)BF.dial.hidden=true;sfx('token');try{GX.buzz(18)}catch(e){}render();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();try{GX.buzz(18)}catch(e){}const b=document.querySelector('[data-a="lock"]');lockIn();return}
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
@@ -233,7 +269,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
 function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
-PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup||0)<400)return true;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
   let best=null,bd=1e9;for(const s of alive()){const p=px(s.x,s.y,1.2);const dd=Math.hypot(p[0]-x,p[1]-y);if(dd<Math.max(30,shipR(s)*1.4)&&dd<bd){bd=dd;best=s}}
   const k=ctx();

@@ -99,10 +99,11 @@ function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-
   const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
   let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
   return `<div class="pp-h">${porHTML(s)}<b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
-  <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
-  <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  <div class="pp-b"><div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  ${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}
+  <details class="pp-more"><summary>Ship card: numbers, pilot, upgrades</summary><div class="stats big">${statSpans(s)}</div>
   <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
-  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}</div>
+  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}</details></div>
   <div class="pp-f">${typeof V3!=='undefined'&&V3.on?`<button class="btn" data-ph="zoomto" data-id="${s.id}">${IC.focus} Zoom to it</button>`:''}<button class="btn primary" data-ph="x">Close</button></div>`}
 // ---- strip (planning): which ships still need a dial, recommended-for-all, lock ----
 function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const nset=my.filter(s=>UI.draft[s.id]!=null).length,all=nset===my.length;const g=guided();
