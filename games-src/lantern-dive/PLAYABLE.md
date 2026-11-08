@@ -30,3 +30,9 @@ The old `game/tutor-test.js` still reports the same 5 stale items as before this
 - `game/playable-play.js`: Quick game (Free play) and Story stage 1, played to the result sheet by touch taps on visible, uncovered UI only, 390x763, 0 console errors.
 - `game/rules-test.js` 104/104; `build-all.py --quick lantern-dive` PASS (phone-check, 7 scenarios, sweep).
 - Rules check (branch shelf/W384-rules-check, games-src/rules-check/lantern-dive.md): WRONG 0. MISSING 2: (a) the Commander may choose where the 2-player drone sits (low impact; needs a new choice UI, deferred); (b) the reminder card after a ping: the shown card already carries the ping token marker in the hand (`.rm`), so the memory aid exists in another form.
+
+## W409 (8 Nov): coached first dive, clean Play, Hints (addendum 4 and 7)
+- Tutorial replaced by the coached dive (see TUTORIAL-COVERAGE.md). Title/menu tutorial button lost its 12 px sub-line (the phone A1 finding).
+- Play is clean: tips, the pointing finger and the "What should I do?" bulb are OFF until the top-bar Hints toggle is on (saved). A one-card Goal opens before Free play starts.
+- Top bar on phone: the prompt no longer forces 240 px, so Menu and Rules fit again (Hints, Jobs, Log, Rules, Menu).
+- Not done: pc A findings (shared drawer text under 16 px), per-move good/okay/poor line (Lantern Dive has no points; job done/broken reactions exist in the coached dive only).

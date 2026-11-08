@@ -34,15 +34,15 @@ icon-sonar-goal	game-icons.net radar-cross-section	CC BY 3.0 (author delapouite)
 logo-emblem	game-icons.net diving-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/diving-helmet.html	real
 token-signal	game-icons.net radio-tower	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/radio-tower.html	real
 token-captain	game-icons.net captain-hat-profile	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/captain-hat-profile.html	real
-portrait-you	game-icons.net diving-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/diving-helmet.html	FALLBACK
-portrait-ines	game-icons.net captain-hat-profile	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/captain-hat-profile.html	FALLBACK
-portrait-bram	game-icons.net spanner	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/spanner.html	FALLBACK
-portrait-kito	game-icons.net headphones	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/headphones.html	FALLBACK
-portrait-odile	game-icons.net stethoscope	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/stethoscope.html	FALLBACK
-portrait-drone	game-icons.net robot-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/robot-helmet.html	FALLBACK
-token-order	none (no free source; keep existing)	-	-	FALLBACK
-token-relative	none (no free source; keep existing)	-	-	FALLBACK
-token-final	none (no free source; keep existing)	-	-	FALLBACK
-stamp-complete	none (no free source; keep existing)	-	-	FALLBACK
-stamp-lost	none (no free source; keep existing)	-	-	FALLBACK
-fx-ping	none (no free source; keep existing)	-	-	FALLBACK
+portrait-you	game-icons.net diving-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/diving-helmet.html	real
+portrait-ines	game-icons.net captain-hat-profile	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/captain-hat-profile.html	real
+portrait-bram	game-icons.net spanner	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/spanner.html	real
+portrait-kito	game-icons.net headphones	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/headphones.html	real
+portrait-odile	game-icons.net stethoscope	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/stethoscope.html	real
+portrait-drone	game-icons.net robot-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/robot-helmet.html	real
+token-order	game-icons.net checklist	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/checklist.html	real
+token-relative	game-icons.net scales	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/scales.html	real
+token-final	game-icons.net checkered-flag	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/checkered-flag.html	real
+stamp-complete	game-icons.net laurels-trophy	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/laurels-trophy.html	real
+stamp-lost	game-icons.net sinking-ship	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/sinking-ship.html	real
+fx-ping	procedural ring glow (no source)	-	-	real

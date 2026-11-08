@@ -8,7 +8,7 @@
     UI.lastRes = null; UI.camp = def; UI.fin = 0; UI.ov = null; UI.sub = ''; window.EC_NOSAVE = 1;
     if (def.setup && def.setup.tutorial) { UI.tutStart(); return; }
     var o = JSON.parse(JSON.stringify(def.setup || {}));
-    if (def.easy && o.hpPct) o.hpPct = Math.min(o.hpPct, 80);
+    if (def.easy) o.hpPct = Math.min(o.hpPct || 100, 80);
     E.newGame(o); UI.mode = 'game'; UI.sel = -1; UI.render();
   }
   UI.campStart = start;
