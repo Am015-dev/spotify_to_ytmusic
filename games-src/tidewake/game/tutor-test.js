@@ -28,7 +28,7 @@ const words=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' '
         const ov=r&&bb?Math.max(0,Math.min(r.right,bb.right)-Math.max(r.left,bb.left))*Math.max(0,Math.min(r.bottom,bb.bottom)-Math.max(r.top,bb.top)):0;
         return {id:st.id,say,n:rs.length,ov,r:r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}});
       if(s.end){console.log("end card at",shown.join(","));break}
-      if(s.wait||!s.r){idle++;if(idle%50===1)console.log('wait',JSON.stringify(s));if(idle>400){bad(tag+' stuck waiting at step '+s.id+' after '+shown.join(','));break}await p.waitForTimeout(150);continue}idle=0;
+      if(s.wait||!s.r){idle++;if(idle%50===1)console.log('wait',JSON.stringify(s));if(idle>400){bad(tag+' stuck waiting at step '+s.id+' after '+shown.join(',')+' '+JSON.stringify(await p.evaluate(()=>({t:G.turn,c:G.cur,st:G.step,q:G.q&&G.q.kind,busy:UI.busy,started:UI.started,fr:TW_TUT.freeze,over:!!G.over,sel:UI.sel}))));break}await p.waitForTimeout(150);continue}idle=0;
       if(shown[shown.length-1]!==s.id){shown.push(s.id);n++;if(process.env.V)console.log(((Date.now()-t0)/1000).toFixed(1),s.id,s.say);if(words(s.say)>12)bad(tag+' step '+s.id+' has '+words(s.say)+' words: '+s.say);if(s.n!==1)rings++;if(s.ov>16)cover++;
         await p.waitForTimeout(700);if(shoot)await p.screenshot({path:path.join(SHOTS,'tut-'+n+'.png')});}
       const hit=await p.evaluate(([x,y])=>{const e=document.elementFromPoint(x,y);return e?(e.className&&String(e.className).indexOf('gxt-cell')>=0?'shield':'ok'):'none'},[s.r.x,s.r.y]);if(hit!=='ok'){mz=(mz||0)+1;if(mz>=6){miss++;mz=0;console.log(tag,'highlight not tappable at step',s.id,hit)}await p.waitForTimeout(150);continue}mz=0;
