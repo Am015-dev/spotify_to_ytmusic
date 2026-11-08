@@ -29,20 +29,20 @@ var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
 function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Math.max(0, x.b.e - x.s.eggs); }, 0); }
 function bestPlay(G, s) {
   var p = G.pl[s], best = null;
-  PP.playable(G, s).forEach(function (x) { var v = B[p.hand[x.i]].p; if (!best || v > best.v) best = { i: x.i, v: v, id: p.hand[x.i] }; });
+  PP.playable(G, s).forEach(function (x) { var v = B[p.hand[x.i]].p - ((x.inf && x.inf.eggs) || 0); if (!best || v > best.v) best = { i: x.i, v: v, id: p.hand[x.i], pts: B[p.hand[x.i]].p }; });
   return best;
 }
 function actInfo(G, s) {
   var p = G.pl[s], out = {};
   var yf = PP.rowYield(p, 0), ye = PP.rowYield(p, 1), yd = PP.rowYield(p, 2);
-  var room = eggRoom(p), lay = Math.min(ye.n, room), bp = bestPlay(G, s), nPl = PP.playable(G, s).length;
+  var room = eggRoom(p), lay = Math.min(ye.n, room), bp = bestPlay(G, s), nPl = PP.playable(G, s).reduce(function (a, x) { a[x.i] = 1; return a; }, {}); nPl = Object.keys(nPl).length;
   var stuck = p.hand.length - nPl;   // birds you hold but cannot afford yet
   out.food = { h: 0, ok: true, v: Math.min(yf.n, 3) * (stuck > 0 ? .9 : .35), what: 'take ' + yf.n + ' from the feeder', gain: '+' + yf.n + ' food' };
   out.eggs = { h: 1, ok: lay > 0, v: lay, what: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' = +' + lay + ' pts', gain: '+' + lay + ' pts', why: room ? '' : 'No bird has room for an egg' };
   if (lay > 0 && lay < ye.n) out.eggs.what = '+' + lay + ' eggs (nests full) = +' + lay + ' pts';
   var cardsCan = G.deck.length + G.tray.filter(Boolean).length > 0;
   out.cards = { h: 2, ok: cardsCan, v: yd.n * (p.hand.length <= 2 ? .8 : p.hand.length >= 6 ? .1 : .4), what: '+' + yd.n + (yd.n === 1 ? ' card' : ' cards'), gain: '+' + yd.n + ' cards', why: cardsCan ? '' : 'No cards left' };
-  out.play = { h: -1, ok: nPl > 0, v: bp ? bp.v + (p.cubes > 1 ? .5 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.v + (bp.v === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.v + ' pts' : '',
+  out.play = { h: -1, ok: nPl > 0, v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
     why: p.hand.length ? 'Not enough food or eggs yet. Get food first.' : 'No birds in hand. Draw birds first.' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
   out.best = best;
@@ -116,7 +116,7 @@ function scoreHTML() {
   var lead = sc.filter(function (s) { return s.total === top; }).length === 1 && top > 0;
   var rows = G.pl.map(function (p, i) {
     var s = sc[i], oth = s.goals + s.bonus + s.cache + s.tuck + s.lead, me = i === UI.view, L = lead && s.total === top;
-    return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="' + pl(s.birds, 'bird pt') + ' + ' + pl(s.eggs, 'egg') + ' + ' + oth + ' other" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
+    return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="birds ' + s.birds + ' · eggs ' + s.eggs + ' · other ' + oth + '" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
       '<span class="sn">' + (L ? '<em class="crown" aria-hidden="true">&#9733;</em>' : '') + esc(me && humans().length === 1 ? 'You' : p.name) + '</span>' +
       '<span class="sp"><b>' + s.birds + '</b><small>bird pts</small></span><span class="sp"><b>' + s.eggs + '</b><small>eggs</small></span><span class="sp"><b>' + oth + '</b><small>other</small></span>' +
       '<span class="st"><b>' + s.total + '</b><small>' + (L ? 'leads' : 'pts') + '</small></span></button>';
@@ -133,9 +133,10 @@ var RATE = { k: null };
 function rateStart() {   // called when your turn begins (no question pending)
   if (!G || !myTurn() || G.q) return;
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
-  RATE.k = key; RATE.seat = UI.view; RATE.sc = PP.scoreOf(G, UI.view).total; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
+  try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
+  RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }
-function rateChoice(m) { if (RATE.k && m && (m.t === 'act' || m.t === 'play') && RATE.choice == null) RATE.choice = m.t === 'play' ? 'play' : m.a; }
+function rateChoice(m) { if (RATE.k && m && (m.t === 'act' || m.t === 'play') && RATE.choice == null) { RATE.choice = m.t === 'play' ? 'play' : m.a; RATE.point = tutPoint(); } }
 function rateEnd() {   // after the turn is over: compare with the best-value estimate made at its start
   if (!RATE.k || RATE.choice == null || !G) return;
   var s = RATE.seat, p = G.pl[s];
@@ -143,8 +144,11 @@ function rateEnd() {   // after the turn is over: compare with the best-value es
   var inf = RATE.inf, ch = RATE.choice, gain = PP.scoreOf(G, s).total - RATE.sc, best = inf.best, v = inf[ch] ? inf[ch].v : 0, bv = best ? inf[best].v : 0;
   var nm = { play: 'playing a bird', food: 'getting food', eggs: 'laying eggs', cards: 'drawing birds' };
   var grade = bv <= 0 || v >= bv * .85 ? 'good' : v >= bv * .45 ? 'okay' : 'poor';
-  var pts = (gain > 0 ? '+' + gain : gain) + (Math.abs(gain) === 1 ? ' point' : ' points');
-  var line = grade === 'good' ? 'Good: ' + pts + (ch === best ? ', the best move this turn.' : ', as good as the best move.')
+  var s1 = PP.scoreOf(G, s), parts = [];   // where the points came from (and what was spent)
+  [['birds', 'bird'], ['eggs', 'egg'], ['cache', 'stored food'], ['tuck', 'tucked'], ['goals', 'goal']].forEach(function (k) { var d = s1[k[0]] - RATE.s0[k[0]]; if (d) parts.push((d > 0 ? '+' : '') + d + ' ' + k[1] + (k[0] === 'eggs' && d < 0 ? ' spent' : '')); });
+  var pts = (gain > 0 ? '+' + gain : gain) + (Math.abs(gain) === 1 ? ' point' : ' points') + (parts.length > 1 || (parts.length && gain === 0) ? ' (' + parts.join(', ') + ')' : '');
+  if (RATE.point && ch === RATE.point) grade = 'good';
+  var line = RATE.point && ch === RATE.point ? 'Good: ' + pts + '. Lesson learned!' : grade === 'good' ? 'Good: ' + pts + (ch === best ? ', the best move this turn.' : ', as good as the best move.')
     : (grade === 'okay' ? 'Okay: ' : 'Poor: ') + pts + '. ' + cap1(nm[best]) + ' was worth more (' + inf[best].gain + ').';
   if (ch === 'food' && gain === 0 && grade === 'good') line = 'Good: food now lets you play birds next turn.';
   RATE.k = null; RATE.last = { g: grade, t: line };

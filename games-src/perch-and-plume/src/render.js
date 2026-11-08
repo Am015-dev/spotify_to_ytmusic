@@ -110,6 +110,7 @@ function renderDock(p, vs, cur) {
   $('#trk').innerHTML = trackerHTML();
   if (!mine || Q) UI.pickBird = false;
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
+  document.body.classList.toggle('idle4', !!idle);
   document.body.classList.toggle('picking', !!(mine && !Q && (UI.pickBird || UI.sel != null)));
   $('#prompt').textContent = promptText(mine);
   $('#acts').innerHTML = mine ? (idle ? act4HTML() : actsHTML()) : '';
