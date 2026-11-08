@@ -5,6 +5,9 @@ const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, 
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
+/* Addendum 7: Play is clean; Hints (top-bar toggle, off by default) turns on previews, badges, ratings, event notes and 'What should I do?'. The tutorial always coaches. */
+function hintsOn() { return UI.mode === 'tutorial' || !!UI.prefs.hints; }
+function note(t, ms) { if (hintsOn()) toast(t, ms); }
 function savePrefs() { try { localStorage.setItem(PREFKEY, JSON.stringify(UI.prefs)); } catch (e) { } }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const RICON = { coin: 'coin', compass: 'compass', tablet: 'tablet', arrow: 'arrow', jewel: 'jewel' };
@@ -88,6 +91,7 @@ function render() {
   document.body.dataset.vtab = UI.tab;
   // dock
   renderDock(L, q, me, actor);
+  const hb = $('#hintbtn'); if (hb) { const on = !!UI.prefs.hints; hb.setAttribute('aria-pressed', String(on)); hb.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); hb.classList.toggle('on', on); }
   if (typeof artApply === 'function') artApply();
   if (typeof bestBadges === 'function') try { bestBadges(); } catch (x) { }
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
@@ -107,7 +111,7 @@ function renderDock(L, q, me, actor) {
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q })).join('') : '<span class="sm">No cards left in your hand.</span>';
   const ps = L.find(m => m.t === 'pass');
-  $('#acts').innerHTML = `<span class="chip dk" title="cards in your deck / discard pile"><svg class="ic" aria-hidden="true"><use href="#s-card"/></svg><span class="num">${me.deck.length}</span><span class="sm">in deck · ${me.disc.length} played</span></span>` + (mine && !q && ps ? mvBtn(ps, '<span class="pl">Pass</span><span class="pf"> (end my round)</span>', 'alt pass') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '') + (UI.coachFree && UI.mode === 'tutorial' && !over ? '<button type="button" class="btn alt" data-a="tutleave">Leave tutorial</button>' : '');
+  $('#acts').innerHTML = `<span class="chip dk" title="cards in your deck / discard pile"><svg class="ic" aria-hidden="true"><use href="#s-card"/></svg><span class="num">${me.deck.length}</span><span class="sm">in deck · ${me.disc.length} played</span></span>` + (mine && !q && ps ? mvBtn(ps, '<span class="pl">Pass</span><span class="pf"> (end my round)</span>', 'alt pass') : '') + (over ? '<button type="button" class="btn go" data-a="showres">See the result</button>' : '') + (mine && !q && !over && hintsOn() && UI.mode !== 'tutorial' ? '<button type="button" class="btn alt" data-a="whatdo">What should I do?</button>' : '') + (UI.coachFree && UI.mode === 'tutorial' && !over ? '<button type="button" class="btn alt" data-a="tutleave">Leave tutorial</button>' : '');
   // guardians and idols you hold (free actions)
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}">${ic('guard', 'guardian')}<span>${g.used ? 'used' : 'Boon'}</span></button>`; });
@@ -120,7 +124,7 @@ function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do: tap Pass to end your round.';
   const k = {}, bits = []; L.forEach(m => { k[m.t] = 1; });
   if (k.play) bits.push('play a card'); if (k.dig || k.disc || k.beat) bits.push('go to a site'); if (k.buy) bits.push('buy a card'); if (k.res || k.temple) bits.push('research');
-  let bestTxt = ''; try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) bestTxt = ' Best now: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
+  let bestTxt = ''; if (hintsOn()) try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) bestTxt = ' Best now: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
   return 'One action: ' + (bits.length > 1 ? bits.slice(0, -1).join(', ') + ' or ' + bits[bits.length - 1] : bits[0]) + '.' + (bestTxt || ' Tap what glows.');
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Pick a card to buy cheaper.', site: 'Pick a site to dig for free.' }[q.h] || 'Choose.'; }

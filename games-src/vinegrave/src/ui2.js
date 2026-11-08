@@ -68,6 +68,8 @@ document.addEventListener('click', e => {
 $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' && GXT.active()) return; closeInsp(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.insp) closeInsp(); });
 const UIACT = {};
+UIACT.hints = () => { UI.prefs.hints = !UI.prefs.hints; savePrefs(); if (window.GXH) try { GXH.setEnabled(hintsOn()); if (!hintsOn()) GXH.hide(); } catch (e) { } toast(UI.prefs.hints ? 'Hints on: previews, best picks and tips.' : 'Hints off: a clean game.', 1600); render(); };
+UIACT.whatdo = () => { if (!myTurn()) return; const m = VAI.choose(G, 'hard'), el = moveTarget(m); bestBadges(); if (el) { const tt = tabOf(el); if (tt && tt !== UI.tab) { showTab(tt); render(); } const n = moveTarget(m); if (n) { n.setAttribute('data-badge', 'Try this'); try { n.scrollIntoView({ block: 'nearest' }); } catch (e) { } } } toast('Try: ' + shortLabel(m) + '. ' + (VAI.why(G, m) || ''), 3200); };
 UIACT.tab = t => { showTab(t.dataset.t); UI.autoTab = false; render(); };
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
@@ -183,15 +185,15 @@ function showEvents(s) {
   let wait = 0; const ev = G.ev || [];
   ev.forEach(e => {
     if (typeof coachEvent === 'function') coachEvent(e, s);
-    if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); toast(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
+    if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); note(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
     if (e.k === 'guardian') { wait = Math.max(wait, 2700); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', 'Overcome it for 5 points and a boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
     if (e.k === 'beat') { wait = Math.max(wait, 2300); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, 'Overcome!', w + (w === 'You' ? ' tame ' : ' tames ') + V.GUARD[e.guard].name + ': +5 points and a boon.', true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
-    if (e.k === 'fear') { sfx.play('fear'); toast(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
-    if (e.k === 'round') { toast('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
+    if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
+    if (e.k === 'round') { note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
     if (e.k === 'gain' || e.k === 'dig' || e.k === 'buy') sfx.play('coin');
     if (e.k === 'research') sfx.play('step');
-    if (e.k === 'rival') toast(G.log[G.log.length - 1].t, 1800);
+    if (e.k === 'rival') note(G.log[G.log.length - 1].t, 1800);
   });
   return UI.fast ? 0 : wait;
 }
@@ -234,7 +236,7 @@ function evalMoves() {   /* every main move you can make now, simulated on a cop
 }
 const sameMv = (a, b) => !!a && !!b && (VG.same ? VG.same(a, b) : JSON.stringify(a) === JSON.stringify(b));
 function previewText(m) {
-  const e = evalMoves().find(x => sameMv(x.m, m)); if (!e) return '';
+  if (!hintsOn()) return ''; const e = evalMoves().find(x => sameMv(x.m, m)); if (!e) return '';
   const p = []; if (e.d.vp) p.push((e.d.vp > 0 ? '+' : '') + e.d.vp + (Math.abs(e.d.vp) === 1 ? ' point' : ' points') + (e.d.why.length ? ' (' + e.d.why.join(', ') + ')' : ''));
   if (e.d.rs > 0) p.push('+' + e.d.rs + ' research step' + (e.d.rs > 1 ? 's' : '')); p.push(...e.d.res.slice(0, 3));
   return p.length ? 'You get: ' + p.join(', ') : 'No goods now: it sets up later turns';
@@ -246,7 +248,7 @@ function shortLabel(m) {
 }
 function bestBadges() {   /* gold badges: the strongest site and the strongest market card for you right now */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
-  const ev = evalMoves(); if (!ev.length) return;
+  if (!hintsOn()) return; const ev = evalMoves(); if (!ev.length) return;
   const top = ev[0], site = ev.find(x => x.m.s != null && /dig|disc|beat/.test(x.m.t)), buy = ev.find(x => x.m.t === 'buy');
   const mark = (x, t) => { if (!x) return; const el = moveEl(x.m, UI.view); if (el && !el.dataset.badge) el.dataset.badge = t; };
   mark(top, 'Best'); mark(site, 'Best site'); mark(buy, 'Best buy');
@@ -258,7 +260,7 @@ function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest 
   return gap <= 2.5 || i === 1 ? { k: 'okay', t: 'Okay move. Slightly better: ' + shortLabel(best.m) + '.' } : { k: 'poor', t: 'Weak move. Much better was: ' + shortLabel(best.m) + '.' };
 }
 function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
-  if (UI.fast || !G || G.phase === 'over' || (typeof GXT !== 'undefined' && GXT.running && GXT.running())) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
+  if (!hintsOn() || UI.fast || !G || G.phase === 'over' || (typeof GXT !== 'undefined' && GXT.running && GXT.running())) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
   const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
   e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
   try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }

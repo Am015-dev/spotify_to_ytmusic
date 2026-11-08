@@ -12,6 +12,8 @@ const OUT = process.argv[2] || 'shots', PRE = process.argv[3] || 'v4';
     const tap = async loc => touch ? loc.tap() : loc.click();
     await page.goto(S.url, { waitUntil: 'load' }); await page.waitForSelector('#start .tbtn'); await page.waitForTimeout(2500); await shot('title');
     await tap(page.locator('#start .tbtn').first());
+    await page.waitForTimeout(500); await shot('goal');
+    await page.waitForTimeout(300); if (await page.locator('#goal:not([hidden]) .tbtn').count()) await tap(page.locator('#goal .tbtn'));
     await page.waitForFunction(() => window.G && myTurn() && !UI.busy, null, { timeout: 20000 }); await page.waitForTimeout(900);
     await page.evaluate(() => { try { showTab('map'); render(); } catch (e) { } }); await shot('map');
     await page.evaluate(() => { try { showTab('track'); render(); } catch (e) { } }); await shot('research');
