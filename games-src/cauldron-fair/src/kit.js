@@ -84,8 +84,8 @@ function potSVG(o) {
     if (mini) { s += `<circle cx="${p.x}" cy="${p.y}" r=".34" fill="${D.RUBY[i] ? '#f4a0aa' : 'rgba(255,255,255,.35)'}"/>`; continue; }
     s += `<g class="sp" data-i="${i}"><circle cx="${p.x}" cy="${p.y}" r=".5" fill="${pad(i)}" stroke="#3a2616" stroke-width=".05" opacity="${i === 0 ? .9 : .94}"/>`;
     if (i > 0 && !isSp) s += `<text x="${p.x}" y="${f2(p.y + .16)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".46" fill="#4a2a22">${D.COINS[i]}</text>`;
-    if (isSp) s += `<text x="${p.x}" y="${f2(p.y - .02)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".34" fill="#6a3a12">15 VP</text><text x="${p.x}" y="${f2(p.y + .3)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".34" fill="#6a3a12">35</text>`;
-    if (i > 0 && !isSp && D.VP[i] > 0) s += `<rect x="${f2(p.x + .02)}" y="${f2(p.y - .68)}" width=".62" height=".44" rx=".08" fill="#7a4a1a" stroke="#fff6dc" stroke-width=".03"/><text x="${f2(p.x + .33)}" y="${f2(p.y - .33)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".38" fill="#fff6dc">${D.VP[i]}</text>`;
+    if (isSp) s += `<text x="${p.x}" y="${f2(p.y - .02)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".26" fill="#6a3a12">15 VP</text><text x="${p.x}" y="${f2(p.y + .3)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".26" fill="#6a3a12">35</text>`;
+    if (i > 0 && !isSp && D.VP[i] > 0) s += `<rect x="${f2(p.x - .26)}" y="${f2(p.y - .5)}" width=".52" height=".36" rx=".08" fill="#7a4a1a" stroke="#fff6dc" stroke-width=".03"/><text x="${p.x}" y="${f2(p.y - .21)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".3" fill="#fff6dc">${D.VP[i]}</text>`;
     if (D.RUBY[i]) s += `<path transform="translate(${f2(p.x - .52)} ${f2(p.y - .56)}) scale(.019)" d="M12 3 L19 9 L12 21 L5 9 Z" fill="#e0334c" stroke="#7a1022" stroke-width="1.6"/>`;
     s += '</g>';
   }

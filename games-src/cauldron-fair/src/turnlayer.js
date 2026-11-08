@@ -51,6 +51,8 @@ function instrBar() {
   const html = '<b>' + i.who.replace(/</g, '&lt;') + '</b><span>' + i.text.replace(/</g, '&lt;') + '</span>'; if (e.dataset.h !== html) { e.dataset.h = html; e.innerHTML = html; }
   const db = $('#dockbody'), pd = $('#promptDock'), vis = pd && pd.getBoundingClientRect().width > 0;
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
+  if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
+  if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
   const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
 }
 // ---- the turn banner: slides in when the turn changes hands
@@ -68,7 +70,7 @@ function turnBanner() {
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
   b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
 }
-setInterval(() => { try { rfScan(); instrBar(); turnBanner(); } catch (e) { } }, 200);
+setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble
 (function () {
   const ts = tutSteps; tutSteps = function () {
