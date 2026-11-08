@@ -12,7 +12,7 @@ Proof column = the test line in `rules-test.js` (`node rules-test.js`, 99 tests)
 | Everyone draws at the same time, own bag, never look | same | net / sweep | draw1 |
 | A chip moves as many spaces as its number, gaps stay empty | same | placement test | spiral |
 | Scoring space = the space after the last chip | same | scoring space test | ring |
-| Stop any time (after at least one chip) | same; a first chip is required | must draw test | stopany |
+| Stop any time (after at least one chip) | same: the rulebook puts the stop-or-draw choice after each chip is placed, so the first chip is drawn | must draw test | stopany |
 | White sum over 7 explodes; last chip stays | same | explosion test | whites, push |
 | Flask: put the last white back, once until refilled | same | flask tests, tutorial script test | flask, seven |
 | Bonus die: furthest pot that did not explode rolls | same (ties all roll, spoon all roll) | bonus die tests | report |
@@ -35,6 +35,7 @@ Proof column = the test line in `rules-test.js` (`node rules-test.js`, 99 tests)
 3. No engine rule differed from the rulebook in the full touch game (9 days, 3 players, 0 errors).
 
 ## Still differs or unverified
-- Die: which outcome sits on the sixth face is not in the rulebook text; we repeat 1 VP.
-- The first chip is compulsory (the rules never say a player may stop on an empty pot).
+- Die: the rulebook lists five results (1 VP, 2 VP, ruby, droplet, orange chip) and no rules page, FAQ or review found on 8 Nov says
+  which sits on the sixth face; we repeat 1 VP. Checked again: rules summary pages, the publisher FAQ list, two reviews.
+- First chip: confirmed, not a difference (the rulebook: "After each chip is drawn and placed, players decide whether they want to stop").
 - Not built: the advanced test-tube side of the cauldron and both expansions.
