@@ -73,23 +73,28 @@ function tutSteps0(){
  {id:'place1',title:'Match the edges',say:'Road meets road: edges must match. Tap the glowing square to lay your tile.',target:tutGlow(1),wait:placeW(1),ready:()=>tutP(1,'place')&&tutRot(0)},
  {id:'fig_road',title:'Claim the road',say:'Tap the glowing circle to put a follower on the road. You start with seven.',target:tutFig(1),wait:figW(1),ready:()=>tutP(1,'fig')},
  {id:'computer',title:'The computer plays',say:'It lays a tile and may claim. A road, town or field with a follower is taken.',target:()=>UI.tl['1,1'],also:tutMp(1),wait:null,ready:()=>tutP(3,'place')&&!!tutMp(1)()},
+ {id:'claimed',title:'One owner',say:'',target:()=>UI.tl['1,1'],also:tutMp(1),wait:null,ready:()=>tutP(3,'place')},
  {id:'place2',title:'End the road',say:'This tile closes your road on the left. Tap the glowing square.',target:tutGlow(3),wait:placeW(3),ready:()=>tutP(3,'place')&&tutRot(3)},
  {id:'fig_priory',title:'Claim the priory',say:'A priory scores 9 when eight tiles surround it. Tap the circle to claim it.',target:tutFig(3),wait:figW(3),ready:()=>tutP(3,'fig')},
  {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:null,
    onEnter:hold,onNext:release,hold:true,ready:()=>tutAfter(4,4)},
  {id:'place3',title:'Make a town',say:'Town meets town. This edge closes the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(2)},
  {id:'fig_town',title:'Claim the town',say:'Claim it before it closes. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
- {id:'town_done',title:'Town finished',say:'Two tiles at 2 points each: 4 more. The follower is back.',target:tutCellsFn(['0,0','0,-1']),wait:null,
-   onEnter:hold,onNext:release,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1']),wait:null,
+   onEnter:hold,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:null,onNext:release,hold:true,ready:()=>tutAfter(6,8)},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
+ {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:null,ready:()=>tutP(9,'place')},
+ {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:null,ready:()=>tutP(9,'place')},
  {id:'place5',title:'Keep building',say:'Six of eight neighbours are down. No follower needed here.',target:tutGlow(9),wait:placeW(9),ready:()=>tutP(9,'place')&&tutRot(1)},
+ {id:'discard',title:'No fit',say:'',target:()=>document.querySelector('#htile'),wait:null,ready:()=>tutP(11,'place')},
  {id:'place6',title:'The last tile',say:'This completes the ring around your priory. Tap the glowing square.',target:tutGlow(11),wait:placeW(11),ready:()=>tutP(11,'place')&&tutRot(3)},
  {id:'skip',title:'Or skip',say:'Nothing to claim here. Tap Skip to end your turn.',target:()=>document.querySelector('#hskip'),wait:{type:'tap',match:a=>a.what==='skip'},ready:()=>tutP(11,'fig')},
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
  {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
- {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! The deeds of Vinemoor go to Garnet, and Hob wants a rematch.',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
+ {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
   ]}
 // ---------------------------------------------------------------- start, leave
 function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=true;UI.tutHold=false;UI.tutAuto=0;
@@ -97,8 +102,16 @@ function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=tr
 // leave the staged game: nothing of it was saved, and the board goes quiet behind the menu
 function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;UI.endShown=false;G=null;UI.lastOpts=null;
   try{resetUI()}catch(e){}for(const e of document.querySelectorAll('#world .glow'))e.remove();try{GXH.hide()}catch(e){}UI.lastOpts=setupOpts();const g=$('#ghost');if(g)g.remove()}
-// the tutorial is the coached first game (coach.js); the forced-step GXT version is retired
-function tutStart(o){coachStart(o)}
+// Learn to play (owner, 8 Nov: gameplay first): a guided first game that teaches every core rule in order, one sentence + one highlighted tap
+// per step (shell/gx-tutor.js), then a real game. The coached free game (coach.js) is no longer launched from here.
+const TUT_RULES=['goal','turn','place1','fig_road','computer','claimed','place2','fig_priory','road_done','place3','fig_town','town_done','pennant','place4','fig_farmer','majority','tie','place5','discard','place6','skip','priory_done','final','winner'];
+function tutStart(o){const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
+  try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';
+  GXT.start({game:TUT_GAME,story:true,setup:tutSetup,steps:tutSteps(),endTitle:STORY.tutEndTitle,endText:pro?STORY.tutEndStory:STORY.tutEndText,
+    endButtons:pro?[{id:'chapter',label:'Start chapter 1'}]:[{id:'play',label:'Play a real game'}],
+    onDone:r=>{tutLeave();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+      if(r&&r.choice==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);else beginGame()},
+    onExit:()=>{tutLeave();showStart()}})}
 // Story starts with the tutorial (Chapter 0) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))prologueCard();else GXC.open()}

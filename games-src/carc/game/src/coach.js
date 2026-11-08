@@ -80,7 +80,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
       GXCOACH.done = true; m.querySelector('[data-a=cgo]').onclick = () => finish(pro);
     };
     const show = () => {
-      if (i >= pages.length) return showLater();
+      if (i >= pages.length) return finish(pro);   // no 'rules to learn later' card: every rule is taught in Learn to play (tutor.js)
       const [k, t] = pages[i]; const guide = STORY.guide;
       const m = card('<div class="cwalk"><img class="cpic" src="' + guide.img + '" alt=""><div><b>' + guide.name + '</b><p>' + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p></div></div><div class="cstep" aria-label="Page ' + (i + 1) + ' of ' + pages.length + '">' + pages.map((_, j) => '<i' + (j === i ? ' class="on"' : '') + '></i>').join('') + '</div><button class="btn big" data-a="cnext">' + (i === pages.length - 1 ? 'Continue' : 'Next') + '</button>');
       m.querySelector('[data-a=cnext]').onclick = () => { i++; show(); };

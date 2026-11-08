@@ -27,3 +27,12 @@ Updated for the current flow (Goal card, "New here?" prompt, tap then "Place her
 - sweep.js
 - rotate-test.js
 - playable-test.js (SIZE env)
+
+## Gameplay first (owner rule, 8 Nov)
+- Rules: compared the engine with the original base rules by playing full games by touch at 390x844 and 375x667, and against the 71 logic tests in RULES-CHECKLIST.md.
+  - No rule differences were found. The listed rules (edges, the tile just placed, claimed features, completion scoring and returns, pennants, farmers at the end, majority/ties, unfinished features, 7 followers) each already have a logic test.
+- Tutorial: "Learn in 5 minutes" and the Story prologue are now a guided first game.
+  - 24 steps, every core rule in order, each one sentence of 12 words or fewer plus one highlighted tap. Then "Play a real game".
+  - New taught steps: one owner per feature, banners, majority, ties, a tile that fits nowhere.
+  - The coached game's "Rules to learn later" card is gone.
+  - Coverage table: TUTORIAL-COVERAGE.md. Proof: game/tut-walk-test.js (also run by learn-touch-test.js).
