@@ -65,7 +65,7 @@ function threatAlt(i){const k=G.ev.threat[i];if(!k)return -1;const r=CARD[k].th.
 function haveText(r){if(!r)return '';const parts=[];const one=o=>{for(const x of o.items||[])parts.push(has(x)?`a ${(INVENTIONS[x]||{}).n}`:'');if(o.weapon)parts.push(`weapon ${G.weapon}`);for(const k in o.res||{})parts.push(`${G.res[k]-committed()[k]} ${RNAME[k]}`)};(r.alt||[r]).forEach(one);const p=[...new Set(parts.filter(Boolean))];return p.length?`you have ${p.join(', ')}`:"you have none of these"}
 // ---------- what can hurt tonight or at dawn ----------
 function wxFoodLoss(){const c=clouds();return Math.max(0,Math.floor(c.est)-G.camp.roof)}
-function clouds(){const S=SCENARIOS[G.scen];const wx=S.wx[G.round]||[];return {dice:wx,est:wx.filter(x=>x!=='animals').length*1.5+G.wx.rain+G.wx.snow}}
+function clouds(){const S=SCENARIOS[G.scen];const wx=wxTab()[G.round]||[];return {dice:wx,est:wx.filter(x=>x!=='animals').length*1.5+G.wx.rain+G.wx.snow}}
 function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.scen];const add=p=>{o.push(p);return p};
   const need=eatersNeed(),have=food(),planF=plannedFood();
   // near death: the hard rule
@@ -101,8 +101,8 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   if(cl.est>G.camp.roof&&(hasShelter()||jobPlanned('build',{k:'shelter'}))){const names=cl.dice.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 animals die'}[x])).concat(G.wx.rain?[`+${G.wx.rain} rain`]:[],G.wx.snow?[`+${G.wx.snow} snow`]:[]);
     const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const rp={id:-1,type:'build',tgt:{k:'roof'},pw:[],pay:'wood'};const canPay=jobPlanned('build',{k:'roof'})||afford(rp)||afford(Object.assign({},rp,{pay:'fur'}));
     add({w:80,icon:'☂️',title:'Raise the roof',why:`Weather tonight (${names.join(', ')}): each cloud above roof ${G.camp.roof} ruins 1 food and 1 wood, and what you can’t pay is a wound each. Roof +1 costs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur.`,act:{type:'build',tgt:{k:'roof'}},cant:canPay?null:`needs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur: you have ${G.res.wood-committed().wood} wood and ${G.res.fur-committed().fur} fur free`,done:jobPlanned('build',{k:'roof'})})}
-  else if(!cl.dice.length&&(S.wx[G.round+1]||[]).length&&G.camp.roof<2)add({w:40,icon:'☂️',title:'Get ready for the weather',why:`Weather dice start tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'needs a shelter first',done:jobPlanned('build',{k:'roof'})});
-  if((S.wx[G.round]||[]).includes('snow')&&G.res.wood-committed().wood<2)add({w:60,icon:'🪵',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone takes a wound.',act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood')});
+  else if(!cl.dice.length&&(wxTab()[G.round+1]||[]).length&&G.camp.roof<2)add({w:40,icon:'☂️',title:'Get ready for the weather',why:`Weather dice start tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'needs a shelter first',done:jobPlanned('build',{k:'roof'})});
+  if((wxTab()[G.round]||[]).includes('snow')&&G.res.wood-committed().wood<2)add({w:60,icon:'🪵',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone takes a wound.',act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood')});
   // the threat that strikes at the next dawn
   if(G.ev.threat[0]&&G.ev.threat[1]){const k=G.ev.threat[0],c=CARD[k];const harm=opsValue(c.te);if(harm<0){const r=c.th.req;const al=threatAlt(0);const rq=reqText(r);
     add({w:70,icon:'⚠️',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)} ${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?`, needs ${rq}: ${haveText(r)}`:''}.`,act:al>=0?{type:'threat',tgt:0,alt:al}:null,cant:al>=0?null:`needs ${rq}`,done:jobPlanned('threat',0)})}}
@@ -157,7 +157,49 @@ function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c
   for(const c of living())if(c.human&&nearDeath(c)&&!restPlanned(c.i)){const p=humanFree().find(q=>q.c===c.i)||allPawns().find(q=>q.c===c.i);if(p&&!placeWhy(p.id,'rest',null)||p&&placedIds().has(p.id)){const snap=JSON.stringify(G.plan);unplace(p.id);if(place(p.id,'rest',null))G.plan=JSON.parse(snap)}}
   if(!planLegal()&&!keep){clearPlan(hs);aiPlan(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)))}
   return {lines,why:whyBy}}
-function suggestPlan(){if(!planOpen())return '';const r=suggestCore(false);UI.sugWhy=r.why;refresh();return r.lines.join('\n')}
+function suggestPlan(){if(!planOpen())return '';const L=(typeof ADVLOOK!=='undefined'?ADVLOOK:G.learn)?lookSuggest():null;if(L){UI.sugWhy=L.why;refresh();return L.lines.join('\n')}
+  const r=suggestCore(false);UI.sugWhy=r.why;refresh();return r.lines.join('\n')}
+// ---------- ✨ Suggest looks ahead: several whole plans (each priority first, the greedy plan, the computer's), each with or without wood on the
+// signal pile, are played out to the next morning a few times on reshuffled decks (the real engine, on a copy); the plan that keeps everyone
+// healthiest and the rescue on schedule wins. Only the plan comes back: nothing of the trial runs is kept.
+// On in the Learn to play game (G.learn): there it takes the coached player to the rescue (adv-test.js 30 learn: 29/30). In Play the faithful
+// island beats it as often as the old Suggest (0/30 both, the computer's own planner wins ~3%), so Play keeps the priority list (ADVLOOK=1 forces it).
+var ADVSIMS=4,ADVHOR=1;var ADVK=Object.assign({pile:2.5,wood:.7,wcap:5,food:0,inv:.6,slack:60,slackT:3,low:10},typeof ADVKX!=='undefined'?ADVKX:{});
+function advScore(g){let s=stateScore(g);if(g.over)return s;
+  for(const c of g.chars){if(c.dead||c.npc)continue;const life=CHARS[c.k].die-c.w;if(life<=4)s-=(5-life)*ADVK.low}
+  if(g.scen==='marooned'){const left=5-PILE_CUM.filter(c=>c<=g.sc.pile).length;const days=13-g.round;const slack=days-left;
+    const K=ADVK;s+=g.sc.pile*K.pile+Math.min(g.res.wood,K.wcap)*K.wood+Math.min(g.res.food+g.res.pfood,4)*K.food;for(const k in g.inv.built)if(k!=='fire')s-=(INV_BASE[k]||2)*K.inv;if(slack<0)s-=900;else if(slack<K.slackT)s-=(K.slackT-slack)*K.slack;
+    if(!g.inv.built.fire){const mnt=g.map.some(m=>m.tile!=null&&!m.down&&(TILES.find(t=>t.no===m.tile)||{}).terr==='mountains');s+=mnt?8:0;if(g.round>=7)s-=(g.round-6)*25}}
+  return s}
+function advSim(json,seed){const keep=G;let sc=-1e9;try{G=JSON.parse(json);G.rng=seed>>>0;for(const c of G.chars){c.human=false;if(c.hh!==undefined)c.hh=false}
+    shuffle(G.ev.deck);shuffle(G.tileDeck);shuffle(G.mys.deck);shuffle(G.hunt);shuffle(G.beast);shuffle(G.discs);for(const d in G.adv)shuffle(G.adv[d]);
+    G.stk.push({f:'fn',k:'go'});const r0=G.round;let n=0;while(!G.over&&n++<80){run();if(G.phase==='plan'&&G.round>=r0+ADVHOR)break;if(G.phase==='plan'&&!G.q){aiPlan();G.stk.push({f:'fn',k:'go'});continue}if(!G.stk.length)break}
+    sc=advScore(G)}catch(e){console.error(e)}finally{G=keep}return sc}
+function lookSuggest(){if(UI.sim||typeof stateScore!=='function')return null;const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);if(!hs.length)return null;
+  const base=JSON.stringify(G),fx0=UI.fx.length,la=UI.lastAct,busy=UI.recBusy;const before0=new Set();
+  {const g0=JSON.parse(base);for(const a of g0.plan.acts)for(const id of a.pw){const q=(()=>{const k=G;G=g0;const r=pawnInfo(id);G=k;return r})();if(q&&(q.c==null||!hs.includes(q.c)))before0.add(id)}}
+  const cands=[];const seen=new Set();let pileMax=0;
+  UI.sim=1;UI.recBusy=1;const mr=Math.random;let rs=(G.seed*7+G.round*104729+G.logN)>>>0;Math.random=()=>{rs=(rs*1664525+1013904223)>>>0;return rs/4294967296};
+  try{clearPlan(hs);const cleared=JSON.stringify(G);
+    if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();pileMax=Math.max(0,Math.min(room,G.res.wood-committed().wood))}
+    const piles=[0];if(pileMax>0)piles.push(pileMax);if(pileMax>2)piles.push(Math.ceil(pileMax/2));
+    const open=priorities().filter(p=>!p.done&&p.act).slice(0,6);
+    const kinds=[{k:'greedy'}].concat(open.map((p,i)=>({k:'first',i})),[{k:'ai',n:0},{k:'ai',n:.45},{k:'ai',n:.45}]);
+    for(const pn of piles)for(const kd of kinds){G=JSON.parse(cleared);UI.lastAct=null;if(pn>0&&pileAdd(pn))continue;
+      try{if(kd.k==='greedy')suggestCore(true);
+        else if(kd.k==='first'){const p=priorities().filter(q=>!q.done&&q.act)[kd.i];if(!p)continue;if(doJob(p.act.type,p.act.tgt,p.act.alt,p.lead))continue;suggestCore(true)}
+        else{AIW.noise=kd.n;aiPlan(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)));AIW.noise=0}}catch(e){AIW.noise=0;continue}
+      if(!planLegal())continue;
+      // the hard rule still holds: anyone close to death rests
+      if(living().some(c=>c.human&&nearDeath(c)&&!restPlanned(c.i)&&!placeWhy((allPawns().find(q=>q.c===c.i)||{}).id,'rest',null)))continue;
+      const key=JSON.stringify(G.plan.acts.map(a=>[a.type,a.tgt,a.pw.length]))+'|'+G.sc.pile;if(seen.has(key))continue;seen.add(key);cands.push({js:JSON.stringify(G),pn,kd})}
+    if(!cands.length)return null;
+    for(const c of cands){let t=0;for(let k=0;k<ADVSIMS;k++)t+=advSim(c.js,(G.seed*131+G.round*977+k*7919)>>>0);c.v=t/ADVSIMS}
+  }finally{UI.sim=0;UI.recBusy=busy;AIW.noise=0;Math.random=mr}
+  cands.sort((a,b)=>b.v-a.v);if(typeof ADVDBG!=='undefined')UI.lookDbg=cands.map(c=>c.kd.k+(c.kd.i!=null?c.kd.i:'')+(c.kd.n!=null?c.kd.n:'')+'/p'+c.pn+'='+c.v.toFixed(0)).join(' ');G=JSON.parse(cands[0].js);UI.fx.length=Math.min(UI.fx.length,fx0);UI.lastAct=la;
+  const lines=[],why={};if(cands[0].pn>0)lines.push(`${cands[0].pn} wood → signal pile (${G.sc.pile}/15)`);
+  for(const a of G.plan.acts){const ids=a.pw.filter(id=>!before0.has(id));if(!ids.length)continue;lines.push(`${pawnGroup(ids)} → ${actLabel(a)}`);why[JSON.stringify([a.type,a.tgt])]='the safest plan for tonight'}
+  return {lines,why}}
 // plan step 2: the job the advisor would give each free pawn, worked out on a copy of the game (the real plan is untouched)
 // The advice stays the same while you follow it; it is worked out again only when the plan leaves it (or resources change).
 function recValid(r){if(!r||r.round!==G.round||r.res!==JSON.stringify(G.res)||r.logN!==G.logN)return false;const now={};for(const a of G.plan.acts)for(const id of a.pw)now[id]=JSON.stringify([a.type,a.tgt]);

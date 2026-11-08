@@ -54,11 +54,11 @@ function discText(k){const d=DISCS[k];if(d.sc!=null)return SCENARIOS[G.scen].fin
 // ---------- starting items ----------
 const PLANITEMS=['biscuits','bottle','pipe','stormglass'];
 function itemWhy(k){const it=G.items.find(i=>i.k===k);if(!it||it.uses<1)return 'not available';if(!PLANITEMS.includes(k))return {rum:'used at night',hammer:'place it as a build pawn',pistol:'offered when you fight',bible:'used by arranging the camp'}[k]||'not now';
-  if(G.phase!=='plan'||G.q||G.over)return 'use it while planning';if(k==='stormglass'&&G.wxEarly)return 'already read this round';if(k==='stormglass'&&!(SCENARIOS[G.scen].wx[G.round]||[]).length)return 'no weather dice this round';return null}
+  if(G.phase!=='plan'||G.q||G.over)return 'use it while planning';if(k==='stormglass'&&G.wxEarly)return 'already read this round';if(k==='stormglass'&&!(wxTab()[G.round]||[]).length)return 'no weather dice this round';return null}
 function useItem(k,ci){const why=itemWhy(k);if(why)return why;const it=G.items.find(i=>i.k===k);it.uses--;lg(`Used: ${ITEMS[k].n}${it.uses?' ('+it.uses+' use left)':' (used up)'}.`,'step');
   switch(k){case 'biscuits':gain('pfood',1,{});break;case 'bottle':weapon(1);break;
   case 'pipe':{const c=ci!=null?P(ci):living().sort((a,b)=>a.det-b.det)[0];gainDet(c,2);break}
-  case 'stormglass':{const r={};for(const d of SCENARIOS[G.scen].wx[G.round]){if(d==='rain')r.rain=DICE['weather-rain'][rnd(6)];if(d==='snow')r.snow=DICE['weather-winter'][rnd(6)];if(d==='animals')r.animals=DICE['weather-animals'][rnd(6)]}G.wxEarly=r;lg(`The storm glass reads the sky: ${Object.values(r).join(', ')}.`,'big');break}}
+  case 'stormglass':{const r={};for(const d of wxTab()[G.round]){if(d==='rain')r.rain=DICE['weather-rain'][rnd(6)];if(d==='snow')r.snow=DICE['weather-winter'][rnd(6)];if(d==='animals')r.animals=DICE['weather-animals'][rnd(6)]}G.wxEarly=r;lg(`The storm glass reads the sky: ${Object.values(r).join(', ')}.`,'big');break}}
   G.items=G.items.filter(i=>i.uses>0);R();return null}
 // ---------- discovery tokens ----------
 function discWhy(i){const o=G.own[i];if(!o)return 'gone';if(o.fut)return 'usable after the actions';const d=DISCS[o.k];if(G.over||G.q)return 'not now';

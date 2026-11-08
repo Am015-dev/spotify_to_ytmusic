@@ -4,6 +4,7 @@ const ST=()=>window.TBSTORY||{};
 const cast=id=>{const c=(window.CAMPAIGN&&window.CAMPAIGN.cast&&window.CAMPAIGN.cast[id])||{};return {name:(c.name||id||'').split(/[ ,]/).slice(0,2).join(' ').replace(/^Old /,'Old '),emoji:c.emoji||'',color:c.color||'#8e5bb5'}};
 const css=document.createElement('style');css.textContent=`
 #tbturn{grid-area:tb;display:flex;align-items:center;gap:10px;height:72px;box-sizing:border-box;overflow:hidden;padding:6px 12px;background:#1a1024;border-bottom:1px solid rgba(232,200,120,.35);z-index:3;cursor:default}
+#tbturn[hidden]{display:none!important}
 #tbturn .tbt-chip{flex:0 0 auto;font:700 14px/1.1 Cinzel,Georgia,serif;letter-spacing:.04em;text-transform:uppercase;padding:7px 10px;border-radius:8px;background:#f0c860;color:#2a1a05;border:2px solid #f0c860;max-width:132px;text-align:center}
 #tbturn .tbt-chip.rv{background:#1a1024;color:#fff;border-color:var(--c,#c0392b)}
 #tbturn .tbt-chip.wt{background:#2a2036;color:#f6ecd2;border-color:#8a7aa0}
@@ -46,7 +47,8 @@ function voice(who,text,ms,tag){if(!text)return;const tx=typeof text==='function
 function nextVoice(){clearTimeout(vT);vNow=vq.shift()||null;paint();if(vNow)vT=setTimeout(nextVoice,window.ANIM?vNow.ms:0)}
 function clearVoice(){vq=[];vNow=null;clearTimeout(vT)}
 // ---- what the strip says right now
-function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.card.kind==='over'){e.hidden=true;return}e.hidden=false;
+const covered=()=>{try{const st=document.getElementById('start');return !!(st&&!st.hidden)||!!document.querySelector('.gxc-map-on:not([hidden]),.gxc-scene-on:not([hidden]),#tbcend')}catch(x){return false}};
+function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.card.kind==='over'||covered()){e.hidden=true;return}e.hidden=false;
   let html='',cls='',key='';
   if(vNow){const c=cast(vNow.who);key='v'+vNow.text;cls='voice';e.style.setProperty('--c',c.color);html='<span class="tbt-face" aria-hidden="true">'+esc2(c.emoji)+'</span><span class="tbt-line"><span class="sr">'+esc2(c.name)+': </span>'+esc2(vNow.text)+'</span>'}
   else if(false){const s=UI._tbCap.s;key='c'+UI._tbCap.t;e.style.setProperty('--c',fcol(s));html='<span class="tbt-chip rv">'+esc2(poss(shortName(s)))+' turn</span><span class="tbt-line">'+esc2(UI._tbCap.t)+'</span>'}
@@ -129,7 +131,9 @@ function coachCheck(){try{if(!coachOn())return;if(G.over){if(!UI._tbEnd)tbEnd();
   else if(sig==='news')say('score',true);
   else if(sig==='evsummary')say('round');
 }catch(e){}}
-setInterval(coachCheck,220);window.tbCoachCheck=coachCheck;
+setInterval(coachCheck,220);
+// a menu, the chapter map or a story scene on top: the strip (and any coach line) is hidden, never shown under it
+setInterval(()=>{try{const e=el&&el.isConnected?el:null;if(!e)return;const c=covered();if(c&&!e.hidden)e.hidden=true;else if(!c&&e.hidden&&G&&UI.started)paint()}catch(x){}},250);window.tbCoachCheck=coachCheck;
 function tbEnd(){UI._tbEnd=1;if(TBCOACH.seen.indexOf('round')<0)TBCOACH.seen.push('round');try{GXT.markDone('thornbound')}catch(e){}
   const C=(ST().coach)||{};let over='';try{over=overHTML()}catch(e){}
   const box=document.createElement('div');box.id='tbcend';box.style.cssText='position:fixed;inset:0;z-index:9999;background:#140c1a;color:#f6ecd2;overflow:auto;padding:16px;font:600 16px/1.35 "EB Garamond",Georgia,serif';

@@ -129,6 +129,9 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Vinegrave https://am015-dev.github.io/spotify_to_ytmusic/vinegrave/ (R3 PASS 05:16, live 05:20, feel-audit live all pass)
 - Kaiten Kitchen https://am015-dev.github.io/spotify_to_ytmusic/kaiten-kitchen/ (R3 PASS 05:56, live 06:16, feel-audit live all pass; Story stage 1 UI-tap test stuck = known, W463 fixing)
 - Sands of Qamar https://am015-dev.github.io/spotify_to_ytmusic/sands-of-qamar/ (R7 PASS 06:20, live 06:30, feel-audit live all pass)
+- Tidewake https://am015-dev.github.io/spotify_to_ytmusic/tidewake/ (R3 PASS 06:34, live 06:40; live feel-audit (a)=3: Learn coach card closes on a board tap after 250 ms, W464 fixing)
+- Redline Rally https://am015-dev.github.io/spotify_to_ytmusic/redline-rally/ (R9 PASS 06:35, live 06:47, feel-audit live all pass)
+- Short Fuse https://am015-dev.github.io/spotify_to_ytmusic/short-fuse/ (R4 PASS 06:50, live 06:56, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
