@@ -1,5 +1,8 @@
 # Free art credits: redline-rally
 
+> Superseded: every slot now comes from the game-icons.net library below (CC BY 3.0); the Kenney pictures listed in the older tables are no longer used.
+
+
 Every picture is composed by `compose.py` from Kenney packs, all **CC0 1.0** (public domain, no attribution required; logged anyway).
 Author of every pack: Kenney (www.kenney.nl), downloaded from the OpenGameArt mirror. No picture contains text. No publisher, designer or original-game name or logo is used.
 
