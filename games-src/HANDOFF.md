@@ -138,6 +138,7 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Doorkick Dungeon https://am015-dev.github.io/spotify_to_ytmusic/doorkick-dungeon/ (R7 PASS 07:47, live 08:00, feel-audit live all pass)
 - Shipwreck Isle https://am015-dev.github.io/spotify_to_ytmusic/shipwreck-isle/ (R6 PASS 07:55, live 08:15, feel-audit live all pass; Learn wins by Suggest 4/4)
 - Cauldron Fair https://am015-dev.github.io/spotify_to_ytmusic/cauldron-fair/ (R5 PASS 07:46, live 08:39, feel-audit live all pass)
+- Nebula Aces https://am015-dev.github.io/spotify_to_ytmusic/nebula-aces/ (R3 PASS 08:45, live 09:00, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
