@@ -20,6 +20,8 @@ html.bf #tags .tag .tgl{display:none}
 .bfp.on{stroke-width:6;opacity:1;filter:drop-shadow(0 0 6px currentColor)}
 .bfp.set{stroke-width:4;opacity:.8}
 .bfp.ghost{stroke:#66ddff;stroke-width:2.5;opacity:.9;stroke-dasharray:5 4}
+.bfp.ghost.g{stroke:#46f08a}.bfp.ghost.w{stroke:#e8eeff}.bfp.ghost.r{stroke:#ff6b6b}.bfp.ghost.on{stroke-dasharray:none;fill:rgba(255,255,255,.12)}
+.bfnose{fill:#e8eeff;stroke:#0a1020;stroke-width:1.5;opacity:.95}.bfnose.g{fill:#46f08a}.bfnose.r{fill:#ff6b6b}
 .bfshot{fill:none;stroke-linecap:round}
 .bfshot.aim{stroke:#ff6070;stroke-width:2.5;stroke-dasharray:8 7;opacity:.85;animation:bfdash 1s linear infinite}
 .bfshot.fire{stroke:#ffd27a;stroke-width:5;filter:drop-shadow(0 0 6px #ff7040) drop-shadow(0 0 2px #fff);animation:bfzap .5s ease-out}
@@ -80,18 +82,18 @@ html.bf #tags .tag .tgl{display:none}
 .bfd-r{display:flex;align-items:center;gap:6px;justify-content:center}
 .bfd-r .who{font:700 12px/1 "Exo 2",sans-serif;color:#cfd3ff;width:62px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bfd-r .dice{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-start;min-height:52px;align-items:center;flex:1}
-#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .5s ease-out}
+#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .7s cubic-bezier(.2,.7,.3,1) backwards}
 #bfdice .die svg{width:48px;height:52px}#bfdice .die i{display:none}
 #bfdice .die.pick{cursor:pointer;border-radius:10px;outline:2px dashed rgba(127,212,255,.7)}
 #bfdice .die.pick.on{outline:3px solid #ffc86b;transform:translateY(-4px)}
-@keyframes bfroll{from{transform:rotate(-200deg) scale(.3);opacity:0}}
+@keyframes bfroll{0%{transform:translate(-140px,-60px) rotate(-560deg) scale(.6);opacity:0}55%{transform:translate(8px,6px) rotate(20deg) scale(1.08);opacity:1}75%{transform:translate(-3px,-5px) rotate(-8deg)}100%{transform:none}}
 .bfd-out{margin:4px 0;font:800 22px/1.1 Orbitron,"Exo 2",sans-serif}
 .bfd-out small{display:block;font:600 11px "Exo 2",sans-serif;color:#aab}
 .bfd-out .hit{color:#ffd27a}.bfd-out .miss{color:#9db4ff}.bfd-out .kill{color:#ff6a50;font-size:28px}
 #bfdice.res .bfd-out{font-size:30px;animation:bfpop .5s ease-out}
 @keyframes bfpop{from{transform:scale(2.2);opacity:0}}
 /* banner */
-#bfban{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
+#bfban{position:absolute;left:50%;top:36%;transition:top .2s;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
 #bfban[hidden]{display:none}
 #bfban b{display:block;font:800 26px/1.15 Orbitron,"Exo 2",sans-serif;color:#ffc86b}
 #bfban span{display:block;font:600 14px/1.3 "Exo 2",sans-serif;margin-top:4px}
@@ -212,3 +214,8 @@ html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{background:transparent!important;box-
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock>*:not(#ppop){visibility:hidden}
 html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{position:fixed;z-index:40;top:auto;left:8px;right:8px;bottom:8px;max-height:min(52%,340px);border:2px solid var(--gold,#ffc86b);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
 
+
+#bfban.top{top:118px}
+
+.bfrng{fill:none;stroke-width:2;stroke-dasharray:2 6;stroke-linecap:round;opacity:.75}.bfrng.r1{stroke:#ffd27a}.bfrng.r2{stroke:#ffb05a;opacity:.6}.bfrng.r3{stroke:#ff8a4a;opacity:.45}
+.bfrlab{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#1a1020;background:#ffd27a;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.6)}.bfrlab.r2{background:#ffb05a}.bfrlab.r3{background:#ff8a4a}

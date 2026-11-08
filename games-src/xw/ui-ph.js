@@ -75,7 +75,7 @@ const sigNow=()=>G?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step,planSid
 PHN.openPop=function(kind,id){PHN.pop={kind,id};PHN.popSig=sigNow();if(typeof sfx==='function')sfx('click');render()};
 PHN.closePop=function(){if(!PHN.pop)return;PHN.pop=null;if(typeof V3!=='undefined')UI.hoverDial=null;render()};
 // ---- pop-ups (live in the dock zone: under the board in portrait, in the right rail in landscape; they never cover the mat) ----
-const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
 function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
   let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const rk=rockHits(s,d[i]);
       return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${ic}${sug===i?'<em class="rs">★</em>':''}${rk?'<em class="rk">!</em>':''}</button>`}).join('');

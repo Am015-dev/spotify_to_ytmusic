@@ -15,7 +15,9 @@ function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e)
 // ---- step bar ----
 function renderSteps(){renderRoad()}
 // ---- dial picker ----
-const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+// K-turn icon: up the left leg, over the top, DOWN the right leg; the head points backwards (the ship ends facing the way it came)
+var KICO='<svg class="kico" viewBox="0 0 16 16" width="1em" height="1em" aria-hidden="true"><path d="M4 15V6.5a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M8.6 9.4h6.8L12 14.6z" fill="currentColor"/></svg>';
+const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
 const COLW=['Turn left','Bank left','Straight','Bank right','Turn right','K-turn'];
 function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=COLS.map(([t,dd])=>d.some(m=>m.t===t&&(m.d||0)===dd&&m.s>0));
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
@@ -162,7 +164,7 @@ ${UI.optsOpen?`  <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['ho
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
 `:''}  </details>
-  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':`<button class="btn primary" data-start="${UI.mode}">Launch</button>`}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
+  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':''}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><ul><li>Art and music by Am015-dev</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2><div class="turn5"><h3>How a turn works</h3><ol><li><b>Plan:</b> tap your ship, then tap where it flies.</li><li><b>Fly:</b> tap Fly. Every ship moves, lowest pilot skill first.</li><li><b>Act:</b> pick one action, like Focus, after you move.</li><li><b>Shoot:</b> tap a glowing enemy. Highest skill fires first.</li><li><b>Dice:</b> hits minus evades is damage; shields go first.</li></ol></div>${RULES_HTML}<h3>Simplified on purpose</h3><p>Asteroids are placed for you (6 of them, spaced apart). Ships start facing the enemy from set spots. The barrel-roll slide is offered in 5 steps. A battle with no winner after 100 rounds goes to the side that destroyed more points.</p>${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
