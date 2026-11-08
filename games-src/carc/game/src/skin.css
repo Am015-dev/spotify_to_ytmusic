@@ -183,4 +183,4 @@ body:has(#modal .scrim) #recentre{display:none}
 @media(max-width:380px){#sheet .sbtn{padding:5px 8px;gap:4px}#sheet .sc{gap:2px}}
 @media(min-width:1024px){#sheet .sc,#sheet .schip,#sheet .srate,#recentre{font-size:16px}}
 @media(max-width:420px){html.sk .seat .nm,.seat .nm{display:none}}
-body:has(.gxh-bub) #recentre{visibility:hidden}
+body:has(.gxh-bub) #recentre,body:has(#coach .cbub:not([hidden])) #recentre{bottom:auto;top:76px}

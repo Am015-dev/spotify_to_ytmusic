@@ -31,8 +31,8 @@ function measure(){const r=boardEl().getBoundingClientRect();return {W:r.width,H
 function setView(v){UI.view=v;applyView()}
 function applyView(){const v=UI.view,w=$('#world');w.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.s})`;boardEl().style.setProperty('--sc',v.s);placeOverlay()}
 function toScreen(wx,wy){return [wx*UI.view.s+UI.view.x,wy*UI.view.s+UI.view.y]}
-function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;const a=Object.assign({},UI.view);if(!ms||UI.reduce){setView(to);return}UI.tw=true;const t0=performance.now();
-  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;ensureGlowVisible()}};UI.tween=requestAnimationFrame(step)}
+function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;UI.twTo=to;const a=Object.assign({},UI.view);if(!ms||UI.reduce){setView(to);return}UI.tw=true;const t0=performance.now();
+  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe();return {s,x:m.W/2-cx*100*s,y:top+(m.H-top)/2-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
@@ -53,7 +53,10 @@ function frameCells(cells,cmin,cmax){const m=measure();let x0=1e9,y0=1e9,x1=-1e9
 function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal.filter(q=>q.r===UI.rot).map(q=>{let rk=0;try{rk=pvRank(prevCalc(q.x,q.y,UI.rot))}catch(e){}return {q,rk,d:Math.hypot(q.x-last[0],q.y-last[1])}}).sort((a,b)=>a.d-b.d);
   if(!g.length)return [last];let best=g[0];for(const e of g)if(e.rk>best.rk)best=e;const set=g.filter(e=>e.d<=2.3).slice(0,6);if(!set.length)set.push(g[0]);if(best.rk>0&&!set.includes(best))set.push(best);
   return set.map(e=>[e.q.x,e.q.y]).concat([last])}
-function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const ph=PHONE();tweenView(frameCells(aimCells(),ph?62:MINC,ph?112:(innerWidth>=1024?190:MAXC)),ms==null?420:ms)}
+function fitsAt(cells,c){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}return (x1-x0+1)*c<=m.W-24&&(y1-y0+1)*c<=m.H-topSafe()-12}
+function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const ph=PHONE(),cmin=ph?62:MINC;let cells=aimCells();
+  if(!fitsAt(cells,cmin)){const last=cells[cells.length-1];cells=[cells[0],last];if(!fitsAt(cells,cmin))cells=[cells[0]]}
+  tweenView(frameCells(cells,cmin,ph?112:(innerWidth>=1024?190:MAXC)),ms==null?420:ms)}
 function camSpot(x,y,ms){const m=measure(),top=topSafe(),c=Math.max(90,Math.min(m.W*.5,(m.H-top)*.55,200));tweenView(focusView(x+.5,y+.5,c),ms==null?380:ms)}
 function camArea(k,ms){if(UI.user||!G)return;const [x,y]=unkey(k),cells=[];for(const q of G.order){const [a,b]=unkey(q);if(Math.abs(a-x)<=2&&Math.abs(b-y)<=2)cells.push([a,b])}tweenView(frameCells(cells.length?cells:[[x,y]],MINC,PHONE()?92:150),ms==null?520:ms)}
 function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else camAim()}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
@@ -227,18 +230,18 @@ function initGestures(){const b=boardEl(),pt=new Map();let last=null;
   const dist=()=>{const a=[...pt.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
   const mid=()=>{const a=[...pt.values()];return {x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2}};
   function zoomAt(px,py,k){const v=UI.view,m=measure();let s=v.s*k;s=Math.max(MINC/100*.6,Math.min(2.4,s));k=s/v.s;setView({s,x:px-(px-v.x)*k,y:py-(py-v.y)*k})}
-  b.addEventListener('pointerdown',e=>{UI.lastPT=e.pointerType;const r=b.getBoundingClientRect();pt.set(e.pointerId,{x:e.clientX-r.left,y:e.clientY-r.top});UI.moved=false;UI.down={x:e.clientX,y:e.clientY};cancelAnimationFrame(UI.tween);UI.tw=false;
+  b.addEventListener('pointerdown',e=>{UI.lastPT=e.pointerType;const r=b.getBoundingClientRect();pt.set(e.pointerId,{x:e.clientX-r.left,y:e.clientY-r.top});UI.moved=false;UI.down={x:e.clientX,y:e.clientY};UI.twPaused=UI.tw?UI.twTo:null;cancelAnimationFrame(UI.tween);UI.tw=false;
     if(pt.size===2)last={d:dist(),m:mid()};
     if(!e.target.closest('button'))aiNow()});
   b.addEventListener('pointermove',e=>{if(!pt.has(e.pointerId))return;const r=b.getBoundingClientRect(),p=pt.get(e.pointerId),nx=e.clientX-r.left,ny=e.clientY-r.top;
     if(UI.down&&Math.hypot(e.clientX-UI.down.x,e.clientY-UI.down.y)>9)UI.moved=true;
     if(pt.size===1){if(UI.moved){const v=UI.view;setView({s:v.s,x:v.x+nx-p.x,y:v.y+ny-p.y});UI.user=true}pt.set(e.pointerId,{x:nx,y:ny})}
     else if(pt.size===2){pt.set(e.pointerId,{x:nx,y:ny});const d=dist(),m=mid();if(last){zoomAt(m.x,m.y,d/last.d);const v=UI.view;setView({s:v.s,x:v.x+m.x-last.m.x,y:v.y+m.y-last.m.y})}last={d,m};UI.moved=true;UI.user=true}});
-  const up=e=>{pt.delete(e.pointerId);last=null;if(!pt.size)setTimeout(()=>{UI.moved=false},60)};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')up(e)});
+  const up=e=>{pt.delete(e.pointerId);last=null;if(!pt.size){const tp=UI.twPaused;UI.twPaused=null;if(tp&&!UI.moved&&!UI.user)tweenView(tp,220);else if(!UI.moved)setTimeout(ensureGlowVisible,0)}if(!pt.size)setTimeout(()=>{UI.moved=false},60)};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')up(e)});
   b.addEventListener('wheel',e=>{e.preventDefault();const r=b.getBoundingClientRect();zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-e.deltaY*.0015));UI.user=true},{passive:false})}
 // ---------- label layout (W426): no label ever overlaps another label, the turn strip or the Recentre button ----------
 function rectHit(a,b,g){g=g||0;return a.left<b.right+g&&b.left<a.right+g&&a.top<b.bottom+g&&b.top<a.bottom+g}
-function fixedRects(){const out=[];for(const s of ['#status','#recentre']){const e=$(s);if(e&&e.offsetParent&&getComputedStyle(e).visibility!=='hidden')out.push(e.getBoundingClientRect())}for(const e of document.querySelectorAll('#ov .pop'))out.push(e.getBoundingClientRect());return out}
+function fixedRects(){const out=[];for(const s of ['#status','#recentre','#coach .cbub:not([hidden])','.gxh-bub']){const e=$(s);if(e&&e.offsetParent&&getComputedStyle(e).visibility!=='hidden')out.push(e.getBoundingClientRect())}for(const e of document.querySelectorAll('#ov .pop'))out.push(e.getBoundingClientRect());return out}
 // placement tags: on phones at most 3 (the best), the chosen spot's always; lower-ranked tags that would collide are dropped
 function layoutTags(){const gl=[...document.querySelectorAll('#world .glow')];if(!gl.length)return;const lim=PHONE()?3:6,taken=fixedRects();
   const list=gl.map(g=>({g,t:g.querySelector('.pvb'),rk:(g.classList.contains('sel')?1e4:0)+(g._rk||0)})).filter(o=>o.t);for(const o of list)o.t.classList.remove('off');
