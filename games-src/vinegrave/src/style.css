@@ -373,3 +373,4 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 .op .sb{order:9;flex:1 0 100%}
 .btn:has(.pv){flex-wrap:wrap;justify-content:center;text-align:center}.btn .pv{flex:1 0 100%}
 #docktitle{flex-wrap:nowrap;overflow:hidden}#docktitle .trk{white-space:nowrap}#docktitle b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body:has(#rs:not([hidden])) #turnover,body:has(.gxt-cell) #turnover,body:has(.gxt-end) #turnover{display:none}

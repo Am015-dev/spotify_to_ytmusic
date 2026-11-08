@@ -258,7 +258,7 @@ function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest 
   return gap <= 2.5 || i === 1 ? { k: 'okay', t: 'Okay move. Slightly better: ' + shortLabel(best.m) + '.' } : { k: 'poor', t: 'Weak move. Much better was: ' + shortLabel(best.m) + '.' };
 }
 function turnOver(m, rating, lbl) {   /* "Turn over: why" card, non-blocking */
-  if (UI.fast) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
+  if (UI.fast || !G || G.phase === 'over' || (typeof GXT !== 'undefined' && GXT.running && GXT.running())) return; let e = $('#turnover'); if (!e) { e = document.createElement('div'); e.id = 'turnover'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
   const why = m.t === 'pass' ? 'You passed: you sit out until everyone has passed and the round ends.' : 'Turn over: you used your one action (' + (lbl || 'your move') + ').';
   e.innerHTML = `<b>${esc(why)}</b>${rating ? `<span class="rt ${rating.k}">${esc(rating.t)}</span>` : ''}<span class="nx">${esc(G.phase === 'over' ? 'The expedition is over.' : 'Next: ' + (VG.actor(G) >= 0 && !myTurn() && G.p[VG.actor(G)] ? G.p[VG.actor(G)].name + ' plays.' : VG.actor(G) === -2 ? 'the rival expedition plays.' : 'your turn again.'))}</span>`;
   try { const d = $('#dock').getBoundingClientRect(), ph = innerWidth < 1000; e.style.top = (ph ? Math.max(60, d.top - e.offsetHeight - 8) : 64) + 'px'; e.style.left = (ph ? innerWidth / 2 : d.left + d.width / 2) + 'px'; } catch (x) { }
