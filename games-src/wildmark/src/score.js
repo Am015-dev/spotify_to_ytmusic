@@ -70,6 +70,7 @@ function pvTurnStart(m) {
   try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }
   var ci = m.t === 'take' ? m.i : m.ti;
   var names = G.market.toks.map(function (k) { return k ? WM.ANI_NAME[k] : ''; });
+  UI.rivalMsg = null;
   PV.turn = { v: v, best: b >= 0 ? v[b] : 0, bestI: b, sol: sol, chosen: ci, s0: pvScore(s.env), ac0: s.acorns + (m.t === 'free' ? 1 : 0), seat: G.cur, names: names };
 }
 function pvColName(i) { var t = G.market.tiles[i], k = G.market.toks[i]; return 'column ' + (i + 1) + (k ? ' (' + WM.ANI_NAME[k] + ')' : ''); }
@@ -89,7 +90,9 @@ function pvTurnEnd() {
   if (window.GXH && GXH.log) try { GXH.log(text); } catch (e) { }
   return UI.verdict;
 }
-function pvVerdictHTML() { var v = UI.verdict; if (!v || !G || G.over) return ''; return '<div id="verdict" class="vd ' + v.tag + '" role="status"><b>' + (v.tag === 'good' ? '&#9733;' : v.tag === 'okay' ? '&#9679;' : '&#9888;') + '</b><span>' + esc(v.text) + '</span></div>'; }
+function pvVerdictHTML() { var v = UI.verdict; if (!v || !G || G.over) return ''; return '<div id="verdict" class="vd ' + v.tag + '" role="status"><b>' + (v.tag === 'good' ? '&#9733;' : v.tag === 'okay' ? '&#9679;' : '&#9888;') + '</b><span>' + esc(v.text) + (UI.rivalMsg ? '<em class="rivl">' + esc(UI.rivalMsg) + '</em>' : '') + '</span></div>'; }
+// the rival's caption joins the verdict strip (one message box at a time, no toast); cleared when you pick
+function rivalNote(t) { UI.rivalMsg = t; }
 // ---- map previews: the ghost tile (tap a spot) or the spot / animal target under the mouse
 function pvSpotBest(env, c) { var b = -99; WM.rots(G.hold.tile).forEach(function (r) { b = Math.max(b, pvTile(env, G.hold.tile, c, r).d); }); return b; }
 function pvNow() {
@@ -112,6 +115,7 @@ function pvStrip(pv) {
   var h = '';
   if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + (pv.d < 0 ? pvText(pv.parts) + ' (breaks a pattern)' : pvText(pv.parts))) + '</span></div>';
   else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();
+  else if (UI.rivalMsg && !G.over && !myTurn()) h = '<div class="vd okay riv"><span>' + esc(UI.rivalMsg) + '</span></div>';
   e.innerHTML = h; e.hidden = !h;
   var ln = $('#line'), lh = ln && getComputedStyle(ln).display !== 'none' ? ln.offsetHeight : 0; e.style.bottom = (lh ? lh + 18 : 10) + 'px';   // sits just above the instruction line
   var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);
