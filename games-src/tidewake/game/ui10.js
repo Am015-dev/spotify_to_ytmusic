@@ -50,11 +50,12 @@ function oskFill(id,v){const t=OSK_TEXT[id]||[id,''];v=v||{};const f=x=>String(x
 // queue a line; rule ids are spoken once. pri: lower goes first
 function oskSay(id,v,o){o=o||{};if(!OSK.on||OSK.walk)return;const rule=OSK_RULES.indexOf(id)>=0;if(rule&&(OSK.said[id]||OSK.q.some(x=>x.id===id)))return;
   const [title,line]=o.text||oskFill(id,v);if(rule)OSK.said[id]=OSK.said[id]||'queued';OSK.q.push({id,title,line,also:o.also||[],pri:o.pri||5,rival:!!o.rival});OSK.q.sort((a,b)=>a.pri-b.pri)}
-function oskShowNext(){if(!OSK.q.length)return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
+function oskTutBusy(){return typeof GXT!=='undefined'&&GXT.running&&GXT.running()}
+function oskShowNext(){if(!OSK.q.length||oskTutBusy())return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
   for(const id of [n.id].concat(n.also))if(OSK_RULES.indexOf(id)>=0)OSK.said[id]=G?'turn '+G.turn:'shown';oskPlace()}
 function oskHide(){OSK.cur=null;const e=document.getElementById('osk');if(e)e.remove()}
 function oskHTML(c){return `<div class="osk-p" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#2c4a5e" stroke="#e3b24b" stroke-width="2"/><path d="M9 33c2-7 6-10 11-10s9 3 11 10" fill="#cfd8dc"/><circle cx="20" cy="16" r="7" fill="#f1c9a5"/><path d="M12 15c1-7 15-7 16 0-3-3-13-3-16 0z" fill="#eceff1"/><circle cx="31" cy="9" r="3.4" fill="#ffcf5a"/></svg><span>Osk</span></div><div class="osk-t"><b>${esc(c.title)}</b><span>${esc(c.line)}</span></div><button type="button" class="osk-x" data-osk="x" aria-label="Dismiss Osk's tip">&times;</button>`}
-function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on){if(e)e.remove();return}
+function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on||oskTutBusy()){if(e)e.remove();return}
   const host=PH.on?document.getElementById('ps'):(document.getElementById('main')||{}).parentNode;if(!host)return;
   if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
   if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival)}

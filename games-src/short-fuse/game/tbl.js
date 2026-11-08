@@ -131,7 +131,7 @@ function sayText(V){if(!G)return '';if(G.over)return G.over.win?'Defused!':'BOOM
     return 'Tap a glowing wire'}
   if(s>=0&&s!==me)return isHuman(s)?nm(s)+"'s turn":nm(s)+(G.q?' is choosing':' is thinking');
   if(G.step==='claim')return 'Claim the turn!';if(G.step==='snip')return 'Call it?';return 'Wait a moment'}
-function setSay(t,hold){const el=document.getElementById('say');if(!el)return;if(hold){TBL.sayT=Date.now()+hold;el.textContent=t;el.classList.add('hot');setTimeout(()=>el.classList.remove('hot'),hold);return}if(Date.now()<TBL.sayT)return;el.textContent=t}
+function setSay(t,hold){const el=document.getElementById('say');if(!el)return;if(hold){TBL.sayT=Date.now()+hold;el.textContent=t;return}if(Date.now()<TBL.sayT)return;el.textContent=t}
 function toast(t){const w=String(t).split(/\s+/).slice(0,8).join(' ');setSay(w,typeof plRead==='function'?plRead(w):4000);if(typeof plWait==='function')plWait();const l=document.getElementById('live');if(l)l.textContent=t}
 // ---------- the whole table ----------
 function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!tb)return;
@@ -190,7 +190,7 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
 function renderOverlays(V){const ov=document.getElementById('over'),cv=document.getElementById('cover');if(!ov||!cv)return;
   const p=G.over?-1:passTo();
   if(UI.brief&&!G.over){const n=G.mission,M=MISSIONS[n];const chips=ruleChips(n).slice(0,4);cv.hidden=false;
-    const h=`<div class="card2 briefc"><div class="bn">${n}</div><h2>Goal</h2><p class="bgoal">Cut all ${G.st.reduce((x,st)=>x+st.w.length,0)} wires together before the fuse (${G.dial==null?'timer':G.dial+' steps'}) runs out.</p><ul class="bpts"><li>Match a crew wire: both wires are cut.</li><li>Wrong guess: the fuse burns one step.</li><li>Hold all of a number? Cut them alone.</li></ul><p class="bjob">Job ${n}: ${esc(M.nm)}</p><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
+    const h=`<div class="card2 briefc"><div class="bn">${n}</div><h2>Goal</h2><p class="bgoal">Cut all ${G.st.reduce((x,st)=>x+st.w.length,0)} wires before the fuse (${G.dial==null?'timer':G.dial+' steps'}) runs out.</p><ul class="bpts"><li>Match a crew wire. Both wires are cut.</li><li>Wrong guess. The fuse burns one step.</li><li>Hold all of a number? Cut them alone.</li></ul><p class="bjob">Job ${n}: ${esc(M.nm)}</p><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
   else if(p>=0){cv.hidden=false;const h=`<div class="card2 pass"><h2>${esc(nm(p))}</h2><button class="big go" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=h}}
   else{cv.hidden=true;cv._s=''}
   if(G.over){if(UI.camp&&UI.campShown){ov.hidden=true}else{ov.hidden=false;const w=!!G.over.win;const next=G.mission<66?G.mission+1:null;const why=w?'':overWhy(G.over.why);

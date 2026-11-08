@@ -118,4 +118,5 @@ function dayWhy(p, round) {
   for (const l of G.log) if (l.round === round && !/rubies at 2 to 1/.test(l.t)) { const m = re.exec(l.t); if (m) out.push((m[1] === 'loses' ? '-' : '+') + m[2] + ' ' + short(m[3])); }
   return out;
 }
-function toast(t) { const e = $('#toast'); if (!e || (typeof tutOn === 'function' && tutOn())) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); const nw = String(t).trim().split(/\s+/).length; toast.t = setTimeout(() => e.classList.remove('on'), 4000 + 1000 * Math.ceil(nw / 10)); }
+const say = t => toast(t, 1);   // a direct answer to a tap always shows
+function toast(t, force) { const e = $('#toast'); if (!e || (typeof tutOn === 'function' && tutOn())) return; if (!force && typeof msgOK === 'function' && !msgOK()) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); const nw = String(t).trim().split(/\s+/).length; toast.t = setTimeout(() => e.classList.remove('on'), 4000 + 1000 * Math.ceil(nw / 10)); }

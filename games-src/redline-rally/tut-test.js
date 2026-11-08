@@ -12,11 +12,13 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     await p.goto(url, { waitUntil: 'load' }); await p.waitForTimeout(400);
     await p.click('#tutSlot button');
     const tap = async (sel) => {
-      const r = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e || !e.getClientRects().length || e.disabled) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!(h && (h === e || e.contains(h))) }; }, sel);
-      if (!r) return false; if (!r.hit) { problems.push('covered ' + sel); return false; } await p.mouse.click(r.x, r.y); return true;
+      const r = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e || !e.getClientRects().length || e.disabled) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!(h && (h === e || e.contains(h))), by: h ? (h.id || h.className || h.tagName) : "" }; }, sel);
+      if (!r) return false; if (!r.hit) { problems.push("covered " + sel + " by " + r.by); return false; } await p.mouse.click(r.x, r.y); return true;
     };
     await p.waitForFunction(() => GXT.state().shown, null, { timeout: 10000 });
-    const s1 = await p.evaluate(() => GXT.state().id); if (s1 !== 'gear') problems.push('first step ' + s1);
+    const s0 = await p.evaluate(() => GXT.state().id); if (s0 !== 'aim') problems.push('first step ' + s0);   // how you win, then Next
+    await tap('.gxt-next'); await p.waitForFunction(() => GXT.state().shown && GXT.state().id === 'gear', null, { timeout: 10000 });
+    const s1 = await p.evaluate(() => GXT.state().id); if (s1 !== 'gear') problems.push('second step ' + s1);
     await tap('.gb[data-g="2"]');
     await p.waitForFunction(() => GXT.state().shown && GXT.state().id === 'cards', null, { timeout: 10000 });
     await tap('#hand .cd:not(.dead):not(.sel)'); await p.waitForTimeout(250);

@@ -31,12 +31,13 @@ function viewSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;const h=humans()
 function mustPass(d){if(NET.on)return !!G.seats[d].human&&d!==NET.mySeat;return hotSeat()&&G.seats[d].human&&UI.holder!==d}
 function handStrip(vs,interactive,sel,rot){if(vs<0||!G.ships[vs].alive&&!G.hands[vs].length)return '';const hd=G.hands[vs];if(!hd.length)return '';
   return `<div class="hand" data-hand="${vs}">${hd.map((c,t)=>cardBtn(c,t,{up:true,owner:vs,sel:interactive&&sel&&sel.t===t,rot})).join('')}</div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-startlist]');if(b){e.stopPropagation();UI.startList=!UI.startList;render()}},true);
 function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d,info);const by={};for(const o of info)(by[o.edge+o.idx]=by[o.edge+o.idx]||[]).push(o);
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
   return `<div class="prompt">
-  <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
+  ${adv&&you?`<button class="btn pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}">Safe start for me</button> `:''}<button type="button" class="btn small" data-startlist aria-expanded="${UI.startList?'true':'false'}">${UI.startList?'Hide the list':'All marks as a list'}</button>${UI.startList?`<div class="startpick" style="grid-template-columns:auto repeat(6,1fr);margin-top:6px">${g}</div>`:''}</div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
   if(q.kind==='bonus'&&G.cur===d&&G.pool.length)extra=`<p class="tiny">Sunken crews' tiles (numbered):</p><div class="hand">${G.pool.map((c,j)=>isCur(c)?`<span class="hc"><span class="n">${j+1}</span><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'pl'+j,size:96})}"></span>`:`<span class="hc sp"><span class="n">${j+1}</span>${isGate(c)?gateArt():cannonArt()}</span>`).join('')}</div>`;
   const timed=UI.qTime>0&&q.kind==='doom'||NET.on&&q.kind==='doom';
@@ -60,7 +61,7 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   const thr=threatHTML(K,d,m,A);
   const rot=pl.length?`<div class="hacts"><button class="btn small" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">&#10226; Left</button><span class="rotl">turned ${(sel.r||0)*90}&deg;</span><button class="btn small" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">&#10227; Right</button></div>`:'';
   const nT=hand.length;
-  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'tap a tile, turn it, then Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
+  UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'drag one onto your junk, or turn it and Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
   let h=`<div class="prompt"><h4>${multi?esc(nm(d))+': lay a current':'Your turn: lay a current'}</h4>${fr}`;
   if(outcome)h+=`<p style="margin:6px 0 4px">${outcome}</p>`;if(thr)h+=`<p style="margin:2px 0">${thr}</p>`;
   if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. You may not sink yourself while a safe move exists. Tap the bulb for the safest move.</p>`;
@@ -92,7 +93,7 @@ function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.
   return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves.</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
-  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return `<div class="goal" data-goal role="button" tabindex="0"><b>Goal:</b> be the last junk still afloat. <u>How?</u></div>`}
+  if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return `<div class="goal" data-goal role="button" tabindex="0"><b>Goal:</b> last junk afloat wins. <u>How?</u></div>`}
 function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over&&!UI.busy||!h?h:gh+h}
 function mainHTML0(){
   if(G.over&&!UI.busy)return overHTML();const d=sideToAct(),vs=viewSeat();
