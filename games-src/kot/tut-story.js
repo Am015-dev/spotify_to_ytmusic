@@ -44,6 +44,7 @@ const cnt_ = () => { const c = {}; G.dice.forEach(d => { c[d.f] = (c[d.f] || 0) 
 const COACH_TIPS = [
   { id: 'goal', rules: ['setup', 'goal', 'roll3'], say: 'Welcome, rookie! This short game ends at 6 ★ (real games: 20), or the last monster standing. Each turn: roll six dice, up to three times.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length },
   { id: 'faces', rules: ['faces'], say: 'Each die says what it does: STAR dice score in sets, ENERGY buys cards, HEAL mends you, HIT smashes rivals.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length && G.rolls <= 2 },
+  { id: 'preview', rules: ['preview'], say: 'See the yellow line above your dice? It shows what you would score if you smashed right now. Check it before every roll.', when: () => myTurn_() && G.phase === 'roll' && G.dice.length && G.rolls <= 2 },
   { id: 'keep', rules: ['keep', 'rekeep'], say: 'Tap dice to keep them, then Roll for the rest. Kept dice can be tapped again to roll them too.', when: () => myTurn_() && G.phase === 'roll' && G.rolls >= 1 && G.dice.length },
   { id: 'pair', rules: ['pair', 'triple'], say: 'A pair of numbers scores nothing. Three of a kind scores that number in ★. Chase the third!', when: () => myTurn_() && G.phase === 'roll' && ['1', '2', '3'].some(f => cnt_()[f] === 2) },
   { id: 'extra', rules: ['extra'], say: 'Four of a kind! Every extra matching die adds 1 ★ on top.', when: () => myTurn_() && G.phase === 'roll' && ['1', '2', '3'].some(f => cnt_()[f] >= 4) },
