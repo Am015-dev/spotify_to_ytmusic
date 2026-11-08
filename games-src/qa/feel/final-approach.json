@@ -1,130 +1,22 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T03:41Z",
+ "when": "2026-11-08T06:01Z",
  "secs": 120,
- "totalSecs": 409,
+ "totalSecs": 403,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 13,
+   "count": 1,
    "detail": [
     {
      "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 3 goes on Axis. Same as Ravi: wings level. ×",
-     "words": 11,
+     "session": "phone/learn",
+     "text": "Your 2 goes on Engines. Speed 4: we hold. ×",
+     "words": 10,
      "shownMs": 250,
-     "neededMs": 5100,
+     "neededMs": 5000,
      "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 6 goes on Axis. Wings tilt 3. Three would crash. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 6 goes on Axis. Close dice keep the wings lev"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 2 goes on Axis. Wings tilt 1. Three would cra"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "phone/learn",
-     "ms": 250,
-     "texts": [
-      "Space 3: 1 plane ×",
-      "Your 3 goes on Axis. Same as Ravi: wings level. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 3 goes on Axis. Close dice keep the wings lev"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "That space belongs to the co-pilot. ×",
-      "Your 6 goes on Engines. Speed 8: we move 1. ×"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "That space belongs to the co-pilot. ×",
-      "Your 4 goes on Axis. Wings tilt 1. Three would cra"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 453,
-     "texts": [
-      "Pick a die first. ×",
-      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
-     ]
-    },
-    {
-     "kind": "two-at-once",
-     "session": "pc/learn",
-     "ms": 250,
-     "texts": [
-      "Axis still empty. Tap again. ×",
-      "Your 6 goes on Axis. Wings tilt 3. Three would cra"
-     ]
     }
    ]
   },
@@ -135,57 +27,21 @@
   },
   "c": {
    "status": "FAIL",
-   "count": 4,
+   "count": 1,
    "detail": [
     {
-     "session": "phone/learn",
-     "text": "Ines (Pilot) had no die on the Axis at the end of the round.",
-     "words": 14,
-     "at": 46754,
-     "where": "p.why"
-    },
-    {
-     "session": "phone/learn",
-     "text": "Fuel: a fuel space burns the die value; below 0 you lose (chapter 8).",
-     "words": 14,
-     "at": 46754,
-     "where": "li."
-    },
-    {
-     "session": "phone/learn",
-     "text": "Wind dial, trainee tokens, icy runway, the 60-second clock (chapters 11 to 15).",
-     "words": 13,
-     "at": 46754,
-     "where": "li."
-    },
-    {
-     "session": "pc/learn",
-     "text": "Names, text and art are original; audio credits are in How to play.",
-     "words": 13,
-     "at": 7504,
-     "where": "p.sm"
+     "session": "phone/play",
+     "text": "The plane is tilted 2: next round the axis dice must lean the other way.",
+     "words": 15,
+     "at": 65031,
+     "where": "p.rr"
     }
    ]
   },
   "d": {
-   "status": "FAIL",
-   "count": 2,
-   "detail": [
-    {
-     "session": "phone/learn",
-     "text": "Ines (Pilot) had no die on the Axis at the end of the round.",
-     "px": 13,
-     "at": 46754,
-     "where": "p.why"
-    },
-    {
-     "session": "phone/play",
-     "text": "Keep it level",
-     "px": 13,
-     "at": 5254,
-     "where": "div.gxc-sc-title"
-    }
-   ]
+   "status": "PASS",
+   "count": 0,
+   "detail": []
   },
   "e": {
    "status": "PASS",
@@ -203,21 +59,21 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 139,
-   "clicks": 176,
+   "secs": 120,
+   "turns": 219,
+   "clicks": 286,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 29
+   "messagesSeen": 28
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 121,
-   "turns": 168,
-   "clicks": 214,
-   "endedBy": "time",
+   "secs": 116,
+   "turns": 230,
+   "clicks": 286,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
    "messagesSeen": 0
@@ -225,20 +81,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 121,
-   "turns": 97,
-   "clicks": 146,
-   "endedBy": "time",
+   "secs": 120,
+   "turns": 202,
+   "clicks": 284,
+   "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 34
+   "messagesSeen": 8
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 47,
-   "turns": 53,
-   "clicks": 85,
+   "secs": 46,
+   "turns": 73,
+   "clicks": 119,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

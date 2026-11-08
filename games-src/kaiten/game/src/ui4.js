@@ -147,7 +147,7 @@ function showFinal() {
       const line = tie ? KK.STORY.quickResult.tie : (win ? KK.STORY.quickResult.win : KK.STORY.quickResult.lose).replace(/%R/g, rv);
       const tot = G.final && G.final.totals ? G.final.totals : G.players.map(() => 0), order = G.players.map((p, s) => s).sort((a, b) => tot[b] - tot[a]);
       box.insertBefore(h('div.kkres', h('div.kkr1', portraitEl(null, 44), h('div', h('b', winLine()), h('span', line))),
-        h('ol.kkrs', ...order.map(s => h('li' + (ws2.indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v2 ? ' (you)' : '')), h('span.p', String(tot[s]) + ' pts'))))), box.firstChild); rs.classList.add('kkfin');
+        h('ol.kkrs', ...order.map(s => h('li' + (ws2.indexOf(s) >= 0 ? '.w' : ''), h('span.n', pname(s) + (s === v2 && pname(s) !== 'You' ? ' (you)' : '')), h('span.p', String(tot[s]) + ' pts'))))), box.firstChild); rs.classList.add('kkfin');
     }
   } catch (e) { console.error(e); }
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);

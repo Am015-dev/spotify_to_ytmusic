@@ -26,3 +26,15 @@ Shots: playable-shots/feel/ (mid-game shots are from the previous build of this 
   - D: the 3D title-city meshes in three3d.js, which W459 is editing.
   - E: the desktop news button, which opens the log drawer through data-gx; the audit sees no change.
 - Shots: playable-shots/feel/.
+
+## Review R6 fix list (W467, 8 Nov)
+- Result card: as soon as someone wins, a card shows the winner's face, "X wins!", one line why (reached 20 ★ / last standing), your stars and place, Play again and Full results. Dice and flying dice step aside. The PC panel says "X wins!".
+- Title: Play now says "You vs 3 computer monsters".
+- Coached game for qa-bot: the round-2 `data-a="start"` on Play now made qa-bot start a normal game, so GXCOACH never ran. The Learn button now carries `data-a="offeryes"`, which qa-bot tries first. qa-bot tutorial phase: done true, 31 rules explained (phone and PC).
+- Owner art: towers and tokens already load as -lite models in the 3D board (checked: GLBX.towers, 3 tokens). Phone flying tokens now use the owner's token renders. Deck card art preloads in the background, so dealt cards show at once.
+  asset-usage: 53.8% (154/286), was 18.5%. Never loaded in a classic phone quick game:
+  - 72 evolution card pictures (evolutions mode only)
+  - 15 ui images: story-map nodes, plus uncropped source sheets of the -c crops in use
+  - 13 model files: full-detail tower/token .glb (High graphics only) and their preview .webp
+- Feel gate after these changes: (a)-(e) all 0. logic 146/146, rules 8/8, gameplay scenarios 12/12.
+- Not done: title snapshot baseline. PLAYBOOK says `--approve-visual` runs only after the owner approves the screens, so the 3 visual tests stay red until then. ui-audit B22 D3 E1 unchanged.
