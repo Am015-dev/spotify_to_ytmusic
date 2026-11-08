@@ -642,7 +642,9 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   engineBed(nMove>0);
   const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
-  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}
+  // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
+  let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}
+  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);if(SB&&t.y-t.h<SB.b+2&&t.x+t.w/2>SB.l&&t.x-t.w/2<SB.r)t.y=SB.b+t.h+4;t.el.style.top=t.y+'px';done.push(t)}
   const ct=document.getElementById('coachtag');if(ct&&ct._v)placeEl(ct,ct._v);
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
 
