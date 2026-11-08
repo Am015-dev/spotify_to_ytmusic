@@ -2,7 +2,7 @@
  "slug": "final-approach",
  "size": "phone",
  "seed": 48774,
- "when": "2026-11-08T05:16Z",
+ "when": "2026-11-08T05:40Z",
  "tutorial": {
   "end": true,
   "coached": true,
@@ -20,8 +20,8 @@
    "gear",
    "reroll"
   ],
-  "bubblesClosed": 6,
-  "clicks": 92
+  "bubblesClosed": 7,
+  "clicks": 93
  },
  "quick": {
   "result": "cap",
@@ -215,5 +215,5 @@
    "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
   }
  ],
- "secs": 82
+ "secs": 65
 }

@@ -1,94 +1,22 @@
 {
  "slug": "final-approach",
- "when": "2026-11-08T05:36Z",
+ "when": "2026-11-08T06:01Z",
  "secs": 120,
- "totalSecs": 467,
+ "totalSecs": 403,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
    "status": "FAIL",
-   "count": 9,
+   "count": 1,
    "detail": [
     {
      "kind": "too-short",
      "session": "phone/learn",
-     "text": "Your 3 goes on Axis. Close dice keep the wings level. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 4 goes on Engines. ×",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 4 goes on Radio. Nothing to clear there. ×",
+     "text": "Your 2 goes on Engines. Speed 4: we hold. ×",
      "words": 10,
      "shownMs": 250,
      "neededMs": 5000,
      "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 3 goes on Axis. Close dice keep the wings level. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach out"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 4 goes on Axis. Wings tilt 1. Three would crash. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "phone/learn",
-     "text": "Your 2 goes on Axis. Wings tilt 1. Three would crash. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 3 goes on Axis. Close dice keep the wings level. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 2 goes on Axis. Wings tilt 1. Three would crash. ×",
-     "words": 12,
-     "shownMs": 250,
-     "neededMs": 5200,
-     "cls": "fa-coach"
-    },
-    {
-     "kind": "too-short",
-     "session": "pc/learn",
-     "text": "Your 3 goes on Engines. ×",
-     "words": 6,
-     "shownMs": 250,
-     "neededMs": 4600,
-     "cls": "fa-coach"
     }
    ]
   },
@@ -98,9 +26,17 @@
    "detail": []
   },
   "c": {
-   "status": "PASS",
-   "count": 0,
-   "detail": []
+   "status": "FAIL",
+   "count": 1,
+   "detail": [
+    {
+     "session": "phone/play",
+     "text": "The plane is tilted 2: next round the axis dice must lean the other way.",
+     "words": 15,
+     "at": 65031,
+     "where": "p.rr"
+    }
+   ]
   },
   "d": {
    "status": "PASS",
@@ -124,19 +60,19 @@
    "size": "phone",
    "mode": "learn",
    "secs": 120,
-   "turns": 214,
-   "clicks": 282,
+   "turns": 219,
+   "clicks": 286,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 35
+   "messagesSeen": 28
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 111,
-   "turns": 226,
-   "clicks": 275,
+   "secs": 116,
+   "turns": 230,
+   "clicks": 286,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -146,19 +82,19 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 201,
-   "clicks": 271,
+   "turns": 202,
+   "clicks": 284,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
-   "messagesSeen": 24
+   "messagesSeen": 8
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 115,
-   "turns": 248,
-   "clicks": 291,
+   "secs": 46,
+   "turns": 73,
+   "clicks": 119,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
