@@ -120,7 +120,7 @@ function doMove(mv) {
 }
 function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
-  if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); return; }
+  if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); else { const el = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (el) { el.classList.add('nudge'); setTimeout(() => el.classList.remove('nudge'), 350); } } return; }
   const v = viewSeat(), ph = G.phase;
   if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
   if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('You cannot pass Lanterns.'); return; } UI.giveSel = id; doMove(m); return; }

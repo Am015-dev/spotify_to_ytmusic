@@ -10,7 +10,7 @@ function hpics(items) {
 const hq = s => () => { const e = document.querySelector(s); return e && e.getBoundingClientRect().width ? e : null; };
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
-  first: { target: hfirst('#acts .bagb:not(.off)', '#acts .bagb'), title: 'Pull a chip', text: 'Tap the bag. The chip lands on the spiral, as many spaces on as its number.', pic: () => hpics([['ico', 'bag']]) },
+  first: { target: hfirst('#acts .bagb:not(.off)', '#acts .bagb'), title: 'Pull a chip', text: 'Tap the bag. The chip moves as many spaces as its number.', pic: () => hpics([['ico', 'bag']]) },
   brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Draw for more coins and points, or Stop to keep your space. Whites must stay at 7 or less.', pic: () => hpics([['chip', 'W2']]) },
   hot: { target: hfirst('#acts .stopb', '#acts .brow'), title: 'Close to boiling', text: 'Another white chip may explode the pot. Stop now, or use the flask on the last white.', pic: () => hpics([['ico', 'boom']]) },
   last: { target: hfirst('#acts .brow', '#acts .bagb'), title: 'The last day', text: 'Everyone secretly picks Draw or Stop, then all show together. No shopping today.', pic: () => hpics([['ico', 'bag']]) },
@@ -23,7 +23,7 @@ const HLP_STEPS = {
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each); a card without a phase is general
 const HLP_RULES = [
-  { title: 'The goal', text: 'Have the most points after 9 days. \u2022 Draw chips to fill your pot. \u2022 Stop before the white chips add past 7. \u2022 Your last space pays coins and points.', pic: () => hpics([['ico', 'bag'], '>', ['ico', 'vp', 'Points'], '>', ['ico', 'check', 'Winner']]) },
+  { title: 'The goal', text: 'Most points after 9 days wins. Draw chips. Stop before the whites pass 7. Your last space scores.', pic: () => hpics([['ico', 'bag'], '>', ['ico', 'vp', 'Points'], '>', ['ico', 'check', 'Winner']]) },
   { title: 'One day', text: 'Draw chips one by one and stop when you like. Then count the day, shop, and begin again.', pic: () => hpics([['ico', 'bag', 'Draw'], '>', ['ico', 'coin', 'Count'], '>', ['chip', 'B1', 'Shop']]) },
   { title: 'Explosions', text: 'White chips add up. More than 7 and the cauldron explodes: you must stop and give something up.', pic: () => hpics([['chip', 'W2', '2'], ['chip', 'W3', '3'], ['chip', 'W3', '3'], '>', ['ico', 'boom', '8']]) },
   { phase: 'first', title: 'Pull a chip', text: 'Tap the bag. The chip moves forward along the spiral by its number.', pic: () => hpics([['ico', 'bag'], '>', ['chip', 'G2', 'Moves 2']]) },
@@ -31,29 +31,29 @@ const HLP_RULES = [
   { phase: 'first', title: 'White chips', text: 'The meter adds up your white chips. Seven is the limit; one more and the pot explodes.', pic: () => hpics([['chip', 'W1'], ['chip', 'W2'], ['chip', 'W3'], '>', ['ico', 'boom', 'Over 7']]) },
   { phase: 'brew', title: 'Draw or stop', text: 'Drawing travels further for more coins and points, but risks an explosion. Stop keeps your space.', pic: () => hpics([['ico', 'bag', 'Draw'], ['ico', 'check', 'Stop']]) },
   { phase: 'brew', title: 'The danger meter', text: 'It shows the chance that the next chip explodes you. When it turns red, think about Stop.', pic: () => hpics([['chip', 'W3', 'Risky']]) },
-  { phase: 'brew', title: 'The flask', text: 'Once a day the flask puts the white chip you just drew back in the bag. Rubies refill it.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
-  { phase: 'brew', title: 'The bonus die', text: 'When everyone has stopped, the safe cauldron with the most coins rolls the bonus die for a prize.', pic: () => hpics([['ico', 'die', 'Die']]) },
+  { phase: 'brew', title: 'The flask', text: 'Once a day, the flask puts your last white chip back. Rubies refill it.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
+  { phase: 'brew', title: 'The bonus die', text: 'When all have stopped, the richest safe cauldron rolls the bonus die.', pic: () => hpics([['ico', 'die', 'Die']]) },
   { phase: 'hot', title: 'Close to boiling', text: 'Your whites are near 7. A white chip may explode you; other colours are safe.', pic: () => hpics([['chip', 'W3'], '>', ['ico', 'boom']]) },
   { phase: 'hot', title: 'The flask', text: 'Just drew a white? Tap the flask to put it back. You cannot save the chip that exploded you.', pic: () => hpics([['ico', 'flask', 'Flask'], '>', ['ico', 'bag', 'Back']]) },
   { phase: 'hot', title: 'If it explodes', text: 'Your last chip stays and you must stop. Then you choose: the points, or the coins to shop.', pic: () => hpics([['ico', 'boom'], '>', ['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
   { phase: 'last', title: 'Stir!', text: 'On the last day everybody secretly chooses Draw or Stop. All choices are shown together.', pic: () => hpics([['ico', 'bag', 'Draw'], ['ico', 'check', 'Stop']]) },
-  { phase: 'last', title: 'Final count', text: 'No shop today. Every 5 coins and every 2 rubies you hold become 1 victory point.', pic: () => hpics([['ico', 'coin', '5'], ['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
+  { phase: 'last', title: 'Final count', text: 'No shop today. Every 5 coins or 2 rubies make 1 point.', pic: () => hpics([['ico', 'coin', '5'], ['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
   { phase: 'last', title: 'Who wins', text: 'The most points wins. A tie goes to the cauldron that reached furthest today.', pic: () => hpics([['ico', 'vp'], '>', ['ico', 'check', 'Winner']]) },
   { phase: 'card', title: 'Fortune cards', text: 'Each day opens with a card. Purple cards happen now, blue cards last the whole day.', pic: () => hpics([['ico', 'ruby', 'Purple: now'], ['ico', 'drop', 'Blue: all day']]) },
   { phase: 'card', title: 'Choose a reward', text: 'Read the options and tap one. The card text above tells you what each one does.', pic: () => hpics([['chip', 'B2'], ['ico', 'ruby', '3']]) },
-  { phase: 'card', title: 'The rat stone', text: 'From day 2, if you trail the leader your first chip starts further on. Tap the rat to use less.', pic: () => hpics([['ico', 'rat', 'Head start']]) },
+  { phase: 'card', title: 'The rat stone', text: 'From day 2, trailing players start further on. Tap the rat to use less.', pic: () => hpics([['ico', 'rat', 'Head start']]) },
   { phase: 'chip', title: 'Chip powers', text: 'Some coloured chips have a power when they land. Blue and yellow ones may ask you to choose.', pic: () => hpics([['chip', 'B1'], ['chip', 'Y1']]) },
   { phase: 'chip', title: 'Place or put back', text: 'A peeked chip can be your next chip, with its power. Or put them all back in the bag.', pic: () => hpics([['chip', 'B2'], '>', ['ico', 'bag', 'Back']]) },
   { phase: 'boom', title: 'You exploded', text: 'The last chip stays and the day ends for you. You still score a ruby if your space has one.', pic: () => hpics([['ico', 'boom'], ['ico', 'ruby']]) },
-  { phase: 'boom', title: 'Points or coins', text: 'Take the victory points on your space, or the coins to buy chips. Not both.', pic: () => hpics([['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
+  { phase: 'boom', title: 'Points or coins', text: 'Take your space\'s points, or its coins. Not both.', pic: () => hpics([['ico', 'vp', 'Points'], ['ico', 'coin', 'Coins']]) },
   { phase: 'boom', title: 'Coins buy chips', text: 'Better chips make a stronger bag for the next days. Points win the game today.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], '>', ['ico', 'bag']]) },
-  { phase: 'shop', title: 'Buy for your bag', text: 'Spend up to your coins on one or two chips of different colours. New chips go in your bag.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], ['chip', 'G1']]) },
+  { phase: 'shop', title: 'Buy for your bag', text: 'Buy one or two chips of different colours. They go in your bag.', pic: () => hpics([['ico', 'coin'], '>', ['chip', 'B1'], ['chip', 'G1']]) },
   { phase: 'shop', title: 'Each colour has a power', text: 'Orange is plain. Green gives rubies, blue peeks, red slides, black counts moths. Tap and hold to read.', pic: () => hpics([['chip', 'O1'], ['chip', 'G1'], ['chip', 'B1'], ['chip', 'R1'], ['chip', 'K1']]) },
-  { phase: 'shop', title: 'Locked stalls', text: 'The yellow stall opens on day 2 and the purple one on day 3. Sold-out chips are gone.', pic: () => hpics([['chip', 'Y1', 'Day 2'], ['chip', 'P1', 'Day 3']]) },
+  { phase: 'shop', title: 'Locked stalls', text: 'Yellow opens on day 2, purple on day 3. Sold-out chips are gone.', pic: () => hpics([['chip', 'Y1', 'Day 2'], ['chip', 'P1', 'Day 3']]) },
   { phase: 'ruby', title: 'Spend rubies', text: 'Every 2 rubies do one thing: move your droplet one space, or refill the flask.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'drop', 'Droplet']]) },
   { phase: 'ruby', title: 'The droplet', text: 'Your first chip starts at the droplet. Moving it on gives you a head start every day.', pic: () => hpics([['ico', 'drop'], '>', ['chip', 'G1']]) },
-  { phase: 'ruby', title: 'Keep them?', text: 'Unspent rubies are not lost. At the end of the game 2 rubies count as 1 victory point.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
-  { phase: 'power', title: 'Chip powers', text: 'Green, purple and black chips act after the brew, if they sit near the end of your pot.', pic: () => hpics([['chip', 'G1'], ['chip', 'P1'], ['chip', 'K1']]) },
+  { phase: 'ruby', title: 'Keep them?', text: 'Unspent rubies stay. At the end, 2 rubies make 1 point.', pic: () => hpics([['ico', 'ruby', '2'], '>', ['ico', 'vp', '1']]) },
+  { phase: 'power', title: 'Chip powers', text: 'Green, purple and black chips near the end act after the brew.', pic: () => hpics([['chip', 'G1'], ['chip', 'P1'], ['chip', 'K1']]) },
   { phase: 'power', title: 'Pick a reward', text: 'The glowing option is a good choice. Read the others if you like, then tap one.', pic: () => hpics([['ico', 'check']]) }
 ];
 // ---------------------------------------------------------------- the phase the player is deciding in (null when there is nothing to decide)

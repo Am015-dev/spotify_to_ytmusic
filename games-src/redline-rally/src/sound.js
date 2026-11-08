@@ -45,7 +45,9 @@ var SFX = {
   win: function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, 0.28, { type: 'triangle', v: 0.2, at: i * 0.11 }); }); tone(1047, 0.7, { type: 'sine', v: 0.15, at: 0.5 }); },
   lose: function () { [392, 330, 262, 196].forEach(function (f, i) { tone(f, 0.3, { type: 'triangle', v: 0.18, at: i * 0.16 }); }); }
 };
+var BUZZ = { card: 12, gear: 18, tap: 8, boost: 25, spin: [40, 30, 60], lightsgo: 30 };
 function sfx(name) {
+  if (BUZZ[name] && window.ANIM !== false) { try { if (navigator.vibrate) navigator.vibrate(BUZZ[name]); } catch (e) { } }   /* snap tick, even with sound off */
   if (!SND.on || !SFX[name]) return; var now = Date.now(); if (SND.last[name] && now - SND.last[name] < 40) return; SND.last[name] = now;
   try { if (audioCtx()) { wake(); SFX[name](); } } catch (e) { }
 }
