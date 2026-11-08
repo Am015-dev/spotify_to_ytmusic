@@ -23,7 +23,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   let started = await tapEl('#start [data-a=play], #start .tbtn.play'); if (started !== true) { await p.evaluate(() => playNow()); }
   await sleep(900); await p.evaluate(s => { if (!G || G.result) { UI.seed = s; playNow(); } }, SEED); await sleep(600);
   for (const sel of ['.fa-goal [data-ro=go]', '.fa-ro [data-ro=go]']) await tapEl(sel);
-  let askTurns = 0, noAsk = 0, shotFirst = false, shotMid = false, last = Date.now(), sig = '', taps = 0;
+  const off = []; let askTurns = 0, noAsk = 0, shotFirst = false, shotMid = false, last = Date.now(), sig = '', taps = 0;
   for (let n = 0; n < 900; n++) {
     const s = await p.evaluate(() => ({ res: G && G.result ? G.result : null, ph: G.phase, turn: G.turn, round: G.round, pend: G.pend && G.pend.h, rdy: G.ready && G.ready[0], placed: Object.keys(G.slots).length,
       prompt: ((document.querySelector('#prompt') || {}).textContent || '').trim(), toast: (document.querySelector('#toast.on') || {}).textContent || '',
@@ -40,7 +40,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       if (!prompts.length || prompts[prompts.length - 1] !== s.prompt) prompts.push('r' + (s.round + 1) + ': ' + s.prompt);
       // the game's own advice, by touch: tap "What should I do?" and follow what it names
       askTurns++; const ak = await tapEl('#acts [data-a=ask]'); if (ak !== true) { noAsk++; errs.push('no "What should I do?" on r' + (s.round + 1) + ' (' + ak + ')'); } await sleep(250);
-      const m = await p.evaluate(() => { const pl = hlpPlan(true); return pl && pl.m ? pl.m : FA.AI.move(FA.stripView(G, 0), 0, 'normal', { noMC: true }); });
+      const m = await p.evaluate(() => { const pl = hlpPlan(true); const mm = pl && pl.m ? pl.m : FA.AI.move(FA.stripView(G, 0), 0, 'normal', { noMC: true }); if (mm && mm.t === 'place' && mm.d !== 'p') mm.want = G.dice[0][mm.d].v + (mm.c || 0); return mm; });
       const said = await p.evaluate(() => UI.askWhy || ''); if (!said) errs.push('the advice said nothing on r' + (s.round + 1));
       if (!m) { await sleep(300); continue; }
       if (m.t === 'rr') { await tapEl('#acts [data-a=rr]'); await sleep(200); await tapEl('#acts [data-a=rr]'); taps += 2; await sleep(600); continue; }
@@ -51,6 +51,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       const before = s.placed; const r = await tapEl('#pz .slot[data-slot="' + m.to + '"]'); taps++; await sleep(450);
       if (r === 'covered') errs.push('space ' + m.to + ' covered');
       const after = await p.evaluate(() => Object.keys(G.slots).length); if (after === before) { await tapEl('#pz .slot[data-slot="' + m.to + '"]'); taps++; await sleep(450); }
+      const got = await p.evaluate(mm => { const x = G.slots[mm.to]; return x ? { v: x.v, s: x.s } : { sel: UI.sel, cof: UI.cof, toast: ((document.querySelector('#toast') || {}).textContent || '').slice(0, 80), ph: G.phase, turn: G.turn, pend: G.pend && G.pend.h, legal: [...document.querySelectorAll('#pz .slot.legal')].map(e => e.dataset.slot).join() }; }, m); if (!got || (got.ph ? got.ph === 'place' && got.turn === 0 : got.s !== 0 || got.v !== m.want)) off.push('r' + (s.round + 1) + ' ' + m.to + ' wanted ' + m.want + ' got ' + JSON.stringify(got));
       continue;
     }
     await sleep(250);
@@ -60,6 +61,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   if (SHOTS) await p.screenshot({ path: path.join(OUT, 'result.png') });
   console.log('prompts seen on my turns:\n  ' + prompts.join('\n  '));
   console.log('refused taps:', refused.length ? [...new Set(refused)].join(' | ') : 'none');
+  console.log('placements off the advice:', off.length ? off.join(' | ') : 'none');
   console.log('advice button on', askTurns - noAsk, 'of', askTurns, 'turns');
   console.log('taps', taps, 'result', res ? (res.win ? 'WIN' : 'LOSE ' + res.why + ': ' + res.msg) : 'NONE');
   console.log('ERRORS ' + errs.length + (errs.length ? '\n  ' + errs.join('\n  ') : ''));
