@@ -41,7 +41,7 @@ function statusText(){const o=t=>({text:words8(t),seat:-1});
   // somebody else is deciding
   const last=G.log[G.log.length-1];const n=UI.nowT&&UI.nowT.at===G.logN?UI.nowT:null;
   if(n)return {text:words8(plain(n.t)),seat:n.s};
-  if(q&&q.seats.length){const names=q.seats.map(x=>shortName(x).replace(' (you)',''));return {text:words8(names.join(' and ')+' is deciding'),seat:q.seats[0]}}
+  if(q&&q.seats.length){const names=q.seats.map(x=>shortName(x).replace(' (you)',''));return {text:words8(names.join(' and ')+(names.length>1?' are choosing':' is choosing')),seat:q.seats[0]}}
   if(last)return {text:words8(plain(last.t)),seat:last.s};
   return o('')}
 const ICO={round:'<path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/>',book:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/>',log:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/>',crown:'<path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',card:'<rect x="6" y="3" width="12" height="18" rx="2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',inf:'<circle cx="12" cy="12" r="8"/><path d="M8 14l1-5 3 3 3-3 1 5z"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',star:'<path d="M12 3l2.6 6 6.4.6-4.9 4.2 1.5 6.3L12 17l-5.6 3.1 1.5-6.3L3 9.6 9.4 9z"/>',road:'<path d="M5 20L9 4M19 20L15 4M12 6v3M12 12v3M12 18v2"/>'};
