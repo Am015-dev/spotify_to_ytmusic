@@ -43,7 +43,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tile.m7{--k:.82}.tile.m10{--k:.66}
 .tile.blk{background:repeating-linear-gradient(45deg,#8d7c68,#8d7c68 6px,#7d6c58 6px,#7d6c58 12px);border-color:#4a3e30;cursor:default}.tile.blk.k-lake{background:linear-gradient(#7fc4e8,#2f7fb5);border-color:#1d5b88}.tile.blk .tn{color:#fff}.tile.blk .ti{opacity:.6}
 .tile.cur{z-index:2;outline:3px solid #fff;outline-offset:-2px;box-shadow:0 0 0 2px #ff7a3a,0 4px 10px rgba(0,0,0,.4)}
-#grid.dim .tile:not(.glow):not(.blk){opacity:.7;filter:saturate(.75)}
+#grid.dim .tile:not(.glow):not(.blk){opacity:1;filter:saturate(.4) brightness(.7)}
 .tile.glow{outline:3px solid #ffd45a;outline-offset:-3px;animation:glowt 1.15s ease-in-out infinite;z-index:1}
 @keyframes glowt{0%,100%{filter:brightness(1);outline-color:#ffd45a}50%{filter:brightness(1.12);outline-color:#fff6c2}}
 .tile.nope{animation:shake .3s}@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
@@ -278,7 +278,7 @@ html.short .sch .s4{display:block}html.short .sch .s3{display:none}
 html.land .gx-board{grid-template-rows:auto auto auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt trk" "gw mkt trk2" "gw mkt ." "gw mine acts"}
 html.land #trk{grid-area:trk;flex-wrap:wrap;align-self:start}html.land #trk2{grid-area:trk2;white-space:normal;align-self:start}
 /* Addendum 7: Play is clean (board, hand, tracker, one score line, top bar); the extras belong to Hints and Learn to play */
-html.m-play .sch .s3,html.m-play .sch .s4{display:none}
+html.m-play .sch .s3{display:none}html.m-play .sch .s4{display:block}
 html.m-play:not(.m-hints) .trk2{display:none}
 #hintsbtn[aria-pressed="true"]{background:#ffd75a;color:#3b1c0e;border-radius:10px}#hintsbtn[hidden],#whatbtn[hidden]{display:none}
 #whatbtn{align-self:flex-start;margin:2px 0}html.land #whatbtn{grid-area:what;align-self:start}
@@ -309,13 +309,12 @@ html.ti .mbox.start canvas.t3d,.mbox canvas.t3d{display:block;width:88px;height:
 .coach button,.turnover button{width:auto;min-width:68px;height:44px;border-radius:12px;padding:0 12px;font:800 15px system-ui}
 #pchip,.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.sch .s4,.sch .st,.sch .pp,.trk,.trk i,.trk b,.trk2,.tile .tn,.tile .tc,.mcard .mn,.deckback,.sp-b,.spot .ord,.spot .sp-c,.dcard,.dcard b,.dcard .dv,.tile .gain,.asrow figure,.ce-h b,.reftip,.gx-drawer small,.gx-drawer .muted{font-size:14px!important}
 .tile .tv{min-width:24px;height:24px;line-height:20px;font-size:16px!important;border:2px solid #4a2a05;box-shadow:0 1px 3px rgba(0,0,0,.45);padding:0 3px}
-html.sk-icons .ri,html.sk-ic2 .e2,html.sk-gd .mcard .mi,html.sk-gd .fl .mi,html.sp3 .tok,html.sk-tk:not(.sp3) .tok,html.sk-tk .own,html.sp3 .own.cam,.dcard .thi{font-size:14px!important;text-indent:-300px;overflow:hidden;white-space:nowrap;line-height:1}
+html.sk-icons .ri,html.sk-ic2 .e2,html.sk-gd .mcard .mi,html.sk-gd .fl .mi,html.sp3 .tok,html.sk-tk:not(.sp3) .tok,html.sk-tk .own,html.sp3 .own.cam,.dcard .thi{font-size:14px!important;line-height:1}
 .sch .w{display:none;font-style:normal}#seats[data-n="2"] .w,#seats[data-n="3"] .w{display:inline}.sch .s2{flex-wrap:wrap;gap:0 8px}
 @media (max-width:700px){.sch .s3,.sch .s4{display:none}.sch .sn small{display:none}}
 .mbox.start{position:relative}
 .mbox.start h2{white-space:normal;font-size:clamp(26px,8.4vw,36px);line-height:1.05;margin-top:6px;padding-right:0}
 html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46px;right:10px;width:84px;height:84px;margin:0}
-.tile:not(.glow):not(.cur){filter:saturate(.85)}
 .tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
 #gw{overflow:visible}#grid{margin-top:6px}
 .coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
@@ -327,3 +326,54 @@ html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-s
 @media (min-width:1024px){.trk,.trk2,.sch .s4,.tile .gain,.deckback,.deckback b,.mcard .mn,.turnover,.coach{font-size:16px}}
 @keyframes plin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 .plpop{animation:plin .3s ease both!important}
+
+/* drag the real piece */
+#grid [data-tile]{touch-action:none}
+.dragghost{position:fixed;z-index:80;pointer-events:none;display:flex;transform:translate(-50%,-70%) scale(1.5);filter:drop-shadow(0 6px 5px rgba(0,0,0,.55))}
+.dragover{outline:4px solid #ffd35a;outline-offset:-2px;box-shadow:0 0 18px 6px rgba(255,200,70,.85);transform:scale(1.04);z-index:5}
+.snap{animation:snapin .28s ease-out}@keyframes snapin{0%{transform:scale(1.12)}60%{transform:scale(.97)}100%{transform:scale(1)}}
+html.dragging,html.dragging *{cursor:grabbing!important;user-select:none}
+@media (prefers-reduced-motion:reduce){.snap{animation:none}}
+
+/* W480 r2: desktop goods cards with names (the middle column is wider), no see-through dimming (it showed the table under the tiles as a ghost layer) */
+html.land .gx-board{grid-template-columns:minmax(0,1fr) 236px 250px}
+html.land .mrow{grid-template-columns:repeat(2,minmax(0,1fr))}html.land .mcard{height:44px}
+html.land .mcard:not(.empty) .mn{display:block;flex:1;width:auto;text-align:left;font-size:15px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;padding:0}
+
+/* W480 r2: the top bar says what each icon is (captions), the game name steps aside on a phone */
+@media (max-width:700px){.gx-bar h1{display:none}.gx-bar .gx-ibtn{flex-direction:column;gap:0;min-height:46px;padding:2px 6px}.gx-bar .gx-ibtn>span{display:block!important;font:700 14px/1.1 var(--gx-body)!important}.gx-bar .gx-sp{flex:1 1 auto}}
+
+/* W480 r2: ui-audit A (16px on desktop) and B (text on busy art gets a plate) */
+@media (min-width:1024px){html body .pchip,html body .sch,html body .sch *,html body .gx-drawer-body p,html body .gx-drawer-body small,html body .gx-drawer-body li,html body .card h4 small,html body .gxc-act small,html body .gxc-lab,html body .reftip,html body .trk,html body .trk *,html body .trk2,html body .crown,html body .spot small,html body .dcard .dv,html body .mbox small,html body .mbox .lede,html body .mbox .acts .btn span,html body .mcard .mn,html body .tile .tn,html body .deckback,html body .sp-b,html body .ce-h b,html body .gxc-act small,html body .gxc-act b,html body .gxc-path small{font-size:16px!important}}
+/*old*/@media (min-width:99999px){.pchip,.sch,.sch *,.gx-drawer-body p,.gx-drawer-body small,.gx-drawer-body li,.card h4 small,.gxc-act small,.gxc-lab,.reftip,.trk,.trk *,.trk2,.crown,.spot small,.dcard .dv,.mbox small,.mbox .lede,.mbox .acts .btn span,.mcard .mn,.tile .tn,.deckback,.sp-b,.ce-h b{font-size:16px!important}}
+.tile .tv{background:#2a1500!important;color:#fff3c8!important;border:0!important;box-shadow:0 0 0 2px #e8b84a,0 2px 4px rgba(0,0,0,.5)!important;min-width:26px;height:26px;line-height:26px!important;padding:0 2px!important;text-shadow:none!important}.tile .tv::before{display:none!important}
+html body .spot .ord{background:#fff6de!important;color:#3b1c0e!important;border-radius:4px;padding:0 5px}
+html body .dcard .dv{background:#2a1a40!important;color:#fff!important;border-radius:9px;min-width:24px;text-align:center}
+.gx-drawer-body :is(p,li,h3,h4){background:#fff7e4!important;border-radius:6px;padding:2px 6px;color:#2f1809}
+html body .gx-drawer-body .card p{background:#fff7e4!important;display:block}
+html body .gxc-lab{background:#fff7e4!important;color:#2f1809;padding:2px 6px;border-radius:8px}
+@media (min-width:1024px){html body #bd #seats .sch,html body #bd #seats .sch *,html body #pchip,html body #bd .mcard .mn,html body #bd .tile .tn,html body #bd .trk *,html body .gx-drawer-body p,html body .gxc-act small{font-size:16px!important}}
+html body .mcard .mn{background:#fff6dc!important}
+@media (min-width:1024px){html body #bd .drow .dcard,html body #bd .drow .dcard *,html body #bd .bidt .spot,html body #bd .bidt .spot *,html body .gx-drawer-body p.small,html body .gx-drawer-body p.muted{font-size:16px!important}}
+/* R6 review fixes: plates and outlines on the painted board, buttons without a square behind, no see-through tiles, title room, bid glow */
+html.sk .mbox .btn,html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn.ghost{background-color:transparent!important}
+#grid.dim .tile:not(.glow):not(.blk){opacity:1!important;filter:saturate(.7) brightness(.82)}
+.tile .tv,html.sk-pl .tile .tv{min-width:24px;height:24px;font-size:14px!important;line-height:20px!important;padding:0 4px;border-radius:12px;background:#2a1500;color:#fff3c8;border:2px solid #f4c04a;top:3px;right:3px}
+html .tile .mp:not(.sm){filter:drop-shadow(1.5px 0 0 #fff8e0) drop-shadow(-1.5px 0 0 #fff8e0) drop-shadow(0 1.5px 0 #fff8e0) drop-shadow(0 -1.5px 0 #fff8e0) drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+html.m-bid #grid .tile.glow{animation:none!important;box-shadow:none!important;outline:0!important}
+@media (max-width:480px){#pchip{display:none}.gx-bar h1{font-size:18px;white-space:nowrap}}
+.sch .s2{font-size:14px}
+.tile .tn{max-width:calc(100% - 30px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html .tile .tn{box-sizing:border-box;max-width:calc(100% - 34px)}
+/* name at the bottom of the tile, cost plate top right, hint gain top left: nothing under anything */
+html .tile .tn{order:9;margin-top:auto;max-width:100%}
+.tile .gain{top:3px;bottom:auto}
+html .tile .tn{max-width:100%!important;margin-top:auto!important;width:auto}
+@media (min-width:1024px){.tile .tv,html.sk-pl .tile .tv{font-size:16px!important;min-width:28px;height:28px;line-height:24px!important}.sch .s2,.sch .s2 .st{font-size:16px}}
+
+@media (max-width:700px){html.sk .gx-bar .gx-ibtn{border-image:none;border:1px solid rgba(255,230,180,.35);border-radius:10px;background:rgba(0,0,0,.28)}}
+html body .trk-p i.done{opacity:1;color:#5a3a1e}
+
+@media (min-width:1024px){html body section.gx-drawer .gx-drawer-body :is(small,p,li,h4 small,.muted){font-size:16px!important}}
+html body .gxc-path .gxc-act small{background:#fff7e4!important;color:#2f1809!important;border-radius:6px}
+@media (min-width:1024px){html body .gxc-path .gxc-act small{font-size:16px!important}}

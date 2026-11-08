@@ -64,7 +64,8 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     const pages = [['road', E.road({ a: me.sc.road, b: me.end.road })], ['town', E.town({ a: me.sc.town, b: me.end.town })], ['priory', E.priory({ a: me.sc.priory, b: me.end.priory })], ['field', E.field({ b: me.end.field })],
       ['total', E.total({ me: me.score, hob: hob.score, win: win.length === 1 && win[0] === 0, tie: win.length > 1 })]];
     let i = 0;
-    const later = ['river', 'inns', 'goods'].concat(['tie', 'majority', 'discard', 'banner', 'score_road', 'score_town', 'score_priory'].filter(k => !ex.includes(k)));
+    const later = ['tie', 'majority', 'discard', 'banner', 'score_road', 'score_town', 'score_priory'].filter(k => !ex.includes(k)).concat(['river', 'inns', 'goods']);
+    const shown = later.slice(0, 3);   // the card shows three short lines at most; every rule is also in How to play
     GXCOACH.later = later;
     const card = html => { const m = document.getElementById('modal'); m.innerHTML = '<div class="scrim"><div class="card coachcard" role="dialog" aria-label="Score summary">' + html + '</div></div>'; return m; };
     const finish = pro => {
@@ -75,7 +76,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     };
     const pro = !!UI.coachPro;
     const showLater = () => {
-      const m = card('<h2>' + STORY.coachEnd.later + '</h2><ul class="clater">' + later.map(k => '<li>' + STORY.coachLater[k] + '</li>').join('') + '</ul><button class="btn big" data-a="cgo">' + (pro ? 'Start chapter 1' : 'Play a real game') + '</button>');
+      const m = card('<h2>' + STORY.coachEnd.later + '</h2><ul class="clater">' + shown.map(k => '<li>' + STORY.coachLater[k] + '</li>').join('') + '</ul><button class="btn big" data-a="cgo">' + (pro ? 'Start chapter 1' : 'Play a real game') + '</button>');
       GXCOACH.done = true; m.querySelector('[data-a=cgo]').onclick = () => finish(pro);
     };
     const show = () => {

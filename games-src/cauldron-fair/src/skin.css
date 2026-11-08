@@ -145,3 +145,4 @@ html.ph #barstat .bfl{display:none}
 #coach.on{pointer-events:none}#coach.on button{pointer-events:auto}
 html.ph #barstat .bav{display:none}
 html.ph #barstat{flex-shrink:0;overflow:visible}
+.flb.armed{outline:3px solid #f2b81e;outline-offset:2px;animation:flarm 0.8s ease-in-out infinite alternate}@keyframes flarm{to{outline-color:#fff6dc}}@media (prefers-reduced-motion:reduce){.flb.armed{animation:none}}

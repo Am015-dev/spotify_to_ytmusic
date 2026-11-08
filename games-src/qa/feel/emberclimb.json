@@ -1,8 +1,8 @@
 {
  "slug": "emberclimb",
- "when": "2026-11-08T04:25Z",
- "secs": 60,
- "totalSecs": 152,
+ "when": "2026-11-08T05:05Z",
+ "secs": 120,
+ "totalSecs": 265,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,13 +36,13 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 60,
-   "turns": 149,
-   "clicks": 187,
+   "secs": 120,
+   "turns": 305,
+   "clicks": 387,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 13
+   "messagesSeen": 14
   },
   {
    "size": "phone",
@@ -58,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 60,
-   "turns": 157,
-   "clicks": 197,
+   "secs": 121,
+   "turns": 320,
+   "clicks": 408,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 8
+   "messagesSeen": 7
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 26,
-   "turns": 59,
-   "clicks": 81,
+   "secs": 18,
+   "turns": 41,
+   "clicks": 56,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

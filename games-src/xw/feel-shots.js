@@ -7,7 +7,7 @@ fs.copyFileSync(process.argv[2] || __dirname + '/nebula.html', SITE + '/index.ht
 for (const d of ['media', 'models', 'music']) { try { fs.symlinkSync(R + '/games/nebula-aces/' + d, SITE + '/' + d); } catch (e) { } }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => { const b = await chromium.launch(); let bad = 0;
-  for (const [w, h, mob] of [[390, 844, true], [1440, 900, false]]) {
+  for (const [w, h, mob] of (process.env.SIZES==='pc'?[[1440, 900, false]]:process.env.SIZES==='phone'?[[390, 844, true]]:[[390, 844, true], [1440, 900, false]])) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: mob, isMobile: mob, deviceScaleFactor: 1 });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
     const shot = n => p.screenshot({ path: OUT + n + '-' + w + '.png' });
@@ -18,17 +18,17 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await p.evaluate(() => { try { GXT.stop(); } catch (e) { } try { tutLeave(); } catch (e) { } try { localStorage.setItem('na_played', '1'); } catch (e) { } });
     await p.goto('file://' + SITE + '/index.html'); await sleep(2500);
     await tap('button.primary:visible:has-text("Launch")'); await sleep(2500); await shot('3-goal-card');
-    await tap('[data-bf="brief"]'); await sleep(2500);
+    await tap('[data-bf="brief"]'); await sleep(2500); await p.evaluate(() => { try { UI.speed = 'fast'; } catch (e) { } });
     const PC = '.gx-dock button.primary:not([disabled]):visible, .gx-dock button.sug:not([disabled]):visible, .gx-dock button:has-text("★"):not([disabled]):visible, .gx-dock button:has-text("Roll"):visible, .gx-dock button:has-text("Next"):visible, .gx-dock button:has-text("Continue"):visible, .gx-dock button:has-text("OK"):visible';
     let rival = false, mid = false, first = false;
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 900; i++) {
       const st = await p.evaluate(() => ({ ph: G.phase, r: G.round, win: G.winner, ht: humanTurn(), hold: !!UI.hold }));
       if (st.win) break;
-      if (!first && st.ph === 'plan' && st.r === 1) { if (mob) await tap('.bfring.need'); await sleep(900); await shot('4-first-turn'); first = true; }
+      if (!first && st.ph === 'plan' && st.r === 1) { await tap('.bfring.need'); await sleep(900); await shot('4-first-turn'); first = true; }
       if (!rival && st.r >= 1 && !st.ht && st.ph !== 'plan') { await sleep(500); await shot('6-rival-turn'); rival = true; }
       if (!mid && st.r >= 3 && st.ht) { await shot('5-mid-game'); mid = true; }
-      const done = !mob ? await tap(PC) : await tap('[data-bf="auto"]') && (await sleep(300), await tap('[data-bf="fly"]:not([disabled])'));
-      if (!done && !(await tap('#bfbtns .btn.primary:not([disabled])')) && !(await tap('.bfring.need, .bfact, .bftgt, .bfm.sug, #bfdice .die.pick, #bfbtns .btn:not([disabled])'))) await p.evaluate(() => { try { if (UI.hold) releaseHold(); } catch (e) { } });
+      const done = await tap('[data-bf="auto"]') && (await sleep(300), await tap('[data-bf="fly"]:not([disabled])'));
+      if (!done && !(await tap('#bfbtns .btn.primary:not([disabled])')) && !(await (async () => { for (const q of ['.bftgt', '.bfact', '.bfring.need', '.bfm.sug', '#bfdice .die.pick', '#bfbtns .btn:not([disabled])']) if (await tap(q)) return true; return false; })())) await p.evaluate(() => { try { if (UI.hold) releaseHold(); } catch (e) { } });
       await sleep(700);
     }
     await sleep(3000); await shot('7-result');
