@@ -470,7 +470,7 @@ html.ph #labels .tl{pointer-events:none;padding:0;border:0;background:none;box-s
 html.ph #labels .tl::after{display:none}
 html.ph #labels .tl b{font-size:0;display:flex;align-items:center;gap:2px}
 html.ph #labels .tl .pt{font:700 13px/20px var(--sans);padding:0 7px;border-radius:10px;background:rgba(20,14,6,.86);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5);white-space:nowrap;text-decoration:none}
-html.ph #labels .tl .pt.unk{background:rgba(60,40,90,.88);color:#f0e4ff}
+html.ph #labels .tl .pt.unk{background:rgba(60,40,90,.88);color:#f0e4ff;text-transform:none;white-space:pre-line;max-width:none;line-height:15px;padding:2px 7px;text-align:center;font-size:14px}
 html.ph #labels .tl .pn{font:700 13px/20px var(--sans);min-width:20px;height:20px;padding:0 3px;margin:0;border-radius:50%;text-align:center;background:rgba(20,14,6,.78);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5)}
 html.ph #labels .tl.far .pn{background:rgba(10,18,28,.75);color:#ffe7b8}
 html.ph #labels .tl.sel .pn,html.ph #labels .tl.pulse .pn{background:var(--amber);color:#2b1a05;transform:scale(1.35)}
@@ -765,7 +765,7 @@ html.ph.ph-l #bf .pawnrow.bf-pw{flex-wrap:wrap;row-gap:6px}html.ph.ph-l .bfpc{fl
 /* feel gate: no phone text under 14px */html.ph #labels .tl .pn,html.ph #labels .tl .pt,html.ph #bfres small,html.ph #bfres span,html.bf #phview #phlabel .bfb,html.ph .bfpn,html.ph .bfpw sub,html.ph .rleg,html.ph .lf,html.ph i.rx,html.ph i.neg,html.ph i.pos,html.ph .now,html.ph span.on,html.ph .rtrack span,html.ph .lives b,html.ph .bfa em,html.ph .bfa .bfw,html.ph .gxt-menu span{font-size:14px!important}
 @media (max-width:600px){#hud,#hud *,#roadmap .rm-p span,#roadmap .rm-p i,#labels .tl .pn,#labels .tl .pt,#bfres small,#bfres span,#phview #phlabel .bfb,.bfpn,.bfpw sub,.gxt-menu span{font-size:14px!important}#roadmap .rm-p span{white-space:normal;overflow-wrap:anywhere;line-height:1.1}.cp-n,.rk,.ch .fp,.ch i,.ch .skills,.ch .skills *,.btn.sk,.btn.sk *,.ch .rs,.ch .rs *,.ch .rt,.ch .muted{font-size:14px!important}#bf .pawnrow.bf-pw{gap:2px}.bfpc{max-width:none!important;flex:1 1 0}.bfpn{letter-spacing:-.02em;white-space:nowrap}}
 #coachb{z-index:42}#bf .bfpw{position:relative;overflow:hidden}#bf .bfpw .bfpic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;z-index:0}#bf .bfpw:has(.bfpic) .ico{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#fff8e8;z-index:1;display:grid;place-items:center;transform:scale(.8)}#bf .bfpw sub,#bf .bfpw u{z-index:2;position:relative}.bfpn{max-width:100%;overflow:hidden;text-overflow:ellipsis}#bfcard .bfscene{display:block;width:100%;max-height:120px;object-fit:cover;border-radius:10px 10px 0 0;margin:-2px 0 6px}.ch-h .chp{width:44px;height:44px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;border:2px solid var(--pc,#b99f67)}
-html.bf #bf{background:linear-gradient(rgba(247,238,214,.9),rgba(240,227,192,.94)),var(--tbl) center/cover no-repeat}html{--tbl:url(media/table-beach-phone.webp)}html[data-scen=settlers]{--tbl:url(media/table-homestead.webp)}html[data-scen=hexed]{--tbl:url(media/table-temple-ruins.webp)}@media (min-width:700px){html{--tbl:url(media/table-beach.webp)}}.bf-opts .opt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;line-height:1.2}.bf-opts .opt .ol{font-size:16px}.bf-opts .opt .os{font-size:14px;font-weight:500;opacity:.85}body.coachfin #coachskip,body.coachfin #bf{visibility:hidden}#coachb[data-kind=final]{top:120px}#coachb[data-kind=final] .cn{font-size:20px}#coachb[data-kind=final] .walk{font-size:17px;line-height:1.5}
+html.bf #bf{background:linear-gradient(rgba(247,238,214,.9),rgba(240,227,192,.94)),var(--tbl) center/cover no-repeat}html{--tbl:url(media/table-beach-phone.webp)}html[data-scen=settlers]{--tbl:url(media/table-homestead.webp)}html[data-scen=hexed]{--tbl:url(media/table-temple-ruins.webp)}@media (min-width:700px){html{--tbl:url(media/table-beach.webp)}}.bf-opts .opt{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;line-height:1.2}.bf-opts .opt .ol{font-size:16px}.bf-opts .opt .os{font-size:14px;font-weight:500;opacity:.85}body.coachfin #coachskip{visibility:hidden}body.coachfin #bf{opacity:.45;pointer-events:none;filter:saturate(.6)}#coachb .cb.pri{background:#8f2a1c;color:#fff7e6;border-color:#6d1f14;font-weight:800;box-shadow:0 2px 0 #5a170e}#coachb[data-kind=final]{top:120px}#coachb[data-kind=final] .cn{font-size:20px}#coachb[data-kind=final] .walk{font-size:17px;line-height:1.5}
 @media (min-width:1024px){#moremenu button,#moremenu span,#moremenu b,#tutset *,#hlpset *{font-size:16px!important}}
 #coachb{position:fixed;left:10px;right:10px;top:142px;z-index:30;max-width:520px;margin:0 auto;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:#fff6dc;color:#2a2014;border:2px solid #c99a3e;box-shadow:0 6px 18px rgba(0,0,0,.45);font:600 15px/1.3 var(--sans);pointer-events:none}
 #coachb[hidden]{display:none}#coachb .cn{font-weight:800;color:#7a3b12}#coachb .ct{flex:1 1 200px}#coachb ul{margin:4px 0 0 18px;padding:0;width:100%;font-weight:500;font-size:14px}
@@ -5731,7 +5731,7 @@ function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return camp
     const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
   else how=esc(S.x);
   const win=G.scen==='marooned'?'You win if a ship sees your signal fire and everyone is alive.':'You win if you meet this goal and everyone is alive.';
-  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b><div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b class="gw">${win}</b>${G.learn&&!G.tut?'<div class="gs">Easy island: milder events, no weather dice. Normal has the full rules.</div>':''}<div class="gs">${esc(SC().goal?SC().goal():S.x)}</div>${G.scen==='marooned'?how:`<p>${how}</p>`}${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
@@ -6132,7 +6132,7 @@ function terrainField(terr,seed){const R=seeded(seed*31+11);const ox=R()*40,oz=R
 // painted hex art (media/hex-*.webp, flat-top, opaque): turned a quarter so it fits the pointy hex, sampled in paintTile in place of the flat colours (the sculpted light is kept, softer)
 const HEXART={n:0,done:0,img:{},px:{},started:0,t0:0};
 function hexArtLoad(){if(HEXART.started)return;HEXART.started=1;HEXART.t0=performance.now();['beach','plains','river','hills','mountains','fog-a','fog-b','fog-c'].forEach(k=>{const i=new Image();i.onload=()=>{HEXART.img[k]=i;HEXART.n++;HEXART.done++};i.onerror=()=>{HEXART.done++};i.src='media/hex-'+k+'.webp'})}
-function hexArtPx(k,S){const key=k+S;if(HEXART.px[key])return HEXART.px[key];const im=HEXART.img[k];if(!im)return null;const c=cvs(S),x=c.getContext('2d');x.translate(S/2,S/2);x.rotate(Math.PI/2);const f=S/512*1.04;x.scale(f,f);x.drawImage(im,-256,-222);try{return HEXART.px[key]=x.getImageData(0,0,S,S).data}catch(e){HEXART.img[k]=null;return null}}   // a page opened from a file: taints the canvas: keep the drawn tile
+function hexArtPx(k,S){const key=k+S;if(HEXART.px[key])return HEXART.px[key];const im=HEXART.img[k];if(!im)return null;const c=cvs(S),x=c.getContext('2d');if(/^fog-/.test(k))x.filter='blur('+Math.max(2,S/40)+'px) saturate(.25) sepia(.5) brightness(1.4) contrast(.45)';x.translate(S/2,S/2);x.rotate(Math.PI/2);const f=S/512*1.04;x.scale(f,f);x.drawImage(im,-256,-222);try{return HEXART.px[key]=x.getImageData(0,0,S,S).data}catch(e){HEXART.img[k]=null;return null}}   // a page opened from a file: taints the canvas: keep the drawn tile
 // paint the top of a tile from its height field: colour, soft baked light, wet sand, snow, riverbanks
 function paintTile(F,S){const c=cvs(S),x=c.getContext('2d'),id=x.createImageData(S,S),D=id.data;const rc=cvs(S/2),rx=rc.getContext('2d'),rid=rx.createImageData(S/2,S/2),RD=rid.data;
   const G1=S+1,H=new Float32Array(G1*G1);for(let j=0;j<G1;j++)for(let i=0;i<G1;i++){H[j*G1+i]=F.h((i/S*2-1)*HR0,(j/S*2-1)*HR0)}F.H=H;F.S=S;
@@ -6241,12 +6241,12 @@ function wreckMesh(){const g=new THREE.Group();const wood=V3.lite?gq('wreckL',()
 // ---------- the mist of the unexplored island: stacked shader layers that read a mask of the tiles nobody has seen ----------
 function buildMist(){if(V3.mistL)return;const b=V3.box;V3.mistC=cvs(128);V3.mistC2=cvs(128);V3.mistT=tex(V3.mistC2,false);V3.mistT.anisotropy=1;V3.mistT.flipY=false;
   V3.mistL=[];for(let i=0;i<3;i++){const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,fog:false,
-    uniforms:{uTime:V3.U.time,uMask:{value:V3.mistT},uBox:{value:new THREE.Vector4(b.x0,b.z0,1/b.L,0)},uLayer:{value:i},uCol:{value:new THREE.Color(.78,.82,.84)},uFlash:{value:0},uNight:{value:0}},
+    uniforms:{uTime:V3.U.time,uMask:{value:V3.mistT},uBox:{value:new THREE.Vector4(b.x0,b.z0,1/b.L,0)},uLayer:{value:i},uCol:{value:new THREE.Color(.92,.88,.78)},uFlash:{value:0},uNight:{value:0}},
     vertexShader:'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
     fragmentShader:GLN+`uniform sampler2D uMask;uniform vec4 uBox;uniform float uTime,uLayer,uFlash,uNight;uniform vec3 uCol;varying vec3 vW;
 void main(){vec4 mk=texture2D(uMask,(vW.xz-uBox.xy)*uBox.z);float m=mk.r;if(m<.01)discard;
- vec2 p=vW.xz*(.28+uLayer*.07)+vec2(uTime*.07,uTime*.04)*(1.+uLayer*.5)+uLayer*7.3;float n=fbm(p)+.45*fbm(p*2.4-vec2(uTime*.05,0.));
- float w=smoothstep(.58,1.12,n);float a=m*(.09+w*.58)*(1.-uLayer*.2);
+ vec2 p=vW.xz*(.28+uLayer*.07)+vec2(uTime*.02,uTime*.012)*(1.+uLayer*.3)+uLayer*7.3;float n=fbm(p)+.45*fbm(p*2.4-vec2(uTime*.05,0.));
+ float w=smoothstep(.58,1.12,n);float a=m*(.05+w*.22)*(1.-uLayer*.25);
  vec3 c=mix(uCol*vec3(.5,.52,.6),uCol*1.05,w)+vec3(.3,.2,.5)*mk.g*.1;c+=vec3(.6,.65,.8)*uFlash*.6;
  gl_FragColor=vec4(c,a);`+GLEND+'}'});
     const pl=new THREE.Mesh(gq('mistG',()=>{const g=new THREE.PlaneGeometry(1,1);g.rotateX(-Math.PI/2);return g}),m);pl.scale.set(b.L,1,b.L);pl.position.set(b.x0+b.L/2,TOPY+.5+i*.32,b.z0+b.L/2);pl.renderOrder=4+i;pl.frustumCulled=false;V3.scene.add(pl);V3.mistL.push(pl)}
@@ -6371,7 +6371,7 @@ function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=h
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
 function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Unknown'}</s></b>`:''}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s><s class="pt ${t?'':'unk'}">${m.id===G.camp.pos?'Camp':t?String(TERRN(t.terr)).replace(/^./,c=>c.toUpperCase()):'Not explored\nyet'}</s></b>`:''}
     else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
@@ -7432,7 +7432,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <div class="quick"><h3>Quick game</h3>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
-   ${seg('Difficulty',[['easy','Easy'],['standard','Standard'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
+   ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
    <details class="morep" open><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
@@ -7540,9 +7540,11 @@ document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.clo
 document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(t)pulsePos(+t.dataset.pos)});
 // ---------- game start ----------
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
+// the first real game is on the Easy island (owner 8 Nov: following ✨ lost on day 5-7 on the full deal); Normal afterwards
+try{if(!localStorage.getItem('swi_real1'))Object.assign(UI.setup,{diff:'easy',items:4,dog:true})}catch(e){}
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
-  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});UI.reportMark=G.logN;V3.layout=null;
+  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});if(s.diff==='easy'&&!UI.cmpDef&&typeof easyDeal==='function')easyDeal();try{localStorage.setItem('swi_real1','1')}catch(e){}UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});try{GXSK.init({sets:{'sk-acts':['build','camp','explore','gather','hunt','rest','threat'].map(k=>'icon-act-'+k),'sk-res':['food','pfood','wood','fur','shelter','roof','palisade','weapon'].map(k=>'icon-res-'+k)}})}catch(e){}if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
@@ -8085,7 +8087,9 @@ const tutOn=()=>false;   // the spotlight tutorial is gone; the coached game (be
 // the staged deal: called by newGame before the first scene. Day 1 has no event card; day 2 turns over Chill Rain (a rain cloud and a threat).
 // Learn to play is a gentler island (same rules, kinder deal): the mountains for Fire come second, the mildest event cards, weak beasts first,
 // a little more food and wood, and no weather dice (Chill Rain still brings a cloud on day 2 to teach the roof). A player who follows ✨ Suggest wins.
-function tutDeal(){G.tut=1;G.learn=1;G.res.food=3;G.res.wood=3;G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
+// "Easy island" (the default first real game, and Easy afterwards): the same kind deal, without the coach. Normal keeps the full rules.
+function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;const t=G.tut;tutDeal();if(!t)delete G.tut}
+function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const mild=[...new Set(EVENTS.map(e=>e.k))].filter(k=>k!=='chillrain').sort((a,b)=>harm(b)-harm(a)).slice(0,14);
   G.ev.deck=['chillrain'].concat(shuffle(mild)).slice(0,G.ev.deck.length);G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
 // ---------------------------------------------------------------- the staged game starts and stops
@@ -8156,7 +8160,7 @@ function coachFinal(){COACH.finished=true;const over=!!G.over,w=!!(G.over&&G.ove
   const fire=has('fire'),pile=(G.sc&&G.sc.pile)||0;
   const walk=[['Goal: fire',fire?'✓ lit':'✗ not lit'],['Goal: wood pile',pile+' of 15'],['Rescue window','days 10 to 12 (you ended on day '+G.round+')'],['Everyone alive',alive+' of '+tot+(alive<tot?': a death loses':'')],['Shelter',hasShelter()?'built (no night wounds)':'none (a wound each night)'],['Roof and palisade',G.camp.roof+' and '+G.camp.pal],['Food and wood left',food()+' and '+G.res.wood]];
   const e=coachEl();COACH.cur='later';e.hidden=false;e.dataset.rule='later';e.dataset.kind='final';
-  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
+  const btns=(COACH.pro?'<button type="button" class="cb" data-coach="chapter">Start chapter 1</button>':(over?'':'<button type="button" class="cb pri" data-coach="keep">Keep playing</button>')+'<button type="button" class="cb'+(over?' pri':'')+'" data-coach="play">Play a real game</button><button type="button" class="cb" data-coach="story">Story</button>');
   const lines=[fire?'Fire: lit ✓':'Fire: not lit',`Wood pile: ${pile} of 15`,`Alive: ${alive} of ${tot}`];
   e.innerHTML='<b class="cn">'+(over?(w?'Rescued!':'We did not make it.'):'You have the hang of it.')+'</b><ul class="walk">'+lines.map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="cbs">'+btns+'</div>';document.body.classList.add('coachfin');
   coachMark({done:1,open:0,step:0})}

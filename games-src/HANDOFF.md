@@ -139,8 +139,13 @@ Wildmark, Vale and Perch passed the qa-bot and ui-audit, and the owner still fou
 - Shipwreck Isle https://am015-dev.github.io/spotify_to_ytmusic/shipwreck-isle/ (R6 PASS 07:55, live 08:15, feel-audit live all pass; Learn wins by Suggest 4/4)
 - Cauldron Fair https://am015-dev.github.io/spotify_to_ytmusic/cauldron-fair/ (R5 PASS 07:46, live 08:39, feel-audit live all pass)
 - Nebula Aces https://am015-dev.github.io/spotify_to_ytmusic/nebula-aces/ (R3 PASS 08:45, live 09:00, feel-audit live all pass)
+- Twin Thrones https://am015-dev.github.io/spotify_to_ytmusic/twin-thrones/ (R6 PASS 09:26, live 09:33, feel-audit live all pass)
 
 ## 05:03 state
 - Merged W480 sands r2 (logic 119/119), W475 redline (65/65). R2 archived (stuck on permission prompt).
 - New reviewers: R7 sands session_01RR7mnYY2bAJ5s4vAQTcBiG, R8 stitchwise session_01RR7mnXUpq2ard1J7RVsJoL, R9 redline session_01RR7mnY315Vk28t5BMK1BXb.
 - R3 vinegrave, R5 nebula, R4 shipwreck, R6 crown, R1 short-fuse. W464 tidewake round 4 sent. W463 kaiten fixes sent.
+
+## 09:20 owner feedback (awake)
+- Redline: speed limits were off-screen (close camera). FIXED live 09:12: always-on next-corner signs (limit + distance, red + heat warning).
+- Hollowbough: owner says coached game unplayable on phone (icon soup, can't follow, coach mistakes). Opus W482 session_01RR7mnb2G2Kj8PASRKq2B5j rebuilding phone screen + coach. R4 review findings go to W482.

@@ -32,7 +32,7 @@ function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.oppo
 function layout() {
   document.documentElement.classList.toggle('sm', innerHeight < 700); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
-  var fr = artHas('quilt-frame') ? 20 : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr) / 9, (H - 12 - 46 - 56 - 22 - 26 - fr) / 9));
+  var fr = artHas('quilt-frame') ? (wide ? 20 : 8) : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr) / 9, (H - 12 - 46 - 56 - 22 - 26 - fr) / 9));
   cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
@@ -145,7 +145,7 @@ function rateMove(m) { // compare the human's move with the best value on offer 
   return 'Last turn: ' + verdict + ' (' + sgn(mine.v) + ').' + (d <= 1 ? ' Best value on offer.' : ' Best was ' + best.name + ' (' + sgn(best.v) + ').'); }
 function renderDock() {
   var s = UI.peek >= 0 ? UI.peek : swWho(G), hum = !G.over && isHuman(s) && !(UI.peek >= 0), off = swOffer(G), box = $('#offers'), pr = $('#prompt'), ac = $('#acts'), dt = $('#detail'), dh = $('.gx-dt');
-  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
+  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; box.classList.toggle('placing', !UI.wide && UI.sel >= 0 && hum); pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
