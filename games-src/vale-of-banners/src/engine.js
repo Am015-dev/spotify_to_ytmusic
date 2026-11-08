@@ -228,7 +228,7 @@
       break;
     }
   }
-  function score(G, s, n, why, cell, ev) { if (!n) return; G.P[s].vp += n; ev.push({ e: 'score', p: s, n: n, why: why, cell: cell }); }
+  function score(G, s, n, why, cell, ev) { if (!n) return; G.P[s].vp += n; var sr = G.P[s].src = G.P[s].src || {}; sr[why] = (sr[why] || 0) + n; ev.push({ e: 'score', p: s, n: n, why: why, cell: cell }); }
   function place(G, s, t, ci, ev, chained) {
     var p = G.P[s], c = CELLS[ci]; p.estate[ci] = t;
     ev.push({ e: 'place', p: s, tile: t, cell: ci, chain: !!chained });
