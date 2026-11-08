@@ -7,7 +7,7 @@ const TUT_GAME = 'final-approach';
 // strip with one plane on space 3. Each round brings one system: 1 axis and engines (spare dice to Coffee), 2 radio and landing gear (plus the reroll token),
 // 3 flaps and brakes, 4 the landing. The dice are made up (TUT_SCRIPT, checked by tut-sim.js: following the coach lands the plane); every legal move stays allowed.
 // dice per round [pilot x4, co-pilot x4]
-const TUT_SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 3, 6, 1], [2, 4, 5, 1]]];
+const TUT_SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 1, 3, 6], [4, 6, 2, 1]]];
 const TUT_SETUP = { scenario: 'tt', seed: 23, row0: 3, pre: { script: TUT_SCRIPT } };
 // the systems the coach (and the computer co-pilot) use each round; the player may still use anything legal
 const TUT_ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
@@ -16,8 +16,8 @@ function tutAdvise(g, seat, die) {
   let al = TUT_ALLOW[Math.min(g.round, 3)], best = null, bc = 1e9; const V = FA.stripView(g, seat); V.nolog = true;
   if (g.round === 0 && (!g.slots['ax' + seat] || !g.slots['en' + seat])) al = ['axis', 'engines'];   // round 1 teaches the two must-fill controls first
   if (g.phase === 'place' && !g.pend) for (const m of FA.validMoves(V, seat)) {
-    if (m.t !== 'place' || m.d === 'p' || (al && !al.includes(FA.SLOT[m.to].grp)) || (die != null && m.d !== die)) continue;
-    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) + Math.abs(m.c || 0) * 0.02; if (c < bc) { bc = c; best = m; }
+    if (m.t !== 'place' || m.d === 'p' || (m.c || 0) !== 0 || (al && !al.includes(FA.SLOT[m.to].grp)) || (die != null && m.d !== die)) continue;   // the coach never asks for coffee
+    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) - (seat === 1 && g.round >= 2 && FA.SLOT[m.to].grp === 'flaps' && !g.pl.sw.fl[FA.SLOT[m.to].ix] ? 5 : 0); if (c < bc) { bc = c; best = m; }
   }
   try { return best || FA.AI.move(g, seat, 'normal', { noMC: true }); } catch (e) { return null; }
 }
@@ -61,7 +61,7 @@ function tutStart(o) {
   closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
   document.querySelectorAll('.fa-skip').forEach(e => e.remove());
   const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Skip the guided flight' }, 'Skip tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
-  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0 }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
+  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0, goal: true }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
 }
 // leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
@@ -139,14 +139,33 @@ function fcShow(key, txt, who, ms) {
 // while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
 function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
 const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
+function tutGoal() {
+  if (typeof roHide === 'function') roHide();
+  const el = h('div.fa-ro.fa-goal', { role: 'dialog', 'aria-label': 'Goal' }, h('b', 'Goal: reach the runway by round 4 and land.'),
+    h('ul', h('li', 'Land with gear and flaps down.'), h('li', 'Keep the wings level.'), h('li', 'Speed must not beat the brakes.')), h('button.rgo', { type: 'button', 'data-ro': 'go' }, "Let's fly"));
+  el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) { el.remove(); fcPoll(); } }); document.body.appendChild(el);
+}
 function fcPump() { }
 function fcFeedback() { }
+// the reason in the turn line: the rule of that control, said before the move (R3: rules BEFORE the move)
+function tutWhy(m) {
+  const S = FA.SLOT[m.to], val = dv(m.d) + (m.c || 0), last = FA.isFinal(G); fcSay(S.grp === 'conc' ? 'coffee' : S.grp);
+  switch (S.grp) {
+    case 'axis': { const x = G.slots.ax1; if (!x) return 'Close dice keep the wings level.'; const nx = G.pl.axis + x.v - val; return nx === 0 ? 'Same as Ravi: wings level.' : 'Wings tilt ' + Math.abs(nx) + '. Three would crash.'; }
+    case 'engines': { const x = G.slots.en1; if (!x) return 'Ravi adds his die. The sum is our speed.'; const sm = val + x.v + FA.windMod(G); if (last) return 'Speed ' + sm + ', brakes ' + FA.brakeVal(G) + '.'; const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + ': ' + (adv ? 'we move ' + adv + '.' : 'we hold.'); }
+    case 'radio': { const at = G.pl.pos + val - 1; return G.planes[at - 1] ? 'It clears the plane on space ' + at + '.' : 'Nothing to clear there.'; }
+    case 'gear': return 'All three gear must be down to land.';
+    case 'brakes': return 'We may land at speed ' + S.vals[0] + ' or less.';
+    case 'conc': return 'It earns a coffee token.';
+  }
+  return '';
+}
 // "Put your 4 on Engines: ..." from the coach's advice
 function fcLine(m) {
   if (!m) return '';
   if (m.t === 'toss') return 'Your ' + dv(m.d) + ' fits nowhere. Throw it away.';
   if (m.t !== 'place') return capW(hlpWhy(m, 0), 12) || 'Your move.';
-  const v = dv(m.d), c = m.c || 0, where = slotName(m.to); let why = ''; try { why = aiChip(m, 0) || ''; } catch (e) { }
+  const v = dv(m.d), c = m.c || 0, where = slotName(m.to); let why = ''; try { why = tutWhy(m) || ''; } catch (e) { }
   const head = c ? 'Coffee makes your ' + v + ' a ' + (v + c) + '. Put it on ' + where + '.' : 'Your ' + v + ' goes on ' + where + '.';
   const all = head + (why ? ' ' + why : ''); return all.split(/\s+/).length <= 12 ? all : head;
 }
@@ -161,12 +180,13 @@ function fcPoll() {
   if (has(/^ra/)) fcSay('radio'); if (has(/^lg/)) fcSay('gear'); if (G.pend && G.pend.h === 'rr' || G.rrHand > 0 && mine) fcSay('reroll');
   if (G.round >= 2) { fcSay('flaps'); fcSay('brakes'); } if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
   if (FA.isFinal(G) && G.phase === 'place') fcSay('final');
+  if (F.goal) { if (!document.querySelector('.fa-goal')) { if (F.goalShown) F.goal = false; else { F.goalShown = true; tutGoal(); } } if (F.goal) return; }
   const R = T.rounds || [], n = Object.keys(sl).length;
   if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
   if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, 'Tap dice to roll again, or keep them all.', 'ravi'); return; }
   if (mine) {
     const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = 'p' + G.round + ':' + n + ':' + (sel == null ? '' : sel);
-    if (F.cur && /^[wt]/.test(F.cur.key) && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
+    if (F.cur && /^t/.test(F.cur.key) && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
     if (!F.cur || F.cur.key !== key) {
       let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
       UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
@@ -174,7 +194,7 @@ function fcPoll() {
     return;
   }
   UI.cpt = null;
-  if (F.queue.length && (!F.cur || F.cur.key.charAt(0) !== 'w' || Date.now() - F.cur.at > F.cur.need)) fcShow('w' + G.round + n, F.queue.shift(), 'ravi', 9000);
+  F.queue.length = 0;   // rules are said in the briefing and inside each turn line, never as a separate bubble
 }
 // the end: the landing check rule by rule with the real numbers, then what did not come up
 function fcEnd() {

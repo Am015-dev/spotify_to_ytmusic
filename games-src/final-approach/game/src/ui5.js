@@ -13,7 +13,7 @@ function renderStart() {
   s.appendChild(setupEl());
 }
 // a first-time Play goes straight to chapter 1 of the flight school; everybody else picks a flight
-function playNow() { if (newPlayer()) { try { GXC.play('c1'); return; } catch (e) { } } UI.sv = 'setup'; renderStart(); }
+function playNow() { newGame('vs'); }   // R3: a quick game is a real flight (Goal card first); the ladder lives in Story
 // the kit's menu button as an element (title, setup and in-game menu)
 function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typeof tutBtn === 'function' ? tutBtn(cls) : ''; const b = w.firstChild; if (b && b.setAttribute) b.setAttribute('data-a', 'offeryes'); return b; }   // data-a: the Learn hook test drivers look for (no game action of its own)
 // tall phone: the painted portrait title (media/title-phone.webp); the landscape art stays the fallback

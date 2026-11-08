@@ -363,12 +363,12 @@ t('ladder: the real game is untouched (no lad): keys, dice, briefing', () => { c
 
 t('tutorial flight: 4 rounds from 3000 ft on the 4-space strip, one plane on space 3; following the coach (round systems only) lands the plane', () => {
   require('./src/ai.js');
-  const SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 3, 6, 1], [2, 4, 5, 1]]];
+  const SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 1, 3, 6], [4, 6, 2, 1]]];
   const ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
   const G = FA.newGame({ scenario: 'tt', seed: 23, row0: 3, pre: { script: SCRIPT } }); eq(D.rounds - G.row0, 4); eq(G.planes.join(''), '0010'); eq(FA.altRow(G)[0], 3000);
   let n = 0; while (!G.result && n++ < 300) { const s = FA.pending(G)[0]; let m = null;
-    if (G.phase === 'brief') m = { t: 'ready' }; else { const al = ALLOW[Math.min(G.round, 3)], V = FA.stripView(G, s); let bc = 1e9;
-      if (!G.pend) for (const x of FA.validMoves(V, s)) { if (x.t !== 'place' || x.d === 'p' || (al && !al.includes(FA.SLOT[x.to].grp))) continue; const S = FA.cloneLite(V); FA.performMove(S, x, s, true); const c = FA.AI.cost(S, s) + Math.abs(x.c || 0) * 0.02; if (c < bc) { bc = c; m = x; } }
+    if (G.phase === 'brief') m = { t: 'ready' }; else { let al = ALLOW[Math.min(G.round, 3)]; if (G.round === 0 && (!G.slots['ax' + s] || !G.slots['en' + s])) al = ['axis', 'engines']; const V = FA.stripView(G, s); let bc = 1e9;
+      if (!G.pend) for (const x of FA.validMoves(V, s)) { if (x.t !== 'place' || x.d === 'p' || (x.c || 0) !== 0 || (al && !al.includes(FA.SLOT[x.to].grp))) continue; const S = FA.cloneLite(V); FA.performMove(S, x, s, true); const c = FA.AI.cost(S, s) - (s === 1 && G.round >= 2 && FA.SLOT[x.to].grp === 'flaps' && !G.pl.sw.fl[FA.SLOT[x.to].ix] ? 5 : 0); if (c < bc) { bc = c; m = x; } }
       if (!m) m = FA.AI.move(G, s, 'normal', { noMC: true }); }
     ok(FA.performMove(G, m, s).ok); }
   ok(G.result && G.result.win, 'tutorial flight should land: ' + JSON.stringify(G.result));

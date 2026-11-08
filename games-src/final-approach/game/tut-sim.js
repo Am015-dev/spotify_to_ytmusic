@@ -3,9 +3,9 @@ const FA = require('./src/engine.js'); require('./src/ai.js');
 const SCRIPT = JSON.parse(process.argv[2] || 'null');
 const ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
 function advise(G, seat) {
-  const al = ALLOW[Math.min(G.round, 3)], V = FA.stripView(G, seat); V.nolog = true; let best = null, bc = 1e9;
-  if (G.phase === 'place' && !G.pend) for (const m of FA.validMoves(V, seat)) { if (m.t !== 'place' || m.d === 'p') continue; if (al && !al.includes(FA.SLOT[m.to].grp)) continue;
-    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) + Math.abs(m.c || 0) * 0.02; if (c < bc) { bc = c; best = m; } }
+  let al = ALLOW[Math.min(G.round, 3)]; if (G.round === 0 && (!G.slots['ax' + seat] || !G.slots['en' + seat])) al = ['axis', 'engines']; const V = FA.stripView(G, seat); V.nolog = true; let best = null, bc = 1e9;
+  if (G.phase === 'place' && !G.pend) for (const m of FA.validMoves(V, seat)) { if (m.t !== 'place' || m.d === 'p' || (m.c || 0) !== 0) continue; if (al && !al.includes(FA.SLOT[m.to].grp)) continue;
+    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) - (seat === 1 && G.round >= 2 && FA.SLOT[m.to].grp === 'flaps' && !G.pl.sw.fl[FA.SLOT[m.to].ix] ? 5 : 0); if (c < bc) { bc = c; best = m; } }
   return best || FA.AI.move(G, seat, 'normal', { noMC: true });
 }
 function play(script, rnd) {
