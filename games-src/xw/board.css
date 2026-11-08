@@ -195,8 +195,8 @@ html.sk-cards .mv.w,html.sk-cards .mv.g{color:#10131f!important}
 .dlg.start .launchbar [data-a="start"]{background:url(media/ui-button-go.webp) center/100% 100% no-repeat;border-color:transparent;color:#1b0d05}
 .dlg.start [data-a="story"]{background:url(media/ui-button-power.webp) center/100% 100% no-repeat;border-color:transparent;color:#eef}
 .dlg.start [data-a="story"] small{color:#d6dcff}
-.dlg.start .acts .btn:not(.primary){background:url(media/ui-button-cream.webp) center/100% 100% no-repeat;border-color:transparent;color:#1b1630}
-details.na-opts>summary{background:url(media/ui-row-c.webp) center/100% 100% no-repeat;border-radius:10px;padding:8px 12px 8px 40px;list-style:none}details.na-opts>summary::-webkit-details-marker{display:none}
+.dlg.start .acts .btn:not(.primary){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-width:14px 22px;background:#efe3c8;background-clip:padding-box;color:#1b1630}
+details.na-opts>summary{background:#2a2148;border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 42 fill/12px 18px stretch;border-width:12px 18px;background-clip:padding-box;border-radius:10px;padding:8px 12px 8px 40px;list-style:none}details.na-opts>summary::-webkit-details-marker{display:none}
 details.na-opts[open]{background:rgba(10,10,30,.6) url(media/ui-panel.webp) center/100% 100% no-repeat}
 /* top bar and its icon buttons */
 .gx-bar{background-image:url(media/ui-topbar.webp);background-size:100% 100%}
