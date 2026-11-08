@@ -38,14 +38,19 @@ var WMF = (function () {
       UI.dragSpots = false; UI.hov = null;
       if (!tutOK({ what: 'take', i: d.i })) { drawMap(); return false; }
       var from = mkRects(d.i);
-      take({ t: 'take', i: d.i, viaDrag: 1 });
-      if (G.stage !== 'tile') return true;
-      if (WM.spots(G.seats[G.cur].env).indexOf(t.c) < 0 || !tutOK({ what: 'spot', c: t.c })) return true;
-      UI.ghost = { c: t.c, rot: bestRot(t.c) };
-      requestAnimationFrame(function () {   // next frame: keeps each task short on slow phones
-        if (!G || G.stage !== 'tile' || !UI.ghost) return; render();
-        var g = $('#map .ghost'); if (g) F.settle(g);
-        flyTok(from && from.k, G.hold && G.hold.tok);
+      // three short tasks instead of one long one on slow phones: the drop (now), the take (next frame), the ghost (the frame after)
+      UI.dropBusy = true;
+      requestAnimationFrame(function () {
+        UI.dropBusy = false; if (!G || !myTurn() || G.stage !== 'pick') return;
+        take({ t: 'take', i: d.i, viaDrag: 1 });
+        if (G.stage !== 'tile') return;
+        if (WM.spots(G.seats[G.cur].env).indexOf(t.c) < 0 || !tutOK({ what: 'spot', c: t.c })) return;
+        UI.ghost = { c: t.c, rot: bestRot(t.c) };
+        requestAnimationFrame(function () {
+          if (!G || G.stage !== 'tile' || !UI.ghost) return; render();
+          var g = $('#map .ghost'); if (g) F.settle(g);
+          flyTok(from && from.k, G.hold && G.hold.tok);
+        });
       });
       return true;
     },
@@ -95,6 +100,17 @@ var WMF = (function () {
   // ---------------------------------------------------------------- flights on the tap path too
   function mkRects(i) { var t = $('#mk .mt[data-i="' + i + '"]'), k = $('#mk .mk[data-i="' + i + '"]'); return { t: t && t.getBoundingClientRect(), k: k && k.getBoundingClientRect(), ti: i, ki: i }; }
   function flyTok(fromR, tok) { var to = $('#acts .htok'); if (!fromR || !to || !tok) return; to.style.opacity = '0'; F.fly(fromR, to, { node: tokNode(tok), ms: 420 }).then(function () { to.style.opacity = ''; F.hop(to); }); }
+  // the move rating (score.js, ~60 ms on a slow phone: it plans the best move) runs one task later on a snapshot, so a
+  // pick never blocks a frame for long; it only reads the state and writes PV.turn, which is read when the turn ends
+  var pvStart0 = window.pvTurnStart;
+  if (pvStart0) {
+    window.pvTurnStart = function (m) {
+      if (!G || G.seats[G.cur].ai) return; UI.rivalMsg = null;
+      var snap = WM.clone(G), mm = Object.assign({}, m);
+      setTimeout(function () { var live = G; G = snap; try { pvStart0(mm); } catch (e) { } finally { G = live; } }, 0);
+    };
+    pvTurnStart = window.pvTurnStart;
+  }
   var take0 = window.take;
   window.take = function (m) {
     var a = m.t === 'take' ? mkRects(m.i) : m.t === 'free' ? { t: ($('#mk .mt[data-i="' + m.ti + '"]') || {}).getBoundingClientRect && $('#mk .mt[data-i="' + m.ti + '"]').getBoundingClientRect(), k: ($('#mk .mk[data-i="' + m.ki + '"]') || null) && $('#mk .mk[data-i="' + m.ki + '"]').getBoundingClientRect() } : null;
