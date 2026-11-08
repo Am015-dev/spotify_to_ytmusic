@@ -5,7 +5,7 @@ const PH={on:false,land:false,pop:null,pd:null,zoom:false,zk:'',cur:null,mphHide
 const PH_REGION=[-4.02,4.02,-4.02,4.02];
 const PH_ICO={tile:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 4q0 8 8 8M4 14q6 0 6 6"/></svg>',mon:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17c2-6 5-8 9-8 3 0 4-3 7-3-1 2-1 3 0 4-2 1-2 3-3 4 3 0 4 2 5 4-3-1-5-2-7-1-3 1-6 1-11 0zM9 12h.01"/></svg>',zoom:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>',rl:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.5-5.4M5 4v4h4"/></svg>',rr:'<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.5-5.4M19 4v4h-4"/></svg>'};
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;if(innerWidth>=1024&&innerWidth>innerHeight)return true; /* desktop: the board-first layout too (board left, slim strip right) */let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
@@ -138,7 +138,7 @@ function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
     else if(PH.pop==='info')h=phInfoHTML();
     else if(PH.pop==='start'){const d=sideToAct();h=d>=0&&G.seats[d].human&&G.phase==='setup'&&!G.q&&!UI.busy&&!mustPass(d)?phStartHTML():null}}
   if(!h){if(PH.pop){PH.pop=null;PH.pd=null}if(!el.hidden){el.hidden=true;el.innerHTML='';PH.pop_h=''}return}
-  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh)}}
+  if(h!==PH.pop_h){const fresh=el.hidden;PH.pop_h=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh);try{oskPlace()}catch(e){}}}
 function phClose(){PH.pop=null;PH.pd=null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 function phOpen(kind,pd){PH.pop=kind;PH.pd=pd||null;PH.toast='';phPopup();phStrip();try{ovUpdate()}catch(e){}}
 // ---------- cards: coach tips, wake roll, Sunk!, interrupts, pass screen, end card ----------
@@ -242,3 +242,8 @@ document.addEventListener('pointerup',e=>{if(DRG.t<0)return;if(!DRG.on){DRG.t=-1
 document.addEventListener('pointercancel',()=>{if(DRG.t>=0){drgEnd();render()}},true);
 // the click that ends a drag must not also select or turn the tile
 document.addEventListener('click',e=>{if(DRG.eat&&Date.now()-DRG.eat<400&&e.target.closest&&e.target.closest('[data-a=card]')){e.stopPropagation();e.preventDefault()}},true);
+
+// Osk's tip may sit inside #pc / #ppop: rescue it to the strip before they are emptied, then put it back on top
+{const resc=()=>{const o=document.getElementById('osk'),ps=document.getElementById('ps');if(o&&ps&&o.parentNode!==ps)ps.insertBefore(o,ps.firstChild)};
+ const _pp=phPopup;phPopup=function(){resc();const r=_pp.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r};
+ const _pc=phCards;phCards=function(){resc();const r=_pc.apply(this,arguments);try{if(typeof OSK!=='undefined'&&OSK.cur)oskPlace()}catch(e){}return r}}

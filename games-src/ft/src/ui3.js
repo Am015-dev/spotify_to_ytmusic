@@ -86,4 +86,4 @@ function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')
   campInit();soundBtns();UI.modal='start';render()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
-function goalHtml(){return `<div class="mbox goal"><h2>Goal</h2><p class="lede">Have the most points when the game ends.</p><ul class="goal-l"><li>Coins and goods score.</li><li>Land and people score.</li><li>Djinns give bonuses.</li></ul><div class="acts big"><button class="btn go big" data-ui="goalgo">Start playing</button></div></div>`}
+function goalHtml(){return `<div class="mbox goal"><h2>Goal</h2><p class="lede">Finish with the most points.</p><ul class="goal-l"><li>Tap a spot to bid for turn order.</li><li>Walk your tribes over tiles.</li><li>Then sell goods for coins.</li></ul><div class="acts big"><button class="btn go big" data-ui="goalgo">Start playing</button></div></div>`}

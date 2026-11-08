@@ -217,3 +217,25 @@ details:not([open])>:not(summary){display:none!important}
 .trk{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
 @media (max-width:1023px){.trk{display:grid;grid-template-columns:repeat(6,18px);grid-auto-rows:17px;gap:1px 2px}.cn12,#track .cn12{min-width:0;width:18px!important;height:17px!important;line-height:15px!important;padding:0;letter-spacing:-.5px}}
 @media (min-width:1024px){.cc,#cutc .cc{font-size:16px!important}}
+html.coon #midc{visibility:hidden}
+/* review R1: the title's button rows say what they set; "More" says what is inside */
+.seglbl{align-self:center;margin-right:4px;padding:2px 10px;border-radius:999px;background:rgba(8,16,26,.82);color:#f3e6bf;font:800 15px/1.4 var(--fb)}
+details.more>summary{cursor:pointer;font:800 15px/1.3 var(--fb);min-height:44px;display:flex;align-items:center;gap:6px}
+details.more[open]>summary span{display:inline-block;transform:rotate(180deg)}
+.jc.mk{flex-wrap:wrap;align-items:center;gap:3px}.jc.mk .mkl{font:800 14px/1 var(--fb);color:#f3e6bf;margin:0 2px 0 4px}
+/* review R1: the story map title never breaks mid-word; on a phone it gets its own row */
+.gxc-htitle{overflow-wrap:normal!important;word-break:normal!important;hyphens:manual}
+@media (max-width:600px){.gxc-head{flex-wrap:wrap}.gxc-htitle{order:-1;flex:1 0 100%;font-size:20px}}
+/* review R1: story result text readable on its painted background; a bigger result card on PC */
+.gxc-res{text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.gxc-res-on .gxc-res>*:not(button):not(.gxc-btns){background:rgba(8,16,26,.78);border-radius:10px;padding:4px 12px}
+.gxc-res-k{color:#f6efdc!important}
+@media (min-width:1024px){#over .card2.end{width:min(600px,90vw)!important;max-width:none!important;font-size:18px;padding:18px 22px}
+ #over .card2.end .endart{height:min(34dvh,290px);margin:-18px -22px 12px}#over .card2.end h2{font-size:3.2rem}#over .card2.end p{font-size:19px}#over .card2.end .row .big{min-height:56px;font-size:19px}}
+@media (min-width:1024px){.seglbl,details.more>summary{font-size:17px}}
+/* art gate: the cast (owner portraits) on the title's Story button; Quill, who rigged the bomb, on the Goal card */
+.cast{display:inline-flex;margin-left:8px;vertical-align:middle}
+.cast i{width:30px;height:30px;border-radius:50%;margin-left:-6px;border:2px solid #2a1a08;background:#d98b2b center top/cover;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.cast .c-brix{background-image:url(media/camp-brix.webp)}.cast .c-quill{background-image:url(media/camp-quill.webp)}.cast .c-mole{background-image:url(media/camp-mole.webp)}
+.card2.briefc{position:relative}
+.card2.briefc .bvil{position:static;margin:0 auto 2px;width:56px;height:56px;border-radius:50%;border:3px solid #8e3b5c;background:#8e3b5c url(media/camp-quill.webp) center top/cover;box-shadow:0 3px 8px rgba(0,0,0,.35)}

@@ -167,3 +167,20 @@ html.sk-kki .sh .av .sc{min-width:38px;height:38px;line-height:38px;top:-12px;ri
 }
 #kkguide .av i,#kkguide i{font-size:16px}
 #kkguide:not(.on){visibility:hidden}
+/* R5 fixes: phone hand rows never cover names; empty counters say so on phone; PC reveal captions wrap under the score */
+#belt.two{row-gap:18px;min-height:calc(var(--hw)*2.8 + 52px)}
+html.ph .ctr .none{display:block;font-size:14px}
+#kkgoal .kgh{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+#kkgoal .kgh h2{margin:2px 0 0}
+#kkgoal .kgh .kkport{flex:none;border:2px solid #4a2a22}
+.dimg img.campp,.sfaces img.campp{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.sfaces span{display:inline-block;overflow:hidden;border-radius:50%}
+@media (min-width:1024px){
+  #stage .sgain{top:auto;bottom:calc(100% + 10px);transform:translate(-50%,0);white-space:nowrap}
+  #stage .sgain small{white-space:normal;max-width:min(320px,80vw);overflow:visible;text-overflow:clip;font-size:16px;padding:4px 12px;background:rgba(42,23,16,.92)}
+}
+.kkport i{font-size:16px}
+.kkport:has(img) i{display:none}
+/* result card: always fully on screen, board dimmed behind it (review R3 05:56) */
+#rs.kkfin{position:fixed!important;inset:0!important;align-items:center!important;justify-content:center!important;padding:12px 10px max(12px,env(safe-area-inset-bottom))!important;background:rgba(24,12,8,.6)!important;z-index:60}
+#rs.kkfin .rsbox.bar{max-height:calc(100dvh - 24px);overflow:auto}

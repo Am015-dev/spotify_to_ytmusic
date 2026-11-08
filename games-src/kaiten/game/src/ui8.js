@@ -132,8 +132,9 @@ async function stageReveal(picks, tok, gains) {
   const bd = $('#bd'), tbl = $('#tbl'), B = bd.getBoundingClientRect(), T = tbl.getBoundingClientRect();
   const f = focusSeat(), np = picks.length, order = []; for (let k = 0; k < np; k++) order.push((f + k) % np);
   const st = h('div#stage', { 'aria-label': 'Reveal' });
-  st.style.top = Math.round(T.top - B.top) + 'px'; st.style.height = Math.round(T.height) + 'px';
-  const W = B.width - 20, podW = Math.max(56, Math.min(120, Math.floor((W - (np - 1) * 8) / np))), cardsW = Math.min(podW - 8, Math.round((T.height - 70) / 1.4));
+  const wide = !isPh() && B.width >= 700, SH = wide ? B.bottom - T.top : T.height;   // on PC the stage also covers the belt strip, so nothing sits empty under it
+  st.style.top = Math.round(T.top - B.top) + 'px'; st.style.height = Math.round(SH) + 'px';
+  const W = B.width - 20, podW = Math.max(56, Math.min(wide ? 210 : 120, Math.floor((W - (np - 1) * 8) / np))), cardsW = Math.min(podW - 8, Math.round((SH - (wide ? 170 : 70)) / 1.4));
   const row = h('div.srow'); st.appendChild(row); st.appendChild(h('div.sban', 'Reveal!'));
   const pods = [];
   for (const s of order) {

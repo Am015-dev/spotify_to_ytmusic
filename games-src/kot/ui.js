@@ -20,7 +20,7 @@ function renderPanel(){
   const p=cur();let who=esc(mname(p)),head='',msg='',acts='',topTip='';
   const btn=(a,l,dis,sm,cls)=>`<button class="btn ${cls||''}" data-act="${a}" ${dis?'disabled':''}>${l}${sm?`<small>${sm}</small>`:''}</button>`;
   const me=G.mode==='solo'?G.pl.find(q=>q.human):null;
-  if(G.winner){who='Game over';msg=esc(G.winText);acts=btn('again','Play again','','','primary')}
+  if(G.winner){const wq=G.winner==='draw'?null:G.pl[+String(G.winner).slice(1)-1];who=wq?esc(mname(wq))+' wins!':'Nobody wins';msg=esc(G.winText);acts=btn('again','Play again','','','primary')}
   else if(!humanTurn()){
     head=G.step===1?`Step 1 · ${esc(mname(p))} is rolling`:G.step<=3?`Step 2 · ${esc(mname(p))} resolves its dice`:`Step 4 · ${esc(mname(p))} is shopping`;
     msg=G.step===1?'Watch which dice it keeps (they turn yellow).':G.step===4?'It may buy power cards or play evolutions.':'';if(G.bug&&P(G.bug.by))msg+=`<div class="tip bug">🧠 ${esc(mname(P(G.bug.by)))} stole ${esc(mname(P(G.bug.v)))}'s roll with a Brainjack token. ${esc(mname(P(G.bug.v)))} rolls again afterwards.</div>`;
@@ -113,10 +113,10 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
    <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
-    ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn'):''}
-    <button class="btn primary big" data-start="solo" data-a="start"><span>▶ Play now (recommended)</span><small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
+    ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn').replace('<button ','<button data-a="offeryes" '):''}
+    <button class="btn primary big" data-start="solo" data-a="start"><span>▶ Play now (recommended)</span><small>You vs ${UI.n-1} computer monster${UI.n>2?'s':''}</small></button>
     ${typeof campStartBtn==='function'?campStartBtn():''}
-    ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
+    ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn').replace('<button ','<button data-a="offeryes" '):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
    </div>
    <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
