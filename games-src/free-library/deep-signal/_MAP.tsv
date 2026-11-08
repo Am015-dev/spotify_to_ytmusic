@@ -1,0 +1,48 @@
+stem	source_file	licence	source_url	flag
+card-coral	plate p52	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+card-kelp	plate p138	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+card-tide	plate p34	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+card-amber	plate p144	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+card-sonar	plate p198	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+card-back	plate p160 dimmed	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+task-coral	plate p160 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+task-kelp	plate p226 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+task-tide	plate p186 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+task-amber	plate p152 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+boss-warden	plate p212 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+boss-swarm	plate p160 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+boss-source	plate p20 crop	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+bg-title	plate p226	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+bg-table	plate p152	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+bg-map	plate p186	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+result-complete	plate p144	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+result-lost	plate p34	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+banner-act1	plate p52	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+banner-act2	plate p212	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+banner-act3	plate p198	Public domain (Haeckel, Kunstformen der Natur 1904, Internet Archive scan)	https://archive.org/details/kunstformenderna00haec	real
+icon-flare	game-icons.net fire-bomb	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/fire-bomb.html	real
+icon-signal	game-icons.net radio-tower	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/radio-tower.html	real
+icon-trick	game-icons.net card-pickup	CC BY 3.0 (author quoting)	https://game-icons.net/1x1/quoting/card-pickup.html	real
+icon-deadzone	game-icons.net fog	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/fog.html	real
+icon-silence	game-icons.net silenced	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/silenced.html	real
+icon-jammed	game-icons.net lightning-tree	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/lightning-tree.html	real
+icon-decide	game-icons.net pointing	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/pointing.html	real
+icon-share	game-icons.net card-exchange	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/card-exchange.html	real
+icon-notrick	game-icons.net thermometer-hot	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/thermometer-hot.html	real
+icon-onetrick	game-icons.net card-play	CC BY 3.0 (author quoting)	https://game-icons.net/1x1/quoting/card-play.html	real
+icon-sonar-goal	game-icons.net radar-cross-section	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/radar-cross-section.html	real
+logo-emblem	game-icons.net diving-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/diving-helmet.html	real
+token-signal	game-icons.net radio-tower	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/radio-tower.html	real
+token-captain	game-icons.net captain-hat-profile	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/captain-hat-profile.html	real
+portrait-you	game-icons.net diving-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/diving-helmet.html	FALLBACK
+portrait-ines	game-icons.net captain-hat-profile	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/captain-hat-profile.html	FALLBACK
+portrait-bram	game-icons.net spanner	CC BY 3.0 (author lorc)	https://game-icons.net/1x1/lorc/spanner.html	FALLBACK
+portrait-kito	game-icons.net headphones	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/headphones.html	FALLBACK
+portrait-odile	game-icons.net stethoscope	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/stethoscope.html	FALLBACK
+portrait-drone	game-icons.net robot-helmet	CC BY 3.0 (author delapouite)	https://game-icons.net/1x1/delapouite/robot-helmet.html	FALLBACK
+token-order	none (no free source; keep existing)	-	-	FALLBACK
+token-relative	none (no free source; keep existing)	-	-	FALLBACK
+token-final	none (no free source; keep existing)	-	-	FALLBACK
+stamp-complete	none (no free source; keep existing)	-	-	FALLBACK
+stamp-lost	none (no free source; keep existing)	-	-	FALLBACK
+fx-ping	none (no free source; keep existing)	-	-	FALLBACK
