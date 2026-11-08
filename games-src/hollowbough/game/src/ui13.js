@@ -136,6 +136,13 @@ function extrasBoot() {
 // ===================== see what to do, how points come in, when a turn ends (owner, Addendum 5) =====================
 // 1 turn tracker + always-visible score breakdown in the top bar; 2 "Turn over: why" card; 3 points pop with the reason; 4 best-value badge on the best spot / meadow card / hand card;
 // 5 preview of what a spot or card yields (hover, focus or touch-down); 6 one-line good / okay / poor rating of your move, compared with the computer's evaluation.
+// HINTS (top-bar toggle, OFF by default; always on inside Learn to play): previews, best badges, good/okay/poor line, "What should I do?"
+try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hints = false; }
+function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
+function goalCard() {
+  const D2 = (t) => h('li', t);
+  UI.cards.unshift({ kind: 'goal', title: 'Goal', sub: 'Win the Elderheart Oak', body: () => h('div', h('p', 'Have the most points when everyone has passed.'), h('ul.goal', D2('Buildings and critters you build score the points printed on them.'), D2('Point tokens, flags (events) you claim and bonus cards add more.'), D2('Pass when your workers are used up: the highest total wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
+}
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {
   let e = document.getElementById(id);
@@ -162,7 +169,7 @@ function seeTracker() {
   const who = G.phase === 'over' ? 'Game over' : a === v ? 'Your turn' : G.players[a].name + "'s turn";
   const tok = '<span class="tk" aria-label="' + free + ' of ' + me.workers + ' workers left">' + '<i class="on"></i>'.repeat(free) + '<i></i>'.repeat(Math.max(0, used)) + '</span>';
   const part = s => { const x = sc[s], nm = s === v ? 'You' : G.players[s].name; return '<span class="sp' + (s === lead ? ' lead' : '') + '"><b>' + nm + ' ' + x.total + (s === lead ? ' ♛' : '') + '</b> <small>cards ' + x.cards + ' · tokens ' + x.tokens + ' · events ' + x.events + (x.bonus ? ' · bonus ' + x.bonus : '') + '</small></span>'; };
-  t.innerHTML = '<div class="tr1"><b>' + SEASN[me.season] + '</b> season ' + (me.season + 1) + ' of 4 · <span class="who' + (a === v ? ' mine' : '') + '">' + who + '</span> ' + (G.phase === 'over' ? '' : tok + ' <span class="fw">workers left</span>') + '</div><div class="tr2">' + G.players.map((_, s) => part(s)).join('') + '</div>';
+  t.innerHTML = '<div class="tr1"><b>' + SEASN[me.season] + '</b> season ' + (me.season + 1) + ' of 4 · <span class="who' + (a === v ? ' mine' : '') + '">' + who + '</span> ' + (G.phase === 'over' ? '' : tok + ' <span class="fw">workers left</span>') + '</div>';
   // the points pop: what each player just earned and why
   const prev = SEE.scores; SEE.scores = sc.map(x => ({ total: x.total, cards: x.cards, tokens: x.tokens, events: x.events, bonus: x.bonus, journey: x.journey }));
   if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
@@ -173,6 +180,7 @@ function seeTracker() {
 // ---- "Turn over: why"
 function seeTurnOver() {
   if (!G || !UI.started) return; const v = viewSeat(), a = G.phase === 'over' ? -2 : HB.actor(G);
+  if (!hintsActive()) { SEE.actor = a; return; }
   if (SEE.actor === v && a !== v && v >= 0 && !(a === -2)) {
     const me = G.players[v], free = availW(me), n = G.players[a] ? G.players[a].name : 'The rival';
     const why = me.passed ? 'You passed, so you are done for the game.' : free === 0 ? 'All your workers are out, so only a card, Prepare or Pass is left.' : 'Each player takes one action, then the turn moves on (' + free + ' worker' + (free === 1 ? '' : 's') + ' left).';
@@ -182,6 +190,7 @@ function seeTurnOver() {
 }
 // ---- badges + preview
 function seeBadges() {
+  if (!hintsActive()) { document.querySelectorAll('.hbbest').forEach(e => e.classList.remove('hbbest')); return; }
   document.querySelectorAll('.hbbest').forEach(e => e.classList.remove('hbbest'));
   const V = seeVals(); if (!V || !UI.tgEls) return;
   const grp = tg => /^w:(basic|forest)/.test(tg) ? 'spot' : /^p:meadow:/.test(tg) ? 'meadow' : /^p:hand:/.test(tg) ? 'hand' : '';
@@ -197,6 +206,7 @@ function seeDelta(x, V) {
   return parts.join(', ') || 'nothing now';
 }
 function seePreview(el) {
+  if (!hintsActive()) return;
   const V = seeVals(); if (!V) return; const tg = el && el.dataset && el.dataset.t; if (!tg) return;
   const xs = V.r.filter(x => tgOf(x.m) === tg); if (!xs.length) return; const x = xs.reduce((a, b) => (b.v > a.v ? b : a));
   let name = '', ab = '';
@@ -214,7 +224,7 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
   const o = act;
   act = function (m) {
     let rate = null;
-    try { const V = SEE.vals; if (V && seeMine() && G.players[viewSeat()] === V.p && m && m.type !== 'choose' && !(UI.cfg && UI.cfg.tutorial && false)) {
+    try { if (!hintsActive()) throw 0; const V = SEE.vals; if (V && seeMine() && G.players[viewSeat()] === V.p && m && m.type !== 'choose' && !(UI.cfg && UI.cfg.tutorial && false)) {
       const me = V.r.find(x => sameM(x.m, m)); if (me) { const best = V.r.reduce((a, b) => (b.v > a.v ? b : a)), d = (best.v - me.v) / V.rng;
         const nm = x => x.m.type === 'worker' ? (x.m.label || 'another spot') : x.m.type === 'pass' ? 'passing' : x.m.type === 'prepare' ? 'Prepare' : (x.m.label || 'another move');
         rate = d <= .12 ? ['good', 'Good: ' + (me === best ? 'the best of ' + V.r.length + ' moves' : 'close to the best') + '. ' + seeDelta(me, V) + '.'] : d <= .4 ? ['okay', 'Okay: ' + nm(best) + ' was a bit better (' + seeDelta(best, V) + ').'] : ['poor', 'Poor: ' + nm(best) + ' was much better (' + seeDelta(best, V) + ').']; } }
@@ -226,3 +236,8 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
   };
 })();
 (function () { const o = render; render = function () { const r = o.apply(this, arguments); try { seeTracker(); seeTurnOver(); setTimeout(() => { try { seeBadges(); } catch (e) { } }, 60); } catch (e) { console.warn('see', e); } return r; }; })();
+
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#hintsbtn'); if (!b) return; UI.hints = !UI.hints; try { localStorage.setItem('hb_hints', UI.hints ? '1' : '0'); } catch (x) { } seeToastOff('hbprev'); seeToastOff('hbrate'); seeToastOff('hbover'); SEE.key = ''; render(); });
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { const on = hintsActive(); document.documentElement.classList.toggle('hints-on', on); const b = $('#hintsbtn'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); b.hidden = !!(UI.cfg && UI.cfg.coached); }
+  if (typeof GXH !== 'undefined' && UI._gxhOn !== on) { UI._gxhOn = on; try { GXH.setEnabled(on); } catch (e) { } }
+  if (!on) ['hbprev', 'hbrate', 'hbover'].forEach(seeToastOff); } catch (e) { } return r; }; })();

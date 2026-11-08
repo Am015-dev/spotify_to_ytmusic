@@ -2,44 +2,53 @@
  "slug": "hollowbough",
  "size": "phone",
  "seed": 94963,
- "when": "2026-11-08T00:49Z",
+ "when": "2026-11-08T01:15Z",
  "tutorial": {
   "end": true,
   "coached": true,
-  "explained": 16,
+  "explained": 17,
   "explainedIds": [
    "goal",
    "stock",
    "rival",
-   "hand",
-   "prep",
-   "places",
-   "event",
    "spring",
-   "shared",
-   "forest",
-   "pass",
+   "hand",
+   "event",
    "build",
+   "meadow",
+   "places",
+   "shared",
+   "pass",
+   "forest",
+   "prep",
    "tale",
    "score",
    "rscore",
    "end"
   ],
   "bubblesClosed": 0,
-  "clicks": 169
+  "clicks": 520
  },
  "quick": {
   "result": "cap",
-  "clicks": 222
+  "clicks": 247
  },
  "story": {
   "result": "cap",
-  "clicks": 226
+  "clicks": 228
  },
  "fuzz": {
-  "taps": 292
+  "taps": 297
  },
  "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#hintsbtn.gx-ibtn \"Hints\" under div#start.art \"Hollowbough Build a wood\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-title-1.png"
+  },
   {
    "sev": "MINOR",
    "phase": "tutorial",
@@ -100,7 +109,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6\n▢3\n⚑2\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6 ♛\n▢3\n⚑2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-2.png"
   },
@@ -172,7 +181,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "element outside viewport button.sc.hc x1 rect 386,658,708,714: \"Kindling Raft\n×1\n×1\n1\"",
+   "desc": "element outside viewport button.sc.hc x1 rect -266,657,56,729: \"Poultice Badger\n×4\n4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -180,7 +189,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) button.tile.t-bev x4: \"3\"",
+   "desc": "tap target 36px (<40) button.tile.t-bev x4: \"3\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -188,7 +197,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) button.tile.t-sev x4: \"6\"",
+   "desc": "tap target 36px (<40) button.tile.t-sev x4: \"6\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -196,7 +205,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 26px (<40) button.tile.t-deck x1: \"99\"",
+   "desc": "tap target 29px (<40) button.tile.t-deck x1: \"96\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -204,7 +213,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 26px (<40) button.tile.t-tree x1: \"Seasons\"",
+   "desc": "tap target 29px (<40) button.tile.t-tree x1: \"Seasons\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -212,7 +221,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 26px (<40) button.tile.t-disc x1: \"6\"",
+   "desc": "tap target 29px (<40) button.tile.t-disc x1: \"7\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -220,7 +229,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) button.chip.turn x1: \"You\n★9\n▢3\n⚑0\"",
+   "desc": "tap target 32px (<40) button.chip.turn x1: \"You\n★9 ♛\n▢3\n⚑2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -228,7 +237,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 30px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑0\"",
+   "desc": "tap target 32px (<40) button.chip x1: \"Bramble\n★0\n▢1\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -236,7 +245,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 32px (<40) button.cityopen x1: \"Open my city\"",
+   "desc": "tap target 38px (<40) button.cityopen x1: \"Open my city\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -244,7 +253,7 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 24px (<40) button.sc x3: \"Lantern Rest\"",
+   "desc": "tap target 24px (<40) button.scount.htog x1: \"▾ 7/8\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
   },
@@ -252,41 +261,9 @@
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 24px (<40) button.scount.htog x1: \"▾ 6/8\"",
+   "desc": "overlapping clickables: button.scount.htog \"▾ 7/8\" / button.sc.hc \"Poultice Badger ×4 4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "tap target 35px (<40) div.cd.hct x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-3.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"99\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★9\n▢3\n⚑3\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
-   "where": "tutorial-board",
-   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑3\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -294,23 +271,63 @@
    "where": "tutorial-board",
    "desc": "element outside viewport button.sc.hc x2 rect -266,649,56,713: \"Poultice Badger\n×4\n4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"96\"",
+   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"93\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★10\n▢3\n⚑2\"",
+   "desc": "tap target 28px (<40) button.tile.t-disc x1: \"7\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★12 ♛\n▢4\n⚑0\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★1\n▢2\n⚑3\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 18px (<40) span.scount x1: \"4/15\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 24px (<40) button.sc x4: \"Lantern Rest\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 24px (<40) div.cd x4: \"\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -318,7 +335,15 @@
    "where": "tutorial-board",
    "desc": "tap target 24px (<40) button.scount.htog x1: \"▾ 8/8\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "overlapping clickables: span.scount \"4/15\" / button.cityopen \"Open my city\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
   },
   {
    "sev": "MINOR",
@@ -326,7 +351,63 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: button.scount.htog \"▾ 8/8\" / button.sc.hc \"Poultice Badger ×4 4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-4.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "element outside viewport button.sc.hc x2 rect -266,657,56,729: \"Poultice Badger\n×4\n4\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 29px (<40) button.tile.t-deck x1: \"92\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 32px (<40) button.chip.turn x1: \"You\n★13 ♛\n▢4\n⚑4\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 32px (<40) button.chip x1: \"Bramble\n★2\n▢3\n⚑2\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 24px (<40) button.sc x2: \"Lantern Rest\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 24px (<40) button.sc.glow x2: \"Dovecote Depot\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases tutorial",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#hintsbtn.gx-ibtn \"Hints\" under div#start.art \"Hollowbough Build a wood\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-title-6.png"
   },
   {
    "sev": "MINOR",
@@ -340,7 +421,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "element outside viewport button.sc.hc x1 rect 386,649,708,713: \"Footsore Drifter\n×2\n1\"",
+   "desc": "element outside viewport button.sc.hc x2 rect -266,635,56,711: \"Whittle Beaver\n×2\n2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -348,7 +429,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 33px (<40) button.tile.t-bev x4: \"3\"",
+   "desc": "tap target 38px (<40) button.tile.t-bev x4: \"3\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -356,7 +437,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 33px (<40) button.tile.t-sev x4: \"?\"",
+   "desc": "tap target 38px (<40) button.tile.t-sev x4: \"4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -364,7 +445,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"108\"",
+   "desc": "tap target 30px (<40) button.tile.t-deck x1: \"106\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -372,7 +453,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) button.tile.t-tree x1: \"Seasons\"",
+   "desc": "tap target 30px (<40) button.tile.t-tree x1: \"Seasons\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -380,7 +461,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) button.tile.t-disc x1: \"0\"",
+   "desc": "tap target 30px (<40) button.tile.t-disc x1: \"0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -388,7 +469,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★0\n▢0\n⚑0\"",
+   "desc": "tap target 33px (<40) button.chip.turn x1: \"You\n★0\n▢0\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -396,7 +477,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑1\"",
+   "desc": "tap target 33px (<40) button.chip x1: \"Bramble\n★1 ♛\n▢0\n⚑1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -412,7 +493,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 35px (<40) button.cityopen x1: \"Open my city\"",
+   "desc": "tap target 39px (<40) button.cityopen x1: \"Open my city\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
@@ -436,55 +517,15 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 33px (<40) button.tile.t-deck x1: \"107\"",
+   "desc": "overlapping clickables: button.scount.htog \"▾ 6/8\" / button.sc.hc.glow \"Whittle Beaver ×2 2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-8.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 33px (<40) button.tile.t-tree x1: \"Seasons\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 33px (<40) button.tile.t-disc x1: \"0\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 35px (<40) button.chip.turn x1: \"You\n★0\n▢0\n⚑0\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 35px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑0\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "tap target 28px (<40) button.handbar x1: \"▴ Hand 6/8 · City 0/15\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-9.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "quick",
-   "where": "quick-board",
-   "desc": "element outside viewport button.sc.hc x1 rect -266,649,56,713: \"Gildenfern Court\n×2\n×3\n×\"",
+   "desc": "element outside viewport button.sc.hc x2 rect -266,640,56,712: \"Whittle Beaver\n×2\n2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
   },
@@ -492,7 +533,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 28px (<40) button.tile.t-disc x1: \"1\"",
+   "desc": "tap target 36px (<40) button.tile.t-bev x4: \"3\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
   },
@@ -500,7 +541,7 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 24px (<40) button.scount.htog x1: \"▾ 5/8\"",
+   "desc": "tap target 36px (<40) button.tile.t-sev x4: \"4\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
   },
@@ -508,17 +549,65 @@
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "overlapping clickables: button.scount.htog \"▾ 5/8\" / button.sc.hc.glow \"Gildenfern Court ×2 ×3 ×\"",
+   "desc": "tap target 29px (<40) button.tile.t-deck x1: \"106\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #222 (2)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 222 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick-board",
+   "desc": "tap target 29px (<40) button.tile.t-tree x1: \"Seasons\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 29px (<40) button.tile.t-disc x1: \"0\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 32px (<40) button.chip.turn x1: \"You\n★0\n▢0\n⚑0\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 32px (<40) button.chip x1: \"Bramble\n★1 ♛\n▢0\n⚑0\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 38px (<40) button.cityopen x1: \"Open my city\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-quick-board-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #247 (Dewberry Nook)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 247 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases quick",
    "shot": "/tmp/qa-shots/hollowbough/phone-quick-noresult-11.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "clickable covered by another element (not tappable): button#hintsbtn.gx-ibtn \"Hints\" under div#start.art \"Hollowbough Build a wood\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-map-12.png"
   },
   {
    "sev": "MINOR",
@@ -580,7 +669,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6\n▢3\n⚑2\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6 ♛\n▢3\n⚑2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-13.png"
   },
@@ -652,7 +741,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport button.sc.hc x2 rect -266,658,56,714: \"Amber Still\n×1\n×1\n1\"",
+   "desc": "element outside viewport button.sc.hc x2 rect -266,649,56,713: \"Amber Still\n×1\n×1\n1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
   },
@@ -660,7 +749,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 30px (<40) button.tile.t-bev x4: \"3\"",
+   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"100\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
   },
@@ -668,7 +757,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 30px (<40) button.tile.t-sev x4: \"6\"",
+   "desc": "tap target 28px (<40) button.tile.t-disc x1: \"9\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
   },
@@ -676,7 +765,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 26px (<40) button.tile.t-deck x1: \"100\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★7 ♛\n▢3\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
   },
@@ -684,39 +773,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 26px (<40) button.tile.t-tree x1: \"Seasons\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 26px (<40) button.tile.t-disc x1: \"9\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.chip.turn x1: \"You\n★7\n▢3\n⚑0\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 30px (<40) button.chip x1: \"Bramble\n★1\n▢1\n⚑0\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 32px (<40) button.cityopen x1: \"Open my city\"",
+   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★1\n▢1\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
   },
@@ -732,14 +789,6 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 35px (<40) div.cd.hct x1: \"\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
    "desc": "overlapping clickables: button.scount.htog \"▾ 5/8\" / button.sc.hc \"Amber Still ×1 ×1 1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-14.png"
@@ -748,7 +797,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "element outside viewport button.sc.hc x2 rect -266,649,56,713: \"Amber Still\n×1\n×1\n1\"",
+   "desc": "element outside viewport button.sc.hc x2 rect -266,640,56,712: \"Amber Still\n×1\n×1\n1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -756,7 +805,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 28px (<40) button.tile.t-deck x1: \"99\"",
+   "desc": "tap target 36px (<40) button.tile.t-bev x4: \"3\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -764,7 +813,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 28px (<40) button.tile.t-disc x1: \"9\"",
+   "desc": "tap target 36px (<40) button.tile.t-sev x4: \"6\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -772,7 +821,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★7\n▢4\n⚑2\"",
+   "desc": "tap target 29px (<40) button.tile.t-deck x1: \"91\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -780,7 +829,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★1\n▢1\n⚑2\"",
+   "desc": "tap target 29px (<40) button.tile.t-tree x1: \"Seasons\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -788,7 +837,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 18px (<40) span.scount x1: \"4/15\"",
+   "desc": "tap target 29px (<40) button.tile.t-disc x1: \"9\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -796,7 +845,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 24px (<40) button.sc x2: \"Lantern Rest\"",
+   "desc": "tap target 32px (<40) button.chip.turn x1: \"You\n★10 ♛\n▢5\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -804,7 +853,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 24px (<40) div.cd x4: \"\"",
+   "desc": "tap target 32px (<40) button.chip x1: \"Bramble\n★3\n▢1\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -812,7 +861,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 24px (<40) button.sc.glow x2: \"Dovecote Depot\"",
+   "desc": "tap target 18px (<40) span.scount x1: \"5/15\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -820,7 +869,7 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "overlapping clickables: span.scount \"4/15\" / button.cityopen \"Open my city\"",
+   "desc": "tap target 38px (<40) button.cityopen x1: \"Open my city\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
@@ -828,25 +877,57 @@
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★7\n▢4\n⚑1\"",
+   "desc": "tap target 24px (<40) button.sc x5: \"Lantern Rest\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-16.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 24px (<40) button.sc x4: \"Lantern Rest\"",
+   "desc": "tap target 24px (<40) div.cd x5: \"\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-16.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story click #226 (88)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 226 clicks (state kept changing)",
+   "where": "story-board",
+   "desc": "tap target 24px (<40) button.scount.htog x1: \"▾ 7/8\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: span.scount \"5/15\" / button.cityopen \"Open my city\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "overlapping clickables: button.scount.htog \"▾ 7/8\" / button.sc.hc \"Amber Still ×1 ×1 1\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-story-board-15.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story click #228 (82)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 228 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases story",
    "shot": "/tmp/qa-shots/hollowbough/phone-story-noresult-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button#hintsbtn.gx-ibtn \"Hints\" under div#start.art \"Hollowbough Build a wood\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-title-18.png"
   },
   {
    "sev": "MINOR",
@@ -908,7 +989,7 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6\n▢3\n⚑2\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6 ♛\n▢3\n⚑2\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-19.png"
   },
@@ -964,7 +1045,7 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-bev.no \"3\" / button.btn.on \"You\"",
+   "desc": "overlapping clickables: button.tile.t-bev.glow \"3\" / button.btn.on \"You\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-19.png"
   },
@@ -972,7 +1053,15 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-bev.glow \"3\" / button.btn.on \"You\"",
+   "desc": "overlapping clickables: button.tile.t-bev.no \"3\" / button.btn.alt \"Bramble\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-19.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.chip \"Bramble ★0 ▢0 ⚑2\" / button.gx-x \"×\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-19.png"
   },
@@ -988,33 +1077,17 @@
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★6\n▢3\n⚑1\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "tap target 24px (<40) button.sc x3: \"Lantern Rest\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
    "desc": "tap target 28px (<40) button.tile.t-deck x1: \"99\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★9\n▢4\n⚑1\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★7 ♛\n▢4\n⚑1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
@@ -1022,7 +1095,7 @@
    "where": "fuzz-screen",
    "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑1\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
@@ -1030,15 +1103,15 @@
    "where": "fuzz-screen",
    "desc": "tap target 18px (<40) span.scount x1: \"4/15\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 24px (<40) button.sc x1: \"Lantern Rest\"",
+   "desc": "tap target 24px (<40) button.sc x2: \"Lantern Rest\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
@@ -1046,15 +1119,15 @@
    "where": "fuzz-screen",
    "desc": "tap target 24px (<40) div.cd x4: \"\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 24px (<40) button.sc.glow x3: \"Dovecote Depot\"",
+   "desc": "tap target 24px (<40) button.sc.glow x2: \"Dovecote Depot\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
@@ -1062,7 +1135,7 @@
    "where": "fuzz-screen",
    "desc": "overlapping clickables: span.scount \"4/15\" / button.cityopen \"Open my city\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
   },
   {
    "sev": "MINOR",
@@ -1070,13 +1143,29 @@
    "where": "fuzz-screen",
    "desc": "clickable covered by another element (not tappable): button.cityopen \"Open my city\" under span.scount \"4/15\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "overlapping clickables: button.chip \"Bramble ★0 ▢0 ⚑1\" / button.gx-x \"×\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-21.png"
   },
   {
    "sev": "MINOR",
    "phase": "fuzz",
    "where": "fuzz-screen",
-   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★9\n▢4\n⚑0\"",
+   "desc": "tap target 31px (<40) button.chip.turn x1: \"You\n★7 ♛\n▢4\n⚑0\"",
+   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
+   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 31px (<40) button.chip x1: \"Bramble\n★0\n▢0\n⚑0\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
   },
@@ -1087,55 +1176,7 @@
    "desc": "tap target 24px (<40) button.sc x4: \"Lantern Rest\"",
    "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
    "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"Berry Patch\" / button.btn.learn \"New here? Learn in 5 min\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"Dewberry Nook\" / button.btn.learn \"New here? Learn in 5 min\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"Amber Weep\" / button.btn.learn \"New here? Learn in 5 min\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"Pebble Bank\" / button.btn.learn \"New here? Learn in 5 min\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"×3\" / button.sbtn.big \"Play\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "fuzz",
-   "where": "fuzz-screen",
-   "desc": "overlapping clickables: button.tile.t-basic.no \"×2\" / button.sbtn.big \"Play\"",
-   "repro": "node games-src/scripts/qa-bot.js hollowbough --size phone --seed 94963 --phases fuzz",
-   "shot": "/tmp/qa-shots/hollowbough/phone-screen-fuzz-screen-22.png"
   }
  ],
- "secs": 608
+ "secs": 747
 }
