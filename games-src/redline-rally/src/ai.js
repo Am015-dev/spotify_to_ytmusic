@@ -5,7 +5,7 @@ function combos(a, k) {
   return out;
 }
 function aiLvl(G, c) { return (c && c.lvl) || G.diff; }   /* per car level; 'pro' is the planner behind the Suggest button */
-var AIP = { easy: { noise: 4.5, hw: 1.9, mis: 0.28, misBy: 3 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
+var AIP = { easy: { noise: 4.5, hw: 1.9, mis: 0.4, misBy: 3, lift: 0.4 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
 function aiP(G, c) { return AIP[aiLvl(G, c)] || AIP.normal; }
 function aiNoise(G, c) { return aiP(G, c).noise; }
 function heatW(c, extra, G) { return (G ? aiP(G, c).hw : 1.25) + (c.eng - extra <= 2 ? 0.9 : 0); }
@@ -15,7 +15,8 @@ function aiPlan(G, c) {
   var adr = G.adr.indexOf(c.i) >= 0 ? 1 : 0, others = G.cars.filter(function (o) { return o !== c; });
   var lv = aiLvl(G, c), easy = lv === 'easy', P = aiP(G, c);
   var mis = P.mis && rnd(G) < P.mis ? P.misBy : 0;   /* rookies misjudge a corner now and then: this round they read every limit higher (spins, burnt heat). Easy often, Normal rarely */   /* easy rivals drive like careful rookies: never top gear, never boost (W496: a new player can reach the podium) */
-  gearOpts(c).filter(function (go) { return !easy || go.g <= 3; }).forEach(function (go) {
+  var lift = P.lift && rnd(G) < P.lift;   /* rookies sometimes hold their gear instead of shifting up */
+  gearOpts(c).filter(function (go) { return !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
     var k = needCards(c, go.g);
     combos(play, k).forEach(function (idx) {
       var base = 0, nx = 0, ul = 0, uc = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { base += UPG[u].sp; ul += UPG[u].lim; uc += UPG[u].cool; } else if (x === 'X') { base += avg; nx++; } else base += +x; });

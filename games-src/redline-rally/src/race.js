@@ -55,7 +55,7 @@ function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
   RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
   /* leaderboard, top-left */
-  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn();
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500;   /* phones: standings live in the Place chip (tap it), nothing over the track */
   if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
   var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
   cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
@@ -91,7 +91,7 @@ function raceHud(now, W, H) {
     /* next corners: road-sign speed limits that are always on screen (the close camera hides the track's own signs) */
     var nks = [], np0 = c.pos, tkN = T(G).N;
     for (var dd = 1; dd <= tkN && nks.length < 2; dd++) { var lm = T(G).corners[(np0 + dd) % tkN]; if (lm) nks.push({ d: dd, limit: climit(G, lm) }); }
-    var sx0 = hx + hw + 12, sw = R * 1.5, pv = RACE.prev;
+    var sx0 = hx + hw + 12, sw = Math.max(R * 1.5, 48), pv = RACE.prev;
     if (nks.length) {
       cx.fillStyle = 'rgba(8,12,20,.8)'; rr(sx0, by, sw * nks.length + 10, R * 2 + 12, 12); cx.fill();
       nks.forEach(function (k, i) {

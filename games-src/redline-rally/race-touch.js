@@ -24,7 +24,7 @@ const SUG = process.env.SUGGEST === '1', SEED = process.env.SEED || '11', path =
     /* rival timing in the page: from the moment a rival car takes the focus until the next car (or your decision) does */
     await p.evaluate(() => { window.__rt = []; let cur = -1, t = 0; setInterval(() => { if (!window.G) return; const f = UI.busy ? UI.lastCar : -1; if (f === cur) return; const now = performance.now();
       if (cur >= 0 && G.cars[cur] && !G.cars[cur].human) window.__rt.push(now - t); cur = f; t = now; }, 30); });
-    const diff = await p.evaluate(() => G.diff), t0 = Date.now(); let turns = 0, goAt = 0, waits = [], stuck = 0;
+    const diff = await p.evaluate(() => G.diff), t0 = Date.now(); let turns = 0, qtaps = 0, qk = {}, goAt = 0, waits = [], stuck = 0;
     for (let i = 0; i < 4000; i++) {
       await p.waitForTimeout(120);
       const st = await p.evaluate(() => ({ ph: G.phase, busy: UI.busy, over: !!G.over, modal: !document.getElementById('modal').hidden, pend: G.pend ? G.pend.t : '', q: !!document.querySelector('#panel .slipq button'), go: !!document.querySelector('#goB') }));
@@ -41,9 +41,9 @@ const SUG = process.env.SUGGEST === '1', SEED = process.env.SEED || '11', path =
         await tap('#goB'); goAt = Date.now(); turns++; stuck = 0; continue;
       }
       if (st.q) {
-        await scan('question ' + st.pend);
+        await scan('question ' + st.pend); qtaps++; qk[st.pend] = (qk[st.pend] || 0) + 1;
         if (SUG && st.pend !== 'disc') { const y = await p.evaluate(t => t === 'boost' ? suggestBoost(G, G.cars[G.pend.car]) : suggestSlip(G, G.cars[G.pend.car]), st.pend); await tap(st.pend === 'boost' ? (y ? '#boostY' : '#boostN') : (y ? '#slipY' : '#slipN')); }
-        else if (st.pend === 'boost') await tap('#boostN'); else if (st.pend === 'slip') await tap('#slipY'); else if (st.pend === 'disc') { if (turns % 2) await tap('#discN'); else await p.waitForTimeout(5600); }
+        else if (st.pend === 'boost') await tap('#boostN'); else if (st.pend === 'slip') await tap('#slipY'); else if (st.pend === 'disc') { await tap('#discN'); }
         continue;
       }
       if (++stuck > 900) { probs.push('stuck'); break; }
@@ -51,8 +51,8 @@ const SUG = process.env.SUGGEST === '1', SEED = process.env.SEED || '11', path =
     const secs = (Date.now() - t0) / 1000, res = await p.evaluate(() => G.over ? G.rank.indexOf(G.cars.find(c => c.human).i) + 1 : 0);
     const rt = await p.evaluate(() => window.__rt), avg = rt.reduce((a, x) => a + x, 0) / Math.max(1, rt.length), mx = Math.max(...rt);
     if (!res) probs.push('race did not end'); if (secs > 300) probs.push('race took ' + secs.toFixed(0) + ' s');
-    if (avg > 1500) probs.push('rival turn avg ' + avg.toFixed(0) + ' ms');
-    console.log(n, probs.length || errs.length ? 'FAIL' : 'PASS', 'diff', diff, 'place', res, 'decisions', turns, 'race', secs.toFixed(0) + 's', 'Go->next decision avg', (waits.reduce((a, w) => a + w.ms, 0) / Math.max(1, waits.length) / 1000).toFixed(1) + 's', 'rival turn avg ' + avg.toFixed(0) + 'ms max ' + mx.toFixed(0) + 'ms (' + rt.length + ' turns)', errs.slice(0, 2).join('|'), probs.slice(0, 12).join(' | '));
+    if (qtaps > 15) probs.push('question taps ' + qtaps + ' > 15'); if (avg > 1500) probs.push('rival turn avg ' + avg.toFixed(0) + ' ms');
+    console.log(n, probs.length || errs.length ? 'FAIL' : 'PASS', 'diff', diff, 'place', res, 'decisions', turns, 'question taps', qtaps, JSON.stringify(qk), 'race', secs.toFixed(0) + 's', 'Go->next decision avg', (waits.reduce((a, w) => a + w.ms, 0) / Math.max(1, waits.length) / 1000).toFixed(1) + 's', 'rival turn avg ' + avg.toFixed(0) + 'ms max ' + mx.toFixed(0) + 'ms (' + rt.length + ' turns)', errs.slice(0, 2).join('|'), probs.slice(0, 12).join(' | '));
     if (probs.length || errs.length) bad = 1; await c.close();
   }
   await b.close(); process.exit(bad);

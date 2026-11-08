@@ -115,7 +115,8 @@ function drawPlan() {
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
-  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  var boOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!boOk) UI.boost = false;
+  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + (UI.mode !== 'tutorial' ? '<button class="bo' + (UI.boost ? ' on' : '') + '" id="boB" aria-pressed="' + !!UI.boost + '"' + (boOk ? '' : ' disabled') + ' title="Boost: after the reveal pay 1 heat to flip one more card">Boost' + (UI.boost ? ' ✓' : '') + '</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
   if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
@@ -125,6 +126,7 @@ function drawPlan() {
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
   if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
+  if ($('#boB')) $('#boB').onclick = function () { sfx('tap'); UI.boost = !UI.boost; drawPlan(); };
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.' : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
@@ -168,7 +170,7 @@ function cardHtml(x, sel, dead, j, cls) {
 function sugMark(sel) { var b = $(sel); if (b) { b.classList.add('sug'); b.insertAdjacentHTML('afterbegin', '<em class="sgt">Suggested</em>'); } }   /* Hints on: the Suggest planner's answer to boost / slipstream */
 function suggest() {
   var c = you(), p = suggestPlan(G, c);   /* plans your own hand from your seat with the strongest planner */
-  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is asked after the reveal */
+  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = UI.mode !== 'tutorial' && !!p.boost; drawPlan();   /* races: Suggest also sets the Boost toggle */
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
@@ -263,6 +265,12 @@ function askBoost() {   /* react step: the cards are revealed (panel), now boost
   var p = G.pend;
   /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
   if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
+  if (!tutOn()) {   /* R3: obvious answers are given for you (fewer question taps): asked only when a boost is safe even with a 4 flip */
+    /* races: you set Boost while planning (toggle); after the reveal it is applied unless an average flip would now spin you. No question. */
+    var bc = G.cars[p.car], q2 = bc.pl2, want = !!(bc.plan && bc.plan.boost), av = Math.round(avgSpeed(bc)), risk = q2 ? cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + av), p.speed + av + 1, q2.lim) > bc.eng - 1 : true;
+    if (!want) return Promise.resolve(false);
+    setMsg(risk ? 'Speed ' + p.speed + '. Boost skipped: it could spin you.' : 'Speed ' + p.speed + '. Boost!'); return wait(450).then(function () { return !risk; });
+  }
   setPhase('react'); setMsg('Speed ' + p.speed + '. Boost: 1 heat for a flipped card?');
   var old = $('#bq'); if (old) old.remove();
   $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y" id="boostY">Boost -1 heat</button></div>');
@@ -276,7 +284,10 @@ function askBoost() {   /* react step: the cards are revealed (panel), now boost
 }
 function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
   if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
-  var c = G.cars[G.pend.car], sel = [], done = null; setPhase('discard');
+  var c = G.cars[G.pend.car], sel = [], done = null;
+  if (!tutOn() && (c.hand.filter(function (x) { var u = upgId(x); return u ? UPG[u].sp <= 1 : x === '1'; }).length < 3 || c.dAsk >= G.round - 2)) return Promise.resolve([]);   /* R3: asked only when 3+ slow cards (Brake, 1) clog the hand, at most every third round */
+  if (!tutOn()) c.dAsk = G.round;
+  setPhase('discard');
   var paint = function () {
     var h = '<div class="who">Discard step</div><div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
@@ -302,7 +313,9 @@ function askSlip() {
   if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); return wait(700).then(function () { return false; }); }   /* no dead buttons */
   var p = G.pend, c = G.cars[p.car], cost = cornerCost(G, p.from, p.L1, p.speed, p.lim) - cornerCost(G, p.from, p.L0, p.speed, p.lim);
   var spin = cornerCost(G, p.from, p.L1, p.speed, p.lim) > c.eng;
-  var sn = p.L1 - p.L0; setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
+  var sn = p.L1 - p.L0;
+  if (!tutOn() && (spin || !cost)) { setMsg(spin ? 'No slipstream: it would spin you out.' : 'Slipstream: ' + sn + ' free spaces.'); return wait(350).then(function () { return !spin; }); }   /* R3: free = taken, spin = skipped; asked only when it costs heat */
+  setPhase('react'); setMsg(spin ? 'Slipstream +' + sn + ' would spin you out' : cost ? 'Slipstream +' + sn + ' costs ' + cost + ' more heat' : 'Slipstream: ' + sn + ' free spaces');
   $('#panel').innerHTML = '<div class="slipq"><button id="slipN">Stay</button><button class="y" id="slipY">Slipstream +' + sn + (spin ? ' (spin!)' : '') + (cost ? ' (-' + cost + ' heat)' : '') + '</button></div>';
   if (hintsOn() && UI.mode !== 'tutorial') sugMark(suggestSlip(G, c) ? '#slipY' : '#slipN');
   return new Promise(function (r0) { var res = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); r0(v); }; $('#slipY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slip' })) return; res(true); }; $('#slipN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'slipno' })) return; res(false); }; if (UI.fast) setTimeout(function () { res(!spin && cost === 0); }, 10); if (tutOn() && GXT.current() && GXT.current().id !== 'slip') { setMsg('No slipstream now: keep your heat.'); setTimeout(function () { res(false); }, 1400 * (window.AIDELAY || 1)); } });
@@ -417,7 +430,8 @@ function frame(now) {
     var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0), wy = q.y - 50 - Math.min(1, ms / 400) * 30;
     var sp = inv.transformPoint(popT.transformPoint(new DOMPoint(q.x, wy))), fs = Math.max(20, Math.min(30, 34 * zoom)), ah = fs * 2;
     cx.font = '900 ' + fs + 'px sans-serif'; var tw = cx.measureText(o.txt).width + 10, x = Math.max(6 + tw / 2, Math.min(W - 6 - tw / 2, sp.x)), y = Math.max(fs + 8 + (o.stem ? ah : 0), Math.min(H - 8, sp.y));
-    if (x + tw / 2 > mx - 4 && y - fs < my + mh + 6) y = my + mh + 10 + fs + (o.stem ? ah : 0);   /* never under the minimap */
+    var hw2 = Math.max(tw, o.stem ? ah * 1.4 : 0) / 2; y = Math.min(y, H - dashH(W, H) - 6);   /* never on the dashboard or its corner signs */
+    if (x + hw2 > mx - 4 && y - fs - (o.stem ? ah : 0) < my + mh + 6) y = my + mh + 10 + fs + (o.stem ? ah : 0);   /* never on the minimap (text or its picture) */
     cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25);
     if (o.stem) artDraw(cx, o.stem, x - ah * 0.7, y - fs - ah, ah * 1.4, ah, 'contain');
     cx.fillStyle = o.col; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = '#000'; cx.lineWidth = Math.max(4, fs / 5); cx.strokeText(o.txt, x, y); cx.fillText(o.txt, x, y); cx.globalAlpha = 1;
@@ -435,6 +449,8 @@ function boot() {
   GX.onShow = function (id) { if (id === 'rulesd') rulesFill(); }; rulesFill();
   GX.onResize(function () { if (G && !$('#game').hidden) sizeCanvas(); });
   $('#playB').onclick = function () { startGame(); }; $('#howB').onclick = howTo; $('#storyB').onclick = function () { campOpen(); }; $('#champB').onclick = function () { champStart(false); }; $('#hintT').onclick = function () { sfx('tap'); setHints(!UI.hints); }; setHints(UI.hints); soundBoot(); if (typeof helpBoot === 'function') helpBoot();
+  $('#posChip').onclick = function () { if (!G) return; sfx('tap'); var rk = rankList(G), N = T(G).N;   /* standings (phones have no leaderboard over the track) */
+    modal('<h2>Standings</h2><ol class="stl">' + rk.map(function (ci) { var o = G.cars[ci]; return '<li' + (o.human ? ' class="me"' : '') + '><i style="background:' + COLS[o.col].hex + '"></i>' + esc(o.human && !G.hot ? 'You' : o.name) + '<span>' + (o.fin ? 'Finished' : 'Lap ' + Math.min(G.laps, Math.floor(o.pos / N) + 1)) + '</span></li>'; }).join('') + '</ol><button class="big" id="stOk" style="width:100%">Keep racing</button>'); $('#stOk').onclick = closeModal; };
   $('#menuB').onclick = function () { modal('<h2>Menu</h2><div style="display:flex;flex-direction:column;gap:8px"><button class="ghostb" id="m1">How to play</button><button class="ghostb" id="m4">Guide: learn by doing</button><button class="ghostb" data-snd id="m5"></button><button class="ghostb" id="m2">Quit to title</button><button class="big" id="m3">Keep racing</button></div>'); $('#m1').onclick = howTo; $('#m4').onclick = function () { closeModal(); chapterMenu(); }; $('#m2').onclick = function () { showTitle(); }; $('#m3').onclick = closeModal; $('#m5').textContent = sndLabel(); $('#m5').onclick = function () { setSound(!SND.on); }; };
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();
