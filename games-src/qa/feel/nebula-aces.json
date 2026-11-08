@@ -1,8 +1,8 @@
 {
  "slug": "nebula-aces",
- "when": "2026-11-08T05:56Z",
+ "when": "2026-11-08T06:56Z",
  "secs": 120,
- "totalSecs": 205,
+ "totalSecs": 269,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -31,25 +31,23 @@
    "detail": []
   }
  },
- "notes": [
-  "phone/learn: stuck"
- ],
+ "notes": [],
  "sessions": [
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 59,
-   "turns": 22,
-   "clicks": 20,
-   "endedBy": "stuck",
+   "secs": 120,
+   "turns": 125,
+   "clicks": 138,
+   "endedBy": "result",
    "tutorialEnded": 7,
    "hintsOff": true,
-   "messagesSeen": 7
+   "messagesSeen": 12
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 11,
+   "secs": 14,
    "turns": 8,
    "clicks": 9,
    "endedBy": "result",
@@ -61,12 +59,12 @@
    "size": "pc",
    "mode": "learn",
    "secs": 121,
-   "turns": 122,
-   "clicks": 144,
+   "turns": 123,
+   "clicks": 147,
    "endedBy": "result",
    "tutorialEnded": 7,
    "hintsOff": true,
-   "messagesSeen": 10
+   "messagesSeen": 12
   },
   {
    "size": "pc",

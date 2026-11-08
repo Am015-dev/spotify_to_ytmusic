@@ -119,12 +119,12 @@ function doPick(seat, mv) {
   commit(seat, mv);
 }
 function flyPick() {
-  const sels = $$('#belt .hc.sel'); if (!sels.length) return; const v = viewSeat(); const slot = document.querySelector('.seat[data-seat="' + v + '"] .slot');
-  const to = slot ? slot.getBoundingClientRect() : null; if (!to || !to.width) return;
+  const sels = $$('#belt .hc.sel'); if (!sels.length) return; const v = viewSeat(); const slot = document.querySelector('.seat[data-seat="' + v + '"] .ctr') || document.querySelector('.seat[data-seat="' + v + '"] .slot');
+  const to = slot ? slot.getBoundingClientRect() : null; if (!to || !to.width) return; UI.serveT = performance.now();
   sels.forEach((b, k) => {
-    const r = k === 0 && UI.flyFrom ? UI.flyFrom : b.getBoundingClientRect(); const c = h('div.flyc'); c.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px'; c.innerHTML = KIT.backSVG({ w: Math.round(r.width) }); document.body.appendChild(c);
+    const r = k === 0 && UI.flyFrom ? UI.flyFrom : b.getBoundingClientRect(); const c = h('div.flyc'); c.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px'; c.appendChild(cardNode(tkey(+b.dataset.id), Math.round(r.width))); document.body.appendChild(c);   // face up: you see your own dish fly
     const dx = to.left + to.width / 2 - (r.left + r.width / 2), dy = to.top + to.height / 2 - (r.top + r.height / 2);
-    const a = c.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx * .6 + 'px,' + (dy * .6 - 30) + 'px) scale(.8)', opacity: 1, offset: .55 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + Math.max(.25, to.width / r.width) + ')', opacity: .85 }], { duration: 480, easing: 'ease-in-out' });
+    const a = c.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx * .6 + 'px,' + (dy * .6 - 30) + 'px) scale(.8)', opacity: 1, offset: .55 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + Math.max(.3, Math.min(1, to.height * .9 / (r.height || 1))) + ')', opacity: .95 }], { duration: 480, easing: 'ease-in-out' });
     a.onfinish = () => c.remove(); setTimeout(() => c.remove(), 900);
   });
   snd('slide', { vol: .5 }); UI.flyFrom = null;
@@ -167,7 +167,7 @@ async function playResolve(evs, preHand) {
     UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, scoring: !!sc, say: 'Everyone has chosen. The plates are under covers…' };
     if (!hand && v < 0) UI.fz.hand = null;
     UI.sel = []; UI.twin = false; UI.rec = null;
-    UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
+    UI.fast = false; render(); { const t0 = (PX.on && PX.serveT) || UI.serveT || 0, left = t0 ? 860 - (performance.now() - t0) : 0; await wait(Math.max(300, left)); } if (tok !== UI.seq) return;   // let your dish land on your tray first
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
     try { UI.fz.news0 = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.fz.news0 = null; }
     UI.fz.msg = sayT('cover'); renderDock(); try { coachMove(); } catch (e) { }

@@ -341,7 +341,13 @@ function frame(now) {
   ord.forEach(function (i) {
     var c = G.cars[i], p = carXY(i, UI.vis[i].p);
     drawCar(c, p, p.a, UI.vis[i].rot);
-    if (c.human || i === UI.focus) { cx.fillStyle = '#fff'; cx.font = '800 26px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.strokeStyle = 'rgba(0,0,0,.75)'; cx.lineWidth = 6; var lb = c.human ? c.name.split(' ')[0] : String(c.name.split(' ')[0]); cx.strokeText(lb, p.x, p.y - 30); cx.fillText(lb, p.x, p.y - 30); }
+  });
+  /* name tags: a dark pill just ahead of the car, inside its lane (never on the kerb), drawn after all cars so none covers it */
+  ord.forEach(function (i) {
+    var c = G.cars[i]; if (!(c.human || i === UI.focus)) return; var p = carXY(i, UI.vis[i].p), lb = c.name.split(' ')[0];
+    var tx = p.x + Math.cos(p.a) * 74, ty = p.y + Math.sin(p.a) * 74; cx.font = '800 22px sans-serif'; var tw = cx.measureText(lb).width + 18;
+    cx.fillStyle = 'rgba(10,14,22,.86)'; rr(tx - tw / 2, ty - 15, tw, 30, 15); cx.fill(); cx.lineWidth = 3; cx.strokeStyle = COLS[c.col].hex; cx.stroke();
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(lb, tx, ty + 1);
   });
   /* pops */
   UI.pops.forEach(function (o) {

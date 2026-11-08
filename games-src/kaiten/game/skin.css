@@ -184,3 +184,8 @@ html.ph .ctr .none{display:block;font-size:14px}
 /* result card: always fully on screen, board dimmed behind it (review R3 05:56) */
 #rs.kkfin{position:fixed!important;inset:0!important;align-items:center!important;justify-content:center!important;padding:12px 10px max(12px,env(safe-area-inset-bottom))!important;background:rgba(24,12,8,.6)!important;z-index:60}
 #rs.kkfin .rsbox.bar{max-height:calc(100dvh - 24px);overflow:auto}
+/* game over: the board no longer depends on the painted canvas; every tray keeps its dish art, dimmed */
+html.kkend #pxc{visibility:hidden}
+html.kkend #bd .grp .pl>svg{visibility:visible!important;opacity:.6}
+html.kkend .ctr{background:var(--ctr,#b4743f)!important;border-color:var(--ink,#4a2a22)!important}
+html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!important}

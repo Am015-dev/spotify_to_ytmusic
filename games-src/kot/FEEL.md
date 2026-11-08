@@ -38,3 +38,17 @@ Shots: playable-shots/feel/ (mid-game shots are from the previous build of this 
   - 13 model files: full-detail tower/token .glb (High graphics only) and their preview .webp
 - Feel gate after these changes: (a)-(e) all 0. logic 146/146, rules 8/8, gameplay scenarios 12/12.
 - Not done: title snapshot baseline. PLAYBOOK says `--approve-visual` runs only after the owner approves the screens, so the 3 visual tests stay red until then. ui-audit B22 D3 E1 unchanged.
+
+## Polish round (W467, 8 Nov, after R6 went live)
+- PC result card sits low on the board with no dark veil, so the winner and the standings stay visible. The side panel, its title and the board banner say "X wins!" (was "Game over" and a long crowned line that got cut off).
+- Evolution "Pick a secret power" choices show their owner picture (pc-evo*). Shots: playable-shots/polish/evo-*.webp.
+- ui-audit: B 22→21, D 3→2 (the stage base was near-black), E 1, A/C/F 0. Also fixed:
+  - Play now had dropped to 40px tall after its text got shorter; it is now at least 56px.
+  - Desktop action-button text is ink on orange.
+  - The dock icon sits on a cream plate.
+  - 2D-board label plates pick black or white, whichever contrasts more.
+- Feel gate: (a)-(e) all 0. Rolling dice tumble inside their own cell, which removed a transient overlap. Learn ends by touch, no skips. logic 146/146. Gameplay scenarios 12/12 (visual baselines still need owner approval).
+- Left:
+  - D: the 3D title-city label textures (far away, about 1-12px tall).
+  - E: the news button is reported dead, but a real click opens the log drawer.
+  - B: mostly 2D fallback-board label boxes, still flagged even though the plates are drawn.

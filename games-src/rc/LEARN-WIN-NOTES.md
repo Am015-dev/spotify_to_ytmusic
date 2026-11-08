@@ -1,6 +1,18 @@
 # Learn to play: can a player who follows ✨ Suggest win? (W481, 8 Nov 2026)
 
-Gate asked: 27/30 Learn games won by following Suggest. **Not met: 0/30 today.** Nothing in the game changed; this adds a test mode and the findings.
+Gate asked: 27/30 Learn games won by following Suggest. **Round 2 (lookahead + Learn deal): 29/30** (other seed sets: 29, 29, 27). Play: 0/30 before and after.
+
+## What changed in round 2
+- ✨ Suggest looks ahead in Learn (advisor.js lookSuggest): 6 priorities-first plans + the greedy plan + 3 computer plans, each with 0 / half / all
+  spare wood on the signal pile, played to the next morning 4 times on reshuffled decks with the real engine on a copy. Score = the computer's
+  stateScore + low-life penalty + pile schedule (all 5 stages by day 12, keep 3 days slack) + Fire deadline, and most inventions count less (wood is
+  the bottleneck). Seeded per day, so the same position gives the same advice. Old Suggest on the new Learn deal: 5/30.
+- Learn deal (tutor.js tutDeal, Learn only): food 3 and wood 3 at the start, mountains tile 2nd, the 14 mildest event cards (Chill Rain still day 2),
+  weakest beasts first, no weather dice (G.wxT={}; engine wxTab() reads it, Play/Story use the scenario table unchanged).
+- Play keeps the priority-list Suggest: the lookahead also wins 0/30 there and the games end earlier (day 7.4 vs 7.9). Faithful marooned is very hard.
+
+---
+Round 1 (below): 0/30, nothing in the game changed.
 
 ## Test tools added to adv-test.js
 - `node adv-test.js 30 learn`: the real Learn setup (tutorial deal from tutor.js tutDeal, easy, Carpenter + Cook + Friday), seed varied per game.

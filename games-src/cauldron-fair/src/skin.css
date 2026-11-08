@@ -197,3 +197,13 @@ html:not(.ph) .tbtn span,html:not(.ph) .tbtn.gxt-menu span{font-size:16px!import
 html:not(.ph) #goalcard .gck{font-size:16px}
 @media (max-height:700px){.stg-tally .drace{flex:0 0 auto;gap:6px;padding:8px 10px}.drpor{display:none}.stg-tally .drbar{height:16px}.stg-tally .drn{font-size:20px}}
 @media (min-width:900px){.stg-tally .drace{flex:0 0 auto;margin:auto 0}}
+#instr.indock{position:static;left:auto;right:auto;bottom:auto;max-width:none;width:auto;margin:0;flex:0 0 auto;order:-1}
+/* W471 (R5 fix 3): desktop day report reads like the phone one: a centred table, solid row backing, bigger tiles */
+@media (min-width:900px){
+  .stg .dtable{max-width:760px;width:100%;margin:0 auto}
+  .stg .ds.lit,.stg .ds{background:rgba(20,10,8,.78)!important;border-color:rgba(255,240,210,.55)}
+  .stg .ds.me{border-color:#f2b81e}
+  .stg .ds .dp{font-size:24px;min-height:38px}
+  .stg .ds .dn,.stg .ds .dtot,.stg .ds .drb{font-size:18px;color:#fff6df}
+  .stg .ds .dp.dim{opacity:.6;filter:grayscale(.5)}
+}

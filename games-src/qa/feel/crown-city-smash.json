@@ -1,8 +1,8 @@
 {
  "slug": "crown-city-smash",
- "when": "2026-11-08T06:06Z",
+ "when": "2026-11-08T07:40Z",
  "secs": 120,
- "totalSecs": 385,
+ "totalSecs": 386,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -38,7 +38,7 @@
    "mode": "learn",
    "secs": 121,
    "turns": 68,
-   "clicks": 84,
+   "clicks": 82,
    "endedBy": "time",
    "tutorialEnded": 8,
    "hintsOff": true,
@@ -47,9 +47,9 @@
   {
    "size": "phone",
    "mode": "play",
-   "secs": 121,
-   "turns": 78,
-   "clicks": 85,
+   "secs": 122,
+   "turns": 76,
+   "clicks": 82,
    "endedBy": "time",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -59,10 +59,10 @@
    "size": "pc",
    "mode": "learn",
    "secs": 120,
-   "turns": 37,
-   "clicks": 43,
+   "turns": 31,
+   "clicks": 40,
    "endedBy": "result",
-   "tutorialEnded": 6,
+   "tutorialEnded": 9,
    "hintsOff": true,
    "messagesSeen": 3
   },
