@@ -1,6 +1,6 @@
 """Build free-library for short-fuse, sunglaze, thornbound, tidewake from Met Open Access (CC0) objects.
 Usage: python3 build_w410b.py SLUG"""
-import sys, os, json, urllib.request, urllib.parse, time, hashlib
+import re, sys, os, json, urllib.request, urllib.parse, time, hashlib
 sys.path.insert(0, os.path.dirname(__file__))
 from lib import *
 CACHE = '/tmp/claude-0/w410b'
@@ -25,7 +25,8 @@ def search(q):
     return (r or {}).get('objectIDs') or []
 
 USED = set()
-def fetch_img(queries, minside=900, skip=0, aspect=None):
+opt_any = False
+def fetch_img(queries, minside=900, skip=0, aspect=None, busy=False, bad=None):
     k = 0
     for q in queries:
         ids = [i for i in search(q) if i not in USED]
@@ -40,6 +41,9 @@ def fetch_img(queries, minside=900, skip=0, aspect=None):
                 import io; im = Image.open(io.BytesIO(d)); im.draft('RGB', (2400, 2400)); im.load()
             except Exception: continue
             if max(im.size) < minside: continue
+            if bad and re.search(bad, o.get('title') or '', re.I): continue
+            if re.search(r'portrait|dish|bowl|cup\b|nude|bust|teapot|ewer|jug|spoon|fragment|sherd|ring\b', o.get('title') or '', re.I) and not opt_any: continue
+            if busy and border_score(im)[0] < 11: continue
             if aspect:
                 a = im.size[0] / im.size[1]
                 if not (aspect[0] <= a <= aspect[1]): continue
@@ -96,14 +100,14 @@ SPEC = {
  ('tile-mine-plate', (512, 512), 'plate', ['iron shield boss', 'metal disc']),
 ],
 'sunglaze': [
- ('tile-gloss-b', (256, 256), 'scene', ['glazed ceramic tile', 'Iznik tile']),
- ('tile-gloss-c', (256, 256), 'scene', ['lustre tile', 'tile panel Persian']),
+ ('tile-gloss-b', (256, 256), 'scene', ['glazed ceramic tile', 'Iznik tile'], dict(object=True)),
+ ('tile-gloss-c', (256, 256), 'scene', ['lustre tile', 'tile panel Persian'], dict(object=True)),
  ('table-kiln-hall', (1920, 1080), 'scene', ['potter workshop kiln', 'pottery kiln']),
  ('table-kiln-hall-phone', (1080, 1920), 'scene', ['potters at work', 'kiln furnace']),
  ('table-moon-courtyard', (1920, 1080), 'scene', ['Alhambra courtyard', 'courtyard moonlight']),
  ('table-moon-courtyard-phone', (1080, 1920), 'scene', ['moonlit garden architecture', 'mosque courtyard']),
  ('back-black-kiln', (768, 1024), 'scene', ['black glazed vessel', 'black pottery']),
- ('end-lose-b', (1024, 768), 'scene', ['broken pottery shards', 'ruins sunset']),
+ ('end-lose-b', (1024, 768), 'scene', ['ruins desert sunset', 'ruined palace']),
  ('end-lose-c', (1024, 768), 'scene', ['cracked tiles wall', 'ruined palace']),
  ('end-win-b', (1024, 768), 'scene', ['tiled palace hall', 'Persian tile panel']),
  ('end-win-c', (1024, 768), 'scene', ['sun rays palace', 'golden dome interior']),
@@ -112,7 +116,7 @@ SPEC = {
 'thornbound': [
  ('board-plate', (1024, 1024), 'scene', ['map of a kingdom', 'old map region']),
  ('tkey-picture', (1024, 1024), 'scene', ['throne', 'royal throne room']),
- ('table-ossuary', (1920, 1080), 'scene', ['ossuary skulls', 'catacomb crypt']),
+ ('table-ossuary', (1920, 1080), 'scene', ['catacombs skulls', 'skulls and bones', 'memento mori', 'crypt'], dict(object=True)),
  ('table-ossuary-phone', (1080, 1920), 'scene', ['crypt interior', 'vaulted crypt']),
  ('table-sinks-masquerade', (1920, 1080), 'scene', ['masquerade ball', 'carnival masks Venice']),
  ('table-sinks-masquerade-phone', (1080, 1920), 'scene', ['ball masked dancers', 'masks festival']),
@@ -132,7 +136,7 @@ SPEC = {
 'tidewake': [
  ('tile-water-e', (512, 512), 'scene', ['stormy sea waves', 'sea waves painting']),
  ('tile-water-f', (512, 512), 'scene', ['ocean swell', 'rough sea']),
- ('tile-water-g', (512, 512), 'scene', ['wave foam', 'seascape calm']),
+ ('tile-water-g', (512, 512), 'scene', ['wave foam seascape', 'sea study waves'], dict(bad='dish|plate|vessel|floral')),
  ('tile-water-h', (512, 512), 'scene', ['sea whirlpool', 'maelstrom']),
  ('table-harbor-noon', (1920, 1080), 'scene', ['harbor ships noon', 'harbor view ships']),
  ('table-harbor-noon-phone', (1080, 1920), 'scene', ['port with ships', 'sailing ships harbour']),
@@ -157,13 +161,13 @@ def main(slug):
     for spec in SPEC[slug]:
         stem, size, kind, qs = spec[:4]; opt = spec[4] if len(spec) > 4 else {}
         stops = opt.get('stops', g['stops']); k = opt.get('k', g['k'])
-        im, meta = fetch_img(qs, minside=900 if size[0] > 600 else 500)
+        im, meta = fetch_img(qs, minside=900 if size[0] > 600 else 500, busy=(kind == 'scene' and size[0] >= 768 and not opt.get('object')), bad=opt.get('bad'))
         if im is None:
             rows.append((stem, 'none', '', '', 'FALLBACK')); print('FAIL', stem); continue
         if opt.get('inv'): im = ImageOps.invert(ImageOps.autocontrast(im.convert('L')).convert('RGB')) if False else ImageOps.autocontrast(im.convert('L')).convert('RGB')
         f = lambda x: gradient_map(x, stops, k, g['sat'])
         if kind == 'plate':
-            t = grade(cover(im, size), f, 1.1)
+            w0, h0 = im.size; im = im.crop((int(w0*.22), int(h0*.22), int(w0*.78), int(h0*.78))); t = grade(cover(im, size), f, 1.1)
             res = rounded_plate(t, size, g['rim'])
         else:
             res = vignette(grade(cover(im, size, 0.5, 0.45), f, 1.1), 0.35)
