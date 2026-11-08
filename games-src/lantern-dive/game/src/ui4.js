@@ -88,7 +88,7 @@ function showResult() {
   const R = G.result, ok = R.ok, m = G.mission, p = Prog.load();
   const box = h('div.rsbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': ok ? 'Dive complete' : 'Dive failed' });
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
-  if (!ok && R.why) box.append(h('p', R.why));
+  if (!ok && R.why) { const wp = String(R.why).split(/:\s+/); wp.forEach((x, i) => box.append(h('p', i < wp.length - 1 ? x + '.' : x))); }   // short lines: the cause, then the job
   if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + '. The dive ended at once. Cards in hand do not matter.'));
   box.append(h('p.sm', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att) + (G.distress ? ' · distress flare lit (+1)' : '')));
   // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
@@ -99,7 +99,7 @@ function showResult() {
   if (!ok) box.append(h('p.sm', 'The red cross marks the job that broke. Grey jobs were still open.'));
   if (m.kind === 'log') {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
-    else box.append(h('p.sm', 'Attempts on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
+    else box.append(h('p.sm', 'Attempts on this dive: ' + (p.tries[m.id] || 0) + '. Stuck from the start? Try new jobs.'));
   } else if (m.kind === 'deep' && ok) box.append(h('p', 'Deep dive ' + m.d + ' complete. The next one is difficulty ' + (m.d + 1) + '.'));
   if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) { campResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
   if (UI.mode === 'descent') { descResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
