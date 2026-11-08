@@ -219,7 +219,7 @@ document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contai
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'ui',act:ds.act,k:ds.k,a:ds.a,w:ds.w,a2:ds.a2}))return;sfx('click');
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
-  if(ds.start){if(ds.start==='solo'&&typeof tutOffer==='function'&&tutOffer('solo'))return;startGame(ds.start);return}
+  if(ds.start){startGame(ds.start);return}   // R5: no 'New here?' modal; the title has its own Learn button
   if(ds.a&&/^net/.test(ds.a)&&typeof netClick==='function'&&netClick(ds.a))return;
   if(ds.dial!=null){UI.draft[ds.ship]=+ds.dial;UI.hoverDial=null;const mine=alive().filter(s=>s.side===planSide());const nxt=mine.find(s=>UI.draft[s.id]==null);if(nxt&&ds.ship===UI.sel)UI.sel=nxt.id;render();return}
   if(ds.sel){UI.sel=ds.sel;render();return}
