@@ -5,7 +5,7 @@ fourth), from a rule summary read on 8 Nov 2026 plus the notes in `rules-notes.m
 `D.SCALE = 3` (damage, Weak, Wrath, Shiv, Rest, Block cap); counts, caps on tokens and energy are not scaled. One gold unit in the printed
 rules = 25 gold here (card removal 3 units = 75 gold, already the shelf value).
 Each rule has one assertion in `logic-test.js` (`node logic-test.js`, id = number). "Optional" rules are marked; "NB" = not built, with the reason.
-Rules whose exact text I could not confirm (Loaded Die effect, Neow's Blessing options, Act IV key details) are left out rather than guessed.
+Rules whose exact text I could not confirm (the solo-start die effect, the opening blessing options, Act IV key details) are left out rather than guessed.
 
 ## Turn and resources
 1. Start of a hero's turn: Energy resets to 3 (unspent Energy is not carried), Block resets to 0, draw 5.
