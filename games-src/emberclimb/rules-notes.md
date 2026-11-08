@@ -105,8 +105,9 @@ Re-checked against the tabletop rulebook text (online copy): Campfire Rest heals
 (x SCALE = 3); a Weak attacker on a Vulnerable target cancels both; one token used per whole attack; card / enemy text resolves top to bottom.
 All match the engine, so the numbers stay. Fixed: an enemy's debuff now lands after its own hit (logic rule 68); start-of-fight Block
 (Iron Bangle) lasts through round 1 (logic rule 67). In-game text now says what each status does ("Vulnerable 1: takes double damage").
-G3 round 2 (8 Nov 2026), shelf choices on top of the tabletop numbers, each one knob in data.js:
-- D.STRONGX = 1: after the first 3 fights of an act, an Encounter room keeps one extra foe (tabletop: one per hero), so floors 4-9 are not trivial.
-- Act-1 boss HP 118-124 (was 132-140). Bosses get a second pattern at half HP (pat2, banner "Phase 2" + new intent); the tabletop act-1 boss splits.
-- bench-newplayer.js (test bot, 30% random plays, default 3-act Quick game, Warrior, 300 runs): floors 1-3 cleared 95%, act-1 boss reached 76%,
-  beaten 28% (round start: 95 / 81 / 26). Test bot with no misplays: 99 / 89 / 59.
+G3 round 3 (8 Nov 2026): owner wants tabletop rules, so round 2's rule changes are undone.
+- One foe per hero in Encounter rooms again; act-1 boss HP back to 132-140; no made-up phase 2.
+- Act-1 boss split as printed (rulebook FAQ, designer ruling): when it dies combat continues, the dead boss takes no action, and at the
+  start of the next round (after the enemy turn) each hero's row gets its listed slimes in order (logic rule 69). Shelf slimes: Bile Blob, Mire Slug, Mire Slug.
+- Balance only by encounter choice: the 40-HP Grub and Acolyte moved from the weak pool (first 3 fights) to the strong pool; the Ash Imp pair moved to weak.
+- bench-newplayer.js, careful player (15% random plays), 300 runs: floors 1-3 cleared 98%, act-1 boss reached 89%, beaten 33%. Test bot: 100 / 93 / 46.

@@ -137,10 +137,13 @@ rule(67, () => { E.newGame({ heroes: ['w'], seed: 67 }); const g0 = E.G(); g0.re
 rule(68, () => { const g = F(['w'], 68); const h = g.hs[0]; h.hand.forEach(c => { c.id = 'w-defend'; }); g.b.en[0].intent = { atk: 8, vuln: 2, tg: 0 }; h.blk = 10; const pv = E.previewHit(0, 0);
   E.performMove({ t: 'end' }); g.b.ph === 'e' && E.step(); return [[8, 999, 2], [pv, h.hp, h.st.vuln || 0]]; });
 
-// boss phase 2: at half HP the boss switches to its second pattern once, and its shown intent is re-planned from it
-rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); E.debug.boss(); const g = E.G(), e = g.b.en[0], d = D.ENEMIES[e.id]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = Math.floor(e.mhp / 2) + 3;
-  g.hs[0].hand.push(E.mk('w-strike')); g.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: g.hs[0].hand.length - 1, e: 0 }); const it = J(Object.assign({}, e.intent, { tg: undefined, die: undefined }));
-  return [[true, 1, true], [!!d.pat2, e.ph2, d.pat2.some(p => J(p) === it)]]; });
+// tabletop split: killing the act-1 boss does not end the fight; the dead boss takes no action; at the start of the next round its
+// listed slimes arrive in the hero's row with intents; the fight ends when they are all dead
+rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); const g0 = E.G(); g0.boss = 'mire-behemoth'; E.debug.boss(); const g = E.G(), e = g.b.en[0]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = 3;
+  g.hs[0].hand.push(E.mk('w-strike')); g.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: g.hs[0].hand.length - 1, e: 0 }); const a = [e.dead, g.scr];
+  E.performMove({ t: 'end' }); for (let k = 0; k < 20 && g.b && g.b.ph === 'e'; k++) E.step(); const sp = g.b.en.filter(x => x.spawn);
+  const b = [sp.length, J(sp.map(x => x.id)) === J(D.ENEMIES['mire-behemoth'].split), sp.every(x => x.intent && x.row === 0), g.b.turn];
+  E.debug.win(); return [[1, 'battle', 3, true, true, 2, 'reward'], a.concat(b, [g.scr])]; });
 // potion Discard: removes the potion on any screen, and is never offered to bots as a move
 rule(70, () => { E.newGame({ heroes: ['w'], seed: 70 }); const g = E.G(); g.pots = ['fire-flask', 'block-brew']; const ok = E.performMove({ t: 'toss', p: 0 }); return [[true, ['block-brew'], false], [ok, g.pots, E.validMoves().some(m => m.t === 'toss')]]; });
 

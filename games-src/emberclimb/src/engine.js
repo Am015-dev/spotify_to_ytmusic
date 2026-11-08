@@ -190,7 +190,6 @@
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addPoison(e, h.pw.envenom);
       if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); }
-      phaseCheck(e);
     }
   }
   function losePoisonKill(e) { if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
@@ -209,7 +208,7 @@
   }
   function hitRaw(e, d) {
     if (e.dead || d <= 0) return; var a = Math.min(e.blk, d); e.blk -= a; var real = d - a; fx('dmg', 'e' + G.b.en.indexOf(e), d, '');
-    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } phaseCheck(e); }
+    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
   }
   function setStance(h, s) {
     if (h.stance === s) return; if (h.stance === 'c') gainEn(h, 2); h.stance = s; fx('stance', 'h' + G.hs.indexOf(h), 0, s);
@@ -259,7 +258,7 @@
     return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0 };
   }
   function plan(e) {
-    var d = D.ENEMIES[e.id], step, pat = (e.ph2 && d.pat2) || d.pat;
+    var d = D.ENEMIES[e.id], step, pat = d.pat;
     if (e.asleep > 0) { e.intent = { sleep: 1 }; return; }
     if (d.mode === 'rand') { var k; do { k = ri(pat.length); } while (k === e.i && pat.length > 1); e.i = k; }
     else e.i = (e.i + 1) % pat.length;
@@ -268,24 +267,26 @@
     e.intent = JSON.parse(JSON.stringify(step)); if (dn) e.intent.die = dn;
     var tg = e.row; if (!G.hs[tg] || G.hs[tg].dead) tg = G.hs.indexOf(aliveHs()[0]); e.intent.tg = tg;
   }
-  // boss phase 2: at half HP a boss with a second pattern changes phase once; its next move is re-planned at once so the new intent shows
-  function phaseCheck(e) {
-    var d = D.ENEMIES[e.id]; if (!d || !d.pat2 || e.ph2 || e.dead || e.hp > e.mhp / 2) return;
-    e.ph2 = 1; e.i = -1; plan(e); fx('phase', 'e' + G.b.en.indexOf(e), 0, e.id);
+  // tabletop split (act-1 boss): when it dies combat goes on; at the start of the next round (after the enemy turn) each hero's row gets
+  // its listed slimes in order. The dead boss takes no action. pendingSplit() keeps the fight from ending in between.
+  function pendingSplit() { return !!(G.b && G.b.en.some(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })); }
+  function doSplits() {
+    G.b.en.slice().forEach(function (e) {
+      var d = D.ENEMIES[e.id]; if (!e.dead || !d.split || e.splitDone) return; e.splitDone = 1;
+      G.hs.forEach(function (h, r) { if (h.dead) return; d.split.forEach(function (id) { var s = mkEnemy(id); s.row = r; s.spawn = 1; G.b.en.push(s); }); });
+      fx('split', 'e' + G.b.en.indexOf(e), d.split.length, e.id);
+    });
   }
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
     if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
-      var cap = G.hs.length + (kind === 'm' && G.fights >= 3 && D.STRONGX ? D.STRONGX : 0);   // G3 r2 balance: later Encounter rooms keep one extra foe
-      while (ids.length > cap) ids.pop();
+      while (ids.length > G.hs.length) ids.pop();
       for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
     }
     resetCombat();
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
     G.b.en.forEach(function (e, i) { e.row = i % G.hs.length; });
-    // G3 r2 balance: the later Encounter rooms of an act (after the first 3 fights) have tougher foes (x D.STRONGHP HP), so floors 4-9 are not trivial
-    if (kind === 'm' && G.fights >= 3 && D.STRONGHP) G.b.en.forEach(function (e) { e.hp = e.mhp = Math.round(e.mhp * D.STRONGHP); });
     G.scr = 'battle'; G.fights++;
     G.hs.forEach(function (h) {
       if (h.dead) return;
@@ -300,6 +301,7 @@
     G.b.turn++; G.b.ph = 'p'; G.b.cur = -1;
     // one shared enemy die per round, rolled before the heroes act so die-based intents are visible
     G.b.die = ri(6) + 1; fx('die', '', G.b.die);
+    if (pendingSplit()) doSplits();
     G.b.en.forEach(function (e) { if (!e.dead) plan(e); });
     // Block is cleared each new round, but not on round 1: start-of-fight Block (Iron Bangle) must last through the first round
     G.hs.forEach(function (h) { if (!h.dead) { if (G.b.turn > 1) h.blk = 0; h.started = 0; } });
@@ -344,7 +346,7 @@
   }
   // tabletop poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies
   function tickPoison() {
-    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); phaseCheck(e); } });
+    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); } });
     if (!alive().length) winBattle();
   }
   // one enemy acts per call; returns true while enemy phase continues
@@ -398,6 +400,7 @@
   }
   function settle() { var n = 0; while (G.b && G.b.ph === 'e' && n++ < 200) step(); }
   function winBattle() {
+    if (pendingSplit()) { var sp = G.b.en.filter(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })[0]; if (!sp.splitSaid) { sp.splitSaid = 1; fx('splitsoon', 'e' + G.b.en.indexOf(sp), D.ENEMIES[sp.id].split.length, sp.id); } return; }
     var kind = G.b.kind, gold = kind === 'b' ? 60 + ri(30) : kind === 'e' ? 25 + ri(11) : 10 + ri(11);
     if (has('gold-tooth')) gold = Math.floor(gold * 1.5);
     G.gold += gold;
@@ -623,7 +626,7 @@
     eff: eff, lines: lines, previewHit: previewHit, previewPlay: previewPlay, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
     debug: {
       boss: function () { enterNode(G.map.length - 1); }, hurt: function (hi, n) { hurtHero(G.hs[hi], n, 1); },
-      win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); winBattle(); } },
+      win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; e.splitDone = 1; }); winBattle(); } },
       shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
       rest: function () { G.at = G.map.filter(function (n) { return n.f === 9; })[0].id; G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },
       event: function (id) { G.at = G.map.filter(function (n) { return n.f === 4; })[0].id; G.evn = { id: id, res: null }; G.scr = 'event'; },

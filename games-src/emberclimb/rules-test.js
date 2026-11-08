@@ -121,7 +121,7 @@ G.lucky = 1; const before = G.q.length; h.hand = [E.mk('w-wild-swing')]; h.en = 
 E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(G.q.slice(before).some(f => f.k === 'die' && f.n === 6) && hp0 - t0.hp >= 14, 'fortune die forces a 6: wild swing deals 14');
 h.hand = [E.mk('wound'), E.mk('burn')]; ok(!E.validMoves().some(m => m.t === 'play'), 'status cards are unplayable'); }
 // orbs
-E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
+E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.b.en.forEach(e => { e.hp = e.mhp = 200; });   // sturdy foe so evokes cannot end the fight
 let a = G.hs[0]; ok(a.orbs.length === 1 && a.orbs[0].k === 'L', 'spark core: starts with a lightning orb');
 a.hand = [E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap')]; a.en = 9; for (let i = 0; i < 4; i++) E.performMove({ t: 'play', h: 0, c: 0 });
 ok(a.orbs.length === 3, 'only 3 orb slots: the oldest orb is evoked when full');

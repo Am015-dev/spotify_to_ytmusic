@@ -98,7 +98,9 @@
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
         case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Strength' : f.x === 'spikes' ? 'Spikes ' + f.n : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
-        case 'phase': (function () { var ed = D.ENEMIES[f.x] || {}, o0 = document.querySelector('.ec-phase'); if (o0) o0.remove(); var d = h('div', 'ec-phase', null, [h('b', '', 'Phase 2'), h('span', '', ed.name + ' ' + (ed.ph2 || 'changes its moves') + '. Watch its new intent!')]); d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); shakeEl(el, 120); setTimeout(function () { if (d.parentNode) d.remove(); }, 2600); })(); break;
+        case 'splitsoon': case 'split': (function () { var ed = D.ENEMIES[f.x] || {}, o0 = document.querySelector('.ec-phase'); if (o0) o0.remove(); var n = f.n || 3, soon = f.k === 'splitsoon';
+          var d = h('div', 'ec-phase', null, [h('b', '', soon ? 'It splits!' : 'Slimes!'), h('span', '', soon ? ed.name + ' ' + (ed.splitSay || 'splits') + '. ' + n + ' slimes join at the start of next round. Finish your turn.' : n + ' slimes from the ' + ed.name + ' join the fight. Check their intents.')]);
+          d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); setTimeout(function () { if (d.parentNode) d.remove(); }, 3000); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
@@ -436,7 +438,7 @@
       x.appendChild(A('enemy-' + (d.img || e.id), d.name, { ph: '#6a3a2a' })); if (e.spk) x.appendChild(h('div', 'spkchip', 'Spikes ' + e.spk));
       if (b.ph === 'e' && UI.actor === i) x.classList.add('acting');
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
-      x.appendChild(h('div', 'nm', d.name + (e.ph2 ? ' · Phase 2' : '')));
+      x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
       if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
       x.appendChild(stChips(e));
