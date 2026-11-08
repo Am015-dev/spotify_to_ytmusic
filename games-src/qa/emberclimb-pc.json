@@ -1,0 +1,37 @@
+{
+ "slug": "emberclimb",
+ "size": "pc",
+ "seed": 27157,
+ "when": "2026-11-08T00:32Z",
+ "tutorial": {
+  "end": true,
+  "endButtons": 0
+ },
+ "quick": {
+  "result": "cap",
+  "clicks": 800
+ },
+ "story": {
+  "result": null
+ },
+ "fuzz": {},
+ "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "clickable covered by another element (not tappable): button#drawpile.chip \"Draw 5\" under span.cl \"Gain 5 Block.\"",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-screen-quick-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #800 (Hits 13 Block 5)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 800 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js emberclimb --size pc --seed 27157 --phases quick",
+   "shot": "/tmp/claude-0/qa-shots/emberclimb/pc-quick-noresult-7.png"
+  }
+ ],
+ "secs": 228
+}
