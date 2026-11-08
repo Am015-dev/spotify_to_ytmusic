@@ -18,7 +18,7 @@ SRC = {'gx-scenario.js': os.path.join(SP, 'shell', 'gx-scenario.js'), 'shell.js'
        'netroom.js': os.path.join(SP, 'net', 'netroom.js'), 'gx-glb.js': os.path.join(SP, 'shell', 'gx-glb.js'), 'three.min.js': os.path.join(SP, 'node_modules', 'three', 'build', 'three.min.js')}
 CAMP = 'window.CAMPAIGN=' + rd(os.path.join(D, '..', 'campaign.json')).strip() + ';'
 ORDER = ['gx-scenario.js', 'scn.js', 'shell.js', 'gx-viewport.js', 'gx-help.js', 'gx-tutor.js', 'gx-skin.js', 'gx-campaign.js', 'campaign-data.js', 'gameaudio.js', 'audio-data.js', 'trystero.min.js', 'three.min.js', 'gx-glb.js', 'netroom.js',
-         'data.js', 'djinns.js', 'engine.js', 'ai.js', 'tutdata.js', 'rules-html.js', 'story.js', 'sound.js', 'net.js', 'ui.js', 'ui2.js', 'ui3.js', 'hlp.js', 'tutor.js', 'paint.js', 'lore.js', 'playable.js', 'coach.js', 'score.js', 'drag.js', 'clean.js', 'feed.js', 'assetlist.js', 'assets.js', 'models3d.js']
+         'data.js', 'djinns.js', 'engine.js', 'ai.js', 'tutdata.js', 'rules-html.js', 'story.js', 'sound.js', 'net.js', 'ui.js', 'ui2.js', 'ui3.js', 'hlp.js', 'tutor.js', 'paint.js', 'lore.js', 'playable.js', 'coach.js', 'guide.js', 'score.js', 'drag.js', 'clean.js', 'feed.js', 'assetlist.js', 'assets.js', 'models3d.js']
 for f in ORDER:
     tag = f'<script src="{f}"></script>'; assert tag in b, f
     src = CAMP if f == 'campaign-data.js' else rd(SRC.get(f, os.path.join(D, f)))

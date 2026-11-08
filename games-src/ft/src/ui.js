@@ -88,6 +88,7 @@ function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filt
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
   return `<div class="arow pws">${h}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
+const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
   if(G.q){const q=G.q;main=q.opts.map((o,i)=>qBoardTile(o)!=null?(o.h==='noop'?'':''):abtn({act:'q',i},esc(shortOpt(o.l)),'')).join('');
     const done=q.opts.findIndex(o=>o.h==='noop');if(done>=0)main+=abtn({act:'q',i:done},'Done','go');return `<div class="arow">${main}</div>`}
@@ -98,16 +99,16 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
   case 'tribe':{const tr=by('tribe');const th=by('thief');const a=G.act;main=th.map(m=>abtn(m,`🦹 ${esc(THIEVES[m.k].n.replace(' Cutpurse',''))}`,'pw')).join('');
     if(a.color==='assassin'){if(tr[0]&&tr[0].none)main+=abtn(tr[0],'No target: carry on','go')}
     else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;main+=tr.map(m=>abtn(m,`Earn ${(a.n+(m.fk||0))*blues*(G.turnFx.qirsh?2:1)}🪙${m.fk?` +${m.fk}🔮`:''}`,m.fk?'':'go')).join('')}
-    else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
+    else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else if(gdOn())main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
     break}
   case 'tile':{const tm=by('tile');const t=G.board[G.act.tile];const pl=tm.filter(m=>m.place!=null);const skip=tm.find(m=>m.skip);const extras=vm.filter(m=>m.act!=='tile').length;
-    if(pl.length===1&&!extras)UI.autoMove=pl[0];
+    if(pl.length===1&&!extras&&!gdOn())UI.autoMove=pl[0];
     else if(pl.length>1||pl.length===1){/* choose by tapping a glowing tile */ if(pl.length===1)main+=abtn(pl[0],t.k==='village'?'🏰 Build here':'🌴 Plant here','go')}
     for(const m of tm.filter(m=>m.work))main+=abtn(m,m.work==='art'?'Pay 1 Crafter':'Pay 2 🔮','');
-    if(skip&&!pl.length){if(tm.length===1&&!extras)UI.autoMove=skip;else main+=abtn(skip,'Skip','ghost')}
+    if(skip&&!pl.length){if(tm.length===1&&!extras&&!gdOn())UI.autoMove=skip;else main+=abtn(skip,'Skip','ghost')}
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
-    if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end){UI.autoMove=end;break}
+    if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
     if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
     main+=abtn(end,'End turn ▶','go');break}}
   if(main)h+=`<div class="arow">${main}</div>`;return h+pw}
