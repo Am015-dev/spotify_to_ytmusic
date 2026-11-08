@@ -29,7 +29,7 @@ T_('stall-short-hand-no-move', () => run(`(function(){ var G=mk(2,9), c=G.cars[0
 T_('optional-discard-before-draw', () => run(`(function(){ var G=mk(2,10), c=G.cars[0]; c.hand=['1','1','H','X','3','4','2']; var e=discardOptional(G,0,[0,1]); var bad=discardOptional(G,0,[0]); return e==='' && bad==='phase' && c.hand.length===7 && c.disc.length>=2; })()`));
 T_('discard-refuses-heat-stress', () => run(`(function(){ var G=mk(2,11), c=G.cars[0]; c.hand=['1','1','H','X','3','4','2']; return discardOptional(G,0,[2])==='card' && discardOptional(G,0,[3])==='card'; })()`));
 T_('no-slipstream-past-finish-line', () => run(`(function(){ var G=mk(2,12), c=G.cars[0], o=G.cars[1]; var tot=total(G); c.pos=tot-3; c.gear=1; c.hand=['4','4','4','4','4','4','4']; o.pos=tot+1; c.plan={gear:2,cards:['4','3'],boost:false}; c.hand=['2','2','2','2','2']; G.phase='resolve'; G.order=[0,1]; G.ri=0; G.adr=[]; resolveNext(G); return !G.pend; })()`));
-T_('race-continues-until-all-finish', () => run(`(function(){ var G=mk(3,13); startResolve(G); G.cars[0].pos=total(G); G.cars[0].fin=1; endRound(G,[]); var a=!G.over; G.cars[1].pos=total(G)+1; G.cars[1].fin=2; G.cars[2].pos=total(G)+2; G.cars[2].fin=3; endRound(G,[]); return a && G.over && G.rank[0]===0 && G.rank[2]===2; })()`));
+T_('race-ends-after-first-finish-round', () => run(`(function(){ var G=mk(3,13); startResolve(G); G.cars[0].pos=total(G); G.cars[0].fin=G.round; endRound(G,[]); return G.over && G.rank[0]===0; })()`));
 T_('finisher-skipped-in-resolve', () => run(`(function(){ var G=mk(3,14); G.cars[0].fin=1; startResolve(G); return G.order.indexOf(0)<0 && G.order.length===2; })()`));
 
 /* ---- W424: starting upgrades, react-step cooldown, weather, finish ties, championship ---- */
