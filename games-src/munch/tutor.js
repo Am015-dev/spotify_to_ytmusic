@@ -112,7 +112,7 @@ function tutSteps(){
  {id:'potion',title:'Strength vs level',say:()=>{const [a,b]=nowStr();return 'Its level '+b+', your strength '+a+'. Tap potion, then your side.'},target:tq('.arena .score.hero'),also:()=>tcard('fizz'),pick:tpick('fizz'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='fizz'&&a.z==='fh'},from:()=>tcard('fizz'),
    ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
- {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();return a+' against '+b+': you lose. Tap Run. 5 or 6 escapes.'},target:tq('.fbtns .runb'),
+ {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();let n=5;try{n=runOdds(P(0),G.cb).rows[0].need}catch(e){}return a+' against '+b+': you lose. Tap Run. '+(isRace(P(0),'elf')?'Elves get +1, so ':'')+n+' or more escapes.'},target:tq('.fbtns .runb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
  {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+': caught! Its Bad Stuff ate your hat.',target:tq('.mine .gear','.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},

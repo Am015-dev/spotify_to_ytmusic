@@ -319,8 +319,19 @@ html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:no
 /* PC: the price tag sits clear of the kind line */
 html:not(.ph) .card .aw .gold{translate:0 -8px}
 /* phone hand names: up to 3 lines, long words break, so no name is cut */
-html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:anywhere;hyphens:auto}
+html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:normal;word-break:normal;hyphens:none}
 
 /* a coach bubble with no free spot lets taps through to the glowing target under it (hlp.js hlpUncover) */
 .gxh-bub.gxh-thru{pointer-events:none;opacity:.6}
 .gxh-bub.gxh-thru .gxh-ok{pointer-events:auto}
+
+/* portrait phone: while the card panel is open (it stops above the action bar, ui.js dkCardFit) the action bar stays on top and tappable */
+html.ph-p.dk-cardup:has(#dkCard.on) .gx-dock{position:relative;z-index:42;pointer-events:auto}
+/* phone: level floats sit on the table under the seat they belong to, below any open panel, smaller */
+html.ph .bffloat{z-index:39;font-size:22px}
+html.ph .bffloat.big{font-size:34px}
+/* portrait phone: the door reveal sits over the table, clear of your hero and item strip; a rival's curse names the rival */
+html.ph-p .bfrev{align-content:start;padding-top:calc(var(--ph-bar,44px) + 64px)}
+html.ph-p .bfrev .bfrc .card{--w:min(42vw,200px,24dvh)}
+.bfrev.them.k-curse .bfban{font-size:clamp(24px,8vw,40px);text-align:center;max-width:92vw}
+@media (max-height:700px){html.ph-p .bfrev{padding-top:calc(var(--ph-bar,44px) + 36px)}html.ph-p .bfrev .bfrc .card{--w:min(36vw,170px,20dvh)}}

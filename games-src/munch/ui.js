@@ -60,7 +60,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netR
   setHTML($('#dkLogBody'),logHTML());setHTML($('#dkOppBody'),oppsFullHTML(me));
   // card details / card actions: a closable popup
   const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
-  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard')}
+  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard');dkCardFit()}
   else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
   let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();if(G.mode==='net'&&typeof netModalHTML==='function')m=netModalHTML()||m;
   if(m&&GX.open)GX.close();
@@ -175,7 +175,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards. You may keep ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}. Extras go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
-      ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll 5 or more on a die for each monster.'];
+      ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll '+(()=>{try{return runOdds(P(me),cb).rows[0].need}catch(e){return 5}})()+' or more on a die for each monster.'];
       const askRec=UI.hints&&co.rec&&co.rec.act==='ask';
       acts=(by('fight').length?btn({act:'fight'},'⚔ Fight!','primary pulse'):'')+(by('run').length?btn({act:'run'},'🏃 Run away'+runLabel(me,cb),co.rec&&co.rec.act==='run'?'primary':''):'')+(by('ask').length?`<button class="btn${askRec?' rec primary':''}" data-a="askmenu">🙋 Ask for help</button>`:'')+abilityBtns(vm,recK);
       tip=monTips(cb)}
@@ -243,7 +243,11 @@ function startOpts(n,online){return `<h3>${online?'Seats (friends first, the com
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
-function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
+// portrait phone: the card panel stops above the action bar, so End turn / Kick / Fight stay visible and tappable while it is open
+function dkCardFit(){const d=document.getElementById('dkCard');if(!d)return;const k=document.querySelector('.gx-dock');const h=document.documentElement;
+  if(h.classList.contains('ph-p')&&k&&k.getBoundingClientRect().height>20){const top=Math.round(k.getBoundingClientRect().top);d.style.bottom=Math.max(0,innerHeight-top)+'px';d.style.maxHeight=Math.max(200,top-48)+'px';h.classList.add('dk-cardup')}else{d.style.bottom='';d.style.maxHeight='';h.classList.remove('dk-cardup')}}
+addEventListener('resize',()=>{if(GX.open==='dkCard')dkCardFit()});
+function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;UI.zoom=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;
   if(t.dataset.mv){uiAct(JSON.parse(t.dataset.mv));return}
   const a=t.dataset.a;
