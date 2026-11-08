@@ -16,6 +16,7 @@ const URL = process.env.URL || 'http://localhost:8765/stitchwise/index.html';
   await pg.goto(URL); await pg.evaluate(() => { localStorage.setItem('sw_seen', '1'); }); await pg.reload(); await pg.waitForTimeout(700);
   await click('[data-a=quick]'); await pg.waitForTimeout(300); const nc = await pg.$('text=Normal computer'); if (nc) { await nc.click(); await pg.waitForTimeout(300); }
   const st = await pg.$('text=Start the game'); if (st) { await st.click(); }
+  await pg.waitForTimeout(500); await shot('3goal'); if (await pg.$('#goalcard')) await click('#goalcard [data-a=goalok]');
   await pg.waitForTimeout(1500); await shot('3first');
   // Advance, then catch rival turn
   await pg.waitForFunction(() => G && !UI.busy && isHuman(swWho(G)), null, { timeout: 20000 });

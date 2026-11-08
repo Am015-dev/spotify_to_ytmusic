@@ -84,7 +84,7 @@ function turnCheck() { // banner + plain line when the turn changes (or stays: t
   if (!G || G.over || G.pend) return; var w = swWho(G), hum = isHuman(w), hot = UI.mode === 'hot', nm = hot ? nameOf(w) + '\u2019s turn' : hum ? 'Your turn' : nameOf(w) + '\u2019s turn', again = w === UI.lastWho, prev = UI.again;
   if (hum) UI.fast = false;
   UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
-  if (!again) { banner(nm, UI.flavor && !UI.wide && UI.lastWho < 0 ? UI.flavor : UI.lastWho >= 0 ? (hum ? 'You are behind now' : nameOf(w) + ' is behind now') : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
+  if (!again) { banner(nm, UI.lastWho >= 0 ? (hum ? 'You are behind now' : nameOf(w) + ' is behind now') : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
   if (UI.coach) { if (!hum && !hot) coachSay('who_next'); if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
   UI.lastWho = w; renderDock();
 }
@@ -92,7 +92,7 @@ function schedule() {
   clearTimeout(UI.tm.ai); if (!G) return; if (G.over) { return later(amt(500), finish); }
   turnCheck();
   var s = swWho(G); if (UI.tutorial && !UI.tutAi) return; if (isHuman(s)) { if (typeof hlpPhaseUpdate === 'function') hlpPhaseUpdate(); return; }
-  UI.tm.ai = later(Math.max(120, AIDELAY, sp(1100)), aiStep);
+  if (UI.goal) return; UI.tm.ai = later(Math.max(120, AIDELAY, sp(1100)), aiStep);
 }
 function aiStep() { // the rival's turn, one visible step at a time (caption, flash, then the move on their quilt)
   if (!G || G.over || UI.busy) return; var s = swWho(G); if (isHuman(s)) return; var m = aiMove(G, UI.tutorial ? 'simple' : lvlOf(s), rngUI), nm = nameOf(s);

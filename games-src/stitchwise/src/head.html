@@ -260,5 +260,15 @@ html.sm .offer .ofx{grid-template-columns:1fr;width:auto;background:#fffaf0;bord
 @media (min-width:1024px){#scorebar .sb b,#scorebar .sb small,.offer .badge{font-size:16px}}
 html.sm .offer .of{background:#fffaf0!important}
 @media (max-width:600px){.pstrip{grid-template-columns:28px minmax(0,1fr)!important;padding:3px 5px!important}.pstrip .thumb{width:28px!important;height:28px!important}.pstrip .st{gap:4px!important;flex-wrap:nowrap!important;white-space:nowrap}.pstrip .st .bt{gap:2px}}
+/* Addendum 7: hints toggle, goal card, score drawer */
+#bulbbtn{width:auto!important;padding:0 10px!important;font-weight:700;font-size:14px;background-image:none!important}
+#bulbbtn.on{background:#e0a520!important;color:#2a1d10!important}
+#goalcard{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:#0008;padding:16px}
+#goalcard .gcard{background:#fff7e2;color:#2a1d10;border:3px solid #7a4e25;border-radius:16px;padding:16px 18px;max-width:420px;box-shadow:0 18px 50px #000a}
+#goalcard h2{font:800 20px/1.25 Georgia,serif;margin:0 0 8px}
+#goalcard ul{margin:0 0 12px;padding-left:20px;font-size:16px;line-height:1.35}
+#goalcard li{margin:4px 0}
+.scored .sdp{background:#fff7e2;border:1px solid #d9b96a;border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:15px;line-height:1.35;color:#2a1d10}
+.scored .sdp b{display:block;font-size:17px;margin-bottom:2px}
 </style>
 </head>

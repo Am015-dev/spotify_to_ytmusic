@@ -18,19 +18,19 @@ function showStart(view) {
 function renderSetup(st) {
   var card = h('div.card'); card.innerHTML = '<h2>Quick game</h2><p class="sub">Pick your opponent. 33 patches, 9\u00D79 quilts, 53 spaces of time.</p>';
   var m = h('div.menu'), opt = function (label, small, cls, f) { var b = h('button.btn' + cls, { type: 'button' }, label, h('small', small)); b.onclick = f; m.appendChild(b); };
-  opt('Easy computer', 'Gentle and a little careless: a good first match', '.go', function () { UI.lvl = 'easy'; newGame('vs', { lvl: 'easy' }); });
-  opt('Normal computer', 'Tidy quilts and sensible timing', '', function () { UI.lvl = 'normal'; newGame('vs', { lvl: 'normal' }); });
-  opt('Hard computer', 'Looks ahead at your replies. Beats a naive player about 9 in 10', '', function () { UI.lvl = 'hard'; newGame('vs', { lvl: 'hard' }); });
-  opt('Two players', 'Pass the screen: both quilts stay in the open', '.alt', function () { newGame('hot', {}); });
+  opt('Easy computer', 'Gentle and a little careless: a good first match', '.go', function () { UI.lvl = 'easy'; newGame('vs', { lvl: 'easy' }); showGoal(); });
+  opt('Normal computer', 'Tidy quilts and sensible timing', '', function () { UI.lvl = 'normal'; newGame('vs', { lvl: 'normal' }); showGoal(); });
+  opt('Hard computer', 'Looks ahead at your replies. Beats a naive player about 9 in 10', '', function () { UI.lvl = 'hard'; newGame('vs', { lvl: 'hard' }); showGoal(); });
+  opt('Two players', 'Pass the screen: both quilts stay in the open', '.alt', function () { newGame('hot', {}); showGoal(); });
   opt('Back', '', '.alt', function () { showStart(); });
   card.appendChild(m); st.innerHTML = ''; st.appendChild(card);
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return; var a = t.dataset.a;
   if (a === 'offer') selectOffer(+t.dataset.k); else if (a === 'adv') doAdvance(); else if (a === 'rot') rotate(); else if (a === 'flip') flip(); else if (a === 'sew') confirmSew(); else if (a === 'cancel') cancelSel();
-  else if (a === 'strip') { var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
+  else if (a === 'strip') { if (G) { showScoreDrawer(); return; } var sd = +t.dataset.seat; if (sd !== viewSeat()) showOppQuilt(sd); else if (G) toast('Buttons ' + G.btn[sd] + ' · income ' + G.inc[sd] + ' per spot · ' + swEmpty(G.board[sd]) + ' empty squares'); }
   else if (a === 'resume') loadGame(); else if (a === 'quick') showStart('setup'); else if (a === 'rules') { GX.show('rulesd'); }
-  else if (a === 'story') storyOpen(); else if (a === 'start') tutStart(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
+  else if (a === 'story') storyOpen(); else if (a === 'start') tutStart(); else if (a === 'goalok') closeGoal(); else if (a === 'whatdo') whatDo(); else if (a === 'skipmap') { coachSkipToMap(); } else if (a === 'result') showResult(); else if (a === 'again') { var lv = UI.lvl; newGame(UI.mode === 'hot' ? 'hot' : 'vs', { lvl: lv }); } else if (a === 'title') showStart(); else if (a === 'look') { $('#rs').hidden = true; }
   else if (a === 'campfin') { $('#rs').hidden = true; }
 });
 function showOppQuilt(seat) { var d = $('#oppd .gx-drawer-body') || null; var body = h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:8px' }); var saved = UI.cs; UI.cs = Math.min(34, Math.floor((Math.min(innerWidth, 420) - 60) / 9)); var q = quiltEl(seat, 'opp'); body.appendChild(q); var sc = swScore(G, seat); body.appendChild(h('div', { html: '<b>' + nameOf(seat) + '</b>: ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ' per spot, ' + sc.empty + ' empty squares' })); UI.cs = saved;
@@ -90,7 +90,7 @@ function showResult(o) {
     if (seqId !== UI.seq2) return; [0, 1].forEach(function (s) { cells[s].forEach(function (e) { e.classList.add('x'); }); setTotals(s, sc[s].empty); });
     var A = sc[0].total, B = sc[1].total, title = hot ? nameOf(w) + ' wins!' : w === 0 ? 'You win!' : nameOf(1) + ' wins.';
     ban.className = 'rvban on ' + (w === 0 || hot ? 'won' : 'lost'); ban.innerHTML = '<div class="rvt1">' + title + '</div><div class="rvt2">' + nameOf(0) + ' ' + A + ' – ' + B + ' ' + nameOf(1) + '</div>' + (A === B ? '<div class="rvt3">' + tieText(w) + '</div>' : '');
-    var QS = ((window.CAMPAIGN || {}).story || {}).quick; if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
+    var QS = ((window.CAMPAIGN || {}).story || {}).quick, WK = (((window.CAMPAIGN || {}).story || {}).final || {}).walk; if (!UI.coach && WK) { var a0 = sc[0], b0 = sc[1]; ban.appendChild(h('div.rvt3.walk', WK.replace('{b}', a0.btn).replace('{x}', a0.bonus ? 7 : 0).replace('{e}', a0.empty).replace('{t}', a0.total).replace('{ob}', b0.btn).replace('{ox}', b0.bonus ? 7 : 0).replace('{oe}', b0.empty).replace('{ot}', b0.total).replace('Marden', nameOf(1)))); } if (UI.coach) coachFinal(ban, w, A, B); else if (!UI.camp && !hot && QS) ban.appendChild(h('div.rvt3.wren', (A === B ? QS.tie : w === 0 ? QS.win : QS.lose).replace('{name}', nameOf(1))));
     $$('.rvcol', c).forEach(function (e) { e.classList.add('done'); }); acts.textContent = ''; sfx('fanfare');
     if (w === 0 || hot) { for (var k = 0; k < 18; k++) c.appendChild(h('i.cf', { style: 'left:' + (Math.random() * 100) + '%;background:' + PAL[k % PAL.length] + ';animation-delay:' + (Math.random() * .6) + 's' })); } else sfx('thud');
     if (o.after) { var cb = h('button.btn.go.grow', { type: 'button' }, 'Continue'); cb.onclick = function () { o.after(); }; acts.appendChild(cb); cb.focus(); }

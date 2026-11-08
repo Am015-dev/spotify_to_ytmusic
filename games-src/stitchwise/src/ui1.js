@@ -20,7 +20,7 @@ var SFX = { pick: function () { tone(520, .08, 'triangle'); }, tick: function ()
 SFX.fanfare = function () { [523, 659, 784, 1047].forEach(function (f, i) { tone(f, .22, 'triangle', .14, i * .12); }); tone(1047, .6, 'sine', .1, .5); tone(1568, .5, 'triangle', .06, .55); };
 SFX.thud = function () { tone(110, .16, 'sine', .2); };
 function sfx(n, a) { try { SFX[n](a); } catch (e) { } }
-function toast(t, ms) { var e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
+function toast(t, ms) { var e = $('#toast'); if (!e) return; if (G && UI.started && !G.over && !hintsOn() && !$('#start:not([hidden])')) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 function amt(ms) { return GX.animMs ? GX.animMs(ms) : ms; }
 function later(ms, f) { var q = UI.seq; return setTimeout(function () { if (q === UI.seq) f(); }, ms); }
 // ---------- who is who
@@ -95,8 +95,8 @@ function render() {
   var q = quiltEl(vs, 'me'); UI.newCells = {}; if (UI.mode !== 'hot' && vs !== 0) q.appendChild(h('div.qlabel', nameOf(vs) + '\u2019s quilt'));
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
-  if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(q); }
-  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
+  if (UI.wide) { qc.appendChild(q); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(q); }
+  var tr = renderTrack(); sd.appendChild(tr); if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
@@ -109,6 +109,9 @@ function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.
 function facts(p) { return '<span class="bt" title="Cost in buttons">' + btnIc() + p.cost + '</span><span class="bt" title="Time it takes">' + timeIc() + p.time + '</span><span class="bt" title="Buttons earned at each button spot">' + btnIc() + '×' + p.inc + '</span>'; }
 function offerFacts(p) { return '<span class="of oc"><b>' + p.cost + '</b><small>cost</small></span><span class="of ot"><b>' + p.time + '</b><small>time</small></span><span class="of oi"><b>+' + p.inc + '</b><small>earn</small></span>'; }
 // W381c: see how you score. Value of a patch for a seat = 2 per square covered (each empty square costs 2) - its button cost + its buttons x gold spots still ahead.
+// W381 Addendum 7: Play is clean by default; Hints (top-bar toggle, off by default) or the Learn-to-play game show previews, badges and ratings.
+UI.hints = (function () { try { return localStorage.getItem('sw_hints') === '1'; } catch (e) { return false; } })();
+function hintsOn() { return !!(UI.hints || UI.coach); }
 function spotsAhead(pos) { return SW.BTN_SPOTS.filter(function (b) { return b > pos; }).length; }
 function patchValue(seat, pid) { var p = PATCHES[pid], np = Math.min(SW.TRACK, G.pos[seat] + p.time), sp = spotsAhead(np); return { sq: p.n, pts: p.n * 2, cost: p.cost, inc: p.inc, spots: sp, incv: p.inc * sp, net: p.n * 2 - p.cost + p.inc * sp }; }
 function advValue(seat) { return swAdvSteps(G, seat); }
@@ -136,7 +139,7 @@ function renderDock() {
   box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
-    var can = hum && !G.pend && aff && fits, val = hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
+    var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
     var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
     if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundSize = 'cover'; b.style.borderColor = 'transparent'; }
     if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); b.appendChild(patchShape(pid, '', p.n > 6 ? 10 : 12)); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
@@ -150,8 +153,8 @@ function renderDock() {
   if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); return; }
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(), pv = patchValue(s, pid), gc = ok ? (curCells() || []).map(function (c) { return (UI.gy + c[1]) * 9 + UI.gx + c[0]; }) : [];
-    pr.textContent = (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net);
-    dt.innerHTML = '<b>' + sgn(pv.pts) + '</b> ' + pv.sq + ' squares \u00B7 <b>\u2212' + pv.cost + '</b> cost \u00B7 <b>+' + pv.incv + '</b> income (' + pv.inc + '\u00D7' + pv.spots + ' gold spots) \u00B7 time ' + p.time + ' \u00B7 7\u00D77 ' + best7(G.board[s], gc) + '/49'; if (!UI.wide && UI.camp) dt.innerHTML = '';
+    pr.textContent = hintsOn() ? (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net) : ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';
+    dt.innerHTML = '<b>' + sgn(pv.pts) + '</b> ' + pv.sq + ' squares \u00B7 <b>\u2212' + pv.cost + '</b> cost \u00B7 <b>+' + pv.incv + '</b> income (' + pv.inc + '\u00D7' + pv.spots + ' gold spots) \u00B7 time ' + p.time + ' \u00B7 7\u00D77 ' + best7(G.board[s], gc) + '/49'; if ((!UI.wide && UI.camp) || !hintsOn()) dt.innerHTML = '';
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'rot', 'aria-label': 'Rotate' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-3-6.2M20 4v5h-5"/></svg>' }), 'Rotate'));
     ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'flip', 'aria-label': 'Flip' }, h('span', { html: '<svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L3 12l5 5zM16 7l5 5-5 5z"/></svg>' }), 'Flip'));
     ac.appendChild(h('button.btn.go.grow', { type: 'button', 'data-a': 'sew', disabled: ok ? null : 'disabled' }, 'Sew it on'));
@@ -161,6 +164,27 @@ function renderDock() {
     pr.textContent = UI.again ? UI.again : nCan ? 'Tap a glowing patch, or tap Advance' : 'No patch you can buy: tap Advance';
     var st = swAdvSteps(G, s), o = nameOf(1 - s);
     ac.appendChild(h('button.btn.adv.grow', { type: 'button', 'data-a': 'adv', title: 'Move your token just ahead of ' + o + ' and take ' + st + ' button' + (st === 1 ? '' : 's') }, 'Advance +' + st + ' button' + (st === 1 ? '' : 's')));
-    dt.textContent = UI.wide || !UI.camp ? UI.rate || trackInfo() : '';
+    dt.textContent = hintsOn() && (UI.wide || !UI.camp) ? UI.rate || trackInfo() : '';
+    if (UI.hints && !UI.coach) ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'whatdo' }, 'What should I do?'));
   }
 }
+
+// score drawer: every number's why, on tap only
+function showScoreDrawer() {
+  if (!G) return; var w = h('div.scored');
+  [0, 1].forEach(function (s) { var c = swScore(G, s); w.appendChild(h('div.sdp', h('b', nameOf(s) + ': ' + sgn(c.total)),
+    h('div', c.btn + ' buttons = ' + c.btn + ' points (buttons are money and score)'),
+    h('div', c.empty + ' gaps \u00D7 \u22122 = \u2212' + c.empty * 2 + ' (every empty square costs 2)'),
+    h('div', (c.bonus ? '+7 for the first full 7\u00D77 block' : '7\u00D77 bonus: not yet (+7 to the first to fill one; best block ' + best7(G.board[s]) + '/49)')),
+    h('div', 'Income +' + G.inc[s] + ': paid at each gold spot passed (' + spotsAhead(G.pos[s]) + ' still ahead)'))); });
+  var ob = h('button.btn.alt.sm', { type: 'button' }, 'See ' + nameOf(1) + '\u2019s quilt'); ob.onclick = function () { GX.close(); showOppQuilt(1); }; w.appendChild(ob);
+  GX.drawer('scored', 'Score', w); var dr = $('#scored .gx-drawer-body'); if (dr) { dr.innerHTML = ''; dr.appendChild(w); } GX.show('scored');
+}
+function setHints(on) { UI.hints = !!on; try { localStorage.setItem('sw_hints', on ? '1' : '0'); } catch (e) { } var b = $('#bulbbtn'); if (b) { b.classList.toggle('on', UI.hints); b.setAttribute('aria-pressed', UI.hints ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints ' + (UI.hints ? 'on' : 'off')); b.textContent = 'Hints ' + (UI.hints ? 'on' : 'off'); } if (G) render(); }
+function showGoal() { // one card before turn 1 in Play: the aim in one sentence, 3 ways to score
+  UI.goal = true; var ov = h('div#goalcard.ov', { role: 'dialog', 'aria-label': 'Goal' }), c = h('div.gcard');
+  c.appendChild(h('h2', 'Goal: the most points when both tokens reach the end'));
+  var ul = h('ul'); ['Every square you cover saves 2 points (gaps cost \u22122 each).', 'Buttons are points: earn them at gold spots and by Advancing.', 'First to fill a 7\u00D77 block gets +7.'].forEach(function (t) { ul.appendChild(h('li', t)); }); c.appendChild(ul);
+  var b = h('button.btn.go.grow', { type: 'button', 'data-a': 'goalok' }, 'Start'); c.appendChild(b); ov.appendChild(c); document.body.appendChild(ov);
+}
+function closeGoal() { var g = $('#goalcard'); if (g) g.remove(); UI.goal = false; schedule(); }
