@@ -53,7 +53,7 @@ function tipTarget(tp) {
 }
 function placeTip() { const b = $('#tipb'); if (b) b.hidden = true; }   // no tip bubbles: the board and a ghost finger do the teaching
 // ---- press and hold a dish: read it (two short lines); drag it up onto the table: grab it
-const SHORT = { tempura: 'Pairs: two = 5', sashimi: 'Sets of three = 10', dumpling: 'More buns, more points', roll1: 'Roll race: 1 icon', roll2: 'Roll race: 2 icons', roll3: 'Roll race: 3 icons', salmon: 'Nigiri: 2 (×3 on paste)', squid: 'Nigiri: 3 (×3 on paste)', egg: 'Nigiri: 1 (×3 on paste)', wasabi: 'Next nigiri ×3', chop: 'Later: grab two dishes', pudding: 'End: most +6, fewest −6' };
+const SHORT = { tempura: 'Pairs: two = 5', sashimi: 'Sets of three = 10', dumpling: '1, 3, 6, 10, 15 for 1-5 buns', roll1: 'Roll race: 1 icon', roll2: 'Roll race: 2 icons', roll3: 'Roll race: 3 icons', salmon: 'Nigiri: 2 (×3 on paste)', squid: 'Nigiri: 3 (×3 on paste)', egg: 'Nigiri: 1 (×3 on paste)', wasabi: 'Next nigiri ×3', chop: 'Later: grab two dishes', pudding: 'End: most +6, fewest −6' };
 function peekShow(b) {
   const id = +b.dataset.id; if (isNaN(id)) return; const k = tkey(id);
   let p = $('#peek'); if (!p) { p = h('div#peek', { 'aria-hidden': 'true' }); document.body.appendChild(p); }

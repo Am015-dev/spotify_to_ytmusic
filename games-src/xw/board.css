@@ -205,7 +205,7 @@ html.ph .gx-gear{background:url(media/ui-iconbtn-k.webp) center/100% 100% no-rep
 /* in-play messages on the painted bubble: the Goal card and the result card on the large one */
 #bfban{background:transparent url(media/ui-bubble-c.webp) center/100% 100% no-repeat;border-color:transparent;padding:16px 26px 22px}
 #bfban:has(span):not(:has([data-keep])){background-image:url(media/ui-bubble.webp)}
-#bfban:has([data-keep]){background:rgba(8,6,24,.9);border-color:#ffc86b;padding:12px 20px}
+#bfban:has([data-keep]){background:rgba(8,6,24,.92) url(media/ui-panel.webp) center/100% 100% no-repeat;border-color:#ffc86b;padding:28px 30px 30px}
 /* ship card: portrait; on a phone a small card at the bottom, the board stays visible */
 .pp-por{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--gold,#ffc86b);flex:0 0 44px}
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{background:transparent!important;box-shadow:none!important;border-color:transparent!important}
@@ -214,3 +214,4 @@ html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{position:fixed;z-index:40;top:au
 
 #tutoffer .gxt-ex{background:url(media/ui-row.webp) center/100% 100% no-repeat;padding:12px 18px 12px 34px;color:#eef}
 #tutoffer .gxt-endc{background:#121030 url(media/ui-panel.webp) center/100% 100% no-repeat}
+.dlg.start p.lead{background:url(media/ui-row.webp) center/100% 100% no-repeat;padding:10px 16px 10px 34px;border-radius:8px}

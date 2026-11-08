@@ -78,7 +78,7 @@ function dayWhy(r){const hurt={},food=[];const cnt={};
 // run inside withState(state at the end of day r)
 function tomorrowInfo(r){const S=SCENARIOS[G.scen];const L=[];const n=r+1;const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   if(n>G.rounds)return {lines:[{t:'This was the last day.'}],top:{t:'—',why:''}};
-  const wx=S.wx[n]||[];L.push({t:wx.length?`Weather tomorrow night: ${wx.map(d=>dieN[d]).join(', ')} (your roof is ${G.camp.roof}).`:'Weather tomorrow night: calm, unless a card adds clouds.',c:wx.length>G.camp.roof?'bad':''});
+  const wx=wxTab()[n]||[];L.push({t:wx.length?`Weather tomorrow night: ${wx.map(d=>dieN[d]).join(', ')} (your roof is ${G.camp.roof}).`:'Weather tomorrow night: calm, unless a card adds clouds.',c:wx.length>G.camp.roof?'bad':''});
   const eaters=living().filter(c=>!c.out).length;const t=campTile();const pf=t?t.src.filter((s,i)=>s!=='wood'&&!G.map[G.camp.pos].exh[i]).length:0;const have=food();
   L.push({t:`Food: ${eaters} needed tomorrow night. You have ${have}${pf?`, and the camp gives about ${pf} in the morning`:''}.`,c:have+pf<eaters?'bad':''});
   if(G.ev.wait){const B2=BEAST[G.ev.wait];L.push({t:`At dawn a ${B2.n} attacks: strength ${B2.str} against your weapon ${G.weapon}.`,c:B2.str>G.weapon?'bad':''})}

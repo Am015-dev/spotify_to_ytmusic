@@ -86,7 +86,7 @@ function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getEle
 // GA shares the synth's AudioContext (created on the first gesture only), so nothing plays before the player touches the page.
 if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'swi',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.on&&SND.music)}
 // what the island looks like right now: the same weather the 3D scene shows (forecast while planning, the real clouds in the weather phase)
-function moodNow(){if(typeof G==='undefined'||!G)return null;try{const S=SCENARIOS[G.scen];const dice=(S&&S.wx[G.round])||[];
+function moodNow(){if(typeof G==='undefined'||!G)return null;try{const S=SCENARIOS[G.scen];const dice=(S&&wxTab()[G.round])||[];
   const w=G.phase==='weather'&&G.wxNow?G.wxNow:{rain:(dice.includes('rain')?1.2:0)+G.wx.rain,snow:(dice.includes('snow')?1.2:0)+G.wx.snow,storm:G.wx.storm};
   const rain=Math.min(1,(w.rain||0)/2),snow=Math.min(1,(w.snow||0)/2),storm=Math.min(1,(w.rain||0)*.25+(w.snow||0)*.25+(w.storm?.5:0));
   const night=G.phase==='night'||!!(G.over&&!G.over.win);
