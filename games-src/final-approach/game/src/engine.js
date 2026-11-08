@@ -68,8 +68,9 @@ const scen = id => D.scenarios.find(s => s.id === id) || (D.tutorials || []).fin
 const track = G => D.tracks[G.tk];
 const altRow = G => D.alt[G.alt][G.round + G.row0];
 const isFinal = G => G.round >= D.rounds - 1 - G.row0;
-// the landing speed must be strictly BELOW the brake marker (equal is too fast), and a brake must be set
-const slowOk = (G, s) => brakeVal(G) >= 2 && s < brakeVal(G);
+// the red brake marker sits just past the last brake number (after the 4 it stands between 4 and 5), and the speed must be below the marker:
+// so a speed EQUAL to the last brake value lands; with no brake set the marker is left of the 2 and nothing can stop the plane
+const slowOk = (G, s) => brakeVal(G) >= 2 && s <= brakeVal(G);
 const brakeVal = G => G.autoBrake ? G.autoBrake : G.mods.ice ? [0].concat(D.iceBrakes)[G.pl.ice] : (G.pl.sw.br[2] ? 6 : G.pl.sw.br[1] ? 4 : G.pl.sw.br[0] ? 2 : 0);
 const windMod = G => G.mods.wind ? D.windMod[G.pl.wind] : 0;
 const planesOnTrack = G => { let n = 0; for (const x of G.planes) n += x; return n; };
@@ -181,7 +182,7 @@ function endRound(G) {
   ev(G, { t: 'endround' });
   if (isFinal(G)) {
     const c = landingChecks(G), ok = Object.values(c).every(Boolean);
-    const br = brakeVal(G), why = ok ? 'landed' : !c.speed ? 'speed' : 'checks', msg = ok ? 'Landed! The passengers applaud.' : !c.speed ? (br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + G.landSpeed + ' is not below the brakes (' + br + ').') : 'The landing failed.';
+    const br = brakeVal(G), why = ok ? 'landed' : !c.speed ? 'speed' : 'checks', msg = ok ? 'Landed! The passengers applaud.' : !c.speed ? (br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + G.landSpeed + ' is above the brakes (' + br + ').') : 'The landing failed.';
     G.result = { win: ok, why, msg, checks: c }; G.phase = 'over';
     ev(G, { t: ok ? 'win' : 'lose', why: G.result.why, msg: G.result.msg, checks: c }); lg(G, ok ? 'LANDED.' : 'LOST: the landing failed (' + Object.keys(c).filter(k => !c[k]).join(', ') + ').'); use(G, ok ? 'win' : why === 'speed' ? 'lose_speed' : 'lose_checks');
     return;
@@ -466,7 +467,7 @@ function checklist(G) {
   const size = track(G).sp.length, br = brakeVal(G), fin = isFinal(G), out = [], eng = G.keys.includes('en0');
   out.push({ k: 'axis', ok: G.pl.axis === 0, n: G.pl.axis });
   if (eng) out.push({ k: 'air', ok: G.pl.pos >= size, n: size - G.pl.pos });
-  if (eng) out.push({ k: 'speed', ok: br >= 2 && !(fin && G.landSpeed >= 0 && G.landSpeed >= br), n: br });
+  if (eng) out.push({ k: 'speed', ok: br >= 2 && !(fin && G.landSpeed >= 0 && G.landSpeed > br), n: br });
   out.push({ k: 'planes', ok: planesOnTrack(G) === 0, n: planesOnTrack(G) });
   out.push({ k: 'gear', ok: G.pl.sw.lg.every(x => x), n: G.pl.sw.lg.reduce((a, x) => a + x, 0) });
   out.push({ k: 'flaps', ok: G.pl.sw.fl.every(x => x), n: G.pl.sw.fl.reduce((a, x) => a + x, 0) });
