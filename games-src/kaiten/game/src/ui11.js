@@ -143,8 +143,8 @@ function coachSay(id, n) {
 }
 function rivalName() { return G ? pname(1) : 'Odile'; }
 function coachPump() {
-  if (COACH.cur || !COACH.q.length || goalOpen()) return;
-  if (document.querySelector('.gx-drawer.on') || UI.rsOpen) { clearTimeout(COACH.wt); COACH.wt = setTimeout(coachPump, 600); return; }   // wait: a drawer would hide the bubble at once
+  if (COACH.cur || !COACH.q.length || goalOpen() || !G || G.phase === 'over') return;
+  if (document.querySelector('.gx-drawer.on') || UI.rsOpen || UI.busy || (G.phase === 'pick' && !canPick())) { clearTimeout(COACH.wt); COACH.wt = setTimeout(coachPump, 600); return; }   // wait: a drawer or the reveal would hide the bubble at once; speak when it is your move
   const m = COACH.q.shift(); COACH.cur = m;
   let g = $('#kkguide'); if (!g) { g = h('div#kkguide', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(g); }
   const who = m.w === 'o' ? { name: pname(1), color: '#e0a31c', portrait: 'camp-odile.webp' } : null;

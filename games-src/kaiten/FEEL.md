@@ -29,3 +29,11 @@ Brief: games-src/BRIEF-GAMEFEEL.md. Rules engine untouched (logic-test.js 81/81)
 
 Weak spots (still >= 7): on PC the right dock is mostly empty. The result card's art covers your own seat
 for a moment at 390x844. The round-end "+N roll race" pops briefly cross the plates.
+
+## Feel gate (feel-audit.js --secs 120): (a)-(e) all 0
+- Learn to play is a coached real game, not tutor steps: ui11 makes GXT.running()/state() report it, so the audit finds it
+  (finished by touch, 0 skips).
+- (c) every line is 12 words or fewer: coach lines, dish tips, chef bios. The PC round label no longer repeats the goal (the Goal card says it).
+- (d) phone text is at least 14px (skin.css floor, card labels included).
+- (a) coach bubbles wait while a drawer, the score sheet or the reveal is up, and only speak when it is your move.
+  A dismissed bubble disappears at once.
