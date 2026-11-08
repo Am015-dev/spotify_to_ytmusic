@@ -46,3 +46,14 @@ the dock is now compact (track hint hidden in Story on phone, 1-line prompts), s
   `"stitchwise": ("Stitchwise", "stitchwise", "stitchwise"),` to modmap.GAMES.
 - Two 404s on load are the missing temp art (portraits etc., listed in HANDOFF.md); the tests ignore "Failed to load resource".
 - Track on phone is still 3 rows of small squares; it reads via the gold "next spot" ring and the hint line, but real track art would help.
+
+## Addendum 5: see how you score (W381c, branch shelf/W381c-stitchwise)
+- **Turn tracker** (panel heading, always on): "Turn: you · behind by 1 · 46 left" (whose turn, why: the token further back moves, spaces left); the turn banner says why it changed ("Marden is behind now").
+- **Value preview** when a patch is picked or dragged: the line reads "Sew it on: worth +18" and the detail shows +squares×2, −cost, +income (buttons × gold spots still ahead), time and 7×7 progress (n/49) with the ghost counted. Value = 2 per square − cost + buttons × gold spots ahead.
+- **Best-value badge** ("Best +21") on the strongest of the 3 patches you can buy.
+- **Score always visible:** each player pill shows the total, ★ for the leader, buttons, income and gaps (empty squares, −2 each); on PC a score bar adds "(buttons − gaps×2)" per player.
+- **Points pop** after sewing: "+12 pts: 6 squares covered, −3 buttons"; income and advance pops keep their reasons.
+- **Rating after each of your turns:** "Last turn: good / okay / poor (+N). Best was <patch> (+M)", compared with the best value on offer (Advance included).
+- The coached first game uses the same preview, badge and rating.
+- Shots: playable-shots/score-preview-phone.webp, score-rating-phone.webp, score-preview-pc.webp, score-coach-phone.webp.
+- Story on phone keeps the detail line hidden (the goal line needs the room); there the prompt still shows "worth +N".

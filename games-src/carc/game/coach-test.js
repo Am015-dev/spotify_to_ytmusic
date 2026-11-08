@@ -41,6 +41,7 @@ async function coachGame(b, W, H, tag) {
     const go = await p.$('[data-a=cgo]'); if (go) { await tapUI(p, go, 'coach end button'); await sleep(500); continue; }
     const nx = await p.$('[data-a=cnext]'); if (nx) { await tapUI(p, nx, 'coach next'); await sleep(250); continue; }
     let acted = false;
+    const hp = await p.$('#hplace'); if (hp && await hp.isVisible() && await tapUI(p, hp, 'Place here')) { idle = 0; await sleep(230); continue; } // touch: confirm the tapped spot
     for (const g of (await p.$$('.glow')).sort(() => Math.random() - .5)) { if (await tapUI(p, g, 'glow')) { acted = true; moves++; break; } }
     if (acted) { idle = 0; await sleep(230); continue; }
     const fg = await p.$$('.fglow');
