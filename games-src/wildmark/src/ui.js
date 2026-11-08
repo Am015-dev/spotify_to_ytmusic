@@ -43,7 +43,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
   }
   out += '<polygon points="' + poly(x, y, s, [0, 1, 2, 3, 4, 5]) + '" fill="none" stroke="' + (tile.key ? '#f2d27a' : 'rgba(20,30,20,.55)') + '" stroke-width="' + (tile.key ? s * 0.09 : s * 0.04) + '"/>';
   var zr = opt.map && UI.pan && UI.pan.z || 0;   // map only: keep portraits readable at phone zoom (36 px placed, 24 px slots), inside the hex
-  if (opt.tok) out += tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.66, Math.max(s * 0.46, 19 / zr)) : s * 0.46);
+  if (opt.tok) out += (opt.hop ? '<g class="hop">' : '') + tokenSvg(opt.tok, x, y, zr ? Math.min(s * 0.66, Math.max(s * 0.46, 19 / zr)) : s * 0.46) + (opt.hop ? '</g>' : '');
   else if (!opt.noSlots) {   // the animals this tile accepts: small discs
     var n = tile.a.length, rr = s * (n === 1 ? 0.3 : 0.22), off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.27, 0], [0.27, 0]] : [[-0.27, 0.16], [0.27, 0.16], [0, -0.3]];
     if (opt.big) { rr = s * (n === 1 ? 0.44 : n === 2 ? 0.33 : 0.29); off = n === 1 ? [[0, 0]] : n === 2 ? [[-0.37, 0], [0.37, 0]] : [[-0.34, 0.22], [0.34, 0.22], [0, -0.38]]; }   // market/preview: readable animal icons
@@ -83,6 +83,13 @@ function step() {
   UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(); }
   var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && !UI.tut && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
   render(); if (typeof tutFix === 'function') tutFix();
+  autoTok();
+}
+function autoTok() {   // one legal target for the animal, and it costs nothing: place it for the player (tap targets stay live until it lands)
+  clearTimeout(UI.autoT); if (UI.fast || UI.tut || UI.mode === 'tutorial' || UI.mode === 'coach' || !myTurn() || G.stage !== 'tok') return;
+  var env = G.seats[G.cur].env, sp = WM.tokSpots(env, G.hold.tok); if (sp.length !== 1 || pvTok(env, sp[0], G.hold.tok).d < 0) return;
+  var key = G.cur + ':' + G.seats[G.cur].done; $('#line').innerHTML = '<b class="stepn" aria-label="Step 3 of 3">3<small>/3</small></b><span class="stept">Only one spot: the ' + esc(WM.ANI_NAME[G.hold.tok]) + ' goes here</span>';
+  UI.autoT = setTimeout(function () { if (G && myTurn() && G.stage === 'tok' && G.cur + ':' + G.seats[G.cur].done === key) act({ t: 'tok', c: sp[0] }); }, 650);
 }
 // turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
 function banner(t) { var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
@@ -107,13 +114,14 @@ function aiStep() {
     var h = G.hold, mp = WM.AI.choose(G);
     if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); rivalNote(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.')); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
     WM.apply(G, mp); UI.view = seat; UI.showAI = { seat: seat, text: nm + ' places the tile in their valley' }; fitView(); render(); sfx('place');
-    setTimeout(function () { if (G && UI.view === seat) pop(mp.c, nm + "'s new tile", 'hab'); }, 60);
+    UI.anim = ANIM && !UI.fast ? { c: mp.c, k: 'drop', until: Date.now() + 700 } : null; drawMap();
     UI.aiT = setTimeout(function () {
       if (!G) return;
       var env = G.seats[seat].env, s0 = WM.score(env, 0), m2 = WM.AI.choose(G); WM.apply(G, m2);
       var s1 = WM.score(env, 0), best = null; WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       UI.showAI = { seat: seat, text: m2.t === 'tok' ? nm + ' puts the ' + WM.ANI_NAME[h.tok] + ' on a tile' + (G.last && G.last.acorn ? ' (+1 acorn)' : '') : nm + ' returns the ' + WM.ANI_NAME[h.tok] };
-      render(); if (m2.t === 'tok') { pop(m2.c, best && best.d > 0 ? '+' + best.d + ' ' + cinfo(best.a).title : WM.ANI_NAME[h.tok], 'ani'); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
+      if (m2.t === 'tok' && ANIM && !UI.fast) UI.anim = { c: m2.c, k: 'hop', until: Date.now() + 700 };
+      render(); if (m2.t === 'tok') { if (best && best.d > 0) pop(m2.c, nm + ' +' + best.d + ' ' + cinfo(best.a).title, 'ani', ['.cc[data-card="' + best.a + '"]', '#seats .seat[data-seat="' + seat + '"]']); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
       UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, D(1000));
     }, D(900));
   }, D(slow ? 1100 : AIDELAY * 0.8));
@@ -125,33 +133,38 @@ function showPass() {
 function act(m) {
   var before = G.seats[G.cur], sc0 = pvScore(before.env, before.acorns), at = null;
   WM.apply(G, m);
-  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); var sp = pvScore(before.env, before.acorns), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvPop(hp), 'hab'); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
+  if (m.t === 'place') { UI.ghost = null; UI.hov = null; sfx('place'); if (ANIM && !UI.fast) UI.anim = { c: m.c, k: 'drop', until: Date.now() + 700 }; var sp = pvScore(before.env, before.acorns), hp = pvParts(sc0, sp); if (pvSum(hp) > 0) { pop(m.c, pvPop(hp), 'hab', ['#terr', '#seats .seat[data-seat="' + G.cur + '"]']); UI.lit = { cells: pvLit(before.env, hp), until: Date.now() + 1600 }; setTimeout(function () { UI.lit = null; drawMap(); }, 1700); } }
   if (m.t === 'tok' || m.t === 'back') {
     UI.undo = null; at = m.c;
     if (UI.mode === 'quick' && !before.ai && (UI.prefs.coachN || 0) < 3) { UI.prefs.coachN = (UI.prefs.coachN || 0) + 1; savePrefs(); }
     if (m.t === 'tok') {
+      if (ANIM && !UI.fast) UI.anim = { c: m.c, k: 'hop', until: Date.now() + 700 };
       var sc1 = pvScore(before.env, before.acorns), best = null, tp = pvParts(sc0, sc1);
       WM.ANI.forEach(function (a) { var d = sc1.ani[a] - sc0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
       var tot = sc1.aniT - sc0.aniT;
       var ta = G.last && G.last.acorn ? ' +1 acorn (keystone).' : '', tk = before.env[m.c] && before.env[m.c].tok;
-      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvPop(tp), 'ani'); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
-      else if (tot < 0) { pop(m.c, pvPop(tp), 'neg'); sfx('tok'); } else sfx('tok');
-      if (!before.ai && tk && tot === 0 && UI.mode !== 'coach') toast(tot > 0 ? WM.ANI_NAME[best.a] + ' +' + tot + ': ' + cinfo(best.a).rule + ta : tot < 0 ? WM.ANI_NAME[tk] + ' ' + tot + ': it broke a pattern.' + ta : WM.ANI_NAME[tk] + ' settled, no points yet. ' + cinfo(tk).rule + ta, 3400);
-      if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn'); sfx('acorn'); }, 350); }
+      if (tot > 0) { UI.lit = { cells: pvLit(before.env, tp), a: best.a, until: Date.now() + 1600 }; pop(m.c, pvPop(tp), 'ani', ['.cc[data-card="' + best.a + '"]', '#seats .seat[data-seat="' + G.cur + '"]']); sfx('score'); setTimeout(function () { UI.lit = null; drawMap(); }, 1700); }
+      else if (tot < 0) { pop(m.c, pvPop(tp), 'neg', [tk ? '.cc[data-card="' + tk + '"]' : '#cards', '#seats .seat[data-seat="' + G.cur + '"]']); sfx('tok'); } else sfx('tok');
+      // (no extra toast over the board: the one-line verdict says what the move scored)
+      if (G.last && G.last.acorn) { setTimeout(function () { pop(m.c, '+1 acorn', 'acorn', ['#acorn']); sfx('acorn'); }, 350); }
     } else sfx('tap');
     if (!before.ai) { pvTurnEnd(); if (!G.over && G.seats[G.cur].ai && UI.humans === 1 && !UI.fast && !UI.tut) { UI.banKey = G.cur + ':' + G.seats[G.cur].done; banner('Your turn is done: ' + G.seats[G.cur].name + "'s turn"); } }   // the turn-over beat, right as you finish
     save();
   }
   render(); step();
 }
-function pop(c, text, cls) {   // floating points at a map cell (DOM, readable size)
-  var b = $('#board').getBoundingClientRect(), p = pix(c), z = UI.pan, x = p[0] * z.z + z.tx, y = p[1] * z.z + z.ty;
-  var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.style.left = Math.max(60, Math.min(b.width - 60, x)) + 'px'; e.style.top = Math.max(30, y - 20) + 'px';
-  // never stack unreadably: at most 2 live pops, a new one sits in its own row under the last one
-  var live = [].slice.call($('#board').querySelectorAll('.pop')); while (live.length > 1) live.shift().remove();
-  if (live.length) e.style.top = (parseFloat(live[0].style.top) + 40) + 'px';
-  $('#board').appendChild(e); var hw = e.offsetWidth / 2 + 6; e.style.left = Math.max(hw, Math.min(b.width - hw, x)) + 'px';   // never half off the board
-  setTimeout(function () { e.remove(); }, 1300);
+function popAt(list) {   // the first visible chip in the list (score chip, seat chip), else the turn/score pill in the top bar
+  popAt.e = null; popAt.r = null;
+  (list || []).concat(['#barstat']).some(function (q) { var e = document.querySelector(q); if (!e) return false; var r = e.getBoundingClientRect(); if (!r.width || !r.height || getComputedStyle(e).display === 'none') return false; popAt.e = e; popAt.r = r; return true; });
+  return popAt.r;
+}
+function pop(c, text, cls, anchors) {   // score pops sit ON the score chip they change (never over the tiles) and the chip bumps
+  var r = popAt(anchors), el = popAt.e, key = (anchors || []).join(); if (!r) return;
+  $$('.pop').forEach(function (o) { if (o.dataset.anc === key) o.parentNode.removeChild(o); });
+  var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.dataset.anc = key; e.style.top = Math.round(r.top + r.height / 2) + 'px';
+  document.body.appendChild(e); var hw = e.offsetWidth / 2 + 6, x = r.left + r.width / 2; e.style.left = Math.max(hw, Math.min(innerWidth - hw, x)) + 'px';
+  if (el) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); setTimeout(function () { el.classList.remove('bump'); }, 700); }
+  setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
 }
 function tutOK(x) { return typeof tutAct === 'function' ? tutAct(x) : true; }
 function myTurn() { return G && !G.over && !G.seats[G.cur].ai && UI.view === G.cur && $('#pass').hidden; }
@@ -235,11 +248,12 @@ function drawMap() {
   var lit = UI.lit && UI.lit.until > Date.now() ? UI.lit.cells : [];
   if (UI.whyA) { var wi = {}; WM.scoreAnimal(env, UI.whyA, wi, G.cards && G.cards[UI.whyA]); lit = lit.concat(wi.lit || []); }   // the card's scoring groups stay lit while its why is open
   var hon = hintsOn(), pv = mine && hon ? pvNow() : null, pvl = pv ? pv.lit : [], brk = pv && pv.broke || [], bad = '';
+  var an1 = UI.anim && UI.anim.until > Date.now() ? UI.anim : null;
   var keys = Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; });
   keys.forEach(function (c) {
     var x = env[c], p = pix(c), tgt = mine && G.stage === 'tok' && !x.tok && x.a.indexOf(G.hold.tok) >= 0, isLast = G.last && G.last.seat === UI.view && (G.last.tile === c);
     if (tgt && hon) { var tv = pvTok(env, c, G.hold.tok).d; bad += pvBadge(p[0] + SZ * 0.5, p[1] - SZ * 0.55, tv, c); }
-    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1 }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
+    out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + (an1 && an1.c === c && an1.k === 'drop' ? ' drop' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1, hop: an1 && an1.c === c && an1.k === 'hop' }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
     WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; if (hon) bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
@@ -319,9 +333,9 @@ function lineText() {
   if (UI.view !== G.cur && !s.ai) return '';
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
-  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: pick a tile + animal pair from the market';
-  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then tap Place' : 'Step 2 of 3: tap Place to put the tile here') : 'Step 2 of 3: tap a glowing spot to place the tile';
-  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: put the ' + WM.ANI_NAME[G.hold.tok] + ' on a glowing tile, or Return it' : 'Step 3 of 3: no tile shows a ' + WM.ANI_NAME[G.hold.tok] + ', so tap Return';
+  if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: drag or tap a tile + animal pair';
+  if (G.stage === 'tile') return UI.ghost ? (G.hold && G.hold.tile && G.hold.tile.t.length > 1 ? 'Step 2 of 3: turn it if you like, then Place' : 'Step 2 of 3: tap Place to put it here') : 'Step 2 of 3: tap a glowing spot for the tile';
+  if (G.stage === 'tok') return WM.tokSpots(s.env, G.hold.tok).length ? 'Step 3 of 3: tap a glowing tile for the ' + WM.ANI_NAME[G.hold.tok] : 'Step 3 of 3: no tile takes a ' + WM.ANI_NAME[G.hold.tok] + ': tap Return';
   return '';
 }
 // first-game coach: one extra plain line per step for the player's first 3 Quick-game turns, then it switches itself off
@@ -397,11 +411,49 @@ function showBig(kind, obj, tok) {
   else { var C = cinfo(obj); body.innerHTML = '<div class="bigpic">' + mkTok(obj) + '</div><h3>' + esc(WM.ANI_NAME[obj]) + ' token</h3><p>Scores by <b>' + esc(C.title) + '</b>: ' + esc(C.rule) + '</p>' + patSvg(obj) + '<p class="pts">' + (C.pts ? C.pts.slice(1).map(function (p, i) { return (i + 1) + (i + 2 === C.pts.length ? '+' : '') + ': ' + p; }).join(' &middot; ') : obj === 'fox' && cset(obj) === 'a' ? '0 to 5 per fox' : 'Card ' + cset(obj).toUpperCase()) + '</p>'; }
   GX.drawer('bigd', kind === 'tile' ? 'Habitat tile' : 'Animal token', body, false); GX.show('bigd');
 }
+(function wireDrag() {   // drag a market column onto the valley: it lifts, snaps to the nearest glowing spot, and drops there (tap still works)
+  var d = null, eatUntil = 0, LIFT = 30;
+  function spotAt(x, y) {
+    if (!G || G.stage !== 'tile') return null;
+    var r = $('#board').getBoundingClientRect(); if (y > r.bottom + 10) return null;
+    var bx = x - r.left, by = y - r.top, z = UI.pan, best = null, bd = 1e9;
+    WM.spots(G.seats[G.cur].env).forEach(function (c) { var p = pix(c), dx = p[0] * z.z + z.tx - bx, dy = p[1] * z.z + z.ty - by, dd = Math.sqrt(dx * dx + dy * dy); if (dd < bd) { bd = dd; best = c; } });
+    return bd < SZ * z.z * 1.35 ? best : null;
+  }
+  document.addEventListener('pointerdown', function (e) {
+    var b = e.target.closest && e.target.closest('#mk .pair.live .mt, #mk .pair.live .mk');
+    if (!b || !myTurn() || G.stage !== 'pick' || UI.wipe || UI.free || !G.market.tiles[+b.dataset.i]) return;
+    d = UI.drag = { i: +b.dataset.i, kind: b.classList.contains('mt') ? 't' : 'k', x: e.clientX, y: e.clientY, on: false, id: e.pointerId };
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!d || e.pointerId !== d.id) return;
+    if (!d.on) {
+      if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) < 14) return;
+      d.on = true; eatUntil = Date.now() + 1e6; onMarket(d.kind, d.i);
+      if (!G || G.stage !== 'tile' || !G.hold) { d = UI.drag = null; eatUntil = Date.now() + 400; return; }
+      var f = document.createElement('div'); f.id = 'dragt'; f.innerHTML = mkTile(G.hold.tile, 30); document.body.appendChild(f); d.f = f;
+    }
+    if (e.cancelable) e.preventDefault();
+    var c = spotAt(e.clientX, e.clientY - LIFT), z = UI.pan;
+    if (c) { var r = $('#board').getBoundingClientRect(), p = pix(c); d.f.style.left = (r.left + p[0] * z.z + z.tx) + 'px'; d.f.style.top = (r.top + p[1] * z.z + z.ty) + 'px'; }
+    else { d.f.style.left = e.clientX + 'px'; d.f.style.top = (e.clientY - LIFT) + 'px'; }
+    d.f.classList.toggle('snap', !!c);
+    if (c !== UI.hov) { UI.hov = c; if (c) sfx('tap'); drawMap(); }
+  }, { passive: false });
+  function end(e) {
+    if (!d || e.pointerId !== d.id) return; var D = d; d = UI.drag = null; if (!D.on) return;
+    eatUntil = Date.now() + 250; var c = e.type === 'pointerup' ? spotAt(e.clientX, e.clientY - LIFT) : null; if (D.f && D.f.parentNode) D.f.parentNode.removeChild(D.f); UI.hov = null;
+    if (c && G && G.stage === 'tile') onCell(c, true); else if (G) render();
+  }
+  document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
+  document.addEventListener('click', function (e) { if (Date.now() < eatUntil) { eatUntil = 0; e.stopImmediatePropagation(); e.preventDefault(); } }, true);   // only the one click the drag gesture itself makes
+})();
 (function wireHold() {
   var t = null, held = false;
   document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#mk .mt, #mk .mk'); if (!b || !G) return; held = false; clearTimeout(t);
     t = setTimeout(function () { var i = +b.dataset.i; held = true; if (b.classList.contains('mt')) { if (G.market.tiles[i]) showBig('tile', G.market.tiles[i]); } else if (G.market.toks[i]) showBig('tok', G.market.toks[i]); }, 520); });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { document.addEventListener(ev, function () { clearTimeout(t); }, true); });
+  document.addEventListener('pointermove', function () { if (UI.drag && UI.drag.on) clearTimeout(t); }, true);
   document.addEventListener('click', function (e) { if (held && e.target.closest && e.target.closest('#mk')) { held = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('#mk')) e.preventDefault(); });
 })();
