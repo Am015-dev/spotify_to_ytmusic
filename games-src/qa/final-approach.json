@@ -2,7 +2,7 @@
  "slug": "final-approach",
  "size": "phone",
  "seed": 48774,
- "when": "2026-11-08T03:35Z",
+ "when": "2026-11-08T04:00Z",
  "tutorial": {
   "end": false,
   "coached": true,
@@ -14,14 +14,14 @@
    "turns",
    "engines",
    "axis",
-   "coffee",
    "radio",
+   "coffee",
    "rounds",
    "gear",
    "reroll"
   ],
-  "bubblesClosed": 69,
-  "clicks": 1428
+  "bubblesClosed": 19,
+  "clicks": 1426
  },
  "quick": {
   "result": "cap",
@@ -113,6 +113,41 @@
   {
    "sev": "MINOR",
    "phase": "tutorial",
+   "where": "load",
+   "desc": "HTTP 404: /final-approach/media/story-map.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "load",
+   "desc": "console.error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "load",
+   "desc": "HTTP 404: /final-approach/media/ui-star-on.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "load",
+   "desc": "HTTP 404: /final-approach/media/ui-star-off.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "load",
+   "desc": "HTTP 404: /final-approach/media/ui-act-banner-c.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Flight briefing\" under div.ttl-in \"Final Approach Two seats\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
@@ -196,7 +231,7 @@
    "where": "tutorial-board",
    "desc": "tap target 28px (<40) span.ck.ok x1: \"Level\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -204,7 +239,7 @@
    "where": "tutorial-board",
    "desc": "tap target 28px (<40) span.ck.no x4: \"3 to go\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -212,15 +247,15 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: div.w.altw.altc \"R1/4 · 3000 ft Your turn\" / button.gx-x \"×\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
    "phase": "tutorial",
    "where": "tutorial-board",
-   "desc": "overlapping clickables: button.slot.p.need \"Speed\" / div.goalb \"3 spaces to the airport,\"",
+   "desc": "overlapping clickables: button.slot.p.nov \"Speed\" / div.goalb \"3 spaces to the airport,\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -228,7 +263,7 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: button.slot.c.full \"2\" / div.goalb \"3 spaces to the airport,\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -236,7 +271,7 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: button.slot.c.nov \"Radio\" / div.goalb \"3 spaces to the airport,\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -244,7 +279,7 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: button.slot.p.hasv \"Gear 1-2\" / div.goalb \"3 spaces to the airport,\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
-   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
   },
   {
    "sev": "MINOR",
@@ -252,13 +287,42 @@
    "where": "tutorial-board",
    "desc": "overlapping clickables: button.slot.p.hasv \"Gear 3-4\" / div.goalb \"3 spaces to the airport,\"",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
+   "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-3.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 28px (<40) div.w.altw x1: \"R2/4 · 2000 ft\nYour turn\"",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
    "shot": "/tmp/qa-shots/final-approach/phone-screen-tutorial-board-5.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial click #77 (Play Learn to fly, then four bosses)",
+   "desc": "HTTP 404: /final-approach/media/story-map.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial click #77 (Play Learn to fly, then four bosses)",
+   "desc": "console.error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial click #77 (Play Learn to fly, then four bosses)",
+   "desc": "HTTP 404: /final-approach/media/ui-act-banner-c.webp",
+   "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial"
   },
   {
    "sev": "MAJOR",
    "phase": "tutorial",
-   "where": "tutorial click #1428 (6)",
-   "desc": "coached game: GXCOACH.done never became true within 720 s (1428 clicks, 11 rules explained)",
+   "where": "tutorial click #1426 (4)",
+   "desc": "coached game: GXCOACH.done never became true within 720 s (1426 clicks, 11 rules explained)",
    "repro": "node games-src/scripts/qa-bot.js final-approach --size phone --seed 48774 --phases tutorial",
    "shot": "/tmp/qa-shots/final-approach/phone-coach-notdone-6.png"
   }

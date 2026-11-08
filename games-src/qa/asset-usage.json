@@ -1,5 +1,5 @@
 {
- "when": "2026-11-08T02:39Z",
+ "when": "2026-11-08T04:03Z",
  "view": "390x844",
  "secs": 180,
  "min": 90,
@@ -788,19 +788,20 @@
    }
   },
   "final-approach": {
-   "shipped": 74,
-   "loaded": 35,
-   "pct": 47.3,
+   "shipped": 75,
+   "loaded": 34,
+   "pct": 45.3,
    "glbShipped": 2,
    "glbLoaded": 0,
    "anyGlb": false,
-   "playedSecs": 185,
+   "playedSecs": 186,
    "end": "cap",
-   "clicks": 387,
+   "clicks": 254,
    "fail": true,
    "neverLoaded": {
     "media/ui*": [
      "media/ui-altbar.webp",
+     "media/ui-bubble-tail.webp",
      "media/ui-bubble.webp",
      "media/ui-button-cream.webp",
      "media/ui-button-go.webp",
@@ -845,16 +846,19 @@
      "music/defeat-a.mp3",
      "music/defeat-b.mp3"
     ],
-    "music/main*": [
-     "music/main-a.mp3",
-     "music/main-b.mp3"
+    "music/tavern*": [
+     "music/tavern-short-a.mp3",
+     "music/tavern-short-b.mp3"
     ],
     "music/victory*": [
      "music/victory-a.mp3",
      "music/victory-b.mp3"
     ],
-    "music/tavern*": [
-     "music/tavern-b.mp3"
+    "models/gx*": [
+     "models/gx3d.js"
+    ],
+    "music/main*": [
+     "music/main-a.mp3"
     ]
    }
   },
