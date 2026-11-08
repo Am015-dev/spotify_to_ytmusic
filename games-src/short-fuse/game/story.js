@@ -42,8 +42,8 @@ const STORY={
 
 STORY.coach={
  // id:[speaker,title,text]. Just-in-time: shown the first time the rule matters, one at a time, never blocking.
- goal:['brix','Prologue',()=>'We win when all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires are cut. Do it before the fuse burns out. Quill rigged the shop door. Let\'s go.'],
- mine:['brix','Your wires','The bottom wires are yours, rookie. Lowest number is on the left.'],
+ goal:['brix','Prologue',()=>'We win when all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires are cut. A miss burns one of three fuse steps. A red wire ends it.'],
+ mine:['brix','Your wires','The bottom wires are yours, lowest on the left. Teal and Plum hold the rest.'],
  crew:['brix','Your crew','Teal and Plum hold the rest. You only see their backs.'],
  fuse:['brix','The fuse','You have three fuse steps. A miss burns one; red ends it.'],
  token:['brix','Show a wire','First, everyone shows one wire. Tap one of yours and a token tells the crew its number.'],
@@ -62,8 +62,8 @@ STORY.coach={
  yellow:['brix','Yellow wires','Quill loves yellow. A yellow only matches a yellow. You must hold one to say it.'],
  rmiss:['quill','Even they slip','Ha! Your crew burned a fuse step. Check the token it left.'],
  red:['quill','Never red','Never point at red. A hand of only reds shows itself.'],
- winTitle:'The rig is silent',winText:'Every wire cut. Quill\'s brass key falls off the door. You are on the crew. Here is how it counted:',
- loseTitle:'The rig went off',loseText:'Brix dusts you off: "Everybody breathes. Again." Here is how it counted:'};
+ winTitle:'The rig is silent',winText:'Every wire cut. Quill\'s brass key falls off the door. You are on the crew.',
+ loseTitle:'The rig went off',loseText:'Brix dusts you off: "Everybody breathes. Again."'};
 STORY.later={goal:'The goal: cut every wire together before the fuse runs out.',mine:'Your stand is face up to you, sorted low to high.',crew:'The crew\'s wires are hidden from you, and yours from them.',fuse:'A miss burns a fuse step. None left, or a red wire, and it explodes.',
  token:'Everyone starts by showing one wire with a token.',tokens2:'Tokens are clues the whole crew shares.',point:'A turn. Point at a crew wire, then name a number you hold.',hit:'A hit cuts both wires.',miss:'A miss burns the fuse. A token shows the true number.',
  solo:'Solo cut. If you hold every wire left of a number, cut them alone.',crew1:'The computer crew can solo cut too.',crew2:'The computer crew guesses from tokens and sort order.',check:'All four of a number cut? A green check goes up.',
