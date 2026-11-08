@@ -4,7 +4,7 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const li = a => a.map(t => h('li', t));
-  sec('Turn in one minute', h('ol', ...li([
+  sec('How a turn works', h('ol', ...li([
     'Draw chips from your bag one by one. Each lands that many spaces along the dotted path in your cauldron.',
     'The white chips must add up to 7 or less. Over 7 and the cauldron explodes.',
     'Stop whenever you like. Your last chip decides your space: the big number is coins, the small brown badge is victory points.',
@@ -124,7 +124,7 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
-      firstTime() ? tutNode('tbtn go') : null,
+      firstTime() ? tutNode('tbtn') : null,
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
       h('div.tsec',
@@ -228,7 +228,7 @@ document.addEventListener('click', ev => {
     case 'setme': setMe(+d.c); renderStart(); break;
     case 'gfx': setGfx && setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
-    case 'start': newGame(d.m, optObj()); break;
+    case 'start': if (d.m === 'vs' && firstTime() && typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME) && typeof tutStart === 'function') { tutStart(); break; } newGame(d.m, optObj()); break;   // a first-time player's Play is the coached first game
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;

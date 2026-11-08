@@ -2,84 +2,174 @@
  "slug": "cauldron-fair",
  "size": "phone",
  "seed": 75112,
- "when": "2026-11-07T21:34Z",
+ "when": "2026-11-07T23:23Z",
  "tutorial": {
   "end": true,
-  "endButtons": 2
+  "coached": true,
+  "explained": 11,
+  "explainedIds": [
+   "goal",
+   "fortune",
+   "draw",
+   "spiral",
+   "whites",
+   "rival2",
+   "report",
+   "shop",
+   "day2",
+   "lastday",
+   "d2count"
+  ],
+  "bubblesClosed": 0,
+  "clicks": 51
  },
  "quick": {
   "result": "cap",
-  "clicks": 630
+  "clicks": 553
  },
  "story": {
   "result": "cap",
-  "clicks": 412
+  "clicks": 425
  },
- "fuzz": {},
+ "fuzz": {
+  "taps": 293
+ },
  "bugs": [
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "title",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under div.ttl-in \"Cauldron Fair Brew bold.\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-title-1.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "text overflows its box (visible) in button.btn.alt x1: \"Take 3 rubies\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nPedlar's Pick\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): button#fortchip.purple \"NOW Pedlar's Pick\" under b \"Today's fortune card: Pe\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): div#fort.purple \"NOW\" under div.opts.g2 \"1 Take a Cinder Moth 2 T\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-2.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "tutorial",
+   "where": "tutorial-board",
+   "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under div#rs \"Wynne wins the fair with\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-tutorial-board-3.png"
+  },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under div.ttl-in \"Cauldron Fair Brew bold.\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-title-1.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-title-4.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nLucky Dip\"",
+   "desc": "text overflows its box (visible) in button.btn.alt x1: \"Take 3 rubies\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-2.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: Lucky Dip\"",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nPedlar's Pick\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-3.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nKind Alms\"",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-4.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "element outside viewport button.gx-ibtn x1 rect 352,-1,398,45: \"Menu\"",
+   "desc": "clickable covered by another element (not tappable): button#fortchip.purple \"NOW Pedlar's Pick\" under b \"Today's fortune card: Pe\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-5.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nFork in the Road\"",
+   "desc": "clickable covered by another element (not tappable): div#fort.purple \"NOW\" under div.opts.g2 \"1 Take a Cinder Moth 2 T\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-5.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-5.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
    "where": "quick-board",
-   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: Fork in the\"",
+   "desc": "tap target 34px (<40) button.blue x1: \"ALL DAY\nThick Skin\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-quick-board-5.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-6.png"
   },
   {
    "sev": "MINOR",
    "phase": "quick",
-   "where": "quick click #630 (g)",
-   "desc": "inconclusive: no result screen within the 220 s cap / 630 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "where": "quick-board",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nA Little Slide\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-quick-noresult-6.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-7.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick-board",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: A Little Sl\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-quick-board-8.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "quick",
+   "where": "quick click #553 (Wynne 18 1)",
+   "desc": "inconclusive: no result screen within the 220 s cap / 553 bot clicks (state kept changing: bot may be slow, or the end is unreachable by random play)",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases quick",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-quick-noresult-9.png"
   },
   {
    "sev": "MINOR",
@@ -87,7 +177,7 @@
    "where": "story-map",
    "desc": "text overflows its box (visible) in button.btn.alt x1: \"Take 3 rubies\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-map-10.png"
   },
   {
    "sev": "MINOR",
@@ -95,7 +185,7 @@
    "where": "story-map",
    "desc": "tap target 34px (<40) button.purple x1: \"NOW\nPedlar's Pick\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-map-10.png"
   },
   {
    "sev": "MINOR",
@@ -103,7 +193,31 @@
    "where": "story-map",
    "desc": "tap target 29px (<40) div.purple x1: \"NOW\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-map-7.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-map-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "clickable covered by another element (not tappable): button#fortchip.purple \"NOW Pedlar's Pick\" under b \"Today's fortune card: Pe\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-map-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-map",
+   "desc": "clickable covered by another element (not tappable): div#fort.purple \"NOW\" under div.opts.g2 \"1 Take a Cinder Moth 2 T\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-map-10.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "story",
+   "where": "story-board",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nPedlar's Pick\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-11.png"
   },
   {
    "sev": "MINOR",
@@ -111,39 +225,23 @@
    "where": "story-board",
    "desc": "tap target 18px (<40) button.dayn.gchip x1: \"🎯 Day 2/9\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-13.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) button.blue x1: \"ALL DAY\nPeek and Pick\"",
+   "desc": "tap target 34px (<40) button.blue x1: \"ALL DAY\nSpring Water\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-9.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-13.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 18px (<40) button.dayn.gchip x1: \"🎯 Day 3/9\"",
+   "desc": "tap target 29px (<40) div.blue x1: \"ALL DAY\nFortune: Spring \"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nA Little Slide\"",
-   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-10.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: A Little Sl\"",
-   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-10.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-13.png"
   },
   {
    "sev": "MINOR",
@@ -151,40 +249,96 @@
    "where": "story-board",
    "desc": "tap target 18px (<40) button.dayn.gchip x1: \"🎯 Day 4/9\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-11.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-14.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
    "where": "story-board",
-   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nRat Bounty\"",
+   "desc": "tap target 34px (<40) button.blue x1: \"ALL DAY\nRuby Glint\"",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-11.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-story-board-14.png"
   },
   {
    "sev": "MINOR",
    "phase": "story",
-   "where": "story-board",
-   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: Rat Bounty\"",
+   "where": "story click #425 (Mirabel 13 1)",
+   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 425 clicks (state kept changing)",
    "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-story-board-11.png"
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-story-noresult-15.png"
   },
   {
    "sev": "MINOR",
-   "phase": "story",
-   "where": "story click #412 (🎯 Day 6/9)",
-   "desc": "inconclusive: story stage 1 reached no result within the 140 s cap / 412 clicks (state kept changing)",
-   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases story",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-story-noresult-12.png"
-  },
-  {
-   "sev": "MINOR",
-   "phase": "tutorial",
+   "phase": "fuzz",
    "where": "title",
    "desc": "clickable covered by another element (not tappable): button.gx-ibtn \"Scores\" under div.ttl-in \"Cauldron Fair Brew bold.\"",
-   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases tutorial",
-   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/5017857c-99fb-577d-a2b0-331a900a4402/scratchpad/qa-shots/cauldron-fair/phone-screen-title-1.png"
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-title-16.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text 11.0px (<12px) in span.slock x2: \"day 2\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nA Little Slide\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: A Little Sl\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-17.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nHaggler's Hour\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: Haggler's H\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-18.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "text overflows its box (visible) in button.btn.alt x1: \"Take 3 rubies\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 34px (<40) button.purple x1: \"NOW\nPedlar's Pick\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-20.png"
+  },
+  {
+   "sev": "MINOR",
+   "phase": "fuzz",
+   "where": "fuzz-screen",
+   "desc": "tap target 29px (<40) div.purple x1: \"NOW\nFortune: Pedlar's Pi\"",
+   "repro": "node games-src/scripts/qa-bot.js cauldron-fair --size phone --seed 75112 --phases fuzz",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/4013c23a-b18a-579e-afd1-f33f0929a730/scratchpad/qa/cauldron-fair/phone-screen-fuzz-screen-20.png"
   }
  ],
- "secs": 30
+ "secs": 453
 }

@@ -13,7 +13,7 @@ music = sorted(os.path.basename(f) for f in glob.glob(os.path.join(REPO, 'games'
 pre = ('window.PP_ASSETS=' + json.dumps({'items': [{k: i[k] for k in ('stem', 'kind', 'w', 'h', 'ratio', 'alpha', 'wave')} for i in man['items']]}, separators=(',', ':'))
        + ';window.PP_HAVE=' + json.dumps(have) + ';window.PP_MUSIC=' + json.dumps(music) + ';\n')
 camp = 'window.CAMPAIGN=' + json.dumps(json.load(open(os.path.join(D, 'campaign.json'), encoding='utf-8')), separators=(',', ':'), ensure_ascii=False) + ';\n'
-UI = ['render.js', 'story.js', 'coach.js', 'flow.js', 'screens.js', 'shelfkit.js', 'tutor.js']   # the game's own UI, in load order
+UI = ['render.js', 'turnui.js', 'story.js', 'coach.js', 'flow.js', 'screens.js', 'shelfkit.js', 'tutor.js']   # the game's own UI, in load order
 SRC = [('gx-scenario.js', os.path.join(SH, 'gx-scenario.js')), ('scn.js', os.path.join(S, 'scn.js')), ('shell.js', os.path.join(SH, 'shell.js')), ('gx-kit.js', os.path.join(SH, 'gx-kit.js')),
        ('gx-viewport.js', os.path.join(SH, 'gx-viewport.js')), ('gx-help.js', os.path.join(SH, 'gx-help.js')), ('gx-tutor.js', os.path.join(SH, 'gx-tutor.js')), ('gx-campaign.js', os.path.join(SH, 'gx-campaign.js')),
        ('gameaudio.js', os.path.join(SP, 'audio', 'gameaudio.js')), ('gx-music.js', os.path.join(SH, 'gx-music.js')),
