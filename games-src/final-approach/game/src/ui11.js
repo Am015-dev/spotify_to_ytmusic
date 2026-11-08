@@ -217,10 +217,10 @@ function roShow(a) {
 // ---------- the Goal, one card before turn 1 (Addendum 7): the win condition in one sentence and three bullets on how you get there ----------
 function goalCard(inStory) {
   const n = D.rounds - G.row0, mods = scenOf().mods.map(m => D.mods[m] && D.mods[m].name).filter(Boolean);
-  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together at the end of round ' + n + ': on the airport, wings level, gear and flaps down, no planes in the way, speed within the brakes.'),
-    h('ul', h('li', 'Axis: you each put a die on it every round; the plane tilts by the difference (3 = spin).'),
-      h('li', 'Engines: your two dice add up to the speed; beating a marker moves you toward the airport.'),
-      h('li', 'Spare dice clear planes (radio), lower gear and flaps, set brakes or earn coffee. The checklist at the bottom shows what is still missing.')),
+  return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Goal: land together in round ' + n + '.'),
+    h('ul', h('li', 'Axis: both dice close, or the plane tilts. Tilt 3 crashes.'),
+      h('li', 'Engines: your two dice add up. Fast enough moves you closer.'),
+      h('li', 'Spare dice: clear planes, lower gear and flaps, set brakes. The checklist shows what is left.')),
     mods.length ? h('p', 'Today also: ' + mods.join(', ') + '.') : null);
 }
 function goalShow() {

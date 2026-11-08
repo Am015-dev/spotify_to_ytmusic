@@ -1674,9 +1674,9 @@
    ]
   },
   "coach": {
-   "intro": "Check ride, Captain: you and {rival} win or crash as one. Plan aloud, but never say dice numbers.",
+   "intro": "Check ride, Captain. We win or crash together. Plan aloud, never say numbers.",
    "seats": "Your dice are hidden from {rival}, his from you. Blue spaces are yours, orange his, grey anyone's.",
-   "goal": "To land: runway clear, gear and flaps down, wings level, speed within the brakes. The checklist at the bottom tracks them.",
+   "goal": "To land: runway clear, gear and flaps down, wings level, speed in the brakes.",
    "turns": "One die each, taking turns. Axis and engines must both be filled every round, or we lose.",
    "axis": "Axis: the plane tips toward the higher die by the difference. A tilt of 3 is a spin and Pell wins.",
    "radio": "A plane on the track is a collision. Radio clears the plane that many spaces ahead: yours counts from 1, {rival}'s from 2.",
@@ -1686,7 +1686,7 @@
    "brakes": "Brakes need exactly 2, then 4, then 6, in order. They count only in the last round.",
    "coffee": "Coffee: any die earns a token. Spend tokens with the + and - buttons to nudge a die by one.",
    "reroll": "A reroll token: either of you may spend it, even on the other's turn. Pick the dice to roll again, or keep them.",
-   "rounds": "Each round the altitude drops 1000 ft. Four rounds to the runway: the plane must be on the airport when the last round starts.",
+   "rounds": "Each round we drop 1000 ft. Reach the airport before the last round.",
    "final": "Landing round. No flying now: engine speed within the brake value, gear and flaps down, wings level."
   },
   "later": [
@@ -1702,10 +1702,10 @@
    "lose": "Pell smiles thinly: \"Not this time.\" Voss: \"Again, Captain. Everyone crashes once.\""
   },
   "rounds": [
-   "Round 1 of 4, 3000 ft: axis and engines. Each of you must put one die on each, every round; spare dice go to Coffee.",
-   "Round 2: radio and landing gear. A plane waits on space 3: the radio clears it before we fly into it, and gear must be down to land.",
-   "Round 3: flaps and brakes. Ravi's flaps go in order; your brakes need exactly 2, then 4, and set how slow we must land.",
-   "Round 4, the landing: the plane stops here. Engine speed must be no more than the brakes, wings level, every light green."
+   "Round 1 of 4: axis and engines. Each of us fills both. Spare dice earn coffee.",
+   "Round 2: radio and gear. A plane sits on space 3. Clear it before we fly in.",
+   "Round 3: flaps and brakes. Ravi's flaps go in order. Brakes need exactly 2, then 4.",
+   "Round 4: landing. The plane stops. Speed must not beat the brakes."
   ]
  }
 }

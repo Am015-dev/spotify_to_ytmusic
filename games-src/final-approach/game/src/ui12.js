@@ -71,16 +71,18 @@ function tutLeave() {
 }
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
-  return false;   // Addendum 7: Play is a clean game; the coached flight is only behind the title's Learn button
+  // Addendum 7: Play is a clean game. A new player is asked once: learn in 4 rounds (the coached flight) or just play (the chapter map)
+  if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer() || UI._storyAsked) return false;
+  UI._storyAsked = true; tutOffer(() => GXC.open()); return true;
   if (typeof GXT === 'undefined' || GXT.isDone(TUT_GAME) || !newPlayer()) return false;
   tutStart({ prologue: true }); return true;
 }
 // a first-time Play: offer the tutorial once ("New here? Learn in 5 minutes"), or just play
-function tutOffer() {
+function tutOffer(onPlay) {
   try { localStorage.setItem('fa_offer', '1'); } catch (e) { }
   const d = document.createElement('div'); d.className = 'gxt-end'; d.setAttribute('data-help', ''); d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', 'New here?');
-  d.innerHTML = '<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A short guided landing: four rounds, one new control each round.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play">Just play</button></div></div>';
-  d.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-offer]'); if (!b) return; d.remove(); if (b.dataset.offer === 'learn') tutStart(); else playNow(); });
+  d.innerHTML = '<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A short guided landing: four rounds, one new control each round.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="offeryes">Learn in 5 minutes</button><button type="button" class="gxt-b" data-offer="play" data-a="offerno">Just play</button></div></div>';
+  d.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-offer]'); if (!b) return; d.remove(); if (b.dataset.offer === 'learn') tutStart({ prologue: !!onPlay }); else if (onPlay) onPlay(); else playNow(); });
   document.body.appendChild(d);
 }
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
