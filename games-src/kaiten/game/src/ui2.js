@@ -14,7 +14,7 @@ function renderBar() {
   const s = $('#barstat'); if (!s) return;
   // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
   const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? (G.len || D.rounds) : G.round - 1) : G.round, RN = G.len || D.rounds;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand + (G.len ? '' : ' · most points after round 3 wins'));
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + RN : 'Round ' + rd + ' of ' + RN) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + RN + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + RN + ' · Turn ' + G.turn + ' of ' + G.hand);
   barTwoLines();
 }
 function barTwoLines() { const s = $('#barstat'); if (s && isPh() && s.textContent.indexOf(' \u00b7 ') > 0 && !s.querySelector('br')) { const a = s.textContent.split(' \u00b7 '); s.replaceChildren(h('b', a[0]), h('br'), a[1].replace('/', ' of ')); } }

@@ -66,7 +66,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     let i = 0;
     const later = ['river', 'inns', 'goods'].concat(['tie', 'majority', 'discard', 'banner', 'score_road', 'score_town', 'score_priory'].filter(k => !ex.includes(k)));
     GXCOACH.later = later;
-    const card = html => { const m = document.getElementById('modal'); m.innerHTML = '<div class="scrim"><div class="card coachcard" role="dialog" aria-label="Score walk">' + html + '</div></div>'; return m; };
+    const card = html => { const m = document.getElementById('modal'); m.innerHTML = '<div class="scrim"><div class="card coachcard" role="dialog" aria-label="Score summary">' + html + '</div></div>'; return m; };
     const finish = pro => {
       GXCOACH.done = true; GXCOACH.running = false; try { GXT.markDone(TUT_GAME); } catch (e) { }
       const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
@@ -81,7 +81,7 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
     const show = () => {
       if (i >= pages.length) return showLater();
       const [k, t] = pages[i]; const guide = STORY.guide;
-      const m = card('<div class="cwalk"><img class="cpic" src="' + guide.img + '" alt=""><div><b>' + guide.name + '</b><p>' + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p></div></div><div class="cstep">' + (i + 1) + ' / ' + pages.length + '</div><button class="btn big" data-a="cnext">' + (i === pages.length - 1 ? 'Next' : 'Next') + '</button>');
+      const m = card('<div class="cwalk"><img class="cpic" src="' + guide.img + '" alt=""><div><b>' + guide.name + '</b><p>' + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p></div></div><div class="cstep">' + (i + 1) + ' / ' + pages.length + '</div><button class="btn big" data-a="cnext">' + (i === pages.length - 1 ? 'Continue' : 'Next') + '</button>');
       m.querySelector('[data-a=cnext]').onclick = () => { i++; show(); };
     };
     show();

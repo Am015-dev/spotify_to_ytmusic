@@ -12,7 +12,8 @@
     <main id="board" data-board aria-label="The valley. Drag to move, pinch to zoom, tap a glowing square to place your tile.">
       <div id="world"></div>
       <div id="ov"></div>
-      <div id="status" role="status" aria-live="polite"></div>
+      <div id="status"></div>
+      <div id="srlive" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
     </main>
     <footer id="hand"></footer>
   </div>
@@ -42,6 +43,11 @@
 <script src="preview.js"></script>
 <script src="bf.js"></script>
 <script src="camp.js"></script>
+<script src="three.min.js"></script>
+<script src="gx-glb.js"></script>
+<script src="gx-glbsprite.js"></script>
 <script src="paint.js"></script>
+<script src="models3d.js"></script>
+<script src="assets.js"></script>
 </body>
 </html>

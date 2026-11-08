@@ -58,3 +58,7 @@ games-src/qa/feel/SUMMARY.md). Needed: (a) 0 short or stacked messages, (b) 0 me
 (c) 0 lines over 12 words, (d) 0 phone text under 14px, (e) 0 overlaps. If the driver cannot find Learn/Play, add
 data-a="learn" / data-a="play" to those buttons. Learn to play must be finishable by touch with no Skip (taps on the
 highlighted target must reach it; spotlight blockers must not cover it).
+- Steady instruction line (decision 03:30): ONE always-visible line that says what to do now ("Your turn: tap a tile") is
+  allowed in Play. Mark it data-fa-skip so feel-audit ignores it. It must not flash, fade or slide: it only changes text
+  when the player's state changes, and it never shows rival play-by-play (that goes on the board as motion). Everything else
+  that pops up still counts.

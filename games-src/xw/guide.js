@@ -61,9 +61,9 @@ function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s
   const d0=Math.min(...en.map(e=>baseDist(s,b,e,B(e)))),d1=Math.min(...en.map(e=>baseDist(p,b,e,B(e))));let why;
   if(mine.length&&!theirs.length)why=`puts ${esc(mine[0].e.name)} in your arc at range ${mine[0].rg} while you stay out of its arc`;
   else if(mine.length)why=`lines up a shot on ${esc(mine[0].e.name)} at range ${mine[0].rg} (it may shoot back)`;
-  else if(!theirs.length)why=d1<d0-20&&rangeOf(d1)>=3?'closes in but stays out of their arcs: they must come to you':'stays out of their arcs: they must come to you';
+  else if(!theirs.length)why=d1<d0-20&&rangeOf(d1)>=3?'closes in, out of their arcs. They must come to you':'stays out of their arcs. They must come to you';
   else why='the best of the moves left, though you may end up in an enemy arc';
-  why+=', if they stay where they are';
+  why+='. (If they stay put.)';
   const clip=tplPoints(s,b,m0,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2));
   const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves until a green one clears it.':m.c==='g'?(s.stress?'Bonus: green clears your stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
   const allRock=dialOf(s).every(x=>rockHits(s,x));

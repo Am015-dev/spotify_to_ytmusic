@@ -72,7 +72,7 @@ function oskTick(){if(!OSK.on||!G||!UI.started){return}
   // new log lines since the last look
   const fresh=G.log.filter(l=>l.i>OSK.logI).reverse();OSK.logI=G.logN;
   for(const l of fresh){const t=l.t;let m;
-    if((m=t.match(/rolls (\d)\+(\d)=(\d+)/))){const n=+m[3];oskSay('roll',{n:m[1]+'+'+m[2]+'='+n,wake:n>=6&&n<=8?'6, 7 or 8 wakes the leviathans: each swims a square or turns.':'calm, the leviathans sleep. Only a 6, 7 or 8 wakes them.'},{pri:2})}
+    if((m=t.match(/rolls (\d)\+(\d)=(\d+)/))){const n=+m[3];oskSay('roll',{n:m[1]+'+'+m[2]+'='+n,wake:n>=6&&n<=8?'a 6, 7 or 8 wakes the leviathans.':'calm. The leviathans sleep.'},{pri:2})}
     if(/ moves | turns |swims/.test(t)&&/^(?!The Maelstrom)/.test(t)&&!/Rogue Wave/.test(t)&&G.mons.some(x=>t.indexOf(levName(x.id))===0))oskSay('levmove',null,{pri:3});
     if(/torn from the sea|ran into|crushed|blocked by/.test(t))oskSay('levsink',null,{pri:2});
     if(/Rogue Wave rises/.test(t))oskSay('wave',null,{pri:1});
@@ -98,13 +98,14 @@ function oskTick(){if(!OSK.on||!G||!UI.started){return}
   if(G.over&&!UI.busy){oskSay('end',{why:oskEndWhy()},{pri:0})}
   // show: nothing up -> next; a tip up for 6 s (rival lines 4 s) gives way to a waiting rule
   const age=Date.now()-OSK.t0;
-  if(!OSK.cur)oskShowNext();else if(OSK.q.length&&age>3000&&(OSK.q[0].pri<=OSK.cur.pri||age>5000))oskShowNext();
+  const need=4000+Math.ceil(String(OSK.cur?OSK.cur.title+' '+OSK.cur.line:'').split(/\s+/).length/10)*1000;
+  if(!OSK.cur)oskShowNext();else if(OSK.q.length&&age>need)oskShowNext();
   else oskPlace();
   if(G.over&&!UI.busy&&!OSK.walk&&OSK.said.end&&OSK.cur&&OSK.cur.id==='end'&&age>2500)oskWalkOpen()}
 // one line on your move: good (it sinks Cobalt) or poor (your bow now faces a leviathan's arrow)
 function oskJudge(){try{const S=G.ships[0],R=G.ships[1];
   if(!R.alive&&S.alive){oskSay('good'+G.turn,null,{pri:2,text:oskFill('good',{why:'Your current sank '+nm(1)+'. A tile that ends a rival is the strongest move there is.'})});return}
-  if(S.alive&&S.x!=null&&adjMons(G,S).length)oskSay('poor'+G.turn,null,{pri:4,text:oskFill('poor',{why:'Your junk now sits next to a leviathan. If its arrow points at you, a 6, 7 or 8 can sink you.'})})}catch(e){}}
+  if(S.alive&&S.x!=null&&adjMons(G,S).length)oskSay('poor'+G.turn,null,{pri:4,text:oskFill('poor',{why:'Your junk now sits next to a leviathan. Its arrow points at you? A 6, 7 or 8 can sink you.'})})}catch(e){}}
 function oskEndWhy(){const w=(G.over&&G.over.win)||[];if(!w.length)return 'Both junks went down together, so nobody keeps the lantern.';
   return w.indexOf(0)>=0?'Yours is the last junk afloat: the lantern is yours, child.':nm(1)+' is the last junk afloat, so he keeps the lantern. Tomorrow we race again.'}
 // ---------------------------------------------------------------- the end: walk through the result with the real numbers, then "Things you'll meet later"

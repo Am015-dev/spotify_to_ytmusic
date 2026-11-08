@@ -178,3 +178,5 @@ html.sk-cards .mv.w,html.sk-cards .mv.g{color:#10131f!important}
 #bfban ul.na-goal li::before{content:"";position:absolute;left:4px;top:.45em;width:9px;height:9px;border-radius:50%;background:#ffc86b}
 .gxt-bub[data-step="goal0"] .gxh-tx{white-space:pre-line;font-size:16px;line-height:1.45}
 .gxt-bub[data-step="goal0"] .gxh-tt{font-size:20px}
+/* a bold phrase inside a sentence wraps as one unit (no box spanning two lines over its neighbour) */
+.roadinfo b,.now-t b,.gx-dock p b{white-space:nowrap}

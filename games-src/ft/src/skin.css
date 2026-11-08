@@ -128,4 +128,4 @@ html.sk-pl .tile .tv{color:#fff3c8;font-weight:800;line-height:11px;padding-top:
 html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}
 html.sk-pl .dcard .dv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-cream.webp) center/142% no-repeat}
 /* menu test v2: solid colour under the painted button art so contrast is measurable (art fills the same colour) */
-html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost{background-color:#f3e2bc}html.sk .ab.go,html.sk .mbox .btn.go{background-color:#b8532b}html.sk .ab.pw,html.sk .mbox .btn.warn{background-color:#4a2f7a}
+/* W480: no flat colour behind the painted buttons (it showed as a rectangle around the rounded art) */
