@@ -39,7 +39,7 @@
     } catch (e) { }
     return t;
   };
-  window.ppAfter = function () { banner(); dieLabels(); try { coach() } catch (e) { } if (typeof bfLine === 'function') bfLine() };
+  window.ppAfter = function () { try { document.documentElement.classList.toggle('cc-tut', !!(typeof G !== 'undefined' && G && G.tut)) } catch (e) { } banner(); dieLabels(); try { coach() } catch (e) { } if (typeof bfLine === 'function') bfLine() };
   // ---- the guide's story beats in the tutorial: a speech card with the portrait (Dot Inkwell, the Clarion's reporter), never over a tap target for long
   let beatT = 0;
   window.ppBeat = function (head, text, ms) {
@@ -71,8 +71,8 @@
     const me = G.pl.find(p => p.human), w = G.winner === 'draw' ? null : G.pl[+G.winner.slice(1) - 1];
     const rows = G.pl.slice().sort((a, b) => b.vp - a.vp).map(p => `${p === me ? 'You' : mname(p)}: ${p.vp} ★, ${Math.max(0, p.hp)} ♥, ${p.cards.length} card${p.cards.length === 1 ? '' : 's'}`).join(' · ');
     showCoach({ id: 'final', head: w === me ? 'KING OF CROWN CITY!' : 'Final scoring', sticky: true,
-      say: `${w ? (w === me ? 'You won' : mname(w) + ' won') : 'Nobody won'} with ${w ? w.vp : 0} ★ (${GOAL()} needed, or last standing). ${rows}.`,
-      html: `<small>Not met in this game (see Help): ${miss.slice(0, 4).concat(COACH_LATER.slice(0, 2).map(l => l[1])).join('; ')}.</small><span class="pp-row"><button type="button" data-pp-play>Play a real game</button><button type="button" data-pp-story>Story mode</button></span>` });
+      say: `${w ? (w === me ? 'You won' : mname(w) + ' won') : 'Nobody won'} with ${w ? w.vp : 0} ★. Real games go to 20 ★.`,
+      html: `<ul class="ppaim nocut">${G.pl.slice().sort((a, b) => b.vp - a.vp).map(p => `<li>${p === me ? 'You' : esc(mname(p))}: ${p.vp} ★, ${Math.max(0, p.hp)} ♥</li>`).join('')}</ul><small>Still to meet:</small><ul class="ppaim nocut">${miss.slice(0, 3).concat(COACH_LATER.slice(0, 2).map(l => l[1])).map(t => `<li>${esc(t.charAt(0).toUpperCase() + t.slice(1))}.</li>`).join('')}</ul><span class="pp-row"><button type="button" data-pp-play>Play a real game</button><button type="button" data-pp-story>Story mode</button></span>` });
     try { GXT.markDone(TUT_GAME) } catch (e) { }
   }
   function coach() {
@@ -218,4 +218,13 @@
     if (!el) { el = document.createElement('button'); el.id = 'ppwhat'; el.type = 'button'; el.setAttribute('data-pp-what', ''); el.textContent = 'What should I do?'; document.body.appendChild(el) }
     el.style.display = show ? 'block' : 'none';
   }
+})();
+
+// W467: Learn to play is the coached free-play game (ppCoach), not a spotlight tour. GXT.running() reports it so drivers see Learn running;
+// GXT.state() is null during free play (nothing to spotlight) and {phase:'end'} once the coached game has a winner.
+(function () {
+  if (typeof GXT === 'undefined') return;
+  const run0 = GXT.running, st0 = GXT.state, coached = () => !!(window.PPC && PPC.on && typeof G !== 'undefined' && G && G.tut);
+  GXT.running = function () { return run0.apply(this, arguments) || coached() || !!(window.PPC && PPC.ended && typeof G !== 'undefined' && G && G.tut) };
+  GXT.state = function () { if (run0.apply(this, arguments)) return st0.apply(this, arguments); if (typeof G !== 'undefined' && G && G.tut && G.winner) return { phase: 'end' }; return null };
 })();

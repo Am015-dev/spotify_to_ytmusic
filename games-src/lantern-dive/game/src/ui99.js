@@ -104,6 +104,16 @@ function extrasBoot() {
   GX.drawer('musicd', 'Music', h('div#musicbody'));
   const os = GX.onShow; GX.onShow = id => { os(id); if (id === 'musicd') { const mb = $('#musicbody'); if (mb) mb._sig = null; renderMusic(); } };
   ['end-win', 'end-lose', 'back-wreck-brass', 'back-last-light', 'table-tunnel-glow'].forEach(f => preImg(f));
+  // W479: the shell loader skips the live 3D lantern on software GL / weak chips. Still load the real .glb there, but draw each model once (no turning), which is cheap.
+  setTimeout(() => { try {
+    if (window.GXGLBV || /[?&]glb=0/.test(location.search) || document.querySelector('script[src="models/gx3d.js"]')) return;
+    const n = navigator; if ((n.deviceMemory && n.deviceMemory <= 2) || (n.connection && n.connection.saveData)) return;
+    const c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) return;
+    window.LD_SOFT = 1; document.querySelectorAll('img.herolan,img.lan3,img.lanrev').forEach(i => i.setAttribute('data-spin', '0'));
+    const sc = document.createElement('script'); sc.src = 'models/gx3d.js'; sc.async = true; sc.onerror = () => { }; document.head.appendChild(sc);
+  } catch (e) { } }, 1800);
+  // W479: once the table is up, fetch the rest of the owner art quietly (story map, drawers, wide-screen plates, phone table) so every screen opens with it ready, also offline
+  setTimeout(() => ['table-tunnel-glow-phone', 'ui-bubble', 'ui-bubble-c', 'ui-bubble-tail', 'ui-button-cream', 'ui-button-go', 'ui-button-power', 'ui-node-boss', 'ui-node-done', 'ui-node-locked', 'ui-panel', 'ui-row', 'ui-row-c', 'ui-seat-c', 'ui-trick-pad', 'camp-lampless', 'camp-maze', 'camp-undertow', 'camp-brack', 'camp-echo', 'camp-dag', 'camp-nerea', 'camp-sumi', 'camp-bram'].forEach(f => preImg(f)), 2500);
   titleApply(); tableApply(); backApply();
   lowTblApply();
   setInterval(() => { try { lowTblApply(); musicSync(); tableApply(); backApply(); if (!document.querySelector('.ttl .ttl-bg[data-p]')) titleApply(); } catch (e) { } }, 800);
@@ -132,7 +142,7 @@ var PADIMG = null;
 (function () {
   const R = document.documentElement;
   function boot() {
-    try { GXSK.init({ map: true, stars: true, sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
+    try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'], 'sk-seat': ['ui-seat'] } }); } catch (e) { }
     // painted card frames (media/card-face-*.webp): drawn by pxFace on the Pixi table, cropped inside their paper edge; the drawn card stays until each file loaded
     let fr = 0; const faceRefresh = () => { clearTimeout(fr); fr = setTimeout(() => { try { for (const k of Object.keys(PX.tex)) if (k.indexOf('f:') === 0) delete PX.tex[k]; PX.warm = ''; for (const o of PX.objs.values()) if (o.kind === 'card') pxCardTex(o); pxPrewarm(); pxDirty(); } catch (e) { } }, 60); };
     ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].forEach((n, si) => { const i = new Image(); i.onload = () => { try { PX.img['face' + si] = i; if (PX.on) faceRefresh(); } catch (e) { } }; i.src = MEDIA + 'card-face-' + n + '.webp'; });

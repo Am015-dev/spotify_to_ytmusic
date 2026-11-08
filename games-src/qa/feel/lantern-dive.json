@@ -1,8 +1,8 @@
 {
  "slug": "lantern-dive",
- "when": "2026-11-08T03:34Z",
- "secs": 50,
- "totalSecs": 136,
+ "when": "2026-11-08T04:59Z",
+ "secs": 45,
+ "totalSecs": 122,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -39,9 +39,9 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 50,
-   "turns": 97,
-   "clicks": 139,
+   "secs": 46,
+   "turns": 121,
+   "clicks": 120,
    "endedBy": "result",
    "tutorialEnded": 5,
    "hintsOff": true,
@@ -50,9 +50,9 @@
   {
    "size": "phone",
    "mode": "play",
-   "secs": 15,
-   "turns": 28,
-   "clicks": 35,
+   "secs": 9,
+   "turns": 11,
+   "clicks": 12,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
@@ -61,8 +61,8 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 50,
-   "turns": 34,
+   "secs": 45,
+   "turns": 30,
    "clicks": 0,
    "endedBy": "time",
    "tutorialEnded": null,
@@ -72,9 +72,9 @@
   {
    "size": "pc",
    "mode": "play",
-   "secs": 21,
-   "turns": 38,
-   "clicks": 55,
+   "secs": 22,
+   "turns": 32,
+   "clicks": 33,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,

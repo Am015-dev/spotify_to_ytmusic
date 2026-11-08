@@ -1,3 +1,14 @@
+# W477 (8 Nov 2026): one board, real pieces (REVIEW-FIX R1, COPY-FIX, DESIGN-FIX)
+- Play screen = ONE board at every size: score strip, three site terraces (deep ruins, ruins, camp), research track (rows 0-7 + temple), market;
+  your tray below (prompt + one button, explorer pawns, goods as "2 coins", hand). No Map/Market/Research tabs, no bottom sheet as the main way.
+- Input (src/ui2.js `pick`, `act`, drag block): tap selects (it lifts, the line says what it does, one Go button), tap again does it;
+  drag an explorer pawn onto a glowing site, a hand card up onto the island, a market card down to the tray. Snap = vibrate tick.
+  Details button opens the old sheet (still used for guardian boons and idols). Rival moves: pawn / card flies, place bounces, points pop.
+- Hints moved to Menu (off by default; body.hints-on). Title: Learn to play / Play (data-a=start) / Story + "Game settings" toggle.
+- Result: winner first, big totals, every kind of points counts up (no table). Learn: step 1 "How to win", 3 short score steps, 1-line end card.
+- Tests: `node drag-test.js` (Learn by touch to its end card, drags, a full game by taps; phone + PC). smoke.js updated; playtest.js,
+  tap-play.js, touch-test.js, tut-test.js still use the old #insp flow (not updated). rules-test.js has 2 FAILs that predate W477 (same at 43a0e446).
+
 # Vinegrave (W344) handoff
 
 Branch `shelf/W344-vinegrave` (from `alex/brave-carson-rbpmlk`). Not deployed. Slug `vinegrave`, folder `games-src/vinegrave/`.

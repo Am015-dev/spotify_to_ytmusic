@@ -130,7 +130,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
-  const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t+': '+LORE.coach[k].s));
+  const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t.replace(/^[A-Z][a-z]+: /,'')+'. '+LORE.coach[k].s));
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
     +'<div class="gxt-ex"><b>Things you will meet later</b><ul class="na-later">'+later.map(t=>'<li>'+t+'</li>').join('')+'</ul></div>'

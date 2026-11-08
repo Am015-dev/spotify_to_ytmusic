@@ -44,7 +44,7 @@ function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').sl
   switch(G.step){
   case 'move':return !G.move?'Tap a glowing tile':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
   case 'tribe':return {assassin:'Tap who to remove',builder:'Masons earn coins',merchant:'Traders fetch goods',vizier:'Advisors join you',elder:'Sages join you',artisan:'Crafters join you'}[G.act.color]||'';
-  case 'tile':{const t=G.board[G.act.tile];return {village:'A palace rises here',oasis:'A palm grows here',sacred:'Tap a djinn to summon',small:'Buy a good for 3🪙',large:'Buy two goods for 6🪙',exchange:'Buy a good for 4🪙',workshop:'Commission an item?'}[t.k]||'Nothing to do here'}
+  case 'tile':{const t=G.board[G.act.tile];return {village:'A palace rises here',oasis:'A palm grows here',sacred:'Tap a djinn to summon',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item?'}[t.k]||'Nothing to do here'}
   case 'sell':return 'Sell goods or end turn'}
   return ''}
 // ---------- seats (the score race) ----------

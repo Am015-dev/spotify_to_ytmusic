@@ -15,10 +15,9 @@ const { chromium } = require('playwright'), serve = require('./serve.js');
     try { await page.evaluate(() => { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } }); } catch (e) { }
     for (let t = 0; t < 3; t++) {
       await page.waitForFunction(() => window.G && typeof myTurn === 'function' && myTurn(), null, { timeout: 20000 });
-      if (!(await page.locator('.glow').filter({ visible: true }).count())) { const tb = page.locator('#vtabs button.has').filter({ visible: true }); if (await tb.count()) await tap(tb.first()); }   // phone: the target may sit behind a tab
-      const g = page.locator('.glow').filter({ visible: true }).first(); await tap(g); await page.waitForSelector('#insp:not([hidden]) .btn.go', { timeout: 5000 });
+      const g = page.locator('.site.glow, #hand .cd.glow, #row .cd.glow').filter({ visible: true }).first(); await tap(g); await page.waitForSelector('#gobtn', { timeout: 5000 });
       if (t === 0) await page.screenshot({ path: `shots/insp-${name}.png` });
-      const before = await page.evaluate(() => G.turns); await tap(page.locator('#insp .btn.go').first());
+      const before = await page.evaluate(() => G.turns); await tap(page.locator('#gobtn').first());
       if (await page.locator('#qbox:not([hidden])').count()) await tap(page.locator('#qbox .btn').last());
       await page.waitForFunction(b => G.turns > b, before, { timeout: 5000 });
       console.log(name, 'turn', t + 1, 'ok; round', await page.evaluate(() => G.round));
@@ -28,8 +27,8 @@ const { chromium } = require('playwright'), serve = require('./serve.js');
     await page.waitForFunction(() => myTurn(), null, { timeout: 20000 });
     if (await page.locator('#qbox:not([hidden])').count()) await tap(page.locator('#qbox .btn').last());
     await tap(page.locator('#acts .btn').first());
-    await page.waitForSelector('#rs:not([hidden]) table', { timeout: 30000 }).catch(() => { });
-    const done = await page.locator('#rs:not([hidden]) table').count(); await page.screenshot({ path: `shots/result-${name}.png` });
+    await page.waitForSelector('#rs:not([hidden]) .rplayers', { timeout: 30000 }).catch(() => { });
+    const done = await page.locator('#rs:not([hidden]) .rplayers').count(); await page.screenshot({ path: `shots/result-${name}.png` });
     console.log(name, done ? 'PASS reached result' : 'FAIL no result', 'errors:', errs.length, errs.slice(0, 3).join(' | ')); if (!done || errs.length) fails++;
     await ctx.close();
   }

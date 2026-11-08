@@ -17,9 +17,18 @@ function clamp(){if(!R.classList.contains('ph'))return;
     e.dataset.full=full;
     const cutT=cut(full,KEEP);e.textContent=cutT;e.dataset.tl=cutT;e.classList.add('tl')}}}
 let busy=false,mo=null;
-function run(){if(busy)return;busy=true;try{clamp()}catch(e){console.warn('brief',e)}finally{busy=false;if(mo)mo.takeRecords()}}
+// owner rule (8 Nov): no phone text under 14 px. Any element whose own text renders smaller is raised to 14 px inline (keeps
+// the size hierarchy above 14). Zero-size labels draw nothing and the F9 perf panel is a dev overlay: both are marked as not text.
+function floor(){if(!R.classList.contains('ph'))return;const hud=document.getElementById('perfhud');if(hud)hud.setAttribute('data-fa-skip','');
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);const seen=new Set();
+  for(let n;(n=w.nextNode());){const e=n.parentElement;if(!e||seen.has(e)||!n.nodeValue.trim()||e.closest('script,style,svg,[data-fa-skip]'))continue;seen.add(e);
+    const f=parseFloat(getComputedStyle(e).fontSize);const bb=e.closest('.gx-bar>.btn');if(f===0||(bb&&parseFloat(getComputedStyle(bb).fontSize)===0)){e.setAttribute('data-fa-skip','');continue}if(f<14)e.style.setProperty('font-size','14px','important')}}
+let ft=0;function run(){if(busy)return;busy=true;try{clamp();clearTimeout(ft);ft=setTimeout(()=>{busy=true;try{floor()}catch(e){}finally{busy=false;if(mo)mo.takeRecords()}},60)}catch(e){console.warn('brief',e)}finally{busy=false;if(mo)mo.takeRecords()}}
 // a MutationObserver callback is a microtask: the text is cut before the browser paints or a test looks at it
-function start(){try{mo=new MutationObserver(run);mo.observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}run()}
+function fix(e){if(!e||e.nodeType!==1||e.closest('script,style,svg,[data-fa-skip]'))return;if(e.closest('.gx-bar>.btn')&&parseFloat(getComputedStyle(e.closest('.gx-bar>.btn')).fontSize)===0){e.setAttribute('data-fa-skip','');return}if(e.id==='perfhud'){e.setAttribute('data-fa-skip','');return}const f=parseFloat(getComputedStyle(e).fontSize);if(f===0&&e.textContent.trim()){e.setAttribute('data-fa-skip','');return}if(f<14&&[...e.childNodes].some(n=>n.nodeType===3&&n.nodeValue.trim()))e.style.setProperty('font-size','14px','important')}
+// added nodes are raised at once (before paint), the full sweep in floor() catches the rest
+function floorRecs(recs){if(!R.classList.contains('ph'))return;for(const r of recs){const ns=r.type==='characterData'?[r.target.parentElement]:[...r.addedNodes];for(const n of ns){if(!n||n.nodeType!==1)continue;fix(n);n.querySelectorAll&&n.querySelectorAll('*').forEach(fix)}}}
+function start(){try{mo=new MutationObserver(recs=>{try{floorRecs(recs)}catch(e){}run()});mo.observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}run()}
 // ---- long-press popup ----
 let tip=null,timer=0,shown=0;
 function hide(){if(tip){tip.remove();tip=null}}
