@@ -323,7 +323,7 @@ html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:nor
 
 /* a coach bubble with no free spot lets taps through to the glowing target under it (hlp.js hlpUncover) */
 .gxh-bub.gxh-thru{pointer-events:none;opacity:.6}
-.gxh-bub.gxh-thru .gxh-ok{pointer-events:auto}
+.gxh-bub.gxh-thru :is(.gxh-ok,.gxh-link,.gxh-x){pointer-events:auto}
 
 /* portrait phone: while the card panel is open (it stops above the action bar, ui.js dkCardFit) the action bar stays on top and tappable */
 html.ph-p.dk-cardup:has(#dkCard.on) .gx-dock{position:relative;z-index:42;pointer-events:auto}
