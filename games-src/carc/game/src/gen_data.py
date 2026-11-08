@@ -60,6 +60,10 @@ for t in D['tiles']:
         d = {'h': [H[x] for x in f['halfEdges']], 'ac': f['adjacentCities']}
         if f.get('inner'): d['in'] = 1
         o['F'].append(d)
+    if o['set'] == 'tb':   # Merchants tiles: a field touches a town only where a town side lies at one of its corners
+        for f in o['F']:
+            if f.get('in'): continue
+            f['ac'] = [ci for ci, c in enumerate(o['C']) if any(h in f['h'] for sd in c['e'] for h in ((2*sd+7) % 8, (2*sd+2) % 8))]
     if t.get('monastery'): o['mon'] = 1
     if t.get('garden'): o['gar'] = 1
     if t.get('start'): o['start'] = 1

@@ -121,7 +121,7 @@
   }
   function answers(G, s) {
     var q = G.q, p = G.p[s], out = [];
-    if (q.h === 'exile') { p.hand.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'hand', i: i } }); }); p.disc.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'disc', i: i } }); }); out.push({ t: 'ans', v: null }); }
+    if (q.h === 'exile') { p.hand.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'hand', i: i } }); }); p.disc.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'disc', i: i } }); }); p.play.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'play', i: i } }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'or') q.d.opts.forEach(function (o, i) { if (canOps(p, o)) out.push({ t: 'ans', v: i }); });
     if (q.h === 'buy') { G.row.forEach(function (id, r) { if (!id) return; var c = card(id); if ((q.d.k === 'i') !== (c.t === 'item')) return; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - q.d.o); if (has(p, need)) out.push({ t: 'ans', v: r }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'site') { G.sites.forEach(function (x, i) { if (freeSite(G, s, i)) out.push({ t: 'ans', v: i }); }); out.push({ t: 'ans', v: null }); }
@@ -138,7 +138,7 @@
       else if (o.p) { if (!has(p, o.p)) return finishOps(G, s, main); pay(p, o.p); }
       else if (o.d) { var n = draw(G, p, o.d); log(G, s, nm(G, s) + ' draws ' + n + ' card' + (n === 1 ? '' : 's') + '.'); }
       else if (o.r) { stepFree(G, s, o.r); }
-      else if (o.x) { if (p.hand.length || p.disc.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
+      else if (o.x) { if (p.hand.length || p.disc.length || p.play.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
       else if (o.or) { G.q = { h: 'or', seat: s, ops: rest, main: main, d: { opts: o.or } }; if (!answers(G, s).length) { G.q = null; continue; } return; }
       else if (o.b) { G.q = { h: 'buy', seat: s, ops: rest, main: main, d: { k: o.b, o: o.o } }; if (answers(G, s).length <= 1) { G.q = null; continue; } return; }
       else if (o.fd) { if (p.ex > 0 && G.sites.some(function (x, j) { return freeSite(G, s, j); })) { G.q = { h: 'site', seat: s, ops: rest, main: main, d: {} }; return; } }
@@ -197,7 +197,7 @@
   }
   function answer(G, s, v) {
     var q = G.q, p = G.p[s], rest = q.ops, main = q.main; G.q = null;
-    if (q.h === 'exile' && v) { var id = v.z === 'hand' ? p.hand.splice(v.i, 1)[0] : p.disc.splice(v.i, 1)[0]; if (id === 'dread' && G.dread != null) G.dread++; else p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + (id === 'dread' ? ' (back to the supply)' : '') + '.', { k: 'exile', card: id }); }
+    if (q.h === 'exile' && v) { var id = (v.z === 'hand' ? p.hand : v.z === 'play' ? p.play : p.disc).splice(v.i, 1)[0]; if (id === 'dread' && G.dread != null) G.dread++; else p.exiled.push(id); log(G, s, nm(G, s) + ' exiles ' + card(id).name + (id === 'dread' ? ' (back to the supply)' : '') + '.', { k: 'exile', card: id }); }
     if (q.h === 'or') { return runOps(G, s, q.d.opts[v].concat(rest), main); }
     if (q.h === 'buy' && v != null) {
       var bid = G.row[v], bc = card(bid), cost = cardCost(bid), k = Object.keys(cost)[0]; p.res[k] -= Math.max(0, cost[k] - q.d.o); G.row[v] = null; refillRow(G);

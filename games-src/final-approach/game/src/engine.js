@@ -179,8 +179,9 @@ function endRound(G) {
   ev(G, { t: 'endround' });
   if (isFinal(G)) {
     const c = landingChecks(G), ok = Object.values(c).every(Boolean);
-    G.result = { win: ok, why: ok ? 'landed' : 'checks', msg: ok ? 'Landed! The passengers applaud.' : 'The landing failed.', checks: c }; G.phase = 'over';
-    ev(G, { t: ok ? 'win' : 'lose', why: G.result.why, msg: G.result.msg, checks: c }); lg(G, ok ? 'LANDED.' : 'LOST: the landing failed (' + Object.keys(c).filter(k => !c[k]).join(', ') + ').'); use(G, ok ? 'win' : 'lose_checks');
+    const br = brakeVal(G), why = ok ? 'landed' : !c.speed ? 'speed' : 'checks', msg = ok ? 'Landed! The passengers applaud.' : !c.speed ? (br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + G.landSpeed + ' is above the brakes (' + br + ').') : 'The landing failed.';
+    G.result = { win: ok, why, msg, checks: c }; G.phase = 'over';
+    ev(G, { t: ok ? 'win' : 'lose', why: G.result.why, msg: G.result.msg, checks: c }); lg(G, ok ? 'LANDED.' : 'LOST: the landing failed (' + Object.keys(c).filter(k => !c[k]).join(', ') + ').'); use(G, ok ? 'win' : why === 'speed' ? 'lose_speed' : 'lose_checks');
     return;
   }
   G.round++;
@@ -230,8 +231,7 @@ function afterEngines(G) {
   if (isFinal(G)) {
     G.landSpeed = s; const br = brakeVal(G);
     ev(G, { t: 'engine', sum, wm, s, final: true, brake: br }); lg(G, 'Landing speed ' + s + (wm ? ' (wind ' + (wm > 0 ? '+' : '') + wm + ')' : '') + ' against brakes ' + br + '.');
-    if (s > br || br < 2) { lose(G, 'speed', br < 2 ? 'No brakes were set: the plane cannot stop.' : 'Too fast: speed ' + s + ' is above the brakes (' + br + ').'); return false; }
-    return true;
+    return true;   // speed against the brakes is judged at the END of the round (landingChecks), so brakes may still be set after the engine dice
   }
   const adv = s <= G.pl.aeroB ? 0 : s <= G.pl.aeroO ? 1 : 2;
   ev(G, { t: 'engine', sum, wm, s, adv, final: false }); lg(G, 'Speed ' + s + (wm ? ' (wind ' + (wm > 0 ? '+' : '') + wm + ')' : '') + ': the plane advances ' + adv + ' space' + (adv === 1 ? '' : 's') + '.');

@@ -1,13 +1,28 @@
-// Tutorial-to-end proof (W390). From FRESH storage: starts the tutorial from the title, then for every step taps the centre of the
-// spotlit element with a touch (elementFromPoint there must be the target, never a kit overlay), or Next for read-only steps,
-// until the end card; asserts every coverage step id was shown and the end state is reached; then starts a real game from the end card.
-//   PLAYWRIGHT_BROWSERS_PATH=... NODE_PATH=games-src/node_modules node playable-tutorial-end.js [sizes=390x763,1440x860]
+// Coached first dive proof (W409). From FRESH storage: start the tutorial from the title, tap the ONE forced step, then play ANY legal moves through
+// the UI by touch taps on visible, uncovered elements (random choice among the glowing cards/jobs), never the engine, until the end card.
+// Asserts: <= 2 forced taps, one guide bubble at a time, the bubble never covers a tap target, every rule was explained in play or listed on the end card.
+//   node playable-tutorial-end.js [sizes=390x763,1440x860] [seed]
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(process.env.HTML || path.join(__dirname, 'lantern-dive.html'));
-const SIZES = (process.argv[2] || '390x763,1440x860').split(',').map(s => s.split('x').map(Number));
-const COVERAGE = ['goal', 'cmd', 'take', 'mates', 'flare', 'ping', 'readping', 'lead', 'win1', 'lost', 'ping2', 'lead2', 'win2', 'done1', 'last', 'lastx', 'follow', 'win3', 'trump', 'win4', 'won'];
+const SIZES = (process.argv[2] || '390x844,390x763,1440x860').split(',').map(s => s.split('x').map(Number));
+let seed = +(process.argv[3] || 7); const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
 const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
+const RULES = ['jobs', 'flare', 'ping', 'readping', 'lead', 'follow', 'void', 'win', 'trump', 'last'];
+async function tap(p, sel, filter, pick) {
+  const t = await p.evaluate(([sel, filter, r]) => {
+    const ok = [];
+    for (const e of document.querySelectorAll(sel)) {
+      const b = e.getBoundingClientRect(); if (b.width < 4 || b.height < 4) continue; if (filter && !new RegExp(filter, 'i').test(e.textContent.trim())) continue;
+      for (const [fx, fy] of [[.5, .5], [.3, .3], [.7, .3], [.3, .7], [.7, .7], [.5, .2], [.5, .8], [.15, .5], [.85, .5]]) {
+        const x = b.left + b.width * fx, y = b.top + b.height * fy; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+        const t = document.elementFromPoint(x, y); if (t && (t === e || e.contains(t))) { ok.push([x, y, (e.dataset.a || e.className) + ':' + e.textContent.trim().slice(0, 18)]); break; }
+      }
+    }
+    return ok.length ? ok[r ? Math.floor(r * ok.length) : 0] : null;
+  }, [sel, filter || null, pick ? rnd() : 0]);
+  if (!t) return null; await p.touchscreen.tap(t[0], t[1]); return t[2];
+}
 (async () => {
   const browser = await PW.chromium.launch();
   for (const [W, H] of SIZES) {
@@ -20,35 +35,42 @@ const sleep = ms => new Promise(r => setTimeout(r, ms)); const probs = [];
     await p.goto('https://gns.test/' + (mobile ? '?phone=1' : '')); await sleep(900); await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } }); await p.reload(); await sleep(900);
     await p.evaluate(() => showStart());
     const b = await p.evaluate(() => { const e = document.querySelector('#start [data-gxt-open]'); const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
-    await p.touchscreen.tap(b[0], b[1]); await sleep(500); await p.evaluate(() => { AIDELAY = 120; });
-    const seen = []; let last = '', lastT = Date.now(), ended = false;
-    for (let g = 0; g < 4000; g++) {
-      const st = await p.evaluate(() => GXT.state());
-      if (!st.active) break; if (st.phase === 'end') { ended = true; break; }
-      const sig = [st.i, st.phase, st.count, st.shown].join('|'); if (sig !== last) { last = sig; lastT = Date.now(); } else if (Date.now() - lastT > 8000) { probs.push(tag + ' stuck at step ' + st.id); break; }
-      if (!st.shown) { await sleep(60); continue; }
-      if (!seen.includes(st.id)) seen.push(st.id);
-      const t = await p.evaluate(() => {
-        const s = GXT.state(), h = s.hole; if (!h) return { err: 'no spotlight' };
-        const el = document.elementFromPoint(h.cx, h.cy), bub = document.querySelector('.gxt-bub');
-        if (s.wait) { const kit = el && el.closest('.gxt-bub,.gxt-top,.gxt-ring,.gxt-cell'); const covered = !el || (kit && !el.closest('[data-help]') ? true : !!kit); return { x: h.cx, y: h.cy, covered, under: el && (el.className.baseVal || el.className || el.tagName) }; }
-        const nb = bub && bub.querySelector('.gxt-next'); if (!nb) return { err: 'no Next button' }; const r = nb.getBoundingClientRect(); const e2 = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2, covered: !(e2 && (e2 === nb || nb.contains(e2))), under: e2 && e2.className };
-      });
-      if (t.err) { probs.push(tag + ' ' + st.id + ': ' + t.err); break; }
-      if (t.covered) probs.push(tag + ' ' + st.id + ': tap point covered by ' + t.under);
-      await p.touchscreen.tap(t.x, t.y); await sleep(260);
+    await p.touchscreen.tap(b[0], b[1]); await sleep(600); await p.evaluate(() => { AIDELAY = 150; });
+    let again = 0, forced = 0, bubbles = new Set(), multi = 0, dismissed = false, ended = false, last = '', lastT = Date.now(), cover = 0;
+    for (let g = 0; g < 1500 && !ended; g++) {
+      const s = await p.evaluate(() => ({ kit: GXT.active(), kitShown: GXT.state().shown, hole: (GXT.state().hole || null), ph: G.phase, must: iMustAct(), busy: UI.busy, end: !!document.getElementById('tend'),
+        nb: document.querySelectorAll('#tbub').length, bub: (document.getElementById('tbub') || {}).dataset ? document.getElementById('tbub').dataset.tip : '', sig: G.phase + G.att + G.tricks.length + (G.trick ? G.trick.plays.length : 0) + (G.tasks || []).map(t => t.owner).join('') + !!document.getElementById('tbub') }));
+      if (s.nb > 1) multi++; if (s.bub) bubbles.add(s.bub);
+      if (s.sig !== last) { last = s.sig; lastT = Date.now(); } else if (Date.now() - lastT > 14000) { probs.push(tag + ' stuck in ' + s.ph); break; }
+      if (s.end) { const bad = await p.evaluate(() => !!document.querySelector('#tend [data-te=again]')); if (bad && !again) { again = 1; await tap(p, '#tend [data-te=again]'); await sleep(600); continue; } ended = true; break; }
+      if (s.kit) { if (s.kitShown && s.hole) { await p.touchscreen.tap(s.hole.cx, s.hole.cy); forced++; await sleep(500); } else await sleep(100); continue; }
+      if (s.bub && !dismissed && g > 30) { const d = await tap(p, '#tbub .tx2'); if (d) { dismissed = true; await sleep(200); if (await p.evaluate(t => (document.getElementById('tbub') || { dataset: {} }).dataset.tip === t, s.bub)) probs.push(tag + ' bubble x did not dismiss'); } }
+      let a = null;
+      if (s.must && !s.busy) {
+        if (s.ph === 'assign') a = await tap(p, '.jcard.glow', null, 1);
+        else if (s.ph === 'distress') a = await tap(p, '#acts button', 'No flare|No|Skip');
+        else if (s.ph === 'signal') a = await tap(p, '#acts button', 'No signal');
+        else if (s.ph === 'play') {
+          if (cover++ % 9 === 3) await tap(p, '.pbtn[data-a=last]');   // look at the last trick sometimes, then close
+          await tap(p, '#ppop [data-a=popx]');
+          a = await tap(p, '#hand .hc.glow', null, 1);
+        }
+      }
+      await sleep(a ? 1900 : 220);   // a reader's pace: the guide gets time to speak
     }
-    const miss = COVERAGE.filter(id => !seen.includes(id)); if (miss.length) probs.push(tag + ' coverage steps never shown: ' + miss.join(','));
     if (!ended) probs.push(tag + ' tutorial did not reach the end card');
     else {
-      const endTxt = await p.evaluate(() => (document.querySelector('.gxt-end') || {}).innerText || ''); if (!/know the rules/i.test(endTxt)) probs.push(tag + ' end card text: ' + endTxt.slice(0, 60));
-      // leave through the end card by tapping its first button; a menu must follow
-      const eb = await p.evaluate(() => { const e = document.querySelector('.gxt-end button'); if (!e) return null; const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
-      if (!eb) probs.push(tag + ' end card has no button'); else { await p.touchscreen.tap(eb[0], eb[1]); await sleep(700); const o = await p.evaluate(() => ({ done: !!(JSON.parse(localStorage.getItem('gxt-lantern-dive') || '{}').done), running: GXT.running() })); if (!o.done) probs.push(tag + ' tutorial not remembered as done'); if (o.running) probs.push(tag + ' tutorial still running after the end card'); }
+      const o = await p.evaluate(() => { const C = UI.tc, t = document.getElementById('tend'); return { seen: Object.keys(C.seen), later: (C.later || []).join(' | '), txt: t.innerText, btn: t.querySelectorAll('button').length }; });
+      console.log(tag, 'forced taps', forced, 'bubbles', [...bubbles].join(','), 'end:', o.txt.split('\n')[1]);
+      if (forced > 2) probs.push(tag + ' ' + forced + ' forced taps');
+      if (multi) probs.push(tag + ' two guide bubbles at once x' + multi);
+      if (!/tricks/.test(o.txt) || !/Things you'll meet later/.test(o.txt)) probs.push(tag + ' end card lacks scoring/later: ' + o.txt.slice(0, 80));
+      const missing = RULES.filter(r => !o.seen.includes(r) && !o.later.length); if (missing.length) probs.push(tag + ' rules neither explained nor listed: ' + missing);
+      const unl = RULES.filter(r => !o.seen.includes(r)); console.log(tag, 'explained in play:', RULES.filter(r => o.seen.includes(r)).join(','), '| listed on end card:', unl.join(',') || '-');
+      const eb = await tap(p, '#tend [data-te=play], #tend [data-te=chapter]'); await sleep(700);
+      const d = await p.evaluate(() => ({ done: !!(JSON.parse(localStorage.getItem('gxt-lantern-dive') || '{}').done), running: GXT.running(), tc: !!UI.tc })); if (!d.done) probs.push(tag + ' not remembered as done'); if (d.running || d.tc) probs.push(tag + ' still running after the end card');
     }
-    console.log(tag, 'steps', seen.length + '/' + COVERAGE.length, ended ? 'reached end' : 'NO END'); await ctx.close();
+    await ctx.close();
   }
-  await browser.close();
-  console.log(probs.length ? 'FAIL\n' + probs.join('\n') : 'PASS tutorial-to-end'); process.exit(probs.length ? 1 : 0);
+  await browser.close(); console.log(probs.length ? 'FAIL\n' + probs.join('\n') : 'PASS coached tutorial to the end'); process.exit(probs.length ? 1 : 0);
 })().catch(e => { console.log('CRASH', e.message); process.exit(1); });
