@@ -71,7 +71,8 @@ function cgSay(id,text,o){o=o||{};if(!UI.cg||!text)return false;if(id&&CG.said[i
   cgShow(text,o,true);return true}
 function cgShow(text,o,force){o=o||{};text=sgShort(text);cgCss();clearTimeout(CG.timer);if(CG.el)CG.el.remove();
   const e=document.createElement('div');e.className='cg-b cg-coach'+(o.kind?' '+o.kind:'');e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('data-cg','1');
-  e.innerHTML='<div class="cg-t"><b>'+(o.who||'Mother Ochre')+'</b>'+text.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div><button type="button" class="cg-x" aria-label="Dismiss the guide">&times;</button>';
+  const who=o.who||'Mother Ochre',pic=/Tamsin/.test(who)?'camp-tamsin':'camp-ochre';
+  e.innerHTML='<img class="cg-pic" src="media/'+pic+'.webp" alt="" aria-hidden="true"><div class="cg-t"><b>'+who+'</b>'+text.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div><button type="button" class="cg-x" aria-label="Dismiss the guide">&times;</button>';
   e.querySelector('.cg-x').addEventListener('click',ev=>{ev.stopPropagation();cgHide()});
   document.body.appendChild(e);CG.el=e;CG.cur=text;CG.shownAt=Date.now();cgPlace();clearInterval(CG.pi);CG.pi=setInterval(cgPlace,400);
   const ms=Math.max(5200,Math.min(11000,2500+text.length*60));CG.timer=setTimeout(cgHide,o.hold?ms+2500:ms)}
@@ -177,7 +178,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefin
 function tutOffer(){if(typeof GXT==='undefined'||UI.tut||NET.on||!firstTime())return false;
   try{localStorage.setItem('sgz_offer','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b" data-offer="play" data-a="play">Play now</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">A guide plays one game with you. Each rule, right when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-offer="learn" data-a="learn">Learn to play</button><button type="button" class="gxt-b sg-link" data-offer="play" data-a="play">Play now</button></div></div>';
   d.addEventListener('click',e=>{const b=e.target.closest('[data-offer]');if(!b)return;d.remove();if(b.dataset.offer==='learn')tutStart();else beginGame()});
   document.body.appendChild(d);return true}
 // ---------------------------------------------------------------- the coach watches every move (before it is applied); input is never blocked

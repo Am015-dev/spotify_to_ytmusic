@@ -132,3 +132,26 @@ span.tag{font-size:14px!important}
   span.tag{font-size:16px!important}
 }
 @media (min-width:1024px){html body .gxc-path .gxc-act small{font-size:16px!important}}
+/* W466 / D5 fix list: rack numbers in the arrow cell, floor label "Broken tiles", offer "Play now" as a link, lighter scrim */
+#bf .bf-ar{clip-path:none;background:none;opacity:1;display:grid;place-items:center;width:calc(var(--cs)*.5);min-width:16px}
+#bf .bf-rn{font:900 14px/1 var(--ff);color:#7a4a1e}
+@media (min-width:1024px){#bf .bf-rn{font-size:16px}}
+#bf .bf-floor .bf-c span{color:#7a1f1f}#bf .bf-floor .bf-c{background:#fbe9e4}
+#bf .bf-fll{font-style:normal;color:#7a1f1f;white-space:nowrap}
+.gxt-end{background:rgba(5,3,6,.25)!important}
+.gxt-b.sg-link{background:none!important;border:0!important;box-shadow:none!important;text-decoration:underline;color:#6b1a28!important;min-height:44px;font-weight:700}
+#bf .bf-fll{white-space:normal;max-width:4.6em;line-height:1.05;text-align:center}
+#bf .bf-floor:has(.bf-bd.fbd) .bf-fll{margin-right:38px}
+/* W466 art: table and tile-back pickers (owner paintings), the sack chip with the chosen tile back */
+.sg-look{align-items:center}
+.sg-thumbs{display:flex;flex-wrap:wrap;gap:6px}
+.sg-th{width:64px;height:44px;padding:0!important;min-width:0!important;border-radius:8px!important;overflow:hidden;border:2px solid #c99a3e!important;border-image:none!important;background:#f3e3c4!important}
+.sg-th.sq{width:44px}
+.sg-th img{width:100%;height:100%;object-fit:cover;display:block}
+.sg-th.on{box-shadow:0 0 0 3px #1f4fa0;border-color:#1f4fa0!important}
+#bf .bf-sack{display:inline-flex;align-items:center;gap:4px;flex:none;color:#fff6e0;font:800 15px var(--ff);padding:0 4px}
+#bf .bf-sack .sg-back{display:inline-block;width:22px;height:22px;margin:0;border-radius:5px;background:var(--sg-back,#c98e5a) center/cover;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+@media (min-width:1024px){#bf .bf-sack{font-size:18px}#bf .bf-sack .sg-back{width:30px;height:30px}}
+#bf .bf-sack{position:absolute;right:10px;top:calc(var(--sat,0px) + 52px);z-index:5;background:rgba(10,20,50,.72);border-radius:14px;padding:3px 8px 3px 4px}
+@media (min-width:1024px){#bf .bf-sack{top:calc(var(--sat,0px) + 66px)}}
+.cg-b .cg-pic{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;align-self:flex-start;margin-top:2px;box-shadow:0 0 0 2px #b98a3e}
