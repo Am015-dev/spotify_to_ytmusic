@@ -30,6 +30,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{p
   // the end card hands over a real game
   const pb=await p.evaluate(()=>{const e=document.querySelector('[data-gxt-end=play]');if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});
   if(!pb)note('no "Play a real game" on the end card');else{await tap(...pb);await sleep(900)}
+  {const st=await p.evaluate(()=>{const e=document.querySelector('#start [data-a=start],#start [data-a=mode][data-go]');if(!e||document.querySelector('#start').hidden)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});
+   if(!st)note('Play a real game did not open the setup screen');else{await tap(...st);await sleep(900)}}
   const real=await p.evaluate(()=>({len:G.rounds,tut:!!(UI.cfg&&UI.cfg.tutorial),q:G.q&&G.q.kind}));console.log('handed over',JSON.stringify(real));if(real.tut||real.len<4)note('the end card did not start a real game');
   // the real game by touch: follow the finger / the one glowing thing; first-turn and mid-game shots
   await p.evaluate(()=>{UI.speed=6});let firstShot=false,midShot=false,steps=0;const t1=Date.now();last='';lastT=Date.now();

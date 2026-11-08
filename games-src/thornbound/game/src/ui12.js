@@ -115,13 +115,13 @@ function storyOpen(){if(typeof GXC==='undefined')return;
 // Learn to play = the spotlight steps above on a staged one-round game; it ends by handing over a real (guided, 5-round) game. UI.cfg.coachTut=true brings back the old coached game.
 function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window.tbCoachStart)window.tbCoachStart(o);return}
   const pro=!!(o&&o.prologue);
-  GXT.start({game:TUT_GAME,steps:tutSteps(),story:false,endTitle:'You know the round',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
-    endButtons:pro&&window.CAMPAIGN?[{id:'chapter',label:'Start chapter 1'},{id:'play',label:'Play a real game'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
+  GXT.start({game:TUT_GAME,steps:tutSteps(),endTitle:'You know the rules',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
+    endButtons:pro&&window.CAMPAIGN?[{id:'chapter',label:'Start chapter 1'}]:null,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     setup:()=>{try{GX.close()}catch(e){}try{GXC.close()}catch(e){}try{hideStart()}catch(e){}try{hideGloss()}catch(e){}closePop(true);newGame('tutorial');UI.coachOn=0;try{clearVoice()}catch(e){}renderAll()},
     onDone:r=>{const c=r&&r.choice;tutLeave();
       if(c==='chapter'&&window.CAMPAIGN&&typeof GXC!=='undefined'){showStart();GXC.play(window.CAMPAIGN.chapters[0].id);return}
-      if(c==='menu'){UI.sv='setup';UI.cfgOpen=false;showStart();renderStart();return}
-      newGame('guided')},
+      if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open();return}
+      UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()},   // Play a real game: the setup screen, one tap from a real game
     onExit:()=>{tutLeave();showStart()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
