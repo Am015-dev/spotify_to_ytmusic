@@ -181,7 +181,8 @@ function tbTurn(delay) {
 function tbAfter(seat, m) {
   if (G.result) { tbHide(); return; }
   if (UI.fc && !G.ai[seat] && m && m.t === 'place') { fcFeedback(UI.chip && UI.chip.text); return; }
-  if (G.ai[seat] && m && m.t === 'place') { const chip = UI.chip && UI.chip.text; tbShow(name(seat) + ' used ' + slotName(m.to), chip || '', 'cap', 1500); tbTurn(1600); }
+  if (G.ai[seat] && m && m.t === 'place') { UI.chip = null; clearTimeout(UI.chipT); document.querySelectorAll('#pz .rchip').forEach(e => e.remove());   // one message at a time
+    tbShow(name(seat) + ' used ' + slotName(m.to), UI.lastWhy || '', 'cap', 4500); tbTurn(4600); }   // readable: 4 s + 1 s per 10 words
   else tbTurn(0);
 }
 // tap anywhere on the board while the computer is thinking: it moves now
