@@ -119,5 +119,15 @@ rule(58, () => { E.newGame({ heroes: ['w'], seed: 57, asc: 2 }); return ['max HP
 rule(59, () => { E.newGame({ heroes: ['w'], seed: 58, acts: 4 }); return [4, E.G().acts]; });
 rule(60, () => { const has = /xform|transform/i.test(J(D.EVENTS)) || /xform|transform/i.test(fs.readFileSync(path.join(__dirname, 'src', 'engine.js'), 'utf8').replace(/\/\/.*$/gm, '')); return ['a transform action exists', has ? 'a transform action exists' : 'no transform action in events or engine']; });
 
+// ---------- W494: systems the original run has that the shelf lacked
+rule(61, () => { E.newGame({ heroes: ['w'], seed: 61, bless: 1 }); const g = E.G(), a = [g.scr, g.evn && g.evn.id, g.at]; const gold0 = g.gold; E.performMove({ t: 'opt', i: 1 }); E.performMove({ t: 'leave' }); const g2 = E.G();
+  return [['event', 'first-ember', -1, 100, 'map', -1, true], a.concat([g2.gold - gold0, g2.scr, g2.at, E.validMoves().every(m => m.t === 'go' && g2.map[m.n].f === 1)])]; });
+rule(62, () => { E.newGame({ heroes: ['w'], seed: 62, bless: 1 }); const g = E.G(), n0 = g.hs[0].deck.length; E.performMove({ t: 'opt', i: 2 }); const c = g.hs[0].deck[g.hs[0].deck.length - 1]; return [[n0 + 1, 'r'], [g.hs[0].deck.length, D.CARDS[c.id].rar]]; });
+rule(63, () => { const ids = Object.keys(D.EVENTS).filter(k => !D.EVENTS[k].start); let seen = new Set(); for (let s = 1; s < 400 && seen.size < ids.length; s++) { E.newGame({ heroes: ['w'], seed: s }); const g = E.G(); const v = g.map.filter(n => n.t === 'v' && n.f === 2)[0]; if (!v) continue; g.at = g.map.filter(n => n.f === 1 && n.nx.indexOf(v.id) >= 0)[0].id; E.performMove({ t: 'go', n: v.id }); seen.add(E.G().evn.id); }
+  return [[true, false, true], [ids.length >= 12, seen.has('first-ember'), seen.size >= 10]]; });
+rule(64, () => { E.newGame({ heroes: ['w'], seed: 64 }); const g = E.G(); g.gold = 100; g.pots = ['fire-flask', 'fire-flask']; g.scr = 'event'; g.evn = { id: 'herb-witch', res: null }; E.performMove({ t: 'opt', i: 0 }); return [[60, 3], [g.gold, g.pots.length]]; });
+rule(65, () => { E.newGame({ heroes: ['w'], seed: 65 }); const g = E.G(); g.scr = 'event'; g.evn = { id: 'forge-spirit', res: null }; E.performMove({ t: 'opt', i: 0 }); const pend = g.evn.pend, ms = E.validMoves(); E.performMove(ms[0]); return [['upg', true, 1], [pend, ms.every(m => m.t === 'evpick'), g.hs[0].deck[ms[0].c].u]]; });
+rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 3/.test(u), /bless: 1/.test(u)]]; });
+
 console.log('RULES passing ' + pass + ' / ' + total + (fails.length ? '   failing: ' + fails.join(',') : ''));
 process.exit(fails.length ? 1 : 0);

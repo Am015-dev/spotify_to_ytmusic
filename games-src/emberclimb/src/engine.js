@@ -89,6 +89,7 @@
     if (G.acts > 1 && !opt.boss) G.boss = D.ACTBOSS[G.act]; G.lastStand = opt.lastStand === 0 ? 0 : 1;
     G.rd = {}; G.rr = {}; G.hs.forEach(function (h) { G.rd[h.k] = rewardPool(h.k, 0); G.rr[h.k] = rewardPool(h.k, 1); }); if (opt.relic && G.relics.indexOf(opt.relic) < 0) G.relics.push(opt.relic);
     genMap(); resetCombat();
+    if (opt.bless) { G.evn = { id: 'first-ember', res: null, start: 1 }; G.scr = 'event'; }   // opening blessing: one free choice before the first room
     return G;
   }
   function resetCombat() { G.hs.forEach(function (h) { h.draw = []; h.hand = []; h.disc = []; h.exh = []; h.en = 0; h.blk = 0; h.st = {}; h.orbs = []; h.stance = 'n'; h.pw = {}; h.mir = 0; }); }
@@ -460,7 +461,7 @@
     else if (n.t === 'r') { G.rest = { todo: G.hs.map(function (h, i) { return h.dead ? -1 : i; }).filter(function (i) { return i >= 0; }) }; G.scr = 'rest'; }
     else if (n.t === 't') { G.rw = { gold: 0, cards: {}, relics: pickRelics('cu', G.hs.length), took: {}, treasure: 1, nrel: G.hs.length }; G.rw.gold = 20 + ri(30); G.gold += G.rw.gold; G.scr = 'reward'; }
     else if (n.t === 's') genShop();
-    else { var ks = Object.keys(D.EVENTS); G.evn = { id: ks[ri(ks.length)], res: null }; G.scr = 'event'; }
+    else { var ks = Object.keys(D.EVENTS).filter(function (k) { return !D.EVENTS[k].start; }); G.evn = { id: ks[ri(ks.length)], res: null }; G.scr = 'event'; }
   }
   function genShop() {
     var items = [], ks = G.hs.map(function (h) { return h.k; });
@@ -475,6 +476,7 @@
     G.shop = { items: items, rm: (G.asc >= 5 ? 100 : 75), removed: 0, remh: [] }; G.scr = 'shop';   // removed = every hero has used their removal; remh = heroes who did
   }
   function leaveNode() {
+    if (G.evn && G.evn.start) { G.evn = null; G.scr = 'map'; return; }   // after the opening blessing: back to the map, still before floor 1
     if (G.at < 0) G.at = G.map.filter(function (n) { return n.f === 1; })[0].id;
     if (G.rw && G.rw.cards) Object.keys(G.rw.cards).forEach(function (hi) { if (!G.rw.took['c' + hi]) returnCards(G.hs[hi].k, G.rw.cards[hi]); });
     G.rw = null; G.shop = null; G.evn = null; G.rest = null;
@@ -491,6 +493,8 @@
     if (d.hp) G.hs.forEach(function (h) { if (!h.dead) { h.hp = Math.max(1, h.hp + d.hp); } }); if (d.mhp) G.hs.forEach(function (h) { h.mhp += d.mhp; h.hp += d.mhp; });
     if (d.relic) gainRelic(pickRelic('cu')); if (d.curse) G.hs.forEach(function (h) { h.deck.push(mk(d.curse)); });
     if (d.card) G.hs.forEach(function (h) { var ch = cardChoices(h, 'm'); h.deck.push(mk(ch[0])); returnCards(h.k, ch.slice(1)); });
+    if (d.rare) G.hs.forEach(function (h) { h.deck.push(mk(drawReward(h.k, 1))); });
+    if (d.pot) for (var pi = 0; pi < d.pot && G.pots.length < G.pslots; pi++) { var pk2 = Object.keys(D.POTIONS); G.pots.push(pk2[ri(pk2.length)]); }
   }
   // ---------- moves
   function validMoves() {

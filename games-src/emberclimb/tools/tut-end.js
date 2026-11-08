@@ -1,4 +1,4 @@
-// Coached first climb test: fresh storage, opens the tutorial from the title, does the 2 forced steps by tapping the spotlit element's centre,
+// Coached first climb test: fresh storage, opens the tutorial from the title, does the guided steps (W494: a guided first fight + map walk) by tapping the spotlit element's centre,
 // then plays the whole climb by choosing legal moves through the UI only (a playable card, a target, End turn, any glowing room, rewards, rest,
 // shop leave, event choices), never blocked by the coach. Asserts the end card appears and every coach rule was either explained during play
 // or listed under "Things you will meet later". Phone 390x763 + PC 1440x860. Run: node tools/tut-end.js   (ONLY=phone|pc to run one size)
@@ -43,7 +43,7 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
     }
     const cov = await pg.evaluate(() => { const C = UI.coach, R = Object.keys((window.EC_STORY.coach || {}).rules || {}); const later = [...document.querySelectorAll('.ec-endcard [data-rule]')].map(x => x.getAttribute('data-rule')); return { total: R.length, seen: R.filter(k => C.seen[k]), later, missing: R.filter(k => !C.seen[k] && later.indexOf(k) < 0), scr: EC.E.G().scr, won: EC.E.G().won }; });
     console.log(name, 'forced steps', forced, '| rules explained in play', cov.seen.length + '/' + cov.total, '| on end card', cov.later.length, '| result', cov.won ? 'won' : 'lost');
-    if (forced > 2) { bad++; console.log('FAIL', name, 'more than 2 forced steps'); }
+    if (forced > 40) { bad++; console.log('FAIL', name, 'more than 40 guided taps'); }
     if (!endCard) { bad++; console.log('FAIL', name, 'no coach end card'); }
     if (cov.missing.length) { bad++; console.log('FAIL', name, 'rules neither explained nor listed:', cov.missing.join(',')); }
     if (endCard) { await T('#coach-play'); await sleep(600); if (!(await pg.$('#play'))) { bad++; console.log('FAIL', name, 'end card did not open a real game'); } }
