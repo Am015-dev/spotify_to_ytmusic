@@ -2,7 +2,7 @@
 var TT_TEST = {};
 (function () {
   var E = TT.E, AI = TT.AI, BY = TT.BYID;
-  var U = { hintsOn: (function () { try { return localStorage.getItem('tt_hints') === '1'; } catch (e) { return false; } })(), G: null, mode: 'cpu', lvl: 'normal', ai: [false, true], busy: false, sel: null, seq: 0, logs: [], aiTimer: 0 };
+  var U = { hintsOn: (function () { try { return localStorage.getItem('tt_hints') === '1'; } catch (e) { return false; } })(), G: null, mode: 'cpu', lvl: (function () { try { return localStorage.getItem('tt_lvl') || 'easy'; } catch (e) { return 'easy'; } })(), /* W492: a first game is Easy; your pick is remembered */ ai: [false, true], busy: false, sel: null, seq: 0, logs: [], aiTimer: 0 };
   var COLN = { brown: 'Raw', grey: 'Goods', blue: 'Civic', green: 'Science', yellow: 'Trade', red: 'War', purple: 'Guild' };
   var SYM = { wheel: 'Wh', scale: 'Sc', quill: 'Qu', mortar: 'Mo', sundial: 'Su', globe: 'Gl', law: 'La' };
   var RS = { wood: 'W', clay: 'C', stone: 'S', glass: 'G', papyrus: 'P' };
@@ -509,6 +509,15 @@ var TT_TEST = {};
     if (G.reason === 'science') return w === 0 ? 'Six symbols, one great discovery. The scholars crown you.' : who + "'s scholars solve what yours could not.";
     return w === 0 ? 'The crown is yours. ' + who + ' bows to the better builder.' : who + ' wears the crown this time. Build faster next round.';
   }
+  function shortWhy(G, a, b) {   // one line: how it was won, and the 2 categories that won it
+    if (G.winner < 0) return 'A draw: same points, same civic points.';
+    var w = G.winner === 0 ? a : b, l = G.winner === 0 ? b : a, wn = U.mode === 'cpu' ? (G.winner === 0 ? 'You' : name(1)) : name(G.winner);
+    if (G.reason === 'military') return wn + ' won by war: the pawn reached the capital.';
+    if (G.reason === 'science') return wn + ' won by science: six different symbols.';
+    var LB = { blue: 'civic cards', green: 'science', yellow: 'trade cards', guild: 'guilds', wonder: 'wonders', token: 'tokens', coins: 'coins', mil: 'war' };
+    var ks = Object.keys(LB).sort(function (x, y) { return (w[y] - l[y]) - (w[x] - l[x]); }).slice(0, 2).filter(function (k) { return w[k] > l[k]; });
+    return wn + ' won ' + w.total + ' to ' + l.total + (G.reason === 'tiebreak' ? ' on civic points' : '') + (ks.length ? ', thanks to ' + ks.map(function (k) { return LB[k] + ' (+' + (w[k] - l[k]) + ')'; }).join(' and ') : '') + '.';
+  }
   function reasonText(G) {
     var mine = U.mode === 'cpu' ? G.winner === 0 : true; return { military: mine ? 'Military supremacy: the conflict pawn reached the rival capital.' : 'Military supremacy: the conflict pawn reached your capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
   }
@@ -518,12 +527,14 @@ var TT_TEST = {};
     r.hidden = false;
     var win = G.winner >= 0 && (U.mode !== 'cpu' || G.winner === 0); if (!U.tut) SND.play(win ? 'win' : 'lose');
     var head = G.winner < 0 ? 'A draw' : U.mode === 'cpu' ? (G.winner === 0 ? 'You win!' : name(1) + ' wins') : name(G.winner) + ' wins!';
-    var h = '<div class="rbx"><i class="rart" id="rart"></i><h2>' + esc(head) + '</h2><p>' + esc(reasonText(G)) + '</p>';
-    var a = G.final ? G.final[0] : E.score(G, 0), b = G.final ? G.final[1] : E.score(G, 1);
-    h += '<table><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
+    var a = G.final ? G.final[0] : E.score(G, 0), b = G.final ? G.final[1] : E.score(G, 1), wp = G.winner < 0 ? 0 : G.winner;
+    // W492: the winner's city first (their board, portrait and best cards), one short reason, the full table folded below
+    var top = G.players[wp].cards.map(function (id) { return BY[id]; }).filter(function (c) { return c.col !== 'brown' && c.col !== 'grey'; }).slice(-4).concat(G.players[wp].wonders.filter(function (w) { return w.card; }).map(function (w) { return BY[w.id]; }).slice(0, 2)).slice(-5);
+    var h = '<div class="rbx"><div class="rcity" id="rcity"><span class="rpt">' + slot('portrait-p' + (wp + 1)) + '</span><div class="rcards">' + top.map(function (c) { return '<span class="rc">' + slot(c.stem) + '</span>'; }).join('') + '</div></div><h2>' + esc(head) + '</h2><p class="rwhy">' + esc(shortWhy(G, a, b)) + '</p>';
+    h += '<details class="rtab"' + (U.tut ? ' open' : '') + '><summary>Full score</summary><table><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
     [['Civic cards', 'blue'], ['Science', 'green'], ['Trade cards', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Science bonus', 'token'], ['Coins', 'coins'], ['War', 'mil']].forEach(function (k) { if (!a[k[1]] && !b[k[1]]) return; h += '<tr><td>' + k[0] + '</td><td class="cu" data-n="' + a[k[1]] + '">0</td><td class="cu" data-n="' + b[k[1]] + '">0</td></tr>'; });
-    h += '<tr class="hl"><td>Points</td><td class="cu" data-n="' + a.total + '">0</td><td class="cu" data-n="' + b.total + '">0</td></tr></table>' + (G.reason && G.reason !== 'points' ? '<p class="sm">An early ' + (G.reason === 'military' ? 'war' : 'science') + ' win: points do not decide this game.</p>' : '');
-    h += '<p class="line">' + esc(resultLine(G)) + '</p><button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button></div>'; r.innerHTML = h; bgSlot($('rart'), win ? 'result-victory' : 'result-defeat'); countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
+    h += '<tr class="hl"><td>Points</td><td class="cu" data-n="' + a.total + '">0</td><td class="cu" data-n="' + b.total + '">0</td></tr></table></details>' + (G.reason && G.reason !== 'points' ? '<p class="sm">An early ' + (G.reason === 'military' ? 'war' : 'science') + ' win: points do not decide this game.</p>' : '');
+    h += '<p class="line">' + esc(resultLine(G)) + '</p><button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button></div>'; r.innerHTML = h; bgSlot($('rcity'), 'city-board-p' + (wp + 1)); fillArt(r); countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
   }
 
   // ---------- drawers
@@ -587,7 +598,7 @@ var TT_TEST = {};
   function step(m) { if (!canAct()) return; doMove(m); }
   document.addEventListener('click', function (ev) {
     var t = ev.target, q = function (s) { return t.closest ? t.closest(s) : null; }, b;
-    if ((b = q('[data-lvl]'))) { U.lvl = b.dataset.lvl; $('lvls').innerHTML = ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === U.lvl ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === U.lvl) + '">' + l + '</button>'; }).join(''); return; }
+    if ((b = q('[data-lvl]'))) { U.lvl = b.dataset.lvl; try { localStorage.setItem('tt_lvl', U.lvl); } catch (e) { } $('lvls').innerHTML = ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === U.lvl ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === U.lvl) + '">' + l + '</button>'; }).join(''); return; }
     if (q('[data-story]')) { if (window.GXC && window.CAMPAIGN) GXC.open(); return; }
     if ((b = q('[data-start]'))) { var k = b.dataset.start; var sd = +(new URLSearchParams(location.search).get('seed')) || undefined; newGame(k === '1' ? 'cpu' : k === '2' ? 'two' : 'watch', U.first ? undefined : sd); U.first = true; return; }
     if ((b = q('[data-again]'))) { newGame(U.mode); return; }

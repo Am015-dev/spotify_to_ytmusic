@@ -480,4 +480,26 @@ html,body{background:#3a1f0e}
 .gx-dock .btn{background:#f2c230;color:#231a05;border:0;box-shadow:0 3px 0 #8a6a12,0 6px 12px rgba(0,0,0,.45);font-weight:800;min-height:48px}
 .gx-dock .btn.alt,.gx-dock .tk{background:#e8d6ae;color:#2b1d0e;border:0;box-shadow:0 3px 0 #8f7e58,0 6px 12px rgba(0,0,0,.45)}
 .gx-dock .gx-ibtn{background:#3b2414;color:#f6e3b8;border:1px solid #7a5428}
+
+/* W492 polish: wonder draft cards = art on top, clear text panel below (no plates over the art) */
+#draft .wcard{display:flex;flex-direction:column;padding:0;background:#1b272b;min-height:0}
+#draft .wcard .art{position:relative;inset:auto;display:block;opacity:1;flex:1 1 auto;min-height:56px;max-height:150px;background-size:cover;background-position:center;border-bottom:2px solid rgba(242,194,48,.45)}
+#draft .wcard .art img{width:100%;height:100%;object-fit:cover;display:block}
+#draft .wcard b,#draft .wcard small{background:none;border-radius:0;padding:0 8px;display:block;color:#fff6dc}
+#draft .wcard b{padding-top:6px;font-size:max(15px,var(--fmin))}
+#draft .wcard small{font-size:max(14px,var(--fmin));line-height:1.25;opacity:.92;margin-top:2px}
+#draft .wcard .costs{padding:6px 8px 8px;margin-top:0;flex:0 0 auto}
+/* W492 result: the winner's city first, the table folded */
+#res .rcity{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;background:#20343a center/cover;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding:8px;box-sizing:border-box}
+#res .rpt{position:absolute;left:8px;top:8px;width:56px;height:56px;border-radius:50%;overflow:hidden;border:2px solid #f2c230;background:#0c171b}
+#res .rpt .art,#res .rc .art{display:block;width:100%;height:100%;background-size:cover;background-position:center}
+#res .rcards{display:flex;gap:4px;justify-content:center}
+#res .rc{width:52px;height:68px;border-radius:6px;overflow:hidden;border:2px solid rgba(242,194,48,.7);background:#0c171b;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+#res .rwhy{font-size:16px;line-height:1.35;max-width:32ch}
+#res details.rtab{width:100%}#res details.rtab summary{cursor:pointer;min-height:44px;display:flex;gap:6px;align-items:center;justify-content:center;font-weight:700;color:#f2c230;list-style:none}
+#res details.rtab summary::after{content:'\25BE'}#res details.rtab[open] summary::after{content:'\25B4'}
+/* tutorial top strip: the step counter never slides under Skip */
+.gxt-prog{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.gxt-prog .gxt-dots{flex:1 1 auto;min-width:0;overflow:hidden}
+.gxt-prog .gxt-n{flex:0 0 auto}
 </style></head>
