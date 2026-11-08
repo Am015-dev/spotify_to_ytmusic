@@ -71,3 +71,8 @@ Method: `game/v4-shots.js` plays 10 turns at 390x763 and 375x553 through taps an
   a plain tap no longer freezes a camera move halfway. "Recentre" button always on the board (moves to the top while a coach bubble is open).
 - Tests: playable-test and coach-test confirm a tapped spot with "Place here" (touch bots).
 - Shots: `playable-shots/v4-{before,after}-{390x763,375x553}-{1-pick,2-aim,3-tapspot,4-follower,5-rival}.webp`.
+- **Addendum 7 (three modes), 01:55 UTC:** PLAY (default) is clean: board, hand, turn strip, one score line ("You 12 - Cobalt 8"; tap "Why" for points by
+  road/town/priory/field), a one-card Goal before turn 1 (win condition + how each feature scores), "+N town" pops. No tags, no hold previews, no ratings, no
+  bubbles, follower spots name only the feature. HINTS: top-bar toggle, off by default (saved in `rv_hints`): turns on tags, the hold/aim preview line, the
+  rating chip and line, worth-labels on follower spots and the bulb ("What should I do?"). LEARN TO PLAY (coached game) always shows everything.
+  Shots: `v4-after-*` = Play (default), `v4-hints-*` = with Hints on, `v4-play-clean-390x763.webp`, `v4-play-goal-390x763.webp`.
