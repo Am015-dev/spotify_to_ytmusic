@@ -1,8 +1,8 @@
 {
  "slug": "tidewake",
- "when": "2026-11-08T06:58Z",
- "secs": 120,
- "totalSecs": 272,
+ "when": "2026-11-08T07:20Z",
+ "secs": 45,
+ "totalSecs": 111,
  "rules": "message stays until tapped or >= 4 s + 1 s per 10 words; <=1 message at once; no messages in Play with Hints off; lines <= 12 words; text >= 14px on phone; no overlapping text after 10 turns",
  "checks": {
   "a": {
@@ -36,18 +36,18 @@
   {
    "size": "phone",
    "mode": "learn",
-   "secs": 121,
-   "turns": 112,
-   "clicks": 123,
+   "secs": 45,
+   "turns": 55,
+   "clicks": 61,
    "endedBy": "result",
-   "tutorialEnded": 7,
+   "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 14
+   "messagesSeen": 6
   },
   {
    "size": "phone",
    "mode": "play",
-   "secs": 13,
+   "secs": 9,
    "turns": 4,
    "clicks": 6,
    "endedBy": "result",
@@ -58,20 +58,20 @@
   {
    "size": "pc",
    "mode": "learn",
-   "secs": 122,
-   "turns": 80,
-   "clicks": 86,
+   "secs": 46,
+   "turns": 49,
+   "clicks": 49,
    "endedBy": "result",
-   "tutorialEnded": 10,
+   "tutorialEnded": 5,
    "hintsOff": true,
-   "messagesSeen": 11
+   "messagesSeen": 6
   },
   {
    "size": "pc",
    "mode": "play",
-   "secs": 16,
-   "turns": 7,
-   "clicks": 7,
+   "secs": 11,
+   "turns": 8,
+   "clicks": 8,
    "endedBy": "result",
    "tutorialEnded": null,
    "hintsOff": true,
