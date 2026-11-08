@@ -135,11 +135,13 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
-  if (PADIMG && R.w <= 760 && R.h <= 520) pxPad(R); else {
+  const tp = document.querySelector('#tpad'), TR = tp && !tp.hidden && PX.B ? pxRect(tp, PX.B) : null, padTR = !!(PADIMG && TR && TR.w > 40);   // G4: the pad sits under the trick
+  if (PADIMG && !padTR && R.w <= 760 && R.h <= 520) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
   }
-  if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
+  if (padTR) { pxPad({ x: TR.x - 4, y: TR.y - 2, w: TR.w + 8, h: TR.h + 4 }); try { const L = PX.L.felt, mi = L.getChildIndex(PX.mat); if (L.getChildIndex(PX.padS) < mi) L.setChildIndex(PX.padS, mi); } catch (e) { } }
+  else if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;

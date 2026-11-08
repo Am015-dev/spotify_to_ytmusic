@@ -153,7 +153,7 @@ function tapJob(i) {
   if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Captain cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
   doMove(m);
 }
-// tap a ping spot on a card of your hand
+// confirm the card picked in Signal mode
 function sigStart() {
   const v = viewSeat(); if (!canAct() || !canSigNow(v)) return;
   if (tutOn() && !GXT.act({ type: 'tap', what: 'signal' })) return;

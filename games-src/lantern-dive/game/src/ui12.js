@@ -54,7 +54,9 @@ const TUT_RULES = [
   ['theirs', 'Jobs are taken in turn; each job has one owner'],
   ['lose', 'One failed job fails the attempt for everyone; the crew tries again'],
   ['flare', 'Distress flare: optional card pass, costs an attempt'],
-  ['ping', 'Signal once per dive, any time between tricks, in no fixed order: highest, lowest or only card of a colour'],
+  ['notrump', 'Lanterns (trumps) can never be signalled'],
+  ['ping', 'Signal between tricks: highest, lowest or only card of a colour'],
+  ['pingonce', 'Each diver signals only once per dive'],
   ['readping', 'Reading a crewmate\'s signal token'],
   ['lead', 'The Captain leads trick one; the leader plays any card'],
   ['follow1', 'Everyone must follow the colour led if they can'],
@@ -67,29 +69,43 @@ const TUT_RULES = [
   ['trumpwin', 'A Lantern beats every colour; higher Lanterns beat lower'],
   ['won', 'All jobs done ends the dive at once with a win']
 ];
+// G4 review fix: most steps are done by touch. A "look" step asks for a tap on the spotlit thing (a job, a seat, a token, a played card);
+// the tap is caught here before the game sees it, so it teaches without making a move. Only 4 steps are Next-only reading.
+const tutLook = (id, say, target, ready) => ({ id, say, target, look: true, wait: { type: 'tap', match: a => a.what === 'look' && a.id === id }, ready });
+document.addEventListener('click', e => {
+  if (!tutOn()) return; let st; try { st = GXT.state(); } catch (x) { return; }
+  if (!st || !st.shown || st.wait !== 'tap') return;
+  const step = tutSteps().find(q => q.id === st.id); if (!step || !step.look) return;
+  const x = e.clientX, y = e.clientY;
+  if (!(st.holes || []).some(r => x >= r.left - 2 && x <= r.left + r.width + 2 && y >= r.top - 2 && y <= r.top + r.height + 2)) return;
+  e.preventDefault(); e.stopPropagation(); GXT.act({ type: 'tap', what: 'look', id: st.id });
+}, true);
+const tutLan = () => tutBox(['L4', 'L3'].map(t => '#hand .hc[data-id="' + tcard(t) + '"]').join(', '));
 function tutSteps() {
   const T = () => G.trick, pl = n => G.phase === 'play' && T() && T().n === n;
   return [
-    tutNext('goal', 'The crew wins together when every job card is done.', tutBox('#pool .jcard'), () => G.phase === 'assign' && tutFree() && !!document.querySelector('#pool .jcard')),
+    tutLook('goal', 'The crew wins together. Tap the jobs: all must be done.', tutBox('#pool .jcard'), () => G.phase === 'assign' && tutFree() && !!document.querySelector('#pool .jcard')),
     tutTap('take', 'Lantern 4 makes you Captain. Captains pick first: take this job.', tq('#pool .jcard[data-i="0"]'), m => m.t === 'take' && m.i === 0, () => G.phase === 'assign' && tutMy()),
-    tutNext('mine', 'Your job: win the trick that holds Lantern 3.', tutBox('#me .jcard, #me [data-a="job"], [data-a="job"][data-i="0"]'), () => G.tasks[1].owner === 1 && tutFree()),
-    tutNext('theirs', 'Dag took the other job: win the first trick.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
+    tutLook('mine', 'Tap your job: win the trick that holds Lantern 3.', tutBox('#me .jcard, #me [data-a="job"], [data-a="job"][data-i="0"]'), () => G.tasks[1].owner === 1 && tutFree()),
+    tutLook('theirs', 'Tap Dag. He took the other job: win trick one.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
     tutNext('lose', 'One failed job fails the attempt. The crew then tries again.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutTap('flare', 'A flare swaps cards but costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
+    tutLook('notrump', 'Tap your Lanterns. Trumps can never be signalled.', tutLan(), () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
     tutUi('ping', 'Signal once per dive, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
     tutUi('pingpick', 'Only a highest, lowest or only colour card. Tap Kelp 3.', tutHand('K3'), a => a.what === 'pingsel' && a.c === tcard('K3'), () => UI.pingSel && UI.sel < 0 && tutFree()),
     tutTap('pingok', 'Kelp 3 is your lowest Kelp. Tap Show it.', tq('#acts [data-a="pingok"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => UI.pingSel && UI.sel === tcard('K3') && tutFree()),
-    tutNext('readping', 'Sumi\'s top token: Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
+    tutLook('pingonce', 'Tap your token. One signal per dive: yours is spent.', tutBox('#mine .sigst'), () => G.players[0].pingUsed && tutFree()),
+    tutLook('readping', 'Tap Sumi. "8 high": Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
     tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && G.pings.some(p => p.seat === 2) && tutMy()),
-    tutNext('follow1', 'Dag follows Kelp. Everyone must follow the colour led, if able.', tq('#felt'), () => pl(0) && T().plays.length === 2 && tutFree()),
+    tutLook('follow1', 'Tap Dag\'s card. Everyone must follow the colour led.', tq('#slots .tslot[data-seat="1"]'), () => pl(0) && T().plays.length === 2 && tutFree()),
     tutNext('win1', 'The highest card of the colour led wins. Dag takes it.', tutSeat(1), () => G.tricks.length >= 1 && tutFree()),
-    tutNext('done1', 'Dag\'s job is done. A done job cannot fail now.', tutSeat(1), () => G.tricks.length >= 1 && tutFree()),
-    tutNext('winlead', 'The winner leads next. Dag led Coral 4.', tq('#felt'), () => pl(1) && T().plays.length === 2 && tutMy()),
+    tutLook('done1', 'Tap Dag. His job is done and cannot fail now.', tutSeat(1), () => G.tricks.length >= 1 && tutFree()),
+    tutLook('winlead', 'Tap Dag\'s Coral 4. The trick winner leads next.', tq('#slots .tslot[data-seat="1"]'), () => pl(1) && T().plays.length === 2 && tutMy()),
     tutTap('nowin', 'Follow Coral. You need not win: play Coral 2.', tutHand('C2'), m => m.t === 'play' && m.c === tcard('C2'), () => pl(1) && tutMy()),
     tutNext('void', 'No Tide in your hand? Then you may play any card.', tq('#hand'), () => pl(2) && T().plays.length === 1 && tutMy()),
     tutTap('trump', 'Lanterns are trumps. Play Lantern 3 to win this trick.', tutHand('L3'), m => m.t === 'play' && m.c === tcard('L3'), () => pl(2) && tutMy()),
     tutNext('trumpwin', 'A Lantern beats any colour. Higher Lanterns beat lower ones.', tq('#felt'), () => G.phase === 'over' && tutFree()),
-    tutNext('won', 'Every job is done, so the crew wins the dive at once!', tutBox('[data-a="job"]'), () => G.phase === 'over' && tutFree())
+    tutLook('won', 'Tap the jobs: all done, so the crew wins at once!', tutBox('[data-a="job"]'), () => G.phase === 'over' && tutFree())
   ];
 }
 // ---------------------------------------------------------------- the kit hooks
