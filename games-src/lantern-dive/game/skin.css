@@ -115,3 +115,8 @@ html .tbtn small,.tlink,.ttl .tag,.ttl .sub{font-size:15px}
 html .seat .top .nm{flex:0 1 auto;max-width:100%}
 html .seat .jc{width:auto;max-width:100%}
 @media (min-width:1024px){html .seat .bdgs{flex-direction:row;justify-content:flex-start;gap:8px}html .seat .top{gap:8px}}
+@keyframes jgl{50%{box-shadow:0 0 0 6px var(--gold),0 0 30px rgba(255,216,115,.95)}}
+/* W479: nothing under 14px on a phone */
+.ppop,.ppop *,.pcard,.pcard *,#dlg *,#rs *,#start *,#tbub,#tbub *,#tskip,.gxh-bub *,.gxt-bub *,.gx-drawer *,.spill,.gotb,.hc .gotb,#hand .handnote,.kv span,.kv b,.dbox small{font-size:max(14px,1em)!important}
+.gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:15px!important}
+#tskip{font-family:inherit}
