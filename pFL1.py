@@ -1,0 +1,10 @@
+# FL: auto vehicle switch, smash→boost, day/night cycle (module fl.js + 5 small hooks; see ANCHORS.md)
+exec(open('P.py').read())
+R("const terr=T0.deck?'road':ground<-1.5?'water':inLot(RO.x,RO.z)&&ground<.5?'dirt':'road';\n  const veh=(RO.vsel||'auto')==='auto'?(terr==='water'?'boat':terr==='dirt'?'offroad':'ship'):RO.vsel;",
+  "const terr=FL_terr(T0,ground,dt);\n  const veh=FL_veh();")
+R("terr==='dirt'?3.6:13)","terr==='dirt'?(veh==='offroad'?8:2.6):13)")
+R("if(RO.bIdle>.8)s.bm=Math.min(100,s.bm+7*dt)","if(RO.bIdle>.8)s.bm=Math.min(100,s.bm+FL_RECH*dt)")
+R("if(pl)pl.bm=Math.min(100,pl.bm+4);AU.sfx('brick')","if(pl)FL_smash(def);AU.sfx('brick')")
+R("seg('Steering assist','assist',[['on','On'],['off','Off']]);","seg('Steering assist','assist',[['on','On'],['off','Off']]);seg('Time of day (free roam)','tod',[['cycle','Cycle'],['day','Always day'],['night','Always night']],()=>{FL.am=null});")
+R('window.__mho={',open('fl.js').read()+'\nwindow.__mho={')
+save()
