@@ -4,7 +4,7 @@
 @media (max-width:639px){:root{--gx-bar-h:44px}}
 .gx-main{display:block;min-height:0;position:relative}
 .gx-board{background:#17463f;position:absolute;inset:0}
-.gx-bar{min-height:var(--gx-bar-h);height:var(--gx-bar-h);box-sizing:border-box;overflow:hidden;padding-top:env(safe-area-inset-top,0px);height:calc(var(--gx-bar-h) + env(safe-area-inset-top,0px))}
+.gx-bar{min-height:var(--gx-bar-h);height:var(--gx-bar-h);box-sizing:border-box;overflow:hidden;padding-top:env(safe-area-inset-top,0px);padding-bottom:0;align-items:flex-start;height:calc(var(--gx-bar-h) + env(safe-area-inset-top,0px))}
 .gx-bar .gx-ibtn{min-height:38px;height:38px}
 .gx-bar h1{font-size:1.25rem}
 #tb{position:absolute;inset:0;display:flex;flex-direction:column;min-height:0;overflow:hidden;color:#fff;-webkit-user-select:none;user-select:none;touch-action:manipulation;
@@ -16,10 +16,10 @@
 /* strip: fuse, finished numbers, wires cut */
 #strip{flex:none;display:flex;align-items:center;gap:8px;padding:4px 8px;height:42px;box-sizing:border-box;background:rgba(10,20,30,.45);border-bottom:2px solid rgba(0,0,0,.35)}
 #fuse{flex:1 1 90px;min-width:70px}
-.fz{display:flex;align-items:center;gap:5px;height:30px}
-.fz .lit{display:grid;place-items:center;color:#ffc928;width:18px;height:18px;flex:none}
+.fz{display:flex;align-items:flex-start;gap:5px;height:38px}
+.fz .lit{display:grid;place-items:center;color:#ffc928;width:18px;height:18px;flex:none;margin-top:10px}
 .fz .lit svg{width:18px;height:18px}
-.rp{position:relative;flex:1;display:flex;gap:3px;height:15px;min-width:0}
+.rp{position:relative;flex:1;display:flex;gap:0;height:20px;margin:3px -14px 0 0;min-width:0}
 .rp i{flex:1;height:100%;border-radius:5px;background:repeating-linear-gradient(60deg,#d99a5b 0 3px,#a8652b 3px 6px);border:1.5px solid #4a2a14;box-sizing:border-box;transition:background .4s}
 .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.9}
 .rp i.next{box-shadow:0 0 6px 1px rgba(255,160,40,.6)}
@@ -28,7 +28,9 @@
 .fz.danger .bm{animation:shk .35s infinite}
 .fz.burn .rp i.next{animation:burn .9s}
 .fz.phew .spark{filter:hue-rotate(160deg)}
-.bm{flex:none;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.bm{flex:none;width:36px;height:36px;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.fz.burn .bm{animation:shk .12s 4,bmflash .9s}
+@keyframes bmflash{0%,100%{filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}25%{filter:brightness(1.7) drop-shadow(0 0 8px #ff9a3a)}}
 @keyframes flick{from{transform:scale(.8) rotate(-8deg)}to{transform:scale(1.15) rotate(8deg)}}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @keyframes burn{0%{background:#fff;transform:scaleY(1.7)}100%{transform:none}}
@@ -167,7 +169,7 @@ button.plate{cursor:pointer;font-family:inherit}
 @keyframes spk{from{opacity:1;transform:translate(0,0) scale(1.2)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
 .pop{position:absolute;transform:translate(-50%,-100%);font:1.5rem/1 var(--fd);color:#fff;-webkit-text-stroke:2px #14163a;paint-order:stroke fill;text-shadow:0 3px 0 #14163a;animation:rise 1.05s ease-out forwards;white-space:nowrap}
 .pop.good{color:#ffe066}.pop.bad{color:#ff7a6a}
-@keyframes rise{0%{opacity:0;transform:translate(-50%,-60%) scale(.5)}20%{opacity:1;transform:translate(-50%,-110%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-220%) scale(1)}}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-55%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-80%) scale(1)}}
 .say{position:absolute;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;animation:bub .9s ease-out forwards}
 .say span{font:800 .72rem var(--fb);background:var(--sc);color:#14163a;border:2px solid #14163a;border-radius:9px;padding:0 6px;white-space:nowrap}
 .say b{font:1.6rem/1.1 var(--fd);color:#fff;background:#14163a;border-radius:12px;padding:1px 12px;border:2px solid #fff;margin-top:2px}
@@ -175,7 +177,7 @@ button.plate{cursor:pointer;font-family:inherit}
 .tile.aim{animation:aim .35s ease-in-out 2;z-index:4}
 @keyframes aim{0%,100%{transform:none}50%{transform:scale(1.2) rotate(3deg);box-shadow:0 0 0 4px #fff,0 0 18px 6px #ffe066}}
 .tile.snap{animation:snap .8s ease-out;z-index:5}
-@keyframes snap{0%{transform:rotateY(90deg) scale(1.5)}30%{transform:rotateY(0) scale(1.3)}60%{transform:scale(.9) rotate(-6deg)}100%{transform:none}}
+@keyframes snap{0%{transform:rotateY(90deg) scale(1.12)}30%{transform:rotateY(0) scale(1.08)}60%{transform:scale(.94) rotate(-4deg)}100%{transform:none}}   /* review R1 (row 5): the cut tile stays inside its own stand */
 .tile.buzz{animation:buzz .7s;z-index:5}
 @keyframes buzz{0%,100%{transform:none}15%{transform:translateX(-5px) rotate(-6deg);box-shadow:0 0 0 4px #ff3b2d,0 0 18px 6px #ff3b2d}30%{transform:translateX(5px) rotate(6deg)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}}
 #tb.shake{animation:shk2 .5s}
@@ -211,6 +213,7 @@ button.plate{cursor:pointer;font-family:inherit}
 #tb.land #mine{--tw:44px}
 
 #mine .mh{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap}
+#mine.mrow .sg{flex-direction:row;justify-content:center;gap:10px}   /* short landscape: plate beside my stand so the crew keeps its rows */
 .chip.sm{min-height:36px;padding:2px 11px;font-size:.88rem;border-radius:11px;border-width:2px;box-shadow:0 2px 0 #14163a}
 
 html.short #strip{height:36px;padding:2px 8px}
@@ -322,3 +325,18 @@ html.short #sc .tr span:nth-child(2){display:none}
 .briefc .bpts{margin:2px 14px 6px;padding-left:18px;text-align:left;font:700 1rem/1.3 var(--fb);color:#1c1408}.briefc .bjob{margin:0 12px 6px;font:700 .875rem var(--fb);color:#4a3418}
 #bulbbtn.hon{box-shadow:0 0 0 3px #ffd34d,0 0 14px #ffd34d}#pv .wsd{font:800 .875rem var(--fb);color:#1c1408;background:#ffd34d;border:0;border-radius:12px;padding:2px 10px;min-height:28px;cursor:pointer}
 .card2.briefc .bn{display:none}
+/* review R1 (row 4): each stand is one framed rack; two stands are labelled and spaced apart; a wrapped stand shows a return arrow */
+.stand{border-radius:7px;background:rgba(8,14,28,.32);box-shadow:0 0 0 3px rgba(8,14,28,.32),0 0 0 4px rgba(255,255,255,.16)}
+#crew .stand.two,#mine .stand.two{margin-top:13px}
+.stl{position:absolute;left:4px;top:-12px;z-index:4;height:18px;line-height:18px;padding:0 7px;border-radius:9px;font:800 14px/18px system-ui,sans-serif;color:#fff;background:#111a2b;border:1px solid var(--sc,#9ab);pointer-events:none;white-space:nowrap}
+.stand.wrapd{row-gap:12px}
+.rtn{display:none}
+.stand.wrapd .rtn{display:block;position:absolute;left:12px;right:8px;top:calc(var(--th) + 3px);height:6px;border:2px solid rgba(255,214,90,.9);border-left:0;border-top:0;border-radius:0 0 4px 0;pointer-events:none;z-index:3}
+.stand.wrapd .rtn::before{content:'';position:absolute;right:-2px;top:-5px;height:5px;border-right:2px solid rgba(255,214,90,.9)}
+.stand.wrapd .rtn::after{content:'';position:absolute;left:-7px;top:1px;border:6px solid transparent;border-right:7px solid rgba(255,214,90,.9);border-left:0;transform:translateY(-1px)}
+#ptip{position:fixed;z-index:60;background:#111a2b;color:#fff;border:1px solid #ffd23f;border-radius:10px;padding:8px 10px;font:600 14px/1.35 system-ui,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+#ptip div+div{margin-top:3px}#ptip .star{color:#ffd23f}
+#ptip u.tl,.briefc .blg u.tl{display:inline-block;width:16px;height:16px;border-radius:4px;vertical-align:-3px;background:var(--ai,#16b3a6);background-size:cover;background-position:center;border:1.5px solid #14163a}
+.briefc .blg{margin:0 14px 6px;font:700 .875rem/1.35 var(--fb);color:#4a3418;text-align:left}.briefc .blg .star{color:#a3410a}
+.end .jchk{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:4px 10px}.end .jchk span{font:700 14px/1.2 var(--fb);padding:4px 8px;border-radius:10px;background:rgba(0,0,0,.12);color:#4a3418}.end .jchk span.on{background:#2f8f3a;color:#fff}
+.end .jnext{margin:2px 12px 4px;font:700 14px/1.3 var(--fb);color:#4a3418}
