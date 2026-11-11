@@ -1,0 +1,213 @@
+/* ===== Phone layout (html.ph): the mat first, decisions in pop-ups next to it. Every rule starts with html.ph so desktop and tablets are untouched. ===== */
+html.ph,html.ph body{overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+html.ph .gx-app{padding:0 var(--sar,0px) var(--sab,0px) var(--sal,0px);display:grid}
+html.ph .gx-main{display:contents}
+/* portrait: slim bar, then a square board at full width, then the dock */
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) var(--bs,100vw) minmax(0,1fr)}
+html.ph.ph-p .gx-bar{grid-row:1;height:calc(44px + var(--sat,0px));min-height:0;padding:var(--sat,0px) 6px 0}
+html.ph.ph-p .gx-board{grid-row:2;width:var(--bs);height:var(--bs)}
+html.ph.ph-p .gx-dock{grid-row:3}
+/* landscape: the board is full height on the left, the dock is the rail, the icon bar is a thin column on the right */
+html.ph.ph-l .gx-app{grid-template-columns:var(--bs,100vh) minmax(0,1fr) 48px;grid-template-rows:minmax(0,1fr);padding-top:var(--sat,0px)}
+html.ph.ph-l .gx-bar{grid-column:3;grid-row:1;flex-direction:column;width:48px;height:100%;padding:4px 2px;gap:4px;overflow:hidden;border-bottom:0;border-left:2px solid var(--gold);align-items:center}
+html.ph.ph-l .gx-board{grid-column:1;grid-row:1;width:var(--bs);height:var(--bs)}
+html.ph.ph-l .gx-dock{grid-column:2;grid-row:1}
+html.ph .gx-bar .gx-sp{flex:1 1 0}
+html.ph .gx-bar h1{display:none}
+html.ph .gx-bar>.btn[data-gx],html.ph .gx-bar>.btn[data-a="rules"],html.ph .gx-gear{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;font-size:0;display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;text-align:center}
+html.ph .gx-bar>.btn .ico,html.ph .gx-gear .ico{width:23px;height:23px;vertical-align:middle}
+html.ph .gx-bar .icw{gap:0;display:inline-flex}
+html.ph .gx-bar>.btn:not(.gx-gear):not([data-gx]):not([data-a="rules"]){display:none}
+html.ph .ph-chip{display:flex;align-items:center;gap:6px;color:var(--gold);font:700 14px/1.1 Orbitron,"Exo 2",sans-serif;white-space:nowrap;min-width:0;overflow:hidden}
+html.ph .ph-chip i.you{font:700 13px "Exo 2",sans-serif;font-style:normal;background:var(--gold);color:#1b1030;border-radius:999px;padding:1px 7px}
+html.ph.ph-l .ph-chip{flex-direction:column;gap:1px;font-size:13px;text-align:center;width:46px}
+html.ph.ph-l .ph-chip i.you{padding:0 4px;font-size:13px}
+html.ph .gx-more{max-height:calc(100dvh - 16px);overflow:auto}
+html.ph.ph-p .gx-more{top:calc(var(--sat,0px) + 48px);right:calc(var(--sar,0px) + 6px)}
+html.ph.ph-l .gx-more{top:calc(var(--sat,0px) + 6px);right:calc(var(--sar,0px) + 54px);bottom:auto;max-height:calc(100dvh - var(--sat,0px) - var(--sab,0px) - 12px)}
+html.ph .gx-more .btn{min-height:44px}
+/* the board */
+html.ph .gx-board{overflow:hidden;background:#05040f}
+html.ph .viewbar,html.ph .legend,html.ph .lgbtn{display:none!important}
+html.ph #coachtag{display:none!important}
+/* compact ship tags on phones: short name + hull/shields/stress, so you can tell ships apart and see who is hurt */
+html.ph #tags .tag{font-size:13px;line-height:1.15;padding:0 4px;border-radius:6px}html.ph #tags .tag b{font-size:13px;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+html.ph #tags .tag .ps,html.ph #tags .tag .dl{display:none}
+html.ph .stage canvas{touch-action:none}
+/* the dock: control row, roadmap, then one panel (strip / step card / pop-up) */
+html.ph .gx-dock{border:0;border-top:2px solid var(--gold);box-shadow:none;max-height:none!important;visibility:visible!important;display:flex;flex-direction:column;position:relative;min-height:0;padding-bottom:0;border-radius:0}
+html.ph.ph-l .gx-dock{border-top:0;border-left:0}
+html.ph .gx-app.gx-dock-min .gx-dock-body{display:flex}
+html.ph .gx-dock-head{order:1;flex:0 0 auto;height:48px;padding:2px 6px;gap:4px;justify-content:flex-start}
+html.ph .gx-dock-head .gx-grab,html.ph .gx-dock-head .gx-dt,html.ph .gx-dock-head [data-gx="dock"]{display:none}
+html.ph .gx-reopen{display:none!important}
+html.ph .ph-ctl{display:flex;gap:4px;margin-right:auto}
+html.ph .gx-dock-head .gx-ibtn{min-width:44px;min-height:44px;padding:0 8px;font-size:0;border-radius:10px}
+html.ph .gx-dock-head .gx-ibtn .ico{width:22px;height:22px}
+html.ph .gx-dock-head .gx-ibtn.on,html.ph .gx-dock-head .gx-ibtn[aria-pressed="true"].na-guide{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+html.ph .gx-dock-head .na-guide{font-size:0;gap:4px}
+html.ph .gx-dock-head .na-guide b{font-size:13px;color:var(--gold)}
+html.ph .gx-dock-head .na-guide .icw{font-size:0}
+html.ph .gx-dock-top{order:2;flex:0 0 auto;padding:2px 6px 4px;gap:0}
+html.ph #queue{display:none}
+html.ph .road .rn{display:none}
+html.ph .road{gap:4px}
+html.ph .road .ph{min-height:44px;font-size:13px;padding:0 2px}
+html.ph .road .ph b{font-size:13px}html.ph .road .ph i{font-size:13px}
+html.ph .roadinfo{font-size:13px;max-height:80px;overflow:auto}html.ph .roadinfo .linkb{min-width:44px;min-height:44px;font-size:16px}
+html.ph #ps{order:3;flex:1 1 auto;min-height:0;overflow:auto;padding:6px 8px;display:flex;flex-direction:column;gap:8px}
+html.ph #ps[hidden]{display:none}
+html.ph .gx-dock-body{order:4;flex:1 1 auto;min-height:0;padding:6px 8px 8px;gap:6px;overflow:auto}
+html.ph.ph-ps .gx-dock-body{flex:0 0 auto;padding:0 8px}
+html.ph.ph-ps #prompt,html.ph.ph-ps #notice,html.ph.ph-ps #radio,html.ph.ph-ps #lastlog,html.ph.ph-ps #shipcard{display:none}
+html.ph #shipcard,html.ph #radio,html.ph #lastlog,html.ph #recap,html.ph #coach{display:none!important}
+html.ph .nowbox{padding:8px 10px}
+html.ph #prompt .head{font-size:15px}
+html.ph #prompt ol.sub{display:none}
+html.ph .now-t,html.ph #prompt p,html.ph .small{font-size:13px}
+html.ph .btn{min-height:44px;font-size:15px}
+html.ph .btn small{font-size:13px}
+html.ph .btn.sm{min-height:44px;font-size:14px}
+html.ph .acts.col .btn{min-height:52px}
+html.ph .acts.col{gap:6px}
+html.ph .btn.armed{border-color:#7fd4ff;box-shadow:0 0 0 3px rgba(127,212,255,.5)}
+html.ph .btn.armed::after{content:"Tap again to confirm";display:block;font-size:13px;color:#7fd4ff;font-weight:700}
+html.ph .ph-move{font-size:14px;background:var(--panel2);border-radius:8px;padding:6px 8px;margin:2px 0 6px}
+html.ph .acts.main{position:sticky;bottom:-8px;padding:6px 0 8px;margin-bottom:-6px}
+html.ph .acts.tiles{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+html.ph .acts.grid{grid-template-columns:repeat(5,minmax(44px,1fr))}html.ph .acts.grid .btn{min-height:44px;font-size:15px}
+html.ph .acts.grid.g9{grid-template-columns:repeat(5,minmax(44px,1fr))}html.ph .acts.grid.g9 .btn{grid-column:auto!important}
+html.ph .tab{min-height:44px}html.ph .linkb{min-height:44px;min-width:44px}
+html.ph .mv{width:44px;height:44px;font-size:20px}
+html.ph .netbar{font-size:13px;min-height:0}
+html.ph .die{width:44px;height:48px}html.ph .dice .die{width:44px;height:48px}html.ph .die .d8{width:40px;height:40px}
+html.ph .dice{gap:6px}
+html.ph .sumgrid b{font-size:1.1rem}
+/* strip */
+html.ph .ps-t{margin:0;font-size:14px;line-height:1.35}
+html.ph .ps-chips{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .ps-chip{flex:1 1 120px;min-height:52px;text-align:left;border:1.5px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);font:inherit;padding:4px 10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center}
+html.ph .ps-chip b{font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .ps-chip span{font-size:13px;color:var(--muted)}
+html.ph .ps-chip.need{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.3);animation:psPulse 1.6s ease-in-out infinite}
+html.ph .ps-chip.need span{color:var(--gold);font-weight:700}
+html.ph .ps-chip.set span{color:#8ff5b8}
+html.ph .ps-chip.on{background:rgba(255,200,107,.16)}
+@keyframes psPulse{50%{box-shadow:0 0 0 5px rgba(255,200,107,.1)}}
+@media (prefers-reduced-motion:reduce){html.ph .ps-chip.need{animation:none}}
+html.ph .ps-btns{display:flex;gap:8px}html.ph .ps-btns .btn{flex:1 1 0;text-align:center;min-height:48px}
+/* pop-ups and cards fill the dock zone (never the board) */
+html.ph #ppop,html.ph #pc{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;background:var(--panel);border-top:2px solid var(--gold)}
+html.ph #ppop[hidden],html.ph #pc[hidden]{display:none}
+html.ph #pc{z-index:9;background:linear-gradient(180deg,#1b1848,#100e2e)}
+html.ph .pp-h{display:flex;align-items:center;gap:8px;padding:2px 4px 2px 10px;min-height:44px;flex:0 0 auto;border-bottom:1px solid var(--line)}
+html.ph .pp-h b{flex:1;min-width:0;font:700 15px Orbitron,"Exo 2",sans-serif;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .pp-n{font-size:13px;color:var(--muted);white-space:nowrap}
+html.ph .pp-h .gx-x{min-width:44px;min-height:44px;font-size:28px}
+html.ph .pp-b,html.ph .pc-b{flex:1 1 auto;min-height:0;overflow:auto;padding:6px 10px;-webkit-overflow-scrolling:touch}
+html.ph .pp-f{flex:0 0 auto;display:flex;gap:8px;padding:6px 10px calc(6px + 0px);border-top:1px solid var(--line);background:var(--panel)}
+html.ph .pp-f .btn{flex:1 1 0;text-align:center;min-height:48px}
+html.ph .pm-grid{display:grid;grid-template-columns:22px repeat(6,44px);gap:2px;justify-content:center;align-items:center}
+html.ph .pm-sp{font:700 13px "Exo 2",sans-serif;color:var(--muted);text-align:center}
+html.ph .pm-e{display:block;width:44px;height:44px}
+html.ph .pm-grid .mv{width:44px;height:44px;font-size:21px;border-radius:9px}
+html.ph .pm-grid .mv[disabled]{opacity:.3}
+html.ph .pm-grid .mv .rs{position:absolute;left:3px;top:0;font-size:13px;color:#06306a}
+html.ph .pm-grid .mv .rk{position:absolute;right:3px;top:0;font-size:13px;font-style:normal;color:#7a0a18;font-weight:800}
+html.ph .pm-leg{font-size:13px;color:var(--muted);margin:4px 0;text-align:center}
+html.ph .pm-leg .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 2px 0 6px}
+html.ph .pm-read{font-size:13px;margin:2px 0;line-height:1.35}
+html.ph .pp-l{margin:2px 0 6px;font-size:14px}
+html.ph .pp-r{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;margin:4px 0}html.ph .pp-r.rec{border-color:var(--gold);background:rgba(255,200,107,.1)}
+html.ph .pp-r .dice-n{font-size:16px}
+html.ph .pp-m{margin:4px 0;padding-left:18px;font-size:13px}
+html.ph .pp-c{padding-left:18px}
+html.ph .stats.big span{font-size:14px;padding:2px 6px}html.ph .stats.big span i{font-size:13px}
+html.ph .pp-bars{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin:6px 0}
+html.ph .pp-bars .bar{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
+html.ph .pp-bars .bar i{width:14px;height:14px;border-radius:3px;background:#ffd0a0}html.ph .pp-bars .bar.s i{background:#7fd4ff}html.ph .pp-bars .bar i.x{background:transparent;border:1.5px solid var(--line)}
+html.ph .adv2{font-size:15px;line-height:1.4;border:1.5px solid var(--gold);border-radius:10px;padding:8px 10px;background:rgba(255,200,107,.1)}
+html.ph .pc-b .brief{font-size:14px}
+/* modals, drawers: full-width sheets with scrolling inside */
+html.ph #modal{padding:max(8px,var(--sat,0px)) max(8px,var(--sar,0px)) max(8px,var(--sab,0px)) max(8px,var(--sal,0px));align-items:center}
+html.ph .dlg{max-height:calc(100dvh - 16px);border-radius:14px;padding:10px 12px 12px;max-width:none;overscroll-behavior:contain}
+html.ph .dlg h1{font-size:1.5rem}
+html.ph .launchbar{top:-10px}
+html.ph .gx-drawer{height:calc(100dvh - 10px);max-height:none;border-radius:14px 14px 0 0}
+html.ph .gx-x{min-width:44px;min-height:44px}
+html.ph select,html.ph .row select{min-height:44px;font-size:16px}
+html.ph input{min-height:44px;font-size:16px}
+html.ph .ex{min-height:44px}
+html.ph .exps{grid-template-columns:1fr}
+html.ph .bld .tab{min-height:44px;font-size:14px}
+html.ph .bld .btn.ghost{min-width:44px}
+html.ph .stats span,html.ph .small{font-size:13px}
+html.ph small,html.ph label small.bio{font-size:13px}
+html.ph #prompt .btn small,html.ph .sumgrid span,html.ph #prompt h4,html.ph .pc-type,html.ph .pc-uq,html.ph .stats span i,html.ph .pcard .stats span,html.ph .stats span{font-size:13px}
+html.ph .pc-art{height:70px}
+html.ph .dice .die,html.ph .die{width:50px;height:64px}html.ph .die i{font-size:13px;margin-top:0;opacity:1}
+html.ph .drow .dl,html.ph .ab,html.ph .ups,html.ph .ups span,html.ph .crit,html.ph .dleg,html.ph .qwhy,html.ph #prompt .dleg{font-size:13px}
+html.ph #prompt .acts.col>.btn.primary{position:sticky;bottom:-4px;z-index:2;box-shadow:0 -8px 10px var(--panel),0 3px 12px rgba(255,170,60,.3)}
+html.ph .dice .die,html.ph .die{width:46px;height:60px}
+html.ph .gx-more{width:min(280px,calc(100vw - 16px));align-items:stretch}html.ph .gx-more .btn{display:flex;align-items:center;gap:8px;text-align:left}
+html.ph .roadinfo:not(:has(.linkb)){display:none}
+/* landscape: the rail is short, so the whole dock scrolls (the control row and the roadmap scroll away to give the card the full height) */
+html.ph.ph-l .gx-dock{overflow-y:auto;overflow-x:hidden;display:block;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+html.ph.ph-l.ph-pop .gx-dock,html.ph.ph-l.ph-card .gx-dock{overflow:hidden}
+html.ph.ph-l .gx-dock-body{overflow:visible}
+html.ph.ph-l #ps{overflow:visible}
+html.ph.ph-l .gx-dock-head{display:flex}
+html.ph:not(.ph-3d) .ph-ctl{display:none}
+html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
+html.ph #map text{display:none}
+/* ===== portrait: compact chrome so the action panel gets the room ===== */
+/* camera: off the board in portrait. A camera button in the top bar opens the four controls as a small
+   pop-up row under the bar for a few seconds; pinch and drag on the board work as always */
+.ph-cam{display:none}
+html.ph.ph-p .ph-cam,html.ph.ph-p .gx-bar>.btn.ph-cam{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
+html.ph.ph-p .ph-cam .ico{width:22px;height:22px}
+html.ph.ph-p.camopen .ph-cam{border-color:var(--gold)}
+html.ph.ph-p .ph-ctl{position:fixed;right:6px;top:var(--cam-top,52px);z-index:20;flex-direction:row;gap:4px;margin:0;padding:4px;border-radius:14px;background:rgba(10,8,30,.88);border:1px solid rgba(255,200,107,.45);box-shadow:0 8px 20px rgba(0,0,0,.5);display:none}
+html.ph.ph-p.camopen .ph-ctl{display:flex}
+/* one 44px row: the phase strip on the left, Guide + Advice on the right */
+html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 4px 0 0;gap:2px;order:0}
+html.ph.ph-p .gx-dock-head .na-guide b{display:none}
+html.ph.ph-p .gx-dock-top{padding:0 94px 0 4px;height:44px;display:flex;flex-direction:row;align-items:center}
+html.ph.ph-p #steps{flex:1;min-width:0}
+html.ph.ph-p .road{gap:1px;align-items:center}
+html.ph.ph-p .road .ph{border-width:1px}
+html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:1px;padding:0 1px;font-size:12.5px;line-height:1;white-space:nowrap;letter-spacing:-.02em}
+html.ph.ph-p .road .ph::before{content:"";position:absolute;left:0;right:0;top:-5px;bottom:-5px}
+html.ph.ph-p .road .ph b,html.ph.ph-p .road .ph i{display:inline;font-size:12.5px;overflow:visible;text-overflow:clip}
+html.ph.ph-p .road .ph .lg,html.ph.ph-p .road .ph .tx{display:none}
+html.ph.ph-p .road .ph .sh{display:inline}
+html.ph.ph-p .road .ph.on{border-color:var(--gold)}
+html.ph.ph-p .roadinfo{position:absolute;left:6px;right:6px;top:46px;z-index:6;max-height:calc(100% - 52px);font-size:14px;background:var(--panel2);border:1px solid var(--gold);padding:6px 8px}
+html.ph .ph-ctl .gx-ibtn{min-width:44px;min-height:44px;width:44px;height:44px;padding:0;font-size:0;border-radius:10px;flex:0 0 44px}
+html.ph .ph-ctl .gx-ibtn .ico{width:22px;height:22px}
+html.ph .ph-ctl .gx-ibtn.on,html.ph .ph-ctl .gx-ibtn[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+html.ph.ph-p .road{width:100%}
+/* the panel scrolls, the primary button stays pinned and fully visible at its bottom edge.
+   .acts.col dissolves into the prompt so its buttons can stick to the scroller (a sticky child cannot leave its own parent) */
+html.ph .gx-dock-body{scroll-padding-bottom:60px}
+html.ph #prompt .acts.col{display:contents}
+html.ph #prompt .acts.col>.btn{display:block;width:100%;margin:0 0 6px}
+html.ph #prompt .acts.col>.btn.primary,html.ph #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph #prompt>.acts:has(>.btn.primary.big){position:sticky;bottom:-4px;z-index:2;background-clip:padding-box;box-shadow:0 -10px 10px -2px var(--panel),0 3px 12px rgba(255,170,60,.25)}
+html.ph #prompt>.acts:has(>.btn.primary.big){background:var(--panel);bottom:-8px;padding:4px 0 6px;margin:0 0 4px;box-shadow:0 -10px 10px -2px var(--panel)}
+html.ph.ph-l #prompt .acts.col>.btn.primary,html.ph.ph-l #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph.ph-l #prompt>.acts:has(>.btn.primary.big),html.ph.ph-l .acts.main{bottom:0}
+html.ph .acts.main>.btn.primary{flex:1 1 100%;width:100%}
+html.ph.ph-p .gx-board{justify-self:center}
+
+/* a ★ choice above the pinned button must never sit under it: unpin the button when a suggested choice is listed */
+html.ph #prompt .acts.col:has(>.btn.rec:not(.primary))>.btn.primary{position:static;box-shadow:none}
+html.ph .pm-leg .rkl{color:#ff6b6b}
+.race{margin:0 0 6px;font-size:13px;color:var(--muted)}.race b{color:#fff}.race .h{color:#ffd0a0}.race .sh{color:#7fd4ff}
+/* dice steps (html.ph-dice): smaller mat, compact dice rows, no legend or race line, nothing pinned over the dice */
+html.ph.ph-p.ph-dice .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) min(var(--bs,100vw),75vw) minmax(0,1fr)}
+html.ph.ph-p.ph-dice .gx-board{width:min(var(--bs,100vw),75vw);height:min(var(--bs,100vw),75vw)}
+html.ph.ph-dice #prompt .race,html.ph.ph-dice #prompt .dleg{display:none}
+html.ph.ph-dice #prompt .drow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}html.ph.ph-dice #prompt .drow .dl{flex:0 0 100%}
+html.ph.ph-dice #prompt .dice .die,html.ph.ph-dice #prompt .die{width:38px;height:48px}
+html.ph.ph-dice #prompt .btn.primary,html.ph.ph-dice #prompt .acts.col>.btn.primary{position:static;box-shadow:none}
+html.ph #tags .tag .tgl{font-size:13px}
+@media (max-height:600px){html.ph #ps .race{display:none}}

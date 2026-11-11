@@ -1,0 +1,7 @@
+const PW = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright');
+const fs = require('fs'), path = require('path'); const html = fs.readFileSync(path.join(__dirname, 'demo.html'));
+(async () => { const br = await PW.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+ const ctx = await br.newContext({ viewport: { width: 1366, height: 768 } }); await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+ const pg = await ctx.newPage(); pg.setDefaultTimeout(150000); await pg.goto('https://gns.test/?static&noqbar&gfx=high'); await pg.waitForFunction(() => window.DEMO_READY === true);
+ const r = await pg.evaluate(() => { const K = SFKit._K, out = {}; K.scene.traverse(o => { if (!o.isMesh || !o.visible) return; const g = o.geometry; let t = g.index ? g.index.count / 3 : g.attributes.position.count / 3; if (g.drawRange && g.drawRange.count !== Infinity) t = Math.min(t, g.drawRange.count / 3); if (o.isInstancedMesh) t *= o.count; const k = (o.isInstancedMesh ? 'I:' : '') + (g.type || 'geo') + (o.parent && o.parent.type === 'Group' ? '' : ''); out[k] = (out[k] || 0) + t; }); return out; });
+ console.log(Object.entries(r).sort((a, b) => b[1] - a[1]).map(e => e[0] + ' ' + Math.round(e[1])).join('\n')); await br.close(); })();

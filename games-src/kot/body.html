@@ -1,0 +1,632 @@
+<body>
+<header>
+  <h1>Crown City Smash</h1>
+  <span class="sub">Roll, smash and stomp your way to 20 stars</span>
+  <span class="spacer"></span>
+  <button class="btn" data-a="tour">Tour</button>
+  <button class="btn" data-a="rules">Rules</button>
+  <button class="btn" data-a="new">New game</button>
+</header>
+<div class="wrap">
+  <div class="board">
+    <svg id="map" viewBox="0 0 1000 640" role="img" aria-label="The city arena and the monsters"></svg>
+    <div id="banner"></div>
+    <div id="score" class="score"></div>
+  </div>
+  <div class="side">
+    <div id="coach" class="box hidden"></div>
+    <div id="prompt" class="box"></div>
+    <div id="dicewrap" class="box"><h3>Dice</h3><div id="dice" class="dicebox"></div><div id="rolls" class="rolls"></div></div>
+    <div id="marketwrap" class="box"><h3>Power cards for sale</h3><div id="market" class="market"></div></div>
+    <div id="minewrap" class="box"><h3 id="minettl">Your cards</h3><div id="mine" class="mine"></div></div>
+    <div id="legendwrap" class="box"><h3>Dice faces</h3><div id="legend" class="legend"></div></div>
+    <div id="logwrap" class="box"><h3>City chronicle</h3><ol id="log"></ol></div>
+  </div>
+</div>
+<div id="modal" class="hidden"></div>
+<script>
+var ANIM=1, AIDELAY=650, DEFN=4, YA=3, YB=0;
+const SAVE='ccs_save', TOUR='ccs_tour';
+const FACES=['1','2','3','E','C','H'];
+const MONS=[
+ {n:'Voltusk',c:'#ffd23f',d:'Thunder-tusked boar of the power grid'},
+ {n:'Squidrik',c:'#b57bff',d:'One-eyed terror of the storm drains'},
+ {n:'Magmaw',c:'#ff6b4a',d:'Lava crab with molten pincers'},
+ {n:'Shroomhulk',c:'#6ad16a',d:'Spore brute from the sewer farms'},
+ {n:'Boltbox',c:'#4fa3ff',d:'Runaway demolition robot'},
+ {n:'Glacyx',c:'#8fe9f2',d:'Walking glacier with a cold heart'}];
+// Power cards. t: K = keep, D = discard. v = how much the computer values a keep card (in energy).
+const CARDS={
+ acid:{n:'Corrosive Drool',c:6,t:'K',v:6,x:'Your smash deals +1 damage every turn, even when you roll no claws.'},
+ cosmic:{n:'Cosmic Gut',c:3,t:'K',v:4,x:'Power cards cost you 1 energy less.'},
+ alpha:{n:'Top Predator',c:5,t:'K',v:5,x:'Gain 1 star whenever you smash with claws.'},
+ plated:{n:'Plated Hide',c:4,t:'K',v:4,x:'Ignore any hit that would cost you exactly 1 heart.'},
+ lurker:{n:'Alley Lurker',c:4,t:'K',v:2,x:'You may reroll your 3s even after your last roll.'},
+ tunnel:{n:'Tunneler',c:5,t:'K',v:4,x:'+1 smash damage while you are in the city. When you yield, the monster taking your place loses 1 heart.'},
+ chameleon:{n:'Chameleon Skin',c:3,t:'K',v:4,x:'When you take damage, roll a die for each point. Every heart rolled cancels 1 damage.'},
+ spree:{n:'Wrecking Spree',c:3,t:'K',v:1.5,x:'If your final dice show 1, 2, 3, energy, claw and heart, gain 9 stars.'},
+ news:{n:'News Chopper',c:3,t:'K',v:3,x:'Gain 1 star whenever you buy a power card.'},
+ carrion:{n:'Carrion Feast',c:4,t:'K',v:3,x:'Gain 3 stars whenever a monster is knocked out.'},
+ battery:{n:'Battery Belly',c:3,t:'K',v:3,x:'At the end of your turn, gain 1 star for every 6 energy you hold.'},
+ growth:{n:'Growth Spurt',c:4,t:'K',v:5,x:'Your maximum hearts go up by 2. Heal 2 when you buy this.'},
+ skull:{n:'Second Skull',c:7,t:'K',v:9,x:'You roll one extra die.'},
+ scorch:{n:'Scorch Breath',c:4,t:'K',v:3,x:'When you smash with claws, the monsters seated next to you lose 1 extra heart.'},
+ hiccup:{n:'Time Hiccup',c:5,t:'K',v:2,x:'On a turn you score three 1s, take another turn with one die fewer.'},
+ kidfan:{n:'Kid Fan Club',c:3,t:'K',v:4,x:'Whenever you gain energy, gain 1 more.'},
+ brain:{n:'Mega Brain',c:5,t:'K',v:6,x:'You get one extra reroll each turn.'},
+ gourmand:{n:'Gourmand',c:4,t:'K',v:2,x:'When you score 1s, gain 2 extra stars.'},
+ grazer:{n:'Grazer',c:5,t:'K',v:3,x:'Gain 1 star at the end of any turn in which you damaged nobody.'},
+ pack:{n:'Pack Hunter',c:3,t:'K',v:3,x:'Once per turn, turn one of your dice into a 1.'},
+ egg:{n:'Egg Clutch',c:7,t:'K',v:5,x:'If you are knocked out, discard all your cards and stars, and hatch again with 10 hearts.'},
+ vjets:{n:'Vapor Jets',c:5,t:'K',v:4,x:'When you yield the city, you take none of the smash damage.'},
+ nova:{n:'Nova Roar',c:7,t:'K',v:6,x:'Your smash hits every other monster, wherever they are.'},
+ omni:{n:'Omni-Muncher',c:4,t:'K',v:4,x:'Once per turn, a 1-2-3 scores 2 stars. Those dice still count for other sets.'},
+ twist:{n:'Twist Ending',c:3,t:'K',v:2,x:'Turn one die to any face, then discard this card.'},
+ quills:{n:'Venom Quills',c:3,t:'K',v:2,x:'When you score 2s and smash with claws, deal 2 extra damage.'},
+ mend:{n:'Quick Mend',c:3,t:'K',v:4,x:'At any time, pay 2 energy to heal 1 heart.'},
+ regrow:{n:'Regrowth',c:4,t:'K',v:3,x:'When your heart dice heal you, heal 1 extra.'},
+ underdog:{n:'Underdog Spirit',c:3,t:'K',v:3,x:'At the end of your turn, if you have the fewest stars, gain 1 star.'},
+ smoke:{n:'Smoke Screen',c:4,t:'K',v:4,x:'Comes with 3 puffs. Spend a puff for an extra reroll. Discard when empty.'},
+ sun:{n:'Sunsoaker',c:2,t:'K',v:2,x:'At the end of your turn, if you have no energy, gain 1.'},
+ barbed:{n:'Barbed Tail',c:5,t:'K',v:6,x:'When you smash with claws, deal 1 extra damage.'},
+ rubber:{n:'Rubber Limbs',c:3,t:'K',v:3,x:'Before resolving, pay 2 energy to turn one die to any face.'},
+ mind:{n:'Mind Link',c:4,t:'K',v:3,x:'Pay 1 energy for an extra reroll.'},
+ street:{n:'Street Eater',c:4,t:'K',v:5,x:'Gain 1 extra star when you start your turn in the city. +1 smash damage from the city.'},
+ thick:{n:'Thick Skin',c:3,t:'K',v:3,x:'Whenever you lose 2 or more hearts at once, gain 1 energy.'},
+ wings:{n:'Membrane Wings',c:6,t:'K',v:5,x:'At the start of another monster’s turn, you may pay 2 energy to take no damage from it that turn.'},
+ kiosk:{n:'Corner Kiosk',c:3,t:'D',x:'Gain 1 star.'},
+ train:{n:'Rush-Hour Train',c:4,t:'D',x:'Gain 2 stars.'},
+ tower:{n:'Tower Block',c:5,t:'D',x:'Gain 3 stars.'},
+ needle:{n:'Sky Needle',c:6,t:'D',x:'Gain 4 stars.'},
+ sirens:{n:'Panic Sirens',c:7,t:'D',x:'Every other monster loses 5 stars.'},
+ surge:{n:'Power Surge',c:8,t:'D',x:'Gain 9 energy.'},
+ flame:{n:'Flame Wave',c:3,t:'D',x:'Every other monster loses 2 hearts.'},
+ refinery:{n:'Refinery Blast',c:6,t:'D',x:'Gain 2 stars. Every other monster loses 3 hearts.'},
+ patch:{n:'Patch Up',c:3,t:'D',x:'Heal 2 hearts.'},
+ carpet:{n:'Carpet Strike',c:4,t:'D',x:'Every monster, you included, loses 3 hearts.'},
+ jetsq:{n:'Jet Squadron',c:5,t:'D',x:'Gain 5 stars and lose 4 hearts.'},
+ militia:{n:'Militia Drill',c:3,t:'D',x:'Gain 2 stars and lose 2 hearts.'},
+ reactor:{n:'Reactor Snack',c:6,t:'D',x:'Gain 2 stars and heal 3 hearts.'},
+ tanks:{n:'Tank Column',c:4,t:'D',x:'Gain 4 stars and lose 3 hearts.'},
+ cyclone:{n:'Cyclone',c:6,t:'D',x:'Gain 2 stars. Every other monster loses 1 energy for every 2 it holds.'},
+ rush:{n:'Rampage Rush',c:7,t:'D',x:'Take another turn right away (skip your end-of-turn effects).'},
+ skydive:{n:'Skydive Stomp',c:5,t:'D',x:'Gain 2 stars and take over the city if you are not already there.'}};
+const DECK=[...Object.keys(CARDS),'skull#2','sirens#2'];
+const base=id=>id.split('#')[0];
+let G=null;
+const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,rollAnim:0};
+
+// ---------- helpers ----------
+const rnd=n=>Math.floor(Math.random()*n);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const P=i=>G.pl[i];
+const cur=()=>G.pl[G.active];
+const has=(p,id)=>p.cards.filter(c=>base(c)===id).length;
+const maxhp=p=>10+2*has(p,'growth');
+const inCity=i=>G.city===i||G.bay===i;
+const where=i=>G.city===i?'Downtown':G.bay===i?'the Harbor':'the suburbs';
+const alive=()=>G.pl.filter(p=>p.alive);
+const isHuman=i=>G.pl[i].human;
+const mname=p=>MONS[p.m].n;
+const costOf=(p,id)=>Math.max(0,CARDS[base(id)].c-has(p,'cosmic'));
+function lg(s,t){G.log.unshift({s,t});if(G.log.length>400)G.log.length=400}
+function fx(i,t,c){(UI.fx[i]=UI.fx[i]||[]).push({t,c})}
+function gainVP(p,n,why){if(n<=0)return;p.vp+=n;fx(p.i,'+'+n+'★','star')}
+function loseVP(p,n){const d=Math.min(p.vp,n);p.vp-=d;if(d)fx(p.i,'-'+d+'★','star')}
+function gainE(p,n){if(n<=0)return;n+=has(p,'kidfan');p.en+=n;fx(p.i,'+'+n+'⚡','energy')}
+function heal(p,n){const d=Math.max(0,Math.min(n,maxhp(p)-p.hp));p.hp+=d;if(d)fx(p.i,'+'+d+'♥','heal');return d}
+function neighbours(i){const a=G.pl.filter(p=>p.alive&&p.i!==i).map(p=>p.i);if(!a.length)return[];const n=G.pl.length;let l=null,r=null;
+  for(let k=1;k<n;k++){const j=(i+k)%n;if(G.pl[j].alive){r=j;break}}for(let k=1;k<n;k++){const j=(i-k+n)%n;if(G.pl[j].alive){l=j;break}}return [...new Set([l,r].filter(x=>x!==null))]}
+function counts(){const c={'1':0,'2':0,'3':0,E:0,C:0,H:0};G.dice.forEach(d=>c[d.f]++);return c}
+function draw(){if(!G.deck.length){G.deck=shuffle(G.disc);G.disc=[]}return G.deck.pop()||null}
+function refill(){for(let k=0;k<3;k++)if(!G.market[k])G.market[k]=draw();G.market=G.market.filter(Boolean)}
+
+// ---------- setup ----------
+function newGame(mode,n,mon){
+  n=n||UI.n||DEFN;mon=(mon===undefined?UI.mon:mon);
+  const others=shuffle([0,1,2,3,4,5].filter(m=>m!==mon));
+  const mons=mode==='solo'?[mon,...others]:shuffle([0,1,2,3,4,5]);
+  const pl=[];for(let i=0;i<n;i++)pl.push({i,m:mons[i],hp:10,vp:0,en:0,cards:[],alive:true,human:mode==='hot',tok:{}});
+  if(mode==='solo'){const seat=rnd(n);const hm=pl[0].m;pl[0].m=pl[seat].m;pl[seat].m=hm;pl[seat].human=true}
+  G={mode,n,pl,city:-1,bay:-1,bayOn:n>=5,deck:shuffle(DECK.slice()),disc:[],market:[],dice:[],rolls:0,phase:'start',active:0,turn:1,log:[],winner:null,winText:'',tf:{},extra:0,less:0,rollId:0};
+  refill();UI.choice=null;UI.roll=null;UI.pick=null;UI.busy=false;UI.info=false;UI.fx={};UI.banner='';
+  lg(-1,`A new rampage begins with ${n} monsters: ${pl.map(mname).join(', ')}.`);
+  if(G.bayOn)lg(-1,'With 5 or more monsters, the Harbor is open as a second city space.');
+  startTurn();
+}
+
+// ---------- asking (humans get a modal, computers answer at once) ----------
+function ask(i,title,text,options,aiPick,cb){
+  if(isHuman(i)&&!G.winner){UI.choice={title,text,options,cb,who:i};render();return}
+  cb(aiPick())}
+function seq(list,fn,done){let k=0;const next=()=>{if(k>=list.length){done();return}fn(list[k++],next)};next()}
+
+// ---------- turn flow ----------
+function startTurn(){
+  if(G.winner)return;
+  const p=cur();G.phase='start';G.tf={dealt:0,culler:false,ones:false};UI.banner='';
+  const flyers=alive().filter(q=>q.i!==p.i&&has(q,'wings')&&q.en>=2);flyers.forEach(q=>q.tok.shield=false);
+  alive().forEach(q=>{if(q.i!==p.i)q.tok.shield=false});
+  seq(flyers,(q,next)=>ask(q.i,'Membrane Wings',`${mname(p)} is about to take a turn. Pay 2 energy to take no damage from it this turn?`,
+      [{k:'y',l:'Spread wings (pay 2 ⚡)',d:`You have ${q.en} energy.`},{k:'n',l:'Save the energy'}],
+      ()=>aiWings(q,p)?'y':'n',k=>{if(k==='y'){q.en-=2;q.tok.shield=true;lg(q.i,`${mname(q)} spreads its wings against ${mname(p)}.`)}next()}),
+    ()=>{
+      if(inCity(p.i)){const b=2+has(p,'street');gainVP(p,b);lg(p.i,`${mname(p)} starts in ${where(p.i)} and gains ${b} stars.`)}
+      const nd=Math.max(1,6+has(p,'skull')-G.less);G.less=0;
+      G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:FACES[rnd(6)],k:false,x:k>=6});
+      G.rolls=2+has(p,'brain');G.rollId++;G.phase='roll';G.aiMarked=false;
+      lg(p.i,`${mname(p)} rolls ${nd} dice.`);refresh()});
+}
+function reroll(){G.dice.forEach(d=>{if(!d.k)d.f=FACES[rnd(6)]});G.rollId++;UI.banner=''}
+function doReroll(kind){const p=cur();
+  if(kind==='mind'){p.en-=1}else if(kind==='smoke'){p.tok.smoke--;if(p.tok.smoke<=0){discardCard(p,'smoke');lg(p.i,`${mname(p)} uses its last puff of smoke.`)}}
+  else if(kind==='lurker'){G.dice.forEach(d=>{d.k=d.f!=='3'});reroll();G.dice.forEach(d=>d.k=false);lg(p.i,`${mname(p)} lurks and rerolls its 3s.`);refresh();return}
+  else G.rolls--;
+  reroll();refresh()}
+function discardCard(p,id){const k=p.cards.findIndex(c=>base(c)===id);if(k>=0)G.disc.push(p.cards.splice(k,1)[0])}
+
+function resolve(){
+  const p=cur();G.phase='resolve';UI.busy=true;const c=counts();const nums=[];const out=[];
+  const inT=inCity(p.i);
+  // numbers
+  let q2=false;
+  for(const f of ['1','2','3']){const n=c[f];if(n>=3){let v=(+f)+(n-3);if(f==='1'&&has(p,'gourmand'))v+=2*has(p,'gourmand');gainVP(p,v);out.push(`${v}★ from ${n}×${f}`);if(f==='2')q2=true;if(f==='1')G.tf.ones=true}}
+  if(has(p,'omni')&&c['1']&&c['2']&&c['3']){gainVP(p,2);out.push('2★ munching 1-2-3')}
+  if(has(p,'spree')&&FACES.every(f=>c[f])){gainVP(p,9);out.push('9★ wrecking spree')}
+  if(c.E){gainE(p,c.E);out.push(`${c.E+(has(p,'kidfan')?1:0)}⚡`)}
+  if(c.H){if(inT)out.push('hearts wasted in the city');else{let h=c.H+(has(p,'regrow')?1:0);const d=heal(p,h);if(d)out.push(`healed ${d}♥`)}}
+  // smash
+  let amt=c.C;const claws=c.C>0;
+  if(claws){amt+=has(p,'barbed');if(inT)amt+=has(p,'street')+has(p,'tunnel');if(q2&&has(p,'quills'))amt+=2}
+  amt+=has(p,'acid');
+  const hitList=[];
+  if(amt>0){
+    let tg=has(p,'nova')?alive().filter(q=>q.i!==p.i):inT?alive().filter(q=>!inCity(q.i)):alive().filter(q=>inCity(q.i));
+    const extra={};if(claws&&has(p,'scorch')){for(const j of neighbours(p.i))extra[j]=(extra[j]||0)+has(p,'scorch')}
+    const all=new Set([...tg.map(q=>q.i),...Object.keys(extra).map(Number)]);
+    for(const j of all){const q=P(j);const a=(tg.includes(q)?amt:0)+(extra[j]||0);const lost=damage(q,a,p);if(tg.includes(q)&&inCity(j))hitList.push({j,lost});}
+    if(all.size){out.push(`smashes ${[...all].map(j=>mname(P(j))).join(', ')} for ${amt}`);lg(p.i,`${mname(p)} smashes ${[...all].map(j=>mname(P(j))+' (−'+(tg.map(q=>q.i).includes(j)?amt:0)+(extra[j]?'+'+extra[j]:'')+')').join(', ')}.`);if(claws&&has(p,'alpha'))gainVP(p,has(p,'alpha'))}
+    else if(claws)out.push('claws hit nobody');
+  }
+  if(G.tf.ones&&has(p,'hiccup'))G.tf.hiccup=true;
+  UI.banner=`<b>${esc(mname(p))}</b>: ${out.length?esc(out.join(' · ')):'nothing useful'}`;
+  if(out.length)lg(p.i,`${mname(p)} resolves: ${out.join(', ')}.`);
+  // yields (only monsters in the city hit by an outside smasher's dice)
+  const yielders=[];
+  const canAsk=hitList.filter(h=>h.lost>0&&!inT&&(P(h.j).hp>0||has(P(h.j),'vjets')));
+  seq(canAsk,(h,next)=>{const q=P(h.j);
+      ask(q.i,'Stay or yield?',`${mname(p)} smashed you for ${h.lost}. You have ${Math.max(0,q.hp)} hearts left. Yield ${where(q.i)} and ${mname(p)} moves in.${has(q,'vjets')?' Your Vapor Jets cancel the damage if you yield.':''}`,
+        [{k:'stay',l:`Stay in ${where(q.i)}`,d:'Keep scoring 2 stars at the start of your turn.'},{k:'yield',l:'Yield and run!',d:'Leave the city. Hearts heal outside.'}],
+        ()=>aiYield(q,h.lost)?'yield':'stay',k=>{if(k==='yield')yielders.push(h);next()})},
+    ()=>{
+      for(const h of yielders){const q=P(h.j);if(G.city===q.i)G.city=-1;if(G.bay===q.i)G.bay=-1;
+        if(has(q,'vjets')){q.hp+=h.lost;fx(q.i,'jets!','heal')}
+        lg(q.i,`${mname(q)} yields and flees the city.`);fx(q.i,'YIELD','star')}
+      deaths();
+      if(!G.winner&&p.alive)enterStep(p,yielders);
+      deaths();
+      UI.busy=false;
+      if(G.winner){refresh();return}
+      if(!p.alive){endTurn();return}
+      G.phase='buy';G.aiSwept=false;refresh()})
+}
+function enterStep(p,yielders){
+  if(G.bay===p.i&&G.city===-1){G.bay=-1;G.city=p.i;lg(p.i,`${mname(p)} moves up from the Harbor to Downtown.`);return}
+  if(inCity(p.i))return;
+  let spot=null;if(G.city===-1)spot='city';else if(G.bayOn&&G.bay===-1)spot='bay';
+  if(!spot)return;
+  if(spot==='city')G.city=p.i;else G.bay=p.i;
+  gainVP(p,1);lg(p.i,`${mname(p)} storms into ${where(p.i)} (+1 star).`);
+  for(const h of yielders){const q=P(h.j);if(q.alive&&has(q,'tunnel')){damage(p,has(q,'tunnel'),q,true);lg(q.i,`${mname(q)}'s tunnels collapse under ${mname(p)}.`)}}
+}
+// apply damage; returns hearts actually lost
+function damage(q,a,src,card){
+  if(a<=0||!q.alive)return 0;
+  if(q.tok.shield&&src&&src.i===G.active&&q.i!==src.i){fx(q.i,'wings!','heal');return 0}
+  if(a===1&&has(q,'plated')){fx(q.i,'blocked','heal');return 0}
+  if(has(q,'chameleon')){let saved=0;for(let k=0;k<a;k++)if(rnd(6)===5)saved++;if(saved){a-=saved;fx(q.i,'dodged '+saved,'heal')}if(a<=0)return 0}
+  q.hp-=a;fx(q.i,'-'+a+'♥','hurt');
+  if(a>=2&&has(q,'thick'))gainE(q,1);
+  if(src&&src.i!==q.i&&src.i===G.active)G.tf.dealt+=a;
+  return a}
+function deaths(){
+  for(const q of G.pl){if(!q.alive||q.hp>0)continue;
+    while(q.hp<=0&&has(q,'mend')&&q.en>=2){q.en-=2;q.hp++;fx(q.i,'mend!','heal')}
+    if(q.hp>0){lg(q.i,`${mname(q)} patches itself up with Quick Mend and survives!`);continue}
+    if(G.city===q.i)G.city=-1;if(G.bay===q.i)G.bay=-1;
+    if(has(q,'egg')){G.disc.push(...q.cards);q.cards=[];q.vp=0;q.hp=10;q.tok={};lg(q.i,`${mname(q)} falls, but a new ${mname(q)} hatches from the Egg Clutch with 10 hearts and no stars!`);fx(q.i,'HATCH!','heal');continue}
+    q.alive=false;q.hp=0;G.disc.push(...q.cards);q.cards=[];q.en=0;
+    lg(q.i,`${mname(q)} is knocked out!`);fx(q.i,'K.O.','hurt');
+    for(const r of alive())if(has(r,'carrion')){gainVP(r,3*has(r,'carrion'));lg(r.i,`${mname(r)} feasts on the wreckage (+3 stars).`)}
+  }
+  if(G.bayOn&&alive().length<=4){G.bayOn=false;lg(-1,'Only four monsters remain: the Harbor closes.');
+    if(G.bay>=0){const b=G.bay;G.bay=-1;if(G.city===-1){G.city=b;lg(b,`${mname(P(b))} moves from the Harbor to Downtown.`)}else lg(b,`${mname(P(b))} is washed out of the Harbor.`)}}
+  checkWin(false)}
+function checkWin(final){
+  if(G.winner)return true;const a=alive();
+  if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
+  if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
+  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`20 stars: ${mname(w[0])} reaches ${w[0].vp} stars and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  return false}
+
+// ---------- buying ----------
+function canBuy(p,k){const id=G.market[k];return id&&p.en>=costOf(p,id)}
+function buy(k,done){const p=cur();const id=G.market[k];if(!id||!canBuy(p,k))return;const b=base(id),C=CARDS[b];
+  p.en-=costOf(p,id);G.market[k]=null;refill();lg(p.i,`${mname(p)} buys “${C.n}”.`);
+  if(has(p,'news'))gainVP(p,has(p,'news'));
+  UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(C.n)}`;
+  if(C.t==='K'){p.cards.push(id);if(b==='growth')heal(p,2);if(b==='smoke')p.tok.smoke=3}
+  else{G.disc.push(id);playDiscard(p,b,()=>{deaths();after()});return}
+  deaths();after();
+  function after(){if(G.winner){refresh();return}if(!p.alive){endTurn();return}
+    if(b==='rush'){lg(p.i,`${mname(p)} goes on a Rampage Rush and takes another turn!`);startTurn();return}
+    refresh()}}
+function playDiscard(p,b,done){const others=alive().filter(q=>q.i!==p.i);
+  switch(b){
+    case 'kiosk':gainVP(p,1);break;case 'train':gainVP(p,2);break;case 'tower':gainVP(p,3);break;case 'needle':gainVP(p,4);break;
+    case 'sirens':others.forEach(q=>loseVP(q,5));break;
+    case 'surge':gainE(p,9);break;
+    case 'flame':others.forEach(q=>damage(q,2,p,true));break;
+    case 'refinery':gainVP(p,2);others.forEach(q=>damage(q,3,p,true));break;
+    case 'patch':heal(p,2);break;
+    case 'carpet':alive().forEach(q=>damage(q,3,p,true));break;
+    case 'jetsq':gainVP(p,5);damage(p,4,null,true);break;
+    case 'militia':gainVP(p,2);damage(p,2,null,true);break;
+    case 'reactor':gainVP(p,2);heal(p,3);break;
+    case 'tanks':gainVP(p,4);damage(p,3,null,true);break;
+    case 'cyclone':gainVP(p,2);others.forEach(q=>{const d=Math.floor(q.en/2);q.en-=d;if(d)fx(q.i,'-'+d+'⚡','energy')});break;
+    case 'skydive':gainVP(p,2);if(!inCity(p.i)){
+      const take=spot=>{const o=spot==='city'?G.city:G.bay;if(o>=0)lg(o,`${mname(P(o))} is stomped out of ${where(o)}.`);if(spot==='city')G.city=p.i;else G.bay=p.i;gainVP(p,1);lg(p.i,`${mname(p)} drops from the sky into ${where(p.i)}!`);done()};
+      if(G.city===-1)return take('city');if(G.bayOn&&G.bay===-1)return take('bay');
+      if(G.bayOn)return ask(p.i,'Skydive Stomp','Which space do you land on? Its monster is kicked out.',[{k:'city',l:`Downtown (kick out ${mname(P(G.city))})`},{k:'bay',l:`The Harbor (kick out ${mname(P(G.bay))})`}],()=>'city',take);
+      return take('city')}break;
+  }
+  done()}
+function sweep(){const p=cur();if(p.en<2||!G.market.length)return;p.en-=2;G.disc.push(...G.market);G.market=[];refill();lg(p.i,`${mname(p)} pays 2 energy to sweep the market.`);refresh()}
+function mend(){const p=cur();if(!has(p,'mend')||p.en<2||p.hp>=maxhp(p))return;p.en-=2;heal(p,1);lg(p.i,`${mname(p)} uses Quick Mend.`);refresh()}
+function endTurn(){
+  const p=cur();UI.pick=null;
+  if(p.alive&&!G.winner){
+    const eh=has(p,'battery');if(eh&&p.en>=6){const v=Math.floor(p.en/6)*eh;gainVP(p,v);lg(p.i,`${mname(p)}'s Battery Belly hums (+${v} stars).`)}
+    if(has(p,'sun')&&p.en===0){gainE(p,has(p,'sun'));lg(p.i,`${mname(p)} soaks up some sun.`)}
+    if(has(p,'underdog')&&alive().every(q=>q.i===p.i||q.vp>p.vp)){gainVP(p,has(p,'underdog'));lg(p.i,`The crowd cheers for underdog ${mname(p)} (+1 star).`)}
+    if(has(p,'grazer')&&!G.tf.dealt){gainVP(p,has(p,'grazer'));lg(p.i,`${mname(p)} grazes peacefully (+1 star).`)}
+  }
+  if(checkWin(true)){refresh();return}
+  if(p.alive&&G.tf.hiccup){G.less=1;lg(p.i,`Time hiccups! ${mname(p)} takes another turn with one die fewer.`);startTurn();return}
+  let j=G.active;const n=G.pl.length;
+  for(let k=1;k<=n;k++){const c=(G.active+k)%n;if(G.pl[c].alive){j=c;break}}
+  if(j<=G.active)G.turn++;
+  G.active=j;UI.fx={};startTurn()}
+
+// ---------- die changing cards ----------
+function changeDie(kind){const p=cur();
+  const opts=G.dice.map((d,k)=>({k:String(k),l:`Die ${k+1}: ${fname(d.f)}`}));
+  UI.choice={title:CARDS[kind].n,text:'Pick the die to change.',options:opts,cancel:true,who:p.i,cb:k=>{
+    const d=G.dice[+k];
+    if(kind==='pack'){d.f='1';G.tf.culler=true;lg(p.i,`${mname(p)} turns a die into a 1 (Pack Hunter).`);refresh();return}
+    UI.choice={title:CARDS[kind].n,text:'Pick the new face.',options:FACES.map(f=>({k:f,l:fname(f)})),cancel:true,who:p.i,cb:f=>{
+      d.f=f;if(kind==='rubber'){p.en-=2}else discardCard(p,'twist');lg(p.i,`${mname(p)} bends a die into ${fname(f)} (${CARDS[kind].n}).`);refresh()}};render()}};render()}
+const fname=f=>({'1':'1','2':'2','3':'3',E:'energy',C:'claw',H:'heart'}[f]);
+
+// ---------- computer players ----------
+function cityThreat(p){return alive().filter(q=>q.i!==p.i&&!inCity(q.i)).length}
+function aiWings(q,act){if(q.en<2)return false;const hitsMe=has(act,'nova')||(inCity(q.i)!==inCity(act.i));return hitsMe&&q.hp<=4}
+function aiYield(q,lost){
+  if(q.hp<=0)return true;
+  const threat=cityThreat(q);
+  if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
+  if(has(q,'vjets')&&q.hp<=7)return true;
+  return q.hp<=Math.max(YA,threat+YB)}
+function aiWantsClaws(p){
+  if(has(p,'nova'))return true;
+  if(inCity(p.i))return true;
+  const occ=[G.city,G.bay].filter(i=>i>=0).map(P);
+  if(!occ.length)return false;
+  const c=counts().C;
+  if(occ.some(o=>o.hp<=c+2))return true;
+  return p.hp>=5}
+function aiMark(p){
+  const c=counts();const inT=inCity(p.i);const miss=maxhp(p)-p.hp;
+  let hw=inT?0:(p.hp<=5?miss:p.hp<=7?Math.min(miss,3):Math.min(miss,1));
+  const claws=aiWantsClaws(p);
+  // choose which number sets to chase: triples always; best pair if dice allow
+  const keepNum={};for(const f of ['1','2','3'])if(c[f]>=3)keepNum[f]=true;
+  const pairs=['3','2','1'].filter(f=>c[f]===2&&!keepNum[f]);
+  if(pairs.length&&!(pairs[0]==='1'&&!has(p,'gourmand')&&c.C+c.E>=3))keepNum[pairs[0]]=true;
+  if(has(p,'omni')&&c['1']&&c['2']&&c['3']){keepNum['1']=keepNum['2']=keepNum['3']=true}
+  // close to 20: chase stars harder
+  const needVP=20-p.vp;
+  let hk=0;
+  G.dice.forEach(d=>{let k=false;
+    if(d.f in keepNum)k=true;
+    else if(d.f==='E')k=!(hw>=3&&!inT);
+    else if(d.f==='C')k=claws&&needVP>3||inT;
+    else if(d.f==='H'){k=hk<hw;if(k)hk++}
+    d.k=k});
+  // limit number dice kept for a chased pair to what's useful
+}
+function aiRollStep(p){
+  if(!G.aiMarked){aiMark(p);G.aiMarked=true;
+    // die-changing tricks
+    refresh();return}
+  G.aiMarked=false;
+  const unkept=G.dice.some(d=>!d.k);
+  if(unkept&&G.rolls>0){doReroll('roll');return}
+  if(unkept&&has(p,'smoke')&&p.tok.smoke>0&&G.dice.filter(d=>!d.k).length>=2){doReroll('smoke');return}
+  if(unkept&&has(p,'mind')&&p.en>=4&&G.dice.filter(d=>!d.k).length>=2){doReroll('mind');return}
+  if(has(p,'lurker')){const c=counts();if(c['3']>0&&c['3']<3&&G.tf.lurk!==true){G.tf.lurk=true;doReroll('lurker');return}}
+  aiTweak(p);resolve()}
+function aiTweak(p){const c=counts();
+  const junk=()=>{let k=G.dice.findIndex(d=>['1','2','3'].includes(d.f)&&c[d.f]===1);if(k<0&&inCity(p.i))k=G.dice.findIndex(d=>d.f==='H');return k};
+  if(has(p,'pack')&&!G.tf.culler&&c['1']===2){const k=junk();if(k>=0&&G.dice[k].f!=='1'){G.dice[k].f='1';G.tf.culler=true;lg(p.i,`${mname(p)} turns a die into a 1 (Pack Hunter).`);return}}
+  for(const f of ['3','2']){if(c[f]===2){const k=junk();if(k<0||G.dice[k].f===f)continue;
+    if(has(p,'rubber')&&p.en>=4){G.dice[k].f=f;p.en-=2;lg(p.i,`${mname(p)} bends a die into a ${f} (Rubber Limbs).`);return}
+    if(has(p,'twist')&&f==='3'){G.dice[k].f=f;discardCard(p,'twist');lg(p.i,`${mname(p)} twists a die into a 3 (Twist Ending).`);return}}}}
+function cardValue(p,id){const b=base(id),C=CARDS[b],others=alive().filter(q=>q.i!==p.i);
+  const lead=Math.max(0,...others.map(q=>q.vp));const late=p.vp>=12||lead>=14;const vpv=late?2.2:1.5;
+  const hpv=h=>p.hp-h<=0?-99:(p.hp-h<=3?-2.5*h:-0.7*h);
+  const cost=costOf(p,id);if(C.t==='D'){
+    const vp={kiosk:1,train:2,tower:3,needle:4,refinery:2,reactor:2,jetsq:5,militia:2,tanks:4,cyclone:2,skydive:2}[b]||0;
+    if(vp&&p.vp+vp>=20&&!({jetsq:4,militia:2,tanks:3}[b]>=p.hp))return 99;
+    let v=vp*vpv;
+    if(b==='jetsq')v+=hpv(4);if(b==='militia')v+=hpv(2);if(b==='tanks')v+=hpv(3);if(b==='carpet')v=others.filter(q=>q.hp<=3).length*6+others.length*1.5+hpv(3);
+    if(b==='flame')v=others.length*1.3+others.filter(q=>q.hp<=2).length*6;if(b==='refinery')v+=others.length*1.8+others.filter(q=>q.hp<=3).length*6;
+    if(b==='patch')v=Math.min(2,maxhp(p)-p.hp)*1.2;if(b==='reactor')v+=Math.min(3,maxhp(p)-p.hp)*1.1;
+    if(b==='sirens')v=others.reduce((a,q)=>a+Math.min(5,q.vp),0)*0.6+(lead>=15?6:0);
+    if(b==='surge')v=9;if(b==='cyclone')v+=others.reduce((a,q)=>a+Math.floor(q.en/2),0)*0.5;
+    if(b==='rush')v=7+(inCity(p.i)?2:0);if(b==='skydive'&&!inCity(p.i))v+=p.hp>=6?4:-2;
+    return v-cost}
+  let v=C.v;const early=G.turn<=4;
+  if(['cosmic','news','kidfan','brain','skull','battery'].includes(b))v+=early?1.5:-1;
+  if(b==='carrion')v+=others.length>=3?1.5:0;if(b==='street'||b==='tunnel')v+=inCity(p.i)?1:0;
+  if(b==='growth'||b==='regrow'||b==='mend')v+=p.hp<=6?1.5:0;
+  if(b==='egg')v+=p.hp<=5?2:0;if(b==='underdog')v+=p.vp<lead-3?1:0;
+  if(late&&!['skull','brain','barbed','acid','nova'].includes(b))v-=2;
+  if(has(p,b)&&!['skull'].includes(b))v-=3;
+  return v-cost}
+function aiBuyStep(p){
+  if(has(p,'mend')&&p.hp<=4&&p.en>=2&&p.hp<maxhp(p)){mend();return}
+  let best=-1,bv=-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id);if(v>bv){bv=v;best=k}});
+  if(best>=0){buy(best);return}
+  const maxv=Math.max(-99,...G.market.map(id=>cardValue(p,id)));
+  if(!G.aiSwept&&p.en>=8&&maxv<-2){G.aiSwept=true;sweep();return}
+  endTurn()}
+function aiStep(){
+  if(!G||G.winner||UI.choice||UI.busy)return;const p=cur();if(p.human)return;
+  if(G.phase==='roll')aiRollStep(p);else if(G.phase==='buy')aiBuyStep(p)}
+function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending)return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
+  UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY):0)}
+function refresh(){render();save();schedule()}
+function save(){try{if(G)localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
+function load(){try{const s=localStorage.getItem(SAVE);return s?JSON.parse(s):null}catch(e){return null}}
+
+// ---------- art ----------
+const INK='#1a1320';
+function faceSVG(f){const s=`stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
+  if('123'.includes(f))return `<svg viewBox="0 0 60 60"><text x="30" y="46" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="${INK}">${f}</text></svg>`;
+  if(f==='E')return `<svg viewBox="0 0 60 60"><path d="M34 4 L12 34 H27 L22 56 L48 22 H32 Z" fill="#2ec27e" ${s}/></svg>`;
+  if(f==='H')return `<svg viewBox="0 0 60 60"><path d="M30 52 C8 36 4 24 10 15 C16 6 27 8 30 17 C33 8 44 6 50 15 C56 24 52 36 30 52 Z" fill="#e63946" ${s}/></svg>`;
+  return `<svg viewBox="0 0 60 60"><g fill="none" ${s} stroke-width="6"><path d="M14 10 C22 22 22 38 12 52"/><path d="M29 6 C37 20 37 38 28 54"/><path d="M44 10 C52 22 52 38 42 52"/></g></svg>`}
+function monArt(m,dead){const C=dead?'#b9b0bd':MONS[m].c;const S=`stroke="${INK}" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"`;
+  const eye=(x,y,r=8)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" ${S}/><circle cx="${x+1.5}" cy="${y+1}" r="${r*.45}" fill="${INK}"/><circle cx="${x+3}" cy="${y-1.5}" r="${r*.15}" fill="#fff"/>`;
+  const X=dead?`<g ${S} stroke-width="6"><path d="M-30 -30 L30 30 M30 -30 L-30 30" stroke="#e63946"/></g>`:'';
+  switch(m){
+  case 0:return `<g ${S}><path d="M-38 -26 L-52 -56 L-18 -40 Z M38 -26 L52 -56 L18 -40 Z" fill="${C}"/><path d="M-48 8 C-50 -34 -26 -48 0 -48 C26 -48 50 -34 48 8 C46 40 26 56 0 56 C-26 56 -46 40 -48 8 Z" fill="${C}"/>
+    <path d="M-4 -52 L10 -52 L3 -38 L12 -38 L-6 -16 L-1 -32 L-10 -32 Z" fill="#4cc9f0"/>
+    <path d="M-34 -16 L-12 -8 M34 -16 L12 -8" stroke-width="5"/>${eye(-20,-2)}${eye(20,-2)}
+    <ellipse cx="0" cy="26" rx="23" ry="15" fill="#ffb3a7"/><ellipse cx="-8" cy="26" rx="3.5" ry="5" fill="${INK}" stroke="none"/><ellipse cx="8" cy="26" rx="3.5" ry="5" fill="${INK}" stroke="none"/>
+    <path d="M-22 36 C-36 32 -42 16 -40 6 C-34 18 -26 24 -16 26 Z M22 36 C36 32 42 16 40 6 C34 18 26 24 16 26 Z" fill="#fff"/></g>${X}`;
+  case 1:return `<g ${S}>${[-34,-17,0,17,34].map((x,k)=>`<path d="M${x*.7} 8 C${x} 30 ${x*1.3+(k%2?10:-10)} 38 ${x*1.1} 56" fill="none" stroke="${INK}" stroke-width="15"/><path d="M${x*.7} 8 C${x} 30 ${x*1.3+(k%2?10:-10)} 38 ${x*1.1} 56" fill="none" stroke="${C}" stroke-width="8"/>`).join('')}
+    <path d="M0 -58 C30 -58 44 -22 40 14 L-40 14 C-44 -22 -30 -58 0 -58 Z" fill="${C}"/><path d="M-22 -40 C-16 -48 -6 -52 4 -52" fill="none" stroke="#fff" stroke-width="4" opacity=".7"/>
+    ${eye(0,-14,17)}<path d="M-20 -36 L-4 -30 M20 -36 L4 -30" stroke-width="5"/><path d="M-12 4 Q0 12 12 4" fill="none"/></g>${X}`;
+  case 2:return `<g ${S}><path d="M-30 -4 C-44 -14 -52 -26 -48 -40 M30 -4 C44 -14 52 -26 48 -40" fill="none" stroke-width="7"/>
+    <path d="M-48 -40 C-66 -44 -64 -64 -48 -62 L-44 -50 L-36 -60 C-26 -56 -30 -40 -48 -40 Z M48 -40 C66 -44 64 -64 48 -62 L44 -50 L36 -60 C26 -56 30 -40 48 -40 Z" fill="${C}"/>
+    <path d="M-40 34 L-54 50 M-30 40 L-38 56 M40 34 L54 50 M30 40 L38 56" stroke-width="6"/>
+    <ellipse cx="0" cy="18" rx="44" ry="28" fill="${C}"/><path d="M-26 12 L-16 20 L-20 30 M18 8 L26 18 L20 28 M-4 30 L4 36" fill="none" stroke="#ffd23f" stroke-width="3"/>
+    <path d="M-12 -2 L-14 -22 M12 -2 L14 -22" stroke-width="5"/>${eye(-14,-26,8)}${eye(14,-26,8)}
+    <path d="M-16 6 L-10 12 L-4 6 L2 12 L8 6 L14 12" fill="none" stroke-width="3.5"/></g>${X}`;
+  case 3:return `<g ${S}><rect x="-32" y="-8" width="64" height="62" rx="20" fill="${C}"/>
+    <path d="M-58 2 C-58 -40 -28 -58 0 -58 C28 -58 58 -40 58 2 C40 8 -40 8 -58 2 Z" fill="#e63946"/>
+    <circle cx="-30" cy="-22" r="8" fill="#fff" stroke-width="3"/><circle cx="4" cy="-40" r="9" fill="#fff" stroke-width="3"/><circle cx="32" cy="-18" r="7" fill="#fff" stroke-width="3"/>
+    <path d="M-24 14 L-8 20 M24 14 L8 20" stroke-width="5"/>${eye(-15,26,7)}${eye(15,26,7)}
+    <path d="M-16 42 Q0 34 16 42 Z" fill="#fff" stroke-width="3.5"/></g>${X}`;
+  case 4:return `<g ${S}><path d="M0 -40 L0 -54" /><circle cx="0" cy="-58" r="6" fill="#ffd23f"/>
+    <rect x="-42" y="-40" width="84" height="76" rx="10" fill="${C}"/><rect x="-32" y="-26" width="64" height="22" rx="7" fill="${INK}"/>
+    <rect x="-24" y="-20" width="16" height="10" rx="3" fill="#4cff9f" stroke="none"/><rect x="8" y="-20" width="16" height="10" rx="3" fill="#4cff9f" stroke="none"/>
+    <rect x="-24" y="6" width="48" height="18" rx="4" fill="#dfe7f0"/><path d="M-12 6 V24 M0 6 V24 M12 6 V24" stroke-width="3"/>
+    <circle cx="-34" cy="28" r="3" fill="${INK}"/><circle cx="34" cy="28" r="3" fill="${INK}"/><path d="M-42 44 L-30 36 M42 44 L30 36" stroke-width="6"/><rect x="-26" y="36" width="52" height="16" rx="4" fill="#ffd23f"/><path d="M-20 36 L-12 52 M-4 36 L4 52 M12 36 L20 52" stroke-width="4"/></g>${X}`;
+  default:return `<g ${S}><path d="M0 -60 L34 -32 L44 18 L22 56 L-22 56 L-44 18 L-34 -32 Z" fill="${C}"/>
+    <path d="M0 -60 L-8 -18 L-34 -32 M-8 -18 L10 -4 L34 -32 M10 -4 L44 18 M-8 -18 L-44 18" fill="none" stroke="#fff" stroke-width="2.5" opacity=".75"/>
+    <path d="M-28 -6 L-6 0 L-8 -12 Z M28 -6 L6 0 L8 -12 Z" fill="#fff"/><circle cx="-12" cy="-5" r="3" fill="#4cc9f0" stroke="none"/><circle cx="12" cy="-5" r="3" fill="#4cc9f0" stroke="none"/>
+    <path d="M-20 24 L20 24 L14 38 L8 26 L2 40 L-4 26 L-10 38 L-16 26 Z" fill="#fff" stroke-width="3"/></g>${X}`}}
+
+function skyline(){let s='';const b=[[0,210,70],[64,170,56],[114,240,62],[170,190,48],[212,150,70],[276,205,40],[312,120,58],[640,160,60],[694,215,48],[736,130,70],[800,185,54],[848,145,66],[908,200,50],[952,165,48]];
+  for(const [x,y,w] of b){s+=`<rect x="${x}" y="${y}" width="${w}" height="${400-y}" fill="#5b2a6e" stroke="${INK}" stroke-width="3"/>`;
+    for(let yy=y+14;yy<380;yy+=22)for(let xx=x+8;xx<x+w-10;xx+=16)if((xx*7+yy*3)%5)s+=`<rect x="${xx}" y="${yy}" width="7" height="10" fill="${(xx+yy)%3?'#ffd23f':'#3b1a4a'}"/>`}return s}
+function statBadge(x,y,kind,val){const col={hp:'#e63946',vp:'#f4a300',en:'#2ec27e'}[kind];
+  const icon=kind==='hp'?`<path d="M0 8 C-9 1 -10 -4 -7 -7 C-4 -10 -1 -8 0 -5 C1 -8 4 -10 7 -7 C10 -4 9 1 0 8 Z" fill="#fff"/>`:kind==='vp'?`<path d="M0 -9 L2.6 -3 L9 -2.6 L4 1.6 L5.6 8 L0 4.6 L-5.6 8 L-4 1.6 L-9 -2.6 L-2.6 -3 Z" fill="#fff"/>`:`<path d="M2 -9 L-6 1 H0 L-2 9 L6 -1 H0 Z" fill="#fff"/>`;
+  return `<g transform="translate(${x},${y})"><rect x="-22" y="-13" width="44" height="26" rx="13" fill="${col}" stroke="${INK}" stroke-width="3"/><g transform="translate(-10,0)">${icon}</g><text x="9" y="7" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="19" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${val}</text></g>`}
+function burst(x,y,r,fill){let d='';for(let k=0;k<24;k++){const a=k*Math.PI/12,rr=k%2?r*.72:r;d+=(k?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+' '+(y+Math.sin(a)*rr).toFixed(1)}return `<path d="${d}Z" fill="${fill}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`}
+
+function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHTML='';return}
+  let s=`<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6f61"/><stop offset=".6" stop-color="#ffb347"/><stop offset="1" stop-color="#ffd98a"/></linearGradient>
+  <pattern id="ht" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.8" fill="#1a1320" opacity=".12"/></pattern>
+  <pattern id="waves" width="40" height="16" patternUnits="userSpaceOnUse"><path d="M0 8 Q10 0 20 8 T40 8" fill="none" stroke="#fff" stroke-width="2.5" opacity=".55"/></pattern></defs>
+  <rect width="1000" height="640" fill="url(#sky)"/>`;
+  for(let k=0;k<16;k++){const a=k*Math.PI/8;s+=`<path d="M465 230 L${465+Math.cos(a)*900} ${230+Math.sin(a)*900} L${465+Math.cos(a+.12)*900} ${230+Math.sin(a+.12)*900} Z" fill="#fff" opacity=".13"/>`}
+  s+=`<rect width="1000" height="640" fill="url(#ht)"/>${skyline()}<rect x="0" y="380" width="1000" height="260" fill="#3b2447"/><rect x="0" y="380" width="1000" height="260" fill="url(#ht)"/>`;
+  // Downtown
+  const act=cur();
+  s+=`<g><rect x="300" y="96" width="330" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/><rect x="300" y="96" width="330" height="270" rx="16" fill="url(#ht)"/>
+   <path d="M318 350 L318 318 L612 318 L612 350" fill="none" stroke="${INK}" stroke-width="3" stroke-dasharray="8 6"/>
+   <g transform="translate(465,96) rotate(-2)"><rect x="-96" y="-22" width="192" height="40" rx="8" fill="#e63946" stroke="${INK}" stroke-width="4"/><text x="0" y="10" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="30" fill="#ffd23f" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">DOWNTOWN</text></g>`;
+  if(G.city>=0){const o=P(G.city);s+=`${burst(465,240,96,'#ffd23f')}<g transform="translate(465,244) scale(1.3)">${monArt(o.m)}</g>
+     <path d="M438 170 L446 150 L456 162 L465 144 L474 162 L484 150 L492 170 Z" fill="#f4a300" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
+     <text x="465" y="352" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="${INK}">${esc(mname(o))} rules the city</text>`}
+  else s+=`<text x="465" y="225" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="34" fill="${INK}" opacity=".55">EMPTY!</text><text x="465" y="258" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="16" fill="${INK}" opacity=".6">The next monster to finish rolling must move in</text>`;
+  s+=`<text x="465" y="134" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="12.5" fill="${INK}" opacity=".7">+1★ on entering · +2★ each turn start · no healing</text></g>`;
+  // Harbor
+  s+=`<g opacity="${G.bayOn?1:.55}"><rect x="660" y="150" width="310" height="216" rx="16" fill="#3aa6d9" stroke="${INK}" stroke-width="5"/><rect x="660" y="150" width="310" height="216" rx="16" fill="url(#waves)"/>
+   <g transform="translate(815,150) rotate(2)"><rect x="-70" y="-20" width="140" height="36" rx="8" fill="#3a86ff" stroke="${INK}" stroke-width="4"/><text x="0" y="9" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">HARBOR</text></g>`;
+  if(G.bayOn&&G.bay>=0){const o=P(G.bay);s+=`<g transform="translate(815,262) scale(1.05)">${monArt(o.m)}</g><text x="815" y="354" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="22" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${esc(mname(o))} holds the harbor</text>`}
+  else s+=`<text x="815" y="258" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="24" fill="#fff" stroke="${INK}" stroke-width="3" paint-order="stroke">${G.bayOn?'EMPTY':'CLOSED'}</text><text x="815" y="284" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="#fff">${G.bayOn?'Counts as the city too':'Opens with 5–6 monsters'}</text>`;
+  s+=`</g>`;
+  // round + dice panel
+  s+=`<g><rect x="30" y="96" width="245" height="270" rx="16" fill="#fff3cf" stroke="${INK}" stroke-width="5"/>
+   <text x="152" y="132" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="28" fill="#e63946" stroke="${INK}" stroke-width="1.2" letter-spacing="1">ROUND ${G.turn}</text>
+   <g transform="translate(78,190) scale(.62)">${monArt(act.m)}</g>
+   <text x="118" y="176" font-family="Bangers,Impact,sans-serif" font-size="22" fill="${INK}">${esc(mname(act))}</text>
+   <text x="118" y="198" font-family="Nunito,sans-serif" font-weight="800" font-size="14" fill="${INK}">${G.winner?'Game over':G.phase==='roll'?'is rolling…':G.phase==='buy'?'is shopping…':'…'}</text>
+   <text x="118" y="218" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="${INK}" opacity=".7">${G.phase==='roll'?G.rolls+' reroll'+(G.rolls===1?'':'s')+' left':''}</text>`;
+  G.dice.forEach((d,k)=>{const x=48+(k%4)*54,y=240+Math.floor(k/4)*56;s+=`<g transform="translate(${x},${y})"><rect width="46" height="46" rx="9" fill="${d.k?'#ffd23f':'#fff'}" stroke="${d.x?'#2ec27e':INK}" stroke-width="3.5"/><g transform="translate(4,4) scale(.64)">${faceSVG(d.f).replace('<svg viewBox="0 0 60 60">','').replace('</svg>','')}</g></g>`});
+  s+=`</g>`;
+  // seats
+  const n=G.pl.length,gap=12,w=Math.min(150,(940-(n-1)*gap)/n),x0=500-(n*w+(n-1)*gap)/2;
+  G.pl.forEach((p,k)=>{const x=x0+k*(w+gap),y=400,h=226,cx=x+w/2,A=k===G.active&&!G.winner,T=inCity(p.i);
+    s+=`<g class="seat" data-seat="${k}" transform="translate(0,0)">`;
+    if(A)s+=`<rect x="${x-6}" y="${y-6}" width="${w+12}" height="${h+12}" rx="18" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`;
+    s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="${p.alive?'#fffaf0':'#9c93a3'}" stroke="${INK}" stroke-width="4"/>
+      <rect x="${x}" y="${y}" width="${w}" height="96" rx="14" fill="${p.alive?MONS[p.m].c:'#b9b0bd'}" stroke="${INK}" stroke-width="4"/><rect x="${x}" y="${y}" width="${w}" height="96" rx="14" fill="url(#ht)"/>
+      <g transform="translate(${cx},${y+50}) scale(.66)" opacity="${T?.35:1}">${monArt(p.m,!p.alive)}</g>`;
+    if(T)s+=`<g transform="translate(${cx},${y+50}) rotate(-8)"><rect x="-58" y="-13" width="116" height="26" rx="6" fill="#e63946" stroke="${INK}" stroke-width="3"/><text x="0" y="6" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="15" fill="#fff" letter-spacing="1">${G.city===p.i?'IN DOWNTOWN':'IN HARBOR'}</text></g>`;
+    s+=`<text x="${cx}" y="${y+120}" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="${w<120?18:22}" fill="${INK}" letter-spacing="1">${esc(mname(p))}</text>`;
+    if(p.human&&G.mode==='solo')s+=`<g transform="translate(${x+8},${y+8}) rotate(-8)"><rect width="44" height="22" rx="6" fill="#1a1320"/><text x="22" y="16" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="15" fill="#ffd23f" letter-spacing="1">YOU</text></g>`;
+    if(p.alive){const bw=w/3.1;s+=statBadge(cx-bw,y+146,'hp',p.hp)+statBadge(cx,y+146,'vp',p.vp)+statBadge(cx+bw,y+146,'en',p.en);
+      const pw=w-20;s+=`<rect x="${x+10}" y="${y+168}" width="${pw}" height="10" rx="5" fill="#fff" stroke="${INK}" stroke-width="2.5"/><rect x="${x+10}" y="${y+168}" width="${pw*Math.min(1,p.vp/20)}" height="10" rx="5" fill="#f4a300" stroke="${INK}" stroke-width="2.5"/>`;
+      s+=`<text x="${cx}" y="${y+198}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="13" fill="${INK}">${p.cards.length} card${p.cards.length===1?'':'s'}${p.tok.shield?' · wings up':''}</text>`;
+      s+=`<text x="${cx}" y="${y+216}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="700" font-size="11.5" fill="${INK}" opacity=".7">${p.cards.slice(0,2).map(c=>esc(CARDS[base(c)].n)).join(', ')}${p.cards.length>2?'…':''}</text>`}
+    else s+=`<text x="${cx}" y="${y+170}" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="34" fill="#e63946" stroke="${INK}" stroke-width="2" letter-spacing="2">K.O.</text>`;
+    const f=UI.fx[k]||[];f.slice(-3).forEach((e,j)=>{const col={hurt:'#e63946',heal:'#2ec27e',star:'#f4a300',energy:'#2ec27e'}[e.c]||'#fff';
+      s+=`<g transform="translate(${x+w-8},${y+18+j*28}) rotate(${j%2?6:-6})"><text text-anchor="end" font-family="Bangers,Impact,sans-serif" font-size="24" fill="${col}" stroke="${INK}" stroke-width="4" paint-order="stroke">${esc(e.t)}</text></g>`});
+    s+=`</g>`});
+  if(G.winner){const w=G.winner==='draw'?null:P(+G.winner.slice(1)-1);s+=`<g>${burst(500,230,190,'#ffd23f')}${w?`<g transform="translate(500,215) scale(1.5)">${monArt(w.m)}</g>`:''}<text x="500" y="345" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#e63946" stroke="${INK}" stroke-width="3" paint-order="stroke" letter-spacing="2">${w?esc(mname(w).toUpperCase())+' WINS!':'NOBODY WINS'}</text></g>`}
+  svg.innerHTML=s}
+
+// ---------- panel ----------
+function humanTurn(){return G&&!G.winner&&isHuman(G.active)}
+function renderPanel(){
+  const pr=document.getElementById('prompt');const di=document.getElementById('dice'),ro=document.getElementById('rolls');
+  document.getElementById('banner').innerHTML=G?UI.banner:'';
+  if(!G){pr.innerHTML='';di.innerHTML='';ro.innerHTML='';return}
+  const p=cur();let who=esc(mname(p)),msg='',acts='';
+  const btn=(a,l,dis,sm,cls)=>`<button class="btn ${cls||''}" data-act="${a}" ${dis?'disabled':''}>${l}${sm?`<small>${sm}</small>`:''}</button>`;
+  if(G.winner){who='Game over';msg=esc(G.winText);acts=btn('again','Play again','', '', 'primary')}
+  else if(!humanTurn()){msg=G.phase==='roll'?`${esc(mname(p))} is rolling. Watch which dice it keeps.`:G.phase==='buy'?`${esc(mname(p))} is looking at the power cards.`:'Resolving…';
+    const me=G.pl.find(q=>q.human);if(me&&G.mode==='solo')msg+=`<br><span class="small muted">You are ${esc(mname(me))}. You will be asked if you get smashed while in the city.</span>`}
+  else if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
+    msg=G.rolls>0?`Click dice to <b>keep</b> them, then reroll the rest. ${G.rolls} reroll${G.rolls===1?'':'s'} left.`:'No rerolls left. Resolve your dice.';
+    msg+=`<br><span class="small muted">You are in ${where(p.i)}. ${inCity(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':'Your claws hit whoever is in the city.'}</span>`;
+    acts=btn('reroll',`Reroll ${nk} ${nk===1?'die':'dice'}`,G.rolls<=0||!nk,'','primary')+btn('resolve','Resolve dice','', '', G.rolls<=0?'primary':'');
+    if(has(p,'mind'))acts+=btn('mind','Mind Link reroll',p.en<1||!nk,'pay 1 ⚡');
+    if(has(p,'smoke')&&p.tok.smoke>0)acts+=btn('smoke','Smoke reroll',!nk,`${p.tok.smoke} puffs left`);
+    if(has(p,'lurker'))acts+=btn('lurker','Reroll my 3s',!G.dice.some(d=>d.f==='3'),'Alley Lurker');
+    if(has(p,'pack'))acts+=btn('pack','Make a die a 1',G.tf.culler,'Pack Hunter, once a turn');
+    if(has(p,'rubber'))acts+=btn('rubber','Bend a die',p.en<2,'Rubber Limbs, 2 ⚡');
+    if(has(p,'twist'))acts+=btn('twist','Twist a die','','then discard');
+  }else if(G.phase==='buy'){msg=`Buy power cards with your <b>${p.en} energy</b>, sweep the market, or end your turn.`;
+    acts=btn('sweep','Sweep cards',p.en<2,'pay 2 ⚡ for 3 new')+btn('end','End turn','', '', 'primary')}
+  if(humanTurn()&&has(p,'mend'))acts+=btn('mend','Quick Mend',p.en<2||p.hp>=maxhp(p),'2 ⚡ → heal 1');
+  pr.innerHTML=`<div class="who" style="color:${MONS[p.m].c==='#ffd23f'?'#c79a00':MONS[p.m].c};-webkit-text-stroke:1px #1a1320">${who}${humanTurn()?' · your turn':''}</div><div class="msg">${msg}</div><div class="acts">${acts}</div>`;
+  const canClick=humanTurn()&&G.phase==='roll';
+  const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
+  di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${spin&&!d.k?'spin':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
+  ro.innerHTML=G.phase==='roll'?`Rerolls: ${Array.from({length:2+has(p,'brain')},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
+  const buyOK=humanTurn()&&G.phase==='buy';
+  document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t}"><div class="hd"><span class="cost">${c}</span><span class="nm">${esc(C.n)}</span></div><span class="ty">${C.t==='K'?'KEEP':'USE NOW'}</span><p>${esc(C.x)}</p>${buyOK?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>Buy</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0">${G.deck.length} cards in the deck.</p>`;
+  const me=G.mode==='solo'?G.pl.find(q=>q.human):p;
+  document.getElementById('minettl').textContent=G.mode==='solo'?`Your cards (${mname(me)})`:`${mname(me)}'s cards`;
+  document.getElementById('mine').innerHTML=me.cards.length?me.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc"><b>${esc(C.n)}</b>${base(id)==='smoke'?` (${me.tok.smoke} puffs)`:''}<br>${esc(C.x)}</div>`}).join(''):'<span class="muted small">No keep cards yet. Buy them with energy after rolling.</span>';
+  const L=document.getElementById('log');L.innerHTML=G.log.slice(0,80).map(l=>`<li class="${l.s>=0&&G.pl[l.s]&&G.pl[l.s].human&&G.mode==='solo'?'me':''}">${esc(l.t)}</li>`).join('');
+}
+function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='';return}
+  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${inCity(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
+function renderLegend(){document.getElementById('legend').innerHTML=[
+  ['1','Three 1s score 1 star; each extra 1 adds 1 more.'],['2','Three 2s score 2 stars, +1 per extra.'],['3','Three 3s score 3 stars, +1 per extra.'],
+  ['E','Energy: 1 each. Spend it on power cards.'],['C','Claw: 1 damage each. From the city you hit everyone outside; from outside you hit the city.'],['H','Heart: heal 1 each (not while in the city). Max 10.']]
+  .map(([f,t])=>faceSVG(f)+`<span>${t}</span>`).join('')}
+
+// ---------- modal ----------
+function renderModal(){const m=document.getElementById('modal');
+  if(UI.info){m.classList.remove('hidden');m.innerHTML=startScreen();return}
+  if(UI.rules){m.classList.remove('hidden');m.innerHTML=rulesHTML();return}
+  if(UI.choice){const c=UI.choice;m.classList.remove('hidden');
+    m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p><b>${esc(mname(P(c.who)))}</b>, this one is for you.</p>`:''}<p>${esc(c.text)}</p><div class="acts">${c.options.map(o=>`<button class="btn" data-opt="${esc(o.k)}">${esc(o.l)}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Cancel</button>':''}</div></div>`;return}
+  m.classList.add('hidden');m.innerHTML=''}
+function startScreen(){const saved=load();
+  return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
+   <p>Giant monsters brawl for the city. Roll six dice up to three times, keep what you like, then score stars, grab energy, heal, or smash. Hold the city to score, but everyone outside is punching you. First to <b>20 stars</b>, or the <b>last monster standing</b>, wins.</p>
+   <div class="row"><b>Monsters:</b>${[2,3,4,5,6].map(k=>`<button class="btn ${UI.n===k?'on':''}" data-n="${k}">${k}</button>`).join('')}<span class="small muted">The Harbor opens with 5–6.</span></div>
+   <p style="margin:.4rem 0 .2rem"><b>Your monster</b> (for the game against the computer):</p>
+   <div class="monpick">${MONS.map((M,k)=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}" title="${esc(M.d)}"><svg viewBox="-64 -64 128 128">${monArt(k)}</svg><span>${esc(M.n)}</span></button>`).join('')}</div>
+   <div class="acts" style="margin-top:.8rem">
+    <button class="btn primary" data-start="solo">Play against the computer<small>You and ${UI.n-1} computer monster${UI.n>2?'s':''}. Your seat in turn order is random. A tour runs on your first game.</small></button>
+    <button class="btn" data-start="hot">Everyone on one screen<small>${UI.n} players take turns on this device.</small></button>
+    <button class="btn" data-start="ai">Watch the computer play<small>A quick way to see the rules in action.</small></button>
+    ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
+   </div><p class="small muted">The names, card text and art are original, for copyright reasons. The rules follow the published rulebook.</p></div>`}
+function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="true"><h2>How to play</h2>
+  <h3>Your turn</h3><ol><li><b>Roll</b> all dice. Keep any dice you like and reroll the rest, up to twice. You can reroll dice you kept earlier.</li>
+  <li><b>Resolve</b>: three of a kind of 1, 2 or 3 scores that many stars, and each extra matching die adds 1. Energy gives 1 each. Hearts heal 1 each, but only outside the city (max 10). Claws smash.</li>
+  <li><b>Smash</b>: from the city (Downtown or the Harbor) your claws hit every monster outside. From outside, they hit every monster in the city. When smashed by dice, a city monster may <b>yield</b>. It still takes the damage, and the smasher moves in.</li>
+  <li><b>Enter</b>: if Downtown is empty after resolving, you must move in (+1 star). With 5–6 monsters, if Downtown is taken and the Harbor is empty, you move into the Harbor.</li>
+  <li><b>Buy</b> power cards with energy. Keep cards stay with you; use-now cards happen at once and are discarded. Pay 2 energy to sweep the three cards and deal three new ones.</li>
+  <li><b>End of turn</b> effects happen, then the next monster goes.</li></ol>
+  <h3>The city</h3><p>Starting your turn in the city scores 2 stars. You cannot heal with hearts there, and everyone outside is hitting you. When only four monsters remain, the Harbor closes.</p>
+  <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
+  <h3>Left out of this version</h3><p class="small">Ten advanced cards that need tokens or peeking at the deck (copying, poison, shrinking, card stealing and similar).</p>
+  <div class="acts"><button class="btn primary" data-a="closerules">Got it</button></div></div>`}
+
+// ---------- tour ----------
+const TOURSTEPS=[
+ {el:'#map',t:'The city',b:'Monsters brawl over Downtown (and the Harbor with 5–6 players). The one in the city scores stars every turn but gets hit by everyone else.'},
+ {el:'#map',t:'Your monster',b:'Each plate along the bottom shows hearts (red), stars (gold, first to 20 wins) and energy (green). The glowing plate is whoever is taking a turn.'},
+ {el:'#dicewrap',t:'The dice',b:'On your turn, click dice to keep them (they turn yellow), then reroll the rest. You get two rerolls.'},
+ {el:'#prompt',t:'What to do now',b:'This box always tells you what is happening and gives you the buttons: Reroll, Resolve, then buy or End turn.'},
+ {el:'#marketwrap',t:'Power cards',b:'Spend energy on cards after resolving. Keep cards change the rules for you; use-now cards pay off at once.'},
+ {el:'#legendwrap',t:'Dice faces',b:'Numbers score only in sets of three. Claws smash, hearts heal, lightning is energy.'},
+ {el:'#logwrap',t:'Chronicle',b:'Everything that happened, newest first. Good luck, monster!'}];
+function startTour(){UI.coach=0;renderTour()}
+function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));const el=document.getElementById('coach');
+  if(UI.coach<0){el.classList.add('hidden');return}const st=TOURSTEPS[UI.coach];el.classList.remove('hidden');
+  el.innerHTML=`<h3>Tour ${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;
+  const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
+
+function render(){renderMap();renderScore();renderPanel();renderModal()}
+
+// ---------- events ----------
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],g.seat');if(!t)return;
+  const ds=t.dataset;
+  if(ds.n){UI.n=+ds.n;render();return}
+  if(ds.mon!==undefined){UI.mon=+ds.mon;render();return}
+  if(ds.start){const k=ds.start;UI.info=false;
+    if(k==='load'){G=load();UI.choice=null;UI.busy=false;UI.fx={};if(G.phase==='resolve'||G.phase==='start'){G.phase='roll'}refresh()}
+    else{newGame(k);let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}if(k==='solo'&&!toured)startTour()}return}
+  if(ds.tour){if(ds.tour==='next')UI.coach=UI.coach>=TOURSTEPS.length-1?-1:UI.coach+1;else if(ds.tour==='prev')UI.coach=Math.max(0,UI.coach-1);else UI.coach=-1;renderTour();return}
+  if(ds.a){if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();return}
+  if(ds.opt!==undefined){const c=UI.choice;if(!c)return;UI.choice=null;if(ds.opt==='x'){refresh();return}c.cb(ds.opt);if(!UI.choice)refresh();return}
+  if(t.classList.contains('seat')&&G){if(UI.choice||UI.info)return;const p=P(+ds.seat);UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.`,options:[],cancel:true};render();return}
+  if(!G||G.winner&&ds.act!=='again')return;
+  if(ds.act==='again'){UI.info=true;render();return}
+  if(!humanTurn()||UI.choice||UI.busy)return;
+  if(ds.die!==undefined&&G.phase==='roll'){const d=G.dice[+ds.die];d.k=!d.k;render();return}
+  const p=cur();
+  if(ds.card!==undefined&&G.phase==='buy'){buy(+ds.card);return}
+  switch(ds.act){
+    case 'reroll':if(G.rolls>0)doReroll('roll');break;
+    case 'resolve':if(G.phase==='roll')resolve();break;
+    case 'mind':if(p.en>=1)doReroll('mind');break;
+    case 'smoke':doReroll('smoke');break;
+    case 'lurker':doReroll('lurker');break;
+    case 'pack':case 'rubber':case 'twist':changeDie(ds.act);break;
+    case 'sweep':sweep();break;
+    case 'mend':mend();break;
+    case 'end':if(G.phase==='buy')endTurn();break;
+  }});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=false;render()}});
+renderLegend();render();
+</script>
+</body>
+</html>

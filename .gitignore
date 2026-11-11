@@ -174,3 +174,10 @@ cython_debug/
 oauth.json
 raw_headers.txt
 playlists.json
+# game kit sources (the Python "parts/" rule above is for packaging)
+!games-src/**/parts/
+
+# AI tuning logs (large, regenerable)
+games-src/*/game/data/*.jsonl
+games-src/*/game/data/ai_*.txt
+games-src/*/game/data/ai.done

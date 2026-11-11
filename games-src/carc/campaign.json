@@ -1,0 +1,297 @@
+{
+  "game": "rampart",
+  "title": "The Deeds of Vinemoor",
+  "version": 1,
+  "cast": {
+    "guide":  { "name": "Old Tamsin", "portrait": "camp-tamsin.webp", "emoji": "🧭", "color": "#7a8a3c" },
+    "you":    { "name": "Garnet", "portrait": "camp-garnet.webp", "emoji": "🟥", "color": "#a3352b" },
+    "hob":    { "name": "Hob the Carter", "portrait": "camp-hob.webp", "emoji": "🛒", "color": "#b08a3e" },
+    "wren":   { "name": "Wren Ashlar", "portrait": "camp-wren.webp", "emoji": "🧱", "color": "#c98b3a" },
+    "mabry":  { "name": "Mabry Furrow", "portrait": "camp-mabry.webp", "emoji": "🌾", "color": "#6f8a2e" },
+    "quill":  { "name": "Brother Quill", "portrait": "camp-quill.webp", "emoji": "📜", "color": "#6b5a8c" },
+    "ferro":  { "name": "Ferro the Boatman", "portrait": "camp-ferro.webp", "emoji": "🛶", "color": "#2f6f99" },
+    "dulcie": { "name": "Dulcie Tapwell", "portrait": "camp-dulcie.webp", "emoji": "🍺", "color": "#9c5a2a" },
+    "ostrand":{ "name": "Reeve Ostrand", "portrait": "camp-ostrand.webp", "emoji": "⚖️", "color": "#2d4f9e" },
+    "lilac":  { "name": "Isolde of Lilac Hall", "portrait": "camp-isolde.webp", "emoji": "🌸", "color": "#8c5a8c" },
+    "corvin": { "name": "Corvin Blackmere", "portrait": "camp-corvin.webp", "emoji": "🐦‍⬛", "color": "#3a3a3a" },
+    "baron":  { "name": "The Sable Baron", "portrait": "camp-baron.webp", "emoji": "🏰", "color": "#1e1e28" }
+  },
+  "acts": [
+    { "act": 1, "title": "The Empty Valley", "blurb": "Lay your first tiles: roads, towns, fields and priories." },
+    { "act": 2, "title": "River and Market", "blurb": "The valley grows rich. Rivals arrive with taverns, goods and masons." },
+    { "act": 3, "title": "The Sable Claim", "blurb": "A baron says the valley is his. Out-build his best settlers." }
+  ],
+  "twists": [
+    { "id": "head-start", "where": "setup", "how": "Right after newGame, the boss seat's score starts at N instead of 0 (logged as 'starts with N points from old deeds')." },
+    { "id": "boss-extra-follower", "where": "setup", "how": "Right after newGame, the boss seat's sup.f and figTotal.f are raised by N, so the boss has 7+N followers." },
+    { "id": "lean-purse", "where": "setup", "how": "Right after newGame, the player's seat sup.f and figTotal.f are lowered by N, so the player has 7-N followers." },
+    { "id": "short-valley", "where": "setup", "how": "Right after newGame, the last N tiles of G.stack are removed and G.total is lowered by N, so the game ends N tiles sooner." },
+    { "id": "boss-opens", "where": "setup", "how": "newGame is called with seats ['ai','human'] so the boss takes the first turn; metrics read the seat where human is true." },
+    { "id": "town-tithe", "where": "scoring", "how": "In complete(), each time a finished town pays the boss seat, the boss also gets N extra points, logged as 'town tithe +N'." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "First Furrow", "boss": false,
+      "intro": [
+        { "who": "guide", "text": "Welcome to Vinemoor, Garnet. The valley is empty and the deeds go to whoever builds best." },
+        { "who": "guide", "text": "Draw a tile, lay it so the edges match, then stand a follower on a road to claim it." },
+        { "who": "hob", "text": "I'm Hob. I just haul carts about. Don't mind me!" }
+      ],
+      "outro": [
+        { "who": "guide", "text": "Every finished road paid you a point per tile, and your follower came home to work again." },
+        { "who": "hob", "text": "Fair's fair. Your roads were straighter than mine." }
+      ],
+      "opponent": { "name": "Hob the Carter", "portrait": "camp-hob.webp", "emoji": "🛒", "cast": "hob",
+        "personality": "Friendly and careless; lays tiles almost at random.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": false, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": true,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 6 or more from roads", "test": { "k": "road", "op": ">=", "v": 6 } },
+        { "text": "Score 40 or more", "test": { "k": "score", "op": ">=", "v": 40 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Hob already plays gently; follow the suggested move each turn." },
+      "unlock": [ { "type": "portrait", "id": "hob", "text": "Hob's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Walls of Clay", "boss": false,
+      "intro": [
+        { "who": "guide", "text": "Towns pay best. A finished town gives 2 per tile and 2 per banner." },
+        { "who": "wren", "text": "I'm Wren. I build walls for a living, so don't expect to out-build me." },
+        { "who": "guide", "text": "Put a warden in a small town and close it fast. A 2-tile town is 4 points." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "Small towns closed quickly bring your wardens home for the next one." },
+        { "who": "wren", "text": "Hm. You wall faster than I do." }
+      ],
+      "opponent": { "name": "Wren Ashlar", "portrait": "camp-wren.webp", "emoji": "🧱", "cast": "wren",
+        "personality": "Proud mason's apprentice who loves towns but leaves them unfinished.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": false, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "custom", "value": 16, "text": "Win with at least 16 points from towns." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 16+ town points", "test": { "k": "town", "op": ">=", "v": 16 } },
+        { "text": "Score 50 or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Score 24 or more from towns", "test": { "k": "town", "op": ">=", "v": 24 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Win with any number of town points." },
+      "unlock": [ { "type": "portrait", "id": "wren", "text": "Wren's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "Green Acres", "boss": false,
+      "intro": [
+        { "who": "mabry", "text": "Farmers lie down in a field and never get up. Seems lazy, but it pays." },
+        { "who": "guide", "text": "At the end, each field pays 3 points for every finished town it touches." },
+        { "who": "guide", "text": "Lay one farmer early in a big field next to towns that will close." }
+      ],
+      "outro": [
+        { "who": "mabry", "text": "Told you. The lazy ones get fat on bread." },
+        { "who": "guide", "text": "Fields are the quiet points. Many games are won in the last count." }
+      ],
+      "opponent": { "name": "Mabry Furrow", "portrait": "camp-mabry.webp", "emoji": "🌾", "cast": "mabry",
+        "personality": "Slow-talking farmer; happy to share a field rather than fight for it.",
+        "aiLevel": "easy", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "custom", "value": 9, "text": "Win with at least 9 points from fields." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 9+ field points", "test": { "k": "field", "op": ">=", "v": 9 } },
+        { "text": "Score 18 or more from fields", "test": { "k": "field", "op": ">=", "v": 18 } },
+        { "text": "Win by 20 or more", "test": { "k": "margin", "op": ">=", "v": 20 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "ex": { "river": false, "ic": false, "tb": false } }, "maxStars": 2, "text": "No river, and any field score will do: just win." },
+      "unlock": [ { "type": "portrait", "id": "mabry", "text": "Mabry's portrait" }, { "type": "table", "id": "harvest", "text": "Harvest table" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "The Quiet Brother", "boss": true,
+      "intro": [
+        { "who": "quill", "text": "Peace, settler. The priories of this valley were promised to my order." },
+        { "who": "guide", "text": "A priory surrounded by 8 tiles is worth 9. Unfinished, it pays 1 per tile around it." },
+        { "who": "guide", "text": "Quill builds priories and nothing else. Use everything you have learned." }
+      ],
+      "outro": [
+        { "who": "quill", "text": "Your roads, towns, fields and priories... the valley speaks for you." },
+        { "who": "guide", "text": "Word travels downriver. Merchants will come now, and harder rivals." }
+      ],
+      "opponent": { "name": "Brother Quill", "portrait": "camp-quill.webp", "emoji": "📜", "cast": "quill",
+        "personality": "Calm and patient; sits brothers in priories and waits.",
+        "aiLevel": "easy", "aiStyle": "standard",
+        "taunt": "Patience is a virtue, settler. You lacked it today.",
+        "praise": "Well built. I will write your name in the valley book." },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "score", "value": 60, "text": "Win with at least 60 points." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 60+ points", "test": { "k": "score", "op": ">=", "v": 60 } },
+        { "text": "Score 9 or more from priories", "test": { "k": "priory", "op": ">=", "v": 9 } },
+        { "text": "Win by 25 or more", "test": { "k": "margin", "op": ">=", "v": 25 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Just win; any score will do." },
+      "unlock": [ { "type": "portrait", "id": "quill", "text": "Brother Quill's portrait" }, { "type": "title", "id": "settler", "text": "Title: Settler of Vinemoor" }, { "type": "act", "id": "2", "text": "Act 2: River and Market" } ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "Ferry Crossing", "boss": false,
+      "intro": [
+        { "who": "ferro", "text": "Ferro, boatman. The river is mine to cross, and I know every bend." },
+        { "who": "guide", "text": "The river tiles come first. They split fields, so plan your farmers around them." },
+        { "who": "guide", "text": "Ferro plays properly now: he finishes what he starts. Watch his followers." }
+      ],
+      "outro": [
+        { "who": "ferro", "text": "You crossed well. Keep the ferry fee, you earned it." }
+      ],
+      "opponent": { "name": "Ferro the Boatman", "portrait": "camp-ferro.webp", "emoji": "🛶", "cast": "ferro",
+        "personality": "Steady and practical; takes the best points on offer each turn.",
+        "aiLevel": "normal", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 90 or more", "test": { "k": "score", "op": ">=", "v": 90 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Ferro plays gently this time." },
+      "unlock": [ { "type": "portrait", "id": "ferro", "text": "Ferro's portrait" }, { "type": "table", "id": "riverbank", "text": "Riverbank table" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Tapwell Tavern", "boss": false,
+      "intro": [
+        { "who": "dulcie", "text": "Dulcie Tapwell. My taverns double a road, and my basilicas triple a town." },
+        { "who": "guide", "text": "Careful: a road with a tavern or a town with a basilica pays nothing if unfinished." },
+        { "who": "guide", "text": "You also get a champion. It counts as two followers when deciding who owns a feature." }
+      ],
+      "outro": [
+        { "who": "dulcie", "text": "A round on the house. You closed what you opened." }
+      ],
+      "opponent": { "name": "Dulcie Tapwell", "portrait": "camp-dulcie.webp", "emoji": "🍺", "cast": "dulcie",
+        "personality": "Bold gambler; loves big basilica towns and moves in on yours with her champion.",
+        "aiLevel": "normal", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": true, "tb": false } },
+      "twist": null,
+      "goal": { "type": "score", "value": 100, "text": "Win with at least 100 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with 100+ points", "test": { "k": "score", "op": ">=", "v": 100 } },
+        { "text": "Score 40 or more from towns", "test": { "k": "town", "op": ">=", "v": 40 } },
+        { "text": "Win by 15 or more", "test": { "k": "margin", "op": ">=", "v": 15 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Dulcie plays gently and any winning score counts." },
+      "unlock": [ { "type": "portrait", "id": "dulcie", "text": "Dulcie's portrait" }, { "type": "cardback", "id": "tavern", "text": "Tavern-sign tile back" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "The Reeve's Market", "boss": true,
+      "intro": [
+        { "who": "ostrand", "text": "I am Reeve Ostrand. Every barrel of wine in this valley is taxed by me." },
+        { "who": "guide", "text": "Whoever closes a town takes its goods. The most wine, grain or cloth is worth 10 each." },
+        { "who": "guide", "text": "Your mason gives an extra turn when you grow its feature; your hog fattens a field." },
+        { "who": "ostrand", "text": "And as reeve, I move first. Market rules." }
+      ],
+      "outro": [
+        { "who": "ostrand", "text": "The ledger does not lie. The market is yours, settler." },
+        { "who": "guide", "text": "But a darker banner flies on the north ridge. Sable." }
+      ],
+      "opponent": { "name": "Reeve Ostrand", "portrait": "camp-ostrand.webp", "emoji": "⚖️", "cast": "ostrand",
+        "personality": "Cold bookkeeper; closes towns for their goods even when they score him little.",
+        "aiLevel": "normal", "aiStyle": "standard",
+        "taunt": "Paid in full. Better luck at the next market.",
+        "praise": "Your accounts balance better than mine. Well traded." },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": true, "tb": true } },
+      "twist": { "id": "boss-opens", "param": null, "text": "Boss rule: Reeve Ostrand takes the first turn." },
+      "goal": { "type": "score", "value": 110, "text": "Win with at least 110 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with 110+ points", "test": { "k": "score", "op": ">=", "v": 110 } },
+        { "text": "Score 10 or more from goods", "test": { "k": "goods", "op": ">=", "v": 10 } },
+        { "text": "Win by 20 or more", "test": { "k": "margin", "op": ">=", "v": 20 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "You move first and the Reeve plays gently." },
+      "unlock": [ { "type": "portrait", "id": "ostrand", "text": "Reeve Ostrand's portrait" }, { "type": "title", "id": "merchant", "text": "Title: Merchant of the Ford" }, { "type": "act", "id": "3", "text": "Act 3: The Sable Claim" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "The Lilac Envoy", "boss": false,
+      "intro": [
+        { "who": "lilac", "text": "Isolde, of Lilac Hall. The Baron sent me to see if you are worth a fight." },
+        { "who": "guide", "text": "She plays the best game you have faced: she counts the tiles still in the bag." },
+        { "who": "guide", "text": "No tricks this time. Just the base valley, and the river." }
+      ],
+      "outro": [
+        { "who": "lilac", "text": "I'll tell the Baron you are worth a fight. He won't like it." }
+      ],
+      "opponent": { "name": "Isolde of Lilac Hall", "portrait": "camp-isolde.webp", "emoji": "🌸", "cast": "lilac",
+        "personality": "Polite and exact; never wastes a follower and blocks your towns from closing.",
+        "aiLevel": "hard", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": false, "tb": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 100 or more", "test": { "k": "score", "op": ">=", "v": 100 } },
+        { "text": "Score 25 or more from fields", "test": { "k": "field", "op": ">=", "v": 25 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Isolde plays at the normal level." },
+      "unlock": [ { "type": "portrait", "id": "lilac", "text": "Isolde's portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "Blackmere's Gambit", "boss": false,
+      "intro": [
+        { "who": "corvin", "text": "Corvin Blackmere, the Baron's steward. I bring an extra pair of hands." },
+        { "who": "guide", "text": "He has 8 followers to your 7. Spend yours carefully and bring them home often." }
+      ],
+      "outro": [
+        { "who": "corvin", "text": "Eight hands, and still you out-built me. The Baron will come himself." }
+      ],
+      "opponent": { "name": "Corvin Blackmere", "portrait": "camp-corvin.webp", "emoji": "🐦‍⬛", "cast": "corvin",
+        "personality": "Sly and grasping; floods the board with followers and steals shared fields.",
+        "aiLevel": "hard", "aiStyle": "standard" },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": true, "tb": false } },
+      "twist": { "id": "boss-extra-follower", "param": 1, "text": "Boss rule: Corvin starts with 8 followers instead of 7." },
+      "goal": { "type": "score", "value": 100, "text": "Win with at least 100 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with 100+ points", "test": { "k": "score", "op": ">=", "v": 100 } },
+        { "text": "Score 50 or more from towns", "test": { "k": "town", "op": ">=", "v": 50 } },
+        { "text": "Win by 15 or more", "test": { "k": "margin", "op": ">=", "v": 15 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Corvin plays at the normal level with 7 followers." },
+      "unlock": [ { "type": "portrait", "id": "corvin", "text": "Corvin's portrait" }, { "type": "cardback", "id": "raven", "text": "Raven tile back" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Sable Claim", "boss": true,
+      "intro": [
+        { "who": "baron", "text": "This valley was my grandfather's. I hold old deeds worth 15 points before we begin." },
+        { "who": "guide", "text": "All three expansions, his best play, and a head start. This is the last deed." },
+        { "who": "guide", "text": "Close towns, guard your fields, and count the tiles left. You know how." }
+      ],
+      "outro": [
+        { "who": "baron", "text": "The old deeds are ash. Vinemoor is yours." },
+        { "who": "guide", "text": "Garnet of Vinemoor. It has a ring to it." },
+        { "who": "hob", "text": "Told everyone you'd do it. Mostly." }
+      ],
+      "opponent": { "name": "The Sable Baron", "portrait": "camp-baron.webp", "emoji": "🏰", "cast": "baron",
+        "personality": "Arrogant and ruthless; contests every big town and farms the whole valley.",
+        "aiLevel": "hard", "aiStyle": "standard",
+        "taunt": "Old deeds always win. Go back to your carts.",
+        "praise": "I yield. Keep the valley, and my banner with it." },
+      "setup": { "np": 2, "seats": ["human", "ai"], "ex": { "river": true, "ic": true, "tb": true } },
+      "twist": { "id": "head-start", "param": 15, "text": "Boss rule: the Sable Baron starts with 15 points." },
+      "goal": { "type": "win", "value": null, "text": "Win the game against the Baron's 15-point head start." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 120 or more", "test": { "k": "score", "op": ">=", "v": 120 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "The Baron plays at the normal level with no head start." },
+      "unlock": [ { "type": "portrait", "id": "baron", "text": "The Sable Baron's portrait" }, { "type": "table", "id": "sable-hall", "text": "Sable Hall table" }, { "type": "title", "id": "lord", "text": "Title: Garnet of Vinemoor" } ]
+    }
+  ]
+}

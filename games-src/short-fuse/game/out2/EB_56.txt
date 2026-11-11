@@ -1,0 +1,6 @@
+job 56 2p  win 4/10  turns 22  3.1s  5x the fuse burnt down; 1x X missed while cutting their own flipped wire
+job 56 3p  win 3/10  turns 22  3.0s  4x the fuse burnt down; 2x X pointed at a red wire; 1x X missed while cutting their own flipped wire
+job 56 4p  win 1/10  turns 22  4.2s  4x X pointed at a red wire; 4x the fuse burnt down; 1x X cut their own flipped wire and it was not 6
+job 56 5p  win 1/10  turns 23  4.9s  4x X pointed at a red wire; 5x the fuse burnt down
+TOTAL games 40 wins 9 (23%) errors 0 stalls 0 invariant-fails 0 time 153s level hard
+loss reasons {"the fuse burnt down":18,"X missed while cutting their own flipped wire":2,"X pointed at a red wire":10,"X cut their own flipped wire and it was not 6":1}

@@ -1,0 +1,92 @@
+{
+ "note": "id -> base file name in this folder. build.py embeds <name>.png if present (a user painting, resized to the size below), else <name>.webp (made by ../paint/paint.js).",
+ "items": {
+  "emb0": "emb0",
+  "emb1": "emb1",
+  "emb2": "emb2",
+  "emb3": "emb3",
+  "emb4": "emb4",
+  "back": "back",
+  "ping": "ping",
+  "flare": "flare",
+  "cmd": "cmd",
+  "drone": "drone",
+  "diver0": "diver0",
+  "diver1": "diver1",
+  "diver2": "diver2",
+  "diver3": "diver3",
+  "diver4": "diver4",
+  "table": "table",
+  "title": "title"
+ },
+ "size": {
+  "emb0": [
+   320,
+   320
+  ],
+  "emb1": [
+   320,
+   320
+  ],
+  "emb2": [
+   320,
+   320
+  ],
+  "emb3": [
+   320,
+   320
+  ],
+  "emb4": [
+   320,
+   320
+  ],
+  "back": [
+   320,
+   448
+  ],
+  "ping": [
+   192,
+   192
+  ],
+  "flare": [
+   192,
+   192
+  ],
+  "cmd": [
+   192,
+   192
+  ],
+  "drone": [
+   256,
+   256
+  ],
+  "diver0": [
+   256,
+   256
+  ],
+  "diver1": [
+   256,
+   256
+  ],
+  "diver2": [
+   256,
+   256
+  ],
+  "diver3": [
+   256,
+   256
+  ],
+  "diver4": [
+   256,
+   256
+  ],
+  "table": [
+   1280,
+   720
+  ],
+  "title": [
+   1440,
+   810
+  ]
+ }
+}

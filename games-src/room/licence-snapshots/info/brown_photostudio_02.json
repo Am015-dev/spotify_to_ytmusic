@@ -1,0 +1,59 @@
+{
+ "evs_cap": 15,
+ "type": 0,
+ "whitebalance": 5800,
+ "tags": [
+  "bed",
+  "studio",
+  "fluorescent",
+  "window",
+  "couch",
+  "chair",
+  "photo",
+  "table",
+  "kitchen",
+  "fridge",
+  "backplates"
+ ],
+ "name": "Brown Photostudio 02",
+ "categories": [
+  "urban",
+  "studio",
+  "indoor",
+  "artificial light",
+  "natural light",
+  "medium contrast"
+ ],
+ "backplates": true,
+ "date_taken": 1649160600,
+ "coords": [
+  49.21998148128005,
+  28.42895420247657
+ ],
+ "authors": {
+  "Sergej Majboroda": "All"
+ },
+ "date_published": 1652918400,
+ "staging": null,
+ "max_resolution": [
+  16384,
+  8192
+ ],
+ "files_hash": "35b637b40bd4c33b1fdb3162a19b55b2a275d749",
+ "sponsors": [
+  "82322099"
+ ],
+ "description": "Free unclipped 16K HDRI - warm brown indoor studio lit by large window daylight and cool fluorescent fixtures; medium contrast, soft shadows.",
+ "category_id": "3aec9d2e-21ed-5f1f-88c0-c45a9c6ee7b9",
+ "category": "Studio/Photo Studios/Natural-Light Studios",
+ "attributes": {
+  "light_type": "mixed",
+  "contrast": "medium",
+  "backplates": true,
+  "environment": "indoor",
+  "weather": "overcast"
+ },
+ "img_version": "4542fee3",
+ "download_count": 776636,
+ "thumbnail_url": "https://cdn.polyhaven.com/asset_img/thumbs/brown_photostudio_02.png?width=256&height=256&v=4542fee3"
+}

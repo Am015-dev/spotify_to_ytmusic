@@ -1,0 +1,49 @@
+/* ===== Board-first shell (shared by every game on the shelf) =====
+   The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
+   everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
+:root{--gx-bar-h:48px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+.gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
+.gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
+.gx-bar::-webkit-scrollbar{display:none}
+.gx-bar .gx-sp{flex:1 0 8px}
+.gx-main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--gx-dock-w);position:relative}
+.gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+.gx-board{position:relative;min-width:0;min-height:0;overflow:hidden}
+.gx-dock{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.gx-dock-head{display:flex;align-items:center;gap:6px;padding:6px 8px 4px;flex:0 0 auto}
+.gx-dock-head .gx-dt{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-dock-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gx-app.gx-dock-min .gx-dock{visibility:hidden}
+
+.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:40px;min-height:40px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
+.gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
+.gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
+/* popups */
+.gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
+.gx-scrim.on{opacity:1;pointer-events:auto}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer.on{transform:none;visibility:visible}
+.gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
+.gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
+.gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
+@media (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
+  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
+  .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
+  .gx-app.gx-dock-min .gx-dock-body{display:none}
+  .gx-reopen{display:none!important}
+  .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-drawer.wide{width:auto}
+  .gx-hide-narrow{display:none!important}
+}
+@media (min-width:1000px){.gx-grab{display:none}}
+@media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}

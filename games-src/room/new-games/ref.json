@@ -1,0 +1,60 @@
+{
+ "G": [
+  [
+   "lantern",
+   "Lantern Dive",
+   "Co-op tricks"
+  ],
+  [
+   "cauldron",
+   "Cauldron Fair",
+   "Push your luck"
+  ],
+  [
+   "approach",
+   "Final Approach",
+   "Co-op dice"
+  ]
+ ],
+ "E": [
+  {
+   "g": "lantern",
+   "s": "The game in brief",
+   "n": "How a dive works",
+   "tags": [
+    "2–5 divers",
+    "co-op",
+    "about 20 minutes"
+   ],
+   "t": "Four colours (Coral, Tide, Kelp, Sunstar, 1 to 9) and four trump Lanterns (1 to 4) are dealt out to the crew; whoever holds Lantern 4 is the Commander and starts picking job cards. Each job is a promise about the tricks one diver will win, and the dive is won only when every job is done; one failed job ends the attempt. In a trick you follow the lead colour if you can, a Lantern beats every colour, and otherwise the highest card of the lead colour wins. Nobody may talk about their cards, but once per dive each diver may show one colour card that is their highest, lowest or only card of that colour. With two divers a computer-run drone joins the crew. Play the 32 dives, the open-ended Deep Dive, a free dive, or practise single job cards.",
+   "sub": [],
+   "c": null
+  },
+  {
+   "g": "cauldron",
+   "s": "The game in brief",
+   "n": "How a brew works",
+   "tags": [
+    "2–4 brewers",
+    "push your luck",
+    "about 45 minutes"
+   ],
+   "t": "Over nine rounds everyone brews at once: draw chips from your own bag one at a time and lay each on your cauldron track, as many spaces on as its number. After every chip you choose to draw again or stop. If the white Fizzpods in your pot add up to more than 7 it boils over, so you take either the points or the shopping, never both. Where you stop pays out coins and points, and the coins buy new chips for the bag in colours with their own powers; rubies, droplets and a flask give extra tricks. A fortune card changes each round, the brewers who are behind get a rat stone head start, and the most points after round nine wins.",
+   "sub": [],
+   "c": null
+  },
+  {
+   "g": "approach",
+   "s": "The game in brief",
+   "n": "How a landing works",
+   "tags": [
+    "2 crew",
+    "co-op",
+    "about 15 minutes"
+   ],
+   "t": "You are the Pilot and the Co-pilot of one airliner, and you win or lose together. Over seven rounds, one per altitude row, each of you rolls four dice behind a screen and places them one at a time on the panel: axis, engines, flaps, landing gear, brakes, radio and concentration. You may talk about the plan before the roll but never about the dice values. The axis dice keep the plane level, the engine dice set the speed, and the speed decides how far along the approach track you move, past any planes in the way. To win, finish on the airport space with the gear down, the flaps set, the plane level and the brakes strong enough for the speed. Eleven airports and 21 flights add traffic, wind, fuel, a trainee and icy runways.",
+   "sub": [],
+   "c": null
+  }
+ ]
+}

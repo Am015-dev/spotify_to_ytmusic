@@ -1,0 +1,6 @@
+Snapshot of https://polyhaven.com/license taken 2026-10-03
+Title: License • Poly Haven
+Description: CC0 means absolute freedom.
+
+Full page HTML saved next to this file (polyhaven-license.html). Summary: all Poly Haven assets are CC0 1.0 (public domain); no attribution required; use, modify and redistribute for any purpose.
+Licence text: https://creativecommons.org/publicdomain/zero/1.0/

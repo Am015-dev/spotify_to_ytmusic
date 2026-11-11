@@ -1,0 +1,463 @@
+{
+  "meta": {
+    "note": "Names are our own. unlock.count = wires of that value that must be cut. Timing labels follow the card footers.",
+    "base_unlock_rule": "Usable from the moment the first 2 wires of the card value are cut; usable once per mission; flip face down after use. Anyone may use a card at any time unless its timing says otherwise; several may be chained.",
+    "setup": "Draw one card per player at random from the eligible pool. Missions list cards to discard and replace."
+  },
+  "equipment": [
+    {
+      "id": "eq1",
+      "unlock": {
+        "value": 1,
+        "count": 2
+      },
+      "name": "Unequal Tag",
+      "timing": "any_time",
+      "effect": "Place the single ≠ marker against two neighbouring wires on your own stand whose values differ. One of the two may already be cut. Two reds, or two yellows, always count as equal, so they can never take this marker.",
+      "structured": {
+        "kind": "place_marker",
+        "marker": "neq",
+        "target": "own_adjacent_pair",
+        "pair_must_differ": true,
+        "allow_one_cut": true,
+        "red_red_equal": true,
+        "yellow_yellow_equal": true
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": [
+        "Card does not literally say \"your\" wires (the = card does); assumed own stand."
+      ]
+    },
+    {
+      "id": "eq2",
+      "unlock": {
+        "value": 2,
+        "count": 2
+      },
+      "name": "Handsets",
+      "timing": "any_time",
+      "effect": "Swap one wire with a teammate. You hand them one of your uncut wires face down; they hand you one of theirs face down; each of you slots the new wire into sorted position. Any uncut wire may be swapped, red or yellow included. Everyone sees which slot each wire left and where it went. A player with two stands puts the incoming wire on the stand the outgoing one came from. Info tokens travel with their wire. Neither player may ask for or hint at a value.",
+      "structured": {
+        "kind": "swap",
+        "with": "teammate_choice",
+        "own_wire": "any_uncut",
+        "their_wire": "their_choice_any_uncut",
+        "info_token": "moves_with_wire",
+        "reinsert": "sorted",
+        "two_stand_rule": "same_stand_as_given",
+        "public": [
+          "source_slot",
+          "dest_slot"
+        ]
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "FAQ: info token follows the wire; in mission 24 the token is discarded instead.",
+        "FAQ: you cannot request a value or direct which stand."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq3",
+      "unlock": {
+        "value": 3,
+        "count": 2
+      },
+      "name": "Triple Probe",
+      "timing": "your_turn",
+      "effect": "During a dual cut, name a number (not yellow) and point at three wires on one teammate stand. The cut succeeds if at least one matches; the teammate cuts one matching wire without saying how many matched. On failure the dial advances 1 and the teammate places one info token in front of one of the three (their choice).",
+      "structured": {
+        "kind": "multi_target_dual_cut",
+        "targets": 3,
+        "same_stand": true,
+        "values": "number_only"
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "FAQ confirms success and failure handling."
+      ],
+      "gaps": [
+        "Red handling extrapolated from the Twin Probe: explode only if all chosen wires are red; token goes on a non-red wire."
+      ]
+    },
+    {
+      "id": "eq4",
+      "unlock": {
+        "value": 4,
+        "count": 2
+      },
+      "name": "Sticky Note",
+      "timing": "any_time",
+      "effect": "Place an info token showing the true value in front of one of your own blue wires.",
+      "structured": {
+        "kind": "place_info",
+        "target": "own_blue_wire",
+        "truthful": true
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "In token-replacement missions (21, 24, 33, 40) the replacement token is used instead; in 24/40 it may go on a cut wire."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq5",
+      "unlock": {
+        "value": 5,
+        "count": 2
+      },
+      "name": "Full Scan",
+      "timing": "your_turn",
+      "effect": "During a dual cut, name a number (not yellow) and point at a teammate's entire stand. Success if any wire on it matches; the teammate cuts one matching wire without saying how many. On failure the dial advances 1 and the teammate places one info token in front of a wire of their choice.",
+      "structured": {
+        "kind": "multi_target_dual_cut",
+        "targets": "whole_stand",
+        "same_stand": true,
+        "values": "number_only"
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": [
+        "Red handling extrapolated: a failure means no wire of that value is on the stand; the teammate tags a non-red wire."
+      ]
+    },
+    {
+      "id": "eq6",
+      "unlock": {
+        "value": 6,
+        "count": 2
+      },
+      "name": "Rewind",
+      "timing": "any_time",
+      "effect": "Move the detonator dial back one step.",
+      "structured": {
+        "kind": "dial",
+        "dial_advance": -1
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": [
+        "Upper bound of the dial (assumed 6)."
+      ]
+    },
+    {
+      "id": "eq7",
+      "unlock": {
+        "value": 7,
+        "count": 2
+      },
+      "name": "Recharge",
+      "timing": "any_time",
+      "effect": "Pick one or two character cards whose personal item has already been used and turn them face up; each can be used once more this mission.",
+      "structured": {
+        "kind": "refresh_characters",
+        "count_max": 2
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": []
+    },
+    {
+      "id": "eq8",
+      "unlock": {
+        "value": 8,
+        "count": 2
+      },
+      "name": "Sweep",
+      "timing": "any_time",
+      "effect": "Call out a number from 1 to 12. Every player, you included, answers yes if they hold at least one uncut blue wire of that number. Players with two stands answer once per stand. Nobody says how many or where. Red and yellow wires never count.",
+      "structured": {
+        "kind": "radar",
+        "values": "1-12",
+        "counts": "uncut_blue_only",
+        "granularity": "per_stand",
+        "reveals": "yes_no"
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "FAQ: a red 7.5 is not a 7.",
+        "Mission 18 makes it permanently available and repeated each turn."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq9",
+      "unlock": {
+        "value": 9,
+        "count": 2
+      },
+      "name": "Damper",
+      "timing": "start_of_your_turn",
+      "effect": "Turn this card face down before you make a dual cut this turn. If that cut fails, the dial does not move, and if it lands on a red wire the bomb does not go off. A wrong non-red wire still gets its info token (number or yellow); a red one gets none.",
+      "structured": {
+        "kind": "shield_next_dual_cut",
+        "cancel_dial": true,
+        "cancel_red_explosion": true,
+        "info_token_on_wrong_nonred": true,
+        "info_token_on_red": false
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "FAQ: if a red was chosen, no info token.",
+        "Mission 14: the rookie cannot use it. Mission 44: it can fake a cut, or cancel the dial step of a pass (FAQ)."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq10",
+      "unlock": {
+        "value": 10,
+        "count": 2
+      },
+      "name": "Two-Value Probe",
+      "timing": "your_turn",
+      "effect": "During a dual cut, name two values (yellow may be one of them) for a single wire. You must hold both values. If the wire is either, the cut succeeds and you cut your matching wire, so teammates also learn that you hold the other value. The two values need not be adjacent. It can be combined with the double, triple or full-scan probes.",
+      "structured": {
+        "kind": "two_value_dual_cut",
+        "values": 2,
+        "yellow_allowed": true,
+        "must_hold_both": true,
+        "combinable_with": [
+          "double_detector",
+          "eq3",
+          "eq5"
+        ]
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": []
+    },
+    {
+      "id": "eq11",
+      "unlock": {
+        "value": 11,
+        "count": 2
+      },
+      "name": "Coffee Break",
+      "timing": "your_turn",
+      "effect": "Skip your turn and choose, without discussion, who takes the next turn; play carries on clockwise from that player.",
+      "structured": {
+        "kind": "skip_and_choose_next"
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [
+        "Mission 43: does not stop the robot moving. Mission 59: skips a whole turn. Mission 65: simply lets you skip. FAQ mission 29: interplay with number-card hand-offs."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq12",
+      "unlock": {
+        "value": 12,
+        "count": 2
+      },
+      "name": "Equal Tag",
+      "timing": "any_time",
+      "effect": "Place the single = marker against two neighbouring wires on your own stand that share a value. One may already be cut. Any two reds, or any two yellows, count as the same.",
+      "structured": {
+        "kind": "place_marker",
+        "marker": "eq",
+        "target": "own_adjacent_pair",
+        "pair_must_match": true,
+        "allow_one_cut": true
+      },
+      "availability": {
+        "pool": "base",
+        "from_mission": 3
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": []
+    },
+    {
+      "id": "eqY",
+      "unlock": {
+        "value": "yellow",
+        "count": 2
+      },
+      "name": "Hidden Compartment",
+      "timing": "instant",
+      "effect": "As soon as it unlocks, draw two more equipment cards and add them to this mission. They may already be unlocked if their values have been cut.",
+      "structured": {
+        "kind": "add_equipment",
+        "count": 2,
+        "trigger": "on_unlock"
+      },
+      "availability": {
+        "pool": "yellow",
+        "from_mission": 9,
+        "only_if_mission_has_yellow": true
+      },
+      "confirmed": true,
+      "notes": [
+        "Rule sticker A."
+      ],
+      "gaps": [
+        "\"Instant\" assumed to fire automatically on unlock."
+      ]
+    },
+    {
+      "id": "eq22",
+      "unlock": {
+        "value": 2,
+        "count": 4
+      },
+      "name": "Lone Tag",
+      "timing": "any_time",
+      "effect": "Place a ×1 token in front of one of your blue wires, cut or uncut. It means that value appears only once on that stand, counting cut wires.",
+      "structured": {
+        "kind": "place_count_token",
+        "token": "x1",
+        "target": "own_blue_wire_cut_or_uncut"
+      },
+      "availability": {
+        "pool": "double",
+        "from_mission": 55
+      },
+      "confirmed": true,
+      "notes": [
+        "Rule sticker C: all 4 wires of the value must be cut to unlock."
+      ],
+      "gaps": []
+    },
+    {
+      "id": "eq33",
+      "unlock": {
+        "value": 3,
+        "count": 4
+      },
+      "name": "Supply Drop",
+      "timing": "instant",
+      "effect": "All equipment cards already used this mission turn face up again and can be used once more.",
+      "structured": {
+        "kind": "refresh_equipment",
+        "trigger": "on_unlock"
+      },
+      "availability": {
+        "pool": "double",
+        "from_mission": 55
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": [
+        "\"Instant\" assumed to fire on unlock."
+      ]
+    },
+    {
+      "id": "eq99",
+      "unlock": {
+        "value": 9,
+        "count": 4
+      },
+      "name": "Express Pass",
+      "timing": "your_turn",
+      "effect": "Make a solo cut of two identical wires from your hand even if other wires of that value are still uncut elsewhere.",
+      "structured": {
+        "kind": "solo_cut_override",
+        "count": 2
+      },
+      "availability": {
+        "pool": "double",
+        "from_mission": 55
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": []
+    },
+    {
+      "id": "eq1010",
+      "unlock": {
+        "value": 10,
+        "count": 4
+      },
+      "name": "Vaporiser",
+      "timing": "instant",
+      "effect": "Draw an info token at random from the supply and reveal its number. Every player cuts all of their remaining wires of that number.",
+      "structured": {
+        "kind": "random_mass_cut",
+        "source": "info_token_supply",
+        "trigger": "on_unlock"
+      },
+      "availability": {
+        "pool": "double",
+        "from_mission": 55
+      },
+      "confirmed": true,
+      "notes": [],
+      "gaps": [
+        "If a yellow token or a value with no uncut wires comes up: assumed redraw.",
+        "\"Instant\" assumed to fire on unlock."
+      ]
+    },
+    {
+      "id": "eq1111",
+      "unlock": {
+        "value": 11,
+        "count": 4
+      },
+      "name": "Hook Line",
+      "timing": "any_time",
+      "effect": "Point at a teammate wire, take it without revealing it, and slot it into your hand in sorted order. Everyone sees where it came from and where it went.",
+      "structured": {
+        "kind": "steal_wire",
+        "target": "teammate_any_uncut",
+        "reinsert": "sorted",
+        "two_stand_rule": "player_chooses"
+      },
+      "availability": {
+        "pool": "double",
+        "from_mission": 55
+      },
+      "confirmed": true,
+      "notes": [
+        "FAQ: a two-stand player chooses the stand."
+      ],
+      "gaps": []
+    }
+  ]
+}

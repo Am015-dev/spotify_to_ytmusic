@@ -1,0 +1,53 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Doorkick <span>Dungeon</span></h1>
+  <span class="ph-chip" id="phchip" aria-live="off"></span>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-scroll"/></svg> <span class="gx-lbl">Diary</span></button>
+  <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-rivals"/></svg> <span class="gx-lbl">Rivals</span></button>
+  <button class="gx-ibtn" data-gx="dkRules" aria-label="How to play"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-book"/></svg> <span class="gx-lbl">Rules</span></button>
+  <button class="gx-ibtn dk-wide" data-a="snd" id="sndbtn" aria-label="Sound"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-sound"/></svg></button>
+  <button class="gx-ibtn dk-wide" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-music"/></svg> On</button>
+  <button class="gx-ibtn dk-wide" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-slow"/></svg> slow</button>
+  <button class="gx-ibtn dk-wide" data-a="pause" id="pausebtn" title="Pause the computer" aria-label="Pause the computer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-pause"/></svg></button>
+  <button class="gx-ibtn dk-wide" data-a="hints" id="hintbtn" title="Suggested moves"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-hint"/></svg> On</button>
+  <button class="gx-ibtn dk-wide" data-a="gfx" id="gfxbtn" title="Graphics quality (High / Medium / Low)" aria-label="Graphics quality"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-gem"/></svg> High</button>
+  <button class="gx-ibtn dk-wide" data-a="new">New game</button>
+  <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
+</header>
+<div id="phopps" class="phopps" aria-label="Players"></div>
+<div class="gx-main">
+  <main class="gx-board" id="app"></main>
+  <aside class="gx-dock" aria-label="What to do now"><div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Doorkick Dungeon</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-dock"/></svg></button></div><div class="gx-dock-body" id="side"></div></aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-dock"/></svg> Panel</button>
+</div>
+</div>
+<div id="dkLogBody"></div>
+<div id="dkOppBody"></div>
+<div id="dkCardBody"></div>
+<div id="dkRulesBody"></div>
+<div id="dkMenuBody"></div>
+<div id="dkNetBody"></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<div id="modal" class="modal" hidden></div>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="shell.js"></script>
+<script src="perfhud.js"></script>
+<script src="cards.js"></script>
+<script src="rules-html.js"></script>
+<script src="art.js"></script>
+<script src="gfx.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="sound.js"></script>
+<script src="coach.js"></script>
+<script src="net.js"></script>
+<script src="ui.js"></script>
+<script src="ph.js"></script>
+<script src="bf.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+const {chromium}=require(process.env.PW);(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1280,height:900}});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://localhost:8765/index.html');await p.waitForTimeout(500);await p.screenshot({path:'s_ref0.png'});await p.click('[data-ref="nebula"]');await p.waitForTimeout(1200);await p.screenshot({path:'s_ref1.png'});
+const f=p.frames().find(f=>f.url().includes('reference'));console.log('frame count',f&&await f.evaluate(()=>document.getElementById('count').textContent),errs);await b.close()})()

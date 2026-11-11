@@ -1,0 +1,50 @@
+{
+ "type": 1,
+ "tags": [
+  "beige",
+  "painted",
+  "suburb",
+  "house",
+  "spikey",
+  "textured",
+  "home"
+ ],
+ "date_published": 1626344163,
+ "name": "Beige Wall 002",
+ "categories": [
+  "man made",
+  "wall",
+  "plaster",
+  "outdoor",
+  "indoor",
+  "plaster-concrete"
+ ],
+ "staging": null,
+ "authors": {
+  "Dimitrios Savva": "Photography",
+  "Rico Cilliers": "Processing"
+ },
+ "dimensions": [
+  3000,
+  3000.000238418579
+ ],
+ "max_resolution": [
+  32767,
+  8192
+ ],
+ "files_hash": "d904663c1d86c6cb623e77391ca04fba433a0923",
+ "description": "Free 32K beige painted plaster texture. Rough, urban wall with fine granular bumps, subtle paint variation, matte and slightly porous surface.",
+ "category_id": "9d3c7da3-4959-5d42-8abc-5c31017a2fd4",
+ "category": "Concrete/Plaster & Stucco/Painted Plaster",
+ "attributes": {
+  "surface_use": "wall",
+  "condition": [
+   "painted"
+  ],
+  "origin": "man_made",
+  "setting": "either"
+ },
+ "img_version": "d77fe530",
+ "download_count": 83543,
+ "thumbnail_url": "https://cdn.polyhaven.com/asset_img/thumbs/beige_wall_002.png?width=256&height=256&v=d77fe530"
+}

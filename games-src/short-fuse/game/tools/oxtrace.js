@@ -1,0 +1,4 @@
+// job 49/63 oxygen trace: node tools/oxtrace.js job np seed
+const {load}=require('./load');const X=load(['data.js','engine.js','ai.js']);const [n,np,g]=process.argv.slice(2).map(Number);const seed=7919*n+104729*np+g*31337;X.setSeed(seed);X.ai.setAiSeed(seed^0x5bd1);X.newGame({np,mission:n,mode:'ai',level:process.argv[5]||'normal'});let k=0,ln=X.G.logN;
+while(!X.G.over&&k++<4000){const st=X.ai.aiStep();if(!st)break;const ox=X.G.seats.map(s=>s.ox).join(',');if(X.G.step==='act'&&!X.G.q&&st.seat===X.G.actor){const h=X.knowledge(st.seat).stands.filter(s=>s.mine).map(s=>s.slots.filter(x=>!x.cut).map(x=>x.v).join(','));console.log('T'+X.G.turn,X.G.seats[st.seat].nm,'ox',ox,'dial',X.G.dial,'hand',h.join('|'),'->',X.describeMove(st.m),st.m.oxTo!=null?'to '+X.G.seats[st.m.oxTo].nm:'')}
+X.performMove(st.m,st.seat);for(const l of X.G.log.filter(l=>l.i>ln).reverse())if(/skips|BOOM|Miss|passes/.test(l.t))console.log('   ',l.t);ln=X.G.logN}

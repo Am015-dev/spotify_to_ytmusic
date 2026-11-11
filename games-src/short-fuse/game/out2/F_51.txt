@@ -1,0 +1,6 @@
+job 51 2p  win 6/10  turns 19  1.6s  3x the fuse burnt down; 1x X pointed at a red wire
+job 51 3p  win 7/10  turns 24  1.9s  3x the fuse burnt down
+job 51 4p  win 5/10  turns 24  2.0s  2x X pointed at a red wire; 3x the fuse burnt down
+job 51 5p  win 1/10  turns 19  1.1s  9x the fuse burnt down
+TOTAL games 40 wins 19 (48%) errors 0 stalls 0 invariant-fails 0 time 65s level hard
+loss reasons {"the fuse burnt down":18,"X pointed at a red wire":3}

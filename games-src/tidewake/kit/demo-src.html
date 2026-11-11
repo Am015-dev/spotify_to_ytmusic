@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tidewake Kit</title>
+<style>
+:root{--ink:#14232b;--gold:#e3b24b;--paper:#ecdcaa;--bg:#10191c}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);font-family:'Cormorant Garamond',Georgia,serif}
+#stage{position:fixed;inset:0}
+#c3{display:block;width:100%;height:100%}
+#fb{position:absolute;inset:0;display:none;background:#10191c}
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;align-items:flex-end;gap:10px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(0deg,rgba(10,18,22,.92),rgba(10,18,22,0));pointer-events:none}
+#dock>*{pointer-events:auto}
+.card{width:86px;height:86px;border-radius:10px;cursor:pointer;transition:transform .15s,filter .15s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.card:hover{transform:translateY(-6px)}
+.card.sel{transform:translateY(-12px) scale(1.06);filter:drop-shadow(0 0 8px #ffd978)}
+.btn{font:700 15px 'IM Fell English SC',Georgia,serif;color:#fff2c4;background:linear-gradient(#2d6d78,#173f4a);border:2px solid var(--gold);border-radius:9px;padding:7px 12px;cursor:pointer;box-shadow:0 3px 0 #0a1a20}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0a1a20}
+#qbar{position:fixed;right:8px;top:8px;z-index:20;display:flex;gap:4px}
+#qbar .btn{padding:3px 9px;font-size:13px}#qbar .on{background:linear-gradient(#e8b84a,#a77a22);color:#14232b}
+#ttl{position:fixed;left:12px;top:8px;z-index:20;color:#f6e7b4;font:700 20px 'IM Fell English SC',Georgia,serif;text-shadow:0 2px 4px #000;pointer-events:none}
+#log{position:fixed;left:12px;top:36px;z-index:20;color:#cfe;font:600 13px Georgia,serif;text-shadow:0 1px 3px #000;pointer-events:none}
+@media (max-width:600px){.card{width:68px;height:68px}.btn{padding:6px 8px;font-size:13px}#ttl{font-size:16px}}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c3"></canvas><div id="fb"></div></div>
+<div id="ttl">Tidewake</div><div id="log"></div>
+<div id="qbar"><button class="btn" data-q="auto">Auto</button><button class="btn" data-q="high">High</button><button class="btn" data-q="medium">Med</button><button class="btn" data-q="low">Low</button></div>
+<div id="dock"></div>
+<script>/*THREE*/</script>
+<script>/*KIT*/</script>
+<script>
+(function(){
+var P=new URLSearchParams(location.search), q=P.get('gfx')||'auto', STATIC=P.has('static');
+var cv=document.getElementById('c3'), fb=document.getElementById('fb'), logEl=document.getElementById('log');
+var tiles={}, hand=[], sel=0, rot=0, lastHover=null;
+function log(s){logEl.textContent=s}
+var res=TWKit.init(cv,{quality:q==='auto'?undefined:q,fallback:fb,force2D:P.has('2d'),preserveDrawingBuffer:P.has('pdb'),
+  onHover:function(p){hover(p)}, onClick:function(p){click(p)}});
+function fit(){TWKit.resize(innerWidth,innerHeight);TWKit.setView({reserve:{b:Math.min(.22,120/innerHeight),t:0}})}
+addEventListener('resize',fit);fit();
+// ---- hand of three tile cards (from the 35 layouts) ----
+var L=TWKit.layouts();
+hand=[L[3],L[17],L[28]];
+var dock=document.getElementById('dock');
+function drawDock(){dock.innerHTML='';hand.forEach(function(p,i){var im=new Image();im.className='card'+(i===sel?' sel':'');im.alt='current tile '+(i+1);im.src=TWKit.cardURL(p,{rot:i===sel?rot:0,selected:i===sel,uid:'h'+i});im.onclick=function(){if(sel===i)rot=(rot+1)%4;else{sel=i;rot=0}drawDock();hover(lastHover)};dock.appendChild(im)});
+ var b=document.createElement('button');b.className='btn';b.textContent='Turn';b.onclick=function(){rot=(rot+1)%4;drawDock();hover(lastHover)};dock.appendChild(b);}
+drawDock();
+// ---- starting ships on edge marks ----
+var starts=[{e:'top',i:2,s:0},{e:'right',i:3,s:1},{e:'bottom',i:5,s:0},{e:'left',i:4,s:1},{e:'top',i:5,s:1},{e:'right',i:1,s:0},{e:'bottom',i:2,s:1},{e:'left',i:2,s:0}];
+var names=['Vermilion','Saffron','Jade','Cobalt','Violet','Tangerine','Rose','Ivory'];
+function startOf(k){var s=starts[k],e=TWKit.edgeSquare(s.e,s.i);return {c:e.c,r:e.r,port:e.ports[s.s]}}
+function tileMap(extra){var m={};Object.keys(tiles).forEach(function(k){m[k]=tiles[k]});if(extra)m[extra.c+','+extra.r]=extra.paths;return m}
+function hover(p){
+  lastHover=p;
+  if(p&&p.kind==='square'&&!tiles[p.c+','+p.r]&&!p.leviathan){
+    var paths=TWKit.rotate(hand[sel],rot),st=startOf(0),tr=TWKit.trace(tileMap({c:p.c,r:p.r,paths:paths}),st.c,st.r,st.port);
+    var hit=tr.some(function(s){return s.c===p.c&&s.r===p.r});
+    TWKit.ghost(p.c,p.r,hand[sel],{rot:rot,valid:true,trace:hit?tr:[],enter:hit?undefined:undefined});
+  } else TWKit.ghost(null);
+}
+function click(p){ if(!p)return; window.LASTPICK=p; log('pick '+JSON.stringify(p));
+  if(p.kind==='square'&&!tiles[p.c+','+p.r]&&!p.leviathan){var paths=TWKit.rotate(hand[sel],rot);tiles[p.c+','+p.r]=paths;TWKit.ghost(null);TWKit.placeTile(p.c,p.r,{paths:paths});}
+}
+// ---- static composed scene ----
+var seed=11;function rnd(){seed=(seed*16807)%2147483647;return (seed-1)/2147483646}
+function layout(i,rot){return TWKit.rotate(L[i%35],rot)}
+var placed=[[1,1,5,0],[2,1,9,1],[3,1,14,2],[1,2,21,3],[2,2,2,0],[1,3,30,1],[2,3,7,2],[4,2,12,3],[4,3,25,0],[3,3,18,1],[0,2,33,2],[4,4,4,1],[2,0,16,3],[3,0,22,0]];
+function composeStatic(){
+  placed.forEach(function(t){var p=layout(t[2],t[3]);tiles[t[0]+','+t[1]]=p;TWKit.placeTile(t[0],t[1],{paths:p,animate:false})});
+  TWKit.placeLeviathan(3,2,{kind:'serpent',arrows:[{dir:0,n:2},{dir:2,n:5},{dir:4,n:1},{dir:6,n:4},{dir:1,n:6},{dir:5,n:3}],animate:false});
+  TWKit.placeLeviathan(0,4,{kind:'dragon',arrows:[{dir:1,n:3},{dir:3,n:1},{dir:5,n:6},{dir:7,n:2},{dir:0,n:5},{dir:4,n:4}],animate:false});
+  TWKit.riftGate(5,0,true,{color:'violet'});TWKit.riftGate(0,5,true,{color:'violet'});
+  TWKit.maelstrom(4,1,true);TWKit.rogueMarker('left',4,true);TWKit.highlightLine({row:3});
+  TWKit.rogueWaveTile(5,5,true);
+  for(var k=0;k<8;k++){var s=startOf(k);TWKit.addShip('p'+k,{color:k,c:s.c,r:s.r,port:s.port,splash:false,cannons:k===1?3:0})}
+  TWKit.setLegal([{c:0,r:0},{c:5,r:2},{c:4,r:5}]);
+}
+// ---- scripted beats ----
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms/TWKit._K.speed)})}
+var D=window.DEMO={tiles:tiles,
+ place:function(c,r,i,rot){var p=layout(i,rot);tiles[c+','+r]=p;return TWKit.placeTile(c,r,{paths:p})},
+ sail:function(k){var st=startOf(k),tr=TWKit.trace(tileMap(),st.c,st.r,st.port);return tr.length?TWKit.moveShip('p'+k,tr):Promise.resolve()},
+ crash:function(){var A=TWKit.getState().ships;return TWKit.collide('p0','p2').then(function(){TWKit.sinkShip('p0',{how:'crash'});return TWKit.sinkShip('p2',{how:'crash'})})},
+ dice:function(){return TWKit.rollDice([{kind:'gold',value:1+Math.floor(rnd()*6)},{kind:'blue',value:1+Math.floor(rnd()*6)}])},
+ cannon:function(){return TWKit.cannonShot({from:'p1',to:'p3'}).then(function(){return TWKit.sinkShip('p3',{how:'cannon'})})},
+ wave:function(){return TWKit.rogueWaveSweep({edge:'left',index:4})},
+ destroy:function(){return TWKit.destroyTile(2,2)},
+ warp:function(){TWKit.setShipAt('p4',{c:5,r:0,port:3});return TWKit.riftWarp('p4',{c:5,r:0},{c:0,r:5})},
+ whirl:function(){TWKit.setShipAt('p5',{c:4,r:1,port:0});return TWKit.sinkShip('p5',{how:'maelstrom',at:{c:4,r:1}})},
+ roar:function(){return TWKit.leviathanRoar(3,2)},
+ spawn:function(){var s=startOf(6);return TWKit.addShip('p6',{color:6,c:s.c,r:s.r,port:s.port})},
+ hoverAt:function(c,r){hover({kind:'square',c:c,r:r})},
+ compose:composeStatic
+};
+function run(){
+  var order=['sail0','dice','roar','crash','dice','cannon','wave','whirl','warp','destroy','spawn'];var i=0;
+  (function next(){var b=order[i++%order.length];log(b);var f=b.indexOf('sail')===0?D.sail(+b.slice(4)||0):D[b]();Promise.resolve(f).then(function(){setTimeout(next,900)})})();
+}
+// initial board: a few tiles, ships on starts
+function init(){
+  composeStatic();
+  if(!STATIC) setTimeout(run,1500);
+}
+var qb=document.getElementById('qbar');function mark(){var a=TWKit.getQuality();[].forEach.call(qb.querySelectorAll('button'),function(b){var v=b.getAttribute('data-q');b.className='btn'+((v==='auto'?a.pref==='auto':a.pref===v)?' on':'')})}
+qb.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;TWKit.setQuality(b.getAttribute('data-q'));mark()});mark();
+if(P.has('noqbar'))qb.style.display='none';
+if(P.has('nodock'))dock.style.display='none';
+TWKit.setHooks({onQuality:mark});
+window.DEMO_READY=false;TWKit.ready.then(function(){init();setTimeout(function(){window.DEMO_READY=true},400)});
+})();
+</script>
+</body>
+</html>

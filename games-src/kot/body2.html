@@ -1,0 +1,85 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Crown City Smash</h1>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn btn" data-gx="dr-market" title="Power cards for sale"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="9" height="13" rx="1.6" transform="rotate(-12 7.5 10.5)" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="currentColor" opacity=".25"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M12.5 6.5l-1.6 2.9h2.2l-1.3 2.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Cards</button>
+  <button class="gx-ibtn btn" data-gx="dr-mine" id="minebtn" title="Your cards, evolutions and tokens"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 17c.6-3 3-4.6 6-4.6s5.4 1.6 6 4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><circle cx="10" cy="7" r="3.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Yours</button>
+  <button class="gx-ibtn btn" data-gx="dr-mons" title="Every monster's cards and stats"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 16V9a6 6 0 0 1 12 0v7l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><circle cx="7.6" cy="9" r="1.3" fill="currentColor"/><circle cx="12.4" cy="9" r="1.3" fill="currentColor"/><path d="M5 4.5 3.5 2.5M15 4.5l1.5-2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Monsters</button>
+  <button class="gx-ibtn btn" data-gx="dr-log" title="The Crown City chronicle (what happened)"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3.5" width="12" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M15 7h2v8a1.5 1.5 0 0 1-3 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M6 7h6M6 10h6M6 13h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Log</button>
+  <button class="gx-ibtn btn pzb" data-a="pause" id="pausebtn" title="Pause the computer (P)"><svg class="pz" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg><span>Pause</span></button>
+  <button class="gx-ibtn btn" data-gx="dr-menu" title="Rules, tips, sound, speed, new game" aria-label="Menu"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" aria-label="The city arena">
+    <div id="stage" class="stage"><canvas id="c3"></canvas><div id="tags"></div><div id="hud"></div></div>
+    <svg id="map" viewBox="0 0 1000 640" role="img" aria-label="The city arena and the monsters"></svg>
+  </main>
+  <aside class="gx-dock" aria-label="Current step and actions">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Crown City Smash</span><button class="gx-ibtn advb" data-a="advise" id="advbtn" title="What should I do now, and why?">🧭 What now?</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-body" id="dockbody">
+      <div id="moment" class="hidden" aria-live="assertive"></div><div id="news" aria-live="polite"></div><div id="advice" class="box hidden"></div><div id="banner" aria-live="polite"></div>
+            <div id="choice" class="box hidden" role="group" aria-live="assertive"></div>
+      <div id="prompt" class="box"><div id="ptop"></div><div id="dicewrap"><div id="dice" class="dicebox"></div><div id="rolls" class="rolls"></div><div id="preview" class="preview"></div></div><div id="pacts" class="acts"></div><div id="buymini" class="hidden"></div><div id="pmsg" class="msg"></div></div>
+      <div id="coach" class="box hidden"></div>
+      <div id="youbox" class="box hidden"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn btn gx-reopen" data-gx="dock">☰ Panel</button>
+</div>
+</div>
+<div id="drawers" hidden>
+  <div id="marketwrap"><div id="market" class="market"></div></div>
+  <div id="minewrap"><div id="mine" class="mine"></div></div>
+  <div id="monswrap"><div id="score" class="score"></div></div>
+  <div id="logwrap"><ol id="log"></ol></div>
+  <div id="menuwrap"><div class="menu">
+    <button class="btn mrow" data-gx="dr-rules">❓ Rules<small>How to play and what each dice face does</small></button>
+    <button class="btn mrow" data-a="tour">🧭 Show the tips again<small>Four short tips, each at the moment it matters</small></button>
+    <button class="btn mrow" data-a="speed" id="speedbtn">⏩ Normal<small>How fast the computer plays</small></button>
+    <button class="btn mrow" data-a="hints" id="hintbtn">💡 On<small>Blue dashed outlines on the dice worth keeping</small></button>
+    <button class="btn mrow" data-a="snd" id="sndbtn">🔊</button>
+    <button class="btn mrow" data-a="mus" id="musbtn">🎵 On</button>
+    <button class="btn mrow" data-a="gfx" id="gfxbtn">Graphics<small>High: bloom and soft shadows. Low: fastest (tap to change)</small></button>
+    <button type="button" class="btn mrow" data-perfhud="show" aria-pressed="false">Show speed</button>
+    <button type="button" class="btn mrow" data-perfhud="test">Test speed</button>
+    <button class="btn mrow" data-a="new">🆕 New game<small>Back to the start screen</small></button>
+  </div></div>
+  <div id="ruleswrap"><div id="rulesbody" class="rules"></div><h3>Dice faces</h3><div id="legend" class="legend"></div></div>
+</div>
+<div id="modal" class="hidden"></div>
+<script>
+var ANIM=1, AIDELAY=650, DEFN=4, DEFX='base', DEFEVO=false, YA=3, YB=0, MBT=8, DEFLV='normal', LVMIX=null, DEFEX=null;
+const SAVE='ccs_save2', TOUR='ccs_tour2';
+const FACES=['1','2','3','E','C','H'];
+const MONS=[
+ {n:'Voltusk',c:'#ffd23f',d:'Thunder-tusked boar of the power grid'},
+ {n:'Squidrik',c:'#b57bff',d:'One-eyed terror of the storm drains'},
+ {n:'Magmaw',c:'#ff6b4a',d:'Lava crab with molten pincers'},
+ {n:'Shroomhulk',c:'#6ad16a',d:'Spore brute from the sewer farms'},
+ {n:'Boltbox',c:'#4fa3ff',d:'Runaway demolition robot'},
+ {n:'Glacyx',c:'#8fe9f2',d:'Walking glacier with a cold heart'},
+ {n:'Cortexa',c:'#ff8fc7',d:'Brain-jacking schemer from beyond the portal',x:1},
+ {n:'Clampede',c:'#3cc9b0',d:'Clam-headed centipede that crawled out of a portal',x:1},
+ {n:'Bramblebat',c:'#9ad35a',d:'Thorny bat-bush hybrid with a taste for neon',x:1}];
+</script>
+<script src="shell.js"></script>
+<script src="perfhud.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="three.min.js"></script>
+<script src="art.js"></script>
+<script src="exp.js"></script>
+<script src="three3d.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="sound.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="net.js"></script>
+<script src="story.js"></script>
+<script src="ui.js"></script>
+<script src="ui-ph.js"></script>
+</body>
+</html>

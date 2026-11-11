@@ -1,0 +1,5 @@
+  {id:'overdrive',cover:'covers/overdrive.jpg',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
+   blurb:'Anti-gravity racing across four Frankfurt circuits, from the Bankenviertel canyon to the Fraport runway where jets land over your head. Race in neon night, dawn, storm or fog, and play a career, Zone survival, three-lives Arena, ghost duels and a new daily challenge.',
+   stats:[['1','player'],['2–4','minutes'],['10+','ages'],['4','circuits']],
+   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],
+   paint:paintOverdrive}

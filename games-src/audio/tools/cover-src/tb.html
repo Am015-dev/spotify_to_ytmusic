@@ -1,0 +1,26 @@
+<!doctype html><meta charset=utf-8><style>html,body{margin:0;width:960px;height:540px;overflow:hidden;background:radial-gradient(ellipse at 50% 0,#2a1b12,#0e0907 70%)}
+#s{position:absolute;inset:0;overflow:hidden}.a{position:absolute}</style><body><div id=s></div>
+<script src="file:///home/user/spotify_to_ytmusic/games-src/thornbound/kit/kit.js"></script>
+<script>
+TBKit.ready.then(async()=>{
+const s=document.getElementById('s');
+const mb=document.createElement('div');mb.className='a';mb.style.cssText='left:-95px;top:-345px;width:1150px;height:1150px;filter:brightness(.62) saturate(.9)';s.appendChild(mb);
+const map=TBKit.map({container:mb,players:['gilded','heath','lantern','choir'],locations:TBKit.defaultLocations(10)});
+const F=['gilded','heath','lantern','choir'];
+F.forEach((f,i)=>{map.setHerald(i,map.locations()[i+2].id)});
+// dark vignette + glow behind cards
+const v=document.createElement('div');v.className='a';v.style.cssText='inset:0;z-index:5;background:radial-gradient(circle at 50% 42%,rgba(255,200,100,.22) 0,rgba(255,200,100,0) 22%),radial-gradient(ellipse at 50% 38%,rgba(0,0,0,0) 0,rgba(8,5,3,.4) 55%,rgba(5,3,2,.85) 100%),linear-gradient(to top,rgba(5,3,2,.85) 0,rgba(5,3,2,0) 36%)';s.appendChild(v);
+const put=(n,css)=>{const d=document.createElement('div');d.className='a';Object.assign(d.style,css);d.appendChild(n);s.appendChild(d);return d};
+// clash row of cards at the bottom: three face-down backs and one revealed winner
+const W=128;
+const spec={faction:'gilded',title:'Ashen Knight',value:5,cost:2,type:'unit',typeLabel:'Knight',art:'knight',text:'When revealed: if you hold the most influence, gain 1 influence.'};
+const spec2={faction:'heath',title:'Elder Stag',value:4,cost:2,type:'unit',art:'stag',text:'Wins ties.'};
+const spec3={faction:'choir',title:'Moon Priest',value:4,cost:3,type:'rite',art:'moon_priest',text:'Look at one card.'};
+const items=[[TBKit.cardBack('lantern',W),-215,36,-13],[TBKit.card(spec2,W),-100,14,-5],[TBKit.card(spec,W),24,4,5],[TBKit.cardBack('choir',W),145,26,13]];
+items.forEach(([n,x,y,r],i)=>put(n,{left:(480-W/2+x+ (i==2?0:0))+'px',top:(372+y)+'px',width:W+'px',transform:`rotate(${r}deg)`,zIndex:8+i,filter:'drop-shadow(0 10px 12px rgba(0,0,0,.7))'}));
+// clash seal and influence tokens
+put(TBKit.token('clash',{},56),{left:'538px',top:'352px',zIndex:20,filter:'drop-shadow(0 0 14px rgba(255,190,80,.7))'});
+put(TBKit.token('winner',{},70),{left:'424px',top:'282px',zIndex:19,opacity:0});
+window.READY=1;
+});
+</script>
