@@ -77,12 +77,13 @@ function setSlot(h, c, st) {   // redraw one bird on the shown board (used to re
   return $('.bc[data-a="bird"][data-h="' + h + '"][data-c="' + c + '"]');
 }
 function apply(m, s) {
-  var pre = PP.clone(G.pl[UI.view].board);
+  var pre = PP.clone(G.pl[UI.view].board), fxAt = window.PPF ? PPF.moveFrom() : null;   // feel: measure before the move
   var r = PP.performMove(G, m, s);
   if (!r.ok) { toast('Not allowed: ' + r.err, 0, 1); render(); return false; }
   var fx = G.fx.slice(); G.fx = [];
   if (isHuman(s)) UI.lastHuman = s;
   save(); render();
+  if (window.PPF) PPF.moved(m, s, fxAt);   // feel: dice, cards and eggs fly
   if (!UI.fast) fx.forEach(function (e) { if (e.k === 'pw' && e.seat === UI.view && pre[e.h] && pre[e.h][e.c] && pre[e.h][e.c].id === e.id) setSlot(e.h, e.c, pre[e.h][e.c]); });
   UI.busy = true; UI.animSeat = s; $('#prompt').textContent = promptText(false);
   playFx(fx, s).then(function () { UI.busy = false; UI.animSeat = null; try { rateEnd(); } catch (e) { } render(); pump(); });
@@ -99,7 +100,7 @@ function popAt(el, txt) {
 function playFx(list, actor) {
   var chain = Promise.resolve(), view = UI.view;
   list.forEach(function (e) {
-    chain = chain.then(function () {
+    chain = chain.then(function () { return window.PPF && !UI.fast ? PPF.fx(e, e.seat === view) : 0; }).then(function () {   // feel.js: camera, points, beats
       var mine = e.seat === view;
       try { coachFx(e, mine); } catch (er) { }
       switch (e.k) {
@@ -156,6 +157,8 @@ function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
 // "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it
 function turnBanner(s) {
   if (UI.fast) { pump(); return; }
+  // no centre banner over the board: the round tracker already says whose turn it is (one message at a time, nothing flashes)
+  UI.cap = isHuman(s) ? null : G.pl[s].name + ' is choosing an action.'; render(); pump(); return;
   var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
   $$('.turnban').forEach(dropEl);
   var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
@@ -210,7 +213,7 @@ function stopTimers() { try { coachHide(); COACH.on = false; } catch (e) { } $$(
 // ---------------- start a game
 // o: {seats:[{name,kind,lvl}], mode, seed, twist, camp, hands, cubes, rounds, tutorial}
 function startGame(o) {
-  stopTimers();
+  stopTimers(); if (window.PPF) PPF.reset();   // feel: counters, camera
   G = PP.newGame({ seats: o.seats, seed: o.seed, twist: o.twist, hands: o.hands, cubes: o.cubes, rounds: o.rounds, tutorial: o.tutorial, goals: o.goals, first: o.first });
   if (o.prep) o.prep(G);
   G.pl.forEach(function (p, i) { p.face = o.seats[i].face || (p.kind === 'human' ? 'you' : null); });

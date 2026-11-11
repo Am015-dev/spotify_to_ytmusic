@@ -9,7 +9,7 @@ function isHuman(s) { return G && G.pl[s] && G.pl[s].kind === 'human'; }
 function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'human' ? i : -1; }).filter(function (i) { return i >= 0; }) : []; }
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
 function q() { return G && G.q; }
-function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
+function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; while (w.firstChild) w.firstChild.remove(); w.appendChild(d); setTimeout(function () { d.remove(); }, Math.max(ms || 0, 4000 + 1000 * Math.ceil(String(t).split(/\s+/).length / 10))); d.addEventListener('click', function () { d.remove(); }); }   // one at a time; stays 4 s + 1 s per 10 words, or until tapped
 function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
@@ -54,6 +54,7 @@ function render() {
   glow();
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
+  if (window.PPF) PPF.rendered();   // feel: drag marks, counters roll
   try { coachState(); } catch (e) { }
 }
 // live chapter goal: always visible during a story chapter, with the count and a tick once met
@@ -127,7 +128,7 @@ function renderDock(p, vs, cur) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Drag to a row or tap: +' + b.p : 'Drag to your board or tap') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
@@ -149,9 +150,9 @@ function promptText(mine) {
   if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
   switch (Q.h) {
-    case 'die': return 'Tap a glowing food die in the feeder to take it (' + n + ' left).';
-    case 'egg': return 'Tap a glowing bird on your board to lay an egg on it (' + n + ' left).';
-    case 'draw': return 'Tap a glowing bird in the tray, or the deck, to take a card (' + n + ' left).';
+    case 'die': return 'Take a glowing food die (' + n + ' left).';
+    case 'egg': return 'Lay an egg on a glowing bird (' + n + ' left).';
+    case 'draw': return 'Take a bird from the tray or the deck (' + n + ' left).';
     case 'bonus': return Q.d.kind === 'card' ? 'Discard a card for 1 more food?' : Q.d.kind === 'food' ? 'Pay 1 food for 1 more egg?' : 'Pay 1 egg for 1 more card?';
     case 'pwTuck': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': tuck a card?';
     case 'pwTrade': return B[G.pl[UI.view].board[Q.d.h][Q.d.c].id].n + ': spend an egg?';

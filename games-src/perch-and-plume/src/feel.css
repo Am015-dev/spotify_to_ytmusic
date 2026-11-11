@@ -1,0 +1,24 @@
+/* feel layer (shell/gx-feel.css + src/feel.js): drag affordances, flights, one compact score line */
+.ppf-n{display:flex;align-items:center;justify-content:center}
+.ppf-n svg{width:80%;height:80%}
+.ppf-die{border-radius:10px;background:#fff8e6;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.ppf-egg{width:30px;height:30px}
+.ppf-back{border-radius:8px;border:2px solid #fff8e6;background:repeating-linear-gradient(45deg,#2f5b3c 0 6px,#36684a 6px 12px);color:#f3d27a;font-size:22px}
+#hand .bc[data-gxf-drag]{cursor:grab}
+.row.gxf-ok,.slot.gxf-ok{outline-color:rgba(255,214,110,.85)}
+#foodrow.gxf-ok,#dockbody.gxf-ok,#hand.gxf-ok{border-radius:12px}
+html.gxf-dragging #dockbody{overflow:hidden}
+/* Play mode: one compact score line (the breakdown opens on tap) */
+.sr .sp{display:none}
+.trk .tr-why{display:none}
+@media (hover:hover){.die[data-gxf-drag]:hover,.bc[data-a="tray"][data-gxf-drag]:hover,#deckb[data-gxf-drag]:hover{box-shadow:0 0 0 3px #ffe28a,0 8px 14px rgba(0,0,0,.4)}
+  .ract:hover,.a4:hover{filter:brightness(1.08)}}
+.sr::after{display:none!important}
+
+/* one voice at a time: the turn rating waits while a coach speaks */
+body:has(.coachb) #rate,body:has(.saycard) #rate{display:none!important}
+/* no label under 14 px anywhere in play */
+#bd small,#dock small,#pop small,.reveal small,#setup small{font-size:max(14px,.85em)}
+/* starting hand: a card's power text stays inside its card */
+#setup .bc{overflow:hidden}
+#setup .bc .bk-pw,#setup .bc .pwt{overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical}
