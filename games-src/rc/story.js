@@ -20,6 +20,13 @@ function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[sto
 function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
 // skip ahead, but stop at the next scene that costs you something (a wound, lost food...) or the day's summary, so nothing hurts you unseen
 function skipStop(i){for(let k=i+1;k<UI.beats.length;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
+// R3 review (5-17 Continue taps a day): Continue jumps over the scenes that need nothing from you, to the next stop:
+// your next choice, the day's summary (one tap, it also shows tomorrow's card) or the end. The scenes still play by themselves if you wait.
+// The guided first game and the coached game keep one scene per tap (their steps explain single scenes).
+function stepMode(){return (typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done)||!!(G&&G.coach)||(typeof netOn==='function'&&netOn())}
+function jumpStop(i){const L=UI.beats.length-1;for(let k=i+1;k<=L;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||b.kind==='intro'&&b.data.page===b.data.of-1||(k===L&&humanQ()))return k}return -1}
+function storyJump(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;if(stepMode()){storyNext();return}
+  const k=jumpStop(i);UI.shown=k>=0?k-1:UI.beats.length-1;UI.seenBeat=null;sfx('click');refresh()}
 function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
 const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
