@@ -1,77 +1,41 @@
-// Coached-game driver: node tutorial-e2e.js p|d  (p = 390x763 touch, d = 1440x860 mouse).
-// Starts the tutorial from the title, takes the one forced step by tapping the spotlit element, then plays the coached game with ANY legal moves through the UI
-// (random choice among glowing cards, build when possible else sell) to the result screen, clicks through the scoring walk and the "later" card,
-// and asserts: every coverage rule was explained during play or listed on the later card, never more than one coach bubble, 0 console errors. Prints one PASS/FAIL line.
-const path = require('path'); const PW = path.resolve(__dirname, '..', 'node_modules', 'playwright'); const HTML = 'file://' + path.resolve(__dirname, 'twin-thrones.html');
-const fs=require('fs');
-const LIB=(function(){// shared driver: taps only visible UI. exports play(pg, touch, opts)
-const T = async (pg, touch, loc) => { await loc.scrollIntoViewIfNeeded().catch(()=>{}); return touch ? loc.tap({timeout:4000}) : loc.click({timeout:4000}); };
-async function dt(pg){ return (await pg.locator('#dt').textContent().catch(()=>'')||'').trim(); }
-async function playToResult(pg, touch, o={}) {
-  const t0 = Date.now(); let turns = 0, shots = o.shots||{};
-  while (Date.now()-t0 < (o.max||240000)) {
-    if (o.stopAt && await o.stopAt(pg)) return {turns, ok:true};
-    if (await pg.locator('#res:not([hidden])').count()) return {turns, ok:true, result:true};
-    if (o.story && await pg.locator('.gxc-result, .gxc-res, [data-gxc-result]').count()) return {turns, ok:true, result:true};
-    if ((await dt(pg)) !== 'Your move') { await pg.waitForTimeout(120); continue; }
-    if (await pg.locator('.wcard.go').count()) { await T(pg,touch,pg.locator('.wcard.go').first()); continue; }
-    if (await pg.locator('[data-first]').count()) { await T(pg,touch,pg.locator('[data-first]').first()); continue; }
-    if (await pg.locator('.picker .tk').count()) { await T(pg,touch,pg.locator('.picker .tk').first()); continue; }
-    const av = pg.locator('#pyr .card.av:not(.dim)');
-    if (await av.count()) {
-      if (!(await pg.locator('#zoom:not([hidden])').count())) { await T(pg,touch,av.nth(Math.floor(Math.random()*Math.min(3,await av.count())))); await pg.waitForTimeout(150); }
-      const b = pg.locator('#zoom [data-a="build"]:not([disabled])');
-      if (await b.count()) await T(pg,touch,b.first()); else await T(pg,touch,pg.locator('#zoom [data-a="discard"]').first());
-      turns++; continue;
-    }
-    await pg.waitForTimeout(120);
+// Guided first game by touch (W492): node tutorial-e2e.js [W H] [shotdir]
+// Opens the tutorial from the title, then for every step taps ONLY the spotlit element (or Next on a rule step) with a real touch,
+// checks one sentence of 12 words or fewer per step, every core rule step appears in order, the result + score steps show, the end card starts
+// a real game, and 0 console errors. Shots: tut-1..tut-N.png when shotdir is given. Prints one PASS/FAIL line.
+const path = require('path'); const { chromium } = require('playwright');
+const W = +(process.argv[2] || 390), H = +(process.argv[3] || 844), OUT = process.argv[4] || '';
+const HTML = 'file://' + path.resolve(__dirname, 'twin-thrones.html');
+(async () => {
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true, deviceScaleFactor: OUT ? 2 : 1 });
+  await ctx.addInitScript(() => { try { localStorage.clear(); } catch (e) { } });
+  const pg = await ctx.newPage(); const errs = []; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+  await pg.goto(HTML, { waitUntil: 'domcontentloaded' }); await pg.waitForTimeout(700);
+  const box = async s => { const l = pg.locator(s); if (!(await l.count())) return null; return l.first().boundingBox({ timeout: 500 }).catch(() => null); };
+  const tapAt = async (x, y) => pg.touchscreen.tap(x, y);
+  const tapSel = async s => { const r = await box(s); if (!r || r.width < 2) return false; await tapAt(r.x + r.width / 2, r.y + r.height / 2); return true; };
+  if (!(await tapSel('#start [data-gxt-open]'))) { console.log('FAIL tutorial: no tutorial button on the title'); process.exit(1); }
+  const seen = [], bad = []; let shot = 0, last = '', t0 = Date.now();
+  while (Date.now() - t0 < 240000) {
+    await pg.waitForTimeout(150);
+    const st = await pg.evaluate(() => window.GXT && GXT.state ? GXT.state() : null);
+    if (!st || !st.active) { if (await box('.gxt-end [data-gxt-end]')) break; continue; }
+    if (st.phase === 'end') break;
+    if (!st.shown || !st.hole) continue;
+    const key = st.id + ':' + st.count; if (key === last) continue;
+    await pg.waitForTimeout(700); // the 600 ms guard after a new bubble
+    const words = st.say.trim().split(/\s+/).length; if (words > 12) bad.push(st.id + ' has ' + words + ' words');
+    const holes = await pg.locator('.gxt-hole, .gxh-ring').count();
+    seen.push(st.id); last = key;
+    if (OUT) await pg.screenshot({ path: path.join(OUT, 'tut-' + (++shot) + '.png') });
+    if (st.wait) await tapAt(st.hole.cx, st.hole.cy); else if (!(await tapSel('.gxt-next'))) bad.push(st.id + ': no Next button');
   }
-  return {turns, ok:false};
-}
-
-
-return { T, dt, playToResult };})();
-
-const sizes = { p:[{width:390,height:763},true], d:[{width:1440,height:860},false] };
-const which = process.argv[2]||'p';
-(async()=>{
-  const { chromium } = require(PW); const [vp,touch]=sizes[which];
-  const b = await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--no-sandbox']});
-  const c = await b.newContext({viewport:vp,hasTouch:touch,isMobile:touch}); const pg = await c.newPage();
-  const errs=[]; pg.on('pageerror',e=>errs.push(e.message)); pg.on('console',m=>m.type()==='error'&&errs.push(m.text()));
-  await pg.goto(HTML); await pg.evaluate(()=>{window.AIDELAY=90}); await pg.waitForTimeout(500);
-  const log=[]; let forced=0, maxBubbles=0;
-  await LIB.T(pg,touch,pg.locator('[data-gxt-open]').first());
-  const t0=Date.now(); let phase='scene', turns=0, over=false;
-  while(Date.now()-t0<420000){
-    maxBubbles=Math.max(maxBubbles, await pg.locator('#coach:not([hidden])').count());
-    const sc=pg.locator('.gxc-scene .gxc-btn.go:visible');
-    if (await sc.count() && !(await pg.evaluate(()=>GXT.state().shown))) { await LIB.T(pg,touch,sc.first()); continue; }
-    const st = await pg.evaluate(()=>{const s=GXT.state(); return {a:s.active,shown:s.shown,hole:s.hole,wait:s.wait,id:s.id};});
-    const endBtn = pg.locator('.gxt-end [data-gxt-end]');
-    if (await endBtn.count()) { log.push('endcard'); await LIB.T(pg,touch,endBtn.first()); await pg.waitForTimeout(300); continue; }
-    if (st.a && st.shown) { if (st.wait) { forced++; if(touch) await pg.touchscreen.tap(st.hole.cx,st.hole.cy); else await pg.mouse.click(st.hole.cx,st.hole.cy); } else { const nb=pg.locator('.gxt-next:visible'); if (await nb.count()) await LIB.T(pg,touch,nb.first()); } await pg.waitForTimeout(250); continue; }
-    if (st.a) { await pg.waitForTimeout(150); continue; }
-    if (await pg.locator('#laterCard').count()) { log.push('later'); over=true; break; }
-    if (await pg.locator('#coach [data-cn]').count()) { log.push('walk'); await LIB.T(pg,touch,pg.locator('#coach [data-cn]').first()); await pg.waitForTimeout(200); continue; }
-    if (await pg.locator('#res:not([hidden])').count()) { await pg.waitForTimeout(300); continue; }
-    if ((await LIB.dt(pg)) !== 'Your move') { await pg.waitForTimeout(120); continue; }
-    if (await pg.locator('.wcard.go').count()) { await LIB.T(pg,touch,pg.locator('.wcard.go').nth(Math.floor(Math.random()*await pg.locator('.wcard.go').count()))).catch(()=>{}); continue; }
-    if (await pg.locator('[data-first]').count()) { await LIB.T(pg,touch,pg.locator('[data-first]').first()); continue; }
-    if (await pg.locator('.picker .tk').count()) { await LIB.T(pg,touch,pg.locator('.picker .tk').first()); continue; }
-    const av = pg.locator('#pyr .card.av:not(.dim)');
-    if (await av.count()) {
-      if (!(await pg.locator('#zoom:not([hidden])').count())) { await LIB.T(pg,touch,av.nth(Math.floor(Math.random()*await av.count()))); await pg.waitForTimeout(150); }
-      const bb = pg.locator('#zoom [data-a="build"]:not([disabled])');
-      const r = Math.random();
-      if (await bb.count() && r < 0.8) await LIB.T(pg,touch,bb.first()); else await LIB.T(pg,touch,pg.locator('#zoom [data-a="discard"]').first());
-      turns++; continue;
-    }
-    await pg.waitForTimeout(120);
-  }
-  const cov = await pg.evaluate(()=>TT_TUTOR.coverage());
-  const missing = cov.all.filter(x=>!cov.seen.includes(x) && !cov.later.includes(x));
-  const okAll = over && !missing.length && !errs.length && forced<=2 && maxBubbles<=1 && turns>10;
-  console.log((okAll?'PASS ':'FAIL ')+'tutorial-to-end', which, 'forced', forced, 'turns', turns, 'seen', cov.seen.length, 'later', cov.later.length, 'missing', JSON.stringify(missing), 'maxBubbles', maxBubbles, 'errors', JSON.stringify(errs.slice(0,3)), log.join('>'));
-  await b.close();
+  await pg.waitForTimeout(500);
+  const endOk = await tapSel('.gxt-end [data-gxt-end="go"]'); await pg.waitForTimeout(900);
+  if (await box('#peek:not([hidden]) [data-goalgo]')) { await tapSel('#peek:not([hidden]) [data-goalgo]'); await pg.waitForTimeout(400); }
+  const after = await pg.evaluate(() => ({ tut: !!TT_TEST.U.tut, phase: TT_TEST.U.G && TT_TEST.U.G.phase, over: TT_TEST.U.G && TT_TEST.U.G.over, rules: TT_TUTOR.rules, layout1: TT.LAYOUT[1].length }));
+  const missing = after.rules.filter(r => seen.indexOf(r) < 0);
+  let order = true; for (let i = 1; i < after.rules.length; i++) if (seen.indexOf(after.rules[i]) >= 0 && seen.indexOf(after.rules[i]) < seen.indexOf(after.rules[i - 1])) order = false;
+  const ok = !missing.length && order && !bad.length && endOk && !after.tut && after.phase === 'draft' && !after.over && after.layout1 === 5 && !errs.length;
+  console.log((ok ? 'PASS' : 'FAIL') + ' tutorial ' + W + 'x' + H + ': ' + seen.length + ' steps, rules ' + (after.rules.length - missing.length) + '/' + after.rules.length + (missing.length ? ' missing ' + missing.join(',') : '') + (order ? '' : ' OUT OF ORDER') + (bad.length ? ' bad: ' + bad.join('; ') : '') + ', real game after: ' + (!after.tut && after.phase === 'draft') + ', errors ' + errs.length + (errs.length ? ' ' + errs.slice(0, 3).join(' | ') : ''));
+  await b.close(); process.exit(ok ? 0 : 1);
 })();
