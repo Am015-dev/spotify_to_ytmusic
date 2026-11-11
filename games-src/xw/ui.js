@@ -1,8 +1,8 @@
 // ---------- interface ----------
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'normal',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
-try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'normal',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
+Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'easy',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
+try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'easy',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
 function saveSetup(){try{localStorage.setItem('na_setup',JSON.stringify({lvl:UI.lvl,size:UI.size,fac:UI.fac,ex:UI.ex}))}catch(e){}}
 function announce(t){const el=$('live');if(el)el.textContent=t}
 // which human side is planning right now (hot-seat hides the other side's dials behind a pass screen)
@@ -15,7 +15,9 @@ function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e)
 // ---- step bar ----
 function renderSteps(){renderRoad()}
 // ---- dial picker ----
-const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+// K-turn icon: up the left leg, over the top, DOWN the right leg; the head points backwards (the ship ends facing the way it came)
+var KICO='<svg class="kico" viewBox="0 0 16 16" width="1em" height="1em" aria-hidden="true"><path d="M4 15V6.5a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M8.6 9.4h6.8L12 14.6z" fill="currentColor"/></svg>';
+const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
 const COLW=['Turn left','Bank left','Straight','Bank right','Turn right','K-turn'];
 function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=COLS.map(([t,dd])=>d.some(m=>m.t===t&&(m.d||0)===dd&&m.s>0));
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
@@ -32,10 +34,11 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
   if(UI.sugCache&&UI.sugCache.k===G.round+'|'+s.id+'|'+dk)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
   // wingmen whose dials are already set: don't suggest ending on top of them
   const friends=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>({s:x,p:finalPose(x,B(x),dialOf(x)[UI.draft[x.id]])}));
-  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
+  const save=G.rng;G.rng=((G.round|0)*2654435761+[...String(s.id)].reduce((h,ch)=>(h*31+ch.charCodeAt(0))>>>0,7))>>>0;/* same position, same suggestion */const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
     if(c.c==='r'&&s.stress)v-=1e6;
+    if(offBoard(p,B(s)))v-=1e6;/* never suggest leaving the mat */ if(m.t==='S'&&c.c!=='r')v+=1.5;/* tie-break: a plain straight that stays on the mat */
     // a suggestion for a new player should look for a fight: reward ending with an enemy (where it is now) inside the arc, closer is better; a red move costs next round's action
     {let best=0;for(const e of enemiesOf(s)){const r=arcReach(p,B(s),e,B(e),s.arc);if(r){const rg=rangeOf(r.d);if(rg<=3)best=Math.max(best,rg===1?3:rg===2?2.5:1.5)}}v+=best;if(c.c==='r')v-=1.5}
 
@@ -162,7 +165,7 @@ ${UI.optsOpen?`  <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['ho
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
 `:''}  </details>
-  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':`<button class="btn primary" data-start="${UI.mode}">Launch</button>`}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
+  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':''}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><ul><li>Art and music by Am015-dev</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2><div class="turn5"><h3>How a turn works</h3><ol><li><b>Plan:</b> tap your ship, then tap where it flies.</li><li><b>Fly:</b> tap Fly. Every ship moves, lowest pilot skill first.</li><li><b>Act:</b> pick one action, like Focus, after you move.</li><li><b>Shoot:</b> tap a glowing enemy. Highest skill fires first.</li><li><b>Dice:</b> hits minus evades is damage; shields go first.</li></ol></div>${RULES_HTML}<h3>Simplified on purpose</h3><p>Asteroids are placed for you (6 of them, spaced apart). Ships start facing the enemy from set spots. The barrel-roll slide is offered in 5 steps. A battle with no winner after 100 rounds goes to the side that destroyed more points.</p>${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
@@ -264,7 +267,7 @@ function startGame(mode,sortie){try{boot3D()}catch(e){}if(typeof NET!=='undefine
   const squads=customSquads();
   if(sortie!=null&&SORTIES[sortie]){const so=SORTIES[sortie];UI.mode='solo';
     newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{})});G.sortie=sortie}
-  else{newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});if(mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads)G.sortie=0}
+  else{const first=mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads;newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads:first?FIRST_GAME.sq.map(q=>q.map(e=>({p:e.p,u:e.u.slice()}))):squads,ex:Object.assign({},UI.ex,first?FIRST_GAME.ex:{}),close:first});if(first){G.sortie=0;lg(-1,'Time limit: 8 rounds. Then more points destroyed wins, or more health left.')}}
   resetGuide();if(bothHuman())UI.pass=0;camView('tilt');render()}
 // the squads built in the squad builder (battle size "custom"), checked; null = use the battle size's squads
 function customSquads(){const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;

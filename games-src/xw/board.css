@@ -20,6 +20,8 @@ html.bf #tags .tag .tgl{display:none}
 .bfp.on{stroke-width:6;opacity:1;filter:drop-shadow(0 0 6px currentColor)}
 .bfp.set{stroke-width:4;opacity:.8}
 .bfp.ghost{stroke:#66ddff;stroke-width:2.5;opacity:.9;stroke-dasharray:5 4}
+.bfp.ghost.g{stroke:#46f08a}.bfp.ghost.w{stroke:#e8eeff}.bfp.ghost.r{stroke:#ff6b6b}.bfp.ghost.on{stroke-dasharray:none;fill:rgba(255,255,255,.12)}
+.bfnose{fill:#e8eeff;stroke:#0a1020;stroke-width:1.5;opacity:.95}.bfnose.g{fill:#46f08a}.bfnose.r{fill:#ff6b6b}
 .bfshot{fill:none;stroke-linecap:round}
 .bfshot.aim{stroke:#ff6070;stroke-width:2.5;stroke-dasharray:8 7;opacity:.85;animation:bfdash 1s linear infinite}
 .bfshot.fire{stroke:#ffd27a;stroke-width:5;filter:drop-shadow(0 0 6px #ff7040) drop-shadow(0 0 2px #fff);animation:bfzap .5s ease-out}
@@ -80,18 +82,18 @@ html.bf #tags .tag .tgl{display:none}
 .bfd-r{display:flex;align-items:center;gap:6px;justify-content:center}
 .bfd-r .who{font:700 12px/1 "Exo 2",sans-serif;color:#cfd3ff;width:62px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bfd-r .dice{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-start;min-height:52px;align-items:center;flex:1}
-#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .5s ease-out}
+#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .7s cubic-bezier(.2,.7,.3,1) backwards}
 #bfdice .die svg{width:48px;height:52px}#bfdice .die i{display:none}
 #bfdice .die.pick{cursor:pointer;border-radius:10px;outline:2px dashed rgba(127,212,255,.7)}
 #bfdice .die.pick.on{outline:3px solid #ffc86b;transform:translateY(-4px)}
-@keyframes bfroll{from{transform:rotate(-200deg) scale(.3);opacity:0}}
+@keyframes bfroll{0%{transform:translate(-140px,-60px) rotate(-560deg) scale(.6);opacity:0}55%{transform:translate(8px,6px) rotate(20deg) scale(1.08);opacity:1}75%{transform:translate(-3px,-5px) rotate(-8deg)}100%{transform:none}}
 .bfd-out{margin:4px 0;font:800 22px/1.1 Orbitron,"Exo 2",sans-serif}
 .bfd-out small{display:block;font:600 11px "Exo 2",sans-serif;color:#aab}
 .bfd-out .hit{color:#ffd27a}.bfd-out .miss{color:#9db4ff}.bfd-out .kill{color:#ff6a50;font-size:28px}
 #bfdice.res .bfd-out{font-size:30px;animation:bfpop .5s ease-out}
 @keyframes bfpop{from{transform:scale(2.2);opacity:0}}
 /* banner */
-#bfban{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
+#bfban{position:absolute;left:50%;top:36%;transition:top .2s;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
 #bfban[hidden]{display:none}
 #bfban b{display:block;font:800 26px/1.15 Orbitron,"Exo 2",sans-serif;color:#ffc86b}
 #bfban span{display:block;font:600 14px/1.3 "Exo 2",sans-serif;margin-top:4px}
@@ -212,3 +214,65 @@ html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{background:transparent!important;box-
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock>*:not(#ppop){visibility:hidden}
 html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{position:fixed;z-index:40;top:auto;left:8px;right:8px;bottom:8px;max-height:min(52%,340px);border:2px solid var(--gold,#ffc86b);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
 
+
+#bfban.top{top:118px}
+
+.bfrng{fill:none;stroke-width:2;stroke-dasharray:2 6;stroke-linecap:round;opacity:.75}.bfrng.r1{stroke:#ffd27a}.bfrng.r2{stroke:#ffb05a;opacity:.6}.bfrng.r3{stroke:#ff8a4a;opacity:.45}
+.bfrlab{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#1a1020;background:#ffd27a;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.6)}.bfrlab.r2{background:#ffb05a}.bfrlab.r3{background:#ff8a4a}
+
+/* name plate under the base, like a printed plate on the stand */
+html.bf #tags .tag{transform:translate(-50%,0);border-radius:4px;border-bottom-width:1px;border-top:2px solid var(--c0)}html.bf #tags .tag.s1{border-top-color:var(--c1)}
+
+/* the secret dial: a big wheel in the thumb zone; the top window shows the chosen move */
+#bfdial{--dd:min(340px,92vw);--dr:calc(var(--dd) * .38);position:absolute;left:50%;bottom:calc(-.5 * var(--dd) + 128px + var(--sab,0px));width:var(--dd);height:var(--dd);transform:translateX(-50%);pointer-events:none;z-index:6}
+#bfdial[hidden]{display:none}
+#bfdial .dface{position:absolute;inset:0;border-radius:50%;pointer-events:auto;touch-action:none;cursor:grab;
+  background:radial-gradient(circle at 50% 50%,#1c2238 0 22%,#0e1222 23% 60%,#151b30 61% 100%);
+  box-shadow:0 0 0 4px #3a4258,0 0 0 7px #11141f,0 -6px 30px rgba(0,0,0,.7),inset 0 0 0 2px rgba(255,255,255,.08)}
+#bfdial .dface::before{content:"";position:absolute;inset:6px;border-radius:50%;background:repeating-conic-gradient(from calc(var(--rot,0rad)),rgba(255,255,255,.10) 0 1deg,transparent 1deg 7.5deg);-webkit-mask:radial-gradient(circle,transparent 0 88%,#000 89%);mask:radial-gradient(circle,transparent 0 88%,#000 89%)}
+#bfdial .ditem{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 17px/1 "Exo 2",sans-serif;color:#fff;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);transition:transform .12s ease-out}
+#bfdial .ditem.g{color:#7df5b0;border-color:#2fc873}#bfdial .ditem.r{color:#ff8a86;border-color:#e23c3c}#bfdial .ditem.danger{box-shadow:0 0 0 2px #ff5a5a inset}
+#bfdial .ditem.on{background:#ffc86b;color:#1a1020;border-color:#fff;transform-origin:center}
+#bfdial .dhub{position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 40% 35%,#59627e,#1b2033 70%);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#bfdial .dwin{position:absolute;left:50%;bottom:calc(100% - 4px);transform:translateX(-50%);min-width:190px;padding:6px 14px 8px;border-radius:14px 14px 6px 6px;background:rgba(8,6,24,.92);border:2px solid #ffc86b;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+#bfdial .dwin::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:9px solid transparent;border-top-color:#ffc86b}
+#bfdial .dmv{font:800 26px/1 "Exo 2",sans-serif}#bfdial .dmv.g{color:#7df5b0}#bfdial .dmv.r{color:#ff8a86}
+#bfdial .dwd{font-size:14px;opacity:.92}#bfdial .rk{color:#ff6b6b}#bfdial .r{color:#ff8a86}
+@media (prefers-reduced-motion:reduce){#bfdial .ditem{transition:none}}
+
+html.bf #bfbar{z-index:8}
+
+/* loose dice on the mat next to the target */
+.bfloose{position:absolute;left:0;top:0;width:34px;height:38px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.7))}
+.bfloose>i .die i,.bfloose>i i:not(:first-child){display:none!important}.bfloose>i{display:block;width:34px;height:38px;animation:bfroll .7s cubic-bezier(.2,.7,.3,1) backwards}.bfloose>i svg,.bfloose>i .die{width:34px!important;height:38px!important}
+/* a damage card that lands face-down and flips face-up */
+.bfcard{position:absolute;left:0;top:0;width:118px;height:76px;perspective:500px;pointer-events:none;z-index:7}
+.bfcard .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:bfflip .6s cubic-bezier(.3,.7,.3,1.2) both}
+.bfcard .cb,.bfcard .cf{position:absolute;inset:0;border-radius:8px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 4px 12px rgba(0,0,0,.6)}
+.bfcard .cb{background:repeating-linear-gradient(45deg,#5a1420 0 6px,#7a1c2c 6px 12px);border:2px solid #d9a24a;display:grid;place-items:center;color:#ffd27a;font-size:26px}
+.bfcard .cf{transform:rotateY(180deg);background:linear-gradient(180deg,#fff7e8,#f0dcc0);border:2px solid #c2203a;color:#2a1010;padding:6px 8px;display:flex;flex-direction:column;gap:3px;text-align:left}
+.bfcard .cf b{font:800 13px/1.1 "Exo 2",sans-serif;color:#a0101e}.bfcard .cf span{font-size:11px;line-height:1.2}
+@keyframes bfflip{0%{transform:translateY(-30px) rotateY(0)}40%{transform:translateY(0) rotateY(0)}100%{transform:rotateY(180deg)}}
+@media (prefers-reduced-motion:reduce){.bfcard .in{animation:none;transform:rotateY(180deg)}}
+/* ship info = a pull-up drawer: grab bar, slides up; the numbers live behind "Ship card" */
+html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{border-radius:18px 18px 10px 10px;animation:ppup .22s cubic-bezier(.2,.8,.3,1)}
+html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.4);margin:6px auto 0}
+@keyframes ppup{from{transform:translateY(60%);opacity:.3}}
+#ppop .pp-more{margin-top:6px;border-top:1px solid rgba(255,255,255,.12);padding-top:6px}
+#ppop .pp-more>summary{cursor:pointer;font-weight:700;color:#ffc86b;list-style:none;min-height:36px;display:flex;align-items:center;gap:6px}
+#ppop .pp-more>summary::before{content:"▴";transition:transform .2s}#ppop .pp-more[open]>summary::before{transform:rotate(180deg)}
+#ppop .pp-more>summary::-webkit-details-marker{display:none}
+/* the dock is see-through while the ship drawer is up: it must not swallow taps meant for the board and its buttons */
+html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{pointer-events:none!important}html.ph.ph-p.ph-info:not(.ph-big) #ppop{pointer-events:auto!important}
+
+/* fire step: a plain-words label over the best target; defence/attack modifier buttons carry a one-line explanation */
+.bftlab{position:absolute;left:0;top:0;z-index:3;pointer-events:none;white-space:nowrap;padding:6px 12px;border-radius:12px;background:rgba(40,6,14,.92);border:2px solid #ffc86b;color:#fff;font:800 14px/1.1 "Exo 2",sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+#bfl>.bftlab{z-index:3}
+#bfbtns .btn small.msub{display:block;margin-top:2px;font:600 11px/1.15 "Exo 2",sans-serif;opacity:.85;white-space:normal}
+html.ph #bfbtns .btn small.msub{font-size:11px}
+/* maneuver dial: a compact grid above the bottom bar (every option visible, nothing under the buttons, the ship stays clear) */
+#bfdial{bottom:calc(var(--dbar,122px) + var(--sab,0px));height:auto;width:min(352px,94vw);left:50%}
+#bfdial .dface{position:relative;inset:auto;border-radius:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px;justify-items:center;background:rgba(8,6,24,.9);border:2px solid rgba(255,255,255,.2);touch-action:manipulation;cursor:pointer}
+#bfdial .dface::before,#bfdial .dhub{display:none}
+#bfdial .ditem{position:static;margin:0;width:56px;height:44px;border-radius:12px;transform:none!important}
+#bfdial .dwin{bottom:calc(100% + 6px)}

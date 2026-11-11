@@ -75,7 +75,7 @@ const sigNow=()=>G?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step,planSid
 PHN.openPop=function(kind,id){PHN.pop={kind,id};PHN.popSig=sigNow();if(typeof sfx==='function')sfx('click');render()};
 PHN.closePop=function(){if(!PHN.pop)return;PHN.pop=null;if(typeof V3!=='undefined')UI.hoverDial=null;render()};
 // ---- pop-ups (live in the dock zone: under the board in portrait, in the right rail in landscape; they never cover the mat) ----
-const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
 function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
   let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const rk=rockHits(s,d[i]);
       return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${ic}${sug===i?'<em class="rs">★</em>':''}${rk?'<em class="rk">!</em>':''}</button>`}).join('');
@@ -99,10 +99,11 @@ function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-
   const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
   let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
   return `<div class="pp-h">${porHTML(s)}<b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
-  <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
-  <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  <div class="pp-b"><div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  ${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}
+  <details class="pp-more"><summary>Ship card: numbers, pilot, upgrades</summary><div class="stats big">${statSpans(s)}</div>
   <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
-  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}</div>
+  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}</details></div>
   <div class="pp-f">${typeof V3!=='undefined'&&V3.on?`<button class="btn" data-ph="zoomto" data-id="${s.id}">${IC.focus} Zoom to it</button>`:''}<button class="btn primary" data-ph="x">Close</button></div>`}
 // ---- strip (planning): which ships still need a dial, recommended-for-all, lock ----
 function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const nset=my.filter(s=>UI.draft[s.id]!=null).length,all=nset===my.length;const g=guided();
@@ -111,7 +112,7 @@ function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps)
   <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
 // ---- the render hook ----
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
-function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown();
+function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown()+(G.ex&&G.ex.roundCap?'/'+G.ex.roundCap:'');
   const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
 function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
   if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};

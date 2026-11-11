@@ -12,7 +12,7 @@ const guideMode=()=>LS.get('na_guide')||'auto';
 function guided(){const m=guideMode();if(m==='full')return true;if(m==='light')return false;return !tourOff()&&(!G||roundShown()<=1)}
 function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=guided();b.innerHTML=`📘 Guide: <b>${on?'full':'light'}</b>`;b.setAttribute('aria-pressed',String(on));b.title=on?'Step-by-step help is on. Tap for short help only.':'Short help. Tap for step-by-step help.'}}
 // ---- where we are: the summary of round N shows at the start of round N+1, before any dial is set ----
-function sumPending(){return !!(G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
+function sumPending(){return !!(G&&!(typeof BF!=="undefined"&&BF.on)&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
 function roundShown(){return G?(sumPending()?G.round-1:G.round):0}
 function stepShown(){if(!G)return 0;if(G.winner)return 5;if(G.round===0)return 0;if(sumPending())return 4;return G.phase==='plan'?1:Math.min(4,G.step||1)}
 // guided pauses stop the host's engine, so online games never pause
