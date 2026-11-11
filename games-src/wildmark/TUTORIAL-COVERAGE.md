@@ -1,36 +1,37 @@
-# Wildmark tutorial coverage (coached first game)
+# Wildmark tutorial coverage (guided first game, W507)
 
-Owner, 7 Nov: "The tutorial is not a game, it's tap tap." It is now a **coached first game**: a real 6-turn game against Bram (easy) with
-free choices from turn 1. There are no forced steps; every legal move is allowed. The market is stacked on turns 1-4 (seed 11,
-`tutFix`) so the key situations come up early. Ward Elder Rowan speaks the first time each rule matters, in one bubble at a time.
-The bubble never blocks a tap (checked by elementFromPoint) and can be dismissed. After the player's own move Rowan gives up to 3
-one-line verdicts ("Nice move: +4 from Bears"). At the end the result screen walks through the score rule by rule with the player's
-real numbers. Rules that never came up are listed under "Things you will meet later".
+The tutorial is a **guided first game**: a real 7-turn game against Bram (rival level `novice`: random pairs). Every step is one sentence
+of at most 12 words from Rowan plus ONE highlighted tap; any other tap is refused. The market is stacked each turn (`tutFix`) so every
+core rule comes up in order. The result screen adds up the score; its main button, **Play a real game**, starts a 20-turn game.
+No "learn later" list: every rule below is taught during the game.
 
-Words: `campaign.json` → `prologue.coach[id]`. Rule ids: `COACH_RULES` in `src/tutor.js`.
-Proof: `node tutorial-end.js` plays the coached game with random legal moves through the UI, at 390x763 and 1440x860. It asserts:
-the result screen and walk-through appear, the tutorial is marked done, no tap was blocked, and every rule below was explained or listed.
+Steps: `tutSteps()` in `src/tutor.js`. Rule ids: `COACH_RULES`. Proof: `node tutorial-end.js [shots dir]` walks it by touch at 390x844 and
+375x667 and checks: exactly one highlighted target per step and nothing covers it, each sentence <= 12 words, a wrong tap is refused,
+all 22 rules taught in this order, walk-through shown, tutorial marked done, the main button starts a real 20-turn game.
 
-| Rule (id) | When Rowan explains it | Story beat |
-|---|---|---|
-| goal: 6 turns, out-score the rival, market "up to +N" badges, pick a pair (`goal`) | first pick | Bram wants the valley for timber |
-| place a tile next to your valley (`place`) | first tile step | |
-| habitats: 1 point per tile in the biggest joined group (`habitat`) | first time your habitat score grows | |
-| turn split tiles (`rotate`) | first split tile you hold over a spot | |
-| settle an animal on a tile that shows it, or return it (`settle`) | first animal step | |
-| bear pairs (`bear`) | first time you hold a bear (stacked: turn 1) | |
-| elk lines (`elk`) | first time you hold an elk | |
-| salmon runs (`salmon`) | first time you hold a salmon | |
-| lone hawks (`hawk`) | first time you hold a hawk | |
-| fox neighbours (`fox`) | first time you hold a fox (stacked: turn 2) | |
-| keystone gives an acorn (`keystone`) | when you earn one (stacked keystone on turn 1) | |
-| spend an acorn: free pick or replace (`acornSpend`) | first pick with an acorn in hand | |
-| three alike: optional sweep, once per turn (`sweep3`) | stacked on turn 3 | |
-| four alike: the market wipes itself (`wipe4`) | stacked on turn 4 | |
-| the rival's turn (`rival`) | Bram's first turn, played step by step | Bram takes, places, settles |
-| habitat majority bonus (+2, tie +1) (`majority`) | from turn 4, again in the walk-through | out-grow Bram |
-| final scoring (`final`), acorns are points (`acornsEnd`), tie-break (`tiebreak`) | the walk-through on the result screen | the thaw |
+| # | Rule (id) | Turn | Rowan says | Tap |
+|---|---|---|---|---|
+| 1 | goal | 1 | Beat Bram: score more points in your valley than he does. | Next |
+| 2 | pick | 1 | Each turn take a tile and the animal below it. | market column 1 |
+| 3 | place | 1 | Your tile must touch your valley. Tap the glowing spot. | spot, then Place |
+| 4 | settle | 1 | Animals live only on tiles that show them. Tap your bear tile. | new tile |
+| 5 | keystone | 1 | Gold keystone tile: an animal on it earns you an acorn. | Next |
+| 6 | rival | 1 | Now Bram plays: he takes, places and settles like you. | Next |
+| 7 | bear | 2 | Bears score in pairs of two. Take the second bear. | column 2, spot |
+| 8 | rotate | 2 | Two-land tiles turn. Tap Turn so forest meets forest. | Turn, Place, settle |
+| 9 | habitat | 2 | Touching same land joins up: 1 point per joined tile. | Next |
+| 10 | sweep3 | 3 | Three alike? Once per turn you may sweep them, free. | Sweep 3 |
+| 11 | elk | 3 | Elk score in straight lines. Take the elk. | column 4, spot, Place, settle |
+| 12 | acornSpend | 4 | You have an acorn. Tap Use acorn. | Use acorn |
+| 13 | acornReplace | 4 | Free pick takes any tile and any animal. Tap it. (the menu also shows Replace animals) | Free pick |
+| 14 | salmon | 4 | Salmon score in runs. Tap the river tile. | tile 1, salmon 3, spot, Place, settle |
+| 15 | wipe4 | 5 | Four alike! The market swaps them by itself. | Next |
+| 16 | hawk | 5 | Hawks score alone, touching no other hawk. Take the hawk. | column 3, spot, Place, settle |
+| 17 | fox | 6 | A fox scores 1 per different animal beside it. | column 2, spot, Place, settle |
+| 18 | majority | 7 | Biggest land of a kind beats Bram: plus 2 points. | Next |
+| 19 | return | 7 | No good spot? Return the animal to the bag. | Return token |
+| 20 | end20 | 7 | Real games last 20 turns each, then everything scores. | Next |
+| 21 | acornsEnd | 7 | Every acorn you still hold is worth 1 point. | Next |
+| 22 | tiebreak | 7 | Tied on points? More acorns wins. | Next |
 
-An animal the player never holds is the only rule that can end up in "Things you will meet later". In the proof runs that was one
-animal per run (hawk on phone, salmon on PC).
-Not in this tutorial: solo-mode market discard (help drawer, "Solo"); card sets B-D (help drawer, mixed cards).
+Not in the tutorial: solo-mode market discard (help drawer, "Solo"); card sets B-D (help drawer, mixed cards). Shots: playable-shots/gameplay/tut-*.png.

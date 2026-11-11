@@ -147,7 +147,7 @@ function pvBadge(x, y, d, c, spot, ghost) {
 function pvStrip(pv) {
   var e = $('#pv'); if (!e) { e = document.createElement('div'); e.id = 'pv'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); }
   var h = '';
-  if (!hintsOn()) { e.innerHTML = ''; e.hidden = true; return; }
+  if (!hintsOn() || UI.tut) { e.innerHTML = ''; e.hidden = true; return; }   // the guided tutorial keeps one sentence on screen: Rowan's
   if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
   else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();
   else if (UI.rivalMsg && !G.over && !myTurn()) h = '<div class="vd okay riv"><span>' + esc(UI.rivalMsg) + '</span></div>';
@@ -178,4 +178,7 @@ function goalShow() {
   e.hidden = false;
 }
 document.addEventListener('pointerdown', function (ev) { var e = $('#goal'); if (!e || e.hidden) return; if (ev.target.closest && ev.target.closest('.gcard') && ev.target.id !== 'goalGo') return; e.hidden = true; }, true);   // never blocks: any tap outside the card (or Start) closes it and still acts
-document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = !UI.prefs.hints; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#hintsB'); if (!b) return; UI.prefs.hints = hintsOn() ? 0 : 1; savePrefs(); sfx('tap'); if (G) { render(); fitView(); } else hintsSync(); });
+
+// G5: the acorn counter is a button (touch has no hover title): one line on what acorns do
+document.addEventListener('click', function (ev) { var b = ev.target.closest && ev.target.closest('#acornCt'); if (!b || !G) return; sfx('tap'); var e = $('#toast'); e.textContent = 'Acorns: 1 point each at the end. Before you pick, spend one to take any tile with any animal, or to replace market animals.'; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, 4200); });

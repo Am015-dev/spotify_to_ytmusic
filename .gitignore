@@ -198,3 +198,4 @@ games-src/next-wave/cutout-tests/
 games-src/nightrun/playtest/*
 !games-src/nightrun/playtest/story-sim.json
 games-src/redline-rally/redline-rally.html
+games-src/wildmark/benchmark/
