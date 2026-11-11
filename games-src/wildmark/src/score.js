@@ -101,7 +101,7 @@ function pvBestCol(v) { var b = -1; v.forEach(function (x, i) { if (x != null &&
 function pvTurnStart(m) {
   if (!G || G.seats[G.cur].ai) return;
   var v = pvMarket().slice(), b = pvBestCol(v), s = G.seats[G.cur], sol = -1;
-  try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }
+  if (hintsOn()) try { var pl = WM.AI.plan(WM.clone(G), 'hard'); sol = pl.pick.t === 'take' ? pl.pick.i : pl.pick.ti; } catch (e) { }   // only the Hints verdict uses it (a long task on slow phones)
   var ci = m.t === 'take' ? m.i : m.ti;
   var names = G.market.toks.map(function (k) { return k ? WM.ANI_NAME[k] : ''; });
   UI.rivalMsg = null;
