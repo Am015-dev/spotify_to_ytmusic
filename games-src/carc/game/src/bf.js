@@ -6,7 +6,7 @@ const MINC=30,MAXC=118;// cell size in screen pixels
 const FIGICON={f:'meeple',big:'champ',bld:'mason',pig:'hog'};
 AIDELAY=Math.max(AIDELAY,950);   // rival steps are shown one at a time with a caption; tap the board to speed up
 Object.assign(UI,{rot:0,deg:0,turn:-1,stepKey:'',user:false,hint:null,aiT:0,tl:{},mp:{},fxSeen:0,view:{s:.4,x:0,y:0},camp:null,first:false,moved:false,
-  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'normal',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
+  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'easy',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
 try{UI.first=localStorage.getItem('rv_seen')!=='1';UI.speed=localStorage.getItem('rv_fast')==='1'?3:1}catch(e){}
 const human=()=>G&&G.pl.some(p=>p.human);
 // Addendum 7: PLAY is clean; HINTS (top-bar toggle, off by default) turns on previews, badges, ratings and the bulb; the coached game always teaches
@@ -26,7 +26,7 @@ function capRemain(){if(!UI.capCur)return 0;return Math.max(0,(UI.cap?UI.cap.unt
 function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
-  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' & ');
+  const ws=d.win&&d.win.length?d.win:[d.by||0],who=ws.length>2?ws.length+' players':ws.length===2?(ws.some(i=>P(i).human)?'You both':'Both'):seatName(P(ws[0]));   // a shared score stays short
   const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
@@ -39,7 +39,7 @@ function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;UI.twTo=to;
   const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible();figShow()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=botSafe();return {s,x:m.W/2-cx*100*s,y:top+(m.H-top-bot)/2-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
-  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
+  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
@@ -52,7 +52,7 @@ function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max
 // ---------- camera follow (W426): frame the spots near the last tile, zoom in on the chosen spot, ease back out, follow the rival ----------
 const PHONE=()=>innerWidth<700;
 function topSafe(){const s=$('#status'),b=boardEl();if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
-function botSafe(){const h=$('#hand');if(!h||getComputedStyle(h).position!=='absolute')return 0;return h.offsetHeight+18}
+function botSafe(){const h=$('#hand'),rc=$('#recentre'),rh=rc&&rc.offsetHeight&&getComputedStyle(rc).bottom!=='auto'?rc.offsetHeight+14:0;if(!h||getComputedStyle(h).position!=='absolute')return rh;return h.offsetHeight+18+rh}   // keep glows clear of the Recentre button too
 function frameCells(cells,cmin,cmax){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const top=topSafe(),bot=botSafe(),aw=m.W-24,ah=m.H-top-bot-12,c=Math.max(cmin,Math.min(cmax,Math.min(aw/(x1-x0+1),ah/(y1-y0+1)))),s=c/100;return {s,x:m.W/2-(x0+x1+1)/2*100*s,y:top+ah/2-(y0+y1+1)/2*100*s}}
 function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal.filter(q=>q.r===UI.rot).map(q=>{let rk=0;try{rk=pvRank(prevCalc(q.x,q.y,UI.rot))}catch(e){}return {q,rk,d:Math.hypot(q.x-last[0],q.y-last[1])}}).sort((a,b)=>a.d-b.d);
@@ -72,10 +72,15 @@ function camArea(k,ms){if(UI.user||!G)return;camValley(null,unkey(k),ms)}
 function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else camAim()}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
 function selSpot(x,y){UI.sel={x,y,r:UI.rot};sfx('click');UI.user=false;renderGlows();renderHand();if(hintsOn())try{pvHighlight(prevCalc(x,y,UI.rot).hl)}catch(e){}renderStatus();camSpot(x,y)}
 // ---------- drawing a tile (rotated by its placement) ----------
-const tileInner=(t,r)=>`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;
+const tileInner=(t,r)=>{TXR=r|0;const o=`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;TXR=0;return o};
 function tileSvg(t,r){return `<svg viewBox="0 0 100 100" aria-hidden="true">${tileInner(t,r)}</svg>`}
 // ---------- world: tiles, glowing placement spots ----------
+function renderGround(w){let g=w.querySelector('#ground');if(!g){g=document.createElement('div');g.id='ground';g.setAttribute('aria-hidden','true');w.insertBefore(g,w.firstChild)}   // empty spots inside the valley show bare earth, not the table
+  const seen={},out=[];for(const k of G.order){const [x,y]=unkey(k);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,nk=nx+','+ny;if(G.tiles[nk]||G.tiles[key(nx,ny)]||seen[nk])continue;seen[nk]=1;
+    let n=0;for(const [ex,ey] of [[1,0],[-1,0],[0,1],[0,-1]])if(G.tiles[key(nx+ex,ny+ey)])n++;if(n>=2)out.push([nx,ny])}}
+  const sig=out.join(';');if(g._sig===sig)return;g._sig=sig;g.innerHTML=out.map(([x,y])=>`<i style="left:${x*100}px;top:${y*100}px"></i>`).join('')}
 function renderTiles(){const w=$('#world');
+  try{renderGround(w)}catch(e){}
   for(const k in UI.tl)if(!G.tiles[k]){UI.tl[k].remove();delete UI.tl[k]}
   const lastK=G.step==='fig'&&G.cur?G.cur.k:G.order[G.order.length-1];
   for(const k of G.order){const T=G.tiles[k];let e=UI.tl[k];const [x,y]=unkey(k);
@@ -108,8 +113,8 @@ function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
     const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k],f.p);
-    addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
-  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
+    e._p=f.p;addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
+  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];flyHome(e)}
   placeOverlay()}
 function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
@@ -136,8 +141,16 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
-  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b><small>left</small>`}
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
+  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
+// feedback: a tile lands with a thud + dust ring; a follower pops, then hops home to its owner's chip
+function thud(k){const e=UI.tl[k];if(!e||UI.reduce)return;const [x,y]=unkey(k),w=$('#world');
+  const d=document.createElement('div');d.className='dust';d.style.left=x*100+'px';d.style.top=y*100+'px';w.appendChild(d);setTimeout(()=>d.remove(),700);
+  const b=boardEl();b.classList.remove('thud');void b.offsetWidth;b.classList.add('thud');setTimeout(()=>b.classList.remove('thud'),260)}
+function flyHome(e){const chip=document.querySelector(`.seat[data-i="${e._p}"]`);if(!chip||UI.reduce||UI.sim||!e.isConnected){e.classList.add('gone');setTimeout(()=>e.remove(),520);return}
+  e.classList.add('homepop','gone','homing');setTimeout(()=>{if(!e.isConnected)return;const b=boardEl().getBoundingClientRect(),c=chip.getBoundingClientRect();e._o=null;
+    e.style.transition='transform .55s cubic-bezier(.5,0,.7,.4),opacity .55s';e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.5)`;e.style.opacity='.15';
+    setTimeout(()=>{bumpSeat(e._p);e.remove()},560)},300)}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function hname(t,p){const mine=P(p).human;return `<div class="hname"><b>${mine?'Your tile':esc(P(p).nm)+'’s tile'}</b><span>${esc(TT[t].n)}</span></div>`}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
@@ -164,14 +177,15 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
-  else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
+  else if(G.over){tn='Game over';t='Counting the points…'}
+  else if(UI.tut&&UI.tutTile){tn='Learn';t='Tap the lit tile to go on.'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
     else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
-    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap again to place.'}
+    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
-    else t=(c&&!UI.cap.intro?c:'')||`Watch ${p.nm} play a tile.`}
+    else t=c||'Watch their tile go down.'}
   say(t,tn,'')}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
@@ -213,32 +227,54 @@ function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s)
 function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
-  for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap=''}
+  for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap='';try{rvTrack(f)}catch(e){console.error(e)}}
+  if(G&&G.over)try{rvFlush()}catch(e){}
 
-  for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
+  for(const f of list){if(f.t==='place'){sfx('place');try{thud(f.x)}catch(e){}buzz(18)}else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;try{capSet(scoreCap(d,false),1500,true)}catch(e){}setTimeout(()=>scorePop(d),delay)}}}
+// one line per rival turn: "Cobalt placed a road and a follower: +3"
+function rvTrack(f){const R=UI.rv;
+  if(f.t==='turn'){rvFlush();if(G&&!P(f.x).human&&human())UI.rv={p:f.x,ty:'',fig:'',pts:0};return}
+  if(!R)return;
+  if(f.t==='place'){const T=G.tiles[f.x];if(T){const ts=TSEG[T.t].map(q=>q.ty);R.ty=ts.includes('C')?'town':ts.includes('M')?'priory':ts.includes('R')?'road':'field'}}
+  else if(f.t==='fig'){const e=G.log.slice(0,8).map(l=>l.t.match(/^(.+?) (?:sets|puts) an? (.+?)(?: \(\w+\))? on the (\w+)\.$/)).find(Boolean);if(e&&e[1]===P(R.p).nm){R.fig=e[2];R.ty=e[3]}}
+  else if(f.t==='score'){const d=f.x,w=d.win&&d.win.length?d.win:[d.by];if(w.includes(R.p))R.pts+=d.pts}}
+function rvFlush(){const R=UI.rv;UI.rv=null;if(!R||!R.ty||!G)return;const nm=seatName(P(R.p));
+  const line=`${nm} placed a ${R.ty}${R.fig?' and a '+R.fig:''}${R.pts?': +'+R.pts:'.'}`;UI.rvLine=line;capSet(line,3400,false,true,true)}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
 function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
   for(const [x,y] of cells){const e=UI.tl[key(x,y)];if(e){e.classList.remove('lit');void e.offsetWidth;e.classList.add('lit')}}
   const cx=cells.reduce((a,c)=>a+c[0],0)/cells.length+.5,cy=cells.reduce((a,c)=>a+c[1],0)/cells.length+.5;
   const w=d.win.length?d.win:[d.by||0];
-  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();
+  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();try{keepPops()}catch(x){}
     const chip=document.querySelector(`.seat[data-i="${i}"]`),b=boardEl().getBoundingClientRect();
-    setTimeout(()=>{const o=e._o;if(chip&&!PHONE()){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
+    setTimeout(()=>{const o=e._o;if(chip){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>{e.remove();try{placeOverlay()}catch(x){}},final?1900:1700)})}
 // ---------- the end: unfinished features score one by one, then the result ----------
+const FINAL0=450,FINALSTEP=240;   // end count: brisk (~3 s), whole valley in view, tap to skip
+// the end count shows the whole valley, centred below the status line (smaller tiles than play allows)
+function endView(){const m=measure(),f=fitCells(G.order.map(unkey),m),ts=topSafe(),bs=Math.max(70,botSafe());
+  const w=f.w,h=f.h,c=Math.max(14,Math.min(MAXC,(m.W-16)/w,(m.H-ts-bs-8)/h)),sc=c/100;UI.user=true;
+  tweenView({s:sc,x:m.W/2-f.cx*100*sc,y:ts+(m.H-ts-bs)/2-f.cy*100*sc},420)}
 function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
-  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),400+n*700);n++}
+  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),FINAL0+n*FINALSTEP);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
 function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;sfx('win');
-  const n=finalPops();
-  const wait=Math.min(8000,900+n*700+1400);
-  setTimeout(()=>{if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()},UI.reduce?300:wait)}
+  try{endView()}catch(e){}const n=finalPops();
+  const wait=Math.min(3400,FINAL0+n*FINALSTEP+1300);let gone=false;
+  const plate=document.createElement('div');plate.id='endplate';plate.setAttribute('role','status');plate.innerHTML='<b>Final count</b><small>Tap to skip</small>';$('#app').appendChild(plate);
+  const go=()=>{if(gone)return;gone=true;clearTimeout(tm);plate.remove();document.removeEventListener('pointerdown',skip,true);if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()};
+  const skip=e=>{e.preventDefault();e.stopPropagation();go()};setTimeout(()=>document.addEventListener('pointerdown',skip,true),250);
+  const tm=setTimeout(go,UI.reduce?300:wait)}
+// the result table: winner first, points per kind so a new player sees why
+function resTable(){const ps=[...G.pl].sort((a,b)=>b.score-a.score),v=(p,k)=>((p.sc||{})[k]||0)+((p.end||{})[k]||0);
+  const rows=[['road','Roads'],['town','Towns'],['priory','Priories'],['field','Farms']];if(G.ex.tb)rows.push(['goods','Goods']);
+  return `<table class="restab"><thead><tr><th></th>${ps.map(p=>`<th style="--c:${PCOL[p.i]}"><i></i>${esc(seatName(p))}</th>`).join('')}</tr></thead><tbody>${rows.map(([k,l])=>`<tr><th>${l}</th>${ps.map(p=>`<td>${v(p,k)}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><th>Total</th>${ps.map(p=>`<td>${p.score}</td>`).join('')}</tr></tfoot></table>`}
 function showResult(){const win=G.over.win,me=G.pl.find(p=>p.human);const iWon=me&&win.includes(me.i)&&win.length===1;
   const title=!human()?G.winText:win.length>1?'A tie!':iWon?'You win!':P(win[0]).nm+' wins';
   const rv=G.pl.find(p=>!p.human),line=UI.camp||typeof STORY==='undefined'||!me?'':(win.length>1?STORY.quickTie:iWon?STORY.quickWin:STORY.quickLose(rv?rv.nm:'The rival'));
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}<div class="rescore">${G.pl.map(p=>`<span style="--c:${PCOL[p.i]}"><i></i>${esc(seatName(p))} ${p.score}</span>`).join('')}</div><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}${resTable()}<button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
   $('#modal').querySelector('[data-a=again]').onclick=()=>beginGame(UI.lastOpts);$('#modal').querySelector('[data-a=menu]').onclick=()=>showStart()}
 // ---------- start screen, menu, rules ----------
 function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g&&g.v===1&&!g.over?g:null}catch(e){return null}}
@@ -267,7 +303,7 @@ function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.s
   d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
   $('#app').appendChild(d);$('#goalok').addEventListener('click',()=>d.remove())}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
-function resetUI(){UI.recap="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
+function resetUI(){UI.recap="";UI.rv=null;UI.rvLine="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
 function loadSaved(){const g=savedGame();if(!g)return;resetUI();G=g;UI.camp=null;UI.fxSeen=0;UI.fx.length=0;$('#modal').innerHTML='';UI.lastOpts=setupOpts();render();refit(false);schedAI()}
 // ---------- gestures: drag to move, pinch / wheel to zoom, tap during a computer turn to speed it up ----------
 function initGestures(){const b=boardEl(),pt=new Map();let last=null;
