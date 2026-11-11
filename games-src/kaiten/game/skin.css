@@ -130,6 +130,16 @@ html .tbtn[data-gxt-open] b,html .tbtn[data-gxt-open] span{color:#fff;opacity:1}
 #rs.kkfin .rsbox.bar .btn{flex:1 1 0;min-width:0;min-height:48px}
 .kkrs{flex-direction:column}
 .kkrs li{padding:2px 10px}
+.kkbd{width:100%;border-collapse:separate;border-spacing:0 2px;margin-top:8px;font-size:14px;color:#3a1f17;table-layout:fixed}
+.kkbd th,.kkbd td{padding:3px 4px;text-align:center;font-weight:800;line-height:1.15}
+.kkbd tbody th{text-align:left;font-weight:700;width:27%;padding-left:6px}
+.kkbd thead th{font-weight:900;vertical-align:bottom;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kkbd .who{display:block;overflow:hidden;text-overflow:ellipsis}.kkbd .cr{display:block;font-size:12px;font-weight:900;color:#a8561a}
+.kkbd td{background:#f6e8c8}.kkbd td.z{color:#8a7357;font-weight:700}.kkbd td.neg{color:#b3261e}.kkbd td small{display:block;font-size:12px;font-weight:700;color:#6b5238}
+.kkbd tr.sep td{background:none;padding:0;height:4px}
+.kkbd tr.tot th{font-size:16px;font-weight:900}.kkbd tr.tot td{font-size:20px;font-weight:900;padding:5px 4px;background:#f1e0bd}.kkbd tr.tot td.w{background:#ffd23a}
+#rs.kkfin .rsbox.bar .btn{border-image:none!important;border:3px solid #4a2a22;border-radius:14px}
+#rs.kkfin .rsbox.bar .btn.go{background:linear-gradient(180deg,#f47a5f,#d9452c);color:#fff}#rs.kkfin .rsbox.bar .btn.alt{background:#fff8e6;color:#4a2a22}
 
 #kkguide .kx{pointer-events:auto;flex:none;align-self:flex-start;width:32px;height:32px;border-radius:50%;border:2px solid #4a2a22;background:#fff8e6;color:#4a2a22;font-size:20px;font-weight:900;line-height:1;cursor:pointer}
 #kkguide.on{pointer-events:none}
