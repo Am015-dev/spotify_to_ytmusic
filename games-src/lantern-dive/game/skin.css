@@ -154,3 +154,35 @@ html.sk .gx-drawer h3{display:inline-block;background:#f3e6bf;color:#5a3306;padd
 html.sk .gx-drawer-body{padding-left:26px;padding-right:26px}
 html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:none!important;border:2px solid #d9b04a;border-radius:50%;color:#fff}
 @media (min-width:1024px){.gxc-path *,.gxc-act *,.gxc-act small,.gxh-bub .gxh-tx,.gxt-bub .gxh-tx{font-size:max(16px,1em)!important}}
+#rstep{position:fixed;inset:0;z-index:70}
+#rstep .rsd{position:fixed;background:rgba(8,4,10,.62);pointer-events:none}
+#rstep .rsh{position:fixed;border-radius:12px;box-shadow:0 0 0 3px #f2c14e,0 0 18px 4px rgba(242,193,78,.6);pointer-events:none}
+#rstep .rsb{position:fixed;transform:none;width:min(340px,calc(100vw - 24px));max-width:none;box-sizing:border-box}
+/* R5: signal state in words beside your seat (the green token here is the legend for the green token on the other seats) */
+#mine .sigst{flex:0 1 auto;display:flex;align-items:center;gap:4px;min-width:0;font-size:14px;font-weight:800;color:#bff5d6;white-space:nowrap;line-height:1.1}
+#mine .sigst .tok{width:22px;height:22px;flex:0 0 22px}
+#mine .sigst.used{color:#c3cfdd;opacity:.7}#mine .sigst.used .tok{filter:grayscale(1) brightness(.8)}
+.ph-narrow #mine .sigst .sgt,.ph-short #mine .sigst .sgt{font-size:14px}
+/* R5: while picking a card to signal, the picked card says which token it gets */
+#hand .hc .pkw{position:absolute;left:50%;top:-18px;transform:translateX(-50%);z-index:6;background:#1e8f5a;color:#fff;border:2px solid #bff5d6;border-radius:9px;padding:0 6px;font-size:14px;font-weight:900;line-height:18px;white-space:nowrap;pointer-events:none}
+
+/* G4 review fix: phone header buttons carry a short word under the icon (44px targets), so nobody opens the Log by accident */
+@media (max-width:1023px){
+  html .gx-bar .gx-ibtn[data-gx]{flex-direction:column;gap:1px;padding:2px 3px;min-width:46px;min-height:44px}
+  html .gx-bar .gx-ibtn[data-gx] span{display:block!important;font-size:14px!important;line-height:1;font-weight:800;letter-spacing:.01em}
+  html .gx-bar .gx-ibtn[data-gx] svg,html .gx-bar .gx-ibtn[data-gx] i[data-ic],html .gx-bar .gx-ibtn[data-gx] .sk-ic{width:20px;height:20px}
+  html.sk .gx-bar .gx-ibtn[data-gx] span{color:#1f1408}
+}
+/* G4 review fix: the trick sits on a painted table pad in the middle of the felt (owner art media/ui-trick-pad.webp) */
+#tpad{position:absolute;transform:translate(-50%,-50%);pointer-events:none;z-index:0;border-style:solid;border-color:transparent;border-width:22px;
+  border-image:url(media/ui-trick-pad.webp) 64 fill / 22px stretch;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55))}
+#tpad[hidden]{display:none}
+#slots{position:relative;z-index:1}
+#lead{z-index:2}
+#lead.on{background:rgba(6,20,40,.72);border:1px solid rgba(255,216,115,.45);border-radius:12px;padding:3px 10px}
+#lead.tight span:first-child{display:none}
+#lead.tight{padding:2px 5px;max-width:72px;text-align:center;line-height:1.1}
+#lead.tight span{font-size:13px!important}
+/* R5 feel: a job's own beat */
+.fl.jobok{color:#c9ffe0;text-shadow:0 2px 0 #0b1f3a,0 0 16px #2fd27a}
+.fl.jobbad{color:#ffd6d6;text-shadow:0 2px 0 #0b1f3a,0 0 16px #ff4d4d}
