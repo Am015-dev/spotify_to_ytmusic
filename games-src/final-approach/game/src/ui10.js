@@ -50,7 +50,7 @@ Object.assign(HLP_STEPS, {
   'sys-engines': { target: hq('#pz .gau'), title: 'Engines set speed', text: 'The two engine dice add up to your speed. Low holds, medium moves one space, high two.', pic: () => HP.gauge() },
   'sys-radio': { target: hfirst('#pz .slot[data-slot=ra0]'), title: 'Clear the way', text: 'The radio clears a plane ahead. A 1 clears your space, a 2 the next one, and so on.', pic: () => HP.radio() },
   'sys-gear': { target: hfirst('#pz .slot[data-slot=lg0]'), title: 'Wheels and flaps', text: 'Gear takes 1-2, 3-4, 5-6; flaps go in order. Land with all of them down.', pic: () => HP.gear() },
-  'sys-brakes': { target: hfirst('#pz .badge.brk', '#pz .slot[data-slot=br0]'), title: 'Brakes', text: 'Brakes set how fast you may land. Place 2, then 4, then 6. Landing speed must stay within them.', pic: () => HP.brake(4) },
+  'sys-brakes': { target: hfirst('#pz .badge.brk', '#pz .slot[data-slot=br0]'), title: 'Brakes', text: 'Brakes set how fast you may land. Place 2, then 4, then 6. Landing speed must be no more than the last one.', pic: () => HP.brake(4) },
   'sys-conc': { target: hfirst('#pz .slot[data-slot=co0]', '#pz .chipr'), title: 'Coffee and rerolls', text: 'A die on a coffee space earns a token to nudge a later die by one. Rerolls redo your dice.', pic: () => HP.cup() }
 });
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each): every cockpit slot, in plain words
@@ -68,7 +68,7 @@ const HLP_RULES = [
   { phase: 'sys-gear', title: 'Flaps in order', text: 'Four flap spaces take 1-2, 2-3, 4-5, 5-6, top to bottom. Co-pilot only.', pic: () => hpics([['flap', 'Co-pilot: flaps']]) },
   { phase: 'sys-gear', title: 'All down to land', text: 'Each gear and flap raises a speed marker. Every one must be down at the landing.', pic: () => hpics([['gear', 'Gear'], ['flap', 'Flaps'], '>', ['air', 'Land']]) },
   { phase: 'sys-brakes', title: 'Set the brakes', text: 'Brake spaces take exactly 2, then 4, then 6, in that order. Only the pilot uses them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
-  { phase: 'sys-brakes', title: 'Speed within the brakes', text: 'In the last round the plane stops: the engine total must be no more than the brakes.', pic: () => hpics([['gauge', 'Speed'], '>', ['brake', 'Brakes', 4]]) },
+  { phase: 'sys-brakes', title: 'Speed within the brakes', text: 'In the last round the plane stops. When the second engine die lands, the total must be no more than the brakes. Set brakes first.', pic: () => hpics([['gauge', 'Speed'], '>', ['brake', 'Brakes', 4]]) },
   { phase: 'sys-conc', title: 'Coffee tokens', text: 'A die on a coffee space earns a token. Spend one to change a die by one.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
   { phase: 'sys-conc', title: 'Reroll tokens', text: 'A reroll token lets both crew roll their unplaced dice again, once.', pic: () => hpics([['reroll', 'Token'], '>', ['dice2', 'New dice']]) },
   { phase: 'sys-conc', title: 'Now the full game', text: 'You know every control. Later flights hide each crew’s dice and add fuel, wind and more.', pic: () => hpics([['plane', 'Full game']]) },
@@ -136,15 +136,36 @@ function hlpPlan() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !myTurn()) return null;
   let m = null; try { m = FA.AI.move(G, v, 'normal', { noMC: true }); } catch (e) { return null; }
   if (!m) return null;
-  const why = capW(hlpWhy(m, v), 15); if (!why) return null;
+  m = hlpSafe(m, v);
+  const why = capW(hlpWhy(m, v), 15) || 'This keeps the flight on track.';
   const sel = typeof UI.sel === 'number' ? UI.sel : -1;
   if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return (e => e && e.getBoundingClientRect().width > 0)(document.querySelector(q)) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
   if (m.t === 'ready') return { m, why, to: () => document.querySelector('#acts [data-a=ready]'), from: null };
   if (m.t === 'rr') return G.pend ? null : { m, why, to: () => document.querySelector('#acts [data-a=rr]'), from: null };
   if (m.t === 'toss') { if (!hlpDie(v, m.d)) return null; return sel === m.d && document.querySelector('#acts [data-a=toss]') ? { m, why, to: () => document.querySelector('#acts [data-a=toss]'), from: null } : { m, why, to: () => hlpDie(v, m.d), from: null }; }
-  if (m.t !== 'place' || m.c || typeof m.d === 'undefined') return null;   // a coffee move needs two taps the finger cannot show: rules cards only
+  if (m.t !== 'place' || typeof m.d === 'undefined') return null;
   if (!hlpDie(v, m.d) || !document.querySelector('#pz .slot[data-slot="' + m.to + '"]')) return null;
-  return { m, why, to: () => document.querySelector('#pz .slot[data-slot="' + m.to + '"]'), from: sel === m.d ? null : () => hlpDie(v, m.d) };
+  const slotEl = () => document.querySelector('#pz .slot[data-slot="' + m.to + '"]');
+  if (m.c) {
+    // a coffee move, shown step by step: pick the die, tap + or - until the face is right, then the space
+    const base = m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v, n = Math.abs(m.c), cw = 'Spend ' + n + ' coffee: ' + base + ' becomes ' + (base + m.c) + ', then ' + slotName(m.to) + '. ' + why;
+    const btn = () => document.querySelector('[data-a=cof][aria-label="' + (m.c > 0 ? 'One more' : 'One less') + '"]');
+    if (sel !== m.d) return { m, why: cw, to: () => hlpDie(v, m.d), from: null };
+    if ((UI.cof || 0) !== m.c) return { m, why: cw, to: btn, from: null };
+    return { m, why: cw, to: slotEl, from: null };
+  }
+  return { m, why, to: slotEl, from: sel === m.d ? null : () => hlpDie(v, m.d) };
+}
+// the advice never leaves an Axis or Engine space empty: when the dice left are only just enough for them, they go there first
+// (also when the flight is already lost and every move scores the same, so the last turns still read right)
+function hlpSafe(m, v) {
+  if (!m || m.t !== 'place' || G.pend) return m;
+  const mand = ['ax' + v, 'en' + v].filter(k => G.keys.includes(k) && !G.slots[k]);
+  if (!mand.length || mand.includes(m.to) || FA.unusedDice(G, v).length > mand.length) return m;
+  const ms = FA.validMoves(G, v).filter(x => x.t === 'place' && mand.includes(x.to)).sort((a, b) => Math.abs(a.c || 0) - Math.abs(b.c || 0));
+  if (!ms.length) return m;
+  const ok = x => { try { const c = FA.clone(G); const r = FA.performMove(c, x, v); return r.ok && !(c.result && !c.result.win); } catch (e) { return false; } };
+  return ms.find(ok) || ms[0];
 }
 function hlpSuggest() { const p = hlpPlan(); return p && p.to() ? { why: p.why, key: p.m.t + ':' + (p.m.to || p.m.c || p.m.d), target: p.to, from: p.from } : null; }
 // ---------------------------------------------------------------- wiring
@@ -165,6 +186,6 @@ setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
 function hintsSync() { const b = $('#bulbbtn'); if (!b) return; const on = !!UI.prefs.hints; b.classList.toggle('hon', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', on ? 'Hints on (tap to turn off)' : 'Hints off (tap to turn on)'); b.title = on ? 'Hints on' : 'Hints off'; }
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('#bulbbtn'); if (b) { e.stopPropagation(); e.preventDefault(); UI.prefs.hints = !UI.prefs.hints; savePrefs(); UI.cpt = null; UI.askWhy = null; hintsSync(); if (G && UI.started) render(); return; }
-  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d } : null; UI.askWhy = (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = null; render(); }
+  const a = e.target.closest && e.target.closest('[data-a=ask]'); if (a) { e.stopPropagation(); e.preventDefault(); const p = hlpPlan(); if (p && p.m) { UI.cpt = p.m.t === 'place' ? { k: p.m.to, d: p.m.d, c: p.m.c || 0 } : null; UI.askWhy = p.m.t === 'place' && p.m.c ? p.why : (p.m.t === 'place' ? 'Try your ' + (p.m.d === 'p' ? '' : G.dice[actSeat()][p.m.d].v + ' on ') + slotName(p.m.to) + ': ' : '') + p.why; } else UI.askWhy = null; render(); }
 }, true);
 setTimeout(hintsSync, 300);

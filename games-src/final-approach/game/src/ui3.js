@@ -1,6 +1,7 @@
 // ===================== part 3: game flow (new game, computer crew, human actions, hot-seat, timer, end) =====================
 const mkey = m => JSON.stringify(m);
 function newGame(mode, o) {
+  UI.chip = null; clearTimeout(UI.chipT); if (typeof document !== 'undefined') document.querySelectorAll('#pz .rchip').forEach(e => e.remove());   // no leftover reason chip from the tutorial or the last flight
   o = o || {}; clearTimeout(UI.tm); UI.seq++;
   const cfg = UI.cfg = Object.assign({ scenario: 'g1', role: 0, level: 'normal', abil: [] }, UI.opt || {}, o);
   const sc = FA.scen(cfg.scenario);
