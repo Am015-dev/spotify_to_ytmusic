@@ -1,0 +1,86 @@
+{
+ "fra_roemer_chase": {
+  "calls": 788,
+  "tris": 2362686,
+  "x": 20,
+  "z": -190,
+  "y": 0
+ },
+ "fra_roemer_aerial": {
+  "calls": 615,
+  "tris": 2180324,
+  "x": 20,
+  "z": -190,
+  "y": 0
+ },
+ "fra_sachs_chase": {
+  "calls": 327,
+  "tris": 1047565,
+  "x": -672,
+  "z": -1157,
+  "y": 0
+ },
+ "fra_sachs_aerial": {
+  "calls": 353,
+  "tris": 1274639,
+  "x": -672,
+  "z": -1157,
+  "y": 0
+ },
+ "fra_hbf_chase": {
+  "calls": 464,
+  "tris": 1611781,
+  "x": 1256,
+  "z": -372,
+  "y": 0
+ },
+ "fra_hbf_aerial": {
+  "calls": 490,
+  "tris": 1653896,
+  "x": 1256,
+  "z": -372,
+  "y": 0
+ },
+ "athA_plaka_chase": {
+  "calls": 279,
+  "tris": 802527,
+  "x": 1696,
+  "z": -2077,
+  "y": 0
+ },
+ "athA_plaka_aerial": {
+  "calls": 294,
+  "tris": 871111,
+  "x": 1696,
+  "z": -2077,
+  "y": 0
+ },
+ "athA_filo_chase": {
+  "calls": 256,
+  "tris": 687255,
+  "x": 2097,
+  "z": -2441,
+  "y": 0.5
+ },
+ "athA_filo_aerial": {
+  "calls": 267,
+  "tris": 738509,
+  "x": 2097,
+  "z": -2441,
+  "y": 0.5
+ },
+ "athB_lyka_chase": {
+  "calls": 266,
+  "tris": 817875,
+  "x": 564,
+  "z": -1225,
+  "y": 18.5
+ },
+ "athB_lyka_aerial": {
+  "calls": 344,
+  "tris": 951289,
+  "x": 564,
+  "z": -1225,
+  "y": 18.5
+ }
+}
