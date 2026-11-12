@@ -79,3 +79,5 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - Bench (300 runs, `GENTLE=1 node bench-newcomer.js 300 w`, DIED=1 adds a per-boss table): Gentle w 39% / s 66%; Tabletop w 0% / s 7%.
 - Also: top-bar potion and relic buttons 44 px (were 36); win-screen relics open the same explain popup as the top bar (+ title).
   Short landscape hides the hero mech line and tap hint on setup so Start climb fits (`node tools/probe-setup.js` PASS at 4 sizes).
+- Touch proof (Gentle default, Warrior, 390x844, `RUNS=3 node tools/newcomer-taps.js`): LOST at boss / WON / LOST at boss, all reached floor 10, 0 page errors.
+  An earlier run (before the script fix) also WON; its other run hit a script-only softlock (event card picker inside #app), now fixed.
