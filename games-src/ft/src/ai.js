@@ -1,7 +1,10 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:4,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
-function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
+// easy = the default rival: plays loose, bids cheap, and eases off when it leads (a new player who follows hints about half the time can win)
+const LVL={easy:{noise:3,depth:8000,bid:.1,ease:0,loose:.92,pool:1},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
+function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
+function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;
   const path=[s];const visits={};
@@ -34,13 +37,16 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   if(G.boss&&G.boss.seat===p.i&&o.c===G.boss.favour)v+=6;// campaign boss rule: this boss prefers one tribe
   return v+(Math.random()-.5)*aiNoise(p)*6}
 function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||scoreOf(q).total<=s)}
-function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}
+function planTurn(p){const L=LVL[p.lv]||LVL.normal,cap=L.depth;const e=aiEase(p);p.__nz=aiNoise(Object.assign({},p,{__nz:null}))+e*2.5;let best=null,bv=-1e9;const all=[];
+  for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([v,o]);if(v>bv){bv=v;best=o}}p.__nz=null;
+  // a loose turn: any walk from the better half (more often while it leads), so the default rival makes human-sized mistakes
+  const lp=(L.loose||0)+(e?.15*e:0);if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
   const p=P(s);const vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
   if(G.q)return {act:'q',i:aiAnswer(G.q)};
-  if(G.phase==='bid'){const v=bestTurnValue(p);const budget=Math.max(0,v*.35-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
+  if(G.phase==='bid'){const L0=LVL[p.lv]||LVL.normal;if(L0.loose&&Math.random()<L0.loose*.6){const fr=vm.filter(m=>bidPrice(p,m.spot,m.fk)<=p.coins*.25);if(fr.length)return fr[Math.floor(Math.random()*fr.length)]}const v=bestTurnValue(p);const L=LVL[p.lv]||LVL.normal;const budget=Math.max(0,v*(aiEase(p)?L.bid*.5:L.bid)-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
   const dj=aiDjinn(p,vm);if(dj)return dj;const it=aiItem(p,vm);if(it)return it;
   switch(G.step){
   case 'move':{if(!G.move){AIPLAN=planTurn(p);if(!AIPLAN)return vm[0];return {act:'start',tile:AIPLAN.s}}
