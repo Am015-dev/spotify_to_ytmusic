@@ -214,9 +214,9 @@ html.ph #tags .tag .tgl{font-size:13px}
 /* menu test v2: 44px icon buttons get a slim painted frame so the icon sits inside it */
 html.sk.ph .gx-bar>.btn[data-gx],html.sk.ph .gx-bar>.btn[data-a="rules"],html.sk.ph .gx-gear{border-width:10px;border-image-width:10px;padding:0}
 /* text keeps 8px from the column the framed rows use */
-html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:8px;padding-right:8px}
+html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear{border-width:10px;border-image-width:10px;padding:0}
-html.sk .dlg h4{padding-left:8px;padding-right:8px}
+html.sk .dlg h4{padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear:not(.sm):not(.ghost){border-width:10px;border-image-width:10px;padding:0}
 html.sk.ph .btn#phcam{border-width:10px;border-image-width:10px;padding:0}
 /* owner rule (8 Nov): no phone text under 14 px. Ship tags, the score strip, maneuver cards and the legend */

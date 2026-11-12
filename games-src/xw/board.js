@@ -94,13 +94,26 @@ function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ba
   if(!(typeof v3==='function'&&v3()&&G))return;const o=ov.getBoundingClientRect(),c=V3.r.domElement.getBoundingClientRect(),dx=c.left-o.left,dy=c.top-o.top,Wd=o.width,Ht=o.height;if(!(Wd>0))return;
   const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
   const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
-  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}return a};
+  const tg=[];document.querySelectorAll('#tags .tag').forEach(t=>{if(t.hidden||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)tg.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
+  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
   const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
   const ys=[yB];for(let y=yB-24;y>=60;y-=24)ys.push(y);ys.push(Math.max(m,Math.min(yB,74)));
   const cur=parseFloat(ban.dataset.py);if(cur>=0&&ban.dataset.pw==String(w)+'x'+h&&hit(left,cur)===0)ys.unshift(cur);
   for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
   ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
   clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
+// the lesson bubble: same rule as the banner. Never over a ship or its name plate, always inside the stage (viewport coords, it is position:fixed)
+BF.placeCoach=function(e){if(!e||e.hidden||!ov||!(typeof v3==='function'&&v3()&&G))return;
+  const o=ov.getBoundingClientRect(),m=8,W=innerWidth;e.style.transition='none';e.style.top='0px';const h=e.offsetHeight;
+  const bt=bar&&!bar.hidden?bar.getBoundingClientRect().top:o.bottom,lo=Math.max(o.top+m,8),hi=Math.max(lo,bt-h-6),hi2=Math.max(hi,o.bottom-h-m);
+  const rr=[];try{for(const c of BF.circ()){const R=c[2]*1.15+6;rr.push([c[0]-R,c[1]-R,c[0]+R,c[1]+R])}}catch(x){}
+  document.querySelectorAll('#tags .tag').forEach(t=>{if(getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)rr.push([q.left-4,q.top-4,q.right+4,q.bottom+4])});
+  document.querySelectorAll('.bfact,.bftgt,.bfm,[data-bf],#bffing').forEach(t=>{if(t.closest('#na-coach')||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4&&q.width<o.width*.9)rr.push([q.left-2,q.top-2,q.right+2,q.bottom+2,.01])});
+  const l=e.getBoundingClientRect(),x0=l.left,x1=l.right;
+  const area=y=>{let a=0;for(const q of rr){const ox=Math.min(x1,q[2])-Math.max(x0,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=ox*oy*(q[4]||1)}return a};
+  const ys=[];for(let y=Math.min(Math.max(50,lo),hi);y<=hi;y+=8)ys.push(y);for(let y=Math.min(Math.max(50,lo),hi)-8;y>=lo;y-=8)ys.push(y);for(let y=hi+8;y<=hi2;y+=8)ys.push(y);
+  let best=null;for(const y of ys){const a=area(y);if(best==null||a<best[0]){best=[a,y];if(!a)break}}
+  e.style.top=(best?best[1]:50).toFixed(0)+'px';clearTimeout(BF.coachT);BF.coachT=setTimeout(()=>BF.placeCoach(e),100)};
 BF.circ=()=>{const c=V3.r.domElement.getBoundingClientRect();return alive().map(s=>{const p=XY(s),q=px(p.x,p.y,1);return[q[0]+c.left,q[1]+c.top,shipR(s)]})};
 function mvLabel(m,s,deg){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return rotIco(m.d>0?a[1]:a[0],s,deg)+'<b>'+m.s+'</b>'}
 function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?rotIco('⇆',s):mvLabel(c.m,s);lay.appendChild(el);
