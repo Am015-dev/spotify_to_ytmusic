@@ -106,7 +106,7 @@ edge / leviathan / collision sinks, last junk afloat wins, sunk crews stay out, 
 | 5 | Phone play | 6 | Tiles 68-100 px, 44 px buttons, start pop-up with big buttons. But the gate sweep finds an off-screen lay button at 375x553, the coach's "Got it" sits over the board and the tap falls through (below), and the "start" label still touches the "Stop" pin. |
 | 6 | AI and pacing | 7 | Fixed: ★ now protects a newcomer, 4 wins in 6 (R29: 1 in 4), no more "under 1%" then out. Random play still sinks fast, as it should. Pacing is slow: about 15 s per round of rival play, up to 27-36 s late in a game (Skip helps). |
 | 7 | Feel | 7 | Painted chart, junks gliding, leviathans moving one by one, red sink marks, named causes. |
-| 8 | Bugs | 6 | 0 errors and 0 stuck. But the gate fails, and tapping "Got it" on a coach bubble opened a leviathan sheet underneath in 3 of 9 games. Tapping a ✗ tile gives no feedback at all (9 such taps in the random game). |
+| 8 | Bugs | 6 | 0 errors and 0 stuck. But the gate fails, and tapping "Got it" on a coach bubble opened a leviathan sheet underneath in 5 of 13 game starts. Tapping a ✗ tile gives no feedback at all (9 such taps in the random game). |
 | | **Total** | **7.1** | **FAIL**: gate FAIL; rows 5 and 8 are below 7. 8+8+8+7+6+7+7+6 = 57/8 = 7.125. No stopper. |
 
 ### Earlier findings (R29)
@@ -121,8 +121,73 @@ edge / leviathan / collision sinks, last junk afloat wins, sunk crews stay out, 
 ### New findings
 | Row | What I did | What happened | Screenshot |
 |---|---|---|---|
-| 8 / 5 | Tapped "Got it" on the coach bubble ("Your start" / "Lay a current") | The bubble closed and the same tap reached the leviathan under it: its rules sheet opened and covered "Safest start" / Place until I closed it with ✕. 3 of 9 games. | games-src/reviews/R34-shots/tw-gotit-tapthrough-sheet.jpg |
+| 8 / 5 | Tapped "Got it" on the coach bubble ("Your start" / "Lay a current") | The bubble closed and the same tap reached the leviathan under it: its rules sheet opened and covered "Safest start" / Place until I closed it with ✕. 5 of 13 game starts. | games-src/reviews/R34-shots/tw-gotit-tapthrough-sheet.jpg |
 | 8 / 5 | Deploy gate at 375x553 | Sweep: lay button `pb small sdet` off screen ("covered ... by none"). | none (gate log) |
 | 4 | Random game: tapped a ✗ tile | Nothing happens: no shake, no line saying it would sink you. | games-src/reviews/R34-shots/tw-r375-x-tile-no-feedback.jpg |
 | 6 | Full games | Rival turns take about 15 s per round; late in a game I waited up to 27-36 s with nothing to tap. | games-src/reviews/R34-shots/tw-s375-star-lost.jpg |
 | 6 (good) | Random play at 390 | Sunk on turn 2 by sailing into a leviathan, with a clear cause line: a careless player loses, a ★ player usually doesn't. | games-src/reviews/R34-shots/tw-r390-random-sunk-turn2.jpg |
+
+---
+
+## 3. vale-of-banners (shelf/W505-vale-gameplay @ 978b7f51, merge was a no-op): 7.0, FAIL
+
+Gate: **PASS** (`rules-test.js ok: AI games: 40/40 finished, stuck 0, invariant breaks 0 / PASS 37 checks`, "1/1 PASS", EXIT 0).
+
+What I played:
+- Tutorial ("New? Learn to play") at **375x667** by touch to "You know how to play / Play a real game": 49 taps (15 of them Next),
+  79 s, **0 dead taps**, 0 targets under 44 px, longest settle 2.2 s, 0 errors.
+- Full Quick games on defaults (▶ Play > Start: 2 players, Gentle rival, Hints on) to the result card:
+
+| Game | Size | How I played | Result | Time | Taps (★ taps) | Dead taps |
+|---|---|---|---|---|---|---|
+| s390 | 390x844 | always the ★ (tab, tile, die, goods, pop-up button), else the glow | **won 144-115** ("A big win, by 29 points") | 7.3 min | 175 (113) | 0 |
+| s375b | 375x667 | same | **won on the tie-break, 154-154** | 6.3 min | 170 (111) | 0 |
+| s375c | 375x667 | same | **lost 98-145** ("A clear loss ... Follow ★ Best.") | 6.9 min | 176 (111) | 0 |
+| s375 | 375x667 | same | **not finished**: round 4, the ★ pointed at a hidden goods button (below) | 13 min | 500 | 327 (all on the hidden ★ target) |
+| g375 | 375x667 | ignored the ★, tapped a random glowing thing on the screen I was on | **lost 71-123**, filled 4 regions, sold twice | 6.3 min | 143 (0) | 0 |
+
+- 0 page and console errors. Rival turns: longest wait 9-13 s.
+- Turn 1 now opens on the Market when nothing can be built (390 game; screenshot). The fitting free tiles glow.
+- (My first two vale runs stopped on a driver bug: I did not know the tile pop-up's "Take to storage" buttons. Not counted.)
+
+Rules: same as R28/R31 and right (5 seasons x 5 rounds; two dice plus the goods die; take, build, sell or workers; ±1 per worker
+with 6 and 1 next to each other; regions, colour bonus, animals, mines, tower; end scoring by silver, goods and workers). Nothing
+invented. Open point stays: the result card says "you win the tie-break" without saying which rule decided it.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. The tie-break reason is not shown. |
+| 2 | Tutorial teaches | 8 | 49 steps at 375, 0 dead taps, ends on "Play a real game". Still 15 Next-only taps. |
+| 3 | First 10 seconds | 7 | Big ▶ Play, defaults chosen, a short goal card, the first turn opens on the Market with the ★ lit. |
+| 4 | Turn clarity | 7 | Fixed: the result table and the score chips now use one list (regions / colours / animals / goods sold / tower / silver ...). Every ★ has a reason line. But a ★ follower who loses is told "Follow ★ Best." |
+| 5 | Phone play | 6 | Targets 44 px or more, 0 covered targets in 4 games. But in 1 of 3 ★ games at 375x667, after "Chain of 2. Build again", the ★ goods button (Honey) was squeezed under the dock's next row: only a sliver showed, and the ★ line said "Sell your Honey". |
+| 6 | AI and pacing | 7 | Fixed: the ★ no longer plays the game for you: 2 wins (one a tie) and 1 clear loss in 3 finished ★ games, vs 168-65 in R31. Without the ★ I lost 71-123 but filled 4 regions (R31: 0). Games 6-7 min at bot speed. |
+| 7 | Feel | 7 | Dice roll, tiles fly, region chain banner, turn rating, honest result lines. |
+| 8 | Bugs | 6 | 0 errors, gate PASS, 0 dead taps in 3 of 4 ★ games. But the hidden ★ target above: 327 taps on it did nothing in one game, and my driver could not finish it. |
+| | **Total** | **7.0** | **FAIL**: rows 5 and 8 are below 7. 8+8+7+7+6+7+7+6 = 56/8. Not counted as a stopper: other moves (4 → 2 workers, the estate) stayed open, but a ★ follower is stuck. |
+
+### Earlier findings (R31)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 6: ★ too strong (won 168-65) | **Fixed**: 144-115, 154-154 (tie-break win), 98-145 | games-src/reviews/R34-shots/vb-s390-star-won-144-115.jpg, games-src/reviews/R34-shots/vb-s375-star-tie-154.jpg, games-src/reviews/R34-shots/vb-s375-star-lost-98-145-follow-star.jpg |
+| Row 6/4: without the ★ a newcomer never finds the market, fills 0 regions | **Better**: the turn opens on the Market when nothing can be built; the no-★ player filled 4 regions but still lost 71-123 | games-src/reviews/R34-shots/vb-s390-turn1-opens-market.jpg, games-src/reviews/R34-shots/vb-g375-glow-lost-71-123.jpg |
+| Row 4: result table vs score strip use different groupings | **Fixed**: same rows in both | games-src/reviews/R34-shots/vb-s390-star-won-144-115.jpg |
+| Row 5: "Turn over" banner over the score strip | **Not re-seen** (0 covered targets in 3 finished games) | n/a |
+| Row 2: tutorial clean | **Still good**: 0 dead in 49 | games-src/reviews/R34-shots/vb-tut375-end.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 / 8 | 375x667, ★ game, round 4 after "Chain of 2. Build again" | The ★ was on "3 · 1 Honey" but the goods row was squeezed under "4 → 2 workers" (only a yellow sliver shows). The ★ line said "Sell your Honey". 327 taps on it did nothing; the game could not go on the ★ way. Seen in 1 of 3 ★ games at 375. | games-src/reviews/R34-shots/vb-s375-star-honey-hidden.jpg |
+| 4 | Followed the ★ every turn and lost 98-145 | The result line says "A clear loss, 47 points behind. Follow ★ Best." to a player who did just that. | games-src/reviews/R34-shots/vb-s375-star-lost-98-145-follow-star.jpg |
+| 1 / 4 | Tied 154-154 | "Tied on points: you win the tie-break." without saying what decided it. | games-src/reviews/R34-shots/vb-s375-star-tie-154.jpg |
+
+---
+
+## Summary
+
+| Game | Tested commit | Total | Result | Gate | Lowest rows |
+|---|---|---:|---|---|---|
+| sands-of-qamar | 2768f6dc | 7.3 | FAIL | PASS | 7 Feel 6 |
+| tidewake | 182fefe8 | 7.1 | FAIL | FAIL (sweep, 375x553) | 5 Phone 6, 8 Bugs 6 |
+| vale-of-banners | 978b7f51 | 7.0 | FAIL | PASS | 5 Phone 6, 8 Bugs 6 |
