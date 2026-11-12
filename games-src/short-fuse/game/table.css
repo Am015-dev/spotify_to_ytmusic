@@ -138,9 +138,9 @@ button.plate{cursor:pointer;font-family:inherit}
 .chip.glow{box-shadow:0 3px 0 #14163a,0 0 0 3px #ffe066,0 0 12px 3px rgba(255,224,102,.8)}
 .chip:active{transform:translateY(2px);box-shadow:0 1px 0 #14163a}
 /* my stand, along the bottom edge */
-#mine{flex:none;display:flex;justify-content:center;padding:4px 6px calc(6px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.38) 30%);--tw:50px;--th:66px}
+#mine{flex:none;display:flex;justify-content:center;padding:0 6px calc(4px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.38) 30%);--tw:50px;--th:66px}
 #mine:empty{display:none}
-#mine .sg{width:100%;gap:5px}
+#mine .sg{width:100%;gap:2px}
 #mine .stand{gap:4px}
 #mine .stand+.stand{margin-top:2px}
 #mine .sg.me.cur .stand{filter:drop-shadow(0 0 7px var(--sc))}
@@ -298,7 +298,7 @@ html .btn.small{min-height:44px}
 html .jobrow .btn{min-width:64px;min-height:48px}
 html .st-main .seg .btn{min-width:60px;min-height:46px}
 /* ---- scorecard.js: tracker, score breakdown, preview / turn-over strip ---- */
-#sc{flex:none;display:flex;flex-direction:column;gap:3px;padding:3px 8px;background:#101c26;border-bottom:1px solid rgba(255,255,255,.14);font:700 .875rem var(--fb);color:#fff}
+#sc{flex:none;display:flex;flex-direction:column;gap:2px;padding:2px 8px;background:#101c26;border-bottom:1px solid rgba(255,255,255,.14);font:700 .875rem var(--fb);color:#fff}
 #sc[hidden],#pv[hidden]{display:none}
 #sc .tr{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden}
 #sc .tr b{color:#ffe066}
@@ -394,7 +394,10 @@ html.short #sc .tr span:nth-child(2){display:none}
 #tb.zm #mine{padding-top:1px;padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
 #tb.zm #mine .sg{gap:2px}
 #crew.zm .sg.cmp .plate .pdot{display:none}
-#crew.zm .sg.cmp .plate b{max-width:58px}
+#crew.zm .sg.cmp .plate{max-width:112px}
+#crew.zm .sg.cmp .plate b{flex:0 0 auto;min-width:0;max-width:78px}
+#crew.zm .sg.cmp .plate em{flex:none}
+#crew.zm .sg.cmp .plate .star{display:none}
 
 /* tight compact rows: still-crowded short screens */
 #crew.zm.tight .sg.cmp{min-height:34px;padding-top:1px;padding-bottom:1px}

@@ -7,7 +7,7 @@ const STORY={
  quick:{
   flavour:['A new device is ticking. Cut every wire together before the fuse dies.','Quill left his brass key on this one. Prove him wrong.','The crew has one chance. Talk it through, then cut.'],
   win:['Quiet room, quiet fuse. Quill will have to try harder.','Every wire cut and not a scorch mark. Brix nods.','Defused together. The crew earned that coffee.'],
-  lose:['Quill is laughing somewhere. Shake it off and go again.','The fuse won this round. Read the tokens closer next time.','Boom. Brix says: "Everybody breathes. Again."']},
+  lose:['Quill is laughing somewhere. Shake it off and go again.','That one went off. Read the tokens closer next time.','Boom. Brix says: "Everybody breathes. Again."']},
  // the tutorial is the PROLOGUE: Brix teaches on a practice rig Quill left at the shop door
  tut:{
   chapters:[{id:1,name:'Your first turn',beat:'Quill taped a ticking rig to the shop door.'},{id:2,name:'Scoring',beat:'The crew plays. Quill is watching.'},{id:3,name:'Special cases',beat:'Quill hid a few tricks in it.'},{id:4,name:'Defused',beat:'One last cut.'}],

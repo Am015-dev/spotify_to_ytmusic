@@ -226,7 +226,7 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   if(ms.length){mine.style.maxHeight='';mine.style.overflow='';
     // my stand first, as big as it can be while the crew keeps a tile a thumb can still tap
     const capC=Math.min(52,crewFit(1e4));const MINEW=mineMinW();let pick=MINEW;
-    for(let tw=maxM;tw>=MINEW;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.34))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
+    for(let tw=maxM;tw>=MINEW;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.29))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
     setMine(pick);tm=pick}
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
@@ -268,7 +268,7 @@ function cleanCap(n){return n<=1?0:n<=4?1:2}
 // the loss line names who did it: a crewmate's red is theirs, never the player's
 function redBy(w,by){return /pointed at|probe pointed|called red/.test(w)&&by!=null&&G.seats[by]?by:null}
 function overWhy(w,by,V){w=String(w||'');if(/fuse|step|burn/i.test(w))return 'The fuse ran out';const s=redBy(w,by);
-  if(s!=null){const me=V&&V.seat===s;const nmS=me?'You':G.seats[s].nm;return nmS+(/called red/.test(w)?' called red on a wire that was not red':' pointed at a red wire')}
+  if(s!=null){const me=V&&V.seat===s;const nmS=me?'You':G.seats[s].nm;return nmS+(/called red/.test(w)?' called red on a wire that was not red':' cut a red wire')}
   if(/red/i.test(w))return 'A red wire was cut';return w.split(/\s+/).slice(0,6).join(' ')}
 function blameCrew(w,by,V){const s=redBy(String(w||''),by);if(s==null||(V&&V.seat===s))return '';const q=G.seats[s];return q.human?`${q.nm} took that risk. Go again together.`:`${q.nm} took a risky guess. Not your fault. Go again.`}
 // ---------- effects ----------
