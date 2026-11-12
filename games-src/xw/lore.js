@@ -33,7 +33,7 @@ const LORE={
     {n:3,name:'Point Blank',steps:['auto','fly2','stress','lock','shoot2','reroll','confirm','roll2']},{n:4,name:'Convoy Saved',steps:['win']}],
   // quick game: a line of flavour before the first turn and a result line in the game's voice
   quick:{intro:'The Armada hits the convoy lane. Clear the way.',win:['The raiders break and run. The convoy slips through.','Clean flying: the lane is clear.'],lose:['Your wing is gone. The convoy scatters.','The Armada owns the lane today.'],draw:'Both wings are spent. The lane stays quiet.'},
-  turn:{plan:['Round {r}: plan','Choose a move for each of your ships.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
+  turn:{plan:['Round {r}: plan your move','Tap your ship, pick a move, then tap Fly.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
 
 // coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
 LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One rule at a time.',btn:'Start'};

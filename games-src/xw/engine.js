@@ -357,9 +357,12 @@ function checkWin(){if(G.winner)return true;const a=[0,1].map(k=>G.ships.some(s=
   if(a[0]&&a[1])return missionCheck();
   if(!a[0]&&!a[1]){const w=G.init;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: both squadrons were destroyed together, and ${sideName(w)} has initiative.`}else{const w=a[0]?0:1;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: every enemy ship is destroyed.`}
   G.phase='over';G.step=5;lg(-1,G.winText);return true}
-function missionCheck(){if(G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));const hp=k=>G.ships.filter(s=>s.side===k&&s.alive).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);// health left: breaks a tie on points
-    const w=sc[0]!==sc[1]?(sc[0]>sc[1]?0:1):hp(0)!==hp(1)?(hp(0)>hp(1)?0:1):-1,byHp=sc[0]===sc[1];
-    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?'Time: a draw on points destroyed.':byHp?`Time: ${sideName(w)} wins with more health left (${hp(w)} to ${hp(1-w)}).`:`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
+// Base game: no round limit, fight until one side has no ships. Optional (off by default) tournament-style clock: when time is
+// called the round in progress is finished, then more points destroyed wins and equal points is a draw [#35, rules-notes T1].
+// ex.roundCap is the same scoring at a set round (campaign chapters only).
+function missionCheck(){const clock=G.ex.clockMin&&G.t0&&G.phase==='end'&&Date.now()-G.t0>=G.ex.clockMin*60000;if(clock||G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));
+    const w=sc[0]===sc[1]?-1:sc[0]>sc[1]?0:1;
+    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?`Time: a draw on points destroyed (${sc[0]} each).`:`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
 function endPhase(){G.phase='end';G.step=4;G.inCombat=false;for(const s of alive())if(s.flags.doomed&&hullDmg(s)>=s.hull)destroy(s,`${sname(s)} finally breaks apart.`);if(checkWin()){refresh();return}
   for(const s of alive()){if(!exKeepFocus(s))s.focus=0;else if(s.focus)mark('kite');s.evade=0;s.flags.juke=false;s.flags.dead=false;s.flags.allin=false;s.flags.psT=null}// [R13] unused focus/evade tokens are removed; target locks stay
   exEndPhase(()=>{G.phase='end';if(!checkWin()){lg(-1,`End of round ${G.round}.`);if(ANIM)setTimeout(()=>{if(G&&!G.winner)startRound()},AIDELAY*.8);else startRound()}refresh()})}

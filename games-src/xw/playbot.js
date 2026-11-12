@@ -1,11 +1,12 @@
 // UI-only player: plays a Quick game (or Story chapter 1) to the result by tapping only visible, uncovered UI. No engine shortcuts.
-//   node playbot.js [quick|story] [WxH]   env: URL (served page, ends with /), CHROME, SHOTS=dir to save screens, FRESH=1
+//   node playbot.js [quick|story] [WxH]   env: URL (served page, ends with /), CHROME, SHOTS=dir to save screens, FRESH=1,
+//   SUG=1: a newcomer who always takes the ★ suggested move (the dial opens on it) and the recommended action/target
 const PW=(()=>{try{return require('/opt/node22/lib/node_modules/playwright')}catch(e){return require('../node_modules/playwright')}})();
 const fs=require('fs');
 const MODE=process.argv[2]||'quick',[W,H]=(process.argv[3]||'390x763').split('x').map(Number);
 const URL=process.env.URL,SHOTS=process.env.SHOTS;if(SHOTS)fs.mkdirSync(SHOTS,{recursive:true});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const SEL=['[data-ph=x]','[data-bf=brief]','.bfring.need','.bfm:not(.danger):not(.set)','[data-bf=fly]:not([disabled])','.bfact.rec','.bfact:not(.skip)','.bftgt','.bfm.w','#bfbtns [data-bfq=ok]','#bfbtns .btn.primary:not([disabled])','.bfspot.rec','[data-a=autoplace]'];
+const SEL=['[data-ph=x]','[data-bf=brief]','.bfring.need',...(process.env.SUG?['.bfm.sug:not(.danger):not(.set)','.bffing-target']:[]),'.bfm:not(.danger):not(.set)','[data-bf=fly]:not([disabled])','.bfact.rec','.bfact:not(.skip)','.bftgt','.bfm.w','#bfbtns [data-bfq=ok]','#bfbtns .btn.primary:not([disabled])','.bfspot.rec','[data-a=autoplace]'];
 (async()=>{const b=await PW.chromium.launch({executablePath:process.env.CHROME||undefined,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const mob=W<700;const ctx=await b.newContext({viewport:{width:W,height:H},hasTouch:mob,isMobile:mob});const p=await ctx.newPage();p.setDefaultTimeout(20000);
  const errs=[];p.on('pageerror',e=>errs.push('PAGE '+e.message));p.on('console',m=>{const t=m.text();if(m.type()==='error'&&!/net::|Failed to load|favicon|fonts\.g/.test(t))errs.push('console '+t.slice(0,150))});
