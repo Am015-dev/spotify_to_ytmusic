@@ -128,6 +128,8 @@ function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chips
     const cls=`bfa ${c.risk} ${c.cur?'cur':''} ${c.done?'done':''}`;const lab=`${E(actLabel(c.a))}${c.rm?' (tap to take back)':''}`;
     return c.rm?`<button class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" data-rm="${c.rm}" aria-label="${lab}">${inner}</button>`:`<div class="${cls}" style="--d:${j*(st==='story'?420:90)}ms" title="${lab}">${inner}</div>`}).join('')}</div>`).join('');
   BF.place()}
+// a tap that misses every glowing place (the camera was still easing, or it fell on a neighbour) lands on the nearest glowing place within a thumb's reach
+BF.snap=function(x,y,id){if(!BF.on||!UI.pick||!UI.pick.length||(id!=null&&UI.pick.includes(id)))return null;let best=null,bd=46;for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-x,r.top+r.height/2-y);if(d<bd){bd=d;best=g}}return best?+best.dataset.t:null};
 BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const tr=Math.round(p.x-26)+','+Math.round(p.y-26);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-26)+'px';g.style.top=Math.round(p.y-26)+'px'}}
   const host=q('#bfchips');if(!host)return;for(const g of host.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const w=g.offsetWidth,h=g.offsetHeight;
     const below=+g.dataset.t===(G&&G.camp?G.camp.pos:-1)&&g.children.length>0&&g.dataset.below==='1';let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=below?Math.min(p.h-h-2,p.y+16):Math.max(2,Math.min(p.h-h-2,p.y-h-4));const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
@@ -238,6 +240,8 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(G.round>1&&!BF.ghostDone){BF.ghostDone=true}
   // a new scene: the island shows what happened
   if(st==='story'){const i=storyIdx();if(i>=0){const b=UI.beats[i];const key=b.id+':'+(i>=UI.beats.length-1&&humanQ()?G.q.title:'');if(BF.fxId!==key){BF.fxId=key;BF.cardClear();BF.beatFx(i);BF.card(i);BF.autoSet(i);if(i>=UI.beats.length-1&&humanQ())BF.qFx()}}}else{BF.fxId=null;BF.cardClear();clearTimeout(BF.autoT);BF.autoT=null}
+  // a 'tap a glowing space' question: the event card must not sit on top of the places (taps and eyes), so it steps aside
+  {const cd=q('#bfcard');if(cd)cd.classList.toggle('bfq',st==='story'&&!!posQ())}
   // the pop-up sits on the half of the island away from the place
   const pp=q('#ppop'),bd=q('.gx-board');if(pp&&!pp.hidden&&PHO.pop&&PHO.pop.k==='tile'&&bd){const p=tilePt(PHO.pop.id);const br=bd.getBoundingClientRect();pp.classList.toggle('top',!!p&&p.y+p.oy-br.top>br.height*.5)}
   // the camp chip flashes when a number changes

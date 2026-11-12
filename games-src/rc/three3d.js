@@ -617,4 +617,4 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   draw()}
 function pickTile(e){const rc=V3.r.domElement.getBoundingClientRect();const m=new THREE.Vector2(((e.clientX-rc.left)/rc.width)*2-1,-((e.clientY-rc.top)/rc.height)*2+1);const ray=new THREE.Raycaster();ray.setFromCamera(m,V3.cam);
   const hits=ray.intersectObjects(Object.values(V3.tiles).map(o=>o.g),true);if(!hits.length)return null;for(const h of hits){let o=h.object;while(o&&o.userData.id===undefined)o=o.parent;if(o)return o.userData.id}return null}
-function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(null);return}if(typeof on3DTile==='function')on3DTile(id)}
+function onClick3D(e){let id=pickTile(e);if(typeof BF!=='undefined'&&BF.snap){const s=BF.snap(e.clientX,e.clientY,id);if(s!=null)id=s}if(id==null){if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(null);return}if(typeof on3DTile==='function')on3DTile(id)}

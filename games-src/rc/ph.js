@@ -43,7 +43,9 @@ function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():n
   const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
   case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}
 function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()}`});return t}
-PHO.sync=function(){if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
+function ppCue(){const pp=q('#ppop');if(!pp||pp.hidden)return;const b=pp.querySelector('.pp-b');if(!b)return;pp.classList.toggle('more',b.scrollHeight>b.clientHeight+6&&b.scrollTop+b.clientHeight<b.scrollHeight-6)}
+document.addEventListener('scroll',e=>{if(e.target&&e.target.classList&&e.target.classList.contains('pp-b'))ppCue()},true);
+PHO.sync=function(){requestAnimationFrame(ppCue);if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
     const lb=q('#phlabel');if(lb&&!(typeof BF!=='undefined'&&BF.on))lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
@@ -88,7 +90,7 @@ function popContent(){const p=PHO.pop;if(!p||!G)return null;
     const t=tileAt(id);return {title:t?`Place ${id+1} · ${t.terr}`:`Place ${id+1}`,html:h,cls:'tile'}}
   return null}
 PHO.tileRows=tileRows;
-PHO.openPop=function(p){PHO.pop=p;PHO.popSig=G?planSig():'';PHO.popOpen=true;renderPop();const b=q('#ppop .pp-b');if(b)b.scrollTop=0};
+PHO.openPop=function(p){if(!PHO.pop||PHO.pop.k!==p.k||PHO.pop.id!==p.id){PHO.popT=Date.now();PHO.popGuard=true}PHO.pop=p;PHO.popSig=G?planSig():'';PHO.popOpen=true;renderPop();const b=q('#ppop .pp-b');if(b)b.scrollTop=0};
 PHO.closePop=function(quiet){const was=PHO.pop;PHO.pop=null;const hud=q('#hud');if(hud&&hud.parentNode&&hud.parentNode.classList.contains('pp-b')){const body=q('.gx-dock-body');if(body)body.insertBefore(hud,body.firstChild)}
   if(typeof V3!=='undefined')V3.hover=null;const pp=q('#ppop');if(pp){pp.hidden=true;pp.innerHTML='';pp.dataset.h=''}if(was&&was.k==='tile'&&!quiet){UI.tileSel=null;if(typeof render==='function')render()}};
 function renderPop(){const pp=q('#ppop');if(!pp)return;if(!PHO.pop){if(!pp.hidden){pp.hidden=true;pp.innerHTML=''}return}
@@ -109,6 +111,9 @@ PHO.tile=function(id){if(!PHO.on)return;if(id==null){if(PHO.pop&&(PHO.pop.k==='t
 function closeZoom(){PHO.zoom=false;const z=q('#pzoom');if(z){z.hidden=true;z.innerHTML=''}}
 function openZoom(el){const z=q('#pzoom');if(!z)return;const c=el.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));c.removeAttribute('data-pos');
   z.innerHTML=`<div class="zc" role="document"><button class="gx-ibtn zc-x" data-ph="zclose" aria-label="Close the card">×</button><div class="zc-b ${[...el.classList].join(' ')}">${c.innerHTML}</div></div>`;z.hidden=false;PHO.zoom=true}
+// the click that ends the tap which OPENED a pop-up must not land on the pop-up (it can now sit under the finger, with its close button or a job row right there)
+document.addEventListener('pointerdown',()=>{PHO.popGuard=false},true);
+document.addEventListener('click',e=>{if(PHO.popGuard&&PHO.pop&&Date.now()-(PHO.popT||0)<1500&&e.target.closest&&e.target.closest('#ppop')){PHO.popGuard=false;e.stopPropagation();e.preventDefault()}},true);
 function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
   if(t.closest('#phlabel')&&G){PHO.pop&&PHO.pop.k==='status'?PHO.closePop():PHO.openPop({k:'status'});return}
   const b=t.closest('[data-ph]');

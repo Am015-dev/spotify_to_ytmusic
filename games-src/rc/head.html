@@ -657,9 +657,12 @@ html.bf #bfgh:not([hidden]){display:block;position:fixed;z-index:70;width:44px;h
 @keyframes bfTap{0%,100%{transform:translate(10px,14px)}45%{transform:translate(2px,2px) scale(.88)}60%{transform:translate(2px,2px) scale(.88)}}
 @keyframes bfRing{0%,35%{opacity:0;transform:scale(.4)}50%{opacity:1}100%{opacity:0;transform:scale(1.7)}}
 /* the pop-up for a place lies over the island, away from that place */
-html.bf #ppop:not([hidden]){inset:auto 8px 8px 8px;max-height:min(52%,300px);border-radius:14px;border:2px solid #b99f67;box-shadow:0 10px 30px rgba(0,0,0,.55);overflow:hidden}
+html.bf #ppop:not([hidden]){inset:auto 8px 8px 8px;max-height:calc(100% - 16px);border-radius:14px;border:2px solid #b99f67;box-shadow:0 10px 30px rgba(0,0,0,.55);overflow:hidden}
 html.bf #ppop.top:not([hidden]){inset:8px 8px auto 8px}
 html.bf #ppop.st:not([hidden]){inset:6px;max-height:none}
+/* scroll cue: a fade and a label while there is more below */
+html.bf #ppop.more::after{content:'\25BE  Scroll for more';position:absolute;left:0;right:0;bottom:0;height:40px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font:800 13px/1 var(--sans);letter-spacing:.04em;color:#6a4a14;background:linear-gradient(rgba(247,230,190,0),rgba(247,230,190,.97) 70%);pointer-events:none;z-index:3}
+html.bf #ppop.more .pp-b{padding-bottom:40px}
 html.bf #ppop .pp-h{min-height:44px}
 .bfrows{display:flex;flex-direction:column;gap:6px}
 .bfr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:6px 12px;border-radius:12px;border:1px solid #b99f67;background:#fffaf0;color:#2a2014;font:700 16px var(--sans);text-align:left;cursor:pointer;width:100%}
@@ -673,6 +676,8 @@ html.bf #ppop .pp-h{min-height:44px}
 @keyframes bfGl{50%{transform:scale(1.18);opacity:.65}}
 /* event card flip, rain, flying gains */
 .bfcard{position:absolute;left:10px;top:52px;width:168px;height:104px;z-index:8;pointer-events:auto;perspective:700px;cursor:pointer;touch-action:manipulation;-webkit-touch-callout:none;user-select:none}
+.bfcard.bfq{display:none!important}
+.btn.sm.pileb{padding:6px 12px;border-width:4px}
 .bfcard .in{width:100%;height:100%;animation:bfFlip .75s cubic-bezier(.2,.8,.3,1) both;transform-style:preserve-3d}
 .bfcard .fr{position:absolute;inset:0;border-radius:14px;background:linear-gradient(#fff4d8,#f1d9a2);border:3px solid #b8863a;box-shadow:0 8px 22px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 8px;text-align:center;color:#2a2014}
 .bfcard .bfic{font-size:34px;line-height:1;letter-spacing:2px}.bfcard .bftt{font:800 15px/1.1 var(--sans)}
