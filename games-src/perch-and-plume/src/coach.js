@@ -1,111 +1,143 @@
-// ===================== the coached first game (tutorial): 1 round, 4 turns vs Pip, free choices from turn 1. Each turn Ottilie
-// teaches ONE action (play a bird, get food, lay eggs, draw birds) in one sentence and points at its big button (COACH.point);
-// the player may pick any action, and the lesson they skipped comes next turn. Then the score is walked through with real numbers.
-// Aunt Ottilie explains each rule the first time it matters (rule ids = TUTORIAL-COVERAGE.md), says one line on a good or poor move,
-// and on what Pip does. One bubble at a time, never blocks a tap (only its x button takes taps), dismissable. Text: story.js STORY.coach.
-var COACH = { on: false, done: {}, q: [], cur: null, t: 0, flags: {}, point: null, turnKey: null };
-// the shelf's coached-game hook (qa-bot and tests read it): running, rule ids explained so far, done once the score walk-through shows
-window.GXCOACH = { get running() { return coachOn() && G.phase !== 'over'; }, get explained() { return Object.keys(COACH.done); }, get done() { return !!COACH.finished; } };
+// ===================== the guided first game (tutorial): 1 round of 4 turns vs Pip, then the score, then a real game.
+// A fixed list of steps teaches every core rule in order. Each step = one sentence (max 12 words, STORY.coach) and ONE highlighted
+// thing to tap (class .tutpoint); taps elsewhere are blocked while that step waits. "See" steps (info) advance when their target is
+// tapped; action steps advance when the game state shows the action happened. Board set-up: tutor.js (tutPick / tutPrep).
+var COACH = { on: false, i: 0, done: {}, cur: null, iv: 0, finished: false, snap: 0, tapped: false };
+// the shelf's coached-game hook (qa-bot and tests read it): running, step ids taught so far, done once the last step is reached
+window.GXCOACH = { get running() { return coachOn() && G.phase !== 'over'; }, get explained() { return Object.keys(COACH.done); }, get done() { return !!COACH.finished; }, get step() { var s = TSTEPS[COACH.i]; return s ? s.id : null; } };
 function coachOn() { return COACH.on && G && UI.mode === 'tutfree'; }
-function coachReset() { COACH.on = true; COACH.done = {}; COACH.q = []; COACH.flags = {}; COACH.point = null; COACH.turnKey = null; COACH.turn = 0; COACH.finished = false; COACH.learned = {}; coachHide(); }
-function coachHide() { clearTimeout(COACH.t); if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; }
-// explain a rule once (id from STORY.coach), or say a one-off line (id starting with '!')
-function coach(id, extra, sticky) {
-  if (!coachOn()) return;
-  if (id[0] !== '!') { if (COACH.done[id]) return; COACH.done[id] = 1; }
-  var t = id[0] === '!' ? id.slice(1) : STORY.coach[id]; if (!t) return;
-  var it = { id: id, text: (sticky && sticky.pre ? sticky.pre : '') + t + (extra ? ' ' + extra : ''), sticky: !!sticky };
-  if (sticky) { COACH.q = COACH.q.filter(function (x) { return !x.sticky; }); COACH.q.unshift(it); coachNext(); return; }
-  COACH.q.push(it);
-  if (!COACH.cur || COACH.cur.dataset.sticky) coachNext();
+function tvis(e) { if (!e || !e.isConnected) return false; for (var x = e; x; x = x.parentElement) { if (x.hidden || getComputedStyle(x).display === 'none') return false; } var r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
+function tq(sel) { return $$(sel).filter(tvis)[0] || null; }
+function tPlaying() { return myTurn() && !UI.busy && G.phase !== 'over' && !document.querySelector('.turnban,.reveal') && !tvis($('#result')); }
+function tResult() { return tvis($('#result')); }
+function tHandCard(id) { var i = G.pl[UI.view].hand.indexOf(id); return i < 0 ? null : tq('#hand [data-a="hand"][data-i="' + i + '"]'); }
+function tOnBoard(id) { var b = G.pl[UI.view].board; for (var r = 0; r < 3; r++) for (var c = 0; c < b[r].length; c++) if (b[r][c].id === id) return [r, c]; return null; }
+function tQ(h) { return !!(G.q && G.q.h === h && PP.sideToAct(G) === UI.view); }
+// the steps, in teaching order. t() = the one element to tap; done() = the step is over (info steps: their target was tapped).
+var TSTEPS = [
+  { id: 'goal', info: 1, t: function () { return tq('#opps .sline') || tq('#opps'); } },
+  { id: 'turns', info: 1, t: function () { return tq('#trk'); } },
+  { id: 'play', t: function () { return tq('.a4[data-k="play"]'); }, done: function () { return UI.pickBird || UI.sel != null || !!tOnBoard(TUT.ids.play); } },
+  { id: 'cost', t: function () { return tHandCard(TUT.ids.play); }, done: function () { return UI.sel != null || !!tOnBoard(TUT.ids.play); } },
+  { id: 'slot', t: function () { return tq('.row[data-h="1"] .slot.glow') || tq('.slot.glow'); }, done: function () { return !!UI.pend || !!tOnBoard(TUT.ids.play); } },
+  { id: 'pay', t: function () { return tq('#acts [data-a="playgo"]'); }, done: function () { return !!tOnBoard(TUT.ids.play); } },
+  { id: 'white', info: 1, t: function () { var rc = tOnBoard(TUT.ids.play); var e = rc && tq('#mat [data-a="bird"][data-h="' + rc[0] + '"][data-c="' + rc[1] + '"]'); return e && (e.closest('.slot') || e); } },
+  { id: 'rgoal', info: 1, t: function () { return tq('#trk .tr-g'); } },
+  { id: 'food', t: function () { return tq('.a4[data-k="food"]'); }, done: function () { return tQ('die') || tQ('pwTuck') || COACH.acted.food; } },
+  { id: 'die', t: function () { return tq('#feeder .die.glow'); }, enter: function () { COACH.snap = G.feeder.filter(Boolean).length; }, done: function () { return !tQ('die') || G.feeder.filter(Boolean).length < COACH.snap; } },
+  { id: 'die2', t: function () { return tq('#feeder .die.glow'); }, done: function () { return !tQ('die'); } },
+  { id: 'tuck', t: function () { return tq('#hand [data-a="hand"]'); }, done: function () { return !tQ('pwTuck'); } },
+  { id: 'cache', info: 1, t: function () { return tq('#mat .row[data-h="0"]'); } },
+  { id: 'eggs', t: function () { return tq('.a4[data-k="eggs"]'); }, done: function () { return tQ('egg') || COACH.acted.eggs; } },
+  { id: 'nest', t: function () { return tq('#mat .glow'); }, done: function () { return !tQ('egg'); } },
+  { id: 'pink', info: 1, t: function () { return tq('#opps .opp') || tq('#opps'); } },
+  { id: 'cards', t: function () { return tq('.a4[data-k="cards"]'); }, done: function () { return tQ('draw') || COACH.acted.cards; } },
+  { id: 'tray', t: function () { return tq('#tray .glow'); }, done: function () { return !tQ('draw'); } },
+  { id: 'goalr', res: 1, info: 1, t: function () { return tq('#result .walk li[data-k="goals"]'); } },
+  { id: 'bonus', res: 1, info: 1, t: function () { return tq('#result .walk li[data-k="bonus"]'); } },
+  { id: 'final', res: 1, info: 1, t: function () { return tq('#result .walk li.tot'); } },
+  { id: 'real', res: 1, t: function () { return tq('#result #again'); }, done: function () { return false; } }
+];
+function coachReset() { COACH.on = true; COACH.i = 0; COACH.done = {}; COACH.finished = false; COACH.tapped = false; COACH.acted = {}; COACH.entered = -1; coachHide(); clearInterval(COACH.iv); COACH.iv = setInterval(coachTick, 200); }
+function coachHide() { if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); }); }
+function coachStep() { return TSTEPS[COACH.i] || null; }
+function coachReady(s) { return s && (s.res ? tResult() : s.info ? tSee(s) : tPlaying()); }
+// a "see" step about your own board shows as soon as the animations stop, even before your next turn (the rival waits for it)
+function tSee(s) { return !UI.busy && G.phase !== 'over' && !document.querySelector('.turnban,.reveal') && !tvis($('#result')) && !!s.t(); }
+// flow.js pump(): hold the rival's turn while a "see" step waits for its tap, so the marker is never late
+function coachHold() { if (!coachOn()) return false; var s = coachStep(); return !!(s && s.info && !s.res && G.phase === 'play' && s.t()); }
+// between steps (rival's turn, round end): say so, instead of a silent gap
+function coachWait(s) {
+  if (COACH.cur && COACH.cur.dataset.rule === 'wait' && COACH.cur.isConnected) return;
+  if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
+  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.dataset.rule = 'wait';
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + (COACH.i + 1) + ' of ' + TSTEPS.length + '</b>' + esc(s.res ? 'The round ends. Your score comes next.' : 'Pip plays. Your next step comes right after.') + '</span><em class="skipw">Tap to skip</em>';
+  d.style.cursor = 'pointer'; d.addEventListener('click', function () { UI.speed = 25; $$('.turnban').forEach(function (b) { b.click(); }); });   // the wait never holds you: a tap plays the rest at once
+  var host = $('#dockbody'), at = $('#prompt'); if (host && at) at.parentNode.insertBefore(d, at); else return;
+  COACH.cur = d;
 }
-function coachNext() {
-  coachHide(); var it = COACH.q.shift(); if (!it) return;
-  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = it.id;
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Aunt Ottilie</b>' + esc(cap1(it.text)) + '</span><button type="button" class="coachx" aria-label="Dismiss">×</button>';
-  d.querySelector('.coachx').addEventListener('click', function (e) { e.stopPropagation(); coachNext(); });
-  if (it.sticky) d.dataset.sticky = '1';
-  var host = document.getElementById('dockbody'), at = document.getElementById('prompt'); if (host && at) host.insertBefore(d, at); else document.body.appendChild(d); COACH.cur = d;   // in the panel, above the instruction bar: it never covers the board
-  if (it.sticky) return;
-  var ms = UI.fast ? 400 : Math.max(4200, it.text.length * 55);
-  COACH.t = setTimeout(coachNext, ms);
+// one bubble: the step's sentence, in the panel above the instruction bar (or above the score walk-through on the result screen)
+function coachSay(s) {
+  var txt = STORY.coach[s.id] || '', n = COACH.i + 1;
+  if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.isConnected) return;
+  if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
+  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
+  var host, at;
+  if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
+  else { host = $('#dockbody'); at = $('#prompt'); }
+  if (host && at && at.parentNode === host) host.insertBefore(d, at); else if (host && at) at.parentNode.insertBefore(d, at); else document.body.appendChild(d);
+  COACH.cur = d;
+  var nb = d.querySelector('[data-coach-next]'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); COACH.tapped = true; setTimeout(coachTick, 0); });
 }
-// effects as they play (called from playFx for every event)
-function coachFx(e, mine) {
-  if (!coachOn()) return;
-  var me = UI.view;
-  switch (e.k) {
-    case 'action':
-      if (mine) { COACH.learned = COACH.learned || {}; COACH.learned[['food', 'eggs', 'cards'][e.h]] = 1; coach(['food', 'eggs', 'cards'][e.h]); if (e.h === 2 && G.pl[me].hand.length >= 6) coach('!' + STORY.coachMove.poorDraw); }
-      else { coach('rival', G.pl[e.seat].name + ' used the ' + HABN[e.h] + '.'); }
-      break;
-    case 'chainStart': if (mine && e.n >= 1) coach('chain'); break;
-    case 'pw':
-      if (e.pink) coach('pink');
-      else if (mine && (/cache|tuck/.test(e.txt || ''))) coach('cache');
-      break;
-    case 'play':
-      if (mine) {
-        COACH.learned = COACH.learned || {}; COACH.learned.play = 1;
-        var pw = PP.power(e.id); if (pw.col === 'white') coach('white');
-        if (!COACH.flags.played) { COACH.flags.played = 1; coach('!' + STORY.coachMove.goodPlay); }
-      } else coach('rival', G.pl[e.seat].name + ' played a bird.');
-      break;
-    case 'roll': coach('feederRoll'); break;
-    case 'goal': coach('goal'); break;
-    case 'round': coach('round'); break;
+// advance through finished steps, then show the current one and mark its target
+function coachTick() {
+  if (!coachOn()) { if (COACH.cur) coachHide(); return; }
+  var guard = 0, s;
+  while ((s = coachStep()) && guard++ < 30) {
+    if (COACH.entered !== COACH.i && coachReady(s)) { COACH.entered = COACH.i; COACH.tapped = false; if (s.enter) s.enter(); }
+    if (COACH.entered !== COACH.i) break;
+    var fin = s.info ? COACH.tapped : (s.done ? s.done() : false);
+    if (!fin) break;
+    COACH.done[s.id] = 1; COACH.i++;
+  }
+  s = coachStep();
+  $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); });
+  if (!s) return;
+  if (s.id === 'real') COACH.finished = true;
+  if (!coachReady(s)) { if (!myTurn() || s.res || UI.busy) coachWait(s); return; }
+  coachSay(s);
+  var t = s.t(); if (t) { t.classList.add('tutpoint'); tInView(t); }
+}
+// R12/R27: a step's target is always fully visible AND tappable while its step waits: scroll every scrollable ancestor (the dock panel
+// included) until the target sits inside it, and keep doing so each tick (the panel can re-flow when the bubble or prompt changes)
+function tScroller(e) { for (var x = e.parentElement; x && x !== document.body; x = x.parentElement) { var o = getComputedStyle(x).overflowY; if ((o === 'auto' || o === 'scroll') && x.scrollHeight > x.clientHeight + 1) return x; } return null; }
+function tInView(t) {
+  var bar = document.querySelector('.gx-bar'), top = bar ? bar.getBoundingClientRect().bottom : 0;
+  for (var k = 0; k < 4; k++) {
+    var r = t.getBoundingClientRect(), sc = tScroller(t), lo = top, hi = window.innerHeight;
+    if (sc) { var c = sc.getBoundingClientRect(); lo = Math.max(lo, c.top + 2); hi = Math.min(hi, c.bottom - 2); }
+    var d = 0; if (r.top < lo) d = r.top - lo; else if (r.bottom > hi) d = r.bottom - hi;
+    if (r.height > hi - lo && r.top >= lo) return;   // taller than the panel: its top is in view, that is the best we can do
+    if (!d) return;
+    if (sc) sc.scrollTop += d; else window.scrollBy(0, d);
   }
 }
-// state checks after each render (what the player is being asked right now)
-function coachState() {
-  if (!coachOn() || !myTurn()) return;
-  var Q = G.q;
-  coachLesson();
-  if (UI.sel != null) coach('play');
-  if (UI.pend) coach('pay');
-  if (Q && Q.h === 'die') coach('feeder');
-  if (Q && Q.h === 'egg') coach('nest');
-  if (Q && Q.h === 'draw') coach('tray');
-  if (Q && Q.h === 'bonus') coach('trade');
-  if (Q && (Q.h === 'pwTuck' || Q.h === 'pwTrade' || Q.h === 'play2')) coach('choice');
-  if (!Q && PP.allSame(G)) coach('reroll');
-  if (!Q && G.pl[UI.view].hand.length === 0) coach('emptyHand');
-}
-// one lesson per turn: the first action not yet learned that is possible now; its rule line is said once, as a sticky bubble,
-// and its big button gets the pointer. Turn 1 = welcome (play a bird).
-var LESSONS = [['play', 'welcome'], ['food', 'food'], ['eggs', 'eggs'], ['cards', 'cards']];
-function coachLesson() {
-  var p = G.pl[UI.view], key = G.round + ':' + p.cubes; if (G.q || UI.sel != null || UI.pend || UI.pickBird) { if (G.q) COACH.point = null; return; }
-  if (COACH.turnKey === key) return;
-  COACH.turnKey = key; COACH.turn = (COACH.turn || 0) + 1; COACH.learned = COACH.learned || {};
-  var inf = actInfo(G, UI.view), L = LESSONS.find(function (l) { return !COACH.learned[l[0]] && inf[l[0]].ok; });
-  COACH.point = L ? L[0] : null;
-  var total = G.cubes[G.round] || 4, n = total - p.cubes + 1, pre = (n >= total ? 'Last turn' : 'Turn ' + n + ' of ' + total) + ': ';
-  if (L && !COACH.done[L[1]]) coach(L[1], '', { pre: pre });
-  else if (L) coach('!' + pre + STORY.coachLesson[L[0]], '', { pre: '' });
-  else coach('!' + pre + STORY.coachMove.free, '', { pre: '' });
-  if (myTurn() && !G.q && $('#act4')) $('#acts').innerHTML = act4HTML();   // redraw the buttons with Ottilie's pointer
-}
-function coachRate(grade, ch) {
+// while a step waits for its tap, only its target (and the header) takes taps; a tap elsewhere pulses the target instead
+document.addEventListener('click', function (e) {
   if (!coachOn()) return;
-  if (COACH.point && ch !== COACH.point) coach('!' + STORY.coachMove.other);
+  var s = coachStep(); if (!s || COACH.entered !== COACH.i) return;
+  var t = s.t(); if (!t) return;
+  if (s.info && t.contains(e.target)) { e.stopPropagation(); e.preventDefault(); COACH.tapped = true; setTimeout(coachTick, 0); return; }   // a "see" step: the tap only advances, never opens the card
+  if (!coachReady(s)) return;
+  if (t.contains(e.target)) {
+    if (s.info) { e.stopPropagation(); e.preventDefault(); COACH.tapped = true; setTimeout(coachTick, 0); }
+    else setTimeout(coachTick, 0);
+    return;
+  }
+  if (e.target.closest && e.target.closest('[data-coach-next],.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x,#pop')) return;   // a card zoom can always be closed
+  e.stopPropagation(); e.preventDefault();
+  t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse'); t.setAttribute('data-nudge', ((t.getAttribute('data-nudge') || '') + '.').slice(-60));   // the pulse is the answer to a stray tap; a changing attribute makes it a visible change for the audit
+}, true);
+// effects as they play (flow.js calls this for every event): remember which row actions you took
+function coachFx(e, mine) {
+  if (!coachOn()) return;
+  if (e.k === 'action' && mine) COACH.acted[['food', 'eggs', 'cards'][e.h]] = 1;
 }
-function coachRules() { return Object.keys(STORY.coach); }
-// end of the coached game: the score walked through rule by rule with the real numbers, then "Things you'll meet later"
+function coachState() { if (coachOn()) coachTick(); }
+function coachRate() { }
+function coachRules() { return TSTEPS.map(function (s) { return s.id; }); }
+// end of the guided game: the score walked through with the real numbers (the result steps point at these lines)
 function coachResultHTML(sc, me) {
   var s = sc[me], p = G.pl[me], nb = PP.birds(p).length, eggs = PP.birds(p).reduce(function (a, x) { return a + x.s.eggs; }, 0);
-  ['final', 'tie'].forEach(function (k) { COACH.done[k] = 1; }); COACH.finished = true;
   var rows = [
-    ['Birds', s.birds, 'the points printed on your ' + nb + ' bird' + (nb === 1 ? '' : 's')],
-    ['Eggs', s.eggs, eggs + ' egg' + (eggs === 1 ? '' : 's') + ', 1 point each'],
-    ['Round goals', s.goals, 'from the goal judged at the end of each round'],
-    ['Bonus card', s.bonus, 'your secret card\'s condition'],
-    ['Stored food', s.cache, s.cache + ' food stored on your birds, 1 point each'],
-    ['Tucked cards', s.tuck, s.tuck + ' card' + (s.tuck === 1 ? '' : 's') + ' tucked behind your birds, 1 point each']
+    ['birds', 'Birds', s.birds, 'the points printed on your ' + nb + ' bird' + (nb === 1 ? '' : 's')],
+    ['eggs', 'Eggs', s.eggs, eggs + ' egg' + (eggs === 1 ? '' : 's') + ', 1 point each'],
+    ['goals', 'Round goal', s.goals, 'most grassland birds at round end'],
+    ['bonus', 'Bonus card', s.bonus, 'your secret card, scored at the end'],
+    ['cache', 'Stored food', s.cache, '1 point each'],
+    ['tuck', 'Tucked cards', s.tuck, '1 point each']
   ];
-  var later = coachRules().filter(function (k) { return !COACH.done[k]; });
-  var h = '<div class="walk"><b>Your score, rule by rule</b><ol>' + rows.map(function (r) { return '<li><span>' + esc(r[0]) + '</span><b>' + r[1] + '</b><small>' + esc(r[2]) + '</small></li>'; }).join('') +
-    '<li class="tot"><span>Total</span><b>' + s.total + '</b><small>' + esc(STORY.coach.tie) + '</small></li></ol></div>';
-  if (later.length) h += '<div class="later" data-later="' + later.join(',') + '"><b>Things you\'ll meet later</b><ul>' + later.map(function (k) { return '<li data-rule="' + k + '">' + esc((STORY.later && STORY.later[k]) || cap1(STORY.coach[k])) + '</li>'; }).join('') + '</ul></div>';
-  return h;
+  return '<div class="walk"><b>Your score, rule by rule</b><ol>' + rows.map(function (r) { return '<li data-k="' + r[0] + '"><span>' + esc(r[1]) + '</span><b>' + r[2] + '</b><small>' + esc(r[3]) + '</small></li>'; }).join('') +
+    '<li class="tot"><span>Total</span><b>' + s.total + '</b><small>A tie? Most unused food wins.</small></li></ol></div>';
 }
