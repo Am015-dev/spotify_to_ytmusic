@@ -318,7 +318,7 @@ html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46p
 .tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
 #gw{overflow:visible}#grid{margin-top:6px}
 .coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
-.plpop{pointer-events:none}.plpop span{display:none}
+.plpop{pointer-events:none}.plpop span{display:inline;font-size:14px;max-width:62vw}
 html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 1px rgba(30,15,5,.85))}
 .tile .tv{top:-3px;right:-3px}
 @media (min-width:1024px){.coach{flex-wrap:wrap}.coach span{flex:1 1 150px}.coach button{flex:1 1 100%}}
@@ -403,3 +403,16 @@ body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!
 html.land .bidt.two{grid-template-columns:repeat(4,minmax(0,1fr))}
 body.guiding .gd-hl{min-height:44px;min-width:44px;box-sizing:border-box}
 .plpop,.plpop *,.fl,.fl *{pointer-events:none!important}
+/* round 2: quiet dear bids, best chooser tag */
+.sp-b.dear{opacity:.62;border-color:#b08a5a}.chb .chbest{display:block;font:800 14px/1 var(--ff-b,system-ui);color:#1f6a2a;margin-top:2px}
+
+/* R25: while a chooser is open only the chooser and its tile/card stay lit; everything else is dimmed and stops glowing */
+html.chzon .glow:not(.chb):not(.chzanc){animation:none!important;outline:0!important;box-shadow:none!important}
+html.chzon #grid .tile:not(.chzanc),html.chzon .dcard:not(.chzanc),html.chzon .mcard:not(.chzanc),html.chzon .sch:not(.chzanc),html.chzon .sp-b,html.chzon #acts button,html.chzon #mine .glow{filter:saturate(.4) brightness(.6)!important;transition:filter .15s}
+html.chzon #chz{z-index:60}
+/* R25 (GXSK rule): the unskinned action button has the same content box as the painted one (plate 14/18 px + no padding),
+   so turning the skin on or off never resizes Undo / Put them back. One line of text is 16 px tall either way. */
+html body .ab{line-height:16px}
+html:not(.sk) body .ab{padding:12px 16px!important}
+/* R25: landscape phones (390 px tall): the full market (5 rows) plus 3 djinns must fit under the top bar in every step */
+html.land.short #mkt .mcard{height:40px!important}html.land.short #mkt .mrow{gap:2px!important}

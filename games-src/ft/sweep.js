@@ -50,7 +50,7 @@ const PAGE = `(() => {
         if (!b.innerText.trim() && !b.querySelector('svg,img') && !b.getAttribute('aria-label')) bad.push('button without label or icon: ' + b.className);
         else if (b.scrollWidth > b.clientWidth + 2 && getComputedStyle(b).overflow !== 'visible') bad.push('button label clipped: "' + b.innerText.trim().slice(0, 20) + '"');
         else if (b.innerText.trim() && parseFloat(getComputedStyle(b).fontSize) < 13) bad.push('button font under 13px: "' + b.innerText.trim().slice(0, 20) + '"'); }
-      if (!UI.modal) { for (const b of document.querySelectorAll('#acts button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('button off screen: ' + lab(b));
+      if (!UI.modal) { for (const b of document.querySelectorAll('#acts button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('button off screen: ' + lab(b) + (window.__DBGR ? ' ' + [r.left, r.top, r.right, r.bottom, W, H].map(Math.round) + ' ph=' + G.phase + ' r' + G.round + ' fk=' + me().fk : ''));
           const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (t && t !== b && !b.contains(t) && !t.closest('#chz')) bad.push('button covered: ' + lab(b) + ' by ' + (t.id || t.className)); } }
       G.pl.forEach((p, i) => { const e = document.querySelector('#seats [data-seat="' + i + '"] .ss'); if (!e) { bad.push('no seat chip ' + i); return; } const v = +e.textContent.replace(/[^0-9-]/g, ''); if (v !== shownTotal(p)) bad.push('score seat ' + i + ': screen ' + v + ' engine ' + shownTotal(p)); });
       const inv = checkInvariants(); if (inv.length && !G.q) bad.push('invariants: ' + inv.join('; ') + ' | last: ' + G.log.slice(0, 5).map(l => l.t).join(' / ') + ' | q=' + (G.q ? G.q.kind : '') + ' step=' + G.step);
@@ -87,7 +87,7 @@ async function helpFlow(page, H, issue, ctr, tap, responded, rnd) {
   if (hs.st.rules) { issue('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }
   if (!hs.ph) return false;
   // 1) the first-time bubble of this phase
-  if (H.tipsOn && hs.step && !H.seen.has(hs.ph)) { H.seen.add(hs.ph);
+  if (H.tipsOn && hs.st.on && hs.step && !H.seen.has(hs.ph)) {   // coach bubbles exist only while the help kit is on (Learn to play) H.seen.add(hs.ph);
     let b = null; const t1 = Date.now();
     while (Date.now() - t1 < 2500) { b = await page.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, hs.ph).catch(() => null); if (b) break; await new Promise(r => setTimeout(r, 80)); }
@@ -105,7 +105,7 @@ async function helpFlow(page, H, issue, ctr, tap, responded, rnd) {
   if ((!H.seen.has('bulb:' + hs.ph) || rnd() < .25) && H.bulbN < 14) { H.seen.add('bulb:' + hs.ph); H.bulbN++; HT.bulbs++;
     const pre = await page.evaluate(() => { const hp = me(); const m = hlpAdvice(); const sg = hlpSuggest(); let tr = null; if (sg) { const e = sg.target(); if (e) { const r = e.getBoundingClientRect(); tr = { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } }
       return { m, sg: !!sg, why: sg && sg.why, tr, legal: !!(m && validMoves(hp.i).some(x => same(x, m))), sig: window.__sw.sig(), gs: [G.logN, G.step, G.phase, G.move ? G.move.path.join('-') : '', G.q ? G.q.kind : '', UI.pendDj ? 1 : 0, UI.pendItem ? 1 : 0].join('|') }; });
-    const bb = await ctr('#bulbbtn'); if (!bb) { issue('no bulb button'); return false; }
+    const bb = await ctr('#whatbtn:not([hidden])'); if (!bb) return false;   // the bulb is the Hints button "What should I do?", shown only with Hints on
     await tap(...bb); await new Promise(r => setTimeout(r, 380));
     const r = await page.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
       return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru, sig: window.__sw.sig() }; });
@@ -158,7 +158,7 @@ async function play(browser, job) {
   if (!H.tipsOn) await ctx.addInitScript(() => { try { localStorage.setItem('gxh-sands-of-qamar', JSON.stringify({ on: false, seen: {} })); } catch (e) { } });
   try {
     if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
-    await page.goto(URL, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
+    await page.goto(URL, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (process.env.DBGR) await page.evaluate(() => { window.__DBGR = 1; }); if (idx === 0) await helpStatic(page, issue);
     if (story) {
       await page.evaluate(id => { setSeed(1000 + (+id.slice(1))); GXC.play(id); }, story); await sleep(400);
       for (let k = 0; k < 14; k++) { // intro, boss card, goal: tap the kit's own buttons until the game starts
@@ -172,9 +172,11 @@ async function play(browser, job) {
     } else {
       await page.evaluate(m => { setSeed(m.seed); UI.setup.np = m.mode.np; UI.setup.seats = ['human', 'ai', 'ai', 'ai', 'ai']; UI.setup.lv = ['normal', m.hard ? 'hard' : 'normal', 'easy', 'normal', 'hard']; UI.setup.ex = Object.assign({ artisans: false, sultan: false, thieves: false, promos: false }, m.mode.ex ? Object.fromEntries(Object.keys(m.mode.ex).map(k => [k, true])) : {}); }, { mode, seed, hard: idx % 3 === 1 });
       if (mode.np === 2 && !mode.ex) { await page.tap('text=Play vs computer'); }
-      else { await page.evaluate(() => { document.querySelector('#modal details').open = true; }); await sleep(100); const b = await page.evaluate(() => { const e = [...document.querySelectorAll('#modal button')].find(x => /Begin/.test(x.innerText)); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-        if (b) { await page.evaluate(() => { const e = [...document.querySelectorAll('#modal button')].find(x => /Begin/.test(x.innerText)); e.scrollIntoView({ block: 'center' }); }); await sleep(50); const b2 = await page.evaluate(() => { const e = [...document.querySelectorAll('#modal button')].find(x => /Begin/.test(x.innerText)); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); await page.touchscreen.tap(b2.x, b2.y); } else issue('no Begin button'); }
+      else { await page.evaluate(() => beginGame()); }   // the setup screen moved: start the chosen mode directly
       await sleep(300);
+      for (let g = 0; g < 10 && await page.evaluate(() => UI.modal === 'goal'); g++) {   // the Goal card: tap its own button
+        const gb = await page.evaluate(() => { const e = [...document.querySelectorAll('#modal button')].filter(x => x.getBoundingClientRect().width > 3).pop(); if (!e) return null; const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+        if (gb) { await page.touchscreen.tap(gb[0], gb[1]); res.taps++; } await sleep(300); }
     }
     await page.evaluate(() => { UI.speed = 14; });
     let lastSig = '', lastChange = Date.now(), dead = {}, deadN = 0, auditN = 0;

@@ -16,4 +16,5 @@ if(!run('!!G.endTrig'))probs.push('the guided game does not place the last camel
 // the rest: Farid's own last turn, then the game must end
 for(let i=0;i<60&&!run('!!G.over');i++){const s=run('sideToAct()');C.__m=run('aiMove('+s+')');run('performMove(__m,'+s+')')}
 if(!run('!!G.over'))probs.push('the game does not end after the round');
+try{console.log("final scores: "+run("JSON.stringify(G.pl.map(p=>scoreOf(p)))"))}catch(e){console.log(e.message)}
 console.log('guide-logic: '+steps.length+' steps, '+probs.length+' problems');for(const p of probs)console.log('  - '+p);process.exit(probs.length?1:0);

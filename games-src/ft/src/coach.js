@@ -79,6 +79,7 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
    {t:'Djinns and goods',h:hd+row('Djinns',a.djinns,b.djinns,'You hold '+pa.dj.length+', Farid '+pb.dj.length+'; each scores its own points.')+row('Goods',a.goods,b.goods,'Sets of different kinds score 1, 3, 7, 13. Your goods: '+pa.res.filter(r=>r!=='fakir').length+' cards in '+gs({res:pa.res.filter(r=>r!=='fakir')})+' kinds.')},
    {t:'The count',h:hd+row('Total',a.total,b.total,esc(plName(G.winText)))}];
   const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).slice(0,6).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(['Everything else is in How to play.']).map(x=>x.startsWith('<li>')?x:'<li>'+esc(x)+'</li>').join('');
+  {const m=(x,y,t)=>({t,h:x.h+y.h.replace(hd,'')});pages.splice(0,4,m(pages[0],pages[1],'Land and coins'),m(pages[2],pages[3],'People, djinns and goods'))}   // 3 pages, not 5
   if(typeof GD!=='undefined'&&GD.i>0){pages[pages.length-1].last=1;return pages}   // the guided game taught every rule: no "later" list
   pages.push({t:"Things you'll meet later",h:'<ul class="ce-l">'+later+'</ul>',last:1});return pages}
 function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let o=document.getElementById('coachend');
