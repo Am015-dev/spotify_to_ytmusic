@@ -249,3 +249,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Reviewer R34 (sands, tidewake, vale) session_01RR7mnXBnPoYwPV47GtkSYS. Waiting review: doorkick (phone-check.js skip fix in its branch).
 - Fixers (prefix session_01RR7mn): F7-cauldron XdMnazBPV3P7dF8xg, F5-nebula bfkmUcn7vtZmBL38B, F10-short-fuse autnHzEpJjy2Vyn8d, F6-thornbound Y9CA3k4e4zAmFAiYd, F6-shipwreck ZGetttip3CUGYB4vN, F9-hollowbough ZnwYthN9aPJSGMEDj, F7-vinegrave Zt7r9JjCknEamZuwS, G3-sunglaze ZofCqiW23UzzGsB49 (live sunglaze fails sweep at 375x553).
 - Reviewer briefs must say: fetch + checkout origin/<branch> fresh and record the commit hash (stale checkouts happened).
+- 20:45 status. LIVE strict-review PASS (12): sunglaze (+375 fix), kaiten, rampart, stitchwise, crown, redline, final-approach, lantern, twin, wildmark, emberclimb, perch.
+- Deploy runs scenario tests: workers must prove BOTH `build-all.py --quick` (scenarios) and `--full` (phone-check+sweep).
+- Reviewer R36 (shipwreck, thornbound, nebula) session_01RR7mnY71BvDP17ccBUoj81. Waiting review: short-fuse (9198c40d).
+- Fixers (prefix session_01RR7mn): F8-sands bg5rsRVppoU1AQpQj, F8-tidewake Y82TesPtiQuy9gQbn, F8-vale b8Egh22twkJx1Ghu9, F8-doorkick atFZkcGiEaNB85fk7, F8-vinegrave bR1jxcLTeRJtguPvS, F10-hollowbough YiMCC92cqcaBM5pEd, F7-cauldron XdMnazBPV3P7dF8xg.
+- 21:48 status. Fixed, in review: R37 (short-fuse 9198c40d, cauldron 93ae36dd, vale 512dd83a) session_01RR7mnZpRrRZvKoeeL6M8Zh; R38 (sands 9a490a85, tidewake 6acc0f67, nebula fd818e08) session_01RR7mnbbL6k4qkA5aofGeGR.
+- Still fixing (prefix session_01RR7mn): F7-thornbound Zmz1cSJERPDnFxz9N, F7-shipwreck aGrqQmwnBawztrDxR, F9-doorkick ZvWTggjk1G2UGEem2, F10-hollowbough YiMCC92cqcaBM5pEd. F8-vinegrave bR1jxcLTeRJtguPvS stuck on a Bash approval prompt since 20:06 (owner told).
