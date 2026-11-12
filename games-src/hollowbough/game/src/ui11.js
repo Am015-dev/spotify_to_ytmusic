@@ -111,8 +111,10 @@ function hlpSuggest() {
   const a = HB.actor(G);
   try { computeRec(true); } catch (e) { return null; }
   const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
+  try { const pn = hlpEl(m).closest('.pv-panel'); if (pn && !pn.classList.contains('on')) pvSetTab(pn.dataset.p, true); pvScrollTo(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
   const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
-  return { why: hlpWhy(m, a), key: mk, m, target: () => { const e = hlpEl(m); return hlpEl(m); } };
+  // the helper's target may sit on another phone tab (Meadow, City, Goals): bring that panel forward so the finger and glow are visible
+  return { why: hlpWhy(m, a), key: mk, m, target: () => hlpEl(m) };
 }
 // ---------------------------------------------------------------- wiring
 // the middle of every button is a spot a bubble must not cover (the kit avoids [data-gxh-avoid]); invisible 2px markers, redrawn with the board
@@ -138,6 +140,6 @@ function hlpInit() {
 function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
-  // the dense board has no free spot for a bubble (it would cover cards and counts); the caption line in the bar already says the same, so no bubble here
-  void st; void nb; GXH.phase(null);
+  // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
+  void st; void nb; try { GXH.phase(hlpPhase()); } catch (e) { }
 }

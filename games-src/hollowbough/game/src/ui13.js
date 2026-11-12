@@ -140,8 +140,11 @@ function extrasBoot() {
 try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hints = false; }
 function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
 function goalCard() {
-  const D2 = (t) => h('li', t);
-  UI.cards.unshift({ kind: 'goal', title: 'Goal', sub: 'Win the Elderheart Oak', body: () => h('div', h('p', 'Have the most points when everyone has passed.'), h('ul.goal', D2('Buildings and critters you build score the points printed on them.'), D2('Point tokens, claimed events and bonus cards add more.'), D2('Pass when you are done. The highest total wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
+  // a painted goal card over the board: art, three short lines, Start
+  const src = typeof HB_ART !== 'undefined' && HB_ART.ever_tree ? HB_ART.ever_tree : null;   // the great tree painting
+  UI.cards.unshift({ kind: 'goal', title: 'Your goal', sub: 'Win the Elderheart Oak', body: () => h('div.hb-goal', src ? h('img.hb-goal-art', { src, alt: '', draggable: 'false' }) : null,
+    h('div.hb-goal-k', 'Your goal'), h('h2.hb-goal-t', 'Win the Elderheart Oak'),
+    h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
 }
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {
@@ -178,7 +181,7 @@ function seeTracker() {
   const prev = SEE.scores; SEE.scores = sc.map(x => ({ total: x.total, cards: x.cards, tokens: x.tokens, events: x.events, bonus: x.bonus, journey: x.journey }));
   if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
     const why = x.events > o.events ? 'event claimed' : x.cards > o.cards ? 'card points' : x.tokens > o.tokens ? 'point tokens' : x.bonus > o.bonus ? 'bonus' : x.journey > o.journey ? 'journey' : 'points';
-    const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxFloat === 'function') fxFloat(frameRect(chip), 'point', '+' + d + ' ' + why, null, { n: 1 }); } catch (e) { }
+    const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxDelta === 'function') fxDelta(s, d); } catch (e) { }
     seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 4600, 168); });
 }
 // ---- "Turn over: why"
@@ -243,5 +246,5 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
 
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#hintsbtn'); if (!b) return; UI.hints = !UI.hints; try { localStorage.setItem('hb_hints', UI.hints ? '1' : '0'); } catch (x) { } seeToastOff('hbprev'); seeToastOff('hbrate'); seeToastOff('hbover'); SEE.key = ''; render(); });
 (function () { const o = render; render = function () { const r = o.apply(this, arguments); try { const on = hintsActive(); document.documentElement.classList.toggle('hints-on', on); const b = $('#hintsbtn'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); b.hidden = !!(UI.cfg && UI.cfg.coached); }
-  if (typeof GXH !== 'undefined' && UI._gxhOn !== on) { UI._gxhOn = on; try { GXH.setEnabled(on); } catch (e) { } }
+  // help tips (GXH) follow their own Menu setting, on by default in every mode; the Hints toggle only drives previews and ratings
   if (!on) ['hbprev', 'hbrate', 'hbover'].forEach(seeToastOff); } catch (e) { } return r; }; })();

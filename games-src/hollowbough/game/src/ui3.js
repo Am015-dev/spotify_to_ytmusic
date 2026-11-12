@@ -62,7 +62,7 @@ function fxFly(node, from, to, ms, done) {
 function fxFloat(from, kind, txt, to, o) {
   o = o || {}; const L = fxLayer(); if (!L || !ANIM || !from) return;
   const e = h('div.fxp' + (o.neg ? '.neg' : ''), kind ? ic(kind, 22) : null, h('b', txt)); L.appendChild(e);
-  const a = ctr(from), jx = (o.slot || 0) * 22 - (o.n || 1) * 11 + 11, sx = a.x + jx, b = to ? ctr(to) : { x: sx, y: a.y - 70 };
+  const a0 = ctr(from), a = { x: a0.x, y: a0.y + ((o.slot || 0) - ((o.n || 1) - 1) / 2) * 32 }, sx = Math.max(50, Math.min((UI.lay ? UI.lay.W : innerWidth) - 50, a.x)), b = to ? ctr(to) : { x: sx, y: a.y - 70 };   // G8: stacked pills, kept on screen
   const up = o.neg ? 22 : -26;
   const f = [{ transform: `translate(${sx}px,${a.y}px) translate(-50%,-50%) scale(.5)`, opacity: 0 },
     { transform: `translate(${sx}px,${a.y + up}px) translate(-50%,-50%) scale(1.3)`, opacity: 1, offset: .25 },
@@ -71,6 +71,21 @@ function fxFloat(from, kind, txt, to, o) {
   const an = animate(e, f, { duration: 950, delay: (o.slot || 0) * 110, easing: 'ease-in-out', fill: 'both' });
   const end = () => { e.remove(); if (to && !o.neg && o.bump) o.bump(); };
   if (an) { an.onfinish = end; an.oncancel = () => e.remove(); setTimeout(() => e.remove(), 2600); } else end();
+}
+// a score change, written inside the seat chip for a moment (never on top of other text or buttons)
+function fxDelta(seat, d) {
+  if (!d) return; const c = $('.chip[data-seat="' + seat + '"]'); if (!c) return;
+  const ln = c.querySelector('.pvch-s') || c.querySelector('.cl > span:nth-child(2)'); if (!ln) return;
+  const old = c.__fxOld != null ? c.__fxOld : ln.textContent; c.__fxOld = old; clearTimeout(c.__fxT);
+  ln.textContent = (d > 0 ? '+' : '\u2212') + Math.abs(d) + (Math.abs(d) === 1 ? ' pt' : ' pts'); ln.classList.add('fxd'); if (d < 0) ln.classList.add('neg');
+  bump('.chip[data-seat="' + seat + '"]');
+  c.__fxT = setTimeout(() => { if (!ln.isConnected) return; ln.textContent = old; ln.classList.remove('fxd', 'neg'); c.__fxOld = null; }, 1600);
+}
+// a goods pile flashes green (gain) or red (spent); the number itself is the feedback
+function fxRes(k, d) {
+  const e = $('.rs[data-res="' + k + '"]'); if (!e) return;
+  e.classList.remove('fxup', 'fxdn'); void e.offsetWidth; e.classList.add(d > 0 ? 'fxup' : 'fxdn');
+  setTimeout(() => e.classList.remove('fxup', 'fxdn'), 1100);
 }
 function bump(sel) { const e = $(sel); if (!e) return; e.classList.remove('bmp'); void e.offsetWidth; e.classList.add('bmp'); setTimeout(() => e.classList.remove('bmp'), 500); }
 // FLIP: a freshly drawn element slides in from where it was before
@@ -96,24 +111,22 @@ function fxPost(pre, m, src) {
   for (const k of RESK) { const d = p.res[k] - pre.res[k]; if (d !== 0) items.push({ kind: k, d }); }
   const dt = score(pre.seat).total - pre.tot; if (dt !== 0) items.push({ kind: 'point', d: dt, pts: true });
   const dh = p.hand.length - pre.hand; if (dh > 0) items.push({ kind: 'card', d: dh });
-  let slot = 0; const n = items.filter(x => x.d > 0).length;
+  // R17: no pill floats over the board. Points show inside the seat chip ("+2 pts" in its city-count line); goods flash on their own pile.
   for (const it of items) {
-    if (it.d > 0) {
-      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
-      fxFloat(src, it.kind, '+' + it.d, to, { slot: slot++, n, bump: mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
-    } else if (mine && it.kind !== 'point') {
-      const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });
-    }
+    if (it.kind === 'point') fxDelta(pre.seat, it.d);
+    else if (it.kind === 'card') { if (mine) bump('.strip.hand .scount'); }
+    else if (mine) fxRes(it.kind, it.d);
   }
   if (m && m.type === 'prepare' && p.season !== pre.season) fxSeason(p.season, mine);
 }
 function ctr0() { const R = UI.lay; return R ? { x: R.W / 2 - 10, y: R.H / 2 - 10, w: 20, h: 20 } : null; }
 function fxSeason(s, mine) {
+  // a brief banner at the top of the board (fades in and out in about 1 s), never a sticker over the cards
   const L = fxLayer(); if (!L || !ANIM || !mine) return;
-  const e = h('div.fxseason', HBKit.season(SEAS[s], 110), h('b', SEASN[s])); L.appendChild(e);
-  const an = animate(e, [{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 1100, fill: 'both' });
+  const e = h('div.fxseason', HBKit.season(SEAS[s], 28), h('b', SEASN[s])); L.appendChild(e);
+  const an = animate(e, [{ opacity: 0, transform: 'translate(-50%,-6px)' }, { opacity: 1, transform: 'translate(-50%,0)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,0)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-6px)' }], { duration: 1000, easing: 'ease-out' });
   if (an) an.onfinish = () => e.remove(); else e.remove();
-  setTimeout(() => e.remove(), 1500);
+  setTimeout(() => e.remove(), 1200);
 }
 // after a move was applied and drawn: pieces land where they went
 function fxLand(m, seat, src, preChip) {
