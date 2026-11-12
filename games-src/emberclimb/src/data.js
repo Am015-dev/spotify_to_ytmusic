@@ -9,13 +9,18 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     var d = { id: id, hero: hero, name: name, type: type, rar: rar, cost: cost, ops: ops, art: art, fl: fl || '' };
     d.tgt = needsTarget(ops); CARDS[id] = d; ORDER.push(id);
   }
-  // Scale: tabletop rules that are pure numbers x SCALE (the shelf keeps video-game-sized HP and damage). Caps follow the tabletop.
-  var SCALE = 3, CAPS = { str: 8, blk: 60, en: 6, shiv: 5, poison: 30, deb: 3, mir: 5 }, EHP = { 1: 1, 2: 1.6 };
+  // ONE SCALE (R16): every number on the shelf = the tabletop number x SCALE (8). Damage, Block, HP, healing, HP loss, Weak, Wrath,
+  // Shiv, orb values, poison per token and gold all use it; token counts (Strength, Weak, Vulnerable, Poison, Frail) stay tabletop
+  // counts and each Strength / Poison token is worth SCALE. Source per value: rules-notes.md. The content tables below were written in
+  // video-game sizes; tt() at the bottom converts them once to whole tabletop units x SCALE. Caps follow the tabletop (Block cap 20 x SCALE).
+  var SCALE = 8, CAPS = { str: 8, blk: 160, en: 6, shiv: 5, poison: 30, deb: 3, mir: 5 }, EHP = { 1: 1, 2: 1.6 };
+  // gold: tabletop coins x SCALE; the video-game sizes below are 25 gold per tabletop coin (common card 2 coins, rare 6)
+  function GOLD(v) { var c = Math.round(Math.abs(v) / 25); return (v < 0 ? -1 : 1) * SCALE * c; }
   var H = {
     w: { k: 'w', name: 'Garrick Cinderplate', role: 'Ember Warrior', hp: 80, mech: 'Strength: every point adds damage to all attacks.', art: 'broad-shouldered armoured warrior with a glowing ember-forged greatsword', relic: 'ember-brand', start: ['w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-strike', 'w-defend', 'w-defend', 'w-defend', 'w-defend', 'w-hammer'], col: '#c8472b' },
     s: { k: 's', name: 'Sable Quillfinger', role: 'Venom Rogue', hp: 70, mech: 'Poison and Shivs: stack poison, flood the table with 0-cost shivs.', art: 'hooded lithe rogue with throwing knives and a vial of green venom', relic: 'whetstone-ring', start: ['s-strike', 's-strike', 's-strike', 's-strike', 's-strike', 's-defend', 's-defend', 's-defend', 's-defend', 's-defend', 's-pinprick', 's-slip-away'], col: '#3f9b5a' },
     a: { k: 'a', name: 'Cog-9', role: 'Orb Automaton', hp: 75, mech: 'Orbs: channel Lightning, Frost and Dark; evoke them for big effects.', art: 'friendly brass clockwork automaton with three glowing orbs orbiting its chest', relic: 'spark-core', start: ['a-strike', 'a-strike', 'a-strike', 'a-strike', 'a-defend', 'a-defend', 'a-defend', 'a-defend', 'a-zap', 'a-dualcast'], col: '#3d8fd0' },
-    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath adds 3 damage per hit; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
+    m: { k: 'm', name: 'Ione Stillwater', role: 'Stance Monk', hp: 72, mech: 'Stances: Wrath adds 8 damage per hit; Calm gives energy on exit.', art: 'serene barefoot monk in saffron robes with prayer beads, calm and wrathful aura halves', relic: 'prayer-beads', start: ['m-strike', 'm-strike', 'm-strike', 'm-strike', 'm-defend', 'm-defend', 'm-defend', 'm-defend', 'm-eruption', 'm-vigilance'], col: '#c9a227' }
   };
   // ---------- Warrior
   c('w-strike', 'w', 'Cinder Strike', 'A', 's', 1, [['dmg', 6]], 'plain sword cut trailing orange sparks');
@@ -136,21 +141,29 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   // flags: t=retain (stays in hand at end of turn) u=unplayable x=exhaust e=ethereal(exhaust at end of turn) b=burn(2 hp at end of turn if held) r=regret d=doubt
 
   var ENEMIES = {
-    'mire-slug': { name: 'Mire Slug', hp: [11, 15], pat: [{ atk: 5 }, { atk: 3, weak: 1 }, { atk: 6 }], art: 'fat grey-green slug with eyestalks on a swamp log' },
-    'gnawer': { name: 'Gnawer', hp: [10, 14], pat: [{ atk: 4 }, { atk: 4 }, { blk: 5, str: 1 }], art: 'oversized scruffy rat showing yellow teeth' },
-    'hex-acolyte': { name: 'Hex Acolyte', hp: [40, 44], pat: [{ str: 3 }, { atk: 6 }], ritual: 3, art: 'cultist in a feathered hood chanting by a candle' },
-    'gape-grub': { name: 'Gape Grub', hp: [40, 44], pat: [{ die: [{ str: 3, blk: 6 }, { atk: 7, blk: 5 }, { atk: 11 }] }], art: 'wide-mouthed pale grub with a ring of teeth' },
-    'rust-tick': { name: 'Rust Tick', hp: [10, 14], pat: [{ atk: 5 }, { die: [{ weak: 2 }, { atk: 4, weak: 1 }, { atk: 7 }] }, { atk: 6 }], art: 'rust-coloured tick the size of a dog' },
-    'bile-blob': { name: 'Bile Blob', hp: [28, 32], pat: [{ atk: 7, add: ['slimed', 1] }, { atk: 11 }, { add: ['slimed', 2] }], art: 'quivering yellow blob of acid with floating bones' },
-    'snare-vine': { name: 'Snare Vine', hp: [22, 26], pat: [{ vuln: 2 }, { die: [{ atk: 4, blk: 6 }, { atk: 8 }, { atk: 11 }] }], art: 'thorny vine bundle with a grasping tendril' },
-    'ash-imp': { name: 'Ash Imp', hp: [16, 20], pat: [{ atk: 3, hits: 3 }, { atk: 3, hits: 3 }, { blk: 6, str: 1 }], art: 'small black imp with ember eyes and bat wings' },
-    'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
-    'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
-    'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
+    // R24 ACT 1 = the printed tabletop enemy cards (tab:1): every number below is the card's own value; data.js multiplies HP, damage,
+    // Block and Spikes by SCALE once (Strength / Weak / Vulnerable / added cards stay counts). Elite and boss HP is per hero (x heroes).
+    // die: 3 rows = d6 1-2 / 3-4 / 5-6, 2 rows = 1-3 / 4-6. first: a one-time opening step. hpF/patF: the gentle first-encounter card.
+    // Source per foe (tabletop value -> in-game value): rules-notes.md "Act 1 foes".
+    'mire-slug': { tab: 1, name: 'Mire Slug', hp: [5, 5], pat: [{ die: [{ atk: 2 }, { weak: 1 }, { atk: 2, add: ['dazed', 1] }] }], art: 'fat grey-green slug with eyestalks on a swamp log' },
+    'spine-slug': { tab: 1, img: 'mire-slug', name: 'Spine Slug', hp: [5, 5], pat: [{ die: [{ atk: 1, vuln: 1 }, { atk: 1, add: ['dazed', 1] }, { atk: 2 }] }], art: 'slug covered in sharp grey spines' },
+    'ooze-drop': { tab: 1, img: 'bile-blob', name: 'Ooze Drop', hp: [3, 3], pat: [{ atk: 1 }], art: 'small drop of yellow ooze with two eyes' },
+    'gnawer': { tab: 1, name: 'Gnawer', hp: [10, 10], pat: [{ die: [{ atk: 3, blk: 1 }, { atk: 4 }, { blk: 2, str: 1 }] }], hpF: 7, patF: [{ die: [{ blk: 2, str: 1 }, { atk: 2, blk: 1 }, { atk: 3 }] }], art: 'oversized scruffy rat showing yellow teeth' },
+    'hex-acolyte': { tab: 1, name: 'Hex Acolyte', hp: [9, 9], pat: [{ atk: 1, str: 1 }], art: 'cultist in a feathered hood chanting by a candle' },
+    'gape-grub': { tab: 1, name: 'Gape Grub', hp: [6, 6], pat: [{ die: [{ atk: 2 }, { atk: 1, str: 1 }, { str: 2 }] }], deathVuln: 1, art: 'wide-mouthed pale grub with a ring of teeth' },
+    'rust-tick': { tab: 1, name: 'Rust Tick', hp: [4, 4], pat: [{ die: [{ str: 1 }, { atk: 2 }, { atk: 2 }] }], curl: 2, hpF: 3, patF: [{ die: [{ str: 1 }, { atk: 2 }, { atk: 1 }] }], art: 'rust-coloured tick the size of a dog' },
+    'bile-blob': { tab: 1, name: 'Bile Blob', hp: [10, 10], pat: [{ die: [{ atk: 1, weak: 2 }, { atk: 4 }, { atk: 3, add: ['slimed', 2] }] }], art: 'quivering yellow blob of acid with floating bones' },
+    'snare-vine': { tab: 1, name: 'Snare Vine', hp: [10, 10], pat: [{ die: [{ atk: 2, weak: 1 }, { atk: 2, add: ['dazed', 1] }, { atk: 3 }] }], art: 'thorny vine bundle with a grasping tendril' },
+    'ash-imp': { tab: 1, name: 'Ash Imp', hp: [10, 10], pat: [{ die: [{ atk: 3 }, { atk: 2, vuln: 1 }, { atk: 2, add: ['dazed', 1] }] }], art: 'small black imp with ember eyes and bat wings' },
+    'thorn-brute': { tab: 1, name: 'Thorn Brute', hp: [14, 14], first: { sleep: 1 }, pat: [{ atk: 3 }], skillTax: 1, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
+    'sleeper-statue': { tab: 1, name: 'Sleeper Statue', hp: [22, 22], sleep: 1, pat: [{ atk: 4 }, { atk: 4 }, { weak: 2, str: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
+    'iron-warden': { tab: 1, name: 'Iron Warden', hp: [7, 7], pat: [{ die: [{ add: ['dazed', 1] }, { atk: 3 }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
+    'iron-warden-b': { tab: 1, img: 'iron-warden', name: 'Iron Warden', hp: [8, 8], pat: [{ die: [{ atk: 3 }, { add: ['dazed', 1] }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
+    'iron-warden-c': { tab: 1, img: 'iron-warden', name: 'Iron Warden', hp: [7, 7], pat: [{ die: [{ atk: 2 }, { add: ['dazed', 1] }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
     'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
-    'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
-    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
-    'gate-colossus': { name: 'Gate Wyrm', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
+    'mire-behemoth': { tab: 1, name: 'Mire Behemoth', hp: [22, 22], split: ['bile-blob', 'mire-slug', 'spine-slug'], splitSay: 'bursts apart', pat: [{ add: ['slimed', 3] }, { atk: 3, add: ['slimed', 2] }, { atk: 6 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
+    'ashen-wraith': { tab: 1, name: 'Ashen Wraith', hp: [36, 36], pat: [{ atk: 1, add: ['burn', 1] }, { atk: 2, hits: 2, add: ['burn', 1] }, { add: ['burn', 2] }, { atk: 3, blk: 5 }, { atk: 2, add: ['burn', 1] }, { atk: 3, hits: 2, add: ['burn', 2], str: 1 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
+    'gate-colossus': { tab: 1, name: 'Gate Wyrm', hp: [40, 40], shift: 6, pat: [{ atk: 2, blk: 5 }], pat2: [{ atk: 2, spikes: 1 }, { atk: 4, str: 1, spikes: 1 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
     // act 2 (Ash Stair) and act 3 (Cinder Gate) encounter decks, act 4 = the optional final act
     'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, art: 'lean black hound with ember-cracked skin and smoking jaws' },
     'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, art: 'floating grey wisp of ash with two coal eyes' },
@@ -161,10 +174,11 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'tomb-king': { name: 'Tomb King', hp: [120, 128], pat: [{ atk: 12, frail: 2 }, { blk: 14, str: 2 }, { atk: 7, hits: 3 }, { atk: 8, add: ['dazed', 2] }], elite: 1, act: 3, art: 'bandaged king rising from a stone sarcophagus in dust' },
     'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
   };
-  var ENC = {
-    weak: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['gape-grub'], ['hex-acolyte']],
-    strong: [['bile-blob', 'rust-tick'], ['snare-vine', 'ash-imp', 'mire-slug'], ['ash-imp', 'ash-imp'], ['gape-grub', 'gnawer'], ['hex-acolyte', 'rust-tick']],
-    elite: [['thorn-brute'], ['sleeper-statue'], ['iron-warden', 'iron-warden', 'iron-warden']],
+  var ENC = {   // R24: the tabletop act-1 decks. The first fight draws from the 4-card first-encounter deck (gentle hpF/patF sides), then the normal deck
+    first: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['ooze-drop']],
+    weak: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['snare-vine'], ['ash-imp'], ['ooze-drop'], ['bile-blob'], ['gape-grub']],
+    strong: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['snare-vine'], ['ash-imp'], ['ooze-drop'], ['bile-blob'], ['gape-grub']],
+    elite: [['thorn-brute'], ['sleeper-statue'], ['iron-warden', 'iron-warden-b', 'iron-warden-c']],
     boss: [['mire-behemoth'], ['ashen-wraith'], ['gate-colossus']]
   };
   // per-act encounter decks (act 1 = ENC). Multi-act climbs meet one fixed guardian per act; act 4 is the optional final act.
@@ -176,46 +190,90 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   var ACTBOSS = { 1: 'mire-behemoth', 2: 'ashen-wraith', 3: 'gate-colossus', 4: 'ember-tyrant' };
   // relic effect keys are read by the engine
   var RELICS = {
-    'ember-brand': { name: 'Ember Brand', t: 'Heal 6 after each fight.', rar: 's', art: 'iron brand glowing orange at the tip' },
+    'ember-brand': { name: 'Ember Brand', t: 'Heal 8 after each fight.', rar: 's', art: 'iron brand glowing orange at the tip' },
     'whetstone-ring': { name: 'Whetstone Ring', t: 'Draw 2 extra on turn 1.', rar: 's', art: 'silver ring with a tiny whetstone' },
     'spark-core': { name: 'Spark Core', t: 'Start fights with a Lightning orb.', rar: 's', art: 'glass sphere with a trapped blue spark' },
     'prayer-beads': { name: 'Prayer Beads', t: 'Start fights with 1 Miracle: spend for +1 energy.', rar: 's', art: 'string of wooden prayer beads' },
-    'lucky-coin': { name: 'Lucky Coin', t: '+25 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
-    'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 4 Block.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
+    'lucky-coin': { name: 'Lucky Coin', t: '+8 gold now.', rar: 'c', art: 'chipped gold coin balanced on its edge' },
+    'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 8 Block.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
     'lantern': { name: 'Tin Lantern', t: '+1 energy on turn 1.', rar: 'c', art: 'small dented tin lantern lit from within' },
     'bag-of-marbles': { name: 'Bag of Marbles', t: 'Enemies start Vulnerable 1.', rar: 'c', art: 'leather pouch spilling glass marbles' },
     'clover-dice': { name: 'Clover Dice', t: 'Dice rolls get +1 (max 6).', rar: 'c', art: 'carved bone die with a four-leaf clover on it' },
-    'healing-moss': { name: 'Healing Moss', t: 'Rest sites heal 10 more.', rar: 'c', art: 'clump of glowing green moss on a stone' },
+    'healing-moss': { name: 'Healing Moss', t: 'Rest sites heal 8 more.', rar: 'c', art: 'clump of glowing green moss on a stone' },
     'gold-tooth': { name: 'Gold Tooth', t: '+50% gold from fights.', rar: 'c', art: 'single gold tooth on a velvet scrap' },
     'oak-heart': { name: 'Oak Heart', t: '+8 max HP now.', rar: 'c', art: 'heart-shaped knot cut from an oak branch' },
     'candle-stub': { name: 'Candle Stub', t: 'Draw 1 extra on turn 1.', rar: 'c', art: 'melted candle stub on a saucer' },
     'pocket-satchel': { name: 'Pocket Satchel', t: '+1 potion slot.', rar: 'c', art: 'small canvas satchel with brass buckles' },
-    'tin-flute': { name: 'Tin Flute', t: 'Skills give +1 Block.', rar: 'u', art: 'little tin flute with painted stripes' },
-    'smoking-censer': { name: 'Smoking Censer', t: 'Attacks deal +1 damage.', rar: 'u', art: 'hanging brass censer trailing grey smoke' },
+    'tin-flute': { name: 'Tin Flute', t: 'Skills give +8 Block.', rar: 'u', art: 'little tin flute with painted stripes' },
+    'smoking-censer': { name: 'Smoking Censer', t: 'Attacks deal +8 damage.', rar: 'u', art: 'hanging brass censer trailing grey smoke' },
     'dawnstone': { name: 'Dawnstone', t: '+1 energy every turn.', rar: 'b', art: 'pale pink glowing stone like a sunrise' },
     'gale-cloak': { name: 'Gale Cloak', t: 'Draw 1 extra every turn.', rar: 'b', art: 'wind-tossed travelling cloak with a brooch' },
     'phoenix-ash': { name: 'Phoenix Ash', t: 'Once per run: revive at 30% HP.', rar: 'b', art: 'urn of warm glowing ash with a red feather' }
   };
   var POTIONS = {
-    'fire-flask': { name: 'Fire Flask', t: 'Deal 20 to an enemy.', tgt: 1, art: 'round flask of bright orange fire' },
-    'block-brew': { name: 'Block Brew', t: 'Gain 12 Block.', art: 'grey potion bottle with metal flecks' },
-    'strength-tonic': { name: 'Strength Tonic', t: 'Gain 2 Strength.', art: 'thick red tonic in a tall bottle' },
+    'fire-flask': { name: 'Fire Flask', t: 'Deal 32 to an enemy.', tgt: 1, art: 'round flask of bright orange fire' },
+    'block-brew': { name: 'Block Brew', t: 'Gain 16 Block.', art: 'grey potion bottle with metal flecks' },
+    'strength-tonic': { name: 'Strength Tonic', t: 'Gain 1 Strength.', art: 'thick red tonic in a tall bottle' },
     'swift-draught': { name: 'Swift Draught', t: 'Draw 3 cards.', art: 'silver-blue swirling potion with wings' },
     'energy-vial': { name: 'Energy Vial', t: 'Gain 2 energy.', art: 'yellow glowing vial with lightning shape' },
-    'venom-vial': { name: 'Venom Vial', t: 'Poison an enemy 4.', tgt: 1, art: 'skull-stoppered green vial' },
+    'venom-vial': { name: 'Venom Vial', t: 'Poison an enemy 2.', tgt: 1, art: 'skull-stoppered green vial' },
     'frost-gas': { name: 'Frost Gas', t: 'All enemies Weak 3.', art: 'pale blue misty bottle' },
-    'healing-draught': { name: 'Healing Draught', t: 'Heal 20.', art: 'rosy pink potion in a heart-shaped flask' },
+    'healing-draught': { name: 'Healing Draught', t: 'Heal 24.', art: 'rosy pink potion in a heart-shaped flask' },
     'fortune-die': { name: 'Fortune Die', t: 'Next 2 dice rolls show 6.', art: 'golden die floating inside a glass bottle' }
   };
   var EVENTS = {
-    'ember-shrine': { name: 'Ember Shrine', q: 'A shrine hums with warm light.', art: 'small stone shrine with floating embers', o: [{ t: 'Pray: heal 15', do: { heal: 15 } }, { t: 'Offer 6 HP: upgrade a card', do: { hp: -6, upg: 1 } }, { t: 'Walk on', do: {} }] },
-    'wandering-tinker': { name: 'Wandering Tinker', q: 'A tinker offers a trade.', art: 'cheerful tinker with a cart of pots and gadgets', o: [{ t: 'Buy a relic (90 gold)', do: { gold: -90, relic: 1 }, cost: 90 }, { t: 'Sell blood: +60 gold, -8 HP', do: { gold: 60, hp: -8 } }, { t: 'Leave', do: {} }] },
+    'ember-shrine': { name: 'Ember Shrine', q: 'A shrine hums with warm light.', art: 'small stone shrine with floating embers', o: [{ t: 'Pray: heal 16', do: { heal: 15 } }, { t: 'Offer 8 HP: upgrade a card', do: { hp: -6, upg: 1 } }, { t: 'Walk on', do: {} }] },
+    'wandering-tinker': { name: 'Wandering Tinker', q: 'A tinker offers a trade.', art: 'cheerful tinker with a cart of pots and gadgets', o: [{ t: 'Buy a relic (32 gold)', do: { gold: -90, relic: 1 }, cost: 90 }, { t: 'Sell blood: +16 gold, -8 HP', do: { gold: 60, hp: -8 } }, { t: 'Leave', do: {} }] },
     'whispering-well': { name: 'Whispering Well', q: 'Drink? Roll the die.', art: 'old stone well with blue mist and a coin', o: [{ t: 'Drink and roll', roll: [{ hp: -8 }, { gold: 40 }, { relic: 1 }] }, { t: 'Leave', do: {} }] },
-    'stranded-caravan': { name: 'Stranded Caravan', q: 'A broken cart blocks the road.', art: 'wrecked merchant cart in a forest road', o: [{ t: 'Help: lose 5 HP, gain a card', do: { hp: -5, card: 1 } }, { t: 'Loot: +45 gold, Regret', do: { gold: 45, curse: 'regret' } }, { t: 'Leave', do: {} }] },
-    'mirror-pool': { name: 'Mirror Pool', q: 'Your reflection offers a deal.', art: 'still dark pond reflecting a different sky', o: [{ t: 'Lose 7 HP: remove a card', do: { hp: -7, rem: 1 } }, { t: 'Gain 6 max HP, Doubt', do: { mhp: 6, curse: 'doubt' } }, { t: 'Step in: transform a card', do: { xform: 1 } }, { t: 'Leave', do: {} }] },
-    'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 30 gold, roll', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
+    'stranded-caravan': { name: 'Stranded Caravan', q: 'A broken cart blocks the road.', art: 'wrecked merchant cart in a forest road', o: [{ t: 'Help: lose 8 HP, gain a card', do: { hp: -5, card: 1 } }, { t: 'Loot: +16 gold, Regret', do: { gold: 45, curse: 'regret' } }, { t: 'Leave', do: {} }] },
+    'mirror-pool': { name: 'Mirror Pool', q: 'Your reflection offers a deal.', art: 'still dark pond reflecting a different sky', o: [{ t: 'Lose 8 HP: remove a card', do: { hp: -7, rem: 1 } }, { t: 'Gain 8 max HP, Doubt', do: { mhp: 6, curse: 'doubt' } }, { t: 'Step in: transform a card', do: { xform: 1 } }, { t: 'Leave', do: {} }] },
+    'first-ember': { img: 'event-ember-shrine', start: 1, name: 'The First Ember', q: 'A warm ember offers one gift.', art: 'small glowing ember floating over an open palm', o: [{ t: 'Gain 8 max HP', do: { mhp: 8 } }, { t: 'Take 32 gold', do: { gold: 100 } }, { t: 'Take a rare card', do: { rare: 1 } }, { t: 'Lose 8 HP: take a relic', do: { hp: -10, relic: 1 } }] },
+    'ash-library': { img: 'node-event', name: 'Ash Library', q: 'Half-burnt books line the walls.', art: 'tall scorched bookshelves with drifting pages', o: [{ t: 'Read: gain a card', do: { card: 1 } }, { t: 'Sleep here: heal 16', do: { heal: 12 } }, { t: 'Leave', do: {} }] },
+    'cursed-chest': { img: 'node-event', name: 'Cursed Chest', q: 'A chest hums with a dark tune.', art: 'iron-bound chest leaking purple smoke', o: [{ t: 'Open: a relic and Regret', do: { relic: 1, curse: 'regret' } }, { t: 'Leave', do: {} }] },
+    'herb-witch': { img: 'event-wandering-tinker', name: 'Herb Witch', q: 'An old woman stirs a pot.', art: 'smiling old woman stirring a bubbling green pot', o: [{ t: 'Buy 2 potions (16 gold)', do: { gold: -40, pot: 2 }, cost: 40 }, { t: 'Taste the stew: heal 8', do: { heal: 8 } }, { t: 'Leave', do: {} }] },
+    'forge-spirit': { img: 'event-ember-shrine', name: 'Forge Spirit', q: 'A spirit offers to hammer a card.', art: 'glowing figure of flame standing at an anvil', o: [{ t: 'Upgrade a card', do: { upg: 1 } }, { t: 'Lose 8 HP: +8 max HP', do: { hp: -6, mhp: 2 } }, { t: 'Leave', do: {} }] },
+    'golden-idol': { img: 'node-event', name: 'Golden Idol', q: 'A golden idol sits on a trap.', art: 'small golden idol on a stone plinth with cracks', o: [{ t: 'Grab it: +32 gold, Injury', do: { gold: 100, curse: 'injury' } }, { t: 'Grab carefully: +16 gold, -8 HP', do: { gold: 50, hp: -9 } }, { t: 'Leave', do: {} }] },
+    'kind-pilgrim': { img: 'event-stranded-caravan', name: 'Kind Pilgrim', q: 'A pilgrim shares the fire.', art: 'hooded pilgrim at a small campfire offering bread', o: [{ t: 'Rest: heal 8', do: { heal: 10 } }, { t: 'Trade stories: remove a card, -8 HP', do: { hp: -4, rem: 1 } }, { t: 'Leave', do: {} }] },
+    'back-alley-gambler': { name: 'Back Alley Gambler', q: 'A grin and a pair of dice.', art: 'hooded gambler at a barrel table with dice', o: [{ t: 'Bet 8 gold and roll: 1-2 lose it, 3-4 keep it, 5 win 16, 6 win 32', roll: [{ gold: -30 }, { gold: -30 }, { gold: 0 }, { gold: 0 }, { gold: 60 }, { gold: 90 }], cost: 30 }, { t: 'Walk away', do: {} }] }
   };
   var NODES = { m: 'Monster', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Treasure', b: 'Boss' };
-  EC.D = { SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget };
+
+  // ---------- tt(): one-time conversion to tabletop units x SCALE (see rules-notes.md "One scale")
+  // u(v, k): nearest whole tabletop unit, at least 1. k = video-game size of one tabletop unit: 5 for damage / Block (Strike 6 -> 1,
+  // Defend 5 -> 1, Bash 8 -> 2), 8 for HP / healing / HP loss (hero 80 -> 10), 3 for Strength / Ritual / Poison token counts.
+  function u(v, k) { var a = Math.abs(v), r = Math.max(1, Math.round(a / k)); return v < 0 ? -r : r; }
+  var KE = (typeof EC_KE !== 'undefined') ? EC_KE : [8, 5, 8, 5],   // R21: foes use the SAME conversion as heroes (HP /8, damage and Block /5): one scale for both sides
+  KB = 0, EHPV = function (v) { return SCALE * u(v, KE[KB]); }, EDM = function (v) { return SCALE * u(v, KE[KB + 1]); };
+  var DM = function (v) { return SCALE * u(v, 5); }, HPV = function (v) { return SCALE * u(v, 8); }, TOK = function (v) { return u(v, 3); };
+  function ttOps(ops) {
+    return ops.map(function (o) {
+      o = o.slice(); var k = o[0];
+      if (k === 'dmg' || k === 'blk' || k === 'all') o[1] = DM(o[1]);
+      else if (k === 'hit') o[2] = DM(o[2]);
+      else if (k === 'dmgx') o[1] = DM(o[1]);
+      else if (k === 'heal' || k === 'loss') o[1] = HPV(o[1]);
+      else if (k === 'str' || k === 'poison' || k === 'poisonAll') o[1] = TOK(o[1]);
+      else if (k === 'focus') o[1] = u(o[1], 3);
+      else if (k === 'power') { if (o[1] === 'plated' || o[1] === 'mental') o[2] = DM(o[2]); else if (o[1] === 'ritual' || o[1] === 'noxious' || o[1] === 'envenom') o[2] = TOK(o[2]); }
+      else if (k === 'roll') { o[1] = ttOps(o[1]); o[2] = ttOps(o[2]); o[3] = ttOps(o[3]); }
+      return o;
+    });
+  }
+  Object.keys(CARDS).forEach(function (id) { var d = CARDS[id]; d.ops = ttOps(d.ops); });
+  function ttPat(p) {
+    if (p.die) { p.die.forEach(ttPat); return; }
+    if (p.atk) p.atk = EDM(p.atk); if (p.blk) p.blk = DM(p.blk); if (p.spikes) p.spikes = DM(p.spikes); if (p.str) p.str = TOK(p.str);
+  }
+  function tabPat(p) { if (p.die) { p.die.forEach(tabPat); return; } if (p.atk) p.atk *= SCALE; if (p.blk) p.blk *= SCALE; if (p.spikes) p.spikes *= SCALE; }
+  Object.keys(ENEMIES).forEach(function (id) { var e = ENEMIES[id]; if (!e.tab) return; e.hp = [e.hp[0] * SCALE, e.hp[1] * SCALE]; if (e.hpF) e.hpF *= SCALE; e.pat.forEach(tabPat); (e.pat2 || []).forEach(tabPat); (e.patF || []).forEach(tabPat); if (e.first) tabPat(e.first); });
+  Object.keys(ENEMIES).forEach(function (id) { var e = ENEMIES[id]; if (e.tab) return; KB = e.boss ? 2 : 0; e.hp = [EHPV(e.hp[0]), EHPV(e.hp[1])]; e.pat.forEach(ttPat); if (e.ritual) e.ritual = TOK(e.ritual); if (e.onSkill) e.onSkill = TOK(e.onSkill); });
+  Object.keys(H).forEach(function (k) { H[k].hp = HPV(H[k].hp); });
+  Object.keys(EVENTS).forEach(function (id) { EVENTS[id].o.forEach(function (o) {
+    function f(d) { if (!d) return; if (d.heal) d.heal = HPV(d.heal); if (d.hp) d.hp = HPV(d.hp); if (d.mhp) d.mhp = HPV(d.mhp); if (d.gold) d.gold = GOLD(d.gold); }
+    f(o.do); (o.roll || []).forEach(f); if (o.cost) o.cost = GOLD(o.cost);
+  }); });
+  EC.D = { GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
+    // Gentle (first climb) player-side numbers: max HP x hp, start with `pots` x `pot`, Rest heals `rest` (tabletop 3) x SCALE. Env GENTLE='{...}' overrides in the bench.
+    GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 6, pots: 3, pot: 'healing-draught', rest: 8 } };
   if (typeof module !== 'undefined') module.exports = EC;
 })();
