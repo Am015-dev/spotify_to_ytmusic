@@ -304,5 +304,6 @@ function bfHandCue(){const hd=document.querySelector('.mine .hand');document.que
       if(!e){e=document.createElement('button');e.type='button';e.className='hcue '+side;e.setAttribute('aria-label',side==='r'?'More cards to the right':'More cards to the left');e.addEventListener('click',ev=>{ev.stopPropagation();hd.scrollBy({left:(side==='r'?1:-1)*hd.clientWidth*.7,behavior:'smooth'})});host.appendChild(e)}
       e.textContent=side==='r'?'+'+n+' ›':'‹ +'+n;const hr=host.getBoundingClientRect();e.style.top=(q.top-hr.top+q.height/2-22)+'px'}};
   upd();if(!hd.dataset.cue){hd.dataset.cue='1';hd.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true})}}
+window.addEventListener('resize',()=>{clearTimeout(bfHandCue.t);bfHandCue.t=setTimeout(()=>{try{bfHandCue()}catch(e){}},150)});   // a turn of the phone moves the hand: place the cues again
 function bfRevealBest(){try{const b=document.querySelector('.mine .hand .card.bf-best');if(b&&typeof dkReveal==='function'&&BF.pick==null){const r=b.getBoundingClientRect(),q=b.parentElement.getBoundingClientRect();if(r.left<q.left||r.right>q.right)dkReveal(b)}}catch(e){}try{bfHandCue()}catch(e){}}
 {const _m=bfMarkBest;bfMarkBest=function(){_m.apply(this,arguments);bfRevealBest();clearTimeout(BF.rvT);BF.rvT=setTimeout(bfRevealBest,80)}}
