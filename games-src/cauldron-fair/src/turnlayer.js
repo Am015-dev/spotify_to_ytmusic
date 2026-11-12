@@ -34,10 +34,10 @@ function instrInfo() {
   const v = viewSeat(); if (v < 0 || hotSeat() || UI.pass != null) return null;
   const me = G.players[v], wait = G.players.filter(p => p.seat !== v && ((G.phase === 'brew' && (p.st === 'draw')) || (G.phase !== 'brew' && p.q))).map(p => p.name);
   if (G.phase === 'brew' && me.st === 'draw' && !me.lock && !me.q) {
-    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day: pick Draw or Stop in secret. Everyone reveals together.' };
+    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day! Draw or Stop. All reveal together.' };
     if (!me.pot.length) return { who: 'YOUR TURN', text: 'Tap the bag to draw your first chip.' };
     const ws = CF.whiteSum(me), lim = CF.limitOf(G, me), safe = lim - ws;
-    return { who: 'YOUR TURN', text: safe <= 0 ? 'The pot is full of white (' + ws + '/' + lim + '). Another white chip explodes it. Draw, or Stop and score.' : 'White ' + ws + ' of ' + lim + '. Draw another chip, or Stop to keep your space.' };
+    return { who: 'YOUR TURN', text: safe <= 0 ? 'Whites ' + ws + '/' + lim + ': one more white explodes. Draw or Stop?' : 'Whites ' + ws + '/' + lim + '. Draw, or Stop to keep this space.' };
   }
   if (me.q && !EVAL_Q[me.q.h]) { const t = promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' }; }
   if (G.phase === 'brew') { if (me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 }; return { who: wait.length ? wait[0].toUpperCase() + '\'S TURN' : 'DAY ENDS', text: (me.boom ? 'Your pot exploded. ' : 'You stopped. ') + (wait.length ? 'Watch ' + wait.join(' and ') + ' draw, one chip at a time.' : 'Counting the day.'), rival: 1 }; }
@@ -53,7 +53,10 @@ function instrBar() {
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
   if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
   if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
-  const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  let top = db ? db.getBoundingClientRect().top : innerHeight - 200;
+  if (db) for (const c of db.children) { if (c === e || c.hidden) continue; const r = c.getBoundingClientRect(); if (r.height > 2 && r.bottom > 0) top = Math.min(top, r.top); }   // R8: sit above the panel's content, never over a fortune title or a choice button
+  e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  { const bd = $('#board'), er = e.getBoundingClientRect(), ih = Math.max(Math.ceil(er.height) + 8, bd ? Math.ceil(bd.getBoundingClientRect().bottom - er.top) + 4 : 0); if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
 }
 // ---- the turn banner: slides in when the turn changes hands
 let TB = { key: '', tm: 0 };
@@ -68,7 +71,7 @@ function turnBanner() {
   } else if (G.phase === 'eval') { key = 'ev' + G.round; text = 'Day ' + G.round + ' · Counting up'; cls = 'ev'; } else return;
   if (key === TB.key) return; TB.key = key; if (!text || !msgOK()) return;
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
-  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
+  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 1200);   // R8: a short flash, it never sits over content
 }
 setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble
@@ -98,7 +101,7 @@ function goalCard(force) {
 
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
-  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the whites pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
   e.addEventListener('click', () => { e.remove(); });
   document.body.appendChild(e);
 }

@@ -85,6 +85,8 @@ html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbt
 #coach{position:fixed;left:8px;right:8px;bottom:262px;z-index:95;display:none;gap:8px;align-items:flex-start;padding:10px 10px 8px 14px;border-radius:14px;background:#fff4d6;color:#2b1a12;border:2px solid #7a5c3e;box-shadow:0 4px 14px rgba(0,0,0,.5);font:600 14.5px/1.25 system-ui,sans-serif;flex-wrap:wrap}
 #coach.on{display:flex;animation:rfin .28s ease-out}
 #coach .tutpor{left:-6px;top:-18px}
+.gxh-bd[data-por] .gxh-tt{padding-left:30px}#coach .cxb b{padding-left:26px}
+html.ph #barstat .dayn.gchip{min-height:44px;display:inline-flex;align-items:center}
 #coach .cxb{flex:1 1 200px;display:flex;flex-direction:column;gap:2px;min-width:0}#coach .cxb b{font-size:15px}
 #coach .cxr{flex:1 1 100%;display:flex;gap:8px;justify-content:flex-end}
 #coach button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#7b1f2e;color:#fff;font:700 14px system-ui,sans-serif}
@@ -209,3 +211,51 @@ html:not(.ph) #goalcard .gck{font-size:16px}
 }
 #goalcard .gck,#goalcard h3{padding:0 8px}#goalcard ul{padding-left:28px;padding-right:8px}
 html.ph{--gx-bar-h:48px}html.ph .gx-bar{height:48px;min-height:48px;overflow:visible}html.ph .gx-bar .gx-ibtn{box-sizing:border-box;height:44px;min-height:44px}
+/* G6 fix: shop stalls say what each chip does; prices sit inside their own chip column and never overlap */
+.stall .sdo{flex:none;min-height:15px;font-size:13px;line-height:1.1;color:#ffe9a8;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.85);margin:-2px 0 1px}
+.mkt .sinfo{font-size:14px;line-height:1.25;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:4px 8px;max-height:3.9em;overflow:auto}
+.mkt .sinfo b{color:#ffe9a8}
+.tokw{overflow:visible}.tok .pc{max-width:100%;box-sizing:border-box;white-space:nowrap;padding:0 3px;gap:1px}
+.tok .pc svg{width:13px!important;height:13px!important;flex:none}
+/* G6 fix: on phones the instruction bar floats just above the panel; the cauldron shrinks so the bar never covers the bottom ring */
+html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:border-box}
+#instr span{overflow-wrap:anywhere}
+.btn.confirm.busy{transform:translateY(2px) scale(.97);filter:brightness(.85)}
+@media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:13px;max-height:2.6em;padding:2px 8px}}
+.tsegs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
+@media (max-height:500px){.tsegs .tseg+.tseg{display:none}}   /* short landscape: rival levels stay in More options */
+/* R3 fix: the ruby screen says in words what each option does; the shop keeps its short stall lines on small phones */
+.rboard .rhelp{grid-column:1/-1;font-size:15px;line-height:1.3;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:5px 10px;text-align:center}
+.rbt.big{flex-direction:column;height:auto;min-height:78px;padding:4px 8px}.rbt .rlb,.rdp .rlb{display:block;font-style:normal;font-size:13px;font-weight:800;color:#fff6df;white-space:nowrap}
+.rdp{display:inline-flex;flex-direction:column;align-items:center}
+.rboard{grid-template-rows:auto auto minmax(0,1fr) auto}
+@media (orientation:landscape) and (max-height:520px){.rboard{grid-template-rows:auto auto minmax(0,1fr)}.rside{grid-row:3}.rpot{grid-row:3}.rboard .rhelp{font-size:13px;padding:2px 8px}}
+#fortchip{min-height:44px;border-radius:22px;box-sizing:border-box}
+/* R3 fix (375x667 shop): rows size to their content, so a price is never cut under the next awning; the short stall line stays; the list scrolls if it must */
+@media (max-height:760px) and (orientation:portrait){
+  .mkt .stalls .rbar{order:-1}   /* rubies first: they never hide below the scroll */
+  .mkt .stalls{grid-auto-rows:auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+  .stall .sdo{display:block;font-size:12px;min-height:14px;margin:-1px 0 0}
+  html.sk-stall .stall{border-width:26px 12px 8px;border-image-width:26px 12px 8px}
+  .stall .toks{padding-bottom:2px}
+  .tok{min-height:50px;padding:1px 2px}.tok svg.chip{width:36px;height:36px}.tok .pc{margin-top:-6px}
+}
+/* R8 fix: the ruby stall says in words what each button does (tap one: the line below explains it) */
+.mkt .rbar{flex-direction:column;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;gap:4px;padding:4px}
+.rbar .rbh{display:flex;align-items:center;justify-content:space-between;gap:4px;color:#fff6df}.rbar .rbh>b{font-size:15px}.rbar .rbh .rgems.cmp{flex:none}
+.rbt.rwd{justify-content:flex-start;gap:6px;min-height:44px;padding:2px 6px;text-align:left;width:100%;box-sizing:border-box}
+.rbt.rwd>span:first-child{flex:none;line-height:0}
+.rwt{display:flex;flex-direction:column;min-width:0;line-height:1.1}.rwt b{font-size:14px;font-weight:800;white-space:normal}.rwt em{font-style:normal;font-size:14px;font-weight:700;color:#ffd7de}
+.rbt.rwd[disabled]{opacity:.55}
+/* R8 fix: the stall list scrolls on small phones: a "N more stalls" cue and a faded bottom edge */
+.mkt .stw{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+.mkt .stw>.stalls{flex:1 1 0}
+.mkt .stalls.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6));mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6))}
+.smore{flex:none;align-self:center;margin-top:4px;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #f2b83a;background:#2b1a12;color:#fff6df;font:800 15px/1 system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;cursor:pointer}
+.smore[hidden]{display:none}
+.mkt .stalls .tout{visibility:hidden}
+@media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0;min-width:0}.mkt .stw>.stalls{min-height:0}.mkt .sinfo{flex:0 0 180px;max-height:none;align-self:stretch}}   /* R22: the info line sits beside the stalls, never squeezing them */
+/* R8: the fortune chip on the board sits above the YOUR TURN bar, never under it */
+html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}
+/* R22 gate: the painted plate must not change the Stop box (GXSK.audit): keep its unskinned padding */
+html.sk #acts .btn.stopb{padding:4px 12px 4px 38px}

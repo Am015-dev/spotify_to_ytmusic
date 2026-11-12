@@ -192,7 +192,7 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
+  const go = () => { UI.shopSel = []; UI.shopInfo = null; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;
