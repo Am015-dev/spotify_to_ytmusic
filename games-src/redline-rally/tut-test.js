@@ -11,9 +11,20 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.addInitScript(() => { window.AIDELAY = .15; });
     await p.goto(url, { waitUntil: 'load' }); await p.waitForTimeout(500);
+    /* dead-tap watch (W496): every 100 ms, any visible enabled button in the game that the tutorial does not point at, and that is not under
+       the dim layer on purpose, must take a tap. A question button (boost / slipstream / discard) that shows while the step is about something
+       else, or stays on screen after it was answered, is a dead tap: logged with the step id once it has stayed on screen 300 ms. */
+    await p.evaluate(() => { window.__dead = []; const seen = {}; setInterval(() => { if (!window.GXT || !GXT.active || !GXT.active()) return;
+      const cur = GXT.current(), tg = cur && cur.target ? cur.target() : null; const now = performance.now();
+      document.querySelectorAll('.slipq button').forEach(b => { const grp = /^boost/.test(b.id) ? /^boost$/ : /^slip/.test(b.id) ? /^slip$/ : /^disc/; if (cur && grp.test(cur.id)) { delete seen[b.id]; return; } const r = b.getBoundingClientRect(); if (!r.width || b.disabled || getComputedStyle(b).visibility === 'hidden') { delete seen[b.id]; return; }
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2), live = hit && (hit === b || b.contains(hit));
+        if (live || b === tg) { delete seen[b.id]; return; }
+        seen[b.id] = seen[b.id] || now; if (now - seen[b.id] > 300 && !window.__dead.some(d => d.b === b.id && d.step === (cur && cur.id))) window.__dead.push({ b: b.id || b.textContent, step: cur && cur.id }); }); }, 100); });
     const tb = await p.$('#tutSlot button'); const bb0 = await tb.boundingBox(); await p.touchscreen.tap(bb0.x + bb0.width / 2, bb0.y + bb0.height / 2);
     const seen = [], rulesAll = await p.evaluate(() => TUT_RULES.slice()), total = await p.evaluate(() => tutSteps().length);
-    let k = 0, ended = false;
+    let k = 0, ended = false, taps = 0, ignored = 0;
+    const tsig = () => p.evaluate(() => [GXT.state().i, !!document.querySelector('.gxt-end'), window.G ? G.phase + G.round + (G.pend ? G.pend.t : '') + UI.sel.length + UI.gear + document.querySelectorAll('.cd.sel,.cd.on').length : ''].join('|'));
+    const chk = async s0 => { taps++; for (let w = 0; w < 30; w++) { await p.waitForTimeout(100); if ((await tsig()) !== s0) return; } ignored++; problems.push('ignored tap at step ' + s0.split('|')[0]); };
     for (let guard = 0; guard < 200 && !ended; guard++) {
       try { await p.waitForFunction(() => (GXT.state().active && GXT.state().shown) || !!document.querySelector('.gxt-end'), null, { timeout: 25000 }); }
       catch (e) { problems.push('stuck at step ' + JSON.stringify(await p.evaluate(() => GXT.state().id))); break; }
@@ -28,22 +39,24 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         if (shots) { fs.mkdirSync(shots, { recursive: true }); await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, 'tut-' + k + '.png') }); }
       }
       await p.waitForTimeout(650);   // the shell ignores taps in the first 600 ms of a step
+      const s0 = await tsig();
       if (st.next) { const nb = await p.$('.gxt-next'); const q = await nb.boundingBox(); await p.touchscreen.tap(q.x + q.width / 2, q.y + q.height / 2); }
       else { const h = st.hole; const hit = await p.evaluate(h => { const e = document.elementFromPoint(h.cx, h.cy); return e ? e.tagName + '#' + e.id + '.' + e.className : 'none'; }, h); if (/gxt|gxh/.test(hit)) problems.push(st.id + ': hole covered by ' + hit); await p.touchscreen.tap(h.cx, h.cy); }
-      await p.waitForTimeout(250);
+      await chk(s0);
     }
     const ruleSeq = seen.filter(s => s.rule).map(s => s.rule);
     if (JSON.stringify(ruleSeq) !== JSON.stringify(rulesAll)) problems.push('rules in order: got ' + ruleSeq.join(','));
     if (seen.length !== total) problems.push('steps shown ' + seen.length + ' of ' + total);
     const real = await p.evaluate(() => { const s = G.cars[0].stats; return { spins: s.spins, stalls: s.stalls || 0, boosts: s.boosts, slips: s.slips }; });
     if (real.spins !== 1 || real.stalls !== 1 || real.boosts !== 1 || real.slips !== 1) problems.push('played moves ' + JSON.stringify(real));   // spin out, stall, boost, slipstream really happened
+    const dead = await p.evaluate(() => window.__dead); if (dead.length) problems.push('dead taps: ' + JSON.stringify(dead));
     if (!ended) problems.push('end card not reached');
     else {
       const eb = await p.$('.gxt-end [data-gxt-end="play"]'); const q = await eb.boundingBox(); await p.touchscreen.tap(q.x + q.width / 2, q.y + q.height / 2); await p.waitForTimeout(800);
       const real = await p.evaluate(() => !!G && UI.mode !== 'tutorial' && G.round === 1 && !G.over && !document.querySelector('#game').hidden && G.track !== 'practice');
       if (!real) problems.push('real race did not start after the tutorial');
     }
-    console.log(n, problems.length || errs.length ? 'FAIL' : 'PASS', 'steps', seen.length, 'rules', ruleSeq.length + '/' + rulesAll.length, errs.length ? 'errs ' + errs.join('|') : '', problems.join(' | '));
+    console.log(n, problems.length || errs.length ? 'FAIL' : 'PASS', 'steps', seen.length, 'taps', taps, 'ignored', ignored, 'rules', ruleSeq.length + '/' + rulesAll.length, errs.length ? 'errs ' + errs.join('|') : '', problems.join(' | '));
     if (problems.length || errs.length) fail = 1; await c.close();
   }
   await b.close(); process.exit(fail);
