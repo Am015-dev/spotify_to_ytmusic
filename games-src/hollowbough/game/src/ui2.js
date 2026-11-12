@@ -397,6 +397,9 @@ function chipEl(s, n) {
   e.appendChild(h('span.cl', h('span.cp', '★' + pts + (!grim && G.players.length > 1 && pts > 0 && G.players.every((q, i) => i === s || score(i).total < pts) ? ' ♛' : '')), h('span', '▢' + cards), (p && n <= 3) ? h('span', '⚑' + availW(p)) : null));
   return e;
 }
+// a choice of which effect goes first: each option names the card and says in one line what it does
+const effQ = () => !!(G && G.q && (G.q.kind === 'trigger' || G.q.kind === 'production'));
+function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').split(/\s+/); return w.length > 10 ? w.slice(0, 9).join(' ') + '…' : w.join(' '); }
 // ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips
 function trayChip(m, i, tg) {
   let inner;
@@ -407,11 +410,12 @@ function trayChip(m, i, tg) {
     else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
-    if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
+    if (m.card !== undefined && effQ()) inner = [h('b', cname(m.card)), h('span.eff', effLine(m.card))];
+    else if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
     else if (m.res !== undefined) inner = [ic(m.res, 24), h('b', m.label ? chipText(m.label) : rname(m.res, 1))];
     else inner = [h('b', chipText(m.label) || 'OK')];
   } else inner = [h('b', chipText(m.label))];
-  const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? '.tcard' : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
+  const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? (effQ() ? '.teff' : '.tcard') : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
   if (m.label) b.setAttribute('aria-label', m.label);
   UI.tgEls[tg] = b; return b;
 }
@@ -429,7 +433,7 @@ function renderActs(mm, qm, qShown) {
   { const trayMs = UI.sel ? UI.sel.ms : qm.filter(m => !qShown.has(m.i)), nc = trayMs.filter(m => m.type === 'choose' && m.card !== undefined).length; UI.trayCw = 44;
     if (nc && trayMs.length > 5) { const availH = Math.max(120, Math.min(R.H * .6, box.y + box.h - 120)); for (const c of [44, 38, 34, 30, 26, 22]) { const per = Math.max(1, Math.floor((box.w - 8) / (c + 12 + 6))), rows = Math.ceil(trayMs.length / per); UI.trayCw = c; if (rows * (Math.round(c * CARD_AR) + 14) + 10 <= availH) break; } } }
   if (UI.sel) UI.sel.ms.forEach(m => { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'o:' + i)); });
-  else if (qm.length) qm.forEach(m => { if (!qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } });
+  else if (qm.length) { const eff = effQ(); qm.forEach(m => { if (eff || !qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } }); }   // order-of-effects choices always list what each effect does
   if (chips.length) {
     a.classList.add('tray');
     const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;

@@ -39,3 +39,11 @@ At the end, "Play a real game" starts a real game against the computer at once. 
 Proof: `game/learn-touch.js 390x844,375x667` walks it by touch taps, checks every step id above appears in this order,
 every say is 12 words or fewer, wrong taps never advance, no "learn later" list, and that "Play a real game" starts a real game.
 Shots: `playable-shots/gameplay/tut-1.png` .. `tut-28.png` (28 = end card).
+
+## R21 fix (37 steps): Summer and Autumn are played, not tapped
+After the Summer draw the lesson now plays every remaining rule for real:
+inn (worker on your own Inn) → innbuy (buy the meadow critter 3 cheaper: free) → bard (its "cards for points" choice: tap Done) →
+special (Inn + that critter claim the staged special event) → stack (berries on it, 2 points each) → haven (worker) → havenq ×2
+(drop two cards) → havendone → havenres (pick a good) → gossip (last worker) → prep3 (Prepare for Autumn) → autumn (says the
+real production: workers and goods gained) → journey → road (pick Long Road 2) → journeyq ×2 (drop two cards) → pass ×2 in Autumn.
+Tray choice chips now report to the coach too (tutGate in ui12.js), so only the asked-for chip answers.

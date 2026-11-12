@@ -10,7 +10,7 @@
 #bd.pv .chip.turn{background:#ffe7a3;box-shadow:0 0 0 2px #fff,0 0 14px 3px rgba(255,210,90,.85)}
 #bd.pv .pvch-t{display:flex;flex-direction:column;min-width:0;line-height:1.05;text-align:left}
 #bd.pv .pvch-n{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#bd.pv .pvch-s{font-size:14px;font-weight:600;opacity:.8;white-space:nowrap}
+#bd.pv .pvch-s{font-size:14px;font-weight:600;white-space:nowrap}
 #bd.pv .pvch-pt{margin-left:auto;font-size:22px;font-weight:800;display:inline-flex;align-items:center;gap:1px;color:var(--pv-ink)}
 #bd.pv .pvch-star{color:#8a5a00;font-size:18px;text-shadow:0 1px 0 #6b4a10}
 #bd.pv .pvsea{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#f8edd2;font-size:14px;line-height:1;gap:1px;min-width:46px}
@@ -419,3 +419,8 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 #bd.pv .rs.fxup b{color:#1f7a1f!important;animation:bmp .5s}#bd.pv .rs.fxdn b{color:#a3321a!important;animation:bmp .5s}
 .achv{white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.25;padding:4px 8px!important;margin:4px 0 6px!important}
 #bd.pv.tall .pv-visit .sc,#bd.pv.tall .strip.city .pv-visit .sc{width:80px}#bd.pv.tall .pv-visit{overflow-x:auto;scrollbar-width:none}
+
+/* order-of-effects chips: card name + one line of what it does */
+#acts.tray .tchip.teff{flex:1 1 100%;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;min-height:48px;height:auto}
+#acts.tray .tchip.teff b{text-align:left}
+#acts.tray .tchip.teff .eff{font-weight:500;line-height:1.2;text-align:left;white-space:normal}

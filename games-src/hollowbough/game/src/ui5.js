@@ -13,7 +13,7 @@ function newGame(mode, o) {
   let players, solo = null;
   if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
   else if (mode === 'tutorial') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
-  else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
+  else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'normal' }]; }   // the first real game: the default (gentle builder) rival, never the random one
   else if (mode === 'hot') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: (cfg.names && cfg.names[i]) || 'Player ' + (i + 1), ai: null }); }
   else if (mode === 'net') { players = o.players; }
   else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }

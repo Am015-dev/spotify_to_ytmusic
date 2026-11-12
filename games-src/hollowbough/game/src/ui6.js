@@ -86,7 +86,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 't': onTarget(d.t, t); break;
-    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { if (typeof tutGate === 'function' && !tutGate(UI.sel ? 'o:' + d.mi : tgOf(m), !!UI.sel)) break; UI.sel = null; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
     case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
     case 'handtog': UI.handHide = !UI.handHide; snd('click', { vol: .4 }); render(); break;

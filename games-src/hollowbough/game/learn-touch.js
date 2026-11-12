@@ -39,7 +39,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(!st.active)break;
     if(st.phase==='end')break;
     const sig=[st.i,st.phase,st.count,st.shown].join('|');
-    if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s at step '+st.i+' '+st.id+' phase '+st.phase+' '+JSON.stringify(await p.evaluate(()=>({q:G&&G.q&&G.q.kind,cards:UI.cards.map(c=>c.kind),busy:UI.animBusy,cur:G&&HB.actor(G),sel:!!UI.sel}))));await p.screenshot({path:'/tmp/claude-0/tutor_stuck_'+W+'_'+mode+'.png'}).catch(()=>{});break}
+    if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s at step '+st.i+' '+st.id+' phase '+st.phase+' '+JSON.stringify(await p.evaluate(()=>({q:G&&G.q&&G.q.kind,cards:UI.cards.map(c=>c.kind),busy:UI.animBusy,cur:G&&HB.actor(G),sel:!!UI.sel,log:(G.log||[]).slice(-6).map(x=>typeof x==="string"?x:JSON.stringify(x).slice(0,120))}))));await p.screenshot({path:'/tmp/claude-0/tutor_stuck_'+W+'_'+mode+'.png'}).catch(()=>{});break}
     if(!st.shown){await sleep(60);continue}
     // ---- a step is on screen
     if(!seenIds.includes(st.id)){seenIds.push(st.id)}
@@ -131,7 +131,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   }
   // ---- the end
   // every core rule is taught, in this order, each as its own step (no "learn later" list)
-  const RULES=['goal','places','twig','stock','rival','resin','hand','build','city','prep','spring','berry','toad','free','event','forest','prep2','summer','haven','journey','inn','special','autumn','pass','score','bonus','end'];
+  const RULES=['goal','places','twig','stock','rival','resin','hand','build','city','prep','spring','berry','toad','free','event','forest','prep2','summer','inn','innbuy','bard','special','stack','haven','havenq','havendone','havenres','gossip','prep3','autumn','journey','road','journeyq','pass','score','bonus','end'];
   if(mode==='clean'){const miss=RULES.filter(r=>!seenIds.includes(r));if(miss.length)note(tag,'rule steps missing: '+miss.join(','));
     const ord=seenIds.filter(r=>RULES.includes(r));if(ord.join()!==RULES.filter(r=>ord.includes(r)).join())note(tag,'rule steps out of order: '+ord.join(','));
     const later=await p.evaluate(()=>!!document.querySelector('.hb-later'));if(later)note(tag,'a "learn later" list appeared')}
