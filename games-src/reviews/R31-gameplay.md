@@ -11,6 +11,7 @@ The gates ran on the same 4 cores during the first sands games, so the sands wai
 |---|---:|---|---|---|
 | sands-of-qamar | 7.0 | FAIL | PASS | 7 Feel 6, 8 Bugs 6 |
 | hollowbough | 7.0 | FAIL | PASS | 6 AI and pacing 6, 8 Bugs 6 |
+| vale-of-banners | 7.3 | FAIL | PASS | 6 AI and pacing 6 |
 
 ---
 
@@ -122,3 +123,61 @@ The result table lists cards, point tokens and Journey but no separate goals or 
 | 8 | 390, Autumn: "Spend goods for tokens, or stop", tapped the glowing "Stop here" | The first tap did nothing. | R31-shots/hb-g390-stop-here-dead.jpg |
 | 6 | Two default games | Lost 24-27 following the glow and 15-25 mixed. | R31-shots/hb-g390-result-24-27.jpg, hb-g375-final.jpg |
 | 2 (good) | Tutorial at 375 | 0 dead taps in 41, one line per step. | R31-shots/hb-tut375-forest-step.jpg |
+
+---
+
+## 3. vale-of-banners (shelf/W505-vale-gameplay, merged locally @ 980b6494): 7.3, FAIL
+
+Gate: **PASS** (phone-check 59.7 s with no dead-tap lines, `rules-test.js ok: AI games: 40/40 finished, stuck 0, invariant breaks 0 /
+PASS 37 checks`, "1/1 PASS", EXIT 0). Lab WARN 3/8 (this does not fail the gate).
+
+What I played:
+- Tutorial ("New? Learn to play") at **375x667** by touch to the "You know how to play / Play a real game" card: 49 steps, 51 taps
+  (15 of them Next), **0 dead taps**, every target 44 px or more, 0 errors. The coach bubble never hid the target. The only
+  covered target was the cell under the "Chain of 3" callout, and that step wanted Next.
+- Two full Quick games on defaults (▶ Play > Start: 2 players, Gentle rival, **Hints on by default**) to the result card:
+
+| Game | Size | How I played | Result | Time | Taps | ★ taps | Dead taps |
+|---|---|---|---|---|---|---|---|
+| g390 | 390x844 | always the ★ (on a tile, space, tab, die or End turn), else the glow | **won 168-65** ("A big win, by 103 points") | 7.5 min | 230 | 171 | 0 |
+| g375 | 375x667 | ignored the ★ and tapped only what glowed on the screen I was on, else any button | **lost 56-113**: I filled 0 regions, turned almost every die into workers and scored 46 points from workers | 4.8 min | 90 | 0 | 0 |
+
+- 0 page and console errors, 0 stuck states, 0 covered targets in both games. Rival turns: longest settle 3.6 s (390) and 4.3 s (375).
+  (My first try at the 375 game stopped early because my driver's patience ran out during a rival turn. The re-run reached the
+  result, so that was my driver, not the game.)
+- ★ visibility: in the ★ game the driver always found the ★ on a tab, tile, die or button it could tap (0 hidden, 0 covered).
+  Every ★ had a reason line ("★ Take Barge: loads goods, banner up the track. Fits a space now.").
+
+Rules: same as R28 and right. 5 seasons x 5 rounds; two dice plus the goods die; take, build, sell or workers; ±1 per worker with 6
+and 1 next to each other; back lane; region and season points; colour bonus; mines; end scoring 1 per silver, 1 per good and 1 per
+2 workers. The published rules set no worker cap, so the 92-worker game is legal. Nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. The tie-break reading is still the one open point (R28). |
+| 2 | Tutorial teaches | 8 | 49 steps at 375, 0 dead taps, the bubble never covers the target, ends on "Play a real game". Still 15 Next-only taps of 51. |
+| 3 | First 10 seconds | 7 | Big ▶ Play, defaults chosen, a short goal card, you move first. |
+| 4 | Turn clarity | 7 | Every ★ has a short reason. A "Turn over" banner rates the turn ("Weak turn. Much better was: take a Granary from stall 5, using 1 worker."). The score chips cut off their breakdown ("regions 11 · animals 8 · go…"). The result table's columns (Built / Silver / Workers / Goods / Lore) don't match the score strip (g390: table "Goods 0", strip "goods 24"). |
+| 5 | Phone play | 7 | Fixed: the worker chip is about 48 px tall, and the round/season cards are a top banner that never blocked a tap (0 covered targets, 0 dead taps in 320 game taps). All targets 44 px or more. The "Turn over" banner still sits over the score strip and tabs while it shows. The score-chip breakdown text is small and cut off. |
+| 6 | AI and pacing | 6 | **The ★ is too strong.** With Hints on by default, tapping the ★ beat the default rival by 103 points (168-65), close to the fixer's 162-42 and 176-95. A newcomer wins without thinking, and the gentle rival is no contest. Without the ★, a newcomer who taps what glows lost 56-113 and never found the market. There is nothing in between: the ★ plays the game for you, and without it you're lost. Games take 5-7.5 min at bot speed (longer for a person). |
+| 7 | Feel | 7 | Dice roll, tiles fly, region flashes, the "Turn over" rating, an honest result line ("A big win, by 103 points", "Follow ★ Best."). |
+| 8 | Bugs | 8 | 0 errors, 0 stuck, 0 dead taps in the tutorial and both games, gate PASS. |
+| | **Total** | **7.3** | **FAIL**: row 6 is below 7. 8+8+7+7+7+6+7+8 = 58/8 = 7.25. No stopper. |
+
+### Earlier findings (R28)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 4: ★ on a market tile while the Market tab is closed (33-37 a game) | **Fixed**: the driver always found a tappable ★, 171 ★ taps with 0 hidden or covered. | R31-shots/vb-g390-star-with-reason.jpg |
+| Row 5: glowing worker chip 40 px tall | **Fixed**: about 48 px. | R31-shots/vb-g390-star-with-reason.jpg |
+| Row 5: round/season cards cover glowing spaces and the ★ | **Fixed**: now a top banner, 0 covered targets and 0 dead taps. | R31-shots/vb-g375-turn-over-banner.jpg |
+| Row 5: "Your turn" banner over the score strip | **Partly**: the "Turn over" banner still covers the score strip and tabs for a moment. | R31-shots/vb-g375-turn-over-banner.jpg |
+| Row 8: 11 of 59 taps during rival turns got no response | **Not re-tested** (I did not tap during rival turns). | n/a |
+| Row 2: tutorial rival-points line leaves out goods | **Not re-checked**. | n/a |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | 390: tapped the ★ every time (Hints are on by default) | Won 168-65, "A big win, by 103 points". The ★ plays the whole game for you. | R31-shots/vb-g390-star-won-168-65.jpg |
+| 6 / 4 | 375: ignored the ★ and tapped what glowed | Never opened the market, turned dice into workers each turn (92 workers), filled 0 regions, lost 56-113. | R31-shots/vb-g375-nostar-lost-56-113.jpg |
+| 4 | Result card after g390 | The table says Goods 0 while the score strip said "goods 24": the two use different groupings. | R31-shots/vb-g390-star-won-168-65.jpg |
+| 2 (good) | Tutorial at 375 | 0 dead taps in 51, ends on "Play a real game". | R31-shots/vb-tut375-end-card.jpg, vb-tut375-step29.jpg |
