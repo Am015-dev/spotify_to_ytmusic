@@ -72,6 +72,18 @@ function trackHead() { // W484: say what the strip is, who is where, and what pa
   var dot = function (s) { return h('i.trdot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }); };
   return h('div#trhead', { role: 'button', tabindex: '0', 'data-a': 'trhelp', 'aria-label': 'Time track: what passing a spot does' }, h('div.trl', h('b', 'Time track'), h('span', dot(0), nameOf(0) + ': ' + G.pos[0] + ' of ' + SW.TRACK), h('span', dot(1), nameOf(1) + ': ' + G.pos[1] + ' of ' + SW.TRACK)),
     h('div.trr', { html: 'Pass ' + btnIc() + ' = income. Pass ' + leaIc() + ' leather = free 1\u00D71.' })); }
+function trPhone() { return !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; } /* R16: phone tags carry only the number (seat colour = who); full names live in the zoomed track sheet */
+function trackSheet() { // R16: tap the track for a big, readable sheet: every space 34px+, names in full, who moves next
+  var old = $('#trsheet'); if (old) old.remove(); var nx = swWho(G), cols = 9, i, g = h('div.tsgrid', { style: 'grid-template-columns:repeat(' + cols + ',1fr)' });
+  for (i = 0; i <= SW.TRACK; i++) { var r = (i / cols) | 0, c = i % cols; if (r % 2) c = cols - 1 - c; var cl = h('div.tsc'); cl.style.gridRow = r + 1; cl.style.gridColumn = c + 1;
+    if (SW.BTN_SPOTS.indexOf(i) >= 0) { cl.classList.add('bspot'); cl.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cl.classList.add('lspot'); cl.innerHTML = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null ? '&#10003;' : leaIc(); } else cl.appendChild(h('small', String(i)));
+    if (i === SW.TRACK) cl.classList.add('tend'); if (i < Math.min(G.pos[0], G.pos[1])) cl.classList.add('past');
+    [0, 1].forEach(function (s) { if (G.pos[s] === i) cl.appendChild(h('i.tsk.' + (s ? 'opp' : 'me') + (s === nx ? '.nx' : ''), { title: nameOf(s) })); }); g.appendChild(cl); }
+  var who = function (s) { return h('span.tsw', h('i.tsk.' + (s ? 'opp' : 'me') + (s === nx ? '.nx' : '')), h('b', nameOf(s)), ' ' + G.pos[s] + ' of ' + SW.TRACK); };
+  var card = h('div.card.tscard', h('h2', 'Time track'), h('p.tsnext', G.over ? 'Both quilters reached the end.' : nx < 0 ? '' : (nameOf(nx) === 'You' ? 'You move next' : nameOf(nx) + ' moves next') + ': furthest back plays.'), h('div.tsrow', who(0), who(1)), g,
+    h('p.tsleg', { html: 'Pass ' + btnIc() + ' = income. Pass ' + leaIc() + ' leather = free 1\u00D71. Both at 53 = game over.' }), h('button.btn.go', { type: 'button', 'data-a': 'trclose' }, 'Back to the quilt'));
+  var ov = h('div#trsheet.ov', { role: 'dialog', 'aria-label': 'Time track, zoomed' }, card); ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); }); document.body.appendChild(ov);
+}
 function renderTrack() {
   var cols = trackCols(), rows = Math.ceil(54 / cols), t = $('#track'); if (!t) { t = h('div#track', { role: 'img', 'data-a': 'trhelp' }); }
   t.innerHTML = ''; t.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; t.style.gridTemplateRows = 'repeat(' + rows + ',auto)';
@@ -80,7 +92,7 @@ function renderTrack() {
     if (i === SW.TRACK && !cell.querySelector('.bfin')) { var bi2 = artImg('icon-bonus', 'ic bfin'); if (bi2) { bi2.alt = 'Finish: 7x7 bonus is judged here'; cell.appendChild(bi2); } }
     if (rc[0] % 2) cell.classList.add('trv'); if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
   artBg(t, 'track-frame'); t.style.backgroundSize = 'cover';
-  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
+  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', trPhone() ? (swWho(G) === s && !G.over ? '\u25B6 ' : '') + G.pos[s] : nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
   return t;
 }
@@ -192,10 +204,10 @@ function renderDock() {
     if (UI.hints && !UI.coach) ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'whatdo' }, 'What should I do?'));
   }
   try { ringStrip(); } catch (e) { console.error(e); }   // W491: the whole ring, clockwise from the spool
-  swComp(hum && !G.pend && UI.sel < 0 && ac.children.length === 1 && !T2);
+  swComp(hum && !G.pend && UI.sel < 0 && ac.children.length === 1) /* R16: the tutorial gets the same compact phone dock (Advance in the header row) as the real game */;
 }
 /* R7: phone portrait (375x667, 390x844): Advance moves up into the dock header row so the quilt gets that height back */
-function swComp(on) { var de = document.documentElement; on = !!on && !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('swcomp', on); var pr = $('#prompt'); if (on && pr && pr.textContent === 'Tap a glowing patch, or tap Advance') pr.textContent = 'Tap a glowing patch, or'; if (on && pr && pr.textContent === 'No patch you can buy: tap Advance') pr.textContent = 'No patch fits. Tap'; }
+function swComp(on) { var de = document.documentElement; on = !!on && !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('swcomp', on); var pr = $('#prompt'); if (on && pr && pr.textContent === 'Tap a glowing patch, or tap Advance') pr.textContent = 'Tap a glowing patch, or'; if (on && pr && pr.textContent === 'No patch you can buy: tap Advance') pr.textContent = 'Nothing fits \u2192'; }
 
 // score drawer: every number's why, on tap only
 function showScoreDrawer() {

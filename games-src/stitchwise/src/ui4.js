@@ -189,7 +189,7 @@ function t2Steps() {
     { id: 'rotate', rule: 'rotate', say: 'Turn it to match the top gap. Tap Rotate.', target: function () { return $('[data-a=rot]'); }, allow: function (a) { return a === 'rot'; }, done: function () { return UI.o === T2.o1; } },
     { id: 'place', rule: 'place', say: 'Drag the patch into the gold gap.', target: ghost, gap: 'h1', allow: function (a) { return a === 'rot' || a === 'flip'; }, done: function () { return t2AtGap(T2.h1); } },
     { id: 'pay', rule: 'pay', say: 'Sew it on. You pay its 4 buttons.', target: sew, gap: 'h1', allow: function (a) { return a === 'sew' && t2AtGap(T2.h1); }, done: function () { return G.owned[0].length >= 1; } },
-    { id: 'time', rule: 'time', say: 'It cost 2 time: your token moved 2. Furthest behind plays next.', btn: 'Watch Marden', target: function () { return $('#tutb .t2b'); },
+    { id: 'time', rule: 'time', say: 'It cost 2 time: you moved 2. Furthest back plays next.', btn: 'Watch', target: function () { return $('#tutb .t2b'); },
       onBtn: function () { UI.tutAi = true; schedule(); }, done: function () { return T2.pressed && t2Mine(); } },
     advStep('advance', 'advance', 'Or Advance: jump just past Marden, +1 button per space.', function () { return G.log.some(function (l) { return l[0] === 0 && l[1] === 'adv'; }) && t2Mine(); }),
     advStep('income', 'income', 'Pass a gold spot: +1 button per button on your patches.', function () { return G.pos[0] > 41 && t2Mine(); }),
@@ -219,7 +219,8 @@ function t2Tick() {
 }
 function t2Show() {
   var st = t2Step(); if (!st || $('#tutfin')) return; var db = $('#dockbody'); if (!db) return; var b = $('#tutb');
-  if (!b) { b = h('div#tutb', { role: 'status', 'aria-live': 'polite' }); } if (b.parentNode !== db || db.firstChild !== b) db.insertBefore(b, db.firstChild);
+  if (!b) { b = h('div#tutb', { role: 'status', 'aria-live': 'polite' }); } var bar = $('.gx-bar'), mb = bar && $('[data-gx=setd]', bar), ph = !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; document.documentElement.classList.add('swtut'); /* R16: on a phone the coach line rides in the top bar (Menu stays), so the tutorial quilt is as big as the real game's */
+  if (ph && mb) { if (b.nextSibling !== mb) { bar.insertBefore(b, mb); requestAnimationFrame(function () { if (T2 && G) render(); }); } } else if (b.parentNode !== db || db.firstChild !== b) db.insertBefore(b, db.firstChild);
   var n = T2.seen.length, key = st.id + ':' + T2.pressed;
   if (b.dataset.key !== key) { b.dataset.key = key; b.dataset.rule = st.rule; b.dataset.step = st.id; b.innerHTML = '';
     b.appendChild(h('span.t2n', Math.min(n, TUT_RULES) + '/' + TUT_RULES)); b.appendChild(h('span.t2t', st.say));
@@ -228,7 +229,7 @@ function t2Show() {
   var all = st.id === 'leather2' && T2.hl ? [T2.hl] : (T2.h1 || []).concat(T2.h2 || [], T2.hl ? [T2.hl] : []); /* R7: only the 1x1 gap glows while the free patch waits */ $$('#quilt .qc').forEach(function (e, i) { e.classList.toggle('t2gap', viewSeat() === 0 && G.board[0][i] === -1 && all.some(function (q) { return q[1] * 9 + q[0] === i; })); });
   var pr = $('#prompt'); if (pr) pr.classList.add('t2hide');
 }
-function t2Clear() { clearInterval(UI.t2iv); T2 = null; window.GXT2 = null; var b = $('#tutb'); if (b) b.remove(); var f = $('#tutfin'); if (f) f.remove(); $$('.t2-hl').forEach(function (e) { e.classList.remove('t2-hl'); }); var pr = $('#prompt'); if (pr) pr.classList.remove('t2hide'); }
+function t2Clear() { clearInterval(UI.t2iv); T2 = null; window.GXT2 = null; document.documentElement.classList.remove('swtut'); var b = $('#tutb'); if (b) b.remove(); var f = $('#tutfin'); if (f) f.remove(); $$('.t2-hl').forEach(function (e) { e.classList.remove('t2-hl'); }); var pr = $('#prompt'); if (pr) pr.classList.remove('t2hide'); }
 function t2Final() { // end scoring, walked through with the real numbers
   if ($('#tutfin')) return; UI.finished = G; var A = swScore(G, 0), B = swScore(G, 1), line = function (nm, c) { return '<p><b>' + nm + ':</b> ' + c.btn + (c.btn === 1 ? ' button' : ' buttons') + (c.bonus ? ' + 7 bonus' : '') + ' − ' + c.empty + ' empty × 2 = <b>' + sgn(c.total) + '</b></p>'; };
   T2.seen.indexOf('end') < 0 && T2.seen.push('end');

@@ -441,5 +441,23 @@ html.swcomp #acts{position:absolute;top:3px;right:50px;width:152px;margin:0!impo
 html.swcomp #acts .btn{min-height:44px;height:44px;width:100%;padding:0 6px;font-size:15px!important;white-space:nowrap}
 html.swcomp #prompt:not(.t2hide){right:206px}
 html.swcomp .gx-dock-head .gx-dt{margin-right:156px;line-height:1.15}
+/* R16: phone tutorial: the coach line sits in the top bar instead of the dock; Menu stays, Hints/Patches/Rules step aside */
+html.ph.swtut .gx-bar #bulbbtn,html.ph.swtut .gx-bar [data-gx=patchd],html.ph.swtut .gx-bar [data-gx=rulesd],html.ph.swtut .gx-bar #barprompt,html.ph.swtut .gx-bar .gx-sp{display:none!important}
+html.ph.swtut .gx-bar{overflow:visible;padding-top:calc(3px + env(safe-area-inset-top,0px))!important;padding-bottom:3px!important}
+.gx-bar #tutb{flex:1 1 auto;min-width:0;margin:0;padding:4px 8px;font-size:14px;line-height:1.22;gap:6px;border-radius:10px;box-shadow:none;min-height:44px}
+.gx-bar #tutb .t2n{font-size:14px;padding:1px 6px}.gx-bar #tutb .t2b{min-height:44px;padding:0 10px;font-size:14px}
+html.ph.swcomp #prompt:not(.t2hide){white-space:normal;overflow-wrap:anywhere;font-size:15px!important}
+/* R16: zoomed track sheet (tap the track) + phone track tags that never cut */
+#trsheet{z-index:70;background:#0009}#trsheet .tscard{max-width:440px;width:100%;display:flex;flex-direction:column;gap:8px}
+#trsheet h2{margin:0;font-size:20px}#trsheet .tsnext{margin:0;font-size:16px;font-weight:800}
+#trsheet .tsrow{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:15px}#trsheet .tsw{display:inline-flex;align-items:center;gap:6px}
+#trsheet .tsgrid{display:grid;gap:3px}#trsheet .tsc{position:relative;height:36px;border-radius:6px;background:#f1e5c8;display:flex;align-items:center;justify-content:center;color:#5a4630;font-weight:700;font-size:14px;min-width:0}
+#trsheet .tsc small{font-size:14px;opacity:.55}#trsheet .tsc.past{background:#bba97f}#trsheet .tsc.bspot{background:#f6cf6b}#trsheet .tsc.lspot{background:#c88a58;color:#fff}#trsheet .tsc.tend{box-shadow:inset 0 0 0 3px var(--gold)}
+#trsheet .tsc svg,#trsheet .tsc img.ic{width:20px;height:20px}
+#trsheet .tsk{display:inline-block;width:18px;height:18px;border-radius:50%;border:3px solid #fff;box-shadow:0 1px 3px #0008;flex:0 0 auto}#trsheet .tsc .tsk{position:absolute;bottom:2px;right:2px}#trsheet .tsc .tsk.opp{right:auto;left:2px}
+#trsheet .tsk.me{background:var(--me)}#trsheet .tsk.opp{background:var(--opp)}#trsheet .tsk.nx{box-shadow:0 0 0 3px var(--gold),0 1px 3px #0008}
+#trsheet .tsleg{margin:0;font-size:15px}#trsheet .tsleg svg,#trsheet .tsleg img.ic{width:16px;height:16px;vertical-align:-3px}#trsheet .btn{min-height:48px}
+html.ph .tk .tkn{padding:1px 5px}
+html.ph #track::after{content:'\2922';position:absolute;right:4px;top:-12px;width:22px;height:22px;border-radius:50%;background:#1f5f58;color:#fff;font-size:14px;line-height:22px;text-align:center;box-shadow:0 1px 3px #0008;pointer-events:none;z-index:4}
 </style>
 </head>

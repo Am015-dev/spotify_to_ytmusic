@@ -24,6 +24,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
     if (!st) { ok(false, 'no tutorial step shown'); break; }
     if (seen[seen.length - 1] !== st.rule) { seen.push(st.rule); if (SH && WANT.indexOf(st.rule) >= 0 && st.id !== 'end') { shotN++; await pg.waitForTimeout(250); await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); } }
     if (st.id === 'score' && SH) { shotN++; await pg.screenshot({ path: path.join(SH, 'tut-' + shotN + '.png') }); }
+    { const qm = await pg.evaluate(() => { const q = document.querySelector('#quilt'); return q ? { cs: q.getBoundingClientRect().width / 9, pl: UI.sel >= 0 || !!G.pend } : null; }); if (process.env.CS) console.log('cs', st.id, qm && qm.cs.toFixed(1), qm && qm.pl); if (qm && st.id !== 'score') ok(qm.cs >= (qm.pl ? 37 : (sz[0] < 380 ? 30 : 37)), 'R16: step ' + st.id + ' tutorial quilt square ' + qm.cs.toFixed(1) + 'px (placing ' + qm.pl + ')'); }
     ok(st.say.trim().split(/\s+/).length <= 13, 'step ' + st.id + ' line <= 13 words: ' + st.say);
     const hl = await pg.$$('.t2-hl'); ok(hl.length === 1, 'step ' + st.id + ': exactly one highlighted target (' + hl.length + ')');
     // a wrong tap is refused (the step does not move on)
