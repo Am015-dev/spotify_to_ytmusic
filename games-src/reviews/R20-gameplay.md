@@ -46,6 +46,56 @@ Build: `npm i three` in games-src, then `build-all.py sands-of-qamar` PASS; the 
 
 ---
 
+## 2. tidewake (branch shelf/W498-tidewake-gameplay @ 7a6ea6ba, fix 2546246c): 7.3 FAIL
+
+How I tested: built with games-src/scripts/build-all.py tidewake (PASS) and served the staged page next to games/tidewake/{media,models,music}. I used Playwright touch only (hasTouch, isMobile, page.touchscreen.tap at element centres, with an elementFromPoint check before each tap). I played the tutorial from the title button to the end card at 390x844 (30 steps, 35 taps, 73 s) and at 375x667 (30 steps, 35 taps, 78 s), with 0 dead taps and 0 errors. Then I played 34 Quick games (you vs 2 computers, default settings) from the title to the result screen, 18 at 390x844 and 16 at 375x667. Every game started with 6 leviathans, so the rulebook start is now the default. Four ways of playing, to see whether choices matter:
+- **star**: always take the ★ tile (or "Use ★"). 15 games.
+- **other**: a legal ✓/! tile that is not the ★. 13 games.
+- **first**: the first ✓ tile. 3 games.
+- **random**: a random tile and turn. 3 games.
+
+Start marks were half "Safe start for me" and half a random gold mark. Across 34 games I saw 0 page errors, 0 console errors, 0 stuck states and 0 dead taps. Rules were re-checked against a rulebook summary online (notes kept locally only).
+
+| # | Row | Score | Why (one line) |
+|---|-----|-------|----------------|
+| 1 | Rules fidelity | 8 | Fixed: the default start now has the rulebook's 6 leviathans for 3 players. "Calm sea start" is an unticked variant labelled "Not the rulebook start". The rest matches: roll first, 6/7/8 wakes them, a 6 on a leviathan's die raises a new one, at least 3 stay on the chart, placement bans unless forced, the blocked-start move to another mark, the swap with sunk crews' hands, last junk wins. |
+| 2 | Tutorial teaches | 7 | Unchanged: 30 one-line steps, one tap each, base rules only, ending on "Play a real game". The danger case (step 22) and a rival sinking (step 28) are shown. The elimination swap is still one spoken line (step 29) with no swap shown. |
+| 3 | First 10 seconds | 8 | The title shows the goal in 4 short lines, "New here? Learn in 5 minutes" comes first, and "Safe start for me" places the first junk. |
+| 4 | Turn clarity | 7 | New and useful: a ★ on the best tile and a line under the tiles ("⚠ 27% chance a leviathan gets you before your next turn. ★ Best: tile 1 (7%). Use ★"). But the ★ often wins by nothing ("This way: 7%… ★ Best: tile 2 (7%)") while all three tiles show ✓. Once the line said "safe until your next turn" and a leviathan sank me on the next roll. After you sink, the button still reads "Skip to my turn". The blocked-start rescue lists every mark twice. |
+| 5 | Phone play | 7 | Taps land at both sizes, tiles are about 70 px, and the result card fits at 375. Start marks are still about 16 px dots spaced 16 px apart, but tapping one opens a list of big "Top 1, left mark" buttons, so no dead tap. The blocked-start rescue list runs past the bottom of the 390x844 screen, and "Accept your fate" sits below the fold. |
+| 6 | AI and pacing | 6 | Choices now matter: the ★ player won 7 of 15 (47%, fair share 33%) and other play won 4 of 19 (21%). But with 6 leviathans, early knock-outs got worse: in 6 of 34 games I was out after 1-2 decisions (one in 40 s while following the ★ at "7%"). Most games gave me only 1-14 decisions in 35-241 s, and I waited a median 8-17 s for rivals between my turns. |
+| 7 | Feel | 7 | Unchanged: painted chart, gliding junks, leviathans moving with arrows, a path preview and red sink marks. The "Sunk!" card says why ("the leviathan Tidegrave swam onto it"). |
+| 8 | Bugs | 8 | 2 tutorials and 34 games: 0 errors, 0 stuck, 0 dead taps. "(you) (you)" is gone (0 log lines in 34 games). Only wording slips (see findings). |
+| | **Total** | **7.3** | **FAIL** (row 6 under 7; no stopper) |
+
+### Earlier findings (R14, R5, G7)
+| Finding | Status | Evidence |
+|---|---|---|
+| G7 stopper: dead Continue in tutorial waits | Fixed (still). Both tutorials ran 35 taps with 0 dead taps. | games-src/reviews/R20-shots/tide-390-tut-end.jpg, games-src/reviews/R20-shots/tide-375-tut-end.jpg |
+| R14 row 1: default "Calm sea start" begins with 3 leviathans, not 6 | **Fixed.** All 34 Quick games started with 6 leviathans. Calm sea is an unticked variant. | games-src/reviews/R20-shots/tide-390-star-start.jpg |
+| R14/R5 row 6: games short and decided by luck, knock-outs with no saving choice | **Half fixed.** Choices matter now (★ 47% vs other 21%). Early knock-outs are worse with 6 leviathans: 6 of 34 games ended for me after 1-2 decisions, one while following the ★. | games-src/reviews/R20-shots/tide-390-star-g4-sunk.jpg, games-src/reviews/R20-shots/tide-390-other-g1-sunk.jpg |
+| R14 row 4: log "Vermilion (you) (you)" | **Fixed.** 0 duplicated lines in 34 games' logs; the feed reads "Vermilion (you) rolls 1+6=7." | games-src/reviews/R20-shots/tide-390-star-g5-sunk.jpg |
+| R14/R5 row 2: elimination swap is one line, no card | **Not fixed.** Step 29 still says "Sink rivals with your tile, and swap tiles with their hands." with nothing shown. | games-src/reviews/R20-shots/tide-390-tut-29.jpg |
+| R5 row 4: empty "Sunken crews' tiles" heading | Not checked: no game had me sink a rival with my own tile and get the swap question. | none |
+| R5/R14 row 5: start marks about 15-16 px | **Not fixed** (about 16 px, 16 px apart). Tapping one opens a chooser of big buttons, and "Safe start for me" is there. | games-src/reviews/R20-shots/tide-390-star-start.jpg |
+| R5 row 5: result stats line hidden at 375 | Fixed (still): "33 turns, 1 junk afloat, 42 leviathan moves." | games-src/reviews/R20-shots/tide-375-star-g1-result.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Quick game at 390, took the ★ tile ("★ Best move: 7% chance…"). | A leviathan swam to my bow on Jade's 8 roll. I was sunk on turn 4 after one decision, 26 s in. Following the advice gave no way to save the junk. | games-src/reviews/R20-shots/tide-390-star-g4-sunk.jpg |
+| 6 | 34 games across four ways of playing. | ★ every turn: 7 of 15 won (2/7 at 390, 5/8 at 375). Other legal tiles: 4 of 19 won. Out after 1-2 placements in 6 of 34 games. Games lasted 35-241 s with 1-14 of my placements. The median wait between my turns was 8-17 s (max 22 s). | games-src/reviews/R20-shots/tide-390-other-g1-sunk.jpg |
+| 6 | Won a game at 375 following the ★. | 10 leviathans on the chart by turn 5; both rivals sank and I won after 2 placements in 35 s. Wins are as sudden as losses. | games-src/reviews/R20-shots/tide-375-star-g4-result.jpg |
+| 4 | Tapped tiles at 375 to compare. | All three tiles show ✓. The line says "This way: 7% chance…" and "★ Best: tile 2 (7%). Use ★": the ★ is chosen by a hidden tie-break that the player cannot see or use. | games-src/reviews/R20-shots/tide-375-other-g4-line1.jpg |
+| 4 | At 390 I took the ★ ("★ Best move: safe until your next turn."). | On Cobalt's next roll (4+3=7) a leviathan reached me and I sank. The "safe" claim was wrong at least once (cause not confirmed; it may count only some ways a leviathan can sink you). | games-src/reviews/R20-shots/tide-390-star-g5-sunk.jpg |
+| 4 | Got sunk at 390 and watched the rest. | The only button is "Skip to my turn", though I have no turns left; in other games it reads "Skip". Skip does jump to the result quickly (sunk at 30 s, result at 41 s). Without it I watched up to 2 minutes (sunk at 91 s, result at 213 s). | games-src/reviews/R20-shots/tide-390-star-g4-sunk.jpg |
+| 4/5 | A leviathan blocked my first move (390). | "Quick: your junk is in danger! Vermilion (you)'s junk is about to be lost…" lists "Relocate to column 1, row 1" twice, row 3 twice, row 4 twice and row 7 twice, with no way to tell the pairs apart. The list runs off the bottom of the screen, so "Accept your fate" and the "25 s left" note are below the fold. The rule itself matches the rulebook. | games-src/reviews/R20-shots/tide-390-other-g2-swap.jpg |
+| 2 | Did the tutorial at both sizes. | It is the same 30 steps as R14; the fix did not touch it. Swap step unchanged. | games-src/reviews/R20-shots/tide-390-tut-29.jpg, games-src/reviews/R20-shots/tide-390-tut-22.jpg |
+| 1 (good) | Opened Quick and Custom setup. | 6 leviathans at the start; "Variant: Calm sea start (off by default). Not the rulebook start." | games-src/reviews/R20-shots/tide-390-star-start.jpg |
+| 8 (good) | Read every game's log. | No "(you) (you)" anywhere; 0 errors in 34 games. | games-src/reviews/R20-shots/tide-375-star-g1-result.jpg |
+
+---
+
 ## 3. vinegrave (branch shelf/W490-vinegrave-bench @ ae27030d): 6.8 FAIL
 
 How I tested: built with the game's own build.py (513,827 bytes, 173 pictures) and served the page next to games/vinegrave/media. Playwright touch only (hasTouch, isMobile, page.touchscreen.tap). Before every tap I checked with elementFromPoint that the target was on top. Tutorial from the title ("Learn to play") to the end card at 390x844 (35 steps, 31 taps + 4 Next, 90 s) and at 375x667 (35 steps, 31 taps + 4 Next, 89 s), with a 1.2 s read pause per step. Every target took the first tap, 0 errors. Then 5 full 5-round games against the default rival (1 computer rival, easy, hints off) from the title (Learn to play, Skip tutorial, Play, Start the expedition) to the result screen, played as a new player. 3 games tapped a random glowing thing after playing free cards first (390 twice, 375 once). 2 games tried sites first, then the market, then anything (390 and 375). I did not tap to speed up rival turns. Results: won 21-14, lost 23-29, 10-64, 14-20 and 25-73. Games took 115-268 s and 35-45 of my actions, 74-95 taps. 0 page errors, 0 console errors, 0 stuck states, 0 covered targets. On every one of my turns I measured whether market glow matched what I could pay, text under 14 px, clipped effect lines and hand-card name cover. I watched for pills overlapping the score chips and the resource row every 120 ms, and counted explorer walkers and flying pieces. Limitation: my research-track selector did not match, so the scripted players climbed research only 0-2 rows. That explains part of the losses (see row 6). Rules re-checked against a full rulebook summary online (notes local only).
