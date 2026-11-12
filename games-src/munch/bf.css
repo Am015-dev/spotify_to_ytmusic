@@ -187,3 +187,11 @@ html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mo
 /* the "what to do now" line never cuts a word: it may take a second line */
 html.ph .bfline{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
 #dkCard .gx-x{min-width:45px;min-height:45px}
+/* level change: the hero's own badge pulses green (up) or red (down) instead of a floating "+1 Lv" over other plates */
+.slv.lvup,.bfhero.lvup{animation:bfLvPulse 1.8s ease-out}
+.slv.lvup.up{box-shadow:0 0 0 3px #7dffb2,0 0 14px 4px rgba(125,255,178,.85)}
+.slv.lvup.down{box-shadow:0 0 0 3px #ff8a7a,0 0 14px 4px rgba(255,138,122,.85)}
+.bfhero.lvup.up{filter:drop-shadow(0 0 8px #7dffb2)}
+.bfhero.lvup.down{filter:drop-shadow(0 0 8px #ff8a7a)}
+@keyframes bfLvPulse{0%{scale:1}20%{scale:1.35}45%{scale:1}65%{scale:1.2}100%{scale:1}}
+@media (prefers-reduced-motion:reduce){.slv.lvup,.bfhero.lvup{animation:none}}

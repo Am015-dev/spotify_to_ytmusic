@@ -123,7 +123,8 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
-function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;const ph=document.documentElement.classList.contains('ph');const bar=(document.querySelector('.gx-bar')||{getBoundingClientRect:()=>({bottom:0})}).getBoundingClientRect().bottom;
+function bfLvCls(i){const u=BF.lvUp&&BF.lvUp[i];return u&&u.t>Date.now()?' lvup '+u.c:''}
+function bfFloat(el,txt,cls){if(!el||!BF.motion()||(typeof G!=='undefined'&&G&&G.winner))return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;const ph=document.documentElement.classList.contains('ph');const bar=(document.querySelector('.gx-bar')||{getBoundingClientRect:()=>({bottom:0})}).getBoundingClientRect().bottom;
   const k=Math.round(r.left)+':'+Math.round(r.top);for(const o of document.querySelectorAll('.bffloat'))if(o.dataset.k===k)o.remove();f.dataset.k=k;
   f.style.left=Math.min(innerWidth-36,Math.max(36,r.left+r.width/2))+'px';f.style.top=(ph?(r.top<innerHeight/2?Math.max(bar+56,r.bottom+20):r.top-16):Math.max(24,r.top-16))+'px';document.body.appendChild(f);  // phone: under the chip, never over the top bar; one float per spot
 setTimeout(()=>f.remove(),4100)}
@@ -136,7 +137,9 @@ function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=m
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
   const fromRect=s=>{const c=s>=0&&s!==me?chip(s):null;return c?c.getBoundingClientRect():null};
   if(N.kick!=null&&(N.kick!==S.kick||N.turn!==S.turn)&&BF.motion()){bfReveal(N.kick,G.active);BF.mine=0}
-  N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
+  // a level change pulses that hero's own level badge (no floating text: it sat over the rival plates and the result text)
+  N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;BF.lvUp=BF.lvUp||{};BF.lvUp[i]={t:Date.now()+1800,c:d>0?'up':'down'};
+    const el=i===me?document.querySelector('.mine .bfhero'):chip(i)&&chip(i).querySelector('.slv');if(el)el.classList.add('lvup',d>0?'up':'down')});
   if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
     const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,bfCap('Lost: '+lost.map(cname).join(', '),7),'bad');
     const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Not worn: ${(w||'no free slot').replace('your race, class or sex can’t use it','wrong race or class').replace(/^you already wear /,'already wearing ').replace('your hands are full','hands full')}`,'bad')}}
@@ -190,7 +193,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
     return _arena.apply(this,arguments)};
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
-    return h.replace('<div class="top">',`<div class="top"><span class="bfhero" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
+    return h.replace('<div class="top">',`<div class="top"><span class="bfhero${bfLvCls(p.i)}" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
     if(G&&G.cb&&G.phase==='combat'&&G.cb.stage==='act'&&!G.q&&me>=0&&sideToAct()===me&&P(me).human){h=h.replace(/<button class="btn[^"]*" data-mv='\{&quot;act&quot;:&quot;(?:fight|run)&quot;\}'>.*?<\/button>/g,'').replace(/<button class="btn[^"]*" data-a="askmenu">.*?<\/button>/g,'').replace(/<div class="acts main">\s*<\/div>/,'')}
     h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
@@ -297,12 +300,16 @@ const bfWords=t=>String(t).split(/\s+/).filter(Boolean).reduce((a,x)=>a+(x.split
 function bfBestShort(me,b){if(b.card==null)return null;if(G.phase==='charity')return 'Too many cards: give away ★';const c=cd(b.card);if(G.cb)return 'Tap the ★ card';if(c.t==='item')return equipWhy(P(me),b.card)?'Carry the ★ item':'Wear the ★ item';return 'Play the ★ card'}
 {const _a=bfAfter;bfAfter=function(S){const r=_a.apply(this,arguments);try{bfMarkBest()}catch(e){UI.lastErr='best '+e}return r}}
 // ---- a hand that scrolls says so: "+N ›" at the edge where cards are hidden (tap it to slide); the ★ card is slid into view ----
+function bfPointed(){const out=[...document.querySelectorAll('.mine .hand .card.bf-best')].map(c=>c.getBoundingClientRect());
+  try{if(typeof GXT!=='undefined'&&GXT.running()){const st=GXT.current();for(const f of [st&&st.also,st&&st.from]){const v=typeof f==='function'?f():null;const r=v&&(v.nodeType===1?v.getBoundingClientRect():v);if(r&&r.width>0&&r.left!=null)out.push({left:r.left,right:r.left+r.width,top:r.top,bottom:r.top+(r.height||0)})}}}catch(e){}return out}
 function bfHandCue(){const hd=document.querySelector('.mine .hand');document.querySelectorAll('.hcue').forEach(e=>e.remove());if(!hd||!hd.classList.contains('scrolls'))return;
   const host=hd.parentElement;if(getComputedStyle(host).position==='static')host.style.position='relative';
   const upd=()=>{const q=hd.getBoundingClientRect();let L=0,Rn=0;hd.querySelectorAll(':scope>.card').forEach(c=>{const r=c.getBoundingClientRect();if(r.left+r.width/2<q.left)L++;else if(r.left+r.width/2>q.right)Rn++});
     for(const [side,n] of [['l',L],['r',Rn]]){let e=host.querySelector('.hcue.'+side);if(!n){if(e)e.remove();continue}
       if(!e){e=document.createElement('button');e.type='button';e.className='hcue '+side;e.setAttribute('aria-label',side==='r'?'More cards to the right':'More cards to the left');e.addEventListener('click',ev=>{ev.stopPropagation();hd.scrollBy({left:(side==='r'?1:-1)*hd.clientWidth*.7,behavior:'smooth'})});host.appendChild(e)}
-      e.textContent=side==='r'?'+'+n+' ›':'‹ +'+n;const hr=host.getBoundingClientRect();e.style.top=(q.top-hr.top+q.height/2-22)+'px'}};
+      e.textContent=side==='r'?'+'+n+' ›':'‹ +'+n;const hr=host.getBoundingClientRect();e.style.top=(q.top-hr.top+q.height/2-22)+'px';
+      // never over the card the prompt points at (the ★ card, or the tutorial's lit card): the cue steps aside while it would cover it
+      e.style.display='';const er=e.getBoundingClientRect();if(bfPointed().some(r=>r.right>er.left+2&&r.left<er.right-2&&r.bottom>er.top&&r.top<er.bottom))e.style.display='none'}};
   upd();if(!hd.dataset.cue){hd.dataset.cue='1';hd.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true})}}
 window.addEventListener('resize',()=>{clearTimeout(bfHandCue.t);bfHandCue.t=setTimeout(()=>{try{bfHandCue()}catch(e){}},150)});   // a turn of the phone moves the hand: place the cues again
 function bfRevealBest(){try{const b=document.querySelector('.mine .hand .card.bf-best');if(b&&typeof dkReveal==='function'&&BF.pick==null){const r=b.getBoundingClientRect(),q=b.parentElement.getBoundingClientRect();if(r.left<q.left||r.right>q.right)dkReveal(b)}}catch(e){}try{bfHandCue()}catch(e){}}

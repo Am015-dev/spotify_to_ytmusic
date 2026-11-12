@@ -279,7 +279,8 @@ function nextTurn(){const n=G.pl.length;let i=G.active;do{i=(i+1)%n}while(P(i).g
   listenDoor(p);
   if(G.turn>R.MAXTURN&&!G.winner){const b=alive().sort((a,b)=>b.lvl-a.lvl)[0];G.winner='P'+(b.i+1);G.winText=`Time's up: ${b.nm} leads at level ${b.lvl}.`}
   openWindow()}
-function listenDoor(p){if(!G.fast||p.dead||G.tut)return;const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} listens at the door and draws a face-down door card.`)}}
+// tutorial: listening is taught once, on your second turn, with a set card (G.tutListen = its key); everyone else stays off so the scripted deal holds
+function listenDoor(p){if(p.dead)return;if(G.tut){if(!G.tutListen||p.i!==0||G.turn<2)return;const k=G.tutListen,i=G.door.findIndex(id=>G.C[id]===k);G.tutListen=null;if(i>=0)G.door.push(G.door.splice(i,1)[0])}else if(!G.fast)return;const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} listens at the door and draws a face-down door card.`)}}
 function wonBy(i){return !!G&&!!G.winner&&(G.winner==='P'+(i+1)||G.cowin===i)}
 function kick(){const p=curPl();const id=drawOne('door');if(id==null){G.phase='after';return}takeKicked(p,id)}
 function takeKicked(p,id,res){const kv=res?'reaches into the discards':'kicks open the door';G.kicked=id;const c=cd(id);fx('door',id);

@@ -35,7 +35,7 @@ function tutDeal(){
   for(const p of G.pl){for(const id of p.hand.splice(0))(cd(id).d==='door'?G.door:G.tr).push(id)}
   const take=key=>{for(const dk of [G.door,G.tr]){const i=dk.findIndex(id=>G.C[id]===key);if(i>=0)return dk.splice(i,1)[0]}throw new Error('tutorial card '+key)};
   const deal=(s,keys)=>keys.forEach(k=>P(s).hand.push(take(k)));
-  deal(0,['elf','gargantuan','lizards','hexlvl','bucket','swash','fizz','rod']);
+  deal(0,['elf','gargantuan','hexlvl','bucket','swash','fizz','rod']);   // the Lizards come later: you hear them when you listen at the door (turn 2)
   deal(1,['elf','dwarf','halfling','mixed','rascal','gooey','antler','kneecaps']);
   deal(2,['dwarf','dwarf','elf','double','stompy','cudgel','pole','sandwich']);
   P(1).lvl=3;P(2).lvl=3;P(1).lv='normal';P(2).lv='normal'}
@@ -80,7 +80,9 @@ const tchip=i=>tq(`#phopps [data-opp="${i}"]`,`#app .opps [data-opp="${i}"]`);
 const mv=a=>`#prompt [data-mv*='"act":"${a}"']`;
 function tcardEl(key){const id=myId(key);return id==null?null:document.querySelector(`.mine .hand [data-card="${id}"]`)}
 // the visible strip of a hand card (its neighbour overlaps it); the hand scrolls the card into view first
-function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{dkReveal(e)}catch(x){}r=e.getBoundingClientRect()}return hslice(e)}
+function tcard(key){const e=tcardEl(key);if(!tvis(e))return null;let r=e.getBoundingClientRect();if(r.left<4||r.right>innerWidth-4){try{dkReveal(e)}catch(x){}r=e.getBoundingClientRect()}
+  for(const c of document.querySelectorAll('.hcue')){const q=c.getBoundingClientRect();if(q.width&&q.right>r.left+2&&q.left<r.right-2&&q.bottom>r.top&&q.top<r.bottom)c.style.display='none'}   // the hand's scroll cue never sits on the card a step points at
+  return hslice(e)}
 const tclear=()=>!document.getElementById('bfrev')&&!BF.kicking&&UI.pass==null&&!GX.open&&document.getElementById('modal').hidden&&!BF.drag;
 const tmine=()=>!!G&&!G.winner&&sideToAct()===0&&!G.q&&tclear();
 const nowStr=()=>{const cb=G.cb;return cb?[sideStr(cb),monStr(cb)]:[0,0]};
@@ -111,9 +113,9 @@ function tutSteps(){
    ready:()=>G.phase==='main'&&G.active===0&&tmine()&&P(0).lvl>=2&&!!document.querySelector('.bfdoor')&&(tutTop('hatmuncher'),true)},
  {id:'potion',title:'Strength vs level',say:()=>{const [a,b]=nowStr();return 'Its level '+b+', your strength '+a+'. Tap potion, then your side.'},target:tq('.arena .score.hero'),also:()=>tcard('fizz'),pick:tpick('fizz'),
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='fizz'&&a.z==='fh'},from:()=>tcard('fizz'),
-   ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
+   ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
  {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();let n=5;try{n=runOdds(P(0),G.cb).rows[0].need}catch(e){}return a+' against '+b+': you lose. Tap Run. '+n+'+ escapes'+(isRace(P(0),'elf')?' (elf +1).':'.')},target:tq('.fbtns .runb'),
-   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
+   wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
  {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+': caught! Its Bad Stuff ate your hat.',target:tq('.mine .gear','.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
  {id:'end1',title:'End your turn',say:'Nothing more to do. Tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
@@ -126,6 +128,8 @@ function tutSteps(){
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
  {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
+ {id:'listen',title:'Listen at the door',say:'Each turn starts with a free door card. Tap your new card.',target:()=>tcard('lizards'),
+   wait:{type:'tap',match:a=>a.what==='card'&&kdef(a.id)==='lizards'},ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!tcard('lizards')&&tclear()},
  {id:'kick2',title:'Your turn again',say:'Your turn. Kick the door again.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
  {id:'trouble',title:'Look for trouble',say:'No monster? Fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
@@ -159,18 +163,19 @@ function tutSetup(){try{GX.close()}catch(e){}
   try{newGame('F',3)}finally{UI.lvl=lvl0;UI.n=n0;UI.names=nm0;DEFSEED=null}
   G.tut=1;G.learn=false;G.rng=TUT_SEED;
   G.active=G.first=0;G.setupOrd=[0,1,2];G.setupI=0;G.log=[];G.ln=0;lg(-1,'The tutorial dungeon opens: you, Morwen and Grub.');
-  tutDeal();tutStackTreasure();tutTop('hatmuncher');
+  tutDeal();tutStackTreasure();tutTop('hatmuncher');G.tutListen='lizards';{const i=G.door.findIndex(id=>G.C[id]==='lizards');if(i>=0)G.door.unshift(G.door.splice(i,1)[0])}   // the Lizards wait at the bottom of the door deck until you listen
   UI.hints=false;render()}
 function tutLeave(){TUTG=false;UI.pause=false;clearTimeout(aiTimer);aiTimer=null;if(UI.spd0!=null){UI.speed=UI.spd0;UI.spd0=null}BF.pick=null;BF.ask=null;
   try{GXH.hide()}catch(e){}G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;UI.pass=null;DEFSEED=null;render()}
 function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:o?'Gear up, kick, fight, run, help, curse, loot, sell, charity. Now the Story begins.':'Gear up, kick, fight, run, help, curse, loot, sell, charity. Now play a real game.',
+    endTitle:'You know the rules',endText:o?'Gear up, listen, kick, fight, run, help, curse, loot, sell, charity. Now the Story begins.':'Gear up, listen, kick, fight, run, help, curse, loot, sell, charity. Now play a real game.',
     endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{const c=r&&r.choice;tutLeave();
       if(c==='chapter'&&first)GXC.play(first.id);
-      else if(c==='story'&&typeof campOpen==='function')campOpen()},
+      else if(c==='story'&&typeof campOpen==='function')campOpen();
+      else{const m=UI.mode&&UI.mode!=='ai'&&UI.mode!=='net'?UI.mode:'F';UI.pass=null;UI.lastSeat=-1;newGame(m,UI.n||DEFN);if(G){G.learn=false;render()}}},   // Play a real game: straight into one on your Quick game settings
     onExit:()=>{tutLeave();if(o&&typeof campOpen==='function'){try{localStorage.setItem('dkd_tutskip','1')}catch(e){}campOpen()}}})}   // skipping the Chapter 0 prologue goes on to the Story map, and Story does not ask again
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
 (function(){const o=uiAct;uiAct=function(m){

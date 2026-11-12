@@ -150,7 +150,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     // "Skip tutorial": once, at step 3, tap it with a finger: everything goes away, the menu is back, the tutorial is not marked done
     if(mode==='skip'&&s.i>=3){const sk=info.skip;await p.touchscreen.tap((sk.left+sk.right)/2,(sk.top+sk.bottom)/2);await sleep(500);
       const o=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-top,.gxt-end').length,start:!document.getElementById('modal').hidden,
-        btn:(()=>{const b=document.querySelector('#modal [data-gxt-open]');return b?b.textContent.trim()+(b.classList.contains('gxt-ok')?' ✓':''):''})(),st:JSON.parse(localStorage.getItem('gxt-doorkick-dungeon')||'{}'),saved:localStorage.getItem('dkd_save2')!=='KEEP'}));
+        btn:(()=>{const b=document.querySelector('#modal [data-gxt-open]');return b?b.textContent.trim()+(b.classList.contains('gxt-ok')?' ✓':''):''})(),st:JSON.parse(localStorage.getItem('gxt-doorkick-dungeon')||'{}'),real:!!G&&!G.tut&&G.turn===1&&document.getElementById('modal').hidden&&!document.querySelector('.gxc-map'),map:!!document.querySelector('.gxc-map'),tutSaved:(()=>{const v=localStorage.getItem('dkd_save2');if(!v||v==='KEEP')return false;try{return !!JSON.parse(v).tut}catch(e){return /"tut":1/.test(v)}})()}));
       if(o.run||o.dom)note(tag,'Skip left tutorial elements on screen ('+o.dom+')');if(!o.start)note(tag,'Skip did not return to the menu');
       if(/✓/.test(o.btn||''))note(tag,'a skipped tutorial shows Tutorial ✓');if(o.st.done)note(tag,'a skipped tutorial was marked done');if(o.st.open)note(tag,'a skipped tutorial is still "open"');if(o.saved)note(tag,'skip saved the staged game');
       const n=await p.evaluate(()=>{newGame('F',3);return !!G&&!G.tut&&G.phase==='setup'});if(!n)note(tag,'no normal game after Skip');
@@ -220,12 +220,12 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       await shot('end');
       const play=e.btns.find(b=>b.k==='play');await p.touchscreen.tap((play.r[0]+play.r[2])/2,(play.r[1]+play.r[3])/2);await sleep(500);
       const after=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length,start:!document.getElementById('modal').hidden,sv:1,
-        btn:(()=>{const b=document.querySelector('#modal [data-gxt-open]');return b?b.textContent.trim()+(b.classList.contains('gxt-ok')?' ✓':''):''})(),st:JSON.parse(localStorage.getItem('gxt-doorkick-dungeon')||'{}'),saved:localStorage.getItem('dkd_save2')!=='KEEP'}));
+        btn:(()=>{const b=document.querySelector('#modal [data-gxt-open]');return b?b.textContent.trim()+(b.classList.contains('gxt-ok')?' ✓':''):''})(),st:JSON.parse(localStorage.getItem('gxt-doorkick-dungeon')||'{}'),real:!!G&&!G.tut&&G.turn===1&&document.getElementById('modal').hidden&&!document.querySelector('.gxc-map'),map:!!document.querySelector('.gxc-map'),tutSaved:(()=>{const v=localStorage.getItem('dkd_save2');if(!v||v==='KEEP')return false;try{return !!JSON.parse(v).tut}catch(e){return /"tut":1/.test(v)}})()}));
       if(after.run||after.dom)note(tag,'tutorial elements left on screen after the end card ('+after.dom+')');
-      if(!after.start)note(tag,'"Play a real game" did not return to the start dialog');
-      if(!/✓/.test(after.btn||''))note(tag,'menu does not show Tutorial ✓ ('+after.btn+')');
+      // "Play a real game" starts one at once on the Quick game settings (not the start dialog, not the story map)
+      if(!after.real)note(tag,'"Play a real game" did not start a real game '+JSON.stringify({start:after.start,map:after.map}));
       if(!after.st.done)note(tag,'tutorial not remembered as done');
-      if(after.saved)note(tag,'the staged tutorial game was saved as a normal game');
+      if(after.tutSaved)note(tag,'the staged tutorial game was saved as a normal game');
       // the title screen too, and a normal game still starts and plays a move
       await p.evaluate(()=>{G=null;render()});await sleep(200);
       const tt=await p.evaluate(()=>[...document.querySelectorAll('#modal [data-gxt-open]')].map(b=>b.textContent.trim()+(b.classList.contains('gxt-ok')?' ✓':'')));
