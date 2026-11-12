@@ -61,12 +61,13 @@ function coachSay(s) {
   if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
   var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>';
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
   var host, at;
   if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
   else { host = $('#dockbody'); at = $('#prompt'); }
   if (host && at && at.parentNode === host) host.insertBefore(d, at); else if (host && at) at.parentNode.insertBefore(d, at); else document.body.appendChild(d);
   COACH.cur = d;
+  var nb = d.querySelector('[data-coach-next]'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); COACH.tapped = true; setTimeout(coachTick, 0); });
 }
 // advance through finished steps, then show the current one and mark its target
 function coachTick() {
@@ -87,13 +88,19 @@ function coachTick() {
   coachSay(s);
   var t = s.t(); if (t) { t.classList.add('tutpoint'); tInView(t); }
 }
-// R12: a step's target is always on screen when its step begins: scroll it into view (inside the panel or the page) once per step
+// R12/R27: a step's target is always fully visible AND tappable while its step waits: scroll every scrollable ancestor (the dock panel
+// included) until the target sits inside it, and keep doing so each tick (the panel can re-flow when the bubble or prompt changes)
+function tScroller(e) { for (var x = e.parentElement; x && x !== document.body; x = x.parentElement) { var o = getComputedStyle(x).overflowY; if ((o === 'auto' || o === 'scroll') && x.scrollHeight > x.clientHeight + 1) return x; } return null; }
 function tInView(t) {
-  var r = t.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
-  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw && COACH.seenAt === COACH.i) return;
-  COACH.seenAt = COACH.i;
-  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw) return;
-  try { t.scrollIntoView({ block: r.height > vh * .6 ? 'start' : 'center', inline: 'nearest' }); } catch (e) { t.scrollIntoView(false); }
+  var bar = document.querySelector('.gx-bar'), top = bar ? bar.getBoundingClientRect().bottom : 0;
+  for (var k = 0; k < 4; k++) {
+    var r = t.getBoundingClientRect(), sc = tScroller(t), lo = top, hi = window.innerHeight;
+    if (sc) { var c = sc.getBoundingClientRect(); lo = Math.max(lo, c.top + 2); hi = Math.min(hi, c.bottom - 2); }
+    var d = 0; if (r.top < lo) d = r.top - lo; else if (r.bottom > hi) d = r.bottom - hi;
+    if (r.height > hi - lo && r.top >= lo) return;   // taller than the panel: its top is in view, that is the best we can do
+    if (!d) return;
+    if (sc) sc.scrollTop += d; else window.scrollBy(0, d);
+  }
 }
 // while a step waits for its tap, only its target (and the header) takes taps; a tap elsewhere pulses the target instead
 document.addEventListener('click', function (e) {
@@ -107,7 +114,7 @@ document.addEventListener('click', function (e) {
     else setTimeout(coachTick, 0);
     return;
   }
-  if (e.target.closest && e.target.closest('.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x,#pop')) return;   // a card zoom can always be closed
+  if (e.target.closest && e.target.closest('[data-coach-next],.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x,#pop')) return;   // a card zoom can always be closed
   e.stopPropagation(); e.preventDefault();
   t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse'); t.setAttribute('data-nudge', ((t.getAttribute('data-nudge') || '') + '.').slice(-60));   // the pulse is the answer to a stray tap; a changing attribute makes it a visible change for the audit
 }, true);
