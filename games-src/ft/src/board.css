@@ -405,3 +405,5 @@ html.chzon #chz{z-index:60}
    so turning the skin on or off never resizes Undo / Put them back. One line of text is 16 px tall either way. */
 html body .ab{line-height:16px}
 html:not(.sk) body .ab{padding:12px 16px!important}
+/* R25: landscape phones (390 px tall): the full market (5 rows) plus 3 djinns must fit under the top bar in every step */
+html.land.short #mkt .mcard{height:40px!important}html.land.short #mkt .mrow{gap:2px!important}
