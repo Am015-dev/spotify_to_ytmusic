@@ -40,7 +40,7 @@ const VW = +(process.env.VW || 390), VH = +(process.env.VH || 844), RUNS = +(pro
         await mark(); if (!(await T('[data-spot]'))) blocked++; if (s.tut.times > 1) { await sleep(300); await mark(); await T('[data-spot]'); } await sleep(600); continue;
       }
       if (s.mode === 'title') { if (await pg.$('#play')) await T('#play'); else { const q = await byText('#title button', /^Quick game/); if (q) await T(q); } continue; }
-      if (!s.scr) { const go = await byText('button', /^Climb$/); if (go) await T(go); continue; }
+      if (!s.scr) { const go = await byText('button', /^(Start climb|Climb)$/); if (go) await T(go); continue; }
       if (s.scr === 'map') { const ns = await pg.$$('.node.glow'); if (ns.length) await T(ns[Math.floor(r() * ns.length)]); continue; }
       if (s.scr === 'battle') {
         const p = s.pick; if (!p) continue;
@@ -62,6 +62,8 @@ const VW = +(process.env.VW || 390), VH = +(process.env.VH || 844), RUNS = +(pro
       if (s.scr === 'rest') { await T('#rest-heal'); continue; }
       if (s.scr === 'shop') { const b = await byText('#app button', /^(Leave|Continue|Walk on|Move on)/i); if (b) await T(b); continue; }
       if (s.scr === 'event') {
+        const dc = await pg.$$eval('.card', ns => ns.map((n, i) => (!n.closest('#app') && n.offsetParent) ? i : -1).filter(i => i >= 0)).catch(() => []);   // R24: the upgrade picker opens in a drawer outside #app
+        if (dc.length) { const all = await pg.$$('.card'); await T(all[dc[Math.floor(r() * dc.length)]]); await sleep(300); const ok2 = await byText('button', /^(Upgrade|Confirm|Choose|Pick)/i); if (ok2) await T(ok2); continue; }
         const os = await pg.$$('.opts .btn:not([disabled])'); if (os.length) { await T(os[Math.floor(r() * os.length)]); continue; }
         const b = await byText('#app button', /^(Leave|Continue|Walk on|Move on)/i) || await pg.$('#app button.btn'); if (b) { await T(b); continue; }
         const c2 = await pg.$$('#app .card'); if (c2.length) await T(c2[0]); continue;

@@ -141,21 +141,29 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   // flags: t=retain (stays in hand at end of turn) u=unplayable x=exhaust e=ethereal(exhaust at end of turn) b=burn(2 hp at end of turn if held) r=regret d=doubt
 
   var ENEMIES = {
-    'mire-slug': { name: 'Mire Slug', hp: [11, 15], pat: [{ atk: 5 }, { atk: 3, weak: 1 }, { atk: 6 }], art: 'fat grey-green slug with eyestalks on a swamp log' },
-    'gnawer': { name: 'Gnawer', hp: [10, 14], pat: [{ atk: 4 }, { atk: 4 }, { blk: 5, str: 1 }], art: 'oversized scruffy rat showing yellow teeth' },
-    'hex-acolyte': { name: 'Hex Acolyte', hp: [40, 44], pat: [{ str: 3 }, { atk: 6 }], ritual: 3, art: 'cultist in a feathered hood chanting by a candle' },
-    'gape-grub': { name: 'Gape Grub', hp: [40, 44], pat: [{ die: [{ str: 3, blk: 6 }, { atk: 7, blk: 5 }, { atk: 11 }] }], art: 'wide-mouthed pale grub with a ring of teeth' },
-    'rust-tick': { name: 'Rust Tick', hp: [10, 14], pat: [{ atk: 5 }, { die: [{ weak: 2 }, { atk: 4, weak: 1 }, { atk: 7 }] }, { atk: 6 }], art: 'rust-coloured tick the size of a dog' },
-    'bile-blob': { name: 'Bile Blob', hp: [28, 32], pat: [{ atk: 7, add: ['slimed', 1] }, { atk: 11 }, { add: ['slimed', 2] }], art: 'quivering yellow blob of acid with floating bones' },
-    'snare-vine': { name: 'Snare Vine', hp: [22, 26], pat: [{ vuln: 2 }, { die: [{ atk: 4, blk: 6 }, { atk: 8 }, { atk: 11 }] }], art: 'thorny vine bundle with a grasping tendril' },
-    'ash-imp': { name: 'Ash Imp', hp: [16, 20], pat: [{ atk: 3, hits: 3 }, { atk: 3, hits: 3 }, { blk: 6, str: 1 }], art: 'small black imp with ember eyes and bat wings' },
-    'thorn-brute': { name: 'Thorn Brute', hp: [80, 86], pat: [{ str: 2 }, { atk: 14 }, { atk: 8, vuln: 2 }], onSkill: 2, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
-    'sleeper-statue': { name: 'Sleeper Statue', hp: [78, 84], sleep: 3, pat: [{ atk: 16 }, { atk: 16 }, { weak: 2, vuln: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
-    'iron-warden': { name: 'Iron Warden', hp: [36, 40], pat: [{ atk: 9 }, { add: ['dazed', 2] }, { atk: 6, blk: 6 }], elite: 1, art: 'tall slim iron sentry with a lantern head' },
+    // R24 ACT 1 = the printed tabletop enemy cards (tab:1): every number below is the card's own value; data.js multiplies HP, damage,
+    // Block and Spikes by SCALE once (Strength / Weak / Vulnerable / added cards stay counts). Elite and boss HP is per hero (x heroes).
+    // die: 3 rows = d6 1-2 / 3-4 / 5-6, 2 rows = 1-3 / 4-6. first: a one-time opening step. hpF/patF: the gentle first-encounter card.
+    // Source per foe (tabletop value -> in-game value): rules-notes.md "Act 1 foes".
+    'mire-slug': { tab: 1, name: 'Mire Slug', hp: [5, 5], pat: [{ die: [{ atk: 2 }, { weak: 1 }, { atk: 2, add: ['dazed', 1] }] }], art: 'fat grey-green slug with eyestalks on a swamp log' },
+    'spine-slug': { tab: 1, img: 'mire-slug', name: 'Spine Slug', hp: [5, 5], pat: [{ die: [{ atk: 1, vuln: 1 }, { atk: 1, add: ['dazed', 1] }, { atk: 2 }] }], art: 'slug covered in sharp grey spines' },
+    'ooze-drop': { tab: 1, img: 'bile-blob', name: 'Ooze Drop', hp: [3, 3], pat: [{ atk: 1 }], art: 'small drop of yellow ooze with two eyes' },
+    'gnawer': { tab: 1, name: 'Gnawer', hp: [10, 10], pat: [{ die: [{ atk: 3, blk: 1 }, { atk: 4 }, { blk: 2, str: 1 }] }], hpF: 7, patF: [{ die: [{ blk: 2, str: 1 }, { atk: 2, blk: 1 }, { atk: 3 }] }], art: 'oversized scruffy rat showing yellow teeth' },
+    'hex-acolyte': { tab: 1, name: 'Hex Acolyte', hp: [9, 9], pat: [{ atk: 1, str: 1 }], art: 'cultist in a feathered hood chanting by a candle' },
+    'gape-grub': { tab: 1, name: 'Gape Grub', hp: [6, 6], pat: [{ die: [{ atk: 2 }, { atk: 1, str: 1 }, { str: 2 }] }], deathVuln: 1, art: 'wide-mouthed pale grub with a ring of teeth' },
+    'rust-tick': { tab: 1, name: 'Rust Tick', hp: [4, 4], pat: [{ die: [{ str: 1 }, { atk: 2 }, { atk: 2 }] }], curl: 2, hpF: 3, patF: [{ die: [{ str: 1 }, { atk: 2 }, { atk: 1 }] }], art: 'rust-coloured tick the size of a dog' },
+    'bile-blob': { tab: 1, name: 'Bile Blob', hp: [10, 10], pat: [{ die: [{ atk: 1, weak: 2 }, { atk: 4 }, { atk: 3, add: ['slimed', 2] }] }], art: 'quivering yellow blob of acid with floating bones' },
+    'snare-vine': { tab: 1, name: 'Snare Vine', hp: [10, 10], pat: [{ die: [{ atk: 2, weak: 1 }, { atk: 2, add: ['dazed', 1] }, { atk: 3 }] }], art: 'thorny vine bundle with a grasping tendril' },
+    'ash-imp': { tab: 1, name: 'Ash Imp', hp: [10, 10], pat: [{ die: [{ atk: 3 }, { atk: 2, vuln: 1 }, { atk: 2, add: ['dazed', 1] }] }], art: 'small black imp with ember eyes and bat wings' },
+    'thorn-brute': { tab: 1, name: 'Thorn Brute', hp: [14, 14], first: { sleep: 1 }, pat: [{ atk: 3 }], skillTax: 1, elite: 1, art: 'bark-skinned hulking brute with thorns and a horned skull' },
+    'sleeper-statue': { tab: 1, name: 'Sleeper Statue', hp: [22, 22], sleep: 1, pat: [{ atk: 4 }, { atk: 4 }, { weak: 2, str: 1 }], elite: 1, art: 'mossy stone statue of a seated giant with one eye opening' },
+    'iron-warden': { tab: 1, name: 'Iron Warden', hp: [7, 7], pat: [{ die: [{ add: ['dazed', 1] }, { atk: 3 }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
+    'iron-warden-b': { tab: 1, img: 'iron-warden', name: 'Iron Warden', hp: [8, 8], pat: [{ die: [{ atk: 3 }, { add: ['dazed', 1] }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
+    'iron-warden-c': { tab: 1, img: 'iron-warden', name: 'Iron Warden', hp: [7, 7], pat: [{ die: [{ atk: 2 }, { add: ['dazed', 1] }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
     'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
-    'mire-behemoth': { name: 'Mire Behemoth', hp: [132, 140], split: ['bile-blob', 'mire-slug', 'mire-slug'], splitSay: 'bursts apart', pat: [{ atk: 9, add: ['slimed', 2] }, { blk: 12, str: 2 }, { atk: 22 }, { atk: 7, hits: 2, all: 1 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
-    'ashen-wraith': { name: 'Ashen Wraith', hp: [124, 130], pat: [{ add: ['burn', 1], atk: 6, all: 1 }, { die: [{ blk: 10, str: 2 }, { atk: 5, hits: 2 }, { atk: 6, hits: 3 }] }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
-    'gate-colossus': { name: 'Gate Wyrm', hp: [138, 146], pat: [{ atk: 9, hits: 2 }, { blk: 16 }, { atk: 24, vuln: 2 }, { str: 3, blk: 8 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
+    'mire-behemoth': { tab: 1, name: 'Mire Behemoth', hp: [22, 22], split: ['bile-blob', 'mire-slug', 'spine-slug'], splitSay: 'bursts apart', pat: [{ add: ['slimed', 3] }, { atk: 3, add: ['slimed', 2] }, { atk: 6 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
+    'ashen-wraith': { tab: 1, name: 'Ashen Wraith', hp: [36, 36], pat: [{ atk: 1, add: ['burn', 1] }, { atk: 2, hits: 2, add: ['burn', 1] }, { add: ['burn', 2] }, { atk: 3, blk: 5 }, { atk: 2, add: ['burn', 1] }, { atk: 3, hits: 2, add: ['burn', 2], str: 1 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
+    'gate-colossus': { tab: 1, name: 'Gate Wyrm', hp: [40, 40], shift: 6, pat: [{ atk: 2, blk: 5 }], pat2: [{ atk: 2, spikes: 1 }, { atk: 4, str: 1, spikes: 1 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
     // act 2 (Ash Stair) and act 3 (Cinder Gate) encounter decks, act 4 = the optional final act
     'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, art: 'lean black hound with ember-cracked skin and smoking jaws' },
     'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, art: 'floating grey wisp of ash with two coal eyes' },
@@ -166,11 +174,11 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'tomb-king': { name: 'Tomb King', hp: [120, 128], pat: [{ atk: 12, frail: 2 }, { blk: 14, str: 2 }, { atk: 7, hits: 3 }, { atk: 8, add: ['dazed', 2] }], elite: 1, act: 3, art: 'bandaged king rising from a stone sarcophagus in dust' },
     'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
   };
-  var ENC = {
-    first: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['mire-slug', 'rust-tick']],   // the tabletop keeps a separate gentle 1st-encounter deck for the first fight
-    weak: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['ash-imp', 'ash-imp'], ['mire-slug', 'rust-tick']],   // the 40-HP Grub and Acolyte are strong-pool foes
-    strong: [['bile-blob', 'rust-tick'], ['snare-vine', 'ash-imp', 'mire-slug'], ['gape-grub', 'gnawer'], ['hex-acolyte', 'rust-tick']],   // G3 r3: solo takes the lead foe; the weak Ash Imp pair moved to the weak pool
-    elite: [['thorn-brute'], ['sleeper-statue'], ['iron-warden', 'iron-warden', 'iron-warden']],
+  var ENC = {   // R24: the tabletop act-1 decks. The first fight draws from the 4-card first-encounter deck (gentle hpF/patF sides), then the normal deck
+    first: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['ooze-drop']],
+    weak: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['snare-vine'], ['ash-imp'], ['ooze-drop'], ['bile-blob'], ['gape-grub']],
+    strong: [['hex-acolyte'], ['gnawer'], ['rust-tick'], ['snare-vine'], ['ash-imp'], ['ooze-drop'], ['bile-blob'], ['gape-grub']],
+    elite: [['thorn-brute'], ['sleeper-statue'], ['iron-warden', 'iron-warden-b', 'iron-warden-c']],
     boss: [['mire-behemoth'], ['ashen-wraith'], ['gate-colossus']]
   };
   // per-act encounter decks (act 1 = ENC). Multi-act climbs meet one fixed guardian per act; act 4 is the optional final act.
@@ -256,7 +264,9 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     if (p.die) { p.die.forEach(ttPat); return; }
     if (p.atk) p.atk = EDM(p.atk); if (p.blk) p.blk = DM(p.blk); if (p.spikes) p.spikes = DM(p.spikes); if (p.str) p.str = TOK(p.str);
   }
-  Object.keys(ENEMIES).forEach(function (id) { var e = ENEMIES[id]; KB = e.boss ? 2 : 0; e.hp = [EHPV(e.hp[0]), EHPV(e.hp[1])]; e.pat.forEach(ttPat); if (e.ritual) e.ritual = TOK(e.ritual); if (e.onSkill) e.onSkill = TOK(e.onSkill); });
+  function tabPat(p) { if (p.die) { p.die.forEach(tabPat); return; } if (p.atk) p.atk *= SCALE; if (p.blk) p.blk *= SCALE; if (p.spikes) p.spikes *= SCALE; }
+  Object.keys(ENEMIES).forEach(function (id) { var e = ENEMIES[id]; if (!e.tab) return; e.hp = [e.hp[0] * SCALE, e.hp[1] * SCALE]; if (e.hpF) e.hpF *= SCALE; e.pat.forEach(tabPat); (e.pat2 || []).forEach(tabPat); (e.patF || []).forEach(tabPat); if (e.first) tabPat(e.first); });
+  Object.keys(ENEMIES).forEach(function (id) { var e = ENEMIES[id]; if (e.tab) return; KB = e.boss ? 2 : 0; e.hp = [EHPV(e.hp[0]), EHPV(e.hp[1])]; e.pat.forEach(ttPat); if (e.ritual) e.ritual = TOK(e.ritual); if (e.onSkill) e.onSkill = TOK(e.onSkill); });
   Object.keys(H).forEach(function (k) { H[k].hp = HPV(H[k].hp); });
   Object.keys(EVENTS).forEach(function (id) { EVENTS[id].o.forEach(function (o) {
     function f(d) { if (!d) return; if (d.heal) d.heal = HPV(d.heal); if (d.hp) d.hp = HPV(d.hp); if (d.mhp) d.mhp = HPV(d.mhp); if (d.gold) d.gold = GOLD(d.gold); }

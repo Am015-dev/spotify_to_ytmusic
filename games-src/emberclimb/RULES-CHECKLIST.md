@@ -48,7 +48,7 @@ Rules whose exact text I could not confirm (the solo-start die effect, the openi
 32. Enemies act after all heroes, in order from the first enemy to the last (bosses last).
 33. An Encounter room has one enemy per hero (one Encounter card drawn per player). NB: the shelf's encounter groups hold 1-3 enemies whatever the party size; changing it re-balances all nine story chapters.
 34. A boss fight uses the act's boss; acts 2 and 3 use a different boss from the one beaten.
-35. Enemy HP scales with the number of heroes (printed HP board); 2 heroes = x1.6 here (approximation, board not available).
+35. Enemy HP: elites and bosses print HP per hero (x heroes); normal foes have flat HP, one card per hero (R24, tabletop cards).
 36. Hero starting HP differs per class (80 / 70 / 75 / 72 here) and each starts with the class starter deck and relic.
 
 ## Death and victory

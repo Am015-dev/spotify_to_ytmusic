@@ -52,3 +52,17 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - Coach "Fully blocked" only after a real attack was fully blocked (stale hp0 cleared).
 - Elite reward at 375x667: compact potion/relic rows, Skip + Continue in one sticky row: everything fits.
 - Not confirmed online: the boss split timing (rulebook PDF host was down); kept as is.
+
+## R24 fixes (12 Nov 2026, shelf/W485-emberclimb-bench)
+- Foe row: dead/split corpses leave the stage; 4+ foes wrap to two rows (`w24many`, `w24six`). `?scn=ec-split` / `ec-split-two` (gate) prove
+  3 and 6 slimes fully on screen and tappable at 390x844 and 375x667 (playable-shots/r24/).
+- Act 1 foes = printed tabletop cards x8 (`tab:1` in data.js, table in rules-notes.md "Act 1 foes"): first-encounter sides, Hunker,
+  2-row die, elite Skill tax, one-time idle step, wyrm guard switch + Thorn Hide, death spores, elite/boss HP per hero, sentries per hero.
+  Tests: rules-test R10/R20/R29, logic rules 30/35 updated.
+- Setup says "Act 1 only"; rules card too. Short landscape gets its own stage layout (`w24ls`) and a compact setup screen.
+  Intent/relic popup is modal (scrim + close button, tap passes through). Shorter intent lines (<= 8 words).
+- Gate `build-all.py --full emberclimb`: PASS (phone-check 6/6, scenarios incl. the 2 new ones). Needs
+  `npm install --no-save @playwright/test@1.63.0 playwright@1.63.0` in games-src in a fresh container.
+- OPEN: difficulty. With the tabletop cards a newcomer by touch won 0/3 (floors 7, 3, 3); bench-newcomer 200 runs: beat boss 1%.
+  Normal fights cost a newcomer 22-41 HP of 80. Elites never kill a passive full-HP hero in under 3 turns (min 3, wardens).
+  Next: decide a faithful lever (the tabletop's own easier setup / starting bonus, potions, or rest frequency) or accept the hard curve.

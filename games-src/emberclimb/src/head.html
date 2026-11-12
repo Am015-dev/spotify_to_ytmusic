@@ -469,7 +469,7 @@ html body.ec-stage #stage .hand.fan .card .cl:not(:first-child){display:none}
 html body.ec-stage #stage .hand.fan .card.sel .cl:not(:first-child){display:block}
 html body.ec-stage #stage .hand.fan .card .ck,html body.ec-stage #stage .hand.fan .card .cty{display:none!important}
 html body.ec-stage #stage .hand.fan .card .ct{font-size:13px!important;padding-left:calc(var(--cw)*.3);min-height:calc(var(--cw)*.24)}
-html body.ec-stage #stage .hand.fan .card .cx{width:30px;height:30px;font-size:17px!important;left:-3px;top:-3px;border:2px solid #2b1700;box-shadow:0 2px 4px #000;z-index:4}
+html body.ec-stage #stage .hand.fan .card .cx{width:30px;height:30px;font-size:17px!important;left:1px;top:1px;border:2px solid #2b1700;box-shadow:0 2px 4px #000;z-index:4}
 html body.ec-stage #stage .w4ghost{transform-origin:50% 50%}
 /* map: tall scroll with clear room icons */
 html body.ec-stagemap #map{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
@@ -600,4 +600,43 @@ html body .over.res{overflow:hidden!important;padding:0!important;gap:0!importan
 html body .over.res>.rscroll{flex:1;min-height:0;width:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 12px 12px}
 html body .over.res>.rbtns{position:relative!important;flex:none;margin:0;background:#14100e;box-shadow:0 -1px 0 rgba(255,255,255,.08)}
 .ec-endc ul[hidden]{display:none}.ec-endc .ec-sum{list-style:none;padding-left:0}.ec-endc .ec-showall{min-height:44px;margin:6px 0 4px;width:100%}
+/* R24: many foes (split boss, 3 sentries, two heroes): two rows of smaller foes, every one fully on screen and tappable */
+html body.ec-stage #stage .arena.w24many .hside{flex:0 0 33%!important}
+html body.ec-stage #stage .enemies.w24many{flex-wrap:wrap;align-content:flex-end;justify-content:center;row-gap:2px;column-gap:2px;min-width:0}
+html body.ec-stage #stage .enemies.w24many .en{flex:0 0 calc(50% - 2px)!important;max-width:calc(50% - 2px)!important}
+html body.ec-stage #stage .enemies.w24six .en{flex:0 0 calc(33.3% - 2px)!important;max-width:calc(33.3% - 2px)!important}
+html body.ec-stage #stage .enemies.w24many .en>.art{width:100%!important;max-width:min(100%,calc((100dvh - 420px) / 2))!important;margin:0 auto!important}
+html body.ec-stage #stage .enemies.w24many .intent{min-height:30px!important;padding:1px 6px 1px 2px!important;margin:0 0 2px!important;max-width:100%;overflow:hidden}
+html body.ec-stage #stage .enemies.w24many .intent .art{width:20px!important;height:20px!important}
+html body.ec-stage #stage .enemies.w24many .intent>span{font-size:15px!important}
+html body.ec-stage #stage .enemies.w24many .en .bar{width:96%;height:16px;margin-top:-4px}
+html body.ec-stage #stage .enemies.w24many .en .bar b{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .nm{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .stc span{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .w4pv{transform:scale(.8)}
+/* R24: Quick setup in a short landscape phone (844x390): smaller title and hero tiles so Start climb, + Second hero and Back fit */
+@media (max-height:520px) and (orientation:landscape){
+html body #title.pick{gap:4px!important;padding-top:4px!important;padding-bottom:4px!important;justify-content:center!important;overflow:hidden}
+html body #title.pick h1{font-size:30px!important;margin:0!important;line-height:1.05}
+html body #title.pick .sub{display:none!important}
+html body #title.pick .heroes{gap:6px!important}
+html body #title.pick .hero{padding:3px!important}
+html body #title.pick .hero .art{height:min(30vh,120px)!important;width:auto!important;aspect-ratio:4/5!important}
+html body #title.pick .refline{margin:0!important;padding:2px 8px!important}
+html body #title.pick .row{margin:0!important}
+html body #title.pick .btn{min-height:44px!important;padding-top:4px!important;padding-bottom:4px!important}
+}
+.refline.w24note{color:#ffe2a0!important}.refline.w24n0{animation:w24n0 .35s ease-out}.refline.w24n1{animation:w24n1 .35s ease-out}
+@keyframes w24n0{from{transform:scale(1.08)}to{transform:none}}@keyframes w24n1{from{transform:scale(1.08)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.refline.w24n0,.refline.w24n1{animation:none}}
+/* R24: stage on a short landscape phone: hand low between the corner controls, the arena gets the height */
+html body.ec-stage #stage.w24ls .arena{margin-bottom:calc(var(--hh) + 6px)!important;padding-bottom:0!important}
+html body.ec-stage #stage.w24ls .hand.fan{left:150px!important;right:150px!important}
+html body.ec-stage #stage.w24ls>.energy{bottom:6px!important;left:8px!important;width:54px!important;height:54px!important}
+html body.ec-stage #stage.w24ls .w485end{bottom:8px!important;right:8px!important;min-width:104px!important}
+html body.ec-stage #stage.w24ls .w485pile{bottom:4px!important}html body.ec-stage #stage.w24ls .w485pile.draw{left:68px!important}html body.ec-stage #stage.w24ls .w485pile.disc{right:118px!important}html body.ec-stage #stage.w24ls .hand.fan{left:126px!important;right:172px!important}
+html body.ec-stage #stage.w24ls .en>.art,html body.ec-stage #stage.w24ls .w485fig .art{max-width:min(96px,calc(100dvh - 300px))!important;margin-left:auto!important;margin-right:auto!important}
+html body.ec-stage #stage.w24ls .enemies.w24many .en>.art{max-width:min(70px,calc((100dvh - 300px) / 2))!important}
+.itip-scrim{position:fixed;inset:0;z-index:69;background:rgba(0,0,0,.18)}
+.itip-x{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#ffd9b0;font-size:20px;cursor:pointer}
 </style></head>

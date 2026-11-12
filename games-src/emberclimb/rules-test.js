@@ -55,7 +55,7 @@ mk.draw = [E.mk('wound'), E.mk('m-strike'), E.mk('wound')]; const dn = mk.disc.l
 E.performMove({ t: 'scry', keep: [1] }); ok(mk.draw.length === 1 && mk.draw[0].id === 'm-strike' && mk.disc.length === dn + 3, 'R19 scry: discard any of the top cards');
 // R20 shared die and die-based intents
 G = fresh(['w'], 17); t0 = G.b.en[0]; t0.id = 'gape-grub'; t0.i = -1; G.b.en.slice(1).forEach(e => { e.dead = 1; }); G.hs[0].hand = []; G.hs[0].hp = G.hs[0].mhp; t0.intent = { blk: 1, tg: 0 };
-const q0 = G.q.length; E.performMove({ t: 'end' }); E.settle(); const dv = G.b.die, want = dv <= 2 ? 'str' : 'atk';
+const q0 = G.q.length; E.performMove({ t: 'end' }); E.settle(); const dv = G.b.die, want = dv <= 4 ? 'atk' : 'str';
 ok(G.q.slice(q0).some(f => f.k === 'die' && f.w === '' && f.n === dv) && t0.intent.die === dv && t0.intent[want] > 0, 'R20 one die per round, die-based intent (die ' + dv + ')');
 // R21 rows and all-hero attacks; R08 any hero down = party loses
 G = fresh(['w', 'a'], 18); ok(G.b.en.every((e, i) => e.row === i % 2 && (e.intent.sleep || e.intent.tg === e.row)), 'R21 each enemy attacks the hero in its row');
@@ -65,7 +65,13 @@ G = fresh(['w', 'a'], 19); G.b.en.forEach((e, i) => { if (i) e.dead = 1; }); G.b
 E.performMove({ t: 'end' }); E.performMove({ t: 'end' }); E.settle(); ok(G.scr === 'over' && !G.won && G.hs[0].hp > 0, 'R08 duo: one hero at 0 HP loses the run');
 // R10 two-hero enemy HP table; R11 class HP; R12 rogue starter
 E.newGame({ heroes: ['w', 'a'], seed: 20 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
-ok(G.b.en.every(e => { const r = D.ENEMIES[e.id].hp; return e.mhp >= Math.round(r[0] * D.EHP[2]) && e.mhp <= Math.round(r[1] * D.EHP[2]); }), 'R10 two heroes: enemy HP x' + D.EHP[2]);
+ok(G.b.en.length === 2 && G.b.en.every(e => { const d = D.ENEMIES[e.id], r = d.hp; return d.tab && (e.pf ? e.mhp === d.hpF : e.mhp >= r[0] && e.mhp <= r[1]); }), 'R10 two heroes: one tabletop foe per hero, normal foe HP flat');
+// R29 tabletop act-1 foe cards (R24): elite / boss HP per hero, Hunker, the elite's Skill tax, the wyrm's guard switch, 2-row die
+{ E.newGame({ heroes: ['w', 'a'], seed: 21, boss: 'mire-behemoth' }); E.debug.boss(); const bb = E.G().b.en[0]; ok(bb.mhp === 2 * 22 * SC, 'R29 boss HP printed per hero (22 x 2 heroes x SCALE)'); }
+{ G = fresh(['w'], 22); const e = G.b.en[0]; e.id = 'rust-tick'; e.curled = 0; e.blk = 0; e.hp = e.mhp = 4 * SC; G.hs[0].hand = [E.mk('w-strike')]; G.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(e.blk === 2 * SC && e.curled === 1, 'R29 Hunker: Block 2 the first time it is hurt'); }
+{ G = fresh(['w'], 23); const e = G.b.en[0]; e.id = 'thorn-brute'; G.b.turn = 2; const hp0 = G.hs[0].hp; G.hs[0].hand = [E.mk('w-defend')]; G.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: 0 }); ok(G.hs[0].hp === hp0 - SC, 'R29 elite Skill tax: 1 HP per Skill from turn 2'); }
+{ G = fresh(['w'], 24); const e = G.b.en[0]; e.id = 'gate-colossus'; e.mode = 0; e.taken = 5 * SC; e.blk = 0; e.hp = e.mhp = 400; G.hs[0].hand = [E.mk('w-hammer')]; G.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(e.mode === 1 && e.spk === SC, 'R29 guard switch: 6 damage flips the wyrm to its defensive mode (Thorn Hide)'); }
+{ ok(D.ENEMIES['iron-warden'].pat[0].die.length === 2 && D.ENEMIES['iron-warden'].hp[0] === 7 * SC && D.ENEMIES['hex-acolyte'].hp[0] === 9 * SC, 'R29 2-row die (1-3 / 4-6) and printed HP x SCALE'); }
 ok(D.H.w.hp === 10 * SC && D.H.s.hp === 9 * SC && D.H.a.hp === 9 * SC && D.H.m.hp === 9 * SC, 'R11 class HP 10/9/9/9 x SCALE');
 ok(D.H.s.start.length === 12 && D.H.s.start.filter(x => x === 's-strike').length === 5 && D.H.s.start.filter(x => x === 's-defend').length === 5, 'R12 rogue starter 5 + 5 + 2');
 // R13 shiv: 3 damage own attack, max 5 held, none at start

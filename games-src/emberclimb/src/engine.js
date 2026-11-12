@@ -189,10 +189,21 @@
     if (real > 0) {
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addPoison(e, h.pw.envenom);
-      if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); }
+      if (e.hp <= 0) killE(e); else hurtE(e, real);
     }
   }
-  function losePoisonKill(e) { if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
+  function losePoisonKill(e) { if (e.hp <= 0) killE(e); }
+  // R24 tabletop foe reactions: Hunker (Block the first time it is hurt), guard switch (enough damage flips the wyrm to its defensive mode),
+  // death spores (heroes become Vulnerable when it dies)
+  function hurtE(e, real) {
+    var d = D.ENEMIES[e.id], ei = 'e' + G.b.en.indexOf(e);
+    if (d.curl && !e.curled) { e.curled = 1; e.blk += d.curl * SC; fx('blk', ei, d.curl * SC); }
+    if (d.shift && !e.mode) { e.taken += real; if (e.taken >= d.shift * SC) { e.mode = 1; e.taken = 0; e.i = -1; e.spk = SC; fx('buff', ei, SC, 'spikes'); plan(e); } }
+  }
+  function killE(e) {
+    e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0);
+    var d = D.ENEMIES[e.id]; if (d.deathVuln) aliveHs().forEach(function (h) { addSt(h, 'vuln', d.deathVuln); fx('debuff', 'h' + G.hs.indexOf(h), d.deathVuln, 'vuln'); });
+  }
   function lowest() { var l = alive().sort(function (a, b) { return a.hp - b.hp; }); return l[0]; }
   function chan(h, k) {
     var slots = 3 + (h.pw.slots || 0);
@@ -208,7 +219,7 @@
   }
   function hitRaw(e, d) {
     if (e.dead || d <= 0) return; var a = Math.min(e.blk, d); e.blk -= a; var real = d - a; fx('dmg', 'e' + G.b.en.indexOf(e), d, '');
-    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
+    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) killE(e); else hurtE(e, real); }
   }
   function setStance(h, s) {
     if (h.stance === s) return; if (h.stance === 'c') gainEn(h, 2); h.stance = s; fx('stance', 'h' + G.hs.indexOf(h), 0, s);
@@ -254,16 +265,21 @@
   }
   // ---------- battle flow
   function mkEnemy(id) {
-    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); hp = Math.round(hp * (D.EHP[G.hs.length] || 1) * (1 + 0.25 * ((G.act || 1) - 1))); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
-    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0 };
+    var d = D.ENEMIES[id], pf = !!(d.hpF && G.fights === 0 && G.b0first), hp = pf ? d.hpF : d.hp[0] + ri(d.hp[1] - d.hp[0] + 1);
+    // R24 tabletop foes: normal foes have flat HP (one card per hero), elite and boss HP is printed per hero; shelf-made foes keep the old x1.6 duo rule
+    var hm = d.tab ? ((d.elite || d.boss) && !d.flat ? G.hs.length : 1) : (D.EHP[G.hs.length] || 1);
+    hp = Math.round(hp * hm * (1 + 0.25 * ((G.act || 1) - 1))); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
+    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0, pf: pf ? 1 : 0, mode: 0, taken: 0 };
   }
   function plan(e) {
-    var d = D.ENEMIES[e.id], step, pat = d.pat;
+    var d = D.ENEMIES[e.id], step, pat = e.pf && d.patF ? d.patF : e.mode && d.pat2 ? d.pat2 : d.pat;
     if (e.asleep > 0) { e.intent = { sleep: 1 }; return; }
+    if (d.first && !e.fd) { e.fd = 1; e.intent = JSON.parse(JSON.stringify(d.first)); e.intent.tg = e.row; return; }   // R24: a one-time opening step (the elite's idle turn)
+    if (e.mode && e.i + 1 >= pat.length) { e.mode = 0; e.taken = 0; e.i = -1; pat = d.pat; }   // R24: the defensive mode ends after its last step, back to attack mode
     if (d.mode === 'rand') { var k; do { k = ri(pat.length); } while (k === e.i && pat.length > 1); e.i = k; }
     else e.i = (e.i + 1) % pat.length;
     step = pat[e.i]; var dn = 0;
-    if (step.die) { dn = G.b.die || 1; step = step.die[dn <= 2 ? 0 : dn <= 4 ? 1 : 2]; }
+    if (step.die) { dn = G.b.die || 1; step = step.die.length === 2 ? step.die[dn <= 3 ? 0 : 1] : step.die[dn <= 2 ? 0 : dn <= 4 ? 1 : 2]; }
     e.intent = JSON.parse(JSON.stringify(step)); if (dn) e.intent.die = dn;
     var tg = e.row; if (!G.hs[tg] || G.hs[tg].dead) tg = G.hs.indexOf(aliveHs()[0]); e.intent.tg = tg;
   }
@@ -288,7 +304,9 @@
       while (ids.length > G.hs.length) ids.pop();
       for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
     }
+    if (kind === 'e' && ids.length > 1 && G.hs.length > 1) { var one = ids.slice(); for (var eh = 1; eh < G.hs.length; eh++) ids = ids.concat(one); }   // R24: the 3-warden elite card is 3 per hero
     resetCombat();
+    G.b0first = kind !== 'e' && kind !== 'b' && G.fights === 0 && !(G.tutEnc && G.tutEnc[G.floor]);
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
     G.b.en.forEach(function (e, i) { e.row = i % G.hs.length; });
     G.scr = 'battle'; G.fights++;
@@ -373,8 +391,8 @@
     var ei = 'e' + G.b.en.indexOf(e); G.lastHit = e.id;
     fx('act', ei, 0, it.atk ? 'atk' : 'cast', G.hs.indexOf(h));
     e.spk = 0; if (it.spikes) { e.spk = it.spikes; fx('buff', ei, it.spikes, 'spikes'); }
-    if (it.str) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.blk) { e.blk += it.blk; fx('blk', ei, it.blk); }
+    if (it.str && !it.atk) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.atk) {
       var weak = st(e, 'weak') > 0;   // Weak/Vulnerable are spent once per whole attack action, not per hit
       for (var j = 0; j < tgs.length && G.scr === 'battle'; j++) {
@@ -390,6 +408,7 @@
       if (G.scr === 'battle' && weak && e.st.weak > 0) e.st.weak--;
     }
     if (G.scr !== 'battle') return;
+    if (it.str && it.atk) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }   // R24: card text reads top to bottom, the hit lands before the Strength
     // the action's text resolves top to bottom: the hit lands first, then its debuffs / added cards (so a Vulnerable it applies cannot double its own hit)
     tgs.forEach(function (t) { if (t.dead) return;
       if (it.weak) addSt(t, 'weak', it.weak); if (it.vuln) addSt(t, 'vuln', it.vuln); if (it.frail) addSt(t, 'frail', it.frail);
@@ -446,6 +465,8 @@
     if (e.cost === 'X') { X = h.en; h.en = 0; } else h.en -= e.cost;
     h.hand.splice(ci, 1);
     fx('play', 'h' + hi, ci, c.id, ti);
+    if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].skillTax && G.b.turn >= 2) { fx('hitme', 'h' + hi, D.ENEMIES[en.id].skillTax * SC, 'enraged'); hurtHero(h, D.ENEMIES[en.id].skillTax * SC, 1); } });   // R24 tabletop elite: from its 2nd turn each Skill costs the player 1 HP
+    if (G.scr !== 'battle') return true;
     if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].onSkill) { addSt(en, 'str', D.ENEMIES[en.id].onSkill); fx('buff', 'e' + G.b.en.indexOf(en), D.ENEMIES[en.id].onSkill, 'str'); } });
     if (h.pw.afterimg) { gainBlk(h, h.pw.afterimg); }
     ATK = { weak: st(h, 'weak') > 0, vt: {}, any: 0 };
@@ -632,6 +653,7 @@
     eff: eff, lines: lines, previewHit: previewHit, previewPlay: previewPlay, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
     debug: {
       boss: function () { enterNode(G.map.length - 1); }, hurt: function (hi, n) { hurtHero(G.hs[hi], n, 1); },
+      split: function () { if (G.b) { G.b.en.forEach(function (e) { if (D.ENEMIES[e.id].split) { e.hp = 0; e.dead = 1; } }); doSplits(); } },   // R24 ?scn=ec-split: the boss bursts at once
       win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; e.splitDone = 1; }); winBattle(); } },
       shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
       rest: function () { G.at = G.map.filter(function (n) { return n.f === 9; })[0].id; G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },

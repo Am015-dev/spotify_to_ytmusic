@@ -156,3 +156,33 @@ G3 round 3 (8 Nov 2026): owner wants tabletop rules, so round 2's rule changes a
   and multi-act climbs are taught by a one-time tip the first time they happen in a real game, never as a "meet later" list.
 - Gambler event: the bet now states its odds (1-2 lose 30, 3-4 keep, 5 win 60, 6 win 90) and a 3-4 roll says "a draw, you keep your
   30 gold" instead of "Nothing changed".
+
+## Act 1 foes: printed tabletop cards (R24, Nov 2026)
+Every Act 1 foe now uses its printed tabletop card (`tab: 1` in data.js), multiplied by SCALE (8) like the hero cards: HP, damage,
+Block and Spikes x8; Strength, Weak, Vulnerable and added status cards stay counts. No more conversion from video-game sizes (`tt()` now
+only touches the shelf-made act 2-4 foes and the Story-only Warden Captain). Elite and boss HP is printed per hero (x heroes); normal foes
+have flat HP (one card per hero). Die rows: 3 rows = 1-2 / 3-4 / 5-6, 2 rows = 1-3 / 4-6. Values come from two independent card
+transcriptions (research notes kept outside the repo); "checked" = both agree, "one source" = only one has it.
+
+| foe (shelf name) | tabletop card | in game (x8) | status |
+|---|---|---|---|
+| Hex Acolyte | 9 HP; every turn: 1 dmg, then +1 Str | 72 HP; 8 dmg, then +1 Str (+8 per hit) | checked |
+| Gnawer | 10 HP; die: 3 dmg + 1 Block / 4 dmg / 2 Block + 1 Str. First-fight side: 7 HP; 2 Block + 1 Str / 2 dmg + 1 Block / 3 dmg | 80 HP; 24 + 8 Block / 32 / 16 Block + 1 Str. First fight: 56 HP; 16 Block + Str / 16 + 8 Block / 24 | one source |
+| Rust Tick | 4 HP; die: +1 Str / 2 dmg / 2 dmg; Hunker 2. First-fight side: 3 HP; +1 Str / 2 / 1 | 32 HP; +1 Str / 16 / 16; first hurt: +16 Block. First fight: 24 HP; +1 Str / 16 / 8 | one source |
+| Ooze Drop | 3 HP; every turn 1 dmg | 24 HP; 8 dmg | checked |
+| Snare Vine | 10 HP; die: 2 dmg + Weak 1 / 2 dmg + Daze / 3 dmg | 80 HP; 16 + Weak 1 / 16 + Daze / 24 | HP checked, row order varies by card |
+| Ash Imp | 10 HP; die: 3 dmg / 2 dmg + Vulnerable 1 / 2 dmg + Daze | 80 HP; 24 / 16 + Vuln 1 / 16 + Daze | HP checked, row order varies by card |
+| Bile Blob | 10 HP; die: 1 dmg + Weak 2 / 4 dmg / 3 dmg + 2 Slimed | 80 HP; 8 + Weak 2 / 32 / 24 + 2 Slimed | sources differ on HP (10 or 12) |
+| Gape Grub | 6 HP; die: 2 dmg / 1 dmg + 1 Str / +2 Str; when it dies heroes get Vulnerable 1 | 48 HP; 16 / 8 + 1 Str / +2 Str; death: Vuln 1 | checked |
+| Mire Slug (split only) | 5 HP; die: 2 dmg / Weak 1 / 2 dmg + Daze | 40 HP; 16 / Weak 1 / 16 + Daze | checked |
+| Spine Slug (split only) | 5 HP; die: 1 dmg + Vuln 1 / 1 dmg + Daze / 2 dmg | 40 HP; 8 + Vuln 1 / 8 + Daze / 16 | checked |
+| Thorn Brute (elite) | 14 HP per hero; idle once, then 3 dmg every turn; from turn 2 each Skill a player plays costs 1 HP | 112 HP per hero; idle, then 24; Skill: -8 HP | checked (HP); Skill tax one source per card text |
+| Sleeper Statue (elite) | 22 HP per hero; asleep turn 1 (wakes when hurt), then 4 / 4 / Weak 2 + 1 Str | 176 HP per hero; 32 / 32 / Weak 2 + Str | HP checked, pattern one source |
+| Iron Warden x3 (elite, 3 per hero) | 7 / 8 / 7 HP; 2-row die: Daze / 3 dmg; 3 dmg / Daze; 2 dmg / Daze | 56 / 64 / 56 HP; Daze / 24; 24 / Daze; 16 / Daze | checked |
+| Mire Behemoth (boss) | 22 HP per hero; 3 Slimed / 3 dmg + 2 Slimed / 6 dmg; dies: next round splits into Bile Blob, Mire Slug, Spine Slug per hero | 176 HP per hero; 3 Slimed / 24 + 2 Slimed / 48; same split | checked |
+| Ashen Wraith (boss) | 36 HP per hero; 6 steps: 1 + Burn / 2x2 + Burn / 2 Burn / 3 + 5 Block / 2 + Burn / 3x2 + 2 Burn + 1 Str | 288 HP per hero; 8 + Burn / 16x2 + Burn / 2 Burn / 24 + 40 Block / 16 + Burn / 24x2 + 2 Burn + Str | one source |
+| Gate Wyrm (boss) | 40 HP per hero; attack mode: 2 dmg + 5 Block; after 6 damage: defensive mode with Thorn Hide 1: 2 dmg, then 4 dmg + 1 Str, then attack mode | 320 HP per hero; 16 + 40 Block; after 48 damage: Spikes 8: 16, then 32 + Str | one source; threshold read from code |
+
+Cuts (listed, not hidden): encounter cards that summon a second foe bring only their lead foe; the gold-thief card
+and the small-goblin-gang cards are not in the deck; the wyrm's Block is not multiplied per hero; Burn from the wraith goes to its row only.
+Story chapters 3-10 (acts 2-4) still use shelf-made foes; the Quick game is Act 1 only and the setup screen says so.

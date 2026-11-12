@@ -36,8 +36,8 @@
   // one-card Goal before turn 1 of a Play game (not in Learn to play or Story, which have their own intros)
   function goalCard(done) {
     var o = h('div', 'ec-goal'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Goal');
-    var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top of the tower and defeat its guardian.'),
-      h('ul', '', null, [h('li', '', 'Cards cost energy. Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
+    var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top. Beat the boss there.'),
+      h('ul', '', null, [h('li', '', 'Cards cost energy.'), h('li', '', 'Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
     var b = on(h('button', 'btn', 'Climb'), function () { o.remove(); if (done) done(); }); b.id = 'goal-go'; c.appendChild(b); o.appendChild(c); document.body.appendChild(o);
   }
   UI.goalCard = goalCard;
@@ -248,17 +248,17 @@
     ['w', 's', 'a', 'm'].forEach(function (k) {
       var H = D.H[k], lk = !heroOpen(k), b = h('button', 'hero' + (UI.pick.indexOf(k) >= 0 ? ' sel' : '') + (lk ? ' locked' : ''), null, [A('hero-' + k, H.name.split(' ')[0], { ph: TONE[k] }), h('b', '', H.name.split(' ')[0]), h('i', '', lk ? '\uD83D\uDD12 Story' : H.role)]);
       b.setAttribute('data-hero', k);
-      on(b, function () { if (lk) { toast(HNEED[k][1]); return; } if (!UI.duo) { UI.pick = [k]; } else { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } } render(); });
+      on(b, function () { if (lk) { UI.heroNote = HNEED[k][1] + '.'; UI.noteN = (UI.noteN || 0) + 1; render(); return; } UI.heroNote = ''; if (!UI.duo && UI.pick[0] === k) { UI.heroNote = H.name.split(' ')[0] + ' is ready. Tap Start climb.'; UI.noteN = (UI.noteN || 0) + 1; render(); return; } if (!UI.duo) { UI.pick = [k]; } else { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } } render(); });
       hs.appendChild(b);
     });
-    var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
+    var mid = h('div', '', null, [hs, h('div', 'refline' + (UI.heroNote ? ' w24note w24n' + ((UI.noteN || 0) % 2) : ''), UI.heroNote || D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
     var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
-    UI.acts = 1; mid.appendChild(h('div', 'refline', 'One act: 9 floors, then a boss drawn at random.'));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
-    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
-    var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes, shared map. Pass the screen. Tap to pick both.' : 'Tap a hero to pick them. Use + Second hero to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
+    UI.acts = 1; mid.appendChild(h('div', 'refline w24act', 'Act 1 only: 9 floors, then a random boss.'));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
+    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Start climb together' : 'Start climb'), function () { UI.heroNote = ''; start(); }); go.id = 'play'; row.appendChild(go);
+    var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes share the map. Tap both.' : 'Tap a hero. + Second hero plays together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
   }
   UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
@@ -366,16 +366,16 @@
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d; try { d = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(h0)); } catch (x) { d = it.atk; } if (d == null || isNaN(d)) d = it.atk;
       var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (it.all) t += ' all'; if (g.hs.length > 1 && !it.all) t += ' → ' + D.H[h0.k].name.split(' ')[0];
-      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
+      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: ' + (n > 1 ? n + ' hits of ' + d : d + ' damage') + '. Block soaks it.' });
     }
-    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
-    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: each of your hits deals 8 less. One Weak is used up per attack (max 3).' });
-    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage from a hit. One is used up per attack (max 3).' });
-    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 8 HP per poison at the end of the turn, ignoring Block. It stays.' });
-    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
-    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: until its next move, every attack card you play on it hurts you for ' + it.spikes + '. Use skills or block that turn.' });
+    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: +' + it.blk + '. Your hits do less.' });
+    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your hits deal 8 less.' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 8 HP each turn.' });
+    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard.' }); }
+    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
     return P;
   }
@@ -389,11 +389,15 @@
     return b;
   }
   UI.explain = function (P) {
-    var old = document.querySelector('.itip'); if (old) old.remove();
-    var t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.appendChild(h('b', '', 'Enemy intent'));
+    document.querySelectorAll('.itip, .itip-scrim').forEach(function (n) { n.remove(); });
+    // R24: a real popup: a see-through scrim under it closes it on any tap (or Esc), so it never sits over the controls you tap next
+    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : 'Enemy intent'));
     P.forEach(function (p) { var r = h('div', 'irow', null, [IA(p.s, p.k), h('span', '', p.say)]); t.appendChild(r); });
-    t.appendChild(h('i', '', 'Tap to close'));
-    t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
+    t.appendChild(h('i', '', 'Tap to close')); var xb = h('button', 'itip-x', '\u2715'); xb.type = 'button'; xb.setAttribute('aria-label', 'Close'); t.appendChild(xb);
+    function close() { t.remove(); sc.remove(); document.removeEventListener('keydown', esc); }
+    function esc(ev) { if (ev.key === 'Escape') close(); }
+    t.addEventListener('click', close); sc.addEventListener('click', function (ev) { close(); var u = document.elementFromPoint(ev.clientX, ev.clientY); if (u && u !== document.body && u.closest('button, .card, .en, .node, [role=button]')) u.click(); });   // the tap that closes it still lands on what is under it document.addEventListener('keydown', esc);
+    document.body.appendChild(sc); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) close(); }, 9000);
   };
   function stChips(o) {
     var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
@@ -403,6 +407,8 @@
   // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
   function STAGE() { return !/[?&]stage=0/.test(Q) && window.innerWidth < 1024; }
   UI.STAGE = STAGE;
+  function LSC() { return window.innerWidth > window.innerHeight && window.innerHeight < 520; }
+  var lsWas = null; window.addEventListener('resize', function () { var n = LSC(); if (n !== lsWas) { lsWas = n; try { var g = G(); if (g && g.scr === 'battle' && UI.mode === 'game' && !UI.busy && !UI.dragging) render(); } catch (e) { } } });   // R24: rotation flips the stage between portrait and the short-landscape layout
   function relicBar(g) {
     var r = h('div', 'w485top');
     var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
@@ -435,8 +441,11 @@
     var SG = STAGE(); if (SG) st.appendChild(relicBar(g));
     var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget(), PV = previewSel(g, b);
     var fk = g.act + ':' + g.floor + ':' + g.at; if (!UI.fs || UI.fs.key !== fk) UI.fs = { key: fk, kind: b.kind, hp0: g.hs.reduce(function (a, x) { return a + x.hp; }, 0), mhp: g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), waste: 0, turns: 1, over: 0 }; UI.fs.turns = Math.max(UI.fs.turns, b.turn || 1);
+    var nShow = 0, many = b.en.length > 3;   // R24: a split boss leaves its corpse plus up to 3 slimes per hero; the stage shows only foes that matter
     b.en.forEach(function (e, i) {
       var d = D.ENEMIES[e.id];
+      if (SG && e.dead && (e.splitDone || many)) return;
+      nShow++;
       var x = h('div', 'en' + (e.dead ? ' dead' : '') + (tgtMode && !e.dead ? ' glow' : ''));
       x.setAttribute('data-w', 'e' + i);
       if (!e.dead) x.appendChild(intentBox(e));
@@ -451,9 +460,9 @@
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
     });
-    if (SG) en.style.setProperty('--n', b.en.length);
+    if (SG) { en.style.setProperty('--n', nShow); if (nShow > 3) en.classList.add('w24many'); if (nShow > 4) en.classList.add('w24six'); }
     var mid = h('div', 'mid');
-    if (SG) { var ar = h('div', 'arena'), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
+    if (SG) { var ar = h('div', 'arena' + (nShow > 3 ? ' w24many' : '')), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
     g.hs.forEach(function (hh, i) {
       if (SG) { mid.appendChild(heroFig(g, b, hh, i, PV)); return; }
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
@@ -485,7 +494,8 @@
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
-    if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
+    else if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
@@ -767,7 +777,7 @@
     var cause = h('div', 'cause');
     if (kd && (!g.won || g.floor >= g.F)) cause.appendChild(A('enemy-' + kid, '', { ph: '#6a3a2a', cls: 'cause-art' }));
     var full = g.floor >= g.F; if (g.won && !full) { kd = null; }
-    cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? ' (boss)' : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
+    cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? (kd.boss ? ' (boss)' : ' (boss fight)') : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
     s.appendChild(cause);
     var QS = (window.EC_STORY || {}).quick; if (QS && !UI.camp && !window.EC_NOSAVE) s.appendChild(h('div', 'storyline', g.won ? QS.won : QS.lost));
     var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
