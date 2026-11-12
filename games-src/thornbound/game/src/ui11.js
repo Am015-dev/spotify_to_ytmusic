@@ -112,8 +112,33 @@ function hlpSuggest(){const M=UI.bf;if(!M||!M.kind||UI.card||UI.dragging||!M.sug
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'thornbound',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
+  GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
+// hints On (the first game's default): every decision shows the suggestion and its finger; the bulb still explains the suggestion
+// (finger, why, How does this work?). Menu > Hints turns them off.
+function bulbState(){const b=$('#bulbbtn');if(!b)return;const on=UI.guide==='full'&&G&&UI.started;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Hints are on. Tap to see why':'Hint: what should I do?')}
+function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
+  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||!!$('#tbgoal')||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
   GXH.phase(busy?null:hlpPhase())}
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();
+// a help bubble never covers a glowing tap spot: on a crowded phone the kit's spot search can settle on one (it also avoids all text);
+// then the bubble moves to the nearest spot clear of every glowing core and of its own rings (text under it is fine)
+function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub'))return;const W=innerWidth,H=innerHeight;
+  const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {left:cx-w/2-3,top:cy-h/2-3,right:cx+w/2+3,bottom:cy+h/2+3}};
+  const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(core);
+  const rings=[...document.querySelectorAll('.gxh-ring')].map(e=>{const q=e.getBoundingClientRect();return {left:q.left-4,top:q.top-4,right:q.right+4,bottom:q.bottom+4,main:!e.classList.contains('from')}});
+  const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;
+  const r=b.getBoundingClientRect();if(!cores.some(c=>hit(r,c)))return;
+  const w=r.width,h=r.height,T=rings.find(x=>x.main)||rings[0]||{left:W/2,top:H/2,right:W/2,bottom:H/2};const tcx=(T.left+T.right)/2,tcy=(T.top+T.bottom)/2;
+  const bar=document.querySelector('.gx-bar');const top=bar?Math.ceil(bar.getBoundingClientRect().bottom)+4:6;
+  let best=null,bd=1e9;for(const x of [Math.max(6,Math.min(W-w-6,tcx-w/2)),6,Math.max(6,W-w-6)])for(let y=top;y<=H-h-6;y+=4){const c={left:x,top:y,right:x+w,bottom:y+h};
+    if(cores.some(k=>hit(c,k))||rings.some(k=>hit(c,k)))continue;const d=Math.abs(x+w/2-tcx)*.5+Math.abs(y+h/2-tcy);if(d<bd){bd=d;best=c}}
+  if(!best)return;b.style.left=Math.round(best.left)+'px';b.style.top=Math.round(best.top)+'px';
+  const side=best.bottom<=T.top+2?'bottom':best.top>=T.bottom-2?'top':best.right<=T.left+2?'right':'left';
+  b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const a=b.querySelector('.gxh-arr');
+  if(a){a.style.left=a.style.top='';if(side==='top'||side==='bottom')a.style.left=Math.round(Math.max(14,Math.min(w-26,tcx-best.left-6)))+'px';else a.style.top=Math.round(Math.max(14,Math.min(h-26,tcy-best.top-6)))+'px'}}
+setInterval(hlpUnblock,60);
+try{new MutationObserver(()=>{if(document.querySelector('.gxh-bub.on'))hlpUnblock()}).observe(document.body,{childList:true,attributes:true,attributeFilter:['class','style'],subtree:false})}catch(e){}
+// the Goal card closes without a re-render: look again for a first-time bubble a moment later
+setInterval(()=>{if(G&&UI.started&&!G.over)try{hlpAfter()}catch(e){}},300);

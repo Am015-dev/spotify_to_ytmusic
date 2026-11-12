@@ -57,7 +57,7 @@ function renderMap(){if(!G||!UI.started)return;const wrap=$('#mapwrap');if(!wrap
   const sig=G.pl.map(p=>p.fac).join()+'|'+(UI.phone?1:0);
   if(!MAP.m||MAP.sig!==sig||UI.mapReset){buildMap();UI.mapReset=false}
   const m=MAP.m,V=UI.V;
-  m.setRound(Math.max(1,G.round),G.rounds);
+  MAP._rn='';syncRound();
   // influence
   for(let s=0;s<G.np;s++){const v=G.pl[s].inf;if(m.influence(s)!==v){const p=ANIM&&!UI.noAnim?m.setInfluence(s,v):m.setInfluence(s,v,{immediate:true});if(ANIM&&p&&p.then){UI.busy=true;p.then(()=>{UI.busy=false})}}}
   // heralds (public). unplaced = at court (dimmed)
