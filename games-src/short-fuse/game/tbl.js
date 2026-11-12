@@ -51,7 +51,10 @@ function tileHTML(x,si,k,mine,g){const known=x.v!=null;const col=known?(x.c==='r
   const inner=`<span class="f">${esc(face)}</span>${small}${not}${toks}<span class="wr"></span>`;
   return gk&&gk!=='sel'?`<button class="${cls}" ${attrs}>${inner}</button>`:`<div class="${cls}" ${attrs}>${inner}</div>`}
 function sideHTML(st){if(!st.side||!st.side.length)return '';return `<span class="side">${st.side.map(t=>`<i class="coin c-${t.t==='y'||t.v==='Y'?'y':'b'}${t.mean==='none'?' no':''}">${t.v==='Y'?'Y':esc(t.v)}</i>`).join('')}</span>`}
-function standHTML(V,st,mine,g){return `<div class="stand${mine?' mine':''}" data-st="${st.i}">${st.slots.map((x,k)=>tileHTML(x,st.i,k,mine,g)).join('')}${sideHTML(st)}</div>`}
+// review R1 (row 4): every stand is its own framed rack; a seat with two stands labels them "Stand 1" / "Stand 2"; a stand that wraps onto
+// more rows shows a return arrow from the end of row 1 to the start of row 2, so it reads as ONE stand, low to high like a line of text
+function standHTML(V,st,mine,g,lab){return `<div class="stand${mine?' mine':''}${lab?' two':''}" data-st="${st.i}">${lab?`<span class="stl">${lab}</span>`:''}${st.slots.map((x,k)=>tileHTML(x,st.i,k,mine,g)).join('')}${sideHTML(st)}<i class="rtn" aria-hidden="true"></i></div>`}
+function standsHTML(V,sts,mine,g){return sts.map((st,j)=>standHTML(V,st,mine,g,sts.length>1?'Stand '+(j+1):'')).join('')}
 function plateHTML(V,q,mine,g){const cur=!G.over&&decider()===q.i;const ox=V.ms.oxygen?`<u class="ox">O₂${q.ox}</u>`:'';const con=q.con&&!V.ms.mole?`<u class="cn${q.conDown?' dn':''}">${esc(q.con)}</u>`:'';
   const gl=g.plates.has(q.i);const star=q.i===G.captain?'<span class="star" title="Foreman">★</span>':'';
   const tool=q.ch&&ITEMS[CHARS[q.ch].item]?`<u class="tl${q.chUsed?' used':''}" style="--ai:var(--a-${CHARS[q.ch].item})" title="${esc(ITEMS[CHARS[q.ch].item].n)}"></u>`:'';
@@ -98,6 +101,7 @@ function trayItems(V){const items=[];const me=V.seat;if(me<0||G.over||UI.brief||
   if(sel&&sel.mode==='choose'){const step=nextStep(sel);const rem=selRemaining(sel);const m0=sel.opts[0];
     if(step&&step.key&&!(step.key==='who'||step.key==='to'||step.key==='next')){const vals=[...new Set(rem.map(m=>JSON.stringify(m[step.key])))].map(x=>JSON.parse(x));vals.forEach(v=>items.push({t:'param',key:step.key,v,label:paramLabel(step.key,v,m0,V)}))}
     else if(!step&&rem.length>1)rem.forEach((m,i)=>items.push({t:'pick',i,label:shortOpt(nice(describeMove(m),V))}));
+    else if(!step&&rem.length===1)items.push({t:'pick',i:0,go:true,label:'Use it: '+shortOpt(nice(describeMove(rem[0]),V))});   // one choice left: say what it does and let the player confirm (never a dead end)
     items.push({t:'cancel',label:'✕',mine:1});return items}
   if(sel&&sel.mode==='multi'){items.push({t:'cancel',label:'✕',mine:1});return items}
   if(sel&&sel.mode==='flipown'){items.push({t:'cancel',label:'✕',mine:1});return items}
@@ -139,50 +143,57 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
   // crew
   const order=crewOrder(V);let crew='';
   for(const s of order){const q=V.seats[s];const sts=V.stands.filter(st=>st.owner===s).sort((a,b)=>a.i-b.i);if(!sts.length)continue;
-    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}">${plateHTML(V,q,false,g)}${sts.map(st=>standHTML(V,st,false,g)).join('')}</div>`}
+    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}">${plateHTML(V,q,false,g)}${standsHTML(V,sts,false,g)}</div>`}
   // mine
   let mine='';if(me>=0){const sts=V.stands.filter(st=>st.owner===me).sort((a,b)=>a.i-b.i);const q=V.seats[me];
     const T=V.legal?V.legal.tools:{};const toolBtns=[];
-    mine=`<div class="sg me${decider()===me&&!G.over?' cur':''}" style="--sc:${SEATC[posOf(me)%5]}"><div class="mh">${plateHTML(V,q,true,g)}@@MC@@</div>${sts.map(st=>standHTML(V,st,true,g)).join('')}</div>`}
+    mine=`<div class="sg me${decider()===me&&!G.over?' cur':''}" style="--sc:${SEATC[posOf(me)%5]}"><div class="mh">${plateHTML(V,q,true,g)}@@MC@@</div>${standsHTML(V,sts,true,g)}</div>`}
   const items=trayItems(V);TBL.items=items;mine=mine.replace('@@MC@@',trayHTML(V,items,true));
   const set=(id,h,sig)=>{const el=document.getElementById(id);if(!el)return el;if(sig===undefined)sig=h;if(el._s!==sig){el._s=sig;el.innerHTML=h}return el};
   set('fuse',fuseHTML(),fuseHTML());set('cutc',cutCountHTML(V));set('track',trackHTML(V));set('clk',clockHTML(V));
-  set('gear',gearHTML(V));set('crew',crew);set('mine',mine);
+  set('gear',gearHTML(V));set('crew',crew+'<div class="mcue" aria-hidden="true"><span>&#9662; more wires below</span></div>');set('mine',mine);
   const trh=trayHTML(V,items,false);const tr=set('tray',trh);tr.classList.toggle('on',trh.length>0);
   tb.classList.toggle('over',!!G.over);tb.classList.toggle('mineon',!!mine);tb.classList.toggle('dng',G.dial!=null&&G.dial<=1&&!G.over);
   setSay(sayText(V));
   renderOverlays(V);
   layoutTable();flushFx();placeGhost(V)}
+const RACK={rg:9,lb:12};   // extra px: the gap between wrapped rows (return arrow) and the label above each of two stands (table.css)
 // tile sizes: as large as fit; stands wrap to more rows rather than shrink below a thumb
 function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
-  for(let tw=o.max;tw>=o.min;tw--){const cols=Math.max(1,Math.floor((W+g)/(tw+g)));const th=Math.round(tw*ratio);let h=0,rows=0;
-    for(const grp of counts){h+=o.plate+o.seatGap;for(const n of grp){const r=Math.ceil(Math.max(1,n)/cols);rows+=r;h+=r*(th+g)}}
+  for(let tw=o.max;tw>=o.min;tw--){const cols=Math.max(1,Math.floor((W+g)/(tw+g)));const th=tileH(tw,ratio);let h=0,rows=0;
+    for(const grp of counts){h+=o.plate+o.seatGap;for(const n of grp){const r=Math.ceil(Math.max(1,n)/cols);rows+=r;h+=r*(th+g)+(r-1)*RACK.rg+(grp.length>1?RACK.lb:0)}}
     if(h>H+1)continue;if(!best)best={tw,rows};else if(tw>=best.tw-4&&rows<best.rows)best={tw,rows}}
   return best?best.tw:o.min}
-function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=st.parentNode.clientWidth||st.clientWidth;const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px'})}
+// every wire is a thumb target: never under 44x44 (crowded jobs scroll the crew area instead of shrinking it)
+const TMIN=44;function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(ratio,1.12):ratio)))}
+function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=st.parentNode.clientWidth||st.clientWidth;const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
   document.documentElement.classList.toggle('short',window.innerHeight<640);
-  const land=W>H*1.15&&W>=600;const big=W>=900&&H>=700;tb.classList.toggle('land',land);
-  const plate=window.innerHeight<640?20:24;
+  const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
+  const plate=44;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
   const ms=[...mine.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length);
   const used0=[...tb.children].filter(e=>e!==felt&&e!==mine&&getComputedStyle(e).position!=='absolute'&&!e.hidden).reduce((a,e)=>a+e.offsetHeight,0);
   const gh=gear.offsetHeight,cw=W-12;const maxM=big?92:land?52:60;
-  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:big?88:54,plate,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:22,max:big?88:54,plate,seatGap:6}))}
-    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:22,max:big?88:land?54:56,plate,seatGap:6})};
-  const setMine=tw=>{mine.style.setProperty('--tw',tw+'px');mine.style.setProperty('--th',Math.round(tw*1.32)+'px');balance(mine,tw,4)};
+  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:54,plate,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:54,plate,seatGap:6}))}
+    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:land?54:56,plate,seatGap:6})};
+  const setMine=tw=>{mine.style.setProperty('--tw',tw+'px');mine.style.setProperty('--th',tileH(tw,1.32)+'px');balance(mine,tw,4)};
   let tm=0,t1=0;crew.classList.toggle('two',land&&cs.length>1);
   if(ms.length){mine.style.maxHeight='';mine.style.overflow='';
     // my stand first, as big as it can be while the crew keeps a tile a thumb can still tap
-    const capC=Math.min(40,crewFit(1e4));let pick=30;
-    for(let tw=maxM;tw>=30;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.34))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
+    const capC=Math.min(52,crewFit(1e4));let pick=TMIN;
+    for(let tw=maxM;tw>=TMIN;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.34))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
     setMine(pick);tm=pick}
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
-  for(let i=0;i<24;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',Math.round(t1*1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=22)break;t1-=1}
-  if(t1<30&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
-  if(t1>=34&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
+  for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=TMIN)break;t1-=1}
+  // still too tall at the smallest (44px) crew tile, short landscape: my name plate moves beside my stand; after that the crew area scrolls (never a wire under 44px)
+  if(ms.length&&land&&crew.scrollHeight>crew.clientHeight+1){mine.classList.add('mrow');setMine(tm);balance(crew,t1,3)}
+  const crowd=crew.scrollHeight>crew.clientHeight+1;crew.classList.toggle('scroll',crowd);
+  const atEnd=()=>crew.classList.toggle('end',crew.scrollTop+crew.clientHeight>=crew.scrollHeight-2);atEnd();if(!crew._sl){crew._sl=1;crew.addEventListener('scroll',atEnd,{passive:true})}
+  if((crowd||t1<TMIN+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
+  if(!crowd&&t1>=TMIN+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
   TBL.lay={W,H,tw:t1,tm};
   placeGhost(UI.V)}
@@ -190,23 +201,29 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
 function renderOverlays(V){const ov=document.getElementById('over'),cv=document.getElementById('cover');if(!ov||!cv)return;
   const p=G.over?-1:passTo();
   if(UI.brief&&!G.over){const n=G.mission,M=MISSIONS[n];const chips=ruleChips(n).slice(0,4);cv.hidden=false;
-    const h=`<div class="card2 briefc"><div class="bn">${n}</div><div class="bvil" aria-hidden="true"></div><h2>Goal</h2><p class="bgoal">Cut all ${G.st.reduce((x,st)=>x+st.w.length,0)} wires before the fuse (${G.dial==null?'timer':G.dial+' steps'}) runs out.</p><ul class="bpts"><li>Match a crew wire. Both wires are cut.</li><li>Wrong guess. The fuse burns one step.</li><li>Hold all of a number? Cut them alone.</li></ul><p class="bjob">Job ${n}: ${esc(M.nm)}</p><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
+    const h=`<div class="card2 briefc"><div class="bn">${n}</div><div class="bvil" aria-hidden="true"></div><h2>Goal</h2><p class="bgoal">Cut all ${G.st.reduce((x,st)=>x+st.w.length,0)} wires before the fuse (${G.dial==null?'timer':G.dial+' steps'}) runs out.</p><ul class="bpts"><li>Match a crew wire. Both wires are cut.</li><li>Wrong guess. The fuse burns one step.</li><li>Hold all of a number? Cut them alone.</li></ul>${n===1?'<p class="blg">Warm-up job: try a match, a solo cut and your Twin Probe.</p>':''}<p class="blg"><span class="star">★</span> = foreman, goes first. ${(()=>{const me=V.seat>=0?V.seats[V.seat]:null;const it=me&&me.ch&&CHARS[me.ch]&&ITEMS[CHARS[me.ch].item];return it?`<u class="tl" style="--ai:var(--a-${CHARS[me.ch].item})"></u> = your ${esc(it.n)}, once per job. `:''})()}Tap a name for help.</p><p class="bjob">Job ${n}: ${esc(M.nm)}</p>${JOBTIP[n]?`<p class="btip"><b>Tip</b> ${esc(JOBTIP[n])}</p>`:''}<p class="bstar">&#9733; Clean job: ${cleanCap(n)?'at most '+cleanCap(n)+' miss':'no misses'}</p><div class="bch">${chips.map(c=>`<span class="rc">${ico(c[0])}<b>${esc(c[1])}</b></span>`).join('')}</div><button class="big go" data-a="briefok">Go</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=paintHTML(h)}}
   else if(p>=0){cv.hidden=false;const h=`<div class="card2 pass"><h2>${esc(nm(p))}</h2><button class="big go" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}</button></div>`;if(cv._s!==h){cv._s=h;cv.innerHTML=h}}
   else{cv.hidden=true;cv._s=''}
   if(G.over){if(UI.camp&&UI.campShown){ov.hidden=true}else{ov.hidden=false;const w=!!G.over.win;const next=G.mission<66?G.mission+1:null;const why=w?'':overWhy(G.over.why);
-    const h=`<div class="card2 end ${w?'win':'lose'}"><div class="endart" aria-hidden="true"></div><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}<p class="endline">${esc(UI.coach?(w?STORY.coach.winText:STORY.coach.loseText):(w?STORY.quick.win:STORY.quick.lose)[G.mission%3])}</p><p class="endstat">${G.stats.turns||G.turn} turns · ${G.stats.miss||0} miss${(G.stats.miss||0)===1?'':'es'} · ${G.st.reduce((x,st)=>x+st.w.filter(q=>q.cut).length,0)}/${G.st.reduce((x,st)=>x+st.w.length,0)} wires cut</p>${UI.coach?`<div class="row"><button class="big go" data-ce="${UI.coach.pro?'chapter':'play'}">${ico('play')}${UI.coach.pro?'Start chapter 1':'Play a real game'}</button><button class="big" data-ce="again">${ico('flip')}Play it again</button></div>`:isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
+    const h=`<div class="card2 end ${w?'win':'lose'}"><div class="endart" aria-hidden="true"></div><h2>${w?'DEFUSED!':'BOOM!'}</h2>${why?`<p>${esc(why)}</p>`:''}<p class="endline">${esc(UI.coach?(w?STORY.coach.winText:STORY.coach.loseText):(w?STORY.quick.win:STORY.quick.lose)[G.mission%3])}</p>${job1Check()}${!UI.coach&&w?`<p class="endstar ${(G.stats.miss||0)<=cleanCap(G.mission)?'got':''}">${(G.stats.miss||0)<=cleanCap(G.mission)?'&#9733; Clean job!':'Clean job needs '+(cleanCap(G.mission)?'at most '+cleanCap(G.mission)+' miss':'no misses')+'. Try again?'}</p>`:''}<p class="endstat">${G.stats.turns||G.turn} turns · ${G.stats.miss||0} miss${(G.stats.miss||0)===1?'':'es'} · ${G.st.reduce((x,st)=>x+st.w.filter(q=>q.cut).length,0)}/${G.st.reduce((x,st)=>x+st.w.length,0)} wires cut</p>${UI.coach?`<div class="row"><button class="big go" data-ce="${UI.coach.pro?'chapter':'play'}">${ico('play')}${UI.coach.pro?'Start chapter 1':'Play a real game'}</button><button class="big" data-ce="again">${ico('flip')}Play it again</button></div>`:isClient()?'<p>Wait for the host</p>':`<div class="row">${w&&next&&!UI.camp?`<button class="big go" data-a="next">${ico('fwd')}Next job</button>`:''}<button class="big${w&&next&&!UI.camp?'':' go'}" data-a="again">${ico('flip')}Again</button><button class="big" data-a="board">${ico('map')}Jobs</button></div>`}</div>`;
     if(ov._s!==h){ov._s=h;ov.innerHTML=h}}}
   else{ov.hidden=true;ov._s=''}}
 function paintHTML(h){return h}
+// pacing: a coach tip for the first jobs, and a clean-job goal (few misses) that gives every job a second thing to aim for
+const JOBTIP={2:'Yellows match only yellow. Guess a yellow only if you hold one.',
+  3:'One red is in play. Point only where a token or count is sure.',4:'Big job: cut sure pairs and solos first, guess last.'};
+function cleanCap(n){return n<=1?0:n<=4?1:2}
 function overWhy(w){w=String(w||'');if(/fuse|step|burn/i.test(w))return 'The fuse ran out';if(/red/i.test(w))return 'A red wire was cut';return w.split(/\s+/).slice(0,6).join(' ')}
 // ---------- effects ----------
 // diffFx() queues effects; they are played right after the DOM was rebuilt
 function fx(name,arg){TBL.fxq.push([name,arg])}
+// a crowded crew area scrolls: bring a wire someone acts on into view
+function seen(el){const c=el&&el.closest('#crew.scroll');if(!c)return;const r=el.getBoundingClientRect(),b=c.getBoundingClientRect();if(r.top<b.top||r.bottom>b.bottom)c.scrollTop+=r.top<b.top?r.top-b.top-6:r.bottom-b.bottom+6}
 function tileEl(u){return document.querySelector(`#tb .tile[data-u="${u}"]`)}
 function sparks(el,n,col){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();
   for(let i=0;i<n;i++){const s=document.createElement('i');s.className='sp';const a=Math.random()*Math.PI*2,d=22+Math.random()*34;s.style.cssText=`left:${r.left-b.left+r.width/2}px;top:${r.top-b.top+r.height/2}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-10}px;background:${col||'#ffc928'}`;f.appendChild(s);setTimeout(()=>s.remove(),800)}}
 function pop(el,txt,cls){const f=document.getElementById('fx'),tb=document.getElementById('tb');if(!el||!f||!tb)return;const r=el.getBoundingClientRect(),b=tb.getBoundingClientRect();const p=document.createElement('div');p.className='pop '+(cls||'');p.textContent=txt;
-  p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top-4)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
+  p.style.left=Math.max(30,Math.min(b.width-30,r.left-b.left+r.width/2))+'px';p.style.top=Math.max(20,r.top-b.top+r.height/2)+'px';f.appendChild(p);setTimeout(()=>p.remove(),1100)}
 // 3D sprites (rendered from the full-detail models): pliers snip at a cut wire, the bomb wobbles on a miss and swells on the boom
 const SPG={};   // owner bomb/pliers .glb models drawn once to a sprite (gx-glbsprite.js); models/<name>@512.webp stays the fallback
 ['bomb','pliers'].forEach(n=>{try{GXSPR.use('models/'+n,{size:256,pitch:.4}).then(u=>{if(u)SPG[n]=u})}catch(e){}});
@@ -230,7 +247,7 @@ function announce(m,seat){if(!ANIM||!m||m.a!=='dual')return;const f=G.st[m.st]&&
   const vv=m.v===undefined?'?':(m.v==='Y'?'Y':m.v)+(m.v2!=null?' / '+(m.v2==='Y'?'Y':m.v2):'');
   d.innerHTML=`<span style="--sc:${SEATC[posOf(seat)%5]}">${esc(nm(seat))}</span><b>${esc(vv)}?</b>`;
   d.style.left=Math.max(34,Math.min(b.width-34,r.left-b.left+r.width/2))+'px';d.style.top=Math.max(26,r.top-b.top-10)+'px';fe.appendChild(d);
-  m.ks.forEach(k=>{const t=G.st[m.st].w[k];const e2=t&&tileEl(t.u);if(e2){e2.classList.add('aim');setTimeout(()=>e2.classList.remove('aim'),700)}});
+  m.ks.forEach(k=>{const t=G.st[m.st].w[k];const e2=t&&tileEl(t.u);if(e2){seen(e2);e2.classList.add('aim');setTimeout(()=>e2.classList.remove('aim'),700)}});
   setTimeout(()=>d.remove(),900);sfx('select')}
 // ---------- the ghost finger: shows the very first move ----------
 function ghostPlan(V){if(!UI.ghost||G.over||UI.brief||passTo()>=0||V.seat<0)return null;const me=V.seat;
@@ -254,11 +271,15 @@ function tapTile(si,k){const V=UI.V;if(!V||V.seat<0||G.over||UI.brief)return;con
   if(own)onMine(si,k);else onTile(si,k)}
 function autoFire(){const sel=UI.sel,V=UI.V;if(!sel||sel.mode!=='dual'||!sel.tg.length||sel.v==null)return false;if(sel.two&&sel.v2==null)return false;const need=toolN(sel.tool);if(need!==99&&sel.tg.length<need)return false;
   const m=buildDual(sel);if(!m)return false;const err=legal(m,V.seat);if(err){toast(err);return false}if(UI.ghost&&UI.ghost.turn)ghostDone('turn');act(m,V.seat);return true}
+function redTip(u){const e=tileEl(u);if(e){e.classList.remove('buzz');void e.offsetWidth;e.classList.add('buzz');setTimeout(()=>e.classList.remove('buzz'),700)}sfx('select');toast('Red: never name it. It reveals itself last.')}
 function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
-  if(V.q&&V.q.who===me&&V.q.opts){const i=V.q.opts.findIndex(o=>o.d&&(o.d.u===sl.u||(o.d.st===si&&o.d.k===k)));if(i>=0){answer(i);return}toast('Tap a glowing wire');return}
+  if(V.q&&V.q.who===me&&V.q.opts){const i=V.q.opts.findIndex(o=>o.d&&(o.d.u===sl.u||(o.d.st===si&&o.d.k===k)));if(i>=0){answer(i);return}if(sl.c==='r'||(V.stands[si].slots[k]||{}).c==='r'){redTip(sl.u);return}toast('Tap a glowing wire');return}
   const sel=UI.sel;if(sel&&(sel.mode==='choose'||sel.mode==='multi'))return onTile(si,k);
-  const L=V.legal;if(!L||decider()!==me){toast(G.actor>=0?nm(G.actor)+"'s turn":'Not now');return}
-  const view=V.stands[si].slots[k];if(view.cut)return;
+  const L=V.legal;const view0=V.stands[si].slots[k];
+  // a red wire is never named: tapping it explains why (and reveals the reds when that is the legal move)
+  if(view0&&!view0.cut&&view0.c==='r'&&!(L&&decider()===me&&L.other.some(m=>m.a==='reveal'))){redTip(sl.u);return}
+  if(!L||decider()!==me){toast(G.actor>=0?nm(G.actor)+"'s turn":'Not now');return}
+  const view=view0;if(view.cut)return;
   if(sel&&sel.mode==='flipown'){if(view.flip){UI.sel=Object.assign(sel.prev&&sel.prev.mode==='dual'?sel.prev:{mode:'dual',tg:[],v:null,v2:null,two:null},{fu:view.u,tool:null,v:null});sfx('select');refresh()}return}
   if(view.flip){// a face-down wire of mine: use it for a solo or point with it
     const soloF=L.solo.filter(m=>m.flip&&m.fu===view.u);if(soloF.length&&!L.flip.some(m=>m.fu===view.u)){act(soloF[0],me);return}
@@ -279,7 +300,9 @@ function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
 // the crew wires: onTile (ui.js) sets the target; a number picked first fires here
 function afterTile(){const V=UI.V;if(UI.sel&&UI.sel.mode==='multi'&&UI.sel.tg.length===UI.sel.n){const m={a:'multi',kind:UI.sel.kind,tg:UI.sel.tg};const err=legal(m,V.seat);if(err){toast(err);UI.sel.tg.pop();refresh();return}act(m,V.seat);return}
   if(UI.sel&&UI.sel.mode==='dual')autoFire();else if(UI.sel&&UI.sel.mode==='choose'&&V&&!nextStep(UI.sel)){const rem=selRemaining(UI.sel);if(rem.length===1)act(rem[0],V.seat)}}
-document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
+document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){{const rt=e.target.closest('#mine .tile.known.r:not(.cut)');if(rt&&G&&!G.over&&!UI.brief){if(UI.tut){const w=G.st[+rt.dataset.s].w[+rt.dataset.k];if(w)redTip(w.u)}else tapTile(+rt.dataset.s,+rt.dataset.k);return}}{const dt=e.target.closest('#tb .tile.crew');const V=UI.V;if(dt&&G&&!G.over&&V&&V.seat>=0&&!UI.brief&&!UI.tut&&!UI.coach){let msg='';   // a tap on a wire that cannot be picked is never silent
+    if(V.q&&V.q.who===V.seat&&V.q.kind==='infoStd')msg='Not theirs: tap one of YOUR wires.';else if(decider()!==V.seat&&decider()>=0)msg='Wait: it is '+nm(decider())+"'s turn.";else if(dt.classList.contains('cut'))msg='That wire is already cut.';
+    if(msg){dt.classList.remove('buzz');void dt.offsetWidth;dt.classList.add('buzz');setTimeout(()=>dt.classList.remove('buzz'),800);toast(msg);return}}}const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
   if(TBL.dragEnded&&Date.now()-TBL.dragEnded<300){return}
   if(t.classList.contains('tile')){const si=+t.dataset.s,k=+t.dataset.k;if(UI.sel&&UI.sel.mode==='dual'&&!UI.sel.v&&t.classList.contains('sel')&&t.classList.contains('crew')&&UI.sel.tg.length===1&&!UI.sel.tool){UI.sel=null;refresh();return}tapTile(si,k);afterTile();return}
   if(t.classList.contains('plate')){plateTap(+t.dataset.seat);return}
@@ -320,3 +343,28 @@ if(window.GXV)GXV.watch(()=>{try{layoutTable()}catch(e){}});
 else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
   window.addEventListener('resize',deb);window.addEventListener('orientationchange',deb);if(window.visualViewport)window.visualViewport.addEventListener('resize',deb);
   const init=()=>{const b=document.getElementById('tb');if(b&&window.ResizeObserver)new ResizeObserver(deb).observe(b)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
+// anything that grows after a layout (my stand gaining a row, a token, the score or preview strip) can leave crew wires under my stand:
+// every refresh checks, synchronously (tiles never move after they are drawn), and lays the table out again when the crew no longer fits.
+// The same overflow right after a relayout means it cannot fit better: no relayout loop.
+TBL.fit=function(){const c=document.getElementById('crew');if(!c||!G||!UI.started)return;const over=()=>c.scrollHeight>c.clientHeight+1;if(!over()){TBL.fitSig=null;return}
+  const sig=()=>c.scrollHeight+'/'+c.clientHeight+'/'+c.querySelectorAll('.tile').length+'/'+innerWidth+'x'+innerHeight;if(sig()===TBL.fitSig)return;layoutTable();TBL.fitSig=over()?sig():null};
+(function(){const o=refresh;refresh=function(){const r=o.apply(this,arguments);try{TBL.fit()}catch(e){}return r}})();
+// some crew changes land outside refresh (late token and flip renders): a light check twice a second catches an overflow that persists
+setInterval(()=>{const c=document.getElementById('crew');if(!c||!G||!UI.started||c.scrollHeight<=c.clientHeight+1){TBL.over0=0;return}if(!TBL.over0){TBL.over0=1;return}TBL.over0=0;try{TBL.fit()}catch(e){}},500);
+// review R1 (row 4): tap a name plate (or its ★ / tool icon) for what the icons mean; the goal card carries the same legend
+function plateTip(seat,el){const V=UI.V;if(!G||!V||!V.seats||!V.seats[seat])return;const q=V.seats[seat];const L=[];const me=V.seat===seat;
+  L.push('<b>'+esc(me?'You':q.nm)+'</b>'+(q.human?'':' · computer crewmate')+' · '+uncutOf(seat).length+' wire'+(uncutOf(seat).length===1?'':'s')+' left');
+  if(seat===G.captain)L.push('<span class="star">★</span> Foreman: takes the first turn.');
+  if(q.ch&&CHARS[q.ch]&&ITEMS[CHARS[q.ch].item])L.push(`<u class="tl" style="--ai:var(--a-${CHARS[q.ch].item})"></u> ${esc(ITEMS[CHARS[q.ch].item].n)}: ${q.chUsed?'used up this job.':'a once-per-job tool.'}`);
+  if(standsOf(seat).length>1)L.push('Two stands: each one is sorted low to high on its own.');
+  let t=document.getElementById('ptip');if(!t){t=document.createElement('div');t.id='ptip';t.setAttribute('role','status');t.addEventListener('click',()=>{t.hidden=true});document.body.appendChild(t)}
+  t.innerHTML=L.map(x=>'<div>'+x+'</div>').join('');t.hidden=false;const r=el.getBoundingClientRect();const w=Math.min(300,innerWidth-24);t.style.width=w+'px';
+  t.style.left=Math.max(12,Math.min(innerWidth-w-12,r.left+r.width/2-w/2))+'px';const below=r.bottom+6+t.offsetHeight<innerHeight-8;t.style.top=(below?r.bottom+6:Math.max(8,r.top-6-t.offsetHeight))+'px';
+  clearTimeout(t._h);t._h=setTimeout(()=>{t.hidden=true},5000)}
+document.addEventListener('click',e=>{const p=e.target.closest&&e.target.closest('#tb .plate');if(!p||p.classList.contains('glow'))return;plateTip(+p.dataset.seat,p)});
+// review R1 (row 6): job 1 is short, so its result card shows which core moves you used, and what to try next job
+function job1Check(){if(!G||G.mission!==1||UI.coach||UI.tut||UI.camp)return '';const me=UI.V&&UI.V.seat>=0?UI.V.seat:-1;if(me<0)return '';
+  const H=G.hist.filter(h=>h.seat===me);const it=G.seats[me]&&G.seats[me].ch&&CHARS[G.seats[me].ch]?ITEMS[CHARS[G.seats[me].ch].item]:null;
+  const L=[['Match',H.some(h=>h.kind==='dual'&&h.ok)],['Wrong guess',H.some(h=>h.kind==='dual'&&!h.ok)],['Solo cut',H.some(h=>h.kind==='solo')]];if(it)L.push([it.n,!!G.seats[me].chUsed]);
+  const miss=L.filter(x=>!x[1]).map(x=>x[0]);
+  return `<p class="jchk">${L.map(x=>`<span class="${x[1]?'on':''}">${x[1]?'✓':'○'} ${esc(x[0])}</span>`).join('')}</p>${miss.length?`<p class="jnext">Next job, try: ${esc(miss.filter(x=>x!=='Wrong guess').join(', ')||'reading the tokens')}.</p>`:''}`}

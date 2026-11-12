@@ -47,14 +47,14 @@ function plLines(n0){const out=[];for(const e of G.log){if(e.i<=n0)break;if(e.c=
       if(pop)plPop(pop[0],pop[1],pop[2]);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}}}}catch(e){console.error(e)}return r}})();
 // ---------- (d) the score pop ----------
 function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tut&&false)return;let p=document.getElementById('spop');if(!p){p=document.createElement('div');p.id='spop';p.setAttribute('aria-hidden','true');p.setAttribute('data-help','');tb.appendChild(p)}
-  p.className='';p.innerHTML='<b>'+esc(big)+'</b>';if(cls==='good')plTick(18);void p.offsetWidth;p.className='on '+cls;clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1500/(UI.speed||1)))}
+  p.className='';p.innerHTML='<b>'+esc(big)+'</b>';try{const cc=document.getElementById('cutc'),q=cc&&cc.getBoundingClientRect();if(q&&q.width){if(p.parentNode!==document.body)document.body.appendChild(p);p.dataset.atc='1';p.style.left=Math.round(Math.min(innerWidth-50,q.right+34))+'px';p.style.top=Math.round(q.top+q.height/2)+'px'}}catch(e){}if(cls==='good')plTick(18);void p.offsetWidth;p.className='on '+cls+(p.dataset.atc?' atc':'');clearTimeout(PL.pt);PL.pt=setTimeout(()=>{p.classList.remove('on');p.remove()},Math.max(900,1500/(UI.speed||1)))}
 // ---------- (b) the one instruction line, in plain words ----------
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(!G||G.over||UI.brief||!V||V.seat<0)return t;const me=V.seat,s=decider();if(UI.tut)return t;
   if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return 'Show a wire: tap one of yours.';
   if(V.legal&&s===me&&!(V.q&&V.q.who===me)){const sel=UI.sel;
-    if(sel&&sel.mode==='dual'&&!sel.tool&&!sel.two){if(sel.tg.length&&sel.v==null)return 'Now tap one of your own numbers to say it.';if(sel.v!=null&&!sel.tg.length)return 'Now tap the crew wire you think matches.'}
-    if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a glowing crew wire to guess it.';
-    if(!sel&&t==='Tap your glowing wires')return 'Your turn: you hold every one left. Tap them to cut.'}
+    if(sel&&sel.mode==='dual'&&!sel.tool&&!sel.two){if(sel.tg.length&&sel.v==null)return 'Now tap your number to say it.';if(sel.v!=null&&!sel.tg.length)return 'Now tap the crew wire that matches.'}
+    if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a crew wire to guess.';
+    if(!sel&&t==='Tap your glowing wires')return 'You hold them all: tap to cut.'}
   if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+' is thinking…';return t}})();
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||!e.target.closest)return;if(e.target.closest('#say')||e.target.closest('#tb'))plSkip()},true);
 // ---------- tap the table while the computer crew plays to speed it up ----------
