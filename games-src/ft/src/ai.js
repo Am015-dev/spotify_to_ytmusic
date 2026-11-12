@@ -1,7 +1,7 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-// easy = the default rival: plays loose about half the time; tuned (R20) so a newcomer who taps only what glows wins about 1 in 3
-const LVL={easy:{noise:1.5,depth:12000,bid:.2,ease:0,loose:.5,pool:.6},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+// easy = the default rival: plays loose about half the time and eases off once it leads by 10+; tuned (R33) so a newcomer who taps only what glows wins about 1 in 2
+const LVL={easy:{noise:1.5,depth:12000,bid:.2,ease:10,loose:.5,pool:.6},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
 function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
 function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
 function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
