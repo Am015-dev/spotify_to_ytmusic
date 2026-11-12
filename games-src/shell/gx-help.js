@@ -87,9 +87,12 @@
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
       b.classList.remove('gxh-compact'); b.style.maxWidth = '';
       if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
-        var wt = [0, 236, 196, 164];
-        for (var wj = 0; wj < wt.length; wj++) { b.style.maxWidth = wt[wj] ? wt[wj] + 'px' : ''; b.dataset.gxhShrunk = '1'; var r4 = place(b, tr); if (r4.tapClear) { delete b.dataset.gxhShrunk; return r4; } }
-        b.style.maxWidth = '';
+        var wt = [0, 236, 196, 164, -350, -292, -236, -196, -164];   // negative: the slim one-line version at that width
+        for (var wj = 0; wj < wt.length; wj++) {
+          var cw2 = Math.abs(wt[wj]); b.classList.toggle('gxh-compact', wt[wj] < 0); b.style.maxWidth = cw2 ? cw2 + 'px' : ''; b.dataset.gxhShrunk = '1';
+          var r4 = place(b, tr); if (r4.tapClear) { delete b.dataset.gxhShrunk; return r4; }
+        }
+        b.classList.remove('gxh-compact'); b.style.maxWidth = '';
       }
       delete b.dataset.gxhShrunk;
     }
