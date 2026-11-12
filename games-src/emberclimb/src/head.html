@@ -462,7 +462,7 @@ html body.ec-stage #stage .w485end{position:absolute;z-index:9;right:8px;bottom:
 html body.ec-stage #stage .hand.fan{z-index:10!important;position:absolute;left:0;right:0;bottom:0;height:var(--hh);margin:0;padding:6px 4px 0;align-items:flex-start;justify-content:center;overflow:visible}
 html body.ec-stage #stage .hand.fan .card{height:calc(var(--cw)*1.5)!important;margin:0 calc(var(--cw)*-.15)!important;transform:translateY(var(--dy,0px)) rotate(var(--rot,0deg))!important;transform-origin:50% 130%;transition:transform .16s ease-out,box-shadow .16s;border-radius:9px;box-shadow:0 4px 10px rgba(0,0,0,.6)}
 html body.ec-stage #stage .hand.fan .card.ok{box-shadow:0 0 0 2px #7dff9a,0 0 12px #7dff9a99,0 4px 10px rgba(0,0,0,.6)}
-html body.ec-stage #stage .hand.fan .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.05)) scale(1.32) rotate(0deg)!important;z-index:40!important;box-shadow:0 0 0 3px #ffd36a,0 0 22px #ffb35c,0 10px 26px #000}
+html body.ec-stage #stage .hand.fan .card.sel{transform:translate(var(--sx,0px),var(--sy,calc(var(--cw)*-1.05))) scale(1.32) rotate(0deg)!important;z-index:40!important;box-shadow:0 0 0 3px #ffd36a,0 0 22px #ffb35c,0 10px 26px #000}
 html body.ec-stage #stage .hand.fan .card .cart{height:calc(var(--cw)*.6)!important}
 html body.ec-stage #stage .hand.fan .card .cb{display:block!important;font-size:13px!important;line-height:1.12;padding:3px 5px;font-weight:700;color:#2a1a0e}
 html body.ec-stage #stage .hand.fan .card .cl:not(:first-child){display:none}
@@ -571,4 +571,16 @@ html body .w485top{min-height:52px}html body .w485top .w485r,html body .w485top 
 html body.ec-stage #stage .intent{min-height:44px!important}
 html body .ov .grid{align-items:start;grid-auto-rows:max-content;display:grid!important;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));justify-items:center;gap:8px}html body .ov .grid .card{--cw:104px}html body .ov .grid .card{height:calc(var(--cw)*1.4)!important;align-self:start}
 html body .ec-phase{top:44%}
+
+/* R7 fix: phone text never below 14px (375x667 and up) */
+@media (max-width:1023px){
+html body #hud .chip,html body .chip,html body .w485fl,html body .w485nl,html body .w485lgi,html body .item.shoptile .sty{font-size:14px!important}
+html body.ec-stage #stage .en .nm,html body.ec-stage #stage .hfig .nm,html body .en .nm,html body .bar b,html body .stc span{font-size:14px!important}
+html body.ec-stage #stage .hand.fan .card .ct,html body .card .ct{font-size:14px!important;line-height:1.05}
+}
+@media (max-width:1023px){html body.ec-stage #stage .bar b,html body.ec-stage #stage .en .stc span,html body.ec-stage #stage .hfig .stc span{font-size:14px!important}}
+.reward .item.taken{opacity:.55;filter:grayscale(.6);cursor:default}.reward .w7done{font-weight:700;color:#e9f5d8;min-height:24px}
+.w485top{position:relative}
+.w7now{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);text-align:center;font-size:14px;font-weight:700;line-height:1.2;color:#fff4dc;background:rgba(20,10,4,.82);border:1px solid rgba(242,135,43,.55);border-radius:999px;padding:4px 12px;pointer-events:none;z-index:6}
+.w7now:empty{display:none}
 </style></head>

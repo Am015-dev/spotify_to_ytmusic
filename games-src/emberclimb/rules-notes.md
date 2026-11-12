@@ -21,7 +21,10 @@ The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules t
 - R07 Monk starter relic: 2 Miracle tokens at the start of each fight (max 5; move `{t:'mir'}` = +1 energy). No Calm start, no Calm Spark.
   Two tokens (not one) is a balance choice so the class stays in the 30-65% band.
 - R08 duo: if ANY hero reaches 0 HP the party loses at once (the optional boss "last stand" is not implemented).
-- R09 Rest heals 9 HP (3 x SCALE), + 10 with the moss relic.
+- R09 Rest heals 30% of max HP (+ 10 with the moss relic). Rulebook, Rest Site: "Rest: Heal 3 HP" (quoted from memory of the printed
+  rulebook; the container cannot open it). The printed heroes start with about 10 HP, so a rest restores roughly 30% of a hero. The shelf
+  keeps video-game HP (70-80), so a flat 3 x SCALE = 9 was only 11% and made resting pointless (R7 review); the heal is now the same
+  share of max HP as on the table (80 HP -> 24). rules-test R09 and logic-test rule 40 check it.
 - R10 two heroes: enemy HP x1.6 (`D.EHP = {1:1, 2:1.6}`). APPROXIMATION: the printed player-count board was not available.
 - R11 class HP 80 / 70 / 75 / 72 (video-game values; tabletop boards not available). R12 rogue starter 5 + 5 + 2 = 12 cards.
 - R13 Shiv: 3 damage (1 x SCALE) as its own attack; at most 5 Shivs in hand; none at the start of a fight.
@@ -111,3 +114,12 @@ G3 round 3 (8 Nov 2026): owner wants tabletop rules, so round 2's rule changes a
   start of the next round (after the enemy turn) each hero's row gets its listed slimes in order (logic rule 69). Shelf slimes: Bile Blob, Mire Slug, Mire Slug.
 - Balance only by encounter choice: the 40-HP Grub and Acolyte moved from the weak pool (first 3 fights) to the strong pool; the Ash Imp pair moved to weak.
 - bench-newplayer.js, careful player (15% random plays), 300 runs: floors 1-3 cleared 98%, act-1 boss reached 89%, beaten 33%. Test bot: 100 / 93 / 46.
+
+## R7 fixes (Nov 2026)
+- Coached first climb: every room type is on the path (fight or ? event choice, treasure, campfire, shop, elite with two foes, boss).
+  The tutorial boss is the act boss that splits as printed; rulebook, boss: "when this boss is defeated, it splits" into the listed
+  slimes, which join at the start of the next round (engine R-split, unchanged). Normal fights keep one foe per hero (rulebook,
+  Encounter: one Encounter card per player). Hero-only rules (Shivs, Orbs, stances, Scry, Retain), two-hero rules, Frail (act 2 foes)
+  and multi-act climbs are taught by a one-time tip the first time they happen in a real game, never as a "meet later" list.
+- Gambler event: the bet now states its odds (1-2 lose 30, 3-4 keep, 5 win 60, 6 win 90) and a 3-4 roll says "a draw, you keep your
+  30 gold" instead of "Nothing changed".

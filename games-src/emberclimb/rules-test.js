@@ -72,8 +72,8 @@ ok(D.H.s.start.length === 12 && D.H.s.start.filter(x => x === 's-strike').length
 G = fresh(['s'], 21); let sr = G.hs[0]; ok(!sr.hand.some(c => c.id === 'shiv'), 'R13 combat starts with 0 shivs');
 playId(G, 's-knife-rain'); playId(G, 's-blade-fan'); ok(sr.hand.filter(c => c.id === 'shiv').length === 5, 'R13 max 5 shivs held');
 t0 = G.b.en[0]; E.performMove({ t: 'play', h: 0, c: sr.hand.findIndex(c => c.id === 'shiv'), e: 0 }); ok(t0.hp === 200 - SC, 'R13 shiv deals ' + SC);
-// R09 rest heals 3 x SCALE
-E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === hr + 3 * SC, 'R09 rest heals ' + 3 * SC);
+// R09 rest heals 30% of max HP (tabletop: heal 3 of ~10 HP)
+E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === Math.min(G.hs[0].mhp, hr + Math.round(G.hs[0].mhp * 0.3)), 'R09 rest heals 30% of max HP');
 // R14 treasure: each hero gains a relic
 E.newGame({ heroes: ['w', 'a'], seed: 23 }); E.debug.treasure(); G = E.G(); ok(G.rw.relics.length === 2 && E.performMove({ t: 'relic', i: 0 }) && E.performMove({ t: 'relic', i: 1 }) && G.rw.took.relic, 'R14 treasure: each hero takes a relic');
 // R15 boss relics: 1 per hero + 1 (3 solo), each hero takes one; R16 boss cards come from the rare deck

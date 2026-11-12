@@ -297,7 +297,7 @@
     else if (g.scr === 'shop') { txt = 'Tap an item, then Buy.'; ttl = 'Shop'; }
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
-    m.textContent = txt; t.textContent = ttl; var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
+    m.textContent = txt; t.textContent = ttl; var nw = document.querySelector('.w7now'); if (nw) nw.textContent = txt;   // R7: the same one-line prompt on the phone stage var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
     if (g.scr === 'map' && STAGE()) { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [nodeIc(k), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
@@ -406,6 +406,7 @@
     r.appendChild(rl);
     r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
     if (g.scr === 'battle') r.appendChild(potRow());
+    if (g.scr === 'battle') { var nw = h('div', 'w7now'); nw.setAttribute('role', 'status'); nw.setAttribute('aria-live', 'polite'); r.appendChild(nw); }   // R7: one line, what to do now (filled by dock())
     return r;
   }
   // stage hero: the figure on the floor, HP bar under it, block as a shield badge, statuses and powers under the bar
@@ -501,7 +502,10 @@
     if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
     function sl0() { return hand.querySelector('.card.sel'); }
-    var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
+    if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
+      for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
+    }
+    var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (SG) { sl.style.setProperty('--sx', Math.round(vw / 2 - (rr.left + rr.width / 2)) + 'px'); var lim = 0; st.querySelectorAll('.bar, .nm, .w4inc').forEach(function (x) { var q = x.getBoundingClientRect(); if (q.width && q.bottom < innerHeight * 0.8) lim = Math.max(lim, q.bottom); }); var cw1 = parseFloat(hand.style.getPropertyValue('--cw')) || 80, dy = lim + 4 - rr.top; if (dy > 0) sl.style.setProperty('--sy', Math.round(-cw1 * 1.05 + Math.min(dy, innerHeight - 4 - rr.bottom)) + 'px'); } else if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }   // R7: on the stage the lifted card rises in the centre, clear of End turn and the foes' HP
   }
   // W420: value preview of the selected card (dry run in the engine on a copy), incoming damage per hero, why-text, draw animation
   function playable(h0, c) { return c && E.canPlay(h0, c) && (E.eff(c).cost === 'X' || E.cost(h0, c) <= h0.en); }
@@ -663,13 +667,14 @@
     if (!r.treasure && UI.fanKey !== rk) { UI.fanKey = rk; fanfare(wasB); }
     if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
-    if (r.pot && !r.took.pot) { var pb = on(h('button', 'item', null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', D.POTIONS[r.pot].name)]), function () { E.performMove({ t: 'takepot' }); render(); }); pb.style.width = '140px'; s.appendChild(pb); }
-    if (r.relics && !r.took.relic) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id || r.took['r' + i]) return; var b = on(h('button', 'item', null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', D.RELICS[id].name), h('span', '', D.RELICS[id].t)]), function () { E.performMove({ t: 'relic', i: i }); render(); }); b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
+    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
+    if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
     Object.keys(r.cards).forEach(function (hi) {
-      if (r.took['c' + hi]) return; if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
+      if (r.took['c' + hi]) { s.appendChild(h('div', 'sub w7done', (UI.rwNote && UI.rwNote[rk + ':' + hi]) || 'Card choice done.')); return; } if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
-      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
-      s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { E.performMove({ t: 'skip', h: +hi }); render(); }));
+      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = '\u2713 ' + D.CARDS[id].name + ' added to your deck.'; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
+      s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
     var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; s.appendChild(lv);
     hud(); app.appendChild(s);
@@ -706,9 +711,9 @@
   function rest() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
-    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Heal ' + (9 + (E.has('healing-moss') ? 10 : 0)) + ' HP, or sharpen one card.'));
+    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP (30%), or smith: upgrade one card for good.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
-    var amt = 3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0);
+    var amt = E.restHeal(g.hs[hi]);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';
     var b2 = on(h('button', 'btn alt', 'Smith: upgrade a card'), function () { UI.ov = 'smith'; render(); }); b2.id = 'rest-smith';
     s.appendChild(b1); s.appendChild(b2); hud(); app.appendChild(s);

@@ -277,9 +277,13 @@
       fx('split', 'e' + G.b.en.indexOf(e), d.split.length, e.id);
     });
   }
+  // rest: tabletop 'Heal 3 HP' on a ~10 HP board = 30%; at the shelf's 70-80 HP scale that is 30% of max HP (rules-notes R09)
+  function restHeal(h) { return Math.round(h.mhp * 0.3) + (has('healing-moss') ? 10 : 0); }
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
+    if (G.tutEnc && G.tutEnc[G.floor]) ids = G.tutEnc[G.floor].slice();   // coached first climb: fixed foes per floor (src/tutor.js)
+    if (G.tutHp && G.tutHp[G.floor]) G.ehp = G.tutHp[G.floor];
     if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
       while (ids.length > G.hs.length) ids.pop();
       for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
@@ -570,14 +574,14 @@
       case 'skip': G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h]); break;
       case 'leave': leaveNode(); break;
       case 'stop': G.rw = null; G.scr = 'over'; G.won = 1; break;
-      case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + 3 * SC + (has('healing-moss') ? 10 : 0)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
+      case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + restHeal(hh)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
       case 'upg': G.hs[mv.h].deck[mv.c].u = 1; G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
       case 'buy': var it = G.shop.items[mv.i]; G.gold -= it.p; it.sold = 1;
         if (it.t === 'card') { var hk = D.CARDS[it.id].hero, tg = G.hs.filter(function (x) { return x.k === hk; })[0] || G.hs[0]; tg.deck.push(mk(it.id)); } else if (it.t === 'relic') gainRelic(it.id); else G.pots.push(it.id); break;
       case 'remove': G.gold -= G.shop.rm; (G.shop.remh = G.shop.remh || []).push(mv.h); G.shop.removed = G.shop.remh.length >= G.hs.length ? 1 : 0; G.hs[mv.h].deck.splice(mv.c, 1); break;
       case 'opt':
         var ev = D.EVENTS[G.evn.id], o = ev.o[mv.i];
-        if (o.roll) { var v = roll(), eff2 = o.roll.length === 3 ? o.roll[v <= 2 ? 0 : v <= 4 ? 1 : 2] : o.roll[v - 1]; var out = applyEff(eff2); G.evn.res = 'Rolled ' + v + ': ' + out; }
+        if (o.roll) { var v = roll(), eff2 = o.roll.length === 3 ? o.roll[v <= 2 ? 0 : v <= 4 ? 1 : 2] : o.roll[v - 1]; var out = applyEff(eff2); G.evn.res = 'Rolled ' + v + ': ' + (out === 'Nothing changed.' ? (o.cost ? 'a draw. You keep your ' + o.cost + ' gold.' : 'no effect this time.') : out); }
         else { var dd = o.do; if (dd.upg || dd.rem || dd.xform) { applyEff({ hp: dd.hp || 0 }); G.evn.pend = dd.upg ? 'upg' : dd.xform ? 'xform' : 'rem'; break; } var out2 = applyEff(dd); G.evn.res = out2 === 'Nothing changed.' ? o.t : out2; }
         break;
       case 'evpick': var pkn = D.CARDS[G.hs[0].deck[mv.c].id].name, pres = ''; if (G.evn.pend === 'upg') { G.hs[0].deck[mv.c].u = 1; pres = 'Upgraded ' + pkn + ' to ' + pkn + '+.'; } else if (G.evn.pend === 'xform') { G.hs[0].deck.splice(mv.c, 1); G.hs[0].deck.push(mk(drawReward(G.hs[0].k, 0))); /* transform: remove a non-curse card, gain the top card of the rewards deck */ } else G.hs[0].deck.splice(mv.c, 1); if (!pres) pres = G.evn.pend === 'xform' ? 'Transformed ' + pkn + ' into ' + D.CARDS[G.hs[0].deck[G.hs[0].deck.length - 1].id].name + '.' : 'Removed ' + pkn + '.'; G.evn.pend = null; G.evn.res = pres; break;
@@ -620,6 +624,7 @@
   }
   // end W420 previewPlay
   EC.E = {
+    restHeal: function (h) { return restHeal(h); },
     lock: function (a) { LOCK = a || []; },
     newGame: function (o) { var g = newGame(o); g.fights = 0; return g; }, G: function () { return G; }, set: function (g) { G = g; },
     validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,

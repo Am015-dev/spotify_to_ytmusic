@@ -55,7 +55,7 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
       else await T('#end');
       continue;
     }
-    if (s.scr === 'reward') { const pt = await pg.$('.reward button.item'); if (pt && s.pots < 3) { await T(pt); await sleep(200); const k2 = await pg.evaluate(() => JSON.stringify(EC.E.G().rw && EC.E.G().rw.took)); if (k2 !== '{}') continue; } const pk = await pg.$('.picks .card'); if (pk) { await T(pk); continue; } await T('#leave'); continue; }
+    if (s.scr === 'reward') { const pt = await pg.$('.reward button.item:not(.taken)'); if (pt && s.pots < 3) { await T(pt); await sleep(200); const k2 = await pg.evaluate(() => JSON.stringify(EC.E.G().rw && EC.E.G().rw.took)); if (k2 !== '{}') continue; } const pk = await pg.$('.picks .card'); if (pk) { await T(pk); continue; } await T('#leave'); continue; }
     if (s.scr === 'rest') { await snap('rest'); if (s.hp > s.mhp * 0.7 && await pg.$('#rest-smith')) { smithed++; await T('#rest-smith'); } else await T('#rest-heal'); continue; }
     if (s.scr === 'shop') {
       await snap('shop');
