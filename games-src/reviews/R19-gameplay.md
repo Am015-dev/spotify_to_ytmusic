@@ -10,6 +10,7 @@ the published rulebook online; notes stay in a local folder outside the repo.
 |---|---|---|---|
 | crown-city-smash | 7.5 | PASS | 4 Turn clarity 7, 5 Phone 7, 6 AI/pacing 7, 7 Feel 7 |
 | perch-and-plume | 6.9 | FAIL | 5 Phone 6, 6 AI/pacing 6 |
+| redline-rally | 6.8 | FAIL | 4 Turn clarity 6, 5 Phone 6, 6 AI/pacing 6 (rules stopper fixed) |
 
 ---
 
@@ -114,3 +115,69 @@ and normal speed, so its "won 4 of 8" does not describe the default game.
 | 5 | First turn, hints on, 390 | The "Round 1: 8 actions each. Goal: Full egg sets (1 per row)" line overlaps both score chips, and a "Swipe your birds" toast covers the food. | R19-shots/pp-390-best-turn1.jpg |
 | 2 | Tutorial step 1 at 375 | "Tap the score" while a "Best" badge glows on "Play a bird"; the score already says "You 5 leads". | R19-shots/pp-375-tut-01.jpg |
 | 2 | Tutorial step 9 | A stale "Good: +2 points ... the best move this turn" line is half cut at the top of the dock. | R19-shots/pp-375-tut-09.jpg |
+
+---
+
+## 3. redline-rally (shelf/W496-redline-gameplay @ b18559a2): 6.8, FAIL
+
+What I played:
+- Tutorial ("New here?") to the end card at 375x667 by touch, tapping only the marked targets: 40 steps, 42 taps, 293 s, 0 errors,
+  then a real race against four rivals.
+- Two full default races (Quick game, defaults: 2 laps, 4 Easy rivals, Hints on) to the podium, as a plain new player: gear up on
+  straights, one down near a corner sign, the biggest cards, boost with 5+ heat and no corner close, and in the Discard step throw
+  away every Brake and 1 (8 cards per race), else let "Keep all" run.
+  - 390x844: **3rd**, 211 s, 22 decisions, 1 spin, boosted 3 times (16 boost questions left to the countdown).
+  - 375x667: **2nd**, 211 s, 21 decisions, 0 spins, boosted 2 times (19 left to the countdown).
+- 0 page errors, 0 console errors, 0 stuck states, 0 dead taps; every tapped target 44 px or more.
+- Go to my next decision: 9.4 s (390) and 9.7 s (375) on average; rival cars about 1.2 s each (max 2.0 s).
+
+Rules check (published rulebook, read online; notes kept locally): the round is shift, play, reveal and move, adrenaline, React
+(cooldown and a boost once per turn for 1 heat, after moving), slipstream, corner check, Discard (optional, every round, any card
+but Heat or Stress), draw to 7.
+- **Discard: fixed.** The step is offered after moving in every round where a card may go (20-21 times per race). My player
+  picked Brake and 1 cards and discarded them (8 per race); Heat and Stress cannot be picked. Shot: R19-shots/rr-390-discard.jpg.
+- **Boost: fixed.** It is now a question after the reveal ("Speed 7. Boost? Pay 1 heat, flip a card, add it"), asked only with
+  engine heat. I chose it 2-3 times per race. Small differences that remain: the question is skipped when even a flip of 1 would
+  spin you (a legal, if bad, choice removed), and the line says "flip a card" where the rule flips until a speed card shows.
+- Both optional questions now auto-answer after **1.5 s** ("Keep all · 1.0" was already showing 0.5 s after the panel opened). A
+  new player who wants to read five cards and choose has to touch the panel within about a second.
+With the rule order restored I no longer count this as a stopper.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Discard every round and boost after the reveal now match the rulebook; the rest (order, adrenaline, slipstream, corners, spin-out, cooldown, stress, two-gear shift) still matches. Minor: boost hidden when a flip of 1 would spin you; "flip a card" vs flip until a speed card. |
+| 2 | Tutorial teaches | 7 | Now teaches exactly what races do: discard a 3 after moving (step 33-34), boost after the reveal (38-39). 40 one-tap steps in rule order, one line each, ends in a real race. Long (about 5 min). Brake and Burst get one line only, and the 1.5 s countdowns never appear in the tutorial, so the first race surprises you. |
+| 3 | First 10 seconds | 7 | Clear title and Play button; the goal card covers laps, gears, corners, heat, Brake/Burst and Suggest (still five lines). |
+| 4 | Turn clarity | 6 | At 390 the dashboard, corner signs ("5 in 2, 6 in 4"), phase strip and preview line are clear. At 375, while planning, my car was not on the board in 3 of 4 shots (grass, trees, a rival), and the gear / heat / next-corner line the fixer moved into the dock was not visible, so I could not see how far the next corner was. The boost and discard questions vanish after 1.5 s. |
+| 5 | Phone play | 6 | Fixed: no dashboard over the 375 board, all targets 44 px or more, text 14 px or more. But "board-first" fails at 375: the camera often shows empty grass instead of your car during planning. On the 375 result card the Race again / Title buttons sit over the 4th and 5th rows. |
+| 6 | AI and pacing | 6 | Better: a plain new player made the podium twice (3rd, 2nd), up from 5th and 5th. But no win in 2 races, and the wait from Go to my next decision grew to 9.4-9.7 s (R9: 7.4-8.0), with two 1.5 s countdowns every round. A race is 3.5 min, a good length. |
+| 7 | Feel | 7 | Cars slide, "Slipstream +2" pops, start lights, a podium with "heat burned · spin-outs · slipstreams". The countdown questions make each round feel hurried, not chosen. |
+| 8 | Bugs | 8 | Tutorial and 2 races: 0 errors, 0 stuck states, 0 dead taps. Wrong-state copy: after a race with 0 spin-outs the podium says "One cleaner corner and it is yours." |
+| | **Total** | **6.8** | **FAIL**: rows 4, 5 and 6 are below 7. The rules stopper is fixed. |
+
+### Earlier findings (G5, R3, R9)
+| Finding | Status | Evidence |
+|---|---|---|
+| R9 row 1 STOPPER: discard only with 3+ slow cards, every third round | **Fixed**: offered every round a card may go; any non-Heat, non-Stress card. | R19-shots/rr-390-discard.jpg |
+| R9 row 1: boost set before the reveal and auto-cancelled | **Fixed**: asked after the reveal; still skipped when a flip of 1 would spin you. | R19-shots/rr-375-tut-39.jpg |
+| R9 row 2: tutorial teaches discard and boost unlike races | **Fixed**: tutorial and races now agree. | R19-shots/rr-375-tut-33.jpg, rr-375-tut-39.jpg |
+| R9 row 6: plain newcomer 5th and 5th on Easy | **Partly fixed**: 3rd and 2nd, no win. | R19-shots/rr-390-result.jpg, rr-375-result.jpg |
+| R9 row 5: Boost button 52x40 | **Fixed**: the boost question buttons are full width; no target under 44 px. | R19-shots/rr-375-tut-39.jpg |
+| R9 row 5: dashboard over the 375 board | **Fixed** (dashboard removed at 375), but see the camera finding. | R19-shots/rr-375-plan1.jpg |
+| R9 row 5/7: pops piled on cars and signs, coach bubble on the minimap | **Mostly fixed**: one "Good: ..." bubble at top left, clear of the minimap. | R19-shots/rr-390-plan2.jpg |
+| R9 row 4: discard question appears without a reason | **Fixed**: it appears every round a card may go. | R19-shots/rr-390-discard.jpg |
+| R9 row 8: "0-3 question taps" claim | **Changed**: 20-21 boost and 20-21 discard questions per race now; most auto-answer after 1.5 s. | R19-shots/rr-390-discard.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 4/5 | Planned my rounds at 375x667 | In 3 of 4 planning shots my car is not on the board (grass and trees, or a rival); no gear / heat / next-corner line is shown in the dock. | R19-shots/rr-375-plan2.jpg, R19-shots/rr-375-plan3.jpg |
+| 1/7 | Reached the Discard step at 390 and waited 0.5 s | "Keep all · 1.0" was already counting; after 1.5 s the step closes by itself. The same for "No boost". | R19-shots/rr-390-discard.jpg |
+| 6 | Timed Go to my next decision in 2 races | 9.4 s and 9.7 s on average (R9: 7.4-8.0 s). | R19-shots/rr-390-plan2.jpg |
+| 6 | Two default races as a plain new player | 3rd at 390, 2nd at 375; no win. | R19-shots/rr-390-result.jpg, R19-shots/rr-375-result.jpg |
+| 8 | Finished 2nd at 375 with 0 spin-outs | The podium says "One cleaner corner and it is yours." | R19-shots/rr-375-result.jpg |
+| 5 | Looked at the result card at 375 | Race again / Title sit over the 4th and 5th rows of the table. | R19-shots/rr-375-result.jpg |
+| 1 | Read the boost line | "Pay 1 heat, flip a card, add it": the rule flips until a speed card shows. | R19-shots/rr-375-tut-39.jpg |
+| 2 | Tutorial at 375 | 40 steps, about 5 minutes by touch; Brake and Burst are one line; no countdown is shown before the first race. | R19-shots/rr-375-tut-end.jpg |
+
+Not tested: the "tap anywhere outside the panel takes the default" path, and hot-seat or online modes.
