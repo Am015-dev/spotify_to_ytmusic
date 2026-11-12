@@ -6,12 +6,12 @@
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs');const html=fs.readFileSync(__dirname+'/thornbound.html');
 const SIZES=(process.argv[2]||'390x844,375x667').split(',').map(s=>s.split('x').map(Number));
-const SEED=+(process.argv[3]||1);
+const SEED=+(process.argv[3]||1);const CAREFUL=!!process.env.CAREFUL;   // CAREFUL=1: a careful newcomer (follows the hint finger, which shows the newcomer model's move) for the balance check
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=(t,m)=>{if(probs.length<40)probs.push(t+': '+m)};
 function rng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 const OBS=`(()=>{if(window.__mut!=null)return;window.__mut=0;new MutationObserver(l=>{window.__mut+=l.length}).observe(document.body,{subtree:true,childList:true,attributes:true,characterData:true})})()`;
 async function tapAndCheck(p,x,y){const m0=await p.evaluate(()=>window.__mut);await p.touchscreen.tap(x,y);await sleep(300);const m1=await p.evaluate(()=>window.__mut);return m1>m0}
-const gap=r=>100+Math.floor(r()*200);
+var NPL=0,NALT=0;const gap=r=>100+Math.floor(r()*200);
 
 async function tutorial(browser,W,H){const tag=W+'x'+H+' tutorial';const r=rng(SEED*7+W);
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
@@ -44,7 +44,8 @@ async function game(browser,W,H){const tag=W+'x'+H+' game';const r=rng(SEED*13+H
   await ctx.route('**/*',q=>new URL(q.request().url()).host==='gns.test'?q.fulfill({status:200,contentType:'text/html',body:html}):q.abort());
   const p=await ctx.newPage();p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message));
   await p.goto('https://gns.test/?phone=1');await sleep(900);
-  await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('gxt-thornbound',JSON.stringify({done:1}))}catch(e){}newGame('me');UI.speed=1});await sleep(400);
+  if(CAREFUL)await p.evaluate(()=>{window.__careful=1});
+  await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('gxt-thornbound',JSON.stringify({done:1}))}catch(e){}if(window.__careful){newGame('me',{guide:'full'});const o=window.aiChoose;window.suggest=s=>{try{return G&&G.q&&G.q.seats.includes(s)?o(s,'newcomer'):null}catch(e){return null}}}else newGame('me');UI.speed=1});await sleep(400);
   await p.evaluate(OBS);
   let last='',lastT=Date.now(),taps=0,dead=0,watchTaps=0,watchDead=0;const t0=Date.now();let over=false;
   while(Date.now()-t0<300000){
@@ -52,7 +53,7 @@ async function game(browser,W,H){const tag=W+'x'+H+' game';const r=rng(SEED*13+H
       if(G.over&&(!UI.card||UI.card.kind==='over'))return {over:1,head:(document.querySelector('#pc h3')||{}).textContent||'',line:(document.querySelector('#pc .tbq')||{}).textContent||'',win:G.over.winner,inf:G.pl.map(p=>p.inf)};
       if(UI.pop){const x=document.querySelector('#ppop .pp-x,#ppop [data-a=pclose]');const r=x&&x.getBoundingClientRect();if(r&&r.width)return {closepop:{x:r.left+r.width/2,y:r.top+r.height/2}}}
       const mine=!UI.card&&G.q&&viewSeatForQ()!=null;const watch=!!(UI.card&&(UI.card.kind==='event'||UI.card.kind==='news'))||(!UI.card&&G.q&&viewSeatForQ()==null);
-      let pl=null;try{const f=document.querySelector('#finger');pl=(!f||f.hidden)?null:fingerPlan()}catch(e){}
+      let pl=null;try{const f=document.querySelector('#finger');pl=(!f||f.hidden)?null:fingerPlan();if(!pl&&window.__careful&&mine&&UI.bf&&UI.bf.rec&&!UI.dragging)pl=planFor(UI.bf,UI.bf.rec)}catch(e){}
       const c=e=>{if(!e)return null;const r=e.getBoundingClientRect();return r.width?{x:r.left+r.width/2,y:r.top+r.height/2}:null};const q=s=>document.querySelector(s);
       const alt=c(q('#ppop [data-a=mv]'))||c(q('#act [data-a=mv].pri'))||c(q('#act [data-a=mv]'))||c(q('#main [data-a=mv]'))||c(q('.tb-loc.glow .tb-ring'))||c(q('.tbx-pan g.rglow rect'))||c(q('#handw .hc.glow'))||c(q('#handw .kcb.glow'));
       const bd=q('#board').getBoundingClientRect(),st=q('#tbturn');const sr=st&&!st.hidden?st.getBoundingClientRect():null;
@@ -66,15 +67,15 @@ async function game(browser,W,H){const tag=W+'x'+H+' game';const r=rng(SEED*13+H
     if(s.sig!==last){last=s.sig;lastT=Date.now()}else if(Date.now()-lastT>10000){note(tag,'STUCK 10 s: '+s.sig+' '+JSON.stringify({plan:s.plan,alt:s.alt})+' '+await p.evaluate(()=>{const a=s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return s+'->'+(t?(t.id||t.getAttribute('class')||t.tagName):'')};return JSON.stringify({hand:UI.hand,rec:UI.bf&&UI.bf.rec&&UI.bf.rec.k,pop:!!UI.pop,a:[a('#ppop [data-a=mv]'),a('#act [data-a=mv]'),a('#handw .hc.glow'),a('.tb-loc.glow .tb-ring')],act:(document.querySelector('#act')||{}).textContent.slice(0,120)})}));await p.screenshot({path:__dirname+'/../playtest/toddler-stuck-game-'+W+'.png'});break}
     const roll=r();let x,y,kind;
     if(s.watch){kind='watch';if(roll<0.5&&s.strip){x=s.strip.x;y=s.strip.y}else{x=s.bd.l+s.bd.w*(0.1+0.8*r());y=s.bd.t+s.bd.h*(0.1+0.8*r())}}
-    else if(s.mine&&roll<0.15){kind='random';x=s.bd.l+s.bd.w*r();y=s.bd.t+s.bd.h*r()}
-    else if(s.mine&&s.plan){kind='target';if(s.plan.from){await p.touchscreen.tap(s.plan.from.x,s.plan.from.y);taps++;await sleep(gap(r))}x=s.plan.to.x;y=s.plan.to.y}
-    else if(s.mine&&s.alt){kind='target';x=s.alt.x;y=s.alt.y}
+    else if(s.mine&&roll<0.15&&!CAREFUL){kind='random';x=s.bd.l+s.bd.w*r();y=s.bd.t+s.bd.h*r()}
+    else if(s.mine&&s.plan){kind='target';NPL=(typeof NPL==='number'?NPL:0)+1;if(s.plan.from){await p.touchscreen.tap(s.plan.from.x,s.plan.from.y);taps++;await sleep(gap(r))}x=s.plan.to.x;y=s.plan.to.y}
+    else if(s.mine&&s.alt){kind='target';NALT=(typeof NALT==='number'?NALT:0)+1;x=s.alt.x;y=s.alt.y}
     else{await sleep(100);continue}
     const vis=await tapAndCheck(p,x,y);taps++;if(kind==='watch')watchTaps++;
     if(!vis&&kind!=='random'){dead++;if(kind==='watch')watchDead++;if(dead<=5)note(tag,'dead tap ('+kind+') sig '+s.sig)}
     await sleep(gap(r))}
   if(!over)note(tag,'game did not reach the result screen');
-  console.log(tag,'taps',taps,'watch taps',watchTaps,'dead',dead,'(watch dead '+watchDead+')',Math.round((Date.now()-t0)/1000)+'s');
+  console.log(tag,'finger',typeof NPL==='number'?NPL:0,'other',typeof NALT==='number'?NALT:0,'taps',taps,'watch taps',watchTaps,'dead',dead,'(watch dead '+watchDead+')',Math.round((Date.now()-t0)/1000)+'s');
   await ctx.close();return dead}
 
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});let dead=0;

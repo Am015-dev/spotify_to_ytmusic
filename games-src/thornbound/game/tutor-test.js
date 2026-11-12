@@ -19,6 +19,8 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
+  if(process.env.TDBG)await p.addInitScript(()=>{window.__gxh=[];setInterval(()=>{try{const s=GXT.state();const k=s.i+'|'+s.phase+'|'+s.count;if(window.__gxk!==k){window.__gxk=k;window.__gxh.push(k+'@'+(Date.now()%100000));if(window.__gxh.length>12)window.__gxh.shift()}}catch(e){}},20);
+    document.addEventListener('pointerdown',e=>{try{window.__gxh.push('PD '+(e.target.className&&e.target.className.baseVal!=null?e.target.className.baseVal:e.target.className)+'@'+(Date.now()%100000))}catch(x){}},true)});
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(t))note(tag,'console error '+t.slice(0,160))});
   await p.goto('https://gns.test/?phone=1');await sleep(900);
@@ -43,7 +45,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s at step '+st.i+' '+st.id+' phase '+st.phase+' '+JSON.stringify(await p.evaluate(()=>({q:G.q&&G.q.kind,card:UI.card&&UI.card.kind,ev:UI.card&&UI.card.ev&&UI.card.ev.t,bf:UI.bf&&UI.bf.kind,hand:UI.hand}))));await p.screenshot({path:'/tmp/claude-0/tutor_stuck_'+W+'_'+mode+'.png'}).catch(()=>{});break}
     if(!st.shown){
       // "Watch the board. Tap to go on": one finger tap (on the board) goes on within 1 s, never a wait for the timer
-      const go=await p.evaluate(()=>{const l=document.querySelector('#tbturn:not([hidden]) .tbt-line');if(!l||!/Tap to go on/.test(l.textContent)||!UI.card)return null;window.__tbGo=UI.card;
+      const go=await p.evaluate(()=>{const l=document.querySelector('#tbturn:not([hidden]) .tbt-line'),ch=document.querySelector('#tbturn:not([hidden]) .tbt-chip');if(!l||!(/Tap to go on/.test(l.textContent)||ch&&/^Tap/.test(ch.textContent))||!UI.card||(typeof tutHold==='function'&&tutHold(UI.card)))return null;window.__tbGo=UI.card;
         const b=document.getElementById('board').getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height*0.62,id:GXT.state().id,kind:UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')}});
       if(go){const t0=Date.now();await p.touchscreen.tap(go.x,go.y);let ok=false;while(Date.now()-t0<1000){if(await p.evaluate(()=>UI.card!==window.__tbGo)){ok=true;break}await sleep(40)}
         totals.goTaps=(totals.goTaps||0)+1;if(!ok)note(tag,'"Tap to go on" before step '+go.id+' ('+go.kind+'): one tap did not go on within 1 s');continue}
@@ -61,6 +63,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hs:document.documentElement.scrollWidth>innerWidth+1,skip:q(document.querySelector('.gxt-skip')),dots:document.querySelectorAll('.gxt-dots i').length,
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
+    if(!s.shown||s.id!==st.id){await sleep(40);continue}   // the step moved on between the two reads (a kept tap landed): read again, never judge a half-drawn step
     totals.steps++;
     if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
@@ -71,7 +74,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(!info.skip)note(tag,id+': no Skip tutorial button');
     // the bubble: inside the screen, not over any spotlight
     const b=info.bub,V=info.v;
-    if(!b)note(tag,id+': no bubble');else{
+    if(!b){note(tag,id+': no bubble');if(process.env.TDBG)console.log('DBG',id,JSON.stringify(await p.evaluate(()=>({st:GXT.state(),h:window.__gxh}))))}else{
       if(b.left<-1||b.top<-1||b.right>V.w+1||b.bottom>V.h+1)note(tag,id+': bubble outside the screen '+JSON.stringify(b));
       for(const h of s.holes){if(b.left<h.left+h.width&&b.right>h.left&&b.top<h.top+h.height&&b.bottom>h.top)note(tag,id+': bubble covers the spotlight')}
       if(info.skip&&b.top<info.skip.bottom-1&&b.left<info.skip.right&&b.right>info.skip.left)note(tag,id+': bubble covers the top strip')}
@@ -95,10 +98,10 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     const need=s.wait?'out':'in';
     const wp=await p.evaluate(([need])=>{const s=GXT.state(),V={w:innerWidth,h:innerHeight};const H=s.holes;
       const inside=(x,y)=>H.some(r=>x>=r.left-2&&x<=r.left+r.width+2&&y>=r.top-2&&y<=r.top+r.height+2);
-      if(need==='in')return {x:s.hole.cx,y:s.hole.cy};
+      if(!s.shown||!s.hole)return null;if(need==='in')return {x:s.hole.cx,y:s.hole.cy};
       const b=s.bubble;const inB=(x,y)=>b&&x>=b.left-10&&x<=b.right+10&&y>=b.top-10&&y<=b.bottom+10;
       for(const [fx,fy] of [[.5,.5],[.15,.45],[.85,.45],[.5,.3],[.2,.7],[.8,.7],[.5,.62],[.1,.2],[.9,.2],[.5,.9]]){const x=V.w*fx,y=V.h*fy;if(y>40&&!inside(x,y)&&!inB(x,y))return {x,y}}return null},need);
-    if(wp&&(guardOnce(s.id))){const before=await state();await p.touchscreen.tap(wp.x,wp.y);await sleep(140);const after=await state();totals.wrong++;
+    if(wp&&(guardOnce(s.id))){const before=await state();if(!before.shown||before.id!==s.id){continue}await p.touchscreen.tap(wp.x,wp.y);await sleep(140);const after=await state();totals.wrong++;
       if(after.i!==before.i||after.count!==before.count)note(tag,id+': a wrong tap advanced the tutorial');
       if(after.wrongs<=before.wrongs)note(tag,id+': a wrong tap did not shake the bubble');
       const hint=await p.evaluate(()=>{const b=document.querySelector('.gxt-bub');return b&&b.classList.contains('gxt-shake')&&b.querySelector('.gxh-tx').textContent});
@@ -124,7 +127,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         const r2=await state();if(!r2.active||r2.i!==0)note(tag,'restart did not start at step 0 ('+JSON.stringify({a:r2.active,i:r2.i})+')');lastSig='';lastT=Date.now();seenIds=[]}
       continue}
     // ---- do exactly what the step asks
-    if(!s.wait){const nx=info.next;await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
+    if(!s.wait){const nx=info.next;if(nx)await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
     else{
       const before=await state();
       {const age=Date.now()-(before.shownAt||0);if(age<700)await sleep(700-age)}   // the kit ignores taps in the first 600 ms of a step (a person reads first)
@@ -194,7 +197,8 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
   const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
-  for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
+  const MO=process.env.TMODES?process.env.TMODES.split(','):null;
+  for(const j of jobs.filter(j=>!MO||MO.includes(j[2]))){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
   if(!totals.goTaps)note('all','no "Tap to go on" moment was tested');
   console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'"tap to go on" taps',totals.goTaps||0,'step ids',totals.ids.join(','));

@@ -172,7 +172,7 @@ const STORY={
  clans:{story:'From the cold coasts the clans ride in with the tide. They move fast and bring many hands. They strike where the valley folk least expect.',enjoy:'Choose the Heathbound Clans for big swings, region-switching riders and Supporters.',tag:'Speed and numbers · easy to learn'},
  uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising for bluffs, ambushes and knocking out rival cards.',tag:'Tricks and ambushes · medium'},
  gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them. Small cards win their fights. Patience is their weapon.',enjoy:'Choose the Pale Choir for clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
-const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['normal','normal','normal','normal']};
+const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['easy','easy','easy','easy']};
 function titleArtSvg(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
  '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
  '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+
