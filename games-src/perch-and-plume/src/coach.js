@@ -40,13 +40,27 @@ var TSTEPS = [
 function coachReset() { COACH.on = true; COACH.i = 0; COACH.done = {}; COACH.finished = false; COACH.tapped = false; COACH.acted = {}; COACH.entered = -1; coachHide(); clearInterval(COACH.iv); COACH.iv = setInterval(coachTick, 200); }
 function coachHide() { if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); }); }
 function coachStep() { return TSTEPS[COACH.i] || null; }
-function coachReady(s) { return s && (s.res ? tResult() : tPlaying()); }
+function coachReady(s) { return s && (s.res ? tResult() : s.info ? tSee(s) : tPlaying()); }
+// a "see" step about your own board shows as soon as the animations stop, even before your next turn (the rival waits for it)
+function tSee(s) { return !UI.busy && G.phase !== 'over' && !document.querySelector('.turnban,.reveal') && !tvis($('#result')) && !!s.t(); }
+// flow.js pump(): hold the rival's turn while a "see" step waits for its tap, so the marker is never late
+function coachHold() { if (!coachOn()) return false; var s = coachStep(); return !!(s && s.info && !s.res && G.phase === 'play' && s.t()); }
+// between steps (rival's turn, round end): say so, instead of a silent gap
+function coachWait(s) {
+  if (COACH.cur && COACH.cur.dataset.rule === 'wait' && COACH.cur.isConnected) return;
+  if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
+  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.dataset.rule = 'wait';
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + (COACH.i + 1) + ' of ' + TSTEPS.length + '</b>' + esc(s.res ? 'The round ends. Your score comes next.' : 'Pip plays. Your next step comes right after.') + '</span><em class="skipw">Tap to skip</em>';
+  d.style.cursor = 'pointer'; d.addEventListener('click', function () { UI.speed = 25; $$('.turnban').forEach(function (b) { b.click(); }); });   // the wait never holds you: a tap plays the rest at once
+  var host = $('#dockbody'), at = $('#prompt'); if (host && at) at.parentNode.insertBefore(d, at); else return;
+  COACH.cur = d;
+}
 // one bubble: the step's sentence, in the panel above the instruction bar (or above the score walk-through on the result screen)
 function coachSay(s) {
   var txt = STORY.coach[s.id] || '', n = COACH.i + 1;
   if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
-  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
+  var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
   d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>';
   var host, at;
   if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
@@ -69,9 +83,17 @@ function coachTick() {
   $$('.tutpoint').forEach(function (e) { e.classList.remove('tutpoint'); });
   if (!s) return;
   if (s.id === 'real') COACH.finished = true;
-  if (!coachReady(s)) { if (COACH.cur && !s.res && !myTurn()) { COACH.cur.parentNode && COACH.cur.parentNode.removeChild(COACH.cur); COACH.cur = null; } return; }
+  if (!coachReady(s)) { if (!myTurn() || s.res || UI.busy) coachWait(s); return; }
   coachSay(s);
-  var t = s.t(); if (t) t.classList.add('tutpoint');
+  var t = s.t(); if (t) { t.classList.add('tutpoint'); tInView(t); }
+}
+// R12: a step's target is always on screen when its step begins: scroll it into view (inside the panel or the page) once per step
+function tInView(t) {
+  var r = t.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
+  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw && COACH.seenAt === COACH.i) return;
+  COACH.seenAt = COACH.i;
+  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw) return;
+  try { t.scrollIntoView({ block: r.height > vh * .6 ? 'start' : 'center', inline: 'nearest' }); } catch (e) { t.scrollIntoView(false); }
 }
 // while a step waits for its tap, only its target (and the header) takes taps; a tap elsewhere pulses the target instead
 document.addEventListener('click', function (e) {
@@ -85,7 +107,7 @@ document.addEventListener('click', function (e) {
     else setTimeout(coachTick, 0);
     return;
   }
-  if (e.target.closest && e.target.closest('.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x')) return;
+  if (e.target.closest && e.target.closest('.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x,#pop')) return;   // a card zoom can always be closed
   e.stopPropagation(); e.preventDefault();
   t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse'); t.setAttribute('data-nudge', ((t.getAttribute('data-nudge') || '') + '.').slice(-60));   // the pulse is the answer to a stray tap; a changing attribute makes it a visible change for the audit
 }, true);

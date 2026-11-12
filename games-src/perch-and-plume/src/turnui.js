@@ -27,6 +27,48 @@ function shortPower(id) {
 var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
 // ---------------- the value estimate (points now, plus a little for what an action sets up)
 function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Math.max(0, x.b.e - x.s.eggs); }, 0); }
+// the Best hint = the hard computer's choice for this exact moment (look-ahead over engines, the round goal and bonus cards),
+// cached per decision so the badge does not jump between renders
+var HINT = { k: null, m: null };
+function hintMove() {
+  if (!G || G.phase === 'over' || !hintsOn() || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
+  var p = G.pl[UI.view], k = JSON.stringify([G.turn, G.round, G.q, p.cubes, p.hand, p.food, p.board.map(function (r) { return r.map(function (x) { return x.eggs; }); }), G.feeder, G.tray]);
+  if (HINT.k !== k) { HINT.k = k; try { HINT.m = PPAI.hint(G, UI.view); } catch (e) { HINT.m = null; } }
+  return HINT.m;
+}
+function markBest() {   // Best badge on the sub-choice the hint picks (die, egg nest, tray card, deck, tuck) and on the space to play into
+  $$('.bestx').forEach(function (e) { e.parentNode.removeChild(e); }); $$('.bestt').forEach(function (e) { e.classList.remove('bestt'); });
+  var m = hintMove(); if (!m) return;
+  var el = null;
+  if (G.q && m.t === 'die' && UI.gsDie != null) el = UI.gsDie === m.i ? $$('#acts [data-a="mv"]').filter(function (x) { try { return JSON.parse(x.dataset.m).f === m.f; } catch (e) { return false; } })[0] : null;   // grub-or-seed die: Best moves to the right button
+  else if (G.q && /^(die|egg|trade|tray|deck|tuck)$/.test(m.t)) el = moveTarget(m);
+  else if (G.q && m.t === 'bonus' && m.yes && m.i != null) el = $('#hand .bc[data-i="' + m.i + '"]');
+  else if (G.q && m.t === 'bonus' && m.yes && m.h != null) el = $('.bc[data-a="bird"][data-h="' + m.h + '"][data-c="' + m.c + '"]');
+  else if (G.q) el = $$('#acts [data-a="mv"]').filter(function (x) {   // a button choice (No thanks, Pay food, Skip, Reroll, a bonus card): the button whose move matches
+    try { var b = JSON.parse(x.dataset.m); return b.t === m.t && ['yes', 'f', 'i'].every(function (k) { return m[k] == null || b[k] === m[k]; }) && (m.yes !== false || b.yes === false); } catch (e) { return false; }
+  })[0] || null;
+  else if (m.t === 'play' && UI.sel === m.i && !UI.pend) el = $('.row[data-h="' + m.h + '"] .slot.next');
+  if (!el) return;
+  el.classList.add('bestt');
+  var b = document.createElement('em'); b.className = 'bestb bestx'; b.textContent = 'Best'; el.appendChild(b);
+}
+// the Best target is always on screen, even after you picked another bird: scroll it into view (hand strip, panel or page)
+function bestInView() {
+  if (!hintMove()) return;
+  var el = UI.sel != null && $('.slot.bestt') ? $('.slot.bestt') : ($('#hand .bc.bestc') || $('.bestt')); if (!el) return;
+  var r = el.getBoundingClientRect(), pr = $('#prompt'), top = 0;
+  var db = $('#dockbody'); if (db && db.contains(el) && pr && pr.offsetHeight) top = Math.max(0, pr.getBoundingClientRect().bottom);
+  if (r.top >= top && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth && bestHit(el)) return;
+  var h = $('#hand'); if (h && h.contains(el) && (r.left < 0 || r.right > window.innerWidth)) h.scrollLeft += r.left - h.getBoundingClientRect().left - 4;
+  r = el.getBoundingClientRect();
+  if (db && db.contains(el) && db.scrollHeight > db.clientHeight) { var d = db.getBoundingClientRect(), lim = Math.max(d.top, top); if (r.bottom > d.bottom) db.scrollTop += Math.min(r.bottom - d.bottom + 4, r.top - lim - 4); else if (r.top < lim) db.scrollTop += r.top - lim - 4; r = el.getBoundingClientRect(); }
+  if (r.top < 0 || r.bottom > window.innerHeight || !bestHit(el)) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  if (!bestHit(el)) el.scrollIntoView({ block: 'center', inline: 'nearest' });
+}
+function bestHit(el) {   // the target is really what a finger lands on (not clipped by the panel edge or under the sticky prompt)
+  var r = el.getBoundingClientRect(), ys = [r.top + Math.min(r.height / 2, 24), r.bottom - 6];
+  return ys.every(function (y) { var t = document.elementFromPoint(r.left + r.width / 2, y); return !!t && (t === el || el.contains(t)); });
+}
 function bestPlay(G, s) {
   var p = G.pl[s], best = null;
   PP.playable(G, s).forEach(function (x) { var v = B[p.hand[x.i]].p - ((x.inf && x.inf.eggs) || 0); if (!best || v > best.v) best = { i: x.i, v: v, id: p.hand[x.i], pts: B[p.hand[x.i]].p }; });
@@ -45,6 +87,8 @@ function actInfo(G, s) {
   out.play = { h: -1, ok: nPl > 0, plain: 'pick from ' + nPl + ' you can pay for', v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
     why: p.hand.length ? 'Not enough food or eggs yet. Get food first.' : 'No birds in hand. Draw birds first.' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
+  var hm = s === UI.view && !G.q ? hintMove() : null;   // Best follows the strong player's plan (engines, round goal, bonus card), not this quick estimate
+  if (hm && hm.t === 'act' && out[hm.a] && out[hm.a].ok) best = hm.a; else if (hm && hm.t === 'play' && out.play.ok) best = 'play';
   out.best = best;
   return out;
 }
@@ -64,7 +108,7 @@ function actIcon(k) {
 function act4HTML() {
   var inf = actInfo(G, UI.view), tp = tutPoint();
   return '<div id="act4" role="group" aria-label="Choose one action">' + ACTDEF.map(function (d) {
-    var a = inf[d.k], best = !tp && hintsOn() && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
+    var a = inf[d.k], best = !tp && hintsOn() && !(typeof coachOn === 'function' && coachOn()) && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
     return '<button type="button" class="a4 a4-' + d.k + (best ? ' best' : '') + (tp === d.k ? ' tutpoint' : '') + '" data-a="a4" data-k="' + d.k + '"' + (a.ok ? '' : ' aria-disabled="true"') + ' data-val="' + a.v.toFixed(2) + '">' +
       '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(txt) + '</span></span>' +
       (best ? '<em class="bestb">Best</em>' : '') + '</button>';
@@ -74,7 +118,7 @@ document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="a4"]'); if (!t || !G || !myTurn() || G.q) return;
   var k = t.dataset.k, inf = actInfo(G, UI.view)[k];
   if (!inf.ok) { toast(inf.why, 0, 1); return; }
-  if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); toast('Swipe your birds. Tap a glowing one to play it.'); return; }
+  if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); return; }   // the instruction bar already says what to tap; no pill over the food
   if (!tutGate({ type: 'tap', what: 'ract', h: inf.h })) return;
   UI.sel = null; UI.pickBird = false; human({ t: 'act', a: k });
 });
@@ -82,7 +126,7 @@ document.addEventListener('click', function (e) {
 function handGo(i) {
   var h = $('#hand'); if (!h) return; var n = h.querySelectorAll('.bc').length; if (!n) return;
   i = Math.max(0, Math.min(n - 1, i)); UI.hix = i;
-  try { var db = $('#dockbody'), sc = db && db.closest('.gx-dock-body,.gx-dock'); [db, sc].forEach(function (x) { if (x && x.scrollHeight > x.clientHeight) x.scrollTop = h.offsetTop - x.offsetTop - 50; }); h.scrollIntoView({ block: 'nearest' }); } catch (e) { }
+  try { var db = $('#dockbody'), pr = $('#prompt'); if (db && db.scrollHeight > db.clientHeight) db.scrollTop += h.getBoundingClientRect().top - (db.getBoundingClientRect().top + (pr ? pr.offsetHeight : 0) + 2); } catch (e) { }   // the hand starts right under the sticky prompt
   var c = h.querySelectorAll('.bc')[i]; if (c) h.scrollTo({ left: c.offsetLeft - h.offsetLeft - 6, behavior: UI.fast ? 'auto' : 'smooth' });
   handPager();
 }
@@ -134,7 +178,7 @@ var RATE = { k: null };
 function rateStart() {   // called when your turn begins (no question pending)
   if (!G || !myTurn() || G.q) return;
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
-  if (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0]) goalCard();
+  // the goal now sits on the starting-hand screen: no pop-up here, so the first tap of the game always lands on what you tap
   try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
   RATE.last = null; RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }
@@ -168,9 +212,9 @@ function showRate() {
 function tutPoint() { try { return coachOn() ? COACH.point || null : null; } catch (e) { return null; } }
 
 // ---------------- Addendum 7: three modes. PLAY is clean (board, hand, tracker, one score line, a Goal card, short pops);
-// HINTS (top-bar toggle, off by default) adds previews, Best badges, the turn rating, toasts and "What should I do?";
+// HINTS (top-bar toggle, on by default since R19) adds previews, Best badges, the turn rating, toasts and "What should I do?";
 // LEARN TO PLAY (tutfree) is the coached game and always shows them.
-function hintsPref() { try { return localStorage.getItem('pp-hints') === '1'; } catch (e) { return false; } }
+function hintsPref() { try { return localStorage.getItem('pp-hints') !== '0'; } catch (e) { return true; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
 function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
 UI.hintPref = hintsPref();
 function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }
@@ -185,7 +229,7 @@ function scoreLineHTML() {
   var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), top = Math.max.apply(null, sc), one = sc.filter(function (v) { return v === top; }).length === 1 && top > 0;
   return '<button type="button" class="sline" data-a="mysc" aria-label="Score: ' + esc(G.pl.map(function (p, i) { return (i === UI.view ? 'you' : p.name) + ' ' + sc[i]; }).join(', ')) + '. Tap for how it adds up">' +
     G.pl.map(function (p, i) { return '<span class="sl' + (i === UI.view ? ' me' : '') + '">' + (one && sc[i] === top ? '<em aria-hidden="true">&#9733;</em>' : '') + esc(i === UI.view && humans().length === 1 ? 'You' : p.name) + ' <b>' + sc[i] + '</b></span>'; }).join('<i>vs</i>') +
-    '<span class="slw">why?</span></button>';
+    (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0] && UI.mode !== 'tutfree' ? '<span class="slw goal1">Goal: most points in ' + G.rounds + ' rounds</span>' : '<span class="slw">why?</span>') + '</button>';   // the first screen says the goal in one line
 }
 // the score drawer: every number's why, for every player
 function showScore() {
