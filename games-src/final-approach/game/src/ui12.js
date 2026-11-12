@@ -1,36 +1,19 @@
-// ===================== part 12: the tutorial (shell/gx-tutor.js): a staged two-round flight that teaches every control by doing it once =====================
-// The staged flight is the end of a real flight at Port Alder: round 1 at 1000 ft (the plane must reach the airport) and the landing round at 0 ft. Some switches are already set
-// (two gears, one flap, the 2 brake), you hold one reroll token, the dice are made up (TUT_SCRIPT) and the co-pilot is scripted (TUT_AI), so every control has a die to teach with.
-// Each step spotlights one thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act). Nothing of it is saved.
+// ===================== part 12: the tutorial (shell/gx-tutor.js): a guided first landing, one rule per step =====================
+// The last four rounds at Port Alder (3000 ft to the runway) on a 4-space strip with one plane on space 3. The dice and the co-pilot are scripted (tut-plan.js,
+// checked by tut-sim.js and rules-test: playing the plan lands). Every step is ONE sentence of 12 words or fewer and ONE highlighted tap; only that tap answers.
+// The steps teach every core rule in order (TUT_RULES); tutor-test.js walks them by touch and checks each rule step appears. Nothing of it is saved.
 const TUT_GAME = 'final-approach';
-// The coached first flight (owner, 8 Nov 2026: "the tutorial is not teaching the game"): the last four rounds at Port Alder (3000 ft to the runway) on an easy 4-space
-// strip with one plane on space 3. Each round brings one system: 1 axis and engines (spare dice to Coffee), 2 radio and landing gear (plus the reroll token),
-// 3 flaps and brakes, 4 the landing. The dice are made up (TUT_SCRIPT, checked by tut-sim.js: following the coach lands the plane); every legal move stays allowed.
-// dice per round [pilot x4, co-pilot x4]
-const TUT_SCRIPT = [[[3, 4, 2, 6], [3, 4, 1, 2]], [[2, 4, 3, 1], [4, 3, 2, 5]], [[2, 4, 5, 3], [3, 4, 1, 2]], [[2, 1, 3, 6], [4, 6, 2, 1]]];
-const TUT_SETUP = { scenario: 'tt', seed: 23, row0: 3, pre: { script: TUT_SCRIPT } };
-// the systems the coach (and the computer co-pilot) use each round; the player may still use anything legal
-const TUT_ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
-// the coach's advice: the computer's own judgement (AI.cost) over the moves of this round's systems; fair: only what this seat may know
-function tutAdvise(g, seat, die) {
-  let al = TUT_ALLOW[Math.min(g.round, 3)], best = null, bc = 1e9; const V = FA.stripView(g, seat); V.nolog = true;
-  if (g.round === 0 && (!g.slots['ax' + seat] || !g.slots['en' + seat])) al = ['axis', 'engines'];   // round 1 teaches the two must-fill controls first
-  if (g.phase === 'place' && !g.pend) for (const m of FA.validMoves(V, seat)) {
-    if (m.t !== 'place' || m.d === 'p' || (m.c || 0) !== 0 || (al && !al.includes(FA.SLOT[m.to].grp)) || (die != null && m.d !== die)) continue;   // the coach never asks for coffee
-    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) - (seat === 1 && g.round >= 2 && FA.SLOT[m.to].grp === 'flaps' && !g.pl.sw.fl[FA.SLOT[m.to].ix] ? 5 : 0); if (c < bc) { bc = c; best = m; }
-  }
-  try { return best || FA.AI.move(g, seat, 'normal', { noMC: true }); } catch (e) { return null; }
-}
+const TUT_SETUP = TUT_PLAN.setup;
 const tutGame = () => !!(UI.cfg && UI.cfg.tutorial && UI.started && G && G.sid === 'tt');
 const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && tutGame();
 const tutBtn = cls => typeof GXT === 'undefined' ? '' : GXT.menuHTML({ game: TUT_GAME, first: firstTime(), cls: cls, launch: tutStart });
 function firstTime() { try { return newPlayer() && !localStorage.getItem('fa_offer'); } catch (e) { return false; } }
-// ---------------------------------------------------------------- the computer crew is scripted
+// ---------------------------------------------------------------- the computer co-pilot plays the plan
 function tutAI(g, seat) {
   if (!tutGame() || seat !== 1 || !g || g.result) return null;
-  if (g.phase === 'brief') { if (!g.ready[1]) { if (g.round === 0 && !g.say[1].length) return { t: 'say', c: 'adv2' }; return { t: 'ready' }; } return null; }
+  if (g.phase === 'brief') return g.ready[1] ? null : { t: 'ready' };
   if (g.pend && g.pend.h === 'rr') return g.pend.d.m[1] ? null : { t: 'rrpick', m: [false, false, false, false] };
-  if (g.phase === 'place' && !g.pend && g.turn === 1) return tutAdvise(g, 1);   // the co-pilot sticks to this round's systems too
+  if (g.phase === 'place' && !g.pend && g.turn === 1) { const q = (TUT_PLAN.cop[g.round] || [])[g.dice[1].filter(d => d.u).length]; if (q && !g.slots[q[1]]) return { t: 'place', d: q[0], to: q[1], c: 0 }; }
   return null;
 }
 (function () { const o = FA.AI.move; FA.AI.move = function (g, seat, level, opt) { const m = tutAI(g, seat); return m || o.apply(this, arguments); }; })();
@@ -38,40 +21,80 @@ function tutAI(g, seat) {
 const tq = sel => () => { const e = document.querySelector(sel); return e && e.getBoundingClientRect().width ? e : null; };
 const tDie = (s, d) => tq('#pz .die[data-s="' + s + '"][data-d="' + d + '"]');
 const tSlot = k => tq('#pz .slot[data-slot="' + k + '"]');
-const placed = () => Object.keys(G.slots).length;
-// my turn, in this round, after this many dice are on the panel, nothing pending
-const myMove = (round, n) => !!G && !G.result && G.round === round && G.phase === 'place' && !G.pend && G.turn === 0 && placed() === n;
+const tAct = a => tq('#acts [data-a=' + a + ']');
+// my turn in this round, nothing pending
+const tutMine = r => !!G && !G.result && G.round === r && G.phase === 'place' && !G.pend && G.turn === 0;
 // the die is lifted already, so a placement step is one tap on the glowing space
-function tutPick(d) {
-  if (UI.sel === d) return true;
+function tutPick(d, c) {
   if (!G || G.phase !== 'place' || G.pend || G.turn !== 0 || G.dice[0][d].u) return false;
-  UI.sel = d; UI.cof = 0; UI.warnK = null; render(); return UI.sel === d;
+  if (UI.sel !== d) { UI.sel = d; UI.cof = 0; UI.warnK = null; render(); }
+  if (c != null && UI.cof !== c) return false;
+  return UI.sel === d;
 }
-const dv = d => G.dice[0][d].v;
-const rival = () => name(1);
-const planeAt = () => G.planes.findIndex(n => n > 0) + 1;
-// a step that puts die d on slot k: the slot is the target, the die stays lit, the finger drags from the die
-const placeStep = (id, title, say, round, n, d, k, extra) => Object.assign({ id, title, say, target: tSlot(k), also: tDie(0, d), from: tDie(0, d),
-  wait: { type: 'drag', match: a => a.what === 'slot' && a.ok && a.k === k }, ready: () => myMove(round, n) && tutPick(d) }, extra || {});
-// ---------------------------------------------------------------- the kit hooks
-if (!window.GXCOACH) window.GXCOACH = { running: false, explained: [], done: false };
+function tutUnpick(d) { if (UI.sel === d) { UI.sel = -1; render(); } return true; }
+const slotOk = k => a => a.what === 'slot' && a.ok && a.k === k;
+// one placement: the slot glows, the die is lit; rule = which core rule this step teaches
+const tPlace = (rule, say, r, d, k, c) => ({ id: rule + ':' + k + ':' + r, rule, say, target: tSlot(k), also: tDie(0, d), wait: { type: 'tap', match: slotOk(k) }, ready: () => tutMine(r) && !G.slots[k] && tutPick(d, c) });
+const tRoll = (rule, say, r) => ({ id: rule + ':' + r, rule, say, target: tAct('ready'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'ready' }, ready: () => !!G && !G.result && G.round === r && G.phase === 'brief' && !G.ready[0] });
+const tLift = (rule, say, r, d, need) => ({ id: rule, rule, say, target: tDie(0, d), wait: { type: 'tap', match: a => a.what === 'die' && a.d === d && !a.rr }, ready: () => tutMine(r) && (!need || !!G.slots[need]) && tutUnpick(d) });
+// the core rules, in the order the steps teach them (tutor-test.js checks each appears)
+const TUT_RULES = ['together', 'secret', 'axis', 'turns', 'engines', 'coffee', 'gear', 'altitude', 'radio', 'reroll', 'coffee-spend', 'tilt-crash', 'flaps', 'overshoot', 'brakes', 'final', 'speed', 'win'];
+function tutSteps() {
+  const rrD = TUT_PLAN.rrDie;
+  return [
+    // round 1, 3000 ft: Ravi goes first
+    tRoll('together', 'We land or crash together. Plan now, then tap Roll.', 0),
+    tLift('secret', 'Dice are secret now. Never say numbers. Tap your 4.', 0, 0),
+    tPlace('axis', 'Axis: the higher die tips the wings. Your 4 beats 3.', 0, 0, 'ax0'),
+    tLift('turns', 'Take turns. Fill Axis and Engines every round, or we crash.', 0, 1, 'en1'),
+    tPlace('engines', "Engines add up: 5 plus Ravi's 2 is 7. We move one.", 0, 1, 'en0'),
+    tPlace('coffee', 'A spare die on Concentration earns a coffee token.', 0, 2, 'co1'),
+    tPlace('gear', 'Gear needs 1-2, 3-4 or 5-6. Each raises blue.', 0, 3, 'lg0'),
+    // round 2, 2000 ft: you go first; a reroll token comes aboard
+    tRoll('altitude', 'We drop 1000 feet each round. Reach the runway in time.', 1),
+    tPlace('radio', "Leaving a plane's space crashes. Radio 2 clears the next space.", 1, 0, 'ra0'),
+    { id: 'reroll', rule: 'reroll', say: 'A reroll token lets us both roll again. Tap it.', target: tAct('rr'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'rr' }, ready: () => tutMine(1) && !!G.slots.ax1 && G.rrHand > 0 && tutUnpick(UI.sel) },
+    { id: 'rrpick', rule: 'reroll', say: 'Tap your 1 to roll it again.', target: tDie(0, rrD), wait: { type: 'tap', match: a => a.what === 'die' && a.d === rrD && a.rr }, ready: () => !!G && !!G.pend && G.pend.h === 'rr' && !G.pend.d.m[0] && !UI.rrm[rrD] },
+    { id: 'rrgo', rule: 'reroll', say: 'Tap Reroll. Only the dice you picked change.', target: tAct('rrpick'), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'rrpick' }, ready: () => !!G && !!G.pend && G.pend.h === 'rr' && !G.pend.d.m[0] && !!UI.rrm[rrD] },
+    { id: 'coffee-spend', rule: 'coffee-spend', say: 'Spend coffee: tap minus to turn your 4 into 3.', target: tq('[data-a=cof][aria-label="One less"]'), also: tDie(0, 1), wait: { type: 'tap', match: a => a.what === 'act' && a.a === 'cof' && a.c === -1 }, ready: () => tutMine(1) && !G.slots.ax0 && tutPick(1, 0) },
+    tPlace('tilt-crash', "Your 3 under Ravi's 4 levels the wings. Tilt 3 crashes.", 1, 1, 'ax0', -1),
+    tPlace('engines', "Your 5 plus Ravi's 3 is 8: one space closer.", 1, 3, 'en0'),
+    tPlace('flaps', "Ravi's flaps go out in order. Your new 6 drops gear.", 1, rrD, 'lg2'),
+    // round 3, 1000 ft: Ravi first; reach the airport
+    tRoll('altitude', 'Last chance to reach the airport. Tap Roll.', 2),
+    tPlace('axis', "Match Ravi's 5 on Axis to keep the wings level.", 2, 0, 'ax0'),
+    tPlace('overshoot', "Your 4 plus Ravi's 4 reaches the airport. Flying past crashes.", 2, 1, 'en0'),
+    tPlace('gear', 'Your 3 drops the last gear. All three are down.', 2, 2, 'lg1'),
+    tPlace('brakes', 'Brakes take exactly 2, then 4, then 6, in order.', 2, 3, 'br0'),
+    // round 4, 0 ft: the landing
+    tRoll('final', 'Landing round: the plane stops moving. Tap Roll.', 3),
+    tPlace('speed', 'Brake 4. Speed is checked when the 2nd engine die lands.', 3, 0, 'br1'),
+    tPlace('axis', "Match Ravi's 3. We must land with level wings.", 3, 1, 'ax0'),
+    tPlace('brakes', 'Brake 6 now. Brakes set after the engines come too late.', 3, 3, 'br2'),
+    tPlace('speed', "Your 2 plus Ravi's 2 is speed 4. Brakes 6: slow enough.", 3, 2, 'en0'),
+    { id: 'win', rule: 'win', say: 'Landed! Runway clear, gear, flaps, level wings, slow enough.', target: tq('#pz'), wait: null, ready: () => !!G && !!G.result && !!G.result.win }
+  ];
+}
 function tutStart(o) {
+  if (typeof GXT === 'undefined') return;
   const pro = !!(o && o.prologue), first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
-  closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
-  document.querySelectorAll('.fa-skip').forEach(e => e.remove());
-  const sk = h('button.fa-skip', { type: 'button', 'aria-label': 'Exit the guided flight' }, 'Exit tutorial'); sk.addEventListener('click', e => { e.stopPropagation(); const wasPro = UI.fc && UI.fc.pro; tutLeave(); if (wasPro && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else showStart(); }); document.body.appendChild(sk);
-  UI.fc = { seen: {}, queue: [], cur: null, pro, first, ended: false, t: 0, goal: true }; window.GXCOACH = { running: true, explained: [], done: false }; UI.cpt = null; fcSay('intro'); clearInterval(UI.fcT); UI.fcT = setInterval(fcPoll, 450);
+  GXT.start({
+    game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+    endTitle: 'You can fly', endText: 'Now a real flight: seven rounds, Ravi plays his own dice.',
+    endButtons: pro && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    setup: () => {
+      try { GX.close(); } catch (e) { } try { if (typeof GXC !== 'undefined') GXC.close(); } catch (e) { } UI._aid = UI._aid || AIDELAY; AIDELAY = Math.min(AIDELAY, 700);
+      closeRS(); newGame('vs', { scenario: 'tt', role: 0, level: 'normal', abil: [], tutorial: true, tipsOff: true });
+    },
+    onDone: r => { const c = r && r.choice; tutLeave(); if (c === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); } else playNow(); },
+    onExit: () => { tutLeave(); showStart(); }
+  });
 }
-// leave the staged flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
+// leave the guided flight: nothing of it is saved, the computer stops and the board goes quiet behind the menu
 function tutLeave() {
-  if (window.GXCOACH && !window.GXCOACH.done) window.GXCOACH.running = false;
-  const lc = UI.fc && UI.fc.cur, left = lc ? Math.max(0, lc.need - (Date.now() - lc.at)) : 0;   // a line still being read fades after its reading time
-  clearInterval(UI.fcT); UI.fc = null; UI.cpt = null; document.querySelectorAll('.fa-fin,.fa-skip' + (left ? '' : ',.fa-coach')).forEach(e => e.remove());
-  if (left) setTimeout(() => document.querySelectorAll('.fa-coach').forEach(e => { if (!UI.fc) e.remove(); }), left);
   clearTimeout(UI.tm); UI.seq++; UI.started = false; UI.sel = -1; UI.cof = 0; if (UI._aid) { AIDELAY = UI._aid; UI._aid = 0; }
   try { hideRecap(); } catch (e) { } try { GXH.hide(); } catch (e) { } try { if (typeof pxClearEnd === 'function') pxClearEnd(); } catch (e) { }
-  $$('#fx .gh,#fx .endb,#fx .pop').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
+  $$('#fx .gh,#fx .endb,#fx .pop,.fa-ro').forEach(e => e.remove()); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a player with chapter progress goes straight to the chapter map
 function storyGate() {
@@ -103,122 +126,3 @@ function tutOffer(onPlay) {
     return o(a, t);
   };
 })();
-// ---------------------------------------------------------------- the tutorial as a story
-const TS = () => (window.CAMPAIGN && window.CAMPAIGN.tutorial) || null;
-function tsCast(id) { const C = window.CAMPAIGN.cast; return C[id] || C.chief; }
-function tsFill(t) {
-  const d = i => (G && G.dice && G.dice[0][i]) ? G.dice[0][i].v : '?', en1 = G && G.slots && G.slots.en1 ? G.slots.en1.v : '?';
-  const x = { rival: name(1), d0: d(0), d1: d(1), d2: d(2), d3: d(3), en1, ax1: G && G.slots && G.slots.ax1 ? G.slots.ax1.v : '?', planeAt: G ? planeAt() : '?',
-    sumE: typeof en1 === 'number' ? en1 + d(1) : '?', aeroB: G ? G.pl.aeroB : '?', aeroO: G ? G.pl.aeroO : '?', tilt: G ? Math.abs(G.pl.axis) : '?', tdir: G && G.pl.axis < 0 ? 'left' : 'right', brake: G ? FA.brakeVal(G) : '?' };
-  return String(t).replace(/\{(\w+)\}/g, (m, k) => x[k] != null ? String(x[k]) : m);
-}
-function tsPortrait(who) {
-  const c = tsCast(who), e = h('span.fa-por', { 'aria-hidden': 'true' }); e.style.setProperty('--fa-pc', c.color || '#2f4f7a');
-  if (c.portrait) e.style.backgroundImage = 'url(media/' + c.portrait + ')';
-  e.setAttribute('data-e', c.emoji || '');   // the emoji is drawn by CSS (not a text node): it sits under the painting until it loads
-  return e;
-}
-function tsReact(text, who) {
-  $$('.fa-react').forEach(e => e.remove());
-  const e = h('div.fa-react', { 'aria-hidden': 'true' }, tsPortrait(who || 'chief'), h('span', text)); document.body.appendChild(e);
-  setTimeout(() => e.classList.add('out'), 2300); setTimeout(() => { try { e.remove(); } catch (er) { } }, 2700);
-}
-
-// ---------------------------------------------------------------- the coached first game (owner, 7 Nov 2026: the tutorial must be a GAME, not tap-tap)
-// A real game from turn 1, every legal move allowed (the dice are stacked, the computer is the real one). Voss speaks just-in-time, one bubble at a time, never blocking input;
-// text lives in campaign.json tutorial.coach. Each rule is said the first time it matters; rules that never came up go to "Things you'll meet later" at the end.
-const FC_CORE = ['seats', 'goal', 'turns', 'axis', 'radio', 'engines', 'gear', 'flaps', 'brakes', 'coffee', 'reroll', 'rounds', 'final'];
-// one bubble only: [a rule that just became relevant] + [what to do now and why]. It never blocks input; x hides it until the situation changes.
-function fcSay(id) { const F = UI.fc, T = TS(); if (!F || !T || !T.coach[id] || F.seen[id]) return; F.seen[id] = true; try { window.GXCOACH.explained.push(id); } catch (e) { } F.queue.push(tsFill(T.coach[id])); }
-function fcHide() { const F = UI.fc; if (!F || !F.cur) return; const c = F.cur; F.cur = null; F.shut = c.key; clearTimeout(c.t); c.el.classList.add('out'); setTimeout(() => { try { c.el.remove(); } catch (e) { } try { render(); } catch (e) { } }, 250); }
-function fcShow(key, txt, who, ms) {
-  const F = UI.fc; if (!F || F.ended) return; if (F.cur && F.cur.key === key) return; if (F.cur && F.shut !== F.cur.key && Date.now() - F.cur.at < F.cur.need) return;   // the line on screen gets its reading time first
-  if (F.cur) { const c = F.cur; F.cur = null; clearTimeout(c.t); } document.querySelectorAll('.fa-coach').forEach(e => e.remove());
-  if (F.shut === key || !txt) return;
-  const x = h('button.x', { type: 'button', 'aria-label': 'Got it' }, '×'); x.addEventListener('click', e => { e.stopPropagation(); F.shut = key; fcHide(); });
-  const el = h('div.fa-coach', { role: 'status', 'data-coach': F.lastId || key }, tsPortrait(who || 'chief'), h('span.t', txt), x); document.body.appendChild(el);
-  F.cur = { el, key, at: Date.now(), need: readMs(txt), t: ms ? setTimeout(fcHide, Math.max(ms, readMs(txt))) : 0 }; fcMute();
-  x.style.visibility = 'hidden'; setTimeout(() => { x.style.visibility = ''; }, readMs(txt));   // the line gets its reading time before it can be closed
-}
-// while the coach speaks it is the one instruction on the board: the dock's line steps aside (UI bar rule 5)
-function fcMute() { const F = UI.fc; if (!F || !F.cur || F.ended || (UI.flash && UI.flash.until > Date.now())) return; for (const id of ['#prompt', '#barprompt']) { const p = $(id); if (p) p.textContent = ''; } }
-const readMs = t => 4000 + Math.ceil(String(t || '').split(' ').length / 10) * 1000;   // BRIEF-GAMEFEEL point 3: 4 s + 1 s per 10 words
-function tutGoal() {
-  if (typeof roHide === 'function') roHide();
-  const el = h('div.fa-ro.fa-goal', { role: 'dialog', 'aria-label': 'Goal' }, h('b', 'Goal: reach the runway by round 4 and land.'),
-    h('ul', h('li', 'Land with gear and flaps down.'), h('li', 'Keep the wings level.'), h('li', 'Speed must not beat the brakes.')), h('button.rgo', { type: 'button', 'data-ro': 'go' }, "Let's fly"));
-  el.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-ro]')) { el.remove(); fcPoll(); } }); document.body.appendChild(el);
-}
-function fcPump() { }
-function fcFeedback() { }
-// the reason in the turn line: the rule of that control, said before the move (R3: rules BEFORE the move)
-function tutWhy(m) {
-  const S = FA.SLOT[m.to], val = dv(m.d) + (m.c || 0), last = FA.isFinal(G); fcSay(S.grp === 'conc' ? 'coffee' : S.grp);
-  switch (S.grp) {
-    case 'axis': { const x = G.slots.ax1; if (!x) return 'Close dice keep the wings level.'; const nx = G.pl.axis + x.v - val; return nx === 0 ? 'Same as Ravi: wings level.' : 'Wings tilt ' + Math.abs(nx) + '. Three would crash.'; }
-    case 'engines': { const x = G.slots.en1; if (!x) return 'Ravi adds his die. The sum is our speed.'; const sm = val + x.v + FA.windMod(G); if (last) return 'Speed ' + sm + ', brakes ' + FA.brakeVal(G) + '.'; const adv = G.pl.pos >= trackOf().sp.length ? 0 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + ': ' + (adv ? 'we move ' + adv + '.' : 'we hold.'); }
-    case 'radio': { const at = G.pl.pos + val - 1; return G.planes[at - 1] ? 'It clears the plane on space ' + at + '.' : 'Nothing to clear there.'; }
-    case 'gear': return 'All three gear must be down to land.';
-    case 'brakes': return 'We may land at speed ' + S.vals[0] + ' or less.';
-    case 'conc': return 'It earns a coffee token.';
-  }
-  return '';
-}
-// "Put your 4 on Engines: ..." from the coach's advice
-function fcLine(m) {
-  if (!m) return '';
-  if (m.t === 'toss') return 'Your ' + dv(m.d) + ' fits nowhere. Throw it away.';
-  if (m.t !== 'place') return capW(hlpWhy(m, 0), 12) || 'Your move.';
-  const v = dv(m.d), c = m.c || 0, where = slotName(m.to); let why = ''; try { why = tutWhy(m) || ''; } catch (e) { }
-  const head = c ? 'Coffee makes your ' + v + ' a ' + (v + c) + '. Put it on ' + where + '.' : 'Your ' + v + ' goes on ' + where + '.';
-  const all = head + (why ? ' ' + why : ''); return all.split(/\s+/).length <= 12 ? all : head;
-}
-function fcPoll() {
-  const F = UI.fc; if (!F) return; if (!G || !UI.started || !tutGame()) return;
-  if (G.result) { UI.cpt = null; if (!F.ended) { F.ended = true; const c = F.cur, wait = c ? Math.max(0, c.need - (Date.now() - c.at)) : 0; setTimeout(fcHide, wait); setTimeout(fcEnd, Math.max(1400, wait + 300)); } return; }
-  const T = TS(), sl = G.slots, has = re => Object.keys(sl).some(k => re.test(k)), mine = G.phase === 'place' && !G.pend && G.turn === 0;
-  // rules, the first time they matter (each said once)
-  if (G.phase === 'place' && G.round === 0) { fcSay('seats'); fcSay('goal'); fcSay('turns'); }
-  if (has(/^ax/)) fcSay('axis'); if (has(/^en/)) fcSay('engines'); if (has(/^co/) || G.coffee > 0 && mine) fcSay('coffee');
-  if (G.round >= 1) { fcSay('rounds'); fcSay('radio'); fcSay('gear'); }
-  if (has(/^ra/)) fcSay('radio'); if (has(/^lg/)) fcSay('gear'); if (G.pend && G.pend.h === 'rr' || G.rrHand > 0 && mine) fcSay('reroll');
-  if (G.round >= 2) { fcSay('flaps'); fcSay('brakes'); } if (has(/^fl/)) fcSay('flaps'); if (has(/^br/)) fcSay('brakes');
-  if (FA.isFinal(G) && G.phase === 'place') fcSay('final');
-  if (F.goal && G.phase !== 'brief') { F.goal = false; document.querySelectorAll('.fa-goal').forEach(e => e.remove()); }
-  if (F.goal) { if (!document.querySelector('.fa-goal')) { if (F.goalShown) F.goal = false; else { F.goalShown = true; tutGoal(); } } if (F.goal) return; }
-  const R = T.rounds || [], n = Object.keys(sl).length;
-  if (G.phase === 'brief') { UI.cpt = null; if (!G.ready[0]) fcShow('b' + G.round, tsFill(R[G.round] || '') + ' Tap Roll.', 'chief'); return; }
-  if (G.pend && G.pend.h === 'rr') { UI.cpt = null; if (!G.pend.d.m[0]) fcShow('rr' + G.round + n, 'Tap dice to roll again, or keep them all.', 'ravi'); return; }
-  if (mine) {
-    const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = 'p' + G.round + ':' + n + ':' + (sel == null ? '' : sel);
-    if (F.cur && /^t/.test(F.cur.key) && Date.now() - F.cur.at < F.cur.need) return;   // let a rule line be read first
-    if (!F.cur || F.cur.key !== key) {
-      let m = tutAdvise(G, 0); if (sel != null && m && m.t === 'place' && m.d !== sel) { const m2 = tutAdvise(G, 0, sel); if (m2 && m2.t === 'place' && m2.d === sel) m = m2; }
-      UI.cpt = m && m.t === 'place' ? { k: m.to, d: m.d } : null; F.lastId = 'turn'; fcShow(key, fcLine(m), 'chief'); render();
-    }
-    const ik = G.round + ':' + n; if (!F.idle || F.idle.k !== ik) F.idle = { k: ik, t: Date.now() };
-    else if (Date.now() - F.idle.t > 15000) { F.idle.t = Date.now() + 60000; const m = tutAdvise(G, 0); if (m && m.t === 'place') { UI.sel = -1; try { commit(0, m); } catch (e) { } } }
-    return;
-  }
-  UI.cpt = null;
-  F.queue.length = 0;   // rules are said in the briefing and inside each turn line, never as a separate bubble
-}
-// the end: the landing check rule by rule with the real numbers, then what did not come up
-function fcEnd() {
-  const F = UI.fc, T = TS(); if (!F || !T || !G || !G.result) return; const win = !!G.result.win;
-  clearInterval(UI.fcT); document.querySelectorAll('.fa-skip').forEach(e => e.remove()); try { GXT.markDone(TUT_GAME); } catch (e) { } window.GXCOACH = Object.assign(window.GXCOACH || { explained: Object.keys(F.seen) }, { running: false, done: true });
-  const later = FC_CORE.filter(k => !F.seen[k]).map(k => tsFill(T.coach[k])).concat(T.later); F.later = later;
-  const rows = landList().map(r => h('li.' + (r[0] === true ? 'ok' : 'no'), h('b', r[0] === true ? '✓' : '✗'), h('span', r[1])));
-  const btn = (id, label, pri) => { const b = h('button.fb' + (pri ? '.pri' : ''), { type: 'button', 'data-fin': id }, label); return b; };
-  const el = h('div.fa-fin', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Check ride result' },
-    h('div.fc', tsPortrait(win ? 'chief' : 'pell'), h('h2', win ? 'Check ride passed' : 'Not this time'), h('p', T.endText[win ? 'win' : 'lose']),
-      h('h3', 'Your final check'), h('ul.fchk', ...rows), win ? null : h('p.why', (t => t.split(/\s+/).length <= 12 ? t : 'The flight ended. The checklist shows why.')(lossText(G.result))),
-      h('div.fr', win && F.pro && F.first ? btn('chapter', 'Start chapter 1', 1) : btn(win ? 'menu' : 'again', win ? 'Back to menu' : 'Try again', 1), win ? btn('again', 'Fly it again') : btn('menu', 'Back to menu')),
-      h('h3', 'Things you will meet later'), h('ul.flat', ...later.map(t => h('li', t)))));
-  el.addEventListener('click', e => {
-    const b = e.target.closest && e.target.closest('[data-fin]'); if (!b) return; const id = b.dataset.fin, pro = F.pro, first = F.first;
-    tutLeave();
-    if (id === 'chapter' && first) { showStart(); GXC.play(first.id); } else if (id === 'again') tutStart({ prologue: pro }); else showStart();
-  });
-  document.body.appendChild(el);
-}

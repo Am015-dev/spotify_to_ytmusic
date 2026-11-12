@@ -5,6 +5,7 @@
 //    A deliberately cheating chooser must be caught by the same comparison.
 // 3. The log and the event list written before placement reveal nothing about unplaced dice.
 const T = require('./tlib.js'); require('./src/ai.js'); const { FA, D } = T;
+FA.AI.NMC.ms = 0; FA.AI.HMC.ms = 0;   // fixed search size: the phone time guard would let machine load, not hidden facts, change the answer
 const games = +process.argv[2] || 40; const J = JSON.stringify; let bad = 0, checks = 0; const probs = []; const P = m => { bad++; if (probs.length < 12) probs.push(m); };
 let pr = 987654321; const prnd = () => { pr = (Math.imul(pr, 1103515245) + 12345) >>> 0; return pr / 4294967296; };
 function poison(G, seat) { const c = FA.clone(G); c.seed = 777; c.rng = 4242; c.script = [[[6, 6, 6, 6], [6, 6, 6, 6]]]; const o = 1 - seat; for (const d of c.dice[o]) if (!d.u) d.v = 1 + Math.floor(prnd() * 6); if (c.pend && c.pend.h === 'rr') c.pend.d.m = c.pend.d.m.map((m, s) => s === o && m ? m.map(() => !!(prnd() < .5)) : m); if (c.pend && c.pend.h === 'wt' && c.pend.d.a === o) c.pend.d.ai = (c.pend.d.ai + 1) % 4; return c; }
