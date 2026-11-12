@@ -1,7 +1,7 @@
 // ===================== part 6: board overlay (labels, route, markers), advisor, sunk cards, monster-phase card =====================
 // ---------- the overlay: HTML/SVG drawn over the board, positioned from the kit's own camera (3D) or the 2D chart ----------
 const OV={items:[],sig:'',descs:[],raf:0,proj:null,pk:''};
-const sqW=(c,r)=>[c-2.5,r-2.5];
+const sqW=(c,r)=>[c-BC,r-BC];
 function ovMakeProj(){try{const bd=$('#board');if(!bd)return null;const B=bd.getBoundingClientRect();if(!B.width)return null;
   const c3=$('#c3');
   if(c3&&!c3.hidden){const K=TWKit._K;if(!K||!K.on||!K.cam)return null;const hr=c3.getBoundingClientRect();if(!hr.width)return null;const v=new THREE.Vector3();
@@ -28,9 +28,21 @@ function startInfo(d){const mv=validMoves(d).filter(m=>m.a==='start');const by={
   const out=[];for(const k in by){const l=by[k];const hor=l[0].edge==='top'||l[0].edge==='bottom';l.sort((a,b)=>hor?a.w[0]-b.w[0]:a.w[1]-b.w[1]);
     l.forEach((o,i)=>{o.side=hor?'LR'[i]:'UD'[i];o.sideWord=hor?['left','right'][i]:['upper','lower'][i];o.lab=o.idx+o.side;out.push(o)})}
   return out}
-function startAdvice(K,d,info){let m=null;try{m=aiMove(d,'hard')}catch(e){}if(!m||m.a!=='start')return null;
-  const o=info.find(x=>x.m.x===m.x&&x.m.y===m.y&&x.m.e===m.e);if(!o)return null;const dm=distMon(K,[m.x,m.y]);
-  return {o,why:`${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark: ${(m.x===0||m.x===BW-1)&&(m.y===0||m.y===BW-1)?'a corner square, but the best left':'away from the corners, so you have room to turn'}${K.mons.some(q=>q.k==='L')?`; the nearest leviathan is ${dm} square${dm===1?'':'s'} away`:''}.`}}
+// the safe start: every legal mark is scored by the counted chance a leviathan blocks or sinks you before your first turn (sinkRisk over the
+// rolls of the players ahead of you, plus your own) and, after your best first tile from there, before your second turn: the "out after
+// 1-2 decisions" danger. Lowest combined chance wins; ties go to the hard computer's own start score.
+function safeStart(K,d){const key=G.logN+':'+d+':'+G.sp;if(UI.ssKey===key)return UI.ssM;let best=null;
+  try{const mv=genMoves(K,d).filter(m=>m.a==='start');const ev=evFirst(K,d),hand=K.hands[d]||[];const L=AILV.hard,rng=mkRng(kHash(K));
+    for(const m of mv){const B=Object.assign({},K,{ships:K.ships.map(s=>Object.assign({},s))});const S=B.ships[d];S.x=m.x;S.y=m.y;S.e=m.e;S.on=null;S.alive=true;
+      const r1=sinkRisk(B,d,ev,1500);let r2=1;
+      for(let t=0;t<hand.length;t++){if(!isCur(hand[t]))continue;for(let r=0;r<4;r++){const h=hypo(B,S,hand[t],r);if(h.dead.includes(d))continue;const S2=h.B.ships[d];if(!S2.alive||S2.x==null)continue;
+        const q=sinkRisk(h.B,d,null,300);if(q<r2)r2=q}}
+      const dg=1-(1-r1)*(1-r2),sc=startScore(K,d,m,L,rng);
+      const v={m,r1,r2,dg,sc};if(!best||Math.round(v.dg*100)<Math.round(best.dg*100)||Math.round(v.dg*100)===Math.round(best.dg*100)&&v.sc>best.sc)best=v}}catch(e){console.error(e)}
+  UI.ssKey=key;UI.ssM=best;return best}
+function startAdvice(K,d,info){const b=safeStart(K,d);const m=b&&b.m;if(!m)return null;
+  const o=info.find(x=>x.m.x===m.x&&x.m.y===m.y&&x.m.e===m.e);if(!o)return null;
+  return {o,b,why:`${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark: ${riskPct(b.r1)} chance a leviathan blocks or sinks you before your first turn, the lowest of every mark${b.r2<1?` (and about ${riskPct(b.r2)} before your second turn with your best tile)`:''}.`}}
 const levNm=id=>levName(id);
 function monHits(mo,sqs){const f=[];if(!mo||mo.k!=='L')return f;for(let die=1;die<=5;die++){const a=LEV[mo.id].arr[die-1];if(a==='R')continue;const dd=DIR[(DIRN[a]+mo.r)%4],tx=mo.x+dd[0],ty=mo.y+dd[1];if(sqs.some(q=>q&&q[0]===tx&&q[1]===ty))f.push(die)}return f}
 // ONE line per leviathan that matters (replaces the two duplicate warnings)
@@ -59,11 +71,16 @@ function advise(K,seat,o){o=o||{};const L=Object.assign({},AILV.hard,{look:o.loo
       else{const S2=hy.B.ships[seat];const after=hand.filter((c,i)=>i!==m.t);
         if(S2&&S2.alive&&S2.x!=null){info.n=safeOpts(hy.B,S2,after);info.fd=drawSafe(hy.B,S2);info.pl=info.n>0?0:1-info.fd;info.s2=surv2(hy.B,seat,after);
           sc+=W2*(info.s2-1);info.trap2=info.s2<.35;
-          info.tier=info.pl>=.999||info.s2<.02?1:(info.trap2?2:3)}
+          info.tier=info.pl>=.999||info.s2<.02?1:(info.trap2?2:3);
+          info.rk=sinkRisk(hy.B,seat,null,2000);info.dg=1-(1-info.rk)*Math.max(.02,info.s2)}
         else if(S2&&S2.alive)info.tier=2}
       if(info.hurts)sc-=400}
+    else if(m.a==='cannon'){info.rk=sinkRisk(Object.assign({},K,{mons:K.mons.filter(x=>x.id!==m.m)}),seat);info.dg=info.rk}
+    else if(m.a==='pass'){info.rk=sinkRisk(K,seat);info.dg=info.rk}
     out.push({m,sc,info})}
-  out.sort((a,b)=>b.info.tier-a.info.tier||b.sc-a.sc);return out}
+  // the star: never a sinking move; then the lowest chance of being out within two turns (a leviathan before my next turn, or no safe tile after it), to the whole percent; ties go to the computer's own score
+  const dg=x=>x.info.tier===0?9:x.info.dg!=null?Math.round(x.info.dg*100):x.info.tier>=3?50:x.info.tier===2?70:95;
+  out.sort((a,b)=>(b.info.tier===0?0:1)-(a.info.tier===0?0:1)||dg(a)-dg(b)||b.sc-a.sc);return out}
 function recMove(d){const key=G.logN+':'+d+':'+(G.q?1:0);if(UI.recKey===key&&UI.recA)return UI.recM;let a=null;try{a=advise(knowledge(d),d)}catch(e){console.error(e)}
   UI.recKey=key;UI.recA=a;UI.recM=a&&a.length?a[0].m:null;return UI.recM}
 function recHTML(K,d,pl,full){const m=recMove(d);if(!m)return '';const a=UI.recA||[];const me=a.find(x=>x.m===m)||a[0];let why='',lab='';
@@ -98,7 +115,7 @@ function sunkNames(seats){const me=youSeat();const l=seats.map(i=>i===me?'Your j
 function renderCards(){const el=$('#cards');if(!el)return;if(!G||!UI.sunk||!UI.sunk.length){el.innerHTML='';el.hidden=true;return}el.hidden=false;
   const me=youSeat();
   el.innerHTML=UI.sunk.map(c=>{const mine=c.seats.includes(me);const who=sunkNames(c.seats);const dots=c.seats.map(dot).join('');
-    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out, but you can watch the rest of the game.':''}</p><button class="btn small" data-a="sunkok" data-id="${c.id}">Got it</button></div>`}).join('')}
+    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out: the rulebook has no way back in. Watch the rest, see the result now, or start a new game.':''}</p>${mine&&humans().length===1&&!NET.on&&!G.over?'<button class="btn small pri" data-a="again">Play again</button> <button class="btn small" data-a="skip">See the result</button> ':''}<button class="btn small" data-a="sunkok" data-id="${c.id}">${mine?'Watch':'Got it'}</button></div>`}).join('')}
 function sunkClear(){UI.sunk=[];UI.marks=[];UI.sunkSeen={};renderCards()}
 // ---------- the monster-phase card ----------
 // builds the card's lines from the recorded events: roll, then one line per leviathan move / rise / swim-off, in the order they happen
@@ -125,20 +142,20 @@ function mphHTML(){const mp=UI.mph;if(!mp||G&&G.over&&!UI.busy)return '';
 // ---------- the overlay descriptors ----------
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}
-  for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-2.5,wy:.95,wz:a[1]-2.5,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
-  for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-2.5,wy:.5,wz:a[1]-2.5,t:'Maelstrom',cls:'piece mael'})}
-  for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-2.5,wy:.55,wz:a[1]-2.5,t:'Rift Gate',cls:'piece gate'})}
-  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-2.5,wy:.55,wz:w.y-2.5,t:`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
+  for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-BC,wy:.95,wz:a[1]-BC,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
+  for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-BC,wy:.5,wz:a[1]-BC,t:'Maelstrom',cls:'piece mael'})}
+  for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-BC,wy:.55,wz:a[1]-BC,t:'Rift Gate',cls:'piece gate'})}
+  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-BC,wy:.55,wz:w.y-BC,t:`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
-  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=UI.tutBest.m}
-    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best})}}
+  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=typeof TS!=='undefined'&&TS.on&&TS.myStart?TS.myStart:UI.tutBest.m}
+    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best,pk:!UI.tut||!!(PH.on&&PH.pop!=='start'&&typeof TUTG!=='undefined'&&TUTG.cur&&TUTG.cur.id==='mark'),mx:o.m.x,my:o.m.y,me:o.m.e})}}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
-  if(PH.on&&PH.pop==='info'){const I=phInfoData(PH.pd);if(I&&I.at)D.push({k:'ring',id:'ri',wx:I.at[0]-2.5,wz:I.at[1]-2.5})}
-  if(PH.on&&PH.pop==='start'&&PH.pd)D.push({k:'ring',id:'rs',wx:PH.pd.x-2.5,wz:PH.pd.y-2.5})
+  if(PH.on&&PH.pop==='info'){const I=phInfoData(PH.pd);if(I&&I.at)D.push({k:'ring',id:'ri',wx:I.at[0]-BC,wz:I.at[1]-BC})}
+  if(PH.on&&PH.pop==='start'&&PH.pd)D.push({k:'ring',id:'rs',wx:PH.pd.x-BC,wz:PH.pd.y-BC})
   {const seen={};for(const t of D){if(t.k!=='tag')continue;const k=t.wx.toFixed(1)+','+t.wz.toFixed(1);const n=seen[k]=(seen[k]||0)+1;if(n>1)t.wy+=.28*(n-1)}}
   ovApply(D)}
 function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length===D.length)return;OV.sig=sig;OV.descs=D;const root=$('#ov');if(!root)return;
@@ -152,7 +169,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
     else{const e=document.createElement('div');
       if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
-      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);try{const pe=TWKit.portEdge(ds.mx,ds.my,ds.me);if(pe&&(pe.edge==='left'||pe.edge==='right'))e.className+=' pv'}catch(_){}if(UI.tut||PH.on)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
