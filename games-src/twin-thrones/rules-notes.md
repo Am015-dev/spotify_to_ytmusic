@@ -43,5 +43,13 @@ Cards (cost and points)
 
 Rule of thumb for a paid release: the UNSURE lines are cost-only (no effect or scoring differs); compare them with a physical copy and edit `data.js` only.
 
+## W492 touch play vs the real game (8 Nov 2026)
+- CHANGED: the first player was always you (you always drafted first and opened Age I). Now random each game, as in the real game (logic rules 15-16).
+- CHANGED: the last wonder of each draft group had to be tapped by its owner. Now it goes to that player automatically (rules 3-4).
+- CHANGED (turn flow): every narration line held the game 4-6 s, so one round (your move + rival move) waited ~25-30 s and a game took 15+ min.
+  Now 1-2.6 s per line; a full game by touch is about 5-6 min.
+- VERIFIED by touch: face-down cards turn up when freed, build / sell (2 + yellow) / wonder, trading 2 + rival brown/grey, chains free,
+  pair -> progress token, loot spaces, 7-wonder cap, weaker military chooses the next starter (tie: last card taker), scoring + blue tie-break.
+
 ## Not built
 Online play, campaign (see HANDOFF.md). Sound and the first-game guide were added in R2 (HANDOFF-R2.md).
