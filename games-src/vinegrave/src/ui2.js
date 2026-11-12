@@ -32,6 +32,11 @@ function refreshInsp() {
     const g = me.guards[I.x], gd = V.GUARD[g.id];
     h += `<h3>${esc(gd.name)}</h3><div class="gport" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></div><p>Beaten: worth 5 points.</p><p>Boon (once, free): ${esc(V.opText(gd.boon))}.</p>${g.used ? '<p class="sm">Boon already used.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
+  } else if (I.kind === 'asst') {
+    const a = me.asst[I.x]; if (!a) return closeInsp(); const d = V.ASSTBY[a.id];
+    h += `<h3>${esc(d.name)}${a.gold ? ' (gold)' : ''}</h3><p>Once a round${d.main ? ' (uses your action)' : ', free'}: ${esc(V.opText(a.gold ? d.gd : d.s))}.</p>${a.gold ? '' : `<p class="sm">Gold side: ${esc(V.opText(d.gd))}.</p>`}<p class="sm">Your notebook on row ${V.ASST_UP.join(' or ')} turns one gold.</p>${a.ex ? '<p class="sm">Resting: ready again next round.</p>' : ''}`;
+    L.forEach(m => { if (m.t === 'asst' && m.k === I.x) add(m, d.main ? 'Use it (your action)' : 'Use it (free)'); });
+    if (!a.ex && !L.some(m => m.t === 'asst' && m.k === I.x) && myTurn()) h += '<p class="sm">You cannot pay its cost yet.</p>';
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
     h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end.</p><p>Set it in a shrine for a free boon now.</p><p class="sm">One idol a turn. Each empty shrine slot is worth points too.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
@@ -51,7 +56,7 @@ function whyNotSite(x) {
 function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
 function pick(k, x, id) {
   if (!G) return;
-  if (k === 'guard' || k === 'idol') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
+  if (k === 'guard' || k === 'idol' || k === 'asst') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
   const ms = movesFor(k, x), S = UI.sel;
   if (G.q && ms.length) { act(ms[0]); return; }   /* answering a question: one tap */
   if (k === 'site' && S && S.k === 'pawn') { const m = ms.find(z => z.t === 'dig' || z.t === 'disc'); if (m) { act(m); return; } }
@@ -67,7 +72,7 @@ document.addEventListener('click', e => {
   if (a === 'ix') { closeInsp(); return; }
   if (a === 'mv') { const m = UI.mv[+t.dataset.m]; if (m) act(m); return; }
   if (a === 'details') { const S = UI.sel; if (S) { openInsp(S.k, S.x); } return; }
-  if (a === 'site' || a === 'row' || a === 'hand' || a === 'track' || a === 'guard' || a === 'idol' || a === 'pawn') {
+  if (a === 'site' || a === 'row' || a === 'hand' || a === 'track' || a === 'guard' || a === 'idol' || a === 'asst' || a === 'pawn') {
     const x = a === 'site' || a === 'hand' ? +t.dataset.i : a === 'row' ? +t.dataset.r : +t.dataset.k; pick(a, x, t.dataset.id); return;
   }
   if (UIACT[a]) UIACT[a](t, e);
@@ -113,12 +118,13 @@ function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode 
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), r = VG.apply(G, m);
+  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, r = VG.apply(G, m);
   if (!r.ok) { render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
-  if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
+  const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
+  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = moveCaption(m, s) + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
 }
 function after() {
@@ -175,6 +181,7 @@ function moveCaption(m, s) {
     case 'pass': return `${n} ${v('pass', 'passes')} for this round.`;
     case 'boon': return `${n} ${v('use', 'uses')} a guardian boon.`;
     case 'idol': return `${n} ${v('set', 'sets')} an idol in a shrine.`;
+    case 'asst': { const a = p && p.asst[m.k]; return `${n} ${v('use', 'uses')} ${a ? 'the ' + V.ASSTBY[a.id].name : 'an assistant'}.`; }
     default: return `${n} ${v('choose', 'chooses')}.`;
   }
 }
@@ -287,7 +294,7 @@ function previewText(m) {
 function shortLabel(m) {
   const me = G.p[UI.view];
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
-    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; default: return 'pass'; }
+    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
 function bestBadges() {   /* gold badges: the strongest site and the strongest market card for you right now */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));

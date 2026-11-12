@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render (one board: sites, research track, market; your tray below) =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, tut: null, sel: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'easy', hot: false }, prefs: {}, tut: null, sel: null };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -29,10 +29,10 @@ const CARD_GLYPH = { item: 'coin', art: 'compass', fear: 'guard' };
 function cardHTML(id, o) {
   o = o || {}; const c = V.CARDS[id];
   const cost = c.t === 'item' ? `<span class="cost">${c.cost}${ic('coin')}</span>` : c.t === 'art' ? `<span class="cost">${c.cost}${ic('compass')}</span>` : '';
-  const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Pays travel: ' + V.TNAME[c.tr] + '.';
+  const lab = c.name + (c.fa ? ', free action' : '') + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Pays travel: ' + V.TNAME[c.tr] + '.';
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="pic" data-art="card-${id}"><svg class="pg" aria-hidden="true"><use href="#s-${CARD_GLYPH[c.t] || 'card'}"/></svg></span>${cost}<span class="tr">${ic(c.tr)}</span>${c.vp ? `<span class="vp${c.vp < 0 ? ' neg' : ''}">${c.vp > 0 ? '+' + c.vp : c.vp}</span>` : ''}
-    <span class="cn">${esc(c.name)}</span><span class="ef">${esc(effShort(c))}</span></button>`;
+    <span class="cn">${esc(c.name)}</span><span class="ef">${c.fa ? 'Free: ' : ''}${esc(effShort(c))}</span></button>`;
 }
 function pawnSVG(s, cls) { return `<svg class="meep ${cls || ''}" viewBox="0 0 20 28" style="color:${s === -2 ? '#9a9486' : HEX[s]}" aria-hidden="true"><use href="#s-meep"/></svg>`; }
 function siteName(x) { return x.tile ? V.SITE[x.tile].name : (x.lvl === 1 ? 'Hidden ruin' : 'Deep ruin'); }
@@ -40,12 +40,12 @@ function siteHTML(x, i, glow, sel) {
   const hid = !x.tile, nm = siteName(x), occ = x.occ === -1 ? '' : x.occ === -2 ? (G.rival ? G.rival.name : 'Rival') : G.p[x.occ].name;
   const lab = nm + '. Travel ' + x.cost.map(t => V.TNAME[t]).join(' + ') + (hid ? '. Explore for ' + V.DISC[x.lvl] + ' compasses' : '. Dig for ' + resWords(V.SITE[x.tile].rew)) + (x.guard ? '. Guardian: ' + V.GUARD[x.guard].name : '') + (occ ? '. ' + occ + ' is here' : '');
   const rew = hid ? `<b>${V.DISC[x.lvl]}</b>${ic('compass')}` : Object.keys(V.SITE[x.tile].rew).map(k => `<b>${V.SITE[x.tile].rew[k]}</b>${ic(k)}`).join('');
-  return `<button type="button" class="site l${x.lvl}${hid ? ' hid' : ''}${glow ? ' glow' : ''}${sel ? ' sel' : ''}${x.occ !== -1 ? ' taken' : ''}" data-a="site" data-i="${i}" aria-label="${esc(lab)}">
+  return `<button type="button" class="site l${x.lvl}${hid ? ' hid' : ''}${glow ? ' glow' : ''}${sel ? ' sel' : ''}${x.occ !== -1 && !(x.cap > 1 && x.occ2 === -1) ? ' taken' : ''}" data-a="site" data-i="${i}" aria-label="${esc(lab)}">
     <span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span>
     <span class="cost">${x.cost.map(t => ic(t)).join('')}</span>
     <span class="nm">${esc(nm)}</span>
     ${x.guard ? `<span class="gd" data-art="guard-${x.guard}"><svg aria-hidden="true"><use href="#s-guard"/></svg></span>` : ''}
-    ${occ ? `<span class="occ"${x.occ >= 0 ? ` data-art="explorer-${x.occ}"` : ''}>${pawnSVG(x.occ)}</span>` : ''}
+    ${occ ? `<span class="occ"${x.occ >= 0 ? ` data-art="explorer-${x.occ}"` : ''}>${pawnSVG(x.occ)}</span>` : ''}${x.occ2 != null && x.occ2 >= 0 ? `<span class="occ occ2" data-art="explorer-${x.occ2}">${pawnSVG(x.occ2)}</span>` : ''}${x.lvl === 0 && x.cap > 1 && x.occ2 === -1 && x.occ !== -1 ? '<span class="sp2" aria-hidden="true">+1</span>' : ''}
     <span class="rew">${rew}</span></button>`;
 }
 // ---------------------------------------------------------------- legal moves for the human who acts now
@@ -70,7 +70,7 @@ function movesFor(k, x) {
 const B2 = !/[?&]b2=0\b/.test(location.search);
 if (B2) document.body.classList.add('vg-b2');
 const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
-  0: [[15, 73], [33, 85], [51, 73], [69, 85], [87, 73]],
+  0: [[15, 69], [33, 79], [51, 69], [69, 79], [87, 69]],
   1: [[15, 41], [33, 53], [51, 41], [69, 53], [87, 41]],
   2: [[21, 11], [42, 23], [63, 11], [84, 23]]
 };
@@ -82,7 +82,7 @@ function mapB2(gS, S) {
   per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
   per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
   const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
-  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep ruins', 2) + sign('Ruins', 36) + sign('Camp', 69)
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', 36) + sign('Camp', 69)
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
@@ -111,7 +111,7 @@ function render() {
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
     const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
     const nx = myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
-    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span><span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
+    tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span>${V.ASST_REC.indexOf(r) >= 0 ? '<span class="tas" aria-label="notebook here: hire an assistant">A</span>' : ''}${V.ASST_UP.indexOf(r) >= 0 ? '<span class="tas gold" aria-label="notebook here: upgrade an assistant">A</span>' : ''}<span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
   }
   const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
@@ -132,12 +132,12 @@ function renderTray(L, q, me, actor) {
   // prompt line + the one button that fits now
   let txt, acts = '';
   if (over) { txt = 'The expedition is over.'; acts = '<button type="button" class="btn go" data-a="showres">See the result</button>'; }
-  else if (!mine) txt = actor < 0 ? 'The round is ending.' : who(actor) + ' is choosing. Tap to skip ahead.';
+  else if (!mine) txt = actor < 0 ? 'The round is ending.' : (who(actor) === 'You' ? 'You are' : who(actor) + ' is') + ' choosing. Tap to skip ahead.';
   else if (q) txt = qPrompt(q);
   else if (S) { const d = selInfo(S); txt = d.t; if (d.go) acts += mvBtn(d.go, d.label, 'go', 'gobtn'); if (S.k !== 'pawn') acts += '<button type="button" class="btn alt info" data-a="details" aria-label="Details">Details</button>'; }
   else txt = promptLine(L);
   const ps = L.find(m => m.t === 'pass');
-  if (mine && !q && ps && !S) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');
+  if (mine && !q && ps && !(S && selInfo(S).go)) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');
   if (UI.coachFree && UI.mode === 'tutorial' && !over && !S) acts += '<button type="button" class="btn alt" data-a="tutleave">Leave</button>';
   $('#prompt').textContent = txt; $('#pacts').innerHTML = acts;
   // choices: a pending question, or the research track's options
@@ -150,7 +150,9 @@ function renderTray(L, q, me, actor) {
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
   me.idols.forEach((d, k) => { ex += `<button type="button" class="tag${d.used ? ' used' : ''}" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'Set' : 'Idol'}</span></button>`; });
-  $('#extra').innerHTML = ex; $('#extra').hidden = !ex;
+  (me.asst || []).forEach((a, k) => { const d = V.ASSTBY[a.id]; ex += `<button type="button" class="tag asst${a.ex ? ' used' : ''}${a.gold ? ' gold' : ''}" data-a="asst" data-k="${k}" aria-label="${esc(d.name)}${a.gold ? ' (gold)' : ''}${a.ex ? ', resting until next round' : ', ready'}"><span class="ic aic">A</span><span>${esc(d.name.split(' ')[0])}</span></button>`; });
+  (me.tv || []).forEach(t => { ex += `<span class="tag tvc" aria-label="${V.TNAME[t]} of travel, this turn only"><span class="ic">${ic(t)}</span><span>${V.TNAME[t]} now</span></span>`; });
+  $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex);
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
   $('#hand').classList.toggle('many', me.hand.length > 5);
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
@@ -170,12 +172,18 @@ function selInfo(S) {
     const pay = payWords(VG.payPlan(G, UI.view, x.cost));
     if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
     return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
-  if (S.k === 'track') { if (!ms.length) return { t: 'Research: you cannot pay the next row yet.' }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
+  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
   return { t: '' };
+}
+function trackWhy() {   /* why the research path cannot climb now: the missing goods, in words */
+  const me = G.p[UI.view], miss = c => { const o = {}; Object.keys(c).forEach(k => { if ((me.res[k] || 0) < c[k]) o[k] = c[k] - (me.res[k] || 0); }); return o; };
+  if (me.glass >= V.TOP) { const t = V.TEMPLE.find((x, k) => G.temple[k] > 0); return t ? 'Temple tile: you need ' + resWords(miss(t.cost)) + ' more.' : 'No temple tiles left.'; }
+  return 'Next row costs ' + resWords(V.TRACK[me.glass + 1].cost) + '. You need ' + resWords(miss(V.TRACK[me.glass + 1].cost)) + ' more.';
 }
 function payWords(pl) {
   if (!pl) return ''; const me = G.p[UI.view], cards = pl.cards.map(i => V.CARDS[me.hand[i]].name), list = cards.length > 1 ? cards.slice(0, -1).join(', ') + ' and ' + cards[cards.length - 1] : cards[0];
-  return (cards.length ? 'You pay with ' + list + '.' : '') + (pl.coins ? (cards.length ? ' Plus ' : 'You pay ') + pl.coins + ' coins for a Plane.' : '') || 'No travel to pay.';
+  const extra = ((pl.tv || []).length ? ' Your travel token pays too.' : '') + ((pl.boons || []).length ? ' A guardian boon pays too.' : '');
+  return ((cards.length ? 'You pay with ' + list + '.' : '') + (pl.coins ? (cards.length ? ' Plus ' : 'You pay ') + pl.coins + ' coins for a Plane.' : '') + extra).trim() || 'No travel to pay.';
 }
 function trackLine(m) {
   const me = G.p[UI.view];
@@ -187,14 +195,16 @@ function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) retur
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return 'Your turn: one action. Tap or drag what glows.' + best;
+  return 'Your turn: one main action. Starting cards are free. Tap or drag what glows.' + best;
 }
-function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
+function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.', asst: (G.p[UI.view].apend > 0 ? 'Hire an assistant. Once a round, free.' : 'Upgrade an assistant to gold.'), tbon: 'You found the temple! Take a bonus tile.' }[q.h] || 'Choose.'; }
 function qHTML(q) {
   const ms = VG.moves(G), p = G.p[UI.view];
   if (q.h === 'exile') return `<div class="qcards">${ms.filter(m => m.v).map(m => { const id = (m.v.z === 'hand' ? p.hand : m.v.z === 'play' ? p.play : p.disc)[m.v.i]; return cardHTML(id, { glow: id === 'dread' }).replace('<button type="button" class="cd', `<button type="button" data-a="mv" data-m="${mvIndex(m)}" class="cd`); }).join('')}</div>${mvBtn({ t: 'ans', v: null }, 'Skip', 'alt')}`;
   if (q.h === 'or') return `<div class="qchoices">${q.d.opts.map((o, i) => { const m = ms.find(x => x.v === i); const t = o.length ? esc(V.opText(o).replace(/^./, c => c.toUpperCase())) : 'Nothing'; return m ? mvBtn(m, t, 'go') : `<button type="button" class="btn" disabled>${t} (cannot pay)</button>`; }).join('')}</div>`;
   if (q.h === 'buy' || q.h === 'site') return mvBtn({ t: 'ans', v: null }, 'Skip', 'alt');
+  if (q.h === 'tbon') return `<div class="qchoices">${ms.map(m => mvBtn(m, esc('Bonus: ' + V.resText(V.TBONUS[G.tb[m.v.b]]) + '.'), 'go')).join('')}</div>`;
+  if (q.h === 'asst') return `<div class="qchoices">${ms.map(m => { if (m.v.g != null) { const d = V.ASSTBY[G.aSt[m.v.g][0]]; return mvBtn(m, esc(d.name + ': ' + V.opText(d.s) + (d.main ? ' (your action)' : '') + '.'), 'go'); } const a = p.asst[m.v.u], d = V.ASSTBY[a.id]; return mvBtn(m, esc('Gold ' + d.name + ': ' + V.opText(d.gd) + '.'), 'go'); }).join('')}</div>`;
   return '';
 }
 function readMs(t, ms) { return Math.max(ms || 0, 4000 + 100 * String(t || '').split(/\s+/).filter(Boolean).length); }   /* 4 s + 1 s per 10 words, never less */

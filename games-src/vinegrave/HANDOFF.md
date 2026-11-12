@@ -1,3 +1,26 @@
+# FIXED2 r2 (12 Nov 2026): research assistants
+- Engine (src/engine.js "research assistants", data V.ASST): 8 helpers, 3 face up; magnifier arriving on row 2 or 5 hires one (question
+  h:'asst'), notebook arriving there turns one gold; free move {t:'asst',k} once a round, rests until round end; max 2 (a third hire upgrades).
+  Assistant shuffle uses its own seeded stream so older seeds play exactly as before. logic-test L1-L10; rules-test answers the hire question.
+- AI values each assistant's remaining uses; Easy noise 4.0 (newbie-sim: glow 62%, sensible 54%). Tray tags (44px, 14px), track rows marked A,
+  reference drawer section, tutorial steps g-asst..g-asst3 (30 steps, 4 Next-only). Still missing: see rules-notes.md "Still missing".
+
+# FIXED2 (8 Nov 2026, R2 review 5.6): hands-on tutorial, Easy tuned, phone labels
+- Tutorial: every rule done by hand (TUTORIAL-COVERAGE.md top); Skip/finish makes Play the primary button.
+- Easy rival noise 1.6 -> 2.6 (src/ai.js). `node newbie-sim.js` = Easy vs glow-follower / sensible / random new players (headless).
+  Every move's caption adds the points it made ("Tamsin buys a temple tile. +6 points.").
+- Pass stays when the selection has no action; research you cannot pay says the missing goods (src/ui1.js trackWhy). "You are choosing".
+- Phone (style.css FIXED2 block): market 3x2 with effect words, site name labels hidden on phone (the tap line names them), signs and
+  track numbers 14px, Research sign inside the track, short phones get smaller hand art. touch-test FULL prints the final score.
+# G2 fix (8 Nov 2026): review G2-gameplay 5.9 FAIL fixes (not deployed)
+- Rule: starting coin / compass cards (t:'basic') are FREE actions (engine.js apply + moves `free:true`); logic-test B1/B2/B3/B11/H1 updated, H1b/H1c added (112/112).
+- Tutorial: g-play steps say "Starting cards are free"; g-turn = one main action; new g-plane (2 coins = any icon), g-deep (6 compasses), Jeep/Boat pay Boot;
+  g-res2 spotlights and names the Climb button (was a dead "Tap again"). Guided steps: only the target glows (ui4 interval adds .gq to other glows).
+- Default rival = easy (UI.opts.lvl); easy noise 1.6 -> 2.6. `node bench-newplayer.js 200 easy`: sensible new player wins 52% (was 34%; normal 26%).
+- Phone: site names, research label, Camp/Ruins signs 14px (were 11px); map sites moved up so camp labels stay on the map; hand fits at 375x667.
+- guided-tut-test now also checks every highlighted target answers ONE tap (waits out the tutor's 600 ms ghost-tap guard like a person).
+- Left: market cards on the board still show icons only (no words) at phone size.
+
 # W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
 - Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,
   tidewake (`python3 reuse-art.py`; table in ASSETS.md). Guardians renamed to match their new figures (data.js GU names).
