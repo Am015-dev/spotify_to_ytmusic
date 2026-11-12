@@ -354,7 +354,10 @@ html.short #sc .tr span:nth-child(2){display:none}
 /* crew rows: name plate beside the wires instead of above them (small portrait screens) */
 #crew.rowy .sg{flex-direction:row;align-items:center;justify-content:center;gap:4px}
 #crew.rowy .sg .plate{flex:none;max-width:84px}
-#crew.rowy .plate b{max-width:38px}
+/* rowy plates: the avatar dot gives its room to the name, so a 4-6 letter name reads in full */
+#crew.rowy .plate .pdot{display:none}
+#crew.rowy .sg .plate{flex-wrap:wrap;justify-content:center;align-content:center;height:auto;min-height:44px;width:68px;max-width:68px;padding:3px 4px;row-gap:1px;column-gap:4px;box-sizing:border-box}
+#crew.rowy .plate b{flex:0 0 100%;max-width:none;text-align:center;font-size:14px;line-height:16px}
 #crew.rowy .plate .pbot{display:none}
 #crew.rowy .stand{flex:1 1 0;min-width:0}
 /* short portrait screens (< 600 px tall, tbl.js zoomLayout): the zoomed crewmate has full-size wires; the others are compact rows.
@@ -372,8 +375,9 @@ html.short #sc .tr span:nth-child(2){display:none}
 #crew.zm .sg.cmp .stl,#crew.zm .sg.cmp .rtn,#crew.zm .sg.cmp .tile .nt,#crew.zm .sg.cmp .tile small,#crew.zm .sg.cmp .tile .wr{display:none}
 #crew.zm .sg.cmp .tile{border-width:1.5px;border-radius:4px;box-shadow:none;animation:none;pointer-events:none}
 #crew.zm .sg.cmp .tile.back::before{display:none}
-#crew.zm .sg.cmp .tile .f{font-size:calc(var(--tw)*.6)}
-#crew.zm .sg.cmp .tile .coin{min-width:13px;height:13px;bottom:1px;font-size:8px!important;line-height:10px;border-width:1px;padding:0 1px}
+#crew.zm .sg.cmp .tile .f{font-size:max(14px,calc(var(--tw)*.6))}
+/* a compact chip's info token fills the chip: its number reads at 14 px */
+#crew.zm .sg.cmp .tile .coin{min-width:0;width:auto;height:auto;left:1px;right:1px;top:1px;bottom:1px;transform:none;display:flex;align-items:center;justify-content:center;font-size:14px!important;line-height:1;border-width:1px;border-radius:3px;padding:0}
 #crew.zm .sg.cmp .tile .coin+.coin{display:none}
 #crew.zm .sg.cmp .side{transform:scale(.7);transform-origin:left center}
 #crew.zm .sg.zx{flex:none;flex-direction:row;align-items:center;justify-content:center;gap:4px}
@@ -395,4 +399,9 @@ html.short #sc .tr span:nth-child(2){display:none}
 /* tight compact rows: still-crowded short screens */
 #crew.zm.tight .sg.cmp{min-height:34px;padding-top:1px;padding-bottom:1px}
 #crew.zm.tight .sg.cmp .plate{height:28px}
+/* screens 600 px tall or more: a tight compact row is still one 44 px tap target */
+@media (min-height:600px){#crew.zm.tight .sg.cmp{min-height:44px}}
+/* a plate that glows (tap a crewmate: probe, gear) is a 44 px target in the zoom layout too */
+#crew.zm .sg.cmp .plate.glow,#crew.zm.tight .sg.cmp .plate.glow{height:44px}
+#crew.zm .sg.zx .plate.glow,html.sk-plate #crew.zm .sg.zx .plate.glow{width:44px;min-height:44px;max-height:none}
 #crew.zm .sg.cmp .tile{min-width:22px}
