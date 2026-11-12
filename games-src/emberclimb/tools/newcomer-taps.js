@@ -62,7 +62,7 @@ const VW = +(process.env.VW || 390), VH = +(process.env.VH || 844), RUNS = +(pro
       if (s.scr === 'rest') { await T('#rest-heal'); continue; }
       if (s.scr === 'shop') { const b = await byText('#app button', /^(Leave|Continue|Walk on|Move on)/i); if (b) await T(b); continue; }
       if (s.scr === 'event') {
-        const dc = await pg.$$eval('.card', ns => ns.map((n, i) => (!n.closest('#app') && n.offsetParent) ? i : -1).filter(i => i >= 0)).catch(() => []);   // R24: the upgrade picker opens in a drawer outside #app
+        const dc = await pg.$$eval('.card', ns => ns.map((n, i) => ((!n.closest('#app') && n.offsetParent) || (n.closest('.ov') && n.getBoundingClientRect().height > 0)) ? i : -1).filter(i => i >= 0)).catch(() => []);   // R24: the upgrade picker opens in a drawer outside #app
         if (dc.length) { const all = await pg.$$('.card'); await T(all[dc[Math.floor(r() * dc.length)]]); await sleep(300); const ok2 = await byText('button', /^(Upgrade|Confirm|Choose|Pick)/i); if (ok2) await T(ok2); continue; }
         const os = await pg.$$('.opts .btn:not([disabled])'); if (os.length) { await T(os[Math.floor(r() * os.length)]); continue; }
         const b = await byText('#app button', /^(Leave|Continue|Walk on|Move on)/i) || await pg.$('#app button.btn'); if (b) { await T(b); continue; }
