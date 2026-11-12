@@ -2,7 +2,7 @@
    hot-seat, scoring pops, result screen, save/resume. Story = campaign.js, tutorial = tutor.js, help + bulb = help.js. */
 var G = null, AIDELAY = 650, ANIM = true;
 var UI = { view: 0, mode: 'quick', ghost: null, free: null, wipe: null, undo: null, pan: { z: 1, tx: 0, ty: 0 }, panT: null, userPan: 0, lit: null, busy: false, camp: null, humans: 1, cfg: null, prefs: {} };
-var SZ = 40, SQ3 = Math.sqrt(3);
+var SZ = 40, SQ3 = Math.sqrt(3), ZMIN = 47 / (SQ3 * (SZ - 1));   // smallest auto-fit zoom: a hex is 47 px wide (44 px tap rule + margin)
 function $(s, r) { return (r || document).querySelector(s); }
 function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -18,7 +18,7 @@ function toastPlace(e) {   // in play, toasts sit at the bottom of the valley, j
 function toast(t, ms) { if (G && !G.over && !hintsOn() && $('#start').hidden) return; var e = $('#toast'); if (document.querySelector('.gx-drawer.on, .gx-drawer[aria-hidden="false"]')) return; e.textContent = t; toastPlace(e); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { e.classList.remove('on'); }, ms || 2200); }
 // ---------------------------------------------------------------- sound (synth; music slots via gx-music when files exist)
 var SND = { ctx: null };
-function hintsOn() { return UI.mode === 'coach' || !!UI.prefs.hints; }   // A7: Play is clean unless the top-bar Hints switch is on
+function hintsOn() { return UI.mode === 'coach' || UI.prefs.hints !== 0; }   // G5: hints (goal chips + point previews) are on until the player switches them off
 function hintsSync() { var on = hintsOn(); document.documentElement.classList.toggle('wm-clean', !on); var b = document.getElementById('hintsB'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); var l = b.querySelector('span'); if (l) l.textContent = on ? 'Hints on' : 'Hints'; } }
 function sfxVol() { try { var p = GX.pref ? GX.pref() : {}; return (p.master == null ? 1 : p.master) * (p.sfx == null ? 0.8 : p.sfx); } catch (e) { return 0.8; } }
 function sfx(kind) {
@@ -56,7 +56,7 @@ function tileSvg(tile, x, y, s, rot, opt) {
 function seatHuman(i) { return G && !G.seats[i].ai; }
 function meSeat() { if (!G) return 0; if (UI.humans > 1) return seatHuman(G.cur) ? G.cur : UI.lastHuman || 0; return 0; }
 function newGame(cfg) {
-  cfg = Object.assign({ np: 2, ai: 'normal', humans: 1, seed: null, turns: 20 }, cfg || {});
+  cfg = Object.assign({ np: 2, ai: 'gentle', humans: 1, seed: null, turns: 20 }, cfg || {});
   var ai = [], names = [];
   for (var i = 0; i < cfg.np; i++) { ai.push(i < cfg.humans ? null : (cfg.lvBy && cfg.lvBy[i]) || cfg.ai); names.push(i < cfg.humans ? (cfg.humans > 1 ? 'Ranger ' + (i + 1) : 'You') : (cfg.names && cfg.names[i]) || WM.RIVALS[(i - cfg.humans) % WM.RIVALS.length]); }
   if (cfg.humans === 1) names[0] = 'You';
@@ -92,7 +92,8 @@ function autoTok() {   // one legal target for the animal, and it costs nothing:
   UI.autoT = setTimeout(function () { if (G && myTurn() && G.stage === 'tok' && G.cur + ':' + G.seats[G.cur].done === key) act({ t: 'tok', c: sp[0] }); }, 650);
 }
 // turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
-function banner(t) { var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+function banner(t) { var wait = UI.popAt ? 1100 - (Date.now() - UI.popAt) : 0; if (wait > 0) { clearTimeout(banner.t); banner.t = setTimeout(function () { banner(t); }, wait); return; }   // G5: a score pop is showing: the banner waits so the two never overlap
+  var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
 function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join('/'); }
 // the rival's turn, step by step (take -> place -> settle), each with a caption on the instruction bar; tap anywhere to speed it up
 function aiStep() {
@@ -158,7 +159,7 @@ function popAt(list) {   // the first visible chip in the list (score chip, seat
   (list || []).concat(['#barstat']).some(function (q) { var e = document.querySelector(q); if (!e) return false; var r = e.getBoundingClientRect(); if (!r.width || !r.height || getComputedStyle(e).display === 'none') return false; popAt.e = e; popAt.r = r; return true; });
   return popAt.r;
 }
-function pop(c, text, cls, anchors) {   // score pops sit ON the score chip they change (never over the tiles) and the chip bumps
+function pop(c, text, cls, anchors) { UI.popAt = Date.now();   // score pops sit ON the score chip they change (never over the tiles) and the chip bumps
   var r = popAt(anchors), el = popAt.e, key = (anchors || []).join(); if (!r) return;
   $$('.pop').forEach(function (o) { if (o.dataset.anc === key) o.parentNode.removeChild(o); });
   var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.dataset.anc = key; e.style.top = Math.round(r.top + r.height / 2) + 'px';
@@ -209,12 +210,19 @@ function confirmPlace() { if (!UI.ghost || !tutOK({ what: 'ok' })) return; act({
 function undoTake() { if (!UI.undo || !tutOK({ what: 'undo' })) return; G = UI.undo; UI.undo = null; UI.ghost = null; sfx('tap'); render(); fitView(); }
 // ---------------------------------------------------------------- pan and zoom
 function boardWH() { var b = $('#board'); return [b.clientWidth || 390, b.clientHeight || 500]; }
+function overlayPads() {   // G5: fit between the chips really on screen at the top and the step line at the bottom (sizes differ per phone and mode)
+  var bd = $('#board'); if (!bd || !bd.getBoundingClientRect) return null; var B = bd.getBoundingClientRect(); if (!B.height) return null;
+  var top = 8, bot = 8; ['#cards', '#seats', '#terr', '#acorn', '#coachb'].forEach(function (q) { var e = $(q); if (!e || e.hidden) return; var r = e.getBoundingClientRect(); if (!r.height || r.top > B.top + B.height / 2) return; top = Math.max(top, r.bottom - B.top + 6); });
+  ['#line', '#acts'].forEach(function (q) { var e = $(q); if (!e || e.hidden) return; var r = e.getBoundingClientRect(); if (!r.height || r.bottom < B.top + B.height / 2 || r.top > B.bottom) return; bot = Math.max(bot, B.bottom - r.top + 6); });
+  return [top, bot];
+}
 function fitView(now) {
   if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
   var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
   // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
+  var wh = boardWH(), op = overlayPads(), padT = op ? op[0] : (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = op ? op[1] : 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
   var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
+  z = Math.max(z, ZMIN);   // G5: never fit so small that a spot is under 44 px; a big valley pans instead (drag)
   var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
   if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
   var f = Object.assign({}, UI.pan), t0 = performance.now(), D = 380;
@@ -237,6 +245,8 @@ function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(2.6, p.z
   function up(e) { if (e.pointerId in pts) { delete pts[e.pointerId]; start = Object.keys(pts).length ? { p: Object.assign({}, UI.pan), pts: JSON.parse(JSON.stringify(pts)) } : start; if (!Object.keys(pts).length) setTimeout(function () { start = null; }, 0); } }
   document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
   document.addEventListener('wheel', function (e) { if (!e.target.closest || !e.target.closest('#map')) return; e.preventDefault(); var p = svgXY(e); zoomAt(e.deltaY < 0 ? 1.12 : 1 / 1.12, p[0], p[1]); UI.userPan = Date.now(); }, { passive: false });
+  // G5: a listener on the map itself marks it tappable, so the browser's touch adjustment never moves a tap near the top chips onto them
+  var mp = $('#map'); if (mp) mp.addEventListener('click', function () { });
   document.addEventListener('click', function (e) {
     var m = e.target.closest && e.target.closest('#map'); if (!m) return; if (moved) { moved = false; return; }
     var hx = e.target.closest('[data-c]'); if (!hx) return; onCell(hx.getAttribute('data-c'), hx.classList.contains('spot'));
@@ -256,7 +266,7 @@ function drawMap() {
     out += '<g class="hx' + (tgt ? ' tgt' : '') + (lit.indexOf(c) >= 0 ? ' lit' : '') + (pvl.indexOf(c) >= 0 ? ' pvlit' : '') + (brk.indexOf(c) >= 0 ? ' pvbrk' : '') + (isLast ? ' last' : '') + (an1 && an1.c === c && an1.k === 'drop' ? ' drop' : '') + '" data-c="' + c + '">' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, map: 1, hop: an1 && an1.c === c && an1.k === 'hop' }) + (tgt ? '<polygon class="ring" points="' + poly(p[0], p[1], SZ - 4, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>';
   });
   if (mine && G.stage === 'tile') {
-    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>'; if (hon) bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
+    WM.spots(env).forEach(function (c) { if (UI.ghost && UI.ghost.c === c) return; var p = pix(c); out += '<polygon class="spot' + (UI.hov === c ? ' hov' : '') + '" data-c="' + c + '" points="' + poly(p[0], p[1], SZ - 1, [0, 1, 2, 3, 4, 5]) + '"/>'; if (hon) bad += pvBadge(p[0], p[1], pvSpotBest(env, c), c, 1); });
     if (UI.ghost) { var p = pix(UI.ghost.c); out += '<g class="ghost" data-c="' + UI.ghost.c + '">' + tileSvg(G.hold.tile, p[0], p[1], SZ - 1, UI.ghost.rot) + '<polygon class="gring" points="' + poly(p[0], p[1], SZ + 2, [0, 1, 2, 3, 4, 5]) + '"/></g>'; }
   }
   var wh = boardWH();
@@ -323,14 +333,14 @@ function renderDock() {
   if (G.stage !== 'pick') UI.acornMenu = false;
   if (myTurn() && hintsOn() && UI.mode !== 'tutorial' && UI.mode !== 'coach' && !UI.wipe && !UI.free && !UI.acornMenu && !(G.stage === 'tile' && UI.ghost)) a += '<button type="button" class="ab whatB" id="whatB">What should I do?</button>';
   $('#acts').innerHTML = a;
-  $('#acorn').innerHTML = '<span class="acn" title="Acorns: 1 point each at the end, or spend one for a free pick or new animals">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></span>';
+  $('#acorn').innerHTML = '<button type="button" class="acn" id="acornCt" aria-label="Acorns: ' + G.seats[UI.view].acorns + '. Tap for what they do">' + mkTok('acorn') + '<b>' + G.seats[UI.view].acorns + '</b></button>';
 }
 function lineText() {
   if (!G) return '';
   if (G.over) return 'Season over';
   if (UI.showAI && UI.view === UI.showAI.seat) return UI.showAI.text;
   var s = G.seats[G.cur];
-  if (UI.view !== G.cur && !s.ai) return '';
+  if (UI.view !== G.cur && !s.ai) return (UI.view === meSeat() ? 'Your valley' : G.seats[UI.view].name + "'s valley") + ': tap ' + (G.cur === meSeat() ? 'You' : G.seats[G.cur].name) + ' to go back to the turn';
   if (UI.view !== meSeat() && !myTurn()) return G.seats[UI.view].name + "'s valley. Tap You to return";
   if (s.ai) return s.name + ' is choosing';
   if (G.stage === 'pick') return UI.wipe ? 'Tap the animals to replace, then Replace' : UI.free ? (UI.free.ti == null ? 'Acorn: pick any tile' : 'Now pick any animal') : 'Step 1 of 3: drag or tap a tile + animal pair';
@@ -442,18 +452,18 @@ function showBig(kind, obj, tok) {
   }, { passive: false });
   function end(e) {
     if (!d || e.pointerId !== d.id) return; var D = d; d = UI.drag = null; if (!D.on) return;
-    eatUntil = Date.now() + 250; var c = e.type === 'pointerup' ? spotAt(e.clientX, e.clientY - LIFT) : null; if (D.f && D.f.parentNode) D.f.parentNode.removeChild(D.f); UI.hov = null;
+    eatUntil = Date.now() + 80; var c = e.type === 'pointerup' ? spotAt(e.clientX, e.clientY - LIFT) : null; if (D.f && D.f.parentNode) D.f.parentNode.removeChild(D.f); UI.hov = null;
     if (c && G && G.stage === 'tile') onCell(c, true); else if (G) render();
   }
   document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
   document.addEventListener('click', function (e) { if (Date.now() < eatUntil) { eatUntil = 0; e.stopImmediatePropagation(); e.preventDefault(); } }, true);   // only the one click the drag gesture itself makes
 })();
 (function wireHold() {
-  var t = null, held = false;
-  document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#mk .mt, #mk .mk'); if (!b || !G) return; held = false; clearTimeout(t);
-    t = setTimeout(function () { var i = +b.dataset.i; held = true; if (b.classList.contains('mt')) { if (G.market.tiles[i]) showBig('tile', G.market.tiles[i]); } else if (G.market.toks[i]) showBig('tok', G.market.toks[i]); }, 520); });
+  var t = null, held = false, sx = 0, sy = 0;
+  document.addEventListener('pointerdown', function (e) { var b = e.target.closest && e.target.closest('#mk .mt, #mk .mk'); if (!b || !G) return; held = false; clearTimeout(t); sx = e.clientX; sy = e.clientY;
+    t = setTimeout(function () { if (UI.drag && UI.drag.on) return; var i = +b.dataset.i; held = true; if (b.classList.contains('mt')) { if (G.market.tiles[i]) showBig('tile', G.market.tiles[i]); } else if (G.market.toks[i]) showBig('tok', G.market.toks[i]); }, 520); });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) { document.addEventListener(ev, function () { clearTimeout(t); }, true); });
-  document.addEventListener('pointermove', function () { if (UI.drag && UI.drag.on) clearTimeout(t); }, true);
+  document.addEventListener('pointermove', function (e) { if ((UI.drag && UI.drag.on) || Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 10) clearTimeout(t); }, true);   // a drag is not a long press
   document.addEventListener('click', function (e) { if (held && e.target.closest && e.target.closest('#mk')) { held = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
   document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('#mk')) e.preventDefault(); });
 })();
@@ -470,6 +480,10 @@ function whyLine(sc, me) {   // one short line: why you won or lost (the biggest
   var p = parts[0]; if (!p.d) return '<p class="why">Neck and neck with ' + esc(nm) + ' in every column.</p>';
   return '<p class="why">' + (win ? 'You beat ' + esc(nm) + ' most on ' : esc(nm) + ' beat you most on ') + p.t + ' (you first).</p>';
 }
+function standHTML(sc, me) {   // final totals up top, winner first
+  var ord = sc.map(function (x, i) { return i; }).sort(function (a, b) { return (sc[b].total * 100 + sc[b].acorns) - (sc[a].total * 100 + sc[a].acorns); });
+  return '<ol class="stand">' + ord.map(function (i, r) { return '<li class="' + (r === 0 && G.winner !== -2 ? 'w' : '') + (i === me ? ' me' : '') + '"><span>' + esc(i === me ? 'You' : G.seats[i].name) + '</span><b>' + sc[i].total + '</b></li>'; }).join('') + '</ol>';
+}
 function showResult() {
   if (!G || !G.over || UI.resultShown === G.seed + ':' + G.logN) return; UI.resultShown = G.seed + ':' + G.logN;
   sfx('end'); save(); musicSync(); $('#toast').classList.remove('on');
@@ -477,19 +491,19 @@ function showResult() {
   if (G.solo) { var best = UI.prefs.best || 0; title = 'You scored ' + sc[0].total + (UI.mode === 'quick' && sc[0].total > best ? ': new best!' : best ? ' (best ' + best + ')' : ''); if (UI.mode === 'quick' && sc[0].total > best) { UI.prefs.best = sc[0].total; savePrefs(); } } else if (G.winner === -2) title = 'A shared win'; else title = (G.winner === me && UI.humans === 1 ? 'You win!' : G.seats[G.winner].name + ' wins!');
   var rs = $('#rs'); rs.hidden = false;
   var camp = UI.mode === 'camp' && window.GXC && GXC.active();
-  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div>' + scoresHTML() + '</div>';
+  rs.innerHTML = '<div class="rbox" data-art="' + (G.winner === 0 || G.solo ? 'result-win' : 'result-lose') + '"><h2 class="rbig">' + esc(title) + '</h2>' + standHTML(sc, me) + quickLine() + (typeof coachFinalHTML === 'function' ? coachFinalHTML() : '') + whyLine(sc, me) + '<div class="rbtn">' + (camp ? '<button type="button" class="big" id="campCont">Continue</button>' : '<button type="button" class="big" id="againB">Play again</button><button type="button" class="ab" id="titleB">Title</button>') + '</div>' + scoresHTML() + '</div>';
   try { if (!camp && window.GNS && GNS.result) GNS.result({ game: 'wildmark', mode: UI.mode === 'tutorial' || UI.mode === 'coach' ? 'tutorial' : G.solo ? 'solo' : 'vs', seats: G.seats.map(function (s, i) { return { name: s.name, me: i === 0, ai: s.ai || undefined }; }), winner: G.winner, scores: sc.map(function (x) { return x.total; }), turns: G.turns }); } catch (e) { }
   if (typeof coachEnd === 'function') coachEnd();
 }
 // ---------------------------------------------------------------- title + setup
 function showTitle() {
   clearTimeout(UI.aiT); UI.mode = 'quick'; UI.camp = null; try { GX.close(); } catch (e) { } $('#rs').hidden = true; $('#pass').hidden = true;
-  var st = $('#start'), sv = loadSave(), c = UI.setup || (UI.setup = { opp: 1, ai: 'normal', humans: 1 });
+  var st = $('#start'), sv = loadSave(), c = UI.setup || (UI.setup = { opp: 1, ai: 'gentle', humans: 1 });
   st.hidden = false; st.classList.toggle('front', UI.sv !== 'setup'); document.documentElement.classList.add('wm-title');
   if (UI.sv === 'setup') {
     var seg = function (id, list, cur) { return '<div class="seg" data-k="' + id + '">' + list.map(function (o) { return '<button type="button" class="sg' + (o[0] === cur ? ' on' : '') + '" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>'; };
     st.innerHTML = '<div class="tbox"><h1 class="logo">Wildmark</h1><div class="lbl">Rival rangers</div>' + seg('opp', [[0, 'Solo'], [1, '1'], [2, '2'], [3, '3']], c.opp) +
-      '<div class="lbl">Rival skill</div>' + seg('ai', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
+      '<div class="lbl">Rival skill</div>' + seg('ai', [['gentle', 'Gentle'], ['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], c.ai) +
       '<div class="lbl">Players on this device</div>' + seg('humans', [[1, '1'], [2, '2'], [3, '3'], [4, '4']], c.humans) +
       '<div class="lbl">Variant cards (house tables)</div>' + seg('cards', [['a', 'Off'], ['mix', 'On']], c.cards || 'a') +
       '<p class="sum">' + esc(setupSum(c)) + '</p><button type="button" class="big" id="goB">Start</button><button type="button" class="ab" id="backT">Back</button></div>';
