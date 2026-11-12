@@ -83,3 +83,11 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Plan line: "Corner 5 in 4: speed 5 or less is safe." (planAdvice); hints off still shows corner burn / spin.
 - Podium line fits the race (spins / heat / shift sooner); 375 result card compact (no scrolling under the buttons).
 - Tests: newcomer-touch.js (R19 gate, shots in playable-shots/r19/), tut-test.js now counts ignored taps.
+
+## R24 fix (planning camera, boost odds, phone-check)
+- Cause of "trees, no car" at 375: the camera eased per frame from the last rival's car, so the first 0.3-1 s of planning (and any
+  resize of the board when the panel redraws, which reset the zoom) showed the old spot. Now planFor cuts straight to the plan frame
+  (camToPlan), a resize while planning re-frames, and easing is time-based. Frame also leaves 50 px for the message pill.
+- Boost question: plan line "Boost +1 to +4: spin-out risk 25%." from the speed cards left in your deck; the Suggested badge says why
+  ("+3 spaces, safe at limit 5" / "50% spin: corner in 3, limit 4").
+- Gate: plan-cam-touch.js (car box inside the board at t+0, +250, +600 ms of every planning decision).
