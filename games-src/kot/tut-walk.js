@@ -38,6 +38,8 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     }
     if (st.wait === 'tap' && st.hole) {
       const hs = st.holes && st.holes.length ? st.holes : [st.hole]; const h = hs[Math.min(st.count || 0, hs.length - 1)];
+      // R7: after one die is kept, the strong ring (first hole) must move to the die still to keep, never stay on the kept one
+      if (st.id === 'keep' && st.count === 1) { const kept = await p.evaluate(h => { const e = document.elementFromPoint(h.cx, h.cy); const d = e && e.closest('[data-die]'); return d ? !!G.dice[+d.dataset.die].k : null }, hs[0]); if (kept !== false) bad.push('step keep: the strong ring stays on the kept die'); if (SH) await p.screenshot({ path: `${SH}/tut-keep-second.png` }) }
       await p.touchscreen.tap(h.cx, h.cy); await L.sleep(450);
     } else if (!st.wait) { await L.sleep(650); const nb = await p.evaluate(() => { const e = document.querySelector('.gxt-next'); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null }); if (nb) await p.touchscreen.tap(nb[0], nb[1]); await L.sleep(400) }
     else await L.sleep(300);
