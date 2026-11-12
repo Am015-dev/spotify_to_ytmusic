@@ -73,7 +73,7 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&tutPlace()&&a.id===tutPlace()[0]},ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
  {id:'place1b',title:'Where it fights',say:'Tap the Uplands. It stays hidden until the fight.',target:tutReg(0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===0},ready:()=>tkind('place')&&tutPlaced()===0&&tutPlace()&&UI.hand===tutPlace()[0]},
- {id:'place2',title:'Your Heir',say:'Your Heir is strongest. Tap the Tablelands, where your Herald is.',target:tutReg(1),also:()=>tutHandRect(p2||0),
+ {id:'place2',title:'Your Heir',say:'Your Heir card is your strongest. Hide it in the Tablelands, where your Herald stands.',target:tutReg(1),also:()=>tutHandRect(p2||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===1},ready:()=>tkind('place')&&tutPlaced()===1&&!!tutPlace()&&(p2=tutPlace()[0],tutSelect(p2))},
  {id:'place3',title:'Last card',say:'Last card: tap the Sinks.',target:tutReg(2),also:()=>tutHandRect(p3||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===2},ready:()=>tkind('place')&&tutPlaced()===2&&!!tutPlace()&&(p3=tutPlace()[0],tutSelect(p3))},
@@ -115,7 +115,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
 // Learn to play = the spotlight steps above on a staged one-round game; it ends by handing over a real (guided, 5-round) game. UI.cfg.coachTut=true brings back the old coached game.
 function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window.tbCoachStart)window.tbCoachStart(o);return}
   const pro=!!(o&&o.prologue);
-  GXT.start({game:TUT_GAME,steps:tutSteps(),endTitle:'You know the rules',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
+  GXT.start({game:TUT_GAME,steps:tutSteps().map(st=>{const oe=st.onEnter;st.onEnter=function(){if(oe)oe.apply(this,arguments);try{if(window.tbStripPaint)window.tbStripPaint()}catch(e){}};return st}),endTitle:'You know the rules',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
     endButtons:pro&&window.CAMPAIGN?[{id:'chapter',label:'Start chapter 1'}]:null,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     setup:()=>{try{GX.close()}catch(e){}try{GXC.close()}catch(e){}try{hideStart()}catch(e){}try{hideGloss()}catch(e){}closePop(true);newGame('tutorial');UI.coachOn=0;try{clearVoice()}catch(e){}renderAll()},
     onDone:r=>{const c=r&&r.choice;tutLeave();
