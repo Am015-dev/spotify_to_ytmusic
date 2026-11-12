@@ -1,50 +1,39 @@
-# Perch & Plume: tutorial coverage (coached first game)
+# Perch & Plume: tutorial coverage (guided first game)
 
-The tutorial is a short real game: 1 round of 4 turns against Pip. There are no forced steps; every legal move is yours from
-turn 1. Each turn Aunt Ottilie teaches ONE action in one sentence (turn 1 play a bird, 2 get food, 3 lay eggs, 4 draw birds) and
-points at that action's big button; if you pick another action, the skipped lesson comes next turn. The seed and the hand are set so that:
-- the bird in hand can be paid on turn 1 (seed + 1 egg);
-- 2 forest birds whose brown powers chain when you get food;
-- a pink "between turns" bird on Pip's board.
-After each turn a one-line rating (good, okay or poor, with where the points came from) compares your move with the best-value estimate.
+The tutorial is one short real game: 1 round of 4 turns against Pip, then the score, then a real game. Every core rule is taught
+in order, one step at a time. Each step is one sentence of 12 words or fewer (Aunt Ottilie's bubble, `src/story.js` `STORY.coach`)
+and one highlighted thing to tap (`.tutpoint`). While a step waits, taps elsewhere are blocked and the target pulses. There is no
+"learn later" list: every rule below comes up in every run, because the board, hand, food and feeder are fixed (`src/tutor.js`):
+- 2 forest birds already placed: a tuck-and-draw bird (right) and a store-food bird (left), so the forest chain shows right to left;
+- 1 grassland bird with 1 egg, so the first bird costs 1 egg in space 2;
+- the first bird in hand is a grassland bird with a white (when played) power and a 1-food cost you can pay;
+- a pink "lay an egg when someone lays eggs" bird on Pip's board.
 
-Aunt Ottilie, the story's guide (STORY.md), explains each rule the first time it matters. She also gives one line on a good or
-poor move and on what Pip does. The coach bubble sits in the panel above the instruction bar, so it never covers the board. Only
-one shows at a time, and the x dismisses it. Text: `src/story.js` (`STORY.coach`); logic: `src/coach.js`.
+Proof: `tests/tutorial-end.js phone|small|pc` taps only the highlighted target of each step and checks every step below appears,
+in this order, with one sentence of 12 words or fewer and exactly one highlight, then that the last tap starts a real game.
 
-At the end, the result screen walks your score rule by rule with your real numbers. Rules that never came up are listed in a
-"Things you'll meet later" card. Proof: `tests/tutorial-end.js phone|pc` plays the whole game by choosing any glowing legal move
-through the UI. It asserts that each rule below was explained live or listed under "later", and that the core rules were
-explained live.
+## Steps (rule id = the step; logic: `src/coach.js` TSTEPS)
+1. step `goal`: most points wins; the practice is one short round (tap the score line).
+2. step `turns`: one action per turn; practice has 4 actions, real games 4 rounds (tap the turn tracker).
+3. step `play`: action 1, play a bird (tap Play a bird).
+4. step `cost`: a bird's food cost is paid from your supply (tap the bird).
+5. step `slot`: the leftmost empty space of its habitat (tap the glowing space).
+6. step `pay`: spaces 2-3 cost 1 egg, 4-5 cost 2 (tap Play).
+7. step `white`: a white power works once, when played (tap the new bird).
+8. step `food`: action 2, get food: the forest takes feeder dice (tap Get food).
+9. step `die`: one die = one food (tap a die).
+10. step `die2`: more forest birds = more food (tap a second die).
+11. step `tuck`: brown powers fire right to left; tuck a card (tap a hand card).
+12. step `cache`: tucked cards and stored food are 1 point each (tap the forest row).
+13. step `eggs`: action 3, lay eggs in the grassland (tap Lay eggs).
+14. step `nest`: each egg is 1 point, up to the nest limit (tap a bird, per egg).
+15. step `pink`: pink powers react between turns (tap Pip's chip after Pip's bird laid an egg).
+16. step `cards`: action 4, draw birds in the wetland (tap Draw birds).
+17. step `tray`: tray or deck; the tray refills after the turn (tap a tray card).
+18. step `goalr`: the round goal is scored at round end (tap the round-goal line of the score).
+19. step `bonus`: the secret bonus card scores at the end (tap its line).
+20. step `final`: final score = birds + eggs + goals + bonus + stored food + tucked cards; tie = most food left (tap the total).
+21. step `real`: start a real game (tap Play again).
 
-## Rules -> when Ottilie explains them (rule id = the coach line)
-- [x] rule `welcome`: turn 1 lesson: play a bird (one action per turn). When: your first turn.
-- [x] rule `food`: turn 2 lesson: get food, more forest birds = more food. When: the turn you get food, or as the next lesson.
-- [x] rule `feeder`: feeder dice, one die = one food. When: you first pick dice.
-- [x] rule `feederRoll`: an empty (or all-same) feeder is rolled again. When: the first reroll.
-- [x] rule `chain`: brown powers fire right to left after a row action. When: your forest birds first fire.
-- [x] rule `cache`: cached food and tucked cards are 1 point each. When: your bird first caches or tucks.
-- [x] rule `play`: leftmost free space of a row the bird lives in. When: you first pick a bird.
-- [x] rule `pay`: food cost, any 2 for 1, egg cost by column (0, 1, 1, 2, 2). When: the first pay screen.
-- [x] rule `white`: white powers work once, when played. When: you first play a white-power bird.
-- [x] rule `eggs`: grassland lays eggs, 1 point each. When: your first grassland action.
-- [x] rule `nest`: nest limit. When: the first time you place eggs.
-- [x] rule `cards`: wetland draws birds. When: your first wetland action.
-- [x] rule `tray`: tray or deck; the tray refills after your turn. When: the first draw choice.
-- [x] rule `trade`: bonus-space trades. When: the first trade offer.
-- [x] rule `choice`: a power asking you (tuck, spend an egg, second bird), always skippable. When: the first such question.
-- [x] rule `pink`: pink powers between turns. When: Pip's pink bird (or yours) first fires.
-- [x] rule `rival`: the rival's turn, step by step. When: Pip's first action.
-- [x] rule `reroll`: you may reroll a feeder whose dice all match. When: the first time it happens on your turn.
-- [x] rule `emptyHand`: draw when your hand is empty. When: your hand first runs out.
-- [x] rule `goal`: the round goal is judged at round end. When: the end of round 1.
-- [x] rule `round`: next round has one fewer action, the tray is replaced, the first player moves on. When: the tutorial has 1 round, so this is listed under "Things you'll meet later".
-- [x] rule `final`: final score = birds + eggs + goals + bonus card + cached food + tucked cards. When: the result walk-through.
-- [x] rule `tie`: tie-break is the most unused food. When: the result walk-through.
-
-Rules that depend on luck (feederRoll, cache, trade, choice, reroll, emptyHand, sometimes white or pink) may not come up in a
-given game. Then they appear in "Things you'll meet later" on the result screen, with the same line.
-
-## Story beats
-Ottilie's lines carry the prologue's voice: dawn in the Larchwood, Pip racing you to fill a notebook. The result has her verdict
-on a win or a loss (STORY.tutResult), above the score walk-through.
+Covered by the in-game instruction bar instead of a step (they depend on dice luck in a real game): the bonus-space trades,
+rerolling an all-same feeder, the empty-feeder reroll. The rules drawer explains each.
