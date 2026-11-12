@@ -164,7 +164,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
      h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
      if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
      if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
-     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     else{const rk=recK();h+='<div class="opts">'+mv.slice().sort((a,b)=>(b.k===rk)-(a.k===rk)).map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
      h+='</div>';sheet=true}}
   set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
