@@ -137,16 +137,18 @@ async function helpFlow(p, tag, st, o) {
     return true; }
   return false;
 }
+async function confirmPlace(p) { await sleep(250); const hp = await p.evaluate(() => { const e = document.querySelector('#hplace'); if (!e) return null; const r = e.getBoundingClientRect(); return r.width > 4 && getComputedStyle(e).visibility !== 'hidden' ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; }); if (hp) await tapAt(p, hp.x, hp.y); }   // touch: a tapped square waits for 'Place here'
 // ---------- play one full game ----------
 async function playGame(b, W, H, variant, tag, opt) {
   opt = opt || {}; const p = await newPage(b, W, H); const hst = { seen: new Set() }; let steps = 0, rotated = false, lastSig = '', lastT = Date.now(), maxStuck = 0;
   try {
     await p.evaluate(v => { UI.speed = 30; UI.first = !!v.first; UI.offered = true; UI.setup.river = !!v.river; UI.setup.ic = !!v.ic; UI.setup.tb = !!v.tb; UI.setup.rivals = v.rivals || 1; UI.setup.lv = v.lv || 'normal'; try { localStorage.removeItem('rv_seen'); } catch (e) { } }, { ...variant, first: opt.first });
-    await p.evaluate(() => showStart()); await p.tap('[data-a=play]'); await sleep(500);
+    await p.evaluate(() => showStart()); await p.tap('[data-a=play]'); await sleep(500); for (let k = 0; k < 4; k++) { const d = await p.$('#modal [data-a=go]:visible, #goalok:visible'); if (!d) break; await d.tap(); await sleep(400); }   // the 'New here?' prompt and the Goal card come first since Addendum 7
     const seen = new Set(); if (opt.tipsOff) await p.evaluate(() => GXH.setEnabled(false));
     for (let it = 0; it < 900; it++) {
       const o = await probe(p); steps++; stat.steps++;
       if (p.errs.length) { await fail(p, tag, 'js-error', p.errs[0]); break; }
+      { const gk = await p.$("#goalok:visible"); if (gk) { await gk.tap(); await sleep(300); continue; } }
       if (o.tw && !o.over) { await sleep(80); continue; }
       for (const m of o.bad) await fail(p, tag, 'check', m);
       if (o.over) break;
@@ -160,7 +162,7 @@ async function playGame(b, W, H, variant, tag, opt) {
         if (o.htile && o.rots > 1 && rnd() < .35) { const r0 = o.rot; await tapAt(p, o.htile.x, o.htile.y); await sleep(350); const o2 = await probe(p); stat.rotates++; if (o2.rot === r0) await fail(p, tag, 'rotate', 'tile did not turn'); if (!o2.glows.length && o2.legalAtRot) await fail(p, tag, 'rotate', 'no glow after turning though ' + o2.legalAtRot + ' legal'); continue; }
         if (!opt.noMid && !rotated && opt.rotate && o.turn > 6) { rotated = true; await p.setViewportSize({ width: H, height: W }); await p.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(900); await probe(p).then(async q => { for (const m of q.bad) await fail(p, tag + '-rot', 'check', m); }); await p.setViewportSize({ width: W, height: H }); await p.evaluate(() => dispatchEvent(new Event('resize'))); await sleep(900); stat.rots++; continue; }
         if (!o.glows.length) { await sleep(200); continue; }
-        const g = pick(o.glows); await tapAt(p, g.x, g.y); stat.places++;
+        const g = pick(o.glows); await tapAt(p, g.x, g.y); stat.places++; await sleep(250); { const hp = await p.evaluate(() => { const e = document.querySelector('#hplace'); if (!e) return null; const r = e.getBoundingClientRect(); return r.width > 4 && getComputedStyle(e).visibility !== 'hidden' ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; }); if (hp) await tapAt(p, hp.x, hp.y); }   // touch: confirm the chosen square
         const dt = await waitChange(p, o.sig, 2500); if (dt < 0) await fail(p, tag, 'dead-tap', 'tap on glow ' + g.x0 + ',' + g.y0 + ' did nothing (rot ' + o.rot + ')');
       } else if (o.step === 'fig') {
         if (o.ghost && (o.hintFig || true) && (o.hintFig)) { stat.hints++; const t = o.hintFig.act === 'skip' ? o.skip : o.fglows.find(q => q.hint); if (!t) await fail(p, tag, 'hint', 'fig hint has no target'); else if (Math.hypot(o.ghost.x - t.x, o.ghost.y - t.y) > 80) await fail(p, tag, 'hint', 'fig finger far from target'); }
@@ -170,7 +172,7 @@ async function playGame(b, W, H, variant, tag, opt) {
     }
     const o = await probe(p); stat.games++;
     if (!o.over) await fail(p, tag, 'unfinished', 'game did not end');
-    else { await sleep(opt.fast ? 5200 : 5200); const res = await p.evaluate(() => !!document.querySelector('#modal .card .rescore') || !!document.querySelector('.gxc')); if (res) stat.results++; else await fail(p, tag, 'result', 'no result card after the game'); const sc = await p.evaluate(() => G.pl.map(q => q.score).join('-')); console.log('  game', tag, 'done', steps, 'steps, score', sc, 'maxStuck', maxStuck + 'ms'); }
+    else { await sleep(4500); /* the end count runs about 3.5 s before the result card */ const res = await p.evaluate(() => !!document.querySelector('#modal .card .restab') || !!document.querySelector('.gxc')); if (res) stat.results++; else await fail(p, tag, 'result', 'no result card after the game'); const sc = await p.evaluate(() => G.pl.map(q => q.score).join('-')); console.log('  game', tag, 'done', steps, 'steps, score', sc, 'maxStuck', maxStuck + 'ms'); }
     if (shotN < 14 && opt.shot) await p.screenshot({ path: path.join(SHOTS, opt.shot) });
   } catch (e) { await fail(p, tag, 'crash', e.message); }
   await p.context().close();
@@ -181,7 +183,7 @@ async function playChapter(b, W, H, id, tag) {
   try {
     await p.evaluate(i => { const ch = {}; for (const c of window.CAMPAIGN.chapters) { if (c.id === i) break; ch[c.id] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; } localStorage.setItem('gns-campaign-rampart', JSON.stringify({ v: 1, ch, unlocked: [], last: null })); }, id);
     await p.reload(); await sleep(400); await p.evaluate(() => { UI.speed = 30; });
-    await p.evaluate(i => { showStart(); GXC.open(); setTimeout(() => GXC.play(i), 50); }, id); await sleep(500);
+    await p.evaluate(i => { showStart(); GXC.open(); setTimeout(() => GXC.play(i), 50); }, id); await sleep(500); for (let k = 0; k < 8; k++) { await sleep(400); const d = await p.$('#goalok:visible'); if (d) { await d.tap(); break; } }
     // skip scenes and boss cards until the board is up
     for (let i = 0; i < 12; i++) { const hasG = await p.evaluate(() => typeof G !== 'undefined' && !!G && !!G.cur && !document.querySelector('.gxc.on,.gxc[class*=on]') ); if (hasG && await p.evaluate(() => !document.querySelector('.gxc'))) break; const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetWidth > 0); const r = bs.find(e => e.classList.contains('go')) || bs.find(e => /^(skip|play|let.?s go|start|go|begin|next|continue|ok|meet|face|fight|accept)/i.test(e.textContent.trim())) || bs.find(e => /skip/i.test(e.textContent)); if (!r) return null; const q = r.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2, t: r.textContent }; }); if (!t) { await sleep(300); continue; } await tapAt(p, t.x, t.y); await sleep(450); }
     const info = await p.evaluate(() => ({ camp: UI.camp && UI.camp.id, np: G.pl.length, lv: G.pl.map(q => q.lv), sc: G.pl.map(q => q.score), sup: G.pl.map(q => q.sup.f), first: G.cur.p, hints: UI.camp && UI.camp.hints, human: G.pl.map(q => q.human) }));
@@ -189,16 +191,16 @@ async function playChapter(b, W, H, id, tag) {
     let lastSig = '', lastT = Date.now();
     for (let it = 0; it < 900; it++) {
       const o = await probe(p); if (p.errs.length) { await fail(p, tag, 'js-error', p.errs[0]); break; }
-      if (o.tw && !o.over) { await sleep(80); continue; }
+      { const gk = await p.$("#goalok:visible"); if (gk) { await gk.tap(); await sleep(300); continue; } }
       if (o.tw && !o.over) { await sleep(80); continue; }
       for (const m of o.bad) await fail(p, tag, 'check', m);
       if (o.over) break;
       if (o.sig !== lastSig) { lastSig = o.sig; lastT = Date.now(); } else if (Date.now() - lastT > 8000) { await fail(p, tag, 'stuck', 'no change for 8 s'); break; }
       if (!o.mine) { await sleep(100); continue; }
-      if (o.step === 'place') { if (!o.glows.length) { await sleep(200); continue; } const g = pick(o.glows); await tapAt(p, g.x, g.y); if (await waitChange(p, o.sig, 2500) < 0) await fail(p, tag, 'dead-tap', 'glow'); }
+      if (o.step === 'place') { if (!o.glows.length) { await sleep(200); continue; } const g = pick(o.glows); await tapAt(p, g.x, g.y); await confirmPlace(p); if (await waitChange(p, o.sig, 2500) < 0) await fail(p, tag, 'dead-tap', 'glow'); }
       else if (o.step === 'fig') { const useFig = o.fglows.length && rnd() < .6; const t = useFig ? pick(o.fglows) : (o.skip || pick(o.fglows)); await tapAt(p, t.x, t.y); if (await waitChange(p, o.sig, 2500) < 0) await fail(p, tag, 'dead-tap', 'fig'); }
     }
-    await sleep(5500);
+    await sleep(9500);
     const end = await p.evaluate(() => ({ over: !!G.over, res: !!document.querySelector('.gxc-res'), txt: (document.querySelector('.gxc-res h2') || {}).textContent, prog: JSON.stringify(GXC.progress().ch) }));
     console.log('  chapter', id, 'end', JSON.stringify(end)); if (!end.over) await fail(p, tag, 'unfinished', 'chapter game did not end'); else if (!end.res) await fail(p, tag, 'story', 'no chapter result screen'); else stat.results++;
   } catch (e) { await fail(p, tag, 'crash', e.message); }

@@ -743,6 +743,20 @@ html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0
 @media (max-height:620px){html.ph .dlg.start .acts:has(>.btn.primary){position:static;margin:.4rem 0;padding:0;background:none}}
 html.ph-p #dr-menu{height:88dvh}
 html.ph-p #dr-mons{height:88dvh}
+/* G7: names get the full chip width: the crown and the card count sit on the chip's top edge, not in the name line */
+html.ph .pchip.hasn b{padding-right:0}
+html.ph header.gx-bar .pchip b{letter-spacing:0}
+html.ph .pchip b .crn{position:absolute;right:1px;top:1px;font:normal 13px/1 sans-serif;z-index:2}
+html.ph header.gx-bar .pchip.city b{padding-right:14px}
+@media (max-width:400px){html.ph header.gx-bar .pchip .pn{display:none}}
+html.ph .pchip b .nmfit{display:inline-block;font:inherit;letter-spacing:inherit;white-space:nowrap;transform-origin:0 50%}
+html.ph .pchip b.fit{text-overflow:clip}
+/* W500: the crown has its own 16px lane at the right end of the name line, inside the name box: never cut by the chip, never over the name */
+html.ph header.gx-bar .pchip.city b{padding-right:16px;position:relative}
+html.ph header.gx-bar .pchip b .crn{top:50%;right:0;left:auto;transform:translateY(-50%);font-size:12px;line-height:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+
+/* W500: the chip crown is a drawn icon (no text node, so nothing hidden behind it): the emoji only when the painted icon is off */
+html.ph .pchip b .crn::before{content:'👑'}html.sk-crown .pchip b .crn::before{content:none}
 
 /* ===== Board-first layer (board.js). Portrait phone: score strip on top, the city fills the screen, the tray at the bottom ===== */
 #bfx{position:fixed;left:0;top:0;width:0;height:0;z-index:60;pointer-events:none}
@@ -945,7 +959,8 @@ html.sk #pacts .btn .bl{background:rgba(50,14,0,.85)}
 html.sk #pacts .btn small{background:rgba(50,14,0,.85);border-radius:6px;padding:0 6px;color:#fff;text-shadow:none}
 html.ph .pchip span em{background:#fffdf5!important}
 /* Play with Hints off: no first-time help bubbles or tooltips (one instruction line only) */
-html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail),html:not(.pp-hints) .gxh-tt:not(#arttail *){display:none!important}
+html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail):not(.gxt-bub),html:not(.pp-hints) .gxh-tt:not(#arttail *):not(.gxt-bub *){display:none!important}
+html.gxt-on #bline,html.gxt-on #pppreview{display:none!important}   /* the guided tutorial: its bubble is the one sentence on screen */
 /* desktop: secondary text 16px */
 html:not(.ph) :is(.menu .btn small,#title small,details.custom .small,#modal p.small,.gxc-act small){font-size:16px!important}
 /* campaign header art at its natural scale (it was stretched 2-3x) */
@@ -1003,9 +1018,17 @@ html.ph #choice .btn img.evopic{max-height:110px}
 html:not(.ph) #pacts .btn{color:#1a1320!important;text-shadow:0 1px 0 rgba(255,255,255,.35)!important}
 html:not(.ph) #pacts .btn .bl,html:not(.ph) #pacts .btn small{color:#fff!important;text-shadow:none!important}
 .gx-dock-head .gx-ibtn{background:#fff7dd!important;border-image-source:none!important}
+html.ph #bcity{display:none;position:absolute;left:50%;transform:translateX(-50%);z-index:5;padding:5px 12px;border-radius:999px;background:#1a1320;border:2px solid #e63946;color:#fff;font:900 15px/1.2 Nunito,sans-serif;white-space:nowrap;pointer-events:none;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+html.ph #bcity.on{display:block}
+/* W500: under the board line on a computer's turn: a one-line recap of the last computer turn + "Tap to skip" */
+#bsub{position:fixed;left:50%;transform:translateX(-50%);z-index:2147481999;max-width:calc(100vw - 24px);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+#bsub[hidden],#bsub [hidden]{display:none!important}
+#brecap{max-width:100%;box-sizing:border-box;padding:3px 10px;border-radius:999px;background:rgba(26,19,32,.82);color:#ffe9a8;font:800 14px/1.2 Nunito,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bskip{padding:2px 10px;border-radius:999px;background:rgba(255,210,63,.92);color:#1a1320;font:900 14px/1.2 Nunito,sans-serif}
+html:not(.ph) #bsub,html.gxt-on #bsub,html.cc-over #bsub,html.cc-tut #bsub{display:none!important}
 
 /* ===== Play on the board (see onboard.js): dice, Roll, SMASH!, End turn, painted cards for sale, your cards, questions ===== */
-#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:min(60px,calc((var(--obw,360px) - 44px)/6.3))}
+#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:max(44px,min(60px,calc((var(--obw,360px) - 44px)/6.3)))}
 #ob button,#ob .die,#ob #choice{pointer-events:auto}
 #ob #obown,#ob #obmid,#ob #obtoast,#ob #obcard{position:absolute}
 #ob #obact,#ob #pacts{position:static!important}
@@ -1120,6 +1143,21 @@ html.ph-p #ob #pacts [data-act="end"]{min-width:0;flex:1 1 150px}
 html.ob .gx-board{overflow:clip}
 html.ph-l #ob #pacts>.btn{flex:none}
 html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
+#ob #obcard.on{pointer-events:none}
+#ob .obbig .obbtns{display:flex;gap:8px;justify-content:center;margin-top:10px;pointer-events:auto}
+#ob .obbig .obbtns .btn{min-height:46px;min-width:110px;font-size:17px;font-weight:800;border-radius:12px;border:3px solid #1a1320;cursor:pointer}
+#ob .obbig .obbuy{background:#1f9d5c;color:#fff}
+#ob .obbig .obx{background:#fff;color:#1a1320}
+
+/* W500: with a pinned card the big card lives in the space above the shop row; its art gives way when the screen is short */
+#ob #obcard.on{align-items:center;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+#ob .obbig{max-height:100%;justify-self:center;display:flex;flex-direction:column}
+#ob .obbig>*{flex:none}
+#ob .obbig>.bart{flex:1 1 150px;min-height:0;aspect-ratio:auto}
+#ob .obbig .obbtns.dlg{padding:0;border:0;background:none;box-shadow:none;margin-top:6px}
+#ob .obbig{padding:8px 12px 10px}
+#ob .obbig h3{margin:4px 0 0;font-size:24px}
+#ob .obbig p{margin:2px 0 0;font-size:14px;line-height:1.25}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -1556,8 +1594,9 @@ html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:cont
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
 .gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
-.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
-.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap;min-width:0;overflow:hidden}
+@media (max-width:480px){.gxt-dots{display:none}}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
@@ -1698,11 +1737,11 @@ html:not(.ph-l) #ob #pacts [data-act="resolve"]:active{transform:scale(.96)}
 html:not(.ph-l) #ob #pacts [data-act="resolve"] .bl{font-size:22px;max-width:none}
 /* W386e: the turn tracker ("Roll 1 of 3 · Tap dice to keep them") is always at the top, under the score strip, above every bubble */
 html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{display:block;position:fixed;left:50%;top:calc(var(--sat,0px) + var(--ph-bar,52px) + 6px);bottom:auto;transform:translateX(-50%);z-index:2147482000;max-width:calc(100vw - 16px);white-space:normal;text-align:center}
-html.ph-p .gxh-bub{margin-top:30px}
+html.ph-p .gxh-bub:not(.gxt-bub){margin-top:30px}
 html.ph-p #bline,html.ph-p:has(.gxh-bub.on) #bline{font:900 14px/1.15 Nunito,sans-serif;padding:4px 10px}
-html.ph-p .gxh-bub{margin-top:36px}
+html.ph-p .gxh-bub:not(.gxt-bub){margin-top:36px}
 html.pp-mine-roll #ob #preview,html.pp-mine-roll #preview{display:none}
-html.ph-p.pp-nobub .gxh-bub{display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
+html.ph-p.pp-nobub .gxh-bub:not(.gxt-bub){display:none}   /* the turn tracker at the top and the preview line already say what to do; one instruction at a time */
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%;box-sizing:border-box}
 html:not(.ph-l) #ob #pacts:has([data-act="resolve"]) .btn{width:auto;min-width:0;box-sizing:border-box;flex:none}
 
@@ -1710,9 +1749,9 @@ html:not(.ph-l) #ob #pacts:has([data-act="resolve"]) .btn{width:auto;min-width:0
 html:not(.pp-hints) #bmarks,html:not(.pp-hints) #bfinger,html:not(.pp-hints) #ccbanner,html:not(.pp-hints) #pppreview{display:none!important}
 html:not(.pp-hints) .die.sugg,html:not(.pp-hints) .sugg{outline:none!important}
 html:not(.pp-hints) .pp-best::before{display:none}
-#pppop.short{padding:6px 12px;border-width:3px;box-shadow:3px 3px 0 #1a1320;top:40%;width:auto;min-width:150px;pointer-events:auto;cursor:pointer}
+#pppop.short{padding:6px 12px;border-width:3px;box-shadow:3px 3px 0 #1a1320;top:40%;width:auto;min-width:150px;pointer-events:none}
 #pppop.short ul{margin:0 0 0 16px;font-size:16px}
-#pppop.on{pointer-events:auto}
+#pppop.on{pointer-events:none}
 #ppwhat{display:none;position:fixed;right:10px;bottom:84px;z-index:2147480000;min-height:40px;padding:6px 14px;border-radius:20px;border:3px solid #1a1320;background:#ffd23f;color:#1a1320;font:900 14px/1.1 Nunito,sans-serif;box-shadow:3px 3px 0 #1a1320;cursor:pointer}
 html.pp-hints header.gx-bar #bulbbtn{box-shadow:0 0 0 3px #ffd23f,0 0 16px 4px rgba(255,210,63,.9)}
 
@@ -2589,7 +2628,8 @@ const GX={key:'gx',open:null,
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -2705,15 +2745,16 @@ const GX={key:'gx',open:null,
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -2729,11 +2770,14 @@ const GX={key:'gx',open:null,
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -2741,12 +2785,12 @@ const GX={key:'gx',open:null,
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -2767,7 +2811,7 @@ const GX={key:'gx',open:null,
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -2830,7 +2874,7 @@ const GX={key:'gx',open:null,
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
@@ -2858,6 +2902,15 @@ const GX={key:'gx',open:null,
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -2910,7 +2963,7 @@ const GX={key:'gx',open:null,
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
@@ -3050,7 +3103,8 @@ const GX={key:'gx',open:null,
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
-    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -3068,8 +3122,8 @@ const GX={key:'gx',open:null,
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
-    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
-    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -3078,7 +3132,7 @@ const GX={key:'gx',open:null,
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }
@@ -4751,6 +4805,7 @@ function checkWin(final){
   if(G.winner)return true;const a=alive();
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
+  if(!final)return false;   // rulebook: the star win is checked at the END of the turn (you must survive it, and may still buy); last standing ends it at once
   const ast=a.find(p=>has(p,'c_astro')&&p.vp>=17);if(ast){G.winner='P'+(ast.i+1);G.winText=`Space Helmet: ${mname(ast)} reaches ${ast.vp} stars (only 17 needed) and is crowned!`;G.phase='over';cov('cost:astro');lg(ast.i,G.winText);return true}
   {const w=a.filter(p=>p.vp>=winAt(p));if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (${GOAL()} needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
@@ -5117,6 +5172,8 @@ function aiYield(q,lost){
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
+// Easy (the newcomer default): flips some keeps, stops rolling early, often skips the shop
+var EZROLL=1,EZFLIP=.4,EZSKIP=.6;
 var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
 // chance that q is knocked out before its next turn if it stays in the city
 function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inCity(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
@@ -5161,7 +5218,7 @@ function aiMark(p){
 function curseBad(p){return exOn('curse')&&['k_ego','k_sand','k_hotep','k_set','k_build','k_ra','k_horus','k_false','k_sphinx','k_scribe','k_flood'].includes(G.curse)}
 function aiMarkLvl(p){if(p.lvl==='hard'||p.lvl==='hard0'){const sp=G.dice.filter(d=>d.t);const nd=G.dice.length-sp.length;
     if(sp.length||nd>7){const all=G.dice;sp.forEach(d=>{d.k=d.t==='b'?d.f!=='O':(d.f==='FA'||d.f==='FW'||(d.f==='FE'&&curseBad(p)))});G.dice=all.filter(d=>!d.t);
-      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
+      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<EZFLIP)d.k=!d.k})}}
 var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
 function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inCity(p.i);
   const need=winAt(p)-p.vp;const others=alive().filter(q=>q.i!==p.i);const lead=others.reduce((a,q)=>q.vp>a.vp?q:a,{vp:-1});
@@ -5224,7 +5281,7 @@ function aiRollStep(p){
   if(!G.aiMarked){aiMarkLvl(p);G.dice.forEach(d=>{if(noReroll(d))d.k=true});G.aiMarked=true;refresh();return}
   G.aiMarked=false;
   const free=G.dice.filter(d=>!d.k&&!noReroll(d)).length;
-  if(free&&G.rolls>0){doReroll('roll');return}
+  if(free&&G.rolls>0&&!(p.lvl==='easy'&&G.rolls<=EZROLL)){doReroll('roll');return}
   if(free>=2&&p.cult>0&&!G.tf.uses.cr&&p.lvl!=='easy'){G.tf.uses.cr=1;useCult(p,'r');return}
   if(free>=2&&has(p,'smoke')&&p.tok.smoke>0){doReroll('smoke');return}
   if(free>=2&&has(p,'mind')&&p.en>=4){doReroll('mind');return}
@@ -5310,6 +5367,7 @@ function aiBuyStep(p){const U=G.tf.uses;
   if(has(p,'lab')&&!U.lab&&G.deck.length){labPeek(p);return}
   if(hasE(p,12)&&!U.catch&&G.disc.length){luckyScoop(p);return}
   if(has(p,'para')&&!U.paraAI){U.paraAI=1;if(paraList(p).some(x=>cardValue(p,x.id)>1)){paraBuy(p);return}}
+  if(p.lvl==='easy'&&Math.random()<EZSKIP){endTurn();return}
   let best=-1,bv=(p.lvl==='hard'||p.lvl==='hard0')?-0.2:-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id)+(p.lvl==='easy'?Math.random()*6-3:0);if(v>bv){bv=v;best=k}});
   if(best>=0){buy(best);return}
   const maxv=Math.max(-99,...G.market.map(id=>cardValue(p,id)));
@@ -7227,7 +7285,7 @@ function renderChoice(on){const el=document.getElementById('choice'),dk=document
   if(!c){el.classList.add('hidden');el.innerHTML='';if(dk)dk.classList.remove('choosing');UI.choiceShown=null;return}
   const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
   el.classList.remove('hidden');if(dk)dk.classList.add('choosing');el.setAttribute('aria-label',c.title);
-  el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${(()=>{const hp=c.options.some(o=>o.primary);return c.options.map(o=>{const pr=o.primary||!hp&&(o.rec||/Recommended\./.test(o.d||''));return `<button class="btn ${pr?'primary':''} ${o.rec?'rec':''}" data-opt="${esc(o.k)}">${!o.primary&&/^\d+$/.test(o.k)&&/secret power|Evolution!/.test(c.title)&&typeof cardPic==='function'?cardPic(+o.k,'evopic'):''}${o.rec&&hp?'<span class="recchip">★ Recommended</span>':''}${esc(o.l)}${o.g?`<b class="gist">${esc(o.g)}</b>`:''}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`}).join('')})()}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
+  el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p class="nocut ctext">${esc(c.text)}</p>${dice}<div class="acts">${(()=>{const hp=c.options.some(o=>o.primary);return c.options.map(o=>{const pr=o.primary||!hp&&(o.rec||/Recommended\./.test(o.d||''));return `<button class="btn ${pr?'primary':''} ${o.rec?'rec':''}" data-opt="${esc(o.k)}">${!o.primary&&/^\d+$/.test(o.k)&&/secret power|Evolution!/.test(c.title)&&typeof cardPic==='function'?cardPic(+o.k,'evopic'):''}${o.rec&&hp?'<span class="recchip">★ Recommended</span>':''}${esc(o.l)}${o.g?`<b class="gist">${esc(o.g)}</b>`:''}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`}).join('')})()}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
   const key=c.title+'|'+c.text;if(UI.choiceShown!==key){UI.choiceShown=key;if(window.GX&&GX.app){GX.showDock();if(GX.open)GX.close()}const b=document.getElementById('dockbody');if(b)b.scrollTop=0;const f=el.querySelector('button');if(f&&document.activeElement&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))try{f.focus({preventScroll:true})}catch(e){}}}
 function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try{localStorage.removeItem(SAVE)}catch(e){}}const xp=UI.xp;
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
@@ -7279,7 +7337,7 @@ function rulesHTML(){return `<div>
   <h3>House rules (kept on purpose)</h3><ul class="hat"><li>The first player is picked at random, not by a dice roll-off.</li><li>The 20-star win is checked when the active monster ends its turn; it must survive the turn.</li><li>Dice order: Automatic resolves hearts before claws. Menu, Dice order: Ask me, lets you choose.</li><li>Evolutions: keep 1 of 2 cards at the start; resolving 3 hearts shows 2 and keeps 1.</li><li>Where an expansion card’s text was unclear, one reading is used (listed in rules-notes.md).</li></ul>
   <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 
-function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
+function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');try{const me=G.pl.find(q=>q.human);if(G.mode==='solo'&&me&&G.winner==='P'+(me.i+1)&&!G.tut)localStorage.setItem('ccs_won','1')}catch(e){}if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
   if(window.GX&&GX.app&&G&&!G.winner&&!UI.info&&humanTurn()&&UI.dockTurn!==G.tid+':'+G.active){UI.dockTurn=G.tid+':'+G.active;GX.showDock()}
   try{if(typeof ppAfter==='function')ppAfter()}catch(e){}}
 const ORDERHTML=()=>'↕ Dice order: '+(UI.order==='ask'?'Ask me':'Automatic')+'<small>Ask lets you pick whether hearts or claws resolve first</small>';
@@ -7297,10 +7355,10 @@ document.addEventListener('click',e=>{
   if(ds.evo!==undefined){UI.evo=ds.evo==='1';render();return}
   if(ds.exk){if(ds.exk==='evo')UI.evo=!UI.evo;else UI.ex[ds.exk]=!UI.ex[ds.exk];saveSetup();render();return}
   if(ds.preset){const on=ds.preset==='all';UI.evo=on;EXPS.forEach(x=>{if(x.k!=='evo')UI.ex[x.k]=on});saveSetup();render();return}
-  if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
+  if(ds.lvl){UI.lvl=ds.lvl;UI.lvlUser=true;saveSetup();render();return}
   if(ds.start){const k=ds.start;UI.info=false;
     if(k==='load'){G=load();if(!saveOK(G)){G=null;try{localStorage.removeItem(SAVE)}catch(e){}render();return}if(!G.gid)G.gid=Math.random();G.xq=G.xq||[];G.log=G.log||[];G.tf=Object.assign(tfBase(),G.tf||{});G.disc=G.disc||[];G.curseDeck=G.curseDeck||[];G.curseDisc=G.curseDisc||[];G.tower=G.tower||[-1,-1,-1];G.pl.forEach(q=>{q.tok=q.tok||{};q.hand=q.hand||[];q.edeck=q.edeck||[];q.edisc=q.edisc||[];q.mb=q.mb||0;q.cult=q.cult||0;q.wk=q.wk||0;q.dmod=q.dmod||0;q.stats=q.stats||{dmg:0,stars:0,cards:0,city:0,kos:0}});G.revealed=G.revealed||[];UI.choice=null;UI.busy=false;UI.pending=null;UI.fx={};if(G.phase==='start')G.dice=[];if(G.phase==='end'){G.phase='buy';G.step=4}if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}fixRoll();refresh()}
-    else{let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}UI.firstGame=!toured&&k==='solo';UI.intro=true;UI.adv=false;UI.coach=-1;UI.freeze=false;UI.tour=false;UI.tipSeen={};newGame(k)}return}
+    else{let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}UI.firstGame=!toured&&k==='solo';newbieLvl();UI.intro=true;UI.adv=false;UI.coach=-1;UI.freeze=false;UI.tour=false;UI.tipSeen={};newGame(k)}return}
   if(ds.tour){tourClick(ds.tour);return}
   if(ds.emo){sendEmote(ds.emo);return}
   if(ds.a==='story'){UI.intro=false;render();if(typeof schedule==='function')schedule();return}
@@ -7337,8 +7395,11 @@ document.addEventListener('keydown',e=>{
   if(!G||G.winner||UI.choice||UI.info||UI.rules||UI.intro||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
   if(G.phase==='roll'){if(e.key==='r'||e.key==='R')click('[data-act="reroll"]');else if(e.key===' '||e.key==='Enter')click('[data-act="resolve"]');else if(e.key==='h'||e.key==='H')click('[data-act="hint"]');else if(/^[1-9]$/.test(e.key))click(`[data-die="${+e.key-1}"]`)}
   else if(G.phase==='buy'&&(e.key===' '||e.key==='Enter'||e.key==='e'||e.key==='E'))click('[data-act="end"]')});
-function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
-try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
+// G7: until the player picks a skill or wins a solo game, the rivals default to Easy (a newcomer's first game is winnable)
+function newbieLvl(){if(UI.lvlUser)return;let won=false;try{won=!!localStorage.getItem('ccs_won')}catch(e){}UI.lvl=won?'normal':'easy'}
+function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,lvlUser:!!UI.lvlUser,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
+try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl&&st.lvlUser!==false)UI.lvl=st.lvl,UI.lvlUser=true;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
+if(typeof window!=='undefined'&&!/jsdom/i.test(navigator.userAgent||''))newbieLvl();
 function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard0(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
 // a pair of numbers scores nothing: say so while there is still a reroll to chase the third
 function pairNote(dice){if(G.rolls<=0)return '';const c=countsOf(dice.filter(d=>!d.t));const pr=['1','2','3'].filter(f=>c[f]===2);if(!pr.length||['1','2','3'].some(f=>c[f]>=3))return '';return ` <span class="pairnote">A pair scores nothing. You need three of a kind.</span>`}
@@ -7418,7 +7479,7 @@ function phChips(){const el=$ph('pchips');if(!el)return;if(!G){el.innerHTML='';r
   const n=G.pl.length,dk=document.querySelector('.gx-dock');const w=(dk?dk.clientWidth:PHONE.aw)-16;const maxc=Math.max(2,Math.floor((w+5)/(innerHeight<640&&innerHeight>innerWidth?86:93)));const rows=Math.ceil(n/maxc);el.style.setProperty('--cc',Math.ceil(n/rows));
   el.setAttribute('role','tablist');el.innerHTML=G.pl.map(p=>{const me=(G.mode==='solo'&&p.human)||(NET.on&&p.i===NET.mySeat);const c=inCity(p.i),b=G.bay===p.i;const nm=esc(mname(p));
     const lab=`${mname(p)}${me?' (you)':''}: ${p.alive?`${p.hp} hearts, ${p.vp} stars, ${p.en} energy, ${p.cards.length} power cards${c?', in Downtown':b?', in the Harbor':''}`:'knocked out'}. ${p.i===G.active&&!G.winner?'Its turn. ':''}Tap for details.`;
-    return `<div role="tab" tabindex="0" class="pchip ${me?'me':''} ${p.cards.length?'hasn':''} ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${c?'city':''}" data-pm="${p.i}" style="--mc:${MONS[p.m].c}" aria-label="${esc(lab)}">${(window.CCMedia&&CCMedia.avatar(p.m))?`<img class="pav" src="${CCMedia.avatar(p.m)}" alt="" draggable="false">`:''}<b>${c?'<i class="crn">👑</i>':b?'⚓':''}${nm}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e" data-engine="G.pl[${p.i}].en">⚡${p.en}</em></span>${p.cards.length?`<i class="pn" aria-hidden="true">🃏${p.cards.length}</i>`:''}`:'<span>K.O.</span>'}${me?'<u aria-hidden="true">YOU</u>':''}</div>`}).join('')}
+    return `<div role="tab" tabindex="0" class="pchip ${me?'me':''} ${p.cards.length?'hasn':''} ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${c?'city':''}" data-pm="${p.i}" style="--mc:${MONS[p.m].c}" aria-label="${esc(lab)}">${(window.CCMedia&&CCMedia.avatar(p.m))?`<img class="pav" src="${CCMedia.avatar(p.m)}" alt="" draggable="false">`:''}<b>${c?'<i class="crn" role="img" aria-label="In Downtown"></i>':b?'⚓':''}${nm}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e" data-engine="G.pl[${p.i}].en">⚡${p.en}</em></span>${p.cards.length?`<i class="pn" aria-hidden="true">🃏${p.cards.length}</i>`:''}`:'<span>K.O.</span>'}${me?'<u aria-hidden="true">YOU</u>':''}</div>`}).join('')}
 // ---- the shop: three tiles in the buy step, a pop-up with enlarged cards ----
 function phShopOK(){return !!(G&&!G.winner&&humanTurn()&&G.phase==='buy')}
 function phTiles(){const el=$ph('pshop');if(!el)return;if(!phShopOK()||!G.market.length){el.innerHTML='';return}
@@ -7545,16 +7606,20 @@ function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat()
 function bfLineText(){return typeof ppLine==='function'?ppLine(bfLineText0()):bfLineText0()}
 function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
   if(UI.intro||UI.choice)return '';
-  if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
+  if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
-    if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
-    return `Roll the other ${nk}, or tap SMASH`}
+    if(!G.dice.some(d=>d.k))return 'Keep dice, then Roll';
+    return `Roll ${nk} more, or SMASH`}
   if(G.phase==='buy'&&!G.bug&&p.vp>=GOAL())return GOAL()+'★ reached: End turn to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or End turn':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: End turn'}
+    const fk=typeof OB!=='undefined'&&OB.pinK>=0?OB.pinK:-1;return fk>=0&&canBuy(p,fk)?'Tap Buy, or Not now':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to read it':'Not enough ⚡: End turn'}
   return ''}
-function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
+function bfLine(){const el=$bf('bline');if(!el)return;bfRecapWatch();const fl=!!(BF.flash&&BF.flash.until>bfNow());let t=fl?BF.flash.t:bfLineText();
+  const rv=!!(t&&G&&!G.winner&&!humanTurn()&&!NET.on&&!UI.choice&&!UI.intro&&!bfOut());
+  if(!fl&&G&&humanTurn()&&G.phase==='roll'&&BF.spin&&bfNow()<BF.spin.end&&!UI.choice&&!UI.intro)t='Rolling the dice…';
+  const rc=BF.recap&&t&&!G.tut&&(rv||(humanTurn()&&G.phase==='roll'&&G.rolls>=rerollsOf(cur())))?BF.recap:'';
+  if(el.textContent!==t)el.textContent=t;bfSub(rc,rv&&!BF.fast,el);el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
 // ---- what the dice would do, shown on the board ----
 function bfMarks(){const el=$bf('bmarks');if(!el)return;
@@ -7572,7 +7637,7 @@ function bfMarks(){const el=$bf('bmarks');if(!el)return;
 // ---- the reroll: dice tumble and land one by one ----
 function bfRollWatch(){if(!G||G.rollId===BF.rid)return;const first=BF.rid<0;BF.rid=G.rollId;if(first||!bfAnim()||G.phase!=='roll')return;
   const idx=G.dice.map((d,k)=>d.k?-1:k).filter(k=>k>=0);if(!idx.length)return;const t0=bfNow();BF.spin={t0,idx,end:t0+520+idx.length*95};
-  idx.forEach((k,j)=>setTimeout(()=>{if(typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},520+j*95));setTimeout(()=>{bfDice();bfMarks()},BF.spin.end-t0+30)}
+  idx.forEach((k,j)=>setTimeout(()=>{if(typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},520+j*95));setTimeout(()=>{bfDice();bfMarks();bfLine()},BF.spin.end-t0+30)}
 function bfDice(){const sp=BF.spin,now=bfNow();document.querySelectorAll('#dice .die[data-die]').forEach(el=>{const k=+el.dataset.die;el.classList.remove('spin');
   if(sp&&now<sp.end&&sp.idx.includes(k)){const j=sp.idx.indexOf(k);el.classList.add('bfroll');el.style.animationDelay=(-(now-sp.t0)/1000)+'s';el.style.setProperty('--land',(.52+j*.095)+'s')}
   else{el.classList.remove('bfroll');el.style.animationDelay=''}})}
@@ -7591,7 +7656,7 @@ function bfBump(k,f){const c=document.querySelector(`.pchip[data-pm="${k}"]`);if
 function bfCapture(){if(!bfOn()||!bfAnim())return;const els=[...document.querySelectorAll('#dice .die[data-die]')];if(!els.length)return;
   const dice=G.dice.map((d,k)=>{const el=els.find(e=>+e.dataset.die===k);return {f:String(d.f),t:d.t||'',xy:el?bfCenter(el):null,html:el?el.innerHTML:faceSVG(d.f)}});
   const c={};dice.forEach(d=>{const f=d.f[0];c[f]=(c[f]||0)+1});
-  BF.cap={t:bfNow(),a:G.active,dice,c,used:{},live:true};BF.next=bfNow()+80;BF.snap=G.pl.map(p=>({h:p.hp,v:p.vp,e:p.en}));BF.rel={};BF.until=bfNow()+900;
+  BF.cap={t:bfNow(),a:G.active,dice,c,used:{},live:true};BF.next=bfNow()+80;BF.snap=G.pl.map(p=>({h:p.hp,v:p.vp,e:p.en}));BF.rel={};BF.until=bfNow()+bfTail(900);
   clearTimeout(BF.capT);BF.capT=setTimeout(bfEnd,6000)}
 function bfEnd(){if(!BF.cap&&!BF.snap)return;BF.cap=null;BF.snap=null;BF.rel={};phChips()}
 function bfSlot(gap){const t=Math.max(bfNow(),BF.next);BF.next=t+(gap||140);return t-bfNow()}
@@ -7617,7 +7682,26 @@ function bfPlay(k,e,orig){const c=BF.cap,a=c.a,m=/^([+-])(\d+)(♥|⚡|★)$/.ex
     const again=o.k!=null&&used[o.k];if(o.k!=null)used[o.k]=1;
     bfFly(html,src,to,{delay:t+j*70,dur:fld==='h'&&m[1]==='-'?470:560,cls:(again?'again ':'')+(o.k!=null?'die':'tok'),burst:j?'':burst,end:fld==='h'?.55:.45,spin:o.k!=null?540:0,size:o.k!=null?52:40,
       land:()=>{if(!landed){landed=true;done()}else if(burst==='hit'&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}}})});
-  BF.until=Math.max(BF.until,bfNow()+t+flights.length*70+900)}
+  BF.until=Math.max(BF.until,bfNow()+t+flights.length*70+bfTail(900))}
+// W500 pacing: a computer turn lands in about 2 s; a tap on the board makes the rest near-instant
+function bfTail(ms){return !G||humanTurn()?ms:BF.fast?120:Math.round(ms*.45)}
+// ---- one-line recap of what each computer monster did on its turn ----
+function bfRecapWatch(){if(!G||G.winner||G.tut||NET.on){BF.rsA=-1;BF.recap='';return}const a=G.active;if(a===BF.rsA)return;
+  const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat();
+    const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);
+    const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp).map(r=>[r.i===me?'you':mname(r),o.hp[r.i]-Math.max(0,r.hp)]);
+    BF.recap=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took 👑':''].filter(Boolean).join(' · '),hit,BF.bought||[])}
+  BF.bought=[];BF.rsA=a;const q=G.pl[a];BF.rs=q?{a,vp:q.vp,en:q.en,hp:G.pl.map(r=>r.hp),city:G.city}:null}
+// the recap and the skip hint sit in their own small lines just under the board line (each one short)
+function bfSub(rc,sk,ln){let w=document.getElementById('bsub');if(!w){w=document.createElement('div');w.id='bsub';w.setAttribute('aria-live','polite');w.innerHTML='<div id="brecap"></div><div id="bskip">⏩ Tap to skip</div>';document.body.appendChild(w)}
+  const r=w.firstChild,k=w.lastChild,on=!!(rc||sk)&&!!ln.textContent&&getComputedStyle(ln).display!=='none';if(r.textContent!==rc)r.textContent=rc;r.hidden=!rc;k.hidden=!sk;w.hidden=!on;
+  if(on){const b=ln.getBoundingClientRect();w.style.top=Math.round(b.bottom+4)+'px'}}
+// at most 8 words and one phone line: drop card names, then rival names
+function bfShort(name,g,hit,bought){const wc=s=>s.replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(x=>/[a-z][a-z]/i.test(x)).length;
+  const mk=(h,b)=>`${name}: ${[g,h,b].filter(Boolean).join(' · ')||'nothing'}`;
+  const hs=hit.length?'hit '+hit.map(x=>x[0]+' −'+x[1]).join(', '):'',hn=hit.length?(hit.length===1?'hit '+hit[0][0]+' −'+hit[0][1]:`hit ${hit.length} rivals`):'';
+  const bs=bought.length?'bought '+bought.join(', '):'',bn=bought.length?(bought.length===1?'bought a card':`bought ${bought.length} cards`):'';
+  for(const [h,b] of [[hs,bs],[hs,bn],[hn,bn],[hn,'']]){const t=mk(h,b);if(wc(t)<=8&&t.length<=40)return t}return mk(hn,'')}
 // ---- the shop in the tray ----
 function bfShop(){const el=$bf('pshop');if(!el||!G)return;if(!phShopOK()||!G.market.length){BF.sel=-1;const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip&&tip.innerHTML)tip.innerHTML='';return}
   const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;
@@ -7631,7 +7715,7 @@ function bfTapCard(k,el){const p=cur();if(!phShopOK())return;
   const from=el?bfCenter(el):null,to=bfChipXY(meSeat()>=0?meSeat():G.active),html=`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,nm=CARDS[base(G.market[k])].n;
   BF.sel=-1;bfTut('buy',1);BF.tipHold={html:`<b>${esc(nm)}</b> ${chipOf(CARDS[base(G.market[k])])}<p>${cx(CARDS[base(G.market[k])].x)}</p>`,until:bfNow()+3200};setTimeout(()=>{bfShop()},3300);bfFly(html,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});uiAct({card:String(k)});bfFlash(`Bought ${nm}!`,1400)}
 // ---- the computer's turn: a tap on the board speeds it up until your next turn ----
-function bfSpeed(){if(BF.fast||!G||humanTurn())return;BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,140);bfFlash('Fast forward ⏩',900)}
+function bfSpeed(){if(BF.fast||!G||humanTurn())return;BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,60);BF.until=Math.min(BF.until,bfNow()+120);bfFlash('Skipping ⏩',700)}
 function bfSlowAgain(){if(BF.fast&&(!G||humanTurn()||G.winner)){BF.fast=false;if(BF.saveDelay)AIDELAY=BF.saveDelay}}
 // ---- the ghost finger: the first game shows each new move once ----
 function bfTut(k,done){if(done){if(!BF.tut[k]){BF.tut[k]=1;try{localStorage.setItem('ccs_bf1',JSON.stringify(BF.tut))}catch(e){}}return}return !BF.tut[k]}
@@ -7654,7 +7738,17 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
 // the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
 function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
   if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pfeed'))}
-function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
+// G7: when the dice tray sits over Downtown (short phones), a tag above the tray still says who holds the city
+function bfCityTag(){const bd=document.querySelector('.gx-board');if(!bd)return;let el=$bf('bcity');if(!el){el=document.createElement('div');el.id='bcity';el.setAttribute('aria-live','polite');bd.appendChild(el)}
+  const tr=document.querySelector('#dicewrap');let show=false;
+  if(G&&!G.winner&&tr&&tr.offsetParent){const r=tr.getBoundingClientRect(),c=bfCityXY();if(c&&r.width&&c.x>r.left-20&&c.x<r.right+20&&c.y>r.top-30&&c.y<r.bottom+20){show=true;const br=bd.getBoundingClientRect();el.style.top=Math.max(4,r.top-br.top-34)+'px'}}
+  if(!show){el.classList.remove('on');return}
+  const nm=i=>{const q=G.pl[i];return q?(q.i===meSeat()?'You':mname(q)):''};
+  const t=G.city>=0?`👑 Downtown: ${nm(G.city)}${G.bayOn&&G.bay>=0?' + '+nm(G.bay):''}`:'👑 Downtown is empty';
+  if(el.textContent!==t)el.textContent=t;el.classList.add('on')}
+function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();try{bfCityTag()}catch(e){}
+  // G7: the chip tap is taught once, on the first rival turn of a game
+  if(G&&!G.winner&&!G.tut&&G.mode==='solo'&&!humanTurn()&&BF.chipTip!==G.gid&&G.turn>0){BF.chipTip=G.gid;setTimeout(()=>bfFlash('Tip: tap a chip up top to see that monster’s cards',2600),400)}bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
   const dk=document.querySelector('.gx-dock');const hold=!!(BF.cap&&bfNow()<BF.until);
   if(hold){clearTimeout(BF.holdT);BF.holdT=setTimeout(phRender,BF.until-bfNow()+40)}
   if(dk)dk.dataset.bf=G&&!G.winner?(hold?'resolving':humanTurn()?G.phase:'watch'):'';
@@ -7677,7 +7771,12 @@ function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let 
  const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);if(G&&!G.winner){const me=meSeat();G.pl.forEach(q=>{const c=document.querySelector(`#pchips .pchip[data-pm="${q.i}"]`);const hot=q.alive&&q.vp>=15&&q.i!==me;if(c)c.classList.toggle('hot',hot);
      if(hot&&me>=0&&!(BF.warned||(BF.warned={}))[q.i+':'+G.gid]){BF.warned[q.i+':'+G.gid]=1;setTimeout(()=>bfFlash(`${mname(q)} is close to 20★!`,2200),50)}})}
    // names that do not fit are trimmed (never clipped)
-   document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;const full=b.textContent;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.textContent=full.slice(0,n)+'…'}});
+   document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;
+     // a long name is condensed (same font size), and only trimmed if it would have to shrink below 70 %
+     const old=b.querySelector('.nmfit');const t=old?old.textContent:[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('');if(old)old.remove();[...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});
+     const nm=document.createElement('var');nm.className='nmfit';nm.textContent=t;b.appendChild(nm);const cs=getComputedStyle(b),r=(b.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0))/nm.offsetWidth;
+     if(r>=.7){nm.style.transform=`scaleX(${Math.min(1,r-.06).toFixed(3)})`;b.classList.add('fit');return}
+     nm.remove();b.appendChild(document.createTextNode(t));const full=t;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.lastChild.textContent=full.slice(0,n)+'…'}});
    if(!BF.snap)return;
    document.querySelectorAll('#pchips .pchip').forEach(c=>{const k=+c.dataset.pm,s=BF.snap[k];if(!s)return;[['h','♥'],['v','★'],['e','⚡']].forEach(([f,sym])=>{if(BF.rel[k+f])return;const em=c.querySelector('em.'+f);if(em)em.textContent=sym+s[f]})})};
  // the tray labels: big words, pips for the rolls left
@@ -7705,7 +7804,9 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
   if(t.closest&&t.closest('[data-act="end"]'))BF.sel=-1;
   // tapping the board outside the shop drops the picked card
   if(BF.sel>=0&&!(t.closest&&t.closest('#pshop'))){BF.sel=-1;setTimeout(phRender,0)}},true);
-try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=320}catch(e){}
+try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=230}catch(e){}
+// the recap names what each computer monster bought
+if(typeof buy==='function'){const _b=buy;buy=function(k){try{if(G&&!humanTurn()&&G.market[k]!==undefined)(BF.bought=BF.bought||[]).push(CARDS[base(G.market[k])].n)}catch(e){}return _b.apply(this,arguments)}}
 setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();
 
@@ -7720,7 +7821,9 @@ phLayout();
 //   - your power cards sit in a row at the top of the board: hold or tap to read
 //   - Stay / Yield and the other questions open in the middle of the board
 // The panel keeps only the status, the result line and the advice. It stays one tap away (☰ Panel).
-const OB={t:0,shown:'',suppress:0,toastT:0};
+const OB={t:0,shown:'',suppress:0,toastT:0,pin:0,pinK:-1};
+// touch: the first tap on a card shows it big with its text and a Buy button; Buy (or a second tap on the card) buys
+function obWillBuy(k){return !obTwo()||OB.pinK===k}
 const $ob=id=>document.getElementById(id);
 const obCoarse=()=>{try{return matchMedia('(pointer:coarse)').matches||!matchMedia('(hover:hover)').matches}catch(e){return true}};
 const obTwo=()=>phOn()||obCoarse();   // touch: tap a card to pick it, tap again to buy. Mouse: one click.
@@ -7745,41 +7848,47 @@ function obPlace(){const ob=$ob('ob');if(!ob||!G)return;const bd=ob.getBoundingC
   ob.style.setProperty('--cx',Math.round(bd.left+x)+'px');ob.style.setProperty('--cy',Math.round(bd.top+y)+'px')}
 // ---- the painted card on the board ----
 function obCardHTML(id,k,o){const C=CARDS[base(id)],p=o.p,c=costOf(p,id);
-  return `<button class="ptile bcard obc ${C.t} ${o.sg?'sugg':''} ${o.ok?'ok':'no'} ${o.arm?'sel':''}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${o.ok?'':', not affordable'}. ${esc(C.x)} ${o.ok?(obTwo()?(o.arm?'Tap to buy.':'Tap to pick it.'):'Click to buy.'):''}">
+  return `<button class="ptile bcard obc ${C.t} ${o.sg?'sugg':''} ${o.ok?'ok':'no'} ${o.arm?'sel':''}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${o.ok?'':', not affordable'}. ${esc(C.x)} ${o.ok?(obTwo()?(o.arm?'Tap to buy.':'Tap to read it.'):'Click to buy.'):''}">
     <span class="cost">${c}</span>${o.sg?'<i class="star">★</i>':''}<span class="oart" aria-hidden="true">${cardIcon(id)}</span><b>${esc(C.n)}</b>${o.ok&&(!obTwo()||o.arm)?`<em class="go">BUY ${c}⚡</em>`:''}</button>`}
 function obShop(){const el=$ob('pshop');if(!el||!G)return;
-  if(!phShopOK()||!G.market.length){BF.sel=-1;if(el.innerHTML)el.innerHTML='';return}
+  if(!phShopOK()||!G.market.length){BF.sel=-1;if(OB.pin)obHideCard();if(el.innerHTML)el.innerHTML='';return}
   const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;
-  const arm=BF.sel>=0?BF.sel:sg;
+  const arm=obTwo()?OB.pinK:(BF.sel>=0?BF.sel:sg);
   el.innerHTML=G.market.map((id,k)=>obCardHTML(id,k,{p,sg:k===sg,ok:canBuy(p,k),arm:k===arm})).join('')}
 bfShop=obShop;
 function obTapCard(k,el){const p=cur();if(!phShopOK())return;
-  if(!canBuy(p,k)){BF.sel=k;obShop();const t=document.querySelector(`#pshop [data-shop="${k}"]`);if(t){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}if(typeof sfx==='function')sfx('click');obFlash(whyNot(p,G.market[k])||'You can’t buy this one',1600);return}
-  if(obTwo()){const fk=BF.sel>=0?BF.sel:suggestCard(p);if(fk!==k){BF.sel=k;obShop();if(phOn())phRender();if(typeof sfx==='function')sfx('click');obFlash('Tap it again to buy',1400);return}}
+  if(!canBuy(p,k)){BF.sel=k;obShop();obPin(k);const t=document.querySelector(`#pshop [data-shop="${k}"]`);if(t){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}if(typeof sfx==='function')sfx('click');obFlash(whyNot(p,G.market[k])||'You can’t buy this one',1600);return}
+  if(!obWillBuy(k)){BF.sel=k;obPin(k);obShop();if(phOn())phRender();if(typeof sfx==='function')sfx('click');return}
+  obHideCard();
   const nm=CARDS[base(G.market[k])].n;let from=null,to=null;try{if(phOn()){from=bfCenter(el);to=bfChipXY(meSeat()>=0?meSeat():G.active)}}catch(e){}
   BF.sel=-1;if(typeof bfTut==='function')bfTut('buy',1);
   if(from&&to&&typeof bfFly==='function')bfFly(`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});
   uiAct({card:String(k)});obFlash(`Bought ${nm}!`,1400)}
 bfTapCard=obTapCard;
 // ---- hold to read: the big card ----
-function obShowCard(id,extra){const C=CARDS[base(id)];if(!C)return;const v=$ob('obcard');if(!v)return;const p=cur(),c=costOf(p,id);
-  v.innerHTML=`<div class="obbig ${C.t}"><span class="cost">${c}</span><div class="bart">${cardIcon(id)}</div><h3>${esc(C.n)}</h3><p class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</p><p>${cx(C.x)}</p>${extra?`<p class="ex">${esc(extra)}</p>`:''}</div>`;
+function obPin(k){const p=cur(),id=G.market[k];if(id===undefined)return;obShowCard(id,canBuy(p,k)?'':(whyNot(p,id)||''),{k,ok:canBuy(p,k)});OB.pin=1;OB.pinK=k;const v=$ob('obcard');if(v){v.setAttribute('role','dialog');v.setAttribute('aria-modal','true');v.setAttribute('aria-label',CARDS[base(id)].n)}}
+function obShowCard(id,extra,o){const C=CARDS[base(id)];if(!C)return;const v=$ob('obcard');if(!v)return;const p=cur(),c=costOf(p,id);
+  v.innerHTML=`<div class="obbig ${C.t}"><span class="cost">${c}</span><div class="bart">${cardIcon(id)}</div><h3>${esc(C.n)}</h3><p class="ty">${chipOf(C)}${C.kw?' · '+esc(C.kw.toUpperCase()):''}</p><p>${cx(C.x)}</p>${extra?`<p class="ex">${esc(extra)}</p>`:''}${o?`<div class="obbtns dlg">${o.ok?`<button class="btn obbuy dlg" data-obbuy="${o.k}">Buy · ${c} ⚡</button>`:''}<button class="btn obx dlg" data-obclose="1">${o.ok?'Not now':'OK'}</button></div>`:''}</div>`;
+  // the card sits above the shop row (its Buy / Not now buttons must never lie over a shop card: the next tap on it has to reach it)
+  const ob=$ob('ob'),sh=$ob('pshop');let pb=0;if(o&&ob&&sh&&sh.firstElementChild){pb=Math.max(0,Math.round(ob.getBoundingClientRect().bottom-sh.getBoundingClientRect().top+22))}v.style.paddingBottom=pb?pb+'px':'';v.style.boxSizing='border-box';
   v.classList.add('on');v.setAttribute('aria-hidden','false');OB.shown=String(id)}
-function obHideCard(){const v=$ob('obcard');if(v){v.classList.remove('on');v.setAttribute('aria-hidden','true')}OB.shown=''}
+function obHideCard(){const v=$ob('obcard');if(v){v.classList.remove('on');v.setAttribute('aria-hidden','true');v.removeAttribute('role');v.removeAttribute('aria-modal')}const was=OB.pinK;OB.shown='';OB.pin=0;OB.pinK=-1;if(was>=0&&G)setTimeout(()=>{obShop();if(phOn())phRender()},0)}
 function obCardOf(t){const s=t.closest&&t.closest('#ob [data-shop]');if(s&&G&&G.market[+s.dataset.shop]!==undefined){const id=G.market[+s.dataset.shop];const p=cur();return {id,extra:canBuy(p,+s.dataset.shop)?'':(whyNot(p,id)||'')}}
   const o=t.closest&&t.closest('#ob [data-own]');if(o)return {id:o.dataset.own,extra:''};return null}
-document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const c=obCardOf(e.target);if(!c)return;OB.sx=e.clientX;OB.sy=e.clientY;clearTimeout(OB.t);OB.t=setTimeout(()=>{OB.suppress=1;obShowCard(c.id,c.extra)},400)},true);
+document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const c=obCardOf(e.target);if(!c)return;OB.sx=e.clientX;OB.sy=e.clientY;clearTimeout(OB.t);OB.t=setTimeout(()=>{if(OB.pin)return;OB.suppress=1;obShowCard(c.id,c.extra)},400)},true);
 document.addEventListener('pointermove',e=>{if(OB.t&&Math.hypot(e.clientX-OB.sx,e.clientY-OB.sy)>12){clearTimeout(OB.t);OB.t=0}},true);
-const obUp=()=>{clearTimeout(OB.t);OB.t=0;if(OB.shown)obHideCard()};
+const obUp=()=>{clearTimeout(OB.t);OB.t=0;if(OB.shown&&!OB.pin)obHideCard()};
 document.addEventListener('pointerup',obUp,true);document.addEventListener('pointercancel',obUp,true);
 document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('#ob [data-shop],#ob [data-own]'))e.preventDefault()},true);
 // mouse: hover for a moment
-document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const c=obCardOf(e.target);if(!c)return;clearTimeout(OB.ht);OB.ht=setTimeout(()=>obShowCard(c.id,c.extra),350)},true);
-document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse')return;if(!obCardOf(e.target))return;clearTimeout(OB.ht);obHideCard()},true);
+document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const c=obCardOf(e.target);if(!c)return;clearTimeout(OB.ht);OB.ht=setTimeout(()=>{if(!OB.pin)obShowCard(c.id,c.extra)},350)},true);
+document.addEventListener('pointerout',e=>{if(e.pointerType!=='mouse'||OB.pin)return;if(!obCardOf(e.target))return;clearTimeout(OB.ht);obHideCard()},true);
 // the tap after a hold must not buy; a tap on a card of ours is handled here for every screen
 window.addEventListener('click',e=>{if(!G)return;
   if(OB.suppress){OB.suppress=0;if(e.target.closest&&e.target.closest('#ob [data-shop],#ob [data-own]')){e.stopPropagation();e.preventDefault();return}}
-  const t=e.target,sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();obHideCard();bfTapCard(+sh.dataset.shop,sh);return}
+  const t=e.target,bb=t.closest&&t.closest('[data-obbuy]');if(bb){e.stopPropagation();e.preventDefault();const k=+bb.dataset.obbuy;const sh=document.querySelector(`#pshop [data-shop="${k}"]`);if(phShopOK()&&OB.pinK===k)bfTapCard(k,sh||bb);else obHideCard();return}
+  if(t.closest&&t.closest('[data-obclose]')){e.stopPropagation();e.preventDefault();BF.sel=-1;obHideCard();return}
+  const sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();if(!OB.pin)obHideCard();bfTapCard(+sh.dataset.shop,sh);return}
   const ow=t.closest&&t.closest('#ob [data-own]');if(ow){e.stopPropagation();e.preventDefault();OB.shown===ow.dataset.own?obHideCard():obShowCard(ow.dataset.own,'');clearTimeout(OB.ownT);OB.ownT=setTimeout(obHideCard,4000);return}
   if(OB.shown)obHideCard();
   if(BF.sel>=0&&!(t.closest&&t.closest('#pshop'))){BF.sel=-1;setTimeout(()=>{obShop();if(phOn())phRender()},0)}},true);
@@ -8102,7 +8211,7 @@ const HLP_STEPS={
   roll:{target:()=>HLP_Q('#dice'),title:'Tap dice to keep',text:'Tap the dice you like. They turn yellow and stay. Then press Roll.',pic:()=>hlpFaces(['3'],'',[0])},
   reroll:{target:()=>HLP_Q('#pacts [data-act="reroll"]'),title:'Roll the rest',text:'Press Roll to throw the dice you did not keep.',pic:()=>hlpFaces(['2','C'],'')},
   done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Tap SMASH! over the city to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
-  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Hold a card to read it, tap to buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
+  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Tap a card to read it, then tap Buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
   watch:{target:()=>{const e=HLP_Q('#bline');return e&&e.getClientRects().length&&e.textContent?e:HLP_Q('#ptop')},title:'Others are playing',text:'Watch their dice. Tap the board to speed them up.',pic:()=>hlpIcons([HLP_CROWN],'',60)}};
 const HLP_RULES=[
   {title:'How a turn works',text:'1  Roll the dice, up to 3 times.\n2  Tap dice to keep them. Roll the rest.\n3  Tap SMASH! to use the dice.\n4  Buy a power card with ⚡, or skip.\n5  Tap End turn.',pic:()=>hlpFaces(['1','2','3','E','C','H'],'')},
@@ -8242,7 +8351,7 @@ const COACH_TIPS = [
   { id: 'stop', rules: ['stop'], say: 'Happy with these dice? Tap SMASH! to use them now.', when: () => myTurn_() && G.phase === 'roll' && G.rolls <= 1 && G.dice.length },
   { id: 'enter', rules: ['enter'], say: 'Downtown was empty, so you moved in: +1 ★.', when: () => myTurn_() && G.phase === 'buy' && inCity(me_()) },
   { id: 'start2', rules: ['start2'], say: 'Starting a turn in Downtown pays +2 ★.', when: () => myTurn_() && G.phase === 'roll' && G.rolls === 2 && inCity(me_()) && G.tid > 2 },
-  { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Tap a card to read it. Tap again to buy it.', when: () => myTurn_() && G.phase === 'buy' },
+  { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Tap a card to read it, then tap Buy.', when: () => myTurn_() && G.phase === 'buy' },
   { id: 'rivals', rules: ['rivals'], say: g => `${g.rival} plays like you. Watch the line at the top.`, when: () => !G.winner && G.active !== me_() && !UI.intro },
   { id: 'yield', rules: ['yield'], say: 'Hit in Downtown. Stay for +2 ★ a turn, or yield and leave.', when: () => UI.choice && /Stay or yield/.test(UI.choice.title) },
   { id: 'ko', rules: ['ko'], say: 'At 0 ♥ a monster is out. Last one standing wins.', when: () => G.pl.some(p => p.alive && p.hp <= 3) },
@@ -8295,16 +8404,14 @@ function tutFirst(){try{return !localStorage.getItem(TOUR)&&!GXT.status(TUT_GAME
 const TUT_SCRIPT=[
   ['3','3','E','H','C','1'],  // you: two 3s to keep
   ['3','E','E','2'],          // reroll of dice 2-5: a third 3 and two energy
-  ['E'],                      // the last reroll: one more energy
+  ['E','E'],                  // the last reroll: the freed energy die and the 2 -> three energy
   ['C','C','1','2','2','H'],  // Squidrik: two claws, no triple
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['C','C','H','E','E','1'],  // you in Downtown: claws, a heart that cannot heal, two energy
+  ['1','2','3','E','E','3'],  // Shroomhulk (2 hearts): nothing scores, no healing
+  ['C','C','H','E','E','1'],  // you in Downtown: claws knock Shroomhulk out, a heart that cannot heal, two energy
   ['C','C','C','1','2','H'],  // Squidrik: three claws
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
   ['H','C','C','3','3','E'],  // you outside: a heart that heals, claws that hit Downtown
   ['C','1','2','H','H','3'],  // Squidrik (now in Downtown): one claw
-  ['1','2','3','H','H','3'],  // Shroomhulk: nothing scores
-  ['3','3','3','3','C','C']]; // you, chapter 4: four 3s (3 stars + 1 for the extra die)
+  ['3','3','3','3','C','C']]; // you, some turns later: four 3s (3 stars + 1 for the extra die)
 const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','mend'];   // cards for sale; then (popped in this order) what a refill and the sweep deal
 (function(){
   // the dice: only the real throws read the script (the computer's look-ahead calls faceOf too and must stay random)
@@ -8325,7 +8432,7 @@ const TUT_BUY=['cosmic','plated','kiosk'], TUT_NEXT=['kidfan','train','sun','men
   const _cs=campSetup;campSetup=function(){const r=_cs.apply(this,arguments);if(UI.tutNext)tutTable();return r};
 })();
 function tutTable(){UI.tutNext=false;G.tut=1;G.mode='solo';
-  [0,1,3].forEach((m,i)=>{const p=G.pl[i];p.m=m;p.human=i===0;p.lvl='easy';p.hp=10;p.vp=0;p.en=0;p.edeck=shuffle(evoDeckOf(m))});
+  [0,1,3].forEach((m,i)=>{const p=G.pl[i];p.m=m;p.human=i===0;p.lvl='easy';p.hp=i===2?2:10;p.vp=0;p.en=0;p.edeck=shuffle(evoDeckOf(m))});
   const all=TUT_BUY.concat(TUT_NEXT);G.deck=G.deck.concat(G.market,G.disc).filter(c=>!all.includes(c));G.market=TUT_BUY.slice();G.disc=[];
   G.deck.push(...TUT_NEXT.slice().reverse());G.ncards=cardTotal();G.log=[];lg(-1,'Tutorial: a short staged game.');
   TUT.script=TUT_SCRIPT.map(f=>f.slice());TUT.hold=false;TUT.ends=0}
@@ -8349,85 +8456,79 @@ const myBuy=()=>myTurn()&&G.phase==='buy'&&!tBusy();
 const isAct=a=>x=>x.what==='act'&&x.act===a;
 const isDie=(f,n)=>x=>x.what==='die'&&x.f===f&&!x.kept&&(n==null||x.k===n);
 const nm=i=>mname(P(i));
+// core rule -> the step that teaches it (in play order). tut-walk.js walks the tutorial by touch and checks every one was shown.
+const TUT_RULES=[['goal: 20 stars or last standing','goal'],['keep dice','keep'],['three rolls','roll1'],['three of a kind (1s, 2s, 3s score 1, 2, 3), pair scores nothing','third'],
+  ['energy','energy'],['kept dice can be rerolled','rekeep'],['resolve the dice','done1'],['empty Downtown: move in, +1 star','score1'],
+  ['buy a power card','buy'],['card powers: permanent vs one-shot','power'],['energy is saved, end turn','end1'],['rivals take turns; outside claws hit Downtown','rivals'],['stay when hit','stay'],
+  ['start in Downtown: +2 stars','bonus'],['Downtown claws hit everyone; stop early','done2'],['0 hearts: knocked out; no healing in Downtown','ko'],
+  ['sweep the cards for 2 energy','sweep'],['yield Downtown','yield'],['outside: hearts heal, claws hit Downtown','done3'],
+  ['extra matching die adds 1 star','later'],['20 stars win at the end of the turn','win20'],['how the game is won','result']];
 function tutSteps(){
   const phone=obTwo();   // touch: tap a card to read it, tap again to buy (a mouse buys with one click)
   const S=[
- {id:'goal',title:'Your goal',say:'Smash your way to 20 ★. The last monster standing wins too.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
- {id:'keep',title:'Keep your 3s',say:'Dice you tap stay put when you roll again. Tap both 3s.',target:tDie(0),also:tDie(1),wait:{type:'tap',times:2,match:isDie('3')},
+ {id:'goal',title:'Your goal',say:'Win with 20 ★, or be the last monster standing.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
+ {id:'keep',title:'Keep dice',say:'Tap both 3s. Kept dice stay put when you roll.',target:()=>tDie(G.dice[0].k?1:0)(),also:()=>G.dice[0].k||G.dice[1].k?null:tDie(1)(),wait:{type:'tap',times:2,match:isDie('3')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.k).length<2},
- {id:'roll1',title:'Roll the rest',say:'You roll up to three times. Tap Roll to throw the other dice.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
+ {id:'roll1',title:'Roll again',say:'You get three rolls. Tap Roll to throw the rest.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice[0].k&&G.dice[1].k},
- {id:'third',title:'Three of a kind',say:'Two 3s score nothing. Three score 3 ★. Tap the new 3.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
+ {id:'third',title:'Three of a kind',say:'Three 3s = 3★, 2s = 2★, 1s = 1★. A pair: 0. Keep it.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].f==='3'&&!G.dice[2].k},
- {id:'energy',title:'Keep the energy',say:'Each ⚡ gives 1 energy to spend on power cards. Keep both.',target:tDie(3),also:tDie(4),wait:{type:'tap',times:2,match:isDie('E')},
+ {id:'energy',title:'Energy',say:'Each ⚡ is 1 energy for power cards. Keep both.',target:tDie(3),also:tDie(4),wait:{type:'tap',times:2,match:isDie('E')},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].k&&G.dice.filter(d=>d.k&&d.f==='E').length<2},
- {id:'roll2',title:'Last roll',say:'One roll left. Throw the last die.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
-   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===5},
- {id:'done1',title:'Smash!',say:'No rolls left. Tap SMASH! over the city to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'rekeep',title:'Change your mind',say:'Kept dice can be rerolled too. Tap this ⚡ to free it.',target:tDie(4),wait:{type:'tap',match:x=>x.what==='die'&&x.k===4&&x.kept},
+   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===5&&G.dice[4].k},
+ {id:'roll2',title:'Last roll',say:'One roll left. Tap Roll.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
+   ready:()=>myRoll()&&G.rolls===1&&G.dice.filter(d=>d.k).length===4&&!G.dice[4].k},
+ {id:'done1',title:'Smash!',say:'No rolls left. Tap SMASH! to use your dice.',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&G.rolls===0},
- {id:'score1',title:'Stars and energy',say:()=>'Three 3s score 3 ★, three ⚡ give 3 energy. Downtown was empty, so you moved in: +1 ★. You have '+P(0).vp+' ★.',target:tMe,wait:null,
+ {id:'score1',title:'Downtown',say:'Downtown was empty, so you moved in: +1 ★.',target:tMe,wait:null,
    ready:()=>myBuy()&&inCity(0)},
   ];
-  if(phone)S.push({id:'shop',title:'Power cards',say:()=>'Spend energy on power cards. Tap '+CARDS[base(G.market[0])].n+' to read it.',target:tShop(0),wait:{type:'tap',match:x=>x.what==='shopsel'&&x.k===0},
+  if(phone)S.push({id:'shop',title:'Power cards',say:'Spend energy on power cards. Tap this card to read it.',target:tShop(0),wait:{type:'tap',match:x=>x.what==='shopsel'&&x.k===0},
     ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3});
   S.push(
- {id:'buy',title:'Buy it',say:()=>(phone?'Tap it again to buy it for ':'Buy it for ')+costOf(P(0),G.market[0])+' ⚡. A PERMANENT card stays with you all game.',target:tShop(0),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
-   ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||BF.sel===0)},
- {id:'end1',title:'End your turn',say:'Saved energy carries over. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'buy',title:'Buy it',say:()=>phone?'It reads: cards cost 1 ⚡ less. PERMANENT: it stays. Tap Buy.':'Click to buy. PERMANENT cards stay all game.',target:()=>phone&&document.querySelector('#obcard.on [data-obbuy="0"]')||tShop(0)(),wait:{type:'tap',match:x=>(x.what==='shopbuy'||x.what==='card')&&x.k===0},
+   ready:()=>myBuy()&&G.market[0]===TUT_BUY[0]&&P(0).en>=3&&(!phone||OB.pinK===0)},
+ {id:'power',title:'Card powers',say:()=>CARDS.cosmic.n+': cards cost 1 ⚡ less. ONE-SHOT cards work once.',target:tMe,wait:null,
    ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
- {id:'rivals',title:'Rivals play too',say:()=>nm(1)+' rolls like you. Its claws hit the monster in Downtown: you. Computers keep, roll and buy too.',
+ {id:'end1',title:'End your turn',say:'Unspent energy is saved. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&P(0).cards.includes('cosmic')},
+ {id:'rivals',title:'Rivals play',say:()=>nm(1)+' rolls too. Claws from outside hit Downtown: you.',
    target:tfirst('#dice','#pchips .pchip[data-pm="1"]','#pchips'),wait:null,onNext:()=>tutRelease(),
    ready:()=>!tBusy()&&G.active===1&&G.phase==='roll'&&G.dice.length===6&&!UI.choice},
- {id:'stay',title:'Stay or yield?',say:()=>'Hit in Downtown? Stay to earn 2 ★ next turn, or yield and run. Tap Stay.',target:tOpt('stay'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='stay'},
+ {id:'stay',title:'Stay or yield?',say:'Hit in Downtown: stay, or yield and leave. Tap Stay.',target:tOpt('stay'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='stay'},
    ready:()=>tChoice(/^Stay or yield/)},
- {id:'bonus',title:'Downtown pays',say:()=>'You started in Downtown: +2 ★. You have '+P(0).vp+' ★. But hearts cannot heal you there.',target:tMe,wait:null,
+ {id:'bonus',title:'Downtown pays',say:'Starting your turn in Downtown pays +2 ★.',target:tMe,wait:null,
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
- {id:'done2',title:'Claws hit everyone',say:'From Downtown your claws hit every rival. You may stop rolling any time. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done2',title:'Hit everyone',say:'From Downtown, claws hit every rival. Stop early: tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&inCity(0)&&G.rolls===2},
- {id:'score2',title:'Smash!',say:()=>'Two claws hit both rivals. Two ⚡ gained. The heart did nothing: no healing in Downtown.',target:tChips,wait:null,
-   ready:()=>myBuy()&&inCity(0)},
- {id:'sweep',title:'New cards',say:'Not happy with the cards? Pay 2 ⚡ to swap all three for new ones.',target:tSweep,wait:{type:'tap',match:isAct('sweep')},
+ {id:'ko',title:'Knocked out',say:()=>nm(2)+' hit 0 ♥ and is out. No healing in Downtown.',target:tChips,wait:null,
+   ready:()=>myBuy()&&inCity(0)&&!P(2).alive},
+ {id:'sweep',title:'New cards',say:'Pay 2 ⚡ to swap all three cards. Tap Sweep.',target:tSweep,wait:{type:'tap',match:isAct('sweep')},
    ready:()=>myBuy()&&P(0).en>=2},
  {id:'end2',title:'End your turn',say:'Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&!G.market.includes(TUT_BUY[1])},
- {id:'yield',title:'Yield the city',say:()=>nm(1)+' hit you again. Yield to leave Downtown: it moves in, but you stop taking hits. Tap Yield.',target:tOpt('yield'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='yield'},
+ {id:'yield',title:'Yield',say:()=>'Hit again. Yield: '+nm(1)+' takes Downtown. Tap Yield.',target:tOpt('yield'),wait:{type:'tap',match:x=>x.what==='opt'&&x.opt==='yield'},
    ready:()=>tChoice(/^Stay or yield/)},
- {id:'done3',title:'Outside the city',say:'Outside, hearts heal you and claws hit whoever holds Downtown. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'done3',title:'Outside',say:'Outside, hearts heal and claws hit Downtown. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    ready:()=>myRoll()&&!inCity(0)&&G.rolls===2},
- {id:'score3',title:'Heal and hit',say:()=>'A heart healed you: '+Math.max(0,P(0).hp)+' ♥. Your claws hit '+nm(1)+' in Downtown.',target:tChips,wait:null,
-   ready:()=>myBuy()&&!inCity(0)},
- {id:'end3',title:'End your turn',say:'Tap End turn. The rivals play on while you watch.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+ {id:'end3',title:'End your turn',say:()=>'Healed to '+Math.max(0,P(0).hp)+' ♥. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
    ready:()=>myBuy()&&!inCity(0)&&P(0).vp<16},
- {id:'later',title:'Four of a kind',say:()=>'Some turns later you have '+P(0).vp+' ★. Four 3s score 3 ★ plus 1 for the extra die. Tap SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
+ {id:'later',title:'Four of a kind',say:'Four 3s: 3 ★ plus 1 for the extra die. SMASH!',target:tDone,wait:{type:'tap',match:isAct('resolve')},
    onEnter:()=>{try{P(0).vp=16;refresh()}catch(e){}},
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.f==='3').length===4&&!inCity(0)},
- {id:'win20',title:'Reach 20 stars',say:()=>'You have '+P(0).vp+' ★. Reach 20 and end your turn to win. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
-   ready:()=>myBuy()&&P(0).vp>=20},
- {id:'result',title:'The result',say:'The first to 20 ★ wins at once. You also win if every rival is K.O. (0 hearts). Tap Finish.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
+ {id:'win20',title:'Twenty stars',say:'20 ★! You win when your turn ends. Tap End turn.',target:tEnd,wait:{type:'tap',match:isAct('end')},
+   ready:()=>myBuy()&&P(0).vp>=20&&!G.winner},
+ {id:'result',title:'You win',say:'First to 20 ★ or last standing wins. Now play for real.',target:tfirst('#modal .btn','#modal','#pchips','.gx-board'),wait:null,
    ready:()=>!!(G&&G.winner&&UI.stats&&document.querySelector('#modal:not(.hidden)'))});
-  // the story layer (tut-story.js): the words, Dot's reactions and the chapter beats; the rules and actions above are untouched
-  const FIRST={goal:1,rivals:2,done3:3,later:4}, LAST={end1:1,yield:2,end3:3,result:4};
-  const H=()=>({vp:P(0).vp,hp:Math.max(0,P(0).hp),rival:nm(1),card:G.market[0]!==undefined?CARDS[base(G.market[0])].n:'the card',cost:G.market[0]!==undefined?costOf(P(0),G.market[0]):0});
-  S.forEach(x=>{const t=TUT_STORY.steps[x.id];if(!t)return;
-    if(typeof t.say==='function'){const f=t.say;x.say=()=>f(H())}else x.say=t.say;
-    const react=t.react,first=FIRST[x.id],last=LAST[x.id],B=TUT_STORY.beats;
-    const oe=x.onEnter;x.onEnter=()=>{if(oe)oe();if(first&&typeof ppBeat==='function')ppBeat('Chapter '+first+' · '+B[first].name,B[first].intro)};
-    const od=x.onDone;x.onDone=()=>{if(od)od();if(typeof ppBeat!=='function')return;if(react&&!last)ppBeat(null,react);if(last&&x.id!=='result')ppBeat('Chapter '+last+' done',(react?react+' ':'')+B[last].outro)}});
-  const CH={goal:1,keep:1,roll1:1,third:1,energy:1,roll2:1,done1:1,score1:1,shop:1,buy:1,end1:1,rivals:2,stay:2,bonus:2,done2:2,score2:2,sweep:2,end2:2,yield:2,done3:3,score3:3,end3:3,later:4,win20:4,result:4};
-  S.forEach(x=>{if(CH[x.id])x.title=CH[x.id]+' · '+x.title});
+  // every rule the tutorial teaches, in order: TUT_RULES (tut-walk.js checks each one appears)
   return S}
 // ---------------------------------------------------------------- start, leave, hooks
 function tutRelease(){TUT.hold=false;try{schedule()}catch(e){}}
-function tutStart(o){   // coached first game (Addendum 4): a real game, free choices from turn 1, Dot speaks just in time (playable.js, tut-story.js)
-  try{localStorage.setItem('gxt-'+TUT_GAME,JSON.stringify({open:true,step:1,seen:true}))}catch(e){}
-  try{GXH.hide()}catch(e){}try{if(GX.open)GX.close()}catch(e){}try{if(typeof GXC!=='undefined'&&GXC.close)GXC.close()}catch(e){}
-  clearTimeout(UI.statsT);UI.info=false;UI.choice=null;UI.stats=false;UI.intro=false;UI.coach=-1;UI.adv=false;UI.paused=false;UI.pending=false;UI.busy=false;UI.camp=null;UI.campNext=false;UI.tutNext=true;
-  const sv={n:UI.n,mon:UI.mon,xp:UI.xp,evo:UI.evo,ex:UI.ex,lvl:UI.lvl};UI.n=3;UI.mon=0;UI.xp='base';UI.evo=false;UI.ex={};UI.lvl='easy';
-  try{setSeed(5);newGame('solo',3,0)}finally{Object.assign(UI,sv)}
-  TUT.hints=UI.hints;UI.hints=false;UI.intro=false;if(G){G.tut=1;G.goal=6;TUT.script=[]}render();if(typeof ppCoachStart==='function')ppCoachStart()}
+function tutStart(o){tutStartScripted(o)}   // the guided first game: one sentence and one highlighted tap per step, then a real game
 function tutStartScripted(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue),first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:pro?'You played a whole game. Now the Story begins.':'You played a whole game, start to finish. Time for a real one.',
+    endTitle:'You know the rules',endText:pro?'Now the Story begins.':'Now a real game.',
     endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:tutSetup,
     onDone:r=>{tutLeave();const c=r&&r.choice;
@@ -8463,7 +8564,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
   return _ga.apply(this,arguments)}})();
 (function(){const _bt=bfTapCard;bfTapCard=function(k,el){
   if(tutOn()&&!UI._tutIn){const p=cur();if(!phShopOK())return;
-    const what=!canBuy(p,k)?'shopno':obTwo()&&(BF.sel>=0?BF.sel:suggestCard(p))!==k?'shopsel':'shopbuy';
+    const what=!canBuy(p,k)?'shopno':!obWillBuy(k)?'shopsel':'shopbuy';
     if(!GXT.act({type:'tap',what,k}))return;
     UI._tutIn=1;try{return _bt.apply(this,arguments)}finally{UI._tutIn=0}}
   return _bt.apply(this,arguments)}})();
@@ -8498,6 +8599,14 @@ tutMenus();
   }
   // ---- 3) + 4) the line on the board (board.js bfLineText passes its text through here)
   const turnLogs = () => { const n0 = (typeof RECAP !== 'undefined' && RECAP.turnN) || 0; return G.log.filter(l => l.n > n0 && l.s === G.active) };
+  // a rival's caption, at most 8 words: "Magmaw resolves: 3★ from 3×3, 1⚡, smashes A −2, B −2" -> "Magmaw: 3★, 1⚡, hits 2 rivals −2"
+  const words = x => x.split(/\s+/).filter(Boolean).length;
+  function short(s) {
+    s = s.replace(/ resolves:/, ':').replace(/ from \d+×\d+/g, '').replace(/\bsmashes\b/, 'hits').replace(/ \((one-shot|permanent)[^)]*\)/i, '').replace(/[“”]/g, '').replace(/\.$/, '');
+    if (words(s) > 8) s = s.replace(/hits ((?:[^,−]+ −\d+,? ?)+)/, (m, l) => { const t = l.match(/−\d+/g) || []; return `hits ${t.length} ${t.length === 1 ? 'rival' : 'rivals'} ${t.every(x => x === t[0]) ? t[0] : ''}`.trim() });
+    if (words(s) > 8) s = s.split(/\s+/).slice(0, 7).join(' ') + '…';
+    return s;
+  }
   window.ppLine = function (t) {
     try {
       if (!(typeof G !== 'undefined' && G) || G.winner || UI.intro || UI.choice || quiet()) return t;
@@ -8505,10 +8614,10 @@ tutMenus();
       if (!humanTurn() && !(NET.on && G.pl[G.active].human)) {
         const ev = turnLogs()[0]; const s = ev ? String(ev.t).replace(/\s+/g, ' ') : '';
         if (G.phase === 'roll' && !s) return `${mname(p)} is rolling the dice…`;
-        return s ? (s.length > 64 ? s.slice(0, 61) + '…' : s) : `${mname(p)} is thinking…`;
+        return s ? short(s) : `${mname(p)} is thinking…`;
       }
-      if (humanTurn() && G.phase === 'roll' && G.dice.length) { const tot = rerollsOf(p) + 1, n = Math.min(tot, Math.max(1, tot - G.rolls)); return `Roll ${n} of ${tot} · ${t}` }
-      if (humanTurn() && G.phase === 'buy') return 'Buy phase · ' + t;
+      if (humanTurn() && G.phase === 'roll' && G.dice.length) { const tot = rerollsOf(p) + 1, n = Math.min(tot, Math.max(1, tot - G.rolls)); return `Roll ${n}/${tot} · ${t}` }
+      if (humanTurn() && G.phase === 'buy') return 'Buy · ' + t;
     } catch (e) { }
     return t;
   };
@@ -8636,8 +8745,9 @@ tutMenus();
     let el = $('pppop'); if (!el) { el = document.createElement('div'); el.id = 'pppop'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
     el.classList.toggle('short', !(window.ppHintsOn && ppHintsOn()));
     el.innerHTML = `${window.ppHintsOn && ppHintsOn() ? '<b>You smashed:</b>' : ''}<ul>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>${rating ? `<p>${rating}</p>` : ''}`;
+    // never over the dice or the buttons: sit above the dice tray, and let taps through (it is only a caption)
+    try { const dw = ($('dicewrap') || $('dice')).getBoundingClientRect(), bar = ($('pchips') || document.body).getBoundingClientRect(); el.style.top = dw.width ? Math.max((bar.bottom || 0) + 6, dw.top - el.offsetHeight - 8) + 'px' : '' } catch (e) { }
     el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), (window.ppHintsOn && ppHintsOn()) ? 4200 : 2600);
-    if (!el._tap) { el._tap = 1; el.addEventListener('click', () => { try { GX.show('dr-log') } catch (e) { } }) }
   }
   // ---- score strip: the leader is marked; the best-value card wears a badge
   function strip() {
