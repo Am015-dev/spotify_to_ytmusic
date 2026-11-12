@@ -216,7 +216,9 @@ function marketEl(p, q) {
   const more = h('button.smore', { type: 'button', hidden: true, 'aria-label': 'Scroll down to more stalls' });
   more.addEventListener('click', ev => { ev.stopPropagation(); stalls.scrollBy({ top: stalls.clientHeight * .8, behavior: 'smooth' }); });
   wrap.appendChild(h('div.stw', stalls, more)); stalls.addEventListener('scroll', () => smoreUpd(stalls, more), { passive: true });
-  requestAnimationFrame(() => smoreUpd(stalls, more));
+  requestAnimationFrame(() => { smoreUpd(stalls, more); stFit(stalls); smoreUpd(stalls, more); });
+  // a tap on a chip the scroll edge cuts still buys it, and the stall slides fully into view
+  stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'); if (b && b.classList.contains('tcut')) { const s = b.closest('.stall,.rbar'); if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
     wrap.appendChild(h('div.sinfo', ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
@@ -226,11 +228,20 @@ function marketEl(p, q) {
   try { sugMark(wrap, p, q, []); } catch (e) { }
   return wrap;
 }
+// R22: when the stalls do not all fit, show whole rows only (the box ends at the bottom of the last row that fits), so no stall
+// is ever half shown; the pill below says how many more there are and scrolling snaps row by row
+function stFit(st) {
+  if (!st.isConnected) return; st.style.maxHeight = '';
+  if (st.scrollHeight <= st.clientHeight + 2) return;
+  const top = st.getBoundingClientRect().top, H = st.clientHeight; let best = 0;
+  [...st.children].forEach(c => { const b = c.getBoundingClientRect().bottom - top; if (b <= H + 1 && b > best) best = b; });
+  if (best > 60) st.style.maxHeight = Math.ceil(best + 2) + 'px';
+}
 // R8: at 375 the stalls scroll; say how many are below and fade the bottom edge
 function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
   st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
-  // R17: a chip or ruby button cut by the scroll edge cannot take a tap at its centre, so it is hidden until it scrolls fully into view
+  // R17/R22: a chip or ruby button cut by the scroll edge is marked; it stays visible and tappable (a tap buys it and scrolls its stall into view)
   const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------

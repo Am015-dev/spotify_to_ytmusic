@@ -40,7 +40,7 @@ function renderReport() {
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
-  UI.advAt = Date.now();
+  UI.advAt = tapMark();
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }

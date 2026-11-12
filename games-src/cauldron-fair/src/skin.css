@@ -250,10 +250,13 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
 /* R8 fix: the stall list scrolls on small phones: a "N more stalls" cue and a faded bottom edge */
 .mkt .stw{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column}
 .mkt .stw>.stalls{flex:1 1 0}
-.mkt .stalls.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),rgba(0,0,0,.25));mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),rgba(0,0,0,.25))}
+.mkt .stalls.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6));mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6))}
 .smore{flex:none;align-self:center;margin-top:4px;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #f2b83a;background:#2b1a12;color:#fff6df;font:800 15px/1 system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;cursor:pointer}
 .smore[hidden]{display:none}
-.mkt .stalls .tcut{visibility:hidden}
+.mkt .stw>.stalls{scroll-snap-type:y proximity;scroll-padding-top:0}
+.mkt .stalls>*{scroll-snap-align:start}
 @media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0}}
 /* R8: the fortune chip on the board sits above the YOUR TURN bar, never under it */
 html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}
+/* R22 gate: the painted plate must not change the Stop box (GXSK.audit): keep its unskinned padding */
+html.sk #acts .btn.stopb{padding:4px 12px 4px 38px}

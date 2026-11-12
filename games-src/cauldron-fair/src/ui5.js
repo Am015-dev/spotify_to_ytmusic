@@ -192,6 +192,15 @@ function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfg
 // ---------- events ----------
 // G6 fix: a tap on Start day answers at once (pressed look + 'Starting…'), so nobody taps it twice while the day report gets ready
 function pressFb(t) { try { if (t.classList.contains('busy')) return; t.classList.add('busy'); t.setAttribute('aria-busy', 'true'); const b = t.querySelector('b') || t; const was = b.textContent; b.textContent = was.replace(/^Start day/, 'Starting day'); setTimeout(() => { if (t.isConnected && t.classList.contains('busy')) { t.classList.remove('busy'); t.removeAttribute('aria-busy'); b.textContent = was; } }, 2500); } catch (e) { } }
+// one press is one gesture. A sheet that opens while a finger is down (or a moment after it lifted) must not take that press's
+// trailing click, but any NEW press counts at once (same idea as the shell tutor's sameGesture).
+const TAP = { id: 0, down: 0, upAt: 0 };
+addEventListener('pointerdown', () => { TAP.id++; TAP.down++; }, true);
+addEventListener('pointerup', () => { if (TAP.down > 0) TAP.down--; TAP.upAt = Date.now(); }, true);
+addEventListener('pointercancel', () => { if (TAP.down > 0) TAP.down--; TAP.upAt = Date.now(); }, true);
+addEventListener('keydown', e => { if (!e.repeat) TAP.id++; }, true);
+function tapMark() { return { id: TAP.id, live: TAP.id > 0 && (TAP.down > 0 || Date.now() - TAP.upAt < 150) }; }
+function openedUnder(mk) { return !!(mk && typeof mk === 'object' && mk.live && mk.id === TAP.id); }
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]');
   if (!t) { if (ev.target.closest('#cwrap,#caul') && G && G.phase === 'brew' && focusSeat() !== viewSeat()) { UI.fastAI = true; return; }
@@ -201,15 +210,14 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // and so does the first brew screen after the report closed
-      if (UI.advAt && Date.now() - UI.advAt < 450 && t.closest('#acts')) break;   // a pop-up that just opened under a finger ignores that tap
+      const v = viewSeat(); if (openedUnder(UI.qT) && t.closest('#qbox')) break;   // only the trailing click of the press that opened a choice is ignored; a new tap always counts
+      if (openedUnder(UI.advAt) && t.closest('#acts')) break;
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; UI.instrNote = { ver: pl.ver, text: 'Only one white chip. Tap the flask again to use it.' }; render(); try { instrBar(); } catch (e) { } document.querySelectorAll('.flb').forEach(fb => { fb.classList.add('armed'); fb.setAttribute('aria-label', 'Tap again to use the flask'); }); break; } }
         if (m.t === 'ratset' || m.t === 'draw') UI.ratOpen = false;
         if (m.t === 'draw') UI.drawT = Date.now();
-        else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
         if (!tutAct({ what: 'mv', m })) break;      // the staged tutorial: only the asked move goes through (after every guard above, so the kit never moves on for a tap the game ignores)
         if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
         if (m.t === 'draw' && !UI.prefs.drew) { UI.prefs.drew = true; savePrefs(); }
