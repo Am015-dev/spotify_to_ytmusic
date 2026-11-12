@@ -402,11 +402,14 @@ html body.ec-stage #stage{--hh:172px}
 html body.ec-stage #stage>.ctl{display:none}
 .w485top{position:relative;z-index:9;display:flex;align-items:center;gap:6px;padding:4px 8px;min-height:44px;background:linear-gradient(rgba(10,7,5,.92),rgba(10,7,5,.55));border-bottom:1px solid rgba(201,162,39,.35);flex:none}
 .w485rel{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
-.w485r{width:36px;height:36px;flex:none;padding:0;border:1px solid rgba(201,162,39,.6);border-radius:50%;background:#1a120e;overflow:hidden}
+.w485r{width:44px;height:44px;flex:none;padding:0;border:1px solid rgba(201,162,39,.6);border-radius:50%;background:#1a120e;overflow:hidden}
 .w485r .art{width:100%;height:100%;border-radius:50%;background-size:cover}
 .w485none{font-size:13px;color:var(--mute);align-self:center}
 .w485fl{flex:none;font-size:13px;font-weight:700;color:#f5e9d8;background:rgba(0,0,0,.5);border-radius:999px;padding:3px 9px}
-html body .w485top .pots{gap:4px}html body .w485top .pot{width:36px;height:36px;padding:2px}
+html body .w485top .pots{gap:4px}html body .w485top .pot{width:44px;height:44px;padding:2px}
+.w8diff button{min-height:44px;padding:4px 12px}.w8dline{font-size:13px}
+@media (max-height:600px){#title .w8diff+.w8dline{margin-top:-4px}}
+@media (max-height:500px) and (orientation:landscape){#title .w8hint,#title .heroes+.refline:not(.w24note){display:none}}
 html body.ec-stage #stage .arena{position:relative;z-index:2;flex:1;min-height:0;display:flex;align-items:flex-end;gap:4px;padding:0 6px;margin-bottom:calc(var(--hh) + 72px)}
 html body.ec-stage #stage .arena::before{content:'';position:absolute;left:-10px;right:-10px;bottom:-30px;height:38%;background:radial-gradient(ellipse 70% 60% at 50% 70%,rgba(255,170,80,.16),transparent 70%),linear-gradient(transparent,rgba(8,5,3,.72) 55%);pointer-events:none;z-index:-1}
 html body.ec-stage #stage .hside{flex:0 0 42%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;min-width:0}

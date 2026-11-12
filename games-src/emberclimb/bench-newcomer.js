@@ -4,7 +4,7 @@
 // Run: node bench-newcomer.js [runs=300] [hero=w]   DIED=1 prints where runs ended.
 if (process.env.KE) global.EC_KE = JSON.parse(process.env.KE);
 const EC = require('./core.js'), E = EC.E, D = EC.D; const N = +process.argv[2] || 300, HERO = process.argv[3] || 'w';
-let f1 = 0, boss = 0, beat = 0, stuck = 0; const died = {};
+const BB = {}; let f1 = 0, boss = 0, beat = 0, stuck = 0; const died = {};
 function hasOp(c, k) { return E.eff(c).ops.some(o => o[0] === k || (o[0] === 'roll' && JSON.stringify(o).indexOf('"' + k + '"') >= 0)); }
 function pick(G, r) {
   const vm = E.validMoves(); const R = a => a[Math.floor(r() * a.length)];
@@ -25,7 +25,7 @@ function pick(G, r) {
   return R(vm);
 }
 for (let i = 0; i < N; i++) {
-  E.newGame({ heroes: [HERO], acts: 1, bless: 1, seed: 5000 + i }); const G = E.G(); let rs = 31 + i * 7, n = 0, reached = false;
+  E.newGame({ heroes: [HERO], acts: 1, bless: 1, gentle: process.env.GENTLE ? 1 : 0, seed: 5000 + i }); const G = E.G(); let rs = 31 + i * 7, n = 0, reached = false;
   const r = () => { rs = (rs * 1103515245 + 12345) & 0x7fffffff; return rs / 0x7fffffff; };
   while (G.scr !== 'over' && !(G.won) && n++ < 8000) {
     if (G.b && G.b.ph === 'e') { E.settle(); continue; }
@@ -33,8 +33,9 @@ for (let i = 0; i < N; i++) {
     const m = pick(G, r); if (!m || !E.performMove(m)) { const m2 = E.validMoves()[0]; if (!m2 || !E.performMove(m2)) { stuck++; break; } }
     if (G.b && G.b.ph === 'e') E.settle();
   }
+  if (reached || G.won) { const bk = G.boss; BB[bk] = BB[bk] || [0, 0, 0]; BB[bk][0]++; if (G.won) BB[bk][1]++; else if (G.b) BB[bk][2] += G.b.en.reduce((a, e) => a + (e.dead ? 0 : e.hp), 0); }
   if (G.scr === 'over' && !G.won) { const k = (G.b ? G.b.kind : '?') + G.floor; died[k] = (died[k] || 0) + 1; }
   if (G.floor >= 2 || G.won) f1++; if (reached || G.won) boss++; if (G.won) beat++;
 }
 const pc = x => (100 * x / N).toFixed(0) + '%';
-console.log(`newcomer bench (${HERO}, ${N} runs, Quick 1 act): survived floor 1 ${pc(f1)} | reached boss ${pc(boss)} | beat boss ${pc(beat)}${stuck ? ' | stuck ' + stuck : ''}`); if (process.env.DIED) console.log('ended (room kind + floor):', JSON.stringify(died));
+console.log(`newcomer bench (${process.env.GENTLE ? 'Gentle' : 'Tabletop'}, ${HERO}, ${N} runs, Quick 1 act): survived floor 1 ${pc(f1)} | reached boss ${pc(boss)} | beat boss ${pc(beat)}${stuck ? ' | stuck ' + stuck : ''}`); if (process.env.DIED) console.log('boss [reached, beaten, foe HP left on loss]:', JSON.stringify(BB)); if (process.env.DIED) console.log('ended (room kind + floor):', JSON.stringify(died));

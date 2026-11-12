@@ -83,6 +83,10 @@
     if (G.asc >= 2) G.hs.forEach(function (h) { h.mhp -= 5; h.hp = h.mhp; });
     if (G.asc >= 3) G.hs.forEach(function (h) { h.deck.push(mk('regret')); });
     if (G.asc >= 6) G.hs.forEach(function (h) { h.hp = Math.ceil(h.mhp * 0.9); });
+    // Gentle (first climb): an easier mode made for the screen, NOT the rulebook. Only the player's numbers change (start HP, starting potions,
+    // rest heal); foes stay exactly tabletop. Tuned so a newcomer who blocks shown hits beats the boss about 1 climb in 3 (bench-newcomer GENTLE=1).
+    G.gentle = opt.gentle ? 1 : 0;
+    if (G.gentle) { var GM = D.GENTLE; G.hs.forEach(function (h) { h.mhp = Math.round(h.mhp * GM.hp); h.hp = h.mhp; }); for (var gp = 0; gp < GM.pots && G.pots.length < G.pslots; gp++) G.pots.push(GM.pot); }
     G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
     G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; G.acts = opt.acts === 4 ? 4 : Math.max(1, Math.min(3, opt.acts || 1)); /* 4 = the optional Act IV; larger values fall back to the three standard acts */ G.act = 1;
     // final act (act 4, optional): one more climb to the Ember Tyrant after act 3. startAct: a story chapter set in a later act
@@ -294,7 +298,7 @@
     });
   }
   // rest: tabletop 'Heal 3 HP' on a ~10 HP board = 30%; at the shelf's 70-80 HP scale that is 30% of max HP (rules-notes R09)
-  function restHeal(h) { return 3 * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
+  function restHeal(h) { return (G.gentle ? D.GENTLE.rest : 3) * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights === 0 && P.first ? P.first : G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();

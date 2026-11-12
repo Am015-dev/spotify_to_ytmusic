@@ -66,3 +66,16 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - OPEN: difficulty. With the tabletop cards a newcomer by touch won 0/3 (floors 7, 3, 3); bench-newcomer 200 runs: beat boss 1%.
   Normal fights cost a newcomer 22-41 HP of 80. Elites never kill a passive full-HP hero in under 3 turns (min 3, wardens).
   Next: decide a faithful lever (the tabletop's own easier setup / starting bonus, potions, or rest frequency) or accept the hard curve.
+
+## R25 Gentle difficulty (12 Nov 2026, shelf/W485-emberclimb-bench)
+- Research: the rulebook has no easier mode or first-game setup. It only recommends the Warrior/Rogue as easier heroes; the solo
+  die relic's exact text was not confirmed (rulebook PDF host down), so it is not built. So: setup screen difficulty choice.
+- Gentle (first climb), default until the first full win (`ec-won1`) or a pick (`ec-diff`): x6 max HP, start with 3 Healing Draughts,
+  Rest heals 8 x SCALE (64) instead of 3 (24). Only player numbers (D.GENTLE in data.js, G.gentle in engine.js); foes untouched.
+  Rules drawer card "Gentle or Tabletop" says it is an easier mode, NOT the rulebook; result screen says "Played on Gentle".
+- Why x6: the boss is the wall. Tabletop Gate Wyrm gains 40 Block every turn (5 x 8) and only shifts after 48 HP damage, so a starter
+  deck (about 24 damage a turn) almost never hurts it: beaten 10-12% even with x5-x6 HP. HP x1.5/x2/x3/x4/x6: beat boss 3/7/16/22/39%.
+  OPEN for the orchestrator: check the printed Gate Wyrm card (rules-notes "one source"); if its Block is lower, Gentle can drop to ~x2.
+- Bench (300 runs, `GENTLE=1 node bench-newcomer.js 300 w`, DIED=1 adds a per-boss table): Gentle w 39% / s 66%; Tabletop w 0% / s 7%.
+- Also: top-bar potion and relic buttons 44 px (were 36); win-screen relics open the same explain popup as the top bar (+ title).
+  Short landscape hides the hero mech line and tap hint on setup so Start climb fits (`node tools/probe-setup.js` PASS at 4 sizes).

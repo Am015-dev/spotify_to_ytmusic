@@ -256,14 +256,19 @@
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
     var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
-    UI.acts = 1; mid.appendChild(h('div', 'refline w24act', 'Act 1 only: 9 floors, then a random boss.'));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
+    UI.acts = 1;
+    // difficulty: Gentle (first climb, player-side numbers only) is the default until the first win or a pick; Tabletop = rulebook numbers
+    UI.diff = UI.diff || diffDefault(); var dg = h('div', 'seg w8diff'); dg.setAttribute('role', 'group'); dg.setAttribute('aria-label', 'Difficulty');
+    [['g', 'Gentle (first climb)'], ['t', 'Tabletop (rulebook)']].forEach(function (o) { var b = on(h('button', UI.diff === o[0] ? 'on' : '', o[1]), function () { UI.diff = o[0]; try { localStorage.setItem('ec-diff', o[0]); } catch (e) { } render(); }); b.setAttribute('data-diff', o[0]); b.setAttribute('aria-pressed', String(UI.diff === o[0])); dg.appendChild(b); });
+    mid.appendChild(dg); mid.appendChild(h('div', 'refline w24act w8dline', 'Act 1 only: 9 floors, then a boss. ' + (UI.diff === 'g' ? 'Easier: more HP and potions.' : 'Rulebook numbers. Hard.')));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
     var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Start climb together' : 'Start climb'), function () { UI.heroNote = ''; start(); }); go.id = 'play'; row.appendChild(go);
-    var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes share the map. Tap both.' : 'Tap a hero. + Second hero plays together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
+    var wrap = h('div', '', null, [h('div', 'refline w8hint', UI.duo ? 'Two heroes share the map. Tap both.' : 'Tap a hero. + Second hero plays together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
   }
-  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
+  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0, gentle: g.gentle ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
+  function diffDefault() { try { var v = localStorage.getItem('ec-diff'); if (v === 'g' || v === 't') return v; return localStorage.getItem('ec-won1') ? 't' : 'g'; } catch (e) { return 'g'; } }
+  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1, gentle: (UI.diff || diffDefault()) === 'g' ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
@@ -771,6 +776,7 @@
   function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
   function resultScr(r, done) {
     var g = G(); try { hud(); } catch (e) { }   // R1: the top-bar HP must match the result (0 when fallen)
+    if (g.won && (g.floor >= g.F) && !UI.camp && !window.EC_NOSAVE) { try { localStorage.setItem('ec-won1', '1'); } catch (e) { } }   // first full win: Tabletop becomes the default (unless the player picked)
     var s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
     s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
@@ -781,6 +787,7 @@
     s.appendChild(cause);
     var QS = (window.EC_STORY || {}).quick; if (QS && !UI.camp && !window.EC_NOSAVE) s.appendChild(h('div', 'storyline', g.won ? QS.won : QS.lost));
     var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
+    if (g.gentle) s.appendChild(h('div', 'refline', 'Played on Gentle (easier mode). Try Tabletop next.'));
     s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F + 1) + ' / ' + (g.F + 1) + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
     if (r) {
       var sr = h('div', 'rstars'); for (var i = 0; i < 3; i++) sr.appendChild(h('span', i < r.stars ? 'on' : '', '★'));
@@ -792,7 +799,7 @@
     var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
     dk.appendChild(gr); s.appendChild(dk);
     var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
-    var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { toast(D.RELICS[id].name + ': ' + D.RELICS[id].t, 3200); }); t.setAttribute('aria-label', D.RELICS[id].name); rr.appendChild(t); });
+    var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: D.RELICS[id].name + ': ' + D.RELICS[id].t }]); }); t.setAttribute('aria-label', D.RELICS[id].name + ': ' + D.RELICS[id].t); t.title = D.RELICS[id].name + ': ' + D.RELICS[id].t; rr.appendChild(t); });
     rl.appendChild(rr); s.appendChild(rl);
     var bt = h('div', 'rbtns');
     var again = on(h('button', 'btn', 'Play again'), function () { done('again'); }); again.id = 'again'; bt.appendChild(again);
