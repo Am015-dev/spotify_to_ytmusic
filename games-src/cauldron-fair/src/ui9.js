@@ -244,8 +244,8 @@ function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
   st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
   // R17/R22: a chip cut by the scroll edge (tcut) stays visible and buys on a tap, then its stall slides into view; one whose centre is past the edge
-  // (tout) cannot take a tap at its centre, so it is hidden until it scrolls in (a tap on its stall scrolls it in)
-  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); e.classList.toggle('tout', r.height > 0 && (cy > b - 4 || cy < t + 4)); });
+  // (tout) cannot take a tap at its centre, so it is hidden and inert until it scrolls in (a tap on its stall scrolls it in)
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); const out = r.height > 0 && (cy > b - 4 || cy < t + 4); e.classList.toggle('tout', out); if (out && !e.disabled) { e.disabled = true; e.dataset.cut = '1'; } else if (!out && e.dataset.cut) { e.disabled = false; delete e.dataset.cut; } });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
