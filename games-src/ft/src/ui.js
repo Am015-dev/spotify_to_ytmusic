@@ -36,16 +36,16 @@ function computePick(){UI.pick=[];UI.pickSeat=[];UI.pickMk=[];UI.pickDj=[];UI.pi
     const tk=tm.filter(m=>m.take);if(tk.length){const sel=UI.mkSel;const js=new Set();for(const m of tk){if(sel.length===0||m.take.includes(sel[0])){for(const j of m.take)if(!sel.includes(j))js.add(j)}}UI.pickMk=[...js]}}}
 // ---------- the one short line ----------
 function qLine(q){return {claim:'Camel or tent?',item:'Keep which item?',djinn:'Pick a djinn',flute:'Pull a person over',kill:'Remove a person',thief:'Take your prize'}[q.kind]||words(q.title).slice(0,6).join(' ')}
-function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').slice(0,2).join(' & ')} ${G.over.win.length>1?'share':'wins'}`;
+function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);const w=G.over.win;if(hs.length===1&&w.length===1&&w[0]===hs[0].i)return 'You win!';const nm=w.map(i=>seatName(P(i))).slice(0,2).join(' & ');return `${nm} ${w.length>1?'share the win':'wins'}`}
   const s=sideToAct(),p=s>=0?P(s):null;if(!p)return '';const hp=me();
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
   if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
   switch(G.step){
-  case 'move':return !G.move?'Tap a glowing tile':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
-  case 'tribe':return {assassin:'Tap who to remove',builder:'Masons earn coins',merchant:'Traders fetch goods',vizier:'Advisors join you',elder:'Sages join you',artisan:'Crafters join you'}[G.act.color]||'';
-  case 'tile':{const t=G.board[G.act.tile];return {village:'A palace rises here',oasis:'A palm grows here',sacred:'Tap a djinn to summon',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item?'}[t.k]||'Nothing to do here'}
-  case 'sell':return 'Sell goods or end turn'}
+  case 'move':return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
+  case 'tribe':return {assassin:'Tap a glowing person to remove',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
+  case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
+  case 'sell':return 'Sell goods, or tap End turn'}
   return ''}
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
@@ -152,7 +152,7 @@ function onTile(i){const p=me();if(!p)return;if(UI.chz){const same=UI.chz.anchor
   if(G.step==='tile'){const m=vm.find(m=>m.act==='tile'&&m.place===i);if(m)return go(m)}
   nope()}
 function mdotHtml(c){return `<i class="mp lg" data-c="${c}"></i>`}
-function killChip(k){return mdotHtml(k.c)+(k.c2?mdotHtml(k.c2):'')+(k.fk?`<small>+${k.fk}🔮</small>`:'')}
+function killChip(k){return mdotHtml(k.c)+(k.c2?mdotHtml(k.c2):'')+`<small>${k.c2?'2 people':esc(MNAME[k.c]||'')}${k.fk?` · spend ${k.fk} Mystic${k.fk>1?'s':''} for reach`:''}</small>`}
 function onSeat(i){const p=me();if(UI.chz&&UI.chz.anchor.seat===i){UI.chz=null;return render()}if(p&&UI.pickSeat.includes(i)){const ks=validMoves(p.i).filter(m=>m.act==='tribe'&&m.kill&&m.kill.pl===i);if(ks.length===1)return go(ks[0]);if(ks.length)return pickChoose({seat:i},ks.map(m=>({html:killChip(m.kill),m})))}
   UI.chz=null;GX.show('plrd');renderPopups()}
 function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j}"]`);const tm=p&&G.step==='tile'&&!G.q?validMoves(p.i).filter(m=>m.act==='tile'&&m.take):[];if(!tm.length){const r=G.market[j];return showTip(el,`<b>${RICON[r]} ${esc(RNAME[r])}</b>${r==='fakir'?'<br>Mystic: extra power':'<br>Different goods make sets'}`)}

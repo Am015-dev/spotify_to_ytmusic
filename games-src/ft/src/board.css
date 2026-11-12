@@ -318,7 +318,7 @@ html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46p
 .tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
 #gw{overflow:visible}#grid{margin-top:6px}
 .coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
-.plpop{pointer-events:none}.plpop span{display:none}
+.plpop{pointer-events:none}.plpop span{display:inline;font-size:14px;max-width:62vw}
 html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 1px rgba(30,15,5,.85))}
 .tile .tv{top:-3px;right:-3px}
 @media (min-width:1024px){.coach{flex-wrap:wrap}.coach span{flex:1 1 150px}.coach button{flex:1 1 100%}}

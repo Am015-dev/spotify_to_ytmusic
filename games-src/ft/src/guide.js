@@ -46,7 +46,7 @@ const GD=(()=>{
    {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
    {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. Take all four.'},
    {id:'end',who:'note',say:'That was your last camel: the game ends after this round.'},
-   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'Shadows kill one person in reach, or a rival’s Advisor. Tap Farid.'},
+   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'Shadows kill in reach, or a rival’s Advisor. Tap Farid’s glowing box.'},
    {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
    {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},
    {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'nakhla',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},
@@ -105,3 +105,6 @@ function gdHook(){const e=coachEl();if(e.dataset.gd)return;e.dataset.gd='1';
 (function(){if(typeof hlpAdvice!=='function')return;const oh=hlpAdvice;hlpAdvice=function(){const st=gdStep();if(st)return st.who==='me'?st.m:null;return oh.apply(this,arguments)}})();
 window.GXGUIDE={get running(){return !!gdStep()},get step(){const s=gdStep();return s?{id:s.id,who:s.who,say:s.say||'',i:GD.i,busy:GD.busy}:null},get told(){return (GD.told||[]).slice()},
   get ids(){return GD.STEPS.filter(s=>s.say).map(s=>s.id)},get steps(){return GD.STEPS.filter(s=>s.say).map(s=>({id:s.id,say:s.say,who:s.who}))}};
+// while a step waits for you, only its own target glows (a Shadow step that wants a rival's Advisor lights the seat, not 16 tiles)
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);const st=gdStep();if(!st||st.who!=='me'||!st.m)return;const m=st.m;
+  if(m.act==='tribe'&&m.kill){UI.pick=m.kill.tile!=null?[m.kill.tile]:[];UI.pickSeat=m.kill.pl!=null?[m.kill.pl]:[]}}})();
