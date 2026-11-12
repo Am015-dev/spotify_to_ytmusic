@@ -11,6 +11,11 @@ function renderAll(){if(!G||!UI.started)return;
 function setHB(){}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
+// a button redrawn between finger-down and finger-up (a rival's step repaints the tray): the browser drops that click, so play it on the new button once
+document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('#act [data-a],#main [data-a],#ppop [data-a]');UI._pd=t?{t,a:t.dataset.a,k:t.dataset.k||'',v:t.dataset.aut||t.dataset.v||'',x:e.clientX,y:e.clientY}:null},true);
+document.addEventListener('pointerup',e=>{const p=UI._pd;UI._pd=null;if(!p||p.t.isConnected||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
+  const n=document.elementFromPoint(e.clientX,e.clientY),t=n&&n.closest&&n.closest('#act [data-a],#main [data-a],#ppop [data-a]');
+  if(!t||t.dataset.a!==p.a||(t.dataset.k||'')!==p.k||(t.dataset.aut||t.dataset.v||'')!==p.v||t.disabled)return;t.click();UI._ncT=Date.now()+350},true);
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-a]');
   // an open detail sheet closes on any tap outside it (that tap does nothing else)
@@ -31,7 +36,7 @@ document.addEventListener('click',e=>{
    case 'pclose':closePop();break;
    case 'newsok':newsOk();break;
    case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
-   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
+   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();const pp=$('#ppop');if(!pp||pp.hidden){UI.pop=null;UI.popArg=null;const ok=humanMove(t.dataset.k);if(!ok){toast('You can\u2019t use that now.');renderAll()}}break}   // no confirm sheet for this move: never a dead tap
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;

@@ -14,7 +14,10 @@ const STEP_HELP=[
  'Winter. Heralds go home and Supporters are lost. Played cards go to the discard pile. The next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
-function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
+// the one round number the header and the board both show (a round-end summary still shows the round that just ended)
+function shownRound(){try{const c=UI.card;if(c&&c.kind==='event'&&c.ev&&c.ev.round)return c.ev.round;if(c&&c.kind==='news'&&c.items&&c.items[0]&&c.items[0].round)return c.items[0].round}catch(e){}return Math.max(1,G.round)}
+function syncRound(){try{if(MAP.m&&G){const r=shownRound();if(MAP._rn!==r+'/'+G.rounds){MAP._rn=r+'/'+G.rounds;MAP.m.setRound(r,G.rounds)}}}catch(e){}}
+function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=shownRound();syncRound();
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
 function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
@@ -51,9 +54,10 @@ function renderRoad(){}
 // ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
+  if(!A&&mv&&mv.length){try{const m=suggest(s);const mm=m&&mv.find(x=>x.k===m.k);if(mm)A={m:mm,why:genericWhy(s,mm)}}catch(e){}}   // never a decision without a suggestion
   UI._adv=A;UI._rec=A?A.m:null;UI._recWhy=A?A.why:'';return UI._rec}
-// suggestions are on in the guided game and in rounds 1-2; later only on request (the "Suggest a move" button)
-function hintsAuto(){return isGuided()||UI.guide!=='off'&&G.round<=2}
+// suggestions: always with hints On (the first game's default), rounds 1-2 with Light; otherwise on request (the "Suggest a move" button)
+function hintsAuto(){return isGuided()||UI.guide==='full'||UI.guide==='light'&&G.round<=2}
 function hintsShown(s,mv){return hintsAuto()||UI.hintQ===qKey(s,mv)}
 const recK=()=>UI._recShown&&UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
@@ -160,7 +164,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
      h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
      if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
      if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
-     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     else{const rk=recK();h+='<div class="opts">'+mv.slice().sort((a,b)=>(b.k===rk)-(a.k===rk)).map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
      h+='</div>';sheet=true}}
   set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
@@ -179,7 +183,7 @@ function promptText(q,s){const t=q.title||'';
     case 'applause':return 'Set the turn order';
     case 'clashOrder':return 'Choose the Clash order';
     default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'Use a power, or tap Done':'Use a power, or tap Done'}return shortT(plain(t))}}
-function shortT(x){const w=String(x||'').split(/\s+/).filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
+function shortT(x){let w=String(x||'').split(/\s+/).filter(Boolean);if(w.length>8){const f=String(x).split(/(?<=[.?!])\s+/)[0].split(/\s+/).filter(Boolean);if(f.length<=8)return f.join(' ')}return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(UI._recWhy||'')+'</span></span></p>'}

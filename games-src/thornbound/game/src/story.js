@@ -4,7 +4,7 @@
 var TBSTORY={
   guide:'ysolde', rival:'tamsin',
   quick:{intro:'The king is dead. The heath is yours to take.',
-    win:'The crown is yours, and the heath sings your name.',lose:'The Court holds the gate this time. Gather your Clans and ride again.',tie:'Neither banner falls. The Favour decides the crown.'},
+    win:'The crown is yours, and the heath sings your name.',lose:'{W} take the throne this time. Gather your people and ride again.',tie:'Neither banner falls. The Favour decides the crown.'},
   // chapters of the tutorial prologue: first step id, title, opening beat, payoff beat (shown after the last step of the chapter)
   // the tutorial's lines live in ui12.js (tutSteps): one sentence per step, no story pop-ups over the board
   chapters:[],
