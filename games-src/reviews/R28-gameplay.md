@@ -11,6 +11,7 @@ the same time on a 4-core machine while the gates ran, so the waits may read lon
 |---|---|---|---|---|
 | nebula-aces | 6.4 | FAIL | PASS | 4 Turn clarity 5; 2, 5, 8 at 6 |
 | vale-of-banners | 7.1 | FAIL | PASS | 5 Phone 6 |
+| cauldron-fair | 7.3 | FAIL | FAIL | 5 Phone 6 |
 
 ---
 
@@ -152,4 +153,75 @@ One WARN, not blocking: `[lab] WARN 3/8 checks (b) LAB rows [...] != scenarios [
 | 2 | Tutorial at 375, first pass | On steps 4 and 6 the bubble crossed the prompt for a moment while sliding in, then moved clear. | games-src/reviews/R28-shots/vb-tut-375-ov-4.jpg |
 | 8 | Tapped the board during rival turns (g3) | 59 taps; the first each turn speeds the rival up. 11 showed no response. Once a stale "Drag a worker..." toast showed during the rival's turn. | games-src/reviews/R28-shots/vb-g3-390-rivaltap.jpg |
 | 7 | Result screen right after the last move | The table counts up, so a quick look shows "Total 13" next to 83 pts. It settles after about a second. Fine, just noting it. | games-src/reviews/R28-shots/vb-g2-375-result.jpg |
+
+---
+
+## 3. cauldron-fair (shelf/W503-cauldron-gameplay @ 0b582b34, merged locally): 7.3, FAIL
+
+What I played (my own build: `build-all.py --out /tmp/r28play/cauldron-fair`, no --full). I used Playwright real touch only:
+isMobile, hasTouch, `touchscreen.tap` at hit-tested centres, fresh storage, default settings (2 makers, easy). The machine was
+shared with other reviewers (load 2-7 on 4 cores), so the waits below are on the high side.
+- Tutorial ("New here? Learn in 5 minutes") to the end card, 3 times: 375 twice, 390 once. Each run had 30 steps and 31 taps, 7 of
+  them Next-only. I tapped each step at +100, +300 or +500 ms after the bubble showed: **0 ignored taps in 93**. A clean run took
+  36 s. Every bubble text is 14 px, every ring target is 56 px or more, and no bubble covered its target. 0 errors.
+- Real games from "Play" to the result card, as a naive new player: draw until the whites are 2 or 3 below the limit, buy the
+  dearest 1-2 glowing chips I can see, take the first choice on every sheet (so "Place none" on every peek), and use the flask
+  sometimes. I tapped the first button of each new sheet at +100, +300 or +500 ms.
+- 2 more games (390 and 375) reached day 9 leading 30-27 and 21-18. Then my script stalled on the day-9 "Back to your cauldron"
+  button. That was my script's fault, not the game's. They are not counted below.
+
+| Game | Size | Result | Taps | Time | My wait for my next action: median / max | Dead taps | First taps on new sheets | Errors |
+|---|---|---|---|---|---|---|---|---|
+| g4 | 390x844 | **won 47-39** | 183 | about 100 s | 0.9 s / 9.4 s | 0 | 15 of 15 worked | 0 |
+| g5 | 375x667 | **won 48-36** | 198 | about 100 s | 2.1 s / 11.6 s | 0 | 14 of 14 worked | 0 |
+| g6 | 375x667 | **won 57-35** | 231 | about 100 s | 0.9 s / 9.3 s | 0 | 13 of 13 worked | 0 |
+
+Rules check: it matches the published base game. I checked the start bag (4/2/1 whites, 1 orange, 1 green), the base prices
+(orange 3, black 10, green 4/8/14, blue 5/10/19, red 6/10/16, yellow 8/12/18, purple 9) and the white limit of 7. Also: the flask
+once a day, rat tails from day 2, the bonus die for the furthest safe pot, points or shop after a boom, buying up to 2 chips of
+different colours, 2 rubies for the droplet or the flask, yellow from day 2 and purple from day 3, the day-6
+white, no shop on the last day, 5 coins or 2 rubies = 1 point, and ties to the furthest pot. Nothing is invented. The one thing I
+could not confirm is the spacing of the rat tails: the game puts one on every second space of the score track. Sources say only
+"count the rat-tail icons between you and the leader".
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 8 | Every turn step and number I checked matches. The only gap is the rat-tail spacing, which is simplified to every second space and which I could not confirm. |
+| 2 | Tutorial teaches | 7 | 30 one-line steps with 0 ignored taps, then "Now a real game". Green and black chips are now taught by doing: you draw a Cinder Moth and a Mossback, then "After the brew" shows the droplet step and the rubies they won. Rat tails get a step with real numbers ("You 0, leader 2: 1 rat tail between") and then the next draw starts 1 space ahead. That step is still a Next card, though, not a tap. On day 2 of the tutorial, a step is titled "Last day", which is odd. |
+| 3 | First 10 seconds | 8 | The title leads with "New here? Learn in 5 minutes", then Play, then the table size and rival level. The first screen is the board with "YOUR TURN · Tap the bag". |
+| 4 | Turn clarity | 7 | The shop stalls say what each chip does in a few words, and the price sits on the chip. The fortune name still shows 3 times at once (NOW chip, YOUR TURN bar, sheet title). On day 9 the bar says "YOUR TURN · Last day! Draw or Stop" while the dock under it says "Decided. Waiting for others…" above "Back to your cauldron". |
+| 5 | Phone play | 6 | Fixed: no half-shown shop row at 375 (it now shows whole rows and a "3 more stalls" pill), and the choice sheet no longer covers the ALL DAY/NOW strip. All my targets were 44 px or more and all text 14 px or more. **But the --full gate FAILS at 375x553**: a help bubble covers tappable shop chips. Also at 375 the chip text at the shop bottom is cut mid-sentence ("…The rest go back into"). And 3 stalls (yellow, purple, black, plus the ruby bar) hide behind the pill while about 130 px of empty floor sits under it. |
+| 6 | AI and pacing | 7 | The rival brews sensibly. A game takes about 100 s and 180-230 taps (many are peek sheets). A naive player won 3 of 3, by 8, 12 and 22 points, even taking "Place none" on every peek. That is beatable, maybe soft (the gate sweep also says newcomers win 85% against easy). My longest wait for my next action was 9-12 s, while the rival finished or the day-end tally ran. |
+| 7 | Feel | 7 | Chips fly from the bag to the spiral, the meter fills, there is a bonus die, painted art and confetti, and a per-day result table. A drawn chip still flies over the first sheet button ("Place none…") as the sheet opens, though the tap still works. The board shrinks small at 375 while a sheet is open. The shop still reads like a form. |
+| 8 | Bugs | 8 | 3 full games and 3 tutorials: 0 page errors, 0 console errors, 0 stuck states, 0 dead taps. The first tap on 42 new sheets at +100, +300 and +500 ms all worked (the old 450 ms silent drop is gone). The gate failure is scored in row 5. |
+| | **Total** | **7.3** | **FAIL**: row 5 is below 7 (the --full gate fails on a phone overlap). No stopper. |
+
+**Gate**: FAIL. `/tmp/r28/gate-cauldron-fair.log` ends "EXIT 1", "0/1 PASS". The phone-check stage ran (56.1 s) with no failure.
+The failure is in the quick sweep: "FAIL cauldron-fair sweep.js: chapter 1 newcomer (draw until risk>30%, buy best) vs easy: win
+85%, tie 3%, goal(15 pts) / 1. [g1@375x553A] help: help bubble covers a tappable target shot: sweep-shots/f1-help.png". Also
+"[lab] cauldron-fair WARN 9/12 checks (b) LAB rows […] != scenarios […]". Shot: games-src/reviews/R28-shots/cf-gate-375x553-help-covers-target.jpg
+
+### Earlier findings (R22)
+| Finding | Status | Evidence (games-src/reviews/R28-shots/...) |
+|---|---|---|
+| Row 5/8: half-visible bottom shop row at 375; taps hit `stw` | **Fixed**: whole rows only plus a "3 more stalls" pill. 0 dead shop taps in 2 games at 375 | cf-375-shop-whole-rows-info-text-cut.jpg |
+| Row 8: first tap on a just-opened choice sheet silently dropped (450 ms guard) | **Fixed**: 42 of 42 first taps at +100/+300/+500 ms worked | cf-375-wren-sheet-chip-over-first-button.jpg (a +150 ms tap here still worked) |
+| Row 2: green and black only read, never done | **Fixed**: both are drawn in the tutorial, and their after-brew effects are shown | cf-375-tut-black-by-doing.jpg, cf-390-tut-green-by-doing.jpg |
+| Row 2: rat-tail counting never shown | **Partly fixed**: a step shows the count with real scores, then the head start is used. It is still a Next card | cf-375-tut-rats-next-only.jpg |
+| Row 5: choice sheet covers the ALL DAY strip at 375 | **Fixed**: the strip sits above the YOUR TURN bar and the sheet | cf-375-fortune-sheet-strip-clear.jpg |
+| Row 7/5: chips fly over the first choice button | **Not fixed** (cosmetic; the tap still lands) | cf-375-wren-sheet-chip-over-first-button.jpg |
+| Row 4/5: tiny peek icons (~16 px) | **Partly fixed**: the peeked chips are 26 px and the icons in the buttons about 20 px | cf-375-wren-sheet-chip-over-first-button.jpg |
+| Row 4: fortune name shown 3 times | **Not fixed** | cf-375-fortune-sheet-strip-clear.jpg |
+| Gate: --full phone-check failed on Draw/Stop "skin changed box" at 375x553 | **Fixed**: the phone-check passes, but the quick sweep now fails (see Gate) | cf-gate-375x553-help-covers-target.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 (gate) | Read the --full gate log | The quick sweep fails at 375x553: in the chapter-1 shop, the help bubble "These chips make your bag stronger…" covers a row of tappable chips | cf-gate-375x553-help-covers-target.jpg |
+| 5 | Day-1 shop at 375x667, tapped Wren Feather 2 | The chip text at the bottom is cut mid-sentence ("…The rest go back into"). 3 stalls and the ruby bar hide behind the pill, with about 130 px of empty floor under it | cf-375-shop-whole-rows-info-text-cut.jpg |
+| 5 (works) | Day-1 shop at 390x844 | All 7 stalls and the ruby bar fit, whole | cf-390-shop-all-stalls.jpg |
+| 4 | Day 9 at 390, read the fortune card | "YOUR TURN · Last day! Draw or Stop" sits above "Decided. Waiting for others…" and "Back to your cauldron". The two lines contradict each other | cf-390-day9-decided-vs-your-turn.jpg |
+| 7 | Drew a Wren Feather at 375 | The drawn chip flies across "Place none, put them all back" as the sheet opens, and the cauldron shrinks to tiny numbers | cf-375-wren-sheet-chip-over-first-button.jpg |
+| 6 | 3 default games, naive play | Won 47-39, 48-36 and 57-35, always taking "Place none" on peeks. The easy rival may be soft | cf-390-result-won-47-39.jpg, cf-375-result-won-48-36.jpg, cf-375-result-won-57-35.jpg |
+| 2 (works) | Finished the tutorial at 375 | "Now a real game / You know every rule" with one "Play a real game" button (302x44) | cf-375-tut-end.jpg |
 
