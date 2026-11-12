@@ -1,5 +1,5 @@
 /* ===== W457 Play view (src/ui2.js pvRender; hooks in ui3.js / ui5.js): one focus at a time. Scoped to #bd.pv so ?board=old keeps the old board. ===== */
-#bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#2f7d3a;--pv-no:#a2382a;
+#bd.pv{--pv-paper:#f8edd2;--pv-paper2:#efdcb2;--pv-ink:#3b2a1c;--pv-wood:#5a3c22;--pv-gold:#ffd25a;--pv-ok:#1f6a2b;--pv-no:#a2382a;
   background:linear-gradient(180deg,rgba(52,34,18,.55),rgba(38,24,12,.72) 75%);color:var(--pv-ink);font-family:inherit}
 #bd.pv *{box-sizing:border-box}
 #bd.pv .pv-col{position:absolute;left:0;top:0;right:0;display:flex;flex-direction:column;gap:6px;padding:6px 8px 0}
@@ -10,7 +10,7 @@
 #bd.pv .chip.turn{background:#ffe7a3;box-shadow:0 0 0 2px #fff,0 0 14px 3px rgba(255,210,90,.85)}
 #bd.pv .pvch-t{display:flex;flex-direction:column;min-width:0;line-height:1.05;text-align:left}
 #bd.pv .pvch-n{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#bd.pv .pvch-s{font-size:14px;font-weight:600;opacity:.8;white-space:nowrap}
+#bd.pv .pvch-s{font-size:14px;font-weight:600;white-space:nowrap}
 #bd.pv .pvch-pt{margin-left:auto;font-size:22px;font-weight:800;display:inline-flex;align-items:center;gap:1px;color:var(--pv-ink)}
 #bd.pv .pvch-star{color:#8a5a00;font-size:18px;text-shadow:0 1px 0 #6b4a10}
 #bd.pv .pvsea{display:flex;flex-direction:column;align-items:center;justify-content:center;color:#f8edd2;font-size:14px;line-height:1;gap:1px;min-width:46px}
@@ -239,11 +239,11 @@ html[data-bench] #bd.pv .pv-mead{background:url(media/bench.webp) center bottom/
 #bd.pv .pvm-pts .pvc-w{font-size:14px}
 /* W482: one steady instruction line in the bar (never two lines over the buttons); one hint button on phones */
 html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:1!important;display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html.ph #bulbbtn{display:none!important}
+html.ph #bulbbtn{display:inline-flex!important;min-width:44px;min-height:44px}
 /* W482: coach bubble and small labels at 14px+ on phones (feel gate d) */
 html.ph .gxt-bub .gxh-tx{font-size:15px;line-height:1.3}
 html.ph .gxt-bub .gxh-tt{font-size:15px}
-html.ph .gxt-bub .gxt-next{font-size:15px;min-height:32px;padding:4px 14px}
+html.ph .gxt-bub .gxt-next{font-size:15px;min-height:44px;padding:4px 14px}
 #bd.pv .strip.hand .scount{font-size:14px}
 .gx-drawer .sm,#rivald .sm,.rc .sm,.rhead .sm{font-size:14px}
 #bd.pv.wide .pvc{overflow:hidden}#bd.pv.wide .pvc-lead{display:none}
@@ -252,7 +252,7 @@ html.ph .pcard span,html.ph .pcard b,html.ph .gx-drawer b,html.ph .gx-drawer .sm
 html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!important}
 #bd.pv.wide .pvc-aff{white-space:normal!important;overflow:hidden}
 /* five piles (tokens too) on a phone: the worker count keeps its number and word, the meeple pictures step aside */
-#bd.pv.tall .resrow.r5 .pv-meeple{display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:0}
+#bd.pv.tall .resrow.r5 .pv-meeple:not(:first-child){display:none}#bd.pv.tall .resrow.r5 .pv-wn{margin-left:2px}   /* W509: with point tokens shown, one worker stays visible so it can still be dragged */
 /* W482 round 2: phone Places = the painted tree-stump table (owner art media/table-woodland-phone.webp) with round clearings on it */
 #bd.pv.tall .pv-spots.pv-board{display:block;position:relative;height:100%;padding:0;gap:0;border-radius:18px;overflow:hidden;background:#6b5233 url(media/table-woodland-phone.webp) center/cover no-repeat;box-shadow:inset 0 0 0 2px #3b2a1c}
 #bd.pv.tall .pv-board .pv-cell{position:absolute;width:32%;transform:translate(-50%,-50%);display:block}
@@ -297,3 +297,145 @@ html.ph .tchip,html.ph .tchip b,html.ph .tchip span{font-size:max(14px,1em)!impo
 #bd.pv.tall .pvch-pt{font-size:17px;margin-left:auto;padding-left:3px}#bd.pv.tall .pvch-star{font-size:14px}
 #bd.pv.tall .chip .pawnw{transform:scale(.85);margin:0 -2px}
 #bd.pv.tall .pvsea b{font-size:14px}
+/* G8: the bar prompt is whole: up to 2 lines, light on the dark bar (replaces the W482 one-line clamp) */
+html.ph #prompt,html.ph .gx-bar #prompt{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2!important;white-space:normal!important;overflow:hidden;text-overflow:clip;font-size:14px!important;line-height:1.15!important;min-width:0;color:#f6e7c4!important;font-weight:700}
+html.ph .gx-bar #prompt.mine,html.sk.ph .gx-bar #prompt.mine{color:#ffd77a!important}
+html:not(.ph) .gx-bar #prompt{color:#f6e7c4!important}html:not(.ph) .gx-bar #prompt.mine{color:#ffd77a!important}
+/* G8: choice buttons say the whole thing (wrap, never cut) */
+#acts .tchip b{white-space:normal;line-height:1.1;text-align:center;overflow-wrap:normal;word-break:normal}
+#acts.tray .tchip{min-height:44px;height:auto}
+/* G8: names never cut a word (fitNames() shrinks the font); no mid-word breaks */
+#bd.pv .pvc-name,#bd.pv .pvm-name,#bd.pv .pv-sw b,#bd.pv .hcn{word-break:normal;overflow-wrap:normal;hyphens:none;overflow:hidden}
+/* G8: goals are readable: dark ink on light paper, 14px+ */
+#bd.pv .pv-panel[data-p=goals] .pv-sw b{color:#2a1f19;font-size:15px}
+#bd.pv .pv-panel[data-p=goals] .pv-sw span{color:#3b2a1c;opacity:1;font-size:14px;font-weight:700}
+/* G8: floating gains sit on their own pill, so they never garble over other text */
+.fxp{background:#2a1f19;border:2px solid #f2c45a;border-radius:999px;padding:1px 9px 1px 4px;z-index:40;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+.fxp b{text-shadow:none!important;color:#fff3cf}
+.fxp.neg{border-color:#e08a70}
+/* G8: worker / card landing ring and the flying built card */
+.pv-ring{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:4px solid #fff3cf;box-shadow:0 0 12px #f2c45a;pointer-events:none;z-index:32;animation:pvring .8s ease-out forwards}
+.pv-ring.gold{border-color:#f2c45a}
+@keyframes pvring{from{transform:scale(.4);opacity:1}to{transform:scale(3.2);opacity:0}}
+.pv-ghost.pv-flycard{position:absolute;z-index:31;width:74px}
+@media (prefers-reduced-motion:reduce){.pv-ring{animation:none;display:none}}
+/* G8: result breakdown: winner's column stands out */
+.pcard table.vs.ovt{font-size:15px}
+.pcard table.vs.ovt th.win,.pcard table.vs.ovt td.win{background:rgba(242,196,90,.28)}
+.pcard table.vs.ovt th{white-space:normal}
+#acts.tray.wrap .tchip:not(.tcard):not(.tx){flex:1 1 40%;padding:2px 6px;gap:4px}
+/* W482 R5: every board place is a framed painted space (like a printed board square): its name on a wooden banner at the top,
+   the reward plate under it, "shared" as a green badge on the painting, and the worker standing ON the painting */
+#bd.pv.tall .pv-board .tile.pv-place::before{width:100px;height:62px;border-radius:10px;border:3px solid #5b4026;box-shadow:inset 0 0 0 2px rgba(248,237,210,.55),0 4px 0 #3b2a1c,0 6px 8px rgba(0,0,0,.45)}
+#bd.pv.tall .pv-board .tile.pv-place.t-forest::before{border-color:#3f6a2a;box-shadow:inset 0 0 0 2px rgba(220,240,200,.5),0 4px 0 #24401a,0 6px 8px rgba(0,0,0,.45)}
+#bd.pv.tall .pv-board .tile.pv-place.glow::before{box-shadow:0 0 0 3px #ffd24a,0 4px 0 #3b2a1c,0 0 16px 6px rgba(255,214,90,.85)}
+#bd.pv.tall .pv-board .tile.pv-place .pv-tin{margin-top:-2px!important}
+#bd.pv.tall .pv-board .pv-nm{position:absolute;top:3px;left:50%;transform:translateX(-50%);width:92px;box-sizing:border-box;z-index:2;background:rgba(43,30,19,.88);color:#fbf1d8;font-size:12px;font-weight:800;line-height:1.08;padding:1px 3px 2px;border-radius:0 0 7px 7px;text-align:center;white-space:normal;overflow-wrap:normal;word-break:keep-all;pointer-events:none}
+#bd.pv.tall .pv-board .tile.pv-place .pv-shtag{top:40px;left:calc(50% - 47px);transform:none;font-size:12px;padding:2px 5px;border-radius:7px;border:1.5px solid #f8edd2}
+#bd.pv.tall .pv-board .tile.pv-place .pw{top:26px;right:auto;left:calc(50% + 4px);bottom:auto;transform:none;z-index:3;filter:drop-shadow(0 3px 2px rgba(0,0,0,.7))}
+#bd.pv.tall .pv-board .tile.pv-place .pv-taken{display:none}
+#bd.pv.tall .pv-board .tile.pv-place.taken::before{filter:grayscale(.5) brightness(.8)}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{width:80px;height:50px;border-width:2px;border-radius:8px}
+#bd.pv.tall .pv-board-s .pv-nm{width:74px;font-size:11px;top:2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{top:31px;left:calc(50% - 38px);font-size:11px;padding:1px 4px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:20px;left:calc(50% + 2px)}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw .pawnw{--pw:24px!important}
+/* the instruction line: dark ink on its own cream label, whatever the bar behind it is (contrast >= 4.5:1 always) */
+html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.ph .gx-bar #prompt{background:#fff4dc;color:#2a1f19!important;border:1.5px solid #5a3b1f;border-radius:9px;padding:2px 8px;text-shadow:none!important;white-space:normal!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2!important;overflow:hidden;text-overflow:clip!important;font-size:13px;line-height:1.15;max-width:100%;box-sizing:border-box}
+html #prompt.mine,html .gx-bar #prompt.mine,html.sk .gx-bar #prompt.mine{color:#6e3205!important}
+html #prompt:empty{display:none!important}
+#bd.pv.tall .pv-board .pv-cell{transform:translate(-50%,0)}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{height:44px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{top:27px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:16px}
+#bd.pv.tall .pv-board-s .pv-sw b,#bd.pv.tall .pv-board-s .pv-sw span{font-size:12px}
+/* phone Goals: two roomy columns on cream, full names that wrap at spaces, and what each goal needs */
+#bd.pv.tall .pv-goals{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#bd.pv.tall .pv-goals .pv-sub{grid-column:1/-1;color:#fbf1d8}
+#bd.pv.tall .pv-goals .tile.pv-small{background:linear-gradient(180deg,#fbf1d8,#efdfb9)!important;opacity:1!important;filter:none!important;padding:5px 6px}
+#bd.pv.tall .pv-goals .tile.done{background:linear-gradient(180deg,#d9d2c2,#c4baa4)!important}
+#bd.pv.tall .pv-goals .pv-tin{align-items:flex-start}
+#bd.pv.tall .pv-goals .pv-sw b{white-space:normal;overflow:visible;word-break:keep-all;overflow-wrap:normal;font-size:14px;color:#2a1f19;display:block}
+#bd.pv.tall .pv-goals .pv-sw span{white-space:normal;overflow:visible;font-size:13px;color:#3b2a1c;opacity:1;display:block}
+#bd.pv.tall .pv-goals .pv-sico{width:24px;height:24px}
+/* phone city: 4 across so every card name fits; empty hand line readable and whole */
+#bd.pv.tall .pv-grid{grid-template-columns:repeat(4,1fr)}
+#bd.pv .sempty,#bd.pv.tall .sempty{width:auto;height:auto;margin:0;left:0;right:0;top:40%;opacity:1;white-space:nowrap;overflow:visible;color:#fbf1d8;text-shadow:0 1px 2px #000}
+#bd.pv.tall .pvch-s{font-size:12px;letter-spacing:-.2px}
+#bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{top:0}
+@media (max-width:380px){#bd.pv.tall .pvch-s{font-size:11px;letter-spacing:-.25px}}
+#bd.pv.tall .pv-grid .pvm-name{padding:1px 1px;letter-spacing:-.35px}
+#bd.pv .strip.hand .scount,#bd.pv.tall .strip.hand .scount{top:2px;line-height:1.25}
+#bd.pv.tall .pv-grid{grid-auto-rows:minmax(58px,1fr);overflow-y:auto;overscroll-behavior:contain}
+#bd.pv .pvc.small .pvc-name{padding-left:2px;padding-right:2px;letter-spacing:-.3px}
+/* R5: the cream prompt label wins over every older bar colour (the old pale-yellow line was ~1.3:1 on cream) */
+html.ph .gx-bar #prompt,html.sk.ph .gx-bar #prompt,html:not(.ph) .gx-bar #prompt,html.sk .gx-bar #prompt{background:#fff4dc;color:#2a1f19!important;text-shadow:none!important}
+html.ph .gx-bar #prompt.mine,html.sk.ph .gx-bar #prompt.mine,html:not(.ph) .gx-bar #prompt.mine,html.sk .gx-bar #prompt.mine{color:#6e3205!important}
+#bd.pv .pv-visit{height:90px}#bd.pv .pv-visit .sc,#bd.pv .strip.city .pv-visit .sc{width:70px;height:86px}
+/* ===== R10 phone bar: no label under 14px anywhere in play (names wrap at spaces instead of shrinking), every tab 44px tall ===== */
+#bd.pv .pv-tab{min-height:44px}
+html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.ph .gx-bar #prompt{font-size:14px!important}
+/* seat chips: 14px count, the name and count share the line and wrap rather than shrink */
+#bd.pv.tall .pvch-s,#bd.pv.tall .pvch-n{font-size:14px!important;letter-spacing:0!important}
+#bd.pv .chip{overflow:hidden}
+/* 390+ board: painted space 104 wide, name 14px on its banner (2 lines at most), reward 14px under it, "shared" 14px on the painting */
+#bd.pv.tall .pv-board .tile.pv-place::before{width:108px;height:64px}
+#bd.pv.tall .pv-board .pv-nm{width:108px;font-size:14px;line-height:1.04;padding:1px 3px 2px}
+#bd.pv.tall .pv-board .tile.pv-place .pv-shtag{font-size:14px;top:44px;left:calc(50% - 52px);padding:0 5px;line-height:16px}
+#bd.pv.tall .pv-board .pv-sw b,#bd.pv.tall .pv-board .pv-sw span,#bd.pv.tall .pv-board .pv-sw b .pv-it{font-size:14px!important;line-height:1.08}
+#bd.pv.tall .pv-board .pv-tin{max-width:124px}
+/* short phones (4 x 3 board): the painting fills the whole space; name banner on top, reward plate at the bottom, "shared" between */
+#bd.pv.tall .pv-board-s .tile.pv-place{width:88px;height:82px;justify-content:flex-end}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{width:88px;height:82px;top:0;left:0;transform:none;border-radius:9px;border-width:2px}
+#bd.pv.tall .pv-board-s .pv-nm{top:0;width:88px;font-size:14px;line-height:1.02;padding:1px 2px 2px;border-radius:9px 9px 6px 6px;letter-spacing:-.2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{position:absolute;left:0;right:0;bottom:0;max-width:none;width:88px;margin:0!important;padding:1px 2px;border-radius:6px 6px 9px 9px;z-index:2}
+#bd.pv.tall .pv-board-s .pv-sw b,#bd.pv.tall .pv-board-s .pv-sw span,#bd.pv.tall .pv-board-s .pv-sw b .pv-it{font-size:14px!important;line-height:1.02;letter-spacing:-.2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{font-size:14px;top:auto;bottom:34px;left:2px;padding:0 4px;line-height:15px;border-width:1px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:auto;bottom:30px;left:auto;right:2px}
+/* goals, cards in hand, city cards, goal card: 14px floor */
+#bd.pv.tall .pv-goals .pv-sw span{font-size:14px}
+#bd.pv .pvc.small .pvc-w,#bd.pv .pvc.small .pvc-cost,#bd.pv .pvc.small .pvc-cost *{font-size:14px!important}
+#bd.pv .pvc-name,#bd.pv .pvm-name{font-size:14px;white-space:normal!important;overflow-wrap:normal;word-break:keep-all;letter-spacing:-.3px!important;line-height:1.05}
+.hb-goal-k{font-size:14px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{position:absolute!important;inset:auto 0 0 0!important;width:88px!important;margin:0!important}
+#bd.pv .pvc-name,#bd.pv .pvm-name{padding-left:1px!important;padding-right:1px!important;letter-spacing:-.5px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place,#bd.pv.tall .pv-board-s .tile.pv-place::before{height:77px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{padding:0 2px 1px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{bottom:31px}
+/* R10: a score bump pops only the number, never the whole seat chip (the chip at 1.35x covered the other chip and its own score) */
+#bd.pv .chip.bmp{animation:none!important}
+#bd.pv .chip.bmp .pvch-pt{animation:bmp .5s;transform-origin:right center}
+/* R10: 14px names that are wider than their box break at a proper hyphen (Trail-warden), never shrink; short phones drop the chip pawn (the border shows the colour) */
+#bd.pv .pvm-name,#bd.pv .pvc-name{-webkit-hyphens:auto;hyphens:auto}
+@media (max-width:380px){#bd.pv.tall .chip .pawnw{display:none}#bd.pv.tall .chips .chip{padding-left:8px}}
+/* R10: phone city 3 across (every 14px card name whole); it scrolls, and a choice scrolls its card into view. Chip pawn hidden on phones (border = colour) */
+#bd.pv.tall .pv-grid{grid-template-columns:repeat(3,1fr)}
+#bd.pv.tall .chip .pawnw{display:none}#bd.pv.tall .chips .chip{padding-left:8px}
+#bd.pv .pv-grid{position:relative}
+/* R17: Prepare says why it is off in two short lines; score changes live inside the seat chip; goods flash on their pile (no floating pills over the board) */
+#acts .btn.prep .prepw{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.1;text-align:left}
+#acts .btn.prep .prepw b{font-size:15px}#acts .btn.prep .prepw small{font-size:14px;font-weight:600;white-space:nowrap}
+#bd.pv .chip .pvch-s.fxd{color:#1f6b1f;opacity:1;font-weight:800}#bd.pv .chip .pvch-s.fxd.neg{color:#9a2a14}
+#bd.pv .rs.fxup b{color:#1f7a1f!important;animation:bmp .5s}#bd.pv .rs.fxdn b{color:#a3321a!important;animation:bmp .5s}
+.achv{white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.25;padding:4px 8px!important;margin:4px 0 6px!important}
+#bd.pv.tall .pv-visit .sc,#bd.pv.tall .strip.city .pv-visit .sc{width:80px}#bd.pv.tall .pv-visit{overflow-x:auto;scrollbar-width:none}
+
+/* order-of-effects chips: card name + one line of what it does */
+#acts.tray .tchip.teff{flex:1 1 100%;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;min-height:48px;height:auto}
+#acts.tray .tchip.teff b{text-align:left}
+#acts.tray .tchip.teff .eff{font-weight:500;line-height:1.2;text-align:left;white-space:normal}
+/* R24: phone landscape (wide and under 560 px high): the hand is a scrolling column on the right, the board keeps the full height */
+#bd.pv.wide.short .pv-col{display:grid;grid-template-columns:minmax(0,1fr) 124px;grid-template-rows:auto minmax(0,1fr);gap:6px 8px;padding:4px 10px 0}
+#bd.pv.wide.short .pv-hud{grid-column:1 / -1}
+#bd.pv.wide.short .pv-stage{grid-column:1;grid-row:2;gap:6px 10px;grid-template-rows:minmax(0,1fr) minmax(0,.8fr)}
+#bd.pv.wide.short .strip.hand.hscroll{grid-column:2;grid-row:2;height:auto;margin:0;padding-top:0;overflow-x:hidden;overflow-y:auto;scroll-snap-type:y proximity;overscroll-behavior:contain}
+#bd.pv.wide.short .strip.hand .hin{position:relative!important;bottom:auto}
+#bd.pv.wide.short .strip.hand .scount{left:4px;top:0;transform:none!important}
+#bd.pv.wide.short .strip.hand .hc{position:absolute;scroll-snap-align:start}
+#bd.pv.wide.short .pv-spots{grid-template-columns:repeat(3,minmax(0,1fr));overflow-y:auto}
+#bd.pv.wide.short .pv-stage{grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) minmax(0,.75fr)}
+#bd.pv.wide.short .pv-spots{gap:5px}
+#bd.pv.wide.short .pv-spots .tile{min-height:52px}
+#bd.pv.wide.short .pv-sw b,#bd.pv.wide.short .pv-small .pv-sw b{font-size:13px;line-height:1.15}
+#bd.pv.wide.short .pv-h{font-size:14px;line-height:1.2}
+#bd.pv.wide.short .pv-mead{grid-template-columns:repeat(3,minmax(0,1fr))}
