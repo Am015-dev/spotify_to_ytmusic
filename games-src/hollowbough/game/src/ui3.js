@@ -72,6 +72,21 @@ function fxFloat(from, kind, txt, to, o) {
   const end = () => { e.remove(); if (to && !o.neg && o.bump) o.bump(); };
   if (an) { an.onfinish = end; an.oncancel = () => e.remove(); setTimeout(() => e.remove(), 2600); } else end();
 }
+// a score change, written inside the seat chip for a moment (never on top of other text or buttons)
+function fxDelta(seat, d) {
+  if (!d) return; const c = $('.chip[data-seat="' + seat + '"]'); if (!c) return;
+  const ln = c.querySelector('.pvch-s') || c.querySelector('.cl > span:nth-child(2)'); if (!ln) return;
+  const old = c.__fxOld != null ? c.__fxOld : ln.textContent; c.__fxOld = old; clearTimeout(c.__fxT);
+  ln.textContent = (d > 0 ? '+' : '\u2212') + Math.abs(d) + (Math.abs(d) === 1 ? ' pt' : ' pts'); ln.classList.add('fxd'); if (d < 0) ln.classList.add('neg');
+  bump('.chip[data-seat="' + seat + '"]');
+  c.__fxT = setTimeout(() => { if (!ln.isConnected) return; ln.textContent = old; ln.classList.remove('fxd', 'neg'); c.__fxOld = null; }, 1600);
+}
+// a goods pile flashes green (gain) or red (spent); the number itself is the feedback
+function fxRes(k, d) {
+  const e = $('.rs[data-res="' + k + '"]'); if (!e) return;
+  e.classList.remove('fxup', 'fxdn'); void e.offsetWidth; e.classList.add(d > 0 ? 'fxup' : 'fxdn');
+  setTimeout(() => e.classList.remove('fxup', 'fxdn'), 1100);
+}
 function bump(sel) { const e = $(sel); if (!e) return; e.classList.remove('bmp'); void e.offsetWidth; e.classList.add('bmp'); setTimeout(() => e.classList.remove('bmp'), 500); }
 // FLIP: a freshly drawn element slides in from where it was before
 function flipFrom(el, from, ms) {
@@ -96,14 +111,11 @@ function fxPost(pre, m, src) {
   for (const k of RESK) { const d = p.res[k] - pre.res[k]; if (d !== 0) items.push({ kind: k, d }); }
   const dt = score(pre.seat).total - pre.tot; if (dt !== 0) items.push({ kind: 'point', d: dt, pts: true });
   const dh = p.hand.length - pre.hand; if (dh > 0) items.push({ kind: 'card', d: dh });
-  let slot = 0; const n = items.filter(x => x.d > 0).length;
+  // R17: no pill floats over the board. Points show inside the seat chip ("+2 pts" in its city-count line); goods flash on their own pile.
   for (const it of items) {
-    if (it.d > 0) {
-      const to = it.kind === 'point' ? (seatRect(pre.seat) || chip) : mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
-      fxFloat(src, it.kind, '+' + it.d + (it.kind === 'point' ? (it.d === 1 ? ' point' : ' points') : ''), to, { slot: slot++, n, bump: it.kind === 'point' ? () => bump('.chip[data-seat="' + pre.seat + '"]') : mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
-    } else if (mine && it.kind !== 'point') {
-      const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });
-    }
+    if (it.kind === 'point') fxDelta(pre.seat, it.d);
+    else if (it.kind === 'card') { if (mine) bump('.strip.hand .scount'); }
+    else if (mine) fxRes(it.kind, it.d);
   }
   if (m && m.type === 'prepare' && p.season !== pre.season) fxSeason(p.season, mine);
 }

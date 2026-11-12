@@ -6,7 +6,7 @@ const HBS = {
   // tutorial steps: title (<=4 words), say (<=12 words, one tap), react (Hazel's reaction after the action)
   // chapter: 1 First turn, 2 Building, 3 Tricks of the trade, 4 Winter's end (the chapter opener is the first step of that chapter)
   steps: {
-    goal:    { ch: 1, title: 'How you win', say: 'Most points when everyone has passed wins. Points show up here.' },
+    goal:    { ch: 1, title: 'How you win', say: 'Most points wins. You start with 3 built cards, worth 6 points.' },
     places:  { title: 'Your turn', say: 'Each turn: send a worker, play a card, or prepare.' },
     twig:    { title: 'Take twigs', say: 'Tap Twig Heap for 3 twigs. Only one worker fits there.', react: 'Three twigs!' },
     stock:   { title: 'Your goods', say: n => 'You have ' + n + ' twigs. Goods pay for cards.' },

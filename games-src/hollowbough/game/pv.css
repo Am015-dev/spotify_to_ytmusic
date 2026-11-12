@@ -412,3 +412,10 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 #bd.pv.tall .pv-grid{grid-template-columns:repeat(3,1fr)}
 #bd.pv.tall .chip .pawnw{display:none}#bd.pv.tall .chips .chip{padding-left:8px}
 #bd.pv .pv-grid{position:relative}
+/* R17: Prepare says why it is off in two short lines; score changes live inside the seat chip; goods flash on their pile (no floating pills over the board) */
+#acts .btn.prep .prepw{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.1;text-align:left}
+#acts .btn.prep .prepw b{font-size:15px}#acts .btn.prep .prepw small{font-size:14px;font-weight:600;white-space:nowrap}
+#bd.pv .chip .pvch-s.fxd{color:#1f6b1f;opacity:1;font-weight:800}#bd.pv .chip .pvch-s.fxd.neg{color:#9a2a14}
+#bd.pv .rs.fxup b{color:#1f7a1f!important;animation:bmp .5s}#bd.pv .rs.fxdn b{color:#a3321a!important;animation:bmp .5s}
+.achv{white-space:normal;overflow-wrap:anywhere;font-size:14px;line-height:1.25;padding:4px 8px!important;margin:4px 0 6px!important}
+#bd.pv.tall .pv-visit .sc,#bd.pv.tall .strip.city .pv-visit .sc{width:80px}#bd.pv.tall .pv-visit{overflow-x:auto;scrollbar-width:none}

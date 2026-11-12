@@ -181,7 +181,7 @@ function seeTracker() {
   const prev = SEE.scores; SEE.scores = sc.map(x => ({ total: x.total, cards: x.cards, tokens: x.tokens, events: x.events, bonus: x.bonus, journey: x.journey }));
   if (prev && prev.length === sc.length) sc.forEach((x, s) => { const o = prev[s], d = x.total - o.total; if (d <= 0) return;
     const why = x.events > o.events ? 'event claimed' : x.cards > o.cards ? 'card points' : x.tokens > o.tokens ? 'point tokens' : x.bonus > o.bonus ? 'bonus' : x.journey > o.journey ? 'journey' : 'points';
-    const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxFloat === 'function') fxFloat(frameRect(chip), 'point', '+' + d + ' ' + why, null, { n: 1 }); } catch (e) { }
+    const chip = $('.chip[data-seat="' + s + '"]'); try { if (chip && typeof fxDelta === 'function') fxDelta(s, d); } catch (e) { }
     seeToast('hbpop', '<b>+' + d + '</b> ' + (s === v ? 'You' : G.players[s].name) + ': ' + why, 4600, 168); });
 }
 // ---- "Turn over: why"

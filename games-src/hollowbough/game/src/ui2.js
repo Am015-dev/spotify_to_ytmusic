@@ -351,6 +351,8 @@ function renderBoard() {
     { const g = (UI.rec && UI.rec.m && UI.tgEls && UI.tgEls[tgOf(UI.rec.m)]) || hin.querySelector('.glow'); if (g && g.closest('.hscroll') === hs) hscrollTo(g); } }
   // ---- action row / tray
   renderActs(mm, qm, qShown);
+  // R17: a choice tray that grows up over the hand: the hand steps out and the panel above takes its room, so the tray never covers a city row
+  { const ae = document.getElementById('acts'); if (tall && ae && ae.classList.contains('tall')) { const top = parseFloat(ae.style.top); if (top > 0) { hs.style.display = 'none'; col.style.height = Math.max(200, top - 4) + 'px'; } } }
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   if (ov) { bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow')); cityOverlay(me, cityList, cityCard); }
   renderPrompt();
@@ -447,7 +449,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span', n > 0 ? 'Prepare after ' + n + ' more worker' + (n > 1 ? 's' : '') : 'Prepare'))); }   // says why it is off
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -752,7 +754,7 @@ function pvRender() {
   const hs = h('div.strip.hand.hscroll'); col.appendChild(hs);
   // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
   // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
-  const HW = 96, gapH = 6, fits = nH * ((tall ? HW : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (HW + gapH)));   // R10: 96+ wide so 14px names fit whole
+  const HW = 104, gapH = 6, fits = nH * ((tall ? HW : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (HW + gapH)));   // R10: 96+ wide so 14px names fit whole
   const cw = !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
   hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
   hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
@@ -785,6 +787,8 @@ function pvRender() {
   for (const [k] of PV_TABS) if (glowIn(k)) tabEl[k].classList.add('hot');
   // ---- action row / choice tray (shared with the old board)
   renderActs(mm, qm, qShown);
+  // R17: a choice tray that grows up over the hand: the hand steps out and the panel above takes its room, so the tray never covers a city row
+  { const ae = document.getElementById('acts'); if (tall && ae && ae.classList.contains('tall')) { const top = parseFloat(ae.style.top); if (top > 0) { hs.style.display = 'none'; col.style.height = Math.max(200, top - 4) + 'px'; } } }
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
