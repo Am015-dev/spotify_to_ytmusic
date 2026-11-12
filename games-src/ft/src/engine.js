@@ -69,14 +69,14 @@ function doBid(m){const mk=G.bidQueue.shift();const p=P(mk.p);const pr=Math.min(
     G.order=G.bids.slice().sort((a,b)=>G.track[b.spot].cost-G.track[a.spot].cost||b.n-a.n).map(b=>b.mk);G.phase='turn';G.turnIdx=0;G.nextBid=[];startTurn()}}
 // ---------- turns ----------
 function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G.turn++;const p=P(mk.p);p.used={};p.itemUsed=0;G.turnFx={};G.move=null;G.act=null;G.step='move';
-  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
+  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){G.noMove=1;lg(`${p.nm} has no legal move: djinn powers only, then the game ends this round.`);G.step='sell'}}   // published rule: no legal meeple move ends the game; that player and those after use powers only, the turn finishes, scores are counted
 function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;
    // rulebook: the game ends at the end of the TURN (= round) in which the last camel is dropped, after every player has acted; endRound() finishes it
 if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
   if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
-  if(!legalStarts().length){lg('No legal move remains anywhere on the board.','big');return finish()}
+  if(G.noMove||!legalStarts().length){lg('No legal move remains on the board: the game ends.','big');return finish()}
   G.round++;G.bidQueue=G.nextBid.slice();G.bids=[];G.phase='bid';lg(`— Round ${G.round}: bid for turn order —`,'round');fx('round')}
 // ---------- movement ----------
 function handCounts(h){const o={};for(const c of h)o[c]=(o[c]||0)+1;return o}
