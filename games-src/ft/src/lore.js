@@ -35,7 +35,9 @@ const LORE={
   endStory:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. Now the real caravans come."',
   quickIntro:'Collect tribes, claim land, and score the most points.',
   win:['The bazaar sings your name. The throne of Qamar is yours!','Your camels hold the best land. Qamar bows to you.'],
-  lose:['Your rival won this time. Want to try again?','So close! Want another game?'],
+  lose:['Your rival won this time. Want to try again?','Another try? Every game teaches something.'],
+  loseClose:['So close! Just a few points short. Another game?','A hair\'s breadth! One better walk and it was yours.'],
+  loseFar:['The rival ran away with this one. Try grabbing more land and selling goods in sets.','A tough game. Next time aim for big Advisor and Sage hauls and full goods sets.'],
   turn:{you:'Your turn',bid:'Bid for turn order'}
 };
 // ---- the coached first game: Hadiya explains each rule when it first matters (coach.js decides when; ids = TUTORIAL-COVERAGE.md) ----
