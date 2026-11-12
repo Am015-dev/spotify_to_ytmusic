@@ -43,7 +43,7 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
   const friends=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>({s:x,p:finalPose(x,B(x),dialOf(x)[UI.draft[x.id]])}));
   const save=G.rng;G.rng=((G.round|0)*2654435761+[...String(s.id)].reduce((h,ch)=>(h*31+ch.charCodeAt(0))>>>0,7))>>>0;/* same position, same suggestion */const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
-    if(v>-500&&!offBoard(p,B(s))){let nx=-1e9;for(const m2 of dialOf(s)){if(exColor(s,m2).c==='r'&&(s.stress||c.c==='r'))continue;const p2=finalPose(p,B(s),m2);if(offBoard(p2,B(s)))continue;let t=0;for(const [e,ps] of enemyPoses)t+=threatTo(s,p2,e,ps[0]);nx=Math.max(nx,t)}v+=Math.max(0,nx)*.7}/* look one round ahead, like the hard rival */
+    if(v>-500&&!offBoard(p,B(s))){let nx=-1e9,safe=0;for(const m2 of dialOf(s)){if(exColor(s,m2).c==='r'&&(s.stress||c.c==='r'))continue;const p2=finalPose(p,B(s),m2);if(offBoard(p2,B(s)))continue;safe++;let t=0;for(const [e,ps] of enemyPoses)t+=threatTo(s,p2,e,ps[0]);nx=Math.max(nx,t)}v+=Math.max(0,nx)*.7;if(safe<3)v-=(3-safe)*6}/* never steer into a corner where next round's moves all leave the mat *//* look one round ahead, like the hard rival */
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
     if(c.c==='r'&&s.stress)v-=1e6;
     if(offBoard(p,B(s)))v-=1e6;/* never suggest leaving the mat */ if(m.t==='S'&&c.c!=='r')v+=SUGSTR;/* tie-break: a plain straight that stays on the mat */

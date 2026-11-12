@@ -147,7 +147,7 @@ function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
   setBtns(`<button class="btn big" data-a="autoplace">✨ Auto-place all</button>`)}
-function planUI(){dropLoose();const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+function planUI(){dropLoose();if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round;UI.sugCache=null}/* a new round starts with no move set: last round's move must never stay pre-picked (it flew newcomers into rocks and off the mat) */const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
   /* the 'Round N: plan' bubble is only for the start of planning: once a ship is picked or planned, the hint line takes over */
   if(ban&&!ban.hidden&&/^p\d/.test(BF.tbId||'')&&(BF.sel||my.some(s=>UI.draft[s.id]!=null))){ban.hidden=true;BF.banUntil=0;clearTimeout(BF.banT)}
   if(BF.sel&&!my.some(s=>s.id===BF.sel))BF.sel=null;
@@ -156,7 +156,7 @@ function planUI(){dropLoose();const ps=planSide();const my=alive().filter(s=>s.s
   if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
   if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=(UI.hints||(typeof tutStaged==='function'&&tutStaged()))?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
-      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m,s)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
+      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m,s)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk||offBoard(p,b)?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
       if(sug===i&&(pick==null||(pick!==sug&&typeof tutStaged==='function'&&tutStaged())))BF.fingT=it.el});
     item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
@@ -181,6 +181,7 @@ function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pic
   if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
   const el=dialEl(),face=el.querySelector('.dface'),key=s.id+':'+L.map(o=>o.i).join(',')+'@'+Math.round(shipDeg(s)/5);BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
   if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m,s)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  if(pick0==null||!L.some(o=>o.i===pick0))BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep;/* a fresh dial opens ON the ★ move: the wheel's old rotation from last round must not pick for you */
   el.hidden=false;el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');dialSpin(false);
   const m=dialOf(s)[pick],c=exColor(s,m).c,rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
   el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m,s)}</span><span class="dwd">${esc(mvWords(m))}${rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
@@ -225,7 +226,7 @@ function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==
       if(els.length)setHint(q.opts.some(o=>o.k==='ok')?'Tap dice to reroll, then Reroll':'Tap the die');
       setBtns(q.opts.filter(o=>!/^[td]\d+$/.test(o.k)).map(o=>`<button class="btn${o.k==='ok'?' primary':''}" data-bfq="${esc(o.k)}">${o.k==='ok'?'⌖ Reroll':o.k==='x'?'Cancel':esc(o.l)}</button>`).join(''));// the finger points only at dice worth rerolling: blanks, and focus results when the roller has no focus token to spend
       {const roller=/Defen/.test(q.opts[0]&&q.opts[0].l)?d:a;const worth=[...els].filter(el=>el.classList.contains('pick')&&!el.classList.contains('on')&&(/blank/i.test(el.getAttribute('aria-label')||'')||(/focus/i.test(el.getAttribute('aria-label')||'')&&!(roller&&roller.focus))));
-       finger(worth[0]||btns.querySelector('.primary'))}return}
+       worth.forEach(el=>el.classList.add('worth'));finger(worth[0]||btns.querySelector('.primary'))}return}
     setBtns(q.opts.map((o,i)=>`<button class="btn${(q.opts.some(x=>x.pri)?o.pri:i===0)?' primary':''}" data-bfq="${esc(o.k)}">${esc(o.l)}</button>`).join(''));return}
   if(!humanTurn()){setHint(G.phase==='amod'?`⏳ ${esc(shortName(a))} aims at ${mineS(d)?'you':esc(shortName(d))}`:`⏳ ${esc(shortName(d))} tries to dodge`);setBtns('');return}
   if(G.phase==='damod'){setHint('Tamper with the attack dice?');setBtns(exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}</button>`).join('')+`<button class="btn primary" data-act="damod" data-k="done">Done</button>`);return}
