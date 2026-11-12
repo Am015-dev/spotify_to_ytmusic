@@ -214,5 +214,21 @@ ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;
   html #game #tray{grid-area:tray}
   html #game #panel:not(:has(#gears)){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center}
 }
+/* W496: 375px phones: the top bar fits (Menu stayed 7px past the edge); podium title readable over the art */
+@media (max-width:389px){.gx-bar .pill .pw{display:none}.gx-bar .pill{padding:3px 5px}}
+button.pill#posChip{font:inherit;color:inherit;border:0;min-height:44px;cursor:pointer}
+.stl{list-style:decimal;padding-left:26px;margin:8px 0 14px}.stl li{display:flex;align-items:center;gap:8px;min-height:40px;font-weight:800;font-size:17px}.stl li i{width:10px;height:22px;border-radius:3px}.stl li span{margin-left:auto;color:var(--mute);font-weight:700}.stl li.me{color:var(--gold)}
+/* R3: short phones (375x667): the board gets at least ~45% of the screen; the dock tightens */
+@media (max-width:600px) and (max-height:700px) and (orientation:portrait){
+  html #game .gx-dock-head{display:none}html #game #trk .phs{display:none}
+  html #game #msg{min-height:30px;padding:3px 10px;font-size:14px}html #game #panel{gap:4px;padding:4px 8px 6px}
+  html #game .gb{min-height:44px}html #game #acts button{min-height:44px}html #game #acts .go{min-height:46px}
+}
+/* R3: Suggest's answer to a boost / slipstream question */
+.slipq button.sug{outline:3px solid var(--gold);outline-offset:1px}.slipq .sgt{display:block;font-style:normal;font-size:12px;color:var(--gold);line-height:1}
+/* R3: phones: with Hints on (bulb shown) Menu ran past the edge. Sound lives in Menu on phones; bar buttons stay 44px */
+@media (max-width:600px){#game .gx-bar .pill .pw{display:none}#game .gx-bar #sndB{display:none}#game .gx-bar .gx-ibtn{min-height:44px;min-width:44px}}
+.podium h2{display:inline-block;position:relative;z-index:1;background:rgba(10,14,24,.78);padding:4px 14px;border-radius:10px;margin-top:64px}
+@media (max-width:600px){.podium h2{margin-top:44px}}
 </style>
 </head>
