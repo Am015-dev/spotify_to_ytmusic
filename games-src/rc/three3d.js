@@ -76,10 +76,12 @@ function init3D(){
 function phIslandPts(){const o=[];for(const t of MAP){const p=hexPos(t.q,t.r);for(let i=0;i<6;i++){const a=i/6*Math.PI*2;o.push([p.x+Math.sin(a)*HR0*1.02,p.z+Math.cos(a)*HR0*1.02])}}return o}
 function phBox(pts){const v=new THREE.Vector3();V3.cam.updateMatrixWorld();V3.cam.updateProjectionMatrix();let x0=9,x1=-9,y0=9,y1=-9;for(const q of pts){v.set(q[0],HEXH,q[1]).project(V3.cam);x0=Math.min(x0,v.x);x1=Math.max(x1,v.x);y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}return {x0,x1,y0,y1}}
 function phFit(){if(!V3.cam||!V3.rad||!V3.center||!V3.r)return;const FILL=V3.phFill||.97;V3.orbit.e=V3.phE||1.4;V3.orbit.a=0;const pts=phIslandPts();const o=V3.orbit;V3.look.copy(V3.center);
+  // short phone board (html.phshort): the supplies strip covers the top of the canvas, so fit the island in the part under it (NDC: top - S)
+  let S=0;try{if(document.documentElement.classList.contains('phshort')){const cv=V3.r.domElement.getBoundingClientRect(),rs=document.getElementById('bfres');if(rs&&cv.height>0)S=Math.min(.6,Math.max(0,2*(rs.getBoundingClientRect().bottom-cv.top)/cv.height))}}catch(e){}
   const ext=()=>{placeCam();const b=phBox(pts);return {b,w:(b.x1-b.x0)/2,h:(b.y1-b.y0)/2}};
-  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2;
+  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h+S/2)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2+S/2;
     const hh=Math.tan(V3.cam.fov*Math.PI/360)*o.d,hw=hh*V3.cam.aspect;const a=o.a;V3.look.x+=Math.cos(a)*cx*hw+(-Math.sin(a))*cy*hh/Math.sin(o.e);V3.look.z+=(-Math.sin(a))*cx*hw+(-Math.cos(a))*cy*hh/Math.sin(o.e)}
-  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
+  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h+S/2)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
   V3.phFitL=V3.look.clone();V3.phFitD=o.d;V3.phL=V3.look.clone();V3.phD=o.d;V3.phMin=o.d*.38;V3.phMax=o.d*1.12;V3.d0=o.d;V3.phMode='fit'}
 function phSetD(d){V3.phD=Math.max(V3.phMin||8,Math.min(V3.phMax||80,d));V3.orbit.d=V3.phD;placeCam()}
 function phPan(l0,dx,dy){const cv=V3.r.domElement,o=V3.orbit;const s=2*Math.tan(V3.cam.fov*Math.PI/360)*o.d/Math.max(1,cv.clientHeight);const a=o.a;
@@ -364,7 +366,8 @@ function tileMesh(t){const grp=new THREE.Group();const terr=t.down?'down':t.terr
   if(T==='plains'){for(const [x,z] of spots(2))acacia(P,x,gy(x,z),z,R);for(const [x,z] of spots(10,null,.22))tuft(P,x,gy(x,z),z,R,R()<.5?0xb7bb62:0x93ad50);for(const [x,z] of spots(3,null,.3))bush(P,x,gy(x,z),z,R,.7,[0x6d9a3a,0x7fa846,0x5a8a34])}
   if(T==='hills'){for(const [x,z] of spots(4,null,.4))rock(P,x,gy(x,z),z,R,.16+R()*.14);for(const [x,z] of spots(3,null,.5))jtree(P,x,gy(x,z),z,R,.8+R()*.3);for(const [x,z] of spots(4,null,.25))tuft(P,x,gy(x,z),z,R,0x8aa34c)}
   if(T==='mountains'){for(const [x,z] of spots(5,null,.35))rock(P,x,gy(x,z),z,R,.12+R()*.15,0x736d64);for(const [x,z] of spots(2,(x,z)=>sampleH(F,x,z)<.35,.5))jtree(P,x,gy(x,z),z,R,.6,false)}
-  if(T==='unknown'){for(const [x,z] of spots(2,null,.8))rock(P,x,gy(x,z)-.05,z,R,.18+R()*.12,0x3e4642);for(const [x,z] of spots(2,null,.8)){const h=.5+R()*.3;P.add(G_.cyl(),0x2a2622,M(x,gy(x,z),z,(R()-.5)*.3,0,(R()-.5)*.3,.045,h,.045),0,.3);P.add(G_.cyl(),0x2a2622,M(x,gy(x,z)+h*.6,z,0,R()*3,1.1,.025,.3,.025),0,.2)}}
+  // unexplored: no props (rocks and sticks read as rubble); the fog art stays, dimmed, so explored land is the bright part (W493 polish)
+  if(T==='unknown'&&top.color)top.color.setHex(0x7d8590);
   // resource and marker props: wood and food sources, the totem, a natural cave
   const tok=(x,z,col)=>{const y=gy(x,z);P.add(G_.cylS(),col,M(x,y,z,0,0,0,.26,.07,.26),0,.35);return y+.07};
   (t.src||[]).forEach((s,i)=>{const x=-1.1+i*.7,z=-1.15;const y=tok(x,z,s==='food'?0x7a2a22:0x5a3a1c);
@@ -555,10 +558,13 @@ function syncLabels(){const box=document.getElementById('labels');if(!box)return
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
     if(!el){el=V3.lab[m.id]=document.createElement('button');el.className='tl';el.dataset.tile=m.id;box.appendChild(el)}
-    el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('pulse',UI.hoverPos===m.id);el.setAttribute('aria-label',`Place ${m.id+1}: ${t?t.terr:'unexplored'}`);el.classList.toggle('far',!t)}}
-function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.clientWidth,h=cv.clientHeight;const v=new THREE.Vector3();
+    el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h;el._w=el._h=0}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('pulse',UI.hoverPos===m.id);el.setAttribute('aria-label',`Place ${m.id+1}: ${t?t.terr:'unexplored'}`);el.classList.toggle('far',!t)}}
+function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.clientWidth,h=cv.clientHeight;const v=new THREE.Vector3();const L=[];
   for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);(V3.ph?v.set(p.x-1.0,HEXH+.2,p.z-1.0):v.set(p.x,HEXH+.2,p.z+HEXR*.55)).project(V3.cam);
-    if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';const tr=`translate(${((v.x+1)/2*w).toFixed(1)}px,${((1-v.y)/2*h).toFixed(1)}px) translate(-50%,-50%)`;if(el._tr!==tr){el._tr=tr;el.style.transform=tr}}}
+    if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';L.push({el,x:(v.x+1)/2*w,y:(1-v.y)/2*h,w:el._w||(el._w=el.offsetWidth),h:el._h||(el._h=el.offsetHeight)})}
+  // G6 review: on a phone two pills ("Mountains" "8 Camp") must never run into each other: push the lower one down (labels sorted top to bottom)
+  if(V3.ph){L.sort((a,b)=>a.y-b.y);for(let i=0;i<L.length;i++){const a=L[i];for(let j=0;j<i;j++){const b=L[j];if(Math.abs(a.x-b.x)<(a.w+b.w)/2+3&&Math.abs(a.y-b.y)<(a.h+b.h)/2+2)a.y=b.y+(a.h+b.h)/2+2}}}
+  for(const o of L){const tr=`translate(${o.x.toFixed(1)}px,${o.y.toFixed(1)}px) translate(-50%,-50%)`;if(o.el._tr!==tr){o.el._tr=tr;o.el.style.transform=tr}}}
 function tween(obj,k,to,dur,done){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur,done})}
 // a little dust puff where a tile lands or a pawn arrives
 function puff(pos,n,col){if(!V3.on||V3.q==='low')return;for(let i=0;i<(n||8);i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:puffTex(),color:col||0xd8c8a8,transparent:true,depthWrite:false,opacity:0}));const a=Math.random()*6.28;s.position.copy(pos);s.position.x+=Math.cos(a)*.3;s.position.z+=Math.sin(a)*.3;s.scale.setScalar(.2);V3.scene.add(s);

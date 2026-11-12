@@ -144,7 +144,8 @@ const LOSS_TIP={hunger:'Plan food every day: the 🍖 priority says how much you
 function overHtml(){const w=G.over.win;const st=G.stats;const lc=w?null:lossCauses();const top=lc?lc.by.filter(([k])=>k!=='?').slice(0,4):[];
   const tips=[...new Set(top.map(([k])=>LOSS_TIP[k]).filter(Boolean))].slice(0,2);
   const why=lc?`<div class="over-why"><b>What went wrong</b><ul>${lc.dies?`<li>${esc(lc.dies.who)} died${lc.dies.why?' from '+esc(lc.dies.why):''} on day ${G.round}.</li>`:''}${top.length?`<li>Wounds this game: ${top.map(([k,n])=>`${esc(k)} ${n}`).join(' · ')}.</li>`:''}${tips.map(t=>`<li>💡 ${esc(t)}</li>`).join('')}${G.diff!=='easy'?'<li>💡 The Easier setting adds the dog and 4 starting items.</li>':''}</ul></div>`:'';
-  return `<div class="mbox"><h2>${w?'🏆 Rescued!':'☠ Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p><p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button><button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>'}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
+  const pace=!w&&G.scen==='marooned'&&G.sc&&/Time ran out/.test(G.over.why)?`<p class="over-pace">🔥 Signal pile ${G.sc.pile}/15${G.inv.built.fire?'':', no fire'}. Put wood on the pile every day once the fire burns.</p>`:'';
+  return `<div class="mbox over"><h2>${w?'🏆 Rescued!':'☠ Lost on the island'}</h2><p class="big">${esc(G.over.why)}</p>${pace}<p class="story">${esc(endLine())}</p>${why}<p class="small">Day ${G.round} of ${G.rounds} · places explored ${st.explored} · things made ${st.built} · fights ${st.fights} · wounds taken ${st.wounds}</p><div class="mb">${typeof netOn==='function'&&netOn()?netOverBtns():`${w?'':'<button class="btn go" data-a="retry">↻ Try again (same island)</button>'+(G.diff!=='easy'?'<button class="btn" data-a="retry" data-easy="1">Try it on Easier</button>':'')}<button class="btn ${w?'go':''}" data-a="new">New game</button><button class="btn" data-a="overok">Look at the island</button>`}</div></div>`}
 function retryGame(easy){const o=G;const s=UI.setup;s.scen=o.scen;s.chars=o.chars.filter(c=>!c.npc).map(c=>c.k);s.ai={};o.chars.forEach(c=>{if(!c.human)s.ai[c.k]=true});if(easy){s.diff='easy';s.items=4;s.dog=true;s.friday=true}
   const old=DEFSEED;DEFSEED=o.seed;try{beginGame()}finally{DEFSEED=old}}
 function toggleMenu(){const m=$('#moremenu'),b=$('.menub');if(!m)return;const on=!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',on)}
@@ -156,7 +157,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Shipwrecked. Work together, stay alive, and get rescued.</p>
    <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
    ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>
-   <details class="quick setup"><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
+   <details class="quick setup" open><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
    ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</details>
@@ -197,7 +198,13 @@ function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
-function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
+// Start day refused on the board (the dock toast is hidden on phones): say it on the board line and, when a free pawn can fill the short job, pick it so its places glow
+function startFix(msg){const a=G.plan.acts.find(x=>x.pw.length<actNeed(x).need);if(!a){BF.say(msg,6000);return}
+  const pos=a.type==='explore'?a.tgt:a.type==='gather'?a.tgt.pos:a.type==='build'&&a.tgt&&a.tgt.cross!=null?a.tgt.cross:G.camp.pos;
+  const p=humanFree().find(q=>!pawnWhy(q.id,a));if(p){UI.sel=p.id;UI.ps.skip=UI.ps.skip.filter(x=>x!==p.id);BF.say(`${pawnLabel(p).split(' ')[0]}: tap place ${pos+1} to help`,8000)}
+  else{for(const id of a.pw.slice())unplace(id);BF.say(`Too few pawns for place ${pos+1}: pawn back`,8000)}
+  if(pstep()!==2)setPStep(2)}
+function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);if(!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))try{startFix(pb[0])}catch(e){}render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
   UI.confirm=null;const r=startActions();if(r){toast(r);render()}else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}
@@ -233,9 +240,9 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   switch(d.a){
   case 'go':tryStart(!!d.force);return;
   case 'goback':UI.confirm=null;render();return;
-  case 'next':storyNext();return;case 'skip':storySkip();return;
+  case 'next':storyJump();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
+  case 'suggest':{if(typeof BF!=='undefined'&&BF.on&&BF.hintOn()&&planOpen()&&!UI.confirm&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)){BF.hint();return}const m=(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)?suggestCore(true):suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
@@ -245,7 +252,9 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
-  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');refresh()}return}
+  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const room=SCEN.marooned.pileRoom();const free=G.res.wood-committed().wood;const n=Math.min(room,free);const res=shelterReserve();const k=G.round+':'+G.logN+':'+free;
+    if(res&&n>0&&free-n<res&&UI.pileOK!==k){UI.pileOK=k;toast(typeof BF!=='undefined'&&BF.on?'⚠ Uses shelter wood! Tap again to add':`⚠ That leaves ${free-n} wood, and the shelter needs ${res}. Without a shelter everyone takes a wound each night. Tap again to add it anyway.`,7000);return}
+    const r=pileAdd(room);if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');const c=typeof curPawn==='function'&&curPawn();toast(typeof BF!=='undefined'&&BF.on?(c?`🔥 Pile +${n}. ${pawnLabel(c).split(' ')[0]} still needs a job`:`🔥 Pile +${n} (no pawn used)`):`🔥 +${n} wood on the signal pile (${G.sc.pile}/15). That uses no pawn${c?`: ${pawnLabel(c).split(' ')[0]} still needs a job, tap a glowing place`:''}.`,6000);if(typeof PHO!=='undefined'&&PHO.closePop)PHO.closePop(true);refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;
