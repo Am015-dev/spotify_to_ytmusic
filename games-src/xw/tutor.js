@@ -144,14 +144,14 @@ function coachReset(){NCH.log=[];NCH.fs={};NCH.finished=false;NCH.shown={};NCH.q
 function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{BF.key='';BF.fkey=''}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
 function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;if(LORE.coach[id].act&&tutScripted()){let k=0;NCH.q.forEach((x,i)=>{if(LORE.coach[x].rule)k=i+1});NCH.q.splice(k,0,id)}else NCH.q.push(id);   // a line that asks for a tap goes ahead of queued taunts, after queued rules
   // the scripted lesson keeps pace with the board: a rule line replaces a taunt at once, or any line that has been up a moment
-  if(NCH.cur&&tutScripted()&&LORE.coach[id].rule&&(!LORE.coach[NCH.cur].rule||LORE.coach[id].act||performance.now()-(NCH.curAt||0)>1800)){coachHide();if(LORE.coach[id].act)coachPump();return}coachPump()}
+  if(NCH.cur&&tutScripted()&&LORE.coach[id].rule&&(!LORE.coach[NCH.cur].rule||LORE.coach[id].act||performance.now()-(NCH.curAt||0)>1100)){coachHide();if(LORE.coach[id].act)coachPump();return}coachPump()}
 function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;(NCH.log=NCH.log||[]).push(id);NCH.curAt=performance.now();let e=document.getElementById('na-coach');
   if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
   e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
   clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70,4000+(L.t+' '+L.s).split(/\s+/).length*100))}
 function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
 // rules that came up are explained at that moment; this runs after every render
-function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NCH.q.length&&performance.now()-(NCH.curAt||0)>1800)coachHide();const me=G.ships.find(x=>x.side===0);if(!me)return;
+function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NCH.q.length&&performance.now()-(NCH.curAt||0)>1100)coachHide();const me=G.ships.find(x=>x.side===0);if(!me)return;
   if(G.winner&&!TUT.drill){coachEnd();return}
   const ht=humanTurn(),ph=G.phase;
   if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2&&document.querySelector('.bfm'))coachSay('marks')}
@@ -161,7 +161,7 @@ function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NC
   if(ph==='target'&&ht)coachSay('shoot');
   if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
   if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
-  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'dodge');if(R.dmg)coachSay('res2')}
+  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&!(G.atk&&G.atk.a!==UI.hold.R.a)){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'dodge');if(R.dmg)coachSay('res2')}
     if(R.dmg)coachSay('res2')}
   if(G.ships.some(x=>x.alive&&x.stress>0))coachSay('stress');
   if(G.round>=2&&!TUT.drill)coachSay('endround');
