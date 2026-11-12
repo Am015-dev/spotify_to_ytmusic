@@ -11,6 +11,7 @@ the repo). Shots are in games-src/reviews/R22-shots/.
 |---|---|---|---|---|
 | cauldron-fair | 7.0 | FAIL | FAIL | 2 Tutorial 6, 5 Phone 6, 8 Bugs 6 |
 | short-fuse | 7.4 | FAIL | FAIL | 6 AI/pacing 6 |
+| nebula-aces | 5.9 | FAIL | FAIL | 6 AI/pacing 3, 4 Turn clarity 5; 2, 5, 8 at 6 |
 
 ---
 
@@ -131,3 +132,71 @@ layouts (taps on glowing wires with clue labels "1", "1·2", "1-3" changed nothi
 - Twin probe once per job, red-plus-other rule: Rules + tutorial (probe; the red case only in Rules).
 - Fuse length by crew size: Rules only.
 - House rules (four rounds without progress explode; no legal cut skips): Rules, "Kept simple" (disclosed, not in the published game).
+
+---
+
+## 3. nebula-aces (shelf/W486-nebula-bench @ ce237f86, merged with alex/brave-carson-rbpmlk locally)
+
+Played: built with build-all.py --full and served next to games/nebula-aces/{media,models,music}. Playwright touch only (isMobile,
+hasTouch, `touchscreen.tap` at hit-tested centres), fresh storage, default settings. "New here? Learn in 5 minutes" to the "Drill done"
+card at 390x844 and 375x667: 3 tutor bubbles, then the coached duel (2 rounds, won), then the flight drill (4 staged rounds), about 90 s
+and about 40 taps per size; taps 150 ms and 500 ms after each tutor bubble: 0 ignored. Then 10 full games from "Launch" (the first
+game: Kael vs two rivals, the default) to the DEFEAT card: 6 as a new player who always takes what the game suggests (the pre-selected
+move, the finger, the "rec" action and target: 3 at 390, 3 at 375) and 4 mixing the suggestion with random green/white moves, two of
+them opening with a K-turn (2 at 390, 2 at 375). An 11th mixed game at 375 was still running in round 9 when my 500 s timer stopped it
+(not counted). 0 page errors, 0 console errors, 0 stuck states, 0 dead taps in every run.
+
+**Rules check.** Checked against the published first-edition rules (base rulebook and the first-edition tournament rules; notes kept
+local). Fixed: no round limit by default. The game is fought until one side has no ships; Options → Game length → "Timed, 20 min" is
+off by default and says "tournament style: points destroyed, a tie is a draw", which matches the early tournament rules (later rules
+used a roll-off). Still right: plan in secret, move lowest pilot skill first (ties: initiative first), one action (focus, evade, lock,
+roll, boost; never the same action twice), stress (no actions, no red; a stressed red becomes the opponent's pick), green clears
+stress, K-turn = straight then 180°, bump = back off and skip the action, any part off the mat = destroyed, asteroid = 1 attack die
+and skip the action, obstructed shot +1 defence die, fire highest skill first with equal skill simultaneous, +1 attack die at range 1,
++1 defence die at range 3 (primary only), shields first, then face-down/face-up damage cards, a 2-damage card, focus/evade removed at
+the end, locks and stress stay, initiative to fewer squad points (on a tie the second-named side; the base rule gives it to one fixed
+faction, so this is an equivalent stand-in), obstacles beyond range 2 of the edges. Disclosed simplifications ("Kept simple" in Rules):
+grid asteroid spots, ships set up facing the enemy (the rules allow any facing), a 5-step barrel-roll slide, a 100-round safety cap.
+The Rules screen still leaves out three base rules the engine applies: a ship on an asteroid can't attack, touching ships can't attack
+each other, and equal pilot skill fires at the same time. Nothing invented that changes how a default game is won.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 7 | The 8-round limit and the health tiebreak are gone; the timed mode is optional, off, and faithful to the early tournament rules. The engine matches the base rules. The Rules screen still leaves out three combat limits (above), and setup facing is fixed (disclosed). |
+| 2 | Tutorial teaches | 6 | The reroll finger now goes to the blanks ("Attack die 3: blank", "Attack die 4: blank"), and every core rule is done once by touch in about 90 s. But it is still 3 bubbles, then a different coach system for the duel, then a card, then the drill, then a card, ending "The rest is in Rules". While I defend, the coach still says "Range 3 gave him a defence die". The drill dial is 42 px circles. |
+| 3 | First 10 seconds | 7 | Clear title line, big "Launch" and "New here? Learn in 5 minutes". Launch goes to one "Start ▶" card and then a finger on your ship. |
+| 4 | Turn clarity | 5 | Fixed: move arrows follow the ship's facing after a K-turn, and the enemy reveal chips are rotated too. But the dial opens on a suggested move that is pre-selected and labelled "rock!" (↑3 "Straight 3 · rock!" in round 1; ↑2 "rock!" flying away from both rivals in round 3), so the game recommends hazards. A "Ships move / Lowest skill first" bubble stays on during the Fire step and covers a rival's name plate. At 375 ship labels, move chips and range wedges pile on top of each other. |
+| 5 | Phone play | 6 | The plan grid at the bottom has big cells and both sizes fit. Still: the board dial in the tutorial and drill is 15+ circles of 42 px, packed together; at 375 the tutorial Lock button sits on Kael's name plate; name plates and move chips overlap; the phone-check gate fails (a 10-word line on the asteroid step, cells off screen after rotation). |
+| 6 | AI and pacing | 3 | On the default first game I lost **10 of 10**, in rounds 1, 1, 4, 4, 5, 5, 5, 6, 6 and 7. Following the game's own suggestions lost 6 of 6, twice in round 1: the suggested ↑3 flies into range 1 of both rivals (and through an asteroid at 375) and Kael (5 health) is gone before round 2. Twice the suggestion (↑2 every round) flew Kael off the mat at full or near-full health. The rival ended with both ships in 9 of 10 games. My wait from my last input to my next plan: median 7-13 s, max 18-40 s per game. A new player cannot win on the default level. |
+| 7 | Feel | 7 | 3D ships glide along their templates, dice tumble in a tray, laser lines, "CRIT!" and damage floaters, a painted DEFEAT card. |
+| 8 | Bugs | 6 | Fixed: no "undefined" on the result card (10 of 10). 0 errors, 0 stuck states, 0 dead taps. But the suggestion logic is broken in play: it pre-selects moves marked "rock!" and, followed round after round, flies the ship off the battlefield (the fixer's note says it "avoids edge traps"). The phone-check gate fails. |
+| | **Total** | **5.9** | **FAIL**: rows 2, 4, 5, 6 and 8 are below 7; row 6 is 3. |
+
+Gate: phone-check FAIL (build-all.py --full): text over 8 words "Auto place recommended Places your asteroids…" on 844x390, P>L, L>P
+and stale; off-screen cells C1, D1 (P>L) and A1, B1 (stale). See /tmp/r22/na/.check/phone-check-results.md on the review machine.
+
+### Earlier findings (R15)
+| R15 finding | Status | Evidence |
+|---|---|---|
+| Row 1: 8-round limit with a "more health left" tiebreak | **Fixed.** No round limit from Launch; "Timed, 20 min" is optional, off by default, and decided on points destroyed (a tie is a draw). | code ui.js Options; rules-notes [T1]; games ran to round 7-9 |
+| Row 4: dial arrows stay screen-fixed after a K-turn | **Fixed.** After a K-turn the ship faces down and the dial shows ↓1 straight and ↘1 for "Bank left 1"; the ghost matches. | games-src/reviews/R22-shots/na-390-after-kturn-arrows-follow-ship.png |
+| Row 4: enemy reveal chips point up the screen | **Fixed.** The chips over the rivals are rotated with each rival's facing. | games-src/reviews/R22-shots/na-375-labels-and-chips-pile-up.png |
+| Row 2: reroll finger picks the hits | **Fixed.** The finger goes to "Attack die 3: blank", then "Attack die 4: blank" (both sizes, from the run log). | games-src/reviews/R22-shots/na-375-tut-lock-button-on-kael-label.png (the lock step before the reroll) |
+| Row 6: lost 5 of 5 on the default first game | **Worse.** Lost 10 of 10, 2 of them in round 1, 6 of 6 when following the suggestions. | games-src/reviews/R22-shots/na-390-defeat-round1-no-undefined.png, games-src/reviews/R22-shots/na-390-defeat-flew-off-mat.png |
+| Row 8: "undefined" on the DEFEAT card | **Fixed** (10 of 10 cards read normally). | games-src/reviews/R22-shots/na-390-defeat-round1-no-undefined.png |
+| Row 4: stale "Rival's turn" bubble during my plan | **Not seen** in 10 games; a different stale bubble ("Ships move" during Fire) appears instead. | games-src/reviews/R22-shots/na-390-ships-move-bubble-in-fire-step.png |
+| Row 4: "★ Use evade" names Kael's pilot ability | **Fixed.** The button reads "★ Focus → evade / Change 1 of your…". | run log (tap text) |
+| Row 4: coach "Range 3 gave him a defence die" while I defend | **Not fixed.** | games-src/reviews/R22-shots/na-375-tut-range3-coach-while-defending.png |
+| Row 5: 42 px overlapping move circles in the coached plan | **Not fixed** (tutorial and drill board dial; the real game uses the bottom grid). | games-src/reviews/R22-shots/na-375-drill-dial-42px-circles.png |
+| Row 5: "Kael" label on Nightjar's label after the K-turn | **Partly.** Not on Nightjar's label, but name plates, move chips and the "Ships move" bubble still stack at 375. | games-src/reviews/R22-shots/na-375-labels-and-chips-pile-up.png |
+| Row 2: split flow; "The rest is in Rules" | **Not fixed.** 3 bubbles → coached duel → card → drill → "Drill done. You know every rule… The rest is in Rules." | games-src/reviews/R22-shots/na-375-drill-end-rest-in-rules.png |
+
+### New findings
+- Row 6/4 — did: first game from Launch at 375, took the pre-selected move — happened: the dial opens on ↑3 "Straight 3 · rock!"; Kael flies through an asteroid into range 1 of both rivals and is destroyed in round 1 (same at 390 without the rock) — shot: games-src/reviews/R22-shots/na-375-suggested-move-into-rock-r1.png, games-src/reviews/R22-shots/na-390-defeat-round1-no-undefined.png
+- Row 6/8 — did: always took the suggested move at 390 — happened: the suggestion was ↑2 in all 6 rounds, marked "rock!" in round 3 while both rivals were behind Kael; in round 6 "Kael Varro flies off the battlefield and is lost" (also in a mixed game at round 7) — shot: games-src/reviews/R22-shots/na-390-suggested-straight2-every-round.png, games-src/reviews/R22-shots/na-390-defeat-flew-off-mat.png
+- Row 6 — did: 10 default games, 6 on the suggestions and 4 mixed — happened: 10 losses in rounds 1-7; the rival kept both ships in 9 of 10; waits between my turns median 7-13 s, max 18-40 s — shot: games-src/reviews/R22-shots/na-390-defeat-flew-off-mat.png
+- Row 4/5 — did: round 2 at 390, after Fly — happened: the step bar reads "R2 Fire" but the "Ships move / Lowest skill first" bubble is still up and covers Knifepoint's name plate — shot: games-src/reviews/R22-shots/na-390-ships-move-bubble-in-fire-step.png
+- Row 5 — did: watched round 3 moves at 375 — happened: Kael's plate sits under a move chip, the Nightjar and Knifepoint plates are stacked, and an orange range wedge fills the lower right — shot: games-src/reviews/R22-shots/na-375-labels-and-chips-pile-up.png
+- Row 5 — did: tutorial lock step at 375 — happened: the Lock button (with the finger) sits on Kael's name plate — shot: games-src/reviews/R22-shots/na-375-tut-lock-button-on-kael-label.png
+- Row 1 — did: compared the Rules screen with the base rules — happened: it leaves out "a ship on an asteroid can't attack", "touching ships can't attack each other" and simultaneous fire at equal skill (the engine applies all three) — no shot (a rules check)
+- Row 4 (works) — did: flew a K-turn in round 1, opened the dial in round 2 — happened: arrows and ghost follow the ship's facing — shot: games-src/reviews/R22-shots/na-390-after-kturn-arrows-follow-ship.png
