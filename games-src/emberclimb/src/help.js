@@ -11,7 +11,7 @@
     { title: 'The climb', text: 'Walk up the map room by room. Glowing rooms are your next step. Beat the boss at the top to win.', pic: svg('climb') },
     { title: 'Your turn', text: 'You draw 5 cards and have 3 energy each turn. Tap a card once to lift it, again to play it. Pick a target if asked.', pic: svg('turn') },
     { title: 'Read the intent', text: 'Enemies show what they will do next. Block cancels attacks. Out of energy? End your turn.', pic: svg('intent') },
-    { title: 'Status effects', text: 'Vulnerable (max 3): the next hit deals double. Weak (max 3): each hit deals 3 less. One is used up per attack; Weak against Vulnerable cancels both. Poison: 1 HP per token at end of turn, stays. Dice: 1-2 low, 3-4 middle, 5-6 high.', pic: svg('status') },
+    { title: 'Status effects', text: 'Vulnerable (max 3): takes double damage from the next attack. Weak (max 3): each of its hits deals 8 less damage. One is used up per attack; Weak against Vulnerable cancels both. Poison: 8 HP per token at end of turn, stays. Dice: 1-2 low, 3-4 middle, 5-6 high.', pic: svg('status') },
     { title: 'After a fight', text: 'Pick 1 of 3 new cards, or skip to keep your deck lean.', pic: svg('reward') },
     { title: 'Rest and shop', text: 'Campfires heal or upgrade a card. Shops sell cards, relics and potions for gold.', pic: svg('rest') },
     { title: 'Two heroes', text: 'Two heroes share the map and take turns. Pass the screen.', pic: svg('duo') },
@@ -19,12 +19,12 @@
     { phase: 'map', title: 'The boss', text: 'The crown room at the top is the boss. Beat it to win the climb.', pic: svg('boss') },
     { phase: 'battle', title: 'Play cards', text: 'Tap a card once to lift it, again to play it. Pick a target if asked. You have 3 energy a turn.', pic: svg('turn') },
     { phase: 'battle', title: 'Intent and block', text: 'The icon over an enemy is its next move. Block cancels attacks this turn.', pic: svg('intent') },
-    { phase: 'battle', title: 'Status effects', text: 'Vulnerable: double damage. Weak: 3 less per hit. One used per attack. Poison: 1 HP per token each turn, it stays.', pic: svg('status') },
+    { phase: 'battle', title: 'Status effects', text: 'Vulnerable: takes double damage. Weak: each hit deals 8 less. One used per attack. Poison: 8 HP per token each turn, it stays.', pic: svg('status') },
     { phase: 'reward', title: 'Pick a card', text: 'Add one of three cards to your deck, or skip to keep it lean. A sharper deck climbs higher.', pic: svg('reward') },
     { phase: 'rest', title: 'Campfire', text: 'Heal some HP, or smith to upgrade one card. Pick one.', pic: svg('rest') },
     { phase: 'shop', title: 'Shop', text: 'Tap an item to see it, then Buy. Cards, relics and potions cost gold.', pic: svg('shop') },
     { phase: 'event', title: 'Event', text: 'A choice with a price or a prize. Read each option, then pick one.', pic: svg('event') },
-    { title: 'Simplified on purpose', text: 'Numbers are 3 times the tabletop scale (a Strike deals 6).\nThe map is generated, not a printed board.\nSome cards and events roll a die.\nAll enemies, relics and events are our own; some card numbers are tuned.\nPotions drop by chance after fights (max 3).\n1 or 2 heroes, not 4.', pic: svg('climb') }
+    { title: 'Simplified on purpose', text: 'Act 1 only. Acts 2 and 3 are left out of Quick games.\nNumbers are 8 times the tabletop scale (a Strike deals 8). Every Act 1 foe uses its printed tabletop card x 8.\nA Quick climb: the first-fight deck, the normal deck, 3 elites and a boss drawn from its 3 bosses.\nActs 2 and 3 are not built as Quick games; story chapters set there use our own foes.\nThe map is generated, not a printed board.\nSome cards and events roll a die.\nAll enemies, relics and events are our own; some card numbers are tuned.\nPotions drop by chance after fights (max 3).\n1 or 2 heroes, not 4.', pic: svg('climb') }
   ];
   function phase() { var gg = g(); if (!gg || (window.UI && UI.mode === 'title')) return null; return gg.scr === 'over' ? null : gg.scr; }
   UI.phase = phase;
