@@ -43,7 +43,19 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
       if (st.k === last) stuck++; else { stuck = 0; last = st.k; } if (stuck > 25) { fails.push('stuck at ' + st.k + ' "' + await page.evaluate(() => document.getElementById('prompt').textContent) + '"'); await page.screenshot({ path: path.join(__dirname, `shots/phone-${W}-g${g}-stuck.png`) }); break; }
       /* the ★ (market badge, best space, or the ★ on a stored tile, goods, dock button or tab) */
       const STAR = '#mk .tilebtn.bestt.glow, #lane .tilebtn.bestt.glow, #es .cell.best.glow, .bestx';
-      if ((MODE === 'best' || rnd() < 0.5) && await T(STAR, 380)) { best++; continue; }
+      if (MODE !== 'read' && (MODE === 'best' || rnd() < 0.5) && await T(STAR, 380)) { best++; continue; }
+      /* read = a newcomer who ignores the ★: taps what glows on the screen it is on (tabs that glow count), else any dock button */
+      if (MODE === 'read') {
+        const L2 = await page.evaluate(() => { const g = [], a = []; const vis = e => { const r = e.getBoundingClientRect(); if (!r.width) return null; const x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); return hit && (hit === e || e.contains(hit)) ? { x, y, end: e.id === 'endB' } : null; };
+          document.querySelectorAll('#mk .tilebtn.glow, #lane .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn.glow, #tabs .tab.has').forEach(e => { const v = vis(e); if (v) g.push(v); });
+          document.querySelectorAll('#acts .btn').forEach(e => { const v = vis(e); if (v) a.push(v); });
+          /* it reads the board: among glowing spaces it builds where the biggest +N shows */
+          let bn = -1, bc = null; document.querySelectorAll('#es .cell.glow').forEach(e => { const t = e.querySelector('.pvb.pts'); const n = t ? +t.textContent.replace('+', '') : 0; const v = vis(e); if (v && n > bn) { bn = n; bc = v; } });
+          if (bc && bn > 0) return { g: [bc], a }; return { g, a }; });
+        const pl = L2.g.length ? L2.g : L2.a; const pl2 = pl.filter(o => !o.end).length ? pl.filter(o => !o.end) : pl;
+        if (pl2.length) { const o = pl2[Math.floor(rnd() * pl2.length)]; await page.touchscreen.tap(o.x, o.y); taps++; own++; await page.waitForTimeout(380); continue; }
+        await page.waitForTimeout(150); continue;
+      }
       /* own pick: any glowing thing or dock button, at random */
       const own1 = await page.evaluate(() => { const L = []; document.querySelectorAll('#mk .tilebtn.glow, #es .cell.glow, #store .tilebtn.glow, #goods .gbtn.glow, #mk .stgoods.glow, #acts .btn, #tabs .tab.has').forEach(e => { const r = e.getBoundingClientRect(); if (!r.width) return; const x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) L.push({ x, y, end: e.id === 'endB' }); }); return L; });
       const pool = own1.filter(o => !o.end).length ? own1.filter(o => !o.end) : own1;
@@ -51,10 +63,11 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
       if (await T(STAR, 380)) { best++; continue; }
       await page.waitForTimeout(150);
     }
-    const res = await page.evaluate(() => ({ rs: !document.getElementById('rs').hidden, txt: (document.querySelector('#rs h2') || {}).textContent, vp: G && G.P.map(p => p.vp).join('-') }));
+    const res = await page.evaluate(() => ({ rs: !document.getElementById('rs').hidden, txt: (document.querySelector('#rs h2') || {}).textContent, vp: G && G.P.map(p => p.vp).join('-'), st: G && G.P.map(p => 'reg ' + p.stat.regions + ' sold ' + p.stat.sales + ' land ' + VB.estateFilled(p) + ' wk ' + p.workers + ' end ' + JSON.stringify(p.end)).join(' | ') }));
+    if (res.rs) { await page.waitForTimeout(1200); await page.screenshot({ path: path.join(__dirname, `shots/${MODE}-${W}x${H}-s${S0}-g${g}-result.png`) }); }
     if (!res.rs && !fails.length) fails.push('result not reached');
     if (errs.length) fails.push('errors: ' + errs.slice(0, 2).join(' | '));
-    console.log(`${fails.length ? 'FAIL' : 'PASS'} ${MODE} game ${g + 1} touch ${W}x${H}: ${taps} taps (★ ${best}, own ${own}), "${res.txt}" (${res.vp})${fails.length ? ' :: ' + fails.join('; ') : ''}`);
+    console.log(`${fails.length ? 'FAIL' : 'PASS'} ${MODE} game ${g + 1} touch ${W}x${H}: ${taps} taps (★ ${best}, own ${own}), "${res.txt}" (${res.vp}) [${res.st}]${fails.length ? ' :: ' + fails.join('; ') : ''}`);
     bad += fails.length ? 1 : 0; await ctx.close();
   }
   await b.close(); process.exit(bad ? 1 : 0);
