@@ -85,7 +85,26 @@
       b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
       var cw = [350, 292, 236];
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
-      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
+      b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
+        var wt = [0, 236, 196, 164];
+        for (var wj = 0; wj < wt.length; wj++) { b.style.maxWidth = wt[wj] ? wt[wj] + 'px' : ''; b.dataset.gxhShrunk = '1'; var r4 = place(b, tr); if (r4.tapClear) { delete b.dataset.gxhShrunk; return r4; } }
+        b.style.maxWidth = '';
+      }
+      delete b.dataset.gxhShrunk;
+    }
+    var tapClear = false;
+    if (!best && cfg && cfg.tapFirst) {   // game opt-in: when nothing is fully free, keep every tappable target clear and let the bubble sit over plain text/board art
+      var avT = avoidRects(32), bt = null, bts = 1e9;
+      for (var xj = 0; xj < xs.length; xj++) for (var yy = top; yy <= bot - h; yy += 3) {
+        var cc = { left: xs[xj], top: yy, right: xs[xj] + w, bottom: yy + h };
+        if (hit(cc, T)) continue;
+        var ot = 0; for (var kk = 0; kk < avT.length; kk++) if (hit(cc, avT[kk])) ot += inter(cc, avT[kk]) || 1;
+        var ox = 0; for (var kx = 0; kx < txt.length; kx++) if (hit(cc, txt[kx])) ox += inter(cc, txt[kx]) || 1;
+        var sc = ot * 1e4 + ox * 4 + Math.abs(cc.left + w / 2 - tr.cx) * 0.5 + Math.abs(yy + h / 2 - tr.cy);
+        if (sc < bts) { bts = sc; bt = cc; bt.ot = ot; }
+      }
+      if (bt) { tapClear = !bt.ot; soft = bt; }
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -98,7 +117,7 @@
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
-    c2.free = !!best;
+    c2.free = !!best; c2.tapClear = tapClear;
     return c2;
   }
   function ringAt(r, cls) {

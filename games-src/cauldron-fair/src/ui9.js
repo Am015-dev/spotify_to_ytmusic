@@ -129,12 +129,17 @@ function stgPlay(box, ds, R) {
 }
 // ---------- W471: the points race under the day's pots: every maker's total as a bar, today's gain lit, who leads in one line
 function stgRace(ds, v, play, R) {
-  const top = Math.max(1, ...ds.map(d => d.after)), ord = ds.slice().sort((a, b) => b.after - a.after), lead = ord[0], second = ord[1];
+  const top = Math.max(1, ...ds.map(d => d.after));
   const box = h('div.drace', { 'aria-label': 'Points after day ' + R.round });
-  const line = !second ? '' : lead.after === second.after ? 'Level at ' + lead.after + ' points.' : (lead.p.seat === v ? 'You lead' : lead.p.name + ' leads') + ' by ' + (lead.after - second.after) + '.';
-  const lc = D.CHARS[chefOf(lead.p.seat) % 4], tie = second && lead.after === second.after;
-  const por = h('img.drpor', { src: 'media/camp-' + lc.id + '.webp', alt: '', width: 112, height: 112, draggable: 'false', style: '--rc:' + lc.css }); por.onerror = () => por.remove();
-  box.appendChild(h('div.drhero', tie ? null : por, h('div.drhl', h('b', 'Points after day ' + R.round), line ? h('span', line) : null)));
+  // the headline always speaks about the numbers on screen: counted-up totals while the day plays, the new totals once they are in
+  const lead = key => { const ord = ds.slice().sort((a, b) => b[key] - a[key]), a = ord[0], b = ord[1]; return { a, tie: !!b && a[key] === b[key], line: !b ? '' : a[key] === b[key] ? 'Level at ' + a[key] + ' points.' : (a.p.seat === v ? 'You lead' : a.p.name + ' leads') + ' by ' + (a[key] - b[key]) + '.' }; };
+  const fresh = !play && STG.raced !== R.round, first = lead(play || fresh ? 'start' : 'after');
+  const por = h('img.drpor', { alt: '', width: 112, height: 112, draggable: 'false' }); por.onerror = () => por.remove();
+  const hl = h('span', first.line);
+  const show = L => { const c = D.CHARS[chefOf(L.a.p.seat) % 4]; por.src = 'media/camp-' + c.id + '.webp'; por.style.setProperty('--rc', c.css); por.style.display = L.tie ? 'none' : ''; hl.textContent = L.line; hl.hidden = !L.line; };
+  show(first);
+  box.appendChild(h('div.drhero', por, h('div.drhl', h('b', 'Points after day ' + R.round), hl)));
+  if (fresh) setTimeout(() => show(lead('after')), 800);
   ds.forEach(d => {
     const me = d.p.seat === v, w0 = Math.round(100 * d.start / top), w1 = Math.round(100 * d.after / top);
     const bar = h('span.drbar', h('i.drold', { style: 'width:' + w0 + '%' }), h('i.drnew', { style: '--w0:' + w0 + '%;--w1:' + (play ? w0 : w1) + '%' }));
