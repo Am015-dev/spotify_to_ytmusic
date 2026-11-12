@@ -88,7 +88,19 @@ function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
 function readMs(h){const w=String(h).replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;return 4000+w*100}
 function banner(h,ms){if(!ban)return;const now=performance.now();if(!ban.hidden&&BF.banUntil&&now<BF.banUntil&&ms<1e9&&BF.banMs<1e9){BF.banQ=(BF.banQ||[]).concat([[h,ms]]).slice(-2);return}
   ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('top');ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
-  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms)}
+  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms);ban.dataset.py='';placeBan()}
+// keep the timed banner off the ships and fully on screen: it sits low (above the bottom bar) when it can, else the first free height; it only moves when it would cover a ship
+function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ban){ban.style.left=ban.style.top=ban.style.transform=ban.style.transition=ban.style.maxWidth=''}return}
+  if(!(typeof v3==='function'&&v3()&&G))return;const o=ov.getBoundingClientRect(),c=V3.r.domElement.getBoundingClientRect(),dx=c.left-o.left,dy=c.top-o.top,Wd=o.width,Ht=o.height;if(!(Wd>0))return;
+  const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
+  const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
+  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}return a};
+  const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
+  const ys=[yB];for(let y=yB-24;y>=60;y-=24)ys.push(y);ys.push(Math.max(m,Math.min(yB,74)));
+  const cur=parseFloat(ban.dataset.py);if(cur>=0&&ban.dataset.pw==String(w)+'x'+h&&hit(left,cur)===0)ys.unshift(cur);
+  for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
+  ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
+  clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
 function mvLabel(m,s,deg){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return rotIco(m.d>0?a[1]:a[0],s,deg)+'<b>'+m.s+'</b>'}
 function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?rotIco('⇆',s):mvLabel(c.m,s);lay.appendChild(el);
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
@@ -136,7 +148,7 @@ function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.win
   else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
   else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
   else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
-  if(!id||id===BF.tbId)return;BF.tbId=id;if(k!=='watch'){BF.banQ=[];BF.banUntil=0}/* my turn now: a queued 'Rival's turn' line is stale, drop it and show this one at once */banner(h,1100);if(ban)ban.classList.toggle('top',k!=='plan');BF.noshotT=0}
+  if(!id||id===BF.tbId)return;BF.tbId=id;if(k!=='watch'){BF.banQ=[];BF.banUntil=0}/* my turn now: a queued 'Rival's turn' line is stale, drop it and show this one at once */banner(h,1100);if(ban)ban.classList.toggle('top',k!=='plan');BF.noshotT=0;placeBan()}
 function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0=me();const hp=side=>alive().filter(s=>s.side===side).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);
   const n=side=>alive().filter(s=>s.side===side).length;const h=`<span class="y">You <b>${n(k0)}</b>✈ ♥${hp(k0)}</span><span class="vs">vs</span><span class="e">Enemy <b>${n(1-k0)}</b>✈ ♥${hp(1-k0)}</span>`;if(top._h!==h){top._h=h;top.innerHTML=h}}
 // ---- the guided first game: a ghost finger shows the one thing to tap ----

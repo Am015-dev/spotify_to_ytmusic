@@ -6,6 +6,9 @@ const UI={choice:null,roll:null,pick:null,busy:false,info:true,sel:null,peek:nul
 // ---- seeded random numbers (mulberry32); all dice, shuffles and AI randomness go through rnd() ----
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)>>>0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
+// a new default game: a fresh seed from the system's entropy (never the page's Math.random, which a test run may have fixed), unless a seed is chosen on purpose: setSeed() or ?seed=N
+function freshSeed(){if(DEFSEED!=null)return DEFSEED;const m=/[?&]seed=(\d+)/.exec((typeof location!=='undefined'&&location.search)||'');if(m)return m[1]>>>0;
+  try{const a=new Uint32Array(2);crypto.getRandomValues(a);return (a[0]^Math.imul(a[1],2654435761)^Date.now())>>>0}catch(e){return (Date.now()*7919+((typeof performance!=='undefined'?performance.now():0)*1000|0))>>>0}}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 const ATK_FACES=['hit','hit','hit','crit','focus','focus','blank','blank'];// [R1]
 const DEF_FACES=['evade','evade','evade','focus','focus','blank','blank','blank'];// [R2]
