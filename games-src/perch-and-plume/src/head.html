@@ -440,7 +440,8 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 #hand .bc.big .bk-body{padding:3px 6px 4px;gap:3px}
 #hand .bc.big .bk-hab,#hand .bc.big .bk-pw,#hand .bc.big .bk-st{display:none}
 #hand .bc.big .bk-hd{gap:4px}
-#hand .bc.big .bk-nm{font-size:14px;line-height:1.1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#hand .bc.big .bk-nm{font-size:14px;line-height:1.1;display:block;overflow-wrap:normal;hyphens:none}
+#hand .bc.big:not(.sel) .bk-hd{display:block}#hand .bc.big:not(.sel) .vpb{position:absolute;top:4px;right:4px;background:rgba(255,250,238,.92);border-radius:8px;padding:0 4px}
 #hand .bc.big .vpb{transform:scale(.8);transform-origin:top right}
 #hand .bc.big .bk-cost{gap:3px;flex-wrap:nowrap}#hand .bc.big .bk-cost .ci{min-width:0}#hand .bc.big .bk-cost .ci small{display:none}#hand .bc.big .bk-cost .ci .fi{width:20px;height:20px}#hand .bc.big .bk-cost .ci.free{font-size:14px}
 #hand .bc.big.sel{flex:0 0 calc(100% - 8px);flex-direction:row;height:auto;min-height:112px}

@@ -42,10 +42,32 @@ function markBest() {   // Best badge on the sub-choice the hint picks (die, egg
   var el = null;
   if (G.q && m.t === 'die' && UI.gsDie != null) el = UI.gsDie === m.i ? $$('#acts [data-a="mv"]').filter(function (x) { try { return JSON.parse(x.dataset.m).f === m.f; } catch (e) { return false; } })[0] : null;   // grub-or-seed die: Best moves to the right button
   else if (G.q && /^(die|egg|trade|tray|deck|tuck)$/.test(m.t)) el = moveTarget(m);
+  else if (G.q && m.t === 'bonus' && m.yes && m.i != null) el = $('#hand .bc[data-i="' + m.i + '"]');
+  else if (G.q && m.t === 'bonus' && m.yes && m.h != null) el = $('.bc[data-a="bird"][data-h="' + m.h + '"][data-c="' + m.c + '"]');
+  else if (G.q) el = $$('#acts [data-a="mv"]').filter(function (x) {   // a button choice (No thanks, Pay food, Skip, Reroll, a bonus card): the button whose move matches
+    try { var b = JSON.parse(x.dataset.m); return b.t === m.t && ['yes', 'f', 'i'].every(function (k) { return m[k] == null || b[k] === m[k]; }) && (m.yes !== false || b.yes === false); } catch (e) { return false; }
+  })[0] || null;
   else if (m.t === 'play' && UI.sel === m.i && !UI.pend) el = $('.row[data-h="' + m.h + '"] .slot.next');
   if (!el) return;
   el.classList.add('bestt');
   var b = document.createElement('em'); b.className = 'bestb bestx'; b.textContent = 'Best'; el.appendChild(b);
+}
+// the Best target is always on screen, even after you picked another bird: scroll it into view (hand strip, panel or page)
+function bestInView() {
+  if (!hintMove()) return;
+  var el = UI.sel != null && $('.slot.bestt') ? $('.slot.bestt') : ($('#hand .bc.bestc') || $('.bestt')); if (!el) return;
+  var r = el.getBoundingClientRect(), pr = $('#prompt'), top = 0;
+  var db = $('#dockbody'); if (db && db.contains(el) && pr && pr.offsetHeight) top = Math.max(0, pr.getBoundingClientRect().bottom);
+  if (r.top >= top && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth && bestHit(el)) return;
+  var h = $('#hand'); if (h && h.contains(el) && (r.left < 0 || r.right > window.innerWidth)) h.scrollLeft += r.left - h.getBoundingClientRect().left - 4;
+  r = el.getBoundingClientRect();
+  if (db && db.contains(el) && db.scrollHeight > db.clientHeight) { var d = db.getBoundingClientRect(), lim = Math.max(d.top, top); if (r.bottom > d.bottom) db.scrollTop += Math.min(r.bottom - d.bottom + 4, r.top - lim - 4); else if (r.top < lim) db.scrollTop += r.top - lim - 4; r = el.getBoundingClientRect(); }
+  if (r.top < 0 || r.bottom > window.innerHeight || !bestHit(el)) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  if (!bestHit(el)) el.scrollIntoView({ block: 'center', inline: 'nearest' });
+}
+function bestHit(el) {   // the target is really what a finger lands on (not clipped by the panel edge or under the sticky prompt)
+  var r = el.getBoundingClientRect(), ys = [r.top + Math.min(r.height / 2, 24), r.bottom - 6];
+  return ys.every(function (y) { var t = document.elementFromPoint(r.left + r.width / 2, y); return !!t && (t === el || el.contains(t)); });
 }
 function bestPlay(G, s) {
   var p = G.pl[s], best = null;

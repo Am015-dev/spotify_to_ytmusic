@@ -54,7 +54,7 @@ function render() {
   $('#barstat').textContent = '';
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { }
+  glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
@@ -125,7 +125,7 @@ function renderDock(p, vs, cur) {
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
     (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var hm = mine && !Q && hintsOn() ? hintMove() : null, bp = hm ? (hm.t === 'play' && (UI.sel == null || UI.sel === hm.i) ? { i: hm.i } : null) : mine && !Q && hintsOn() && typeof coachOn === 'function' && coachOn() ? bestPlay(G, vs) : null;
+  var hm = mine && !Q && hintsOn() ? hintMove() : null, bp = hm ? (hm.t === 'play' ? { i: hm.i } : null) : mine && !Q && hintsOn() && typeof coachOn === 'function' && coachOn() ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
   setH($('#hand'), p.hand.length ? order.map(function (i) {

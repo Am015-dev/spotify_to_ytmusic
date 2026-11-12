@@ -39,3 +39,11 @@ Not taught as a step: bonus-space trades and feeder rerolls (dice luck); the ins
 Measured (rival speed fast, hints on): final build, always tapping Best won 4/4 (62-59, 86-46, 60-25, 64-64 won on tie-break);
 a mixed newcomer (Best half the time, else a random glowing target) won 1/2 (57-51, lost 53-64). Over all builds in this pass: Best 7/8, mixed 2/6.
 Headless (`node hint-gate.js 80`): Best 85-91%, mixed 67-74%, random 30% vs Easy. Random glowing taps with hints off still lose (29-62, 39-47).
+
+## R12 round 2 (orchestrator)
+| Ask | Fix | Test |
+|---|---|---|
+| Mixed newcomer won 2/6 | Easy also shrugs a quarter of its small choices (`EASY_RND` in `src/ai.js`). By touch (hints on, fast rival), Best half the time: won 4 of 8 (52-44, 69-52, 55-50, 57-55; lost 41-46, 57-58, 47-55, 58-58 on tie-break). Always Best: 2/2 (77-36, 69-36) in the tuning pass. Headless: Best 88%, mixed 65%, random 19%. | `BEST=0.5 node tests/touch-game.js`, `hint-gate.js` |
+| Cut hand names | Compact hand card: points badge sits over the picture, the name gets the full width, up to 2 lines, never clipped. | `tests/hand-names.js` (all birds at 390 and 375) |
+| No Best on the bonus question | Best also marks button choices (No thanks, Pay food, Skip, Reroll, bonus card) and the card or bird a bonus trade uses. 0 decisions without Best in 2 full games. | touch-game `best taps / misses` |
+| Best off screen after picking another bird | Best stays on the Best bird; `bestInView()` scrolls it (strip, panel or page) until a finger really lands on it. 0 scrolls in 11 hints-on games. | touch-game scroll count |

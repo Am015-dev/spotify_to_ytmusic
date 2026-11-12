@@ -7,7 +7,7 @@
   var PP = root.PP || require('./engine.js');
   var B = PP.B, FOODS = PP.FOODS;
   var PWV = { gainF: .75, gainS: .9, cacheS: 1, cacheF: .8, tuckDraw: .9, tuckEgg: 1.1, tuckFood: 1, flock: 1, laySelf: .9, layNest: 1.4, draw1: .55, hunt: .5, huntDie: .45, allFood: .6, allDraw: .4, trade: .5 };
-  var AIW = { eng: .6, row: .25, kk: 2.5 };   // hard's tuned weights (tuned by ai-gate duels)
+  var AIW = { eng: .6, row: .25, kk: 2.5 }, EASY_RND = .25;   // hard's tuned weights (tuned by ai-gate duels)
   function turnsLeft(G, seat) { var t = G.pl[seat].cubes; for (var r = G.round + 1; r < G.rounds; r++) t += G.cubes[r]; return t; }
   function need(G, seat) {   // how much each food is wanted by the birds in hand (missing food weighs more)
     var p = G.pl[seat], w = { grub: .2, seed: .2, fish: .2, berry: .2, rodent: .2 };
@@ -47,6 +47,7 @@
   function sub(G, seat, lvl) {
     var q = G.q, p = G.pl[seat], mv = PP.validMoves(G, seat), T = turnsLeft(G, seat);
     if (!mv.length) return null;
+    if (lvl === 'easy' && q.h !== 'setup' && q.h !== 'automa' && Math.random() < EASY_RND) { var mr = mv.filter(function (m) { return m.t !== 'reroll'; }); if (mr.length) return mr[Math.floor(Math.random() * mr.length)]; }   // easy: a casual player, a quarter of its small choices are a shrug
     switch (q.h) {
       case 'setup': return setup(G, seat);
       case 'automa': return { t: 'auto' };

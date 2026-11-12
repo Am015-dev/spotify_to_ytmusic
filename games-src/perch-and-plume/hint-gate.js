@@ -15,7 +15,9 @@ function run(name, pol) {
   console.log(`${name} vs easy: wins ${w}/${N} = ${Math.round(100 * w / N)}%, avg ${(sa / N).toFixed(1)} vs ${(sb / N).toFixed(1)}, hint ${(ms / Math.max(1, nd)).toFixed(0)} ms/decision`);
   return w / N;
 }
+// touch-like newcomer: picks one of the 4 actions at random (as tapping a random action tile), then a random option inside it
+function rndTouch(G, s) { if (G.q) return rnd(G, s); const mv = PP.validMoves(G, s), ty = ['food', 'eggs', 'cards', 'play'].filter(k => mv.some(m => k === 'play' ? m.t === 'play' : m.t === 'act' && m.a === k)), k = ty[Math.floor(Math.random() * ty.length)], opts = mv.filter(m => k === 'play' ? m.t === 'play' : m.t === 'act' && m.a === k); return opts[Math.floor(Math.random() * opts.length)]; }
 const best = run('Best', (G, s) => AI.hint(G, s));
-const mix = run('Mixed', (G, s) => Math.random() < .5 ? AI.hint(G, s) : rnd(G, s));
+const mix = run('Mixed', (G, s) => Math.random() < .5 ? AI.hint(G, s) : rndTouch(G, s));
 console.log((best >= .7 && mix >= .4 && mix <= .8 ? 'PASS' : 'FAIL') + ` hint-gate: Best ${Math.round(best * 100)}% (need 70), mixed ${Math.round(mix * 100)}% (need 40-80; by touch a mixed newcomer is weaker, see GAMEPLAY-W508.md)`);
-if (process.env.ALL) run('Random', rnd);
+if (process.env.ALL) run('Random', rndTouch);
