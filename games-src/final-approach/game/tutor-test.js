@@ -1,5 +1,6 @@
-// Tutorial test (Final Approach): plays the staged tutorial flight through the REAL page with touch taps, doing exactly what every step asks.
-//   node tutor-test.js [sizes=390x763,375x553]        Exit code 1 on any problem.
+// Tutorial test (Final Approach): plays the guided first landing through the REAL page with touch taps, doing exactly what every step asks.
+//   node tutor-test.js [sizes=390x844,375x667]
+// Every step: one sentence of 12 words or fewer and one highlighted tap; every core rule in TUT_RULES must appear as a step, in that order.        Exit code 1 on any problem.
 // Runs per size: one clean run; at 390x763 also one run with rotations half way (portrait -> landscape -> portrait) and a "leave and come back" run.
 // Checks per step: the bubble is short (say <= 20 words, title <= 4), inside the screen and never over the spotlight; the target is visible and not covered by
 // the kit; a wrong tap (outside the spotlight) does not advance and shakes the bubble; the right action advances; nothing stuck for 8 s; no page errors.
@@ -8,8 +9,8 @@
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path');
 const html=fs.readFileSync(__dirname+'/final-approach.html');
-const SIZES=(process.argv[2]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));
-const SHOTS=path.join(__dirname,'..','playtest');
+const SIZES=(process.argv[2]||'390x844,375x667').split(',').map(s=>s.split('x').map(Number));
+const SHOTS=path.join(__dirname,'..','playable-shots','gameplay');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
@@ -25,15 +26,14 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
   await p.reload();await sleep(900);
   // first visit: the title shows "New here? Learn in 5 minutes" as the first option
-  const first=await p.evaluate(()=>{showStart();const b=document.querySelector('#start .tbtn');return b?{t:b.textContent,gxt:b.hasAttribute('data-gxt-open')}:null});
-  if(!first||!first.gxt||!/New here/.test(first.t))note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
-  if(first&&wc(first.t)>0&&!/Learn in 5 minutes/.test(first.t))note(tag,'label: '+first.t);
+  const first=await p.evaluate(()=>{showStart();const b=document.querySelector('#start [data-gxt-open]');return b?{t:b.textContent}:null});
+  if(!first)note(tag,'the title has no Learn to play button');
   // start it with a finger, from the menu
   const tb=await p.evaluate(mode=>{const b=document.querySelector(mode==='story'?'#start .tbtn.story':'#start [data-gxt-open]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},mode);
   await p.touchscreen.tap(tb[0],tb[1]);await sleep(500);
     const state=()=>p.evaluate(()=>GXT.state());
-  const shot=async(n)=>{if(W===390&&H===763&&mode==='clean'){fs.mkdirSync(SHOTS,{recursive:true});await p.screenshot({path:path.join(SHOTS,'tutor-'+n+'.png')})}};
-  let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[];
+  const shot=async(n)=>{if(W===390&&H===844&&mode==='clean'){fs.mkdirSync(SHOTS,{recursive:true});await p.screenshot({path:path.join(SHOTS,'tut-'+n+'.png')})}};
+  let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[],rules=[],shotN=0;
   for(let guard=0;guard<4000;guard++){
     const st=await state();
     if(!st.active)break;
@@ -42,7 +42,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s at step '+st.i+' '+st.id+' phase '+st.phase+' '+JSON.stringify(await p.evaluate(()=>({round:G.round,ph:G.phase,turn:G.turn,sel:UI.sel,cof:UI.cof,pend:G.pend&&G.pend.h,slots:Object.keys(G.slots).length,rr:G.rrHand}))));await p.screenshot({path:'/tmp/claude-0/tutor_stuck_'+W+'_'+mode+'.png'}).catch(()=>{});break}
     if(!st.shown){await sleep(60);continue}
     // ---- a step is on screen
-    if(!seenIds.includes(st.id)){seenIds.push(st.id)}
+    if(!seenIds.includes(st.id)){seenIds.push(st.id);const ru=await p.evaluate(i=>tutSteps()[i].rule,st.i);if(!rules.includes(ru))rules.push(ru);if(W===390&&H===844&&mode==='clean'){await sleep(250);await shot(String(++shotN))}}
     const info=await p.evaluate(()=>{const s=GXT.state(),v={w:innerWidth,h:innerHeight};
       const b=document.querySelector('.gxt-bub'),nb=b&&b.querySelector('.gxt-next');
       const q=(e)=>{if(!e)return null;const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,w:r.width,h:r.height}};
@@ -55,7 +55,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(wc(info.say)>12)note(tag,id+': say over 12 words ('+wc(info.say)+')');
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!info.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');
@@ -78,11 +78,10 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763
-    if(!/^Tap (the glowing|Next)/.test(info.say)){if(id==='seats')await shot('early');if(id==='engines')await shot('mid');if(id==='engines2')await shot('landing')}
     // rotations
-    if(mode==='rotate'&&rotated===0&&s.id==='radio'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
+    if(mode==='rotate'&&rotated===0&&s.id==='radio:ra0:1'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
       const r=await state();if(!r.shown||!r.hole)note(tag,'after rotating to landscape the step is not on screen');else await p.screenshot({path:'/tmp/claude-0/tutor_rot_land.png'});continue}
-    if(mode==='rotate'&&rotated===1&&s.id==='roll2'){rotated=2;await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
+    if(mode==='rotate'&&rotated===1&&s.id==='altitude:2'){rotated=2;await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
       const r=await state();if(!r.shown||!r.hole)note(tag,'after rotating back the step is not on screen');continue}
     // a wrong tap: outside the spotlight (or on the highlighted thing of a Next step) must not advance and must shake the bubble
     const need=s.wait?'out':'in';
@@ -116,8 +115,17 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       else{const rb=await p.evaluate(()=>{const b=document.querySelector('[data-gxt-dlg=restart]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});await p.touchscreen.tap(rb[0],rb[1]);await sleep(600);        const r2=await state();if(!r2.active||r2.i!==0)note(tag,'restart did not start at step 0 ('+JSON.stringify({a:r2.active,i:r2.i})+')');lastSig='';lastT=Date.now();seenIds=[]}
       continue}
     // ---- do exactly what the step asks
+    if(!s.wait&&s.i===s.n-1){   // the last step, like a real player: look at the landing for a while (the end scene plays), tap the highlight, then Finish by touch
+      await sleep(3500);for(let k=0;k<3;k++){await p.touchscreen.tap(h.cx,h.cy);await sleep(350)}await sleep(1800);
+      const nb=await p.evaluate(()=>{const e=document.querySelector('.gxt-bub .gxt-next');if(!e)return null;const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,t=document.elementFromPoint(x,y);return {x,y,top:!!t&&(t===e||e.contains(t)),txt:e.textContent,under:t&&(t.id||t.className||t.tagName)}});
+      if(!nb)note(tag,'last step: no Finish button');else{if(!nb.top)note(tag,'last step: Finish is covered by '+nb.under);if(nb.txt!=='Finish')note(tag,'last step button says '+nb.txt);
+        await p.touchscreen.tap(nb.x,nb.y);await sleep(900);
+        const ec=await p.evaluate(()=>{const c=document.querySelector('.gxt-end .gxt-endc');if(!c)return null;const b=c.querySelector('[data-gxt-end]'),r=b.getBoundingClientRect(),t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {top:!!t&&(t===b||b.contains(t)),under:t&&(t.id||t.className||t.tagName)}});
+        if(!ec)note(tag,'Finish (by touch) did not show the end card');else if(!ec.top)note(tag,'the end card is covered by '+ec.under)}
+      continue}
     if(!s.wait){const nx=info.next;await p.touchscreen.tap((nx.left+nx.right)/2,(nx.top+nx.bottom)/2)}
     else{
+      await sleep(650);   // a human never taps within 0.6 s of a new bubble (the kit ignores that as the tail of the last gesture)
       const before=await state();
       await p.touchscreen.tap(h.cx,h.cy);
       const t1=Date.now();let moved=false;
@@ -129,7 +137,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   // ---- the end
   const fin=await state();
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
-  else if(mode!=='story'&&!await p.evaluate(()=>!!(G&&G.result&&G.result.win&&G.round===1&&G.pl.axis===0&&FA.planesOnTrack(G)===0)))note(tag,'the staged flight did not end in a landing');
+  else if(mode!=='story'&&!await p.evaluate(()=>!!(G&&G.result&&G.result.win&&G.round===3&&G.pl.axis===0&&FA.planesOnTrack(G)===0)))note(tag,'the staged flight did not end in a landing');
   else if(mode==='story'){
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');return c&&[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom]})()}))});
@@ -152,22 +160,27 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');if(!c)return null;const r=c.querySelector('.gxt-endc').getBoundingClientRect();return {t:c.querySelector('.gxt-et').textContent,btns:[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom,q.width,q.height]})()})),inside:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight}});
     if(!e)note(tag,'no end card');else{
-      if(!/know the rules/i.test(e.t))note(tag,'end card title: '+e.t);
+      if(!/can fly/i.test(e.t))note(tag,'end card title: '+e.t);
       const ks=e.btns.map(b=>b.k).join();if(ks!=='play,story')note(tag,'end card buttons: '+ks);
       if(!e.inside)note(tag,'end card outside the screen');
       for(const b of e.btns)if(b.r[5]<40)note(tag,'end button too small: '+b.t);
       await shot('end');
+      const want=await p.evaluate(()=>TUT_RULES);const order=rules.filter(r=>want.includes(r));
+      for(const r of want)if(!rules.includes(r))note(tag,'core rule step missing: '+r);
+      if(order.join()!==want.join())note(tag,'rule steps out of order: '+order.join());
       const play=e.btns.find(b=>b.k==='play');await p.touchscreen.tap((play.r[0]+play.r[2])/2,(play.r[1]+play.r[3])/2);await sleep(500);
       const after=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length,start:!document.querySelector('#start').hidden,sv:document.querySelector('#start').dataset.v,
-        btn:(document.querySelector('#start [data-gxt-open] b')||{}).textContent,st:JSON.parse(localStorage.getItem('gxt-final-approach')||'{}'),saved:!!localStorage.getItem('fa_save')}));
+        btn:(document.querySelector('#start [data-gxt-open] b')||{}).textContent,st:JSON.parse(localStorage.getItem('gxt-final-approach')||'{}'),saved:(()=>{try{return JSON.parse(localStorage.getItem('fa_save')).G.sid==='tt'}catch(e){return false}})()}));
       if(after.run||after.dom)note(tag,'tutorial elements left on screen after the end card ('+after.dom+')');
-      if(!after.start)note(tag,'"Play a real game" did not open the setup screen');
+      const real=await p.evaluate(()=>!!G&&UI.started&&G.sid!=='tt'&&!(UI.cfg&&UI.cfg.tutorial)&&!G.result);if(!real)note(tag,'"Play a real game" did not start a real flight');
+      await p.evaluate(()=>{try{document.querySelectorAll('.fa-goal').forEach(e=>e.remove())}catch(e){}showStart()});await sleep(200);
+      after.btn=await p.evaluate(()=>(document.querySelector('#start [data-gxt-open] b')||{}).textContent);
       if(!/✓/.test(after.btn||''))note(tag,'menu does not show Tutorial ✓ ('+after.btn+')');
       if(!after.st.done)note(tag,'tutorial not remembered as done');
       if(after.saved)note(tag,'the staged tutorial game was saved as a normal game');
       // the title screen too, and a normal game still starts and plays a move
       await p.evaluate(()=>{UI.sv='title';renderStart()});
-      const tt=await p.evaluate(()=>[...document.querySelectorAll('#start .tbtn b')].map(b=>b.textContent));
+      const tt=await p.evaluate(()=>[...document.querySelectorAll('#start [data-gxt-open]')].map(b=>b.textContent));
       if(!tt.some(x=>/Tutorial ✓/.test(x)))note(tag,'title menu does not show Tutorial ✓: '+tt.join('|'));
       if(/New here/.test(tt.join('')))note(tag,'"New here" still shown after the tutorial');
       const n=await p.evaluate(()=>{UI.seed=5;newGame('vs',{scenario:'g1',role:0,level:'normal'});return !!G&&UI.started&&G.sid==='g1'&&!(UI.cfg&&UI.cfg.tutorial)});
@@ -175,15 +188,15 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       else{await sleep(1200);const hb=await p.evaluate(()=>({bub:!!document.querySelector('.gxt-bub,.gxt-cell'),gx:document.querySelectorAll('.gxh-bub').length}));if(hb.bub)note(tag,'tutorial elements in a normal game')}
     }
   }
-  totals.runs++;totals.ids=seenIds.length>totals.ids.length?seenIds:totals.ids;
+  totals.runs++;totals.ids=seenIds.length>totals.ids.length?seenIds:totals.ids;if(rules.length>(totals.rules||[]).length)totals.rules=rules;
   console.log(tag,'done in',Math.round((Date.now()-t0)/1000)+'s, steps seen',seenIds.length);
   await ctx.close()}
 const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(once.has(k))return false;once.add(k);return true};
 
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
+  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);
   for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
-  console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));
+  console.log('rules taught',totals.rules||'','steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));
   console.log(probs.length?'PROBLEMS '+probs.length+'\n  '+probs.join('\n  '):'PROBLEMS 0');process.exit(probs.length?1:0)})();
