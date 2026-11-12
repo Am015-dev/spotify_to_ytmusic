@@ -105,3 +105,5 @@ html:not(.hints-on) #bulbbtn{display:none!important}
 .gxt-next,.gxh-ok.gxt-next{min-height:44px}
 /* story map header on phones: the story title gets its own full row above Back / Tutorial / stars, words never broken */
 @media (max-width:600px){.gxc-head{flex-wrap:wrap;row-gap:4px}.gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;font-size:17px}}
+/* R10: story map stage labels 14px on phones (no label under 14px) */
+.gxc-lab{font-size:14px!important}

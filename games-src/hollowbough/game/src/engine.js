@@ -616,8 +616,8 @@ H.waive = d => {
   if (n <= 0 || !rsum(rem)) { now('payRem', Object.assign({}, d, { rem, n: 0 })); return; }
   if (n >= rsum(rem)) { now('payRem', Object.assign({}, d, { rem: {}, n: 0 })); return; }
   const opts = [];
-  for (const r of RES) if (rem[r] > 0) { const r2 = Object.assign({}, rem); r2[r]--; opts.push({ label: 'Do not pay 1 ' + rn(r, 1) + ' (' + n + ' left to cut)', res: r, h: 'waive', d: Object.assign({}, d, { rem: r2, n: n - 1 }) }); }
-  ask(d.seat, 'waive', 'Choose which resources to cut from the price', opts);
+  for (const r of RES) if (rem[r] > 0) { const r2 = Object.assign({}, rem); r2[r]--; opts.push({ label: 'Cut 1 ' + rn(r, 1) + ' off the price' + (n > 1 ? ' (' + n + ' cuts left)' : ''), res: r, h: 'waive', d: Object.assign({}, d, { rem: r2, n: n - 1 }) }); }
+  ask(d.seat, 'waive', 'Cheaper: pick what you do not pay (price ' + rtxt(rem) + ')', opts);
 };
 H.payRem = d => {
   const p = P(d.seat), rem = plain(d.rem || {});

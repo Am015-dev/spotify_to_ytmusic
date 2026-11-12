@@ -74,7 +74,8 @@ function schedule() {
   if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
   if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
   const a = HB.actor(G), p = G.players[a], hs = humans();
-  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? Math.round(AIDELAY * .4) : 0); return; }
+  if (p.ai) { if (!UI.aiRun0) UI.aiRun0 = Date.now(); if (!isClient()) UI.tm = setTimeout(aiStep, ANIM && !aiHurry() ? Math.round(AIDELAY * .4) : 30); return; }
+  UI.aiRun0 = 0;
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
@@ -83,6 +84,7 @@ function schedule() {
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; if (ANIM && !(UI.cfg && UI.cfg.tutorial) && UI.bannerFor !== 'h:' + a + ':' + G.turn) { UI.bannerFor = 'h:' + a + ':' + G.turn; turnBanner(hotSeat() ? p.name + "'s turn" : HBS.turn.you); } snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }
+function aiHurry() { return !!(UI.aiRun0 && Date.now() - UI.aiRun0 > 1500 && !(UI.cfg && UI.cfg.tutorial)); }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
@@ -91,6 +93,9 @@ function aiStep() {
   const tok = UI.animTok = (UI.animTok || 0) + 1;
   const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; UI.aiCap = ''; render(); aiApply(m, a, src); };
   if (!ANIM) { go(null); return; }
+  // R10: a rival run (several steps in a row, e.g. Autumn prepare + triggers, or the whole rest of the year after you finish)
+  // never keeps you waiting more than ~3 s: after 1.5 s the remaining steps play at once, without the caption / fly beat
+  if (aiHurry()) { UI.animBusy = false; UI.aiCap = ''; go(null); return; }
   // one thing at a time: banner (first rival step of a turn run), caption saying what the rival is about to do, a beat, then the move flies
   if (UI.bannerFor !== a + ':' + G.turn) { UI.bannerFor = a + ':' + G.turn; if (!(UI.cfg && UI.cfg.tutorial)) turnBanner(HBS.turn.rival(p.name), true); }
   UI.animBusy = true; UI.aiCap = isPh() ? p.name + ' is playing' : p.name + ': ' + String(m.label || 'plays').split(' - ')[0].replace(/^[^:]*:\s*/, ''); render();

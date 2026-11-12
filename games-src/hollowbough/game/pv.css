@@ -243,7 +243,7 @@ html.ph #bulbbtn{display:none!important}
 /* W482: coach bubble and small labels at 14px+ on phones (feel gate d) */
 html.ph .gxt-bub .gxh-tx{font-size:15px;line-height:1.3}
 html.ph .gxt-bub .gxh-tt{font-size:15px}
-html.ph .gxt-bub .gxt-next{font-size:15px;min-height:32px;padding:4px 14px}
+html.ph .gxt-bub .gxt-next{font-size:15px;min-height:44px;padding:4px 14px}
 #bd.pv .strip.hand .scount{font-size:14px}
 .gx-drawer .sm,#rivald .sm,.rc .sm,.rhead .sm{font-size:14px}
 #bd.pv.wide .pvc{overflow:hidden}#bd.pv.wide .pvc-lead{display:none}
@@ -372,3 +372,43 @@ html #prompt:empty{display:none!important}
 html.ph .gx-bar #prompt,html.sk.ph .gx-bar #prompt,html:not(.ph) .gx-bar #prompt,html.sk .gx-bar #prompt{background:#fff4dc;color:#2a1f19!important;text-shadow:none!important}
 html.ph .gx-bar #prompt.mine,html.sk.ph .gx-bar #prompt.mine,html:not(.ph) .gx-bar #prompt.mine,html.sk .gx-bar #prompt.mine{color:#6e3205!important}
 #bd.pv .pv-visit{height:90px}#bd.pv .pv-visit .sc,#bd.pv .strip.city .pv-visit .sc{width:70px;height:86px}
+/* ===== R10 phone bar: no label under 14px anywhere in play (names wrap at spaces instead of shrinking), every tab 44px tall ===== */
+#bd.pv .pv-tab{min-height:44px}
+html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.ph .gx-bar #prompt{font-size:14px!important}
+/* seat chips: 14px count, the name and count share the line and wrap rather than shrink */
+#bd.pv.tall .pvch-s,#bd.pv.tall .pvch-n{font-size:14px!important;letter-spacing:0!important}
+#bd.pv .chip{overflow:hidden}
+/* 390+ board: painted space 104 wide, name 14px on its banner (2 lines at most), reward 14px under it, "shared" 14px on the painting */
+#bd.pv.tall .pv-board .tile.pv-place::before{width:108px;height:64px}
+#bd.pv.tall .pv-board .pv-nm{width:108px;font-size:14px;line-height:1.04;padding:1px 3px 2px}
+#bd.pv.tall .pv-board .tile.pv-place .pv-shtag{font-size:14px;top:44px;left:calc(50% - 52px);padding:0 5px;line-height:16px}
+#bd.pv.tall .pv-board .pv-sw b,#bd.pv.tall .pv-board .pv-sw span,#bd.pv.tall .pv-board .pv-sw b .pv-it{font-size:14px!important;line-height:1.08}
+#bd.pv.tall .pv-board .pv-tin{max-width:124px}
+/* short phones (4 x 3 board): the painting fills the whole space; name banner on top, reward plate at the bottom, "shared" between */
+#bd.pv.tall .pv-board-s .tile.pv-place{width:88px;height:82px;justify-content:flex-end}
+#bd.pv.tall .pv-board-s .tile.pv-place::before{width:88px;height:82px;top:0;left:0;transform:none;border-radius:9px;border-width:2px}
+#bd.pv.tall .pv-board-s .pv-nm{top:0;width:88px;font-size:14px;line-height:1.02;padding:1px 2px 2px;border-radius:9px 9px 6px 6px;letter-spacing:-.2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{position:absolute;left:0;right:0;bottom:0;max-width:none;width:88px;margin:0!important;padding:1px 2px;border-radius:6px 6px 9px 9px;z-index:2}
+#bd.pv.tall .pv-board-s .pv-sw b,#bd.pv.tall .pv-board-s .pv-sw span,#bd.pv.tall .pv-board-s .pv-sw b .pv-it{font-size:14px!important;line-height:1.02;letter-spacing:-.2px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{font-size:14px;top:auto;bottom:34px;left:2px;padding:0 4px;line-height:15px;border-width:1px}
+#bd.pv.tall .pv-board-s .tile.pv-place .pw{top:auto;bottom:30px;left:auto;right:2px}
+/* goals, cards in hand, city cards, goal card: 14px floor */
+#bd.pv.tall .pv-goals .pv-sw span{font-size:14px}
+#bd.pv .pvc.small .pvc-w,#bd.pv .pvc.small .pvc-cost,#bd.pv .pvc.small .pvc-cost *{font-size:14px!important}
+#bd.pv .pvc-name,#bd.pv .pvm-name{font-size:14px;white-space:normal!important;overflow-wrap:normal;word-break:keep-all;letter-spacing:-.3px!important;line-height:1.05}
+.hb-goal-k{font-size:14px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{position:absolute!important;inset:auto 0 0 0!important;width:88px!important;margin:0!important}
+#bd.pv .pvc-name,#bd.pv .pvm-name{padding-left:1px!important;padding-right:1px!important;letter-spacing:-.5px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place,#bd.pv.tall .pv-board-s .tile.pv-place::before{height:77px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-tin{padding:0 2px 1px!important}
+#bd.pv.tall .pv-board-s .tile.pv-place .pv-shtag{bottom:31px}
+/* R10: a score bump pops only the number, never the whole seat chip (the chip at 1.35x covered the other chip and its own score) */
+#bd.pv .chip.bmp{animation:none!important}
+#bd.pv .chip.bmp .pvch-pt{animation:bmp .5s;transform-origin:right center}
+/* R10: 14px names that are wider than their box break at a proper hyphen (Trail-warden), never shrink; short phones drop the chip pawn (the border shows the colour) */
+#bd.pv .pvm-name,#bd.pv .pvc-name{-webkit-hyphens:auto;hyphens:auto}
+@media (max-width:380px){#bd.pv.tall .chip .pawnw{display:none}#bd.pv.tall .chips .chip{padding-left:8px}}
+/* R10: phone city 3 across (every 14px card name whole); it scrolls, and a choice scrolls its card into view. Chip pawn hidden on phones (border = colour) */
+#bd.pv.tall .pv-grid{grid-template-columns:repeat(3,1fr)}
+#bd.pv.tall .chip .pawnw{display:none}#bd.pv.tall .chips .chip{padding-left:8px}
+#bd.pv .pv-grid{position:relative}

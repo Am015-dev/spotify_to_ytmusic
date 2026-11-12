@@ -476,8 +476,8 @@ function promptText() {
 }
 // the line for a pending decision: plain, whole, 12 words at most (wraps to 2 lines in the bar; the long wording stays in the log)
 function qShort(q) {
-  if (q.kind === 'discard') { const d = q.opts[0] && q.opts[0].d, c = (d && d.count) || 0, mx = d && d.max; if (c || (mx && mx < 9)) return c + (mx && mx < 9 ? ' of ' + mx : '') + ' discarded. Tap more, or Done.'; }   // a running count before Done
-  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', ruins: 'Tap a building to raze for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Two effects at once: pick which goes first.', queen: 'Tap a card worth up to 3 to play free.', inn: 'Tap a meadow card to play it 3 cheaper.', university: 'Tap a card to remove for its cost back.', cemetery: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', ranger: 'Pick a worker, then where it goes.', tuck: 'Tap a critter to tuck under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Tap the card to keep; a rival gets the other.', pigeon: 'Play one revealed card free, or skip.', waive: 'Pick resources to leave off the cost.', judge: 'Pick a resource in the cost to swap.', spend: 'Spend goods for point tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep the card, or tuck it for 1 point?', clock: 'Belfry token: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick which stack to add to the cellar.' })[q.kind];
+  if (q.kind === 'discard') { const d = q.opts[0] && q.opts[0].d, c = (d && d.count) || 0, mx = d && d.max; if (c || (mx && mx < 9)) { const mn = (d && d.min) || 0, ex = mn && mn === mx; return c + (mx && mx < 9 ? ' of ' + mx : '') + ' discarded. ' + (ex ? 'Tap ' + (mx - c) + ' more.' : c >= mn ? 'Tap more, or Done.' : 'Tap ' + (mn - c) + ' more.'); } }   // a running count before Done
+  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', ruins: 'Raze a building for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Pick which effect goes first.', queen: 'Play a card worth up to 3 free.', inn: 'Play a meadow card 3 cheaper.', university: 'Remove a card for its cost back.', cemetery: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', ranger: 'Pick a worker, then where it goes.', tuck: 'Tuck a critter under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Keep one; your rival gets the other.', pigeon: 'Play a shown card free, or skip.', waive: 'Pick resources to leave off the cost.', judge: 'Pick a resource in the cost to swap.', spend: 'Spend goods for tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep it, or tuck it for 1 point?', clock: 'Belfry: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick a stack for the cellar.' })[q.kind];
   return m || wordsCap(q.title, 12);
 }
 // a choice button: say plainly what it does, short enough to fit (no cut words)
@@ -546,7 +546,7 @@ const PV_SPECIAL = {
   forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a place', '+ 1 card', 'copy'],
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
-const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow: play 1 cheaper' };
+const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
 const PV_TCOL = { production: 'green', destination: 'red', governance: 'blue', traveler: 'tan', prosperity: 'purple' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
@@ -620,7 +620,7 @@ function pvChip(s, n) {
   e.style.setProperty('--pc', pcolor(s).c);
   const nm = s === viewSeat() && humans().length === 1 ? 'You' : pname(s);
   e.appendChild(pawn(s, 24));
-  e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', p && p.passed ? (innerWidth < 380 ? 'done' : cards + '/15 done') : cards + (innerWidth < 380 ? '/15' : '/15 city'))));
+  e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', p && p.passed ? (innerWidth < 440 ? 'done' : cards + '/15 done') : cards + (innerWidth < 380 ? '/15' : '/15 city'))));
   e.appendChild(h('b.pvch-pt' + (me ? '.rs' : ''), me ? { 'data-res': 'point' } : {}, h('span.pvch-star', '★'), String(pts)));
   return e;
 }
@@ -727,7 +727,7 @@ function pvRender() {
   const pCi = panel('city', 'My city'), vis = visitList();
   const city = h('div.strip.city'); pCi.appendChild(city);
   city.appendChild(h('div.pv-ch', h('b', (fs === viewSeat() ? 'My city' : pname(fs) + "'s city")), h('span', HB.cityCount(G, fs) + ' of 15 · ' + score(fs).total + ' points')));
-  const grid = h('div.pv-grid'); city.appendChild(grid);
+  const grid = h('div.pv-grid.pv-scrolly'); city.appendChild(grid);
   const cityCard = (b, it) => {
     const tg = 'd:' + it.id;
     if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
@@ -752,8 +752,8 @@ function pvRender() {
   const hs = h('div.strip.hand.hscroll'); col.appendChild(hs);
   // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
   // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
-  const gapH = 6, fits = nH * ((tall ? 84 : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (84 + gapH)));
-  const cw = !tall ? 118 : fits ? 84 : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 92) * 1.5) : Math.round(cw * 1.22);
+  const HW = 96, gapH = 6, fits = nH * ((tall ? HW : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (HW + gapH)));   // R10: 96+ wide so 14px names fit whole
+  const cw = !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
   hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
   hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
   { const sc = hs.lastChild; const keep = () => { sc.style.transform = 'translateX(' + hs.scrollLeft + 'px)'; }; hs.addEventListener('scroll', keep, { passive: true }); requestAnimationFrame(keep); }   // the Hand label stays put while the cards scroll
@@ -798,7 +798,7 @@ function pvFitWords(root) {
   const over = e => { if (e.scrollWidth > e.clientWidth + 1) return true; const cs = getComputedStyle(e); if (/hidden|clip/.test(cs.overflow + cs.overflowY) && e.scrollHeight > e.clientHeight + 1) return true;
     const c = clipOf(e); if (!c || c === e) return false; const r = e.getBoundingClientRect(), q = c.getBoundingClientRect(); return r.right > q.right + 1 || r.left < q.left - 1; };
   root.querySelectorAll('.pvc-name,.pvm-name,.pvc-cost,.pvc-ci,.pvc-aff,.hcn,.pv-sw b,.pv-sw span,.pv-nm,.pvch-s,.pvch-n,.pv-tab span,.rsw').forEach(e => {
-    if (!e.getClientRects().length || !over(e)) return; let f = parseFloat(getComputedStyle(e).fontSize); for (let k = 0; k < 10 && f > 11 && over(e); k++) { f = Math.max(11, f - 0.5); e.style.setProperty('font-size', f + 'px', 'important'); e.querySelectorAll('b,span,i').forEach(c => c.style.setProperty('font-size', f + 'px', 'important')); } });
+    if (!e.getClientRects().length || !over(e)) return; let f = parseFloat(getComputedStyle(e).fontSize); for (let k = 0; k < 10 && f > 14 && over(e); k++) { f = Math.max(14, f - 0.5); e.style.setProperty('font-size', f + 'px', 'important'); e.querySelectorAll('b,span,i').forEach(c => c.style.setProperty('font-size', f + 'px', 'important')); } });
 }
 // ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
 // Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
@@ -853,7 +853,7 @@ function fitNames(root) {
     if (!e.clientWidth) continue;
     e.style.fontSize = '';
     let px = parseFloat(getComputedStyle(e).fontSize) || 14, n = 0;
-    while (n++ < 10 && px > 9 && (e.scrollWidth > e.clientWidth + 1 || longestWord(e) > e.clientWidth + 1)) { px -= 1; e.style.fontSize = px + 'px'; }
+    while (n++ < 10 && px > 14 && (e.scrollWidth > e.clientWidth + 1 || longestWord(e) > e.clientWidth + 1)) { px -= 1; e.style.fontSize = px + 'px'; }
   }
 }
 // width of the longest single word (a word wider than its box is what gets cut)

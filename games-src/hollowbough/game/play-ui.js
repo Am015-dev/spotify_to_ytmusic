@@ -13,7 +13,7 @@ async function game(b,kind,W,H){const probs=[];const t0=Date.now();
   await p.goto('https://gns.test/');await sleep(600);await p.evaluate(()=>{localStorage.clear();localStorage.setItem('hb_played','1');localStorage.setItem('hb_offer','1');localStorage.setItem('gxt-hollowbough',JSON.stringify({done:1}))});await p.reload();await sleep(900);
   const tapEl=async sel=>{const r=await p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const b=e.getBoundingClientRect();if(b.width<4)return null;const x=b.left+b.width/2,y=b.top+b.height/2;const t=document.elementFromPoint(x,y);return{x,y,ok:!!t&&(e===t||e.contains(t)||t.contains(e))}},sel);if(!r)return false;if(!r.ok){probs.push('covered: '+sel);return false}await p.touchscreen.tap(r.x,r.y);return true};
   const tapAt=async(x,y)=>p.touchscreen.tap(x,y);
-  await p.evaluate(()=>{AIDELAY=120});
+  if(!process.env.REAL)await p.evaluate(()=>{AIDELAY=120});let w0=0,wmax=0,wseason='';
   if(kind==='quick'){await tapEl('[data-a="opt"][data-k="mode"][data-v="vs"], .chipb:has-text("vs computer")').catch(()=>{});await tapEl('[data-start="play"], .sbtn.big');}
   else{await p.touchscreen.tap(...(await p.evaluate(()=>{const e=[...document.querySelectorAll('.chipb')].find(x=>/Story/.test(x.textContent));const r=e.getBoundingClientRect();return[r.left+r.width/2,r.top+r.height/2]})));await sleep(300);await tapEl('.sbtn.big');await sleep(900);await tapEl('.gxc-node.open');await sleep(600);}
   await sleep(1200);let idle=0,taps=0,over=false;const seenT=new Set();
@@ -42,13 +42,15 @@ async function game(b,kind,W,H){const probs=[];const t0=Date.now();
     }).catch(e=>({kind:'err',e:e.message}));
     if(s.kind==='done'||(s.over&&s.kind==='wait')){over=true;break}
     if(s.kind==='btn'&&s.cov===false)probs.push('button covered: '+s.txt);
-    if(s.kind==='btn'||s.kind==='move'){idle=0;if(s.cov===false&&s.kind==='move'){probs.push('target covered '+s.tg)}if(taps%6===0||s.kind==='btn'){const tp=await p.evaluate(textcheck).catch(()=>[]);for(const x of tp)if(!seenT.has(x)){seenT.add(x);probs.push('text: '+x)}}await tapAt(s.q.x,s.q.y);taps++;if(process.env.DBG&&taps%15===0){console.error(taps,JSON.stringify(await p.evaluate(()=>({n:G.logN,t:G.turn,ph:G.phase,q:G.q&&G.q.kind,seat:HB.actor(G),pc:UI.cards[0]&&UI.cards[0].kind,sel:!!UI.sel,res:G.players[0].res,w:G.players[0].workers,dep:G.players[0].dep.length,se:G.players[0].season,rec:UI.rec&&UI.rec.m&&UI.rec.m.label}))))}await sleep(s.kind==='btn'?350:550);}
+    if(s.kind==='wait'){if(!w0)w0=Date.now()}else if(w0&&(s.kind==='btn'||s.kind==='move')){const w=Date.now()-w0;if(w>wmax){wmax=w;wseason=await p.evaluate(()=>['Winter','Spring','Summer','Autumn'][G.players[0].season]||'').catch(()=>'')}w0=0}
+    if(s.kind==='btn'||s.kind==='move'){idle=0;if(s.cov===false&&s.kind==='move'){probs.push('target covered '+s.tg)}if(taps%6===0||s.kind==='btn'){const tp=await p.evaluate(textcheck).catch(()=>[]);for(const x of tp)if(!seenT.has(x)){seenT.add(x);probs.push('text: '+x)}}if(process.env.QSHOT){const qk=await p.evaluate(()=>G.q?G.q.kind:'').catch(()=>'');if(qk&&!seenT.has('q'+qk)){seenT.add('q'+qk);await p.screenshot({path:(process.env.SHOTDIR||'/tmp')+'/q-'+W+'-'+qk+'.png'})}}if(process.env.SHOT&&process.env.SHOT.split(',').includes(String(taps)))await p.screenshot({path:(process.env.SHOTDIR||'/tmp')+'/pu-'+kind+'-'+W+'-'+taps+'.png'});await tapAt(s.q.x,s.q.y);taps++;if(process.env.DBG&&taps%15===0){console.error(taps,JSON.stringify(await p.evaluate(()=>({n:G.logN,t:G.turn,ph:G.phase,q:G.q&&G.q.kind,seat:HB.actor(G),pc:UI.cards[0]&&UI.cards[0].kind,sel:!!UI.sel,res:G.players[0].res,w:G.players[0].workers,dep:G.players[0].dep.length,se:G.players[0].season,rec:UI.rec&&UI.rec.m&&UI.rec.m.label}))))}await sleep(s.kind==='btn'?350:550);}
     else{idle++;await sleep(300);if(idle>60){probs.push('stuck: '+JSON.stringify(s).slice(0,120));break}}
   }
   {const tp=await p.evaluate(textcheck).catch(()=>[]);for(const x of tp)if(!seenT.has(x)){seenT.add(x);probs.push('text(result): '+x)}}
   const fin=await p.evaluate(()=>({over:!!(G&&G.phase==='over'),res:G&&G.over?G.over.scores.map(x=>x.total):null,camp:!!UI.camp}));
   if(!over&&!fin.over)probs.push('no result screen');
   await p.screenshot({path:__dirname+'/../playtest/play-'+kind+'-'+W+'-end.png'});
-  console.log((probs.length?'FAIL ':'PASS ')+kind+' game by taps '+W+'x'+H+' taps='+taps+' scores='+JSON.stringify(fin.res)+' '+Math.round((Date.now()-t0)/1000)+'s '+probs.slice(0,12).join(' | '));
+  const minFz=await p.evaluate(()=>window.__minFz||0).catch(()=>0);if(process.env.REAL&&wmax>4000)probs.push('rival wait '+(wmax/1000).toFixed(1)+'s');
+  console.log((probs.length?'FAIL ':'PASS ')+kind+' minText='+minFz+'px maxWait='+(wmax/1000).toFixed(1)+'s('+wseason+')'+' game by taps '+W+'x'+H+' taps='+taps+' scores='+JSON.stringify(fin.res)+' '+Math.round((Date.now()-t0)/1000)+'s '+probs.slice(0,process.env.ALL?200:12).join(' | '));
   await ctx.close();return probs.length}
 (async()=>{const b=await PW.chromium.launch();let bad=0;for(const [W,H] of SIZES){if(which!=='story')bad+=await game(b,'quick',W,H);if(which!=='quick')bad+=await game(b,'story',W,H);}await b.close();process.exit(bad?1:0)})();

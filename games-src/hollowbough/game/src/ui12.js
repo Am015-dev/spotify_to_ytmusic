@@ -121,7 +121,7 @@ function tutSteps() {
     if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
     st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
     st.ready = () => { if (tab && G && UI.pvTab !== tab && HB.actor(G) === 0 && !UI.cards.length) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } }
-      try { const el = st.target && st.target(); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
+      try { const el = st.target && st.target(); if (el && typeof pvScrollTo === 'function') pvScrollTo(el); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
       return (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd()); };
   });
   return L;

@@ -17,6 +17,7 @@ module.exports=function(){
     {let moving=false;for(let e=el;e&&!moving;e=e.parentElement)if(e.getAnimations&&e.getAnimations().some(x=>x.playState==='running'))moving=true;if(moving)continue}   // mid-animation: judged once it lands
     const cx=r.left+Math.min(r.width/2,20),cy=r.top+r.height/2;const t=document.elementFromPoint(Math.max(0,Math.min(innerWidth-1,cx)),Math.max(0,Math.min(innerHeight-1,cy)));if(t&&!(t===el||el.contains(t)||t.contains(el)))continue;
     const key=own.slice(0,30);
+    {const fz=parseFloat(cs.fontSize);window.__minFz=Math.min(window.__minFz||99,fz);if(fz<13.95&&!seen.has('s'+key)){seen.add('s'+key);P.push('small '+fz+'px "'+key+'" '+where(el))}}
     const fg=pc(cs.color);const bg=bgOf(el);
     if(fg&&bg.c&&!(cs.textShadow&&cs.textShadow!=='none'&&/(\d+(\.\d+)?)px (\d+(\.\d+)?)px (\d+(\.\d+)?)px/.test(cs.textShadow)&&lum(fg)>.5&&false)){const a=fg[3];const f=fg.slice(0,3).map((v,k)=>v*a+bg.c[k]*(1-a));const L1=lum(f),L2=lum(bg.c);const cr=(Math.max(L1,L2)+.05)/(Math.min(L1,L2)+.05);
       if(cr<4.5&&!seen.has('c'+key)){seen.add('c'+key);P.push('contrast '+cr.toFixed(1)+' "'+key+'" '+cs.color+' on rgb('+bg.c.map(Math.round)+')')}}
@@ -27,5 +28,18 @@ module.exports=function(){
     // clipped by an ancestor with overflow hidden
     for(let e=el.parentElement,d=0;e&&d<4;e=e.parentElement,d++){const s=getComputedStyle(e);if(/hidden|clip/.test(s.overflow+s.overflowX+s.overflowY)){const pr=e.getBoundingClientRect();if((r.right>pr.right+2||r.left<pr.left-2||r.bottom>pr.bottom+2||r.top<pr.top-2)&&!seen.has('k'+key)){if(s.overflowX!=='auto'&&s.overflowX!=='scroll'&&s.overflowY!=='auto'&&s.overflowY!=='scroll'){seen.add('k'+key);P.push('clipped "'+key+'" '+where(el)+' ['+[r.top,r.bottom,r.left,r.right,pr.top,pr.bottom,pr.left,pr.right].map(Math.round)+'] '+s.overflowX+'/'+s.overflowY)}}break}}
   }
+  // every tap target 44px+ on its short side (visible, uncovered, enabled)
+  for(const el of document.querySelectorAll('button,.btn,[data-a],[role=button],.tile.glow,.glow[data-t],.chipb,.gx-tab,.pv-tab')){
+    const r=el.getBoundingClientRect();if(r.width<2||r.height<2||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth)continue;
+    const cs=getComputedStyle(el);if(cs.visibility==='hidden'||cs.pointerEvents==='none'||el.disabled)continue;let op=1;for(let e=el;e;e=e.parentElement){op*=+getComputedStyle(e).opacity;if(e.hidden)op=0}if(op<.5)continue;
+    if(el.closest('[aria-hidden="true"],.gx-perf,#perfhud'))continue;
+    const t=document.elementFromPoint(Math.max(0,Math.min(innerWidth-1,r.left+r.width/2)),Math.max(0,Math.min(innerHeight-1,r.top+r.height/2)));if(t&&!(t===el||el.contains(t)||t.contains(el)))continue;
+    if(el.parentElement&&el.parentElement.closest('button,.btn,[data-a]'))continue;
+    const k='t'+(el.textContent||el.className).trim().slice(0,20);
+    if(Math.min(r.width,r.height)<43.5&&!seen.has(k)){seen.add(k);P.push('target '+Math.round(r.width)+'x'+Math.round(r.height)+' "'+(el.textContent||'').trim().slice(0,20)+'" '+where(el))}
+  }
+  // the seat chips never overlap each other or leave the screen
+  {const cs=[...document.querySelectorAll('#bd .chip')].map(e=>e.getBoundingClientRect()).filter(r=>r.width>4);
+   for(let i=0;i<cs.length;i++){const a=cs[i];if(a.left<-1||a.right>innerWidth+1)P.push('chip off screen ['+Math.round(a.left)+','+Math.round(a.right)+']');for(let j=i+1;j<cs.length;j++){const b=cs[j];if(a.left<b.right-1&&b.left<a.right-1&&a.top<b.bottom-1&&b.top<a.bottom-1)P.push('chips overlap')}}}
   return P;
 };

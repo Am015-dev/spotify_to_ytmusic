@@ -13,7 +13,7 @@ const html=fs.readFileSync(__dirname+'/hollowbough.html');
 const SIZES=(process.argv[2]||'390x844,375x667').split(',').map(s=>s.split('x').map(Number));
 const SHOTS=path.join(__dirname,'..','playtest');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
+const probs=[];const seenTC=new Set();const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
 const totals={steps:0,wrong:0,runs:0,ids:[]};
 
@@ -77,6 +77,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       if(s.wait&&info.cover)note(tag,id+': target covered by '+info.under);
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
+    {const tp=await p.evaluate(require('./textcheck.js')).catch(()=>[]);for(const x of tp)if(/^(small|target|chip)/.test(x)&&!seenTC.has(x)){seenTC.add(x);note(tag,id+': '+x)}}
     // screenshots at 390x763
     if(!/^Tap (the glowing|Next)/.test(info.say)&&!shotDone.has(id)){shotDone.add(id);if(process.env.SHOT)await sleep(700);await shot('tut-'+(s.i+1))}
     // rotations
