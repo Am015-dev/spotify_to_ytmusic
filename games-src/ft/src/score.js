@@ -77,3 +77,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 // a short vibrate tick when a piece is picked up or dropped (phones that support it)
 (function(){const o=go;go=function(m){try{if(navigator.vibrate&&m&&(m.act==='step'||m.act==='start'||m.act==='tile'))navigator.vibrate(12)}catch(e){}return o.apply(this,arguments)}})();
+// only walks worth taking glow at the start of a turn (at least about half the best walk's points); the others stay tappable but quiet
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
+  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
+  scCompute();const top=SC.bestTotal;if(!(top>0))return;const keep=UI.pick.filter(i=>{const x=SC.starts[i];return x&&x.best&&x.best.total>=Math.max(3,top*.45)});if(keep.length)UI.pick=keep}catch(e){}}})();

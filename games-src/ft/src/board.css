@@ -393,3 +393,6 @@ html.land #feed:not([hidden]){display:flex;flex-direction:column;gap:6px;positio
 @keyframes gdpulse{from{outline-color:#ffcf3f}to{outline-color:#fff3b8}}
 @media (prefers-reduced-motion:reduce){.gd-hl{animation:none}}
 body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!important}
+
+/* round 2: quiet dear bids, best chooser tag */
+.sp-b.dear{opacity:.62;border-color:#b08a5a}.chb .chbest{display:block;font:800 14px/1 var(--ff-b,system-ui);color:#1f6a2a;margin-top:2px}

@@ -18,7 +18,8 @@ function flyEl(inner,cls,from,to,o){o=o||{};const fx=$('#fx');if(!fx||!ANIM)retu
     a.onfinish=fin;setTimeout(fin,dur+(o.delay||0)/spd()+400)}catch(e){fin()}return el}
 function tileEl(i){return document.querySelector(`#grid [data-tile="${i}"]`)}
 function seatEl(i){return document.querySelector(`#seats [data-seat="${i}"]`)}
-function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM||(G&&G.over))return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.left=at.x+'px';el.style.top=at.y+'px';fx.appendChild(el);setTimeout(()=>el.remove(),1500/spd())}
+function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM||(G&&G.over))return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.top=at.y+'px';fx.appendChild(el);const hw=el.offsetWidth*.6+6;el.style.left=Math.max(hw,Math.min(innerWidth-hw,at.x))+'px';   // keep the whole chip on screen (it pops to 1.2x around its centre)
+  setTimeout(()=>el.remove(),1500/spd())}
 function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)return;const flights=[];const gains={},loss={};
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a||!b)continue;const ca={},cb={};for(const c of a.m.concat(a.hand))ca[c]=(ca[c]||0)+1;for(const c of b.m.concat(b.hand))cb[c]=(cb[c]||0)+1;
     for(const c of new Set([...Object.keys(ca),...Object.keys(cb)])){const d=(cb[c]||0)-(ca[c]||0);for(let k=0;k<Math.abs(d);k++)(d>0?(gains[c]=gains[c]||[]):(loss[c]=loss[c]||[])).push(i)}}
@@ -49,10 +50,14 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
     if(G&&G.over)return;   // no score chips over the result card
     const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+' pts';   // every chip says whose points and that they are points
     const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):ctr(se.getBoundingClientRect());floatText(lab,at,d>0?'up':'dn')})}
+// the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
+function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
+  if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
+  const ms=c.opts.map(o=>o.m);if(ms.every(m=>m.act==='tribe'&&m.kill)){const b=bestKill(hp,ms);const j=ms.indexOf(b);if(j>=0)return j}}catch(e){}return 0}
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
 function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;if(!c||!G){el.hidden=true;el.innerHTML='';return}
-  el.innerHTML=c.opts.map((o,i)=>`<button class="chb glow" data-chz="${i}">${o.html}</button>`).join('');el.hidden=false;
+  const bi=chzBest(c);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
   const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}
   const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
   el.style.left=x+'px';el.style.top=y+'px'}

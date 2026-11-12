@@ -162,6 +162,8 @@ html body #grid .tile .gain{font-size:13px!important}
  html body #bd .bidt{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;width:100%!important;overflow:visible!important}
  html body #bd .bidt .spot{min-width:0!important;width:auto!important;min-height:46px!important}
  html body #bd .bidt .sp-b{min-width:44px!important;min-height:44px!important;width:100%!important}
+ html body #bd .bidt .spot{display:flex!important;flex-direction:column!important;justify-content:flex-end!important;gap:2px!important}   /* a spot with a Mystic option stacks its two buttons instead of widening the row */
+ html body #bd .bidt .spot:last-child{align-items:flex-end!important}   /* 9 spots on a phone: the last 44px button overflows leftwards, not off the screen */
  html body .dcard{min-height:44px!important}
  html body .ab.pw,html body #acts .ab,html body #acts [data-mv]{min-height:44px!important}
  html body .gchip,html body [data-sell]{min-width:44px!important;min-height:44px!important}

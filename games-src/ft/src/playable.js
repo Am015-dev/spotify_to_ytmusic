@@ -26,10 +26,12 @@ function plAfter(){if(!G){return}
   else PL.lastId=null}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
 // the instruction line: the rival's turn is told step by step in plain words (the engine's own log line), the pick-who-stays popup says so
+// the rival's caption stays one short line: no bracketed detail, 8 words at most
+function plCap(t){const w=String(t).replace(/\s*\([^)]*\)/g,'').trim().split(/\s+/);return w.length>8?w.slice(0,8).join(' ').replace(/[,;:]$/,''):w.join(' ')}
 (function(){const o=lineText;lineText=function(){const t=o();if(!G||G.over||online())return t;
   if(me()&&UI.chz&&G.step==='move')return 'Pick who stays on this tile';
-  if(!me()&&!G.q&&!G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for/.test(e.t))return plShort(e.t)}
-  if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plShort(e.t)}
+  if(!me()&&!G.q&&!G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for/.test(e.t))return plCap(plShort(e.t))}
+  if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plCap(plShort(e.t))}
   return t}})();
 // the result speaks in the game's voice
 (function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const tops=G.pl.map(x=>shownTotal(x)),gap=mp?Math.max(...tops)-shownTotal(mp):0,rel=gap/Math.max(1,Math.max(...tops));const a=won?LORE.win:(gap<=10||rel<=0.08)?LORE.loseClose:(rel>=0.35?LORE.loseFar:LORE.lose);const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
