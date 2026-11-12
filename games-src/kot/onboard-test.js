@@ -61,9 +61,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     else { await p.mouse.move(cb.x + cb.width / 2, cb.y + cb.height / 2); await sleep(700); const on = await p.evaluate(() => document.getElementById('obcard').classList.contains('on')); on ? ok(tag, 'hover shows the big card') : fail(tag, 'hover did not show the card'); await shot('4-hold'); await p.mouse.move(5, 5); await sleep(300) }
     const off = await p.evaluate(() => !document.getElementById('obcard').classList.contains('on')); off || fail(tag, 'big card stayed');
     const c1 = await p.evaluate(() => G.pl[G.active].cards.length + 100 * G.pl[G.active].en); c1 === c0 ? ok(tag, 'holding does not buy') : fail(tag, 'a hold bought a card');
-    // tap to buy (touch: twice)
+    // tap to buy (touch: tap reads the card, then Buy)
     const k = await p.evaluate(() => { const q = cur(), sg = suggestCard(q); const a = G.market.map((_, j) => j).filter(j => canBuy(q, j)); return a.find(j => j !== sg) ?? a[0] ?? -1 }); if (k < 0) fail(tag, 'nothing affordable to buy');
-    else { await tap(`#ob #pshop [data-shop="${k}"]`); await sleep(500); if (touch) { const sel = await p.evaluate(() => BF.sel); sel === k ? ok(tag, 'first tap picks the card') : fail(tag, 'first tap did not pick'); await shot('5-picked'); await tap(`#ob #pshop [data-shop="${k}"]`); await sleep(900) }
+    else { await tap(`#ob #pshop [data-shop="${k}"]`); await sleep(500); if (touch) { const sel = await p.evaluate(() => BF.sel + ':' + document.getElementById('obcard').classList.contains('on') + ':' + !!document.querySelector('#obcard [data-obbuy]')); sel === k + ':true:true' ? ok(tag, 'first tap shows the card big with its text and Buy') : fail(tag, 'first tap did not show the card ' + sel); await shot('5-picked'); await tap(`#obcard.on [data-obbuy="${k}"]`); await sleep(900) }
       const c2 = await p.evaluate(() => G.pl[G.active].cards.length + 100 * G.pl[G.active].en); c2 !== c0 ? ok(tag, 'tap buys from the board') : fail(tag, 'card not bought ' + c0 + '->' + c2); await shot('6-bought') }
     await tap('#ob [data-act="end"]'); await sleep(2500); await shot('7-bots');
     const own = await p.evaluate(() => document.querySelectorAll('#ob #obown .obo').length === G.pl.find(q => q.human).cards.length ? 9 : 0); own ? ok(tag, 'owned cards show on the board (' + own + ')') : fail(tag, 'owned cards missing');

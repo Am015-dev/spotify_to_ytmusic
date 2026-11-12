@@ -1,6 +1,7 @@
 // Phone layout + touch-only play check. node lay-phone.js [WxH,...] [--turns=N] [--dom]   prints "FAIL <size> <check>" lines, then PROBLEMS n
 // Default sizes: 390x844 390x763 390x664 375x553 412x780 844x390 750x342 (isMobile + hasTouch; ?phone=1 is NOT forced: phone mode must switch on by itself).
 // Checks: no page scroll, phone class, tap targets >= 44 px, visible text >= 13 px, no text clipped, slots / dice / windows inside the board and not overlapping,
+// The title Play button starts a quick game now; the setup screen is opened from code (UI.sv = setup).
 // the dock holds the prompt, touch-only play (tap a die, tap a glowing space), drawers, guided tip card, hot-seat pass card, final card fits.
 require('../../phfit.js').guard(2);   // one child process per size, results added up
 const FIT = require('../../phfit.js');
@@ -56,14 +57,14 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     const phc = await p.evaluate(() => document.documentElement.className); if (!/\bph\b/.test(phc)) fail('phone class missing', phc);
     { const bt = await p.evaluate(() => [...document.querySelectorAll('#start button')].filter(e => e.offsetParent).map(b => b.dataset.a).join()); if (!/play/.test(bt) || !/online/.test(bt)) fail('title buttons', bt); }
     // the title's How to play must open the rules on top of the title (it used to open behind it)
-    { await p.tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450); const r = await p.evaluate(() => { const d = document.getElementById('rulesd'); const b = d.getBoundingClientRect(); const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { on: d.classList.contains('on'), top: !!h && d.contains(h) }; }); if (!r.on || !r.top) fail('title How to play is hidden or dead', JSON.stringify(r)); await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(300); }
-    await p.tap('[data-a=play]'); await p.waitForTimeout(350); await scroll('setup'); await shot('0setup'); await targets('setup'); await clipped('setup');
+    if (await p.$('#start .tlink[data-a=rules]')) { await p.tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450); const r = await p.evaluate(() => { const d = document.getElementById('rulesd'); const b = d.getBoundingClientRect(); const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { on: d.classList.contains('on'), top: !!h && d.contains(h) }; }); if (!r.on || !r.top) fail('title How to play is hidden or dead', JSON.stringify(r)); await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(300); }
+    await p.evaluate(() => { UI.sv = 'setup'; renderStart(); }); await p.waitForTimeout(350); await scroll('setup'); await shot('0setup'); await targets('setup'); await clipped('setup');
     await p.tap('[data-a=cfgopen]'); await p.waitForTimeout(300); await shot('0config'); await targets('configure'); await clipped('configure');
     { const st = await p.evaluate(() => ({ open: !document.querySelector('#cfg').hidden })); if (!st.open) fail('Configure sheet did not open'); }
     await p.tap('#cfg .cfghead [data-a=cfgclose]'); await p.waitForTimeout(200);
     // ---- guided first flight: tip card, then touch-only play
     await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 5; AIDELAY = 60; });
-    await p.tap('[data-start=guided]'); await p.waitForTimeout(1500); await scroll('guided'); await shot('1guided');
+    await p.tap('[data-start=vs]'); { const cl = await p.$('.fa-goal [data-ro=go]'); if (cl) await cl.tap(); } await p.waitForTimeout(1500); await scroll('guided'); await shot('1guided');
     { const tip = await p.evaluate(() => !document.querySelector('#pc').hidden); if (tip) fail('a tip card is shown (board-first: the ghost finger teaches)'); else if (false) { const pr = await rect('#pc'); if (pr[3] > H + 1 || pr[0] < -1 || pr[2] > W + 1) fail('tip card outside the screen', JSON.stringify(pr)); if (W < H && pr[3] - pr[1] > .6 * H) fail('tip sheet taller than 60% of the screen', JSON.stringify(pr)); } }
     await panel('guided brief'); await targets('guided brief'); await clipped('guided brief'); await fit('guided brief');
     const m = await p.evaluate(() => { const b = document.querySelector('#bd').getBoundingClientRect(); return { w: b.width, h: b.height, vw: innerWidth, vh: innerHeight, mode: UI.LY && UI.LY.mode, k: UI.LY && +UI.LY.k.toFixed(3) }; }); log('board', JSON.stringify(m), await gx());
@@ -89,7 +90,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     { const over = await p.evaluate(() => !!G.result); if (over) { await shot('5over'); await p.waitForTimeout(400); } }
     for (const id of ['logd', 'rulesd', 'setd', 'crewd']) { await p.tap(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); if (!(await p.evaluate(i => document.getElementById(i).classList.contains('on'), id))) fail('drawer did not open', id); if (id === 'setd') { await shot('5menu'); await targets('menu'); await fit('menu'); } await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(250); }
     // ---- finish with computers on both seats, then look at the end screen
-    if (await p.evaluate(() => !!G.result)) { await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(250); await p.tap('[data-start=vs]'); await p.waitForTimeout(800); }
+    if (await p.evaluate(() => !!G.result)) { await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.evaluate(() => { UI.sv = 'setup'; renderStart(); }); await p.waitForTimeout(250); await p.tap('[data-start=vs]'); await p.waitForTimeout(800); }
     await p.evaluate(() => { const k = document.querySelector('#pc [data-a=tipoff]'); if (k) k.click(); G.ai = [true, true]; AIDELAY = 0; schedule(); });
     for (let k = 0; k < 200; k++) { const o = await p.evaluate(() => !!(G && G.result && UI.overShown && document.querySelector('#fx .endb'))); if (o) break; await p.waitForTimeout(400); }
     await p.waitForTimeout(500); await shot('6final'); await scroll('final'); await targets('final'); await clipped('final'); await fit('final');
@@ -102,10 +103,10 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       if (!/^ok/.test(r)) fail('clock not visible in a timed scenario', r); else { log('clock', r); await shot('9clock'); }
       await p.evaluate(() => { UI.prefs.story = true; }); }
     // ---- story card of a normal flight
-    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150); await p.tap('[data-start=vs]'); await p.waitForTimeout(900);
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.evaluate(() => { UI.sv = 'setup'; renderStart(); }); await p.waitForTimeout(150); await p.tap('[data-start=vs]'); await p.waitForTimeout(900);
     { const st = await p.evaluate(() => !!document.querySelector('#rs.story .stbox')); if (st) { await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(300); } if (false) { await shot('8story'); await scroll('story'); await targets('story'); await clipped('story'); await fit('story'); const rr = await rect('.stbox'); if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('story card does not fit', JSON.stringify(rr)); await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(300); } }
     // ---- hot-seat pass card
-    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150);
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.evaluate(() => { UI.sv = 'setup'; renderStart(); }); await p.waitForTimeout(150);
     await p.tap('[data-start=hot]'); await p.waitForTimeout(900); { const cl = await p.$('#rs.story [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(300); } }
     // the briefing needs nobody's dice: both crew get ready on the shared screen (no pass card), then the device is handed to the first player
     { const pre = await p.evaluate(() => !document.querySelector('#pass').hidden); if (pre) fail('pass card shown during the briefing (no hidden dice yet)'); }

@@ -1,29 +1,38 @@
-# Tutorial coverage (W397, ADDENDUM 4): a COACHED first game, not a tap list
-The tutorial is a SHORT real duel against the real computer (fixed seed 5, "easy"): Age I is the full pyramid, Ages II and III are small pyramids (9 and 5 cards) so it fits one sitting and the cards stay big; stacked decks make the bottom row of Age I, the open cards of Age II and a guild in Age III come up. The four story chapters (The Crowns, First Turns, The Years Turn, The Last Card) frame draft, Age I, II and III as coach beats. `window.GXCOACH = {running, explained, done}` is exposed. Every move is a free choice from move 1.
-- ONE forced step only: take the glowing wonder (`first`). Then free play.
-- Guide Ione speaks just-in-time in ONE bubble at a time (never blocks the board, only its x takes taps, auto-hides after 9 s, queued if a second rule appears). Text: `campaign.json` -> `prologue.coach`.
-- Rules that never came up are listed on a "Things you'll meet later" card after the final scoring; the final scoring is walked through row by row with the player's real numbers (`prologue.walk`).
-- Driver: `tutorial-e2e.js p|d` plays the coached game with random legal moves through the UI at 390x763 and 1440x860 and asserts: forced steps <= 2, one bubble at a time, every rule below was explained in play OR listed on the later card, 0 console errors.
-Legend: PLAY = explained the first time it happens in play; LATER = on the later card if it did not come up; WALK = scoring walk.
+# Tutorial coverage (W492): a guided first game, one rule per step
 
-| Rule | When Ione says it | Id |
-|---|---|---|
-| Wonder draft, 4 each, points + power | first wonder (forced step), draft turn | `first`, `draft` |
-| Pyramid: only glowing (uncovered) cards; taking uncovers/flips | first play turn | `pyramid` |
-| Look at what a card frees for the rival | when the rival takes a card you uncovered | `tension` |
-| Build a free card, production | you build for 0 | `free` |
-| Coin (yellow) cards pay at once | you build a card that gives coins | `coin` |
-| Paid cost, missing resources bought (2 + rival production) | you build and pay coins | `paid` |
-| Shield pushes the pawn, 9 wins | any shield card built | `shield` |
-| Loot at marked spaces | the pawn passes a marked space | `loot` |
-| Chain mark gained / chain build free | you build a card with a mark / by chain | `chain-mark`, `chain` |
-| Science symbols, pair, six win | you build a green card | `sci` |
-| Pair gives a progress token | the token choice appears | `pair` |
-| Sell: 2 coins + 1 per yellow; poor-move line if you sold a card you could build free | you sell | `sell` (`sell-poor`) |
-| Raise a wonder | you raise one | `wonder` |
-| Age change, who starts (behind on the track; at a tie the last-card taker, W391 fix) | Age II/III begins | `age` |
-| Guild scores at the end from the richer city | you build a purple card | `guild` |
-| Final scoring, rule by rule, tie-break | result screen walk (9 rows, your numbers) | WALK |
-| Yellow trade posts, seven-wonder cap, wonder powers, token effects, tie-break, science win, military win, draft order | not guaranteed to come up | LATER (`trade`, `cap`, `powers`, `tokens`, `tie`, `science`, `military`, `draftorder`) |
-Story beats: intro scene before the duel (3 lines), Ione's reaction lines are the coach bubbles, Pell's name on the rival; the scoring walk is the climax.
-Honest limits: a rule only counts as "explained in play" when the situation really occurs in that game; otherwise it is on the later card (the e2e prints how many of each).
+The tutorial is one short scripted game on the real engine (fixed deal, fixed rival choices; Age I has 9 cards, Age II 5, Age III 3).
+Every step is one sentence of 12 words or fewer and ONE highlighted tap: either the game action itself (wonder, card, Build / Sell / Wonder,
+token, who starts) or Next on a rule you can see on the board. The rival waits while a rule bubble is up. After the score: "Play a real game".
+No "learn later" list: every core rule is taught in play order.
+
+| # | Rule | Step id | Tap |
+|---|---|---|---|
+| 1 | How to win (points after 3 ages, or war / science early) | goal | Next |
+| 2 | Wonder draft, round 1: you pick 1, rival 2, last one is yours automatically | draft, draft-last | wonder, Next |
+| 3 | Round 2 (4 new wonders): rival first, you take 2, rival gets the last | draft-2, draft-3 | wonder x2 |
+| 4 | Pyramid: only uncovered (glowing) cards can be taken | pyramid | card |
+| 5 | Build a free card | build-free | Build |
+| 6 | A freed face-down card turns face up | flip | Next |
+| 7 | Your brown / grey cards pay resource costs | resource, own-resource | card, Build |
+| 8 | Shields push the pawn; rival's end = instant military win | shield, military-win | Next x2 |
+| 9 | Trading: 2 coins + 1 per rival card making that resource | trade-card, trade | card, Build |
+| 10 | Yellow cards give coins | yellow, yellow-build | card, Build |
+| 11 | Green cards carry science symbols (missing papyrus bought for 2) | science, science-build | card, Build |
+| 12 | End of age: weaker military chooses who starts | next-age | I start |
+| 13 | Age II: new cards, same turn rules | age2 | Next |
+| 14 | Chains: linked card is free | chain-card, chain | card, Build |
+| 15 | Build a wonder with any card (pay its cost, card goes under) | wonder-card, wonder | card, Wonder |
+| 16 | Play-again wonder | again | Next |
+| 17 | Only 7 of the 8 wonders get built | seven | Next |
+| 18 | Science pair: take a progress token | pair-card, pair-build, pair | card, Build, token |
+| 19 | Six different science symbols = instant win | science-win | Next |
+| 20 | Tied shields: whoever took the last card chooses | tie-start | Next |
+| 21 | Age III; token effect (+1 shield) and chain again | age3, loot-build | card, Build |
+| 22 | Looting: the pawn crosses a coin space, rival loses coins | loot | Next |
+| 23 | Sell (discard): 2 coins + 1 per yellow card | sell-card, sell | card, Sell |
+| 24 | Civilian scoring: cards, wonders, tokens, war track, 1 per 3 coins | score | Next |
+| 25 | Tie on points: more blue points wins | tie | Finish |
+
+Tests: `node tutorial-script-test.js` plays the fixed deal move by move on the engine and checks each rule really happens (costs, flips,
+chain, pair, loot, who chooses) and that every sentence is <= 12 words. `node tutorial-e2e.js 390 844 [shotdir]` (and `375 667`) walks the
+tutorial by real touch, tapping only the highlighted element, and checks all 26 rule steps appear in order, the end card starts a real game, 0 errors.
