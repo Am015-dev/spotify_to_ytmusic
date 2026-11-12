@@ -21,9 +21,9 @@ const res=w.eval(`(function(N,FOLLOW,LVL){ANIM=0;AIDELAY=0;schedule=function(){}
      if(k<glow.length){const ms=glow[k];m=ms[rand(ms.length)].m}else m=btn[k-glow.length]||vm[0]}}
    else m=aiMove(s);
    if(!m)break;const r=performMove(m,s);if(!r.success){const vm=validMoves(s);if(!vm.length)break;performMove(vm[vm.length-1],s)}}
-  out.push({w:G.winner,turn:G.turn,lv:G.pl.map(p=>p.lvl),dec,fol,cur:G.pl[0].st.cursed,deaths:G.pl[0].st.deaths,kills:G.pl[0].st.kills,lvs:G.pl.map(p=>p.lv).join('')})}
+  out.push({w:G.winner,co:G.cowin,turn:G.turn,lv:G.pl.map(p=>p.lvl),dec,fol,cur:G.pl[0].st.cursed,deaths:G.pl[0].st.deaths,kills:G.pl[0].st.kills,lvs:G.pl.map(p=>p.lv).join('')})}
  return JSON.stringify(out)})(${N},${FOLLOW},'${LVL}')`);
-const o=JSON.parse(res);let win=0,lv=0,t=0,d=0;for(const g of o){if(g.w==='P1')win++;lv+=g.lv[0];t+=g.turn;d+=g.dec}
+const o=JSON.parse(res);let win=0,lv=0,t=0,d=0;for(const g of o){if(g.w==='P1'||g.co===0)win++;lv+=g.lv[0];t+=g.turn;d+=g.dec}
 console.log(o.slice(0,8).map(g=>`${g.w} t${g.turn} lv${g.lv.join(',')} dec${g.dec} cursed${g.cur} deaths${g.deaths} kills${g.kills} ${g.lvs}`).join('\n'));
 console.log(`games ${o.length} newcomer wins ${win} (${Math.round(100*win/o.length)}%) avg lv ${(lv/o.length).toFixed(1)} avg turns ${(t/o.length).toFixed(0)} avg decisions ${(d/o.length).toFixed(0)}`);
 process.exit(0)},1500);

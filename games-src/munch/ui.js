@@ -225,7 +225,7 @@ function menuHTML(me){const u=UI.menu;
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away. ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
-function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
+function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=wonBy(me)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
   const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`;
@@ -240,7 +240,8 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    ${online?'':`<button class="btn primary pulse dkstart" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
-   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
+   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'easy')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
+   <h3>Game length</h3><div class="seg"><button class="btn ${UI.fast!==false?'on':''}" data-set="fast" data-v="1">Quick (faster play)</button><button class="btn ${UI.fast===false?'on':''}" data-set="fast" data-v="0">Full</button></div>
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
@@ -278,7 +279,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='mprevx'){musicPreviewStop();renderMusic();return}
   if(a==='mmus'&&typeof toggleMusic==='function'){toggleMusic();renderMusic();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
-  if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
+  if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='fast')UI.fast=v==='1';else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
   if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
   if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);if(G){G.learn=UI.learn===true&&t.dataset.start!=='ai';render()}return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
