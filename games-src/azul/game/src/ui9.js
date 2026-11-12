@@ -156,7 +156,7 @@ const bfUse=c=>`<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${c===
 const bfQ=s=>BF.root&&BF.root.querySelector(s);
 const bfEl=k=>bfQ(`[data-k="${k}"]`);
 const bfSlot=k=>bfQ(`[data-s="${k}"]`)||bfEl(k);
-function bfR(el){if(!el)return null;const r=el.getBoundingClientRect();return r.width>0?{left:r.left,top:r.top,width:r.width,height:r.height}:null}
+function bfR(el){if(!el)return null;const r=el.getBoundingClientRect();if(!(r.width>0))return null;const v=el.style&&parseFloat(el.style.getPropertyValue('--v'));if(v&&v<r.width)return {left:r.left+(r.width-v)/2,top:r.top+(r.height-v)/2,width:v,height:v};return {left:r.left,top:r.top,width:r.width,height:r.height}}
 const BFPLATE={u:null};try{GXSPR.use('models/plate',{size:160,pitch:.7}).then(u=>{if(u){BFPLATE.u=u;try{bfDraw()}catch(e){}}})}catch(e){}   // W466: owner bowl model beside the floor: extra tiles break into it
 const BFSUN={u:null};
    // owner sun model (models/sun.glb) drawn once to a sprite; the plain sun glyph is the fallback
@@ -168,7 +168,7 @@ function bfClone(g){return JSON.parse(JSON.stringify({fac:g.fac,ctr:g.ctr,marker
 const bfFocus=()=>{try{return focusSeat()}catch(e){return 0}};
 // ---------- timing: tap anywhere during an animation to speed it up ----------
 function bfAnimOK(){return !!ANIM&&typeof Element!=='undefined'&&!!Element.prototype.animate&&!/jsdom/i.test(navigator.userAgent)}
-function bfD(ms){return ms*(BF.fast?.22:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
+function bfD(ms){return ms*(BF.fast?.22:BF.tile&&!UI.tut?.3:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
 function bfWait(ms){return bfAnimOK()&&ms>0?new Promise(r=>setTimeout(r,bfD(ms))):Promise.resolve()}
 function bfTrack(a){BF.anims.push(a);if(BF.fast)a.playbackRate=4;const done=()=>{const i=BF.anims.indexOf(a);if(i>=0)BF.anims.splice(i,1)};a.finished.then(done,done);return a}
 function bfSpeedUp(){if(BF.fast)return;BF.fast=true;for(const a of BF.anims)try{a.playbackRate=4}catch(e){}}
@@ -225,13 +225,15 @@ function bfFx(f){if(!G)return;bfSync();const x=f.x;let e=null;
 const bfHold=()=>BF.on&&(BF.busy||BF.q.length>0);
 async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeout(BF.idleT);BF.fingerOn=false;bfFinger(null);
   try{while(BF.q.length&&BF.gk===gk){const e=BF.q.shift();try{await bfStep(e)}catch(err){BF.errs.push(String(err&&err.message||err));BF.q.length=0;break}}}
-  finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
+  finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.tile=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
 async function bfStep(e){const S=BF.disp;
   if(e.t==='take')return bfTake(e.x);
-  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
+  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);
+    if(!UI.tut&&G&&G.over&&BF.q.some(z=>z.t==='win')){BF.q.length=0;BF.rv=null;BF.say='Final scoring';S.phase='wall';bfDraw();sfx('turn');await bfWait(900);BF.disp=bfClone(G);BF.say='';sfx('win');return}   // game over: no slow tiling, the result shows with the true final score
+    BF.tile=true;S.phase='wall';BF.say='Round over: tiling!';bfDraw();sfx('turn');bfTip('tiling');await bfWait(1350);if(UI.tut)await tutPause('tiling');return}
   if(e.t==='wall')return bfWall(e.x);
   if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length)){if(UI.tut)await tutPause('floor');await bfFloors();}
-    S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
+    BF.tile=false;S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
   if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
@@ -239,13 +241,13 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
-  if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(700)}
+  if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(120)}
   if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw();
-    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(450)}}   // W466: show which kiln the rival takes from
+    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(150)}}   // W466: show which kiln the rival takes from
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
   for(const o of rest){const el=bfEl(o.key);if(el&&x.src>=0)el.classList.add('nud')}
-  if(lifted){sfx('select');await bfWait(focus?620:900)}
+  if(lifted){sfx('select');await bfWait(focus?620:250)}
   picked.forEach(o=>o.r=bfR(bfEl(o.key)));rest.forEach(o=>o.r=bfR(bfEl(o.key)));const ctrOld=S.ctr.map((t,k)=>bfR(bfEl('c_'+k)));const sunR=bfR(bfEl('sun'));
   // 2. the engine's take on the mirror; work out where each tile lands (glazes before prisms, rack first, then breakage)
   const p=S.pl[x.p];const f0=p.floor.length,L0=x.line<5?p.lines[x.line].length:0,c0=S.ctr.length;const hadSun=x.src<0&&S.markerIn==='ctr';
@@ -258,7 +260,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(x.src<0)rest.forEach((o,i)=>bfFlip(bfEl('c_'+i),o.r));else ctrOld.forEach((r,k)=>bfFlip(bfEl('c_'+k),r));
   // 3. fly: chosen tiles to the rack (or to a rival's chip), the rest slides to the middle
   const chip=bfChipR(x.p);const fl=[];sfx('take');
-  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:820,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
+  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:50),dur:focus?600:480,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
   rest.forEach((o,i)=>{if(!restTo[i])return;fl.push(bfFly(o.t,o.r,bfR(bfSlot(restTo[i])),{delay:200+i*60,dur:520,lift:12}).then(()=>{bfShow(restTo[i]);const el=bfEl(restTo[i]);if(el&&bfAnimOK())el.animate([{transform:'scale(1.25)'},{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:bfD(260)});sfx('place')}))});
   if(hadSun)fl.push(bfFly(SUN,sunR,focus?bfR(bfSlot(sunKey)):chip,{dur:600,lift:60}).then(()=>bfShow(sunKey)));
   await Promise.all(fl);BF.hide.clear();sfx('place');
@@ -269,8 +271,8 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(brk.length||hadSun){if(focus){for(const o of brk){const el=o.to&&bfEl(o.to);if(el){el.classList.remove('crash');void el.offsetWidth;el.classList.add('crash')}}
       const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
     else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
-    if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(brk.length?820:420)}
-  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(260)}
+    if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(focus?(brk.length?820:420):(brk.length?300:0))}
+  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(100)}
   if(focus&&pl&&pl.human)BF.seen.took=1}
 // end of round: each full rack sends one tile to the wall; the lines it joins light up and the points pop
 function bfRun1(w,r,c){const o=[[r,c]];for(let x=c-1;x>=0&&w[r][x]>=0;x--)o.push([r,x]);for(let x=c+1;x<5&&w[r][x]>=0;x++)o.push([r,x]);
@@ -333,8 +335,8 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
     h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
-    a.forEach((t,k)=>{const key=`f${i}_${k}`;const x=(k%2?.56:-.56)*ts,y=(k<2?-.56:.56)*ts;const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
-      h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-ts/2}px;top:${R.ks/2+y-ts/2}px;width:${ts}px;height:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
+    a.forEach((t,k)=>{const key=`f${i}_${k}`;const x=(k%2?.56:-.56)*ts,y=(k<2?-.56:.56)*ts;const hs=Math.max(ts,44);const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
+      h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-hs/2}px;top:${R.ks/2+y-hs/2}px;width:${hs}px;height:${hs}px;--v:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
     h+='</div>'});
   const items=S.ctr.map((t,k)=>({t,k})).sort((u,v)=>u.t-v.t||u.k-v.k);if(S.markerIn==='ctr')items.unshift({t:SUN,k:'sun'});const N=items.length;
   if(N){let b=null;for(let c=1;c<=N;c++){const rr=Math.ceil(N/c);const s=Math.min(ts*1.05,R.pw*.9/c,R.ph*.84/rr);if(!b||s>b.s)b={c,rr,s}}const p=b.s,gx=R.cx-b.c*p/2,gy=R.cy-b.rr*p/2;
