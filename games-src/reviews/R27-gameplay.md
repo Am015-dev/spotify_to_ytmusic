@@ -14,6 +14,7 @@ Screenshots: `games-src/reviews/R27-shots/`.
 |---|---|---|---|---|
 | redline-rally | 7.0 | FAIL | PASS | 8 Bugs 6 |
 | perch-and-plume | 6.8 | FAIL | PASS | 5 Phone 5, 6 AI 6 |
+| sands-of-qamar | 6.6 | FAIL | PASS | 2 Tutorial 6, 5 Phone 6, 7 Feel 6, 8 Bugs 6 |
 
 ---
 
@@ -129,3 +130,53 @@ What I played:
 | 4 | Finished level at 46-46 at 390 | "Fern wins the year." No line says it was a tie decided by leftover food. | R27-shots/pp-g1-390-result.jpg |
 | 6 | Two default games as a half-Best newcomer | Lost 46-46 (tie-break) and 7-36. | R27-shots/pp-g1-390-result.jpg, pp-g2-375-result.jpg |
 | 2 (good) | Tutorial at both sizes | 21 steps, 23 taps, 0 dead, ends on "Tap to play a real game" and a real starting hand. | R27-shots/pp-tut390-s21.jpg, pp-tut375-realgame.jpg |
+
+---
+
+## 3. sands-of-qamar (shelf/W497-sands-gameplay @ da97ae84 after the local merge): 6.6, FAIL
+
+Gate: **PASS** (`npm i three` in games-src, then `--full`: scenarios, phone-check at every size, rules-test "ai games 200 stuck 0").
+Lab rows WARN 9/12 (not a gate fail). R25's three phone-check failures did not come back in this run.
+
+What I played (touch only; note: every tile carries a base `glow` class, the real lit target is the highlighted one, so my driver
+followed the highlight like a person does):
+- Tutorial ("New here? Learn by playing") at 375x667 to "Play a real game": 81 taps, 66 s, ended "You win! 109-105". 0 errors.
+  **12 taps did nothing** (see findings). One tutorial tile target was 58x36.
+- Two full games from the title (▶ Play vs computer > Start playing; defaults: 2 players, easy rival, hints off), to the result screen:
+  - 390x844, tapping only the lit target (the chooser's "best" when one is open): **won 210-197**, 142 s, 132 taps.
+  - 375x667, "mixed" newcomer, 35 % of taps on any other card, spot or tile: **lost 123-206**, 215 s, 226 taps.
+- Rival wait: median 3.3 s (390) and 4.5 s (375), max 7.0 s. 0 page errors, 0 console errors, 0 stuck states.
+- Rules: unchanged from R25 and right, with the same gap: "has no legal move and passes" (engine.js:72) instead of ending the game.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Same as R25: bid track, moves, tile actions, sale table, djinns and scoring match; the no-legal-move rule still passes instead of ending the game. |
+| 2 | Tutorial teaches | 6 | One line and one lit target per step, ends in a real game. But the very first lit thing is a trap: step 1 shows a glowing free spot and the top line "Tap a glowing spot to bid", yet the spot ignores taps until you press the coach's Next. On the sell step "End turn" looks live and does nothing, and on the Shrine step a lit "Pay 2 Sages (best)" did nothing while the coach said "You have none: skip it." 12 dead taps in one tutorial. |
+| 3 | First 10 seconds | 7 | One big "New here? Learn by playing", a short goal card, one lit spot. The board is still a wall of 30 busy tiles. |
+| 4 | Turn clarity | 7 | Fixed: pops now add up ("Teal scores 2 pts: djinns +6, Sages −4", "You score 8 pts: earned 8 coins"); "1 camel left" grammar fixed; one lit drop tile per step; the chooser no longer leaves other things lit. |
+| 5 | Phone play | 6 | Still: the 8th and 9th bid spots are half-width stacks at both sizes; score pops sit over the step tabs ("You score 6 pts from tiles held"); 13 px meeple counts on tiles; one 58x36 tile target in the tutorial at 375. |
+| 6 | AI and pacing | 7 | Lit-target newcomer won 210-197; mixed newcomer lost 123-206. Waits 3.3-4.5 s median, 7 s max; games 2.5-3.5 min. Winnable if you follow the light. |
+| 7 | Feel | 6 | Meeples drop tile by tile, coins and goods animate, painted result card. One lit drop per step still walks you through the move. |
+| 8 | Bugs | 6 | 0 errors, 0 stuck, gate PASS. But in both real games the lit free bid spot ignored taps at the start of a round while a score pop showed (4 dead at 390, 1 at 375), plus the 12 dead tutorial taps. |
+| | **Total** | **6.6** | **FAIL**: rows 2, 5, 7 and 8 below 7. 8+6+7+7+6+7+6+6 = 53/8. No stopper. |
+
+### Earlier findings (R25)
+| Finding | Status | Evidence |
+|---|---|---|
+| Score pops contradict their reasons | **Fixed** ("Teal scores 2 pts: djinns +6, Sages −4"). | R27-shots/sq-g1-390-d3.jpg |
+| Grammar ("gains 2 coins", "1 camels left") | **Fixed** in what I saw ("1 camel left"). | sq-g1-390-result.jpg |
+| Lit targets ignore taps while a chooser is open (81 of 2,600) | **Fixed** in play (0 such dead taps in 358 game taps). | n/a (driver log) |
+| Gate FAIL (phone-check 3 of 3 runs) | **Fixed** (gate PASS). | gate log |
+| Rival pops during my Move step / over the step tabs | **Not fixed**. | sq-g1-390-d40.jpg |
+| Bid row 8 px above the bottom; 8th/9th spots squeezed | **Not fixed**. | sq-tut-step1-375.jpg, sq-g1-390-dead2.jpg |
+| No legal move passes instead of ending the game | **Not fixed** (engine.js:72). | n/a |
+| Mixed newcomer cannot win (0 of 4) | **Same**: lost 123-206. | sq-g2-375-result.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 2 / 8 | Tutorial step 1 at 375: tapped the glowing free spot, as the top line says | 3 taps, nothing. Only the coach's "Next ▶" moves on. A newcomer's first tap is dead. | R27-shots/sq-tut-step1-after-375.jpg |
+| 8 | Real games, start of a round: tapped the lit free bid spot while a score pop showed | No response (4 times at 390, once at 375); a later tap works. | R27-shots/sq-g1-390-dead2.jpg, sq-g2-375-dead2.jpg |
+| 2 / 8 | Tutorial sell step ("Sell them all") | The red "End turn ▶" looks live and does nothing. Later a lit "Pay 2 Sages (best)" did nothing while the coach said to skip. | R27-shots/sq-tut375-dead3.jpg |
+| 6 | Two default games | Lit-target play won 210-197; mixed play lost 123-206. | R27-shots/sq-g1-390-result.jpg, sq-g2-375-result.jpg |
+| 2 (good) | Tutorial to the end | Ends on "Play a real game" after a 109-105 practice win, 66 s. | R27-shots/sq-tut375-result.jpg |
