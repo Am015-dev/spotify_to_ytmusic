@@ -56,12 +56,12 @@ function pingTok(s, size) {
   const p = G.players[s]; if (p.helper) return null;
   if (G.comm === 'none') return h('span.tok', { html: KIT.pingSVG({ size, spent: true }), title: 'No signals in this dive' });
   if (G.comm === 'narc') return null;
-  return h('span.tok', { html: KIT.pingSVG({ size, spent: !!p.pingUsed }), title: p.pingUsed ? 'Ping used' : 'Ping ready' });
+  return h('span.tok', { html: KIT.pingSVG({ size, spent: !!p.pingUsed }), title: p.pingUsed ? 'Signal used' : 'Signal ready' });
 }
 function shownEl(s) {
   const sh = shownBy(s); if (!sh.length) return null;
   const w = h('span.shownw', { style: 'display:flex;gap:3px' });
-  sh.slice(0, 2).forEach(p => w.append(h('span.spill', { style: 'background:' + D.suits[suitOf(p.c)].c + ';color:' + (suitOf(p.c) === 3 || suitOf(p.c) === 4 ? '#1b1405' : '#fff'), title: cname(p.c) + (p.k === 'high' ? ' (their highest)' : p.k === 'low' ? ' (their lowest)' : p.k === 'only' ? ' (their only one)' : '') }, String(valOf(p.c)) + (p.k === 'high' ? '\u25B2' : p.k === 'low' ? '\u25BD' : p.k === 'only' ? '\u25CF' : ''))));
+  sh.slice(0, 2).forEach(p => w.append(h('span.spill', { style: 'background:' + D.suits[suitOf(p.c)].c + ';color:' + (suitOf(p.c) === 3 || suitOf(p.c) === 4 ? '#1b1405' : '#fff'), title: cname(p.c) + (p.k === 'high' ? ' (their highest)' : p.k === 'low' ? ' (their lowest)' : p.k === 'only' ? ' (their only one)' : '') }, String(valOf(p.c)) + (p.k === 'high' ? ' high' : p.k === 'low' ? ' low' : p.k === 'only' ? ' only' : ''))));
   return w;
 }
 const CARD_ICO = '<svg viewBox="0 0 12 16" aria-hidden="true"><rect x="1" y="1" width="10" height="14" rx="2.2"/><path d="M4 5.5h4M4 8.5h4"/></svg>', TRICK_ICO = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.2l2 4.4 4.8.5-3.6 3.2 1 4.7L8 11.6l-4.2 2.4 1-4.7L1.2 6.1 6 5.6z"/></svg>';
@@ -77,9 +77,9 @@ function seatMarks() {
 function seatEl(s, act, mk) {
   const p = G.players[s]; if (p.helper) return droneEl(s, act, mk);
   const won = tricksWon()[s], cm = s === G.cap, vote = mk.vote.has(s);
-  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
-  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(17), title: 'Commander' }));
-  const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
+  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Captain' : '') + ', ' + p.hand.length + ' cards' });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(17), title: 'Captain' }));
+  const t = !p.pingUsed && G.comm !== 'none' ? pingTok(s, 18) : null; if (t) { t.classList.add('pk'); av.append(t); }   // seats show only a ready token (green, as on your own 'Signal ready' pill); a spent one disappears
   b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b><span class="bl">' + (p.hand.length === 1 ? 'card' : 'cards') + '</span>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b><span class="bl">' + (won === 1 ? 'trick' : 'tricks') + '</span>', title: won + ' tricks won' })));
   const sh = shownEl(s); if (sh) b.append(h('span.pg', sh));
   const js = jobs(s), jb = h('span.jobs'); js.slice(0, 2).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2)));
@@ -120,24 +120,40 @@ function tableGeo() {
   const compact = side || small;
   const av = side ? 28 : (small ? 28 : 30), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
   const row3 = !side && !small && k === 3 && drone < 0 && H >= 470;   // W479: three rivals share one row on top; the trick gets the whole width
-  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
-  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
-  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, seats: [], slots: [] };
+  // R5: a short phone table with 3-4 rivals: every rival in one top row and the trick in two rows under them (each card below its player, yours
+  // centred beneath), so no seat ever sits on the trick and the cards stay big enough to read
+  const line = !side && small && drone < 0 && (k === 3 || k === 4);
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : (line ? Math.floor((W - 12 - 6 * (k - 1)) / k) : row3 ? Math.min(300, Math.floor((W - 16 - 12) / 3)) : Math.round(Math.min(100, W * .26))), seatH = side ? (wideT ? 112 : 76) : (line ? Math.max(84, UI.lineSeatH || 0) : row3 ? (ph ? 150 : 118) : (small ? 100 : 116));
+  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : (line ? 30 : 54);
+  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, line, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
   geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
   // trick area
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
-  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side || (row3 && !ph) ? 3.8 : 4.4)); const cwMax = ph ? 88 : (W >= 1100 ? 176 : 112);
-  if (!side && k >= 3 && !row3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2 + (ph && !side && k >= 3 && H < 470 ? 14 : 0), cx = side ? (zl + zr) / 2 : W / 2;
+  let cw = Math.floor(zoneH / (side || (row3 && !ph) ? 3.8 : (row3 ? 3.75 : (k === 2 && ph ? 3.5 : 4.4)))); const cwMax = ph ? (row3 ? 112 : 92) : (W >= 1100 ? 176 : 112);   // G4: phone trick cards bigger, the trick fills the felt
+  const tight = ph && !side && k >= 3 && !row3 && drone < 0;   // G4: short phone, seats on both sides: a tighter diamond so the cards can be bigger
+  if (tight) cw = Math.min(Math.floor((zoneH - 24) / 3.64), Math.floor((W / 2 - seatW - 8) / 1.42));
+  else if (!side && k >= 3 && !row3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
   if (row3) cw = Math.min(cw, Math.floor((W / 2 - 6) / 1.6));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
   geo.pl = side ? zl : ((k >= 3 && !row3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 && !row3 || drone >= 0) ? W - seatW - 8 : W - 6);
   geo.cw = cw; geo.ch = ch; geo.cx = cx; geo.cy = cy; geo.top = top; geo.zoneH = zoneH;
-  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : (row3 && !ph ? .84 : 1.0)));
-  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry)]); }
+  const rx = Math.round(cw * (side ? 1.5 : (row3 && ph ? 1.1 : (tight ? .92 : 1.05)))), ry = Math.round(ch * (side ? .86 : (row3 ? (ph ? .8 : .84) : (tight ? .8 : 1.0))));
+  geo.rx = rx; geo.ry = ry;
+  geo.tight = tight && !line; const oy = n === 3 && !side ? Math.round(ry * .25) : 0;   // G4: three slots form a triangle; centre it on the pad
+  if (line) {
+    // rows: card, its name label (about 26 px), card; your own label sits in the bottom margin
+    const lcw = Math.max(40, Math.min(cwMax, Math.floor((zoneH - 36) / 2 / 1.4), seatW - 6)), lch = Math.round(lcw * 1.4), gap = Math.max(4, Math.min(12, Math.floor((zoneH - 2 * lch - 28) / 2)));
+    geo.cw = lcw; geo.ch = lch; geo.pl = 6; geo.pr = W - 6;
+    const y1 = Math.round(top + gap + lch / 2), y2 = Math.round(y1 + lch + 28);
+    geo.slots.push([Math.round(W / 2), y2]);
+    for (let i = 0; i < k; i++) geo.slots.push([Math.round(W / 2 + (i - (k - 1) / 2) * (seatW + 6)), y1]);
+    geo.cy = Math.round((y1 + y2) / 2); geo.ry = Math.round((y2 - y1) / 2); geo.rx = Math.round((k - 1) / 2 * (seatW + 6));
+  } else
+  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry - oy)]); }
   // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
   const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
   geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
@@ -161,6 +177,7 @@ function seatSpots(geo, list) {
     list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
     return out;
   }
+  if (geo.line) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - (kk - 1) / 2) * (seatW + 6), y0, seatW); }); return out; }
   if (geo.row3) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - 1) * (seatW + 8), y0, seatW); }); return out; }
   if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
   else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
@@ -188,6 +205,7 @@ function renderFelt(v) {
   const assign = G.phase === 'assign';
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = !(G.phase === 'play' || G.phase === 'over' || UI.fz);
   try { lanternReveal(geo); } catch (e) { }
+  { const tp0 = $('#tpad'); if (tp0 && !pool.hidden) tp0.hidden = true; }
   { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
@@ -199,11 +217,15 @@ function renderFelt(v) {
       const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
       const dd = h('span.dd', ...Array.from({ length: jobDiff(i) }, () => h('i')));
       c.append(h('b', d.s), dd);
-      if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Commander', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
+      if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Captain', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
       pool.append(c);
     });
     return renderLead(lead, pile, v);
   }
+  { let tp = $('#tpad'); if (!tp) { tp = h('div#tpad', { 'aria-hidden': 'true' }); felt.insertBefore(tp, felt.firstChild); }
+    tp.hidden = slots.hidden; tp.style.visibility = PX && PX.on ? 'hidden' : '';   /* the Pixi table paints the same pad at this rect (pxDrawFelt) */
+    if (!tp.hidden) { const pw = Math.min(geo.W - 8, 2 * (geo.rx || geo.cw) + geo.cw + 44), ph2 = Math.min(geo.zoneH + 20, 2 * (geo.ry || geo.ch) + geo.ch + 64);
+      Object.assign(tp.style, { left: geo.cx + 'px', top: (geo.cy + 10) + 'px', width: pw + 'px', height: ph2 + 'px' }); } }
   const n = G.np, shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
   felt.style.setProperty('--cw', geo.cw + 'px');
@@ -220,7 +242,11 @@ function renderFelt(v) {
 function renderLead(lead, pile, v) {
   const geo = UI.geo;
   lead.style.left = (geo ? geo.cx : 0) + 'px'; lead.style.top = (geo ? geo.cy : 0) + 'px';
-  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns' : D.suits[ls].name)); lead.classList.add('on'); }
+  if (geo && geo.line) { lead.style.left = Math.round(Math.max(48, geo.slots[0][0] - geo.cw * 1.25)) + 'px'; lead.style.top = geo.slots[0][1] + 'px'; }   // R5 line layout: beside your slot
+  if (geo && geo.tight) { const tp = $('#tpad'), r = tp && tp.style.width ? { w: parseFloat(tp.style.width), h: parseFloat(tp.style.height) } : null;   // G4: no room in the middle: the colour led sits in the pad's top-left corner
+    if (r) { lead.style.left = Math.round((geo.cx - r.w / 2 + 22 + geo.cx - geo.cw / 2) / 2) + 'px'; lead.style.top = Math.round(geo.cy + 10 - r.h / 2 + 34) + 'px'; } }
+  lead.classList.toggle('tight', !!(geo && geo.tight));
+  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns (trump)' : D.suits[ls].name)); lead.classList.add('on'); }
   else lead.classList.remove('on');
   if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last', 'aria-label': 'Last trick' }, h('span', { html: KIT.iconSVG('book', 20) }), h('span', 'Last')));
 }
@@ -232,7 +258,7 @@ function renderMine(v) {
   const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: cmdHTML(18) }));
   me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b><span class="bl">' + (tricksWon()[s] === 1 ? 'trick' : 'tricks') + '</span>', title: tricksWon()[s] + ' tricks won' }))));
   box.append(me);
-  const t = pingTok(s, 30); if (t) box.append(t);
+  if (!p.helper && G.comm !== 'narc') box.append(h('span.sigst' + (p.pingUsed || G.comm === 'none' ? '.used' : ''), { title: 'Your signal token' }, h('span.tok', { html: KIT.pingSVG({ size: 22, spent: false }) }), h('span.sgt', G.comm === 'none' ? 'No signals' : p.pingUsed ? 'Signal used' : 'Signal ready')));
   if (G.comm === 'narc') box.append(h('span.pbtn.pool', { html: KIT.pingSVG({ size: 22 }) + '<b>' + G.pool + '</b>' }));
   const mj = h('div.mjobs'); const js = jobs(s);
   js.forEach(i => mj.append(jobChip(i, { me: true })));
@@ -248,12 +274,29 @@ function legalCards(v) {
   if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
   return null;
 }
+// before trick 1 a computer leader waits until you signal or tap Ready (signals have no order; nobody is rushed past the first window)
+function preWait() { const v = viewSeat(); return !!G && UI.mode !== 'tutorial' && !NET.on && v >= 0 && G.phase === 'play' && G.tricks.length === 0 && G.trick.plays.length === 0 && !UI.preReady && LD.canPing(G, v) && G.players[G.trick.turn].ai; }
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
 // the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
 function pingSpots(v) {
-  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || !iMustAct()) return m;
+  const m = new Map(); if (v < 0 || !G || UI.busy || G.phase === 'over' || (G.phase === 'signal' && !iMustAct())) return m;   // between tricks any diver may signal, turn or not
   if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
   return m;
+}
+// signalling is its own mode (R5): tap Signal, pick a glowing card, then confirm. No small targets on the cards, so a card tap always plays.
+const PING_WORD = { high: 'Highest', low: 'Lowest', only: 'Only one', '': 'Show' };
+function canSigNow(v) { return v >= 0 && !!G && !UI.busy && G.phase !== 'over' && Array.from(pingSpots(v).keys()).length > 0; }
+function sigActs(M, v) {   // the prompt and buttons while picking a card to signal
+  M.cls = 'mine'; const k = UI.sel >= 0 ? pingSpots(v).get(UI.sel) : undefined;
+  M.p = UI.sel >= 0 && k !== undefined ? 'Show ' + cname(UI.sel) + (k ? ' as your ' + PING_WORD[k].toLowerCase().replace('only one', 'only ' + D.suits[LD.suit(UI.sel)].name) : '') + '?' : 'Pick a glowing card to show.';
+  M.acts.push({ label: 'Show it', a: 'pingok', cls: 'go', dis: !(UI.sel >= 0 && k !== undefined) }); M.acts.push({ label: 'Cancel', a: 'noping', cls: 'alt' }); return M;
+}
+// R13: a card someone must win for an open job carries a small tag ("Yours" or the owner's name), so a newcomer sees which card fulfils which job
+function jobTag(c, v) {
+  if (!G || !G.tasks || G.phase === 'assign') return null;
+  for (let i = 0; i < G.tasks.length; i++) { const t = G.tasks[i]; if (t.owner < 0 || jobSt(i) !== 0) continue; const d = TASKS[t.id]; if (!d || !d.cs || !d.cs.includes(c)) continue;
+    const me = t.owner === v; return { me, t: me ? 'Yours' : pname(t.owner), long: me ? 'your job: win this card' : pname(t.owner) + ' must win this card' }; }
+  return null;
 }
 function renderHand(v) {
   const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
@@ -271,8 +314,9 @@ function renderHand(v) {
     const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : '') + (got.has(c) ? ', you got this card in the flare pass' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
     b.append(cardN(c, 84));
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
-    if (spots.has(c)) b.append(h('span.pspot', { 'data-a': 'pingc', 'data-id': c, role: 'button', 'aria-label': 'Show ' + cname(c) + ' to the team', html: KIT.pingSVG({ size: 30, k: spots.get(c) }) }));
+    if (UI.pingSel && UI.sel === c && spots.has(c)) b.append(h('span.pkw', { 'aria-hidden': 'true' }, PING_WORD[spots.get(c)] || 'Show'));
     if (got.has(c)) b.append(h('span.gotb', 'New'));
+    { const jt = jobTag(c, v); if (jt) { b.append(h('span.jtg' + (jt.me ? '.me' : ''), { 'aria-hidden': 'true' }, jt.t)); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', ' + jt.long); } }
     btns.push(b);
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
@@ -339,20 +383,26 @@ function actModel(v) {
     }
     case 'signal': {
       if (!must) { M.p = who + ' may signal…'; return M; }
+      if (UI.pingSel) return sigActs(M, v);
       M.cls = 'mine'; const pm = mv.filter(m => m.t === 'ping');
-      M.p = pm.length ? 'Tap a ping spot, or skip.' : 'Nothing to signal.';
+      M.p = pm.length ? 'Signal a card, or skip.' : 'Nothing to signal.';
+      if (pm.length) btn('Signal', 'signal', { cls: 'alt' });
       btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' });
       return M;
     }
     case 'play': {
       const T = G.trick, turn = T.turn, helper = G.players[turn].helper, ctl2 = ctlSeat(turn);
       const myTurn = v >= 0 && ctl2 === v;
+      if (UI.pingSel && canSigNow(v)) return sigActs(M, v);
+      const sig = canSigNow(v) && T.plays.length === 0;
       if (myTurn) {
         M.cls = 'mine';
         M.p = helper ? 'Tap a drone card.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play a card.');
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
           if (UI.ab) { M.p = 'Every card breaks a ' + (UI.ab.job >= 0 ? 'job.' : 'rule.'); M.warn = 1; } }
-      } else M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : '';
+        if (sig && !helper) { if (!UI.ab) M.p = 'Lead, or signal first.'; btn('Signal', 'signal', { cls: 'alt' }); }
+      } else if (preWait()) { M.cls = 'mine'; M.p = 'Signal now, or tap Ready.'; btn('Signal', 'signal', { cls: 'alt' }); btn('Ready', 'ready', { cls: 'go' }); }
+      else { M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : ''; if (sig) btn('Signal', 'signal', { cls: 'alt' }); }
       return M;
     }
   }
@@ -373,9 +423,15 @@ function render() {
   if (!G || !UI.started) return;
   layoutVars();
   const v = viewSeat();
+  if (UI.pingSel && !canSigNow(v)) { UI.pingSel = false; UI.sel = -1; }
   renderBar(); renderMine(v); renderHand(v);
   UI.geo = tableGeo(); if (UI.geo) { const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--dw', UI.geo.dw + 'px'); r.setProperty('--av', UI.geo.av + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); }
-  renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
+  renderOpp(v);
+  if (UI.geo && UI.geo.line) {   // the line layout needs the real seat height (names, job chips and signal chips can wrap): measure and lay out again once
+    const hs = Array.from(document.querySelectorAll('#opp .seat')).map(e => e.offsetHeight), mh = hs.length ? Math.max(...hs) : 0;
+    if (mh > UI.geo.seatH + 1 || (mh && mh < UI.geo.seatH - 8 && mh >= 84)) { UI.lineSeatH = mh; UI.geo = tableGeo(); const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); renderOpp(v); }
+  }
+  renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
   renderActs(v);
   try { placeFinger(); } catch (e) { console.error(e); }
   try { hlpAfter(); } catch (e) { console.error(e); }
