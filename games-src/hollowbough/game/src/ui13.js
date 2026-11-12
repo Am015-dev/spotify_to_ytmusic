@@ -140,8 +140,11 @@ function extrasBoot() {
 try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hints = false; }
 function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
 function goalCard() {
-  const D2 = (t) => h('li', t);
-  UI.cards.unshift({ kind: 'goal', title: 'Goal', sub: 'Win the Elderheart Oak', body: () => h('div', h('p', 'Have the most points when everyone has passed.'), h('ul.goal', D2('Buildings and critters you build score the points printed on them.'), D2('Point tokens, claimed events and bonus cards add more.'), D2('Pass when you are done. The highest total wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
+  // a painted goal card over the board: art, three short lines, Start
+  const src = typeof HB_ART !== 'undefined' && HB_ART.ever_tree ? HB_ART.ever_tree : null;   // the great tree painting
+  UI.cards.unshift({ kind: 'goal', title: 'Your goal', sub: 'Win the Elderheart Oak', body: () => h('div.hb-goal', src ? h('img.hb-goal-art', { src, alt: '', draggable: 'false' }) : null,
+    h('div.hb-goal-k', 'Your goal'), h('h2.hb-goal-t', 'Win the Elderheart Oak'),
+    h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();
 }
 const SEE = { vals: null, key: '', last: null, scores: null, actor: -1, rate: null };
 function seeToast(id, html, ms, top) {

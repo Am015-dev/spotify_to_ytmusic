@@ -25,6 +25,7 @@ function tutStage(g) {
   for (const k of ['inn', 'post_office', 'lookout']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
   const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad;
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
+  g.tale = true;          // the lesson is a short year: it may end before Autumn (a real game passes only in Autumn)
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
@@ -80,7 +81,7 @@ function tutSteps() {
     { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
     { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'city', title: S.city.title, say: () => tsay('city', G.players[0].city.length), target: tq('#bd .strip.city'), wait: null,
+    { id: 'city', title: S.city.title, say: () => tsay('city', HB.cityCount(G, 0)), target: tq('#bd .strip.city'), wait: null,
       ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
     { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },
@@ -94,9 +95,20 @@ function tutSteps() {
     { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
     { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
+    { id: 'prep2', title: S.prep2.title, say: tsay('prep2'), target: tgEl('prep'), wait: tapIs('prep'), ready: () => myTurn() && G.players[0].season === 1 && !!tgEl('prep')() },
+    { id: 'summer', title: S.summer.title, say: tsay('summer'), target: tq('#bd [data-t^="q:"]'), wait: { type: 'tap', times: 2, match: a => /^q:/.test(a.tg || '') },
+      ready: () => !!G && !!G.q && HB.actor(G) === 0 && !UI.cards.length && !UI.animBusy && !!tq('#bd [data-t^="q:"]')() },
+    tutLook('haven', tq('#bd .tile[data-k="haven"]'), tg => /w:haven$/.test(tg)),
+    tutLook('journey', tq('#bd .tile[data-k="journey"]'), tg => /w:journey$/.test(tg)),
+    tutLook('inn', () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'inn'); return e ? tq('#bd .strip.city .sc[data-id="' + e.id + '"]')() : null; },
+      tg => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'inn'); return !!e && (tg === 'd:' + e.id || tg === 'x:c' + e.id); }),
+    tutLook('special', tq('#bd .tile[data-k="sev"][data-i="0"]'), tg => /w:sev:0$/.test(tg)),
+    { id: 'autumn', title: S.autumn.title, say: tsay('autumn'), target: tq('#bd .chips'), wait: null, ready: myTurn },
     { id: 'pass', title: S.pass.title, say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
       ready: () => myTurn() && !!tgEl('pass')() },
     { id: 'score', title: S.score.title, say: () => tsay('score', sc0(), pname(1), G.over.scores[1].total), target: tq('#pc table.vs'), wait: null,
+      hold: c => c.kind === 'over-score', ready: () => !!cardTitle('over-score') && !!document.querySelector('#pc:not([hidden]) table.vs') },
+    { id: 'bonus', title: S.bonus.title, say: tsay('bonus'), target: tq('#pc table.vs'), wait: null,
       hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
       ready: () => !!cardTitle('over-score') && !!document.querySelector('#pc:not([hidden]) table.vs') },
     { id: 'end', title: S.end.title, say: () => tsay('end', G.over.winner === 0, G.over.scores[0].total, G.over.scores[1].total),
@@ -105,13 +117,19 @@ function tutSteps() {
   // reaction beat after each action, and the next step waits until it has been read
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
-    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city' }[st.id];
+    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', inn: 'city', special: 'goals' }[st.id];
+    if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
     st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
     st.ready = () => { if (tab && G && UI.pvTab !== tab && HB.actor(G) === 0 && !UI.cards.length) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } }
       try { const el = st.target && st.target(); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
       return (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd()); };
   });
   return L;
+}
+// a "look" step: tap the real thing on the board to learn it; the tap teaches, it does not move a worker
+function tutLook(id, target, isIt) {
+  const S = HBS.steps;
+  return { id, title: S[id].title, say: tsay(id), target, look: isIt, wait: tapIs('look:' + id), ready: () => myTurn() && !!target() };
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
@@ -123,7 +141,7 @@ function tutStart(o) {
   // Learn to play: one step at a time. Each step names the exact thing to tap, glows it, and waits for that tap.
   if (typeof GXT !== 'undefined') GXT.start({ game: TUT_GAME, steps: tutSteps(), endTitle: 'You know the rules', endText: HBS.end.text,
     endButtons: pro && window.CAMPAIGN && window.CAMPAIGN.chapters ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
-    onDone: o => { tutLeave(); const c = o && o.choice; if (c === 'chapter' || c === 'story') { const f = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0]; if (c === 'chapter' && f && typeof GXC !== 'undefined') GXC.play(f.id); else campOpen(); } else showStart(); },
+    onDone: o => { tutLeave(); const c = o && o.choice; if (c === 'play') { newGame('vs'); return; } if (c === 'chapter' || c === 'story') { const f = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0]; if (c === 'chapter' && f && typeof GXC !== 'undefined') GXC.play(f.id); else campOpen(); } else showStart(); },
     onExit: () => { tutLeave(); showStart(); } });
 }
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
@@ -142,7 +160,9 @@ function tutOffer(go) {
 (function () {
   const o = onTarget;
   onTarget = function (tg, el) {
-    if (tutOn() && !UI._tutIn) { if (!G || UI.cards.length) return; if (!/^x:/.test(tg) && !UI.animBusy && !GXT.act({ type: 'tap', tg })) return; }
+    if (tutOn() && !UI._tutIn) { if (!G || UI.cards.length) return;
+      const st = GXT.current(); if (st && st.look) { let hit = false; try { hit = !!st.look(String(tg)); } catch (e) { } GXT.act({ type: 'tap', tg: hit ? 'look:' + st.id : String(tg) }); return; }
+      if (!/^x:/.test(tg) && !UI.animBusy && !GXT.act({ type: 'tap', tg })) return; }
     return o.apply(this, arguments);
   };
 })();

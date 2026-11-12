@@ -180,7 +180,7 @@ function tileFace(t, big) {
     case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
     case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b.bd', dd.pts)))); break; }
-    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), h('b.bd', dd.pts ? dd.pts : '?')))); break; }
+    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), h('b.bd', dd.pts ? dd.pts : '★')))); break; }
   }
   if (big) { const nm = t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discards' : t.kind === 'tree' ? 'Seasons' : (tileInfo(t.kind, t.i).name || ''); f.appendChild(h('div.nm', nm)); }
   return f;
@@ -221,7 +221,7 @@ function posStripCard(box, fit, n, i) {
 }
 function placeBox(e, b) { e.style.cssText += `;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`; return e; }
 function renderBoard() {
-  if (PV_ON) return pvRender();   // W457 Play view (below); ?board=old keeps this board
+  if (PV_ON) { const r = pvRender(); try { fitNames(); } catch (e) { } return r; }   // W457 Play view (below); ?board=old keeps this board; G8: names fit
   const host = $('#board'), bd = $('#bd'); if (!host || !G) return;
   const W = host.clientWidth || 390, H = host.clientHeight || 470;
   const R = boardLayout(W, H); UI.lay = R;
@@ -300,11 +300,11 @@ function renderBoard() {
   };
   if (R.col) {
     const hb = placeBox(h('button.handbar', { 'data-a': 'handtog', type: 'button', 'aria-label': 'Show my hand and city' }), R.hbar); bd.appendChild(hb);
-    hb.appendChild(h('span', '\u25B4 Hand ' + (v >= 0 ? G.players[v].hand.length : 0) + '/8 \u00B7 City ' + me.city.length + '/15'));
+    hb.appendChild(h('span', '\u25B4 Hand ' + (v >= 0 ? G.players[v].hand.length : 0) + '/8 \u00B7 City ' + HB.cityCount(G, fs) + '/15'));
   } else { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
     const fit = R.strip.city, n = cityList.length;
     if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
-    strip.appendChild(h('span.scount', { 'data-a': 'city' }, (me.city.length) + '/15'));
+    strip.appendChild(h('span.scount', { 'data-a': 'city' }, HB.cityCount(G, fs) + '/15'));
     const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); if (R.slots) { open.style.left = (cityBox.x + cityBox.w - 48) + 'px'; open.style.width = '48px'; } open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
     // target size: every city card keeps >= 24 css px of its own width uncovered (WCAG 2.2 target-size), even when the 15 slots are tighter
     const cStep = R.slots && n > 1 ? Math.max(fit.step, Math.min(24, (cityBox.w - fit.x0 - fit.cw - 40) / (n - 1))) : fit.step;
@@ -365,7 +365,7 @@ function cityOverlay(me, list, cityCard) {
   const nSl = Math.max(15, list.length), cols = 5, rows = Math.ceil(nSl / cols), gp = 6, top = 46;
   const cw = Math.max(40, Math.min(112, Math.floor(Math.min((W - 24 - (cols - 1) * gp) / cols, (H - top - 70 - (rows - 1) * gp) / rows / CARD_AR)))), ch = Math.round(cw * CARD_AR);
   const pn = h('div.cvpanel', { 'data-a': 'noop' }); o.appendChild(pn);
-  pn.appendChild(h('div.cvhead', h('b', 'My city'), h('span', me.city.length + '/15')));
+  pn.appendChild(h('div.cvhead', h('b', 'My city'), h('span', HB.cityCount(G, G.players.indexOf(me)) + '/15')));
   const grid = h('div.cvgrid'); grid.style.cssText = `grid-template-columns:repeat(${cols},${cw}px);gap:${gp}px`;
   for (let i = 0; i < nSl; i++) {
     const it = list[i], cell = h('div.cvcell'); cell.style.cssText = `width:${cw}px;height:${ch}px`;
@@ -406,9 +406,9 @@ function trayChip(m, i, tg) {
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
     if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
-    else if (m.res !== undefined) inner = [ic(m.res, 26)];
-    else inner = [h('b', wordsCap(m.label, 6) || 'OK')];
-  } else inner = [h('b', wordsCap(m.label, 5))];
+    else if (m.res !== undefined) inner = [ic(m.res, 24), h('b', m.label ? chipText(m.label) : rname(m.res, 1))];
+    else inner = [h('b', chipText(m.label) || 'OK')];
+  } else inner = [h('b', chipText(m.label))];
   const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? '.tcard' : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
   if (m.label) b.setAttribute('aria-label', m.label);
   UI.tgEls[tg] = b; return b;
@@ -433,11 +433,12 @@ function renderActs(mm, qm, qShown) {
     const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
     if (hasCard || many) {
       let rows;
-      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
+      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(4, Math.ceil(chips.length * 150 / Math.max(120, box.w)));   // G8: chips carry words now
       const hh = hasCard ? rows * (Math.round(UI.trayCw * CARD_AR) + 14) + 10 : Math.max(box.h, rows * 50 + 6);
       a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
     }
     chips.forEach(c => a.appendChild(c));
+    if (a.classList.contains('wrap') && !hasCard && a.scrollHeight > a.clientHeight + 1) { const hh2 = a.scrollHeight + 6; a.style.top = (box.y + box.h - hh2) + 'px'; a.style.height = hh2 + 'px'; }   // G8: grow to fit every choice
     if (UI.sel) a.appendChild(h('button.tchip.tx', { 'data-a': 'selx', type: 'button', 'aria-label': 'Cancel' }, '×'));
     return;
   }
@@ -446,7 +447,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare (workers still out)' }, seasonIcon(Math.min(3, p.season + 1), 26), h('span', 'Prepare')));
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span', n > 0 ? 'Prepare after ' + n + ' more worker' + (n > 1 ? 's' : '') : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -468,14 +469,49 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
-  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : 'Build, Prepare or Pass';   // phone: one short line
+  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : p.season < 3 ? 'Build or Prepare' : 'Build or Pass';   // phone: one short line (Pass only in Autumn)
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
-  return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build, Prepare or Pass.' : 'play a card, Prepare or Pass.'));
+  const last = p.season < 3 ? 'Prepare' : 'Pass';
+  return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build or ' + last + '.' : 'play a card or ' + last + '.'));
 }
-// the short line for a pending decision (8 words at most; the long wording stays in the log)
+// the line for a pending decision: plain, whole, 12 words at most (wraps to 2 lines in the bar; the long wording stays in the log)
 function qShort(q) {
-  const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to use next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to use first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
-  return m || wordsCap(q.title, 8);
+  if (q.kind === 'discard') { const d = q.opts[0] && q.opts[0].d, c = (d && d.count) || 0, mx = d && d.max; if (c || (mx && mx < 9)) return c + (mx && mx < 9 ? ' of ' + mx : '') + ' discarded. Tap more, or Done.'; }   // a running count before Done
+  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', ruins: 'Tap a building to raze for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Two effects at once: pick which goes first.', queen: 'Tap a card worth up to 3 to play free.', inn: 'Tap a meadow card to play it 3 cheaper.', university: 'Tap a card to remove for its cost back.', cemetery: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', ranger: 'Pick a worker, then where it goes.', tuck: 'Tap a critter to tuck under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Tap the card to keep; a rival gets the other.', pigeon: 'Play one revealed card free, or skip.', waive: 'Pick resources to leave off the cost.', judge: 'Pick a resource in the cost to swap.', spend: 'Spend goods for point tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep the card, or tuck it for 1 point?', clock: 'Belfry token: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick which stack to add to the cellar.' })[q.kind];
+  return m || wordsCap(q.title, 12);
+}
+// a choice button: say plainly what it does, short enough to fit (no cut words)
+function chipText(label) {
+  let s = String(label || '');
+  let m;
+  if ((m = s.match(/^Do not use /))) return 'Skip: repeat nothing';
+  if ((m = s.match(/^Spend a token: repeat (.*)$/))) s = 'Repeat ' + m[1];
+  if ((m = s.match(/^Give 1 berry to (\S+) and take 2 point tokens/))) return 'Give ' + m[1] + ' a berry: +2 tokens';
+  if ((m = s.match(/^Prepare for (\w+)/))) return 'Prepare for ' + m[1];
+  if ((m = s.match(/^Trade away (.*)$/))) return 'Give ' + m[1];
+  if ((m = s.match(/^Pass \(/))) return 'Pass: done for the game';
+  if ((m = s.match(/^Tuck (.*) beneath the event \((\d) points?\)/))) return 'Tuck ' + m[1] + ': +' + m[2] + ' points';
+  if ((m = s.match(/^Tuck it beneath the event/))) return 'Tuck it: +1 point';
+  s = s.replace(/\s*\([^)]*\)/g, '').replace(/\s+-\s.*$/, '').replace(/:\s.*$/, '').replace(/\?$/, '').trim();
+  const w = s.split(/\s+/); return w.length > 8 ? w.slice(0, 7).join(' ') + '…' : s;
+}
+// a special goal's real points: a fixed number, or "2 per twig, up to 6"
+function sevPts(dd) {
+  const s = dd.score, up = (String(dd.text || '').match(/up to (\d)/) || [])[1];
+  const cap = (per, txt) => per + ' per ' + txt + (up ? ', up to ' + per * up : '');
+  if (!s) return dd.key === 'grand_market' || /point tokens/.test(dd.text || '') ? '2 tokens per good, up to 6' : (dd.pts ? dd.pts + ' points' : 'see card');
+  if (s.flat != null) return s.flat + ' points';
+  if (s.per_twig_on_event) return cap(s.per_twig_on_event, 'twig');
+  if (s.per_berry_on_event) return cap(s.per_berry_on_event, 'berry');
+  if (s.per_card_beneath) return cap(s.per_card_beneath, 'card tucked');
+  if (s.per_critter_beneath) return cap(s.per_critter_beneath, 'critter tucked');
+  if (s.per_husband_wife_pair_in_all_cities) return s.per_husband_wife_pair_in_all_cities + ' per vole pair, all cities';
+  if (s.per_dungeon_prisoner) return s.per_dungeon_prisoner + ' per prisoner';
+  if (s.per_worker_in_monastery) return s.per_worker_in_monastery + ' per cloister worker';
+  if (s.per_cemetery_worker) return s.per_cemetery_worker + ' per buried worker';
+  if (s.per_token_on_chapel) return s.per_token_on_chapel + ' per shrine token';
+  if (s.per_resource_on_event) return '1 or 2 per good, up to 6';
+  return dd.pts ? dd.pts + ' points' : 'see card';
 }
 // ===================== part 14: the Play view (W457): one focus at a time =====================
 // Phone: a top bar (scores, resource piles, worker meeples), ONE focus panel (Places | Meadow | City), a fanned hand, the action row.
@@ -511,14 +547,16 @@ const PV_SPECIAL = {
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
 const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow: play 1 cheaper' };
+const PV_TCOL = { production: 'green', destination: 'red', governance: 'blue', traveler: 'tan', prosperity: 'purple' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
   if (kind === 'basic') { const o = join(basicItems(i)); if (D.basic[i].shared) o.sub = o.sub ? o.sub + ' · shared' : 'shared'; return o; }
   if (kind === 'forest') { const k = D.forest[G.forest[i]].key; if (PV_SPECIAL[k]) { const s = PV_SPECIAL[k]; return { main: s[0], sub: s[1], ico: s[2] }; } return join(FIC[k] || [['any', '']]); }
   if (kind === 'haven') return { main: 'Cards to goods', sub: '2 cards = any 1', ico: 'haven' };
-  if (kind === 'journey') return { main: 'Journey', sub: 'Autumn only: points', ico: 'road' };
-  if (kind === 'bev') { const dd = D.basicEvents[G.bev[i].k]; return { main: dd.name, sub: 'Goal · ' + dd.pts + ' points', ico: 'flag' }; }
-  if (kind === 'sev') { const dd = D.specialEvents[G.sev[i].k]; return { main: dd.name, sub: 'Goal · ' + (dd.pts || '?') + ' points', ico: 'star' }; }
+  if (kind === 'journey') return { main: 'Journey', sub: 'Autumn only · 2-5\u00a0pts', ico: 'road' };
+  if (kind === 'bev') { const dd = D.basicEvents[G.bev[i].k], t = Object.keys(dd.need || {})[0]; return { main: dd.name, sub: t ? 'Needs ' + dd.need[t] + ' ' + (PV_TCOL[t] || t) + ' · ' + dd.pts + '\u00a0pts' : dd.pts + '\u00a0pts', ico: 'flag' }; }
+  if (kind === 'sev') { const dd = D.specialEvents[G.sev[i].k], nm = (dd.req || []).map(k => { const c = D.cards.find(x => x.key === k); return c ? c.name : k; });
+    return { main: dd.name, sub: (nm.length ? 'Needs ' + nm.join(' + ') + ' · ' : '') + sevPts(dd), ico: 'star' }; }
   return { main: '', sub: '', ico: 'any' };
 }
 // ---- card faces: name, painted art, cost as big icons with numbers, points
@@ -560,6 +598,7 @@ function pvSetTab(v, quiet) {
   bd.querySelectorAll('.pv-panel').forEach(p => p.classList.toggle('on', p.dataset.p === v));
   bd.querySelectorAll('.pv-tab').forEach(t => { const on = t.dataset.v === v; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
   if (!quiet) { const p = bd.querySelector('.pv-panel.on'); if (p) { p.classList.remove('pvin'); void p.offsetWidth; p.classList.add('pvin'); } }
+  try { const p = bd.querySelector('.pv-panel.on'); if (p) pvFitWords(p); } catch (e) { }   // labels in a panel that was hidden at render are fitted now
   pvRects(); if (!quiet) { try { placeFinger(); } catch (e) { } }
 }
 // where things are, for the flying pieces (a piece on a hidden panel flies to / from its tab)
@@ -581,7 +620,7 @@ function pvChip(s, n) {
   e.style.setProperty('--pc', pcolor(s).c);
   const nm = s === viewSeat() && humans().length === 1 ? 'You' : pname(s);
   e.appendChild(pawn(s, 24));
-  e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', (p && p.passed ? 'done · ' : '') + cards + '/15 city')));
+  e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', p && p.passed ? (innerWidth < 380 ? 'done' : cards + '/15 done') : cards + (innerWidth < 380 ? '/15' : '/15 city'))));
   e.appendChild(h('b.pvch-pt' + (me ? '.rs' : ''), me ? { 'data-res': 'point' } : {}, h('span.pvch-star', '★'), String(pts)));
   return e;
 }
@@ -624,7 +663,7 @@ function pvRender() {
   // ---- tabs (phone)
   const tabs = h('div.pv-tabs', { role: 'tablist' }); if (tall) col.appendChild(tabs);
   const tabEl = {};
-  for (const [k, l] of PV_TABS) { const t = h('button.pv-tab', { 'data-a': 'pvtab', 'data-v': k, type: 'button', role: 'tab' }, h('span', l), k === 'city' ? h('b.pv-tn', me.city.length + '/15') : k === 'meadow' ? h('b.pv-tn', G.meadow.filter(x => x >= 0).length) : k === 'goals' ? h('b.pv-tn', G.bev.concat(G.sev).filter(x => x.o === -1 || x.o == null).length) : h('b.pv-tn', availW(me))); tabEl[k] = t; tabs.appendChild(t); }
+  for (const [k, l] of PV_TABS) { const t = h('button.pv-tab', { 'data-a': 'pvtab', 'data-v': k, type: 'button', role: 'tab' }, h('span', l), k === 'city' ? h('b.pv-tn', HB.cityCount(G, fs) + '/15') : k === 'meadow' ? h('b.pv-tn', G.meadow.filter(x => x >= 0).length) : k === 'goals' ? h('b.pv-tn', G.bev.concat(G.sev).filter(x => x.o === -1 || x.o == null).length) : h('b.pv-tn', availW(me))); tabEl[k] = t; tabs.appendChild(t); }
   const stage = h('div.pv-stage'); col.appendChild(stage);
   const panel = (k, title) => { const p = h('section.pv-panel', { 'data-p': k, 'aria-label': title }); if (!tall) p.appendChild(h('h2.pv-h', title)); stage.appendChild(p); return p; };
   // ---- places
@@ -635,7 +674,8 @@ function pvRender() {
     { const key = kind === 'basic' ? D.basic[i].key : kind === 'forest' ? D.forest[G.forest[i]].key : kind === 'bev' ? D.basicEvents[G.bev[i].k].key : kind === 'sev' ? D.specialEvents[G.sev[i].k].key : kind;
       const ph = key && HBKit.paintedHref ? HBKit.paintedHref(key) : null; if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the place's own painting
     if (tall && (kind === 'basic' || kind === 'forest' || kind === 'haven')) {   // phone board plate: at most 2 short lines, "shared" as a small tag
-      const fk = kind === 'forest' ? D.forest[G.forest[i]].key : '', sh = /shared/.test(w.sub || '');
+      const fk = kind === 'forest' ? D.forest[G.forest[i]].key : '', sh = kind === 'haven' || /shared/.test(w.sub || '');
+      e.classList.add('pv-place'); e.appendChild(h('span.pv-nm', info.name || ''));   // the place's name, printed on its painting like a board space
       const short = PV_BOARD[fk] || (kind === 'haven' ? '2 cards for any 1' : [w.main.replace(/ \+ /g, ', '), (w.sub || '').replace(/\s*·?\s*shared/, '')].filter(Boolean).join(', '));
       const parts = short.split(', '); e.appendChild(h('span.pv-tin', h('span.pv-sw', h('b', parts.length < 2 ? short : parts.flatMap((t, j) => j ? [' ', h('span.pv-it', t + (j < parts.length - 1 ? ',' : ''))] : [h('span.pv-it', t + (parts.length > 1 ? ',' : ''))])))));   // each item stays whole on its line
       if (sh) e.appendChild(h('span.pv-shtag', 'shared'));
@@ -648,7 +688,7 @@ function pvRender() {
     else if (tg) { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:' + tg); if (mine) e.classList.add('no'); }
     if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
     if (kind === 'bev' || kind === 'sev') { const ev = (kind === 'bev' ? G.bev : G.sev)[i]; if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 22))); } }
-    else { const ws = workersAt(kind, i); if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, 26))); e.appendChild(pw); if (!info.shared && kind !== 'journey' && kind !== 'haven') { e.classList.add('taken'); e.appendChild(h('span.pv-taken', 'Taken')); } } }
+    else { const ws = workersAt(kind, i); if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, tall ? 30 : 26))); e.appendChild(pw); if (!info.shared && kind !== 'journey' && kind !== 'haven' && !e.classList.contains('glow')) { e.classList.add('taken'); e.appendChild(h('span.pv-taken', 'Taken')); } } }
     return e;
   };
   const cell = e => spots.appendChild(h('div.pv-cell', e));   // a plain grid cell around each button: rows then size to the words
@@ -658,7 +698,7 @@ function pvRender() {
   // phone: the places are round clearings on the painted tree-stump table (owner art), not a grid of boxes; staggered so it reads as a board
   if (tall) { const short = H < 640, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones: 4 across, 3 rows
     const n = spots.children.length, rows = Math.ceil(n / nc), y0 = short ? 15 : 13, yr = short ? 66 : 74;
-    Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (y0 + r * yr / Math.max(1, rows - 1) + (col % 2 ? 2 : -1)) + '%'; }); }
+    Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (0.6 + r * 99 / rows + (short ? 0 : col % 2 ? 1.2 : 0)) + '%';   /* rows hang from the top of their band, so nothing overlaps or leaves the board */ }); }
   // ---- goals (events): their own panel, so Places fits one screen
   const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
   if (tall) gl.appendChild(h('div.pv-sub', 'Goals score points. Have the cards one needs? Send a worker to claim it.'));
@@ -686,7 +726,7 @@ function pvRender() {
   // ---- city: 15 slots that fill with the cards' art
   const pCi = panel('city', 'My city'), vis = visitList();
   const city = h('div.strip.city'); pCi.appendChild(city);
-  city.appendChild(h('div.pv-ch', h('b', (fs === viewSeat() ? 'My city' : pname(fs) + "'s city")), h('span', me.city.length + ' of 15 · ' + score(fs).total + ' points')));
+  city.appendChild(h('div.pv-ch', h('b', (fs === viewSeat() ? 'My city' : pname(fs) + "'s city")), h('span', HB.cityCount(G, fs) + ' of 15 · ' + score(fs).total + ' points')));
   const grid = h('div.pv-grid'); city.appendChild(grid);
   const cityCard = (b, it) => {
     const tg = 'd:' + it.id;
@@ -716,6 +756,7 @@ function pvRender() {
   const cw = !tall ? 118 : fits ? 84 : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 92) * 1.5) : Math.round(cw * 1.22);
   hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
   hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
+  { const sc = hs.lastChild; const keep = () => { sc.style.transform = 'translateX(' + hs.scrollLeft + 'px)'; }; hs.addEventListener('scroll', keep, { passive: true }); requestAnimationFrame(keep); }   // the Hand label stays put while the cards scroll
   const x0 = fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8;
   const hin = h('div.hin'); hin.style.cssText = `position:relative;width:${fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
   hand.forEach((id, i) => {
@@ -748,8 +789,16 @@ function pvRender() {
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
   hs.scrollLeft = fits ? 0 : (UI.hsx || 0); { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
-  renderPrompt(); renderBar(); placeFinger();
+  renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
   if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
+}
+// no cut words on a phone: a label whose longest word is wider than its box (or that runs past its card) steps its font down, to 11 px at the least
+function pvFitWords(root) {
+  const clipOf = e => e.closest('.pvc,.pvm,.mc,.sc,.tile,.pv-tab,.chip');
+  const over = e => { if (e.scrollWidth > e.clientWidth + 1) return true; const cs = getComputedStyle(e); if (/hidden|clip/.test(cs.overflow + cs.overflowY) && e.scrollHeight > e.clientHeight + 1) return true;
+    const c = clipOf(e); if (!c || c === e) return false; const r = e.getBoundingClientRect(), q = c.getBoundingClientRect(); return r.right > q.right + 1 || r.left < q.left - 1; };
+  root.querySelectorAll('.pvc-name,.pvm-name,.pvc-cost,.pvc-ci,.pvc-aff,.hcn,.pv-sw b,.pv-sw span,.pv-nm,.pvch-s,.pvch-n,.pv-tab span,.rsw').forEach(e => {
+    if (!e.getClientRects().length || !over(e)) return; let f = parseFloat(getComputedStyle(e).fontSize); for (let k = 0; k < 10 && f > 11 && over(e); k++) { f = Math.max(11, f - 0.5); e.style.setProperty('font-size', f + 'px', 'important'); e.querySelectorAll('b,span,i').forEach(c => c.style.setProperty('font-size', f + 'px', 'important')); } });
 }
 // ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
 // Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
@@ -763,8 +812,23 @@ function pvScrollTo(el) {
   return false;
 }
 // Play view part of fxLand (src/ui3.js): true when it drew the landing
+// G8: the worker settles with a ring; a built card flies into the city (or onto the City tab when the city is not shown)
 function pvLand(m, seat, src, preChip) {
   if (!ANIM || !m || !$('#bd.pv')) return false;
+  const mine = seat === viewSeat();
+  if (m.type === 'worker' && m.k !== 'dest') {
+    const sel = '.tile[data-k="' + (m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k) + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]');
+    const t = $(sel); if (t) setTimeout(() => { pvRing(frameRect(t)); if (mine) PV_FEEL.tick(18); snd('place', { vol: .5 }); }, 520);
+  } else if (m.type === 'play') {
+    const inCity = $('#bd .strip.city .sc[data-id="' + m.card + '"]'), tab = $('#bd .pv-tab[data-v="city"]');
+    const to = inCity ? frameRect(inCity) : mine ? frameRect(tab) : seatRect(seat);
+    const from = src || (mine ? UI.lay && UI.lay.hand : seatRect(seat));
+    if (!inCity && from && to) {
+      const g = h('div.pv-ghost.pv-flycard', pvFace(m.card, { small: true }));
+      fxFly(g, from, to, 620, () => { pvRing(to, 'gold'); if (tab && mine) { tab.classList.remove('bmp'); void tab.offsetWidth; tab.classList.add('bmp'); setTimeout(() => tab.classList.remove('bmp'), 500); } });
+    } else if (inCity) setTimeout(() => pvRing(frameRect(inCity), 'gold'), 600);
+    if (mine) PV_FEEL.tick(22);
+  }
   if (m.type === 'worker' && m.k !== 'dest') {
     const sel = '.tile[data-k="' + (m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k) + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]');
     const t = $(sel), pw = t && t.querySelectorAll('.pw .pawnw'), mine = seat === viewSeat();
@@ -775,4 +839,27 @@ function pvLand(m, seat, src, preChip) {
   }
   if (m.type === 'play') { const el = $('#bd .strip.city .sc[data-id="' + m.card + '"]'); if (el) { if (src) flipFrom(el, src, 620); el.classList.add('pv-new'); setTimeout(() => el.classList.remove('pv-new'), 1500); } return true; }
   return false;
+}
+function pvRing(r, cls) {
+  const L = fxLayer(); if (!L || !ANIM || !r) return;
+  const c = ctr(r), e = h('div.pv-ring' + (cls ? '.' + cls : '')); e.style.left = c.x + 'px'; e.style.top = c.y + 'px'; L.appendChild(e);
+  setTimeout(() => e.remove(), 900);
+}
+// ---- names fit their box: shrink the font a step at a time until no word is cut (never below 9px)
+const FIT_SEL = '#bd .pvc-name, #bd .pvm-name, #bd .pv-sw b, #bd .pv-sw span, #bd .hcn, #bd .tchip b, #pc .ovt th';
+function fitNames(root) {
+  const els = (root || document).querySelectorAll(FIT_SEL);
+  for (const e of els) {
+    if (!e.clientWidth) continue;
+    e.style.fontSize = '';
+    let px = parseFloat(getComputedStyle(e).fontSize) || 14, n = 0;
+    while (n++ < 10 && px > 9 && (e.scrollWidth > e.clientWidth + 1 || longestWord(e) > e.clientWidth + 1)) { px -= 1; e.style.fontSize = px + 'px'; }
+  }
+}
+// width of the longest single word (a word wider than its box is what gets cut)
+const FIT_CV = document.createElement('canvas').getContext('2d');
+function longestWord(e) {
+  const cs = getComputedStyle(e); FIT_CV.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+  let m = 0; for (const w of (e.textContent || '').split(/\s+/)) m = Math.max(m, FIT_CV.measureText(w).width);
+  return m + (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
 }

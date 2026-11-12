@@ -19,7 +19,7 @@ const totals={steps:0,wrong:0,runs:0,ids:[]};
 
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+  await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='gns.test')return r.abort();const f=require('path').join(__dirname,'../../../games/hollowbough',decodeURIComponent(u.pathname));if(u.pathname!=='/'&&require('fs').existsSync(f)&&require('fs').statSync(f).isFile())return r.fulfill({status:200,path:f});return r.fulfill({status:200,contentType:'text/html',body:html})});   // the built page served next to the real media (games/hollowbough)
   const p=await ctx.newPage();p.setDefaultTimeout(15000);
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
   p.on('console',m=>{const t=m.text();if(m.type()==='warning'&&/rejected|gxt/.test(t))note(tag,'console '+t.slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(t))note(tag,'console error '+t.slice(0,160))});
@@ -32,7 +32,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await p.touchscreen.tap(tb[0],tb[1]);await sleep(500);
   await p.evaluate(()=>{AIDELAY=60});
   const state=()=>p.evaluate(()=>GXT.state());
-  const shot=async(n)=>{if(process.env.SHOT&&W===SIZES[0][0]&&H===SIZES[0][1]&&mode==='clean'){fs.mkdirSync(process.env.SHOT,{recursive:true});await p.screenshot({path:path.join(process.env.SHOT,'learn-'+n+'.png')})}};
+  const shot=async(n)=>{if(process.env.SHOT&&W===SIZES[0][0]&&H===SIZES[0][1]&&mode==='clean'){fs.mkdirSync(process.env.SHOT,{recursive:true});await p.screenshot({path:path.join(process.env.SHOT,n+'.png')})}};
   const shotDone=new Set();let lastSig='',lastT=Date.now(),rotated=0,left=false,seenIds=[];
   for(let guard=0;guard<4000;guard++){
     const st=await state();
@@ -55,7 +55,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
         hasData:[...document.querySelectorAll('.gxt-bub,.gxt-cell,.gxt-top,.gxt-ring')].every(e=>e.hasAttribute('data-help'))}});
     const s=info.s,id=s.id;
     totals.steps++;
-    if(wc(info.say)>20)note(tag,id+': say over 20 words ('+wc(info.say)+')');
+    if(wc(info.say)>12)note(tag,id+": say over 12 words ("+wc(info.say)+")");
     if(info.title&&wc(info.title)>4)note(tag,id+': title over 4 words');
     if(!info.say)note(tag,id+': empty text');
     if(info.hs)note(tag,id+': page scrolls sideways');
@@ -78,7 +78,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     }
     if(!s.wait){if(!info.next||!info.nextOk)note(tag,id+': the Next button is missing or covered')}
     // screenshots at 390x763
-    if(!/^Tap (the glowing|Next)/.test(info.say)&&!shotDone.has(id)){shotDone.add(id);if(process.env.SHOT)await sleep(700);await shot(String(s.i).padStart(2,'0')+'-'+id)}
+    if(!/^Tap (the glowing|Next)/.test(info.say)&&!shotDone.has(id)){shotDone.add(id);if(process.env.SHOT)await sleep(700);await shot('tut-'+(s.i+1))}
     // rotations
     if(mode==='rotate'&&rotated===0&&s.id==='berry'){rotated=1;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);
       const r=await state();if(!r.shown||!r.hole)note(tag,'after rotating to landscape the step is not on screen');else await p.screenshot({path:'/tmp/claude-0/tutor_rot_land.png'});continue}
@@ -129,6 +129,11 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     await sleep(40);
   }
   // ---- the end
+  // every core rule is taught, in this order, each as its own step (no "learn later" list)
+  const RULES=['goal','places','twig','stock','rival','resin','hand','build','city','prep','spring','berry','toad','free','event','forest','prep2','summer','haven','journey','inn','special','autumn','pass','score','bonus','end'];
+  if(mode==='clean'){const miss=RULES.filter(r=>!seenIds.includes(r));if(miss.length)note(tag,'rule steps missing: '+miss.join(','));
+    const ord=seenIds.filter(r=>RULES.includes(r));if(ord.join()!==RULES.filter(r=>ord.includes(r)).join())note(tag,'rule steps out of order: '+ord.join(','));
+    const later=await p.evaluate(()=>!!document.querySelector('.hb-later'));if(later)note(tag,'a "learn later" list appeared')}
   const fin=await state();
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
   else if(mode==='story'){
@@ -157,12 +162,13 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
       const ks=e.btns.map(b=>b.k).join();if(ks!=='play,story')note(tag,'end card buttons: '+ks);
       if(!e.inside)note(tag,'end card outside the screen');
       for(const b of e.btns)if(b.r[5]<40)note(tag,'end button too small: '+b.t);
-      await shot('end');
+      await shot('tut-'+(RULES.length+1));
       const play=e.btns.find(b=>b.k==='play');await p.touchscreen.tap((play.r[0]+play.r[2])/2,(play.r[1]+play.r[3])/2);await sleep(500);
       const after=await p.evaluate(()=>({run:GXT.running(),dom:document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length,start:!document.querySelector('#start').hidden,sv:'',
         btn:(document.querySelector('#start [data-gxt-open] b')||{}).textContent,st:JSON.parse(localStorage.getItem('gxt-hollowbough')||'{}'),saved:!!localStorage.getItem('hb_save1')}));
       if(after.run||after.dom)note(tag,'tutorial elements left on screen after the end card ('+after.dom+')');
-      if(!after.start)note(tag,'"Play a real game" did not open the setup screen');
+      const real=await p.evaluate(()=>({g:!!G&&UI.started&&!G.over,mode:UI.mode,tut:!!(UI.cfg&&UI.cfg.tutorial)}));
+      if(!real.g||real.mode!=='vs'||real.tut)note(tag,'"Play a real game" did not start a real game '+JSON.stringify(real));
       
       if(!after.st.done)note(tag,'tutorial not remembered as done');
       if(after.saved)note(tag,'the staged tutorial game was saved as a normal game');
