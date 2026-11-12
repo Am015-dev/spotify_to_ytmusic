@@ -121,10 +121,10 @@ function extrasBoot() {
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', extrasBoot); else setTimeout(extrasBoot, 0);
 
-// ---- 3D Commander lantern (sprite rendered from the full-detail model; Low graphics keeps the drawn icon)
+// ---- 3D Captain lantern (sprite rendered from the full-detail model; Low graphics keeps the drawn icon)
 // seat badge: the lantern sprite, falling back to the drawn icon if the file is missing
 function cmdHTML(sz) { if (lowGfx()) return KIT.cmdSVG({ size: sz }); return '<img class="lan3" src="models/lantern@512.webp" alt="" width="' + (sz + 5) + '" height="' + (sz + 5) + '" decoding="async" draggable="false" onerror="this.outerHTML=KIT.cmdSVG({size:' + sz + '})">'; }
-// at the start of each job hand-out the Commander's lantern swings in and glows over the felt for a moment
+// at the start of each job hand-out the Captain's lantern swings in and glows over the felt for a moment
 let lanKey = '';
 function lanternReveal(geo) {
   if (!G || G.phase !== 'assign' || G.cap < 0 || lowGfx()) return;
