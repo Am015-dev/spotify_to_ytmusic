@@ -126,14 +126,19 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+// a fast tap (the right one, but while the step is still appearing) is never lost: it is kept and replayed once the step can take it (no input race can wedge the tutorial)
+function tutEarly(a){try{const st=GXT.current(),S=GXT.state();if(!st||!st.wait||!S.active)return false;if(S.phase!=='show'&&S.phase!=='pend'&&S.phase!=='gap')return false;return !st.wait.match||!!st.wait.match(a)}catch(e){return false}}
+document.addEventListener('pointerdown',e=>{UI._lastPt=[e.clientX,e.clientY]},true);
+function tutQueue(fn){clearTimeout(UI._tutQT);try{if(UI._lastPt&&typeof tapRing==='function')tapRing(UI._lastPt[0],UI._lastPt[1])}catch(e){}const t0=Date.now();const go=()=>{if(!tutOn())return;if(Date.now()-t0>2500)return;if(fn()===false)UI._tutQT=setTimeout(go,120)};UI._tutQT=setTimeout(go,120)}
 (function(){const o=humanMove;humanMove=function(k){
-  if(tutOn()&&!UI._tutIn){const s=viewSeatForQ();const mv=s!=null?legal(s).find(m=>m.k===k):null;if(!GXT.act({type:'tap',what:'move',k,kind:G.q&&G.q.kind,mv}))return false}
+  if(tutOn()&&!UI._tutIn){const s=viewSeatForQ();const mv=s!=null?legal(s).find(m=>m.k===k):null;const a={type:'tap',what:'move',k,kind:G.q&&G.q.kind,mv};
+    if(!GXT.act(a)){if(mv&&tutEarly(a))tutQueue(()=>{const s2=viewSeatForQ();if(s2==null||!legal(s2).some(m=>m.k===k))return true;return humanMove(k)!==false});return false}}
   return o(k)}})();
 (function(){const o=handTap;handTap=function(id){
   if(tutOn()){const M=UI.bf;const commit=!!(M&&cardDriven(M)&&UI.hand===id&&cardMoves(id).length===1);
-    if(!commit&&!GXT.act({type:'tap',what:'select',id}))return}
+    if(!commit){const a={type:'tap',what:'select',id};if(!GXT.act(a)){if(tutEarly(a)){tutQueue(()=>{if(UI.hand===id)return true;const S=GXT.state();if(S.phase!=='show')return false;if(!GXT.act(a))return false;o(id);return true})}return}}}
   return o(id)}})();
 (function(){const o=orderTap;orderTap=function(r){
-  if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;if(!GXT.act({type:'tap',what:'order',r}))return;
+  if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;const a={type:'tap',what:'order',r};if(!GXT.act(a)){if(tutEarly(a)){const i0=GXT.index(),c0=GXT.state().count;tutQueue(()=>{const T=GXT.state();if(!T.active||T.i!==i0||T.count!==c0)return true;if(T.phase!=='show')return false;if(!GXT.act(a))return false;UI._tutIn=1;try{o(r)}finally{UI._tutIn=0}return true})}return}
     UI._tutIn=1;try{return o(r)}finally{UI._tutIn=0}}
   return o(r)}})();
