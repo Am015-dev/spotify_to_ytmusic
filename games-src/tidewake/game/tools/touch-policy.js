@@ -5,7 +5,7 @@
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const gx=require('../../../scripts/gx-serve.js');const path=require('path');
 const FILE=process.argv[2]||path.join(__dirname,'..','tidewake.html');
-let fail=0;const STAR=[];let DEATH=null;const bad=m=>{fail++;console.log('FAIL',m)};
+let fail=0;const STAR=[];let DEATH=null,START='';const bad=m=>{fail++;console.log('FAIL',m)};
 async function tapEl(p,loc){const b=await loc.boundingBox();if(!b)return false;const x=b.x+b.width/2,y=b.y+b.height/2;
   const top=await p.evaluate(([x,y,sel])=>{const e=document.elementFromPoint(x,y);return !!e},[x,y]);if(!top)return false;await p.touchscreen.tap(x,y);return true}
 // one decision per call: returns what it tapped (or '')
@@ -13,7 +13,7 @@ async function step(p){
   const vis=async sel=>{const l=p.locator(sel+':visible');return (await l.count())?l.first():null};
   let e;
   for(const sel of ['[data-a=sunkok]','[data-ph=dismiss]','[data-a=q]','.gxh-btn:has-text("Got it")','button:has-text("Got it")','[data-ph=showover]']){if((e=await vis(sel))&&await tapEl(p,e))return sel}
-  if(process.env.POLICY==='star'&&(e=await vis('button.pb[data-a=startmark]'))){if(await tapEl(p,e))return 'startmark'}
+  if(process.env.POLICY==='star'&&(e=await vis('button.pb[data-a=startmark]'))){const al=await e.getAttribute('aria-label');if(await tapEl(p,e)){START=al;return 'startmark'}}
   if(e=await vis('[data-a=startmark]')){if(await tapEl(p,e))return 'startmark'}
   const st=await p.evaluate(()=>({over:!!(G&&G.over),phase:G&&G.phase,busy:!!UI.busy,me:typeof sideToAct==='function'?sideToAct():-9,place:!!document.querySelector('[data-a=place]:not([disabled])')}));
   if(!DEATH){const dd=await p.evaluate(()=>G.ships[0].alive?null:{turn:G.turn,out:G.ships[0].out});if(dd)DEATH=dd}
@@ -53,9 +53,9 @@ async function drive(p,name,maxMs){const t0=Date.now();let idle=0,last='';const 
       for(let i=0;i<16;i++){const up=await p.evaluate(()=>typeof G!=='undefined'&&!!G&&!!G.phase&&!!UI.started&&!document.querySelector('.gxc'));if(up)break;
         const bt=p.locator('.gxc button:visible').filter({hasNotText:/Back|Close|Skip|×|‹/});
         if(!await bt.count()){await p.waitForTimeout(500);continue}await bt.last().tap();await p.waitForTimeout(800)}}
-    STAR.length=0;DEATH=null;const r=await drive(p,mode,240000);
+    STAR.length=0;DEATH=null;START='';const r=await drive(p,mode,240000);
     {const d2=await p.evaluate(()=>G.ships[0].alive?null:{turn:G.turn,out:G.ships[0].out});if(!DEATH&&d2)DEATH=d2}
-    STAR.forEach((x,i)=>{const nx=STAR[i+1];const lev=DEATH&&/crushed|blocked/.test(DEATH.out)&&!nx;console.log('  STAR turn',x.turn,'said:',x.t.replace(/\s+/g,' ').slice(0,170),'| outcome:',nx?'afloat at my next turn':DEATH?('sunk ('+DEATH.out+')'+(lev?' by a leviathan':'')):'game ended, still afloat')});
+    console.log('  START said:',(START||'-').slice(0,120),'| first-turn outcome:',STAR.length?'afloat at my first turn':DEATH?'sunk ('+DEATH.out+')':'-');STAR.forEach((x,i)=>{const nx=STAR[i+1];const lev=DEATH&&/crushed|blocked/.test(DEATH.out)&&!nx;console.log('  STAR turn',x.turn,'said:',x.t.replace(/\s+/g,' ').slice(0,170),'| outcome:',nx?'afloat at my next turn':DEATH?('sunk ('+DEATH.out+')'+(lev?' by a leviathan':'')):'game ended, still afloat')});
     const res={win:await p.evaluate(()=>!!(G.over&&G.over.win.includes(0))),secs:(Date.now()-T0)/1000,pl:r.seen.place||0};GL.push(res);console.log(process.env.POLICY,process.env.SIZE,mode,'win='+res.win,'placements='+res.pl,'secs='+((Date.now()-T0)/1000).toFixed(0),'turn='+(await p.evaluate(()=>G.turn)),r.ok?'PASS':'FAIL',JSON.stringify(r.seen),errs.length?'ERR '+errs.slice(0,2):'0 console errors');if(errs.length)bad(mode+' console errors');
     await p.screenshot({path:path.join(__dirname,'..','out-'+process.env.POLICY+'-'+process.env.SIZE+'-'+GL.length+'.png')}).catch(()=>{});await c.close()}
   const W=GL.filter(x=>x.win).length;console.log('SUMMARY',process.env.POLICY,process.env.SIZE,'games',GL.length,'wins',W,'avg secs',(GL.reduce((a,x)=>a+x.secs,0)/GL.length).toFixed(0),'placements',GL.map(x=>x.pl).join(','));await b.close();process.exit(fail?1:0)})();
