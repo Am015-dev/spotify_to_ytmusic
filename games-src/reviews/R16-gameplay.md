@@ -8,7 +8,7 @@ hooks for speed). The real rulebooks were read online; notes stayed local. Shots
 |---|---|---|---|
 | kaiten-kitchen | 7.8 | PASS | 5 Phone 7, 6 AI/pacing 7 |
 | stitchwise | 7.0 | FAIL | 5 Phone 6 |
-| emberclimb | see section 3 | | |
+| emberclimb | 6.5 | FAIL | 1 Rules 6, 4 Turn clarity 6, 5 Phone 6, 6 AI/pacing 6 |
 
 ---
 
@@ -85,3 +85,52 @@ ghost lands, Rotate up to 3 times, else Advance. 390: 15 of my turns. 375: 19 of
 - Row 4. Did: a turn at 375 where nothing fit. Happened: the line reads "No patch fits. Tap" and is cut by the Advance button. Shot: sw-06-prompt-cut-375.png
 - Row 5. Did: advanced in the game and in the tutorial. Happened: the "+2 buttons" pop sits on the Rules and Menu buttons. Shots: sw-01-tut-leather-tag-cut-390.png, sw-05-game-375.png
 - Row 6. Did: timed the rival. Happened: 2.3-2.7 s median, slower than R7's 1.1 s but brisk enough. Lost 6-19 at 375. Shot: sw-07-result-375.png
+
+---
+
+## 3. emberclimb (shelf/W485-emberclimb-bench @ 57f9dae0)
+
+Played: "New here? Learn in 5 minutes" from fresh storage by touch at 390 and at 375, then the coached climb it turns into, to the
+result: fight, reward, map, campfire, shop, two-foe elite, the boss, "CLIMB WON!" (390: 35/88 HP, 2.2 min; 375: 48/80 HP, 4.2 min),
+then the "What you did" end card. My taps: a random playable card, a random glowing target, End turn when nothing fits, a random glowing
+room, rest at campfires, leave shops. 0 page errors, 0 console errors, 0 stuck states. Quick game setup opened at 375. Text sizes, the
+reward screen at 375 and the optional two-hero fight were measured on the game's own ?scn= scenes.
+
+**Rules check (rest).** The published tabletop rulebook's campfire says "Rest: Heal 3 HP" (Smith upgrades a card instead). The printed
+hero boards start at about 10 HP, so a rest gives back about 30% of a hero. This game uses 80 HP heroes, so the faithful translation is
+the share, not the number: **30% of max HP (24 at 80 HP), as the latest fixer did, is right**. The earlier "heal 3, scaled to 9" used a
+x3 scale while HP is scaled about x8, which made rests worth 11% instead of 30%. Damage is still on a third scale (cards deal 6-12,
+Weak takes off 3), so the scaling stays mixed.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 6 | Rest is now right (see above). Vulnerable doubles, Weak takes off a step, potions Drink, elites, shop, relics, the boss. But scales are still mixed (80 HP, 6-12 damage, Weak -3 on a 6-damage Strike = half, on the table -1 on a 1-damage Strike = all of it). The boss line says it "splits when it falls"; I could not confirm the tabletop timing online and did not see a split happen on screen. |
+| 2 | Tutorial teaches | 7 | Fixed: every room is met by doing on a real 7-floor climb (event, chest, campfire, shop, two-foe elite, boss), one line + one tap per step, and no "meet later" list. Still 3 Next-only lines (goal, energy, map). The end card is a 26-bullet checklist, a wall of text after the win. |
+| 3 | First 10 seconds | 7 | Big "New here? Learn in 5 minutes" button; step 1 points at the boss's intent with "Goal: beat the boss on top." |
+| 4 | Turn clarity | 6 | "Incoming 5" on the hero, glowing playable cards. But the prompt pill "Tap a glowing card to pick it. You have 3 energy." sits on the enemy's intent icon at the top (and repeats in the bottom bar), and coach toasts ("A relic: a lasting bonus...") cover HP, gold, Hints and Rules. |
+| 5 | Phone play | 6 | Fixed: text 14 px+ (measured), hand inside the screen at 375 (x 6..368), potions 44x44. Not fixed: coach toasts over the top bar; at 375 the second elite foe is cut at the right edge; reward card text is cut ("Deal 7. Channel..."); on the result the deck grid runs under Play again / Title. In the optional two-hero mode 7 cards overlap so names read "uic ut", and the third foe is cut off. |
+| 6 | AI and pacing | 6 | Foe turns are quick and the tutorial climb was won at both sizes. Quick game still defaults to "3 acts" (long for a phone); "1 act" is not offered on the hero screen at 375 next to it. |
+| 7 | Feel | 7 | "+2 Dazed" splash, damage pops, cards fly, "Good fight: lost 0 HP" grade, boss art, "CLIMB WON!". |
+| 8 | Bugs | 7 | Two full climbs: 0 errors, 0 stuck, 0 dead taps. A stale coach toast ("The boss: when it falls, it splits into slimes") pops up on the result screen over "CLIMB WON!". |
+| | **Total** | **6.5** | **FAIL**: rows 1, 4, 5 and 6 are below 7. No stopper. |
+
+### Earlier findings (R7)
+| R7 finding | Status | Evidence |
+|---|---|---|
+| Row 2: "24 of 34" and a 10-item "meet later" list | **Fixed**: "What you did on this climb" checklist, no later list (but 26 bullets long) | R16-shots/ember-06-endcard-wall-390.png |
+| Row 1: "Rest: heal 9" (11%) | **Fixed**: "Rest: heal 24" (30%), which matches the rulebook's share | ember-04-rest-heal-24-390.png |
+| Row 5: edge cards off screen at 375 | **Fixed** (6..368 on a 375 screen) | ember-12-fight-hand-375.png |
+| Row 5: relics under result buttons, toast over "Final deck" | **Partly fixed**: relics are a count in the summary; deck grid still under the buttons; a coach toast now covers "CLIMB WON!" | ember-09-result-stale-toast-375.png |
+| Row 4/5: raised card covers foe HP and End turn | **Not re-checked** (my taps play the card at once) | n/a |
+| Row 8: reward layout jumps after taking the potion | **Not reproduced**: took the item, then a card, both landed | ember-07-reward-390.png |
+| Row 6: "3 acts" is the Quick game default | **Not fixed** | ember-13-quick-3acts-default-375.png |
+| Row 4: bet event "Nothing changed" | **Not seen** (no bet event on these climbs) | n/a |
+
+### New findings
+- Row 4/5. Did: opened a normal fight at 390. Happened: the prompt pill covers the enemy's intent icon at the top of the stage. Shot: R16-shots/ember-03-fight-prompt-over-intent-390.png
+- Row 4/5. Did: entered the elite fight. Happened: a coach toast covers HP, gold, Hints and Rules; at 375 the second Iron Warden is cut at the right edge. Shots: ember-05-elite-toast-over-topbar-390.png, ember-08-elite-375.png
+- Row 8/5. Did: won the climb at 375. Happened: a stale boss tip covers "CLIMB WON!", and the deck grid runs under Play again / Title. Shot: ember-09-result-stale-toast-375.png
+- Row 5. Did: opened a card reward at 375. Happened: "Ball Lightning" text is cut after "Deal 7. Channel". Shot: ember-10-reward-text-cut-375.png
+- Row 2. Did: finished the climb. Happened: the end card is a 26-bullet list to read. Shot: ember-06-endcard-wall-390.png
+- Row 2. Did: tutorial step 1. Happened: a Next button, not a tap on the board (also step 2 and the map step). Shot: ember-01-tut-step1-next-390.png
+- Row 5. Did: the optional "+ Second hero" fight at 375. Happened: 7 overlapping cards with names cut ("uic ut"), third foe cut. Shot: ember-11-two-heroes-375.png
