@@ -58,6 +58,7 @@ function render() {
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
   glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
+  if (UI.pend) [40, 160, 420].forEach(function (ms) { setTimeout(function () { try { if (UI.pend) dockToActs(); } catch (e) { } }, ms); });   // late layout (card art, the chosen card's scroll) must not push Play/Cancel out of the panel
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
@@ -123,6 +124,7 @@ function renderDock(p, vs, cur) {
   document.body.classList.toggle('deciding', !!(mine && Q));
   document.body.classList.toggle('picking', !!(mine && !Q && (UI.pickBird || UI.sel != null)));
   $('#prompt').textContent = promptText(mine);
+  document.body.classList.toggle('confirming', !!(mine && UI.pend));   // the confirm's hint rides inside #acts (in flow, above Play/Cancel), never as the sticky line over them
   setH($('#acts'), mine ? (idle ? act4HTML() : actsHTML()) : '');
   var have = PP.FOODS.filter(function (f) { return p.food[f]; });
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
@@ -189,7 +191,7 @@ function actsHTML() {
   if (UI.pend) {
     var inf = PP.playInfo(G, UI.view, p.hand[UI.pend.i], UI.pend.h, Q && Q.h === 'play2' ? Q.d.hab : null); if (!inf) { UI.pend = null; return ''; }
     var pay = inf.pays[UI.pend.k % inf.pays.length], paid = PP.FOODS.filter(function (f) { return pay[f]; }).map(function (f) { return new Array(pay[f] + 1).join(foodIcon(f)); }).join('');
-    return '<button type="button" class="btn pri" data-a="playgo">Play: ' + (paid || 'free') + (inf.eggs ? ' + ' + inf.eggs + eggIcon() : '') + '</button>' +
+    return '<div class="cfhint">' + esc(promptText(true)) + '</div><button type="button" class="btn pri" data-a="playgo">Play: ' + (paid || 'free') + (inf.eggs ? ' + ' + inf.eggs + eggIcon() : '') + '</button>' +
       (inf.pays.length > 1 ? '<button type="button" class="btn" data-a="paycycle">Other food</button>' : '') + '<button type="button" class="btn" data-a="cancel">Cancel</button>';
   }
   if (UI.gsDie != null) return mvBtn({ t: 'die', i: UI.gsDie, f: 'grub' }, foodIcon('grub') + 'Grub') + mvBtn({ t: 'die', i: UI.gsDie, f: 'seed' }, foodIcon('seed') + 'Seed') + '<button type="button" class="btn" data-a="cancel">Back</button>';

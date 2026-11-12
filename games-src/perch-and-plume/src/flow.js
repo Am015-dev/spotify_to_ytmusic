@@ -12,7 +12,7 @@ document.addEventListener('click', function (e) {
   if (!G) return;
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
   // your choice is pending but your birds are still animating: keep the tap and apply it the moment they finish (never a dead tap)
-  if (!mine && UI.busy && (Q || /^(ract|slot|playgo|a4|hand)$/.test(a)) && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv|ract|slot|playgo|a4)$/.test(a) && !t.closest('#pop')) {
+  if (!mine && UI.busy && (Q || /^(ract|slot|playgo|a4|hand)$/.test(a) || (a === 'bird' && t.classList.contains('glow'))) && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv|ract|slot|playgo|a4)$/.test(a) && !t.closest('#pop')) {
     var sel = '[data-a="' + a + '"]' + ['i', 'h', 'c', 'm', 'k'].map(function (k) { return t.dataset[k] != null ? '[data-' + k + '="' + String(t.dataset[k]).replace(/["\\]/g, '\\$&') + '"]' : ''; }).join(''), n = 0;
     t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse');
     (function later() { if (UI.busy && n++ < 60) { setTimeout(later, 80); return; } var x = myTurn() && document.querySelector(sel); if (x) x.click(); })();
