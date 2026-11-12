@@ -16,13 +16,20 @@ function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementByI
   e.innerHTML=why?'<span>'+esc(why)+'</span>':'<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>';document.body.appendChild(e);PLQB=true;
   const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;const land=document.documentElement.classList.contains('land');e.style.left=(land?Math.max(6,Math.min(innerWidth-w-6,r.left)):Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)))+'px';e.style.top=(land?Math.round(innerHeight*.58):tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
-// R20: every score pop says who and why in plain grammar ("You lose 3 pts: spent 3 coins", "Teal: +2 pts, earned 2 coins")
-const PL_PART={coins:['coins','coin'],advisors:['Advisor points','Advisor point'],sages:['Sage points','Sage point'],crafters:['Crafter points','Crafter point'],djinns:['djinn points','djinn point'],palms:['palm points','palm point'],palaces:['palace points','palace point'],goods:['goods points','goods point'],items:['item points','item point'],cities:['city points','city point'],tiles:['tile points','tile point']};
-function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const who=you?'You':p.nm;const keys=Object.keys(PL_PART).filter(k=>a&&b&&(b[k]||0)!==(a[k]||0)).sort((x,y)=>Math.abs(b[y]-a[y])-Math.abs(b[x]-a[x]));
-  const e=G.log[0];const k=keys[0];const ch=k?b[k]-a[k]:d;const n=Math.abs(ch);const nm=k?PL_PART[k][n===1?1:0]:'pts';
-  let why;if(k==='coins')why=ch<0?'spent '+n+' '+nm:'earned '+n+' '+nm;else if(k==='sages'&&ch<0)why='Sages used';else if(k==='advisors'&&ch<0)why=ch<=-10?'lost the Advisor lead':'lost an Advisor';else if(k)why=(ch<0?'lost ':'got ')+n+' '+nm;else why='';
-  if(d>0&&e&&e.c!=='turn'&&e.c!=='round'&&e.t.indexOf(p.nm)===0){const t=plShort(e.t);if(t.split(' ').length<=9)why=t.replace(/^(You|Your)\s+/,'').split(p.nm+"'s ").join('').replace(new RegExp('^'+p.nm+'\\s+'),'')}
-  const pts=Math.abs(d)+' pt'+(Math.abs(d)===1?'':'s');return (you?(d>0?'You score ':'You lose '):(p.nm+(d>0?' scores ':' loses ')))+pts+(why?': '+why:'')}
+// R25: every score pop's number is the sum of the reasons it names. One part changed: "You lose 3 pts: spent 3 coins" /
+// "Teal scores 5 pts from palaces". Several parts: "You score 2 pts: palaces +5, coins \u22123" (the listed numbers add up to the headline).
+const PL_LAB={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',palms:'palms',palaces:'palaces',goods:'goods sets',items:'treasures',cities:'cities',tiles:'tiles held'};
+function plParts(a,b,hideItems){return Object.keys(PL_LAB).filter(k=>!(hideItems&&k==='items')&&a&&b&&(b[k]||0)!==(a[k]||0)).map(k=>[k,(b[k]||0)-(a[k]||0)]).sort((x,y)=>Math.abs(y[1])-Math.abs(x[1]))}
+function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);
+  const head=(you?(d>0?'You score ':'You lose '):(p.nm+(d>0?' scores ':' loses ')))+n+' pt'+(n===1?'':'s');
+  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head;
+  if(ps.length===1){const [k,c]=ps[0];const m=Math.abs(c);
+    if(k==='coins')return head+(c<0?': spent ':': earned ')+m+' coin'+(m===1?'':'s');
+    if(k==='sages'&&c<0)return head+': used Sages';
+    if(k==='goods'&&c<0)return head+': goods sold';
+    if(k==='advisors'&&c<0)return head+(c<=-10?': lost the Advisor lead':': fewer Advisors');
+    return head+' from '+PL_LAB[k]}
+  return head+': '+ps.map(([k,c])=>PL_LAB[k]+' '+(c>0?'+':'\u2212')+Math.abs(c)).join(', ')}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
   if(PL.seed!==G.seed){PL.seed=G.seed;PL.logN=G.logN;PL.tot=null;if(!G.tut&&!G.coach&&!G.over&&!(UI.camp))plBanner('Bid for turn order',LORE.quickIntro,'')}

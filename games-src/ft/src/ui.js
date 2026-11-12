@@ -54,7 +54,7 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camels left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
@@ -177,6 +177,7 @@ function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTime
 function toast(t){const el=$('#line');if(!el)return;el.textContent=t;clearTimeout(UI.tt);UI.tt=setTimeout(()=>{if(G)renderLine()},1800)}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-tile],[data-seat],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.chz!=null){const c=UI.chz;if(c&&c.opts[+d.chz])go(c.opts[+d.chz].m);return}
+  if(UI.chz&&!b.closest('#chz')){UI.chz=null;render();return}   // R25: while a chooser is open everything else is dimmed; a tap there just closes the chooser
   if(d.mv){const m=JSON.parse(d.mv);if(m.ui)return uiAct(m.ui);if(m.act==='sell')UI.sellSel=[];if(typeof sfx==='function')sfx('click');return go(m)}
   if(d.tile!=null)return onTile(+d.tile);
   if(d.seat!=null)return onSeat(+d.seat);

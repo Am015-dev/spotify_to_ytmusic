@@ -396,3 +396,8 @@ body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!
 
 /* round 2: quiet dear bids, best chooser tag */
 .sp-b.dear{opacity:.62;border-color:#b08a5a}.chb .chbest{display:block;font:800 14px/1 var(--ff-b,system-ui);color:#1f6a2a;margin-top:2px}
+
+/* R25: while a chooser is open only the chooser and its tile/card stay lit; everything else is dimmed and stops glowing */
+html.chzon .glow:not(.chb):not(.chzanc){animation:none!important;outline:0!important;box-shadow:none!important}
+html.chzon #grid .tile:not(.chzanc),html.chzon .dcard:not(.chzanc),html.chzon .mcard:not(.chzanc),html.chzon .sch:not(.chzanc),html.chzon .sp-b,html.chzon #acts button,html.chzon #mine .glow{filter:saturate(.4) brightness(.6)!important;transition:filter .15s}
+html.chzon #chz{z-index:60}

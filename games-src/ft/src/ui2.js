@@ -47,7 +47,7 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
-    if(G&&G.over)return;   // no score chips over the result card; the chip sits under the seat, never over its name and coins
+    if(G&&G.over)return;if(G&&!G.coach&&!G.tut)return;   // R25: in Play the seat's labelled pop (playable.js) says it once; no second chip. No score chips over the result card; the chip sits under the seat, never over its name and coins
     const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
     const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
 // the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
@@ -57,9 +57,9 @@ function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;try{adv=typeo
   const ms=c.opts.map(o=>o.m);if(ms.every(m=>m.act==='tribe'&&m.kill)){const b=bestKill(hp,ms);const j=ms.indexOf(b);if(j>=0)return j}}catch(e){}return 0}
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
-function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;if(!c||!G){el.hidden=true;el.innerHTML='';return}
+function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;for(const q of document.querySelectorAll('.chzanc'))q.classList.remove('chzanc');document.documentElement.classList.remove('chzon');if(!c||!G){el.hidden=true;el.innerHTML='';return}
   const bi=chzBest(c);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
-  const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}
+  const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}ae.classList.add('chzanc');document.documentElement.classList.add('chzon');   // R25: only the chooser and its tile stay lit
   const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
   el.style.left=x+'px';el.style.top=y+'px'}
 // ---------- the ghost finger: shows one real, legal move to the new player, and stays away after a few moves ----------
