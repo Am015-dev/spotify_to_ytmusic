@@ -6,8 +6,8 @@
   W.CARDSX = {
     bear: { b: { title: 'Bear Trios', rule: 'Each group of exactly 3 bears scores 10.' }, c: { title: 'Mixed Dens', rule: 'Groups of 1, 2 or 3 bears score 2, 5, 8; +3 for one of each size.' }, d: { title: 'Big Dens', rule: 'Groups of 2, 3 or 4 bears score 5, 8, 13.' } },
     elk: { b: { title: 'Elk Herds', rule: 'Shapes of 1, 2, 3 (triangle) or 4 (diamond) elk score 2, 5, 9, 13.' }, c: { title: 'Elk Meadow', rule: 'Any connected group of elk scores by size: 2, 4, 7, 10, 14, 18, 23, 28.' }, d: { title: 'Elk Rings', rule: 'Elk curled around one space score by size: 2, 5, 8, 12, 16, 21.' } },
-    salmon: { b: { title: 'Short Runs', rule: 'Salmon runs (each touching at most 2 salmon) of 1-5+: 2, 4, 9, 11, 17.' }, c: { title: 'Long Runs', rule: 'Only runs of 3, 4 or 5+ salmon score: 10, 12, 15.' }, d: { title: 'Busy Rivers', rule: 'Each run scores 1 per salmon plus 1 per other animal touching it.' } },
-    hawk: { b: { title: 'Watching Hawks', rule: 'Lone hawks that can see another hawk in a straight line: 2-8+ score 5, 9, 12, 16, 20, 24, 28.' }, c: { title: 'Sight Lines', rule: 'Each straight line of sight between two hawks scores 3.' }, d: { title: 'Hawk Pairs', rule: 'Pairs of hawks in sight score 4, 7, 9, 11 for 1-4 kinds of animals between them.' } },
+    salmon: { b: { title: 'Short Runs', rule: 'Salmon runs (each touching at most 2 salmon) of 1-5+: 2, 4, 9, 11, 17.' }, c: { title: 'Long Runs', rule: 'Only runs of 3, 4 or 5+ salmon score: 10, 12, 15.' }, d: { title: 'Busy Rivers', rule: 'Each run of 3+ salmon scores 1 per salmon plus 1 per other animal touching it.' } },
+    hawk: { b: { title: 'Watching Hawks', rule: 'Lone hawks that can see another hawk in a straight line: 2-8+ score 5, 9, 12, 16, 20, 24, 28.' }, c: { title: 'Sight Lines', rule: 'Each straight line of sight between two hawks scores 3.' }, d: { title: 'Hawk Pairs', rule: 'Pairs of hawks in sight score 4, 7, 9 for 1, 2, 3+ kinds of animals between them.' } },
     fox: { b: { title: 'Fox Pairs Seen', rule: 'Each fox: 3, 5, 7 for 1, 2, 3 kinds of animal pairs next to it (not foxes).' }, c: { title: 'Fox Favourite', rule: 'Each fox: 1 point per animal of the most common kind next to it (not foxes).' }, d: { title: 'Fox Dens', rule: 'Each pair of foxes: 5, 7, 9, 11 for 1-4 kinds of animal pairs around it (not foxes).' } }
   };
   W.cardInfo = function (a, set) { return !set || set === 'a' ? W.CARDS[a] : W.CARDSX[a][set]; };
@@ -54,14 +54,14 @@
     } else if (a === 'salmon') {
       runs(env).forEach(function (g) { var n = g.length, p = 0;
         if (set === 'b') p = T([0, 2, 4, 9, 11, 17], n); if (set === 'c') p = n >= 3 ? T([0, 0, 0, 10, 12, 15], n) : 0;
-        if (set === 'd') { var ad = {}; g.forEach(function (x) { nb(x).forEach(function (y) { if (env[y] && env[y].tok && env[y].tok !== 'salmon') ad[y] = 1; }); }); p = n + Object.keys(ad).length; }
+        if (set === 'd') { var ad = {}; g.forEach(function (x) { nb(x).forEach(function (y) { if (env[y] && env[y].tok && env[y].tok !== 'salmon') ad[y] = 1; }); }); p = n >= 3 ? n + Object.keys(ad).length : 0; }
         if (p) { v += p; lit = lit.concat(g); } });
     } else if (a === 'hawk') {
       var hs = cells(env, 'hawk');
       if (set === 'b') { var q = hs.filter(function (x) { return !nb(x).some(function (y) { return tokAt(env, y, 'hawk'); }) && sight(env, x).some(function (s) { return s.between.length > 0; }); }); lit = q; v = q.length >= 2 ? T([0, 0, 5, 9, 12, 16, 20, 24, 28], q.length) : 0; }
       if (set === 'c') { var seen = {}; hs.forEach(function (x) { sight(env, x).forEach(function (s) { var key = [x, s.c].sort().join('|'); if (!seen[key] && s.between.length) { seen[key] = 1; v += 3; lit.push(x, s.c); } }); }); }
       if (set === 'd') { var used = {}, pairs = []; hs.forEach(function (x) { sight(env, x).forEach(function (s) { if (x < s.c && s.between.length) { var kinds = {}; s.between.forEach(function (y) { var t = env[y].tok; if (t && t !== 'hawk') kinds[t] = 1; }); pairs.push({ a: x, b: s.c, n: Object.keys(kinds).length }); } }); });
-        pairs.sort(function (p1, p2) { return p2.n - p1.n; }).forEach(function (p1) { if (used[p1.a] || used[p1.b] || !p1.n) return; used[p1.a] = used[p1.b] = 1; v += T([0, 4, 7, 9, 11], p1.n); lit.push(p1.a, p1.b); }); }
+        pairs.sort(function (p1, p2) { return p2.n - p1.n; }).forEach(function (p1) { if (used[p1.a] || used[p1.b] || !p1.n) return; used[p1.a] = used[p1.b] = 1; v += T([0, 4, 7, 9], p1.n); lit.push(p1.a, p1.b); }); }
     } else if (a === 'fox') {
       var fx = cells(env, 'fox');
       if (set === 'b' || set === 'c') fx.forEach(function (x) { var p = 0, ar = nb(x);

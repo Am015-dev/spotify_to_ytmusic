@@ -15,7 +15,7 @@ const path = require('path'), { chromium } = require(process.env.PW || 'playwrig
     await p.waitForFunction(() => document.querySelector('#goB') && !UI.busy, null, { timeout: 60000 });
     for (let i = 0; i < 4 && await p.evaluate(() => document.querySelector('#goB').disabled); i++) await tap('#hand .cd.glow');
     const round = await p.evaluate(() => G.round); ok(await tap('#goB'), 'round ' + round + ': cards and Go by touch');
-    for (let t = 0; t < 400; t++) { if (await p.locator('#slipN').count()) await tap('#slipN'); if (await p.evaluate(r0 => G.round > r0 && !UI.busy && !!document.querySelector('#goB'), round)) break; await p.waitForTimeout(100); }
+    for (let t = 0; t < 400; t++) { if (await p.locator('#slipN').count()) await tap('#slipN'); if (await p.locator('#boostN').count()) await tap('#boostN'); if (await p.locator('#discN').count()) await tap('#discN'); if (await p.evaluate(r0 => G.round > r0 && !UI.busy && !!document.querySelector('#goB'), round)) break; await p.waitForTimeout(100); }
   }
   ok(await tap('#hintT'), 'touch the Hints toggle'); ok(await p.evaluate(() => !!document.querySelector('#sugB') && !document.getElementById('bulbbtn').hidden), 'Hints on shows Suggest and the bulb');
   ok(blocked === 0, 'no touch landed on a covering element (' + blocked + ')'); ok(errs.length === 0, '0 page errors ' + errs.slice(0, 1).join(''));

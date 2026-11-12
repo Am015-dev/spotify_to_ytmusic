@@ -5,31 +5,67 @@ official rules as I know them. I cannot open the rulebook from this container, s
 numbers with confidence; "UNCHECKED" means I could not recall the official number with confidence, so it was left alone (nothing invented).
 Names in the game are all original; this file uses plain rule terms only.
 
+## One scale (R16, Nov 2026): every number = tabletop number x SCALE (8)
+The re-review found three scales mixed (HP x8, damage ~x5, Weak/Shiv/rest x3). Now ONE constant, `D.SCALE = 8` (data.js), applies to
+every number: damage, Block, HP, healing, HP loss, Weak, Wrath, Shiv, orb values, poison per token, relic/potion/event numbers and gold.
+Token counts (Strength, Weak, Vulnerable, Poison, Frail, Ritual) stay tabletop counts; each Strength or Poison token is worth SCALE.
+Tests: rules-test.js R28 (every number in cards, upgrades, enemies, heroes, events, shop and start gold is a multiple of SCALE; anchors
+Strike/Defend/Shiv = 1 unit, hero 10 units) plus the scaled R02-R27 checks; logic-test.js 70 rules use SCALE too.
+
+| Value | Tabletop source | Shelf (x8) |
+|---|---|---|
+| Strike / Defend | starter cards: deal 1 / gain 1 Block | 8 / 8 |
+| Heavy starter attack (Warrior) | 2 damage + Vulnerable | 16 + 2 Vulnerable tokens |
+| Shiv | deal 1 | 8 |
+| Weak | attacker deals 1 less per hit (floor 0) | -8 per hit (so a Weak Strike deals 0, as on the table) |
+| Vulnerable | the hit is doubled | x2 (a multiplier, not scaled) |
+| Strength | +1 damage per hit per token | +8 per hit per token |
+| Wrath | +1 damage per hit dealt; ending a turn in it costs 1 HP | +8 / 8 HP |
+| Poison | 1 HP per token at the end of the heroes' turn | 8 HP per token |
+| Hero HP | printed boards about 10 (Warrior) / 9 | 80 / 72 / 72 / 72 |
+| Rest | Heal 3 | 24 (= 30% of the 80 HP Warrior, as the reviewer confirmed) |
+| Block cap / Strength cap / debuff cap | 20 / 8 tokens / 3 tokens | 160 / 8 / 3 |
+| Orbs | Lightning 1 (evoke 2), Frost 1 Block (evoke 1), Dark +1 per turn (evoke 1 + stored), Focus +1 | x8 |
+| Burn / Regret | 1 HP / 1 HP per card held | 8 / 8 per card |
+| Gold | coins: common card 2, uncommon 3, rare 6, relic 6 (uncommon 9), potion 2, removal 3, start 4; monster 1, elite 1-2, boss 2-4, chest 1-2 | coins x8 |
+
+Card, enemy, relic, potion and event numbers that I could not check against a printed copy (this container cannot open the rulebook)
+were written in video-game sizes and are converted once at load by `tt()` in data.js to the nearest whole tabletop unit (at least 1),
+then x8: hero cards and potions 5 per unit (Strike 6 -> 1, Defend 5 -> 1, 8 -> 2); hero HP, healing and HP loss 8 per unit;
+token counts 3 per token. Enemy tables use their own unit size, set by the newcomer balance gate below: normal and elite foes 3.5
+(HP and attacks), bosses 7 (HP) and 4.5 (attacks). Every result is still a whole tabletop value x 8. UNCHECKED against print: the
+per-card and per-foe unit counts (the anchors in the table above are the checked ones).
+
+Newcomer balance gate (owner, R16): Quick game (1 act, opening blessing), solo, `node bal-newb.js 200 0.5` (test bot choices with 50%
+of card plays replaced by a random playable card): reach the act-1 boss 53%, beat it 33% (Warrior 51/31, Rogue 56/38, Automaton 58/40,
+Monk 48/23).
+
 ## Baseline (owner decision, Nov 2026): the TABLETOP rulebook
-The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules that are pure numbers are multiplied by one constant,
-`D.SCALE = 3` (data.js). Caps live in `D.CAPS`. Each item below has a `rules-test.js` case labelled R01..R23.
+Superseded by "One scale" above: every number is the tabletop number x `D.SCALE` (8). Caps live in `D.CAPS`. Each item below has a `rules-test.js` case labelled R01..R23.
 - R01 no hand size cap. R18 energy cap 6 (not scaled); only spending Miracles can go above it.
-- R02 Vulnerable doubles hit damage (after Strength and Wrath); Weak is -3 (SCALE) per hit, floor 0.
+- R02 Vulnerable doubles hit damage (after Strength and Wrath); Weak is -SCALE per hit, floor 0.
 - R03 Vulnerable/Weak max 3 tokens each. Weak is spent when its holder attacks, Vulnerable when its holder is hit by an attack:
   1 token per whole card / enemy action (a multi-hit spends one). Frail still drops 1 per round (video-game rule, unused by enemies).
 - R04 a Weak attacker hitting a Vulnerable target: neither applies; 1 Weak and 1 Vulnerable are removed.
-- R05 Poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies;
+- R05 Poison: at the end of the heroes' turn each poisoned enemy loses SCALE HP per token (ignores Block); tokens stay until it dies;
   at most 30 tokens across all enemies. Poison card amounts were cut for persistence (vial 3, barbed 2, cloud 2 all, storm 3 all,
   brew 4 + double, pressure point 3, haze 1 per turn, venom potion 4; upgrades +1).
-- R06 Wrath: +3 damage per hit dealt, no extra damage taken; ending your turn in Wrath costs 3 HP. Every fight starts Neutral.
+- R06 Wrath: +SCALE damage per hit dealt, no extra damage taken; ending your turn in Wrath costs SCALE HP. Every fight starts Neutral.
   Calm exit +2 energy (capped at 6).
 - R07 Monk starter relic: 2 Miracle tokens at the start of each fight (max 5; move `{t:'mir'}` = +1 energy). No Calm start, no Calm Spark.
   Two tokens (not one) is a balance choice so the class stays in the 30-65% band.
 - R08 duo: if ANY hero reaches 0 HP the party loses at once (the optional boss "last stand" is not implemented).
-- R09 Rest heals 9 HP (3 x SCALE), + 10 with the moss relic.
+- R09 Rest heals 3 x SCALE = 24 HP (+ SCALE with the moss relic). Rulebook, Rest Site: "Rest: Heal 3 HP" (quoted from memory of the
+  printed rulebook; the container cannot open it). With HP on the same scale (Warrior 10 x 8 = 80) this is the table's 30% share.
+  rules-test R09 and logic-test rule 40 check it.
 - R10 two heroes: enemy HP x1.6 (`D.EHP = {1:1, 2:1.6}`). APPROXIMATION: the printed player-count board was not available.
-- R11 class HP 80 / 70 / 75 / 72 (video-game values; tabletop boards not available). R12 rogue starter 5 + 5 + 2 = 12 cards.
-- R13 Shiv: 3 damage (1 x SCALE) as its own attack; at most 5 Shivs in hand; none at the start of a fight.
+- R11 class HP 10 / 9 / 9 / 9 x SCALE = 80 / 72 / 72 / 72. R12 rogue starter 5 + 5 + 2 = 12 cards.
+- R13 Shiv: 1 x SCALE damage as its own attack; at most 5 Shivs in hand; none at the start of a fight.
 - R14 treasure: one relic per hero. R15 boss relics: 1 per hero + 1 revealed (3 solo); each hero may take one.
 - R16 card rewards: a shuffled reward deck per class (its commons + uncommons) and a separate rare deck; unpicked/skipped cards go
   back and the deck is reshuffled. Monster: 3 from the reward deck; elite: 1 rare + 2; boss: 3 rares (shelf simplification of when
   rares appear; deterministic by seed).
-- R17 Strength cap 8 (heroes), hero Block cap 60 (20 x SCALE).
+- R17 Strength cap 8 (heroes), hero Block cap 160 (20 x SCALE).
 - R19 Retain (flag `t`: stays in hand at end of turn; Final Verdict, Panic Button) and Scry X (Third Eye 3, Deep Bow 2): pending
   choice, move `{t:'scry', keep:[indices into the top cards, 0 = top]}`; the bot discards unplayable junk.
 - R20 one shared enemy die (d6) per round, rolled before the heroes act; some enemy steps are die-based (1-2 / 3-4 / 5-6):
@@ -39,7 +75,7 @@ The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules t
 - R22 acts: `opt.acts` (1-3, default 1): after a boss, full heal, new map and boss, foes +25% HP per act. Encounter decks per act
   are not separate (same pools).
 - R23 merchant: 3 class cards per hero (common/uncommon/rare) + 1 neutral card, 3 relics, 3 potions; the first relic and potion are
-  15 gold cheaper. Card removal 75 gold once.
+  one coin (SCALE gold) cheaper. Card removal 3 coins once.
 - Chapter 2 (warden-captain) boss HP set to 106% so the first-legal bot stays at 70-85%.
 
 ## Core turn (older notes, superseded where the list above says so)
@@ -84,3 +120,81 @@ The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules t
 - Card reward: pick 1 of 3 or skip (reward decks, R16). Elite relic; treasure / boss relics per R14 / R15. Rest: heal 9 or upgrade.
 
 `node rules-test.js` re-run after every change: PASS (targeted checks + 300 bot games, 0 stuck / invariant / crash).
+
+## W494 gameplay pass (8 Nov 2026): compared with the tabletop rules and the video game it comes from
+Already matching (checked in code + logic-test rules 1-60): energy 3, draw 5, hand discarded, Block resets, intents with fixed / die /
+random patterns, Vulnerable / Weak / Strength / Poison / Frail, pick 1 of 3 or skip, rest = heal or upgrade, shop (cards, relics,
+potions, card removal 75), events with choices, elites drop a relic, boss relic choice, 3 potion slots, gold, branching map with an
+act boss, Exhaust / Ethereal / Retain, 3 acts + optional final act.
+Differences found and fixed:
+- No opening choice before floor 1 (the video game opens every run with a free gift): added the First Ember event (8 max HP / 100 gold /
+  a rare card / a relic for 10 HP), quick play only (`newGame({bless:1})`), rules 61-62.
+- Only 6 events, so ? rooms repeated within one act: 12 now (library, cursed chest, herb witch, forge spirit, golden idol, pilgrim),
+  rules 63-65. New events borrow an existing picture (`img`) until owner art exists.
+- Quick play defaulted to a 1-act climb (one boss, ~10 rooms), which felt short and simple: a full run is 3 acts by default now (rule 66);
+  the 1-act choice stays on the title.
+- Tutorial only forced 2 steps, then left rules to chance: now a guided first fight + map walk teaching every core rule (TUTORIAL-COVERAGE.md).
+Not changed (owner baseline = tabletop numbers): rest heals 9 (video game 30%), 9 floors per act (video game 15), ? rooms are always events.
+
+## G3 review re-check (8 Nov 2026)
+Re-checked against the tabletop rulebook text (online copy): Campfire Rest heals 3 HP (x SCALE = 9); Vulnerable doubles a hit; Weak is -1 per hit
+(x SCALE = 3); a Weak attacker on a Vulnerable target cancels both; one token used per whole attack; card / enemy text resolves top to bottom.
+All match the engine, so the numbers stay. Fixed: an enemy's debuff now lands after its own hit (logic rule 68); start-of-fight Block
+(Iron Bangle) lasts through round 1 (logic rule 67). In-game text now says what each status does ("Vulnerable 1: takes double damage").
+G3 round 3 (8 Nov 2026): owner wants tabletop rules, so round 2's rule changes are undone.
+- One foe per hero in Encounter rooms again; act-1 boss HP back to 132-140; no made-up phase 2.
+- Act-1 boss split as printed (rulebook FAQ, designer ruling): when it dies combat continues, the dead boss takes no action, and at the
+  start of the next round (after the enemy turn) each hero's row gets its listed slimes in order (logic rule 69). Shelf slimes: Bile Blob, Mire Slug, Mire Slug.
+- Balance only by encounter choice: the 40-HP Grub and Acolyte moved from the weak pool (first 3 fights) to the strong pool; the Ash Imp pair moved to weak.
+- bench-newplayer.js, careful player (15% random plays), 300 runs: floors 1-3 cleared 98%, act-1 boss reached 89%, beaten 33%. Test bot: 100 / 93 / 46.
+
+## R7 fixes (Nov 2026)
+- Coached first climb: every room type is on the path (fight or ? event choice, treasure, campfire, shop, elite with two foes, boss).
+  The tutorial boss is the act boss that splits as printed; rulebook, boss: "when this boss is defeated, it splits" into the listed
+  slimes, which join at the start of the next round (engine R-split, unchanged). Normal fights keep one foe per hero (rulebook,
+  Encounter: one Encounter card per player). Hero-only rules (Shivs, Orbs, stances, Scry, Retain), two-hero rules, Frail (act 2 foes)
+  and multi-act climbs are taught by a one-time tip the first time they happen in a real game, never as a "meet later" list.
+- Gambler event: the bet now states its odds (1-2 lose 30, 3-4 keep, 5 win 60, 6 win 90) and a 3-4 roll says "a draw, you keep your
+  30 gold" instead of "Nothing changed".
+
+## Act 1 foes: printed tabletop cards (R24, Nov 2026)
+Every Act 1 foe now uses its printed tabletop card (`tab: 1` in data.js), multiplied by SCALE (8) like the hero cards: HP, damage,
+Block and Spikes x8; Strength, Weak, Vulnerable and added status cards stay counts. No more conversion from video-game sizes (`tt()` now
+only touches the shelf-made act 2-4 foes and the Story-only Warden Captain). Elite and boss HP is printed per hero (x heroes); normal foes
+have flat HP (one card per hero). Die rows: 3 rows = 1-2 / 3-4 / 5-6, 2 rows = 1-3 / 4-6. Values come from two independent card
+transcriptions (research notes kept outside the repo); "checked" = both agree, "one source" = only one has it.
+
+| foe (shelf name) | tabletop card | in game (x8) | status |
+|---|---|---|---|
+| Hex Acolyte | 9 HP; every turn: 1 dmg, then +1 Str | 72 HP; 8 dmg, then +1 Str (+8 per hit) | checked |
+| Gnawer | 10 HP; die: 3 dmg + 1 Block / 4 dmg / 2 Block + 1 Str. First-fight side: 7 HP; 2 Block + 1 Str / 2 dmg + 1 Block / 3 dmg | 80 HP; 24 + 8 Block / 32 / 16 Block + 1 Str. First fight: 56 HP; 16 Block + Str / 16 + 8 Block / 24 | one source |
+| Rust Tick | 4 HP; die: +1 Str / 2 dmg / 2 dmg; Hunker 2. First-fight side: 3 HP; +1 Str / 2 / 1 | 32 HP; +1 Str / 16 / 16; first hurt: +16 Block. First fight: 24 HP; +1 Str / 16 / 8 | one source |
+| Ooze Drop | 3 HP; every turn 1 dmg | 24 HP; 8 dmg | checked |
+| Snare Vine | 10 HP; die: 2 dmg + Weak 1 / 2 dmg + Daze / 3 dmg | 80 HP; 16 + Weak 1 / 16 + Daze / 24 | HP checked, row order varies by card |
+| Ash Imp | 10 HP; die: 3 dmg / 2 dmg + Vulnerable 1 / 2 dmg + Daze | 80 HP; 24 / 16 + Vuln 1 / 16 + Daze | HP checked, row order varies by card |
+| Bile Blob | 10 HP; die: 1 dmg + Weak 2 / 4 dmg / 3 dmg + 2 Slimed | 80 HP; 8 + Weak 2 / 32 / 24 + 2 Slimed | sources differ on HP (10 or 12) |
+| Gape Grub | 6 HP; die: 2 dmg / 1 dmg + 1 Str / +2 Str; when it dies heroes get Vulnerable 1 | 48 HP; 16 / 8 + 1 Str / +2 Str; death: Vuln 1 | checked |
+| Mire Slug (split only) | 5 HP; die: 2 dmg / Weak 1 / 2 dmg + Daze | 40 HP; 16 / Weak 1 / 16 + Daze | checked |
+| Spine Slug (split only) | 5 HP; die: 1 dmg + Vuln 1 / 1 dmg + Daze / 2 dmg | 40 HP; 8 + Vuln 1 / 8 + Daze / 16 | checked |
+| Thorn Brute (elite) | 14 HP per hero; idle once, then 3 dmg every turn; from turn 2 each Skill a player plays costs 1 HP | 112 HP per hero; idle, then 24; Skill: -8 HP | checked (HP); Skill tax one source per card text |
+| Sleeper Statue (elite) | 22 HP per hero; asleep turn 1 (wakes when hurt), then 4 / 4 / Weak 2 + 1 Str | 176 HP per hero; 32 / 32 / Weak 2 + Str | HP checked, pattern one source |
+| Iron Warden x3 (elite, 3 per hero) | 7 / 8 / 7 HP; 2-row die: Daze / 3 dmg; 3 dmg / Daze; 2 dmg / Daze | 56 / 64 / 56 HP; Daze / 24; 24 / Daze; 16 / Daze | checked |
+| Mire Behemoth (boss) | 22 HP per hero; 3 Slimed / 3 dmg + 2 Slimed / 6 dmg; dies: next round splits into Bile Blob, Mire Slug, Spine Slug per hero | 176 HP per hero; 3 Slimed / 24 + 2 Slimed / 48; same split | checked (A, B) |
+| Ashen Wraith (boss) | 36 HP solo, 75 for two heroes (printed per party size); 6 steps: 1 + Burn / 2x2 + Burn / 2 Burn / 3 + 5 Block / 2 + Burn / 3x2 + 2 Burn + 1 Str | 288 HP solo, 600 duo; 8 + Burn / 16x2 + Burn / 2 Burn / 24 + 40 Block / 16 + Burn / 24x2 + 2 Burn + Str | checked (A, B; duo HP A only) |
+| Gate Wyrm (boss) | 40 HP per hero. Attack mode, 2 steps: (1) 2 dmg + 5 Block per hero, Block kept; (2) Mode Shift: Block still up -> lose it and deal 6; Block broken -> no attack, defensive mode with Sharp Hide 1. Defensive: 2 dmg, then 4 dmg + 1 Str (Sharp Hide ends), then attack mode | 320 HP per hero; 16 + 40 Block per hero; 48, or turn defensive (Spikes 8); 16, then 32 + Str | checked (A, B, C, D) |
+
+Cuts (listed, not hidden): encounter cards that summon a second foe bring only their lead foe; the gold-thief card
+and the small-goblin-gang cards are not in the deck; the wyrm's Block is not multiplied per hero; Burn from the wraith goes to its row only.
+Story chapters 3-10 (acts 2-4) still use shelf-made foes; the Quick game is Act 1 only and the setup screen says so.
+
+
+## R29 boss check (12 Nov 2026): sources for the three act-1 boss cards
+Notes and downloads kept outside the repo. Sources, by kind (no names):
+- A: an open-source fan web version of the board game (TypeScript enemy table, every act-1 boss with HP per party size and its action track).
+- B: an open-source fan mod that ports the board game's rules into the video game (Java, one class per boss; solo values). Written separately from A.
+- C: a third-party rules explainer article: "starts its turn with Block: attacks for 6; no Block: no attack, shifts to defensive mode".
+- D: a board-game forum Q&A thread on the same boss: Block left at its turn = 6 damage; Block gone = no attack, defensive mode. A second
+  thread's "7" is the harder Ascension row (A and B both give 7 at Ascension 10+).
+- The old Gate Wyrm (one repeated "2 dmg + 5 Block" step, shift after 6 damage) was wrong: the 6 is the Mode Shift hit, not an HP threshold.
+- Result: Mire Behemoth unchanged (A, B agree). Ashen Wraith unchanged solo (A, B agree); duo HP 75 per A (B is solo only). Gate Wyrm rebuilt.
+- Gentle re-tuned on the corrected boss: x5 max HP (was x6), 3 Healing Draughts, Rest heals 8. Foes untouched.
