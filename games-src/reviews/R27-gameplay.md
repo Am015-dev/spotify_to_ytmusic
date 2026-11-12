@@ -13,6 +13,7 @@ Screenshots: `games-src/reviews/R27-shots/`.
 | Game | Total | Verdict | Gate | Lowest rows |
 |---|---|---|---|---|
 | redline-rally | 7.0 | FAIL | PASS | 8 Bugs 6 |
+| perch-and-plume | 6.8 | FAIL | PASS | 5 Phone 5, 6 AI 6 |
 
 ---
 
@@ -74,3 +75,57 @@ what I saw. Nothing invented.
 | 7 / 5 | Same moment | The "Slipstream +2" banner sits over the cars and the "You" tag. | R27-shots/rr-r1-375-q1.jpg |
 | 2 | Tutorial at 375 and 390 | 9.2-9.3 s with nothing to tap after the Go that leads to the spin-out lesson. | R27-shots/rr-tut375-s31.jpg |
 | 6 | Four default races | 3 wins and a 2nd; Easy is beatable without Suggest. | R27-shots/rr-r4-390-result.jpg, rr-r3-375-result.jpg |
+
+---
+
+## 2. perch-and-plume (shelf/W508-perch-gameplay @ 20510d21 after the local merge): 6.8, FAIL
+
+Gate: **PASS** (`--full`: scenarios, phone-check at every size, rules-test "240/240 AI games finished"). Lab rows WARN 3/8 (not a gate fail).
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") by touch at 375x667 and 390x844: 21 steps, 23 taps, 52-53 s, 0 dead taps, 0 errors.
+  On info steps I tapped the lit target first (as the line says, e.g. "Tap the score"), then Next. Every lit target was on screen,
+  on top and 44 px or more (smallest 44x44 at 375). Step 2 now shows the round tracker right above the coach line. It ends with
+  "Tap to play a real game" and opens a real game's starting hand.
+- Two Quick games on defaults (Quick game > Start the year > Keep these: 2 players, Easy rival Fern, hints on), as a newcomer who taps
+  "Best" about half the time when one is shown and otherwise a random lit target:
+  - 390x844: **lost on the tie-break, 46-46** ("Fern wins the year"), 105 s, 157 taps.
+  - 375x667: **lost 7-36**, 80 s, 121 taps, only 2 birds played (see the 375 finding: Play a bird is hidden at the start of most turns).
+- Fern never kept me waiting more than 1.5 s. 0 page errors, 0 console errors, 0 stuck states. 7 taps per game changed nothing,
+  all on row chips while their powers were animating ("Your wetland birds use their powers"); the chips are not lit then, so I do not
+  count them.
+- Rotation: a running game at 390x844 rotated to 844x390, 667x375, then 375x667.
+- Rules: unchanged from R26 and still right (4 rounds; I saw "Round 1 of 4 · 8 actions" and "Round 2 of 4" with 7 action squares;
+  row yields, egg cost by column, any 2 food for 1, tray refill, goals, final scoring and the leftover-food tie-break).
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right; 8/7/6/5 actions per round are in the game. 120 own birds is a stated simplification. |
+| 2 | Tutorial teaches | 7 | Stopper fixed: 21 one-line steps, 23 taps, 0 dead, 53 s, ends in a real game. Still: the shrinking 8/7/6/5 actions are never taught ("Practice: 4 actions. Real games: 4 rounds."), and the round goals are only shown on the score page. |
+| 3 | First 10 seconds | 7 | Starting hand with "Goal: most points after 4 rounds..." and one "Keep these". |
+| 4 | Turn clarity | 7 | Fixed: the dock now says "Fern's turn" / "Your move is finishing. Then Fern plays." Prompts say what to tap, Best badges, "Grub or seed?" is clear. A 46-46 tie ends with "Fern wins the year." and no line saying the tie went to leftover food. |
+| 5 | Phone play | 5 | At 375x667 the dock opens scrolled down at the start of a turn: "Play a bird" and "Get food" sit under the "Your turn" header with only a thin strip showing; you see "Lay eggs" and "Draw birds". The round tracker and prompt are scrolled away too. In landscape the dock is full height now and the names read "You" / "Fern" (fixed), but the prompt and the four actions are scrolled out of view. |
+| 6 | AI and pacing | 6 | Brisk: Fern moves in under 1.5 s; a game is 1.5-2 min of my taps. My newcomer lost both: a 46-46 tie-break at 390 and 7-36 at 375, where Play a bird was mostly hidden. |
+| 7 | Feel | 7 | Painted birds, rival card shown, food and eggs fly, powers fire chip by chip with a caption, clean result table. |
+| 8 | Bugs | 7 | Tutorial at 2 sizes and 2 full games: 0 errors, 0 stuck, 0 dead taps on lit targets. Gate PASS. |
+| | **Total** | **6.8** | **FAIL**: rows 5 and 6 are below 7. 8+7+7+7+5+6+7+7 = 54/8 = 6.75. No stopper. |
+
+### Earlier findings (R26)
+| Finding | Status | Evidence |
+|---|---|---|
+| Stopper: tutorial step 2 target scrolled away, every tap swallowed | **Fixed**: tracker visible above the coach line with a Next; 0 dead taps at both sizes. | R27-shots/pp-tut375-s02.jpg, pp-tut390-s02.jpg |
+| 8/7/6/5 actions never taught | **Not fixed** (same line). | pp-tut375-s02.jpg |
+| Landscape dock a 132 px strip, names "Y..." / "F..." | **Partly fixed**: dock full height, names readable. New: prompt and the 4 actions scrolled out of the dock. | pp-rot-844x390.jpg, pp-rot-667x375.jpg |
+| "Your turn" shown while Fern's move plays | **Fixed** ("Fern's turn", "Your move is finishing. Then Fern plays."). | pp-g2-375-d3.jpg |
+| Board share 48 % at 375x667 | **Not re-measured**; the dock problem below matters more. | n/a |
+| "Fresh spring morning" toast over the starting hand | **Not seen** after the tutorial. | pp-tut375-realgame.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 / 6 | Started a Quick game at 375x667 and waited for my turn | "Play a bird" and "Get food" are scrolled under the "Your turn" header (button top at 380 px, header ends at about 430 px); only "Lay eggs" (greyed) and "Draw birds" show. The same happened turn after turn in my 375 game, and my newcomer played only 2 birds. | R27-shots/pp-pab-covered-375.jpg |
+| 5 | Late in my first 375 game, picked a bird to play | The yellow prompt "Tap Play to put Clover Bittern in your wetland." lay over the "Play:" confirm button; only its lower edge showed, and my driver went round that screen for minutes. I saw it once and could not make it happen again on demand; that screenshot was lost when I reran the game, so I do not score it. A clean state for comparison: | R27-shots/pp-375-play-confirm-clean.jpg |
+| 5 | Rotated a running game to 844x390 and 667x375 | Dock full height, names readable, but the prompt and the 4 action buttons are scrolled out; only hand cards show. | R27-shots/pp-rot-844x390.jpg, pp-rot-667x375.jpg |
+| 4 | Finished level at 46-46 at 390 | "Fern wins the year." No line says it was a tie decided by leftover food. | R27-shots/pp-g1-390-result.jpg |
+| 6 | Two default games as a half-Best newcomer | Lost 46-46 (tie-break) and 7-36. | R27-shots/pp-g1-390-result.jpg, pp-g2-375-result.jpg |
+| 2 (good) | Tutorial at both sizes | 21 steps, 23 taps, 0 dead, ends on "Tap to play a real game" and a real starting hand. | R27-shots/pp-tut390-s21.jpg, pp-tut375-realgame.jpg |
