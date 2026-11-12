@@ -36,8 +36,8 @@
   // one-card Goal before turn 1 of a Play game (not in Learn to play or Story, which have their own intros)
   function goalCard(done) {
     var o = h('div', 'ec-goal'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'Goal');
-    var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top of the tower and defeat its guardian.'),
-      h('ul', '', null, [h('li', '', 'Cards cost energy. Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
+    var c = h('div', 'ec-goalc', null, [h('h2', '', 'Goal'), h('p', 'lead', 'Reach the top. Beat the boss there.'),
+      h('ul', '', null, [h('li', '', 'Cards cost energy.'), h('li', '', 'Attacks cut HP. Block stops hits.'), h('li', '', 'Win fights to earn cards, gold and relics.'), h('li', '', 'If your HP hits 0, the climb ends.')])]);
     var b = on(h('button', 'btn', 'Climb'), function () { o.remove(); if (done) done(); }); b.id = 'goal-go'; c.appendChild(b); o.appendChild(c); document.body.appendChild(o);
   }
   UI.goalCard = goalCard;
@@ -50,8 +50,12 @@
   // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
+  // overlays (coach bubble, toasts) sit just above the dock's button row on phones: never over the top bar, the intents or the result
+  function ecSlot() { try { var a = document.getElementById('dockact'), r = a && a.getBoundingClientRect(), v = (r && r.height && r.top > 80 && r.top < innerHeight) ? Math.round(innerHeight - r.top + 6) : 64; document.documentElement.style.setProperty('--ecslot', v + 'px'); } catch (e) { } }
+  UI.slot = ecSlot;
   function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
-    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); ecSlot(); var gz = G(), d = h('div', 'toast' + (gz && gz.scr === 'over' ? ' mid' : ''), t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+  UI.toast = toast;
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -98,6 +102,9 @@
         case 'blk': SFX('block'); fxAt(f.w, 'fx-block-burst'); numAt(f.w, f.n, 'blk', 'Block'); break;
         case 'heal': SFX('heal'); fxAt(f.w, 'fx-heal-sparkle'); numAt(f.w, f.n, 'heal', 'HP'); break;
         case 'buff': if (f.x === 'str') fxAt(f.w, 'fx-fire-burst'); SFX('buff'); popAt(f.w, f.x === 'str' ? '+' + f.n + ' Strength' : f.x === 'spikes' ? 'Spikes ' + f.n : f.x === 'nrg' ? '+' + f.n + ' Energy' : 'Power!', 'buf'); break;
+        case 'splitsoon': case 'split': (function () { var ed = D.ENEMIES[f.x] || {}, o0 = document.querySelector('.ec-phase'); if (o0) o0.remove(); var n = f.n || 3, soon = f.k === 'splitsoon';
+          var d = h('div', 'ec-phase', null, [h('b', '', soon ? 'It splits!' : 'Slimes!'), h('span', '', soon ? ed.name + ' ' + (ed.splitSay || 'splits') + '. ' + n + ' slimes join at the start of next round. Finish your turn.' : n + ' slimes from the ' + ed.name + ' join the fight. Check their intents.')]);
+          d.setAttribute('role', 'status'); document.body.appendChild(d); SFX('crit'); setTimeout(function () { if (d.parentNode) d.remove(); }, 3000); })(); break;
         case 'debuff': popAt(f.w, (f.x === 'poison' ? 'Poison' : f.x === 'vuln' ? 'Vulnerable' : 'Weak') + (f.n ? ' ' + f.n : ''), 'deb'); break;
         case 'die': if (window.ANIM) { var d = h('div', 'pop die', '🎲 ' + f.n); d.appendChild(A('die-' + f.n, '', { noph: 1, cls: 'dieart' })); d.style.left = '40%'; d.style.top = '36%'; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 1000); } break;
         case 'act': if (f.x === 'atk' && el && window.ANIM) { el.classList.add('lunge'); setTimeout(function () { el.classList.remove('lunge'); }, 480); } break;
@@ -125,10 +132,11 @@
     var sx = 0, sy = 0, gh = null, on0 = false, hot = -1;
     function foes() { return [].slice.call(document.querySelectorAll('.en[data-w]')).filter(function (n) { return !n.classList.contains('dead'); }); }
     function under(x, y) { var t = -1; foes().forEach(function (n) { var r = n.getBoundingClientRect(); if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) t = +n.getAttribute('data-w').slice(1); }); return t; }
-    function end() { document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
+    function end() { document.body.classList.remove('ec-dragging'); var ar0 = document.getElementById('w485arrow'); if (ar0) ar0.remove(); document.removeEventListener('pointermove', mv, true); document.removeEventListener('pointerup', up, true); document.removeEventListener('pointercancel', cancel, true); if (gh) gh.remove(); gh = null; document.querySelectorAll('.en.w4drop,.en.glow').forEach(function (n) { n.classList.remove('w4drop'); }); }
     function mv(ev) {
-      if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; render(); gh = el.cloneNode(true); gh.className = el.className + ' w4ghost'; var r = el.getBoundingClientRect(); gh.style.cssText = 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
+      if (!on0) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 14) return; on0 = true; UI.dragging = 1; UI.sel = i; var g = G(), hh = g.hs[g.b.cur], tg = hh && hh.hand[i] && E.eff(hh.hand[i]).tgt; var r = { width: el.offsetWidth, height: el.offsetHeight }, cw1 = el.parentNode ? getComputedStyle(el.parentNode).getPropertyValue('--cw') : ''; gh = el.cloneNode(true); gh.classList.remove('sel'); gh.classList.add('w4ghost'); render(); document.body.classList.add('ec-dragging'); gh.style.cssText = (cw1 ? '--cw:' + cw1 + ';' : '') + 'position:fixed;z-index:95;pointer-events:none;width:' + r.width + 'px;height:' + r.height + 'px;left:0;top:0;transform:translate(' + (ev.clientX - r.width / 2) + 'px,' + (ev.clientY - r.height * .7) + 'px) rotate(-4deg) scale(1.08)'; document.body.appendChild(gh); if (tg) foes().forEach(function (n) { n.classList.add('glow'); }); }
       if (gh) { var w = parseFloat(gh.style.width), hgt = parseFloat(gh.style.height); gh.style.transform = 'translate(' + (ev.clientX - w / 2) + 'px,' + (ev.clientY - hgt * .7) + 'px) rotate(-4deg) scale(1.08)'; }
+      if (STAGE() && gh) arrowTo(ev.clientX, ev.clientY, hot >= 0, gh);
       var t = under(ev.clientX, ev.clientY); if (t !== hot) { hot = t; foes().forEach(function (n) { n.classList.toggle('w4drop', +n.getAttribute('data-w').slice(1) === t); }); if (t >= 0) { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { } } }
       ev.preventDefault();
     }
@@ -143,10 +151,20 @@
     el.addEventListener('pointerdown', function (ev) { if (UI.busy || (window.GXT && GXT.active())) return; sx = ev.clientX; sy = ev.clientY; on0 = false; hot = -1; document.addEventListener('pointermove', mv, true); document.addEventListener('pointerup', up, true); document.addEventListener('pointercancel', cancel, true); });
     el.style.touchAction = 'none';
   }
-  function holdPeek(el, c) {
+  // W485 targeting arrow: a dashed curve with a head from the dragged card's top to the finger, gold over a legal foe
+  function arrowTo(x, y, hit, gh) {
+    var NS = 'http://www.w3.org/2000/svg', sv = document.getElementById('w485arrow');
+    if (!sv) { sv = document.createElementNS(NS, 'svg'); sv.id = 'w485arrow'; sv.setAttribute('aria-hidden', 'true'); sv.innerHTML = '<defs><marker id="w485ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="currentColor"/></marker></defs><path class="w485ap" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 12" marker-end="url(#w485ah)"/>'; document.body.appendChild(sv); }
+    var hd = document.querySelector('.hand.fan'), r = hd ? hd.getBoundingClientRect() : { left: 0, width: innerWidth, top: innerHeight - 160 }, sx = r.left + r.width / 2, sy = r.top + 10;
+    if (Math.abs(y - sy) < 40) { sv.style.display = 'none'; return; } sv.style.display = '';
+    var cx = (sx + x) / 2 + (x - sx) * -.2, cy = Math.min(sy, y) - 60;
+    sv.querySelector('.w485ap').setAttribute('d', 'M' + sx + ' ' + sy + ' Q' + cx + ' ' + cy + ' ' + x + ' ' + (y - 10)); sv.classList.toggle('hit', !!hit);
+    if (gh) gh.style.opacity = '.55';
+  }
+  function holdPeek(el, c, o) {
     var t = 0, x0 = 0, y0 = 0;
     function stop() { if (t) { clearTimeout(t); t = 0; } }
-    el.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; stop(); t = setTimeout(function () { t = 0; UI.peeked = Date.now(); var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); var close = function (e2) { if (e2) { e2.stopPropagation(); } pk.remove(); }; pk.addEventListener('pointerdown', close); document.body.appendChild(pk); }, 450); });
+    el.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; stop(); t = setTimeout(function () { t = 0; UI.peeked = Date.now(); var pk = h('div', 'peek'); pk.appendChild(cardEl(c, o)); var close = function (e2) { if (e2) { e2.stopPropagation(); } pk.remove(); }; pk.addEventListener('pointerdown', close); document.body.appendChild(pk); }, 450); });
     el.addEventListener('pointermove', function (ev) { if (Math.abs(ev.clientX - x0) + Math.abs(ev.clientY - y0) > 12) stop(); });
     ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { el.addEventListener(n, stop); });
     el.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
@@ -159,7 +177,7 @@
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
-    var cb = h('div', 'cb'); E.lines(e).forEach(function (l) { cb.appendChild(h('span', 'cl', l)); }); el.appendChild(cb);
+    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb);
     // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
@@ -168,10 +186,12 @@
     var g = G(); app.innerHTML = ''; tscr.innerHTML = ''; modeCls();
     if (UI.mode === 'title' || !g) { gameEl.hidden = true; tscr.hidden = false; try { GX.close(); } catch (e) { } try { GXH.hide(); } catch (e) { } return title(); }
     tscr.hidden = true; gameEl.hidden = false;
+    document.body.classList.toggle('ec-stage', g.scr === 'battle' && STAGE()); document.body.classList.toggle('ec-stagemap', g.scr === 'map' && STAGE());
     if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
     if (UI.ov) overlay();
+    if (UI.potSel == null) UI.potSel = -1; potPop();
     dock(g);
     if (UI.lastScr !== g.scr) { if (g.scr === 'reward' || (g.scr === 'over' && g.won)) SFX('win'); else if (g.scr === 'over') SFX('lose'); UI.lastScr = g.scr; }
     if (UI.camp && UI.bossLine && g.scr === 'reward' && g.map[g.at] && g.map[g.at].t === 'b' && UI.bossPost !== g.at + ':' + g.floor && !(window.GXT && GXT.active())) { UI.bossPost = g.at + ':' + g.floor; UI.bossLine('post'); }
@@ -228,22 +248,27 @@
     ['w', 's', 'a', 'm'].forEach(function (k) {
       var H = D.H[k], lk = !heroOpen(k), b = h('button', 'hero' + (UI.pick.indexOf(k) >= 0 ? ' sel' : '') + (lk ? ' locked' : ''), null, [A('hero-' + k, H.name.split(' ')[0], { ph: TONE[k] }), h('b', '', H.name.split(' ')[0]), h('i', '', lk ? '\uD83D\uDD12 Story' : H.role)]);
       b.setAttribute('data-hero', k);
-      on(b, function () { if (lk) { toast(HNEED[k][1]); return; } if (!UI.duo) { UI.pick = [k]; } else { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } } render(); });
+      on(b, function () { if (lk) { UI.heroNote = HNEED[k][1] + '.'; UI.noteN = (UI.noteN || 0) + 1; render(); return; } UI.heroNote = ''; if (!UI.duo && UI.pick[0] === k) { UI.heroNote = H.name.split(' ')[0] + ' is ready. Tap Start climb.'; UI.noteN = (UI.noteN || 0) + 1; render(); return; } if (!UI.duo) { UI.pick = [k]; } else { var i = UI.pick.indexOf(k); if (i >= 0) { if (UI.pick.length > 1) UI.pick.splice(i, 1); } else { UI.pick.push(k); if (UI.pick.length > 2) UI.pick.shift(); } } render(); });
       hs.appendChild(b);
     });
-    var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
+    var mid = h('div', '', null, [hs, h('div', 'refline' + (UI.heroNote ? ' w24note w24n' + ((UI.noteN || 0) % 2) : ''), UI.heroNote || D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
     var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
-    mid.appendChild(seg);
-    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
-    var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes, shared map. Pass the screen. Tap to pick both.' : 'Tap a hero to pick them. Use + Second hero to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
+    UI.acts = 1;
+    // difficulty: Gentle (first climb, player-side numbers only) is the default until the first win or a pick; Tabletop = rulebook numbers
+    UI.diff = UI.diff || diffDefault(); var dg = h('div', 'seg w8diff'); dg.setAttribute('role', 'group'); dg.setAttribute('aria-label', 'Difficulty');
+    [['g', 'Gentle (first climb)'], ['t', 'Tabletop (rulebook)']].forEach(function (o) { var b = on(h('button', UI.diff === o[0] ? 'on' : '', o[1]), function () { UI.diff = o[0]; try { localStorage.setItem('ec-diff', o[0]); } catch (e) { } render(); }); b.setAttribute('data-diff', o[0]); b.setAttribute('aria-pressed', String(UI.diff === o[0])); dg.appendChild(b); });
+    mid.appendChild(dg); mid.appendChild(h('div', 'refline w24act w8dline', 'Act 1 only: 9 floors, then a boss. ' + (UI.diff === 'g' ? 'Easier: more HP and potions.' : 'Rulebook numbers. Hard.')));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
+    var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Start climb together' : 'Start climb'), function () { UI.heroNote = ''; start(); }); go.id = 'play'; row.appendChild(go);
+    var wrap = h('div', '', null, [h('div', 'refline w8hint', UI.duo ? 'Two heroes share the map. Tap both.' : 'Tap a hero. + Second hero plays together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
   }
-  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
+  UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0, gentle: g.gentle ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
+  function diffDefault() { try { var v = localStorage.getItem('ec-diff'); if (v === 'g' || v === 't') return v; return localStorage.getItem('ec-won1') ? 't' : 'g'; } catch (e) { return 'g'; } }
+  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1, gentle: (UI.diff || diffDefault()) === 'g' ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
@@ -257,7 +282,7 @@
     for (var i = 0; i < g.pslots; i++) (function (i) {
       var id = g.pots[i];
       if (!id) { p.appendChild(h('span', 'pot', '')); return; }
-      var b = h('button', 'pot full', null, [A('pot-' + id, D.POTIONS[id].name, { ph: '#5a8a5a' })]); b.setAttribute('aria-label', D.POTIONS[id].name); on(b, function () { usePot(i); }); p.appendChild(b);
+      var b = h('button', 'pot full', null, [A('pot-' + id, D.POTIONS[id].name, { ph: '#5a8a5a' })]); b.setAttribute('aria-label', D.POTIONS[id].name); if (UI.potSel === i) b.classList.add('sel'); on(b, function () { UI.potSel = UI.potSel === i ? -1 : i; render(); }); p.appendChild(b);
     })(i);
     return p;
   }
@@ -281,7 +306,8 @@
     else if (g.scr === 'shop') { txt = 'Tap an item, then Buy.'; ttl = 'Shop'; }
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
-    m.textContent = txt; t.textContent = ttl; var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
+    ecSlot(); m.textContent = txt; t.textContent = ttl; var nw = document.querySelector('.w7now'); if (nw) nw.textContent = txt;   // R7: the same one-line prompt on the phone stage var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
+    if (g.scr === 'map' && STAGE()) { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [nodeIc(k), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
     // PC side panel: the deck you climb with, as small card pictures (R1 polish: fill the panel with something useful)
@@ -292,7 +318,9 @@
   var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + (3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0)); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
   function mapScr() {
     var g = G(); hud();
-    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); m.appendChild(BG('bg-map'));
+    var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); var SGM = STAGE(), mroot = m;
+    if (SGM) { app.appendChild(relicBar(g)); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
+    m.appendChild(BG('bg-map'));
     function pos(n) { return { x: (n.c + 0.5) / 4 * 100, y: 100 - (n.f - 0.5) / ((G().F || 9) + 1.5) * 100 }; }
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
     g.map.forEach(function (n) { n.nx.forEach(function (k) { var a = pos(n), b = pos(g.map[k]), l = document.createElementNS(NS, 'line'); l.setAttribute('x1', a.x); l.setAttribute('y1', a.y); l.setAttribute('x2', b.x); l.setAttribute('y2', b.y); l.setAttribute('stroke', n.vis ? '#f2872b' : '#6b5040'); l.setAttribute('stroke-width', '2'); l.setAttribute('vector-effect', 'non-scaling-stroke'); l.setAttribute('stroke-dasharray', n.vis ? '' : '4 4'); svg.appendChild(l); }); });
@@ -301,14 +329,25 @@
     g.map.forEach(function (n) {
       var p = pos(n), ok = rc.indexOf(n.id) >= 0;
       var b = h('button', 'node t-' + n.t + (ok ? ' glow' : '') + (n.vis ? ' vis' : '') + (g.at === n.id ? ' here' : ''), null, [A(NODEN[n.t], NODEG[n.t], { ph: '#3a2a20' })]);
+      if (SGM) { b.appendChild(nodeIc(n.t)); if (ok) b.appendChild(h('span', 'w485nl', NODEL[n.t])); }
       b.style.left = p.x + '%'; b.style.top = p.y + '%'; b.setAttribute('aria-label', D.NODES[n.t]); if (ok && NODEHINT[n.t]) b.appendChild(h('span', 'w4ntag' + (n.t === 'e' || n.t === 'b' ? ' hot' : ''), NODEHINT[n.t]()));   // W420 value hint
       if (ok) on(b, function () { var go = function () { E.performMove({ t: 'go', n: n.id }); UI.sel = -1; render(); if (G().scr === 'battle') beginBattleUI(); }; if (n.t === 'b' && UI.camp && UI.bossLine && !(window.GXT && GXT.active())) UI.bossLine('pre').then(go); else go(); });
       else b.disabled = true;
       m.appendChild(b);
     });
     var QI = (window.EC_STORY || {}).quick; if (QI && UI.hints && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
-    app.appendChild(m);
+    app.appendChild(mroot);
+    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; }); }
   }
+  var NODEL = { m: 'Fight', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Chest', b: 'Boss' };
+  var NODEI = { m: '<path d="M3 19 15 7l1.6 1.6L4.6 20.6zM14 4.5l5.5-1-1 5.5-2.2-1.1zM21 19 9 7 7.4 8.6l12 12zM10 4.5 4.5 3.5l1 5.5 2.2-1.1z"/>',
+    e: '<path fill-rule="evenodd" d="M12 4c-4.6 0-7.5 2.8-7.5 6.6 0 2.4 1.3 3.7 2.1 4.6V18h2v2h2v-2h2.8v2h2v-2h2v-2.8c.8-.9 2.1-2.2 2.1-4.6C19.5 6.8 16.6 4 12 4zm-3 6.2a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8zm6 0a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8zM2 3l4 4-1.4.8zm20 0-4 4 1.4.8z"/>',
+    r: '<path d="M12 2c1 4 7 6 7 12a7 7 0 0 1-14 0c0-3 1-5 3-7 0 2 1 3 2 3 0-3 1-6 2-8zM4 21h16v2H4z"/>',
+    s: '<path fill-rule="evenodd" d="M6 8h12l1.5 13h-15zM9 8V7a3 3 0 0 1 6 0v1h-1.6V7a1.4 1.4 0 0 0-2.8 0v1z"/>',
+    v: '<path d="M9 8c0-4 7-4 7 0 0 3-4 3-4 6h-2.2c0-4 4-4 4-6s-2.6-2-2.6 0zM10 17h3v3h-3z"/>',
+    t: '<path fill-rule="evenodd" d="M3 10h18v10H3zm7.5 2v3h3v-3zM5 5h14l2 4H3z"/>',
+    b: '<path d="M3 18 2 7l5.2 4L12 4l4.8 7L22 7l-1 11zM3 19.5h18V22H3z"/>' };
+  function nodeIc(t) { var d = document.createElement('span'); d.className = 'w485ni'; d.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" aria-hidden="true">' + (NODEI[t] || NODEI.v) + '</svg>'; return d; }
   // ---------- battle
   // intent icons: one code-drawn picture per intent / debuff kind (named stems in assets.json so art can replace them); tap an intent to read it
   var ICO = {
@@ -332,16 +371,16 @@
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d; try { d = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(h0)); } catch (x) { d = it.atk; } if (d == null || isNaN(d)) d = it.atk;
       var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (it.all) t += ' all'; if (g.hs.length > 1 && !it.all) t += ' → ' + D.H[h0.k].name.split(' ')[0];
-      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: hits ' + (n > 1 ? n + ' times for ' + d + ' each' : 'for ' + d) + ' damage (Block soaks it first).' });
+      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: ' + (n > 1 ? n + ' hits of ' + d : d + ' damage') + '. Block soaks it.' });
     }
-    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
-    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: each of your hits deals 3 less. One Weak is used up per attack (max 3).' });
-    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage from a hit. One is used up per attack (max 3).' });
-    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 1 HP per poison at the end of the turn, ignoring Block. It stays.' });
-    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
-    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: until its next move, every attack card you play on it hurts you for ' + it.spikes + '. Use skills or block that turn.' });
+    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: +' + it.blk + '. Your hits do less.' });
+    if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your hits deal 8 less.' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 8 HP each turn.' });
+    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard.' }); }
+    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
     return P;
   }
@@ -350,30 +389,68 @@
     var P = intentParts(e), main = P[0].k, cls = main === 'atk' ? 'atk' : main === 'blk' ? 'def' : (main === 'str' || main === 'sleep' || main === 'unk') ? 'buf' : 'deb';
     var b = h('button', 'intent ' + cls); b.type = 'button'; b.setAttribute('aria-label', 'Enemy intent: ' + P.map(function (p) { return p.say; }).join(' '));
     if (main === 'atk') { try { var it = e.intent, g = G(), tg = it.all ? g.hs : [g.hs[it.tg] || g.hs[0]], d0 = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(tg[0])) * (it.hits || 1), hot = tg.some(function (t) { return t && !t.dead && d0 >= t.hp * .25; }); if (hot) b.classList.add('w4hot'); if (moOk()) b.classList.add(hot ? 'w4danger' : 'w4atk'); } catch (x) { } }   // W420 pulse
-    P.forEach(function (p) { b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', p.t)); });
+    var sg0 = STAGE(); P.forEach(function (p, k) { if (sg0 && k > 1) return; b.appendChild(IA(p.s, p.k)); if (p.t) b.appendChild(h('span', '', sg0 ? p.t.replace(/^Hits /, '').replace(/^(Block|Strength|Weak|Vulnerable|Frail|Poison|Spikes) \+?/, function (m, w) { return w === 'Strength' ? '+' : ''; }) : p.t)); });
     on(b, function () { UI.explain(P); });
     return b;
   }
   UI.explain = function (P) {
-    var old = document.querySelector('.itip'); if (old) old.remove();
-    var t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.appendChild(h('b', '', 'Enemy intent'));
+    document.querySelectorAll('.itip, .itip-scrim').forEach(function (n) { n.remove(); });
+    // R24: a real popup: a see-through scrim under it closes it on any tap (or Esc), so it never sits over the controls you tap next
+    var sc = h('div', 'itip-scrim'), t = h('div', 'itip'); t.setAttribute('role', 'dialog'); t.setAttribute('aria-modal', 'true'); t.appendChild(h('b', '', P.some(function (p) { return /^relic-/.test(p.s || ''); }) ? 'Relic' : 'Enemy intent'));
     P.forEach(function (p) { var r = h('div', 'irow', null, [IA(p.s, p.k), h('span', '', p.say)]); t.appendChild(r); });
-    t.appendChild(h('i', '', 'Tap to close'));
-    t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
+    t.appendChild(h('i', '', 'Tap to close')); var xb = h('button', 'itip-x', '\u2715'); xb.type = 'button'; xb.setAttribute('aria-label', 'Close'); t.appendChild(xb);
+    function close() { t.remove(); sc.remove(); document.removeEventListener('keydown', esc); }
+    function esc(ev) { if (ev.key === 'Escape') close(); }
+    t.addEventListener('click', close); sc.addEventListener('click', function (ev) { close(); var u = document.elementFromPoint(ev.clientX, ev.clientY); if (u && u !== document.body && u.closest('button, .card, .en, .node, [role=button]')) u.click(); });   // the tap that closes it still lands on what is under it document.addEventListener('keydown', esc);
+    document.body.appendChild(sc); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) close(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { if (o.st[p[0]]) w.appendChild(h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + o.st[p[0]])])); });
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
+    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
     return w;
+  }
+  // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
+  function STAGE() { return !/[?&]stage=0/.test(Q) && window.innerWidth < 1024; }
+  UI.STAGE = STAGE;
+  function LSC() { return window.innerWidth > window.innerHeight && window.innerHeight < 520; }
+  var lsWas = null; window.addEventListener('resize', function () { var n = LSC(); if (n !== lsWas) { lsWas = n; try { var g = G(); if (g && g.scr === 'battle' && UI.mode === 'game' && !UI.busy && !UI.dragging) render(); } catch (e) { } } });   // R24: rotation flips the stage between portrait and the short-landscape layout
+  function relicBar(g) {
+    var r = h('div', 'w485top');
+    var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
+    if (!(g.relics || []).length) rl.appendChild(h('span', 'w485none', 'No relics yet'));
+    r.appendChild(rl);
+    r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
+    if (g.scr === 'battle') r.appendChild(potRow());
+    if (g.scr === 'battle') { var nw = h('div', 'w7now'); nw.setAttribute('role', 'status'); nw.setAttribute('aria-live', 'polite'); r.appendChild(nw); }   // R7: one line, what to do now (filled by dock())
+    return r;
+  }
+  // stage hero: the figure on the floor, HP bar under it, block as a shield badge, statuses and powers under the bar
+  function heroFig(g, b, hh, i, PV) {
+    var H = D.H[hh.k], p = h('div', 'hfig' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : '')); p.setAttribute('data-w', 'h' + i);
+    var fg = h('div', 'w485fig'); fg.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] })); p.appendChild(fg);
+    if (hh.stance !== 'n') p.appendChild(h('div', 'w485stance s-' + hh.stance, hh.stance === 'w' ? 'Wrath' : 'Calm'));
+    if (hh.k === 'a' && hh.orbs.length) { var ob = h('div', 'orbs'); hh.orbs.forEach(function (o) { var ox = h('div', 'orb ' + o.k, o.k === 'D' ? String(o.v) : ''); ox.appendChild(A('orb-' + o.k, '', { noph: 1, cls: 'orbart' })); ob.appendChild(ox); }); p.appendChild(ob); }
+    var bar = h('div', 'bar', null, [h('i'), h('b', '', hh.hp + '/' + hh.mhp)]); bar.querySelector('i').style.width = (100 * Math.max(0, hh.hp) / hh.mhp) + '%';
+    if (hh.blk) bar.appendChild(h('span', 'w485shield', String(hh.blk)));
+    p.appendChild(h('div', 'nm', H.name.split(' ')[0])); p.appendChild(bar); p.appendChild(stChips(hh));
+    var pw = Object.keys(hh.pw); if (pw.length) p.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
+    var inc = incoming(g, i); if (inc > 0 && !hh.dead) { var net = Math.max(0, inc - hh.blk); p.appendChild(h('div', 'w4inc' + (net > 0 ? ' cut' : ''), net > 0 ? 'Incoming ' + net : 'All blocked')); }
+    if (PV && (PV.blk[i] > 0 || PV.heal[i] > 0)) p.appendChild(h('div', 'w4hb', PV.blk[i] > 0 ? '+' + PV.blk[i] + ' block' : '+' + PV.heal[i] + ' HP'));
+    return p;
   }
   function needTarget() { var g = G(), h0 = g.hs[g.b.cur], c = h0.hand[UI.sel]; return c && E.eff(c).tgt; }
   function battle() {
     var g = G(), b = g.b, cur = g.hs[b.cur >= 0 ? b.cur : 0];
     hud();
     var st = h('div'); st.id = 'stage'; st.setAttribute('data-board', '1'); st.appendChild(A(b.kind === 'b' ? 'bg-boss-' + g.boss : b.kind === 'e' ? 'bg-elite' : 'bg-battle-' + (1 + ((g.floor - 1) % 3)), '', { cls: 'bg', kind: 'bg' }));
+    var SG = STAGE(); if (SG) st.appendChild(relicBar(g));
     var en = h('div', 'enemies'), tgtMode = b.ph === 'p' && UI.sel >= 0 && needTarget(), PV = previewSel(g, b);
     var fk = g.act + ':' + g.floor + ':' + g.at; if (!UI.fs || UI.fs.key !== fk) UI.fs = { key: fk, kind: b.kind, hp0: g.hs.reduce(function (a, x) { return a + x.hp; }, 0), mhp: g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), waste: 0, turns: 1, over: 0 }; UI.fs.turns = Math.max(UI.fs.turns, b.turn || 1);
+    var nShow = 0, many = b.en.length > 3;   // R24: a split boss leaves its corpse plus up to 3 slimes per hero; the stage shows only foes that matter
     b.en.forEach(function (e, i) {
       var d = D.ENEMIES[e.id];
+      if (SG && e.dead && (e.splitDone || many)) return;
+      nShow++;
       var x = h('div', 'en' + (e.dead ? ' dead' : '') + (tgtMode && !e.dead ? ' glow' : ''));
       x.setAttribute('data-w', 'e' + i);
       if (!e.dead) x.appendChild(intentBox(e));
@@ -382,14 +459,17 @@
       if (e.blk) x.appendChild(h('div', 'blkchip', '🛡' + e.blk));
       x.appendChild(h('div', 'nm', d.name));
       x.appendChild(h('div', 'bar', null, [h('i'), h('b', '', e.hp + '/' + e.mhp)])); x.querySelector('.bar i').style.width = (100 * e.hp / e.mhp) + '%';
+      if (SG && e.blk) x.querySelector('.bar').appendChild(h('span', 'w485shield', String(e.blk)));
       x.appendChild(stChips(e));
       if (!e.dead) on(x, function () { onEnemy(i); });   // tap the enemy to play the lifted attack on it (restored: lost in the W420 rewrite; tools/tap-enemy.js guards it)
       var pv = PV && PV.en[i]; if (pv && !e.dead && (pv.dmg > 0 || pv.kill)) x.appendChild(h('div', 'w4pv' + (pv.kill ? ' kill' : ''), null, [h('b', '', (PV.rnd ? '~' : '') + '-' + (pv.kill ? pv.dmg : pv.hpLoss)), h('i', '', pv.kill ? 'kills' : pv.stripped ? pv.stripped + ' block off' : (whyMods(cur, cur.hand[UI.sel], e) || 'HP'))]));   // W420 value preview
       en.appendChild(x);
     });
-    st.appendChild(en);
+    if (SG) { en.style.setProperty('--n', nShow); if (nShow > 3) en.classList.add('w24many'); if (nShow > 4) en.classList.add('w24six'); }
     var mid = h('div', 'mid');
+    if (SG) { var ar = h('div', 'arena' + (nShow > 3 ? ' w24many' : '')), hsd = h('div', 'hside'); hsd.style.setProperty('--n', g.hs.length); ar.appendChild(hsd); ar.appendChild(en); st.appendChild(ar); mid = hsd; } else st.appendChild(en);
     g.hs.forEach(function (hh, i) {
+      if (SG) { mid.appendChild(heroFig(g, b, hh, i, PV)); return; }
       var H = D.H[hh.k], p = h('div', 'heropan' + (b.cur === i && b.ph === 'p' ? ' act' : '') + (hh.dead ? ' dead' : ''));
       p.setAttribute('data-w', 'h' + i);
       p.appendChild(A('hero-' + hh.k, H.name.split(' ')[0], { ph: TONE[hh.k] }));
@@ -402,21 +482,29 @@
       var pw = Object.keys(hh.pw); if (pw.length) inf.appendChild(h('div', 'stc', null, pw.map(function (k) { return h('span', '', k + ' ' + hh.pw[k]); })));
       p.appendChild(inf); mid.appendChild(p);
     });
-    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0)), h('em', 'enl', 'Energy')]); en0.setAttribute('aria-label', 'Energy'); mid.appendChild(en0);
-    st.appendChild(mid);
+    var emax = Math.max(cur.en, 3 + (E.has('dawnstone') ? 1 : 0) + ((cur.pw && cur.pw.deva) || 0));
+    var en0 = h('div', 'energy', null, [A('icon-energy', '', { noph: 1 }), h('span', '', String(b.ph === 'p' ? cur.en : 0) + (SG ? '/' + emax : '')), h('em', 'enl', 'Energy')]); en0.setAttribute('aria-label', 'Energy ' + (b.ph === 'p' ? cur.en : 0) + ' of ' + emax);
+    if (SG) st.appendChild(en0); else { mid.appendChild(en0); st.appendChild(mid); }
     // controls row (piles left, end turn right), then the hand
     var anyOk0 = (b.ph === 'p' ? cur.hand : []).some(function (c) { return E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'); });
     var ctl = h('div', 'ctl');
-    if (b.ph === 'p') {
+    if (SG) {
+      var pile = function (id, cls, n, lab, ov) { var pb = on(h('button', 'w485pile ' + cls, null, [h('i', 'w485pc'), h('b', '', String(n))]), function () { if (Date.now() < (UI.dealT || 0) || b.ph !== 'p') return; UI.ov = ov; render(); }); pb.id = id; pb.type = 'button'; pb.setAttribute('aria-label', lab + ': ' + n + ' cards'); return pb; };
+      st.appendChild(pile('drawpile', 'draw', cur.draw.length, 'Draw pile', 'draw')); st.appendChild(pile('discpile', 'disc', cur.disc.length, 'Discard pile', 'disc'));
+      if (b.ph === 'p') { var ebs = on(h('button', 'btn w485end' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); ebs.id = 'end'; ebs.type = 'button'; try { if (window.GXT && GXT.active() && !UI.tutFree() && !(GXT.current() || {}).endOk) ebs.disabled = true; } catch (e) { } st.appendChild(ebs); }
+      else st.appendChild(h('div', 'w485end w485wait', 'Enemy turn'));
+    } else if (b.ph === 'p') {
       ctl.appendChild(h('div', 'piles', null, [(function (dc) { dc.id = 'drawpile'; return dc; })(on(h('button', 'chip', 'Draw ' + cur.draw.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'draw'; render(); })), on(h('button', 'chip', 'Used ' + cur.disc.length), function () { if (Date.now() < (UI.dealT || 0)) return; UI.ov = 'disc'; render(); }), h('span', 'chip', 'Turn ' + b.turn)]));
-      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; if (window.innerWidth >= 1024) { eb.classList.add('w4endpc'); ctl.appendChild(eb); } try { if (window.GXT && GXT.active() && !UI.tutFree()) eb.disabled = true; } catch (e) { }
+      var eb = on(h('button', 'btn' + (anyOk0 ? '' : ' pulse'), 'End turn'), endTurn); eb.id = 'end'; UI.endBtn = eb; if (window.innerWidth >= 1024) { eb.classList.add('w4endpc'); ctl.appendChild(eb); } try { if (window.GXT && GXT.active() && !UI.tutFree() && !(GXT.current() || {}).endOk) eb.disabled = true; } catch (e) { }
     }
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
-    if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
+    else if (SG) { hand.classList.add('fan'); var cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
-      var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), el = cardEl(c); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
-      el.setAttribute('data-c', i); holdPeek(el, c); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
+      var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
+      if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
+      el.setAttribute('data-c', i); holdPeek(el, c, co); if (ok) dragPlay(el, i); on(el, function () { if (UI.peeked && Date.now() - UI.peeked < 700) return; onCard(i); }); hand.appendChild(el);
     });
     if (UI.sel >= 0) hand.classList.add('hassel');
     st.appendChild(hand);
@@ -433,7 +521,10 @@
     if (PV && sl0()) { var bt = [], rr0 = sl0().getBoundingClientRect(), vw0 = document.documentElement.clientWidth; g.hs.forEach(function (x, k) { if (PV.blk[k] > 0) bt.push('+' + PV.blk[k] + ' block' + (g.hs.length > 1 ? ' ' + D.H[x.k].name.split(' ')[0] : '')); if (PV.heal[k] > 0) bt.push('+' + PV.heal[k] + ' HP'); });
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
     function sl0() { return hand.querySelector('.card.sel'); }
-    var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }
+    if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
+      for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
+    }
+    var sl = hand.querySelector('.card.sel'); if (sl) { var rr = sl.getBoundingClientRect(), vw = document.documentElement.clientWidth; if (SG) { sl.style.setProperty('--sx', Math.round(vw / 2 - (rr.left + rr.width / 2)) + 'px'); var lim = 0; st.querySelectorAll('.bar, .nm, .w4inc').forEach(function (x) { var q = x.getBoundingClientRect(); if (q.width && q.bottom < innerHeight * 0.8) lim = Math.max(lim, q.bottom); }); var cw1 = parseFloat(hand.style.getPropertyValue('--cw')) || 80, dy = lim + 4 - rr.top; if (dy > 0) sl.style.setProperty('--sy', Math.round(-cw1 * 1.05 + Math.min(dy, innerHeight - 4 - rr.bottom)) + 'px'); } else if (rr.left < 4) sl.style.setProperty('--sx', (4 - rr.left) + 'px'); else if (rr.right > vw - 4) sl.style.setProperty('--sx', (vw - 4 - rr.right) + 'px'); }   // R7: on the stage the lifted card rises in the centre, clear of End turn and the foes' HP
   }
   // W420: value preview of the selected card (dry run in the engine on a copy), incoming damage per hero, why-text, draw animation
   function playable(h0, c) { return c && E.canPlay(h0, c) && (E.eff(c).cost === 'X' || E.cost(h0, c) <= h0.en); }
@@ -485,6 +576,7 @@
     document.body.appendChild(ov); SFX('boss'); tmr = setTimeout(end, 6000);
   };
   function flyCard(ci, ti, done) {
+    if (STAGE()) return flyStage(ci, ti, done);
     var cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('.mid');
     if (!moOk() || !cel || !tel || !cel.animate) return done();
     var a = cel.getBoundingClientRect(), b = tel.getBoundingClientRect(), f = cel.cloneNode(true); f.classList.remove('sel'); f.classList.add('fly');
@@ -494,6 +586,19 @@
     document.body.appendChild(f);
     var an = f.animate(kf, { duration: 320, easing: 'ease-in' });
     an.onfinish = function () { f.remove(); tel.classList.add('w4impact'); setTimeout(function () { tel.classList.remove('w4impact'); }, 300); done(); }; setTimeout(function () { if (f.parentNode) { f.remove(); } }, 700);
+  }
+  // W485 stage: the played card jumps to the centre big, holds ~400 ms, then flies into its target (a foe, or the hero for skills)
+  function flyStage(ci, ti, done) {
+    var g = G(), cel = document.querySelector('.hand [data-c="' + ci + '"]'), tel = ti != null ? document.querySelector('[data-w="e' + ti + '"]') : document.querySelector('[data-w="h' + (g.b.cur >= 0 ? g.b.cur : 0) + '"]');
+    if (!moOk() || !cel || !tel || !cel.animate) return done();
+    var hd = cel.parentNode, cw = hd ? getComputedStyle(hd).getPropertyValue('--cw') : '', w = cel.offsetWidth, hh = cel.offsetHeight, a = cel.getBoundingClientRect(), b = tel.getBoundingClientRect();
+    var f = cel.cloneNode(true); f.classList.remove('sel'); f.classList.add('fly', 'w485play'); f.style.cssText = (cw ? '--cw:' + cw + ';' : '') + 'position:fixed;z-index:90;margin:0;left:0;top:0;width:' + w + 'px;height:' + hh + 'px;pointer-events:none';
+    var vw = document.documentElement.clientWidth, vh = window.innerHeight, sc = Math.min(1.7, (vw * .5) / w), x0 = a.left + a.width / 2 - w / 2, y0 = a.top + a.height / 2 - hh / 2, xc = vw / 2 - w / 2, yc = vh * .42 - hh / 2, xt = b.left + b.width / 2 - w / 2, yt = b.top + b.height * .4 - hh / 2;
+    var T = function (x, y, s2, r) { return 'translate(' + x + 'px,' + y + 'px) scale(' + s2 + ') rotate(' + (r || 0) + 'deg)'; };
+    document.body.appendChild(f); cel.style.visibility = 'hidden';
+    var an = f.animate([{ transform: T(x0, y0, 1), opacity: 1 }, { transform: T(xc, yc, sc), opacity: 1, offset: .22 }, { transform: T(xc, yc, sc), opacity: 1, offset: .74 }, { transform: T(xt, yt, .45, ti != null ? 16 : 0), opacity: .1 }], { duration: wt(820), easing: 'ease-in-out' });
+    var fin = false, end = function () { if (fin) return; fin = true; f.remove(); tel.classList.add('w4impact'); setTimeout(function () { tel.classList.remove('w4impact'); }, 300); done(); };
+    an.onfinish = end; setTimeout(end, wt(820) + 400);
   }
   function onCard(i) {
     var g = G(); if (g.b.ph !== 'p' || UI.busy) return; var cur = g.hs[g.b.cur], c = cur.hand[i];
@@ -516,16 +621,29 @@
     });
   }
   function afterMove() { var g = G(); if (g.scr !== 'battle') { render(); } }
-  function usePot(i) {
+  // potion menu: what it does, then Drink (on a chosen foe if it targets) or Discard
+  function potPop() {
+    var g = G(), i = UI.potSel, id = g && g.pots[i]; var o0 = document.querySelector('.ec-potpop'); if (o0) o0.remove(); if (!id) { UI.potSel = -1; return; }
+    var P = D.POTIONS[id], inFight = g.scr === 'battle' && g.b && g.b.ph === 'p' && !UI.busy, d = h('div', 'ec-potpop'); d.setAttribute('role', 'dialog');
+    d.appendChild(h('b', '', P.name)); d.appendChild(h('span', '', P.t)); var row = h('div', 'row');
+    if (inFight && P.tgt) g.b.en.forEach(function (e, k) { if (e.dead) return; var b = on(h('button', 'btn potdrink', 'Drink on ' + D.ENEMIES[e.id].name), function () { UI.potSel = -1; usePot(i, k); }); row.appendChild(b); });
+    else if (inFight) row.appendChild(on(h('button', 'btn potdrink', 'Drink'), function () { UI.potSel = -1; usePot(i); }));
+    else row.appendChild(h('span', 'potnote', 'Drink it during a fight.'));
+    row.appendChild(on(h('button', 'btn alt potdisc', 'Discard'), function () { UI.potSel = -1; E.performMove({ t: 'toss', p: i }); render(); }));
+    row.appendChild(on(h('button', 'btn alt potclose', 'Close'), function () { UI.potSel = -1; render(); }));
+    d.appendChild(row); document.body.appendChild(d);
+  }
+  UI.potPop = potPop;
+  function usePot(i, k) {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p') { toast('Use in a fight'); return; }
     var id = g.pots[i];
-    if (D.POTIONS[id].tgt) { var al = g.b.en.map(function (e, k) { return e.dead ? -1 : k; }).filter(function (k) { return k >= 0; }); E.performMove({ t: 'pot', p: i, e: al[0] }); }
+    if (D.POTIONS[id].tgt) { var al = g.b.en.map(function (e, k) { return e.dead ? -1 : k; }).filter(function (k) { return k >= 0; }); E.performMove({ t: 'pot', p: i, e: k != null && al.indexOf(k) >= 0 ? k : al[0] }); }
     else E.performMove({ t: 'pot', p: i });
     render();
   }
   function endTurn() {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; if (!tutOk({ type: 'tap', w: 'end' })) return; UI.sel = -1;
-    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.bk0 = hh0.blk; if (UI.fs && hh0.en > 0 && hh0.hand.some(function (c) { return playable(hh0, c) && E.eff(c).type !== 'X'; })) UI.fs.waste += hh0.en; } catch (e) { }
+    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.inc0 = g.b.en.reduce(function (t, e, i) { return t + (!e.dead && e.intent && e.intent.atk ? E.previewHit(i, g.b.cur) : 0); }, 0); UI.bk0 = hh0.blk; if (UI.fs && hh0.en > 0 && hh0.hand.some(function (c) { return playable(hh0, c) && E.eff(c).type !== 'X'; })) UI.fs.waste += hh0.en; } catch (e) { }
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
@@ -542,7 +660,7 @@
     if (!window.ANIM) { E.settle(); render(); return; }
     UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
     var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
-    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0) UI.coachReact('good', 'blocked'); } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
+    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0 && UI.inc0 > 0) UI.coachReact('good', 'blocked'); UI.hp0 = null; } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
     UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
       var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
@@ -568,15 +686,17 @@
     if (!r.treasure && UI.fanKey !== rk) { UI.fanKey = rk; fanfare(wasB); }
     if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
-    if (r.pot && !r.took.pot) { var pb = on(h('button', 'item', null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', D.POTIONS[r.pot].name)]), function () { E.performMove({ t: 'takepot' }); render(); }); pb.style.width = '140px'; s.appendChild(pb); }
-    if (r.relics && !r.took.relic) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id || r.took['r' + i]) return; var b = on(h('button', 'item', null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', D.RELICS[id].name), h('span', '', D.RELICS[id].t)]), function () { E.performMove({ t: 'relic', i: i }); render(); }); b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
+    if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
+    if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    var act = h('div', 'rwact');   // R21: Skip + Continue in one row that sticks to the bottom of the reward, so it never falls below the fold
     Object.keys(r.cards).forEach(function (hi) {
-      if (r.took['c' + hi]) return; if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
+      if (r.took['c' + hi]) { s.appendChild(h('div', 'sub w7done', (UI.rwNote && UI.rwNote[rk + ':' + hi]) || 'Card choice done.')); return; } if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
-      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
-      s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { E.performMove({ t: 'skip', h: +hi }); render(); }));
+      var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = '\u2713 ' + D.CARDS[id].name + ' added to your deck.'; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
+      (g.hs.length === 1 ? act : s).appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
-    var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; s.appendChild(lv);
+    var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; act.appendChild(lv); s.appendChild(act);
     hud(); app.appendChild(s);
   }
   // W420: one-line fight rating + reward value tags
@@ -594,17 +714,26 @@
     if (/"(draw|nrg|scry|mir)"/.test(s)) return 'draw';
     return 'utility';
   }
-  function deckPicker(title, hi, filter, cb) {
-    var g = G(), ov = h('div', 'ov'); ov.appendChild(h('h2', '', title, [on(h('button', 'x', '✕'), function () { UI.ov = null; render(); })]));
-    var gr = h('div', 'grid'); g.hs[hi].deck.forEach(function (c, i) { if (!filter(c)) return; var el = cardEl(c); on(el, function () { cb(i); }); gr.appendChild(el); });
+  // deck picker; with up=1 a tap shows the card before and after the upgrade, and nothing changes until Upgrade is tapped
+  function deckPicker(title, hi, filter, cb, up) {
+    var g = G(), ov = h('div', 'ov'); ov.appendChild(h('h2', '', title, [on(h('button', 'x', '✕'), function () { UI.ov = null; UI.pickSel = -1; render(); })]));
+    var ps = UI.pickSel != null ? UI.pickSel : -1, pc = up && ps >= 0 ? g.hs[hi].deck[ps] : null;
+    if (up) {
+      var pv = h('div', 'ec-upv');
+      if (pc) { var a0 = cardEl(pc), a1 = cardEl({ id: pc.id, u: 1 }); pv.appendChild(a0); pv.appendChild(h('span', 'arr', '→')); pv.appendChild(a1);
+        var ok = on(h('button', 'btn', 'Upgrade ' + D.CARDS[pc.id].name), function () { UI.pickSel = -1; cb(ps); }); ok.id = 'upg-ok'; pv.appendChild(ok); }
+      else pv.appendChild(h('div', 'sub', 'Tap a card to see it upgraded.'));
+      ov.appendChild(pv);
+    }
+    var gr = h('div', 'grid'); g.hs[hi].deck.forEach(function (c, i) { if (!filter(c)) return; var el = cardEl(c); if (up && i === ps) el.classList.add('sel'); on(el, function () { if (up) { UI.pickSel = i; render(); } else cb(i); }); gr.appendChild(el); });
     ov.appendChild(gr); return ov;
   }
   function rest() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
-    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Heal ' + (9 + (E.has('healing-moss') ? 10 : 0)) + ' HP, or sharpen one card.'));
+    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP, or smith: upgrade one card for good.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
-    var amt = 3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0);
+    var amt = E.restHeal(g.hs[hi]);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';
     var b2 = on(h('button', 'btn alt', 'Smith: upgrade a card'), function () { UI.ov = 'smith'; render(); }); b2.id = 'rest-smith';
     s.appendChild(b1); s.appendChild(b2); hud(); app.appendChild(s);
@@ -616,11 +745,12 @@
     g.shop.items.forEach(function (x, i) {
       var nm = x.t === 'card' ? D.CARDS[x.id].name : x.t === 'relic' ? D.RELICS[x.id].name : D.POTIONS[x.id].name;
       var art = x.t === 'card' ? A(x.id, nm, { ph: TONE[D.CARDS[x.id].hero] }) : x.t === 'relic' ? A('relic-' + x.id, nm, { ph: '#8a6a2a' }) : A('pot-' + x.id, nm, { ph: '#5a8a5a' });
-      var b = h('button', 'item' + (x.sold ? ' sold' : '') + (g.gold < x.p ? ' poor' : ''), null, [art, h('span', '', nm), h('span', 'price', '● ' + x.p)]);
+      var ds = x.t === 'card' ? E.lines(E.eff({ id: x.id, u: 0 })).join(' ') : x.t === 'relic' ? D.RELICS[x.id].t : D.POTIONS[x.id].t, ty = x.t === 'card' ? ({ A: 'Attack', S: 'Skill', P: 'Power' })[D.CARDS[x.id].type] || 'Card' : x.t === 'relic' ? 'Relic' : 'Potion';
+      var b = h('button', 'item shoptile t-' + x.t + (x.sold ? ' sold' : '') + (g.gold < x.p ? ' poor' : ''), null, [art, h('b', 'stn', nm), h('i', 'sty', ty + (x.t === 'card' ? ' · cost ' + D.CARDS[x.id].cost : '')), h('span', 'sds', x.sold ? 'Sold' : ds), h('span', 'price', '● ' + x.p)]); b.setAttribute('aria-label', nm + ', ' + ty + ', ' + ds + ', ' + x.p + ' gold');
       if (UI.shopSel === i) b.classList.add('picked');
       on(b, function () { UI.shopSel = i; render(); }); it.appendChild(b);
     });
-    var rm = on(h('button', 'item' + (g.shop.removed ? ' sold' : ''), null, [A('icon-remove', '✂', { ph: '#7a3a3a' }), h('span', '', 'Remove a card'), h('span', 'price', '● ' + g.shop.rm)]), function () { if (g.gold < g.shop.rm) { toast('Not enough gold'); return; } UI.ov = 'remove'; render(); });
+    var rm = on(h('button', 'item shoptile t-rm' + (g.shop.removed ? ' sold' : ''), null, [A('icon-remove', '✂', { ph: '#7a3a3a' }), h('b', 'stn', 'Remove a card'), h('i', 'sty', 'Service'), h('span', 'sds', g.shop.removed ? 'Done' : 'Take one card out of your deck.'), h('span', 'price', '● ' + g.shop.rm)]), function () { if (g.gold < g.shop.rm) { toast('Not enough gold'); return; } UI.ov = 'remove'; render(); });
     it.appendChild(rm); s.appendChild(it);
     var sx = g.shop.items[UI.shopSel];
     if (sx && !sx.sold) {
@@ -634,7 +764,7 @@
   }
   function event() {
     var g = G(), ev = D.EVENTS[g.evn.id], s = h('div', 'reward'); s.appendChild(A('bg-event', '', { cls: 'bg', kind: 'bg' }));
-    s.appendChild(h('h2', '', ev.name)); s.appendChild(host('cast-teller', ev.q)); s.appendChild(A('event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
+    s.appendChild(h('h2', '', ev.name)); s.appendChild(host('cast-teller', ev.q)); s.appendChild(A(ev.img || 'event-' + g.evn.id, ev.name, { cls: 'evart', ph: '#4a3a5a', kind: 'card' }));
     if (g.evn.res) { s.appendChild(h('div', 'sub', g.evn.res)); var evl = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); evl.id = 'ev-leave'; s.appendChild(evl); }
     else {
       s.appendChild(h('div', 'sub', ev.q)); var o = h('div', 'opts');
@@ -646,17 +776,19 @@
   function bigCard(c) { var pk = h('div', 'peek'); pk.appendChild(cardEl(c)); pk.addEventListener('pointerdown', function (e) { e.stopPropagation(); pk.remove(); }); pk.addEventListener('click', function () { pk.remove(); }); document.body.appendChild(pk); }
   function resultScr(r, done) {
     var g = G(); try { hud(); } catch (e) { }   // R1: the top-bar HP must match the result (0 when fallen)
+    if (g.won && (g.floor >= g.F) && !UI.camp && !window.EC_NOSAVE) { try { localStorage.setItem('ec-won1', '1'); } catch (e) { } }   // first full win: Tabletop becomes the default (unless the player picked)
     var s = h('div', 'over res'); s.appendChild(A(g.won ? 'bg-victory' : 'bg-defeat', '', { cls: 'bg panelbg', kind: 'bg' }));
     s.appendChild(h('h1', '', g.won ? ((g.F || 9) >= 9 ? 'SUMMIT!' : 'CLIMB WON!') : 'FALLEN'));
     var bossId = g.boss, kid = g.won ? bossId : g.killer, kd = kid && D.ENEMIES[kid];
     var cause = h('div', 'cause');
     if (kd && (!g.won || g.floor >= g.F)) cause.appendChild(A('enemy-' + kid, '', { ph: '#6a3a2a', cls: 'cause-art' }));
     var full = g.floor >= g.F; if (g.won && !full) { kd = null; }
-    cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? ' (boss)' : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
+    cause.appendChild(h('div', 'sub', g.won ? (full ? 'Final boss down: ' + (D.ENEMIES[bossId] ? D.ENEMIES[bossId].name : 'the tower boss') + '.' : 'The guided fight is won.') : (kd ? 'Felled by ' + kd.name + (g.killIn === 'b' ? (kd.boss ? ' (boss)' : ' (boss fight)') : g.killIn === 'e' ? ' (elite)' : '') + '.' : 'Your own cards finished you.')));
     s.appendChild(cause);
     var QS = (window.EC_STORY || {}).quick; if (QS && !UI.camp && !window.EC_NOSAVE) s.appendChild(h('div', 'storyline', g.won ? QS.won : QS.lost));
     var tot = g.hs.reduce(function (a, x) { return a + x.deck.length; }, 0);
-    s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F) + ' / ' + g.F + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
+    if (g.gentle) s.appendChild(h('div', 'refline', 'Played on Gentle (easier mode). Try Tabletop next.'));
+    s.appendChild(h('div', 'chip rstat', 'Floors ' + Math.min(g.floor, g.F + 1) + ' / ' + (g.F + 1) + '   Deck ' + tot + '   Relics ' + g.relics.length + '   Gold ' + g.gold));
     if (r) {
       var sr = h('div', 'rstars'); for (var i = 0; i < 3; i++) sr.appendChild(h('span', i < r.stars ? 'on' : '', '★'));
       s.appendChild(h('div', 'storyline', null, [sr, h('span', '', (r.def.title || 'Story') + (r.won ? ' · best ' + (r.best || r.stars) + ' of ' + (r.def.maxStars || 3) + ' stars' : ' · not cleared yet'))]));
@@ -667,13 +799,14 @@
     var gr = h('div', 'rgrid'); g.hs.forEach(function (x) { var seen = {}, order = []; x.deck.forEach(function (c) { var k = c.id + (c.u ? '+' : ''); if (!seen[k]) { seen[k] = { c: c, n: 0 }; order.push(k); } seen[k].n++; }); order.forEach(function (k) { var o = seen[k], t = on(h('button', 'rcard t-' + E.eff(o.c).type, null, [A(o.c.id, '', { cls: 'rart', kind: 'card', noph: 1 }), h('span', '', E.eff(o.c).name), h('i', '', o.n > 1 ? '×' + o.n : '')]), function () { bigCard(o.c); }); t.setAttribute('aria-label', 'View ' + E.eff(o.c).name); gr.appendChild(t); }); });
     dk.appendChild(gr); s.appendChild(dk);
     var rl = h('div', 'rsec'); rl.appendChild(h('b', '', 'Relics (tap for text)'));
-    var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { toast(D.RELICS[id].name + ': ' + D.RELICS[id].t, 3200); }); t.setAttribute('aria-label', D.RELICS[id].name); rr.appendChild(t); });
+    var rr = h('div', 'rrow'); g.relics.forEach(function (id) { var t = on(h('button', 'rrel', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]), function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: D.RELICS[id].name + ': ' + D.RELICS[id].t }]); }); t.setAttribute('aria-label', D.RELICS[id].name + ': ' + D.RELICS[id].t); t.title = D.RELICS[id].name + ': ' + D.RELICS[id].t; rr.appendChild(t); });
     rl.appendChild(rr); s.appendChild(rl);
     var bt = h('div', 'rbtns');
     var again = on(h('button', 'btn', 'Play again'), function () { done('again'); }); again.id = 'again'; bt.appendChild(again);
     if (r) { var mp = on(h('button', 'btn alt', 'Story map'), function () { done('map'); }); mp.id = 'rmap'; bt.appendChild(mp); }
     if (r && r.won) { var nx = on(h('button', 'btn', 'Next chapter'), function () { done('next'); }); nx.id = 'rnext'; bt.insertBefore(nx, bt.firstChild); }
     var tt = on(h('button', 'btn alt', 'Title'), function () { done('title'); }); tt.id = 'rtitle'; bt.appendChild(tt);
+    var sc = h('div', 'rscroll'); Array.prototype.slice.call(s.children).forEach(function (n) { if (!n.classList.contains('bg')) sc.appendChild(n); }); s.appendChild(sc);   // the deck scrolls inside rscroll, never under Play again / Title
     s.appendChild(bt); app.appendChild(s);
   }
   UI.showResult = function (r) {
@@ -701,9 +834,9 @@
       ov = h('div', 'ov'); ov.appendChild(h('h2', '', UI.ov === 'deck' ? 'Your deck' : UI.ov === 'draw' ? 'Draw pile' : 'Discard pile', [on(h('button', 'x', '✕'), close)]));
       var gg = h('div', 'grid'), cards = []; if (UI.ov === 'deck') g.hs.forEach(function (x) { cards = cards.concat(x.deck); }); else { var cu = g.hs[g.b.cur]; cards = UI.ov === 'draw' ? cu.draw.slice().sort(function (a, b) { return a.id < b.id ? -1 : 1; }) : cu.disc; }
       cards.forEach(function (c) { gg.appendChild(cardEl(c)); }); ov.appendChild(gg);
-    } else if (UI.ov === 'smith') { var hi = g.rest.todo[0]; ov = deckPicker('Upgrade which card?', hi, function (c) { return !c.u && D.CARDS[c.id].ops.length && D.CARDS[c.id].hero !== 'z'; }, function (i) { E.performMove({ t: 'upg', h: hi, c: i }); UI.ov = null; render(); }); }
+    } else if (UI.ov === 'smith') { var hi = g.rest.todo[0]; ov = deckPicker('Upgrade which card?', hi, function (c) { return !c.u && D.CARDS[c.id].ops.length && D.CARDS[c.id].hero !== 'z'; }, function (i) { E.performMove({ t: 'upg', h: hi, c: i }); UI.ov = null; render(); toast('Upgraded ' + D.CARDS[G().hs[hi].deck[i].id].name + '+', 2200); }, 1); }
     else if (UI.ov === 'remove') { ov = h('div', 'ov'); ov.appendChild(h('h2', '', 'Remove which card?', [on(h('button', 'x', '✕'), close)])); var gr2 = h('div', 'grid'); g.hs.forEach(function (x, hi) { x.deck.forEach(function (c, i) { var el = cardEl(c); on(el, function () { E.performMove({ t: 'remove', h: hi, c: i }); UI.ov = null; render(); }); gr2.appendChild(el); }); }); ov.appendChild(gr2); }
-    else if (UI.ov === 'evpick') { ov = deckPicker(g.evn.pend === 'rem' ? 'Remove which card?' : 'Upgrade which card?', 0, function (c) { return g.evn.pend === 'rem' || (!c.u && D.CARDS[c.id].ops.length); }, function (i) { E.performMove({ t: 'evpick', c: i }); UI.ov = null; render(); }); }
+    else if (UI.ov === 'evpick') { ov = deckPicker(g.evn.pend === 'rem' ? 'Remove which card?' : 'Upgrade which card?', 0, function (c) { return g.evn.pend === 'rem' || (!c.u && D.CARDS[c.id].ops.length); }, function (i) { E.performMove({ t: 'evpick', c: i }); UI.ov = null; render(); }, g.evn.pend !== 'rem' && g.evn.pend !== 'xform'); }
     if (ov) { ov.addEventListener('click', function (e) { if (e.target === ov) close(); }); app.appendChild(ov); }
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && UI.ov) { UI.ov = null; render(); } });
