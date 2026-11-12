@@ -237,9 +237,9 @@ document.addEventListener('click', ev => {
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
     case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; UI.shopInfo = null; shopToggle(d.k); break;
-    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
+    case 'shopbuy': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
     case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; UI.shopInfo = d.ri || null; rubySelect(d.k); break;
-    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
+    case 'rubygo': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;

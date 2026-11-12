@@ -218,7 +218,7 @@ function marketEl(p, q) {
   wrap.appendChild(h('div.stw', stalls, more)); stalls.addEventListener('scroll', () => smoreUpd(stalls, more), { passive: true });
   requestAnimationFrame(() => { smoreUpd(stalls, more); stFit(stalls); smoreUpd(stalls, more); });
   // a tap on a chip the scroll edge cuts still buys it, and the stall slides fully into view
-  stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'); if (b && b.classList.contains('tcut')) { const s = b.closest('.stall,.rbar'); if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
+  stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
     wrap.appendChild(h('div.sinfo', ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
@@ -241,8 +241,9 @@ function stFit(st) {
 function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
   st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
-  // R17/R22: a chip or ruby button cut by the scroll edge is marked; it stays visible and tappable (a tap buys it and scrolls its stall into view)
-  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); });
+  // R17/R22: a chip cut by the scroll edge (tcut) stays visible and buys on a tap, then its stall slides into view; one whose centre is past the edge
+  // (tout) cannot take a tap at its centre, so it is hidden until it scrolls in (a tap on its stall scrolls it in)
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); e.classList.toggle('tout', r.height > 0 && (cy > b - 4 || cy < t + 4)); });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
