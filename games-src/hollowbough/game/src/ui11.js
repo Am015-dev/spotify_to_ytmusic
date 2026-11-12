@@ -17,10 +17,10 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
-  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
-  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'All workers are out. Tap Prepare. They come home and you gain more.', pic: () => hnode(() => HP.season(1)) },
-  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice. Your city still scores.', pic: () => hnode(HP.tree) },
-  how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'This can be done in several ways. Tap the option you want.', pic: () => hnode(HP.cost) },
+  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing place or card.', pic: () => hnode(HP.worker) },
+  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'Tap Prepare. Workers come home.', pic: () => hnode(() => HP.season(1)) },
+  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card, or tap Pass twice.', pic: () => hnode(HP.tree) },
+  how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'Tap the way you want.', pic: () => hnode(HP.cost) },
   pickCard: { target: hfirst('#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a card', text: 'The power needs a card. Tap one that glows.', pic: () => hnode(HP.card) },
   pickRes: { target: hfirst('#acts .tchip'), title: 'Pick a resource', text: 'Tap the resource you want, in the row below the board.', pic: () => hnode(() => HP.res('berry')) },
   pickPlace: { target: hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a place', text: 'Tap the glowing place or worker the power should use.', pic: () => hnode(HP.haven) },
@@ -141,5 +141,5 @@ function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
   // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
-  void st; void nb; try { const ph = hlpPhase(); GXH.phase(ph === 'turn' && guideOn() ? null : ph); } catch (e) { }   // R35: while the finger shows the move, the 'Your turn' bubble stays away (one message at a time)
+  void st; void nb; try { GXH.phase(hlpPhase()); } catch (e) { }
 }

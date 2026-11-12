@@ -221,7 +221,8 @@ function guideTop() {
 }
 function guideTrim(myNow) {
   if (!myNow || !guideOn()) return;
-  const top = guideTop(); if (!top.size) return;
+  const top = new Set(guideTop()); if (!top.size) return;
+  if (UI.rec && UI.rec.m) top.add(tgOf(UI.rec.m));   // the finger's target always shines
   for (const tg in UI.tgEls) { if (!/^(w:|p:|d:)/.test(tg)) continue; const e = UI.tgEls[tg];
     if (top.has(tg)) continue;
     if (e.classList.contains('glow')) { e.classList.remove('glow'); e.classList.add('cango'); } }
@@ -481,7 +482,7 @@ function renderActs(mm, qm, qShown) {
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
     else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
-    if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : '') + (mm.every(m => m.type === 'pass') ? '.glow' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
+    if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
 function renderPrompt() {
@@ -638,12 +639,12 @@ function pvSetTab(v, quiet) {
   try { meadFix(); } catch (e) { }
   pvRects(); if (!quiet) { try { placeFinger(); } catch (e) { } }
 }
-// the meadow row scrolls sideways: bring the card the finger points at (else the first glowing one) fully into view
+// the meadow row scrolls sideways: bring the card the finger points at (else the first glowing one) fully into view, moving the row as little as possible
 function meadFix() {
   const mead = document.querySelector('#bd .pv-mead'); if (!mead) return; const q = mead.getBoundingClientRect(); if (q.width < 4) return;
   const rt = UI.rec && UI.rec.m && UI.tgEls && UI.tgEls[tgOf(UI.rec.m)], want = rt && mead.contains(rt) ? rt : mead.querySelector('.glow'); if (!want) return;
   const r = want.getBoundingClientRect(); if (r.left >= q.left - 1 && r.right <= q.right + 1) return;
-  mead.scrollLeft = Math.max(0, mead.scrollLeft + (r.left - q.left) - Math.max(8, (q.width - r.width) / 2)); UI.pvMx = mead.scrollLeft;
+  mead.scrollLeft = Math.max(0, mead.scrollLeft + (r.left < q.left ? r.left - q.left - 8 : r.right - q.right + 8)); UI.pvMx = mead.scrollLeft;   // the smallest scroll that shows it whole
 }
 // where things are, for the flying pieces (a piece on a hidden panel flies to / from its tab)
 function pvRects() {
@@ -832,8 +833,7 @@ function pvRender() {
   if (UI.pvCityN != null && fs === UI.pvSeat && me.city.length > UI.pvCityN && fs === viewSeat()) { UI.pvForce = 'city'; UI.pvCityAt = Date.now(); }
   UI.pvCityN = me.city.length; UI.pvSeat = fs;
   if (UI.pvForce) { UI.pvTab = UI.pvForce; UI.pvForce = null; }
-  else if (myNow && !UI.pvMine) { UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places'); if (!glowIn(UI.pvTab)) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
-    if (guideOn() && UI.rec && UI.rec.m) { const re = UI.tgEls[tgOf(UI.rec.m)], pn = re && re.closest && re.closest('.pv-panel'); if (pn) UI.pvTab = pn.dataset.p; } }   // a new turn opens on the panel the finger points into
+  else if (myNow && !UI.pvMine) { UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places'); if (!glowIn(UI.pvTab)) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; } }
   else if (mine && (G.q || UI.sel) && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
   UI.pvMine = myNow;
   if (UI.tutTab && typeof tutOn === 'function' && tutOn()) UI.pvTab = UI.tutTab;   // Learn: the panel the current step points at stays in front

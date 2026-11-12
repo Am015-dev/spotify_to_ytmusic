@@ -149,7 +149,10 @@ function fingerWanted() {
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
-function hscrollTo(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
+function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
+// the finger stays on its target when a row scrolls under it
+function fingerFollow() { const f = document.getElementById('finger'), el = UI.fingerEl; if (!f || f.hidden || !el || !el.isConnected) return; const r = frameRect(el); if (!r || r.w < 4) return; const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; }
+function hscrollTo0(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
   if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
   else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
 function placeFinger() {
@@ -161,17 +164,18 @@ function placeFinger() {
   let el = UI.tgEls && UI.tgEls[tg];
   if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
   if (!el) return;
-  { const pn = PV_ON && el.closest && el.closest('#bd.pv .pv-panel'); const tb = pn && !pn.classList.contains('on') && pvTall() && document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]');
-    if (tb) el = tb; else hscrollTo(el); }   // the finger never flips the panel by itself: on a hidden panel it points at that panel's tab
+  if (tg === 'pass' && UI.mode !== 'guided') return;   // vs games: Pass never glows, so the finger does not point at it
+  { const pn = PV_ON && el.closest && el.closest('#bd.pv .pv-panel'); const tb = pn && !pn.classList.contains('on') && pvTall() && UI.pvTabUser === G.logN && document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]');
+    if (tb) { el = tb; tb.classList.add('glow'); } else hscrollTo(el); }   // a tab the player picked this turn stays in front: the finger then points at its target's tab
   const r = frameRect(el); if (!r || r.w < 4) return;
-  const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
+  const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false; UI.fingerEl = el;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
 // ---- Play view (W457): tab taps, drag a worker meeple onto a place or a hand card up into the city, a tick on every usable tap
 if (PV_ON) {
   document.addEventListener('click', e => {
     if (UI.pvDragEnd && Date.now() - UI.pvDragEnd < 450) { e.stopPropagation(); e.preventDefault(); return; }
-    const t = e.target.closest && e.target.closest('[data-a="pvtab"]'); if (t) { e.stopPropagation(); pvSetTab(t.dataset.v); snd('click', { vol: .4 }); }
+    const t = e.target.closest && e.target.closest('[data-a="pvtab"]'); if (t) { e.stopPropagation(); UI.pvTabUser = G ? G.logN : -1; pvSetTab(t.dataset.v); snd('click', { vol: .4 }); }
     // a board tap while a message card is up (or before the game starts) still answers: a small 'not now' shake
     const bt = e.target.closest && e.target.closest('#bd.pv [data-a="t"]'); if (bt && (!G || UI.cards.length || !UI.started)) shake(bt);
   }, true);
