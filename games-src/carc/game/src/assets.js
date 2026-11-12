@@ -2,7 +2,7 @@
 // The camp-* portraits are the computer rivals' faces (turn line). Everything else in media/ and models/ (Story map nodes, panels,
 // bubbles, pieces) loads in small idle batches after the first screen, and the music tracks are fetched one by one later, so Story
 // mode, the result card and the Music picker open without a wait. Data saver on = no music warm-up.
-const RIVAL_PIC=['hob','ferro','mabry','dulcie','wren','corvin','isolde','quill','ostrand','baron'];
+const RIVAL_PIC=['hob','ferro','mabry','dulcie','wren','corvin','isolde','quill','ostrand','baron','garnet'];
 function rivalPic(p){if(!p||p.human)return '';if(UI.coach&&typeof STORY!=='undefined')return STORY.rival.img;const nm=String(p.nm||'').toLowerCase(),hit=RIVAL_PIC.find(k=>nm.includes(k));return MEDIA+'camp-'+(hit||RIVAL_PIC[(p.i-1+RIVAL_PIC.length)%RIVAL_PIC.length])+'.webp'}
 (function(){const o=say;say=function(t,tn,rc){o.apply(this,arguments);try{const p=G&&G.cur&&!G.over?P(G.cur.p):null,u=PAINT_ON&&rivalPic(p),b=document.querySelector('#status .tn');if(u&&b){const i=document.createElement('img');i.className='tpic';i.alt='';i.src=u;b.insertBefore(i,b.firstChild)}}catch(e){}}})();
 function assetsWarm(){const L=MEDIA_FILES.filter(f=>/\.webp$/.test(f)).map(f=>MEDIA+f).concat((typeof MODEL_FILES!=='undefined'?MODEL_FILES:[]).filter(f=>/\.webp$/.test(f)).map(f=>'models/'+f));

@@ -66,47 +66,58 @@ const trayStarts = k => () => { const s = document.querySelector('#tbl .seat.me'
 const tutDone = () => !!(G && G.phase === 'over' && UI.tutOver && UI.rsInfo && UI.rsInfo.done);
 const RS = seat => G.rs[0][seat];   // round-1 score lines: 0 = you, 1 = the chef
 const pickStep = (id, t, title, say, extra) => Object.assign({ id, title, say, target: () => beltCard(myPick(t)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(t)[0] }, ready: () => turnIs(t) && UI.sel.length === 0 && !UI.twin }, extra || {});
+// a "look" step: one sentence, and the glowing thing itself is the one tap that moves on (no Next button; see the capture listener below)
+const lookStep = (id, title, say, target, ready, extra) => Object.assign({ id, title, say, target, look: true, wait: { type: 'tap', match: a => a.what === 'look' && a.step === id }, ready }, extra || {});
+const shelfOrMe = () => tq('#tbl .seat.me .grp.shelf')() || tq('#tbl .seat.me .ctr')();
+// every rule id the tutorial must teach, in order (tut-walk.js checks each appears as a step)
+const TUT_RULES = ['goal', 'chef', 'pick1', 'passed', 'pick2', 'paste', 'nigiri', 'nigiriVals', 'sticksTake', 'sticksUse', 'twinA', 'twinB', 'fish3', 'roll', 'bun', 'custard', 'scoreSets', 'scoreRoll', 'rollTie', 'scoreNigiri', 'scoreChef', 'clear', 'rounds', 'custardEnd', 'penalty', 'custardTie', 'tieBreak'];
 function tutStepsRaw() {
+  const R = () => pname(1);
   return [
-    { id: 'goal', title: 'Your goal', say: 'Collect dishes that score points. After the last round the highest total wins. Today: one short round.', target: tq('#tbl .seat.me .av'), wait: null, ready: () => turnIs(1) },
-    { id: 'chef', title: 'The chef', say: () => pname(1) + ' is a computer. They play by the same rules and choose at the same time as you.', target: tq('#tbl .seat:not(.me) .sh'), wait: null, ready: () => turnIs(1) },
-    { id: 'belt', title: 'Your plates', say: 'Each turn you take one dish. Then your other dishes pass along the belt to the chef.', target: tq('#belt'), wait: null, ready: () => turnIs(1) },
-    pickStep('pick1', 1, 'Take one dish', 'Tap the Crispy Prawn to take it.'),
-    { id: 'passed', title: 'Picks flip together', say: 'Both picks were revealed at once, then the hands swapped. You now hold the chef\'s leftovers.', target: tq('#belt'), wait: null, ready: () => turnIs(2) },
-    pickStep('pick2', 2, 'A pair scores 5', 'Two Crispy Prawns make a pair: 5 points. Tap this one.'),
-    pickStep('paste', 3, 'Fire Paste', 'Fire Paste triples the next nigiri you take. Tap it.'),
-    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon Nigiri is worth 3. On your Fire Paste it scores 9. Tap it.'),
-    pickStep('sticksTake', 5, 'Twin Sticks', 'Twin Sticks stay on your table. Take them now and use them next turn.'),
-    { id: 'sticksUse', title: 'Use the sticks', say: 'The glowing sticks let you take two dishes this turn. Tap them.', target: tq('#tbl .seat.me .grp.usable'), wait: { type: 'tap', match: a => a.what === 'twin' }, ready: () => turnIs(6) && !!document.querySelector('#tbl .seat.me .grp.usable') && !UI.twin },
-    { id: 'twinA', title: 'First dish', say: 'Fish Slices score 10 for a set of three. Tap a Fish Slice.', target: () => beltCard(myPick(6)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[0] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 0 },
-    { id: 'twinB', title: 'Second dish', say: 'Tap the other Fish Slice. The sticks go back into the hand you pass on.', target: () => beltCard(myPick(6)[1])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[1] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 1 },
-    pickStep('fish3', 7, 'Complete the set', 'Three Fish Slices make a set: 10 points. Tap the third.'),
-    pickStep('roll', 8, 'Seaweed Rolls', 'Roll icons race. Most icons this round scores 6, second most 3. Tap the three-icon roll.'),
-    pickStep('bun', 9, 'Steam Buns', 'Each extra bun is worth more: 1, 3, 6, 10, then 15. Tap it.'),
-    pickStep('custard', 10, 'Custard Cup', 'Custard scores only at the game end. Most cups gets 6. Tap it.'),
-    { id: 'scoreSets', title: 'Sets scored', say: () => 'Prawn pair ' + RS(0).tempura + ', Fish Slice set ' + RS(0).sashimi + ', one Steam Bun ' + RS(0).dumpling + '. A lone dish scores nothing.', target: tq('#tbl .seat.me .ctr'), wait: null, ready: tutDone, pending: 'Counting the round' },
-    { id: 'scoreRoll', title: 'Roll race', say: () => 'Your ' + RS(0).icons + ' icons beat the chef\'s ' + RS(1).icons + ': you get ' + RS(0).maki + ', they get ' + RS(1).maki + '.', target: myTray('roll'), wait: null, ready: tutDone },
-    { id: 'scoreNigiri', title: 'Nigiri and paste', say: () => 'Your Moon Nigiri on Fire Paste scored ' + (RS(0).nigiri + RS(0).wasabi) + '. Nigiri alone: 1 to 3.', target: trayStarts('pn-'), wait: null, ready: tutDone },
-    { id: 'scoreChef', title: 'The chef scored', say: () => pname(1) + ' got ' + RS(1).total + '. Her lone Fish Slice scored nothing.', target: tq('#tbl .seat:not(.me)'), wait: null, ready: tutDone },
-    { id: 'scoreCustard', title: 'Custard counts', say: 'Custard scores once, at the very end: most cups +6, fewest −6 (not with two diners).', target: tq('#tbl .seat.me .grp.shelf'), wait: null, ready: tutDone },
-    { id: 'end', title: 'The meal ends', say: () => 'You win ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '! Real meals last 3 rounds. Ties go to more custard.', target: tq('#tbl .seat.me .av'), wait: null, ready: tutDone }
+    lookStep('goal', 'Your goal', 'Most points after three rounds wins the meal.', tq('#tbl .seat.me .av'), () => turnIs(1)),
+    lookStep('chef', 'The chef', () => R() + ' picks at the same time, by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
+    pickStep('pick1', 1, 'Take one dish', 'Each turn, take one dish. Nobody sees your pick.'),
+    lookStep('passed', 'Flip and pass', 'Picks flip together. Then the hands pass on.', tq('#belt'), () => turnIs(2)),
+    pickStep('pick2', 2, 'A pair scores 5', 'Two Crispy Prawns make a pair: 5 points.'),
+    pickStep('paste', 3, 'Fire Paste', 'Fire Paste triples the next nigiri you take.'),
+    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon Nigiri is 3. On your Fire Paste it scores 9.'),
+    lookStep('nigiriVals', 'Nigiri values', 'Nigiri alone: Sun 1, Sunset 2, Moon 3.', trayStarts('pn-'), () => turnIs(5)),
+    pickStep('sticksTake', 5, 'Twin Sticks', 'Twin Sticks let you take two dishes on a later turn.'),
+    { id: 'sticksUse', title: 'Use the sticks', say: 'Tap your sticks: two dishes this turn.', target: tq('#tbl .seat.me .grp.usable'), wait: { type: 'tap', match: a => a.what === 'twin' }, ready: () => turnIs(6) && !!document.querySelector('#tbl .seat.me .grp.usable') && !UI.twin },
+    { id: 'twinA', title: 'First dish', say: 'Three Fish Slices score 10. One or two score nothing.', target: () => beltCard(myPick(6)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[0] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 0 },
+    { id: 'twinB', title: 'Second dish', say: 'Take another. The sticks go back into the passed hand.', target: () => beltCard(myPick(6)[1])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[1] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 1 },
+    pickStep('fish3', 7, 'Complete the set', 'A third Fish Slice completes the set: 10 points.'),
+    pickStep('roll', 8, 'Seaweed Rolls', 'Most roll icons scores 6. Second most scores 3.'),
+    pickStep('bun', 9, 'Steam Buns', 'Steam Buns climb: 1, 3, 6, 10, then 15.'),
+    pickStep('custard', 10, 'Custard Cup', 'Custard Cups stay on your table until the meal ends.'),
+    lookStep('scoreSets', 'Sets scored', () => 'Prawn pair ' + RS(0).tempura + ', Fish set ' + RS(0).sashimi + ', one bun ' + RS(0).dumpling + '.', tq('#tbl .seat.me .ctr'), tutDone, { pending: 'Counting the round' }),
+    lookStep('scoreRoll', 'Roll race', () => 'Your ' + RS(0).icons + ' icons beat ' + R() + '\'s ' + RS(1).icons + ': +' + RS(0).maki + ' for you.', myTray('roll'), tutDone),
+    lookStep('rollTie', 'Roll tie', 'A tie for most icons splits 6, and nobody gets second.', myTray('roll'), tutDone),
+    lookStep('scoreNigiri', 'Nigiri and paste', () => 'Moon Nigiri on Fire Paste: ' + (RS(0).nigiri + RS(0).wasabi) + ' points.', trayStarts('pn-'), tutDone),
+    lookStep('scoreChef', 'The chef scored', () => R() + ' scored ' + RS(1).total + '. A lone Fish Slice scores nothing.', tq('#tbl .seat:not(.me)'), tutDone),
+    lookStep('clear', 'Round over', 'After a round, every dish except custard leaves the table.', tq('#tbl .seat.me .ctr'), tutDone),
+    lookStep('rounds', 'Three rounds', 'A real meal has three rounds. Each round deals fresh hands.', tq('#tbl .seat.me .av'), tutDone),
+    lookStep('custardEnd', 'Custard counts', 'At the very end, most Custard Cups scores 6.', shelfOrMe, tutDone),
+    lookStep('penalty', 'Fewest cups', 'With three or more diners, fewest cups loses 6.', shelfOrMe, tutDone),
+    lookStep('custardTie', 'Custard ties', 'Custard ties split the points, rounded down.', shelfOrMe, tutDone),
+    lookStep('tieBreak', 'Equal totals', 'Equal totals? The diner with more Custard Cups wins.', tq('#tbl .seat.me .av'), tutDone)
   ];
 }
-// the story layer: every step is a reason (story.js), then the action; chapters open with a beat and pay off in the next one
+// titles and fixed sentences live in story.js (KK.STORY.tut); steps with live numbers keep their own sentence
 function tutSteps() {
-  const raw = tutStepsRaw(), T = KK.STORY.tut, C = KK.STORY.chapters, P = KK.STORY.payoff, DYN = { scoreSets: 1, scoreRoll: 1, scoreNigiri: 1, scoreChef: 1, end: 1 };
-  raw.forEach(st => { const t = T[st.id]; if (!t) return; st.title = t.t; if (!DYN[st.id]) st.say = t.s; });
-  const beat = (id, before, tgt, pay) => { const nx = raw.find(x => x.id === before); return { id, title: C[id].title, say: C[id].open, target: tgt, wait: null, ready: nx.ready, chapter: true }; };
-  const out = [];
-  raw.forEach(st => {
-    if (st.id === 'goal') out.push(beat('c1', 'goal', tq('#belt')));
-    if (st.id === 'paste') out.push(beat('c2', 'paste', tq('#belt'), 'c1'));
-    if (st.id === 'fish3') out.push(beat('c3', 'fish3', tq('#belt'), 'c2'));
-    if (st.id === 'scoreSets') out.push(beat('c4', 'scoreSets', tq('#tbl .seat.me .ctr'), 'c3'));
-    out.push(st);
-  });
-  return out;
+  const raw = tutStepsRaw(), T = KK.STORY.tut, DYN = { chef: 1, scoreSets: 1, scoreRoll: 1, scoreNigiri: 1, scoreChef: 1 };
+  raw.forEach(st => { const t = T[st.id]; if (!t) return; if (t.t) st.title = t.t; if (!DYN[st.id] && t.s) st.say = t.s; });
+  return raw;
 }
+// a look step answers only a tap inside its glowing target; the tap is eaten so the board under it does nothing
+function tutLookHit(e) {
+  if (!tutOn()) return null; const st = GXT.current(); if (!st || !st.look) return null;
+  let el = null; try { el = st.target(); } catch (er) { } if (!el || !el.getBoundingClientRect) return null;
+  const r = el.getBoundingClientRect(), x = e.clientX, y = e.clientY, p = 8;
+  return x >= r.left - p && x <= r.right + p && y >= r.top - p && y <= r.bottom + p ? st : null;
+}
+window.addEventListener('pointerdown', e => { if (tutLookHit(e)) e.stopPropagation(); }, true);
+window.addEventListener('click', e => { const st = tutLookHit(e); if (!st) return; e.stopPropagation(); e.preventDefault(); GXT.act({ type: 'tap', what: 'look', step: st.id }); }, true);
 // ---------------------------------------------------------------- the kit hooks
 function tutLeave() {
   clearTimeout(UI.tm); UI.seq++; UI.rq = []; UI.started = false; UI.busy = false; UI.fz = null; UI.cards = []; UI.sel = []; UI.twin = false; UI.tutOver = false;
@@ -116,10 +127,17 @@ function tutLeave() {
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
 function storyOpen() { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
-  const pro = !!(o && o.prologue); const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS();
-  newGame('coached', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] });
-  coachBegin(pro, first);
+  if (typeof GXT === 'undefined') return; const pro = !!(o && o.prologue);
+  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
+  const cfg = { game: TUT_GAME, steps: tutSteps(), story: false, endTitle: 'You know the rules',
+    endButtons: pro && first ? [{ id: 'play', label: 'Play a real game' }, { id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'play', label: 'Play a real game' }],
+    setup: () => { try { GX.close(); } catch (e) { } try { closePop(); } catch (e) { } closeRS(); newGame('tutorial', { np: 2, seats: [2] }); },
+    onDone: r => { tutLeave(); try { lsSet('kk_done', '1'); } catch (e) { } const c = r && r.choice;
+      if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
+      else { goalCard.seen = 1; showStart(); newGame('vs', { np: 3, seats: [2, 3], level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'] }); } },
+    onExit: () => { tutLeave(); showStart(); if (pro && typeof GXC !== 'undefined') campOpen(); } };
+  Object.defineProperty(cfg, 'endText', { get: () => G && G.final ? 'You won ' + G.final.totals[0] + ' to ' + G.final.totals[1] + '. Now a real meal!' : 'Now a real three-round meal!' });
+  GXT.start(cfg);
 }
 // ================= the COACHED first game: a real 3-round game, free choices from turn 1; Suzu (and the rival) speak just in time =================
 // One bubble at a time, never blocks input (only the x takes taps), dismissible. Rules that never came up are listed on the end card ("Things you'll meet later").
