@@ -463,7 +463,7 @@ function markBest() {
   el.setAttribute('aria-label', (el.getAttribute('aria-label') || el.textContent) .replace(/, best move$/, '') + ', best move');
 }
 function renderBar() {
-  $('#barstat').textContent = G.over ? 'Game over' : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases;
+  $('#barstat').textContent = G.over ? 'Game over' : (innerWidth <= 640 ? VB.PHASES[Math.min(G.phase, 4)] + ' ' + (G.phase + 1) + '/' + G.nPhases : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases);   /* phones: the short form fits the bar, no clipped text */
 }
 function renderOpp() {   /* turn tracker (round, whose turn, dice left as tokens) + score chips with points by source */
   var o = $('#opp'); o.innerHTML = ''; o.classList.toggle('clean', !hints()); o.appendChild(trackerEl());
@@ -555,6 +555,7 @@ function renderEstate(box, seat, s) {
   });
   host.insertAdjacentHTML('beforeend', regionSvg(S, W, HH, p));
 }
+function dockSeat() { var a = VB.actor(G); return G.over ? me() : G.P[isHuman(a) ? a : UI.view]; }
 function renderDock() {
   var a = VB.actor(G), p = G.over ? me() : G.P[isHuman(a) ? a : UI.view], top = pend(), mt = myTurn();
   if (!G.over && isHuman(a)) UI.view = a;
@@ -595,7 +596,7 @@ function renderDock() {
   var rr = $('#resrow'); rr.innerHTML = '';
   var RESTIP = { silver: 'Silver buys back-lane tiles. 1 point each at the end.', workers: 'Drag a worker onto a die to change it by one.', vp: 'Your points so far.', pos: 'Banner track. Barges move you up and first.' };
   function resTap(k) { return function () { toast(RESTIP[k], 2600); }; }
-  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'silver' }, [h('span.rw', { text: p.silver + ' silver' })]));
+  rr.appendChild(h('span.res', { id: 'r-silver', title: 'Silver', 'aria-label': RESTIP.silver, onclick: resTap('silver'), 'data-engine': 'dockSeat().silver' }, [h('span.rw', { text: p.silver + ' silver' })]));
   var wl = p.workers - (mt ? bumpUsed() : 0);
   rr.appendChild(h('span.res.meep' + (mt && wl > 0 ? '.can' : ''), { id: 'r-workers', title: 'Workers', 'data-drag': mt && wl > 0 ? 'meeple' : null, 'data-idx': 0, 'aria-label': RESTIP.workers + ' You have ' + wl + '.', onclick: resTap('workers') }, [h('i', { html: MEEPLE }), h('span.rw', { text: wl + (wl === 1 ? ' worker' : ' workers') })]));
   rr.appendChild(h('span.res.vpchip', { id: 'r-vp', title: 'Points', 'aria-label': RESTIP.vp, onclick: resTap('vp') }, [h('span.rw', { text: p.vp + ' pts' })]));
