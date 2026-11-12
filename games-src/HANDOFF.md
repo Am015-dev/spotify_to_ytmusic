@@ -217,3 +217,10 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Fixers: F2 thornbound, F2 tidewake (r2: board size check), F2 lantern (r2 feel), F2 vinegrave (r2 assistants), kaiten, twin, nebula (first round, no report yet).
 - Waiting reviewer: perch.
 - Shared shell note: gx-tutor.js ignores taps for 600 ms after a bubble shows (deliberate debounce); consider 350 ms later.
+
+## 12 Nov 11:08 UTC
+- Weekly usage limit stopped every worker on 8 Nov 21:30; resumed today.
+- LIVE: sunglaze (deployed c48746443, 0 errors).
+- R7: stitchwise 7.0, crown 7.1, emberclimb 5.9. R9: rampart 7.3, redline 4.0 (rules stopper: discard/boost). R10: sands 6.6, hollowbough 7.0. R13: lantern 7.0, twin 7.0. Doorkick/vale/perch with R12 session_01RR7mnXeaxYbsvBMtyF1mRQ.
+- New fixers: F3-lantern session_01RR7mnZm6BLWzdPPXCs7ciW, F2-twin session_01RR7mna6NYWCERVdnXkZpi6, F3-stitchwise session_01RR7mnXi6YCTvaHmW1BQhu6, F2-crown session_01RR7mnZYF1KYv2BXV1e8yKS, F4-emberclimb session_01RR7mnZXpxHZ77HDqa9B4C4, F3-rampart session_01RR7mna9d1mUKys5mHLej2a, F3-redline session_01RR7mnas1tsFM9BAczLp4S1, F3-sands session_01RR7mnakUzknpQBowTqVJ96, F3-hollowbough session_01RR7mnZtC4qZFDbCGFrwqof.
+- Resumed (same sessions as before): final-approach, wildmark, thornbound, tidewake, vinegrave, short-fuse, cauldron, shipwreck, kaiten, nebula.
