@@ -73,7 +73,9 @@ function tmphHide(){try{PH.mphHide=UI.mph;phAfter()}catch(e){}}
 // a tap on the highlight of a "tap" step: swallowed (the game never sees it) and counted
 function tutTapIn(e){const s=TUTG.on&&TUTG.cur;if(!s||!s.tap||typeof GXT==='undefined')return false;const st=GXT.state();if(!st.shown||st.id!==s.id)return false;
   let r=null;try{const t=s.target();r=t&&t.getBoundingClientRect?t.getBoundingClientRect():t&&t.left!=null?t:t&&t.x!=null?{left:t.x-22,top:t.y-22,width:44,height:44}:null}catch(x){}
-  if(!r)return false;const p=e.changedTouches?e.changedTouches[0]:e;const x=p.clientX,y=p.clientY;return x>=r.left-4&&x<=r.left+r.width+4&&y>=r.top-4&&y<=r.top+r.height+4}
+  if(!r)return false;const p=e.changedTouches?e.changedTouches[0]:e;const x=p.clientX,y=p.clientY;if(x>=r.left-4&&x<=r.left+r.width+4&&y>=r.top-4&&y<=r.top+r.height+4)return true;
+  // a "look at this" step also goes on from a tap anywhere on the chart (a near miss on a small junk was a dead tap)
+  const bd=document.getElementById('board'),B=bd&&bd.getBoundingClientRect();return !!(B&&B.width>0&&x>=B.left&&x<=B.right&&y>=B.top&&y<=B.bottom&&!(e.target&&e.target.closest&&e.target.closest('button,[data-a],.gxt-top')))}
 for(const ev of ['pointerdown','pointerup','mousedown','mouseup','touchstart','touchend','click'])window.addEventListener(ev,e=>{if(!tutTapIn(e))return;e.stopPropagation();if(e.cancelable&&ev!=='touchstart')e.preventDefault();
   if(ev==='pointerup'||ev==='click'){const s=TUTG.cur;if(s&&TUTG.tap!==s.id){TUTG.tap=s.id;GXT.act({type:'event',k:'tap'})}}},true);
 // the "until" steps finish when the game reaches their state (polled)

@@ -107,7 +107,7 @@ function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI
 // the danger warning: a leviathan one move from your bow square or your tile (it strikes only on a roll of 6, 7 or 8)
 function dangerMons(){const me=youSeat();if(me<0||hotSeat()||!G||G.phase!=='play'||UI.tut)return [];const S=G.ships[me];if(!S||!S.alive||S.x==null)return [];
   const sq=[[S.x,S.y]];if(S.on)sq.push(S.on);return G.mons.filter(m=>m.k==='L'&&monHits(m,sq).length)}
-function dangerHTML(){const d=dangerMons();if(!d.length)return '';return `<span class="warn-l" data-danger="1"> &#9888; Danger: ${d.map(m=>esc(levName(m.id))).join(' and ')} can reach your junk if the dice show 6, 7 or 8.</span>`}
+function dangerHTML(){const d=dangerMons();if(!d.length)return '';const full=`${d.map(m=>levName(m.id)).join(' and ')} can reach your junk if the dice show 6, 7 or 8.`;return `<span class="warn-l" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}"> &#9888; ${d.length>1?d.length+' leviathans':esc(levName(d[0].id))}: 6-8 reaches you</span>`}
 function phWhose(i){const me=youSeat();return (i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>")}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
 function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
