@@ -34,7 +34,7 @@ html.sk-bomb svg.bm,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg{background:u
 html.sk-bomb svg.bm{width:36px;height:36px}
 html.sk-bomb svg.bm *,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg *{display:none}
 /* ---- player name plates: brass, the seat colour stays as the bottom edge ---- */
-html.sk-plate .plate{height:26px;padding:0 3px 0 0;border-style:solid;border-color:transparent;border-width:0 9px;border-radius:0;border-image:url(media/ui-nameplate-c.webp) 0 20 fill/0 9px stretch;background:none;color:#2a1a08;text-shadow:0 1px 0 rgba(255,235,170,.6);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));position:relative}
+html.sk-plate .plate{height:44px;padding:0 5px 0 2px;font-size:.86rem;border-style:solid;border-color:transparent;border-width:0 9px;border-radius:0;border-image:url(media/ui-nameplate-c.webp) 0 20 fill/0 9px stretch;background:none;color:#2a1a08;text-shadow:0 1px 0 rgba(255,235,170,.6);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));position:relative}
 html.sk-plate .plate::after{content:'';position:absolute;left:1px;right:-8px;bottom:2px;height:3px;border-radius:2px;background:var(--sc)}
 html.sk-plate .plate em{background:rgba(60,30,0,.18);color:#2a1a08}
 html.sk-plate .plate .star{color:#a3410a}

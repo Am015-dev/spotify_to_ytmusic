@@ -73,7 +73,7 @@
 .sg{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;position:relative}
 .sg.out{opacity:.6}
 .stand{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:3px;max-width:100%;position:relative}
-.plate{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px 0 5px;border-radius:12px;background:rgba(10,20,30,.55);border:2px solid var(--sc,#888);color:#fff;font:800 .78rem var(--fb);white-space:nowrap;max-width:100%;box-sizing:border-box;cursor:default}
+.plate{display:inline-flex;align-items:center;gap:5px;height:44px;padding:0 10px 0 7px;border-radius:22px;background:rgba(10,20,30,.55);border:2px solid var(--sc,#888);color:#fff;font:800 .78rem var(--fb);white-space:nowrap;max-width:100%;box-sizing:border-box;cursor:default}
 .plate .pdot{width:11px;height:11px;border-radius:50%;background:var(--sc);border:1.5px solid #14163a;flex:none}
 .plate b{overflow:hidden;text-overflow:ellipsis;max-width:90px}
 .plate em{font:900 .74rem var(--fb);font-style:normal;background:rgba(255,255,255,.2);border-radius:8px;padding:0 5px}
@@ -218,16 +218,22 @@ button.plate{cursor:pointer;font-family:inherit}
 html.short #strip{height:36px;padding:2px 8px}
 html.short .fz{height:24px}
 html.short #say{height:22px;font-size:.92rem}
-html.short .plate{height:20px;font-size:.72rem}
+html.short .plate{height:44px;font-size:.8rem}
 html.short .eqk{width:44px;height:48px}
 html.short .eqk .en{font-size:8.5px}
 html.short .eqk b{width:19px;height:19px;font-size:.75rem;line-height:15px}
 html.short .jc{min-height:28px}
 html.short .nc{height:24px;min-width:18px}
-#crew{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+#crew{overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain}
+/* crowded jobs: wires stay 44px+ and the crew area scrolls; a fade at the bottom says there is more */
+#crew .mcue{display:none}
+#crew.scroll:not(.end) .mcue{display:block;position:sticky;bottom:0;height:0;flex:none;align-self:center;pointer-events:none;z-index:3}
+#crew .mcue span{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);white-space:nowrap;font:800 .82rem var(--fb);color:#14163a;background:#ffe066;border:2px solid #14163a;border-radius:10px;padding:1px 9px}
+#crew.scroll{justify-content:flex-start;align-content:start;row-gap:8px}
+#crew.scroll:not(.end){-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),rgba(0,0,0,.25));mask-image:linear-gradient(#000 calc(100% - 22px),rgba(0,0,0,.25))}
 
 #gear.mini{gap:4px}
-#gear.mini .eqk{width:34px;height:34px;padding:0;align-items:center}
+#gear.mini .eqk{width:44px;height:44px;padding:0;align-items:center}
 #gear.mini .eqk .en,#gear.mini .eqk .nd{display:none}
 #gear.mini .eqk b{position:static;border:0;background:none;width:auto;height:auto;font-size:1.05rem;line-height:1;color:#ffe066}
 #gear.mini .eqk.ready b{color:#fff}
@@ -324,3 +330,7 @@ html.short #sc .tr span:nth-child(2){display:none}
 .briefc .bpts{margin:2px 14px 6px;padding-left:18px;text-align:left;font:700 1rem/1.3 var(--fb);color:#1c1408}.briefc .bjob{margin:0 12px 6px;font:700 .875rem var(--fb);color:#4a3418}
 #bulbbtn.hon{box-shadow:0 0 0 3px #ffd34d,0 0 14px #ffd34d}#pv .wsd{font:800 .875rem var(--fb);color:#1c1408;background:#ffd34d;border:0;border-radius:12px;padding:2px 10px;min-height:28px;cursor:pointer}
 .card2.briefc .bn{display:none}
+
+.briefc .btip{margin:0 14px 6px;font:700 .95rem/1.3 var(--fb);color:#1c1408;background:rgba(255,224,102,.45);border-radius:8px;padding:4px 8px;text-align:left}.briefc .btip b{color:#7a3d00;margin-right:4px}
+.briefc .bstar{margin:0 12px 8px;font:800 .9rem var(--fb);color:#7a3d00}
+.end .endstar{margin:2px 14px 4px;font:800 1rem var(--fb);color:#4a3418}.end .endstar.got{color:#8a5a00;text-shadow:0 0 6px rgba(255,210,63,.8)}

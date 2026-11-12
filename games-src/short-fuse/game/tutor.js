@@ -107,7 +107,8 @@ function tutSteps(){return tutStory([
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
  {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,60)},
- {id:'red',title:'Red wires',say:'Never point at red: the bomb explodes. If red is all you have left, it reveals itself.',target:tutEl(0,49),wait:null,ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
+ {id:'red',title:'Red wires',say:'Red wires blow the bomb, so never name one. Tap your red.',target:tutEl(0,49),
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===49},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
  {id:'solo',title:'Solo cut',say:'You hold every 2 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()},
  {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.over&&G.over.win}
