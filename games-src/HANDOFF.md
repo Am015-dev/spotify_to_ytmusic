@@ -255,3 +255,7 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Fixers (prefix session_01RR7mn): F8-sands bg5rsRVppoU1AQpQj, F8-tidewake Y82TesPtiQuy9gQbn, F8-vale b8Egh22twkJx1Ghu9, F8-doorkick atFZkcGiEaNB85fk7, F8-vinegrave bR1jxcLTeRJtguPvS, F10-hollowbough YiMCC92cqcaBM5pEd, F7-cauldron XdMnazBPV3P7dF8xg.
 - 21:48 status. Fixed, in review: R37 (short-fuse 9198c40d, cauldron 93ae36dd, vale 512dd83a) session_01RR7mnZpRrRZvKoeeL6M8Zh; R38 (sands 9a490a85, tidewake 6acc0f67, nebula fd818e08) session_01RR7mnbbL6k4qkA5aofGeGR.
 - Still fixing (prefix session_01RR7mn): F7-thornbound Zmz1cSJERPDnFxz9N, F7-shipwreck aGrqQmwnBawztrDxR, F9-doorkick ZvWTggjk1G2UGEem2, F10-hollowbough YiMCC92cqcaBM5pEd. F8-vinegrave bR1jxcLTeRJtguPvS stuck on a Bash approval prompt since 20:06 (owner told).
+- 23:05 status. READY, waiting owner yes: short-fuse c40209e4 (R37 raw 7.5 all rows >=7; only gate failed; orchestrator re-ran --quick and --full: PASS).
+- R37 FAIL: cauldron (gate cf-start, shop chips), vale (dock on staged build). R38 FAIL: sands 6.6, tidewake 7.1, nebula 7.1. R40 FAIL: shipwreck 7.0 (Phone, Feel).
+- Fixers (prefix session_01RR7mn): F8-cauldron XHEpd96Gw4SZpQKXR, F9-vale YsCG35preZuHn1tc2, F8-shipwreck a8PLrHvbcQ23hxzQj, F9-sands ZEdc1kAE8hgjKNSi6, F9-tidewake Xoto8RHitWvAFyWsp, F7-nebula a4XR6svtjujwbdFMG. F8-vinegrave bR1jxcLTeRJtguPvS still blocked on approval.
+- Reviewer R39 (thornbound bf654f28, doorkick 69fceeb6, hollowbough d2fde088) session_01RR7mna9BxSVfE7rV11BPvZ.
