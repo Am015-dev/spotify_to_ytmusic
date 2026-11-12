@@ -14,26 +14,27 @@ in this order, with one sentence of 12 words or fewer and exactly one highlight,
 
 ## Steps (rule id = the step; logic: `src/coach.js` TSTEPS)
 1. step `goal`: most points wins; the practice is one short round (tap the score line).
-2. step `turns`: one action per turn; practice has 4 actions, real games 4 rounds (tap the turn tracker).
+2. step `turns`: one action per turn; real rounds give 8, then 7, 6, 5 actions (tap the turn tracker, which also says the next round's count).
 3. step `play`: action 1, play a bird (tap Play a bird).
 4. step `cost`: a bird's food cost is paid from your supply (tap the bird).
 5. step `slot`: the leftmost empty space of its habitat (tap the glowing space).
 6. step `pay`: spaces 2-3 cost 1 egg, 4-5 cost 2 (tap Play).
 7. step `white`: a white power works once, when played (tap the new bird).
-8. step `food`: action 2, get food: the forest takes feeder dice (tap Get food).
-9. step `die`: one die = one food (tap a die).
-10. step `die2`: more forest birds = more food (tap a second die).
-11. step `tuck`: brown powers fire right to left; tuck a card (tap a hand card).
-12. step `cache`: tucked cards and stored food are 1 point each (tap the forest row).
-13. step `eggs`: action 3, lay eggs in the grassland (tap Lay eggs).
-14. step `nest`: each egg is 1 point, up to the nest limit (tap a bird, per egg).
-15. step `pink`: pink powers react between turns (tap Pip's chip after Pip's bird laid an egg).
-16. step `cards`: action 4, draw birds in the wetland (tap Draw birds).
-17. step `tray`: tray or deck; the tray refills after the turn (tap a tray card).
-18. step `goalr`: the round goal is scored at round end (tap the round-goal line of the score).
-19. step `bonus`: the secret bonus card scores at the end (tap its line).
-20. step `final`: final score = birds + eggs + goals + bonus + stored food + tucked cards; tie = most food left (tap the total).
-21. step `real`: start a real game (tap Play again).
+8. step `rgoal`: the round goal (grassland birds) counts live on the tracker; the bird you just played counted (tap the goal line).
+9. step `food`: action 2, get food: the forest takes feeder dice (tap Get food).
+10. step `die`: one die = one food (tap a die).
+11. step `die2`: more forest birds = more food (tap a second die).
+12. step `tuck`: brown powers fire right to left; tuck a card (tap a hand card).
+13. step `cache`: tucked cards and stored food are 1 point each (tap the forest row).
+14. step `eggs`: action 3, lay eggs in the grassland (tap Lay eggs).
+15. step `nest`: each egg is 1 point, up to the nest limit (tap a bird, per egg).
+16. step `pink`: pink powers react between turns (tap Pip's chip after Pip's bird laid an egg).
+17. step `cards`: action 4, draw birds in the wetland (tap Draw birds).
+18. step `tray`: tray or deck; the tray refills after the turn (tap a tray card).
+19. step `goalr`: the round goal is scored at round end (tap the round-goal line of the score).
+20. step `bonus`: the secret bonus card scores at the end (tap its line).
+21. step `final`: final score = birds + eggs + goals + bonus + stored food + tucked cards; tie = most food left (tap the total).
+22. step `real`: start a real game (tap Play again).
 
 Covered by the in-game instruction bar instead of a step (they depend on dice luck in a real game): the bonus-space trades,
 rerolling an all-same feeder, the empty-feeder reroll. The rules drawer explains each.

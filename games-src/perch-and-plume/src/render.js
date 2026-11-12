@@ -152,7 +152,8 @@ function dockToActs() {   // the step's buttons and what glows in the panel sit 
   var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || !myTurn() || db.scrollHeight <= db.clientHeight) return;
   var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
   if (ac.children.length) els.push(ac);
-  var g = db.querySelector('#hand .glow, #hand .sel, #acts .glow') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
+  if (document.body.classList.contains('idle4')) { var a4 = $('#act4') || ac; els = [a4]; }   // choosing an action: only the 4 buttons matter, not a Best hand card below
+  var g = els.length && document.body.classList.contains('idle4') ? null : db.querySelector('#hand .glow, #hand .sel, #acts .glow') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
   var top = Math.min.apply(null, els.map(function (e) { return e.getBoundingClientRect().top; })), bot = Math.max.apply(null, els.map(function (e) { return e.getBoundingClientRect().bottom; }));
   var d = top < lim ? top - lim : bot > r.bottom ? Math.min(bot - r.bottom + 4, top - lim) : 0;
   if (Math.abs(d) > 2) db.scrollTop += d;

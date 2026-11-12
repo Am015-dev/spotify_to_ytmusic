@@ -55,7 +55,8 @@ function markBest() {   // Best badge on the sub-choice the hint picks (die, egg
 // the Best target is always on screen, even after you picked another bird: scroll it into view (hand strip, panel or page)
 function bestInView() {
   if (!hintMove()) return;
-  var el = UI.sel != null && $('.slot.bestt') ? $('.slot.bestt') : ($('#hand .bc.bestc') || $('.bestt')); if (!el) return;
+  var idle = document.body.classList.contains('idle4');   // choosing an action: Best is one of the 4 action buttons, never a hand card below them
+  var el = idle ? $('.a4.best') : UI.sel != null && $('.slot.bestt') ? $('.slot.bestt') : ($('#hand .bc.bestc') || $('.bestt')); if (!el) return;
   var r = el.getBoundingClientRect(), pr = $('#prompt'), top = 0;
   var db = $('#dockbody'); if (db && db.contains(el) && pr && pr.offsetHeight) top = Math.max(0, pr.getBoundingClientRect().bottom);
   if (r.top >= top && r.left >= 0 && r.bottom <= window.innerHeight && r.right <= window.innerWidth && bestHit(el)) return;
@@ -153,7 +154,14 @@ function trackerHTML() {
   return '<div class="trk" role="status" aria-label="Round ' + (G.round + 1) + ' of ' + G.rounds + ', ' + p.cubes + ' actions left">' +
     '<span class="tr-r"><b>Round ' + (G.round + 1) + ' of ' + G.rounds + '</b><span class="tr-w' + (isHuman(cur) ? ' me' : '') + '">' + esc(whoT) + '</span></span>' +
     '<span class="tr-c"><span class="cubes" aria-hidden="true">' + tok + '</span><span>' + p.cubes + (p.cubes === 1 ? ' action' : ' actions') + ' left</span></span>' +
-    '<span class="tr-why">' + (last ? 'Game ends' : 'Round ends') + ' when all actions are used.</span></div>';
+    trGoalHTML() + '<span class="tr-why">' + (last ? 'Game ends when all actions are used.' : 'Round ends when all actions are used. Next round: ' + (G.cubes[G.round + 1] || total) + ' actions.') + '</span></div>';
+}
+// the round goal, always on screen during play, with the live count for you and each rival (scored when the round ends)
+function trGoalHTML() {
+  var gid = G.goals && G.goals[G.round], g = gid && PP_DATA.goals.filter(function (x) { return x.id === gid; })[0]; if (!g) return '';
+  var me = UI.view, cnt = G.pl.map(function (p, i) { return (i === me ? 'you ' : p.name + ' ') + PP.goalCount(G, i, gid); });
+  cnt.unshift(cnt.splice(me, 1)[0]);
+  return '<span class="tr-g" data-a="trgoal"><b>Round goal:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
 }
 function scoreHTML() {
   var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); }), top = Math.max.apply(null, sc.map(function (s) { return s.total; }));
@@ -179,9 +187,21 @@ function rateStart() {   // called when your turn begins (no question pending)
   if (!G || !myTurn() || G.q) return;
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
   // the goal now sits on the starting-hand screen: no pop-up here, so the first tap of the game always lands on what you tap
-  try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
+  dockTurnTop(); [0, 120, 400].forEach(function (ms) { setTimeout(dockTurnTop, ms); });   // a new turn opens on the tracker and all 4 actions, even after late re-renders
   RATE.last = null; RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }
+// R27: at turn start the dock shows the 4 actions in full (and as much of the tracker above them as fits), unless you scrolled it yourself
+var DOCKT = { k: null, touched: false };
+function dockTurnTop() {
+  try {
+    var db = $('#dockbody'), ac = $('#act4') || $('#acts'), k = RATE.k; if (!db || !ac || !myTurn() || G.q || !document.body.classList.contains('idle4')) return;
+    if (DOCKT.k !== k) { DOCKT.k = k; DOCKT.touched = false; } if (DOCKT.touched) return;
+    var dk = $('#dock'); if (dk) dk.scrollTop = 0;
+    db.scrollTop = 0; var r = db.getBoundingClientRect(), a = ac.getBoundingClientRect(), pr = $('#prompt'), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight : 0);
+    if (a.bottom > r.bottom) db.scrollTop += Math.min(a.bottom - r.bottom + 4, a.top - lim);
+  } catch (e) { }
+}
+['touchstart', 'wheel'].forEach(function (ev) { document.addEventListener(ev, function (e) { if (e.target.closest && e.target.closest('#dockbody')) DOCKT.touched = true; }, { passive: true }); });
 function rateChoice(m) { if (RATE.k && m && (m.t === 'act' || m.t === 'play') && RATE.choice == null) { RATE.choice = m.t === 'play' ? 'play' : m.a; RATE.point = tutPoint(); } }
 function rateEnd() {   // after the turn is over: compare with the best-value estimate made at its start
   if (!RATE.k || RATE.choice == null || !G) return;

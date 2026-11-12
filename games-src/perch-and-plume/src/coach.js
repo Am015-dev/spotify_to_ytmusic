@@ -22,6 +22,7 @@ var TSTEPS = [
   { id: 'slot', t: function () { return tq('.row[data-h="1"] .slot.glow') || tq('.slot.glow'); }, done: function () { return !!UI.pend || !!tOnBoard(TUT.ids.play); } },
   { id: 'pay', t: function () { return tq('#acts [data-a="playgo"]'); }, done: function () { return !!tOnBoard(TUT.ids.play); } },
   { id: 'white', info: 1, t: function () { var rc = tOnBoard(TUT.ids.play); var e = rc && tq('#mat [data-a="bird"][data-h="' + rc[0] + '"][data-c="' + rc[1] + '"]'); return e && (e.closest('.slot') || e); } },
+  { id: 'rgoal', info: 1, t: function () { return tq('#trk .tr-g'); } },
   { id: 'food', t: function () { return tq('.a4[data-k="food"]'); }, done: function () { return tQ('die') || tQ('pwTuck') || COACH.acted.food; } },
   { id: 'die', t: function () { return tq('#feeder .die.glow'); }, enter: function () { COACH.snap = G.feeder.filter(Boolean).length; }, done: function () { return !tQ('die') || G.feeder.filter(Boolean).length < COACH.snap; } },
   { id: 'die2', t: function () { return tq('#feeder .die.glow'); }, done: function () { return !tQ('die'); } },

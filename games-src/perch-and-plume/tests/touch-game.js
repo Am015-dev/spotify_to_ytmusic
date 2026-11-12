@@ -14,7 +14,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto(URL); await p.waitForTimeout(800);
     for (const s of ['[data-t="quick"]', '[data-go]', '#keepgo']) { await p.locator(s).first().waitFor({ timeout: 10000 }); await p.locator(s).first().tap(); await p.waitForTimeout(500); }
-    let minT = null, minF = [99, ''], waits = [], lastTap = 0, wasMine = true, taps = 0, scrolls = 0, dead = [], t0 = Date.now(), idle = Date.now();
+    let a4k = null, a4turns = 0, a4hid = 0, minT = null, minF = [99, ''], waits = [], lastTap = 0, wasMine = true, taps = 0, scrolls = 0, dead = [], t0 = Date.now(), idle = Date.now();
     const sig = () => p.evaluate(() => JSON.stringify([G, UI.sel, UI.pend, UI.pickBird, UI.gsDie, UI.busy, !document.querySelector('#pop').hidden]).length + ':' + JSON.stringify([G.q, UI.sel, UI.pend, UI.pickBird, UI.gsDie, G.pl.map(x => [x.food, x.hand.length, x.board.map(r => r.length)])]));
     while (Date.now() - t0 < 600000) {
       const tgt = await p.evaluate((BESTP) => {
@@ -34,6 +34,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
         return null;
       }, BESTP);
       if (tgt === 'result') break;
+      if (tgt && await p.evaluate(() => document.body.classList.contains('idle4') && !!document.querySelector('#act4'))) { const k = await p.evaluate(() => G.round + ':' + G.pl[UI.view].cubes); if (k !== a4k) { a4k = k; a4turns++; const hid = await p.evaluate(() => [...document.querySelectorAll('.a4')].filter(e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !(r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && t && (t === e || e.contains(t))); }).map(e => e.dataset.k)); if (hid.length) { a4hid++; if (process.env.WHY) console.log('     turn start: hidden ' + hid.join(',')); } } }   // R27: every turn opens with all 4 actions on screen
       if (tgt && tgt !== '#passgo' && lastTap && !wasMine) { waits.push((Date.now() - lastTap) / 1000); } if (tgt && tgt !== '#passgo') wasMine = true; else if (!tgt) wasMine = false;
       if (!tgt) { if (Date.now() - idle > 25000) { ok(false, `${w}x${h} stuck: nothing to tap for 25 s`); await p.screenshot({ path: 'shots/touch-stuck.png' }); break; } await p.waitForTimeout(150); continue; }
       const loc = p.locator(tgt).first();
@@ -55,6 +56,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
     console.log(`     smallest tap target ${minT ? minT.w + 'x' + minT.h + ' (' + minT.what + ')' : '-'}; smallest text ${minF[0]} px ("${minF[1]}")`);
     waits.sort((a, b) => b - a); console.log(`     waits for my turn: ${waits.length}, longest ${waits.slice(0, 5).map(x => x.toFixed(1)).join(', ')} s; mean ${(waits.reduce((a, b) => a + b, 0) / Math.max(1, waits.length)).toFixed(1)} s`);
     if (BESTP) console.log('     best taps / misses: ' + await p.evaluate(() => JSON.stringify(window.__nb || {})));
+    ok(a4hid === 0, `${w}x${h} all 4 actions on screen at the start of ${a4turns - a4hid}/${a4turns} turns`);
     ok(res !== 'no result', `${w}x${h} full game reaches the result`);
     ok(dead.length === 0, `${w}x${h} every glowing target answers its first tap (${dead.length} dead${dead.length ? ': ' + dead.slice(0, 3).join(' | ') : ''})`);
     ok(scrolls <= MAXS, `${w}x${h} dock scrolls ${scrolls} (target 0-${MAXS})`);

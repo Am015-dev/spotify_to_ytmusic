@@ -22,12 +22,13 @@ var STORY = {
   // the guided first game: one line per step, in teaching order (ids = TUTORIAL-COVERAGE.md, steps in coach.js). Max 12 words each.
   coach: {
     goal: 'Most points wins. Tap the score.',
-    turns: 'One action per turn. Practice: 4 actions. Real games: 4 rounds.',
+    turns: 'One action per turn. Real rounds give 8, then 7, 6, 5.',
     play: 'Action one: play a bird. Tap this button.',
     cost: 'This bird costs one food from your supply. Tap it.',
     slot: 'Birds fill the leftmost empty space in their habitat.',
     pay: 'Space two also costs one egg. Tap Play.',
     white: 'White power: it worked once, when you played it.',
+    rgoal: 'Round goal: grassland birds. Your new bird just counted! Tap the goal.',
     food: 'Action two: get food. The forest takes feeder dice.',
     die: 'Tap a die. Each die is one food.',
     die2: 'Two forest birds give two food. Take another die.',
