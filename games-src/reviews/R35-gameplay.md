@@ -14,7 +14,7 @@ Rules were checked against the published rules; notes stayed local. Screenshots:
 |---|---|---|---|---|---|
 | doorkick-dungeon | ea277eee | 7.3 | FAIL | PASS | 5 Phone 6 |
 | vinegrave | d48c7b8c | 7.1 | FAIL | PASS | 5 Phone 6 |
-| hollowbough | e42ccd28 | see section 3 | | | |
+| hollowbough | e42ccd28 | 7.3 | FAIL | PASS | 6 AI 6 |
 
 ---
 
@@ -135,3 +135,57 @@ What I played:
 | 2 (good) | Tutorial at both sizes | 35 taps, 0 dead, ends on "Play a real game". | R35-shots/vg-tut-end-390.jpg |
 
 ---
+
+## 3. hollowbough (shelf/W482-hollowbough @ e42ccd28 + local merge): 7.3, FAIL
+
+Gate: **PASS** (`--full`: phone-check 65.3 s PASS, lab WARN 10/12 (not a gate fail), "SWEEP PASS", "1/1 PASS", EXIT 0).
+
+What I played:
+- **Tutorial** ("New here? Learn in 5 minutes") by touch at 375x667: 37 steps, 41 taps (10 are Next), 33 s, longest wait 1.8 s,
+  **0 dead taps**, 0 errors. It ends "You win, 22 to 17. Now play a real game!", then "Play a real game".
+- **Real games** (Play > Play now > Start; defaults: Guided, 2 players). My newcomer taps a hint finger if one shows, else the first
+  glowing place or card, else a button, and passes only when nothing glows:
+
+| Size | Newcomer | Result | Time | Taps | Dead taps on lit targets | Waits |
+|---|---|---|---|---|---|---|
+| 390x844 | glow-follower | **lost 21-34** (city 9, tokens 4, goals 3, Journey 5) | 1 min | 41 | 0 | median 1.6 s, max 2.4 s |
+| 375x667 | glow-follower, 30% of taps on any lit thing | **lost 22-30** (city 11/15) | 1.4 min | 70 | 0 | median 0.4 s, max 3.3 s |
+| 375x667 (first try, not scored for row 6) | my driver tapped Pass at the start of Autumn | lost 8-37 | 1 min | 42 | 9 taps on a glowing meadow card whose centre was off the left edge (driver, see findings) | |
+
+  0 page and console errors, 0 stuck states. All three reached the result card ("Bramble wins!", a table, Play again /
+  Look at the board / Main menu).
+- **Hint bulb** (default "Guided" shows no finger by itself after the first tip): I tapped the bulb 8 times during play. A finger showed
+  7 times, each on a real target (Resin Pool, Kindling Glen, Prepare, Dewberry Nook, Quarry Burrow, Lantern Rest). It did not show once, during a rival move.
+- **Rules**: unchanged and right for 2 players (8 basic places plus forest and Haven, workers 2/+1/+1/+2, Spring and Autumn production,
+  2 meadow cards in Summer, hand 8, city 15, Journey in Autumn, events, purple bonuses, ties to most events). The result table now
+  lists Goals and Journey rows. I found nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. |
+| 2 | Tutorial teaches | 8 | Fixed: the guided rival scores 17 now (22-17, was 22-1). 37 one-line steps, 0 dead taps. 10 of 41 taps are still Next only. |
+| 3 | First 10 seconds | 7 | Learn and Play up top, a goal tip with one "Got it", and places glow. |
+| 4 | Turn clarity | 7 | Repeated questions now count down ("Tap a meadow card to take it: 2 left.", "Pick what to give away: 2 left."). The prompt is still a small pill in the top-left corner. On defaults every open place glows, so the glow does not say what is good. |
+| 5 | Phone play | 7 | Places 127x89 (390) and 88x77 (375), cards 117-168 px wide, 44 px tabs. At 375 the meadow row scrolls sideways and can leave a glowing card mostly off the left edge. |
+| 6 | AI and pacing | 6 | Brisk (median 0.4-1.6 s; a game is 1-1.5 min of my turns). But a newcomer following the glow lost both scored games, 21-34 and 22-30. The fixer's "glow-follow won 3 + 1 tie of 4" did not hold for me. Across R24, R31 and R35 that is 0 wins in 6 default games. |
+| 7 | Feel | 7 | Painted places and cards, meeples, flying cards, a painted end scene with achievements. |
+| 8 | Bugs | 8 | Gate PASS. 0 errors, 0 stuck states, 0 dead taps on lit targets that were on screen, in a tutorial and 2 scored games. R31's ignored taps on meadow cards and "Stop here" were not seen. |
+| | **Total** | **7.3** | **FAIL**: row 6 is below 7. 8+8+7+7+7+6+7+8 = 58/8 = 7.25. No stopper. |
+
+### Earlier findings (R31)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 8: glowing meadow card ignored the first taps (390) | **Not seen** on cards that were on screen. In one 375 run my driver hit a glowing card whose centre was off the left edge 9 times, with no effect. A person would not tap there, so I do not score it. | R35-shots/hb-meadow-card-offscreen-375.jpg |
+| Row 8: "Stop here" ignored the first tap | **Not seen**. | n/a |
+| Row 6: newcomer lost both default games | **Not fixed**: lost 21-34 and 22-30. | R35-shots/hb-result-lost-21-34-390.jpg, R35-shots/hb-result-lost-22-30-375.jpg |
+| Row 2: guided rival scores 1 (22-1) | **Fixed**: 22-17. | R35-shots/hb-tut35-score-22-17-375.jpg |
+| Row 4: prompt pill small in the top-left | **Not fixed**. | R35-shots/hb-result-lost-21-34-390.jpg |
+| Fixer: hint finger missing on 29% of taps | **Mostly fixed**: 7 of 8 bulb taps showed a finger on a real target. | R35-shots/hb-bulb-finger-390.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Two default games following the glow | Lost 21-34 and 22-30. Bramble builds 20-24 city points plus purple bonuses. | R35-shots/hb-result-lost-21-34-390.jpg |
+| 5 | 375, Summer, "Tap a meadow card to clear away" | The meadow row was scrolled, so a glowing card sat mostly off the left edge. | R35-shots/hb-meadow-card-offscreen-375.jpg |
+| 4 | Played on defaults (Guided) | No hint finger appears unless you tap the bulb; every open place glows, so the glow is no guide. | R35-shots/hb-bulb-finger-390.jpg |
+| 2 (good) | Tutorial at 375 | 41 taps, 0 dead, ends 22-17 and opens a real game. | R35-shots/hb-tut-end-375.jpg |
