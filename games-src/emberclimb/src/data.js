@@ -162,8 +162,8 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'iron-warden-c': { tab: 1, img: 'iron-warden', name: 'Iron Warden', hp: [7, 7], pat: [{ die: [{ atk: 2 }, { add: ['dazed', 1] }] }], elite: 1, flat: 1, art: 'tall slim iron sentry with a lantern head' },
     'warden-captain': { name: 'Warden Captain', hp: [56, 60], pat: [{ atk: 11 }, { blk: 10, spikes: 7 }, { atk: 22 }], boss: 1, art: 'iron sentry captain in spiked plate with a lantern helm' },
     'mire-behemoth': { tab: 1, name: 'Mire Behemoth', hp: [22, 22], split: ['bile-blob', 'mire-slug', 'spine-slug'], splitSay: 'bursts apart', pat: [{ add: ['slimed', 3] }, { atk: 3, add: ['slimed', 2] }, { atk: 6 }], boss: 1, art: 'colossal swamp creature of mud and reeds with a wide mouth' },
-    'ashen-wraith': { tab: 1, name: 'Ashen Wraith', hp: [36, 36], pat: [{ atk: 1, add: ['burn', 1] }, { atk: 2, hits: 2, add: ['burn', 1] }, { add: ['burn', 2] }, { atk: 3, blk: 5 }, { atk: 2, add: ['burn', 1] }, { atk: 3, hits: 2, add: ['burn', 2], str: 1 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
-    'gate-colossus': { tab: 1, name: 'Gate Wyrm', hp: [40, 40], shift: 6, pat: [{ atk: 2, blk: 5 }], pat2: [{ atk: 2, spikes: 1 }, { atk: 4, str: 1, spikes: 1 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
+    'ashen-wraith': { tab: 1, name: 'Ashen Wraith', hp: [36, 36], hpN: { 2: 75 }, pat: [{ atk: 1, add: ['burn', 1] }, { atk: 2, hits: 2, add: ['burn', 1] }, { add: ['burn', 2] }, { atk: 3, blk: 5 }, { atk: 2, add: ['burn', 1] }, { atk: 3, hits: 2, add: ['burn', 2], str: 1 }], boss: 1, art: 'tall ghost of burnt cloth and ash with six floating candles' },
+    'gate-colossus': { tab: 1, name: 'Gate Wyrm', hp: [40, 40], keepBlk: 1, hide: 1, pat: [{ atk: 2, blk: 5, blkH: 1 }, { atk: 6, guard: 1 }], pat2: [{ atk: 2, spikes: 1 }, { atk: 4, str: 1 }], boss: 1, art: 'green horned wyrm bursting out of a dungeon gate' },
     // act 2 (Ash Stair) and act 3 (Cinder Gate) encounter decks, act 4 = the optional final act
     'cinder-hound': { name: 'Cinder Hound', hp: [30, 34], pat: [{ atk: 5, hits: 2 }, { atk: 8, add: ['burn', 1] }, { blk: 6, str: 1 }], act: 2, art: 'lean black hound with ember-cracked skin and smoking jaws' },
     'ash-wisp': { name: 'Ash Wisp', hp: [20, 24], pat: [{ atk: 4, frail: 2 }, { atk: 7 }, { die: [{ blk: 8 }, { atk: 6, frail: 1 }, { atk: 10 }] }], act: 2, art: 'floating grey wisp of ash with two coal eyes' },
@@ -274,6 +274,6 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   }); });
   EC.D = { GOLD: GOLD, SCALE: SCALE, CAPS: CAPS, EHP: EHP, CARDS: CARDS, ORDER: ORDER, H: H, ENEMIES: ENEMIES, ENC: ENC, ENCA: ENCA, ACTBOSS: ACTBOSS, RELICS: RELICS, POTIONS: POTIONS, EVENTS: EVENTS, NODES: NODES, needsTarget: needsTarget,
     // Gentle (first climb) player-side numbers: max HP x hp, start with `pots` x `pot`, Rest heals `rest` (tabletop 3) x SCALE. Env GENTLE='{...}' overrides in the bench.
-    GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 6, pots: 3, pot: 'healing-draught', rest: 8 } };
+    GENTLE: (typeof process !== 'undefined' && process.env && process.env.GENTLE_CFG) ? JSON.parse(process.env.GENTLE_CFG) : { hp: 5, pots: 3, pot: 'healing-draught', rest: 8 } };
   if (typeof module !== 'undefined') module.exports = EC;
 })();

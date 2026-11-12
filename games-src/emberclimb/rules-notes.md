@@ -179,10 +179,22 @@ transcriptions (research notes kept outside the repo); "checked" = both agree, "
 | Thorn Brute (elite) | 14 HP per hero; idle once, then 3 dmg every turn; from turn 2 each Skill a player plays costs 1 HP | 112 HP per hero; idle, then 24; Skill: -8 HP | checked (HP); Skill tax one source per card text |
 | Sleeper Statue (elite) | 22 HP per hero; asleep turn 1 (wakes when hurt), then 4 / 4 / Weak 2 + 1 Str | 176 HP per hero; 32 / 32 / Weak 2 + Str | HP checked, pattern one source |
 | Iron Warden x3 (elite, 3 per hero) | 7 / 8 / 7 HP; 2-row die: Daze / 3 dmg; 3 dmg / Daze; 2 dmg / Daze | 56 / 64 / 56 HP; Daze / 24; 24 / Daze; 16 / Daze | checked |
-| Mire Behemoth (boss) | 22 HP per hero; 3 Slimed / 3 dmg + 2 Slimed / 6 dmg; dies: next round splits into Bile Blob, Mire Slug, Spine Slug per hero | 176 HP per hero; 3 Slimed / 24 + 2 Slimed / 48; same split | checked |
-| Ashen Wraith (boss) | 36 HP per hero; 6 steps: 1 + Burn / 2x2 + Burn / 2 Burn / 3 + 5 Block / 2 + Burn / 3x2 + 2 Burn + 1 Str | 288 HP per hero; 8 + Burn / 16x2 + Burn / 2 Burn / 24 + 40 Block / 16 + Burn / 24x2 + 2 Burn + Str | one source |
-| Gate Wyrm (boss) | 40 HP per hero; attack mode: 2 dmg + 5 Block; after 6 damage: defensive mode with Thorn Hide 1: 2 dmg, then 4 dmg + 1 Str, then attack mode | 320 HP per hero; 16 + 40 Block; after 48 damage: Spikes 8: 16, then 32 + Str | one source; threshold read from code |
+| Mire Behemoth (boss) | 22 HP per hero; 3 Slimed / 3 dmg + 2 Slimed / 6 dmg; dies: next round splits into Bile Blob, Mire Slug, Spine Slug per hero | 176 HP per hero; 3 Slimed / 24 + 2 Slimed / 48; same split | checked (A, B) |
+| Ashen Wraith (boss) | 36 HP solo, 75 for two heroes (printed per party size); 6 steps: 1 + Burn / 2x2 + Burn / 2 Burn / 3 + 5 Block / 2 + Burn / 3x2 + 2 Burn + 1 Str | 288 HP solo, 600 duo; 8 + Burn / 16x2 + Burn / 2 Burn / 24 + 40 Block / 16 + Burn / 24x2 + 2 Burn + Str | checked (A, B; duo HP A only) |
+| Gate Wyrm (boss) | 40 HP per hero. Attack mode, 2 steps: (1) 2 dmg + 5 Block per hero, Block kept; (2) Mode Shift: Block still up -> lose it and deal 6; Block broken -> no attack, defensive mode with Sharp Hide 1. Defensive: 2 dmg, then 4 dmg + 1 Str (Sharp Hide ends), then attack mode | 320 HP per hero; 16 + 40 Block per hero; 48, or turn defensive (Spikes 8); 16, then 32 + Str | checked (A, B, C, D) |
 
 Cuts (listed, not hidden): encounter cards that summon a second foe bring only their lead foe; the gold-thief card
 and the small-goblin-gang cards are not in the deck; the wyrm's Block is not multiplied per hero; Burn from the wraith goes to its row only.
 Story chapters 3-10 (acts 2-4) still use shelf-made foes; the Quick game is Act 1 only and the setup screen says so.
+
+
+## R29 boss check (12 Nov 2026): sources for the three act-1 boss cards
+Notes and downloads kept outside the repo. Sources, by kind (no names):
+- A: an open-source fan web version of the board game (TypeScript enemy table, every act-1 boss with HP per party size and its action track).
+- B: an open-source fan mod that ports the board game's rules into the video game (Java, one class per boss; solo values). Written separately from A.
+- C: a third-party rules explainer article: "starts its turn with Block: attacks for 6; no Block: no attack, shifts to defensive mode".
+- D: a board-game forum Q&A thread on the same boss: Block left at its turn = 6 damage; Block gone = no attack, defensive mode. A second
+  thread's "7" is the harder Ascension row (A and B both give 7 at Ascension 10+).
+- The old Gate Wyrm (one repeated "2 dmg + 5 Block" step, shift after 6 damage) was wrong: the 6 is the Mode Shift hit, not an HP threshold.
+- Result: Mire Behemoth unchanged (A, B agree). Ashen Wraith unchanged solo (A, B agree); duo HP 75 per A (B is solo only). Gate Wyrm rebuilt.
+- Gentle re-tuned on the corrected boss: x5 max HP (was x6), 3 Healing Draughts, Rest heals 8. Foes untouched.

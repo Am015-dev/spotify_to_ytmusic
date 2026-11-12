@@ -183,7 +183,7 @@
   function dmgBase(h, base, card) { return base + st(h, 'str') * SC + (card && card.type === 'A' && has('smoking-censer') ? SC : 0) + (h.stance === 'w' ? SC : 0); }
   var SPK_CARD = null;
   function hitEnemy(h, e, base, card) {
-    if (e.dead) return;
+    if (e.dead || !G.b || G.scr !== 'battle') return;   // a hero killed by Spikes mid-card ends the fight: later hits do nothing
     if (e.spk > 0 && card && card.type === 'A' && SPK_CARD !== card) { SPK_CARD = card; fx('hitme', 'h' + G.hs.indexOf(h), e.spk, 'spikes'); hurtHero(h, e.spk); if (G.scr !== 'battle' || h.dead) return; }
     var ei = G.b.en.indexOf(e), weak = ATK ? ATK.weak : st(h, 'weak') > 0, vul;
     if (ATK) { ATK.any = 1; if (ATK.vt[ei] == null) ATK.vt[ei] = st(e, 'vuln') > 0; vul = ATK.vt[ei]; } else vul = st(e, 'vuln') > 0;
@@ -197,12 +197,11 @@
     }
   }
   function losePoisonKill(e) { if (e.hp <= 0) killE(e); }
-  // R24 tabletop foe reactions: Hunker (Block the first time it is hurt), guard switch (enough damage flips the wyrm to its defensive mode),
+  // R24 tabletop foe reactions: Hunker (Block the first time it is hurt), Mode Shift (the wyrm turns defensive when its Block was broken),
   // death spores (heroes become Vulnerable when it dies)
   function hurtE(e, real) {
     var d = D.ENEMIES[e.id], ei = 'e' + G.b.en.indexOf(e);
     if (d.curl && !e.curled) { e.curled = 1; e.blk += d.curl * SC; fx('blk', ei, d.curl * SC); }
-    if (d.shift && !e.mode) { e.taken += real; if (e.taken >= d.shift * SC) { e.mode = 1; e.taken = 0; e.i = -1; e.spk = SC; fx('buff', ei, SC, 'spikes'); plan(e); } }
   }
   function killE(e) {
     e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0);
@@ -270,6 +269,7 @@
   // ---------- battle flow
   function mkEnemy(id) {
     var d = D.ENEMIES[id], pf = !!(d.hpF && G.fights === 0 && G.b0first), hp = pf ? d.hpF : d.hp[0] + ri(d.hp[1] - d.hp[0] + 1);
+    if (d.hpN && d.hpN[G.hs.length]) hp = Math.round(d.hpN[G.hs.length] * SC / G.hs.length);   // printed total HP for this party size (the card is not a flat per-hero number)
     // R24 tabletop foes: normal foes have flat HP (one card per hero), elite and boss HP is printed per hero; shelf-made foes keep the old x1.6 duo rule
     var hm = d.tab ? ((d.elite || d.boss) && !d.flat ? G.hs.length : 1) : (D.EHP[G.hs.length] || 1);
     hp = Math.round(hp * hm * (1 + 0.25 * ((G.act || 1) - 1))); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
@@ -382,7 +382,7 @@
     if (G.b.ei >= G.b.en.length) { finishRound(); return false; }
     G.b.ei++;
     if (e.dead) return true;
-    e.blk = 0;
+    if (!D.ENEMIES[e.id].keepBlk) e.blk = 0;   // the wyrm keeps its Block until its Mode Shift step
     act(e);
     if (G.scr !== 'battle') return false;
     return true;
@@ -393,9 +393,11 @@
     var hs = aliveHs(), h = G.hs[it.tg]; if (!h || h.dead) h = hs[0]; if (!h) return;
     var tgs = it.all ? hs : [h];
     var ei = 'e' + G.b.en.indexOf(e); G.lastHit = e.id;
+    // printed boss Mode Shift: Block still up -> it drops the Block and attacks; Block broken -> no attack, it turns defensive (Sharp Hide)
+    if (it.guard) { if (e.blk > 0) e.blk = 0; else { e.mode = 1; e.i = -1; e.spk = (d.hide || 1) * SC; fx('act', ei, 0, 'cast', G.hs.indexOf(h)); fx('buff', ei, e.spk, 'spikes'); return; } }
     fx('act', ei, 0, it.atk ? 'atk' : 'cast', G.hs.indexOf(h));
     e.spk = 0; if (it.spikes) { e.spk = it.spikes; fx('buff', ei, it.spikes, 'spikes'); }
-    if (it.blk) { e.blk += it.blk; fx('blk', ei, it.blk); }
+    if (it.blk) { var bk = it.blk * (it.blkH ? G.hs.length : 1); e.blk += bk; fx('blk', ei, bk); }   // blkH: printed 'per hero' Block
     if (it.str && !it.atk) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.atk) {
       var weak = st(e, 'weak') > 0;   // Weak/Vulnerable are spent once per whole attack action, not per hit

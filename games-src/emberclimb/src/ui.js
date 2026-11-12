@@ -227,6 +227,7 @@
   }
   // Story unlocks: Rogue, Automaton and Monk join the Quick game after Story chapters 2, 3 and 4 (campaign.json unlock ids hero-s / hero-a / hero-m); ?unlock=all opens everything
   var HNEED = { s: ['hero-s', 'Beat Story chapter 2 to unlock'], a: ['hero-a', 'Beat Story chapter 3 to unlock'], m: ['hero-m', 'Beat Story chapter 4 to unlock'] };
+  if (!/[?&]story=all/.test(location.search)) HNEED.m[1] = 'Beat Story chapter 3 to unlock';
   function heroOpen(k) {
     if (!HNEED[k] || /unlock=all/.test(Q)) return true;
     try { if (!window.GXC || !GXC.data || !GXC.data()) return true; return GXC.unlocked().some(function (u) { return u.id === HNEED[k][0]; }); } catch (e) { return true; }
@@ -368,12 +369,13 @@
   function intentParts(e) {
     var it = e.intent, g = G(), P = []; if (!it) return [{ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: this enemy has not shown its next move.' }];
     if (it.sleep) return [{ k: 'sleep', s: 'intent-sleep', t: 'Asleep', cap: 'sleeps', say: 'Asleep: it does nothing for ' + e.asleep + ' more turn' + (e.asleep === 1 ? '' : 's') + ' unless you hurt it.' }];
+    if (it.guard && !(e.blk > 0)) return [{ k: 'str', s: 'intent-buff', t: 'Mode shift', cap: 'turns defensive', say: 'Its Block broke: no attack. It turns defensive and grows spikes.' }];
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d; try { d = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(h0)); } catch (x) { d = it.atk; } if (d == null || isNaN(d)) d = it.atk;
       var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (it.all) t += ' all'; if (g.hs.length > 1 && !it.all) t += ' → ' + D.H[h0.k].name.split(' ')[0];
       P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: ' + (n > 1 ? n + ' hits of ' + d : d + ' damage') + '. Block soaks it.' });
     }
-    if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: +' + it.blk + '. Your hits do less.' });
+    if (it.blk) { var bk = it.blk * (it.blkH ? g.hs.length : 1); P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + bk, cap: 'raises ' + bk + ' Block', say: 'Block: +' + bk + (D.ENEMIES[e.id].keepBlk ? '. It keeps it. Break it to stop the next hit.' : '. Your hits do less.') }); }
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
     if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your hits deal 8 less.' });
     if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage.' });
