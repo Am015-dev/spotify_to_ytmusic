@@ -20,11 +20,11 @@
     return best;
   }
   function habGain(env, c, t, before) { var g = 0; t.forEach(function (tt) { g += W.corridor(env, tt) - before[tt]; }); return g; }
-  var BW = 0.6, EASY_RANDOM = 0.4;   // hard: points per majority-bonus swing (2-player)
+  var BW = 0.6, EASY_RANDOM = 0.4, GENTLE_NOISE = +(window.WM_GENTLE_NOISE || 25), GENTLE_TOK = 0.5;   // gentle = the default first-game rival (random pair, very loose placement)   // hard: points per majority-bonus swing (2-player)
   W.AI = {
     plan: function (G, level) {
       W.curCards = G.cards;
-      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', noise = lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
+      var s = G.seats[G.cur], env = s.env, lv = level || s.ai || 'normal', gentle = lv === 'gentle', novice = lv === 'novice' || gentle; if (novice) lv = 'easy'; var noise = gentle ? GENTLE_NOISE : lv === 'easy' ? 6 : lv === 'normal' ? 0.6 : 0;
       var pot = lv === 'easy' ? 0.15 : lv === 'normal' ? 0.45 : 0.6, rnd = function () { return W.rnd(G); };
       var bagTot = 0; for (var a in G.bag) bagTot += G.bag[a];
       var ctx = { bag: G.bag, bagTot: bagTot }, before = {}; W.TER.forEach(function (t) { before[t] = W.corridor(env, t); });
@@ -53,7 +53,8 @@
           if (!endGame) base += pot * slotVal(env, c, ctx) * 0.6;
           var tb = 0, tc = null;
           W.tokSpots(env, tok).forEach(function (tc0) { var g = gainTok(env, tc0, tok) + (env[tc0].key ? kb : 0); if (!endGame) g -= pot * slotVal(env, tc0, ctx) * 0.5; if (tc === null || g > tb) { tb = g; tc = tc0; } });
-          if (tc !== null && tb < -0.5 && lv !== 'easy') tc = null;   // returning beats ruining a pattern
+          if (tc !== null && tb < -0.5 && lv !== 'easy') tc = null;
+          if (gentle && rnd() < GENTLE_TOK) { var tsg = W.tokSpots(env, tok); tc = tsg.length ? tsg[Math.floor(rnd() * tsg.length)] : null; tb = tc !== null ? gainTok(env, tc, tok) : 0; }   // gentle: half the time settles the animal wherever it fits   // returning beats ruining a pattern
           base += tc !== null ? tb : 0;
           for (var j = 0; j < rots.length; j++) {
             env[c].rot = rots[j];
@@ -66,7 +67,8 @@
       }
       var acornV = endGame ? 1 : (lv === 'hard' ? 3.5 : 2.2);
       for (var i = 0; i < 4; i++) { var t = G.market.tiles[i], k = G.market.toks[i]; if (!t || !k) continue; var e = evalPair(t, k, 0); if (!best || e.v > best.v) best = Object.assign(e, { m: { t: 'take', i: i } }); }
-      if (lv === 'easy' && rnd() < EASY_RANDOM) {   // easy: sometimes just grabs a random pair
+      if (lv === 'easy' && (novice || rnd() < EASY_RANDOM)) {   // novice (the guided tutorial's rival) always grabs a random pair
+          // easy: sometimes just grabs a random pair
         var ok = []; for (var r0 = 0; r0 < 4; r0++) if (G.market.tiles[r0] && G.market.toks[r0]) ok.push(r0);
         var ri = ok[Math.floor(rnd() * ok.length)], er = evalPair(G.market.tiles[ri], G.market.toks[ri], 0); best = Object.assign(er, { m: { t: 'take', i: ri } });
       }
@@ -79,7 +81,7 @@
     choose: function (G, level) {
       var s = G.seats[G.cur], lv = level || s.ai || 'normal';
       if (G.stage === 'pick') {
-        if (!G.used3 && !G.opts.no3 && W.triple(G) && lv !== 'easy') {
+        if (!G.used3 && !G.opts.no3 && W.triple(G) && lv !== 'easy' && lv !== 'gentle') {
           var p0 = W.AI.plan(G, lv); if (p0.v < 2) return { t: 'wipe3' };
           G._plan = p0; return p0.pick;
         }
