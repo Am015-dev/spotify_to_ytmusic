@@ -5,12 +5,16 @@ locally (a no-op for all three: every tip already holds it), and ran both gates 
 `VIS_SLUGS="," build-all.py --quick` and `--full`. I served the built page next to its `games/<slug>/` media and played it by real
 touch only (`page.touchscreen.tap`), as a new player on default settings, starting from the title screen. Screenshots are in `R36-shots/`.
 
+All three tips already contain the shared branch, so the tested commit is the branch tip.
+
 Machine note: my first gate run for shipwreck-isle overlapped with my own play runs (load average 20 on 4 cores), and its phone-check
 failed on slow taps. I threw that run away and re-ran both gates with nothing else running. Only the clean runs are reported.
 
 | Game | Tested commit | Total | Result | Quick gate | Full gate | Lowest rows |
 |---|---|---|---|---|---|---|
 | shipwreck-isle | a0de6533 | **4.0** (capped; 6.0 uncapped) | **FAIL** | PASS | **FAIL** | Bugs 4 (dead taps), Tutorial 5 |
+| thornbound | dd813c17 | **6.0** | **FAIL** | **FAIL** | PASS | AI/pacing 4, Feel 5 |
+| nebula-aces | e917a7ff | **7.1** | **FAIL** | PASS | PASS | Phone play 6 |
 
 ---
 
@@ -28,7 +32,7 @@ failed on slow taps. I threw that run away and re-ran both gates with nothing el
 What I played (no seed, speed, graphics or scenario overrides; I only cleared local storage):
 - **Tutorial** ("New here?" > Learn) at 390x844, tapping only the lit ring. PASS by its own check: 45 of 49 steps shown, 26 of 26 rule
   ids. **79 taps** (45 ring taps plus 34 Continue or Next taps) and **278 s**. Every ring target is 60 px or more. It ends on "You know
-  the rules! / Fire and 15 wood by day 12" with "Keep playing / New game". The 375x667 tutorial run was still going when I wrote this.
+  the rules! / Fire and 15 wood by day 12" with "Keep playing / New game". At 375x667 it also passes: 46 of 49 steps, 81 taps (46 ring plus 35 Continue/Next), 211 s, ring targets 59 px or more.
 - **Two full default games** by touch (Marooned, 12 days), using my own plan: tap a castaway, tap a random glowing place, answer
   questions, and use ✨ only when a castaway had nothing to do.
   - 390x844: **lost on day 12**, "Time ran out: no ship came", 216 s, 76 board taps, 1 dead glowing place.
@@ -58,7 +62,7 @@ and weather all match, as R8 found. I saw nothing invented.
 | Finding | Status | Evidence (games-src/reviews/R36-shots/...) |
 |---|---|---|
 | Row 2: 57 steps plus 34 Continue taps (90 taps) | **Partly fixed.** 45 steps plus 34 Continue/Next taps (79 taps), 278 s. | ship-tut390-camp-pop.jpg, ship-tut390-end.jpg |
-| Row 2: tutorial roll was the Cook's build dice; adventure card had no effect and was missing at 375 | **Fixed at 390.** Day 3 "A real roll: tap this unknown place, and go alone", then "The ? token drew this adventure card". Not yet seen at 375. | ship-tut390-end.jpg |
+| Row 2: tutorial roll was the Cook's build dice; adventure card had no effect and was missing at 375 | **Fixed** at both sizes. Day 3 "A real roll: tap this unknown place, and go alone", then "The ? token drew this adventure card" (both sizes). | ship-tut390-end.jpg |
 | Row 4: day summary as bare icons | **Fixed.** Now in words with red warnings. | ship-375-lost-day12.jpg |
 | Row 4: "Add wood to the pile +3" used no pawn with no explanation | **Fixed.** The row reads "Add wood to the signal pile (no pawn) +1 wood". | ship-tut390-camp-pop.jpg |
 | Row 5: "+N" chip covers the Camp label | **Not fixed, worse.** The "+1" chip now blocks taps on the glowing camp (dead taps). | ship-390-deadtap-place2.jpg |
@@ -85,3 +89,118 @@ failures only in a `retry` number inside the help-kit summary, which never fails
 met a dead tap, whether or not a second tap works. I logged each first-tap failure in my own games: 4 in 2 games. In my runs every one of
 them also failed the retry, so in my runs the retry hid nothing. But the gate's own summary shows `"retry":10`, so the gate now
 treats "works on the second tap" as a pass. The retry should count as a problem, or at least be printed as a failing number.
+
+---
+
+## 2. thornbound (shelf/W489-thornbound-rules @ dd813c17): 6.0, FAIL
+
+**Quick gate: FAIL**, the same on two runs. "scenarios 10/12 ok":
+- `menu`: "no text covered at its centre: [board] text not topmost: "5" <text> is under <div.gxh-tx> | "10" ... | "ROUND" <text> is
+  under <div.gxh-bub.on>". A help bubble sits on top of the score track and the round counter.
+- `tb-story-start`: "setup failed: GXS.wait timed out: ... GXCOACH.running && document.querySelector('[data-gxt-skip]')".
+
+**Full gate: PASS.** Phone-check passed at all 6 sizes ("1/1 PASS ... EXIT 0"). The lab warning "10/12 checks" is not a gate fail.
+
+What I played:
+- **Tutorial** ("New here? Learn in 5 minutes") at 390x844 and 375x667 with the game's touch walker, which taps only the spotlight and
+  tries wrong taps: **38 steps** at both sizes, 66 s and 59 s, 27 "tap to go on" taps, 76 wrong taps refused, 0 errors. The steps run
+  over 2 rounds and include takeback, the tied Clash (tiea, tie, tieb, tiec), Lore buy (lore, lore2) and steal (bid3, bid4, kc). One
+  check failed: at the goal step a wrong tap gave no "Tap ..." hint.
+- **Two default games** from the title (Quick game > Start, nothing changed: you plus 1 Easy rival, 4 rounds, hints on). I played as a
+  newcomer who taps the coach button, then the suggested glowing card or spot, then any glowing thing, then the main button. I waited
+  1.2 s after every tap and counted a tap as dead when nothing on screen changed.
+  - 390x844: **lost 4 - 20** ("Gilded Court ... wins with 20 Influence"), 401 s, 89 taps, 0 dead taps, longest still screen 3.4 s, 0 errors.
+  - 375x667: **did not finish.** In round 2, at "Tap the regions in the order they should fight", a full-screen card pop-up
+    ("Dockside Broker. You can't play this card now.") covered the board. No ✕ or close button was visible in the 375x667 frame.
+    My driver, which taps only lit things, found nothing to tap for 757 s. A person may still close it (Esc, or a close button below
+    the fold); I did not confirm that, so I have not scored it as a stopper.
+
+**Rules check.** The published game, checked online (notes local only): Influence wins after a fixed number of rounds (4 short, 5
+standard, 6 long). Bids in strength order take a Kingdom Card, steal one a rival holds with a higher bid, or take your card back. The
+Herald adds +1 where it stands, each Supporter adds +1 in its region, and Lore buys the faction's stronger cards. The tutorial lines
+match all of this. The first game uses the official short length (4 rounds). I saw nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Engine as R23. Tied Clash, takeback, steal and Lore buying are now taught. |
+| 2 | Tutorial teaches | 7 | Fixed since R23: 38 one-line steps over 2 rounds in about 1 min, and every R23 gap is now a tap step. Still 27 "tap to go on" taps between steps, and a few reading-only cards (goal, map, tactics, attrition). |
+| 3 | First 10 seconds | 7 | The title's first button is "New here? Learn in 5 minutes". The goal card is down to a headline plus 3 bullets, then "Make a secret bid: tap a card, then the glowing spot". |
+| 4 | Turn clarity | 6 | The "YOUR TURN" line plus the lit card help. But I was lost at the clash order: a card that can't be played still opens a full card sheet, and that sheet hides the prompt. Bottom chips (Coin, Whispers, Pledges, Favour, Tactics) are labels with no explanation on the board. |
+| 5 | Phone play | 6 | Full gate PASS. But the quick gate fails on a help bubble over the score track. At 375x667 the "Make a secret bid" bubble covers the top half of the board. The bottom chips are 70-73x40 px (under 44), the 375 bid spot is 40x57, and the first screen has 24 text items under 14 px. |
+| 6 | AI and pacing | 4 | Following the game's own suggestions against 1 Easy rival, I **lost 4 - 20**. The earlier newcomer record was 1 win in 3. Waits are short now (longest still screen 3.4 s), but a game is still about 5-7 min. |
+| 7 | Feel | 5 | The painted board and cards look good. Play is still discs and numbers flipping, with no clash animation worth watching. |
+| 8 | Bugs | 6 | 0 page errors, 0 dead taps at 390. At 375 the full-screen card sheet ended my run (see above). The quick gate fails 2 scenarios on both runs. |
+| | **Total** | **6.0** | **FAIL**. 7+7+7+6+6+4+5+6 = 48/8 = 6.0. Rows 4, 5, 6, 7 and 8 are below 7. |
+
+### Earlier findings (R23)
+| Finding | Status | Evidence (games-src/reviews/R36-shots/...) |
+|---|---|---|
+| Row 2: 28 steps, 1 round, 8 Next-only, 6 silent watch steps of 7-18 s | **Fixed.** 38 steps over 2 rounds in 59-66 s, with no long silent waits. | tb-390-goal-card.jpg |
+| Row 3: goal card 4 lines of rules, busy first screen | **Mostly fixed.** Headline plus 3 bullets. | tb-390-goal-card.jpg |
+| Row 4: no suggestion unless you tap the bulb | **Fixed.** Hints are on by default; the lit card and spot lead each step. | tb-375-first-turn-bubble.jpg |
+| Row 6: newcomer lost 4-21 and 5-17; 6.5 min games, 180+ "tap to go on" | **Partly fixed.** About 89 taps a game now, and the longest still screen is 3.4 s. But I still **lost 4 - 20** against the Easy rival. | tb-390-lost-4-20.jpg |
+| Row 5 / 8: Govern sheet half under the board, 26 dead taps | **Not seen** (0 dead taps at 390); a new full-screen sheet problem appeared at 375 instead. | tb-375-cardpop-covers-clash-order.jpg |
+| Row 5: gate FAIL (board 48% at 375x553) | **Fixed.** Phone-check passes at every size. | gate log |
+| Row 7: static board, discs and "?" tokens | **Not fixed.** | tb-390-lost-4-20.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Default game at 390x844 (1 Easy rival, 4 rounds), following the suggested glow | Lost 4 - 20. | tb-390-lost-4-20.jpg |
+| 4 / 8 | Default game at 375x667, round 2, clash order | A full-screen card sheet ("You can't play this card now") covered the board and the prompt, with no close button visible. My run could not go on. | tb-375-cardpop-covers-clash-order.jpg |
+| 5 | Quick gate, scenario `menu`, run twice | Fails both times: a help bubble covers the score-track numbers and "ROUND". | gate log |
+| 8 | Quick gate, scenario `tb-story-start`, run twice | "GXS.wait timed out" waiting for the coach's Skip button in the story start. | gate log |
+| 5 | First turn at 375x667 | The "Make a secret bid" bubble covers the top half of the board. The bottom chips are 70x40 px and the bid spot is 40x57 px. | tb-375-first-turn-bubble.jpg |
+
+---
+
+## 3. nebula-aces (shelf/W486-nebula-bench @ e917a7ff): 7.1, FAIL
+
+**Quick gate: PASS** ("1/1 PASS ... EXIT 0"). **Full gate: PASS**: phone-check passed at all 6 sizes in 102 s; same lab warning as
+R32 ("9/12 checks", not a gate fail).
+
+What I played:
+- **Tutorial** ("New here?") at 390x844 and 375x667 with the game's lesson walker, which taps only the spotlight or the ghost finger
+  and tries wrong moves: **all pass** at both sizes. Every lesson line is 12 words or fewer, a wrong move or action is refused, the
+  drill really barrel rolls, boosts, tries a move off the mat (refused) and bumps, and the end card starts a real game. 0 page errors.
+  The coached reroll was done by touch in both runs without the R32 loop.
+- **Two default Quick games** ("Launch"), following the suggestions: the ★ move the dial opens on, the recommended action and target,
+  then Roll / Done. The driver taps about 0.15-0.5 s after a target appears, faster than a person.
+  - 390x844: **VICTORY in round 9**, 51 taps, 0 errors, 0 stuck states.
+  - 375x667: the game ended with my side as the winner in round 9, 51 taps, 0 errors. My screenshot was taken after the result card had
+    already closed (it shows the title), so I don't have the 375 result card.
+  - Both games ended the same way: round 9 and 51 taps. The first game seems to play out the same way each time when you follow the
+    suggestions.
+
+**Rules check.** Same base-rules engine R28 and R32 checked: secret dials, lowest skill moves first, one action, stress, a bump skips
+the action, off the mat is destroyed, highest skill fires first, range bonus, shields first, crits. I saw nothing invented. The
+R32 notes on the Rules screen (asteroid "damage die" wording, simultaneous fire at equal skill) were not re-checked this pass.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | As in R32. |
+| 2 | Tutorial teaches | 7 | Fixed per F5: the coached reroll worked by touch at both sizes, the lesson refuses wrong taps, and every rule line is 12 words or fewer. Still split into bubbles, duel, card, drill and card. |
+| 3 | First 10 seconds | 7 | "Launch" and "New here?" are big, then "Tap your ship to plan its move" with a finger. |
+| 4 | Turn clarity | 7 | One hint line and a finger on the next thing at every step ("Tap ◉ Focus: your next shot hits harder"). |
+| 5 | Phone play | 6 | Gate PASS and targets are 44 px or more. **Not fixed**: at 375x667 the "Round 1: plan your move" bubble still covers the enemy ship Knifepoint. A sliding "Your turn / Kael Varro flew. Now pick a..." banner runs over Knifepoint and is cut off at the right edge. Kael's name plate showed hearts and shield in my shots, so the Lock-chip overlap was not seen. |
+| 6 | AI and pacing | 7 | Following the suggestions won 2 of 2 in round 9, at a brisk pace. Both games played out the same way, so a replay feels the same. |
+| 7 | Feel | 8 | 3D ships fly their paths, dice tumble with MISS / hit stamps, laser lines, the rival's turn plays out step by step, and the VICTORY card is painted. |
+| 8 | Bugs | 8 | 2 tutorials and 2 games: 0 page errors, 0 stuck states, and no fast-tap loop at the reroll. |
+| | **Total** | **7.1** | **FAIL**: row 5 is below 7. 7+7+7+7+6+7+8+8 = 57/8 = 7.1. No stopper. |
+
+### Earlier findings (R32)
+| Finding | Status | Evidence (games-src/reviews/R36-shots/...) |
+|---|---|---|
+| Row 2: fast tap on the reroll die closed the pick mode (looped 120 times) | **Fixed** in my runs: the lesson walker finished the coached reroll at both sizes. | - |
+| Row 2: coach lines run late | **Better.** The lesson test's line-per-step checks pass; I did not time each line. | - |
+| Row 5: ⌖ Lock chip on Kael's name plate at 375 | **Not seen.** Hearts and shield are visible in my 375 shots. | na-375-your-turn-overlap.jpg |
+| Row 5: "Your turn" bubble hides Knifepoint at 375 | **Not fixed.** Now the "Round 1: plan your move" bubble covers Knifepoint, and a sliding banner crosses it later. | na-375-first-turn-bubble-covers-knifepoint.jpg, na-375-your-turn-overlap.jpg |
+| Row 6: game length swings (round 10 to round 20) | **Changed.** Both games ended in round 9 the same way. | na-390-victory-r9.jpg |
+| Row 1: Rules screen "damage die" wording | Not re-checked. | - |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 | First turn at 375x667 | The "Round 1: plan your move" bubble covers the enemy ship Knifepoint. | na-375-first-turn-bubble-covers-knifepoint.jpg |
+| 5 | Round 3 at 375x667 | The "Your turn / Kael Varro flew. Now pick a..." banner slides over Knifepoint and is cut off at the right edge. | na-375-your-turn-overlap.jpg |
+| 6 | Two default games following the suggestions | Identical games (round 9, 51 taps, same result). | na-390-victory-r9.jpg |
