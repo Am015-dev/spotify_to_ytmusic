@@ -229,7 +229,7 @@ function marketEl(p, q) {
   return wrap;
 }
 // R22: when the stalls do not all fit, show whole rows only (the box ends at the bottom of the last row that fits), so no stall
-// is ever half shown; the pill below says how many more there are and scrolling snaps row by row
+// is half shown at first; the pill below says how many more there are
 function stFit(st) {
   if (!st.isConnected) return; st.style.maxHeight = '';
   if (st.scrollHeight <= st.clientHeight + 2) return;
