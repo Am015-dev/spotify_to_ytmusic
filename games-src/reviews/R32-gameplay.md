@@ -10,6 +10,7 @@ games-src/reviews/R32-shots/.
 | Game | Total | Verdict | Gate (--full) | Lowest rows |
 |---|---|---|---|---|
 | cauldron-fair | 7.4 | FAIL | **FAIL** | 5 Phone 6 |
+| redline-rally | 7.4 | PASS | PASS | 2, 3, 5, 6, 7 at 7 |
 
 ---
 
@@ -74,3 +75,60 @@ its own icon spacing). Nothing invented.
 | 4 | Stopped on day 9 at 390 and watched the tally | Plates say "You 37 / Odo 35" while the headline says "Odo leads by 2" and the bars count up to other numbers. The same on day 7 ("18 / 18" above "Odo leads by 7"). The plates update only after the count. | cf-390-day9-tally-plates-vs-headline.jpg |
 | 4 | Rival boomed on day 1; the fortune sheet opened | Name 3 times on one screen (chip, dock line, sheet title). | cf-390-fortune-name-3x-choice-sheet.jpg |
 | 5 | Shop at 375 | Stall name "Dusk Si…" is cut (cosmetic). | cf-375-shop-all-stalls-info-line.jpg |
+
+---
+
+## 2. redline-rally (shelf/W496-redline-gameplay @ e1642049, merge was a no-op): 7.4, PASS
+
+**Gate: PASS.** `build-all.py --full redline-rally`: "1/1 PASS ... EXIT 0"; phone-check 57.2 s passed at every size including the
+landscape-to-portrait turn that failed in R30; rules-test "PASS" (spins 3.65, slipstreams 16.0, boosts 3.5 per AI game).
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") to the end card at 390x844 and 375x667: 40 steps, 40 taps, 0 ignored taps, 0 errors,
+  52-53 s. Smallest ring target 64x92 (cards) at 375; text 16 px. 11 steps are Next-only. Longest silent wait 5.25 s (cars moving).
+  It now ends on "You know every rule / Now a real race against four rivals" with "Play a real game" (and "Story mode").
+- 2 default races (Play ▶ > Start the race; 2 laps, 4 easy rivals) to the podium:
+
+| Race | Size | Player | Result | Taps | Time | Wait median / max | Real dead taps | Errors |
+|---|---|---|---|---|---|---|---|---|
+| r1 | 390x844 | taps Suggest, Go, the Suggested boost answer, Keep all | **won** "Flag! Sunline is yours", 0 spin-outs | 73 | 107 s | 0.3 s / 3.3 s | 0 | 0 |
+| r2 | 375x667 | plain: biggest cards that keep under the "up to speed N safe" line, random boost answer, Keep all | **2nd** "One cleaner corner and it is yours", 5 spin-outs | 117 | 169 s | 0.3 s / 4.6 s | 0 | 0 |
+
+My driver logged 7 "no change" taps in r2. I re-did them by hand: in gear 1 a second card tap swaps the chosen card (the 3 is
+dropped, the 4 is chosen), which is right; my detector missed it because the page length did not change. Not counted.
+
+**Rules check.** Unchanged since R30, which checked them against the published game: gear = number of cards (one gear up or down free,
+two for 1 heat), sum = speed, corners over the limit cost 1 heat per point, spin-out with stress and back to gear 1, 2 cars per space,
+slipstream +2, adrenaline for the last car (+1 speed, +1 cooldown), boost for 1 heat (flip until a speed card), cooldown in low gear,
+discard step, Brake / Burst / Heat as the starting upgrade cards. The tutorial lines all match. Nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. |
+| 2 | Tutorial teaches | 7 | Every rule in order, one tap each, 0 ignored taps, and it now ends in "Play a real game". The scripted move's rating string in the build is now "Good: 7 spaces for 0 heat" (R30 "Okay … best went 11" not seen). Still 11 Next-only steps, silent waits up to 5.25 s, and on the last step the camera shows Juno, not your car. |
+| 3 | First 10 seconds | 7 | Big Play ▶, a 4-line goal card, one "Start the race". |
+| 4 | Turn clarity | 8 | Fixed: each boost button carries its own text ("Suggested / +2 spaces, no corner in reach / Boost -1 heat" vs "No boost"); the plan line is short ("Speed 4: road clear, corner in 13"); the risk line "Boost +1 to +4: spin-out risk 0%" sits above both. |
+| 5 | Phone play | 7 | Gate PASS (the L>P failure is gone). Cards 52x80, gears 74x49, Go 276x46 at 375; everything fits at both sizes. Score floats ("+1 engine", "Clean: 4 in a 4") still land on the cars and corner signs. |
+| 6 | AI and pacing | 7 | About 2-3 min a race; Suggest won, the plain player was 2nd with 5 spin-outs. Fair on Easy. |
+| 7 | Feel | 7 | Start lights, cars slide, "+N spaces" / "Slipstream +2" pops, podium with heat, spin-outs and slipstreams per car. |
+| 8 | Bugs | 8 | Gate PASS; 2 races and 2 tutorials with 0 errors, 0 stuck states, 0 real dead taps. |
+| | **Total** | **7.4** | **PASS**: every row 7 or more, no stopper. 8+7+7+8+7+7+7+8 = 59/8. |
+
+### Earlier findings (R30)
+| Finding | Status | Evidence (games-src/reviews/R32-shots/...) |
+|---|---|---|
+| Gate FAIL: phone-check L>P "text >8 words: 11w" | **Fixed.** --full gate PASS. | (gate log) |
+| Row 2: scripted tutorial move rated "Okay: 7 spaces. The best play went about 11." | **Fixed** (build string "Good: 7 spaces for 0 heat."; no "Okay" line seen at either size). | rr-390-tut-boost-step.jpg |
+| Row 4: Suggested badge and the boost's risk sat on the No boost button | **Fixed.** Each button shows its own text; Suggested sits on the button it means. | rr-375-boost-own-text-suggested.jpg |
+| Row 2: 11 Next-only steps | **Not fixed** (still 11). | rr-390-tut-last-step-camera-on-juno.jpg |
+| Row 2: Finish led to the season map | **Fixed.** End card with "Play a real game". | rr-390-tut-end-play-real-game.jpg |
+| Row 7/5: "Slipstream +2" banner over the cars | **Partly.** Floats still sit over cars and corner signs. | rr-375-float-over-corner-sign.jpg, rr-375-boost-own-text-suggested.jpg |
+| Row 8: "Keep all" with 0 picked | **Still fixed** (used every round, 0 dead). | rr-375-result-2nd-plain.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 2 | Last tutorial step, 390 | "You won, and the others race on" while the camera shows Juno's car and "Slipstream +2", not mine. | rr-390-tut-last-step-camera-on-juno.jpg |
+| 5/7 | Plain race at 375 | "Clean: 4 in a 4" and "+1 engine" floats sit on the corner sign and on the cars. | rr-375-float-over-corner-sign.jpg |
+| 4 (works) | Gear 1, tapped a second card | The new card replaces the old one (good, no dead tap). | rr-375-card-swap-gear1.jpg |
+| 6 (good) | Two default races | Won 107 s (Suggest), 2nd 169 s (plain). | rr-390-result-win-suggest.jpg, rr-375-result-2nd-plain.jpg |
