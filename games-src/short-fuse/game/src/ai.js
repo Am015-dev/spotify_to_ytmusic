@@ -13,7 +13,7 @@
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
 //   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Damper kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
-const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
+const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:160,noise:0,tools:1,think:2,ch:2,info:.12},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.hist.length);mix(K.ann.length);mix(K.q?K.q.opts?K.q.opts.length:1:0);mix(K.legal?K.legal.plain.length:0);mix(Math.round(K.clock));return h>>>0}

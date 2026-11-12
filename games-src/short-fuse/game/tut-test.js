@@ -11,11 +11,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // rule -> the step ids that teach it, in teaching order
 const RULES = [
   ['goal: cut every wire together', ['goal']],
-  ['stands sorted, hidden from the others', ['mine', 'crew']],
-  ['fuse: a miss burns a step, red = boom', ['fuse']],
-  ['opening info token', ['token', 'tokens2']],
+  ['fuse: a miss burns a step, red = boom', ['goal']],
+  ['stands sorted, hidden from the others', ['mine']],
+  ['opening info token', ['token', 'point']],
   ['dual cut: point at a wire, name a value you hold', ['point', 'name']],
-  ['correct: both wires cut; one cut per turn', ['hit', 'crew1']],
+  ['correct: both wires cut; one cut per turn', ['hit']],
   ['twin probe: two wires, one number, once per job', ['probe', 'wrong1b']],
   ['wrong: fuse advances, a token shows the true value', ['wrong1', 'wrong2', 'wrongres']],
   ['equipment unlocks after two cuts, works once', ['hit', 'gear']],

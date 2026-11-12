@@ -40,7 +40,7 @@ function plLines(n0){const out=[];for(const e of G.log){if(e.i<=n0)break;if(e.c=
 (function(){const o=applyMove;applyMove=function(m,seat){if(!G||G.over)return o(m,seat);const n0=G.logN,c0=plCut(),d0=G.dial;const r=o(m,seat);
   try{if(r&&r.success!==false&&G){const L=plLines(n0);if(L.length&&!(m.a==='q'&&!L.length)){const first=L[0],bad=L.some(e=>e.c==='bad'),good=L.some(e=>e.c==='good');
       let t=plain(L.slice(0,2).map(e=>e.t).join(' '));if(t.length>84){const rs=L.find(e=>/^(Hit|Miss)/.test(e.t));t=plain((rs||L[0]).t)}let hold=plRead(t);if(m.a==='q'||!L.length)hold=0;
-      if(hold&&ANIM){hold=0;UI.aiNotBefore=Math.max(UI.aiNotBefore||0,Date.now()+Math.max(300,1600/(UI.speed||1)))}void bad;void good;void t;
+      if(hold&&ANIM){hold=0;UI.aiNotBefore=Math.max(UI.aiNotBefore||0,Date.now()+Math.max(300,1100/(UI.speed||1)))}void bad;void good;void t;
       const dc=plCut()-c0;let pop=null;
       if(dc>0)pop=['+'+dc,dc>=3?'wires cut':(m.a==='solo'?'solo cut: no guessing needed':'a match: both wires cut'),'good'];
       else if(G.dial!=null&&d0!=null&&G.dial<d0)pop=['Fuse −'+(d0-G.dial),'a miss: nobody cut','bad'];
@@ -55,11 +55,11 @@ function plPop(big,why,cls){const tb=document.getElementById('fx');if(!tb||UI.tu
     if(sel&&sel.mode==='dual'&&!sel.tool&&!sel.two){if(sel.tg.length&&sel.v==null)return 'Now tap your number to say it.';if(sel.v!=null&&!sel.tg.length)return 'Now tap the crew wire that matches.'}
     if(!sel&&t==='Tap a glowing wire')return 'Your turn: tap a crew wire to guess.';
     if(!sel&&t==='Tap your glowing wires')return 'You hold them all: tap to cut.'}
-  if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+' is thinking…';return t}})();
+  if(s>=0&&s!==me&&!isHuman(s)&&!G.q)return nm(s)+' is thinking… tap to skip';return t}})();
 document.addEventListener('pointerdown',e=>{if(!G||!UI.started||!e.target.closest)return;if(e.target.closest('#say')||e.target.closest('#tb'))plSkip()},true);
 // ---------- tap the table while the computer crew plays to speed it up ----------
-document.addEventListener('pointerdown',e=>{if(!G||!UI.started||G.over||UI.brief||UI.tut||!e.target.closest||!e.target.closest('#tb'))return;const s=decider();if(s<0||isHuman(s)||UI._boost)return;
-  UI._boost=UI.speed;UI.speed=Math.max(UI.speed,3);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}},true);
+document.addEventListener('pointerdown',e=>{if(!G||!UI.started||G.over||UI.brief||UI.tut||!e.target.closest||!e.target.closest('#tb,#say'))return;const s=decider();if(s<0||isHuman(s)||UI._boost)return;
+  UI._boost=UI.speed;UI.speed=Math.max(UI.speed,4);if(UI.aiT){clearTimeout(UI.aiT);UI.aiT=null;schedule()}},true);
 // drawer text that is scrolled completely out of view is hidden (it is not visible anyway): nothing is left "under" the painted frame
 function plClip(){document.querySelectorAll('.gx-drawer.open .gx-drawer-body,.gx-drawer.on .gx-drawer-body,.gx-drawer-body').forEach(body=>{const r=body.getBoundingClientRect();if(!r.height)return;
   body.querySelectorAll('*').forEach(e=>{const q=e.getBoundingClientRect();if(!q.height)return;const out=q.top>=r.bottom-1||q.bottom<=r.top+1;const h=e.style.visibility==='hidden';if(out&&!h)e.style.visibility='hidden';else if(!out&&h)e.style.visibility=''})})}
