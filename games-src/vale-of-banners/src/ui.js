@@ -243,7 +243,8 @@ function takeValues() {   /* value of every legal take for the best-pick badge *
 function rateBefore(m) {
   if (!myTurn() || m.k === 'end' || m.k === 'skip' || m.k === 'discard') return;
   var s = VB.actor(G), base = VB.evalSeat(G, s), best = -99, bm = null, got = valOf(m, base);
-  var hm = hardMove(); if (hm && ['k', 'v', 'slot', 'cell', 's', 'die'].every(function (f) { return hm[f] === m[f]; })) got = 1e9;   /* following ★ always rates as a best move */
+  var hm = hardMove(), fol = !!(hm && ['k', 'v', 'slot', 'cell', 's', 'die'].every(function (f) { return hm[f] === m[f]; })); if (fol) got = 1e9;
+  UI.moveN = (UI.moveN || 0) + 1; if (fol) UI.starN = (UI.starN || 0) + 1;   /* the result tip must fit: a ★ follower is not told to follow ★ */   /* following ★ always rates as a best move */
   VB.validMoves(G).forEach(function (x) { if (x.k === 'end' || x.k === 'skip') return; var v = valOf(x, base); if (v > best) { best = v; bm = x; } });
   var R = UI.rate = UI.rate || { got: 0, best: 0, miss: 0, alt: '' };
   if (got >= 1e9) got = best;
@@ -585,10 +586,10 @@ function renderDock() {
   if (p.store.length > VB.cap(p)) { var t4 = p.store[VB.cap(p)]; st.appendChild(h('div.slot.sel', {}, [h('button.tilebtn.glow', { type: 'button', id: 'st-' + VB.cap(p), onclick: function () { tapStore(VB.cap(p)); }, 'aria-label': VB.tileName(t4) }, [hexEl(t4)])])); }
   /* goods */
   var gd = $('#goods'); gd.innerHTML = '';
-  var gt = VB.goodsTypes(p); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods' }));
+  var gt = VB.goodsTypes(p); gd.classList.toggle('many', gt.length >= 4); if (!gt.length) gd.appendChild(h('span.tip', { text: 'No goods' }));
   gt.forEach(function (g) {
     var ok = mt && VB.validMoves(G).some(function (m) { return m.k === 'sell' && m.v === g; });
-    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', sell with a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span.gw', { text: p.goods[g] + ' ' + VB.GOODS[g] })]));
+    gd.appendChild(h('button.gbtn' + (ok ? '.glow' : ''), { type: 'button', id: 'gd-' + g, 'aria-label': p.goods[g] + ' ' + VB.GOODS[g] + ', sell with a ' + g, onclick: function () { tapGoods(g); } }, [h('span.gchip', { text: g, style: 'background-color:' + GCOL[g] }), h('span.gw', {}, [document.createTextNode(String(p.goods[g])), h('span.gn', { text: ' ' + VB.GOODS[g] })])]));
   });
   /* resources */
   var rr = $('#resrow'); rr.innerHTML = '';
@@ -845,7 +846,7 @@ function startGame(o) {
   var n = o.n || 2, seats = [];
   for (var i = 0; i < n; i++) seats.push(i === 0 ? { name: o.myName || 'You', human: true } : { name: (o.names && o.names[i]) || VB.SEATNAME[i], human: !!(o.hot && o.hot[i]), ai: o.ai || 'normal', style: o.style || null });
   G = VB.newGame({ n: n, teams: !!o.teams, seed: o.seed, phases: o.phases || 5, rounds: o.rounds, seats: seats, bonus: o.bonus, noBlack: o.noBlack });
-  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.costTipDone = false; UI.autoZ = null; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
+  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.costTipDone = false; UI.autoZ = null; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1; UI.moveN = 0; UI.starN = 0;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
 
   UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; UI.bump = {}; FEEL.cam = { z: 1, x: 0, y: 0 }; save(); render(); musSync(); sfx('dice'); hintSync(); if (UI.mode === 'quick' && !UI.fast && !QS.get('scn')) showGoal(); else { if (UI.mode !== 'quick') toast(VB.PHASES[0] + ' begins', 1600); turnBanner(); } schedule();
@@ -857,6 +858,7 @@ function marginLine(won) {   /* the words match the gap: never 'close one' after
   if (G.teams) n = Math.abs(G.teamVP[0] - G.teamVP[1]), k = n <= 8 ? 'close' : n <= 25 ? 'clear' : 'big';
   if (n === 0) return won ? 'Tied on points: you win the tie-break.' : 'Tied on points: lost on the tie-break.';
   var line = set[k].replace('N', n + (n === 1 ? ' point' : ' points'));
+  if (!won && (UI.moveN || 0) >= 3 && UI.starN / UI.moveN >= 0.5) line = line.replace(/ ?(Follow the ★ Best hint next time\.|Try a gentler rival, or follow ★ Best\.)/, k === 'big' && !G.seats.some(function (x) { return x.ai === 'gentle'; }) ? ' Try a gentler rival, or build toward regions earlier.' : ' Build toward regions earlier next time.');
   return G.seats.some(function (x) { return x.ai === 'gentle'; }) ? line.replace('Try a gentler rival, or follow', 'Follow') : line;
 }
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }

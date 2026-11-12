@@ -352,11 +352,15 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
   #prompt{order:-2;grid-column:1/-1}#chainb{order:-1;grid-column:1/-1}
   #dicerow{order:1;grid-column:1;flex-wrap:nowrap;gap:4px}#store{order:2;grid-column:2;justify-self:end;flex-wrap:wrap;justify-content:flex-end}
   #resrow{order:3;grid-column:1/-1;gap:6px}#goods{order:4;grid-column:1/-1}
-  #acts{order:5;grid-column:1/-1;position:sticky;bottom:-8px;z-index:2;background:var(--parch,#f4ecd8);padding:2px 0 8px;margin-bottom:-8px}
+  #acts{order:5;grid-column:1/-1;padding:2px 0 0}
   #acts:empty{display:none}
-  .gx-dock{max-height:min(46dvh,320px)}
+  #goods.many .gn{display:none}#goods.many .gbtn{min-width:46px;justify-content:center;gap:2px;padding:2px 3px}#goods.many .gchip{padding:2px 4px}   /* 3+ goods kinds: chip + count only, so the goods stay on one row */
+  .gx-dock{max-height:min(50dvh,340px)}
   #store{--hex:34px;gap:4px}#store .slot{width:44px;height:46px;box-sizing:border-box}#dicerow .die.white{width:32px;height:32px}
   #prompt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+}
+@media (max-width:640px) and (orientation:portrait) and (max-height:600px){   /* very short phones (375x553): the chain note shares a row with the chips; points are in the score bar */
+  #resrow{order:3;grid-column:1;gap:4px}#r-vp{display:none}.gx-dock{max-height:min(55dvh,340px)}#dockbody{gap:3px}#chainb{order:3;grid-column:2;justify-self:end;font-size:14px;padding:2px 6px;line-height:1.1;text-align:center}
 }
 @media (max-width:640px) and (orientation:portrait) and (max-height:700px){
   #prompt{-webkit-line-clamp:2}#prompt.full{-webkit-line-clamp:unset;display:block}
