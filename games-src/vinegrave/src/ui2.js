@@ -208,8 +208,10 @@ function diffText(s, b) {
   const dv = a.sc.total - b.sc.total;
   return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0 };
 }
-function popAt(rect, t) {
-  if (!rect || !t || (!t.vp && !t.res)) return; const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
+function popAt(rect, t, n) {
+  if (!rect || !t || (!t.vp && !t.res)) return;
+  { const fx = document.getElementById('fx'); if (fx && !fx.hidden && (n || 0) < 12) { setTimeout(() => popAt(rect, t, (n || 0) + 1), 450); return; } }   /* never stack pills on the guardian card: they wait until it closes */
+  const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
   e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
   document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
   e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);

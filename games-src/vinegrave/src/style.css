@@ -129,8 +129,9 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 .btn:has(.pv){flex-wrap:wrap;text-align:center}
 #qbox{display:flex;flex-direction:column;gap:6px;background:#fff3d6;border:2px solid var(--gx-accent);border-radius:12px;padding:8px}
 #qbox .qchoices{display:flex;flex-direction:column;gap:6px}
-#qbox .qcards{display:flex;gap:6px;overflow-x:auto;padding:4px 2px}
+#qbox .qcards{display:flex;gap:4px;overflow-x:auto;padding:4px 2px}
 #qbox .qcards .cd{flex:0 0 72px}
+@media (max-width:999px){#qbox .qcards{overflow-x:visible}#qbox .qcards .cd{flex:1 1 0;min-width:0;max-width:84px;margin:0}}
 #myrow{display:flex;align-items:center;gap:8px;min-height:46px}
 #pawns{display:flex;gap:2px;flex:none}
 .pawn{display:block;width:34px;height:46px;padding:2px 3px;border:0;background:transparent;border-radius:10px}
@@ -552,3 +553,13 @@ body.vg-pick #row .cd.mc:not(.glow){filter:none}
 #row .cd.mc .need .ic{width:12px;height:12px}
 .vpop.onchip{padding:3px 10px;animation-name:vpopChip}
 @keyframes vpopChip{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.12)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+
+/* ================= FIXED6: phone in landscape = board left, tray right, so the map is never behind the tray ================= */
+@media (orientation:landscape) and (max-height:560px) and (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr) minmax(300px,36vw)!important;grid-template-rows:minmax(0,1fr)!important}
+  .gx-dock{grid-column:2;grid-row:1;min-height:0;overflow-y:auto;border-top:0;border-left:3px solid var(--vg-ink);box-shadow:-6px 0 22px rgba(0,0,0,.45)}
+  body.vg-b2 #map{min-height:0}
+  body.vg-b2 #row .cards{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:calc((100% - 10px) / 3);overflow-x:auto;scrollbar-width:none}
+  body.vg-b2 #row .cd .ef{min-height:0}body.vg-b2 #row .cd .pic{display:none}
+  body.vg-b2 #hand .cd{flex:0 1 calc((100% - 12px) / 5)}
+}
