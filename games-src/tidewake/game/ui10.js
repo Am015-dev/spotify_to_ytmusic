@@ -65,7 +65,7 @@ function tutSteps(){const ph=!!PH.on;const S=[
  ].filter(Boolean);
  return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
    wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
-   onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}},
+   onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}try{ovUpdate()}catch(e){}},
    onDone:()=>{TUTG.seen.push(s.id);TUTG.cur=null;TUTG.hold=false;try{s.done&&s.done()}catch(e){console.error(e)}TUTG.freeze=false;schedule();render()}}))}
 // between steps the game's own Continue / Skip buttons stay live holes in the tutor layer (a visible button never eats taps)
 function tutLive(){return [...document.querySelectorAll('#pc [data-ph=dismiss],[data-a=skip]')].filter(e=>!e.closest('[hidden]')&&e.offsetWidth>0)}

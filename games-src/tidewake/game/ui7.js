@@ -249,6 +249,7 @@ document.addEventListener('click',e=>{if(!PH.on)return;
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
     else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
+    else if(a==='pip'){sfx('click');phOpen('start',{x:+t.dataset.x,y:+t.dataset.y})}
     else if(a==='stardet'){PH.det=!PH.det;sfx('click');render()}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}
     else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph'){if(!(typeof tutHold==='function'&&tutHold('mph')))PH.mphHide=UI.mph;if(UI.busy&&!NET.on){UI.skip=true;sleepFlush()}}else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}

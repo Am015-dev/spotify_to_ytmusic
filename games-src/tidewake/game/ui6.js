@@ -149,8 +149,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
-  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=UI.tutBest.m}
-    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best,pk:!UI.tut||!!(typeof TUTG!=='undefined'&&TUTG.cur&&/^mark/.test(TUTG.cur.id)),mx:o.m.x,my:o.m.y,me:o.m.e})}}
+  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);let bm=null;if(UI.tut){if(!UI.tutBest||UI.tutBest.g!==G.sp){let m=null;try{m=aiMove(d,'hard')}catch(e){}UI.tutBest={g:G.sp,m}}bm=typeof TS!=='undefined'&&TS.on&&TS.myStart?TS.myStart:UI.tutBest.m}
+    for(const o of info){const best=!!(bm&&bm.x===o.m.x&&bm.y===o.m.y&&bm.e===o.m.e);D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e+(bm?(best?'b':'d'):''),wx:o.w[0],wz:o.w[1],t:o.lab,best,dim:!!bm&&!best,pk:!UI.tut||!!(PH.on&&PH.pop!=='start'&&typeof TUTG!=='undefined'&&TUTG.cur&&TUTG.cur.id==='mark'),mx:o.m.x,my:o.m.y,me:o.m.e})}}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
@@ -169,7 +169,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
     else{const e=document.createElement('div');
       if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
-      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
+      else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);if(UI.tut)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
