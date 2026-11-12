@@ -7,7 +7,7 @@ Waits of 0.9-2 s before each decision stand in for a human reading the screen. R
 
 | Game | Total | Result | Rows under 7 |
 |---|---|---|---|
-| final-approach | see below | | |
+| final-approach | 7.4 | PASS | none |
 | tidewake | 7.0 | FAIL | 6 |
 | wildmark | see below | | |
 
@@ -15,7 +15,42 @@ Waits of 0.9-2 s before each decision stand in for a human reading the screen. R
 
 ## 1. final-approach (branch shelf/W506-final-approach-gameplay @ 5c8005e0)
 
-FA_SECTION
+Played: the tutorial by touch 6 times, 3 ways at each size (390x844 and 375x667): (a) tap every highlight, then on step 27 wait 6 s,
+tap the highlight 3 times, then Finish; (b) tap Finish at once; (c) wait 8 s, then Finish. Each run: 27 steps, 27-30 taps, 50-60 s.
+Then Quick games (Computer > Just play, default level) to the result, following "What should I do?" on every turn and doing what it
+highlighted by touch (tap the die, tap the space): 3 full games (390 won, 375 lost, 375 won), about 160 s each. 0 page errors, 0 console
+errors, 0 failed requests in all runs. Two more 390 games were cut short in round 7 by my own script, which had no code for the advice's
+reroll-pick mode; a watchdog read the page every 25 s and it stayed responsive ("Your turn", dice and buttons live), so this is not a game hang.
+
+| # | Row | Score | Why (one line) |
+|---|-----|-------|----------------|
+| 1 | Rules fidelity | 8 | Unchanged from R6: speed judged at the second engine die, equal speed lands, Axis/Engines every round, gear/flaps raise the speed markers, radio clears planes, coffee, reroll, altitude, brakes in order. Played games end on the right checks ("Landing speed 5 against brakes 6"; "Not level at landing"). |
+| 2 | Tutorial teaches | 8 | 27 one-line steps, one tap each, every rule in order, and step 27 now ends on "✓ You can fly / Play a real game / Story mode" in all 6 runs. |
+| 3 | First 10 seconds | 7 | "New here? Learn in 5 minutes" is now the first option on the title (above Play); Quick game asks Learn / Just play; the flight card says "Every round: fill both Axis and Engines." |
+| 4 | Turn clarity | 7 | "What should I do?" showed on 28 of 28 of my turns in each game; it rings the die and the space and says why ("Try your 5 on Axis: Axis 5 against 6: the plane ends level."). Checklist chips (Level, 6 to go, 9 planes, Gear 0/3, Flaps 0/4) stay visible. The prompt line talks about one die only ("Your 4: engines, or coffee."). |
+| 5 | Phone play | 7 | Spaces 47x47, dice 52x52, Finish 71x44, chips fit at 375; nothing cut off on the play screen at either size. |
+| 6 | AI and pacing | 7 | About 2.5 min a game; Ravi answers in 0.5 s, 1.4-3.2 s at a round start. Following the advice I won 2 of 3. The loss came in the landing round: the advice put my Axis die first ("Your partner's axis die decides the tilt") and Ravi's die then left the wings 1 right. |
+| 7 | Feel | 7 | Painted cockpit, dice fly to spaces, "Ravi used Coffee" banners, a painted runway on a win and a night crash scene on a loss. |
+| 8 | Bugs | 8 | 6 tutorials and 3 full games: 0 errors, 0 stuck states, 0 dead taps. |
+| | **Total** | **7.4** | **PASS** (every row >= 7, no stopper) |
+
+### Earlier findings (G5, R4, R6)
+| Finding | Status | Evidence |
+|---|---|---|
+| R6 STOPPER: tutorial stuck on step 27 of 27 at both sizes | **Fixed.** 6 of 6 runs reached the end card: highlight taps then Finish, Finish at once, and Finish after 8 s, at 390x844 and 375x667. The bubble now says the plain line and its button says Finish. | R14-shots/fa-375-tut-last.jpg, fa-375-tut-end-hl.jpg, fa-390-tut-end-fin.jpg |
+| R6: "What should I do?" absent on all 30 turns | **Fixed.** On every turn (28/28, 3 games), with die and space rings. | R14-shots/fa-375-g2-ask.jpg |
+| R6: no Play again 2 s after the end | **Fixed.** "Fly again" (loss); "Fly again" + "Next airport" (win). | R14-shots/fa-390-g1-result.jpg, fa-375-g2-result.jpg |
+| R6: "New here?" at the bottom of the title | **Fixed.** First option. | R14-shots/fa-390-title.jpg |
+| R6: following the advice lost the game | Partly. Won 2 of 3; the loss was the final-round Axis order (see row 6). | R14-shots/fa-375-g2-result.jpg |
+| R6: "Spend a token? Tap again." repeated / token spent with no die picked | Not checked: I did not spend reroll tokens in the played games. | none |
+| G5/R4 brake rules | Still right (R6 confirmed; tutorial lands at speed 4 against brakes 6). | R14-shots/fa-375-tut-last.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | 375 game, followed the advice in round 7 (landing). | The advice played my 3 on Axis first, saying "Your partner's axis die decides the tilt"; Ravi then tipped the plane 1 right and the landing failed. In the last round the advice should keep the Axis answer in my hands or warn that Ravi may not match. | R14-shots/fa-375-g2-result.jpg |
+| 7 / 4 | Lost a landing. | The result says only "Not level at landing" with no number (it was 1 right) and no hint what would have fixed it. | R14-shots/fa-375-g2-result.jpg |
+| 4 | Read the prompt line on my turn. | "Your 4: engines, or coffee." names one die while I hold four. | R14-shots/fa-390-quick3.jpg |
 
 ---
 
