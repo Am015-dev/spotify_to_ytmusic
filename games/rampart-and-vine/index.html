@@ -186,8 +186,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
 .gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
-.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
-.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap;min-width:0;overflow:hidden}
+@media (max-width:480px){.gxt-dots{display:none}}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
@@ -206,6 +207,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 @keyframes gxt-shake{0%,100%{transform:translateX(0)}18%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.gxt-ring,.gxt-bub.gxt-shake{animation:none}}
 @media (max-height:620px){.gxt-endc{gap:6px;padding:12px 14px}.gxt-ek{display:none}.gxt-et{font-size:19px}.gxt-b{min-height:44px}.gxt-top{min-height:44px}}
+/* the between-steps wait: three pulsing dots, no words (gx-tutor.js tick) */
+.gxt-pill.gxt-wait{display:flex;gap:6px;align-items:center;padding:9px 14px}
+.gxt-pill.gxt-wait i{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35;animation:gxtDot 1s infinite ease-in-out}
+.gxt-pill.gxt-wait i:nth-child(2){animation-delay:.15s}.gxt-pill.gxt-wait i:nth-child(3){animation-delay:.3s}
+@keyframes gxtDot{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+@media (prefers-reduced-motion:reduce){.gxt-pill.gxt-wait i{animation:none;opacity:.8}}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -339,7 +346,7 @@ html.sk .menu .opt{min-height:38px;font:700 14px/1 var(--ff);padding:0}
 .gxt-bub .gxh-tt::before{display:block;font:800 13px/1.3 var(--ff);letter-spacing:.06em;color:#6b3a1c;margin-bottom:2px}
 .fglow{position:relative}
 .fglow .flab{position:absolute;left:50%;top:100%;transform:translate(-50%,4px);background:rgba(40,27,18,.94);color:#fff3dc;font:800 13px/1 var(--ff);padding:3px 7px;border-radius:7px;white-space:nowrap;pointer-events:none;text-shadow:none}
-#left small{font:700 13px/1 var(--ff);--x:0;margin-left:2px;background:rgba(40,27,18,.92);color:#fff3dc;padding:2px 5px;border-radius:5px}
+#left small{font:700 14px/1 var(--ff);--x:0;margin-left:2px;background:rgba(40,27,18,.92);color:#fff3dc;padding:2px 5px;border-radius:5px}
 .hname{display:flex;flex-direction:column;gap:2px;max-width:46vw;color:#fff3dc;text-align:left;pointer-events:none;background:rgba(40,27,18,.86);padding:6px 10px;border-radius:10px}
 .hname b{font:800 14px/1.2 var(--ff)}.hname span{font:600 14px/1.25 var(--ff);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 @media(min-width:1024px){.hname b,.hname span{font-size:16px}}
@@ -494,7 +501,7 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 #modal .card .btn{display:flex;align-items:center;justify-content:center;text-align:center}
 #status .tpic{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 18%;background:#f6ead2;border:2px solid var(--c);margin:-4px 2px -4px 0;flex:0 0 auto}
 [data-gxt-open] span{font-size:14px!important}
-.fglow.wait{visibility:hidden;pointer-events:none}
+.fglow.wait{visibility:visible;pointer-events:auto}
 /* DESIGN-FIX 2: legal spots read at a glance (solid warm outline, light fill, slow pulse) */
 .glow::after{border-color:#ffd76a;background:rgba(255,215,106,.22);animation-duration:1.4s}
 /* DESIGN-FIX 5: the held tile is bigger on phones */
@@ -510,6 +517,114 @@ html #hinfo .big,html.sk #hinfo .big{color:#fff3dc!important;font-weight:800;tex
 .glow.dragover::after{border-color:#fff;box-shadow:0 0 0 calc(3px/var(--sc,1)) #ffd24a,0 0 calc(18px/var(--sc,1)) #ffd24a;animation:none}
 .fglow{width:48px!important;height:48px!important}
 .fglow .flab{pointer-events:auto;cursor:pointer}
+/* ===== W487 phone clean-up (390x844 / 375x667) ===== */
+/* panels: the frame is a real 28px border, so the painted corners never sit on the words; the page is a soft parchment sunk into the frame */
+html.sk .card,html.sk .menu,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-width:28px;border-image:url(media/ui-panel-c.webp) 100/28px stretch;background:radial-gradient(ellipse at 50% 35%,#fbf3de 0,#f6e9cc 62%,#ead6aa 100%) padding-box;box-shadow:inset 0 0 0 1.5px rgba(59,36,9,.6),inset 0 0 16px rgba(110,70,25,.32);padding:10px 12px}
+html.sk .card{max-width:400px;width:calc(100% - 8px)}
+.coachcard h2,html.sk .coachcard h2{padding:0;margin-top:2px}
+.cwalk{margin:2px 0 8px}.cwalk>div{min-width:0;flex:1 1 auto}.cwalk p{overflow-wrap:anywhere}
+.cstep{display:flex;justify-content:center;gap:6px;margin:0 0 4px;font-size:0}
+.cstep i{width:9px;height:9px;border-radius:50%;background:#c9b08a;display:block}.cstep i.on{background:#8e3a1c}
+/* one score strip: the owner's score pills, name + score on top, followers left under it; tap for the breakdown */
+html #seats,html.sk #seats{gap:4px;cursor:pointer;flex:0 1 auto}html #top #left{margin-left:auto}
+html .seat,html .seat.cur,html.sk .seat,html.sk .seat.cur{box-sizing:border-box;border-style:solid;border-color:transparent;border-width:0 9px 0 24px;padding:2px 4px 2px 2px;min-height:44px;height:44px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;flex:0 0 auto}
+html:not(.sk) .seat{background:#f3e3c3;border-radius:10px;color:#2a1608}html:not(.sk) .seat.cur{box-shadow:0 0 0 2px var(--c)}
+html .seat .dot{position:absolute;left:-17px;top:50%;margin-top:-7px;width:12px;height:12px;border-width:1.5px}html .seat{position:relative}
+html .seat .nm{font:800 14px/1 var(--ff);max-width:7ch;overflow:hidden;text-overflow:ellipsis;display:block!important;color:#2a1608;opacity:1}
+html .seat b{font:800 18px/1 var(--ff);border-bottom:2.5px solid var(--c);color:#2a1608}
+html .seat .fl{font:700 13px/1 var(--ff)!important;gap:2px;color:#2a1608;opacity:1}html .seat .fl small{font:inherit;opacity:.8}html .seat .fi,html .seat .fl .ic{width:15px;height:15px}
+@media(max-width:380px){html .seat .nm{max-width:5ch}html .seat .fl small{display:none}}
+html.sk .seat,html.sk .seat.cur{border-image:url(media/ui-score-pill.webp) 0 26 0 64 fill/0 9px 0 24px stretch;background:none;border-radius:0;box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .seat.cur{filter:drop-shadow(0 0 4px var(--c)) drop-shadow(0 0 2px #fff6d8)}
+html.sk .seat .dot{position:absolute;left:-17px;top:50%;margin-top:-7px;width:12px;height:12px;border-width:1.5px}
+html.sk .seat{position:relative}
+.seat .sl1,.seat .sl2{display:flex;align-items:center;gap:4px;line-height:1.05;white-space:nowrap}
+html.sk .seat .nm,html.sk .seat b,html.sk .seat .fl{color:#2a1608!important;opacity:1}
+html.sk .seat .nm{font:800 14px/1 var(--ff);max-width:7ch;overflow:hidden;text-overflow:ellipsis;display:block!important}
+html.sk .seat b{font:800 18px/1 var(--ff);border-bottom:2.5px solid var(--c)}
+html.sk .seat .fl{font:700 13px/1 var(--ff)!important;gap:1px}html.sk .seat .fl small{font:inherit;opacity:.8}
+html.sk .seat .fi{width:15px;height:15px}
+@media(max-width:380px){html.sk .seat .nm{max-width:5ch}html.sk .seat .fl small{display:none}}
+html.sk #left{flex-direction:row;gap:3px}html.sk #left .lt{display:flex;flex-direction:column;align-items:center;line-height:1}
+html.sk #left .lt b{background:none;padding:0;font-size:16px!important}html.sk #left .lt small{display:block!important;font:700 13px/1 var(--ff);color:#fff3dc;text-shadow:0 1px 2px #1a0e05;background:none;padding:0;margin:1px 0 0}
+html.sk #left::before{display:none}
+html.cb #left .pile{width:18px;height:26px}
+/* the second score bar is gone: only its breakdown drawer remains, opened from the pills */
+#sheet{height:0;border:0!important;padding:0!important;overflow:visible}
+#sheet .sbtn{display:none}
+#sheet .srate{top:0}
+#sheet .shead{display:flex;align-items:center;gap:8px;font:800 16px var(--ff);margin-bottom:6px}#sheet .shead b{border-bottom:3px solid var(--c)}
+#sheet .sico{width:22px;height:22px;object-fit:contain;flex:0 0 auto;margin-right:2px}
+/* seamless board: tiles overlap by a hair so no table line shows between them; no bevel lines */
+.tl{width:100.8px!important;height:100.8px!important}.tl svg{width:100.8px!important;height:100.8px!important}
+html .tl{box-shadow:none}
+/* the tray: the held tile is big; the end plate is the ribbon at its own shape, dark words on the cream band */
+@media (max-width:699px) and (min-height:780px){#htile{width:124px;height:124px}}
+html #hinfo .big,html.sk #hinfo .big{display:grid;place-items:center;box-sizing:border-box;width:240px;height:114px;aspect-ratio:auto;padding:0 72px 10px;background:url(media/ui-ribbon.webp) center/549px 114px no-repeat;color:#2a3a14!important;font:800 16px/1.05 var(--ff);letter-spacing:.01em;text-shadow:none!important;white-space:normal;text-align:center}   /* the art is the middle 336px of the 768px file; the cream band is about 105px wide here, so the words wrap onto two lines */
+html #hand #hinfo{align-items:center}
+html.sk #hand:has(#hinfo .big){justify-content:center}
+#ground{position:absolute;left:0;top:0;pointer-events:none}
+#ground i{position:absolute;width:100.8px;height:100.8px;background:linear-gradient(rgba(92,66,34,.24),rgba(92,66,34,.24)),url(media/tex-field.webp) 0 0/100px 100px;box-shadow:inset 0 0 14px 6px rgba(40,24,8,.5)}
+.seat .sl2{margin-top:2px}html.sk .seat .fl{gap:2px}
+html #hand #hinfo:has(.big){flex:1 1 auto;width:100%;align-items:center}
+@media (max-height:600px){html.sk .card,html.sk .menu,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-width:20px;border-image-width:20px;padding:6px 10px;gap:6px}}
+html.sk .card>p,html.sk .card .sub,html.sk .card>h1,html.sk .card>h2,html.sk .card .cwalk,html.sk .card .clater{padding-left:8px;padding-right:8px}html.sk .card .clater{padding-left:calc(8px + 1.2em)}
+/* feedback + phone fit (review G1): tile thud, dust ring, followers hop home, points fly to the chip */
+.tl.drop{animation:drop2 .5s cubic-bezier(.3,.7,.3,1)}
+@keyframes drop2{0%{transform:translateY(-34px) scale(1.35);opacity:0;filter:drop-shadow(0 18px 14px rgba(0,0,0,.4))}55%{transform:none;opacity:1}72%{transform:scale(1.05,.93)}88%{transform:scale(.99,1.02)}100%{transform:none;opacity:1}}
+.dust{position:absolute;width:100px;height:100px;border-radius:50%;pointer-events:none;border:6px solid rgba(255,244,214,.75);animation:dust .6s ease-out forwards;z-index:3}
+@keyframes dust{from{transform:scale(.7);opacity:.9}to{transform:scale(1.7);opacity:0}}
+#board.thud{animation:thudb .24s ease-out}
+@keyframes thudb{20%{translate:0 3px}55%{translate:0 -1px}}
+.mp.homepop{animation:hpop .3s ease-out}
+@keyframes hpop{40%{scale:1.7;filter:drop-shadow(0 0 8px #ffe28a)}}
+.pop{transition:transform .85s cubic-bezier(.5,0,.8,.4),opacity .85s}
+@media(max-width:699px){.pop{transition:transform .85s cubic-bezier(.5,0,.8,.4),opacity .85s}}
+@media(prefers-reduced-motion:reduce){.tl.drop,.dust,#board.thud,.mp.homepop{animation:none}}
+/* 44px targets and full names on small phones */
+#modal .card .opt{min-height:44px}
+html.sk .menu .opt,.menu .opt{min-height:44px}
+@media(max-width:400px){html .seat .nm,html.sk .seat.cur .nm,html.sk .seat .nm{max-width:none;overflow:visible;text-overflow:clip}html .seat .fl small{display:none}html .seat,html.sk .seat,html .seat.cur,html.sk .seat.cur{border-width:0 7px 0 22px;padding-right:2px}}
+#hintsbtn,#menubtn{min-height:44px}
+@media(max-width:480px){#seats:has(.seat:nth-child(3)) .seat:not(.cur) .nm{max-width:3ch;overflow:hidden}#seats:has(.seat:nth-child(3)) .seat:not(.cur) .fl{display:none}#seats:has(.seat:nth-child(3)) .seat{border-width:0 6px 0 20px}}
+@media(max-width:480px){#seats:has(.seat:nth-child(4)) .seat:not(.cur) .nm{display:none!important}}
+#left small,html.sk #left small{font-size:14px}
+.mp.gone.homing{opacity:1}
+/* result table (R4): winner first, points per kind */
+.restab{width:100%;border-collapse:collapse;font:700 16px/1.2 var(--ff);color:var(--ink);background:#fff8e8;border-radius:12px;overflow:hidden}
+.restab th,.restab td{padding:7px 8px;text-align:right}
+.restab tbody th,.restab tfoot th{text-align:left;font-weight:700;color:var(--mut)}
+.restab thead th{font-size:16px;color:var(--ink);white-space:nowrap}
+.restab thead th i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:-1px;border:1.5px solid #fff8e8;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.restab thead th:nth-child(2),.restab td:nth-child(2){background:rgba(224,168,58,.18)}
+.restab tbody tr+tr{border-top:1px solid rgba(45,32,22,.1)}
+.restab tfoot{border-top:2px solid rgba(45,32,22,.35)}
+.restab tfoot td,.restab tfoot th{font-size:20px;font-weight:800;color:var(--ink)}
+/* R4: counters readable on a phone (14px floor) */
+html.sk .seat .fl,html.sk .seat .fl small{font-size:15px!important;font-weight:800}
+html.sk .seat .fl .ic{width:16px;height:16px}
+html.sk #top #left b{font-size:16px!important}
+html.sk #top #left small,#left small{font-size:14px!important}
+/* R4: end-count plate, centred and readable; the whole screen skips */
+#endplate{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 26px;border-radius:16px;background:rgba(40,27,18,.9);border:2px solid var(--gold);color:#fff3dc;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:endIn .25s ease-out}
+#endplate b{font:800 24px/1.1 var(--ff-h,var(--ff))}#endplate small{font:700 15px/1 var(--ff);opacity:.85}
+@keyframes endIn{from{opacity:0;transform:translate(-50%,12px)}}
+/* ===== R9 phone fixes (375x667 / 390x844) ===== */
+#recentre{min-height:44px}
+#hintsbtn{min-width:44px}
+body:has(#endplate) #hand #hinfo{visibility:hidden}
+.resbtns{display:flex;gap:8px;align-items:stretch;margin-top:8px}
+.resbtns .btn{flex:1 1 0;margin:0!important;min-height:48px;justify-content:center;white-space:nowrap}
+@media(max-height:740px){.card .endart{height:min(17vh,120px)!important}.restab th,.restab td{padding:5px 8px}.card[aria-label=Result] h2{margin:2px 0!important}}
+.mp.tdemo{pointer-events:none;animation:tdemo .9s ease-out both}
+@keyframes tdemo{from{opacity:0;margin-top:-18px}to{opacity:1;margin-top:0}}
+.tdemotag{pointer-events:none;white-space:nowrap;font:800 15px/1.2 var(--ff);color:#fff3dc;background:#281b12;border:2px solid #e0a83a;border-radius:10px;padding:5px 9px;box-shadow:0 2px 8px rgba(0,0,0,.45);z-index:6}
+#ov .mp.tdhide{opacity:0!important}
+.gedges{position:absolute;inset:0;pointer-events:none;z-index:7}
+.gedge{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:5px;min-height:44px;min-width:44px;padding:0 12px;border:2px solid #ffd24a;border-radius:999px;background:rgba(40,27,18,.92);color:#fff3dc;font:800 14px/1 var(--ff);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
+.gedge b{color:#ffd24a;font-size:14px}
+.gedge[hidden]{display:none}
+body:has(#modal .scrim) .gedges{display:none}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -1386,7 +1501,8 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -1502,15 +1618,16 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -1526,11 +1643,14 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -1538,12 +1658,12 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -1564,7 +1684,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -1627,7 +1747,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
@@ -1655,6 +1775,15 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -1707,7 +1836,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
@@ -1786,7 +1915,11 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   }
   // ------------------------------------------------------------------ one step: wait for it, show it, advance on the right action
   function draw() {   // (re)build the visible pieces for the current step at the current layout
-    var st = S.step, hs = holesOf(st); clearVisuals();
+    var st = S.step, hs = holesOf(st);
+    // a redraw for the same step keeps its bubble element (it only moves): a rebuilt bubble reads as a message that vanished unread
+    var keep = hs && S.bub && S.bub.dataset.step === String(st.id || S.i) && S.say === stepText(st, 'say') ? S.bub : null;
+    if (keep) S.vis = (S.vis || []).filter(function (e) { return e !== keep; });
+    clearVisuals();
     var v = vp();
     if (!hs) { S.phase = 'pend'; S.key = ''; drawWaiting(); return false; }
     var H = hs.map(function (r) { return inflate(r, st.pad != null ? st.pad : 6, v); });
@@ -1799,6 +1932,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
@@ -1824,7 +1958,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
-      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill', esc(st.pending || 'Watch the board'))); S.pill.setAttribute('role', 'status'); } return; }
+      if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
       return;
@@ -1842,6 +1976,8 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -1859,6 +1995,8 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -1867,7 +2005,7 @@ html body :is(.gxh-ring,.gxt-ring){animation-duration:1.6s}
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }
@@ -3064,7 +3202,7 @@ function buildGeo(t){if(GEO[t])return GEO[t];const d=TT[t],segs=tileSegs(t),fix=
 function r2len(R){return lineLen(R.pts)}
 // ---------- SVG painter (catalogue, 2D board, dock preview) ----------
 const PAL={field:'#a9b86a',field2:'#c2c077',town:'#e3c89a',townEdge:'#8a5a33',roof:'#c0613a',road:'#efe2bf',roadEdge:'#9c8458',river:'#4d93c2',riverEdge:'#2f6f99',mon:'#f1e6cf',hedge:'#5d7a35'};
-let TEXSET={};const TX=(k,fb)=>TEXSET[k]?`url(#tx-${k}) ${fb}`:fb;// painted textures (paint.js) under the flat colours
+let TEXSET={},TXR=0;const TX=(k,fb)=>TEXSET[k]?`url(#tx-${k}-${TXR&3}) ${fb}`:fb;// painted textures (paint.js) under the flat colours
 function polyD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')+'Z'}
 function lineD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}
 function tileSVG(t,opt){opt=opt||{};const g=buildGeo(t),d=TT[t];let s='';
@@ -3082,7 +3220,7 @@ function tileSVG(t,opt){opt=opt||{};const g=buildGeo(t),d=TT[t];let s='';
     if(c.p)s+=`<path d="M${sp[0]+7} ${sp[1]-12}h9v7l-4.5 3l-4.5-3z" fill="#2c5fb8" stroke="#f0c44c" stroke-width="1.2"/>`;
     if(c.g)s+=`<circle cx="${sp[0]-9}" cy="${sp[1]+6}" r="5" fill="${GOODS_COL[c.g]}" stroke="#3a2a18" stroke-width=".8"/>`});
   if(d.gar){const fs=g.spots[d.C.length+d.R.length];if(fs)s+=`<rect x="${fs[0]-5}" y="${fs[1]+5}" width="10" height="7" rx="2" fill="${TX('garden','#6e9a3c')}" stroke="#3f5f22" stroke-width="1"/>`}
-  if(TEXSET.field)s+=`<rect width="100" height="100" fill="url(#tshade)" pointer-events="none"/>`;
+  
   if(opt.spots)g.spots.forEach((p,i)=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff" stroke="#000" stroke-width="1"/><text x="${p[0]}" y="${p[1]+2}" font-size="5" text-anchor="middle">${i}</text>`});
   return s}
 const GOODS_COL={wine:'#7a1f3d',grain:'#e3b23c',cloth:'#3f6fb5'};
@@ -3308,7 +3446,7 @@ function render_game_to_text(){if(!G)return '{}';return JSON.stringify({turn:G.t
 // ---------- computer players ----------
 // easy: random legal placement with a bias toward points; normal: greedy value of placement + follower incl. completion odds;
 // hard: adds field/majority weighting and a one-ply look at the tiles still in the bag (can each open side still be filled?).
-let AIPLAN=null;var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
+let AIPLAN=null;var EASYK={good:25,drop:50,claim:30,keep:2};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
 const LVL={easy:{opp:.3,slots:false},normal:{opp:.8,slots:false},hard:{opp:.9,slots:true}};
 function lvOf(s){return LVL[P(s).lv]?P(s).lv:'normal'}
 // ---- what is still in the bag (public: anyone can count the tiles) ----
@@ -3376,8 +3514,11 @@ function aiPlan(s,lvIn){const lv=lvIn||lvOf(s),t=G.cur.t,places=legalPlacements(
     const tot=pv.v+bonus+bfv;const c={q,v:tot,pv,bf,bfv,bonus,pr};all.push(c);if(!best||tot>best.v)best=c}
   if(lv==='hard'&&all.length>1&&tilesLeft()>1)best=lookAhead(s,all)||best;
   if(lv==='easy'&&all.length){// mostly random, nudged toward points
-    const r=rnd(100);if(r<45){all.sort((a,b)=>b.pv.dl[s]-a.pv.dl[s]);best=all[rnd(Math.min(3,all.length))]}else best=all[rnd(all.length)];
-    if(best.bf&&rnd(100)<40)best.bf=null;if(!best.bf&&rnd(100)<35){const ops=figOptionsFromProbe(best.pr,s).filter(o=>o.k==='f');if(ops.length)best.bf=ops[rnd(ops.length)]}}
+    // a beatable first rival: mostly a random spot, one claim now and then, never a farmer
+    const r=rnd(100);if(r<EASYK.good){all.sort((a,b)=>b.pv.dl[s]-a.pv.dl[s]);best=all[rnd(Math.min(4,all.length))]}else best=all[rnd(all.length)];
+    if(best.bf&&(best.bf.g.ty==='F'||rnd(100)<EASYK.drop))best.bf=null;
+    if(!best.bf&&rnd(100)<EASYK.claim){const ops=figOptionsFromProbe(best.pr,s).filter(o=>o.k==='f'&&o.g.ty!=='F');if(ops.length)best.bf=ops[rnd(ops.length)]}
+    if(best.bf&&P(s).sup.f<=EASYK.keep)best.bf=null}
   const place={act:'place',x:best.q.x,y:best.q.y,r:best.q.r};const fig=best.bf?{act:'fig',k:best.bf.k,l:best.bf.l}:{act:'skip'};
   return {place,fig,why:best.pv.why,bonus:best.bonus,figOpt:best.bf,v:best.v,pr:best.pr}}
 // hard: one ply ahead. For the best few plans, play them on a copy of the state and ask what the next rival could
@@ -3603,24 +3744,29 @@ const STORY={
   quickLose:r=>`${r} wins the deeds this time. Want a rematch?`,
   quickTie:'A tie! You share the deeds.',
   tut:{
-    goal:{ch:1,who:'guide',title:'The empty valley',say:'Lay tiles and claim things with followers. Most points wins the deeds.'},
-    turn:{ch:1,who:'guide',title:'Your first tile',say:'Tap your tile to turn it. Point the road the right way.'},
-    place1:{ch:1,who:'guide',title:'Road meets road',say:'Edges must match. Lay it where the road continues.'},
-    fig_road:{ch:1,who:'guide',title:'Claim the road',say:'A follower on a road claims it. You start with seven.'},
-    computer:{ch:1,who:'rival',title:'Hob takes a turn',say:'Hob plays a tile. A road, town or field with a follower is taken.'},
-    place2:{ch:2,who:'guide',title:'Close the road',say:'Close your road on the left. A finished road scores 1 per tile.'},
-    fig_priory:{ch:2,who:'guide',title:'Claim the priory',say:'Put a follower on the priory. Eight tiles around it score 9.'},
-    road_done:{ch:2,who:'guide',title:'Road finished',say:'Four tiles, four points. Your follower goes home.'},
-    place3:{ch:2,who:'guide',title:'Build a town',say:'Join town to town. Close the town above before Hob claims it.'},
-    fig_town:{ch:2,who:'guide',title:'Claim the town',say:'Claim it before it closes. A finished town scores 2 per tile.'},
-    town_done:{ch:2,who:'guide',title:'Town finished',say:'Two tiles, four points. Your follower goes home.'},
-    place4:{ch:3,who:'guide',title:'Fill the ring',say:'A priory needs eight neighbours. This is the fourth.'},
-    fig_farmer:{ch:3,who:'guide',title:'Send a farmer',say:'A follower in a field is a farmer. At the end it scores 3 per finished town.'},
-    place5:{ch:3,who:'guide',title:'Keep building',say:'Six neighbours are down. Place the tile. You need no follower.'},
-    place6:{ch:3,who:'guide',title:'The last tile',say:'This tile completes the ring around your priory.'},
+    goal:{ch:1,who:'guide',title:'The empty valley',say:'Lay tiles and claim them with followers. Most points wins.'},
+    turn:{ch:1,who:'guide',title:'Your first tile',say:'This is your tile. Tap it to turn it.'},
+    place1:{ch:1,who:'guide',title:'Road meets road',say:'Edges must match: road to road. Tap the glowing square.'},
+    fig_road:{ch:1,who:'guide',title:'Claim the road',say:'Tap the circle: a follower claims this road. You have seven.'},
+    computer:{ch:1,who:'rival',title:'Hob takes a turn',say:'Hob laid a tile and claimed it. Tap Hob’s lit tile.'},
+    place2:{ch:2,who:'guide',title:'Close the road',say:'Close your road. Followers go only on the tile just laid.'},
+    fig_priory:{ch:2,who:'guide',title:'Claim the priory',say:'Claim the priory. Eight tiles around it score 9.'},
+    road_done:{ch:2,who:'guide',title:'Road finished',say:'Finished road: 1 point per tile. Tap the lit tiles.'},
+    place3:{ch:2,who:'guide',title:'Build a town',say:'Town meets town. Tap the square to close the town.'},
+    fig_town:{ch:2,who:'guide',title:'Claim the town',say:'Claim the town before it closes.'},
+    town_done:{ch:2,who:'guide',title:'Town finished',say:'Finished town: 2 points per tile. Tap the lit tiles.'},
+    place4:{ch:3,who:'guide',title:'Fill the ring',say:'A priory needs all eight neighbours. Lay the fourth.'},
+    fig_farmer:{ch:3,who:'guide',title:'Send a farmer',say:'A follower in a field is a farmer. It never comes home.'},
+    place5:{ch:3,who:'guide',title:'Keep building',say:'Lay this tile. No follower needed this time.'},
+    place6:{ch:3,who:'guide',title:'The last tile',say:'This tile closes the ring around your priory.'},
     skip:{ch:3,who:'guide',title:'Keep your follower',say:'Nothing to claim here. Tap Skip to keep your follower.'},
-    priory_done:{ch:4,who:'guide',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower goes home.'},
-    final:{ch:4,who:'guide',title:'Final scoring',say:'The valley is full. Unfinished roads and towns score 1 per tile. Your farmer scores 3.'},
+    priory_done:{ch:4,who:'guide',title:'Priory scored',say:'Eight neighbours: the priory scores 9. Follower comes home.'},
+    final:{ch:4,who:'guide',title:'Final scoring',say:'Last tile! Open things: 1 per tile. Farmers: 3 per finished town.'},
+    claimed:{ch:1,who:'guide',title:'One owner',say:'A claimed road or town takes no second follower. Tap the tile.'},
+    pennant:{ch:2,who:'guide',title:'Banners',say:'Each banner in a finished town adds 2 points. Tap the tiles.'},
+    majority:{ch:3,who:'guide',title:'Most followers',say:'Most followers on a road or town scores it. Tap the tiles.'},
+    tie:{ch:3,who:'guide',title:'Ties',say:'Tied for most followers? Both score in full. Tap the tiles.'},
+    discard:{ch:3,who:'guide',title:'No fit',say:'A tile that fits nowhere is swapped for a new one.'},
     winner:{ch:4,who:'guide',title:'The deeds are yours',say:null}
   },
   prologue:{title:'Prologue',text:'Welcome, Garnet. Vinemoor is empty, and Hob wants it. Play one game with me first. I will explain each rule as it comes up.'},
@@ -3720,16 +3866,23 @@ const tutP=(n,st)=>!!G&&G.turn===n&&myTurn(st);
 const tutAfter=(n,pts)=>!!G&&G.turn===n&&G.step==='place'&&G.cur.p===1&&P(0).score===pts;
 // ---------------------------------------------------------------- the steps
 function tutSteps(){return tutStory(tutSteps0())}
-function tutStory(L){tutStyle();return L.map(st=>{const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
+function tutStory(L){tutStyle();return L.map(st=>{if(st.wait&&st.wait.match&&st.onEnter&&!st.wrong&&/tOn\(\)/.test(String(st.onEnter)))st.wrong='Tap the lit tile.';const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
 function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let lastCh=0;
   for(const id in STORY.tut){const t=STORY.tut[id],c=STORY[t.who];const sel=`.gxt-bub[data-step="${id}"]`;
     o.push(`${sel} .gxh-bd::before{background-image:url(${c.img});border-color:${c.col}}`);
     if(t.ch!==lastCh){lastCh=t.ch;o.push(`${sel} .gxh-tt::before{content:"CHAPTER ${t.ch}: ${STORY.chapters[t.ch].toUpperCase()}"}`)}}
   const e=document.createElement('style');e.id='tutcast';e.textContent=o.join('\n');document.head.appendChild(e)}
+// R9: majority and ties shown on the board: example followers stand on the lit road, with a one-line count above it
+function tutDemoOff(){for(const e of UI.tdemo||[])e.remove();UI.tdemo=null;for(const id in UI.mp)UI.mp[id].classList.remove('tdhide')}
+function tutDemo(spec,txt){tutDemoOff();for(const id in UI.mp)UI.mp[id].classList.add('tdhide');const out=[];let top=null;for(const [k,p] of spec){const T=G.tiles[k];if(!T)continue;const l=TSEG[T.t].findIndex(sg=>sg&&sg.ty==='R');if(l<0)continue;const [wx,wy]=spotWorld(k,l);
+    const e=document.createElement('div');e.className='mp tdemo';e.style.setProperty('--c',PCOL[p]);e.innerHTML=pcHtml(FIGICON.f,p);addOv(e,wx,wy,{dy:-4});out.push(e);if(!top||wy<top[1])top=[wx,wy]}
+  if(top&&txt){const t=document.createElement('div');t.className='tdemotag';t.textContent=txt;addOv(t,top[0],top[1],{dy:-46});out.push(t)}UI.tdemo=out;try{placeOverlay()}catch(e){}}
 function tutSteps0(){
   const placeW=n=>({type:'tap',match:a=>a.what==='place'&&a.x===tutT(n)[1]&&a.y===tutT(n)[2]});
   const figW=n=>({type:'tap',match:a=>a.what==='fig'&&a.k==='f'&&a.l===tutSegOf(n)});
   const hold=()=>{UI.tutHold=true},release=()=>{UI.tutHold=false;schedAI()};
+  // a rule shown on the board: tap any tile of the lit group to go on (no Next button)
+  const tileW={type:'tap',match:a=>a.what==='tile'},tOn=()=>{UI.tutTile=true},tOff=()=>{UI.tutTile=false};
   const RING=['-2,-1','-1,-1','0,-1','-2,0','-1,0','0,0','-2,1','-1,1','0,1'];
   return [
  {id:'goal',title:'Build the valley',say:'This is where your valley starts. Add tiles, claim roads and towns with followers. Most points wins.',target:()=>UI.tl['0,0'],wait:null,
@@ -3739,33 +3892,47 @@ function tutSteps0(){
    wait:{type:'tap',match:a=>a.what==='rotate'},ready:()=>tutP(1,'place')&&!!document.querySelector('#htile')},
  {id:'place1',title:'Match the edges',say:'Road meets road: edges must match. Tap the glowing square to lay your tile.',target:tutGlow(1),wait:placeW(1),ready:()=>tutP(1,'place')&&tutRot(0)},
  {id:'fig_road',title:'Claim the road',say:'Tap the glowing circle to put a follower on the road. You start with seven.',target:tutFig(1),wait:figW(1),ready:()=>tutP(1,'fig')},
- {id:'computer',title:'The computer plays',say:'It lays a tile and may claim. A road, town or field with a follower is taken.',target:()=>UI.tl['1,1'],also:tutMp(1),wait:null,ready:()=>tutP(3,'place')&&!!tutMp(1)()},
+ {id:'computer',title:'The computer plays',say:'It lays a tile and may claim. A road, town or field with a follower is taken.',target:()=>UI.tl['1,1'],also:tutMp(1),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(3,'place')&&!!tutMp(1)()},
+ {id:'claimed',title:'One owner',say:'',target:()=>UI.tl['1,1'],also:tutMp(1),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(3,'place')},
  {id:'place2',title:'End the road',say:'This tile closes your road on the left. Tap the glowing square.',target:tutGlow(3),wait:placeW(3),ready:()=>tutP(3,'place')&&tutRot(3)},
  {id:'fig_priory',title:'Claim the priory',say:'A priory scores 9 when eight tiles surround it. Tap the circle to claim it.',target:tutFig(3),wait:figW(3),ready:()=>tutP(3,'fig')},
- {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:null,
-   onEnter:hold,onNext:release,hold:true,ready:()=>tutAfter(4,4)},
+ {id:'road_done',title:'Road finished',say:'A finished road scores 1 point per tile: 4 for you. Your follower comes home.',target:tutCellsFn(['0,0','1,0','1,1','-1,0']),wait:tileW,
+   onEnter:()=>{hold();tOn()},onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(4,4)},
  {id:'place3',title:'Make a town',say:'Town meets town. This edge closes the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(2)},
  {id:'fig_town',title:'Claim the town',say:'Claim it before it closes. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
- {id:'town_done',title:'Town finished',say:'Two tiles at 2 points each: 4 more. The follower is back.',target:tutCellsFn(['0,0','0,-1']),wait:null,
-   onEnter:hold,onNext:release,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,
+   onEnter:()=>{hold();tOn()},onDone:tOff,hold:true,ready:()=>tutAfter(6,8)},
+ {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,onEnter:tOn,onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(6,8)},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
+ {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,0',0],['1,1',1]],'You 2, Hob 1: only you score')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},
+ {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,1',1]],'You 1, Hob 1: both score in full')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},
  {id:'place5',title:'Keep building',say:'Six of eight neighbours are down. No follower needed here.',target:tutGlow(9),wait:placeW(9),ready:()=>tutP(9,'place')&&tutRot(1)},
+ {id:'discard',title:'No fit',say:'',target:()=>document.querySelector('#htile'),wait:null,ready:()=>tutP(11,'place')},
  {id:'place6',title:'The last tile',say:'This completes the ring around your priory. Tap the glowing square.',target:tutGlow(11),wait:placeW(11),ready:()=>tutP(11,'place')&&tutRot(3)},
  {id:'skip',title:'Or skip',say:'Nothing to claim here. Tap Skip to end your turn.',target:()=>document.querySelector('#hskip'),wait:{type:'tap',match:a=>a.what==='skip'},ready:()=>tutP(11,'fig')},
  {id:'priory_done',title:'Priory scored',say:'Eight tiles around it: 9 points! Your follower comes home.',target:tutCellsFn(RING),wait:null,onEnter:()=>{UI.user=false;refit(true)},ready:()=>!!G&&G.over&&P(0).sc.priory===9},
  {id:'final',title:'Final scoring',say:'Valley full! Your farmer scores 3 for the finished town. Unfinished roads and towns score 1 per tile.',target:tutCellsFn(['-2,-1']),also:tutCellsFn(['0,-1']),wait:null,
    onEnter:()=>tutFinalPops(),ready:()=>!!G&&G.over},
- {id:'winner',title:'Most points wins',say:()=>'You win '+P(0).score+' to '+P(1).score+'! The deeds of Vinemoor go to Garnet, and Hob wants a rematch.',target:()=>UI.tl['0,0'],wait:null,ready:()=>!!G&&G.over}
+ {id:'winner',title:'Most points wins',say:()=>(P(0).score>=P(1).score?'You win ':'Hob wins ')+Math.max(P(0).score,P(1).score)+' to '+Math.min(P(0).score,P(1).score)+'. Most points wins!',target:()=>UI.tl['0,0'],wait:null,wrong:'Tap Finish.',ready:()=>!!G&&G.over}
   ]}
+(function(){const hook=()=>{const b=document.getElementById('board');if(!b||b._tt)return;b._tt=1;b.addEventListener('click',e=>{if(!UI.tut||!UI.tutTile||UI.moved)return;if(typeof GXT!=='undefined'&&GXT.active())GXT.act({type:'tap',what:'tile'})})};if(document.readyState!=='loading')hook();else document.addEventListener('DOMContentLoaded',hook);setInterval(hook,1500)})();
 // ---------------------------------------------------------------- start, leave
 function tutSetup(){try{GXC.close()}catch(e){}closeMenu();UI.camp=null;UI.tut=true;UI.tutHold=false;UI.tutAuto=0;
   beginGame({np:2,seats:['human','ai'],lv:['normal','normal'],ex:{},seed:7,stack:TUT_TURNS.map(t=>t[0])});if(G&&G.pl[1]){G.pl[1].nm=STORY.rival.name;render()}}
 // leave the staged game: nothing of it was saved, and the board goes quiet behind the menu
 function tutLeave(){UI.tut=false;UI.tutHold=false;UI.tutAuto=0;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;UI.endShown=false;G=null;UI.lastOpts=null;
   try{resetUI()}catch(e){}for(const e of document.querySelectorAll('#world .glow'))e.remove();try{GXH.hide()}catch(e){}UI.lastOpts=setupOpts();const g=$('#ghost');if(g)g.remove()}
-// the tutorial is the coached first game (coach.js); the forced-step GXT version is retired
-function tutStart(o){coachStart(o)}
+// Learn to play (owner, 8 Nov: gameplay first): a guided first game that teaches every core rule in order, one sentence + one highlighted tap
+// per step (shell/gx-tutor.js), then a real game. The coached free game (coach.js) is no longer launched from here.
+const TUT_RULES=['goal','turn','place1','fig_road','computer','claimed','place2','fig_priory','road_done','place3','fig_town','town_done','pennant','place4','fig_farmer','majority','tie','place5','discard','place6','skip','priory_done','final','winner'];
+function tutStart(o){const pro=!!(o&&o.prologue);if(typeof GXT==='undefined'){coachStart(o);return}
+  try{GXC.close()}catch(e){}closeMenu();$('#modal').innerHTML='';
+  GXT.start({game:TUT_GAME,story:true,setup:tutSetup,steps:tutSteps(),endTitle:STORY.tutEndTitle,endText:pro?STORY.tutEndStory:STORY.tutEndText,
+    endButtons:pro?[{id:'chapter',label:'Start chapter 1'}]:[{id:'play',label:'Play a real game'}],
+    onDone:r=>{tutLeave();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+      if(r&&r.choice==='chapter'&&first&&typeof GXC!=='undefined')GXC.play(first.id);else beginGame()},
+    onExit:()=>{tutLeave();showStart()}})}
 // Story starts with the tutorial (Chapter 0) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))prologueCard();else GXC.open()}
@@ -3863,9 +4030,9 @@ const COACH_DECK = [31, 29, 7, 21, 1, 9, 29, 31, 0, 13, 21, 3, 18, 15, 19, 29, 3
       GXCOACH.done = true; m.querySelector('[data-a=cgo]').onclick = () => finish(pro);
     };
     const show = () => {
-      if (i >= pages.length) return showLater();
+      if (i >= pages.length) return finish(pro);   // no 'rules to learn later' card: every rule is taught in Learn to play (tutor.js)
       const [k, t] = pages[i]; const guide = STORY.guide;
-      const m = card('<div class="cwalk"><img class="cpic" src="' + guide.img + '" alt=""><div><b>' + guide.name + '</b><p>' + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p></div></div><div class="cstep">' + (i + 1) + ' / ' + pages.length + '</div><button class="btn big" data-a="cnext">' + (i === pages.length - 1 ? 'Continue' : 'Next') + '</button>');
+      const m = card('<div class="cwalk"><img class="cpic" src="' + guide.img + '" alt=""><div><b>' + guide.name + '</b><p>' + t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p></div></div><div class="cstep" aria-label="Page ' + (i + 1) + ' of ' + pages.length + '">' + pages.map((_, j) => '<i' + (j === i ? ' class="on"' : '') + '></i>').join('') + '</div><button class="btn big" data-a="cnext">' + (i === pages.length - 1 ? 'Continue' : 'Next') + '</button>');
       m.querySelector('[data-a=cnext]').onclick = () => { i++; show(); };
     };
     show();
@@ -3927,11 +4094,11 @@ function prevCalc(x, y, r) {
 function prevFig(l) {
   const T = G.tiles[G.cur.k], id = find(T.s0 + +l), F = G.fd[id]; if (!F) return '';
   const nm = PV_TY[F.ty];
-  if (F.ty === 'F') return 'field: 3 per finished town';
-  if (F.ty === 'M') return 'priory: 9 with 8 tiles around';
+  if (F.ty === 'F') return 'farmer';
+  if (F.ty === 'M') return 'priory 9';
   const done = F.oe && F.oe.length === 0;
   if (done) return nm + ' +' + featPoints(F, true) + ' now';
-  return nm + ' +' + featPoints(F, true) + ' when finished';
+  return nm + ' +' + featPoints(F, true);
 }
 // highlight a feature's tiles while a spot is held or hovered
 function pvHighlight(keys) { for (const e of document.querySelectorAll('#world .pvhl')) e.classList.remove('pvhl'); if (keys) for (const k of keys) { const e = UI.tl[k]; if (e) e.classList.add('pvhl'); } }
@@ -3948,8 +4115,11 @@ function renderSheet() {   // PLAY: one score line (you vs rivals); tap it for w
   const rt = hintsOn() ? UI.rating : null, w = rt ? rt.word.toLowerCase() : '';
   const chip = '<span class="schip ' + w + '">' + (rt ? rt.word : 'Why') + '<em aria-hidden="true">' + (UI.sheetOpen ? '▴' : '▾') + '</em></span>';
   const bd = cat.map(([k, nm]) => '<span class="sc"><i>' + nm + '</i>' + G.pl.map(p => '<b style="--c:' + PCOL[p.i] + '">' + (p.sc[k] + p.end[k]) + '</b>').join('<u>–</u>') + '</span>').join('');
-  const drawer = UI.sheetOpen ? '<div class="srate ' + w + '"><div class="srow">' + bd + '</div>' + (rt ? '<div><b>' + rt.word + ':</b> ' + esc(rt.text) + '</div>' : '') + '</div>' : '';
+  const fl = '<span class="sc"><img class="sico" src="media/icon-follower.webp" alt=""><i>Followers left</i>' + G.pl.map(p => '<b style="--c:' + PCOL[p.i] + '">' + p.sup.f + '</b>').join('<u>–</u>') + '</span><span class="sc"><img class="sico" src="media/icon-tile.webp" alt=""><i>Tiles left</i><b>' + tilesLeft() + '</b></span>';
+  const head = '<div class="shead"><img class="sico" src="media/icon-score.webp" alt=""><span>' + G.pl.map(p => esc(seatName(p)) + ' <b style="--c:' + PCOL[p.i] + '">' + p.score + '</b>').join(' <u>–</u> ') + '</span></div>';
+  const drawer = UI.sheetOpen ? '<div class="srate ' + w + '">' + head + '<div class="srow">' + bd + fl + '</div>' + (rt ? '<div><b>' + rt.word + ':</b> ' + esc(rt.text) + '</div>' : '') + '</div>' : '';
   el.innerHTML = '<button type="button" class="sbtn" aria-expanded="' + !!UI.sheetOpen + '" aria-label="Scores; tap for where the points came from">' + tot + chip + '</button>' + drawer;
+  if (!el._seatTap) { el._seatTap = 1; const st = document.getElementById('seats'); if (st) { st.setAttribute('role', 'button'); st.tabIndex = 0; st.setAttribute('aria-label', 'Scores; tap for where the points came from'); st.addEventListener('click', () => el.firstChild && el.firstChild.click()); } }
   el.firstChild.onclick = () => { UI.sheetOpen = !UI.sheetOpen; clearTimeout(UI.sheetT); if (UI.sheetOpen) UI.sheetT = setTimeout(() => { UI.sheetOpen = false; renderSheet(); }, 6000); renderSheet(); };
 }
 // ---------- rating the move ----------
@@ -3984,7 +4154,7 @@ const MINC=30,MAXC=118;// cell size in screen pixels
 const FIGICON={f:'meeple',big:'champ',bld:'mason',pig:'hog'};
 AIDELAY=Math.max(AIDELAY,950);   // rival steps are shown one at a time with a caption; tap the board to speed up
 Object.assign(UI,{rot:0,deg:0,turn:-1,stepKey:'',user:false,hint:null,aiT:0,tl:{},mp:{},fxSeen:0,view:{s:.4,x:0,y:0},camp:null,first:false,moved:false,
-  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'normal',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
+  legal:[],rots:[],figs:[],ov:[],setup:{rivals:1,lv:'easy',river:false,ic:false,tb:false},tween:0,overT:0,lastKey:null,humanTurns:0});
 try{UI.first=localStorage.getItem('rv_seen')!=='1';UI.speed=localStorage.getItem('rv_fast')==='1'?3:1}catch(e){}
 const human=()=>G&&G.pl.some(p=>p.human);
 // Addendum 7: PLAY is clean; HINTS (top-bar toggle, off by default) turns on previews, badges, ratings and the bulb; the coached game always teaches
@@ -4004,7 +4174,7 @@ function capRemain(){if(!UI.capCur)return 0;return Math.max(0,(UI.cap?UI.cap.unt
 function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
-  const who=(d.win&&d.win.length?d.win:[d.by||0]).map(i=>seatName(P(i))).join(' & ');
+  const ws=d.win&&d.win.length?d.win:[d.by||0],who=ws.length>2?ws.length+' players':ws.length===2?(ws.some(i=>P(i).human)?'You both':'Both'):seatName(P(ws[0]));   // a shared score stays short
   const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
@@ -4017,7 +4187,7 @@ function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;UI.twTo=to;
   const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;UI.twTo=null;ensureGlowVisible();figShow()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100,top=topSafe(),bot=botSafe();return {s,x:m.W/2-cx*100*s,y:top+(m.H-top-bot)/2-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
-  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
+  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2,w,h}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
@@ -4030,7 +4200,7 @@ function zoomTile(k,anim){const m=measure(),[x,y]=unkey(k),ph=PHONE(),c=Math.max
 // ---------- camera follow (W426): frame the spots near the last tile, zoom in on the chosen spot, ease back out, follow the rival ----------
 const PHONE=()=>innerWidth<700;
 function topSafe(){const s=$('#status'),b=boardEl();if(!s||!b||!s.offsetHeight)return 40;return Math.max(40,s.getBoundingClientRect().bottom-b.getBoundingClientRect().top+8)}
-function botSafe(){const h=$('#hand');if(!h||getComputedStyle(h).position!=='absolute')return 0;return h.offsetHeight+18}
+function botSafe(){const h=$('#hand'),rc=$('#recentre'),rh=rc&&rc.offsetHeight&&getComputedStyle(rc).bottom!=='auto'?rc.offsetHeight+14:0;if(!h||getComputedStyle(h).position!=='absolute')return rh;return h.offsetHeight+18+rh}   // keep glows clear of the Recentre button too
 function frameCells(cells,cmin,cmax){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const top=topSafe(),bot=botSafe(),aw=m.W-24,ah=m.H-top-bot-12,c=Math.max(cmin,Math.min(cmax,Math.min(aw/(x1-x0+1),ah/(y1-y0+1)))),s=c/100;return {s,x:m.W/2-(x0+x1+1)/2*100*s,y:top+ah/2-(y0+y1+1)/2*100*s}}
 function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal.filter(q=>q.r===UI.rot).map(q=>{let rk=0;try{rk=pvRank(prevCalc(q.x,q.y,UI.rot))}catch(e){}return {q,rk,d:Math.hypot(q.x-last[0],q.y-last[1])}}).sort((a,b)=>a.d-b.d);
@@ -4038,22 +4208,32 @@ function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal
   return set.map(e=>[e.q.x,e.q.y]).concat([last])}
 function fitsAt(cells,c){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}return (x1-x0+1)*c<=m.W-24&&(y1-y0+1)*c<=m.H-topSafe()-botSafe()-12}
 // the camera keeps the whole valley in view when the tiles stay readable; otherwise the biggest readable patch around the newest tile
+const GLOWMIN=()=>PHONE()?44:54;   // R9: smallest cell that is still a 44px touch target; used so every glow fits on screen
 const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?104:(innerWidth>=1024?200:MAXC);
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
 function camValley(extra,around,ms){if(!G||!G.order.length)return;tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
+  {const all=G.order.map(unkey).concat(gl),gm=GLOWMIN();if(!fitsAt(all,CAMMIN())&&fitsAt(all,gm)){tweenView(frameCells(all,gm,CAMMAX()),ms==null?600:ms);return}if(!fitsAt(all,gm)&&gl.length&&fitsAt(gl.concat([unkey(G.order[G.order.length-1])]),gm)){tweenView(frameCells(gl.concat([unkey(G.order[G.order.length-1])]),gm,CAMMAX()),ms==null?600:ms);return}}
   const near=aimCells();const cells=valleyCells(gl);if(!near.slice(0,-1).some(q=>cells.some(c=>c[0]===q[0]&&c[1]===q[1]))){camValley(near,near[0],ms==null?600:ms);return}tweenView(frameCells(cells,CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camSpot(x,y,ms){const m=measure(),c=UI.view.s*100,sx=(x+.5)*c+UI.view.x,sy=(y+.5)*c+UI.view.y,top=topSafe(),bot=botSafe();if(sx>c&&sx<m.W-c&&sy>top+c*.8&&sy<m.H-bot-c*.8)return;tweenView(focusView(x+.5,y+.5,Math.max(c,CAMMIN())),ms==null?420:ms)}
+function hiddenGlows(){return [...$('#world').querySelectorAll('.glow')].filter(g=>g.style.visibility==='hidden').map(g=>[+g.dataset.x,+g.dataset.y])}
+function camGlows(){const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);if(!gl.length)return;const gm=GLOWMIN();if(fitsAt(gl,gm)){tweenView(frameCells(gl,gm,CAMMAX()),420);return}
+  const h=hiddenGlows(),c=h[0]||gl[0],by=gl.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1])),out=[];for(const q of by){out.push(q);if(!fitsAt(out,gm)){out.pop();break}}tweenView(frameCells(out.length?out:[c],gm,CAMMAX()),420)}
 function camArea(k,ms){if(UI.user||!G)return;camValley(null,unkey(k),ms)}
-function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else camAim()}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
+function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else if(hiddenGlows().length&&UI.rcT===G.order.length+':'+UI.rot)camGlows();else{UI.rcT=G.order.length+':'+UI.rot;camAim()}}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
 function selSpot(x,y){UI.sel={x,y,r:UI.rot};sfx('click');UI.user=false;renderGlows();renderHand();if(hintsOn())try{pvHighlight(prevCalc(x,y,UI.rot).hl)}catch(e){}renderStatus();camSpot(x,y)}
 // ---------- drawing a tile (rotated by its placement) ----------
-const tileInner=(t,r)=>`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;
+const tileInner=(t,r)=>{TXR=r|0;const o=`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;TXR=0;return o};
 function tileSvg(t,r){return `<svg viewBox="0 0 100 100" aria-hidden="true">${tileInner(t,r)}</svg>`}
 // ---------- world: tiles, glowing placement spots ----------
+function renderGround(w){let g=w.querySelector('#ground');if(!g){g=document.createElement('div');g.id='ground';g.setAttribute('aria-hidden','true');w.insertBefore(g,w.firstChild)}   // empty spots inside the valley show bare earth, not the table
+  const seen={},out=[];for(const k of G.order){const [x,y]=unkey(k);for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,nk=nx+','+ny;if(G.tiles[nk]||G.tiles[key(nx,ny)]||seen[nk])continue;seen[nk]=1;
+    let n=0;for(const [ex,ey] of [[1,0],[-1,0],[0,1],[0,-1]])if(G.tiles[key(nx+ex,ny+ey)])n++;if(n>=2)out.push([nx,ny])}}
+  const sig=out.join(';');if(g._sig===sig)return;g._sig=sig;g.innerHTML=out.map(([x,y])=>`<i style="left:${x*100}px;top:${y*100}px"></i>`).join('')}
 function renderTiles(){const w=$('#world');
+  try{renderGround(w)}catch(e){}
   for(const k in UI.tl)if(!G.tiles[k]){UI.tl[k].remove();delete UI.tl[k]}
   const lastK=G.step==='fig'&&G.cur?G.cur.k:G.order[G.order.length-1];
   for(const k of G.order){const T=G.tiles[k];let e=UI.tl[k];const [x,y]=unkey(k);
@@ -4074,20 +4254,40 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
 // follower spots stay hidden while the camera moves, so a button never slides away under a finger
 function figShow(){for(const e of document.querySelectorAll('#ov .fglow.wait'))e.classList.remove('wait')}
-function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=52;
+function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=64;
   for(let it=0;it<24;it++){let moved=false;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j];let dx=(b.x+b.ox)-(a.x+a.ox),dy=(b.y+b.oy)-(a.y+a.oy),d=Math.hypot(dx,dy);if(d>=D)continue;if(d<.01){dx=0;dy=1;d=1}const k=(D-d)/2/d;a.ox-=dx*k;a.oy-=dy*k;b.ox+=dx*k;b.oy+=dy*k;moved=true}if(!moved)break}
   for(const q of P)q.e.style.transform=`translate(${q.x+q.ox}px,${q.y+q.oy}px) translate(-50%,-50%)`}
 function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(24,Math.min(48,cell*.4));$('#ov').style.setProperty('--ms',ms+'px');
   for(const el of $('#ov').children){const o=el._o;if(!o)continue;const [sx,sy]=toScreen(o.wx,o.wy);el.style.transform=`translate(${sx+o.dx}px,${sy+o.dy}px) translate(-50%,-50%)`;
     if(o.cull){const r=o.r||0;const vis=sx>pad+r&&sx<m.W-pad-r&&sy>pad+r+28&&sy<m.H-pad-r;el.style.visibility=vis?'':'hidden'}}
   // glows must lie fully inside the board so none is half cut off or under the bars
-  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}spreadFigs();keepPops();layoutTags();layoutFlabs()}
+  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}edgeArrows();spreadFigs();keepPops();layoutTags();layoutFlabs()}
+// R9: glows that do not fit on a small phone get an arrow at the board edge ("2 more"); a tap slides the view to them
+const EDGE_ARW={l:'\u25C0',r:'\u25B6',t:'\u25B2',b:'\u25BC'};
+function edgeArrows(){const bd=boardEl();if(!bd)return;let box=bd.querySelector('.gedges');if(!box){box=document.createElement('div');box.className='gedges';bd.appendChild(box)}
+  const on=G&&!G.over&&myTurn('place')&&!UI.aiFly;const m=measure(),c=UI.view.s*100,top=Math.max(34,topSafe()),bot=m.H-botSafe(),side={l:[],r:[],t:[],b:[]};
+  if(on)for(const g of $('#world').querySelectorAll('.glow')){if(g.style.visibility!=='hidden')continue;const gx=+g.dataset.x,gy=+g.dataset.y,x=gx*c+UI.view.x,y=gy*c+UI.view.y;
+    const o={l:-x,r:x+c-m.W,t:top-y,b:y+c-bot};let k='l';for(const q in o)if(o[q]>o[k])k=q;side[k].push([gx,gy,x+c/2,y+c/2])}
+  const br=bd.getBoundingClientRect(),avoid=[];if(on){for(const g of $('#world').querySelectorAll('.glow'))if(g.style.visibility!=='hidden'){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;avoid.push({l:x,t:y,r:x+c,b:y+c})}
+    for(const r of fixedRects())avoid.push({l:r.left-br.left,t:r.top-br.top,r:r.right-br.left,b:r.bottom-br.top})}
+  for(const k in side){let e=box.querySelector('[data-s='+k+']');const L=side[k];if(!L.length){if(e)e.hidden=true;continue}
+    if(!e){e=document.createElement('button');e.type='button';e.className='gedge';e.dataset.s=k;e.addEventListener('click',ev=>{ev.stopPropagation();edgeGo(e.dataset.s)});box.appendChild(e)}
+    e.hidden=false;e.setAttribute('aria-label',L.length+' more '+(L.length>1?'squares':'square')+' this way');e.innerHTML='<b>'+EDGE_ARW[k]+'</b>'+L.length+' more';
+    const ax=L.reduce((a,q)=>a+q[2],0)/L.length,ay=L.reduce((a,q)=>a+q[3],0)/L.length,w=e.offsetWidth||96,h=e.offsetHeight||44;
+    let X,Y;if(k==='l'||k==='r'){X=k==='l'?6:m.W-w-6;Y=Math.max(top+6,Math.min(bot-h-6,ay-h/2))}else{Y=k==='t'?top+6:bot-h-6;X=Math.max(6,Math.min(m.W-w-6,ax-w/2))}
+    // never on a visible glow, the status, Recentre or another arrow: slide along the edge to the nearest free place
+    const hit=(x,y)=>avoid.some(r=>x<r.r&&x+w>r.l&&y<r.b&&y+h>r.t),vert=k==='l'||k==='r';let best=null;
+    for(let d=0;d<=Math.max(m.W,m.H);d+=12){for(const sg of d?[1,-1]:[1]){const x=vert?X:X+sg*d,y=vert?Y+sg*d:Y;if(x<4||x+w>m.W-4||y<top+2||y+h>bot-2)continue;if(!hit(x,y)){best=[x,y];break}}if(best)break}
+    if(!best){e.hidden=true;continue}[X,Y]=best;avoid.push({l:X-4,t:Y-4,r:X+w+4,b:Y+h+4});e.style.transform='translate('+Math.round(X)+'px,'+Math.round(Y)+'px)'}}
+function edgeGo(k){if(!myTurn('place'))return;sfx('click');const m=measure(),c=UI.view.s*100,cx=(m.W/2-UI.view.x)/c,cy=((topSafe()+m.H-botSafe())/2-UI.view.y)/c;
+  const L=[...$('#world').querySelectorAll('.glow')].filter(g=>g.style.visibility==='hidden').map(g=>[+g.dataset.x,+g.dataset.y]).filter(([x,y])=>k==='l'?x+.5<cx:k==='r'?x+.5>cx:k==='t'?y+.5<cy:y+.5>cy);if(!L.length)return;
+  L.sort((a,b)=>Math.hypot(a[0]+.5-cx,a[1]+.5-cy)-Math.hypot(b[0]+.5-cx,b[1]+.5-cy));UI.user=true;tweenView(focusView(L[0][0]+.5,L[0][1]+.5,c),380)}
 function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100+sp[0],y*100+sp[1]]}
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
     const e=document.createElement('div');e.className='mp';e.style.setProperty('--c',PCOL[f.p]);e.innerHTML=pcHtml(FIGICON[f.k],f.p);
-    addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
-  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
+    e._p=f.p;addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
+  for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];flyHome(e)}
   placeOverlay()}
 function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
@@ -4095,7 +4295,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
     ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
       b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{let nm='';try{nm=hintsOn()?prevFig(l):(FEATW[G.fd[find(T.s0+ +l)].ty]||'')}catch(e){const sg=TSEG[T.t][+l];nm=sg?FEATW[sg.ty]:''}if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
-      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;if(UI.tw&&!UI.sim)b.classList.add('wait');UI.figs.push(b)})}
+      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*62:0});b._m=m;if(UI.tw&&!UI.sim)b.classList.add('wait');UI.figs.push(b)})}
   clearTimeout(UI.figT);UI.figT=setTimeout(figShow,700);
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
@@ -4114,8 +4314,16 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
-  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><b>${tilesLeft()}</b><small>left</small>`}
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
+  $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
+// feedback: a tile lands with a thud + dust ring; a follower pops, then hops home to its owner's chip
+function thud(k){const e=UI.tl[k];if(!e||UI.reduce)return;const [x,y]=unkey(k),w=$('#world');
+  const d=document.createElement('div');d.className='dust';d.style.left=x*100+'px';d.style.top=y*100+'px';w.appendChild(d);setTimeout(()=>d.remove(),700);
+  const b=boardEl();b.classList.remove('thud');void b.offsetWidth;b.classList.add('thud');setTimeout(()=>b.classList.remove('thud'),260)}
+function flyHome(e){const chip=document.querySelector(`.seat[data-i="${e._p}"]`);if(!chip||UI.reduce||UI.sim||!e.isConnected){e.classList.add('gone');setTimeout(()=>e.remove(),520);return}
+  e.classList.add('homepop','gone','homing');setTimeout(()=>{if(!e.isConnected)return;const b=boardEl().getBoundingClientRect(),c=chip.getBoundingClientRect();e._o=null;
+    e.style.transition='transform .55s cubic-bezier(.5,0,.7,.4),opacity .55s';e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.5)`;e.style.opacity='.15';
+    setTimeout(()=>{bumpSeat(e._p);e.remove()},560)},300)}
 function bumpSeat(i){const e=document.querySelector(`.seat[data-i="${i}"]`);if(e){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function hname(t,p){const mine=P(p).human;return `<div class="hname"><b>${mine?'Your tile':esc(P(p).nm)+'’s tile'}</b><span>${esc(TT[t].n)}</span></div>`}
 function renderHand(){const h=$('#hand');const p=G.over?null:G.cur&&G.cur.p;
@@ -4142,14 +4350,15 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 function renderStatus(){let t='',tn='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc){tn='Scoring';t=c}
-  else if(G.over){tn='Game over';t='The valley is full. Counting the points…'}
+  else if(G.over){tn='Game over';t='Counting the points…'}
+  else if(UI.tut&&UI.tutTile){tn='Learn';t='Tap the lit tile to go on.'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&UI.cap.intro&&G.step==='place')t=c;
     else if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
-    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap again to place.'}
+    else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me)t='Add a follower, or Skip.';
-    else t=(c&&!UI.cap.intro?c:'')||`Watch ${p.nm} play a tile.`}
+    else t=c||'Watch their tile go down.'}
   say(t,tn,'')}
 // ---------- turn bookkeeping ----------
 function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(key===UI.stepKey)return;UI.stepKey=key;
@@ -4191,32 +4400,54 @@ function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s)
 function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
-  for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap=''}
+  for(const f of list){if(UI.coach)try{coachFx(f)}catch(e){console.error(e)}if(f.t==='fig'){const lf=lastFig();if(lf&&lf.p>=0&&!P(lf.p).human)UI.recap=`${lf.nm} took a ${lf.ty}.`}else if(f.t==='turn'&&!P(f.x).human)UI.recap='';try{rvTrack(f)}catch(e){console.error(e)}}
+  if(G&&G.over)try{rvFlush()}catch(e){}
 
-  for(const f of list){if(f.t==='place')sfx('place');else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
+  for(const f of list){if(f.t==='place'){sfx('place');try{thud(f.x)}catch(e){}buzz(18)}else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;try{capSet(scoreCap(d,false),1500,true)}catch(e){}setTimeout(()=>scorePop(d),delay)}}}
+// one line per rival turn: "Cobalt placed a road and a follower: +3"
+function rvTrack(f){const R=UI.rv;
+  if(f.t==='turn'){rvFlush();if(G&&!P(f.x).human&&human())UI.rv={p:f.x,ty:'',fig:'',pts:0};return}
+  if(!R)return;
+  if(f.t==='place'){const T=G.tiles[f.x];if(T){const ts=TSEG[T.t].map(q=>q.ty);R.ty=ts.includes('C')?'town':ts.includes('M')?'priory':ts.includes('R')?'road':'field'}}
+  else if(f.t==='fig'){const e=G.log.slice(0,8).map(l=>l.t.match(/^(.+?) (?:sets|puts) an? (.+?)(?: \(\w+\))? on the (\w+)\.$/)).find(Boolean);if(e&&e[1]===P(R.p).nm){R.fig=e[2];R.ty=e[3]}}
+  else if(f.t==='score'){const d=f.x,w=d.win&&d.win.length?d.win:[d.by];if(w.includes(R.p))R.pts+=d.pts}}
+function rvFlush(){const R=UI.rv;UI.rv=null;if(!R||!R.ty||!G)return;const nm=(n=>n.split(" ").length>2?n.split(" ").pop():n)(seatName(P(R.p)));   // R9: a long story name ("The Sable Baron") keeps the caption to 8 words
+  const line=`${nm} placed a ${R.ty}${R.fig?' and a '+R.fig:''}${R.pts?': +'+R.pts:'.'}`;UI.rvLine=line;capSet(line,3400,false,true,true)}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
 function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
   for(const [x,y] of cells){const e=UI.tl[key(x,y)];if(e){e.classList.remove('lit');void e.offsetWidth;e.classList.add('lit')}}
   const cx=cells.reduce((a,c)=>a+c[0],0)/cells.length+.5,cy=cells.reduce((a,c)=>a+c[1],0)/cells.length+.5;
   const w=d.win.length?d.win:[d.by||0];
-  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();
+  w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();try{keepPops()}catch(x){}
     const chip=document.querySelector(`.seat[data-i="${i}"]`),b=boardEl().getBoundingClientRect();
-    setTimeout(()=>{const o=e._o;if(chip&&!PHONE()){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
+    setTimeout(()=>{const o=e._o;if(chip&&!final){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>{e.remove();try{placeOverlay()}catch(x){}},final?1900:1700)})}
 // ---------- the end: unfinished features score one by one, then the result ----------
+const FINAL0=450,FINALSTEP=240;   // end count: brisk (~3 s), whole valley in view, tap to skip
+// the end count shows the whole valley, centred below the status line (smaller tiles than play allows)
+function endView(){const m=measure(),f=fitCells(G.order.map(unkey),m),ts=topSafe(),bs=Math.max(70,botSafe());
+  const w=f.w,h=f.h,c=Math.max(14,Math.min(MAXC,(m.W-16)/w,(m.H-ts-bs-8)/h)),sc=c/100;UI.user=true;
+  tweenView({s:sc,x:m.W/2-f.cx*100*sc,y:ts+(m.H-ts-bs)/2-f.cy*100*sc},420)}
 function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
-  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),400+n*700);n++}
+  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),FINAL0+n*FINALSTEP);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
 function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;sfx('win');
-  const n=finalPops();
-  const wait=Math.min(8000,900+n*700+1400);
-  setTimeout(()=>{if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()},UI.reduce?300:wait)}
+  try{endView()}catch(e){}const n=finalPops();
+  const wait=Math.min(3400,FINAL0+n*FINALSTEP+1300);let gone=false;
+  const plate=document.createElement('div');plate.id='endplate';plate.setAttribute('role','status');plate.innerHTML='<b>Final count</b><small>Tap to skip</small>';$('#app').appendChild(plate);
+  const go=()=>{if(gone)return;gone=true;clearTimeout(tm);plate.remove();document.removeEventListener('pointerdown',skip,true);if(!G||!G.over)return;if(UI.camp&&typeof campFinish==='function'){campFinish();return}showResult()};
+  const skip=e=>{e.preventDefault();e.stopPropagation();go()};setTimeout(()=>document.addEventListener('pointerdown',skip,true),250);
+  const tm=setTimeout(go,UI.reduce?300:wait)}
+// the result table: winner first, points per kind so a new player sees why
+function resTable(){const ps=[...G.pl].sort((a,b)=>b.score-a.score),v=(p,k)=>((p.sc||{})[k]||0)+((p.end||{})[k]||0);
+  const rows=[['road','Roads'],['town','Towns'],['priory','Priories'],['field','Farms']];if(G.ex.tb)rows.push(['goods','Goods']);
+  return `<table class="restab"><thead><tr><th></th>${ps.map(p=>`<th style="--c:${PCOL[p.i]}"><i></i>${esc(seatName(p))}</th>`).join('')}</tr></thead><tbody>${rows.map(([k,l])=>`<tr><th>${l}</th>${ps.map(p=>`<td>${v(p,k)}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><th>Total</th>${ps.map(p=>`<td>${p.score}</td>`).join('')}</tr></tfoot></table>`}
 function showResult(){const win=G.over.win,me=G.pl.find(p=>p.human);const iWon=me&&win.includes(me.i)&&win.length===1;
   const title=!human()?G.winText:win.length>1?'A tie!':iWon?'You win!':P(win[0]).nm+' wins';
   const rv=G.pl.find(p=>!p.human),line=UI.camp||typeof STORY==='undefined'||!me?'':(win.length>1?STORY.quickTie:iWon?STORY.quickWin:STORY.quickLose(rv?rv.nm:'The rival'));
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}<div class="rescore">${G.pl.map(p=>`<span style="--c:${PCOL[p.i]}"><i></i>${esc(seatName(p))} ${p.score}</span>`).join('')}</div><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}${resTable()}<div class="resbtns"><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div></div>`;
   $('#modal').querySelector('[data-a=again]').onclick=()=>beginGame(UI.lastOpts);$('#modal').querySelector('[data-a=menu]').onclick=()=>showStart()}
 // ---------- start screen, menu, rules ----------
 function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g&&g.v===1&&!g.over?g:null}catch(e){return null}}
@@ -4245,7 +4476,7 @@ function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.s
   d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
   $('#app').appendChild(d);$('#goalok').addEventListener('click',()=>d.remove())}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
-function resetUI(){UI.recap="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
+function resetUI(){UI.recap="";UI.rv=null;UI.rvLine="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
 function loadSaved(){const g=savedGame();if(!g)return;resetUI();G=g;UI.camp=null;UI.fxSeen=0;UI.fx.length=0;$('#modal').innerHTML='';UI.lastOpts=setupOpts();render();refit(false);schedAI()}
 // ---------- gestures: drag to move, pinch / wheel to zoom, tap during a computer turn to speed it up ----------
 function initGestures(){const b=boardEl(),pt=new Map();let last=null;
@@ -4380,8 +4611,8 @@ const PIMG={};
 function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=(f.includes('/')?f:MEDIA+f)+'.webp'}
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 // texture name -> [file, size of one repeat in tile units]
-const TEXD={field:100,road:40,river:50,lake:40,garden:20,hedge:24,hub:24,wall:25,mon:50,'town-basilica':60,town:60,roof:24};
-function texDefs(){let d='';for(const k in TEXD){if(PIMG['tex-'+k]!==1)continue;const s=TEXD[k];d+=`<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"><image href="${MEDIA}tex-${k}.webp" width="${s}" height="${s}" preserveAspectRatio="none"/></pattern>`}return d}
+const TEXD={field:100,road:50,river:50,lake:50,garden:20,hedge:25,hub:25,wall:25,mon:50,'town-basilica':50,town:50,roof:25};   // every repeat divides the 100-unit tile, so textures run on across tile edges
+function texDefs(){let d='';for(const k in TEXD){if(PIMG['tex-'+k]!==1)continue;const s=TEXD[k];for(let r=0;r<4;r++)d+=`<pattern id="tx-${k}-${r}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"${r?` patternTransform="rotate(${-90*r} 50 50)"`:''}><image href="${MEDIA}tex-${k}.webp" width="${s}" height="${s}" preserveAspectRatio="none"/></pattern>`}return d}   // one pattern per tile turn: the texture is turned back so it never flips direction at a tile edge
 function texApply(){TEXSET={};let any=false;
   if(PAINT_ON)for(const k in TEXD)if(PIMG['tex-'+k]===1){TEXSET[k]=1;any=true}
   let el=document.getElementById('txdefs');if(!el){el=document.createElement('div');el.id='txdefs';el.setAttribute('aria-hidden','true');el.style.cssText='position:absolute;width:0;height:0;overflow:hidden';document.body.insertBefore(el,document.body.firstChild)}
@@ -4507,7 +4738,7 @@ const MODEL_FILES=["piece-champ-lite.glb", "piece-champ.glb", "piece-champ.webp"
 // The camp-* portraits are the computer rivals' faces (turn line). Everything else in media/ and models/ (Story map nodes, panels,
 // bubbles, pieces) loads in small idle batches after the first screen, and the music tracks are fetched one by one later, so Story
 // mode, the result card and the Music picker open without a wait. Data saver on = no music warm-up.
-const RIVAL_PIC=['hob','ferro','mabry','dulcie','wren','corvin','isolde','quill','ostrand','baron'];
+const RIVAL_PIC=['hob','ferro','mabry','dulcie','wren','corvin','isolde','quill','ostrand','baron','garnet'];
 function rivalPic(p){if(!p||p.human)return '';if(UI.coach&&typeof STORY!=='undefined')return STORY.rival.img;const nm=String(p.nm||'').toLowerCase(),hit=RIVAL_PIC.find(k=>nm.includes(k));return MEDIA+'camp-'+(hit||RIVAL_PIC[(p.i-1+RIVAL_PIC.length)%RIVAL_PIC.length])+'.webp'}
 (function(){const o=say;say=function(t,tn,rc){o.apply(this,arguments);try{const p=G&&G.cur&&!G.over?P(G.cur.p):null,u=PAINT_ON&&rivalPic(p),b=document.querySelector('#status .tn');if(u&&b){const i=document.createElement('img');i.className='tpic';i.alt='';i.src=u;b.insertBefore(i,b.firstChild)}}catch(e){}}})();
 function assetsWarm(){const L=MEDIA_FILES.filter(f=>/\.webp$/.test(f)).map(f=>MEDIA+f).concat((typeof MODEL_FILES!=='undefined'?MODEL_FILES:[]).filter(f=>/\.webp$/.test(f)).map(f=>'models/'+f));

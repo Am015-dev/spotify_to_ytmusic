@@ -57,7 +57,7 @@
       "id": "c2", "act": 1, "title": "Stones in the Net",
       "boss": false,
       "intro": [
-        { "who": "brack", "text": "Two jobs this time. The Commander picks first, then each diver in turn." },
+        { "who": "brack", "text": "Two jobs this time. The Captain picks first, then each diver in turn." },
         { "who": "nerea", "text": "Pick the job your hand can win. Big cards win tricks; Lanterns beat every colour." },
         { "who": "brack", "text": "Find where those stones came from." }
       ],
@@ -84,8 +84,8 @@
       "boss": false,
       "intro": [
         { "who": "brack", "text": "The base is ours now. Check all five chambers before we move in." },
-        { "who": "sumi", "text": "More jobs means more talking. Show one card with your ping: your highest, lowest or only one." },
-        { "who": "sumi", "text": "A good ping tells the team what you can win. Try one!" }
+        { "who": "sumi", "text": "More jobs means more talking. Show one card with your signal: your highest, lowest or only one." },
+        { "who": "sumi", "text": "A good signal tells the team what you can win. Try one!" }
       ],
       "outro": [
         { "who": "sumi", "text": "See? One card shown and everyone knew where to play." },
@@ -100,7 +100,7 @@
       "hints": true,
       "stars": [
         { "text": "Complete dive 5", "test": { "k": "won" } },
-        { "text": "Use your ping at least once", "test": { "k": "pings", "op": ">=", "v": 1 } },
+        { "text": "Use your signal at least once", "test": { "k": "pings", "op": ">=", "v": 1 } },
         { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
       ],
       "easier": { "aiLevel": "easy", "twist": null, "setup": { "mates": "hard" }, "maxStars": 2, "text": "Your teammates play their very best and the coach stays on." },
@@ -112,7 +112,7 @@
       "intro": [
         { "who": "brack", "text": "The stones lead to an old wreck, and a grey current wraps around it." },
         { "who": "undertow", "text": "Show me your cards, little lamps. I will blur every mark you make." },
-        { "who": "nerea", "text": "Murky water: your ping shows the card but not whether it's high, low or only. Think it through." }
+        { "who": "nerea", "text": "Murky water: your signal shows the card but not whether it's high, low or only. Think it through." }
       ],
       "outro": [
         { "who": "bram", "text": "Through the current and into the hold. There's a tablet in here, snapped in half." },
@@ -144,7 +144,7 @@
       "boss": false,
       "intro": [
         { "who": "brack", "text": "The tablet is carved in signs nobody knows. One diver should study it alone." },
-        { "who": "nerea", "text": "Commander's call: the Commander takes every job, or hands them all to one willing diver." },
+        { "who": "nerea", "text": "Captain's call: the Captain takes every job, or hands them all to one willing diver." },
         { "who": "brack", "text": "A gentle start. Choose well and the rest follows." }
       ],
       "outro": [
@@ -170,7 +170,7 @@
       "boss": false,
       "intro": [
         { "who": "sumi", "text": "The base radio answered the tablet's pattern. Something down there is listening." },
-        { "who": "brack", "text": "Deep narcosis today: a few shared ping tokens in the middle. Anyone may grab one between tricks." },
+        { "who": "brack", "text": "Deep narcosis today: a few shared signal tokens in the middle. Anyone may grab one between tricks." },
         { "who": "bram", "text": "So don't waste them. One good signal beats three nervous ones." }
       ],
       "outro": [
@@ -182,7 +182,7 @@
         "aiLevel": "normal", "aiStyle": "narcosis" },
       "setup": { "mode": "local", "kind": "log", "mission": 11, "np": 4, "mates": "normal", "timer": false },
       "twist": null,
-      "goal": { "type": "mission", "value": 11, "text": "Complete dive 11, Whispers, with the shared ping tokens." },
+      "goal": { "type": "mission", "value": 11, "text": "Complete dive 11, Whispers, with the shared signal tokens." },
       "hints": false,
       "stars": [
         { "text": "Complete dive 11", "test": { "k": "won" } },
@@ -217,7 +217,7 @@
       "stars": [
         { "text": "Complete dive 20 without the flare", "test": { "k": "won" } },
         { "text": "Complete it within 4 attempts", "test": { "k": "attempts", "op": "<=", "v": 4 } },
-        { "text": "Use your ping at least once", "test": { "k": "pings", "op": ">=", "v": 1 } }
+        { "text": "Use your signal at least once", "test": { "k": "pings", "op": ">=", "v": 1 } }
       ],
       "easier": { "aiLevel": "easy", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "The flare is allowed again and your strongest teammates dive with you, three of you." },
       "unlock": [
