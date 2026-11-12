@@ -44,6 +44,7 @@ const TUT_ACT=['F','TL'];
 const tutStaged=()=>!!(TUT.on&&!TUT.free&&G&&G.tut&&G.round<=(TUT.drill?3:2));
 const tutScripted=()=>!!(TUT.on&&!TUT.free&&G&&G.tut);
 function tutAllow(ds){if(!tutStaged()||!TUT.coach)return true;const s=ship('s1');if(!s)return true;
+  if(ds.bfm!=null&&NCH.q.some(x=>LORE.coach[x].act)){coachHide();return false}   // a line that explains this tap is still waiting: show it first
   if(ds.bfm!=null){if(drillEdge()){if(+ds.bfm===drillOffIx()){TUT.edgeSeen=true;TUT.did.edge=1;coachSay('edgeno');BF.key='';setTimeout(render,0)}return false}return +ds.bfm===dialIx(s,tutMove())}
   if(ds.bfa!=null)return ds.bfa===tutAct();
   return true}
