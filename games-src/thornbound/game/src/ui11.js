@@ -142,3 +142,10 @@ setInterval(hlpUnblock,60);
 try{new MutationObserver(()=>{if(document.querySelector('.gxh-bub.on'))hlpUnblock()}).observe(document.body,{childList:true,attributes:true,attributeFilter:['class','style'],subtree:false})}catch(e){}
 // the Goal card closes without a re-render: look again for a first-time bubble a moment later
 setInterval(()=>{if(G&&UI.started&&!G.over)try{hlpAfter()}catch(e){}},300);
+// a repaint after the bubble was placed (a card lifts, a region starts to glow) can put a glowing target under it: place it again once the screen has settled
+(function(){const o=renderAll;const AV='.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot';
+  const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}};
+  const check=()=>{try{const b=document.querySelector('.gxh-bub.on');if(!b)return;const r=b.getBoundingClientRect();
+    for(const e of document.querySelectorAll(AV)){if(e.closest('[data-help]')||e.closest('[hidden]'))continue;const q=e.getBoundingClientRect();if(!q.width||!q.height)continue;const c=core(q);
+      if(r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t){GXH.relayout();return}}}catch(e){}};
+  renderAll=function(){const x=o.apply(this,arguments);if(typeof GXH!=='undefined'&&document.querySelector('.gxh-bub.on')){requestAnimationFrame(check);setTimeout(check,260)}return x}})();

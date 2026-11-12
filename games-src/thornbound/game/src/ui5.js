@@ -11,6 +11,11 @@ function renderAll(){if(!G||!UI.started)return;
 function setHB(){}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
+// a button redrawn between finger-down and finger-up (a rival's step repaints the tray): the browser drops that click, so play it on the new button once
+document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('#act [data-a],#main [data-a],#ppop [data-a]');UI._pd=t?{t,a:t.dataset.a,k:t.dataset.k||'',v:t.dataset.aut||t.dataset.v||'',x:e.clientX,y:e.clientY}:null},true);
+document.addEventListener('pointerup',e=>{const p=UI._pd;UI._pd=null;if(!p||p.t.isConnected||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
+  const n=document.elementFromPoint(e.clientX,e.clientY),t=n&&n.closest&&n.closest('#act [data-a],#main [data-a],#ppop [data-a]');
+  if(!t||t.dataset.a!==p.a||(t.dataset.k||'')!==p.k||(t.dataset.aut||t.dataset.v||'')!==p.v||t.disabled)return;t.click();UI._ncT=Date.now()+350},true);
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-a]');
   // an open detail sheet closes on any tap outside it (that tap does nothing else)

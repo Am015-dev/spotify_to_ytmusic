@@ -187,7 +187,7 @@ function hideTip(){const t=$('#tip');if(t&&!t.hidden){t.hidden=true;t.innerHTML=
       d.drag=true;UI.dragging=true;UI.hand=d.id;const g=document.createElement('div');g.className='dragc';const w=cssPx('--cw',50)*1.2;g.innerHTML=cardEl(d.id,w).outerHTML;document.body.appendChild(g);d.g=g;d.b.classList.add('lifted');UI.dragging=false;renderMain();renderSpots();UI.dragging=true}
     if(d.g){d.g.style.transform='translate('+(e.clientX-30)+'px,'+(e.clientY-70)+'px)';const t=dropAt(e.clientX,e.clientY);document.body.classList.toggle('over-t',!!t)}
     e.preventDefault()},true);
-  const fin=(e,ok)=>{if(!d)return;clearTimeout(d.lp);const x=d;d=null;if(!x.drag)return;UI.dragging=false;document.body.classList.remove('over-t');if(x.g)x.g.remove();x.b.classList.remove('lifted');UI._ncT=Date.now()+70;
+  const fin=(e,ok)=>{if(!d)return;clearTimeout(d.lp);const x=d;d=null;if(!x.drag){if(ok&&!x.b.isConnected&&G&&UI.started&&!UI.pop&&!UI.card&&Math.hypot(e.clientX-x.x,e.clientY-x.y)<12&&document.querySelector('#handw .hc[data-id="'+x.id+'"]')){UI._ncT=Date.now()+350;handTap(x.id)}return}UI.dragging=false;document.body.classList.remove('over-t');if(x.g)x.g.remove();x.b.classList.remove('lifted');UI._ncT=Date.now()+70;
     if(ok){const t=dropAt(e.clientX,e.clientY);const c=t&&cardMoves(x.id).find(m=>m.type===t.type&&(t.type==='spot'||m.r===t.r));if(c){commitCard(x.id,c);return}}
     renderAll()};
   document.addEventListener('pointerup',e=>fin(e,true),true);document.addEventListener('pointercancel',e=>fin(e,false),true)})();
