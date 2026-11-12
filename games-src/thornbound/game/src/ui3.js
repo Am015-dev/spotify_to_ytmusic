@@ -54,6 +54,7 @@ function renderRoad(){}
 // ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
+  if(!A&&mv&&mv.length){try{const m=suggest(s);const mm=m&&mv.find(x=>x.k===m.k);if(mm)A={m:mm,why:genericWhy(s,mm)}}catch(e){}}   // never a decision without a suggestion
   UI._adv=A;UI._rec=A?A.m:null;UI._recWhy=A?A.why:'';return UI._rec}
 // suggestions are on in the guided game and in rounds 1-2; later only on request (the "Suggest a move" button)
 function hintsAuto(){return isGuided()||UI.guide!=='off'&&G.round<=2}

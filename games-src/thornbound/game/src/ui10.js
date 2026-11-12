@@ -202,7 +202,10 @@ function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
 // planFor(M,rm): where the move rm is made on the board: {from,to} points (from = the card to pick up first), fromR/toR rects, key. Used by the ghost finger and by the lightbulb.
 function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
-  let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);if(!e)return null;let r=e.getBoundingClientRect();
+    const hid=()=>{if(!r.width)return false;if(r.bottom>innerHeight-2||r.top<0)return true;const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !(t&&(t===e||e.contains(t)||t.closest('#finger,.tapring,.fly')))};
+    if(hid()){try{e.scrollIntoView({block:'center',inline:'nearest'})}catch(x){}r=e.getBoundingClientRect()}   // a suggested button scrolled out of the dock is brought into view first
+    return r};const K=rm.k;
   const T=r=>{toR=r;return ctr(r)},F=r=>{fromR=r;return ctr(r)};
   try{
     if(UI.pop){if(UI.pop==='confirm')to=T(el('#ppop [data-a=mv]'));else return null}
@@ -213,7 +216,7 @@ function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
     case 'bidRes':{to=T(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
     case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=T(regionRect(nx));break}
     case 'menu':{if(rm.a==='supp'&&rm.p)to=T(regionRect(rm.p.r));else if(UI.sheetOpen)to=T(el('#main [data-k="'+K+'"]'));else to=T(el('#act [data-k="'+K+'"]')||(rm.t==='act'&&rm.a!=='supp'?el('#act [data-a=powers]'):el('#act .btn.pri')));break}
-    default:{to=T(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
+    default:{{const b=el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]');const w=b&&b.height>90?(el('#act [data-k="'+K+'"] .ot')||el('#main [data-k="'+K+'"] .ot')):null;to=T(w||b)}break}   // a big option button: point at its words, not at a picture inside it
   }}catch(e){return null}
   return to?{from,to,fromR,toR,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
 function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey())||(typeof tutOn==='function'&&tutOn()))return null;return planFor(M,rm)}

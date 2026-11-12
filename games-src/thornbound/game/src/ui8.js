@@ -86,9 +86,12 @@ function advise(s,mv){if(!G||!G.q||!mv||!mv.length)return null;const q=G.q,k=q.k
   if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?adviseDay(s,mv):adviseMenu(s,mv,ph)}
   if(k==='occupier'){const ids=mv.filter(m=>m.id!=null).map(m=>m.id);if(!ids.length)return null;const sc=id=>{const i=cinfo(id);return i.strength*10+i.votes+i.lore};const w=ids.slice().sort((a,b)=>sc(a)-sc(b))[0];const m=mv.find(x=>x.id===w);
     return {m,why:cinfo(w).name+' ('+cinfo(w).strength+') is your weakest card. A card under a Kingdom Card cannot fight. (A stronger one would make the Kingdom Card harder to steal.)'}}
-  if(k==='slot'||k==='order'||k==='applause'||k==='discardDown'||k==='discardPick')return null;
   if(k==='clashOrder')return adviseOrder(s,mv);
-  const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return why?{m,why}:null}
+  const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return {m,why:why||genericWhy(s,m)}}
+// every decision gets a suggestion (owner, Nov 2026): when no specific reason applies, a plain one
+function genericWhy(s,m){const k=G.q.kind;if(m.t==='seldone'||m.t==='done')return 'Nothing here helps you more than keeping what you have.';if(m.skip)return 'Keep what you have: this bonus is worth less.';
+  if(k==='discardDown'||k==='discardPick')return 'Let go of the card you need least.';if(k==='steal'||m.t==='steal')return 'Take it: you gain its power and they lose it.';if(m.t==='return')return 'Keep your card: nothing on offer is worth it.';
+  return 'A safe choice for this moment.'}
 function reasonFor(s,m){const q=G.q,k=q.kind;
   if(['bid','herald','place','tie','bidRes','location'].includes(k))return whyFor(s,m);
   if(k==='siteBuy'){if(m.t==='seldone')return 'Keep your Lore: '+(q.chosen&&q.chosen.length?'you have bought enough for now.':'nothing here is worth it yet.');const i=cinfo(m.v);return i.kind==='hq'?i.name+' is an HQ. It is a permanent power in front of you. It never goes to your hand. '+lcFirst(i.text)+'.':i.name+' goes to your hand: Strength '+i.strength+(i.text?', and '+lcFirst(i.text):'')+'.'}
@@ -108,7 +111,7 @@ function tacUses(seat,id){const i=DD.TACTICS[G.pl[seat].fac].findIndex(t=>t.id==
 // one short line per Council for the Govern rows (<= 8 words)
 const CSHORT={relics:'Its votes become Influence at a Herald Reward.',secrets:'Its votes place markers that claim location bonuses.',oaths:'Its votes bring Supporters home in Autumn.'};
 const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get Influence equal to their votes.',secrets:'in Autumn you place markers on locations. Four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote. Get one more for the most votes there.'};
-function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a)))return null;const a=m.a||'';
+function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a))){const mm=mv.find(x=>x.k===m.k);return mm?{m:mm,why:(typeof actWhy==='function'?actWhy(s,mm):'')||genericWhy(s,mm)}:null}const a=m.a||'';
   // the last Autumn: only Influence still counts
   if(ph==='Autumn'&&G.round>=G.rounds&&m.t==='act'&&!/Influence/.test(m.label||'')&&!(a==='journey'&&!G.pl[s].site.length)){const d=mv.find(x=>x.t==='done');const inf=mv.find(x=>x.t==='act'&&/Influence/.test(x.label||'')&&taught(actKind(x.a)));
     if(inf)return {m:inf,why:'This is the last round: only Influence counts now. '+actWhy(s,inf)};return d?{m:d,why:'This is the last round. Only Influence counts now, and nothing here gives Influence.'}:null}
