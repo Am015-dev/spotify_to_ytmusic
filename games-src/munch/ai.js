@@ -130,8 +130,16 @@ function aiAnswer(p,vm){const q=G.q;const yes={act:'opt',opt:'yes'},no={act:'opt
   return vm[0]}
 // ---- the scheduler: the computer acts one step at a time so humans can follow ----
 let aiTimer=null;
-function schedule(){if(aiTimer||!G||G.winner||UI.pause)return;if(G.mode==='net'&&(G.nw||typeof isHost!=='function'||!isHost()))return;const s=sideToAct();if(s<0)return;if(P(s).human)return;if(UI.busy)return;
-  const base=ANIM?AIDELAY/(UI.speed||1):0;const hold=ANIM&&UI.hold?UI.hold-Date.now():0;aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold))}
+// rival-turn cap: after RIVAL_CAP ms of one rival turn the rest runs instantly (reveals and clips closed); any tap during a rival turn does it at once
+const RIVAL_CAP=2200;let rivalT0=0,rivalTimer=null;
+function rivalRush(){if(!rivalT0||!G||G.winner)return;UI.rush=true;UI.hold=0;try{if(BF.revClose)BF.revClose()}catch(e){}try{if(document.getElementById('bfclip'))document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))}catch(e){}
+  if(aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}
+function rivalEnd(){rivalT0=0;UI.rush=false;if(rivalTimer){clearTimeout(rivalTimer);rivalTimer=null}}
+try{document.addEventListener('pointerdown',()=>{if(rivalT0&&!UI.rush)rivalRush()},true)}catch(e){}
+function schedule(){if(aiTimer||!G||G.winner||UI.pause)return;if(G.mode==='net'&&(G.nw||typeof isHost!=='function'||!isHost()))return;const s=sideToAct();if(s<0||P(s).human){rivalEnd();return}if(UI.busy)return;
+  if(ANIM&&!rivalT0){rivalT0=Date.now();rivalTimer=setTimeout(()=>{rivalTimer=null;rivalRush()},RIVAL_CAP)}
+  if(UI.rush){UI.hold=0;try{if(BF.revClose)BF.revClose()}catch(e){}}
+  const base=ANIM&&!UI.rush?AIDELAY/(UI.speed||1):0;const hold=ANIM&&UI.hold&&!UI.rush?UI.hold-Date.now():0;aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold,UI.rush?20:0))}
 function aiStep(){if(!G||G.winner)return;const s=sideToAct();if(s<0||P(s).human)return;const m=aiMove(s);if(!m){console.error('AI has no move in '+G.phase);return}
   const r=performMove(m,s);if(!r.success){console.error('AI move rejected: '+r.error+' '+mvKey(m));const vm=validMoves(s).filter(x=>x.act!=='sell');if(vm.length)performMove(vm[vm.length-1],s)}
   refresh()}

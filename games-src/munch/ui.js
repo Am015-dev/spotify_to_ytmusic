@@ -44,7 +44,7 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
 // ---- panels ----
 // key art behind the title and end screens (CSS reads the class; media/ files are deployed beside the page)
 function modalArt(k){const m=$('#modal');if(!m)return;['title','win','lose'].forEach(n=>m.classList.toggle('art-'+n,k===n))}
-function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netRender==='function')netRender();
+function render(){const root=$('#app');if(!root)return;if(!G&&typeof dkGoalClose==='function')dkGoalClose();syncMenu();if(typeof netRender==='function')netRender();
   document.documentElement.classList.toggle('dk-title',!G);
   if(!G){if(typeof musicSync==='function')musicSync();setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;modalArt('title');if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
   scanLog();if(typeof musicSync==='function')musicSync();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
