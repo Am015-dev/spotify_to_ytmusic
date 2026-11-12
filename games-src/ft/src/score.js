@@ -94,3 +94,22 @@ function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;cons
   let best=null;for(const x of good)if(x.o.path[n]===ms[0].tile&&(!best||x.total>best.total))best=x;if(!best)return -1;const c=best.o.c;
   const left=hand.length;if(left===1)return ms.findIndex(m=>m.c===c);
   const nc=hand.filter(h=>h===c).length;let j=ms.findIndex(m=>m.c!==c);if(j<0||(nc<1))j=ms.findIndex(m=>m.c===c&&nc>1);return j}
+// R38 row 6: the glow IS the hint. A newcomer who taps only what glows should win about half of the games on defaults.
+// Bid: only the suggested spot glows (the others stay tappable). Start: the suggested start plus the 2 best other starts glow.
+// Walk: on the suggested start the glow follows the suggested route (the planner's, not the points-now greedy one).
+function scGlowHint(){if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
+  if(G.phase==='bid'){if(!UI.pickSpot.length)return;const m=hlpAdvice();if(m&&m.act==='bid'&&UI.pickSpot.includes(m.spot))UI.pickSpot=[m.spot];return}
+  if(G.phase!=='turn'||G.step!=='move'||G.cur!==hp.i)return;
+  if(!G.move){const m=hlpAdvice();scCompute();const rk=Object.keys(SC.starts).map(Number).filter(s=>UI.pick.includes(s)&&SC.starts[s].best).sort((a,b)=>SC.starts[b].best.total-SC.starts[a].best.total);
+    const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=3)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
+  const pl=typeof HPL!=='undefined'?HPL.plan:null;if(!pl||pl.seed!==G.seed||pl.turn!==G.turn)return;const path=G.move.path,q=pl.o.path;if(q.length<=path.length||!path.every((x,i)=>x===q[i]))return;
+  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.pick=[nx]}
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{scGlowHint()}catch(e){}}})();
+// on a step with several colours the chooser lists the planned colour first, so the first glowing chip is the planned one
+// R38 row 5: on the steps where the market cannot be touched (Earn, Shadows, selling) a phone hides it, so the tiles keep >= 44 px
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),a=G&&G.act;
+  const off=!!(G&&!G.over&&hp&&G.phase==='turn'&&G.cur===hp.i&&!G.q&&(G.step==='sell'||(G.step==='tribe'&&a&&(a.color==='builder'||a.color==='assassin'))));
+  document.documentElement.classList.toggle('mk-off',off)}catch(e){}}})();
+// R38 row 5: after the move the djinn row stays only while a djinn can be taken, and the market only while goods can be taken (or are being collected)
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;const after=!!(G&&!G.over&&hp&&G.phase==='turn'&&G.cur===hp.i&&!G.q&&G.step!=='move');
+  R.classList.toggle('dj-off',after&&!UI.pickDj.length);R.classList.toggle('mr-off',after&&!UI.pickMk.length&&!(G.step==='tribe'&&G.act&&G.act.color==='merchant'))}catch(e){}}})();

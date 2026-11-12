@@ -14,8 +14,11 @@ function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementByI
   const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
   e.innerHTML=why?'<span>'+esc(why)+'</span>':'<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>';document.body.appendChild(e);PLQB=true;
-  const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;const land=document.documentElement.classList.contains('land');e.style.left=(land?Math.max(6,Math.min(innerWidth-w-6,r.left)):Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)))+'px';e.style.top=(land?Math.round(innerHeight*.58):tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;// R27: the layout shifts while a pop is up (coach card, fit); keep it under the step tabs the whole time
-  const keep=setInterval(()=>{if(!e.isConnected||land)return;const t2=document.getElementById('trk'),r2=t2&&!t2.hidden?t2.getBoundingClientRect():null,s2=seatEl(i),b2=r2?r2.bottom:s2?s2.getBoundingClientRect().bottom:0;if(b2)e.style.top=Math.round(b2+4)+'px'},120);
+  // R38 row 4: the pop lives IN the score bar (it covers the step tracker, or the scorer's seat chip), never on the tile grid
+  const bar=()=>{const t2=document.getElementById('trk');if(t2&&!t2.hidden){const q=t2.getBoundingClientRect();if(q.width>40&&q.height>8)return q}const s2=seatEl(i);return s2?s2.getBoundingClientRect():r};
+  const place=()=>{const q=bar();e.style.left=Math.round(q.left)+'px';e.style.top=Math.round(q.top)+'px';e.style.width=Math.round(q.width)+'px';e.style.height=Math.max(22,Math.round(q.height))+'px'};
+  e.classList.add('inbar');place();const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;
+  const keep=setInterval(()=>{if(e.isConnected)place()},120);
   setTimeout(()=>{clearInterval(keep);e.remove();PLQB=false;plPopNext()},ms)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
 // R25: every score pop's number is the sum of the reasons it names. One part changed: "You lose 3 pts: spent 3 coins" /
