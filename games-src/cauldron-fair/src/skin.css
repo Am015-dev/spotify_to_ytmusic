@@ -259,3 +259,16 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
 html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}
 /* R22 gate: the painted plate must not change the Stop box (GXSK.audit): keep its unskinned padding */
 html.sk #acts .btn.stopb{padding:4px 12px 4px 38px}
+
+/* R28: when the stalls do not fit in two columns, they use three, then tighter rows, so none hides behind the "more stalls" pill */
+html.ph .stalls.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stalls.c3 .tok{min-width:0;padding:1px 0}.stalls.c3 .toks{gap:0}.stalls.c3 .tok svg.chip{width:32px;height:32px}
+.stalls.c3 .sth b{font-size:12px}.stalls.c3 .stall .sdo{font-size:11px}
+html.sk-stall .stalls.c3 .stall{border-width:26px 7px 8px;border-image-width:26px 7px 8px}
+.stalls.tight .tok{min-height:44px}.stalls.tight .tok svg.chip{width:30px;height:30px}.stalls.tight .tok .pc{margin-top:-8px}
+html.sk-stall .stalls.tight .stall{border-width:22px 7px 6px;border-image-width:22px 7px 6px}
+.stalls.tight .stall .sdo{min-height:13px}
+/* R28: the line under the stalls shows the whole text of a chip (never cut mid-sentence); the stalls give way and refit */
+@media (orientation:portrait){.mkt .sinfo{max-height:none!important;overflow:visible!important;flex:0 0 auto}}
+@media (max-height:640px){html.sk-awn .awn{height:40px}}
+.stall .sdo .ss{display:none}.stalls.c3 .sdo .sl{display:none}.stalls.c3 .sdo .ss{display:inline}.stalls.tight .stall .sdo{display:none}

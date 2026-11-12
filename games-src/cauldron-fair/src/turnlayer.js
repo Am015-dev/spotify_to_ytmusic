@@ -39,7 +39,11 @@ function instrInfo() {
     const ws = CF.whiteSum(me), lim = CF.limitOf(G, me), safe = lim - ws;
     return { who: 'YOUR TURN', text: safe <= 0 ? 'Whites ' + ws + '/' + lim + ': one more white explodes. Draw or Stop?' : 'Whites ' + ws + '/' + lim + '. Draw, or Stop to keep this space.' };
   }
-  if (me.q && !EVAL_Q[me.q.h]) { const t = promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' }; }
+  if (G.phase === 'brew' && me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 };   // R28: once decided it is never "YOUR TURN" (day 9)
+  if (me.q && !EVAL_Q[me.q.h]) {
+    const FQ = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, restart: 1 };   // fortune choices: the card name is already on the NOW chip and the sheet title, so the bar says only what to do
+    const t = FQ[me.q.h] && QINFO[me.q.h] ? QINFO[me.q.h][1](me, me.q.d) : promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' };
+  }
   if (G.phase === 'brew') { if (me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 }; return { who: wait.length ? wait[0].toUpperCase() + '\'S TURN' : 'DAY ENDS', text: (me.boom ? 'Your pot exploded. ' : 'You stopped. ') + (wait.length ? 'Watch ' + wait.join(' and ') + ' draw, one chip at a time.' : 'Counting the day.'), rival: 1 }; }
   return null;
 }

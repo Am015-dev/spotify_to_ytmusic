@@ -33,7 +33,7 @@ const STORY = {
     refill: ['Refill the flask', 'Two more rubies refill your used flask: tap it.'],
     confirm: ['Next day', 'Chips join your bag (day 6 adds a white); start day 2.'],
     day2: ['Blue fortune', 'Blue cards last all day, so today the limit is 9.'],
-    rats: ['Rat tails', () => { const p = tp(), o = G.players.reduce((m, x) => Math.max(m, x.vp), 0); return 'You ' + p.vp + ', leader ' + o + ': ' + tn(p.ratTails, 'rat tail') + ' between, one every second space.'; }],
+    rats: ['Rat tails', () => { const p = tp(), o = G.players.reduce((m, x) => Math.max(m, x.vp), 0); return 'Tap the rat: you ' + p.vp + ', leader ' + o + ', so ' + tn(p.ratTails, 'rat tail') + ' between.'; }],
     d2draw: ['Last day', () => 'So your rat starts you ' + tn(tp().ratTails, 'space') + ' ahead; draw in secret.'],
     red: ['Red chip', 'New chips in your bag: red moves 1 extra after an orange.'],
     redsaw: ['It jumped', 'Red jumped one extra space, so draw again.'],

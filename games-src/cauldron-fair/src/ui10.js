@@ -63,7 +63,7 @@ function hlpPhase() {
     if (!G || !UI.started || G.phase === 'over' || tutOn()) return null;
     const v = viewSeat(); if (v < 0 || (hotSeat() && UI.holder < 0)) return null;
     const p = G.players[v];
-    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? 'shop' : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
+    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? (innerHeight < 700 && innerWidth < 600 ? null : 'shop') : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
     if (p.q) return HP_CARDQ[p.q.h] ? 'card' : HP_CHIPQ[p.q.h] ? 'chip' : null;
     if (G.phase !== 'brew' || p.st !== 'draw' || p.lock || BF.pulling || focusSeat() !== v) return null;
     if (G.round === LASTD()) return 'last';

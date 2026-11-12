@@ -114,7 +114,7 @@ function tutSteps() {
     { id: 'confirm', target: tq('#rs [data-a=shopbuy]'),
       wait: { type: 'tap', match: a => a.what === 'shopbuy' }, ready: () => shop('#rs [data-a=shopbuy]')() && !!(UI.rubySel && UI.rubySel.flask) },
     { id: 'day2', target: tfirst('#fortchip', '#fort'), wait: null, ready: () => d2() && tp().pot.length === 0 && !!document.querySelector('#ratchip') },
-    { id: 'rats', target: tq('#ratchip'), also: tfirst('#others .th', '#others'), wait: null, ready: () => d2() && tp().pot.length === 0 && tp().ratTails > 0 && !!document.querySelector('#ratchip') },
+    { id: 'rats', target: tq('#ratchip .ratb'), also: tfirst('#others .th', '#others'), wait: { type: 'tap', match: a => a.what === 'ratopen' }, wrong: 'Tap the rat.', ready: () => d2() && tp().pot.length === 0 && tp().ratTails > 0 && !!document.querySelector('#ratchip') },
     { id: 'd2draw', target: tbag, also: tq('#ratchip'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 0 },
     { id: 'red', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 1 && lastC() === 'O' },
     { id: 'redsaw', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 2 && lastC() === 'R' },

@@ -192,6 +192,7 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
 const STALL_DO = { none: 'No power, cheapest', black: 'Most moths: droplet', g1: 'In last 2: a ruby', g2: 'In last 2: free chip', g3: 'Whites at 7: slide on', g4: 'In last 2: buy droplet',
   b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: '+1 after an orange', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
   y1: 'After a white: undo it', y2: 'Next chip moves ×2', y3: 'Raises your limit', y4: 'Moves extra spaces', p1: 'Points at the count', p2: 'Trade in for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };
+const STALL_DO3 = { none: 'Cheapest', black: 'Moth: droplet', g1: 'Last 2: ruby', g2: 'Last 2: chip', g3: 'Slide on at 7', g4: 'Last 2: droplet', b1: 'Peek, then pick', b2: 'Shields chips', b3: 'On ruby: +1', b4: 'On ruby: points', r1: '+1 after orange', r2: 'Set aside', r3: 'Jumps after white', r4: 'White 1s go 2', y1: 'Undo a white', y2: 'Next chip x2', y3: 'Raises limit', y4: 'Moves extra', p1: 'Points at count', p2: 'Trade for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };   // R28: the 3-column stalls say it in fewer words, never cut by an ellipsis
 function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
@@ -201,7 +202,7 @@ function marketEl(p, q) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
-    st.appendChild(h('div.sdo', bk ? (STALL_DO[bk.eff] || bk.title) : ''));   // what the chip does, in a few words (long-press or tap it for the full text)
+    st.appendChild(h('div.sdo', h('span.sl', bk ? (STALL_DO[bk.eff] || bk.title) : ''), h('span.ss', bk ? (STALL_DO3[bk.eff] || STALL_DO[bk.eff] || bk.title) : '')));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -231,8 +232,14 @@ function marketEl(p, q) {
 // R22: when the stalls do not all fit, show whole rows only (the box ends at the bottom of the last row that fits), so no stall
 // is half shown at first; the pill below says how many more there are
 function stFit(st) {
-  if (!st.isConnected) return; st.style.maxHeight = '';
-  if (st.scrollHeight <= st.clientHeight + 2) return;
+  if (!st.isConnected) return; st.style.maxHeight = ''; st.classList.remove('c3', 'tight');
+  const btn = st.parentElement && st.parentElement.querySelector('.smore'); if (btn) btn.hidden = true;   // the pill takes room: measure without it first
+  const fits = () => st.scrollHeight <= st.clientHeight + 2;
+  if (fits()) return;
+  // R28: use the empty floor before hiding anything: 3 columns, then tighter rows; the pill only shows if they still do not fit
+  const portrait = !matchMedia('(orientation:landscape)').matches;
+  if (portrait) { st.classList.add('c3'); if (fits()) return; st.classList.add('tight'); if (fits()) return; }
+  if (btn) btn.hidden = false;
   const top = st.getBoundingClientRect().top, H = st.clientHeight; let best = 0;
   [...st.children].forEach(c => { const b = c.getBoundingClientRect().bottom - top; if (b <= H + 1 && b > best) best = b; });
   if (best > 60) st.style.maxHeight = Math.ceil(best + 2) + 'px';
