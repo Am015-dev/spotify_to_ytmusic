@@ -112,3 +112,35 @@ function decide(K,seat,lv){const L0=AILV[lv]||AILV.normal,L=CAMP_PUSH&&seat===CA
   let bi=0;for(let i=1;i<mv.length;i++)if(sc[i]>sc[bi])bi=i;return mv[bi]}
 function aiMove(seat,lv){return decide(knowledge(seat),seat,lv||(G&&G.seats[seat]&&G.seats[seat].lv)||'normal')}
 function aiStep(force){if(!G||G.phase==='over')return null;const s=sideToAct();if(s<0)return null;if(G.seats[s].human&&!force)return null;const m=aiMove(s);return m?{seat:s,m}:null}
+// ---------- honest risk: the chance a leviathan sinks or blocks this junk before its next turn ----------
+// Plays the real leviathan rules forward N times with one fixed dice stream (so equal positions get equal numbers): every roll before my next
+// turn, my own roll included (16/36 wakes them), each leviathan in arrow order rolls one die (1-5 its arrow, 6 = a new one rises on a rolled
+// square), swims off the chart, crushes the tile it enters (and a junk on it) and any leviathan there; fewer than 3 = the next turn refills
+// instead of rolling. Sunk = a leviathan enters my tile, or one sits on my bow square after my own roll. Rival tiles moving my junk are not counted.
+function sinkRisk(B,seat,ev,N){const S=B.ships[seat];if(!S||!S.alive)return 1;if(S.x==null)return null;N=N||3000;
+  const front=[S.x,S.y],on=S.on,rng=mkRng(0x2f6b1d37),gates=B.gates||[];
+  if(ev==null){ev=B.ships.filter(s=>s.alive).length}
+  const M0=B.mons.filter(m=>m.k==='L').map(m=>({id:m.id,x:m.x,y:m.y,r:m.r})),D0=(B.mdeck||[]).filter(x=>x<10);let dead=0;
+  for(let n=0;n<N;n++){let mons=M0.map(m=>Object.assign({},m));const deck=D0.slice();let refill=!!B.refill,died=false;
+    const spawn=()=>{if(!deck.length)return;let x,y,k=0;do{x=Math.floor(rng()*6);y=Math.floor(rng()*6);k++}while(k<200&&(mons.some(o=>o.x===x&&o.y===y)||gates.some(g=>g.x===x&&g.y===y)));
+      const id=deck.splice(Math.floor(rng()*deck.length),1)[0];if(on&&x===on[0]&&y===on[1])died=true;mons.push({id,x,y,r:Math.floor(rng()*4)})};
+    for(let e=0;e<ev&&!died;e++){
+      if(refill){refill=false;while(mons.length<3&&deck.length&&!died)spawn();continue}
+      if(rng()>=16/36)continue;
+      const order=mons.slice().sort((a,b)=>LEV[a.id].order-LEV[b.id].order||LEV[b.id].gold-LEV[a.id].gold||a.id-b.id);
+      for(const m of order){if(died)break;if(!mons.includes(m))continue;const die=1+Math.floor(rng()*6);
+        if(die===6){spawn();continue}
+        const a=LEV[m.id].arr[die-1];if(a==='R'){m.r=(m.r+LEV[m.id].rd+4)%4;continue}
+        const dd=DIR[(DIRN[a]+m.r)%4];let tx=m.x+dd[0],ty=m.y+dd[1];
+        if(!inB(tx,ty)){mons=mons.filter(o=>o!==m);continue}
+        if(gates.some(g=>g.x===tx&&g.y===ty)){let k=0;do{tx=Math.floor(rng()*6);ty=Math.floor(rng()*6);k++}while(k<200&&mons.some(o=>o.x===tx&&o.y===ty))}
+        if(on&&tx===on[0]&&ty===on[1])died=true;
+        mons=mons.filter(o=>o===m||!(o.x===tx&&o.y===ty));m.x=tx;m.y=ty}
+      if(mons.length<3&&deck.length)refill=true}
+    if(!died&&mons.some(m=>m.x===front[0]&&m.y===front[1]))died=true;if(died)dead++}
+  return Math.max(dead/N,1e-4)}  // a rising leviathan can land anywhere: never exactly 0 while any can rise or move
+// rolls before a seat's first turn when it starts at a mark now: the players ahead of it in turn order, then its own roll
+function evFirst(K,seat){return ((seat-K.first+K.np)%K.np)+1}
+// the risk as words that never round a real chance down to "safe"
+function riskWord(p){if(p==null)return '';if(p<=0)return 'no leviathan can reach you before your next turn';const pc=Math.round(p*100);return (pc<1?'under 1%':pc+'%')+' chance a leviathan sinks or blocks you before your next turn'}
+function riskPct(p){if(p==null)return '';if(p<=0)return '0%';const pc=Math.round(p*100);return pc<1?'under 1%':pc+'%'}
