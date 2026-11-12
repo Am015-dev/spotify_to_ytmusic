@@ -81,7 +81,7 @@ Every numbered rule below has exactly one assertion in `logic-test.js` (same num
 59. A monster with 19 stars does not win.
 60. A monster that scores past 20 (e.g. 18 + a triple of 3s) wins.
 61. If every remaining monster is eliminated at the same moment, nobody wins.
-62. Reaching 20 stars wins the game immediately (the moment the stars are scored, mid-turn).
+62. Reaching 20 stars mid-turn does not end the game: you may still buy, and win when the turn ends.
 
 ## Buying power cards
 
@@ -178,3 +178,7 @@ Every numbered rule below has exactly one assertion in `logic-test.js` (same num
 144. Leech Tendrils (4): may buy Keep cards from other monsters, paying the owner the cost.
 145. The 66-card deck contains exactly 17 Discard cards (kiosk, train, tower, needle, surge, sirens x2, flame, refinery, patch, carpet, jetsq, militia, reactor, tanks, cyclone, rush, skydive).
 146. The 66-card deck contains Keep cards only of the printed list (no duplicate except Second Skull).
+
+## Winning at turn end
+
+147. A monster that reaches 20 stars but is knocked out in the same turn does not win (Jet Squadron at 4 hearts).
