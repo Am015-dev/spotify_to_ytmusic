@@ -18,7 +18,7 @@ var TUT_CH = [
   { pos: 0, gear: 1, eng: 6, hand: ['1', '3', '2', '4', '1', '2', '3'], kit: [3, ['2', '2']], juno: [2, ['2', '1']] },   /* you start last: adrenaline */
   { pos: 6, gear: 2, eng: 6, hand: ['1', '4', '2', '4', '1', '2', '3'], kit: [7, ['3', '2']], juno: [5, ['2', '1']] },   /* 4+4 = 8 in a limit-5 corner: burn 3 */
   { pos: 14, gear: 2, eng: 3, hand: ['1', '4', '2', '4', '2', '1', '3'], kit: [12, ['2', '2']], juno: [9, ['1', '1']] },   /* 4+4 into the limit-4 corner with 3 heat: spin out */
-  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', '3'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* one playable card in gear 2: stall */
+  { pos: 14, gear: 1, eng: 0, hand: ['H', 'H', 'H', 'H', 'H', 'H', 'X'], kit: [16, ['2', '3']], juno: [12, ['2', '1']] },   /* the spin's Stress card is the one playable card; gear 2 needs two: stall */
   { pos: 14, gear: 1, eng: 0, hand: ['H', 'X', 'H', 'H', 'H', 'H', '2'], top: ['2'], kit: [21, ['1', '1']], juno: [16, ['2', '1']] },   /* gear 1 + stress: cool down, adrenaline */
   { pos: 17, gear: 1, eng: 4, hand: ['2', '4', '1', '3', '1', '4', '3'], kit: [23, ['1', '1']], juno: [19, ['2', '1']] },   /* gear 1 -> 3 for 1 heat, beside Juno: slipstream, then discard */
   { pos: 24, gear: 3, eng: 3, hand: ['1', '4', '3', '1', '2', '3', '4'], top: ['3'], kit: [25, ['1', '1']], juno: [22, ['2', '1']] }   /* 4+2+1, boost after the reveal: finish */
@@ -77,16 +77,17 @@ function tutSteps() {
     info('space', 2, 'Two cars fit per space, so a full space stops you behind.', 'space'),
     info('corner', 2, 'The corner sign ahead is its speed limit: 5.', 'corner'),
     info('engine', 2, 'Your engine holds 6 heat, and speeding through corners burns it.', 'engine', eng),
+    info('bb', 2, 'Your deck also holds Brake (speed 0) and Burst (speed 5).', null),
     card('c24', 2, '4', 'Tap a 4.'),
     card('c24b', 2, '4', 'Tap the other 4 for speed 8, three over the limit.'),
     go('go2', 2, 'Tap Go: each point over the limit burns 1 heat.', 'burn'),
     card('c34', 3, '4', 'Tap a 4.'),
     card('c34b', 3, '4', 'Tap the other 4: speed 8 into a limit-4 corner.'),
     go('go3', 3, 'Tap Go: with too little heat to pay, you spin out.', 'spin'),
-    info('spun', 4, 'Spun out: stopped before the corner, gear 1, a stress card.', null),
-    { id: 'heatcard', rule: 'heatcards', say: 'Burned heat returns as dead cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
+    info('spun', 4, 'Spun out: stopped before the corner, gear 1, plus a Stress card.', null),
+    { id: 'heatcard', rule: 'heatcards', say: 'Spent heat comes back as dead Heat cards you cannot play.', target: function () { return tutCardV('H'); }, ready: tutPlan(4), wait: null, side: 'top' },
     gear('g42', 4, 2, 'Tap gear 2, though you hold just one playable card.', 'stall'),
-    card('c43', 4, '3', 'Tap the 3, your only card that is not heat.'),
+    card('c43', 4, 'X', 'Tap the Stress card, your only card that is not heat.'),
     go('go4', 4, 'Tap Go: too few cards means a stall, no move.'),
     gear('gear1', 5, 1, 'Stay in gear 1: it cools up to 3 heat cards.', 'cooldown'),
     card('c5x', 5, 'X', 'Tap the Stress card: it flips a random speed card.', 'stress'),
@@ -98,13 +99,13 @@ function tutSteps() {
     card('c61b', 6, '1', 'Tap the other 1: speed 4, plus 1 for adrenaline.'),
     go('go6', 6, 'Tap Go to pull up right beside Juno.'),
     { id: 'slip', rule: 'slip', say: 'Next to a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top' },
-    { id: 'disc', rule: 'discard', say: 'After moving you may discard: tap a 3 you do not want.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
-    { id: 'discgo', say: 'Tap Discard 1, then you draw back to 7.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
+    { id: 'disc', rule: 'discard', say: 'Discard any card but Heat or Stress after moving: tap a 3.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
+    { id: 'discgo', say: 'Tap Discard 1 to draw to 7; Keep all skips this step.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
     card('c74', 7, '4', 'Tap the 4.'),
     card('c72', 7, '2', 'Tap the 2.'),
     card('c71', 7, '1', 'Tap the 1 for speed 7.'),
     go('go7', 7, 'Tap Go: your cards show first, then you may boost.'),
-    { id: 'boost', rule: 'boost', say: 'Boost pays 1 heat to flip a card and add it.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
+    { id: 'boost', rule: 'boost', say: 'After the reveal, boost once: pay 1 heat, flip, add the card.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
     { id: 'finish', rule: 'finish', say: 'You won, and the others race on until all finish.', target: cv, ready: function () { return !!UI.tutOver; }, wait: null, side: 'bottom' }
   ];
 }
@@ -112,7 +113,7 @@ function tutStart(o) {
   closeModal(); UI.cmpDef = null; UI.tutOver = false; o = o || {};
   GXT.start({
     game: TUT_GAME, setup: function () { UI.mode = 'tutorial'; startGame({ track: 'practice', laps: 1, opp: 2, hum: 1, diff: 'easy', seed: 12, tut: true }); },
-    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against two rivals.',
+    steps: tutSteps(), story: true, endTitle: 'You know every rule', endText: 'Now a real race against four rivals. Tap Suggest any time you are unsure.',
     onDone: function (r) { tutLeave(false); if (r && r.choice === 'story' && typeof GXC !== 'undefined') GXC.open(); else if (o.then) o.then(); else startGame(); },
     onExit: function () { tutLeave(true); }
   });

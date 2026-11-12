@@ -142,6 +142,9 @@ function needPlans(G) { return G.cars.filter(function (c) { return c.human && !c
 function startResolve(G) {
   G.cars.forEach(function (c) { if (c.fin && c.plan) { c.hand = c.hand.concat(c.plan.cards); c.plan = null; } });   /* a finished car does not play */
   G.phase = 'resolve'; G.order = racing(G); G.ri = 0; G.adr = adrenalineFor(G);
+  /* simultaneous planning (rulebook steps 1-2): every computer car shifts and commits its cards face down now, from the same
+     start-of-round board the human saw, before any car moves or any card is revealed. Boost stays a react choice (afterReact). */
+  G.order.forEach(function (ci) { var c = G.cars[ci]; if (!c.human && !c.legend && !c.plan) c.plan = aiPlan(G, c); });
 }
 function curCar(G) { return G.phase === 'resolve' && G.ri < G.order.length ? G.cars[G.order[G.ri]] : null; }
 
@@ -152,7 +155,7 @@ function resolveNext(G) {
   if (G.ri >= G.order.length) { endRound(G, ev); return ev; }
   var c = G.cars[G.order[G.ri]];
   if (c.legend) return legendTurn(G, c);
-  if (!c.plan) c.plan = aiPlan(G, c);
+  if (!c.plan) c.plan = aiPlan(G, c);   /* safety net only: startResolve has already committed every computer plan */
   var pl = c.plan, from = c.pos, cost;
   if (pl.cards.length < pl.gear) {   /* not enough playable cards: play them all, fill with heat from the hand, do not move, back to gear 1 */
     var fill = 0; for (var q = c.hand.length - 1; q >= 0 && pl.cards.length + fill < pl.gear; q--) if (c.hand[q] === 'H') { c.hand.splice(q, 1); c.disc.push('H'); fill++; }
@@ -173,7 +176,7 @@ function resolveNext(G) {
   c.pl2 = { speed: speed, from: from, lim: lim, addX: addX };
   /* boost is decided in the react step, after the cards are revealed: a human is asked now (G.pend boost -> boostChoice) */
   if (c.human && c.eng >= 1) { G.pend = { t: 'boost', car: c.i, speed: speed }; return ev; }
-  return ev.concat(afterReact(G, c, !!pl.boost));
+  return ev.concat(afterReact(G, c, aiBoost(G, c)));   /* computer boost: decided now, in its own react step, from its revealed speed */
 }
 function boostChoice(G, use) { var p = G.pend; if (!p || p.t !== 'boost') return []; G.pend = null; return afterReact(G, G.cars[p.car], !!use); }
 function afterReact(G, c, boost) {   /* boost, then adrenaline speed, move, slipstream offer */
