@@ -101,7 +101,7 @@ function goalCard(force) {
 
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
-  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the whites pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
   e.addEventListener('click', () => { e.remove(); });
   document.body.appendChild(e);
 }
