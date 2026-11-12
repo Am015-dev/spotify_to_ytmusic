@@ -9,7 +9,7 @@
 const PW = (() => { try { return require('playwright'); } catch (e) { return require('/opt/node-tools/node_modules/playwright'); } })();
 const fs = require('fs'), path = require('path');
 const html = fs.readFileSync(__dirname + '/cauldron-fair.html');
-const SIZES = (process.argv[2] || '390x763,375x553').split(',').map(s => s.split('x').map(Number));
+const SIZES = (process.argv[2] || '390x844,375x667').split(',').map(s => s.split('x').map(Number));
 const SHOTS = path.join(__dirname, 'playtest');
 const TMP = process.env.TMPDIR || '/tmp';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -22,7 +22,7 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/6
 async function run(browser, W, H, mode) {
   const tag = W + 'x' + H + ' ' + mode; const t0 = Date.now();
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, userAgent: UA });
-  await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort());
+  await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host !== 'gns.test') return r.abort(); const f = require('path').join(__dirname, '../../games/cauldron-fair', u.pathname); if (u.pathname.length > 1 && require('fs').existsSync(f) && require('fs').statSync(f).isFile()) return r.fulfill({ path: f }); return r.fulfill({ status: 200, contentType: 'text/html', body: html }); });
   const p = await ctx.newPage(); p.setDefaultTimeout(15000);
   p.on('pageerror', e => note(tag, 'PAGE ERROR ' + e.message + ' ' + (e.stack || '').split('\n').slice(0, 3).join('|')));
   p.on('console', m => { const t = m.text(); if (m.type() === 'warning' && /rejected|gxt/.test(t)) note(tag, 'console ' + t.slice(0, 200)); if (m.type() === 'error' && !/net::|Failed to load|favicon/.test(t)) note(tag, 'console error ' + t.slice(0, 160)); });
@@ -74,7 +74,9 @@ async function run(browser, W, H, mode) {
     });
     const s = info.s, id = s.id;
     totals.steps++;
-    if (wc(info.say) > 20) note(tag, id + ': say over 20 words (' + wc(info.say) + ')');
+    if (wc(info.say) > 12) note(tag, id + ': say over 12 words (' + wc(info.say) + ')');
+    if ((String(info.say).trim().match(/[.!?](\s|$)/g) || []).length > 1) note(tag, id + ': more than one sentence: ' + info.say);
+    if (W === 390 && H === 844 && mode === 'clean' && !(run.shot = run.shot || new Set()).has(id)) { run.shot.add(id); const G2 = path.join(__dirname, 'playable-shots', 'gameplay'); fs.mkdirSync(G2, { recursive: true }); await sleep(350); await p.screenshot({ path: path.join(G2, 'tut-' + seenIds.length + '.png') }); }
     if (info.title && wc(info.title) > 4) note(tag, id + ': title over 4 words');
     if (!info.say) note(tag, id + ': empty text');
     if (info.hs) note(tag, id + ': page scrolls sideways');
@@ -96,7 +98,7 @@ async function run(browser, W, H, mode) {
     }
     if (!s.wait) { if (!info.next || !info.nextOk) note(tag, id + ': the Next button is missing or covered'); }
     // screenshots at 390x763
-    if (!/^Tap (the glowing|Next)/.test(info.say)) { if (id === 'spiral') await shot('early'); if (id === 'flask') await shot('flask'); if (id === 'shops1') await shot('shop'); if (id === 'peek') await shot('peek'); }
+    if (!/^Tap (the glowing|Next)/.test(info.say)) { if (id === 'keep') await shot('early'); if (id === 'flask') await shot('flask'); if (id === 'shops') await shot('shop'); if (id === 'peek') await shot('peek'); }
     // rotations
     if (mode === 'rotate' && rotated === 0 && s.id === 'whites') { rotated = 1; await p.setViewportSize({ width: H, height: W }); await p.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(1000);
       const r = await state(); if (!r.shown || !r.hole) note(tag, 'after rotating to landscape the step is not on screen'); else await p.screenshot({ path: TMP + '/tutor_rot_land.png' }); continue; }
@@ -198,21 +200,23 @@ async function run(browser, W, H, mode) {
     await sleep(300);
     const e = await p.evaluate(() => { const c = document.querySelector('.gxt-end'); if (!c) return null; const r = c.querySelector('.gxt-endc').getBoundingClientRect(); return { t: c.querySelector('.gxt-et').textContent, btns: [...c.querySelectorAll('[data-gxt-end]')].map(b => ({ t: b.textContent, k: b.dataset.gxtEnd, r: (() => { const q = b.getBoundingClientRect(); return [q.left, q.top, q.right, q.bottom, q.width, q.height]; })() })), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
     if (!e) note(tag, 'no end card'); else {
-      if (!/know the rules/i.test(e.t)) note(tag, 'end card title: ' + e.t);
-      const ks = e.btns.map(b => b.k).join(); if (ks !== 'play,story') note(tag, 'end card buttons: ' + ks);
+      if (!/real game/i.test(e.t)) note(tag, 'end card title: ' + e.t);
+      const ks = e.btns.map(b => b.k).join(); if (ks !== 'real') note(tag, 'end card buttons (want only "real"): ' + ks);
+      if (/later|not seen/i.test(await p.evaluate(() => document.body.innerText))) note(tag, 'a "learn later" list is on screen');
       if (!e.inside) note(tag, 'end card outside the screen');
       for (const b of e.btns) if (b.r[5] < 40) note(tag, 'end button too small: ' + b.t);
       await shot('end');
-      const play = e.btns.find(b => b.k === 'play'); await p.touchscreen.tap((play.r[0] + play.r[2]) / 2, (play.r[1] + play.r[3]) / 2); await sleep(500);
-      const after = await p.evaluate(() => ({ run: GXT.running(), dom: document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length, start: !document.querySelector('#start').hidden, sv: document.querySelector('#start').dataset.v,
+      if (await p.evaluate(() => !!localStorage.getItem('cf_save'))) note(tag, 'the staged tutorial game was saved as a normal game');
+      const play = e.btns.find(b => b.k === 'real'); await p.touchscreen.tap((play.r[0] + play.r[2]) / 2, (play.r[1] + play.r[3]) / 2); await sleep(900);
+      const real = await p.evaluate(() => !!G && UI.started && G.last === 9 && G.round === 1 && UI.mode !== 'tutorial' && G.phase !== 'over');
+      if (!real) note(tag, '"Play a real game" did not start a real 9-day game');
+      const after = await p.evaluate(() => ({ run: GXT.running(), dom: document.querySelectorAll('.gxt-cell,.gxt-bub,.gxt-end,.gxt-top').length, start: true, sv: document.querySelector('#start').dataset.v,
         btn: (document.querySelector('#start [data-gxt-open] b') || {}).textContent, st: JSON.parse(localStorage.getItem('gxt-cauldron-fair') || '{}'), saved: !!localStorage.getItem('cf_save'), played: !!UI.prefs.played }));
       if (after.run || after.dom) note(tag, 'tutorial elements left on screen after the end card (' + after.dom + ')');
-      if (!after.start) note(tag, '"Play a real game" did not open the setup screen');
-      if (!/✓/.test(after.btn || '')) note(tag, 'menu does not show Tutorial ✓ (' + after.btn + ')');
       if (!after.st.done) note(tag, 'tutorial not remembered as done');
-      if (after.saved) note(tag, 'the staged tutorial game was saved as a normal game');
-      if (after.played) note(tag, 'the tutorial counted as a played game');
-      await p.evaluate(() => { UI.sv = 'title'; renderStart(); });
+      await p.evaluate(() => { tutLeave(); showStart(); UI.sv = 'title'; renderStart(); });
+      const btn2 = await p.evaluate(() => { UI.sv = 'setup'; renderStart(); const t = (document.querySelector('#start [data-gxt-open]') || {}).textContent; UI.sv = 'title'; renderStart(); return t; });
+      if (!/✓/.test(btn2 || '')) note(tag, 'menu does not show Tutorial ✓ (' + btn2 + ')');
       const tt = await p.evaluate(() => [...document.querySelectorAll('#start .tbtn b')].map(b => b.textContent));
       if (/New here/.test(tt.join(''))) note(tag, '"New here" still shown after the tutorial');
       const n = await p.evaluate(() => { newGame('vs', optObj()); return !!G && UI.started && G.last === 9 && G.round === 1; });
@@ -229,7 +233,7 @@ const once = new Set(); const guardOnce = id => { const k = id + '|' + (guardOnc
 (async () => {
   const b = await PW.chromium.launch({ executablePath: CHROMIUM, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const jobs = []; for (const [W, H] of SIZES) { jobs.push([W, H, 'clean']); }
-  const [W0, H0] = SIZES[0]; jobs.push([W0, H0, 'rotate']); jobs.push([W0, H0, 'leave']); jobs.push([W0, H0, 'skip']); jobs.push([W0, H0, 'anim']); jobs.push([W0, H0, 'story']); jobs.push([375, 553, 'story']);
+  const [W0, H0] = SIZES[0]; if (!process.env.TUT_ONLY) jobs.push([W0, H0, 'rotate']); if (!process.env.TUT_ONLY) { jobs.push([W0, H0, 'leave']); jobs.push([W0, H0, 'skip']); jobs.push([W0, H0, 'anim']); jobs.push([W0, H0, 'story']); jobs.push([375, 553, 'story']); }
   for (const j of jobs) { guardOnce.run = j.join('x'); try { await run(b, ...j); } catch (e) { note(j.join(' '), 'CRASH ' + String(e.message).split('\n')[0]); } }
   await b.close();
   // the checklist: every rule has a step that was really shown
@@ -237,7 +241,7 @@ const once = new Set(); const guardOnce = id => { const k = id + '|' + (guardOnc
   if (!m) note('checklist', 'TUT_RULES not found'); else {
     const rules = [...m[1].matchAll(/\[('(?:[^'\\]|\\.)*'(?:\s*,\s*'[\w]+')+)\]/g)].map(x => [...x[1].matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(y => y[1]));
     if (rules.length < 14) note('checklist', 'only ' + rules.length + ' rules listed');
-    for (const r of rules) { const ids = r.slice(1); if (!ids.some(i => totals.ids.includes(i))) note('checklist', 'rule "' + r[0] + '" has no step that was shown (' + ids.join(',') + ')'); }
+    for (const r of rules) { const ids = r.slice(1); if (!ids.every(i => totals.ids.includes(i))) note('checklist', 'rule "' + r[0] + '" has no step that was shown (' + ids.join(',') + ')'); }
   }
   console.log('steps checked', totals.steps, 'wrong taps', totals.wrong, 'step ids', totals.ids.join(','));
   console.log(probs.length ? 'PROBLEMS ' + probs.length + '\n  ' + probs.join('\n  ') : 'PROBLEMS 0'); process.exit(probs.length ? 1 : 0);

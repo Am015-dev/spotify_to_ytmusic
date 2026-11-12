@@ -188,6 +188,10 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
   return { box, ds, kind };
 }
 // ---------- the market stall ----------
+// what each stall's chip does, in plain words short enough for a 375px phone (tap a chip for the full text)
+const STALL_DO = { none: 'No power, cheapest', black: 'Most moths: droplet', g1: 'In last 2: a ruby', g2: 'In last 2: free chip', g3: 'Whites at 7: slide on', g4: 'In last 2: buy droplet',
+  b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: '+1 after an orange', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
+  y1: 'After a white: undo it', y2: 'Next chip moves ×2', y3: 'Raises your limit', y4: 'Moves extra spaces', p1: 'Points at the count', p2: 'Trade in for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };
 function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
@@ -195,7 +199,9 @@ function marketEl(p, q) {
   const stalls = h('div.stalls');
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
+    const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
+    st.appendChild(h('div.sdo', bk ? (STALL_DO[bk.eff] || bk.title) : ''));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -207,12 +213,25 @@ function marketEl(p, q) {
     st.appendChild(row); stalls.appendChild(st);
   }
   if (p.rubies >= D.rubySpend && G.round < LASTD()) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
-  wrap.appendChild(stalls);
+  const more = h('button.smore', { type: 'button', hidden: true, 'aria-label': 'Scroll down to more stalls' });
+  more.addEventListener('click', ev => { ev.stopPropagation(); stalls.scrollBy({ top: stalls.clientHeight * .8, behavior: 'smooth' }); });
+  wrap.appendChild(h('div.stw', stalls, more)); stalls.addEventListener('scroll', () => smoreUpd(stalls, more), { passive: true });
+  requestAnimationFrame(() => smoreUpd(stalls, more));
+  { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
+    const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
+    wrap.appendChild(h('div.sinfo', ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
   try { sugMark(wrap, p, q, []); } catch (e) { }
   return wrap;
+}
+// R8: at 375 the stalls scroll; say how many are below and fade the bottom edge
+function smoreUpd(st, btn) {
+  if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
+  st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
+  // R17: a chip or ruby button cut by the scroll edge cannot take a tap at its centre, so it is hidden until it scrolls fully into view
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
@@ -229,20 +248,24 @@ function rubyGems(p, cost, compact) {
   if (n > show) out.appendChild(h('b', '+' + (n - show)));
   return out;
 }
-function rubyBar(p) {   // the small ruby corner of the market
-  const S = rubyState(p), el = h('div.rbar.rubyp', rubyGems(p, S.cost, true));
-  const dk = S.nextDrop(), fk = S.flaskKey();
-  el.appendChild(h('button.rbt.rdrop' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', type: 'button', disabled: dk ? null : true, 'aria-label': 'Droplet: start further on, ' + D.rubySpend + ' rubies a step' }, h('span', { html: ico('drop', 28) }), h('b', '+' + S.sel.drop)));
-  el.appendChild(h('button.rbt.rflask' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 28, p.flask || S.sel.flask) })));
+function rubyBar(p) {   // the ruby stall of the market: plain words on each button, a tap explains it in the line below
+  const S = rubyState(p), n = D.rubySpend, el = h('div.rbar.rubyp', h('div.rbh', h('b', 'Rubies'), rubyGems(p, S.cost, true)));
+  const dk = S.nextDrop(), fk = S.flaskKey(), undoDrop = dk && S.sel.drop && +dk[0] === 0;
+  const dropTxt = undoDrop ? 'Drop moved +' + S.sel.drop : 'Move your drop +' + (S.sel.drop + 1), flaskTxt = p.flask ? 'Flask is full' : S.sel.flask ? 'Flask refilled' : 'Refill flask';
+  el.appendChild(h('button.rbt.rdrop.rwd' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', 'data-ri': 'drop', type: 'button', disabled: dk ? null : true, 'aria-label': dropTxt + ': ' + n + ' rubies' }, h('span', { html: ico('drop', 24) }), h('span.rwt', h('b', dropTxt), h('em', undoDrop ? 'tap to undo' : n + ' rubies'))));
+  el.appendChild(h('button.rbt.rflask.rwd' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', 'data-ri': 'flask', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : flaskTxt + ': ' + n + ' rubies' }, h('span', { html: ico('flask', 24, p.flask || S.sel.flask) }), h('span.rwt', h('b', flaskTxt), p.flask ? null : h('em', S.sel.flask ? 'tap to undo' : n + ' rubies'))));
   const best = el.querySelector('[data-k="' + UI.rubyBest + '"]'); if (best) best.classList.add('sug');
   return el;
 }
+const RUBY_INFO = { drop: 'Move your drop: 2 rubies push your droplet 1 space further. Every brew from now on starts there, so each chip lands further out.',
+  flask: 'Refill flask: 2 rubies refill your flask. In the next brew you can put back one white chip you just drew.' };
 function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the droplet, its next spaces, the flask
   const S = rubyState(p), pts = KIT.GEO.pts, R = KIT.GEO.R, i0 = p.droplet, i1 = Math.min(D.TRACK_LEN - 1, p.droplet + S.mx);
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (let i = i0; i <= i1; i++) { x0 = Math.min(x0, pts[i].x); x1 = Math.max(x1, pts[i].x); y0 = Math.min(y0, pts[i].y); y1 = Math.max(y1, pts[i].y); }
   const sz = Math.max(6, Math.max(x1 - x0, y1 - y0) + 3), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
   const svg = KIT.potSVG({ pot: [], droplet: p.droplet + S.sel.drop, rat: 0, space: null, boom: false, mini: false, uid: 'rb', label: 'Your cauldron', size: 400 }).replace(/viewBox="[^"]*" width="\d+" height="\d+"/, 'viewBox="' + vx.toFixed(2) + ' ' + vy.toFixed(2) + ' ' + sz.toFixed(2) + ' ' + sz.toFixed(2) + '"');
   const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', { html: S.cost ? ico('ruby', 20) : '' }, S.cost ? '−' + S.cost : '')));
+  wrap.appendChild(h('div.rhelp', 'Spend ' + D.rubySpend + ' rubies: tap a glowing drop to start one space further, or tap the flask to refill it. Or keep them.'));
   const pot = h('div.rpot', { html: svg });
   for (let k = 0; k <= S.mx; k++) {
     const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
@@ -251,7 +274,7 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   }
   wrap.appendChild(pot);
   const fk = S.flaskKey();
-  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend)),
-    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop))));
+  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend), h('em.rlb', p.flask ? 'Flask full' : S.sel.flask ? 'Refilled' : 'Refill flask')),
+    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop), h('em.rlb', 'Start space'))));
   return wrap;
 }

@@ -23,12 +23,13 @@ function buildRules() {
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
   sec('How a day goes', h('ol', ...li([
-    'The fair\'A fortune card is drawn. Purple is instant. Blue lasts all day.',
+    'A fortune card is drawn. Purple is instant. Blue lasts all day.',
     'From day 2, players behind get a rat stone. Count rat tails between you and the leader. Your first chip starts that many spaces further.',
     'Everybody brews at the same time. Each chip moves as many spaces as its number. Then draw again, or stop.',
     'When everyone has stopped, the day is counted. Bonus die, powers, rubies, points, shop.',
     'Spend rubies if you like. Then all your chips go back in the bag. A new day begins.'])));
   sec('Brewing and explosions', h('p', 'White chips (Fizzpods) are dangerous. Only they count towards the limit. Past 7, your cauldron explodes. The last chip stays and you must stop. Later you take your points or your coins, not both.'),
+    h('p', 'If your bag runs empty, you stop. Your last chip still picks your space.'),
     h('p', 'Once a day, your flask puts your last white chip back. It cannot undo an explosion. Refill it with 2 rubies.'),
     h('p', 'On the last day, everyone picks Draw or Stop in secret. Then all picks are shown at once. On other days the computers draw while you think.'));
   sec('The spiral', h('p', 'You score the space right after your last chip. Big number: coins to shop. Brown number: points. Some spaces hold a ruby. The last space is the spoon: 15 points and 35 coins.'));
@@ -40,6 +41,12 @@ function buildRules() {
     'Shopping: buy one or two chips of different colours. Leftover coins are lost. Sold-out chips are gone.',
     'Rubies: 2 rubies move your droplet one space, or refill the flask.'])));
   sec('The ingredient books', h('p', 'Orange and black are always in the shop. Green, blue and red come from the chosen set. Yellow opens on day 2, purple on day 3. Blue, red and yellow act when drawn. Green, purple and black act after the brew. The Cards drawer lists every book.'));
+  { const bk = c => { const set = (typeof G !== 'undefined' && G && G.sets && G.sets[c]) || (c === 'K' ? 0 : 1); return D.BOOKS[c] && D.BOOKS[c][set]; };
+    const gr = bk('G'), bl = bk('K');
+    sec('Green and black chips', h('ul', ...li([
+      D.COLORS.G.name + ' (green)' + (gr ? ', ' + gr.title + ': ' + gr.text : ': after the brew, it pays off as one of your last two chips.'),
+      D.COLORS.K.name + ' (black)' + (bl ? ': ' + bl.text : ': after the brew, more black chips than a neighbour wins a droplet step.')]))); }
+  sec('Extra white chip', h('p', 'Before day 6 everyone adds one white 1 to their bag. Your pot gets riskier from then on.'));
   sec('The last day and the end', h('p', 'Day 9 has no shop. Every 5 coins and every 2 rubies make 1 point. The most points wins. On a tie, the furthest cauldron on day 9 wins.'));
   sec('Playing it', h('ul', ...li([
     'The ring shows where you would score now. The box under the buttons shows your explosion chance.',
@@ -138,7 +145,8 @@ function titleEl() {
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,   // W471: on a first visit Learn to play is the one big primary button
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
-      h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      h('div.tsegs', h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      (() => { const o = optObj(), cur = o.seats.every(c => (o.lvBy[c] || TEMPER[c]) === o.lvBy[o.seats[0]]) ? o.lvBy[o.seats[0]] : ''; return h('div.tseg', h('span.lbl', 'Rivals'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (cur === v ? '.on' : ''), { 'data-a': 'lvall', 'data-v': v, type: 'button', 'aria-pressed': cur === v ? 'true' : 'false', 'aria-label': 'Computer makers play ' + v }, v))); })()),
       h('div.tsec',
         h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
         h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
@@ -182,6 +190,8 @@ function onlineEl() {
 }
 function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(true); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; renderStart(); }
 // ---------- events ----------
+// G6 fix: a tap on Start day answers at once (pressed look + 'Starting…'), so nobody taps it twice while the day report gets ready
+function pressFb(t) { try { if (t.classList.contains('busy')) return; t.classList.add('busy'); t.setAttribute('aria-busy', 'true'); const b = t.querySelector('b') || t; const was = b.textContent; b.textContent = was.replace(/^Start day/, 'Starting day'); setTimeout(() => { if (t.isConnected && t.classList.contains('busy')) { t.classList.remove('busy'); t.removeAttribute('aria-busy'); b.textContent = was; } }, 2500); } catch (e) { } }
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]');
   if (!t) { if (ev.target.closest('#cwrap,#caul') && G && G.phase === 'brew' && focusSeat() !== viewSeat()) { UI.fastAI = true; return; }
@@ -218,10 +228,10 @@ document.addEventListener('click', ev => {
     case 'ratopen': if (!tutAct({ what: 'ratopen' })) break; UI.ratOpen = !UI.ratOpen; render(); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
-    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; shopToggle(d.k); break;
-    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; shopBuy(); break;
-    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; rubySelect(d.k); break;
-    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; rubyGo(); break;
+    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; UI.shopInfo = null; shopToggle(d.k); break;
+    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
+    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; UI.shopInfo = d.ri || null; rubySelect(d.k); break;
+    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
@@ -242,6 +252,7 @@ document.addEventListener('click', ev => {
     case 'menu': showStart(); break;
     case 'start': newGame(d.m, optObj()); break;   // W471: Play is always a clean game; Learn to play is the coached one
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
+    case 'lvall': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); [0, 1, 2, 3].forEach(c => { if (c !== o.me) o.lvBy[c] = d.v; }); renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'drawer': GX.show(d.v); break;
