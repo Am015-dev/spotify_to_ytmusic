@@ -10,6 +10,7 @@ The gates ran on the same 4 cores during the first sands games, so the sands wai
 | Game | Total | Verdict | Gate | Lowest rows |
 |---|---:|---|---|---|
 | sands-of-qamar | 7.0 | FAIL | PASS | 7 Feel 6, 8 Bugs 6 |
+| hollowbough | 7.0 | FAIL | PASS | 6 AI and pacing 6, 8 Bugs 6 |
 
 ---
 
@@ -68,3 +69,56 @@ the sale table, djinns, camels and scoring). **New and right:** "no legal move" 
 | 6 | Followed only the light at 390 | Lost 184-219: the rival took 71 tile points and 30 palm points to my 45 and 6. | R31-shots/sq-g390-result-lost.jpg |
 | 5 | Round start at 390 | The second bid row touches the bottom edge, and the score pop covers the first tile row. | R31-shots/sq-g390-bid-dead-first-tap.jpg |
 | 2 (good) | Tutorial at 375 to the end | 0 dead taps, ends on "Play a real game". | R31-shots/sq-tut375-end.jpg |
+
+---
+
+## 2. hollowbough (shelf/W482-hollowbough, merged locally @ a51a8bae): 7.0, FAIL
+
+Gate: **PASS** (phone-check 63.9 s with no dead-tap lines, `sweep.js ok`, "SWEEP PASS", "1/1 PASS", EXIT 0). Lab WARN 10/12
+(LAB rows differ from the scenario list; this does not fail the gate). I served every asset folder (cards, media, models, music).
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") at **375x667** by touch to "Play a real game": 37 steps, 41 taps (10 of them
+  Next), 61 s, longest settle 1.4 s, **0 dead taps**, 0 covered targets, 0 errors. It ends on the score table, "You win, 22 to 1".
+- Two full default games (Play > "Play now" > Start; mode Guided, 2 players) to the result card:
+
+| Game | Size | How I played | Result | Time | Taps | Dead taps on lit targets |
+|---|---|---|---|---|---|---|
+| g390 | 390x844 | only the glowing thing | **lost 24-27** (city 13/15) | 2.5 min | 82 | 4: a glowing meadow card twice and another once ("Tap a meadow card to clear away"), and "Stop here" once |
+| g375m | 375x667 | mixed newcomer, 30 % of taps on any place, card or button | **lost 15-25** (city 6/15) | 2.1 min | 67 | 0. Twelve taps on greyed places or cards I could not pay for did nothing, which is expected. |
+
+- Both games reached a real result card ("Bramble wins!", a score table, Play again / Look at the board / Main menu). 0 page and
+  console errors, 0 stuck states, and no discard loop ("discard" came up twice per game and closed normally).
+
+Rules: unchanged and right for 2 players (8 basic places plus forest and Haven, workers 2/+1/+1/+2, Spring and Autumn production,
+2 meadow cards in Summer, hand 8, city 15, Journey in Autumn, basic and special events). Nothing invented in what I saw.
+The result table lists cards, point tokens and Journey but no separate goals or events row.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. |
+| 2 | Tutorial teaches | 8 | A full guided year, one line and one tap per step, 61 s at 375, 0 dead taps, then "Play a real game". The rival still ends on 1 point (22-1), and 10 of 41 taps are Next only. |
+| 3 | First 10 seconds | 7 | Learn and Play up top. Play asks "Learn in 5 minutes / Play now". A goal card with one Start. Places glow. |
+| 4 | Turn clarity | 7 | Short prompts ("Pick the resource you want to gain.", "Spend goods for tokens, or stop."). Costs sit on the cards. The prompt is a small pill in the top-left corner, easy to miss. |
+| 5 | Phone play | 7 | Places 127x89 (390) and 88x77 (375), hand cards 117-122 px, 44 px tabs and buttons. Nothing cut off in my shots. The meadow tab shows one big card and leaves the right half of the screen empty. |
+| 6 | AI and pacing | 6 | The rival is brisk (longest settle 1.8 s) and games take 2-2.5 min. But a newcomer lost both default games: following the glow 24-27, mixed 15-25. Across R24 and R31 that makes 0 wins in 4 default games. |
+| 7 | Feel | 7 | Painted places and cards, meeples, flying cards, a painted end scene with achievements. |
+| 8 | Bugs | 6 | Fixed: the result card is reachable in both games, and the discard/Undo loop is gone. 0 errors, gate PASS. But 4 lit targets ignored the first tap in the 390 game (the glowing meadow card twice, Stop here once). The next tap worked, so it is not a stopper. |
+| | **Total** | **7.0** | **FAIL**: rows 6 and 8 are below 7. 8+8+7+7+7+6+7+6 = 56/8. No stopper. |
+
+### Earlier findings (R24)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 8: no result card by touch in either game | **Fixed**: the result card showed in both games. | R31-shots/hb-g390-result-24-27.jpg, hb-g375-final.jpg |
+| Row 8: "4 of 5 discarded. Tap 1 more." loop, then a fresh 0-0 game | **Fixed**: not seen in 149 game taps. | n/a (driver log) |
+| Gate FAIL (menu scenario, phone-check dead taps) | **Fixed**: `--full` PASS. | gate log |
+| Row 2: guided rival scores 1 all year (22-1) | **Not fixed**. | R31-shots/hb-tut375-end-22-1.jpg |
+| Known: score chips crowd with 3-4 players | **Not checked** (defaults are 2 players). | n/a |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 8 | 390, Summer: "Tap a meadow card to clear away", tapped the glowing card | Two taps on one card and one on another did nothing. A later card took the tap. | R31-shots/hb-g390-meadow-card-dead.jpg |
+| 8 | 390, Autumn: "Spend goods for tokens, or stop", tapped the glowing "Stop here" | The first tap did nothing. | R31-shots/hb-g390-stop-here-dead.jpg |
+| 6 | Two default games | Lost 24-27 following the glow and 15-25 mixed. | R31-shots/hb-g390-result-24-27.jpg, hb-g375-final.jpg |
+| 2 (good) | Tutorial at 375 | 0 dead taps in 41, one line per step. | R31-shots/hb-tut375-forest-step.jpg |
