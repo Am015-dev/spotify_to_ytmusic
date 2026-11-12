@@ -56,19 +56,33 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(G.phase==='setup'){let best='';try{const m=!hotSeat()||humans().length===1?aiMove(d,'hard'):null;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}">Safe start for me</button>`}catch(e){}
     return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
-  const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
+  const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';let rm=null;try{rm=can&&!UI.tut?recMove(dd):null}catch(e){}
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
-    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
+    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);const bm=rm&&rm.a==='place'&&rm.t===t,bs=bm&&rm.r===r&&!A.bad;bd=bs?`<i class="bd best">&#9733;</i>`:`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`+(bm?`<i class="bd bst">&#9733;</i>`:'');lab=(bs?', best move':bm?', best tile: turn it':'')+(A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe')}
       tiles+=`<button class="pt${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="Tile ${t+1}${lab}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[card]],{rot:r,size:80,uid:'s'+t})}">${bd}</button>`}
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
-  const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
+  const hint=PH.pop==='tiles'?'':(can?(phTileNote(K,dd,hand,sel,rm)||phTileHint(K,dd,hand,sel)):'Pick an option.');
   return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span>${dangerHTML()}</div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
 function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?phCrews():phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
+// what one placement does: sinks you / sinks a rival / chance a leviathan sinks or blocks you before your next turn / rival pushed to the edge
+function phNote(K,d,m){const A=analyse(K,d,m);const o={A,bad:A.bad,pct:0,sinks:[],push:[]};
+  for(const x of A.others)if(x.coll||x.st==='edge'||x.st==='mon')o.sinks.push(x.i);if(A.bad)return o;
+  try{const h=hypo(K,K.ships[m.s],K.hands[d][m.t],m.r),S=h.B.ships[m.s];if(S&&S.alive&&S.x!=null)o.pct=Math.round(100*monRisk(h.B,[S.x,S.y],S.on,AILV.hard,null));
+    for(const x of A.others){if(o.sinks.includes(x.i))continue;const R=h.B.ships[x.i];if(R&&R.alive&&R.x!=null&&Math.min(R.x,R.y,BW-1-R.x,BW-1-R.y)===0)o.push.push(x.i)}}catch(e){}
+  return o}
+function phNoteTxt(o){if(o.bad)return 'sinks you';const p=[];if(o.sinks.length)p.push('sinks '+o.sinks.map(i=>esc(nm(i))).join(' and ')+'!');
+  p.push(o.pct<5?'safe until your next turn':o.pct+'% chance a leviathan gets you before your next turn');if(o.push.length)p.push('pushes '+o.push.map(i=>esc(nm(i))).join(' and ')+' to the edge');return p.join(', ')}
+// the line under the tiles: what the chosen tile does, and the ★ best move when this one is worse (warns a turn ahead of a block)
+function phTileNote(K,d,hand,sel,rm){try{if(UI.tut||!isCur(hand[sel.t]))return '';const m={a:'place',t:sel.t,r:sel.r,s:sel.s};const o=phNote(K,d,m);
+  const isB=rm&&rm.a==='place'&&rm.t===m.t&&rm.r===m.r&&rm.s===m.s;if(isB)return `<b>&#9733; Best move:</b> ${phNoteTxt(o)}.`;
+  let h=(o.bad?'<b class="warn-l">&#10007; This way sinks you.</b>':o.pct>=15?`<b class="warn-l">&#9888; ${phNoteTxt(o)}.</b>`:`This way: ${phNoteTxt(o)}.`);
+  if(rm&&rm.a==='place'){const ob=phNote(K,d,rm);if(!ob.bad){const tw=rm.t===m.t?'turn this tile':'tile '+(rm.t+1);h+=` <b>&#9733; Best: ${tw}</b>${ob.pct<5?' (safe)':' ('+ob.pct+'%)'}. <button class="pb small" data-a="sugg">Use &#9733;</button>`}}
+  return h}catch(e){return ''}}
 // each tile keeps its own turn (Turn used to turn all three previews at once)
 function phRot(t){return (UI.rots&&UI.rots[t])||0}
 function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
@@ -107,7 +121,7 @@ function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
-  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
+  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn&&!/ \(you\)$/.test(mn)?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
   return `<div class="ps-feed"><h5>Since your last move</h5><ol>${keep.map(l=>`<li class="${l.c==='bad'?'bad':l.c==='big'?'big':''}">${you(l.t)}</li>`).join('')}</ol>${more?`<p class="tiny">${more} earlier line${more>1?'s':''} in the Log.</p>`:''}</div>`}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
