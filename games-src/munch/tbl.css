@@ -349,3 +349,20 @@ html.ph .opp.seat .snm{font-size:12.5px;letter-spacing:-.02em;text-overflow:clip
 html.ph .score .sl{max-width:none;white-space:normal;text-overflow:clip;overflow:visible;font-size:12.5px;line-height:1.1;text-align:center;overflow-wrap:normal;word-break:keep-all;hyphens:none}
 /* desktop Sell confirm: a full 44 px tap target like every other control */
 .sellbar .btn{min-height:44px}
+
+/* phone: the fight score chip is a real 44 px target (tutorial lights it) */
+html.ph .arena:has(>.vs) .vs .score.hero{min-height:44px}
+/* phone result card: the whole table sits above the button bar (no scroll at 375x667): small hero, tight table, no footer line */
+html.ph .dlg.end{padding-bottom:0}
+html.ph .dlg.end .win3d{width:84px;height:84px;margin-bottom:0}html.ph .dlg.end .winp{width:56px;height:56px;margin-bottom:4px}
+html.ph .dlg.end .confetti{font-size:14px;line-height:1.1;margin:0}
+html.ph .dlg.end h2{font-size:1.25rem;line-height:1.15;margin:2px 0 4px}
+html.ph .dlg.end>p{margin:2px 0 4px;font-size:13px;line-height:1.25}
+html.ph .dlg.end>p.small.muted:last-of-type{display:none}
+html.ph .dlg.end table{font-size:13px;table-layout:fixed;margin-bottom:16px}
+html.ph .dlg.end table th{font-size:11px;padding:0 1px;white-space:nowrap}
+html.ph .dlg.end table td{padding:2px 1px}
+html.ph .dlg.end table td:first-child{width:38%;overflow:hidden;text-overflow:clip;font-size:12.5px}
+html.ph .dlg.end table td:first-child .ptok{width:22px;height:22px;margin-right:2px}
+html.ph .dlg.end .recap p{margin:0 0 2px;font-size:13px;line-height:1.25}
+html.ph .dlg.end .recap{margin:0 0 4px}
