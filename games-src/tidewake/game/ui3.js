@@ -37,7 +37,7 @@ function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
   return `<div class="prompt">
-  ${adv&&you?`<button class="btn pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}">Safe start for me</button> `:''}<button type="button" class="btn small" data-startlist aria-expanded="${UI.startList?'true':'false'}">${UI.startList?'Hide the list':'All marks as a list'}</button>${UI.startList?`<div class="startpick" style="grid-template-columns:auto repeat(6,1fr);margin-top:6px">${g}</div>`:''}</div>`}
+  ${adv&&you?`<button class="btn pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}" title="${esc(adv.why)}">Safest start &middot; ${riskPct(adv.b.r1)}</button> `:''}<button type="button" class="btn small" data-startlist aria-expanded="${UI.startList?'true':'false'}">${UI.startList?'Hide the list':'All marks as a list'}</button>${UI.startList?`<div class="startpick" style="grid-template-columns:auto repeat(6,1fr);margin-top:6px">${g}</div>`:''}</div>`}
 // the elimination bonus: "Keep your hand" first, each swap shown as a picture (your tile -> the pool tile), not a blind number
 function qOrder(q){const ix=q.opts.map((o,i)=>i);return q.kind==='bonus'?ix.filter(i=>q.opts[i].h!=='bSwap').concat(ix.filter(i=>q.opts[i].h==='bSwap')):ix}
 function tileImg(c,uid){return isCur(c)?`<img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid,size:96})}">`:isGate(c)?gateArt():cannonArt()}
@@ -48,6 +48,7 @@ function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||hu
   let title=String(q.title).replace(/^You drew/,(you?'You':nm(d))+' drew');
   if(q.kind==='cannonDraw'){const n=G.hands[d].filter(isCannon).length;extra=`<p>It shoots a leviathan that would sink you. Keep it, or swap it for a new tile?${n?` You hold ${n}.`:''}</p>`}
   if(q.kind==='doom')extra=`<p class="warn-l">If you do nothing, your junk sinks. Pick a rescue below, or accept.</p>`+extra;
+  if(q.kind==='doom'&&q.opts.some(o=>o.h==='dReloc'))return relocHTML(d,q,you,timed);
   return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4>${q.kind==='cannonDraw'?'':`<p>${esc(title)}</p>`}${extra}<div class="opts${q.kind==='bonus'?' bopts':''}">${qOrder(q).map(i=>{const o=q.opts[i];return `<button class="btn${/Accept/.test(o.l)?' warn':''}${o.h==='bSwap'?' bswap':''}" data-a="q" data-i="${i}"${o.h==='bSwap'?` aria-label="${esc(o.l)}"`:''}>${o.h==='bSwap'?bonusPair(d,o.d):esc(o.l)}</button>`}).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
 function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='place'),gts=mv.filter(m=>m.a==='gate'),cns=mv.filter(m=>m.a==='cannon'),pas=mv.find(m=>m.a==='pass');
   const hand=K.hands[d];let sel=UI.sel;const fronts=[...new Set(pl.map(m=>m.s))];
@@ -112,3 +113,16 @@ function mainHTML0(){
     if(G.phase==='setup')return startHTML(d);
     if(G.step==='act'){return placeHTML(d,knowledge(d))}return ''}
   return oppHTML(d)+handStrip(vs,false)}
+
+// the blocked-start rescue (rulebook: move to another free start mark on the same edge): each mark once, named like the start list
+// ("Left 3, upper mark"), safest first by the counted risk after your best first tile from there; Accept and the timer stay on screen
+function markName(x,y,e){try{const pe=TWKit.portEdge(x,y,e);if(!pe)return `column ${x+1}, row ${y+1}`;const hor=pe.edge==='top'||pe.edge==='bottom';const a=pw(x,y,e),b=pw(x,y,e^1);
+  const first=hor?a[0]<b[0]:a[1]<b[1];return `${pe.edge[0].toUpperCase()+pe.edge.slice(1)} ${pe.index}, ${hor?(first?'left':'right'):(first?'upper':'lower')} mark`}catch(e){return `column ${x+1}, row ${y+1}`}}
+function relocRisk(d,o){const K=knowledge(d),hand=K.hands[d]||[];const B=Object.assign({},K,{ships:K.ships.map(s=>Object.assign({},s))});const S=B.ships[d];S.x=o.d.x;S.y=o.d.y;S.e=o.d.e;S.on=null;
+  let best=1;for(let t=0;t<hand.length;t++){if(!isCur(hand[t]))continue;for(let r=0;r<4;r++){const h=hypo(B,S,hand[t],r);if(h.dead.includes(d))continue;const S2=h.B.ships[d];if(!S2.alive||S2.x==null)continue;const v=sinkRisk(h.B,d,null,600);if(v<best)best=v}}return best}
+function relocHTML(d,q,you,timed){const key=G.logN+':'+q.opts.length;if(UI.rlKey!==key){UI.rlKey=key;UI.rl=q.opts.map((o,i)=>o.h==='dReloc'?{i,nm:markName(o.d.x,o.d.y,o.d.e),rk:relocRisk(d,o)}:null).filter(Boolean).sort((a,b)=>a.rk-b.rk)}
+  const rl=UI.rl,acc=q.opts.findIndex(o=>o.h==='dAccept'),oth=q.opts.map((o,i)=>i).filter(i=>q.opts[i].h!=='dReloc'&&q.opts[i].h!=='dAccept');const b=rl[0];
+  const lbl=r=>r.rk>=1?'every tile sinks you there':riskPct(r.rk)+' risk after your best tile';
+  return `<div class="prompt alert" data-qkind="doom"><h4>Quick: ${you?'your':esc(nm(d))+"'s"} junk is blocked!</h4><p class="warn-l" style="margin:2px 0">A leviathan sits on your first square. You may move to another free mark on this edge.</p>
+  <div class="opts">${oth.map(i=>`<button class="btn" data-a="q" data-i="${i}">${esc(q.opts[i].l)}</button>`).join('')}${b?`<button class="btn pri" data-a="q" data-i="${b.i}" aria-label="Move to ${esc(b.nm)}, ${lbl(b)}"><span style="display:block">&#9733; Move to ${esc(b.nm)}<small style="display:block">${lbl(b)}</small></span></button>`:''}</div>
+  <div class="rlrow">${rl.length>1?`<details class="rlmore"><summary class="btn small">Other free marks (${rl.length-1})</summary><div class="rlgrid">${rl.slice(1).map(r=>`<button class="btn small" data-a="q" data-i="${r.i}" aria-label="Move to ${esc(r.nm)}, ${lbl(r)}">${esc(r.nm.replace(/ mark$/,''))}<small>${r.rk>=1?'sinks':riskPct(r.rk)}</small></button>`).join('')}</div></details>`:''}${acc>=0?`<button class="btn warn small" data-a="q" data-i="${acc}">Accept your fate</button>`:''}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt" data-short="1" style="margin:2px 0">${UI.qTime>0?UI.qTime:25} s left, then the &#9733; is used.</p>`:''}</div>`}

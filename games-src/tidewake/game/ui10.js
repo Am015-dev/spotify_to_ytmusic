@@ -28,12 +28,12 @@ function tmine(turn){return tcalm()&&G.turn===turn&&G.cur===TS.me&&G.step==='act
 function tsel(t,r){UI.sel={t:t,r:r||0,s:0};render()}
 // ---------------------------------------------------------------- the steps (say: 12 words or fewer; tap: tap the highlight to go on)
 // run: Cobalt and the sea may move while this step waits; hold: keep the roll card up until it is tapped
-const TUT_RULES=['goal','order','mark','reloc','roll','wake','levmove','six','hand','edge','turn','never','place','sail','calm','draw','chain','push','collide','place3','blocked','offboard','min3','turn2','turn2b','place2','levsink','swap','win'];
+const TUT_RULES=['goal','order','mark','reloc','roll','wake','levmove','six','hand','edge','turn','never','place','sail','calm','draw','chain','push','collide','place3','blocked','offboard','min3','turn2','turn2b','place2','levsink','swap','swap2','swap3','win'];
 function tutSteps(){const ph=!!PH.on;const S=[
   {id:'goal',say:'Last junk afloat wins. Tap the sea chart to begin.',target:()=>document.getElementById('board'),tap:1,ready:()=>!!G&&UI.started&&G.phase==='setup'},
   {id:'order',say:'Cobalt chose his start first. Every junk starts before any tile.',target:()=>tship(TS.co),tap:1,run:1,ready:()=>tcalm()&&G.ships[TS.co].x!=null&&sideToAct()===TS.me},
   ph?{id:'mark',say:'Tap this gold mark on the edge to start there.',target:()=>{const p=hproj(TS.myStart.x-BC,TS.myStart.y-BC+.5);return p?{x:p.x,y:p.y}:null},until:()=>PH.pop==='start'||G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me}:null,
-  {id:ph?'mark2':'mark',say:'Tap this mark. Your junk starts here.',target:()=>tvis(`[data-a=startmark][data-x="${TS.myStart.x}"][data-y="${TS.myStart.y}"][data-e="${TS.myStart.e}"]`),until:()=>G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me},
+  {id:ph?'mark2':'mark',say:'Tap this mark. Your junk starts here.',target:()=>tvis(`[data-a=startmark]:not(.pri)[data-x="${TS.myStart.x}"][data-y="${TS.myStart.y}"][data-e="${TS.myStart.e}"]`),until:()=>G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me},
   {id:'reloc',say:'A leviathan on your start square? Move to another free mark.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.ships[TS.me].x!=null},
   {id:'roll',say:'Every turn starts with a roll of two dice.',target:tmph,tap:1,run:1,hold:1,ready:()=>tcalm()&&G.turn===2&&!!tmph()},
   {id:'wake',say:'6, 7 or 8 wakes the leviathans. Any other total: calm.',target:tmph,tap:1,hold:1,ready:()=>!!tmph(),done:tmphHide},
@@ -58,7 +58,9 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'turn2b',say:'Tap Turn once more.',target:trot,until:()=>UI.sel&&UI.sel.r===2,ready:()=>tmine(8)&&UI.sel&&UI.sel.r===1},
   {id:'place2',say:'Tap Place.',target:tplace,until:()=>G.turn>8,ready:()=>tmine(8)&&UI.sel&&UI.sel.r===2},
   {id:'levsink',say:'A leviathan swam onto Cobalt\'s tile. He sinks with it!',target:()=>tvis('#pc [data-a=sunkok],#cards [data-a=sunkok]'),until:()=>!(UI.sunk&&UI.sunk.length),run:1,ready:()=>tcalm()&&!!G.over&&!!tvis('#pc [data-a=sunkok],#cards [data-a=sunkok]')},
-  {id:'swap',say:'Sink rivals with your tile, and swap tiles with their hands.',target:()=>tship(TS.me)||document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length)},
+  {id:'swap',say:'Sink a rival with your tile? Swap with their hand. Tap yours.',target:()=>tvis('#twswap [data-sw=me][data-i="1"]'),until:()=>TSW.a!=null,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length),enter:()=>swOpen()},
+  {id:'swap2',say:'Now tap the sunken crew\'s tile to take it.',target:()=>tvis('#twswap [data-sw=co][data-i="0"]'),until:()=>TSW.n>0,ready:()=>!!tvis('#twswap')},
+  {id:'swap3',say:'Swapped! Tap Keep this hand when you are done.',target:()=>tvis('#twswap [data-sw=keep]'),until:()=>!TSW.on,ready:()=>!!tvis('#twswap')},
   {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over}
  ].filter(Boolean);
  return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
@@ -97,7 +99,7 @@ function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.n
   TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
   try{startGame(s,{tutorial:true,first:TS.co,seed:TS.seed,names:['Vermilion','Cobalt']})}finally{TUTG.starting=0}
   TUTG.freeze=true;UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}render()}
-function tutLeave(){if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
+function tutLeave(){try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
 // Story is preceded by the guided game (the prologue) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
@@ -115,3 +117,15 @@ function tutOffer(go){if(typeof GXT==='undefined'||NET.on||!firstTime()||GXT.sta
 // leaving the guided game any other way (Menu > New game, Story, the title) switches it off
 {const _sg=startGame;startGame=function(s,o){if(TUTG.on&&!TUTG.starting){try{GXT.stop()}catch(e){}tutLeave()}return _sg.apply(this,arguments)}
  const _ss=showStart;showStart=function(){if(TUTG.on){try{GXT.stop()}catch(e){}tutLeave()}return _ss.apply(this,arguments)}}
+
+// ---------- the tutorial's practice swap (the elimination bonus): your three tiles, the sunken crew's three; tap one of yours, then one of
+// theirs, and they change places, exactly as the real swap card does after your tile sinks a rival; Keep this hand ends it ----------
+const TSW={on:false,a:null,n:0,me:[],co:[]};
+function swOpen(){TSW.on=true;TSW.a=null;TSW.n=0;TSW.me=(G&&G.hands[TS.me]&&G.hands[TS.me].filter(isCur).length>=3?G.hands[TS.me].filter(isCur).slice(0,3):[12,13,15]);TSW.co=[35,9,10];swRender()}
+function swRender(){let el=document.getElementById('twswap');if(!TSW.on){if(el)el.remove();return}
+  if(!el){el=document.createElement('div');el.id='twswap';el.className='prompt ask';document.body.appendChild(el)}
+  const t=(c,k,i)=>`<button class="hc${k==='me'&&TSW.a===i?' sel':''}" data-sw="${k}" data-i="${i}" aria-label="${k==='me'?'Your':'Sunken crew\'s'} tile ${i+1}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'sw'+k+i,size:96})}"></button>`;
+  el.innerHTML=`<h4>Practice: the swap</h4><p class="tiny">Your tiles</p><div class="swrow">${TSW.me.map((c,i)=>t(c,'me',i)).join('')}</div><p class="tiny">Sunken crew's tiles</p><div class="swrow">${TSW.co.map((c,i)=>t(c,'co',i)).join('')}</div><button class="btn pri" data-sw="keep">Keep this hand</button>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#twswap [data-sw]');if(!b||!TSW.on)return;e.stopPropagation();const k=b.dataset.sw,i=+b.dataset.i;
+  if(k==='me'){TSW.a=i;try{sfx('tile_rotate')}catch(x){}}else if(k==='co'&&TSW.a!=null){const x=TSW.me[TSW.a];TSW.me[TSW.a]=TSW.co[i];TSW.co[i]=x;TSW.a=null;TSW.n++;try{sfx('tile_place')}catch(x){}}
+  else if(k==='keep'){TSW.on=false}swRender()},true);
