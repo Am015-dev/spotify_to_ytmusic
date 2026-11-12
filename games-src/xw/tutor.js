@@ -141,7 +141,7 @@ const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
 window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
 function coachReset(){NCH.log=[];NCH.fs={};NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
 function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{BF.key='';BF.fkey=''}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
-function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;if(LORE.coach[id].act&&tutScripted())NCH.q.unshift(id);else NCH.q.push(id);   // a line that asks for a tap goes first, ahead of queued taunts
+function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;if(LORE.coach[id].act&&tutScripted()){let k=0;NCH.q.forEach((x,i)=>{if(LORE.coach[x].rule)k=i+1});NCH.q.splice(k,0,id)}else NCH.q.push(id);   // a line that asks for a tap goes ahead of queued taunts, after queued rules
   // the scripted lesson keeps pace with the board: a rule line replaces a taunt at once, or any line that has been up a moment
   if(NCH.cur&&tutScripted()&&LORE.coach[id].rule&&(!LORE.coach[NCH.cur].rule||LORE.coach[id].act||performance.now()-(NCH.curAt||0)>1800)){coachHide();if(LORE.coach[id].act)coachPump();return}coachPump()}
 function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;(NCH.log=NCH.log||[]).push(id);NCH.curAt=performance.now();let e=document.getElementById('na-coach');
