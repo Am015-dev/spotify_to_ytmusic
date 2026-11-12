@@ -104,3 +104,16 @@ conflicts): run it at merge time.
 - Gates: build-all --quick PASS; tutorial-end PASS both sizes; smoke + playthrough PASS; qa-bot phone 0 blockers / 0 majors;
   ui-audit phone-s and pc A-F 0, phone B2 = the menu-walk race on drawer headings ("Speed", "Solo"), also there before W416.
 - Shots: playable-shots/v2-before-*.webp, v2-after-*.webp, CRITIQUE-v2.md (top fixes left listed there).
+
+## G5 gameplay review fixes (8 Nov, branch shelf/W507-wildmark-gameplay)
+- Default rival is now **Gentle** (Play, setup default, after the tutorial; Easy/Normal/Hard unchanged, Story unchanged). Gentle = random pair,
+  loose placement, animal settled anywhere half the time, no acorns/sweeps. `node newplayer-bench.js 100 gentle` (BOT=random|casual|newcomer|greedy):
+  random tapper wins 9%, casual newcomer 91%, newcomer 100%, best-points-now 100% (old Normal default: casual 0%, greedy 55%).
+- Result: totals strip on top, winner first; score sheet text 14px light ink on the dark panel (contrast 12.9).
+- Board never auto-fits below 47 px per hex (spots/targets 47x54 at 375 and 390); a big valley pans. Fit uses the real overlay sizes.
+  The map has its own click listener so the browser's touch adjustment no longer moves taps near the top chips onto them (it opened Scores).
+  Short phones (height <= 760) hide the Largest-area row (still in Scores).
+- Hints (goal chips + point previews) are on by default; acorn counter is a button with a one-line explanation; rival-view line says how
+  to go back; the turn banner waits for a score pop; tutorial shows the second acorn power (Replace animals).
+- Gate: `node g5-check.js` (default Play by touch at 390x844 + 375x667 to the result: min spot/target 47 px, result text 14px / 12.9:1, 0 errors).
+- r2: rules-test "salmon D" case expected a run of 2 to score; the published card D scores only runs of 3+ (1 per salmon + 1 per adjacent other animal). The engine was right; the test is fixed (+2 cases). rules-test green. Left: the ghost tile is still ~54 px.
