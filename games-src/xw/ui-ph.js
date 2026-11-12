@@ -76,9 +76,9 @@ PHN.openPop=function(kind,id){PHN.pop={kind,id};PHN.popSig=sigNow();if(typeof sf
 PHN.closePop=function(){if(!PHN.pop)return;PHN.pop=null;if(typeof V3!=='undefined')UI.hoverDial=null;render()};
 // ---- pop-ups (live in the dock zone: under the board in portrait, in the right rail in landscape; they never cover the mat) ----
 const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
-function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
+function dialPopHTML(s){const DG=shipDeg(s);const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
   let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const om=offMat(s,d[i]),rk=rockHits(s,d[i]);
-      return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${om?', leaves the mat: ship lost':rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${ic}${sug===i?'<em class="rs">★</em>':''}${om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':''}</button>`}).join('');
+      return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${om?', leaves the mat: ship lost':rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${rotIco(ic,s,DG)}${sug===i?'<em class="rs">★</em>':''}${om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':''}</button>`}).join('');
     if(cells.includes('data-pd'))g+=`<span class="pm-sp">${sp}</span>${cells}`}
   const read=pick!=null?moveRead(s,pick):`<span class="muted">Tap a maneuver: the ghost on the mat shows where ${nm(s)} ends. Rows are speed, arrows the direction.${sug>=0?` ★ is recommended.`:''}</span>`;
   return `<div class="pp-h"><b>${nm(s)} · set the dial</b><span class="pp-n">${my.length>1?`ship ${idx+1}/${my.length}`:''}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
@@ -112,7 +112,7 @@ function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps)
   <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
 // ---- the render hook ----
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
-function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown();
+function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown()+(G.ex&&G.ex.roundCap?'/'+G.ex.roundCap:'');
   const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
 function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
   if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};
