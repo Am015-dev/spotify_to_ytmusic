@@ -116,7 +116,7 @@ function aiStep(force){if(!G||G.phase==='over')return null;const s=sideToAct();i
 // Plays the real leviathan rules forward N times with one fixed dice stream (so equal positions get equal numbers): every roll before my next
 // turn, my own roll included (16/36 wakes them), each leviathan in arrow order rolls one die (1-5 its arrow, 6 = a new one rises on a rolled
 // square), swims off the chart, crushes the tile it enters (and a junk on it) and any leviathan there; fewer than 3 = the next turn refills
-// instead of rolling. Sunk = a leviathan enters my tile, or one sits on my bow square after my own roll. Rival tiles moving my junk are not counted.
+// instead of rolling. Sunk = a leviathan enters my tile, or one sits on my bow square after my own roll. Rival tiles that move or ram my junk are added by rivalRisk.
 function sinkRisk(B,seat,ev,N){const S=B.ships[seat];if(!S||!S.alive)return 1;if(S.x==null)return null;N=N||3000;
   const front=[S.x,S.y],on=S.on,rng=mkRng(0x2f6b1d37),gates=B.gates||[];
   if(ev==null){ev=B.ships.filter(s=>s.alive).length}
@@ -138,9 +138,30 @@ function sinkRisk(B,seat,ev,N){const S=B.ships[seat];if(!S||!S.alive)return 1;if
         mons=mons.filter(o=>o===m||!(o.x===tx&&o.y===ty));m.x=tx;m.y=ty}
       if(mons.length<3&&deck.length)refill=true}
     if(!died&&mons.some(m=>m.x===front[0]&&m.y===front[1]))died=true;if(died)dead++}
-  return Math.max(dead/N,1e-4)}  // a rising leviathan can land anywhere: never exactly 0 while any can rise or move
+  const rv=rivalRisk(B,seat,ev);return Math.max(1-(1-dead/N)*(1-rv),1e-4)}  // a rising leviathan can land anywhere: never exactly 0 while any can rise or move
+// rival tiles: before my next turn every rival ahead of me lays one tile on ITS bow square. If that is my bow square too, the tile moves my
+// junk as well (maybe off the edge or into a leviathan); and the rival's own new path can end on my mark (both junks sink). Each rival holds 3 unseen
+// tiles (sampled from the tiles not on the chart or in my hand) and plays like the computer: never a move that sinks itself when it has another,
+// and it takes a move that sinks me when it can (kill bonus), else 20% of the time a random safe one. Returns the chance some rival sinks me.
+function rivalRisk(B,seat,ev){const S=B.ships[seat];if(!S||!S.alive||S.x==null)return 0;
+  const alive=B.ships.filter(s=>s.alive&&s.i!==seat&&s.x!=null&&!sameTeam(B,s.i,seat));if(!alive.length)return 0;
+  let who=alive;if(ev!=null&&B.np){const ahead=[];for(let k=0;k<B.np;k++){const i=(B.first+k)%B.np;if(i===seat)break;ahead.push(i)}if(ev-1<alive.length)who=alive.filter(s=>ahead.includes(s.i))}
+  if(!who.length)return 0;const seen=new Set();for(const c of B.bd)if(c)seen.add(c[0]);for(const c of (B.hands&&B.hands[seat])||[])seen.add(c);
+  const pool=[];for(let t=0;t<56;t++)if(!seen.has(t))pool.push(t);if(!pool.length)return 0;
+  const rng=mkRng(0x51ab7c3+seat*977);let surv=1;
+  for(const R of who){if(!freeSq(B,R.x,R.y))continue;
+    // table: per unseen tile, per turn: does the rival sink itself, does it sink me
+    const tab={};let any=false;for(const t of pool){const row=[];for(let r=0;r<4;r++){const sim=simPlace(B,R.x,R.y,t,r);const rr=sim.res[R.i],me=sim.res[seat];
+        const rDie=!rr||rr.st==='edge'||rr.st==='mon'||sim.coll.includes(R.i),mDie=!!(me&&(me.st==='edge'||me.st==='mon'))||sim.coll.includes(seat);row.push([rDie,mDie]);if(mDie)any=true}tab[t]=row}
+    if(!any)continue;
+    let hit=0;const NS=160;
+    for(let n=0;n<NS;n++){const h=[];while(h.length<Math.min(3,pool.length)){const t=pool[Math.floor(rng()*pool.length)];if(!h.includes(t))h.push(t)}
+      const opts=[];for(const t of h)for(const o of tab[t])opts.push(o);const safe=opts.filter(o=>!o[0]);const use=safe.length?safe:opts;
+      const k=use.filter(o=>o[1]).length;if(!k)continue;hit+=safe.length?(.8+.2*k/use.length):k/use.length}
+    surv*=1-hit/NS}
+  return 1-surv}
 // rolls before a seat's first turn when it starts at a mark now: the players ahead of it in turn order, then its own roll
 function evFirst(K,seat){return ((seat-K.first+K.np)%K.np)+1}
 // the risk as words that never round a real chance down to "safe"
-function riskWord(p){if(p==null)return '';if(p<=0)return 'no leviathan can reach you before your next turn';const pc=Math.round(p*100);return (pc<1?'under 1%':pc+'%')+' chance a leviathan sinks or blocks you before your next turn'}
+function riskWord(p){if(p==null)return '';if(p<=0)return 'no leviathan can reach you before your next turn';const pc=Math.round(p*100);return (pc<1?'under 1%':pc+'%')+' chance you are sunk or blocked before your next turn'}
 function riskPct(p){if(p==null)return '';if(p<=0)return '0%';const pc=Math.round(p*100);return pc<1?'under 1%':pc+'%'}

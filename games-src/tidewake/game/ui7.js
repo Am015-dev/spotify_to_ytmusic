@@ -54,7 +54,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small>${dangerHTML()}</div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){let best='';try{const sb=!hotSeat()||humans().length===1?safeStart(knowledge(d),d):null,m=sb&&sb.m;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}" aria-label="Safest start: ${riskPct(sb.r1)} chance a leviathan blocks or sinks you before your first turn">Safest start &middot; ${riskPct(sb.r1)}</button>`}catch(e){}
-    return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
+    return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';let rm=null;try{rm=can&&!UI.tut?recMove(dd):null}catch(e){}
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
@@ -90,11 +90,16 @@ function phWhyBest(K,b,o){if(!b||!o||b.bad)return '';if(b.pc<o.pc)return '';cons
   return 'same odds; either is fine'}
 // the line under the tiles: what the chosen tile does, and the ★ best move with its real reason when this one is worse or only equal
 function phTileNote(K,d,hand,sel,rm){try{if(UI.tut||!isCur(hand[sel.t]))return '';const m={a:'place',t:sel.t,r:sel.r,s:sel.s};const o=phNote(K,d,m);
-  const isB=rm&&rm.a==='place'&&rm.t===m.t&&rm.r===m.r&&rm.s===m.s;if(isB)return `<b>&#9733; Best move:</b> ${phNoteTxt(o)}.`;
-  let h=(o.bad?'<b class="warn-l">&#10007; This way sinks you.</b>':o.pc>=15?`<b class="warn-l">&#9888; This way: ${phNoteTxt(o)}.</b>`:`This way: ${phNoteTxt(o)}.`);
-  if(rm&&rm.a==='place'){const ob=phNote(K,d,rm);if(!ob.bad){const tw=rm.t===m.t?'turn this tile':'tile '+(rm.t+1);const why=o.bad?'':phWhyBest(K,ob,o);
-    h+=` <b>&#9733; Best: ${tw}</b> (${riskPct(ob.rk)}${why?'; '+why:''}). <button class="pb small" data-a="sugg">Use &#9733;</button>`}}
-  return h}catch(e){console.error(e);return ''}}
+  // one short line (R25: max 12 words); the reasons sit behind the (i) button, opened on purpose
+  const isB=rm&&rm.a==='place'&&rm.t===m.t&&rm.r===m.r&&rm.s===m.s;const pc=x=>riskPct(x.rk)||'0%';
+  const keeps=x=>x.e&&x.e.info.n!=null?(x.e.info.n>0?`keeps ${Math.min(x.e.info.n,9)} move${x.e.info.n===1?'':'s'} open`:'next turn depends on your draw'):'';
+  const det=`<button class="pb small sdet" data-ph="stardet" aria-label="Why" aria-expanded="${PH.det?'true':'false'}">i</button>`;
+  let h,full;
+  if(isB){h=`<b>&#9733; Safest:</b> ${pc(o)} risk${keeps(o)?', '+keeps(o):''}`;full=`<b>&#9733; Safest move:</b> ${phNoteTxt(o)}.`}
+  else{h=o.bad?'<b class="warn-l">&#10007; This way sinks you.</b>':o.pc>=15?`<b class="warn-l">&#9888; This way: ${pc(o)} risk.</b>`:`This way: ${pc(o)} risk.`;full=`This way: ${phNoteTxt(o)}.`;
+    if(rm&&rm.a==='place'){const ob=phNote(K,d,rm);if(!ob.bad){const tw=rm.t===m.t?'Turn it':'Tile '+(rm.t+1);const why=o.bad?'':phWhyBest(K,ob,o);
+      h+=` <b>&#9733; ${tw}: ${pc(ob)}</b> <button class="pb small" data-a="sugg">Use &#9733;</button>`;full+=` <b>&#9733; Best: ${rm.t===m.t?'turn this tile':'tile '+(rm.t+1)}</b>: ${phNoteTxt(ob)}${why?' ('+why+')':''}.`}}}
+  return h+det+(PH.det?`<div class="sdetx" data-help role="note">${full} Risk counts leviathans and rival tiles.</div>`:'')}catch(e){console.error(e);return ''}}
 // each tile keeps its own turn (Turn used to turn all three previews at once)
 function phRot(t){return (UI.rots&&UI.rots[t])||0}
 function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
@@ -181,9 +186,14 @@ function phNeed(){if(!G||!UI.started)return null;const d=sideToAct();
   if(!G.over&&!UI.busy&&G.q&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat))return 'q';
   if(UI.sunk&&UI.sunk.length)return 'sunk';
   if(G.over&&!UI.busy&&PH.ovHide!==G.over)return 'over';
-  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy))return 'mph';
+  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy)){if(!UI.tut){phRollToast(UI.mph);PH.mphHide=UI.mph}else return 'mph'}
   if(!UI.busy&&!G.over&&(UI.confirm||UI.guide==='full'&&nextLesson()))return 'coach';
   return null}
+// the wake roll outside the tutorial: a one-line toast over the board that never blocks a tap (R25: the card cost 2-19 taps a game)
+function phRollToast(mp){let t=document.getElementById('rtoast');if(!t){t=document.createElement('div');t.id='rtoast';t.setAttribute('role','status');t.setAttribute('aria-live','polite');document.body.appendChild(t)}
+  const show=()=>{if(!mp||mp.roll)return false;const who=G&&G.seats[mp.seat]?(mp.seat===youSeat()&&!hotSeat()?'You':nm(mp.seat)):'Roll';
+    t.innerHTML=`<b>${esc(who)} rolled ${mp.total}</b> ${mp.wake?'· leviathans wake!':'· calm sea'}`;t.className=mp.wake?'on wake':'on';clearTimeout(t._tm);t._tm=setTimeout(()=>{t.className=''},2600/(UI.tickRate||1));return true};
+  if(!show()){const iv=setInterval(()=>{if(UI.mph!==mp){clearInterval(iv);return}if(show())clearInterval(iv)},120);setTimeout(()=>clearInterval(iv),4000)}}
 const PH_SRC={pass:'#main .passbox',over:'#main [data-over]',q:'#main [data-qkind]',sunk:'#cards > *',mph:'#res .mph',coach:'#coach .coach:not(.light)'};
 function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():null;
   if(!kind){PH.cur=null;if(!pc.hidden){pc.hidden=true;pc.innerHTML=''}clearTimeout(PH.tmr);PH.tmr=0;try{phPopup()}catch(e){}return}
@@ -239,6 +249,7 @@ document.addEventListener('click',e=>{if(!PH.on)return;
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
     else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
+    else if(a==='stardet'){PH.det=!PH.det;sfx('click');render()}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}
     else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph'){if(!(typeof tutHold==='function'&&tutHold('mph')))PH.mphHide=UI.mph;if(UI.busy&&!NET.on){UI.skip=true;sleepFlush()}}else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}
     else if(a==='showover'){PH.ovHide=null;phAfter()}
