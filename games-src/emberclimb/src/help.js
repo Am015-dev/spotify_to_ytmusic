@@ -24,7 +24,7 @@
     { phase: 'rest', title: 'Campfire', text: 'Heal some HP, or smith to upgrade one card. Pick one.', pic: svg('rest') },
     { phase: 'shop', title: 'Shop', text: 'Tap an item to see it, then Buy. Cards, relics and potions cost gold.', pic: svg('shop') },
     { phase: 'event', title: 'Event', text: 'A choice with a price or a prize. Read each option, then pick one.', pic: svg('event') },
-    { title: 'Simplified on purpose', text: 'Numbers are 3 times the tabletop scale (a Strike deals 6).\nThe map is generated, not a printed board.\nSome cards and events roll a die.\nAll enemies, relics and events are our own; some card numbers are tuned.\nPotions drop by chance after fights (max 3).\n1 or 2 heroes, not 4.', pic: svg('climb') }
+    { title: 'Simplified on purpose', text: 'Numbers are 8 times the tabletop scale (a Strike deals 8). Foes and heroes use the same scale.\nA Quick climb is Act 1: its first-fight deck, normal and strong fights, 3 elites and a boss drawn from its 3 bosses.\nActs 2 and 3 are not built as Quick games; story chapters set there use our own foes.\nThe map is generated, not a printed board.\nSome cards and events roll a die.\nAll enemies, relics and events are our own; some card numbers are tuned.\nPotions drop by chance after fights (max 3).\n1 or 2 heroes, not 4.', pic: svg('climb') }
   ];
   function phase() { var gg = g(); if (!gg || (window.UI && UI.mode === 'title')) return null; return gg.scr === 'over' ? null : gg.scr; }
   UI.phase = phase;

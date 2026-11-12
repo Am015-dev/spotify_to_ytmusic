@@ -167,6 +167,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'ember-tyrant': { name: 'Ember Tyrant', hp: [210, 220], pat: [{ atk: 10, all: 1, add: ['burn', 2] }, { str: 3, blk: 20 }, { atk: 8, hits: 3 }, { atk: 30, vuln: 2 }], boss: 1, act: 4, art: 'horned fire demon striding out of a burning archway' }
   };
   var ENC = {
+    first: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['mire-slug', 'rust-tick']],   // the tabletop keeps a separate gentle 1st-encounter deck for the first fight
     weak: [['mire-slug', 'gnawer'], ['rust-tick', 'rust-tick'], ['ash-imp', 'ash-imp'], ['mire-slug', 'rust-tick']],   // the 40-HP Grub and Acolyte are strong-pool foes
     strong: [['bile-blob', 'rust-tick'], ['snare-vine', 'ash-imp', 'mire-slug'], ['gape-grub', 'gnawer'], ['hex-acolyte', 'rust-tick']],   // G3 r3: solo takes the lead foe; the weak Ash Imp pair moved to the weak pool
     elite: [['thorn-brute'], ['sleeper-statue'], ['iron-warden', 'iron-warden', 'iron-warden']],
@@ -233,7 +234,8 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
   // u(v, k): nearest whole tabletop unit, at least 1. k = video-game size of one tabletop unit: 5 for damage / Block (Strike 6 -> 1,
   // Defend 5 -> 1, Bash 8 -> 2), 8 for HP / healing / HP loss (hero 80 -> 10), 3 for Strength / Ritual / Poison token counts.
   function u(v, k) { var a = Math.abs(v), r = Math.max(1, Math.round(a / k)); return v < 0 ? -r : r; }
-  var KE = (typeof EC_KE !== 'undefined') ? EC_KE : [3.5, 3.5, 7, 4.5], KB = 0, EHPV = function (v) { return SCALE * u(v, KE[KB]); }, EDM = function (v) { return SCALE * u(v, KE[KB + 1]); };
+  var KE = (typeof EC_KE !== 'undefined') ? EC_KE : [8, 5, 8, 5],   // R21: foes use the SAME conversion as heroes (HP /8, damage and Block /5): one scale for both sides
+  KB = 0, EHPV = function (v) { return SCALE * u(v, KE[KB]); }, EDM = function (v) { return SCALE * u(v, KE[KB + 1]); };
   var DM = function (v) { return SCALE * u(v, 5); }, HPV = function (v) { return SCALE * u(v, 8); }, TOK = function (v) { return u(v, 3); };
   function ttOps(ops) {
     return ops.map(function (o) {

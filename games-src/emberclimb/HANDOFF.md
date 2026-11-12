@@ -39,3 +39,16 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - Juice + addendum 5 (ui.js W420 parts, head.html W420 blocks, sound.js): hit-stop + shake, flying numbers, draw/play animations, pulsing intents, boss intro video (UI.bossIntro, ?scn=bossintro), victory fanfare, rarity glow, damage preview per foe (E.previewPlay), Incoming chip, reason pops, reward/path value hints, one-line fight rating.
 - Not done: KayKit renders and game-icons badges (no local packs; normal foes stay pixel art next to illustrated bosses), owner UI plates (ui-panel/buttons) not wired, 1-4 players, tutor-test.js still expects 7 guide steps (fails the same on the previous commit), visual baselines need owner approval.
 - W420 urgent (8 Nov 02:00): enemy tap restored (`tools/tap-enemy.js`, touch + mouse, wins a fight). ALL pictures are now owner Doorkick art: `owner-art/install.py` maps every slot (heroes, foes, cards, relics, potions, events, rooms, backgrounds) to doorkick-dungeon media/cards and removes anything else; contact sheet `playable-shots/v4-contact-sheet.webp`.
+
+## R21 fixes (12 Nov 2026)
+- Difficulty: foes now use the same tabletop conversion as heroes (data.js KE = [8, 5, 8, 5]: HP /8, damage and Block /5, x SCALE 8).
+  Before, foes were converted at /3.5 (harsher than the hero cards). First fight draws from a gentle 1st-encounter pool (ENC.first), like the
+  tabletop's separate 1st Encounter deck. Bench: `node bench-newcomer.js 300 w` (no AI moves, reads intents, blocks when hit, attacks the weakest).
+  Before: floor 1 survived 99%, boss reached 37%, boss beaten 11%. After: 100% / 84% / 47% (Rogue 61%).
+- Touch proof: `VW=375 VH=667 RUNS=3 node tools/newcomer-taps.js` (Quick, real taps), `TUT=1 ...` (coached climb).
+- Fidelity: Strength / Poison chips show the x8 value; Quick game is Act 1 only (setup no longer offers 3 acts; acts 2-3 used shelf-made foes),
+  boss drawn at random from the 3 act-1 bosses; rules drawer says so. Campfire no longer names the tabletop. Story chapters in later acts keep
+  shelf-made foes (said in the rules drawer).
+- Coach "Fully blocked" only after a real attack was fully blocked (stale hp0 cleared).
+- Elite reward at 375x667: compact potion/relic rows, Skip + Continue in one sticky row: everything fits.
+- Not confirmed online: the boss split timing (rulebook PDF host was down); kept as is.

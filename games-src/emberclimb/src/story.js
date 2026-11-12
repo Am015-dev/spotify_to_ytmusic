@@ -91,7 +91,7 @@ window.EC_STORY = {
       lose: 'If your HP hits 0, the climb ends.',
       preview: 'Hints on: lifting a card shows the damage to each foe.',
       frail: 'Frail: your Block cards give a quarter less while it lasts.',
-      acts: 'A full climb has three acts plus a finale. Each heals you.',
+      acts: 'This chapter is set in a later act. A new act heals you.',
       laststand: 'Two heroes vs a boss: the first fall leaves 1 HP.',
       shiv: 'Shivs: 0-cost knives that hit for 3. At most 5 in hand.',
       orbs: 'Orbs: Lightning zaps, Frost blocks, Dark grows.',

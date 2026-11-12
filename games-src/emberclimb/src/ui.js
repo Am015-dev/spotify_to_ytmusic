@@ -256,7 +256,7 @@
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
     var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
-    mid.appendChild(seg);
+    UI.acts = 1; mid.appendChild(h('div', 'refline', 'One act: 9 floors, then a boss drawn at random.'));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
     var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
     var wrap = h('div', '', null, [h('div', 'refline', UI.duo ? 'Two heroes, shared map. Pass the screen. Tap to pick both.' : 'Tap a hero to pick them. Use + Second hero to play together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
@@ -396,7 +396,7 @@
     t.addEventListener('click', function () { t.remove(); }); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.remove(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
     [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
     return w;
   }
@@ -628,7 +628,7 @@
   }
   function endTurn() {
     var g = G(); if (g.scr !== 'battle' || g.b.ph !== 'p' || UI.busy) return; if (!tutOk({ type: 'tap', w: 'end' })) return; UI.sel = -1;
-    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.bk0 = hh0.blk; if (UI.fs && hh0.en > 0 && hh0.hand.some(function (c) { return playable(hh0, c) && E.eff(c).type !== 'X'; })) UI.fs.waste += hh0.en; } catch (e) { }
+    try { var hh0 = g.hs[g.b.cur]; if (UI.coachReact && hh0 && hh0.en > 0 && hh0.hand.some(function (c) { return E.canPlay(hh0, c) && E.cost(hh0, c) <= hh0.en && E.eff(c).type !== 'X'; })) UI.coachReact('poor', 'leftover'); UI.hp0 = hh0.hp; UI.inc0 = g.b.en.reduce(function (t, e, i) { return t + (!e.dead && e.intent && e.intent.atk ? E.previewHit(i, g.b.cur) : 0); }, 0); UI.bk0 = hh0.blk; if (UI.fs && hh0.en > 0 && hh0.hand.some(function (c) { return playable(hh0, c) && E.eff(c).type !== 'X'; })) UI.fs.waste += hh0.en; } catch (e) { }
     E.performMove({ t: 'end' }); render();
     if (G().scr === 'battle' && G().b.ph === 'e') enemyPhase(); else render();
   }
@@ -645,7 +645,7 @@
     if (!window.ANIM) { E.settle(); render(); return; }
     UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
     var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
-    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0) UI.coachReact('good', 'blocked'); } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
+    var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0 && UI.inc0 > 0) UI.coachReact('good', 'blocked'); UI.hp0 = null; } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
     UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
       var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
@@ -674,13 +674,14 @@
     // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
     if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
     if (r.relics) { var rl = h('div', 'picks'); r.relics.forEach(function (id, i) { if (!id) return; var tk = !!r.took['r' + i], gone = !tk && !!r.took.relic; var b = on(h('button', 'item' + (tk || gone ? ' taken' : ''), null, [A('relic-' + id, D.RELICS[id].name, { ph: '#8a6a2a' }), h('b', '', (tk ? '\u2713 ' : '') + D.RELICS[id].name), h('span', '', tk ? 'Taken: in your relic bar' : gone ? 'Not taken' : D.RELICS[id].t)]), function () { if (tk || gone) return; E.performMove({ t: 'relic', i: i }); render(); }); if (tk || gone) b.disabled = true; b.style.width = '130px'; rl.appendChild(b); }); s.appendChild(rl); }
+    var act = h('div', 'rwact');   // R21: Skip + Continue in one row that sticks to the bottom of the reward, so it never falls below the fold
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) { s.appendChild(h('div', 'sub w7done', (UI.rwNote && UI.rwNote[rk + ':' + hi]) || 'Card choice done.')); return; } if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
       else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
       var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = '\u2713 ' + D.CARDS[id].name + ' added to your deck.'; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
-      s.appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
+      (g.hs.length === 1 ? act : s).appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
     });
-    var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; s.appendChild(lv);
+    var lv = on(h('button', 'btn', 'Continue'), function () { E.performMove({ t: 'leave' }); render(); }); lv.id = 'leave'; act.appendChild(lv); s.appendChild(act);
     hud(); app.appendChild(s);
   }
   // W420: one-line fight rating + reward value tags
@@ -715,7 +716,7 @@
   function rest() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
-    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP (the tabletop heal 3), or smith: upgrade one card for good.'));
+    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP, or smith: upgrade one card for good.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
     var amt = E.restHeal(g.hs[hi]);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';

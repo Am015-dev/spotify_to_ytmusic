@@ -280,7 +280,7 @@
   // rest: tabletop 'Heal 3 HP' on a ~10 HP board = 30%; at the shelf's 70-80 HP scale that is 30% of max HP (rules-notes R09)
   function restHeal(h) { return 3 * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
   function startBattle(kind) {
-    var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
+    var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights === 0 && P.first ? P.first : G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
     if (G.tutEnc && G.tutEnc[G.floor]) ids = G.tutEnc[G.floor].slice();   // coached first climb: fixed foes per floor (src/tutor.js)
     if (G.tutHp && G.tutHp[G.floor]) G.ehp = G.tutHp[G.floor];
