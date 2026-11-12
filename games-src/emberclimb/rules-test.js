@@ -14,27 +14,27 @@ E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
 ok(G.scr === 'battle' && G.hs[0].hand.length === 5 && G.hs[0].en === 3, 'fight starts: 5 cards, 3 energy');
 // R02 Vulnerable doubles after Strength; Weak -SCALE per hit
 const h = G.hs[0], e0 = G.b.en[0], SC = D.SCALE; h.hand = [E.mk('w-strike'), E.mk('w-hammer'), E.mk('w-defend')]; h.en = 3; e0.hp = e0.mhp = 100; e0.blk = 0; e0.st = {}; h.st = {};
-E.performMove({ t: 'play', h: 0, c: 1, e: 0 }); ok(e0.hp === 92 && e0.st.vuln === 2, 'hammer: 8 dmg + vulnerable 2');
+E.performMove({ t: 'play', h: 0, c: 1, e: 0 }); ok(e0.hp === 100 - 2 * SC && e0.st.vuln === 2, 'hammer: 2 x SCALE dmg + vulnerable 2');
 h.hand.push(E.mk('w-hammer')); ok(h.en === 1 && !E.validMoves().some(m => m.t === 'play' && m.c === h.hand.length - 1), 'cost 2 card not playable with 1 energy');
-E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(e0.hp === 92 - 12, 'R02 vulnerable doubles: 6 x 2 = 12');
+E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(e0.hp === 100 - 4 * SC, 'R02 vulnerable doubles: Strike ' + SC + ' x 2');
 ok(e0.st.vuln === 1, 'R03 vulnerable loses 1 token per attack, not per round');
-h.st.str = 3; h.hand.push(E.mk('w-strike')); h.en = 1; E.performMove({ t: 'play', h: 0, c: h.hand.length - 1, e: 0 }); ok(e0.hp === 80 - 18, 'R02 strength then vulnerable: (6+3) x 2 = 18');
+h.st.str = 3; h.hand.push(E.mk('w-strike')); h.en = 1; E.performMove({ t: 'play', h: 0, c: h.hand.length - 1, e: 0 }); ok(e0.hp === 100 - 4 * SC - 8 * SC, 'R02 strength (each token = SCALE) then vulnerable: (1+3) x SCALE x 2');
 // helper: fresh fight, clean state
 function fresh(hs, seed) { E.newGame({ heroes: hs, seed }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); const g = E.G(); g.hs.forEach(x => { x.st = {}; x.blk = 0; }); g.b.en.forEach(e => { e.hp = e.mhp = 200; e.blk = 0; e.st = {}; }); return g; }
 function playId(g, id, tgt, hi) { const x = g.hs[hi || 0]; x.hand.push(E.mk(id)); x.en = Math.max(x.en, 3); const mv = { t: 'play', h: hi || 0, c: x.hand.length - 1 }; if (tgt != null) mv.e = tgt; return E.performMove(mv); }
 G = fresh(['w'], 11); let hw = G.hs[0], t0 = G.b.en[0];
-hw.st.weak = 1; playId(G, 'w-strike', 0); ok(t0.hp === 200 - (6 - SC) && !hw.st.weak, 'R02 weak: -' + SC + ' per hit, spent by the attack');
+hw.st.weak = 1; playId(G, 'w-strike', 0); ok(t0.hp === 200 && !hw.st.weak, 'R02 weak: -' + SC + ' per hit, spent by the attack');
 hw.st.weak = 2; playId(G, 'w-defend'); ok(hw.st.weak === 2, 'R03 weak is not spent by a skill');
-t0.hp = 200; t0.st = { vuln: 2 }; hw.st = {}; playId(G, 'w-twin-slash', 0); ok(t0.hp === 200 - 20 && t0.st.vuln === 1, 'R03 multi-hit: both hits doubled, only 1 vulnerable spent');
+t0.hp = 200; t0.st = { vuln: 2 }; hw.st = {}; playId(G, 'w-twin-slash', 0); ok(t0.hp === 200 - 4 * SC && t0.st.vuln === 1, 'R03 multi-hit: both hits doubled, only 1 vulnerable spent');
 playId(G, 'w-roar'); playId(G, 'w-roar'); playId(G, 'w-roar'); playId(G, 'w-roar'); ok(t0.st.weak === 3, 'R03 weak capped at 3 tokens');
-t0.hp = 200; t0.st = { vuln: 1 }; hw.st = { weak: 1 }; playId(G, 'w-strike', 0); ok(t0.hp === 194 && !t0.st.vuln && !hw.st.weak, 'R04 weak attacker vs vulnerable target: neither applies, both lose 1');
+t0.hp = 200; t0.st = { vuln: 1 }; hw.st = { weak: 1 }; playId(G, 'w-strike', 0); ok(t0.hp === 200 - SC && !t0.st.vuln && !hw.st.weak, 'R04 weak attacker vs vulnerable target: neither applies, both lose 1');
 // R05 poison: end of the heroes' turn, 1 HP per token, tokens stay; cap 30 total
 G = fresh(['s'], 12); G.b.en.forEach(e => { e.st.poison = 0; }); t0 = G.b.en[0]; t0.st.poison = 4; G.hs[0].hand = []; E.performMove({ t: 'end' });
-ok(t0.hp === 196 && t0.st.poison === 4, 'R05 poison: lose 1 per token at end of turn, tokens stay');
-E.settle(); G.hs[0].hand = []; t0.st.poison = 28; G.hs[0].hand.push(E.mk('s-toxic-vial')); G.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(t0.st.poison === 30, 'R05 poison capped at 30 tokens');
+ok(t0.hp === 200 - 4 * SC && t0.st.poison === 4, 'R05 poison: lose SCALE per token at end of turn, tokens stay');
+E.settle(); G.hs[0].hand = []; t0.st.poison = 30; G.hs[0].hand.push(E.mk('s-toxic-vial')); G.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(t0.st.poison === 30, 'R05 poison capped at 30 tokens');
 // R06 wrath: +SCALE per hit dealt, no extra taken, end of turn in wrath costs SCALE HP; monk starts neutral
 G = fresh(['m'], 13); let mk = G.hs[0]; ok(mk.stance === 'n', 'R06 stance class starts every fight neutral');
-mk.stance = 'w'; t0 = G.b.en[0]; playId(G, 'm-strike', 0); ok(t0.hp === 200 - 6 - SC, 'R06 wrath: +' + SC + ' damage per hit');
+mk.stance = 'w'; t0 = G.b.en[0]; playId(G, 'm-strike', 0); ok(t0.hp === 200 - SC - SC, 'R06 wrath: +' + SC + ' damage per hit');
 G.b.en[0].intent = { atk: 10, tg: 0 }; ok(E.previewHit(0, 0) === 10, 'R06 wrath does not raise damage taken (previewHit)');
 mk.hand = []; const hpw = mk.hp; E.performMove({ t: 'end' }); ok(mk.hp === hpw - SC, 'R06 ending the turn in wrath costs ' + SC + ' HP');
 // R07 monk relic: Miracles, no calm start, no calm spark
@@ -45,7 +45,7 @@ mk.en = 6; mk.stance = 'c'; playId(G, 'm-empty-fist', 0); ok(mk.en === 6, 'R18 e
 mk.en = 3; mk.stance = 'c'; mk.hand.push(E.mk('m-empty-fist')); E.performMove({ t: 'play', h: 0, c: mk.hand.length - 1, e: 0 }); ok(mk.en === 4, 'R06 calm exit still gives 2 energy');
 // R17 strength cap 8, block cap 60
 G = fresh(['w'], 15); hw = G.hs[0]; hw.st.str = 7; playId(G, 'w-kindle'); ok(hw.st.str === 8, 'R17 strength capped at 8');
-hw.blk = 58; playId(G, 'w-defend'); ok(hw.blk === 60, 'R17 player block capped at 60');
+hw.blk = 20 * SC - 2; playId(G, 'w-defend'); ok(hw.blk === 20 * SC, 'R17 player block capped at 20 x SCALE');
 // R01 no hand cap
 hw.hand = []; for (let i = 0; i < 11; i++) hw.hand.push(E.mk('w-defend')); hw.draw = []; for (let i = 0; i < 6; i++) hw.draw.push(E.mk('w-strike'));
 playId(G, 'w-second-wind'); ok(hw.hand.length === 13, 'R01 no hand cap (' + hw.hand.length + ' cards)');
@@ -66,14 +66,24 @@ E.performMove({ t: 'end' }); E.performMove({ t: 'end' }); E.settle(); ok(G.scr =
 // R10 two-hero enemy HP table; R11 class HP; R12 rogue starter
 E.newGame({ heroes: ['w', 'a'], seed: 20 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
 ok(G.b.en.every(e => { const r = D.ENEMIES[e.id].hp; return e.mhp >= Math.round(r[0] * D.EHP[2]) && e.mhp <= Math.round(r[1] * D.EHP[2]); }), 'R10 two heroes: enemy HP x' + D.EHP[2]);
-ok(D.H.w.hp === 80 && D.H.s.hp === 70 && D.H.a.hp === 75 && D.H.m.hp === 72, 'R11 class HP 80/70/75/72');
+ok(D.H.w.hp === 10 * SC && D.H.s.hp === 9 * SC && D.H.a.hp === 9 * SC && D.H.m.hp === 9 * SC, 'R11 class HP 10/9/9/9 x SCALE');
 ok(D.H.s.start.length === 12 && D.H.s.start.filter(x => x === 's-strike').length === 5 && D.H.s.start.filter(x => x === 's-defend').length === 5, 'R12 rogue starter 5 + 5 + 2');
 // R13 shiv: 3 damage own attack, max 5 held, none at start
 G = fresh(['s'], 21); let sr = G.hs[0]; ok(!sr.hand.some(c => c.id === 'shiv'), 'R13 combat starts with 0 shivs');
 playId(G, 's-knife-rain'); playId(G, 's-blade-fan'); ok(sr.hand.filter(c => c.id === 'shiv').length === 5, 'R13 max 5 shivs held');
 t0 = G.b.en[0]; E.performMove({ t: 'play', h: 0, c: sr.hand.findIndex(c => c.id === 'shiv'), e: 0 }); ok(t0.hp === 200 - SC, 'R13 shiv deals ' + SC);
-// R09 rest heals 3 x SCALE
-E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === hr + 3 * SC, 'R09 rest heals ' + 3 * SC);
+// R09 rest heals 30% of max HP (tabletop: heal 3 of ~10 HP)
+E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === Math.min(G.hs[0].mhp, hr + 3 * SC) && 3 * SC === Math.round(0.3 * D.H.w.hp), 'R09 rest heals 3 x SCALE (30% of the 80 HP Warrior)');
+// R28 ONE SCALE: every damage, Block, HP, heal, HP-loss and gold number is a whole tabletop value x SCALE
+{ const bad = []; const m = (v, w) => { if (typeof v === 'number' && v % SC !== 0) bad.push(w + '=' + v); };
+  const ops = (o, w) => o.forEach(x => { const k = x[0]; if (['dmg', 'blk', 'all', 'heal', 'loss', 'dmgx'].includes(k)) m(x[1], w + ':' + k); if (k === 'hit') m(x[2], w + ':hit'); if (k === 'power' && (x[1] === 'plated' || x[1] === 'mental')) m(x[2], w + ':' + x[1]); if (k === 'roll') [x[1], x[2], x[3]].forEach(r => ops(r, w)); });
+  Object.values(D.CARDS).forEach(c => { ops(c.ops, c.id); ops(E.upOps ? E.upOps(c.ops) : [], c.id + '+'); });
+  Object.entries(D.ENEMIES).forEach(([id, e]) => { m(e.hp[0], id); m(e.hp[1], id); const f = p => { if (p.die) return p.die.forEach(f); m(p.atk, id + ':atk'); m(p.blk, id + ':blk'); m(p.spikes, id + ':spikes'); }; e.pat.forEach(f); });
+  Object.values(D.H).forEach(x => m(x.hp, x.k + ':hp'));
+  Object.entries(D.EVENTS).forEach(([id, ev]) => ev.o.forEach(o => [o.do].concat(o.roll || []).forEach(d => { if (d) ['heal', 'hp', 'mhp', 'gold'].forEach(k => m(d[k], id + ':' + k)); })));
+  E.newGame({ heroes: ['w', 'm'], seed: 41 }); m(E.G().gold, 'start gold'); E.debug.shop(); E.G().shop.items.forEach(it => m(it.p, 'price ' + it.id)); m(E.G().shop.rm, 'removal');
+  ok(!bad.length, 'R28 one scale: all numbers are tabletop x ' + SC + (bad.length ? ' BAD ' + bad.slice(0, 8).join(' ') : ''));
+  ok(D.CARDS.shiv.ops[0][1] === SC && D.CARDS['w-strike'].ops[0][1] === SC && D.CARDS['w-defend'].ops[0][1] === SC && D.H.w.hp === 10 * SC, 'R28 anchors: Strike 1, Defend 1, Shiv 1, hero 10 HP (x SCALE)'); }
 // R14 treasure: each hero gains a relic
 E.newGame({ heroes: ['w', 'a'], seed: 23 }); E.debug.treasure(); G = E.G(); ok(G.rw.relics.length === 2 && E.performMove({ t: 'relic', i: 0 }) && E.performMove({ t: 'relic', i: 1 }) && G.rw.took.relic, 'R14 treasure: each hero takes a relic');
 // R15 boss relics: 1 per hero + 1 (3 solo), each hero takes one; R16 boss cards come from the rare deck
@@ -100,7 +110,7 @@ E.newGame({ heroes: ['w'], seed: 32, acts: 3, final: 1 }); G = E.G(); ok(G.acts 
 E.newGame({ heroes: ['w'], seed: 33, startAct: 4 }); G = E.G(); ok(G.act === 4 && G.boss === 'ember-tyrant', 'R25 a chapter can start in the final act');
 E.performMove({ t: 'go', n: E.validMoves()[0].n }); const a4ids = Object.keys(D.ENCA[4]).reduce((a, k) => a.concat(...D.ENCA[4][k]), []); ok(G.b.en.every(e => a4ids.indexOf(e.id) >= 0), 'R25 final-act fights use the act 4 deck');
 // R26 frail: an enemy applies Frail, block cards give 25% less while it lasts
-E.newGame({ heroes: ['w'], seed: 34, startAct: 2 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.hs[0].st = { frail: 1 }; G.hs[0].blk = 0; playId(G, 'w-iron-skin'); ok(G.hs[0].blk === 6, 'R26 frail: 8 block becomes 6');
+E.newGame({ heroes: ['w'], seed: 34, startAct: 2 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.hs[0].st = { frail: 1 }; G.hs[0].blk = 0; playId(G, 'w-iron-skin'); ok(G.hs[0].blk === Math.floor(2 * SC * 0.75), 'R26 frail: 2 x SCALE block loses 25%');
 ok(D.ENEMIES['ash-wisp'].pat[0].frail === 2 && D.ENEMIES['tomb-king'].pat[0].frail === 2, 'R26 act 2/3 foes apply Frail');
 // R27 last stand: boss fight, 2 heroes, the first fall leaves that hero at 1 HP with Weak 3; the second fall loses
 E.newGame({ heroes: ['w', 's'], seed: 35, boss: 'mire-behemoth' }); G = E.G(); E.debug.boss();
@@ -110,10 +120,10 @@ E.newGame({ heroes: ['w'], seed: 36, boss: 'mire-behemoth' }); G = E.G(); E.debu
 // R23 merchant: 3 cards per hero, 3 relics + 3 potions, first relic/potion one step cheaper
 E.newGame({ heroes: ['w', 'm'], seed: 28 }); E.debug.shop(); G = E.G(); const its = G.shop.items, rel = its.filter(x => x.t === 'relic'), pts = its.filter(x => x.t === 'pot');
 ok(its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'w').length === 3 && its.filter(x => x.t === 'card' && D.CARDS[x.id].hero === 'm').length === 3 && rel.length === 3 && pts.length === 3, 'R23 merchant: 3 cards per hero, 3 relics, 3 potions');
-ok(pts[0].p === pts[1].p - 25 && rel[0].p === (D.RELICS[rel[0].id].rar === 'u' ? 195 : 125), 'R23 merchant: first relic and potion 25 (one gold unit) cheaper');
+ok(pts[0].p === pts[1].p - SC && rel[0].p === SC * (D.RELICS[rel[0].id].rar === 'u' ? 8 : 5), 'R23 merchant: first relic and potion one coin (SCALE gold) cheaper');
 // UI contract: plain-word keyword lines
 const ln = id => E.lines(E.eff({ id, u: 0 })).join(' ');
-ok(/Retain/.test(ln('m-judgment')) && /Scry 3/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && /Shivs \(3-damage/.test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');
+ok(/Retain/.test(ln('m-judgment')) && /Scry 3/.test(ln('m-third-eye')) && /Miracle/.test(ln('m-zen-burst')) && /Shivs \(8-damage/.test(ln('s-blade-fan')), 'lines: Retain, Scry, Miracle, Shiv described');
 // dice: clover relic and lucky potion
 E.newGame({ heroes: ['w'], seed: 1 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
 { const h = G.hs[0];
@@ -121,7 +131,7 @@ G.lucky = 1; const before = G.q.length; h.hand = [E.mk('w-wild-swing')]; h.en = 
 E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(G.q.slice(before).some(f => f.k === 'die' && f.n === 6) && hp0 - t0.hp >= 14, 'fortune die forces a 6: wild swing deals 14');
 h.hand = [E.mk('wound'), E.mk('burn')]; ok(!E.validMoves().some(m => m.t === 'play'), 'status cards are unplayable'); }
 // orbs
-E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
+E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.b.en.forEach(e => { e.hp = e.mhp = 200; });   // sturdy foe so evokes cannot end the fight
 let a = G.hs[0]; ok(a.orbs.length === 1 && a.orbs[0].k === 'L', 'spark core: starts with a lightning orb');
 a.hand = [E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap')]; a.en = 9; for (let i = 0; i < 4; i++) E.performMove({ t: 'play', h: 0, c: 0 });
 ok(a.orbs.length === 3, 'only 3 orb slots: the oldest orb is evoked when full');

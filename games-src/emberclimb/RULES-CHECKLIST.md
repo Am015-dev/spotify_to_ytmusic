@@ -82,3 +82,11 @@ Rules whose exact text I could not confirm (the solo-start die effect, the openi
 58. Ascension levels 1-13 (lose max HP, potion limit 2, starting curse, small post-boss heal, dearer removal, start damaged...). OPTIONAL. NB: not built.
 59. Act IV (Ruby / Sapphire / Emerald keys, extra elite and final boss). OPTIONAL. NB: not built.
 60. Transform (remove a non-curse card, gain the top card of the rewards deck). NB: not built, no event or room offers it.
+
+## Run structure (W494, from the video game the tabletop game comes from)
+61. Opening blessing: before floor 1 the party takes one free gift (8 max HP, 100 gold, a rare card, or a relic for 10 HP), then picks a floor-1 room.
+62. The rare-card blessing adds one rare class card to the deck.
+63. Event rooms draw from 12 events (the opening blessing is never drawn in a ? room).
+64. Events can sell potions; potions never exceed the potion slots.
+65. An event upgrade asks which card and upgrades exactly that one.
+66. Quick play is a full run by default: 3 acts, each ending with its boss, starting with the blessing.
