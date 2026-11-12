@@ -81,3 +81,16 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
   if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
   scCompute();const top=SC.bestTotal;if(!(top>0))return;const keep=UI.pick.filter(i=>{const x=SC.starts[i];return x&&x.best&&x.best.total>=Math.max(3,top*.45)});if(keep.length)UI.pick=keep}catch(e){}}})();
+// R20: once a group is lifted, only drops that still lead to a good ending glow (at least 70% of the best ending still open from here)
+function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;const sx=SC.starts[G.move.start];if(!sx)return null;const path=G.move.path;
+  const ok=sx.outs.filter(x=>{const q=x.o.path;if(q.length<=path.length)return false;for(let i=0;i<path.length;i++)if(q[i]!==path[i])return false;return true});
+  if(!ok.length)return null;let top=-1e9;for(const x of ok)top=Math.max(top,x.total);return ok.filter(x=>x.total>=top-1||x.total>=top*.7)}
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
+  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.q||UI.pendDj||UI.pendItem||!scMine())return;
+  if(!G.move){scCompute();return}
+  const good=scWalkOuts();if(!good)return;const n=G.move.path.length;const keep=UI.pick.filter(t=>good.some(x=>x.o.path[n]===t));if(keep.length)UI.pick=keep}catch(e){}}})();
+// which colour to drop on a step: keep the ending colour for the last drop, so the planned ending still works
+function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;const n=G.move.path.length;const hand=G.move.hand;
+  let best=null;for(const x of good)if(x.o.path[n]===ms[0].tile&&(!best||x.total>best.total))best=x;if(!best)return -1;const c=best.o.c;
+  const left=hand.length;if(left===1)return ms.findIndex(m=>m.c===c);
+  const nc=hand.filter(h=>h===c).length;let j=ms.findIndex(m=>m.c!==c);if(j<0||(nc<1))j=ms.findIndex(m=>m.c===c&&nc>1);return j}

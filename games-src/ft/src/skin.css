@@ -182,3 +182,31 @@ html body #bd #grid .tile .tv{font-size:14px!important}
  html body #grid .tile .tn{font-size:14px!important;line-height:16px!important;right:13px;letter-spacing:-1px;padding:0!important;overflow:visible!important}
  html body #bd #grid .tile .tv{min-width:14px;height:16px;line-height:16px!important;font-size:14px!important;padding:0 1px;right:0;bottom:0;letter-spacing:-.8px}
 }
+/* R20: short portrait phones (375x553) gave the board 137 px (25 px tiles, names cut): the seat chips drop their People/Goods line
+   and the goods market is one row of nine pictures, so the tiles get the room (names and counts never clipped) */
+html.short:not(.land) #seats .sch .s4{display:none}
+html.short:not(.land) .mrow{grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:2px}html.short:not(.land) .mrow .deckback i{width:20px;height:28px}
+html.short:not(.land) .mrow .mcard{height:44px!important;margin:0!important;padding:0!important}
+html.short:not(.land) .mrow .mcard .mn{display:none}
+html.short:not(.land) .mrow .mcard .mi{font-size:20px}
+/* R20: the people on a tile are clearly visible (figures sized to the tile, about 16 px on a 375 phone, not 11x13), three across;
+   the count sits as a small badge on the figure; the whole tile is the tap target (44 px or more) */
+@media (max-width:700px){
+ html body #grid .tile .ms{gap:2px 2px!important;padding:0 3px 2px 1px!important}
+ html body #grid .tile .ms .mg{position:relative;height:auto!important;padding:0 0 2px!important;gap:0!important;background:none!important;box-shadow:none!important}
+ html body #grid .tile .ms .mg .mp{--ms:min(19px,calc((var(--cw) - 12px)/3))!important;filter:drop-shadow(0 1px 1px rgba(30,15,5,.75))!important}
+ html body #grid .tile .ms .mg b{position:absolute;right:-3px;bottom:-2px;min-width:14px;height:14px;padding:0 1px;box-sizing:border-box;border-radius:7px;background:#fff6dc;border:1px solid #6b3f12;text-align:center;font-size:13px!important;line-height:12px!important}
+}
+/* R20: score chips sit under the seat chip (never over its name and coins) and stay fully solid while readable */
+.ft{border:2px solid currentColor;animation:riseR20 1.4s ease-out forwards!important}
+@keyframes riseR20{0%{opacity:0;transform:translate(-50%,0) scale(.7)}10%{opacity:1;transform:translate(-50%,-10%) scale(1.1)}92%{opacity:1;transform:translate(-50%,-40%) scale(1)}100%{opacity:0;transform:translate(-50%,-45%) scale(1)}}
+@media (max-width:700px){html body #grid .tile .ms .mg b{bottom:1px}html body #grid .tile .ms .mg{padding-bottom:3px!important}}
+@media (max-width:700px){html body #grid .tile .ms>.mp{--ms:min(18px,calc((var(--cw) - 10px)/3.5))!important;--k:1!important}}
+/* tall phones (701px+): tile name at the bottom, people above it; the figures never reach down over the name */
+@media (max-width:700px) and (min-height:701px){html body #grid .tile .ms{bottom:21px!important;overflow:visible}html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 12px)/3),calc(var(--ch) - 52px))!important}}
+@media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 12px)/3),calc(var(--ch) - 25px))!important}}
+/* three figures always fit side by side (no wrap that pushes them over the name): 1px gaps, badge kept inside the tile */
+@media (max-width:700px){html body #grid .tile .ms{gap:1px 1px!important;padding:0 0 2px!important}html body #grid .tile .ms .mg b{right:-1px}
+ html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3))!important}}
+@media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 25px))!important}}
+@media (max-width:700px) and (min-height:701px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 52px))!important}}

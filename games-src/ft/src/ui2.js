@@ -47,12 +47,13 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
-    if(G&&G.over)return;   // no score chips over the result card
-    const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+' pts';   // every chip says whose points and that they are points
-    const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):ctr(se.getBoundingClientRect());floatText(lab,at,d>0?'up':'dn')})}
+    if(G&&G.over)return;   // no score chips over the result card; the chip sits under the seat, never over its name and coins
+    const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
+    const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
 // the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
 function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
   if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
+  if(typeof scStepBest==='function'&&c.opts.length&&c.opts.every(o=>o.m&&o.m.act==='step')){const j=scStepBest(c.opts.map(o=>o.m));if(j>=0)return j}
   const ms=c.opts.map(o=>o.m);if(ms.every(m=>m.act==='tribe'&&m.kill)){const b=bestKill(hp,ms);const j=ms.indexOf(b);if(j>=0)return j}}catch(e){}return 0}
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
