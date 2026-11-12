@@ -8,6 +8,7 @@ games/<slug>/ media and played with Playwright touch (isMobile, hasTouch, `touch
 |---|---|---|---|
 | stitchwise | 7.5 | PASS | 2 Tutorial 7, 5 Phone 7, 6 AI/pacing 7, 7 Feel 7 |
 | rampart-and-vine | 7.5 | PASS | 4 Turn clarity 7, 5 Phone 7, 6 AI/pacing 7, 7 Feel 7 |
+| short-fuse | 7.4 | FAIL | 6 AI/pacing 6; 2, 4, 5, 7 at 7 |
 
 ---
 
@@ -93,3 +94,48 @@ Each game: 36 of my turns, 211-221 s. My last tap to my next turn: median 3.8 s,
 - Row 2. Did: the majority step at 375. Happened: the coach bubble folds to "•••", only "Tap the lit tile to go on" shows; the board label says the rule, but two framed tiles (red and blue) make "the lit tile" unclear. Shot: rv-375-tut16-majority.png
 - Row 6. Did: 2 games of random play. Happened: lost 7-28 and 6-22 (farmers placed early and lost). A new player who taps without thinking will lose; one who claims roads and towns can win. Shots: rv-375-result.png, rv-390-s-result.png
 - Positive: rival turn caption "Cobalt placed a priory." and the follower step with four clear labelled spots. Shots: rv-375-mid.png, rv-375-figspots.png
+
+---
+
+## 3. short-fuse (shelf/W488-short-fuse-sprites @ 9d5a47e0)
+
+Played: "Learn to play" by touch to the end at 390 and 375 (22 steps, 10 of them Next-only, 27 taps, 43 s), then "Play job 1"
+and "Next job" by touch, default settings (3 crew, Normal). The player reads only the screen (tokens, cut wires, low-to-high
+order), takes free solo cuts, and otherwise points at the crew wire whose clues best fit a number it holds.
+- 390: job 1 won (24 s, 8 taps), job 2 won (37 s, 13 taps), job 3 lost, red cut (39 s, 15 taps); job 4 lost, fuse out (28 s, 11 taps).
+- 375: job 1 won (27 s, 9 taps), job 2 won clean (34 s, 11 taps), job 3 lost, red cut (39 s, 15 taps); job 4 lost, fuse out (32 s, 9 taps).
+- Size checks at 375: job 4 with 2 crew (lost, 32 s), job 12 with 5 crew (won 53/53, 83 s).
+My last tap to my next turn: median 4.0-4.9 s with 3 crew, 2.3 s with 2 crew, 9.2 s (max 13.3 s) with 5 crew.
+0 page errors, 0 console errors, 0 stuck states, 0 dead taps; every tap centre hit its own button.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 8 | Dual cut, solo cut, yellow only matches yellow, red pointed at = boom, a red-only hand reveals itself, info token on a miss, validation, equipment after 2 cuts of its value, fuse length by crew size, foreman with 2 stands at 3 crew. House rule (no cut in four rounds explodes) is disclosed in Rules. |
+| 2 | Tutorial teaches | 7 | 22 one-line steps, every core rule, real taps for token, dual cut, Twin Probe miss, Rewind, yellow, red and solo cut, then job 1. The red tap now explains itself ("Tap your red: never say red or point at one."). But 10 of 22 steps are still Next-only reading (goal, mine, crew, fuse, tokens2, hit, crew1, wrongres, crew2, win). |
+| 3 | First 10 seconds | 8 | One-line pitch, big Play, "Learn to play"; the job card has the goal, 3 bullets, a tip and a clean-job goal. |
+| 4 | Turn clarity | 7 | "Plum is choosing", "Everyone shows a wire", Red at / Yellow at strip, tappable name plates, brief-card tips. At 375 the "Stand 1" tag still sits on the top of the foreman's first wire row. |
+| 5 | Phone play | 7 | Fixed: every wire is 44x49 px or larger in jobs 1-4 and 12 at 2, 3 and 5 crew (390: mine 58x77 in job 1); name plates 114-136x44; a crowded crew area scrolls with a "▾ more wires below" cue. Not fixed: the 5 header icons (Job card, Equipment, How to play, Hints, Menu) are 40x44. |
+| 6 | AI and pacing | 6 | Job 1 is still 24-27 s and 8-9 taps (R8: 25-31 s, 6-8 taps); job 2 34-37 s. Then a steep wall: my screen-reading player lost jobs 3 and 4 at both sizes (0 of 4; 2 by a red cut, 2 by the fuse at 22/51). With 5 crew each of my turns waits 9 s (max 13 s). |
+| 7 | Feel | 7 | SNIP stamp, shake on a miss, validation ticks fill in, art-led DEFUSED / BOOM cards with "Next job / Again / Jobs". |
+| 8 | Bugs | 9 | 2 tutorials + 10 jobs: 0 errors, 0 stuck, 0 dead taps; every job reached its result card. |
+| | **Total** | **7.4** | **FAIL**: row 6 is below 7. No stopper. |
+
+### Earlier findings (R8)
+| R8 finding | Status | Evidence |
+|---|---|---|
+| Row 5: crew wires 25x33, own 30x40 at 375 from job 4 | **Fixed**: 44x49 minimum in jobs 1-4 and 12, 2-5 crew, with a scroll cue | R18-shots/sf-375-j4-job1-start.png, sf-375-c5j12-job1-start.png, sf-375-c2j4-job1-start.png |
+| Row 5: name plates 26 px tall | **Fixed**: 44 px tall | sf-375-j4-job1-start.png |
+| Row 5: header icons 40x44 | **Not fixed**: still 40x44 | sf-375-job2-brief.png |
+| Row 4: "Stand 1" label on the first wire at 375 | **Not fixed** | sf-375-j4-job1-start.png |
+| Row 2: red tap does nothing | **Partly fixed**: the tap now explains the rule; the reveal is still automatic on the last line | sf-375-tut20-red.png |
+| Row 2: 10 of 22 steps Next-only | **Not fixed** | sf-375-tut06-tokens2.png |
+| Row 6: job 1 is 25-31 s, 6-8 taps | **Not fixed**: 24-27 s, 8-9 taps; brief tips and a clean-job goal were added | sf-375-job1-result.png, sf-390-job1-result.png |
+| Row 6: jobs 2-4 won 3 of 7 | **Worse in my runs**: jobs 2 won 2 of 2, jobs 3-4 won 0 of 4 (3 crew) and 0 of 1 (2 crew) | sf-375-job3-result.png, sf-375-j4-job1-result.png |
+| Row 4: scissors badges and gear cards unnamed | **Not re-checked** in detail | n/a |
+
+### New findings
+- Row 6. Did: chained jobs 1-4 with "Next job" at both sizes. Happened: jobs 1-2 are won in 24-37 s with 8-13 taps; job 3 ended "BOOM! A red wire was cut" both times and job 4 "The fuse ran out" at 22/51. Shots: R18-shots/sf-375-job3-result.png, sf-375-j4-job1-result.png
+- Row 6. Did: job 12 with 5 crew at 375. Happened: 83 s for 12 of my taps; I waited 9.2 s median and 13.3 s max between my turns. Shot: sf-375-c5j12-job1-result.png
+- Row 5. Did: measured the top bar in every job. Happened: Job card / Equipment / How to play / Hints / Menu are 40 px wide. Shot: sf-375-job2-brief.png
+- Row 4/5. Did: job 4 at 375. Happened: the "Stand 1" tag overlaps the top of the foreman's first wire row; the "▾ more wires below" cue is clear. Shot: sf-375-j4-job1-start.png
+- Positive: job cards now carry a tip and a clean-job goal ("Tip Yellows match only yellow", "★ Clean job: at most 1 miss"). Shot: sf-375-job2-brief.png
