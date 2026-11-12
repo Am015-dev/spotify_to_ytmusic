@@ -109,7 +109,7 @@ Weak takes off 3), so the scaling stays mixed.
 | 3 | First 10 seconds | 7 | Big "New here? Learn in 5 minutes" button; step 1 points at the boss's intent with "Goal: beat the boss on top." |
 | 4 | Turn clarity | 6 | "Incoming 5" on the hero, glowing playable cards. But the prompt pill "Tap a glowing card to pick it. You have 3 energy." sits on the enemy's intent icon at the top (and repeats in the bottom bar), and coach toasts ("A relic: a lasting bonus...") cover HP, gold, Hints and Rules. |
 | 5 | Phone play | 6 | Fixed: text 14 px+ (measured), hand inside the screen at 375 (x 6..368), potions 44x44. Not fixed: coach toasts over the top bar; at 375 the second elite foe is cut at the right edge; reward card text is cut ("Deal 7. Channel..."); on the result the deck grid runs under Play again / Title. In the optional two-hero mode 7 cards overlap so names read "uic ut", and the third foe is cut off. |
-| 6 | AI and pacing | 6 | Foe turns are quick and the tutorial climb was won at both sizes. Quick game still defaults to "3 acts" (long for a phone); "1 act" is not offered on the hero screen at 375 next to it. |
+| 6 | AI and pacing | 6 | Foe turns are quick and the tutorial climb was won at both sizes. Quick game still defaults to "3 acts" (long for a phone); "1 act" is offered but not chosen by default. |
 | 7 | Feel | 7 | "+2 Dazed" splash, damage pops, cards fly, "Good fight: lost 0 HP" grade, boss art, "CLIMB WON!". |
 | 8 | Bugs | 7 | Two full climbs: 0 errors, 0 stuck, 0 dead taps. A stale coach toast ("The boss: when it falls, it splits into slimes") pops up on the result screen over "CLIMB WON!". |
 | | **Total** | **6.5** | **FAIL**: rows 1, 4, 5 and 6 are below 7. No stopper. |
