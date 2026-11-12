@@ -563,7 +563,7 @@ function pvSpot(kind, i) {
   if (kind === 'haven') return { main: 'Cards to goods', sub: '2 cards = any 1', ico: 'haven' };
   if (kind === 'journey') return { main: 'Journey', sub: 'Autumn only · 2-5\u00a0pts', ico: 'road' };
   if (kind === 'bev') { const dd = D.basicEvents[G.bev[i].k], t = Object.keys(dd.need || {})[0]; return { main: dd.name, sub: t ? 'Needs ' + dd.need[t] + ' ' + (PV_TCOL[t] || t) + ' · ' + dd.pts + '\u00a0pts' : dd.pts + '\u00a0pts', ico: 'flag' }; }
-  if (kind === 'sev') { const dd = D.specialEvents[G.sev[i].k], nm = (dd.req || []).map(k => { const c = D.cards.find(x => x.key === k); return c ? c.name : k; });
+  if (kind === 'sev') { const dd = D.specialEvents[G.sev[i].k], nm = (dd.req || []).map(k => { const c = D.cards.find(x => x.key === k); return c ? c.name.split(' ').pop() : k; });   // last word of each name keeps the plate under 8 words; the full names show when the goal is held
     return { main: dd.name, sub: (nm.length ? 'Needs ' + nm.join(' + ') + ' · ' : '') + sevPts(dd), ico: 'star' }; }
   return { main: '', sub: '', ico: 'any' };
 }
@@ -629,7 +629,7 @@ function pvChip(s, n) {
   const nm = s === viewSeat() && humans().length === 1 ? 'You' : pname(s);
   e.appendChild(pawn(s, 24));
   e.appendChild(h('span.pvch-t', h('b.pvch-n', n >= 4 ? nm.slice(0, 5) : nm), h('span.pvch-s', p && p.passed ? (innerWidth < 440 ? 'done' : cards + '/15 done') : cards + (innerWidth < 380 ? '/15' : '/15 city'))));
-  e.appendChild(h('b.pvch-pt' + (me ? '.rs' : ''), me ? { 'data-res': 'point' } : {}, h('span.pvch-star', '★'), String(pts)));
+  e.appendChild(h('b.pvch-pt.cp' + (me ? '.rs' : ''), me ? { 'data-res': 'point' } : {}, h('span.pvch-star', '★'), String(pts)));
   return e;
 }
 // ---- the view
@@ -637,7 +637,7 @@ function pvRender() {
   const host = $('#board'), bd = $('#bd'); if (!host || !bd || !G) return;
   const W = host.clientWidth || 390, H = host.clientHeight || 600;
   const tall = W < H && !document.documentElement.classList.contains('ph-l');
-  bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
+  bd.setAttribute('data-board', ''); bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
   const short = !tall && H < 560;   // phone landscape: the hand becomes a column on the right so the board keeps the height
   bd.className = 'pv ' + (tall ? 'tall' : 'wide') + (short ? ' short' : '');
   UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
@@ -710,7 +710,7 @@ function pvRender() {
     Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (0.6 + r * 99 / rows + (short ? 0 : col % 2 ? 1.2 : 0)) + '%';   /* rows hang from the top of their band, so nothing overlaps or leaves the board */ }); }
   // ---- goals (events): their own panel, so Places fits one screen
   const pGo = panel('goals', 'Goals: first to qualify claims'), gl = h('div.pv-spots.pv-goals.pv-scrolly'); pGo.appendChild(gl);
-  if (tall) gl.appendChild(h('div.pv-sub', 'Goals score points. Have the cards one needs? Send a worker to claim it.'));
+  if (tall) gl.appendChild(h('div.pv-sub', 'Cards fit a goal? Send a worker.'));
   const gcell = e => gl.appendChild(h('div.pv-cell', e));
   gcell(tile('journey', 0, true)); G.bev.forEach((x, i) => gcell(tile('bev', i, true))); G.sev.forEach((x, i) => gcell(tile('sev', i, true)));
   // ---- meadow: a swipeable row of big readable cards

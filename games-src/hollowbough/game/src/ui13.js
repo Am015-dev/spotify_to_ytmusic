@@ -246,5 +246,5 @@ document.addEventListener('pointerup', () => setTimeout(() => seeToastOff('hbpre
 
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#hintsbtn'); if (!b) return; UI.hints = !UI.hints; try { localStorage.setItem('hb_hints', UI.hints ? '1' : '0'); } catch (x) { } seeToastOff('hbprev'); seeToastOff('hbrate'); seeToastOff('hbover'); SEE.key = ''; render(); });
 (function () { const o = render; render = function () { const r = o.apply(this, arguments); try { const on = hintsActive(); document.documentElement.classList.toggle('hints-on', on); const b = $('#hintsbtn'); if (b) { b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.classList.toggle('on', on); b.hidden = !!(UI.cfg && UI.cfg.coached); }
-  if (typeof GXH !== 'undefined' && UI._gxhOn !== on) { UI._gxhOn = on; try { GXH.setEnabled(on); } catch (e) { } }
+  // help tips (GXH) follow their own Menu setting, on by default in every mode; the Hints toggle only drives previews and ratings
   if (!on) ['hbprev', 'hbrate', 'hbover'].forEach(seeToastOff); } catch (e) { } return r; }; })();

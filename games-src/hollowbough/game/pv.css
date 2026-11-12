@@ -239,7 +239,7 @@ html[data-bench] #bd.pv .pv-mead{background:url(media/bench.webp) center bottom/
 #bd.pv .pvm-pts .pvc-w{font-size:14px}
 /* W482: one steady instruction line in the bar (never two lines over the buttons); one hint button on phones */
 html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:1!important;display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-html.ph #bulbbtn{display:none!important}
+html.ph #bulbbtn{display:inline-flex!important;min-width:44px;min-height:44px}
 /* W482: coach bubble and small labels at 14px+ on phones (feel gate d) */
 html.ph .gxt-bub .gxh-tx{font-size:15px;line-height:1.3}
 html.ph .gxt-bub .gxh-tt{font-size:15px}
