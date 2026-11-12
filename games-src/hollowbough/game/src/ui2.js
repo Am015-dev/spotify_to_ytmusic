@@ -423,7 +423,9 @@ function renderActs(mm, qm, qShown) {
   const R = UI.lay; if (!R || !G) return;
   const old = $('#acts'); if (old) old.remove();
   const box = R.acts, a = placeBox(h('div#acts'), box); $('#bd').appendChild(a);
-  if (G.phase === 'over') return;
+  if (G.phase === 'over') {   // R24: after "Look at the board" the result is always one tap away
+    if (!UI.cards.length && !(UI.cfg && UI.cfg.tutorial)) { a.appendChild(h('button.btn.prep.glow', { 'data-a': 'reresult', type: 'button' }, h('span', 'See the result'))); if (!NET.on && !campOn()) a.appendChild(h('button.btn.pass', { 'data-a': 'again', type: 'button' }, h('span', 'Play again'))); }
+    return; }
   mm = mm || myMoves(); qm = qm || []; qShown = qShown || new Set();
   const act = HB.actor(G), p = G.players[act], mine = mm.length > 0;
   // choices (a question, or a card / place with several ways to use it)
@@ -636,7 +638,8 @@ function pvRender() {
   const W = host.clientWidth || 390, H = host.clientHeight || 600;
   const tall = W < H && !document.documentElement.classList.contains('ph-l');
   bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
-  bd.className = 'pv ' + (tall ? 'tall' : 'wide');
+  const short = !tall && H < 560;   // phone landscape: the hand becomes a column on the right so the board keeps the height
+  bd.className = 'pv ' + (tall ? 'tall' : 'wide') + (short ? ' short' : '');
   UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
   const mm = myMoves(), mine = mm.length > 0, v = viewSeat(), fs = focusSeat(), me = G.players[fs];
   const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
@@ -759,16 +762,16 @@ function pvRender() {
   // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
   // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
   const HW = 104, gapH = 6, fits = nH * ((tall ? HW : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (HW + gapH)));   // R10: 96+ wide so 14px names fit whole
-  const cw = !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
-  hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
+  const cw = short ? 112 : !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
+  if (!short) hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
   hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
   { const sc = hs.lastChild; const keep = () => { sc.style.transform = 'translateX(' + hs.scrollLeft + 'px)'; }; hs.addEventListener('scroll', keep, { passive: true }); requestAnimationFrame(keep); }   // the Hand label stays put while the cards scroll
   const x0 = fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8;
-  const hin = h('div.hin'); hin.style.cssText = `position:relative;width:${fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
+  const hin = h('div.hin'); hin.style.cssText = short ? `position:relative;width:100%;height:${24 + nH * (ch + gapH)}px` : `position:relative;width:${fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
   hand.forEach((id, i) => {
     const tg = 'p:hand:' + id, off = i - (nH - 1) / 2;
     const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) + ' (in hand)' }, pvFace(id, { small: true }));
-    b.style.cssText = `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
+    b.style.cssText = short ? `left:0;top:${20 + i * (ch + gapH)}px;width:${cw}px;height:${ch}px;--dy:0px;z-index:${i + 2}` : `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
     if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
     else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
     else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
@@ -796,7 +799,8 @@ function pvRender() {
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
-  hs.scrollLeft = fits ? 0 : (UI.hsx || 0); { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
+  if (short) { hs.scrollTop = UI.hsy || 0; hs.addEventListener('scroll', () => { UI.hsy = hs.scrollTop; }, { passive: true }); const g = hs.querySelector('.glow'); if (g && (g.offsetTop < hs.scrollTop || g.offsetTop + g.offsetHeight > hs.scrollTop + hs.clientHeight)) hs.scrollTop = g.offsetTop - 20; }
+  else hs.scrollLeft = fits ? 0 : (UI.hsx || 0); if (!short) { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
   renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
   if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
 }

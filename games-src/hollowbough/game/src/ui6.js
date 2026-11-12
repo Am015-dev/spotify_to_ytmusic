@@ -95,6 +95,7 @@ document.addEventListener('click', ev => {
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;
+    case 'reresult': if (G && G.phase === 'over' && !UI.cards.length) { UI.resultDone = true; queueOver(); } break;
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
     case 'menu': UI.camp = null; showStart(); break;

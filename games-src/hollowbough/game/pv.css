@@ -424,3 +424,18 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 #acts.tray .tchip.teff{flex:1 1 100%;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 10px;min-height:48px;height:auto}
 #acts.tray .tchip.teff b{text-align:left}
 #acts.tray .tchip.teff .eff{font-weight:500;line-height:1.2;text-align:left;white-space:normal}
+/* R24: phone landscape (wide and under 560 px high): the hand is a scrolling column on the right, the board keeps the full height */
+#bd.pv.wide.short .pv-col{display:grid;grid-template-columns:minmax(0,1fr) 124px;grid-template-rows:auto minmax(0,1fr);gap:6px 8px;padding:4px 10px 0}
+#bd.pv.wide.short .pv-hud{grid-column:1 / -1}
+#bd.pv.wide.short .pv-stage{grid-column:1;grid-row:2;gap:6px 10px;grid-template-rows:minmax(0,1fr) minmax(0,.8fr)}
+#bd.pv.wide.short .strip.hand.hscroll{grid-column:2;grid-row:2;height:auto;margin:0;padding-top:0;overflow-x:hidden;overflow-y:auto;scroll-snap-type:y proximity;overscroll-behavior:contain}
+#bd.pv.wide.short .strip.hand .hin{position:relative!important;bottom:auto}
+#bd.pv.wide.short .strip.hand .scount{left:4px;top:0;transform:none!important}
+#bd.pv.wide.short .strip.hand .hc{position:absolute;scroll-snap-align:start}
+#bd.pv.wide.short .pv-spots{grid-template-columns:repeat(3,minmax(0,1fr));overflow-y:auto}
+#bd.pv.wide.short .pv-stage{grid-template-columns:minmax(0,1.5fr) minmax(0,1.1fr) minmax(0,.75fr)}
+#bd.pv.wide.short .pv-spots{gap:5px}
+#bd.pv.wide.short .pv-spots .tile{min-height:52px}
+#bd.pv.wide.short .pv-sw b,#bd.pv.wide.short .pv-small .pv-sw b{font-size:13px;line-height:1.15}
+#bd.pv.wide.short .pv-h{font-size:14px;line-height:1.2}
+#bd.pv.wide.short .pv-mead{grid-template-columns:repeat(3,minmax(0,1fr))}

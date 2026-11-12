@@ -197,6 +197,22 @@ function tutOffer(go) {
 })();
 // a choice chip in the tray (not a board target) still tells the lesson, and only the asked-for one answers
 function tutGate(tg, sel) { if (!tutOn() || UI._tutIn) return true; if (sel) { const st = GXT.current(); if (!st || !st.sel) return true; } if (!G || UI.cards.length || UI.animBusy) return false; return !!GXT.act({ type: 'tap', tg: String(tg) }); }
+// While a tutorial step is up, only what the step spotlights may glow: places under the dim shield (or anything while the step is waiting
+// for Bramble) do not answer a tap, so they must not look tappable. The class is parked as .tgoff and comes back when its turn comes.
+function tutGlowSweep() {
+  const bd = document.getElementById('bd'); if (!bd) return;
+  const els = bd.querySelectorAll('.glow,.tgoff');
+  if (!tutOn()) { els.forEach(e => { if (e.classList.contains('tgoff')) { e.classList.remove('tgoff'); e.classList.add('glow'); } }); return; }
+  const st = GXT.state() || {}, holes = st.phase === 'show' && st.wait ? (st.holes || []) : [];
+  els.forEach(e => {
+    const r = e.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const lit = holes.some(h => cx >= h.left && cx <= h.left + h.width && cy >= h.top && cy <= h.top + h.height);
+    if (lit && e.classList.contains('tgoff')) { e.classList.remove('tgoff'); e.classList.add('glow'); }
+    else if (!lit && e.classList.contains('glow')) { e.classList.remove('glow'); e.classList.add('tgoff'); }
+  });
+}
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { tutGlowSweep(); } catch (e) { } return r; }; })();
+setInterval(() => { try { if (tutOn() || document.querySelector('#bd .tgoff')) tutGlowSweep(); } catch (e) { } }, 120);
 (function () { const o = doUndo; doUndo = function () { if (tutOn()) return; return o.apply(this, arguments); }; })();
 (function () { const o = nextCard; nextCard = function () { if (tutOn() && !UI._tutIn && UI.cards.length && UI.cards[0].kind !== 'pass') return; return o.apply(this, arguments); }; })();
 // ===================== part 14: the coached first game (replaces the forced tap-by-tap tutorial) =====================
