@@ -186,3 +186,4 @@ html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mo
 .hcue.r{right:2px}.hcue.l{left:2px}
 /* the "what to do now" line never cuts a word: it may take a second line */
 html.ph .bfline{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+#dkCard .gx-x{min-width:45px;min-height:45px}

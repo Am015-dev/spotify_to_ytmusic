@@ -22,7 +22,7 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
 // self-harm moves (curse yourself, boost your own monster) never glow; they stay in the card's details pop-up
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
 const BFSIDE=['berserk','turn','flight','toss','drop'];
-function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)&&!(m.act==='trouble'&&riskyCard(me,id))).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z&&!(x.z[0]==='p'&&+x.z.slice(1)>=G.pl.length)).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
+function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z&&!(x.z[0]==='p'&&+x.z.slice(1)>=G.pl.length)).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
@@ -129,7 +129,7 @@ function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingC
 setTimeout(()=>f.remove(),4100)}
 function bfRead(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
 function bfOne(){document.querySelectorAll('.bfbub').forEach(x=>x.remove())}
-function bfBubble(s,txt){if(!UI.hints&&!(typeof tutOn==='function'&&tutOn()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
+function bfBubble(s,txt){if(!UI.hints&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
 function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';bfOne();document.body.appendChild(b);b.addEventListener('click',()=>b.remove());setTimeout(()=>b.remove(),bfRead(txt))}
 function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
@@ -261,19 +261,19 @@ function dkGoalClose(){const o=document.getElementById('dkgoal');if(o)o.remove()
 document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkgoal');if(o&&Date.now()-(UI.goalAt||0)>250){e.preventDefault();e.stopPropagation();setTimeout(dkGoalClose,0);return}
   if(e.target.closest&&e.target.closest(document.documentElement.classList.contains('ph')?'#phchip':'#phchip,#docktitle')&&!document.querySelector('.gxh-bub,.gxh-card,#bfrev')&&typeof G!=='undefined'&&G)dkGoal()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
-(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof GXT!=='undefined'&&GXT.running&&GXT.running())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
 
 // tap to skip: during a rival's turn a tap on the table (not on a button, card or panel) closes the door reveal and runs the rest of that turn fast
-document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net'||(typeof tutOn==='function'&&tutOn()))return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
+document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net'||(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
   const t=e.target;if(!t.closest||!t.closest('.gx-board')||t.closest('#phopps,.opps,button,[data-mv],[data-a],[data-card],[data-opp],.gx-drawer,#modal,.gx-bar,.gxh-bub,.gxh-rules,#dkgoal,.hand'))return;
   UI.ff=G.turn;UI.hold=0;if(BF.revClose)BF.revClose();if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(x){}},true);
 // ---- the newcomer's guide: the advisor's best move gets the ★ (a card, or one pulsing button) and the line says it in words ----
 // Hints stay off for the old badges; this only marks ONE move: the one coach() would make (equip, beatable fight, one-shot, help, curse).
-function bfBest(me){if(me<0||!G||G.winner||sideToAct()!==me||!P(me).human||(typeof tutOn==='function'&&tutOn()))return null;let co;try{co=coach(me)}catch(e){return null}
+function bfBest(me){if(me<0||!G||G.winner||sideToAct()!==me||!P(me).human||(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return null;let co;try{co=coach(me)}catch(e){return null}
   const m=co&&co.rec;if(!m||m.act==='sell')return null;if((m.card!=null&&!['play','equip','give','toss','discard','unequip'].includes(m.act)&&!['berserk','turn','flight'].includes(m.act)))return {m,co,card:null};
   return {m,co,card:m.card!=null&&!['unequip'].includes(m.act)?m.card:null}}
 function bfBestLine(me,b){const m=b.m,c=m.card!=null?cd(m.card):null,fn=c?String(cname(m.card)).replace(/<[^>]+>/g,''):'',nm=fn,cb=G.cb;
-  if(b.card!=null){if(G.phase==='charity')return 'Too many cards: give away ★ '+fn;
+  if(b.card!=null){if(G.phase==='charity')return 'Give away ★ '+fn;
     if(c.t==='curse'&&typeof m.tgt==='number')return 'Curse '+P(m.tgt).nm+' with the ★ card';
     if(cb&&cb.who!==me&&cb.help!==me)return 'Stop '+P(cb.who).nm+' with the ★ card';
     if(cb)return bfCap('Tap the ★ card to win this fight',8);
@@ -285,14 +285,16 @@ function bfBestLine(me,b){const m=b.m,c=m.card!=null?cd(m.card):null,fn=c?String
     case 'pass':return G.phase==='window'?'Let '+curPl().nm+' go on':(cb&&winning(cb)?'Let the fight go on':'They’re losing: let it be');
     case 'opt':return m.opt==='yes'?'Tap Yes':'Tap No'}
   return null}
-function bfMarkBest(){const me=viewSeat();document.querySelectorAll('.bf-best').forEach(e=>e.classList.remove('bf-best'));const b=bfBest(me);if(!b||BF.pick!=null||BF.ask)return;
+function bfMarkBest(){const me=viewSeat();document.querySelectorAll('.bf-best').forEach(e=>e.classList.remove('bf-best'));if(typeof GXT!=='undefined'&&GXT.running&&GXT.running())return;const b=bfBest(me);if(!b||BF.pick!=null||BF.ask)return;
   const k=mvKey(b.m);let hit=false;
   if(b.card!=null){document.querySelectorAll(`.mine .hand .card[data-card="${b.card}"],.mine .gear .gchip[data-card="${b.card}"]`).forEach(e=>{e.classList.add('bf-best','sug');hit=true})}
   const btns=[...document.querySelectorAll('#prompt button[data-mv],.arena .fbtns button[data-mv],#prompt button[data-a="askmenu"],.arena button[data-a="askmenu"]')];
   for(const e of btns){let mk=null;try{mk=e.dataset.a==='askmenu'?(b.m.act==='ask'?k:'ask?'):mvKey(JSON.parse(e.dataset.mv))}catch(x){}
     if(!hit&&b.card==null&&mk===k){e.classList.add('bf-best','pulse','primary');hit=true}else e.classList.remove('pulse')}
   if(!hit&&b.m.act==='kick'){const d=document.querySelector('.bfdoor');if(d){d.classList.add('bf-best');hit=true}}
-  const t=hit?bfBestLine(me,b):null;if(t)bfSay(t)}
+  let t=hit?bfBestLine(me,b):null;if(t&&bfWords(t)>8)t=bfBestShort(me,b);if(t)bfSay(t)}
+const bfWords=t=>String(t).split(/\s+/).filter(Boolean).reduce((a,x)=>a+(x.split(/[-–—]+/).filter(Boolean).length||1),0);
+function bfBestShort(me,b){if(b.card==null)return null;if(G.phase==='charity')return 'Too many cards: give away ★';const c=cd(b.card);if(G.cb)return 'Tap the ★ card';if(c.t==='item')return equipWhy(P(me),b.card)?'Carry the ★ item':'Wear the ★ item';return 'Play the ★ card'}
 {const _a=bfAfter;bfAfter=function(S){const r=_a.apply(this,arguments);try{bfMarkBest()}catch(e){UI.lastErr='best '+e}return r}}
 // ---- a hand that scrolls says so: "+N ›" at the edge where cards are hidden (tap it to slide); the ★ card is slid into view ----
 function bfHandCue(){const hd=document.querySelector('.mine .hand');document.querySelectorAll('.hcue').forEach(e=>e.remove());if(!hd||!hd.classList.contains('scrolls'))return;
@@ -304,5 +306,3 @@ function bfHandCue(){const hd=document.querySelector('.mine .hand');document.que
   upd();if(!hd.dataset.cue){hd.dataset.cue='1';hd.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true})}}
 function bfRevealBest(){try{const b=document.querySelector('.mine .hand .card.bf-best');if(b&&typeof dkReveal==='function'&&BF.pick==null){const r=b.getBoundingClientRect(),q=b.parentElement.getBoundingClientRect();if(r.left<q.left||r.right>q.right)dkReveal(b)}}catch(e){}try{bfHandCue()}catch(e){}}
 {const _m=bfMarkBest;bfMarkBest=function(){_m.apply(this,arguments);bfRevealBest();clearTimeout(BF.rvT);BF.rvT=setTimeout(bfRevealBest,80)}}
-// while a card is held the ★ steps aside (the glowing spots are the next tap), and comes back when it is put down
-{const _bm=bfMark;bfMark=function(){const r=_bm.apply(this,arguments);try{if(BF.pick!=null||BF.drag)document.querySelectorAll('.bf-best').forEach(e=>e.classList.remove('bf-best'));else if(!document.querySelector('.bf-best'))bfMarkBest()}catch(e){}return r}}

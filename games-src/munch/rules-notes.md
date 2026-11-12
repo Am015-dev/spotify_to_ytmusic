@@ -140,11 +140,8 @@ The inventory (`inventory.md`) has the full card data for original expansions 3,
   - Games last about 45–75 turns with 4 heroes (11–19 rounds each).
 - **Random clicker:** `click.js` played every human flow in both "me vs computer" and "friends on one device": 0 rejected moves.
 
-## Newcomer balance (R12 fix, 12 Nov 2026): rules relied on
-Checked against the published rulebook online. Only computer *choices* changed; no rule changed.
-- Help: "If you cannot win a combat on your own, you may ask any other player to help you. If that player says no, you may ask another player."
-  Helping and refusing is a free choice, so Easy computers may say yes to a human whenever together they win, and refuse each other.
-- Curses: playing a curse is one of the actions you "may take at any time", on any player. Never forced, so Easy computers hold their curses
-  unless the human leads them by 2+ levels (or is about to win).
-- Meddling in someone else's fight (monster boosts, wandering monsters) is likewise optional. Easy computers leave a human's fight alone unless it would end the game.
+## Newcomer guidance (R12 fix, 12 Nov 2026): rules relied on
+Checked against the published rulebook online. No rule changed; the ★ only marks the move the advisor would make.
 - Fight or run: only Fight is offered when you win, only Run when you lose (the rulebook: if you can't defeat the monster and no one helps, you must run away).
+- Help: "If you cannot win a combat on your own, you may ask any other player to help you. If that player says no, you may ask another player."
+- Curses are among the actions you "may take at any time", on any player, so the ★ may suggest one on a rival.
