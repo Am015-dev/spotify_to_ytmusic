@@ -106,3 +106,65 @@ Rules re-checked against the published rulebook online (notes local only).
 | 6 (works) | 9 glow-only games | Won 5: 197-196, 253-226, 259-200, 195-191, 228-123. Rival waits had a median of 1.2-4.6 s and a max of 10.6 s. | games-src/reviews/R25-shots/sands-g3-375-result.jpg, games-src/reviews/R25-shots/sands-g9-375-result.jpg, games-src/reviews/R25-shots/sands-g1-390-result.jpg |
 | 2 (works) | Whole guided game at both sizes | 41 steps, one highlight each, 0 dead taps, 3 count pages, "Play a real game" opens the start screen. | games-src/reviews/R25-shots/sands-tut-lift-390.jpg, games-src/reviews/R25-shots/sands-tut-chz-390.jpg, games-src/reviews/R25-shots/sands-tut-count-3-375.jpg |
 | 3 (works) | Opened a real game | 4-line Goal card, one "Start playing" button. | games-src/reviews/R25-shots/sands-g1-390-goal.jpg |
+
+
+---
+
+## 3. vinegrave (branch shelf/W490-vinegrave-bench @ 7afa9ee9, up to date with alex/brave-carson-rbpmlk): 6.9 FAIL
+
+How I tested: built with `VIS_SLUGS="," build-all.py --quick --out /tmp/r25/vine vinegrave` and served the staged page next to games/vinegrave/media. I played by touch only (Playwright hasTouch, isMobile, page.touchscreen.tap at element centres, with an elementFromPoint check before each tap). A tap counted as dead if nothing on the page or in the state changed within 1.15 s.
+- **Tutorial:** fresh storage, title "Learn to play" to the "Prologue complete" card, at 390x844 (97 s) and 375x667 (99 s). 1 s read pause per step.
+- **Games:** 6 full games from the title (Play, then "Start the expedition") to the result screen, on defaults (1 computer rival, easy, hints off). I never tapped to hurry the rival.
+  - 4 games tapped a random glowing site, card or the research track, then its button, and passed at random when they could ("glow", 2 at 390, 2 at 375).
+  - 2 games did the same but never touched the research track ("no research", 1 at each size).
+
+Across 2 tutorials and 6 games: 0 page errors, 0 console errors, 0 stuck states and 0 dead taps in the games. Rules were re-checked against a full rulebook transcription online (notes kept locally only).
+
+**Gate: FAIL.**
+- The build's scenario tests passed only 6 of 8. "vg-board" failed: a hand card is 4 px off the left edge at 390x763. "menu" failed: the "Patron Letter" card is cut 4 px by the screen edge and by the dock.
+- `--quick` skips phone-check, so I ran phone-check.js on the staged build myself. It failed all 6 scenarios: "off-screen: Trail Notes +1 compass", the 14-word prompt "Your turn: one main action. Starting cards are free…" against the 8-word limit, and 3-6 dead taps per scenario.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Still right where I could check against the rulebook: starting deck (2 coin, 2 compass, 2 Dread) and starting goods by seat; one main action plus free actions; Plane = 2 coins and pays any travel; items cost coins and go under the deck; artifacts cost compasses and work at once, but cost a tablet from hand; guardians are 5 points with a one-time boon; a Dread card for each explorer next to an unbeaten guardian at round end (into the play area); fear tiles (-2) when Dread runs out; blocking tiles on camp spaces at 2-3 players; 2 market cards exiled per round; first into the temple wins ties. Small gap: at round end the rulebook lets you discard or keep leftover hand cards, but the engine always keeps them. Card values and temple costs are the builder's own. |
+| 2 | Tutorial teaches | 8 | Fixed: the rival really plays (11 state changes: it digs at Lookout Cliff, plays its free cards, buys 3 items, raises its magnifier, passes). The counter runs 1/35 to 35/35. Research, notebook, assistants, temple, bonus tile and a temple tile are all done by tapping, one short line each, and it ends on a 3-step count and "Play a real game". Weak: the count says "Research: you 18", but the card above it shows Research 12 and Temple 6. Round-end Dread and exiling are still only words. At both sizes, one step needed a second tap. |
+| 3 | First 10 seconds | 7 | Clean title (Learn to play, Play, Story) and goal card. "You are choosing. Tap to skip ahead." is gone from the page text. But the first prompt is 14 words (phone-check flags it), and the first screen is a dense board: 6 cards, 15 site discs, a research column and a resource row. |
+| 4 | Turn clarity | 7 | Better: market cards show a cost token (coin or compass), star points and mostly plain effects ("Draw 2 cards, +1 compass", "Buy an item 2 cheaper", "Magnifier up 1"). Cards you can't afford carry "Need N more". Research rows show person icons for assistants. Still: "Choose one" (Bone Dice) and "research" (Box Camera) don't say what they do. The dock still says "Starting cards are free" in round 4 with no starting card in hand. Your own "+1 point" pill lands on the market or the research track. |
+| 5 | Phone play | 6 | Good at 390x844 and 375x667: 0 visible text under 14 px, smallest glowing target 44 px (375) and 54 px (390), and 0 hand names cut in 120 measured turns. Bad: the gate fails (hand card off-screen at 390x763, "Trail Notes" off-screen, names covered by the next card). At 375 the result card's buttons still cover the second player's breakdown, which is your own when you lose. By round 4 "Need N more" tags cover the art on all 6 market cards. Your pill sits on the market's top row in 15-56 of the samples per game. The exile chooser cuts its 5th card at the screen edge with no scroll hint. |
+| 6 | AI and pacing | 6 | Waits are fixed: median 2.0-2.5 s and the longest 4.3 s (R20: up to 37.8 s), and games take 2.3-3.5 min. But the easy rival is now too soft and still uneven. A newcomer tapping random glowing things won 4 of 4: 36-16, 26-6, 74-38 and 77-8 (by 20, 20, 36, 69). The rival scored 6 and 8 points over 5 rounds in two of those games. A newcomer who ignores research lost 2 of 2 (17-41, 12-22). The rival's score swings from 6 to 41, so the outcome mostly depends on whether you happen to climb research. That is not a sensible, steady opponent. |
+| 7 | Feel | 7 | The market now reads as 6 painted cards, not text strips. Explorers walk to sites, cards and goods fly, points count up, a guardian event card pops ("The Old Warden wakes!"), and rival moves get a board caption. It now looks like a board game on the map half. Still: pills and the rival caption pile onto the guardian event card ("+1 coin +1 compass +1 tablet" over "+3 points"). The bottom half is a resource row plus chips, and most turns are tap disc, then tap button. |
+| 8 | Bugs | 7 | 6 games and 2 tutorials: 0 errors, 0 stuck states, 0 dead taps in games. One tutorial step needed a second tap at each size. The gate fails (2 of 8 scenario tests, phone-check 6 of 6 scenarios) on off-screen hand cards and dead taps. |
+| | **Total** | **6.9** | **FAIL**: rows 5 and 6 are below 7 and the gate fails; no stopper. (7+8+7+7+6+6+7+7 = 55 / 8 = 6.875) |
+
+### Earlier findings (R20)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 4: no Buy button | Still fixed (priced Go button on every pick) | games-src/reviews/R25-shots/vine-g1-390-t6.jpg |
+| Row 4: unaffordable cards glow | Still fixed ("Need N more" on unaffordable cards; I did not count wrong glows systematically) | games-src/reviews/R25-shots/vine-g5-390-t25.jpg |
+| Row 4: market effects are jargon ("cheap buy", "+3 goods", "exile twice") | **Mostly fixed**: plain words ("Buy an item 2 cheaper", "Remove 2 cards", "Magnifier up 1"); "Choose one" and "research" remain | games-src/reviews/R25-shots/vine-g5-390-t25.jpg, games-src/reviews/R25-shots/vine-g6-375-t15.jpg |
+| Row 7 / owner "spreadsheet like": market is 6 text strips | **Fixed**: 6 cards with art, cost token, star points and an effect icon. By round 4 the "Need N more" tags hide most of the art. | games-src/reviews/R25-shots/vine-g1-390-t6.jpg, games-src/reviews/R25-shots/vine-g5-390-t25.jpg |
+| Row 5: rival pills cover the market's top row | **Half fixed**: rival pills now land on the board, but your own "+1 point" pill still covers the top-left market card or the research track | games-src/reviews/R25-shots/vine-g3-390-pop-over-row.jpg, games-src/reviews/R25-shots/vine-g1-390-pop-over-row.jpg |
+| Row 5: hand names cut at 375 ("Creep…") | **Fixed at 375x667** (0 cut in 120 turns); **not at 390x763**, where the gate shows the first card off the edge and names covered | games-src/reviews/R25-shots/vine-g6-375-t15.jpg, games-src/reviews/R25-shots/vine-gate-portrait.jpg |
+| Row 5: result card buttons cover your breakdown at 375 | **Not fixed**: Play again covers the second player's breakdown (yours when you lose) | games-src/reviews/R25-shots/vine-g4-375-result.jpg |
+| Row 6: waits up to 16-38 s after passing | **Fixed**: max 4.3 s over 119 waits | none (timing log) |
+| Row 6: rival scores swing 14-73, newcomer won 1 of 5 | **Not fixed, flipped**: newcomer now wins 4 of 4 by 20-69 with random taps; rival scores 6-41 | games-src/reviews/R25-shots/vine-g6-375-result.jpg, games-src/reviews/R25-shots/vine-g3-390-result.jpg |
+| Row 2: rival "out" for the whole tutorial | **Fixed**: the rival digs, buys, researches and passes in round 1 | games-src/reviews/R25-shots/vine-tut-390-s21.jpg |
+| Row 2 / 8: counter "16/33" for 35 steps | **Fixed**: 1/35 to 35/35 | games-src/reviews/R25-shots/vine-tut-375-count35.jpg |
+| Row 4: research "A" badges unexplained | **Fixed on the track** (silver and gold person icons); the dock's assistant chip still shows a letter "A" | games-src/reviews/R25-shots/vine-tut-375-s24.jpg, games-src/reviews/R25-shots/vine-g5-390-t25.jpg |
+| Row 3: "You are choosing. Tap to skip ahead." | **Fixed** (gone from the page text) | games-src/reviews/R25-shots/vine-g1-390-goal.jpg |
+| Row 8: rival caption still on the board at the start of my turn | Not re-checked | none |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | 4 default games tapping random glowing things | Won all 4: 36-16, 26-6, 74-38, 77-8. In two games the "easy" rival ended on 6 and 8 points after 5 rounds. Easy is now too soft to give a newcomer a real game. | games-src/reviews/R25-shots/vine-g6-375-result.jpg, games-src/reviews/R25-shots/vine-g1-390-result.jpg, games-src/reviews/R25-shots/vine-g5-390-result.jpg |
+| 6 | 2 default games that never touched the research track | Lost both, 17-41 and 12-22. With research a random tapper scores 26-77; without it 12-17. One hidden lever decides the game. | games-src/reviews/R25-shots/vine-g3-390-result.jpg, games-src/reviews/R25-shots/vine-g4-375-result.jpg |
+| 5 / 8 | Ran the build gate and phone-check on the staged build | Scenario tests 6 of 8 (hand card 4 px off-screen at 390x763; "Patron Letter" cut by the edge and dock). Phone-check fails all 6 scenarios ("Trail Notes" off-screen, a 14-word prompt, 3-6 dead taps each). | games-src/reviews/R25-shots/vine-gate-portrait.jpg |
+| 5 | Lost at 375x667 | The result card's Play again / See the island / Title buttons cover my score breakdown; only "You 12 points" shows. | games-src/reviews/R25-shots/vine-g4-375-result.jpg |
+| 7 / 5 | A guardian woke during the rival's turn (390) | Its event card is covered by the rival caption and two stacked pills ("+1 coin +1 compass +1 tablet" over "+3 points"). | games-src/reviews/R25-shots/vine-g1-390-fx-2.jpg |
+| 2 | Read the tutorial's final count at 375 | The bubble says "Research: you 18" while the card shows Research 12 and Temple 6. The total (28) is right, but the words don't match the card. | games-src/reviews/R25-shots/vine-tut-375-count33.jpg |
+| 4 | Round 4 at 390 with no starting cards in hand | The prompt still says "Starting cards are free. Tap or drag what glows." "Choose one" on Bone Dice and "research" on Box Camera don't say what they do. | games-src/reviews/R25-shots/vine-g5-390-t25.jpg, games-src/reviews/R25-shots/vine-g6-375-t15.jpg |
+| 5 | Exile question at 375 | The row of hand cards runs off the right edge (5th card cut) with no scroll cue. | games-src/reviews/R25-shots/vine-g6-375-t15.jpg |
+| 1 (minor) | Read the engine's round end against the rulebook | Leftover hand cards are always kept; the rulebook lets you discard or keep them. | none |
+| 2 (works) | Whole tutorial by touch at both sizes | 35 steps, the rival plays its round, ends on "Prologue complete. You 28, Tamsin 4" and "Play a real game". | games-src/reviews/R25-shots/vine-tut-390-end.jpg, games-src/reviews/R25-shots/vine-tut-375-end.jpg |
+| 3 (works) | Opened the title | Clean title with 3 buttons and a one-line goal. | games-src/reviews/R25-shots/vine-g1-390-title.jpg |
