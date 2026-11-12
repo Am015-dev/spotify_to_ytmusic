@@ -451,3 +451,5 @@ html.short:not(.land) #mkt .mrow{display:flex!important;flex-wrap:nowrap;overflo
 html.short:not(.land) #mkt .mrow::-webkit-scrollbar{display:none}
 html.short:not(.land) #mkt .mrow>*{flex:0 0 auto}html.short:not(.land) #mkt .mrow .mcard{width:44px;min-width:44px}
 html.dj-off:not(.land) #mkt .drow,html.mr-off:not(.land) #mkt .mrow{display:none!important}
+html.short.bid-mk:not(.land) #mkt,html.short.pw-on:not(.land) #mkt .drow{display:none!important}
+html.short:not(.land) #trk{display:none!important}   /* the one-line prompt above says what to do; the score pop then lands on the scorer's seat chip */

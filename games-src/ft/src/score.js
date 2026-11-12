@@ -113,3 +113,7 @@ function scGlowHint(){if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep===
 // R38 row 5: after the move the djinn row stays only while a djinn can be taken, and the market only while goods can be taken (or are being collected)
 (function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;const after=!!(G&&!G.over&&hp&&G.phase==='turn'&&G.cur===hp.i&&!G.q&&G.step!=='move');
   R.classList.toggle('dj-off',after&&!UI.pickDj.length);R.classList.toggle('mr-off',after&&!UI.pickMk.length&&!(G.step==='tribe'&&G.act&&G.act.color==='merchant'))}catch(e){}}})();
+// R38 (375x553): a short phone hides the market while bidding, and the djinn row while djinn powers fill the button row
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
+  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));
+  const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
