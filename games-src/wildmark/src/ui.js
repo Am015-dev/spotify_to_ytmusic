@@ -196,19 +196,55 @@ function confirmPlace() { if (!UI.ghost || !tutOK({ what: 'ok' })) return; act({
 function undoTake() { if (!UI.undo || !tutOK({ what: 'undo' })) return; G = UI.undo; UI.undo = null; UI.ghost = null; sfx('tap'); render(); fitView(); }
 // ---------------------------------------------------------------- pan and zoom
 function boardWH() { var b = $('#board'); return [b.clientWidth || 390, b.clientHeight || 500]; }
+// the safe area: the board minus every chip that floats over it (measured, so it holds at any size and with hints on/off)
+function safeRect() {
+  var bd = $('#board'), wh = boardWH(), r = { l: 6, t: 6, r: wh[0] - 6, b: wh[1] - 6 }; if (!bd) return r; var br = bd.getBoundingClientRect();
+  function vis(e) { if (!e || e.hidden) return null; var q = e.getBoundingClientRect(); if (q.width < 2 || q.height < 2) return null; var cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return null; return { l: q.left - br.left, t: q.top - br.top, r: q.right - br.left, b: q.bottom - br.top }; }
+  ['#cards', '#seats', '#terr', '#acorn', '#coachb'].forEach(function (s) { var q = vis($(s)); if (q && q.t < wh[1] * 0.45) r.t = Math.max(r.t, q.b + 4); });
+  ['#line', '#pv'].forEach(function (s) { var q = vis($(s)); if (q && q.b > wh[1] * 0.55) r.b = Math.min(r.b, q.t - 4); });
+  var z = vis($('#zoom')); r.rw = r.r; r.zt = z ? z.t - 4 : 1e9; if (z) r.r = Math.min(r.r, z.l - 4);   // rw / zt: above the zoom column the full width is free
+  if (r.b - r.t < 120) r.b = Math.min(wh[1] - 6, r.t + 120);
+  return r;
+}
+var HEX_MIN = 44;   // never shrink a hex below 44 px across (a finger's width)
 function fitView(now) {
-  if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env); if (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) cells = cells.concat(WM.spots(env));
-  var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; cells.forEach(function (c) { var p = pix(c); x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
-  // keep clear of the chips on top (cards, seats), the zoom column on the right and the status line at the bottom
-  var wh = boardWH(), padT = (hintsOn() ? (G.np > 1 ? 156 : 110) : (G.np > 1 ? 62 : 16)) + (UI.mode === 'coach' ? 76 : 0), padB = 118, padL = 8, padR = 60, w = x1 - x0 + SZ * 2.2, h = y1 - y0 + SZ * 2.4;
-  var z = Math.max(0.3, Math.min(2.5, Math.min((wh[0] - padL - padR) / w, (wh[1] - padT - padB) / h)));
-  var t = { z: z, tx: padL + (wh[0] - padL - padR) / 2 - (x0 + x1) / 2 * z, ty: padT + (wh[1] - padT - padB) / 2 - (y0 + y1) / 2 * z };
-  if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); return; }
+  if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env), spots = (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : [];
+  function box(list) { var b = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }; list.forEach(function (c) { var p = pix(c); b.x0 = Math.min(b.x0, p[0]); b.x1 = Math.max(b.x1, p[0]); b.y0 = Math.min(b.y0, p[1]); b.y1 = Math.max(b.y1, p[1]); }); return b; }
+  var sr = safeRect(), aw = sr.r - sr.l, ah = sr.b - sr.t, zMin = HEX_MIN / (SZ * SQ3);
+  function zFor(b) { return Math.min(aw / (b.x1 - b.x0 + SZ * SQ3 + 4), ah / (b.y1 - b.y0 + SZ * 2 + 4)); }
+  var b = box(cells.concat(spots)), z = Math.min(2.5, zFor(b));
+  if (z < zMin && spots.length) { var bs = box(spots); b = bs; z = Math.max(zMin, Math.min(1, zFor(bs))); }   // the whole valley cannot fit: fit the legal spots
+  z = Math.max(z, zMin);
+  if (!isFinite(z) || b.x0 > b.x1) z = 1;
+  var t = { z: z, tx: sr.l + aw / 2 - (b.x0 + b.x1) / 2 * z, ty: sr.t + ah / 2 - (b.y0 + b.y1) / 2 * z };
+  var fc = typeof tutOn === 'function' && tutOn() && spots.length && UI.tut.spot && spots.indexOf(UI.tut.spot) >= 0 ? UI.tut.spot : null;   // tutorial: its one glowing spot is always fully in view
+  if (fc) { var q = pix(fc), m = SZ * z + 4, fx = t.tx + q[0] * z, fy = t.ty + q[1] * z; if (fx - m < sr.l) t.tx += sr.l - (fx - m); if (fx + m > sr.r) t.tx -= fx + m - sr.r; if (fy - m < sr.t) t.ty += sr.t - (fy - m); if (fy + m > sr.b) t.ty -= fy + m - sr.b; }
+  UI.userPan = 0;
+  if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); edgeArrows(); return; }
   var f = Object.assign({}, UI.pan), t0 = performance.now(), D = 380;
   cancelAnimationFrame(UI.panT);
   (function an(n) { var k = Math.min(1, (n - t0) / D), e = 1 - Math.pow(1 - k, 3); UI.pan = { z: f.z + (t.z - f.z) * e, tx: f.tx + (t.tx - f.tx) * e, ty: f.ty + (t.ty - f.ty) * e }; applyPan(); if (k < 1) UI.panT = requestAnimationFrame(an); })(t0);
 }
-function applyPan() { var v = $('#vp'); if (v) v.setAttribute('transform', 'translate(' + UI.pan.tx.toFixed(1) + ',' + UI.pan.ty.toFixed(1) + ') scale(' + UI.pan.z.toFixed(3) + ')'); }
+// legal spots that are off screen (or under a chip) get an arrow on that edge; tap it to bring the nearest one into view
+function edgeArrows() {
+  var bd = $('#board'); if (!bd) return; var host = $('#edgea'); if (!host) { host = document.createElement('div'); host.id = 'edgea'; bd.appendChild(host); }
+  var h = ''; if (G && G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai && !UI.ghost) {
+    var sr = safeRect(), p = UI.pan, rr = SZ * p.z * 0.75, side = { l: [], r: [], t: [], b: [] };
+    var seen = [];   // spots on screen: an arrow never sits on one of them
+    WM.spots(G.seats[UI.view].env).forEach(function (c) { var q = pix(c), x = p.tx + q[0] * p.z, y = p.ty + q[1] * p.z;
+      var hw = SZ * SQ3 / 2 * p.z - 2, hh = SZ * p.z * 0.75;   // any real part of the spot outside the safe area counts as hidden (the pointed tips may touch the edge)
+      if (x - hw < sr.l) side.l.push([x, y, c]); else if (x + hw > (y + hh < sr.zt ? sr.rw : sr.r)) side.r.push([x, y, c]); else if (y - hh < sr.t) side.t.push([x, y, c]); else if (y + hh > sr.b) side.b.push([x, y, c]); else seen.push([x, y]); });
+    function free(x, y) { return seen.every(function (v) { return v[0] < x - rr || v[0] > x + 44 + rr || v[1] < y - rr || v[1] > y + 44 + rr; }); }
+    Object.keys(side).forEach(function (k) { var L = side[k]; if (!L.length) return; var a = L[0], cx = (sr.l + sr.r) / 2, cy = (sr.t + sr.b) / 2;
+      var x = k === 'l' ? sr.l : k === 'r' ? sr.r - 44 : Math.max(sr.l, Math.min(sr.r - 44, a[0] - 22)), y = k === 't' ? sr.t : k === 'b' ? sr.b - 44 : Math.max(sr.t, Math.min(sr.b - 44, a[1] - 22));
+      for (var n = 0, ok = free(x, y); !ok && n < 12; n++) { var d = (n >> 1) * 24 + 24, sg = n % 2 ? -1 : 1; var nx = k === 'l' || k === 'r' ? x : Math.max(sr.l, Math.min(sr.r - 44, x + sg * d)), ny = k === 't' || k === 'b' ? y : Math.max(sr.t, Math.min(sr.b - 44, y + sg * d)); if (free(nx, ny)) { x = nx; y = ny; ok = true; } }
+      if (!ok) return;
+      h += '<button type="button" class="ea ea-' + k + '" data-c="' + a[2] + '" style="left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px" aria-label="' + L.length + ' more spot' + (L.length > 1 ? 's' : '') + ' this way">' + ({ l: '&#9664;', r: '&#9654;', t: '&#9650;', b: '&#9660;' })[k] + '<small>' + L.length + '</small></button>'; });
+  }
+  host.innerHTML = h;
+}
+function panTo(c) { var q = pix(c), sr = safeRect(), p = UI.pan; p.tx = (sr.l + sr.r) / 2 - q[0] * p.z; p.ty = (sr.t + sr.b) / 2 - q[1] * p.z; applyPan(); }
+function applyPan() { var v = $('#vp'); if (v) v.setAttribute('transform', 'translate(' + UI.pan.tx.toFixed(1) + ',' + UI.pan.ty.toFixed(1) + ') scale(' + UI.pan.z.toFixed(3) + ')'); clearTimeout(UI.eaT); UI.eaT = setTimeout(edgeArrows, 60); }
 function zoomAt(f, cx, cy) { var p = UI.pan, z = Math.max(0.3, Math.min(2.6, p.z * f)); f = z / p.z; p.tx = cx - (cx - p.tx) * f; p.ty = cy - (cy - p.ty) * f; p.z = z; applyPan(); }
 (function wirePan() {
   var pts = {}, start = null, moved = false;
@@ -475,6 +511,7 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('mk')) return onMarket('k', +t.dataset.i);
   if (t.classList.contains('sg')) { var k = t.parentNode.dataset.k, v = t.dataset.v; UI.setup[k] = k === 'ai' || k === 'cards' ? v : +v; if (UI.setup.humans + UI.setup.opp > 4) UI.setup.opp = 4 - UI.setup.humans; if (UI.setup.humans + UI.setup.opp < 1) UI.setup.opp = 0; showTitle(); return; }
   if (t.classList.contains('tsz')) { UI.setup.opp = +t.dataset.n - 1; UI.setup.humans = 1; showTitle(); return; }
+  if (t.classList.contains('ea')) { panTo(t.dataset.c); return; }
   if (t.classList.contains('cc')) { cardWhy(t.getAttribute('data-card')); return; }
   if (t.id === 'whatB') { var bb = document.getElementById('bulbbtn'); if (bb) bb.click(); return; }
   if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }

@@ -4,7 +4,7 @@
    Steps: TUT_STEPS below (rule ids in COACH_RULES). Proof: tutorial-end.js (walks it by touch, checks every rule step appears). */
 var TUT_GAME = 'wildmark', TUT_SEED = 11, TUT_TURNS = 7;
 window.GXCOACH = { running: false, explained: [], done: false };   // read by the QA bot's coached mode
-var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'acornReplace', 'salmon', 'wipe4', 'hawk', 'fox', 'majority', 'return', 'end20', 'acornsEnd', 'tiebreak'];
+var COACH_RULES = ['goal', 'pick', 'place', 'settle', 'keystone', 'rival', 'bear', 'rotate', 'habitat', 'sweep3', 'elk', 'acornSpend', 'salmon', 'wipe4', 'hawk', 'acornReplace', 'fox', 'majority', 'return', 'end20', 'acornsEnd', 'tiebreak'];
 // one step = { r: rule id taught (first step of a rule), say: <=12 words, hl: what glows, ok: allowed action, done: finished?, go: on enter }
 // hl kinds: 'next' (the bubble's Next button), 'col:i' (market tile i), 'tok:i' (market animal i), 'spot' (chosen map spot), 'cell' (tile just placed), '#id'
 function tutSteps() {
@@ -35,7 +35,7 @@ function tutSteps() {
     { wait: 1 },
     // turn 4: spend an acorn (free pick; replace is the other power), salmon runs
     { r: 'acornSpend', say: 'You have an acorn. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
-    { r: 'acornReplace', say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
+    { say: 'Free pick takes any tile and any animal. Tap it.', hl: '#freeB', ok: 'freeB', done: function () { return !!UI.free; } },
     { r: 'salmon', say: 'Salmon score in runs. Tap the river tile.', hl: 'col:0', ok: 'freet:0', done: function () { return UI.free && UI.free.ti === 0 || G.stage === 'tile'; } },
     { say: 'Now tap the salmon from another column.', hl: 'tok:2', ok: 'freek:2', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot next to your river.', hl: 'spot', pick: 'nearRiver', ok: 'spot', done: function () { return !!UI.ghost; } },
@@ -50,6 +50,10 @@ function tutSteps() {
     { say: 'Settle the hawk.', hl: 'cell', ok: 'tok', done: turnDone },
     { wait: 1 },
     // turn 6: fox neighbours
+    { say: 'Acorns can also swap market animals. Tap Use acorn.', hl: '#acornB', ok: 'acorn', done: function () { return !!UI.acornMenu; } },
+    { r: 'acornReplace', say: 'Tap Replace animals.', hl: '#wipeB', ok: 'wipeB', done: function () { return !!UI.wipe; } },
+    { say: 'Tap the salmon you do not need.', hl: 'tok:3', ok: 'wsel:3', done: function () { return !!UI.wipe && UI.wipe.indexOf(3) >= 0; } },
+    { say: 'Tap Replace: a new animal comes from the bag.', hl: '#wokB', ok: 'wok', done: function () { return !UI.wipe; }, after: fixReplace },
     { r: 'fox', say: 'A fox scores 1 per different animal beside it.', hl: 'col:1', ok: 'take:1', done: function () { return G.stage === 'tile'; } },
     { say: 'Tap the spot with the most animals around it.', hl: 'spot', pick: 'nearTok', ok: 'spot', done: function () { return !!UI.ghost; } },
     { say: 'Tap Place.', hl: '#okB', ok: 'ok', done: function () { return G.stage === 'tok'; } },
@@ -116,6 +120,7 @@ function tutFix() {
   G.used3 = false; render();
 }
 function fixSweep() { ['fox', 'salmon', 'bear'].forEach(function (a, i) { tTok(a, i); }); }   // the three swept animals come back as a fixed set
+function fixReplace() { tTok('hawk', 3); }   // the replaced salmon comes back as a fixed animal, so the tutorial stays the same every time
 function fixWipe4() { ['elk', 'fox', 'hawk', 'bear'].forEach(tTok); G.wiped4 = (G.wiped4 || 0) + 1; G.log.push('Four Hawk tokens: the market is wiped.'); }
 // the step machine: runs after every render (ui.js render -> coachCheck)
 function coachCheck() {
@@ -124,7 +129,7 @@ function coachCheck() {
     var s = T.steps[T.i]; if (!s) break;
     if (!T.entered) {
       if (s.wait) { if (s.wait === 2 ? !G.over : !(myTurn() && G.stage === 'pick' && G.seats[0].done > T.t0)) { coachHide(); return; } T.i++; continue; }
-      if (s.hl === 'spot' && G.stage === 'tile') T.spot = tutPickSpot(s.pick);
+      if (s.hl === 'spot' && G.stage === 'tile') { T.spot = tutPickSpot(s.pick); fitView(); }
       if (s.hl === 'cell') T.spot = T.spot || (G.last && G.last.tile);
       if (s.go) s.go();
       if (s.ok === 'take:0' || s.ok === 'take:1' || s.ok === 'take:2' || s.ok === 'take:3' || s.ok === 'acorn') T.t0 = G.seats[0].done;

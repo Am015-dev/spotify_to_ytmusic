@@ -53,7 +53,8 @@ ok(S([[0, 0, 'elk'], [1, 0, 'elk'], [0, 1, 'elk']], 'elk', 'b') === 9, 'elk B tr
 ok(S([[0, 0, 'elk'], [1, 0, 'elk'], [2, 0, 'elk'], [3, 0, 'elk'], [4, 0, 'elk']], 'elk', 'c') === 14, 'elk C group of 5 = 14');
 ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [2, 0, 'salmon']], 'salmon', 'b') === 9, 'salmon B run 3 = 9');
 ok(S([[0, 0, 'salmon'], [1, 0, 'salmon']], 'salmon', 'c') === 0, 'salmon C run 2 = 0');
-ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [0, 1, 'bear']], 'salmon', 'd') === 3, 'salmon D 2 + 1 neighbour');
+ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [0, 1, 'bear']], 'salmon', 'd') === 0, 'salmon D run of 2 = 0');
+ok(S([[0, 0, 'salmon'], [1, 0, 'salmon'], [2, 0, 'salmon'], [0, 1, 'bear']], 'salmon', 'd') === 4, 'salmon D run 3 + 1 neighbour = 4');
 ok(S([[0, 0, 'hawk'], [1, 0], [2, 0, 'hawk']], 'hawk', 'c') === 3, 'hawk C one sight line 3');
 ok(S([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'hawk']], 'hawk', 'd') === 4, 'hawk D pair with 1 kind 4');
 ok(S([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear'], [0, 1, 'elk']], 'fox', 'c') === 2, 'fox C most common 2');
