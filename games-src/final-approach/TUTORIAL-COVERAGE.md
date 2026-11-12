@@ -1,45 +1,39 @@
-# Final Approach: tutorial coverage (W425, coached first flight, 4 rounds)
+# Final Approach: tutorial coverage (W506, guided first landing)
 
-The tutorial is a **coached first flight**, the prologue of the story: check ride at Port Alder, the last four rounds (3000 ft to the runway) on an easy
-4-space strip with one plane on space 3. Each round brings one system: 1 axis and engines (spare dice to coffee), 2 radio and landing gear (and the
-reroll token), 3 flaps and brakes, 4 the landing. The computer co-pilot sticks to the same systems. On each of your turns ONE bubble says what to do
-and why ("Put your 3 on Axis (green ring). The Axis goes first: a middle value leaves the most room.") and a green ring marks the slot and a dashed
-ring the die; pick another die and the advice follows it. Every legal move stays allowed; the preview line shows what the die would do before you
-drop it. A new rule is said the first time it matters (on the co-pilot's turns or the briefing, at least 4.5 s before the next instruction).
-After each round a card says why it ended, what changed and rates it. The end card walks the landing checklist with the real state; rules that did
-not come up are listed under "Things you will meet later". Text: `campaign.json` > `tutorial.rounds`, `tutorial.coach`, `tutorial.later`.
-Code: `game/src/ui12.js` (`tutAdvise`, `fcPoll`, `fcLine`, `fcEnd`), dice `TUT_SCRIPT` (checked by `game/tut-sim.js` and rules-test: following the coach lands).
+The tutorial is a guided first landing: the last four rounds at Port Alder (3000 ft to the runway) on a 4-space strip with one plane on space 3.
+Every step is one sentence of 12 words or fewer and one highlighted tap (the shell kit `gx-tutor.js`: only the glowing thing answers).
+Dice and the co-pilot are scripted in `game/tut-plan.js`; `game/tut-sim.js` and `rules-test.js` prove the plan lands. After the last step
+the end card offers "Play a real game" (a normal seven-round flight starts at once). There is no "learn later" list.
+Code: `game/src/ui12.js` (`tutSteps`, `TUT_RULES`). Test: `node game/tutor-test.js` walks every step by touch at 390x844 and 375x667
+and fails if a core rule step is missing or out of order, or any line is over 12 words.
 
-## Rule checklist (trigger = the moment it is explained)
-| Rule | Coach id | Trigger | Where |
+| # | Rule taught | Tap | Line |
 |---|---|---|---|
-| Win or lose together, plan aloud, silence after the roll | `intro` | game start (before the first roll) | in play |
-| Hidden dice, blue / orange / grey spaces | `seats` | first placement phase | in play |
-| Landing checklist (runway, gear and flaps, level, speed in brakes) | `goal` | first placement phase | in play |
-| Take turns one die each; axis and engines mandatory | `turns` | first placement phase | in play |
-| Axis: tilt by the difference, spin at 3 | `axis` | first axis die placed | in play |
-| Radio and collisions with planes on the track | `radio` | round 2 (or a radio die placed) | in play |
-| Engines: sum vs blue / orange markers, end on the airport | `engines` | first engine die placed | in play |
-| Landing gear 1-2, 3-4, 5-6 | `gear` | round 2 (or a gear die placed) | in play |
-| Flaps in order (co-pilot) | `flaps` | round 3 (or a flap die placed) | in play |
-| Brakes 2, 4, 6 in order, last round only | `brakes` | a brake die placed or the last round starts | in play |
-| Coffee tokens | `coffee` | a coffee die placed or a token held on my turn | in play |
-| Reroll token, either seat | `reroll` | a reroll opens, or I hold a token | in play |
-| Altitude falls each round (four rounds here, seven in a full game) | `rounds` | round 2 | in play |
-| Last round: plane stops, speed within brakes | `final` | landing round starts | in play |
-| Final scoring rule by rule, real numbers | final card | result | always |
-| Reasons for Ravi's moves | banner + caption | every rival move | always |
-| Traffic die, corridor tabs, fuel, wind, trainee, ice, clock, crew cards, hand-over, flip side, cross-check, die that fits nowhere | `tutorial.later` | end card | later card only (honest: not demonstrated) |
+| 1 | Win or crash together, plan before the roll | Roll | We land or crash together. Plan now, then tap Roll. |
+| 2 | Dice are secret, no talking numbers | your 4 | Dice are secret now. Never say numbers. Tap your 4. |
+| 3 | Axis: the higher die tips the wings | Axis | Axis: the higher die tips the wings. Your 4 beats 3. |
+| 4 | Alternate turns; Axis + Engines every round or crash | your 5 | Take turns. Fill Axis and Engines every round, or we crash. |
+| 5 | Engines: sum vs blue/orange, approach track | Speed | Engines add up: 5 plus Ravi's 2 is 7. We move one. |
+| 6 | Concentration earns coffee | Coffee | A spare die on Concentration earns a coffee token. |
+| 7 | Gear 1-2/3-4/5-6 raises blue | Gear 1-2 | Gear needs 1-2, 3-4 or 5-6. Each raises blue. |
+| 8 | Altitude drops each round | Roll | We drop 1000 feet each round. Reach the runway in time. |
+| 9 | Collision crash, radio clears planes | Radio | Leaving a plane's space crashes. Radio 2 clears the next space. |
+| 10-12 | Reroll token: both reroll chosen dice | Reroll, your 1, Reroll button | A reroll token lets us both roll again. Tap it. / Tap your 1 to roll it again. / Tap Reroll. Only the dice you picked change. |
+| 13 | Spending coffee (+/-1) | minus | Spend coffee: tap minus to turn your 4 into 3. |
+| 14 | Axis balance back to level; tilt 3 crashes | Axis | Your 3 under Ravi's 4 levels the wings. Tilt 3 crashes. |
+| 15 | Engines again | Speed | Your 5 plus Ravi's 3 is 8: one space closer. |
+| 16 | Flaps in order (co-pilot) | Gear 5-6 | Ravi's flaps go out in order. Your new 6 drops gear. |
+| 17 | Must reach the airport | Roll | Last chance to reach the airport. Tap Roll. |
+| 18 | Level wings | Axis | Match Ravi's 5 on Axis to keep the wings level. |
+| 19 | Overshooting the airport crashes | Speed | Your 4 plus Ravi's 4 reaches the airport. Flying past crashes. |
+| 20 | All gear down | Gear 3-4 | Your 3 drops the last gear. All three are down. |
+| 21 | Brakes 2, 4, 6 in order | Brake 2 | Brakes take exactly 2, then 4, then 6, in order. |
+| 22 | Landing round: plane stops | Roll | Landing round: the plane stops moving. Tap Roll. |
+| 23 | Speed may equal the brakes, not more | Brake 4 | Brake 4 next. Landing speed may equal the brakes, not more. |
+| 24 | Land level | Axis | Match Ravi's 3. We must land with level wings. |
+| 25 | Landing speed = engine sum | Speed | Your 2 plus Ravi's 2 makes speed 4. |
+| 26 | Brake 6 | Brake 6 | Brake 6 makes speed 4 safe. Last die, then we land. |
+| 27 | Win: all five landing checks | Finish | Landed! Runway clear, gear, flaps, level wings, slow enough. |
 
-Limits: four rounds, not seven; the modules are taught in Story chapters 7 to 15 (their intro scenes name the new rule). A free-play loss is possible and is explained on the end card with "Try again".
-
-## Three modes (Addendum 7)
-- **Learn to play** (title button "New here? Learn"): the coached flight above. The only place with coach bubbles, pointing rings and previews by default.
-- **Play** (Play / Quick game, the default): clean screen. Board, dice tray, turn tracker (round x of y, altitude, whose turn, dice left), the landing
-  checklist line, one instruction line, the top bar. A one-card Goal before turn 1 (phones: a card over the board that closes on Got it or Roll; wide:
-  on top of the flight story card). After each placement a short chip says what it did. The round-over card says why the round ended and what changed
-  (no rating). No coach bubbles, no ghost finger, no floating toasts (a refused tap puts its reason on the one line). Every "why" is on tap: the checklist
-  strip opens the full checklist, a refused space says why on the line, the drawers hold the log and rules. Story no longer forces the coached flight.
-- **Hints** (the bulb in the top bar, off by default): previews on each glowing slot and in the dock, the good/okay/poor line on the round-over card,
-  the ghost finger, and a "What should I do?" button on your turn that rings the suggested slot and die and says why.
-Check: `game/shoot-play.js <png> 390x763` plays a Quick game to the first own turn and fails if a bubble, preview, toast, ghost or card is on screen.
+Not in the guided landing (each is introduced in its Story chapter with its own intro scene): traffic die, corridor tabs, fuel, wind,
+trainee, icy runway, the clock, crew cards, a die that fits nowhere.
