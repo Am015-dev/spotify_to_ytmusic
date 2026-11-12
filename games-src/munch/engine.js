@@ -3,7 +3,7 @@
 var ANIM=1, AIDELAY=420, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
 const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CHARM_MIN:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
-let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};
+let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null,fast:true};
 // ---- random ----
 function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
@@ -66,7 +66,7 @@ function bigWhy(p,id){const c=cd(id);if(!c.big)return null;return bigCount(p,id)
 function newGame(mode,n){n=n||DEFN;const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
   const ids=[];const C={};let k=0;for(const def of CARDS){if(def.x3&&!DEFEX[def.x3])continue;for(let c=0;c<(def.cp||1);c++){C[k]=def.k;ids.push(k++)}}
   G={v:2,gid:Date.now()%1e9,rng:seed,seed,mode,C,door:[],tr:[],dd:[],td:[],pl:[],turn:1,active:0,phase:'setup',cb:null,q:null,ops:[],then:null,log:[],winner:null,winText:'',ex:Object.assign({},DEFEX),kicked:null,fought:false,lastRoll:null,win:null,cowin:-1};
-  // Faster Play (the rulebook's own option): Listen at the Door each turn + a shared win for the helper. Opt-in for now (FLAG: UI.fast, Game length: Quick); off in the tutorial and the story.
+  // Faster Play (the rulebook's own option): Listen at the Door each turn + a shared win for the helper. On by default since its touch run passed (FLAG: UI.fast; Game length: Full turns it off); off in the tutorial and the story.
   G.fast=UI.fast===true&&!(typeof TUTG!=='undefined'&&TUTG)&&!(typeof CMP_GO!=='undefined'&&CMP_GO);
   for(const id of ids)(D(C[id]).d==='door'?G.door:G.tr).push(id);shuffle(G.door);shuffle(G.tr);
   const names=UI.names||HERO_NAMES;

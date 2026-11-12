@@ -3,7 +3,7 @@
 //   NODE_PATH=/opt/node-tools/node_modules node newbie-touch.js [games=4] [WxH=390x844] [seed=1] [fast=1]
 const { chromium } = require('playwright');const gx = require('../scripts/gx-serve.js');const sleep = ms => new Promise(r => setTimeout(r, ms));
 const MAXM=+process.env.NBMIN||0;const N=+process.argv[2]||4,[W,H]=(process.argv[3]||'390x844').split('x').map(Number),S0=+process.argv[4]||1,FAST=process.argv[5]!=='0';
-(async()=>{const URL=await gx.url('doorkick-dungeon',{file:__dirname+'/doorkick.html'});const b=await chromium.launch();let rr=S0*977;const rand=n=>{rr=(rr*1103515245+12345)%2147483648;return rr%n};
+(async()=>{const URL=await gx.url('doorkick-dungeon',{file:__dirname+'/doorkick.html'});const b=await chromium.launch();let rr=S0*977;const rand=n=>{rr=(rr*1103515245+12345)%2147483648;return (rr>>>16)%n};// high bits: the low bits of this generator repeat every few calls, which locked the driver into wear/take-off loops in 'post'
  const res=[];for(let g=0;g<N;g++){const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});const page=await ctx.newPage();const errs=[];
   page.on('pageerror',e=>errs.push(e.message));page.on('console',m=>m.type()==='error'&&!/ERR_|Failed to load|net::/.test(m.text())&&errs.push(m.text()));
   await page.goto(URL);await page.evaluate(()=>{localStorage.clear()});await page.reload();await sleep(600);

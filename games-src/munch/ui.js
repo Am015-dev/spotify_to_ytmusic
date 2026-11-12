@@ -247,7 +247,7 @@ function rulesHTML(){return RULES_HTML}
 // ---- input ----
 // portrait phone: the card panel stops above the action bar, so End turn / Kick / Fight stay visible and tappable while it is open
 function dkCardFit(){const d=document.getElementById('dkCard');if(!d)return;const k=document.querySelector('.gx-dock');const h=document.documentElement;
-  if(h.classList.contains('ph-p')&&k&&k.getBoundingClientRect().height>20){const top=Math.round(k.getBoundingClientRect().top);d.style.bottom=Math.max(0,innerHeight-top)+'px';d.style.maxHeight=Math.max(200,top-48)+'px';h.classList.add('dk-cardup')}else{d.style.bottom='';d.style.maxHeight='';h.classList.remove('dk-cardup')}}
+  if(h.classList.contains('ph-p')&&k&&k.getBoundingClientRect().height>20){const top=Math.round(k.getBoundingClientRect().top);d.style.bottom=Math.max(0,innerHeight-top)+'px';d.style.maxHeight=Math.max(200,Math.min(top-48,Math.round((top-48)*.78)))+'px'/* leave a strip of board above the panel: on short phones a full-height panel left nothing to tap outside to close it */;h.classList.add('dk-cardup')}else{d.style.bottom='';d.style.maxHeight='';h.classList.remove('dk-cardup')}}
 addEventListener('resize',()=>{if(GX.open==='dkCard')dkCardFit()});
 function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;UI.zoom=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;

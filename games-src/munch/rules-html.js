@@ -10,7 +10,7 @@ const RULES_HTML=`
 <li><b>If you didn't fight a monster:</b> either <b style="white-space:nowrap">look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
 <li><b>Charity.</b> If you hold more than 5 cards (6 for dwarves), give the extras to the lowest-level player. If that's you, discard them.</li>
 </ol>
-<p><b>Quick game (faster play).</b> The rulebook's own faster-play option, pick <b>Quick</b> under Game length to use it: the target stays level 10, but at the start of each turn you <b>listen at the door</b> (draw one door card face down), and if you help a hero win the game in a fight, <b>you win too</b>. The story and the tutorial use the full rules.  With it on, the computer heroes default to Easy.</p>
+<p><b>Quick game (faster play), on by default.</b> New games use the rulebook's own faster-play option; pick <b>Full</b> under Game length for the full rules. In a Quick game the target stays level 10, but at the start of each turn you <b>listen at the door</b> (draw one door card face down), and if you help a hero win the game in a fight, <b>you win too</b>. The story and the tutorial use the full rules. With it on, the computer heroes default to Easy.</p>
 <h3>Fighting</h3>
 <ul>
 <li>Your <b>combat strength</b> is your level plus the bonuses of the items you wear. The monster's strength is its level plus any boosts.</li>
