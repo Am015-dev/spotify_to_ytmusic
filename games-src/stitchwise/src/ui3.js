@@ -43,7 +43,7 @@ function showPatch(pid) {
   GX.drawer('bigd', p.name, b); var dr = $('#bigd .gx-drawer-body'); dr.innerHTML = ''; dr.appendChild(b); GX.show('bigd');
 }
 function buildPatchList() {
-  var g = h('div.refgrid'); PATCHES.forEach(function (p) { var b = h('button', { type: 'button', 'aria-label': p.name }, patchShape(p.id, '', 9), h('div.meta', { style: 'display:flex;gap:6px;font-weight:700;font-size:12px', html: facts(p) })); b.onclick = function () { showPatch(p.id); }; g.appendChild(b); });
+  var g = h('div.refgrid'); PATCHES.forEach(function (p) { var b = h('button', { type: 'button', 'aria-label': p.name }, patchShape(p.id, '', 9), h('div.meta', { style: 'display:flex;gap:6px;font-weight:700;font-size:14px', html: facts(p) })); b.onclick = function () { showPatch(p.id); }; g.appendChild(b); });
   var w = h('div', h('p.sub', { style: 'font-size:.9rem' }, 'All 33 patches, in every game. Tap one to see it large. Icons: cost in buttons, time, buttons it earns at each button spot.'), g); GX.drawer('patchd', 'All patches', w, true); var dr = $('#patchd .gx-drawer-body'); dr.innerHTML = ''; dr.appendChild(w);
 }
 function rulesHtml() {
