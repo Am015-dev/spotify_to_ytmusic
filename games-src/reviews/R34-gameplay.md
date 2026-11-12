@@ -62,3 +62,67 @@ when it leads by 10+) is an AI setting, not a rule change. Nothing invented.
 | 5 | 375x667, Take step with a few Mystics in hand | The Earn list (Earn 6 / 8 / 10 / 12 ...) stacks under the board and squeezes the tiles to 58x36 px. At 390 with 7 Earn rows the tiles shrink to about 46 px. | games-src/reviews/R34-shots/sq-g375-earn-list-tiles-36px.jpg |
 | 6 (good) | Glow-follow at 390 | Won 268-155; the result card names where the points came from ("most of the points came from Goods (94)"). | games-src/reviews/R34-shots/sq-g390-glow-won-268-155.jpg |
 | 6 (good) | Mixed newcomer at 375 | Lost 174-213; a fair game, not a rout. | games-src/reviews/R34-shots/sq-g375-mixed-final-board.jpg |
+
+---
+
+## 2. tidewake (shelf/W498-tidewake-gameplay @ 182fefe8, merge was a no-op): 7.1, FAIL
+
+Gate: **FAIL.** Build, phone-check, lab and scenarios pass, but the quick sweep fails: "sweep.js: 4 games, 76 taps ... PROBLEMS 1 /
+375x553 g1 lay: covered pb small sdet by none". On the small phone a lay-phase button (`pb small sdet`) has its centre off the
+screen (elementFromPoint finds nothing). This is a row 5 and row 8 finding, and it blocks a deploy.
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") by touch at both sizes to "You know the rules / Play a real game": 35 taps at 390 (89 s)
+  and 36 taps at 375 (88 s), **0 dead taps**, 0 targets under 44 px, longest settle 5.1 s, 0 errors.
+- Quick games (Quick game > Just play: you vs 2 computers, coach tips on by default) to the end, 8 counted:
+
+| Game | Size | How I played | Placements | Result | Time |
+|---|---|---|---|---|---|
+| s390a | 390x844 | "Safest start", then "Use ★" + Place every turn | 6 | **won** | 2.7 min |
+| s390b | 390x844 | same | 11 | **won** | 4.5 min |
+| s390c | 390x844 | same | 18 | **won** | 6.2 min |
+| s375a | 375x667 | same | 17 | **won** | 6.0 min |
+| s375b | 375x667 | same | 23 | lost (Jade last afloat) | 7.2 min |
+| s375c | 375x667 | same | 5 | lost (Cobalt last afloat) | 2.2 min |
+| r390a | 390x844 | random gold mark, random tile, 0-2 random turns, Place | 1 | sunk on turn 2 (sailed into a leviathan) | 0.8 min |
+| r375a | 375x667 | same | 11 | **won** | 4.7 min |
+
+- ★-follow won **4 of 6** (fair share 33%); every ★ line I logged before Place said 1-3% risk, rising to 10-14% late in the game
+  (the fixer's claim that ★ risk is honest looks right). Random play won 1 of 2.
+- 0 page and console errors, 0 stuck states. The start pop-up opened on every gold-mark tap (it has two big "upper / lower mark"
+  buttons). Rival turns: about 15 s of waiting per round, and up to 27-36 s without anything to tap late in a game.
+- (Earlier ★ runs were thrown away: my driver mistook a rival's "Sunk" card for my own, and once kept tapping under a sheet.)
+
+Rules check: unchanged and right (every junk starts on an edge mark before tiles, a dice roll first, 6/7/8 wakes the leviathans,
+edge / leviathan / collision sinks, last junk afloat wins, sunk crews stay out, refill to three). The leviathan sheet's numbers
+(1-6 faces, move order) match the expansion. No official smaller first-game setup exists, as the fixer says. Nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. |
+| 2 | Tutorial teaches | 8 | 35-36 one-line steps at both sizes, 0 dead taps, ends on "Play a real game". |
+| 3 | First 10 seconds | 8 | 4 goal lines on the title, tutorial first, "Safest start · under 1%". |
+| 4 | Turn clarity | 7 | Short ★ line with the real risk ("★ Safest: 14% risk, keeps 5 moves open"), ✓ / ✗ / ★ badges, a warning in the prompt ("⚠ Tidegrave: 6-8 reaches you"), a clear Sunk card naming cause and turn. |
+| 5 | Phone play | 6 | Tiles 68-100 px, 44 px buttons, start pop-up with big buttons. But the gate sweep finds an off-screen lay button at 375x553, the coach's "Got it" sits over the board and the tap falls through (below), and the "start" label still touches the "Stop" pin. |
+| 6 | AI and pacing | 7 | Fixed: ★ now protects a newcomer, 4 wins in 6 (R29: 1 in 4), no more "under 1%" then out. Random play still sinks fast, as it should. Pacing is slow: about 15 s per round of rival play, up to 27-36 s late in a game (Skip helps). |
+| 7 | Feel | 7 | Painted chart, junks gliding, leviathans moving one by one, red sink marks, named causes. |
+| 8 | Bugs | 6 | 0 errors and 0 stuck. But the gate fails, and tapping "Got it" on a coach bubble opened a leviathan sheet underneath in 3 of 9 games. Tapping a ✗ tile gives no feedback at all (9 such taps in the random game). |
+| | **Total** | **7.1** | **FAIL**: gate FAIL; rows 5 and 8 are below 7. 8+8+8+7+6+7+7+6 = 57/8 = 7.125. No stopper. |
+
+### Earlier findings (R29)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 6: ★ doesn't protect a newcomer (1 of 4, out after 1 placement) | **Fixed**: ★ won 4 of 6; the shortest ★ game still lasted 5 placements | games-src/reviews/R34-shots/tw-s390-star-won.jpg, games-src/reviews/R34-shots/tw-s375-star-lost.jpg |
+| Row 5/8: gate sweep fails a start-mark tap at 375x553 | **Changed, still FAIL**: start marks now open the pop-up (my 390/375 taps all worked), but the sweep now fails on an off-screen lay button at 375x553 | none (gate log) |
+| Row 5: "Stop" pin overlaps the "start" label | **Not fixed** (they touch; both readable) | games-src/reviews/R34-shots/tw-s390-star-line-start-stop.jpg |
+| Row 4: ★ line short, risk honest | **Still good**: 1-3 % early, 10-14 % late, matches outcomes | games-src/reviews/R34-shots/tw-s390-star-line-start-stop.jpg |
+| Row 2: tutorial clean | **Still good**: 0 dead at both sizes | games-src/reviews/R34-shots/tw-tut390-end.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 8 / 5 | Tapped "Got it" on the coach bubble ("Your start" / "Lay a current") | The bubble closed and the same tap reached the leviathan under it: its rules sheet opened and covered "Safest start" / Place until I closed it with ✕. 3 of 9 games. | games-src/reviews/R34-shots/tw-gotit-tapthrough-sheet.jpg |
+| 8 / 5 | Deploy gate at 375x553 | Sweep: lay button `pb small sdet` off screen ("covered ... by none"). | none (gate log) |
+| 4 | Random game: tapped a ✗ tile | Nothing happens: no shake, no line saying it would sink you. | games-src/reviews/R34-shots/tw-r375-x-tile-no-feedback.jpg |
+| 6 | Full games | Rival turns take about 15 s per round; late in a game I waited up to 27-36 s with nothing to tap. | games-src/reviews/R34-shots/tw-s375-star-lost.jpg |
+| 6 (good) | Random play at 390 | Sunk on turn 2 by sailing into a leviathan, with a clear cause line: a careless player loses, a ★ player usually doesn't. | games-src/reviews/R34-shots/tw-r390-random-sunk-turn2.jpg |
