@@ -350,3 +350,10 @@ html.short #sc .tr span:nth-child(2){display:none}
 .briefc .btip{margin:0 14px 6px;font:700 .95rem/1.3 var(--fb);color:#1c1408;background:rgba(255,224,102,.45);border-radius:8px;padding:4px 8px;text-align:left}.briefc .btip b{color:#7a3d00;margin-right:4px}
 .briefc .bstar{margin:0 12px 8px;font:800 .9rem var(--fb);color:#7a3d00}
 .end .endstar{margin:2px 14px 4px;font:800 1rem var(--fb);color:#4a3418}.end .endstar.got{color:#8a5a00;text-shadow:0 0 6px rgba(255,210,63,.8)}
+
+/* crew rows: name plate beside the wires instead of above them (small portrait screens) */
+#crew.rowy .sg{flex-direction:row;align-items:center;justify-content:center;gap:4px}
+#crew.rowy .sg .plate{flex:none;max-width:84px}
+#crew.rowy .plate b{max-width:38px}
+#crew.rowy .plate .pbot{display:none}
+#crew.rowy .stand{flex:1 1 0;min-width:0}

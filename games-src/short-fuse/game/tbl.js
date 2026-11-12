@@ -156,7 +156,8 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
   tb.classList.toggle('over',!!G.over);tb.classList.toggle('mineon',!!mine);tb.classList.toggle('dng',G.dial!=null&&G.dial<=1&&!G.over);
   setSay(sayText(V));
   renderOverlays(V);
-  layoutTable();flushFx();placeGhost(V)}
+  layoutTable();flushFx();placeGhost(V);
+  clearTimeout(TBL.lt);TBL.lt=setTimeout(()=>{try{layoutTable()}catch(e){}},320)}
 const RACK={rg:9,lb:12};   // extra px: the gap between wrapped rows (return arrow) and the label above each of two stands (table.css)
 // tile sizes: as large as fit; stands wrap to more rows rather than shrink below a thumb
 function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
@@ -165,35 +166,40 @@ function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
     if(h>H+1)continue;if(!best)best={tw,rows};else if(tw>=best.tw-4&&rows<best.rows)best={tw,rows}}
   return best?best.tw:o.min}
 // every wire is a thumb target: never under 44x44 (crowded jobs scroll the crew area instead of shrinking it)
-const TMIN=44;function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(ratio,1.12):ratio)))}
+const TMIN=44,TMINW=30;function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(ratio,1.12):ratio)))}
 function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=st.parentNode.clientWidth||st.clientWidth;const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
   document.documentElement.classList.toggle('short',window.innerHeight<640);
   const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
-  const plate=44;
+  let plateH=44;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
   const ms=[...mine.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length);
   const used0=[...tb.children].filter(e=>e!==felt&&e!==mine&&getComputedStyle(e).position!=='absolute'&&!e.hidden).reduce((a,e)=>a+e.offsetHeight,0);
   const gh=gear.offsetHeight,cw=W-12;const maxM=big?92:land?52:60;
-  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:54,plate,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:54,plate,seatGap:6}))}
-    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:TMIN,max:big?88:land?54:56,plate,seatGap:6})};
+  const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMINW,max:big?88:54,plate:plateH,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:TMINW,max:big?88:54,plate:plateH,seatGap:6}))}
+    return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:TMINW,max:big?88:land?54:56,plate:plateH,seatGap:6})};
   const setMine=tw=>{mine.style.setProperty('--tw',tw+'px');mine.style.setProperty('--th',tileH(tw,1.32)+'px');balance(mine,tw,4)};
   let tm=0,t1=0;crew.classList.toggle('two',land&&cs.length>1);
   if(ms.length){mine.style.maxHeight='';mine.style.overflow='';
     // my stand first, as big as it can be while the crew keeps a tile a thumb can still tap
-    const capC=Math.min(52,crewFit(1e4));let pick=TMIN;
-    for(let tw=maxM;tw>=TMIN;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.34))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
+    const capC=Math.min(52,crewFit(1e4));let pick=TMINW;
+    for(let tw=maxM;tw>=TMINW;tw-=2){setMine(tw);const hm=mine.offsetHeight;const ch=H-used0-hm-gh;if(hm>H*(land?.5:.34))continue;const c=crewFit(ch);if(c>=capC){pick=tw;break}pick=tw}
     setMine(pick);tm=pick}
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
-  for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=TMIN)break;t1-=1}
+  for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=TMINW)break;t1-=1}
+  // before scrolling: crew rows put each name plate beside its wires (one plate height saved per seat)
+  crew.classList.remove('rowy');
+  if(!TBL.relaid&&!land&&crew.scrollHeight>crew.clientHeight+1){const sh0=crew.scrollHeight,t0=t1;crew.classList.add('rowy');plateH=0;t1=crewFit(ch);
+    for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=TMINW)break;t1-=1}
+    plateH=44;if(crew.scrollHeight>=sh0){crew.classList.remove('rowy');t1=t0;crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3)}}
   // still too tall at the smallest (44px) crew tile, short landscape: my name plate moves beside my stand; after that the crew area scrolls (never a wire under 44px)
   if(ms.length&&land&&crew.scrollHeight>crew.clientHeight+1){mine.classList.add('mrow');setMine(tm);balance(crew,t1,3)}
   const crowd=crew.scrollHeight>crew.clientHeight+1;crew.classList.toggle('scroll',crowd);
   const atEnd=()=>crew.classList.toggle('end',crew.scrollTop+crew.clientHeight>=crew.scrollHeight-2);atEnd();if(!crew._sl){crew._sl=1;crew.addEventListener('scroll',atEnd,{passive:true})}
-  if((crowd||t1<TMIN+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
-  if(!crowd&&t1>=TMIN+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
+  if((crowd||t1<TMINW+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
+  if(!crowd&&t1>=TMINW+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
   TBL.lay={W,H,tw:t1,tm};
   placeGhost(UI.V)}
@@ -344,6 +350,8 @@ function chipTap(n){const V=UI.V;const it=TBL.items&&TBL.items[n];if(!it||!V)ret
     if(ownerOf(si)===V.seat)return;UI.sel={mode:'dual',tool:null,tg:[{st:si,k}],v:mv.v,v2:null,two:null,fu:null};if(UI.ghost&&UI.ghost.turn)ghostDone('turn');autoFire()};
   document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true)})();
 // ---------- keeping the layout right on every size change (iOS reports the old size right after a rotation) ----------
+// the felt grows or shrinks when a sibling (scorecard, strip, banner) changes height after a pass: lay out again
+if(window.ResizeObserver){let busy=0;const ro=new ResizeObserver(()=>{if(busy)return;busy=1;try{layoutTable()}catch(e){}busy=0});const hook=()=>{const f=document.getElementById('felt'),m=document.getElementById('mine');if(!f)return setTimeout(hook,100);ro.observe(f);if(m)ro.observe(m)};hook()}
 if(window.GXV)GXV.watch(()=>{try{layoutTable()}catch(e){}});
 else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
   window.addEventListener('resize',deb);window.addEventListener('orientationchange',deb);if(window.visualViewport)window.visualViewport.addEventListener('resize',deb);
