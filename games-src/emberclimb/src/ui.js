@@ -50,8 +50,12 @@
   // owner brief (8 Nov): a message stays at least 4 s + 1 s per 10 words, one at a time, and a tap closes it
   function readMs(t, ms) { var w = String(t || '').split(/\s+/).filter(Boolean).length; return Math.max(ms || 0, 4000 + 1000 * Math.ceil(w / 10)); }
   UI.readMs = readMs;
+  // overlays (coach bubble, toasts) sit just above the dock's button row on phones: never over the top bar, the intents or the result
+  function ecSlot() { try { var a = document.getElementById('dockact'), r = a && a.getBoundingClientRect(), v = (r && r.height && r.top > 80 && r.top < innerHeight) ? Math.round(innerHeight - r.top + 6) : 64; document.documentElement.style.setProperty('--ecslot', v + 'px'); } catch (e) { } }
+  UI.slot = ecSlot;
   function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
-    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var d = h('div', 'toast', t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); ecSlot(); var gz = G(), d = h('div', 'toast' + (gz && gz.scr === 'over' ? ' mid' : ''), t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
+  UI.toast = toast;
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
   function popAt(w, txt, cls) {
     if (!window.ANIM) return; var r = rectOf(w); if (!r) return;
@@ -250,7 +254,7 @@
     var mid = h('div', '', null, [hs, h('div', 'refline', D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
-    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 3;
+    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
     mid.appendChild(seg);
     var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Climb together' : 'Climb'), function () { start(); }); go.id = 'play'; row.appendChild(go);
@@ -259,7 +263,7 @@
   }
   UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function start() { var a = UI.acts || 3; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
+  function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
@@ -297,7 +301,7 @@
     else if (g.scr === 'shop') { txt = 'Tap an item, then Buy.'; ttl = 'Shop'; }
     else if (g.scr === 'event') { txt = 'Choose one.'; ttl = 'Event'; }
     else if (g.scr === 'over') { txt = g.won ? 'You won this climb.' : 'This climb is over.'; ttl = 'Result'; }
-    m.textContent = txt; t.textContent = ttl; var nw = document.querySelector('.w7now'); if (nw) nw.textContent = txt;   // R7: the same one-line prompt on the phone stage var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
+    ecSlot(); m.textContent = txt; t.textContent = ttl; var nw = document.querySelector('.w7now'); if (nw) nw.textContent = txt;   // R7: the same one-line prompt on the phone stage var ap = document.getElementById('game'); if (ap) ap.classList.toggle('ec-over', g.scr === 'over');
     if (g.scr === 'map' && STAGE()) { var lg = h('div', 'w485leg'); 'm e r s t v'.split(' ').forEach(function (k) { lg.appendChild(h('span', 'w485lgi t-' + k, null, [nodeIc(k), document.createTextNode(k === 'v' ? 'Event' : NODEL[k])])); }); a.appendChild(lg); }
     if (g.scr !== 'over') a.appendChild(potRow());
     if (g.scr === 'battle' && g.relics && g.relics.length) { var pi = h('div', 'pcinfo', null, [h('b', '', 'Relics')]); g.relics.forEach(function (id) { pi.appendChild(h('div', 'rl', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' }), h('span', '', null, [h('b', '', D.RELICS[id].name), document.createTextNode(D.RELICS[id].t)])])); }); a.parentNode.appendChild(pi); }
@@ -366,10 +370,10 @@
     }
     if (it.blk) P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + it.blk, cap: 'raises ' + it.blk + ' Block', say: 'Block: it gains ' + it.blk + ' Block, so your attacks do less.' });
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: it gains ' + it.str + ' Strength, so every later attack hits harder.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: each of your hits deals 3 less. One Weak is used up per attack (max 3).' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: each of your hits deals 8 less. One Weak is used up per attack (max 3).' });
     if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage from a hit. One is used up per attack (max 3).' });
     if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker for ' + it.frail + ' turns.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 1 HP per poison at the end of the turn, ignoring Block. It stays.' });
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 8 HP per poison at the end of the turn, ignoring Block. It stays.' });
     if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Junk: adds ' + it.add[1] + ' ' + cn + ' to your discard pile. It clogs your deck.' }); }
     if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: until its next move, every attack card you play on it hurts you for ' + it.spikes + '. Use skills or block that turn.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
@@ -711,7 +715,7 @@
   function rest() {
     var g = G(), s = h('div', 'reward'); s.appendChild(A('bg-rest', '', { cls: 'bg', kind: 'bg' }));
     var hi = g.rest.todo[0], hh = g.hs[hi], H = D.H[hh.k];
-    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP (30%), or smith: upgrade one card for good.'));
+    s.appendChild(h('h2', '', 'Campfire')); s.appendChild(host('cast-healer', 'Sit, climber. Rest to heal ' + E.restHeal(g.hs[hi]) + ' HP (the tabletop heal 3), or smith: upgrade one card for good.'));
     if (g.hs.length > 1) s.appendChild(h('div', 'chip', H.name));
     var amt = E.restHeal(g.hs[hi]);
     var b1 = on(h('button', 'btn', 'Rest: heal ' + amt), function () { E.performMove({ t: 'heal', h: hi }); UI.ov = null; render(); }); b1.id = 'rest-heal';
@@ -784,6 +788,7 @@
     if (r) { var mp = on(h('button', 'btn alt', 'Story map'), function () { done('map'); }); mp.id = 'rmap'; bt.appendChild(mp); }
     if (r && r.won) { var nx = on(h('button', 'btn', 'Next chapter'), function () { done('next'); }); nx.id = 'rnext'; bt.insertBefore(nx, bt.firstChild); }
     var tt = on(h('button', 'btn alt', 'Title'), function () { done('title'); }); tt.id = 'rtitle'; bt.appendChild(tt);
+    var sc = h('div', 'rscroll'); Array.prototype.slice.call(s.children).forEach(function (n) { if (!n.classList.contains('bg')) sc.appendChild(n); }); s.appendChild(sc);   // the deck scrolls inside rscroll, never under Play again / Title
     s.appendChild(bt); app.appendChild(s);
   }
   UI.showResult = function (r) {

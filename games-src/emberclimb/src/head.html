@@ -583,4 +583,19 @@ html body.ec-stage #stage .hand.fan .card .ct,html body .card .ct{font-size:14px
 .w485top{position:relative}
 .w7now{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);text-align:center;font-size:14px;font-weight:700;line-height:1.2;color:#fff4dc;background:rgba(20,10,4,.82);border:1px solid rgba(242,135,43,.55);border-radius:999px;padding:4px 12px;pointer-events:none;z-index:6}
 .w7now:empty{display:none}
+/* W485-r16: coach bubble / toasts / prompt pill never cover the top bar, an enemy intent or the result; the result deck scrolls above its buttons; reward text wraps */
+@media (max-width:1023px){
+html body .ec-say,html body .toast{top:auto!important;bottom:var(--ecslot,64px)!important;left:0!important;right:0!important;margin:0 auto!important;transform:none!important;animation:none!important;width:max-content;max-width:min(94vw,520px);padding:6px 10px;gap:8px}
+html body .toast{white-space:normal;text-align:center;font-size:14px;line-height:1.2;border-radius:14px;padding:5px 10px}
+html body .ec-say{padding:4px 8px}html body .ec-say .art{width:30px;height:30px}
+html body .ec-say b{display:inline;margin-right:6px;font-size:13px}html body .ec-say span{display:inline;font-size:14px;line-height:1.2}
+html body .w7now{display:none!important}
+html body .toast.mid{top:42%!important;bottom:auto!important}
+html body .picks .card{--cw:clamp(100px,29vw,150px);height:auto;min-height:calc(var(--cw)*1.4);overflow:visible}
+html body .picks .card .cb,html body .picks .card .cb .cl,html body .picks .card .cl{font-size:13px!important;line-height:1.2;overflow:visible!important;text-overflow:clip!important;-webkit-line-clamp:unset!important;max-height:none!important;white-space:normal}
+}
+html body .over.res{overflow:hidden!important;padding:0!important;gap:0!important}
+html body .over.res>.rscroll{flex:1;min-height:0;width:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 12px 12px}
+html body .over.res>.rbtns{position:relative!important;flex:none;margin:0;background:#14100e;box-shadow:0 -1px 0 rgba(255,255,255,.08)}
+.ec-endc ul[hidden]{display:none}.ec-endc .ec-sum{list-style:none;padding-left:0}.ec-endc .ec-showall{min-height:44px;margin:6px 0 4px;width:100%}
 </style></head>

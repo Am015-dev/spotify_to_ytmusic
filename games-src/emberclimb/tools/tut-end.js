@@ -47,6 +47,16 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
     if (forced > 40) { bad++; console.log('FAIL', name, 'more than 40 guided taps'); }
     if (!endCard) { bad++; console.log('FAIL', name, 'no coach end card'); }
     if (cov.missing.length) { bad++; console.log('FAIL', name, 'core rules not met by doing:', cov.missing.join(',')); }
+    if (endCard) {   // W485 r16: a short summary (3-5 lines) + a "Show all" button (>= 44px) that opens the full list
+      const sm = await pg.evaluate(() => { const l = [...document.querySelectorAll('.ec-endcard .ec-sum li')].filter(e => e.offsetHeight), b = document.querySelector('#coach-all'), ul = document.querySelector('#coach-list'), r = b && b.getBoundingClientRect(), v0 = ul && !ul.hidden && ul.offsetHeight > 0; return { n: l.length, bh: r ? Math.round(r.height) : 0, bw: r ? Math.round(r.width) : 0, openAtStart: !!v0, rules: ul ? ul.querySelectorAll('[data-rule]').length : 0 }; });
+      if (sm.n < 3 || sm.n > 5) { bad++; console.log('FAIL', name, 'end card summary has', sm.n, 'lines (want 3-5)'); }
+      if (sm.openAtStart) { bad++; console.log('FAIL', name, 'full list is open at start'); }
+      if (sm.bh < 44 || sm.bw < 44) { bad++; console.log('FAIL', name, 'Show all button too small', sm.bw + 'x' + sm.bh); }
+      await T('#coach-all'); await sleep(200);
+      const open = await pg.evaluate(() => { const ul = document.querySelector('#coach-list'); return ul && !ul.hidden && ul.offsetHeight > 0 ? ul.querySelectorAll('li').length : 0; });
+      if (open !== sm.rules || !open) { bad++; console.log('FAIL', name, 'Show all did not open the full list', open, '/', sm.rules); } else console.log(name, 'end card: summary', sm.n, 'lines, Show all opens', open, 'rules');
+      await T('#coach-all');
+    }
     if (cov.listLater) { bad++; console.log('FAIL', name, 'end card still lists rules for later / a count'); }
     if (endCard) { await T('#coach-play'); await sleep(600); if (!(await pg.$('#play'))) { bad++; console.log('FAIL', name, 'end card did not open a real game'); } }
     if (errs.length) { bad++; console.log('FAIL', name, 'errors', errs.slice(0, 2).join(' | ')); }

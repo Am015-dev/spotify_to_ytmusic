@@ -32,7 +32,7 @@ window.EC_STORY = {
       junkintent: { say: 'An Iron Warden. It will stuff 2 Dazed into your deck:\njunk cards you can never play.', react: 'His sentries fight dirty. So will we.' },
       potion: { say: 'Potions are free and break after one use.\nPour the Venom Vial on it.', react: 'Hiss! Poison is in its gears now.' },
       poison: { say: 'Poison bites at the end of your turn, through any Block.\nAnd it stays until the thing falls.', react: '' },
-      power: { say: 'Powers burn for the whole fight.\nPlay Kindle: +2 Strength on every hit.', react: 'Feel that fire in your arms? Every swing hits 2 harder.' },
+      power: { say: 'Powers burn for the whole fight.\nPlay Kindle: Strength, +8 on every hit.', react: 'Feel that fire in your arms? Every swing hits 8 harder.' },
       exhaust: { say: 'Roar at it: it goes Weak and hits softer.\nThe roar exhausts: gone until the next fight.', react: 'It flinched. Weak things hit soft.' },
       die: { say: 'Some cards roll the tower\'s die: 1-6, low to high.\nSwing wild!', react: 'Ha! Fortune favours the bold.' },
       end2: { say: 'Hold the rest and end your turn.\nWatch the poison chew.', react: '' },
@@ -69,8 +69,8 @@ window.EC_STORY = {
       endturn: 'No card fits your energy? Tap End turn.',
       target: 'Many enemies: lift an attack, then tap your target.',
       vuln: 'Vulnerable: takes double damage from the next attack.',
-      weak: 'Weak: each of its hits deals 3 less damage.',
-      poison: 'Poison hits 1 HP per token each turn. It stays.',
+      weak: 'Weak: each of its hits deals 8 less damage.',
+      poison: 'Poison hits 8 HP per token each turn. It stays.',
       strength: 'Strength adds to every hit you make this fight.',
       power: 'A Power card lasts the whole fight. Play it early.',
       exhaust: 'Exhaust cards vanish for the rest of this fight once played.',
@@ -101,7 +101,7 @@ window.EC_STORY = {
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
     poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
-    end: { title: 'You climbed the tower', did: 'What you did on this climb', heroes: 'Each other hero brings one new trick. Its first fight shows it.', play: 'Play a real game', title2: 'Title' }
+    end: { title: 'You climbed the tower', did: 'You beat the climb. You used:', heroes: 'Each other hero brings one new trick. Its first fight shows it.', play: 'Play a real game', title2: 'Title' }
   },
   // Story mode scenes per chapter (id from campaign.json): intro (2-3 lines), win and loss outros, boss lines before and after
   chapters: {

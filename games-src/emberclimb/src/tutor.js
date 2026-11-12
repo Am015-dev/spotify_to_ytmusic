@@ -13,20 +13,22 @@
   // ---- speech card: portrait + one line; tap it to dismiss; sits at the top, away from the hand and End turn
   UI.say = function (text, ms, who) {
     var old = $('.ec-say'); if (!text) { if (old) old.remove(); return null; }
+    var gs = g(); if (gs && gs.scr === 'over') return null;   // no coach line over the result / game-over screen
+    if (UI.slot) UI.slot();
     // one message at a time: a bubble that has not been on screen long enough is never replaced; the new line waits its turn
     var tw = document.querySelector('.toast');   // a toast still being read is never removed: the bubble waits (R1: relic toast cut after 250 ms)
     if ((old && Date.now() < (+old.getAttribute('data-until') || 0)) || (tw && Date.now() < (+tw.getAttribute('data-until') || 0))) { C.q.unshift({ key: 'say', text: text, ms: ms }); return null; }
     if (old) old.remove(); if (tw) tw.remove();
-    var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status');
+    var c = (ST.cast || {})[who || 'guide'] || { name: 'Warden Ashgrove', emoji: '🔥', color: '#a8431f' }, d = document.createElement('div'); d.className = 'ec-say'; d.setAttribute('role', 'status'); if (gs) d.setAttribute('data-scr', gs.scr || '');
     var pic = window.EC_A ? EC_A('cast-' + (who || 'guide'), c.emoji || '', { kind: 'portrait', ph: c.color || '#a8431f' }) : document.createElement('div'); d.appendChild(pic);
     var t = document.createElement('div'), b = document.createElement('b'), sp = document.createElement('span'); b.textContent = c.name; sp.textContent = text; t.appendChild(b); t.appendChild(sp); d.appendChild(t);
     d.addEventListener('click', function (e) { e.stopPropagation(); d.remove(); });
     var dur = UI.readMs ? UI.readMs(text, ms) : (ms || 5200); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { if (d.parentNode) d.remove(); }, dur); return sp;
   };
-  function speak(key, text, ms) { if (!text) return; C.q.push({ key: key, text: text, ms: ms }); pump(); }
-  function pump() { if ($('.ec-say') || !C.q.length) return; var it = C.q.shift(); UI.say(it.text, it.ms); var b = $('.ec-say'); if (b) b.setAttribute('data-k', it.key || ''); }
+  function speak(key, text, ms) { if (!text) return; C.q.push({ key: key, text: text, ms: ms, scr: (g() || {}).scr }); pump(); }
+  function pump() { if ($('.ec-say') || !C.q.length) return; var it = C.q.shift(); UI.say(it.text, it.ms); var b = $('.ec-say'); if (b) { b.setAttribute('data-k', it.key || ''); b.setAttribute('data-scr', it.scr || (g() || {}).scr || ''); } }
   // R7: a fight reaction ("Fully blocked") never follows you to the next screen: drop it from the queue and the screen when the screen changes
-  function scrChange() { var G = g(); if (!G || C.lastScr === G.scr) return; C.lastScr = G.scr; C.q = C.q.filter(function (it) { return !/^(good|poor):/.test(it.key || ''); }); var b = $('.ec-say'); if (b && /^(good|poor):/.test(b.getAttribute('data-k') || '')) b.remove(); }
+  function scrChange() { var G = g(); if (!G || C.lastScr === G.scr) return; C.lastScr = G.scr; var sc = G.scr; C.q = C.q.filter(function (it) { return !/^(good|poor):/.test(it.key || '') && (!it.scr || it.scr === sc) && sc !== 'over'; }); var b = $('.ec-say'); if (b && (sc === 'over' || /^(good|poor):/.test(b.getAttribute('data-k') || '') || (b.getAttribute('data-scr') && b.getAttribute('data-scr') !== sc))) b.remove(); }
   setInterval(function () { if (C.on) { scrChange(); pump(); tick(); } else { try { tips(); } catch (e) { } } }, 400);
   function rule(k) { if (!C.on || C.seen[k] || !CO.rules[k]) return; C.seen[k] = 1; speak(k, CO.rules[k]); }
   UI.coachRule = rule;
@@ -110,8 +112,17 @@
     add('h2', CO.end.title || 'You climbed the tower');
     // what you did, as a checklist (no counts, no "later" list): each line is a rule you used on this climb
     add('h3', CO.end.did || 'What you did on this climb');
-    var ul = add('ul', ''); ul.className = 'ec-did';
+    // short summary first (3-5 lines); the full checklist (one line per rule used) sits behind "Show all"
+    var GRP = [['Fighting: cards and energy, block, enemy intents and status effects.', ['energy', 'intent', 'block', 'vuln', 'weak', 'strength', 'endturn', 'target', 'power', 'exhaust', 'poison']],
+      ['Climbing: map rooms, rewards, gold, shops, campfires and events.', ['map', 'reward', 'gold', 'shop', 'rest', 'event']],
+      ['Big fights: an elite with two foes, and the boss.', ['elite', 'boss', 'split']],
+      ['Potions and relics.', ['potion', 'relic']]];
+    var sm = add('ul', ''); sm.className = 'ec-sum';
+    GRP.forEach(function (gp) { if (!gp[1].some(function (k) { return C.seen[k]; })) return; var li = document.createElement('li'); li.textContent = '\u2713 ' + gp[0]; sm.appendChild(li); });
+    var ul = add('ul', ''); ul.className = 'ec-did'; ul.hidden = true; ul.id = 'coach-list';
     CORE.forEach(function (k) { if (!C.seen[k] || !CO.rules[k]) return; var li = document.createElement('li'); li.textContent = '\u2713 ' + CO.rules[k]; li.setAttribute('data-rule', k); ul.appendChild(li); });
+    var all = add('button', 'Show all'); all.type = 'button'; all.className = 'btn alt ec-showall'; all.id = 'coach-all'; all.setAttribute('aria-expanded', 'false'); all.setAttribute('aria-controls', 'coach-list');
+    all.addEventListener('click', function () { ul.hidden = !ul.hidden; all.textContent = ul.hidden ? 'Show all' : 'Hide list'; all.setAttribute('aria-expanded', ul.hidden ? 'false' : 'true'); });
     add('p', CO.end.heroes || 'Each other hero brings one new trick. Its first fight shows it.');
     var row = document.createElement('div'); row.className = 'ec-endrow';
     var b1 = document.createElement('button'); b1.type = 'button'; b1.className = 'btn'; b1.id = 'coach-play'; b1.textContent = CO.end.play || 'Play a real game';
@@ -130,8 +141,8 @@
     G.map.forEach(function (n) { G.map.forEach(function (o) { if (o.f === n.f + 1) n.nx.push(o.id); }); }); G.F = 6; G.pots = ['venom-vial']; G.boss = 'mire-behemoth';
     G.tutEnc = { 2: ['rust-tick'], 6: ['iron-warden', 'iron-warden'], 7: ['mire-behemoth'] }; G.tutHp = { 6: 55, 7: 40 };
     E.performMove({ t: 'go', n: 0 }); G = g();
-    // guided first fight: one slug with a fixed pattern (bite 5, then bite 3 + Weak), sized so it falls to the second Strike of turn 2
-    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 36; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 5, tg: 0 };
+    // guided first fight: one slug with a fixed pattern (bite 8, then bite 8 + Weak), sized so it falls to the second Strike of turn 2 (16 + 2 x 32 = 80)
+    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 72; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 8, tg: 0 };
     var h = G.hs[0], mk = E.mk; h.hand = [mk('w-hammer'), mk('w-defend'), mk('w-strike'), mk('w-strike'), mk('w-defend')]; h.en = 3; h.blk = 0;
     h.draw = [mk('w-strike'), mk('w-defend'), mk('w-strike'), mk('w-roar'), mk('w-kindle')]; h.disc = [];
     h.deck.push(mk('w-cleave'), mk('w-wild-swing'));   // a hit-all attack and a die card, so both rules come up by playing them
@@ -155,8 +166,8 @@
       { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
       { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
       info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
-      { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 2 to every hit.', wait: tap('w-kindle'), ready: turn2 },
-      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 3 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
+      { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 8 to every hit.', wait: tap('w-kindle'), ready: turn2 },
+      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 8 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
       { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
       { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },

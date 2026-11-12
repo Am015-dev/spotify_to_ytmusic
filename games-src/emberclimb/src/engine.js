@@ -64,7 +64,7 @@
     if (e.fl.indexOf('x') >= 0 && e.type !== 'P') out.push('Exhaust.');
     if (e.fl.indexOf('u') >= 0) out.push('Unplayable.');
     if (e.fl.indexOf('b') >= 0) out.push('End of turn in hand: lose 2 HP.');
-    if (e.fl.indexOf('r') >= 0) out.push('Held at end: 1 HP per card.');
+    if (e.fl.indexOf('r') >= 0) out.push('Held at end: ' + SC + ' HP per card.');
     if (e.fl.indexOf('d') >= 0) out.push('End of turn in hand: Weak 1.');
     if (e.fl.indexOf('e') >= 0) out.push('Exhausts at turn end.');
     return out;
@@ -348,7 +348,7 @@
     if (G.scr !== 'battle') return;
     if (!nextHero(G.b.cur + 1)) { tickPoison(); if (G.scr !== 'battle') return; G.b.ph = 'e'; G.b.ei = 0; G.b.cur = -1; }
   }
-  // tabletop poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies
+  // tabletop poison: at the end of the heroes' turn each poisoned enemy loses SCALE HP per token (ignores Block); tokens stay until it dies
   function tickPoison() {
     alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { p *= SC; e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); } });
     if (!alive().length) winBattle();
@@ -437,7 +437,8 @@
   // ---------- actions
   function cost(h, c) { var e = eff(c); return e.cost === 'X' ? h.en : e.cost; }
   function canPlay(h, c) {
-    var e = eff(c); if (e.fl.indexOf('u') >= 0) return false; if (e.cost === 'X') return true;
+    var e = eff(c); if (e.fl.indexOf('u') >= 0) return false; if (e.tgt && G.b && !alive().length) return false;   // no living target (e.g. a fallen boss about to split): the card does not glow
+    if (e.cost === 'X') return true;
     return e.cost <= h.en;
   }
   function play(hi, ci, ti) {

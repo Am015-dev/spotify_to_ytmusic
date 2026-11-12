@@ -127,7 +127,7 @@ rule(63, () => { const ids = Object.keys(D.EVENTS).filter(k => !D.EVENTS[k].star
   return [[true, false, true], [ids.length >= 12, seen.has('first-ember'), seen.size >= 10]]; });
 rule(64, () => { E.newGame({ heroes: ['w'], seed: 64 }); const g = E.G(); g.gold = 100; g.pots = ['fire-flask', 'fire-flask']; g.scr = 'event'; g.evn = { id: 'herb-witch', res: null }; E.performMove({ t: 'opt', i: 0 }); return [[100 - 2 * SC, 3], [g.gold, g.pots.length]]; });
 rule(65, () => { E.newGame({ heroes: ['w'], seed: 65 }); const g = E.G(); g.scr = 'event'; g.evn = { id: 'forge-spirit', res: null }; E.performMove({ t: 'opt', i: 0 }); const pend = g.evn.pend, ms = E.validMoves(); E.performMove(ms[0]); return [['upg', true, 1], [pend, ms.every(m => m.t === 'evpick'), g.hs[0].deck[ms[0].c].u]]; });
-rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 3/.test(u), /bless: 1/.test(u)]]; });
+rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 1/.test(u), /bless: 1/.test(u)]]; });
 
 // ---------- G3 review fixes
 // Iron Bangle: the start-of-fight Block survives into round 1 and is cleared at the start of round 2

@@ -1,4 +1,4 @@
-// W494 new-player Act 1 by touch: fresh storage, Quick game (default = full 3-act run with the opening blessing), played to the start of
+// W494 new-player Act 1 by touch: fresh storage, Quick game (default = 1-act climb with the opening blessing; a win at the act-1 boss ends on the result screen), played to the start of
 // Act 2 (or a loss) by tapping only visible, uncovered UI at 390x844. Prefers rooms not yet visited (shop, rest, event, elite) so every
 // room type is met; smiths at a campfire when healthy, takes a card out at the shop, uses potions. Writes playable-shots/w494/
 // rest.png shop.png event.png boss.png. Fails on page errors, a stuck screen, or failed invariants. Run: node tools/act1-taps.js
@@ -19,12 +19,13 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
   let last = '', stuck = 0; result = ''; cut = 0; bossDone = false; let inBoss = false;
   for (let i = 0; i < 6000; i++) {
     await sleep(200);
-    const s = await pg.evaluate(() => { const g = EC.E.G(); return { mode: UI.mode, scr: g && g.scr, ph: g && g.b && g.b.ph, kind: g && g.b && g.b.kind, busy: UI.busy, ov: UI.ov, act: g && g.act, ev: g && g.evn && g.evn.id, res: !!(g && g.evn && g.evn.res), floor: g && g.floor, inv: g ? EC.E.checkInvariants().length : 0, hp: g && g.hs[0].hp, mhp: g && g.hs[0].mhp, pots: g ? g.pots.length : 0, deck: g ? g.hs[0].deck.length : 0, gold: g && g.gold }; });
+    const s = await pg.evaluate(() => { const g = EC.E.G(); return { won: !!(g && g.won), mode: UI.mode, scr: g && g.scr, ph: g && g.b && g.b.ph, kind: g && g.b && g.b.kind, busy: UI.busy, ov: UI.ov, act: g && g.act, ev: g && g.evn && g.evn.id, res: !!(g && g.evn && g.evn.res), floor: g && g.floor, inv: g ? EC.E.checkInvariants().length : 0, hp: g && g.hs[0].hp, mhp: g && g.hs[0].mhp, pots: g ? g.pots.length : 0, deck: g ? g.hs[0].deck.length : 0, gold: g && g.gold }; });
     if (s.inv) inv++;
     const key = JSON.stringify(s); if (key === last) stuck++; else stuck = 0; last = key;
     if (stuck > 80) { await pg.screenshot({ path: path.join(OUT, 'stuck-act1.png') }); console.log('FAIL stuck at', key); bad++; break; }
     if (s.scr && s.act >= 2) { result = 'reached Act 2 (deck ' + s.deck + ', HP ' + s.hp + '/' + s.mhp + ')'; break; }
     if (s.kind === 'b') inBoss = true;
+    if (s.scr === 'over' && s.won) { result = 'won the 1-act climb at the boss (deck ' + s.deck + ', HP ' + s.hp + '/' + s.mhp + ')'; bossDone = true; break; }
     if (s.scr === 'over') { result = 'lost on floor ' + s.floor + ' (act ' + s.act + ')' + (inBoss ? ' at the boss' : ''); bossDone = inBoss; break; }
     { const gb = await pg.$('.ec-goal button'); if (gb && await gb.isVisible()) { await T(gb); continue; } }
     if (s.mode === 'title') { if (await pg.$('#play')) await T('#play'); else { const q = await byText('#title button', /^Quick game/); if (q) await T(q); } continue; }
@@ -65,9 +66,9 @@ const OUT = path.join(__dirname, '..', 'playable-shots', 'w494'); fs.mkdirSync(O
     if (s.scr === 'event') { if (s.ev !== 'first-ember') await snap('event'); if (s.res) { await T('#ev-leave'); continue; } const b = await pg.$('.reward .opts button:not([disabled])'); if (b) await T(b); continue; }
   }
   console.log('run ' + runs + ':', result || 'no result', '| rooms met:', Object.keys(met).join(','));
-  if (/Act 2/.test(result) || !result || bossDone) break;   // G3 r3: a finished act-1 boss fight (won or lost) proves Act 1 is playable by touch
+  if (/Act 2|won the 1-act/.test(result) || !result || bossDone) break;   // G3 r3: a finished act-1 boss fight (won or lost) proves Act 1 is playable by touch
   }
-  if (!/Act 2/.test(result) && !bossDone) { bad++; console.log('FAIL no run finished the act-1 boss fight in 5 tries'); }
+  if (!/Act 2|won the 1-act/.test(result) && !bossDone) { bad++; console.log('FAIL no run finished the act-1 boss fight in 5 tries'); }
   console.log('runs used: ' + Math.min(runs, 5) + (runs > 1 ? ' (earlier runs died before the boss)' : ' (first try)'));
   console.log('act1:', result || 'no result', '| rooms met:', Object.keys(met).join(','), '| smith', smithed, 'shop cut', cut, '| invariant failures', inv);
   if (!result) bad++; if (inv) bad++;
