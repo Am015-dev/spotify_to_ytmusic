@@ -144,3 +144,6 @@ function tutQueue(fn){clearTimeout(UI._tutQT);try{if(UI._lastPt&&typeof tapRing=
   return o(r)}})();
 // Learn to play: the first Clash plays out slowly (its step explains it); the later Clashes of the staged round resolve at once, so no silent wait passes ~3 s
 (function(){const o=bfEvent;bfEvent=function(c){if(UI.cfg&&UI.cfg.tutorial&&c&&c.ev&&c.ev.t==='clash'&&Object.keys(UI.clashRes||{}).length>0&&!tutHold(c)){const a=ANIM;ANIM=0;try{return o.apply(this,arguments)}finally{ANIM=a}}return o.apply(this,arguments)}})();
+// watch steps (a Next button) move on by themselves 2.5 s after they appear; a tap on Next still skips at once
+(function(){let id=null,t0=0;setInterval(()=>{try{if(typeof GXT==='undefined'||!tutOn()){id=null;return}const S=GXT.state();if(!S||!S.active||S.phase!=='show'||!S.shown||S.wait){id=null;return}
+  const k=S.i+':'+S.id;if(k!==id){id=k;t0=Date.now();return}if(Date.now()-t0>=2500/Math.max(1,Math.min(UI.speed||1,4))){id=null;GXT.next()}}catch(e){}},100)})();

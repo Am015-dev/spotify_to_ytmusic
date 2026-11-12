@@ -30,7 +30,7 @@ function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const 
   sizeMap();
   if((was!==on||wasLand!==UI.land)&&G){UI.mapReset=true;renderAll()}}
 // the map square: as big as the board area allows (portrait: the width; wide: the left column)
-function sizeMap(){const bd=$('#board');if(!bd)return;const W=bd.clientWidth,H=bd.clientHeight;if(!W||!H)return;const cs=document.documentElement.classList.contains('bf-w')?0:(($('#cstrip')||{}).offsetHeight||40)+6;const S=Math.max(120,Math.floor(Math.min(W,H-cs)));   // the pile chips sit under the board, never over it
+function sizeMap(){const bd=$('#board');if(!bd)return;const W=bd.clientWidth,H=bd.clientHeight;if(!W||!H)return;const side=!document.documentElement.classList.contains('bf-w')&&matchMedia('(max-height:620px) and (orientation:portrait)').matches;const cs=document.documentElement.classList.contains('bf-w')||side?0:(($('#cstrip')||{}).offsetHeight||40)+6;const S=Math.max(120,Math.floor(Math.min(side?W-68:W,H-cs)));   // the pile chips sit under the board, never over it
   document.documentElement.style.setProperty('--ms',S+'px');UI.bs=S}
 function phoneRefresh(){}
 function toggleZoom(){}

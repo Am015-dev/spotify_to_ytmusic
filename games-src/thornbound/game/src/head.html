@@ -531,4 +531,9 @@ html.desk .race-c.four .rv-t b{display:block}
 html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:13px}
 html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw .hand>.hc{top:1px}
 html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:13px;white-space:normal;line-height:1.1}}
+/* short portrait phones: the pile chips stand in a column right of the map, so the map keeps the full board height (>=80% of the width) */
+@media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #mapwrap{padding-bottom:0;justify-content:flex-start;padding-left:2px}
+html:not(.bf-w) #cstrip{left:auto;right:3px;top:3px;bottom:3px;width:62px;flex-direction:column;gap:3px}
+html:not(.bf-w) #cstrip .cs-c{min-height:0;padding:1px 2px;font-size:11px}html:not(.bf-w) #cstrip .cs-c span{font-size:11px}html:not(.bf-w) #cstrip .cs-c em{font-size:10px}
+html:not(.bf-w) #act .btn{max-height:44px;flex-direction:row;gap:6px;align-items:center;justify-content:center}html:not(.bf-w) #act .btn b{display:inline-block}}
 </style></head>
