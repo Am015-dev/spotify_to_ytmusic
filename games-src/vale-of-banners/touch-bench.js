@@ -30,6 +30,7 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
     let stuck = 0, last = '', audits = 0;
     for (let i = 0; started && i < 5000; i++) {
       const st = await page.evaluate(() => ({ over: !!G.over, rs: !document.getElementById('rs').hidden, tv: !document.getElementById('tv').hidden, mine: !G.over && G.seats[VB.actor(G)].human, busy: UI.busy, k: G.turn + '/' + G.phase + '/' + G.round + '/' + G.P[0].used + '/' + G.P[0].store.length + '/' + G.pend.length + '/' + UI.sel + '/' + UI.tab }));
+      if (process.env.DBG && i % 25 === 0) console.log(i, taps, JSON.stringify(st), await page.evaluate(() => { const m = hardMove(); return JSON.stringify(m) + ' sel ' + UI.sel + ' die ' + UI.die + ' tab ' + UI.tab + ' bestx ' + [...document.querySelectorAll('.bestx,.cell.best,.bestt')].map(e => e.id).join(','); }));
       if (st.rs) break;
       if (!st.over && !st.tv && !(await page.evaluate(() => UI.hintsOn)) && await T('#hintT', 300)) continue;
       if (st.over) { await T('#resB', 600); await page.waitForTimeout(600); continue; }
