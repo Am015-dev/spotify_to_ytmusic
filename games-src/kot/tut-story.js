@@ -54,7 +54,7 @@ const COACH_TIPS = [
   { id: 'stop', rules: ['stop'], say: 'Happy with these dice? Tap SMASH! to use them now.', when: () => myTurn_() && G.phase === 'roll' && G.rolls <= 1 && G.dice.length },
   { id: 'enter', rules: ['enter'], say: 'Downtown was empty, so you moved in: +1 ★.', when: () => myTurn_() && G.phase === 'buy' && inCity(me_()) },
   { id: 'start2', rules: ['start2'], say: 'Starting a turn in Downtown pays +2 ★.', when: () => myTurn_() && G.phase === 'roll' && G.rolls === 2 && inCity(me_()) && G.tid > 2 },
-  { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Tap a card to read it. Tap again to buy it.', when: () => myTurn_() && G.phase === 'buy' },
+  { id: 'buy', rules: ['cards', 'types', 'sweep', 'endturn'], say: 'Tap a card to read it, then tap Buy.', when: () => myTurn_() && G.phase === 'buy' },
   { id: 'rivals', rules: ['rivals'], say: g => `${g.rival} plays like you. Watch the line at the top.`, when: () => !G.winner && G.active !== me_() && !UI.intro },
   { id: 'yield', rules: ['yield'], say: 'Hit in Downtown. Stay for +2 ★ a turn, or yield and leave.', when: () => UI.choice && /Stay or yield/.test(UI.choice.title) },
   { id: 'ko', rules: ['ko'], say: 'At 0 ♥ a monster is out. Last one standing wins.', when: () => G.pl.some(p => p.alive && p.hp <= 3) },

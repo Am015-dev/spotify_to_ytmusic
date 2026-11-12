@@ -52,11 +52,18 @@ function cardSVG(id, o) {
   o = o || {}; const w = o.w || 100, h = H(w), s = D.suitOf(id), v = D.valOf(id), c = SU[s], lan = s === 4;
   const k = key('c', id, w, o.part || '', o.dim ? 1 : 0, o.sel ? 1 : 0, o.small ? 1 : 0, KIT.ART.emb0 ? 1 : 0); if (cached[k] && !o.standalone) return cached[k];
   const r = w * .085, bw = Math.max(1.6, w * .026), gid = uid('g');
-  let mat = `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lan ? '#16336b' : '#fffaf0'}"/><stop offset="1" stop-color="${lan ? '#0a1730' : PAPER2}"/></linearGradient></defs>`;
+  // R5: each colour has its own paper tint and its own shape (circle, triangle, diamond, star) at the foot, so Coral and Sunstar never look alike, colour-blind included
+  const TINT = [['#fde3e9', '#f2b3c2'], ['#e3eefc', '#b7cff2'], ['#e2f4e7', '#b4ddc0'], ['#fff4c8', '#f3d36e']][s] || ['#fffaf0', PAPER2];
+  let mat = `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${lan ? '#16336b' : TINT[0]}"/><stop offset="1" stop-color="${lan ? '#0a1730' : TINT[1]}"/></linearGradient></defs>`;
   mat += `<rect x="${f(bw / 2)}" y="${f(bw / 2)}" width="${f(w - bw)}" height="${f(h - bw)}" rx="${f(r)}" fill="url(#${gid})" stroke="${INK}" stroke-width="${f(bw)}"/>`;
   mat += `<rect x="${f(w * .05)}" y="${f(w * .05)}" width="${f(w * .9)}" height="${f(h - w * .1)}" rx="${f(r * .7)}" fill="none" stroke="${lan ? '#d9b04a' : c.c}" stroke-width="${f(Math.max(1.2, w * .02))}" opacity=".85"/>`;
   if (lan) { let st = ''; for (let i = 0; i < 9; i++) st += `<circle cx="${f(w * (.12 + ((i * 37) % 76) / 100))}" cy="${f(h * (.1 + ((i * 53) % 80) / 100))}" r="${f(w * (.008 + (i % 3) * .004))}" fill="#9fd0ff" opacity=".5"/>`; mat += st; }
-  let mid = ''; const ew = w * .56;
+  let foot = ''; if (!lan) { const cx = w / 2, cy = h * .865, R = w * .1, sw = Math.max(1, w * .022), st = `fill="${c.c}" stroke="${c.dk}" stroke-width="${f(sw)}" stroke-linejoin="round"`;
+    if (s === 0) foot = `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R * .9)}" ${st}/>`;
+    else if (s === 1) foot = `<path d="M${f(cx)} ${f(cy - R)}L${f(cx + R * 1.1)} ${f(cy + R * .85)}L${f(cx - R * 1.1)} ${f(cy + R * .85)}Z" ${st}/>`;
+    else if (s === 2) foot = `<path d="M${f(cx)} ${f(cy - R * 1.1)}L${f(cx + R)} ${f(cy)}L${f(cx)} ${f(cy + R * 1.1)}L${f(cx - R)} ${f(cy)}Z" ${st}/>`;
+    else { let d = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? R * .48 : R * 1.15; d += (i ? 'L' : 'M') + f(cx + Math.cos(a) * rr) + ' ' + f(cy + Math.sin(a) * rr); } foot = `<path d="${d}Z" ${st}/>`; } }
+  let mid = foot; const ew = w * .56;
   mid += emb(s, (w - ew) / 2, h * .5 - ew * .5, ew, true);
   const num = lan ? GOLD : c.dk, nfs = w * .3;
   let top = '';
