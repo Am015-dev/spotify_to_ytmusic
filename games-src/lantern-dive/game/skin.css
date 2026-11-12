@@ -168,9 +168,11 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 
 /* G4 review fix: phone header buttons carry a short word under the icon (44px targets), so nobody opens the Log by accident */
 @media (max-width:1023px){
-  html .gx-bar .gx-ibtn[data-gx]{flex-direction:column;gap:1px;padding:2px 3px;min-width:46px;min-height:44px}
+  html .gx-bar .gx-ibtn[data-gx]{flex-direction:column;gap:1px;padding:0 3px;min-width:46px;min-height:44px}
+  /* gate fix: the 44px bar leaves 24px inside a 10px painted frame, too small for icon + word; a 4px frame band (border-image-width only, so the skin moves no box) leaves 32px so nothing sits under the art */
+  html.sk .gx-bar .gx-ibtn[data-gx]{border-image-width:4px}
   html .gx-bar .gx-ibtn[data-gx] span{display:block!important;font-size:14px!important;line-height:1;font-weight:800;letter-spacing:.01em}
-  html .gx-bar .gx-ibtn[data-gx] svg,html .gx-bar .gx-ibtn[data-gx] i[data-ic],html .gx-bar .gx-ibtn[data-gx] .sk-ic{width:20px;height:20px}
+  html .gx-bar .gx-ibtn[data-gx] svg,html .gx-bar .gx-ibtn[data-gx] i[data-ic],html .gx-bar .gx-ibtn[data-gx] .sk-ic{width:18px;height:18px}
   html.sk .gx-bar .gx-ibtn[data-gx] span{color:#1f1408}
 }
 /* G4 review fix: the trick sits on a painted table pad in the middle of the felt (owner art media/ui-trick-pad.webp) */
