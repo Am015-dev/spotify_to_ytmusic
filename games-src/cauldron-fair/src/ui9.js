@@ -237,6 +237,8 @@ function stFit(st) {
   [...st.children].forEach(c => { const b = c.getBoundingClientRect().bottom - top; if (b <= H + 1 && b > best) best = b; });
   if (best > 60) st.style.maxHeight = Math.ceil(best + 2) + 'px';
 }
+// a rotation or resize refits the open shop (the fitted height was measured for the old size)
+addEventListener('resize', () => { const st = document.querySelector('.mkt .stw > .stalls'), mb = st && st.parentElement.querySelector('.smore'); if (!st || !mb) return; requestAnimationFrame(() => { smoreUpd(st, mb); stFit(st); smoreUpd(st, mb); }); });
 // R8: at 375 the stalls scroll; say how many are below and fade the bottom edge
 function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;

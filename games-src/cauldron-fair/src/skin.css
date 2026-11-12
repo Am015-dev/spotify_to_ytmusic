@@ -254,7 +254,7 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
 .smore{flex:none;align-self:center;margin-top:4px;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #f2b83a;background:#2b1a12;color:#fff6df;font:800 15px/1 system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;cursor:pointer}
 .smore[hidden]{display:none}
 .mkt .stalls .tout{visibility:hidden}
-@media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0}}
+@media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0;min-width:0}.mkt .stw>.stalls{min-height:0}.mkt .sinfo{flex:0 0 180px;max-height:none;align-self:stretch}}   /* R22: the info line sits beside the stalls, never squeezing them */
 /* R8: the fortune chip on the board sits above the YOUR TURN bar, never under it */
 html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}
 /* R22 gate: the painted plate must not change the Stop box (GXSK.audit): keep its unskinned padding */
