@@ -205,7 +205,7 @@ function bfRace(){const dk=document.querySelector('.gx-dock');if(!dk)return;let 
    document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;
      // a long name is condensed (same font size), and only trimmed if it would have to shrink below 70 %
      const old=b.querySelector('.nmfit');const t=old?old.textContent:[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('');if(old)old.remove();[...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});
-     const nm=document.createElement('var');nm.className='nmfit';nm.textContent=t;b.appendChild(nm);const r=b.clientWidth/nm.offsetWidth;
+     const nm=document.createElement('var');nm.className='nmfit';nm.textContent=t;b.appendChild(nm);const cs=getComputedStyle(b),r=(b.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0))/nm.offsetWidth;
      if(r>=.7){nm.style.transform=`scaleX(${Math.min(1,r-.06).toFixed(3)})`;b.classList.add('fit');return}
      nm.remove();b.appendChild(document.createTextNode(t));const full=t;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.lastChild.textContent=full.slice(0,n)+'…'}});
    if(!BF.snap)return;
