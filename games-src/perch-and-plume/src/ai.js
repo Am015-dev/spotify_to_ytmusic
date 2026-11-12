@@ -7,7 +7,7 @@
   var PP = root.PP || require('./engine.js');
   var B = PP.B, FOODS = PP.FOODS;
   var PWV = { gainF: .75, gainS: .9, cacheS: 1, cacheF: .8, tuckDraw: .9, tuckEgg: 1.1, tuckFood: 1, flock: 1, laySelf: .9, layNest: 1.4, draw1: .55, hunt: .5, huntDie: .45, allFood: .6, allDraw: .4, trade: .5 };
-  var AIW = { eng: .6, row: .25, kk: 2.5 }, EASY_RND = .25;   // hard's tuned weights (tuned by ai-gate duels)
+  var AIW = { eng: .6, row: .25, kk: 2.5 }, EASY_RND = .6;   // hard's tuned weights (tuned by ai-gate duels)
   function turnsLeft(G, seat) { var t = G.pl[seat].cubes; for (var r = G.round + 1; r < G.rounds; r++) t += G.cubes[r]; return t; }
   function need(G, seat) {   // how much each food is wanted by the birds in hand (missing food weighs more)
     var p = G.pl[seat], w = { grub: .2, seed: .2, fish: .2, berry: .2, rodent: .2 };
@@ -140,12 +140,12 @@
         tot += value(G2, seat, lvl, known);
       }
       var v = tot / sims;
-      if (lvl === 'easy') v += (Math.random() - .5) * 16;
+      if (lvl === 'easy') v += (Math.random() - .5) * 32;
       else if (lvl === 'normal') v += (Math.random() - .5) * 3;
       return { m: m, v: v };
     }).sort(function (a, b) { return b.v - a.v; });
     if (lvl === 'normal' && scored.length > 1 && Math.random() < .3) return scored[1].m;   // normal: a fair player who sometimes takes the second-best move
-    if (lvl === 'easy' && scored.length > 2 && Math.random() < .6) return scored[1 + Math.floor(Math.random() * Math.min(4, scored.length - 1))].m;
+    if (lvl === 'easy' && scored.length > 2 && Math.random() < .75) return scored[1 + Math.floor(Math.random() * Math.min(6, scored.length - 1))].m;
     return scored[0].m;
   }
   // why (<= 15 words) for the hint bulb

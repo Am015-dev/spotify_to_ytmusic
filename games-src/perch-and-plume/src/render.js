@@ -12,7 +12,9 @@ function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideT
 function setH(el, h) { if (!el || el._h === h) return; el._h = h; el.innerHTML = h; }
 function q() { return G && G.q; }
 function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
-function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
+// R19: the wait between your turns has a budget: after 2 s of rival play (round-end scoring, two rival turns in a row) the rest runs 6x faster
+function spd() { var sp = UI.speed || 1; if (UI.rvT0 && Date.now() - UI.rvT0 > 2000) sp = Math.max(sp, 6); return sp; }
+function aMs(ms) { if (UI.fast) return 0; var sp = spd(); try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
 // big picture, name, points in large type, habitat band with words, food cost as at most 3 icons with words, power in one sentence)
@@ -38,6 +40,7 @@ function cardHTML(id, size, st, attrs) {
   var b = B[id], pw = PP.power(id), col = pw.col || 'none';
   var h = '<div class="bc ' + (size === 'slot' ? 'on-board' : 'mini') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points') + '">';
   h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="hband">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + '</span><span class="vp">' + b.p + '</span></div>';
+  if (size === 'tray') h += '<div class="nm">' + esc(b.n) + '</div>';   // R19: a tray bird shows its name before you take it
   if (size === 'slot' && st && (st.eggs || st.cache || st.tuck)) {
     h += '<div class="meta">';
     if (st.eggs) h += '<span class="mt">' + eggIcon() + '<b>' + st.eggs + '</b></span>';

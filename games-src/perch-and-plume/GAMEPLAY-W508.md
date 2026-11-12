@@ -47,3 +47,15 @@ Headless (`node hint-gate.js 80`): Best 85-91%, mixed 67-74%, random 30% vs Easy
 | Cut hand names | Compact hand card: points badge sits over the picture, the name gets the full width, up to 2 lines, never clipped. | `tests/hand-names.js` (all birds at 390 and 375) |
 | No Best on the bonus question | Best also marks button choices (No thanks, Pay food, Skip, Reroll, bonus card) and the card or bird a bonus trade uses. 0 decisions without Best in 2 full games. | touch-game `best taps / misses` |
 | Best off screen after picking another bird | Best stays on the Best bird; `bestInView()` scrolls it (strip, panel or page) until a finger really lands on it. 0 scrolls in 11 hints-on games. | touch-game scroll count |
+
+## R19 fixes (6.9 FAIL, rows 5 and 6)
+| R19 finding | Fix | Test |
+|---|---|---|
+| Row 6: on defaults (hints off, normal speed) a newcomer lost 40-59 twice | Hints (Best badges, previews) are **on by default**; the bulb turns them off and remembers it. Easy shrugs more of its small choices (`EASY_RND` .6, noise 32, off-plan 75%). No rule changed. | `DEFAULTS=1 BEST=0.5 node tests/touch-game.js` (new player's storage, normal rival speed); `ALL=1 node hint-gate.js` |
+| Row 5: tray cards 33x45 with only a number; board birds 40x40 | Phones: the feeder takes one row of 5 dice, the tray gets its own row of named cards (name 14 px, points, habitats) next to the deck; a board bird covers its whole 44 px space. Pills sit above the dock, not over the score chips or food; the "Swipe your birds" pill is gone. | `tests/phone-sizes.js` (44 px cards, names shown, no text under 14 px) |
+| Row 6: round-end waits 14-19 s | The wait between your turns has a budget: after 2 s of rival play the rest runs 6x faster; a tap skips the rest (x25) for the whole wait, not into your turn. Turn banners 0.6/0.8 s. | touch-game prints the waits |
+| Row 2: Best glowing on "Play a bird" while step 1 asks to tap the score | No Best on the action tiles during the guided tutorial. | `tests/tutorial-end.js` (now also fails on a tap on the target that does nothing) |
+
+Measured by touch (touchscreen.tap), default settings, newcomer = Best half the time, else a random glowing target:
+390x844 won 55-45 and 59-58, 375x667 won 62-54 and 66-25; 0 dead taps, 0 scrolls, 0 page errors; longest wait 6.4 s
+untapped (was 14-19 s), mean 1.9-2.2 s; smallest tap target 44x44, smallest text 14 px. Headless: Best 97%, mixed 70%, random 25% vs Easy.

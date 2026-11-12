@@ -108,7 +108,7 @@ function actIcon(k) {
 function act4HTML() {
   var inf = actInfo(G, UI.view), tp = tutPoint();
   return '<div id="act4" role="group" aria-label="Choose one action">' + ACTDEF.map(function (d) {
-    var a = inf[d.k], best = !tp && hintsOn() && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
+    var a = inf[d.k], best = !tp && hintsOn() && !(typeof coachOn === 'function' && coachOn()) && inf.best === d.k, txt = a.ok ? (hintsOn() ? a.what : a.plain || a.what) : a.why;
     return '<button type="button" class="a4 a4-' + d.k + (best ? ' best' : '') + (tp === d.k ? ' tutpoint' : '') + '" data-a="a4" data-k="' + d.k + '"' + (a.ok ? '' : ' aria-disabled="true"') + ' data-val="' + a.v.toFixed(2) + '">' +
       '<span class="a4i" aria-hidden="true">' + actIcon(d.k) + '</span><span class="a4t"><b>' + d.t + '</b><span>' + esc(txt) + '</span></span>' +
       (best ? '<em class="bestb">Best</em>' : '') + '</button>';
@@ -118,7 +118,7 @@ document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="a4"]'); if (!t || !G || !myTurn() || G.q) return;
   var k = t.dataset.k, inf = actInfo(G, UI.view)[k];
   if (!inf.ok) { toast(inf.why, 0, 1); return; }
-  if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); toast('Swipe your birds. Tap a glowing one to play it.'); return; }
+  if (k === 'play') { UI.pickBird = true; UI.hix = 0; render(); handGo(0); return; }   // the instruction bar already says what to tap; no pill over the food
   if (!tutGate({ type: 'tap', what: 'ract', h: inf.h })) return;
   UI.sel = null; UI.pickBird = false; human({ t: 'act', a: k });
 });
@@ -211,9 +211,9 @@ function showRate() {
 function tutPoint() { try { return coachOn() ? COACH.point || null : null; } catch (e) { return null; } }
 
 // ---------------- Addendum 7: three modes. PLAY is clean (board, hand, tracker, one score line, a Goal card, short pops);
-// HINTS (top-bar toggle, off by default) adds previews, Best badges, the turn rating, toasts and "What should I do?";
+// HINTS (top-bar toggle, on by default since R19) adds previews, Best badges, the turn rating, toasts and "What should I do?";
 // LEARN TO PLAY (tutfree) is the coached game and always shows them.
-function hintsPref() { try { return localStorage.getItem('pp-hints') === '1'; } catch (e) { return false; } }
+function hintsPref() { try { return localStorage.getItem('pp-hints') !== '0'; } catch (e) { return true; } }   // on by default (R19): a newcomer sees Best; the bulb turns it off
 function hintsOn() { return !!(UI.mode === 'tutfree' || UI.hintPref); }
 UI.hintPref = hintsPref();
 function hintsBtn() { var b = $('#bulbbtn'); if (!b) return; var on = hintsOn(); b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.setAttribute('aria-label', 'Hints: ' + (on ? 'on' : 'off')); b.classList.toggle('on', on); var t = b.querySelector('.hst'); if (t) t.textContent = on ? 'on' : 'off'; }

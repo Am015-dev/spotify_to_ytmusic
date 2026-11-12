@@ -3,18 +3,18 @@
 // Counts taps, dock scrolls (target not fully on screen when it is wanted) and dead taps (a glowing target whose tap changes
 // nothing within 1 s). Every glowing target must answer its first tap.   node tests/touch-game.js [url] [maxScrolls]
 const { chromium } = require('playwright');
-const BESTP = +(process.env.BEST || 0), HINTS = BESTP > 0;
+const BESTP = +(process.env.BEST || 0), HINTS = BESTP > 0, DEF = !!process.env.DEFAULTS;   // DEFAULTS=1: a new player's settings (normal rival speed, hints as shipped)
 const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = +(process.argv[3] || 1);
 (async () => {
   const b = await chromium.launch(); let fails = 0; const errs = [];
   const ok = (c, m) => { if (!c) fails++; console.log((c ? 'PASS ' : 'FAIL ') + m); };
   for (const [w, h] of (process.env.SIZES || '390x844,375x667').split(',').map(x => x.split('x').map(Number))) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true });
-    await ctx.addInitScript((HINTS) => { try { localStorage.setItem('gns-prefs', JSON.stringify({ ai: 'fast' })); localStorage.setItem('pp-played', '1'); if (HINTS) localStorage.setItem('pp-hints', '1'); } catch (e) { } }, HINTS);
+    await ctx.addInitScript(({ HINTS, DEF }) => { try { if (!DEF) localStorage.setItem('gns-prefs', JSON.stringify({ ai: 'fast' })); localStorage.setItem('pp-played', '1'); if (!DEF) localStorage.setItem('pp-hints', HINTS ? '1' : '0'); } catch (e) { } }, { HINTS, DEF });
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto(URL); await p.waitForTimeout(800);
     for (const s of ['[data-t="quick"]', '[data-go]', '#keepgo']) { await p.locator(s).first().waitFor({ timeout: 10000 }); await p.locator(s).first().tap(); await p.waitForTimeout(500); }
-    let taps = 0, scrolls = 0, dead = [], t0 = Date.now(), idle = Date.now();
+    let minT = null, minF = [99, ''], waits = [], lastTap = 0, wasMine = true, taps = 0, scrolls = 0, dead = [], t0 = Date.now(), idle = Date.now();
     const sig = () => p.evaluate(() => JSON.stringify([G, UI.sel, UI.pend, UI.pickBird, UI.gsDie, UI.busy, !document.querySelector('#pop').hidden]).length + ':' + JSON.stringify([G.q, UI.sel, UI.pend, UI.pickBird, UI.gsDie, G.pl.map(x => [x.food, x.hand.length, x.board.map(r => r.length)])]));
     while (Date.now() - t0 < 600000) {
       const tgt = await p.evaluate((BESTP) => {
@@ -34,6 +34,7 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
         return null;
       }, BESTP);
       if (tgt === 'result') break;
+      if (tgt && tgt !== '#passgo' && lastTap && !wasMine) { waits.push((Date.now() - lastTap) / 1000); } if (tgt && tgt !== '#passgo') wasMine = true; else if (!tgt) wasMine = false;
       if (!tgt) { if (Date.now() - idle > 25000) { ok(false, `${w}x${h} stuck: nothing to tap for 25 s`); await p.screenshot({ path: 'shots/touch-stuck.png' }); break; } await p.waitForTimeout(150); continue; }
       const loc = p.locator(tgt).first();
       const inView = await loc.evaluate(e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth && (() => { const t = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 24)); return !!t && (t === e || e.contains(t)); })(); }).catch(() => null);
@@ -41,7 +42,9 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
       if (!inView) { scrolls++; if (process.env.WHY) console.log('     scroll for: ' + await loc.evaluate(e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 24)); return (e.className + ' ' + (e.dataset.a || '') + ' ' + (e.textContent || '').trim().slice(0, 24) + ' @' + Math.round(r.top) + '-' + Math.round(r.bottom) + ' q=' + (G.q && G.q.h) + ' pick=' + UI.pickBird + ' sel=' + UI.sel + ' top=' + (t ? t.className || t.id : '-')); })); await loc.scrollIntoViewIfNeeded().catch(() => { }); await p.waitForTimeout(200); }
       const before = await sig(); const what = await loc.evaluate(e => (e.className || e.id || '') + ' ' + (e.textContent || '').trim().slice(0, 20)).catch(() => '');
       const box = await loc.boundingBox().catch(() => null); if (!box) continue;
-      await p.touchscreen.tap(box.x + box.width / 2, box.y + Math.min(box.height / 2, 24)); taps++; idle = Date.now(); if (taps % 25 === 0) console.log(`     ${w}x${h} ... ${taps} taps, ${scrolls} scrolls, ${dead.length} dead, round ${await p.evaluate(() => G.round + 1)}`);
+      if (!/popx|passgo/.test(tgt) && (!minT || box.width * box.height < minT.w * minT.h)) minT = { w: Math.round(box.width), h: Math.round(box.height), what: what.slice(0, 30) };
+      if (taps % 10 === 0) { const fs = await p.evaluate(() => { let m = 99, t = ''; document.querySelectorAll('.gx-main *').forEach(e => { const r = e.getBoundingClientRect(); if (!r.width || r.bottom < 0 || r.top > innerHeight || getComputedStyle(e).visibility === 'hidden') return; if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) return; const f = parseFloat(getComputedStyle(e).fontSize); if (f < m) { m = f; t = e.textContent.trim().slice(0, 20); } }); return [m, t]; }); if (fs[0] < minF[0]) minF = fs; }
+      await p.touchscreen.tap(box.x + box.width / 2, box.y + Math.min(box.height / 2, 24)); taps++; idle = Date.now(); lastTap = Date.now(); if (taps % 25 === 0) console.log(`     ${w}x${h} ... ${taps} taps, ${scrolls} scrolls, ${dead.length} dead, round ${await p.evaluate(() => G.round + 1)}`);
       const changed = await p.waitForFunction(s => { try { return (JSON.stringify([G, UI.sel, UI.pend, UI.pickBird, UI.gsDie, UI.busy, !document.querySelector('#pop').hidden]).length + ':' + JSON.stringify([G.q, UI.sel, UI.pend, UI.pickBird, UI.gsDie, G.pl.map(x => [x.food, x.hand.length, x.board.map(r => r.length)])])) !== s; } catch (e) { return true; } }, before, { timeout: 1000, polling: 30 }).then(() => true).catch(() => false);
       if (!changed && !/popx|passgo/.test(tgt)) dead.push(what);
       if (dead.length > 12) { console.log('     stuck on dead taps: ' + dead.slice(-3).join(' | ') + ' :: ' + await p.evaluate(() => JSON.stringify({ q: G.q && G.q.h, sel: UI.sel, pend: UI.pend, pick: UI.pickBird, hm: typeof hintMove === 'function' ? hintMove() : null, prompt: document.querySelector('#prompt').textContent }))); await p.screenshot({ path: 'shots/touch-dead.png' }); break; }
@@ -49,6 +52,8 @@ const URL = process.argv[2] || 'http://127.0.0.1:8765/perch-and-plume/', MAXS = 
     }
     const res = await p.evaluate(() => !document.querySelector('#result').hidden ? G.pl.map((x, i) => x.name + ' ' + G.final[i].total).join(' / ') + ' ' + document.querySelector('#result').innerText.replace(/\s+/g, ' ').slice(0, 80) : 'no result');
     console.log(`     ${w}x${h}: ${taps} taps, ${scrolls} scrolls, ${dead.length} dead taps, ${Math.round((Date.now() - t0) / 1000)} s; ${res}`);
+    console.log(`     smallest tap target ${minT ? minT.w + 'x' + minT.h + ' (' + minT.what + ')' : '-'}; smallest text ${minF[0]} px ("${minF[1]}")`);
+    waits.sort((a, b) => b - a); console.log(`     waits for my turn: ${waits.length}, longest ${waits.slice(0, 5).map(x => x.toFixed(1)).join(', ')} s; mean ${(waits.reduce((a, b) => a + b, 0) / Math.max(1, waits.length)).toFixed(1)} s`);
     if (BESTP) console.log('     best taps / misses: ' + await p.evaluate(() => JSON.stringify(window.__nb || {})));
     ok(res !== 'no result', `${w}x${h} full game reaches the result`);
     ok(dead.length === 0, `${w}x${h} every glowing target answers its first tap (${dead.length} dead${dead.length ? ': ' + dead.slice(0, 3).join(' | ') : ''})`);

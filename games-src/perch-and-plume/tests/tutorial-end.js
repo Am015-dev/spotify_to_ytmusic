@@ -18,7 +18,7 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   await p.goto(URL); await p.waitForTimeout(1000);
   const open = await p.$('[data-gxt-open]'); ok(!!open, 'tutorial button on the title (fresh storage)');
   await open.scrollIntoViewIfNeeded(); const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2);
-  const seen = [], words = []; let pinkEgg = 0, tucked = 0, blocked = null, idle = Date.now(), real = false, later = false;
+  const seen = [], words = []; const ignored = []; let pinkEgg = 0, tucked = 0, blocked = null, idle = Date.now(), real = false, later = false;
   let lastStep = null, lastAt = Date.now(); const lat = {}, geo = {};
   while (Date.now() - idle < 30000) {
     const st = await p.evaluate(() => {
@@ -55,9 +55,12 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
     }
     const top = await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return !!t && (t === e || e.contains(t)); }, [x, y]);
     if (!top) { await p.screenshot({ path: 'shots/tut-covered.png' }); console.log('     covered target at step ' + st.step + ' by ' + await el.evaluate((e, [x, y]) => { const t = document.elementFromPoint(x, y); return t ? (t.id || t.className || t.tagName) + ' in ' + ((t.parentElement || {}).className || '') : 'none'; }, [x, y])); await p.waitForTimeout(300); continue; }
-    await tapXY(x, y); taps++; idle = Date.now(); await p.waitForTimeout(350);
+    const sg = () => p.evaluate(() => (window.GXCOACH && GXCOACH.step) + '|' + UI.mode + '|' + UI.pickBird + '|' + UI.sel + '|' + UI.pend + '|' + JSON.stringify([G.q, G.pl.map(x => [x.food, x.hand, x.board, x.cubes])])).catch(() => 'nav');
+    const b4 = await sg(); await tapXY(x, y); taps++; idle = Date.now(); await p.waitForTimeout(350);
+    if (await sg() === b4) { await p.waitForTimeout(700); if (await sg() === b4) { ignored.push(st.step); if (process.env.WHY) console.log('     ignored at ' + st.step + ': ' + b4 + ' :: ' + await p.evaluate(([x, y]) => { const t = document.elementFromPoint(x, y); return (t ? t.className + ' / ' + (t.closest('[data-a]') || {}).outerHTML : '-').slice(0, 300) + ' busy=' + UI.busy + ' q=' + JSON.stringify(G.q) + ' legal=' + JSON.stringify(PP.validMoves(G, 0)) + ' pop=' + !document.querySelector('#pop').hidden + ' gate=' + (typeof tutAct === 'function' ? tutAct({ type: 'tap', what: 'bird', t: 'egg', h: 0, c: 0 }) : '-'); }, [x, y])); } }   // R19: a tap on the highlighted target must always do something
   }
   console.log('     steps: ' + seen.join(' > '));
+  ok(ignored.length === 0, `${SIZE} taps on the highlighted target that did nothing: ${ignored.length} ${ignored.join(',')}`);
   ok(real, `the last step starts a real 4-round game at its starting hand (${taps} taps)`);
   ok(JSON.stringify(seen) === JSON.stringify(RULES), `every rule step appears, in order (${seen.length}/${RULES.length})` + (seen.length !== RULES.length ? ' missing ' + RULES.filter(r => !seen.includes(r)).join(',') : ''));
   const long = words.filter(w => w[1] > 12), multi = words.filter(w => w[2] !== 1);

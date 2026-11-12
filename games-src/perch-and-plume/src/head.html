@@ -457,5 +457,19 @@ body.picking #trk,body.picking .coachb,body.picking #rate{display:none}
 @media (prefers-reduced-motion:reduce){.flyfx{display:none}.bump{animation:none}}
 .ovl p.rnote{font-size:15px!important;line-height:1.4;opacity:1}
 .a4.glow{box-shadow:0 0 0 3px #ffd76a,0 0 12px #ffd76a}
+/* R19 phone sizes: the feeder takes one full row; the tray gets its own row of named cards (name, points, habitats), every card
+   and board bird at least 44 px to tap. */
+@media (max-width:999px){#mid{flex-wrap:wrap;gap:4px;min-height:0}
+#feeder{width:100%!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px!important;padding:4px!important;box-sizing:border-box}
+#feeder .die{width:auto!important;height:auto!important;min-height:44px!important;max-height:48px;aspect-ratio:auto}
+#tray{flex:1 1 0;gap:4px;justify-content:stretch}
+.tcard{width:auto!important;flex:1 1 0;aspect-ratio:auto;min-height:64px}
+.tcard .bc .pic{flex:0 0 26px}
+.tcard .bc .nm{font-size:14px;line-height:1.1;padding:2px 4px 3px;-webkit-line-clamp:2}
+.tcard .bc .vp{top:1px;right:1px;min-width:20px;height:20px;font-size:14px}
+.deck{width:56px!important;min-height:64px!important}
+.slot .bc{inset:-2px}
+#toast{top:auto;bottom:calc(var(--gx-sheet-h) + 8px)}   /* pills sit just above the dock, never over the score chips or food */
+#toast .t{padding:6px 12px}}
 </style>
 </head>

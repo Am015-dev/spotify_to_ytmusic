@@ -1,8 +1,8 @@
 // ===================== part 2: input, moves, the animated power chain, computer turns, hot-seat, save =====================
 var SAVE_KEY = 'pp-save';
 function tutGate(a) { return typeof tutAct === 'function' ? tutAct(a) : true; }
-document.addEventListener('click', function (e) {   // a tap while the rival plays speeds its steps up (x3) until your next turn
-  if (G && G.phase === 'play' && !isHuman(PP.sideToAct(G)) && humans().length) UI.speed = 3;
+document.addEventListener('click', function (e) {   // a tap while the rival plays skips the rest of its steps (x25) until your next turn
+  if (G && G.phase === 'play' && !isHuman(PP.sideToAct(G)) && humans().length) UI.speed = 25;
 }, true);
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a]'); if (!t) return;
@@ -167,9 +167,9 @@ function playFx(list, actor) {
   return chain;
 }
 // ---------------- the turn engine: computer moves, hot-seat hand-over, game over
-function aiDelay() { if (UI.fast) return 30; var sp = UI.speed || 1; try { return Math.round((GX.aiDelay ? GX.aiDelay(850) : 850) / sp); } catch (e) { return 850; } }
+function aiDelay() { if (UI.fast) return 30; var sp = spd(); try { return Math.round((GX.aiDelay ? GX.aiDelay(850) : 850) / sp); } catch (e) { return 850; } }
 // one plain line saying what is happening now (rival steps), shown in the instruction bar and as a pill over the board
-function caption(t) { UI.cap = t; var p = $('#prompt'); if (p) p.textContent = t; if (!UI.fast) toast(t, Math.round(1700 / (UI.speed || 1))); }
+function caption(t) { UI.cap = t; var p = $('#prompt'); if (p) p.textContent = t; if (!UI.fast) toast(t, Math.round(1700 / spd())); }
 function dropEl(x) { if (x && x.parentNode) x.parentNode.removeChild(x); }
 // "Your turn" / "<Rival>'s turn" banner; the turn waits for it (~1 s), a tap skips it
 function turnBanner(s) {
@@ -177,12 +177,12 @@ function turnBanner(s) {
   var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
   $$('.turnban').forEach(dropEl);
   var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
-  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to speed up.') + '</span>';
+  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to skip.') + '</span>';
   document.body.appendChild(d); UI.busy = true;
   UI.cap = me ? null : G.pl[s].name + ' is choosing an action.'; render();
   var done = false, fin = function () { if (done) return; done = true; dropEl(d); UI.busy = false; pump(); };
   d.addEventListener('click', fin);
-  var t = setTimeout(fin, aMs(me ? 950 : 1000)); UI.timers.push(t);
+  var t = setTimeout(fin, aMs(me ? 600 : 800)); UI.timers.push(t);
 }
 // the rival's played bird is shown large for a moment, then shrinks away
 function reveal(id, label, seat) {
@@ -199,8 +199,9 @@ function pump() {
   var s = PP.sideToAct(G);
   if (G.phase === 'setup') { if (isHuman(s)) { if (humans().length > 1 && s !== UI.view) { askPass(s, function () { showKeep(s); }); return; } UI.view = s; showKeep(s); return; } apply(PPAI.setup(G, s), s); return; }
   if (!isHuman(s) && G.phase === 'play' && typeof coachHold === 'function' && coachHold()) { UI.pumpT = setTimeout(pump, 250); return; }   // tutorial: the rival waits while a "see" step is shown
+  if (G.phase === 'play' && humans().length && !(typeof coachOn === 'function' && coachOn())) { if (isHuman(s)) UI.rvT0 = 0; else if (!UI.rvT0) UI.rvT0 = Date.now(); }   // start of the wait budget (see spd())
   var tk = s + ':' + G.round + ':' + G.pl[s].cubes;
-  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : 1) : (tut ? 2 : UI.speed); turnBanner(s); return; }
+  if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : (UI.rvT0 && UI.speed > 1 ? UI.speed : 1)) : (tut ? 2 : 1); turnBanner(s); return; }   // a skip tap lasts for the whole wait, not into your turn
   if (isHuman(s)) {
     if (s !== UI.view) { if (humans().length > 1) { askPass(s, function () { UI.view = s; render(); }); return; } UI.view = s; }
     render(); try { GX.showDock(); } catch (e) { } return;
