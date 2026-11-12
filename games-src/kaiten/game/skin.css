@@ -199,3 +199,6 @@ html.kkend #pxc{visibility:hidden}
 html.kkend #bd .grp .pl>svg{visibility:visible!important;opacity:.6}
 html.kkend .ctr{background:var(--ctr,#b4743f)!important;border-color:var(--ink,#4a2a22)!important}
 html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!important}
+/* the result card scrolls on short screens (phone landscape) but Play again / Menu stay in reach */
+#rs.kkfin .rsbox.bar .btn{position:sticky;bottom:0;z-index:3;box-shadow:0 -6px 8px -2px #fff3d6}
+@media (max-height:520px){.kkbd{font-size:13px;border-spacing:0 1px}.kkbd th,.kkbd td{padding:1px 4px}.kkbd .cr{display:none}.kkbd tr.tot td{font-size:17px;padding:2px 4px}.kkbd td small{display:none}.kkr1 div{font-size:13px}.kkr1 b{font-size:17px}}
