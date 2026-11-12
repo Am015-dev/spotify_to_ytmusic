@@ -27,13 +27,13 @@ html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html
 html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
 html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
 /* buttons: cream / go / power pills */
-html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 18px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 18px stretch;border-width:14px 18px;padding:0;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
 html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
-html.sk .mbox .btn.sm{border-image-width:14px 18px}
+html.sk .mbox .btn.sm{border-image-width:14px 18px;border-width:14px 18px}
 /* menu rows */
 html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .gx-drawer .menu .btn.gxt-menu{min-height:64px;padding-top:10px;padding-bottom:10px}
@@ -210,6 +210,3 @@ html.short:not(.land) .mrow .mcard .mi{font-size:20px}
  html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3))!important}}
 @media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 25px))!important}}
 @media (max-width:700px) and (min-height:701px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 52px))!important}}
-
-/* R25: on short phones the button keeps its narrow unskinned padding, so the plate's edges are drawn thinner */
-html.sk.short:not(.land) .ab{border-image-width:10px 8px}

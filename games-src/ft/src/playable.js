@@ -64,3 +64,9 @@ function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)retur
   if(!b&&on){b=document.createElement('button');b.id='skipai';b.type='button';b.textContent='Skip \u25B6\u25B6';b.setAttribute('aria-label','Skip the rival turn');
     b.addEventListener('click',e=>{e.stopPropagation();UI.hurry=true;b.hidden=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;schedule()}});document.body.appendChild(b)}
   if(b){b.hidden=!on;const l=document.getElementById('line');if(on&&l){const q=l.getBoundingClientRect();if(q.height)b.style.top=Math.round(q.top+q.height/2-22)+'px'}}}catch(e){}}})();
+
+// ---- R25: nothing under an open sheet (drawer, menu, result) keeps its glow: it could not be tapped there, so it must not look tappable ----
+function plCover(){try{const cov=!!((typeof GX!=='undefined'&&GX.open)||document.querySelector('.gx-drawer.on')||(G&&UI.modal));const IN='.gx-drawer,#modal,.mbox,#chz';
+  if(cov){for(const e of document.querySelectorAll('.glow'))if(!e.closest(IN)){e.classList.remove('glow');e.classList.add('litoff')}}
+  else for(const e of document.querySelectorAll('.litoff')){e.classList.remove('litoff');e.classList.add('glow')}}catch(e){}}
+(function(){const r=render;render=function(){r.apply(this,arguments);plCover()}})();setInterval(plCover,150);

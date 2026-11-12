@@ -401,3 +401,7 @@ body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!
 html.chzon .glow:not(.chb):not(.chzanc){animation:none!important;outline:0!important;box-shadow:none!important}
 html.chzon #grid .tile:not(.chzanc),html.chzon .dcard:not(.chzanc),html.chzon .mcard:not(.chzanc),html.chzon .sch:not(.chzanc),html.chzon .sp-b,html.chzon #acts button,html.chzon #mine .glow{filter:saturate(.4) brightness(.6)!important;transition:filter .15s}
 html.chzon #chz{z-index:60}
+/* R25 (GXSK rule): the unskinned action button has the same content box as the painted one (plate 14/18 px + no padding),
+   so turning the skin on or off never resizes Undo / Put them back. One line of text is 16 px tall either way. */
+html body .ab{line-height:16px}
+html:not(.sk) body .ab{padding:12px 16px!important}
