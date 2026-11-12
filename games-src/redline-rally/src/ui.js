@@ -195,7 +195,7 @@ function commit() {
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
 }
-function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = UI.mode === 'tutorial' ? 1 : 0.38;   /* your own turn plays in about 2 s (R3: it took 4-5 s) */ startResolve(G); runResolve(); }
+function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : 0.38;   /* R27: the tutorial's spin-out round (3) runs fast so no 9 s wait */   /* your own turn plays in about 2 s (R3: it took 4-5 s) */ startResolve(G); runResolve(); }
 
 /* ================= resolving, with animation ================= */
 function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cls || ''; }
@@ -229,7 +229,7 @@ async function runResolve() {
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(0.24, UI.rival) : Math.max(0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.24, UI.rival) : Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
   return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
     var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
@@ -247,7 +247,7 @@ async function playEvents(ev) {
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     /* brisk rivals: a computer car's whole turn plays in about 1.2 s (tap anywhere: faster still); your own move keeps its full pace */
-    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? 0.4 : 0.16) : 0;   /* R19: about 0.7 s per rival car */
+    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : 0.16) : 0;   /* R19: about 0.7 s per rival car */
     if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(550); }
@@ -286,7 +286,8 @@ function askBoost() {   /* React step (rulebook): after your cards are revealed 
   /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
   var spin1 = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1;   /* R19: always offered (a legal choice), marked when any flip would spin you */
   var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
-  var bo = boostOdds(G, bc);   /* R24: the plan line shows the spin-out risk before you choose, and the badge says why */
+  var bo = boostOdds(G, bc); if (sug && bo.pct > 10) sug = false;   /* R27: never suggest a boost with more than a 10% spin-out risk */
+   /* R24: the plan line shows the spin-out risk before you choose, and the badge says why */
   setPhase('react'); setMsg(bo.line, bo.spin ? 'warn' : '');   /* <= 8 words (phone-check) */
   var old = $('#bq'); if (old) old.remove();
   $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (spin1 ? ' (spins you)' : risk ? ' (risky)' : '') + '</button></div>');
@@ -308,14 +309,14 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
   var paint = function () {
     var h = '<div class="who">Discard step</div><div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
-    h += '</div><div class="slipq"><button id="discN">Keep all</button><button class="y" id="discY"' + (sel.length ? '' : ' disabled') + '>Discard ' + sel.length + '</button></div>';
+    h += '</div><div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
     setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop unwanted cards, or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
       sfx('card'); if (k >= 0) sel.splice(k, 1); else sel.push(j); paint(); }; });
-    $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; done(sel.slice()); };
+    if ($('#discY')) $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; done(sel.slice()); };
     $('#discN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discno' })) return; done([]); };
   };
   return new Promise(function (res) {
