@@ -216,6 +216,9 @@ html.ph header.gx-bar .pchip.city b{padding-right:14px}
 @media (max-width:400px){html.ph header.gx-bar .pchip .pn{display:none}}
 html.ph .pchip b .nmfit{display:inline-block;font:inherit;letter-spacing:inherit;white-space:nowrap;transform-origin:0 50%}
 html.ph .pchip b.fit{text-overflow:clip}
-/* W500: the crown sits on the chip's top-right corner, outside the name line, so a crowned name is never cut or covered */
-html.ph header.gx-bar .pchip.city b{padding-right:0;position:static}
-html.ph header.gx-bar .pchip b .crn{top:-5px;right:auto;left:50%;transform:translateX(-50%);font-size:12px;line-height:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+/* W500: the crown has its own 16px lane at the right end of the name line, inside the name box: never cut by the chip, never over the name */
+html.ph header.gx-bar .pchip.city b{padding-right:16px;position:relative}
+html.ph header.gx-bar .pchip b .crn{top:50%;right:0;left:auto;transform:translateY(-50%);font-size:12px;line-height:1;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+
+/* W500: the chip crown is a drawn icon (no text node, so nothing hidden behind it): the emoji only when the painted icon is off */
+html.ph .pchip b .crn::before{content:'👑'}html.sk-crown .pchip b .crn::before{content:none}
