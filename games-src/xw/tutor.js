@@ -153,7 +153,7 @@ function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getEleme
 function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NCH.q.length&&performance.now()-(NCH.curAt||0)>1800)coachHide();const me=G.ships.find(x=>x.side===0);if(!me)return;
   if(G.winner&&!TUT.drill){coachEnd();return}
   const ht=humanTurn(),ph=G.phase;
-  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2&&document.querySelector('.bfm'))coachSay('marks')}
+  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(G.round>=2&&NCH.shown.endround&&!TUT.drill&&document.querySelector('.bfring.need,.bfm'))coachSay('marks')}
   if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
   const idle=!(BF.flyUntil>performance.now())&&!BF.wave;
   if(ph==='action'&&ht&&idle&&document.querySelector('.bfact')){coachSay('action');coachSay('moves');if(G.round>=2)coachSay('lock')}
