@@ -32,6 +32,10 @@ function phMini(card,rot,A){const ps=TWKit.rotate(BASE_PATHS[CUR_TYPE[card]],rot
     const e=PH_P[en];s+=`<circle cx="${6+e[0]*88}" cy="${6+e[1]*88}" r="6.5" fill="#fff" stroke="#14232b" stroke-width="3"/>`}
   return s+'</svg>'}
 function phWhy(A){if(!A)return '';if(A.coll)return 'collision';if(A.st==='edge')return 'off the edge';if(A.st==='mon')return 'hits a monster';if(A.st==='gate')return 'Rift Gate';if(A.st==='ok')return (A.n||1)+(A.n>1?' currents':' current')+(A.mons&&A.mons.length?' · monster near':'');return ''}
+// why a tile cannot go down this way (R34: a tap on an X tile gave no sign): a short line in the strip
+function phCantMsg(m,seat){try{if(!m||m.a!=='place')return '';const A=analyse(knowledge(seat),seat,m);if(!A||!A.bad)return '';
+  return "Can't: "+(A.coll?'another junk is in the way':A.st==='mon'?'a leviathan is ahead':A.st==='edge'?'no room ahead':'that way sinks you')+'. Turn the tile.'}catch(e){return ''}}
+function phCardNote(){if(!PH.on||!UI.sel||UI.busy)return;const d=sideToAct();PH.toast=phCantMsg({a:'place',t:UI.sel.t,r:UI.sel.r,s:UI.sel.s},d)}
 // ---------- what the player may do right now ----------
 function phPlaceCtx(){if(!G||!UI.started||G.over||UI.busy)return null;const d=sideToAct();if(d<0||!G.seats[d].human||mustPass(d))return null;if(NET.on&&d!==NET.mySeat)return null;if(G.q||G.phase!=='play'||G.step!=='act')return null;
   const K=knowledge(d);return {d,K,hand:K.hands[d],sel:UI.sel,pl:(UI.moves||[]).filter(m=>m.a==='place')}}
@@ -222,8 +226,8 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
    const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length,es=G.variant==='easysolo',so=G.variant==='solo';
    const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
    el.innerHTML=`<span class="chip" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${G.deck.length} tiles${so?' &middot; '+toRise+' to rise':''}</small></span></span>`};
- const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;phAfter()}return r};
- const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(!PH.on)return _onPick(p);phPick(p)}}
+ const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;if(G.seats[s]&&G.seats[s].human)PH.toast=phCantMsg(m,s);phAfter()}return r};
+ const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(Date.now()-(PH.closeT||0)<600)return;if(!PH.on)return _onPick(p);phPick(p)}}
 function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kind!=='coach'&&PH.cur.kind!=='mph'&&PH.cur.kind!=='sunk'&&PH.cur.kind!=='q')return;
   const d=sideToAct(),mine=!UI.busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat);
   let sq=null,ship=null;if(p){if(p.kind==='ship')ship=+String(p.id).slice(1);else if(p.kind==='square'||p.kind==='start')sq=[p.c,p.r]}
@@ -242,13 +246,16 @@ function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kin
     else if(G.gates.some(g=>g.x===sq[0]&&g.y===sq[1]))pd={k:'gate',x:sq[0],y:sq[1]};
     else if(G.wave&&G.wave.x===sq[0]&&G.wave.y===sq[1])pd={k:'wave'}}
   if(pd&&phInfoData(pd)){sfx('click');phOpen('info',pd)}else if(PH.pop)phClose()}
+// the tap that closes a card must never reach the board under it (R34: "Got it" opened a leviathan's rules): a press on a card button, then a board tap within 0.6 s, is dropped
+document.addEventListener('pointerdown',e=>{if(PH.on&&e.target.closest&&e.target.closest('#pc button,.gxh-bub,#twgoal'))PH.closeT=Date.now()},true);
 // taps inside the strip / pop-up / cards
 document.addEventListener('click',e=>{if(!PH.on)return;
   if(Date.now()-PH.swipeT<350&&e.target.closest&&e.target.closest('#ppop')){e.stopPropagation();e.preventDefault();return}
+  if(e.target.closest&&e.target.closest('#pc [data-a=coachok],#pc [data-a=sunkok],#pc [data-ph=dismiss],#pc [data-a=skip],.gxh-ok,.gxh-bub,#twgoal'))PH.closeT=Date.now();
   const t=e.target.closest&&e.target.closest('[data-ph]');
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
-    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
+    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');phCardNote();render()}}
     else if(a==='pip'){sfx('click');phOpen('start',{x:+t.dataset.x,y:+t.dataset.y})}
     else if(a==='stardet'){PH.det=!PH.det;sfx('click');render()}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}

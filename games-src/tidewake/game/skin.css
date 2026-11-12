@@ -83,6 +83,9 @@ html.ph .ps-riv li:last-child{color:#ffe7a3;font-weight:700}
   html.ph-p .ps-line:empty{display:none}
   html.ph .ps-goal{margin-top:4px;padding:6px 8px;min-height:44px}
 }
+@media (orientation:portrait) and (max-height:600px){
+  html.ph-p .pt{width:56px;height:56px}
+}
 
 .goal[data-goal]{cursor:pointer;font-size:max(1rem,16px)}.goal[data-goal] u{color:#0f5d66;font-weight:700}
 

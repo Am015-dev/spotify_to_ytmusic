@@ -195,6 +195,8 @@ html.ph .ps-line .sdet{min-width:30px;min-height:30px;margin-left:6px;padding:0 
 #rtoast{position:fixed;left:50%;top:52px;translate:-50% -8px;z-index:40;pointer-events:none;opacity:0;transition:opacity .25s,translate .25s;background:#fff8e1;color:#10262d;border:2px solid #8a6a2a;border-radius:999px;padding:6px 14px;font:700 15px/1.2 var(--fb);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.45)}#rtoast.on{opacity:1;translate:-50% 0}#rtoast.wake{background:#ffe1d6;border-color:#b0381e}
 #ov>div{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
 #ov .opip.pickable{pointer-events:auto;cursor:pointer;touch-action:manipulation}#ov .opip.pickable::after{content:'';position:absolute;left:50%;top:50%;width:18px;height:48px;margin:-24px 0 0 -9px}#ov .opip.pickable.pv::after{width:48px;height:18px;margin:-9px 0 0 -24px}
+/* the tap zone reaches inward only, so it never sits on the edge numbers outside the marks (gate: text not topmost) */
+#ov .opip.pickable.e-top::after{margin-top:-6px}#ov .opip.pickable.e-bottom::after{margin-top:-42px}#ov .opip.pickable.e-left::after{margin-left:-6px}#ov .opip.pickable.e-right::after{margin-left:-42px}
 .otag{font:700 .72rem/1 var(--fb);color:#fff;background:rgba(11,42,51,.86);border:1px solid rgba(255,226,140,.8);border-radius:8px;padding:2px 6px;margin:-4px 0 0 0;translate:-50% -100%;text-shadow:0 1px 1px #000;display:inline-flex;gap:4px;align-items:center}
 .otag i{width:9px;height:9px;border-radius:50%;border:1.5px solid #fff;display:inline-block}
 .otag.mon{background:rgba(70,20,110,.9);border-color:#e6c8ff}
@@ -314,6 +316,7 @@ html.ph .zoom svg.ico{stroke:#14232b}
 html.ph .btn,html.ph .btn.small,html.ph .gsw,html.ph .gx-x{min-height:44px}
 html.ph .gx-x{min-width:44px}
 /* landscape rail: tiles stacked on the left, controls on the right */
+@media (max-height:600px){html.ph-p #ps{gap:3px;padding:4px 8px}html.ph-p .ps-turn{padding:3px 9px;margin:0 0 2px}html.ph-p .ps-main{gap:6px}}
 html.ph-l .ps-main{flex-wrap:nowrap;align-items:flex-start;justify-content:flex-start}
 html.ph-l .ps-tiles{flex-direction:column;gap:7px}
 html.ph-l .pt{width:56px;height:56px}

@@ -76,8 +76,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   if(netClick(a,t))return;
   if(['card','rot','sugg','place','startmark'].indexOf(a)<0)sfx('click');
   switch(a){
-  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');render();break}
-  case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');render();break}
+  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');try{if(typeof phCardNote==='function')phCardNote()}catch(e){}render();break}
+  case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');try{if(typeof phCardNote==='function')phCardNote()}catch(e){}render();break}
   case 'place':doPlace();break;
   case 'target':if(UI.sel){UI.sel.s=+D.s;render()}break;
   case 'startmark':{const m={a:'start',x:+D.x,y:+D.y,e:+D.e};const er=G&&!G.over?(UI.busy?'the sea is still moving.':legal(m,d<0?0:d)):null;if(er&&!NET.on){say(d>=0&&G.seats[d]&&!G.seats[d].human?'Wait: '+nm(d)+' is choosing a start.':'That mark is not free now: '+er,'bad');sfx('error');break}act(m,d);break}

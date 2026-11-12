@@ -7,7 +7,9 @@ async function playEvents(evs,gen){
   // a computer's turn replays faster (about 5 s a turn at the default speed); your own turn and the tutorial keep their pace
   const base=UI.speed||1,fast=()=>!NET.on&&humans().length>0&&!(typeof TUTG!=='undefined'&&TUTG.on)&&UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;
   const pace=sp=>{if(UI.speed!==sp){UI.speed=sp;try{TWKit.setSpeed(sp)}catch(x){}}};
-  try{for(const e of evs){if(UI.skip||UI.gen!==gen||!UI.started)break;if(e.t!=='arrive')UI.arrow=null;pace(fast()?base*2.1:base);try{await playEv(e,gen)}catch(x){console.error(x)}ovUpdate()}}finally{pace(base)}
+  // a computer's turn never takes more than ~2 s: after that the rest of it runs instantly (R34: 15-36 s of waiting per round)
+  let rv0=0;const cap=setInterval(()=>{if(UI.gen!==gen||!UI.started){clearInterval(cap);return}if(!fast()){rv0=0;return}if(!rv0){rv0=Date.now();return}if(Date.now()-rv0>=2000){UI.skip=true;sleepFlush()}},100);
+  try{for(const e of evs){if(UI.skip||UI.gen!==gen||!UI.started)break;if(e.t!=='arrive')UI.arrow=null;pace(fast()?base*2.1:base);try{await playEv(e,gen)}catch(x){console.error(x)}ovUpdate()}}finally{clearInterval(cap);pace(base)}
   UI.mphLive=false;UI.hiMon=null;UI.arrow=null;
   if(UI.gen===gen){UI.res=null}
 }
