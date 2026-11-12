@@ -273,6 +273,15 @@
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
     D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
+    if (cfg.tapFirst) {   // the layout can move under an open bubble (a pill appears, an info line grows): step aside when it now covers a tappable target
+      var lastKey = '';
+      setInterval(function () {
+        if (!cur || !cur.bub || rulesEl || !cur.bub.classList.contains('on')) { lastKey = ''; return; }
+        var r = cur.bub.getBoundingClientRect(), av = avoidRects(32), key = '';
+        for (var i = 0; i < av.length; i++) if (hit({ left: r.left, top: r.top, right: r.right, bottom: r.bottom }, av[i])) key += Math.round(av[i].left) + ',' + Math.round(av[i].top) + ';';
+        if (key && key !== lastKey) { lastKey = key; draw(); } else if (!key) lastKey = '';
+      }, 250);
+    }
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
