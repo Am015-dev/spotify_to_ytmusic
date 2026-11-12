@@ -13,7 +13,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
   await pg.goto(process.env.URL || 'file://' + path.join(__dirname, 'stitchwise.html')); await pg.waitForTimeout(900);
   const cdp = await ctx.newCDPSession(pg);
   const tapXY = async (x, y) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await pg.waitForTimeout(250); };
-  const tap = async el => { await el.scrollIntoViewIfNeeded(); const bb = await el.boundingBox(); ok(bb && bb.width >= 40 && bb.height >= 40, 'tap target >= 40px: ' + (bb && [bb.width, bb.height])); await tapXY(bb.x + bb.width / 2, bb.y + bb.height / 2); };
+  const tap = async el => { try { await el.scrollIntoViewIfNeeded(); } catch (e) { if (/not attached/.test(e.message)) { await pg.waitForTimeout(150); return; } throw e; } /* R7: a redraw replaced the element; the loop re-reads the state and taps again */ const bb = await el.boundingBox(); if (!bb) return; ok(bb && bb.width >= 40 && bb.height >= 40, 'tap target >= 40px: ' + (bb && [bb.width, bb.height])); await tapXY(bb.x + bb.width / 2, bb.y + bb.height / 2); };
   const drag = async (x0, y0, x1, y1) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y: y0 }] }); for (let i = 1; i <= 6; i++) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + (x1 - x0) * i / 6, y: y0 + (y1 - y0) * i / 6 }] }); await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await pg.waitForTimeout(400); };
   // title -> Learn
   const learn = await pg.$('[data-a=learn]'); ok(!!learn, 'Learn button on the title'); await tap(learn); await pg.waitForTimeout(500);
@@ -56,7 +56,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
       if (mv) {
         const offers = await pg.$$('#offers .offer:not(.up)'); await tap(offers[mv.k]); await pg.waitForTimeout(250);
         for (let r = 0; r < 4 && !sewn; r++) {
-          const tgt = await pg.evaluate(mv => { const c = curCells(), b = bbox(c); return { i: (mv.y + Math.floor(b[1] / 2)) * 9 + mv.x + Math.floor(b[0] / 2) }; }, mv);
+          const tgt = await pg.evaluate(mv => { const c = curCells(); if (!c || UI.sel < 0) return null; const b = bbox(c); return { i: (mv.y + Math.floor(b[1] / 2)) * 9 + mv.x + Math.floor(b[0] / 2) }; }, mv); if (!tgt) break;
           const c = await (await pg.$$('#quilt .qc'))[Math.min(80, tgt.i)].boundingBox(); await tapXY(c.x + c.width / 2, c.y + c.height / 2); await pg.waitForTimeout(250);
           if (turns === 3) await shot('placing');
           const sew = await pg.$('[data-a=sew]:not([disabled])'); if (sew) { await tap(sew); sewn = true; break; }
@@ -64,7 +64,7 @@ let fails = 0; const ok = (c, m) => { if (!c) { fails++; console.log('FAIL', m);
         }
         if (!sewn) { const cn = await pg.$('[data-a=cancel]'); if (cn) await tap(cn); }
       }
-      if (!sewn) { const adv = await pg.$('[data-a=adv]'); if (adv) await tap(adv); }
+      if (!sewn) { await pg.waitForTimeout(250); const adv = await pg.$('[data-a=adv]'); if (adv) await tap(adv).catch(async () => { const a2 = await pg.$('[data-a=adv]'); if (a2) await tap(a2); }); }   // R7: the dock can redraw between query and tap
       if (turns >= 10 && !midShot) { midShot = true; await shot('mid-game'); }
     }
     await pg.waitForFunction(() => G.over, null, { timeout: 60000 }); await pg.waitForTimeout(1500);

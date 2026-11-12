@@ -90,8 +90,8 @@ function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[
   var W = UI.walks = UI.walks || {}, now = Date.now(), stp = Math.max(40, sp(150));
   [0, 1].forEach(function (s) { if (last[s] < G.pos[s] && amt(1)) W[s] = { from: W[s] ? curW(s) : last[s], to: G.pos[s], t0: now }; });
   function curW(s) { var w = W[s]; if (!w) return G.pos[s]; var n = w.from + Math.floor((Date.now() - w.t0) / stp); if (n >= w.to || w.to !== G.pos[s]) { delete W[s]; return G.pos[s]; } return n; }
-  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); tagFit(); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } }
-  tick(); setTimeout(tagFit, 0); }
+  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); tagFit(); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } else { clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } }
+  tick(); setTimeout(tagFit, 0); clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } /* R7: re-fit the name tags once the token transition has settled (no cut or overlapping tags) */
 function tagFit() { var t = $('#track'); if (!t) return; var tw = t.clientWidth, L = []; /* W484: name tags stay inside the track and never overlap each other */
   $$('.tk', t).forEach(function (k) { var g = $('.tkn', k); if (!g) return; var kx = k.offsetLeft + k.offsetWidth / 2, ky = k.offsetTop, gw = g.offsetWidth; L.push({ g: g, kx: kx, ky: ky, gw: gw, me: k.dataset.seat === '0', l: kx - gw / 2 }); });
   if (L.length === 2 && Math.abs(L[0].ky - L[1].ky) < 8) { L.sort(function (a, b) { return a.kx - b.kx || (a.me ? -1 : 1); }); var a = L[0], b = L[1], ov = a.l + a.gw + 3 - b.l; if (ov > 0) { a.l -= ov / 2; b.l += ov / 2; } if (a.l < 2) { b.l += 2 - a.l; a.l = 2; } if (b.l + b.gw > tw - 2) { a.l -= b.l + b.gw - tw + 2; b.l = tw - 2 - b.gw; } }
@@ -159,7 +159,7 @@ function rateMove(m) { // compare the human's move with the best value on offer 
   return 'Last turn: ' + verdict + ' (' + sgn(mine.v) + ').' + (d <= 1 ? ' Best value on offer.' : ' Best was ' + best.name + ' (' + sgn(best.v) + ').'); }
 function renderDock() {
   var s = UI.peek >= 0 ? UI.peek : swWho(G), hum = !G.over && isHuman(s) && !(UI.peek >= 0), off = swOffer(G), box = $('#offers'), pr = $('#prompt'), ac = $('#acts'), dt = $('#detail'), dh = $('.gx-dt');
-  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; box.classList.toggle('placing', !UI.wide && UI.sel >= 0 && hum); pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
+  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; swComp(false); box.classList.toggle('placing', !UI.wide && UI.sel >= 0 && hum); pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
@@ -172,7 +172,7 @@ function renderDock() {
   if (!off.length) box.appendChild(h('div', 'No patches left.'));
   if (G.over) { pr.textContent = 'The fair is over.'; dh.textContent = 'Result'; ac.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'result' }, 'See the result')); return; }
   pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? 'Drag it on your quilt. Red stripes = no room.' : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
-  if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
+  if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = T2 ? 'You passed a leather space. Sew the 1×1 patch into the single square gap.' : 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
   box.style.display = '';
   if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); if (!UI.fast) pr.appendChild(h('small.skipn', ' Tap to skip')); return; }
   if (UI.sel >= 0) {
@@ -192,7 +192,10 @@ function renderDock() {
     if (UI.hints && !UI.coach) ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'whatdo' }, 'What should I do?'));
   }
   try { ringStrip(); } catch (e) { console.error(e); }   // W491: the whole ring, clockwise from the spool
+  swComp(hum && !G.pend && UI.sel < 0 && ac.children.length === 1 && !T2);
 }
+/* R7: phone portrait (375x667, 390x844): Advance moves up into the dock header row so the quilt gets that height back */
+function swComp(on) { var de = document.documentElement; on = !!on && !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('swcomp', on); var pr = $('#prompt'); if (on && pr && pr.textContent === 'Tap a glowing patch, or tap Advance') pr.textContent = 'Tap a glowing patch, or'; if (on && pr && pr.textContent === 'No patch you can buy: tap Advance') pr.textContent = 'No patch fits. Tap'; }
 
 // score drawer: every number's why, on tap only
 function showScoreDrawer() {
