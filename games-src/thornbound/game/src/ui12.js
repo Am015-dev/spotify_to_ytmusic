@@ -73,7 +73,7 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&tutPlace()&&a.id===tutPlace()[0]},ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
  {id:'place1b',title:'Where it fights',say:'Tap the Uplands. It stays hidden until the fight.',target:tutReg(0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===0},ready:()=>tkind('place')&&tutPlaced()===0&&tutPlace()&&UI.hand===tutPlace()[0]},
- {id:'place2',title:'Your Heir',say:'Your Heir is strongest. Tap the Tablelands, where your Herald is.',target:tutReg(1),also:()=>tutHandRect(p2||0),
+ {id:'place2',title:'Your Heir',say:'Your Heir card is your strongest. Hide it in the Tablelands, where your Herald stands.',target:tutReg(1),also:()=>tutHandRect(p2||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===1},ready:()=>tkind('place')&&tutPlaced()===1&&!!tutPlace()&&(p2=tutPlace()[0],tutSelect(p2))},
  {id:'place3',title:'Last card',say:'Last card: tap the Sinks.',target:tutReg(2),also:()=>tutHandRect(p3||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===2},ready:()=>tkind('place')&&tutPlaced()===2&&!!tutPlace()&&(p3=tutPlace()[0],tutSelect(p3))},
@@ -115,7 +115,7 @@ function storyOpen(){if(typeof GXC==='undefined')return;
 // Learn to play = the spotlight steps above on a staged one-round game; it ends by handing over a real (guided, 5-round) game. UI.cfg.coachTut=true brings back the old coached game.
 function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window.tbCoachStart)window.tbCoachStart(o);return}
   const pro=!!(o&&o.prologue);
-  GXT.start({game:TUT_GAME,steps:tutSteps(),endTitle:'You know the rules',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
+  GXT.start({game:TUT_GAME,steps:tutSteps().map(st=>{const oe=st.onEnter;st.onEnter=function(){if(oe)oe.apply(this,arguments);try{if(window.tbStripPaint)window.tbStripPaint()}catch(e){}};return st}),endTitle:'You know the rules',endText:'Bid, Herald, hide, fight, claim, Autumn. Now play for real.',
     endButtons:pro&&window.CAMPAIGN?[{id:'chapter',label:'Start chapter 1'}]:null,story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     setup:()=>{try{GX.close()}catch(e){}try{GXC.close()}catch(e){}try{hideStart()}catch(e){}try{hideGloss()}catch(e){}closePop(true);newGame('tutorial');UI.coachOn=0;try{clearVoice()}catch(e){}renderAll()},
     onDone:r=>{const c=r&&r.choice;tutLeave();
@@ -126,15 +126,20 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}
 // ---------------------------------------------------------------- the game tells the kit what the player does (before it is applied)
+// a fast tap (the right one, but while the step is still appearing) is never lost: it is kept and replayed once the step can take it (no input race can wedge the tutorial)
+function tutEarly(a){try{const st=GXT.current(),S=GXT.state();if(!st||!st.wait||!S.active)return false;if(S.phase!=='show'&&S.phase!=='pend'&&S.phase!=='gap')return false;return !st.wait.match||!!st.wait.match(a)}catch(e){return false}}
+document.addEventListener('pointerdown',e=>{UI._lastPt=[e.clientX,e.clientY]},true);
+function tutQueue(fn){clearTimeout(UI._tutQT);try{if(UI._lastPt&&typeof tapRing==='function')tapRing(UI._lastPt[0],UI._lastPt[1])}catch(e){}const t0=Date.now();const go=()=>{if(!tutOn())return;if(Date.now()-t0>2500)return;if(fn()===false)UI._tutQT=setTimeout(go,120)};UI._tutQT=setTimeout(go,120)}
 (function(){const o=humanMove;humanMove=function(k){
-  if(tutOn()&&!UI._tutIn){const s=viewSeatForQ();const mv=s!=null?legal(s).find(m=>m.k===k):null;if(!GXT.act({type:'tap',what:'move',k,kind:G.q&&G.q.kind,mv}))return false}
+  if(tutOn()&&!UI._tutIn){const s=viewSeatForQ();const mv=s!=null?legal(s).find(m=>m.k===k):null;const a={type:'tap',what:'move',k,kind:G.q&&G.q.kind,mv};
+    if(!GXT.act(a)){if(mv&&tutEarly(a))tutQueue(()=>{const s2=viewSeatForQ();if(s2==null||!legal(s2).some(m=>m.k===k))return true;return humanMove(k)!==false});return false}}
   return o(k)}})();
 (function(){const o=handTap;handTap=function(id){
   if(tutOn()){const M=UI.bf;const commit=!!(M&&cardDriven(M)&&UI.hand===id&&cardMoves(id).length===1);
-    if(!commit&&!GXT.act({type:'tap',what:'select',id}))return}
+    if(!commit){const a={type:'tap',what:'select',id};if(!GXT.act(a)){if(tutEarly(a)){tutQueue(()=>{if(UI.hand===id)return true;const S=GXT.state();if(S.phase!=='show')return false;if(!GXT.act(a))return false;o(id);return true})}return}}}
   return o(id)}})();
 (function(){const o=orderTap;orderTap=function(r){
-  if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;if(!GXT.act({type:'tap',what:'order',r}))return;
+  if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;const a={type:'tap',what:'order',r};if(!GXT.act(a)){if(tutEarly(a)){const i0=GXT.index(),c0=GXT.state().count;tutQueue(()=>{const T=GXT.state();if(!T.active||T.i!==i0||T.count!==c0)return true;if(T.phase!=='show')return false;if(!GXT.act(a))return false;UI._tutIn=1;try{o(r)}finally{UI._tutIn=0}return true})}return}
     UI._tutIn=1;try{return o(r)}finally{UI._tutIn=0}}
   return o(r)}})();
 // Learn to play: the first Clash plays out slowly (its step explains it); the later Clashes of the staged round resolve at once, so no silent wait passes ~3 s

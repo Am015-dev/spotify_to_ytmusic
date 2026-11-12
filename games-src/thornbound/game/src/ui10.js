@@ -37,7 +37,10 @@ function handTap(id){const M=UI.bf;
 function commitCard(id,c){UI.hand=null;
   try{const el=$('#handw .hc[data-id="'+id+'"]');let dest=null;if(c.type==='spot'){const sp=$('#spots .bspot');dest=sp&&sp.getBoundingClientRect()}else if(c.type==='region'&&c.r!=null&&MAP.m){const R=regionRect(c.r);dest={left:R.left+R.width/2-14,top:R.top+R.height/2-20,width:28,height:40}}
     if(el&&dest)flyEl(el.innerHTML,el.getBoundingClientRect(),dest,{ms:380})}catch(e){}
-  humanMove(c.k)}
+  const ok=humanMove(c.k);
+  // not taken (the tutorial asked for something else, or the step is still appearing): the card stays lifted in your hand, never lost
+  if(ok===false){try{const s=viewSeatForQ();if(s!=null&&legal(s).some(m=>m.k===c.k)&&G.pl[s].hand.includes(id)){UI.hand=id;renderAll()}}catch(e){}}
+  return ok}
 // ---------------------------------------------------------------- taps on the map
 function regionTap(r){const M=UI.bf;if(!M||!M.kind||(UI.card&&UI.card.kind!=='tip'))return false;
   if(M.kind==='place'||M.kind==='tie'){if(UI.hand!=null){const c=cardMoves(UI.hand).find(x=>x.type==='region'&&x.r===r);if(c){commitCard(UI.hand,c);return true}}return false}
@@ -79,7 +82,7 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
   const sp=Math.max(1,Math.min(UI.speed||1,4));const done=()=>{if(e.parentNode)e.remove()};
   const chip=seat!=null?document.querySelector('#rivals .rv[data-s="'+seat+'"] .rv-n'):null;
   try{const a=e.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-90%) scale(1.25)',opacity:1,offset:.35},{transform:'translate(-50%,-90%) scale(1.15)',opacity:1,offset:.6},
-      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-0)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.5)',opacity:.15}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
+      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-chip.getBoundingClientRect().width-18)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.45)',opacity:0}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
     a.onfinish=()=>{done();if(chip){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}}}catch(x){}
   setTimeout(done,1400/sp)}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
@@ -100,7 +103,7 @@ function bfSlot(r,s,old,nw){if(!ANIM||UI.noAnim||!nw||!nw.faceDown||(old&&old.co
   flyEl(BACK_HTML,{left:f.left+f.width/2-14,top:f.top+f.height/2-20,width:28,height:40},t,{ms:520})}
 // ---------------------------------------------------------------- events played on the board (bids, clashes, round end): no panels, a tap skips
 function evDone(){const c=UI.card;if(!c||c.kind!=='event')return;clearTimeout(UI._evT);UI.card=null;UI._cardKey=null;UI.noAnim=false;UI._cp=null;UI._clashLine='';UI.mapReset=false;MAP.slotDirty=true;pump()}
-function bfSkip(){const c=UI.card;if(!c)return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
+function bfSkip(){const c=UI.card;if(!c)return false;if(typeof tutHold==='function'&&tutHold(c))return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
 const spd=()=>Math.max(1,Math.min(UI.speed||1,4))*(UI.cfg&&UI.cfg.tutorial?3:1);   // Learn to play runs the rival's turns 3x faster: no silent wait over ~3 s
 function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c)))evDone()},ANIM?ms/spd():0)}
 function bfEvent(c){const ev=c.ev;if(ev.t==='bids')bfBids(c);else if(ev.t==='clash')bfClash(c);else if(ev.t==='summary')bfSummary(c);else bfAuto(c,300)}
@@ -112,19 +115,41 @@ function clashLine(ev){const me=vs(),w=ev.winner,reg=REG[ev.r];if(w<0)return 'Ti
 function elimLine(ev){const d=ev.dead||{};const me=vs();const o=Object.keys(d).map(Number).filter(s=>d[s]&&d[s].length);if(!o.length)return '';const s=o.sort((a,b)=>(b===me)-(a===me))[0];const n=d[s].length;
   return (s===me?'You lose ':sideName(s)+' loses ')+n+' card'+(n>1?'s':'')}
 function bfClash(c){const ev=c.ev;UI.noAnim=true;UI.clashBrk=UI.clashBrk||{};UI.clashBrk[ev.r]={tot:ev.tot,brk:ev.brk,parts:ev.parts};
-  const fin=()=>{if(UI.card!==c)return;UI.clashRes[ev.r]={winner:ev.winner,tot:ev.tot};try{drawOverlay()}catch(e){}UI._clashLine=clashLine(ev);renderBar();if(typeof sfx==='function')sfx(ev.winner<0?'tie':'win');
+  const fin=()=>{if(UI.card!==c)return;UI.clashRes[ev.r]={winner:ev.winner,tot:ev.tot};try{drawOverlay()}catch(e){}UI._clashLine=clashLine(ev);renderBar();if(typeof sfx==='function')sfx(ev.winner<0?'tie':'win');try{const me=vs();bfBanner(ev.winner<0?'Tie':ev.winner===me?'You win!':sideName(ev.winner)+' win',REG[ev.r]+' \u00b7 '+ev.parts.map(x=>ev.tot[x]).sort((a,b)=>b-a).join(' to '),ev.winner<0?'#c8c0d8':fcol(ev.winner))}catch(x){}
     const el=elimLine(ev);const hold=el?1500:1100;
     if(el)setTimeout(()=>{if(UI.card===c){UI._clashLine=el;renderBar()}},900/spd());
     bfAuto(c,hold+300)};
   UI._clashLine='The Clash in '+REG[ev.r];renderBar();
   if(!ANIM){fin();return}
   const p=mapReveal(ev);Promise.resolve(p).then(()=>{if(UI.card===c)setTimeout(fin,150/spd())})}
+// a big stamp over the board for the moments that matter (a Clash won or lost, a round ending): it lands, holds, fades; never blocks a tap
+function bfBanner(t,sub,col){try{if(!ANIM||UI.reduce)return;const bd=$('#board');if(!bd)return;const R=bd.getBoundingClientRect();const fx=$('#fx')||document.body;
+  const e=document.createElement('div');e.className='tbban';e.style.cssText='left:'+(R.left+R.width/2)+'px;top:'+(R.top+R.height*0.42)+'px;--bc:'+(col||'#f0c860');
+  e.innerHTML='<b>'+esc(t)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');fx.appendChild(e);setTimeout(()=>e.remove(),1500/spd())}catch(x){}}
+(function(){const st=document.createElement('style');st.textContent='.tbban{position:fixed;transform:translate(-50%,-50%);z-index:60;pointer-events:none;min-width:200px;max-width:88vw;text-align:center;padding:10px 18px;border-radius:12px;background:rgba(20,12,26,.9);border:3px solid var(--bc);box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 24px var(--bc);color:#fff;animation:tbban 1.45s cubic-bezier(.2,1.4,.4,1) forwards}.tbban b{display:block;font:700 22px/1.2 Cinzel,Georgia,serif;color:var(--bc)}.tbban small{display:block;font:600 16px/1.3 "EB Garamond",Georgia,serif;margin-top:2px}@keyframes tbban{0%{transform:translate(-50%,-50%) scale(1.8);opacity:0}14%{transform:translate(-50%,-50%) scale(1);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-62%) scale(.96);opacity:0}}';document.head.appendChild(st)})();
 function bfSummary(c){const ev=c.ev;renderBar();
+  try{const me=vs(),d=ev.inf1[me]-ev.inf0[me];bfBanner(ev.round>=ev.rounds?'Final round over':'Round '+ev.round+' over',(d>0?'You +'+d+' Influence':'You held '+ev.inf1[me])+' \u00b7 '+ev.inf1.map((v,s)=>shortName(s)+' '+v).filter((x,s)=>s!==me).join(', '),'#f0c860')}catch(x){}
   if(ANIM)ev.inf1.forEach((v,s)=>{const d=v-ev.inf0[s];if(d){const ch=seatEl(s);if(ch)bfPopAt(ch.getBoundingClientRect(),(d>0?'+':'−')+Math.abs(d),fcol(s),s)}});
   bfAuto(c,1400)}
 // a tap on the board or the status line skips the narration
-document.addEventListener('pointerdown',e=>{if(!UI.card||!G)return;if(UI.card.kind!=='event'&&UI.card.kind!=='news')return;
-  if(e.target.closest&&e.target.closest('#board,.gx-bar #barstat,#rivals')){if(bfSkip())UI._nc=1}},true);
+// Every tap does something you can see (owner, 8 Nov): a narration card is skipped from anywhere on the table (board, strip, hand, dock),
+// a rival's step is played at once, and a tap that cannot act yet leaves a ring where it landed (and the step keeps it, see tutQueue).
+function tapRing(x,y){try{if(UI.reduce)return;const fx=$('#fx')||document.body;const r=document.createElement('div');r.className='tapring';r.style.cssText='left:'+(x-22)+'px;top:'+(y-22)+'px';fx.appendChild(r);setTimeout(()=>r.remove(),450)}catch(e){}}
+(function(){const st=document.createElement('style');st.textContent='.tapring{position:fixed;width:44px;height:44px;border-radius:50%;border:3px solid #f0c860;pointer-events:none;z-index:2147483000;animation:tapr .42s ease-out forwards}@keyframes tapr{from{transform:scale(.4);opacity:.95}to{transform:scale(1.25);opacity:0}}';document.head.appendChild(st)})();
+window.tbTapAhead=function(){if(!G||!UI.started||G.over)return false;if(UI.card&&(UI.card.kind==='event'||UI.card.kind==='news')){return bfSkip()}
+  if(!UI.card&&G.q&&viewSeatForQ()==null){try{const w=whoActs();if(w.ai.length){UI._tbHold=0;clearTimeout(_pumpT);aiStep(w);pump();return true}}catch(e){}}return false};
+document.addEventListener('pointerdown',e=>{if(!G||!UI.started)return;const tg=e.target;if(!tg||!tg.closest)return;
+  const cell=tg.closest('.gxt-cell');
+  if(cell){const S=(typeof GXT!=='undefined'&&GXT.state)?GXT.state():null;if(S&&S.active&&S.phase!=='show'){
+    // the second tap of a two-tap step (fight order, Supporters) lands while the step redraws: keep it and play it on the region once the step is back
+    let r=null;if(S.count>0){try{const el=document.elementsFromPoint(e.clientX,e.clientY).find(x=>!x.closest('.gxt-cell,.gxt-ring,.gxt-fin')&&x.closest('[data-reg]'));if(el)r=+el.closest('[data-reg]').getAttribute('data-reg')}catch(x){}}
+    if(r!=null&&!isNaN(r)&&typeof tutQueue==='function'){const i0=S.i,c0=S.count;tutQueue(()=>{const T=GXT.state();if(!T.active||T.i!==i0||T.count!==c0)return true;if(T.phase!=='show')return false;regionTap(r);return true})}
+    else tbTapAhead();tapRing(e.clientX,e.clientY)}return}   // tutorial between steps: skip ahead, show the tap
+  const skipSel='#ppop,.gx-drawer,#start,#netbox,#tbgoal,#tbcend,.gxh-bub,.gxt-top,.gxt-end,.tbt-goal,.tbt-skip,.tbt-term,.gx-bar button:not(#barstat)';
+  if(!UI.card&&!G.over&&G.q&&viewSeatForQ()==null&&!UI.pop&&!tg.closest(skipSel)&&tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){tbTapAhead();tapRing(e.clientX,e.clientY);UI._nc=1;return}   // a rival's turn: a tap hurries it
+  if(!UI.card||(UI.card.kind!=='event'&&UI.card.kind!=='news'))return;
+  if(tg.closest('#ppop,.gx-drawer,#start,#netbox,#tbgoal,#tbcend,.gxh-bub,.gxt-top,.gxt-end,.tbt-goal,.tbt-skip,.tbt-term,.gx-bar button:not(#barstat)'))return;
+  if(tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){if(bfSkip())UI._nc=1;else tapRing(e.clientX,e.clientY)}},true);
 // ---------------------------------------------------------------- long-press: a small tooltip near the thing (8 words or fewer)
 const LOC_SHORT=['Govern','Journey','Favour','','Deck bottom','Recover cards'];
 function tipFor(kind,arg){const V=UI.V;if(!V)return '';
@@ -177,7 +202,10 @@ function fingerWanted(kind){if(isGuided()||UI.camp||UI.guide==='full')return tru
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
 // planFor(M,rm): where the move rm is made on the board: {from,to} points (from = the card to pick up first), fromR/toR rects, key. Used by the ghost finger and by the lightbulb.
 function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
-  let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);if(!e)return null;let r=e.getBoundingClientRect();
+    const hid=()=>{if(!r.width)return false;if(r.bottom>innerHeight-2||r.top<0)return true;const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !(t&&(t===e||e.contains(t)||t.closest('#finger,.tapring,.fly')))};
+    if(hid()){try{e.scrollIntoView({block:'center',inline:'nearest'})}catch(x){}r=e.getBoundingClientRect()}   // a suggested button scrolled out of the dock is brought into view first
+    return r};const K=rm.k;
   const T=r=>{toR=r;return ctr(r)},F=r=>{fromR=r;return ctr(r)};
   try{
     if(UI.pop){if(UI.pop==='confirm')to=T(el('#ppop [data-a=mv]'));else return null}
@@ -188,7 +216,7 @@ function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
     case 'bidRes':{to=T(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
     case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=T(regionRect(nx));break}
     case 'menu':{if(rm.a==='supp'&&rm.p)to=T(regionRect(rm.p.r));else if(UI.sheetOpen)to=T(el('#main [data-k="'+K+'"]'));else to=T(el('#act [data-k="'+K+'"]')||(rm.t==='act'&&rm.a!=='supp'?el('#act [data-a=powers]'):el('#act .btn.pri')));break}
-    default:{to=T(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
+    default:{{const b=el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]');const w=b&&b.height>90?(el('#act [data-k="'+K+'"] .ot')||el('#main [data-k="'+K+'"] .ot')):null;to=T(w||b)}break}   // a big option button: point at its words, not at a picture inside it
   }}catch(e){return null}
   return to?{from,to,fromR,toR,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
 function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey())||(typeof tutOn==='function'&&tutOn()))return null;return planFor(M,rm)}
