@@ -8,9 +8,13 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function 
 function isHuman(s) { return G && G.pl[s] && G.pl[s].kind === 'human'; }
 function humans() { return G ? G.pl.map(function (p, i) { return p.kind === 'human' ? i : -1; }).filter(function (i) { return i >= 0; }) : []; }
 function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideToAct(G); return isHuman(s) && s === UI.view && !UI.busy && !UI.passing; }
+// replace a part only when its HTML really changed: a tap that lands during a re-render keeps its button (never a dead tap)
+function setH(el, h) { if (!el || el._h === h) return; el._h = h; el.innerHTML = h; }
 function q() { return G && G.q; }
 function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
-function aMs(ms) { if (UI.fast) return 0; var sp = UI.speed || 1; try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
+// R19: the wait between your turns has a budget: after 2 s of rival play (round-end scoring, two rival turns in a row) the rest runs 6x faster
+function spd() { var sp = UI.speed || 1; if (UI.rvT0 && Date.now() - UI.rvT0 > 2000) sp = Math.max(sp, 6); return sp; }
+function aMs(ms) { if (UI.fast) return 0; var sp = spd(); try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
 function costHTML(b) { return b.c.map(function (s) { if (s === '*') return foodIcon('any'); var p = s.split('|'); return p.length > 1 ? p.map(function (f) { return foodIcon(f); }).join('<i>/</i>') : foodIcon(s); }).join(b.c.some(function (s) { return s.indexOf('|') >= 0; }) ? '' : '<i>+</i>'); }
 // a bird card: size 'slot' (on the board: picture, points, eggs) | 'tray' (picture + points) | 'hand' / 'big' (the readable card:
 // big picture, name, points in large type, habitat band with words, food cost as at most 3 icons with words, power in one sentence)
@@ -36,6 +40,7 @@ function cardHTML(id, size, st, attrs) {
   var b = B[id], pw = PP.power(id), col = pw.col || 'none';
   var h = '<div class="bc ' + (size === 'slot' ? 'on-board' : 'mini') + '" ' + (attrs || '') + ' aria-label="' + esc(b.n + ', ' + b.p + ' points') + '">';
   h += '<div class="pic">' + artHTML('bird-' + id) + '<span class="hband">' + b.h.split('').map(function (x) { return '<i class="h' + x + '"></i>'; }).join('') + '</span><span class="vp">' + b.p + '</span></div>';
+  if (size === 'tray') h += '<div class="nm">' + esc(b.n) + '</div>';   // R19: a tray bird shows its name before you take it
   if (size === 'slot' && st && (st.eggs || st.cache || st.tuck)) {
     h += '<div class="meta">';
     if (st.eggs) h += '<span class="mt">' + eggIcon() + '<b>' + st.eggs + '</b></span>';
@@ -50,8 +55,10 @@ function render() {
   if (!G) return;
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
   $('#barstat').textContent = '';
+  $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow();
+  glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
+  if (UI.pend) [40, 160, 420].forEach(function (ms) { setTimeout(function () { try { if (UI.pend) dockToActs(); } catch (e) { } }, ms); });   // late layout (card art, the chosen card's scroll) must not push Play/Cancel out of the panel
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
@@ -74,14 +81,14 @@ function renderGoalbar() {
   el.setAttribute('aria-label', 'Chapter goal. ' + r.label + ': ' + r.cur + (r.met ? ', met' : ''));
 }
 function renderOpps(cur) {   // the always-visible score breakdown: every player, leader marked
-  $('#opps').innerHTML = hintsOn() ? scoreHTML() : scoreLineHTML();
+  setH($('#opps'), hintsOn() ? scoreHTML() : scoreLineHTML());
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
 function renderMid() {
   var f = '';
   for (var i = 0; i < 5; i++) { var d = G.feeder[i]; f += d ? '<button type="button" class="die" data-a="die" data-i="' + i + '" aria-label="' + (d === 'gs' ? 'grub or seed' : d) + ' die">' + foodIcon(d) + '<small>' + (d === 'gs' ? 'either' : d) + '</small></button>' : '<span class="die gone"></span>'; }
-  $('#feeder').innerHTML = f;
-  $('#tray').innerHTML = G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join('');
+  setH($('#feeder'), f);
+  setH($('#tray'), G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join(''));
   $('#deckb').innerHTML = '<span>Deck</span><span>' + G.deck.length + '</span>';
 }
 function rowLabel(p, h) {
@@ -100,51 +107,69 @@ function renderMat(p, vs) {
     }
     h += '</div>';
   }
-  $('#mat').innerHTML = h;
+  setH($('#mat'), h);
 }
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
   var who = G.phase === 'over' ? 'Game over' : isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
-  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = UI.animSeat === UI.view && humans().length === 1 ? 'Your birds are working' : G.pl[UI.animSeat].name + ' is playing';
+  // while the last move still animates, the header names whose move it is and who plays next (never "your birds" without a bird power firing)
+  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = (UI.animSeat === UI.view && humans().length === 1 ? 'Your move' : G.pl[UI.animSeat].name + "'s move") + ' \u00b7 ' + (isHuman(cur) && humans().length === 1 ? 'you' : G.pl[cur].name) + ' next';
   $('#dt').textContent = who;
-  $('#trk').innerHTML = trackerHTML();
+  setH($('#trk'), trackerHTML());
   var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
   hintsBtn();
   if (!mine || Q) UI.pickBird = false;
   var idle = mine && !Q && UI.sel == null && !UI.pend && UI.gsDie == null && !UI.pickBird;
   document.body.classList.toggle('idle4', !!idle);
+  document.body.classList.toggle('deciding', !!(mine && Q));
   document.body.classList.toggle('picking', !!(mine && !Q && (UI.pickBird || UI.sel != null)));
   $('#prompt').textContent = promptText(mine);
-  $('#acts').innerHTML = mine ? (idle ? act4HTML() : actsHTML()) : '';
+  document.body.classList.toggle('confirming', !!(mine && UI.pend));   // the confirm's hint rides inside #acts (in flow, above Play/Cancel), never as the sticky line over them
+  setH($('#acts'), mine ? (idle ? act4HTML() : actsHTML()) : '');
   var have = PP.FOODS.filter(function (f) { return p.food[f]; });
-  $('#foodrow').innerHTML = '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
-    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : '');
+  setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
+    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var bp = mine && !Q && hintsOn() ? bestPlay(G, vs) : null;
+  var hm = mine && !Q && hintsOn() ? hintMove() : null, bp = hm ? (hm.t === 'play' ? { i: hm.i } : null) : mine && !Q && hintsOn() && typeof coachOn === 'function' && coachOn() ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
-  $('#hand').innerHTML = p.hand.length ? order.map(function (i) {
+  setH($('#hand'), p.hand.length ? order.map(function (i) {
     var id = p.hand[i], b = B[id], st;
     if (tuckQ) st = '<div class="bk-st go">Tap to use this card</div>';
     else if (!mine) st = '';
-    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? 'Now tap a glowing space on your board' : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
+    else if (ok[i]) st = '<div class="bk-st go">' + (UI.sel === i ? (UI.pend ? 'Chosen: tap Play to confirm' : 'Now tap a glowing space on your board') : hintsOn() ? 'Tap to play: +' + b.p + (b.p === 1 ? ' point' : ' points') : 'Tap to play this bird') + '</div>';
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
     return bigCardHTML(id, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"', (bp && bp.i === i ? '<em class="bestb">Best</em>' : '') + st, cls);
-  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>';
+  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>');
   if (UI.hix == null || UI.hix >= p.hand.length) UI.hix = 0;
   handScrollSync(); handPager();
   var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
+  var sc = $('#hand .bc.sel'); if (sc) $('#hand').scrollLeft = sc.offsetLeft - $('#hand').offsetLeft - 4;
+  else { var bc = $('#hand .bc.bestc'); if (bc && (bc.offsetLeft - $('#hand').offsetLeft + bc.offsetWidth > $('#hand').scrollLeft + $('#hand').clientWidth || bc.offsetLeft - $('#hand').offsetLeft < $('#hand').scrollLeft)) $('#hand').scrollLeft = bc.offsetLeft - $('#hand').offsetLeft - 4; }   // the Best bird is never hidden off the strip
+}
+// keep the step's buttons (Play / Other food / Cancel, Skip, No thanks) just under the sticky prompt, never scrolled out of sight
+function dockToActs() {   // the step's buttons and what glows in the panel sit just under the sticky prompt, so you never scroll to find them
+  var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || !myTurn() || db.scrollHeight <= db.clientHeight) return;
+  var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
+  if (ac.children.length) els.push(ac);
+  if (document.body.classList.contains('idle4')) { var a4 = $('#act4') || ac; els = [a4]; }   // choosing an action: only the 4 buttons matter, not a Best hand card below
+  var g = els.length && document.body.classList.contains('idle4') ? null : db.querySelector('#hand .glow, #hand .sel, #acts .glow') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
+  var top = Math.min.apply(null, els.map(function (e) { return e.getBoundingClientRect().top; })), bot = Math.max.apply(null, els.map(function (e) { return e.getBoundingClientRect().bottom; }));
+  var d = top < lim ? top - lim : bot > r.bottom ? Math.min(bot - r.bottom + 4, top - lim) : 0;
+  if (Math.abs(d) > 2) db.scrollTop += d;
 }
 function promptText(mine) {
   if (!G) return '';
   if (G.phase === 'over') return 'The year is over.';
   if (!mine && UI.cap) return UI.cap;
-  if (!mine && isHuman(UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat) && humans().length <= 1) return UI.animSeat === UI.view && UI.busy ? 'Your birds are at work, one by one.' : 'Your turn is starting.';
-  if (!mine) return UI.busy ? (UI.animSeat === UI.view ? 'Your birds are at work, one by one.' : G.pl[UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat].name + ' is playing.') : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
+  var nx = PP.sideToAct(G), nxn = isHuman(nx) && humans().length <= 1 ? 'you' : G.pl[nx].name;
+  if (!mine && UI.busy && UI.animSeat === UI.view) return (UI.animPw ? 'Your birds\u2019 powers fire, one by one.' : 'Your move is finishing.') + (nx !== UI.view ? ' Then ' + nxn + ' plays.' : '');
+  if (!mine && isHuman(UI.animSeat == null ? nx : UI.animSeat) && humans().length <= 1) return 'Your turn is starting.';
+  if (!mine) return UI.busy ? G.pl[UI.animSeat == null ? nx : UI.animSeat].name + ' is playing.' : 'Watch ' + G.pl[nx].name + '.';
   var Q = G.q;
-  if (UI.pend) return 'Play ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '?';
+  if (UI.pend) return 'Tap Play to put ' + B[G.pl[UI.view].hand[UI.pend.i]].n + ' in your ' + HABN[UI.pend.h] + '.';
   if (UI.gsDie != null) return 'Grub or seed?';
   if (!Q) return UI.sel != null ? 'Tap the glowing space on your board.' : UI.pickBird ? 'Pick a glowing bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
@@ -166,7 +191,7 @@ function actsHTML() {
   if (UI.pend) {
     var inf = PP.playInfo(G, UI.view, p.hand[UI.pend.i], UI.pend.h, Q && Q.h === 'play2' ? Q.d.hab : null); if (!inf) { UI.pend = null; return ''; }
     var pay = inf.pays[UI.pend.k % inf.pays.length], paid = PP.FOODS.filter(function (f) { return pay[f]; }).map(function (f) { return new Array(pay[f] + 1).join(foodIcon(f)); }).join('');
-    return '<button type="button" class="btn pri" data-a="playgo">Play: ' + (paid || 'free') + (inf.eggs ? ' + ' + inf.eggs + eggIcon() : '') + '</button>' +
+    return '<div class="cfhint">' + esc(promptText(true)) + '</div><button type="button" class="btn pri" data-a="playgo">Play: ' + (paid || 'free') + (inf.eggs ? ' + ' + inf.eggs + eggIcon() : '') + '</button>' +
       (inf.pays.length > 1 ? '<button type="button" class="btn" data-a="paycycle">Other food</button>' : '') + '<button type="button" class="btn" data-a="cancel">Cancel</button>';
   }
   if (UI.gsDie != null) return mvBtn({ t: 'die', i: UI.gsDie, f: 'grub' }, foodIcon('grub') + 'Grub') + mvBtn({ t: 'die', i: UI.gsDie, f: 'seed' }, foodIcon('seed') + 'Seed') + '<button type="button" class="btn" data-a="cancel">Back</button>';
@@ -189,7 +214,7 @@ function glow() {
   if (UI.pend || UI.gsDie != null) return;
   if (!Q) {
     if (UI.sel != null) { var id = p.hand[UI.sel]; [0, 1, 2].forEach(function (h) { if (PP.playInfo(G, UI.view, id, h)) add('.row[data-h="' + h + '"] .slot.next'); }); return; }
-    if (!UI.pickBird) add('.ract');
+    if (!UI.pickBird) { add('.ract'); add('.a4:not([aria-disabled])'); return; }   // choosing an action: the four actions (and the rows) glow; the hand glows once you pick Play a bird
     PP.playable(G, UI.view).forEach(function (x) { add('#hand .bc[data-i="' + x.i + '"]'); });
     return;
   }
@@ -206,7 +231,7 @@ function glow() {
 function fitMat() {   // slots keep a card-like shape: width from the row height, never wider than the screen allows
   var m = $('#mat'); if (!m || !m.clientHeight) return;
   var rh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rh')) || 64, rowH = (m.clientHeight - 8) / 3, w = (m.clientWidth - rh - 30) / 5;
-  m.style.setProperty('--sw', Math.max(40, Math.floor(Math.min(w, rowH * .78))) + 'px');
+  m.style.setProperty('--sw', Math.max(44, Math.floor(Math.min(w, rowH * .78))) + 'px');
 }
 // big card view (tap to inspect): the same readable card, larger, plus nest and egg facts
 function showCard(id, st, extra) { hideHelp();
