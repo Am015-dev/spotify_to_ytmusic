@@ -8,6 +8,7 @@ and 375x667. The tutorial driver taps only the spotlit target or Next. In play I
 |------|---------|-----|--------|-------------|
 | lantern-dive | 7.0, 6.9, 7.0 | **7.3** | **PASS** | all 7: 2, 3, 4, 5, 6, 7 |
 | twin-thrones | 7.1, 7.0 | **7.3** | **PASS** | all 7: 3, 4, 5, 6, 7, 8 |
+| nebula-aces | 6.1 | **5.9** | **FAIL** | 6 AI and pacing (4), 4 Turn clarity (5) |
 
 ---
 
@@ -87,3 +88,62 @@ and 0 console errors.
 - Row 8 — did: tapped a wonder right after my first draft pick at 375x667, while the line narrated my pick — happened: nothing happened, and the 3 wonders stayed bright with no "Rival is choosing" cue; my driver logged 15 such ignored taps over the draft — shot: games-src/reviews/R15-shots/twin-375-draft-tap-ignored.jpg
 - Row 5 — did: armed the "Master Builders" token at 390x844 — happened: the token tooltip covers "Your turn / Pick a progress token", and a "+2 Scholars' Court" floater sits on my city row — shot: games-src/reviews/R15-shots/twin-390-board-token-armed.jpg
 - Row 6 — did: played Easy at 375x667 with random glowing cards — happened: lost 57-74; the result explains why ("civic cards (+21) and wonders (+13)") — shot: games-src/reviews/R15-shots/twin-375-result-lost.jpg
+
+---
+
+## 3. nebula-aces (shelf/W486-nebula-bench @ 1c27a099, source games-src/xw)
+
+What I played: "New here? Learn in 5 minutes" to the end at 390x844 and at 375x667. That is 3 intro steps, then the coached duel
+with the ghost finger (2 rounds, won), then the flight drill (roll, boost, edge, bump), then "Drill done", in 135 s and 52-57 taps.
+I tapped exactly what the finger or spotlight showed. Then 5 real games by touch from "Launch" (the first game: the easy rival, an
+8-round dogfight) to the result screen: 1 at 390x844 and 4 at 375x667. 2 games mixed the suggested move with random green/white moves,
+and 3 always took the suggested (pre-picked) move, the recommended action and target, and the lit button. Plus a K-turn check at
+375x667: plan a K-turn, fly it, then open the dial in round 2. 0 page errors and 0 console errors.
+
+**Rules check (the 8-round limit).** The base game has no round limit: you fight until one side has no ships (the game's own
+rules-notes.md and engine.js say the same: "1e has no round limit (tournaments use a clock)"). The official tournament rules use a
+clock (75 min), not a round count, and score on points destroyed. A tie in points destroyed was a draw in the early regulations;
+later it was settled by a roll-off ("Final Salvo": each side rolls dice equal to its ships' attack values) or a judge's random pick.
+**Health left is never a tiebreak** in any official version. So "8 rounds, then more health left wins" is a house rule on both
+counts. It changes the win condition of the first game a new player flies, and the player is not told it is a house rule. Not faithful.
+
+**Reverse arrows check.** The K-turn itself is right: its dial icon turns back, and the ghost's nose points back down the screen.
+**After the turn-around it is wrong.** In round 2 my ship faces down the screen. Its dial still shows "↑1" for Straight 1, but the
+ghost goes down. "↖1 Bank left 1" goes down-right on screen. The revealed enemy moves above the rival ships use the same up-the-screen
+arrows ("↑2" over Knifepoint, who faces right). This is exactly the owner's complaint, and it is **not fixed**. The fixer's
+reverse-test only checks the K-turn icon, not the moves after the turn.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 6 | The core first-edition rules still match (movement lowest skill first, firing highest first, range-3 defence die, focus, lock, stress on red moves, K-turn 180°, rocks, bumping, edge). But the first game's 8-round limit with a "more health left" tiebreak is in neither the base game nor the official tournament rules (see above). |
+| 2 | Tutorial teaches | 6 | Better: one line per step and a finger on the real control. The "coming up later" list is gone, and roll, boost, the edge and bumping are flown in the drill. But the coached reroll step walks the finger over both HIT dice first ("Attack die 1: hit", "Attack die 2: hit", then the blanks), so it teaches rerolling hits. The coached plan step uses 42 px move circles that overlap. It ends with "The rest is in Rules." |
+| 3 | First 10 seconds | 7 | Clear title line ("A tactical starfighter duel. Plan every move in secret…"), a big Launch and "New here?". |
+| 4 | Turn clarity | 5 | Dial arrows point the wrong way once the ship faces down the screen, and the enemy move arrows are fixed to the screen. A "Rival's turn / Nightjar takes aim" bubble stays on the board during my plan step. "★ Use evade" is really Kael's pilot ability (turn 1 focus into an evade), not an evade token. The 3 intro steps disappear into a separate modal ("Your first battle"). |
+| 5 | Phone play | 6 | Fixed: at 375 the dial is a grid docked above the bar, so the ship and all moves show (cells about 52x40). Still: the coached plan step has 42 px move circles that overlap each other, the drill targets are 42 px, and after the K-turn the "Kael" label sits on Nightjar's label. |
+| 6 | AI and pacing | 4 | On the default first game (the easy rival) I lost **5 of 5**, in rounds 4-6 (66-100 s). In the 3 games where I always took the suggested move, the rival ended with all 6 health in 2 of them and 5 in the third. A new player cannot win on the default level. Games are short, and the rival moves briskly. |
+| 7 | Feel | 7 | Loose dice roll in a dice tray, arcs and range wedges, 3D ships, laser lines, "CRIT!" and damage floaters. |
+| 8 | Bugs | 6 | The DEFEAT card's subtitle is the literal word "undefined" in 2 of 5 games (390 and 375). 0 errors, 0 stuck states, 0 dead taps. |
+
+**Total: 5.9 — FAIL** (rows 1, 2, 4, 5, 6 and 8 are below 7; row 6 is 4).
+
+### Earlier findings (G2)
+- G2 R2, "Coming up later" list (barrel roll, boost, bumping, edge): **FIXED.** The flight drill flies each one. Shots: games-src/reviews/R15-shots/nebula-375-drill-roll.jpg, games-src/reviews/R15-shots/nebula-375-duel-end.jpg
+- G2 R2, split flow (3 bubbles, then a modal, then the guided game): **NOT FIXED.** It is still 3 intro steps, then the "Your first battle" card, then the duel, then the drill card. Shot: games-src/reviews/R15-shots/nebula-375-drill-end-rest-in-rules.jpg
+- G2 R4, strange dial default that heads off the mat and changes between openings: **FIXED.** The default is the suggested move (↑3 Straight 3 · 🎯), the same on every opening. Shot: games-src/reviews/R15-shots/nebula-375-kturn-ghost-ok.jpg
+- G2 R4, stale "Round 1: plan" bubble: **PARTLY.** That one is gone, but a "Rival's turn" bubble stays on during my round-2 plan. Shot: games-src/reviews/R15-shots/nebula-375-stale-rivals-turn-in-plan.jpg
+- G2 R4, defence modifiers with no explanation: **FIXED** (subtitles such as "Turn 1 focus into hits."), but "Use evade" names the wrong thing. Shot: games-src/reviews/R15-shots/nebula-390-tut-use-evade-label.jpg
+- G2 R5, the 375 dial covers my ship and its lower options are cut: **FIXED** (grid above the bar). Shot: games-src/reviews/R15-shots/nebula-375-after-kturn-bank-left-arrow-wrong.jpg
+- G2 R6, lost after 12 rounds on the default level; can't show a new player wins: **NOT FIXED.** Games are short now (4-6 rounds), but I lost all 5. Shots: games-src/reviews/R15-shots/nebula-375-defeat-r6.jpg, games-src/reviews/R15-shots/nebula-375-defeat-undefined.jpg
+- G2 R8, thin vertical line on the first tutorial step: **not seen** this time.
+- Owner, "when the ship reverses the arrows are directed wrongly": **NOT FIXED** (see above). Shots: games-src/reviews/R15-shots/nebula-375-after-kturn-bank-left-arrow-wrong.jpg, games-src/reviews/R15-shots/nebula-375-after-kturn-straight-arrow-wrong.jpg, games-src/reviews/R15-shots/nebula-390-defeat-undefined-enemy-arrows.jpg
+
+### New findings
+- Row 4 — did: flew a K-turn 4 in round 1 at 375x667, then opened the dial in round 2 — happened: the ship faces down the screen. "↑1 Straight 1" shows a ghost going down, and "↖1 Bank left 1" a ghost going down-right. The arrows stay fixed to the screen, not the ship — shots: games-src/reviews/R15-shots/nebula-375-after-kturn-straight-arrow-wrong.jpg, games-src/reviews/R15-shots/nebula-375-after-kturn-bank-left-arrow-wrong.jpg (the K-turn ghost itself is right: games-src/reviews/R15-shots/nebula-375-kturn-ghost-ok.jpg)
+- Row 4 — did: watched the end of a game at 390x844 — happened: the revealed enemy moves "↱3" and "↑2" float over rivals that face left and right, so they point the wrong way too — shot: games-src/reviews/R15-shots/nebula-390-defeat-undefined-enemy-arrows.jpg
+- Row 2 — did: followed the finger on the coached lock-and-reroll step (390 and 375) — happened: the finger goes to "Attack die 1: hit", then "Attack die 2: hit", then the 2 blanks. Both hits get picked for a reroll (code: the finger takes the first unpicked die, whatever its face) — shots: games-src/reviews/R15-shots/nebula-390-tut-finger-reroll-hit1.jpg, games-src/reviews/R15-shots/nebula-390-tut-finger-reroll-hits-selected.jpg
+- Row 6 — did: 5 real games from Launch (the easy rival, 8 rounds), 3 of them always on the suggested move — happened: lost 5 of 5 by round 4-6; in 2 games the rival kept all 6 health — shots: games-src/reviews/R15-shots/nebula-375-defeat-r6.jpg, games-src/reviews/R15-shots/nebula-375-defeat-undefined.jpg
+- Row 8 — did: lost at 390x844 and at 375x667 — happened: the DEFEAT card's subtitle reads "undefined" — shots: games-src/reviews/R15-shots/nebula-390-defeat-undefined-enemy-arrows.jpg, games-src/reviews/R15-shots/nebula-375-defeat-undefined.jpg
+- Row 1 — did: compared the first game's 8-round limit and "more health left" tiebreak (data.js, engine.js missionCheck) with the base and tournament rules — happened: neither has a round count or a health tiebreak (clock and points destroyed; a tie is a draw or a dice roll-off) — no shot (a rules check)
+- Row 4 — did: started planning round 2 at 375x667 — happened: a "Rival's turn / Nightjar takes aim" bubble stays on the board while the bar says "Tap your ship to plan its move" — shot: games-src/reviews/R15-shots/nebula-375-stale-rivals-turn-in-plan.jpg
+- Row 5 — did: the coached plan step at 375x667 — happened: 15 move circles of 42 px overlap in a tight cluster ahead of the ship — shot: games-src/reviews/R15-shots/nebula-375-tut-board-targets-42px.jpg
+- Row 4 — did: defended in the coached duel — happened: the button "★ Use evade" is Kael's pilot ability (turn 1 focus into an evade), not an evade token; and the coach line "Range 3 gave him a defence die" shows while I am the one defending — shot: games-src/reviews/R15-shots/nebula-390-tut-use-evade-label.jpg
