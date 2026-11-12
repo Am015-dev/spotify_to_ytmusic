@@ -5471,7 +5471,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-k.allno.can{box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55)}
 .bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
 .bf-t.nofit::after{content:'✗';position:absolute;right:4%;top:4%;width:38%;height:38%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
-.bf-t.adv{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
+.bf-t.adv{padding:0;border:0;background:none;display:block;box-shadow:none;outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
 .bf-t.adv::before{content:none;position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
 .bf-t.sun{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
 .bf-t.deal{animation:bfDeal .5s cubic-bezier(.3,1.5,.5,1) both}
@@ -5704,7 +5704,8 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
     h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
-    a.forEach((t,k)=>{const key=`f${i}_${k}`;const x=(k%2?.56:-.56)*ts,y=(k<2?-.56:.56)*ts;const hs=Math.max(ts,44);const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
+    a.forEach((t,k)=>{const key=`f${i}_${k}`;const tight=Math.max(ts,44)>ts*1.12,off=tight?R.ks/4:.56*ts;const x=(k%2?off:-off),y=(k<2?-off:off);const hs=tight?R.ks/2:Math.max(ts,44);   // small kilns: the four hit boxes are the kiln's quadrants, never overlapping (a 44px box on a 20px pitch covered its neighbours)
+      const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
       h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-hs/2}px;top:${R.ks/2+y-hs/2}px;width:${hs}px;height:${hs}px;--v:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
     h+='</div>'});
   const items=S.ctr.map((t,k)=>({t,k})).sort((u,v)=>u.t-v.t||u.k-v.k);if(S.markerIn==='ctr')items.unshift({t:SUN,k:'sun'});const N=items.length;
