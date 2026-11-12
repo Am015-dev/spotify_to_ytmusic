@@ -253,3 +253,5 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Deploy runs scenario tests: workers must prove BOTH `build-all.py --quick` (scenarios) and `--full` (phone-check+sweep).
 - Reviewer R36 (shipwreck, thornbound, nebula) session_01RR7mnY71BvDP17ccBUoj81. Waiting review: short-fuse (9198c40d).
 - Fixers (prefix session_01RR7mn): F8-sands bg5rsRVppoU1AQpQj, F8-tidewake Y82TesPtiQuy9gQbn, F8-vale b8Egh22twkJx1Ghu9, F8-doorkick atFZkcGiEaNB85fk7, F8-vinegrave bR1jxcLTeRJtguPvS, F10-hollowbough YiMCC92cqcaBM5pEd, F7-cauldron XdMnazBPV3P7dF8xg.
+- 21:48 status. Fixed, in review: R37 (short-fuse 9198c40d, cauldron 93ae36dd, vale 512dd83a) session_01RR7mnZpRrRZvKoeeL6M8Zh; R38 (sands 9a490a85, tidewake 6acc0f67, nebula fd818e08) session_01RR7mnbbL6k4qkA5aofGeGR.
+- Still fixing (prefix session_01RR7mn): F7-thornbound Zmz1cSJERPDnFxz9N, F7-shipwreck aGrqQmwnBawztrDxR, F9-doorkick ZvWTggjk1G2UGEem2, F10-hollowbough YiMCC92cqcaBM5pEd. F8-vinegrave bR1jxcLTeRJtguPvS stuck on a Bash approval prompt since 20:06 (owner told).
