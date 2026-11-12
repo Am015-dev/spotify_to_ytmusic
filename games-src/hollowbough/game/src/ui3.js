@@ -144,6 +144,7 @@ function fxLand(m, seat, src, preChip) {
 function fingerWanted() {
   if ((UI.cfg && UI.cfg.tutorial) || UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
   if (UI.mode === 'guided') return true;
+  if (typeof guideOn === 'function' && guideOn()) return true;   // R35: the finger shows by default in vs games too (hints off turns it off)
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
@@ -160,7 +161,8 @@ function placeFinger() {
   let el = UI.tgEls && UI.tgEls[tg];
   if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
   if (!el) return;
-  hscrollTo(el);
+  { const pn = PV_ON && el.closest && el.closest('#bd.pv .pv-panel'); const tb = pn && !pn.classList.contains('on') && pvTall() && document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]');
+    if (tb) el = tb; else hscrollTo(el); }   // the finger never flips the panel by itself: on a hidden panel it points at that panel's tab
   const r = frameRect(el); if (!r || r.w < 4) return;
   const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');

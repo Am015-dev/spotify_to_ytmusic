@@ -201,6 +201,31 @@ function tgOf(m) {
   if (m.type === 'choose') return 'q:' + m.i;
   return '';
 }
+// ---- the newcomer guide (R35): in a guided or vs game the ghost finger shows by default (off only when the player turned hints off),
+// and on a plain turn only the 1-3 best places or cards glow; every other legal place still answers a tap, it just does not shine
+function guideOn() {
+  if (!G || G.phase === 'over' || (UI.cfg && UI.cfg.tutorial) || UI.camp || NET.on) return false;
+  if (UI.mode === 'guided') return true;
+  if (UI.mode !== 'vs' && UI.mode !== 'solo') return false;
+  try { return localStorage.getItem('hb_hints') !== '0'; } catch (e) { return true; }
+}
+function guideTop() {
+  const seat = viewSeat(), key = G.logN + ':' + G.turn + ':' + seat;
+  if (UI.gtop && UI.gtop.k === key) return UI.gtop.v;
+  const top = new Set(); let r = [];
+  try { computeRec(true); if (UI.rec && UI.rec.m) { const t = tgOf(UI.rec.m); if (/^(w:|p:|d:)/.test(t)) top.add(t); } } catch (e) { }
+  try { r = HB.AI.rank(G, seat).filter(x => x.m.type === 'worker' || x.m.type === 'play').sort((a, b) => b.v - a.v); } catch (e) { r = []; }
+  const best = r.length ? r[0].v : 0;
+  for (const x of r) { if (top.size >= 3) break; if (top.size && x.v < best - 1.5) break; top.add(tgOf(x.m)); }   // only places close to the best one shine
+  UI.gtop = { k: key, v: top }; return top;
+}
+function guideTrim(myNow) {
+  if (!myNow || !guideOn()) return;
+  const top = guideTop(); if (!top.size) return;
+  for (const tg in UI.tgEls) { if (!/^(w:|p:|d:)/.test(tg)) continue; const e = UI.tgEls[tg];
+    if (top.has(tg)) continue;
+    if (e.classList.contains('glow')) { e.classList.remove('glow'); e.classList.add('cango'); } }
+}
 function tileTg(kind, i) { return kind === 'basic' || kind === 'forest' ? 'w:' + kind + ':' + i : kind === 'haven' ? 'w:haven' : kind === 'journey' ? 'w:journey' : kind === 'bev' || kind === 'sev' ? 'w:' + kind + ':' + i : ''; }
 // open destinations in rival cities that I may visit
 function visitList() {
@@ -456,7 +481,7 @@ function renderActs(mm, qm, qShown) {
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
     else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
-    if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
+    if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : '') + (mm.every(m => m.type === 'pass') ? '.glow' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
 function renderPrompt() {
@@ -610,7 +635,15 @@ function pvSetTab(v, quiet) {
   bd.querySelectorAll('.pv-tab').forEach(t => { const on = t.dataset.v === v; t.classList.toggle('on', on); t.setAttribute('aria-selected', on ? 'true' : 'false'); });
   if (!quiet) { const p = bd.querySelector('.pv-panel.on'); if (p) { p.classList.remove('pvin'); void p.offsetWidth; p.classList.add('pvin'); } }
   try { const p = bd.querySelector('.pv-panel.on'); if (p) pvFitWords(p); } catch (e) { }   // labels in a panel that was hidden at render are fitted now
+  try { meadFix(); } catch (e) { }
   pvRects(); if (!quiet) { try { placeFinger(); } catch (e) { } }
+}
+// the meadow row scrolls sideways: bring the card the finger points at (else the first glowing one) fully into view
+function meadFix() {
+  const mead = document.querySelector('#bd .pv-mead'); if (!mead) return; const q = mead.getBoundingClientRect(); if (q.width < 4) return;
+  const rt = UI.rec && UI.rec.m && UI.tgEls && UI.tgEls[tgOf(UI.rec.m)], want = rt && mead.contains(rt) ? rt : mead.querySelector('.glow'); if (!want) return;
+  const r = want.getBoundingClientRect(); if (r.left >= q.left - 1 && r.right <= q.right + 1) return;
+  mead.scrollLeft = Math.max(0, mead.scrollLeft + (r.left - q.left) - Math.max(8, (q.width - r.width) / 2)); UI.pvMx = mead.scrollLeft;
 }
 // where things are, for the flying pieces (a piece on a hidden panel flies to / from its tab)
 function pvRects() {
@@ -793,12 +826,14 @@ function pvRender() {
   hs.addEventListener('scroll', () => { UI.hsx = hs.scrollLeft; }, { passive: true });
   if (!nH) hs.appendChild(h('span.sempty', v >= 0 ? 'No cards in hand' : ''));
   // ---- which panel is in front (phone): my turn starts on Places (or the Meadow when no worker is left); a pending choice shows its panel
-  const glowIn = k => !!stage.querySelector('.pv-panel[data-p="' + k + '"] .glow');
   const myNow = mine && !G.q && !UI.sel;
+  guideTrim(myNow);
+  const glowIn = k => !!stage.querySelector('.pv-panel[data-p="' + k + '"] .glow');
   if (UI.pvCityN != null && fs === UI.pvSeat && me.city.length > UI.pvCityN && fs === viewSeat()) { UI.pvForce = 'city'; UI.pvCityAt = Date.now(); }
   UI.pvCityN = me.city.length; UI.pvSeat = fs;
   if (UI.pvForce) { UI.pvTab = UI.pvForce; UI.pvForce = null; }
-  else if (myNow && !UI.pvMine) UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places');
+  else if (myNow && !UI.pvMine) { UI.pvTab = availW(me) > 0 && okw.size ? 'places' : (glowIn('meadow') ? 'meadow' : 'places'); if (!glowIn(UI.pvTab)) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
+    if (guideOn() && UI.rec && UI.rec.m) { const re = UI.tgEls[tgOf(UI.rec.m)], pn = re && re.closest && re.closest('.pv-panel'); if (pn) UI.pvTab = pn.dataset.p; } }   // a new turn opens on the panel the finger points into
   else if (mine && (G.q || UI.sel) && !glowIn(UI.pvTab || 'places')) { const k = PV_TABS.map(x => x[0]).find(glowIn); if (k) UI.pvTab = k; }
   UI.pvMine = myNow;
   if (UI.tutTab && typeof tutOn === 'function' && tutOn()) UI.pvTab = UI.tutTab;   // Learn: the panel the current step points at stays in front
@@ -811,11 +846,13 @@ function pvRender() {
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
+  meadFix();   // R35: a glowing meadow card is never left off the edge
   if (tiny) { spots.scrollLeft = UI.pvBx || 0; spots.addEventListener('scroll', () => { UI.pvBx = spots.scrollLeft; }, { passive: true });
     const gs = [...spots.querySelectorAll('.glow')], q = spots.getBoundingClientRect(), vis = e => { const r = e.getBoundingClientRect(); return r.left >= q.left - 1 && r.right <= q.right + 1; };
     if (gs.length && !gs.some(vis)) pvScrollTo(gs[0]); }   // a glowing place is always in view
   if (short) { hs.scrollTop = UI.hsy || 0; hs.addEventListener('scroll', () => { UI.hsy = hs.scrollTop; }, { passive: true }); const g = hs.querySelector('.glow'); if (g && (g.offsetTop < hs.scrollTop || g.offsetTop + g.offsetHeight > hs.scrollTop + hs.clientHeight)) hs.scrollTop = g.offsetTop - 20; }
   else hs.scrollLeft = fits ? 0 : (UI.hsx || 0); if (!short) { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
+  if (guideOn()) { try { computeRec(); } catch (e) { } }   // the finger is there as soon as the turn is drawn
   renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
   if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
 }

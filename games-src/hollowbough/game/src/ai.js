@@ -331,6 +331,7 @@ function choose(G, seat, level, opts) {
   const rng = mkRng(seedOf(G, seat));
   if (level === 'easy') return chooseEasy(G, seat, rng);
   if (level === 'hard') return chooseHard(G, seat, rng, (opts && opts.budget) || 220);
+  if (level === 'coach') return chooseNormal0(G, seat, rng);   // the helper's pick for the player: normal strength, never eased off
   return chooseNormal(G, seat, rng);
 }
 // play the next move for whoever must act (helper for UIs and tests); returns the move or null
