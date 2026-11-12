@@ -31,3 +31,17 @@ Gates and results are in the commit message and the report; scripts: `tutor-test
 - ui-audit (local server): phone A0 B8 C0 D0 E2 F0; phone-s A0 B14 C1 D0 E0 F0; pc A0 B6 C0 D0 E4 F0. **Not zero**: B (text on busy painted backgrounds: title offer, Rules drawer, More panel, campaign header) and E (state-toggle buttons in the More panel read as dead) sit on shared shell surfaces; C1 on phone-s unlooked at.
 - Shots (phone, `playable-shots/`): title, first-turn, island-turn (event scene), day-summary, island-weather. The game-over screen itself was not captured.
 - Rules: 2/2 differences found vs the rulebook fixed (Soldier Fortify cost 3, Defence plan puts the beast on top of the hunting deck). rules-check file (W384) listed 1 WRONG; the second was found by reading the rulebook.
+
+## R8 fix 3 (12 Nov 2026)
+- ✨ plans toward the win: from day 3 the advisor puts spare wood on the signal pile whenever the pace line says behind (PACE_T now lives in
+  advisor.js and is shared with the pace line), and keeps the shelter's wood back (`shelterReserve`). Fire and pile-wood priorities start on day 3.
+  Headless Easy (`easy-sim.js 80`): 63% → 78-88% wins, avg pile 14.5; on pace on days 5-7 in every game.
+- Camp pop-up: the pile row says "(no pawn)" and "+N wood", warns "uses your shelter wood", and the first tap that would eat shelter wood only
+  warns (tap again to add). After adding, the bar says which pawn still needs a job. The ✨ pick (⭐ row) is listed first in every place's pop-up.
+- Day summary: plain words ("Food -1", "Cook -2 life"), and danger lines first (no shelter, food short for tonight, someone at 3 life or less);
+  "on track" only shows with no danger.
+- Learn to play: 46 steps (was 57). The guide picks the pawn itself where a step only said "Tap the Cook". The roll step waits for the
+  explore roll. A scene that one of the next steps explains is held on screen.
+- FLAG `?hint=1` (off): ✨ becomes a per-pawn hint (finger on the place, ⭐ row) and the player places every pawn. Open problem: touch games that
+  follow the hints lost 4 of 4 (piles 3-14), while the same plan placed at once wins. The hint map equals suggestPlan's (probe), so the gap is in
+  how the hints are followed (pawn order, rows); `HINT=1 node taps-test.js` reproduces it.

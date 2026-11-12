@@ -126,18 +126,27 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
   const I=invReq(k);const probe={id:-1,type:'build',tgt:{k},pw:[],pay:'wood'};const tw=targetWhy('build',{k});
   o.push({w,icon:'🔨',title:`Make ${I.n}`,why:`${I.n} ${why}. It needs ${invNeedPlain(I)}.`,act:{type:'build',tgt:{k}},cant:tw&&tw!=='already planned'?tw:(jobPlanned('build',{k})||afford(probe)?null:`needs ${invNeedPlain(I)}`),done:jobPlanned('build',{k})})};
   switch(G.scen){
-  case 'marooned':{if(!has('fire'))inv('fire',G.round>=5?75:55,'is half of the rescue signal: sailors look for smoke');
+  case 'marooned':{if(!has('fire'))inv('fire',G.round>=3?76:55,'is half of the rescue signal: sailors look for smoke');
     const s=PILE_CUM.findIndex(c=>c>G.sc.pile);const prev=s>0?PILE_CUM[s-1]:0;const room=SCEN.marooned.pileRoom();
-    if(G.sc.pile<15&&G.round>=4){const stage=`Stage ${s+1} of 5: ${G.sc.pile-prev} of ${PILE_CUM[s]-prev} wood placed`;const daysLeft=Math.max(0,12-G.round+1);const woodLeft=15-G.sc.pile;
-      if(room&&G.res.wood-committed().wood>0&&G.round>=5)o.push({w:65,icon:'🔥',title:`Add wood to the signal pile (${G.sc.pile}/15)`,why:`${stage}. One stage per day: 1, then 2, 3, 4 and 5 wood. It must be full, with Fire, on day 10, 11 or 12.`,pile:1,done:false});
+    if(G.sc.pile<15&&G.round>=3){const stage=`Stage ${s+1} of 5: ${G.sc.pile-prev} of ${PILE_CUM[s]-prev} wood placed`;const daysLeft=Math.max(0,12-G.round+1);const woodLeft=15-G.sc.pile;
+      if(room&&G.res.wood-committed().wood-shelterReserve()>0&&G.round>=3)o.push({w:65,icon:'🔥',title:`Add wood to the signal pile (${G.sc.pile}/15)`,why:`${stage}. One stage per day: 1, then 2, 3, 4 and 5 wood. It must be full, with Fire, on day 10, 11 or 12.`,pile:1,done:false});
       else if(G.sc.stageRound===G.round)o.push({w:30,icon:'🔥',title:`Signal pile: today’s stage is done (${G.sc.pile}/15)`,why:'Save wood for tomorrow’s stage.',done:true,pile:1,info:true});
-      else if(room&&G.round>=5)o.push({w:55,icon:'🔥',title:`Signal pile ${G.sc.pile}/15: no spare wood`,why:`${stage}. Gather wood today: you need ${woodLeft} more wood in all.`,act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood')})}
+      else if(room&&G.round>=3)o.push({w:(PACE_T[G.round+1]&&G.sc.pile<PACE_T[G.round+1])?77:58,icon:'🔥',title:`Signal pile ${G.sc.pile}/15: no spare wood`,why:`${stage}. Gather wood today: you need ${woodLeft} more wood in all.`,act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood')})}
     if(G.round>=8){const need=15-G.sc.pile;const stages=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;o.push({w:66,info:true,icon:'⛵',title:G.round>=10?'The rescue window is open':'The rescue window opens on day 10',why:`Fire ${has('fire')?'✓':'✗'}, pile ${G.sc.pile}/15: you need ${need} more wood (${stages} stage${stages===1?'':'s'}, one a day)${has('fire')?'':', plus Fire'}. A ship can come on day 10, 11 or 12.`,done:false})}
     break}
   case 'hexed':{const t=G.map.filter(m=>tileAt(m.id)&&!G.sc.crosses.includes(m.id)).sort((a,b)=>(a.fog?1:0)-(b.fog?1:0)||dist(G.camp.pos,a.id)-dist(G.camp.pos,b.id))[0];if(t){const tgt={k:'cross',cross:t.id};const tw=targetWhy('build',tgt);o.push({w:G.round>=5?78:58,icon:'✝️',title:`Raise a cross (${G.sc.crosses.length}/5)`,why:`Five crosses on five different places break the curse. Each costs 2 wood.`,act:{type:'build',tgt},cant:tw&&tw!=='already planned'?tw:(G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')||G.res.wood-committed().wood>=2?null:'needs 2 wood: gather some'),done:G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')})}if(G.sc.temple!=null&&!G.sc.templeDone)o.push({w:50,icon:'🛕',title:'Search the dark temple',why:'An explore action there draws mystery cards: up to 3 treasures.',act:{type:'special',tgt:'temple'},cant:targetWhy('special','temple')==='already planned'?null:targetWhy('special','temple'),done:jobPlanned('special','temple')})}break;
   case 'stranded':if(!has('jraft'))inv('jraft',88,'lets us row out to Ada');else if(!G.sc.rescued)o.push({w:98,icon:'⛵',title:'Row out and rescue Ada',why:`Ada loses 2 life every night on the rock (${CHARS.ada.die-G.sc.ada} left).`,act:{type:'special',tgt:'ada'},cant:targetWhy('special','ada')==='already planned'?null:targetWhy('special','ada'),done:jobPlanned('special','ada')});else inv('lifeboat',80,'takes everyone home');break;
   case 'settlers':{const next=G.sc.goals.filter(k=>!has(k)).sort((a,b)=>(missingTerrain(a)?1:0)-(missingTerrain(b)?1:0))[0];if(next)inv(next,60,'is one of the nine things our settlement needs');if(G.camp.pal<1&&hasShelter())o.push({w:45,icon:'🧱',title:'Build a palisade',why:'The settlement needs a palisade of 1 or more.',act:{type:'build',tgt:{k:'pal'}},done:jobPlanned('build',{k:'pal'})});if(G.weapon<1)o.push({w:45,icon:'🗡️',title:'Make a weapon',why:'The settlement needs a weapon of 1 or more.',act:{type:'build',tgt:{k:'weapon'}},done:jobPlanned('build',{k:'weapon'})})}break}
   return o}
+// R3 review: the rescue pace (Marooned: fire, then a 15-wood pile by day 10-12). Shared by the pace line, the day summary and ✨.
+const PACE_T={5:4,6:5,7:6,8:7,9:9,10:11,11:13,12:15};
+// wood kept back for a shelter that is not built or planned yet (the pile never eats it)
+function shelterReserve(){if(hasShelter()||jobPlanned('build',{k:'shelter'}))return 0;return SRP_COST[Math.min(4,Math.max(2,G.np))].wood}
+// how much wood ✨ puts on the pile today: whenever the pace says behind (today or tomorrow), the stages left need every day, or there is plenty
+function advPileN(){if(G.scen!=='marooned'||typeof SCEN==='undefined')return 0;const room=SCEN.marooned.pileRoom();if(!room)return 0;
+  const spare=G.res.wood-committed().wood-shelterReserve()-((wxTab()[G.round]||[]).includes('snow')?1:0);if(spare<=0)return 0;
+  const stagesLeft=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const daysLeft=12-G.round;const t=Math.max(PACE_T[G.round]||0,PACE_T[G.round+1]||0);
+  const behind=(t&&G.sc.pile<t)||daysLeft<=stagesLeft+1||(G.round>=4&&spare>=2);return behind||spare>=room?Math.min(room,spare):0}
 // the red priorities that are still open and could be fixed: Start the day asks first
 function uncoveredRed(){return priorities().filter(p=>p.red&&!p.done&&(p.can||p.move))}
 // ---------- ✨ Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
@@ -152,6 +161,8 @@ function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c
     for(const p of pr){const before=placedIds();if(!doJob(p.act.type,p.act.tgt,p.act.alt,p.lead)){note(before,p.title.replace(/\s*\(.*\)$/,''));did=true;break}}if(!did)break}
   // 3. the computer plans what is left
   const before=placedIds(),mark=G.logN;if(humanFree().some(p=>p.c!=null)){aiPlanBest(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)));note(before,'the computer’s pick')}
+  // 4. the signal pile, planned toward the win (R8 review: ✨ left the pile at 3/15 while the pace line said "build faster")
+  {const n=advPileN();if(n>0&&!pileAdd(n))lines.push(`${n} wood → signal pile (${G.sc.pile}/15)`)}
   const also=G.log.filter(l=>l.i>mark&&(l.c==='step'||/signal pile/.test(l.t))).reverse().map(l=>l.t.replace(/\.$/,''));if(also.length)lines.push('Also: '+also.join('; '));
   // safety net: the rules for the advisor must hold (checked by adv-test.js)
   for(const c of living())if(c.human&&nearDeath(c)&&!restPlanned(c.i)){const p=humanFree().find(q=>q.c===c.i)||allPawns().find(q=>q.c===c.i);if(p&&!placeWhy(p.id,'rest',null)||p&&placedIds().has(p.id)){const snap=JSON.stringify(G.plan);unplace(p.id);if(place(p.id,'rest',null))G.plan=JSON.parse(snap)}}
@@ -204,12 +215,14 @@ function lookSuggest(){if(UI.sim||typeof stateScore!=='function')return null;con
 // The advice stays the same while you follow it; it is worked out again only when the plan leaves it (or resources change).
 function recValid(r){if(!r||r.round!==G.round||r.res!==JSON.stringify(G.res)||r.logN!==G.logN)return false;const now={};for(const a of G.plan.acts)for(const id of a.pw)now[id]=JSON.stringify([a.type,a.tgt]);
   for(const id in r.bkey)if(now[id]!==r.bkey[id])return false;for(const id in now){if(id in r.bkey)continue;const m=r.map[id];if(!m||JSON.stringify([m.type,m.tgt])!==now[id])return false}return true}
-function recPlan(){if(!planOpen())return {map:{}};if(recValid(UI.rec))return UI.rec;if(UI.recBusy)return {map:{}};const bkey={};for(const a of G.plan.acts)for(const id of a.pw)bkey[id]=JSON.stringify([a.type,a.tgt]);const res0=JSON.stringify(G.res),log0=G.logN;
+// fresh: the whole day's plan exactly as ✨ Plan it for me makes it (from an empty human plan), used by the phone's ✨ hints pawn by pawn
+function recPlan(fresh){if(!planOpen())return {map:{}};if(recValid(UI.rec)&&(!fresh||UI.rec.fresh))return UI.rec;const hsP=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);const none=!G.plan.acts.some(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&(q.c==null||hsP.includes(q.c))}));fresh=!!fresh&&none;if(UI.recBusy)return {map:{}};const bkey={};for(const a of G.plan.acts)for(const id of a.pw)bkey[id]=JSON.stringify([a.type,a.tgt]);const res0=JSON.stringify(G.res),log0=G.logN;
   const save=JSON.stringify(G),fx=UI.fx.length,la=UI.lastAct,mate=UI.mate,sw=UI.sugWhy;const before=placedIds();const map={};UI.recBusy=1;
-  try{const r=suggestCore(true);for(const a of G.plan.acts){const n=actNeed(a);const k=a.pw.length;const key=JSON.stringify([a.type,a.tgt]);const dt=dtype(a);
+  const pile0=G.sc&&G.sc.pile|0;let pileN=0;
+  try{const r=suggestCore(!fresh);pileN=(G.sc&&G.sc.pile|0)-pile0;for(const a of G.plan.acts){const n=actNeed(a);const k=a.pw.length;const key=JSON.stringify([a.type,a.tgt]);const dt=dtype(a);
       for(const id of a.pw)if(!before.has(id))map[id]={type:a.type,tgt:a.tgt,alt:a.alt||0,label:actLabel(a),why:r.why[key]||'',sure:!n.roll||k>=n.max,k,with:a.pw.filter(x=>x!==id).map(x=>{const p=pawnInfo(x);return p?pawnLabel(p):'?'}),odds:n.roll&&k<n.max&&dt&&typeof diceOdds==='function'?diceOdds(dt):null}}}
   catch(e){console.error(e)}finally{G=JSON.parse(save);UI.fx.length=Math.min(UI.fx.length,fx);UI.lastAct=la;UI.mate=mate;UI.sugWhy=sw;UI.recBusy=0}
-  UI.rec={round:G.round,res:res0,logN:log0,bkey,map};return UI.rec}
+  UI.rec={round:G.round,res:res0,logN:log0,bkey,map,fresh,pileN};return UI.rec}
 // ---------- first-game walkthrough ----------
 UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
 // the first-game walkthrough and the guided-game tips are now the help kit's coach bubbles (hlp.js)

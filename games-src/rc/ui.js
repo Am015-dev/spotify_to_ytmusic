@@ -236,7 +236,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyJump();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)?suggestCore(true):suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
+  case 'suggest':{if(typeof BF!=='undefined'&&BF.on&&BF.hintOn()&&planOpen()&&!UI.confirm&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)){BF.hint();return}const m=(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G&&G.tut)?suggestCore(true):suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
@@ -246,7 +246,9 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
-  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');refresh()}return}
+  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const room=SCEN.marooned.pileRoom();const free=G.res.wood-committed().wood;const n=Math.min(room,free);const res=shelterReserve();const k=G.round+':'+G.logN+':'+free;
+    if(res&&n>0&&free-n<res&&UI.pileOK!==k){UI.pileOK=k;toast(typeof BF!=='undefined'&&BF.on?'⚠ Uses shelter wood! Tap again to add':`⚠ That leaves ${free-n} wood, and the shelter needs ${res}. Without a shelter everyone takes a wound each night. Tap again to add it anyway.`,7000);return}
+    const r=pileAdd(room);if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');const c=typeof curPawn==='function'&&curPawn();toast(typeof BF!=='undefined'&&BF.on?(c?`🔥 Pile +${n}. ${pawnLabel(c).split(' ')[0]} still needs a job`:`🔥 Pile +${n} (no pawn used)`):`🔥 +${n} wood on the signal pile (${G.sc.pile}/15). That uses no pawn${c?`: ${pawnLabel(c).split(' ')[0]} still needs a job, tap a glowing place`:''}.`,6000);if(typeof PHO!=='undefined'&&PHO.closePop)PHO.closePop(true);refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;
