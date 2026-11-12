@@ -46,3 +46,63 @@ Build: `npm i three` in games-src, then `build-all.py sands-of-qamar` PASS; the 
 
 ---
 
+## 3. vinegrave (branch shelf/W490-vinegrave-bench @ ae27030d): 6.8 FAIL
+
+How I tested: built with the game's own build.py (513,827 bytes, 173 pictures) and served the page next to games/vinegrave/media. Playwright touch only (hasTouch, isMobile, page.touchscreen.tap). Before every tap I checked with elementFromPoint that the target was on top. Tutorial from the title ("Learn to play") to the end card at 390x844 (35 steps, 31 taps + 4 Next, 90 s) and at 375x667 (35 steps, 31 taps + 4 Next, 89 s), with a 1.2 s read pause per step. Every target took the first tap, 0 errors. Then 5 full 5-round games against the default rival (1 computer rival, easy, hints off) from the title (Learn to play, Skip tutorial, Play, Start the expedition) to the result screen, played as a new player. 3 games tapped a random glowing thing after playing free cards first (390 twice, 375 once). 2 games tried sites first, then the market, then anything (390 and 375). I did not tap to speed up rival turns. Results: won 21-14, lost 23-29, 10-64, 14-20 and 25-73. Games took 115-268 s and 35-45 of my actions, 74-95 taps. 0 page errors, 0 console errors, 0 stuck states, 0 covered targets. On every one of my turns I measured whether market glow matched what I could pay, text under 14 px, clipped effect lines and hand-card name cover. I watched for pills overlapping the score chips and the resource row every 120 ms, and counted explorer walkers and flying pieces. Limitation: my research-track selector did not match, so the scripted players climbed research only 0-2 rows. That explains part of the losses (see row 6). Rules re-checked against a full rulebook summary online (notes local only).
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Unchanged since R17 and still right where I could check: starting resources by seat (2 coins / 1 coin + 1 compass / ...), 2 starting Dread in the deck, starting cards free, items under the deck, artifacts bought work at once while one played from hand costs 1 tablet, ruins 3 / deep ruins 6 compasses plus travel, Plane for 2 coins, guardians 5 points and once-per-game boons, Dread for unbeaten guardians, assistants, temple tiles, 5 rounds, tie-break. Card values, idol slots and temple costs are still the builder's own. |
+| 2 | Tutorial teaches | 7 | Same 35 steps as R17: one line and one tap each, 4 Next-only steps, every core action done by tapping, ends on "Play a real game". Still staged: the rival is "out" all the way through, goods are topped up between steps, there is a "Practice jump" for the magnifier, and Dread at round end, assistant upgrade and exile are only words. New: the step counter says "16/33" and "19/33", but there are 35 steps. |
+| 3 | First 10 seconds | 7 | Clean title (Learn to play, Play, Story) and a clean goal card: "Most points after 5 rounds wins" and 3 icon lines. The first real turn says "Your turn: one main action. Starting cards are free. Tap or drag what glows." The hidden dock behind the goal card still reads "You are choosing. Tap to skip ahead." |
+| 4 | Turn clarity | 7 | Fixed: only market cards you can pay glow (0 wrong glows in 5 games, about 210 turns). The others carry a "Need N more" tag (about 190 tags seen per game). Tapping a card shows a priced button ("Buy · 4 compasses", "Buy · 1 coin"); sites show Dig / Explore / Fight. "Nothing left to do. Tap Pass." appears when true. Weak: market effect lines are terse jargon ("cheap buy", "Choose one", "+3 goods", "exile twice", "research draw 1") with no words for what they mean. The research track's "A" badges are still unexplained. |
+| 5 | Phone play | 6 | Fixed: no text under 14 px and no clipped effect line at either size (checked on every turn). Score pills now sit under the chips (touching by 1 px) and no longer hide the name or score. Still: at 375 the hand fans the cards so names are cut ("Creep…" twice, under the next card and the -1 badge). The rival's pills ("+1 coin +1 compass", "+1 tablet") now land on the market's top row and cover its "Need N more" tags. At 375 the result card's buttons cover your own score breakdown. Market cards are thin strips where a "Need N more" bar covers most of the art. |
+| 6 | AI and pacing | 6 | Rival turns are brisk and shown on the board: median wait 0.2-2.9 s, but max 16-38 s after I passed (375: 37.8 s). As a new player I won 1 of 5 on the default "easy" rival. The rival scored 64 and 73 in two games (R17 saw at most 30). My scripted players hardly used research (0-2 rows), which a real new player might also miss, but the R17 player who did research won 3 of 3. So the default rival is very uneven: 14 to 73 points in my 5 games. |
+| 7 | Feel | 6 | Better: explorers now walk the trail to the site (14-18 walks per game), goods and cards fly (90-105 flights per game), counters bump, points count up, and rival moves have a caption on the board ("Tamsin sends an explorer to Old Wreck.") with an orange ring on the site. But the screen is still mostly a grid: 6 market strips that read like spreadsheet rows ("Need 2 more", "draw 2"), a research column of numbers, and a resource row. Most turns are: tap a glowing disc or strip, read a line, tap a priced button. It moves now but still looks like a dashboard. The owner's "spreadsheet like" is only partly answered. |
+| 8 | Bugs | 8 | 2 tutorials and 5 full games to the result: 0 errors, 0 stuck states, 0 dead taps on real targets, Pass works. Small: wrong step counter (x/33 for 35 steps). The rival caption can still be on the board at the start of my turn. |
+| | **Total** | **6.8 FAIL** | Rows 5, 6 and 7 are below 7. (7+7+7+7+6+6+6+8 = 54 / 8 = 6.75, shown as 6.8.) |
+
+### Earlier findings (R17, R2, G2)
+| Finding | Status | Evidence |
+|---|---|---|
+| R17 row 4: no Buy button; buy only by a second tap | **Fixed.** Priced button "Buy · 4 compasses" / "Buy · N coins"; seen in every game. | games-src/reviews/R20-shots/vg-tut-390-g-art2.jpg |
+| R17 row 4 / G2 row 4: every market card glows, even unaffordable | **Fixed.** 0 unaffordable glows over 5 games; unaffordable cards show "Need N more". | games-src/reviews/R20-shots/vg-g2-375-t15.jpg, games-src/reviews/R20-shots/vg-g5-390-overlap.jpg |
+| R17 row 5 / R2 / G2: market effect lines clipped | **Fixed.** Lines wrap to 2 rows; 0 clipped lines found at 390 and 375. | games-src/reviews/R20-shots/vg-g1-390-buy1.jpg |
+| R17 row 5: "+2 points" pill on the You chip hides name and score | **Fixed.** Pills sit under the chip (1 px touch at most). New problem: they cover the market's top row. | games-src/reviews/R20-shots/vg-g5-390-overlap.jpg, games-src/reviews/R20-shots/vg-g2-375-t4.jpg |
+| R17 row 5: resource toasts cover the counts | **Fixed.** Goods fly into the counter and it bumps; no pill on the resource row in 5 games. | games-src/reviews/R20-shots/vg-g1-390-buy1.jpg |
+| R17 row 5: hand names covered at 375 | **Not fixed.** "Creeping Dread" shows as "Creep…" under the next card and its -1 badge. | games-src/reviews/R20-shots/vg-g2-375-t15.jpg |
+| R17 row 2: rival "out" for the whole tutorial, goods topped up, practice jump | **Not fixed** (tutorial unchanged). | games-src/reviews/R20-shots/vg-tut-390-g-beat.jpg |
+| R17 row 6: 24 s waits after passing | **Not fixed.** Max wait 16.5 s (390), 37.8 s (375) while the rival plays on. | none (timing log) |
+| R17 row 6 / G2: rival scores swing, late jump | **Worse in my games.** Rival 14, 20, 29, 64, 73. | games-src/reviews/R20-shots/vg-s3-390-result.jpg, games-src/reviews/R20-shots/vg-g2-375-result.jpg |
+| R17 row 7: rival turns are a dock line | **Fixed** in part: caption on the board plus a ringed site, cards fly from the rival chip. | games-src/reviews/R20-shots/vg-g1-390-rival.jpg, games-src/reviews/R20-shots/vg-g2-375-rival.jpg |
+| R17 row 3 / R2: "You are choosing. Tap to skip ahead." | **Not fixed.** Still in the dock behind the goal card (read from the page text). | games-src/reviews/R20-shots/vg-g1-390-goal.jpg |
+| R17 row 4: research "A" badges unexplained | **Not fixed.** | games-src/reviews/R20-shots/vg-g1-390-t30.jpg |
+| R2/G2 items fixed in R17 (Skip loop, Pass disappearing, dead tutorial taps, text size) | Still fixed. | games-src/reviews/R20-shots/vg-tut-390-end.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Played 5 default games as a new player (hints off), not speeding up the rival | Won 1 (21-14), lost 4 (23-29, 10-64, 14-20, 25-73). The "easy" rival hit 64 and 73 with the temple and research. A player who misses the research track gets crushed. | games-src/reviews/R20-shots/vg-s3-390-result.jpg, games-src/reviews/R20-shots/vg-g2-375-result.jpg, games-src/reviews/R20-shots/vg-g5-390-result.jpg, games-src/reviews/R20-shots/vg-s4-375-result.jpg |
+| 7 | Watched my moves and the rival's moves | Explorers walk the trail, goods and bought cards fly, points count up, and a board caption names the rival's move. Still, the market is 6 text strips ("Need 2 more / draw 2"), so most of the screen reads as rows of numbers. | games-src/reviews/R20-shots/vg-g1-390-t30.jpg |
+| 5 | Rival gained goods at 375 and 390 | Its pill ("+1 coin +1 compass", "+1 tablet") drops onto the market's top row and covers "Need 1 more" and the card effect for 1.7 s. | games-src/reviews/R20-shots/vg-g2-375-t4.jpg, games-src/reviews/R20-shots/vg-g5-390-overlap.jpg |
+| 4 | Read market cards in real games | The effect words are shorthand: "cheap buy", "Choose one", "+3 goods", "exile twice", "research draw 1". A new player cannot tell what they do without opening Details. | games-src/reviews/R20-shots/vg-g5-390-overlap.jpg, games-src/reviews/R20-shots/vg-g2-375-t4.jpg |
+| 5 | Lost at 375x667 | The result card's Play again / See the island / Title buttons cover your own score breakdown; only "You 10 points" shows. | games-src/reviews/R20-shots/vg-g2-375-result.jpg |
+| 2 / 8 | Did the tutorial at both sizes | The counter reads "16/33", "19/33", but the tutorial has 35 steps. | games-src/reviews/R20-shots/vg-tut-390-g-item.jpg |
+| 8 (minor) | Started my turn right after a rival move | The rival caption ("Tamsin sends an explorer to Old Wreck.") is still on the board while the dock says "Your turn". | games-src/reviews/R20-shots/vg-g1-390-t30.jpg |
+| 4 (works) | Ran out of things to afford | Dock says "Nothing left to do. Tap Pass." and the Pass button works. | games-src/reviews/R20-shots/vg-g1-390-rival.jpg |
+| 3 (works) | Opened a real game | Clean goal card, one button. | games-src/reviews/R20-shots/vg-g1-390-goal.jpg |
+
+### Rules check (against a rulebook summary online; notes kept locally only)
+- Starting deck and hand: rulebook says 2 coin cards, 2 compass cards and 2 Fear, draw 5. Game: 2 Patron Letter (coin), Trail Notes (compass), 2 Creeping Dread in the first hand. Matches.
+- Starting resources by seat: rulebook says 2 coins / 1 coin + 1 compass / 2 coins + 1 compass / 1 coin + 2 compasses. Game table: identical.
+- Main action vs free actions: rulebook says one main action; lightning cards, idol slot, boon and assistants are free. Game: same, and starting cards are free.
+- Discover: rulebook says level I and II sites cost compasses plus travel, take an idol, and a guardian may appear. Game: 3 / 6 compasses plus travel, idol 3 points, guardian on discovery.
+- Plane: rulebook says it pays any travel and costs 2 coins. Game: "2 coins buy a Plane".
+- Buy: rulebook says items cost coins and go under the deck; artifacts cost compasses and resolve at once without the tablet cost, but cost a tablet when played from hand. Game: same (engine charges 1 tablet when an artifact is played from hand).
+- Guardians: rulebook says pay the cost with an explorer there, 5 points each, boon once per game, 1 Fear per explorer returning from an unbeaten guardian at round end. Game: same.
+- Research: rulebook says notebook never above magnifier, assistants on marked rows, temple tiles 6/6/11 once in the temple, bonus tile on reaching it. Game: same structure, its own costs.
+- End of round: rulebook says exile the cards by the round marker, shuffle the play area under the deck, refresh assistants, draw to 5, 5 rounds. Game: same.
+- Tie-break: rulebook says first into the temple, then research. Game: same.
+
+---
+
