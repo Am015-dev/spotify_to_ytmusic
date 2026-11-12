@@ -81,12 +81,12 @@ function actInfo(G, s) {
   var room = eggRoom(p), lay = Math.min(ye.n, room), bp = bestPlay(G, s), nPl = PP.playable(G, s).reduce(function (a, x) { a[x.i] = 1; return a; }, {}); nPl = Object.keys(nPl).length;
   var stuck = p.hand.length - nPl;   // birds you hold but cannot afford yet
   out.food = { h: 0, ok: true, v: Math.min(yf.n, 3) * (stuck > 0 ? .9 : .35), what: 'take ' + yf.n + ' from the feeder', gain: '+' + yf.n + ' food' };
-  out.eggs = { h: 1, ok: lay > 0, v: lay, plain: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' on your birds', what: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' = +' + lay + ' pts', gain: '+' + lay + ' pts', why: room ? '' : 'No bird has room for an egg' };
-  if (lay > 0 && lay < ye.n) out.eggs.what = '+' + lay + ' eggs (nests full) = +' + lay + ' pts';
+  out.eggs = { h: 1, ok: lay > 0, v: lay, plain: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' on your birds', what: '+' + lay + (lay === 1 ? ' egg' : ' eggs') + ' = +' + lay + ' pts', gain: '+' + lay + ' pts', why: room ? '' : 'No room for eggs' };
+  if (lay > 0 && lay < ye.n) out.eggs.what = '+' + lay + ' pts, nests full';
   var cardsCan = G.deck.length + G.tray.filter(Boolean).length > 0;
   out.cards = { h: 2, ok: cardsCan, v: yd.n * (p.hand.length <= 2 ? .8 : p.hand.length >= 6 ? .1 : .4), what: '+' + yd.n + (yd.n === 1 ? ' card' : ' cards'), gain: '+' + yd.n + ' cards', why: cardsCan ? '' : 'No cards left' };
-  out.play = { h: -1, ok: nPl > 0, plain: 'pick from ' + nPl + ' you can pay for', v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
-    why: p.hand.length ? 'Not enough food or eggs yet. Get food first.' : 'No birds in hand. Draw birds first.' };
+  out.play = { h: -1, ok: nPl > 0, plain: 'can pay for ' + nPl, v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') + ' (' + nPl + ' birds)' : '', gain: bp ? '+' + bp.pts + ' pts' : '',
+    why: p.hand.length ? 'Get food first' : 'Draw birds first' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
   var hm = s === UI.view && !G.q ? hintMove() : null;   // Best follows the strong player's plan (engines, round goal, bonus card), not this quick estimate
   if (hm && hm.t === 'act' && out[hm.a] && out[hm.a].ok) best = hm.a; else if (hm && hm.t === 'play' && out.play.ok) best = 'play';
