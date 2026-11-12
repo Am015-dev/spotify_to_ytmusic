@@ -101,6 +101,7 @@ function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ba
   for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
   ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
   clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
+BF.circ=()=>{const c=V3.r.domElement.getBoundingClientRect();return alive().map(s=>{const p=XY(s),q=px(p.x,p.y,1);return[q[0]+c.left,q[1]+c.top,shipR(s)]})};
 function mvLabel(m,s,deg){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return rotIco(m.d>0?a[1]:a[0],s,deg)+'<b>'+m.s+'</b>'}
 function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?rotIco('⇆',s):mvLabel(c.m,s);lay.appendChild(el);
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
