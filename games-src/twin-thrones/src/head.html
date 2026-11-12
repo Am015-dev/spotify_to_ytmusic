@@ -502,4 +502,18 @@ html,body{background:#3a1f0e}
 .gxt-prog{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
 .gxt-prog .gxt-dots{flex:1 1 auto;min-width:0;overflow:hidden}
 .gxt-prog .gxt-n{flex:0 0 auto}
+/* R13 phone fix: pyramid cards include their border; a waiting choice is a sheet over the pyramid mat; pickers 44px+, 14px+ */
+#pyr .card{box-sizing:border-box}
+.gx-app.ttsheet .gx-dock{position:fixed;z-index:40;border-radius:16px;box-shadow:0 0 0 2px rgba(242,194,48,.7),0 10px 30px rgba(0,0,0,.65);padding-bottom:0}
+.gx-app.ttsheet .gx-reopen{display:none!important}
+.gx-app.ttsheet .gx-dock-head [data-gx=dock]{font-size:0;min-width:64px;padding:0 10px}
+.gx-app.ttsheet .gx-dock-head [data-gx=dock]::after{content:"Hide";font-size:15px;font-weight:700}
+.gx-app.ttsheet.gx-dock-min .gx-dock-head [data-gx=dock]::after{content:"Show choice"}
+.gx-app.ttsheet .picker{max-height:none}
+.picker .tk{min-height:46px;font-size:max(14px,var(--fmin));line-height:1.2}.picker .tk small{font-size:14px}
+#acts .btn{min-height:46px}
+#zoom .zb3 .zb.off,#zoom .zb3 .zb[aria-disabled=true]{opacity:1;filter:none;background:#4a3a2a;color:#e4d6bb}
+.card.v4 .nm.t2{padding-left:1px;padding-right:0;letter-spacing:-.07em}
+.tokrow .tok.pickable{box-shadow:0 0 0 3px #f2c230,0 0 14px 4px rgba(242,194,48,.8)}
+.tokrow .tok.arm{box-shadow:0 0 0 3px #fff,0 0 18px 6px rgba(255,255,255,.85);transform:scale(1.12);animation:none;z-index:2}
 </style></head>

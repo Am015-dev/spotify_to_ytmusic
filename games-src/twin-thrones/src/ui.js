@@ -183,7 +183,7 @@ var TT_TEST = {};
     var P = $('pyr'), W = P.clientWidth, H = P.clientHeight, rows = TT.LAYOUT[U.G.age] || TT.LAYOUT[1], n = rows.length, xm = 0;
     rows.forEach(function (r) { r.xs.forEach(function (x) { xm = Math.max(xm, Math.abs(x)); }); });
     var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), h = Math.min(1.95 * w, 186), ms = Math.max(70, 0.5 * h);
-    if (h + (n - 1) * ms > H) { h = Math.max(1.3 * w * 0 + 40, H - (n - 1) * ms); if (h < 1.4 * w) { h = H / (1 + 0.5 * (n - 1)); ms = 0.5 * h; w = Math.min(w, h / 1.4); } }
+    if (h + (n - 1) * ms > H) { h = Math.max(40, H - (n - 1) * ms); if (h < 1.4 * w) { var ovr = n >= 6 ? 0.36 : 0.5; h = H / (1 + ovr * (n - 1)); ms = ovr * h; w = Math.min(w, h / 1.1); } }
     var step = Math.max(ms, Math.min(0.8 * h, (H - h) / Math.max(1, n - 1))), u = w / 1.9;
     return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
   }
@@ -253,11 +253,11 @@ var TT_TEST = {};
     [[3, 0], [6, 1]].forEach(function (z) { var a = $('tg' + z[0]), b = $('tg' + (-z[0])); if (a) a.style.visibility = G.loot[0][z[1]] ? 'hidden' : 'visible'; if (b) b.style.visibility = G.loot[1][z[1]] ? 'hidden' : 'visible'; });
   }
   function renderTokens() {
-    var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; h += '<button class="tok' + (U.G.pend[0] && U.G.pend[0].type === 'token' && U.G.pend[0].from !== 'lib' && canAct() ? ' pickable' : '') + '" data-tok="' + t + '" aria-label="Science bonus: ' + esc(d.nm) + '">' + slot(d.stem) + '</button>'; });
+    var h = ''; U.G.tokensUp.forEach(function (t) { var d = BY[t]; var pk = U.G.pend[0] && U.G.pend[0].type === 'token' && U.G.pend[0].from !== 'lib' && canAct(); h += '<button class="tok' + (pk ? ' pickable' : '') + (pk && U.tokArm === t ? ' arm' : '') + '" data-tok="' + t + '" aria-label="' + (pk ? (U.tokArm === t ? 'Tap again to take ' : 'Pick progress token: ') : 'Science bonus: ') + esc(d.nm) + '">' + slot(d.stem) + '</button>'; });
     $('tokrow').innerHTML = '<span class="tl">Science bonus</span>' + h + '<span class="tsp"></span><span id="bank" aria-label="Bank: sell cards here">' + slot('coin', 'b1') + slot('coin', 'b2') + slot('coin', 'b3') + '<em>Sell +' + (U.G.phase === 'play' ? E.discardGain(U.G, U.mode === 'two' ? E.sideToAct(U.G) : 0) : 2) + '</em></span>'; fillArt($('tokrow'));
   }
   function renderPyr(flips) {
-    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
+    var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
     var bestCell = -1; if (U.hintsOn && human && G.phase === 'play' && !G.pend.length) { try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
     if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
@@ -292,7 +292,18 @@ var TT_TEST = {};
     P.appendChild(d); fillArt(d);
   }
   function canAct() { return !U.busy && U.G && !U.G.over && !isAI(E.sideToAct(U.G)); }
-  function dock() { dock0(); zoomRender(); }
+  function dock() { dock0(); if (U.G && $('tokrow')) renderTokens(); placeSheet(); zoomRender(); }
+  // phone: a choice that waits on you (progress token, who starts, discard, revive) opens as a sheet laid over the pyramid mat,
+  // so the board never shrinks and the pyramid, the cities and the dock never overlap. "Hide" folds it to its title bar.
+  function placeSheet() {
+    var a = document.querySelector('.gx-app'), d = $('dock'), P = $('pyr'); if (!a || !d || !P) return;
+    var G = U.G, on = !!(G && !G.over && G.phase === 'play' && G.pend.length && canAct() && matchMedia('(max-width:999px)').matches), was = a.classList.contains('ttsheet');
+    if (on && !was && window.GX && GX.showDock) GX.showDock();
+    a.classList.toggle('ttsheet', on);
+    if (on !== was && G && G.phase === 'play' && P.children.length) { if (!on) d.style.cssText = ''; renderPyr(); }
+    if (!on) { if (was) d.style.cssText = ''; return; }
+    var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; d.style.maxHeight = r.height + 'px';
+  }
   function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
   function dock0() {
     var G = U.G, p = E.sideToAct(G), msg = $('msg'), sub = $('sub'), acts = $('acts'), dt = $('dt'); acts.innerHTML = ''; sub.textContent = '';
@@ -353,6 +364,7 @@ var TT_TEST = {};
     var p = E.sideToAct(G), cell = G.pyr[U.sel], c = BY[cell.id], zs = dropZones(cell.i), bi = E.buildInfo(G, p, c), M = E.validMoves(G), gain = E.discardGain(G, p);
     var okB = M.some(function (m) { return m.t === 'build' && m.i === cell.i; }), wz = zs.filter(function (q) { return q.m.t === 'wonder'; }), wok = wz.filter(function (q) { return q.ok; });
     var pr = $('pyr').getBoundingClientRect(), cw = Math.min(140, Math.round(pr.width * 0.38)), ch = Math.round(cw * 1.4), bw = Math.min(pr.width - 12, 360);
+    if (U.liftCh && U.liftCh < ch) { ch = U.liftCh; cw = Math.round(ch / 1.4); }
     var free = bi.chain || !bi.coins, pay = free ? '<span class="pay fr">Free</span>' : '<span class="pay' + (okB ? '' : ' no') + '">' + slot('coin') + '<b>' + bi.coins + '</b></span>';
     var why = free ? (bi.chain ? 'Free: you own its chain card.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' to buy what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
     var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
@@ -364,6 +376,10 @@ var TT_TEST = {};
     h += '<button class="btn zb won' + (w0 ? '' : ' off') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (wok.length > 1 ? 'or tap one below' : esc(BY[w0.m.w].nm)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
     if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
     z.innerHTML = h; z.hidden = false; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
+    // the lift may rise over the war track and token row (not over either city) before the card shrinks
+    var le = z.querySelector('.lift'), lt0 = parseFloat(le.style.top), lb = { top: lt0, bottom: lt0 + le.offsetHeight }, s1 = $('s1'), rt = s1 ? s1.getBoundingClientRect().bottom + 4 : pr.top + 4, over = lb.bottom - (pr.bottom - 4);
+    if (over > 0 && lb.top > rt) { var up = Math.min(over, lb.top - rt); le.style.top = (parseFloat(le.style.top) - up) + 'px'; over -= up; }
+    if (over > 1 && ch > 72 && !U.liftFit) { U.liftCh = Math.max(72, Math.floor(ch - over)); U.liftFit = true; zoomRender(); U.liftFit = false; return; }
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   function closeZoom() { if (U.sel == null) return; U.sel = null; renderPyr(); dock(); }
@@ -399,6 +415,7 @@ var TT_TEST = {};
   function popNum(txt, near, kind) {
     var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : ''); e.textContent = txt; document.body.appendChild(e);
     e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 4200 : 1000);
+    document.querySelectorAll('#acts button, #zoom .zb, #dock .gx-ibtn').forEach(function (bt) { var br = bt.getBoundingClientRect(), er = e.getBoundingClientRect(); if (br.width && er.right > br.left && er.left < br.right && er.bottom + 2 > br.top && er.top < br.bottom + 30) e.style.top = Math.max(4, br.top - er.height - 32) + 'px'; });
     var fu = TTA.url('fx-coin-burst'); if (fu) { var f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.top - 10) + 'px;background-image:url("' + fu + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   }
   function lineOf(ev, G) {
@@ -676,6 +693,8 @@ var TT_TEST = {};
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card') && e.target.classList.contains('av')) { e.preventDefault(); e.target.click(); } });
   window.addEventListener('resize', function () { if (U.G && U.G.phase !== 'draft' && !U.G.over) renderPyr(); });
   if (window.GX) GX.onResize(function () { if (U.G && U.G.phase !== 'draft' && $('pyr').children.length) renderPyr(); });
+  var pyrSz = '';
+  U.pyrRO = window.ResizeObserver ? new ResizeObserver(function () { var P = $('pyr'); if (!P) return; var k = P.clientWidth + 'x' + P.clientHeight; if (k === pyrSz) return; pyrSz = k; if (U.G && U.G.phase !== 'draft' && P.children.length && !(DR && DR.on)) { renderPyr(); placeSheet(); U.liftCh = 0; zoomRender(); } }) : null;
 
   // ---------- boot
   function boot() {
@@ -694,6 +713,7 @@ var TT_TEST = {};
   TT_TEST.U = U; TT_TEST.E = E;
   TT_TEST.forceEnd = function (seat) { var G = U.G; G.over = true; G.winner = seat; G.reason = 'military'; G.pend = []; render(); };
   TT_TEST.newGame = newGame;
+  TT_TEST.pop = function (t, k) { popNum(t, $('pts0') || $('s0'), k); };
   TT_TEST.select = function (i) { U.sel = i; renderPyr(); dock(); };
   TT_TEST.toPlay = function (steps) { // test hook: let the AI draft and play on both seats until it is seat 0's turn
     var G = U.G, rng = function () { return E.rnd(G); }, k = 0; clearTimeout(U.aiTimer);
