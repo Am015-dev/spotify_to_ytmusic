@@ -12,6 +12,15 @@
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -64,7 +73,7 @@
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
@@ -204,7 +213,8 @@
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
-    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -222,8 +232,8 @@
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
-    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
-    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -232,7 +242,7 @@
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }
