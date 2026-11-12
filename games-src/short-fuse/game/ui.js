@@ -192,7 +192,7 @@ function toolN(t){return t==='dd'?2:t==='eq3'||t==='pt3'?3:t==='eq5'?99:1}
 function eq5Slots(si){return G.st[si].w.map((x,k)=>k).filter(k=>{const x=G.st[si].w[k];return !x.cut&&!x.x&&!x.flip})}
 function onTile(si,k){const V=UI.V;if(!V||V.seat<0||G.over)return;const sl=G.st[si].w[k];
   // a question that names wires
-  if(V.q&&V.q.who===V.seat&&V.q.opts){const i=V.q.opts.findIndex(o=>o.d&&(o.d.u===sl.u||(o.d.st===si&&o.d.k===k)));if(i>=0){answer(i);return}toast('Pick one of the glowing wires, or use the buttons.');return}
+  if(V.q&&V.q.who===V.seat&&V.q.opts){const i=V.q.opts.findIndex(o=>o.d&&(o.d.u===sl.u||(o.d.st===si&&o.d.k===k)));if(i>=0){answer(i);return}{const te=tileEl(sl.u);if(te){te.classList.remove('buzz');void te.offsetWidth;te.classList.add('buzz');setTimeout(()=>te.classList.remove('buzz'),800)}}toast(V.q.kind==='infoStd'&&ownerOf(si)!==V.seat?'Not theirs: tap one of YOUR wires.':'Pick one of the glowing wires.');return}
   const sel=UI.sel;
   if(sel&&sel.mode==='choose'){const step=nextStep(sel);if(step&&step.board){const ok=selRemaining(sel).filter(m=>m[step.board[0]]===si&&m[step.board[1]]===k);if(ok.length){sel.fixed[step.board[0]]=si;sel.fixed[step.board[1]]=k;sel.picked=[{s:si,k}];sfx('select');refresh();return}}toast('That wire cannot be used for this.');return}
   if(sel&&sel.mode==='multi'){if(sl.cut)return;const i=sel.tg.findIndex(t=>t.s===si&&t.k===k);if(i>=0)sel.tg.splice(i,1);else if(sel.tg.length<sel.n)sel.tg.push({s:si,k});sfx('select');refresh();return}
