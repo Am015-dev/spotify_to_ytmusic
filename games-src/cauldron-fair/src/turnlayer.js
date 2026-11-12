@@ -53,8 +53,10 @@ function instrBar() {
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
   if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
   if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
-  const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
-  { const ih = Math.ceil(e.getBoundingClientRect().height) + 8; if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
+  let top = db ? db.getBoundingClientRect().top : innerHeight - 200;
+  if (db) for (const c of db.children) { if (c === e || c.hidden) continue; const r = c.getBoundingClientRect(); if (r.height > 2 && r.bottom > 0) top = Math.min(top, r.top); }   // R8: sit above the panel's content, never over a fortune title or a choice button
+  e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  { const bd = $('#board'), er = e.getBoundingClientRect(), ih = Math.max(Math.ceil(er.height) + 8, bd ? Math.ceil(bd.getBoundingClientRect().bottom - er.top) + 4 : 0); if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
 }
 // ---- the turn banner: slides in when the turn changes hands
 let TB = { key: '', tm: 0 };
@@ -69,7 +71,7 @@ function turnBanner() {
   } else if (G.phase === 'eval') { key = 'ev' + G.round; text = 'Day ' + G.round + ' · Counting up'; cls = 'ev'; } else return;
   if (key === TB.key) return; TB.key = key; if (!text || !msgOK()) return;
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
-  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
+  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 1200);   // R8: a short flash, it never sits over content
 }
 setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble

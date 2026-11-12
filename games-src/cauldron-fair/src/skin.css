@@ -238,3 +238,19 @@ html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:b
   .stall .toks{padding-bottom:2px}
   .tok{min-height:50px;padding:1px 2px}.tok svg.chip{width:36px;height:36px}.tok .pc{margin-top:-6px}
 }
+/* R8 fix: the ruby stall says in words what each button does (tap one: the line below explains it) */
+.mkt .rbar{flex-direction:column;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;gap:4px;padding:4px}
+.rbar .rbh{display:flex;align-items:center;justify-content:space-between;gap:4px;color:#fff6df}.rbar .rbh>b{font-size:15px}.rbar .rbh .rgems.cmp{flex:none}
+.rbt.rwd{justify-content:flex-start;gap:6px;min-height:44px;padding:2px 6px;text-align:left;width:100%;box-sizing:border-box}
+.rbt.rwd>span:first-child{flex:none;line-height:0}
+.rwt{display:flex;flex-direction:column;min-width:0;line-height:1.1}.rwt b{font-size:14px;font-weight:800;white-space:normal}.rwt em{font-style:normal;font-size:14px;font-weight:700;color:#ffd7de}
+.rbt.rwd[disabled]{opacity:.55}
+/* R8 fix: the stall list scrolls on small phones: a "N more stalls" cue and a faded bottom edge */
+.mkt .stw{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+.mkt .stw>.stalls{flex:1 1 0}
+.mkt .stalls.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),rgba(0,0,0,.25));mask-image:linear-gradient(to bottom,#000 calc(100% - 44px),rgba(0,0,0,.25))}
+.smore{flex:none;align-self:center;margin-top:4px;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #f2b83a;background:#2b1a12;color:#fff6df;font:800 15px/1 system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;cursor:pointer}
+.smore[hidden]{display:none}
+@media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0}}
+/* R8: the fortune chip on the board sits above the YOUR TURN bar, never under it */
+html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}

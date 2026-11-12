@@ -82,7 +82,7 @@ const tn = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
 // The order is the order the rules happen in a real day: goal, fortune, drawing, the spiral, whites, flask, stop or push, boom, scoring, shop, rubies, the last day, the end.
 function tutSteps() {
   const rep = () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .ds:not(.me) .dtile'));
-  const shop = sel => () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector(sel));
+  const shop = sel => () => { const e = UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector(sel); if (e && e.closest('.stalls')) { const st = e.closest('.stalls'), a = e.getBoundingClientRect(), b = st.getBoundingClientRect(); if (a.top < b.top || a.bottom > b.bottom) e.scrollIntoView({ block: 'nearest' }); } return !!e; };   // R8: the stall list can scroll on small phones; bring the spotlit chip into view
   const fin = () => !!(G && G.phase === 'over' && UI.rsMode === 'final' && document.querySelector('#rs .win'));
   const lastC = () => { const p = tp(); return p && p.pot.length ? p.pot[p.pot.length - 1].c : ''; };
   const d2 = () => tbrew() && G.round === 2;
