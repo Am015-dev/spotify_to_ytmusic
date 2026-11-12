@@ -25,7 +25,7 @@ function showConfig() { hideHelp();
   var el = $('#setup');
   function draw() {
     var h = '<h2>Quick game</h2><div class="cfg"><div class="lab">Players</div><div class="seg">' + [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" class="btn' + (CFG.n === n ? ' on' : '') + '" data-n="' + n + '">' + n + '</button>'; }).join('') + '</div>';
-    if (CFG.n === 1) h += '<p style="text-align:left">Solo: you play against the Rival Flock, a simple deck-driven rival that grabs dice, lays eggs and races you for the round goals.</p>';
+    if (CFG.n === 1) h += '<p style="text-align:left">Solo: you race the Rival Flock.</p>';
     h += '<div class="seatrow"><span class="nm">You</span><span>always a person</span></div>';
     for (var i = 1; i < CFG.n; i++) h += '<div class="seatrow"><span class="nm">' + NAMES[i - 1] + '</span><div class="seg">' + ['ai', 'human'].map(function (k) { return '<button type="button" class="btn' + (CFG.kinds[i] === k ? ' on' : '') + '" data-k="' + i + ':' + k + '">' + (k === 'ai' ? 'Computer' : 'Person (pass the device)') + '</button>'; }).join('') + '</div></div>';
     h += '<div class="lab">Computer skill</div><div class="seg">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" class="btn' + (CFG.lvl === l ? ' on' : '') + '" data-l="' + l + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +

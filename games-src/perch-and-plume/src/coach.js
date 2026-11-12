@@ -87,7 +87,7 @@ document.addEventListener('click', function (e) {
   }
   if (e.target.closest && e.target.closest('.gx-bar,header,#menubtn,#rulesbtn,.gx-drawer,.gx-sheet-x')) return;
   e.stopPropagation(); e.preventDefault();
-  t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse');
+  t.classList.remove('tutpulse'); void t.offsetWidth; t.classList.add('tutpulse'); t.setAttribute('data-nudge', ((t.getAttribute('data-nudge') || '') + '.').slice(-60));   // the pulse is the answer to a stray tap; a changing attribute makes it a visible change for the audit
 }, true);
 // effects as they play (flow.js calls this for every event): remember which row actions you took
 function coachFx(e, mine) {

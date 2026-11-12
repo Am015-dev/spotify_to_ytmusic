@@ -109,11 +109,12 @@ function trackerHTML() {
   return '<div class="trk" role="status" aria-label="Round ' + (G.round + 1) + ' of ' + G.rounds + ', ' + p.cubes + ' actions left">' +
     '<span class="tr-r"><b>Round ' + (G.round + 1) + ' of ' + G.rounds + '</b><span class="tr-w' + (isHuman(cur) ? ' me' : '') + '">' + esc(whoT) + '</span></span>' +
     '<span class="tr-c"><span class="cubes" aria-hidden="true">' + tok + '</span><span>' + p.cubes + (p.cubes === 1 ? ' action' : ' actions') + ' left</span></span>' +
-    '<span class="tr-why">' + (last ? 'Game ends' : 'Round ends') + ' when everyone has used all their actions.</span></div>';
+    '<span class="tr-why">' + (last ? 'Game ends' : 'Round ends') + ' when all actions are used.</span></div>';
 }
 function scoreHTML() {
   var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); }), top = Math.max.apply(null, sc.map(function (s) { return s.total; }));
-  var lead = sc.filter(function (s) { return s.total === top; }).length === 1 && top > 0;
+  var tot0 = G.cubes[Math.min(G.round, G.cubes.length - 1)] || 0, moved = G.round > 0 || G.pl.some(function (q) { return q.cubes < tot0; });
+  var lead = moved && sc.filter(function (s) { return s.total === top; }).length === 1 && top > 0;
   var rows = G.pl.map(function (p, i) {
     var s = sc[i], oth = s.goals + s.bonus + s.cache + s.tuck + s.lead, me = i === UI.view, L = lead && s.total === top;
     return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="birds ' + s.birds + ' · eggs ' + s.eggs + ' · other ' + oth + '" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
@@ -135,7 +136,7 @@ function rateStart() {   // called when your turn begins (no question pending)
   var key = UI.view + ':' + G.round + ':' + G.pl[UI.view].cubes; if (RATE.k === key) return;
   if (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0]) goalCard();
   try { [$('#dockbody'), $('#dock')].forEach(function (x) { if (x) x.scrollTop = 0; }); } catch (e) { }   // a new turn starts at the top: tracker, Ottilie, the 4 buttons
-  RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
+  RATE.last = null; RATE.k = key; RATE.seat = UI.view; RATE.s0 = PP.scoreOf(G, UI.view); RATE.sc = RATE.s0.total; RATE.point = null; RATE.inf = actInfo(G, UI.view); RATE.cubes = G.pl[UI.view].cubes; RATE.round = G.round; RATE.choice = null;
 }
 function rateChoice(m) { if (RATE.k && m && (m.t === 'act' || m.t === 'play') && RATE.choice == null) { RATE.choice = m.t === 'play' ? 'play' : m.a; RATE.point = tutPoint(); } }
 function rateEnd() {   // after the turn is over: compare with the best-value estimate made at its start
