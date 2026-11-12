@@ -2,9 +2,13 @@
 // at 375x667, 390x844, 375x553 and asserts every dock button is fully inside the dock's visible area, inside the screen, >= 44 px
 // (acts/goods) and that elementFromPoint at its centre is the button. VB_HTML=<built html> node dock-states.js. Exit 1 on any failure.
 const { chromium } = require('playwright'); const path = require('path');
-const URL = 'file://' + (process.env.VB_HTML || path.join(__dirname, 'vale-of-banners.html'));
+/* STAGED build by default (the page players get, shell included): VB_URL=http://host/vale-of-banners/ (e.g. build-all's GX_URL + slug),
+   else build-all's GX_URL, else gx-serve on GX_STAGE (a build-all --out folder, default games-src/.staging). VB_HTML=<file> tests a bare html instead. */
+let URL = process.env.VB_URL || (process.env.VB_HTML ? 'file://' + process.env.VB_HTML : null);
+const getURL = async () => URL || (URL = await require('../scripts/gx-serve.js').url('vale-of-banners'));
 const SIZES = ['375x667', '390x844', '375x553', '360x640'];
 (async () => {
+  await getURL(); console.log('dock test on ' + URL);
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let bad = 0, checks = 0;
   for (const sz of SIZES) {
     const [W, H] = sz.split('x').map(Number), ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true }), page = await ctx.newPage(), errs = [];
@@ -29,7 +33,7 @@ const SIZES = ['375x667', '390x844', '375x553', '360x640'];
       const bads = await page.evaluate(st => {
         eval('(' + st.f + ')()'); G.order = [0, 1]; G.ti = 0; G.pend = []; UI.busy = false; UI.sel = null; if (st.n === 'chain2 hints off') { try { localStorage.setItem('gxh_off', '1'); } catch (e) { } }
         render(); const out = [], dk = document.getElementById('dockbody').getBoundingClientRect(), dockR = document.getElementById('dock').getBoundingClientRect();
-        document.querySelectorAll('#acts .btn, #goods .gbtn, #dicerow button.die:not(.used), #store .tilebtn, #chainb.on').forEach(e => {
+        document.querySelectorAll('#acts .btn, #goods .gbtn, #dicerow button.die:not(.used), #store .tilebtn, #chainb.on, #r-workers').forEach(e => {
           const r = e.getBoundingClientRect(); if (!r.width || !r.height) return; const id = e.id || e.className, x = r.left + r.width / 2, y = r.top + r.height / 2;
           if (r.top < dockR.top - 1 || r.bottom > Math.min(innerHeight, dockR.bottom) + 1.5) out.push(id + ' outside dock/screen @' + Math.round(r.top) + '-' + Math.round(r.bottom) + ' (dock ' + Math.round(dockR.top) + '-' + Math.round(dockR.bottom) + ', screen ' + innerHeight + ')');
           else { const hit = document.elementFromPoint(x, y); if (!hit || !(hit === e || e.contains(hit))) out.push(id + ' covered by ' + (hit ? hit.id || hit.className : 'nothing')); }

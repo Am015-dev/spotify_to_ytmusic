@@ -1,12 +1,17 @@
-// DOCK CHECK (star-following touch games): every dock button (acts, goods, dice, storage) fully visible, uncovered, >=44 px in every state.
+// DOCK CHECK (star-following touch games): every dock button (acts, goods, dice, storage, workers), every glowing market tile, the ★ tile and the view tabs
+// fully on screen, uncovered, >=44 px at every decision. Runs on the STAGED build (see URL below), the page players get.
 // Based on phone-play.js. node dock-check.js [WxH] [games]
 // Full Quick games played ONLY by touch on a small phone, checking at every one of your decisions that every needed control
 // (glowing targets, dock buttons, End turn) is inside the screen, not covered (turn banner included) and 44x44 or bigger. node phone-play.js [WxH] [games]
 // e.g. node phone-play.js 375x667 5   (default 375x667, 5 games). Exit 1 on any stuck state, off-screen control or error.
 const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
-const URL = 'file://' + (process.env.VB_HTML || path.join(__dirname, 'vale-of-banners.html'));
+/* STAGED build by default (the page players get, shell included): VB_URL=http://host/vale-of-banners/ (e.g. build-all's GX_URL + slug),
+   else build-all's GX_URL, else gx-serve on GX_STAGE (a build-all --out folder, default games-src/.staging). VB_HTML=<file> tests a bare html instead. */
+let URL = process.env.VB_URL || (process.env.VB_HTML ? 'file://' + process.env.VB_HTML : null);
+const getURL = async () => URL || (URL = await require('../scripts/gx-serve.js').url('vale-of-banners'));
 const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(process.argv[3] || 5);
 (async () => {
+  await getURL(); console.log('dock test on ' + URL);
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let bad = 0;
   fs.mkdirSync(path.join(__dirname, 'shots'), { recursive: true });
   for (let g = 0; g < N; g++) {
@@ -17,7 +22,7 @@ const [W, H] = (process.argv[2] || '375x667').split('x').map(Number), N = +(proc
       const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) return { x, y }; } return null; }, sel);
     /* every displayed needed control: centre on screen, uncovered, and at least 44x44 touch box (or a 44 px wide cell) */
     const audit = () => page.evaluate(() => { const out = [], tb = document.getElementById('tbanner'), tr = tb && +getComputedStyle(tb).opacity > 0.05 ? tb.getBoundingClientRect() : null;
-      document.querySelectorAll('#acts .btn, #goods .gbtn, #dicerow button.die:not(.used), #store .tilebtn, #es .cell.glow, #mk .stgoods.glow').forEach(e => {
+      document.querySelectorAll('#acts .btn, #goods .gbtn, #dicerow button.die:not(.used), #store .tilebtn, #es .cell.glow, #mk .stgoods.glow, #mk .tilebtn.glow, #mk .tilebtn.bestt, #tabs .tab, #r-workers').forEach(e => {
         const r = e.getBoundingClientRect(); if (!r.width || !r.height) return; let p = e; while (p) { if (getComputedStyle(p).display === 'none') return; p = p.parentElement; }
         const x = r.left + r.width / 2, y = r.top + r.height / 2, id = e.id || e.className.split(' ')[0];
         if (x < 0 || y < 0 || x > innerWidth || y > innerHeight || r.bottom > innerHeight + 1) { out.push(id + ' off-screen @' + Math.round(r.top) + '-' + Math.round(r.bottom)); return; }
