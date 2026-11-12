@@ -7,6 +7,7 @@ and 375x667. The tutorial driver taps only the spotlit target or Next. In play I
 | Game | Earlier | R15 | Result | Lowest rows |
 |------|---------|-----|--------|-------------|
 | lantern-dive | 7.0, 6.9, 7.0 | **7.3** | **PASS** | all 7: 2, 3, 4, 5, 6, 7 |
+| twin-thrones | 7.1, 7.0 | **7.3** | **PASS** | all 7: 3, 4, 5, 6, 7, 8 |
 
 ---
 
@@ -48,3 +49,41 @@ errors in every run.
 - Row 5 — did: finished a won dive at 375x667 — happened: the Result button covers the "You" label under my card on the pad — shot: games-src/reviews/R15-shots/lantern-375-result-btn-over-you.jpg
 - Row 6 (works) — did: retried a failed dive with the same jobs — happened: won on attempt 2, and the result says why it ended ("Every job was done after trick 3. The dive ended at once.") — shot: games-src/reviews/R15-shots/lantern-375-retry-won.jpg, games-src/reviews/R15-shots/lantern-390-result-won.jpg
 - Row 4 (works) — did: broke my own job at 390 — happened: the result names it ("Win a 6 using your own 6"), with the trick — shot: games-src/reviews/R15-shots/lantern-390-result-fail.jpg
+
+---
+
+## 2. twin-thrones (shelf/W483-twin @ bccc4b1a)
+
+What I played: the tutorial to its end card ("You know the rules", "Play a real game") at 390x844 (38 steps, 73 taps, 150 s) and at
+375x667 (38 steps, 75 taps, 149 s). Then a full Quick game on Easy (the default; "easy" is the button marked on) at each size, by touch,
+to the result screen. At 390x844 I won 66-60 (331 s, 31 turns). At 375x667 I lost 57-74. My play was random among the glowing cards:
+build if I could pay, else a wonder, else sell. I took progress tokens by tapping the glowing token on the board twice. 0 page errors
+and 0 console errors.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 8 | I checked again against the published duel rules: wonder draft 1-2-1 twice, only uncovered cards, freed cards flip, trade at 2 + the rival's production, free chains, sell for 2 + 1 per yellow card, loot spaces, instant war and science wins, a science pair gives a token, the 7-wonder limit, the weaker army chooses who starts, 1 point per 3 coins, ties go to blue cards. The wonder values I saw (12 coins + another turn; 3 coins, the rival loses 3, another turn) match. No deviation found. |
+| 2 | Tutorial teaches | 8 | 38 one-line steps in play order, almost all taps on the real card or button, including chain, wonder, the 8th wonder lost, token pick, loot, sell, scoring and the tiebreak; ends on "Play a real game". Long for "5 minutes" (2.5 min). |
+| 3 | First 10 seconds | 7 | A clear title and goal line ("Two rival cities, one pyramid of cards. Build the better city."), Easy on by default, a big "Quick game". "New here?" is one of 4 equal tiles, not the first thing. |
+| 4 | Turn clarity | 7 | The turn line always says whose turn and what to do ("Pick a progress token: a bonus you keep for the whole game.", "You will start the new age."). Build shows "free" / "pay 6" / "too costly". Still: the token tooltip covers the turn line, and the rival's draft picks give no "rival is choosing" cue on the cards. |
+| 5 | Phone play | 7 | Fixed: at 375 the token pick, who-starts and Build/Sell/Wonder are a sheet ("Your move", with Hide) over the pyramid. Nothing piles onto my city row, and no labels are cut. No visible text under 14 px (whole page, Age I, 375). Buttons are 44 px+, and token tiles are about 94x44. Still: the token tooltip sits on the turn line at both sizes, and a "+2 Scholars' Court" floater sits over my city row. |
+| 6 | AI and pacing | 7 | Easy is winnable by random play (won 1 of 2 here, 2 of 2 in R13). A game is about 5.5 min. Waits are on the slow side: median 6.7 s, max 21.8 s from my move to my next turn at 390 (the max spans an age change with who-starts). |
+| 7 | Feel | 7 | Cards lift to a big preview, fly to the city, coins and points float up, the war pawn moves, and the rival's pick is shown first. |
+| 8 | Bugs | 7 | 0 errors, 0 stuck states, and both games reached the result. The last card no longer lands on "You win!". Minor: during the rival's draft pick, the wonders stay bright and a tap does nothing, with no feedback. |
+
+**Total: 7.3 — PASS** (every row ≥ 7, no stopper).
+
+### Earlier findings (G2, R13)
+- R13 row 5, token pick at 375 collapses the pyramid into a strip over my city ("Sie", "Fre"): **FIXED.** The token pick is a sheet over the pyramid; my city row is clear. Shots: games-src/reviews/R15-shots/twin-375-token-sheet-real.jpg, games-src/reviews/R15-shots/twin-375-tut-token-sheet.jpg
+- R13 row 5, who-starts at 375 overlaps my city, "+3 Open Stage" on "I start": **FIXED** in the real game. In the tutorial a "+… Weights Hall" floater still touches the top edge of "I start" (it can still be tapped). Shots: games-src/reviews/R15-shots/twin-375-who-starts-real.jpg, games-src/reviews/R15-shots/twin-375-tut-who-starts.jpg
+- R13 row 5, Build/Sell/Wonder over my city row at 375: **FIXED.** They sit over the pyramid, under the card preview. Shot: games-src/reviews/R15-shots/twin-375-build-lift.jpg
+- R13 row 8, last card's fly-in on "You win!": **FIXED** (clean result at both sizes). Shots: games-src/reviews/R15-shots/twin-390-result-won.jpg, games-src/reviews/R15-shots/twin-375-result-lost.jpg
+- R13/G2, board token tap only opened an info card: **FIXED.** In a real game (375 and 390), the board tokens glow. My first tap armed one ("Tap it again to take it"), and the second took it. Shot: games-src/reviews/R15-shots/twin-390-board-token-armed.jpg
+- R13 row 4, token tooltip covers the turn line: **NOT FIXED.** Shots: games-src/reviews/R15-shots/twin-375-token-armed-tooltip.jpg, games-src/reviews/R15-shots/twin-390-board-token-armed.jpg
+- G2/R13, "Build: too costly" looked live: **still fixed** ("Wonder too costly" is greyed). Shot: games-src/reviews/R15-shots/twin-375-build-lift.jpg
+- R13 row 2, tutorial long: **still true** (38 steps, 150 s). Shot: games-src/reviews/R15-shots/twin-375-tut-end.jpg, games-src/reviews/R15-shots/twin-390-tut-end.jpg
+
+### New findings
+- Row 8 — did: tapped a wonder right after my first draft pick at 375x667, while the line narrated my pick — happened: nothing happened, and the 3 wonders stayed bright with no "Rival is choosing" cue; my driver logged 15 such ignored taps over the draft — shot: games-src/reviews/R15-shots/twin-375-draft-tap-ignored.jpg
+- Row 5 — did: armed the "Master Builders" token at 390x844 — happened: the token tooltip covers "Your turn / Pick a progress token", and a "+2 Scholars' Court" floater sits on my city row — shot: games-src/reviews/R15-shots/twin-390-board-token-armed.jpg
+- Row 6 — did: played Easy at 375x667 with random glowing cards — happened: lost 57-74; the result explains why ("civic cards (+21) and wonders (+13)") — shot: games-src/reviews/R15-shots/twin-375-result-lost.jpg
