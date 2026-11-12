@@ -639,7 +639,10 @@ function pvRender() {
   const tall = W < H && !document.documentElement.classList.contains('ph-l');
   bd.setAttribute('data-board', ''); bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
   const short = !tall && H < 560;   // phone landscape: the hand becomes a column on the right so the board keeps the height
-  bd.className = 'pv ' + (tall ? 'tall' : 'wide') + (short ? ' short' : '');
+  const tiny = tall && H < 600;   // short portrait phones (375x553): the board takes the hand's room; the hand is a one-row strip that opens on tap
+  bd.className = 'pv ' + (tall ? 'tall' : 'wide') + (short ? ' short' : '') + (tiny ? ' tiny' : '');
+  if (UI.handOpen && UI.handOpen !== G.logN) UI.handOpen = 0;
+  { const fx = document.getElementById('fx'); if (fx) fx.toggleAttribute('data-help', tiny); }   // short phones: a coach tip may lie over fly-in cards and pills (passing pictures, no buttons)   // an open hand closes again once anything happens
   UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
   const mm = myMoves(), mine = mm.length > 0, v = viewSeat(), fs = focusSeat(), me = G.players[fs];
   const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
@@ -668,7 +671,8 @@ function pvRender() {
     for (let i = 0; i < Math.min(me.workers, tall ? 3 : 4); i++) { const m = h('span.pv-meeple' + (i < free ? '' : '.out') + (i < free && canW ? '.can' : ''), { 'aria-hidden': 'true' }, pawn(fs, 30)); wk.appendChild(m); }
     wk.appendChild(h('span.pv-wn', h('b', free), h('i.rsw', free === 1 ? 'worker' : 'workers')));
     if (canW) wk.setAttribute('title', 'Drag a worker to a glowing place');
-    r.appendChild(wk); hud.appendChild(r); }
+    r.appendChild(wk); hud.appendChild(r);
+    if (tiny) { r.setAttribute('data-help', ''); hud.querySelectorAll('.pvch-t,.pvch-pt,.pvsea').forEach(e => e.setAttribute('data-help', '')); } }   // short phones: a coach tip may lie over the counts (no buttons there; each chip's middle stays protected)
   // ---- tabs (phone)
   const tabs = h('div.pv-tabs', { role: 'tablist' }); if (tall) col.appendChild(tabs);
   const tabEl = {};
@@ -705,7 +709,8 @@ function pvRender() {
   for (let i = 0; i < G.forest.length; i++) cell(tile('forest', i));
   cell(tile('haven', 0));
   // phone: the places are round clearings on the painted tree-stump table (owner art), not a grid of boxes; staggered so it reads as a board
-  if (tall) { const short = H < 640, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones: 4 across, 3 rows
+  if (tiny) { spots.classList.add('pv-board', 'pv-board-s', 'pv-board-t', 'hscroll'); spots.style.setProperty('--cw', Math.floor((W - 16 - 8 - 12 - 16) / 4) + 'px'); }   // 4 whole columns, the 5th peeks in   // 3 across in a grid that fills the band: every place whole, none overlapping
+  else if (tall) { const short = H < 640, nc = short ? 4 : 3, xs = short ? [13, 38, 62, 87] : [19, 50, 81]; spots.classList.add('pv-board'); if (short) spots.classList.add('pv-board-s');   // short phones: 4 across, 3 rows
     const n = spots.children.length, rows = Math.ceil(n / nc), y0 = short ? 15 : 13, yr = short ? 66 : 74;
     Array.from(spots.children).forEach((c, k) => { const r = Math.floor(k / nc), col = k % nc; c.style.left = xs[col] + '%'; c.style.top = (0.6 + r * 99 / rows + (short ? 0 : col % 2 ? 1.2 : 0)) + '%';   /* rows hang from the top of their band, so nothing overlaps or leaves the board */ }); }
   // ---- goals (events): their own panel, so Places fits one screen
@@ -762,16 +767,20 @@ function pvRender() {
   // whole cards side by side, never overlapping (every name readable); more than fit -> the row scrolls sideways
   // phone: when not all fit, a whole number k of cards fills the row exactly (no card half off the edge); the row snaps card by card
   const HW = 104, gapH = 6, fits = nH * ((tall ? HW : 118) + gapH) <= W - 16, kFit = Math.max(1, Math.floor((W - 8) / (HW + gapH)));   // R10: 96+ wide so 14px names fit whole
-  const cw = short ? 112 : !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH, ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
-  if (!short) hs.style.height = (ch + (tall ? 22 : 30)) + 'px';
-  hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
+  const mini = tiny && !UI.handOpen, hx = tiny ? 64 : 0;   // mini: name-only cards, 48 px high, after a Hand toggle on the left
+  const cw = short ? 112 : mini ? 124 : !tall ? 118 : fits ? HW : Math.ceil((W - 8) / kFit) - gapH; let ch = tall ? Math.round(Math.min(cw, 86) * 1.5) : Math.round(cw * 1.22);
+  if (mini) ch = 48;
+  if (!short) hs.style.height = (ch + (mini ? 8 : tall ? 22 : 30)) + 'px';
+  if (tiny) { hs.classList.add(mini ? 'mini' : 'open'); hs.appendChild(h('button.scount.hs-tg', { type: 'button', 'aria-expanded': mini ? 'false' : 'true', 'aria-label': (mini ? 'Show' : 'Hide') + ' hand cards' }, h('span', 'Hand'), h('b', nH + '/8 ' + (mini ? '▴' : '▾'))));
+    hs.lastChild.addEventListener('click', e => { e.stopPropagation(); UI.handOpen = mini ? G.logN : 0; renderBoard(); }); }
+  else hs.appendChild(h('span.scount', v >= 0 ? 'Hand ' + nH + '/8' + (fits ? '' : ' ›') : ''));
   { const sc = hs.lastChild; const keep = () => { sc.style.transform = 'translateX(' + hs.scrollLeft + 'px)'; }; hs.addEventListener('scroll', keep, { passive: true }); requestAnimationFrame(keep); }   // the Hand label stays put while the cards scroll
-  const x0 = fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8;
-  const hin = h('div.hin'); hin.style.cssText = short ? `position:relative;width:100%;height:${24 + nH * (ch + gapH)}px` : `position:relative;width:${fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
+  const x0 = hx || (fits ? (W - nH * (cw + gapH) + gapH) / 2 : 8);
+  const hin = h('div.hin'); hin.style.cssText = short ? `position:relative;width:100%;height:${24 + nH * (ch + gapH)}px` : `position:relative;width:${tiny ? hx + nH * (cw + gapH) + 4 : fits ? W - 4 : x0 * 2 + nH * (cw + gapH)}px;height:100%`; hs.appendChild(hin);
   hand.forEach((id, i) => {
     const tg = 'p:hand:' + id, off = i - (nH - 1) / 2;
     const b = h('button.sc.hc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) + ' (in hand)' }, pvFace(id, { small: true }));
-    b.style.cssText = short ? `left:0;top:${20 + i * (ch + gapH)}px;width:${cw}px;height:${ch}px;--dy:0px;z-index:${i + 2}` : `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
+    b.style.cssText = short ? `left:0;top:${20 + i * (ch + gapH)}px;width:${cw}px;height:${ch}px;--dy:0px;z-index:${i + 2}` : `left:${x0 + i * (cw + gapH)}px;width:${cw}px;height:${ch}px;--dy:${fits && tall && !tiny ? Math.round(off * off * 1.6) : 0}px;z-index:${i + 2}`;
     if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
     else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
     else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
@@ -799,6 +808,9 @@ function pvRender() {
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
+  if (tiny) { spots.scrollLeft = UI.pvBx || 0; spots.addEventListener('scroll', () => { UI.pvBx = spots.scrollLeft; }, { passive: true });
+    const gs = [...spots.querySelectorAll('.glow')], q = spots.getBoundingClientRect(), vis = e => { const r = e.getBoundingClientRect(); return r.left >= q.left - 1 && r.right <= q.right + 1; };
+    if (gs.length && !gs.some(vis)) pvScrollTo(gs[0]); }   // a glowing place is always in view
   if (short) { hs.scrollTop = UI.hsy || 0; hs.addEventListener('scroll', () => { UI.hsy = hs.scrollTop; }, { passive: true }); const g = hs.querySelector('.glow'); if (g && (g.offsetTop < hs.scrollTop || g.offsetTop + g.offsetHeight > hs.scrollTop + hs.clientHeight)) hs.scrollTop = g.offsetTop - 20; }
   else hs.scrollLeft = fits ? 0 : (UI.hsx || 0); if (!short) { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
   renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
@@ -819,6 +831,8 @@ function pvScrollTo(el) {
   if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
   const sy = el && el.closest && el.closest('.pv-scrolly');
   if (sy) { const a = el.offsetTop, b = a + el.offsetHeight; if (a < sy.scrollTop) sy.scrollTop = a - 4; else if (b > sy.scrollTop + sy.clientHeight) sy.scrollTop = b - sy.clientHeight + 4; }
+  const bt = el && el.closest && el.closest('.pv-board-t');   // short phones: the places scroll sideways
+  if (bt) { const r = el.getBoundingClientRect(), q = bt.getBoundingClientRect(); if (r.left < q.left) bt.scrollLeft += r.left - q.left - 4; else if (r.right > q.right) bt.scrollLeft += r.right - q.right + 4; UI.pvBx = bt.scrollLeft; return true; }
   const hm = el && el.closest && el.closest('.pv-mead');
   if (hm) { const a = el.offsetLeft, b = a + el.offsetWidth; if (a < hm.scrollLeft) hm.scrollLeft = Math.max(0, a - 8); else if (b > hm.scrollLeft + hm.clientWidth) hm.scrollLeft = b - hm.clientWidth + 8; UI.pvMx = hm.scrollLeft; return true; }
   return false;
@@ -832,7 +846,8 @@ function pvLand(m, seat, src, preChip) {
     const sel = '.tile[data-k="' + (m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k) + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]');
     const t = $(sel); if (t) setTimeout(() => { pvRing(frameRect(t)); if (mine) PV_FEEL.tick(18); snd('place', { vol: .5 }); }, 520);
   } else if (m.type === 'play') {
-    const inCity = $('#bd .strip.city .sc[data-id="' + m.card + '"]'), tab = $('#bd .pv-tab[data-v="city"]');
+    // :not(.pv-vc): the visit row shows rivals' cards with the same id; only my own city card may fly
+    const inCity = $('#bd .strip.city .sc[data-id="' + m.card + '"]:not(.pv-vc)'), tab = $('#bd .pv-tab[data-v="city"]');
     const to = inCity ? frameRect(inCity) : mine ? frameRect(tab) : seatRect(seat);
     const from = src || (mine ? UI.lay && UI.lay.hand : seatRect(seat));
     if (!inCity && from && to) {
@@ -849,7 +864,7 @@ function pvLand(m, seat, src, preChip) {
     if (t) { t.classList.add('pv-hit'); setTimeout(() => t.classList.remove('pv-hit'), 700); }
     return true;
   }
-  if (m.type === 'play') { const el = $('#bd .strip.city .sc[data-id="' + m.card + '"]'); if (el) { if (src) flipFrom(el, src, 620); el.classList.add('pv-new'); setTimeout(() => el.classList.remove('pv-new'), 1500); } return true; }
+  if (m.type === 'play') { const el = $('#bd .strip.city .sc[data-id="' + m.card + '"]:not(.pv-vc)'); if (el) { if (src) flipFrom(el, src, 620); el.classList.add('pv-new'); setTimeout(() => el.classList.remove('pv-new'), 1500); } return true; }
   return false;
 }
 function pvRing(r, cls) {

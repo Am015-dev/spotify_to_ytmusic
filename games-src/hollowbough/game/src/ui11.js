@@ -111,7 +111,7 @@ function hlpSuggest() {
   const a = HB.actor(G);
   try { computeRec(true); } catch (e) { return null; }
   const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
-  try { const pn = hlpEl(m).closest('.pv-panel'); if (pn && !pn.classList.contains('on')) pvSetTab(pn.dataset.p, true); } catch (x) { }   // the target may sit on another phone tab: bring it forward
+  try { const pn = hlpEl(m).closest('.pv-panel'); if (pn && !pn.classList.contains('on')) pvSetTab(pn.dataset.p, true); pvScrollTo(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
   const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
   // the helper's target may sit on another phone tab (Meadow, City, Goals): bring that panel forward so the finger and glow are visible
   return { why: hlpWhy(m, a), key: mk, m, target: () => hlpEl(m) };

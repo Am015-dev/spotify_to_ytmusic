@@ -439,3 +439,30 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 #bd.pv.wide.short .pv-sw b,#bd.pv.wide.short .pv-small .pv-sw b{font-size:13px;line-height:1.15}
 #bd.pv.wide.short .pv-h{font-size:14px;line-height:1.2}
 #bd.pv.wide.short .pv-mead{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* W482 short portrait phones (< 600 px tall, e.g. 375x553): the places fill the band as a 3-across grid (every place whole, no overlap);
+   the hand is one row of name cards behind a Hand toggle; tapping it lays the full cards over the board until the next move */
+#bd.pv.tiny .pv-col{gap:5px;padding-top:5px}
+#bd.pv.tiny .chips .chip{min-height:44px;padding-top:2px;padding-bottom:2px}
+#bd.pv.tiny .resrow{min-height:44px;padding-top:1px;padding-bottom:1px}
+#bd.pv.tiny .resrow .rs svg,#bd.pv.tiny .resrow .rs img{max-height:20px}
+#bd.pv.tiny .pv-tab{min-height:44px}
+#bd.pv.tiny .strip.hand.mini{padding-top:4px;overflow-y:hidden}
+#bd.pv.tiny .strip.hand.mini .hc{top:4px;bottom:auto;transform:none!important}
+#bd.pv.tiny .strip.hand.mini .pvc{flex-direction:row;align-items:stretch}
+#bd.pv.tiny .strip.hand.mini .pvc-art{flex:0 0 30px;min-height:0;border-bottom:0;border-right:2px solid var(--td)}
+#bd.pv.tiny .strip.hand.mini .pvc-pts,#bd.pv.tiny .strip.hand.mini .pvc-cost,#bd.pv.tiny .strip.hand.mini .cost{display:none}
+#bd.pv.tiny .strip.hand.mini .pvc-name{flex:1 1 0;min-width:0;min-height:0;display:flex;align-items:center;order:2;padding:0 4px}
+#bd.pv.tiny .strip.hand.open{position:absolute;left:0;right:0;bottom:0;z-index:40;margin:0;padding-top:6px;background:linear-gradient(rgba(30,20,10,.55),rgba(30,20,10,.85))}
+#bd.pv.tiny .strip.hand .scount.hs-tg{position:absolute;left:4px;top:4px;width:56px;height:48px;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:0;font:inherit;font-size:14px!important;line-height:1.05;color:#f8edd2;background:#3a2a18;border:2px solid rgba(248,237,210,.7);border-radius:10px;z-index:30;cursor:pointer}
+#bd.pv.tiny .strip.hand .scount.hs-tg b{font-size:14px;white-space:nowrap}
+#bd.pv.tiny .pv-col{gap:3px;padding-top:3px}
+#bd.pv.tiny .pv-tabs{padding-top:0;padding-bottom:0;min-height:44px}
+#bd.pv.tiny .strip.hand.hscroll{scroll-padding-left:64px}
+#bd.pv.tiny .pv-spots.pv-board.pv-board-t{position:relative!important;display:grid!important;grid-auto-flow:column;grid-template-rows:repeat(3,minmax(0,1fr));grid-auto-columns:var(--cw,80px);grid-template-columns:none!important;gap:3px 4px;padding:3px 4px;height:100%;box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scroll-padding-left:4px;overscroll-behavior-x:contain;touch-action:pan-x;z-index:auto}
+#bd.pv.tiny .pv-board-t .pv-cell{position:relative!important;left:auto!important;top:auto!important;width:auto!important;min-width:0;min-height:0;transform:none!important;display:block;scroll-snap-align:start}
+#bd.pv.tiny .pv-board-t .tile.pv-place,#bd.pv.tiny .pv-board-t .tile.pv-place::before{width:100%!important;height:100%!important}
+#bd.pv.tiny .pv-board-t .pv-nm,#bd.pv.tiny .pv-board-t .tile.pv-place .pv-tin{width:100%!important;box-sizing:border-box}
+#bd.pv.tiny .pv-board-t .tile.pv-place .pv-tin{padding:0 1px 1px!important}#bd.pv.tiny .pv-board-t .pv-sw b,#bd.pv.tiny .pv-board-t .pv-sw b .pv-it,#bd.pv.tiny .pv-board-t .pv-nm{letter-spacing:-.45px!important}
+/* short phones: a compact coach tip uses its full width for the text (the OK button keeps the title row), so it fits the band over the counts */
+html:has(#bd.pv.tiny) .gxh-bub.gxh-compact{padding-top:4px;padding-bottom:4px}html:has(#bd.pv.tiny) .gxh-bub.gxh-compact .gxh-tt{min-height:30px;line-height:30px}
+html:has(#bd.pv.tiny) .gxh-bub.gxh-compact .gxh-tx{padding-right:0}
