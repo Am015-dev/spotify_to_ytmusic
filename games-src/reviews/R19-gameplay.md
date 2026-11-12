@@ -9,6 +9,7 @@ the published rulebook online; notes stay in a local folder outside the repo.
 | Game | Total | Verdict | Lowest rows |
 |---|---|---|---|
 | crown-city-smash | 7.5 | PASS | 4 Turn clarity 7, 5 Phone 7, 6 AI/pacing 7, 7 Feel 7 |
+| perch-and-plume | 6.9 | FAIL | 5 Phone 6, 6 AI/pacing 6 |
 
 ---
 
@@ -59,3 +60,57 @@ What I played:
 | 6 | Five default games as a newcomer | Won 4 of 5. In 3 of 5 games two rivals knocked each other out, so the field is soft; a 2.8 min win felt quick. | R19-shots/crown-390-g3result.jpg |
 | 8 (method) | Read the fixer's touch walk (`games-src/kot/playable/lib.js`) | Its tap helper uses `page.mouse.click`, not `touchscreen.tap`, so its "by touch" numbers are mouse numbers. My own touch runs agree with its results. | n/a |
 | 2/4 (works) | Bought a card in a real game | Tap opens the card with art, PERMANENT tag, text, "Buy · 4 ⚡" and "Not now". | R19-shots/crown-390-g3cardread.jpg |
+
+---
+
+## 2. perch-and-plume (shelf/W508-perch-gameplay @ badb8e38): 6.9, FAIL
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") to its last step at 375x667, tapping only the highlighted target: 21 steps, 23 taps,
+  78 s, 0 errors, then a real 4-round game at its starting hand. All 21 targets started on screen and were 44x44 or more.
+- Three full Quick games at the default settings (2 players, Easy rival Fern, default rival speed, not "fast"), to the result:
+  - 390, hints **off** (the default), a newcomer tapping a glowing thing they can see: **lost 40-59**, 230 s, 89 taps.
+  - 375, hints off, same newcomer: **lost 40-59**, 237 s, 85 taps.
+  - 390, hints switched **on** (lightbulb), Best half the time, else a random glowing target: **won 57-44**, 252 s, 112 taps,
+    Best shown on 55 of 56 decisions.
+- 0 page errors, 0 console errors, 0 stuck states, 0 dead taps, 0 dock scrolls in 3 games.
+- Rival wait from my last tap to my next turn: 3.2-3.7 s on average (median 0.6 s), 14-19 s at most (round ends).
+
+The fixer measured with hints on and the rival on "fast" (its touch-game.js writes both into storage). A new player gets hints off
+and normal speed, so its "won 4 of 8" does not describe the default game.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | As R12: 4 rounds of 8/7/6/5 actions, egg cost by column, rows that grow, feeder dice, 3-card tray, brown powers right to left, white and pink powers, tuck and cache, round goals, 5-item start, a secret bonus card. The row-bonus trades did not come up in my 3 games. |
+| 2 | Tutorial teaches | 7 | Fixed at 375: every target on screen and 44 px or more, 78 s, one line and one tap each, ends in a real game. Still: step 1 asks you to "Tap the score" while a "Best" badge glows on "Play a bird"; the score already reads "You 5 leads" before you have done anything; the shrinking 8/7/6/5 actions are never taught ("Real games: 4 rounds"). |
+| 3 | First 10 seconds | 7 | The starting-hand screen opens with "Goal: most points after 4 rounds" and a pre-picked start with "Keep these". The first board is busy: score bar, feeder, tray, 3 rows and 4 actions at once. |
+| 4 | Turn clarity | 7 | The prompt always says what to tap ("Tap a glowing bird in the tray, or the deck, to take a card (1 left)") and action tiles say what they give. With hints on, Best marks the choice and "What should I do?" sits under the prompt. With hints off (the default) nothing says which action is sensible. |
+| 5 | Phone play | 6 | Hand cards are 37x50 px (36x48 at 375) and board birds 40x40 at 375, under 44. Tray cards are about 33x45 and show only a points number, so you cannot read which bird you take. At 375 the hand cards are cut at the bottom edge. At the first turn the "Round 1: 8 actions each. Goal: ..." line is drawn over the score chips. |
+| 6 | AI and pacing | 6 | On the default settings a newcomer lost both games 40-59; only with the lightbulb on (which nothing makes a newcomer turn on) did the mixed player win, 57-44. Rival turns are quick (median 0.6 s), but round ends still wait 14-19 s with nothing to do. A game is about 4 min. |
+| 7 | Feel | 7 | Painted birds and habitats, eggs and food fly, point pops on the rows, a clear result table. |
+| 8 | Bugs | 8 | 1 tutorial and 3 full games: 0 errors, 0 stuck states, 0 dead taps. Not higher because of the overlapping round line. |
+| | **Total** | **6.9** | **FAIL**: rows 5 and 6 are below 7. No stopper. |
+
+### Earlier findings (G4, R6, R12)
+| Finding | Status | Evidence |
+|---|---|---|
+| R12 row 6: lost 5/5 to Easy | **Partly fixed**: won 1 of 1 with hints on; lost 2 of 2 on the default (hints off). | R19-shots/pp-390-best-result.jpg, pp-390-def-result.jpg, pp-375-def-result.jpg |
+| R12 row 6: round-end waits 13-23 s | **Not fixed**: 14-19 s at most. | R19-shots/pp-390-def-turn2.jpg |
+| R12 row 4: "Your birds are working" during Fern's turn | **Not checked** in a shot (I did not catch Fern's first turn); no wrong header seen in my shots. | n/a |
+| R12 row 5: tutorial targets off screen / under 44 at 375 | **Fixed**: 21 of 21 on screen, all 44x44 or more. | R19-shots/pp-375-tut-01.jpg, pp-375-tut-09.jpg |
+| R12 row 5: hand names cut | **Fixed** for names (whole names, e.g. "Copper Warble…" is cut only by the screen edge); cards still cut at the bottom at 375. | R19-shots/pp-375-def-turn2.jpg |
+| R12 row 5: big "Your turn" banner over the rows | **Not seen** in my shots. | R19-shots/pp-390-best-turn1.jpg |
+| G4/R6/R12 row 3: busy first tutorial screen | **Not fixed**. | R19-shots/pp-375-tut-01.jpg |
+| R6/R12 row 1: row-bonus trade never offered | **Not seen** in 3 games. | n/a |
+| Dead taps / first-tap stopper | **Fixed**: 0 dead taps in 3 games. | R19-shots/pp-390-def-turn2.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Two default games (hints off, normal speed) as a newcomer tapping glowing targets | Lost 40-59 at 390 and 40-59 at 375. | R19-shots/pp-390-def-result.jpg, R19-shots/pp-375-def-result.jpg |
+| 6 | Turned the lightbulb on, took Best half the time | Won 57-44. The game is winnable only with a setting that is off by default. | R19-shots/pp-390-best-result.jpg |
+| 5 | Drew from the tray at 375 and 390 | Tray cards are about 33x45 px with only a points number; the bird and its cost cannot be read before taking it. | R19-shots/pp-375-def-turn2.jpg, R19-shots/pp-390-def-turn2.jpg |
+| 5 | Tapped hand cards and board birds | Hand cards 37x50 (390) and 36x48 (375); board birds 40x40 at 375. | R19-shots/pp-390-best-turn1.jpg |
+| 5 | First turn, hints on, 390 | The "Round 1: 8 actions each. Goal: Full egg sets (1 per row)" line overlaps both score chips, and a "Swipe your birds" toast covers the food. | R19-shots/pp-390-best-turn1.jpg |
+| 2 | Tutorial step 1 at 375 | "Tap the score" while a "Best" badge glows on "Play a bird"; the score already says "You 5 leads". | R19-shots/pp-375-tut-01.jpg |
+| 2 | Tutorial step 9 | A stale "Good: +2 points ... the best move this turn" line is half cut at the top of the dock. | R19-shots/pp-375-tut-09.jpg |
