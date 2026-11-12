@@ -142,7 +142,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   const fin=await state();
   // every core rule has its own step (orchestrator gate, W489): goal, bid, Kingdom Card, Herald, hidden cards, Supporters, Clash, claim, scoring, Tactics,
   // hand size / Attrition, the Favour, Day/Night card powers, Govern into a Council, Journey, Winter, the win condition
-  if(mode!=='skip')for(const need of ['goal','tactic','attrition','bid1','kc','favour','herald','cmds','place1','supp','order','clash','claim','score','govern','council','journey','round','end'])if(!seenIds.includes(need))note(tag,'the tutorial never taught step '+need);
+  if(mode!=='skip')for(const need of ['goal','tactic','attrition','bid1','takeback','kc','tie','tieb','tiec','lore','bid3','favour','herald','cmds','place1','supp','order','clash','claim','score','govern','council','journey','round','end'])if(!seenIds.includes(need))note(tag,'the tutorial never taught step '+need);
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
   else if(mode==='story'){
     await sleep(300);
