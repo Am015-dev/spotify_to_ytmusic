@@ -158,3 +158,7 @@ function tutOffer(){return false;if(typeof GXT==='undefined'||!firstTime()||GXT.
 (function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
 // while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();
+// Learn to play: every tap off the target answers, each time: the ring around what to tap (or the bubble's Next) pulses again
+(function(){let n=0;const st=document.createElement('style');st.textContent='.gxt-ring.sf-nudge,.sf-nudge{animation:sfNudge .5s ease-out 2}@keyframes sfNudge{0%{transform:scale(1)}40%{transform:scale(1.12);filter:brightness(1.6)}100%{transform:scale(1)}}';
+  (document.head||document.documentElement).appendChild(st);
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('.gxt-cell'))return;n++;const tx=document.querySelector('.gxh-tx');const bub=tx&&tx.parentElement;let R=[...document.querySelectorAll('.gxt-ring')];if(!R.length&&bub)R=[...bub.querySelectorAll('button')];if(!R.length&&!bub){try{toast(n%2?'Watch the crew…':'Watch the crew. Next step soon.')}catch(_){}}if(bub)bub.classList.toggle('sf-n1',n%2===1);R.forEach(r=>{r.classList.remove('sf-nudge');void r.offsetWidth;r.classList.add('sf-nudge');r.classList.toggle('sf-n1',n%2===1)})},true)})();

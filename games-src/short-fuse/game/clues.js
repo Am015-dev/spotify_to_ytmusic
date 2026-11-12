@@ -40,9 +40,10 @@ function clNote(vals){const a=[...vals].filter(c=>c!==14).sort((x,y)=>x-y);if(!a
     if(sel&&sel.tg.length===1&&sel.v==null){const tg=sel.tg[0];const c=by[G.st[tg.st].w[tg.k].u];if(c)return 'Clues: '+clList(c.vals)+(c.vals.has(14)?'. Might be red!':'. Not red.')}
     if(sel&&sel.v!=null&&!sel.tg.length)return 'Dim wires can’t be '+VNm(sel.v)+'. ! = maybe red.';
     if(!sel&&/^Your turn: tap a crew wire/.test(t)){const any=Object.values(by).some(c=>c.vals.has(14));return any?'Your turn. A ! wire might be red.':t}}catch(e){}return t}})();
-// the "safe to say" check: a dim wire, or a wire that might be red, needs a second tap
+// the "safe to say" check: a dim wire, or a wire that might be red, needs a second tap (each wire warns once per turn, so going
+// back and forth between two wires never leaves every tap answered by a warning only)
 document.addEventListener('click',e=>{if(!e.target.closest)return;const t=e.target.closest('#tb .tile.cl-no,#tb .tile.cl-red');if(!t||!clOn())return;
-  const u=+t.dataset.u;if(CL.ok===u)return;CL.ok=u;e.stopPropagation();e.preventDefault();
+  const u=+t.dataset.u;const tk=G.turn+':'+G.logN;if(CL.okT!==tk){CL.okT=tk;CL.okS=new Set()}if(CL.okS.has(u))return;CL.okS.add(u);e.stopPropagation();e.preventDefault();
   const sel=clSel();const mine=t.classList.contains('mine');let msg;
   if(t.classList.contains('cl-no'))msg=mine?'Clues say that wire can’t match. Tap again to say it.':'Clues say it can’t be '+(sel&&sel.v!=null?VNm(sel.v):'that')+'. Tap again to point.';
   else msg='Careful: this one might be red. Tap again to point.';
