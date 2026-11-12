@@ -38,7 +38,7 @@ const LORE={
 // coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
 LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One rule at a time.',btn:'Start'};
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
-LORE.laterShort=['Barrel roll and boost: extra sideways moves.','Bumping a ship skips your action.','Flying off the mat destroys your ship.'];
+LORE.laterShort=['After you move, tap Roll or Boost to slide.','Bump into a ship and you skip your action.','Fly off the mat and your ship is lost.'];
 LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
 LORE.coach={
   goal:{rule:1,t:'Brecken: Your goal',s:'Destroy Slate’s ship before he destroys yours.'},
@@ -50,7 +50,8 @@ LORE.coach={
   shoot:{rule:1,act:1,t:'Brecken: Arc, range, order',s:'Highest skill fires first. Shoot an enemy in your arc, range 1-3.'},
   dice:{rule:1,t:'Brecken: Read the dice',s:'Hit and crit hurt. Focus needs a token. Blank misses.'},
   usefocus:{rule:1,act:1,t:'Brecken: Spend focus',s:'Spend your focus token: focus faces become hits.'},
-  res1:{rule:1,t:'Brecken: Range 3 and evades',s:'Range 3 gave him a defence die. Each evade cancels a hit.'},
+  res1:{rule:1,t:'Brecken: Range 3 and evades',s:'His evades cancelled your hits. At range 3 he rolls one more.'},
+  dodge:{t:'Brecken: You dodged',s:'Your evades cancelled his hits. At range 3 you roll one more.'},
   defend:{rule:1,t:'Brecken: Pilot power',s:'Kael turns one focus result into an evade.'},
   res2:{rule:1,t:'Brecken: Shields first',s:'Damage takes shields first, then hull. Crits are face-up cards.'},
   goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Keep him in your arc.'},

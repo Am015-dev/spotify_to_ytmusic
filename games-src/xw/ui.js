@@ -43,7 +43,11 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
 
     // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
     {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
-const rk=rockHits(s,m);if(rk)v-=40*rk;
+const rk=rockHits(s,m);if(rk)v-=400*rk;
+    // look one round ahead: never steer into a corner where next round every move flies off the mat; prefer poses that can still line up a shot
+    if(v>-350){const st=s.stress||c.c==='r';let safe=0,nx=0;for(const m2 of dialOf(s)){if(exColor(s,m2).c==='r'&&st)continue;const p2=finalPose(p,B(s),m2);if(offBoard(p2,B(s)))continue;safe++;let t=0;for(const [e,ps] of enemyPoses)t+=threatTo(s,p2,e,ps[0]);nx=Math.max(nx,t)}
+      v+=safe===0?-300:safe<3?-6/safe:0;v+=nx*.7}
+
     else{const P=corners(p,B(s));const near=Math.min(...G.rocks.map(o=>{const R=rockPoly(o);return Math.min(...P.map(q=>polyPointDist(q,R)))}),1e9);if(near<30)v-=(30-near)/6}
     sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
   UI.sugCache={k:G.round+'|'+s.id+'|'+dk,v:best,sc};return best}
@@ -80,7 +84,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
 function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
   if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
 function setupText(q){const r=recOpt(q);const rock=q.key==='rock';
-  return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place (recommended)<small>Places your ${rock?'asteroids and ship':'ships'} in sensible spots. In a first game it doesn't matter much.</small></button></div>
+  return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place<small>Sensible spots for your ${rock?'rocks':'ships'}.</small></button></div>
   ${rock&&G.rocks.length?`<p class="small">Both sides take turns placing 6 asteroids. ${G.rocks.length} ${G.rocks.length===1?'is':'are'} already down: the grey rocks.</p>`:''}${rock?'<p class="small">Flying through an asteroid hurts and skips your action. Shooting past one gives the defender +1 die.</p>':''}
   <p class="small muted"><b>Or place ${rock?'it':'it'} yourself:</b> tap an outlined spot, or pick one below. ${rock?'Columns A-E run from your left. Rows 1-5 run from your edge.':'Spots 1-9 run along your edge, left to right.'} ★ <b>${esc(r.o.l)}</b> is suggested. Why: ${r.why}.</p>`}
 // long lists of short choices (asteroid spots A1…E5 and the like) become a compact grid; the spots are laid out like the mat

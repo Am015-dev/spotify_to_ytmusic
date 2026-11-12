@@ -28,7 +28,7 @@ html.bf #tags .tag .tgl{display:none}
 @keyframes bfdash{to{stroke-dashoffset:-30}}
 @keyframes bfzap{from{stroke-width:14;opacity:.2}to{stroke-width:5;opacity:1}}
 /* maneuver end markers */
-.bfm{width:42px;height:42px;border-radius:50%;border:3px solid #e8eeff;background:rgba(10,12,34,.86);color:#fff;font:800 17px/1 "Exo 2",sans-serif;display:flex;align-items:center;justify-content:center;gap:0;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer;touch-action:manipulation}
+.bfm{width:44px;height:44px;border-radius:50%;border:3px solid #e8eeff;background:rgba(10,12,34,.86);color:#fff;font:800 17px/1 "Exo 2",sans-serif;display:flex;align-items:center;justify-content:center;gap:0;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer;touch-action:manipulation}
 .bfm b{font-size:13px;margin-left:1px}
 .bfm.g{border-color:#46f08a;color:#b8ffd3}.bfm.r{border-color:#ff5a5a;color:#ffc0c0}
 .bfm.sug{box-shadow:0 0 0 3px rgba(127,212,255,.55),0 3px 10px rgba(0,0,0,.6)}

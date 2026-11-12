@@ -129,7 +129,7 @@ function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NC
   if(ph==='target'&&ht)coachSay('shoot');
   if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
   if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
-  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'res1');if(R.dmg)coachSay('res2')}
+  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'dodge');if(R.dmg)coachSay('res2')}
     if(R.dmg)coachSay('res2')}
   if(G.ships.some(x=>x.alive&&x.stress>0))coachSay('stress');
   if(G.round>=2)coachSay('endround')}
@@ -146,7 +146,7 @@ function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NC
   const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t.replace(/^[A-Z][a-z]+: /,'')+'. '+LORE.coach[k].s));
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
-    +'<div class="gxt-ex"><b>Coming up later</b><ul class="na-later">'+LORE.laterShort.map(t=>'<li>'+t+'</li>').join('')+'</ul>The rest is in Rules.</div>'
+    +'<div class="gxt-ex"><b>Try these in your first battle</b><ul class="na-later">'+LORE.laterShort.map(t=>'<li>'+t+'</li>').join('')+'</ul></div>'
     +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
   document.body.appendChild(d);TUT.coach=false}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared

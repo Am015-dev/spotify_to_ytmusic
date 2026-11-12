@@ -78,7 +78,7 @@ function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const id
   if(ids.length)sfx('lock');
   const fly=(id,k)=>{const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:performance.now(),dur:Math.max(1,D)};if(k===0||ANIM)sfx('engine')};
   const go=()=>{ids.forEach((id,k)=>{if(step)setTimeout(()=>fly(id,k),k*step);else fly(id,k)});
-    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;render()};if(tot)setTimeout(land,tot+60);else land()};
+    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;if(ban&&!ban.hidden&&/Ships move/.test(ban.innerHTML)){clearTimeout(BF.banT);ban.hidden=true;BF.banUntil=0}render()};if(tot)setTimeout(land,tot+60);else land()};
   if(reveal)setTimeout(go,reveal);else go();
   if(ids.length>1)banner('<b>Ships move</b><span>Lowest skill first</span>',reveal+tot*.6)}
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
@@ -177,7 +177,7 @@ function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return
   const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
 function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
   if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
-  const el=dialEl(),face=el.querySelector('.dface'),key=s.id+':'+L.map(o=>o.i).join(',');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
+  const el=dialEl(),face=el.querySelector('.dface'),key=G.round+'|'+s.id+'|'+Math.round(s.x)+','+Math.round(s.y)+'|'+sug+':'+L.map(o=>o.i).join(',');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
   if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
   el.hidden=false;dialSpin(false);
   const m=dialOf(s)[pick],c=exColor(s,m).c,rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
