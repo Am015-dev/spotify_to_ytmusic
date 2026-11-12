@@ -202,6 +202,9 @@ async function nextCandidate(page, used) {
 
 async function doMoves(page, n, st, used) {
   for (let i = 0; i < n; i++) {
+    // a first-run tutorial (shell/gx-tutor.js) shields everything but its one spotlight and needs a drag or a specific tap: a blind tapper leaves it through its own skip button
+    const sk = await page.evaluate("(() => { const b = document.querySelector('[data-gxt-skip]'); if (!b) return null; const r = b.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; })()").catch(() => null);
+    if (sk) { await tap(page, sk[0], sk[1]); await sleep(700); const cf = await page.evaluate("(() => { const b = document.querySelector('[data-gxt-dlg=exit],[data-gxt-end=skip],[data-gxt-skip-yes]'); if (!b) return null; const r = b.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; })()").catch(() => null); if (cf) { await tap(page, cf[0], cf[1]); await sleep(700); } continue; }
     const c = await nextCandidate(page, used);
     if (!c) { st.noCandidate = true; break; }
     used.add(Math.round(c.x / 4) + ',' + Math.round(c.y / 4));

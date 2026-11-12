@@ -61,11 +61,11 @@ function bfKick(){const me=viewSeat();if(BF.kicking||!G||me<0||!validMoves(me).s
 function bfHold(on){const h=document.documentElement;clearTimeout(BF.holdT);if(on){h.classList.add('bf-rev');BF.holdT=setTimeout(()=>h.classList.remove('bf-rev'),9000)}else h.classList.remove('bf-rev')}
 function bfReveal(id,who){bfHold(1);BF.ev={door0:0,door1:0,card:0};if(cd(id).t==='monster'&&bfBossClip(id,who))return;bfRevealCard(id,who)}
 function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who===me&&G.mode!=='ai';const kind=c.t==='monster'?'mon':c.t==='curse'?'curse':'other';
-  const ban=kind==='mon'?'A MONSTER!':kind==='curse'?'CURSED!':mine?'Into your hand':'Into '+P(who).nm+'’s hand';
-  const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
-  let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
+  const ban=kind==='mon'?'A MONSTER!':kind==='curse'?(who===me?'CURSED!':esc(P(who).nm)+' is cursed!'):mine?'Into your hand':'Into '+P(who).nm+'’s hand';
+  const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?(who===me?'It hits you at once.':'It hits '+esc(P(who).nm)+', not you.'):'No monster this time';
+  let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' own':''}${who!==me?' them':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):4200;let opened=false;
+  document.body.appendChild(o);if(typeof tbFitNames==='function')tbFitNames([...o.querySelectorAll('.card')]);const tut=typeof tutOn==='function'&&tutOn();const dur=tut?(mine?1700:1000):mine?3000:1500;let opened=false;
   const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
   const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
     if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
@@ -74,7 +74,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
   BF.revClose=()=>{if(!o.isConnected)return;o.remove();bfHold(0)};
   E.door0=performance.now();o.classList.add('door');
   if(dimg){dimg.addEventListener('animationend',()=>{E.door1=performance.now();open()},{once:true});setTimeout(()=>{if(!opened&&dimg.isConnected&&!E.door1)open()},1400)}else{E.door1=performance.now();open()}
-  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur+800);
+  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur+300);
 }
 // ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are kicked open in a game ----
 // The clip IS the reveal: the door card opens into the video, which fills the table (soft vignette edges, no box), the monster's name and level
@@ -123,10 +123,13 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
-function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=Math.max(24,r.top-16)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),4100)}
+function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;const ph=document.documentElement.classList.contains('ph');const bar=(document.querySelector('.gx-bar')||{getBoundingClientRect:()=>({bottom:0})}).getBoundingClientRect().bottom;
+  const k=Math.round(r.left)+':'+Math.round(r.top);for(const o of document.querySelectorAll('.bffloat'))if(o.dataset.k===k)o.remove();f.dataset.k=k;
+  f.style.left=Math.min(innerWidth-36,Math.max(36,r.left+r.width/2))+'px';f.style.top=(ph?(r.top<innerHeight/2?Math.max(bar+56,r.bottom+20):r.top-16):Math.max(24,r.top-16))+'px';document.body.appendChild(f);  // phone: under the chip, never over the top bar; one float per spot
+setTimeout(()=>f.remove(),4100)}
 function bfRead(t){return 4000+Math.ceil(String(t).split(/\s+/).length/10)*1000}
 function bfOne(){document.querySelectorAll('.bfbub').forEach(x=>x.remove())}
-function bfBubble(s,txt){if(!UI.hints&&!(typeof tutOn==='function'&&tutOn()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
+function bfBubble(s,txt){if(!UI.hints&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return;const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';bfOne();document.body.appendChild(b);setTimeout(()=>b.remove(),bfRead(txt))}
 function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';bfOne();document.body.appendChild(b);b.addEventListener('click',()=>b.remove());setTimeout(()=>b.remove(),bfRead(txt))}
 function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
@@ -136,7 +139,7 @@ function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const a
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
   if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
     const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,bfCap('Lost: '+lost.map(cname).join(', '),7),'bad');
-    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,bfCap(`Not worn: ${w||'no free slot'}`,8),'bad')}}
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Not worn: ${(w||'no free slot').replace('your race, class or sex can’t use it','wrong race or class').replace(/^you already wear /,'already wearing ').replace('your hands are full','hands full')}`,'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -183,7 +186,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
     if(G&&!G.cb&&G.phase==='setup'&&(me>=0&&P(me).human||G.mode==='ai'||me<0||curPl().i!==me)){const mineS=me>=0&&P(me).human&&sideToAct()===me;const p=mineS?P(me):curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div>${mineS?'':`<div class="bfcap">${esc(p.nm.split(/[ ,]/)[0])} gears up…</div>`}</div>`}
     if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=132;
-      return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
+      return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'Into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
     return _arena.apply(this,arguments)};
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
@@ -191,7 +194,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
     if(G&&G.cb&&G.phase==='combat'&&G.cb.stage==='act'&&!G.q&&me>=0&&sideToAct()===me&&P(me).human){h=h.replace(/<button class="btn[^"]*" data-mv='\{&quot;act&quot;:&quot;(?:fight|run)&quot;\}'>.*?<\/button>/g,'').replace(/<button class="btn[^"]*" data-a="askmenu">.*?<\/button>/g,'').replace(/<div class="acts main">\s*<\/div>/,'')}
     h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
-    h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \((?:need \d\+: )?([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
+    h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \(need (\d)\+: ([^)]*)\)/,'🏃 Run $1+ ($2)').replace(/🏃 Run away \(([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
   const _render=render;render=function(){const S=BF.snap;const r=_render.apply(this,arguments);try{bfAfter(S)}catch(e){UI.lastErr='bf '+e}return r}})();
@@ -258,4 +261,49 @@ function dkGoalClose(){const o=document.getElementById('dkgoal');if(o)o.remove()
 document.addEventListener('pointerdown',e=>{const o=document.getElementById('dkgoal');if(o&&Date.now()-(UI.goalAt||0)>250){e.preventDefault();e.stopPropagation();setTimeout(dkGoalClose,0);return}
   if(e.target.closest&&e.target.closest(document.documentElement.classList.contains('ph')?'#phchip':'#phchip,#docktitle')&&!document.querySelector('.gxh-bub,.gxh-card,#bfrev')&&typeof G!=='undefined'&&G)dkGoal()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')dkGoalClose()});
-(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof tutOn==='function'&&tutOn())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof tutOn==='function'&&tutOn())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{if(G&&!G.tut&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running())&&G.mode!=='ai'&&G.mode!=='net'&&UI.goalGid!==G.gid&&G.turn<=1&&G.phase==='setup'&&!/[?&]scn=/.test(location.search)){UI.goalGid=G.gid;setTimeout(()=>{if(!G||G.tut||(typeof GXT!=='undefined'&&GXT.running&&GXT.running())||(typeof TUTG!=='undefined'&&TUTG))return;let seen=0;try{seen=localStorage.getItem('dkd_goal');localStorage.setItem('dkd_goal','1')}catch(e){}if(!seen)dkGoal()},600)}}catch(e){}return x}})();
+
+// tap to skip: during a rival's turn a tap on the table (not on a button, card or panel) closes the door reveal and runs the rest of that turn fast
+document.addEventListener('pointerdown',e=>{try{if(typeof G==='undefined'||!G||G.winner||G.mode==='net'||(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return;const me=viewSeat();if(me<0||G.active===me||sideToAct()===me)return;
+  const t=e.target;if(!t.closest||!t.closest('.gx-board')||t.closest('#phopps,.opps,button,[data-mv],[data-a],[data-card],[data-opp],.gx-drawer,#modal,.gx-bar,.gxh-bub,.gxh-rules,#dkgoal,.hand'))return;
+  UI.ff=G.turn;UI.hold=0;if(BF.revClose)BF.revClose();if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(x){}},true);
+// ---- the newcomer's guide: the advisor's best move gets the ★ (a card, or one pulsing button) and the line says it in words ----
+// Hints stay off for the old badges; this only marks ONE move: the one coach() would make (equip, beatable fight, one-shot, help, curse).
+function bfBest(me){if(me<0||!G||G.winner||sideToAct()!==me||!P(me).human||(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))return null;let co;try{co=coach(me)}catch(e){return null}
+  const m=co&&co.rec;if(!m||m.act==='sell')return null;if((m.card!=null&&!['play','equip','give','toss','discard','unequip'].includes(m.act)&&!['berserk','turn','flight'].includes(m.act)))return {m,co,card:null};
+  return {m,co,card:m.card!=null&&!['unequip'].includes(m.act)?m.card:null}}
+function bfBestLine(me,b){const m=b.m,c=m.card!=null?cd(m.card):null,fn=c?String(cname(m.card)).replace(/<[^>]+>/g,''):'',nm=fn,cb=G.cb;
+  if(b.card!=null){if(G.phase==='charity')return 'Give away ★ '+fn;
+    if(c.t==='curse'&&typeof m.tgt==='number')return 'Curse '+P(m.tgt).nm+' with the ★ card';
+    if(cb&&cb.who!==me&&cb.help!==me)return 'Stop '+P(cb.who).nm+' with the ★ card';
+    if(cb)return bfCap('Tap the ★ card to win this fight',8);
+    if(c.t==='item')return (equipWhy(P(me),m.card)?'Carry ★ ':'Wear ★ ')+fn;if(c.t==='level')return 'Tap the ★ card: +1 level';
+    if(c.t==='race'||c.t==='class')return 'Become ★ '+fn;return 'Play ★ '+fn}
+  switch(m.act){case 'fight':return 'You’re winning! Tap Fight';case 'run':return 'Too strong for you: tap Run';case 'ask':return 'Too strong: tap Get help';
+    case 'kick':return 'All geared up: kick the door!';case 'ready':return 'All set? Tap Ready';case 'end':return 'Done: end your turn';case 'loot':return 'Empty room: tap Loot';
+    case 'trouble':return 'Fight ★ '+fn+': you win';
+    case 'pass':return G.phase==='window'?'Let '+curPl().nm+' go on':(cb&&winning(cb)?'Let the fight go on':'They’re losing: let it be');
+    case 'opt':return m.opt==='yes'?'Tap Yes':'Tap No'}
+  return null}
+function bfMarkBest(){const me=viewSeat();document.querySelectorAll('.bf-best').forEach(e=>e.classList.remove('bf-best'));if(typeof GXT!=='undefined'&&GXT.running&&GXT.running())return;const b=bfBest(me);if(!b||BF.pick!=null||BF.ask)return;
+  const k=mvKey(b.m);let hit=false;
+  if(b.card!=null){document.querySelectorAll(`.mine .hand .card[data-card="${b.card}"],.mine .gear .gchip[data-card="${b.card}"]`).forEach(e=>{e.classList.add('bf-best','sug');hit=true})}
+  const btns=[...document.querySelectorAll('#prompt button[data-mv],.arena .fbtns button[data-mv],#prompt button[data-a="askmenu"],.arena button[data-a="askmenu"]')];
+  for(const e of btns){let mk=null;try{mk=e.dataset.a==='askmenu'?(b.m.act==='ask'?k:'ask?'):mvKey(JSON.parse(e.dataset.mv))}catch(x){}
+    if(!hit&&b.card==null&&mk===k){e.classList.add('bf-best','pulse','primary');hit=true}else e.classList.remove('pulse')}
+  if(!hit&&b.m.act==='kick'){const d=document.querySelector('.bfdoor');if(d){d.classList.add('bf-best');hit=true}}
+  let t=hit?bfBestLine(me,b):null;if(t&&bfWords(t)>8)t=bfBestShort(me,b);if(t)bfSay(t)}
+const bfWords=t=>String(t).split(/\s+/).filter(Boolean).reduce((a,x)=>a+(x.split(/[-–—]+/).filter(Boolean).length||1),0);
+function bfBestShort(me,b){if(b.card==null)return null;if(G.phase==='charity')return 'Too many cards: give away ★';const c=cd(b.card);if(G.cb)return 'Tap the ★ card';if(c.t==='item')return equipWhy(P(me),b.card)?'Carry the ★ item':'Wear the ★ item';return 'Play the ★ card'}
+{const _a=bfAfter;bfAfter=function(S){const r=_a.apply(this,arguments);try{bfMarkBest()}catch(e){UI.lastErr='best '+e}return r}}
+// ---- a hand that scrolls says so: "+N ›" at the edge where cards are hidden (tap it to slide); the ★ card is slid into view ----
+function bfHandCue(){const hd=document.querySelector('.mine .hand');document.querySelectorAll('.hcue').forEach(e=>e.remove());if(!hd||!hd.classList.contains('scrolls'))return;
+  const host=hd.parentElement;if(getComputedStyle(host).position==='static')host.style.position='relative';
+  const upd=()=>{const q=hd.getBoundingClientRect();let L=0,Rn=0;hd.querySelectorAll(':scope>.card').forEach(c=>{const r=c.getBoundingClientRect();if(r.left+r.width/2<q.left)L++;else if(r.left+r.width/2>q.right)Rn++});
+    for(const [side,n] of [['l',L],['r',Rn]]){let e=host.querySelector('.hcue.'+side);if(!n){if(e)e.remove();continue}
+      if(!e){e=document.createElement('button');e.type='button';e.className='hcue '+side;e.setAttribute('aria-label',side==='r'?'More cards to the right':'More cards to the left');e.addEventListener('click',ev=>{ev.stopPropagation();hd.scrollBy({left:(side==='r'?1:-1)*hd.clientWidth*.7,behavior:'smooth'})});host.appendChild(e)}
+      e.textContent=side==='r'?'+'+n+' ›':'‹ +'+n;const hr=host.getBoundingClientRect();e.style.top=(q.top-hr.top+q.height/2-22)+'px'}};
+  upd();if(!hd.dataset.cue){hd.dataset.cue='1';hd.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true})}}
+window.addEventListener('resize',()=>{clearTimeout(bfHandCue.t);bfHandCue.t=setTimeout(()=>{try{bfHandCue()}catch(e){}},150)});   // a turn of the phone moves the hand: place the cues again
+function bfRevealBest(){try{const b=document.querySelector('.mine .hand .card.bf-best');if(b&&typeof dkReveal==='function'&&BF.pick==null){const r=b.getBoundingClientRect(),q=b.parentElement.getBoundingClientRect();if(r.left<q.left||r.right>q.right)dkReveal(b)}}catch(e){}try{bfHandCue()}catch(e){}}
+{const _m=bfMarkBest;bfMarkBest=function(){_m.apply(this,arguments);bfRevealBest();clearTimeout(BF.rvT);BF.rvT=setTimeout(bfRevealBest,80)}}

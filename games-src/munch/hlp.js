@@ -36,7 +36,7 @@ const HLP_STEPS={
  charity:{target:hfirst('.mine .hand .card.play','.mine .hand'),title:'Too many cards',text:'You hold more cards than the limit. Tap a glowing card and give it away.',pic:()=>HP.hand()},
  window:{target:hfirst('#prompt .acts button','.arena'),title:'A rival’s door',text:'They are about to kick. Curse them with a glowing card, or let them go on.',pic:()=>HP.curse()},
  fight:{target:hfirst('.fbtns .fightb','.fbtns button','.arena .vs'),title:'The fight',text:'The bigger number wins. Tap Fight if you lead. Otherwise add cards, get help or run.',pic:()=>HP.swords()},
- meddle:{target:hfirst('.arena .vs','#prompt .acts button'),title:'A rival fights',text:'Play a glowing card to change their fight. Or tap Let it be.',pic:()=>HP.monster()},
+ meddle:{target:hfirst('.arena .row.mons .mon .card','.arena .vs','#prompt .acts button'),title:'A rival fights',text:'Play a glowing card to change their fight. Or tap Let it be.',pic:()=>HP.monster()},
  qHelp:{target:hfirst('#prompt .acts button'),title:'Asked for help',text:'A rival offers treasure to team up. Tap Help to join, or Refuse.',pic:()=>HP.help()},
  qWard:{target:hfirst('#prompt .acts button'),title:'A curse is coming',text:'Your ring can cancel it. Tap Cancel the curse, or let it happen.',pic:()=>HP.ward()},
  qRescue:{target:hfirst('#prompt .acts button'),title:'Caught!',text:'Use an escape card to dodge the Bad Stuff, or take it.',pic:()=>HP.run()},
@@ -174,9 +174,12 @@ function hlpCovers(){const bs=[...document.querySelectorAll('.gxh-bub.on:not(.gx
   const cs=[...document.querySelectorAll(HLP_CORE)].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<innerWidth&&q.top<innerHeight)
     .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2,t:cy-h/2,r:cx+w/2,b:cy+h/2}});
   return bs.some(b=>{const r=b.getBoundingClientRect();return cs.some(c=>r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t)})}
-function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(hlpCovers())document.querySelectorAll('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)').forEach(b=>b.classList.add('gxh-thru'))}
+// the phase bubble must also clear its own target's full box: on short screens move it just above or below the target (arrow hidden if it no longer points)
+function hlpClearOwn(){const b=document.querySelector('.gxh-bub.on[data-phase="post"]');if(!b)return;const st=HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();if(!te)return;const T=te.getBoundingClientRect(),r=b.getBoundingClientRect();
+  if(!(r.left<T.right&&r.right>T.left&&r.top<T.bottom&&r.bottom>T.top))return;const h=r.height,top=T.top-h-10>=4?T.top-h-10:T.bottom+10+h<=innerHeight-4?T.bottom+10:null;if(top==null)return;b.style.top=Math.round(top)+'px';const a=b.querySelector('.gxh-arr');if(a)a.style.visibility='hidden';if(hlpCovers())b.classList.add('gxh-thru')}
+function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();hlpClearOwn();if(hlpCovers())document.querySelectorAll('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)').forEach(b=>b.classList.add('gxh-thru'))}
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
-(function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)'))hlpUncover()}catch(e){}requestAnimationFrame(loop)})();
+(function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)'))hlpUncover();hlpClearOwn()}catch(e){}requestAnimationFrame(loop)})();
 (function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter();hlpUncover()}catch(e){UI.lastErr='hlp '+e}return r}})();
 // pick-ups, asks and overlays change the phase without a render: look again now and then (cheap, idempotent)
 (function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit){GXH.phase(hlpPhase());hlpUncover()}}catch(e){}return r}})();
