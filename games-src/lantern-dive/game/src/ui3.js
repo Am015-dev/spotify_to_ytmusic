@@ -15,13 +15,13 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && mode !== 'tutorial' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
+  { const e = document.getElementById('rstep'); if (e) e.remove(); } Object.assign(UI, { started: true, rstep: null, preReady: false, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && mode !== 'tutorial' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
 function newGame(mode, o) {
   o = o || {};
-  const opt = Object.assign({}, DEF, UI.opt || {}, o);
+  const opt = Object.assign({}, DEF, { mission: startDive() }, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
   if (mode === 'tutorial') { np = 3; opt.kind = 'log'; opt.mission = 1; opt.seats = [3, 2]; }   // the staged tutorial (ui12.js): you, Dag and Sumi
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
@@ -58,7 +58,7 @@ function nextAttempt(same) {
   LD.nextAttempt(G, { same: !fresh });
   const keep = { mode: UI.mode, cfg: UI.cfg };
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
+  Object.assign(UI, { preReady: false, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
   const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false;
   closePop(); render(); sndMusic(); autosave(); if (NET.on && isHost()) netPush(true); schedule();
 }
@@ -66,6 +66,7 @@ function nextAttempt(same) {
 function aiWants() {
   if (!G || G.phase === 'over') return false;
   for (const s of LD.pending(G)) if (G.players[s].ai) return true;
+  if (UI.mode === 'tutorial' && typeof tutPingDue === 'function' && tutPingDue()) return true;
   if (G.phase === 'play' && G.trick.plays.length === 0 && UI.mode !== 'tutorial') for (const p of G.players) if (p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)) return true;
   return false;
 }
@@ -76,12 +77,15 @@ function schedule() {
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length) return;
+  if (ruleStepCheck()) return;   // a special rule's first-time step is up (ui12.js)
   if (UI.mode === 'tutorial' && tutAuto()) return;
   if (UI.mode === 'tutorial' && tutPaused()) { UI.tm = setTimeout(schedule, 200); return; }
   try { if (storyCheck()) return; } catch (e) { console.error(e); }
   if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
+  if (UI.pingSel && !NET.on && UI.mode !== 'tutorial' && canSigNow(viewSeat())) return;   // the computers wait while you pick a card to signal
+  if (preWait() && !(G.players.some(p => p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)))) { try { coachCheck(); } catch (e) { } return; }   // the computer leader waits for your Ready
   if (aiWants()) {
-    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.25 + .6 * Math.random()));
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.08 + .14 * Math.random()));
     const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiTurn(); }, d); return;
   }
   if (hotSeat()) hotNext();
@@ -122,7 +126,7 @@ function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
   if (!canAct()) { if (G && !isOver() && !UI.busy) toast('Wait for your turn.'); else { const el = document.querySelector('#hand .hc[data-id="' + id + '"]'); if (el) { el.classList.add('nudge'); setTimeout(() => el.classList.remove('nudge'), 350); } } return; }
   const v = viewSeat(), ph = G.phase;
-  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (UI.pingSel) { const ok = pingSpots(v).has(id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card of a colour.'); return; } if (tutOn() && !GXT.act({ type: 'tap', what: 'pingsel', c: id })) return; UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
   if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('You cannot pass Lanterns.'); return; } UI.giveSel = id; doMove(m); return; }
   if (ph === 'play') {
     const T = G.trick, turn = T.turn;
@@ -146,10 +150,16 @@ function playSel() {
 // tap a job card on the table: it flies to your seat
 function tapJob(i) {
   if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
-  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Commander cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'The Captain cannot take that.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
   doMove(m);
 }
-// tap a ping spot on a card of your hand
+// confirm the card picked in Signal mode
+function sigStart() {
+  const v = viewSeat(); if (!canAct() || !canSigNow(v)) return;
+  if (tutOn() && !GXT.act({ type: 'tap', what: 'signal' })) return;
+  UI.pingSel = true; UI.sel = -1; fingerDone(); render();
+}
+function sigOk() { if (UI.sel < 0) { toast('Pick a glowing card first.'); return; } const id = UI.sel; tapPing(id); }
 function tapPing(id) {
   if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
   if (!m) { snd('error'); toast('You cannot show that card.'); return; }
@@ -237,22 +247,56 @@ async function playEvs(evs) {
     if (tr) {
       UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      render(); flyIn(pls); await wait(ANIM ? 320 : 0); if (tok !== UI.seq) return;
       UI.fz.win = true; render(); snd('trick');
       try { const me = viewSeat(), wn = tr.w === me ? 'You win' : pname(tr.w) + ' wins', wcs = suitOf(tr.wc); cap(wn + ' the trick with ' + cname(tr.wc), 'good', wcs === 4 ? 'The Lantern beats every colour.' : (tr.plays.some(p => suitOf(p.c) === 4) ? '' : 'Highest card of the led colour wins.')); } catch (e) { }
-      await wait(ANIM ? 2400 : 0); if (tok !== UI.seq) return;
+      await wait(ANIM ? (UI.mode === 'tutorial' ? 2400 : 850) : 0); if (tok !== UI.seq) return;
       await tutHoldWait(); if (tok !== UI.seq) return;
-      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(520); if (tok !== UI.seq) return;
-      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(1300); if (tok !== UI.seq) return; }
+      await sweepTo(tr.w); if (tok !== UI.seq) return;
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(200); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(UI.mode === 'tutorial' ? 1300 : 900); if (tok !== UI.seq) return; }
     } else {
-      render(); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? 1200 : 420) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
-      if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
+      render(); flyIn(pls); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? (UI.mode === 'tutorial' ? 1200 : 340) : 220) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      if (jb.length) { jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
     }
   } catch (e) { console.error(e); UI.fz = null; }
   UI.busy = false; UI.fz = null; UI.holdJobs = null; UI.fastT = false;
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
+}
+// ---- R5 feel: DOM card motion (the Pixi table animates its own copy, so these run only on the DOM table) ----
+const flyOK = () => !!(ANIM && document.body.animate && !(typeof PX !== 'undefined' && PX.on));
+function seatC(s) {
+  const el = s === viewSeat() ? document.querySelector('#mine .me') : document.querySelector('#opp [data-key="seat' + s + '"]') || document.querySelector('#opp .seat[data-seat="' + s + '"]');
+  if (!el) return null; const r = el.getBoundingClientRect(); return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+}
+// a played card travels from its diver's seat to its slot in the trick (~260 ms); your own cards come from your hand
+function flyIn(pls) {
+  if (!flyOK() || !pls || !pls.length) return;
+  for (const p of pls) {
+    const el = document.querySelector('#slots .tslot[data-seat="' + p.seat + '"] .tc'); if (!el) continue;
+    let a = null; if (p.seat === viewSeat()) { const hr = $('#hand') && $('#hand').getBoundingClientRect(); if (hr) a = { x: hr.left + hr.width / 2, y: hr.top + 30 }; } else a = seatC(p.seat);
+    if (!a) continue; const r = el.getBoundingClientRect(), dx = Math.round(a.x - r.left - r.width / 2), dy = Math.round(a.y - r.top - r.height / 2);
+    el.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.45) rotate(' + (dx < 0 ? -10 : 10) + 'deg)', opacity: .5 }, { transform: 'translate(0,0) scale(1) rotate(0)', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  }
+}
+// the won trick's cards sweep together into the winner's seat
+async function sweepTo(w) {
+  if (!flyOK()) return; const a = seatC(w), els = Array.from(document.querySelectorAll('#slots .tc')); if (!a || !els.length) return;
+  els.forEach((el, i) => { const r = el.getBoundingClientRect(), dx = Math.round(a.x - r.left - r.width / 2), dy = Math.round(a.y - r.top - r.height / 2);
+    el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3)', opacity: 0 }], { duration: 300, delay: i * 20, easing: 'cubic-bezier(.5,0,.7,.4)', fill: 'forwards' }); });
+  await wait(300 + els.length * 20);
+}
+// a job done or broken gets its own beat: the chip pops with a ring and a big word rises from its owner
+function jobBeat(jb) {
+  for (const j of jb) {
+    const ok = j.st > 0, own = G.tasks[j.i] && G.tasks[j.i].owner;
+    if (own != null && own >= 0) floatAt(own, ok ? 'Job done!' : 'Job broken', ok ? 'jobok' : 'jobbad');
+    if (!ANIM || !document.body.animate) continue;   // job chips are DOM on both tables
+    document.querySelectorAll('[data-job="' + j.i + '"], [data-a="job"][data-i="' + j.i + '"]').forEach(el => el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' }, { transform: 'scale(1.35)', boxShadow: '0 0 0 6px ' + (ok ? 'rgba(80,220,140,.85)' : 'rgba(240,80,80,.85)') }, { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(0,0,0,0)' }], { duration: 700, easing: 'ease-out' }));
+  }
+  if (ANIM && document.body.animate) { const t = $('#table'); if (t && jb.some(j => j.st < 0)) t.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 300 }); }
 }
 function animatePass() {
   if (!document.body.animate || !ANIM) return;
