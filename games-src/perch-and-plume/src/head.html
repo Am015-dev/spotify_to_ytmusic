@@ -482,5 +482,37 @@ body.confirming #prompt{display:none}
 #whatbtn{order:1}#hand{order:2}#hpg{order:3}
 #act4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.a4{min-width:0}
 @media (max-width:999px) and (max-height:900px),(max-height:500px){.a4{min-height:46px;padding:2px 8px;gap:6px}.a4 .a4i{flex-basis:26px;height:26px}.a4 .a4i .fi,.a4 .a4i svg,.a4 .a4i .egi{width:24px;height:24px}.a4 .a4t b{font-size:15px;line-height:1.1}.a4 .a4t span{font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+/* FIXED6 short-portrait dock: the turn opens with round + goal, food + hint, all 4 actions and the hand strip on screen, no scroll.
+   The hide button rides beside a two-line round/goal panel (no separate head row), food shares a row with "What should I do?",
+   and the hand is a one-row strip of two whole 58 px cards (no half card cut by the edge) (picture, name, points, cost); tapping a bird still opens it big. */
+@media (max-width:999px) and (orientation:portrait){
+.gx-dock{position:relative}
+.gx-app:not(.gx-dock-min) .gx-dock-head{position:absolute;top:0;left:0;right:0;height:0;padding:0;z-index:3}
+.gx-app:not(.gx-dock-min) .gx-dock-head .gx-grab{position:absolute;top:4px;left:50%;margin-left:-22px}
+.gx-app:not(.gx-dock-min) .gx-dock-head .gx-dt{display:none}
+.gx-app:not(.gx-dock-min) .gx-dock-head .gx-ibtn{position:absolute;top:12px;right:8px;width:44px;height:44px;min-height:44px;padding:0}
+#dockbody{flex-direction:row;flex-wrap:wrap;align-content:flex-start;gap:4px;padding:12px 8px 8px}
+#dockbody>*{flex:1 1 100%;min-width:0}
+#dockbody>#trk{order:-3;flex:1 1 100%;margin-right:52px}
+#trk .trk{display:grid;grid-template-columns:auto auto;justify-content:start;align-items:center;gap:2px 10px;min-height:44px;padding:4px 10px;box-sizing:border-box;font-size:14px;line-height:1.2}
+#trk .tr-r b{font-size:14px}#trk .tr-c{font-size:14px}#trk .tr-w,#trk .cubes,#trk .tr-why{display:none}
+#trk .tr-g{grid-column:1 / -1;font-size:14px;line-height:1.2}#trk .tr-g b{display:none}#trk .tr-g::before{content:"Goal: ";font-weight:800;color:#e0a948}
+#dockbody>#foodrow{order:-2;flex:1 1 0;min-height:44px;gap:6px;margin:0}
+#foodrow .fl,#foodrow .fd small{display:none}
+#foodrow .fd.bon{min-height:44px;font-size:14px;padding:0 8px}
+#dockbody>#whatbtn:not([hidden]){order:-2;flex:0 0 auto;align-self:center;min-height:44px;padding:0 10px;font-size:14px;gap:4px}
+#whatbtn svg{width:20px;height:20px}
+#hand{padding:8px 2px 4px;gap:12px}
+#hand .bc.big:not(.sel){flex:0 0 calc((100% - 12px) / 2);scroll-snap-align:start;flex-direction:row;height:58px;min-height:0;overflow:visible}
+#hand .bc.big:not(.sel) .bk-pic{flex:0 0 44px;min-height:0;border-radius:6px 0 0 6px}
+#hand .bc.big:not(.sel) .bk-body{flex:1 1 0;min-width:0;padding:3px 5px;gap:2px;justify-content:space-between}
+#hand .bc.big:not(.sel) .bk-hd{display:block}
+#hand .bc.big:not(.sel) .bk-nm{font-size:14px;line-height:1.1;display:block}
+#hand .bc.big:not(.sel) .vpb{position:absolute;top:auto;bottom:2px;left:2px;right:auto;min-width:22px;height:22px;padding:0 4px;border-radius:11px;background:#23412f;color:#fff;transform:none;justify-content:center}
+#hand .bc.big:not(.sel) .vpb b{font-size:14px}#hand .bc.big:not(.sel) .vpb small{display:none}
+#hand .bc.big:not(.sel) .bk-cost .ci .fi{width:18px;height:18px}
+#hand .bc.big:not(.sel) .bk-st{display:none}
+#hand .bc.big:not(.sel) .bestb{top:-8px;left:2px;right:auto}
+}
 </style>
 </head>
