@@ -1,5 +1,5 @@
 // K-turn ("turn around") test (W486). Logic: the ship flies forward, then ends facing the way it came.
-// Spin dial: tapping a move on the wheel picks it.
+// Dial: tapping a move on the dial grid picks it.
 // Visual (needs GX_URL, e.g. GX_URL=http://127.0.0.1:8765): on a 390x844 touch phone, the dial icon's arrowhead, the ghost's nose
 // and the 3D ghost ship all point BACK down the screen for a K-turn, and forward for a straight.  Run: node reverse-test.js
 const fs=require('fs'),vm=require('vm'),path=require('path');let fails=0;const ok=(c,m)=>{if(!c){fails++;console.log('FAIL '+m)}else console.log('ok   '+m)};
@@ -21,11 +21,10 @@ const s3=r(`finalPose({x:400,y:100,h:Math.PI/2},40,{s:3,t:'S',d:0})`);ok(Math.ab
   ok(head&&head.headMid>8&&head.headTipBelow,'dial icon for the K-turn: arrowhead points down (backwards) '+JSON.stringify(head));
   const noseDir=async()=>p.evaluate(()=>{const ns=[...document.querySelectorAll('#bf path.bfnose')].map(n=>n.getBBox());const gs=[...document.querySelectorAll('#bf path.bfp.ghost')].map(n=>n.getBBox());if(!ns.length||!gs.length)return null;
     const g=gs[0],gc=g.y+g.height/2;let best=ns[0],bd=1e9;for(const n of ns){const d=Math.hypot(n.x+n.width/2-(g.x+g.width/2),n.y+n.height/2-gc);if(d<bd){bd=d;best=n}}return (best.y+best.height/2)-gc});
-  // spin like a thumb: drag along the rim one notch at a time until the move sits in the window, then lock it
-  const pickK=async i=>{for(let n=0;n<24;n++){const st=await p.evaluate(i=>{const r=document.querySelector('#bfdial .dface').getBoundingClientRect();const L=BF.dlist,k=L.findIndex(o=>o.i===i),n=L.length;let cur=((Math.round(-BF.drot/BF.dstep)%n)+n)%n;let d=k-cur;if(d>n/2)d-=n;if(d<-n/2)d+=n;return {cx:r.left+r.width/2,cy:r.top+r.height/2,R:r.width*.38,step:BF.dstep,d,done:UI.draft[BF.sel]===i}},i);
-      if(st.done&&st.d===0)break;const a0=0,a1=-Math.sign(st.d)*st.step;const pt=a=>[st.cx+Math.sin(a)*st.R,st.cy-Math.cos(a)*st.R];
-      await p.mouse.move(...pt(a0));await p.mouse.down();for(let j=1;j<=6;j++)await p.mouse.move(...pt(a0+(a1-a0)*j/6));await p.mouse.up();await p.waitForTimeout(250)}
-    ok(await p.evaluate(i=>UI.draft[BF.sel]===i,i),'spinning the dial puts move '+i+' in the window');await tap('[data-bf=dlock]')};
+  // the phone dial is a grid of moves: tap the move's cell, then lock it
+  const pickK=async i=>{const xy=await p.evaluate(i=>{const k=BF.dlist.findIndex(o=>o.i===i);const e=document.querySelector(`#bfdial .ditem[data-k="${k}"]`);if(!e)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},i);
+    if(xy)await p.touchscreen.tap(...xy);await p.waitForTimeout(300);
+    ok(await p.evaluate(i=>UI.draft[BF.sel]===i,i),'tapping the move on the dial picks move '+i);await tap('[data-bf=dlock]')};
   await pickK(kI);const dk=await noseDir();ok(dk!=null&&dk>0,`K-turn ghost nose points back down the screen (dy=${dk&&dk.toFixed(1)})`);
   const g3=await p.evaluate(()=>{const g=(BF.g3||[])[0];return g?Math.cos(g.rotation.y-G.ships.find(s=>s.side===0).h):null});ok(g3!=null&&g3<-0.99,'3D ghost ship is turned around ('+g3+')');
   await tap('.bfring.done, .bfring.need');const sI=await p.evaluate(()=>dialOf(ship(BF.sel)).findIndex(m=>m.t==='S'&&m.s===2));await pickK(sI);

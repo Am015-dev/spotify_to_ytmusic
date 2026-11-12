@@ -112,7 +112,7 @@ function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps)
   <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
 // ---- the render hook ----
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
-function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown();
+function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown()+(G.ex&&G.ex.roundCap?'/'+G.ex.roundCap:'');
   const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
 function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
   if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};
