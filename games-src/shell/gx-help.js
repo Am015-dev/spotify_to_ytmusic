@@ -7,7 +7,8 @@
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -123,15 +124,16 @@
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -147,11 +149,14 @@
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -159,12 +164,12 @@
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -185,7 +190,7 @@
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -248,7 +253,7 @@
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
