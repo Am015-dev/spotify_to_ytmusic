@@ -1,7 +1,7 @@
 // Every tap of a full default game by touch (R3 review: "5-17 Continue taps a day"). Title -> Play -> the default game (Marooned, 2 players,
 // Easy island) to the result screen, like a new player who taps whatever button is showing as soon as it shows (no speed-up, no waiting for
 // the scenes to play by themselves). Each day (R8: ✨ only suggests): for every pawn ✨, the place the finger shows, the ⭐ row; ✨ once more for
-// the pile; Start day (HINT=1, the flagged hint mode; default: ✨ Plan it for me, Start day). OWN=1: an own plan (random glowing places and rows; after a refused Start day it follows the board line). Every question: the ✨ pick (PICK=first: the first option).
+// the pile; Start day (HINT=1, the flagged hint mode; default: ✨ Plan it for me, Start day). OWN=1: an own plan (random glowing places and rows, scrolled into view in the place pop-up; after a refused Start day it follows the board line; an open Camp status sheet is closed first). Every question: the ✨ pick (PICK=first: the first option).
 // Counts decision taps (plan, Start day, answers, a space to choose) and non-decision taps (Continue, Start day N from the summary, OK).
 // FAIL when non-decision taps > 60, a page error, or no result screen.   node taps-test.js [WxH=390x844] [seed]
 const PW=require('playwright');const fs=require('fs'),path=require('path');
@@ -28,7 +28,8 @@ const HTML=path.join(__dirname,'shipwreck.html');const LIVE=path.join(__dirname,
    // R8: ✨ only suggests. FOLLOW (default): ✨, then the place the finger shows, then the ⭐ row, for every pawn. OWN=1: my own plan (random places and rows).
    if(!OWN&&!HINT&&(st.st==='plan'||st.st==='plan2')&&planned!==st.day){await shot('plan-'+st.day);if(await tap('#bf [data-a=suggest]')){planned=st.day;count(true,st.day,'plan');await sleep(450);continue}}
    if((OWN||HINT)&&(st.st==='plan'||st.st==='plan2')){if(planned!==st.day){planned=st.day;await shot('plan-'+st.day)}
-     if(await centre('#ppop .bfr')){const ok=OWN?await p.evaluate(rn=>{const rs=[...document.querySelectorAll('#ppop .bfr:not(.no)')];if(!rs.length)return false;const r=rs[Math.floor(rn*rs.length)].getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},rnd()):await centre('#ppop .bfr[data-rec="1"]')||await centre('#ppop .bfr[data-place]');
+     if(await p.evaluate(()=>!!(PHO.pop&&PHO.pop.k==='status'))&&await tap('#ppop .pp-x')){count(false,st.day,'close status');await sleep(350);continue}
+     if(await centre('#ppop .bfr')){const ok=OWN?await p.evaluate(rn=>{const rs=[...document.querySelectorAll('#ppop .bfr:not(.no)')];if(!rs.length)return false;const e=rs[Math.floor(rn*rs.length)];e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},rnd()):await centre('#ppop .bfr[data-rec="1"]')||await centre('#ppop .bfr[data-place]');
        if(ok){await p.touchscreen.tap(ok[0],ok[1]);count(true,st.day,'row');await sleep(450);continue}}
      const fr=await p.evaluate(own=>{const short=planProblems().some(m=>/needs \d pawn/.test(m));const f=humanFree().filter(q=>q.c!=null||(!own&&BF.recTile(q))||(own&&short&&!!BF.msg));const c=curPawn();return {n:f.length,swap:f.length&&(!c||!f.some(q=>q.id===c.id))?f[0].id:null}},OWN);const free=fr.n;
      if(fr.swap&&await tap('#bf [data-pawn="'+fr.swap+'"]')){count(true,st.day,'pawn');await sleep(400);continue}

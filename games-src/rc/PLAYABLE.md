@@ -58,3 +58,11 @@ Gates and results are in the commit message and the report; scripts: `tutor-test
   until 900 s (1206 decision taps, cause not found yet: next fixer, dump planProblems/BF.msg/#ppop when dec>200). Sparkle plan
   390x844 s13 RESCUED day 10, 375x667 s14 RESCUED day 11. 0 page errors.
 - `?hint=1` left OFF (not debugged this round).
+
+## Fix 5 (12 Nov 2026)
+- The 375x667 s12 own-plan stall was the driver, not the game. The place pop-up shows ~2 of its rows at 375x667 (145 of 622 px,
+  the next row peeks) and the driver tapped rows by their box without scrolling: a row below the fold put the tap on the board line
+  (#phlabel), which opens Camp status; the driver then tapped hidden glows under the sheet for 900 s. A player scrolls the rows, and
+  the sheet has a clear ×. taps-test OWN now scrolls the chosen row into view and closes an open Camp status sheet first. No game change.
+- Own-plan touch games, seeds 11-16 at 375x667 and 390x844: 12/12 finish (lost days 5-9, 54-134 decision taps, ≤34 non-decision), 0 errors.
+- Left: at 375x667 the place pop-up hides most rows (only a peek says there are more); a taller pop-up or a "more ▾" cue is a design call.
