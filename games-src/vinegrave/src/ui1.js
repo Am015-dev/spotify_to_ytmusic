@@ -18,12 +18,12 @@ const rw = (k, n) => n === 1 ? V.RNAME[k] : PL[k];
 const resWords = r => Object.keys(r).map(k => r[k] + ' ' + rw(k, r[k])).join(' and ');
 function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span class="num">${r[k]}</span>${ic(k)}</span>`).join(''); }
 function opsHTML(ops) { return `<span class="sm">${esc(V.opText(ops))}</span>`; }
-function effShort(c) {   /* a card's effect in 1-4 words for the card face ("+1 compass", "draw 2") */
+function effShort(c, nb) {   /* a card's effect in 1-4 words for the card face ("+1 compass", "draw 2") */
   if (c.t === 'fear') return 'No effect';
   const one = o => o.g ? (Object.keys(o.g).length > 2 ? '+' + Object.values(o.g).reduce((a, b) => a + b, 0) + ' goods' : Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ')) : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
   const ops = (c.ops || []).map(one).filter(Boolean); if (ops.indexOf('trade') >= 0) return 'Trade'; if (ops.indexOf('choose') >= 0) return 'Choose one';
   const u = []; ops.forEach(o => { const f = u.find(x => x.o === o); if (f) f.n++; else u.push({ o, n: 1 }); });
-  return u.slice(0, 2).map(x => x.n > 1 ? x.o + ' twice' : x.o).join(', ');
+  return u.slice(0, 2).map(x => (x.n > 1 ? x.o + ' twice' : x.o).replace(/(\+\d+|draw|free|cheap) /g, nb ? '$1\u00a0' : '$1 ')).join(' ');
 }
 const CARD_GLYPH = { item: 'coin', art: 'compass', fear: 'guard' };
 function cardHTML(id, o) {
@@ -32,7 +32,7 @@ function cardHTML(id, o) {
   const lab = c.name + (c.fa ? ', free action' : '') + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Pays travel: ' + V.TNAME[c.tr] + '.';
   return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="pic" data-art="card-${id}"><svg class="pg" aria-hidden="true"><use href="#s-${CARD_GLYPH[c.t] || 'card'}"/></svg></span>${cost}<span class="tr">${ic(c.tr)}</span>${c.vp ? `<span class="vp${c.vp < 0 ? ' neg' : ''}">${c.vp > 0 ? '+' + c.vp : c.vp}</span>` : ''}
-    <span class="cn">${esc(c.name)}</span><span class="ef">${c.fa ? 'Free: ' : ''}${esc(effShort(c))}</span></button>`;
+    <span class="cn">${esc(c.name)}</span><span class="ef">${c.fa ? 'Free: ' : ''}${esc(effShort(c, o.a === 'row'))}</span>${o.need ? `<span class="need">${o.need}</span>` : ''}</button>`;
 }
 function pawnSVG(s, cls) { return `<svg class="meep ${cls || ''}" viewBox="0 0 20 28" style="color:${s === -2 ? '#9a9486' : HEX[s]}" aria-hidden="true"><use href="#s-meep"/></svg>`; }
 function siteName(x) { return x.tile ? V.SITE[x.tile].name : (x.lvl === 1 ? 'Hidden ruin' : 'Deep ruin'); }
@@ -116,7 +116,9 @@ function render() {
   const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
-  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
+  const canMain = myTurn() && !q && L.some(m => m.t !== 'pass' && !m.free);
+  const needOf = id => { if (!canMain) return ''; const c = V.CARDS[id], k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); return n > 0 ? 'Need ' + n + ' more ' + ic(k) : ''; };
+  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r, need: gR[r] ? '' : needOf(id) }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
   renderTray(L, q, me, actor);
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
   if (typeof artApply === 'function') artApply();
@@ -162,17 +164,17 @@ function selInfo(S) {
   const me = G.p[UI.view], ms = movesFor(S.k, S.x);
   if (S.k === 'pawn') return { t: 'Drag your explorer onto a glowing site.' };
   if (S.k === 'hand') { const c = V.CARDS[me.hand[S.x]]; if (!c) return { t: '' };
-    if (ms[0]) return { t: c.name + '. ' + c.text + ' Tap again or drag it up.', go: ms[0], label: 'Play' };
+    if (ms[0]) return { t: c.name + '. ' + c.text + ' Or drag it up.', go: ms[0], label: 'Play' };
     return { t: c.name + '. ' + (c.t === 'fear' ? 'No effect. Use it to pay travel.' : c.t === 'art' ? 'Playing it needs 1 tablet.' : c.text) }; }
   if (S.k === 'row') { const id = G.row[S.x]; if (!id) return { t: '' }; const c = V.CARDS[id], cw = c.cost + ' ' + (c.t === 'item' ? rw('coin', c.cost) : rw('compass', c.cost));
-    return ms[0] ? { t: c.name + ', ' + cw + '. ' + c.text + ' Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
+    return ms[0] ? { t: c.name + '. ' + c.text, go: ms[0], label: 'Buy · ' + cw } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
     if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
     if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
     const pay = payWords(VG.payPlan(G, UI.view, x.cost));
     if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
     return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
-  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]) + ' Tap again to climb.', go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
+  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
   return { t: '' };
 }
 function trackWhy() {   /* why the research path cannot climb now: the missing goods, in words */

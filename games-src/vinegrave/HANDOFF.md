@@ -1,3 +1,11 @@
+# FIXED3 (12 Nov 2026, R17 review 6.8): market + feel
+- Market: only cards you can pay glow; the rest show "Need N more" (coin/compass); the dock button reads "Buy · N coins". Effect lines wrap
+  (no clipping) at 390 and 375; hand effect lines wrap too. Tutorial "Tap again" steps now point at the Play/Dig/Explore/Fight/Buy button.
+- Feel (src/ui2.js walkTo, gainFly, popUnder, tickPts, rivalCap): explorers walk the trail to their site; goods fly into their counters and bump;
+  point pills sit under the chip (never on it) and the chip counts up; a rival's played card comes out of its chip; rival move caption on the board.
+- Gates: logic 132/132, rules-test, ai-gate, guided-tut-test, drag-test, touch-test FULL 390x844 + 375x667, guard: all PASS, 0 errors.
+- Left: rulebook page quotes in rules-notes.md not checked against a full rulebook (none reachable this session).
+
 # FIXED2 r2 (12 Nov 2026): research assistants
 - Engine (src/engine.js "research assistants", data V.ASST): 8 helpers, 3 face up; magnifier arriving on row 2 or 5 hires one (question
   h:'asst'), notebook arriving there turns one gold; free move {t:'asst',k} once a round, rests until round end; max 2 (a third hire upgrades).

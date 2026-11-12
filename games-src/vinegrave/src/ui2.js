@@ -145,7 +145,7 @@ function aiStep() {
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
-  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) el0.classList.add('aimark'); }
+  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) el0.classList.add('aimark'); rivalCap(cap); }
   turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
     const b = snapS(s), F = m ? fxBefore(m, s) : {};
@@ -153,7 +153,7 @@ function aiStep() {
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
     const d = showEvents(s); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#prompt').textContent = cap; actFx(m, s, F, b); }
-    turnWait(UI.fast ? 0 : Math.max(d, 1100), () => { UI.busy = false; after(); });   /* step 2: the result stays readable before the next step */
+    turnWait(UI.fast ? 0 : Math.max(d, 1100), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
   });
 }
 // ---------------------------------------------------------------- turn presentation: caption, target pulse, pieces fly, score pop; tap to speed up
@@ -214,16 +214,59 @@ function fxBefore(m, s) {
   if (m.t === 'dig' || m.t === 'disc') { F.pawn = UI.dropFrom || (s === UI.view ? R($('#pawns .pawn.mine:last-of-type') || $('#pawns .pawn.mine')) : R(chipOf(s))); F.ps = s;
     if (s === UI.view) { const pl = VG.payPlan(G, s, G.sites[m.s].cost); if (pl) F.pay = pl.cards.map(i => { const e = $(`#hand .cd[data-i="${i}"]`); return e ? { r: R(e), html: e.outerHTML } : null; }).filter(Boolean); } }
   if (m.t === 'buy' || (m.t === 'play' && s === UI.view)) { const e = moveEl(m, s); if (e) F.card = { r: UI.dropFrom || R(e), html: e.outerHTML }; }
+  if (m.t === 'play' && s !== UI.view && s >= 0 && G.p[s].hand[m.i] && chipOf(s)) F.card = { r: R(chipOf(s)), html: cardHTML(G.p[s].hand[m.i]), w: 64, h: 90 };
+  if (s >= 0 && G.p[s]) F.pts = VG.score(G, s).total;
   return F;
 }
 function actFx(m, s, F, b) {   /* after a move: pieces fly to where they go, the place it lands bounces, then what it gave pops */
   if (UI.fast || !G || !m) return; F = F || {}; const el = moveEl(m, s), tr = el && el.getBoundingClientRect();
-  if (F.pawn && tr) fly(F.pawn, `<span class="pawn">${pawnSVG(F.ps)}</span>`, tr, { w: 40, h: 54, end: .7, fade: false, dur: 560 });
+  if (F.pts != null) { const cb = chipOf(s) && chipOf(s).querySelector('.pts b'); if (cb && VG.score(G, s).total !== F.pts) cb.textContent = F.pts; }
+  if (F.pawn && tr) walkTo(F.pawn, m.s, F.ps);
   (F.pay || []).forEach((p, k) => setTimeout(() => fly(p.r, p.html, tr, { end: .3 }), 80 + k * 90));
-  if (F.card) { const dest = m.t === 'buy' ? (s === UI.view ? $('#hand') : chipOf(s)) : $('#map'); fly(F.card.r, F.card.html, dest && dest.getBoundingClientRect(), { end: m.t === 'play' ? 1.3 : .4 }); }
-  if (el && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat' || m.t === 'res' || m.t === 'temple')) { setTimeout(() => { const n = moveEl(m, s); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, m.t === 'dig' || m.t === 'disc' ? 520 : 0); }
-  const vpAt = chipOf(s), resAt = s === UI.view ? $('#myres') : chipOf(s), d = diffText(s, b);
-  if (d) setTimeout(() => { if (d.res) popAt((resAt && resAt.getBoundingClientRect()) || tr, { res: d.res }); if (d.vp) setTimeout(() => popAt(vpAt && vpAt.getBoundingClientRect(), { vp: d.vp, neg: d.neg }), d.res ? 500 : 0); }, 560);
+  if (F.card) { const dest = m.t === 'buy' ? (s === UI.view ? $('#hand') : chipOf(s)) : $('#map'); fly(F.card.r, F.card.html, dest && dest.getBoundingClientRect(), { end: m.t === 'play' ? 1.3 : .4, w: F.card.w, h: F.card.h, dur: m.t === 'play' && s !== UI.view ? 800 : 520 }); }
+  if (el && (m.t === 'beat' || m.t === 'res' || m.t === 'temple' || ((m.t === 'dig' || m.t === 'disc') && !F.pawn))) { setTimeout(() => { const n = moveEl(m, s); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, m.t === 'dig' || m.t === 'disc' ? 520 : 0); }
+  const d = diffText(s, b), late = m.t === 'dig' || m.t === 'disc' ? 900 : 560;
+  if (d) setTimeout(() => {
+    if (d.res) { if (s === UI.view) gainFly(b, tr); else popUnder(chipOf(s), { res: d.res }); }
+    if (d.vp) setTimeout(() => { popUnder(chipOf(s), { vp: d.vp, neg: d.neg }); tickPts(s, F.pts); }, d.res ? 450 : 0);
+  }, late);
+}
+/* the explorer walks the trail: in at the camp edge, up through the nearest site of each lower level, onto its site */
+function walkTo(from, si, ps) {
+  if (!from || reducedMo() || UI.fast) return; const x = G.sites[si], tEl = $(`.site[data-i="${si}"]`), map = $('#map'); if (!tEl || !map) return;
+  const c = e => { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, mr = map.getBoundingClientRect(), T = c(tEl);
+  const pts = [[from.left + from.width / 2, from.top + from.height / 2], [Math.max(mr.left + 20, Math.min(mr.right - 20, T[0])), mr.bottom - 8]];
+  for (let lv = 0; lv < x.lvl; lv++) { let best = null, bd = 1e9; G.sites.forEach((y, i) => { if (y.lvl !== lv) return; const e = $(`.site[data-i="${i}"]`); if (!e) return; const p = c(e), dd = Math.abs(p[0] - T[0]); if (dd < bd) { bd = dd; best = p; } }); if (best) pts.push(best); }
+  pts.push(T);
+  const occ = tEl.querySelector('.occ'); if (occ) occ.style.opacity = '0';
+  const g = document.createElement('div'); g.className = 'walker'; g.innerHTML = pawnSVG(ps); document.body.appendChild(g);
+  const o = pts[0], frames = pts.map((p, k) => ({ transform: `translate(${p[0] - 20}px,${p[1] - 44}px) rotate(${k % 2 ? -6 : 6}deg)`, offset: k / (pts.length - 1) }));
+  g.style.left = '0px'; g.style.top = '0px'; const dur = 380 + 230 * (pts.length - 1);
+  try { g.animate(frames, { duration: dur, easing: 'ease-in-out', fill: 'forwards' }); } catch (e) { }
+  setTimeout(() => { g.remove(); if (occ) occ.style.opacity = ''; const n = $(`.site[data-i="${si}"]`); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, dur + 40);
+}
+/* your goods: each one flies from where you got it into its counter, and the counter bumps */
+function gainFly(b, from) {
+  if (!b) return; const a = snapS(UI.view), rcs = [...document.querySelectorAll('#myres .rc')];
+  V.RES.forEach((k, j) => { const dlt = a.res[k] - b.res[k], rc = rcs[j]; if (!dlt || !rc) return;
+    if (dlt > 0 && from) for (let n = 0; n < Math.min(dlt, 3); n++) setTimeout(() => fly(from, `<span class="rv">${ic(k)}</span>`, rc.getBoundingClientRect(), { w: 30, h: 30, end: .8, dur: 480 }), n * 110);
+    setTimeout(() => { const r2 = document.querySelectorAll('#myres .rc')[j]; if (r2) { r2.classList.remove('bump'); void r2.offsetWidth; r2.classList.add('bump'); } }, 480 + Math.min(dlt, 3) * 110); });
+}
+/* a pill just under a score chip (never on it) */
+function popUnder(chip, t) {
+  if (!chip) return; const r = chip.getBoundingClientRect(); popAt({ left: r.left, width: r.width, top: r.bottom + 30, height: 0 }, t);
+}
+/* the chip's points count up to the new total */
+function tickPts(s, from) {
+  const chip = chipOf(s), bEl = chip && chip.querySelector('.pts b'); if (!bEl || from == null) return; const to = VG.score(G, s).total; if (to === from) return;
+  const t0 = performance.now(), dur = 600; bEl.classList.remove('tick'); void bEl.offsetWidth; bEl.classList.add('tick');
+  const st = () => { const k = Math.min(1, (performance.now() - t0) / dur), e = chipOf(s), bb = e && e.querySelector('.pts b'); if (!bb) return; bb.textContent = Math.round(from + (to - from) * k); if (k < 1) requestAnimationFrame(st); };
+  requestAnimationFrame(st);
+}
+/* the rival's move in one line on the board, where your eyes are */
+function rivalCap(t) {
+  let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }
+  if (!t) { e.classList.remove('on'); return; } const m = $('#map'); e.style.top = ((m ? m.getBoundingClientRect().top : 120) + 6) + 'px'; e.textContent = t; e.classList.add('on');
 }
 function turnWait(ms, fn) { clearTimeout(turnWait.t); turnWait.fn = fn; turnWait.t = setTimeout(() => { turnWait.fn = null; fn(); }, ms); }
 function speedUp() { if (!turnWait.fn || !G || myTurn()) return; const f = turnWait.fn; turnWait.fn = null; clearTimeout(turnWait.t); f(); }
