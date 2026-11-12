@@ -64,7 +64,7 @@
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
