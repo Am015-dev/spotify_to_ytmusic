@@ -391,3 +391,8 @@ html.short #sc .tr span:nth-child(2){display:none}
 #tb.zm #mine .sg{gap:2px}
 #crew.zm .sg.cmp .plate .pdot{display:none}
 #crew.zm .sg.cmp .plate b{max-width:58px}
+
+/* tight compact rows: still-crowded short screens */
+#crew.zm.tight .sg.cmp{min-height:34px;padding-top:1px;padding-bottom:1px}
+#crew.zm.tight .sg.cmp .plate{height:28px}
+#crew.zm .sg.cmp .tile{min-width:22px}

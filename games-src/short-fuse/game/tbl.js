@@ -177,10 +177,12 @@ document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest
 function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll');balance(mine,tm,4,mine.querySelector('.stand.two')?20:0);
   const cw=crew.clientWidth-12;const sgs=[...crew.querySelectorAll('.sg')];
   for(const s of sgs.filter(x=>x.classList.contains('cmp'))){const n=s.querySelectorAll('.tile').length,ns=s.querySelectorAll('.stand').length;const pw=s.querySelector('.plate').offsetWidth;const avail=cw-pw-14-(ns-1)*6;
-    let tw=Math.min(28,Math.floor((avail+2)/Math.max(1,n))-2),lines=1;if(tw<22){tw=22;lines=Math.ceil(n*24/avail)}
+    let tw=Math.min(28,Math.floor((avail+2)/Math.max(1,n))-2),lines=1;if(tw<23){tw=23;lines=Math.ceil(n*25/avail)}
     s.style.setProperty('--tw',tw+'px');s.style.setProperty('--th',(lines===1?30:Math.floor((38-(lines-1)*2)/lines))+'px')}
   const zx=sgs.find(x=>x.classList.contains('zx'));let tw=TMINW;
   if(zx){const two=zx.querySelectorAll('.stand').length>1;const pw=zx.querySelector('.plate').offsetWidth+4;for(tw=54;tw>21;tw--){zx.style.setProperty('--tw',tw+'px');zx.style.setProperty('--th',tileH(tw,1.3)+'px');balance(zx,tw,3,pw+(two?20:0));if(crew.scrollHeight<=crew.clientHeight+1)break}}
+  // rows still too tall: tight rows (shorter plate and row) so every plate stays inside the crew area, clear of my stand
+  if(crew.scrollHeight>crew.clientHeight+1&&!crew.classList.contains('tight')){crew.classList.add('tight');for(const s of sgs.filter(x=>x.classList.contains('cmp')))s.style.setProperty('--th',(parseInt(s.style.getPropertyValue('--th'))>22?22:parseInt(s.style.getPropertyValue('--th')))+'px')}
   if(!TBL.zhint&&sgs.length>1&&!lsGet('sf_zhint',0)){TBL.zhint=1;lsSet('sf_zhint',1);setTimeout(()=>toast('Tap a crewmate to see their wires'),400)}
   return {tw,fit:crew.scrollHeight<=crew.clientHeight+1}}
 const RACK={rg:9,lb:12};   // extra px: the gap between wrapped rows (return arrow) and the label above each of two stands (table.css)
@@ -195,7 +197,7 @@ const TMIN=44,TMINW=30;function tileH(tw,ratio){return Math.max(TMIN,Math.round(
 function balance(root,tw,g,gut){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=(st.parentNode.clientWidth||st.clientWidth)-(gut||0);const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
-  document.documentElement.classList.toggle('short',window.innerHeight<640);tb.classList.remove('zm');crew.classList.remove('zm');crew.querySelectorAll('.sg').forEach(x=>{x.style.removeProperty('--tw');x.style.removeProperty('--th')});
+  document.documentElement.classList.toggle('short',window.innerHeight<640);tb.classList.remove('zm');crew.classList.remove('zm','tight');crew.querySelectorAll('.sg').forEach(x=>{x.style.removeProperty('--tw');x.style.removeProperty('--th')});
   const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
   let plateH=44;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
@@ -340,7 +342,7 @@ function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
 // the crew wires: onTile (ui.js) sets the target; a number picked first fires here
 function afterTile(){const V=UI.V;if(UI.sel&&UI.sel.mode==='multi'&&UI.sel.tg.length===UI.sel.n){const m={a:'multi',kind:UI.sel.kind,tg:UI.sel.tg};const err=legal(m,V.seat);if(err){toast(err);UI.sel.tg.pop();refresh();return}act(m,V.seat);return}
   if(UI.sel&&UI.sel.mode==='dual')autoFire();else if(UI.sel&&UI.sel.mode==='choose'&&V&&!nextStep(UI.sel)){const rem=selRemaining(UI.sel);if(rem.length===1)act(rem[0],V.seat)}}
-document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){{const rt=e.target.closest('#mine .tile.known.r:not(.cut)');if(rt&&G&&!G.over&&!UI.brief){if(UI.tut){const w=G.st[+rt.dataset.s].w[+rt.dataset.k];if(w)redTip(w.u)}else tapTile(+rt.dataset.s,+rt.dataset.k);return}}{const dt=e.target.closest('#tb .tile.crew');const V=UI.V;if(dt&&G&&!G.over&&V&&V.seat>=0&&!UI.brief&&!UI.tut&&!UI.coach){let msg='';   // a tap on a wire that cannot be picked is never silent
+document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.rk,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){{const rt=e.target.closest('#mine .tile.known.r:not(.cut)');if(rt&&G&&!G.over&&!UI.brief){if(UI.tut){const w=G.st[+rt.dataset.s].w[+rt.dataset.k];if(w)redTip(w.u)}else tapTile(+rt.dataset.s,+rt.dataset.k);return}}{const dt=e.target.closest('#tb .tile.crew');const V=UI.V;if(dt&&G&&!G.over&&V&&V.seat>=0&&!UI.brief&&!UI.tut&&!UI.coach){let msg='';   // a tap on a wire that cannot be picked is never silent
     if(V.q&&V.q.who===V.seat&&V.q.kind==='infoStd')msg='Not theirs: tap one of YOUR wires.';else if(decider()!==V.seat&&decider()>=0)msg='Wait: it is '+nm(decider())+"'s turn.";else if(dt.classList.contains('cut'))msg='That wire is already cut.';
     if(msg){dt.classList.remove('buzz');void dt.offsetWidth;dt.classList.add('buzz');setTimeout(()=>dt.classList.remove('buzz'),800);toast(msg);return}}}const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
   if(TBL.dragEnded&&Date.now()-TBL.dragEnded<300){return}

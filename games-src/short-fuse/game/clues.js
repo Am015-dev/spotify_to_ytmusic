@@ -15,21 +15,26 @@ function clRead(){const V=UI.V;const key=G.mission+':'+G.logN+':'+G.turn+':'+V.s
 const clName=c=>c===14?'red':c===13?'yellow':String(c);
 function clList(vals){const a=[...vals].sort((x,y)=>x-y).filter(c=>c!==14).map(clName);if(!a.length)return 'red';const s=a.length>4?a[0]+' to '+a[a.length-1]:a.length===1?a[0]:a.slice(0,-1).join(', ')+' or '+a[a.length-1];return s}
 function clSel(){const s=UI.sel;return s&&s.mode==='dual'&&!s.tool&&!s.two&&s.fu==null?s:null}
+// a risky wire (might be red, or cannot be the picked number) does not glow while a sensible one does: it stays tappable (two-tap warning) as .rk
+function clQuiet(sel){const all=[...document.querySelectorAll(sel)];const bad=e=>e.classList.contains('cl-no')||e.classList.contains('cl-red');if(!all.some(e=>!bad(e)))return;
+  all.filter(bad).forEach(e=>{e.classList.remove('glow');e.classList.add('rk');if(!e.classList.contains('cl-red')&&!e.querySelector('.clm'))mark2(e)})}
+function mark2(e){if(getComputedStyle(e).position==='static')e.style.position='relative';const i=document.createElement('i');i.className='clm';i.textContent='!';i.setAttribute('aria-hidden','true');e.appendChild(i)}
 function clDecorate(){
   if(!CL.css){CL.css=1;const st=document.createElement('style');st.textContent=
-    '#tb .tile.cl-no{opacity:.35;filter:saturate(.35)}#tb .tile.cl-sure{outline:3px solid #8cf06a;outline-offset:-3px}'+
+    '#tb .tile.cl-no{opacity:.35;filter:saturate(.35)}#tb .tile.rk{opacity:.6;filter:saturate(.5);cursor:pointer}#tb .tile.rk.cl-no{opacity:.35}#tb .tile.cl-sure{outline:3px solid #8cf06a;outline-offset:-3px}'+
     '#tb .tile .clm{position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:#e8322a;color:#fff;font:800 14px/20px system-ui,sans-serif;text-align:center;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.5);z-index:3;font-style:normal}'+
     '#tb .tile.cl-sure .clm{display:none}'+
     '#tb .tile .clv{position:absolute;left:0;right:0;bottom:2px;text-align:center;font:800 14px/16px system-ui,sans-serif;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000;pointer-events:none;font-style:normal;white-space:nowrap;letter-spacing:-.5px}';document.head.appendChild(st)}
-  document.querySelectorAll('#tb .cl-no,#tb .cl-sure,#tb .cl-red').forEach(e=>e.classList.remove('cl-no','cl-sure','cl-red'));document.querySelectorAll('#tb .clm,#tb .clv').forEach(e=>e.remove());
+  document.querySelectorAll('#tb .rk').forEach(e=>{e.classList.remove('rk');e.classList.add('glow')});document.querySelectorAll('#tb .cl-no,#tb .cl-sure,#tb .cl-red').forEach(e=>e.classList.remove('cl-no','cl-sure','cl-red'));document.querySelectorAll('#tb .clm,#tb .clv').forEach(e=>e.remove());
   if(!clOn())return;const by=clRead();if(!by)return;const sel=clSel();
   const mark=e=>{e.classList.add('cl-red');if(getComputedStyle(e).position==='static')e.style.position='relative';const i=document.createElement('i');i.className='clm';i.textContent='!';i.setAttribute('aria-hidden','true');e.appendChild(i)};
   if(sel&&sel.tg.length===1&&sel.v==null){const t=sel.tg[0];const c=by[G.st[t.st].w[t.k].u];if(!c)return;
-    document.querySelectorAll('#mine .tile.glow.g-val').forEach(e=>{const sl=G.st[+e.dataset.s].w[+e.dataset.k];if(sl&&sl.v!=null&&!c.vals.has(CODE(sl.v)))e.classList.add('cl-no')});return}
+    document.querySelectorAll('#mine .tile.glow.g-val').forEach(e=>{const sl=G.st[+e.dataset.s].w[+e.dataset.k];if(sl&&sl.v!=null&&!c.vals.has(CODE(sl.v)))e.classList.add('cl-no')});clQuiet('#mine .tile.glow.g-val');return}
   const code=sel&&sel.v!=null&&!sel.tg.length?CODE(sel.v):null;
   document.querySelectorAll('#crew .tile.glow.g-tgt').forEach(e=>{const c=by[+e.dataset.u];if(!c)return;
     if(code!=null){if(!c.vals.has(code))e.classList.add('cl-no');else if(c.vals.size===1)e.classList.add('cl-sure')}
     if(c.vals.has(14)&&!e.classList.contains('cl-no'))mark(e)});
+  clQuiet('#crew .tile.glow.g-tgt');
   // a short note on every hidden crew wire the clues narrow to 1-3 values ("7", "5·6", "3-5"): the notes a careful player keeps
   document.querySelectorAll('#crew .tile.back:not(.cut)').forEach(e=>{const c=by[+e.dataset.u];if(!c)return;const t=clNote(c.vals);if(!t)return;
     if(getComputedStyle(e).position==='static')e.style.position='relative';const i=document.createElement('i');i.className='clv';i.textContent=t;i.setAttribute('aria-hidden','true');e.appendChild(i)})}
@@ -42,7 +47,7 @@ function clNote(vals){const a=[...vals].filter(c=>c!==14).sort((x,y)=>x-y);if(!a
     if(!sel&&/^Your turn: tap a crew wire/.test(t)){const any=Object.values(by).some(c=>c.vals.has(14));return any?'Your turn. A ! wire might be red.':t}}catch(e){}return t}})();
 // the "safe to say" check: a dim wire, or a wire that might be red, needs a second tap (each wire warns once per turn, so going
 // back and forth between two wires never leaves every tap answered by a warning only)
-document.addEventListener('click',e=>{if(!e.target.closest)return;const t=e.target.closest('#tb .tile.cl-no,#tb .tile.cl-red');if(!t||!clOn())return;
+document.addEventListener('click',e=>{if(!e.target.closest)return;const t=e.target.closest('#tb .tile.rk');if(!t||!clOn())return;
   const u=+t.dataset.u;const tk=G.turn+':'+G.logN;if(CL.okT!==tk){CL.okT=tk;CL.okS=new Set()}if(CL.okS.has(u))return;CL.okS.add(u);e.stopPropagation();e.preventDefault();
   const sel=clSel();const mine=t.classList.contains('mine');let msg;
   if(t.classList.contains('cl-no'))msg=mine?'Clues say that wire can’t match. Tap again to say it.':'Clues say it can’t be '+(sel&&sel.v!=null?VNm(sel.v):'that')+'. Tap again to point.';
