@@ -379,7 +379,7 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 #bd.pv.tall .pvch-s,#bd.pv.tall .pvch-n{font-size:14px!important;letter-spacing:0!important}
 #bd.pv .chip{overflow:hidden}
 /* 390+ board: painted space 104 wide, name 14px on its banner (2 lines at most), reward 14px under it, "shared" 14px on the painting */
-#bd.pv.tall .pv-board .tile.pv-place::before{width:108px;height:64px}
+#bd.pv.tall .pv-board .tile.pv-place::before{width:108px;height:var(--pvph,64px)}   /* --pvph: a shorter picture when the row band is short (set in render) */
 #bd.pv.tall .pv-board .pv-nm{width:108px;font-size:14px;line-height:1.04;padding:1px 3px 2px}
 #bd.pv.tall .pv-board .tile.pv-place .pv-shtag{font-size:14px;top:44px;left:calc(50% - 52px);padding:0 5px;line-height:16px}
 #bd.pv.tall .pv-board .pv-sw b,#bd.pv.tall .pv-board .pv-sw span,#bd.pv.tall .pv-board .pv-sw b .pv-it{font-size:14px!important;line-height:1.08}
@@ -466,3 +466,5 @@ html #prompt,html.ph #prompt,html .gx-bar #prompt,html.sk .gx-bar #prompt,html.p
 /* short phones: a compact coach tip uses its full width for the text (the OK button keeps the title row), so it fits the band over the counts */
 html:has(#bd.pv.tiny) .gxh-bub.gxh-compact{padding-top:4px;padding-bottom:4px}html:has(#bd.pv.tiny) .gxh-bub.gxh-compact .gxh-tt{min-height:30px;line-height:30px}
 html:has(#bd.pv.tiny) .gxh-bub.gxh-compact .gxh-tx{padding-right:0}
+/* R35: a short board band (390x763) shrinks the place picture (--pvph); the shared tag sits small on the picture's lower left corner */
+#bd.pv.tall .pv-board.pv-shrunk .tile.pv-place .pv-shtag{top:calc(var(--pvph,64px) - 16px);left:calc(50% - 54px);font-size:14px;line-height:15px;padding:0 3px;z-index:3}

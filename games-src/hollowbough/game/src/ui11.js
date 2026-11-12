@@ -141,5 +141,5 @@ function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
   // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
-  void st; void nb; try { GXH.phase(hlpPhase()); } catch (e) { }
+  void st; void nb; try { const ph = hlpPhase(); GXH.phase(ph === 'turn' && guideOn() ? null : ph); } catch (e) { }   // R35: while the finger shows the move, the 'Your turn' bubble stays away (one message at a time)
 }

@@ -847,6 +847,8 @@ function pvRender() {
   pvSetTab(UI.pvTab, true);
   mead.scrollLeft = UI.pvMx || 0;
   meadFix();   // R35: a glowing meadow card is never left off the edge
+  { const sp = bd.querySelector('.pv-spots.pv-board:not(.pv-board-t):not(.pv-board-s)'); if (sp && sp.clientHeight) { const low = () => { const q = sp.getBoundingClientRect().top; let m = 0; for (const e of sp.querySelectorAll('.tile, .tile *')) { const r = e.getBoundingClientRect(); if (r.height) m = Math.max(m, r.bottom - q); } return m; };
+    let over = low() - (sp.clientHeight - 2); if (over > 0) { sp.classList.add('pv-shrunk'); sp.style.setProperty('--pvph', Math.max(52, 64 - Math.ceil(over)) + 'px'); } } }   // every row of places fits the board (390x763: the last row was cut by 4-8 px)
   if (tiny) { spots.scrollLeft = UI.pvBx || 0; spots.addEventListener('scroll', () => { UI.pvBx = spots.scrollLeft; }, { passive: true });
     const gs = [...spots.querySelectorAll('.glow')], q = spots.getBoundingClientRect(), vis = e => { const r = e.getBoundingClientRect(); return r.left >= q.left - 1 && r.right <= q.right + 1; };
     if (gs.length && !gs.some(vis)) pvScrollTo(gs[0]); }   // a glowing place is always in view
