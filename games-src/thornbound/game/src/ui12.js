@@ -160,7 +160,7 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
       if(c==='chapter'&&window.CAMPAIGN&&typeof GXC!=='undefined'){showStart();GXC.play(window.CAMPAIGN.chapters[0].id);return}
       if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open();return}
       showStart();UI.sv='setup';UI.cfgOpen=false;renderStart()},   // Play a real game: the setup screen, one tap from a real game
-    onExit:()=>{tutLeave();showStart()}})}
+    onExit:()=>{tutLeave();showStart();if(pro&&window.CAMPAIGN&&typeof GXC!=='undefined')GXC.open()}})}   // Skip in the Story prologue: on to the chapter map
 // the staged deal: the seed's opening hand with the Dockside Broker (2 Lore, for the Lore buy) in place of the Hearth Priestesses; the computer plays at x6 (animations cap at x4) so no wait is long
 function tutStage(){const P=G.pl[0],a=P.hand.indexOf(4),b=P.deck.indexOf(1);if(a>=0&&b>=0){P.hand[a]=1;P.deck[b]=4;const o=G.q&&G.q.o&&G.q.o[0];if(o)o.forEach(m=>{if(m.id===4){m.id=1;m.k='b:1';m.label='Bid with '+cinfo(1).name}})}
   if(UI._tutSpd==null)UI._tutSpd=UI.speed;UI.speed=6}
