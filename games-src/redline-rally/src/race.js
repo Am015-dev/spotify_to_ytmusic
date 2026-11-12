@@ -42,10 +42,9 @@ function raceWorld(now) {
   for (var p = c.pos + 1; p <= pv.L; p++) { var q2 = tk.space(p, 0); cx.beginPath(); cx.arc(q2.x, q2.y, 7, 0, 7); cx.fill(); }
   var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = 0.5 + 0.25 * Math.sin(now / 180); cx.translate(g.x, g.y); cx.rotate(g.a);
   cx.strokeStyle = pv.spin ? '#ff3b30' : '#fff'; cx.lineWidth = 5; cx.setLineDash([10, 8]); rr(-40, -20, 80, 40, 9); cx.stroke(); cx.setLineDash([]); cx.restore();
-  var lb = pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe';
+  var lb = (pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe') + (pv.slip && !pv.spin ? ' · slip +' + slipN(G) : '');   /* one label at the ghost car, not two */
   cx.font = '900 30px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.lineWidth = 7; cx.strokeStyle = '#000'; cx.fillStyle = pv.spin ? '#ff5a4a' : pv.burn ? '#ffb347' : '#8cf0b4';
   cx.strokeText(lb, g.x, g.y - 34); cx.fillText(lb, g.x, g.y - 34);
-  if (pv.slip) { cx.font = '800 24px sans-serif'; cx.fillStyle = '#8ce6ff'; cx.strokeText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); cx.fillText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); }
 }
 
 /* ---------- screen layer: dashboard, leaderboard, flash, lights ---------- */

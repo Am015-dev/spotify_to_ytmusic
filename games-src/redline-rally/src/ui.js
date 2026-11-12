@@ -91,7 +91,7 @@ function you() { return G.cars[UI.seat]; }
 function planFor(ci) {
   if (ci == null) return startRound();
   UI.seat = ci; UI.focus = ci; var c = G.cars[ci];
-  UI.sel = []; UI.gear = c.gear; UI.boost = false;
+  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = [];   /* last round's pops leave before you plan: only the move preview is on the track */
   if (G.hot) { UI.lockModal = true; modal('<h2>Pass to ' + esc(c.name) + '</h2><p>Hide the other hands. Tap when it is your turn.</p><button class="big" id="rdy" style="width:100%">I am ' + esc(c.name.split(' ')[0]) + '</button>'); $('#mx').hidden = true; $('#rdy').onclick = function () { UI.lockModal = false; closeModal(); drawPlan(); }; return; }
   drawPlan();
 }
@@ -115,8 +115,8 @@ function drawPlan() {
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() ? '' : 'glow'); });
-  var boOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!boOk) UI.boost = false;
-  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + (UI.mode !== 'tutorial' ? '<button class="bo' + (UI.boost ? ' on' : '') + '" id="boB" aria-pressed="' + !!UI.boost + '"' + (boOk ? '' : ' disabled') + ' title="Boost: after the reveal pay 1 heat to flip one more card">Boost' + (UI.boost ? ' ✓' : '') + '</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  UI.boost = false;   /* boost is never planned: it is offered after the reveal (React step) */
+  h += '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
   if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
@@ -126,7 +126,6 @@ function drawPlan() {
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
   if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
-  if ($('#boB')) $('#boB').onclick = function () { sfx('tap'); UI.boost = !UI.boost; drawPlan(); };
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.' : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
@@ -170,7 +169,7 @@ function cardHtml(x, sel, dead, j, cls) {
 function sugMark(sel) { var b = $(sel); if (b) { b.classList.add('sug'); b.insertAdjacentHTML('afterbegin', '<em class="sgt">Suggested</em>'); } }   /* Hints on: the Suggest planner's answer to boost / slipstream */
 function suggest() {
   var c = you(), p = suggestPlan(G, c);   /* plans your own hand from your seat with the strongest planner */
-  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = UI.mode !== 'tutorial' && !!p.boost; drawPlan();   /* races: Suggest also sets the Boost toggle */
+  UI.gear = p.gear; UI.sel = p.idx.slice(); UI.boost = false; drawPlan();   /* boost is offered after the reveal; Suggest marks its advice there */
 }
 function commit() {
   if (tutOn() && !GXT.act({ type: 'tap', what: 'go' })) return; sfx('go');
@@ -261,39 +260,44 @@ function showPlayed(e) {
   });
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
-function askBoost() {   /* react step: the cards are revealed (panel), now boost or not */
-  var p = G.pend;
+function qTimer(ms, label, btnSel, done) {   /* smart default: a visible countdown on the skip button; touching the panel stops it (then the buttons decide) */
+  if (tutOn() || UI.fast) return; var b = $(btnSel); if (!b) return; var t0 = performance.now(), base = label, stop = false;
+  b.classList.add('qt'); b.style.setProperty('--qt', '0');
+  var pn = $('#panel'), halt = function () { stop = true; clearInterval(UI.qT); var x = $(btnSel); if (x) { x.classList.remove('qt'); x.textContent = base; } if (pn) pn.removeEventListener('pointerdown', halt, true); };
+  if (pn) pn.addEventListener('pointerdown', halt, true); UI.qHalt = halt;
+  clearInterval(UI.qT); UI.qT = setInterval(function () { if (stop) return; var k = Math.min(1, (performance.now() - t0) / ms), x = $(btnSel); if (!x) { halt(); return; }
+    x.style.setProperty('--qt', k.toFixed(3)); x.textContent = base + ' · ' + Math.ceil((ms - (performance.now() - t0)) / 1000); if (k >= 1) { halt(); done(); } }, 100);
+}
+function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost, once per turn. Asked only when legal (1+ engine heat). */
+  var p = G.pend, bc = G.cars[p.car], q2 = bc.pl2;
   /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
   if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
-  if (!tutOn()) {   /* R3: obvious answers are given for you (fewer question taps): asked only when a boost is safe even with a 4 flip */
-    /* races: you set Boost while planning (toggle); after the reveal it is applied unless an average flip would now spin you. No question. */
-    var bc = G.cars[p.car], q2 = bc.pl2, want = !!(bc.plan && bc.plan.boost), av = Math.round(avgSpeed(bc)), risk = q2 ? cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + av), p.speed + av + 1, q2.lim) > bc.eng - 1 : true;
-    if (!want) return Promise.resolve(false);
-    setMsg(risk ? 'Speed ' + p.speed + '. Boost skipped: it could spin you.' : 'Speed ' + p.speed + '. Boost!'); return wait(450).then(function () { return !risk; });
-  }
-  setPhase('react'); setMsg('Speed ' + p.speed + '. Boost: 1 heat for a flipped card?');
+  var av = Math.round(avgSpeed(bc)), L0 = q2 ? landing(G, bc, q2.from + p.speed) : 0, risk = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 4), p.speed + 4, q2.lim) > bc.eng - 1;
+  var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
+  setPhase('react'); setMsg('Speed ' + p.speed + '. Boost? Pay 1 heat, flip a card, add it.' + (risk ? ' A big flip could spin you.' : nc && !tutOn() ? ' Corner in ' + (nc.d + 1) + '.' : ''), risk ? 'warn' : '');
   var old = $('#bq'); if (old) old.remove();
-  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y" id="boostY">Boost -1 heat</button></div>');
-  if (hintsOn() && UI.mode !== 'tutorial') sugMark(suggestBoost(G, G.cars[p.car]) ? '#boostY' : '#boostN');
+  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (risk ? ' (risky)' : '') + '</button></div>');
+  if (hintsOn() && UI.mode !== 'tutorial') sugMark(sug ? '#boostY' : '#boostN');
   return new Promise(function (res) {
-    var fin = function (v) { var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
+    var fin = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
     $('#boostY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); fin(true); };
     $('#boostN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boostno' })) return; fin(false); };
+    qTimer(BOOSTMS, 'No boost', '#boostN', function () { fin(false); });   /* no boost by itself; the hint marks Boost when it is the better play */
     if (UI.fast) setTimeout(function () { fin(false); }, 10);
   });
 }
+var BOOSTMS = 2500, DISCMS = 2500;
 function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
   if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
   var c = G.cars[G.pend.car], sel = [], done = null;
-  if (!tutOn() && (c.hand.filter(function (x) { var u = upgId(x); return u ? UPG[u].sp <= 1 : x === '1'; }).length < 3 || c.dAsk >= G.round - 2)) return Promise.resolve([]);   /* R3: asked only when 3+ slow cards (Brake, 1) clog the hand, at most every third round */
-  if (!tutOn()) c.dAsk = G.round;
+  /* rulebook: every round, after moving, you may discard any cards except Heat and Stress. Nothing is pre-selected; Keep all (or the countdown) skips */
   setPhase('discard');
   var paint = function () {
     var h = '<div class="who">Discard step</div><div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
     h += '</div><div class="slipq"><button id="discN">Keep all</button><button class="y" id="discY"' + (sel.length ? '' : ' disabled') + '>Discard ' + sel.length + '</button></div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
-    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Tap cards to throw away, or keep all.');
+    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Discard step: drop cards you do not want (not Heat or Stress), or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
@@ -302,9 +306,8 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
     $('#discN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discno' })) return; done([]); };
   };
   return new Promise(function (res) {
-    done = function (v) { clearInterval(UI.discT); var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
-    /* the discard step keeps everything by itself after 5 s unless you touch a card (one tap fewer each round) */
-    if (!tutOn()) { var left = 5; UI.discT = setInterval(function () { if (sel.length) { clearInterval(UI.discT); var b0 = $('#discN'); if (b0) b0.textContent = 'Keep all'; return; } left--; var b = $('#discN'); if (b) b.textContent = 'Keep all · ' + left; if (left <= 0) done([]); }, 1000); var b1 = $('#discN'); if (b1) b1.textContent = 'Keep all · 5'; }
+    done = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
+    qTimer(DISCMS, 'Keep all', '#discN', function () { done([]); });   /* keeps everything by itself unless you touch the hand */
     if (UI.fast) setTimeout(function () { res([]); }, 10);
   });
 }

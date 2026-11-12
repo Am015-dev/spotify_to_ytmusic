@@ -15,13 +15,14 @@ function race(levels, seed, human) {   /* human: car 0 is a player who taps Sugg
       const N = X.T(G).N; let near = false; for (let d = 1; d <= 8; d++) if (X.T(G).corners[(c.pos + d) % N]) near = true;
       let g = Math.min(4, Math.max(1, c.gear + (near ? -1 : 1))); const opts = X.gearOpts(c).map(o => o.g); if (!opts.includes(g)) g = c.gear;
       const val = x => { const u = X.upgId(x); return u ? X.UPG[u].sp : x === 'X' ? 2 : +x; };
-      const idx = c.hand.map((x, j) => j).filter(j => c.hand[j] !== 'H').sort((a, b) => val(c.hand[b]) - val(c.hand[a])).slice(0, X.needCards(c, g));
+      if (process.env.G2) g = near ? Math.min(2, c.gear + 1) : Math.min(4, c.gear + 1); if (!opts.includes(g)) g = c.gear;   /* the reviewer's player: gear 2 near a corner sign */
+      const idx = process.env.TOUCH ? c.hand.map((x, j) => j).filter(j => c.hand[j] !== 'H').slice(0, X.needCards(c, g)) : c.hand.map((x, j) => j).filter(j => c.hand[j] !== 'H').sort((a, b) => val(c.hand[b]) - val(c.hand[a])).slice(0, X.needCards(c, g));
       if (X.submitPlan(G, c.i, { gear: g, idx, boost: false })) X.submitPlan(G, c.i, { gear: c.gear, idx: idx.slice(0, X.needCards(c, c.gear)), boost: false }); } });
     if (!NAIVE) G.cars.forEach(c => { if (c.human && !c.fin && !c.plan) { const p = X.suggestPlan(G, c); const e = X.submitPlan(G, c.i, { gear: p.gear, idx: p.idx, boost: false }); if (e) throw new Error('suggest plan refused: ' + e); } });
     X.startResolve(G);
     let guard = 0; while (G.phase === 'resolve' && guard++ < 500) {
       const q = G.pend; if (!q) { X.resolveNext(G); continue; }
-      if (q.t === 'boost') X.boostChoice(G, X.suggestBoost(G, G.cars[q.car])); else if (q.t === 'slip') X.slipChoice(G, X.suggestSlip(G, G.cars[q.car])); else X.discardChoice(G, q.car, []);
+      if (q.t === 'boost') { const c = G.cars[q.car], N = X.T(G).N; let near = false; for (let d = 1; d <= 8; d++) if (X.T(G).corners[(c.pos + q.speed + d) % N]) near = true; X.boostChoice(G, NAIVE ? c.eng >= 5 && !near : X.suggestBoost(G, c)); } else if (q.t === 'slip') X.slipChoice(G, X.suggestSlip(G, G.cars[q.car])); else X.discardChoice(G, q.car, []);
     }
   }
   const rank = X.rankList(G), out = {};
@@ -58,6 +59,6 @@ for (const l of ['easy', 'normal', 'hard']) {
 }
 }
 /* D: a plain newcomer (no Suggest) on default Easy should finish mid-pack on average, not last */
-{ NAIVE = true; let pl = 0, pod = 0; for (let s = 0; s < N; s++) { const r = race(['you', 'easy', 'easy', 'easy', 'easy'], 13000 + s, 'easy'); pl += r.out[0].place; if (r.out[0].place <= 3) pod++; }
-  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%'); if (pl / N > 3.6) { console.log('FAIL plain newcomer on easy'); bad = 1; } NAIVE = false; }
+{ NAIVE = true; let pl = 0, pod = 0, nsp = 0; for (let s = 0; s < N; s++) { const r = race(["you", "easy", "easy", "easy", "easy"], 13000 + s, "easy"); pl += r.out[0].place; nsp += r.out[0].spins; if (r.out[0].place <= 3) pod++; }
+  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%', 'spins/race', (nsp / N).toFixed(2)); if (pl / N > 3.6) { console.log('FAIL plain newcomer on easy'); bad = 1; } NAIVE = false; }
 process.exit(bad);

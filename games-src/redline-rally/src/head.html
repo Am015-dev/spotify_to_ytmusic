@@ -72,6 +72,8 @@ button.qt{appearance:none;border:0;background:transparent;color:var(--gold);curs
 .reveal{display:flex;gap:6px;justify-content:center;align-items:center;min-height:calc(var(--cw)*1.4)}
 .slipq{display:flex;gap:8px}.slipq button{flex:1;min-height:52px;border-radius:12px;border:2px solid #3b4a68;background:#1d2636;font-weight:900;font-size:17px}
 .slipq .y{background:linear-gradient(#1f7a46,#175c35);color:#fff;border:0}
+.slipq .y.risk{background:linear-gradient(#8a5a12,#6b430b)}
+.slipq button.qt{background:linear-gradient(90deg,#33476b calc(var(--qt)*100%),#1d2636 calc(var(--qt)*100%))}
 /* ---- modal ---- */
 #modal{position:fixed;inset:0;background:rgba(5,8,14,.82);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
 .sheet{position:relative;width:min(520px,100%);max-height:100%;overflow:auto;background:var(--panel);border:1px solid #3a4866;border-radius:16px;padding:18px 16px 16px}
@@ -112,6 +114,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 #banner.on{display:flex;animation:bnIn .3s ease-out}
 #banner i{width:14px;height:14px;border-radius:50%;background:var(--bc,#ffc23a);flex:0 0 auto}
 #banner.round i{display:none}
+#banner.rate{left:8px;transform:none;max-width:calc(100% - 140px);font-size:15px;padding:6px 12px}   /* the round rating stays clear of the minimap (top right) */
 @keyframes bnIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
 #msg{font-size:16px;line-height:1.3;min-height:44px;display:flex;align-items:center;justify-content:center;padding:6px 12px;max-height:3.3em;overflow:hidden}
 #gears .gl{font-size:14px;line-height:1.1;max-width:46px;font-weight:800}

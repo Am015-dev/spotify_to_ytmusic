@@ -60,3 +60,13 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Small screens: top bar fits 375 (pill words hidden < 390), pops drawn in screen space inside the board and clear of the minimap,
   opaque minimap, start lights a small strip top-left on short boards, podium title on a dark plate, place-aware losing line.
 - Tutorial spin-out: the Stress card now shows in hand; the stall uses it as the one playable card. race-touch.js = full default race by touch.
+
+## W496 round 4 (R9 re-review 4.0 FAIL fixes)
+- Rules: boost toggle removed; boost is asked after the reveal every turn with 1+ engine heat ("No boost" default after 2.5 s,
+  "risky" tag, Suggested mark with Hints). Discard step offered every round (no slow-card / every-third-round gate), nothing
+  pre-selected, "Keep all" default after 2.5 s. Wording quoted in rules-notes.md. Logic R73-R75.
+- Tutorial: discard any non-Heat/Stress card, boost question after the reveal (as raced), Brake/Burst line.
+- Easy rivals slower (ai.js AIP.easy): sim plain newcomer who boosts at 5+ heat avg 2.6-2.7, podium ~78%.
+- Board: last round's pops cleared when you plan; one preview label ("safe · slip +2"); round rating banner left of the minimap.
+- race-touch.js: plain player = sim-levels D (biggest cards, gear down near corners, boost at 5+ heat); gate counts skip taps.
+- Open: dashboard still overlays the bottom of the 375 board; Go->next decision ~10 s with the two 2.5 s defaults.

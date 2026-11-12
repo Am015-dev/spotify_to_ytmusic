@@ -77,6 +77,7 @@ function tutSteps() {
     info('space', 2, 'Two cars fit per space, so a full space stops you behind.', 'space'),
     info('corner', 2, 'The corner sign ahead is its speed limit: 5.', 'corner'),
     info('engine', 2, 'Your engine holds 6 heat, and speeding through corners burns it.', 'engine', eng),
+    info('bb', 2, 'Your deck also holds Brake (speed 0) and Burst (speed 5).', null),
     card('c24', 2, '4', 'Tap a 4.'),
     card('c24b', 2, '4', 'Tap the other 4 for speed 8, three over the limit.'),
     go('go2', 2, 'Tap Go: each point over the limit burns 1 heat.', 'burn'),
@@ -98,13 +99,13 @@ function tutSteps() {
     card('c61b', 6, '1', 'Tap the other 1: speed 4, plus 1 for adrenaline.'),
     go('go6', 6, 'Tap Go to pull up right beside Juno.'),
     { id: 'slip', rule: 'slip', say: 'Next to a car, slipstream gives 2 free spaces: tap it.', target: function () { return $('#slipY'); }, ready: pend('slip'), wait: { type: 'tap', match: function (a) { return a.what === 'slip'; } }, side: 'top' },
-    { id: 'disc', rule: 'discard', say: 'After moving you may discard: tap a 3 you do not want.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
-    { id: 'discgo', say: 'Tap Discard 1, then you draw back to 7.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
+    { id: 'disc', rule: 'discard', say: 'Discard any card but Heat or Stress after moving: tap a 3.', target: function () { var c = G.cars[UI.seat]; for (var j = 0; j < c.hand.length; j++) if (c.hand[j] === '3') return document.querySelector('#panel .cd[data-i="' + j + '"]'); return null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'dcard' && G.cars[UI.seat].hand[a.i] === '3'; } }, side: 'top' },
+    { id: 'discgo', say: 'Tap Discard 1 to draw to 7; Keep all skips this step.', target: function () { var b = $('#discY'); return b && !b.disabled ? b : null; }, ready: pend('disc'), wait: { type: 'tap', match: function (a) { return a.what === 'discgo'; } }, side: 'top' },
     card('c74', 7, '4', 'Tap the 4.'),
     card('c72', 7, '2', 'Tap the 2.'),
     card('c71', 7, '1', 'Tap the 1 for speed 7.'),
     go('go7', 7, 'Tap Go: your cards show first, then you may boost.'),
-    { id: 'boost', rule: 'boost', say: 'Boost pays 1 heat to flip a card and add it.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
+    { id: 'boost', rule: 'boost', say: 'After the reveal, boost once: pay 1 heat, flip, add the card.', target: function () { return $('#boostY'); }, ready: pend('boost'), wait: { type: 'tap', match: function (a) { return a.what === 'boost'; } }, side: 'top' },
     { id: 'finish', rule: 'finish', say: 'You won, and the others race on until all finish.', target: cv, ready: function () { return !!UI.tutOver; }, wait: null, side: 'bottom' }
   ];
 }
