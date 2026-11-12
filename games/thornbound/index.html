@@ -949,8 +949,9 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
 .gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
-.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
-.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap;min-width:0;overflow:hidden}
+@media (max-width:480px){.gxt-dots{display:none}}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
@@ -1686,7 +1687,8 @@ const GX={key:'gx',open:null,
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -1802,15 +1804,16 @@ const GX={key:'gx',open:null,
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -1826,11 +1829,14 @@ const GX={key:'gx',open:null,
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -1838,12 +1844,12 @@ const GX={key:'gx',open:null,
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -1864,7 +1870,7 @@ const GX={key:'gx',open:null,
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -1927,7 +1933,7 @@ const GX={key:'gx',open:null,
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
@@ -1955,6 +1961,15 @@ const GX={key:'gx',open:null,
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -2007,7 +2022,7 @@ const GX={key:'gx',open:null,
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
@@ -2147,7 +2162,8 @@ const GX={key:'gx',open:null,
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
-    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -2165,8 +2181,8 @@ const GX={key:'gx',open:null,
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
-    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
-    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -2175,7 +2191,7 @@ const GX={key:'gx',open:null,
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }
