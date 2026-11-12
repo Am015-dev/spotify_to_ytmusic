@@ -3,6 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof newGame === 'function' && typeof UI !== 'undefined' && typeof renderAll === 'function' && typeof GXT !== 'undefined'; };
   var $ = function (s) { return document.querySelector(s); };
+  var tutRunning = function () { return (typeof GXCOACH !== 'undefined' && !!GXCOACH.running) || (typeof tutOn === 'function' && !!tutOn()); };
   // a 3-player game (you vs 2 computer houses), no menus, tips off, waiting at YOUR first decision
   function table(seed) {
     try { GXH.setEnabled(false); } catch (e) { }
@@ -34,16 +35,17 @@
   });
 
   GXS.add({
+    // the tutorial is the spotlight walk (GXT) since W489; the old coached game (GXCOACH) still counts
     id: 'tb-story-start', name: 'Story after Skip tutorial', ask: 'Skip tutorial: is the chapter map next?', seed: 6, when: function () { return booted() && typeof storyOpen === 'function' && typeof GXC !== 'undefined' && !!window.CAMPAIGN; },
     setup: function () {
       try { GXH.setEnabled(false); } catch (e) { }
       showStart(); storyOpen();   // what the Story button does: first time, the tutorial comes first
-      return GXS.wait(function () { return GXCOACH.running && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
+      return GXS.wait(function () { return tutRunning() && document.querySelector('[data-gxt-skip]'); }, 10000).then(function () { return new Promise(function (r) { setTimeout(r, 500); }); });
     },
     checks: [
-      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return GXCOACH.running || 'no tutorial'; } },
+      { kind: 'fn', name: 'the tutorial opened first (not seen yet)', fn: function () { return tutRunning() || 'no tutorial'; } },
       { kind: 'text', sel: '[data-gxt-skip]', re: /skip tutorial/i, name: 'Skip tutorial label' },
-      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: GXCOACH.running, map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
+      { kind: 'tap', sel: '[data-gxt-skip]', name: 'tap Skip tutorial', state: function () { return { tut: tutRunning(), map: !!document.querySelector('.gxc-map-on .gxc-map'), start: !document.getElementById('start').hidden && !document.querySelector('.gxc-map-on') }; },
         expect: function (a, b) { return (!b.tut && b.map) || (b.tut ? 'tutorial still running' : b.start ? 'went back to the title screen, not the chapter map' : 'blank: no chapter map'); } },
       { kind: 'visible', sel: '.gxc-map-on .gxc-map', name: 'chapter map' },
       { kind: 'fn', name: 'map has chapter 1 to play, and no tutorial strip is left', fn: function () { var n = document.querySelectorAll('.gxc-map-on button, .gxc-map-on [data-ch]').length; return (n >= 2 && !document.querySelector('.gxt-top')) || (n < 2 ? 'chapter map is empty' : 'tutorial strip left over'); } },

@@ -103,3 +103,4 @@ html.tb-bk-choir .bidc.back[data-b=choir]{background:#120b0e url(media/back-moth
 /* chapter map: one message at a time (only the newest "Beat chapter N first." note shows) */
 .gxc .gxc-toast:not(:last-child){display:none}
 @media (min-width:900px){.rank.pic,.ovwhy{max-width:640px;margin-left:auto;margin-right:auto}.ovcard{max-width:960px;margin-left:auto;margin-right:auto}}
+body.tb-bubturn #tbturn{visibility:hidden}

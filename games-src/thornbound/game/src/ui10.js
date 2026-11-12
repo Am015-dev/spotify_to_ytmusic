@@ -28,6 +28,8 @@ const cardDriven=M=>!!M&&(M.kind==='bid'||M.kind==='place'||M.kind==='tie');
 function handTap(id){const M=UI.bf;
   if(M&&M.aut&&autMoves(id).length){if(UI.autCard===id&&Date.now()-(UI._autT||0)<500)return;UI._autT=Date.now();UI.autCard=UI.autCard===id?null:id;if(typeof sfx==='function')sfx('tap');renderAll();return}
   const cm=M&&M.kind?cardMoves(id):[];
+  // a card you can't use for the current decision never opens a sheet over the prompt: a short note instead (long-press still reads the card)
+  if(!cm.length&&M&&M.kind){UI.hand=null;if(typeof sfx==='function')sfx('tap');const ln=(($('#tbturn .tbt-line')||{}).textContent||'').trim();if(typeof bfMsg==='function')bfMsg('You can\u2019t play this card now.'+(ln?' '+ln:''));return}
   if(!cm.length){UI.hand=null;openPop('card',{id});return}
   if(cardDriven(M)){
     if(UI.hand===id){if(cm.length===1){commitCard(id,cm[0]);return}UI.hand=null;renderAll();return}
@@ -60,7 +62,7 @@ function renderSpots(){const el=$('#spots');if(!el)return;if(!G||!UI.V){el.inner
   const showBack=has&&!G.bidRev;
   if(!P||isPassing()||(!has&&!asking)){if(el._h!==''){el._h='';el.innerHTML=''}return}
   const S=UI.bs||360;const w=Math.round(Math.max(40,Math.min(60,S*.13))),h=Math.round(w*1.4308);
-  const glow=asking&&UI.hand!=null,rec=asking&&M.rec&&M.rec.id!=null;const retk=M&&M.kind==='bidRes'&&M.mv.some(m=>m.t==='return');
+  const glow=asking&&UI.hand!=null,rec=asking&&M.rec&&M.rec.id!=null;const retk=M&&M.kind==='bidRes'&&M.mv.some(m=>m.t==='return')&&!(UI._recShown&&M.sug&&M.sug.t!=='return');   // hints on: the spot glows only when taking your card back IS the suggestion
   const h2='<button class="bspot'+(glow?' glow hot':'')+(glow&&rec?' rec':'')+(has?' full':'')+(retk?' glow':'')+'" id="bidspot" data-a="spot" style="width:'+w+'px;height:'+h+'px" aria-label="'+(has?'Your bid':'Bid spot')+'">'+(has?'<span class="bs-c" data-owner="'+me+'" data-up="1">'+cardEl(P.bid,w).outerHTML+'</span>':'<span class="bs-l">'+ico('crown')+'</span>')+'</button>';
   if(el._h!==h2){el._h=h2;el.innerHTML=h2}}
 function spotTap(){const M=UI.bf;if(!M)return;
@@ -116,12 +118,21 @@ function elimLine(ev){const d=ev.dead||{};const me=vs();const o=Object.keys(d).m
   return (s===me?'You lose ':sideName(s)+' loses ')+n+' card'+(n>1?'s':'')}
 function bfClash(c){const ev=c.ev;UI.noAnim=true;UI.clashBrk=UI.clashBrk||{};UI.clashBrk[ev.r]={tot:ev.tot,brk:ev.brk,parts:ev.parts};
   const fin=()=>{if(UI.card!==c)return;UI.clashRes[ev.r]={winner:ev.winner,tot:ev.tot};try{drawOverlay()}catch(e){}UI._clashLine=clashLine(ev);renderBar();if(typeof sfx==='function')sfx(ev.winner<0?'tie':'win');try{const me=vs();bfBanner(ev.winner<0?'Tie':ev.winner===me?'You win!':sideName(ev.winner)+' win',REG[ev.r]+' \u00b7 '+ev.parts.map(x=>ev.tot[x]).sort((a,b)=>b-a).join(' to '),ev.winner<0?'#c8c0d8':fcol(ev.winner))}catch(x){}
+    try{bfClashHit(ev.r,ev.winner<0?'#c8c0d8':fcol(ev.winner),ev.winner<0)}catch(x){}
     const el=elimLine(ev);const hold=el?1500:1100;
     if(el)setTimeout(()=>{if(UI.card===c){UI._clashLine=el;renderBar()}},900/spd());
     bfAuto(c,hold+300)};
   UI._clashLine='The Clash in '+REG[ev.r];renderBar();
   if(!ANIM){fin();return}
   const p=mapReveal(ev);Promise.resolve(p).then(()=>{if(UI.card===c)setTimeout(fin,150/spd())})}
+// the Clash lands: a shock ring and sparks burst from the region in the winner's colour, and the board jolts (a tie: a softer grey ring, no jolt)
+function bfClashHit(r,col,tie){if(!ANIM||UI.reduce)return;const fx=$('#fx');if(!fx)return;let R;try{R=regionRect(r)}catch(e){return}const cx=R.left+R.width/2,cy=R.top+R.height/2,sp=spd();
+  const ring=document.createElement('div');ring.className='tbhit';ring.style.cssText='left:'+cx+'px;top:'+cy+'px;--hc:'+col;fx.appendChild(ring);
+  try{ring.animate([{transform:'translate(-50%,-50%) scale(.2)',opacity:.95},{transform:'translate(-50%,-50%) scale('+(Math.max(R.width,R.height)/60).toFixed(2)+')',opacity:0}],{duration:700/sp,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=()=>ring.remove()}catch(e){}setTimeout(()=>ring.remove(),900/sp);
+  const n=tie?8:16;for(let i=0;i<n;i++){const k=document.createElement('i');k.className='tbspark';k.style.cssText='left:'+cx+'px;top:'+cy+'px;--hc:'+col;fx.appendChild(k);const a=Math.PI*2*i/n+Math.random()*.4,d=40+Math.random()*Math.max(40,R.width*.45);
+    try{k.animate([{transform:'translate(-50%,-50%) scale(1)',opacity:1},{transform:'translate(calc(-50% + '+(Math.cos(a)*d).toFixed(0)+'px),calc(-50% + '+(Math.sin(a)*d).toFixed(0)+'px)) scale(.3)',opacity:0}],{duration:(550+Math.random()*250)/sp,easing:'cubic-bezier(.1,.7,.3,1)'}).onfinish=()=>k.remove()}catch(e){}setTimeout(()=>k.remove(),1000/sp)}
+  if(!tie){const bd=$('#board');if(bd)try{bd.animate([{transform:'translate(0,0)'},{transform:'translate(-4px,2px)'},{transform:'translate(4px,-2px)'},{transform:'translate(-2px,1px)'},{transform:'translate(0,0)'}],{duration:260/sp})}catch(e){}}}
+(function(){const st=document.createElement('style');st.textContent='.tbhit{position:fixed;width:60px;height:60px;border-radius:50%;border:5px solid var(--hc);box-shadow:0 0 18px var(--hc),inset 0 0 14px var(--hc);pointer-events:none;z-index:59}.tbspark{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--hc);box-shadow:0 0 8px var(--hc),0 0 2px #fff;pointer-events:none;z-index:59}';document.head.appendChild(st)})();
 // a big stamp over the board for the moments that matter (a Clash won or lost, a round ending): it lands, holds, fades; never blocks a tap
 function bfBanner(t,sub,col){try{if(!ANIM||UI.reduce)return;const bd=$('#board');if(!bd)return;const R=bd.getBoundingClientRect();const fx=$('#fx')||document.body;
   const e=document.createElement('div');e.className='tbban';e.style.cssText='left:'+(R.left+R.width/2)+'px;top:'+(R.top+R.height*0.42)+'px;--bc:'+(col||'#f0c860');

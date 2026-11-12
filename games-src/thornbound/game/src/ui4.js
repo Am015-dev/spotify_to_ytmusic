@@ -14,11 +14,13 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
+  // hints on and the suggestion is a button (Done, Pass, Keep...): the cards stay tappable but don't glow, so the glow always shows the suggestion
+  const quiet=!!(M&&M.rec&&M.rec.id==null);
   const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
   ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
-    h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'. '+esc(cardLine(id))+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+cardBand(id)+'</button>'});
+    h+='<button class="hc'+(on?' on':'')+(pl?(quiet?' pl':' glow pl'):'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'. '+esc(cardLine(id))+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+cardBand(id)+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
 const roadX=()=>{const x=innerHeight<620?0:innerHeight<820?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read

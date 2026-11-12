@@ -23,7 +23,7 @@ function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<s
 const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const HLP_STEPS={
- bid:{target:hq('#handw'),title:'Make a secret bid',text:'Tap a card to bid it, then tap the glowing spot. The highest bid picks first.',pic:()=>HP.back()},
+ bid:{target:hq('#handw'),title:'Make a secret bid',text:'Tap a card, then the glowing spot. Highest bid picks first.',pic:()=>HP.back()},
  bidRes:{target:hq('#handw'),title:'Take a Kingdom Card',text:'Tap a glowing Kingdom Card for a lasting power. Or tap Keep my card.',pic:()=>HP.kc()},
  occupier:{target:hfirst('#handw'),title:'Tuck a card under',text:'Pick the hand card that sits under your new Kingdom Card. It cannot fight.',pic:()=>HP.back()},
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
@@ -129,16 +129,25 @@ function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=docum
   const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(core);
   const rings=[...document.querySelectorAll('.gxh-ring')].map(e=>{const q=e.getBoundingClientRect();return {left:q.left-4,top:q.top-4,right:q.right+4,bottom:q.bottom+4,main:!e.classList.contains('from')}});
   const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;
-  const r=b.getBoundingClientRect();if(!cores.some(c=>hit(r,c)))return;
-  const w=r.width,h=r.height,T=rings.find(x=>x.main)||rings[0]||{left:W/2,top:H/2,right:W/2,bottom:H/2};const tcx=(T.left+T.right)/2,tcy=(T.top+T.bottom)/2;
+  const r=b.getBoundingClientRect();
+  const T=rings.find(x=>x.main)||rings[0]||{left:W/2,top:H/2,right:W/2,bottom:H/2};const tcx=(T.left+T.right)/2,tcy=(T.top+T.bottom)/2;
   const bar=document.querySelector('.gx-bar');const top=bar?Math.ceil(bar.getBoundingClientRect().bottom)+4:6;
-  let best=null,bd=1e9;for(const x of [Math.max(6,Math.min(W-w-6,tcx-w/2)),6,Math.max(6,W-w-6)])for(let y=top;y<=H-h-6;y+=4){const c={left:x,top:y,right:x+w,bottom:y+h};
-    if(cores.some(k=>hit(c,k))||rings.some(k=>hit(c,k)))continue;const d=Math.abs(x+w/2-tcx)*.5+Math.abs(y+h/2-tcy);if(d<bd){bd=d;best=c}}
+  // labels (score track, round, region names, chips) stay readable: find the spot that covers the fewest of them (none if it can),
+  // trying the slim one-line bubble when the full one covers any
+  const txt=[];try{const rg=document.createRange(),tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null);let n;while((n=tw.nextNode())&&txt.length<400){if(!/\S/.test(n.nodeValue))continue;const e=n.parentElement;if(!e||e.closest('[data-help],[hidden],.gxh-bub,#tbturn,script,style'))continue;rg.selectNodeContents(n);const q=rg.getBoundingClientRect();if(q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H)txt.push(q)}}catch(e){}
+  const curT=txt.filter(k=>hit(r,k)).length;if(!cores.some(c=>hit(r,c))&&!curT)return;
+  const search=(w,h)=>{let bb=null,bs=1e9;for(const x of [Math.max(6,Math.min(W-w-6,tcx-w/2)),6,Math.max(6,W-w-6)])for(let y=top;y<=H-h-6;y+=4){const c={left:x,top:y,right:x+w,bottom:y+h};
+    if(cores.some(k=>hit(c,k))||rings.some(k=>hit(c,k)))continue;const nt=txt.filter(k=>hit(c,k)).length;const d=nt*1000+Math.abs(x+w/2-tcx)*.5+Math.abs(y+h/2-tcy);if(d<bs){bs=d;bb=c}}return bb?{c:bb,s:bs}:null};
+  let w=r.width,h=r.height,res=search(w,h);
+  if((!res||res.s>=1000)&&!b.classList.contains('gxh-compact')){b.classList.add('gxh-compact');const r2=b.getBoundingClientRect();const res2=search(r2.width,r2.height);if(res2&&(!res||res2.s<res.s)){res=res2;w=r2.width;h=r2.height}else b.classList.remove('gxh-compact')}
+  if(res&&!cores.some(c=>hit(r,c))&&res.s>=curT*1000)return;
+  const best=res&&res.c;
   if(!best)return;b.style.left=Math.round(best.left)+'px';b.style.top=Math.round(best.top)+'px';
   const side=best.bottom<=T.top+2?'bottom':best.top>=T.bottom-2?'top':best.right<=T.left+2?'right':'left';
   b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const a=b.querySelector('.gxh-arr');
   if(a){a.style.left=a.style.top='';if(side==='top'||side==='bottom')a.style.left=Math.round(Math.max(14,Math.min(w-26,tcx-best.left-6)))+'px';else a.style.top=Math.round(Math.max(14,Math.min(h-26,tcy-best.top-6)))+'px'}}
-setInterval(hlpUnblock,60);
+function hlpTurnCover(){const b=document.querySelector('.gxh-bub.on'),t=document.getElementById('tbturn');let on=false;if(b&&t&&!(typeof tutOn==='function'&&tutOn())){const r=b.getBoundingClientRect(),q=t.getBoundingClientRect();on=r.left<q.right&&r.right>q.left&&r.top<q.bottom&&r.bottom>q.top}document.body.classList.toggle('tb-bubturn',on)}
+setInterval(()=>{hlpUnblock();hlpTurnCover()},60);
 try{new MutationObserver(()=>{if(document.querySelector('.gxh-bub.on'))hlpUnblock()}).observe(document.body,{childList:true,attributes:true,attributeFilter:['class','style'],subtree:false})}catch(e){}
 // the Goal card closes without a re-render: look again for a first-time bubble a moment later
 setInterval(()=>{if(G&&UI.started&&!G.over)try{hlpAfter()}catch(e){}},300);
