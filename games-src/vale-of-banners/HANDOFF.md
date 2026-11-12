@@ -100,3 +100,14 @@ Spending (after fixes): hard ends with 3.8 silver / 3.0 workers, normal 7.9 / 7.
 - Tutorial rebuilt as a guided first game: 48 steps, one line of 12 words or fewer + one glowing tap each, every core rule in order, then a
   real game; the "Things you'll meet later" list is gone. `node tut-walk.js` (tut-end.js removed). TUTORIAL-COVERAGE.md lists the steps.
 - Shots: playable-shots/gameplay/ (tut-1..49, first-turn, mid-game, result; `SHOTS=1 node tut-walk.js` / `SHOTS=1 node drag-play.js`).
+
+## FIX4 (R21 rows 4 and 6): hints on by default, every star says why, star = coach
+- Hints ON by default (`vob_hints` !== '0'); the top-bar button shows its "Hints on" label on phones too.
+- Every star carries a reason line under the prompt (ui.js `starWhy/starLine`): "★ Take Keep: a free action when built, costs 1 worker.
+  Fits a space now." The prompt names the same move as the star (hardMove), the tile card and the bulb give the same reason.
+- Learn to play: no look-ahead star at all; `tutStarPaint` puts the one star on the coach's target (tut-walk checks every step).
+- Fixed: the workers star pointed at a button the dock does not draw (doubles with one die used).
+- `node tools/newbie-gauntlet.js 120 gentle`: a newcomer who reads the previews and ignores the star wins 80% vs Gentle, 13% vs Normal.
+- `MODE=newbie|star W= H= node newbie-test.js`: whole default games by touchscreen.tap.
+- Left: some taps land on the "Turn over" beat card or mid-animation (5-14 per game); bubble over the prompt on tutorial step 26;
+  goal card while the rival moves; red worker badge unexplained; story-test.js taps a hidden market tab at phone size.

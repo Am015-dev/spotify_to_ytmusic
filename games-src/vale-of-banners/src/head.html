@@ -354,5 +354,10 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
   #prompt{-webkit-line-clamp:2}#prompt.full{-webkit-line-clamp:unset;display:block}
   #dicerow.theirs{flex-wrap:wrap}
 }
+/* the star's reason line (ui.js starLine) and a labelled Hints button on phones */
+#prompt .starwhy{display:block;font-weight:700;font-size:max(14px,.92em)!important;color:#6b4a00;line-height:1.25;margin-top:1px}
+html body .gx-bar #hintT span{display:inline!important;font-weight:800;margin-left:2px}
+html body .gx-bar #hintT{padding:4px 8px!important;min-width:44px}
+@media (max-width:640px) and (orientation:portrait) and (max-height:700px){#prompt:has(.starwhy){-webkit-line-clamp:3}}
 </style>
 </head>

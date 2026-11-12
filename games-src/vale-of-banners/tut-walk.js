@@ -15,7 +15,7 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
     const tapXY = async (x, y) => { if (touch) await page.touchscreen.tap(x, y); else await page.mouse.click(x, y); };
     const tb = await page.evaluate(() => { const e = document.getElementById('tutB'); const r = e && e.getBoundingClientRect(); return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; });
     if (!tb) { console.log(name, 'FAIL no tutorial button'); bad++; continue; } await tapXY(tb.x, tb.y); await page.waitForTimeout(900);
-    const seen = [], rulesSeen = []; let shot = 0, guard = 0, w0 = 0, wMax = 0, wAt = '';   /* longest silent wait between two steps (rival turns included) */
+    const seen = [], rulesSeen = []; let shot = 0, guard = 0, starSteps = 0, starOn = 0, w0 = 0, wMax = 0, wAt = '';   /* longest silent wait between two steps (rival turns included) */
     while (guard++ < 2500) {
       const st = await page.evaluate(() => {
         if (document.querySelector('.gxt-end')) return { end: true };
@@ -36,6 +36,8 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
         const w = String(st.say || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length, sent = (String(st.say).match(/[.!?](\s|$)/g) || []).length;
         if (w > 12) fails.push(st.id + ' line has ' + w + ' words'); if (sent > 2) fails.push(st.id + ' more than two sentences');
         if (!st.ok) fails.push(st.id + ' target covered by ' + st.hit);
+        await page.waitForTimeout(320); const sc = await page.evaluate(() => { const c = GXT.current(), t = c && c.target && c.target(); const want = t && t.id && /^(mt-|bl-|ec-|st-|gd-|gs-)/.test(t.id) ? [t.id] : []; const got = [].slice.call(document.querySelectorAll('.bestx,.bestt,.cell.best,.bestb,.bestq')).map(e => /bestb|bestq/.test(e.className) ? (e.parentElement && e.parentElement.id) : e.id).filter(x => x && !/^tab-/.test(x)); return { want, got: [...new Set(got)] }; });
+        starSteps++; if (sc.got.some(g => sc.want.indexOf(g) < 0) || sc.want.some(w => sc.got.indexOf(w) < 0)) fails.push(st.id + ' star ' + JSON.stringify(sc.got) + ' but coach ' + JSON.stringify(sc.want)); else if (sc.want.length) starOn++;
         if (touch && st.w && (st.w < 43.5 || st.hh < 43.5)) fails.push(st.id + ' target only ' + Math.round(st.w) + 'x' + Math.round(st.hh));
         if (name === 'phone' && process.env.SHOTS) { await page.waitForTimeout(250); fs.mkdirSync(SHOTDIR, { recursive: true }); await page.screenshot({ path: path.join(SHOTDIR, 'tut-' + (++shot) + '.png') }); }
       }
@@ -54,7 +56,7 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
       const later = await page.evaluate(() => /meet later/i.test(document.body.innerText)); if (later) fails.push('a "learn later" list is shown');
     }
     if (errs.length) fails.push('errors: ' + errs.slice(0, 3).join(' | '));
-    console.log(name, fails.length ? 'FAIL' : 'PASS', seen.length + ' steps, longest wait ' + (wMax / 1000).toFixed(1) + ' s before "' + wAt + '", rules in order: ' + rulesSeen.join(' > '), fails.length ? '\n  ' + fails.join('\n  ') : '');
+    console.log(name, fails.length ? 'FAIL' : 'PASS', seen.length + ' steps, star = coach on ' + (starSteps - fails.filter(f => / star /.test(f)).length) + '/' + starSteps + ' (star on target ' + starOn + '), longest wait ' + (wMax / 1000).toFixed(1) + ' s before "' + wAt + '", rules in order: ' + rulesSeen.join(' > '), fails.length ? '\n  ' + fails.join('\n  ') : '');
     if (fails.length) bad++; await ctx.close();
   }
   await b.close(); process.exit(bad ? 1 : 0);
