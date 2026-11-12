@@ -105,7 +105,7 @@ function renderChoice(on){const el=document.getElementById('choice'),dk=document
   if(!c){el.classList.add('hidden');el.innerHTML='';if(dk)dk.classList.remove('choosing');UI.choiceShown=null;return}
   const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
   el.classList.remove('hidden');if(dk)dk.classList.add('choosing');el.setAttribute('aria-label',c.title);
-  el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${(()=>{const hp=c.options.some(o=>o.primary);return c.options.map(o=>{const pr=o.primary||!hp&&(o.rec||/Recommended\./.test(o.d||''));return `<button class="btn ${pr?'primary':''} ${o.rec?'rec':''}" data-opt="${esc(o.k)}">${!o.primary&&/^\d+$/.test(o.k)&&/secret power|Evolution!/.test(c.title)&&typeof cardPic==='function'?cardPic(+o.k,'evopic'):''}${o.rec&&hp?'<span class="recchip">★ Recommended</span>':''}${esc(o.l)}${o.g?`<b class="gist">${esc(o.g)}</b>`:''}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`}).join('')})()}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
+  el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p class="nocut ctext">${esc(c.text)}</p>${dice}<div class="acts">${(()=>{const hp=c.options.some(o=>o.primary);return c.options.map(o=>{const pr=o.primary||!hp&&(o.rec||/Recommended\./.test(o.d||''));return `<button class="btn ${pr?'primary':''} ${o.rec?'rec':''}" data-opt="${esc(o.k)}">${!o.primary&&/^\d+$/.test(o.k)&&/secret power|Evolution!/.test(c.title)&&typeof cardPic==='function'?cardPic(+o.k,'evopic'):''}${o.rec&&hp?'<span class="recchip">★ Recommended</span>':''}${esc(o.l)}${o.g?`<b class="gist">${esc(o.g)}</b>`:''}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`}).join('')})()}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
   const key=c.title+'|'+c.text;if(UI.choiceShown!==key){UI.choiceShown=key;if(window.GX&&GX.app){GX.showDock();if(GX.open)GX.close()}const b=document.getElementById('dockbody');if(b)b.scrollTop=0;const f=el.querySelector('button');if(f&&document.activeElement&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))try{f.focus({preventScroll:true})}catch(e){}}}
 function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try{localStorage.removeItem(SAVE)}catch(e){}}const xp=UI.xp;
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
@@ -157,7 +157,7 @@ function rulesHTML(){return `<div>
   <h3>House rules (kept on purpose)</h3><ul class="hat"><li>The first player is picked at random, not by a dice roll-off.</li><li>The 20-star win is checked when the active monster ends its turn; it must survive the turn.</li><li>Dice order: Automatic resolves hearts before claws. Menu, Dice order: Ask me, lets you choose.</li><li>Evolutions: keep 1 of 2 cards at the start; resolving 3 hearts shows 2 and keeps 1.</li><li>Where an expansion card’s text was unclear, one reading is used (listed in rules-notes.md).</li></ul>
   <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 
-function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
+function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');try{const me=G.pl.find(q=>q.human);if(G.mode==='solo'&&me&&G.winner==='P'+(me.i+1)&&!G.tut)localStorage.setItem('ccs_won','1')}catch(e){}if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
   if(window.GX&&GX.app&&G&&!G.winner&&!UI.info&&humanTurn()&&UI.dockTurn!==G.tid+':'+G.active){UI.dockTurn=G.tid+':'+G.active;GX.showDock()}
   try{if(typeof ppAfter==='function')ppAfter()}catch(e){}}
 const ORDERHTML=()=>'↕ Dice order: '+(UI.order==='ask'?'Ask me':'Automatic')+'<small>Ask lets you pick whether hearts or claws resolve first</small>';
@@ -175,10 +175,10 @@ document.addEventListener('click',e=>{
   if(ds.evo!==undefined){UI.evo=ds.evo==='1';render();return}
   if(ds.exk){if(ds.exk==='evo')UI.evo=!UI.evo;else UI.ex[ds.exk]=!UI.ex[ds.exk];saveSetup();render();return}
   if(ds.preset){const on=ds.preset==='all';UI.evo=on;EXPS.forEach(x=>{if(x.k!=='evo')UI.ex[x.k]=on});saveSetup();render();return}
-  if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
+  if(ds.lvl){UI.lvl=ds.lvl;UI.lvlUser=true;saveSetup();render();return}
   if(ds.start){const k=ds.start;UI.info=false;
     if(k==='load'){G=load();if(!saveOK(G)){G=null;try{localStorage.removeItem(SAVE)}catch(e){}render();return}if(!G.gid)G.gid=Math.random();G.xq=G.xq||[];G.log=G.log||[];G.tf=Object.assign(tfBase(),G.tf||{});G.disc=G.disc||[];G.curseDeck=G.curseDeck||[];G.curseDisc=G.curseDisc||[];G.tower=G.tower||[-1,-1,-1];G.pl.forEach(q=>{q.tok=q.tok||{};q.hand=q.hand||[];q.edeck=q.edeck||[];q.edisc=q.edisc||[];q.mb=q.mb||0;q.cult=q.cult||0;q.wk=q.wk||0;q.dmod=q.dmod||0;q.stats=q.stats||{dmg:0,stars:0,cards:0,city:0,kos:0}});G.revealed=G.revealed||[];UI.choice=null;UI.busy=false;UI.pending=null;UI.fx={};if(G.phase==='start')G.dice=[];if(G.phase==='end'){G.phase='buy';G.step=4}if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}fixRoll();refresh()}
-    else{let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}UI.firstGame=!toured&&k==='solo';UI.intro=true;UI.adv=false;UI.coach=-1;UI.freeze=false;UI.tour=false;UI.tipSeen={};newGame(k)}return}
+    else{let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}UI.firstGame=!toured&&k==='solo';newbieLvl();UI.intro=true;UI.adv=false;UI.coach=-1;UI.freeze=false;UI.tour=false;UI.tipSeen={};newGame(k)}return}
   if(ds.tour){tourClick(ds.tour);return}
   if(ds.emo){sendEmote(ds.emo);return}
   if(ds.a==='story'){UI.intro=false;render();if(typeof schedule==='function')schedule();return}
@@ -215,8 +215,11 @@ document.addEventListener('keydown',e=>{
   if(!G||G.winner||UI.choice||UI.info||UI.rules||UI.intro||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
   if(G.phase==='roll'){if(e.key==='r'||e.key==='R')click('[data-act="reroll"]');else if(e.key===' '||e.key==='Enter')click('[data-act="resolve"]');else if(e.key==='h'||e.key==='H')click('[data-act="hint"]');else if(/^[1-9]$/.test(e.key))click(`[data-die="${+e.key-1}"]`)}
   else if(G.phase==='buy'&&(e.key===' '||e.key==='Enter'||e.key==='e'||e.key==='E'))click('[data-act="end"]')});
-function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
-try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
+// G7: until the player picks a skill or wins a solo game, the rivals default to Easy (a newcomer's first game is winnable)
+function newbieLvl(){if(UI.lvlUser)return;let won=false;try{won=!!localStorage.getItem('ccs_won')}catch(e){}UI.lvl=won?'normal':'easy'}
+function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,lvlUser:!!UI.lvlUser,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
+try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl&&st.lvlUser!==false)UI.lvl=st.lvl,UI.lvlUser=true;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
+if(typeof window!=='undefined'&&!/jsdom/i.test(navigator.userAgent||''))newbieLvl();
 function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard0(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
 // a pair of numbers scores nothing: say so while there is still a reroll to chase the third
 function pairNote(dice){if(G.rolls<=0)return '';const c=countsOf(dice.filter(d=>!d.t));const pr=['1','2','3'].filter(f=>c[f]===2);if(!pr.length||['1','2','3'].some(f=>c[f]>=3))return '';return ` <span class="pairnote">A pair scores nothing. You need three of a kind.</span>`}
