@@ -13,12 +13,12 @@ const has = (G, pred) => VG.moves(G).some(pred);
 const find = (G, pred) => VG.moves(G).find(pred);
 const cnt = (p, id) => p.deck.concat(p.hand, p.play, p.disc).filter(c => c === id).length;
 const bootHand = p => { p.hand = ['grant', 'grant', 'trail', 'trail', 'grant']; };
-const itemHand = p => { p.hand = ['machete', 'machete', 'machete', 'machete', 'machete']; };   /* item cards: playing one IS the main action */
+const itemHand = p => { p.hand = ['satchel', 'satchel', 'satchel', 'satchel', 'satchel']; };   /* item cards: playing one IS the main action */
 const passAll = G => { let n = 0; const r0 = G.round; while (G.phase === 'play' && G.round === r0 && n++ < 20) go(G, { t: 'pass' }); };
 // p0 discovers level-1 site 5 (needs 2 boots); then p1 plays a card, so it is p0's turn again with the explorer standing at a guarded ruin
 function afterDisc() {
-  const G = G2(11), p = G.p[0]; p.res.compass = 3; bootHand(p); G.p[1].hand = ['machete', 'machete', 'machete', 'machete', 'machete'];
-  G.d0 = cnt(p, 'dread'); go(G, { t: 'disc', s: 5 }); G.sites[5].guard = 'rootback-boar'; go(G, { t: 'play', i: 0 }); return G;
+  const G = G2(11), p = G.p[0]; p.res.compass = 3; bootHand(p); G.p[1].hand = ['satchel', 'satchel', 'satchel', 'satchel', 'satchel'];
+  G.d0 = cnt(p, 'dread'); go(G, { t: 'disc', s: 5 }); G.sites[5].guard = 'mire-crawler'; go(G, { t: 'play', i: 0 }); return G;
 }
 
 sec('A. Setup');
@@ -40,7 +40,7 @@ rule('A15', 'Component count: 40 item cards.', () => eq(40, V.ITEMS.length));
 rule('A16', 'Component count: 35 artifact cards.', () => eq(35, V.ARTS.length));
 
 sec('B. Rounds and turns');
-rule('B1', 'A turn is exactly one main action (play an item card), then play passes to the next explorer.', () => { const G = G2(); G.p[0].hand = ['machete', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
+rule('B1', 'A turn is exactly one main action (play an item card), then play passes to the next explorer.', () => { const G = G2(); G.p[0].hand = ['satchel', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
 rule('B2', 'Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).', () => { const G = G2(1, 3); G.p.forEach(itemHand); const t = []; go(G, { t: 'pass' }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); go(G, { t: 'play', i: 0 }); t.push(G.turn); return eq([1, 2, 1], t); });
 rule('B3', 'If everyone else has passed, the last player takes turns one after another.', () => { const G = G2(); G.p.forEach(itemHand); go(G, { t: 'pass' }); go(G, { t: 'play', i: 0 }); const a = G.turn; go(G, { t: 'play', i: 0 }); return eq([1, 1], [a, G.turn]); });
 rule('B4', 'The round ends when all players have passed: next round starts, explorers return to the board owners.', () => { const G = G2(); bootHand(G.p[0]); go(G, { t: 'dig', s: 0 }); go(G, { t: 'pass' }); const mid = G.round; go(G, { t: 'pass' }); return eq([1, 2, 2, -1], [mid, G.round, G.p[0].ex, G.sites[0].occ]); });
@@ -48,7 +48,7 @@ rule('B5', 'Free actions (a guardian boon) do not end the turn.', () => { const 
 rule('B6', 'The starting marker passes one seat each round: round 2 starts with seat 1.', () => { const G = G2(); passAll(G); return eq([2, 1], [G.round, G.turn]); });
 rule('B7', 'The game lasts 5 rounds: after round 5 everyone passes, the game is over and no round 6 starts.', () => { const G = G2(); G.round = 5; passAll(G); return eq(['over', 5], [G.phase, G.round]); });
 rule('B8', 'At the start of a round each player draws up to 5 cards.', () => { const G = G2(); const p = G.p[0]; p.deck = ['grant', 'trail', 'grant', 'trail', 'grant', 'trail']; p.hand = p.hand.slice(0, 2); passAll(G); return eq(5, p.hand.length); });
-rule('B9', 'Unplayed hand cards may be kept for the next round.', () => { const G = G2(); const p = G.p[0]; p.hand = ['machete', 'grant', 'grant', 'grant', 'grant']; passAll(G); return eq(true, p.hand.indexOf('machete') >= 0); });
+rule('B9', 'Unplayed hand cards may be kept for the next round.', () => { const G = G2(); const p = G.p[0]; p.hand = ['satchel', 'grant', 'grant', 'grant', 'grant']; passAll(G); return eq(true, p.hand.indexOf('satchel') >= 0); });
 rule('B10', 'A played card goes to the play area and stays there until the end of the round.', () => { const G = G2(); const p = G.p[0]; bootHand(p); go(G, { t: 'play', i: 0 }); return eq([4, 1], [p.hand.length, p.play.length]); });
 rule('B11', 'End of round: the play area is shuffled and put on the BOTTOM of the deck (no separate discard pile, no reshuffle of the whole deck).', () => {
   const G = G2(), p = G.p[0], q = G.p[1], old = ['lamp', 'rope', 'tarp', 'ledger', 'kettle', 'satchel', 'pickaxe'];
@@ -69,7 +69,7 @@ rule('B15', 'Passed flags are cleared when the new round starts.', () => { const
 
 sec('C. Dig at a site');
 rule('C1', 'Dig: pay the travel icon by discarding a card from hand to the play area, move an explorer to the site, take its loot.', () => { const G = G2(), p = G.p[0]; bootHand(p); go(G, { t: 'dig', s: 0 }); return eq([4, 1, 1, 3, 1], [p.hand.length, p.play.length, p.ex, p.res.coin, p.res.compass]); });
-rule('C2', 'A Boot cost can be paid by any travel icon.', () => { const G = G2(), p = G.p[0]; p.res.coin = 0; const r = []; ['rope', 'lamp', 'flares', 'machete'].forEach(c => { p.hand = [c]; r.push(!!VG.payPlan(G, 0, ['boot'])); }); return eq([true, true, true, true], r); });
+rule('C2', 'A Boot cost can be paid by any travel icon.', () => { const G = G2(), p = G.p[0]; p.res.coin = 0; const r = []; ['rope', 'lamp', 'flares', 'satchel'].forEach(c => { p.hand = [c]; r.push(!!VG.payPlan(G, 0, ['boot'])); }); return eq([true, true, true, true], r); });
 rule('C3', 'A Plane pays any icon (Jeep, Boat or Boot).', () => { const G = G2(), p = G.p[0]; p.res.coin = 0; p.hand = ['flares']; return eq([true, true, true], ['car', 'ship', 'boot'].map(n => !!VG.payPlan(G, 0, [n]))); });
 rule('C4', 'A Jeep cannot pay a Boat and a Boat cannot pay a Jeep.', () => { const G = G2(), p = G.p[0]; p.res.coin = 0; p.hand = ['rope']; const a = !!VG.payPlan(G, 0, ['ship']); p.hand = ['lamp']; return eq([false, false], [a, !!VG.payPlan(G, 0, ['car'])]); });
 rule('C5', 'Two coins always hire a Plane (pays any icon); one coin does not.', () => { const G = G2(), p = G.p[0]; p.hand = []; p.res.coin = 2; const a = VG.payPlan(G, 0, ['ship']); p.res.coin = 1; return eq([2, null], [a && a.coins, VG.payPlan(G, 0, ['ship'])]); });
@@ -99,9 +99,9 @@ rule('D10', 'A hidden site cannot be dug before it is discovered.', () => { cons
 sec('E. Guardians and Dread');
 rule('E1', 'End of round: an explorer still standing on a guardian site brings home a Dread card from the supply (even if it did not wake that guardian).', () => { const G = afterDisc(); const d0 = G.dread; go(G, { t: 'pass' }); go(G, { t: 'pass' }); return eq([G.d0 + 1, d0 - 1], [cnt(G.p[0], 'dread'), G.dread]); });
 rule('E2', 'You can only overcome a guardian on a site where your own explorer stands.', () => { const G = G2(11), p = G.p[0]; p.res.compass = 3; bootHand(p); go(G, { t: 'disc', s: 5 }); const q = G.p[1]; Object.keys(q.res).forEach(k => q.res[k] = 9); return eq(false, has(G, m => m.t === 'beat')); });
-rule('E3', 'Overcoming pays the guardian cost, removes it from the site, and keeps it beside your board (5 points).', () => { const G = afterDisc(), p = G.p[0], cost = V.GUARD['rootback-boar'].cost; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); const e = {}; V.RES.forEach(k => e[k] = 5 - (cost[k] || 0)); return eq({ res: e, guards: 1, onsite: null, vp: 5 }, { res: p.res, guards: p.guards.length, onsite: G.sites[5].guard, vp: VG.score(G, 0).guards }); });
+rule('E3', 'Overcoming pays the guardian cost, removes it from the site, and keeps it beside your board (5 points).', () => { const G = afterDisc(), p = G.p[0], cost = V.GUARD['mire-crawler'].cost; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); const e = {}; V.RES.forEach(k => e[k] = 5 - (cost[k] || 0)); return eq({ res: e, guards: 1, onsite: null, vp: 5 }, { res: p.res, guards: p.guards.length, onsite: G.sites[5].guard, vp: VG.score(G, 0).guards }); });
 rule('E4', 'An overcome guardian means no Dread at round end.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); go(G, { t: 'pass' }); go(G, { t: 'pass' }); return eq(G.d0, cnt(p, 'dread')); });
-rule('E5', 'A guardian boon can be used once per game, as a free action.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); go(G, { t: 'pass' }); const t = G.turn; const c = p.res.coin; go(G, { t: 'boon', k: 0 }); return eq([c + 3, false, t], [p.res.coin, has(G, m => m.t === 'boon'), G.turn]); });
+rule('E5', 'A guardian boon can be used once per game, as a free action.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); go(G, { t: 'pass' }); const t = G.turn; const c = p.res.jewel; go(G, { t: 'boon', k: 0 }); return eq([c + 1, false, t], [p.res.jewel, has(G, m => m.t === 'boon'), G.turn]); });
 rule('E6', 'An overcome guardian is worth 5 points whether or not its boon was used.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); const a = VG.score(G, 0).guards; go(G, { t: 'pass' }); go(G, { t: 'boon', k: 0 }); return eq([5, 5], [a, VG.score(G, 0).guards]); });
 rule('E7', 'Overcoming is a main action (turn passes) and the explorer stays on the site until the round ends.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 5); go(G, { t: 'beat', s: 5 }); return eq([1, 0, 1], [G.turn, G.sites[5].occ, p.ex]); });
 rule('E8', 'Cannot overcome a guardian you cannot pay for.', () => { const G = afterDisc(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 0); return eq(false, has(G, m => m.t === 'beat')); });
@@ -126,8 +126,8 @@ rule('G7', 'Bought artifact effects that need a choice pause for the answer, the
 
 sec('H. Play a card');
 rule('H1', 'Playing a starting coin card gives its effect as a FREE action: +1 coin, still your turn.', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; const c = p.res.coin; go(G, { t: 'play', i: 0 }); return eq([c + 1, 0], [p.res.coin, G.turn]); });
-rule('H1b', 'Playing a starting compass card is free too; you can play both and still take a main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'trail', 'machete', 'grant', 'grant']; const c = p.res.compass, k = p.res.coin; go(G, { t: 'play', i: 1 }); go(G, { t: 'play', i: 0 }); const t0 = G.turn; go(G, { t: 'play', i: 0 }); return eq([c + 2, k + 2, 0, 1], [p.res.compass, p.res.coin, t0, G.turn]); });
-rule('H1c', 'Playing an item card for its effect uses the main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['machete', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
+rule('H1b', 'Playing a starting compass card is free too; you can play both and still take a main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['grant', 'trail', 'satchel', 'grant', 'grant']; const c = p.res.compass, k = p.res.coin; go(G, { t: 'play', i: 1 }); go(G, { t: 'play', i: 0 }); const t0 = G.turn; go(G, { t: 'play', i: 0 }); return eq([c + 1, k + 1, 0, 1], [p.res.compass, p.res.coin, t0, G.turn]); });
+rule('H1c', 'Playing an item card for its effect uses the main action.', () => { const G = G2(), p = G.p[0]; p.hand = ['satchel', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(1, G.turn); });
 rule('H2', 'Dread cards have no effect and cannot be played.', () => { const G = G2(), p = G.p[0]; p.hand = ['dread', 'dread', 'dread', 'dread', 'dread']; return eq(0, VG.moves(G).filter(m => m.t === 'play').length); });
 rule('H3', 'Exile removes a card from the game for good (hand card exiled, then the rest of the effect).', () => { const G = G2(), p = G.p[0]; p.hand = ['tarp', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); go(G, { t: 'ans', v: { z: 'hand', i: 0 } }); return eq({ ex: ['grant'], hand: 3, compass: 1, turn: 1 }, { ex: p.exiled, hand: p.hand.length, compass: p.res.compass, turn: G.turn }); });
 rule('H4', 'Exile can also take a card from your PLAY area (including the card just played).', () => { const G = G2(), p = G.p[0]; p.hand = ['tarp', 'grant', 'grant', 'grant', 'grant']; go(G, { t: 'play', i: 0 }); return eq(true, VG.moves(G).some(m => m.t === 'ans' && m.v && m.v.z === 'play')); });
@@ -138,11 +138,11 @@ sec('I. Research track and temple');
 rule('I1', 'Research: pay the row cost, move the magnifier up one row, take the row bonus.', () => { const G = G2(), p = G.p[0]; p.res.tablet = 1; const c = p.res.coin; go(G, { t: 'res', k: 'g' }); return eq([1, 0, c + 1], [p.glass, p.res.tablet, p.res.coin]); });
 rule('I2', 'The notebook may never rise above the magnifier (equal is fine).', () => { const G = G2(); const p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 9); const out = []; [[0, 0], [1, 1], [2, 1]].forEach(([g, n]) => { p.glass = g; p.note = n; out.push(has(G, m => m.t === 'res' && m.k === 'n')); }); return eq([false, false, true], out); });
 rule('I3', 'Each arrival (magnifier or notebook) takes the row bonus.', () => { const G = G2(), p = G.p[0]; p.glass = 1; p.res.tablet = 1; const c = p.res.coin; go(G, { t: 'res', k: 'n' }); return eq([1, c + 1], [p.note, p.res.coin]); });
-rule('I4', 'First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.', () => { const G = G2(), p = G.p[0], q = G.p[1]; p.glass = 1; q.glass = 1; p.res.arrow = 1; q.res.arrow = 1; p.res.tablet = 0; q.res.tablet = 0; p.res.compass = 0; q.res.compass = 0; go(G, { t: 'res', k: 'g' }); go(G, find(G, m => m.t === 'ans')); const a = [p.res.tablet, p.res.compass]; go(G, { t: 'res', k: 'g' }); return eq([[1, 2], [0, 2]], [a, [q.res.tablet, q.res.compass]]); });
-rule('I5', 'Magnifier in the temple (top row) scores by order of arrival: first 10, second 8 (points).', () => { const G = G2(), p = G.p[0], q = G.p[1]; [p, q].forEach(x => { x.glass = 7; x.res.jewel = 1; x.res.tablet = 1; }); go(G, { t: 'res', k: 'g' }); go(G, { t: 'res', k: 'g' }); return eq([10, 8], [VG.score(G, 0).research, VG.score(G, 1).research]); });
+rule('I4', 'First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.', () => { const G = G2(), p = G.p[0], q = G.p[1]; p.glass = 1; q.glass = 1; p.res.arrow = 1; q.res.arrow = 1; p.res.tablet = 0; q.res.tablet = 0; p.res.compass = 0; q.res.compass = 0; go(G, { t: 'res', k: 'g' }); const a = [p.res.tablet, p.res.compass]; go(G, { t: 'res', k: 'g' }); return eq([[1, 2], [0, 2]], [a, [q.res.tablet, q.res.compass]]); });
+rule('I5', 'Magnifier in the temple (top row) scores by order of arrival: first 10, second 8 (points).', () => { const G = G2(), p = G.p[0], q = G.p[1]; [p, q].forEach(x => { x.glass = 7; x.res.jewel = 1; x.res.tablet = 1; }); go(G, { t: 'res', k: 'g' }); go(G, find(G, m => m.t === 'ans')); go(G, { t: 'res', k: 'g' }); return eq([10, 8], [VG.score(G, 0).research, VG.score(G, 1).research]); });
 rule('I6', 'The notebook can never enter the temple row.', () => { const G = G2(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 9); p.glass = 8; p.note = 7; return eq(false, has(G, m => m.t === 'res' && m.k === 'n')); });
-rule('I7', 'Magnifier already in the temple: research buys a temple tile instead. A 6-point stack needs two of the three costs, the 11-point stack needs all three.', () => { const G = G2(), p = G.p[0]; p.glass = 8; p.res.tablet = 2; p.res.jewel = 1; p.res.arrow = 0; const a = [has(G, m => m.t === 'temple' && m.k === 0), has(G, m => m.t === 'temple' && m.k === 2)]; p.res.arrow = 2; return eq([true, false, true], a.concat([has(G, m => m.t === 'temple' && m.k === 2)])); });
-rule('I8', 'Buying a temple tile removes it from its stack, scores its points and uses the main action.', () => { const G = G2(), p = G.p[0]; p.glass = 8; p.res.tablet = 2; p.res.jewel = 1; const n = G.temple[0]; go(G, { t: 'temple', k: 0 }); return eq({ n: n - 1, tiles: [6], res: [0, 0], turn: 1 }, { n: G.temple[0], tiles: p.temple, res: [p.res.tablet, p.res.jewel], turn: G.turn }); });
+rule('I7', 'Magnifier already in the temple: research buys a temple tile instead. A 6-point stack needs two of the three costs, the 11-point stack needs all three.', () => { const G = G2(), p = G.p[0]; p.glass = 8; p.res.tablet = 2; p.res.jewel = 1; p.res.arrow = 0; const a = [has(G, m => m.t === 'temple' && m.k === 1), has(G, m => m.t === 'temple' && m.k === 0)]; p.res.arrow = 2; return eq([true, false, true], a.concat([has(G, m => m.t === 'temple' && m.k === 2)])); });
+rule('I8', 'Buying a temple tile removes it from its stack, scores its points and uses the main action.', () => { const G = G2(), p = G.p[0]; p.glass = 8; p.res.tablet = 2; p.res.jewel = 1; const n = G.temple[1]; go(G, { t: 'temple', k: 1 }); return eq({ n: n - 1, tiles: [6], res: [0, 0], turn: 1 }, { n: G.temple[1], tiles: p.temple, res: [p.res.tablet, p.res.jewel], turn: G.turn }); });
 rule('I9', 'An empty temple stack cannot be bought from.', () => { const G = G2(), p = G.p[0]; p.glass = 8; Object.keys(p.res).forEach(k => p.res[k] = 9); G.temple[0] = 0; return eq(false, has(G, m => m.t === 'temple' && m.k === 0)); });
 rule('I10', 'Research is a main action (turn passes) and the magnifier cannot move past the temple.', () => { const G = G2(), p = G.p[0]; p.res.tablet = 1; go(G, { t: 'res', k: 'g' }); const t = G.turn; p.glass = 8; return eq([1, false], [t, VG.moves(G).concat(G.turn === 1 ? [] : []).some(m => m.t === 'res' && m.k === 'g') && G.turn === 0]); });
 rule('I11', 'Research cannot be done without paying the row cost.', () => { const G = G2(), p = G.p[0]; Object.keys(p.res).forEach(k => p.res[k] = 0); return eq(false, has(G, m => m.t === 'res')); });
@@ -170,30 +170,49 @@ rule('K4', 'Solo: the rival keeps playing its tiles after you pass, until all ar
 rule('K5', 'Solo: the rival overcoming a guardian scores 5 points.', () => { const G = SOLO(); G.sites[5].tile = 'moth-cave'; G.sites[5].guard = 'stone-ape'; G.rival.deck = ['rv-hunt']; G.rival.vp = 0; go(G, { t: 'pass' }); return eq(5, G.rival.vp); });
 rule('K6', 'Solo: the rival discovering a site takes an idol worth 3 points.', () => { const G = SOLO(); G.rival.deck = ['rv-scout']; G.rival.vp = 0; go(G, { t: 'pass' }); return eq(3, G.rival.vp); });
 
-sec('L. Research assistants', 'Published structure; names, abilities, rows (2 and 5) and the limit of 2 are our own.');
-const toRow2 = (G, s, k) => { const p = G.p[s]; p.glass = k === 'g' ? 1 : 2; p.note = k === 'n' ? 1 : 0; p.res.arrow = 1; G.turn = s; go(G, { t: 'res', k }); };
-rule('L1', 'Setup: three assistants lie face up in the offer; nobody has one.', () => { const G = G2(); return eq([3, 0, 0], [G.aOffer.length, G.p[0].asst.length, G.p[1].asst.length]); });
-rule('L2', 'Magnifier reaching an assistant row: choose one of the offer, it joins silver side up, the offer refills, then the turn ends.', () => {
-  const G = G2(); toRow2(G, 0, 'g'); const asks = VG.moves(G).length, id = G.aOffer[1]; go(G, { t: 'ans', v: { g: 1 } });
-  return eq([3, id, false, 3, 1], [asks, G.p[0].asst[0].id, G.p[0].asst[0].gold, G.aOffer.length, G.turn]); });
-rule('L3', 'Notebook reaching an assistant row upgrades one of your assistants to its gold side.', () => {
-  const G = G2(); G.p[0].asst = [{ id: 'a-map', gold: false, ex: false }]; toRow2(G, 0, 'n'); go(G, { t: 'ans', v: { u: 0 } }); return eq(true, G.p[0].asst[0].gold); });
-rule('L4', 'Using an assistant is free, once a round: it gives its ability, is exhausted, and the turn does not end.', () => {
+sec('L. Research assistants', 'Rulebook p.15-16 and setup: 12 tiles, 3 stacks of 4, notebook recruits / upgrades, 2 squares. Rows and 9 of the effects are ours.');
+const rich = p => Object.keys(p.res).forEach(k => p.res[k] = 9);
+const noteTo = (G, s, row) => { const p = G.p[s]; p.note = row - 1; p.glass = Math.max(p.glass, row); rich(p); G.turn = s; go(G, { t: 'res', k: 'n' }); };
+rule('L1', 'Setup: 12 assistants, silver side up, in 3 stacks of 4; nobody has one.', () => { const G = G2(); return eq([3, [4, 4, 4], 0], [G.aSt.length, G.aSt.map(x => x.length), G.p[0].asst.length]); });
+rule('L2', 'Notebook onto a silver-symbol row: choose the top assistant of a stack; it joins silver side up; then the turn ends.', () => {
+  const G = G2(); const top = G.aSt[1][0]; noteTo(G, 0, V.ASST_REC[0]); const asks = VG.moves(G).length; go(G, { t: 'ans', v: { g: 1 } });
+  return eq([3, top, false, 3, 1], [asks, G.p[0].asst[0].id, G.p[0].asst[0].gold, G.aSt[1].length, G.turn]); });
+rule('L3', 'The magnifier on that row recruits nobody (assistants come from the notebook).', () => { const G = G2(); const p = G.p[0]; p.glass = V.ASST_REC[0] - 1; rich(p); go(G, { t: 'res', k: 'g' }); return eq([null, 0], [G.q, p.asst.length]); });
+rule('L4', 'Notebook onto a gold-symbol row: flip one assistant to gold, and it is refreshed even if used this round.', () => {
+  const G = G2(); G.p[0].asst = [{ id: 'a-map', gold: false, ex: true }]; noteTo(G, 0, V.ASST_UP[0]); go(G, { t: 'ans', v: { u: 0 } }); return eq([true, false], [G.p[0].asst[0].gold, G.p[0].asst[0].ex]); });
+rule('L5', 'Using an assistant turns it sideways (once a round); a free-action assistant does not end the turn.', () => {
   const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: false }]; const c = p.res.compass; go(G, { t: 'asst', k: 0 });
   return eq([c + 1, true, 0, false], [p.res.compass, p.asst[0].ex, G.turn, has(G, m => m.t === 'asst')]); });
-rule('L5', 'Exhausted assistants are ready again next round.', () => {
-  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: true }]; go(G, { t: 'pass' }); go(G, { t: 'pass' }); return eq([2, false], [G.round, p.asst[0].ex]); });
-rule('L6', 'The gold side is stronger than the silver side.', () => {
-  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-purse', gold: true, ex: false }]; const c = p.res.coin; go(G, { t: 'asst', k: 0 }); return eq(c + 2, p.res.coin); });
-rule('L7', 'At most 2 assistants: a third hire becomes an upgrade instead.', () => {
-  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: false }, { id: 'a-cook', gold: true, ex: false }]; toRow2(G, 0, 'g');
+rule('L6', 'All assistants are refreshed at the end of the round.', () => { const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: true }]; go(G, { t: 'pass' }); go(G, { t: 'pass' }); return eq([2, false], [G.round, p.asst[0].ex]); });
+rule('L7', 'The gold side has the stronger effect.', () => { const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-purse', gold: true, ex: false }]; const c = p.res.coin; go(G, { t: 'asst', k: 0 }); return eq(c + 2, p.res.coin); });
+rule('L8', 'Two assistant squares: with 2 assistants a recruit can only upgrade.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-map', gold: false, ex: false }, { id: 'a-cook', gold: true, ex: false }]; noteTo(G, 0, V.ASST_REC[0]);
   const ms = VG.moves(G).map(m => JSON.stringify(m.v)); go(G, { t: 'ans', v: { u: 0 } }); return eq([['{"u":0}'], 2, true], [ms, p.asst.length, p.asst[0].gold]); });
-rule('L8', 'An upgrade with no silver assistant left is lost, and the turn simply ends.', () => {
-  const G = G2(); toRow2(G, 0, 'n'); return eq([null, 1], [G.q, G.turn]); });
-rule('L9', 'A free research step (boon or card) that reaches an assistant row also hires one.', () => {
-  const G = G2(); const p = G.p[0]; p.glass = 1; p.guards = [{ id: 'glass-moth', used: false }]; go(G, { t: 'boon', k: 0 }); return eq(['asst', 0], [G.q && G.q.h, G.q && G.q.seat]); });
-rule('L10', 'An assistant that costs goods can only be used when you can pay.', () => {
-  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-gem', gold: false, ex: false }]; p.res.coin = 1; const a = has(G, m => m.t === 'asst'); p.res.coin = 2; return eq([false, true], [a, has(G, m => m.t === 'asst')]); });
+rule('L9', 'The discount assistant (no free-action icon) is your main action: buy an item or artifact 1 cheaper (2 when gold).', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-broker', gold: false, ex: false }]; const id = G.row[0], cost = V.CARDS[id].cost; p.res.coin = cost - 1;
+  go(G, { t: 'asst', k: 0 }); go(G, { t: 'ans', v: 0 }); return eq([0, true, 1], [p.res.coin, p.deck.includes(id), G.turn]); });
+rule('L10', 'The choice assistant gives a coin or a Plane; the Plane pays a travel icon this turn.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-guide', gold: false, ex: false }]; p.hand = ['dread']; p.res.coin = 0; const before = has(G, m => m.t === 'dig' && m.s === 2);
+  go(G, { t: 'asst', k: 0 }); go(G, { t: 'ans', v: 1 }); const after = has(G, m => m.t === 'dig' && m.s === 2); go(G, { t: 'dig', s: 2 }); return eq([false, true, 0], [before, after, p.tv.length]); });
+rule('L11', 'The travel assistant needs a Boot of travel (paid like a dig) to make an arrowhead.', () => {
+  const G = G2(); const p = G.p[0]; p.asst = [{ id: 'a-fletch', gold: false, ex: false }]; p.hand = []; p.res.coin = 0; const a = has(G, m => m.t === 'asst');
+  p.hand = ['grant']; const ar = p.res.arrow; go(G, { t: 'asst', k: 0 }); return eq([false, ar + 1, 0], [a, p.res.arrow, p.hand.length]); });
+rule('L12', 'A free notebook step (a boon) onto a silver-symbol row also recruits.', () => {
+  const G = G2(); const p = G.p[0]; p.glass = 4; p.note = V.ASST_REC[0] - 1; p.guards = [{ id: 'vine-widow', used: false }]; go(G, { t: 'boon', k: 0 }); return eq(['asst', 0], [G.q && G.q.h, G.q && G.q.seat]); });
+
+sec('M. Free items, travel boons, temple, blocking, exile', 'Rulebook p.4, 9, 13, 14 and setup.');
+rule('M1', 'A lightning (free-action) item is played without using your main action.', () => { const G = G2(); const p = G.p[0]; p.hand = ['machete', 'satchel']; go(G, { t: 'play', i: 0 }); return eq([0, true], [G.turn, has(G, m => m.t === 'play')]); });
+rule('M2', 'A travel boon pays a travel cost like a card, once; then it is used.', () => {
+  const G = G2(); const p = G.p[0]; p.guards = [{ id: 'howl-bat', used: false }]; p.hand = ['dread']; p.res.coin = 0; go(G, { t: 'dig', s: 2 }); return eq([0, true, false], [G.sites[2].occ, p.guards[0].used, has(G, m => m.t === 'boon')]); });
+rule('M3', 'Temple stacks: one 11, two 6 and three 2 point stacks, each with as many tiles as players.', () => { const G = VG.newGame({ np: 3, seed: 1 }); return eq([[11, 6, 6, 2, 2, 2], [3, 3, 3, 3, 3, 3]], [V.TEMPLE.map(t => t.vp), G.temple]); });
+rule('M4', 'A 2-point temple tile pays one of the three costs.', () => { const G = G2(); const p = G.p[0]; p.glass = 8; Object.keys(p.res).forEach(k => p.res[k] = 0); p.res.jewel = 1; return eq([false, false, true], [0, 1, 4].map(k => has(G, m => m.t === 'temple' && m.k === k))); });
+rule('M5', 'Magnifier reaching the Lost Temple: choose one bonus tile from a stack of as many tiles as players.', () => {
+  const G = G2(); const p = G.p[0]; p.glass = 7; rich(p); go(G, { t: 'res', k: 'g' }); const n = VG.moves(G).length, r = Object.assign({}, p.res); go(G, { t: 'ans', v: { b: 0 } });
+  return eq([2, 1, 1], [n, G.tb.length, 1 + (Object.keys(p.res).some(k => p.res[k] > r[k]) ? 0 : 1) - 0]); });
+rule('M6', 'Blocking tiles: 2 players block all 5 camp second spaces, 3 players block 3, 4 players none.', () => { const c = np => VG.newGame({ np, seed: 2 }).sites.filter(x => x.lvl === 0 && x.cap === 1).length; return eq([5, 3, 0], [c(2), c(3), c(4)]); });
+rule('M7', 'With 4 players two explorers can dig at the same camp (its second space).', () => {
+  const G = VG.newGame({ np: 4, seed: 2 }); G.p.forEach(p => { p.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; }); go(G, { t: 'dig', s: 0 }); go(G, { t: 'dig', s: 0 }); return eq([0, 1], [G.sites[0].occ, G.sites[0].occ2]); });
+rule('M8', 'Exile can take a card from your play area.', () => { const G = G2(); const p = G.p[0]; p.play = ['trail']; p.guards = [{ id: 'ember-hound', used: false }]; go(G, { t: 'boon', k: 0 }); go(G, { t: 'ans', v: { z: 'play', i: 0 } }); return eq([0, ['trail']], [p.play.length, p.exiled]); });
 if (process.argv.includes('--md')) {
   const lines = []; let n = 0; R.forEach(r => { if (r.sec) lines.push('', '## ' + r.sec, ''); else { n++; lines.push('- **' + r.id + '** ' + r.text); } });
   console.log(lines.join('\n') + '\n\nTOTAL ' + n); process.exit(0);

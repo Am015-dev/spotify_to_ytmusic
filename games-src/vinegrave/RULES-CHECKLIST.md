@@ -162,15 +162,28 @@ once a round free, max 2; names, abilities, rows and the limit are our own).
 
 ## L. Research assistants
 
-- **L1** Setup: three assistants lie face up in the offer; nobody has one.
-- **L2** Magnifier reaching an assistant row: choose one of the offer, it joins silver side up, the offer refills, then the turn ends.
-- **L3** Notebook reaching an assistant row upgrades one of your assistants to its gold side.
-- **L4** Using an assistant is free, once a round: it gives its ability, is exhausted, and the turn does not end.
-- **L5** Exhausted assistants are ready again next round.
-- **L6** The gold side is stronger than the silver side.
-- **L7** At most 2 assistants: a third hire becomes an upgrade instead.
-- **L8** An upgrade with no silver assistant left is lost, and the turn simply ends.
-- **L9** A free research step (boon or card) that reaches an assistant row also hires one.
-- **L10** An assistant that costs goods can only be used when you can pay.
+- **L1** Setup: 12 assistants, silver side up, in 3 stacks of 4; nobody has one.
+- **L2** Notebook onto a silver-symbol row: choose the top assistant of a stack; it joins silver side up; then the turn ends.
+- **L3** The magnifier on that row recruits nobody (assistants come from the notebook).
+- **L4** Notebook onto a gold-symbol row: flip one assistant to gold, and it is refreshed even if used this round.
+- **L5** Using an assistant turns it sideways (once a round); a free-action assistant does not end the turn.
+- **L6** All assistants are refreshed at the end of the round.
+- **L7** The gold side has the stronger effect.
+- **L8** Two assistant squares: with 2 assistants a recruit can only upgrade.
+- **L9** The discount assistant (no free-action icon) is your main action: buy an item or artifact 1 cheaper (2 when gold).
+- **L10** The choice assistant gives a coin or a Plane; the Plane pays a travel icon this turn.
+- **L11** The travel assistant needs a Boot of travel (paid like a dig) to make an arrowhead.
+- **L12** A free notebook step (a boon) onto a silver-symbol row also recruits.
 
-TOTAL 122
+## M. Free items, travel boons, temple, blocking, exile
+
+- **M1** A lightning (free-action) item is played without using your main action.
+- **M2** A travel boon pays a travel cost like a card, once; then it is used.
+- **M3** Temple stacks: one 11, two 6 and three 2 point stacks, each with as many tiles as players.
+- **M4** A 2-point temple tile pays one of the three costs.
+- **M5** Magnifier reaching the Lost Temple: choose one bonus tile from a stack of as many tiles as players.
+- **M6** Blocking tiles: 2 players block all 5 camp second spaces, 3 players block 3, 4 players none.
+- **M7** With 4 players two explorers can dig at the same camp (its second space).
+- **M8** Exile can take a card from your play area.
+
+TOTAL 132

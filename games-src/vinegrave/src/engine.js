@@ -13,17 +13,22 @@
   function newGame(o) {
     o = o || {}; var np = o.np || 2, seats = o.seats || [];
     var G = { v: 1, rng: (o.seed == null ? Math.floor(Math.random() * 1e9) : o.seed) >>> 0, np: np, round: 1, rounds: o.rounds || V.ROUNDS, turn: 0, first: 0, phase: 'play', q: null,
-      p: [], sites: [], row: [], items: [], arts: [], s1: [], s2: [], guards: [], idols: [], temple: V.TEMPLE.map(function (t) { return t.n; }), log: [], ev: [], winner: null, twist: o.twist || null, planeCost: 2, rival: null, turns: 0 };
+      p: [], sites: [], row: [], items: [], arts: [], s1: [], s2: [], guards: [], idols: [], temple: V.TEMPLE.map(function () { return np; }), log: [], ev: [], winner: null, twist: o.twist || null, planeCost: 2, rival: null, turns: 0 };
     G.seed0 = G.rng; G.dread = V.DREAD_SUPPLY - 2 * np; G.firstTaken = {};
-    G.aPile = (function (a, x) { for (var i = a.length - 1; i > 0; i--) { x = (x * 1103515245 + 12345) >>> 0; var j = x % (i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; })(V.ASST.map(function (a) { return a.id; }), G.seed0 ^ 0x5a5a);   /* own stream: the main shuffles stay as before */ G.aOffer = G.aPile.splice(0, V.ASST_OFFER);
+    var lcg = (function (x) { return function () { x = (x * 1103515245 + 12345) >>> 0; return x / 4294967296; }; })(G.seed0 ^ 0x5a5a);   /* own stream: the main shuffles stay as before */
+    var lshuf = function (a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(lcg() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+    var aAll = lshuf(V.ASST.map(function (a) { return a.id; })); G.aSt = []; for (var st = 0; st < V.ASST_STACKS; st++) G.aSt.push(aAll.slice(st * 4, st * 4 + 4));
+    G.tb = lshuf(V.TBONUS.map(function (b, i) { return i; })).slice(0, np);   /* Lost Temple bonus stack: as many tiles as players */
+    G.blockN = np >= 4 ? 0 : np === 3 ? 3 : 5;   /* blocking tiles on the camps' second spaces (rulebook setup step 9) */
     for (var i = 0; i < np; i++) {
       var st = V.START[i] || V.START[3], sd = seats[i] || {};
       var p = { name: sd.name || (i ? 'Explorer ' + (i + 1) : 'You'), ai: sd.ai || null, res: { coin: st.coin, compass: st.compass, tablet: 0, arrow: 0, jewel: 0 },
-        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [], fearTiles: 0, asst: [], apend: 0, upend: 0 };
+        deck: shuf(G, ['dread', 'dread', 'grant', 'grant', 'trail', 'trail']), hand: [], play: [], disc: [], ex: V.EXPL, note: 0, glass: 0, guards: [], idols: [], temple: [], passed: false, idolTurn: false, exiled: [], fearTiles: 0, asst: [], apend: 0, upend: 0, tbpend: 0, tv: [] };
       G.p.push(p);
     }
     G.items = shuf(G, V.ITEMS.slice()); G.arts = shuf(G, V.ARTS.slice()); G.s1 = shuf(G, V.S1.slice()); G.s2 = shuf(G, V.S2.slice()); G.guards = shuf(G, V.GUARDS.slice()); G.idols = shuf(G, V.IDOLS.slice());
-    V.CAMP.forEach(function (c) { G.sites.push({ id: c.id, lvl: 0, cost: c.cost.slice(), tile: c.id, occ: -1, guard: null }); });
+    V.CAMP.forEach(function (c) { G.sites.push({ id: c.id, lvl: 0, cost: c.cost.slice(), tile: c.id, occ: -1, guard: null, cap: 2, occ2: -1 }); });
+    (function () { var cs = lshuf([0, 1, 2, 3, 4]).slice(0, G.blockN); cs.forEach(function (i) { G.sites[i].cap = 1; }); })();
     V.SLOT1.forEach(function (c) { G.sites.push({ id: 'l1-' + G.sites.length, lvl: 1, cost: c.slice(), tile: null, occ: -1, guard: null }); });
     V.SLOT2.forEach(function (c) { G.sites.push({ id: 'l2-' + G.sites.length, lvl: 2, cost: c.slice(), tile: null, occ: -1, guard: null }); });
     for (var r = 0; r < V.ROW; r++) G.row.push(null);
@@ -71,28 +76,38 @@
   var CAN = { boot: ['boot', 'car', 'ship', 'plane'], car: ['car', 'plane'], ship: ['ship', 'plane'], plane: ['plane'] };   // which travel icons pay a need
   var CVAL = function (id) { var c = card(id); return c.t === 'fear' ? 0 : c.t === 'basic' ? 1 : 2 + (c.cost || 0) * 0.3; };
   // cheapest way to pay travel icons from hand cards (+ planes bought with coins). Returns {cards:[hand idx], coins} or null.
+  // cheapest way to pay travel icons: this turn's travel values first (they expire), then hand cards, then unused travel boons, then planes
+  // bought with coins. Returns {cards:[hand idx], coins, tv:[credit idx], boons:[guardian idx]} or null.
   function payPlan(G, s, need, skip) {
-    var p = G.p[s], used = {}, coins = 0, cards = [];
+    var p = G.p[s], used = {}, coins = 0, cards = [], tvU = {}, tvs = [], bU = {}, bs = [], bpool = [];
     if (skip) skip.forEach(function (i) { used[i] = 1; });
+    (p.guards || []).forEach(function (g, k) { var tv = !g.used && V.GUARD[g.id].tv; if (tv) bpool.push({ k: k, tv: tv }); });
     var order = need.slice().sort(function (a, b) { return CAN[a].length - CAN[b].length; });
     for (var n = 0; n < order.length; n++) {
+      var want = order[n], done = false;
+      (p.tv || []).some(function (t, i) { if (!tvU[i] && CAN[want].indexOf(t) >= 0) { tvU[i] = 1; tvs.push(i); done = true; return true; } return false; });
+      if (done) continue;
       var best = -1, bv = 1e9;
       for (var i = 0; i < p.hand.length; i++) {
-        if (used[i]) continue; var tr = card(p.hand[i]).tr; if (CAN[order[n]].indexOf(tr) < 0) continue;
-        var v = CVAL(p.hand[i]) + (tr === order[n] ? 0 : 0.5) + (tr === 'plane' ? 1 : 0);
+        if (used[i]) continue; var tr = card(p.hand[i]).tr; if (CAN[want].indexOf(tr) < 0) continue;
+        var v = CVAL(p.hand[i]) + (tr === want ? 0 : 0.5) + (tr === 'plane' ? 1 : 0);
         if (v < bv) { bv = v; best = i; }
       }
-      if (best >= 0) { used[best] = 1; cards.push(best); }
-      else if (p.res.coin - coins >= G.planeCost) coins += G.planeCost;
+      if (best >= 0) { used[best] = 1; cards.push(best); continue; }
+      bpool.some(function (b) { if (bU[b.k] || !b.tv.some(function (t) { return CAN[want].indexOf(t) >= 0; })) return false; bU[b.k] = 1; bs.push(b.k); done = true; return true; });   /* one boon pays all its icons; extra icons are lost */
+      if (done) continue;
+      if (p.res.coin - coins >= G.planeCost) coins += G.planeCost;
       else return null;
     }
-    return { cards: cards, coins: coins };
+    return { cards: cards, coins: coins, tv: tvs, boons: bs };
   }
   function spendTravel(G, s, plan) {
     var p = G.p[s]; plan.cards.slice().sort(function (a, b) { return b - a; }).forEach(function (i) { p.play.push(p.hand.splice(i, 1)[0]); });
     p.res.coin -= plan.coins;
+    (plan.tv || []).slice().sort(function (a, b) { return b - a; }).forEach(function (i) { p.tv.splice(i, 1); });
+    (plan.boons || []).forEach(function (k) { p.guards[k].used = true; log(G, s, nm(G, s) + ' uses the boon of ' + V.GUARD[p.guards[k].id].name + ' as travel.', { k: 'boon' }); });
   }
-  function freeSite(G, s, i) { var x = G.sites[i]; return x && x.occ === -1 && (x.lvl === 0 || x.tile); }
+  function freeSite(G, s, i) { var x = G.sites[i]; return x && (x.occ === -1 || (x.cap > 1 && x.occ2 === -1)) && (x.lvl === 0 || x.tile); }
   // ------------------------------------------------------------ whose turn
   function actor(G) { if (G.phase !== 'play') return -1; if (G.q) return G.q.seat; return G.turn; }
   // ------------------------------------------------------------ legal moves
@@ -100,14 +115,14 @@
     var s = actor(G); if (s < 0) return []; var p = G.p[s], out = [];
     if (G.q) return answers(G, s);
     // free actions
-    p.guards.forEach(function (g, k) { if (!g.used) out.push({ t: 'boon', k: k, free: true }); });
-    (p.asst || []).forEach(function (a, k) { if (!a.ex && canOps(p, asstOps(a))) out.push({ t: 'asst', k: k, free: true }); });
+    p.guards.forEach(function (g, k) { if (!g.used && !V.GUARD[g.id].tv) out.push({ t: 'boon', k: k, free: true }); });   /* travel boons pay when you dig (payPlan) */
+    (p.asst || []).forEach(function (a, k) { if (!a.ex && canOpsG(G, s, asstOps(a))) out.push(V.ASSTBY[a.id].main ? { t: 'asst', k: k } : { t: 'asst', k: k, free: true }); });
     if (p.idols.some(function (d) { return !d.used; }) && p.idols.filter(function (d) { return d.used; }).length < V.SLOTS)
       p.idols.forEach(function (d, k) { if (!d.used) V.SHRINE.forEach(function (sh, j) { out.push({ t: 'idol', k: k, sh: j, free: true }); }); });
     // main actions
-    p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push(c.t === 'basic' ? { t: 'play', i: i, free: true } : { t: 'play', i: i }); });   /* rulebook: the starting coin / compass cards are free actions */
+    p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push(c.t === 'basic' || c.fa ? { t: 'play', i: i, free: true } : { t: 'play', i: i }); });   /* rulebook: the starting coin / compass cards are free actions */
     if (p.ex > 0) G.sites.forEach(function (x, i) {
-      if (x.occ !== -1) return;
+      if (x.occ !== -1 && !(x.cap > 1 && x.occ2 === -1)) return;
       if (x.lvl === 0 || x.tile) { if (payPlan(G, s, x.cost)) out.push({ t: 'dig', s: i }); }
       else if (p.res.compass >= V.DISC[x.lvl] && (x.lvl === 1 ? G.s1 : G.s2).length) {
         var pl = payPlan(G, s, x.cost); if (pl && p.res.coin - pl.coins >= 0) out.push({ t: 'disc', s: i });
@@ -125,9 +140,10 @@
     var q = G.q, p = G.p[s], out = [];
     if (q.h === 'exile') { p.hand.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'hand', i: i } }); }); p.disc.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'disc', i: i } }); }); p.play.forEach(function (id, i) { out.push({ t: 'ans', v: { z: 'play', i: i } }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'or') q.d.opts.forEach(function (o, i) { if (canOps(p, o)) out.push({ t: 'ans', v: i }); });
-    if (q.h === 'buy') { G.row.forEach(function (id, r) { if (!id) return; var c = card(id); if ((q.d.k === 'i') !== (c.t === 'item')) return; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - q.d.o); if (has(p, need)) out.push({ t: 'ans', v: r }); }); out.push({ t: 'ans', v: null }); }
+    if (q.h === 'buy') { G.row.forEach(function (id, r) { if (!id) return; var c = card(id); if (q.d.k !== '*' && (q.d.k === 'i') !== (c.t === 'item')) return; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - q.d.o); if (has(p, need)) out.push({ t: 'ans', v: r }); }); out.push({ t: 'ans', v: null }); }
     if (q.h === 'site') { G.sites.forEach(function (x, i) { if (freeSite(G, s, i)) out.push({ t: 'ans', v: i }); }); out.push({ t: 'ans', v: null }); }
-    if (q.h === 'asst') { if (p.apend > 0) G.aOffer.forEach(function (id, i) { out.push({ t: 'ans', v: { g: i } }); }); else p.asst.forEach(function (a, k) { if (!a.gold) out.push({ t: 'ans', v: { u: k } }); }); }
+    if (q.h === 'asst') { if (p.apend > 0) G.aSt.forEach(function (st, i) { if (st.length) out.push({ t: 'ans', v: { g: i } }); }); else p.asst.forEach(function (a, k) { if (!a.gold) out.push({ t: 'ans', v: { u: k } }); }); }
+    if (q.h === 'tbon') G.tb.forEach(function (b, i) { out.push({ t: 'ans', v: { b: i } }); });
     return out;
   }
   // ------------------------------------------------------------ research assistants
@@ -136,12 +152,15 @@
      left to upgrade is lost. Returns true when the seat must choose. */
   function asstNext(G, s) {
     var p = G.p[s]; if (!p.asst) return false;
-    while (p.apend > 0 && (p.asst.length >= V.ASST_MAX || !G.aOffer.length)) { p.apend--; p.upend++; }
+    while (p.apend > 0 && (p.asst.length >= V.ASST_MAX || !G.aSt.some(function (x) { return x.length; }))) { p.apend--; p.upend++; }
     if (p.apend > 0) return true;
     if (p.upend > 0 && !p.asst.some(function (a) { return !a.gold; })) p.upend = 0;
     return p.upend > 0;
   }
-  function asstAsk(G, s, rest, main) { if (!asstNext(G, s)) return false; G.q = { h: 'asst', seat: s, ops: rest || [], main: main, d: {} }; return true; }
+  function asstAsk(G, s, rest, main) { var pp = G.p[s]; if (pp.tbpend > 0) { if (G.tb.length) { G.q = { h: 'tbon', seat: s, ops: rest || [], main: main, d: {} }; return true; } pp.tbpend = 0; }
+    if (!asstNext(G, s)) return false; G.q = { h: 'asst', seat: s, ops: rest || [], main: main, d: {} }; return true; }
+  function canOpsG(G, s, ops) { var p = G.p[s]; if (!canOps(p, ops)) return false; for (var i = 0; i < ops.length; i++) { if (ops[i].tp && !payPlan(G, s, ops[i].tp)) return false; if (ops[i].b && !G.row.some(function (id) { return id && buyOk(G, p, id, ops[i]); })) return false; } return true; }
+  function buyOk(G, p, id, o) { var c = card(id); if (o.b !== '*' && (o.b === 'i') !== (c.t === 'item')) return false; var cost = cardCost(id), k = Object.keys(cost)[0], need = {}; need[k] = Math.max(0, cost[k] - o.o); return has(p, need); }
   function canOps(p, ops) { var need = {}; ops.forEach(function (o) { if (o.p) for (var k in o.p) need[k] = (need[k] || 0) + o.p[k]; }); return has(p, need); }
   // ------------------------------------------------------------ effects
   // run ops for seat s; stops at the first op that needs a choice (G.q). main = this is the turn's main action (turn ends when the ops are done)
@@ -153,6 +172,8 @@
       else if (o.p) { if (!has(p, o.p)) return finishOps(G, s, main); pay(p, o.p); }
       else if (o.d) { var n = draw(G, p, o.d); log(G, s, nm(G, s) + ' draws ' + n + ' card' + (n === 1 ? '' : 's') + '.'); }
       else if (o.r) { stepFree(G, s, o.r); if (asstAsk(G, s, rest, main)) return; }
+      else if (o.tv) { p.tv.push(o.tv); log(G, s, nm(G, s) + ' gets a ' + V.TNAME[o.tv] + ' of travel for this turn.'); }
+      else if (o.tp) { var tpl = payPlan(G, s, o.tp); if (!tpl) return finishOps(G, s, main); spendTravel(G, s, tpl); }
       else if (o.x) { if (p.hand.length || p.disc.length || p.play.length) { G.q = { h: 'exile', seat: s, ops: rest, main: main, d: {} }; return; } }
       else if (o.or) { G.q = { h: 'or', seat: s, ops: rest, main: main, d: { opts: o.or } }; if (!answers(G, s).length) { G.q = null; continue; } return; }
       else if (o.b) { G.q = { h: 'buy', seat: s, ops: rest, main: main, d: { k: o.b, o: o.o } }; if (answers(G, s).length <= 1) { G.q = null; continue; } return; }
@@ -166,10 +187,10 @@
     if (k === 'g') { if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
     else { if (p.note < p.glass && p.note + 1 < V.TOP) { p.note++; arrive(G, s, p.note, 'notebook'); } else if (p.glass < V.TOP) { p.glass++; arrive(G, s, p.glass, 'magnifier'); } }
   }
-  function arrive(G, s, row, what) { var pp = G.p[s]; if (pp.asst && V.ASST_ROWS.indexOf(row) >= 0) { if (what === 'magnifier') pp.apend++; else pp.upend++; } if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); if (what === 'magnifier' && V.FIRST[row] && !(G.firstTaken || {})[row]) { G.firstTaken = G.firstTaken || {}; G.firstTaken[row] = s + 1; gain(G.p[s], V.FIRST[row]); log(G, s, nm(G, s) + ' is first to row ' + row + ': extra ' + V.resText(V.FIRST[row]) + '.', { k: 'first', row: row }); } log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
+  function arrive(G, s, row, what) { var pp = G.p[s]; if (pp.asst && what === 'notebook') { if (V.ASST_REC.indexOf(row) >= 0) pp.apend++; if (V.ASST_UP.indexOf(row) >= 0) pp.upend++; } if (pp.asst && what === 'magnifier' && row === V.TOP) pp.tbpend = (pp.tbpend || 0) + 1; if (row === V.TOP && what === 'magnifier') { G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(s) < 0) G.templeOrder.push(s); } var b = V.TRACK[row].bonus; gain(G.p[s], b); if (what === 'magnifier' && V.FIRST[row] && !(G.firstTaken || {})[row]) { G.firstTaken = G.firstTaken || {}; G.firstTaken[row] = s + 1; gain(G.p[s], V.FIRST[row]); log(G, s, nm(G, s) + ' is first to row ' + row + ': extra ' + V.resText(V.FIRST[row]) + '.', { k: 'first', row: row }); } log(G, s, nm(G, s) + '\'s ' + what + ' climbs to row ' + row + (row === V.TOP ? ' (the temple)' : '') + ': +' + V.resText(b) + '.', { k: 'research', row: row, what: what }); }
   function digSite(G, s, i) {
     var x = G.sites[i], p = G.p[s], site = V.SITE[x.tile];
-    x.occ = s; p.ex--; gain(p, site.rew);
+    if (x.occ === -1) x.occ = s; else x.occ2 = s; p.ex--; gain(p, site.rew);
     log(G, s, nm(G, s) + ' digs at ' + site.name + ': +' + V.resText(site.rew) + '.', { k: 'dig', site: i, g: site.rew });
   }
   // ------------------------------------------------------------ apply
@@ -179,10 +200,10 @@
     if (!legal) return { ok: false, err: 'illegal move ' + JSON.stringify(m) };
     G.ev = []; var p = G.p[s];
     if (m.t === 'ans') { answer(G, s, m.v); return { ok: true }; }
-    if (m.t === 'asst') { var as = p.asst[m.k]; as.ex = true; log(G, s, nm(G, s) + ' sends the ' + V.ASSTBY[as.id].name + ' to work.', { k: 'asst' }); runOps(G, s, asstOps(as), false); return { ok: true }; }
+    if (m.t === 'asst') { var as = p.asst[m.k]; as.ex = true; log(G, s, nm(G, s) + ' sends the ' + V.ASSTBY[as.id].name + ' to work.', { k: 'asst' }); runOps(G, s, asstOps(as), !!V.ASSTBY[as.id].main); return { ok: true }; }
     if (m.t === 'boon') { var g = p.guards[m.k]; g.used = true; log(G, s, nm(G, s) + ' uses the boon of ' + V.GUARD[g.id].name + '.', { k: 'boon' }); runOps(G, s, V.GUARD[g.id].boon, false); return { ok: true }; }
     if (m.t === 'idol') { var d = p.idols[m.k], sh = V.SHRINE[m.sh]; d.used = true; p.idolTurn = true; log(G, s, nm(G, s) + ' sets the ' + V.IDOL[d.id].name + ' in a shrine: ' + sh.text + '.', { k: 'idol' }); runOps(G, s, sh.ops, false); return { ok: true }; }
-    if (m.t === 'play' && card(p.hand[m.i]).t === 'basic') { var bid0 = p.hand.splice(m.i, 1)[0], b0 = card(bid0); p.play.push(bid0); log(G, s, nm(G, s) + ' plays ' + b0.name + ' (free).', { k: 'play', card: bid0, free: true }); runOps(G, s, b0.ops, false); return { ok: true }; }
+    if (m.t === 'play' && (card(p.hand[m.i]).t === 'basic' || card(p.hand[m.i]).fa)) { var bid0 = p.hand.splice(m.i, 1)[0], b0 = card(bid0); p.play.push(bid0); log(G, s, nm(G, s) + ' plays ' + b0.name + ' (free).', { k: 'play', card: bid0, free: true }); runOps(G, s, b0.ops, false); return { ok: true }; }
     G.turns++;
     if (m.t === 'pass') { p.passed = true; log(G, s, nm(G, s) + ' passes.', { k: 'pass' }); endTurn(G, true); return { ok: true }; }
     if (m.t === 'play') {
@@ -222,9 +243,10 @@
       else { p.play.push(bid); log(G, s, nm(G, s) + ' takes ' + bc.name + ' cheaper and uses it.', { k: 'buy', card: bid }); return runOps(G, s, bc.ops.concat(rest), main); }
     }
     if (q.h === 'site' && v != null) digSite(G, s, v);
+    if (q.h === 'tbon') { var bt = V.TBONUS[G.tb.splice(v.b, 1)[0]]; gain(p, bt); p.tbpend--; log(G, s, nm(G, s) + ' takes a Lost Temple bonus: ' + V.resText(bt) + '.', { k: 'tbon', g: bt }); if (asstAsk(G, s, rest, main)) return; return runOps(G, s, rest, main); }
     if (q.h === 'asst') {
-      if (v && v.g != null) { var aid = G.aOffer.splice(v.g, 1)[0]; p.asst.push({ id: aid, gold: false, ex: false }); p.apend--; if (G.aPile.length) G.aOffer.push(G.aPile.shift()); log(G, s, nm(G, s) + ' hires the ' + V.ASSTBY[aid].name + '.', { k: 'hire', a: aid }); }
-      else if (v && v.u != null) { var ua = p.asst[v.u]; ua.gold = true; p.upend--; log(G, s, nm(G, s) + '\'s ' + V.ASSTBY[ua.id].name + ' turns gold.', { k: 'upgrade', a: ua.id }); }
+      if (v && v.g != null) { var aid = G.aSt[v.g].shift(); p.asst.push({ id: aid, gold: false, ex: false }); p.apend--; log(G, s, nm(G, s) + ' hires the ' + V.ASSTBY[aid].name + '.', { k: 'hire', a: aid }); }
+      else if (v && v.u != null) { var ua = p.asst[v.u]; ua.gold = true; ua.ex = false; p.upend--; log(G, s, nm(G, s) + '\'s ' + V.ASSTBY[ua.id].name + ' turns gold.', { k: 'upgrade', a: ua.id }); }
       if (asstAsk(G, s, rest, main)) return;
     }
     runOps(G, s, rest, main);
@@ -232,7 +254,7 @@
   function same(a, b) { if (a.t !== b.t) return false; if (a.t === 'ans') return JSON.stringify(a.v) === JSON.stringify(b.v === undefined ? null : b.v); for (var k of ['i', 's', 'r', 'k', 'sh']) if (a[k] !== undefined && a[k] !== b[k]) return false; return true; }
   // ------------------------------------------------------------ turn / round flow
   function endTurn(G, passed) {
-    var cur = G.turn; G.p[cur].idolTurn = false;
+    var cur = G.turn; G.p[cur].idolTurn = false; if (G.p[cur].tv) G.p[cur].tv = [];
     if (G.rival && cur === 0) { if (!passed) rivalTurn(G); else while (G.rival.deck.length) rivalTurn(G); }   /* after you pass the rival plays out its stack */
     if (G.p.every(function (p) { return p.passed; })) return endRound(G);
     for (var k = 1; k <= G.np; k++) { var n = (cur + k) % G.np; if (!G.p[n].passed) { G.turn = n; return; } }
@@ -240,7 +262,7 @@
   function endRound(G) {
     G.sites.forEach(function (x) {
       if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'play'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
-      x.occ = -1;
+      x.occ = -1; if (x.occ2 != null && x.occ2 >= 0) { G.p[x.occ2].ex++; x.occ2 = -1; }
     });
     G.p.forEach(function (p) { p.deck = p.deck.concat(shuf(G, p.play.concat(p.disc))); p.disc = []; p.play = []; p.passed = false; p.idolTurn = false; (p.asst || []).forEach(function (a) { a.ex = false; }); });   /* rulebook: the play area is shuffled and put under the deck (items bought this round stay above it) */
     if (G.round >= G.rounds) return endGame(G);
@@ -299,7 +321,7 @@
     var errs = [];
     G.p.forEach(function (p, i) {
       for (var k in p.res) if (p.res[k] < 0 || p.res[k] !== Math.floor(p.res[k])) errs.push('seat ' + i + ' ' + k + ' = ' + p.res[k]);
-      var onBoard = G.sites.filter(function (x) { return x.occ === i; }).length; if (onBoard + p.ex !== V.EXPL) errs.push('seat ' + i + ' explorers ' + onBoard + '+' + p.ex);
+      var onBoard = G.sites.filter(function (x) { return x.occ === i; }).length + G.sites.filter(function (x) { return x.occ2 === i; }).length; if (onBoard + p.ex !== V.EXPL) errs.push('seat ' + i + ' explorers ' + onBoard + '+' + p.ex);
       if (p.note > p.glass) errs.push('seat ' + i + ' notebook above magnifier');
       if (p.glass > V.TOP) errs.push('seat ' + i + ' glass too high');
       if ((p.asst || []).length > V.ASST_MAX) errs.push('seat ' + i + ' too many assistants');

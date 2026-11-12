@@ -480,3 +480,10 @@ body.vg-guided.vg-pick #map .site.gq,body.vg-guided.vg-pick #row .cd.gq,body.vg-
   body.vg-b2.vg-hasex #hand .cd .pic{height:14px}
   body.vg-b2.vg-hasex #extra .tag{min-height:44px;padding-top:0;padding-bottom:0}
 }
+.tc .tas.gold{background:#e8b84a;color:#3a240c}
+.tag.tvc{min-height:44px;font-size:14px;background:#e7f0ff}
+body.vg-b2 .site .occ2{right:auto;left:-14px}
+body.vg-b2 .site .sp2{position:absolute;left:-8px;bottom:-6px;font:800 14px/18px var(--gx-font,Georgia,serif);background:#f4e6c0;color:#3a240c;border:1px solid #6a4318;border-radius:9px;padding:0 4px;z-index:3}
+body.vg-b2 #extra{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+body.vg-b2 #extra .tag{flex:none}
+@media (max-width:400px){body.vg-b2 #extra{gap:4px}body.vg-b2 #extra .tag{padding:0 6px 0 3px;gap:3px}body.vg-b2 #extra .tag .ic{width:30px;height:30px}}

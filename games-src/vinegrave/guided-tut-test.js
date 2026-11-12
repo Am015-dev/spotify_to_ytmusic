@@ -3,8 +3,8 @@
 // node guided-tut-test.js   (python3 build.py first)
 const { chromium } = require('playwright'), serve = require('./serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const RULES = ['goal', 'g-play', 'g-play2', 'g-plane', 'g-plane2', 'g-disc', 'g-disc2', 'g-idol', 'g-shrine', 'g-beat', 'g-beat2', 'g-boon', 'g-boon2',
-  'g-item', 'g-item2', 'g-art', 'g-art2', 'g-res', 'g-res2', 'g-asst', 'g-asst2', 'g-asst3', 'g-note', 'g-note2', 'g-temple', 'g-temple2', 'g-pass', 'score1', 'score2', 'score3'];
+const RULES = ['goal', 'g-play', 'g-play2', 'g-free', 'g-free2', 'g-plane', 'g-plane2', 'g-disc', 'g-disc2', 'g-idol', 'g-shrine', 'g-beat', 'g-beat2', 'g-boon', 'g-boon2',
+  'g-item', 'g-item2', 'g-art', 'g-art2', 'g-res', 'g-res2', 'g-note', 'g-note2', 'g-asst', 'g-asst2', 'g-asst3', 'g-temple', 'g-temple2', 'g-tbon', 'g-temple3', 'g-temple4', 'g-pass', 'score1', 'score2', 'score3'];
 (async () => {
   const S = await serve(), b = await chromium.launch(); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
   for (const [w, h] of [[390, 844], [375, 667]]) {

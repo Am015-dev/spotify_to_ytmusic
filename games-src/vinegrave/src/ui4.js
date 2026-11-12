@@ -38,12 +38,12 @@ function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up o
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
   const me = G.p[0], tm = G.p[1];
-  me.hand = ['trail', 'dread', 'grant', 'dread', 'trail']; me.deck = ['grant'];
+  me.hand = ['trail', 'dread', 'machete', 'dread', 'trail']; me.deck = ['grant'];   /* Brush Machete: a free-action (lightning) item */
   me.res = { coin: 2, compass: 2, tablet: 1, arrow: 0, jewel: 1 };
   tm.hand = ['dread', 'grant', 'dread', 'trail', 'grant']; tm.deck = ['trail'];
   const gi = G.guards.indexOf('glass-moth'); if (gi >= 0) { G.guards.splice(gi, 1); G.guards.push('glass-moth'); }
   const li = G.items.indexOf('lamp'); if (li >= 0) { G.items[li] = G.row[0]; G.row[0] = 'lamp'; } else { const ri = G.row.indexOf('lamp'); if (ri > 0) { G.row[ri] = G.row[0]; G.row[0] = 'lamp'; } }
-  const ao = ['a-map', 'a-purse', 'a-scribe']; G.aPile = G.aPile.concat(G.aOffer).filter(x => ao.indexOf(x) < 0); G.aOffer = ao;   /* the helper you hire first asks nothing */
+  const ao = ['a-map', 'a-purse', 'a-scribe'], rest = [].concat.apply([], G.aSt).filter(x => ao.indexOf(x) < 0); G.aSt = ao.map((id, k) => [id].concat(rest.slice(k * 3, k * 3 + 3)));   /* the helper you hire first asks nothing */
   G.turn = 0; G.first = 0; render();
 }
 const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
@@ -136,6 +136,9 @@ function guidedSteps() {
     step('g-play', 'Free cards', 'Starting cards are free to play. Tap Trail Notes.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
     step('g-play2', 'Free cards', 'Tap it again: plus 1 compass. Your turn goes on.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
       { ready: () => tmine() && !!$('#hand .cd.sel') }),
+    step('g-free', 'Free items', 'Lightning items are free too. Tap Brush Machete.', tq(() => $('#hand .cd[data-id="machete"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'machete' }),
+    step('g-free2', 'Free items', 'Tap again: a coin and a compass. Still your turn.', tq(() => $('#hand .cd.sel')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+      { ready: () => tmine() && !!$('#hand .cd.sel') }),
     step('g-plane', 'Travel by Plane', 'This camp needs a Boat. No Boat card? Tap it.', tsel('.site[data-i="2"].glow'), { type: 'tap', match: a => a.what === 'site' && a.x === 2 },
       { onEnter: () => TOP_UP({ coin: 2 }), ready: () => tmine() && !!$('.site[data-i="2"].glow') }),
     step('g-plane2', 'Travel by Plane', 'Tap again: 2 coins buy a Plane. Take its goods.', selSite(), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'dig' }),
@@ -160,16 +163,22 @@ function guidedSteps() {
     step('g-res', 'Research', 'Pay to climb the magnifier. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
       { onEnter: () => TOP_UP(V.TRACK[G.p[0].glass + 1].cost) }),
     step('g-res2', 'Research', 'Tap Magnifier: up one row, take its bonus.', choice(/^Magnifier/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'g' }),
-    step('g-asst', 'Assistants', 'Row 2 brings an assistant. Tap the Map Reader.', choice(/^Map Reader/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
+    step('g-note', 'Notebook', 'Now the notebook, to row 2. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => { const me = G.p[0]; if (me.note < 1) me.note = 1; TOP_UP(V.TRACK[me.note + 1].cost); } }),
+    step('g-note2', 'Notebook', 'Tap Notebook. It follows, never passing the magnifier.', choice(/^Notebook/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'n' }),
+    step('g-asst', 'Assistants', 'Your notebook hired help. Tap the Map Reader.', choice(/^Map Reader/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
       { ready: () => tmine() && !!G.q && G.q.h === 'asst' }),
     step('g-asst2', 'Assistants', 'Your assistant works once a round, free. Tap it.', tq(() => $('#extra [data-a=asst]')), { type: 'tap', match: a => a.what === 'asst' },
       { ready: () => tmine() && !!$('#extra [data-a=asst]') }),
     step('g-asst3', 'Assistants', 'Use it now: plus 1 compass. It rests until next round.', tinsp('Use it'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'asst' }, { ready: inspOpen }),
-    step('g-note', 'Notebook', 'Now the notebook. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
-      { onEnter: () => TOP_UP(V.TRACK[G.p[0].note + 1].cost) }),
-    step('g-note2', 'Notebook', 'Tap Notebook. It follows, never passing the magnifier.', choice(/^Notebook/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'n' }),
-    step('g-temple', 'Temple', 'Practice jump: your magnifier is at the temple. Tap it.', tq('#track'), { type: 'tap', match: a => a.what === 'track' }, { onEnter: toTemple }),
-    step('g-temple2', 'Temple', 'Tap the temple tile: 6 big points.', choice(/^Temple/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'temple' }),
+    step('g-temple', 'Temple', 'Practice jump: magnifier near the top. Tap the path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => { const me = G.p[0]; me.glass = Math.max(me.glass, V.TOP - 1); TOP_UP(V.TRACK[V.TOP].cost); } }),
+    step('g-temple2', 'Temple', 'Tap Magnifier: into the temple, the top row.', choice(/^Magnifier/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'g' }),
+    step('g-tbon', 'Temple bonus', 'First time in the temple: pick a bonus tile.', choice(/^Bonus/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
+      { ready: () => tmine() && !!G.q && G.q.h === 'tbon' }),
+    step('g-temple3', 'Temple tiles', 'Now research buys temple tiles. Tap the path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => TOP_UP(V.TEMPLE[1].cost), ready: () => tmine() && !G.q }),
+    step('g-temple4', 'Temple tiles', 'Tap a 6 point tile: big points at the end.', choice(/^Temple tile, 6/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'temple' }),
     step('g-pass', 'Pass', 'Pass ends your round. Played cards go under your deck.', tq('#passbtn'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' },
       { ready: () => tmine() && !!$('#passbtn') })
   ];

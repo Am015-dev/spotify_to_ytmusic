@@ -34,8 +34,8 @@ function refreshInsp() {
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
   } else if (I.kind === 'asst') {
     const a = me.asst[I.x]; if (!a) return closeInsp(); const d = V.ASSTBY[a.id];
-    h += `<h3>${esc(d.name)}${a.gold ? ' (gold)' : ''}</h3><p>Once a round, free: ${esc(V.opText(a.gold ? d.gd : d.s))}.</p>${a.gold ? '' : `<p class="sm">Gold side: ${esc(V.opText(d.gd))}.</p>`}<p class="sm">Your notebook on row ${V.ASST_ROWS.join(' or ')} turns one gold.</p>${a.ex ? '<p class="sm">Resting: ready again next round.</p>' : ''}`;
-    L.forEach(m => { if (m.t === 'asst' && m.k === I.x) add(m, 'Use it (free)'); });
+    h += `<h3>${esc(d.name)}${a.gold ? ' (gold)' : ''}</h3><p>Once a round${d.main ? ' (uses your action)' : ', free'}: ${esc(V.opText(a.gold ? d.gd : d.s))}.</p>${a.gold ? '' : `<p class="sm">Gold side: ${esc(V.opText(d.gd))}.</p>`}<p class="sm">Your notebook on row ${V.ASST_UP.join(' or ')} turns one gold.</p>${a.ex ? '<p class="sm">Resting: ready again next round.</p>' : ''}`;
+    L.forEach(m => { if (m.t === 'asst' && m.k === I.x) add(m, d.main ? 'Use it (your action)' : 'Use it (free)'); });
     if (!a.ex && !L.some(m => m.t === 'asst' && m.k === I.x) && myTurn()) h += '<p class="sm">You cannot pay its cost yet.</p>';
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];

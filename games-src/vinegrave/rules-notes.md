@@ -29,11 +29,35 @@ of items/artifacts shifting each round, artifacts free when bought and costing a
 Guessed / our own numbers: every card, site, guardian, idol and track value; starting resources; idol slot scoring (3 vs 1);
 temple tile costs; the rival deck. Counts match the box roughly: 35 items, 35 artifacts, 15 guardians, 10 level-1 and 8 level-2 sites.
 Left out: expansions, the alternate board side.
-Research assistants (FIXED2 r2, logic-test L1-L10): 8 helpers, 3 face up. Your magnifier arriving on row 2 or 5 hires one (silver side);
-your notebook arriving there turns one gold (stronger). Each works once a round as a free action, then rests until round end. At most 2:
-a third hire becomes an upgrade. Our own: the 8 abilities, the rows, the limit of 2 (guessed against the box).
-Still missing from the published base game: free-action (lightning) cards, guardian boons that pay travel, temple bonus tiles, blocking
-tiles, the alternate board side, exile from the play area (H4), and box counts (6 deep ruins, 16 idols, 40 items; we have 8/12/35).
+## FIXED2 r3 (12 Nov 2026): rules checked against the official English rulebook (24 pages, read 12 Nov 2026), with short quotes
+Assistants (logic-test L1-L12):
+- Setup: "12 assistant tiles"; "Turn all assistants silver side up. Shuffle them into 3 random stacks of 4" (p.3-4). Built: G.aSt.
+- Recruit: "When you move your notebook to a row with this symbol, choose one of the assistants available on the supply board. (Usually,
+  there are 3 ...)" (p.16). Built: notebook only; the magnifier never recruits.
+- "Set the assistant on one of the assistant squares on your player board. The silver side should be face up." 2 squares (player aid:
+  "you can have only 2"). Built: max 2; a recruit with 2 held can only upgrade (our handling; the rulebook is silent).
+- Use: "To use your assistant, turn it sideways ... you can use an assistant's effect only once per round. At the end of the round, all
+  assistants are refreshed" (p.16). Free action only when it shows the free-action icon.
+- Upgrade: "When you move your notebook to a row with this symbol, upgrade one of your assistants to the gold level ... the assistant is
+  refreshed even if its silver-level effect was used earlier in the round" (p.16).
+- Effects shown in the rulebook (p.16): a choice of a coin or a Plane (free); a buy discount of 1, 2 on the gold side, which "has no free
+  action icon, so using this assistant counts as your turn's main action"; one that "needs a Boot to make you an arrowhead" (free).
+  Built as a-guide, a-broker, a-fletch. Our own (only icons on the tiles, not in the text): the other 9 effects, the gold sides of the
+  guide and the fletcher, and which notebook rows hold the symbols (we use rows 2 and 4 to hire, 3 and 5 to upgrade).
+Other rules (logic-test M1-M8):
+- Free-action items: "Exploration cards have effects that are free actions, and some item effects are free actions, too" (p.13). Which
+  items: ours (8 cheap items, shown "Free:" on the card).
+- Travel boons: "Some boons are travel values" that pay like a card; "used once during the game" (p.11). 3 guardians (ours) have them;
+  they pay automatically when you dig or explore.
+- Temple: "the 6-point stack ... requires you to pay the two costs ... The 11-point stack ... all three costs" and tiles "are limited"
+  (p.14); setup makes stacks "with as many tiles as there are players": one 11, two 6 and three 2 point stacks. The three costs are ours.
+- Lost Temple: "When your magnifying glass reaches the top row ... take a bonus tile. Look through the stack of face-down tiles and choose
+  one ... There are just enough for everyone" (p.14). Tile values are ours.
+- Blocking tiles (setup 9): "In a four-player game, do not use the blocking tiles"; three players block 3 camp spaces at random; "In a
+  two-player game, block all 5 ... Each site will have space for only one archaeologist." Built: camp sites have a second space.
+- Exile: "you may exile a card from your hand or your play area" (p.13). Built and tested (M8).
+- Box counts: 10 level-I and 6 level-II site tiles, 16 idols, 40 items, 35 artifacts, 15 guardians (p.2): all match.
+Still not built: the alternate board side; research bonus tiles on every space (we keep first-arrival rewards on rows 2, 4, 6, 7).
 
 ## Cross-check against the published rulebook (web, 7 Nov 2026)
 Checked against a rulebook summary page found online (no rulebook text or art copied; numbers re-expressed). Fixed to match:

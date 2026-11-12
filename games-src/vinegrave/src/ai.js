@@ -7,7 +7,7 @@
     var v = 0; (ops || []).forEach(function (o) {
       if (o.g) for (var k in o.g) v += W[k] * o.g[k];
       if (o.p) for (var k2 in o.p) v -= W[k2] * o.p[k2];
-      if (o.d) v += 0.7 * o.d; if (o.x) v += 0.6; if (o.r) v += 1.6; if (o.b) v += 0.5 + 0.3 * o.o; if (o.fd) v += 1.6;
+      if (o.d) v += 0.7 * o.d; if (o.x) v += 0.6; if (o.tv) v += 0.8; if (o.tp) v -= 0.5; if (o.r) v += 1.6; if (o.b) v += 0.5 + 0.3 * o.o; if (o.fd) v += 1.6;
       if (o.or) v += Math.max.apply(null, o.or.map(opVal));
     }); return v;
   }
