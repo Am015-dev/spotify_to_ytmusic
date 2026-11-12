@@ -176,7 +176,7 @@ function hlpCovers(){const bs=[...document.querySelectorAll('.gxh-bub.on:not(.gx
   return bs.some(b=>{const r=b.getBoundingClientRect();return cs.some(c=>r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t)})}
 // the phase bubble must also clear its own target's full box: on short screens move it just above or below the target (arrow hidden if it no longer points)
 function hlpClearOwn(){const b=document.querySelector('.gxh-bub.on[data-phase]');if(!b)return;const st=HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();if(!te)return;const T=te.getBoundingClientRect(),r=b.getBoundingClientRect();
-  if(!(r.left<T.right&&r.right>T.left&&r.top<T.bottom&&r.bottom>T.top))return;const h=r.height,top=T.top-h-10>=4?T.top-h-10:T.bottom+10+h<=innerHeight-4?T.bottom+10:null;if(top==null)return;b.style.top=Math.round(top)+'px';const a=b.querySelector('.gxh-arr');if(a)a.style.visibility='hidden'}
+  if(!(r.left<T.right&&r.right>T.left&&r.top<T.bottom&&r.bottom>T.top))return;const h=r.height,top=T.top-h-10>=4?T.top-h-10:T.bottom+10+h<=innerHeight-4?T.bottom+10:null;if(top==null)return;b.style.top=Math.round(top)+'px';const a=b.querySelector('.gxh-arr');if(a)a.style.visibility='hidden';if(hlpCovers())b.classList.add('gxh-thru')}
 function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();hlpClearOwn();if(hlpCovers())document.querySelectorAll('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)').forEach(b=>b.classList.add('gxh-thru'))}
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
 (function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub):not(.gxh-thru)'))hlpUncover();hlpClearOwn()}catch(e){}requestAnimationFrame(loop)})();
