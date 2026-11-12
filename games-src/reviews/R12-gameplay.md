@@ -70,3 +70,57 @@ What I played:
 | 3 | Quick game, first screen | A 4-point goal card covers the board while the rival already plays its first turn behind it. | R12-shots/vale-g-goalcard-375.jpg |
 | 4 | Season change | The prompt becomes a 3-line paragraph ("Spring is over. Mines pay silver: Azure +0, You +0. New tiles in the market. A full region now gets +8 extra."). | R12-shots/vale-g-zoom-390.jpg |
 | 7 (works) | Whole game | Dice and tiles fly, regions flash, the camera follows the glowing spaces, and the result table is clear. | R12-shots/vale-g-result-win-375.jpg |
+
+---
+
+## 3. perch-and-plume (shelf/W508-perch-gameplay @ b343f526): 6.6, FAIL
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") to the "You win the year / Tap to play a real game" card, by tapping only the highlighted target. A real game followed both times.
+  - 390x844: 21 steps, 23 taps, 24 s.
+  - 375x667: 21 steps, 23 taps, 25 s.
+  - 0 errors.
+- Five full Quick games at the default settings (2 players, Easy rival "Fern", hints off), all to the result screen. Rival speed was the default, not "fast" (the fixer's touch-game.js sets fast).
+  - Four as a new player who taps glowing targets and picks an action at random: lost 39-67 (390), 21-69 (375), 21-59 (390), 19-55 (390).
+  - One control game with the lightbulb switched on, always taking "Best": lost 61-70 (390).
+- 0 page errors, 0 console errors, 0 stuck states, 0 dead taps in 5 games (about 400 taps).
+- Dock scrolls needed to reach a glowing target: 2, 0, 0, 0 and 3.
+- Rival wait from my last tap to my next decision: 2.8-3.4 s on average, 13-23 s at most (the round-end steps).
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Matches the published rules: 4 rounds of 8/7/6/5 actions; egg cost by column; rows that grow stronger; dice feeder; 3-card tray; brown powers right to left; white and pink powers; tuck and cache; round goals; a 5-item starting hand; 1 of 2 secret bonus cards (on the start screen, below the fold). The row-bonus trades are in the engine, but no game offered me one on screen. |
+| 2 | Tutorial teaches | 7 | Every rule in order, one line and one tap each, and it ends in a real game with a "your score, rule by rule" card. Fixed: no step made me wait more than 2 s for its marker. At 375x667, 4 targets start off screen or half under the bottom edge ("Play a bird", the Play and pay buttons, "real game"). Five targets are under 44 px: nest 40x42, tray 36x48, die 56x38, the round strip 359x35. |
+| 3 | First 10 seconds | 7 | Fixed: the start screen and the top bar now carry the goal ("Goal: most points in 4 rounds"), and each action tile says what it gives ("take 2 from the feeder", "+2 eggs = +2 pts"). Not fixed: tutorial step 1 still opens on the full board at once (score bar, feeder, tray, 3 rows, food, bonus card, coach bubble, 4 actions). |
+| 4 | Turn clarity | 6 | Play and Cancel sit under a clear prompt. But the dock header says "Your birds are working" and "Your birds are at work, one by one" during Fern's turn, even in round 1 when I had no birds, while the pill says "Fern's turn". That is two answers to "whose turn is it?". With hints off (the default), nothing tells a newcomer which action is sensible. |
+| 5 | Phone play | 6 | Better: 0-3 dock scrolls per game (6-7 in R6), and Play is never covered. Still: at 375 the hand cards are cut at the bottom edge, and names are cut at both sizes ("Gilded Treecreep", "Fern Woodpeck"). The tutorial at 375 needs 4 scrolls and has 5 targets under 44 px. A big "Your turn" banner covers the three habitat rows at every turn start. |
+| 6 | AI and pacing | 5 | A game is about 3.5 min and rival turns average about 3 s. But I lost all 5 games to the default Easy rival: four new-player games by 28-48 points, and the hints-on, always-"Best" game 61-70. R6 won 1 of 2. A newcomer's first win is not likely. |
+| 7 | Feel | 7 | Painted birds and habitats. Now an egg token flies to the bird and "+1 egg = +1 point" pops on the row. Food dice leave the feeder. The result table is clear. The dock still carries most of the story. |
+| 8 | Bugs | 8 | 2 tutorials and 5 full games: 0 errors, 0 stuck states, 0 dead taps. Not higher because of the wrong "Your birds are working" header (row 4). |
+| | **Total** | **6.6** | **FAIL**: rows 4, 5 and 6 are below 7. No stopper. |
+
+### Earlier findings (G4, R6)
+| Finding | Status | Evidence |
+|---|---|---|
+| G4 row 8 STOPPER: dead first tap after Keep these | **Fixed**: 0 dead taps in 5 games, including the first tap of each. | R12-shots/pp-g-r1-390.jpg |
+| G4 rows 4/5: Play button under the dock header, stale text | **Fixed** (still fine in all 5 games). | R12-shots/pp-g-hand-375.jpg |
+| G4/R6 row 5: 6-7 dock scrolls per game | **Mostly fixed**: 2, 0, 0, 0, 3. | R12-shots/pp-g-hand-375.jpg |
+| R6 row 8: dead tap on a glowing "+2 food" row at 375 | **Fixed**: 0 of about 400 taps dead (390 and 375). | R12-shots/pp-g-result-375.jpg |
+| G4/R6 row 2: see-step markers late (food 4.9 s, eggs 4.2 s, goal 7.0 s) | **Fixed**: no step over 2 s at either size. | R12-shots/pp-tut-07-white-375.jpg |
+| R6 row 2: 3 targets below the fold when the step begins | **Not fixed at 375**: 4 steps start with the target off screen or half cut (390: 1). | R12-shots/pp-tut-03-button-cut-375.jpg |
+| G4/R6 row 3: busy first tutorial screen | **Not fixed**. | R12-shots/pp-tut-01-busy-390.jpg |
+| R6 row 3: no goal line | **Fixed**: the goal is on the start screen and in the top bar. | R12-shots/pp-start-hand-390.jpg, R12-shots/pp-g-r1-390.jpg |
+| R6 row 7: actions resolve as dock text | **Partly fixed**: eggs and food now fly, with point pops on the board. | R12-shots/pp-best-result-390.jpg, R12-shots/pp-g-yourturn-banner-390.jpg |
+| G4/R6 row 6: rival too strong | **Not fixed**: Easy is the default (R12-shots/pp-setup-easy-390.jpg), but I lost 5 of 5 to it. | R12-shots/pp-g1-result-390.jpg, R12-shots/pp-g-result-375.jpg, R12-shots/pp-g2-result-390.jpg, R12-shots/pp-best-result-390.jpg |
+| R1 row 1: row-bonus trade never offered | **Not seen** in 5 games. | n/a |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | Played 5 default games (Easy), one with hints on, always taking "Best" | Lost all 5: 39-67, 21-69, 21-59, 19-55, and 61-70 with "Best". | R12-shots/pp-best-result-390.jpg, R12-shots/pp-g-result-375.jpg |
+| 4 | Watched Fern's turn in round 1 (I had no birds yet) | The dock header reads "Your birds are working" and the line "Your birds are at work, one by one", next to a "Fern's turn" pill. | R12-shots/pp-g-fernturn-yourbirds-390.jpg, R12-shots/pp-g-fernturn-375.jpg |
+| 5 | Tutorial at 375x667 | Steps "Play a bird", the Play and pay buttons and "real game" start off screen or half under the bottom edge. Nest 40x42, tray 36x48 and die 56x38 targets are under 44 px. | R12-shots/pp-tut-03-button-cut-375.jpg, R12-shots/pp-tut-04-375.jpg |
+| 5 | Turn start | A large "Your turn / 8 actions left this round" banner covers all three habitat rows. | R12-shots/pp-g-yourturn-banner-390.jpg |
+| 5 | Hand strip | Card names are cut ("Gilded Treecreep", "Fern Woodpeck"). At 375 the cards are cut at the bottom edge. | R12-shots/pp-g-hand-375.jpg |
+| 6 | Timed rival turns at default speed | Average 2.8-3.4 s, but up to 13-23 s with nothing to do at round ends. | R12-shots/pp-g2-result-390.jpg |
+| 2 (works) | Tutorial end | A "Your score, rule by rule" card, then a real game. | R12-shots/pp-tut-end-375.jpg |
