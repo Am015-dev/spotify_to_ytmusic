@@ -118,7 +118,8 @@ const GUIDED = !/[?&]tut=coach\b/.test(location.search);
 const TOP_UP = r => { const me = G.p[0]; Object.keys(r).forEach(k => { me.res[k] = Math.max(me.res[k], r[k]); }); render(); };
 const tsel = (sel, test) => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width && (!test || test(x))); return e || null; };
 function guidedSteps() {
-  const step = (id, title, say, target, wait, extra) => Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {});
+  const step = (id, title, say, target, wait, extra) => { const o = Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {}), oe = o.onEnter;
+    o.onEnter = function () { const r = oe ? oe.apply(this, arguments) : undefined; setTimeout(() => { if (G && UI.mode === 'tutorial') render(); }, 0); return r; }; return o; };   /* re-glow for the new step */
   const site = lv => tsel('.site.l' + lv + '.glow');
   const isSite = lv => a => a.what === 'site' && G.sites[a.x] && G.sites[a.x].lvl === lv;
   const selSite = () => tq(() => $('.site.sel'));

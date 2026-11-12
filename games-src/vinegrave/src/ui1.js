@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render (one board: sites, research track, market; your tray below) =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, tut: null, sel: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'easy', hot: false }, prefs: {}, tut: null, sel: null };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -30,7 +30,7 @@ function cardHTML(id, o) {
   o = o || {}; const c = V.CARDS[id];
   const cost = c.t === 'item' ? `<span class="cost">${c.cost}${ic('coin')}</span>` : c.t === 'art' ? `<span class="cost">${c.cost}${ic('compass')}</span>` : '';
   const lab = c.name + (c.t === 'item' ? ', item, ' + c.cost + (c.cost === 1 ? ' coin' : ' coins') : c.t === 'art' ? ', artifact, ' + c.cost + (c.cost === 1 ? ' compass' : ' compasses') : '') + '. ' + c.text + ' Pays travel: ' + V.TNAME[c.tr] + '.';
-  return `<button type="button" class="cd ${c.t}${o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
+  return `<button type="button" class="cd ${c.t}${o.glow === 2 ? ' can' : o.glow ? ' glow' : ''}${o.sel ? ' sel' : ''}" ${o.a ? `data-a="${o.a}"` : ''} ${o.i != null ? `data-i="${o.i}"` : ''} ${o.r != null ? `data-r="${o.r}"` : ''} data-id="${id}" aria-label="${esc(lab)}">
     <span class="pic" data-art="card-${id}"><svg class="pg" aria-hidden="true"><use href="#s-${CARD_GLYPH[c.t] || 'card'}"/></svg></span>${cost}<span class="tr">${ic(c.tr)}</span>${c.vp ? `<span class="vp${c.vp < 0 ? ' neg' : ''}">${c.vp > 0 ? '+' + c.vp : c.vp}</span>` : ''}
     <span class="cn">${esc(c.name)}</span><span class="ef">${esc(effShort(c))}</span></button>`;
 }
@@ -40,7 +40,7 @@ function siteHTML(x, i, glow, sel) {
   const hid = !x.tile, nm = siteName(x), occ = x.occ === -1 ? '' : x.occ === -2 ? (G.rival ? G.rival.name : 'Rival') : G.p[x.occ].name;
   const lab = nm + '. Travel ' + x.cost.map(t => V.TNAME[t]).join(' + ') + (hid ? '. Explore for ' + V.DISC[x.lvl] + ' compasses' : '. Dig for ' + resWords(V.SITE[x.tile].rew)) + (x.guard ? '. Guardian: ' + V.GUARD[x.guard].name : '') + (occ ? '. ' + occ + ' is here' : '');
   const rew = hid ? `<b>${V.DISC[x.lvl]}</b>${ic('compass')}` : Object.keys(V.SITE[x.tile].rew).map(k => `<b>${V.SITE[x.tile].rew[k]}</b>${ic(k)}`).join('');
-  return `<button type="button" class="site l${x.lvl}${hid ? ' hid' : ''}${glow ? ' glow' : ''}${sel ? ' sel' : ''}${x.occ !== -1 ? ' taken' : ''}" data-a="site" data-i="${i}" aria-label="${esc(lab)}">
+  return `<button type="button" class="site l${x.lvl}${hid ? ' hid' : ''}${glow === 2 ? ' can' : glow ? ' glow' : ''}${sel ? ' sel' : ''}${x.occ !== -1 ? ' taken' : ''}" data-a="site" data-i="${i}" aria-label="${esc(lab)}">
     <span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span>
     <span class="cost">${x.cost.map(t => ic(t)).join('')}</span>
     <span class="nm">${esc(nm)}</span>
@@ -68,6 +68,8 @@ function movesFor(k, x) {
 // ---------------------------------------------------------------- W490 board view (flag: on by default, ?b2=0 = old terraces)
 /* one painted map: camp at the bottom, ruins in the middle, deep ruins at the top; sites are painted places joined by trails */
 const B2 = !/[?&]b2=0\b/.test(location.search);
+if (B2 && typeof ResizeObserver !== 'undefined') try { const fit = () => { const m = document.getElementById('map'); if (!m) return; const h = m.getBoundingClientRect().height; m.style.setProperty('--ms', h ? Math.max(0.62, Math.min(1, h / 290)).toFixed(2) : 1); };
+  addEventListener('DOMContentLoaded', () => { const m = document.getElementById('map'); if (m) new ResizeObserver(fit).observe(m); fit(); }); if (document.getElementById('map')) new ResizeObserver(fit).observe(document.getElementById('map')); } catch (e) { }   /* sites scale with the map's height */
 if (B2) document.body.classList.add('vg-b2');
 const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
   0: [[15, 73], [33, 85], [51, 73], [69, 85], [87, 73]],
@@ -86,8 +88,26 @@ function mapB2(gS, S) {
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
+/* which legal main moves glow: in a real game only the 3 strongest places (by the computer's own scoring, within 1.5 points of the best),
+   so a newcomer who taps what glows plays well; the tutorial, a pending question and hot-seat keep every legal move glowing */
+function glowSet(L, q) {
+  if (G && UI.mode === 'tutorial' && !q) return tutGlow(L);
+  if (q || !G || UI.mode === 'hot' || typeof evalMoves !== 'function') return L;
+  let ev = []; try { ev = evalMoves(); } catch (x) { return L; } if (!ev.length) return L;
+  const key = m => m.t === 'res' || m.t === 'temple' ? 't' : m.t === 'buy' ? 'r' + m.r : m.t === 'play' ? 'h' + m.i : m.s != null ? 's' + m.s : m.t;
+  const top = ev[0].v, keys = []; ev.forEach(e => { const k = key(e.m); if (keys.length < 3 && e.v >= top - 1.5 && keys.indexOf(k) < 0) keys.push(k); });
+  return L.filter(m => keys.indexOf(key(m)) >= 0);
+}
+/* guided first game: only what the current step asks for glows (a glowing site during "Play a card" was a dead tap) */
+function tutGlow(L) {
+  let st = null; try { st = typeof GUIDED !== 'undefined' && GUIDED && !UI.coachFree && GXT.active() ? GXT.current() : null; } catch (x) { } if (!st) return L;
+  const mt = st.wait && st.wait.match; if (!mt) return L; const me = G.p[UI.view];
+  const forms = m => [{ what: 'mv', m }].concat(m.s != null ? [{ what: 'site', x: m.s }] : m.t === 'play' ? [{ what: 'hand', x: m.i, id: me.hand[m.i] }] : m.t === 'buy' ? [{ what: 'row', x: m.r, id: G.row[m.r] }] : m.t === 'res' || m.t === 'temple' ? [{ what: 'track' }] : []);
+  const f = L.filter(m => forms(m).some(a => { try { return !!mt(a); } catch (x) { return false; } }));
+  return f.length ? f : L;
+}
 function render() {
-  if (!G) return; UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
+  if (!G) return; if (yourTurnClear()) { const t = $('#toast'); if (t) t.classList.remove('on'); } UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
   const actor = VG.actor(G);
   if (UI.sel && (!myTurn() || UI.sel.at !== G.turns + ':' + G.round + ':' + G.p[UI.view].hand.length)) UI.sel = null;
   const S = UI.sel || {};
@@ -101,21 +121,22 @@ function render() {
   $('#opp').innerHTML = G.p.map((p, i) => chip(i, i === UI.view && UI.humans.length === 1 ? 'You' : p.name.split(' ')[0] === 'Dr' ? p.name.split(' ')[1] : p.name.split(' ')[0], tots[i], p.ex, actor === i && G.phase === 'play', p.passed, lead === i)).join('')
     + (G.rival ? chip(-2, G.rival.name.replace(/'s (expedition|crew)$/, ''), VG.rivalScore(G), null, false, false, false) : '');
   // sites: deep ruins, ruins, camp (nearest your tray)
-  const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = 1; });
+  const GL = glowSet(L, q), gl = m => GL.indexOf(m) >= 0 ? 1 : 2;   /* the strongest few moves glow; other legal ones get a faint ring (R29: following the glow scores well) */
+  const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = Math.min(gS[m.s] || 2, gl(m)); });
   if (q && q.h === 'site') VG.moves(G).forEach(m => { if (m.v != null) gS[m.v] = 1; });
   const ter = (lv, label) => `<div class="ter t${lv}"><span class="tl">${label}</span><div class="tiles">${G.sites.map((x, i) => x.lvl === lv ? siteHTML(x, i, gS[i], S.k === 'site' && S.x === i) : '').join('')}</div></div>`;
   if (B2) $('#map').innerHTML = mapB2(gS, S); else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
   $('#map').classList.toggle('pawnsel', S.k === 'pawn');
   // research track: rows 0..8 left to right, the temple last
-  const trG = L.some(m => m.t === 'res' || m.t === 'temple');
+  const trG = GL.some(m => m.t === 'res' || m.t === 'temple'), trC = !trG && L.some(m => m.t === 'res' || m.t === 'temple');
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
     const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
     const nx = myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
     tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span><span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
   }
-  const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
+  const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('can', trC); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
   // market
-  const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
+  const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = Math.min(gR[m.r] || 2, gl(m)); }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
   renderTray(L, q, me, actor);
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
@@ -126,7 +147,7 @@ function render() {
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
 }
 function renderTray(L, q, me, actor) {
-  const over = G.phase === 'over', mine = myTurn(), S = UI.sel;
+  const over = G.phase === 'over', mine = myTurn(), S = UI.sel, GL = glowSet(L, q), gl = m => GL.indexOf(m) >= 0 ? 1 : 2;
   document.body.classList.toggle('vg-pick', !!mine && !over && !q && L.some(m => m.t !== 'pass' && !m.free));
   $('#dock').classList.toggle('mine', !!mine && !over);
   // prompt line + the one button that fits now
@@ -143,15 +164,16 @@ function renderTray(L, q, me, actor) {
   // choices: a pending question, or the research track's options
   const qb = $('#qbox'); let qh = q ? qHTML(q) : (S && S.k === 'track' ? trackChoices() : '');
   qb.hidden = !qh; qb.innerHTML = qh;
+  const qc = qb.querySelector('.qcards'), qg = qc && qc.querySelector('.cd.glow'); if (qg) qc.scrollLeft = Math.max(0, qg.offsetLeft - qc.offsetLeft - 8);   /* the suggested card is in view (R29: cut at 375) */
   // your explorers (drag one onto a glowing site), then your goods in words
-  const canGo = mine && !q && L.some(m => m.t === 'dig' || m.t === 'disc');
+  const canGo = mine && !q && GL.some(m => m.t === 'dig' || m.t === 'disc');
   $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${canGo ? ' glow' : ''}${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site"><span class="pa" data-art="explorer-${UI.view}"></span>${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
   $('#myres').innerHTML = V.RES.map(k => `<span class="rc${me.res[k] ? '' : ' zero'}"><span class="rv">${ic(k)}<b>${me.res[k]}</b></span><span class="rl">${rw(k, me.res[k] === 1 ? 1 : 2).replace('arrowheads', 'arrows').replace('arrowhead', 'arrow')}</span></span>`).join('');
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
   me.idols.forEach((d, k) => { ex += `<button type="button" class="tag${d.used ? ' used' : ''}" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'Set' : 'Idol'}</span></button>`; });
   $('#extra').innerHTML = ex; $('#extra').hidden = !ex;
-  const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = 1; });
+  const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = Math.min(play[m.i] || 2, gl(m)); });
   $('#hand').classList.toggle('many', me.hand.length > 5);
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
 }
@@ -160,10 +182,10 @@ function selInfo(S) {
   const me = G.p[UI.view], ms = movesFor(S.k, S.x);
   if (S.k === 'pawn') return { t: 'Drag your explorer onto a glowing site.' };
   if (S.k === 'hand') { const c = V.CARDS[me.hand[S.x]]; if (!c) return { t: '' };
-    if (ms[0]) return { t: c.name + '. ' + c.text + ' Tap again or drag it up.', go: ms[0], label: 'Play' };
+    if (ms[0]) return { t: c.name + ': ' + effShort(c) + '. Tap again.', go: ms[0], label: 'Play' };
     return { t: c.name + '. ' + (c.t === 'fear' ? 'No effect. Use it to pay travel.' : c.t === 'art' ? 'Playing it needs 1 tablet.' : c.text) }; }
   if (S.k === 'row') { const id = G.row[S.x]; if (!id) return { t: '' }; const c = V.CARDS[id], cw = c.cost + ' ' + (c.t === 'item' ? rw('coin', c.cost) : rw('compass', c.cost));
-    return ms[0] ? { t: c.name + ', ' + cw + '. ' + c.text + ' Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
+    return ms[0] ? { t: c.name + ', ' + cw + '. Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
     if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
     if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
@@ -187,7 +209,7 @@ function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) retur
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return 'Your turn: one action. Tap or drag what glows.' + best;
+  return (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. What glows is a strong move.') + best;
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {
@@ -198,7 +220,9 @@ function qHTML(q) {
   return '';
 }
 function readMs(t, ms) { return Math.max(ms || 0, 4000 + 100 * String(t || '').split(/\s+/).filter(Boolean).length); }   /* 4 s + 1 s per 10 words, never less */
+function yourTurnClear() { return !!(G && UI.mode !== 'tutorial' && G.phase === 'play' && $('#start').hidden && myTurn()); }
 function toast(t, ms) {
   ms = readMs(t, ms); const e = $('#toast'); if ($('#coach.on') || ($('#fx') && !$('#fx').hidden)) return;   /* one message at a time */
+  if (yourTurnClear()) return;   /* R29: never over the board on your turn (a tap on a market card hit it) */
   e.textContent = t; toast.n = (toast.n || 0) + 1; e.className = 'on t' + toast.n; clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms);
 }

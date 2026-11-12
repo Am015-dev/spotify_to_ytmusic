@@ -70,6 +70,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* glow = you can use it now; the rest dims while it is your pick */
 .site.glow,.cd.glow,#track.glow{box-shadow:inset 0 0 0 2px var(--vg-paper),0 0 0 3px var(--glow),0 0 16px 4px rgba(255,211,106,.65)}
 .site.glow,.cd.glow{border-color:#7a4f10}
+.site.can,.cd.can,#track.can{box-shadow:0 0 0 2px rgba(255,226,160,.55)}
 body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick #hand .cd:not(.glow){filter:saturate(.55) brightness(.68)}
 .site.sel,#row .cd.sel{transform:translateY(-4px) scale(1.06);z-index:4;box-shadow:inset 0 0 0 2px var(--vg-paper),0 0 0 3px #fff,0 0 0 6px var(--glow),0 10px 22px rgba(0,0,0,.6)}
 #map.pawnsel .site.glow{animation:siteinvite 1s ease-in-out infinite alternate}
@@ -129,11 +130,12 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 .btn:has(.pv){flex-wrap:wrap;text-align:center}
 #qbox{display:flex;flex-direction:column;gap:6px;background:#fff3d6;border:2px solid var(--gx-accent);border-radius:12px;padding:8px}
 #qbox .qchoices{display:flex;flex-direction:column;gap:6px}
-#qbox .qcards{display:flex;gap:6px;overflow-x:auto;padding:4px 2px}
-#qbox .qcards .cd{flex:0 0 72px}
+#qbox .qcards{display:flex;gap:6px;overflow-x:auto;padding:4px 2px;position:relative}
+#qbox .qcards .cd{flex:0 0 66px}
 #myrow{display:flex;align-items:center;gap:8px;min-height:46px}
 #pawns{display:flex;gap:2px;flex:none}
-.pawn{display:block;width:34px;height:46px;padding:2px 3px;border:0;background:transparent;border-radius:10px}
+span.pawn{width:34px;padding:2px 3px}
+.pawn{display:block;width:44px;height:48px;padding:2px 8px;border:0;background:transparent;border-radius:10px}
 .pawn.mine{touch-action:none;cursor:grab}
 .pawn.glow{background:rgba(255,211,106,.5);box-shadow:0 0 0 2px #c98a2e;animation:pawnbob 1.4s ease-in-out infinite}
 .pawn.sel{background:#ffd36a;box-shadow:0 0 0 3px #7a4f10;transform:translateY(-4px)}
@@ -374,7 +376,7 @@ body.vg-b2 #map .trails{position:absolute;inset:0;width:100%;height:100%;pointer
 body.vg-b2 #map .trails path{fill:none;stroke:#6a4318;stroke-width:1.1;stroke-dasharray:1.6 1.8;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-width:3;opacity:.75}
 body.vg-b2 .msign{position:absolute;left:-4px;writing-mode:vertical-rl;transform:rotate(180deg);font:800 11px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 2px;letter-spacing:.03em;pointer-events:none;z-index:1;box-shadow:0 2px 3px rgba(0,0,0,.35)}
 /* a site = a painted round place, its name on a banner, travel cost and loot as tokens */
-body.vg-b2 .site{--sd:56px;position:absolute;width:var(--sd);height:var(--sd);max-width:none;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f4e6c0;padding:0;overflow:visible;background:#3c5a3f;
+body.vg-b2 .site{--sd:56px;position:absolute;width:calc(var(--sd) * var(--ms,1));height:calc(var(--sd) * var(--ms,1));max-width:none;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f4e6c0;padding:0;overflow:visible;background:#3c5a3f;
   box-shadow:0 0 0 2px #5a3a14,0 6px 10px rgba(0,0,0,.55);flex:none;z-index:2}
 body.vg-b2 .site .pic{inset:0;border-radius:50%}
 body.vg-b2 .site.l0{--sd:54px}
@@ -422,7 +424,7 @@ body.vg-b2 #hand{gap:0;padding-top:6px}
 body.vg-b2 #hand .cd{margin:0 -5px;transform:rotate(calc(var(--k,0) * 4deg)) translateY(calc(var(--k,0) * var(--k,0) * 2.5px));transform-origin:50% 120%}
 body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
 @media (max-height:720px) and (max-width:999px){
-  body.vg-b2 #map{min-height:220px}
+  body.vg-b2 #map{min-height:0}
   body.vg-b2 .site{--sd:52px}body.vg-b2 .site.l0{--sd:48px}body.vg-b2 .site.l2{--sd:54px}
   body.vg-b2 .site .nm{font-size:11px}
   body.vg-b2 #track .tc{min-height:0}body.vg-b2 #track .tl{display:none!important}
@@ -438,3 +440,6 @@ body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
   body.vg-b2 .tc .tn{font-size:16px}body.vg-b2 .tc .tm i{width:20px;height:20px}
   body.vg-b2 #row .tl{display:block}
 }
+
+/* R29: the map never runs under the tray (short phones, or when the tray grows): it may shrink, and its sites scale with it (--ms set in ui1.js) */
+@media (max-width:999px){body.vg-b2 #map{min-height:0}}

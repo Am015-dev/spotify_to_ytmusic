@@ -1,3 +1,13 @@
+# R29 fix (12 Nov 2026): newcomer can win on Easy; nothing covers your turn
+- Glow = advice (src/ui1.js `glowSet`): in a real game only the 3 strongest places glow (computer's own scoring, within 1.5 of the best);
+  other legal moves get a faint ring (.can) and still work. Prompt: "Your turn. What glows is a strong move." Tutorial: only the step's
+  target glows (`tutGlow`, re-rendered on each step). Hot-seat and choosers: every legal move glows.
+- Easy: noise 1.6 -> 4.5 (src/ai.js); the title default is now Easy (UI.opts). Normal/Hard unchanged (ai-gate PASS).
+- Toasts never show on your turn and are cleared when it starts (`yourTurnClear`). Explorer pawns 44x48 tap area.
+- Map shrinks above the tray instead of running under it; sites scale with the map height (--ms, ResizeObserver).
+- Test: `node newcomer-touch.js 6 390x844` (R29 reviewer's newcomer by touchscreen.tap: random glowing thing, its button, 8% random passes).
+  Fast estimate: the node sim in the R29 report (top-3 glow, Easy 4.5) = newcomer 56% wins, avg +2.
+
 # W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
 - Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,
   tidewake (`python3 reuse-art.py`; table in ASSETS.md). Guardians renamed to match their new figures (data.js GU names).
