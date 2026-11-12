@@ -49,7 +49,8 @@ function raceWorld(now) {
 
 /* ---------- screen layer: dashboard, leaderboard, flash, lights ---------- */
 function dashR(W, H) { return W >= 500 ? 42 : H < 360 ? 21 : 30; }   /* short phone boards (375x667): a smaller dashboard so the track stays visible */
-function dashH(W, H) { return H > 240 ? dashR(W, H) * 2 + 18 : 0; }
+function dashOff(W, H) { return W < 500 && H < 420; }   /* short phone boards (375x667): no dashboard on the track; gear, heat and the next corner sit in the dock line (tracker) */
+function dashH(W, H) { return H > 240 && !dashOff(W, H) ? dashR(W, H) * 2 + 18 : 0; }
 function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
   RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
@@ -66,7 +67,7 @@ function raceHud(now, W, H) {
   }
   /* dashboard, bottom-left: speedometer, gear lever, heat gauge */
   var R = dashR(W, H), bx = 8, by = H - R * 2 - 18, dw = R * 2 + R * 1.3 + R * 0.9 + 34;
-  if (H > 240) {
+  if (H > 240 && !dashOff(W, H)) {
     cx.fillStyle = 'rgba(8,12,20,.8)'; rr(bx, by, dw, R * 2 + 12, 12); cx.fill();
     var ox = bx + 6 + R, oy = by + 6 + R, a0 = Math.PI * 0.8, a1 = Math.PI * 2.2, max = 20, f = Math.min(1, RACE.spd / max);
     cx.lineWidth = R * 0.18; cx.lineCap = 'butt'; cx.strokeStyle = '#2a3140'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a1); cx.stroke();
@@ -130,7 +131,10 @@ function tracker() {
   var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
   var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap ? nm(ld) + ' leads by ' + gap : 'level with ' + nm(ld));
   var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
-  PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
+  if (UI.W && dashOff(UI.W, UI.H)) {   /* short boards: the dashboard as one dock line, the board stays clear */
+    var ph = PHASES.filter(function (p) { return p[0] === RACE.ph; })[0], nc = nextCorner(me.pos), gr = G.phase === 'plan' && me.i === UI.seat && !me.plan ? UI.gear : me.gear;
+    h += '<li class="dm">Gear <b>' + gr + '</b></li><li class="dm' + (me.eng <= 1 ? ' hot' : '') + '">Heat <b>' + me.eng + '</b></li>' + (nc ? '<li class="dm">Corner <b class="sgn">' + nc.limit + '</b> in ' + nc.d + '</li>' : '') + (mine && ph ? '<li class="on">' + ph[1] + '</li>' : '');
+  } else PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
   h += '</ol>';
   d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
 }

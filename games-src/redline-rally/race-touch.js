@@ -5,7 +5,7 @@
 const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SEED = process.env.SEED || '11', path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] }); let bad = 0;
-  for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]]) {
+  for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]].filter(v => !process.env.VP || v[0] === process.env.VP)) {
     const c = await b.newContext({ viewport: vp, hasTouch: true, isMobile: true }), p = await c.newPage(), errs = [], probs = [];
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto(url + (url.includes('?') ? '&' : '?') + 'seed=' + SEED, { waitUntil: 'load' });
@@ -48,9 +48,9 @@ const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SE
         if (SUG && st.pend !== 'disc') { const y = await p.evaluate(t => t === 'boost' ? suggestBoost(G, G.cars[G.pend.car]) : suggestSlip(G, G.cars[G.pend.car]), st.pend); await tap(st.pend === 'boost' ? (y ? '#boostY' : '#boostN') : (y ? '#slipY' : '#slipN')); }
         else if (st.pend === 'boost') { /* plain newcomer: boost with 5+ heat and no corner close, else let the No-boost countdown run (0 taps) */
           const y = await p.evaluate(() => { const c = G.cars[G.pend.car], N = T(G).N; let near = false; for (let d = 1; d <= 8; d++) if (T(G).corners[(c.pos + G.pend.speed + d) % N]) near = true; return c.eng >= 5 && !near; });
-          const timed = await p.$('#boostN.qt'); if (y) { qtaps--; qk.boost--; qk.boostYes = (qk.boostYes || 0) + 1; await tap('#boostY'); } else if (TAPALL || !timed) await tap('#boostN'); else { qtaps--; qk.boost--; qk.boostAuto = (qk.boostAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#bq'), null, { timeout: 6000 }).catch(() => probs.push('boost countdown stuck')); } }
+          const timed = await p.$('#boostN.qt'); if (y) { qtaps--; qk.boost--; qk.boostYes = (qk.boostYes || 0) + 1; await tap('#boostY'); } else if (TAPALL || !timed) await tap('#boostN'); else { qtaps--; qk.boost--; qk.boostAuto = (qk.boostAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#bq'), null, { timeout: 4000 }).catch(() => probs.push('boost countdown stuck')); } }
         else if (st.pend === 'slip') await tap('#slipY');
-        else if (st.pend === 'disc') { if (TAPALL) await tap('#discN'); else { qtaps--; qk.disc--; qk.discAuto = (qk.discAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#discN'), null, { timeout: 6000 }).catch(() => probs.push('discard countdown stuck')); } }
+        else if (st.pend === 'disc') { if (TAPALL) await tap('#discN'); else { qtaps--; qk.disc--; qk.discAuto = (qk.discAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#discN'), null, { timeout: 4000 }).catch(() => probs.push('discard countdown stuck')); } }
         continue;
       }
       if (++stuck > 900) { probs.push('stuck'); break; }

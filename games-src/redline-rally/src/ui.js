@@ -52,7 +52,7 @@ function howTo() { rulesFill(); GX.show('rulesd'); }
 function startGame(o) {
   var s = o || UI.set; UI.mode = o && o.tut ? 'tutorial' : ''; if (!(o && o.champ)) UI.champ = null;
   var wx = s.wx || 'dry'; if (wx === 'random') wx = WX_IDS[Math.floor(Math.random() * WX_IDS.length)]; if (!(o && o.cmp)) UI.cmpDef = null; if (!(o && o.tut)) lsSet('rr_seen', '1');
-  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp, wx: o && (o.tut || o.cmp) ? 'dry' : wx, sup: !(o && o.tut) && s.sup !== false });
+  G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed != null ? o.seed : UI.seedArg, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp, wx: o && (o.tut || o.cmp) ? 'dry' : wx, sup: !(o && o.tut) && s.sup !== false });
   if (s.hum === 1) { G.cars[0].name = 'You'; G.cars[0].drv = ''; }   /* the player is "You", never a named driver (the story's rival Kit must be someone else) */
   if (o && o.tut) { [['kit', 'Kit Marlow'], ['juno', 'Juno Vega']].forEach(function (d, k) { G.cars[k + 1].drv = d[0]; G.cars[k + 1].name = d[1]; }); }
   window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
@@ -233,7 +233,7 @@ async function playEvents(ev) {
     UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? 0.4 : 0.26) : 0;
     if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
-    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(750); }
+    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(550); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
     if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
@@ -260,19 +260,22 @@ function showPlayed(e) {
   });
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
-function qTimer(ms, label, btnSel, done) {   /* smart default: a visible countdown on the skip button; touching the panel stops it (then the buttons decide) */
+function qTimer(ms, label, btnSel, done) {   /* smart default: a short countdown on the skip button. A tap anywhere outside the panel takes the default now; touching the panel stops the countdown (then its buttons decide) */
   if (tutOn() || UI.fast) return; var b = $(btnSel); if (!b) return; var t0 = performance.now(), base = label, stop = false;
   b.classList.add('qt'); b.style.setProperty('--qt', '0');
-  var pn = $('#panel'), halt = function () { stop = true; clearInterval(UI.qT); var x = $(btnSel); if (x) { x.classList.remove('qt'); x.textContent = base; } if (pn) pn.removeEventListener('pointerdown', halt, true); };
-  if (pn) pn.addEventListener('pointerdown', halt, true); UI.qHalt = halt;
+  var halt = function () { stop = true; clearInterval(UI.qT); var x = $(btnSel); if (x) { x.classList.remove('qt'); x.textContent = base; } document.removeEventListener('pointerdown', tapAny, true); };
+  var tapAny = function (e) { var pn = $('#panel'); halt(); if (!(pn && pn.contains(e.target)) && !e.target.closest('#modal,.gx-bar')) { e.preventDefault(); e.stopPropagation(); done(); } };
+  document.addEventListener('pointerdown', tapAny, true); UI.qHalt = halt;
   clearInterval(UI.qT); UI.qT = setInterval(function () { if (stop) return; var k = Math.min(1, (performance.now() - t0) / ms), x = $(btnSel); if (!x) { halt(); return; }
-    x.style.setProperty('--qt', k.toFixed(3)); x.textContent = base + ' · ' + Math.ceil((ms - (performance.now() - t0)) / 1000); if (k >= 1) { halt(); done(); } }, 100);
+    x.style.setProperty('--qt', k.toFixed(3)); x.textContent = base + ' · ' + Math.max(0, (ms - (performance.now() - t0)) / 1000).toFixed(1); if (k >= 1) { halt(); done(); } }, 100);
 }
 function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost, once per turn. Asked only when legal (1+ engine heat). */
   var p = G.pend, bc = G.cars[p.car], q2 = bc.pl2;
   /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
   if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
   var av = Math.round(avgSpeed(bc)), L0 = q2 ? landing(G, bc, q2.from + p.speed) : 0, risk = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 4), p.speed + 4, q2.lim) > bc.eng - 1;
+  /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
+  if (!tutOn() && q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1) return Promise.resolve(false);
   var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
   setPhase('react'); setMsg('Speed ' + p.speed + '. Boost? Pay 1 heat, flip a card, add it.' + (risk ? ' A big flip could spin you.' : nc && !tutOn() ? ' Corner in ' + (nc.d + 1) + '.' : ''), risk ? 'warn' : '');
   var old = $('#bq'); if (old) old.remove();
@@ -286,7 +289,7 @@ function askBoost() {   /* React step (rulebook): after your cards are revealed 
     if (UI.fast) setTimeout(function () { fin(false); }, 10);
   });
 }
-var BOOSTMS = 2500, DISCMS = 2500;
+var BOOSTMS = 1500, DISCMS = 1500;
 function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
   if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
   var c = G.cars[G.pend.car], sel = [], done = null;
@@ -397,7 +400,7 @@ function frame(now) {
   cvFit(); var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
   var tgt = RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p), k = (UI.fast || window.ANIM === false) ? 1 : 0.12; cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k; cam.x = Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y));
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
-  var shk = camShake(now), dOff = H < 420 ? dashH(W, H) / 2 : 0; cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
+  var shk = camShake(now), dOff = H < 420 ? dashH(W, H) / 2 : 0;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */

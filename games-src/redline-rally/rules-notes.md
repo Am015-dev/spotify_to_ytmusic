@@ -72,3 +72,6 @@ As built now:
   Stress cannot be picked. Smart default: "Keep all" counts down 2.5 s; touching the hand stops it.
 - Tutorial teaches both exactly as raced (discard any non-Heat, non-Stress card; boost question after the reveal).
 - Logic tests R73 (discard offered every round, a 3 may go), R74 (boost asked after the reveal only with heat), R75 (UI has no gate/toggle).
+
+Round 2 (orchestrator): countdowns are now 1.5 s and a tap anywhere outside the panel takes the default (touching the panel stops it).
+Boost is not asked when even the smallest flip (1) would spin you (no real choice). Discard is asked only when a card may go.

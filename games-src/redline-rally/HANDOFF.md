@@ -69,4 +69,5 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Easy rivals slower (ai.js AIP.easy): sim plain newcomer who boosts at 5+ heat avg 2.6-2.7, podium ~78%.
 - Board: last round's pops cleared when you plan; one preview label ("safe · slip +2"); round rating banner left of the minimap.
 - race-touch.js: plain player = sim-levels D (biggest cards, gear down near corners, boost at 5+ heat); gate counts skip taps.
-- Open: dashboard still overlays the bottom of the 375 board; Go->next decision ~10 s with the two 2.5 s defaults.
+- r2: 375 board has no dashboard (gear, heat, next corner in the dock line, race.js dashOff); 1.5 s defaults, tap-anywhere;
+  ?seed= now seeds the game. Touch placings: 390 seeds 11/21-24: 1,2,2,3,3; 375: 5,1,4,3. Go->next ~10 s in the test.
