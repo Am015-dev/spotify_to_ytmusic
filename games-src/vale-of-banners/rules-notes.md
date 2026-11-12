@@ -14,7 +14,7 @@
   Beacon Tower = 4 points; Granary = sell one kind of goods.
 - Region complete: 1/3/6/10/15/21/28/36 points for 1-8 spaces + 10/8/6/4/2 for seasons 1-5.
 - Goods: 5 per season laid out, one per round goes to the stall shown by the white die. Max 3 kinds of goods held.
-- End: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, Lore end scrolls. Tie: higher on the track.
+- End: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, Lore end scrolls. Tie: more empty estate spaces, then later in turn order (W505).
 - Start: 1 silver, 1-4 workers by starting order, 3 random goods, home keep on the centre space.
 
 ## Guessed / simplified (say so if the owner wants them changed)
@@ -44,3 +44,13 @@ Checked against a rules summary of the official rulebook (rulespal.com rulebook 
 - 40 tiles are black-backed (6 barges, 2 mines, 2 keeps, 6 lore, 8 pastures, 16 buildings) and feed only the back lane; the six stalls never get one.
 - Animals per tile (2/2/3/3/3/4/4 per kind) is our guess; the published split was not found.
 - Not confirmed, so not changed: whether leftover tiles stay on the stalls at season end; whether a meadow may hold two animal kinds.
+
+## W505 gameplay gate (8 Nov 2026)
+Read the full rulebook text again (setup, phase setup, actions, every tile, end) plus two rules pages that list a correction.
+- Fixed: goods crates still on the stalls at a season's end now stay there; only the hexagon tiles are cleared and refilled.
+- Fixed: tie-break is now MORE empty estate spaces, then the player later in turn order. The English rulebook says "fewest"; two rules pages
+  note this is a translation error, so we follow the correction.
+- Confirmed unchanged: sale 2/3/4 per crate, colour bonus 5/6/7 first and 2/3/4 second (nothing for later players), region 1-36 + 10..2,
+  back lane 2 silver once per turn, barge picks any stall, a full storage forces a discard, the 8 buildings, keep = one free action.
+- Still different: the original's stall spaces are colour-coded (each space shows the colour of tile it takes; in 3-player games stall 6 holds a
+  keep in seasons 1, 3, 5 and a mine in seasons 2, 4). The exact colour layout was not found, so our stalls still draw at random.
