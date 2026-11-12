@@ -11,16 +11,16 @@ function lightsStart() {
   setTimeout(function () { sfx('lightsgo'); }, 420 * 5 + 300);
   setTimeout(function () { RACE.lights = null; }, 420 * 5 + 1300);
 }
-function lightsDraw(now, W) {
+function lightsDraw(now, W, H) {
   var L = RACE.lights; if (!L) return; var t = L.freeze != null ? L.freeze : now - L.t0, on = Math.min(5, Math.floor((t - 200) / 420) + 1), out = t > 420 * 5 + 300;
-  var r = Math.max(9, Math.min(18, W / 26)), gap = r * 2.6, w = gap * 5 + 16, x0 = W / 2 - w / 2, y0 = W < 500 ? 104 : 64;
+  var shortB = H && H < 380, r = Math.max(9, Math.min(shortB ? 11 : 18, W / 26)), gap = r * 2.6, w = gap * 5 + 16, x0 = shortB ? 8 : W / 2 - w / 2, y0 = shortB ? 8 : W < 500 ? 104 : 64;   /* short phone board: a small strip top-left, clear of your car (W496) */
   cx.fillStyle = 'rgba(10,12,18,.92)'; rr(x0, y0, w, r * 2 + 18, 12); cx.fill(); cx.strokeStyle = '#3a4152'; cx.lineWidth = 2; cx.stroke();
   for (var i = 0; i < 5; i++) {
     var lit = !out && i < on; cx.beginPath(); cx.arc(x0 + 8 + gap * i + gap / 2, y0 + 9 + r, r, 0, 7);
     cx.fillStyle = out ? '#2fd36b' : lit ? '#ff2a2a' : '#3b1416'; cx.shadowColor = lit ? '#ff2a2a' : out ? '#2fd36b' : 'transparent'; cx.shadowBlur = lit || out ? 16 : 0; cx.fill(); cx.shadowBlur = 0;
   }
   cx.font = '900 ' + Math.round(r * 1.1) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'top'; cx.fillStyle = out ? '#2fd36b' : '#fff';
-  cx.strokeStyle = '#000'; cx.lineWidth = 4; var tx = out ? 'GO!' : 'Lights...'; cx.strokeText(tx, W / 2, y0 + r * 2 + 24); cx.fillText(tx, W / 2, y0 + r * 2 + 24);
+  cx.strokeStyle = '#000'; cx.lineWidth = 4; var tx = out ? 'GO!' : 'Lights...'; var tX = shortB ? x0 + w / 2 : W / 2; cx.strokeText(tx, tX, y0 + r * 2 + 24); cx.fillText(tx, tX, y0 + r * 2 + 24);
 }
 
 /* ---------- world layer (inside the camera transform): skid marks, move preview ---------- */
@@ -42,18 +42,20 @@ function raceWorld(now) {
   for (var p = c.pos + 1; p <= pv.L; p++) { var q2 = tk.space(p, 0); cx.beginPath(); cx.arc(q2.x, q2.y, 7, 0, 7); cx.fill(); }
   var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = 0.5 + 0.25 * Math.sin(now / 180); cx.translate(g.x, g.y); cx.rotate(g.a);
   cx.strokeStyle = pv.spin ? '#ff3b30' : '#fff'; cx.lineWidth = 5; cx.setLineDash([10, 8]); rr(-40, -20, 80, 40, 9); cx.stroke(); cx.setLineDash([]); cx.restore();
-  var lb = pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe';
+  var lb = (pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe') + (pv.slip && !pv.spin ? ' · slip +' + slipN(G) : '');   /* one label at the ghost car, not two */
   cx.font = '900 30px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.lineWidth = 7; cx.strokeStyle = '#000'; cx.fillStyle = pv.spin ? '#ff5a4a' : pv.burn ? '#ffb347' : '#8cf0b4';
   cx.strokeText(lb, g.x, g.y - 34); cx.fillText(lb, g.x, g.y - 34);
-  if (pv.slip) { cx.font = '800 24px sans-serif'; cx.fillStyle = '#8ce6ff'; cx.strokeText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); cx.fillText('slipstream +' + slipN(G) + '?', g.x, g.y + 62); }
 }
 
 /* ---------- screen layer: dashboard, leaderboard, flash, lights ---------- */
+function dashR(W, H) { return W >= 500 ? 42 : H < 360 ? 21 : 30; }   /* short phone boards (375x667): a smaller dashboard so the track stays visible */
+function dashOff(W, H) { return W < 500 && H < 420; }   /* short phone boards (375x667): no dashboard on the track; gear, heat and the next corner sit in the dock line (tracker) */
+function dashH(W, H) { return H > 240 && !dashOff(W, H) ? dashR(W, H) * 2 + 18 : 0; }
 function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
   RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
   /* leaderboard, top-left */
-  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn();
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500;   /* phones: standings live in the Place chip (tap it), nothing over the track */
   if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
   var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
   cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
@@ -64,8 +66,8 @@ function raceHud(now, W, H) {
   });
   }
   /* dashboard, bottom-left: speedometer, gear lever, heat gauge */
-  var R = W < 500 ? 30 : 42, bx = 8, by = H - R * 2 - 18, dw = R * 2 + R * 1.3 + R * 0.9 + 34;
-  if (H > 240) {
+  var R = dashR(W, H), bx = 8, by = H - R * 2 - 18, dw = R * 2 + R * 1.3 + R * 0.9 + 34;
+  if (H > 240 && !dashOff(W, H)) {
     cx.fillStyle = 'rgba(8,12,20,.8)'; rr(bx, by, dw, R * 2 + 12, 12); cx.fill();
     var ox = bx + 6 + R, oy = by + 6 + R, a0 = Math.PI * 0.8, a1 = Math.PI * 2.2, max = 20, f = Math.min(1, RACE.spd / max);
     cx.lineWidth = R * 0.18; cx.lineCap = 'butt'; cx.strokeStyle = '#2a3140'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a1); cx.stroke();
@@ -89,7 +91,7 @@ function raceHud(now, W, H) {
     /* next corners: road-sign speed limits that are always on screen (the close camera hides the track's own signs) */
     var nks = [], np0 = c.pos, tkN = T(G).N;
     for (var dd = 1; dd <= tkN && nks.length < 2; dd++) { var lm = T(G).corners[(np0 + dd) % tkN]; if (lm) nks.push({ d: dd, limit: climit(G, lm) }); }
-    var sx0 = hx + hw + 12, sw = R * 1.5, pv = RACE.prev;
+    var sx0 = hx + hw + 12, sw = Math.max(R * 1.5, 48), pv = RACE.prev;
     if (nks.length) {
       cx.fillStyle = 'rgba(8,12,20,.8)'; rr(sx0, by, sw * nks.length + 10, R * 2 + 12, 12); cx.fill();
       nks.forEach(function (k, i) {
@@ -103,7 +105,7 @@ function raceHud(now, W, H) {
     }
   }
   if (RACE.flash) { var fa = RACE.flashHold ? 0.7 : 1 - (now - RACE.flash) / 700; if (fa > 0) { cx.fillStyle = 'rgba(255,30,20,' + (0.45 * fa).toFixed(2) + ')'; cx.fillRect(0, 0, W, H); } else RACE.flash = 0; }
-  lightsDraw(now, W);
+  lightsDraw(now, W, H);
 }
 function camShake(now) { if (!RACE.shake || RACE.flashHold) return 0; var a = 1 - (now - RACE.shake) / 500; if (a <= 0) { RACE.shake = 0; return 0; } return Math.sin(now / 18) * 10 * a; }
 function raceSpin(e) { RACE.flash = performance.now(); RACE.shake = RACE.flash; RACE.skids.push({ p: e.to + 1, lane: laneOf(e.car), t: RACE.flash }); sfx('skid'); }
@@ -127,20 +129,24 @@ function tracker() {
   var mine = G.phase === 'plan' || (curCar(G) && curCar(G).i === me.i) || G.pend;
   var dt = document.getElementById('dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · Lap ' + lap + '/' + G.laps + ' · Deck ' + me.deck.length + ' · Discard ' + me.disc.length + (G.wx && G.wx !== 'dry' ? ' · ' + WEATHER[G.wx].name : '');
   var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
-  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap ? nm(ld) + ' leads by ' + gap : 'level with ' + nm(ld));
+  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap > 0 ? nm(ld) + ' leads by ' + gap : ld.fin ? nm(ld) + ' finished first' : 'level with ' + nm(ld));
   var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
-  PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
+  if (UI.W && dashOff(UI.W, UI.H)) {   /* short boards: the dashboard as one dock line, the board stays clear */
+    var ph = PHASES.filter(function (p) { return p[0] === RACE.ph; })[0], nc = nextCorner(me.pos), gr = G.phase === 'plan' && me.i === UI.seat && !me.plan ? UI.gear : me.gear;
+    h += '<li class="dm">Gear <b>' + gr + '</b></li><li class="dm' + (me.eng <= 1 ? ' hot' : '') + '">Heat <b>' + me.eng + '</b></li>' + (nc ? '<li class="dm">Corner <b class="sgn">' + nc.limit + '</b> in ' + nc.d + '</li>' : '') + (mine && ph ? '<li class="on">' + ph[1] + '</li>' : '');
+  } else PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
   h += '</ol>';
   d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
 }
 /* the computer's best plan for this hand, as a yardstick for the round rating */
 function rateStart(c) {
-  try { var g2 = JSON.parse(JSON.stringify(G)), p = aiPlan(g2, g2.cars[c.i]), sp = 0, avg = avgSpeed(c); p.cards.forEach(function (x) { var u = upgId(x); sp += u ? UPG[u].sp : x === 'X' ? avg : +x; }); if (p.boost) sp += avg; RACE.best = { sp: Math.round(sp) }; } catch (e) { RACE.best = null; }
+  try { var g2 = JSON.parse(JSON.stringify(G)); g2.diff = 'hard'; var p = aiPlan(g2, g2.cars[c.i]), sp = 0, avg = avgSpeed(c); p.cards.forEach(function (x) { var u = upgId(x); sp += u ? UPG[u].sp : x === 'X' ? avg : +x; }); if (p.boost) sp += avg; RACE.best = { sp: Math.round(sp) }; } catch (e) { RACE.best = null; }
   RACE.start = { pos: c.pos, heat: c.stats.heat, spins: c.stats.spins, ci: c.i };
 }
 function rateRound() {
   var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
-  if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
+  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' spaces, just as planned.'; }   /* a scripted tutorial move is the right play */
+  else if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
   else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
   else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
   else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }
@@ -182,12 +188,12 @@ function champResult() {
 /* ---------- Play mode: the "why" of the race order opens on tap only ---------- */
 function scoreWhy() {
   var rk = rankList(G), N = T(G).N, rows = rk.map(function (ci, k) { var c = G.cars[ci]; return '<tr class="' + (c.human ? 'you' : '') + '"><td>' + (k + 1) + '</td><td><i class="pc" style="background:' + COLS[c.col].hex + '"></i>' + esc(c.human && !G.hot ? 'You' : c.name) + '</td><td>' + (c.fin ? 'finished ' + ord(c.fin) : 'lap ' + Math.min(G.laps, Math.floor(c.pos / N) + 1) + ', ' + (total(G) - c.pos) + ' to go') + '</td><td>heat ' + c.eng + '</td></tr>'; }).join('');
-  modal('<h2>Race order</h2><p>The car furthest round the track is ahead. Two cars on one space? The first one there is ahead. The race ends when all cars finish ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
+  modal('<h2>Race order</h2><p>Furthest round the track leads.</p><p>Same space? First there leads.</p><p>Race ends after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '.</p><table class="champ"><tbody>' + rows + '</tbody></table>');
 }
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast with no heat? You spin.</li></ul>' +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast with no heat? You spin.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }
