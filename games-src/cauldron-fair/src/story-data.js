@@ -11,9 +11,9 @@ const STORY = {
   // ---- the tutorial is the PROLOGUE: "The Night Before". chapters: id of the first step of each
   chapters: {
     goal: ['Ch 1 · The night before', 'Granny Hask: "Tomorrow the fair opens. Tonight you and Wynne play two practice days. Most points wins."'],
-    shops1: ['Ch 3 · The stalls', 'Hask: "The brew is done. Spend your coins at the stalls."'],
-    day2: ['Ch 4 · The last day', 'Hask: "Day two is the last day. Make it count."'],
-    report: ['Ch 2 · Counting up', 'Hask: "Everyone has stopped. Time to count each pot."']
+    shops1: ['Ch 3 · The stalls', 'Granny Hask: "The brew is done. Spend your coins at the stalls."'],
+    day2: ['Ch 4 · The last day', 'Granny Hask: "Day two is the last day. Make it count."'],
+    report: ['Ch 2 · Counting up', 'Granny Hask: "Everyone has stopped. Time to count each pot."']
   },
   // id -> [title, say]. say may be a function. Max two short lines. The guide speaks; the glow shows where to tap, so no "click here" wording.
   steps: {
@@ -34,7 +34,7 @@ const STORY = {
     confirm: ['Next day', 'Chips join your bag (day 6 adds a white); start day 2.'],
     day2: ['Blue fortune', 'Blue cards last all day, so today the limit is 9.'],
     d2draw: ['Last day', 'You trail, so your rat gives a head start; draw in secret.'],
-    red: ['Red chip', 'Hask added chips; draw, a red moves 1 extra after an orange.'],
+    red: ['Red chip', 'New chips in your bag: red moves 1 extra after an orange.'],
     redsaw: ['It jumped', 'Red jumped one extra space, so draw again.'],
     yellow: ['A white', 'A white came; draw, since yellow after a white can return it.'],
     yback: ['Yellow helps', 'Yellow came after a white: send that white back.'],

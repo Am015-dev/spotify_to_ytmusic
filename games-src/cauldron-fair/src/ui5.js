@@ -23,12 +23,13 @@ function buildRules() {
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
   sec('How a day goes', h('ol', ...li([
-    'The fair\'A fortune card is drawn. Purple is instant. Blue lasts all day.',
+    'A fortune card is drawn. Purple is instant. Blue lasts all day.',
     'From day 2, players behind get a rat stone. Count rat tails between you and the leader. Your first chip starts that many spaces further.',
     'Everybody brews at the same time. Each chip moves as many spaces as its number. Then draw again, or stop.',
     'When everyone has stopped, the day is counted. Bonus die, powers, rubies, points, shop.',
     'Spend rubies if you like. Then all your chips go back in the bag. A new day begins.'])));
   sec('Brewing and explosions', h('p', 'White chips (Fizzpods) are dangerous. Only they count towards the limit. Past 7, your cauldron explodes. The last chip stays and you must stop. Later you take your points or your coins, not both.'),
+    h('p', 'If your bag runs empty, you stop. Your last chip still picks your space.'),
     h('p', 'Once a day, your flask puts your last white chip back. It cannot undo an explosion. Refill it with 2 rubies.'),
     h('p', 'On the last day, everyone picks Draw or Stop in secret. Then all picks are shown at once. On other days the computers draw while you think.'));
   sec('The spiral', h('p', 'You score the space right after your last chip. Big number: coins to shop. Brown number: points. Some spaces hold a ruby. The last space is the spoon: 15 points and 35 coins.'));
@@ -40,6 +41,12 @@ function buildRules() {
     'Shopping: buy one or two chips of different colours. Leftover coins are lost. Sold-out chips are gone.',
     'Rubies: 2 rubies move your droplet one space, or refill the flask.'])));
   sec('The ingredient books', h('p', 'Orange and black are always in the shop. Green, blue and red come from the chosen set. Yellow opens on day 2, purple on day 3. Blue, red and yellow act when drawn. Green, purple and black act after the brew. The Cards drawer lists every book.'));
+  { const bk = c => { const set = (typeof G !== 'undefined' && G && G.sets && G.sets[c]) || (c === 'K' ? 0 : 1); return D.BOOKS[c] && D.BOOKS[c][set]; };
+    const gr = bk('G'), bl = bk('K');
+    sec('Green and black chips', h('ul', ...li([
+      D.COLORS.G.name + ' (green)' + (gr ? ', ' + gr.title + ': ' + gr.text : ': after the brew, it pays off as one of your last two chips.'),
+      D.COLORS.K.name + ' (black)' + (bl ? ': ' + bl.text : ': after the brew, more black chips than a neighbour wins a droplet step.')]))); }
+  sec('Extra white chip', h('p', 'Before day 6 everyone adds one white 1 to their bag. Your pot gets riskier from then on.'));
   sec('The last day and the end', h('p', 'Day 9 has no shop. Every 5 coins and every 2 rubies make 1 point. The most points wins. On a tie, the furthest cauldron on day 9 wins.'));
   sec('Playing it', h('ul', ...li([
     'The ring shows where you would score now. The box under the buttons shows your explosion chance.',

@@ -230,6 +230,8 @@ function marketEl(p, q) {
 function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
   st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
+  // R17: a chip or ruby button cut by the scroll edge cannot take a tap at its centre, so it is hidden until it scrolls fully into view
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
