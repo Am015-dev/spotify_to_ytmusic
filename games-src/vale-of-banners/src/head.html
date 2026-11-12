@@ -109,6 +109,8 @@ button{font:inherit;font-size:var(--fs)}
 .seg{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
 .seg button{min-height:44px;min-width:44px;border-radius:10px;border:2px solid rgba(42,32,20,.3);background:#fff8e6;color:#2a2014;font-weight:700;padding:4px 10px;cursor:pointer}
 .seg button.on{background:#2f5d3a;color:#fff;border-color:#2f5d3a}
+.seg button.pulse{animation:segpulse .5s ease-out}
+@keyframes segpulse{0%{transform:scale(1)}40%{transform:scale(1.12);box-shadow:0 0 0 4px rgba(255,214,90,.7)}100%{transform:scale(1)}}
 .srow{display:flex;flex-direction:column;gap:4px;text-align:left}
 .srow>span{font-weight:700}
 #tv .tbig{display:flex;gap:14px;align-items:center}

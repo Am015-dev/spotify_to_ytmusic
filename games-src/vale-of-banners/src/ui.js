@@ -71,9 +71,10 @@ function toast(msg, ms) {   /* toast lane = the dock title row: it never covers 
 }
 function popupsOk() { return !!UI.hintsOn && UI.mode !== 'tutorial' && UI.mode !== 'story'; }   /* pop-ups only with Hints on in a Quick game; Learn uses Odo, Play the line */
 function lineSay(msg, ms) {   /* show a note in the instruction line for a readable time, then go back to the instruction */
-  var pr = $('#prompt'); if (!pr) return; UI.note = msg; pr.textContent = msg; pr.classList.add('note'); clearTimeout(lineSay.t);
-  lineSay.t = setTimeout(function () { UI.note = null; pr.classList.remove('note'); if (G) pr.textContent = promptText(); }, Math.max(ms || 0, readMs(msg)));
+  var pr = $('#prompt'); if (!pr) return; UI.note = msg; pr.textContent = msg; starAdd(pr); pr.classList.add('note'); clearTimeout(lineSay.t);
+  lineSay.t = setTimeout(function () { UI.note = null; pr.classList.remove('note'); if (G) { pr.textContent = promptText(); starAdd(pr); } }, Math.max(ms || 0, readMs(msg)));
 }
+function starAdd(pr) { try { var sl = G && !G.over && isHuman(VB.actor(G)) && starLine(); if (sl) pr.appendChild(h('span.starwhy', { text: sl })); } catch (e) { } }
 function readMs(txt) { return 4000 + 100 * String(txt || '').split(/\s+/).length; }   /* owner: a message stays 4 s + 1 s per 10 words */
 function countUp(tb) {   /* totals tick up from 0 so the result lands as a beat (instant with fast / reduced motion) */
   if (UI.fast || document.documentElement.classList.contains('gx-reduce')) return;
@@ -425,7 +426,7 @@ function starWhy(m) {
   if (m.k === 'discard') return 'Throw away ' + VB.tileName(G.P[s].store[m.s]) + ': least useful now.';
   return gain ? gain + '.' : '';
 }
-function starLine() { if (!hints() || UI.mode === 'tutorial') return ''; var m = hardMove(); return m && m.k !== 'end' ? '★ ' + starWhy(m) : ''; }
+function starLine() { if (!hints() || UI.mode === 'tutorial') return ''; var m = hardMove(); return m ? '★ ' + (m.k === 'end' ? 'End turn: no useful move left. Saves your workers for later.' : starWhy(m)) : ''; }
 function tutStarPaint() {   /* Learn to play: exactly one star, always on the coach's target (never a second opinion) */
   if (!G || UI.mode !== 'tutorial') return; var id = null;
   try { var st = GXT.current(), e = st && st.target ? st.target() : null; if (e && e.id && /^(mt-|bl-|ec-|st-|gd-|gs-)/.test(e.id)) id = e.id; } catch (e) { }
@@ -549,7 +550,7 @@ function renderDock() {
   var gc = !G.over && goalChips(), dt = $('#docktitle');
   if (gc) { dt.innerHTML = ''; dt.appendChild(gc); dt.classList.add('goals'); } else dt.classList.remove('goals');
   if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? 'Your move' : G.seats[a].name + '\'s turn · tap to speed up';
-  var pr0 = $('#prompt'); pr0.textContent = UI.note || promptText(); var sl0 = UI.note ? '' : starLine(); if (sl0) pr0.appendChild(h('span.starwhy', { text: sl0 })); pr0.classList.remove('full'); pr0.onclick = function () { pr0.classList.toggle('full'); };   /* short phones clamp the line: tap to read it all */
+  var pr0 = $('#prompt'); pr0.textContent = UI.note || promptText(); var sl0 = starLine(); if (sl0) pr0.appendChild(h('span.starwhy', { text: sl0 })); pr0.classList.remove('full'); pr0.onclick = function () { pr0.classList.toggle('full'); };   /* short phones clamp the line: tap to read it all */
   var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain of ' + UI.chain + '. Build again'; cb.classList.add('on'); } else cb.classList.remove('on');
   /* dice */
   var dr = $('#dicerow'); dr.innerHTML = ''; var theirs = !G.over && !isHuman(a);
@@ -769,7 +770,7 @@ function doMove(m) {
   try { if (isHuman(s) && GX.undo) { } } catch (e) { }
   try { if (hints()) rateBefore(m); } catch (e) { }
   var r = VB.performMove(G, m); if (!r.ok) { sfx('bad'); toast('That move is not allowed.'); render(); return Promise.resolve(); }
-  r.ev.forEach(function (ev) { if (ev.e === 'score') { srcAdd(ev.p, ev.why, ev.n); srcLogAdd(ev); } });
+  r.ev.forEach(function (ev) { if (ev.e === 'score') { srcAdd(ev.p, ev.why, ev.n); srcLogAdd(ev); if (UI.tutAi && ev.p !== 0) { var rt = UI.rvTut = UI.rvTut || { pts: 0, region: 0, colour: 0 }; rt.pts += ev.n; if (ev.why === 'region') rt.region++; if (ev.why === 'colour') rt.colour++; } } });
   if (m.k === 'end' && isHuman(s)) { var rl = UI.mode === 'tutorial' ? { k: 'okay', t: '' } : rateLine(); UI.lastRate = rl; try { coach('turnover'); } catch (e) { } if (hints() && UI.mode !== 'tutorial') beat('Turn over', rl.t, 'turn ' + rl.k); }
   if (UI.die != null && G.P[s].used[UI.die]) UI.die = null;
   if (UI.bump && typeof m.die === 'number' && G.P[s].used[m.die]) delete UI.bump[m.die]; if (m.k === 'end') UI.bump = {};
@@ -907,7 +908,7 @@ function showSetup() {
   c.appendChild(h('h1', { text: 'Quick game' }));
   function seg(label, opts, cur, set) {
     var r = h('div.srow', {}, [h('span', { text: label })]), s = h('div.seg');
-    opts.forEach(function (o) { s.appendChild(h('button' + (cur === o[0] ? '.on' : ''), { type: 'button', text: o[1], 'aria-pressed': cur === o[0] ? 'true' : 'false', onclick: function () { set(o[0]); showSetup(); } })); });
+    opts.forEach(function (o) { s.appendChild(h('button' + (cur === o[0] ? '.on' : '') + (SET.pulse === label + '|' + o[0] ? '.pulse' : ''), { type: 'button', text: o[1], 'aria-pressed': cur === o[0] ? 'true' : 'false', onclick: function () { if (cur === o[0]) { SET.tick = (SET.tick || 0) + 1; SET.note = label + ': ' + o[1] + (SET.tick % 2 ? ' is already chosen. Tap Start.' : ' is chosen. Tap Start to play.'); SET.pulse = label + '|' + o[0]; showSetup(); return; } SET.note = ''; SET.pulse = ''; set(o[0]); showSetup(); } })); });
     r.appendChild(s); return r;
   }
   c.appendChild(seg('Players', [[1, 'Solo'], [2, '2'], [3, '3'], [4, '4']], SET.n, function (v) { SET.n = v; SET.hot = Math.max(0, Math.min(SET.hot, v - 1)); }));
@@ -917,8 +918,8 @@ function showSetup() {
     c.appendChild(seg('Friends on this device', hs, SET.hot, function (v) { SET.hot = v; }));
     if (SET.n === 4) c.appendChild(seg('Teams', [[0, 'Each alone'], [1, '2 v 2']], SET.teams, function (v) { SET.teams = v; }));
   }
-  c.appendChild(h('p.tip', { text: SET.n === 1 ? 'Solo: 25 rounds. Fill all 37 spaces to win.' : SET.n === 4 && SET.teams ? 'You and Saffron against Azure and Violet. Partners share everything.' : SET.hot ? 'Pass the device when it tells you to.' : 'You against ' + (SET.n - 1) + ' computer player' + (SET.n > 2 ? 's' : '') + '.' }));
-  c.appendChild(h('button.btn.big', { type: 'button', id: 'goB', 'data-a': 'start', text: 'Start', onclick: function () {
+  c.appendChild(h('p.tip', { text: SET.note ? SET.note : SET.n === 1 ? 'Solo: 25 rounds. Fill all 37 spaces to win.' : SET.n === 4 && SET.teams ? 'You and Saffron against Azure and Violet. Partners share everything.' : SET.hot ? 'Pass the device when it tells you to.' : 'You against ' + (SET.n - 1) + ' computer player' + (SET.n > 2 ? 's' : '') + '.' }));
+  c.appendChild(h('button.btn.big', { type: 'button', id: 'goB', 'data-a': 'start', text: 'Start', onclick: function () { SET.note = ''; SET.pulse = '';
     var hot = {}, names = {}; for (var k = 1; k <= SET.hot; k++) { hot[k] = true; names[k] = 'Friend ' + k; }
     UI.lastOpts = { n: SET.n, ai: SET.ai, hot: hot, names: names, teams: SET.n === 4 && !!SET.teams }; startGame(UI.lastOpts);
   } }));
@@ -1026,7 +1027,7 @@ function tutStage(n) {   /* stage your next turn so this lesson's rule comes up 
 }
 function rivalThen(n) {   /* real rival turns (captions, banner), then stage your next turn */
   return function () {
-    UI.tutAi = true; UI.quick = true;   /* tutorial rival turns run at speed: the lesson waits under 3 s, never 10 s in silence */
+    UI.tutAi = true; UI.quick = true; UI.rvTut = { pts: 0, region: 0, colour: 0 };   /* tutorial rival turns run at speed: the lesson waits under 3 s, never 10 s in silence */
     try { toast(G.seats[1].name + ' plays its turns…', 1800); } catch (e) { }
     return new Promise(function (res) {
       schedule();
@@ -1063,6 +1064,9 @@ function tutSteps() {
     { id: 'workers', rule: 'workers', tab: 'estate', say: 'Any die can become two workers. Tap your 5.', target: id('wk1'), wait: ev('workers') },
     { id: 'end2', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
     { id: 'kinds', rule: 'kinds', tab: 'estate', say: 'You can keep at most three kinds of goods.', target: id('goods'), wait: null, ai: rivalThen(3) },
+    { id: 'rvscore', rule: 'order', tab: 'estate', say: function () { var r = UI.rvTut || { pts: 0, region: 0, colour: 0 }, nm = String(G.seats[1].name).split(' ')[0], pr = [];
+        if (r.region) pr.push(r.region + (r.region > 1 ? ' regions' : ' region')); if (r.colour) pr.push(r.colour + ' colour bonus');
+        return r.pts ? nm + ' scored ' + r.pts + (pr.length ? ': ' + pr.join(', ') : '') + '.' : nm + ' has not scored yet.'; }, target: id('opp'), wait: null },
     { id: 'bend', rule: 'bend', tab: 'market', say: 'A worker moves a die one step. Tap the keep.', target: id('mt-2-0'), wait: tapW('market', function (a) { return a.d === 2; }) },
     { id: 'bend2', rule: 'bend', tab: 'market', say: 'Pay one worker: your 1 becomes a 2.', target: btn('die 1'), wait: ev('take') },
     { id: 'wrap', rule: 'wrap', tab: 'estate', say: 'Six and one are neighbours too: a worker turns 6 into 1.', target: id('r-workers'), wait: null },
@@ -1098,7 +1102,38 @@ function tutSteps() {
     { id: 'tie', rule: 'tie', tab: 'estate', say: 'A tie goes to the estate with more empty spaces.', target: id('es'), wait: null }
   ];
 }
+
+/* Learn to play: the coach bubble never covers the instruction line (#prompt). The shared tutor places a bubble around the glowing target only;
+   when that lands on the prompt, slide it to the nearest free spot that touches neither the prompt nor any glowing ring. */
+function tutBubFix(b) {
+  try {
+    if (!b || b.dataset.pfix === (b.style.left + '|' + b.style.top)) return;
+    var pr = $('#prompt'); if (!pr) return; var pq = pr.getBoundingClientRect(); if (pq.width < 4 || pq.height < 4) return;
+    var br = b.getBoundingClientRect(), W = innerWidth, H = innerHeight, pad = 6;
+    function hit(a, c) { return a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top; }
+    var P = { left: pq.left - 2, right: pq.right + 2, top: pq.top - 2, bottom: pq.bottom + 2 };
+    var rings = [].slice.call(document.querySelectorAll('.gxt-ring')).map(function (e) { var r = e.getBoundingClientRect(); return { left: r.left - 8, right: r.right + 8, top: r.top - 8, bottom: r.bottom + 8 }; });
+    function ok(c) { if (c.left < pad || c.right > W - pad || c.top < 36 || c.bottom > H - pad) return false; if (hit(c, P)) return false; for (var i = 0; i < rings.length; i++) if (hit(c, rings[i])) return false; return true; }
+    var cur = { left: br.left, right: br.right, top: br.top, bottom: br.bottom };
+    if (!hit(cur, P)) { b.dataset.pfix = b.style.left + '|' + b.style.top; return; }
+    var w = br.width, h = br.height, best = null, bd = 1e9, xs = [br.left, pad, W - w - pad, (W - w) / 2];
+    xs.forEach(function (x) { for (var y = 36; y <= H - pad - h; y += 4) { var c = { left: x, right: x + w, top: y, bottom: y + h }; if (!ok(c)) continue; var d = Math.abs(x - br.left) * 0.5 + Math.abs(y - br.top); if (d < bd) { bd = d; best = c; } } });
+    if (!best) return;
+    b.style.left = Math.round(best.left) + 'px'; b.style.top = Math.round(best.top) + 'px';
+    var ring = rings[0], arr = b.querySelector('.gxh-arr');
+    if (ring && arr) { var cx = (ring.left + ring.right) / 2, cy = (ring.top + ring.bottom) / 2, sd = best.bottom <= ring.top + 10 ? 'bottom' : best.top >= ring.bottom - 10 ? 'top' : best.right <= ring.left + 10 ? 'right' : 'left';
+      b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + sd; arr.style.left = arr.style.top = '';
+      if (sd === 'top' || sd === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, cx - best.left - 6))) + 'px'; else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, cy - best.top - 6))) + 'px'; }
+    b.dataset.pfix = b.style.left + '|' + b.style.top;
+  } catch (e) { }
+}
+function tutBubWatch() {
+  if (tutBubWatch.on || typeof MutationObserver === 'undefined') return; tutBubWatch.on = 1;
+  var busy = 0; new MutationObserver(function () { if (busy) return; busy = 1; requestAnimationFrame(function () { try { [].slice.call(document.querySelectorAll('.gxt-bub')).forEach(tutBubFix); } catch (e) { } busy = 0; }); })
+    .observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+}
 function tutStart(o) {
+  tutBubWatch();
   if (typeof GXT === 'undefined') return;
   $('#start').hidden = true;
   var steps = tutSteps();
