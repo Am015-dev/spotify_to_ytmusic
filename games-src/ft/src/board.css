@@ -398,7 +398,7 @@ body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!
 /* R27: nine spots do not fit one row at 44 px on a phone: two rows of five and four, every spot 44 tall; the place label sits on its top edge */
 .bidt.two{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-columns:auto;gap:3px}
 .bidt.two .spot{min-height:44px;height:44px;padding:0;justify-content:center}
-.bidt.two .spot .ord{position:absolute;top:0;left:0;z-index:1;font-size:10px!important;padding:0 3px!important;line-height:1.1;border-radius:6px 0 6px 0!important}
+.bidt.two .spot .ord{position:absolute;top:0;left:0;z-index:1;font-size:13px!important;padding:0 4px!important;line-height:1.05;border-radius:6px 0 6px 0!important}
 .bidt.two .sp-b{min-height:44px;height:44px;padding-top:8px}.bidt.two .spot .sp-c{line-height:44px;padding-top:6px}
 html.land .bidt.two{grid-template-columns:repeat(4,minmax(0,1fr))}
 body.guiding .gd-hl{min-height:44px;min-width:44px;box-sizing:border-box}
@@ -416,3 +416,20 @@ html body .ab{line-height:16px}
 html:not(.sk) body .ab{padding:12px 16px!important}
 /* R25: landscape phones (390 px tall): the full market (5 rows) plus 3 djinns must fit under the top bar in every step */
 html.land.short #mkt .mcard{height:40px!important}html.land.short #mkt .mrow{gap:2px!important}
+/* R34 Earn list: ONE row (- Mystic | Earn N | + Mystic) so the bazaar keeps its tiles on a 375x667 phone */
+#acts .arow.earn{flex-wrap:nowrap;gap:6px;width:100%;max-width:420px;margin:0 auto;align-items:stretch}
+html body #acts .arow.earn .ab{height:48px;min-height:44px!important;max-height:52px;padding:0 8px!important;margin:0}
+#acts .arow.earn .ab.ern{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+#acts .arow.earn .ab.ern b{font-size:17px;font-weight:800;white-space:nowrap}#acts .arow.earn .ab.ern small{font-size:12px;opacity:.85;white-space:nowrap}
+#acts .arow.earn .ab.ern-s{flex:0 0 64px;font-size:16px;white-space:nowrap}#acts .arow.earn .ab.ern-s:disabled{opacity:.4}
+/* R34 feel (juice.js): decoration only, never over 0.6 s, never takes a tap */
+.jdip{animation:jdip .3s ease-out}@keyframes jdip{35%{transform:translateY(3px) scale(.95)}100%{transform:none}}
+.jland{animation:jland .55s cubic-bezier(.3,1.5,.5,1);z-index:3}@keyframes jland{0%{transform:scale(1)}25%{transform:scale(1.1,.88)}55%{transform:scale(.96,1.06)}100%{transform:scale(1)}}
+.jring{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:4px solid var(--jc);box-shadow:0 0 12px var(--jc);pointer-events:none;animation:jring .6s ease-out forwards}.jring.big{border-width:6px}
+@keyframes jring{0%{transform:scale(.3);opacity:1}100%{transform:scale(4.2);opacity:0}}.jring.big{animation-name:jringb}@keyframes jringb{0%{transform:scale(.3);opacity:1}100%{transform:scale(6);opacity:0}}
+.fl.jgold,.fl.jcn{z-index:2}.jsp{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fffbe0 0,#ffd35a 45%,rgba(255,170,0,0) 72%);box-shadow:0 0 10px 3px rgba(255,200,60,.8)}
+.jcoin{display:block;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#e8b030 55%,#a8721a);border:1px solid #7a4e0e;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.jglow{animation:jglow .55s ease-out}@keyframes jglow{0%{box-shadow:0 0 0 0 rgba(255,211,90,.95)}40%{box-shadow:0 0 0 6px rgba(255,211,90,.7),0 0 22px 6px rgba(255,200,60,.6)}100%{box-shadow:0 0 0 0 rgba(255,211,90,0)}}
+.jhurt{animation:jhurt .5s ease-out}@keyframes jhurt{20%,60%{transform:translateX(-3px)}40%,80%{transform:translateX(3px)}0%,100%{transform:none}}
+.jhaul{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(255,200,60,0);animation:jhaul .6s ease-out forwards}@keyframes jhaul{30%{box-shadow:inset 0 0 60px 18px rgba(255,200,60,.55)}100%{box-shadow:inset 0 0 0 0 rgba(255,200,60,0)}}
+@media (prefers-reduced-motion:reduce){.jdip,.jland,.jglow,.jhurt{animation:none!important}.jring,.jhaul{display:none}}

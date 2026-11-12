@@ -105,7 +105,9 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
   case 'move':if(G.move){const u=by('undo')[0];main=u?abtn(u,'↶ Put them back','ghost'):(UI.moveSnap&&G.move.drops.length?'<button class="ab ghost" data-ui="undodrop">↶ Undo last drop</button>':'')}break;
   case 'tribe':{const tr=by('tribe');const th=by('thief');const a=G.act;main=th.map(m=>abtn(m,`🦹 ${esc(THIEVES[m.k].n.replace(' Cutpurse',''))}`,'pw')).join('');
     if(a.color==='assassin'){if(tr[0]&&tr[0].none)main+=abtn(tr[0],'No target: carry on','go')}
-    else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;main+=tr.map(m=>abtn(m,`Earn ${(a.n+(m.fk||0))*blues*(G.turnFx.qirsh?2:1)}🪙${m.fk?` <small>spend ${m.fk} Mystic</small>`:''}`,m.fk?'':'go')).join('')}
+    else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;const mx=Math.max(...tr.map(m=>m.fk||0));const ek=G.turn+'|'+a.tile;if(UI.earnKey!==ek){UI.earnKey=ek;const adv=typeof HPL!=='undefined'&&HPL.m&&HPL.m.act==='tribe'&&typeof hintsOn==='function'&&hintsOn()?HPL.m.fk||0:0;UI.earnFk=adv}   // R34: one row, not a stack that squeezes the bazaar
+      UI.earnFk=Math.max(0,Math.min(mx,UI.earnFk||0));const m=tr.find(x=>(x.fk||0)===UI.earnFk)||tr[0];const fk=m.fk||0;
+      main+=`<button class="ab ghost ern-s" data-ui="ernm" aria-label="Spend one Mystic less"${fk?'':' disabled'}>−🔮</button>`+abtn(m,`<b>Earn ${(a.n+fk)*blues*(G.turnFx.qirsh?2:1)}🪙</b><small>${fk?`spend ${fk} of ${mx} Mystic`:`keep your ${mx} Mystic`}</small>`,'ern go')+`<button class="ab ghost ern-s" data-ui="ernp" aria-label="Spend one more Mystic"${fk<mx?'':' disabled'}>+🔮</button>`}
     else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else if(gdOn())main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
     break}
   case 'tile':{const tm=by('tile');const t=G.board[G.act.tile];const pl=tm.filter(m=>m.place!=null);const skip=tm.find(m=>m.skip);const extras=vm.filter(m=>m.act!=='tile').length;
@@ -118,7 +120,7 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
     if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
     main+=abtn(end,'End turn ▶','go');break}}
-  if(main)h+=`<div class="arow">${main}</div>`;return h+pw}
+  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
@@ -200,6 +202,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pend
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
   switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'goalgo':UI.modal=null;render();schedule();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
+  case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
 function resetScene(){UI.camp=null;UI.snap=null;UI.chz=null;UI.pendDj=UI.pendItem=null;UI.mkSel=[];UI.sellSel=[];UI.moveSnap=null;UI.hurry=false}
