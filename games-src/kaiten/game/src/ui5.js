@@ -118,6 +118,7 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),
     h('p.tag', 'Grab a plate, pass the belt.'),
+    h('ol.menuboard', { 'aria-label': 'How a meal goes' }, h('li', h('b', '1'), 'Pick one dish'), h('li', h('b', '2'), 'Pass your hand'), h('li', h('b', '3'), 'Most points wins')),
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
@@ -146,7 +147,7 @@ function setupEl() {
   const n = o.np - 1;
   // until a first meal is finished, the guided game is the big button
   const first = !lsGet('kk_done');
-  const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', first ? 'Normal game' : 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
   const bGuide = cls => tutNode('sbtn' + cls.replace(/\./g, ' '));
   const go = h('div.sgo',
     first ? bGuide('.big') : bMeal('.big'),
