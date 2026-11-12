@@ -357,3 +357,37 @@ html.short #sc .tr span:nth-child(2){display:none}
 #crew.rowy .plate b{max-width:38px}
 #crew.rowy .plate .pbot{display:none}
 #crew.rowy .stand{flex:1 1 0;min-width:0}
+/* short portrait screens (< 600 px tall, tbl.js zoomLayout): the zoomed crewmate has full-size wires; the others are compact rows.
+   A compact row is one 44 px button (tap = zoom that crewmate); its wire chips are flat (no glow, no lift) so they never look tappable. */
+#crew.zm{justify-content:flex-start;gap:1px;padding-top:0;padding-bottom:0}
+#crew.zm .sg.cmp{flex:none;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;min-height:44px;box-sizing:border-box;padding:2px 6px 2px 3px;border-radius:14px;
+  background:rgba(8,14,30,.42);border:2px solid color-mix(in srgb,var(--sc) 55%,transparent);cursor:pointer;-webkit-tap-highlight-color:transparent}
+#crew.zm .sg.cmp:active{background:rgba(8,14,30,.6)}
+#crew.zm .sg.cmp.cur{border-color:var(--sc)}
+#crew.zm .sg.cmp .plate{height:34px;padding:0 7px 0 5px;gap:4px;flex:none;max-width:96px;pointer-events:none}
+#crew.zm .sg.cmp .plate.glow{pointer-events:auto}
+#crew.zm .sg.cmp .plate b{max-width:44px}
+#crew.zm .sg.cmp .plate .pbot,#crew.zm .sg.cmp .plate u{display:none}
+#crew.zm .sg.cmp .stand{flex:1 1 auto;justify-content:flex-start;gap:2px;row-gap:2px;margin-top:0;filter:none;max-width:none!important}
+#crew.zm .sg.cmp .stl,#crew.zm .sg.cmp .rtn,#crew.zm .sg.cmp .tile .nt,#crew.zm .sg.cmp .tile small,#crew.zm .sg.cmp .tile .wr{display:none}
+#crew.zm .sg.cmp .tile{border-width:1.5px;border-radius:4px;box-shadow:none;animation:none;pointer-events:none}
+#crew.zm .sg.cmp .tile.back::before{display:none}
+#crew.zm .sg.cmp .tile .f{font-size:calc(var(--tw)*.6)}
+#crew.zm .sg.cmp .tile .coin{min-width:13px;height:13px;bottom:1px;font-size:8px!important;line-height:10px;border-width:1px;padding:0 1px}
+#crew.zm .sg.cmp .tile .coin+.coin{display:none}
+#crew.zm .sg.cmp .side{transform:scale(.7);transform-origin:left center}
+#crew.zm .sg.zx{flex:none;flex-direction:row;align-items:center;justify-content:center;gap:4px}
+#crew.zm .sg.zx .plate,html.sk-plate #crew.zm .sg.zx .plate{flex:none;writing-mode:vertical-rl;transform:rotate(180deg);width:18px;height:auto;max-height:52px;min-height:40px;padding:3px 0;gap:2px;justify-content:center;
+  border:0;border-image:none;border-radius:8px;background:var(--sc);color:#14163a;filter:none;font:900 10px/18px var(--fb);text-shadow:none;overflow:hidden}
+#crew.zm .sg.zx .plate::after{display:none}
+#crew.zm .sg.zx .plate b{max-width:none;max-height:44px}
+#crew.zm .sg.zx .plate>:not(b){display:none}
+#crew.zm .sg.zx .stand{flex:0 1 auto;min-width:0}
+#tb.zm .stand.wrapd{row-gap:6px}
+#tb.zm .stand.wrapd .rtn{top:var(--th);height:4px}
+#tb.zm .stand.two{margin-top:0}
+#tb.zm .stand.two .stl{top:50%;left:auto;right:calc(100% + 3px);transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;height:auto;width:16px;padding:4px 0;font-size:10px;line-height:16px}
+#tb.zm #mine{padding-top:1px;padding-bottom:calc(2px + env(safe-area-inset-bottom,0px))}
+#tb.zm #mine .sg{gap:2px}
+#crew.zm .sg.cmp .plate .pdot{display:none}
+#crew.zm .sg.cmp .plate b{max-width:58px}

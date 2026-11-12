@@ -141,9 +141,10 @@ function toast(t){const w=String(t).split(/\s+/).slice(0,8).join(' ');setSay(w,t
 function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!tb)return;
   const g=glowInfo(V);TBL.lastG=g;const me=V.seat>=0?V.seat:-1;
   // crew
-  const order=crewOrder(V);let crew='';
-  for(const s of order){const q=V.seats[s];const sts=V.stands.filter(st=>st.owner===s).sort((a,b)=>a.i-b.i);if(!sts.length)continue;
-    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}">${plateHTML(V,q,false,g)}${standsHTML(V,sts,false,g)}</div>`}
+  const order=crewOrder(V).filter(s=>V.stands.some(st=>st.owner===s));let crew='';const zm=!!TBL.zm&&order.length>0;if(zm)zoomPick(V,g,order);
+  const flat={u:new Map(),plates:g.plates};   // a compact crewmate row: its wires are shown, never tappable (the row itself zooms)
+  for(const s of order){const q=V.seats[s];const sts=V.stands.filter(st=>st.owner===s).sort((a,b)=>a.i-b.i);const cmp=zm&&s!==UI.zoom;
+    crew+=`<div class="sg${decider()===s&&!G.over?' cur':''}${q.nUncut?'':' out'}${zm?(cmp?' cmp':' zx'):''}" data-seat="${s}" style="--sc:${SEATC[posOf(s)%5]}"${cmp?` role="button" aria-label="Show ${esc(q.nm)}'s wires"`:''}>${plateHTML(V,q,false,cmp?flat:g)}${standsHTML(V,sts,false,cmp?flat:g)}</div>`}
   // mine
   let mine='';if(me>=0){const sts=V.stands.filter(st=>st.owner===me).sort((a,b)=>a.i-b.i);const q=V.seats[me];
     const T=V.legal?V.legal.tools:{};const toolBtns=[];
@@ -158,6 +159,30 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
   renderOverlays(V);
   layoutTable();flushFx();placeGhost(V);
   clearTimeout(TBL.lt);TBL.lt=setTimeout(()=>{try{layoutTable()}catch(e){}},320)}
+// ---------- short portrait screens (< 600 px tall): one crewmate zoomed to full-size wires, the others as compact rows ----------
+// The zoomed crewmate follows the move: when what glows changes and the zoomed one has nothing to tap, the zoom moves to the
+// crewmate of the suggested move (or the one with the most glowing wires). A tap on a compact row zooms that crewmate.
+function seatOfU(u){for(const st of UI.V.stands)if(st.slots.some(x=>x.u===u))return st.owner;return null}
+function zoomPick(V,g,order){const cnt={};for(const s of order){let n=0;for(const st of V.stands)if(st.owner===s)for(const x of st.slots)if(g.u.has(x.u))n++;cnt[s]=n}
+  const hot=order.filter(s=>cnt[s]>0);const sel=UI.sel;const key=hot.join(',')+'|'+G.logN+'|'+decider()+'|'+(G.q?G.q.kind:'')+'|'+(sel?sel.mode+':'+sel.v+':'+(sel.tg||[]).length+':'+sel.tool:'');
+  if(!order.includes(UI.zoom))UI.zoom=null;
+  if(key!==TBL.zkey){TBL.zkey=key;if(hot.length&&!hot.includes(UI.zoom)){let pref=null;
+    try{const p=ghostPlan(V);if(p&&p.u!=null)pref=seatOfU(p.u)}catch(e){}
+    if(pref==null||!hot.includes(pref))try{const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(m&&m.st!=null)pref=ownerOf(m.st)}catch(e){}
+    UI.zoom=hot.includes(pref)?pref:hot.slice().sort((a,b)=>cnt[b]-cnt[a])[0]}}
+  if(UI.zoom==null)UI.zoom=hot.length?hot[0]:order[0]}
+function zoomTo(s){if(UI.zoom===s)return;UI.zoom=s;lsSet('sf_zhint',1);sfx('click');const el=document.getElementById('crew');if(el)el._s=null;renderTable(UI.V)}
+document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();zoomTo(+s.dataset.seat)},true);
+// lays out the compact rows and the zoomed crewmate; returns false when it cannot fit (the crew area then scrolls)
+function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll');balance(mine,tm,4,mine.querySelector('.stand.two')?20:0);
+  const cw=crew.clientWidth-12;const sgs=[...crew.querySelectorAll('.sg')];
+  for(const s of sgs.filter(x=>x.classList.contains('cmp'))){const n=s.querySelectorAll('.tile').length,ns=s.querySelectorAll('.stand').length;const pw=s.querySelector('.plate').offsetWidth;const avail=cw-pw-14-(ns-1)*6;
+    let tw=Math.min(28,Math.floor((avail+2)/Math.max(1,n))-2),lines=1;if(tw<22){tw=22;lines=Math.ceil(n*24/avail)}
+    s.style.setProperty('--tw',tw+'px');s.style.setProperty('--th',(lines===1?30:Math.floor((38-(lines-1)*2)/lines))+'px')}
+  const zx=sgs.find(x=>x.classList.contains('zx'));let tw=TMINW;
+  if(zx){const two=zx.querySelectorAll('.stand').length>1;const pw=zx.querySelector('.plate').offsetWidth+4;for(tw=54;tw>21;tw--){zx.style.setProperty('--tw',tw+'px');zx.style.setProperty('--th',tileH(tw,1.3)+'px');balance(zx,tw,3,pw+(two?20:0));if(crew.scrollHeight<=crew.clientHeight+1)break}}
+  if(!TBL.zhint&&sgs.length>1&&!lsGet('sf_zhint',0)){TBL.zhint=1;lsSet('sf_zhint',1);setTimeout(()=>toast('Tap a crewmate to see their wires'),400)}
+  return {tw,fit:crew.scrollHeight<=crew.clientHeight+1}}
 const RACK={rg:9,lb:12};   // extra px: the gap between wrapped rows (return arrow) and the label above each of two stands (table.css)
 // tile sizes: as large as fit; stands wrap to more rows rather than shrink below a thumb
 function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
@@ -167,10 +192,10 @@ function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
   return best?best.tw:o.min}
 // every wire is a thumb target: never under 44x44 (crowded jobs scroll the crew area instead of shrinking it)
 const TMIN=44,TMINW=30;function tileH(tw,ratio){return Math.max(TMIN,Math.round(tw*(tw<52?Math.min(ratio,1.12):ratio)))}
-function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=st.parentNode.clientWidth||st.clientWidth;const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
+function balance(root,tw,g,gut){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=(st.parentNode.clientWidth||st.clientWidth)-(gut||0);const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px';st.classList.toggle('wrapd',rows>1)})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
   const crew=document.getElementById('crew'),mine=document.getElementById('mine'),felt=document.getElementById('felt'),gear=document.getElementById('gear');
-  document.documentElement.classList.toggle('short',window.innerHeight<640);
+  document.documentElement.classList.toggle('short',window.innerHeight<640);tb.classList.remove('zm');crew.classList.remove('zm');crew.querySelectorAll('.sg').forEach(x=>{x.style.removeProperty('--tw');x.style.removeProperty('--th')});
   const land=W>H*1.15&&W>=600;mine.classList.remove('mrow');const big=W>=900&&H>=700;tb.classList.toggle('land',land);
   let plateH=44;
   const cs=[...crew.querySelectorAll('.sg')].map(s=>[...s.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length));
@@ -200,8 +225,12 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const atEnd=()=>crew.classList.toggle('end',crew.scrollTop+crew.clientHeight>=crew.scrollHeight-2);atEnd();if(!crew._sl){crew._sl=1;crew.addEventListener('scroll',atEnd,{passive:true})}
   if((crowd||t1<TMINW+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
   if(!crowd&&t1>=TMINW+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
+  // short portrait screen and the crew still does not fit at 44 px wires: compact rows + one zoomed crewmate
+  const zmOn=!land&&window.innerHeight<600&&crowd&&crew.querySelectorAll('.sg').length>0;
+  if(zmOn!==!!TBL.zm&&!TBL.zrr){TBL.zm=zmOn;TBL.zrr=1;try{crew._s=null;renderTable(UI.V)}finally{TBL.zrr=0}return}
+  if(zmOn){const z=zoomLayout(tb,crew,mine,tm);t1=z.tw;crew.classList.toggle('scroll',!z.fit);atEnd()}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
-  TBL.lay={W,H,tw:t1,tm};
+  TBL.lay={W,H,tw:t1,tm,zm:zmOn};
   placeGhost(UI.V)}
 // ---------- overlays: briefing, pass-the-phone, the end ----------
 function renderOverlays(V){const ov=document.getElementById('over'),cv=document.getElementById('cover');if(!ov||!cv)return;
