@@ -59,6 +59,11 @@ function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let 
     o.push(`${sel} .gxh-bd::before{background-image:url(${c.img});border-color:${c.col}}`);
     if(t.ch!==lastCh){lastCh=t.ch;o.push(`${sel} .gxh-tt::before{content:"CHAPTER ${t.ch}: ${STORY.chapters[t.ch].toUpperCase()}"}`)}}
   const e=document.createElement('style');e.id='tutcast';e.textContent=o.join('\n');document.head.appendChild(e)}
+// R9: majority and ties shown on the board: example followers stand on the lit road, with a one-line count above it
+function tutDemoOff(){for(const e of UI.tdemo||[])e.remove();UI.tdemo=null;for(const id in UI.mp)UI.mp[id].classList.remove('tdhide')}
+function tutDemo(spec,txt){tutDemoOff();for(const id in UI.mp)UI.mp[id].classList.add('tdhide');const out=[];let top=null;for(const [k,p] of spec){const T=G.tiles[k];if(!T)continue;const l=TSEG[T.t].findIndex(sg=>sg&&sg.ty==='R');if(l<0)continue;const [wx,wy]=spotWorld(k,l);
+    const e=document.createElement('div');e.className='mp tdemo';e.style.setProperty('--c',PCOL[p]);e.innerHTML=pcHtml(FIGICON.f,p);addOv(e,wx,wy,{dy:-4});out.push(e);if(!top||wy<top[1])top=[wx,wy]}
+  if(top&&txt){const t=document.createElement('div');t.className='tdemotag';t.textContent=txt;addOv(t,top[0],top[1],{dy:-46});out.push(t)}UI.tdemo=out;try{placeOverlay()}catch(e){}}
 function tutSteps0(){
   const placeW=n=>({type:'tap',match:a=>a.what==='place'&&a.x===tutT(n)[1]&&a.y===tutT(n)[2]});
   const figW=n=>({type:'tap',match:a=>a.what==='fig'&&a.k==='f'&&a.l===tutSegOf(n)});
@@ -87,8 +92,8 @@ function tutSteps0(){
  {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1']),wait:tileW,onEnter:tOn,onDone:()=>{tOff();release()},hold:true,ready:()=>tutAfter(6,8)},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
- {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(9,'place')},
- {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(9,'place')},
+ {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,0',0],['1,1',1]],'You 2, Hob 1: only you score')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},
+ {id:'tie',title:'Ties',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,1',1]],'You 1, Hob 1: both score in full')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},
  {id:'place5',title:'Keep building',say:'Six of eight neighbours are down. No follower needed here.',target:tutGlow(9),wait:placeW(9),ready:()=>tutP(9,'place')&&tutRot(1)},
  {id:'discard',title:'No fit',say:'',target:()=>document.querySelector('#htile'),wait:null,ready:()=>tutP(11,'place')},
  {id:'place6',title:'The last tile',say:'This completes the ring around your priory. Tap the glowing square.',target:tutGlow(11),wait:placeW(11),ready:()=>tutP(11,'place')&&tutRot(3)},

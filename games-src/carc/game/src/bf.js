@@ -60,16 +60,21 @@ function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal
   return set.map(e=>[e.q.x,e.q.y]).concat([last])}
 function fitsAt(cells,c){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}return (x1-x0+1)*c<=m.W-24&&(y1-y0+1)*c<=m.H-topSafe()-botSafe()-12}
 // the camera keeps the whole valley in view when the tiles stay readable; otherwise the biggest readable patch around the newest tile
+const GLOWMIN=()=>PHONE()?44:54;   // R9: smallest cell that is still a 44px touch target; used so every glow fits on screen
 const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?104:(innerWidth>=1024?200:MAXC);
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
 function camValley(extra,around,ms){if(!G||!G.order.length)return;tweenView(frameCells(valleyCells(extra,around),CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camAim(ms){if(!G||!myTurn('place')||UI.user||!G.order.length)return;const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);
+  {const all=G.order.map(unkey).concat(gl),gm=GLOWMIN();if(!fitsAt(all,CAMMIN())&&fitsAt(all,gm)){tweenView(frameCells(all,gm,CAMMAX()),ms==null?600:ms);return}if(!fitsAt(all,gm)&&gl.length&&fitsAt(gl.concat([unkey(G.order[G.order.length-1])]),gm)){tweenView(frameCells(gl.concat([unkey(G.order[G.order.length-1])]),gm,CAMMAX()),ms==null?600:ms);return}}
   const near=aimCells();const cells=valleyCells(gl);if(!near.slice(0,-1).some(q=>cells.some(c=>c[0]===q[0]&&c[1]===q[1]))){camValley(near,near[0],ms==null?600:ms);return}tweenView(frameCells(cells,CAMMIN(),CAMMAX()),ms==null?600:ms)}
 function camSpot(x,y,ms){const m=measure(),c=UI.view.s*100,sx=(x+.5)*c+UI.view.x,sy=(y+.5)*c+UI.view.y,top=topSafe(),bot=botSafe();if(sx>c&&sx<m.W-c&&sy>top+c*.8&&sy<m.H-bot-c*.8)return;tweenView(focusView(x+.5,y+.5,Math.max(c,CAMMIN())),ms==null?420:ms)}
+function hiddenGlows(){return [...$('#world').querySelectorAll('.glow')].filter(g=>g.style.visibility==='hidden').map(g=>[+g.dataset.x,+g.dataset.y])}
+function camGlows(){const gl=UI.legal.filter(q=>q.r===UI.rot).map(q=>[q.x,q.y]);if(!gl.length)return;const gm=GLOWMIN();if(fitsAt(gl,gm)){tweenView(frameCells(gl,gm,CAMMAX()),420);return}
+  const h=hiddenGlows(),c=h[0]||gl[0],by=gl.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1])),out=[];for(const q of by){out.push(q);if(!fitsAt(out,gm)){out.pop();break}}tweenView(frameCells(out.length?out:[c],gm,CAMMAX()),420)}
 function camArea(k,ms){if(UI.user||!G)return;camValley(null,unkey(k),ms)}
-function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else camAim()}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
+function recentre(){UI.user=false;if(!G||!G.order.length||G.over){if(G&&G.order.length)refit(true);return}sfx('click');if(myTurn('place')){if(UI.sel)camSpot(UI.sel.x,UI.sel.y);else if(hiddenGlows().length&&UI.rcT===G.order.length+':'+UI.rot)camGlows();else{UI.rcT=G.order.length+':'+UI.rot;camAim()}}else if(myTurn('fig'))zoomTile(G.cur.k,true);else if(G.cur&&G.cur.k&&G.tiles[G.cur.k])camArea(G.cur.k);else camArea(G.order[G.order.length-1])}
 function selSpot(x,y){UI.sel={x,y,r:UI.rot};sfx('click');UI.user=false;renderGlows();renderHand();if(hintsOn())try{pvHighlight(prevCalc(x,y,UI.rot).hl)}catch(e){}renderStatus();camSpot(x,y)}
 // ---------- drawing a tile (rotated by its placement) ----------
 const tileInner=(t,r)=>{TXR=r|0;const o=`<g transform="rotate(${r*90} 50 50)">${tileSVG(t)}</g>`;TXR=0;return o};
@@ -101,14 +106,34 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
 // follower spots stay hidden while the camera moves, so a button never slides away under a finger
 function figShow(){for(const e of document.querySelectorAll('#ov .fglow.wait'))e.classList.remove('wait')}
-function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=52;
+function spreadFigs(){const f=[...$('#ov').children].filter(e=>e.classList.contains('fglow')&&e._o);if(f.length<2)return;const P=f.map(e=>{const [x,y]=toScreen(e._o.wx,e._o.wy);return {e,x:x+e._o.dx,y:y+e._o.dy,ox:0,oy:0}}),D=64;
   for(let it=0;it<24;it++){let moved=false;for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j];let dx=(b.x+b.ox)-(a.x+a.ox),dy=(b.y+b.oy)-(a.y+a.oy),d=Math.hypot(dx,dy);if(d>=D)continue;if(d<.01){dx=0;dy=1;d=1}const k=(D-d)/2/d;a.ox-=dx*k;a.oy-=dy*k;b.ox+=dx*k;b.oy+=dy*k;moved=true}if(!moved)break}
   for(const q of P)q.e.style.transform=`translate(${q.x+q.ox}px,${q.y+q.oy}px) translate(-50%,-50%)`}
 function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(24,Math.min(48,cell*.4));$('#ov').style.setProperty('--ms',ms+'px');
   for(const el of $('#ov').children){const o=el._o;if(!o)continue;const [sx,sy]=toScreen(o.wx,o.wy);el.style.transform=`translate(${sx+o.dx}px,${sy+o.dy}px) translate(-50%,-50%)`;
     if(o.cull){const r=o.r||0;const vis=sx>pad+r&&sx<m.W-pad-r&&sy>pad+r+28&&sy<m.H-pad-r;el.style.visibility=vis?'':'hidden'}}
   // glows must lie fully inside the board so none is half cut off or under the bars
-  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}spreadFigs();keepPops();layoutTags();layoutFlabs()}
+  const c=UI.view.s*100;for(const g of $('#world').querySelectorAll('.glow')){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;g.style.visibility=(x>=0&&y>=34&&x+c<=m.W&&y+c<=m.H-botSafe())?'':'hidden'}edgeArrows();spreadFigs();keepPops();layoutTags();layoutFlabs()}
+// R9: glows that do not fit on a small phone get an arrow at the board edge ("2 more"); a tap slides the view to them
+const EDGE_ARW={l:'\u25C0',r:'\u25B6',t:'\u25B2',b:'\u25BC'};
+function edgeArrows(){const bd=boardEl();if(!bd)return;let box=bd.querySelector('.gedges');if(!box){box=document.createElement('div');box.className='gedges';bd.appendChild(box)}
+  const on=G&&!G.over&&myTurn('place')&&!UI.aiFly;const m=measure(),c=UI.view.s*100,top=Math.max(34,topSafe()),bot=m.H-botSafe(),side={l:[],r:[],t:[],b:[]};
+  if(on)for(const g of $('#world').querySelectorAll('.glow')){if(g.style.visibility!=='hidden')continue;const gx=+g.dataset.x,gy=+g.dataset.y,x=gx*c+UI.view.x,y=gy*c+UI.view.y;
+    const o={l:-x,r:x+c-m.W,t:top-y,b:y+c-bot};let k='l';for(const q in o)if(o[q]>o[k])k=q;side[k].push([gx,gy,x+c/2,y+c/2])}
+  const br=bd.getBoundingClientRect(),avoid=[];if(on){for(const g of $('#world').querySelectorAll('.glow'))if(g.style.visibility!=='hidden'){const x=+g.dataset.x*c+UI.view.x,y=+g.dataset.y*c+UI.view.y;avoid.push({l:x,t:y,r:x+c,b:y+c})}
+    for(const r of fixedRects())avoid.push({l:r.left-br.left,t:r.top-br.top,r:r.right-br.left,b:r.bottom-br.top})}
+  for(const k in side){let e=box.querySelector('[data-s='+k+']');const L=side[k];if(!L.length){if(e)e.hidden=true;continue}
+    if(!e){e=document.createElement('button');e.type='button';e.className='gedge';e.dataset.s=k;e.addEventListener('click',ev=>{ev.stopPropagation();edgeGo(e.dataset.s)});box.appendChild(e)}
+    e.hidden=false;e.setAttribute('aria-label',L.length+' more '+(L.length>1?'squares':'square')+' this way');e.innerHTML='<b>'+EDGE_ARW[k]+'</b>'+L.length+' more';
+    const ax=L.reduce((a,q)=>a+q[2],0)/L.length,ay=L.reduce((a,q)=>a+q[3],0)/L.length,w=e.offsetWidth||96,h=e.offsetHeight||44;
+    let X,Y;if(k==='l'||k==='r'){X=k==='l'?6:m.W-w-6;Y=Math.max(top+6,Math.min(bot-h-6,ay-h/2))}else{Y=k==='t'?top+6:bot-h-6;X=Math.max(6,Math.min(m.W-w-6,ax-w/2))}
+    // never on a visible glow, the status, Recentre or another arrow: slide along the edge to the nearest free place
+    const hit=(x,y)=>avoid.some(r=>x<r.r&&x+w>r.l&&y<r.b&&y+h>r.t),vert=k==='l'||k==='r';let best=null;
+    for(let d=0;d<=Math.max(m.W,m.H);d+=12){for(const sg of d?[1,-1]:[1]){const x=vert?X:X+sg*d,y=vert?Y+sg*d:Y;if(x<4||x+w>m.W-4||y<top+2||y+h>bot-2)continue;if(!hit(x,y)){best=[x,y];break}}if(best)break}
+    if(!best){e.hidden=true;continue}[X,Y]=best;avoid.push({l:X-4,t:Y-4,r:X+w+4,b:Y+h+4});e.style.transform='translate('+Math.round(X)+'px,'+Math.round(Y)+'px)'}}
+function edgeGo(k){if(!myTurn('place'))return;sfx('click');const m=measure(),c=UI.view.s*100,cx=(m.W/2-UI.view.x)/c,cy=((topSafe()+m.H-botSafe())/2-UI.view.y)/c;
+  const L=[...$('#world').querySelectorAll('.glow')].filter(g=>g.style.visibility==='hidden').map(g=>[+g.dataset.x,+g.dataset.y]).filter(([x,y])=>k==='l'?x+.5<cx:k==='r'?x+.5>cx:k==='t'?y+.5<cy:y+.5>cy);if(!L.length)return;
+  L.sort((a,b)=>Math.hypot(a[0]+.5-cx,a[1]+.5-cy)-Math.hypot(b[0]+.5-cx,b[1]+.5-cy));UI.user=true;tweenView(focusView(L[0][0]+.5,L[0][1]+.5,c),380)}
 function spotWorld(k,l){const T=G.tiles[k],[x,y]=unkey(k),sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100+sp[0],y*100+sp[1]]}
 function renderMeeples(){const live={};
   for(const f of G.figs){const id=f.s+f.k+f.p;live[id]=f;if(UI.mp[id])continue;const k=G.sk[f.s],l=G.sl[f.s],[wx,wy]=spotWorld(k,l);
@@ -122,7 +147,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
     ms.forEach((m,i)=>{const b=document.createElement('button');b.className='fglow';b.style.setProperty('--c',PCOL[p]);b.innerHTML=pcHtml(FIGICON[m.k],p);
       b.setAttribute('aria-label',`Place ${FIGN[m.k]} here`);{let nm='';try{nm=hintsOn()?prevFig(l):(FEATW[G.fd[find(T.s0+ +l)].ty]||'')}catch(e){const sg=TSEG[T.t][+l];nm=sg?FEATW[sg.ty]:''}if(nm&&ms.length===1||nm&&i===0){const lb=document.createElement('span');lb.className='flab';lb.textContent=nm;b.appendChild(lb)}}b.addEventListener('click',()=>onFig(m));
-      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;if(UI.tw&&!UI.sim)b.classList.add('wait');UI.figs.push(b)})}
+      addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*62:0});b._m=m;if(UI.tw&&!UI.sim)b.classList.add('wait');UI.figs.push(b)})}
   clearTimeout(UI.figT);UI.figT=setTimeout(figShow,700);
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
@@ -239,7 +264,7 @@ function rvTrack(f){const R=UI.rv;
   if(f.t==='place'){const T=G.tiles[f.x];if(T){const ts=TSEG[T.t].map(q=>q.ty);R.ty=ts.includes('C')?'town':ts.includes('M')?'priory':ts.includes('R')?'road':'field'}}
   else if(f.t==='fig'){const e=G.log.slice(0,8).map(l=>l.t.match(/^(.+?) (?:sets|puts) an? (.+?)(?: \(\w+\))? on the (\w+)\.$/)).find(Boolean);if(e&&e[1]===P(R.p).nm){R.fig=e[2];R.ty=e[3]}}
   else if(f.t==='score'){const d=f.x,w=d.win&&d.win.length?d.win:[d.by];if(w.includes(R.p))R.pts+=d.pts}}
-function rvFlush(){const R=UI.rv;UI.rv=null;if(!R||!R.ty||!G)return;const nm=seatName(P(R.p));
+function rvFlush(){const R=UI.rv;UI.rv=null;if(!R||!R.ty||!G)return;const nm=(n=>n.split(" ").length>2?n.split(" ").pop():n)(seatName(P(R.p)));   // R9: a long story name ("The Sable Baron") keeps the caption to 8 words
   const line=`${nm} placed a ${R.ty}${R.fig?' and a '+R.fig:''}${R.pts?': +'+R.pts:'.'}`;UI.rvLine=line;capSet(line,3400,false,true,true)}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
 function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
@@ -248,7 +273,7 @@ function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.len
   const w=d.win.length?d.win:[d.by||0];
   w.forEach((i,j)=>{const e=document.createElement('div');e.className='pop';e.style.setProperty('--c',PCOL[i]);{const F=G.fd[d.r];e.innerHTML='+'+d.pts+'<small>'+(F?FEATW[F.ty]:'')+'</small>'}let dy=-j*30;{const [px,py]=toScreen(cx*100,cy*100);for(let k=0;k<8;k++){const hit=[...$('#ov').querySelectorAll('.pop')].some(o=>{if(!o._o)return false;const [ox,oy]=toScreen(o._o.wx,o._o.wy);return Math.abs(ox+o._o.dx-px)<70&&Math.abs(oy+o._o.dy-(py+dy))<44});if(!hit)break;dy-=46}}addOv(e,cx*100,cy*100,{dy});placeOverlay();try{keepPops()}catch(x){}
     const chip=document.querySelector(`.seat[data-i="${i}"]`),b=boardEl().getBoundingClientRect();
-    setTimeout(()=>{const o=e._o;if(chip){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
+    setTimeout(()=>{const o=e._o;if(chip&&!final){const c=chip.getBoundingClientRect();const [sx,sy]=toScreen(o.wx,o.wy);e.style.transform=`translate(${c.left+c.width/2-b.left}px,${c.top+c.height/2-b.top}px) translate(-50%,-50%) scale(.6)`;e.style.opacity='.1';e._o=null}else e.style.opacity='0';bumpSeat(i)},final?900:700);
     setTimeout(()=>{e.remove();try{placeOverlay()}catch(x){}},final?1900:1700)})}
 // ---------- the end: unfinished features score one by one, then the result ----------
 const FINAL0=450,FINALSTEP=240;   // end count: brisk (~3 s), whole valley in view, tap to skip
@@ -274,7 +299,7 @@ function resTable(){const ps=[...G.pl].sort((a,b)=>b.score-a.score),v=(p,k)=>((p
 function showResult(){const win=G.over.win,me=G.pl.find(p=>p.human);const iWon=me&&win.includes(me.i)&&win.length===1;
   const title=!human()?G.winText:win.length>1?'A tie!':iWon?'You win!':P(win[0]).nm+' wins';
   const rv=G.pl.find(p=>!p.human),line=UI.camp||typeof STORY==='undefined'||!me?'':(win.length>1?STORY.quickTie:iWon?STORY.quickWin:STORY.quickLose(rv?rv.nm:'The rival'));
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}${resTable()}<button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div>`;
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Result"><h2>${esc(title)}</h2>${line?`<p class="sub">${esc(line)}</p>`:''}${resTable()}<div class="resbtns"><button class="btn big" data-a="again">Play again</button><button class="btn alt" data-a="menu">Menu</button></div></div></div>`;
   $('#modal').querySelector('[data-a=again]').onclick=()=>beginGame(UI.lastOpts);$('#modal').querySelector('[data-a=menu]').onclick=()=>showStart()}
 // ---------- start screen, menu, rules ----------
 function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g&&g.v===1&&!g.over?g:null}catch(e){return null}}

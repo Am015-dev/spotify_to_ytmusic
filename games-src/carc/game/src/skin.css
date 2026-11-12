@@ -339,3 +339,19 @@ html.sk #top #left small,#left small{font-size:14px!important}
 #endplate{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 26px;border-radius:16px;background:rgba(40,27,18,.9);border:2px solid var(--gold);color:#fff3dc;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:endIn .25s ease-out}
 #endplate b{font:800 24px/1.1 var(--ff-h,var(--ff))}#endplate small{font:700 15px/1 var(--ff);opacity:.85}
 @keyframes endIn{from{opacity:0;transform:translate(-50%,12px)}}
+/* ===== R9 phone fixes (375x667 / 390x844) ===== */
+#recentre{min-height:44px}
+#hintsbtn{min-width:44px}
+body:has(#endplate) #hand #hinfo{visibility:hidden}
+.resbtns{display:flex;gap:8px;align-items:stretch;margin-top:8px}
+.resbtns .btn{flex:1 1 0;margin:0!important;min-height:48px;justify-content:center;white-space:nowrap}
+@media(max-height:740px){.card .endart{height:min(17vh,120px)!important}.restab th,.restab td{padding:5px 8px}.card[aria-label=Result] h2{margin:2px 0!important}}
+.mp.tdemo{pointer-events:none;animation:tdemo .9s ease-out both}
+@keyframes tdemo{from{opacity:0;margin-top:-18px}to{opacity:1;margin-top:0}}
+.tdemotag{pointer-events:none;white-space:nowrap;font:800 15px/1.2 var(--ff);color:#fff3dc;background:#281b12;border:2px solid #e0a83a;border-radius:10px;padding:5px 9px;box-shadow:0 2px 8px rgba(0,0,0,.45);z-index:6}
+#ov .mp.tdhide{opacity:0!important}
+.gedges{position:absolute;inset:0;pointer-events:none;z-index:7}
+.gedge{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:5px;min-height:44px;min-width:44px;padding:0 12px;border:2px solid #ffd24a;border-radius:999px;background:rgba(40,27,18,.92);color:#fff3dc;font:800 14px/1 var(--ff);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.45);cursor:pointer}
+.gedge b{color:#ffd24a;font-size:14px}
+.gedge[hidden]{display:none}
+body:has(#modal .scrim) .gedges{display:none}
