@@ -1,7 +1,7 @@
 // ===================== part 6: board overlay (labels, route, markers), advisor, sunk cards, monster-phase card =====================
 // ---------- the overlay: HTML/SVG drawn over the board, positioned from the kit's own camera (3D) or the 2D chart ----------
 const OV={items:[],sig:'',descs:[],raf:0,proj:null,pk:''};
-const sqW=(c,r)=>[c-2.5,r-2.5];
+const sqW=(c,r)=>[c-BC,r-BC];
 function ovMakeProj(){try{const bd=$('#board');if(!bd)return null;const B=bd.getBoundingClientRect();if(!B.width)return null;
   const c3=$('#c3');
   if(c3&&!c3.hidden){const K=TWKit._K;if(!K||!K.on||!K.cam)return null;const hr=c3.getBoundingClientRect();if(!hr.width)return null;const v=new THREE.Vector3();
@@ -125,10 +125,10 @@ function mphHTML(){const mp=UI.mph;if(!mp||G&&G.over&&!UI.busy)return '';
 // ---------- the overlay descriptors ----------
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}
-  for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-2.5,wy:.95,wz:a[1]-2.5,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
-  for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-2.5,wy:.5,wz:a[1]-2.5,t:'Maelstrom',cls:'piece mael'})}
-  for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-2.5,wy:.55,wz:a[1]-2.5,t:'Rift Gate',cls:'piece gate'})}
-  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-2.5,wy:.55,wz:w.y-2.5,t:`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
+  for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-BC,wy:.95,wz:a[1]-BC,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
+  for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-BC,wy:.5,wz:a[1]-BC,t:'Maelstrom',cls:'piece mael'})}
+  for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-BC,wy:.55,wz:a[1]-BC,t:'Rift Gate',cls:'piece gate'})}
+  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-BC,wy:.55,wz:w.y-BC,t:`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
@@ -137,8 +137,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
-  if(PH.on&&PH.pop==='info'){const I=phInfoData(PH.pd);if(I&&I.at)D.push({k:'ring',id:'ri',wx:I.at[0]-2.5,wz:I.at[1]-2.5})}
-  if(PH.on&&PH.pop==='start'&&PH.pd)D.push({k:'ring',id:'rs',wx:PH.pd.x-2.5,wz:PH.pd.y-2.5})
+  if(PH.on&&PH.pop==='info'){const I=phInfoData(PH.pd);if(I&&I.at)D.push({k:'ring',id:'ri',wx:I.at[0]-BC,wz:I.at[1]-BC})}
+  if(PH.on&&PH.pop==='start'&&PH.pd)D.push({k:'ring',id:'rs',wx:PH.pd.x-BC,wz:PH.pd.y-BC})
   {const seen={};for(const t of D){if(t.k!=='tag')continue;const k=t.wx.toFixed(1)+','+t.wz.toFixed(1);const n=seen[k]=(seen[k]||0)+1;if(n>1)t.wy+=.28*(n-1)}}
   ovApply(D)}
 function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length===D.length)return;OV.sig=sig;OV.descs=D;const root=$('#ov');if(!root)return;

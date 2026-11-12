@@ -35,8 +35,8 @@ async function drive(p,name,maxMs){const t0=Date.now();let idle=0,last='';const 
 (async()=>{
   const url=await gx.url('tidewake',{file:FILE,query:'?2d'});
   const b=await PW.chromium.launch(process.env.PW_EXE?{executablePath:process.env.PW_EXE}:{});
-  for(const mode of ['quick','story']){
-    const c=await b.newContext({viewport:(([w,h])=>({width:w,height:h}))((process.env.SIZE||"390x763").split("x").map(Number)),hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()));
+  for(const mode of (process.env.MODES||'quick,story').split(',')){const T0=Date.now();
+    const c=await b.newContext({viewport:(([w,h])=>({width:w,height:h}))((process.env.SIZE||"390x763").split("x").map(Number)),hasTouch:true,isMobile:true});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&errs.push(m.text()+' @'+JSON.stringify(m.location())));
     await p.goto(url);await p.waitForTimeout(1500);
     try{await p.evaluate(()=>{localStorage.setItem('tw_played','1');localStorage.setItem('tw_offered','1');localStorage.setItem('gxt-tidewake','{"done":1}')});await p.reload();await p.waitForTimeout(1500)}catch(e){}
     if(mode==='quick'){const pl=p.getByText('Quick game: you vs 2 computers');await pl.tap();await p.waitForTimeout(800)}
@@ -47,6 +47,6 @@ async function drive(p,name,maxMs){const t0=Date.now();let idle=0,last='';const 
         const bt=p.locator('.gxc button:visible').filter({hasNotText:/Back|Close|Skip|×|‹/});
         if(!await bt.count()){await p.waitForTimeout(500);continue}await bt.last().tap();await p.waitForTimeout(800)}}
     const r=await drive(p,mode,240000);
-    console.log(mode,r.ok?'PASS':'FAIL',JSON.stringify(r.seen),errs.length?'ERR '+errs.slice(0,2):'0 console errors');if(errs.length)bad(mode+' console errors');
+    console.log(mode,'secs='+((Date.now()-T0)/1000).toFixed(0),'turn='+(await p.evaluate(()=>G.turn)),r.ok?'PASS':'FAIL',JSON.stringify(r.seen),errs.length?'ERR '+errs.slice(0,2):'0 console errors');if(errs.length)bad(mode+' console errors');
     await p.screenshot({path:path.join(__dirname,'out-'+mode+'.png')}).catch(()=>{});await c.close()}
   await b.close();process.exit(fail?1:0)})();

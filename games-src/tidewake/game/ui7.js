@@ -15,7 +15,7 @@ function phApply(){const R=document.documentElement;const was=PH.on;PH.on=phDete
   const bs=PH.land?Math.min(h-I.t-I.b,w-I.l-I.r-300):Math.max(Math.round((w-I.l-I.r)*.78),Math.min(w-I.l-I.r,h-I.t-I.b-bar-250));
   R.classList.toggle('ph-l',PH.land);R.classList.toggle('ph-p',!PH.land);
   R.style.setProperty('--bs',Math.max(200,Math.floor(bs))+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
-// ---------- camera: flat top-down, the 6x6 board + edge numbers fill the square ----------
+// ---------- camera: flat top-down, the 7x7 board + edge numbers fill the square ----------
 function phZoom(){if(!PH.on||!kitOk())return;let c=null,r=null;
   if(PH.zoom&&G&&UI.started){const vs=viewSeat(),sd=sideToAct(),i=vs>=0?vs:sd;let S=i>=0?G.ships[i]:null;let p=S&&shipPos(S);if(!p){S=G.ships.find(x=>shipPos(x));p=S&&shipPos(S)}if(p){c=p.c;r=p.r}}
   const key=c!=null?c+','+r:'';if(key===PH.zk)return;PH.zk=key;try{if(key)TWKit.focus(c,r,1.7);else TWKit.focus(null)}catch(e){}}
@@ -229,7 +229,7 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
 // ---------- drag a hand tile onto your junk's bow square (phone and PC): the square glows, the tile snaps there, a vibrate tick, then it is laid ----------
 const DRG={on:false,t:-1,el:null,gh:null,tg:null,x0:0,y0:0,hot:false,eat:0};
 function drgTarget(){const c=phPlaceCtx?phPlaceCtx():null;if(!c||!UI.sel)return null;const S=G.ships[UI.sel.s];if(!S||S.x==null)return null;
-  const a=hproj(S.x-2.5,S.y-2.5),b=hproj(S.x-1.5,S.y-2.5);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
+  const a=hproj(S.x-BC,S.y-BC),b=hproj(S.x-BC+1,S.y-BC);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
 function drgEnd(){if(DRG.gh)DRG.gh.remove();if(DRG.tg)DRG.tg.remove();if(DRG.el)DRG.el.classList.remove('dragsrc');Object.assign(DRG,{on:false,el:null,gh:null,tg:null,hot:false,t:-1})}
 document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-a=card]');if(!b||UI.busy||!UI.sel||e.button>0)return;
   DRG.t=+b.dataset.t;DRG.el=b;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.on=false},true);

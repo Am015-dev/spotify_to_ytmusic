@@ -15,7 +15,7 @@ function tutHold(k){return k==='mph'&&TUTG.on&&TUTG.hold}
 function tvis(sel){let off=null;for(const e of document.querySelectorAll(sel)){if(e.closest('[hidden]'))continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2){if(r.bottom>0&&r.top<innerHeight)return e;off=off||e}}
   // a control scrolled out of the phone's bottom panel: bring it back into view
   if(off){try{off.scrollIntoView({block:'nearest'})}catch(x){}const r=off.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)return off}return null}
-function tcell(x,y){const a=hproj(x-3,y-3),b=hproj(x-2,y-2);if(!a||!b)return null;const l=Math.min(a.x,b.x),t=Math.min(a.y,b.y);return {left:l,top:t,width:Math.abs(b.x-a.x),height:Math.abs(b.y-a.y)}}
+function tcell(x,y){const a=hproj(x-BW/2,y-BW/2),b=hproj(x-BW/2+1,y-BW/2+1);if(!a||!b)return null;const l=Math.min(a.x,b.x),t=Math.min(a.y,b.y);return {left:l,top:t,width:Math.abs(b.x-a.x),height:Math.abs(b.y-a.y)}}
 function tmon(id){const m=G&&monById(id);return m?tcell(m.x,m.y):null}
 function tship(i){const s=G&&G.ships[i];return s&&s.x!=null?tcell(s.x,s.y):null}
 function ttile(i){return tvis(`[data-a=card][data-t="${i}"],[data-ph=pcard][data-t="${i}"]`)}
@@ -32,7 +32,7 @@ const TUT_RULES=['goal','order','mark','reloc','roll','wake','levmove','six','ha
 function tutSteps(){const ph=!!PH.on;const S=[
   {id:'goal',say:'Last junk afloat wins. Tap the sea chart to begin.',target:()=>document.getElementById('board'),tap:1,ready:()=>!!G&&UI.started&&G.phase==='setup'},
   {id:'order',say:'Cobalt chose his start first. Every junk starts before any tile.',target:()=>tship(TS.co),tap:1,run:1,ready:()=>tcalm()&&G.ships[TS.co].x!=null&&sideToAct()===TS.me},
-  ph?{id:'mark',say:'Tap this gold mark on the edge to start there.',target:()=>{const p=hproj(TS.myStart.x-2.5,TS.myStart.y-2.5+.5);return p?{x:p.x,y:p.y}:null},until:()=>PH.pop==='start'||G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me}:null,
+  ph?{id:'mark',say:'Tap this gold mark on the edge to start there.',target:()=>{const p=hproj(TS.myStart.x-BC,TS.myStart.y-BC+.5);return p?{x:p.x,y:p.y}:null},until:()=>PH.pop==='start'||G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me}:null,
   {id:ph?'mark2':'mark',say:'Tap this mark. Your junk starts here.',target:()=>tvis(`[data-a=startmark][data-x="${TS.myStart.x}"][data-y="${TS.myStart.y}"][data-e="${TS.myStart.e}"]`),until:()=>G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me},
   {id:'reloc',say:'A leviathan on your start square? Move to another free mark.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.ships[TS.me].x!=null},
   {id:'roll',say:'Every turn starts with a roll of two dice.',target:tmph,tap:1,run:1,hold:1,ready:()=>tcalm()&&G.turn===2&&!!tmph()},
@@ -44,7 +44,7 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'turn',say:'Tap Turn to spin the tile a quarter.',target:trot,until:()=>UI.sel&&UI.sel.t===0&&UI.sel.r===1,ready:()=>tmine(2)},
   {id:'never',say:'Also never into a loop, a leviathan or a rival\'s path.',target:()=>ttile(0),tap:1,ready:()=>tmine(2)&&UI.sel&&UI.sel.r===1},
   {id:'place',say:'Tap Place. The tile goes on the square at your bow.',target:tplace,until:()=>G.turn>2,ready:()=>tmine(2)&&UI.sel&&UI.sel.r===1},
-  {id:'sail',say:'Your junk sailed along that line to its open end.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.turn===3&&G.ships[TS.me].y===4},
+  {id:'sail',say:'Your junk sailed along that line to its open end.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.turn===3&&G.ships[TS.me].y===5},
   {id:'calm',say:'Cobalt laid a tile. Now you rolled a 3: calm, nothing moved.',target:()=>tmon(7),tap:1,run:1,ready:()=>tmine(4)},
   {id:'draw',say:'After each turn you draw back up to three tiles.',target:()=>ttile(2),tap:1,ready:()=>tmine(4),enter:()=>tsel(0,0)},
   {id:'chain',say:'This tile meets Cobalt\'s tile. Tap Place: you sail through both.',target:tplace,until:()=>G.turn>4,ready:()=>tmine(4)&&UI.sel&&UI.sel.t===0&&UI.sel.r===0},

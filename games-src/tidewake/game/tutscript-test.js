@@ -13,22 +13,22 @@ try{
   ok(G.order[0]===1&&G.phase==='setup','Cobalt places her start first');
   const cm=co();ok(cm&&cm.a==='start','scripted start');mv(cm,1,'co start');
   ok(X.sideToAct()===0,'then you');
-  mv({a:'start',x:2,y:5,e:5},0,'my start');
+  mv({a:'start',x:2,y:6,e:5},0,'my start');
   ok(G.phase==='play'&&G.cur===1&&G.turn===1&&G.step==='act','turn 1 is Cobalt\'s');
   // turn 1: Cobalt
   mv(co(),1,'T1');ok(G.turn===2&&G.cur===0,'turn 2 is yours');ok(G.dice[0]+G.dice[1]===7&&G.stats.monRoll===1,'turn 2 is a 7: the leviathans stir');ok(G.mons.length===5&&G.ships[0].alive&&G.ships[1].alive,'nobody hurt by the stir');
   ok(G.hands[0][0]===22&&G.hands[0].length===3,'your hand starts with tile 22');
   // the lesson: tile 22 unturned is a red cross (off the chart), turned once it is safe
   const bad=X.validMoves(0).filter(m=>m.a==='place'&&m.t===0&&m.r===0).length;ok(bad===0,'tile 22 unturned must not be a legal move (edge)');
-  const sim0=T.E.simPlace(G,2,5,22,0);ok(sim0.res[0].st==='edge','unturned 22 sails off the edge');
-  const sim1=T.E.simPlace(G,2,5,22,1);ok(sim1.res[0].st==='ok'&&sim1.res[0].x===2&&sim1.res[0].y===4,'turned once it sails north');
+  const sim0=T.E.simPlace(G,2,6,22,0);ok(sim0.res[0].st==='edge','unturned 22 sails off the edge');
+  const sim1=T.E.simPlace(G,2,6,22,1);ok(sim1.res[0].st==='ok'&&sim1.res[0].x===2&&sim1.res[0].y===5,'turned once it sails north');
   mv({a:'place',t:0,r:1,s:0},0,'T2');
-  ok(G.ships[0].x===2&&G.ships[0].y===4&&G.ships[0].alive,'your junk sailed to (3,5) in 1-based columns/rows');
+  ok(G.ships[0].x===2&&G.ships[0].y===5&&G.ships[0].alive,'your junk sailed to (3,5) in 1-based columns/rows');
   ok(G.turn===3&&G.cur===1,'turn 3 Cobalt');mv(co(),1,'T3');
   // turn 4: a calm 3; your tile 14 joins Cobalt's current
   ok(G.turn===4&&G.dice[0]+G.dice[1]===3&&G.stats.monRoll===1,'turn 4 is calm');
   ok(G.hands[0][0]===14&&G.hands[0][1]===4&&G.hands[0][2]===9,'hand at turn 4');
-  const s4=T.E.simPlace(G,2,4,14,0);ok(s4.res[0].st==='ok'&&s4.res[0].path.length===2&&s4.res[0].x===4&&s4.res[0].y===4,'tile 14 chains across Cobalt\'s tile');
+  const s4=T.E.simPlace(G,2,5,14,0);ok(s4.res[0].st==='ok'&&s4.res[0].path.length===2&&s4.res[0].x===4&&s4.res[0].y===5,'tile 14 chains across Cobalt\'s tile');
   mv({a:'place',t:0,r:0,s:0},0,'T4');
   ok(!G.q&&G.turn===5&&G.cur===1&&!G.wave,'base game: no Deck Cannon, no Rogue Wave');mv(co(),1,'T5');
   ok(G.turn===6&&G.dice[0]+G.dice[1]===5,'calm 5');
