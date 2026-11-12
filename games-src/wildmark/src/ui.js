@@ -93,7 +93,8 @@ function autoTok() {   // one legal target for the animal, and it costs nothing:
 }
 // turn banner: "Your turn" / "<Rival>'s turn", one at a time, fades by itself
 function banner(t) { var wait = UI.popAt ? 1100 - (Date.now() - UI.popAt) : 0; if (wait > 0) { clearTimeout(banner.t); banner.t = setTimeout(function () { banner(t); }, wait); return; }   // G5: a score pop is showing: the banner waits so the two never overlap
-  var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); } e.textContent = t; e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
+  var e = $('#turnban'); if (!e) { e = document.createElement('div'); e.id = 'turnban'; e.setAttribute('aria-live', 'polite'); document.body.appendChild(e); } e.textContent = t;   // rides over the top bar: it never covers the valley
+  e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); }
 function terrText(t) { return t.t.map(function (x) { return WM.TER_NAME[x]; }).join('/'); }
 // the rival's turn, step by step (take -> place -> settle), each with a caption on the instruction bar; tap anywhere to speed it up
 function aiStep() {
@@ -240,7 +241,7 @@ function fitView(now) {
   var fc = typeof tutOn === 'function' && tutOn() && spots.length && UI.tut.spot && spots.indexOf(UI.tut.spot) >= 0 ? UI.tut.spot : null;   // tutorial: its one glowing spot is always fully in view
   if (fc) { var q = pix(fc), m = SZ * z + 4, fx = t.tx + q[0] * z, fy = t.ty + q[1] * z; if (fx - m < sr.l) t.tx += sr.l - (fx - m); if (fx + m > sr.r) t.tx -= fx + m - sr.r; if (fy - m < sr.t) t.ty += sr.t - (fy - m); if (fy + m > sr.b) t.ty -= fy + m - sr.b; }
   UI.userPan = 0;
-  if (now || !ANIM || UI.fast) { UI.pan = t; drawMap(); edgeArrows(); return; }
+  if (now || !ANIM || UI.fast) { cancelAnimationFrame(UI.panT); UI.pan = t; drawMap(); edgeArrows(); return; }
   var f = Object.assign({}, UI.pan), t0 = performance.now(), D = 380;
   cancelAnimationFrame(UI.panT);
   (function an(n) { var k = Math.min(1, (n - t0) / D), e = 1 - Math.pow(1 - k, 3); UI.pan = { z: f.z + (t.z - f.z) * e, tx: f.tx + (t.tx - f.tx) * e, ty: f.ty + (t.ty - f.ty) * e }; applyPan(); if (k < 1) UI.panT = requestAnimationFrame(an); })(t0);
@@ -412,7 +413,10 @@ function renderTop() {
 }
 function render() {
   if (!G) return;
+  var plc = myTurn() && (G.stage === 'tile' || G.stage === 'tok'), de = document.documentElement;   // placing: the market folds away so the valley gets the room
+  if (de.classList.contains('wm-placing') !== plc) { de.classList.toggle('wm-placing', plc); UI.plcFit = 1; }
   hintsSync(); renderDock(); renderTop(); drawMap(); cardWhyRender();
+  if (UI.plcFit) { UI.plcFit = 0; setTimeout(function () { if (G) fitView(); }, 0); }
   if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
   if (typeof coachCheck === 'function') coachCheck();
@@ -615,7 +619,8 @@ function cardWhyRender() {
   var a = UI.whyA; if (!a || !G || G.over) { e.hidden = true; e.innerHTML = ''; $$('.cc.on').forEach(function (c) { c.classList.remove('on'); }); return; }
   var ri = rivalOf(UI.view), C = cinfo(a), rl = ri >= 0 ? pvCardLine(a, ri) : '';
   if (rl.indexOf(' (') > 0) rl = rl.slice(0, rl.indexOf(' ('));
-  e.innerHTML = '<div class="wpat">' + (patSvg(a) || mkTok(a)) + '</div><div class="wtx"><h3>' + esc(WM.ANI_NAME[a] + ': ' + C.title) + '</h3><p>' + esc(C.rule) + '</p><p class="wl me">' + esc(pvCardLine(a, UI.view)) + '</p>' + (rl ? '<p class="wl riv">' + esc(rl) + '</p>' : '') + '<p class="wh">Lit on the board: the ' + ({ bear: 'bears', elk: 'elk', salmon: 'salmon', hawk: 'hawks', fox: 'foxes' })[a] + ' that score.</p><button type="button" class="ab" id="whyAll">All cards</button></div><button type="button" class="cx" id="whyX" aria-label="Close">&times;</button>';
+  var ml = pvCardLine(a, UI.view); if (ml.indexOf(' (') > 0) ml = ml.slice(0, ml.indexOf(' ('));   // rule and table sit just above: one short line each
+  e.innerHTML = '<div class="wpat">' + (patSvg(a) || mkTok(a)) + '</div><div class="wtx"><h3>' + esc(WM.ANI_NAME[a] + ': ' + C.title) + '</h3><p>' + esc(C.rule) + '</p>' + (pvSetA(a) ? '<p class="wt">' + esc(PV_TABLE[a]) + '</p>' : '') + '<p class="wl me">' + esc(ml) + '</p>' + (rl ? '<p class="wl riv">' + esc(rl) + '</p>' : '') + '<p class="wh">Lit on the board: the ' + ({ bear: 'bears', elk: 'elk', salmon: 'salmon', hawk: 'hawks', fox: 'foxes' })[a] + ' that score.</p><button type="button" class="ab" id="whyAll">All cards</button></div><button type="button" class="cx" id="whyX" aria-label="Close">&times;</button>';
   e.hidden = false; $$('.cc').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-card') === a); });
 }
 document.addEventListener('click', function (ev) { var t = ev.target.closest && ev.target.closest('#whyX, #whyAll'); if (!t) return; UI.whyA = null; render(); if (t.id === 'whyAll') openCards(); });

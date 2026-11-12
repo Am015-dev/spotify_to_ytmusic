@@ -12,7 +12,7 @@ WM.CARDS = {
   elk: { title: 'Ridge Lines', rule: 'Straight lines of elk. Each elk counts in one line.', pts: [0, 2, 5, 9, 13] },
   salmon: { title: 'River Runs', rule: 'Chains of salmon, each touching at most 2 salmon.', pts: [0, 2, 5, 8, 12, 16, 20, 25] },
   hawk: { title: 'Lone Perches', rule: 'Hawks touching no other hawk.', pts: [0, 2, 5, 8, 11, 14, 18, 22, 26] },
-  fox: { title: 'Curious Fox', rule: 'Each fox: 1 point per different animal next to it.', pts: null }
+  fox: { title: 'Curious Fox', rule: '1 point per different animal next to each fox.', pts: null }
 };
 // The habitat tile set (85): 25 single-terrain keystones (5 per terrain, one animal each) and 60 split tiles (6 per terrain pair, 2-3 animals).
 (function () {
