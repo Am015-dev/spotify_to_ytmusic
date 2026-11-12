@@ -10,7 +10,7 @@ let rs = S0 * 7919; const rnd = () => { rs = (rs * 16807) % 2147483647; return r
   fs.mkdirSync(path.join(__dirname, 'shots'), { recursive: true });
   for (let g = 0; g < N; g++) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true }), page = await ctx.newPage(), errs = [], fails = [];
-    page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });   // picture slots without a local file are expected
+    page.on('pageerror', e => { errs.push(String(e)); if (errs.length === 1) console.log('PAGEERR', e.stack); }); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });   // picture slots without a local file are expected
     await page.goto(URL); await page.evaluate(() => { localStorage.clear(); try { GXT.markDone('vale-of-banners'); } catch (e) { } }); await page.reload(); await page.waitForTimeout(500);
     const find = sel => page.evaluate(sel => { for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (!r.width || !r.height) continue; const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || +cs.opacity === 0) continue;
       const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue; const hit = document.elementFromPoint(x, y); if (hit && (hit === e || e.contains(hit))) return { x, y }; } return null; }, sel);

@@ -209,7 +209,7 @@ function sim(m) { var c = VB.fclone(G), s = VB.actor(G), r = VB.performMove(c, m
 function valOf(m, base) { var r = sim(m); return r ? VB.evalSeat(r.G, r.s) - base : -99; }
 var PV = { key: '' };
 function pvKey() { return G.seq + ':' + UI.sel + ':' + UI.die + ':' + VB.actor(G); }
-function pvReset() { if (PV.key !== pvKey()) PV = { key: pvKey(), base: VB.evalSeat(G, VB.actor(G)), cell: {}, take: null }; return PV; }
+function pvReset() { if (PV.key !== pvKey()) PV = { key: pvKey(), base: G.over ? 0 : VB.evalSeat(G, VB.actor(G)), cell: {}, take: null }; return PV; }
 function previewPlace(m) {   /* points this build adds right now, region progress, and its value for the best-spot star */
   var P0 = pvReset(), k = m.cell + '/' + m.s + '/' + m.die; if (P0.cell[k]) return P0.cell[k];
   var r = sim(m); if (!r) return null; var n = 0, why = [];
@@ -219,6 +219,7 @@ function previewPlace(m) {   /* points this build adds right now, region progres
   return (P0.cell[k] = { n: n, why: why, f: f, size: reg.cells.length, val: VB.evalSeat(r.G, r.s) - P0.base });
 }
 function hardMove() {   /* the look-ahead best move for the human (cached per state); drives every ★ and the bulb */
+  if (!G || G.over || !myTurn()) return null;
   var P0 = pvReset(); if (P0.hard !== undefined) return P0.hard;
   try { P0.hard = VB.aiMove(VB.fclone(G), 'hard'); } catch (e) { P0.hard = null; } return P0.hard;
 }
@@ -280,7 +281,7 @@ function isHuman(s) { return G.seats[s] && G.seats[s].human; }
 function myTurn() { return G && !G.over && isHuman(VB.actor(G)) && !UI.busy && !tvOpen(); }
 function tvOpen() { return !$('#tv').hidden; }
 function animMs(x) { if (UI.fast) return 0; var k = rivalNow() ? (UI.quick ? 0.15 : 0.55) : 1; try { return Math.round(GX.animMs(x) * k); } catch (e) { return Math.round(x * k); } }
-function rivalNow() { try { return !!G && !G.over && !isHuman(VB.actor(G)) && !(UI.mode === 'tutorial'); } catch (e) { return false; } }   /* rival animations run at about half length */
+function rivalNow() { try { return !!G && !G.over && !isHuman(VB.actor(G)) && !(UI.mode === 'tutorial' && !UI.tutAi); } catch (e) { return false; } }   /* rival animations run at about half length */
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 function save() { try { if (G && !G.over && UI.mode === 'quick') localStorage.setItem('vob_save', JSON.stringify(G)); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem('vob_save'); } catch (e) { return false; } }
