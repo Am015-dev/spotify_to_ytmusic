@@ -11,6 +11,7 @@ games-src/reviews/R32-shots/.
 |---|---|---|---|---|
 | cauldron-fair | 7.4 | FAIL | **FAIL** | 5 Phone 6 |
 | redline-rally | 7.4 | PASS | PASS | 2, 3, 5, 6, 7 at 7 |
+| nebula-aces | 6.8 | FAIL | PASS | 2 Tutorial 6, 5 Phone 6 |
 
 ---
 
@@ -132,3 +133,71 @@ discard step, Brake / Burst / Heat as the starting upgrade cards. The tutorial l
 | 5/7 | Plain race at 375 | "Clean: 4 in a 4" and "+1 engine" floats sit on the corner sign and on the cars. | rr-375-float-over-corner-sign.jpg |
 | 4 (works) | Gear 1, tapped a second card | The new card replaces the old one (good, no dead tap). | rr-375-card-swap-gear1.jpg |
 | 6 (good) | Two default races | Won 107 s (Suggest), 2nd 169 s (plain). | rr-390-result-win-suggest.jpg, rr-375-result-2nd-plain.jpg |
+
+---
+
+## 3. nebula-aces (shelf/W486-nebula-bench @ 092fa706, merged locally to 5bf7f79a): 6.8, FAIL
+
+**Gate: PASS.** `build-all.py --full nebula-aces`: "1/1 PASS ... EXIT 0"; phone-check 117.8 s passed; rules-test PASS. One warning
+(not a gate fail): "[lab] nebula-aces WARN 9/12 checks (b) LAB rows [...] != scenarios".
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes"), following only the coach (the 👆 finger or the lit hole; never "★ Auto"):
+  - 390x844, by hand at about 1.3 s per tap: 3 bubbles, "Your first battle" card, coached duel (2 rounds), "Flight drill" card,
+    drill, end card **"Play a real game / Story mode"**. About 40 taps, 0 errors. So the tutorial can be finished by touch.
+  - 375x667, at 1 s per tap: the coached duel to the "Flight drill" card in 22 taps, 0 ignored, 0 errors (reroll die-pick worked).
+  - 390x844 with my fast driver (tap about 0.3 s after each new target): **stuck in a loop at the coached reroll**, 240 taps:
+    finger on a blank die → tap it → the pick mode closes and the finger goes back to "⌖ Reroll / Choose any of your dice" → tap →
+    finger on the die again … The dice were still growing in (38x39, later 48x52) when tapped. This is the spot where the fixer's
+    driver got stuck too. At a slower pace (≥ 0.4 s after the dice settle) the die is selected, the finger moves to the second blank
+    die, then "⌖ Reroll", and the duel goes on.
+- 2 full games from "Launch" on defaults to the result card, following the guide: the finger where shown, else the pre-selected dial
+  move ("Lock move ✓"), the recommended action, the recommended target, Roll, recommended defence or Done; "Hold fire" when nothing
+  was in arc. 0.5 s pause before each tap.
+
+| Game | Size | Result | Round | Taps | Time | Wait median / max | Dead taps | Errors |
+|---|---|---|---|---|---|---|---|---|
+| n1 | 390x844 | **VICTORY** | 20 | 103 | 277 s | 1.2 s / 6.7 s | 0 | 0 |
+| n2 | 375x667 | **VICTORY** | 10 | 59 | 155 s | 1.1 s / 7.1 s | 0 | 0 |
+
+(An earlier 390 run where my driver closed the dial with ✕ every round instead of locking the suggestion lost in round 14. Not counted.)
+
+**Rules check.** The engine is the same base-rules engine R28 checked (secret dials, lowest skill moves first, one action, stress, bump
+skips the action, off the mat = destroyed, asteroid = attack die and no action, highest skill fires first, range bonuses, shields
+first, crits face up, initiative by points). The game's own messages now state the asteroid and touching limits ("a ship sitting on an
+asteroid can't shoot this round", "ships touching each other can't fire at each other"). The Rules screen still says "Flying through
+an asteroid rolls a damage die" (it is an attack die) and does not state equal-skill simultaneous fire. Nothing invented.
+
+| # | Row | Score | Why |
+|---|-----|-------|-----|
+| 1 | Rules fidelity | 7 | Engine right; in-game messages now give the asteroid and touching limits. Rules screen: "damage die" wording and simultaneous fire still missing. |
+| 2 | Tutorial teaches | 6 | Now finishable by touch, ends in "Play a real game", and the drill makes you fly off the mat once ("Ship lost. See? That ship would be gone"). Still: the flow is split (bubbles, card, duel, card, drill, card); coach lines still run late ("His evades cancelled your hits. At range 3 he rolls one more" shows while Slate shoots me; "Pilot power" shows at the next plan step); and the reroll die-pick throws away a quick tap on the die the finger shows (closes the pick mode), which looped my driver 120 times. |
+| 3 | First 10 seconds | 7 | "Launch" and "New here?" are big; one goal card; then "Tap your ship to plan its move" with a finger. |
+| 4 | Turn clarity | 7 | Fixed per R28: a one-line hint plus a finger on the next thing every step ("Tap ◉ Focus: your next shot hits harder"), and following the suggestion never led to a loss in my 2 games. The real-game dial marks the suggestion only as a pre-selected yellow cell (no ★ or reason), and the "Your turn" bubble covers an enemy ship. |
+| 5 | Phone play | 6 | Gate PASS; dial cells, chips and bottom buttons 44 px+. **Not fixed**: at 375 the ⌖ Lock chip still sits on Kael's name plate (hearts and shield hidden), and the "Your turn" bubble hides Knifepoint. |
+| 6 | AI and pacing | 7 | Following the guide won 2 of 2 (rounds 10 and 20). Waits 1.1-1.2 s median, about 7 s max (rival moves and dice). Length still swings: the round-20 game was 4.6 min at my pace, a person would take 10+. |
+| 7 | Feel | 7 | 3D ships fly their paths, dice tumble, laser lines, damage floaters, painted VICTORY / DEFEAT cards. |
+| 8 | Bugs | 7 | 2 full games: 0 page errors, 0 console errors, 0 stuck states, 0 dead taps (the R28 sliding chips are fixed). The quick-tap reroll cancel is scored in row 2; it never stopped play at a human pace. |
+| | **Total** | **6.8** | **FAIL**: rows 2 and 5 below 7. 7+6+7+7+6+7+7+7 = 54/8 = 6.75. Not capped: the reroll loop only happens on taps faster than about 0.4 s. |
+
+### Earlier findings (R28)
+| Finding | Status | Evidence (games-src/reviews/R32-shots/...) |
+|---|---|---|
+| Row 8/5: fire and action chips slide 15-60 px after they appear (dead taps) | **Fixed.** 0 dead taps in 162 game taps at 0.5 s pace. | na-390-victory-r20.jpg |
+| Row 4/6: ★ / pre-selected move marked "rock!" in 4 of 9 games | **Not seen.** 2 of 2 games won on the pre-selected move; no rock hit noted. Not proven over many games. | na-375-dial-suggested-no-star.jpg |
+| Row 4/6: dial never warns when a move leaves the mat | **Fixed.** The drill shows a cell marked "off mat! ✕" and makes you fly it once. | na-390-drill-offmat-taught.jpg |
+| Row 2/8: 4-5 ignored taps per tutorial size on sliding targets | **Fixed** (0 ignored at 1-1.3 s pace) but **new**: a quick tap on the reroll die closes the pick mode. | na-390-tut-reroll-pick-finger-on-die.jpg, na-390-tut-reroll-quick-tap-cancelled.jpg |
+| Row 2: coach lines one step late ("Range 3 …" while the rival aims; "Pilot power" at the next plan) | **Not fixed.** | na-390-tut-coach-my-shot-while-rival-aims.jpg |
+| Row 2: split flow (bubbles, duel, card, drill, card) | **Not fixed**; the end card now offers "Play a real game". | na-390-tut-end-play-real-game.jpg |
+| Row 5: action chips cover name plates at 375 | **Not fixed.** ⌖ Lock covers Kael's plate. | na-375-lock-chip-over-kael-plate.jpg |
+| Row 6: suggestion wins 5 of 7 (claimed 8 of 10) | **Better**: 2 of 2 (fixer: 3 of 6). | na-390-victory-r20.jpg, na-375-victory-r10.jpg |
+| Row 1: "damage die" should say attack die | **Not fixed.** | no shot (Rules text) |
+| Row 6: game length rounds 5-22 | **Unchanged** (rounds 10 and 20). | na-390-victory-r20.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 2/8 | Coached reroll at 390: tapped the die the finger shows about 0.3 s after the pick dice appeared | The pick mode closes, nothing is selected, and the finger goes back to "⌖ Reroll / Choose any of your dice". Repeated 120 times in a row. At a slower pace it works. | na-390-tut-reroll-pick-finger-on-die.jpg, na-390-tut-reroll-quick-tap-cancelled.jpg |
+| 4 | Opened the dial in a real game at 375 | The suggestion is just a pre-selected yellow cell ("Turn left 2") with no ★ and no reason; the tutorial taught a ★ mark. | na-375-dial-suggested-no-star.jpg |
+| 5 | Action step at 375 | The "Your turn / Kael Varro flew" bubble covers Knifepoint; ⌖ Lock covers Kael's plate. | na-375-lock-chip-over-kael-plate.jpg |
+| 2 (good) | Drill | Off the mat is now taught by doing: the finger points at the "off mat!" move and Brecken says "See? That ship would be gone. Fly straight 2 instead." | na-390-drill-offmat-taught.jpg |
