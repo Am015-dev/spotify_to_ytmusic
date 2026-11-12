@@ -137,3 +137,5 @@ function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._
   if(tutOn()){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;if(!GXT.act({type:'tap',what:'order',r}))return;
     UI._tutIn=1;try{return o(r)}finally{UI._tutIn=0}}
   return o(r)}})();
+// Learn to play: the first Clash plays out slowly (its step explains it); the later Clashes of the staged round resolve at once, so no silent wait passes ~3 s
+(function(){const o=bfEvent;bfEvent=function(c){if(UI.cfg&&UI.cfg.tutorial&&c&&c.ev&&c.ev.t==='clash'&&Object.keys(UI.clashRes||{}).length>0&&!tutHold(c)){const a=ANIM;ANIM=0;try{return o.apply(this,arguments)}finally{ANIM=a}}return o.apply(this,arguments)}})();

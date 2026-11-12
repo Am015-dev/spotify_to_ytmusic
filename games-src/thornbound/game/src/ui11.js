@@ -114,6 +114,13 @@ let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'thornbound',defaultOn:false,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
+// hints On (the first game's default): every decision shows the suggestion and its finger; one tap on the bulb turns them off,
+// after that the bulb shows one suggestion per tap (and Menu > Hints turns them back on)
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('#bulbbtn');if(!b||!G||!UI.started||UI.guide!=='full'||isGuided())return;
+  e.stopImmediatePropagation();e.preventDefault();UI.guide='off';UI.hintQ=null;try{GXH.hide()}catch(x){}bulbState();renderAll();bfMsg('Hints off. Tap the bulb for one hint.')},true);
+function bulbState(){const b=$('#bulbbtn');if(!b)return;const on=UI.guide==='full'&&G&&UI.started;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Hints are on. Tap to turn them off':'Hint: what should I do?')}
+function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
   const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
   GXH.phase(busy?null:hlpPhase())}
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();

@@ -31,7 +31,7 @@ document.addEventListener('click',e=>{
    case 'pclose':closePop();break;
    case 'newsok':newsOk();break;
    case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
-   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
+   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();const pp=$('#ppop');if(!pp||pp.hidden){UI.pop=null;UI.popArg=null;const ok=humanMove(t.dataset.k);if(!ok){toast('You can\u2019t use that now.');renderAll()}}break}   // no confirm sheet for this move: never a dead tap
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;

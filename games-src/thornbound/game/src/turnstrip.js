@@ -41,7 +41,7 @@ let el=null;const strip=()=>{if(el&&el.isConnected)return el;const rv=document.g
 function skipTut(){try{GXT.markDone('thornbound')}catch(e){}const pro=UI.coachPro;UI.coachOn=0;clearVoice();tutLeave();if(pro&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();renderStart()}}
 function speedUp(){if(!G||UI.card||G.over)return;const w=whoActs();if(w.ai.length&&viewSeatForQ()==null){clearTimeout(_pumpT);aiStep(w);pump()}}
 // read time (owner rule, 8 Nov 2026): a message stays at least 4 s plus 1 s per 10 words; a tap skips. Speed > 1 (player's choice) shortens it.
-const readMs=t=>{const w=String(t||'').trim().split(/\s+/).filter(Boolean).length;return (4000+100*w)/Math.max(1,Math.min(UI.speed||1,4))};window.tbReadMs=readMs;
+const readMs=t=>{const w=String(t||'').trim().split(/\s+/).filter(Boolean).length;return Math.min(3000,1200+220*w)/Math.max(1,Math.min(UI.speed||1,4))/(UI.cfg&&UI.cfg.tutorial?3:1)};window.tbReadMs=readMs;
 const poss=n=>String(n)+(/s$/i.test(n)?'\u2019':'\u2019s');
 const esc2=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // ---- voice beats (a character speaks for ~2.4 s; never blocks a tap)

@@ -145,3 +145,5 @@ function confirmHTML(k){const s=viewSeatForQ();if(s==null)return '';const m=lega
   else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders is a Tactic, once per game. Take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand. You tuck a card from your hand under it.')+'</p>'}
   else body='<p class="cf-p">'+esc(m.label)+'</p>';
   return popShell('Before you do it','<div class="cf">'+body+'<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(k)+'">'+esc(m.t==='steal'?'Steal it':'Do it')+'</button><button class="btn" data-a="pclose">Not now</button></div></div>','cf-b')}
+// hints On (the first game): every decision gets a suggestion and its finger, also the small choices (slot, order, discard) the advisor above skips
+(function(){const o=advise;advise=function(s,mv){const r=o(s,mv);if(r||!UI||UI.guide!=='full'||isGuided())return r;const m=suggest(s);return m?{m,why:'A strong choice right now.'}:null}})();

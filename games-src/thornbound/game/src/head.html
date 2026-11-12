@@ -521,4 +521,11 @@ html.desk .rv-n{font-size:2.1rem}
 html.desk .bidc{width:44px;height:62px;border-radius:6px;margin:0 6px}
 html.desk .bidc.up b{font-size:1.5rem}
 html.desk .race-c.four .rv-t b{display:block}
+#tbhmsg{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 56px);transform:translateX(-50%);z-index:60;background:rgba(20,12,24,.94);color:#f6e6c0;border:1px solid #c9a24a;border-radius:12px;padding:10px 14px;font:600 15px/1.3 system-ui,sans-serif;pointer-events:none;max-width:86vw;text-align:center}#tbhmsg[hidden]{display:none}
+#bulbbtn.on{box-shadow:0 0 0 2px #f0c860,0 0 14px rgba(240,200,96,.55)}
+/* short portrait phones (375x553 etc.): tighter strips so the board keeps >=55% of the screen */
+@media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #rivals{padding-top:2px;padding-bottom:calc(2px + var(--sab))}html:not(.bf-w) #act{min-height:44px;padding:0 8px}
+html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:13px}
+html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw .hand>.hc{top:1px}
+html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:13px;white-space:normal;line-height:1.1}}
 </style></head>

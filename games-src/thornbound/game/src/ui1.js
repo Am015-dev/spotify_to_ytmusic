@@ -176,7 +176,7 @@ function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
       if(!G.q){renderAll();return}
       const w=whoActs();
       if(w.ai.length){ // AI answers (simultaneous hidden decisions are collected in any order)
-        if(AIDELAY>0&&ANIM){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.6)/UI.speed);return}
+        if(AIDELAY>0&&ANIM){renderAll();if(UI.mode==='watch'&&UI.watchPaused)return;_pumpT=setTimeout(()=>{aiStep(w);pump()},AIDELAY*(UI.mode==='watch'?1:.6)/UI.speed/(UI.cfg&&UI.cfg.tutorial?3:1));return}
         aiStep(w);continue}
       // only humans are pending
       const h=pickHumanSeat(w.hum);

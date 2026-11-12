@@ -52,8 +52,8 @@ function renderRoad(){}
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
   UI._adv=A;UI._rec=A?A.m:null;UI._recWhy=A?A.why:'';return UI._rec}
-// suggestions are on in the guided game and in rounds 1-2; later only on request (the "Suggest a move" button)
-function hintsAuto(){return isGuided()||UI.guide!=='off'&&G.round<=2}
+// suggestions: always with hints On (the first game's default), rounds 1-2 with Light; otherwise on request (the "Suggest a move" button)
+function hintsAuto(){return isGuided()||UI.guide==='full'||UI.guide==='light'&&G.round<=2}
 function hintsShown(s,mv){return hintsAuto()||UI.hintQ===qKey(s,mv)}
 const recK=()=>UI._recShown&&UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
@@ -179,7 +179,7 @@ function promptText(q,s){const t=q.title||'';
     case 'applause':return 'Set the turn order';
     case 'clashOrder':return 'Choose the Clash order';
     default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'Use a power, or tap Done':'Use a power, or tap Done'}return shortT(plain(t))}}
-function shortT(x){const w=String(x||'').split(/\s+/).filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
+function shortT(x){let w=String(x||'').split(/\s+/).filter(Boolean);if(w.length>8){const f=String(x).split(/(?<=[.?!])\s+/)[0].split(/\s+/).filter(Boolean);if(f.length<=8)return f.join(' ')}return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(UI._recWhy||'')+'</span></span></p>'}

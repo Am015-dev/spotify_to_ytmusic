@@ -101,7 +101,7 @@ function bfSlot(r,s,old,nw){if(!ANIM||UI.noAnim||!nw||!nw.faceDown||(old&&old.co
 // ---------------------------------------------------------------- events played on the board (bids, clashes, round end): no panels, a tap skips
 function evDone(){const c=UI.card;if(!c||c.kind!=='event')return;clearTimeout(UI._evT);UI.card=null;UI._cardKey=null;UI.noAnim=false;UI._cp=null;UI._clashLine='';UI.mapReset=false;MAP.slotDirty=true;pump()}
 function bfSkip(){const c=UI.card;if(!c)return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
-const spd=()=>Math.max(1,Math.min(UI.speed||1,4));
+const spd=()=>Math.max(1,Math.min(UI.speed||1,4))*(UI.cfg&&UI.cfg.tutorial?3:1);   // Learn to play runs the rival's turns 3x faster: no silent wait over ~3 s
 function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c)))evDone()},ANIM?ms/spd():0)}
 function bfEvent(c){const ev=c.ev;if(ev.t==='bids')bfBids(c);else if(ev.t==='clash')bfClash(c);else if(ev.t==='summary')bfSummary(c);else bfAuto(c,300)}
 function bfBids(c){const ev=c.ev;c.rank=ev.bids.slice().sort((a,b)=>a.str-b.str||ev.order.indexOf(b.seat)-ev.order.indexOf(a.seat)).map(b=>b.seat);c.revN=0;
@@ -172,7 +172,7 @@ document.addEventListener('pointerup',()=>{if(UI._nc){UI._nc=0;UI._ncT=Date.now(
 document.addEventListener('click',e=>{if(UI._ncT&&Date.now()<UI._ncT){UI._ncT=0;e.stopPropagation();e.preventDefault()}},true);
 const learnKey=()=>G&&G.q?(G.q.t==='menu'?'menu':G.q.kind):'';
 function lsGetJ(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(e){return {}}}
-function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('tb_fl')[kind]>=1)}
+function fingerWanted(kind){if(isGuided()||UI.camp||UI.guide==='full')return true;return !(lsGetJ('tb_fl')[kind]>=1)}
 (function(){const o=humanMove;humanMove=function(k){const kind=learnKey();const r=o(k);if(r&&kind){try{const L=lsGetJ('tb_fl');L[kind]=(L[kind]||0)+1;localStorage.setItem('tb_fl',JSON.stringify(L))}catch(e){}}return r}})();
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
 // planFor(M,rm): where the move rm is made on the board: {from,to} points (from = the card to pick up first), fromR/toR rects, key. Used by the ghost finger and by the lightbulb.

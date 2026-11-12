@@ -19,10 +19,10 @@ function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const 
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
   root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);UI.desk=UI.land&&!on;root.classList.toggle('desk',UI.desk);
   const barH=on?44:48;
-  let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?44:H<820?50:H<1000?56:66);
+  let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?40:H<820?50:H<1000?56:66);
   if(!UI.land){ // portrait: the map is as wide as the screen; whatever height is left over goes to a bigger hand
     const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
-    const hh=Hm-rh-46-W-10;cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}
+    const th=(($('#tbturn')||{}).offsetHeight)||72,road=H<820?16:40;const hh=Math.min(Hm-rh-46-W-10,Hm-rh-th-46-Math.ceil(.57*H)-road);cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}   // a bigger hand only while the board keeps >=57% of the screen, Kingdom Card row (roadX) included
   if(UI.desk){ // desktop: the right column is the table; the hand gets big, readable cards
     const R=W-Math.max(150,Math.min(H-barH,Math.round(W*.62)));cw=Math.max(66,Math.min(116,Math.floor((H-barH)*.125),Math.floor((R-48)/3.9)))}
   root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
