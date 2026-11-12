@@ -1,3 +1,10 @@
+# FIXED2 r2 (12 Nov 2026): research assistants
+- Engine (src/engine.js "research assistants", data V.ASST): 8 helpers, 3 face up; magnifier arriving on row 2 or 5 hires one (question
+  h:'asst'), notebook arriving there turns one gold; free move {t:'asst',k} once a round, rests until round end; max 2 (a third hire upgrades).
+  Assistant shuffle uses its own seeded stream so older seeds play exactly as before. logic-test L1-L10; rules-test answers the hire question.
+- AI values each assistant's remaining uses; Easy noise 4.0 (newbie-sim: glow 62%, sensible 54%). Tray tags (44px, 14px), track rows marked A,
+  reference drawer section, tutorial steps g-asst..g-asst3 (30 steps, 4 Next-only). Still missing: see rules-notes.md "Still missing".
+
 # FIXED2 (8 Nov 2026, R2 review 5.6): hands-on tutorial, Easy tuned, phone labels
 - Tutorial: every rule done by hand (TUTORIAL-COVERAGE.md top); Skip/finish makes Play the primary button.
 - Easy rival noise 1.6 -> 2.6 (src/ai.js). `node newbie-sim.js` = Easy vs glow-follower / sensible / random new players (headless).

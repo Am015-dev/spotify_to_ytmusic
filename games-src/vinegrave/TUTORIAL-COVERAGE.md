@@ -1,8 +1,8 @@
 # FIXED2 (R2 review): every rule is done by hand; 4 Next-only steps (goal + 3 score steps)
 
-27 steps (src/ui4.js `guidedSteps`): goal (Next) · play a card (2 taps) · Plane: a Boat camp paid with 2 coins (2) · discover a ruin, Dread
+30 steps (src/ui4.js `guidedSteps`): goal (Next) · play a card (2 taps) · Plane: a Boat camp paid with 2 coins (2) · discover a ruin, Dread
 cards pay the boots (2) · tap the idol, set it in a shrine (2) · beat the guardian that woke (2) · tap the boon, use it (2) · buy an item (2)
-· buy an artifact (2) · magnifier climbs (2) · notebook climbs (2) · temple tile (practice jump to the top, 2) · Pass (round end text) ·
+· buy an artifact (2) · magnifier climbs (2), row 2 hires an assistant, tap it, use it (3) · notebook climbs (2) · temple tile (practice jump to the top, 2) · Pass (round end text) ·
 3 score steps (Next). `node guided-tut-test.js` also fails if more than 5 steps are Next-only. Skipping or finishing sets prefs.played,
 so the big title button becomes Play (a real game).
 
