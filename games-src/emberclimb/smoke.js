@@ -32,6 +32,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     const tap = async sel => { const el = await pg.$(sel); if (!el) return false; await tapEl(el); return true; };
     await pg.screenshot({ path: `shots/${name}-title.png` });
     await pg.evaluate(() => { UI.sub = 'quick'; UI.render(); }); await tap('#play'); await sleep(100);
+    { const gb = await pg.$('.ec-goal button'); if (gb) { await tapEl(gb); await sleep(100); } }
+    // W494: quick play opens with the First Ember gift; take the first option, then Continue
+    if (await pg.evaluate(() => EC.E.G().scr === 'event')) { await tap('.reward .opts button'); await sleep(150); await tap('#ev-leave'); await sleep(150); }
     if (!(await pg.$('#map'))) fail(name + ': no map after Climb');
     await pg.screenshot({ path: `shots/${name}-map.png` });
     if (await pg.$('#goal-go')) { await tap('#goal-go'); await sleep(200); }   // Addendum 7: the one-card Goal before turn 1

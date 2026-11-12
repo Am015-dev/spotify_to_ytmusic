@@ -1,7 +1,7 @@
-// Coached first climb test: fresh storage, opens the tutorial from the title, does the 2 forced steps by tapping the spotlit element's centre,
+// Coached first climb test: fresh storage, opens the tutorial from the title, does the guided steps (W494: a guided first fight + map walk) by tapping the spotlit element's centre,
 // then plays the whole climb by choosing legal moves through the UI only (a playable card, a target, End turn, any glowing room, rewards, rest,
-// shop leave, event choices), never blocked by the coach. Asserts the end card appears and every coach rule was either explained during play
-// or listed under "Things you will meet later". Phone 390x763 + PC 1440x860. Run: node tools/tut-end.js   (ONLY=phone|pc to run one size)
+// shop leave, event choices), never blocked by the coach. Asserts the end card appears with no "meet later" list and that every core rule
+// (window.EC_TUT_CORE minus the situational ones: lose, preview, piles, event) was explained by doing it on this climb. Phone 390x763 + PC 1440x860. Run: node tools/tut-end.js   (ONLY=phone|pc to run one size)
 const { chromium } = require('playwright'), { serve, sleep, tap } = require('./tap-lib');
 (async () => {
   const { srv, base } = await serve(); const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let bad = 0;
@@ -22,7 +22,8 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
         if (!s.tut.ready) continue;
         if (s.tut.next) { if (await pg.$('.gxt-next')) { await T('.gxt-next'); forced++; } continue; }
         const mark = () => pg.evaluate(() => { document.querySelectorAll('[data-spot]').forEach(x => x.removeAttribute('data-spot')); const c = GXT.current(); const t = c && c.target && c.target(); if (t) t.setAttribute('data-spot', '1'); return !!t; });
-        if (!(await mark())) continue; if (!(await T('[data-spot]'))) { bad++; console.log('FAIL', name, 'forced step target covered', s.tut.id); continue; }
+        if (!(await mark())) continue; if (!(await T('[data-spot]')) && !(await sleep(600), await mark(), await T('[data-spot]'))) {   // the spotlight hole follows the card one tick later
+        bad++; console.log('FAIL', name, 'forced step target covered', s.tut.id); continue; }
         if (s.tut.times > 1) { await sleep(300); await mark(); await T('[data-spot]'); } forced++; await sleep(700); continue;
       }
       if (s.scr === 'battle') {
@@ -35,17 +36,18 @@ const { chromium } = require('playwright'), { serve, sleep, tap } = require('./t
         continue;
       }
       if (s.scr === 'map') { const ns = await pg.$$('.node.glow'); if (ns.length) await T(ns[Math.floor(Math.random() * ns.length)]); continue; }
-      if (s.scr === 'reward') { const it = await pg.$('.reward .picks .item'); if (it) { await T(it); continue; } const pk = await pg.$$('.picks .card'); if (pk.length && Math.random() < 0.7) { await T(pk[Math.floor(Math.random() * pk.length)]); continue; } await T('#leave'); continue; }
+      if (s.scr === 'reward') { const it = await pg.$('.reward .picks .item:not(.taken)'); if (it) { await T(it); continue; } const pk = await pg.$$('.picks .card'); if (pk.length && Math.random() < 0.7) { await T(pk[Math.floor(Math.random() * pk.length)]); continue; } await T('#leave'); continue; }
       if (s.scr === 'rest') { await T(Math.random() < 0.8 ? '#rest-heal' : '#rest-heal'); continue; }
       if (s.scr === 'shop') { await T('#shop-leave'); continue; }
       if (s.scr === 'event') { const ov = await pg.$('.ov .grid .card'); if (ov) { await T(ov); continue; } const b = await pg.$('#ev-leave') || await pg.$('.opts button:not([disabled])'); if (b) await T(b); continue; }
       if (s.scr === 'over') continue;   // the coach walks through the numbers, then shows its end card
     }
-    const cov = await pg.evaluate(() => { const C = UI.coach, R = Object.keys((window.EC_STORY.coach || {}).rules || {}); const later = [...document.querySelectorAll('.ec-endcard [data-rule]')].map(x => x.getAttribute('data-rule')); return { total: R.length, seen: R.filter(k => C.seen[k]), later, missing: R.filter(k => !C.seen[k] && later.indexOf(k) < 0), scr: EC.E.G().scr, won: EC.E.G().won }; });
+    const cov = await pg.evaluate(() => { const C = UI.coach, R = Object.keys((window.EC_STORY.coach || {}).rules || {}); const later = [...document.querySelectorAll('.ec-endcard [data-rule]')].map(x => x.getAttribute('data-rule')), opt = ['lose', 'preview', 'piles', 'event'], core = (window.EC_TUT_CORE || R).filter(k => opt.indexOf(k) < 0); return { total: R.length, seen: R.filter(k => C.seen[k]), later, listLater: /meet later|of \d+\./i.test((document.querySelector('.ec-endcard') || {}).textContent || ''), missing: core.filter(k => !C.seen[k]), scr: EC.E.G().scr, won: EC.E.G().won }; });
     console.log(name, 'forced steps', forced, '| rules explained in play', cov.seen.length + '/' + cov.total, '| on end card', cov.later.length, '| result', cov.won ? 'won' : 'lost');
-    if (forced > 2) { bad++; console.log('FAIL', name, 'more than 2 forced steps'); }
+    if (forced > 40) { bad++; console.log('FAIL', name, 'more than 40 guided taps'); }
     if (!endCard) { bad++; console.log('FAIL', name, 'no coach end card'); }
-    if (cov.missing.length) { bad++; console.log('FAIL', name, 'rules neither explained nor listed:', cov.missing.join(',')); }
+    if (cov.missing.length) { bad++; console.log('FAIL', name, 'core rules not met by doing:', cov.missing.join(',')); }
+    if (cov.listLater) { bad++; console.log('FAIL', name, 'end card still lists rules for later / a count'); }
     if (endCard) { await T('#coach-play'); await sleep(600); if (!(await pg.$('#play'))) { bad++; console.log('FAIL', name, 'end card did not open a real game'); } }
     if (errs.length) { bad++; console.log('FAIL', name, 'errors', errs.slice(0, 2).join(' | ')); }
     await ctx.close();

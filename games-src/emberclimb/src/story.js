@@ -68,8 +68,8 @@ window.EC_STORY = {
       block: 'An attack is coming. Block cards soak damage until your next turn.',
       endturn: 'No card fits your energy? Tap End turn.',
       target: 'Many enemies: lift an attack, then tap your target.',
-      vuln: 'Vulnerable: the next hit on it deals double.',
-      weak: 'Weak: each hit deals 3 less.',
+      vuln: 'Vulnerable: takes double damage from the next attack.',
+      weak: 'Weak: each of its hits deals 3 less damage.',
       poison: 'Poison hits 1 HP per token each turn. It stays.',
       strength: 'Strength adds to every hit you make this fight.',
       power: 'A Power card lasts the whole fight. Play it early.',
@@ -82,11 +82,12 @@ window.EC_STORY = {
       gold: 'Gold piles up. Spend it at shops.',
       relic: 'A relic: a lasting bonus for the whole climb.',
       map: 'Your path: glowing rooms are your next step. Pick one.',
-      rest: 'Campfire: rest to heal, or smith to upgrade one card.',
+      rest: 'Campfire: rest heals 30% of your HP, or smith upgrades one card.',
       shop: 'Shop: tap an item, then Buy. You can also remove a card.',
       event: 'A ? room: a choice with a price or a prize.',
       elite: 'An elite: tougher than a normal foe, better loot.',
-      boss: 'On the Spikes turn, block. Attacking then hurts you.',
+      boss: 'The boss: when it falls, it splits into slimes. Save energy.',
+      split: 'It split! Slimes join next round. Each one must fall too.',
       lose: 'If your HP hits 0, the climb ends.',
       preview: 'Hints on: lifting a card shows the damage to each foe.',
       frail: 'Frail: your Block cards give a quarter less while it lasts.',
@@ -100,7 +101,7 @@ window.EC_STORY = {
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
     poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
-    end: { title: 'You climbed the tower', later: 'Things you will meet later', play: 'Play a real game', title2: 'Title' }
+    end: { title: 'You climbed the tower', did: 'What you did on this climb', heroes: 'Each other hero brings one new trick. Its first fight shows it.', play: 'Play a real game', title2: 'Title' }
   },
   // Story mode scenes per chapter (id from campaign.json): intro (2-3 lines), win and loss outros, boss lines before and after
   chapters: {

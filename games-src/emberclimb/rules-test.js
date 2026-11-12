@@ -72,8 +72,8 @@ ok(D.H.s.start.length === 12 && D.H.s.start.filter(x => x === 's-strike').length
 G = fresh(['s'], 21); let sr = G.hs[0]; ok(!sr.hand.some(c => c.id === 'shiv'), 'R13 combat starts with 0 shivs');
 playId(G, 's-knife-rain'); playId(G, 's-blade-fan'); ok(sr.hand.filter(c => c.id === 'shiv').length === 5, 'R13 max 5 shivs held');
 t0 = G.b.en[0]; E.performMove({ t: 'play', h: 0, c: sr.hand.findIndex(c => c.id === 'shiv'), e: 0 }); ok(t0.hp === 200 - SC, 'R13 shiv deals ' + SC);
-// R09 rest heals 3 x SCALE
-E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === hr + 3 * SC, 'R09 rest heals ' + 3 * SC);
+// R09 rest heals 30% of max HP (tabletop: heal 3 of ~10 HP)
+E.newGame({ heroes: ['w'], seed: 22 }); E.debug.rest(); G = E.G(); const hr = G.hs[0].hp; E.performMove({ t: 'heal', h: 0 }); ok(G.hs[0].hp === Math.min(G.hs[0].mhp, hr + Math.round(G.hs[0].mhp * 0.3)), 'R09 rest heals 30% of max HP');
 // R14 treasure: each hero gains a relic
 E.newGame({ heroes: ['w', 'a'], seed: 23 }); E.debug.treasure(); G = E.G(); ok(G.rw.relics.length === 2 && E.performMove({ t: 'relic', i: 0 }) && E.performMove({ t: 'relic', i: 1 }) && G.rw.took.relic, 'R14 treasure: each hero takes a relic');
 // R15 boss relics: 1 per hero + 1 (3 solo), each hero takes one; R16 boss cards come from the rare deck
@@ -121,7 +121,7 @@ G.lucky = 1; const before = G.q.length; h.hand = [E.mk('w-wild-swing')]; h.en = 
 E.performMove({ t: 'play', h: 0, c: 0, e: 0 }); ok(G.q.slice(before).some(f => f.k === 'die' && f.n === 6) && hp0 - t0.hp >= 14, 'fortune die forces a 6: wild swing deals 14');
 h.hand = [E.mk('wound'), E.mk('burn')]; ok(!E.validMoves().some(m => m.t === 'play'), 'status cards are unplayable'); }
 // orbs
-E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G();
+E.newGame({ heroes: ['a'], seed: 5 }); E.performMove({ t: 'go', n: E.validMoves()[0].n }); G = E.G(); G.b.en.forEach(e => { e.hp = e.mhp = 200; });   // sturdy foe so evokes cannot end the fight
 let a = G.hs[0]; ok(a.orbs.length === 1 && a.orbs[0].k === 'L', 'spark core: starts with a lightning orb');
 a.hand = [E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap'), E.mk('a-zap')]; a.en = 9; for (let i = 0; i < 4; i++) E.performMove({ t: 'play', h: 0, c: 0 });
 ok(a.orbs.length === 3, 'only 3 orb slots: the oldest orb is evoked when full');
