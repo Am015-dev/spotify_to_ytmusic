@@ -17,7 +17,7 @@ async function playToResult(pg, touch, o={}) {
     const av = pg.locator('#pyr .card.av:not(.dim)');
     if (await av.count()) {
       if (!(await pg.locator('#zoom:not([hidden])').count())) { await T(pg,touch,av.nth(Math.floor(Math.random()*Math.min(3,await av.count())))); await pg.waitForTimeout(150); }
-      const b = pg.locator('#zoom [data-a="build"]:not([disabled])');
+      const b = pg.locator('#zoom [data-a="build"]:not([disabled]):not([aria-disabled="true"])');
       if (await b.count()) await T(pg,touch,b.first()); else await T(pg,touch,pg.locator('#zoom [data-a="discard"]').first());
       turns++; continue;
     }
@@ -57,7 +57,7 @@ const which = process.argv[3]||'p'; const out=(process.env.SHOTS||'/tmp/ttshots'
       if (await pg.locator('[data-first]').count()) { await T(pg,touch,pg.locator('[data-first]').first()); continue; }
       if (await pg.locator('.picker .tk').count()) { await T(pg,touch,pg.locator('.picker .tk').first()); continue; }
       const av = pg.locator('#pyr .card.av:not(.dim)');
-      if (await av.count()) { if (!(await pg.locator('#zoom:not([hidden])').count())) { await T(pg,touch,av.first()); await pg.waitForTimeout(150);} const bb=pg.locator('#zoom [data-a="build"]:not([disabled])'); if(await bb.count()) await T(pg,touch,bb.first()); else await T(pg,touch,pg.locator('#zoom [data-a="discard"]').first()); continue; }
+      if (await av.count()) { if (!(await pg.locator('#zoom:not([hidden])').count())) { await T(pg,touch,av.first()); await pg.waitForTimeout(150);} const bb=pg.locator('#zoom [data-a="build"]:not([disabled]):not([aria-disabled="true"])'); if(await bb.count()) await T(pg,touch,bb.first()); else await T(pg,touch,pg.locator('#zoom [data-a="discard"]').first()); continue; }
     }
     await pg.waitForTimeout(150);
   }
@@ -70,7 +70,7 @@ const { chromium } = require(PW);
 
 const out = (process.env.SHOTS||'/tmp/ttshots');
 (async()=>{
- for (const [n,vp,t] of (process.argv[3]==='d'?[['d',{width:1440,height:860},false]]:[['p',{width:390,height:763},true]])) {
+ for (const [n,vp,t] of (process.argv[3]==='d'?[['d',{width:1440,height:860},false]]:[['p',{width:+(process.env.TW||390),height:+(process.env.TH||763)},true]])) {
   const b = await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--no-sandbox']});
   const c = await b.newContext({viewport:vp,hasTouch:t,isMobile:t}); const pg = await c.newPage();
   const errs=[]; pg.on('pageerror',e=>errs.push(e.message)); pg.on('console',m=>m.type()==='error'&&errs.push(m.text()));
@@ -78,7 +78,7 @@ const out = (process.env.SHOTS||'/tmp/ttshots');
   await pg.evaluate(()=>{window.AIDELAY=90});
   await T(pg,t,pg.locator('[data-start="1"]').first());
   let shot=0;
-  const r = await playToResult(pg,t,{max:200000, stopAt: async (pg)=>{ if(!shot && await pg.locator('#pyr .card.av:not(.dim)').count()){ shot=1; await pg.waitForTimeout(300); await pg.screenshot({path:out+'/'+n+'-5firstturn.png'}); await T(pg,t,pg.locator('#pyr .card.av:not(.dim)').first()); await pg.waitForTimeout(400); await pg.screenshot({path:out+'/'+n+'-6zoom.png'}); await T(pg,t,pg.locator('#zoom [data-zclose]').first()); } return false; }});
+  const r = await playToResult(pg,t,{max:200000, stopAt: async (pg)=>{ if(!shot && await pg.locator('#pyr .card.av:not(.dim)').count()){ shot=1; await pg.waitForTimeout(300); await pg.screenshot({path:out+'/'+n+'-5firstturn.png'}); await T(pg,t,pg.locator('#pyr .card.av:not(.dim)').first()); await pg.waitForTimeout(400); await pg.screenshot({path:out+'/'+n+'-6zoom.png'}); await pg.evaluate(()=>TT_UI.closeZoom()); } return false; }});
   await pg.waitForTimeout(1200); await pg.screenshot({path:out+'/'+n+'-9result.png'});
   console.log(n, JSON.stringify(r), errs.slice(0,3));
   await b.close();
