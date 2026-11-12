@@ -34,7 +34,7 @@ async function playGame(browser,W,H,gi){
     s.seats.forEach((x,i)=>{x.h=i===0;x.lv=['normal','normal','easy','hard'][i%4]});
     AIDELAY=0;ANIM=anim?1:0;UI.anim=anim;UI.speed=anim?40:1;try{TWKit.setSpeed(UI.speed)}catch(e){}UI.tickRate=1;setSeed(seed);setAiSeed(seed);
     window.__acts=[];const _a=act;act=function(m,s){window.__acts.push(JSON.stringify(m));return _a.apply(this,arguments)};
-    startGame(JSON.parse(JSON.stringify(s)));GXH.setEnabled(gi%5!==4)},[np,gi,exp,anim,300+gi*13]);
+    startGame(JSON.parse(JSON.stringify(s)));if(gi%5===4)GXH.setEnabled(false)},[np,gi,exp,anim,300+gi*13]);
   await sleep(500);
   let last='',lastT=Date.now(),taps=0,rot=false;const t0=Date.now();const SLOW=twoD?1:3;     // the 3D board runs on a software renderer here: everything takes about 3x longer
   const state=()=>p.evaluate(()=>({over:!!G.over,ph:hlpPhase(),busy:!!UI.busy,q:G.q&&G.q.kind,pc:PH.cur&&PH.cur.kind,pop:PH.pop,turn:G.turn,
