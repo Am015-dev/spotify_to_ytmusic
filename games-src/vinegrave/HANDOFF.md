@@ -2,11 +2,53 @@
 - Glow = advice (src/ui1.js `glowSet`): in a real game only the 3 strongest places glow (computer's own scoring, within 1.5 of the best);
   other legal moves get a faint ring (.can) and still work. Prompt: "Your turn. What glows is a strong move." Tutorial: only the step's
   target glows (`tutGlow`, re-rendered on each step). Hot-seat and choosers: every legal move glows.
-- Easy: noise 1.6 -> 4.5 (src/ai.js); the title default is now Easy (UI.opts). Normal/Hard unchanged (ai-gate PASS).
+- Easy (src/ai.js EASY): best move 60%, 2nd 30%, ends its round after 9 steps (was 40/30/7: too soft once the glow advises). Default stays Easy.
 - Toasts never show on your turn and are cleared when it starts (`yourTurnClear`). Explorer pawns 44x48 tap area.
 - Map shrinks above the tray instead of running under it; sites scale with the map height (--ms, ResizeObserver).
 - Test: `node newcomer-touch.js 6 390x844` (R29 reviewer's newcomer by touchscreen.tap: random glowing thing, its button, 8% random passes).
-  Fast estimate: the node sim in the R29 report (top-3 glow, Easy 4.5) = newcomer 56% wins, avg +2.
+  Result on this build: 390x844 won 3/6 (avg 24.5 v 25.7), 375x667 won 2/6 (avg 23.8 v 25.5); 0 dead taps, 0 page errors.
+# FIXED4 (12 Nov 2026): R20 6.8 findings (market reads like a spreadsheet, easy rival too strong, long waits, tutorial counter)
+- Market (src/ui1.js `mktHTML`, `effPlain`; style.css FIXED4 block): six real cards: art on top, cost as a coin/compass token, points as a star,
+  effect = one icon + plain words ("Buy an item 2 cheaper", "Remove a card", "Notebook up 1"). Unaffordable cards dim, cost token rimmed red, small "Need N more" pill (no bar over the art).
+  Shots: playable-shots/fixed4/market-before|after-390|375.jpg. Hand at <=420 px: 5 cards side by side, names whole, -1 badge top-left.
+- Rival pills (ui2 `popUnder`) land on the board under the caption, never on the market.
+- Pacing (ui2 `aiStep`, `finishSolo`): wait budget from the end of your move: first rival step animated, quick steps after 1.2 s, the rest at once after 2.4 s
+  (toast "Tamsin Reed played 2 more moves."); guardian card auto-closes at 3 s (tap closes sooner). Measured longest wait 3.9 s in 3 touch games.
+- Easy rival (ai.js `EASY`): casual player, skips research 60%, sometimes stops early, noise 5. Newcomer sim (no research, random glowing): 24/60 wins (was 6/40).
+- Tutorial (ui4 `tutAI`, `TUTN`): Tamsin really plays (cards, camp digs, middle market, research) but never what the next lesson needs; counter 1/35..35/35.
+  Research badges are person icons with "hires an assistant" in the research line. Dock never says "You are choosing".
+- Left: tutorial still tops up goods before steps and keeps the "Practice jump" to the temple; easy rival can still spike (sim max 82).
+
+# FIXED3 (12 Nov 2026, R17 review 6.8): market + feel
+- Market: only cards you can pay glow; the rest show "Need N more" (coin/compass); the dock button reads "Buy · N coins". Effect lines wrap
+  (no clipping) at 390 and 375; hand effect lines wrap too. Tutorial "Tap again" steps now point at the Play/Dig/Explore/Fight/Buy button.
+- Feel (src/ui2.js walkTo, gainFly, popUnder, tickPts, rivalCap): explorers walk the trail to their site; goods fly into their counters and bump;
+  point pills sit under the chip (never on it) and the chip counts up; a rival's played card comes out of its chip; rival move caption on the board.
+- Gates: logic 132/132, rules-test, ai-gate, guided-tut-test, drag-test, touch-test FULL 390x844 + 375x667, guard: all PASS, 0 errors.
+- Left: rulebook page quotes in rules-notes.md not checked against a full rulebook (none reachable this session).
+
+# FIXED2 r2 (12 Nov 2026): research assistants
+- Engine (src/engine.js "research assistants", data V.ASST): 8 helpers, 3 face up; magnifier arriving on row 2 or 5 hires one (question
+  h:'asst'), notebook arriving there turns one gold; free move {t:'asst',k} once a round, rests until round end; max 2 (a third hire upgrades).
+  Assistant shuffle uses its own seeded stream so older seeds play exactly as before. logic-test L1-L10; rules-test answers the hire question.
+- AI values each assistant's remaining uses; Easy noise 4.0 (newbie-sim: glow 62%, sensible 54%). Tray tags (44px, 14px), track rows marked A,
+  reference drawer section, tutorial steps g-asst..g-asst3 (30 steps, 4 Next-only). Still missing: see rules-notes.md "Still missing".
+
+# FIXED2 (8 Nov 2026, R2 review 5.6): hands-on tutorial, Easy tuned, phone labels
+- Tutorial: every rule done by hand (TUTORIAL-COVERAGE.md top); Skip/finish makes Play the primary button.
+- Easy rival noise 1.6 -> 2.6 (src/ai.js). `node newbie-sim.js` = Easy vs glow-follower / sensible / random new players (headless).
+  Every move's caption adds the points it made ("Tamsin buys a temple tile. +6 points.").
+- Pass stays when the selection has no action; research you cannot pay says the missing goods (src/ui1.js trackWhy). "You are choosing".
+- Phone (style.css FIXED2 block): market 3x2 with effect words, site name labels hidden on phone (the tap line names them), signs and
+  track numbers 14px, Research sign inside the track, short phones get smaller hand art. touch-test FULL prints the final score.
+# G2 fix (8 Nov 2026): review G2-gameplay 5.9 FAIL fixes (not deployed)
+- Rule: starting coin / compass cards (t:'basic') are FREE actions (engine.js apply + moves `free:true`); logic-test B1/B2/B3/B11/H1 updated, H1b/H1c added (112/112).
+- Tutorial: g-play steps say "Starting cards are free"; g-turn = one main action; new g-plane (2 coins = any icon), g-deep (6 compasses), Jeep/Boat pay Boot;
+  g-res2 spotlights and names the Climb button (was a dead "Tap again"). Guided steps: only the target glows (ui4 interval adds .gq to other glows).
+- Default rival = easy (UI.opts.lvl); easy noise 1.6 -> 2.6. `node bench-newplayer.js 200 easy`: sensible new player wins 52% (was 34%; normal 26%).
+- Phone: site names, research label, Camp/Ruins signs 14px (were 11px); map sites moved up so camp labels stay on the map; hand fits at 375x667.
+- guided-tut-test now also checks every highlighted target answers ONE tap (waits out the tutor's 600 ms ghost-tap guard like a person).
+- Left: market cards on the board still show icons only (no words) at phone size.
 
 # W490 (8 Nov 2026): reused owner art + board view (flag body.vg-b2, on; ?b2=0 = old terraces)
 - Art: 116 slots now hold owner art copied from shipwreck-isle, sands-of-qamar, emberclimb, rampart-and-vine, thornbound, hollowbough,

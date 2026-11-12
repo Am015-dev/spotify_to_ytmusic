@@ -1,13 +1,15 @@
 /* Vinegrave computer explorers: one-step simulation of every legal move scored by a value function (points now + resources + deck + position).
-   easy = noisy, short-sighted · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
+   easy = steady and cautious (2nd/3rd best moves, ends its round early; a newcomer who follows the prompt wins ~half) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
+  var EASY = { p0: 0.6, p1: 0.3, cap: 9, noise: 0 };   /* R29: with 'what glows is strong', a newcomer wins about half */   /* easy: P(best main move), P(2nd best), log steps per round before it passes */
+  if (typeof process !== 'undefined' && process.env && process.env.VG_EASY) { var ev0 = process.env.VG_EASY.split(',').map(Number); EASY.p0 = ev0[0]; EASY.p1 = ev0[1]; EASY.cap = ev0[2]; }
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {
     var v = 0; (ops || []).forEach(function (o) {
       if (o.g) for (var k in o.g) v += W[k] * o.g[k];
       if (o.p) for (var k2 in o.p) v -= W[k2] * o.p[k2];
-      if (o.d) v += 0.7 * o.d; if (o.x) v += 0.6; if (o.r) v += 1.6; if (o.b) v += 0.5 + 0.3 * o.o; if (o.fd) v += 1.6;
+      if (o.d) v += 0.7 * o.d; if (o.x) v += 0.6; if (o.tv) v += 0.8; if (o.tp) v -= 0.5; if (o.r) v += 1.6; if (o.b) v += 0.5 + 0.3 * o.o; if (o.fd) v += 1.6;
       if (o.or) v += Math.max.apply(null, o.or.map(opVal));
     }); return v;
   }
@@ -22,6 +24,7 @@
     p.hand.forEach(function (id) { v += CV[id] * (p.passed ? plays : 0.3 + plays); });
     
     p.guards.forEach(function (g) { if (!g.used) v += opVal(V.GUARD[g.id].boon) * 0.8; });
+    (p.asst || []).forEach(function (a) { var d = V.ASSTBY[a.id], uses = Math.max(0, left - (a.ex ? 1 : 0)); v += opVal(a.gold ? d.gd : d.s) * uses * 0.6; });   /* assistants: what their remaining uses are worth */
     p.idols.forEach(function (d) { if (!d.used && f > 0.5) v += 0.6; });
     G.sites.forEach(function (x) { if (x.occ === s && x.guard) v -= VG.has(p, V.GUARD[x.guard].cost) ? 0.3 : 1.6; });
     if (lvl === 'hard') { v += p.glass * 0.35 * f + (p.glass >= V.TOP ? 1 : 0); v += Math.min(p.res.jewel, 3) * 0.2 * f; }
@@ -57,10 +60,19 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 4.5 : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? EASY.noise : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];
+    // easy: steady but beatable (R25: wild noise made it pass whole rounds and score 6-8). It often takes its 2nd or 3rd best main move
+    // and, like a cautious explorer, ends its round after about EASY.cap logged steps
+    if (lvl === 'easy' && !inner) {
+      var mains = out.filter(function (o) { return !o.m.free && o.m.t !== 'pass'; }), r = VG.rng(G), k = r < EASY.p0 ? 0 : r < EASY.p0 + EASY.p1 ? 1 : 2;
+      if (mains.length && !(top.m.free && top.d > 0.2)) top = mains[Math.min(k, mains.length - 1)];
+      var acts = G.log.filter(function (e) { return e.r === G.round && e.s === s; }).length;
+      if (top.d < -1.5 || (acts >= EASY.cap && !top.m.free)) { var pz = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (pz) top = pz; }
+      return top.m;
+    }
     // free actions only when they help; otherwise prefer the best non-free main action
     if (top.m.free && top.d <= 0.2) { var main = out.filter(function (o) { return !o.m.free; })[0]; if (main) top = main; }
     if (!inner && top.m.t !== 'pass' && !top.m.free && top.d < -1.5) { var ps = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (ps) top = ps; }
@@ -79,11 +91,12 @@
       case 'res': return 'Climb the research track for points.';
       case 'temple': return 'Claim a temple tile for points.';
       case 'boon': return 'Use your guardian\'s boon now.';
+      case 'asst': return 'Your assistant works once a round, for free.';
       case 'idol': return 'Set an idol in a shrine for its boon.';
       case 'pass': return 'Nothing useful left: pass.';
       default: return 'This is the best choice now.';
     }
   }
-  var VAI = { choose: choose, value: value, why: why, opVal: opVal };
+  var VAI = { EASY: EASY, choose: choose, value: value, why: why, opVal: opVal };
   if (typeof module !== 'undefined' && module.exports) module.exports = VAI; else root.VAI = VAI;
 })(typeof window !== 'undefined' ? window : this);
