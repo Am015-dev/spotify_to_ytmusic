@@ -247,7 +247,7 @@ function run(){
   const html=fs.readFileSync(__dirname+'/doorkick.html','utf8');
   const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/',beforeParse(w){w.matchMedia=w.matchMedia||(()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}))}});
   const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
-  w.eval(`ANIM=0;AIDELAY=0;render=function(){};schedule=function(){};refresh=function(){};setSeed(5);
+  w.eval(`ANIM=0;AIDELAY=0;UI.fast=false;render=function(){};schedule=function(){};refresh=function(){};setSeed(5);
    var RIG=[],_rnd=rnd;rnd=function(n){if(n===6&&RIG.length)return RIG.shift()-1;return _rnd(n)};function rig(){RIG.push(...arguments)}
    function E(e,g){return JSON.stringify(e)===JSON.stringify(g)||('expected '+JSON.stringify(e)+' got '+JSON.stringify(g))}
    function ALL(){for(const r of arguments)if(r!==true)return r;return true}

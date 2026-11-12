@@ -27,7 +27,7 @@ function aiSafe(s){const p=P(s);const lv=p.lv,rng=G.rng;try{p.lv='normal';return
 // ---- the "about to win" check ----
 function fightGain(cb){let lv=0;const pure=cb.help<0&&cb.pb===0&&cb.bers===0&&itemBonus(P(cb.who),cb)===0;for(const m of cb.mons){const d=mdef(m);lv+=d.lv||1;if(d.sp==='fire'&&cb.fire)lv++;if(d.sp==='pure'&&pure)lv++}for(const k of cb.killed)if(k.kill){lv+=k.def.lv||1;if(k.def.sp==='pure'&&pure)lv++;if(k.def.sp==='fire'&&cb.fire)lv++}return lv}
 function winThreat(cb){cb=cb||(G&&G.cb);if(!cb||G.winner||(!cb.mons.length&&!cb.killed.length))return null;if(cb.stage==='run'||!winning(cb))return null;const f=P(cb.who);const g=fightGain(cb);if(f.lvl+g<R.WIN)return null;return {who:cb.who,gain:g}}
-function stopEval(who){if(G.winner)return G.winner==='P'+(who+1)?{stop:false,m:99}:{stop:true,m:-99};const cb=G.cb;if(!cb)return {stop:true,m:-99};if(cb.who!==who)return {stop:true,m:-50};
+function stopEval(who){if(G.winner)return wonBy(who)?{stop:false,m:99}:{stop:true,m:-99};const cb=G.cb;if(!cb)return {stop:true,m:-99};if(cb.who!==who)return {stop:true,m:-50};
   const d=sideStr(cb)-monStr(cb);return {stop:!winThreat(cb),m:d}}
 function counterCands(me,who){return validMoves(me).filter(m=>{if(!['play','join','backstab'].includes(m.act)||m.card==null)return false;const c=cd(m.card);
   if(m.act==='play'&&m.tgt==='p')return false;if(c.t==='level'||c.t==='race'||c.t==='class'||c.t==='item')return false;if(c.t==='curse'&&m.tgt!==who)return false;if(c.t==='enh'&&c.b<0)return false;if(c.sp==='steal'&&m.tgt!==who)return false;return true})}
@@ -106,7 +106,8 @@ function coach(me){if(!G||me<0||!P(me)||!P(me).human)return {};const key=[G.ln,G
 function vm0(me){return validMoves(me)}
 function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)return r;const cb=G.cb;
   if(G.q){const q=G.q;const m=aiSafe(me);r.rec=m;
-    if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
+    if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN&&G.fast&&(sideStr(cb)+pStr(p)>monStr(cb)||(sideStr(cb)+pStr(p)===monStr(cb)&&(isCls(p,'warrior')||isCls(f,'warrior'))))){r.rec={act:'opt',opt:'yes'};r.why=`Help! Together you win: ${esc(f.nm)} reaches level ${R.WIN} and, as the helper, you WIN TOO.`}
+    else if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
       else{const tot=sideStr(cb)+pStr(p),mb=monStr(cb);const w=tot>mb||(tot===mb&&(isCls(p,'warrior')||isCls(f,'warrior')));const elf=isRace(p,'elf');const ahead=f.lvl-p.lvl;
         if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}. You would both run.`}
         else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}. You get ${q.n} treasure${plural(q.n)}${elf?', plus a level (Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}

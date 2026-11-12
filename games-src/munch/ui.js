@@ -44,7 +44,8 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
 // ---- panels ----
 // key art behind the title and end screens (CSS reads the class; media/ files are deployed beside the page)
 function modalArt(k){const m=$('#modal');if(!m)return;['title','win','lose'].forEach(n=>m.classList.toggle('art-'+n,k===n))}
-function render(){const root=$('#app');if(!root)return;if(!G&&typeof dkGoalClose==='function')dkGoalClose();syncMenu();if(typeof netRender==='function')netRender();
+function render(){const root=$('#app');if(!root)return;syncMenu();if(!G&&typeof dkGoalClose==='function')dkGoalClose();  // back at the menu: no leftover goal card over the Start button
+  if(typeof netRender==='function')netRender();
   document.documentElement.classList.toggle('dk-title',!G);
   if(!G){if(typeof musicSync==='function')musicSync();setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;modalArt('title');if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
   scanLog();if(typeof musicSync==='function')musicSync();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
@@ -60,7 +61,7 @@ function render(){const root=$('#app');if(!root)return;if(!G&&typeof dkGoalClose
   setHTML($('#dkLogBody'),logHTML());setHTML($('#dkOppBody'),oppsFullHTML(me));
   // card details / card actions: a closable popup
   const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
-  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard')}
+  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard');dkCardFit()}
   else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
   let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();if(G.mode==='net'&&typeof netModalHTML==='function')m=netModalHTML()||m;
   if(m&&GX.open)GX.close();
@@ -175,7 +176,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards. You may keep ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}. Extras go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
-      ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll 5 or more on a die for each monster.'];
+      ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll '+(()=>{try{return runOdds(P(me),cb).rows[0].need}catch(e){return 5}})()+' or more on a die for each monster.'];
       const askRec=UI.hints&&co.rec&&co.rec.act==='ask';
       acts=(by('fight').length?btn({act:'fight'},'⚔ Fight!','primary pulse'):'')+(by('run').length?btn({act:'run'},'🏃 Run away'+runLabel(me,cb),co.rec&&co.rec.act==='run'?'primary':''):'')+(by('ask').length?`<button class="btn${askRec?' rec primary':''}" data-a="askmenu">🙋 Ask for help</button>`:'')+abilityBtns(vm,recK);
       tip=monTips(cb)}
@@ -224,7 +225,7 @@ function menuHTML(me){const u=UI.menu;
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away. ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
-function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
+function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=wonBy(me)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}${(()=>{const w=G.pl[parseInt(String(G.winner).slice(1))-1];return w?(dkHero3d(w.nm,'win3d')||dkPortrait(w.nm,'winp')):''})()}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${dkPortrait(p.nm,'ptok ptokp')}${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
   const story=online||typeof campLine!=='function'?'':`<button class="btn primary bigb story-btn" data-a="story">📖 Story mode: 10 chapters, 3 bosses</button>${campLine()}`;
@@ -236,14 +237,19 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    ${open?`<div class="qopts"><h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${(UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
    ${online||UI.mode==='ai'?'':`<div class="seg"><button class="btn tgl ${UI.learn===true?'on':''}" id="hintsBlearn" data-a="learnon" aria-pressed="${UI.learn===true}">${UI.learn===true?'✓':'○'} Hints while I play</button></div>`}
-   ${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
+   ${online?'':`<button class="btn primary pulse dkstart" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
-   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
+   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||(UI.fast===true?'easy':'normal'))===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
+   <h3>Game length</h3><div class="seg"><button class="btn ${UI.fast===true?'on':''}" data-set="fast" data-v="1">Quick (faster play)</button><button class="btn ${UI.fast!==true?'on':''}" data-set="fast" data-v="0">Full</button></div>
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
-function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
+// portrait phone: the card panel stops above the action bar, so End turn / Kick / Fight stay visible and tappable while it is open
+function dkCardFit(){const d=document.getElementById('dkCard');if(!d)return;const k=document.querySelector('.gx-dock');const h=document.documentElement;
+  if(h.classList.contains('ph-p')&&k&&k.getBoundingClientRect().height>20){const top=Math.round(k.getBoundingClientRect().top);d.style.bottom=Math.max(0,innerHeight-top)+'px';d.style.maxHeight=Math.max(200,Math.min(top-48,Math.round((top-48)*.78)))+'px'/* leave a strip of board above the panel: on short phones a full-height panel left nothing to tap outside to close it */;h.classList.add('dk-cardup')}else{d.style.bottom='';d.style.maxHeight='';h.classList.remove('dk-cardup')}}
+addEventListener('resize',()=>{if(GX.open==='dkCard')dkCardFit()});
+function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;UI.zoom=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;
   if(t.dataset.mv){uiAct(JSON.parse(t.dataset.mv));return}
   const a=t.dataset.a;
@@ -273,7 +279,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='mprevx'){musicPreviewStop();renderMusic();return}
   if(a==='mmus'&&typeof toggleMusic==='function'){toggleMusic();renderMusic();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
-  if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
+  if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='fast')UI.fast=v==='1';else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
   if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
   if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);if(G){G.learn=UI.learn===true&&t.dataset.start!=='ai';render()}return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
