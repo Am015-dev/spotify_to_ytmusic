@@ -227,8 +227,8 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const atEnd=()=>crew.classList.toggle('end',crew.scrollTop+crew.clientHeight>=crew.scrollHeight-2);atEnd();if(!crew._sl){crew._sl=1;crew.addEventListener('scroll',atEnd,{passive:true})}
   if((crowd||t1<TMINW+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
   if(!crowd&&t1>=TMINW+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
-  // short portrait screen and the crew still does not fit at 44 px wires: compact rows + one zoomed crewmate
-  const zmOn=!land&&window.innerHeight<600&&crowd&&crew.querySelectorAll('.sg').length>0;
+  // portrait screen (any height) and the crew still does not fit at 44 px wires: compact rows + one zoomed crewmate
+  const zmOn=!land&&crowd&&crew.querySelectorAll('.sg').length>0;
   if(zmOn!==!!TBL.zm&&!TBL.zrr){TBL.zm=zmOn;TBL.zrr=1;try{crew._s=null;renderTable(UI.V)}finally{TBL.zrr=0}return}
   if(zmOn){const z=zoomLayout(tb,crew,mine,tm);t1=z.tw;crew.classList.toggle('scroll',!z.fit);atEnd()}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
