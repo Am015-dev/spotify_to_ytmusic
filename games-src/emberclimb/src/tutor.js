@@ -30,6 +30,8 @@
   setInterval(function () { if (C.on) { scrChange(); pump(); tick(); } else { try { tips(); } catch (e) { } } }, 400);
   function rule(k) { if (!C.on || C.seen[k] || !CO.rules[k]) return; C.seen[k] = 1; speak(k, CO.rules[k]); }
   UI.coachRule = rule;
+  // R7: also check on every render, so a room left quickly (the campfire) still gets its line
+  var r0 = UI.render; UI.render = function () { var out = r0.apply(this, arguments); if (C.on) { try { tick(); } catch (e) { } } return out; };
   // the rules the coached climb teaches (Warrior); hero-only tricks (Shivs, Orbs, stances, Scry, Retain), two-hero rules, Frail (act 2) and
   // multi-act climbs are shown once, the first time they happen in a real game (tips below), never as a list
   var CORE = ['intent', 'energy', 'vuln', 'block', 'endturn', 'strength', 'power', 'weak', 'exhaust', 'poison', 'potion', 'reward', 'gold', 'map',
@@ -66,6 +68,9 @@
     if (G.scr === 'over') return finale();
     if (G.scr !== 'battle' || !G.b) return;
     var b = G.b, h = G.hs[0], al = b.en.filter(function (e) { return !e.dead; });
+    if (b.kind === 'e' && !C.elitePrep && b.turn <= 1) {   // the coached elite opens with its Dazed step (a real step of its own pattern)
+      C.elitePrep = 1; var w = b.en[0], pt = (D.ENEMIES[w.id] || {}).pat || []; pt.forEach(function (st, k) { if (st.add && w.i !== k) { w.i = k; w.intent = JSON.parse(JSON.stringify(st)); w.intent.tg = 0; } }); UI.render();
+    }
     if (b.kind === 'e') rule('elite'); if (b.kind === 'b') rule('boss'); if (b.en.some(function (e) { return e.spawn || (e.dead && e.splitSaid); })) rule('split');
     if (b.ph === 'p' && !UI.busy) {
       rule('energy');
@@ -130,7 +135,7 @@
     var h = G.hs[0], mk = E.mk; h.hand = [mk('w-hammer'), mk('w-defend'), mk('w-strike'), mk('w-strike'), mk('w-defend')]; h.en = 3; h.blk = 0;
     h.draw = [mk('w-strike'), mk('w-defend'), mk('w-strike'), mk('w-roar'), mk('w-kindle')]; h.disc = [];
     h.deck.push(mk('w-cleave'), mk('w-wild-swing'));   // a hit-all attack and a die card, so both rules come up by playing them
-    C.on = false; C.seen = {}; C.q = []; C.done = 0; C.lastDraw = -1; C.later = null;
+    C.on = false; C.seen = {}; C.q = []; C.done = 0; C.elitePrep = 0; C.lastDraw = -1; C.later = null;
     UI.mode = 'game'; UI.sel = -1; UI.ov = null; UI.render();
   }
   function scr(s) { return function () { var G = g(); return !!(G && G.scr === s && !UI.busy); }; }
