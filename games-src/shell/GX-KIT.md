@@ -185,6 +185,7 @@ GXH.init({ game: 'slug', defaultOn: true,                       // tips remember
   avoid: '.glow,.rec,#act .btn' });                              // bubbles never cover the core (56px) of these, nor the target
 GXH.phase(phaseId | null);        // call at the end of every render; first time a phase is reached its bubble shows (arrow + soft ring on the target,
                                   // title, one sentence, "Got it"); a tap anywhere dismisses (and still reaches what was tapped); one bubble at a time
+                                  // (a tap on the bulb only closes it; a new bubble waits until 750 ms after the last tap). Test: scripts/gxh-tap-test.js
 GXH.bulb({ el: '#bulbbtn',        // an existing button (an SVG bulb is injected) or omit it for a floating bottom-right bulb
   suggest: () => ({ target: () => rect|el, from: () => rect|el /*card to pick up first*/, why: '<= 15 words' }) /* or null */,
   rulesFor: () => phaseId });     // tap: glowing ring + ghost finger (from -> target) + bubble with the why and "How does this work?" (rules cards)
