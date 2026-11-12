@@ -143,7 +143,10 @@ R102. Solo: each habitat whose largest corridor has 7 or more tiles earns 2; 6 t
 R103. Solo: the bonus is counted per habitat (two habitats of 7+ = 4).
 R104. Bonuses are added into the final total (W.final) once per habitat.
 
-## Scoring: wildlife cards B, C and D (point tables recalled from the printed cards; flagged where unverified)
+## Scoring: wildlife cards B, C and D
+
+W507 (8 Nov): every B-D table below was checked against an online rules guide that lists each card's numbers. All matched except
+Salmon D (runs need 3+ salmon) and Hawks D (tops out at 9 for 3+ kinds); both fixed. The "table recalled" flags are kept only as history.
 
 R105. Bears B: each group of exactly 3 bears = 10; groups of 2 or 4 = 0.
 R106. Bears C: groups of 1 / 2 / 3 = 2 / 5 / 8, plus 3 if you have one group of each size; groups of 4 score 0. _(table 2/5/8 +3 recalled)_
@@ -153,8 +156,16 @@ R109. Elk C: any connected group of elk scores by size 2, 4, 7, 10, 14, 18, 23, 
 R110. Elk D: elk around one space score by number around it: 2, 5, 8, 12, 16, 21 (1..6). _(table recalled)_
 R111. Salmon B: runs of 1..5+ score 2, 4, 9, 11, 17. _(table recalled)_
 R112. Salmon C: only runs of 3, 4, 5+ score: 10, 12, 15; runs of 1 or 2 score 0. _(table recalled)_
-R113. Salmon D: each run scores 1 per salmon plus 1 per adjacent other-animal token (run of 2 touching a bear and an elk = 4).
+R113. Salmon D: each run of 3+ salmon scores 1 per salmon plus 1 per adjacent other-animal token (run of 3 touching a bear and an elk = 5); a run of 2 scores 0. _(checked 8 Nov, W507)_
 R114. Hawks C: 3 points per straight line of sight between two hawks (counted once per pair).
-R115. Hawks D: a pair of hawks in sight scores by the number of different animals between them: 4, 7, 9, 11; each hawk is in one pair. _(table recalled)_
+R115. Hawks D: a pair of hawks in sight scores by the number of different animals between them: 4, 7, 9 for 1, 2, 3+ kinds (4 kinds still 9); each hawk is in one pair. _(checked 8 Nov, W507)_
 R116. Fox C: each fox scores the number of the most common neighbouring animal (foxes excluded).
 R117. Fox B: each fox scores 3 / 5 / 7 for 1 / 2 / 3 different PAIRS of the same animal around it (foxes excluded). _(table recalled)_
+
+## Rulebook re-read (W507)
+
+R118. No limit on acorns per turn: two replaces in one turn are both allowed, each costs its own acorn.
+R119. A three-token sweep that leaves four alike is wiped again automatically.
+
+Checked and equal in effect, not asserted: the rulebook lets you put the tile and the animal down in either order; the animal can only
+go on a tile that is already in your valley, so tile-then-animal (our order) reaches exactly the same positions.
