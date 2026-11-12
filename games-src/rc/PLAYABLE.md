@@ -65,4 +65,13 @@ Gates and results are in the commit message and the report; scripts: `tutor-test
   (#phlabel), which opens Camp status; the driver then tapped hidden glows under the sheet for 900 s. A player scrolls the rows, and
   the sheet has a clear ×. taps-test OWN now scrolls the chosen row into view and closes an open Camp status sheet first. No game change.
 - Own-plan touch games, seeds 11-16 at 375x667 and 390x844: 12/12 finish (lost days 5-9, 54-134 decision taps, ≤34 non-decision), 0 errors.
-- Left: at 375x667 the place pop-up hides most rows (only a peek says there are more); a taller pop-up or a "more ▾" cue is a design call.
+- Full gate (`--full`) was failing before this fix (the last round ran `--quick`):
+  phone-check "skin changed box" on the small "Add N wood to the pile" button: the skin gave every `.btn.sm` full-size padding plus a
+  4px plate border (+10px). skin.css now keeps `.btn.sm` at its unskinned box (0 7px; dock 0 9px).
+  sweep: 375x553 had the ✨/Start day row below the screen (board floor 0.9x width beat the space left). The board now gives way down
+  to 200px; on a board under 300px (`html.phshort`) the zoom buttons hide (pinch and drag still work) and the phone camera fits the
+  island under the supplies strip. The sweep now reads food/wood from the token strip (the chip shows the day) and counts the
+  status line, not the turn banner. Sweep (QUICK, 4 games): 123 problems at 93fa1182 → 5.
+- Left (all were there at 93fa1182 too): a "tap a glowing space" story question can stall the sweep (taps land on #bfscene);
+  place 3 at 390x763 s102 sometimes misses; one "tapping the bulb changed the game" at 375x553 s102. At 375x667 the place pop-up
+  shows ~2 rows (a peek says there are more).

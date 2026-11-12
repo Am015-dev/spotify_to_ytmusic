@@ -76,10 +76,12 @@ function init3D(){
 function phIslandPts(){const o=[];for(const t of MAP){const p=hexPos(t.q,t.r);for(let i=0;i<6;i++){const a=i/6*Math.PI*2;o.push([p.x+Math.sin(a)*HR0*1.02,p.z+Math.cos(a)*HR0*1.02])}}return o}
 function phBox(pts){const v=new THREE.Vector3();V3.cam.updateMatrixWorld();V3.cam.updateProjectionMatrix();let x0=9,x1=-9,y0=9,y1=-9;for(const q of pts){v.set(q[0],HEXH,q[1]).project(V3.cam);x0=Math.min(x0,v.x);x1=Math.max(x1,v.x);y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}return {x0,x1,y0,y1}}
 function phFit(){if(!V3.cam||!V3.rad||!V3.center||!V3.r)return;const FILL=V3.phFill||.97;V3.orbit.e=V3.phE||1.4;V3.orbit.a=0;const pts=phIslandPts();const o=V3.orbit;V3.look.copy(V3.center);
+  // short phone board (html.phshort): the supplies strip covers the top of the canvas, so fit the island in the part under it (NDC: top - S)
+  let S=0;try{if(document.documentElement.classList.contains('phshort')){const cv=V3.r.domElement.getBoundingClientRect(),rs=document.getElementById('bfres');if(rs&&cv.height>0)S=Math.min(.6,Math.max(0,2*(rs.getBoundingClientRect().bottom-cv.top)/cv.height))}}catch(e){}
   const ext=()=>{placeCam();const b=phBox(pts);return {b,w:(b.x1-b.x0)/2,h:(b.y1-b.y0)/2}};
-  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2;
+  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h+S/2)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2+S/2;
     const hh=Math.tan(V3.cam.fov*Math.PI/360)*o.d,hw=hh*V3.cam.aspect;const a=o.a;V3.look.x+=Math.cos(a)*cx*hw+(-Math.sin(a))*cy*hh/Math.sin(o.e);V3.look.z+=(-Math.sin(a))*cx*hw+(-Math.cos(a))*cy*hh/Math.sin(o.e)}
-  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
+  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h+S/2)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
   V3.phFitL=V3.look.clone();V3.phFitD=o.d;V3.phL=V3.look.clone();V3.phD=o.d;V3.phMin=o.d*.38;V3.phMax=o.d*1.12;V3.d0=o.d;V3.phMode='fit'}
 function phSetD(d){V3.phD=Math.max(V3.phMin||8,Math.min(V3.phMax||80,d));V3.orbit.d=V3.phD;placeCam()}
 function phPan(l0,dx,dy){const cv=V3.r.domElement,o=V3.orbit;const s=2*Math.tan(V3.cam.fov*Math.PI/360)*o.d/Math.max(1,cv.clientHeight);const a=o.a;
