@@ -145,7 +145,8 @@ function rateStart(c) {
 }
 function rateRound() {
   var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
-  if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
+  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' spaces, just as planned.'; }   /* a scripted tutorial move is the right play */
+  else if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
   else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
   else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
   else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }

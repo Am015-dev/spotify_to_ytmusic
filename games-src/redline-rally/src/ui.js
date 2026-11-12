@@ -137,7 +137,7 @@ function drawPlan() {
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
   else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + (cq.spin ? ': you would spin out!' : cq.burn ? ': corner burns ' + cq.burn + ' heat.' : '. Press Go.'), cq.spin || cq.burn ? 'warn' : ''); }
-  else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : '') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
+  else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0].replace(/ card$/, '') + ')'; var core = (ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : ''); if (!ci.spin && core.split(/\s+/).length <= 5) core += '. ' + STORY.planGo; setMsg(core, ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
   if (!ready && need === 0) $('#goB').disabled = false;
@@ -181,8 +181,8 @@ function boostOdds(G, c) {   /* R24: what a boost flip can add (the speed cards 
   var pct = Math.round(spins / vals.length * 100), avg = Math.round(sum / vals.length), L0 = landing(G, c, q.from + sp), nc = nextCorner(L0), d = nc ? nc.d : 99;
   var inR = nc && d <= hi, line = 'Boost +' + (lo === hi ? lo : lo + ' to +' + hi) + ': spin-out risk ' + pct + '%.';   /* every text <= 8 words (phone-check) */
   return { line: line, spin: spins, pct: pct,
-    yes: '+' + avg + ' spaces, ' + (!inR ? 'no corner in reach' : (spins ? pct + '% spin' : 'safe') + ' at limit ' + nc.limit),
-    no: spins ? pct + '% spin: corner in ' + d + ', limit ' + nc.limit : 'save heat for later corners' };
+    yes: '+' + avg + ' spaces, ' + (!inR ? 'no corner in reach' : (spins ? 'Boost: ' + pct + '% spin' : 'safe') + ' at limit ' + nc.limit),
+    no: spins ? 'No boost: safe, keeps heat' : 'save heat for later corners' };
 }   /* Hints on: the Suggest planner's answer to boost / slipstream */
 function suggest() {
   var c = you(), p = suggestPlan(G, c);   /* plans your own hand from your seat with the strongest planner */
