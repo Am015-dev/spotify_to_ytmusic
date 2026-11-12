@@ -15,6 +15,7 @@ Screenshots: `games-src/reviews/R24-shots/`.
 |---|---|---|---|---|
 | emberclimb | 6.5 | FAIL | FAIL | 1 Rules 6, 5 Phone 6, 6 AI 6, 8 Bugs 6 |
 | redline-rally | 6.9 | FAIL | FAIL (scenarios PASS, phone-check FAIL) | 4 Turn clarity 6, 5 Phone 6 |
+| hollowbough | 7.1 | FAIL | FAIL | 8 Bugs 6 |
 
 ---
 
@@ -137,3 +138,61 @@ close to "follow the labels".
 | 4/5 | Planned after a spin-out at 375 | Board shows trees only; the car and the corner are off camera. | rr-375-plan-trees-no-car.jpg |
 | Gate | phone-check at 375x553 | FAIL: 27-word text "The car furthest round the track...". | n/a (phone-check results) |
 | 2 | Tutorial end | Rivals keep racing for 9.6 s before the end card. | rr-375-tut-end.jpg |
+
+---
+
+## 3. hollowbough (shelf/W482-hollowbough @ ffee9509): 7.1, FAIL
+
+Gate: **FAIL**. Quick build: scenarios 12/13 (`menu`: 6 place badges and texts cut by the scrolling places panel, e.g.
+"2 berries, 1 c", "twig, resin, b"). phone-check: FAIL at every size (2-5 dead taps on Berry Patch / Dewberry Nook or on goods).
+Note: I first served only `media/`, so phone-check ran without the `cards/`, `models/` and `music/` folders. Its dead-tap
+lines name places, not pictures, but I could not re-run it in my time.
+
+What I played:
+- Tutorial at 390x844 by touch: 41 lines, 42 taps, 44 s, longest wait 2.3 s, 0 page errors. It plays a full year. You
+  take goods, build, Prepare, use a shared place, the meadow, a free critter, a basic event, the forest, Summer's 2 meadow cards,
+  the Inn (3 off), a discard card, a special event with berries placed, the Haven (2 cards for 1 good), Autumn, and the Journey
+  (pick road 2, drop 2). Then Pass and a real scoring table. It ends on "You know every rule / Play a real game".
+- Two default games (Play, mode Guided, vs computer), random glowing targets and buttons (with all asset folders served):
+  - 375: **lost 30-31**, my city full 15/15. "Game over." with both players "done".
+  - 390: **lost 31-43** (game 2 of that run, see below). The rival had 8+ cards in its city by Autumn.
+  - In neither game did my shots catch a result card. Both runs went on tapping a "Game over." board until my time cap. A
+    random tap outside may have closed the card, but I **could not confirm a result screen in a real game by touch**.
+  - 390, game 1: for about 350 taps the prompt cycled "4 of 5 discarded. Tap 1 more." / "Bramble is playing" with the score
+    frozen at 20-14. Then the board showed "Spring" and 0-0, a fresh game. I cannot say whether my driver hit a Play again
+    button on a result card I did not capture, or the game restarted.
+- 0 page errors in all runs. Rival turns were quick (no long waits seen in the shots).
+
+Rules: unchanged from R21 and still right for 2 players (8 basic places + forest + Haven, workers 2/+1/+1/+2, green production in
+Spring and Autumn, 2 meadow cards in Summer, hand 8, city 15, Journey in Autumn, basic and special events). The tutorial now
+teaches all of them and invents nothing I could find.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged and right. |
+| 2 | Tutorial teaches | 8 | Fixed: a full guided year with the Inn, a special event, the Haven, Autumn and the Journey played out, one line and one tap each, 44 s, then a real game. The guided rival ends on 1 point, so the tutorial score table is lopsided (22-1). |
+| 3 | First 10 seconds | 7 | "New here? Learn in 5 minutes" first, Play, goal card, glowing places. |
+| 4 | Turn clarity | 7 | Plain prompts ("Pick the resource you want to gain.", "4 of 5 discarded. Tap 1 more.", "Build or Pass"), "Need 2 pebbles" on cards. |
+| 5 | Phone play | 7 | Places 127x89, cards 122x129, Prepare/Pass full width; works at both sizes. The scenario test finds place badges cut by the scrolling panel. |
+| 6 | AI and pacing | 7 | Fixed: the rival builds real cities and scores 31-43. A random-tapping newcomer lost by 1 and by 12, so a real new player can win. |
+| 7 | Feel | 7 | Painted places and cards, meeples, cards fly, score pops in the chip. |
+| 8 | Bugs | 6 | 0 errors. Gate FAIL (scenario + phone-check). In real games I could not confirm a result screen by touch, and game 1 jumped to a fresh 0-0 Spring for a reason I could not pin down. |
+| | **Total** | **7.1** | **FAIL**: row 8 is below 7 and the gate fails. No stopper confirmed. |
+
+### Earlier findings (R21)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 6: rival "done" with 4 cards | **Fixed**: rival 8+ cards, 31 and 43 points. | R24-shots/hb-g390-gameover-31-43-no-result.jpg, hb-g375-gameover-30-31-fullcity.jpg |
+| Row 2: Journey, Inn, events only "Tap it"; Autumn skipped | **Fixed**: all played out. | hb-tut-23-inn-390.jpg, hb-tut-35-journey-390.jpg, hb-tut-41-result-390.jpg |
+| Row 8: about 170 dead taps with a full city | **Not confirmed either way**: the 375 game reached 15/15 and the end, but my run log was lost when I stopped it. | hb-g375-gameover-30-31-fullcity.jpg |
+| Row 4: "pick which effect goes first" unexplained | **Not seen** in my runs. | n/a |
+| Row 2/5: step-1 bubble covers goods and tabs at 375 | **Not re-checked** (tutorial at 390 only). | n/a |
+| Row 7/5: flying card over the goods row | **Not seen** in my shots. | n/a |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 8 | Two full default games by touch | Both ended on a "Game over." board; no result card in any shot; my taps went on. | hb-g390-gameover-31-43-no-result.jpg, hb-g375-gameover-30-31-fullcity.jpg |
+| 8 | 390 game 1 | "4 of 5 discarded. Tap 1 more." repeated for about 350 taps at 20-14, then the board showed a fresh 0-0 Spring. | hb-g390-top-strip-stuck-discard-then-reset.jpg |
+| 2 | Tutorial scoring | The guided rival scores 1 point all year (22-1). | hb-tut-41-result-390.jpg |
+| Gate | Quick build + phone-check | `menu` scenario: place badges cut by the scrolling panel; phone-check dead taps at every size. | n/a (build log) |
