@@ -211,4 +211,5 @@ function renderRat(p, legal) {
   const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
   if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
   c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
+  try { if (typeof GXH !== 'undefined') setTimeout(() => GXH.relayout(), 0); } catch (e) { }   // a bubble placed before this pill appeared must move off it
 }
