@@ -133,9 +133,8 @@ function shelfEl(s, n, pd, landing) {
 function pudStand(s) {
   const pc = pudCounts(), mx = Math.max(...pc), mn = Math.min(...pc), n = pc[s];
   if (mx === mn) return 'dessert';
-  if (n === mx) return '+6';
-  if (n === mn && G.np > 2) return '−6';
-  return 'dessert';
+  const v = KK.puddingPoints(pc, G.np)[s];   // the engine's own split: ties share the points (3 each for two tied)
+  return v > 0 ? '+' + v : v < 0 ? '\u2212' + -v : 'dessert';
 }
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;

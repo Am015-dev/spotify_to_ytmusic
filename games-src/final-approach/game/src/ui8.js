@@ -5,7 +5,7 @@ function phPrompt() {
   if (UI.flash && UI.flash.until > Date.now()) return UI.flash.t;
   if (G.result) return document.querySelector('#fx .endb') ? '' : endWords();   // the end banner already says it: say it once
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
-  if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
+  if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : (crewPlan(v) || 'Tap Roll to start.')) : 'Crew getting ready.';
   if (G.pend) {
     const p = G.pend, me = mine && pend.includes(v);
     if (p.h === 'rr') return me && !p.d.m[v] ? 'Tap dice to reroll, or keep.' : 'Waiting for the reroll.';
@@ -14,9 +14,36 @@ function phPrompt() {
     if (p.h === 'wt') return me && v === 1 - p.d.a ? 'Pick one die to swap.' : 'Waiting for the hand-over.';
   }
   if (mine && G.turn === v && G.lad === 1) return UI.sel === -1 || UI.sel == null ? (G.slots['ax' + (1 - v)] ? 'Pick the die that levels it.' : 'Pick a die for the axis.') : 'Drop it on the glowing axis.';
-  if (mine && G.turn === v) { const mi = mandInfo(v); if (mi && mi.lost) return 'Too few dice left!'; if (mi && mi.tight && (UI.sel === -1 || UI.sel == null)) return 'Save a die for Axis and Engines.'; return UI.sel === -1 || UI.sel == null ? 'Drag a die onto a space.' : 'Drop it on a glowing space.'; }
+  if (mine && G.turn === v) { const mi = mandInfo(v); if (mi && mi.lost) return 'Too few dice left!'; if (mi && mi.tight && (UI.sel === -1 || UI.sel == null)) return 'Save a die for Axis and Engines.'; return dieHint(v) || (UI.sel === -1 || UI.sel == null ? 'Drag a die onto a space.' : 'Drop it on a glowing space.'); }
   if (v === 'all') return name(G.turn) + ' is placing.';
   return name(G.turn) + ' is placing...';
+}
+// the next useful hint for one die (the lifted one, else the computer's pick): "Your 4: engines, or radio the plane on 3." (12 words max)
+// Fair: judged on what this seat may know (FA.stripView); the two best spaces for that die by the computer's own cost; cached per state.
+function dieHint(v) {
+  try {
+    const sel = typeof UI.sel === 'number' && UI.sel >= 0 ? UI.sel : null, key = G.seed + ':' + G.evN + ':' + v + ':' + sel + ':' + G.round;
+    if (UI._dh && UI._dh.k === key) return UI._dh.t;
+    const V = FA.stripView(G, v); V.nolog = true; let d = sel;
+    if (d == null) { const m = FA.AI.move(V, v, 'normal', { noMC: true }); d = m && m.t === 'place' && typeof m.d === 'number' ? m.d : null; }
+    let t = '';
+    if (d != null && G.dice[v][d] && !G.dice[v][d].u) {
+      const val = G.dice[v][d].v, best = {};
+      for (const m of FA.validMoves(V, v)) {
+        if (m.t !== 'place' || m.d !== d || (m.c || 0) !== 0) continue;
+        const S = FA.cloneLite(V); FA.performMove(S, m, v, true); const c = FA.AI.cost(S, v), g = FA.SLOT[m.to].grp;
+        if (!best[g] || c < best[g].c) best[g] = { c, k: m.to };
+      }
+      const word = (g, k) => {
+        if (g === 'radio') { const at = G.pl.pos + val - 1; return G.planes[at - 1] ? 'radio the plane on ' + at : null; }
+        if (g === 'axis') { const o = G.slots['ax' + (1 - v)]; return o && o.v === val ? 'axis to level' : 'axis'; }
+        return { engines: 'engines', gear: 'gear', flaps: 'flaps', brakes: 'brake ' + val, conc: 'coffee', kero: 'fuel', intern: 'trainee', ice: 'icy brake' }[g] || g;
+      };
+      const ws = Object.keys(best).sort((a, b) => best[a].c - best[b].c).map(g => word(g, best[g].k)).filter(Boolean).slice(0, 2);
+      if (ws.length) t = 'Your ' + val + ': ' + ws[0] + (ws[1] ? ', or ' + ws[1] : '') + '.';
+    }
+    UI._dh = { k: key, t }; return t;
+  } catch (e) { return ''; }
 }
 // ---------- the overlay layer: round animation, ghost finger, dragged die ----------
 function fxLayer() { const bd = $('#bd'); if (!bd) return null; let f = $('#fx'); if (!f) { f = h('div#fx', { 'aria-hidden': 'true' }); bd.appendChild(f); } return f; }
@@ -193,3 +220,14 @@ document.addEventListener('pointerdown', e => {
     const a = AIDELAY; AIDELAY = 60; try { schedule(); } finally { AIDELAY = a; }
   } catch (er) { }
 }, true);
+// the computer crewmate's plan for this round, said in the briefing (public facts only, the same advice its briefing phrases use): "Ravi: Move one space, then gear next. Tap Roll."
+const PLANW = { adv0: 'hold position', adv1: 'move one space', adv2: 'move two spaces', plane: 'clear the traffic', level: 'level the axis', gear: 'gear next', flaps: 'flaps next', brakes: 'brakes before engines', coffee: 'save coffee', slow: 'keep the speed low', fuel: 'watch the fuel', trainee: 'train the trainee', first: 'I go first', ok: 'all good' };
+function crewPlan(v) {
+  try {
+    const o = 1 - v; if (!G || !G.ai || !G.ai[o] || G.lad === 1 || UI.mode === 'net') return '';
+    const k = G.seed + ':' + G.round + ':' + v; if (UI._plan && UI._plan.k === k) return UI._plan.t;
+    const c = FA.AI.say(G, o).filter(x => PLANW[x]).slice(0, 2); let t = '';
+    if (c.length) { const a = PLANW[c[0]]; t = name(o) + ': ' + a[0].toUpperCase() + a.slice(1) + (c[1] ? ', then ' + PLANW[c[1]] : '') + '.'; }
+    UI._plan = { k, t }; return t;
+  } catch (e) { return ''; }
+}
