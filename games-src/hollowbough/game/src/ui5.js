@@ -71,7 +71,9 @@ function schedule() {
     return;
   }
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; if (ANIM && !(UI.cfg && UI.cfg.tutorial) && UI.bannerFor !== 'h:' + a + ':' + G.turn) { UI.bannerFor = 'h:' + a + ':' + G.turn; turnBanner(hotSeat() ? p.name + "'s turn" : HBS.turn.you); } snd('turn', { vol: .6 }); GX.buzz(15); }
-  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
+  // the hint waits for flying cards / points to land (a turn often starts mid-animation; it used to be dropped then, so the finger never showed)
+  if (!UI.noRec) { let tries = 0; const tick = () => { if (!G || G.phase === 'over') return; if ((UI.animBusy || UI.cards.length) && tries++ < 40) { UI.tr = setTimeout(tick, 150); return; }
+    const had = UI.rec, f = $('#finger'); computeRec(); if (UI.rec !== had || (UI.rec && f && f.hidden)) placeFinger(); }; UI.tr = setTimeout(tick, 40); }
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
@@ -138,6 +140,7 @@ function act(m) {
   const n0 = G.logN, src = UI.fxSrc; UI.fxSrc = null;
   const pre = sndPre(), fpre = fxPre(a), chip0 = seatRect(a);
   if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
+  const qk = G.q ? G.q.kind + ':' + G.q.who : '', ackAt = src;
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
@@ -145,7 +148,10 @@ function act(m) {
   GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
   UI.lastAi = ''; afterMove();
   try { fxPost(fpre, m, src); fxLand(m, a, src, chip0); } catch (e) { console.error(e); }
+  if (qk && G.q && G.q.kind + ':' + G.q.who === qk) qAck(ackAt);   // the same question again: show the tap was taken
 }
+// a repeated question (clear 3 cards, take 2 resources, spend up to 3) looks unchanged after a pick; a tick where you tapped + the prompt bumps
+function qAck(at) { try { const n = qLeft(G.q); if (at) fxFloat(at, null, n > 0 ? '\u2713 ' + n + ' left' : '\u2713'); bump('#prompt'); snd('click', { vol: .5 }); try { navigator.vibrate && navigator.vibrate(10); } catch (e) { } } catch (e) { } }
 // ---- end of game: one card per player, then the result
 function queueOver() {
   const ov = G.over; if (!ov) return;

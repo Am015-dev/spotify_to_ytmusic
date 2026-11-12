@@ -475,8 +475,11 @@ function promptText() {
 // the short line for a pending decision (8 words at most; the long wording stays in the log)
 function qShort(q) {
   const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to use next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to use first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
-  return m || wordsCap(q.title, 8);
+  const n = qLeft(q);
+  return n > 1 ? (m || wordsCap(q.title, 6)).replace(/[.?]$/, '') + ': ' + n + ' left.' : (m || wordsCap(q.title, 8));
 }
+// how many picks this question still has (a repeated question: 3 cards to clear, 2 resources to take, 3 berries to spend); 0 when unknown
+function qLeft(q) { const o = q && q.opts && q.opts.find(x => x && x.d && (x.d.left != null || x.d.n != null)); if (!o) return 0; const v = o.d.left != null ? o.d.left : o.d.n; return v > 0 && v < 20 ? v : 0; }
 // ===================== part 14: the Play view (W457): one focus at a time =====================
 // Phone: a top bar (scores, resource piles, worker meeples), ONE focus panel (Places | Meadow | City), a fanned hand, the action row.
 // Wide: the same pieces side by side. Same contract as the old board (src/ui2.js renderBoard, kept behind ?board=old):

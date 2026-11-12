@@ -23,6 +23,8 @@ function tutStage(g) {
   while (p.hand.length) g.discard.push(p.hand.pop());
   for (const k of ['mine', 'twig_barge', 'resin_refinery', 'farm', 'wife']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
   for (const k of ['inn', 'post_office', 'lookout']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
+  // Bramble starts with a small city of her own too, so the demo ends close (you just ahead), not 22 to 1
+  for (const k of ['farm', 'mine', 'twig_barge', 'architect']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
   const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad;
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
   g.nolog = false;
