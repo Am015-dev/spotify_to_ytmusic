@@ -9,6 +9,7 @@ Rules were re-checked against the published games online; notes stayed local. Sc
 |---|---|---|---|---|
 | wildmark | **7.5** | **PASS** | **PASS** | First 10 s 7, Turn clarity 7, Phone 7, Feel 7 |
 | vale-of-banners | **7.0** | **FAIL** | **FAIL** | Bugs 6 (gate dead taps) |
+| perch-and-plume | **4.0** (avg 6.4, capped) | **FAIL** | **PASS** | Bugs 4 (tutorial step 2 stopper), Tutorial 5, Phone 6 |
 
 ---
 
@@ -125,3 +126,56 @@ Gate: **FAIL**. `phone-check: 390x763 FAIL 2 dead taps (2 / Gentle); 375x553 FAI
 | 6 | 3 default games, ★ about half the time | Won 82-61, lost 74-84 and 64-67. 4.5-5 min each. One 10-11 s wait per game (machine was busy). | R26-shots/vale-g2-375-result.jpg |
 | 5 | Start of my turns at both sizes | The fading "Your turn" banner sits over the score strip ("You 2 pts ★ leads"). | R26-shots/vale-g-390-dead1.jpg |
 | 2 | Tutorial at both sizes | 48 steps, 14 of them Next-only. The prompt line is covered by the coach bubble on most Next steps. | R26-shots/vale-tut-375-26.jpg |
+
+---
+
+## 3. perch-and-plume (shelf/W508-perch-gameplay @ 1196f255): 4.0 (capped; uncapped average 6.4), FAIL
+
+What I played (branch checked out locally, `origin/alex/brave-carson-rbpmlk` merged locally, built with
+`VIS_SLUGS="," build-all.py --full`, served next to `games/perch-and-plume/media`, real touch only via `touchscreen.tap`, defaults):
+- Tutorial from the title's "New here? Learn in 5 minutes" to the real game it starts with, at 375x667 and 390x844:
+  21 steps, 26-27 taps, 33-35 s, 0 page errors. Every lit target was 44 px or more. **Except step 2 at both sizes** (see findings).
+- Two Quick games (title > Quick game > Start the year > Keep these; defaults: 2 players, Easy rival Fern, hints on), as a newcomer who
+  takes "Best" about half the time and otherwise taps a random lit target:
+  - 390x844: **lost 35-48**, 206 s, 163 taps, Best taken 58 of 157 decisions.
+  - 375x667: **won 42-38**, 174 s, 112 taps, Best taken 53 of 109 decisions.
+- Wait from my last tap to my next turn: median 1.6 s (390) and 2.3 s (375), max 6.6 s.
+- 0 page errors, 0 console errors, 0 stuck states in both games, 0 tapped targets under 44 px, 0 text items under 14 px on the result screens.
+- Rotation: started a game at 390x844, rotated to 844x390 and 667x375, then back to 375x667.
+- Rules re-checked online this pass (core rulebook and a rules summary; notes kept local).
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Re-checked online: 4 rounds with 8/7/6/5 actions, row yields, egg cost by column (free, 1, 1, 2, 2), one trade on the bonus spaces (grassland pays 1 food for +1 egg), any 2 food for 1 when playing, tray refill, goals 4/1/0 to 7/4/3, final scoring and tie on leftover food: all match `rules-notes.md` and what I saw. 120 own birds instead of 170 (a stated simplification). |
+| 2 | Tutorial teaches | 5 | Short and good otherwise: 21 one-line steps, one target each, 33 s, ends in a real game. But step 2's target is invisible at both sizes and every tap is swallowed (finding 1). The 8/7/6/5 shrinking actions are still not taught: "Practice: 4 actions. Real games: 4 rounds." |
+| 3 | First 10 seconds | 7 | Starting hand with a goal line ("most points after 4 rounds...") and "Keep these"; the four actions say what they give; a "Best" badge. A toast covers the second hand card for a moment. |
+| 4 | Turn clarity | 7 | Prompt always says what to tap ("Tap Play to put Tidal Wren in your forest"), Best badges, "Grub or seed?" choice is clear. "leads" appears only after the first move (fixed). Small flaw: while Fern's move is still playing, the dock already says "Your turn" and the action buttons look live (the tap is held and applied about 0.4-1.2 s later, so it is not lost). |
+| 5 | Phone play | 6 | Portrait is fine: targets 44 px+, no text under 14 px, nothing cut off in my shots. Board share (my measure of the board element): 54% at 390x844, 48% at 375x667. After rotating a running game to landscape the dock shrinks to a 132 px strip at the top right with about 200 px of empty space under it; the prompt and the four action buttons are scrolled out of it, only hand-card tops show. At 667x375 the score names are cut to "Y..." and "F...". |
+| 6 | AI and pacing | 7 | Waits median 1.6-2.3 s, max 6.6 s; a game is about 3-3.5 min. The mixed newcomer won 1 of 2 (42-38, lost 35-48): winnable, not a given. |
+| 7 | Feel | 7 | Painted birds, rival's card shown when played ("Fern plays"), food and eggs fly, clear result table. Unchanged. |
+| 8 | Bugs | 4 | Both games: 0 errors, 0 stuck, 0 dead taps on lit targets. But tutorial step 2 is a dead-tap trap for a new player (finding 1). The gate passes, yet phone-check still logs "1 dead" in 3 of 6 scenarios. |
+| | **Total** | **4.0** | **FAIL**: capped at 4 by the tutorial step-2 stopper (every tap dead, target hidden). Uncapped average 6.4; rows 2, 5 and 8 under 7. |
+
+Gate: **PASS**. `--full` result "1/1 PASS": phone-check PASS in all 6 scenarios (390x763, 375x553, 844x390, P>L, L>P, stale), errors none,
+rules-test 240/240 AI games finished. Still logged inside the PASS: "1 dead" tap in 390x763, P>L and stale; lab-test WARN 3/8 (LAB rows differ from scenarios).
+
+### Earlier findings (R23)
+| Finding | Status | Evidence |
+|---|---|---|
+| Gate FAIL: "2 dead taps (+2 eggs / +1 cards)" | **Fixed** as a gate result (PASS), but phone-check still records 1 dead tap in 3 scenarios. | gate log |
+| Gate: 23-word text | **Fixed** (not in the gate output). | gate log |
+| Gate: board 49% after rotate | **Fixed** for the gate (PASS); my measure 56% at 844x390, 47% at 667x375, 48% at 375x667. But see the landscape dock finding. | R26-shots/pp-land-landscape844.jpg |
+| Tutorial step 2 target covered (2 taps needed) | **Not fixed, worse**: now 0 visible pixels at both sizes; every tap is swallowed until you drag the dock down. | R26-shots/pp-tut375-s2.jpg, R26-shots/pp-tut390-s2.jpg |
+| 8/7/6/5 actions never taught | **Not fixed**. | R26-shots/pp-tut375-s2-afterdrag.jpg |
+| Mixed newcomer wins 1 of 2 | Same: won 42-38 (375), lost 35-48 (390). | R26-shots/pp-g375-result.jpg, R26-shots/pp-g390-result.jpg |
+| Waits max 6.4 s | Same: max 6.6 s, median 1.6-2.3 s. | log |
+| "leads" shown before anyone moved (fixer claim) | **Fixed**: "You 0 pts / Fern 0 pts" after Keep these; "leads" only after a move. | R26-shots/pp-g375-turn1.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 2 / 8 (stopper) | Tutorial step 2 ("One action per turn. Practice: 4 actions. Real games: 4 rounds."), 375x667 and 390x844 | The lit target is the round tracker inside the dock, which is scrolled 107 px down, so the tracker sits under the board / dock header with 0 visible pixels. There is no Next button; every tap anywhere is blocked and only "pulses" the hidden tracker. My first run made 119 taps without moving on. It goes on only after dragging the dock down, which nothing tells you to do. | R26-shots/pp-tut375-s2.jpg, R26-shots/pp-tut390-s2.jpg, R26-shots/pp-tut375-s2-afterdrag.jpg |
+| 5 | Started a game at 390x844, rotated to 844x390 and 667x375 | The dock becomes a 132 px strip in the top right with about 200 px of empty dark space below; the prompt and the 4 action buttons are scrolled out, only hand-card tops show. At 667x375 the score chips read "Y..." and "F...". | R26-shots/pp-land-landscape844.jpg, R26-shots/pp-land-landscape667.jpg |
+| 4 | Tapped "Get food" while Fern's move was still on screen (4 times) | The dock head already said "Your turn" and the buttons looked live; the prompt still said "Fern takes grub from the feeder". The tap was held and applied 0.4-1.2 s later ("Tap a glowing food die"), so not lost, but the turn label is early. | R26-shots/pp-g390-yourturn-during-fern.jpg, R26-shots/pp-g390-buffered-tap.jpg |
+| 5 | 375x667 game | Board element is 48% of the screen (54% at 390x844); the gate's 55% rule is met only at its own sizes. | R26-shots/pp-land-back375.jpg |
+| 3 | Real game start after the tutorial | A "fresh spring morning" toast lies over the second starting-hand card for about 2 s. | R26-shots/pp-tut375-end.jpg |
