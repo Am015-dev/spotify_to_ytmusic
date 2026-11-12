@@ -112,3 +112,59 @@ Fidelity:
 | 5 | Boss split scenario at 390 | All 3 slimes fit. The third name is cut to "Spine Sl…". | games-src/reviews/R29-shots/ember-split-390-fits.jpg |
 
 ---
+
+## 3. vinegrave (shelf/W490-vinegrave-bench @ 034baeba, already up to date): 7.0 FAIL
+
+**Gate: PASS.** Build, scenarios, phone-check (61 s), lab-test (WARN 3/8 LAB-row mismatch, not blocking), and "PASS rules-test (200 AI games)".
+
+What I played:
+- **Tutorial ("Learn to play") at both sizes:** 35 steps, 36 taps, 0 dead taps, 75-76 s, ending on "Play a real game".
+- **Default games** (Play, then "Start the expedition": 1 rival, easy, hints off). A newcomer taps a random glowing site, card or the research track, then its button, and passes when nothing glows (plus at random 8% of the time after turn 3). Two reached the result screen:
+  - 375x667: lost 7-18 in 73 s (I passed early).
+  - 390x844: lost 14-17 in 127 s, 28 actions.
+- Three more runs stalled on my driver, not the game: it did not know the "Choose one effect" and "Hire an assistant" choosers. Not scored.
+- Rival waits: median 2.1 s, max 3.8 s. 0 page or console errors.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | As in R25: starting deck and goods, one main action plus free actions, Plane = 2 coins, items under the deck, artifacts at once, guardians, Dread at round end, research with notebook and assistants, temple tiles. The small gap I logged before (leftover hand always kept) was not re-checked. |
+| 2 | Tutorial teaches | 8 | Fixed: the count now matches the card ("Research and temple: you 18" = Research 12 + Temple 6; idols, shrines and guardians 12; cards and Dread 0; total 30). 0 dead taps at both sizes, the rival plays its round, and it ends on "Play a real game". Round-end Dread and exiling are still only words. |
+| 3 | First 10 seconds | 7 | Clean title (Learn to play, Play, Story) and a one-line goal. The first board is still dense: 6 market cards, 15 site discs, the research column, a resource row. |
+| 4 | Turn clarity | 7 | Priced action buttons ("Buy · 3 compasses", "Dig", "Explore"). Choosers read plainly ("Trail Guide: gain 1 coin OR a Plane of travel this turn."). Small corner badges ("−2") replace "Need N more" and leave the art visible. The prompt is "Your turn. Tap or drag what glows." |
+| 5 | Phone play | 7 | Fixed: at 375 the result card's buttons sit below both breakdowns. The gate's phone-check passes. Still: explorer pawns are 34x46 (under 44 wide). At the start of my turn the "Tamsin Reed played 1 more move." toast covers the market's top row, and my tap on a glowing card there hit the toast. Hand names are partly covered by the next card or a "+3" badge ("Survey Airship", "Creeping Dread"). |
+| 6 | AI and pacing | 6 | Waits fixed (median 2.1 s). Easy is no longer a pushover: the rival scored 17-18 in both games, so it is steadier than R25's 6-41. But my newcomer lost both (by 11 and by 3), so I could not confirm the fixer's "won 3 of 4". A newcomer winning on the default level is not shown in my sample. |
+| 7 | Feel | 7 | Painted market cards, explorers walking to sites, flying goods and points, a painted result card with art and per-category breakdowns. |
+| 8 | Bugs | 7 | Gate PASS. 0 errors and 0 stuck states in 2 full games and 2 tutorials. 2 dead taps: one on a card covered by the rival toast, and one on a "Skip" that did nothing. |
+| | **Total** | **7.0** | **FAIL**: row 6 is below 7. 7+8+7+7+7+6+7+7 = 56/8 = 7.0. |
+
+### Earlier findings (R25)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 6: easy rival too soft (newcomer won 4/4, rival 6-8 points) | **Fixed, maybe overcorrected**: the rival scored 17 and 18; my newcomer lost both | games-src/reviews/R29-shots/vine-g375-result-lost.jpg, games-src/reviews/R29-shots/vine-g390b-result-lost.jpg |
+| Row 5: result buttons cover your breakdown at 375 | **Fixed** | games-src/reviews/R29-shots/vine-g375-result-lost.jpg |
+| Row 5/8: gate 6/8 scenarios, phone-check 0/6 | **Fixed** (gate PASS) | none (gate log) |
+| Row 2: count says "Research: you 18" vs the card | **Fixed** ("Research and temple: you 18") | games-src/reviews/R29-shots/vine-tut-390-count.jpg |
+| Row 5: "Need N more" tags hide the market art by round 4 | **Fixed** (small corner badges) | games-src/reviews/R29-shots/vine-375-midgame.jpg |
+| Row 4: "Starting cards are free" in round 4 | **Fixed** ("Your turn. Tap or drag what glows.") | games-src/reviews/R29-shots/vine-g375b-covered-site.jpg |
+| Row 5: exile chooser cuts its 5th card at 375 | Not re-seen (no exile chooser in my games) | none |
+| Row 7/5: pills and the rival caption pile onto the guardian card | **Partly**: the rival toast now covers the market's top row at the start of my turn | games-src/reviews/R29-shots/vine-g375b-covered-site.jpg |
+| Row 6: one hidden lever (research) decides the game | Not re-tested (the research-free run stalled on my driver) | none |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | 2 default games tapping random glowing things | Lost 7-18 and 14-17. The rival is steady now, but a newcomer win was not shown. | games-src/reviews/R29-shots/vine-g390b-result-lost.jpg, games-src/reviews/R29-shots/vine-g375-result-lost.jpg |
+| 5 / 8 | Tapped a glowing market card at the start of my turn (375) | "Tamsin Reed played 1 more move." covers the top market row; the tap landed on the toast. | games-src/reviews/R29-shots/vine-g375b-covered-site.jpg |
+| 5 | Measured the explorer pawns | 34x46, under 44 px wide. They glow; the prompt says drag, and a plain tap is easy to miss. | games-src/reviews/R29-shots/vine-pawn-tap-dead.jpg |
+| 5 | Hand at 375 | "Survey Airship" is under a "+3" badge, and "Creeping Dread" is cut by the next card. | games-src/reviews/R29-shots/vine-g375b-covered-site.jpg |
+| 4 (good) | Hired an assistant | A plain three-button chooser: "Trail Guide: gain 1 coin OR a Plane of travel this turn." / "Healer: exile a card." / "Gem Cutter: pay 2 coins, then gain 1 jewel." | games-src/reviews/R29-shots/vine-375-assistant-chooser.jpg |
+| 2 (good) | Tutorial at both sizes | 35 steps, 36 taps, 0 dead, ends on "Play a real game". | games-src/reviews/R29-shots/vine-tut-390-end.jpg, games-src/reviews/R29-shots/vine-tut-375-end.jpg |
+
+---
+
+## Summary
+| Game | Total | Result | Gate | Lowest rows |
+|---|---:|---|---|---|
+| tidewake | 6.9 | FAIL | FAIL (quick sweep: start-mark tap at 375x553) | 6 AI/pacing 5; 5 Phone 6; 8 Bugs 6 |
+| emberclimb | 6.8 | FAIL | PASS | 1 Rules 6; 6 AI/pacing 6 |
+| vinegrave | 7.0 | FAIL | PASS | 6 AI/pacing 6 |
