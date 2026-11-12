@@ -84,3 +84,30 @@ The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules t
 - Card reward: pick 1 of 3 or skip (reward decks, R16). Elite relic; treasure / boss relics per R14 / R15. Rest: heal 9 or upgrade.
 
 `node rules-test.js` re-run after every change: PASS (targeted checks + 300 bot games, 0 stuck / invariant / crash).
+
+## W494 gameplay pass (8 Nov 2026): compared with the tabletop rules and the video game it comes from
+Already matching (checked in code + logic-test rules 1-60): energy 3, draw 5, hand discarded, Block resets, intents with fixed / die /
+random patterns, Vulnerable / Weak / Strength / Poison / Frail, pick 1 of 3 or skip, rest = heal or upgrade, shop (cards, relics,
+potions, card removal 75), events with choices, elites drop a relic, boss relic choice, 3 potion slots, gold, branching map with an
+act boss, Exhaust / Ethereal / Retain, 3 acts + optional final act.
+Differences found and fixed:
+- No opening choice before floor 1 (the video game opens every run with a free gift): added the First Ember event (8 max HP / 100 gold /
+  a rare card / a relic for 10 HP), quick play only (`newGame({bless:1})`), rules 61-62.
+- Only 6 events, so ? rooms repeated within one act: 12 now (library, cursed chest, herb witch, forge spirit, golden idol, pilgrim),
+  rules 63-65. New events borrow an existing picture (`img`) until owner art exists.
+- Quick play defaulted to a 1-act climb (one boss, ~10 rooms), which felt short and simple: a full run is 3 acts by default now (rule 66);
+  the 1-act choice stays on the title.
+- Tutorial only forced 2 steps, then left rules to chance: now a guided first fight + map walk teaching every core rule (TUTORIAL-COVERAGE.md).
+Not changed (owner baseline = tabletop numbers): rest heals 9 (video game 30%), 9 floors per act (video game 15), ? rooms are always events.
+
+## G3 review re-check (8 Nov 2026)
+Re-checked against the tabletop rulebook text (online copy): Campfire Rest heals 3 HP (x SCALE = 9); Vulnerable doubles a hit; Weak is -1 per hit
+(x SCALE = 3); a Weak attacker on a Vulnerable target cancels both; one token used per whole attack; card / enemy text resolves top to bottom.
+All match the engine, so the numbers stay. Fixed: an enemy's debuff now lands after its own hit (logic rule 68); start-of-fight Block
+(Iron Bangle) lasts through round 1 (logic rule 67). In-game text now says what each status does ("Vulnerable 1: takes double damage").
+G3 round 3 (8 Nov 2026): owner wants tabletop rules, so round 2's rule changes are undone.
+- One foe per hero in Encounter rooms again; act-1 boss HP back to 132-140; no made-up phase 2.
+- Act-1 boss split as printed (rulebook FAQ, designer ruling): when it dies combat continues, the dead boss takes no action, and at the
+  start of the next round (after the enemy turn) each hero's row gets its listed slimes in order (logic rule 69). Shelf slimes: Bile Blob, Mire Slug, Mire Slug.
+- Balance only by encounter choice: the 40-HP Grub and Acolyte moved from the weak pool (first 3 fights) to the strong pool; the Ash Imp pair moved to weak.
+- bench-newplayer.js, careful player (15% random plays), 300 runs: floors 1-3 cleared 98%, act-1 boss reached 89%, beaten 33%. Test bot: 100 / 93 / 46.

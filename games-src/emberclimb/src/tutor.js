@@ -1,5 +1,5 @@
-// Emberclimb coached first climb (the tutorial). A REAL short climb with free choices: only the first 2 steps are forced (read the intent,
-// play Anvil Blow) through the shared tutor kit; then the kit stops and the coach speaks just in time: the first time a rule matters, after a
+// Emberclimb coached first climb (the tutorial, W494). A guided first fight + the first map screen teach every core rule in order (one
+// line of 12 words or fewer, one highlighted tap per step, src steps() below); then the kit stops, the REAL short climb goes on and the coach speaks just in time: the first time a rule matters, after a
 // good or poor play, never blocking input (one dismissable line at a time). The end walks through the real numbers and lists the rules that
 // did not come up ("Things you will meet later"). Text: src/story.js (EC_STORY.coach). Rule keys = TUTORIAL-COVERAGE.md.
 (function () {
@@ -94,21 +94,43 @@
     G.map = MAP.map(function (m, i) { var k = used[m[0]] || 0; used[m[0]] = k + 1; return { id: i, f: m[0], c: cols[m[0]][k], t: m[1], nx: [] }; });
     G.map.forEach(function (n) { G.map.forEach(function (o) { if (o.f === n.f + 1) n.nx.push(o.id); }); }); G.F = 5; G.pots = ['venom-vial'];
     E.performMove({ t: 'go', n: 0 }); G = g();
-    var e = G.b.en[0]; G.b.en = [e]; e.id = 'gnawer'; e.hp = e.mhp = 14; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 4, tg: 0 };
+    // guided first fight: one slug with a fixed pattern (bite 5, then bite 3 + Weak), sized so it falls to the second Strike of turn 2
+    var e = G.b.en[0]; G.b.en = [e]; e.id = 'mire-slug'; e.hp = e.mhp = 36; e.blk = 0; e.st = {}; e.i = 0; e.intent = { atk: 5, tg: 0 };
     var h = G.hs[0], mk = E.mk; h.hand = [mk('w-hammer'), mk('w-defend'), mk('w-strike'), mk('w-strike'), mk('w-defend')]; h.en = 3; h.blk = 0;
-    h.draw = [mk('w-defend'), mk('w-kindle'), mk('w-strike'), mk('w-roar'), mk('w-wild-swing')]; h.disc = [];
+    h.draw = [mk('w-strike'), mk('w-defend'), mk('w-strike'), mk('w-roar'), mk('w-kindle')]; h.disc = [];
     C.on = false; C.seen = {}; C.q = []; C.done = 0; C.lastDraw = -1; C.later = null;
     UI.mode = 'game'; UI.sel = -1; UI.ov = null; UI.render();
   }
+  function scr(s) { return function () { var G = g(); return !!(G && G.scr === s && !UI.busy); }; }
+  function turn2() { var G = g(); return battleP() && G.b.turn >= 2; }
+  function node(t) { return function () { return $('#map .node.t-' + t); }; }
+  function goldEl() { var xs = document.querySelectorAll('.reward .chip'); for (var i = 0; i < xs.length; i++) if (/gold/.test(xs[i].textContent)) return xs[i]; return null; }
+  // Every core rule in order, one line of 12 words or fewer, one highlighted tap each. ids = the rule keys tools/tut-walk.js checks.
+  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map', 'go'];   // G3 r2: mostly doing steps, 4 Next-only lines
   function steps() {
-    var tap = function (id) { return { type: 'tap', times: 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
+    var tap = function (id, n) { return { type: 'tap', times: n || 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
+    var info = function (id, target, say, ready, side) { return { id: id, title: 'Warden Ashgrove', target: target, say: say, wait: null, ready: ready || battleP, side: side }; };
+    var en = function () { return $('.en'); }, intent = function () { return $('.en .intent') || $('.en'); };
     return [
-      { id: 'intent', title: 'Warden Ashgrove', target: function () { return $('.en .intent'); }, side: 'bottom', say: 'Goal: reach the top and beat its guardian.\nThis rat shows its next move: a bite for 4.', wait: null, ready: battleP },
-      { id: 'attack', title: 'Your first card', target: function () { return cardEl('w-hammer'); }, say: 'Lift Anvil Blow, then tap the rat.\nAfter that, the climb is yours.', wait: { type: 'tap', times: 1, match: function (a) { return a.w === 'card' && a.id === 'w-hammer'; } }, ready: battleP },   // lifting the card ends the guided part, so the spotlight never blocks the enemy tap
+      info('intent', intent, 'Goal: beat the boss on top. This icon is its next move.'),
+      info('energy', function () { return $('.energy') || $('#end'); }, 'Each turn: 3 energy and 5 new cards. Cards cost energy.'),
+      { id: 'vuln', title: 'Attack', target: function () { return cardEl('w-hammer'); }, say: 'Tap Anvil Blow twice. Vulnerable: it takes double damage.', wait: tap('w-hammer'), ready: battleP },
+      { id: 'block', title: 'Block', target: function () { return cardEl('w-defend'); }, say: 'Tap Plate Guard twice. Block soaks hits, this turn only.', wait: tap('w-defend'), ready: battleP },
+      { id: 'endturn', title: 'End turn', target: function () { return $('#end'); }, endOk: 1, onEnter: function () { setTimeout(function () { UI.render(); }, 30); }, say: 'Tap End turn. Leftover cards go to the discard pile.', wait: { type: 'tap', match: function (a) { return a.w === 'end'; } }, ready: battleP },
+      info('pattern', intent, 'Foes repeat a pattern. Next: a bite that makes you Weak.', turn2),
+      { id: 'strength', title: 'Power', target: function () { return cardEl('w-kindle'); }, say: 'Tap Kindle twice. Strength adds 2 to every hit.', wait: tap('w-kindle'), ready: turn2 },
+      { id: 'exhaust', title: 'Weak', target: function () { return cardEl('w-roar'); }, say: 'Tap the Roar twice. Weak foes hit 3 less. Roar exhausts.', wait: tap('w-roar'), ready: turn2 },
+      { id: 'potion', title: 'Potion', target: function () { return $('.ec-potpop .potdrink') || $('.pot.full'); }, say: 'Tap the potion, then Drink. Poison hurts through Block.', wait: { type: 'event', match: function (a) { return a.pots === 0; } }, ready: turn2 },
+      { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2 },
+      { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
+      { id: 'leave', title: 'Onward', target: function () { return $('#leave'); }, say: 'Tap Continue to climb.', wait: { type: 'event', match: function (a) { return a.scr === 'map'; } }, ready: scr('reward') },
+      info('map', function () { return $('#map'); }, 'Rooms: fights, elites, rest, shop, events. The boss waits on top.', scr('map')),
+      { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, also: function () { return [].slice.call(document.querySelectorAll('#map .node.glow')).slice(1); }, say: 'Tap a glowing room. The run is yours now.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
       { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
-        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; C.seen.intent = 1; C.seen.vuln = 1; speak('free', 'It is Vulnerable now: your next hit lands double.', 4600); UI.render(); }, 60); } }
+        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; ['intent', 'vuln', 'energy', 'block', 'endturn', 'weak', 'poison', 'strength', 'power', 'exhaust', 'potion', 'reward', 'gold', 'map', 'rest', 'shop', 'event', 'elite', 'boss', 'acts', 'relic'].forEach(function (k) { C.seen[k] = 1; }); UI.render(); }, 60); } }
     ];
   }
+  window.EC_TUT_RULES = RULES;
   function finish(play) {
     C.on = false; window.EC_NOSAVE = 0; UI.ov = null; try { GXT.markDone('emberclimb'); } catch (e) { } var sy = $('.ec-say'); if (sy) sy.remove();
     if (UI.camp) {

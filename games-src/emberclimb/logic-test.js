@@ -119,5 +119,33 @@ rule(58, () => { E.newGame({ heroes: ['w'], seed: 57, asc: 2 }); return ['max HP
 rule(59, () => { E.newGame({ heroes: ['w'], seed: 58, acts: 4 }); return [4, E.G().acts]; });
 rule(60, () => { const has = /xform|transform/i.test(J(D.EVENTS)) || /xform|transform/i.test(fs.readFileSync(path.join(__dirname, 'src', 'engine.js'), 'utf8').replace(/\/\/.*$/gm, '')); return ['a transform action exists', has ? 'a transform action exists' : 'no transform action in events or engine']; });
 
+// ---------- W494: systems the original run has that the shelf lacked
+rule(61, () => { E.newGame({ heroes: ['w'], seed: 61, bless: 1 }); const g = E.G(), a = [g.scr, g.evn && g.evn.id, g.at]; const gold0 = g.gold; E.performMove({ t: 'opt', i: 1 }); E.performMove({ t: 'leave' }); const g2 = E.G();
+  return [['event', 'first-ember', -1, 100, 'map', -1, true], a.concat([g2.gold - gold0, g2.scr, g2.at, E.validMoves().every(m => m.t === 'go' && g2.map[m.n].f === 1)])]; });
+rule(62, () => { E.newGame({ heroes: ['w'], seed: 62, bless: 1 }); const g = E.G(), n0 = g.hs[0].deck.length; E.performMove({ t: 'opt', i: 2 }); const c = g.hs[0].deck[g.hs[0].deck.length - 1]; return [[n0 + 1, 'r'], [g.hs[0].deck.length, D.CARDS[c.id].rar]]; });
+rule(63, () => { const ids = Object.keys(D.EVENTS).filter(k => !D.EVENTS[k].start); let seen = new Set(); for (let s = 1; s < 400 && seen.size < ids.length; s++) { E.newGame({ heroes: ['w'], seed: s }); const g = E.G(); const v = g.map.filter(n => n.t === 'v' && n.f === 2)[0]; if (!v) continue; g.at = g.map.filter(n => n.f === 1 && n.nx.indexOf(v.id) >= 0)[0].id; E.performMove({ t: 'go', n: v.id }); seen.add(E.G().evn.id); }
+  return [[true, false, true], [ids.length >= 12, seen.has('first-ember'), seen.size >= 10]]; });
+rule(64, () => { E.newGame({ heroes: ['w'], seed: 64 }); const g = E.G(); g.gold = 100; g.pots = ['fire-flask', 'fire-flask']; g.scr = 'event'; g.evn = { id: 'herb-witch', res: null }; E.performMove({ t: 'opt', i: 0 }); return [[60, 3], [g.gold, g.pots.length]]; });
+rule(65, () => { E.newGame({ heroes: ['w'], seed: 65 }); const g = E.G(); g.scr = 'event'; g.evn = { id: 'forge-spirit', res: null }; E.performMove({ t: 'opt', i: 0 }); const pend = g.evn.pend, ms = E.validMoves(); E.performMove(ms[0]); return [['upg', true, 1], [pend, ms.every(m => m.t === 'evpick'), g.hs[0].deck[ms[0].c].u]]; });
+rule(66, () => { const u = fs.readFileSync(path.join(__dirname, 'src', 'ui.js'), 'utf8'); return [[true, true], [/UI\.acts = UI\.acts \|\| 3/.test(u), /bless: 1/.test(u)]]; });
+
+// ---------- G3 review fixes
+// Iron Bangle: the start-of-fight Block survives into round 1 and is cleared at the start of round 2
+rule(67, () => { E.newGame({ heroes: ['w'], seed: 67 }); const g0 = E.G(); g0.relics.push('iron-bangle'); go1(); const g = E.G(), b1 = g.hs[0].blk, t1 = g.b.turn;
+  g.hs[0].hp = g.hs[0].mhp = 999; g.b.en.forEach(e => { e.intent = { atk: 0, tg: 0 }; }); E.performMove({ t: 'end' }); for (let k = 0; k < 20 && g.b && g.b.ph === 'e'; k++) E.step(); return [[1, 4, 2, 0], [t1, b1, g.b && g.b.turn, g.hs[0].blk]]; });
+// an enemy action resolves top to bottom: its hit lands first, then the Vulnerable it applies (8 into 10 Block = 0 damage, not 16)
+rule(68, () => { const g = F(['w'], 68); const h = g.hs[0]; h.hand.forEach(c => { c.id = 'w-defend'; }); g.b.en[0].intent = { atk: 8, vuln: 2, tg: 0 }; h.blk = 10; const pv = E.previewHit(0, 0);
+  E.performMove({ t: 'end' }); g.b.ph === 'e' && E.step(); return [[8, 999, 2], [pv, h.hp, h.st.vuln || 0]]; });
+
+// tabletop split: killing the act-1 boss does not end the fight; the dead boss takes no action; at the start of the next round its
+// listed slimes arrive in the hero's row with intents; the fight ends when they are all dead
+rule(69, () => { E.newGame({ heroes: ['w'], seed: 69 }); const g0 = E.G(); g0.boss = 'mire-behemoth'; E.debug.boss(); const g = E.G(), e = g.b.en[0]; g.hs[0].hp = g.hs[0].mhp = 999; e.blk = 0; e.st = {}; e.hp = 3;
+  g.hs[0].hand.push(E.mk('w-strike')); g.hs[0].en = 3; E.performMove({ t: 'play', h: 0, c: g.hs[0].hand.length - 1, e: 0 }); const a = [e.dead, g.scr];
+  E.performMove({ t: 'end' }); for (let k = 0; k < 20 && g.b && g.b.ph === 'e'; k++) E.step(); const sp = g.b.en.filter(x => x.spawn);
+  const b = [sp.length, J(sp.map(x => x.id)) === J(D.ENEMIES['mire-behemoth'].split), sp.every(x => x.intent && x.row === 0), g.b.turn];
+  E.debug.win(); return [[1, 'battle', 3, true, true, 2, 'reward'], a.concat(b, [g.scr])]; });
+// potion Discard: removes the potion on any screen, and is never offered to bots as a move
+rule(70, () => { E.newGame({ heroes: ['w'], seed: 70 }); const g = E.G(); g.pots = ['fire-flask', 'block-brew']; const ok = E.performMove({ t: 'toss', p: 0 }); return [[true, ['block-brew'], false], [ok, g.pots, E.validMoves().some(m => m.t === 'toss')]]; });
+
 console.log('RULES passing ' + pass + ' / ' + total + (fails.length ? '   failing: ' + fails.join(',') : ''));
 process.exit(fails.length ? 1 : 0);
