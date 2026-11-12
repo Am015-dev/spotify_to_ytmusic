@@ -45,3 +45,16 @@ Gates and results are in the commit message and the report; scripts: `tutor-test
 - FLAG `?hint=1` (off): ✨ becomes a per-pawn hint (finger on the place, ⭐ row) and the player places every pawn. Open problem: touch games that
   follow the hints lost 4 of 4 (piles 3-14), while the same plan placed at once wins. The hint map equals suggestPlan's (probe), so the gap is in
   how the hints are followed (pawn order, rows); `HINT=1 node taps-test.js` reproduces it.
+
+## Fix 4 (12 Nov 2026)
+- Gate (`build-all --quick`, VIS_SLUGS=","): 6/8 → PASS. Both failures were new on this branch (live build has neither):
+  day token printed "1/12" (the scenario read 112): now big "1" with "of 12 days" under it; the closed "Game setup" `<details>`
+  still gave its buttons boxes under the next summary: setup is open by default (live had the rows visible; rc-uibar wants 3 rows)
+  and closed `<details>` on the start screen now hide their content (display:none).
+- Own plan stall: a far place needs one more pawn (distance rule); Start day was refused with a toast that is hidden on phones.
+  Now the refusal speaks on the board line; when a free pawn (Friday, Dog) can fill the job it is picked and the line says
+  "Friday: tap place N to help"; when none can, the lone pawn comes back ("Too few pawns for place N: pawn back"). Not in Learn to play.
+- Touch results: own plan 390x844 s11 lost day 5 (finished), 375x667 s15 lost day 5 (finished), 375x667 s12 still loops on day 2
+  until 900 s (1206 decision taps, cause not found yet: next fixer, dump planProblems/BF.msg/#ppop when dec>200). Sparkle plan
+  390x844 s13 RESCUED day 10, 375x667 s14 RESCUED day 11. 0 page errors.
+- `?hint=1` left OFF (not debugged this round).

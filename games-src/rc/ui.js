@@ -157,7 +157,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Shipwrecked. Work together, stay alive, and get rescued.</p>
    <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
    ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>
-   <details class="quick setup"><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
+   <details class="quick setup" open><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
    ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</details>
@@ -198,7 +198,13 @@ function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
-function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
+// Start day refused on the board (the dock toast is hidden on phones): say it on the board line and, when a free pawn can fill the short job, pick it so its places glow
+function startFix(msg){const a=G.plan.acts.find(x=>x.pw.length<actNeed(x).need);if(!a){BF.say(msg,6000);return}
+  const pos=a.type==='explore'?a.tgt:a.type==='gather'?a.tgt.pos:a.type==='build'&&a.tgt&&a.tgt.cross!=null?a.tgt.cross:G.camp.pos;
+  const p=humanFree().find(q=>!pawnWhy(q.id,a));if(p){UI.sel=p.id;UI.ps.skip=UI.ps.skip.filter(x=>x!==p.id);BF.say(`${pawnLabel(p).split(' ')[0]}: tap place ${pos+1} to help`,8000)}
+  else{for(const id of a.pw.slice())unplace(id);BF.say(`Too few pawns for place ${pos+1}: pawn back`,8000)}
+  if(pstep()!==2)setPStep(2)}
+function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);if(!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))try{startFix(pb[0])}catch(e){}render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
   UI.confirm=null;const r=startActions();if(r){toast(r);render()}else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}
