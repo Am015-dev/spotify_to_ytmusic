@@ -7,8 +7,8 @@ const PIMG={};
 function pimg(f,cb){if(PIMG[f]!==undefined){if(cb&&PIMG[f]===1)cb();return}PIMG[f]=0;const i=new Image();i.onload=()=>{PIMG[f]=1;if(cb)cb()};i.src=(f.includes('/')?f:MEDIA+f)+'.webp'}
 function unl(t){try{const u=GXC.unlocked().filter(x=>x.type===t);return u.length?u[u.length-1].id:null}catch(e){return null}}
 // texture name -> [file, size of one repeat in tile units]
-const TEXD={field:100,road:40,river:50,lake:40,garden:20,hedge:24,hub:24,wall:25,mon:50,'town-basilica':60,town:60,roof:24};
-function texDefs(){let d='';for(const k in TEXD){if(PIMG['tex-'+k]!==1)continue;const s=TEXD[k];d+=`<pattern id="tx-${k}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"><image href="${MEDIA}tex-${k}.webp" width="${s}" height="${s}" preserveAspectRatio="none"/></pattern>`}return d}
+const TEXD={field:100,road:50,river:50,lake:50,garden:20,hedge:25,hub:25,wall:25,mon:50,'town-basilica':50,town:50,roof:25};   // every repeat divides the 100-unit tile, so textures run on across tile edges
+function texDefs(){let d='';for(const k in TEXD){if(PIMG['tex-'+k]!==1)continue;const s=TEXD[k];for(let r=0;r<4;r++)d+=`<pattern id="tx-${k}-${r}" patternUnits="userSpaceOnUse" width="${s}" height="${s}"${r?` patternTransform="rotate(${-90*r} 50 50)"`:''}><image href="${MEDIA}tex-${k}.webp" width="${s}" height="${s}" preserveAspectRatio="none"/></pattern>`}return d}   // one pattern per tile turn: the texture is turned back so it never flips direction at a tile edge
 function texApply(){TEXSET={};let any=false;
   if(PAINT_ON)for(const k in TEXD)if(PIMG['tex-'+k]===1){TEXSET[k]=1;any=true}
   let el=document.getElementById('txdefs');if(!el){el=document.createElement('div');el.id='txdefs';el.setAttribute('aria-hidden','true');el.style.cssText='position:absolute;width:0;height:0;overflow:hidden';document.body.insertBefore(el,document.body.firstChild)}

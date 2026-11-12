@@ -11,6 +11,8 @@ var SVG_TIME = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 2h10M5 1
 var SVG_LEA = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" rx="2" fill="#8a5a3a" stroke="#4a2a12" stroke-width="1.2"/><rect x="6" y="6" width="8" height="8" fill="none" stroke="#f0d9b0" stroke-width="1.2" stroke-dasharray="2 1.5"/></svg>';
 function leaIc() { var i = artImg('icon-leather', 'ic'); return i ? i.outerHTML : SVG_LEA; }
 function bonusIc() { var i = artImg('icon-bonus', 'ic'); return i ? i.outerHTML : '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="8" r="6" fill="#e0a82e" stroke="#7a5410" stroke-width="1.3"/><path d="M6 13l-2 6 6-3 6 3-2-6" fill="#c8553d"/></svg>'; }
+document.addEventListener('error', function (e) { var t = e.target; if (!t || t.tagName !== 'IMG' || !t.getAttribute('data-stem')) return; /* R2: a picture that fails to load falls back to the drawn icon, never a broken-image mark */
+  var st = t.getAttribute('data-stem'), fb = st === 'icon-button' ? SVG_BTN : st === 'icon-leather' ? SVG_LEA : ''; var p = t.parentNode; if (p && p.classList) p.classList.remove('hasimg'); if (fb) { var w = document.createElement('span'); w.innerHTML = fb; t.replaceWith(w.firstChild || w); } else t.remove(); }, true);
 function btnIc() { var i = artImg('icon-button', 'ic'); return i ? i.outerHTML : SVG_BTN; }
 function timeIc() { var i = artImg('icon-hourglass', 'ic'); return i ? i.outerHTML : SVG_TIME; }
 // ---------- sound: small synth, off-able; respects the shelf volume sliders
@@ -30,10 +32,11 @@ function nameOf(s) { return UI.names[s] || (s === 0 ? 'You' : 'Computer'); }
 function lvlOf(s) { return UI.mode === 'hot' ? 'human' : (UI.camp ? UI.camp.opponent.aiLevel : UI.lvl); }
 // ---------- layout (board sized to the space the shell leaves)
 function layout() {
-  document.documentElement.classList.toggle('sm', innerHeight < 700); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
+  document.documentElement.classList.toggle('sm', innerHeight < 700); var de = document.documentElement, ph = innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('ph', ph); /* R2: phone portrait, the quilt is the hero */
+  de.classList.toggle('swplace', ph && !!G && !G.over && isHuman(swWho(G)) && (UI.sel >= 0 || !!G.pend) && UI.peek < 0); var b = GX.boardSize(), W = b.w, H = b.h, wide = W > H * 1.12 && W >= 600; UI.wide = wide; var bd = $('#bd'); bd.classList.toggle('wide', wide);
   var cs;
   var fr = artHas('quilt-frame') ? (wide ? 20 : 8) : 0; if (wide) cs = Math.floor(Math.min((H - 20 - 12 - fr) / 9, (W * 0.55 - fr) / 9)); else cs = Math.floor(Math.min((W - 16 - 10 - fr) / 9, (H - 12 - 46 - 56 - 22 - 26 - (innerHeight < 800 ? -12 : 60) - fr) / 9)); /* W484: room for the track header */
-  cs = Math.max(18, Math.min(72, cs)); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
+  cs = Math.max(18, Math.min(72, cs)); if (!wide && UI.csFit) cs = Math.max(18, Math.min(UI.csFit, Math.floor((W - 16 - 10 - fr) / 9))); document.documentElement.style.setProperty('--cs', cs + 'px'); UI.cs = cs;
   var tw = wide ? Math.max(190, Math.min(520, W - 9 * cs - 70)) : Math.min(W - 16, 560); var tr = $('#track'); if (tr) tr.style.width = tw + 'px';
 }
 // ---------- quilt
@@ -42,7 +45,7 @@ function quiltEl(seat, cls) {
   var board = G.board[seat], q = h('div#quilt.' + cls), bx = patchBoxes(board), cs = UI.cs || 36;
   for (var i = 0; i < 81; i++) {
     var p = board[i], x = i % 9, y = (i / 9) | 0, c = h('div.qc'); c.dataset.x = x; c.dataset.y = y;
-    if (p === 99) { c.classList.add('torn'); if (artHas('torn-square')) artBg(c, 'torn-square'); } else if (p === 100) { c.classList.add('lea'); if (artHas('patch-leather')) { artBg(c, 'patch-leather'); c.style.backgroundSize = 'cover'; } } else if (p >= 0) {
+    if (p === 99) { c.classList.add('torn'); if (artHas('torn-square')) artBg(c, 'torn-square'); } else if (p === 101) { c.classList.add('old'); c.style.setProperty('--pc', pcol(((i * 7) + ((i / 9) | 0) * 3) % 33)); } else if (p === 100) { c.classList.add('lea'); if (artHas('patch-leather')) { artBg(c, 'patch-leather'); c.style.backgroundSize = 'cover'; } } else if (p >= 0) {
       c.classList.add('f', ppat(p)); c.style.setProperty('--pc', pcol(p));
       if (x === 0 || board[i - 1] !== p) c.classList.add('eL'); if (x === 8 || board[i + 1] !== p) c.classList.add('eR'); if (y === 0 || board[i - 9] !== p) c.classList.add('eT'); if (y === 8 || board[i + 9] !== p) c.classList.add('eB');
       if (artHas(fabricStem(p))) { var b = bx[p], sz = Math.max(b[2] - b[0] + 1, b[3] - b[1] + 1) * cs; c.style.backgroundImage = 'url(media/' + fabricStem(p) + '.webp)'; c.style.backgroundSize = sz + 'px ' + sz + 'px'; c.style.backgroundPosition = (-(x - b[0]) * cs) + 'px ' + (-(y - b[1]) * cs) + 'px'; c.classList.add('img'); }
@@ -55,12 +58,12 @@ function quiltEl(seat, cls) {
   q.setAttribute('aria-label', nameOf(seat) + ' quilt: ' + swEmpty(board) + ' empty squares');
   return q;
 }
-function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
+function thumb(seat) { var c = document.createElement('canvas'); c.width = c.height = 90; c.className = 'thumb'; var x = c.getContext('2d'); x.fillStyle = '#f1e5c8'; x.fillRect(0, 0, 90, 90); for (var i = 0; i < 81; i++) { var p = G.board[seat][i]; if (p === -1) continue; x.fillStyle = p === 99 ? '#4d4032' : p === 100 ? '#8a5a3a' : p === 101 ? '#b8a27e' : pcol(p); x.fillRect((i % 9) * 10 + 0.5, ((i / 9) | 0) * 10 + 0.5, 9, 9); } return c; }
 function strip(seat) {
   var sc = swScore(G, seat), w = (UI.peek >= 0 ? UI.peek : swWho(G)) === seat && !G.over;
   return h('button.pstrip' + (w ? '.turn' : ''), { type: 'button', 'data-a': 'strip', 'data-seat': seat, title: 'If it ended now: ' + sc.total + ' points', 'aria-label': nameOf(seat) + ': ' + G.btn[seat] + ' buttons, income ' + G.inc[seat] + ', score ' + sc.total + '. Tap for their quilt.' },
     h('span.dot', { style: 'background:' + (seat === 0 ? 'var(--me)' : 'var(--opp)') }), thumb(seat), h('b', nameOf(seat)), /* W484: no running score on the plate (it read -157 at the start); the score is in the result and the score drawer */
-    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> buttons', title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares, -2 each', html: (artHas('torn-square') ? '<img class="ic torn" alt="" src="' + artUrl('torn-square') + '">' : '') + sc.empty + ' empty' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
+    h('span.st', h('span.bt', { html: '<span class="nb" data-seat="' + seat + '">' + G.btn[seat] + '</span> button' + (G.btn[seat] === 1 ? '' : 's'), title: 'Buttons' }), false ? h('span.bt', { html: '<small>income</small> +' + G.inc[seat], title: 'Buttons earned each time a gold spot is passed' }) : null, h('span.bt.emp', { title: 'Empty squares, -2 each', html: (artHas('torn-square') ? '<img class="ic torn" alt="" src="' + artUrl('torn-square') + '">' : '') + sc.empty + ' empty' }), G.bonus === seat ? h('span.bt', { html: bonusIc() + '+7', title: '7x7 bonus' }) : null));
 }
 // ---------- track
 function trackCols() { return UI.wide ? 9 : 18; }
@@ -69,6 +72,18 @@ function trackHead() { // W484: say what the strip is, who is where, and what pa
   var dot = function (s) { return h('i.trdot', { style: 'background:' + (s === 0 ? 'var(--me)' : 'var(--opp)') }); };
   return h('div#trhead', { role: 'button', tabindex: '0', 'data-a': 'trhelp', 'aria-label': 'Time track: what passing a spot does' }, h('div.trl', h('b', 'Time track'), h('span', dot(0), nameOf(0) + ': ' + G.pos[0] + ' of ' + SW.TRACK), h('span', dot(1), nameOf(1) + ': ' + G.pos[1] + ' of ' + SW.TRACK)),
     h('div.trr', { html: 'Pass ' + btnIc() + ' = income. Pass ' + leaIc() + ' leather = free 1\u00D71.' })); }
+function trPhone() { return !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; } /* R16: phone tags carry only the number (seat colour = who); full names live in the zoomed track sheet */
+function trackSheet() { // R16: tap the track for a big, readable sheet: every space 34px+, names in full, who moves next
+  var old = $('#trsheet'); if (old) old.remove(); var nx = swWho(G), cols = 9, i, g = h('div.tsgrid', { style: 'grid-template-columns:repeat(' + cols + ',1fr)' });
+  for (i = 0; i <= SW.TRACK; i++) { var r = (i / cols) | 0, c = i % cols; if (r % 2) c = cols - 1 - c; var cl = h('div.tsc'); cl.style.gridRow = r + 1; cl.style.gridColumn = c + 1;
+    if (SW.BTN_SPOTS.indexOf(i) >= 0) { cl.classList.add('bspot'); cl.innerHTML = btnIc(); } else if (SW.LEATHER_SPOTS.indexOf(i) >= 0) { cl.classList.add('lspot'); cl.innerHTML = G.leather[SW.LEATHER_SPOTS.indexOf(i)] !== null ? '&#10003;' : leaIc(); } else cl.appendChild(h('small', String(i)));
+    if (i === SW.TRACK) cl.classList.add('tend'); if (i < Math.min(G.pos[0], G.pos[1])) cl.classList.add('past');
+    [0, 1].forEach(function (s) { if (G.pos[s] === i) cl.appendChild(h('i.tsk.' + (s ? 'opp' : 'me') + (s === nx ? '.nx' : ''), { title: nameOf(s) })); }); g.appendChild(cl); }
+  var who = function (s) { return h('span.tsw', h('i.tsk.' + (s ? 'opp' : 'me') + (s === nx ? '.nx' : '')), h('b', nameOf(s)), ' ' + G.pos[s] + ' of ' + SW.TRACK); };
+  var card = h('div.card.tscard', h('h2', 'Time track'), h('p.tsnext', G.over ? 'Both quilters reached the end.' : nx < 0 ? '' : (nameOf(nx) === 'You' ? 'You move next' : nameOf(nx) + ' moves next') + ': furthest back plays.'), h('div.tsrow', who(0), who(1)), g,
+    h('p.tsleg', { html: 'Pass ' + btnIc() + ' = income. Pass ' + leaIc() + ' leather = free 1\u00D71. Both at 53 = game over.' }), h('button.btn.go', { type: 'button', 'data-a': 'trclose' }, 'Back to the quilt'));
+  var ov = h('div#trsheet.ov', { role: 'dialog', 'aria-label': 'Time track, zoomed' }, card); ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); }); document.body.appendChild(ov);
+}
 function renderTrack() {
   var cols = trackCols(), rows = Math.ceil(54 / cols), t = $('#track'); if (!t) { t = h('div#track', { role: 'img', 'data-a': 'trhelp' }); }
   t.innerHTML = ''; t.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)'; t.style.gridTemplateRows = 'repeat(' + rows + ',auto)';
@@ -77,7 +92,7 @@ function renderTrack() {
     if (i === SW.TRACK && !cell.querySelector('.bfin')) { var bi2 = artImg('icon-bonus', 'ic bfin'); if (bi2) { bi2.alt = 'Finish: 7x7 bonus is judged here'; cell.appendChild(bi2); } }
     if (rc[0] % 2) cell.classList.add('trv'); if (i < Math.min(G.pos[0], G.pos[1])) cell.classList.add('past'); t.appendChild(cell); }
   artBg(t, 'track-frame'); t.style.backgroundSize = 'cover';
-  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
+  [1, 0].forEach(function (s) { var k = h('div.tk.' + (s === 0 ? 'me' : 'opp'), { 'data-seat': s, title: nameOf(s) + ' at ' + G.pos[s] }, h('span.tkn', trPhone() ? (swWho(G) === s && !G.over ? '\u25B6 ' : '') + G.pos[s] : nameOf(s) + ' ' + G.pos[s] + '/' + SW.TRACK)); if (artHas(s === 0 ? 'token-me' : 'token-opp')) { artBg(k, s === 0 ? 'token-me' : 'token-opp'); k.style.backgroundSize = 'contain'; k.style.border = '0'; k.style.boxShadow = 'none'; } t.appendChild(k); });
   t.setAttribute('aria-label', 'Time track. ' + nameOf(0) + ' at ' + G.pos[0] + ' of 53, ' + nameOf(1) + ' at ' + G.pos[1] + '.');
   return t;
 }
@@ -87,8 +102,8 @@ function placeTokens() { var t = $('#track'); if (!t) return; var top = G.stamp[
   var W = UI.walks = UI.walks || {}, now = Date.now(), stp = Math.max(40, sp(150));
   [0, 1].forEach(function (s) { if (last[s] < G.pos[s] && amt(1)) W[s] = { from: W[s] ? curW(s) : last[s], to: G.pos[s], t0: now }; });
   function curW(s) { var w = W[s]; if (!w) return G.pos[s]; var n = w.from + Math.floor((Date.now() - w.t0) / stp); if (n >= w.to || w.to !== G.pos[s]) { delete W[s]; return G.pos[s]; } return n; }
-  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); tagFit(); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } }
-  tick(); setTimeout(tagFit, 0); }
+  function tick() { var tt = $('#track'); if (!tt) return; var more = false; [0, 1].forEach(function (s) { var k = $('.tk[data-seat="' + s + '"]', tt); if (!k) return; k.classList.toggle('top', G.pos[0] === G.pos[1] && s === top); if (W[s]) { k.style.transition = 'left .12s, top .12s'; more = true; } at(k, curW(s), s); if (W[s] && !k._st) { k._st = 1; } }); tagFit(); if (more) { clearTimeout(UI.tm.walk); UI.tm.walk = setTimeout(tick, stp); } else { clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } }
+  tick(); setTimeout(tagFit, 0); clearTimeout(UI.tm.tagfit); UI.tm.tagfit = setTimeout(tagFit, 260); } /* R7: re-fit the name tags once the token transition has settled (no cut or overlapping tags) */
 function tagFit() { var t = $('#track'); if (!t) return; var tw = t.clientWidth, L = []; /* W484: name tags stay inside the track and never overlap each other */
   $$('.tk', t).forEach(function (k) { var g = $('.tkn', k); if (!g) return; var kx = k.offsetLeft + k.offsetWidth / 2, ky = k.offsetTop, gw = g.offsetWidth; L.push({ g: g, kx: kx, ky: ky, gw: gw, me: k.dataset.seat === '0', l: kx - gw / 2 }); });
   if (L.length === 2 && Math.abs(L[0].ky - L[1].ky) < 8) { L.sort(function (a, b) { return a.kx - b.kx || (a.me ? -1 : 1); }); var a = L[0], b = L[1], ov = a.l + a.gw + 3 - b.l; if (ov > 0) { a.l -= ov / 2; b.l += ov / 2; } if (a.l < 2) { b.l += 2 - a.l; a.l = 2; } if (b.l + b.gw > tw - 2) { a.l -= b.l + b.gw - tw + 2; b.l = tw - 2 - b.gw; } }
@@ -104,19 +119,22 @@ function trackInfo() {
   return 'Gold spot (income) in ' + (nb == null ? '-' : nb - pos) + ' \u00B7 free patch in ' + (nl == null ? '-' : nl - pos);
 }
 // ---------- render everything
-function render() {
-  if (!G) return; renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
+function render(fit) {
+  if (!G) return; if (!fit) UI.csFit = 0; var svNew = fit ? null : Object.assign({}, UI.newCells); renderDock(); layout(); var vs = viewSeat(), os = 1 - vs, qc = $('#qcol'), sd = $('#side'); qc.innerHTML = ''; sd.innerHTML = '';
   var q = quiltEl(vs, 'me'); UI.newCells = {}; var qf = h('div.qframe'); if (artBg(qf, 'quilt-frame')) { qf.style.backgroundSize = '100% 100%'; qf.classList.add('art'); } if (UI.mode !== 'hot' && vs !== 0) q.appendChild(h('div.qlabel', nameOf(vs) + '\u2019s quilt'));
   artBg($('#board'), 'bg-table');
   var ps = UI.peek >= 0 && UI.mode !== 'hot' ? 0 : vs, pills = h('div#pills', strip(ps), strip(1 - ps)), sbar = scoreBar();
   qf.appendChild(q); if (UI.wide) { qc.appendChild(qf); sd.appendChild(pills); if (hintsOn()) sd.appendChild(sbar); } else { qc.appendChild(pills); qc.appendChild(qf); }
   sd.appendChild(trackHead()); var tr = renderTrack(); sd.appendChild(tr);
   if (UI.wide && !(UI.wide && hintsOn())) { var mcs = Math.max(14, Math.min(30, Math.floor(((innerHeight - 330) / 9)))), sv = UI.cs, svn = UI.newCells; UI.cs = mcs; UI.newCells = {}; var oq = quiltEl(os, 'opp'); UI.cs = sv; UI.newCells = svn; oq.removeAttribute('id'); oq.className = 'oppq'; oq.style.setProperty('--cs', mcs + 'px'); oq.style.backgroundImage = 'none'; oq.setAttribute('data-a', 'strip'); oq.setAttribute('data-seat', os); oq.setAttribute('role', 'button'); oq.setAttribute('aria-label', nameOf(os) + ' quilt, tap to enlarge'); sd.appendChild(h('div.oppwrap', h('span', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), oq)); } if (UI.wide && hintsOn()) { sd.appendChild(h('div#tinfo', trackInfo())); var om = h('button.oppmini', { type: 'button', 'data-a': 'strip', 'data-seat': os, 'aria-label': nameOf(os) + ' quilt, tap to enlarge' }, thumb(os), h('span', h('b', os === 0 && UI.mode !== 'hot' ? 'Your quilt' : nameOf(os) + '\u2019s quilt'), h('small', swScore(G, os).empty + ' empty squares \u00B7 score now ' + swScore(G, os).total))); sd.appendChild(om); } placeTokens(); markLanding();
+  if (!fit && !UI.wide) { try { var bdE = $('#bd'), top = bdE.getBoundingClientRect().top, low = 0; Array.prototype.forEach.call(bdE.querySelectorAll('#qcol > *, #side > *'), function (e) { var r = e.getBoundingClientRect(); if (r.height) low = Math.max(low, r.bottom - top); }); /* R2: fit the quilt to the real free height, measured */
+    var nc = UI.cs + Math.floor((bdE.clientHeight - low - 6) / 9); if (low && nc !== UI.cs) { UI.csFit = Math.max(18, nc); UI.newCells = svNew; return render(true); } } catch (e) { } }
   drawGhost();
   var bp = $('#barprompt'); if (bp) bp.textContent = G.over ? 'Game over' : UI.peek >= 0 ? nameOf(UI.peek) + ' is stitching' : (isHuman(swWho(G)) ? (UI.mode === 'hot' ? nameOf(swWho(G)) + ' to play' : 'Your turn') : nameOf(swWho(G)) + ' is stitching');
   var gl = $('#goalline'); if (gl) { gl.hidden = !UI.camp; if (UI.camp) gl.textContent = 'Goal: ' + UI.camp.goal.text + (UI.camp.twist ? ' \u00B7 ' + UI.camp.twist.text : ''); }
   try { if (typeof coachRender === 'function') coachRender(); } catch (e) { }
   try { if (typeof hlpRefresh === 'function') hlpRefresh(); } catch (e) { }
+  try { if (typeof T2 !== 'undefined' && T2) t2Show(); } catch (e) { }   // W491 fix: the tutorial highlight survives every redraw (no unlit gap)
 }
 function patchShape(pid, cls, oc, cells) { var p = PATCHES[pid], c = cells || p.cells, w = 0, ht = 0; c.forEach(function (q) { if (q[0] > w) w = q[0]; if (q[1] > ht) ht = q[1]; }); var s = h('div.shape' + (cls ? '.' + cls : ''), { style: 'grid-template-columns:repeat(' + (w + 1) + ',' + oc + 'px);grid-template-rows:repeat(' + (ht + 1) + ',' + oc + 'px);--pc:' + pcol(pid) }), set = {}; c.forEach(function (q) { set[q[0] + ',' + q[1]] = 1; });
   for (var y = 0; y <= ht; y++) for (var x = 0; x <= w; x++) { var e = h('i.sc' + (set[x + ',' + y] ? '' : '.e')); e.style.width = e.style.height = oc + 'px'; if (set[x + ',' + y] && artHas(fabricStem(pid))) { var sz = Math.max(w + 1, ht + 1) * oc; e.style.backgroundImage = 'url(media/' + fabricStem(pid) + '.webp)'; e.style.backgroundSize = sz + 'px ' + sz + 'px'; e.style.backgroundPosition = (-x * oc) + 'px ' + (-y * oc) + 'px'; } s.appendChild(e); }
@@ -153,22 +171,22 @@ function rateMove(m) { // compare the human's move with the best value on offer 
   return 'Last turn: ' + verdict + ' (' + sgn(mine.v) + ').' + (d <= 1 ? ' Best value on offer.' : ' Best was ' + best.name + ' (' + sgn(best.v) + ').'); }
 function renderDock() {
   var s = UI.peek >= 0 ? UI.peek : swWho(G), hum = !G.over && isHuman(s) && !(UI.peek >= 0), off = swOffer(G), box = $('#offers'), pr = $('#prompt'), ac = $('#acts'), dt = $('#detail'), dh = $('.gx-dt');
-  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; box.classList.toggle('placing', !UI.wide && UI.sel >= 0 && hum); pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
+  box.innerHTML = ''; ac.innerHTML = ''; dt.innerHTML = ''; swComp(false); box.classList.toggle('placing', !UI.wide && UI.sel >= 0 && hum); pr.classList.toggle('rv-cap', !G.over && !hum && UI.mode !== 'hot');
   off.forEach(function (pid, k) {
     var p = PATCHES[pid], aff = hum && !G.pend && G.btn[s] >= p.cost, fits = hum && !G.pend && swPlacements(G.board[s], p).length > 0, why = !hum ? '' : G.pend ? '' : !aff ? 'need ' + (p.cost - G.btn[s]) + ' more' : !fits ? 'no room' : '';
     var can = hum && !G.pend && aff && fits, val = hintsOn() && hum && !G.pend && aff && fits ? patchValue(s, pid).net : null;
-    var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
+    var b = h('button.offer' + (UI.sel === k ? '.sel' : '') + (hum && !G.pend && (!aff || !fits) ? '.no.cant' : '') + (!hum ? '.no' : '') + (can && UI.sel < 0 && (!T2 || t2OfferOk(k)) ? '.can' : '') + (UI.sel >= 0 && UI.sel !== k ? '.dim' : ''), { type: 'button', 'data-a': 'offer', 'data-k': k, 'data-why': why, 'aria-label': p.name + ': cost ' + p.cost + ' buttons, time ' + p.time + ', earns ' + p.inc + ' per button spot, ' + p.n + ' squares' });
     if (artHas('ui-offer-card')) { artBg(b, 'ui-offer-card'); b.style.backgroundImage = 'linear-gradient(#fffaf0e6,#fffaf0e6),' + b.style.backgroundImage; b.style.backgroundSize = 'cover'; }
-    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; var ph = !sm && !wd && !UI.wide; /* W484: phone portrait: big pieces (box ~100x72, cells up to 26px, tap target is the whole card) */ b.appendChild(patchShape(pid, '', ph ? Math.max(13, Math.min(26, Math.floor(100 / (bb[0] + 1)), Math.floor(54 / (bb[1] + 1)))) : Math.max(9, Math.min(sm ? 12 : wd ? 30 : 18, Math.floor((sm ? 60 : wd ? 170 : 96) / bb[0]), Math.floor((sm ? 44 : wd ? 96 : 40) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
+    if (val != null) b.dataset.val = val; b.appendChild(h('span.onm', p.name)); var bb = bbox(p.cells), sm = document.documentElement.classList.contains('sm'), wd = innerWidth >= 1024; var ph = !sm && !wd && !UI.wide; /* W484: phone portrait: big pieces (box ~100x72, cells up to 26px, tap target is the whole card) */ b.appendChild(patchShape(pid, '', ph ? Math.max(11, Math.min(20, Math.floor(84 / (bb[0] + 1)), Math.floor(36 / (bb[1] + 1)))) : Math.max(9, Math.min(sm ? 12 : wd ? 30 : 18, Math.floor((sm ? 60 : wd ? 170 : 96) / bb[0]), Math.floor((sm ? 44 : wd ? 96 : 40) / bb[1]))))); b.appendChild(h('div.meta.ofx', { html: offerFacts(p) })); box.appendChild(b);
   });
   if (hum && !G.pend && UI.sel < 0 && !G.owned[s].length && !UI.tutorial) { var cans = $$('.offer.can', box); if (cans.length) { var bk = cans.reduce(function (a, c) { return patchValue(s, off[+c.dataset.k]).net > patchValue(s, off[+a.dataset.k]).net ? c : a; }); bk.appendChild(h('span.hand', { 'aria-hidden': 'true' }, h('i', '\u261D\uFE0F'), h('b', 'Tap'))); } } /* W484: a hand on the very first turn */
   var vs = $$('.offer[data-val]', box); if (vs.length) { var bst = vs.reduce(function (a, b) { return +b.dataset.val > +a.dataset.val ? b : a; }); bst.appendChild(h('span.badge', 'Best ' + sgn(+bst.dataset.val))); }
   if (!off.length) box.appendChild(h('div', 'No patches left.'));
   if (G.over) { pr.textContent = 'The fair is over.'; dh.textContent = 'Result'; ac.appendChild(h('button.btn.go', { type: 'button', 'data-a': 'result' }, 'See the result')); return; }
-  pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? 'Drag it on your quilt. Red = no room.' : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
-  if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
+  pr.classList.remove('w484q'); dh.textContent = hum && !G.pend && UI.sel >= 0 && !UI.coach ? 'Drag it on your quilt. Red stripes = no room.' : hum && !G.pend && UI.sel < 0 && !UI.coach ? 'Goal: fill your quilt. Most points wins.' : turnTracker(s); /* W484: the goal in plain words on your turn */
+  if (G.pend) { pr.textContent = hum ? 'Free 1×1 patch! Tap any empty square on your quilt' : nameOf(s) + ' sews a free 1×1 patch'; if (hum) { box.style.display = 'none'; dt.textContent = T2 ? 'You passed a leather space. Sew the 1×1 patch into the single square gap.' : 'You passed a leather space on the track. The 1×1 patch is yours, sew it anywhere.'; } return; }
   box.style.display = '';
-  if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); return; }
+  if (!hum) { pr.textContent = UI.cap || (nameOf(s) + ' is thinking…'); if (!UI.fast) pr.appendChild(h('small.skipn', ' Tap to skip')); return; }
   if (UI.sel >= 0) {
     var pid = off[UI.sel], p = PATCHES[pid], ok = ghostOk(), pv = patchValue(s, pid), gc = ok ? (curCells() || []).map(function (c) { return (UI.gy + c[1]) * 9 + UI.gx + c[0]; }) : [];
     pr.textContent = hintsOn() ? (ok ? 'Sew it on: ' : 'Drag it onto your quilt: ') + 'worth ' + sgn(pv.net) : ok ? 'Good spot! Tap Sew it on' : 'Drag the patch onto your quilt';
@@ -185,7 +203,11 @@ function renderDock() {
     dt.textContent = hintsOn() && (UI.wide || !UI.camp) ? UI.rate || trackInfo() : '';
     if (UI.hints && !UI.coach) ac.appendChild(h('button.btn.alt.sm', { type: 'button', 'data-a': 'whatdo' }, 'What should I do?'));
   }
+  try { ringStrip(); } catch (e) { console.error(e); }   // W491: the whole ring, clockwise from the spool
+  swComp(hum && !G.pend && UI.sel < 0 && ac.children.length === 1) /* R16: the tutorial gets the same compact phone dock (Advance in the header row) as the real game */;
 }
+/* R7: phone portrait (375x667, 390x844): Advance moves up into the dock header row so the quilt gets that height back */
+function swComp(on) { var de = document.documentElement; on = !!on && !UI.wide && innerWidth <= 600 && innerHeight > innerWidth; de.classList.toggle('swcomp', on); var pr = $('#prompt'); if (on && pr && pr.textContent === 'Tap a glowing patch, or tap Advance') pr.textContent = 'Tap a glowing patch, or'; if (on && pr && pr.textContent === 'No patch you can buy: tap Advance') pr.textContent = 'Nothing fits \u2192'; }
 
 // score drawer: every number's why, on tap only
 function showScoreDrawer() {
