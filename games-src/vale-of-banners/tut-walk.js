@@ -15,7 +15,7 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
     const tapXY = async (x, y) => { if (touch) await page.touchscreen.tap(x, y); else await page.mouse.click(x, y); };
     const tb = await page.evaluate(() => { const e = document.getElementById('tutB'); const r = e && e.getBoundingClientRect(); return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; });
     if (!tb) { console.log(name, 'FAIL no tutorial button'); bad++; continue; } await tapXY(tb.x, tb.y); await page.waitForTimeout(900);
-    const seen = [], rulesSeen = []; let shot = 0, guard = 0;
+    const seen = [], rulesSeen = []; let shot = 0, guard = 0, w0 = 0, wMax = 0, wAt = '';   /* longest silent wait between two steps (rival turns included) */
     while (guard++ < 2500) {
       const st = await page.evaluate(() => {
         if (document.querySelector('.gxt-end')) return { end: true };
@@ -28,6 +28,7 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
         const inView = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight;
         return { id: c.id, rule: c.rule, say, x, y, ok: inView && !!hit && (hit === t || t.contains(hit)), hit: hit ? (hit.id || hit.className) : 'none', w: r.width, hh: r.height };
       });
+      if (st.wait) { if (!w0) w0 = Date.now(); } else if (w0) { const d = Date.now() - w0; if (d > wMax) { wMax = d; wAt = st.id; } w0 = 0; }
       if (st.end || st.done) break; if (st.wait) { if (guard % 40 === 39 && process.env.DBG) console.log(name, 'waiting', await page.evaluate(() => { const c = GXT.current(); return (c && c.id) + ' ' + GXT.state().phase + ' busy ' + UI.busy + ' actor ' + VB.actor(G) + ' tab ' + UI.tab + ' tv ' + !document.getElementById('tv').hidden; })); await page.waitForTimeout(150); continue; }
       if (process.env.STOPAT === st.id) { console.log(await page.evaluate(() => { const r = s => { const e = document.querySelector(s); if (!e) return s + ' none'; const b = e.getBoundingClientRect(); return s + ' ' + [b.top, b.bottom, b.height].map(Math.round).join('/'); }; return [r('#bd'), r('#mk'), r('#lane'), r('#dock'), r('.drow'), r('#store'), r('#goods'), r('#acts'), r('#endB'), r('#prompt'), 'dock sh ' + document.getElementById('dock').scrollHeight + ' ov ' + getComputedStyle(document.getElementById('dock')).overflowY + ' ' + [...document.getElementById('dock').querySelectorAll('*')].filter(e => getComputedStyle(e).overflowY === 'auto' || getComputedStyle(e).overflowY === 'scroll').map(e => e.id || e.className).join(','), 'sw ' + document.documentElement.scrollWidth + ' bd ' + document.getElementById('bd').clientWidth + ' iw ' + innerWidth + ' wide: ' + [...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > innerWidth + 2).slice(0, 8).map(e => (e.id || e.className) + ':' + Math.round(e.getBoundingClientRect().right)).join(' '), JSON.stringify(L.mkFit), JSON.stringify({ ey: L.ey, eh: L.eh })].join('\n'); })); await page.screenshot({ path: process.env.STOPSHOT || '/tmp/stop.png' }); break; }
       if (seen[seen.length - 1] !== st.id) {
@@ -53,7 +54,7 @@ const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
       const later = await page.evaluate(() => /meet later/i.test(document.body.innerText)); if (later) fails.push('a "learn later" list is shown');
     }
     if (errs.length) fails.push('errors: ' + errs.slice(0, 3).join(' | '));
-    console.log(name, fails.length ? 'FAIL' : 'PASS', seen.length + ' steps, rules in order: ' + rulesSeen.join(' > '), fails.length ? '\n  ' + fails.join('\n  ') : '');
+    console.log(name, fails.length ? 'FAIL' : 'PASS', seen.length + ' steps, longest wait ' + (wMax / 1000).toFixed(1) + ' s before "' + wAt + '", rules in order: ' + rulesSeen.join(' > '), fails.length ? '\n  ' + fails.join('\n  ') : '');
     if (fails.length) bad++; await ctx.close();
   }
   await b.close(); process.exit(bad ? 1 : 0);

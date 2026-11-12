@@ -43,7 +43,9 @@ var GLYPH = { castle: '🏰', mine: '⛏️', know: '📜', ship: '⛵', hall: '
 var GCOL = ['', '#f7f4ec', '#f6dc92', '#f3c27e', '#f0b0a0', '#c7dbf2', '#e6e6e6'];
 var SHORT = { hall: 'Moot Hall', carp: 'Joiner', chapel: 'Chapel', mkt: 'Fair', inn: 'Inn', mint: 'Mint', tower: 'Beacon', store: 'Granary' };
 function tlabel(t) { if (!t) return ''; if (t.t === 'bld') return SHORT[t.k] || VB.BLD[t.k].name.split(' ')[0]; if (t.t === 'pas') return t.n + ' ' + VB.ANIMALS[t.k]; return VB.COLNAME[t.t]; }
-function labelled(b, t) { b.appendChild(h('span.tlab', { text: tlabel(t), 'aria-hidden': 'true' })); b.classList.add('lab'); return b; }
+function labelled(b, t) { b.appendChild(h('span.tlab', { text: tlabel(t), 'aria-hidden': 'true', 'data-short': t.t === 'bld' ? (TINY[t.k] || '') : '' })); b.classList.add('lab'); return b; }
+var TINY = { hall: 'Hall', store: 'Barn', chapel: 'Abbey', tower: 'Tower', carp: 'Saw' };   /* whole words for narrow stalls: a label is never cut mid-word */
+function fitLabels() { document.querySelectorAll('.tlab[data-short]').forEach(function (e) { var sh = e.getAttribute('data-short'); if (sh && e.scrollWidth > e.clientWidth + 1) e.textContent = sh; }); }
 function glyph(t) { return t.t === 'bld' || t.t === 'pas' ? GLYPH[t.k] : GLYPH[t.t]; }
 var TERRAIN = { castle: 'tile-keep', mine: 'tile-mine', ship: 'tile-barge', know: 'tile-lore-k1', pas: 'tile-pas-sheep-2', bld: 'tile-bld-hall' };
 function hexEl(t, opt) {
@@ -235,8 +237,10 @@ function takeValues() {   /* value of every legal take for the best-pick badge *
 function rateBefore(m) {
   if (!myTurn() || m.k === 'end' || m.k === 'skip' || m.k === 'discard') return;
   var s = VB.actor(G), base = VB.evalSeat(G, s), best = -99, bm = null, got = valOf(m, base);
+  var hm = hardMove(); if (hm && ['k', 'v', 'slot', 'cell', 's', 'die'].every(function (f) { return hm[f] === m[f]; })) got = 1e9;   /* following ★ always rates as a best move */
   VB.validMoves(G).forEach(function (x) { if (x.k === 'end' || x.k === 'skip') return; var v = valOf(x, base); if (v > best) { best = v; bm = x; } });
   var R = UI.rate = UI.rate || { got: 0, best: 0, miss: 0, alt: '' };
+  if (got >= 1e9) got = best;
   R.got += Math.max(0, got); R.best += Math.max(0, best);
   if (best - got > R.miss) { R.miss = best - got; R.alt = describe(bm, s).replace(G.seats[s].name + ' ', '').replace(/^(\w+?)s\b/, '$1'); }
 }
@@ -391,9 +395,33 @@ function render() {
   layout(); renderBar(); renderOpp(); renderMarket(); fitMarket(); fitEstate(); renderEstate(); renderDock(); renderScores(); fitMarket();   /* again: the dock may have grown */
   autoZoom();
   if (L.tabs) { ensureTabs(parseInt($('#tabs').style.top, 10) || 50, 6); renderRival(); }
+  try { markBest(); } catch (e) { }
+  try { fitLabels(); } catch (e) { }
   try { artApply(); } catch (e) { }
   toastPos();
   try { GXH.phase(myTurn() && !UI.camp || myTurn() ? helpPhase() : null); } catch (e) { }
+}
+/* one ★ on every decision, never only on market picks: the look-ahead move is shown on whatever you tap next
+   (stored tile, glowing space, goods, worker swap, crates, Skip, End turn), and on the tab that hides it */
+function markBest() {
+  document.querySelectorAll('.bestx').forEach(function (e) { e.classList.remove('bestx'); var b = e.querySelector(':scope > .bestq'); if (b) b.remove(); });
+  if (!hints() || !myTurn() || UI.busy) return;
+  var m = hardMove(); if (!m) return; var p = G.P[VB.actor(G)], top = pend(), id = null;
+  if (m.k === 'take' || m.k === 'grab') id = 'mt-' + m.v + '-' + m.slot;
+  else if (m.k === 'buy') id = 'bl-' + m.slot;
+  else if (m.k === 'place') { if (UI.sel === m.s || (UI.sel == null && UI.die != null && document.querySelector('#es .cell.best'))) return; id = 'st-' + m.s; }
+  else if (m.k === 'discard') id = 'st-' + m.s;
+  else if (m.k === 'sell') id = 'gd-' + m.v;
+  else if (m.k === 'ship') id = 'gs-' + m.v;
+  else if (m.k === 'end') id = 'endB';
+  else if (m.k === 'skip') id = 'skipB';
+  else if (m.k === 'workers') { if (m.die === 'x') id = 'wkxB'; else { var i0 = p.dice[0] === p.dice[m.die] ? 0 : m.die; id = 'wk' + i0; } }
+  var el = id && document.getElementById(id); if (!el) return;
+  if (el.classList.contains('bestt') || el.querySelector('.bestb')) return;   /* the market already wears its ★ Best badge */
+  el.classList.add('bestx'); el.appendChild(h('span.bestq', { text: '★', 'aria-hidden': 'true' }));
+  el.setAttribute('aria-label', (el.getAttribute('aria-label') || el.textContent) .replace(/, best move$/, '') + ', best move');
+  var tab = el.closest('#mk') ? 'market' : el.closest('#es') ? 'estate' : null, tb = tab && document.getElementById('tab-' + tab);
+  if (tb && !tb.classList.contains('on')) { tb.classList.add('bestx'); tb.appendChild(h('span.bestq', { text: '★', 'aria-hidden': 'true' })); }
 }
 function renderBar() {
   $('#barstat').textContent = G.over ? 'Game over' : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases;
@@ -956,7 +984,8 @@ function tutStage(n) {   /* stage your next turn so this lesson's rule comes up 
 }
 function rivalThen(n) {   /* real rival turns (captions, banner), then stage your next turn */
   return function () {
-    UI.tutAi = true;
+    UI.tutAi = true; UI.quick = true;   /* tutorial rival turns run at speed: the lesson waits under 3 s, never 10 s in silence */
+    try { toast(G.seats[1].name + ' plays its turns…', 1800); } catch (e) { }
     return new Promise(function (res) {
       schedule();
       (function poll() {
