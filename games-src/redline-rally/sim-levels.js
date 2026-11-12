@@ -6,6 +6,7 @@
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const X = vm.createContext({ console, Math, Date, JSON });
 ['data', 'track', 'engine', 'ai'].forEach(f => vm.runInContext(fs.readFileSync(path.join(__dirname, 'src', f + '.js'), 'utf8'), X, { filename: f }));
+if (process.env.EASY) X.AIP.easy = JSON.parse(process.env.EASY);
 const N = +process.argv[2] || 200, ONLY = process.env.ONLY; let NAIVE = false;
 function race(levels, seed, human) {   /* human: car 0 is a player who taps Suggest every round and answers the questions like the touch gate */
   const G = X.newGame({ track: 'sunline', laps: 2, n: levels.length, humans: human ? 1 : 0, seed, diff: human || 'normal', sup: true });
@@ -59,6 +60,6 @@ for (const l of ['easy', 'normal', 'hard']) {
 }
 }
 /* D: a plain newcomer (no Suggest) on default Easy should finish mid-pack on average, not last */
-{ NAIVE = true; let pl = 0, pod = 0, nsp = 0; for (let s = 0; s < N; s++) { const r = race(["you", "easy", "easy", "easy", "easy"], 13000 + s, "easy"); pl += r.out[0].place; nsp += r.out[0].spins; if (r.out[0].place <= 3) pod++; }
-  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%', 'spins/race', (nsp / N).toFixed(2)); if (pl / N > 3.6) { console.log('FAIL plain newcomer on easy'); bad = 1; } NAIVE = false; }
+{ NAIVE = true; let pl = 0, pod = 0, nsp = 0, win = 0; const OPP = +(process.env.OPP || 4); for (let s = 0; s < N; s++) { const r = race(["you"].concat(Array(OPP).fill("easy")), 13000 + s, "easy"); pl += r.out[0].place; nsp += r.out[0].spins; if (r.out[0].place <= 3) pod++; if (r.out[0].place === 1) win++; }
+  console.log('Plain newcomer (no Suggest) vs 4 easy: avg place', (pl / N).toFixed(2), 'podium', (100 * pod / N).toFixed(0) + '%', 'win', (100 * win / N).toFixed(0) + '%', 'spins/race', (nsp / N).toFixed(2)); if (pl / N > 3.6) { console.log('FAIL plain newcomer on easy'); bad = 1; } NAIVE = false; }
 process.exit(bad);

@@ -22,7 +22,9 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         seen[b.id] = seen[b.id] || now; if (now - seen[b.id] > 300 && !window.__dead.some(d => d.b === b.id && d.step === (cur && cur.id))) window.__dead.push({ b: b.id || b.textContent, step: cur && cur.id }); }); }, 100); });
     const tb = await p.$('#tutSlot button'); const bb0 = await tb.boundingBox(); await p.touchscreen.tap(bb0.x + bb0.width / 2, bb0.y + bb0.height / 2);
     const seen = [], rulesAll = await p.evaluate(() => TUT_RULES.slice()), total = await p.evaluate(() => tutSteps().length);
-    let k = 0, ended = false;
+    let k = 0, ended = false, taps = 0, ignored = 0;
+    const tsig = () => p.evaluate(() => [GXT.state().i, !!document.querySelector('.gxt-end'), window.G ? G.phase + G.round + (G.pend ? G.pend.t : '') + UI.sel.length + UI.gear + document.querySelectorAll('.cd.sel,.cd.on').length : ''].join('|'));
+    const chk = async s0 => { taps++; for (let w = 0; w < 30; w++) { await p.waitForTimeout(100); if ((await tsig()) !== s0) return; } ignored++; problems.push('ignored tap at step ' + s0.split('|')[0]); };
     for (let guard = 0; guard < 200 && !ended; guard++) {
       try { await p.waitForFunction(() => (GXT.state().active && GXT.state().shown) || !!document.querySelector('.gxt-end'), null, { timeout: 25000 }); }
       catch (e) { problems.push('stuck at step ' + JSON.stringify(await p.evaluate(() => GXT.state().id))); break; }
@@ -37,9 +39,10 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         if (shots) { fs.mkdirSync(shots, { recursive: true }); await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, 'tut-' + k + '.png') }); }
       }
       await p.waitForTimeout(650);   // the shell ignores taps in the first 600 ms of a step
+      const s0 = await tsig();
       if (st.next) { const nb = await p.$('.gxt-next'); const q = await nb.boundingBox(); await p.touchscreen.tap(q.x + q.width / 2, q.y + q.height / 2); }
       else { const h = st.hole; const hit = await p.evaluate(h => { const e = document.elementFromPoint(h.cx, h.cy); return e ? e.tagName + '#' + e.id + '.' + e.className : 'none'; }, h); if (/gxt|gxh/.test(hit)) problems.push(st.id + ': hole covered by ' + hit); await p.touchscreen.tap(h.cx, h.cy); }
-      await p.waitForTimeout(250);
+      await chk(s0);
     }
     const ruleSeq = seen.filter(s => s.rule).map(s => s.rule);
     if (JSON.stringify(ruleSeq) !== JSON.stringify(rulesAll)) problems.push('rules in order: got ' + ruleSeq.join(','));
@@ -53,7 +56,7 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
       const real = await p.evaluate(() => !!G && UI.mode !== 'tutorial' && G.round === 1 && !G.over && !document.querySelector('#game').hidden && G.track !== 'practice');
       if (!real) problems.push('real race did not start after the tutorial');
     }
-    console.log(n, problems.length || errs.length ? 'FAIL' : 'PASS', 'steps', seen.length, 'rules', ruleSeq.length + '/' + rulesAll.length, errs.length ? 'errs ' + errs.join('|') : '', problems.join(' | '));
+    console.log(n, problems.length || errs.length ? 'FAIL' : 'PASS', 'steps', seen.length, 'taps', taps, 'ignored', ignored, 'rules', ruleSeq.length + '/' + rulesAll.length, errs.length ? 'errs ' + errs.join('|') : '', problems.join(' | '));
     if (problems.length || errs.length) fail = 1; await c.close();
   }
   await b.close(); process.exit(fail);

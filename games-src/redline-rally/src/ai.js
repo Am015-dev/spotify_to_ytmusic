@@ -5,7 +5,7 @@ function combos(a, k) {
   return out;
 }
 function aiLvl(G, c) { return (c && c.lvl) || G.diff; }   /* per car level; 'pro' is the planner behind the Suggest button */
-var AIP = { easy: { noise: 6, hw: 2.4, mis: 0.6, misBy: 4, lift: 0.75 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
+var AIP = { easy: { noise: 10, hw: 2.4, mis: 0.8, misBy: 5, lift: 0.97 }, normal: { noise: 1.6, hw: 1.6, mis: 0.08, misBy: 2 }, hard: { noise: 0.3, hw: 1.25, look: 1 }, pro: { noise: 0.15, hw: 1.25, look: 1 } };
 function aiP(G, c) { return AIP[aiLvl(G, c)] || AIP.normal; }
 function aiNoise(G, c) { return aiP(G, c).noise; }
 function heatW(c, extra, G) { return (G ? aiP(G, c).hw : 1.25) + (c.eng - extra <= 2 ? 0.9 : 0); }

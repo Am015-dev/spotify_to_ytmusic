@@ -103,6 +103,13 @@ function curveInfo() {   /* what the selected cards would do at the next corner 
   var burn = 0; ks.forEach(function (k) { burn += Math.max(0, shown - k.limit - ul); });
   return { sp: shown, uncertain: nx > 0 || UI.boost, burn: burn, spin: burn > c.eng - cost, ks: ks, cost: cost, next: nextCorner(c.pos), adr: adr };
 }
+function planAdvice(c, need) {   /* R19: the corner rule as plain advice: any speed up to the limit is safe, and so is stopping short */
+  var nc = nextCorner(c.pos);
+  if (!nc) return 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.';
+  var safe = Math.max(nc.limit, nc.d - 1);
+  if (safe >= 12) return 'Corner ' + nc.limit + ' is ' + nc.d + ' away: shift up.';
+  return 'Corner ' + nc.limit + ' in ' + nc.d + ': up to speed ' + safe + ' safe.';
+}
 function nextCorner(pos) {
   var tk = T(G), N = tk.N;
   for (var d = 1; d <= N; d++) { var lim = tk.corners[(pos + d) % N]; if (lim) return { d: d, limit: climit(G, lim) }; } return null;
@@ -128,8 +135,8 @@ function drawPlan() {
   if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
-  if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? 'Pick a gear, then tap ' + need + ' card' + (need > 1 ? 's' : '') + '.' : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
-  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + '. Press Go.', ''); }
+  if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
+  else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); setMsg('Speed ' + cq.sp + (cq.uncertain ? '?' : '') + (cq.spin ? ': you would spin out!' : cq.burn ? ': corner burns ' + cq.burn + ' heat.' : '. Press Go.'), cq.spin || cq.burn ? 'warn' : ''); }
   else { var ci = previewSet(curveInfo()); var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''); if (UI.note && /upgrade|:/.test(UI.note) && UI.sel.some(function (j) { return upgId(c.hand[j]); })) sp += ' (' + UI.note.split(':')[0] + ')'; setMsg((ci.spin ? sp + ': you would spin out!' : ci.burn ? sp + ': the corner burns ' + ci.burn + ' heat' : ci.ks.length ? sp + ': the corner is safe' : ci.next ? sp + ': road clear, corner in ' + ci.next.d : sp + ': road clear') + (ci.slip && !ci.spin ? ', slipstream likely' : '') + (ci.spin ? '' : '. ' + STORY.planGo), ci.spin ? 'warn' : ci.burn ? 'warn' : 'good'); }
   if (!ready) previewSet(null);
   RACE.ph = UI.swap ? 'discard' : (UI.sel.length || UI.touchedGear) ? 'play' : 'shift'; RACE.spdT = UI.sel.length ? curveInfo().sp : 0;   /* the needle revs as you tap cards */
@@ -178,7 +185,7 @@ function commit() {
   $('#panel').innerHTML = '<div class="reveal"><div class="cd back" data-art="card-back"></div><div class="cd back" data-art="card-back"></div></div>'; artApply($('#panel'));
   var nx = needPlans(G)[0]; if (nx != null) planFor(nx); else startRound();
 }
-function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = UI.mode === 'tutorial' ? 1 : 0.45;   /* your own turn plays in about 2 s (R3: it took 4-5 s) */ startResolve(G); runResolve(); }
+function startRound() { UI.busy = true; UI.skipStep = false; UI.pace = UI.mode === 'tutorial' ? 1 : 0.38;   /* your own turn plays in about 2 s (R3: it took 4-5 s) */ startResolve(G); runResolve(); }
 
 /* ================= resolving, with animation ================= */
 function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cls || ''; }
@@ -212,7 +219,7 @@ async function runResolve() {
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(0.35, UI.rival) : Math.max(0.6, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(0.24, UI.rival) : Math.max(0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
   return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
     var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
@@ -230,7 +237,7 @@ async function playEvents(ev) {
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     /* brisk rivals: a computer car's whole turn plays in about 1.2 s (tap anywhere: faster still); your own move keeps its full pace */
-    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? 0.4 : 0.26) : 0;
+    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? 0.4 : 0.16) : 0;   /* R19: about 0.7 s per rival car */
     if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
     if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(550); }
@@ -260,26 +267,18 @@ function showPlayed(e) {
   });
   h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
 }
-function qTimer(ms, label, btnSel, done) {   /* smart default: a short countdown on the skip button. A tap anywhere outside the panel takes the default now; touching the panel stops the countdown (then its buttons decide) */
-  if (tutOn() || UI.fast) return; var b = $(btnSel); if (!b) return; var t0 = performance.now(), base = label, stop = false;
-  b.classList.add('qt'); b.style.setProperty('--qt', '0');
-  var halt = function () { stop = true; clearInterval(UI.qT); var x = $(btnSel); if (x) { x.classList.remove('qt'); x.textContent = base; } document.removeEventListener('pointerdown', tapAny, true); };
-  var tapAny = function (e) { var pn = $('#panel'); halt(); if (!(pn && pn.contains(e.target)) && !e.target.closest('#modal,.gx-bar')) { e.preventDefault(); e.stopPropagation(); done(); } };
-  document.addEventListener('pointerdown', tapAny, true); UI.qHalt = halt;
-  clearInterval(UI.qT); UI.qT = setInterval(function () { if (stop) return; var k = Math.min(1, (performance.now() - t0) / ms), x = $(btnSel); if (!x) { halt(); return; }
-    x.style.setProperty('--qt', k.toFixed(3)); x.textContent = base + ' · ' + Math.max(0, (ms - (performance.now() - t0)) / 1000).toFixed(1); if (k >= 1) { halt(); done(); } }, 100);
-}
+function qTimer() {}   /* R19: a player's choice is never answered on a timer; the question waits for a tap */
 function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost, once per turn. Asked only when legal (1+ engine heat). */
   var p = G.pend, bc = G.cars[p.car], q2 = bc.pl2;
   /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
   if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
   var av = Math.round(avgSpeed(bc)), L0 = q2 ? landing(G, bc, q2.from + p.speed) : 0, risk = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 4), p.speed + 4, q2.lim) > bc.eng - 1;
   /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
-  if (!tutOn() && q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1) return Promise.resolve(false);
+  var spin1 = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1;   /* R19: always offered (a legal choice), marked when any flip would spin you */
   var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
-  setPhase('react'); setMsg('Speed ' + p.speed + '. Boost? Pay 1 heat, flip a card, add it.' + (risk ? ' A big flip could spin you.' : nc && !tutOn() ? ' Corner in ' + (nc.d + 1) + '.' : ''), risk ? 'warn' : '');
+  setPhase('react'); setMsg(spin1 ? 'Boost? Any flip spins you.' : risk ? 'Boost? A big flip could spin you.' : 'Boost? 1 heat: add the next speed card.', risk || spin1 ? 'warn' : '');   /* <= 8 words (phone-check) */
   var old = $('#bq'); if (old) old.remove();
-  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (risk ? ' (risky)' : '') + '</button></div>');
+  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (risk ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (spin1 ? ' (spins you)' : risk ? ' (risky)' : '') + '</button></div>');
   if (hintsOn() && UI.mode !== 'tutorial') sugMark(sug ? '#boostY' : '#boostN');
   return new Promise(function (res) {
     var fin = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
@@ -300,7 +299,7 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
     h += '</div><div class="slipq"><button id="discN">Keep all</button><button class="y" id="discY"' + (sel.length ? '' : ' disabled') + '>Discard ' + sel.length + '</button></div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
-    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Discard step: drop cards you do not want (not Heat or Stress), or keep all.');
+    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop unwanted cards, or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
@@ -331,7 +330,7 @@ function askSlip() {
 function loseLine() {   /* the line fits the place you got: podium praise, or one concrete tip */
   var me = G.cars.filter(function (c) { return c.human; })[0], k = me ? G.rank.indexOf(me.i) + 1 : 0;
   if (G.hot || !k) return pickLine(STORY.quickLose);
-  if (k <= 3) return 'You made the podium in ' + ord(k) + '. One cleaner corner and it is yours.';
+  if (k <= 3) return 'You made the podium in ' + ord(k) + '. ' + (me.stats.spins ? 'One cleaner corner and it is yours.' : me.stats.heat >= 6 ? 'Burn less heat in corners and it is yours.' : 'Shift up sooner on the straights and it is yours.');
   return 'You finished ' + ord(k) + '. Gear down before corners and keep heat for the last lap.';
 }
 function showResult() {
@@ -356,7 +355,19 @@ function sizeCanvas() {
   cv.width = Math.max(2, Math.round(r.width * dpr)); cv.height = Math.max(2, Math.round(r.height * dpr)); UI.W = r.width; UI.H = r.height;
   UI.cam.s = Math.max(UI.H < 330 ? 0.62 : 0.75, Math.min(1.3, Math.min(UI.W, UI.H * 1.3) / 420));   /* close camera: cars ~90-100 px (R9) */
   UI.cam.s = Math.max(UI.cam.s, UI.W / 2000, UI.H / 1200);   /* never show beyond the 2000x1200 board */
+  UI.camBase = UI.cam.s;
 }
+function planFrame() {   /* R19: while you plan, the camera frames your car and the next corner sign (with its limit), plus the move preview; returns {x, y, s} or null */
+  if (!G || G.phase !== 'plan' || UI.busy || !G.cars[UI.seat] || !G.cars[UI.seat].human || G.cars[UI.seat].fin) return null;
+  var c = G.cars[UI.seat], tk = T(G), nc = nextCorner(c.pos), pts = [carXY(c.i, UI.vis[c.i] ? UI.vis[c.i].p : c.pos)];
+  if (nc) { var q = tk.at(((c.pos + nc.d) % tk.N) * tk.seg); pts.push({ x: q.x + Math.sin(q.a) * 98, y: q.y - Math.cos(q.a) * 98 }); }
+  if (RACE.prev && RACE.prev.car === c.i) pts.push(tk.space(c.pos + RACE.prev.L, 0));
+  var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; pts.forEach(function (p) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
+  var W = UI.W, H = UI.H - (H0dash()), m = 90, base = UI.camBase || UI.cam.s;
+  var s = Math.min(base, (W - 40) / (x1 - x0 + 2 * m), (H - 40) / (y1 - y0 + 2 * m));
+  s = Math.max(s, Math.min(W / 2000, H / 1200)); return { x: (x0 + x1) / 2, y: (y0 + y1) / 2, s: s, corner: nc ? (c.pos + nc.d) % tk.N : -1 };
+}
+function H0dash() { return UI.H < 420 ? dashH(UI.W, UI.H) : 0; }
 function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1)) sizeCanvas(); } }
 window.addEventListener('resize', cvFit); window.addEventListener('orientationchange', function () { setTimeout(cvFit, 120); });
 if (window.ResizeObserver) { var cvRO = new ResizeObserver(cvFit); document.addEventListener('DOMContentLoaded', function () { var w = $('#cvw'); if (w) cvRO.observe(w); }); if (document.readyState !== 'loading') { var w0 = $('#cvw'); if (w0) cvRO.observe(w0); } }
@@ -398,16 +409,18 @@ function rr(x, y, w, h, r) { cx.beginPath(); cx.moveTo(x + r, y); cx.arcTo(x + w
 function frame(now) {
   requestAnimationFrame(frame); if (!G || $('#game').hidden || !cx) return;
   cvFit(); var W = UI.W, H = UI.H, cam = UI.cam, tk = T(G); UI.spinT = (now % 600) / 600;
-  var tgt = RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p), k = (UI.fast || window.ANIM === false) ? 1 : 0.12; cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k; cam.x = Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y));
+  var pf = planFrame(), tgt = pf || (RACE.prev && G.phase === 'plan' ? T(G).space((G.cars[RACE.prev.car].pos + RACE.prev.L) / 2, 0) : carXY(UI.focus, UI.vis[UI.focus].p)), k = (UI.fast || window.ANIM === false) ? 1 : 0.12; cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k;
+  var sT = pf ? pf.s : (UI.camBase || cam.s); cam.s += (sT - cam.s) * k; UI.planCorner = pf ? pf.corner : -1; cam.x = W / cam.s >= 2000 ? 1000 : Math.max(W / 2 / cam.s, Math.min(2000 - W / 2 / cam.s, cam.x)); cam.y = H / cam.s >= 1200 ? 600 : Math.max(H / 2 / cam.s, Math.min(1200 - H / 2 / cam.s, cam.y));   /* zoomed out past the board (planning frame): centred, grass around */
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
   var shk = camShake(now), dOff = H < 420 ? dashH(W, H) / 2 : 0;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
   tk.list.forEach(function (kk) {
-    var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98;
-    if (!artDraw(cx, 'ui-corner-sign', sx - 36, sy - 36, 72, 72, 'contain')) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(sx, sy, 34, 0, 7); cx.fill(); cx.lineWidth = 8; cx.strokeStyle = '#d8281d'; cx.stroke(); }
-    cx.fillStyle = '#111'; cx.font = '900 38px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2);
+    var q = tk.at(kk.idx * tk.seg), sx = q.x + Math.sin(q.a) * 98, sy = q.y - Math.cos(q.a) * 98, nx = kk.idx === UI.planCorner, z = nx ? Math.max(1, 0.62 / cam.s) : 1, r = 36 * z;   /* the next corner keeps a readable size while the camera is zoomed out */
+    if (nx) { cx.save(); cx.globalAlpha = 0.55 + 0.35 * Math.sin(now / 260); cx.lineWidth = 7 * z; cx.strokeStyle = '#ffd24a'; cx.beginPath(); cx.arc(sx, sy, r + 9 * z, 0, 7); cx.stroke(); cx.restore(); }
+    if (!artDraw(cx, 'ui-corner-sign', sx - r, sy - r, 2 * r, 2 * r, 'contain')) { cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(sx, sy, 34 * z, 0, 7); cx.fill(); cx.lineWidth = 8 * z; cx.strokeStyle = '#d8281d'; cx.stroke(); }
+    cx.fillStyle = '#111'; cx.font = '900 ' + Math.round(38 * z) + 'px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(climit(G, kk.limit), sx, sy + 2 * z);
   });
   artDraw(cx, 'ui-flag-checkered', tk.at(0).x - 40, tk.at(0).y - 150, 80, 60, 'contain');
   raceWorld(now);

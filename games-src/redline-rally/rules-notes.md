@@ -66,10 +66,11 @@ Quoted from the published rulebook (read online, 12 Nov 2026):
   "You can never choose to discard Stress or Heat cards (even the Upgrade ones)."
 As built now:
 - Boost: no planning toggle. After the reveal you are asked every turn you hold 1+ engine heat (the only legal limit):
-  "No boost" / "Boost -1 heat" (marked "risky" when a big flip could spin you). Smart default: "No boost" counts down 2.5 s and is
-  taken by itself; touching the panel stops the countdown. With Hints on, Boost is marked "Suggested" when it is the better play.
+  "No boost" / "Boost -1 heat" (marked "risky" when a big flip could spin you, "spins you" when any flip would). R19: no countdown;
+  the question waits for a tap, and it is asked even when a flip would spin you (a legal choice). The line says "flip to the next
+  speed card" (the rule flips until a speed card shows). With Hints on, Boost is marked "Suggested" when it is the better play.
 - Discard: offered every round after moving, whenever the hand holds a card that may go. Nothing is pre-selected; Heat and
-  Stress cannot be picked. Smart default: "Keep all" counts down 2.5 s; touching the hand stops it.
+  Stress cannot be picked. R19: no countdown; "Keep all" or "Discard n" is always a tap.
 - Tutorial teaches both exactly as raced (discard any non-Heat, non-Stress card; boost question after the reveal).
 - Logic tests R73 (discard offered every round, a 3 may go), R74 (boost asked after the reveal only with heat), R75 (UI has no gate/toggle).
 

@@ -50,7 +50,7 @@ const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SE
           const y = await p.evaluate(() => { const c = G.cars[G.pend.car], N = T(G).N; let near = false; for (let d = 1; d <= 8; d++) if (T(G).corners[(c.pos + G.pend.speed + d) % N]) near = true; return c.eng >= 5 && !near; });
           const timed = await p.$('#boostN.qt'); if (y) { qtaps--; qk.boost--; qk.boostYes = (qk.boostYes || 0) + 1; await tap('#boostY'); } else if (TAPALL || !timed) await tap('#boostN'); else { qtaps--; qk.boost--; qk.boostAuto = (qk.boostAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#bq'), null, { timeout: 4000 }).catch(() => probs.push('boost countdown stuck')); } }
         else if (st.pend === 'slip') await tap('#slipY');
-        else if (st.pend === 'disc') { if (TAPALL) await tap('#discN'); else { qtaps--; qk.disc--; qk.discAuto = (qk.discAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#discN'), null, { timeout: 4000 }).catch(() => probs.push('discard countdown stuck')); } }
+        else if (st.pend === 'disc') { if (true) await tap('#discN'); else { qtaps--; qk.disc--; qk.discAuto = (qk.discAuto || 0) + 1; await p.waitForFunction(() => !document.querySelector('#discN'), null, { timeout: 4000 }).catch(() => probs.push('discard countdown stuck')); } }
         continue;
       }
       if (++stuck > 900) { probs.push('stuck'); break; }
@@ -58,7 +58,7 @@ const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SE
     const hs = await p.evaluate(() => JSON.stringify(G.cars.find(c => c.human).stats)); const secs = (Date.now() - t0) / 1000, res = await p.evaluate(() => G.over ? G.rank.indexOf(G.cars.find(c => c.human).i) + 1 : 0);
     const rt = await p.evaluate(() => window.__rt), avg = rt.reduce((a, x) => a + x, 0) / Math.max(1, rt.length), mx = Math.max(...rt);
     if (!res) probs.push('race did not end'); if (secs > 300) probs.push('race took ' + secs.toFixed(0) + ' s');
-    if (qtaps > (TAPALL ? 60 : 15)) probs.push('skip taps ' + qtaps + ' > 15'); if (avg > 1500) probs.push('rival turn avg ' + avg.toFixed(0) + ' ms');
+    if (qtaps > 70) probs.push('question taps ' + qtaps + ' > 70');   /* R19: no countdowns; every question is answered by a tap */ if (avg > 1500) probs.push('rival turn avg ' + avg.toFixed(0) + ' ms');
     console.log(n, probs.length || errs.length ? 'FAIL' : 'PASS', 'diff', diff, 'place', res, 'decisions', turns, 'skip taps (No boost/Keep all/slip)', qtaps, JSON.stringify(qk), 'race', secs.toFixed(0) + 's', 'you', hs, 'Go->next decision avg', (waits.reduce((a, w) => a + w.ms, 0) / Math.max(1, waits.length) / 1000).toFixed(1) + 's', 'rival turn avg ' + avg.toFixed(0) + 'ms max ' + mx.toFixed(0) + 'ms (' + rt.length + ' turns)', errs.slice(0, 2).join('|'), probs.slice(0, 12).join(' | '));
     if (probs.length || errs.length) bad = 1; await c.close();
   }

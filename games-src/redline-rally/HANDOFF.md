@@ -71,3 +71,15 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - race-touch.js: plain player = sim-levels D (biggest cards, gear down near corners, boost at 5+ heat); gate counts skip taps.
 - r2: 375 board has no dashboard (gear, heat, next corner in the dock line, race.js dashOff); 1.5 s defaults, tap-anywhere;
   ?seed= now seeds the game. Touch placings: 390 seeds 11/21-24: 1,2,2,3,3; 375: 5,1,4,3. Go->next ~10 s in the test.
+
+## W496 round 5 (R19 re-review 6.8 FAIL fixes)
+- Planning camera (ui.js planFrame): frames your car, the next corner sign and the move preview; zooms out as far as needed
+  (grass beyond the board), the next corner sign keeps a readable size and pulses gold.
+- No timers: boost and discard questions wait for a tap (qTimer is a no-op). Boost is offered even when any flip spins you
+  ("spins you" tag); line says "flip to the next speed card".
+- Waits: rivals ~0.7 s each (UI.rival 0.16), own turn pace 0.38. newcomer-touch.js: tap->next decision avg 1.3 s, max <= 4 s.
+- Easy rivals gentler (AIP.easy noise 10, mis 0.8/5, lift 0.97): sim plain newcomer vs 4 Easy win 65%, podium 99%.
+  Normal/Hard unchanged; ladder order holds.
+- Plan line: "Corner 5 in 4: speed 5 or less is safe." (planAdvice); hints off still shows corner burn / spin.
+- Podium line fits the race (spins / heat / shift sooner); 375 result card compact (no scrolling under the buttons).
+- Tests: newcomer-touch.js (R19 gate, shots in playable-shots/r19/), tut-test.js now counts ignored taps.
