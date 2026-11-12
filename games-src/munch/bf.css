@@ -177,3 +177,12 @@ html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mo
 #dkgoal .dkgy{margin:0 0 14px;font-size:16px}
 #dkgoal .btn{width:100%;min-height:48px;font-size:17px;justify-content:center;text-align:center}
 #phchip,#docktitle{cursor:pointer}
+/* the advisor's one best move: a gold ★ on the card (shown on phones too), a steady pulse on the button */
+.mine .hand .card.bf-best::before,.mine .gear .gchip.bf-best::before{content:"★";position:absolute;top:-10px;right:-6px;z-index:9;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff6c8,#ffc93c 60%,#c8860e);color:#4a2400;font:900 15px/24px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #4a2400,0 0 10px rgba(255,200,60,.9);pointer-events:none}
+.mine .hand .card.bf-best::after{box-shadow:0 0 0 3px #ffe27a,0 0 0 7px rgba(255,200,60,.55),0 0 18px 6px rgba(255,190,50,.45)!important}
+.mine .gear .gchip.bf-best{position:relative;box-shadow:0 0 0 3px #ffe27a,0 0 12px rgba(255,200,60,.7)!important}
+/* the hand scroll cue: a 44px tab at the edge with the number of hidden cards */
+.hcue{position:absolute;z-index:12;min-width:48px;height:44px;padding:0 8px;border-radius:22px;border:2px solid #4a2400;background:linear-gradient(#fff2c4,#f0bf4c);color:#3a1a00;font:800 15px/40px system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.55);cursor:pointer}
+.hcue.r{right:2px}.hcue.l{left:2px}
+/* the "what to do now" line never cuts a word: it may take a second line */
+html.ph .bfline{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
