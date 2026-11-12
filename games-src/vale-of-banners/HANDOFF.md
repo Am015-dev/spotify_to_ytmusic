@@ -19,6 +19,10 @@ Branch `shelf/W350-vale-of-banners` (not deployed). Slug `vale-of-banners`, fold
 - Music: gx-music slots title/main/finale/victory/defeat, silent until `games/vale-of-banners/music/<slot>-a.mp3` exist (build lists them). Synth sfx, mute.
 
 ## AI (headless, `node gauntlet.js N A B [players]`)
+G7 fix (Nov 2026): new level `gentle` (greedy + wide noise) is the Quick-game default and the post-tutorial rival. gentle vs gentle 48%,
+easy vs gentle 73% (avg 101 vs 82), normal vs gentle 93%. The ★ Best badges and the bulb now follow the `hard` look-ahead move
+(hard vs gentle 92%, hard vs normal 67%); a player following ★ Best should beat the default. Rival turns ~2.4 s (was ~7 s), tap = faster.
+
 | match | games | win % | avg score |
 |---|---|---|---|
 | hard vs first-legal bot | 100 | 100% | 151 vs 25 (after the rulebook fixes; 159 vs 26 before) |

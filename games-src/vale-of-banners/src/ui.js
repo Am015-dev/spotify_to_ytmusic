@@ -99,7 +99,7 @@ function coach(id, text) {
 }
 function coachPump() {
   if (UI.cBusy || !UI.cq || !UI.cq.length) return; var t = UI.cq.shift(); if (!t) return coachPump();
-  UI.cBusy = true; say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : readMs(VSTORY.guide.name + ' ' + t) + 900);
+  UI.cBusy = true; var tutOn = false; try { tutOn = typeof GXT !== 'undefined' && GXT.active(); } catch (e) { } if (tutOn) lineSay(VSTORY.guide.name + ': ' + t); else say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : readMs(VSTORY.guide.name + ' ' + t) + 900);
 }
 function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and at turn starts (m null) */
   if (UI.mode !== 'tutorial' || !G || (typeof GXT !== 'undefined' && GXT.running())) return;
@@ -128,13 +128,14 @@ function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and
   }
   if (G.over) coach('season');
 }
-function stepMs() { return UI.fast ? 0 : UI.quick ? 160 : animMs(800); }
+function stepMs() { return UI.fast ? 0 : UI.quick ? 90 : animMs(300); }   /* rival beats: brisk (~2 s a turn), a tap makes them near-instant */
 function turnBanner() {
   if (!G || G.over) return; var a = VB.actor(G), hu = G.seats.filter(function (s) { return s.human; }).length;
   var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
-  UI.hold = UI.fast ? 0 : Date.now() + animMs(1000);
+  try { var orr = $('#opp').getBoundingClientRect(); if (orr.height) { b.style.top = Math.round(orr.top + orr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* sit over the rival strip: never over a glowing target */
+  UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
   if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
 }
 function describe(m, s) {
@@ -215,10 +216,19 @@ function previewPlace(m) {   /* points this build adds right now, region progres
   var reg = VB.REGIONS[VB.CELLS[m.cell].reg], f = reg.cells.filter(function (x) { return r.G.P[r.s].estate[x]; }).length;
   return (P0.cell[k] = { n: n, why: why, f: f, size: reg.cells.length, val: VB.evalSeat(r.G, r.s) - P0.base });
 }
+function hardMove() {   /* the look-ahead best move for the human (cached per state); drives every ★ and the bulb */
+  var P0 = pvReset(); if (P0.hard !== undefined) return P0.hard;
+  try { P0.hard = VB.aiMove(VB.fclone(G), 'hard'); } catch (e) { P0.hard = null; } return P0.hard;
+}
 function takeValues() {   /* value of every legal take for the best-pick badge */
   var P0 = pvReset(); if (P0.take) return P0.take; var o = {}, best = null;
   VB.validMoves(G).forEach(function (m) { if (m.k !== 'take' && m.k !== 'grab' && m.k !== 'buy') return; if (UI.die != null && m.die != null && m.die !== UI.die) return; var id = m.k === 'buy' ? 'bl-' + m.slot : 'mt-' + m.v + '-' + m.slot, v = valOf(m, P0.base) - (m.w || 0) * 0.6; if (o[id] == null || v > o[id]) o[id] = v; });
   for (var id in o) if (best == null || o[id] > o[best]) best = id;
+  /* the star follows the look-ahead pick (whole turn), not the one-step greedy value: no star when taking is not the best move */
+  var hm = hardMove();
+  if (hm) { var hid = hm.k === 'buy' ? 'bl-' + hm.slot : (hm.k === 'take' || hm.k === 'grab') ? 'mt-' + hm.v + '-' + hm.slot : null;
+    if (hid && o[hid] != null) { var top = o[best]; best = hid; o[hid] = Math.max(o[hid], top) + 0.01; }
+    else if (UI.die == null || (hm.die != null && hm.die === UI.die)) best = null; }
   return (P0.take = { v: o, best: best });
 }
 /* move rating: every action of a human turn is compared with the greedy best action at that moment */
@@ -265,7 +275,8 @@ function me() { return G.P[UI.view]; }
 function isHuman(s) { return G.seats[s] && G.seats[s].human; }
 function myTurn() { return G && !G.over && isHuman(VB.actor(G)) && !UI.busy && !tvOpen(); }
 function tvOpen() { return !$('#tv').hidden; }
-function animMs(x) { if (UI.fast) return 0; try { return GX.animMs(x); } catch (e) { return x; } }
+function animMs(x) { if (UI.fast) return 0; var k = rivalNow() ? (UI.quick ? 0.15 : 0.55) : 1; try { return Math.round(GX.animMs(x) * k); } catch (e) { return Math.round(x * k); } }
+function rivalNow() { try { return !!G && !G.over && !isHuman(VB.actor(G)) && !(UI.mode === 'tutorial'); } catch (e) { return false; } }   /* rival animations run at about half length */
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 function save() { try { if (G && !G.over && UI.mode === 'quick') localStorage.setItem('vob_save', JSON.stringify(G)); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem('vob_save'); } catch (e) { return false; } }
@@ -324,8 +335,8 @@ function fitMarket() {   /* phone tabs: shrink the stalls (or lay the six stalls
     mk.classList.toggle('six', six); mk.style.gridTemplateColumns = six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = six ? '3px' : '6px';
     var h0 = hx; mk.style.setProperty('--hex', h0 + 'px');
     while (bottom() > limit && h0 > 30) { h0 -= 2; mk.style.setProperty('--hex', h0 + 'px'); }
-    var r = { six: six, hex: h0, fit: bottom() <= limit };
-    if (!best || (r.fit && !best.fit) || (r.fit === best.fit && r.hex > best.hex)) best = r;
+    var r = { six: six, hex: h0, b: bottom() }; r.fit = r.b <= limit;
+    if (!best || (r.fit && !best.fit) || (r.fit && best.fit && r.hex > best.hex) || (!r.fit && !best.fit && r.b < best.b)) best = r;   /* nothing fits: take the shorter layout */
   });
   mk.classList.toggle('six', best.six); mk.style.gridTemplateColumns = best.six ? 'repeat(6,minmax(0,1fr))' : 'repeat(3,1fr)'; mk.style.gap = best.six ? '3px' : '6px'; mk.style.setProperty('--hex', best.hex + 'px');
   L.mkFit = best;
@@ -350,6 +361,19 @@ function renderRival() {
   var box = h('div.minies'); r.appendChild(box); var hh = r.clientHeight - 40, w = r.clientWidth;
   var S = Math.min(w / (7 * 1.732 + 0.4), hh / 11.1); renderEstate(box, s, S);
 }
+function autoZoom() {   /* small phones: when build spaces glow and would be under 44 px, zoom the estate onto them (Fit / pinch undo it) */
+  if (UI.fast || !G || !L.tabs || UI.tab !== 'estate' || UI.busy) return;
+  var need = 46 / (L.s * 1.732); if (need <= 1.02) return;
+  var gl = [].slice.call(document.querySelectorAll('#es .cell.glow')), drag = !!(FEEL.drag && FEEL.drag.on);
+  if (!gl.length || !myTurn()) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } return; }
+  var key = gl.map(function (e) { return e.getAttribute('data-ci'); }).join(','); if (UI.autoZ === key) { var er = $('#es').getBoundingClientRect(); if (gl.every(function (e) { var r = e.getBoundingClientRect(), x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2; return x > er.left && x < er.right && y > er.top && y < er.bottom; })) return; }   /* same spaces, but re-centre if one drifted out of view */
+  if (FEEL.cam.z > 1.02 && !UI.autoZ) return;   /* the player zoomed by hand: leave it */
+  var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  gl.forEach(function (e) { var xy = cellXY(VB.CELLS[+e.getAttribute('data-ci')], L.s, L.ew, L.eh); x0 = Math.min(x0, xy.x); x1 = Math.max(x1, xy.x); y0 = Math.min(y0, xy.y); y1 = Math.max(y1, xy.y); });
+  var zf = Math.min((L.ew - 56) / Math.max(1, x1 - x0), (L.eh - 56) / Math.max(1, y1 - y0)), zz = Math.max(1, Math.min(2.6, need, zf));   /* never zoom a glowing space out of view */
+  if (zz <= 1.02) { if (UI.autoZ) { UI.autoZ = null; if (!drag) camReset(true); } UI.autoZ = key; return; }
+  var c = FEEL.cam; c.z = zz; c.x = L.ew / 2 - (x0 + x1) / 2 * c.z; c.y = L.eh / 2 - (y0 + y1) / 2 * c.z; camClamp(); camApply(null, !drag); UI.autoZ = key;
+}
 function fitEstate() {   /* phone: the estate takes what the market leaves */
   var b = $('#bd'), mk = $('#mk'), W = b.clientWidth, H = b.clientHeight; if (W > H * 1.15 && !portraitPhone()) return;
   if (phoneTabs()) { L.s = Math.max(12, Math.min(L.ew / (7 * 1.732 + 0.4), L.eh / 11.1)); $('#es').style.cssText = (UI.tab === 'estate' ? '' : 'display:none;') + 'left:' + L.ex + 'px;top:' + L.ey + 'px;width:' + L.ew + 'px;height:' + L.eh + 'px;--hex:' + Math.floor(L.s * 1.732 + 1) + 'px'; return; }
@@ -365,6 +389,7 @@ function render() {
   if (!G) return;
   document.body.classList.toggle('gx-myturn', !!myTurn()); document.body.classList.toggle('gx-selecting', UI.sel != null && !!myTurn());
   layout(); renderBar(); renderOpp(); renderMarket(); fitMarket(); fitEstate(); renderEstate(); renderDock(); renderScores(); fitMarket();   /* again: the dock may have grown */
+  autoZoom();
   if (L.tabs) { ensureTabs(parseInt($('#tabs').style.top, 10) || 50, 6); renderRival(); }
   try { artApply(); } catch (e) { }
   toastPos();
@@ -394,6 +419,10 @@ function legalTakeFor(d, slot) {
   if (top && top.t !== 'castle') return [];
   return movesWhere(function (m) { return m.k === 'take' && m.v === d && m.slot === slot; });
 }
+function costTip() {   /* the dark number on a tile has a legend the first time it shows in a game */
+  if (UI.costTipDone || UI.mode === 'tutorial' || !myTurn() || (L.tabs && UI.tab !== 'market')) return; UI.costTipDone = true;
+  setTimeout(function () { lineSay('A number on a tile = workers it costs to take with your dice.', 4000); }, 50);
+}
 function renderMarket() {
   var mk = $('#mk'); mk.innerHTML = ''; var mt = myTurn(), top = pend();
   for (var d = 1; d <= 6; d++) (function (d) {
@@ -403,7 +432,7 @@ function renderMarket() {
     G.depots[d].forEach(function (t, k) {
       if (!t) { tl.appendChild(h('div.hx.empty', { style: 'background:rgba(255,255,255,.08)', 'aria-hidden': 'true' })); return; }
       var lg = mt ? legalTakeFor(d, k) : [], b = h('button.tilebtn' + (lg.length ? '.glow' : ''), { type: 'button', id: 'mt-' + d + '-' + k, 'data-drag': lg.length && !pend() ? 'mtile' : null, 'data-idx': d * 10 + k, 'aria-label': VB.tileName(t) + ' in stall ' + d, onclick: function () { tapMarket(d, k); } }, [hexEl(t)]); labelled(b, t);
-      var best = pick(lg.slice()); if (best && best.w) b.appendChild(h('span.cost', { text: '' + best.w, title: 'Costs ' + best.w + ' worker' + (best.w > 1 ? 's' : '') }));
+      var best = pick(lg.slice()); if (best && best.w) { b.appendChild(h('span.cost', { text: '' + best.w, title: 'Costs ' + best.w + ' worker' + (best.w > 1 ? 's' : '') })); costTip(); }
       if (lg.length && hints() && takeValues().best === 'mt-' + d + '-' + k) { b.classList.add('bestt'); b.appendChild(h('span.bestb', { text: '★ Best', title: 'Best pick for you right now' })); }
       tl.appendChild(b);
     });
@@ -432,6 +461,7 @@ function renderEstate(box, seat, s) {
   var es = box || $('#es'), p = G.P[seat == null ? UI.view : seat], S = s || L.s, W = box ? S * 7 * 1.732 + 4 : L.ew, HH = box ? S * 11 : L.eh;
   es.innerHTML = ''; var tg = box ? {} : placeTargets(), pv = {}, bestC = null;
   if (hints()) Object.keys(tg).forEach(function (ci) { var x = previewPlace(tg[ci]); if (!x) return; x.val -= (tg[ci].w || 0) * 0.6; pv[ci] = x; if (bestC == null || x.val > pv[bestC].val) bestC = ci; });
+  if (hints() && !box) { var hm2 = hardMove(); if (hm2 && hm2.k === 'place' && pv[hm2.cell] && (UI.sel == null || hm2.s === UI.sel)) bestC = String(hm2.cell); }
   if (box) { es.style.width = W + 'px'; es.style.height = HH + 'px'; es.style.setProperty('--hex', Math.floor(S * 1.732 + 1) + 'px'); }
   var host = es; if (!box) { host = h('div', { id: 'esin', style: 'width:' + W + 'px;height:' + HH + 'px' }); es.appendChild(host); camClamp(); camApply(host); }
   var cb = !box && FEEL.combo;
@@ -456,7 +486,7 @@ function renderDock() {
   var gc = !G.over && goalChips(), dt = $('#docktitle');
   if (gc) { dt.innerHTML = ''; dt.appendChild(gc); dt.classList.add('goals'); } else dt.classList.remove('goals');
   if (!gc) dt.textContent = G.over ? 'Game over' : isHuman(a) ? 'Your move' : G.seats[a].name + '\'s turn · tap to speed up';
-  $('#prompt').textContent = UI.note || promptText();
+  var pr0 = $('#prompt'); pr0.textContent = UI.note || promptText(); pr0.classList.remove('full'); pr0.onclick = function () { pr0.classList.toggle('full'); };   /* short phones clamp the line: tap to read it all */
   var cb = $('#chainb'); if (UI.chain > 1 && mt) { cb.textContent = 'Chain of ' + UI.chain + '. Build again'; cb.classList.add('on'); } else cb.classList.remove('on');
   /* dice */
   var dr = $('#dicerow'); dr.innerHTML = ''; var theirs = !G.over && !isHuman(a);
@@ -688,7 +718,8 @@ function doMove(m) {
         if (ev.p !== UI.view) { setCap(G.seats[ev.p].name + ' builds ' + aName(ev.tile) + (ev.chain ? ', for free' : '')); return rivalPeek(ev); }
         var dst = 'ec-' + ev.cell, el = document.getElementById(dst); if (el) el.style.visibility = 'hidden';
         if (ev.chain && prevCell != null) ribbon(rectOf('ec-' + prevCell), rectOf(dst));
-        var z0 = FEEL.cam.z; return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
+        var z0 = FEEL.cam.z; if (L.tabs && (UI.autoZ || z0 <= 1.02)) UI.autoZ = 'anim';   /* an animation zoom is not a hand zoom: autoZoom may undo it */
+        return (L.tabs ? camTo(ev.cell, Math.max(z0, 1.3)) : camTo(ev.cell)).then(function () { if (!src) src = rectOf('st-0'); return fly(src, rectOf(dst), ev.tile); }).then(function () { buzz(10); if (el) { el.style.visibility = ''; el.animate && el.animate([{ transform: 'translate(-50%,-50%) scale(1.25)' }, { transform: 'translate(-50%,-50%) scale(1)' }], { duration: animMs(260) || 1 }); } if (ev.chain && chainNow > 1) popAt(rectOf(dst), 'Chain of ' + chainNow); if (L.tabs && z0 <= 1.01) setTimeout(function () { if (!(FEEL.drag && FEEL.drag.on)) camReset(true); }, animMs(700)); });
       }
       if (ev.e === 'score') { sfx('score'); var rr = ev.cell != null && ev.p === UI.view ? rectOf('ec-' + ev.cell) : rectOf('r-vp'); if (ev.p !== UI.view) { var pc = UI.peekCell && ev.cell != null ? UI.peekCell.getBoundingClientRect() : null, oc = document.querySelector('.och[data-seat="' + ev.p + '"]'); rr = pc || (oc && oc.getBoundingClientRect()); } var why = '+' + ev.n + ' ' + (WHY[ev.why] || 'points'); if (ev.why === 'region' && ev.cell != null && hints()) { var bz = VB.PHASE_BONUS[Math.min(4, G.phase)]; why += ' (' + (ev.n - bz) + ' size + ' + bz + ' early)'; } if (ev.why === 'region' && ev.cell != null) flashRegion(ev.cell, ev.p); popAt(rr, why); if (ev.p !== UI.view) setCap(G.seats[ev.p].name + ': ' + why); return Promise.all([flyPts(rr, scoreEl(ev.p), '+' + ev.n), wait(UI.quick ? 80 : animMs(ev.why === 'region' ? 900 : 550))]).then(function () { renderOpp(); }); }
       if (ev.e === 'sell') { sfx('sell'); return wait(animMs(200)); }
@@ -723,7 +754,7 @@ function schedule() {
   var a = VB.actor(G);
   if (isHuman(a)) { try { GX.showDock(); } catch (e) { } return; }
   if (UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && !UI.tutAi) return;
-  var dl = UI.fast ? 5 : Math.max(UI.quick ? 120 : (GX.aiDelay ? GX.aiDelay(450) : 450), (UI.hold || 0) - Date.now());
+  var dl = UI.fast ? 5 : Math.max(UI.quick ? 60 : (GX.aiDelay ? GX.aiDelay(180) : 180), UI.quick ? 0 : (UI.hold || 0) - Date.now());
   UI.aiT = setTimeout(function () { if (UI.busy || !G || G.over || isHuman(VB.actor(G))) return; aiPlay(VB.aiMove(G)); }, dl);
 }
 
@@ -733,12 +764,20 @@ function startGame(o) {
   var n = o.n || 2, seats = [];
   for (var i = 0; i < n; i++) seats.push(i === 0 ? { name: o.myName || 'You', human: true } : { name: (o.names && o.names[i]) || VB.SEATNAME[i], human: !!(o.hot && o.hot[i]), ai: o.ai || 'normal', style: o.style || null });
   G = VB.newGame({ n: n, teams: !!o.teams, seed: o.seed, phases: o.phases || 5, rounds: o.rounds, seats: seats, bonus: o.bonus, noBlack: o.noBlack });
-  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
+  UI.view = 0; UI.sel = null; UI.die = null; UI.chain = 0; UI.busy = false; UI.costTipDone = false; UI.autoZ = null; UI.mode = o.mode || 'quick'; UI.camp = UI.mode === 'story'; UI.lastHuman = -1;
   $('#start').hidden = true; $('#rs').hidden = true; $('#tv').hidden = true;
 
   UI.quick = false; UI.cap = ''; UI.pinTab = null; UI.tab = 'estate'; UI.bump = {}; FEEL.cam = { z: 1, x: 0, y: 0 }; save(); render(); musSync(); sfx('dice'); hintSync(); if (UI.mode === 'quick' && !UI.fast && !QS.get('scn')) showGoal(); else { if (UI.mode !== 'quick') toast(VB.PHASES[0] + ' begins', 1600); turnBanner(); } schedule();
 }
 function resume() { try { G = JSON.parse(localStorage.getItem('vob_save')); } catch (e) { G = null; } if (!G) return showTitle(); UI.mode = 'quick'; UI.camp = false; UI.busy = false; $('#start').hidden = true; render(); musSync(); schedule(); }
+function marginLine(won) {   /* the words match the gap: never 'close one' after a 50-point loss */
+  var vs = G.P.map(function (p) { return p.vp; }), me = vs[0], others = vs.slice(1), ref = won ? Math.max.apply(null, others) : Math.max.apply(null, vs);
+  var n = Math.abs(me - ref), set = won ? VSTORY.quickWin : VSTORY.quickLose, k = n <= 8 ? 'close' : n <= 25 ? 'clear' : 'big';
+  if (G.teams) n = Math.abs(G.teamVP[0] - G.teamVP[1]), k = n <= 8 ? 'close' : n <= 25 ? 'clear' : 'big';
+  if (n === 0) return won ? 'Tied on points: you win the tie-break.' : 'Tied on points: lost on the tie-break.';
+  var line = set[k].replace('N', n + (n === 1 ? ' point' : ' points'));
+  return G.seats.some(function (x) { return x.ai === 'gentle'; }) ? line.replace('Try a gentler rival, or follow', 'Follow') : line;
+}
 function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { } musSync(); showResult(); }
 function showResult() {
   var rs = $('#rs'); toastOff(); rs.innerHTML = ''; UI.cq = []; clearTimeout(UI.cT); UI.cBusy = false; var gd0 = $('#guide'); if (gd0) gd0.classList.remove('on'); var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
@@ -758,7 +797,7 @@ function showResult() {
     c.appendChild(h('p.voice', {}, [h('b', { text: VSTORY.guide.name + ': ' }), document.createTextNode(won ? VSTORY.tut.result.win : VSTORY.tut.result.lose)]));
     try { GXT.markDone('vale-of-banners'); } catch (e) { }
   }
-  var vline = UI.mode === 'tutorial' ? null : G.solo ? (won ? VSTORY.soloWin : VSTORY.soloLose) : UI.camp ? null : (won ? VSTORY.quickWin : VSTORY.quickLose);
+  var vline = UI.mode === 'tutorial' ? null : G.solo ? (won ? VSTORY.soloWin : VSTORY.soloLose) : UI.camp ? null : marginLine(won);
   if (vline) c.appendChild(h('p.voice', { text: vline }));
   var cd = null; try { cd = UI.camp && GXC.active(); } catch (e) { }
   if (cd) {   /* Story: say which goal decided the chapter and which star goals were met */
@@ -770,7 +809,7 @@ function showResult() {
   }
   var ac = h('div.acts', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:10px' });
   if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) ac.appendChild(h('button.btn', { type: 'button', id: 'campfin', text: 'Continue the story', onclick: function () { rs.hidden = true; try { GXC.finish(G); } catch (e) { console.error(e); } } }));
-  else if (UI.mode === 'tutorial') { ac.appendChild(h('button.btn', { type: 'button', id: 'realB', text: 'Play a real game', onclick: function () { UI.mode = 'quick'; UI.lastOpts = { n: 2, ai: 'easy' }; startGame(UI.lastOpts); } })); }
+  else if (UI.mode === 'tutorial') { ac.appendChild(h('button.btn', { type: 'button', id: 'realB', text: 'Play a real game', onclick: function () { UI.mode = 'quick'; UI.lastOpts = { n: 2, ai: 'gentle' }; startGame(UI.lastOpts); } })); }
   else ac.appendChild(h('button.btn', { type: 'button', id: 'again', text: 'Play again', onclick: function () { startGame(UI.lastOpts || {}); } }));
   ac.appendChild(h('button.btn.alt', { type: 'button', id: 'lookB', text: 'Look at the board', onclick: function () { rs.hidden = true; } }));
   if (!UI.camp) ac.appendChild(h('button.btn.alt', { type: 'button', id: 'titleB', text: 'Title', onclick: showTitle }));
@@ -779,7 +818,7 @@ function showResult() {
 }
 
 /* ---------------- title + quick setup ---------------- */
-var SET = { n: 2, ai: 'normal', hot: 0, teams: 0 };
+var SET = { n: 2, ai: 'gentle', hot: 0, teams: 0 };
 function showTitle() {
   clearTimeout(UI.aiT); try { GXT.stop(); } catch (e) { } try { GXC.close(); } catch (e) { } GX.close && GX.close();
   var st = $('#start'); st.innerHTML = ''; st.hidden = false; $('#rs').hidden = true; $('#tv').hidden = true;
@@ -803,7 +842,7 @@ function showSetup() {
   }
   c.appendChild(seg('Players', [[1, 'Solo'], [2, '2'], [3, '3'], [4, '4']], SET.n, function (v) { SET.n = v; SET.hot = Math.max(0, Math.min(SET.hot, v - 1)); }));
   if (SET.n > 1) {
-    c.appendChild(seg('Computer players', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
+    c.appendChild(seg('Computer players', [['gentle', 'Gentle'], ['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']], SET.ai, function (v) { SET.ai = v; }));
     var hs = [[0, 'None']]; for (var i = 1; i < SET.n; i++) hs.push([i, String(i)]);
     c.appendChild(seg('Friends on this device', hs, SET.hot, function (v) { SET.hot = v; }));
     if (SET.n === 4) c.appendChild(seg('Teams', [[0, 'Each alone'], [1, '2 v 2']], SET.teams, function (v) { SET.teams = v; }));
@@ -880,7 +919,7 @@ function helpInit() {
       'p-ship': { target: function () { return $('#mk'); }, title: 'Barge', text: 'Load all goods from one stall.' }
     }, rules: [{ title: 'Dice', text: 'A die can take, build, sell or hire.' }, { title: 'Regions', text: 'Fill an outlined region. Early pays more.' }] });
     GXH.bulb({ el: '#bulbbtn', suggest: function () {
-      if (!myTurn()) return null; var c = VB.fclone(G), m = VB.aiMove(c, 'normal'); if (!m) return null;
+      if (!myTurn()) return null; var m = hardMove(); if (!m) return null;
       var tgt = m.k === 'take' || m.k === 'grab' ? $('#mt-' + m.v + '-' + m.slot) : m.k === 'place' ? $('#st-' + m.s) : m.k === 'sell' ? $('#gd-' + m.v) : m.k === 'buy' ? $('#bl-' + m.slot) : m.k === 'end' ? $('#endB') : m.k === 'workers' ? $('#acts .btn') : $('#acts');
       return { target: tgt || $('#dock'), why: VB.why(G, m) };
     }, rulesFor: helpPhase });
@@ -1000,7 +1039,7 @@ function tutStart(o) {
   });
   GXT.start({ game: 'vale-of-banners', story: true, endTitle: VSTORY.endTitle, endText: VSTORY.endText, setup: tutSetup, steps: steps, onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }
-    if (r && r.choice === 'story') storyOpen(); else { UI.lastOpts = { n: 2, ai: 'easy' }; startGame(UI.lastOpts); }
+    if (r && r.choice === 'story') storyOpen(); else { UI.lastOpts = { n: 2, ai: 'gentle' }; startGame(UI.lastOpts); }
   }, onExit: function () { UI.mode = 'quick'; showTitle(); } });
 }
 

@@ -322,5 +322,34 @@ html.gx-noanim .fly,html.gx-reduce .fly{transition:none}
 .rules li,.rules p{font-size:15px!important}.tcard .btn{font-size:16px!important}
 #prompt.note{color:#7a2a12;font-weight:800}
 .goal ol{margin:6px 0 8px;padding-left:22px;line-height:1.45}
+
+/* G7 fixes: crate targets 44px+, worker badges never over names, short phones keep the turn banner off the estate */
+.stgoods.glow{min-width:44px;min-height:44px;align-items:center;justify-content:center;box-sizing:border-box}
+.tilebtn.lab .cost{top:2px!important;bottom:auto!important;right:-4px!important;z-index:1}
+#mk.big.six .tilebtn.lab .cost{top:1px!important;right:-2px!important;line-height:15px}
+.tilebtn.lab .tlab{z-index:4}
+#mk.big.six .stall:not(.lane) .tilebtn.lab .tlab{max-width:calc(100% + 2px);overflow:hidden;text-overflow:clip;letter-spacing:-.3px;padding:0 3px}
+@media (max-height:760px){#tbanner{top:96px;font-size:22px;padding:8px 18px}#tbanner .rd{width:32px;height:32px;font-size:20px}}
+/* R1 fixes: small portrait phones. The dock packs dice + storage on one row so every action button fits on screen
+   (375x667, 360x640); the dock body scrolls with the action row pinned to its bottom as a last resort. Crates are 44x44. */
+#mk .stgoods.glow{min-width:44px!important;min-height:44px!important}
+.cell.glow{min-width:44px}
+#tbanner.top{font-size:20px;padding:3px 14px;gap:10px;max-width:calc(100vw - 16px);box-sizing:border-box}#tbanner.top .rd{width:28px;height:28px;font-size:18px}
+@media (max-width:640px) and (orientation:portrait){
+  #dockbody{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 8px;align-items:center;overflow-y:auto;touch-action:pan-y}
+  #dockbody>.drow{display:contents}
+  #prompt{order:-2;grid-column:1/-1}#chainb{order:-1;grid-column:1/-1}
+  #dicerow{order:1;grid-column:1;flex-wrap:nowrap;gap:4px}#store{order:2;grid-column:2;justify-self:end;flex-wrap:wrap;justify-content:flex-end}
+  #resrow{order:3;grid-column:1/-1;gap:6px}#goods{order:4;grid-column:1/-1}
+  #acts{order:5;grid-column:1/-1;position:sticky;bottom:-8px;z-index:2;background:var(--parch,#f4ecd8);padding:2px 0 8px;margin-bottom:-8px}
+  #acts:empty{display:none}
+  .gx-dock{max-height:min(46dvh,320px)}
+  #store{--hex:34px;gap:4px}#store .slot{width:44px;height:46px;box-sizing:border-box}#dicerow .die.white{width:32px;height:32px}
+  #prompt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+}
+@media (max-width:640px) and (orientation:portrait) and (max-height:700px){
+  #prompt{-webkit-line-clamp:2}#prompt.full{-webkit-line-clamp:unset;display:block}
+  #dicerow.theirs{flex-wrap:wrap}
+}
 </style>
 </head>
