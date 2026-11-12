@@ -1,7 +1,7 @@
 // ===================== part 1: state, drawing helpers, render (one board: sites, research track, market; your tray below) =====================
 const V = VD, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 let G = null;
-const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'normal', hot: false }, prefs: {}, tut: null, sel: null };
+const UI = { mode: 'vs', humans: [0], view: 0, mv: [], insp: null, busy: false, camp: null, started: false, fast: false, opts: { opp: 1, lvl: 'easy', hot: false }, prefs: {}, tut: null, sel: null };
 const COL = ['var(--p0)', 'var(--p1)', 'var(--p2)', 'var(--p3)'], HEX = ['#2bb3a6', '#e9a22a', '#d6493b', '#9a6ad6'];
 const SAVEKEY = 'vinegrave-save', PREFKEY = 'vinegrave-prefs';
 try { UI.prefs = JSON.parse(localStorage.getItem(PREFKEY) || '{}') || {}; } catch (e) { UI.prefs = {}; }
@@ -20,7 +20,7 @@ function resHTML(r) { return Object.keys(r).map(k => `<span class="chip"><span c
 function opsHTML(ops) { return `<span class="sm">${esc(V.opText(ops))}</span>`; }
 function effShort(c) {   /* a card's effect in 1-4 words for the card face ("+1 compass", "draw 2") */
   if (c.t === 'fear') return 'No effect';
-  const one = o => o.g ? (Object.keys(o.g).length > 2 ? '+' + Object.values(o.g).reduce((a, b) => a + b, 0) + ' goods' : Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ')) : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
+  const one = o => o.g ? (Object.keys(o.g).length > 2 ? '+' + Object.values(o.g).reduce((a, b) => a + b, 0) + ' goods' : Object.keys(o.g).map(k => '+' + o.g[k] + ' ' + rw(k, o.g[k]).replace('arrowhead', 'arrow')).join(' ')) : o.p ? 'trade' : o.d ? 'draw ' + o.d : o.x ? 'exile' : o.r ? 'climb research' : o.b ? 'cheap buy' : o.fd ? 'free dig' : o.or ? 'choose' : '';
   const ops = (c.ops || []).map(one).filter(Boolean); if (ops.indexOf('trade') >= 0) return 'Trade'; if (ops.indexOf('choose') >= 0) return 'Choose one';
   const u = []; ops.forEach(o => { const f = u.find(x => x.o === o); if (f) f.n++; else u.push({ o, n: 1 }); });
   return u.slice(0, 2).map(x => x.n > 1 ? x.o + ' twice' : x.o).join(', ');
@@ -118,26 +118,34 @@ function render() {
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = 1; }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => id ? cardHTML(id, { a: 'row', r, glow: gR[r], sel: S.k === 'row' && S.x === r }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>').join('') + '</div>';
   renderTray(L, q, me, actor);
+  { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(myTurn() && !q && !UI.sel && G.phase === 'play' && /research|Research/.test($('#prompt').textContent))); }
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
   if (typeof artApply === 'function') artApply();
   if (typeof bestBadges === 'function') try { bestBadges(); } catch (x) { }
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
   if (UI.insp) refreshInsp();
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
+  guidedGlow();
+}
+setInterval(() => { if (typeof UI !== 'undefined' && UI.mode === 'tutorial') guidedGlow(); }, 250);   /* the tutor changes step without a render */
+/* guided tutorial step: only the step's target glows, so a tap on anything else is never a dead tap on a glowing piece */
+function guidedGlow() {
+  try { if (UI.mode !== 'tutorial' || !window.GXT || !GXT.active()) return; const st = GXT.current(); if (!st || !st.wait || typeof st.target !== 'function') return;
+    const t = st.target(); if (!t) return; document.querySelectorAll('#map .glow,#row .glow,#hand .glow,#pawns .glow,#track.glow').forEach(e => { if (e !== t && !t.contains(e) && !e.contains(t)) e.classList.remove('glow'); }); } catch (x) { }
 }
 function renderTray(L, q, me, actor) {
   const over = G.phase === 'over', mine = myTurn(), S = UI.sel;
   document.body.classList.toggle('vg-pick', !!mine && !over && !q && L.some(m => m.t !== 'pass' && !m.free));
   $('#dock').classList.toggle('mine', !!mine && !over);
   // prompt line + the one button that fits now
-  let txt, acts = '';
+  let txt, acts = '', selGo = false;
   if (over) { txt = 'The expedition is over.'; acts = '<button type="button" class="btn go" data-a="showres">See the result</button>'; }
   else if (!mine) txt = actor < 0 ? 'The round is ending.' : who(actor) + ' is choosing. Tap to skip ahead.';
   else if (q) txt = qPrompt(q);
-  else if (S) { const d = selInfo(S); txt = d.t; if (d.go) acts += mvBtn(d.go, d.label, 'go', 'gobtn'); if (S.k !== 'pawn') acts += '<button type="button" class="btn alt info" data-a="details" aria-label="Details">Details</button>'; }
+  else if (S) { const d = selInfo(S); txt = d.t; selGo = !!d.go; if (d.go) acts += mvBtn(d.go, d.label, 'go', 'gobtn'); if (S.k !== 'pawn') acts += '<button type="button" class="btn alt info" data-a="details" aria-label="Details">Details</button>'; }
   else txt = promptLine(L);
   const ps = L.find(m => m.t === 'pass');
-  if (mine && !q && ps && !S) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');
+  if (mine && !q && ps && (!S || !selGo)) acts += mvBtn(ps, 'Pass', 'alt pass', 'passbtn');   /* a pick with no move never hides Pass */
   if (UI.coachFree && UI.mode === 'tutorial' && !over && !S) acts += '<button type="button" class="btn alt" data-a="tutleave">Leave</button>';
   $('#prompt').textContent = txt; $('#pacts').innerHTML = acts;
   // choices: a pending question, or the research track's options
@@ -160,10 +168,10 @@ function selInfo(S) {
   const me = G.p[UI.view], ms = movesFor(S.k, S.x);
   if (S.k === 'pawn') return { t: 'Drag your explorer onto a glowing site.' };
   if (S.k === 'hand') { const c = V.CARDS[me.hand[S.x]]; if (!c) return { t: '' };
-    if (ms[0]) return { t: c.name + '. ' + c.text + ' Tap again or drag it up.', go: ms[0], label: 'Play' };
+    if (ms[0]) return { t: c.name + ': ' + effShort(c) + '. Tap again.', go: ms[0], label: 'Play' };
     return { t: c.name + '. ' + (c.t === 'fear' ? 'No effect. Use it to pay travel.' : c.t === 'art' ? 'Playing it needs 1 tablet.' : c.text) }; }
   if (S.k === 'row') { const id = G.row[S.x]; if (!id) return { t: '' }; const c = V.CARDS[id], cw = c.cost + ' ' + (c.t === 'item' ? rw('coin', c.cost) : rw('compass', c.cost));
-    return ms[0] ? { t: c.name + ', ' + cw + '. ' + c.text + ' Tap again to buy.', go: ms[0], label: 'Buy' } : { t: c.name + '. ' + c.text + ' You need ' + cw + '.' }; }
+    return ms[0] ? { t: c.name + ': ' + effShort(c) + '. Tap again.', go: ms[0], label: 'Buy' } : { t: c.name + ': you need ' + cw + '.' }; }
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
     if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
     if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
@@ -186,8 +194,17 @@ function trackLine(m) {
 function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) return ''; return `<div class="qchoices">${ms.map(m => mvBtn(m, esc(trackLine(m)), 'go')).join('')}</div>`; }
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
-  let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = ' Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return 'Your turn: one action. Tap or drag what glows.' + best;
+  const nr = researchNudge(); if (nr) return nr;
+  let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = 'Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
+  return best || 'Your turn. Tap or drag what glows.';
+}
+/* research is the big lever: when climbing (or a temple tile) is about as strong as your best move, the prompt says so, with the reason, and the track pulses */
+function researchNudge() {
+  if (UI.mode === 'tutorial' || typeof evalMoves !== 'function') return '';
+  try { const ev = evalMoves(); if (!ev.length) return ''; const r = ev.find(x => x.m.t === 'res' || x.m.t === 'temple'); if (!r || ev[0].v - r.v > 0.6) return '';
+    if (r.m.t === 'temple') return 'Temple tile: points now. Tap Research.';
+    const me = G.p[UI.view], row = (r.m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row], gift = T && Object.keys(T.bonus || {}).length;
+    return gift ? 'Climb research: a gift now, points later.' : 'Climb research: big points at the end.'; } catch (x) { return ''; }
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.' }[q.h] || 'Choose.'; }
 function qHTML(q) {

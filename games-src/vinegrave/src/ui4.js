@@ -174,7 +174,7 @@ function tutSteps() {
     ...(GUIDED ? guidedSteps() : []),
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
       onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
-    { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
+    { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research and temple: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
       target: tq(scoreTarget), wait: null, ready: () => true },
     { id: 'score2', title: 'The count', say: () => { const [a, b] = sc(); return `Idols, shrines and guardians: you ${a.idols + a.slots + a.guards}, Tamsin ${b.idols + b.slots + b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
     { id: 'score3', title: 'The count', say: () => { const [a, b] = sc(); CO.seen.tiebreak = CO.seen.rounds = 1;

@@ -1,7 +1,8 @@
 /* Vinegrave computer explorers: one-step simulation of every legal move scored by a value function (points now + resources + deck + position).
-   easy = noisy, short-sighted · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
+   easy = steady and cautious (often its 2nd best move, ends its round early) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
+  var EASY = (typeof process !== 'undefined' && process.env && process.env.VG_EASY) ? process.env.VG_EASY.split(',').map(Number) : [0.4, 0.3, 1, 0, 8];   /* easy: P(best), P(2nd), spread, P(skip research), log steps before it ends its round */
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {
     var v = 0; (ops || []).forEach(function (o) {
@@ -57,10 +58,18 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 1.6 : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 0 : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];
+    // easy: steady but beatable. No wild noise (it made the rival pass whole rounds and score 6); it often takes its 2nd or 3rd best main move
+    if (lvl === 'easy' && !inner) {
+      var skipR = VG.rng(G) < (EASY[3] || 0), mains = out.filter(function (o) { return !o.m.free && o.m.t !== 'pass' && !(skipR && (o.m.t === 'res' || o.m.t === 'temple')); }), r = VG.rng(G), k = r < EASY[0] ? 0 : r < EASY[0] + EASY[1] ? 1 : 2 + Math.floor(VG.rng(G) * (EASY[2] || 1));
+      if (mains.length && (top.m.free ? top.d <= 0.2 : true)) top = mains[Math.min(k, mains.length - 1)];
+      var acts = G.log.filter(function (e) { return e.r === G.round && e.s === s; }).length;
+      if (top.d < -1.5 || (EASY[4] && acts >= EASY[4] && !top.m.free)) { var pz = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (pz) top = pz; }
+      return top.m;
+    }
     // free actions only when they help; otherwise prefer the best non-free main action
     if (top.m.free && top.d <= 0.2) { var main = out.filter(function (o) { return !o.m.free; })[0]; if (main) top = main; }
     if (!inner && top.m.t !== 'pass' && !top.m.free && top.d < -1.5) { var ps = out.filter(function (o) { return o.m.t === 'pass'; })[0]; if (ps) top = ps; }

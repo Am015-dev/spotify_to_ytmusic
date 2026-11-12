@@ -187,9 +187,9 @@ function diffText(s, b) {
   return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0 };
 }
 function popAt(rect, t) {
-  if (!rect || !t || (!t.vp && !t.res)) return; const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : ''); e.setAttribute('aria-hidden', 'true');
+  if (!rect || !t || (!t.vp && !t.res)) return; const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
   e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
-  document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
+  document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));   /* score pills sit ON the score chip, never over the market or track */
   e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
 }
 function fly(from, html, to, o) {   /* a piece glides from where it was to where it goes */
@@ -216,7 +216,7 @@ function actFx(m, s, F, b) {   /* after a move: pieces fly to where they go, the
   if (F.card) { const dest = m.t === 'buy' ? (s === UI.view ? $('#hand') : chipOf(s)) : $('#map'); fly(F.card.r, F.card.html, dest && dest.getBoundingClientRect(), { end: m.t === 'play' ? 1.3 : .4 }); }
   if (el && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat' || m.t === 'res' || m.t === 'temple')) { setTimeout(() => { const n = moveEl(m, s); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, m.t === 'dig' || m.t === 'disc' ? 520 : 0); }
   const vpAt = chipOf(s), resAt = s === UI.view ? $('#myres') : chipOf(s), d = diffText(s, b);
-  if (d) setTimeout(() => { if (d.res) popAt((resAt && resAt.getBoundingClientRect()) || tr, { res: d.res }); if (d.vp) setTimeout(() => popAt(vpAt && vpAt.getBoundingClientRect(), { vp: d.vp, neg: d.neg }), d.res ? 500 : 0); }, 560);
+  if (d) setTimeout(() => { if (d.res) popAt((resAt && resAt.getBoundingClientRect()) || tr, { res: d.res }); if (d.vp) setTimeout(() => popAt(vpAt && vpAt.getBoundingClientRect(), { vp: d.vp, neg: d.neg, chip: true }), d.res ? 500 : 0); }, 560);
 }
 function turnWait(ms, fn) { clearTimeout(turnWait.t); turnWait.fn = fn; turnWait.t = setTimeout(() => { turnWait.fn = null; fn(); }, ms); }
 function speedUp() { if (!turnWait.fn || !G || myTurn()) return; const f = turnWait.fn; turnWait.fn = null; clearTimeout(turnWait.t); f(); }

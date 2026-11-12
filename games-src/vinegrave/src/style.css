@@ -418,8 +418,8 @@ body.vg-b2 .pawn .pa.hasart{background-size:contain!important;background-positio
 body.vg-b2 .pawn .pa.hasart+.meep{opacity:0}
 body.vg-b2 .rc .rv .ic{width:24px;height:24px;border-radius:50%}
 body.vg-b2 .rc .rv .ic.hasart svg{display:none}
-body.vg-b2 #hand{gap:0;padding-top:6px}
-body.vg-b2 #hand .cd{margin:0 -5px;transform:rotate(calc(var(--k,0) * 4deg)) translateY(calc(var(--k,0) * var(--k,0) * 2.5px));transform-origin:50% 120%}
+body.vg-b2 #hand{gap:4px;padding-top:6px}
+body.vg-b2 #hand .cd{margin:0;transform:rotate(calc(var(--k,0) * 2deg)) translateY(calc(var(--k,0) * var(--k,0) * .5px));transform-origin:50% 120%}
 body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
 @media (max-height:720px) and (max-width:999px){
   body.vg-b2 #map{min-height:220px}
@@ -438,3 +438,11 @@ body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
   body.vg-b2 .tc .tn{font-size:16px}body.vg-b2 .tc .tm i{width:20px;height:20px}
   body.vg-b2 #row .tl{display:block}
 }
+/* R25: research nudge, the track breathes when the prompt points at it */
+#track.nudge{animation:vgNudge 1.6s ease-in-out infinite}
+@keyframes vgNudge{0%,100%{box-shadow:0 0 0 2px var(--glow)}50%{box-shadow:0 0 0 5px var(--glow),0 0 18px var(--glow)}}
+@media (prefers-reduced-motion:reduce){#track.nudge{animation:none;box-shadow:0 0 0 4px var(--glow)}}
+/* R25: on short phones the result buttons sit below the breakdown (not over it) */
+@media (max-height:700px){.rbtns{position:static;margin:4px 0 0;padding:0;background:none}.rbox .rart{display:none}.rplayers{gap:6px}}
+.vpop.onchip{padding:3px 10px;animation-name:vpopChip}
+@keyframes vpopChip{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.12)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
