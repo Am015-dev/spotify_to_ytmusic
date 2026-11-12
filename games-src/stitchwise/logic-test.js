@@ -109,5 +109,32 @@ R(64, () => { // real flow: p0 reaches 53 first, equal final scores
 // ---- Data structure
 R(65, () => { PATCHES.forEach(p => { eq(true, p.n >= 2 && p.cost >= 0 && p.cost <= 10 && p.time >= 1 && p.inc >= 0 && p.inc <= 3, 'patch ' + p.id + ' ranges'); const set = new Set(p.cells.map(c => c.join())), st = [p.cells[0]], vis = new Set([p.cells[0].join()]); while (st.length) { const c = st.pop(); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(d => { const k = [c[0] + d[0], c[1] + d[1]]; if (set.has(k.join()) && !vis.has(k.join())) { vis.add(k.join()); st.push(k); } }); } eq(p.n, vis.size, 'patch ' + p.id + ' connected'); }); eq(1, PATCHES.filter(p => p.n === 2).length); });
 
+// ---- W491: the owner's rule list, one end-to-end check each
+R(66, () => { // ring + neutral token: only the 3 after it are buyable; the token moves to the bought patch's spot
+  const G = mk({ btn: [20, 20] }); const off = ids(G); eq([1, 2, 3], off); eq(['buy', 'buy', 'buy', 'adv'], L.swMoves(G).map(m => m.t), 'three buy options + advance');
+  const r = L.swApply(G, { t: 'buy', k: 3, o: 0, x: 0, y: 0 }); eq(false, r.ok, '4th patch refused');
+  const m = firstPlace(G, 0, 2); m.k = 1; L.swApply(G, m); eq([3, 4, 5], ids(G), 'next offer starts after the bought patch'); eq(false, G.ring.includes(2), 'bought patch left the ring'); });
+R(67, () => { // pay buttons, move by time; furthest behind plays next, several turns in a row
+  const G = withFirst(4, { btn: [10, 10] }); const p = PATCHES[4]; L.swApply(G, firstPlace(G, 0, 4)); eq(10 - p.cost, G.btn[0], 'paid'); eq(p.time, G.pos[0], 'moved by time'); eq(1, L.swWho(G), 'behind player next');
+  const H = mk({ pos: [2, 10], cur: 0, btn: [10, 10] }); L.swApply(H, firstPlace(H, 0, ids(H)[0])); eq(0, L.swWho(H), 'still behind: same player again'); });
+R(68, () => { // landing on the opponent's space: on top, goes next
+  const G = withFirst(4, { pos: [0, 3], btn: [10, 10] }); L.swApply(G, firstPlace(G, 0, 4)); eq(3, G.pos[0]); eq(0, L.swWho(G), 'on top moves first'); });
+R(69, () => { // advance: just past the opponent, 1 button per space
+  const G = mk({ pos: [4, 9], cur: 0 }); const b = G.btn[0]; L.swApply(G, { t: 'adv' }); eq(10, G.pos[0], 'one past'); eq(b + 6 + 0, G.btn[0], '6 spaces = 6 buttons (income spot 5 not in range)'); });
+R(70, () => { // passing a button mark pays income = button icons on the quilt
+  const G = mk({ pos: [9, 14], cur: 0, inc: [3, 0] }); const b = G.btn[0]; L.swApply(G, { t: 'adv' }); eq(b + 6 + 3, G.btn[0], 'advance 6 + income 3 at space 11'); });
+R(71, () => { // leather: the first to pass places it at once; the second gets nothing
+  const G = mk({ pos: [18, 22], cur: 0 }); L.swApply(G, { t: 'adv' }); eq(0, L.swWho(G), 'must place now'); eq(true, !!G.pend, 'pending'); eq(false, L.swApply(G, { t: 'adv' }).ok, 'cannot do anything else first');
+  L.swApply(G, { t: 'leather', x: 4, y: 4 }); eq(100, G.board[0][40]); eq(0, G.leather[0]);
+  const H = mk({ pos: [22, 19], cur: 1 }); H.leather[0] = 0; L.swApply(H, { t: 'adv' }); eq(null, H.pend, 'second passer gets nothing'); });
+R(72, () => { // first full 7x7 square: the 7-point tile, once
+  const G = mk({ cur: 0 }); fillRect(G, 0, 0, 0, 7, 7); G.board[0][0] = -1; L.swApply(G, { t: 'adv' }); /* opens no leather */ G.cur = 0; G.pos = [18, 22]; L.swApply(G, { t: 'adv' }); L.swApply(G, { t: 'leather', x: 0, y: 0 }); eq(0, G.bonus, 'bonus to the first');
+  fillRect(G, 1, 0, 0, 7, 7); eq(0, G.bonus, 'stays with the first'); eq(7, L.swScore(G, 0).bonus); eq(0, L.swScore(G, 1).bonus); });
+R(73, () => { // rotate/flip legal, inside 9x9, no overlap; end when both reach the last space; score = buttons + bonus - 2 per empty
+  const p = PATCHES.find(q => q.or.length === 8); eq(8, p.or.length, 'a shape with 8 orientations');
+  const G = withFirst(p.id, { btn: [20, 20] }); eq(false, L.swApply(L.swNew({ seed: 1 }), { t: 'buy', k: 0, o: 0, x: 8, y: 8 }).ok && false, 'n/a');
+  const H = withFirst(4, { btn: [20, 20] }); eq(false, L.swApply(H, { t: 'buy', k: 0, o: 0, x: 6, y: 0 }).ok, 'off the board refused'); fillCells(H, 0, [[0, 0]]); eq(false, L.swApply(H, { t: 'buy', k: 0, o: 0, x: 0, y: 0 }).ok, 'overlap refused'); eq(true, L.swApply(H, { t: 'buy', k: 0, o: 1, x: 0, y: 1 }).ok, 'rotated fits');
+  const E = mk({ pos: [52, 53], cur: 0 }); L.swApply(E, { t: 'adv' }); eq(true, E.over, 'both at the end: over'); const sc = L.swScore(E, 0); eq(E.btn[0] - 2 * 81, sc.total, 'buttons - 2 per empty'); });
+
 const pass = total - failed.size; console.log('rules ' + total + ', passing ' + pass + ', failing ' + failed.size + (failed.size ? ' [' + [...failed].sort((a, b) => a - b).join(',') + ']' : ''));
 process.exit(failed.size ? 1 : 0);
