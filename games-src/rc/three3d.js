@@ -66,7 +66,11 @@ function init3D(){
       if(PT.size===1){const [r]=[...PT.values()];V3.drag={x:r.x,y:r.y,l:V3.look.clone(),moved:true};return}
       const d=V3.drag;V3.drag=null;if(e.type==='pointerup'&&d&&!d.moved&&(e.target===cv||cv.hasPointerCapture&&0))onClick3D(e);return}
     const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv)onClick3D(e)};
-  window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  // a board tap is acted on at pointerup and the board redraws at once; the browser's click that follows then hits whatever was just drawn under the finger
+  // (a job plate's take-back button, the place pop-up) and undid the tap: R36 dead taps. That trailing click belongs to the board tap, so it is dropped.
+  const up0=up;const up2=e=>{const was=V3.drag&&!V3.drag.moved&&e.target===cv&&e.type==='pointerup';up0(e);if(was)V3.tapEnd={t:Date.now(),x:e.clientX,y:e.clientY}};
+  window.addEventListener('click',e=>{const k=V3.tapEnd;if(!k||e.target===cv)return;V3.tapEnd=null;if(Date.now()-k.t<700&&Math.hypot(e.clientX-k.x,e.clientY-k.y)<24){e.stopPropagation();e.preventDefault()}},true);
+  window.addEventListener('pointerup',up2);window.addEventListener('pointercancel',up);
   cv.addEventListener('wheel',e=>{e.preventDefault();if(V3.ph){phSetD(V3.orbit.d*(1+e.deltaY*.0015));return}V3.orbit.d=Math.max(12,Math.min(48,V3.orbit.d+e.deltaY*.02));placeCam()},{passive:false});
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
   V3.on=true;applyQ(V3.pref==='auto'?gfxAuto():V3.pref);placeCam();

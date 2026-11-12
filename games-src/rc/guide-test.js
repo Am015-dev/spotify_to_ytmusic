@@ -32,7 +32,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  const r=await p.evaluate(()=>({rules:GXGUIDE.rules,seen:GXGUIDE.seen,steps:GXGUIDE.steps}));
  const shownRules=[...new Set(order.map(o=>says[o][0]))];
  for(const ru of r.rules)if(!shownRules.includes(ru))probs.push('rule step never shown: '+ru);
- const must=['goal','death','phases','event','morale','production','pawns','explore','dice','sure','build','shelter','invention','action','weather','night','wounds','adventure','threat','gather','camp','rest','hunt','roof','real'];
+ const must=['goal','death','phases','event','morale','production','pawns','explore','dice','sure','build','shelter','invention','action','weather','night','wounds','adventure','threat','gather','camp','rest','hunt','roof','pile','fire','real'];
  for(const m of must)if(!r.rules.includes(m))probs.push('rule missing from the step list: '+m);
  for(const st of r.steps){const n=st.say.replace(/[^A-Za-z0-9'’?✊]+/g,' ').trim().split(' ').filter(Boolean).length;if(n>12)probs.push(st.id+' has '+n+' words')}
  // order: the first appearance of each phase rule follows the game's phase order
@@ -41,6 +41,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  if(SHOTS&&fin){shotN++;await p.screenshot({path:path.join(SHOTS,'tut-'+shotN+'.png')})}
  if(fin){await tap('#coachb [data-guide=keep]');await sleep(800);const k=await p.evaluate(()=>({g:!!G,tut:!!(G&&G.tut),run:GXGUIDE.running,ring:!!document.querySelector('#tutring:not([hidden])')}));if(!k.g||k.tut||k.run||k.ring)probs.push('Keep playing did not continue as a normal game '+JSON.stringify(k))}
  if(errs.length)probs.push('errors: '+errs.slice(0,3).join(' | '));
+ if(process.env.VERBOSE)console.log(order.join(" "));
  console.log(`guide ${W}x${H}: ${probs.length?'FAIL '+probs.join('; '):'PASS'} steps ${order.length}/${r.steps.length} rules ${shownRules.length}/${r.rules.length}`);
  if(process.env.V)console.log(order.map(o=>o+': '+says[o][1]).join('\n'));
  await br.close();process.exit(probs.length?1:0)})();

@@ -22,7 +22,7 @@ function easyDeal(){if(G.scen!=='marooned'||G.cmp)return;if(EASYK.pile&&G.sc&&!G
   G.ev.deck=G.ev.deck.map(k=>{if(!harsh.has(k))return k;const i=spare.findIndex(x=>book(x)===book(k));return i<0?k:spare.splice(i,1)[0]});
   if(EASYK.mild){const all=[...new Set(EVENTS.map(e=>e.k))].sort((a,b)=>harm(b)-harm(a)),n=G.ev.deck.length,nb=G.ev.deck.filter(book).length,half=Math.ceil(EASYK.mild/2);   // the mildest cards, same book / "?" split as the real deck
     const pick=(f,k,m)=>shuffle(all.filter(f).slice(0,m)).slice(0,k);G.ev.deck=shuffle(pick(book,nb,Math.max(nb,half)).concat(pick(k=>!book(k),n-nb,Math.max(n-nb,half))))}if(EASYK.beasts)G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
-function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[4,5,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
+function tutDeal(){G.tut=1;G.learn=1;G.res.food=Math.max(3,G.res.food);G.res.wood=Math.max(3,G.res.wood);if(G.scen==='marooned')G.tileDeck=[5,4,10,6,3,1,2,7,9,11];G.ev.threat=[null,null];G.wxT={};
   const harm=k=>{try{return opsValue(CARD[k].ev||[])+opsValue(CARD[k].te||[])}catch(e){return 0}};const mild=[...new Set(EVENTS.map(e=>e.k))].filter(k=>k!=='chillrain').sort((a,b)=>harm(b)-harm(a)).slice(0,14);
   G.ev.deck=['chillrain'].concat(shuffle(mild)).slice(0,G.ev.deck.length);G.beast.sort((a,b)=>BEAST[a].str-BEAST[b].str)}
 // ---------------------------------------------------------------- the staged game starts and stops

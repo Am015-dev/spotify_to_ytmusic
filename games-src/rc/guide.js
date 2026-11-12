@@ -2,7 +2,7 @@
 // Runs on the staged deal of tutor.js (tutBegin: Marooned, Carpenter + Cook + Friday, kind decks, Chill Rain on day 2).
 // Day 1: goal, death, the six phases, no event yet, morale, production, pawns, explore (1 pawn = dice, 2 = sure), build a shelter,
 // make an invention (Shovel), Start day, weather vs roof, night (eat or 2 wounds, no shelter = 1 wound), wounds.
-// Day 2: event card, adventure token, threat (Dig a Drain needs the Shovel), morale, gather, rest, a real hunt (one beast seeded), rain cloud. Day 3: tidy the camp.
+// Day 2: event card, adventure token, threat (Dig a Drain needs the Shovel), morale, gather, rest, a real hunt (one beast seeded), rain cloud. Day 3: tidy the camp, a real roll, add wood to the signal pile, build the Fire (the win condition).
 // Then the end card: Keep playing turns it into a normal game. Only the highlighted thing answers while a step shows; scenes nobody explains play by themselves.
 // window.GXGUIDE = {running, step, seen:[ids], rules:[ids], done}.  ?coach=1 keeps the older coached game.
 const GUIDE={on:false,i:0,seen:[],t:0,shown:null,tapped:false,done:false,exp:null,tips:null};
@@ -57,7 +57,7 @@ const GUIDE_STEPS=[
  {sel:'c0_0',id:'t2',day:2,rule:'threat',when:gPlan,kind:'act',say:'Tap the camp. Threats are handled there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'t3',day:2,rule:'threat',when:gPlan,kind:'act',say:'Dig a Drain with the Shovel. The threat is gone.',tgt:()=>gRow('threat'),done:()=>!!gAct('threat')},
  {sel:'c1_0',id:'g2',day:2,rule:'gather',when:gPlan,kind:'act',say:'Tap the land you found yesterday.',tgt:()=>gGlow(gExp()),done:()=>gPop()===gExp()},
- {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather fish. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]'))if(/fish|food/i.test(e.textContent)&&/gather/.test(decodeURIComponent(e.dataset.place)))f=f||e;return f||gRow('gather')},done:()=>!!gAct('gather')},
+ {id:'g3',day:2,rule:'gather',when:gPlan,skip:()=>!!gAct('gather'),kind:'act',say:'Gather food. Food and wood arrive after all jobs.',tgt:()=>{let f=null;for(const e of document.querySelectorAll('#ppop .bfr[data-place]'))if(/fish|food/i.test(e.textContent)&&/gather/.test(decodeURIComponent(e.dataset.place)))f=f||e;return f||gRow('gather')},done:()=>!!gAct('gather')},
  {sel:'c1_1',id:'r2',day:2,rule:'rest',when:gPlan,kind:'act',say:'Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
  {id:'r3',day:2,rule:'rest',when:gPlan,kind:'act',say:'Rest heals 1 wound.',tgt:()=>gRow('rest'),done:()=>!!gAct('rest')},
  {sel:'c0_1',id:'h2',day:2,rule:'hunt',when:gPlan,kind:'act',say:'A beast was spotted. Tap the camp. Hunts start there.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
@@ -70,6 +70,12 @@ const GUIDE_STEPS=[
  {id:'c3',day:3,rule:'camp',when:gPlan,kind:'act',say:'Tidy the camp: 2 determination and morale up.',tgt:()=>gRow('camp'),done:()=>!!gAct('camp')},
  {sel:'c0_0',id:'x2',day:3,rule:'roll',when:gPlan,kind:'act',say:'A real roll: tap this unknown place, and go alone.',tgt:()=>gGlow(gExp2()),done:()=>gPop()===gExp2()||!!gAct('explore')},
  {id:'x3',day:3,rule:'roll',when:gPlan,skip:()=>!!gAct('explore'),kind:'act',say:'Explore alone. The ? token adds an adventure card.',tgt:()=>gRow('explore'),done:()=>!!gAct('explore')},
+ {sel:'c1_0',id:'w2',day:3,rule:'pile',when:gPlan,kind:'act',say:'Now the way home. Tap the camp.',tgt:()=>gGlow(gCamp()),done:()=>gPop()===gCamp()},
+ {id:'w3',day:3,rule:'pile',when:gPlan,kind:'act',say:'Add wood to the signal pile. It needs no pawn.',tgt:()=>gdq('#ppop .bfr.pile:not(.no)'),done:()=>{try{return G.sc.stageRound===G.round}catch(e){return false}}},
+ {id:'w4',day:3,rule:'pile',when:gPlan,kind:'info',say:'Next stages: 2, 3, 4, 5 wood. One stage a day.',tgt:()=>gRes(6)||gRes(1)},
+ {id:'f2',day:3,rule:'fire',when:gPlan,kind:'act',say:'Build the Fire. The mountains you found allow it.',tgt:()=>gRow('build','fire')||gGlow(gCamp()),done:()=>!!gAct('build','fire')},
+ {sel:'c1_1',id:'f3',day:3,rule:'fire',when:gPlan,kind:'act',say:'Make the Fire sure: tap the camp again.',tgt:()=>gGlow(gCamp()),done:()=>{const a=gAct('build','fire');return gPop()===gCamp()||!!a&&a.pw.length>=2}},
+ {id:'f4',day:3,rule:'fire',when:gPlan,kind:'act',skip:()=>{const a=gAct('build','fire');return !!a&&a.pw.length>=2},say:'Join the Fire. Fire plus 15 wood by day 10-12 wins.',tgt:()=>gRow('build','fire'),done:()=>{const a=gAct('build','fire');return !!a&&a.pw.length>=2}},
  {id:'x4',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap ✨ to give the other pawns jobs.',tgt:()=>gdq('#bf [data-a=suggest]'),done:()=>{try{return !planProblems().length}catch(e){return false}}},
  {id:'go3',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap Start day and watch the dice.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'roll',day:3,rule:'roll',beat:'act',when:gDiceBeat,kind:'info',say:'The dice: ✔ success, 🩸 a wound, ❓ an adventure.',tgt:()=>null},
