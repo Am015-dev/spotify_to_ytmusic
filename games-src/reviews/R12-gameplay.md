@@ -7,14 +7,15 @@ I used Playwright phone contexts (isMobile, hasTouch, deviceScaleFactor 1) and o
 `elementFromPoint` that the control was on screen and not covered. A tap that changed nothing within 1.5 s counted as dead. I never called a
 game function to make a move. Rival speed stayed at the default, and I did not tap to speed up rival turns, so the waits below are real.
 As a "new player" I tapped what glowed: the game's suggestion about half the time, otherwise a random legal glowing target or button.
-For each game I also ran one control game that always took the suggestion. I checked the rules against the published rulebook and rule summaries
+For vale and perch I also ran one control game that always took the suggestion. My doorkick control run was stopped early, so I give none for it.
+Up to five browsers ran at once on 4 cores, so the measured waits may be slightly long. I checked the rules against the published rulebook and rule summaries
 online (notes kept in a local folder, never committed). Screenshots are in `games-src/reviews/R12-shots/`.
 
 | Game | Total | Verdict | Lowest rows |
 |---|---|---|---|
 | vale-of-banners | 7.1 | FAIL | 6 AI and pacing 6 |
-| doorkick-dungeon | (follows) | | |
-| perch-and-plume | (follows) | | |
+| doorkick-dungeon | 6.6 | FAIL | 6 AI and pacing 5; 4 Turn clarity 6; 5 Phone play 6 |
+| perch-and-plume | 6.6 | FAIL | 6 AI and pacing 5; 4 Turn clarity 6; 5 Phone play 6 |
 
 ---
 
@@ -73,6 +74,60 @@ What I played:
 
 ---
 
+## 2. doorkick-dungeon (shelf/W502-doorkick-gameplay @ 155219e2): 6.6, FAIL
+
+What I played:
+- Tutorial ("New here? Learn in 5 minutes") to "Play a real game" at 390x844 and 375x667. Each run was 27 steps, with every step's marker shown within 0.5 s of the step (waits for rival or scripted moves: 1.9-5.1 s). 0 errors.
+- Real games: Quick game with the defaults (4 heroes, rivals Morwen, Grub, Tansy), tapping Start and "Just play".
+  - Four games as a new player who taps glowing cards, then the glow; the game's marked move half the time; otherwise a random legal button.
+  - 390x844: Tansy won at 10 after 6.1 min, me level 1.
+  - 375x667: Grub won after 12.2 min, me level 1.
+  - 390x844: Tansy won after 14.8 min, me level 1.
+  - 375x667: no winner after 17 min (levels 1, 1, 6, 6); I stopped it there.
+- Three games reached the result screen with 0 page errors, 0 console errors and 0 stuck states. Wait from my last action to my next decision: 4.3-6.2 s on average, 15-22 s at most. Every one of these waits covers 3 rival turns and the meddle windows.
+- A separate card-panel check at both sizes: I opened an equipped chip's panel, checked End turn, tapped the panel's ×, then a rival. In 16 more checks inside the games, the panel never covered the action bar.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 7 | Matches the published turn: kick the door (a curse hits at once); fight or run (5+, elf 4+, "Run 33%" for a human, "Run 50%" for an elf); levels and treasure; Bad Stuff; look for trouble or loot the room; charity down to 5; sell 1,000 gold for a level but never the winning one; meddling, help for treasure, races and classes. Nothing broke. |
+| 2 | Tutorial teaches | 7 | 27 short steps in rule order, one tap each, ending in a real game. Fixed: the run step now says "4+ escapes (elf +1)" next to "Run 50%". At 375 names are still cut in the fight ("Hairy Hat-…", "Pip (Y…"), and a "Lost: Brave Bucket" toast lies over the "Caught: Bad Stuff" banner. |
+| 3 | First 10 seconds | 7 | Fixed: Start is on screen at both sizes (centre y 808 of 844, 631 of 667). Clear title line, then "Tap or drag glowing cards onto your hero" with glowing cards. A 3-bullet "How to win" card still opens over the board while a rival is already playing. |
+| 4 | Turn clarity | 6 | The bottom line always says what to do ("Curse Tansy? Drag a card on them", "Too many cards: drag extras to discard", "Losing! Add cards, get help, or run"), and run odds show on the button. But names are still cut at 375 ("Pip (yo…", "Morw…", "Gargantua"). In practice a newcomer who follows the glowing cards stays at level 1 and strength 1 for a whole game: the screen never shows why they keep losing or what to equip. |
+| 5 | Phone play | 6 | Fixed: the card panel stops above the action bar at both sizes, its × (44x44) closes it, and End turn stays reachable. All main buttons are 44 px or more. Not fixed: the hand row runs past the right edge (the 6th card starts at x=402 of 390), names are cut at 375, "+2 Lv" floats sit over the rival plates at tutorial start, and the result table breaks a name onto its own line ("Morwen"). |
+| 6 | AI and pacing | 5 | Rival turns are shorter than before (a decision every 4-6 s on average, against 15-20 s per rival turn in G8). But games ran 6, 12, 15 and over 17 min, and in all four I ended at level 1 while a rival reached 9-10. G8's player who always took the lightbulb got to level 9, so a win is possible, but it is not likely for a new player. |
+| 7 | Feel | 7 | Painted art, the door KICK!, the "A MONSTER!" reveal, dice, "+1 Lv" floats and a result page with kills, helps, deaths and curses per hero. |
+| 8 | Bugs | 8 | 2 tutorials and 4 long games: 0 errors, 0 stuck states, and the G8 panel stall did not come back. Unconfirmed: twice, tapping "Run (sure)" changed nothing within 1.5 s (in two different games); I could not tell a dead tap from a slow animation. |
+| | **Total** | **6.6** | **FAIL**: rows 4, 5 and 6 are below 7. No stopper. |
+
+### Earlier findings (G8)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 8 possible stopper: the card panel stayed over the action bar; End turn unreachable | **Fixed.** At 390 and 375 the panel opens above the action bar. The visible × (44x44, at y 427 of 844 and 250 of 667) closes it on the first tap, and End turn, Ready and Kick! stay visible and tappable. No stuck state in 4 games (about 1,000 taps). | R12-shots/dk-panel-open-390.jpg, R12-shots/dk-panel-closed-390.jpg, R12-shots/dk-panel-open-375.jpg, R12-shots/dk-panel-closed-375.jpg, R12-shots/dk-panel-above-bar-375.jpg |
+| Row 8: Thief "Let it be" did not move on | **Not seen again**: every "Let X go on" tap in 4 games moved the game on, and there were 0 stuck states. I did not force the Thief backstab case. | R12-shots/dk-g-375.jpg |
+| Row 4: hand cards shown as blank faces | **Fixed**: every hand card shows art and name. | R12-shots/dk-g-charity-390.jpg |
+| Row 4: names cut ("Gargant", "Hairy Hat-…") | **Partly fixed**: whole at 390 in fights ("Hairy Hat-Muncher"), and in some real fights at 375 ("Pip (you)"). Still cut in the 375 tutorial fight ("Hairy Hat-…", "Pip (Y…"), on rival plates ("Morw…") and in the hand ("Gargantua"). | R12-shots/dk-tut-11-run-375.jpg, R12-shots/dk-g-fight-375.jpg |
+| Row 4: a rival's curse banner read as if I was cursed | **Not checked**: no rival kicked a curse while my driver took a screenshot. My own door curses read "A curse! It hit you". | R12-shots/dk-g-charity-390.jpg |
+| Row 2/1: tutorial run step said 5 or 6 for an elf | **Fixed**: "4+ escapes (elf +1)" next to "Run 50%". | R12-shots/dk-tut-11-run-390.jpg |
+| Row 5: 3D door covered the fight at 375 | **Fixed**: the fight shows monster, hero, Run and Help. | R12-shots/dk-tut-11-run-375.jpg |
+| Row 5: "+2 Lv" float over the top bar and Skip | **Partly fixed**: off the top bar now, but over the rival name plates. | R12-shots/dk-tut-01-floats-390.jpg |
+| Row 5: strength badge over "Pip (You)" | **Partly fixed**: no overlap at 390. At 375 the name is cut to "Pip (Y…". | R12-shots/dk-tut-11-run-375.jpg |
+| Row 3: Start below the fold | **Fixed** at both sizes. | R12-shots/dk-quick-start-onscreen-390.jpg, R12-shots/dk-quick-start-onscreen-375.jpg |
+| Row 6: 15-20 s per rival turn; game over 10 min | **Partly fixed**: 4.3-6.2 s per decision on average (3 rivals), max 15-22 s. Games still ran 6-17+ min. | R12-shots/dk-g-17min-noend-375.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 6 | 4 default games as a new player who taps the glowing cards and the glow | Level 1 at the end of all four, cursed 5-15 times. Rivals reached 9-10. "Best moment: surviving." | R12-shots/dk-g-result-390.jpg, R12-shots/dk-g-lv1-late-390.jpg |
+| 6 | Timed the 375 game | No winner after 17 min (levels 1, 1, 6, 6). Too long for a phone session. | R12-shots/dk-g-17min-noend-375.jpg |
+| 4 | Charity step with 6+ cards | "Too many cards: drag extras to discard" came up most turns. It names no card and no count, and the extras glow only after you pick a card. | R12-shots/dk-g-charity-390.jpg |
+| 2/5 | Tutorial step 12 at 375 | The "Lost: Brave Bucket" toast covers the "Caught: Bad Stuff" banner text. | R12-shots/dk-tut-12-toast-375.jpg |
+| 5 | Result page at 390 | The name column wraps "Morwen" below its avatar, so the row reads out of line. | R12-shots/dk-g-result-390.jpg |
+| 5 | Hand row | Cards scroll sideways. The 6th card starts off screen with no sign that there is more. | R12-shots/dk-g-charity-390.jpg |
+| 3 | First screen of a Quick game | The "How to win" card covers the board while a rival is already playing. | R12-shots/dk-g-goalcard-390.jpg |
+| 7 (works) | Door kick and monster reveal | The kick, the "A MONSTER!" card and the run odds feel like a real table moment. | R12-shots/dk-panel-above-bar-375.jpg |
+
+---
+
 ## 3. perch-and-plume (shelf/W508-perch-gameplay @ b343f526): 6.6, FAIL
 
 What I played:
@@ -112,7 +167,7 @@ What I played:
 | R6 row 3: no goal line | **Fixed**: the goal is on the start screen and in the top bar. | R12-shots/pp-start-hand-390.jpg, R12-shots/pp-g-r1-390.jpg |
 | R6 row 7: actions resolve as dock text | **Partly fixed**: eggs and food now fly, with point pops on the board. | R12-shots/pp-best-result-390.jpg, R12-shots/pp-g-yourturn-banner-390.jpg |
 | G4/R6 row 6: rival too strong | **Not fixed**: Easy is the default (R12-shots/pp-setup-easy-390.jpg), but I lost 5 of 5 to it. | R12-shots/pp-g1-result-390.jpg, R12-shots/pp-g-result-375.jpg, R12-shots/pp-g2-result-390.jpg, R12-shots/pp-best-result-390.jpg |
-| R1 row 1: row-bonus trade never offered | **Not seen** in 5 games. | n/a |
+| R6 row 1: row-bonus trade never offered | **Not seen** in 5 games. | n/a |
 
 ### New findings
 | Row | What I did | What happened | Screenshot |
