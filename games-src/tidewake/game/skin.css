@@ -155,8 +155,6 @@ html.ph .ps-crews .crew b{font:700 17px/1.2 var(--fb);color:#fff2c4}
 html.ph .ps-crews .crew span{font:500 15px/1.3 var(--fb);color:#cfe9e4}
 html.ph .ps-crews .crew.now{border-color:#ffd24a;box-shadow:0 0 0 2px rgba(255,210,74,.35)}
 html.ph .ps-crews .crew.sunk{opacity:.6}html.ph .ps-crews .crew.sunk b{text-decoration:line-through}
-/* the first Learn bubble sits under the board: push the strip's own lines below it */
-html.ph:has(.gxt-bub) #ps{padding-top:190px}
 /* Story map: the title wraps between words only; Act captions grow to fit instead of clipping */
 .gxc-htitle{overflow-wrap:normal!important;word-break:normal!important;hyphens:none}
 @media (max-width:500px){.gxc-htitle{font-size:17px}}
@@ -166,7 +164,22 @@ html.ph:has(.gxt-bub) #ps{padding-top:190px}
 @media (min-width:1024px){html.ph .gx-bar .gx-ibtn{min-width:76px;height:auto;min-height:48px;padding:4px 10px}html.ph .gx-bar .gx-ibtn>span{white-space:nowrap;overflow:visible}}
 /* result card: its buttons do not cover the captain list */
 html.ph #pc .row:has(>.btn[data-a=again]),html.ph #pc .row:has(>.btn.pri){position:static;box-shadow:none;margin:8px 0 0}
+/* result card on a phone: the button row stays pinned at the bottom of the panel, in one or two rows, nothing on top of anything (Rules lives in the Menu) */
+html.ph #pc .prompt[data-over] .row{position:sticky;bottom:-8px;z-index:3;margin:8px -10px -8px;padding:6px 8px 8px;background:#fff8e1;box-shadow:0 -8px 8px -4px #fff8e1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+html.ph #pc .prompt[data-over] .row .btn{position:static;box-shadow:none;width:100%;min-height:44px;margin:0;padding-left:4px;padding-right:4px;white-space:normal;line-height:1.1}
+html.ph #pc .prompt[data-over] .row .btn[data-a=rewind],html.ph #pc .prompt[data-over] .row .btn[data-a=guided]{grid-column:1/-1}
+html.ph #pc .prompt[data-over] .row .btn[data-gx=rulesd]{display:none}
 @media (min-width:1024px){html.ph .gx-bar .gx-ibtn{flex-direction:row!important;gap:6px;min-height:40px}html.ph .gx-bar .gx-ibtn>span{margin-top:0!important;background:none!important}}
 
 /* the guided tutorial has 30+ steps: keep its progress dots clear of the Skip button */
 .gxt-top .gxt-prog{max-width:calc(100% - 132px);overflow:hidden;white-space:nowrap}
+
+/* elimination bonus: picture swaps in a grid, Keep first and full width */
+.opts.bopts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}   /* 9 swaps = 3 rows: no scroll at 375 */
+.opts.bopts .btn:not(.bswap){grid-column:1/-1}
+.opts.bopts .bswap{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;min-height:44px}
+.opts.bopts .bp{display:flex;align-items:center;gap:4px}
+.opts.bopts .bp .hc{width:36px;height:36px;display:inline-block}
+.opts.bopts .bswap .bl{font-size:14px;line-height:1.1}
+.opts.bopts .bp .hc img,.opts.bopts .bp .hc svg{width:100%;height:100%;display:block}
+.opts.bopts .bl{font-size:13px;line-height:1}

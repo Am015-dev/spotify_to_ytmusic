@@ -4,7 +4,8 @@
 //   node logic-test.js          run all rules; one line per failure: "FAIL R<n> expected ... got ..."
 //   node logic-test.js --md     rewrite RULES-CHECKLIST.md from the rule table below
 const {load}=require('./game/tools/load');const fs=require('fs');
-const X=load(['data.js','engine.js']);const E=X.E,ctx=X.ctx;
+// the rule table's scenarios use 6x6 coordinates (the rules do not depend on the size; the 7x7 board's own checks are in game/rules-test.js)
+const X=load(['data.js','engine.js'],';BW=6;BC=2.5;');const E=X.E,ctx=X.ctx;
 const ORND=ctx.rnd;let DQ=[];ctx.rnd=function(n){return (n===6&&DQ.length)?DQ.shift()-1:ORND(n)};   // scripted d6: DQ holds the faces to roll next
 const J=JSON.stringify;
 function eq(got,exp,what){if(J(got)!==J(exp))throw new Error(`expected ${J(exp)} got ${J(got)}${what?'  ['+what+']':''}`)}
