@@ -9,7 +9,7 @@ Waits of 0.9-2 s before each decision stand in for a human reading the screen. R
 |---|---|---|---|
 | final-approach | 7.4 | PASS | none |
 | tidewake | 7.0 | FAIL | 6 |
-| wildmark | see below | | |
+| wildmark | 7.3 | FAIL | 5 |
 
 ---
 
@@ -99,4 +99,39 @@ Build note: the worktree build needs `games-src/node_modules/three` (missing in 
 
 ## 3. wildmark (branch shelf/W507-wildmark-gameplay @ 7ed35418)
 
-WM_SECTION
+Played: the tutorial to the end by touch at 390x844 and 375x667 (42 steps: 33 do-it taps and 9 Next, 42 taps, 87 s each, 0 repeats,
+ends on "You win! 35-25" with "Play a real game"). Then 4 games on the title's default "Play against 1 computer ranger" (rival Gentle):
+390x844 careless (always the first column, the planner's spot) to the result, lost 40-66; 375x667 playing the planner's best move: 93-62
+win to the result, plus two more that my script left on the last turns (79-39 at turn 16 and 88-63 at turn 20) when it tapped a planner
+spot that was off-screen. A rerun that hit-tested every spot tap found 0 covered spots and 0 dead taps in 20 turns. 0 page errors, 0
+console errors in all runs.
+
+| # | Row | Score | Why (one line) |
+|---|-----|-------|----------------|
+| 1 | Rules fidelity | 8 | Unchanged since R2: market of four pairs, four-alike auto wipe, once-a-turn three-alike wipe, both acorn powers, 20 turns, 2-player largest-area bonus, acorn tie-break; the result table scores each animal card correctly ("Bear pairs 1,2,3,4 = 4,11,19,27"). |
+| 2 | Tutorial teaches | 7 | 42 short steps, one tap each, every scoring rule by doing it. "Replace animals" (step 23) is still a Next-only line you never try. |
+| 3 | First 10 seconds | 7 | "New here? Learn in 5 minutes" first, then one big Play button; goal "Beat Bram: score more points in your valley than he does." |
+| 4 | Turn clarity | 7 | "up to +N" on every column, glowing spots with "+1" badges, a one-line verdict ("★ +5 · Good move", "⚠ No points · Poor move: Salmon column was +4") and "What should I do?". |
+| 5 | Phone play | 6 | The market column labels and the "up to +N" badges are 13 px on every turn (the top chips are fixed). At 375x667 a grown valley puts legal spots off the left edge (a "+1" spot cut off at x=0) and under the You/Bram chips; you must pan to find them. |
+| 6 | AI and pacing | 8 | Bram's turn takes 2.4-3.1 s. Playing well I won 93-62; playing carelessly I lost 40-66. A 20-turn game takes about 3 minutes at my pace. |
+| 7 | Feel | 7 | The verdict is now a small one-line pill that fades, "+1 acorn" pops by the counter, tiles drop in and animals hop. I placed by tapping; I did not test drag-and-snap. |
+| 8 | Bugs | 8 | 2 tutorials and 2 full games plus 2 long partial games: 0 errors, 0 stuck states, 0 dead taps on visible targets. |
+| | **Total** | **7.3** | **FAIL** (row 5 under 7; no stopper) |
+
+### Earlier findings (G5, R2)
+| Finding | Status | Evidence |
+|---|---|---|
+| R2 row 5: top animal-count chips 13 px | Partly fixed. The top chips are no longer under 14 px, but the market labels ("Salmon", "Fox") and "up to +N" badges measure 13 px. | R14-shots/wm-375-g4-first.jpg |
+| R2/R5/R7: verdict card and step card cover the lower board | **Fixed.** One-line pill ("★ +5 · Good move") that fades. | R14-shots/wm-375-g3-turn15.jpg |
+| R2 row 7: your own turn feels flat | Partly fixed: pops and tile/animal animations are there; drag not tested by me. | R14-shots/wm-375-g3-turn15.jpg |
+| R2 row 2: "Replace animals" acorn power only a Next line | Not fixed (step 23, a Next-only line in my run log). | R14-shots/wm-390-tut-end.jpg |
+| R2 row 6: Gentle may be soft | Still true for a careful player (93-62), fine for a first game. | R14-shots/wm-375-g4-result.jpg |
+| G5: unreadable result | Still fixed: big totals, one-line reason, per-animal table. | R14-shots/wm-375-g4-result.jpg |
+| R7: painted terrains hard to tell apart | Not re-checked. | none |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 | 375x667, turn 16, held a tile with a valley of 18 tiles. | Legal "+1" spots lie at the very left edge (one cut off at x=0) and the top row runs under the You/Bram chips; the camera does not fit the legal spots, so a player has to pan or zoom out to see all options. | R14-shots/wm-375-g2-stuck.jpg |
+| 5 | Measured text on the first play screen. | 8 market texts at 13 px: "up to +3", "Salmon", "up to +1", "Fox"... | R14-shots/wm-375-g4-first.jpg |
+| 4 (good) | Careless game at 390. | The verdict pill tells you every poor move in one line ("⚠ -7 · Poor move: Bear column was +6"). | R14-shots/wm-390-g1-turn15.jpg |
