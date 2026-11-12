@@ -89,7 +89,7 @@ const isAct=a=>x=>x.what==='act'&&x.act===a;
 const isDie=(f,n)=>x=>x.what==='die'&&x.f===f&&!x.kept&&(n==null||x.k===n);
 const nm=i=>mname(P(i));
 // core rule -> the step that teaches it (in play order). tut-walk.js walks the tutorial by touch and checks every one was shown.
-const TUT_RULES=[['goal: 20 stars or last standing','goal'],['keep dice','keep'],['three rolls','roll1'],['three of a kind, pair scores nothing','third'],
+const TUT_RULES=[['goal: 20 stars or last standing','goal'],['keep dice','keep'],['three rolls','roll1'],['three of a kind (1s, 2s, 3s score 1, 2, 3), pair scores nothing','third'],
   ['energy','energy'],['kept dice can be rerolled','rekeep'],['resolve the dice','done1'],['empty Downtown: move in, +1 star','score1'],
   ['buy a power card','buy'],['card powers: permanent vs one-shot','power'],['energy is saved, end turn','end1'],['rivals take turns; outside claws hit Downtown','rivals'],['stay when hit','stay'],
   ['start in Downtown: +2 stars','bonus'],['Downtown claws hit everyone; stop early','done2'],['0 hearts: knocked out; no healing in Downtown','ko'],
@@ -99,11 +99,11 @@ function tutSteps(){
   const phone=obTwo();   // touch: tap a card to read it, tap again to buy (a mouse buys with one click)
   const S=[
  {id:'goal',title:'Your goal',say:'Win with 20 ★, or be the last monster standing.',target:tChips,wait:null,ready:()=>myRoll()&&G.rolls===2&&!G.dice.some(d=>d.k)},
- {id:'keep',title:'Keep dice',say:'Tap both 3s. Kept dice stay put when you roll.',target:tDie(0),also:tDie(1),wait:{type:'tap',times:2,match:isDie('3')},
+ {id:'keep',title:'Keep dice',say:'Tap both 3s. Kept dice stay put when you roll.',target:()=>tDie(G.dice[0].k?1:0)(),also:()=>G.dice[0].k||G.dice[1].k?null:tDie(1)(),wait:{type:'tap',times:2,match:isDie('3')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice.filter(d=>d.k).length<2},
  {id:'roll1',title:'Roll again',say:'You get three rolls. Tap Roll to throw the rest.',target:tRoll,wait:{type:'tap',match:isAct('reroll')},
    ready:()=>myRoll()&&G.rolls===2&&G.dice[0].k&&G.dice[1].k},
- {id:'third',title:'Three of a kind',say:'Three 3s score 3 ★. A pair scores nothing. Keep it.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
+ {id:'third',title:'Three of a kind',say:'Three 3s = 3★, 2s = 2★, 1s = 1★. A pair: 0. Keep it.',target:tDie(2),wait:{type:'tap',match:isDie('3',2)},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].f==='3'&&!G.dice[2].k},
  {id:'energy',title:'Energy',say:'Each ⚡ is 1 energy for power cards. Keep both.',target:tDie(3),also:tDie(4),wait:{type:'tap',times:2,match:isDie('E')},
    ready:()=>myRoll()&&G.rolls===1&&G.dice[2].k&&G.dice.filter(d=>d.k&&d.f==='E').length<2},

@@ -260,3 +260,7 @@ html:not(.ph) #pacts .btn .bl,html:not(.ph) #pacts .btn small{color:#fff!importa
 .gx-dock-head .gx-ibtn{background:#fff7dd!important;border-image-source:none!important}
 html.ph #bcity{display:none;position:absolute;left:50%;transform:translateX(-50%);z-index:5;padding:5px 12px;border-radius:999px;background:#1a1320;border:2px solid #e63946;color:#fff;font:900 15px/1.2 Nunito,sans-serif;white-space:nowrap;pointer-events:none;box-shadow:0 3px 0 rgba(0,0,0,.35)}
 html.ph #bcity.on{display:block}
+/* W500: the computer's turn line: "tap to skip" hint + a one-line recap of the last computer turn */
+html.ph #bline .bskip{font-style:normal;font-weight:700;opacity:.8}
+html.ph #bline .brecap{display:block;margin-top:2px;font:800 14px/1.15 Nunito,sans-serif;color:#ffe9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #bline.flash .brecap{color:#1a1320}

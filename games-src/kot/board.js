@@ -37,7 +37,7 @@ function bfOut(){if(!G||G.winner||G.mode!=='solo')return false;const me=meSeat()
 function bfLineText(){return typeof ppLine==='function'?ppLine(bfLineText0()):bfLineText0()}
 function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.choice&&!$bf('choice').classList.contains('hidden'))return 'Choose here';if(bfOut())return 'You’re knocked out · watching the end';
   if(UI.intro||UI.choice)return '';
-  if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
+  if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     if(G.rolls<=0||!nk)return 'No rolls left: tap SMASH';
     if(!G.dice.some(d=>d.k))return 'Keep dice, then Roll';
@@ -46,7 +46,12 @@ function bfLineText0(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
     const fk=typeof OB!=='undefined'&&OB.pinK>=0?OB.pinK:-1;return fk>=0&&canBuy(p,fk)?'Tap Buy, or Not now':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to read it':'Not enough ⚡: End turn'}
   return ''}
-function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
+function bfLine(){const el=$bf('bline');if(!el)return;bfRecapWatch();const fl=!!(BF.flash&&BF.flash.until>bfNow());let t=fl?BF.flash.t:bfLineText();
+  const rv=!!(t&&G&&!G.winner&&!humanTurn()&&!NET.on&&!UI.choice&&!UI.intro&&!bfOut());
+  if(!fl&&G&&humanTurn()&&G.phase==='roll'&&BF.spin&&bfNow()<BF.spin.end&&!UI.choice&&!UI.intro)t='Rolling the dice…';
+  const rc=BF.recap&&t&&!G.tut&&(rv||(humanTurn()&&G.phase==='roll'&&G.rolls>=rerollsOf(cur())))?BF.recap:'';
+  const h=t?esc(t)+(rv&&!fl&&!BF.fast?'<i class="bskip"> · tap to skip</i>':'')+(rc?`<small class="brecap">${esc(rc)}</small>`:''):'';
+  if(el.innerHTML!==h)el.innerHTML=h;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
 // ---- what the dice would do, shown on the board ----
 function bfMarks(){const el=$bf('bmarks');if(!el)return;
@@ -64,7 +69,7 @@ function bfMarks(){const el=$bf('bmarks');if(!el)return;
 // ---- the reroll: dice tumble and land one by one ----
 function bfRollWatch(){if(!G||G.rollId===BF.rid)return;const first=BF.rid<0;BF.rid=G.rollId;if(first||!bfAnim()||G.phase!=='roll')return;
   const idx=G.dice.map((d,k)=>d.k?-1:k).filter(k=>k>=0);if(!idx.length)return;const t0=bfNow();BF.spin={t0,idx,end:t0+520+idx.length*95};
-  idx.forEach((k,j)=>setTimeout(()=>{if(typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},520+j*95));setTimeout(()=>{bfDice();bfMarks()},BF.spin.end-t0+30)}
+  idx.forEach((k,j)=>setTimeout(()=>{if(typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},520+j*95));setTimeout(()=>{bfDice();bfMarks();bfLine()},BF.spin.end-t0+30)}
 function bfDice(){const sp=BF.spin,now=bfNow();document.querySelectorAll('#dice .die[data-die]').forEach(el=>{const k=+el.dataset.die;el.classList.remove('spin');
   if(sp&&now<sp.end&&sp.idx.includes(k)){const j=sp.idx.indexOf(k);el.classList.add('bfroll');el.style.animationDelay=(-(now-sp.t0)/1000)+'s';el.style.setProperty('--land',(.52+j*.095)+'s')}
   else{el.classList.remove('bfroll');el.style.animationDelay=''}})}
@@ -83,7 +88,7 @@ function bfBump(k,f){const c=document.querySelector(`.pchip[data-pm="${k}"]`);if
 function bfCapture(){if(!bfOn()||!bfAnim())return;const els=[...document.querySelectorAll('#dice .die[data-die]')];if(!els.length)return;
   const dice=G.dice.map((d,k)=>{const el=els.find(e=>+e.dataset.die===k);return {f:String(d.f),t:d.t||'',xy:el?bfCenter(el):null,html:el?el.innerHTML:faceSVG(d.f)}});
   const c={};dice.forEach(d=>{const f=d.f[0];c[f]=(c[f]||0)+1});
-  BF.cap={t:bfNow(),a:G.active,dice,c,used:{},live:true};BF.next=bfNow()+80;BF.snap=G.pl.map(p=>({h:p.hp,v:p.vp,e:p.en}));BF.rel={};BF.until=bfNow()+900;
+  BF.cap={t:bfNow(),a:G.active,dice,c,used:{},live:true};BF.next=bfNow()+80;BF.snap=G.pl.map(p=>({h:p.hp,v:p.vp,e:p.en}));BF.rel={};BF.until=bfNow()+bfTail(900);
   clearTimeout(BF.capT);BF.capT=setTimeout(bfEnd,6000)}
 function bfEnd(){if(!BF.cap&&!BF.snap)return;BF.cap=null;BF.snap=null;BF.rel={};phChips()}
 function bfSlot(gap){const t=Math.max(bfNow(),BF.next);BF.next=t+(gap||140);return t-bfNow()}
@@ -109,7 +114,17 @@ function bfPlay(k,e,orig){const c=BF.cap,a=c.a,m=/^([+-])(\d+)(♥|⚡|★)$/.ex
     const again=o.k!=null&&used[o.k];if(o.k!=null)used[o.k]=1;
     bfFly(html,src,to,{delay:t+j*70,dur:fld==='h'&&m[1]==='-'?470:560,cls:(again?'again ':'')+(o.k!=null?'die':'tok'),burst:j?'':burst,end:fld==='h'?.55:.45,spin:o.k!=null?540:0,size:o.k!=null?52:40,
       land:()=>{if(!landed){landed=true;done()}else if(burst==='hit'&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}}})});
-  BF.until=Math.max(BF.until,bfNow()+t+flights.length*70+900)}
+  BF.until=Math.max(BF.until,bfNow()+t+flights.length*70+bfTail(900))}
+// W500 pacing: a computer turn lands in about 2 s; a tap on the board makes the rest near-instant
+function bfTail(ms){return !G||humanTurn()?ms:BF.fast?120:Math.round(ms*.45)}
+// ---- one-line recap of what each computer monster did on its turn ----
+function bfRecapWatch(){if(!G||G.winner||G.tut||NET.on){BF.rsA=-1;BF.recap='';return}const a=G.active;if(a===BF.rsA)return;
+  const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat(),bits=[];
+    const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);if(g.length)bits.push(g.join(" "));
+    const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp);if(hit.length)bits.push('hit '+hit.map(r=>`${r.i===me?"you":mname(r)} −${o.hp[r.i]-Math.max(0,r.hp)}`).join(', '));
+    if(G.city===q.i&&o.city!==q.i)bits.push('took Downtown');(BF.bought||[]).forEach(n=>bits.push('bought '+n));
+    BF.recap=`${mname(q)}: ${bits.length?bits.join(' · '):'nothing this turn'}`}
+  BF.bought=[];BF.rsA=a;const q=G.pl[a];BF.rs=q?{a,vp:q.vp,en:q.en,hp:G.pl.map(r=>r.hp),city:G.city}:null}
 // ---- the shop in the tray ----
 function bfShop(){const el=$bf('pshop');if(!el||!G)return;if(!phShopOK()||!G.market.length){BF.sel=-1;const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip&&tip.innerHTML)tip.innerHTML='';return}
   const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;
@@ -123,7 +138,7 @@ function bfTapCard(k,el){const p=cur();if(!phShopOK())return;
   const from=el?bfCenter(el):null,to=bfChipXY(meSeat()>=0?meSeat():G.active),html=`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,nm=CARDS[base(G.market[k])].n;
   BF.sel=-1;bfTut('buy',1);BF.tipHold={html:`<b>${esc(nm)}</b> ${chipOf(CARDS[base(G.market[k])])}<p>${cx(CARDS[base(G.market[k])].x)}</p>`,until:bfNow()+3200};setTimeout(()=>{bfShop()},3300);bfFly(html,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});uiAct({card:String(k)});bfFlash(`Bought ${nm}!`,1400)}
 // ---- the computer's turn: a tap on the board speeds it up until your next turn ----
-function bfSpeed(){if(BF.fast||!G||humanTurn())return;BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,140);bfFlash('Fast forward ⏩',900)}
+function bfSpeed(){if(BF.fast||!G||humanTurn())return;BF.fast=true;BF.saveDelay=AIDELAY;AIDELAY=Math.min(AIDELAY,60);BF.until=Math.min(BF.until,bfNow()+120);bfFlash('Skipping ⏩',700)}
 function bfSlowAgain(){if(BF.fast&&(!G||humanTurn()||G.winner)){BF.fast=false;if(BF.saveDelay)AIDELAY=BF.saveDelay}}
 // ---- the ghost finger: the first game shows each new move once ----
 function bfTut(k,done){if(done){if(!BF.tut[k]){BF.tut[k]=1;try{localStorage.setItem('ccs_bf1',JSON.stringify(BF.tut))}catch(e){}}return}return !BF.tut[k]}
@@ -212,6 +227,8 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
   if(t.closest&&t.closest('[data-act="end"]'))BF.sel=-1;
   // tapping the board outside the shop drops the picked card
   if(BF.sel>=0&&!(t.closest&&t.closest('#pshop'))){BF.sel=-1;setTimeout(phRender,0)}},true);
-try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=320}catch(e){}
+try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=230}catch(e){}
+// the recap names what each computer monster bought
+if(typeof buy==='function'){const _b=buy;buy=function(k){try{if(G&&!humanTurn()&&G.market[k]!==undefined)(BF.bought=BF.bought||[]).push(CARDS[base(G.market[k])].n)}catch(e){}return _b.apply(this,arguments)}}
 setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();
