@@ -10,7 +10,7 @@ const w=dom.window;
 setTimeout(()=>{
 const res=w.eval(`(function(N,FOLLOW,LVL){ANIM=0;AIDELAY=0;schedule=function(){};render=function(){};refresh=function(){};try{tutOn=()=>false}catch(e){}
  const out=[];let rr=1;const rand=n=>{rr=(rr*1103515245+12345)%2147483648;return rr%n};
- for(let g=0;g<N;g++){rr=g*7919+3;setSeed(500+g);if(LVL)UI.lvl=LVL;UI.hints=true;UI.mode='F';newGame('F',4);G.pl[0].human=true;for(let i=1;i<4;i++)G.pl[i].human=false;
+ for(let g=0;g<N;g++){rr=g*7919+3;setSeed(500+g);if(LVL)UI.lvl=LVL;UI.fast=${process.env.NBFAST!=='0'};UI.hints=true;UI.mode='F';newGame('F',4);G.pl[0].human=true;for(let i=1;i<4;i++)G.pl[i].human=false;
   let steps=0,dec=0,fol=0,cursed=0;
   while(!G.winner&&steps<6000){steps++;const s=sideToAct();if(s<0)break;let m=null;
    if(s===0){dec++;const vm=validMoves(0);UI.coachKey=null;const co=coach(0);

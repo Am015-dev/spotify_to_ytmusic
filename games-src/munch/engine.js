@@ -66,8 +66,8 @@ function bigWhy(p,id){const c=cd(id);if(!c.big)return null;return bigCount(p,id)
 function newGame(mode,n){n=n||DEFN;const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
   const ids=[];const C={};let k=0;for(const def of CARDS){if(def.x3&&!DEFEX[def.x3])continue;for(let c=0;c<(def.cp||1);c++){C[k]=def.k;ids.push(k++)}}
   G={v:2,gid:Date.now()%1e9,rng:seed,seed,mode,C,door:[],tr:[],dd:[],td:[],pl:[],turn:1,active:0,phase:'setup',cb:null,q:null,ops:[],then:null,log:[],winner:null,winText:'',ex:Object.assign({},DEFEX),kicked:null,fought:false,lastRoll:null,win:null,cowin:-1};
-  // Faster Play (the rulebook's own option): Listen at the Door each turn + a shared win for the helper. On by default in a Quick game; off in the tutorial and the story.
-  G.fast=UI.fast!==false&&!(typeof TUTG!=='undefined'&&TUTG)&&!(typeof CMP_GO!=='undefined'&&CMP_GO);
+  // Faster Play (the rulebook's own option): Listen at the Door each turn + a shared win for the helper. Opt-in for now (FLAG: UI.fast, Game length: Quick); off in the tutorial and the story.
+  G.fast=UI.fast===true&&!(typeof TUTG!=='undefined'&&TUTG)&&!(typeof CMP_GO!=='undefined'&&CMP_GO);
   for(const id of ids)(D(C[id]).d==='door'?G.door:G.tr).push(id);shuffle(G.door);shuffle(G.tr);
   const names=UI.names||HERO_NAMES;
   for(let i=0;i<n;i++){const human=mode==='hot'?true:mode==='ai'?false:i===0;

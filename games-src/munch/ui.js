@@ -240,8 +240,8 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    ${online?'':`<button class="btn primary pulse dkstart" data-start="${UI.mode||'F'}">Start</button>`}</div>`:''}
    ${typeof tutBtn==='function'?tutBtn('btn'):''}${!net&&typeof onlineBlock==='function'&&!online?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
-   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'easy')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
-   <h3>Game length</h3><div class="seg"><button class="btn ${UI.fast!==false?'on':''}" data-set="fast" data-v="1">Quick (faster play)</button><button class="btn ${UI.fast===false?'on':''}" data-set="fast" data-v="0">Full</button></div>
+   <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||(UI.fast===true?'easy':'normal'))===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
+   <h3>Game length</h3><div class="seg"><button class="btn ${UI.fast===true?'on':''}" data-set="fast" data-v="1">Quick (faster play)</button><button class="btn ${UI.fast!==true?'on':''}" data-set="fast" data-v="0">Full</button></div>
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
