@@ -105,6 +105,10 @@ const MVW={T:'Turn',B:'Bank',S:'Straight',K:'K-turn'};
 function mvWords(m){return m.s===0?'Full stop':m.t==='S'?`Straight ${m.s}`:m.t==='K'?`K-turn ${m.s} (turn around)`:`${MVW[m.t]} ${m.d<0?'left':'right'} ${m.s}`}
 const colWords=c=>c==='g'?'green = easy, clears a stress token':c==='r'?'red = hard, gives a stress token (no action while stressed)':'white = normal';
 function rockHits(s,m){const key=[G.round,s.id,s.x,s.y,s.h,m.s,m.t,m.d||0].join('|');const C=UI.rhC=(UI.rhC&&UI.rhC.g===G)?UI.rhC:{g:G,v:{}};if(key in C.v)return C.v[key];return C.v[key]=rockHits0(s,m)}
+// the final pose leaves the mat: the ship is destroyed (marked red "off mat!" on every dial)
+function offMat(s,m){return offBoard(finalPose(s,B(s),m),B(s))}
+// a move the ★ must never pick while any safe move exists: off the mat, onto or through a rock, or a red while stressed
+function unsafeMv(s,m){return offMat(s,m)||rockHits(s,m)>0||(exColor(s,m).c==='r'&&!!s.stress)}
 function rockHits0(s,m){const b=B(s),p=finalPose(s,b,m);if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))return 2;return tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2))?1:0}
 function recBox(s,sug){if(!UI.hints)return '';const m=dialOf(s)[sug],c=exColor(s,m).c;const si=sugInfo(s,sug);
   const bad=dialOf(s).filter((x,i)=>i!==sug&&rockHits(s,x)).length;const rock=bad&&!rockHits(s,m)?` It also avoids the asteroids that ${bad} other move${bad>1?'s':''} would hit.`:'';

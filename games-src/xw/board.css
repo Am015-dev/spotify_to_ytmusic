@@ -264,3 +264,12 @@ html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info::before{content:"";display:block
 #ppop .pp-more>summary::-webkit-details-marker{display:none}
 /* the dock is see-through while the ship drawer is up: it must not swallow taps meant for the board and its buttons */
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{pointer-events:none!important}html.ph.ph-p.ph-info:not(.ph-big) #ppop{pointer-events:auto!important}
+/* off-mat warning: a red tag on every move whose end leaves the mat (the ship is lost) */
+.bfm em.rk.om{width:auto;height:auto;border-radius:4px;padding:1px 3px;font-size:9px;line-height:1.1;white-space:nowrap;font-style:normal;right:-10px}
+#bfdial .rk.om{color:#fff;background:#d92b2b;border-radius:4px;padding:0 4px}
+button.mv em.om,button.mv em.rk{position:absolute;right:1px;bottom:1px;font-style:normal;font-size:9px;font-weight:800;background:#d92b2b;color:#fff;border-radius:4px;padding:0 3px;line-height:1.3;white-space:nowrap;pointer-events:none}
+button.mv{position:relative}
+/* new tappable chips fade in where they will stay (opacity only: a chip that moves under the finger eats the tap) */
+.bfact,.bftgt,.bfm,.bfspot{animation-name:bffade;animation-duration:.18s;animation-timing-function:ease-out}
+.bftgt{animation:bffade .18s ease-out,bftg 1s ease-in-out .18s infinite}
+@keyframes bffade{from{opacity:0}}

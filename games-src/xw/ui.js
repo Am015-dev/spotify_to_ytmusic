@@ -23,7 +23,7 @@ function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=C
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
   for(let sp=5;sp>=1;sp--){let row='';let any=false;for(const [t,dd,ic] of COLS){const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);
       if(i<0){row+='<td></td>';continue}any=true;const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;
-      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${ic}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
+      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${ic}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}${offMat(s,d[i])?'<em class="om">off mat!</em>':rockHits(s,d[i])?'<em class="rk">rock!</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 // the result line for the player reading it: "You win/lose: …" in a solo or online game, the neutral line in hot-seat or watch
@@ -31,7 +31,9 @@ function winLine(){const me=soloSide();if(!G||!G.winner||me<0||G.winner==='draw'
   const why=/both squadrons/.test(G.winText)?`both squadrons fell together, and ${won?'you':sideName(1-me)} had initiative`:/^Time/.test(G.winText)?'on points destroyed when time ran out':won?'every enemy ship is destroyed':'all your ships are destroyed';
   return `${won?'You win':'You lose'}: ${why}.`}
 function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>x.id+':'+UI.draft[x.id]).join(',');
-  if(UI.sugCache&&UI.sugCache.k===G.round+'|'+s.id+'|'+dk)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
+  // the cache key carries the game, every ship's pose and stress and the rocks: a ★ worked out for another game or for poses still flying is never reused
+  const ck=[G.round,s.id,s.stress?1:0,dk,alive().map(x=>x.id+'@'+Math.round(x.x*10)+','+Math.round(x.y*10)+','+Math.round(x.h*1000)).join(';'),G.rocks.map(o=>Math.round(o.x)+','+Math.round(o.y)).join(';')].join('|');
+  if(UI.sugCache&&UI.sugCache.g===G&&UI.sugCache.k===ck)return UI.sugCache.v;const anySafe=dialOf(s).some(m=>!unsafeMv(s,m));const lv={samples:6,noise:0,look:0};
   // wingmen whose dials are already set: don't suggest ending on top of them
   const friends=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>({s:x,p:finalPose(x,B(x),dialOf(x)[UI.draft[x.id]])}));
   const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
@@ -43,10 +45,10 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
 
     // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
     {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
-const rk=rockHits(s,m);if(rk)v-=40*rk;
+const rk=rockHits(s,m);if(rk)v-=40*rk;if(offMat(s,m))v-=1e5;if(anySafe&&unsafeMv(s,m))v-=1e6;
     else{const P=corners(p,B(s));const near=Math.min(...G.rocks.map(o=>{const R=rockPoly(o);return Math.min(...P.map(q=>polyPointDist(q,R)))}),1e9);if(near<30)v-=(30-near)/6}
     sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
-  UI.sugCache={k:G.round+'|'+s.id+'|'+dk,v:best,sc};return best}
+  UI.sugCache={g:G,k:ck,v:best,sc};return best}
 function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];if(offBoard(p,b))return '<b class="bad">Flies off the battlefield: the ship would be destroyed!</b>';
   if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))bits.push('<b class="bad">lands on an asteroid (damage roll, no action, no shot)</b>');
   else if(tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2)))bits.push('<b class="bad">clips an asteroid (damage roll, no action)</b>');

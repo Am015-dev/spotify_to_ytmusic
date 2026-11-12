@@ -125,7 +125,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
   const sheet=k==='ask'||(!!PHN.pop&&PHN.pop.kind==='info');R.classList.toggle('bf-sheet',sheet);
   topLine(k);
-  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp,f.bp))}
+  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);BF.fitP=1;requestAnimationFrame(()=>{BF.fitP=0;fit(f.pts,f.min,f.sd,f.tp,f.bp)})}
   if(key===BF.key)return;BF.key=key;clear();dice.hidden=true;
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
@@ -154,9 +154,9 @@ function planUI(){dropLoose();const ps=planSide();const my=alive().filter(s=>s.s
   if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
   if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=(UI.hints||(typeof tutStaged==='function'&&tutStaged()))?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
-      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
+      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const om=offMat(s,m),rk=rockHits(s,m)||(om?1:0);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(om?', leaves the mat: the ship is destroyed':rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
       if(sug===i&&(pick==null||(pick!==sug&&typeof tutStaged==='function'&&tutStaged())))BF.fingT=it.el});
-    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
+    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock · <b class="rk">off mat!</b> lost');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
   setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
@@ -177,11 +177,12 @@ function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return
   const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
 function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
   if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
-  const el=dialEl(),face=el.querySelector('.dface'),key=s.id+':'+L.map(o=>o.i).join(',');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
-  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  // the face is rebuilt (and turned to this round's pick) for every round and pose: a face kept from last round showed old marks and pre-selected last round's slot
+  const el=dialEl(),face=el.querySelector('.dface'),key=[G.round,s.id,Math.round(s.x),Math.round(s.y),Math.round(s.h*100),sug,L.map(o=>o.i).join(',')].join(':');BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
+  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m)||offMat(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
   el.hidden=false;dialSpin(false);
-  const m=dialOf(s)[pick],c=exColor(s,m).c,rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
-  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m)}</span><span class="dwd">${esc(mvWords(m))}${rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
+  const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
+  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m)}</span><span class="dwd">${esc(mvWords(m))}${om?' · <b class="rk om">off mat!</b>':rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
   pathW(tplPoints(s,b,m,4),'bfp on '+c);ghostW(s,m,c+' on',true);item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
   setHint(`Spin the dial for ${esc(shortName(s))}`);
   setBtns(`<button class="btn" data-bf="dclose" aria-label="Close the dial">✕</button><button class="btn primary big" data-bf="dlock">Lock move ✓</button>`);finger(null)}
@@ -285,7 +286,11 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup|
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
 function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
 function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;if(typeof NCH!=='undefined'&&NCH.cur&&BF.fing&&BF.fing.offsetParent)(NCH.fs=NCH.fs||{})[NCH.cur]=1;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=shownXY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
+  // tappable chips sit where they will END from their first frame: projected with the camera's target (not the glide in progress) and the ship's real
+  // pose (not the mesh still flying), so a quick tap never lands where a chip used to be. Paths and rings below still follow what is drawn.
+  const cam=V3.camera,glide=!!(V3.ez&&!V3.debugCam);let sp0,sq0;if(glide){sp0=cam.position.clone();sq0=cam.quaternion.clone();placeCam(0,0,V3.cam);cam.updateMatrixWorld()}
+  if(BF.fitP){if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}return}// the camera target is set next frame: keep new chips hidden until then
+  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=it.ring?shownXY(s):XY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
       if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86);const base=y<Ht-230?Math.PI/2:-Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}
       if(it.dy)y+=it.dy*(r*1.3+26)}
@@ -293,6 +298,7 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
     it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:0;if(it.relax||it.r)rel.push(it)}
   relaxItems(rel,Wd,Ht);
   for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(/bfm/.test(it.el.className)?Ht-(bar?bar.offsetHeight:90)-20:Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
+  if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
   if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}
