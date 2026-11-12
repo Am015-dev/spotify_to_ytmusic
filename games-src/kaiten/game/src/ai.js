@@ -166,9 +166,9 @@ function easyPick(G, seat) {
       case 'salmon': case 'squid': case 'egg': v = NIG[k] * (t.u > 0 ? 3 : 1); break;
       case 'wasabi': v = 2.2; break; case 'chop': v = 1.2; break; case 'pudding': v = 2; break;
     }
-    return v + (rng() - 0.5) * 3;
+    return v + (rng() - 0.5) * 2.4;
   });
-  let i = 0; if (rng() < 0.15) i = Math.floor(rng() * h.length); else for (let j = 1; j < h.length; j++) if (vals[j] > vals[i]) i = j;
+  let i = 0; if (rng() < 0.1) i = Math.floor(rng() * h.length); else for (let j = 1; j < h.length; j++) if (vals[j] > vals[i]) i = j;
   if (h.length >= 2 && KK._.hasChop(p) && (h.length === 2 || rng() < 0.12)) { let j = i === 0 ? 1 : 0; for (let x = 0; x < h.length; x++) if (x !== i && vals[x] > vals[j]) j = x; return [Math.min(i, j), Math.max(i, j)]; }
   return [i];
 }
