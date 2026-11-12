@@ -54,7 +54,7 @@ function render() {
   $('#barstat').textContent = '';
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
   renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
-  glow(); try { dockToActs(); } catch (e) { }
+  glow(); try { markBest(); } catch (e) { } try { dockToActs(); } catch (e) { }
   try { rateStart(); showRate(); } catch (e) { }
   try { if (window.GXH && GXH.phase) GXH.phase(helpPhase()); } catch (e) { }
   try { coachState(); } catch (e) { }
@@ -108,7 +108,8 @@ function renderMat(p, vs) {
 function renderDock(p, vs, cur) {
   var Q = G.q, mine = myTurn();
   var who = G.phase === 'over' ? 'Game over' : isHuman(cur) ? (humans().length > 1 ? G.pl[cur].name + "'s turn" : 'Your turn') : G.pl[cur].name + "'s turn";
-  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = UI.animSeat === UI.view && humans().length === 1 ? 'Your birds are working' : G.pl[UI.animSeat].name + ' is playing';
+  // while the last move still animates, the header names whose move it is and who plays next (never "your birds" without a bird power firing)
+  if (G.phase !== 'over' && UI.busy && UI.animSeat != null && UI.animSeat !== cur) who = (UI.animSeat === UI.view && humans().length === 1 ? 'Your move' : G.pl[UI.animSeat].name + "'s move") + ' \u00b7 ' + (isHuman(cur) && humans().length === 1 ? 'you' : G.pl[cur].name) + ' next';
   $('#dt').textContent = who;
   setH($('#trk'), trackerHTML());
   var wb = $('#whatbtn'); if (wb) wb.hidden = !(hintsOn() && UI.mode !== 'tutfree' && mine && !Q);
@@ -124,7 +125,7 @@ function renderDock(p, vs, cur) {
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
     (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
-  var bp = mine && !Q && hintsOn() ? bestPlay(G, vs) : null;
+  var hm = mine && !Q && hintsOn() ? hintMove() : null, bp = hm ? (hm.t === 'play' && (UI.sel == null || UI.sel === hm.i) ? { i: hm.i } : null) : mine && !Q && hintsOn() && typeof coachOn === 'function' && coachOn() ? bestPlay(G, vs) : null;
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
   var order = p.hand.map(function (id, i) { return i; }).sort(function (x, y) { return (ok[y] ? 1 : 0) - (ok[x] ? 1 : 0) || (ok[x] ? B[p.hand[y]].p - B[p.hand[x]].p : 0) || x - y; });   // birds you can play first, best first
   setH($('#hand'), p.hand.length ? order.map(function (i) {
@@ -141,13 +142,14 @@ function renderDock(p, vs, cur) {
   handScrollSync(); handPager();
   var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
   var sc = $('#hand .bc.sel'); if (sc) $('#hand').scrollLeft = sc.offsetLeft - $('#hand').offsetLeft - 4;
+  else { var bc = $('#hand .bc.bestc'); if (bc && (bc.offsetLeft - $('#hand').offsetLeft + bc.offsetWidth > $('#hand').scrollLeft + $('#hand').clientWidth || bc.offsetLeft - $('#hand').offsetLeft < $('#hand').scrollLeft)) $('#hand').scrollLeft = bc.offsetLeft - $('#hand').offsetLeft - 4; }   // the Best bird is never hidden off the strip
 }
 // keep the step's buttons (Play / Other food / Cancel, Skip, No thanks) just under the sticky prompt, never scrolled out of sight
 function dockToActs() {   // the step's buttons and what glows in the panel sit just under the sticky prompt, so you never scroll to find them
   var db = $('#dockbody'), pr = $('#prompt'), ac = $('#acts'); if (!db || !ac || !myTurn() || db.scrollHeight <= db.clientHeight) return;
   var r = db.getBoundingClientRect(), lim = r.top + (pr && pr.offsetHeight ? pr.offsetHeight + 6 : 0), els = [];
   if (ac.children.length) els.push(ac);
-  var g = db.querySelector('#hand .glow, #hand .sel, #acts .glow'); if (g) els.push(g); else if (!els.length) return;
+  var g = db.querySelector('#hand .glow, #hand .sel, #acts .glow') || db.querySelector('#hand .bestc'); if (g) els.push(g); else if (!els.length) return;
   var top = Math.min.apply(null, els.map(function (e) { return e.getBoundingClientRect().top; })), bot = Math.max.apply(null, els.map(function (e) { return e.getBoundingClientRect().bottom; }));
   var d = top < lim ? top - lim : bot > r.bottom ? Math.min(bot - r.bottom + 4, top - lim) : 0;
   if (Math.abs(d) > 2) db.scrollTop += d;
@@ -156,8 +158,10 @@ function promptText(mine) {
   if (!G) return '';
   if (G.phase === 'over') return 'The year is over.';
   if (!mine && UI.cap) return UI.cap;
-  if (!mine && isHuman(UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat) && humans().length <= 1) return UI.animSeat === UI.view && UI.busy ? 'Your birds are at work, one by one.' : 'Your turn is starting.';
-  if (!mine) return UI.busy ? (UI.animSeat === UI.view ? 'Your birds are at work, one by one.' : G.pl[UI.animSeat == null ? PP.sideToAct(G) : UI.animSeat].name + ' is playing.') : 'Watch ' + G.pl[PP.sideToAct(G)].name + '.';
+  var nx = PP.sideToAct(G), nxn = isHuman(nx) && humans().length <= 1 ? 'you' : G.pl[nx].name;
+  if (!mine && UI.busy && UI.animSeat === UI.view) return (UI.animPw ? 'Your birds\u2019 powers fire, one by one.' : 'Your move is finishing.') + (nx !== UI.view ? ' Then ' + nxn + ' plays.' : '');
+  if (!mine && isHuman(UI.animSeat == null ? nx : UI.animSeat) && humans().length <= 1) return 'Your turn is starting.';
+  if (!mine) return UI.busy ? G.pl[UI.animSeat == null ? nx : UI.animSeat].name + ' is playing.' : 'Watch ' + G.pl[nx].name + '.';
   var Q = G.q;
   if (UI.pend) return 'Tap Play to put ' + B[G.pl[UI.view].hand[UI.pend.i]].n + ' in your ' + HABN[UI.pend.h] + '.';
   if (UI.gsDie != null) return 'Grub or seed?';

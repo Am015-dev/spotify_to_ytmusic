@@ -27,6 +27,26 @@ function shortPower(id) {
 var HABW = { F: 'Forest', G: 'Meadow', W: 'Wetland' };
 // ---------------- the value estimate (points now, plus a little for what an action sets up)
 function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Math.max(0, x.b.e - x.s.eggs); }, 0); }
+// the Best hint = the hard computer's choice for this exact moment (look-ahead over engines, the round goal and bonus cards),
+// cached per decision so the badge does not jump between renders
+var HINT = { k: null, m: null };
+function hintMove() {
+  if (!G || G.phase === 'over' || !hintsOn() || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
+  var p = G.pl[UI.view], k = JSON.stringify([G.turn, G.round, G.q, p.cubes, p.hand, p.food, p.board.map(function (r) { return r.map(function (x) { return x.eggs; }); }), G.feeder, G.tray]);
+  if (HINT.k !== k) { HINT.k = k; try { HINT.m = PPAI.hint(G, UI.view); } catch (e) { HINT.m = null; } }
+  return HINT.m;
+}
+function markBest() {   // Best badge on the sub-choice the hint picks (die, egg nest, tray card, deck, tuck) and on the space to play into
+  $$('.bestx').forEach(function (e) { e.parentNode.removeChild(e); }); $$('.bestt').forEach(function (e) { e.classList.remove('bestt'); });
+  var m = hintMove(); if (!m) return;
+  var el = null;
+  if (G.q && m.t === 'die' && UI.gsDie != null) el = UI.gsDie === m.i ? $$('#acts [data-a="mv"]').filter(function (x) { try { return JSON.parse(x.dataset.m).f === m.f; } catch (e) { return false; } })[0] : null;   // grub-or-seed die: Best moves to the right button
+  else if (G.q && /^(die|egg|trade|tray|deck|tuck)$/.test(m.t)) el = moveTarget(m);
+  else if (m.t === 'play' && UI.sel === m.i && !UI.pend) el = $('.row[data-h="' + m.h + '"] .slot.next');
+  if (!el) return;
+  el.classList.add('bestt');
+  var b = document.createElement('em'); b.className = 'bestb bestx'; b.textContent = 'Best'; el.appendChild(b);
+}
 function bestPlay(G, s) {
   var p = G.pl[s], best = null;
   PP.playable(G, s).forEach(function (x) { var v = B[p.hand[x.i]].p - ((x.inf && x.inf.eggs) || 0); if (!best || v > best.v) best = { i: x.i, v: v, id: p.hand[x.i], pts: B[p.hand[x.i]].p }; });
@@ -45,6 +65,8 @@ function actInfo(G, s) {
   out.play = { h: -1, ok: nPl > 0, plain: 'pick from ' + nPl + ' you can pay for', v: bp ? bp.v + (p.cubes > 1 ? 1 : 0) : 0, what: bp ? 'pick from ' + nPl + ', up to +' + bp.pts + (bp.pts === 1 ? ' pt' : ' pts') : '', gain: bp ? '+' + bp.pts + ' pts' : '',
     why: p.hand.length ? 'Not enough food or eggs yet. Get food first.' : 'No birds in hand. Draw birds first.' };
   var best = null; Object.keys(out).forEach(function (k) { if (out[k].ok && (!best || out[k].v > out[best].v)) best = k; });
+  var hm = s === UI.view && !G.q ? hintMove() : null;   // Best follows the strong player's plan (engines, round goal, bonus card), not this quick estimate
+  if (hm && hm.t === 'act' && out[hm.a] && out[hm.a].ok) best = hm.a; else if (hm && hm.t === 'play' && out.play.ok) best = 'play';
   out.best = best;
   return out;
 }

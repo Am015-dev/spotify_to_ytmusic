@@ -19,7 +19,7 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   const open = await p.$('[data-gxt-open]'); ok(!!open, 'tutorial button on the title (fresh storage)');
   await open.scrollIntoViewIfNeeded(); const r0 = await open.boundingBox(); await tapXY(r0.x + r0.width / 2, r0.y + r0.height / 2);
   const seen = [], words = []; let pinkEgg = 0, tucked = 0, blocked = null, idle = Date.now(), real = false, later = false;
-  let lastStep = null, lastAt = Date.now(); const lat = {};
+  let lastStep = null, lastAt = Date.now(); const lat = {}, geo = {};
   while (Date.now() - idle < 30000) {
     const st = await p.evaluate(() => {
       if (typeof UI === 'undefined' || !G) return { wait: 1 };
@@ -37,7 +37,14 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
       if (st.step === 'cache') tucked = await p.evaluate(() => G.pl[0].board[0].reduce((a, b) => a + b.tuck + b.cache, 0));
       if (SHOTS) { await p.waitForTimeout(250); await p.screenshot({ path: path.join(SHOTS, 'tut-' + seen.length + '.png') }); }
     }
-    const el = await p.$('.tutpoint'); if (!el) { await p.waitForTimeout(200); continue; } await el.scrollIntoViewIfNeeded().catch(() => { });
+    const el = await p.$('.tutpoint'); if (!el) { await p.waitForTimeout(200); continue; }
+    if (!geo[st.step]) {   // R12: the target must be on screen (the game scrolls it into view) and at least 44x44, before this test scrolls anything
+      await p.waitForTimeout(450);
+      const g = await p.evaluate(() => { const e = document.querySelector('.tutpoint'); if (!e) return null; const r = e.getBoundingClientRect(); return { on: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth, w: Math.round(r.width), h: Math.round(r.height) }; }).catch(() => null);
+      if (g && process.env.WHY) console.log('     ' + st.step + ' ' + JSON.stringify(g));
+      if (g) geo[st.step] = g;
+    }
+    await el.scrollIntoViewIfNeeded().catch(() => { });
     const r = await el.boundingBox(); if (!r) { await p.waitForTimeout(200); continue; }
     const x = r.x + r.width / 2, y = r.y + Math.min(r.height / 2, 30);
     if (blocked === null && st.step === 'play') {   // a tap somewhere else must do nothing
@@ -56,6 +63,9 @@ const RULES = [...COVER.matchAll(/step `([a-zA-Z0-9]+)`/g)].map(m => m[1]);
   const long = words.filter(w => w[1] > 12), multi = words.filter(w => w[2] !== 1);
   const slow = ['white', 'cache', 'pink', 'food', 'eggs', 'cards', 'goalr'].filter(k => !(lat[k] <= 2000));   // a "see" step's marker shows within 2 s of the step starting, its power's own animation included (G4 review); goalr waits for Pip's last turn and shows a 'watch' line meanwhile
   ok(slow.length === 0, 'step markers appear within 2 s (R6: food, eggs, goalr waited 4-7 s): ' + ['white', 'cache', 'pink', 'food', 'eggs', 'cards', 'goalr'].map(k => k + ' ' + lat[k] + ' ms').join(', '));
+  const off = Object.keys(geo).filter(k => !geo[k].on), small = Object.keys(geo).filter(k => geo[k].w < 44 || geo[k].h < 44);
+  ok(off.length === 0, 'every tutorial target starts fully on screen' + (off.length ? ': ' + off.join(',') : ''));
+  ok(small.length === 0, 'every tutorial target is at least 44x44' + (small.length ? ': ' + small.map(k => k + ' ' + geo[k].w + 'x' + geo[k].h).join(', ') : ''));
   ok(long.length === 0, 'one sentence of 12 words or fewer per step' + (long.length ? ': ' + long.map(w => w[0] + '=' + w[1]).join(',') : ''));
   ok(multi.length === 0, 'exactly one highlighted tap per step' + (multi.length ? ': ' + multi.map(w => w[0] + '=' + w[2]).join(',') : ''));
   ok(blocked === true, 'a tap away from the highlighted target is blocked');

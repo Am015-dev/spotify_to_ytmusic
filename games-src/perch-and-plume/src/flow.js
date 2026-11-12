@@ -92,7 +92,7 @@ function apply(m, s) {
   if (isHuman(s)) UI.lastHuman = s;
   save(); render();
   if (!UI.fast) fx.forEach(function (e) { if (e.k === 'pw' && e.seat === UI.view && pre[e.h] && pre[e.h][e.c] && pre[e.h][e.c].id === e.id) setSlot(e.h, e.c, pre[e.h][e.c]); });
-  UI.busy = true; UI.animSeat = s; $('#prompt').textContent = promptText(false);
+  UI.busy = true; UI.animSeat = s; UI.animPw = fx.some(function (e) { return e.k === 'pw' && e.seat === s; }); $('#prompt').textContent = promptText(false);
   playFx(fx, s).then(function () { UI.busy = false; UI.animSeat = null; try { rateEnd(); } catch (e) { } render(); pump(); });
   return true;
 }

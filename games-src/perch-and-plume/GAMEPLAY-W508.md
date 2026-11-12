@@ -28,3 +28,14 @@ Not taught as a step: bonus-space trades and feeder rerolls (dice luck); the ins
 | Tutorial food/eggs/goalr waits 4-7 s | Pip's turns played at full speed between steps. | In the tutorial Pip plays 6x faster, your own animations 2x; the wait bubble says "Tap to skip" and a tap plays the rest at once. `src/flow.js`, `src/coach.js` | `tests/tutorial-end.js` (all step markers within 2 s) |
 | First 10 s, Feel | Goal not stated on the first screen; actions resolved as number changes. | Score bar says "Goal: most points in 4 rounds" on the first turn; the four actions glow; food flies from the die to your food row, eggs fly to the bird, rows bump. `src/turnui.js`, `src/flow.js` | screenshots |
 | Result note looked under 14 px | | 15 px. `src/screens.js` | |
+
+## R12 re-review fixes (6.6 FAIL -> fixer 3)
+| R12 finding | Cause | Fix | Test |
+|---|---|---|---|
+| Row 6: lost 5/5 to Easy, even always taking "Best" (61-70) | "Best" came from a one-line estimate (points now, food if stuck), blind to engines, round goals and bonus cards. | "Best" (action tile, bird, space, die, nest, tray card, deck, tuck) is now the hard computer's own look-ahead choice for that moment, cached per decision (`PPAI.hint`, `hintMove()`/`markBest()` in `src/turnui.js`). Easy is noisier (noise 16, off-plan 60% of turns) and hardly values engines or row strength. The grub-or-seed die moves its Best to the right button; the Best bird is kept in view in the hand strip. | `hint-gate.js` (headless, Best vs Easy and mixed vs Easy); `BEST=1` / `BEST=0.5 node tests/touch-game.js` (by touch) |
+| Row 4: header "Your birds are working" during Fern's turn, with no birds | The hand-over animation of your last move ran under Fern's turn and was always called "your birds at work". | Header: "Your move · Fern next"; line: "Your move is finishing. Then Fern plays." ("Your birds' powers fire" only when a brown power really fires). `src/render.js`, `src/flow.js` | screenshots |
+| Row 5: tutorial at 375x667, 4 targets off screen, 5 under 44 px | The Play button carried a 256 px egg icon (unsized `.egi`), so it ran under the screen edge; nothing scrolled targets in; small-screen dice were 38 px; tray/nest/round strip under 44. | Egg/nest icons in buttons 22 px; each step scrolls its target into view (`tInView` in `src/coach.js`); a tutorial target is at least 44x44; dice 44 px on short phones. | `tests/tutorial-end.js` now fails if a target starts off screen or under 44x44 (before the test scrolls) |
+
+Measured (rival speed fast, hints on): final build, always tapping Best won 4/4 (62-59, 86-46, 60-25, 64-64 won on tie-break);
+a mixed newcomer (Best half the time, else a random glowing target) won 1/2 (57-51, lost 53-64). Over all builds in this pass: Best 7/8, mixed 2/6.
+Headless (`node hint-gate.js 80`): Best 85-91%, mixed 67-74%, random 30% vs Easy. Random glowing taps with hints off still lose (29-62, 39-47).

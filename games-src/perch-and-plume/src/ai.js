@@ -1,7 +1,7 @@
 /* Perch & Plume computer players. Main action: try each candidate on a copy of the game (the copy's deck and dice are re-shuffled,
    so the computer never peeks at hidden cards), finish the turn with the quick sub-choices below, then score the result with value().
    value() = points now + food and cards worth more early + brown engine value over the turns left + the current round goal + bonus cards.
-   Levels: easy (noisy, short-sighted), normal, hard (goal and bonus aware, plans payments). */
+   Levels: easy (noisy, short-sighted: hardly values engines or row strength), normal, hard (goal and bonus aware, plans payments). */
 (function (root) {
   'use strict';
   var PP = root.PP || require('./engine.js');
@@ -34,9 +34,9 @@
     var kk = Math.max(1, Math.floor(T / (lvl === 'hard' ? AIW.kk : 3.5)));
     hv.forEach(function (x, k) { v += x * wR * (k < kk ? 1 : .12); });
     // brown engine: each row is used about a third of the remaining turns
-    PP.birds(p).forEach(function (x) { var pw = PP.power(x.s.id); if (pw.col === 'brown') { var pv = PWV[pw.k] || .5; if (pw.k === 'laySelf' && x.s.eggs >= x.b.e) pv = .1; v += pv * T * (lvl === 'hard' ? AIW.eng : .3); } if (pw.col === 'pink') v += .35 * Math.min(T, 8); });
+    PP.birds(p).forEach(function (x) { var pw = PP.power(x.s.id); if (pw.col === 'brown') { var pv = PWV[pw.k] || .5; if (pw.k === 'laySelf' && x.s.eggs >= x.b.e) pv = .1; v += pv * T * (lvl === 'hard' ? AIW.eng : lvl === 'easy' ? .1 : .3); } if (pw.col === 'pink') v += .35 * Math.min(T, 8); });
     // row strength: a longer row gives a bigger action
-    [0, 1, 2].forEach(function (h) { var y = PP.rowYield(p, h); v += (y.n - (h === 1 ? 2 : 1)) * T * (lvl === 'hard' ? AIW.row : .12); });
+    [0, 1, 2].forEach(function (h) { var y = PP.rowYield(p, h); v += (y.n - (h === 1 ? 2 : 1)) * T * (lvl === 'hard' ? AIW.row : lvl === 'easy' ? .04 : .12); });
     // round goal (current round, weighted by how close the scoring is)
     if (G.goals[G.round] && lvl === 'hard') { var res = PP.placeGoal(G, G.round); v += (res.pts[seat] || 0) * (lvl === 'hard' ? .9 : .6) * (p.cubes <= 2 ? 1 : .7); }
     // egg room matters while there is time to fill it
@@ -139,12 +139,12 @@
         tot += value(G2, seat, lvl, known);
       }
       var v = tot / sims;
-      if (lvl === 'easy') v += (Math.random() - .5) * 12;
+      if (lvl === 'easy') v += (Math.random() - .5) * 16;
       else if (lvl === 'normal') v += (Math.random() - .5) * 3;
       return { m: m, v: v };
     }).sort(function (a, b) { return b.v - a.v; });
     if (lvl === 'normal' && scored.length > 1 && Math.random() < .3) return scored[1].m;   // normal: a fair player who sometimes takes the second-best move
-    if (lvl === 'easy' && scored.length > 2 && Math.random() < .5) return scored[1 + Math.floor(Math.random() * Math.min(4, scored.length - 1))].m;
+    if (lvl === 'easy' && scored.length > 2 && Math.random() < .6) return scored[1 + Math.floor(Math.random() * Math.min(4, scored.length - 1))].m;
     return scored[0].m;
   }
   // why (<= 15 words) for the hint bulb
@@ -158,7 +158,9 @@
     if (m.t === 'deck') return 'Nothing in the tray fits; try the deck.';
     return 'A sensible choice right now.';
   }
-  var AI = { W: AIW, choose: choose, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
+  // the Best hint: the strongest player's choice (hard look-ahead: engines, round goal, bonus cards)
+  function hint(G, seat) { return choose(G, seat, 'hard'); }
+  var AI = { W: AIW, choose: choose, hint: hint, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
   root.PPAI = AI;
   if (typeof module !== 'undefined') module.exports = AI;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -85,7 +85,15 @@ function coachTick() {
   if (s.id === 'real') COACH.finished = true;
   if (!coachReady(s)) { if (!myTurn() || s.res || UI.busy) coachWait(s); return; }
   coachSay(s);
-  var t = s.t(); if (t) t.classList.add('tutpoint');
+  var t = s.t(); if (t) { t.classList.add('tutpoint'); tInView(t); }
+}
+// R12: a step's target is always on screen when its step begins: scroll it into view (inside the panel or the page) once per step
+function tInView(t) {
+  var r = t.getBoundingClientRect(), vh = window.innerHeight, vw = window.innerWidth;
+  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw && COACH.seenAt === COACH.i) return;
+  COACH.seenAt = COACH.i;
+  if (r.top >= 0 && r.left >= 0 && r.bottom <= vh && r.right <= vw) return;
+  try { t.scrollIntoView({ block: r.height > vh * .6 ? 'start' : 'center', inline: 'nearest' }); } catch (e) { t.scrollIntoView(false); }
 }
 // while a step waits for its tap, only its target (and the header) takes taps; a tap elsewhere pulses the target instead
 document.addEventListener('click', function (e) {
