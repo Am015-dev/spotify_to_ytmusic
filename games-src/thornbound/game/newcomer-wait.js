@@ -15,15 +15,16 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     if(!await tapSel('#start [data-a=play]')){console.log('g'+g+': no Play button');bad++;continue}
     if(!await tapSel('#start [data-a=start]')){console.log('g'+g+': no Start button');bad++;continue}
     const t0=Date.now();let still=0,stillT=Date.now(),lastSnap='',worst={ms:0,what:''},taps=0;
-    while(Date.now()-t0<600000){
-      const s=await p.evaluate(()=>{const vis=e=>{const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight)return null;const cx=Math.min(Math.max(r.left+Math.min(r.width/2,22),1),innerWidth-1),cy=r.top+r.height/2;const t=document.elementFromPoint(cx,cy);if(!t||!(t===e||e.contains(t)||t.contains(e)))return null;return [cx,cy]};
+    const CAP=+(process.env.CAP||420000);let lastLog=Date.now();
+    while(Date.now()-t0<CAP){if(process.env.V&&Date.now()-lastLog>15000){lastLog=Date.now();console.log('  '+Math.round((Date.now()-t0)/1000)+'s taps '+taps+' worst '+(worst.ms/1000).toFixed(1)+' '+worst.what+' round '+(await p.evaluate(()=>G.round+' q='+(G.q&&G.q.kind)+' card='+(UI.card&&UI.card.kind)+' line='+((document.querySelector('#tbturn .tbt-line')||{}).textContent||''))))}
+      const s=await p.evaluate(()=>{const vis=e=>{const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight)return null;const cx=Math.min(Math.max(r.left+Math.min(r.width/2,22),1),innerWidth-1),cy=r.top+r.height/2;const t=document.elementFromPoint(cx,cy);const hs=e.closest('.tb-loc')||e.closest('g.rglow')||e;if(!t||!(t===hs||hs.contains(t)||t.contains(hs)))return null;return [cx,cy]};
         const pick=sels=>{for(const s of sels)for(const e of document.querySelectorAll(s)){const c=vis(e);if(c)return {s,c}}return null};
         const over=!!(G&&G.over);
         const t=pick(['.gxh-bub.on .gxh-ok','#tbgoal button','#pc [data-a=take]','#ppop [data-a=mv]','#handw .hc.glow.rg','#spots .bspot.glow','.tb-loc.glow.rec .tb-ring','.tbx-pan g.rglow rect','#handw .kcb.glow.rg','#handw .hc.glow','.tb-loc.glow .tb-ring','#handw .kcb.glow','#main [data-a=mv]','#act [data-a=mv]']);
         const h=document.body.innerHTML;let k=h.length;for(let i=0;i<h.length;i+=11)k=(k*31+h.charCodeAt(i))|0;
         return {over,t,snap:k+'|'+(UI.card&&UI.card.kind)+'|'+G.logN,st:(document.querySelector('#tbturn .tbt-line')||{}).textContent||'',card:UI.card&&(UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')),q:G.q&&G.q.kind}});
       if(s.over)break;
-      if(s.t){const d=Date.now()-stillT;if(d>worst.ms)worst={ms:d,what:worst.what};stillT=Date.now();await p.touchscreen.tap(...s.t.c);taps++;await sleep(350);lastSnap='';continue}
+      if(s.t){const d=Date.now()-stillT;if(d>worst.ms)worst={ms:d,what:worst.what};stillT=Date.now();if(process.env.V>1)console.log('   tap '+s.t.s);await p.touchscreen.tap(...s.t.c);taps++;await sleep(350);lastSnap='';continue}
       if(s.snap!==lastSnap){lastSnap=s.snap;const d=Date.now()-stillT;if(d>worst.ms)worst={ms:d,what:'still: card='+s.card+' q='+s.q+' line="'+s.st+'"'};stillT=Date.now()}
       else{const d=Date.now()-stillT;if(d>worst.ms)worst={ms:d,what:'still: card='+s.card+' q='+s.q+' line="'+s.st+'"'}}
       await sleep(150)}
