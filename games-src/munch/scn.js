@@ -303,7 +303,7 @@
     setup: function () { gearUp(33, true); return GXS.wait(function () { return document.querySelectorAll('.mine .hand .card').length >= 6; }, 6000).then(function () { return idle(700); }); },
     mut: [{ name: 'names run under the next card', js: 'var st = document.createElement("style"); st.textContent = "html.ph .mine .hand .card .cn{width:100%!important;max-width:none!important}"; document.head.appendChild(st)' }],
     checks: [
-      { kind: 'visible', sel: '.mine .hand .card', name: 'hand' },
+      { kind: 'fn', name: 'hand: cards are on screen (a scrolling hand slides to the star card)', fn: function () { var c = [].filter.call(document.querySelectorAll('.mine .hand .card'), function (e) { var q = e.getBoundingClientRect(); return q.width > 20 && q.left >= -2 && q.right <= innerWidth + 2 && q.top >= 0 && q.bottom <= innerHeight; }); return c.length >= 3 || 'only ' + c.length + ' whole hand cards on screen'; } },
       { kind: 'fn', name: 'the long names are in the hand', fn: function () { return (window.__want && window.__want.length >= 2) || 'only ' + (window.__want || []).length + ' long-name cards found'; } },
       { kind: 'fn', name: 'every card name is fully visible: not under the next card, not clipped, no word broken', fn: function () {
         var cards = [].slice.call(document.querySelectorAll('.mine .hand .card')), bad = [];
@@ -331,9 +331,9 @@
         var vis = [].slice.call(document.querySelectorAll('#prompt .bfline, .bfstage .bfcap, .gxh-bub.on')).filter(function (e) { return GXS.vis(e) && /\S/.test(e.textContent); });
         var lines = vis.map(function (e) { return e.textContent.trim(); }); if (lines.length !== 1) return lines.length + ' instruction texts at once: ' + lines.map(function (t) { return '"' + t + '"'; }).join(' / ');
         return wordsIn(lines[0]) <= 8 || '"' + lines[0] + '" is ' + wordsIn(lines[0]) + ' words'; } },
-      { kind: 'fn', name: 'the line says what works: tap OR drag', fn: function () { var t = line(); return (/tap/i.test(t) && /drag/i.test(t)) || 'line is "' + t + '"'; } },
+      { kind: 'fn', name: 'the line names the star card to act on (the hand slides it into view)', fn: function () { var t = line(); return (/★/.test(t) && !!document.querySelector('.mine .hand .card.bf-best')) || 'line is "' + t + '"'; } },
       { kind: 'play', name: 'tap a glowing card, then your hero: it is played (the line is true)', snap: function () { return { hand: P(0).hand.length }; },
-        steps: [{ sel: '.mine .hand .card.play', until: function () { return BF.pick != null; }, max: 3 }, { sel: '.bf-tgt' }], idle: function () { return !UI.busy && BF.pick == null; },
+        steps: [{ sel: '.mine .hand .card.bf-best', until: function () { return BF.pick != null; }, max: 3 }, { sel: '.bf-tgt' }], idle: function () { return !UI.busy && BF.pick == null; },
         verify: function (b, a) { return (a.hand === b.hand - 1) || 'hand ' + b.hand + ' -> ' + a.hand + ': the card was not played by tap, tap'; } },
       { kind: 'fn', name: 'rival chips: the sword and helmet numbers carry a word (str / gear), whole inside the chip', fn: function () {
         var bad = []; [].forEach.call(document.querySelectorAll('.opp.seat'), function (s) { var b = s.querySelector('.sbd'), t = b.textContent;
@@ -351,7 +351,7 @@
       { kind: 'text', sel: '#prompt .bfline', re: /\S/, name: 'status text', minPx: 12 },
       { kind: 'fn', name: 'line is 8 words or fewer', fn: function () { return wordsIn(line()) <= 8 || '"' + line() + '" is ' + wordsIn(line()) + ' words'; } },
       { kind: 'fn', name: 'line is a single line (no wrap past 2 rows)', fn: function () { var e = document.querySelector('#prompt .bfline'), px = parseFloat(getComputedStyle(e).lineHeight) || 16; return e.getBoundingClientRect().height <= px * 2.2 || 'line wraps to ' + Math.round(e.getBoundingClientRect().height / px) + ' rows'; } },
-      { kind: 'tap', sel: '.mine .hand .card.play', name: 'tap a glowing card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } },
+      { kind: 'tap', sel: '.mine .hand .card.bf-best', name: 'tap the star card', state: function () { return line(); }, expect: function (a, b) { return (a !== b && wordsIn(b) <= 8 && /tap|drop|drag|glow/i.test(b)) || 'line after tap: "' + b + '"'; } },
       { kind: 'fn', name: 'the picked card glows exactly where the engine allows it', fn: function () { if (BF.pick == null) return 'no card picked'; var zones = {}; bfMoves(0, BF.pick).forEach(function (x) { zones[x.z] = 1; }); var shown = {}; [].forEach.call(document.querySelectorAll('.bf-tgt'), function (e) { shown[e.dataset.bfz] = 1; }); var a = Object.keys(zones).sort().join(','), b = Object.keys(shown).sort().join(','); return (a === b && a !== '') || 'engine zones [' + a + '] but glowing [' + b + ']'; } }
     ],
     mut: [{ name: 'no target glows', js: 'document.querySelectorAll(".bf-tgt").forEach(function (e) { e.classList.remove("bf-tgt"); e.removeAttribute("data-bfz") })' }]

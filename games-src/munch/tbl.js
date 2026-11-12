@@ -7,11 +7,12 @@ function tbFitNames(cs){cs.forEach(c=>{const m=c.querySelector('.cn');if(!m)retu
   const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;for(let i=0;i<10&&bad()&&fs>10;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
 function tbFan(){tbFitNames([...document.querySelectorAll('.arena .card,.bfstage .card')]);const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
-  const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0){if((tbFan.n=(tbFan.n||0)+1)<25){clearTimeout(tbFan.t);tbFan.t=setTimeout(tbFan,200)}return}tbFan.n=0;   // hand not laid out yet (board hidden behind a screen): fit it again when it shows
+  
   // portrait phone, 5+ cards: a fan hides every name, so the hand becomes a row of whole, readable cards that scrolls sideways
   if(document.documentElement.classList.contains('ph-p')){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
     // up to 5 cards always fit; 6+ shrink to 72 px and the row scrolls sideways (every card keeps its art, whole name and bonus)
-    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100)hd.style.setProperty('--hw',Math.max(n>5?72:64,fw)+'px')}
+    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100){const mn=n>5?72:64;let hw=Math.max(mn,fw);if(n>5&&n*mn+(n-1)*gap>room){const g2=14,full=hd.clientWidth,m=Math.max(1,Math.floor((full+g2)/(mn+g2)));hw=Math.floor((full-g2*(m-1))/m);hd.style.setProperty('--ov',g2+'px')}hd.style.setProperty('--hw',hw+'px')}}   // scrolling row: the card width is chosen so a whole number of cards fills the strip (the first view cuts no card in half)
     hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*wN+(n-1)*gap>room);hd.classList.remove('tight');tbFitNames(cs);return}
   // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
   let w=w0;if(n>1){const fit=avail-MS*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
