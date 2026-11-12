@@ -163,7 +163,7 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 #bf .bf-wall .bf-c{width:calc(var(--cs)*1.1);height:calc(var(--cs)*1.1)}
 #bf .bf-rack .bf-c{width:calc(var(--cs)*.9);height:calc(var(--cs)*.9)}
 #bf .bf-row{align-items:center}
-#bf .bf-c .pr{inset:5%;opacity:.8;filter:saturate(.75)}
+#bf .bf-c .pr{inset:5%;opacity:.3;filter:saturate(.45)}
 #bf .bf-wall .bf-c>.bf-t{box-shadow:0 2px 4px rgba(0,0,0,.45)}
 /* rival turn: the kiln it takes from glows; its chip pulses as the tiles arrive */
 #bf .rv-src{animation:rvSrc .9s ease-in-out infinite;border-radius:50%}
@@ -172,3 +172,11 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 @keyframes chipHit{40%{transform:scale(1.12)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){#bf .rv-src,#bf .bf-chip.hit{animation:none}#bf .rv-src{box-shadow:0 0 0 5px #ffd65a}}
 #bf.tapfx .bf-say::after,#bf .bf-say.fastm::after{content:' ⏩';font-size:.9em}
+/* W501 fix: every tap target is 44px+ (rack rows, floor line, kiln tiles) */
+#bf .bf-me .bf-row{min-height:44px}
+#bf .bf-me .bf-floor{min-height:44px;margin-top:2px}
+#bf .bf-k .bf-t svg{position:absolute;left:50%;top:50%;width:var(--v);height:var(--v);margin:calc(var(--v)/-2) 0 0 calc(var(--v)/-2)}
+#bf .bf-chip{height:44px;border-radius:22px}
+#bf .bf-chip:has(.bf-pj)>i{display:none}
+#bf .bf-chip:has(.bf-pj){gap:2px;padding:0 6px}
+#bf .bf-chip .bf-pj{padding:1px 3px;margin-left:2px}
