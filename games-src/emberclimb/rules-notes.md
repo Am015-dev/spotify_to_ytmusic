@@ -5,34 +5,67 @@ official rules as I know them. I cannot open the rulebook from this container, s
 numbers with confidence; "UNCHECKED" means I could not recall the official number with confidence, so it was left alone (nothing invented).
 Names in the game are all original; this file uses plain rule terms only.
 
+## One scale (R16, Nov 2026): every number = tabletop number x SCALE (8)
+The re-review found three scales mixed (HP x8, damage ~x5, Weak/Shiv/rest x3). Now ONE constant, `D.SCALE = 8` (data.js), applies to
+every number: damage, Block, HP, healing, HP loss, Weak, Wrath, Shiv, orb values, poison per token, relic/potion/event numbers and gold.
+Token counts (Strength, Weak, Vulnerable, Poison, Frail, Ritual) stay tabletop counts; each Strength or Poison token is worth SCALE.
+Tests: rules-test.js R28 (every number in cards, upgrades, enemies, heroes, events, shop and start gold is a multiple of SCALE; anchors
+Strike/Defend/Shiv = 1 unit, hero 10 units) plus the scaled R02-R27 checks; logic-test.js 70 rules use SCALE too.
+
+| Value | Tabletop source | Shelf (x8) |
+|---|---|---|
+| Strike / Defend | starter cards: deal 1 / gain 1 Block | 8 / 8 |
+| Heavy starter attack (Warrior) | 2 damage + Vulnerable | 16 + 2 Vulnerable tokens |
+| Shiv | deal 1 | 8 |
+| Weak | attacker deals 1 less per hit (floor 0) | -8 per hit (so a Weak Strike deals 0, as on the table) |
+| Vulnerable | the hit is doubled | x2 (a multiplier, not scaled) |
+| Strength | +1 damage per hit per token | +8 per hit per token |
+| Wrath | +1 damage per hit dealt; ending a turn in it costs 1 HP | +8 / 8 HP |
+| Poison | 1 HP per token at the end of the heroes' turn | 8 HP per token |
+| Hero HP | printed boards about 10 (Warrior) / 9 | 80 / 72 / 72 / 72 |
+| Rest | Heal 3 | 24 (= 30% of the 80 HP Warrior, as the reviewer confirmed) |
+| Block cap / Strength cap / debuff cap | 20 / 8 tokens / 3 tokens | 160 / 8 / 3 |
+| Orbs | Lightning 1 (evoke 2), Frost 1 Block (evoke 1), Dark +1 per turn (evoke 1 + stored), Focus +1 | x8 |
+| Burn / Regret | 1 HP / 1 HP per card held | 8 / 8 per card |
+| Gold | coins: common card 2, uncommon 3, rare 6, relic 6 (uncommon 9), potion 2, removal 3, start 4; monster 1, elite 1-2, boss 2-4, chest 1-2 | coins x8 |
+
+Card, enemy, relic, potion and event numbers that I could not check against a printed copy (this container cannot open the rulebook)
+were written in video-game sizes and are converted once at load by `tt()` in data.js to the nearest whole tabletop unit (at least 1),
+then x8: hero cards and potions 5 per unit (Strike 6 -> 1, Defend 5 -> 1, 8 -> 2); hero HP, healing and HP loss 8 per unit;
+token counts 3 per token. Enemy tables use their own unit size, set by the newcomer balance gate below: normal and elite foes 3.5
+(HP and attacks), bosses 7 (HP) and 4.5 (attacks). Every result is still a whole tabletop value x 8. UNCHECKED against print: the
+per-card and per-foe unit counts (the anchors in the table above are the checked ones).
+
+Newcomer balance gate (owner, R16): Quick game (1 act, opening blessing), solo, `node bal-newb.js 200 0.5` (test bot choices with 50%
+of card plays replaced by a random playable card): reach the act-1 boss 53%, beat it 33% (Warrior 51/31, Rogue 56/38, Automaton 58/40,
+Monk 48/23).
+
 ## Baseline (owner decision, Nov 2026): the TABLETOP rulebook
-The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules that are pure numbers are multiplied by one constant,
-`D.SCALE = 3` (data.js). Caps live in `D.CAPS`. Each item below has a `rules-test.js` case labelled R01..R23.
+Superseded by "One scale" above: every number is the tabletop number x `D.SCALE` (8). Caps live in `D.CAPS`. Each item below has a `rules-test.js` case labelled R01..R23.
 - R01 no hand size cap. R18 energy cap 6 (not scaled); only spending Miracles can go above it.
-- R02 Vulnerable doubles hit damage (after Strength and Wrath); Weak is -3 (SCALE) per hit, floor 0.
+- R02 Vulnerable doubles hit damage (after Strength and Wrath); Weak is -SCALE per hit, floor 0.
 - R03 Vulnerable/Weak max 3 tokens each. Weak is spent when its holder attacks, Vulnerable when its holder is hit by an attack:
   1 token per whole card / enemy action (a multi-hit spends one). Frail still drops 1 per round (video-game rule, unused by enemies).
 - R04 a Weak attacker hitting a Vulnerable target: neither applies; 1 Weak and 1 Vulnerable are removed.
-- R05 Poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies;
+- R05 Poison: at the end of the heroes' turn each poisoned enemy loses SCALE HP per token (ignores Block); tokens stay until it dies;
   at most 30 tokens across all enemies. Poison card amounts were cut for persistence (vial 3, barbed 2, cloud 2 all, storm 3 all,
   brew 4 + double, pressure point 3, haze 1 per turn, venom potion 4; upgrades +1).
-- R06 Wrath: +3 damage per hit dealt, no extra damage taken; ending your turn in Wrath costs 3 HP. Every fight starts Neutral.
+- R06 Wrath: +SCALE damage per hit dealt, no extra damage taken; ending your turn in Wrath costs SCALE HP. Every fight starts Neutral.
   Calm exit +2 energy (capped at 6).
 - R07 Monk starter relic: 2 Miracle tokens at the start of each fight (max 5; move `{t:'mir'}` = +1 energy). No Calm start, no Calm Spark.
   Two tokens (not one) is a balance choice so the class stays in the 30-65% band.
 - R08 duo: if ANY hero reaches 0 HP the party loses at once (the optional boss "last stand" is not implemented).
-- R09 Rest heals 30% of max HP (+ 10 with the moss relic). Rulebook, Rest Site: "Rest: Heal 3 HP" (quoted from memory of the printed
-  rulebook; the container cannot open it). The printed heroes start with about 10 HP, so a rest restores roughly 30% of a hero. The shelf
-  keeps video-game HP (70-80), so a flat 3 x SCALE = 9 was only 11% and made resting pointless (R7 review); the heal is now the same
-  share of max HP as on the table (80 HP -> 24). rules-test R09 and logic-test rule 40 check it.
+- R09 Rest heals 3 x SCALE = 24 HP (+ SCALE with the moss relic). Rulebook, Rest Site: "Rest: Heal 3 HP" (quoted from memory of the
+  printed rulebook; the container cannot open it). With HP on the same scale (Warrior 10 x 8 = 80) this is the table's 30% share.
+  rules-test R09 and logic-test rule 40 check it.
 - R10 two heroes: enemy HP x1.6 (`D.EHP = {1:1, 2:1.6}`). APPROXIMATION: the printed player-count board was not available.
-- R11 class HP 80 / 70 / 75 / 72 (video-game values; tabletop boards not available). R12 rogue starter 5 + 5 + 2 = 12 cards.
-- R13 Shiv: 3 damage (1 x SCALE) as its own attack; at most 5 Shivs in hand; none at the start of a fight.
+- R11 class HP 10 / 9 / 9 / 9 x SCALE = 80 / 72 / 72 / 72. R12 rogue starter 5 + 5 + 2 = 12 cards.
+- R13 Shiv: 1 x SCALE damage as its own attack; at most 5 Shivs in hand; none at the start of a fight.
 - R14 treasure: one relic per hero. R15 boss relics: 1 per hero + 1 revealed (3 solo); each hero may take one.
 - R16 card rewards: a shuffled reward deck per class (its commons + uncommons) and a separate rare deck; unpicked/skipped cards go
   back and the deck is reshuffled. Monster: 3 from the reward deck; elite: 1 rare + 2; boss: 3 rares (shelf simplification of when
   rares appear; deterministic by seed).
-- R17 Strength cap 8 (heroes), hero Block cap 60 (20 x SCALE).
+- R17 Strength cap 8 (heroes), hero Block cap 160 (20 x SCALE).
 - R19 Retain (flag `t`: stays in hand at end of turn; Final Verdict, Panic Button) and Scry X (Third Eye 3, Deep Bow 2): pending
   choice, move `{t:'scry', keep:[indices into the top cards, 0 = top]}`; the bot discards unplayable junk.
 - R20 one shared enemy die (d6) per round, rolled before the heroes act; some enemy steps are die-based (1-2 / 3-4 / 5-6):
@@ -42,7 +75,7 @@ The shelf keeps video-game-sized numbers (HP ~70-80, Strike 6). Tabletop rules t
 - R22 acts: `opt.acts` (1-3, default 1): after a boss, full heal, new map and boss, foes +25% HP per act. Encounter decks per act
   are not separate (same pools).
 - R23 merchant: 3 class cards per hero (common/uncommon/rare) + 1 neutral card, 3 relics, 3 potions; the first relic and potion are
-  15 gold cheaper. Card removal 75 gold once.
+  one coin (SCALE gold) cheaper. Card removal 3 coins once.
 - Chapter 2 (warden-captain) boss HP set to 106% so the first-legal bot stays at 70-85%.
 
 ## Core turn (older notes, superseded where the list above says so)
