@@ -88,7 +88,7 @@ function dragEnd(s, ok) {
   const noClick = () => { UI.noClick = Date.now() + 350; };
   document.addEventListener('pointerdown', e => {
     if (!G || !UI.started) return;
-    if (UI.busy && e.target.closest && e.target.closest('#bd,#stage')) hurry();
+    if (UI.busy && e.target.closest && e.target.closest('#bd,#stage,#tbl,#belt,#dock,.seat')) hurry();
     const b = e.target.closest && e.target.closest('#belt .hc[data-up="1"]'); if (!b || (e.button && e.button !== 0)) return;
     st = { b, x: e.clientX, y: e.clientY, id: e.pointerId, drag: null, peek: false };
     st.tm = setTimeout(() => { if (st && !st.drag) { st.peek = true; peekShow(b); } }, 430);
@@ -117,7 +117,7 @@ function hurry() {
   if (UI.fast) return; UI.fast = true;
   try { for (const a of document.getAnimations()) if (a.playState === 'running') a.playbackRate = 3; } catch (e) { }
 }
-const spd = () => (AIDELAY > 0 ? Math.max(.5, AIDELAY / 650) : .5) * (UI.fast ? .35 : 1);
+const spd = () => PACE * (AIDELAY > 0 ? Math.max(.5, AIDELAY / 650) : .5) * (UI.fast ? .35 : 1);
 function anim(el, kf, o) { if (!el.animate) return Promise.resolve(); const a = el.animate(kf, o); if (UI.fast) a.playbackRate = 3; return new Promise(r => { a.onfinish = r; a.oncancel = r; setTimeout(r, (o.duration + (o.delay || 0)) / (UI.fast ? 3 : 1) + 400); }); }
 // ---- the reveal stage: every diner's covered dish in a row in the middle of the table, a drum roll, all covers up at once
 function stageOK() { return !!$('#tbl') && !!document.body.animate && !pxRM(); }
@@ -153,13 +153,13 @@ async function stageReveal(picks, tok, gains) {
     const sl = document.querySelector('.seat[data-seat="' + p.s + '"] .slot .sbox'), to = p.host.getBoundingClientRect();
     if (!sl || !to.width) return Promise.resolve();
     const fr = sl.getBoundingClientRect(), dx = fr.left + fr.width / 2 - (to.left + to.width / 2), dy = fr.top + fr.height / 2 - (to.top + to.height / 2), sc = Math.max(.25, fr.width / to.width);
-    return anim(p.host, [{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }, { transform: 'none' }], { duration: 340 * spd(), easing: 'cubic-bezier(.2,.8,.3,1)', delay: i * 40 });
+    return anim(p.host, [{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')' }, { transform: 'none' }], { duration: 260 * spd(), easing: 'cubic-bezier(.2,.8,.3,1)', delay: i * 30 });
   }));
   if (tok !== UI.seq) return stageClear();
   // drum roll: the covers rattle
   st.classList.add('wob');
-  const rolls = G.turn <= 3 && G.round === 1 ? 3 : 1;   // a full drum roll while the game is new, then quicker
-  for (let k = 0; k < rolls; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(190); if (tok !== UI.seq) return stageClear(); }
+  const rolls = 1;   // a full drum roll while the game is new, then quicker
+  for (let k = 0; k < rolls; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(130); if (tok !== UI.seq) return stageClear(); }
   st.classList.remove('wob'); st.classList.add('up'); UI.fz.slots = picks.map(p => ({ mode: 'faces', cards: p.cards })); renderDock(); renderLabActs();
   snd('cloche');
   // ONE BY ONE: each diner's cover lifts in turn, the dish is named in the caption line, its points pop with the plain reason (tap to hurry)
@@ -167,11 +167,11 @@ async function stageReveal(picks, tok, gains) {
   for (let i = 0; i < pods.length; i++) {
     const p = pods[i], l = news0 && news0.lines.find(x => x.s === p.s), d = gains ? (gains[p.s] || 0) : 0;
     pods.forEach((q, j) => q.pod.classList.toggle('cur', j === i)); if (UI.fz) UI.fz.msg = revealCaption(p.s, l); renderDock();
-    snd('cloche'); await covers[i].lift({ delay: 0 }); if (tok !== UI.seq) return stageClear();
+    snd('cloche'); covers[i].lift({ delay: 0 });   // lifts overlap; the pause below is the pace
     const why = l ? l.why.map(w => w.replace(/^[+\u2212]\d+ /, '')).join(' and ') : '';
     const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + '.cur', d > 0 ? '+' + d : d < 0 ? '\u2212' + -d : '+0', h('small', d !== 0 && why ? why : 'no points yet'));
     p.host.appendChild(g); p.pod.classList.add('done'); if (d > 0) snd('coin', { vol: .5 });
-    await wait(1000 * stp); if (tok !== UI.seq) return stageClear();
+    await wait(560 * stp); if (tok !== UI.seq) return stageClear();
   }
   pods.forEach(q => q.pod.classList.remove('cur')); st.classList.remove('seq');
   // each dish goes home to its diner's counter
@@ -180,7 +180,7 @@ async function stageReveal(picks, tok, gains) {
     const se = document.querySelector('.seat[data-seat="' + p.s + '"] .ctr'), fr = p.host.getBoundingClientRect(); if (!se) return Promise.resolve();
     const to = se.getBoundingClientRect(), dx = to.left + Math.min(to.width / 2, 60) - (fr.left + fr.width / 2), dy = to.top + to.height / 2 - (fr.top + fr.height / 2);
     p.pod.querySelector('.snm').style.opacity = '0';
-    return anim(p.host, [{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.45)', opacity: .9 }], { duration: 380 * spd(), easing: 'cubic-bezier(.5,0,.6,1)', delay: i * 40, fill: 'both' });
+    return anim(p.host, [{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.45)', opacity: .9 }], { duration: 280 * spd(), easing: 'cubic-bezier(.5,0,.6,1)', delay: i * 30, fill: 'both' });
   }));
   st.classList.add('out');
 }
@@ -222,21 +222,21 @@ async function passAlong(sizes) {
     const ex = bw.left + 6 - r.left, kf = [{ transform: 'none' }, { transform: 'translate(' + ex + 'px,0) rotate(-4deg)', offset: .5 }];
     if (to) kf.push({ transform: 'translate(' + (to.x - (r.left + r.width / 2)) + 'px,' + (to.y - (r.top + r.height / 2)) + 'px) scale(' + Math.max(.2, 30 / r.width) + ')', opacity: .9 });
     else kf.push({ transform: 'translate(' + (ex - r.width * 1.5) + 'px,0)', opacity: 0 });
-    jobs.push(anim(c, kf, { duration: 1000 * sp, easing: 'ease-in-out', delay: k * 40 * sp, fill: 'both' }));
+    jobs.push(anim(c, kf, { duration: 700 * sp, easing: 'ease-in-out', delay: k * 40 * sp, fill: 'both' }));
   });
   // every other hand moves one seat on
   for (let s = 0; s < np; s++) {
     if (s === f || s === pv && np > 1) continue;
     const a = avR(s), b = avR((s + 1) % np); if (!a || !b) continue;
     const el = h('div.pkt'); el.innerHTML = KIT.backSVG({ w: 34 }); el.appendChild(h('b', String(sizes ? sizes[s] : ''))); el.style.left = '0'; el.style.top = '0'; document.body.appendChild(el); keep.push(el);
-    jobs.push(anim(el, [{ transform: 'translate(' + (a.x - 17) + 'px,' + (a.y - 24) + 'px) scale(.6)', opacity: 0 }, { transform: 'translate(' + (a.x - 17) + 'px,' + (a.y - 24) + 'px)', opacity: 1, offset: .15 }, { transform: 'translate(' + (b.x - 17) + 'px,' + (b.y - 24) + 'px)', opacity: 1, offset: .85 }, { transform: 'translate(' + (b.x - 17) + 'px,' + (b.y - 24) + 'px) scale(.6)', opacity: 0 }], { duration: 1100 * sp, easing: 'ease-in-out', delay: 150 * sp, fill: 'both' }));
+    jobs.push(anim(el, [{ transform: 'translate(' + (a.x - 17) + 'px,' + (a.y - 24) + 'px) scale(.6)', opacity: 0 }, { transform: 'translate(' + (a.x - 17) + 'px,' + (a.y - 24) + 'px)', opacity: 1, offset: .15 }, { transform: 'translate(' + (b.x - 17) + 'px,' + (b.y - 24) + 'px)', opacity: 1, offset: .85 }, { transform: 'translate(' + (b.x - 17) + 'px,' + (b.y - 24) + 'px) scale(.6)', opacity: 0 }], { duration: 780 * sp, easing: 'ease-in-out', delay: 150 * sp, fill: 'both' }));
   }
   // the next hand comes to you from the previous diner, onto the right end of the belt
   if (from && np > 1) {
     const hw = cards[0] ? cards[0].getBoundingClientRect().width : 60, tx = bw.right - hw - 10, ty = bw.bottom - hw * 1.4 - 8;
     const el = h('div.pkt.in'); el.style.width = hw + 'px'; el.style.height = Math.round(hw * 1.4) + 'px'; el.innerHTML = KIT.backSVG({ w: Math.round(hw) }); el.appendChild(h('b', String(sizes ? sizes[pv] : ''))); el.style.left = '0'; el.style.top = '0'; document.body.appendChild(el); keep.push(el);
     tag(pname(pv) + ' →', bw.right - 10, bw.top + 4); keep[keep.length - 1].classList.add('r');
-    jobs.push(anim(el, [{ transform: 'translate(' + (from.x - hw / 2) + 'px,' + (from.y - hw * .7) + 'px) scale(.4)', opacity: 0 }, { transform: 'translate(' + (from.x - hw / 2) + 'px,' + (from.y - hw * .7) + 'px) scale(.5)', opacity: 1, offset: .2 }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1)', opacity: 1 }], { duration: 1000 * sp, easing: 'cubic-bezier(.3,.1,.3,1)', delay: 350 * sp, fill: 'both' }));
+    jobs.push(anim(el, [{ transform: 'translate(' + (from.x - hw / 2) + 'px,' + (from.y - hw * .7) + 'px) scale(.4)', opacity: 0 }, { transform: 'translate(' + (from.x - hw / 2) + 'px,' + (from.y - hw * .7) + 'px) scale(.5)', opacity: 1, offset: .2 }, { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(1)', opacity: 1 }], { duration: 700 * sp, easing: 'cubic-bezier(.3,.1,.3,1)', delay: 350 * sp, fill: 'both' }));
   }
   UI.passKeep = keep;
   await Promise.all(jobs);
