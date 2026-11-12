@@ -452,11 +452,11 @@ function markBest() {
   else if (m.k === 'skip') id = 'skipB';
   else if (m.k === 'workers') { if (m.die === 'x') id = 'wkxB'; else { var i0 = !p.used[0] && p.dice[0] === p.dice[m.die] ? 0 : m.die; id = 'wk' + i0;   /* the dock draws one button per unused die value */ } }
   var el = id && document.getElementById(id); if (!el) return;
-  if (el.classList.contains('bestt') || el.querySelector('.bestb')) return;   /* the market already wears its ★ Best badge */
+  var tab = el.closest('#mk') ? 'market' : el.closest('#es') ? 'estate' : null, tb = tab && document.getElementById('tab-' + tab);
+  if (tb && !tb.classList.contains('on') && !tb.querySelector('.bestq')) { tb.classList.add('bestx'); tb.appendChild(h('span.bestq', { text: '★', 'aria-hidden': 'true' })); }   /* the ★ sits on a closed tab: that tab wears it too */
+  if (el.querySelector('.bestb')) return;   /* the market already wears its ★ Best badge */
   el.classList.add('bestx'); el.appendChild(h('span.bestq', { text: '★', 'aria-hidden': 'true' }));
   el.setAttribute('aria-label', (el.getAttribute('aria-label') || el.textContent) .replace(/, best move$/, '') + ', best move');
-  var tab = el.closest('#mk') ? 'market' : el.closest('#es') ? 'estate' : null, tb = tab && document.getElementById('tab-' + tab);
-  if (tb && !tb.classList.contains('on')) { tb.classList.add('bestx'); tb.appendChild(h('span.bestq', { text: '★', 'aria-hidden': 'true' })); }
 }
 function renderBar() {
   $('#barstat').textContent = G.over ? 'Game over' : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases;
