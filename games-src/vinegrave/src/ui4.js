@@ -33,7 +33,12 @@ const TUT_GAME = 'vinegrave', TUT_SITE = 5;   // the first level-1 ruin (travel:
 const tq = sel => () => { const e = typeof sel === 'function' ? sel() : $(sel); return e && e.getBoundingClientRect().width ? e : null; };
 const tinsp = txt => () => [...document.querySelectorAll('#insp .btn')].find(b => b.textContent.indexOf(txt) === 0) || null;
 const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $('#fx').hidden);
-function tutAI() { if (!GUIDED || UI.coachFree) return null; const L = VG.moves(G); return L.find(m => m.t === 'play') || L.find(m => m.t === 'pass') || null; }   /* guided game: Tamsin only plays cards, then passes; coached play: the real (easy) computer */
+function tutAI() {   /* guided game: Tamsin really plays (cards, camp digs, market middle, research) but never takes what the next lesson needs */
+  if (!GUIDED || UI.coachFree) return null; if (G.q) return null; const L = VG.moves(G), me = G.p[0];
+  const safe = L.filter(m => m.t === 'play' || m.t === 'res' || (m.t === 'buy' && m.r >= 1 && m.r <= 4) || (m.t === 'dig' && m.s !== 2 && G.sites[m.s] && G.sites[m.s].lvl === 0));
+  if (!me.passed && safe.length) { const b = VAI.choose(G, 'easy'); return (b && safe.find(m => VG.same ? VG.same(m, b) : JSON.stringify(m) === JSON.stringify(b))) || safe.find(m => m.t === 'play') || safe.find(m => m.t === 'dig') || safe[0]; }
+  return L.find(m => m.t === 'play') || L.find(m => m.t === 'pass') || null;
+}   /* guided game: Tamsin only plays cards, then passes; coached play: the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
@@ -107,11 +112,17 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
 }
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
+/* one step counter over both tutor runs (rules + score walk): "16/35", never "16/33" */
+const TUTN = { off: 0, tot: 0 };
+function tutCount() {
+  if (!TUTN.tot) return; document.querySelectorAll('.gxt-n').forEach(e => { const m = /^(\d+)\/(\d+)$/.exec(e.textContent); if (!m || +m[2] === TUTN.tot) return; e.textContent = (+m[1] + TUTN.off) + '/' + TUTN.tot; const d = e.parentNode && e.parentNode.querySelector('.gxt-dots'); if (d) d.setAttribute('aria-label', 'Step ' + (+m[1] + TUTN.off) + ' of ' + TUTN.tot); });
+}
+try { new MutationObserver(tutCount).observe(document.documentElement, { childList: true, subtree: true, characterData: true }); } catch (e) { }
 function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
   if (typeof GXT === 'undefined' || !UI.coachFree) return; CO.q = []; if (CO.cur) { setTimeout(coachScoreStart, 400); return; }   /* Pell finishes his line first */
   UI.coachFree = false; CO.over = true; coachHide();
   const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
-  TUTCFG = c; GXT.start(c);
+  TUTN.off = TUTN.tot - steps.length; TUTCFG = c; GXT.start(c);
 }
 /* W490 guided first game (owner, 8 Nov: gameplay first): every core rule in order, one sentence of 12 words or fewer,
    one highlighted tap per step, on a real board; then the score walk and a real game. ?tut=coach = the older coached free play. */
@@ -216,7 +227,7 @@ function tutStart(o) {
     onDone: r => { const c = r && r.choice; coachEnd(); tutSeen(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
       if (c === 'chapter' && first) GXC.play(first.id); else if (c === 'story') { $('#start').hidden = true; GXC.open(); } else if (c === 'play') UIACT.quick(); else showTitle(); },
     onExit: () => { coachEnd(); tutSeen(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } };
-  GXT.start(TUTCFG);
+  TUTN.off = 0; TUTN.tot = TUTCFG.steps.filter(x => x.id !== 'free').length + tutSteps().filter(x => /^score/.test(x.id)).length; GXT.start(TUTCFG);
 }
 function tutSeen() { UI.prefs.played = true; try { savePrefs(); } catch (x) { } }   /* skipped or finished: Play becomes the big button, so Play never restarts the tutorial */
 function coachEnd() { document.body.classList.remove('vg-coached'); UI.coachFree = false; CO.q = []; coachHide(); }

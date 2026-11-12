@@ -125,35 +125,50 @@ function doMove(m) {
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
   const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
   if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = moveCaption(m, s) + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
-  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
+  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(500, Math.min(delay, 800)));
 }
 function after() {
   if (!G) return; render();
   if (G.phase === 'over') { clearSave(); setTimeout(() => { try { if (typeof CO !== 'undefined') { CO.q.length = 0; coachHide(); } } catch (x) { } showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
+  UI.rivalT0 = 0; UI.quick = false;
   if (s !== UI.view) { if (UI.humans.length > 1) showPass(s); else { UI.view = s; render(); } }
 }
-function aiDelay() { const b = typeof GX !== 'undefined' && GX.aiDelay ? GX.aiDelay(650) : 650; return UI.fast ? 0 : b; }
+function aiDelay() { const b = typeof GX !== 'undefined' && GX.aiDelay ? GX.aiDelay(650) : 650; return UI.fast ? 0 : UI.quick ? 150 : b; }
 function schedule() {
   clearTimeout(schedule.t); if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
   schedule.t = setTimeout(aiStep, aiDelay());
 }
+function finishSolo() {   /* the rest of the rivals' round at once; one line says how many moves they made */
+  const r0 = G.round; let n = 0;
+  while (G.phase === 'play' && !isHuman(VG.actor(G)) && n < 400) { const s = VG.actor(G), m = VAI.choose(G, G.p[s].ai || 'normal'); const r = m ? VG.apply(G, m) : { ok: false }; if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); } n++; }
+  UI.quick = false; G.ev = []; save(); UI.busy = false; rivalCap(''); fxHide();
+  if (n) toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 || G.phase !== 'play' ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);
+  after();
+}
 function aiStep() {
   if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
-  if (!$('#fx').hidden) { schedule.t = setTimeout(aiStep, 400); return; }   /* the guardian card is still up: wait for it */
+  if (!UI.rivalT0) UI.rivalT0 = Date.now();   /* the wait budget counts from the end of the human's move, guardian card included */
+  if (!$('#fx').hidden) { schedule.t = setTimeout(aiStep, 200); return; }   /* the guardian card is still up: wait for it */
+  /* every human has passed: the rivals finish the round briskly; after 3 s the rest happens at once (no wait over 4 s) */
+  /* wait budget (R20: no wait over 4 s): a rival run starts brisk; after 1.2 s (or once every human passed) steps are quick; after 2.4 s the rest of the run happens at once */
+  const solo = !UI.fast && UI.mode !== 'tutorial' && G.p.every(p => p.ai || p.passed);
+  if (!UI.rivalT0) UI.rivalT0 = Date.now(); const el = Date.now() - UI.rivalT0;
+  UI.quick = !UI.fast && UI.mode !== 'tutorial' && (solo || el > 1200);
+  if (UI.quick && el > 2400) { finishSolo(); return; }
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
   if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) el0.classList.add('aimark'); rivalCap(cap); }
-  turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
+  turnWait(UI.fast ? 0 : UI.quick ? 260 : 600, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
     const b = snapS(s), F = m ? fxBefore(m, s) : {};
     const r = m ? VG.apply(G, m) : { ok: false };
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
     const d = showEvents(s); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#prompt').textContent = cap; actFx(m, s, F, b); }
-    turnWait(UI.fast ? 0 : Math.max(d, 1100), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
+    turnWait(UI.fast ? 0 : UI.quick ? 420 : Math.min(Math.max(d, 1000), 1500), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
   });
 }
 // ---------------------------------------------------------------- turn presentation: caption, target pulse, pieces fly, score pop; tap to speed up
@@ -254,7 +269,8 @@ function gainFly(b, from) {
 }
 /* a pill just under a score chip (never on it) */
 function popUnder(chip, t) {
-  if (!chip) return; const r = chip.getBoundingClientRect(); popAt({ left: r.left, width: r.width, top: r.bottom + 30, height: 0 }, t);
+  if (!chip) return; const r = chip.getBoundingClientRect(), mp = $('#map');
+  if (mp && chip !== chipOf(UI.view)) { const m = mp.getBoundingClientRect(); popAt({ left: r.left, width: r.width, top: m.top + 64, height: 0 }, t); return; }   /* a rival's pill sits on the board, never on the market */ popAt({ left: r.left, width: r.width, top: r.bottom + 30, height: 0 }, t);
 }
 /* the chip's points count up to the new total */
 function tickPts(s, from) {
@@ -278,8 +294,8 @@ function showEvents(s) {
   ev.forEach(e => {
     if (typeof coachEvent === 'function') coachEvent(e, s);
     if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); note(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
-    if (e.k === 'guardian') { wait = Math.max(wait, 4800); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', ['Fight it for 5 points and a boon.', 'Still beside it at round end? Take a Dread card.']); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
-    if (e.k === 'beat') { wait = Math.max(wait, 4800); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, (w === 'You' ? 'You beat ' : short(e.s) + ' beats ') + V.GUARD[e.guard].name + '!', ['+5 points and a boon.', 'Boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'], true); }
+    if (e.k === 'guardian') { wait = Math.max(wait, 2600); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', ['Fight it for 5 points and a boon.', 'Still beside it at round end? Take a Dread card.']); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
+    if (e.k === 'beat') { wait = Math.max(wait, 2600); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, (w === 'You' ? 'You beat ' : short(e.s) + ' beats ') + V.GUARD[e.guard].name + '!', ['+5 points and a boon.', 'Boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'], true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
     if (e.k === 'round') { note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
@@ -287,13 +303,13 @@ function showEvents(s) {
     if (e.k === 'research') sfx.play('step');
     if (e.k === 'rival') note(G.log[G.log.length - 1].t, 1800);
   });
-  return UI.fast ? 0 : wait;
+  return UI.fast ? 0 : UI.quick ? Math.min(wait, 400) : wait;
 }
 function fxCard(kind, id, title, text, good) {
-  if (UI.fast) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
+  if (UI.fast || UI.quick) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
   f.innerHTML = `<div class="fxcard${good ? ' good' : ''}" data-help><div class="rays" aria-hidden="true"></div><div class="por" data-art="guard-${id}"><svg><use href="#s-guard"/></svg></div><b>${esc(title)}</b>${[].concat(text).map(l => `<span>${esc(l)}</span>`).join('')}<small class="sm">Tap to close</small></div>`; try { coachHide(); } catch (e) { }
   if (typeof artApply === 'function') artApply(f);
-  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, readMs(title + ' ' + [].concat(text).join(' ')) + 800);   /* readable: 4 s + 1 s per 10 words; a tap closes it sooner */
+  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, Math.min(3000, readMs(title + ' ' + [].concat(text).join(' ')) + 800));   /* readable: 4 s + 1 s per 10 words; a tap closes it sooner */
   try { $('#toast').classList.remove('on'); } catch (e) { }   /* gone before the next turn starts (R3 bug 4); a tap closes it sooner */
 }
 function fxHide() { const f = $('#fx'); if (!f) return; clearTimeout(fxCard.t); f.hidden = true; f.innerHTML = ''; f.className = ''; }

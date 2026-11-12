@@ -13,11 +13,13 @@ const RULES = ['goal', 'g-play', 'g-play2', 'g-free', 'g-free2', 'g-plane', 'g-p
     const tap = (x, y) => p.touchscreen.tap(x, y);
     const tapEl = async sel => { const r = await p.evaluate(s => { const e = document.querySelector(s); if (!e) return null; const q = e.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; }, sel); if (r) await tap(r.x, r.y); return !!r; };
     await p.goto(S.url); await p.waitForSelector('#start [data-a=tut]'); await sleep(500); await tapEl('#start [data-a=tut]');
-    const seen = [], long = [], taps = {}, nextOnly = []; let ended = false; const t0 = Date.now();
+    const seen = [], long = [], taps = {}, nextOnly = [], counters = []; let rivalMax = 0; let ended = false; const t0 = Date.now();
     while (Date.now() - t0 < 150000) {
       const g = await p.evaluate(() => typeof GXT !== 'undefined' && GXT.running() ? GXT.state() : null);
+      rivalMax = Math.max(rivalMax, await p.evaluate(() => typeof G !== 'undefined' && G && G.log ? G.log.filter(l => /^Tamsin/.test(l.t) && !/pass/i.test(l.t)).length : 0));
       if (g && g.phase === 'end') { ended = true; break; }
       if (g && g.shown) {
+        const cnt = await p.evaluate(() => { const e = document.querySelector('.gxt-n'); return e ? e.textContent : ''; }); if (cnt) counters.push(g.id + '=' + cnt);
         if (seen[seen.length - 1] !== g.id) { seen.push(g.id); const n = String(g.say).split(/\s+/).filter(Boolean).length; if (n > 12) long.push(g.id + ':' + n); }
         if (g.wait === null) { if (!nextOnly.includes(g.id)) nextOnly.push(g.id); await tapEl('.gxt-next'); } else if (g.hole) { const age = await p.evaluate(t => Date.now() - t, g.shownAt); if (age < 700) await sleep(700 - age);   /* a person never taps inside the tutor's 600 ms ghost-tap guard */
           taps[g.id] = (taps[g.id] || 0) + 1; await tap(g.hole.cx, g.hole.cy); await sleep(900); if (process.env.DBG) console.log('  tapped', g.id, JSON.stringify(await p.evaluate(() => { const s = GXT.state(); return [s.id, s.phase, s.shown, UI.sel]; }))); }
@@ -32,6 +34,9 @@ const RULES = ['goal', 'g-play', 'g-play2', 'g-free', 'g-free2', 'g-plane', 'g-p
     ok(!dead.length, `${w}x${h}: every highlighted target responds to one tap${dead.length ? ' (dead: ' + dead.join(', ') + ')' : ''}`);
     ok(ended, `${w}x${h}: reaches the end card by highlighted taps only (${Math.round((Date.now() - t0) / 1000)} s)`);
     ok(nextOnly.length <= 5, `${w}x${h}: at most 5 Next-only steps (${nextOnly.length}: ${nextOnly.join(',')})`);
+    const dens = [...new Set(counters.map(c => c.split('/')[1]))], nums = counters.map(c => +c.split('=')[1].split('/')[0]);
+    ok(dens.length === 1 && +dens[0] === seen.length && nums.every((n, i) => !i || n >= nums[i - 1]), `${w}x${h}: step counter counts every step (${counters[0]} .. ${counters[counters.length - 1]}, ${seen.length} steps seen)`);
+    ok(rivalMax >= 3, `${w}x${h}: the rival really plays in the tutorial (${rivalMax} rival moves logged)`);
     ok(errs === 0, `${w}x${h}: no page errors (${errs})`);
     if (process.env.DBG) console.log('  seen', seen.join(' '));
     await ctx.close();

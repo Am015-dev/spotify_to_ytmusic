@@ -1,3 +1,15 @@
+# FIXED4 (12 Nov 2026): R20 6.8 findings (market reads like a spreadsheet, easy rival too strong, long waits, tutorial counter)
+- Market (src/ui1.js `mktHTML`, `effPlain`; style.css FIXED4 block): six real cards: art on top, cost as a coin/compass token, points as a star,
+  effect = one icon + plain words ("Buy an item 2 cheaper", "Remove a card", "Notebook up 1"). Unaffordable cards dim, cost token rimmed red, small "Need N more" pill (no bar over the art).
+  Shots: playable-shots/fixed4/market-before|after-390|375.jpg. Hand at <=420 px: 5 cards side by side, names whole, -1 badge top-left.
+- Rival pills (ui2 `popUnder`) land on the board under the caption, never on the market.
+- Pacing (ui2 `aiStep`, `finishSolo`): wait budget from the end of your move: first rival step animated, quick steps after 1.2 s, the rest at once after 2.4 s
+  (toast "Tamsin Reed played 2 more moves."); guardian card auto-closes at 3 s (tap closes sooner). Measured longest wait 3.9 s in 3 touch games.
+- Easy rival (ai.js `EASY`): casual player, skips research 60%, sometimes stops early, noise 5. Newcomer sim (no research, random glowing): 24/60 wins (was 6/40).
+- Tutorial (ui4 `tutAI`, `TUTN`): Tamsin really plays (cards, camp digs, middle market, research) but never what the next lesson needs; counter 1/35..35/35.
+  Research badges are person icons with "hires an assistant" in the research line. Dock never says "You are choosing".
+- Left: tutorial still tops up goods before steps and keeps the "Practice jump" to the temple; easy rival can still spike (sim max 82).
+
 # FIXED3 (12 Nov 2026, R17 review 6.8): market + feel
 - Market: only cards you can pay glow; the rest show "Need N more" (coin/compass); the dock button reads "Buy · N coins". Effect lines wrap
   (no clipping) at 390 and 375; hand effect lines wrap too. Tutorial "Tap again" steps now point at the Play/Dig/Explore/Fight/Buy button.

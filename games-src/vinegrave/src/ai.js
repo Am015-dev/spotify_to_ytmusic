@@ -2,6 +2,7 @@
    easy = noisy (4.0 with assistants: a sensible new player wins ~half, newbie-sim.js) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
+  var EASY = { res: 0.4, stop: 0.07, noise: 5 };
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {
     var v = 0; (ops || []).forEach(function (o) {
@@ -35,6 +36,10 @@
   }
   function best(G, s, lvl, depth, inner) {
     var ms = VG.moves(G); if (!ms.length) return null;
+    if (lvl === 'easy' && !inner && depth === 0 && !G.q) {   /* easy = a casual player: often skips the research track, sometimes stops early (a newcomer wins about half, see newbie note in HANDOFF) */
+      var lean = ms.filter(function (m) { return m.t !== 'res' && m.t !== 'temple' && m.t !== 'asst' || VG.rng(G) < EASY.res; }); if (lean.length) ms = lean;
+      if (VG.rng(G) < EASY.stop) { var pz = ms.filter(function (m) { return m.t === 'pass'; })[0]; if (pz) return pz; }
+    }
     if (ms.length === 1) return ms[0];
     var base = value(G, s, lvl), out = [];
     ms.forEach(function (m) {
@@ -58,7 +63,7 @@
         o.d += 0.5 * Math.max(0, value(H2, s, lvl) - v1);
       });
     }
-    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? 4.0 : lvl === 'normal' ? 0.25 : 0;
+    var noise = lvl === 'novice' ? 4.5 : lvl === 'easy' ? EASY.noise : lvl === 'normal' ? 0.25 : 0;
     if (!inner && noise) { var rr = function () { return VG.rng(G) - 0.5; }; out.forEach(function (o) { o.d += rr() * noise * 2; }); }
     out.sort(function (a, b) { return b.d - a.d; });
     var top = out[0];
@@ -86,6 +91,6 @@
       default: return 'This is the best choice now.';
     }
   }
-  var VAI = { choose: choose, value: value, why: why, opVal: opVal };
+  var VAI = { EASY: EASY, choose: choose, value: value, why: why, opVal: opVal };
   if (typeof module !== 'undefined' && module.exports) module.exports = VAI; else root.VAI = VAI;
 })(typeof window !== 'undefined' ? window : this);
