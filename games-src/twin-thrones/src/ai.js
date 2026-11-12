@@ -33,10 +33,10 @@
     var before = ev(g, o); try { E.apply(g, { t: 'build', i: cellI }); } catch (e) { return 0; }
     return Math.max(0, ev(g, o) - before);
   }
+  var SLIP = { easy: [0.6, 5], normal: [0.28, 3] };
   function pick(G, level, rng) {
     var p = E.sideToAct(G), M = E.validMoves(G);
     if (!M.length) return null; if (M.length === 1) return M[0];
-    if (level === 'easy') return M[Math.floor(rng() * M.length)];
     if (G.phase === 'draft' && !G.pend.length) { var b = M[0], bv = -1e9; M.forEach(function (m) { var v = wval(m.w) + rng() * 0.3; if (v > bv) { bv = v; b = m; } }); return b; }
     if (G.pend.length) {
       if (G.pend[0].type === 'first') return M.filter(function (m) { return m.who === p; })[0];
@@ -75,8 +75,11 @@
       });
       top.sort(function (a, b) { return b[0] - a[0]; }); return top[0][1];
     }
-    return scored.length ? scored[0][1] : M[0];
+    if (!scored.length) return M[0];
+    // W492: Easy and Normal slip like a human: sometimes they take a lesser move from their top few (Normal ~2 of 3 vs a sensible new player)
+    var sl = SLIP[level]; if (sl && scored.length > 1 && rng() < sl[0]) return scored[1 + Math.floor(rng() * Math.min(sl[1], scored.length - 1))][1];
+    return scored[0][1];
   }
-  var API = { pick: pick, ev: ev, wval: wval, PRM: PRM };
+  var API = { SLIP: SLIP, pick: pick, ev: ev, wval: wval, PRM: PRM };
   if (typeof module !== 'undefined') module.exports = API; else TT.AI = API;
 })();

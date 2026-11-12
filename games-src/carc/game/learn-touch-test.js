@@ -1,3 +1,6 @@
+// Since 8 Nov (owner: gameplay first) "Learn to play" is the guided first game; its by-touch walk is tut-walk-test.js. This entry point runs that walk at 390x844
+// so existing callers keep working. The old coached-game walk below is kept for reference and is not run.
+if (!process.env.LEARN_OLD) { require('child_process').execFileSync(process.execPath, [require('path').join(__dirname, 'tut-walk-test.js'), '390x844'], { stdio: 'inherit' }); process.exit(0); }
 // Learn to play, finished by touch only (BRIEF-GAMEFEEL feel gate): a 390x844 phone taps "Learn to play", then only taps what the
 // game shows (Got it on Tamsin's bubble, a glowing square, Place here, a follower spot or Skip, the score-summary buttons) until the
 // coached game is over and the start screen is back. It never calls a game function to move and never uses a Skip-tutorial button.
