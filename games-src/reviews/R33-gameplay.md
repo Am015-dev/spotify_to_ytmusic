@@ -13,6 +13,7 @@ I did not edit game code. Rulebook notes and downloaded sources stay in a local 
 |---|---:|---|---|---|
 | emberclimb | 7.1 | PASS | PASS | 2, 3, 4, 5, 7, 8 at 7 |
 | perch-and-plume | 7.3 | PASS | PASS | 3, 4, 5, 6, 7, 8 at 7 |
+| short-fuse | 7.4 | FAIL | PASS | 5 Phone 6 |
 
 ---
 
@@ -129,3 +130,56 @@ What I played:
 | 5 | Tutorial step 22 at 375 | On the score page the coach bubble is scrolled half off the top; only "real game." shows. | games-src/reviews/R33-shots/pp-tut375-step22-cut.jpg |
 | 8 (minor) | Tutorial step 21 at 390: tapped the spotlit Total row | It took more than 1 s to move to step 22 (it did move). | games-src/reviews/R33-shots/pp-tut390-step21-slow.jpg |
 | 2 (good) | Tutorial to the end at both sizes | Ends with "You know every rule now. Tap to play a real game." on Play again, then a real game with "Keep these". | games-src/reviews/R33-shots/pp-tut390-end.jpg |
+
+---
+
+## 3. short-fuse (shelf/W488-short-fuse-sprites @ 8e5b9bf4, already up to date with alex/brave-carson-rbpmlk): 7.4 FAIL
+
+**Gate: PASS.** Build, scenarios, phone-check, lab test and sweep all passed. In R22 the phone-check FAILED with 2-5 dead taps; that is now fixed.
+
+Since R22 the fixer changed only crew AI and layout code (5 commits: deduction-safe crew, loss card naming the crewmate, risky wires dim with "!",
+small-portrait table layout, crewmate zoom). R22 checked the rules against the published game. No rules code changed, and I found nothing invented.
+
+What I played:
+- **Tutorial ("Learn to play") by touch:** 17 steps, 17 taps, 0 dead, 34 s, at both sizes. It ends on "Defused!" → Finish → "Play job 1".
+- **Jobs on defaults** (Play from the title: 3 crew, Normal). Driver: shows a middle wire, takes a glowing solo cut, else points at the first glowing
+  crew wire and says a number of mine that fits. That is a weaker player than R22's careful clue-reader: it ignores the clue line.
+  - 390x844: job 1 lost (fuse, 20/24), lost again (fuse, 12/24), then **won** on Again (24/24). 22-25 s per job.
+  - 375x667: job 1 lost (fuse, 20/24), **won** on Again, then job 2 lost (fuse, 22/34).
+  - 6 jobs to the result card, 63 taps, 0 dead taps, 0 page errors, 0 stuck states.
+    The only console line was one blocked external request, which my sandbox blocks.
+  - My last tap to my next turn (2 computer crewmates): median 3.8 s, max 5.5 s.
+  - All 4 losses were the fuse after 3 misses, caused by my guesses. **No crewmate pointed at a red** in 6 jobs (R22: 3 of 29 jobs).
+    The sample is small and covers jobs 1-2 only.
+- **Sizes:** own wires are 30x44 px at both sizes, for both job 1 and job 4. Crew wires are 43x48 at 390, 31x44 at 375 for the zoomed crewmate,
+  and 23x18 (not tappable) for the compact one.
+
+| # | Row | Score | Why |
+|---|-----|------:|-----|
+| 1 | Rules fidelity | 8 | Unchanged since R22's rulebook check: dual cut, solo cut, yellow, red, info tokens, fuse by crew size, gear after 2 cuts, twin probe. House rules are disclosed. |
+| 2 | Tutorial teaches | 8 | 17 one-line steps (goal, own wires, show a wire, point, say a number, clean cut, twin probe, miss, Rewind, yellow, red, solo cut, win), 5 Next-only, 0 dead at both sizes, then "Play job 1". |
+| 3 | First 10 seconds | 8 | One-line pitch, a big Play, "Learn to play · A guided first job"; the job card gives the goal in 3 bullets and a tip. |
+| 4 | Turn clarity | 7 | "Your turn · 1 action · or play gear", "Turn over: Plum cut 2 wires alone, no risk. Next: you.", and "Clues: 6. Not red." under a picked wire. The loss card now names the real cause ("The fuse ran out · 13 turns · 3 misses · 20/24 wires cut"). I did not see a red loss, so I could not check the crewmate-named card. At 390 in job 4 the crew plates show "1" and "P." instead of the names. |
+| 5 | Phone play | 6 | Own wires are 30 px wide at both sizes (R22: 44 px or more), with small gaps. At 375 job 4 uses a zoom layout: one crewmate's wires at 31x44, the other's as 23x18 strips you cannot tap until you tap that plate ("Tap a crewmate to see their wires"). It fits, but the main targets are now under 44 px, and the crew view needs an extra tap. |
+| 6 | AI and pacing | 7 | Crew turns take about 2 s each (3.8 s for two). Jobs take 18-26 s. No crewmate red-point in 6 jobs, so the AI fix holds in my sample. My clue-blind guesser lost 4 of 6 jobs to the fuse; R22's careful clue-reader won about 3 of 4 jobs 1-2. |
+| 7 | Feel | 7 | Wires cut with a SNIP, the fuse burns along the rope, "+2" pops, painted DEFUSED / BOOM cards with move ticks ("✓ Match ✓ Wrong guess ✓ Solo cut"). |
+| 8 | Bugs | 8 | Gate PASS (R22 phone-check FAIL now fixed). 2 tutorials + 6 jobs: 0 errors, 0 stuck, 0 dead taps. |
+| | **Total** | **7.4** | **FAIL**: row 5 is below 7. 8+8+8+7+6+7+7+8 = 59/8 = 7.375. No stopper. |
+
+### Earlier findings (R22)
+| Finding | Status | Evidence |
+|---|---|---|
+| Row 6: a computer crewmate pointed at a red in 3 of 29 jobs | **Fixed in my sample**: 0 of 6 jobs (jobs 1-2 only) | games-src/reviews/R33-shots/sf-q390-job1-lost.jpg (fuse loss, not red) |
+| Row 4: red-loss card blames the fuse and the player, never names the crewmate | **Not re-seen** (no red loss). Fuse losses now read "The fuse ran out" plus turns, misses and wires cut. | games-src/reviews/R33-shots/sf-q390-job2-lost.jpg |
+| Row 5: job 4 at 375, second crewmate hidden under "▾ more wires below" | **Changed**: a zoom layout replaces scrolling; the other crewmate is a compact 23x18 strip until you tap its plate | games-src/reviews/R33-shots/sf-size-j4-375.jpg |
+| Row 4/5: "Stand" tags on wires / on the "more wires" cue | **Fixed**: Stand 1/2 tags sit beside or above the wires | games-src/reviews/R33-shots/sf-size-j4-375.jpg, games-src/reviews/R33-shots/sf-size-j4-390.jpg |
+| Gate: phone-check 2-5 dead taps | **Fixed** (gate PASS) | none (gate log) |
+| Row 5: coach bubble covers the hand on "A miss" | Not checked visually this round; 0 dead taps in the tutorial | games-src/reviews/R33-shots/sf-tut375-end.jpg |
+
+### New findings
+| Row | What I did | What happened | Screenshot |
+|---|---|---|---|
+| 5 | Measured every wire in job 1 and job 4 at both sizes | Own wires are 30x44 px at 390 and 375 (under 44 px wide). At 375 in job 4 the zoomed crewmate's wires are 31x44, the other's 23x18 (not tappable). | games-src/reviews/R33-shots/sf-size-j4-375.jpg, games-src/reviews/R33-shots/sf-size-j4-390.jpg, games-src/reviews/R33-shots/sf-q375-turn2.jpg |
+| 4 / 5 | Job 4 at 390, setup | The crew plates read "1 ★ 26" and "P. 13": the names are cut to one character. | games-src/reviews/R33-shots/sf-size-j4-390.jpg |
+| 6 | Job 1 on defaults, guessing without reading the clue line | Lost twice to the fuse (3 misses) before winning on the third try, at both sizes. That is fair by the rules, but the crew wires show no clue labels until you tap one, so a newcomer who does not tap around guesses blind. | games-src/reviews/R33-shots/sf-q390-turn1.jpg, games-src/reviews/R33-shots/sf-q390-job3-won.jpg |
+| 2 (good) | Tutorial by touch at both sizes | 17 taps, 0 dead, ends on Finish → "Play job 1". | games-src/reviews/R33-shots/sf-tut390-end.jpg |
