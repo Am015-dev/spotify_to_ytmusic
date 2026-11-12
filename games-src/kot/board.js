@@ -50,8 +50,7 @@ function bfLine(){const el=$bf('bline');if(!el)return;bfRecapWatch();const fl=!!
   const rv=!!(t&&G&&!G.winner&&!humanTurn()&&!NET.on&&!UI.choice&&!UI.intro&&!bfOut());
   if(!fl&&G&&humanTurn()&&G.phase==='roll'&&BF.spin&&bfNow()<BF.spin.end&&!UI.choice&&!UI.intro)t='Rolling the dice…';
   const rc=BF.recap&&t&&!G.tut&&(rv||(humanTurn()&&G.phase==='roll'&&G.rolls>=rerollsOf(cur())))?BF.recap:'';
-  const h=t?esc(t)+(rv&&!fl&&!BF.fast?'<i class="bskip"> · tap to skip</i>':'')+(rc?`<small class="brecap">${esc(rc)}</small>`:''):'';
-  if(el.innerHTML!==h)el.innerHTML=h;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
+  if(el.textContent!==t)el.textContent=t;bfSub(rc,rv&&!BF.fast,el);el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){if(!document.documentElement.classList.contains('pp-hints')||(G&&G.tut))return;ms=Math.max(ms||0,4000+String(t).split(/\s+/).length*100);BF.flash={t,until:bfNow()+ms};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,ms+20)}
 // ---- what the dice would do, shown on the board ----
 function bfMarks(){const el=$bf('bmarks');if(!el)return;
@@ -119,12 +118,21 @@ function bfPlay(k,e,orig){const c=BF.cap,a=c.a,m=/^([+-])(\d+)(♥|⚡|★)$/.ex
 function bfTail(ms){return !G||humanTurn()?ms:BF.fast?120:Math.round(ms*.45)}
 // ---- one-line recap of what each computer monster did on its turn ----
 function bfRecapWatch(){if(!G||G.winner||G.tut||NET.on){BF.rsA=-1;BF.recap='';return}const a=G.active;if(a===BF.rsA)return;
-  const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat(),bits=[];
-    const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);if(g.length)bits.push(g.join(" "));
-    const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp);if(hit.length)bits.push('hit '+hit.map(r=>`${r.i===me?"you":mname(r)} −${o.hp[r.i]-Math.max(0,r.hp)}`).join(', '));
-    if(G.city===q.i&&o.city!==q.i)bits.push('took Downtown');(BF.bought||[]).forEach(n=>bits.push('bought '+n));
-    BF.recap=`${mname(q)}: ${bits.length?bits.join(' · '):'nothing this turn'}`}
+  const o=BF.rs;if(o&&G.pl[o.a]&&!G.pl[o.a].human){const q=G.pl[o.a],me=meSeat();
+    const dv=q.vp-o.vp,de=q.en-o.en,dh=q.hp-o.hp[q.i];const g=[];if(dv>0)g.push(`+${dv}★`);if(de>0)g.push(`+${de}⚡`);if(dh>0)g.push(`+${dh}♥`);
+    const hit=G.pl.filter(r=>r.i!==q.i&&o.hp[r.i]>r.hp).map(r=>[r.i===me?'you':mname(r),o.hp[r.i]-Math.max(0,r.hp)]);
+    BF.recap=bfShort(mname(q),[g.join(' '),G.city===q.i&&o.city!==q.i?'took 👑':''].filter(Boolean).join(' · '),hit,BF.bought||[])}
   BF.bought=[];BF.rsA=a;const q=G.pl[a];BF.rs=q?{a,vp:q.vp,en:q.en,hp:G.pl.map(r=>r.hp),city:G.city}:null}
+// the recap and the skip hint sit in their own small lines just under the board line (each one short)
+function bfSub(rc,sk,ln){let w=document.getElementById('bsub');if(!w){w=document.createElement('div');w.id='bsub';w.setAttribute('aria-live','polite');w.innerHTML='<div id="brecap"></div><div id="bskip">⏩ Tap to skip</div>';document.body.appendChild(w)}
+  const r=w.firstChild,k=w.lastChild,on=!!(rc||sk)&&!!ln.textContent&&getComputedStyle(ln).display!=='none';if(r.textContent!==rc)r.textContent=rc;r.hidden=!rc;k.hidden=!sk;w.hidden=!on;
+  if(on){const b=ln.getBoundingClientRect();w.style.top=Math.round(b.bottom+4)+'px'}}
+// at most 8 words and one phone line: drop card names, then rival names
+function bfShort(name,g,hit,bought){const wc=s=>s.replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(x=>/[a-z][a-z]/i.test(x)).length;
+  const mk=(h,b)=>`${name}: ${[g,h,b].filter(Boolean).join(' · ')||'nothing'}`;
+  const hs=hit.length?'hit '+hit.map(x=>x[0]+' −'+x[1]).join(', '):'',hn=hit.length?(hit.length===1?'hit '+hit[0][0]+' −'+hit[0][1]:`hit ${hit.length} rivals`):'';
+  const bs=bought.length?'bought '+bought.join(', '):'',bn=bought.length?(bought.length===1?'bought a card':`bought ${bought.length} cards`):'';
+  for(const [h,b] of [[hs,bs],[hs,bn],[hn,bn],[hn,'']]){const t=mk(h,b);if(wc(t)<=8&&t.length<=40)return t}return mk(hn,'')}
 // ---- the shop in the tray ----
 function bfShop(){const el=$bf('pshop');if(!el||!G)return;if(!phShopOK()||!G.market.length){BF.sel=-1;const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip&&tip.innerHTML)tip.innerHTML='';return}
   const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;

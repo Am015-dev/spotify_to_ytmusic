@@ -29,6 +29,9 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
       // and hearts when below 7 hp outside Downtown (the reviewer's newcomer policy)
       const want = st.dice.map((d, i) => { const f = d[0], n = st.dice.filter(x => x[0] === f).length; return (!d.includes('*') && ((/[123]/.test(f) && n >= 2) || f === 'C' || f === 'E' || (f === 'H' && st.hp < 7 && !st.city))) ? i : -1 }).filter(i => i >= 0);
       for (const i of want) if (await L.tapSel(p, `#dice .die[data-die="${i}"]`)) { taps++; await L.sleep(250) }
+      // then roll the rest (a newcomer uses every roll), SMASH only when nothing is left to roll
+      const free = await p.evaluate(() => G.dice.filter(d => !d.k).length);
+      if (free && await L.tapSel(p, '#pacts [data-act="reroll"]')) { taps++; await L.sleep(1200); continue }
     }
     if (st && st.me && !st.choice && st.ph === 'buy' && buys < 40) {
       const k = await p.evaluate(() => { const q = G.pl[G.active]; for (let i = 0; i < G.market.length; i++) if (canBuy(q, i)) return i; return -1 });
@@ -48,6 +51,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
   const ms = rt.map(r => r.ms).sort((x, y) => x - y), avg = ms.length ? Math.round(ms.reduce((x, y) => x + y, 0) / ms.length) : 0;
   const gp = await p.evaluate(() => window.__gap || []); console.log(`wait between my turns avg=${gp.length ? Math.round(gp.reduce((x, y) => x + y, 0) / gp.length) : 0}ms max=${Math.max(0, ...gp)}ms`);
   console.log(`rival turns n=${ms.length} avg=${avg}ms median=${ms[ms.length >> 1] || 0}ms max=${ms[ms.length - 1] || 0}ms · human ${hw ? 'WON' : 'lost'} · ${((Date.now() - t0) / 60000).toFixed(1)} min`);
+  console.log('final: ' + await p.evaluate(() => G.pl.map(q => `${q.human ? 'YOU ' : ''}${mname(q)} ${q.vp}★ ${q.hp}♥${q.alive ? '' : ' KO'}`).join(' | ') + ' · level ' + G.pl.filter(q => !q.human).map(q => q.lvl).join(',')));
   if (process.env.RT_DUMP) console.log(JSON.stringify(rt.slice(0, 6)));
   const ok = !!w && !p.errs.length;
   console.log((ok ? 'PASS' : 'FAIL') + ` game-walk ${W}x${H} winner=${w} taps=${taps} errors=${p.errs.length} ` + p.errs.slice(0, 3).join(' | '));
