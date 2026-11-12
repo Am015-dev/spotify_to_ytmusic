@@ -291,6 +291,13 @@ function sigActs(M, v) {   // the prompt and buttons while picking a card to sig
   M.p = UI.sel >= 0 && k !== undefined ? 'Show ' + cname(UI.sel) + (k ? ' as your ' + PING_WORD[k].toLowerCase().replace('only one', 'only ' + D.suits[LD.suit(UI.sel)].name) : '') + '?' : 'Pick a glowing card to show.';
   M.acts.push({ label: 'Show it', a: 'pingok', cls: 'go', dis: !(UI.sel >= 0 && k !== undefined) }); M.acts.push({ label: 'Cancel', a: 'noping', cls: 'alt' }); return M;
 }
+// R13: a card someone must win for an open job carries a small tag ("Yours" or the owner's name), so a newcomer sees which card fulfils which job
+function jobTag(c, v) {
+  if (!G || !G.tasks || G.phase === 'assign') return null;
+  for (let i = 0; i < G.tasks.length; i++) { const t = G.tasks[i]; if (t.owner < 0 || jobSt(i) !== 0) continue; const d = TASKS[t.id]; if (!d || !d.cs || !d.cs.includes(c)) continue;
+    const me = t.owner === v; return { me, t: me ? 'Yours' : pname(t.owner), long: me ? 'your job: win this card' : pname(t.owner) + ' must win this card' }; }
+  return null;
+}
 function renderHand(v) {
   const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
   if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? '' : (watching() ? 'Watching the other divers.' : 'Take the device.'))); return; }
@@ -309,6 +316,7 @@ function renderHand(v) {
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
     if (UI.pingSel && UI.sel === c && spots.has(c)) b.append(h('span.pkw', { 'aria-hidden': 'true' }, PING_WORD[spots.get(c)] || 'Show'));
     if (got.has(c)) b.append(h('span.gotb', 'New'));
+    { const jt = jobTag(c, v); if (jt) { b.append(h('span.jtg' + (jt.me ? '.me' : ''), { 'aria-hidden': 'true' }, jt.t)); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', ' + jt.long); } }
     btns.push(b);
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
@@ -392,7 +400,7 @@ function actModel(v) {
         M.p = helper ? 'Tap a drone card.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play a card.');
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
           if (UI.ab) { M.p = 'Every card breaks a ' + (UI.ab.job >= 0 ? 'job.' : 'rule.'); M.warn = 1; } }
-        if (sig && !helper) { if (!UI.ab) M.p = 'Lead a card, or signal first.'; btn('Signal', 'signal', { cls: 'alt' }); }
+        if (sig && !helper) { if (!UI.ab) M.p = 'Lead, or signal first.'; btn('Signal', 'signal', { cls: 'alt' }); }
       } else if (preWait()) { M.cls = 'mine'; M.p = 'Signal now, or tap Ready.'; btn('Signal', 'signal', { cls: 'alt' }); btn('Ready', 'ready', { cls: 'go' }); }
       else { M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : ''; if (sig) btn('Signal', 'signal', { cls: 'alt' }); }
       return M;

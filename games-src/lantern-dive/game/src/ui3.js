@@ -85,7 +85,7 @@ function schedule() {
   if (UI.pingSel && !NET.on && UI.mode !== 'tutorial' && canSigNow(viewSeat())) return;   // the computers wait while you pick a card to signal
   if (preWait() && !(G.players.some(p => p.ai && !p.helper && LD.canPing(G, p.seat) && LD.AI.pingChoice(G, p.seat)))) { try { coachCheck(); } catch (e) { } return; }   // the computer leader waits for your Ready
   if (aiWants()) {
-    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.25 + .6 * Math.random()));
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.08 + .14 * Math.random()));
     const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiTurn(); }, d); return;
   }
   if (hotSeat()) hotNext();
@@ -247,16 +247,16 @@ async function playEvs(evs) {
     if (tr) {
       UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); flyIn(pls); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      render(); flyIn(pls); await wait(ANIM ? 320 : 0); if (tok !== UI.seq) return;
       UI.fz.win = true; render(); snd('trick');
       try { const me = viewSeat(), wn = tr.w === me ? 'You win' : pname(tr.w) + ' wins', wcs = suitOf(tr.wc); cap(wn + ' the trick with ' + cname(tr.wc), 'good', wcs === 4 ? 'The Lantern beats every colour.' : (tr.plays.some(p => suitOf(p.c) === 4) ? '' : 'Highest card of the led colour wins.')); } catch (e) { }
-      await wait(ANIM ? 2400 : 0); if (tok !== UI.seq) return;
+      await wait(ANIM ? (UI.mode === 'tutorial' ? 2400 : 850) : 0); if (tok !== UI.seq) return;
       await tutHoldWait(); if (tok !== UI.seq) return;
       await sweepTo(tr.w); if (tok !== UI.seq) return;
-      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(520); if (tok !== UI.seq) return;
-      UI.holdJobs = null; if (jb.length) { render(); jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(1300); if (tok !== UI.seq) return; }
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1 trick', 'plus'); await wait(200); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } try { const j = jb.find(x => x.st < 0) || jb[0], d = TASKS[G.tasks[j.i].id], who = G.tasks[j.i].owner; cap((j.st > 0 ? 'Job done: ' : 'Job broken: ') + d.s, j.st > 0 ? 'good' : 'bad', (who === viewSeat() ? 'Your job' : pname(who) + '\'s job') + (j.st < 0 ? ' - the crew must dive again.' : ' - one step closer.')); } catch (e) { } await wait(UI.mode === 'tutorial' ? 1300 : 900); if (tok !== UI.seq) return; }
     } else {
-      render(); flyIn(pls); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? 1200 : 420) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      render(); flyIn(pls); flyJobs(flights); await wait(pls.length ? (pls.some(p => p.s !== viewSeat()) ? (UI.mode === 'tutorial' ? 1200 : 340) : 220) : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
       if (jb.length) { jobBeat(jb); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
     }
   } catch (e) { console.error(e); UI.fz = null; }
@@ -285,8 +285,8 @@ function flyIn(pls) {
 async function sweepTo(w) {
   if (!flyOK()) return; const a = seatC(w), els = Array.from(document.querySelectorAll('#slots .tc')); if (!a || !els.length) return;
   els.forEach((el, i) => { const r = el.getBoundingClientRect(), dx = Math.round(a.x - r.left - r.width / 2), dy = Math.round(a.y - r.top - r.height / 2);
-    el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3)', opacity: 0 }], { duration: 380, delay: i * 30, easing: 'cubic-bezier(.5,0,.7,.4)', fill: 'forwards' }); });
-  await wait(380 + els.length * 30);
+    el.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.3)', opacity: 0 }], { duration: 300, delay: i * 20, easing: 'cubic-bezier(.5,0,.7,.4)', fill: 'forwards' }); });
+  await wait(300 + els.length * 20);
 }
 // a job done or broken gets its own beat: the chip pops with a ring and a big word rises from its owner
 function jobBeat(jb) {

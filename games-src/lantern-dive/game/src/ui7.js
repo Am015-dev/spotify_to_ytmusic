@@ -92,7 +92,7 @@ function pxFace(id, w) {
   const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
   const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
   const fi = PX.img['face' + s], dk = lan || (fi && (s === 0 || s === 3));   // painted card frame (media/card-face-*.webp), cropped inside its ragged paper edge; coral and sunstar are dark scenes so their numerals go light
-  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
+  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); if (!lan) { x.globalCompositeOperation = 'color'; x.globalAlpha = .62; x.fillStyle = su.c; x.fillRect(0, 0, w, H); x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1; const fb = Math.max(2.5, w * .065); rr(bw / 2 + fb / 2, bw / 2 + fb / 2, w - bw - fb, H - bw - fb, rad * .8); x.lineWidth = fb; x.strokeStyle = su.c; x.stroke(); } x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
   else {
     const g = x.createLinearGradient(0, 0, w, H); const TINT = [['#fde3e9', '#f2b3c2'], ['#e3eefc', '#b7cff2'], ['#e2f4e7', '#b4ddc0'], ['#fff4c8', '#f3d36e']][s] || ['#fffaf0', '#e9dfc2'];   // R5: same per-colour paper as the kit's cards
     g.addColorStop(0, lan ? '#16336b' : TINT[0]); g.addColorStop(1, lan ? '#0a1730' : TINT[1]);
@@ -107,11 +107,11 @@ function pxFace(id, w) {
   if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
   const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
-    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = dk ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : dk ? ['#ffc9d6', '#cfe2ff', '#c9f0d6', '#ffd873'][s] : su.dk; x.fillText(String(v), w * .15, w * .36);
     if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
   corner(false);
   if (!lan) {   // R5: each colour's own shape at the foot (circle, triangle, diamond, star): Coral and Sunstar never look alike, colour-blind included
-    const cx = w / 2, cy = H * .865, R = w * .1; x.beginPath();
+    const cx = w / 2, cy = H * .855, R = w * .13; x.beginPath();
     if (s === 0) x.arc(cx, cy, R * .9, 0, 7);
     else if (s === 1) { x.moveTo(cx, cy - R); x.lineTo(cx + R * 1.1, cy + R * .85); x.lineTo(cx - R * 1.1, cy + R * .85); x.closePath(); }
     else if (s === 2) { x.moveTo(cx, cy - R * 1.1); x.lineTo(cx + R, cy); x.lineTo(cx, cy + R * 1.1); x.lineTo(cx - R, cy); x.closePath(); }

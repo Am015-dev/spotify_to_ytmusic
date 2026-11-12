@@ -12,7 +12,7 @@ const LD = g.LD || require('./engine.js');
 const AI = LD.AI = {};
 const D = LD.DATA, TASKS = D.tasks, KIND = LD._.KIND;
 const suit = LD.suit, val = LD.val, LAN = 4;
-const P = AI.params = { easy: { K: 2, noise: .22, ping: 0, dist: 99, roll: 1 }, normal: { K: 5, noise: 0, ping: 1.6, dist: 3, roll: 1 }, hard: { K: 9, noise: 0, ping: 1.2, dist: 2, roll: 1 } };
+const P = AI.params = { easy: { K: 2, noise: .22, ping: 0, dist: 99, roll: 1 }, normal: { K: 16, noise: 0, ping: 1.6, dist: 3, roll: 1 }, hard: { K: 9, noise: 0, ping: 1.2, dist: 2, roll: 1 } };
 const lvl = l => P[l] || P.normal;
 // ---------- seeded rng from the view ----------
 function hash(V, me, extra) {

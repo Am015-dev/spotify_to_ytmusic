@@ -186,3 +186,16 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 /* R5 feel: a job's own beat */
 .fl.jobok{color:#c9ffe0;text-shadow:0 2px 0 #0b1f3a,0 0 16px #2fd27a}
 .fl.jobbad{color:#ffd6d6;text-shadow:0 2px 0 #0b1f3a,0 0 16px #ff4d4d}
+/* R13: job tag on a hand card someone must win ("Yours" or the owner's name) */
+.hc .jtg{position:absolute;left:1px;top:-13px;background:#fff;color:#0b1f3a;border:2px solid #0b1f3a;border-radius:8px;padding:0 5px;font-size:14px!important;font-weight:900;line-height:17px;pointer-events:none;z-index:3;white-space:nowrap}
+.hc .jtg.me{background:var(--gold);color:#2a1d04}
+/* R13: on phones your own jobs get their own full-width row and wrap, so no job text is ever cut ("Exac 2 i..." at 375 px) */
+@media (max-width:520px){
+#bd:not(.side) #mine{flex-wrap:wrap;row-gap:2px}
+#bd:not(.side) #mine .mjobs{flex:1 1 100%;flex-wrap:wrap;overflow:visible;padding:2px 2px 2px 2px;gap:4px}
+#bd:not(.side) #mine .mjobs:empty{display:none}
+#bd:not(.side) #mine .mjobs .jc{flex:1 1 auto;max-width:100%;min-height:34px}
+#bd:not(.side) #mine .mjobs .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}
+}
+/* R13: a crewmate's job chip wraps instead of clipping at 3 lines ("Exactly three Lanterns") */
+@media (max-width:520px){html .seat .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}html .seat .jc{overflow:visible;height:auto}}
