@@ -41,10 +41,12 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
 function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
   if(!ar.querySelector(':scope>.vs'))return;const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
   let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.getBoundingClientRect().width;
-  ar.classList.remove('tight','tight2');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
+  ar.classList.remove('tight','tight2','tight3');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
   if(out()){ar.classList.add('tight');for(let k=0;k<6&&out()&&cw>36;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
   // a very short table (a tall hand or prompt below it): slim score line, no dice box (the prompt says the roll), cards down to 26 px
-  if(out()){ar.classList.add('tight2');for(let k=0;k<8&&out()&&cw>26;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}}
+  if(out()){ar.classList.add('tight2');for(let k=0;k<8&&out()&&cw>26;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
+  // a big pick in the dock (loot a body: 7 choices) leaves a sliver of table: only the score line and the buttons stay
+  if(out())ar.classList.add('tight3')}
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
   const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};

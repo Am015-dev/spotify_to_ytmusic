@@ -390,3 +390,7 @@ html.ph .arena.tight2 .sline .n{font-size:26px;-webkit-text-stroke-width:1px;tex
 html.ph .arena.tight2 .sline .sl1 i{font-size:.72rem}
 html.ph .arena.tight2 .sline>:not(.sl1){display:none}
 html.ph .arena.tight2 .row.mons{margin-bottom:2px}
+html.ph .arena.tight3>:is(.vs,.row.mons,.row.small,.rollbox){display:none!important}
+html.ph .arena.tight3:has(>.sline){padding-top:30px}
+html.ph .arena.tight3:has(>.vs){grid-template-rows:auto;align-content:start}
+html.ph .arena.tight3>.fbtns{grid-row:1!important}html.ph .arena.tight3>.fbtns button{min-height:44px}
