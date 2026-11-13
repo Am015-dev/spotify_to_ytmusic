@@ -62,7 +62,7 @@ function fxFly(node, from, to, ms, done) {
 function fxFloat(from, kind, txt, to, o) {
   o = o || {}; const L = fxLayer(); if (!L || !ANIM || !from) return;
   const e = h('div.fxp' + (o.neg ? '.neg' : ''), kind ? ic(kind, 22) : null, h('b', txt)); L.appendChild(e);
-  const a = ctr(from), jx = (o.slot || 0) * 22 - (o.n || 1) * 11 + 11, sx = a.x + jx, b = to ? ctr(to) : { x: sx, y: a.y - 70 };
+  const a0 = ctr(from), a = { x: a0.x, y: a0.y + ((o.slot || 0) - ((o.n || 1) - 1) / 2) * 32 }, sx = Math.max(50, Math.min((UI.lay ? UI.lay.W : innerWidth) - 50, a.x)), b = to ? ctr(to) : { x: sx, y: a.y - 70 };   // G8: stacked pills, kept on screen
   const up = o.neg ? 22 : -26;
   const f = [{ transform: `translate(${sx}px,${a.y}px) translate(-50%,-50%) scale(.5)`, opacity: 0 },
     { transform: `translate(${sx}px,${a.y + up}px) translate(-50%,-50%) scale(1.3)`, opacity: 1, offset: .25 },
@@ -71,6 +71,21 @@ function fxFloat(from, kind, txt, to, o) {
   const an = animate(e, f, { duration: 950, delay: (o.slot || 0) * 110, easing: 'ease-in-out', fill: 'both' });
   const end = () => { e.remove(); if (to && !o.neg && o.bump) o.bump(); };
   if (an) { an.onfinish = end; an.oncancel = () => e.remove(); setTimeout(() => e.remove(), 2600); } else end();
+}
+// a score change, written inside the seat chip for a moment (never on top of other text or buttons)
+function fxDelta(seat, d) {
+  if (!d) return; const c = $('.chip[data-seat="' + seat + '"]'); if (!c) return;
+  const ln = c.querySelector('.pvch-s') || c.querySelector('.cl > span:nth-child(2)'); if (!ln) return;
+  const old = c.__fxOld != null ? c.__fxOld : ln.textContent; c.__fxOld = old; clearTimeout(c.__fxT);
+  ln.textContent = (d > 0 ? '+' : '\u2212') + Math.abs(d) + (Math.abs(d) === 1 ? ' pt' : ' pts'); ln.classList.add('fxd'); if (d < 0) ln.classList.add('neg');
+  bump('.chip[data-seat="' + seat + '"]');
+  c.__fxT = setTimeout(() => { if (!ln.isConnected) return; ln.textContent = old; ln.classList.remove('fxd', 'neg'); c.__fxOld = null; }, 1600);
+}
+// a goods pile flashes green (gain) or red (spent); the number itself is the feedback
+function fxRes(k, d) {
+  const e = $('.rs[data-res="' + k + '"]'); if (!e) return;
+  e.classList.remove('fxup', 'fxdn'); void e.offsetWidth; e.classList.add(d > 0 ? 'fxup' : 'fxdn');
+  setTimeout(() => e.classList.remove('fxup', 'fxdn'), 1100);
 }
 function bump(sel) { const e = $(sel); if (!e) return; e.classList.remove('bmp'); void e.offsetWidth; e.classList.add('bmp'); setTimeout(() => e.classList.remove('bmp'), 500); }
 // FLIP: a freshly drawn element slides in from where it was before
@@ -96,24 +111,22 @@ function fxPost(pre, m, src) {
   for (const k of RESK) { const d = p.res[k] - pre.res[k]; if (d !== 0) items.push({ kind: k, d }); }
   const dt = score(pre.seat).total - pre.tot; if (dt !== 0) items.push({ kind: 'point', d: dt, pts: true });
   const dh = p.hand.length - pre.hand; if (dh > 0) items.push({ kind: 'card', d: dh });
-  let slot = 0; const n = items.filter(x => x.d > 0).length;
+  // R17: no pill floats over the board. Points show inside the seat chip ("+2 pts" in its city-count line); goods flash on their own pile.
   for (const it of items) {
-    if (it.d > 0) {
-      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
-      fxFloat(src, it.kind, '+' + it.d, to, { slot: slot++, n, bump: mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
-    } else if (mine && it.kind !== 'point') {
-      const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });
-    }
+    if (it.kind === 'point') fxDelta(pre.seat, it.d);
+    else if (it.kind === 'card') { if (mine) bump('.strip.hand .scount'); }
+    else if (mine) fxRes(it.kind, it.d);
   }
   if (m && m.type === 'prepare' && p.season !== pre.season) fxSeason(p.season, mine);
 }
 function ctr0() { const R = UI.lay; return R ? { x: R.W / 2 - 10, y: R.H / 2 - 10, w: 20, h: 20 } : null; }
 function fxSeason(s, mine) {
+  // a brief banner at the top of the board (fades in and out in about 1 s), never a sticker over the cards
   const L = fxLayer(); if (!L || !ANIM || !mine) return;
-  const e = h('div.fxseason', HBKit.season(SEAS[s], 110), h('b', SEASN[s])); L.appendChild(e);
-  const an = animate(e, [{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 1100, fill: 'both' });
+  const e = h('div.fxseason', HBKit.season(SEAS[s], 28), h('b', SEASN[s])); L.appendChild(e);
+  const an = animate(e, [{ opacity: 0, transform: 'translate(-50%,-6px)' }, { opacity: 1, transform: 'translate(-50%,0)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,0)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-6px)' }], { duration: 1000, easing: 'ease-out' });
   if (an) an.onfinish = () => e.remove(); else e.remove();
-  setTimeout(() => e.remove(), 1500);
+  setTimeout(() => e.remove(), 1200);
 }
 // after a move was applied and drawn: pieces land where they went
 function fxLand(m, seat, src, preChip) {
@@ -131,11 +144,23 @@ function fxLand(m, seat, src, preChip) {
 function fingerWanted() {
   if ((UI.cfg && UI.cfg.tutorial) || UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
   if (UI.mode === 'guided') return true;
+  if (typeof guideOn === 'function' && guideOn()) return true;   // R35: the finger shows by default in vs games too (hints off turns it off)
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
   return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
-function hscrollTo(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
+function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
+// the finger stays on its target when a row scrolls under it
+// R39: the finger tip sits on the target but off every card name: try a few spots, keep the one covering the least name text
+function fingerSpot(r) {
+  const c = ctr(r), fb = $('#board').getBoundingClientRect(), names = [...document.querySelectorAll('.pvc-name,.hcn,.tcn,.cn,.nm,.pv-name')].map(e => e.getBoundingClientRect()).filter(b => b.width > 2 && b.height > 2);
+  const spots = [[c.x, c.y], [c.x, r.y + 2], [r.x + r.w * .75, r.y + 4], [r.x + r.w * .25, r.y + 4], [c.x, r.y + 12], [c.x, r.y + r.h * .3], [c.x, r.y + r.h * .72], [r.x + r.w * .78, r.y + r.h * .78], [r.x + r.w * .22, r.y + r.h * .78], [c.x, r.y + r.h - 6], [r.x + r.w * .5, r.y + r.h + 4]];
+  let best = spots[0], bo = 1e9;
+  for (const [x, y] of spots) { const L = fb.left + x - 23, T = fb.top + y - 8, o = names.reduce((s, b) => s + Math.max(0, Math.min(b.right, L + 48) - Math.max(b.left, L)) * Math.max(0, Math.min(b.bottom, T + 58) - Math.max(b.top, T)), 0); if (o < bo) { bo = o; best = [x, y]; } if (!o) break; }
+  return best;
+}
+function fingerFollow() { const f = document.getElementById('finger'), el = UI.fingerEl; if (!f || f.hidden || !el || !el.isConnected) return; const r = frameRect(el); if (!r || r.w < 4) return; const sp = fingerSpot(r); f.style.left = (sp[0] - 19) + 'px'; f.style.top = (sp[1] - 4) + 'px'; }
+function hscrollTo0(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
   if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
   else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
 function placeFinger() {
@@ -147,16 +172,18 @@ function placeFinger() {
   let el = UI.tgEls && UI.tgEls[tg];
   if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
   if (!el) return;
-  hscrollTo(el);
+  if (tg === 'pass' && UI.mode !== 'guided') return;   // vs games: Pass never glows, so the finger does not point at it
+  { const pn = PV_ON && el.closest && el.closest('#bd.pv .pv-panel'); const tb = pn && !pn.classList.contains('on') && pvTall() && UI.pvTabUser === G.logN && document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]');
+    if (tb) { el = tb; tb.classList.add('glow'); } else hscrollTo(el); }   // a tab the player picked this turn stays in front: the finger then points at its target's tab
   const r = frameRect(el); if (!r || r.w < 4) return;
-  const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
+  const sp = fingerSpot(r); f.style.left = (sp[0] - 19) + 'px'; f.style.top = (sp[1] - 4) + 'px'; f.hidden = false; UI.fingerEl = el; clearTimeout(UI.ftm); UI.ftm = setTimeout(fingerFollow, 300); UI.ftm2 = setTimeout(fingerFollow, 900);   // R39: panels settle after the first placement; re-pick the spot off the names
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
 // ---- Play view (W457): tab taps, drag a worker meeple onto a place or a hand card up into the city, a tick on every usable tap
 if (PV_ON) {
   document.addEventListener('click', e => {
     if (UI.pvDragEnd && Date.now() - UI.pvDragEnd < 450) { e.stopPropagation(); e.preventDefault(); return; }
-    const t = e.target.closest && e.target.closest('[data-a="pvtab"]'); if (t) { e.stopPropagation(); pvSetTab(t.dataset.v); snd('click', { vol: .4 }); }
+    const t = e.target.closest && e.target.closest('[data-a="pvtab"]'); if (t) { e.stopPropagation(); UI.pvTabUser = G ? G.logN : -1; pvSetTab(t.dataset.v); snd('click', { vol: .4 }); }
     // a board tap while a message card is up (or before the game starts) still answers: a small 'not now' shake
     const bt = e.target.closest && e.target.closest('#bd.pv [data-a="t"]'); if (bt && (!G || UI.cards.length || !UI.started)) shake(bt);
   }, true);

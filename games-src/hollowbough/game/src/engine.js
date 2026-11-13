@@ -245,7 +245,8 @@ function genMoves(seat) {
   if (availW(p) > 0) for (const l of locOpts(seat)) { const m = { type: 'worker' }; for (const k in l) if (k !== 'label') m[k] = l[k]; m.label = 'Place a worker: ' + l.label; out.push(m); }
   for (const m of playMoves(seat)) out.push(m);
   if (availW(p) === 0 && p.season < 3) out.push({ type: 'prepare', label: 'Prepare for ' + SEASONS[p.season + 1] + ' (recall workers' + (p.season === 0 ? ', +1 worker, run production' : p.season === 1 ? ', +1 worker, draw from the meadow' : ', +2 workers, run production') + ')' });
-  out.push({ type: 'pass', label: 'Pass (you are done for the game)' });
+  // you pass only once you are in Autumn (the last season); before that the year goes on. G.tale: the tutorial's short year may end early.
+  if (p.season >= 3 || G.tale || !out.length) out.push({ type: 'pass', label: 'Pass (you are done for the game)' });
   return out;
 }
 function occCount(k, i) {
@@ -615,8 +616,8 @@ H.waive = d => {
   if (n <= 0 || !rsum(rem)) { now('payRem', Object.assign({}, d, { rem, n: 0 })); return; }
   if (n >= rsum(rem)) { now('payRem', Object.assign({}, d, { rem: {}, n: 0 })); return; }
   const opts = [];
-  for (const r of RES) if (rem[r] > 0) { const r2 = Object.assign({}, rem); r2[r]--; opts.push({ label: 'Do not pay 1 ' + rn(r, 1) + ' (' + n + ' left to cut)', res: r, h: 'waive', d: Object.assign({}, d, { rem: r2, n: n - 1 }) }); }
-  ask(d.seat, 'waive', 'Choose which resources to cut from the price', opts);
+  for (const r of RES) if (rem[r] > 0) { const r2 = Object.assign({}, rem); r2[r]--; opts.push({ label: 'Cut 1 ' + rn(r, 1) + ' off the price' + (n > 1 ? ' (' + n + ' cuts left)' : ''), res: r, h: 'waive', d: Object.assign({}, d, { rem: r2, n: n - 1 }) }); }
+  ask(d.seat, 'waive', 'Cheaper: pick what you do not pay (price ' + rtxt(rem) + ')', opts);
 };
 H.payRem = d => {
   const p = P(d.seat), rem = plain(d.rem || {});

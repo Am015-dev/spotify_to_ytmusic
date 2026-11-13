@@ -11,6 +11,7 @@
   function table(seed) {
     try { GXH.setEnabled(false); } catch (e) { }
     try { GX.close(); } catch (e) { }
+    try { localStorage.setItem('hb_hints', '0'); } catch (e) { }   // tips off: no finger, every legal place glows
     UI.seed = seed; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame('vs'); UI.fingerSeen = true; try { GXH.setEnabled(false); } catch (e) { }
     return GXS.wait(function () { return UI.started && HB.actor(G) === 0 && !UI.animBusy && !UI.cards.length && document.querySelectorAll('#bd .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
   }
