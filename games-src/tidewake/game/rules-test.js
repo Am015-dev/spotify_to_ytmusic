@@ -1,5 +1,7 @@
 // Named rule scenarios. Each builds a real game, rigs the board with rig(), then drives the real engine (performMove / agenda handlers).  node rules-test.js
-const {load}=require('./tools/load');const X=load(['data.js','engine.js','ai.js']);const E=X.E;
+const {load}=require('./tools/load');// The rule scenarios below were written on a 6x6 grid (their coordinates put the edge at 5): the rules do not depend on the size, so they run with BW=6.
+// The 7x7 board itself (the game's real size) has its own checks at the end.
+const X=load(['data.js','engine.js','ai.js'],';BW=6;BC=2.5;');const E=X.E;
 let pass=0,fail=0;const fails=[];
 function T(name,fn){try{const r=fn();if(r===false)throw new Error('returned false');pass++;console.log('PASS',name)}catch(e){fail++;fails.push(name);console.log('FAIL',name,'-',(e.stack||e.message).split('\n').slice(0,3).join(' | '))}}
 function ok(c,msg){if(!c)throw new Error(msg||'assertion failed')}
@@ -166,4 +168,13 @@ T('FIX5 teams: only 4, 6 or 8 players (5 -> 4, 7 -> 6, 2 -> 4)',()=>{for(const [
 T('FIX3 easy solo (our variant): 4 starting leviathans, goal 24 turns',()=>{game(1,{variant:'easysolo'});eq(X.G.mons.filter(m=>m.k==='L').length,4);eq(X.G.opts.goal,24)});
 T('knowledge hides others\' hands, deck order, monster-deck order and seed',()=>{game(3,{exp:{cannon:1,rift:1}});const K=X.knowledge(1);ok(K.hands[0].every(c=>c===-1)&&K.hands[1].every(c=>c>=0),'own hand only');ok(K.deck.every(c=>c===-1));ok(K.seed===undefined&&K.rng===undefined);
   ok(JSON.stringify(K.mdeck)===JSON.stringify(K.mdeck.slice().sort((a,b)=>a-b)),'monster deck order hidden');inv()});
+// ---- the published 7x7 board: dice reach columns/rows 1-6 only; start marks sit on all four edges of the 7x7 grid
+{const Y=load(['data.js','engine.js','ai.js']);
+ T('7x7 board: 49 squares, start marks on the 7-square edges',()=>{Y.setSeed(9);Y.newGame({players:2,first:0});ok(Y.G.bd.length===49,'49 squares');
+   const m=Y.E.startMarks(Y.G,0);ok(m.length>0&&m.every(s=>s.x===0||s.y===0||s.x===6||s.y===6),'edge marks');ok(m.some(s=>s.x===6)&&m.some(s=>s.y===6),'column 7 and row 7 marks')});
+ T('7x7 board: leviathans are only ever rolled onto columns/rows 1-6 (no number on column 7 or row 7)',()=>{let bad=0,n=0;
+   for(let sd=1;sd<=300;sd++){Y.setSeed(sd);Y.ai.setAiSeed(sd);Y.newGame({players:3,first:0,seats:['ai','ai','ai']});for(const m of Y.G.mons){n++;if(m.x>5||m.y>5)bad++}}
+   ok(n>500&&bad===0,'set-up placements '+n+', off the numbered 6x6: '+bad)});
+ T('7x7 board: a full computer game ends cleanly with no invariant failure',()=>{for(let sd=1;sd<=20;sd++){Y.setSeed(sd);Y.ai.setAiSeed(sd);Y.newGame({players:4,first:0,seats:['ai','ai','ai','ai']});let k=0;
+   while(Y.G.phase!=='over'&&k++<4000){const s=Y.ai.aiStep();if(!s)break;Y.performMove(s.m,s.seat)}ok(Y.G.phase==='over','game '+sd+' over');ok(!Y.checkInvariants().length,Y.checkInvariants()[0])}});}
 console.log(`\n${pass} passed, ${fail} failed`+(fails.length?': '+fails.join('; '):''));process.exit(fail?1:0);

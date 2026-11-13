@@ -1,6 +1,6 @@
 | # | screenshot | what I think is happening | what I'd do | confidence 1-5 | confusion | fun 1-5 |
 |---|---|---|---|---|---|---|
-| 1 | r3-casual/001-open.png | Intro: Sultan died, move meeples across tiles, last-stop collects tribe. Guide checkbox on. | Enter with guide | 4 | "lift the people... leaving one on every tile" is Five-Tribes-ish, a lot to skim | 3 |
+| 1 | r3-casual/001-open.png | Intro: Sultan died, move meeples across tiles, last-stop collects tribe. Guide checkbox on. | Enter with guide | 4 | "lift the people... leaving one on every tile" is the tribes-ish, a lot to skim | 3 |
 | 2 | r3-casual/002-Enter_the_sultanate.png | Setup: 2 players, me Onyx vs computer Teal normal. Expansions header with nothing under it visible | Begin | 4 | "Expansions" header shows no options; driver lists hidden tappables below (y=503-638) I cannot see | 3 |
 | 3 | r3-casual/003-Begin.png | Board of 30 tiles covered in colored meeples; round 1 intro, bid for turn order | Continue | 4 | Tile labels tiny/unreadable; meeple piles are a blur | 3 |
 | 4 | r3-casual/004-error.png / 005-195_733.png | Continue by text timed out, had to tap coordinates. Bid screen: pay coins for turn order, I place 2 markers. Suggested 5th spot 3 coins. Teal took 4th | Tap Suggested | 4 | "more below: scroll" but phone has no scroll; 7th/8th row cut off. Meeple layout on board looks reshuffled vs prior shot | 3 |

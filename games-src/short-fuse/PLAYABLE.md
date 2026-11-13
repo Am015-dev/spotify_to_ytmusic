@@ -78,3 +78,12 @@ The idle-round guard (four full rounds with no cut explode) is now stated in the
 - Round 2: COPY-FIX.md applied (35 lines left to apply). The middle of the table shows the owner's rig art and the race ("12 / 24 wires cut") in the
   biggest gap between the stands (phone: between the crew racks; desktop: between crew row and your rack); hidden when there is no room.
   Header number track no longer overlaps on desktop (flex row) and stays a 6x2 grid at 14px on phone.
+
+## FIXED2 (review R1, 8 Nov 2026): turn clarity, tutorial by doing, job 1
+- Racks: every stand is its own framed rack. A seat with two stands labels them "Stand 1" / "Stand 2" with a gap between. A stand that wraps onto two rows shows a gold return arrow from the end of row 1 to the start of row 2 (`standsHTML`, `.stl`, `.rtn` in tbl.js / table.css; `RACK` keeps the fit maths right).
+- Icons: tap any name plate for what its icons mean (★ foreman, the Twin Probe case, wires left, two stands); the goal card has the same legend.
+- Learn to play (22 steps): the practice miss is made with the Twin Probe (tap the probe, two of Plum's wires, say 2; Plum tags the 1), and the red step is "tap your red". tut-test.js now checks both.
+- Job 1: you are the foreman (first turn, two labelled stands); the goal card says "try a match, a solo cut and your Twin Probe"; the result card shows which of Match / Wrong guess / Solo cut / Twin Probe you used and what to try next job.
+- The cut snap no longer scales a tile over the next stand.
+- Gates: rules-test 101/0; tut-test PASS at 390x844 and 375x667; mission-touch job 1 PASS at both (11 taps, won, 0 errors); playable-test PASS at both; rotate-test PASS (6/6); guard ok.
+- Shots: playable-shots/fixed2/.

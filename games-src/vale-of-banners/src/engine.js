@@ -71,7 +71,8 @@
   V.depotSize = function (G) { return G.n <= 2 ? 2 : G.n === 3 ? 3 : 4; };
   V.blackSize = function (G) { return G.n <= 2 ? 4 : G.n === 3 ? 6 : 8; };
   function startPhase(G) {
-    for (var d = 1; d <= 6; d++) { G.depots[d] = []; G.goodsAt[d] = []; for (var k = 0; k < V.depotSize(G); k++) G.depots[d].push(G.bag.length ? G.bag.pop() : null); }
+    for (var d = 1; d <= 6; d++) { G.depots[d] = []; G.goodsAt[d] = G.goodsAt[d] || [];   /* goods left on a stall stay into the next season */
+    for (var k = 0; k < V.depotSize(G); k++) G.depots[d].push(G.bag.length ? G.bag.pop() : null); }
     var bb = G.bagB || G.bag; G.black = []; for (k = 0; k < V.blackSize(G); k++) G.black.push(bb.length && !G.noBlack ? bb.pop() : null);
     G.rg = []; for (k = 0; k < 5; k++) G.rg.push(G.gbag.length ? G.gbag.pop() : 0);
     G.round = 0; startRound(G);
@@ -315,7 +316,7 @@
     if (G.teams) G.teamVP = V.TEAMS.map(function (tm) { return G.P[tm[0]].vp + G.P[tm[1]].vp; });
     var best = -1; G.rank = [];
     for (var i = 0; i < G.n; i++) G.rank.push(i);
-    G.rank.sort(function (a, b) { return (G.teams ? G.teamVP[b % 2] - G.teamVP[a % 2] : 0) || (G.P[b].vp - G.P[a].vp) || (V.estateFilled(G.P[b]) - V.estateFilled(G.P[a])) || (G.P[a].pos - G.P[b].pos) || (G.P[a].arr - G.P[b].arr); });   /* tie: fewer empty spaces, then the one further back on the track */
+    G.rank.sort(function (a, b) { return (G.teams ? G.teamVP[b % 2] - G.teamVP[a % 2] : 0) || (G.P[b].vp - G.P[a].vp) || (V.estateFilled(G.P[a]) - V.estateFilled(G.P[b])) || (G.P[a].pos - G.P[b].pos) || (G.P[a].arr - G.P[b].arr); });   /* tie: more empty spaces (corrected rule), then the one later in turn order */
     G.winner = G.rank[0];
     G.log.push({ k: 'over', winner: G.winner });
   }

@@ -39,7 +39,7 @@ function renderRival(seat) {
 }
 function rowCard(id, e) {
   const c = cdef(id); const bits = []; if (e) { if (e.occ) bits.push('occupied'); if (e.tok) bits.push(e.tok + ' tokens'); if (e.w) bits.push(e.w + ' workers'); if (e.pris && e.pris.length) bits.push(e.pris.length + ' prisoners'); }
-  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), h('div.sm', c.text)));
+  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), ...textLines(c.text).map(t => h('div.sm', t))));
 }
 function renderDrawers() {
   if (!GX.open || !G) return;
@@ -72,6 +72,8 @@ function renderStart() {
   s.appendChild(card);
 }
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
+// card text in short lines (one idea per line, ~12 words): split at ; and at sentence ends, then at commas when still long
+function textLines(t) { const out = []; String(t || '').split(/;\s*|(?<=\.)\s+/).forEach(s => { s = s.trim(); if (!s) return; if (s.split(/\s+/).length <= 12) { out.push(s); return; } let cur = ''; s.split(/,\s*/).forEach(c => { const n = cur ? cur + ', ' + c : c; if (cur && n.split(/\s+/).length > 12) { out.push(cur + ','); cur = c; } else cur = n; }); if (cur) out.push(cur); }); return out.flatMap(s => { const w = s.split(/\s+/); if (w.length <= 12) return [s]; const r = []; for (let i = 0; i < w.length; i += 10) r.push(w.slice(i, i + 10).join(' ')); return r; }); }
 // ---- events
 document.addEventListener('click', ev => {
   if (UI.zoomAt && Date.now() - UI.zoomAt < 450) { ev.preventDefault(); return; }
@@ -84,7 +86,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 't': onTarget(d.t, t); break;
-    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { if (typeof tutGate === 'function' && !tutGate(UI.sel ? 'o:' + d.mi : tgOf(m), !!UI.sel)) break; UI.sel = null; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
     case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
     case 'handtog': UI.handHide = !UI.handHide; snd('click', { vol: .4 }); render(); break;
@@ -93,6 +95,7 @@ document.addEventListener('click', ev => {
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;
+    case 'reresult': if (G && G.phase === 'over' && !UI.cards.length) { UI.resultDone = true; queueOver(); } break;
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
     case 'menu': UI.camp = null; showStart(); break;
