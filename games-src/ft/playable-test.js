@@ -5,7 +5,7 @@
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs');const html=fs.readFileSync(__dirname+'/sands.html');
 const mode=process.argv[2]||'quick';const [W,H]=(process.argv[3]||'390x763').split('x').map(Number);const SH=process.argv[4]||'';
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{if(probs.length<30)probs.push(m)};
+const SMALL={};const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{if(probs.length<30)probs.push(m)};
 (async()=>{const b=await PW.chromium.launch();const mob=W<700;
  const MOUSE=W>=700||!!process.env.MOUSE;const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:mob&&!MOUSE,hasTouch:!MOUSE,serviceWorkers:'block'});
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
@@ -39,9 +39,11 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const probs=[];const note=m=>{i
   if(!tgt){await sleep(250);continue}
   if(!tgt.ok){note('hint target covered '+tgt.what);}
   await tapXY(tgt.x,tgt.y);turns++;await sleep(220);
+  if(process.env.TARGETS){const sm=await p.evaluate(()=>[...document.querySelectorAll('#bd button,#bd [data-mv],#bd [data-sell],#bd [data-dj],#bd [data-chz],#bd .sp-b,#bd [data-tile],#bd [role=button],#chz button,#modal button')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.height&&getComputedStyle(e).visibility!=='hidden'&&(r.width<44||r.height<44)&&r.bottom>0&&r.top<innerHeight}).map(e=>(e.id||e.className||e.tagName).toString().slice(0,30)+' '+Math.round(e.getBoundingClientRect().width)+'x'+Math.round(e.getBoundingClientRect().height)));for(const x of sm)SMALL[x.replace(/ \d+x\d+$/,'')]=x}
   if(turns===30&&!shots.s){shots.s=1;await shot('mid')}
  }
  const fin=await p.evaluate(()=>({over:!!(G&&G.over),win:G&&G.winner,pl:G&&G.pl.map(x=>x.nm)}));
  if(!fin.over)note('game did not reach the result screen');
  console.log(mode,W+'x'+H,'taps',turns,'result',JSON.stringify(fin),probs.length?'PROBLEMS':'PASS');probs.forEach(x=>console.log(' -',x));
+ if(process.env.TARGETS)console.log('small targets (<44px):',JSON.stringify(Object.values(SMALL)));
  await b.close();process.exit(probs.length?1:0)})();
