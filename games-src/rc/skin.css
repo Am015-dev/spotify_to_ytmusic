@@ -53,3 +53,20 @@ html.sk .gx-drawer{background-color:#f1e6c8;background-clip:padding-box}
 html.sk .gx-drawer .gxh-set,html.sk .gx-drawer .gxh-set>span,html.sk .gx-drawer .gxh-set button{color:#2a1a0a;border-color:#6b4a1a}
 html.sk .gx-drawer .gxh-set button[aria-pressed=true]{background:#e0a64a;color:#1b1208}
 html.sk .gx-drawer a{color:#5a3200;text-decoration:underline}
+
+/* R40 feel: the die tumbles, the fight clashes, gains fly into their chip. Each effect <= 0.6 s; none takes a tap. */
+@keyframes bfPopIn{0%{opacity:0;transform:translate(-50%,-20%) scale(.5)}45%{opacity:1;transform:translate(-50%,-60%) scale(1.3)}100%{opacity:1;transform:translate(-50%,-80%) scale(1)}}
+@keyframes bfPopOut{0%{opacity:1;transform:translate(-50%,-80%)}100%{opacity:0;transform:translate(-50%,-200%)}}
+.bfdie{position:absolute;z-index:7;transform:translate(-50%,-50%);font-size:58px;line-height:1;color:#fff8e6;text-shadow:0 2px 6px rgba(0,0,0,.7);pointer-events:none;will-change:transform}
+.bfdie.done.good{color:#b8f5bf}.bfdie.done.bad{color:#ffb4a8}
+.bffight{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 10px;margin:6px 0 2px;pointer-events:none}
+.bffight b{display:inline-flex;flex-direction:column;align-items:center;font:800 24px/1 var(--sans);padding:6px 10px;border-radius:12px;background:rgba(20,12,4,.08);border:2px solid rgba(80,50,20,.35)}
+.bffight b small{font:700 14px/1.1 var(--sans);opacity:.8;margin-top:2px}
+.bffight .fs{color:#8a2c1c}.bffight .fw{color:#24506a}.bffight i{font:800 15px var(--sans);opacity:.7}
+.bffight em{flex-basis:100%;text-align:center;font:800 18px/1.2 var(--sans);font-style:normal}.bffight em.bad{color:#b0281a}.bffight em.good{color:#1f7a34}
+.bffight .fs{animation:bfClashL .42s .15s cubic-bezier(.3,.8,.4,1) both}.bffight .fw{animation:bfClashR .42s .15s cubic-bezier(.3,.8,.4,1) both}
+.bffight em{animation:bfWound .36s .55s ease-out both}
+@keyframes bfClashL{0%{opacity:0;transform:translateX(-46px)}70%{opacity:1;transform:translateX(8px)}100%{transform:none}}
+@keyframes bfClashR{0%{opacity:0;transform:translateX(46px)}70%{opacity:1;transform:translateX(-8px)}100%{transform:none}}
+@keyframes bfWound{0%{opacity:0;transform:scale(1.8)}60%{opacity:1;transform:scale(.92)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.bffight b,.bffight em{animation:none!important;opacity:1!important;transform:none!important}.bfpop{animation:none!important;opacity:1!important}}

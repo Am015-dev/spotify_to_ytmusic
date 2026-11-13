@@ -218,11 +218,13 @@ function recValid(r){if(!r||r.round!==G.round||r.res!==JSON.stringify(G.res)||r.
 // fresh: the whole day's plan exactly as ✨ Plan it for me makes it (from an empty human plan), used by the phone's ✨ hints pawn by pawn
 function recPlan(fresh){if(!planOpen())return {map:{}};if(recValid(UI.rec)&&(!fresh||UI.rec.fresh))return UI.rec;const hsP=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);const none=!G.plan.acts.some(a=>a.pw.some(id=>{const q=pawnInfo(id);return q&&(q.c==null||hsP.includes(q.c))}));fresh=!!fresh&&none;if(UI.recBusy)return {map:{}};const bkey={};for(const a of G.plan.acts)for(const id of a.pw)bkey[id]=JSON.stringify([a.type,a.tgt]);const res0=JSON.stringify(G.res),log0=G.logN;
   const save=JSON.stringify(G),fx=UI.fx.length,la=UI.lastAct,mate=UI.mate,sw=UI.sugWhy;const before=placedIds();const map={};UI.recBusy=1;
-  const pile0=G.sc&&G.sc.pile|0;let pileN=0;
-  try{const r=suggestCore(!fresh);pileN=(G.sc&&G.sc.pile|0)-pile0;for(const a of G.plan.acts){const n=actNeed(a);const k=a.pw.length;const key=JSON.stringify([a.type,a.tgt]);const dt=dtype(a);
-      for(const id of a.pw)if(!before.has(id))map[id]={type:a.type,tgt:a.tgt,alt:a.alt||0,label:actLabel(a),why:r.why[key]||'',sure:!n.roll||k>=n.max,k,with:a.pw.filter(x=>x!==id).map(x=>{const p=pawnInfo(x);return p?pawnLabel(p):'?'}),odds:n.roll&&k<n.max&&dt&&typeof diceOdds==='function'?diceOdds(dt):null}}}
+  const pile0=G.sc&&G.sc.pile|0;let pileN=0;const ext=[];const used0=G.chars.map(c=>Object.assign({},c.used||{})),items0=G.items.map(i=>[i.k,i.uses]);
+  try{const r=suggestCore(!fresh);
+    // R40: the plan's extras the per-pawn hints must not lose (the Carpenter's Thrifty, a bottle, biscuits...): ✨ applies them once every pawn has its job
+    G.chars.forEach((c,j)=>{for(const k in (c.used||{}))if(!(used0[j]||{})[k])ext.push({t:'skill',ci:c.i,k})});for(const [k,u] of items0){const it=G.items.find(i=>i.k===k);if(!it||it.uses<u)ext.push({t:'item',k})}pileN=(G.sc&&G.sc.pile|0)-pile0;for(const a of G.plan.acts){const n=actNeed(a);const k=a.pw.length;const key=JSON.stringify([a.type,a.tgt]);const dt=dtype(a);
+      for(const id of a.pw)if(!before.has(id))map[id]={type:a.type,tgt:a.tgt,alt:a.alt||0,pay:a.pay||null,lead:a.pw[0],label:actLabel(a),why:r.why[key]||'',sure:!n.roll||k>=n.max,k,with:a.pw.filter(x=>x!==id).map(x=>{const p=pawnInfo(x);return p?pawnLabel(p):'?'}),odds:n.roll&&k<n.max&&dt&&typeof diceOdds==='function'?diceOdds(dt):null}}}
   catch(e){console.error(e)}finally{G=JSON.parse(save);UI.fx.length=Math.min(UI.fx.length,fx);UI.lastAct=la;UI.mate=mate;UI.sugWhy=sw;UI.recBusy=0}
-  UI.rec={round:G.round,res:res0,logN:log0,bkey,map,fresh,pileN};return UI.rec}
+  UI.rec={round:G.round,res:res0,logN:log0,bkey,map,fresh,pileN,ext};return UI.rec}
 // ---------- first-game walkthrough ----------
 UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
 // the first-game walkthrough and the guided-game tips are now the help kit's coach bubbles (hlp.js)

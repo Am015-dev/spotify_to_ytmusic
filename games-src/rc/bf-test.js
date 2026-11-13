@@ -6,7 +6,7 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));let bad=0;
 for(const [W,H] of [[390,763],[375,553]]){const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));const prob=m=>{bad++;console.log(W+'x'+H,'PROBLEM',m)};
- await p.goto('https://swi.test/');await p.waitForTimeout(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}setSeed(7);AIDELAY=0});
+ await p.goto('https://swi.test/');await p.waitForTimeout(1200);await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('swi_hint','0')}catch(e){}setSeed(7);AIDELAY=0});
  await p.tap('[data-a=start]');await p.waitForTimeout(1500);let minPct=100,days=0,plans=0,tapsTile=0;
  for(let k=0;k<400&&days<3;k++){
   const s=await p.evaluate(()=>{const r=document.querySelector('.gx-board').getBoundingClientRect();const lb=document.querySelector('#phlabel').textContent.trim();

@@ -95,9 +95,9 @@ function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you'
   return ['isl','The island’s turn']}
 function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w:G.res.wood,low:(()=>{let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded'||c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m})(),sh:hasShelter(),mo:G.morale,d:G.round,r:G.rounds}})}catch(e){}if(!o)return '';
   // resources as tokens: the owner's icon, a big number, the name under it (owner 8 Nov: "a spreadsheet")
-  const tk=(bad,ic,n,nm)=>`<span class="tk ${bad?'bad':''}">${ic.length>2?`<img src="media/icon-res-${ic}.webp" alt="">`:`<i>${ic}</i>`}<b>${n}</b><small>${nm}</small></span>`;
+  const tk=(bad,ic,n,nm)=>`<span class="tk ${bad?'bad':''}" data-r="${{food:'food',wood:'wood','❤':'life',shelter:'shelter','🔥':'pile','📅':'day'}[ic]||''}">${ic.length>2?`<img src="media/icon-res-${ic}.webp" alt="">`:`<i>${ic}</i>`}<b>${n}</b><small>${nm}</small></span>`;
   let pc=null;try{withView(()=>{pc=goalPace()})}catch(e){}
-  return tk(false,'📅',o.d,'of '+o.r+' days')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')+(pc?tk(pc.behind,'🔥',pc.pile+'/15','Pile'):'')+(pc&&pc.behind?`<span class="pace" role="alert">⚠ ${E(pc.text)}</span>`:'')}
+  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')+(pc?tk(pc.behind,'🔥',pc.pile+'/15','Pile'):'')+(pc&&pc.behind?`<span class="pace" role="alert">⚠ ${E(pc.text)}</span>`:'')}
 // R3 review: say during play when the rescue goal is behind schedule (Marooned: fire, then a 15-wood pile by day 10-12). Targets come from
 // easy-sim.js: winning games average pile 6 by day 6, 10 by day 9; losing games are 2-3 behind that.
 function goalPace(day){if(!G||G.scen!=='marooned'||G.over||!G.sc)return null;const d=Math.min(G.rounds,day||G.round),pile=G.sc.pile|0,fire=!!(G.inv&&G.inv.built&&G.inv.built.fire);
@@ -171,14 +171,14 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
   el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-72,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
 function deltas(A,B){const o=[];if(!A||!B)return o;
-  for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,w:`${{food:'Food',pfood:'Dry food',wood:'Wood',fur:'Fur'}[k]} ${z>a?'+':''}${z-a}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a})}
+  for(const k of ['food','pfood','wood','fur']){const a=A.res[k],z=B.res[k];if(z!==a)o.push({t:`${z>a?'+':''}${z-a}${RICON[k]}`,w:`${{food:'Food',pfood:'Dry food',wood:'Wood',fur:'Fur'}[k]} ${z>a?'+':''}${z-a}`,c:z>a?'good':'bad',fly:RICON[k],up:z>a,rk:k==='pfood'?'food':k})}
   B.chars.forEach((c,j)=>{const x=A.chars[j];if(!x||(c.npc&&G.scen!=='stranded'))return;const d=lifeOf(B,c)-lifeOf(A,x);if(d)o.push({t:`<i style="background:${PCOL[c.i%6]}"></i>${d>0?'+':''}${d}♥`,w:`${E(c.nm)} ${d>0?'+':''}${d} life`,c:d>0?'good':'bad'})});
   if(A.fri&&B.fri&&A.fri.w!==B.fri.w){const d=A.fri.w-B.fri.w;o.push({t:`${d>0?'+':''}${d}♥`,c:d>0?'good':'bad'})}
   if(A.morale!==B.morale)o.push({t:`${B.morale>A.morale?'☺ +':'☹ '}${B.morale-A.morale}`,w:`Morale ${B.morale>A.morale?'+':''}${B.morale-A.morale}`,c:B.morale>A.morale?'good':'bad'});
   for(const [k,ic] of [['roof','☂'],['pal','🧱']])if(A.camp[k]!==B.camp[k])o.push({t:`${ic} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,w:`${k==='roof'?'Roof':'Palisade'} ${B.camp[k]>A.camp[k]?'+':''}${B.camp[k]-A.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
   if(A.weapon!==B.weapon)o.push({t:`🗡 ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,w:`Weapon ${B.weapon>A.weapon?'+':''}${B.weapon-A.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
   const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)o.push({t:sz?'🏠 built':'🏠 lost',w:sz?'Shelter built':'Shelter lost',c:sz?'good':'bad'});
-  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:`🔥 +${B.sc.pile-A.sc.pile}`,w:`Pile +${B.sc.pile-A.sc.pile}`,c:'good'});
+  if(G.scen==='marooned'&&A.sc&&B.sc&&A.sc.pile!==B.sc.pile)o.push({t:`🔥 +${B.sc.pile-A.sc.pile}`,w:`Pile +${B.sc.pile-A.sc.pile}`,c:'good',fly:'🪵',up:true,rk:'pile'});
   if(G.scen==='hexed'&&A.sc&&B.sc&&A.sc.crosses.length!==B.sc.crosses.length)o.push({t:'✝ raised',c:'good'});
   const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)o.push({t:'🧭 new land',c:'good'});
   return o}
@@ -187,16 +187,34 @@ BF.beatFx=function(i){const b=UI.beats[i];if(!b||!G)return;const d=b.data||{};le
     if(b.kind==='daysum'){const x=daySumData(i);arr=x.A&&x.B?deltas(x.A,x.B).slice(0,6):[]}
     else if(!['intro','plan','dawn','go'].includes(b.kind)&&i>0)arr=deltas(beatState(i-1),B);
     let k=0,t=0;
-    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.pop(pos,'🎲','dice',0,k++);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,k++);if(dd.w)BF.pop(pos,'🩸','bad big',700,k++);if(dd.q)BF.pop(pos,'❓','big',1000,k++);t=1100}
-    arr.forEach((x,j)=>{BF.pop(pos,x.t,x.c,t+j*240,k+j);if(x.fly)BF.fly(pos,x.fly,x.up,t+j*240+350)})}catch(e){console.error(e)}}
+    if(b.kind==='act'&&d.dice){const dd=d.dice;BF.die(pos,dd.s,0);k++;BF.pop(pos,dd.s?'✔ success':'✖ failed',dd.s?'good big':'bad big',560,k++);if(dd.w)BF.pop(pos,'🩸 wound','bad big',820,k++);if(dd.q)BF.pop(pos,'❓','big',1060,k++);t=1100}
+    arr.forEach((x,j)=>{BF.pop(pos,x.t,x.c,t+j*240,k+j);if(x.fly)BF.fly(pos,x.fly,x.up,t+j*240+200,x.rk)})}catch(e){console.error(e)}}
 // a pending choice with dice shows the dice on the island too
-BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.pop(pos,'🎲','dice',0,0);BF.pop(pos,dd.s?'✔':'✖',dd.s?'good big':'bad big',380,1);if(dd.w)BF.pop(pos,'🩸','bad big',700,2);if(dd.q)BF.pop(pos,'❓','big',1000,3)};
+BF.qFx=function(){const qq=G.q;if(!qq||qq.kind!=='dice'||!qq.dice)return;const dd=qq.dice;const pos=G.camp.pos;BF.die(pos,dd.s,0);BF.pop(pos,dd.s?'✔ success':'✖ failed',dd.s?'good big':'bad big',560,1);if(dd.w)BF.pop(pos,'🩸 wound','bad big',820,2);if(dd.q)BF.pop(pos,'❓','big',1060,3)};
 
 // ---------- gains fly to the resource row, losses fly away ----------
-BF.fly=function(id,icon,up,delay){if(!BF.on||!q('#bfov'))return;const p=tilePt(id),chip=q('#phchip');if(!p||!chip||!chip.getBoundingClientRect().width)return;const cr=chip.getBoundingClientRect();
+BF.fly=function(id,icon,up,delay,rk){if(!BF.on||!q('#bfov'))return;const p=tilePt(id);let chip=rk&&q('#bfres .tk[data-r="'+rk+'"]');if(!chip||!chip.getBoundingClientRect().width)chip=q('#bfres')&&q('#bfres').getBoundingClientRect().width?q('#bfres'):q('#phchip');if(!p||!chip||!chip.getBoundingClientRect().width)return;const cr=chip.getBoundingClientRect();if(BF.rm()){if(up)setTimeout(()=>BF.bump(chip),delay||0);return}
   const sx=p.ox+p.x,sy=p.oy+p.y,cx=cr.left+cr.width/2,cy=cr.top+cr.height/2;const el=document.createElement('div');el.className='bffly';el.textContent=icon;document.body.appendChild(el);
   const a=up?[[sx,sy,.6,0],[sx,sy-26,1.3,1],[cx,cy,.7,.9]]:[[cx,cy,.7,0],[sx,sy,1.3,1],[sx+(sx<innerWidth/2?-90:90),sy-60,.5,0]];
-  try{const an=el.animate(a.map(([x,y,s,o],j)=>({transform:`translate(${x-14}px,${y-14}px) scale(${s})`,opacity:o,offset:j/(a.length-1)})),{duration:1100,delay:delay||0,fill:'both',easing:'ease-in-out'});an.onfinish=()=>el.remove()}catch(e){setTimeout(()=>el.remove(),1500+(delay||0))}};
+  try{const an=el.animate(a.map(([x,y,s,o],j)=>({transform:`translate(${x-14}px,${y-14}px) scale(${s})`,opacity:o,offset:j/(a.length-1)})),{duration:600,delay:delay||0,fill:'both',easing:'ease-in-out'});an.onfinish=()=>{el.remove();if(up)BF.bump(chip)}}catch(e){setTimeout(()=>el.remove(),900+(delay||0))}};
+// ---------- R40 feel: dice, fights and gains move on the board. Every effect is 0.6 s or less, never takes a tap (pointer-events none),
+// and with reduced motion it shows its last frame still instead of moving ----------
+BF.rm=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
+BF.bump=function(el){if(!el||!el.animate||BF.rm())return;try{el.animate([{transform:'scale(1)'},{transform:'scale(1.16)',filter:'brightness(1.5)'},{transform:'scale(1)'}],{duration:320,easing:'ease-out'})}catch(e){}};
+const DIEF=['⚀','⚁','⚂','⚃','⚄','⚅'];
+BF.die=function(id,ok,delay){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfdie '+(ok?'good':'bad');el.setAttribute('aria-hidden','true');el.textContent=DIEF[5];
+  el.style.left=Math.round(Math.max(30,Math.min(p.w-30,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-72,p.y)))+'px';ov.appendChild(el);const end=()=>{el.textContent=ok?'⚅':'⚀';el.classList.add('done')};
+  setTimeout(()=>el.remove(),1500+(delay||0));if(BF.rm()||!el.animate){end();return}
+  let n=0;const tm=setInterval(()=>{el.textContent=DIEF[(n++*4+1)%6]},70);setTimeout(()=>{clearInterval(tm);end()},(delay||0)+520);
+  try{el.animate([{transform:'translate(-50%,-260%) rotate(-300deg) scale(.5)',opacity:0},{transform:'translate(-50%,-50%) rotate(20deg) scale(1.25)',opacity:1,offset:.6},{transform:'translate(-50%,-75%) rotate(-8deg) scale(1)',opacity:1,offset:.8},{transform:'translate(-50%,-50%) rotate(0) scale(1)',opacity:1}],{duration:540,delay:delay||0,fill:'both',easing:'cubic-bezier(.3,.7,.4,1)'})}catch(e){}};
+// a fight: the beast's strength meets the weapon, and the wound it costs (from the game log of that beat; the beast's card as the fallback)
+function fightNums(i){const b=UI.beats[i];if(!b||b.kind!=='fight')return null;const d=b.data||{};let str=null,wpn=null;
+  try{const L=G.log.filter(x=>x.i>b.n0).sort((x,y)=>x.i-y.i);for(const x of L){const m=/strength (\d+) vs weapon (\d+)/.exec(x.t);if(m){str=+m[1];wpn=+m[2];break}}}catch(e){}
+  if(str==null){try{const A=beatState(i-1)||G;const bs=d.beast&&BEAST[d.beast];if(!bs)return null;str=(bs.str||0);wpn=A.weapon|0}catch(e){return null}}
+  let hurt=0;try{const A=beatState(i-1),B=beatState(i);if(A&&B&&d.who!=null&&d.who>=0){const j=B.chars.findIndex(c=>c.i===d.who);if(j>=0&&A.chars[j])hurt=Math.max(0,lifeOf(A,A.chars[j])-lifeOf(B,B.chars[j]))}}catch(e){}
+  if(!hurt)hurt=Math.max(0,str-wpn);return {str,wpn,hurt}}
+function fightHtml(i){const f=fightNums(i);if(!f)return '';const win=f.str<=f.wpn;return `<span class="bffight ${BF.rm()?'still':''}" aria-label="Beast strength ${f.str} against weapon ${f.wpn}${f.hurt?': '+f.hurt+' wound'+(f.hurt>1?'s':''):': no wound'}"><b class="fs">🐾 ${f.str}<small>strength</small></b><i>vs</i><b class="fw">🗡 ${f.wpn}<small>weapon</small></b><em class="${win?'good':'bad'}">${win?'✔ no wound':'🩸 −'+f.hurt+' ♥'}</em></span>`}
+
 // ---------- weather on the camp: rain drops, snow, a flash ----------
 BF.rain=function(pos,r,s,storm){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(pos);if(!p)return;const n=Math.min(18,(r||0)*5+(s||0)*5+(storm?8:0));if(!n)return;
   const w=document.createElement('div');w.className='bfrain';w.style.left=Math.round(p.x-60)+'px';w.style.top=Math.round(p.y-120)+'px';
@@ -223,7 +241,7 @@ BF.card=function(i){BF.cardClear();const b=UI.beats[i];const ov=q('#bfov');if(!b
   let scene='';try{if(k==='weather'){const w=(viewState()||G).lastWx||{};scene=w.storm?'gale':w.snow?'winter':w.rain?'rain':'horizon'}
     else if(k==='threat'||k==='fight')scene='prowlers';else if(k==='mystery')scene='altar';
     else{const c=d.card!=null&&CARD[d.card];const t=c&&(c.icon||c.deck||c.type);scene={book:'whisper',build:'log',explore:'shroud',gather:'hunger',wreck:'undertow'}[t]||(k==='adventure'?'shroud':'undertow')}}catch(e){}
-  el.innerHTML=`<div class="in">${scene&&!(k==='fight'&&d.beast)?`<img class="bfscene" src="media/camp-${scene}.webp" alt="">`:''}<div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span>${(()=>{try{const c=d.card!=null&&CARD[d.card];if(!c)return '';const t=(k==='event'?opsText(c.ev):k==='threat'&&c.th?opsText(c.th.rw||c.th.pen||[]):opsText(c.ops))||'';return t?`<span class="bfeff">${E(w12(t.replace(/;.*$/,'.')))}</span>`:''}catch(e){return ''}})()}</div></div>`;ov.appendChild(el);
+  el.innerHTML=`<div class="in">${scene&&!(k==='fight'&&d.beast)?`<img class="bfscene" src="media/camp-${scene}.webp" alt="">`:''}<div class="fr">${(k==='fight'&&d.beast&&artImg('beast',d.beast,'bfart'))||`<span class="bfic">${ic}</span>`}<span class="bftt">${E(w8(capFor(i)))}</span>${k==='fight'?fightHtml(i):''}${(()=>{try{const c=d.card!=null&&CARD[d.card];if(!c)return '';const t=(k==='event'?opsText(c.ev):k==='threat'&&c.th?opsText(c.th.rw||c.th.pen||[]):opsText(c.ops))||'';return t?`<span class="bfeff">${E(w12(t.replace(/;.*$/,'.')))}</span>`:''}catch(e){return ''}})()}</div></div>`;ov.appendChild(el);
   // hold to read the full card text; a quick tap moves on
   let t0=0,tm=null,held=false;const cancel=()=>{clearTimeout(tm);tm=null};
   el.addEventListener('pointerdown',e=>{e.stopPropagation();t0=Date.now();held=false;cancel();tm=setTimeout(()=>{held=true;BF.info()},480)});
@@ -244,22 +262,36 @@ BF.ghostSpot=ghostSpot;
 // next pawn would go and the ⭐ row in the pop-up; the player places every pawn.
 // the wood ✨ puts on the pile today: what the day's whole plan put there (the advisor's step and the computer's), within today's room
 function wantPile(){let n=advPileN();try{const r=UI.rec;if(r&&r.fresh&&r.round===G.round&&r.pileN>0){const room=SCEN.marooned.pileRoom();const free=G.res.wood-committed().wood-shelterReserve();n=Math.max(n,Math.min(r.pileN,room,free))}}catch(e){}return Math.max(0,n)}
-// FLAG (off by default, unfinished): ✨ as a per-pawn hint instead of Plan it for me. On with ?hint=1 or localStorage swi_hint=1.
-// Touch games that follow the hints still lose more often than the whole plan (piles 7-14 on day 12), see HANDOFF.
-BF.hintOn=()=>{try{return /[?&]hint=1/.test(location.search)||localStorage.getItem('swi_hint')==='1'}catch(e){return false}};
+// ✨ as a per-pawn hint instead of Plan it for me. R40 (F2: "✨ plays the game"): on by default on the Easy island, so a newcomer makes
+// every placement and hears why; Normal keeps Plan it for me. ?hint=1 / localStorage swi_hint=1 force it on, swi_hint=0 off.
+BF.hintOn=()=>{try{if(/[?&]hint=1/.test(location.search)||localStorage.getItem('swi_hint')==='1')return true;if(localStorage.getItem('swi_hint')==='0')return false}catch(e){}
+  return !!(typeof G!=='undefined'&&G&&G.diff==='easy'&&!G.cmp&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))};
+// the one-line why for a hinted job: the advisor's priority when it has one, else what that kind of job does for the day
+function hintWhy(rec,cur){let w=String(rec.why||'');if(/computer/.test(w)||w.length>26)w='';if(!w){const t=rec.type,L=String(rec.label||''),k=rec.tgt&&rec.tgt.k||(/shelter/i.test(L)?'shelter':/roof/i.test(L)?'roof':/palisade/i.test(L)?'pal':/fire/i.test(L)?'fire':'');
+  w=t==='rest'?'heals 1 life':t==='gather'?(/wood/i.test(L)?'wood for fire and pile':'food for tonight'):t==='build'?(k==='shelter'?'stops night wounds':k==='roof'?'keeps the rain off':k==='pal'?'stops storm damage':k==='fire'?'half of the rescue':'helps every day'):t==='explore'?'new land to use':t==='threat'?'clears a threat':t==='hunt'?'food, but it bites':t==='camp'?'morale':''}
+  if(!rec.sure&&rec.odds)w+=(w?' · ':'')+'🎲';return w}
+BF.hintWhy=hintWhy;
 BF.wantPile=()=>wantPile();
+// R40: the whole plan's extras (a skill like Thrifty, an item, fur instead of wood) that the pawn-by-pawn hints would lose: still to do today?
+function recExtras(){const r=UI.rec;if(!r||!r.fresh||r.round!==G.round||!planOpen())return [];const o=[];
+  for(const x of r.ext||[]){if(x.t==='skill'&&!skillWhy(x.ci,x.k))o.push(x);else if(x.t==='item'&&!itemWhy(x.k))o.push(x)}
+  for(const a of G.plan.acts){if(!a.pw.length)continue;const m=a.pw.map(id=>r.map[id]).find(m=>m&&m.pay&&m.type===a.type&&JSON.stringify(m.tgt)===JSON.stringify(a.tgt));if(m&&a.pay!==m.pay){const b=Object.assign({},a,{pay:m.pay});if(afford(b))o.push({t:'pay',id:a.id,pay:m.pay})}}return o}
+function applyExtras(){const done=[];for(const x of recExtras()){try{if(x.t==='skill'){const c=P(x.ci);const s=c&&CHARS[c.k].skills.find(y=>y.k===x.k);if(!useSkill(x.ci,x.k))done.push(`${c.nm.split(' ')[0]}: ${s?s.n:x.k}`)}
+    else if(x.t==='item'){if(!useItem(x.k))done.push(ITEMS[x.k]?ITEMS[x.k].n:x.k)}else if(x.t==='pay'){setPay(x.id,x.pay);done.push(`pay with ${x.pay}`)}}catch(e){}}return done}
+BF.hintMore=()=>{try{return wantPile()>0||recExtras().length>0}catch(e){return false}};
 BF.hint=function(){let pre='';const castFree=()=>humanFree().some(p=>p.c!=null||recTile(p));
   // the pile goes last, like the advisor's own plan: only once every castaway pawn has its job (that wood is then really spare)
-  if(!castFree()){try{const n=wantPile();if(n>0&&!pileAdd(n))pre=`🔥 Pile +${n}. `}catch(e){}}
+  if(!castFree()){try{const ex=applyExtras();if(ex.length)pre=`✨ ${ex.join(', ')}. `;const n=wantPile();if(n>0&&!pileAdd(n))pre+=`🔥 Pile +${n}. `}catch(e){}}
   try{recPlan(true)}catch(e){}
   // the pawn to advise: the one in hand if it has a pick, else the first castaway pawn with one (helpers like the Dog are optional)
   let cur=curPawn();const free=humanFree();const cand=(cur?[cur]:[]).concat(free.filter(p=>p.c!=null),free.filter(p=>p.c==null));let rt=null;
-  for(const p of cand){const r=recTile(p);if(r){cur=p;rt=r;break}}
+  // a job's leader first (the leader rolls, takes the wounds and brings the skills: the whole plan's order, R40 sim 15/40 -> 30/40 with the extras)
+  {const fid=new Set(free.map(p=>p.id));const recs=cand.map(p=>[p,recTile(p)]).filter(x=>x[1]);const pick=recs.find(([p,r])=>r.rec.lead===p.id||!fid.has(r.rec.lead))||recs[0];if(pick){cur=pick[0];rt=pick[1]}}
   if(!rt&&cur&&cur.c==null){const f=free.find(p=>p.c!=null);if(f)cur=f}
   if(!cur||!free.some(p=>p.c!=null)&&!rt){BF.hintId=null;BF.say(pre+'Every pawn has a job. Start day');render();return}
   UI.sel=cur.id;const nm=pawnLabel(cur).split(' ')[0];
   if(!rt){BF.hintId=null;BF.say(pre+`No clear pick for ${nm}: any glow`);render();return}
-  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'');BF.say(`${pre?pre.replace(/\.\s*$/,'')+' · ':''}✨ ${nm} → ${lb.replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat')}`,6000);render()};
+  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'');const why=hintWhy(rt.rec,cur);BF.hintTxt=why;BF.say(`${pre?pre.replace(/\.\s*$/,'')+' · ':''}✨ ${nm} → ${lb.replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat')}${why?': '+why:''}`,8000);render()};
 BF.ghostPlace=function(){const gh=q('#bfgh');if(!gh)return;let s=null;try{s=ghostSpot()}catch(e){}if(!s){gh.hidden=true;BF.ghostAt=null;return}gh.hidden=false;gh.style.left=Math.round(s.x-14)+'px';gh.style.top=Math.round(s.y-12)+'px';BF.ghostAt=s};
 // ---------- details drawer: the story text and the day's needs live here ----------
 BF.info=function(){const d=GX.drawer('detd','Details',null);fillInfo();GX.show('detd');return d};
@@ -291,12 +323,14 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(!BF.on){UI.pick=null;return}
   if(BF._st!==st){BF._st=st;BF.msg=null}
   // glowing places: where the pawn in hand can work
-  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=legalTiles(cur);try{if(BF.pileNag!==G.round+':'+G.logN&&!humanFree().some(p=>p.c!=null||recTile(p))&&wantPile()>0){BF.pileNag=G.round+':'+G.logN;BF.say(`🔥 ✨ adds ${wantPile()} wood to the pile`,6000)}}catch(e){}}else if(st==='story'&&posQ())UI.pick=posQ().map(x=>x.pos);else UI.pick=null;
+  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=legalTiles(cur);try{if(BF.pileNag!==G.round+':'+G.logN&&!humanFree().some(p=>p.c!=null||recTile(p))&&(wantPile()>0||BF.hintOn()&&recExtras().length)){BF.pileNag=G.round+':'+G.logN;const n=wantPile();BF.say(n>0?`🔥 ✨ adds ${n} wood to the pile`:'✨ has one more tip for today',6000)}}catch(e){}}else if(st==='story'&&posQ())UI.pick=posQ().map(x=>x.pos);else UI.pick=null;
   { // the glow under each place the pawn in hand can work
     const gl=q('#bfglow');if(gl){const ids=UI.pick||[];const sig=ids.join(',');if(gl.dataset.s!==sig){gl.dataset.s=sig;gl.innerHTML=ids.map(i=>`<i class="bfgl" data-t="${i}"></i>`).join('');BF.place()}}}
   // the tray
   const h=trayHtml(st);if(tray.dataset.h!==h){tray.dataset.h=h;tray.innerHTML=h}
   tray.dataset.st=st;
+  // R40: a story beat's tray is one button row, so the board takes the rest of the screen (a question keeps the full tray)
+  {const app=q('.gx-app');if(app){const v=st==='story'&&h.indexOf('bf-opts')<0?'lite':'';if(app.dataset.bft!==v){app.dataset.bft=v;try{if(typeof resize3D==='function'&&V3.on){resize3D();if(typeof placeLabels==='function')placeLabels()}}catch(e){}}}}
   // the status line
   BF.paint();
   // chips on the island
@@ -312,7 +346,8 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   const pp=q('#ppop'),bd=q('.gx-board');if(pp&&!pp.hidden&&PHO.pop&&PHO.pop.k==='tile'&&bd){const p=tilePt(PHO.pop.id);const br=bd.getBoundingClientRect();pp.classList.toggle('top',!!p&&p.y+p.oy-br.top>br.height*.5)}
   // the camp chip flashes when a number changes
   const chip=q('#phchip');if(chip){const v=chip.dataset.h;if(BF._chip!=null&&BF._chip!==v){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}BF._chip=v}
-  const bz=q('#bfzoom'),pv=q('#phview');if(bz&&pv)bz.hidden=pv.hidden;
+  // R40: the zoom buttons never sit over a card or a pop-up (they covered the event card and the day summary at 375x667)
+  const bz=q('#bfzoom'),pv=q('#phview');if(bz&&pv){const ppo=q('#ppop'),pz=q('#pzoom');const v=pv.hidden||!!q('#bfcard')||!!(ppo&&!ppo.hidden)||!!(pz&&!pz.hidden);if(bz.hidden!==v)bz.hidden=v}
   if(GX.open==='detd')fillInfo();
   // the game-over card sits over the lower part of the screen
   if(st==='over'&&bd){const r=bd.getBoundingClientRect();const top=Math.round(r.top+r.height*.28);R.style.setProperty('--dz-t',top+'px');R.style.setProperty('--dz-l','0px');R.style.setProperty('--dz-w',innerWidth+'px');R.style.setProperty('--dz-h',(innerHeight-top)+'px')}

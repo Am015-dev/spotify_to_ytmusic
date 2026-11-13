@@ -5,7 +5,7 @@
 // Counts decision taps (plan, Start day, answers, a space to choose) and non-decision taps (Continue, Start day N from the summary, OK).
 // FAIL when non-decision taps > 60, a page error, or no result screen.   node taps-test.js [WxH=390x844] [seed]
 const PW=require('playwright');const fs=require('fs'),path=require('path');
-const [W,H]=(process.argv[2]||'390x844').split('x').map(Number);const SEED=process.argv[3];const PICK=process.env.PICK||'adv';const OWN=!!process.env.OWN;const HINT=!!process.env.HINT;let rs0=(+(process.argv[3]||7))>>>0;const rnd=()=>{rs0=(rs0*1664525+1013904223)>>>0;return rs0/4294967296};const warns=new Set();
+const [W,H]=(process.argv[2]||'390x844').split('x').map(Number);const SEED=process.argv[3];const PICK=process.env.PICK||'adv';const OWN=!!process.env.OWN;let HINT=!!process.env.HINT;let rs0=(+(process.argv[3]||7))>>>0;const rnd=()=>{rs0=(rs0*1664525+1013904223)>>>0;return rs0/4294967296};const warns=new Set();
 const HTML=path.join(__dirname,'shipwreck.html');const LIVE=path.join(__dirname,'../../games/shipwreck-isle');const sleep=ms=>new Promise(r=>setTimeout(r,ms));const SHOTS=process.env.SHOTS||'';const shot=async n=>{if(SHOTS)await p.screenshot({path:path.join(SHOTS,n+'.png')})};let p;
 (async()=>{const br=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await br.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});
@@ -18,6 +18,8 @@ const HTML=path.join(__dirname,'shipwreck.html');const LIVE=path.join(__dirname,
  const centre=sel=>p.evaluate(sel=>{for(const e of document.querySelectorAll(sel)){if(e.disabled)continue;const r=e.getBoundingClientRect();if(r.width<8||r.height<8)continue;const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const t=document.elementFromPoint(x,y);if(t&&(t===e||e.contains(t)))return [x,y]}return null},sel);
  const tap=async sel=>{const c=await centre(sel);if(!c)return false;await p.touchscreen.tap(c[0],c[1]);return true};
  await tap('#modal [data-a=start]');await sleep(600);await tap('.tutoffer [data-tutoffer=play]');await sleep(1500);
+ // R40: ✨ hints pawn by pawn by default on the Easy island; WHOLE=1 forces Plan it for me (localStorage swi_hint=0)
+ if(process.env.WHOLE)await p.evaluate(()=>{try{localStorage.setItem('swi_hint','0')}catch(e){}});HINT=HINT||await p.evaluate(()=>!!(BF.hintOn&&BF.hintOn()));
  const D={},N={},labels={};let dec=0,non=0,planned=-1,pileDay=-1,t0=Date.now(),idle=0;
  const count=(isDec,day,what)=>{if(isDec){dec++;D[day]=(D[day]||0)+1}else{non++;N[day]=(N[day]||0)+1;labels[what]=(labels[what]||0)+1}};
  while(Date.now()-t0<900000){
@@ -33,7 +35,7 @@ const HTML=path.join(__dirname,'shipwreck.html');const LIVE=path.join(__dirname,
        if(ok){await p.touchscreen.tap(ok[0],ok[1]);count(true,st.day,'row');await sleep(450);continue}}
      const fr=await p.evaluate(own=>{const short=planProblems().some(m=>/needs \d pawn/.test(m));const f=humanFree().filter(q=>q.c!=null||(!own&&BF.recTile(q))||(own&&short&&!!BF.msg));const c=curPawn();return {n:f.length,swap:f.length&&(!c||!f.some(q=>q.id===c.id))?f[0].id:null}},OWN);const free=fr.n;
      if(fr.swap&&await tap('#bf [data-pawn="'+fr.swap+'"]')){count(true,st.day,'pawn');await sleep(400);continue}
-     if(!OWN&&free===0&&!st.confirm&&pileDay!==st.day&&await p.evaluate(()=>BF.wantPile()>0)){pileDay=st.day;await tap('#bf [data-a=suggest]');count(true,st.day,'suggest pile');await sleep(450);continue}
+     if(!OWN&&free===0&&!st.confirm&&pileDay!==st.day&&await p.evaluate(()=>BF.hintMore?BF.hintMore():BF.wantPile()>0)){pileDay=st.day;await tap('#bf [data-a=suggest]');count(true,st.day,'suggest pile');await sleep(450);continue}
      if(free>0&&!st.confirm){if(!OWN){await tap('#bf [data-a=suggest]');count(true,st.day,'suggest');await sleep(500);const gh=await p.evaluate(()=>BF.ghostAt&&BF.ghostAt.why==='tile'?[BF.ghostAt.x,BF.ghostAt.y]:null);if(gh){await p.touchscreen.tap(gh[0],gh[1]);count(true,st.day,'space');await sleep(500);continue}}
        else{const g=await p.evaluate(rn=>{const m=/tap place (\d+)/.exec(BF.msg&&BF.msg.t||'');const gs=[...document.querySelectorAll(m?'#bfglow .bfgl[data-t="'+(m[1]-1)+'"]':'#bfglow .bfgl')];if(!gs.length)return null;const r=gs[Math.floor(rn*gs.length)].getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},rnd());if(g){await p.touchscreen.tap(g[0],g[1]);count(true,st.day,'space');await sleep(500);continue}}}}
    const sel=PICK==='first'?'.bf-opts .opt':'.bf-opts .opt.rec, .bf-opts .opt';
