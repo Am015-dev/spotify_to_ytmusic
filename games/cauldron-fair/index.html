@@ -376,7 +376,7 @@ html.ph #others{justify-content:safe center}
 .th .ti .ts{overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-p .gx-dock{max-height:var(--dockh)}
 html.ph #roster{display:none}
-html.ph #fort{cursor:pointer;padding:3px 8px;font-size:13px;gap:6px;align-items:center}
+html.ph #fort{cursor:pointer;min-height:44px;box-sizing:border-box;padding:3px 8px;font-size:13px;gap:6px;align-items:center}
 html.ph #fort .fk{width:auto;height:auto;padding:1px 6px;font-size:13px;border-radius:6px}
 html.ph #fort b{display:inline;font-size:13px}
 html.ph #fort:not(.open) .fx{display:none}
@@ -668,7 +668,7 @@ html.ph .rsbox.stg{padding:3px 6px 5px}
 .rpot svg.pot{display:block;width:100%;height:100%}
 .rtg{appearance:none;position:absolute;transform:translate(-50%,-50%);border-radius:50%;border:3px dashed #ff5a4a;background:rgba(255,90,70,.18);padding:0;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;min-width:44px;min-height:44px}
 .rtg{align-items:center}.rtg .rgh{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.6}.rtg .rgh svg{width:70%;height:70%}
-.rtg i{font-style:normal;position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:1px;font-size:12px;font-weight:900;background:rgba(40,10,10,.9);color:#ffb0b8;border-radius:9px;padding:0 4px;z-index:2;white-space:nowrap}.rtg i svg{display:block}
+.rtg i{pointer-events:none;font-style:normal;position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:1px;font-size:12px;font-weight:900;background:rgba(40,10,10,.9);color:#ffb0b8;border-radius:9px;padding:0 4px;z-index:2;white-space:nowrap}.rtg i svg{display:block}
 .rtg.here{background:transparent;border-color:#ffe680}
 .rtg.tglow{animation:tgl 1.5s ease-in-out infinite}
 .rside{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:16px}
@@ -678,7 +678,7 @@ html.ph .rsbox.stg{padding:3px 6px 5px}
 .rboard .sug::after,.rbar .sug::after,.stalls .sug::after{content:none}
 @media (min-height:700px){.tok svg.chip{width:50px;height:50px}.dpick{min-height:56px}}
 @media (max-height:620px){.dpick{min-height:44px}.tok{min-height:46px;padding:1px 3px}.tok svg.chip{width:36px;height:36px}.sth{min-height:16px}.stall{padding:1px 4px 3px}.stalls{gap:4px}.mkt{gap:4px}.awn{height:34px}.awn .pur b{font-size:22px}.rbt.big{height:70px}.ds{min-height:54px}.dp{min-height:26px;font-size:18px}.dchip .dav svg{width:32px;height:32px}}
-@media (max-height:640px) and (orientation:portrait){html.ph .stalls{grid-template-columns:repeat(3,minmax(0,1fr))}.tok{min-width:0;padding:1px 0}.tok svg.chip{width:31px;height:31px}.toks{gap:0}.tok .pc{font-size:12px;padding:0 4px;background:#f2c230;color:#3a2438;border-color:#8a5a12}.tok .pc svg{display:none}.sth b{font-size:11px}.rbar{gap:2px}.rbt{min-width:44px;min-height:44px}}
+@media (max-height:640px) and (orientation:portrait){html.ph .stalls{grid-template-columns:repeat(2,minmax(0,1fr))}.tok{min-width:44px;padding:1px 0}.tok svg.chip{width:31px;height:31px}.toks{gap:0}.tok .pc{font-size:12px;padding:0 4px;background:#f2c230;color:#3a2438;border-color:#8a5a12}.tok .pc svg{display:none}.sth b{font-size:11px}.rbar{gap:2px}.rbt{min-width:44px;min-height:44px}}
 @media (orientation:landscape) and (max-height:520px){
   .dtable{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ds{max-height:none;min-height:0}
   html.ph .stalls{grid-template-columns:repeat(4,minmax(0,1fr))}.rboard{grid-template-columns:minmax(0,1fr) 96px;grid-template-rows:auto minmax(0,1fr)}.rside{grid-column:2;grid-row:2;flex-direction:column}.rbt.big{width:78px;height:92px;flex-direction:column;gap:2px}.rpot{grid-column:1;grid-row:2;max-height:100%}
@@ -822,6 +822,7 @@ html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
 html.sk-row .mrow{position:relative;isolation:isolate}
 html.sk-row .mrow::before{content:'';position:absolute;inset:-4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+body:has(#rs:not([hidden])) #fortchip,body:has(#rs:not([hidden])) #fort{visibility:hidden}   /* the open sheet names the fortune itself: once only */
 body:has(.gxh-bub.on) #fortchip>div,body:has(.gxh-bub.on) #fort>div,body:has(.gxh-bub.on) #toast{display:none}
 /* UI bar: text >= 16px on wide screens, panels fit their content */
 @media (min-width:1024px){
@@ -863,6 +864,8 @@ html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbt
 #coach{position:fixed;left:8px;right:8px;bottom:262px;z-index:95;display:none;gap:8px;align-items:flex-start;padding:10px 10px 8px 14px;border-radius:14px;background:#fff4d6;color:#2b1a12;border:2px solid #7a5c3e;box-shadow:0 4px 14px rgba(0,0,0,.5);font:600 14.5px/1.25 system-ui,sans-serif;flex-wrap:wrap}
 #coach.on{display:flex;animation:rfin .28s ease-out}
 #coach .tutpor{left:-6px;top:-18px}
+.gxh-bd[data-por] .gxh-tt{padding-left:30px}#coach .cxb b{padding-left:26px}
+html.ph #barstat .dayn.gchip{min-height:44px;display:inline-flex;align-items:center}
 #coach .cxb{flex:1 1 200px;display:flex;flex-direction:column;gap:2px;min-width:0}#coach .cxb b{font-size:15px}
 #coach .cxr{flex:1 1 100%;display:flex;gap:8px;justify-content:flex-end}
 #coach button{min-height:44px;padding:0 14px;border-radius:10px;border:0;background:#7b1f2e;color:#fff;font:700 14px system-ui,sans-serif}
@@ -987,6 +990,67 @@ html:not(.ph) #goalcard .gck{font-size:16px}
 }
 #goalcard .gck,#goalcard h3{padding:0 8px}#goalcard ul{padding-left:28px;padding-right:8px}
 html.ph{--gx-bar-h:48px}html.ph .gx-bar{height:48px;min-height:48px;overflow:visible}html.ph .gx-bar .gx-ibtn{box-sizing:border-box;height:44px;min-height:44px}
+/* G6 fix: shop stalls say what each chip does; prices sit inside their own chip column and never overlap */
+.stall .sdo{flex:none;min-height:15px;font-size:13px;line-height:1.1;color:#ffe9a8;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.85);margin:-2px 0 1px}
+.mkt .sinfo{font-size:14px;line-height:1.25;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:4px 8px;max-height:3.9em;overflow:auto}
+.mkt .sinfo b{color:#ffe9a8}
+.tokw{overflow:visible}.tok .pc{max-width:100%;box-sizing:border-box;white-space:nowrap;padding:0 3px;gap:1px}
+.tok .pc svg{width:13px!important;height:13px!important;flex:none}
+/* G6 fix: on phones the instruction bar floats just above the panel; the cauldron shrinks so the bar never covers the bottom ring */
+html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:border-box}
+#instr span{overflow-wrap:anywhere}
+.btn.confirm.busy{transform:translateY(2px) scale(.97);filter:brightness(.85)}
+@media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:13px;max-height:2.6em;padding:2px 8px}}
+.tsegs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
+@media (max-height:500px){.tsegs .tseg+.tseg{display:none}}   /* short landscape: rival levels stay in More options */
+/* R3 fix: the ruby screen says in words what each option does; the shop keeps its short stall lines on small phones */
+.rboard .rhelp{grid-column:1/-1;font-size:15px;line-height:1.3;color:#fff6df;background:rgba(40,24,10,.82);border:1px solid rgba(255,240,210,.35);border-radius:10px;padding:5px 10px;text-align:center}
+.rbt.big{flex-direction:column;height:auto;min-height:78px;padding:4px 8px}.rbt .rlb,.rdp .rlb{display:block;font-style:normal;font-size:13px;font-weight:800;color:#fff6df;white-space:nowrap}
+.rdp{display:inline-flex;flex-direction:column;align-items:center}
+.rboard{grid-template-rows:auto auto minmax(0,1fr) auto}
+@media (orientation:landscape) and (max-height:520px){.rboard{grid-template-rows:auto auto minmax(0,1fr)}.rside{grid-row:3}.rpot{grid-row:3}.rboard .rhelp{font-size:13px;padding:2px 8px}}
+#fortchip{min-height:44px;border-radius:22px;box-sizing:border-box}
+/* R3 fix (375x667 shop): rows size to their content, so a price is never cut under the next awning; the short stall line stays; the list scrolls if it must */
+@media (max-height:760px) and (orientation:portrait){
+  .mkt .stalls .rbar{order:-1}   /* rubies first: they never hide below the scroll */
+  .mkt .stalls{grid-auto-rows:auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-content:start}
+  .stall .sdo{display:block;font-size:12px;min-height:14px;margin:-1px 0 0}
+  html.sk-stall .stall{border-width:26px 12px 8px;border-image-width:26px 12px 8px}
+  .stall .toks{padding-bottom:2px}
+  .tok{min-height:50px;padding:1px 2px}.tok svg.chip{width:36px;height:36px}.tok .pc{margin-top:-6px}
+}
+/* R8 fix: the ruby stall says in words what each button does (tap one: the line below explains it) */
+.mkt .rbar{flex-direction:column;flex-wrap:nowrap;align-items:stretch;justify-content:flex-start;gap:4px;padding:4px}
+.rbar .rbh{display:flex;align-items:center;justify-content:space-between;gap:4px;color:#fff6df}.rbar .rbh>b{font-size:15px}.rbar .rbh .rgems.cmp{flex:none}
+.rbt.rwd{justify-content:flex-start;gap:6px;min-height:44px;padding:2px 6px;text-align:left;width:100%;box-sizing:border-box}
+.rbt.rwd>span:first-child{flex:none;line-height:0}
+.rwt{display:flex;flex-direction:column;min-width:0;line-height:1.1}.rwt b{font-size:14px;font-weight:800;white-space:normal}.rwt em{font-style:normal;font-size:14px;font-weight:700;color:#ffd7de}
+.rbt.rwd[disabled]{opacity:.55}
+/* R8 fix: the stall list scrolls on small phones: a "N more stalls" cue and a faded bottom edge */
+.mkt .stw{position:relative;flex:1 1 0;min-height:0;display:flex;flex-direction:column}
+.mkt .stw>.stalls{flex:1 1 0}
+.mkt .stalls.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6));mask-image:linear-gradient(to bottom,#000 calc(100% - 10px),rgba(0,0,0,.6))}
+.smore{flex:none;align-self:center;margin-top:4px;min-height:44px;padding:0 16px;border-radius:22px;border:2px solid #f2b83a;background:#2b1a12;color:#fff6df;font:800 15px/1 system-ui,sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.5);white-space:nowrap;cursor:pointer}
+.smore[hidden]{display:none}
+.mkt .stalls .tout{visibility:hidden}
+@media (orientation:landscape) and (max-height:520px){.mkt .stw{flex:1 1 0;min-width:0}.mkt .stw>.stalls{min-height:0}.mkt .sinfo{flex:0 0 180px;max-height:none;align-self:stretch}}   /* R22: the info line sits beside the stalls, never squeezing them */
+/* R8: the fortune chip on the board sits above the YOUR TURN bar, never under it */
+html.ph.hasinstr:not(.ph-l) :is(#fortchip,#ratchip){bottom:calc(var(--instrh,60px) + 2px)}
+/* R22 gate: the painted plate must not change the Stop box (GXSK.audit): keep its unskinned padding */
+html.sk #acts .btn.stopb{padding:4px 12px 4px 38px}
+
+/* R28: when the stalls do not fit in two columns, they use three, then tighter rows, so none hides behind the "more stalls" pill */
+html.ph .stalls.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stalls.c3 .tok{min-width:0;padding:1px 0}.stalls.c3 .toks{gap:0}.stalls.c3 .tok svg.chip{width:32px;height:32px}
+.stalls.c3 .sth b{font-size:12px}.stalls.c3 .stall .sdo{font-size:11px}
+html.sk-stall .stalls.c3 .stall{border-width:26px 7px 8px;border-image-width:26px 7px 8px}
+.stalls.tight .tok{min-height:44px}.stalls.tight .tok svg.chip{width:30px;height:30px}.stalls.tight .tok .pc{margin-top:-8px}
+html.sk-stall .stalls.tight .stall{border-width:22px 7px 6px;border-image-width:22px 7px 6px}
+.stalls.tight .stall .sdo{min-height:13px}
+/* R28: the line under the stalls shows the whole text of a chip (never cut mid-sentence); the stalls give way and refit */
+@media (orientation:portrait){.mkt .sinfo{max-height:none!important;overflow:visible!important;flex:0 0 auto}}
+@media (max-height:640px){html.sk-awn .awn{height:40px}}
+.stall .sdo .ss{display:none}.stalls.c3 .sdo .sl{display:none}.stalls.c3 .sdo .ss{display:inline}.stalls.tight .stall .sdo{display:none}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -4167,7 +4231,7 @@ fn mainFragment(
       { kind: 'visible', sel: '.awn', name: 'awning with the coin purse' },
       { kind: 'visible', sel: '.stalls .stall', name: 'stall board' },
       { kind: 'fn', name: 'every shown price is >= 12 px', fn: function () { var bad = [].slice.call(document.querySelectorAll('.stall .tok .pc')).filter(function (e) { return parseFloat(getComputedStyle(e).fontSize) < 12; }); return bad.length === 0 || bad.length + ' prices under 12 px'; } },
-      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 32 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
+      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 44 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
     ]
   });
   GXS.add({
@@ -4249,7 +4313,7 @@ fn mainFragment(
     setup: function () { try { GXH.setEnabled(false); } catch (e) { } try { GX.close(); } catch (e) { } UI.sv = 'title'; renderStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
     checks: [
       { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn.go'); return n.length === 1 || n.length + ' green primary buttons'; } },
-      { kind: 'fn', name: 'quick game row: players 2/3/4 in one style', fn: function () { var b = document.querySelectorAll('#start .tseg .chipb'); return b.length === 3 || b.length + ' options'; } },
+      { kind: 'fn', name: 'quick game row: players 2/3/4 in one style', fn: function () { var b = document.querySelectorAll('#start .tseg:first-child .chipb'); return b.length === 3 || b.length + ' options'; } },
       { kind: 'fn', name: 'Continue only when a save exists', fn: function () { var c = !!document.querySelector('#start [data-a=loadsave]'); return c === !!hasSave() || 'Continue ' + c + ' but save ' + hasSave(); } },
       { kind: 'fn', name: 'no character roster on the start screen', fn: function () { return !document.querySelector('#start .dcard,#start #roster') || 'roster shown'; } },
       { kind: 'fn', name: 'start buttons at least 44 px tall', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#start button'), function (b) { if (b.getBoundingClientRect().height < 44) bad.push(b.textContent.slice(0, 12)); }); return uiBad(bad); } },
@@ -4362,13 +4426,13 @@ const GX={key:'gx',open:null,
   // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
   var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
   function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
-  function avoidRects(k) {
+  function avoidRects(k, snug) {
     var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
     var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
+      out.push(infl(core(r, k), snug ? 2 : (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }
@@ -4412,7 +4476,29 @@ const GX={key:'gx',open:null,
       b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
       var cw = [350, 292, 236];
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
-      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
+      b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
+        var wt = [0, 236, 196, 164, -350, -292, -236, -196, -164];   // negative: the slim one-line version at that width
+        for (var wj = 0; wj < wt.length; wj++) {
+          var cw2 = Math.abs(wt[wj]); b.classList.toggle('gxh-compact', wt[wj] < 0); b.style.maxWidth = cw2 ? cw2 + 'px' : ''; b.dataset.gxhShrunk = '1';
+          var r4 = place(b, tr); if (r4.tapClear || r4.free) { delete b.dataset.gxhShrunk; return r4; }
+        }
+        b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      }
+      delete b.dataset.gxhShrunk;
+    }
+    var tapClear = false;
+    if (!best && cfg && cfg.tapFirst) {   // game opt-in: when nothing is fully free, keep every tappable target clear and let the bubble sit over plain text/board art
+      var avT = avoidRects(32, true), bt = null, bts = 1e9;
+      for (var xj = 0; xj < xs.length; xj++) for (var yy = top; yy <= bot - h; yy += 3) {
+        var cc = { left: xs[xj], top: yy, right: xs[xj] + w, bottom: yy + h };
+        if (hit(cc, T)) continue;
+        var ot = 0; for (var kk = 0; kk < avT.length; kk++) if (hit(cc, avT[kk])) ot += inter(cc, avT[kk]) || 1;
+        var ox = 0; for (var kx = 0; kx < txt.length; kx++) if (hit(cc, txt[kx])) ox += inter(cc, txt[kx]) || 1;
+        var sc = ot * 1e4 + ox * 4 + Math.abs(cc.left + w / 2 - tr.cx) * 0.5 + Math.abs(yy + h / 2 - tr.cy);
+        if (sc < bts) { bts = sc; bt = cc; bt.ot = ot; }
+      }
+      if (bt) { tapClear = !bt.ot; soft = bt; }
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -4425,7 +4511,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
-    c2.free = !!best;
+    c2.free = !!best; c2.tapClear = tapClear;
     return c2;
   }
   function ringAt(r, cls) {
@@ -4599,6 +4685,7 @@ const GX={key:'gx',open:null,
 //   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
 //              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             live?:()=>el|[el] /* game controls kept tappable between steps, e.g. a roll card's Continue */,
 //             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
@@ -4643,7 +4730,11 @@ const GX={key:'gx',open:null,
     return null;
   }
   function holesOf(st) {
-    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) {
+      // opt-in (cfg.fallbackMs): a next-button step whose target is missing/hidden for that long shows an untargeted bubble instead of blocking
+      if (cfg.fallbackMs && !st.wait && S && S.step === st && Date.now() - S.since > cfg.fallbackMs) { var v0 = vp(); var fh = norm({ left: v0.w / 2 - 22, top: v0.h * 0.4, width: 44, height: 44 }); fh.fb = 1; return [fh]; }
+      return null;
+    }
     var out = [p], al = null;
     try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
     if (al && !Array.isArray(al)) al = [al];
@@ -4676,7 +4767,7 @@ const GX={key:'gx',open:null,
   function swallow(e) { e.preventDefault(); e.stopPropagation(); }
   function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
   // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
-  function drawCells(hs, shield) {
+  function drawCells(hs, shield, clearOut) {
     var v = vp(), xs = [0, v.w], ys = [0, v.h];
     hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
     xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
@@ -4684,7 +4775,7 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
       var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
       for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
-      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], !!clearOut));
     }
     if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
   }
@@ -4707,9 +4798,10 @@ const GX={key:'gx',open:null,
   function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
   function topLimit() { return stripH() + 4; }
   // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
-  function place(b, hs, side) {
+  function stAvoid(st) { try { return st.avoid ? st.avoid() : null; } catch (e) { return null; } }
+  function place(b, hs, side, avoid) {   // avoid: optional extra rects the bubble should not cover (e.g. the board area the step talks about)
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
-    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var T = hs.map(function (r) { return inflate(r, 8, v); }).concat((avoid || []).filter(Boolean).map(function (r) { return inflate(r, 4, v); }));
     var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
     function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
     var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
@@ -4759,23 +4851,32 @@ const GX={key:'gx',open:null,
     S.holes = H; S.key = rkey(hs);
     var nextStep = !st.wait;
     drawCells(H, nextStep);
-    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    if (!hs[0].fb) H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
     add(topStrip());
     if (st.wait && st.wait.type !== 'event') {
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
-    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side, stAvoid(st)); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
     add(b); S.bub = b; S.say = say;
     var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-    place(b, H, st.side);
+    place(b, H, st.side, stAvoid(st));
     return true;
   }
-  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
-    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  // cfg.live (opt-in): ()=>el|[el] the game's own controls that must stay tappable while no step is shown (e.g. a Continue on a roll card)
+  function liveRects() {
+    if (!cfg || typeof cfg.live !== 'function') return null;
+    var a = null; try { a = cfg.live(); } catch (e) { a = null; } if (!a) return null; if (!Array.isArray(a)) a = [a];
+    var out = []; a.forEach(function (x) { var r = toRect(x); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out.length ? out : null;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim; only cfg.live controls stay live
+    var v = vp(), L = liveRects(); S.liveKey = L ? rkey(L) : '';
+    if (L) drawCells(L, false, true); else add(cell(0, 0, v.w, v.h, true));
+    add(topStrip());
   }
   function enter(i) {
     var st = cfg.steps[i]; if (!st) { finish(); return; }
@@ -4791,6 +4892,7 @@ const GX={key:'gx',open:null,
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
+      if (!hs && cfg.live) { var L0 = liveRects(), k0 = L0 ? rkey(L0) : ''; if (k0 !== (S.liveKey || '')) { clearVisuals(); drawWaiting(); } }
       if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
@@ -5799,7 +5901,7 @@ var BOOKS = {
     4: { price: [7, 11, 17], eff: 'r4', title: 'Pod skipper', text: 'Once it is in your pot, later white 1s move 2 spaces. They still count 1 towards exploding.' }
   },
   Y: {
-    1: { price: [8, 12, 18], eff: 'y1', title: 'Kind cut', text: 'Drawn right after a white chip? You may put that white back. Its space stays empty. The yellow chip stays put.' },
+    1: { price: [8, 12, 18], eff: 'y1', title: 'Send a white back', text: 'Drawn right after a white chip? You may put that white back. Its space stays empty. The yellow chip stays put.' },
     2: { price: [9, 13, 19], eff: 'y2', title: 'Double step', text: 'The next chip you place moves twice as far as its number.' },
     3: { price: [8, 12, 18], eff: 'y3', title: 'Roomier pot', text: 'One yellow chip in your pot: you explode past 8. Three or more: past 9.' },
     4: { price: [8, 12, 18], eff: 'y4', title: 'Sunroot stretch', text: 'Your 1st yellow moves 1 extra space. Your 2nd moves 2 extra. Your 3rd moves 3 extra. Later ones get nothing.' }
@@ -6293,7 +6395,7 @@ function H(G, p, m) {
       break;
     }
     case 'y1': {
-      if (m.yes === true) { const w = p.pot[d.idx]; if (!w || w.c !== 'W') return 'no white chip there'; p.pot.splice(d.idx, 1); bagInsert(p, w); ev(G, { t: 'flask', seat: p.seat, chip: { i: w.i, c: w.c, v: w.v }, free: true }); lg(G, nm(G, p) + ' puts the white chip back (Kind cut).'); use(G, 'y1'); }
+      if (m.yes === true) { const w = p.pot[d.idx]; if (!w || w.c !== 'W') return 'no white chip there'; p.pot.splice(d.idx, 1); bagInsert(p, w); ev(G, { t: 'flask', seat: p.seat, chip: { i: w.i, c: w.c, v: w.v }, free: true }); lg(G, nm(G, p) + ' puts the white chip back (Send a white back).'); use(G, 'y1'); }
       else if (m.yes !== false) return 'bad choice';
       p.q = null; break;
     }
@@ -7659,36 +7761,42 @@ const STORY = {
   // ---- the tutorial is the PROLOGUE: "The Night Before". chapters: id of the first step of each
   chapters: {
     goal: ['Ch 1 · The night before', 'Granny Hask: "Tomorrow the fair opens. Tonight you and Wynne play two practice days. Most points wins."'],
-    shops1: ['Ch 3 · The stalls', 'Hask: "The brew is done. Spend your coins at the stalls."'],
-    day2: ['Ch 4 · The last day', 'Hask: "Day two is the last day. Make it count."'],
-    report: ['Ch 2 · Counting up', 'Hask: "Everyone has stopped. Time to count each pot."']
+    shops1: ['Ch 3 · The stalls', 'Granny Hask: "The brew is done. Spend your coins at the stalls."'],
+    day2: ['Ch 4 · The last day', 'Granny Hask: "Day two is the last day. Make it count."'],
+    report: ['Ch 2 · Counting up', 'Granny Hask: "Everyone has stopped. Time to count each pot."']
   },
   // id -> [title, say]. say may be a function. Max two short lines. The guide speaks; the glow shows where to tap, so no "click here" wording.
   steps: {
-    goal: ['Ch 1 · Night before', 'Granny Hask: "Tomorrow the fair opens. Tonight you and Wynne play two practice days. Most points wins."'],
-    fortune: ['A fortune card', 'Hask: "Each day starts with a fortune card. Purple cards are instant. Take 3 rubies."'],
-    draw1: ['Reach in', 'Hask: "Tap your bag to pull one chip."'],
-    spiral: ['It walks the spiral', () => 'Hask: "It moved ' + tn(tp().pot[0].v, 'space') + ', its number. The ring marks your score if you stop."'],
-    whites: ['The Fizzpods', 'Hask: "White Fizzpods fill the meter. Over 7 and the pot explodes. Draw again."'],
-    keep: ['Steady now', () => 'Hask: "Whites at ' + tws() + ' of 7. Draw one more.\'s pot is bubbling too. One more."'],
-    flask: ['The flask', () => 'Hask: "' + tws() + ' of 7is risky. Tap the flask to put the last white back."'],
-    seven: ['Safe at seven', 'Hask: "The white is back in your bag. Exactly 7 is safe. Draw again."'],
-    push: ['Push your luck', 'Hask: "At 7, any white chip explodes the pot. Tap the bag to risk it."'],
-    report: ['Ch 2 · Counting up', () => { const d = G.players[1].res && G.players[1].res.die; return 'Hask: "Your space pays coins and points. Only safe pots roll the bonus die' + (d && d.length ? ': Wynne\'s did!"' : '."'); }],
-    choose: ['Boom!', () => { const d = tp().q.d; return 'Hask: "Your pot exploded. Pick ' + tn(d.vp, 'point') + ' or ' + d.coins + ' coins. Take the coins to shop."'; }],
-    shops1: ['Ch 3 · The stalls', 'Hask: "Marrow is cheap and has no power. Mossback gives rubies when it is one of your last two chips."'],
-    shops2: ['More wares', 'Hask: "Wren Feather peeks at extra chips. Scarlet Cap moves further for each Marrow in your pot."'],
-    shops3: ['Locked stalls', 'Hask: "Cinder Moth wins droplet steps. Sunroot opens on day 2. Dusk Sigh opens on day 3."'],
-    buy: ['Buy a chip', 'Hask: "Buy up to two chips of different colours. Take the Wren Feather."'],
-    droplet: ['The droplet', 'Hask: "Spend 2 rubies to move your droplet one space. Tap it."'],
-    refill: ['Refill the flask', 'Hask: "Refill a used flask for 2 rubies. Tap the flask."'],
-    confirm: ['Ready for day two', 'Hask: "Your chips go in the bag. Day two is next."'],
-    day2: ['Ch 4 · Last day', 'Hask: "Last day! The limit is 9 today. The rat stone helps whoever is behind."'],
-    d2draw: ['Draw together', 'Hask: "You and Wynne choose in secret, then show together. Tap your bag."'],
-    peek: ['Peek and pick', 'Hask: "The feather shows a chip. Place it as your next chip, or put it back."'],
-    d2stop: ['Stop here', 'Hask: "Stopping keeps this space, with its coins and points. Tap Stop."'],
-    d2report: ['The final count', 'Hask: "Every 5 coins and every 2 rubies make 1 point. Tap to see who won."'],
-    end: ['The Ladle awaits', () => { const a = G.players[0].vp, b = G.players[1].vp; return (G.winner === 0 ? 'Hask: "You win, ' + a + ' to ' + b + (a === b ? ' on the tie-break' : '') + '! Wynne grins. The real fair starts tomorrow."' : G.winner < 0 ? 'Hask: "A tie, ' + a + ' each! Wynne laughs. Tomorrow it is for real."' : 'Hask: "Wynne wins, ' + b + ' to ' + a + '. She smiles. Win it back tomorrow."') + ' A real fair lasts 9 days.'; }]
+    goal: ['The goal', 'Most points after nine days wins; tonight we practise two.'],
+    fortune: ['Fortune card', 'Purple fortune cards happen at once, so take the rubies.'],
+    draw1: ['Draw a chip', 'Everyone draws at once: tap your bag for one chip.'],
+    keep: ['Moves and scores', () => 'It moved ' + tn(tp().pot[0].v, 'space') + ' and you score the next space; draw again.'],
+    keep2: ['White chips', 'Whites fill the meter, over 7 explodes; stop any time, or draw.'],
+    flask: ['The flask', () => 'Whites are at ' + tws() + ': tap the flask to return that white.'],
+    seven: ['Seven is safe', 'The flask works once a day; draw again, 7 is safe.'],
+    push: ['Push your luck', 'At 7 one more white explodes the pot; risk it.'],
+    report: ['The bonus die', 'The furthest safe pot rolls: points, a ruby, droplet or orange.'],
+    choose: ['Boom!', 'An exploded pot scores points or coins, not both: take coins.'],
+    shops: ['The stalls', 'Stalls say what chips do; yellow opens day 2, purple day 3.'],
+    buy: ['Buy chips', 'Buy up to two chips of different colours: tap Wren Feather.'],
+    droplet: ['The droplet', 'Two rubies move your droplet one space on: tap it.'],
+    refill: ['Refill the flask', 'Two more rubies refill your used flask: tap it.'],
+    confirm: ['Next day', 'Chips join your bag (day 6 adds a white); start day 2.'],
+    day2: ['Blue fortune', 'Blue cards last all day, so today the limit is 9.'],
+    rats: ['Rat tails', () => { const p = tp(), o = G.players.reduce((m, x) => Math.max(m, x.vp), 0); return 'Tap the rat: you ' + p.vp + ', leader ' + o + ', so ' + tn(p.ratTails, 'rat tail') + ' between.'; }],
+    d2draw: ['Last day', () => 'So your rat starts you ' + tn(tp().ratTails, 'space') + ' ahead; draw in secret.'],
+    red: ['Red chip', 'New chips in your bag: red moves 1 extra after an orange.'],
+    redsaw: ['It jumped', 'Red jumped one extra space, so draw again.'],
+    yellow: ['A white', 'A white came; draw, since yellow after a white can return it.'],
+    yback: ['Yellow helps', 'Yellow came after a white: send that white back.'],
+    bdraw: ['Blue chip', 'Draw: your blue feather peeks at a chip for you.'],
+    peek: ['Peek and pick', 'Place the purple: one purple pays 1 point at the count.'],
+    black: ['Black chip', 'Draw: more Cinder Moths than a neighbour wins a droplet step.'],
+    green: ['Green chip', 'Draw again: a Mossback in your last two chips pays a ruby.'],
+    d2stop: ['Stop here', 'Stop: score this space; a ruby on it pays one.'],
+    chipfx: ['After the brew', 'Your moth won a droplet step and ruby; your moss, a ruby.'],
+    d2report: ['Final count', 'No shop today: 5 coins or 2 rubies make 1 point.'],
+    end: ['Well brewed', () => { const a = G.players[0].vp, b = G.players[1].vp; return (G.winner === 0 ? 'You won ' + a + ' to ' + b : G.winner < 0 ? 'A tie at ' + a : 'Wynne won ' + b + ' to ' + a) + ', and ties go to the furthest pot.'; }]
   },
   // ---- Story mode: a lost chapter ends with one of these (the shared kit shows one outro; turnlayer.js swaps it in when you lose)
   outroLose: {
@@ -7726,8 +7834,9 @@ const $ = s => /^#[\w-]+$/.test(s) ? document.getElementById(s.slice(1)) : docum
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = D.CHARS.map(c => c.name);
-const TEMPER = ['normal', 'easy', 'hard', 'normal'];   // the default level of each fair-goer
-const DEF = { np: 3, me: 0, seats: [1, 2], lvBy: { 1: 'easy', 2: 'hard', 3: 'normal', 0: 'normal' }, sets: 1 };
+const TEMPER = ['easy', 'easy', 'normal', 'normal'];   // the default level of each fair-goer
+// default table: you against one easy rival (a sensible new player wins about half of these; newbie-bench.js). Normal and hard stay one tap away.
+const DEF = { np: 2, me: 0, seats: [1], lvBy: { 1: 'easy', 2: 'normal', 3: 'normal', 0: 'easy' }, sets: 1 };
 // tiny element builder: h('div.cls#id', {attr:..}, ...kids)
 function h(sel, at) {
   const m = /^([a-z0-9]*)((?:[.#][\w-]+)*)$/i.exec(sel) || [0, 'div', ''];
@@ -7838,7 +7947,7 @@ const QINFO = {
   haggle: ['Haggler\'s Hour', () => 'Swap one chip for a higher one'],
   crow: ['Wren Feather: pick one', () => 'Place one as your next chip'],
   peek: ['Peek and Pick', () => 'Place one chip, or none'],
-  y1: ['Kind cut', () => 'Return the white chip to the bag?'],
+  y1: ['Send a white back', () => 'Return the white chip to the bag?'],
   restart: ['Do-Over', () => 'Restart the day? Once only'],
   side: ['Scarlet Cap beside the pot', () => 'Add it, keep it, or return it'],
   gift: ['Spilled Brew', () => 'Take any 2-chip'],
@@ -7996,9 +8105,9 @@ function renderActs() {
   a.appendChild(brewDeck(p, v, legal));
 }
 function renderQ(p, legal, qb) {
-  const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = Date.now(); qb.hidden = false;
+  const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = tapMark(); qb.hidden = false;
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
-  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
+  qb.append(h('div.qt', fromCard && G.fcard ? fortImg(D.FORTUNE.find(x => x.id === G.fcard) || { id: G.fcard }, 'qfimg') : null, h('b', fromCard ? 'Today\'s fortune card' : info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
@@ -8216,7 +8325,7 @@ function renderReport() {
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
-  UI.advAt = Date.now();
+  UI.advAt = tapMark();
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
@@ -8231,7 +8340,8 @@ function sugMark(box, p, q, legal) {
       box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
       return;
     }
-    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m; const js = JSON.stringify(stripM ? stripM(m) : m);
+    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m;
+    if (UI.mode === 'tutorial') { const want = q.h === 'y1' ? legal.find(x => x.yes) : q.h === 'crow' ? legal.find(x => x.idx >= 0 && p.hold[x.idx] && p.hold[x.idx].c !== 'W') : null; if (want) m = want; }   // the tutorial's ask and the best tag always agree const js = JSON.stringify(stripM ? stripM(m) : m);
     const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
     const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
   } catch (e) {}
@@ -8274,7 +8384,7 @@ function showFinal() {
   box.appendChild(body);
   box.appendChild(h('div.rsfoot', h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, UI.camp && typeof GXC !== 'undefined' && GXC.active() ? h('button.btn.go', { 'data-a': 'campfin', type: 'button' }, 'Continue the story') : (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), (UI.camp ? null : h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu')))));
   const conf = h('div.conf'); const cols = ['#f2b81e', '#d6392f', '#3fa04a', '#3b82d6', '#8a55c4']; for (let i = 0; i < 26; i++) { const c = h('i'); c.style.cssText = 'left:' + Math.random() * 100 + '%;background:' + cols[i % 5] + ';animation-delay:' + Math.random() * 2 + 's;animation-duration:' + (2 + Math.random() * 2) + 's'; conf.appendChild(c); }
-  rs.innerHTML = ''; rs.appendChild(box); if (!UI.sim) rs.appendChild(conf);
+  rs.innerHTML = ''; rs.appendChild(box); const vw = viewSeat(), lost = vw >= 0 && G.winners.indexOf(vw) < 0 && !hotSeat(); if (!UI.sim && !lost) rs.appendChild(conf);   // confetti only when you (or a hot-seat friend) won
 }
 // ---------- the old guided tips are retired: first-time help is the help kit (ui10.js), the staged tutorial is ui11.js ----------
 const mineP = () => { const v = viewSeat(); return G && v >= 0 ? G.players[v] : null; };
@@ -8307,12 +8417,13 @@ function buildRules() {
     'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', h('b', 'Have the most points after 9 days.')), h('ul', [h('li', 'Draw chips from your bag to fill your pot.'), h('li', 'Stop before the white chips add up past 7.'), h('li', 'Your last space pays coins and points.')]));
   sec('How a day goes', h('ol', ...li([
-    'The fair\'A fortune card is drawn. Purple is instant. Blue lasts all day.',
+    'A fortune card is drawn. Purple is instant. Blue lasts all day.',
     'From day 2, players behind get a rat stone. Count rat tails between you and the leader. Your first chip starts that many spaces further.',
     'Everybody brews at the same time. Each chip moves as many spaces as its number. Then draw again, or stop.',
     'When everyone has stopped, the day is counted. Bonus die, powers, rubies, points, shop.',
     'Spend rubies if you like. Then all your chips go back in the bag. A new day begins.'])));
   sec('Brewing and explosions', h('p', 'White chips (Fizzpods) are dangerous. Only they count towards the limit. Past 7, your cauldron explodes. The last chip stays and you must stop. Later you take your points or your coins, not both.'),
+    h('p', 'If your bag runs empty, you stop. Your last chip still picks your space.'),
     h('p', 'Once a day, your flask puts your last white chip back. It cannot undo an explosion. Refill it with 2 rubies.'),
     h('p', 'On the last day, everyone picks Draw or Stop in secret. Then all picks are shown at once. On other days the computers draw while you think.'));
   sec('The spiral', h('p', 'You score the space right after your last chip. Big number: coins to shop. Brown number: points. Some spaces hold a ruby. The last space is the spoon: 15 points and 35 coins.'));
@@ -8324,6 +8435,12 @@ function buildRules() {
     'Shopping: buy one or two chips of different colours. Leftover coins are lost. Sold-out chips are gone.',
     'Rubies: 2 rubies move your droplet one space, or refill the flask.'])));
   sec('The ingredient books', h('p', 'Orange and black are always in the shop. Green, blue and red come from the chosen set. Yellow opens on day 2, purple on day 3. Blue, red and yellow act when drawn. Green, purple and black act after the brew. The Cards drawer lists every book.'));
+  { const bk = c => { const set = (typeof G !== 'undefined' && G && G.sets && G.sets[c]) || (c === 'K' ? 0 : 1); return D.BOOKS[c] && D.BOOKS[c][set]; };
+    const gr = bk('G'), bl = bk('K');
+    sec('Green and black chips', h('ul', ...li([
+      D.COLORS.G.name + ' (green)' + (gr ? ', ' + gr.title + ': ' + gr.text : ': after the brew, it pays off as one of your last two chips.'),
+      D.COLORS.K.name + ' (black)' + (bl ? ': ' + bl.text : ': after the brew, more black chips than a neighbour wins a droplet step.')]))); }
+  sec('Extra white chip', h('p', 'Before day 6 everyone adds one white 1 to their bag. Your pot gets riskier from then on.'));
   sec('The last day and the end', h('p', 'Day 9 has no shop. Every 5 coins and every 2 rubies make 1 point. The most points wins. On a tie, the furthest cauldron on day 9 wins.'));
   sec('Playing it', h('ul', ...li([
     'The ring shows where you would score now. The box under the buttons shows your explosion chance.',
@@ -8422,7 +8539,8 @@ function titleEl() {
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,   // W471: on a first visit Learn to play is the one big primary button
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
-      h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      h('div.tsegs', h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
+      (() => { const o = optObj(), cur = o.seats.every(c => (o.lvBy[c] || TEMPER[c]) === o.lvBy[o.seats[0]]) ? o.lvBy[o.seats[0]] : ''; return h('div.tseg', h('span.lbl', 'Rivals'), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (cur === v ? '.on' : ''), { 'data-a': 'lvall', 'data-v': v, type: 'button', 'aria-pressed': cur === v ? 'true' : 'false', 'aria-label': 'Computer makers play ' + v }, v))); })()),
       h('div.tsec',
         h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
         h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
@@ -8466,6 +8584,17 @@ function onlineEl() {
 }
 function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(true); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; renderStart(); }
 // ---------- events ----------
+// G6 fix: a tap on Start day answers at once (pressed look + 'Starting…'), so nobody taps it twice while the day report gets ready
+function pressFb(t) { try { if (t.classList.contains('busy')) return; t.classList.add('busy'); t.setAttribute('aria-busy', 'true'); const b = t.querySelector('b') || t; const was = b.textContent; b.textContent = was.replace(/^Start day/, 'Starting day'); setTimeout(() => { if (t.isConnected && t.classList.contains('busy')) { t.classList.remove('busy'); t.removeAttribute('aria-busy'); b.textContent = was; } }, 2500); } catch (e) { } }
+// one press is one gesture. A sheet that opens while a finger is down (or a moment after it lifted) must not take that press's
+// trailing click, but any NEW press counts at once (same idea as the shell tutor's sameGesture).
+const TAP = { id: 0, down: 0, upAt: 0 };
+addEventListener('pointerdown', () => { TAP.id++; TAP.down++; }, true);
+addEventListener('pointerup', () => { if (TAP.down > 0) TAP.down--; TAP.upAt = Date.now(); }, true);
+addEventListener('pointercancel', () => { if (TAP.down > 0) TAP.down--; TAP.upAt = Date.now(); }, true);
+addEventListener('keydown', e => { if (!e.repeat) TAP.id++; }, true);
+function tapMark() { return { id: TAP.id, live: TAP.id > 0 && (TAP.down > 0 || Date.now() - TAP.upAt < 150) }; }
+function openedUnder(mk) { return !!(mk && typeof mk === 'object' && mk.live && mk.id === TAP.id); }
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]');
   if (!t) { if (ev.target.closest('#cwrap,#caul') && G && G.phase === 'brew' && focusSeat() !== viewSeat()) { UI.fastAI = true; return; }
@@ -8475,15 +8604,14 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // and so does the first brew screen after the report closed
-      if (UI.advAt && Date.now() - UI.advAt < 450 && t.closest('#acts')) break;   // a pop-up that just opened under a finger ignores that tap
+      const v = viewSeat(); if (openedUnder(UI.qT) && t.closest('#qbox')) break;   // only the trailing click of the press that opened a choice is ignored; a new tap always counts
+      if (openedUnder(UI.advAt) && t.closest('#acts')) break;
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; UI.instrNote = { ver: pl.ver, text: 'Only one white chip. Tap the flask again to use it.' }; render(); try { instrBar(); } catch (e) { } document.querySelectorAll('.flb').forEach(fb => { fb.classList.add('armed'); fb.setAttribute('aria-label', 'Tap again to use the flask'); }); break; } }
         if (m.t === 'ratset' || m.t === 'draw') UI.ratOpen = false;
         if (m.t === 'draw') UI.drawT = Date.now();
-        else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
         if (!tutAct({ what: 'mv', m })) break;      // the staged tutorial: only the asked move goes through (after every guard above, so the kit never moves on for a tap the game ignores)
         if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
         if (m.t === 'draw' && !UI.prefs.drew) { UI.prefs.drew = true; savePrefs(); }
@@ -8502,10 +8630,10 @@ document.addEventListener('click', ev => {
     case 'ratopen': if (!tutAct({ what: 'ratopen' })) break; UI.ratOpen = !UI.ratOpen; render(); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
-    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; shopToggle(d.k); break;
-    case 'shopbuy': if (!tutAct({ what: 'shopbuy' })) break; shopBuy(); break;
-    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; rubySelect(d.k); break;
-    case 'rubygo': if (!tutAct({ what: 'rubygo' })) break; rubyGo(); break;
+    case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; UI.shopInfo = null; shopToggle(d.k); break;
+    case 'shopbuy': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
+    case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; UI.shopInfo = d.ri || null; rubySelect(d.k); break;
+    case 'rubygo': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
@@ -8526,6 +8654,7 @@ document.addEventListener('click', ev => {
     case 'menu': showStart(); break;
     case 'start': newGame(d.m, optObj()); break;   // W471: Play is always a clean game; Learn to play is the coached one
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
+    case 'lvall': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); [0, 1, 2, 3].forEach(c => { if (c !== o.me) o.lvBy[c] = d.v; }); renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'drawer': GX.show(d.v); break;
@@ -8792,7 +8921,7 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
+  const go = () => { UI.shopSel = []; UI.shopInfo = null; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;
@@ -8811,6 +8940,7 @@ function renderRat(p, legal) {
   const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
   if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
   c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
+  try { if (typeof GXH !== 'undefined') setTimeout(() => GXH.relayout(), 0); } catch (e) { }   // a bubble placed before this pill appeared must move off it
 }
 // ===================== part 7: the painted cauldron (PixiJS 8: WebGL, else Pixi's canvas renderer, else the plain SVG view) =====================
 // The DOM stays the layout / hit / accessibility layer (thumbnails, buttons, the invisible SVG cauldron). When the Pixi cauldron is on (html.px)
@@ -9292,12 +9422,17 @@ function stgPlay(box, ds, R) {
 }
 // ---------- W471: the points race under the day's pots: every maker's total as a bar, today's gain lit, who leads in one line
 function stgRace(ds, v, play, R) {
-  const top = Math.max(1, ...ds.map(d => d.after)), ord = ds.slice().sort((a, b) => b.after - a.after), lead = ord[0], second = ord[1];
+  const top = Math.max(1, ...ds.map(d => d.after));
   const box = h('div.drace', { 'aria-label': 'Points after day ' + R.round });
-  const line = !second ? '' : lead.after === second.after ? 'Level at ' + lead.after + ' points.' : (lead.p.seat === v ? 'You lead' : lead.p.name + ' leads') + ' by ' + (lead.after - second.after) + '.';
-  const lc = D.CHARS[chefOf(lead.p.seat) % 4], tie = second && lead.after === second.after;
-  const por = h('img.drpor', { src: 'media/camp-' + lc.id + '.webp', alt: '', width: 112, height: 112, draggable: 'false', style: '--rc:' + lc.css }); por.onerror = () => por.remove();
-  box.appendChild(h('div.drhero', tie ? null : por, h('div.drhl', h('b', 'Points after day ' + R.round), line ? h('span', line) : null)));
+  // the headline always speaks about the numbers on screen: counted-up totals while the day plays, the new totals once they are in
+  const lead = key => { const ord = ds.slice().sort((a, b) => b[key] - a[key]), a = ord[0], b = ord[1]; return { a, tie: !!b && a[key] === b[key], line: !b ? '' : a[key] === b[key] ? 'Level at ' + a[key] + ' points.' : (a.p.seat === v ? 'You lead' : a.p.name + ' leads') + ' by ' + (a[key] - b[key]) + '.' }; };
+  const fresh = !play && STG.raced !== R.round, first = lead(play || fresh ? 'start' : 'after');
+  const por = h('img.drpor', { alt: '', width: 112, height: 112, draggable: 'false' }); por.onerror = () => por.remove();
+  const hl = h('span', first.line);
+  const show = L => { const c = D.CHARS[chefOf(L.a.p.seat) % 4]; por.src = 'media/camp-' + c.id + '.webp'; por.style.setProperty('--rc', c.css); por.style.display = L.tie ? 'none' : ''; hl.textContent = L.line; hl.hidden = !L.line; };
+  show(first);
+  box.appendChild(h('div.drhero', por, h('div.drhl', h('b', 'Points after day ' + R.round), hl)));
+  if (fresh) setTimeout(() => show(lead('after')), 800);
   ds.forEach(d => {
     const me = d.p.seat === v, w0 = Math.round(100 * d.start / top), w1 = Math.round(100 * d.after / top);
     const bar = h('span.drbar', h('i.drold', { style: 'width:' + w0 + '%' }), h('i.drnew', { style: '--w0:' + w0 + '%;--w1:' + (play ? w0 : w1) + '%' }));
@@ -9351,14 +9486,21 @@ function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
   return { box, ds, kind };
 }
 // ---------- the market stall ----------
+// what each stall's chip does, in plain words short enough for a 375px phone (tap a chip for the full text)
+const STALL_DO = { none: 'No power, cheapest', black: 'Most moths: droplet', g1: 'In last 2: a ruby', g2: 'In last 2: free chip', g3: 'Whites at 7: slide on', g4: 'In last 2: buy droplet',
+  b1: 'Peek, then pick one', b2: 'Shields next chips', b3: 'On a ruby: +1 ruby', b4: 'On a ruby: points', r1: '+1 after an orange', r2: 'Set aside, add later', r3: 'After a white: jumps', r4: 'White 1s move 2',
+  y1: 'After a white: undo it', y2: 'Next chip moves ×2', y3: 'Raises your limit', y4: 'Moves extra spaces', p1: 'Points at the count', p2: 'Trade in for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };
+const STALL_DO3 = { none: 'Cheapest', black: 'Moth: droplet', g1: 'Last 2: ruby', g2: 'Last 2: chip', g3: 'Slide on at 7', g4: 'Last 2: droplet', b1: 'Peek, then pick', b2: 'Shields chips', b3: 'On ruby: +1', b4: 'On ruby: points', r1: '+1 after orange', r2: 'Set aside', r3: 'Jumps after white', r4: 'White 1s go 2', y1: 'Undo a white', y2: 'Next chip x2', y3: 'Raises limit', y4: 'Moves extra', p1: 'Points at count', p2: 'Trade for prizes', p3: 'Far out: points', p4: 'Upgrades a chip' };   // R28: the 3-column stalls say it in fewer words, never cut by an ellipsis
 function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
-  const stalls = h('div.stalls');
+  const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
+    const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
+    st.appendChild(h('div.sdo', h('span.sl', bk ? (STALL_DO[bk.eff] || bk.title) : ''), h('span.ss', bk ? (STALL_DO3[bk.eff] || STALL_DO[bk.eff] || bk.title) : '')));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -9370,12 +9512,45 @@ function marketEl(p, q) {
     st.appendChild(row); stalls.appendChild(st);
   }
   if (p.rubies >= D.rubySpend && G.round < LASTD()) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
-  wrap.appendChild(stalls);
+  const more = h('button.smore', { type: 'button', hidden: true, 'aria-label': 'Scroll down to more stalls' });
+  more.addEventListener('click', ev => { ev.stopPropagation(); stalls.scrollBy({ top: stalls.clientHeight * .8, behavior: 'smooth' }); });
+  wrap.appendChild(h('div.stw', stalls, more)); stalls.addEventListener('scroll', () => smoreUpd(stalls, more), { passive: true });
+  requestAnimationFrame(() => { smoreUpd(stalls, more); stFit(stalls); smoreUpd(stalls, more); });
+  // a tap on a chip the scroll edge cuts still buys it, and the stall slides fully into view
+  stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
+  { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
+    const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
+    wrap.appendChild(h('div.sinfo', ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
   try { sugMark(wrap, p, q, []); } catch (e) { }
   return wrap;
+}
+// R22: when the stalls do not all fit, show whole rows only (the box ends at the bottom of the last row that fits), so no stall
+// is half shown at first; the pill below says how many more there are
+function stFit(st) {
+  if (!st.isConnected) return; st.style.maxHeight = ''; st.classList.remove('c3', 'tight');
+  const btn = st.parentElement && st.parentElement.querySelector('.smore'); if (btn) btn.hidden = true;   // the pill takes room: measure without it first
+  const fits = () => st.scrollHeight <= st.clientHeight + 2;
+  const portrait = !matchMedia('(orientation:landscape)').matches;
+  // R37: two columns only (a chip stays >= 44 px wide); portrait is always the tighter rows (so the layout never flips under a tap); the scroll pill only shows if they still do not fit
+  if (portrait) st.classList.add('tight');
+  if (fits()) return;
+  if (btn) btn.hidden = false;
+  const top = st.getBoundingClientRect().top, H = st.clientHeight; let best = 0;
+  [...st.children].forEach(c => { const b = c.getBoundingClientRect().bottom - top; if (b <= H + 1 && b > best) best = b; });
+  if (best > 60) st.style.maxHeight = Math.ceil(best + 2) + 'px';
+}
+// a rotation or resize refits the open shop (the fitted height was measured for the old size)
+addEventListener('resize', () => { const st = document.querySelector('.mkt .stw > .stalls'), mb = st && st.parentElement.querySelector('.smore'); if (!st || !mb) return; const fit = () => { smoreUpd(st, mb); stFit(st); smoreUpd(st, mb); }; fit(); requestAnimationFrame(fit); });   // R37: refit at once (the help finger reads the layout right after a rotation), and once more next frame
+// R8: at 375 the stalls scroll; say how many are below and fade the bottom edge
+function smoreUpd(st, btn) {
+  if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
+  st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
+  // R17/R22: a chip cut by the scroll edge (tcut) stays visible and buys on a tap, then its stall slides into view; one whose centre is past the edge
+  // (tout) cannot take a tap at its centre, so it is hidden and inert until it scrolls in (a tap on its stall scrolls it in)
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); const out = r.height > 0 && (cy > b - 4 || cy < t + 4); e.classList.toggle('tout', out); if (out && !e.disabled) { e.disabled = true; e.dataset.cut = '1'; } else if (!out && e.dataset.cut) { e.disabled = false; delete e.dataset.cut; } });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
@@ -9392,20 +9567,24 @@ function rubyGems(p, cost, compact) {
   if (n > show) out.appendChild(h('b', '+' + (n - show)));
   return out;
 }
-function rubyBar(p) {   // the small ruby corner of the market
-  const S = rubyState(p), el = h('div.rbar.rubyp', rubyGems(p, S.cost, true));
-  const dk = S.nextDrop(), fk = S.flaskKey();
-  el.appendChild(h('button.rbt.rdrop' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', type: 'button', disabled: dk ? null : true, 'aria-label': 'Droplet: start further on, ' + D.rubySpend + ' rubies a step' }, h('span', { html: ico('drop', 28) }), h('b', '+' + S.sel.drop)));
-  el.appendChild(h('button.rbt.rflask' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 28, p.flask || S.sel.flask) })));
+function rubyBar(p) {   // the ruby stall of the market: plain words on each button, a tap explains it in the line below
+  const S = rubyState(p), n = D.rubySpend, el = h('div.rbar.rubyp', h('div.rbh', h('b', 'Rubies'), rubyGems(p, S.cost, true)));
+  const dk = S.nextDrop(), fk = S.flaskKey(), undoDrop = dk && S.sel.drop && +dk[0] === 0;
+  const dropTxt = undoDrop ? 'Drop moved +' + S.sel.drop : 'Move your drop +' + (S.sel.drop + 1), flaskTxt = p.flask ? 'Flask is full' : S.sel.flask ? 'Flask refilled' : 'Refill flask';
+  el.appendChild(h('button.rbt.rdrop.rwd' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', 'data-ri': 'drop', type: 'button', disabled: dk ? null : true, 'aria-label': dropTxt + ': ' + n + ' rubies' }, h('span', { html: ico('drop', 24) }), h('span.rwt', h('b', dropTxt), h('em', undoDrop ? 'tap to undo' : n + ' rubies'))));
+  el.appendChild(h('button.rbt.rflask.rwd' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', 'data-ri': 'flask', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : flaskTxt + ': ' + n + ' rubies' }, h('span', { html: ico('flask', 24, p.flask || S.sel.flask) }), h('span.rwt', h('b', flaskTxt), p.flask ? null : h('em', S.sel.flask ? 'tap to undo' : n + ' rubies'))));
   const best = el.querySelector('[data-k="' + UI.rubyBest + '"]'); if (best) best.classList.add('sug');
   return el;
 }
+const RUBY_INFO = { drop: 'Move your drop: 2 rubies push your droplet 1 space further. Every brew from now on starts there, so each chip lands further out.',
+  flask: 'Refill flask: 2 rubies refill your flask. In the next brew you can put back one white chip you just drew.' };
 function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the droplet, its next spaces, the flask
   const S = rubyState(p), pts = KIT.GEO.pts, R = KIT.GEO.R, i0 = p.droplet, i1 = Math.min(D.TRACK_LEN - 1, p.droplet + S.mx);
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (let i = i0; i <= i1; i++) { x0 = Math.min(x0, pts[i].x); x1 = Math.max(x1, pts[i].x); y0 = Math.min(y0, pts[i].y); y1 = Math.max(y1, pts[i].y); }
   const sz = Math.max(6, Math.max(x1 - x0, y1 - y0) + 3), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
   const svg = KIT.potSVG({ pot: [], droplet: p.droplet + S.sel.drop, rat: 0, space: null, boom: false, mini: false, uid: 'rb', label: 'Your cauldron', size: 400 }).replace(/viewBox="[^"]*" width="\d+" height="\d+"/, 'viewBox="' + vx.toFixed(2) + ' ' + vy.toFixed(2) + ' ' + sz.toFixed(2) + ' ' + sz.toFixed(2) + '"');
   const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', { html: S.cost ? ico('ruby', 20) : '' }, S.cost ? '−' + S.cost : '')));
+  wrap.appendChild(h('div.rhelp', 'Spend ' + D.rubySpend + ' rubies: tap a glowing drop to start one space further, or tap the flask to refill it. Or keep them.'));
   const pot = h('div.rpot', { html: svg });
   for (let k = 0; k <= S.mx; k++) {
     const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
@@ -9414,8 +9593,8 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
   }
   wrap.appendChild(pot);
   const fk = S.flaskKey();
-  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend)),
-    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop))));
+  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend), h('em.rlb', p.flask ? 'Flask full' : S.sel.flask ? 'Refilled' : 'Refill flask')),
+    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop), h('em.rlb', 'Start space'))));
   return wrap;
 }
 // ===================== part 10: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
@@ -9431,7 +9610,7 @@ const hq = s => () => { const e = document.querySelector(s); return e && e.getBo
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
   first: { target: hfirst('#acts .bagb:not(.off)', '#acts .bagb'), title: 'Pull a chip', text: 'Tap the bag. The chip moves as many spaces as its number.', pic: () => hpics([['ico', 'bag']]) },
-  brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Draw to score more, or Stop to keep your space. Keep whites at 7 or less.', pic: () => hpics([['chip', 'W2']]) },
+  brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Each space shows coins (big number), points (small badge) and rubies. Draw for more, or Stop to keep it.', pic: () => hpics([['chip', 'W2']]) },
   hot: { target: hfirst('#acts .stopb', '#acts .brow'), title: 'Close to boiling', text: 'Another white chip may explode the pot. Stop, or use the flask.', pic: () => hpics([['ico', 'boom']]) },
   last: { target: hfirst('#acts .brow', '#acts .bagb'), title: 'The last day', text: 'Everyone picks Draw or Stop in secret. Then all show. No shop today.', pic: () => hpics([['ico', 'bag']]) },
   card: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Fortune card', text: 'Today\'s card gives a choice. Tap the one you want.', pic: () => hpics([['ico', 'ruby']]) },
@@ -9483,7 +9662,7 @@ function hlpPhase() {
     if (!G || !UI.started || G.phase === 'over' || tutOn()) return null;
     const v = viewSeat(); if (v < 0 || (hotSeat() && UI.holder < 0)) return null;
     const p = G.players[v];
-    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? 'shop' : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
+    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? (innerHeight < 700 && innerWidth < 600 ? null : 'shop') : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
     if (p.q) return HP_CARDQ[p.q.h] ? 'card' : HP_CHIPQ[p.q.h] ? 'chip' : null;
     if (G.phase !== 'brew' || p.st !== 'draw' || p.lock || BF.pulling || focusSeat() !== v) return null;
     if (G.round === LASTD()) return 'last';
@@ -9543,7 +9722,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'cauldron-fair', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
+  GXH.init({ game: 'cauldron-fair', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, tapFirst: true, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {
@@ -9558,22 +9737,37 @@ function hlpAfter() {
 //
 // THE RULES THIS TUTORIAL TEACHES (read from the rules drawer and rules-test.js): each line is  rule -> the steps that do it.  tutor-test.js checks every rule has a step.
 const TUT_RULES = [
-  ['the goal: most victory points after 9 days', 'goal', 'end'],
-  ['drawing chips from your bag', 'draw1'],
-  ['moving along the cauldron spiral, the scoring space (coins, points, ruby)', 'spiral'],
-  ['white chips and the explosion limit of 7 (the meter)', 'whites', 'keep'],
-  ['the flask puts a white chip back (once a day)', 'flask'],
-  ['stopping versus pushing your luck', 'seven', 'push', 'd2stop'],
-  ['what happens when you explode: choose coins or points', 'choose'],
-  ['the bonus die', 'report'],
-  ['the fortune card (purple now, blue all day)', 'fortune', 'day2'],
-  ['rubies: move the droplet / refill the flask', 'droplet', 'refill'],
-  ['the droplet and the rat stone head start', 'droplet', 'day2'],
-  ['buying chips in the shop; each colour has a power', 'shops1', 'shops2', 'shops3', 'buy'],
-  ['a chip power at work (blue: peek and pick)', 'peek'],
-  ['scoring at the end of a day', 'report', 'd2report'],
-  ['the last day: secret Draw or Stop, no shop, 5 coins and 2 rubies = 1 point', 'd2draw', 'd2report'],
-  ['how the game ends after 9 days', 'end']
+  ['the goal: most victory points after 9 days', 'goal'],
+  ['the fortune card: purple happens now', 'fortune'],
+  ['everyone draws at the same time, from their own bag', 'draw1'],
+  ['a chip moves as many spaces as its number', 'keep'],
+  ['the scoring space is the one after your last chip', 'keep'],
+  ['white chips and the explosion limit of 7 (the meter)', 'keep2'],
+  ['you may stop any time', 'keep2'],
+  ['the flask puts the last white chip back (once a day)', 'flask', 'seven'],
+  ['pushing your luck: one more white explodes', 'push'],
+  ['the bonus die: the furthest safe pot rolls; its faces', 'report'],
+  ['a ruby on the scoring space gives a ruby', 'd2stop'],
+  ['an exploded pot takes points or coins, not both', 'choose'],
+  ['every stall says what its chip does', 'shops'],
+  ['yellow opens on day 2, purple on day 3', 'shops'],
+  ['buying: up to two chips of different colours', 'buy'],
+  ['rubies: 2 move the droplet, 2 refill the flask', 'droplet', 'refill'],
+  ['bought chips go into the bag; a new day starts', 'confirm'],
+  ['an extra white chip before day 6', 'confirm'],
+  ['the fortune card: blue lasts all day', 'day2'],
+  ['rat tails: one on every second space behind the leader, a head start (counted)', 'rats', 'd2draw'],
+  ['the last day: secret Draw or Stop, revealed together', 'd2draw'],
+  ['red: moves extra when orange chips are in the pot (done)', 'red', 'redsaw'],
+  ['yellow: right after a white, it may send that white back (done)', 'yellow', 'yback'],
+  ['blue: peek and pick (done)', 'bdraw', 'peek'],
+  ['purple: pays at the count, 1 point for one (done)', 'peek', 'd2report'],
+  ['black: more than your neighbour moves the droplet (and a ruby) (done)', 'black', 'chipfx'],
+  ['green: a green in your last two chips pays a ruby (done)', 'green', 'chipfx'],
+  ['stopping keeps your scoring space', 'd2stop'],
+  ['the last day: no shop, 5 coins and 2 rubies = 1 point', 'd2report'],
+  ['tie-break: furthest pot on the last day', 'end'],
+  ['the game ends after the last day; most points wins', 'end']
 ];
 const TUT_GAME = 'cauldron-fair', TUT_SEED = 23;
 const tutOn = () => typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial';
@@ -9595,7 +9789,10 @@ function tutFix() {
   UI.focus = 0;
   if (G.phase === 'brew' && G.round === 1 && !T.d1) { T.d1 = 1; tutOrder(me, ['W2', 'W3', 'W1']); tutOrder(wy, ['W2', 'O1', 'W1', 'G1', 'W1']); }
   if (G.round === 1 && T.d1 && !T.fl && me.flask === false) { T.fl = 1; tutOrder(me, ['W2', 'W1']); }        // the flask put the white 1 back at a random place
-  if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; tutOrder(me, ['B1', 'W2', 'W3']); tutOrder(wy, ['W2']); }
+  // day 2: Hask slips a red, a yellow, a purple, a black and a green into the bag, so each colour's power is seen by doing it: orange then red (+1), a white then yellow (sends it back),
+  // then blue peeks at the purple (the right pick, and the hint agrees), which pays 1 point at the count
+  if (G.phase === 'brew' && G.round === 2 && !T.d2) { T.d2 = 1; ['R1', 'Y1', 'P1', 'K1', 'G1'].forEach(k => CF._.give(G, me, k, true)); tutOrder(me, ['O1', 'R1', 'W1', 'Y1', 'B1', 'P1', 'K1', 'G1']); tutOrder(wy, ['W2']); }
+  if (G.round === 2 && T.d2 && !T.yb && me.pot.some(c => c.c === 'Y') && !me.q) { T.yb = 1; tutOrder(me, ['B1', 'P1', 'K1', 'G1']); }      // the white that yellow sent back must not land on top
 }
 // Wynne is scripted too: she takes a Wren Feather 2 from the card, draws 4 chips on day 1 and 1 on day 2, then stops; shopping and rubies are the normal computer's.
 function tutAI(Gx, seat) {
@@ -9615,57 +9812,59 @@ const tbag = tq('#acts .bagb:not(.off)');
 const tmove = pred => () => { const L = UI.legal[0] || []; const b = [...document.querySelectorAll('#qbox [data-a=mv]')].find(e => { const m = L[+e.dataset.i]; return m && pred(m); }); return b && b.getBoundingClientRect().width ? b : null; };
 const tws = () => CF.whiteSum(tp());
 const tn = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+// Every step: ONE sentence of 12 words or fewer (the words live in story-data.js STORY.steps), ONE highlighted target, ONE tap (the action itself, or Next).
+// The order is the order the rules happen in a real day: goal, fortune, drawing, the spiral, whites, flask, stop or push, boom, scoring, shop, rubies, the last day, the end.
 function tutSteps() {
+  const rep = () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .ds:not(.me) .dtile'));
+  const shop = sel => () => { const e = UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector(sel); if (e && e.closest('.stalls')) { const st = e.closest('.stalls'), a = e.getBoundingClientRect(), b = st.getBoundingClientRect(); if (a.top < b.top || a.bottom > b.bottom) e.scrollIntoView({ block: 'nearest' }); } return !!e; };   // R8: the stall list can scroll on small phones; bring the spotlit chip into view
+  const fin = () => !!(G && G.phase === 'over' && UI.rsMode === 'final' && document.querySelector('#rs .win'));
+  const lastC = () => { const p = tp(); return p && p.pot.length ? p.pot[p.pot.length - 1].c : ''; };
+  const d2 = () => tbrew() && G.round === 2;
   return [
-    { id: 'goal', title: 'Welcome to the fair', say: 'Most victory points after day 9 wins. Your rival\'s points are here. This practice lasts two days.', target: tfirst('#others .th', '#cwrap'), wait: null,
-      ready: () => !!(G && UI.started && G.round === 1 && document.querySelector('#acts,#qbox')) },
-    { id: 'fortune', title: 'Fortune card', say: 'Each day starts with a fortune card. This purple one is instant. Take 3 rubies.', target: tmove(m => m.t === 'pick' && m.o === 'rubies'),
+    { id: 'goal', target: tfirst('#others .th', '#cwrap'), wait: null, ready: () => !!(G && UI.started && G.round === 1 && document.querySelector('#acts,#qbox')) },
+    { id: 'fortune', target: tmove(m => m.t === 'pick' && m.o === 'rubies'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pick' && a.m.o === 'rubies' }, ready: () => !!(tp() && tp().q && tp().q.h === 'pick') },
-    { id: 'draw1', title: 'Draw a chip', say: 'Tap your bag to pull a chip.', target: tbag,
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 0 && G.round === 1 },
-    { id: 'spiral', title: 'The spiral', say: () => 'It moved ' + tn(tp().pot[0].v, 'space') + ': its number. The ring marks the space you score if you stop.', target: tq('#cwrap'), wait: null,
-      ready: () => tbrew() && tp().pot.length === 1 },
-    { id: 'whites', title: 'White chips', say: 'White chips fill this meter. More than 7 and the pot explodes. Draw again.', target: tbag, also: tq('#acts .meter'),
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 1 && !!document.querySelector('#acts .meter') },
-    { id: 'keep', title: 'Keep drawing', say: () => 'Whites are at ' + tws() + ' of 7. Draw once more.', target: tbag, also: tq('#acts .meter'),
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 },
-    { id: 'flask', title: 'The flask', say: () => tws() + ' of 7 is risky. The flask puts the last white chip back. Tap it!', target: tq('#acts .flb'), also: tq('#acts .meter'),
+    { id: 'draw1', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 0 && G.round === 1 },
+    { id: 'keep', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 1 && G.round === 1 },
+    { id: 'keep2', target: tbag, also: tq('#acts .meter'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 && G.round === 1 },
+    { id: 'flask', target: tq('#acts .flb'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'flask' }, ready: () => tbrew() && tp().pot.length === 3 && !!document.querySelector('#acts .flb') },
-    { id: 'seven', title: 'Seven is safe', say: 'The white is back in the bag. Exactly 7 is safe. Draw again.', target: tbag, also: tq('#acts .meter'),
+    { id: 'seven', target: tbag,
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && tp().pot.length === 2 && tp().flask === false && tws() === 5 },
-    { id: 'push', title: 'Push your luck', say: 'At 7, any white chip explodes the pot. Tap the bag to risk it.', target: tbag, also: tq('#acts .meter'),
+    { id: 'push', target: tbag,
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, wrong: 'Tap the bag.', ready: () => tbrew() && tp().pot.length === 3 && tws() === 7 },
-    { id: 'report', title: 'Counting the day', say: () => { const d = G.players[1].res && G.players[1].res.die; return 'Spaces pay coins and points. Only safe pots can roll the bonus die' + (d && d.length ? ': ' + G.players[1].name + '\'s did.' : '.'); }, target: tq('#rs .ds:not(.me) .dtile'), also: tq('#rs .ds:not(.me) .dout'), wait: null,
-      ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .ds:not(.me) .dtile')) },
-    { id: 'choose', title: 'Your pot exploded', say: () => { const d = tp().q.d; return 'Your pot exploded. Pick ' + tn(d.vp, 'point') + ' or ' + d.coins + ' coins to shop. Take the coins.'; }, target: tq('#rs .dpick.dpc'),
+    { id: 'report', target: tq('#rs .ds:not(.me) .dtile'), wait: null, ready: rep },
+    { id: 'choose', target: tq('#rs .dpick.dpc'),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'de' && a.m.o === 'buy' }, ready: () => !!(UI.rsOpen && !STG.run && tp().q && tp().q.h === 'de' && document.querySelector('#rs .dpick.dpc')) },
-    { id: 'shops1', title: 'The fair stalls', say: 'Marrow is cheap and has no power. Mossback gives rubies when it is one of your last two chips.', target: tq('#rs .stall.cO'), also: tq('#rs .stall.cG'), wait: null,
-      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cG')) },
-    { id: 'shops2', title: 'More powers', say: 'Wren Feather peeks at extra chips. Scarlet Cap moves further for each Marrow in your pot.', target: tq('#rs .stall.cB'), also: tq('#rs .stall.cR'), wait: null,
-      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cR')) },
-    { id: 'shops3', title: 'Locked stalls', say: 'Cinder Moth: the most moths win droplet steps. Sunroot opens on day 2. Dusk Sigh opens on day 3.', target: tq('#rs .stall.cK'), also: tq('#rs .stall.cY'), wait: null,
-      ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .stall.cK')) },
-    { id: 'buy', title: 'Buy a chip', say: 'Buy up to two chips of different colours. Tap the Wren Feather.', target: tq('#rs .tok[data-k="B1"]'),
-      wait: { type: 'tap', match: a => a.what === 'shopsel' && a.k === 'B1' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .tok[data-k="B1"]')) },
-    { id: 'droplet', title: 'The droplet', say: 'Spend 2 rubies to move your droplet one space. Tap it.', target: tq('#rs .rbt.rdrop'),
-      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .rbt.rdrop:not([disabled])')) },
-    { id: 'refill', title: 'Refill the flask', say: 'A used flask comes back for 2 rubies. Tap the flask to refill it.', target: tq('#rs .rbt.rflask'),
-      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1f' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && document.querySelector('#rs .rbt.rflask:not([disabled])') && UI.rubySel && UI.rubySel.drop === 1) },
-    { id: 'confirm', title: 'Start day 2', say: 'Your chips go in the bag. Tap to start day 2.', target: tq('#rs [data-a=shopbuy]'),
-      wait: { type: 'tap', match: a => a.what === 'shopbuy' }, ready: () => !!(UI.rsOpen && tp().q && tp().q.h === 'shop' && UI.rubySel && UI.rubySel.flask) },
-    { id: 'day2', title: 'The last day', say: 'Blue cards last all day. The limit is 9 today. The rat stone helps whoever is behind.', target: tfirst('#fortchip', '#fort'), also: tq('#ratchip'), wait: null,
-      ready: () => tbrew() && G.round === 2 && !!document.querySelector('#ratchip') },
-    { id: 'd2draw', title: 'Draw together', say: 'On the last day both players choose in secret, then show. Tap the bag.', target: tbag,
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => tbrew() && G.round === 2 && tp().pot.length === 0 },
-    { id: 'peek', title: 'Peek and pick', say: 'The Wren Feather peeked at a chip. Place it as your next chip, or put it back.', target: tmove(m => m.t === 'crow' && m.idx === 0),
+    { id: 'shops', target: tq('#rs .stall.cG'), wait: null, ready: shop('#rs .stall.cG') },
+    { id: 'buy', target: tq('#rs .tok[data-k="B1"]'),
+      wait: { type: 'tap', match: a => a.what === 'shopsel' && a.k === 'B1' }, ready: shop('#rs .tok[data-k="B1"]') },
+    { id: 'droplet', target: tq('#rs .rbt.rdrop'),
+      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1' }, ready: shop('#rs .rbt.rdrop:not([disabled])') },
+    { id: 'refill', target: tq('#rs .rbt.rflask'),
+      wait: { type: 'tap', match: a => a.what === 'rubysel' && a.k === '1f' }, ready: () => shop('#rs .rbt.rflask:not([disabled])')() && !!(UI.rubySel && UI.rubySel.drop === 1) },
+    { id: 'confirm', target: tq('#rs [data-a=shopbuy]'),
+      wait: { type: 'tap', match: a => a.what === 'shopbuy' }, ready: () => shop('#rs [data-a=shopbuy]')() && !!(UI.rubySel && UI.rubySel.flask) },
+    { id: 'day2', target: tfirst('#fortchip', '#fort'), wait: null, ready: () => d2() && tp().pot.length === 0 && !!document.querySelector('#ratchip') },
+    { id: 'rats', target: tq('#ratchip .ratb'), also: tfirst('#others .th', '#others'), wait: { type: 'tap', match: a => a.what === 'ratopen' }, wrong: 'Tap the rat.', ready: () => d2() && tp().pot.length === 0 && tp().ratTails > 0 && !!document.querySelector('#ratchip') },
+    { id: 'd2draw', target: tbag, also: tq('#ratchip'), wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 0 },
+    { id: 'red', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 1 && lastC() === 'O' },
+    { id: 'redsaw', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 2 && lastC() === 'R' },
+    { id: 'yellow', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && tp().pot.length === 3 && lastC() === 'W' },
+    { id: 'yback', target: tmove(m => m.t === 'y1' && m.yes), also: () => document.querySelector('#qbox'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'y1' && a.m.yes }, ready: () => !!(tp() && tp().q && tp().q.h === 'y1') },
+    { id: 'bdraw', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && lastC() === 'Y' },
+    { id: 'peek', target: tmove(m => m.t === 'crow' && m.idx === 0), also: () => document.querySelector('#qbox'),   // the whole peek card stays clear of the bubble
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'crow' && a.m.idx === 0 }, ready: () => !!(tp() && tp().q && tp().q.h === 'crow') },
-    { id: 'd2stop', title: 'Stop here', say: 'Stop keeps your space, with its coins and points. Tap Stop.', target: tq('#acts .stopb:not(.off)'),
-      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'stop' }, wrong: 'Tap Stop.', ready: () => tbrew() && G.round === 2 && tp().pot.length === 2 },
-    { id: 'd2report', title: 'The final count', say: () => 'Every 5 coins and every 2 rubies make 1 point. Tap to see who won.', target: tq('#rs [data-a=rscont]:not(.off)'), also: tq('#rs .ds.me .dtile'),
+    { id: 'black', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && lastC() === 'P' },
+    { id: 'green', target: tbag, wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'draw' }, ready: () => d2() && lastC() === 'K' },
+    { id: 'd2stop', target: tq('#acts .stopb:not(.off)'),
+      wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'stop' }, wrong: 'Tap Stop.', ready: () => d2() && lastC() === 'G' },
+    { id: 'chipfx', target: tfirst('#rs .ds.me', '#rs .rsbody'), wait: null, ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && G.phase === 'over' && document.querySelector('#rs [data-a=rscont]:not(.off)')) },
+    { id: 'd2report', target: tq('#rs [data-a=rscont]:not(.off)'),
       wait: { type: 'tap', match: a => a.what === 'rscont' }, ready: () => !!(UI.rsOpen && UI.rsMode === 'report' && !STG.run && G.phase === 'over' && document.querySelector('#rs [data-a=rscont]:not(.off)')) },
-    { id: 'end', title: 'You know the game', say: () => { const a = G.players[0].vp, b = G.players[1].vp; return (G.winner === 0 ? 'You win, ' + a + ' to ' + b + (a === b ? ' on the tie-break!' : '!') : G.winner < 0 ? 'A tie, ' + a + ' each!' : G.players[1].name + ' wins, ' + b + ' to ' + a + '.') + ' A real game lasts 9 days.'; },
-      target: tfirst('#rs .win', '#rs .rsbody'), wait: null, ready: () => !!(G && G.phase === 'over' && UI.rsMode === 'final' && document.querySelector('#rs .win')) }
-  ];
+    { id: 'end', target: tfirst('#rs .win', '#rs .rsbody'), wait: null, wrong: 'Tap Finish.', ready: fin }
+  ].map(s => { const t = STORY.steps[s.id]; s.title = t[0]; s.say = t[1]; return s; });
 }
 // ---------------------------------------------------------------- the kit hooks
 // Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
@@ -9678,14 +9877,15 @@ function tutStart(o) {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({
     game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'You know the rules',
-    endText: o ? 'Draw, stop, explode, shop, rubies, the last day. Now the Story begins.' : 'Draw, stop, explode, shop, rubies, the last day. The lightbulb explains anything new.',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    endTitle: 'Now a real game',
+    endText: o ? 'You know every rule. Chapter 1 is next.' : 'You know every rule. Your first real game starts now.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'real', label: 'Play a real game' }],
     setup: () => { try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false; newGame('tutorial'); },
     onDone: r => {
       tutLeave(); const c = r && r.choice;
       if (c === 'chapter' && first) { showStart(); GXC.play(first.id); }
       else if (c === 'story' && typeof GXC !== 'undefined') { showStart(); GXC.open(); }
+      else if (c === 'real') newGame('vs', optObj());   // straight into a real 9-day game against the computer
       else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
     },
     onExit: () => { tutLeave(); showStart(); }
@@ -9846,12 +10046,16 @@ function instrInfo() {
   const v = viewSeat(); if (v < 0 || hotSeat() || UI.pass != null) return null;
   const me = G.players[v], wait = G.players.filter(p => p.seat !== v && ((G.phase === 'brew' && (p.st === 'draw')) || (G.phase !== 'brew' && p.q))).map(p => p.name);
   if (G.phase === 'brew' && me.st === 'draw' && !me.lock && !me.q) {
-    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day: pick Draw or Stop in secret. Everyone reveals together.' };
+    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day! Draw or Stop. All reveal together.' };
     if (!me.pot.length) return { who: 'YOUR TURN', text: 'Tap the bag to draw your first chip.' };
     const ws = CF.whiteSum(me), lim = CF.limitOf(G, me), safe = lim - ws;
-    return { who: 'YOUR TURN', text: safe <= 0 ? 'The pot is full of white (' + ws + '/' + lim + '). Another white chip explodes it. Draw, or Stop and score.' : 'White ' + ws + ' of ' + lim + '. Draw another chip, or Stop to keep your space.' };
+    return { who: 'YOUR TURN', text: safe <= 0 ? 'Whites ' + ws + '/' + lim + ': one more white explodes. Draw or Stop?' : 'Whites ' + ws + '/' + lim + '. Draw, or Stop to keep this space.' };
   }
-  if (me.q && !EVAL_Q[me.q.h]) { const t = promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' }; }
+  if (G.phase === 'brew' && me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 };   // R28: once decided it is never "YOUR TURN" (day 9)
+  if (me.q && !EVAL_Q[me.q.h]) {
+    const FQ = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, restart: 1 };   // fortune choices: the card name is already on the NOW chip and the sheet title, so the bar says only what to do
+    const t = FQ[me.q.h] && QINFO[me.q.h] ? QINFO[me.q.h][1](me, me.q.d) : promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' };
+  }
   if (G.phase === 'brew') { if (me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 }; return { who: wait.length ? wait[0].toUpperCase() + '\'S TURN' : 'DAY ENDS', text: (me.boom ? 'Your pot exploded. ' : 'You stopped. ') + (wait.length ? 'Watch ' + wait.join(' and ') + ' draw, one chip at a time.' : 'Counting the day.'), rival: 1 }; }
   return null;
 }
@@ -9865,7 +10069,10 @@ function instrBar() {
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
   if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
   if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
-  const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  let top = db ? db.getBoundingClientRect().top : innerHeight - 200;
+  if (db) for (const c of db.children) { if (c === e || c.hidden) continue; const r = c.getBoundingClientRect(); if (r.height > 2 && r.bottom > 0) top = Math.min(top, r.top); }   // R8: sit above the panel's content, never over a fortune title or a choice button
+  e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  { const bd = $('#board'), er = e.getBoundingClientRect(), ih = Math.max(Math.ceil(er.height) + 8, bd ? Math.ceil(bd.getBoundingClientRect().bottom - er.top) + 4 : 0); if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
 }
 // ---- the turn banner: slides in when the turn changes hands
 let TB = { key: '', tm: 0 };
@@ -9880,14 +10087,11 @@ function turnBanner() {
   } else if (G.phase === 'eval') { key = 'ev' + G.round; text = 'Day ' + G.round + ' · Counting up'; cls = 'ev'; } else return;
   if (key === TB.key) return; TB.key = key; if (!text || !msgOK()) return;
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
-  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
+  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 1200);   // R8: a short flash, it never sits over content
 }
 setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble
 (function () {
-  const ts = tutSteps; tutSteps = function () {
-    return ts().map(s => { const t = STORY.steps[s.id]; if (t) { s.title = t[0]; s.say = t[1]; } return s; });
-  };
   const mo = new MutationObserver(() => { document.querySelectorAll('.gxt-bub .gxh-bd:not([data-por])').forEach(bd => { bd.dataset.por = 1; const im = h('img.tutpor', { src: STORY.guide.img, alt: STORY.guide.name, width: 36, height: 36 }); bd.insertBefore(im, bd.firstChild); }); });
   try { mo.observe(document.body, { childList: true, subtree: true }); } catch (e) { }
 })();
@@ -9906,74 +10110,6 @@ setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { if (!UI.camp && UI.mode !== 'tutorial' && G) { const v = viewSeat(), w = $('#rs .win > div'); if (w && !w.querySelector('.rsvoice')) { const line = G.winners.length > 1 ? STORY.quickTie : v >= 0 && G.winners.indexOf(v) >= 0 ? STORY.quickWin : STORY.quickLose; w.appendChild(h('div.rsvoice', line)); } } } catch (e) { console.error(e); } return r; };
 })();
-// ===================== the coached first game (replaces the forced tap steps): a real two-day game with free choices from turn 1.
-// The guide speaks just-in-time, one bubble at a time, never blocking input; it can be dismissed. No spotlight, no forced taps.
-// Rules that did not come up are named on the "Things you'll meet later" card at the end. window.COACH.shown / .later feed the test. =====
-const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null, prologue: false, tm: 0, ids: [] };
-const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach.coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
-const cMe = () => G && G.players[0];
-const COACH_RULES = [
-  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Have the most points after two days. \u2022 Chips from your bag fill your pot. \u2022 Stop before the white chips pass 7. \u2022 Your last space pays coins and points.'],
-  ['fortune', () => cMe().q && cMe().q.h === 'pick', 'Fortune card', 'Each day starts with a fortune card. Purple ones happen now. Pick any reward.'],
-  ['draw', () => G.phase === 'brew' && cMe().st === 'draw' && !cMe().q && cMe().pot.length === 0 && G.round === 1, 'Your bag', 'Tap the bag to pull a chip. It moves as many spaces as its number.'],
-  ['spiral', () => G.phase === 'brew' && cMe().pot.length >= 1 && G.round === 1, 'The spiral', () => 'Your chip is on space ' + cMe().pot[cMe().pot.length - 1].pos + '. Stop now to keep its coins and points.'],
-  ['whites', () => cMe().pot.some(c => c.c === 'W'), 'White Fizzpods', () => 'White chips fill the meter: ' + CF.whiteSum(cMe()) + ' of ' + CF.limitOf(G, cMe()) + '. Go over and it explodes.'],
-  ['flask', () => G.phase === 'brew' && cMe().flask !== false && CF.whiteSum(cMe()) >= 4 && cMe().st === 'draw', 'The flask', 'Getting hot? Tap the flask. Your last white chip goes back. Once a day.'],
-  ['seven', () => G.phase === 'brew' && cMe().st === 'draw' && CF.whiteSum(cMe()) === CF.limitOf(G, cMe()), 'Exactly seven', 'Seven is still safe. One more white chip explodes the pot.'],
-  ['boom', () => cMe().boom && G.round === 1, 'Boom!', 'Boom! Today you get points or coins, not both. No bonus die either.'],
-  ['stopped', () => cMe().st === 'done' && !cMe().boom && G.round === 1 && G.phase === 'brew', 'Safe stop', 'Good, you keep your space. Safe pots may roll the bonus die.'],
-  ['rival2', () => G.players[1] && G.players[1].st === 'done' && !G.players[1].boom && G.round === 1 && G.phase === 'brew', 'Wynne', 'Wynne stopped early. Safe, but a smaller score.'],
-  ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Wynne\'s pot exploded. She went over the limit.'],
-  ['report', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 1, 'Counting the day', 'Now each pot is counted. Coins, points, and a die for safe pots.'],
-  ['shop', () => cMe().q && cMe().q.h === 'shop', 'The stalls', 'Spend coins on up to two chips of different colours. Hold a chip to read its power.'],
-  ['rubies', () => cMe().q && cMe().q.h === 'shop' && cMe().rubies >= 2, 'Rubies', 'Two rubies move your droplet on, or refill your flask.'],
-  ['day2', () => G.round === 2 && G.phase === 'brew', 'The last day', 'Day two is the last. Blue fortune cards last all day.'],
-  ['lastday', () => G.round === LASTD() && G.phase === 'brew' && cMe().st === 'draw', 'Secret choice', 'Today you both pick Draw or Stop in secret. No shop today.'],
-  ['peek', () => cMe().q && cMe().q.h === 'crow', 'Peek and pick', 'A feather chip peeks ahead. Place the chip, or send it back.'],
-  ['d2count', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 2, 'Final count', 'Last day: 5 coins make 1 point. So do 2 rubies.']
-];
-Object.defineProperty(window, 'GXCOACH', { get: () => ({ running: !!COACH.on, explained: COACH.shown.filter(i => i !== 'end'), later: COACH.later, done: !!COACH.finished }), configurable: true });
-COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
-const COACH_LATER = [['Purple chips (from day 3) and black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: players behind start further ahead', 'rat'], ['A full game lasts 9 days. Ties go to the furthest chip', 'ties']];
-function coachShow(id, title, text) {
-  const b = coachBox(), t = typeof text === 'function' ? text() : text;
-  const tp = t.replace(/</g, '&lt;').split(' \u2022 '), body = '<span>' + tp[0] + '</span>' + (tp.length > 1 ? '<ul class="cxl">' + tp.slice(1).map(x => '<li>' + x + '</li>').join('') + '</ul>' : '');
-  b.innerHTML = '<img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><div class="cxb"><b>' + title.replace(/</g, '&lt;') + '</b>' + body + '</div><div class="cxr"><button type="button" data-cx="ok">Got it</button><button type="button" data-cx="leave" class="lv">Leave tutorial</button></div>';
-  b.className = 'on' + (UI.rsOpen ? ' top' : ''); COACH.cur = id; COACH.shown.push(id); clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(9000, 4000 + 1000 * Math.ceil(t.split(/\s+/).length / 10)));   // reading time: at least 4 s + 1 s per 10 words
-}
-function coachNext() { clearTimeout(COACH.tm); const b = coachBox(); COACH.cur = null; b.className = ''; let n = COACH.q.shift(); while (n && !(() => { try { return n[3](); } catch (e) { return false; } })()) n = COACH.q.shift(); if (n) setTimeout(() => { if (COACH.on && !COACH.cur) coachShow(n[0], n[1], n[2]); }, 250); }
-function coachTick() {
-  { const b = $('#coach'); if (b) b.classList.toggle('top', !!(typeof UI !== 'undefined' && UI.rsOpen)); }
-  if (!COACH.on || !G || UI.mode !== 'tutorial') return;
-  if (G.phase === 'over' && UI.rsMode === 'final') { if (COACH.shown.indexOf('end') < 0 && !$('#coachend')) coachEnd(); return; }
-  for (const [id, when, title, text] of COACH_RULES) {
-    if (COACH.shown.indexOf(id) >= 0 || COACH.q.some(q => q[0] === id)) continue;
-    let ok = false; try { ok = !!when(); } catch (e) { }
-    if (ok) { if (!COACH.cur) coachShow(id, title, text); else COACH.q.push([id, title, text, when]); break; }
-  }
-}
-setInterval(() => { try { coachTick(); } catch (e) { } }, 300);
-function coachEnd() {
-  const a = G.players[0], b = G.players[1]; COACH.shown.push('end'); COACH.finished = 1; coachNext(); COACH.q = [];
-  COACH.later = COACH.ids.filter(i => COACH.shown.indexOf(i) < 0 && i !== 'end');
-  const lines = COACH_RULES.filter(r => COACH.later.indexOf(r[0]) >= 0).map(r => r[2]).concat(COACH_LATER.map(x => x[0]));
-  const win = G.winner === 0 ? 'You win ' + a.vp + ' to ' + b.vp + '!' : G.winner < 0 ? 'A tie, ' + a.vp + ' each!' : b.name + ' wins ' + b.vp + ' to ' + a.vp + '.';
-  const d = h('div#coachend', { role: 'dialog', 'aria-label': 'Tutorial finished' });
-  d.innerHTML = '<div class="ce"><img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><h3>' + win + '</h3><p>You made ' + a.vp + ' points. ' + b.name + ' made ' + b.vp + '.</p><p>On the last day, 5 coins or 2 rubies made 1 point.</p><h4>Rules you have not seen yet</h4><ul>' + lines.map(l => '<li>' + l.replace(/</g, '&lt;') + '</li>').join('') + '</ul><p>Hask: "Tomorrow it is for real."</p><div class="cb">' + (COACH.prologue ? '<button type="button" data-ce="chapter">Start chapter 1</button>' : '') + '<button type="button" data-ce="play">Play a game</button></div></div>';
-  document.body.appendChild(d); d.addEventListener('click', ev => { const k = ev.target.closest('[data-ce]'); if (k) coachFinish(k.dataset.ce); });
-}
-function coachClean() { COACH.on = false; clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; ['#coach', '#coachend'].forEach(s => { const e = $(s); if (e) e.remove(); }); }
-function coachFinish(choice) {
-  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave();
-  if (choice === 'chapter' && first && typeof GXC !== 'undefined') { showStart(); GXC.play(first.id); } else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
-}
-function coachLeave() { coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave(); showStart(); }
-tutStart = function (o) {
-  coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
-  newGame('tutorial'); Object.assign(COACH, { on: true, finished: 0, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
-};
-
 // ---- W471 Goal card: one plain sentence and three bullets. Opens on day 1 of a Quick game and from the Day chip; stays until tapped.
 function goalCard(force) {
   let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
@@ -9981,15 +10117,13 @@ function goalCard(force) {
 
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
-  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the whites pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
   e.addEventListener('click', () => { e.remove(); });
   document.body.appendChild(e);
 }
 window.goalCard = goalCard;
 document.addEventListener('click', ev => { const d = ev.target.closest && ev.target.closest('#barstat .dayn'); if (d && !UI.camp) goalCard(true); });
 
-// W471: the coached first game is free play, not a GXT spotlight script; report it as a running tutor so shared drivers find it
-(function () { if (typeof GXT === 'undefined') return; const r = GXT.running, s = GXT.state; GXT.running = function () { return !!COACH.on || r.apply(this, arguments); }; GXT.state = function () { return COACH.on && !r.call(GXT) ? null : s.apply(this, arguments); }; })();
 // W471: phone text floor. Owner rule: no text under 14px on a phone. Any element with its own text that computes smaller is raised to 14px.
 (function () {
   let t = 0;
