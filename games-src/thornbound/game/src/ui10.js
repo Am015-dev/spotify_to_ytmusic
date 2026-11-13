@@ -160,7 +160,7 @@ document.addEventListener('pointerdown',e=>{if(!G||!UI.started)return;const tg=e
   if(!UI.card&&!G.over&&G.q&&viewSeatForQ()==null&&!UI.pop&&!tg.closest(skipSel)&&tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){tbTapAhead();tapRing(e.clientX,e.clientY);UI._nc=1;return}   // a rival's turn: a tap hurries it
   if(!UI.card||(UI.card.kind!=='event'&&UI.card.kind!=='news'))return;
   if(tg.closest('#ppop,.gx-drawer,#start,#netbox,#tbgoal,#tbcend,.gxh-bub,.gxt-top,.gxt-end,.tbt-goal,.tbt-skip,.tbt-term,.gx-bar button:not(#barstat)'))return;
-  if(tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){if(bfSkip()){if(!tg.closest('#act [data-a=mv],#main [data-a=mv]'))UI._nc=1}else tapRing(e.clientX,e.clientY)}},true);   // a tap on a choice button skips the narration AND still presses the button (legal() checks it)
+  if(tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){if(bfSkip())UI._nc=1;else tapRing(e.clientX,e.clientY)}},true);
 // ---------------------------------------------------------------- long-press: a small tooltip near the thing (8 words or fewer)
 const LOC_SHORT=['Govern','Journey','Favour','','Deck bottom','Recover cards'];
 function tipFor(kind,arg){const V=UI.V;if(!V)return '';
