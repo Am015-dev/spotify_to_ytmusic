@@ -71,8 +71,11 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span>${dangerHTML()}</div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
 // short portrait phones (<= 600 px tall): the line's (i) and Use ★ buttons join the Turn / Place row, so the line stays one text row and the Goal
 // strip stays on screen (R38: cut by 24 px at 375x553). The buttons keep their data-ph / data-a, so the same delegated taps work.
+// R42: at 375x667 a 2-line danger note or a 4-junk race pushed the Goal strip 13-38 px off screen. When the strip overflows, step down: the Goal on one
+// line ("Goal" + the race, the full text stays in its aria-label), then the danger note without the leviathan's name (still in its title / aria-label).
+function phFit(el){try{el.classList.remove('fit1','fit2');if(!PH.on||PH.land)return;const over=()=>el.scrollHeight>el.clientHeight+1;if(!over())return;el.classList.add('fit1');if(over())el.classList.add('fit2')}catch(e){}}
 function phShortCtl(el){try{if(PH.land||innerHeight>600)return;const ctl=el.querySelector('.ps-ctl'),ln=el.querySelector('.ps-line');if(!ctl||!ln)return;ln.querySelectorAll('.sdet,[data-a=sugg]').forEach(b=>ctl.appendChild(b))}catch(e){}}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?(G&&G.phase==='setup'&&innerHeight<600?'':phCrews()):phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;phShortCtl(el);if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?(G&&G.phase==='setup'&&innerHeight<600?'':phCrews()):phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;phShortCtl(el);phFit(el);if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
@@ -114,7 +117,7 @@ function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI
 // the danger warning: a leviathan one move from your bow square or your tile (it strikes only on a roll of 6, 7 or 8)
 function dangerMons(){const me=youSeat();if(me<0||hotSeat()||!G||G.phase!=='play'||UI.tut)return [];const S=G.ships[me];if(!S||!S.alive||S.x==null)return [];
   const sq=[[S.x,S.y]];if(S.on)sq.push(S.on);return G.mons.filter(m=>m.k==='L'&&monHits(m,sq).length)}
-function dangerHTML(){const d=dangerMons();if(!d.length)return '';const full=`${d.map(m=>levName(m.id)).join(' and ')} can reach your junk if the dice show 6, 7 or 8.`;return `<span class="warn-l" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}"> &#9888; ${d.length>1?d.length+' leviathans':esc(levName(d[0].id))}: 6-8 reaches you</span>`}
+function dangerHTML(){const d=dangerMons();if(!d.length)return '';const full=`${d.map(m=>levName(m.id)).join(' and ')} can reach your junk if the dice show 6, 7 or 8.`;return `<span class="warn-l" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}"> &#9888; <span class="wn">${d.length>1?d.length+' leviathans':esc(levName(d[0].id))}: </span>6-8 reaches you</span>`}
 function phWhose(i){const me=youSeat();return (i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>")}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
 function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
@@ -141,7 +144,7 @@ function phCrews(){if(!G||!UI.started||!PH.on)return '';const me=youSeat();
 function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
   if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal" data-goal>${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
   const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
-  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal: last junk afloat</span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
+  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal<span class="gl2">: last junk afloat</span></span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
@@ -230,7 +233,7 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
    const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
    el.innerHTML=`<span class="chip" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${G.deck.length} tiles${so?' &middot; '+toRise+' to rise':''}</small></span></span>`};
  const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;if(G.seats[s]&&G.seats[s].human)PH.toast=phCantMsg(m,s);phAfter()}return r};
- const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(Date.now()-(PH.closeT||0)<600)return;if(!PH.on)return _onPick(p);phPick(p)}}
+ const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(Date.now()-(PH.closeT||0)<450)return;if(!PH.on)return _onPick(p);phPick(p)}}
 function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kind!=='coach'&&PH.cur.kind!=='mph'&&PH.cur.kind!=='sunk'&&PH.cur.kind!=='q')return;
   const d=sideToAct(),mine=!UI.busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat);
   let sq=null,ship=null;if(p){if(p.kind==='ship')ship=+String(p.id).slice(1);else if(p.kind==='square'||p.kind==='start')sq=[p.c,p.r]}
@@ -252,12 +255,34 @@ function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kin
 // a press that starts on a bubble, card or sheet never reaches the board, however long it is held (R38: the coach bubble is removed on pointerdown, so a held
 // "Got it" or a tap on the bubble body let the click land on the board). The press's click is dropped unless it lands inside a bubble/card that is still there;
 // a second press that starts within 0.6 s of that press ending (a double tap) is dropped the same way.
-const PG_SEL='.gxh-bub,.gxh-rules,#pc,#ppop,#twgoal';const PG={on:false,up:0};
-document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL));PG.on=inG||(PG.up>0&&Date.now()-PG.up<600);PG.up=0},true);
-document.addEventListener('pointerup',e=>{if(PG.on)PG.up=Date.now()},true);
-document.addEventListener('pointercancel',e=>{if(PG.on)PG.up=Date.now()},true);
+const PG_SEL='.gxh-bub,.gxh-rules,#pc,#ppop,#twgoal';const PG={on:false,up:0,chain:false,x:-99,y:-99};
+// R42: a gold start mark's touch area reached over the bubble's edge, so a tap at (or just below) the bubble's corner opened "Start here?". While a bubble or
+// card is up, a press on the board within 12 px of it counts as a press on the bubble; marks near it also lose their hit area (pgClip).
+const PG_NEAR='.gxh-bub.on,#pc:not([hidden]),.gxh-rules';
+function pgRects(){const o=[];for(const e of document.querySelectorAll(PG_NEAR)){if(!e.getClientRects().length)continue;const r=e.getBoundingClientRect();if(r.width>4&&r.height>4)o.push(r)}return o}
+function pgNear(x,y,m){for(const r of pgRects())if(x>=r.left-m&&x<=r.right+m&&y>=r.top-m&&y<=r.bottom+m)return true;return false}
+const pgBoard=t=>!!(t&&t.closest&&t.closest('#ov,#board,canvas')&&!t.closest('button:not(.opip),.gx-bar,.gx-dock,#ps'));
+function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll('#ov .opip')){let near=false;if(R.length){const q=e.getBoundingClientRect(),cx=(q.left+q.right)/2,cy=(q.top+q.bottom)/2;
+  near=R.some(r=>cx>=r.left-36&&cx<=r.right+36&&cy>=r.top-36&&cy<=r.bottom+36)}e.classList.toggle('nearbub',near)}}catch(e){}}
+setInterval(()=>{if(PH.on&&G&&G.phase==='setup')pgClip()},250);
+document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL))||(pgBoard(t)&&pgNear(e.clientX,e.clientY,12));
+  const ch=!inG&&PG.up>0&&Date.now()-PG.up<600;PG.on=inG||ch;PG.chain=ch&&!(Math.abs(e.clientX-PG.x)<30&&Math.abs(e.clientY-PG.y)<30);PG.up=0;if(inG)PH.closeT=Date.now();if(PG.on&&!ch){PG.x=e.clientX;PG.y=e.clientY}},true);
+// every press that started on a bubble/card (it may close it) blocks board picks for a short while after it ends (R42: PH.closeT was no longer set)
+document.addEventListener('pointerup',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
+document.addEventListener('pointercancel',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
 document.addEventListener('click',e=>{if(!PG.on)return;if(PG.up&&Date.now()-PG.up>1000){PG.on=false;return}const t=e.target;
-  if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;e.stopPropagation();e.stopImmediatePropagation();if(e.cancelable)e.preventDefault()},true);
+  if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;
+  // a 2nd press within 0.6 s loses its click when it lands on the board or near the first press (a double tap); a control elsewhere (Place, Pass, a tile) answers
+  if(PG.chain&&t&&t.isConnected&&!pgBoard(t))return;
+  e.stopPropagation();e.stopImmediatePropagation();if(e.cancelable)e.preventDefault()},true);
+// R42 (sweep under load): a redraw of the strip / pop-up between the press and the release replaced the pressed button, so the click went nowhere.
+// If the pressed control is gone, the same control (same action and data) now under the finger gets the click.
+{let pr=null,hit=false;const key=b=>b?[b.dataset.a,b.dataset.t,b.dataset.d,b.dataset.s].join('|'):'';
+ document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#ppop [data-a],#ps [data-a],#dockbody [data-a]');pr=b?{el:b,k:key(b),ts:Date.now()}:null;hit=false},true);
+ document.addEventListener('click',e=>{if(!pr||!e.isTrusted)return;const b=e.target&&e.target.closest&&e.target.closest('[data-a]');if(b&&key(b)===pr.k)hit=true},true);
+ document.addEventListener('pointerup',e=>{const q=pr;if(!q)return;const x=e.clientX,y=e.clientY;
+   setTimeout(()=>{if(pr!==q)return;pr=null;if(hit||q.el.isConnected||Date.now()-q.ts>1500)return;const h=document.elementFromPoint(x,y),b=h&&h.closest&&h.closest('[data-a]');
+     if(b&&!b.disabled&&key(b)===q.k)b.click()},350)},true)}
 // taps inside the strip / pop-up / cards
 document.addEventListener('click',e=>{if(!PH.on)return;
   if(Date.now()-PH.swipeT<350&&e.target.closest&&e.target.closest('#ppop')){e.stopPropagation();e.preventDefault();return}
