@@ -468,3 +468,11 @@ html:has(#bd.pv.tiny) .gxh-bub.gxh-compact{padding-top:4px;padding-bottom:4px}ht
 html:has(#bd.pv.tiny) .gxh-bub.gxh-compact .gxh-tx{padding-right:0}
 /* R35: a short board band (390x763) shrinks the place picture (--pvph); the shared tag sits small on the picture's lower left corner */
 #bd.pv.tall .pv-board.pv-shrunk .tile.pv-place .pv-shtag{top:calc(var(--pvph,64px) - 16px);left:calc(50% - 54px);font-size:14px;line-height:15px;padding:0 3px;z-index:3}
+/* R39: "Keep one" choices: face-up cards at hand size, name under each */
+#acts.tray .tchip.tcard.tbig{flex-direction:column;gap:2px;padding:3px 5px;align-items:center}
+#acts.tray .tchip.tcard.tbig .tcn{font-size:14px!important;line-height:1.1;text-align:center;max-width:92px;white-space:normal}
+/* R39: the prompt never cuts: two lines on phones, the tracker line yields */
+html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:unset!important;display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:14px!important;line-height:1.1!important}
+html.ph .gx-bar{min-height:52px}
+html.ph #barprompt{max-height:none!important;overflow:visible!important}
+#acts.tray .tchip.tcard.tbig{align-self:flex-start}

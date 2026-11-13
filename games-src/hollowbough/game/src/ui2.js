@@ -437,11 +437,12 @@ function trayChip(m, i, tg) {
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
     if (m.card !== undefined && effQ()) inner = [h('b', cname(m.card)), h('span.eff', effLine(m.card))];
+    else if (m.card !== undefined && G.q && G.q.kind === 'teach') inner = PV_ON ? [pvFace(m.card, { small: true })] : [cardEl(m.card, 78), h('b.tcn', cname(m.card))];   // R39: the choices face up, with names
     else if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
     else if (m.res !== undefined) inner = [ic(m.res, 24), h('b', m.label ? chipText(m.label) : rname(m.res, 1))];
     else inner = [h('b', chipText(m.label) || 'OK')];
   } else inner = [h('b', chipText(m.label))];
-  const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? (effQ() ? '.teff' : '.tcard') : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
+  const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? (effQ() ? '.teff' : G.q && G.q.kind === 'teach' ? '.tcard.tbig' : '.tcard') : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
   if (m.label) b.setAttribute('aria-label', m.label);
   UI.tgEls[tg] = b; return b;
 }
@@ -465,14 +466,15 @@ function renderActs(mm, qm, qShown) {
   if (chips.length) {
     a.classList.add('tray');
     const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
+    const big = hasCard && chips.some(c => c.classList.contains('tbig'));   // R39: face-up "Keep one" cards are hand-card size
     if (hasCard || many) {
       let rows;
-      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(4, Math.ceil(chips.length * 150 / Math.max(120, box.w)));   // G8: chips carry words now
-      const hh = hasCard ? rows * (Math.round(UI.trayCw * CARD_AR) + 14) + 10 : Math.max(box.h, rows * 50 + 6);
+      if (hasCard) { const per = big ? 2 : Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(4, Math.ceil(chips.length * 150 / Math.max(120, box.w)));   // G8: chips carry words now
+      const hh = big ? rows * 128 + 10 : hasCard ? rows * (Math.round(UI.trayCw * CARD_AR) + 14) + 10 : Math.max(box.h, rows * 50 + 6);
       a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
     }
     chips.forEach(c => a.appendChild(c));
-    if (a.classList.contains('wrap') && !hasCard && a.scrollHeight > a.clientHeight + 1) { const hh2 = a.scrollHeight + 6; a.style.top = (box.y + box.h - hh2) + 'px'; a.style.height = hh2 + 'px'; }   // G8: grow to fit every choice
+    if (a.classList.contains('wrap') && (!hasCard || big) && a.scrollHeight > a.clientHeight + 1) { const hh2 = a.scrollHeight + 6; a.style.top = (box.y + box.h - hh2) + 'px'; a.style.height = hh2 + 'px'; }   // G8: grow to fit every choice
     if (UI.sel) a.appendChild(h('button.tchip.tx', { 'data-a': 'selx', type: 'button', 'aria-label': 'Cancel' }, '×'));
     return;
   }

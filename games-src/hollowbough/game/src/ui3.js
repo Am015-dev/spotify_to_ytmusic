@@ -151,7 +151,15 @@ function fingerWanted() {
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
 function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
 // the finger stays on its target when a row scrolls under it
-function fingerFollow() { const f = document.getElementById('finger'), el = UI.fingerEl; if (!f || f.hidden || !el || !el.isConnected) return; const r = frameRect(el); if (!r || r.w < 4) return; const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; }
+// R39: the finger tip sits on the target but off every card name: try a few spots, keep the one covering the least name text
+function fingerSpot(r) {
+  const c = ctr(r), fb = $('#board').getBoundingClientRect(), names = [...document.querySelectorAll('.pvc-name,.hcn,.tcn,.cn,.nm,.pv-name')].map(e => e.getBoundingClientRect()).filter(b => b.width > 2 && b.height > 2);
+  const spots = [[c.x, c.y], [c.x, r.y + 2], [r.x + r.w * .75, r.y + 4], [r.x + r.w * .25, r.y + 4], [c.x, r.y + 12], [c.x, r.y + r.h * .3], [c.x, r.y + r.h * .72], [r.x + r.w * .78, r.y + r.h * .78], [r.x + r.w * .22, r.y + r.h * .78], [c.x, r.y + r.h - 6], [r.x + r.w * .5, r.y + r.h + 4]];
+  let best = spots[0], bo = 1e9;
+  for (const [x, y] of spots) { const L = fb.left + x - 23, T = fb.top + y - 8, o = names.reduce((s, b) => s + Math.max(0, Math.min(b.right, L + 48) - Math.max(b.left, L)) * Math.max(0, Math.min(b.bottom, T + 58) - Math.max(b.top, T)), 0); if (o < bo) { bo = o; best = [x, y]; } if (!o) break; }
+  return best;
+}
+function fingerFollow() { const f = document.getElementById('finger'), el = UI.fingerEl; if (!f || f.hidden || !el || !el.isConnected) return; const r = frameRect(el); if (!r || r.w < 4) return; const sp = fingerSpot(r); f.style.left = (sp[0] - 19) + 'px'; f.style.top = (sp[1] - 4) + 'px'; }
 function hscrollTo0(el) { if (PV_ON && pvScrollTo(el)) return; const hs = el && el.closest && el.closest('.hscroll'); if (!hs) return; const a = el.offsetLeft, b = a + el.offsetWidth, c = el.offsetTop, d = c + el.offsetHeight;
   if (hs.classList.contains('vert')) { if (c < hs.scrollTop) hs.scrollTop = c - 4; else if (d > hs.scrollTop + hs.clientHeight) hs.scrollTop = d - hs.clientHeight + 4; UI.hsy = hs.scrollTop; }
   else { if (a < hs.scrollLeft + 36) hs.scrollLeft = Math.max(0, a - 40); else if (b > hs.scrollLeft + hs.clientWidth) hs.scrollLeft = b - hs.clientWidth + 4; UI.hsx = hs.scrollLeft; } }
@@ -168,7 +176,7 @@ function placeFinger() {
   { const pn = PV_ON && el.closest && el.closest('#bd.pv .pv-panel'); const tb = pn && !pn.classList.contains('on') && pvTall() && UI.pvTabUser === G.logN && document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]');
     if (tb) { el = tb; tb.classList.add('glow'); } else hscrollTo(el); }   // a tab the player picked this turn stays in front: the finger then points at its target's tab
   const r = frameRect(el); if (!r || r.w < 4) return;
-  const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false; UI.fingerEl = el;
+  const sp = fingerSpot(r); f.style.left = (sp[0] - 19) + 'px'; f.style.top = (sp[1] - 4) + 'px'; f.hidden = false; UI.fingerEl = el; clearTimeout(UI.ftm); UI.ftm = setTimeout(fingerFollow, 300); UI.ftm2 = setTimeout(fingerFollow, 900);   // R39: panels settle after the first placement; re-pick the spot off the names
   f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
 // ---- Play view (W457): tab taps, drag a worker meeple onto a place or a hand card up into the city, a tick on every usable tap
