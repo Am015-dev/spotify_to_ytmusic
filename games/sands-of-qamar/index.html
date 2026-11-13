@@ -545,7 +545,7 @@ html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46p
 .tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
 #gw{overflow:visible}#grid{margin-top:6px}
 .coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
-.plpop{pointer-events:none}.plpop span{display:none}
+.plpop{pointer-events:none}.plpop span{display:inline;font-size:14px;max-width:62vw}
 html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 1px rgba(30,15,5,.85))}
 .tile .tv{top:-3px;right:-3px}
 @media (min-width:1024px){.coach{flex-wrap:wrap}.coach span{flex:1 1 150px}.coach button{flex:1 1 100%}}
@@ -615,6 +615,71 @@ html.land #feed:not([hidden]){display:flex;flex-direction:column;gap:6px;positio
 #feed .fd-row{display:flex;gap:8px;align-items:flex-start;font:700 16px/1.25 var(--gx-body,system-ui)}
 #feed .fd-dot{flex:0 0 12px;height:12px;border-radius:50%;margin-top:5px;border:2px solid #4a2a05;box-sizing:border-box}
 #coach.on~#feed,#turnover.on~#feed{display:none!important}
+/* the guided first game (guide.js): the one tap each step asks for glows; undo is hidden while guided */
+.gd-hl{outline:4px solid #ffcf3f!important;outline-offset:2px;box-shadow:0 0 0 7px rgba(255,207,63,.45),0 0 18px 6px rgba(255,180,40,.75)!important;animation:gdpulse .9s ease-in-out infinite alternate;z-index:6}
+@keyframes gdpulse{from{outline-color:#ffcf3f}to{outline-color:#fff3b8}}
+@media (prefers-reduced-motion:reduce){.gd-hl{animation:none}}
+body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!important}
+
+.gd-off{opacity:.45;filter:grayscale(.5);animation:none!important;box-shadow:none!important;outline:0!important}
+/* R27: nine spots do not fit one row at 44 px on a phone: two rows of five and four, every spot 44 tall; the place label sits on its top edge */
+.bidt.two{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-columns:auto;gap:3px}
+.bidt.two .spot{min-height:44px;height:44px;padding:0;justify-content:center}
+.bidt.two .spot .ord{position:absolute;top:0;left:0;z-index:1;font-size:13px!important;padding:0 4px!important;line-height:1.05;border-radius:6px 0 6px 0!important}
+.bidt.two .sp-b{min-height:44px;height:44px;padding-top:8px}.bidt.two .spot .sp-c{line-height:44px;padding-top:6px}
+html.land .bidt.two{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.guiding .gd-hl{min-height:44px;min-width:44px;box-sizing:border-box}
+.plpop,.plpop *,.fl,.fl *{pointer-events:none!important}
+/* round 2: quiet dear bids, best chooser tag */
+.sp-b.dear{opacity:.62;border-color:#b08a5a}.chb .chbest{display:block;font:800 14px/1 var(--ff-b,system-ui);color:#1f6a2a;margin-top:2px}
+
+/* R25: while a chooser is open only the chooser and its tile/card stay lit; everything else is dimmed and stops glowing */
+html.chzon .glow:not(.chb):not(.chzanc){animation:none!important;outline:0!important;box-shadow:none!important}
+html.chzon #grid .tile:not(.chzanc),html.chzon .dcard:not(.chzanc),html.chzon .mcard:not(.chzanc),html.chzon .sch:not(.chzanc),html.chzon .sp-b,html.chzon #acts button,html.chzon #mine .glow{filter:saturate(.4) brightness(.6)!important;transition:filter .15s}
+html.chzon #chz{z-index:60}
+/* R25 (GXSK rule): the unskinned action button has the same content box as the painted one (plate 14/18 px + no padding),
+   so turning the skin on or off never resizes Undo / Put them back. One line of text is 16 px tall either way. */
+html body .ab{line-height:16px}
+html:not(.sk) body .ab{padding:12px 16px!important}
+/* R25: landscape phones (390 px tall): the full market (5 rows) plus 3 djinns must fit under the top bar in every step */
+html.land.short #mkt .mcard{height:40px!important}html.land.short #mkt .mrow{gap:2px!important}
+/* R34 Earn list: ONE row (- Mystic | Earn N | + Mystic) so the bazaar keeps its tiles on a 375x667 phone */
+#acts .arow.earn{flex-wrap:nowrap;gap:6px;width:100%;max-width:420px;margin:0 auto;align-items:stretch}
+html body #acts .arow.earn .ab{height:48px;min-height:44px!important;max-height:52px;padding:0 8px!important;margin:0}
+#acts .arow.earn .ab.ern{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+#acts .arow.earn .ab.ern b{font-size:17px;font-weight:800;white-space:nowrap}#acts .arow.earn .ab.ern small{font-size:12px;opacity:.85;white-space:nowrap}
+#acts .arow.earn .ab.ern-s{flex:0 0 64px;font-size:16px;white-space:nowrap}#acts .arow.earn .ab.ern-s:disabled{opacity:.4}
+/* R34 feel (juice.js): decoration only, never over 0.6 s, never takes a tap */
+.jdip{animation:jdip .3s ease-out}@keyframes jdip{35%{transform:translateY(3px) scale(.95)}100%{transform:none}}
+.jland{animation:jland .55s cubic-bezier(.3,1.5,.5,1);z-index:3}@keyframes jland{0%{transform:scale(1)}25%{transform:scale(1.1,.88)}55%{transform:scale(.96,1.06)}100%{transform:scale(1)}}
+.jring{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:4px solid var(--jc);box-shadow:0 0 12px var(--jc);pointer-events:none;animation:jring .55s ease-out forwards}.jring.big{border-width:6px}
+@keyframes jring{0%{transform:scale(.3);opacity:1}100%{transform:scale(4.2);opacity:0}}.jring.big{animation-name:jringb}@keyframes jringb{0%{transform:scale(.3);opacity:1}100%{transform:scale(6);opacity:0}}
+.fl.jgold,.fl.jcn{z-index:2}.jsp{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fffbe0 0,#ffd35a 45%,rgba(255,170,0,0) 72%);box-shadow:0 0 10px 3px rgba(255,200,60,.8)}
+.jcoin{display:block;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#e8b030 55%,#a8721a);border:1px solid #7a4e0e;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.jglow{animation:jglow .26s ease-out}@keyframes jglow{0%{box-shadow:0 0 0 0 rgba(255,211,90,.95)}40%{box-shadow:0 0 0 6px rgba(255,211,90,.7),0 0 22px 6px rgba(255,200,60,.6)}100%{box-shadow:0 0 0 0 rgba(255,211,90,0)}}
+.jhurt{animation:jhurt .5s ease-out}@keyframes jhurt{20%,60%{transform:translateX(-3px)}40%,80%{transform:translateX(3px)}0%,100%{transform:none}}
+.jhaul{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(255,200,60,0);animation:jhaul .55s ease-out forwards}@keyframes jhaul{30%{box-shadow:inset 0 0 60px 18px rgba(255,200,60,.55)}100%{box-shadow:inset 0 0 0 0 rgba(255,200,60,0)}}
+@media (prefers-reduced-motion:reduce){.jdip,.jland,.jglow,.jhurt{animation:none!important}.jring,.jhaul{display:none}}
+
+/* R38: the score pop sits in the score bar over the step tracker (never on the tiles); djinn powers and goods stay one row */
+.plpop.inbar{box-sizing:border-box;max-width:none;padding:0 10px;border-radius:10px;justify-content:center;overflow:hidden;transform-origin:center}
+.plpop.inbar span{max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ce-r.ce-s{padding:3px 0}.ce-r.ce-s span{font-weight:700}.ce-r.ce-s b{font-size:16px}
+#acts .arow.pws{flex-wrap:nowrap;justify-content:safe center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:100%;padding:0 2px}
+#acts .arow.pws::-webkit-scrollbar{display:none}
+#acts .arow.pws .ab.pw{flex:0 0 auto;white-space:nowrap;min-height:44px!important;padding:0 10px}
+#mine{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;justify-content:safe center;max-width:100%;padding:1px 2px}#mine::-webkit-scrollbar{display:none}
+#mine .gchip{flex:0 0 auto}
+html.short:not(.land) .ab.pw{min-height:44px!important}
+html.mk-off:not(.land) #mkt{display:none}
+html.short:not(.land) .mcard:not(.empty),html.short:not(.land) .dcard{min-height:44px!important}
+/* R38: a short phone keeps the market on one row, but every card stays 44 px wide; the row slides sideways when it is full */
+html.short:not(.land) #mkt .mrow{display:flex!important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:3px}
+html.short:not(.land) #mkt .mrow::-webkit-scrollbar{display:none}
+html.short:not(.land) #mkt .mrow>*{flex:0 0 auto}html.short:not(.land) #mkt .mrow .mcard{width:44px;min-width:44px}
+html.dj-off:not(.land) #mkt .drow,html.mr-off:not(.land) #mkt .mrow{display:none!important}
+html.short.bid-mk:not(.land) #mkt,html.short.pw-on:not(.land) #mkt .drow{display:none!important}
+html.short:not(.land) #trk{display:none!important}   /* the one-line prompt above says what to do; the score pop then lands on the scorer's seat chip */
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -801,6 +866,87 @@ html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-s
 html.sk-pl .dcard .dv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-cream.webp) center/142% no-repeat}
 /* menu test v2: solid colour under the painted button art so contrast is measurable (art fills the same colour) */
 /* W480: no flat colour behind the painted buttons (it showed as a rectangle around the rounded art) */
+/* W497 gameplay fix: who stands on a tile, readable at a glance (one figure per colour + its count); names never clipped */
+html body #grid .tile .ms{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:2px;padding:0 1px 2px}
+html body #grid .tile .ms .mg{display:inline-flex;align-items:center;gap:1px;height:20px;padding:0 4px 0 1px;border-radius:10px;background:rgba(255,249,234,.95);box-shadow:0 1px 2px rgba(40,20,5,.55);line-height:1}
+html body #grid .tile .ms .mg .mp{--ms:15px;--k:1;filter:none}
+html body #grid .tile .ms .mg b{font:900 14px/1 var(--ff-b,system-ui);color:#2a1608;font-size:14px!important}
+html body #grid .tile .tn{max-width:100%!important;overflow:visible!important;text-overflow:clip!important;font-size:12px!important;letter-spacing:-.35px;padding:0 2px!important;text-align:center}
+html body #grid .tile .gain{font-size:13px!important}
+#gainkey{position:fixed;z-index:40;left:50%;transform:translateX(-50%);pointer-events:none;padding:4px 10px;border-radius:999px;background:#fff6dc;border:2px solid #8a5a1e;color:#3b1c0e;font:700 13px/1.2 var(--ff-b,system-ui);white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+#gainkey[hidden]{display:none}
+@media (max-width:700px){
+ html body #bd #grid .tile .tv{position:absolute;top:1px;right:1px;min-width:22px;height:22px;line-height:22px!important;font-size:14px!important;padding:0 3px;border-radius:11px;z-index:4}
+ html body #grid .tile .ms{position:absolute;left:1px;right:1px;top:23px;bottom:15px;padding:0;z-index:3;align-content:center;gap:2px 1px}
+ html body #grid .tile .ms .mg{height:18px;padding:0 3px 0 0;gap:0}
+ html body #grid .tile .ms .mg .mp{--ms:13px}
+ html body #grid .tile .ms .mg b{font-size:13px!important}
+ html body #grid .tile .tn{position:absolute!important;left:0;right:0;bottom:1px;margin:0!important;z-index:4}
+}
+@media (max-width:700px) and (max-height:700px){
+ html body #bd #grid .tile .tv{top:auto;bottom:1px;right:1px;min-width:16px;padding:0 2px;height:17px;line-height:17px!important;font-size:12px!important;border-radius:9px}
+ html body #grid .tile .ms{top:0;right:0;left:0;bottom:17px;justify-content:center;gap:1px 1px}
+ html body #grid .tile .ms .mg{height:16px}
+ html body #grid .tile .ms .mg .mp{--ms:12px}
+ html body #grid .tile .ms .mg b{font-size:12px!important}
+ html body #grid .tile .tn{font-size:11px!important;right:17px;text-align:left;padding:0 0 0 1px!important;letter-spacing:-.5px}
+ html body #grid .tile .ti{opacity:.35}
+}
+#skipai{position:fixed;right:8px;z-index:45;min-width:64px;min-height:44px;padding:0 12px;border-radius:22px;border:2px solid #8a5a1e;background:#fff6dc;color:#3b1c0e;font:800 15px/1 var(--ff-b,system-ui);box-shadow:0 2px 6px rgba(0,0,0,.35);cursor:pointer}
+#skipai[hidden]{display:none}
+/* W497: every tap target 44px or more on a phone */
+@media (max-width:700px){
+ html body #bd .bidt{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;width:100%!important;overflow:visible!important}
+ html body #bd .bidt .spot{min-width:0!important;width:auto!important;min-height:46px!important}
+ html body #bd .bidt .sp-b{min-width:44px!important;min-height:44px!important;width:100%!important}
+ html body #bd .bidt .spot{display:flex!important;flex-direction:column!important;justify-content:flex-end!important;gap:2px!important}   /* a spot with a Mystic option stacks its two buttons instead of widening the row */
+ html body #bd .bidt .spot:last-child{align-items:flex-end!important}   /* 9 spots on a phone: the last 44px button overflows leftwards, not off the screen */
+ html body .dcard{min-height:44px!important}
+ html body .ab.pw,html body #acts .ab,html body #acts [data-mv]{min-height:44px!important}
+ html body .gchip,html body [data-sell]{min-width:44px!important;min-height:44px!important}
+ html body .mcard{min-height:44px!important}
+ html body #chz .chb,html body .chb{min-height:44px!important}
+}
+/* R5 fix: no text under 14px on the board at any phone size (counts, names, values, gain badges, the badge legend) */
+html body #grid .tile .ms .mg b,html body #grid .tile .gain{font-size:14px!important}
+#gainkey{font-size:14px}
+html body #grid .tile .tn{font-size:14px!important}
+html body #bd #grid .tile .tv{font-size:14px!important}
+@media (max-width:700px) and (max-height:700px){
+ html body #grid .tile .ms .mg{height:16px;padding:0 2px 0 0}
+ html body #grid .tile .ms .mg .mp{--ms:11px}
+ html body #grid .tile .ms .mg b{font-size:14px!important;letter-spacing:-.5px}
+ html body #grid .tile .tn{font-size:14px!important;line-height:16px!important;right:13px;letter-spacing:-1px;padding:0!important;overflow:visible!important}
+ html body #bd #grid .tile .tv{min-width:14px;height:16px;line-height:16px!important;font-size:14px!important;padding:0 1px;right:0;bottom:0;letter-spacing:-.8px}
+}
+/* R20: short portrait phones (375x553) gave the board 137 px (25 px tiles, names cut): the seat chips drop their People/Goods line
+   and the goods market is one row of nine pictures, so the tiles get the room (names and counts never clipped) */
+html.short:not(.land) #seats .sch .s4{display:none}
+html.short:not(.land) .mrow{grid-template-columns:repeat(10,minmax(0,1fr))!important;gap:2px}html.short:not(.land) .mrow .deckback i{width:20px;height:28px}
+html.short:not(.land) .mrow .mcard{height:44px!important;margin:0!important;padding:0!important}
+html.short:not(.land) .mrow .mcard .mn{display:none}
+html.short:not(.land) .mrow .mcard .mi{font-size:20px}
+/* R20: the people on a tile are clearly visible (figures sized to the tile, about 16 px on a 375 phone, not 11x13), three across;
+   the count sits as a small badge on the figure; the whole tile is the tap target (44 px or more) */
+@media (max-width:700px){
+ html body #grid .tile .ms{gap:2px 2px!important;padding:0 3px 2px 1px!important}
+ html body #grid .tile .ms .mg{position:relative;height:auto!important;padding:0 0 2px!important;gap:0!important;background:none!important;box-shadow:none!important}
+ html body #grid .tile .ms .mg .mp{--ms:min(19px,calc((var(--cw) - 12px)/3))!important;filter:drop-shadow(0 1px 1px rgba(30,15,5,.75))!important}
+ html body #grid .tile .ms .mg b{position:absolute;right:-3px;bottom:-2px;min-width:14px;height:14px;padding:0 1px;box-sizing:border-box;border-radius:7px;background:#fff6dc;border:1px solid #6b3f12;text-align:center;font-size:13px!important;line-height:12px!important}
+}
+/* R20: score chips sit under the seat chip (never over its name and coins) and stay fully solid while readable */
+.ft{border:2px solid currentColor;animation:riseR20 1.4s ease-out forwards!important}
+@keyframes riseR20{0%{opacity:0;transform:translate(-50%,0) scale(.7)}10%{opacity:1;transform:translate(-50%,-10%) scale(1.1)}92%{opacity:1;transform:translate(-50%,-40%) scale(1)}100%{opacity:0;transform:translate(-50%,-45%) scale(1)}}
+@media (max-width:700px){html body #grid .tile .ms .mg b{bottom:1px}html body #grid .tile .ms .mg{padding-bottom:3px!important}}
+@media (max-width:700px){html body #grid .tile .ms>.mp{--ms:min(18px,calc((var(--cw) - 10px)/3.5))!important;--k:1!important}}
+/* tall phones (701px+): tile name at the bottom, people above it; the figures never reach down over the name */
+@media (max-width:700px) and (min-height:701px){html body #grid .tile .ms{bottom:21px!important;overflow:visible}html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 12px)/3),calc(var(--ch) - 52px))!important}}
+@media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 12px)/3),calc(var(--ch) - 25px))!important}}
+/* three figures always fit side by side (no wrap that pushes them over the name): 1px gaps, badge kept inside the tile */
+@media (max-width:700px){html body #grid .tile .ms{gap:1px 1px!important;padding:0 0 2px!important}html body #grid .tile .ms .mg b{right:-1px}
+ html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3))!important}}
+@media (max-width:700px) and (max-height:700px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 25px))!important}}
+@media (max-width:700px) and (min-height:701px){html body #grid .tile .ms .mg .mp{--ms:min(18px,calc((var(--cw) - 11px)/3),calc(var(--ch) - 52px))!important}}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -1025,8 +1171,9 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
 .gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 14px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
-.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
-.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
+.gxt-prog{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto;overflow:hidden}
+.gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap;min-width:0;overflow:hidden}
+@media (max-width:480px){.gxt-dots{display:none}}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}
 .gxt-dots i.done{background:#c99a35}
 .gxt-dots i.on{background:#ffe08a;box-shadow:0 0 6px #ffe08a;transform:scale(1.35)}
@@ -1789,7 +1936,8 @@ const GX={key:'gx',open:null,
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -1816,13 +1964,13 @@ const GX={key:'gx',open:null,
   // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
   var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
   function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
-  function avoidRects(k) {
+  function avoidRects(k, snug) {
     var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
     var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
+      out.push(infl(core(r, k), snug ? 2 : (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }
@@ -1866,7 +2014,29 @@ const GX={key:'gx',open:null,
       b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
       var cw = [350, 292, 236];
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
-      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
+      b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
+        var wt = [0, 236, 196, 164, -350, -292, -236, -196, -164];   // negative: the slim one-line version at that width
+        for (var wj = 0; wj < wt.length; wj++) {
+          var cw2 = Math.abs(wt[wj]); b.classList.toggle('gxh-compact', wt[wj] < 0); b.style.maxWidth = cw2 ? cw2 + 'px' : ''; b.dataset.gxhShrunk = '1';
+          var r4 = place(b, tr); if (r4.tapClear || r4.free) { delete b.dataset.gxhShrunk; return r4; }
+        }
+        b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      }
+      delete b.dataset.gxhShrunk;
+    }
+    var tapClear = false;
+    if (!best && cfg && cfg.tapFirst) {   // game opt-in: when nothing is fully free, keep every tappable target clear and let the bubble sit over plain text/board art
+      var avT = avoidRects(32, true), bt = null, bts = 1e9;
+      for (var xj = 0; xj < xs.length; xj++) for (var yy = top; yy <= bot - h; yy += 3) {
+        var cc = { left: xs[xj], top: yy, right: xs[xj] + w, bottom: yy + h };
+        if (hit(cc, T)) continue;
+        var ot = 0; for (var kk = 0; kk < avT.length; kk++) if (hit(cc, avT[kk])) ot += inter(cc, avT[kk]) || 1;
+        var ox = 0; for (var kx = 0; kx < txt.length; kx++) if (hit(cc, txt[kx])) ox += inter(cc, txt[kx]) || 1;
+        var sc = ot * 1e4 + ox * 4 + Math.abs(cc.left + w / 2 - tr.cx) * 0.5 + Math.abs(yy + h / 2 - tr.cy);
+        if (sc < bts) { bts = sc; bt = cc; bt.ot = ot; }
+      }
+      if (bt) { tapClear = !bt.ot; soft = bt; }
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1879,7 +2049,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
-    c2.free = !!best;
+    c2.free = !!best; c2.tapClear = tapClear;
     return c2;
   }
   function ringAt(r, cls) {
@@ -1905,15 +2075,16 @@ const GX={key:'gx',open:null,
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -1929,11 +2100,14 @@ const GX={key:'gx',open:null,
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -1941,12 +2115,12 @@ const GX={key:'gx',open:null,
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -1967,7 +2141,7 @@ const GX={key:'gx',open:null,
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -2030,7 +2204,7 @@ const GX={key:'gx',open:null,
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;
@@ -2049,6 +2223,7 @@ const GX={key:'gx',open:null,
 //   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
 //              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             live?:()=>el|[el] /* game controls kept tappable between steps, e.g. a roll card's Continue */,
 //             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
@@ -2058,6 +2233,15 @@ const GX={key:'gx',open:null,
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -2084,7 +2268,11 @@ const GX={key:'gx',open:null,
     return null;
   }
   function holesOf(st) {
-    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) {
+      // opt-in (cfg.fallbackMs): a next-button step whose target is missing/hidden for that long shows an untargeted bubble instead of blocking
+      if (cfg.fallbackMs && !st.wait && S && S.step === st && Date.now() - S.since > cfg.fallbackMs) { var v0 = vp(); var fh = norm({ left: v0.w / 2 - 22, top: v0.h * 0.4, width: 44, height: 44 }); fh.fb = 1; return [fh]; }
+      return null;
+    }
     var out = [p], al = null;
     try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
     if (al && !Array.isArray(al)) al = [al];
@@ -2110,14 +2298,14 @@ const GX={key:'gx',open:null,
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
   function swallow(e) { e.preventDefault(); e.stopPropagation(); }
   function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
   // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
-  function drawCells(hs, shield) {
+  function drawCells(hs, shield, clearOut) {
     var v = vp(), xs = [0, v.w], ys = [0, v.h];
     hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
     xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
@@ -2125,7 +2313,7 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
       var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
       for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
-      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], !!clearOut));
     }
     if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
   }
@@ -2148,9 +2336,10 @@ const GX={key:'gx',open:null,
   function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
   function topLimit() { return stripH() + 4; }
   // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
-  function place(b, hs, side) {
+  function stAvoid(st) { try { return st.avoid ? st.avoid() : null; } catch (e) { return null; } }
+  function place(b, hs, side, avoid) {   // avoid: optional extra rects the bubble should not cover (e.g. the board area the step talks about)
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
-    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var T = hs.map(function (r) { return inflate(r, 8, v); }).concat((avoid || []).filter(Boolean).map(function (r) { return inflate(r, 4, v); }));
     var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
     function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
     var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
@@ -2200,23 +2389,32 @@ const GX={key:'gx',open:null,
     S.holes = H; S.key = rkey(hs);
     var nextStep = !st.wait;
     drawCells(H, nextStep);
-    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    if (!hs[0].fb) H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
     add(topStrip());
     if (st.wait && st.wait.type !== 'event') {
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
-    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side, stAvoid(st)); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
     add(b); S.bub = b; S.say = say;
     var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-    place(b, H, st.side);
+    place(b, H, st.side, stAvoid(st));
     return true;
   }
-  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
-    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  // cfg.live (opt-in): ()=>el|[el] the game's own controls that must stay tappable while no step is shown (e.g. a Continue on a roll card)
+  function liveRects() {
+    if (!cfg || typeof cfg.live !== 'function') return null;
+    var a = null; try { a = cfg.live(); } catch (e) { a = null; } if (!a) return null; if (!Array.isArray(a)) a = [a];
+    var out = []; a.forEach(function (x) { var r = toRect(x); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out.length ? out : null;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim; only cfg.live controls stay live
+    var v = vp(), L = liveRects(); S.liveKey = L ? rkey(L) : '';
+    if (L) drawCells(L, false, true); else add(cell(0, 0, v.w, v.h, true));
+    add(topStrip());
   }
   function enter(i) {
     var st = cfg.steps[i]; if (!st) { finish(); return; }
@@ -2232,6 +2430,7 @@ const GX={key:'gx',open:null,
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
+      if (!hs && cfg.live) { var L0 = liveRects(), k0 = L0 ? rkey(L0) : ''; if (k0 !== (S.liveKey || '')) { clearVisuals(); drawWaiting(); } }
       if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
@@ -2250,7 +2449,8 @@ const GX={key:'gx',open:null,
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
-    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -2268,8 +2468,8 @@ const GX={key:'gx',open:null,
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
-    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
-    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -2278,7 +2478,7 @@ const GX={key:'gx',open:null,
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }
@@ -4865,14 +5065,14 @@ function doBid(m){const mk=G.bidQueue.shift();const p=P(mk.p);const pr=Math.min(
     G.order=G.bids.slice().sort((a,b)=>G.track[b.spot].cost-G.track[a.spot].cost||b.n-a.n).map(b=>b.mk);G.phase='turn';G.turnIdx=0;G.nextBid=[];startTurn()}}
 // ---------- turns ----------
 function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G.turn++;const p=P(mk.p);p.used={};p.itemUsed=0;G.turnFx={};G.move=null;G.act=null;G.step='move';
-  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
+  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){G.noMove=1;lg(`${p.nm} has no legal move: djinn powers only, then the game ends this round.`);G.step='sell'}}   // published rule: no legal meeple move ends the game; that player and those after use powers only, the turn finishes, scores are counted
 function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;
    // rulebook: the game ends at the end of the TURN (= round) in which the last camel is dropped, after every player has acted; endRound() finishes it
 if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
   if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
-  if(!legalStarts().length){lg('No legal move remains anywhere on the board.','big');return finish()}
+  if(G.noMove||!legalStarts().length){lg('No legal move remains on the board: the game ends.','big');return finish()}
   G.round++;G.bidQueue=G.nextBid.slice();G.bids=[];G.phase='bid';lg(`— Round ${G.round}: bid for turn order —`,'round');fx('round')}
 // ---------- movement ----------
 function handCounts(h){const o={};for(const c of h)o[c]=(o[c]||0)+1;return o}
@@ -5050,7 +5250,7 @@ function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=
 function goodsBest(p){const w=hasDj(p,'zarifa')?Math.floor(p.fk/2):0;if(!w)return goodsScore(p.res);const kinds=Object.keys(RNAME).filter(k=>k!=='fakir');let best=0;
   const rec=(res,left)=>{if(!left){best=Math.max(best,goodsScore(res));return}for(const k of kinds)rec(res.concat([k]),left-1)};if(w<=3)rec(p.res,w);else{let r=p.res.slice();for(let i=0;i<w;i++){let bk=kinds[0],bv=-1;for(const k of kinds){const v=goodsScore(r.concat([k]));if(v>bv){bv=v;bk=k}}r.push(bk)}best=goodsScore(r)}return best}
 function finish(){if(G.over)return;const sc=G.pl.map(p=>({p,s:scoreOf(p)}));sc.sort((a,b)=>b.s.total-a.s.total);const top=sc[0].s.total;const winners=sc.filter(x=>x.s.total===top).map(x=>x.p);
-  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
+  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
 // ---------- invariants and test hooks ----------
 function checkInvariants(){const v=[];if(!G)return v;let n=G.bag.length;for(const t of G.board){n+=t.m.length;if(t.block&&t.m.length)v.push('meeple on a blocked tile')}if(G.move)n+=G.move.hand.length;if(G.act&&!G.act.tribeDone)n+=G.act.n;
   for(const p of G.pl){n+=p.vz+p.el+p.art;if(p.coins<0)v.push(p.nm+' coins negative');if(p.fk<0)v.push(p.nm+' mystics negative');if(p.camels<0)v.push('camels negative');if(p.el<0||p.vz<0||p.art<0)v.push('kept meeples negative')}
@@ -5074,8 +5274,11 @@ function applyTwist(def){const tw=def&&def.twist&&def.twist.id,par=def&&def.twis
 <script>
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:4,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
-function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
+// easy = the default rival: plays loose about half the time and eases off once it leads by 10+; tuned (R33) so a newcomer who taps only what glows wins about 1 in 2
+const LVL={easy:{noise:1.5,depth:12000,bid:.2,ease:10,loose:.5,pool:.6},normal:{noise:.6,depth:20000,bid:.3,ease:15,loose:.3,pool:.5},hard:{noise:0,depth:60000,bid:.35,ease:0}};
+function aiLead(p){if(!G||!G.pl)return 0;const s=scoreOf(p).total;let o=-1e9;for(const q of G.pl)if(q.i!==p.i)o=Math.max(o,scoreOf(q).total);return s-o}
+function aiNoise(p){const L=LVL[p.lv]||LVL.normal;if(p.__nz!=null)return p.__nz;return L.noise}
+function aiEase(p){const L=LVL[p.lv]||LVL.normal;if(!L.ease)return 0;const d=aiLead(p);return d>L.ease?Math.min(4,1+(d-L.ease)/10):0}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;
   const path=[s];const visits={};
@@ -5108,13 +5311,16 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   if(G.boss&&G.boss.seat===p.i&&o.c===G.boss.favour)v+=6;// campaign boss rule: this boss prefers one tribe
   return v+(Math.random()-.5)*aiNoise(p)*6}
 function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||scoreOf(q).total<=s)}
-function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}
+function planTurn(p){const L=LVL[p.lv]||LVL.normal,cap=L.depth;const e=aiEase(p);p.__nz=aiNoise(Object.assign({},p,{__nz:null}))+e*2.5;let best=null,bv=-1e9;const all=[];
+  for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([v,o]);if(v>bv){bv=v;best=o}}p.__nz=null;
+  // a loose turn: any walk from the better half (more often while it leads), so the default rival makes human-sized mistakes
+  const lp=(L.loose||0)+(e?.15*e:0);if(lp&&all.length>3&&Math.random()<lp){all.sort((a,b)=>b[0]-a[0]);const h=all.slice(0,Math.max(2,Math.ceil(all.length*(L.pool||.5))));const pk=h[Math.floor(Math.random()*h.length)];best=pk[1];bv=pk[0]}return best&&Object.assign(best,{v:bv})}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){if(G&&G.tut&&typeof tutAIMove==='function'){const tm=tutAIMove(s);if(tm)return tm}
   const p=P(s);const vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
   if(G.q)return {act:'q',i:aiAnswer(G.q)};
-  if(G.phase==='bid'){const v=bestTurnValue(p);const budget=Math.max(0,v*.35-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
+  if(G.phase==='bid'){const L0=LVL[p.lv]||LVL.normal;if(L0.loose&&Math.random()<L0.loose*.6){const fr=vm.filter(m=>bidPrice(p,m.spot,m.fk)<=p.coins*.25);if(fr.length)return fr[Math.floor(Math.random()*fr.length)]}const v=bestTurnValue(p);const L=LVL[p.lv]||LVL.normal;const budget=Math.max(0,v*(aiEase(p)?L.bid*.5:L.bid)-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
   const dj=aiDjinn(p,vm);if(dj)return dj;const it=aiItem(p,vm);if(it)return it;
   switch(G.step){
   case 'move':{if(!G.move){AIPLAN=planTurn(p);if(!AIPLAN)return vm[0];return {act:'start',tile:AIPLAN.s}}
@@ -5180,7 +5386,7 @@ const TUT_KEYS={   // tile index -> [kind, value] (value only where several exis
 const TUT_PEOPLE={   // tile index -> its three people (the rest of the bazaar is filled from what is left)
   11:['elder','elder','elder'],8:['elder','elder','elder'],5:['vizier','vizier','vizier'],2:['vizier','vizier','vizier'],
   24:['merchant','merchant','merchant'],27:['merchant','merchant','merchant'],19:['builder','vizier','vizier'],15:['builder','builder','builder'],13:['vizier','assassin','assassin']};
-const TUT_MARKET=['fish','wheat','silk','pottery','fakir','spice','jewels','papyrus','gold'];
+const TUT_MARKET=['fish','wheat','silk','pottery','fakir','spice','fakir','jewels','papyrus'];
 const TUT_DJ=['nakhla','wazira','hikma'];
 function tutBuild(){
   // 1. the tiles: the keyed positions get their kind, everything else keeps the order the seed gave
@@ -5546,8 +5752,9 @@ Object.assign(UI,{pendDj:null,pendItem:null,chz:null,mkSel:[],sellSel:[],fxSeen:
 function refresh(){if(G&&!G.tut&&!G.coach&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G)return;playFx();try{render()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
 // the summoning moment: the brass lamp turns (24-frame strip rendered from the 3D model) and the djinn's name rises out of the smoke
-function showSummon(k,tries){tries=tries||0;if(tries<12&&((typeof PLQB!=='undefined'&&PLQB)||(document.getElementById('coach')||{classList:{contains:()=>false}}).classList.contains('on'))){setTimeout(()=>showSummon(k,tries+1),700);return}const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('aria-live','polite');o.style.pointerEvents='auto';o.addEventListener('click',()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)});
-  o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(()=>{o.classList.add('out');setTimeout(()=>o.remove(),300)},ANIM?5200:300)}
+function showSummon(k,tries){tries=tries||0;if(tries<12&&((typeof PLQB!=='undefined'&&PLQB)||(document.getElementById('coach')||{classList:{contains:()=>false}}).classList.contains('on'))){setTimeout(()=>showSummon(k,tries+1),700);return}const d=DJ[k];const hc=document.documentElement.classList;if(!d||!(hc.contains('sp3')||hc.contains('sk-dj')))return;let o=document.getElementById('summon');if(o)o.remove();o=document.createElement('div');o.id='summon';o.setAttribute('aria-live','polite');o.style.pointerEvents='none';   /* never blocks: the card is see-through to taps, and any tap anywhere closes it while the tap still reaches what was under it */
+  const bye=()=>{document.removeEventListener('pointerdown',bye,true);o.classList.add('out');setTimeout(()=>o.remove(),300)};document.addEventListener('pointerdown',bye,true);
+  o.innerHTML=`<i class="sm-smoke"></i>${hc.contains('sk-dj')?`<img class="sm-art" src="media/djinn-${k}.webp" alt="">`:'<i class="sm-lamp"></i>'}<b>${esc(d.n)}</b><span>${d.vp} points</span>`;document.body.appendChild(o);setTimeout(bye,ANIM?2200:300)}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='summon'&&f.h)try{showSummon(f.x)}catch(e){}   /* only your own djinn gets the big card; the rival's is told on the line */const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
 const online=()=>typeof NET!=='undefined'&&NET.on;
 const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
@@ -5573,16 +5780,17 @@ function computePick(){UI.pick=[];UI.pickSeat=[];UI.pickMk=[];UI.pickDj=[];UI.pi
     const tk=tm.filter(m=>m.take);if(tk.length){const sel=UI.mkSel;const js=new Set();for(const m of tk){if(sel.length===0||m.take.includes(sel[0])){for(const j of m.take)if(!sel.includes(j))js.add(j)}}UI.pickMk=[...js]}}}
 // ---------- the one short line ----------
 function qLine(q){return {claim:'Camel or tent?',item:'Keep which item?',djinn:'Pick a djinn',flute:'Pull a person over',kill:'Remove a person',thief:'Take your prize'}[q.kind]||words(q.title).slice(0,6).join(' ')}
-function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').slice(0,2).join(' & ')} ${G.over.win.length>1?'share':'wins'}`;
+function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);const w=G.over.win;if(hs.length===1&&w.length===1&&w[0]===hs[0].i)return 'You win!';const nm=w.map(i=>seatName(P(i))).slice(0,2).join(' & ');return `${nm} ${w.length>1?'share the win':'wins'}`}
   const s=sideToAct(),p=s>=0?P(s):null;if(!p)return '';const hp=me();
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
+  {const gs=typeof gdStep==='function'?gdStep():null;if(gs&&gs.who!=='me')return 'Tap Next to go on'}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
   if(G.phase==='bid'){const two=hp.markers>1;return 'Tap a glowing spot to bid'}
   switch(G.step){
-  case 'move':return !G.move?'Tap a glowing tile':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
-  case 'tribe':return {assassin:'Tap who to remove',builder:'Masons earn coins',merchant:'Traders fetch goods',vizier:'Advisors join you',elder:'Sages join you',artisan:'Crafters join you'}[G.act.color]||'';
-  case 'tile':{const t=G.board[G.act.tile];return {village:'A palace rises here',oasis:'A palm grows here',sacred:'Tap a djinn to summon',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item?'}[t.k]||'Nothing to do here'}
-  case 'sell':return 'Sell goods or end turn'}
+  case 'move':return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
+  case 'tribe':return {assassin:'Tap a glowing person to remove',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';
+  case 'tile':{const t=G.board[G.act.tile];return {village:UI.pick.length>1?'Tap a glowing tile for the palace':'Tap Build here',oasis:UI.pick.length>1?'Tap a glowing tile for the palm':'Tap Plant here',sacred:'Tap a djinn to summon, or Skip',small:'Buy a good for 3🪙',large:(UI.mkSel&&UI.mkSel.length===1?'One chosen. Pick one more good':'Pick two goods for 6🪙'),exchange:'Buy a good for 4🪙',workshop:'Commission an item, or Skip'}[t.k]||'Tap Skip to go on'}
+  case 'sell':return 'Sell goods, or tap End turn'}
   return ''}
 // ---------- seats (the score race) ----------
 function E2(e,k){return `<i class="e2" data-i="${k}">${e}</i>`}
@@ -5590,10 +5798,11 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camels left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
+function mgHtml(m){const n={};for(const c of m)n[c]=(n[c]||0)+1;return Object.keys(n).map(c=>`<span class="mg" title="${n[c]} ${esc(n[c]>1?MPLUR[c]:MNAME[c])}"><i class="mp" data-c="${c}"></i><b>${n[c]}</b></span>`).join('')}
 function mpHtml(c,h){return `<i class="mp${h?' h':''}" data-c="${c}"></i>`}
 function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   if(t.block)return `<div class="tile blk k-${t.k}" data-tile="${i}" aria-label="${esc(d.n)}"><i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span></div>`;
@@ -5601,7 +5810,7 @@ function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':''].filter(Boolean).join(' ');
   return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
-   <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
+   <div class="ms">${mgHtml(t.m)}${hand.map(c=>mpHtml(c,1)).join('')}</div>
    <div class="tk">${own!=null?`<b class="own${t.tent!=null?'':' cam'}" data-p="${own}" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok palm" data-n="${Math.min(3,t.palm)}">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok pal" data-n="${Math.min(3,t.pal)}">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
@@ -5614,17 +5823,22 @@ function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='trib
 const mvAttr=m=>esc(JSON.stringify(m));
 function abtn(m,label,cls){return `<button class="ab ${cls||''}" data-mv='${mvAttr(m)}'>${label}</button>`}
 function shortOpt(l){let t=String(l).replace(/\s*\(.*?\)/g,'').replace(/:.*$/,'').trim();const w=t.split(/\s+/);return w.length>6?w.slice(0,6).join(' '):t}
-function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const done=new Set(G.bids.map(b=>b.spot));
+// only sensible bids glow: the free spots, plus a cheap spot when the computer would take it (R20: 8-12 coins on round 1 is not sensible); the dear ones stay tappable but quiet
+function bidGood(hp,bm){const k=m=>m.spot+':'+(m.fk||0);const g=new Set();let adv=null;try{adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}
+  for(const m of bm){const pr=bidPrice(hp,m.spot,m.fk);if(pr===0||(pr<=Math.max(1,Math.floor(hp.coins*.06))&&adv&&adv.act==='bid'&&adv.spot===m.spot&&(adv.fk||0)===(m.fk||0)))g.add(k(m))}
+  if(!g.size){let lo=1e9;for(const m of bm)lo=Math.min(lo,bidPrice(hp,m.spot,m.fk));bm.forEach(m=>{if(bidPrice(hp,m.spot,m.fk)===lo)g.add(k(m))})}return m=>g.has(k(m))}
+function trackHtml(hp,vm){const bm=vm.filter(m=>m.act==='bid');const good=bidGood(hp,bm);const done=new Set(G.bids.map(b=>b.spot));
   const ord=['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
-  return `<div class="bidt" aria-label="Turn order">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
-    return `<div class="spot ${b?'taken':''}" style="${b?'--pc:'+PCOL[b.mk.p]:''}"><small class="ord">${ord[s]}</small>${mine.map(m=>`<button class="sp-b glow ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${t.cost} coins${m.fk?' with '+m.fk+' Mystic':''}">${m.fk?`<i>−${m.fk}🔮</i>${bidPrice(hp,s,m.fk)}🪙`:`${t.cost}🪙`}</button>`).join('')||`<span class="sp-c">${t.cost}🪙</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
+  return `<div class="bidt${G.track.length>7?' two':''}" aria-label="Turn order">${G.track.map((t,s)=>{const b=G.bids.find(x=>x.spot===s);const mine=bm.filter(m=>m.spot===s);
+    return `<div class="spot ${b?'taken':''}" style="${b?'--pc:'+PCOL[b.mk.p]:''}"><small class="ord">${ord[s]}</small>${mine.map(m=>`<button class="sp-b ${good(m)?'glow':'dear'} ${m.fk?'fkv':''}" data-mv='${mvAttr(m)}' aria-label="${bidPrice(hp,s,m.fk)?bidPrice(hp,s,m.fk)+' coins':'free'}${m.fk?' with '+m.fk+' Mystic':''}">${m.fk?`<i>−${m.fk}🔮</i>${bidPrice(hp,s,m.fk)}🪙`:`${t.cost}🪙`}</button>`).join('')||`<span class="sp-c">${t.cost}🪙</span>`}${b?'<i class="mk"></i>':''}</div>`}).join('')}</div>`}
 function powerChips(hp,vm){const pw=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(!pw.length)return '';const seen=new Set();let h='';
-  for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay=(m.pay.el?m.pay.el+'●':'')+(m.pay.fk?m.pay.fk+'🔮':'');
+  for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const pay='pay '+[m.pay.el?m.pay.el+' Sage'+(m.pay.el>1?'s':''):'',m.pay.fk?m.pay.fk+' Mystic'+(m.pay.fk>1?'s':''):''].filter(Boolean).join(' + ');
       h+=m.t>=0?`<button class="ab pw${UI.pendDj&&same(UI.pendDj,{k:m.k,pay:m.pay})?' on':''}" data-pw='${mvAttr({k:m.k,pay:m.pay})}'>✨ ${esc(DJ[m.k].n)} <small>${pay}</small></button>`:abtn(m,`✨ ${esc(DJ[m.k].n)} <small>${pay}</small>`,'pw')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);
       if(m.k==='flute'||m.k==='talisman')h+=`<button class="ab pw${UI.pendItem&&UI.pendItem.k===m.k?' on':''}" data-pi="${m.k}">${itemIc(m.k)} ${esc(ITEMS[m.k].n)}</button>`;else h+=abtn(m,`${itemIc(m.k)} ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'pw')}}
   return `<div class="arow pws">${h}</div>`}
 // builds the button area and sets UI.autoMove when the turn needs no decision from the player
+const gdOn=()=>typeof gdStep==='function'&&!!gdStep();   // the guided game shows a button for every step, never an automatic move
 function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal)return '';const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);let h='',main='';
   if(G.q){const q=G.q;main=q.opts.map((o,i)=>qBoardTile(o)!=null?(o.h==='noop'?'':''):abtn({act:'q',i},esc(shortOpt(o.l)),'')).join('');
     const done=q.opts.findIndex(o=>o.h==='noop');if(done>=0)main+=abtn({act:'q',i:done},'Done','go');return `<div class="arow">${main}</div>`}
@@ -5634,20 +5848,22 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
   case 'move':if(G.move){const u=by('undo')[0];main=u?abtn(u,'↶ Put them back','ghost'):(UI.moveSnap&&G.move.drops.length?'<button class="ab ghost" data-ui="undodrop">↶ Undo last drop</button>':'')}break;
   case 'tribe':{const tr=by('tribe');const th=by('thief');const a=G.act;main=th.map(m=>abtn(m,`🦹 ${esc(THIEVES[m.k].n.replace(' Cutpurse',''))}`,'pw')).join('');
     if(a.color==='assassin'){if(tr[0]&&tr[0].none)main+=abtn(tr[0],'No target: carry on','go')}
-    else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;main+=tr.map(m=>abtn(m,`Earn ${(a.n+(m.fk||0))*blues*(G.turnFx.qirsh?2:1)}🪙${m.fk?` +${m.fk}🔮`:''}`,m.fk?'':'go')).join('')}
-    else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
+    else if(a.color==='builder'&&tr.length>1){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;const mx=Math.max(...tr.map(m=>m.fk||0));const ek=G.turn+'|'+a.tile;if(UI.earnKey!==ek){UI.earnKey=ek;const adv=typeof HPL!=='undefined'&&HPL.m&&HPL.m.act==='tribe'&&typeof hintsOn==='function'&&hintsOn()?HPL.m.fk||0:0;UI.earnFk=adv}   // R34: one row, not a stack that squeezes the bazaar
+      UI.earnFk=Math.max(0,Math.min(mx,UI.earnFk||0));const m=tr.find(x=>(x.fk||0)===UI.earnFk)||tr[0];const fk=m.fk||0;
+      main+=`<button class="ab ghost ern-s" data-ui="ernm" aria-label="Spend one Mystic less"${fk?'':' disabled'}>−🔮</button>`+abtn(m,`<b>Earn ${(a.n+fk)*blues*(G.turnFx.qirsh?2:1)}🪙</b><small>${fk?`spend ${fk} of ${mx} Mystic`:`keep your ${mx} Mystic`}</small>`,'ern go')+`<button class="ab ghost ern-s" data-ui="ernp" aria-label="Spend one more Mystic"${fk<mx?'':' disabled'}>+🔮</button>`}
+    else if(tr[0]){const extras=vm.filter(m=>m.act!=='tribe').length;if(extras)main+=abtn(tr[0],'Collect ▶','go');else if(gdOn())main+=abtn(tr[0],'Collect ▶','go');else UI.autoMove=tr[0]}
     break}
   case 'tile':{const tm=by('tile');const t=G.board[G.act.tile];const pl=tm.filter(m=>m.place!=null);const skip=tm.find(m=>m.skip);const extras=vm.filter(m=>m.act!=='tile').length;
-    if(pl.length===1&&!extras)UI.autoMove=pl[0];
+    if(pl.length===1&&!extras&&!gdOn())UI.autoMove=pl[0];
     else if(pl.length>1||pl.length===1){/* choose by tapping a glowing tile */ if(pl.length===1)main+=abtn(pl[0],t.k==='village'?'🏰 Build here':'🌴 Plant here','go')}
     for(const m of tm.filter(m=>m.work))main+=abtn(m,m.work==='art'?'Pay 1 Crafter':'Pay 2 🔮','');
-    if(skip&&!pl.length){if(tm.length===1&&!extras)UI.autoMove=skip;else main+=abtn(skip,'Skip','ghost')}
+    if(skip&&!pl.length){if(tm.length===1&&!extras&&!gdOn())UI.autoMove=skip;else main+=abtn(skip,'Skip','ghost')}
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
-    if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end){UI.autoMove=end;break}
+    if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end&&!gdOn()){UI.autoMove=end;break}
     if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
     main+=abtn(end,'End turn ▶','go');break}}
-  if(main)h+=`<div class="arow">${main}</div>`;return h+pw}
+  if(main)h+=`<div class="arow${main.indexOf('ab ern')>=0?' earn':''}">${main}</div>`;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
 function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
   if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
@@ -5688,7 +5904,7 @@ function onTile(i){const p=me();if(!p)return;if(UI.chz){const same=UI.chz.anchor
   if(G.step==='tile'){const m=vm.find(m=>m.act==='tile'&&m.place===i);if(m)return go(m)}
   nope()}
 function mdotHtml(c){return `<i class="mp lg" data-c="${c}"></i>`}
-function killChip(k){return mdotHtml(k.c)+(k.c2?mdotHtml(k.c2):'')+(k.fk?`<small>+${k.fk}🔮</small>`:'')}
+function killChip(k){return mdotHtml(k.c)+(k.c2?mdotHtml(k.c2):'')+`<small>${k.c2?'2 people':esc(MNAME[k.c]||'')}${k.fk?` · spend ${k.fk} Mystic${k.fk>1?'s':''} for reach`:''}</small>`}
 function onSeat(i){const p=me();if(UI.chz&&UI.chz.anchor.seat===i){UI.chz=null;return render()}if(p&&UI.pickSeat.includes(i)){const ks=validMoves(p.i).filter(m=>m.act==='tribe'&&m.kill&&m.kill.pl===i);if(ks.length===1)return go(ks[0]);if(ks.length)return pickChoose({seat:i},ks.map(m=>({html:killChip(m.kill),m})))}
   UI.chz=null;GX.show('plrd');renderPopups()}
 function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j}"]`);const tm=p&&G.step==='tile'&&!G.q?validMoves(p.i).filter(m=>m.act==='tile'&&m.take):[];if(!tm.length){const r=G.market[j];return showTip(el,`<b>${RICON[r]} ${esc(RNAME[r])}</b>${r==='fakir'?'<br>Mystic: extra power':'<br>Different goods make sets'}`)}
@@ -5697,7 +5913,7 @@ function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j
   if(!UI.mkSel.length){if(tm.some(m=>m.take.includes(j))){UI.mkSel=[j];return render()}return}
   const a=UI.mkSel[0];const m=tm.find(m=>m.take.length===2&&m.take.includes(a)&&m.take.includes(j));UI.mkSel=[];if(m)return go(m);render()}
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
-    if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">${m.pay.el}● ${m.pay.fk?'+ 🔮':''}</span>`,m}))};return render()}}
+    if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">Pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}</span>`,m}))};return render()}}
   const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<img class="tipart" src="media/thief-${k}.webp" alt=""><b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<img class="tipart" src="media/djinn-${k}.webp" alt=""><b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
 function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
@@ -5707,6 +5923,7 @@ function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTime
 function toast(t){const el=$('#line');if(!el)return;el.textContent=t;clearTimeout(UI.tt);UI.tt=setTimeout(()=>{if(G)renderLine()},1800)}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-tile],[data-seat],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.chz!=null){const c=UI.chz;if(c&&c.opts[+d.chz])go(c.opts[+d.chz].m);return}
+  if(UI.chz&&!b.closest('#chz')){UI.chz=null;render();return}   // R25: while a chooser is open everything else is dimmed; a tap there just closes the chooser
   if(d.mv){const m=JSON.parse(d.mv);if(m.ui)return uiAct(m.ui);if(m.act==='sell')UI.sellSel=[];if(typeof sfx==='function')sfx('click');return go(m)}
   if(d.tile!=null)return onTile(+d.tile);
   if(d.seat!=null)return onSeat(+d.seat);
@@ -5728,6 +5945,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pend
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
   switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'goalgo':UI.modal=null;render();schedule();return;case 'more':UI.more=!UI.more;render();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
+  case 'ernm':UI.earnFk=Math.max(0,(UI.earnFk||0)-1);render();return;case 'ernp':UI.earnFk=(UI.earnFk||0)+1;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
 function resetScene(){UI.camp=null;UI.snap=null;UI.chz=null;UI.pendDj=UI.pendItem=null;UI.mkSel=[];UI.sellSel=[];UI.moveSnap=null;UI.hurry=false}
@@ -5737,7 +5955,7 @@ function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!
 // ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?900:1100;/* W480: readable rival pace */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
 
 </script>
@@ -5762,7 +5980,8 @@ function flyEl(inner,cls,from,to,o){o=o||{};const fx=$('#fx');if(!fx||!ANIM)retu
     a.onfinish=fin;setTimeout(fin,dur+(o.delay||0)/spd()+400)}catch(e){fin()}return el}
 function tileEl(i){return document.querySelector(`#grid [data-tile="${i}"]`)}
 function seatEl(i){return document.querySelector(`#seats [data-seat="${i}"]`)}
-function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM)return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.left=at.x+'px';el.style.top=at.y+'px';fx.appendChild(el);setTimeout(()=>el.remove(),1500/spd())}
+function floatText(txt,at,cls){const fx=$('#fx');if(!fx||!ANIM||(G&&G.over))return;const el=document.createElement('div');el.className='ft '+(cls||'');el.textContent=txt;el.style.top=at.y+'px';fx.appendChild(el);const hw=el.offsetWidth*.6+6;el.style.left=Math.max(hw,Math.min(innerWidth-hw,at.x))+'px';   // keep the whole chip on screen (it pops to 1.2x around its centre)
+  setTimeout(()=>el.remove(),1500/spd())}
 function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)return;const flights=[];const gains={},loss={};
   for(let i=0;i<cur.tiles.length;i++){const a=prev.tiles[i],b=cur.tiles[i];if(!a||!b)continue;const ca={},cb={};for(const c of a.m.concat(a.hand))ca[c]=(ca[c]||0)+1;for(const c of b.m.concat(b.hand))cb[c]=(cb[c]||0)+1;
     for(const c of new Set([...Object.keys(ca),...Object.keys(cb)])){const d=(cb[c]||0)-(ca[c]||0);for(let k=0;k<Math.abs(d);k++)(d>0?(gains[c]=gains[c]||[]):(loss[c]=loss[c]||[])).push(i)}}
@@ -5790,12 +6009,19 @@ function animate(prev){const cur=snapState();if(!ANIM||!prev||document.hidden)re
   // scores pop up where they are earned
   const tf=cur.act&&cur.act.tile!=null?tileEl(cur.act.tile):null;
   cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss');if(ss){ss.classList.add('bump')}
-    const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):ctr(se.getBoundingClientRect());floatText((d>0?'+':'−')+Math.abs(d),at,d>0?'up':'dn');if(tf&&i===actor){const p2=ctr(se.getBoundingClientRect());if(Math.hypot(p2.x-at.x,p2.y-at.y)>40)floatText((d>0?'+':'−')+Math.abs(d),p2,d>0?'up':'dn')}})}
+    if(G&&G.over)return;if(G&&!G.coach&&!G.tut)return;   // R25: in Play the seat's labelled pop (playable.js) says it once; no second chip. No score chips over the result card; the chip sits under the seat, never over its name and coins
+    const lab=(G&&G.pl[i]&&G.pl[i].human&&G.pl.filter(x=>x.human).length===1?'You':(G&&G.pl[i]?G.pl[i].nm:''))+' '+(d>0?'+':'−')+Math.abs(d)+(Math.abs(d)===1?' pt':' pts');   // every chip says whose points and that they are points
+    const sr=se.getBoundingClientRect();const at=tf&&i===actor?ctr(tf.getBoundingClientRect()):{x:sr.left+sr.width/2,y:sr.bottom+14};floatText(lab,at,d>0?'up':'dn')})}
+// the chooser lights its sensible option (the computer's own pick for you, or the best Shadow target); the rest stay tappable
+function chzBest(c){try{const hp=me();if(!hp)return 0;let adv=null;const cz=UI.chz;try{UI.chz=null;adv=typeof hlpAdvice==='function'?hlpAdvice():null}catch(e){}finally{UI.chz=cz}   // R38: the advice is read as if the chooser were shut, so the planned colour is the one marked best
+  if(adv){const j=c.opts.findIndex(o=>same(o.m,adv));if(j>=0)return j}
+  if(typeof scStepBest==='function'&&c.opts.length&&c.opts.every(o=>o.m&&o.m.act==='step')){const j=scStepBest(c.opts.map(o=>o.m));if(j>=0)return j}
+  const ms=c.opts.map(o=>o.m);if(ms.every(m=>m.act==='tribe'&&m.kill)){const b=bestKill(hp,ms);const j=ms.indexOf(b);if(j>=0)return j}}catch(e){}return 0}
 function seatPoint(i){const se=seatEl(i);return se?ctr(se.getBoundingClientRect()):{x:innerWidth/2,y:20}}
 // ---------- the pop-over for a choice on a tile, a seat or a card ----------
-function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;if(!c||!G){el.hidden=true;el.innerHTML='';return}
-  el.innerHTML=c.opts.map((o,i)=>`<button class="chb glow" data-chz="${i}">${o.html}</button>`).join('');el.hidden=false;
-  const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}
+function placeChz(){const el=$('#chz');if(!el)return;const c=UI.chz;for(const q of document.querySelectorAll('.chzanc'))q.classList.remove('chzanc');document.documentElement.classList.remove('chzon');if(!c||!G){el.hidden=true;el.innerHTML='';return}
+  const bi=chzBest(c);el.innerHTML=c.opts.map((o,i)=>`<button class="chb${i===bi?' glow':''}" data-chz="${i}">${o.html}${i===bi&&c.opts.length>1?'<small class="chbest">best</small>':''}</button>`).join('');el.hidden=false;
+  const a=c.anchor;const ae=a.tile!=null?tileEl(a.tile):a.seat!=null?seatEl(a.seat):a.dj?document.querySelector(`[data-dj="${a.dj}"],[data-th="${String(a.dj).replace('t:','')}"]`):null;if(!ae){el.hidden=true;return}ae.classList.add('chzanc');document.documentElement.classList.add('chzon');   // R25: only the chooser and its tile stay lit
   const r=ae.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;let x=r.left+r.width/2-w/2;x=Math.max(6,Math.min(innerWidth-w-6,x));let minY=50;for(const id of ['line','trk','trk2','coach','turnover']){const q=document.getElementById(id);if(q&&!q.hidden&&q.getClientRects().length){const b=q.getBoundingClientRect().bottom;if(b>minY)minY=b}}minY+=4;let y=r.top-h-8;if(y<minY)y=r.bottom+8;if(y+h>innerHeight-6)y=Math.max(minY,innerHeight-h-6);
   el.style.left=x+'px';el.style.top=y+'px'}
 // ---------- the ghost finger: shows one real, legal move to the new player, and stays away after a few moves ----------
@@ -5829,7 +6055,7 @@ function statusHtml(p){const s=scoreOf(p);const L=(ic,n,lab,t)=>`<span class="st
    <div class="sts">${L('🪙',p.coins,'coins')}${L('🐪',p.camels,'camels')}${p.tent?L('⛺',1,'tent'):''}${L(mdot('vizier'),p.vz,'Advisors')}${L(mdot('elder'),p.el,'Sages')}${G.ex.artisans?L(mdot('artisan'),p.art,'Crafters'):''}${L('🔮',p.fk,'Mystics','Mystic cards: add power to Masons or Shadows, or stand in for a Sage')}${L('🧺',p.res.length,'goods · set '+goodsBest(p),'goods cards; the set is worth '+goodsBest(p)+' points now')}${p.dj.length?L('🧞',p.dj.length,'djinns'):''}</div></div>`}
 function scoreTable(){const rows=G.over.scores;const keys=['coins','advisors','sages','crafters','djinns','tiles','palms','palaces','goods','items','cities','total'];const nm={coins:'🪙 Coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'Djinns',tiles:'Tiles',palms:'Palms',palaces:'Palaces',goods:'Goods',items:'Items',cities:'Cities',total:'★ Total'};
   const epi=rows.map(r=>{const best=keys.filter(k=>k!=='total').sort((a,b)=>r.s[b]-r.s[a])[0];return `<li>${pChip(P(r.p))}: most of the points came from <b>${nm[best]}</b> (${r.s[best]}).</li>`}).join('');
-  return `<div class="prompt"><h3>${pIc('ui-trophy.webp','🏆')} ${esc(G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
+  return `<div class="prompt"><h3>${pIc('ui-trophy.webp','🏆')} ${esc(typeof plName==='function'?plName(G.winText):G.winText)}</h3><ul class="story">${epi}</ul><div class="tw"><table><tr><th></th>${rows.map(r=>`<th>${pChip(P(r.p))}</th>`).join('')}</tr>${keys.filter(k=>k==='total'||rows.some(r=>r.s[k])).map(k=>`<tr class="${k==='total'?'tot':''}"><td>${nm[k]}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
 function renderPopups(){if(GX.open==='logd'){const lb=$('#logbody');lb.innerHTML=`<ol class="log">${G.log.slice(0,300).reverse().map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;lb.scrollTop=lb.scrollHeight}
   if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>playerSheet(p)).join('');
   if(GX.open==='djd'&&$('#djbody').dataset.v!==String(G.logN))renderDjPop()}
@@ -5876,7 +6102,7 @@ function cardArt(kind,name,o){o=o||{};if(o.img&&typeof PAINT_ON!=='undefined'&&P
 function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='offer'&&typeof offerHtml==='function'?offerHtml():UI.modal==='start'?startHtml():UI.modal==='over'&&G&&G.over?overHtml():UI.modal==='lobby'&&online()?lobbyHtml():UI.modal==='goal'?goalHtml():'';m.hidden=!h;if(m.dataset.h!==h){
   const a=document.activeElement,id=a&&m.contains(a)&&a.id,sel=id&&a.selectionStart!=null?[a.selectionStart,a.selectionEnd]:null;const det=[...m.querySelectorAll('details')].map(d=>d.open);
   m.innerHTML=h;m.dataset.h=h;if(UI.modal==='start')paintOpening();[...m.querySelectorAll('details')].forEach((d,i)=>{if(det[i]!=null)d.open=det[i]});if(id){const e=document.getElementById(id);if(e){e.focus({preventScroll:true});if(sel)try{e.setSelectionRange(sel[0],sel[1])}catch(x){}}}}}
-UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
+UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','easy','easy','easy','easy'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox start"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>Sands of Qamar</h2><p class="lede">Collect tribes. Claim land. Win the bazaar.</p>
    <div class="seg qrow">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>
@@ -6099,17 +6325,17 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 // This file: the menu entry, the first-time offer, start and leave. The rules list and the coach itself: coach.js.
 const TUT_GAME='sands-of-qamar';
 const tutOn=()=>false;                 // no spotlight tutorial any more
-const tutHeld=()=>false;
+const tutHeld=()=>typeof guideHeld==='function'&&guideHeld();   // the guided steps hold the computer (guide.js)
 function firstTime(){try{if(typeof GXT==='undefined'||GXT.status(TUT_GAME).seen)return false;if(FING.n>0)return false;if(localStorage.getItem(SAVE))return false}catch(e){}return true}
 const tutBtn=cls=>{if(typeof GXT==='undefined')return '';let done=false;try{done=GXT.isDone(TUT_GAME)}catch(e){}const first=firstTime();
-  return `<button type="button" class="${cls} gxt-menu ${first?'gxt-first':''}" data-a="learn" data-ui="tutgo" data-coach-entry><b>${done?'Coached game ✓':'New here? Learn by playing'}</b><span>${done?'Play it again with Hadiya':'A short real game, rules explained as you play'}</span></button>`};
+  return `<button type="button" class="${cls} gxt-menu ${first?'gxt-first':''}" data-a="learn" data-ui="tutgo" data-coach-entry><b>${done?'Coached game ✓':'New here? Learn by playing'}</b><span>${done?'Play it again with Hadiya':'Every rule, one tap at a time, then a real game'}</span></button>`};
 function tutMenuFill(){const el=document.getElementById('gxtmenu');if(el)el.innerHTML=tutBtn('btn')}
 function tutOffer(next){if(typeof GXT==='undefined'||online())return false;let seen='1';try{seen=localStorage.getItem('soq_tutoffer')}catch(e){}
   return false;if(seen||!firstTime())return false;try{localStorage.setItem('soq_tutoffer','1')}catch(e){}UI.offerNext=next;UI.modal='offer';render();return true}
-function offerHtml(){return `<div class="mbox"><h2>New here?</h2><p class="lede">Play one short coached game. Hadiya explains each rule when it matters. About 8 minutes.</p><div class="acts big"><button class="btn go big" data-ui="tutgo">▶ Play a coached game</button><button class="btn big" data-ui="tutplay">Just play</button></div></div>`}
+function offerHtml(){return `<div class="mbox"><h2>New here?</h2><p class="lede">Play one short coached game. Hadiya explains each rule when it matters. About 5 minutes.</p><div class="acts big"><button class="btn go big" data-ui="tutgo">▶ Play a coached game</button><button class="btn big" data-ui="tutplay">Just play</button></div></div>`}
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStart(o){UI.coachStory=!!(o&&o.prologue);try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;coachBegin();UI.modal='goal';COACH.seen.goal=1;refresh();render()}
-function tutLeave(){clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;coachEnd();G=null;resetScene();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}render()}
+function tutStart(o){UI.coachStory=!!(o&&o.prologue);try{GX.close()}catch(e){}clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;resetScene();tutNew();UI.snap=null;coachBegin();if(typeof guideBegin==='function')guideBegin();COACH.seen.goal=1;refresh();render()}
+function tutLeave(){if(typeof guideEnd==='function')guideEnd();clearTimeout(aiTimer);aiTimer=null;clearTimeout(UI.autoT);UI.autoT=0;coachEnd();G=null;resetScene();UI.modal=null;UI.fx.length=0;UI.fxSeen=0;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}render()}
 
 </script>
 <script>
@@ -6236,7 +6462,9 @@ const LORE={
   endStory:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. Now the real caravans come."',
   quickIntro:'Collect tribes, claim land, and score the most points.',
   win:['The bazaar sings your name. The throne of Qamar is yours!','Your camels hold the best land. Qamar bows to you.'],
-  lose:['Your rival won this time. Want to try again?','So close! Want another game?'],
+  lose:['Your rival won this time. Want to try again?','Another try? Every game teaches something.'],
+  loseClose:['So close! Just a few points short. Another game?','A hair\'s breadth! One better walk and it was yours.'],
+  loseFar:['The rival ran away with this one. Try grabbing more land and selling goods in sets.','A tough game. Next time aim for big Advisor and Sage hauls and full goods sets.'],
   turn:{you:'Your turn',bid:'Bid for turn order'}
 };
 // ---- the coached first game: Hadiya explains each rule when it first matters (coach.js decides when; ids = TUTORIAL-COVERAGE.md) ----
@@ -6282,36 +6510,58 @@ LORE.coachLater=['Story mode adds Crafters, Cutpurses and Wonder Cities.','No le
 const PL={seed:null,logN:0,tot:null,lastId:null,pops:0,banT:0,reactT:0};
 const plEl=(id,cls)=>{let e=document.getElementById(id);if(!e){e=document.createElement('div');e.id=id;e.className=cls||'';e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');document.body.appendChild(e)}return e};
 function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length===1){const nm=hs[0].nm;t=t.split(nm+"'s").join('Your').split(nm).join('You')}
-  const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring'};
-  return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings)\b/g,(m,v)=>'You '+V[v])}
+  const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring',wins:'win'};
+  return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings|wins)\b/g,(m,v)=>'You '+V[v])}
 function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the coach and the tracker say it
   const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
 const PLQ=[];let PLQB=false;
 function plPop(i,d,why){if(G&&G.coach)return;   // in Learn to play the coach explains every change, one message at a time
   PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
-function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}const [i,d,why]=PLQ.shift();const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
+function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();if(G&&!G.over&&me()&&me().i!==i&&G.phase==='turn'){plPopNext();return}   // a rival's pop never lands during your own turn
+  const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
-  e.innerHTML='<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>'+(why?'<span>'+esc(why)+'</span>':'');document.body.appendChild(e);PLQB=true;
-  const w=e.offsetWidth;const tr=document.getElementById('trk');const tb=tr&&!tr.hidden?tr.getBoundingClientRect().bottom:r.bottom;const land=document.documentElement.classList.contains('land');e.style.left=(land?Math.max(6,Math.min(innerWidth-w-6,r.left)):Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)))+'px';e.style.top=(land?Math.round(innerHeight*.58):tb+4)+'px';const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;setTimeout(()=>{e.remove();PLQB=false;plPopNext()},ms)}
+  e.innerHTML=why?'<span>'+esc(why)+'</span>':'<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>';document.body.appendChild(e);PLQB=true;
+  // R38 row 4: the pop lives IN the score bar (it covers the step tracker, or the scorer's seat chip), never on the tile grid
+  const bar=()=>{const t2=document.getElementById('trk');if(t2&&!t2.hidden){const q=t2.getBoundingClientRect();if(q.width>40&&q.height>8)return q}const s2=seatEl(i);return s2?s2.getBoundingClientRect():r};
+  const place=()=>{const q=bar();e.style.left=Math.round(q.left)+'px';e.style.top=Math.round(q.top)+'px';e.style.width=Math.round(q.width)+'px';e.style.height=Math.max(22,Math.round(q.height))+'px'};
+  e.classList.add('inbar');place();const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;
+  const keep=setInterval(()=>{if(e.isConnected)place()},120);
+  setTimeout(()=>{clearInterval(keep);e.remove();PLQB=false;plPopNext()},ms)}
 function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
+// R25: every score pop's number is the sum of the reasons it names. One part changed: "You lose 3 pts: spent 3 coins" /
+// "Teal scores 5 pts from palaces". Several parts: "You score 2 pts: palaces +5, coins \u22123" (the listed numbers add up to the headline).
+const PL_LAB={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',palms:'palms',palaces:'palaces',goods:'goods sets',items:'treasures',cities:'cities',tiles:'tiles held'};
+function plParts(a,b,hideItems){return Object.keys(PL_LAB).filter(k=>!(hideItems&&k==='items')&&a&&b&&(b[k]||0)!==(a[k]||0)).map(k=>[k,(b[k]||0)-(a[k]||0)]).sort((x,y)=>Math.abs(y[1])-Math.abs(x[1]))}
+function plWhy(i,d,a,b){const p=G.pl[i];const you=seatName(p)==='You';const n=Math.abs(d);
+  const head=(you?(d>0?'You score ':'You lose '):(p.nm+(d>0?' scores ':' loses ')))+n+' pt'+(n===1?'':'s');
+  const ps=plParts(a,b,online()&&p.i!==NET.mySeat&&!G.over);const sum=ps.reduce((t,x)=>t+x[1],0);if(!ps.length||sum!==d)return head;
+  if(ps.length===1){const [k,c]=ps[0];const m=Math.abs(c);
+    if(k==='coins')return head+(c<0?': spent ':': earned ')+m+' coin'+(m===1?'':'s');
+    if(k==='sages'&&c<0)return head+': used Sages';
+    if(k==='goods'&&c<0)return head+': goods sold';
+    if(k==='advisors'&&c<0)return head+(c<=-10?': lost the Advisor lead':': fewer Advisors');
+    return head+' from '+PL_LAB[k]}
+  return head+': '+ps.map(([k,c])=>PL_LAB[k]+' '+(c>0?'+':'\u2212')+Math.abs(c)).join(', ')}
 function plShort(t){return plName(String(t||'')).replace(/^[^\w—]+/,'').replace(/\.$/,'')}
 function plAfter(){if(!G){return}
   if(PL.seed!==G.seed){PL.seed=G.seed;PL.logN=G.logN;PL.tot=null;if(!G.tut&&!G.coach&&!G.over&&!(UI.camp))plBanner('Bid for turn order',LORE.quickIntro,'')}
   else if(G.logN>PL.logN){const fresh=G.log.filter(e=>e.i>PL.logN).reverse();PL.logN=G.logN;if(!G.tut&&!G.coach&&!G.over)for(const e of fresh){
     if(e.c==='turn'){const m=/— (.+)'s turn —/.exec(e.t);const nm=m?m[1]:'';const mine=G.pl.some(p=>p.nm===nm&&p.human)&&G.pl.filter(p=>p.human).length===1;plBanner(mine?LORE.turn.you:nm+"'s turn",mine?'Tap a glowing tile to start':'Watch each step. Tap the board to speed up.',mine?'mine':'rival')}
     else if(e.c==='round'&&G.round>1)plBanner(LORE.turn.bid,'Dearer spots play earlier','')}}
-  const tot=G.pl.map(p=>shownTotal(p));if(PL.tot&&PL.tot.length===tot.length&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t))){const e=G.log[0];plPop(i,d,e&&e.c!=='turn'?plShort(e.t):'')}});PL.tot=tot;
+  const tot=G.pl.map(p=>shownTotal(p)),parts=G.pl.map(p=>scoreOf(p));if(PL.tot&&PL.tot.length===tot.length&&PL.parts&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t)))plPop(i,d,plWhy(i,d,PL.parts[i],parts[i]))});PL.tot=tot;PL.parts=parts;
   if(typeof tutOn==='function'&&tutOn()){const st=GXT.state();if(st&&st.shown&&st.id!==PL.lastId){const prev=PL.lastId;PL.lastId=st.id;const L=LORE.tut[prev];if(L&&L.react){const t=typeof L.react==='function'?L.react():L.react;const who=['sages','advisors'].includes(prev)?LORE.rival:LORE.guide;plSay(prev==='tribes'||prev==='sages'||prev==='advisors'?LORE.rival:LORE.guide,t)}}}
   else PL.lastId=null}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
 // the instruction line: the rival's turn is told step by step in plain words (the engine's own log line), the pick-who-stays popup says so
+// the rival's caption stays one short line: no bracketed detail, 8 words at most
+function plCap(t){const w=String(t).replace(/\s*\([^)]*\)/g,'').trim().split(/\s+/);return w.length>8?w.slice(0,8).join(' ').replace(/[,;:]$/,''):w.join(' ')}
 (function(){const o=lineText;lineText=function(){const t=o();if(!G||G.over||online())return t;
   if(me()&&UI.chz&&G.step==='move')return 'Pick who stays on this tile';
-  if(!me()&&!G.q&&!G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for/.test(e.t))return plShort(e.t)}
-  if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plShort(e.t)}
+  if(!me()&&!G.q&&!G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for/.test(e.t))return plCap(plShort(e.t))}
+  if(!me()&&G.tut){const e=G.log[0];if(e&&e.c!=='turn'&&e.c!=='round'&&!/opens for|tutorial/.test(e.t))return plCap(plShort(e.t))}
   return t}})();
 // the result speaks in the game's voice
-(function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const a=won?LORE.win:LORE.lose;const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
+(function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const tops=G.pl.map(x=>shownTotal(x)),gap=mp?Math.max(...tops)-shownTotal(mp):0,rel=gap/Math.max(1,Math.max(...tops));const a=won?LORE.win:(gap<=10||rel<=0.08)?LORE.loseClose:(rel>=0.35?LORE.loseFar:LORE.lose);const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
 // the tutorial as the prologue: the guide's and the rival's words replace the plain lessons (same ids, same targets, same waits)
 function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)return s;const ch=LORE.chapters[s.id];const rival=['order','sages','advisors'].includes(s.id);const who=rival?LORE.rival:LORE.guide;
   const say=()=>{const v=L.say;if(typeof v!=='function')return v;
@@ -6319,6 +6569,19 @@ function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)retur
     if(s.id==='masons')return v(bluesAround(TUT_ME.t2.path[2][0]).length);
     if(s.id==='score'){const sc=G.over?G.over.scores:[];const a=sc.find(x=>x.p===0),b=sc.find(x=>x.p===1);return v(a?a.s.total:0,b?b.s.total:0)}return ''};
   return Object.assign({},s,{title:()=>ch?'Ch.'+ch.n+' '+ch.t:who.face+' '+who.name,say})})}
+
+// ---- W497: a visible Skip button while the computer plays (a tap on the table still works too) ----
+(function(){const r=render;render=function(){r.apply(this,arguments);try{let b=document.getElementById('skipai');
+  const on=!!(G&&!G.over&&!UI.modal&&G.pl.some(p=>p.human)&&sideToAct()>=0&&!P(sideToAct()).human&&!online()&&!tutHeld()&&!UI.hurry);
+  if(!b&&on){b=document.createElement('button');b.id='skipai';b.type='button';b.textContent='Skip \u25B6\u25B6';b.setAttribute('aria-label','Skip the rival turn');
+    b.addEventListener('click',e=>{e.stopPropagation();UI.hurry=true;b.hidden=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;schedule()}});document.body.appendChild(b)}
+  if(b){b.hidden=!on;const l=document.getElementById('line');if(on&&l){const q=l.getBoundingClientRect();if(q.height)b.style.top=Math.round(q.top+q.height/2-22)+'px'}}}catch(e){}}})();
+
+// ---- R25: nothing under an open sheet (drawer, menu, result) keeps its glow: it could not be tapped there, so it must not look tappable ----
+function plCover(){try{const cov=!!((typeof GX!=='undefined'&&GX.open)||document.querySelector('.gx-drawer.on')||(G&&UI.modal));const IN='.gx-drawer,#modal,.mbox,#chz';
+  if(cov){for(const e of document.querySelectorAll('.glow'))if(!e.closest(IN)){e.classList.remove('glow');e.classList.add('litoff')}}
+  else for(const e of document.querySelectorAll('.litoff')){e.classList.remove('litoff');e.classList.add('glow')}}catch(e){}}
+(function(){const r=render;render=function(){r.apply(this,arguments);plCover()}})();setInterval(plCover,150);
 
 </script>
 <script>
@@ -6401,8 +6664,10 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
    {t:'Palms and palaces',h:hd+row('Palms',a.palms,b.palms,'3 points per palm on a tile you hold. You: '+(a.palms/3)+' palm'+(a.palms===3?'':'s')+'.')+row('Palaces',a.palaces,b.palaces,'5 points per palace on a tile you hold. You: '+(a.palaces/5)+'.')},
    {t:'People',h:hd+row('Sages',a.sages,b.sages,'2 points each. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
    {t:'Djinns and goods',h:hd+row('Djinns',a.djinns,b.djinns,'You hold '+pa.dj.length+', Farid '+pb.dj.length+'; each scores its own points.')+row('Goods',a.goods,b.goods,'Sets of different kinds score 1, 3, 7, 13. Your goods: '+pa.res.filter(r=>r!=='fakir').length+' cards in '+gs({res:pa.res.filter(r=>r!=='fakir')})+' kinds.')},
-   {t:'The count',h:hd+row('Total',a.total,b.total,esc(plName(G.winText)))}];
+   {t:'The count',h:hd+[['Land',a.tiles,b.tiles],['Coins',a.coins,b.coins],['Palms',a.palms,b.palms],['Palaces',a.palaces,b.palaces],['Sages',a.sages,b.sages],['Advisors',a.advisors,b.advisors],['Djinns',a.djinns,b.djinns],['Goods',a.goods,b.goods]].filter(x=>x[1]||x[2]).map(x=>`<div class="ce-r ce-s"><span>${x[0]}</span><b>${x[1]}</b><b>${x[2]}</b></div>`).join('')+row('Total',a.total,b.total,esc(plName(G.winText)))}];   // R38 row 2: the last page shows how each total was made, source by source
   const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).slice(0,6).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(['Everything else is in How to play.']).map(x=>x.startsWith('<li>')?x:'<li>'+esc(x)+'</li>').join('');
+  {const m=(x,y,t)=>({t,h:x.h+y.h.replace(hd,'')});pages.splice(0,4,m(pages[0],pages[1],'Land and coins'),m(pages[2],pages[3],'People, djinns and goods'))}   // 3 pages, not 5
+  if(typeof GD!=='undefined'&&GD.i>0){pages[pages.length-1].last=1;return pages}   // the guided game taught every rule: no "later" list
   pages.push({t:"Things you'll meet later",h:'<ul class="ce-l">'+later+'</ul>',last:1});return pages}
 function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let o=document.getElementById('coachend');
   if(!o){const pages=coachPages();COACH.pages=pages;COACH.pg=0;o=document.createElement('div');o.id='coachend';o.className='coachend';o.setAttribute('data-help','');document.body.appendChild(o);
@@ -6421,6 +6686,118 @@ window.GXCOACH={get running(){return !!(G&&G.coach&&!G.over)},get explained(){re
 
 // QA hook: the shell tutor API (GXT) also reports the coached game, so the feel audit finds, starts and plays Learn
 try{if(typeof GXT!=='undefined'){const r=GXT.running&&GXT.running.bind(GXT),s=GXT.state&&GXT.state.bind(GXT);GXT.running=()=>!!(r&&r())||!!(G&&G.coach&&!G.over);GXT.state=()=>{const x=s?s():null;return x&&x.active?x:(G&&G.coach&&!G.over?{active:true,phase:'end',coached:true}:x)}}}catch(e){}
+
+</script>
+<script>
+// ===================== the GUIDED first game (gameplay gate, W497) =====================
+// The tutorial is a real two-player game on the stacked board of tutdata.js, played in a fixed order: each step teaches ONE rule,
+// in ONE sentence of 12 words or fewer, with ONE highlighted tap (your move, or Next while Farid's scripted move is shown).
+// Every core rule comes up in order: bidding, both markers, moving, last colour, taking, camels, every tribe, every tile,
+// Mystics, goods sets and selling, djinns, the round, Shadows' kills, the last camel and the final count. Then a real game.
+// Only the highlighted move is accepted while a step waits; Farid's moves are scripted (the AI is held) until the last turn.
+// The count (coach.js pages) walks every scoring rule, one page per tap. guide-test.js walks it all by touch.
+const GD=(()=>{
+  const B=(spot)=>({act:'bid',spot}),S=(tile)=>({act:'start',tile}),D=(tile,c)=>({act:'step',tile,c});
+  // who: 'me' = your highlighted move m; 'note' = Next (ms = Farid's moves played on Next); 'auto' = Farid's move played at once, no bubble
+  const STEPS=[
+   {id:'goal',who:'note',say:'Most points wins. Coins, land, people, goods and djinns score.'},
+   {id:'bid',who:'me',m:B(5),say:'Bid for turn order: dearer spots play first. Tap 1 coin.'},
+   {id:'bidfree',who:'auto',ms:[B(6)]},
+   {id:'markers',who:'me',m:B(7),say:'Farid took a free spot. You have two markers: take one too.'},
+   {id:'order',who:'note',ms:[B(8)],say:'Same price: the later bidder plays first. Farid goes second.'},
+   {id:'lift',who:'me',m:S(24),say:'Your turn. Tap a tile to lift everyone on it.'},
+   {id:'drop',who:'me',m:D(25,'merchant'),say:'Drop one per tile: up, down, left or right.'},
+   {id:'noback',who:'me',m:D(26,'merchant'),say:'Never step straight back. Drop the next one onward.'},
+   {id:'lastcolour',who:'me',m:D(27,'merchant'),say:'The last one must land on its own colour.'},
+   {id:'traders',who:'me',m:{act:'tribe'},say:'Take all Traders; your camel claims the emptied tile. Collect goods.'},
+   {id:'stall',who:'me',m:{act:'tile',take:[0]},say:'Stall: 3 coins buys a card. Take this Mystic; Mystics never score.'},
+   {id:'sell',who:'me',m:{act:'sell',kinds:['fish','pottery','silk','wheat']},say:'Four different goods sell for 13 coins. Sell them all.'},
+   {id:'done',who:'me',m:{act:'end'},say:'Selling is the last part of a turn. Tap End turn.'},
+   {id:'sages',who:'note',ms:[S(11),D(10,'elder'),D(9,'elder'),D(8,'elder'),{act:'tribe'},{act:'tile',dj:'hikma',pay:{el:2,fk:0}},{act:'end'}],say:'Sages score 2 each. At a Shrine, two Sages summon a djinn.'},
+   {id:'choose',who:'me',m:S(19),say:'Lift this mixed tile. You choose which colour drops where.'},
+   {id:'chz',who:'me',m:D(20,'vizier'),say:'Drop an Advisor here. Keep the Mason for the end.'},
+   {id:'pass',who:'me',m:D(21,'vizier'),say:'Any tile can be passed through. The other Advisor here.'},
+   {id:'masonland',who:'me',m:D(15,'builder'),say:'The Mason lands on Masons. You take all four.'},
+   {id:'masons',who:'me',m:{act:'tribe'},say:'Masons earn coins per blue tile around. Keep the Mystic: Earn 20.'},
+   {id:'hamlet',who:'me',m:{act:'tile',place:15},say:'Hamlet: you must raise a palace. Palaces score 5.'},
+   {id:'done2',who:'me',m:{act:'end'},say:'Nothing to sell. Tap End turn.'},
+   {id:'advisors',who:'note',ms:[S(5),D(4,'vizier'),D(3,'vizier'),D(2,'vizier'),{act:'tribe'},{act:'tile',place:2},{act:'end'}],say:'Advisors: 1 each, +10 per rival with fewer. Oasis: palm, 3 points.'},
+   {id:'bid2',who:'me',m:B(6),say:'Round over, the row refills. Bid again: take a free spot.'},
+   {id:'r2a',who:'auto',ms:[B(7)]},
+   {id:'bid3',who:'me',m:B(8),say:'Your second marker takes the last free spot.'},
+   {id:'zeros',who:'note',ms:[B(4)],say:'Only three free spots: Farid must pay, so he plays first.'},
+   {id:'bazaar',who:'note',ms:[S(12),D(13,'builder'),D(19,'assassin'),D(18,'merchant'),{act:'tribe'},{act:'tile',take:[3,5]},{act:'end'}],say:'Grand Bazaar: Farid pays 6 coins for two of the first six.'},
+   {id:'lift3',who:'me',m:S(29),say:'Lift these three. A Shadow will end on Shadows.'},
+   {id:'s1',who:'me',m:D(28,'vizier'),say:'The Advisor drops here.'},
+   {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
+   {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. Last camel: this is the final round.'},
+   {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap Farid’s glowing box.'},
+   {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
+   {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},
+   {id:'rival',who:'note',ms:[S(21),D(15,'assassin'),D(9,'merchant'),D(8,'vizier'),D(7,'builder'),{act:'tribe'},{act:'tile',dj:'nakhla',pay:{el:2,fk:0}},{act:'end'}],say:'Farid plays by the same rules: Masons, then another djinn.'},
+   {id:'lift4',who:'me',m:S(1),say:'Last turn. Lift this tile.'},
+   {id:'t1',who:'me',m:D(7,'vizier'),say:'Drop the Advisor here.'},
+   {id:'t2',who:'me',m:D(13,'assassin'),say:'Drop the Shadow here.'},
+   {id:'t3',who:'me',m:D(14,'elder'),say:'The Sage lands on a Shrine holding a Sage.'},
+   {id:'sages2',who:'me',m:{act:'tribe'},say:'You keep Sages: 2 points each, and they pay for djinns.'},
+   {id:'summon',who:'me',m:{act:'tile',dj:'wahha',pay:{el:2,fk:0}},say:'Summon Wahha with your two Sages.'},
+   {id:'power',who:'me',m:{act:'djinn',k:'wahha',t:22,pay:{el:0,fk:1}},say:'Use its power once per turn: pay your Mystic, plant a palm.'},
+   {id:'last',who:'me',m:{act:'end'},say:'Tap End turn. The round ends, then the game.'}];
+  return {STEPS,i:0,on:false,busy:false};
+})();
+const gdStep=()=>GD.on&&G&&G.coach&&!G.over?GD.STEPS[GD.i]||null:null;
+function guideHeld(){return !!gdStep()}
+const gdEq=(a,b)=>{const k=v=>JSON.stringify(v,(q,x)=>x&&typeof x==='object'&&!Array.isArray(x)?Object.keys(x).sort().reduce((o,z)=>(o[z]=x[z],o),{}):x);return k(a)===k(b)};
+function guideBegin(){GD.on=true;GD.i=0;GD.busy=false;GD.told=[];document.body.classList.add('guiding')}
+function guideEnd(){GD.on=false;GD.busy=false;document.body.classList.remove('guiding');document.querySelectorAll('.gd-hl').forEach(e=>e.classList.remove('gd-hl'))}
+function gdNext(){GD.i++;GD.busy=false;if(!GD.STEPS[GD.i]){guideEnd();try{schedule()}catch(e){}}try{render()}catch(e){}}
+// Farid's scripted moves, one every 0.6 s so they can be watched; 'ai' = his own computer turn
+function gdPlay(ms,done){GD.busy=true;const q=ms==='ai'?null:ms.slice();
+  const tick=()=>{if(!G||G.over){GD.busy=false;return}
+    if(q){if(!q.length)return done();const m=q.shift();GD.go(m)}
+    else{if(sideToAct()!==1||G.phase!=='turn')return done();const m=aiMove(1);if(!m)return done();GD.go(m)}
+    setTimeout(tick,ANIM?450:0)};tick()}
+// the move the current step asks for (also what the hint finger points at)
+function gdTarget(st){if(!st)return null;const q=s=>document.querySelector(s);
+  if(st.who!=='me')return q('#coach button');
+  const m=st.m;if(UI.chz){const j=UI.chz.opts.findIndex(o=>gdEq(o.m,m));if(j>=0)return q(`[data-chz="${j}"]`)}
+  if(m.act==='djinn'){if(UI.pendDj&&UI.pendDj.k===m.k)return tileEl(m.t);return [...document.querySelectorAll('[data-pw]')].find(b=>{try{return JSON.parse(b.dataset.pw).k===m.k}catch(e){return false}})||null}
+  if(m.act==='tribe'&&m.kill){if(m.kill.pl!=null)return q(`[data-seat="${m.kill.pl}"]`);return tileEl(m.kill.tile)}
+  let el=null;try{el=fingerEl(m)}catch(e){}
+  if(!el&&m.act==='sell'){el=[...document.querySelectorAll('[data-mv]')].find(b=>{try{const x=JSON.parse(b.dataset.mv);return x.act==='sell'&&gdEq(x,m)}catch(e){return false}})||null;
+    if(!el){const k=m.kinds.find(r=>!(UI.sellSel||[]).includes(r));el=k?q(`[data-sell="${k}"],[data-res="${k}"]`):null}}
+  return el}
+function guideDraw(){const st=gdStep();document.querySelectorAll('.gd-hl').forEach(e=>e.classList.remove('gd-hl'));if(!st)return;
+  if(st.who==='auto'){if(!GD.busy&&!UI.modal)gdPlay(st.ms,gdNext);return}
+  if(UI.modal&&UI.modal!=='goal')return;if(UI.modal==='goal'){UI.modal=null}
+  const e=coachEl();if(COACH.cur!=='gd:'+st.id){clearTimeout(COACH.t);e.querySelector('i').textContent=LORE.guide.face;
+    e.querySelector('span').innerHTML='<b>'+esc(LORE.guide.name)+' · '+GD.STEPS.slice(0,GD.i+1).filter(s=>s.say).length+'/'+GD.STEPS.filter(s=>s.say).length+'</b>'+esc(st.say);
+    COACH.cur='gd:'+st.id;COACH.shownAt=Date.now();if(!GD.told.includes(st.id))GD.told.push(st.id);
+    const tc=document.getElementById('turnover');if(tc)tc.classList.remove('on');e.classList.add('on');try{fit()}catch(x){}}
+  clearTimeout(COACH.t);e.classList.add('on');const b=e.querySelector('button');b.hidden=st.who==='me';b.textContent=GD.busy?'…':'Next ▶';b.setAttribute('aria-label','Next');
+  b.style.visibility=GD.busy?'hidden':'';
+  const t=gdTarget(st);if(t&&!GD.busy)t.classList.add('gd-hl');
+  // only the step's own target may look lit or live: every other glow goes out, every other action button is greyed (R27: 12 dead tutorial taps)
+  const own=e=>!!t&&!GD.busy&&(e===t||e.contains(t)||t.contains(e));
+  document.querySelectorAll('.glow').forEach(e=>{if(!own(e))e.classList.remove('glow')});
+  document.querySelectorAll('#acts button,#chz button,#mine button').forEach(e=>{const off=!own(e);e.classList.toggle('gd-off',off);if(off)e.setAttribute('aria-disabled','true');else e.removeAttribute('aria-disabled')})}
+// the bubble's button is Next while the guide runs (captured before the coach's own "Got it")
+function gdHook(){const e=coachEl();if(e.dataset.gd)return;e.dataset.gd='1';
+  e.addEventListener('click',ev=>{const st=gdStep();if(!st)return;ev.stopImmediatePropagation();ev.stopPropagation();if(st.who!=='note'||GD.busy||!ev.target.closest('button'))return;
+    if(st.ms)gdPlay(st.ms,gdNext);else gdNext()},true)}
+// only the highlighted move is accepted while a step waits for you
+(function(){const og=go;GD.go=og;go=function(m){const st=gdStep();
+  if(st&&sideToAct()===0&&P(0).human){if(st.who!=='me'||GD.busy||!gdEq(m,st.m)){toast('Tap the glowing spot.');try{render()}catch(e){}return}
+    og(m);gdNext();return}
+  return og(m)}})();
+// while guided: no free coach tips, the hint finger shows the step's move
+(function(){const oc=coachAfter;coachAfter=function(){if(gdStep()){gdHook();return guideDraw()}return oc.apply(this,arguments)}})();
+(function(){if(typeof hlpAdvice!=='function')return;const oh=hlpAdvice;hlpAdvice=function(){const st=gdStep();if(st)return st.who==='me'?st.m:null;return oh.apply(this,arguments)}})();
+window.GXGUIDE={get running(){return !!gdStep()},get step(){const s=gdStep();return s?{id:s.id,who:s.who,say:s.say||'',i:GD.i,busy:GD.busy}:null},get told(){return (GD.told||[]).slice()},
+  get ids(){return GD.STEPS.filter(s=>s.say).map(s=>s.id)},get steps(){return GD.STEPS.filter(s=>s.say).map(s=>({id:s.id,say:s.say,who:s.who}))}};
+// while a step waits for you, only its own target glows (a Shadow step that wants a rival's Advisor lights the seat, not 16 tiles)
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);const st=gdStep();if(!st||st.who!=='me'||!st.m)return;const m=st.m;
+  if(m.act==='tribe'&&m.kill){UI.pick=m.kill.tile!=null?[m.kill.tile]:[];UI.pickSeat=m.kill.pl!=null?[m.kill.pl]:[]}}})();
 
 </script>
 <script>
@@ -6468,7 +6845,9 @@ function scPreview(){const ln=document.getElementById('line');if(!ln)return;cons
   else if(G.phase==='bid'&&G.bidQueue[0]&&G.bidQueue[0].p===0)txt='Dearer spots play first. Each coin spent is a point lost.';
   else if(scMine()&&G.act&&(G.step==='tribe'||G.step==='tile'||G.step==='sell')){const a=G.act;txt='You took '+a.n+' '+(a.n>1?MPLUR[a.color]:MNAME[a.color])+' on '+tileName(G.board[a.tile])+'. Finish the tile action to end your turn.'}
   e.hidden=!txt;e.textContent=txt}
-function scBadges(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
+function scKey(){let k=document.getElementById('gainkey');const n=document.querySelectorAll('#grid .gain').length;if(!n){if(k)k.hidden=true;return}if(!k){k=document.createElement('div');k.id='gainkey';k.setAttribute('aria-hidden','true');k.setAttribute('data-help','');document.body.appendChild(k)}k.textContent='+N on a tile = points that walk can score · ★ = best';const g=document.getElementById('grid');if(g){const r=g.getBoundingClientRect();k.style.top=Math.round(r.bottom+2)+'px'}k.hidden=false}
+function scBadges(hn){try{scBadgesIn(hn)}finally{scKey()}}
+function scBadgesIn(hn){document.querySelectorAll('#grid .gain').forEach(x=>x.remove());document.querySelectorAll('#grid .sc-best').forEach(x=>x.classList.remove('sc-best'));
   if(!hn||!scMine()||G.step!=='move'||online())return;scCompute();const add=(i,v,star)=>{const el=tileEl(i);if(!el)return;const b=document.createElement('i');b.className='gain'+(star?' star':'');b.textContent=(star?'★':'')+'+'+v;b.setAttribute('data-help','');b.setAttribute('aria-hidden','true');el.appendChild(b)};
   if(!G.move){const top=SC.bestTotal;for(const s in SC.starts){const x=SC.starts[s].best;if(x)add(+s,x.total,x.total>=top&&top>0)}}
   else{const sx=SC.starts[G.move.start];if(!sx)return;let top=-1;const res={};for(const nx of stepTargets()){let b=null;for(const x of sx.outs)if(scPrefix(x,G.move.path,nx)&&(!b||x.total>b.total))b=x;if(b){res[nx]=b;top=Math.max(top,b.total)}}
@@ -6481,9 +6860,10 @@ function scSeats(){if(!G||G.over||online()){return}const tot=G.pl.map(p=>shownTo
 // ---- after your turn: why it ended and a one-line rating against the greedy best ----
 function scCard(text,face,name,tries){const cb=document.getElementById('coach');if(((cb&&cb.classList.contains('on'))||(typeof PLQB!=='undefined'&&PLQB))&&(tries||0)<12){setTimeout(()=>scCard(text,face,name,(tries||0)+1),700);return}const e=scEl('turnover','turnover');e.innerHTML='<i>'+face+'</i><span><b>'+esc(name)+'</b>'+esc(text)+'</span><button type="button" aria-label="Got it">Got it</button>';e.querySelector('button').onclick=()=>{e.classList.remove('on');try{fit()}catch(x){}};
   const tb=document.getElementById('table');if(tb&&tb.parentNode&&e.parentNode!==tb.parentNode)tb.parentNode.insertBefore(e,tb);e.classList.add('on');try{fit()}catch(x){}clearTimeout(SC.cardT);SC.cardT=setTimeout(()=>{e.classList.remove('on');try{fit()}catch(x){}},ANIM?5000+text.split(' ').length*100:400)}
-function scTurnEnd(){if(!G||G.over||online())return;
+function scTurnEnd(){if(!G||G.over||online())return;if(G.tut||(typeof GD!=='undefined'&&GD.on)){SC.pend=null;return}   // the guided game scripts every move: never grade it, and never a second bubble beside the guide's
   if(scMine()){if(G.act){SC.pend={e:G.act.tile,c:G.act.color,n:G.act.n,s:G.move?G.move.start:SC.pend&&SC.pend.s,t:G.turn,tot:shownTotal(G.pl[0])}}else if(G.move&&(!SC.pend||SC.pend.t!==G.turn))SC.pend={s:G.move.start,t:G.turn}}
   else if(SC.pend&&SC.pend.e!=null&&G.phase==='turn'||(SC.pend&&G.over)){const d=SC.pend;SC.pend=null;const sx=SC.starts[d.s];let got=null,best=SC.bestTotal;if(sx)for(const x of sx.outs)if(x.o.e===d.e&&x.o.c===d.c&&(!got||x.total>got.total))got=x;
+    let nOut=0;for(const k in SC.starts)nOut+=((SC.starts[k]||{}).outs||[]).length;if(nOut<=1)return;   // a forced walk (one way to go) gets no praise or blame
     const a=got?got.total:Math.max(0,shownTotal(G.pl[0])-d.tot);const bt=Math.max(best,a);const r=bt<=0||a>=bt-1||a>=bt*.85?'Good':a>=bt*.5?'Okay':'Poor';
     const why=r==='Good'?'that was the best or close to it.':'the best walk was +'+bt+' ('+SC.bestLabel+').';
     const g=LORE.guide;scCard(r+': '+d.n+' '+(d.n>1?MPLUR[d.c]:MNAME[d.c])+', +'+a+'. '+(r==='Good'?'Best or close.':'Best was +'+bt+'.'),typeof COACH!=='undefined'&&G.coach?g.face:'📋',typeof COACH!=='undefined'&&G.coach?g.name:'Your turn')}
@@ -6500,6 +6880,46 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 
 // a short vibrate tick when a piece is picked up or dropped (phones that support it)
 (function(){const o=go;go=function(m){try{if(navigator.vibrate&&m&&(m.act==='step'||m.act==='start'||m.act==='tile'))navigator.vibrate(12)}catch(e){}return o.apply(this,arguments)}})();
+// only walks worth taking glow at the start of a turn (at least about half the best walk's points); the others stay tappable but quiet
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
+  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.move||G.q||UI.pendDj||UI.pendItem||!scMine()||UI.pick.length<4)return;
+  scCompute();const top=SC.bestTotal;if(!(top>0))return;const keep=UI.pick.filter(i=>{const x=SC.starts[i];return x&&x.best&&x.best.total>=Math.max(3,top*.45)});if(keep.length)UI.pick=keep}catch(e){}}})();
+// R20: once a group is lifted, only drops that still lead to a good ending glow (at least 70% of the best ending still open from here)
+function scWalkOuts(){if(!G||!G.move||SC.key!==G.turn+'|'+G.round)return null;const sx=SC.starts[G.move.start];if(!sx)return null;const path=G.move.path;
+  const ok=sx.outs.filter(x=>{const q=x.o.path;if(q.length<=path.length)return false;for(let i=0;i<path.length;i++)if(q[i]!==path[i])return false;return true});
+  if(!ok.length)return null;let top=-1e9;for(const x of ok)top=Math.max(top,x.total);return ok.filter(x=>x.total>=top-1||x.total>=top*.7)}
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{
+  if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.phase!=='turn'||G.step!=='move'||G.q||UI.pendDj||UI.pendItem||!scMine())return;
+  if(!G.move){scCompute();return}
+  const good=scWalkOuts();if(!good)return;const n=G.move.path.length;const keep=UI.pick.filter(t=>good.some(x=>x.o.path[n]===t));if(keep.length)UI.pick=keep}catch(e){}}})();
+// which colour to drop on a step: keep the ending colour for the last drop, so the planned ending still works
+function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;const n=G.move.path.length;const hand=G.move.hand;
+  let best=null;for(const x of good)if(x.o.path[n]===ms[0].tile&&(!best||x.total>best.total))best=x;if(!best)return -1;const c=best.o.c;
+  const left=hand.length;if(left===1)return ms.findIndex(m=>m.c===c);
+  const nc=hand.filter(h=>h===c).length;let j=ms.findIndex(m=>m.c!==c);if(j<0||(nc<1))j=ms.findIndex(m=>m.c===c&&nc>1);return j}
+// R38 row 6: the glow IS the hint. A newcomer who taps only what glows should win about half of the games on defaults.
+// Bid: only the suggested spot glows (the others stay tappable). Start: the suggested start plus the 2 best other starts glow.
+// Walk: on the suggested start the glow follows the suggested route (the planner's, not the points-now greedy one).
+function scGlowHint(){if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
+  if(G.phase==='bid'){if(!UI.pickSpot.length)return;const m=hlpAdvice();if(m&&m.act==='bid'&&UI.pickSpot.includes(m.spot))UI.pickSpot=[m.spot];return}
+  if(G.phase!=='turn'||G.step!=='move'||G.cur!==hp.i)return;
+  if(!G.move){const m=hlpAdvice();scCompute();const rk=Object.keys(SC.starts).map(Number).filter(s=>UI.pick.includes(s)&&SC.starts[s].best).sort((a,b)=>SC.starts[b].best.total-SC.starts[a].best.total);
+    const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=3)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
+  const pl=typeof HPL!=='undefined'?HPL.plan:null;if(!pl||pl.seed!==G.seed||pl.turn!==G.turn)return;const path=G.move.path,q=pl.o.path;if(q.length<=path.length||!path.every((x,i)=>x===q[i]))return;
+  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.pick=[nx]}
+(function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{scGlowHint()}catch(e){}}})();
+// on a step with several colours the chooser lists the planned colour first, so the first glowing chip is the planned one
+// R38 row 5: on the steps where the market cannot be touched (Earn, Shadows, selling) a phone hides it, so the tiles keep >= 44 px
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),a=G&&G.act;
+  const off=!!(G&&!G.over&&hp&&G.phase==='turn'&&G.cur===hp.i&&!G.q&&(G.step==='sell'||(G.step==='tribe'&&a&&(a.color==='builder'||a.color==='assassin'))));
+  document.documentElement.classList.toggle('mk-off',off)}catch(e){}}})();
+// R38 row 5: after the move the djinn row stays only while a djinn can be taken, and the market only while goods can be taken (or are being collected)
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;const after=!!(G&&!G.over&&hp&&G.phase==='turn'&&G.cur===hp.i&&!G.q&&G.step!=='move');
+  R.classList.toggle('dj-off',after&&!UI.pickDj.length);R.classList.toggle('mr-off',after&&!UI.pickMk.length&&!(G.step==='tribe'&&G.act&&G.act.color==='merchant'))}catch(e){}}})();
+// R38 (375x553): a short phone hides the market while bidding, and the djinn row while djinn powers fill the button row
+(function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
+  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));
+  const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
 
 </script>
 <script>
@@ -6570,6 +6990,42 @@ function feedHtml(e,rows){
   e.innerHTML='<h4>Last moves</h4>'+rows.map(l=>{const t=plShort(l.t).split(/\s+/).slice(0,12).join(' ');return `<div class="fd-row"><i class="fd-dot" style="background:${dot(l.t)}"></i><span>${esc(t)}</span></div>`}).join('')}
 setInterval(()=>{try{if(G)feedRender()}catch(e){}},500);
 (function(){const o=render;render=function(){o.apply(this,arguments);try{feedRender()}catch(e){console.error(e)}}})();
+
+</script><script>
+// ===================== Feel: juice on every move (R34 row 7) =====================
+// Every effect is decoration only: pointer-events none, never blocks a tap, never longer than ~0.6 s, never changes G.
+// 1 each drop dips its tile and plays a note one step higher than the last, so a walk builds up like a phrase
+// 2 the last drop LANDS: the tile squashes and a ring in the collected tribe's colour bursts out of it
+// 3 points fly as a gold spark from where they were earned into the score star, which counts up and glows
+// 4 coins jingle out of the tile into the seat; a big haul (12+ pts at once) flashes the board edge gold
+const JU={drops:0,at:-1,raf:{}};
+const JU_COL={vizier:'#f2c230',elder:'#f4f1ea',merchant:'#3fa34d',builder:'#2f6fd6',assassin:'#d23a2e',artisan:'#9a5bd0'};
+function juOk(){return typeof ANIM!=='undefined'&&ANIM&&!document.hidden&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)}
+function juNote(k){try{if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const f=392*Math.pow(1.122,Math.min(k,9));tone(f,.09,{type:'triangle',v:.07})}catch(e){}}
+function juCls(el,c,ms){if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c);setTimeout(()=>el.classList.remove(c),ms||600)}
+function juRing(at,col,big){const fx=$('#fx');if(!fx)return;const r=document.createElement('div');r.className='jring'+(big?' big':'');r.style.left=at.x+'px';r.style.top=at.y+'px';r.style.setProperty('--jc',col||'#ffd35a');fx.appendChild(r);setTimeout(()=>r.remove(),600)}
+function juCount(i,from,to){const se=seatEl(i);const b=se&&se.querySelector('.ss');if(!b)return;const n=[...b.childNodes].find(x=>x.nodeType===3);if(!n)return;
+  cancelAnimationFrame(JU.raf[i]);const t0=performance.now(),dur=480;const step=t=>{const k=Math.min(1,(t-t0)/dur);const v=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));
+    const live=[...b.childNodes].find(x=>x.nodeType===3);if(live!==n||!n.isConnected)return;n.nodeValue=String(k>=1?to:v);if(k<1)JU.raf[i]=requestAnimationFrame(step)};JU.raf[i]=requestAnimationFrame(step)}
+function juMove(cur){const mv=G.move;const n=mv?mv.drops.length:0;
+  if(mv&&n>JU.drops&&(mv.start===JU.at||JU.at<0||JU.drops===0)){const te=tileEl(mv.at);juCls(te,'jdip',320);juNote(n-1)}
+  JU.drops=mv?n:0;JU.at=mv?mv.start:-1}
+function juice(prev,cur){if(!G||!prev||!cur)return;juMove(cur);if(!juOk()||G.over)return;
+  const actor=prev.cur!=null&&prev.cur>=0?prev.cur:cur.cur;
+  // 2 the landing
+  if(prev.step==='move'&&cur.step!=='move'&&cur.act&&cur.act.tile!=null){const te=tileEl(cur.act.tile);if(te){juCls(te,'jland',560);juRing(ctr(te.getBoundingClientRect()),JU_COL[cur.act.color])}}
+  const src=cur.act&&cur.act.tile!=null&&tileEl(cur.act.tile)?ctr(tileEl(cur.act.tile).getBoundingClientRect()):null;
+  // 3 points into the star
+  cur.tot.forEach((t,i)=>{const d=t-(prev.tot[i]||0);if(!d)return;const se=seatEl(i);if(!se)return;const ss=se.querySelector('.ss')||se;const to=ctr(ss.getBoundingClientRect());
+    juCount(i,prev.tot[i]||0,t);if(d<0){juCls(se,'jhurt',520);return}
+    const from=src&&i===actor?src:{x:to.x,y:to.y+40};const sparks=Math.min(5,1+Math.floor(d/4));
+    for(let k=0;k<sparks;k++)flyEl('<i class="jsp"></i>','jgold',{x:from.x+(k-(sparks-1)/2)*10,y:from.y},to,{delay:k*25,dur:320,big:1.6,end2:.5,fade:true,end:k===0?()=>juCls(se,'jglow',260):null});   // R38: the whole chain (sparks + star pulse) ends by 0.6 s: last spark lands at 420 ms, the pulse runs 320-580 ms, no second ring
+    if(d>=12&&G.pl[i]&&G.pl[i].human){const fx=$('#fx');if(fx){const v=document.createElement('div');v.className='jhaul';fx.appendChild(v);setTimeout(()=>v.remove(),600)}}});
+  // 4 coins out of the tile
+  cur.coins.forEach((c,i)=>{const d=c-(prev.coins[i]||0);if(d<=0||!src||i!==actor)return;const to=seatPoint(i);const n=Math.min(6,1+Math.floor(d/3));
+    for(let k=0;k<n;k++)flyEl('<i class="jcoin"></i>','jcn',{x:src.x+(k%3-1)*9,y:src.y+Math.floor(k/3)*8},to,{delay:k*30,dur:380,big:1.4,end2:.6,fade:true});
+    try{if(SND.on&&typeof sfx==='function')sfx('coins')}catch(e){}})}
+(function(){if(typeof animate!=='function')return;const o=animate;animate=function(prev){o.apply(this,arguments);try{juice(prev,snapState())}catch(e){console.error(e)}}})();
 
 </script>
 <script>
