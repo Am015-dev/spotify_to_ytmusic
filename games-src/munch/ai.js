@@ -1,5 +1,9 @@
 // ---------- computer players: rule-based Normal; Easy adds mistakes; Hard keeps a safety margin, plays the leader harder and saves its tricks ----------
 // The AI reads only public information about other seats (levels, tables, hand sizes), never their hands or the decks.
+// A long game wears the rivals down: after turn 40 nobody curses or backs the leader for sport any more, and as it drags on only the
+// players still in the race (level 5+, then 7+) spend cards to stop a winning kill. Without this the table keeps knocking the leader down.
+function tired(){return G.turn>=40}
+function blocks(p){const t=G.turn;return t<40||p.lvl>=(t<60?5:7)}
 function threat(o){return o.lvl*10+pStr(o)}
 function leader(ex){return alive().filter(o=>o.i!==ex).sort((a,b)=>threat(b)-threat(a))[0]}
 function cardValue(p,id){const c=cd(id);switch(c.t){
@@ -25,7 +29,7 @@ function aiWindowPick(p,vm){const cur=curPl();
   const lv=vm.find(m=>cd(m.card).t==='level'&&m.tgt===p.i);if(lv)return lv;
   const hire=vm.find(m=>cd(m.card).sp==='hire');if(hire)return hire;
   const st=vm.filter(m=>cd(m.card).sp==='steal').sort((a,b)=>P(b.tgt).lvl-P(a.tgt).lvl);if(st.length&&p.lvl<R.WIN-1)return st[0];
-  const cs=vm.filter(m=>cd(m.card).t==='curse'&&m.tgt===cur.i);const soft=p.lv==='easy'&&cur.human&&cur.lvl<8;if(cs.length&&!soft&&(threat(cur)>=threat(p)||cur.lvl>=7))return cs.sort((a,b)=>curseHarm(cur,b.card)-curseHarm(cur,a.card))[0];
+  const cs=vm.filter(m=>cd(m.card).t==='curse'&&m.tgt===cur.i);const soft=p.lv==='easy'&&cur.human&&cur.lvl<8;if(cs.length&&!soft&&!tired()&&(threat(cur)>=threat(p)||cur.lvl>=7))return cs.sort((a,b)=>curseHarm(cur,b.card)-curseHarm(cur,a.card))[0];
   return null}
 function curseHarm(t,id){const c=cd(id);let h=0;for(const o of c.ops||[]){if(o[0]==='lvl')h+=o[1]*5;if(o[0]==='item'||o[0]==='pick')h+=itemPool(t,o[1]).length?4:0;if(o[0]==='race'||o[0]==='cls'||o[0]==='clsOr1')h+=3;if(o[0]==='pers')h+=3;if(o[0]==='sex')h+=4;if(o[0]==='tax')h+=2;if(o[0]==='grab')h+=Math.min(2,t.hand.length)*2}return h}
 function handBoost(p){let b=0;for(const id of p.hand){const c=cd(id);if(c.t==='oneshot'&&c.b&&!c.sp)b+=c.b}if(isCls(p,'warrior'))b+=Math.min(R.BERSERK,Math.max(0,p.hand.length-2));return b}
@@ -57,7 +61,7 @@ function aiCalm(p,vm){const by=a=>vm.filter(m=>m.act===a);
     if(c.t==='special'&&c.sp==='steal'&&G.phase!=='setup'){const l=leader(p.i);if(l&&m.tgt===l.i)return m}
     if(c.t==='item'){if(!equipWhy(p,m.card)&&!bigWhy(p,m.card))return m;if(!c.big)return m}
     if(c.t==='oneshot'&&c.sp==='dowse'&&G.phase==='post'&&(G.dd.length+G.td.length)>6)return m;
-    if(c.t==='curse'&&G.phase!=='setup'&&m.tgt!==p.i){const l=leader(p.i);if(l&&m.tgt===l.i&&!(p.lv==='easy'&&l.human&&l.lvl<8)&&(l.lvl>=p.lvl+1||l.lvl>=7)&&curseHarm(l,m.card)>=3)return m}}
+    if(c.t==='curse'&&G.phase!=='setup'&&m.tgt!==p.i&&!tired()){const l=leader(p.i);if(l&&m.tgt===l.i&&!(p.lv==='easy'&&l.human&&l.lvl<8)&&(l.lvl>=p.lvl+1||l.lvl>=7)&&curseHarm(l,m.card)>=3)return m}}
   // wear the best: equip upgrades, swap a worse worn item for a better carried one
   const eq=by('equip').sort((a,b)=>(cd(b.card).b||0)-(cd(a.card).b||0));if(eq.length)return eq[0];
   for(const e of p.eq.filter(e=>!e.on)){const c=cd(e.id);if(!reqOK(p,c,e))continue;const worn=p.eq.filter(x=>x.on&&x.id!==e.id&&x.cheat==null).find(x=>{const d=cd(x.id);return (d.slot&&d.slot===c.slot)||(c.hands&&d.hands)});
@@ -105,7 +109,7 @@ function aiHelpBoost(p,vm){const cb=G.cb;if(winning(cb))return null;const b=vm.f
 // someone else's fight: stop the leader, and always stop a winning kill
 function aiInterfere(p,vm){const cb=G.cb;const f=P(cb.who);if(!winning(cb))return null;
   const lvGain=cb.mons.reduce((a,m)=>a+(mdef(m).lv||1),0);const wouldWin=f.lvl+lvGain>=R.WIN;if(p.lv==='easy'&&f.human&&!wouldWin)return null;const lead=leader(-1);
-  const hostile=wouldWin||(lead&&lead.i===cb.who&&f.lvl>=p.lvl+1)||(p.lv==='hard'&&f.lvl>=p.lvl+2);if(!hostile)return null;
+  const hostile=(wouldWin||(lead&&lead.i===cb.who&&f.lvl>=p.lvl+1)||(p.lv==='hard'&&f.lvl>=p.lvl+2))&&blocks(p)&&(wouldWin||!tired());if(!hostile)return null;
   const gap=sideStr(cb)-monStr(cb)+(fighters(cb).some(x=>isCls(x,'warrior'))?1:0);
   const opts=vm.filter(m=>m.act==='play'||m.act==='join').map(m=>{const c=cd(m.card);let b=0;
     if(m.act==='join')b=cd(m.card).lvl;else if(c.t==='enh'&&c.b>0)b=c.b;else if(c.t==='enh'&&c.sp==='mate')b=mStr(cb.mons[m.tgt],cb);else if(c.t==='oneshot'&&m.tgt==='m'&&!c.sp)b=c.b||0;else if(c.sp==='wander')b=cd(m.tgt).lvl;else if(c.sp==='illusion')b=cd(m.opt).lvl-mStr(cb.mons[m.tgt],cb);

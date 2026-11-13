@@ -362,7 +362,14 @@ html.ph .dlg.end>p.small.muted:last-of-type{display:none}
 html.ph .dlg.end table{font-size:13px;table-layout:fixed;margin-bottom:16px}
 html.ph .dlg.end table th{font-size:11px;padding:0 1px;white-space:nowrap}
 html.ph .dlg.end table td{padding:2px 1px}
-html.ph .dlg.end table td:first-child{width:38%;overflow:hidden;text-overflow:clip;font-size:12.5px}
+html.ph .dlg.end table td:first-child{width:40%;white-space:normal;overflow-wrap:anywhere;line-height:1.15;font-size:12.5px}
 html.ph .dlg.end table td:first-child .ptok{width:22px;height:22px;margin-right:2px}
 html.ph .dlg.end .recap p{margin:0 0 2px;font-size:13px;line-height:1.25}
 html.ph .dlg.end .recap{margin:0 0 4px}
+
+/* result card: a level float from the last fight must not sit on the headline */
+html:has(#modal:not([hidden]) .dlg.end) .bffloat{display:none!important}
+.opts .btn.opt.rec{box-shadow:0 0 0 3px #ffe27a,0 0 10px rgba(255,200,60,.6)}.optstar{color:#c98a00;font-weight:900}html.sk .optstar,html.sk .btn.rec .optstar{color:#ffe27a;text-shadow:0 1px 0 #3a2213}
+/* touch size: every gear chip is at least 44 px tall, wherever it sits (hero row, rival panel, fight, card panel) */
+html.ph .gchip,html.ph .arena .mon .gchip,html.ph .gear .gchip,html.ph .phlist .gchip,.gchip.eqoff{min-height:44px!important;box-sizing:border-box}
+@media (pointer:coarse),(max-width:480px){.gchip,.arena .mon .gchip{min-height:44px!important;box-sizing:border-box}}
