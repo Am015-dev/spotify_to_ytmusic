@@ -321,10 +321,6 @@ html:not(.ph) .card .aw .gold{translate:0 -8px}
 /* phone hand names: up to 3 lines, long words break, so no name is cut */
 html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:normal;word-break:normal;hyphens:none}
 
-/* a coach bubble with no free spot lets taps through to the glowing target under it (hlp.js hlpUncover) */
-.gxh-bub.gxh-thru{pointer-events:none;opacity:.6}
-.gxh-bub.gxh-thru :is(.gxh-ok,.gxh-link,.gxh-x){pointer-events:auto}
-
 /* portrait phone: while the card panel is open (it stops above the action bar, ui.js dkCardFit) the action bar stays on top and tappable */
 html.ph-p.dk-cardup:has(#dkCard.on) .gx-dock{position:relative;z-index:42;pointer-events:auto}
 /* phone: level floats sit on the table under the seat they belong to, below any open panel, smaller */
@@ -373,3 +369,24 @@ html:has(#modal:not([hidden]) .dlg.end) .bffloat{display:none!important}
 /* touch size: every gear chip is at least 44 px tall, wherever it sits (hero row, rival panel, fight, card panel) */
 html.ph .gchip,html.ph .arena .mon .gchip,html.ph .gear .gchip,html.ph .phlist .gchip,.gchip.eqoff{min-height:44px!important;box-sizing:border-box}
 @media (pointer:coarse),(max-width:480px){.gchip,.arena .mon .gchip{min-height:44px!important;box-sizing:border-box}}
+
+/* the tutorial strip sits over the header: its buttons hide while it is up, so Skip never covers Menu */
+html:has(.gxt-top) header .gx-ibtn{visibility:hidden}
+/* result table: the name sits beside its portrait (never wraps under it); short phones drop the winner art so the last row clears Play again */
+.dlg.end .enm{display:flex;align-items:center;gap:4px;min-width:0}
+.dlg.end .enm>span{min-width:0;overflow-wrap:break-word;line-height:1.1}
+html.ph .dlg.end table th:first-child{width:38%}
+html.ph .dlg.end table td:first-child{overflow-wrap:break-word}
+.dlg.end .enm .ptok{flex:0 0 auto;margin-right:0!important}
+@media (max-height:620px){html.ph .dlg.end :is(.win3d,.winp){display:none}html.ph .dlg.end table{margin-bottom:20px}}
+/* tbl.js tbFit last step: the fight still pokes out of a very short table */
+html.ph .arena.tight2:has(>.vs){align-content:start;row-gap:2px}
+html.ph .arena.tight2>.rollbox,html.ph .arena.tight2 .fightnote{display:none}
+html.ph .arena.tight2:has(>.sline){padding-top:32px}
+html.ph .arena.tight2 .mon>.small.mstr{display:none!important}
+html.ph .arena.tight2 .vs .score.hero .num{margin-top:0}
+html.ph .arena.tight2 .sline .sl1{padding:0 14px 1px}
+html.ph .arena.tight2 .sline .n{font-size:26px;-webkit-text-stroke-width:1px;text-shadow:0 2px 0 #0d0603}
+html.ph .arena.tight2 .sline .sl1 i{font-size:.72rem}
+html.ph .arena.tight2 .sline>:not(.sl1){display:none}
+html.ph .arena.tight2 .row.mons{margin-bottom:2px}
