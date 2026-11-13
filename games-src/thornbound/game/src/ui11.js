@@ -117,7 +117,11 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
 // hints On (the first game's default): every decision shows the suggestion and its finger; the bulb still explains the suggestion
 // (finger, why, How does this work?). Menu > Hints turns them off.
 function bulbState(){const b=$('#bulbbtn');if(!b)return;const on=UI.guide==='full'&&G&&UI.started;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Hints are on. Tap to see why':'Hint: what should I do?')}
-function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
+// the note sits just above the pile chips / action row, over the lower map: never on the turn prompt, the score bar or the hand
+function bfMsgPlace(el){try{const vis=e=>{if(!e)return null;const r=e.getBoundingClientRect();return r.width&&r.height&&r.top>0&&r.top<innerHeight?r:null};
+  const a=vis($('#cstrip'))||vis($('#act'))||vis($('#handw'));const tt=vis($('#tbturn'));const top=tt?tt.bottom:0;const h=el.offsetHeight||48;
+  let y=a?a.top-h-8:innerHeight*.6;if(y<top+6)y=top+6;el.style.top=Math.round(y)+'px';el.style.bottom='auto'}catch(e){}}
+function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;bfMsgPlace(el);clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
   const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||!!$('#tbgoal')||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
   GXH.phase(busy?null:hlpPhase())}

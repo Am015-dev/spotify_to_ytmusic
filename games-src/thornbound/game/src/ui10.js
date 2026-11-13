@@ -38,7 +38,7 @@ function handTap(id){const M=UI.bf;
   openPop('card',{id})}
 function commitCard(id,c){UI.hand=null;
   try{const el=$('#handw .hc[data-id="'+id+'"]');let dest=null;if(c.type==='spot'){const sp=$('#spots .bspot');dest=sp&&sp.getBoundingClientRect()}else if(c.type==='region'&&c.r!=null&&MAP.m){const R=regionRect(c.r);dest={left:R.left+R.width/2-14,top:R.top+R.height/2-20,width:28,height:40}}
-    if(el&&dest)flyEl(el.innerHTML,el.getBoundingClientRect(),dest,{ms:380})}catch(e){}
+    if(el&&dest){if(c.type==='spot'){UI._bidFly=Date.now();fxFly(el.innerHTML,el.getBoundingClientRect(),dest,{ms:420,lift:30,land:$('#spots .bspot')})}else flyEl(el.innerHTML,el.getBoundingClientRect(),dest,{ms:380})}}catch(e){}
   const ok=humanMove(c.k);
   // not taken (the tutorial asked for something else, or the step is still appearing): the card stays lifted in your hand, never lost
   if(ok===false){try{const s=viewSeatForQ();if(s!=null&&legal(s).some(m=>m.k===c.k)&&G.pl[s].hand.includes(id)){UI.hand=id;renderAll()}}catch(e){}}
@@ -61,7 +61,7 @@ function renderSpots(){const el=$('#spots');if(!el)return;if(!G||!UI.V){el.inner
   const me=vs(),M=UI.bf,P=me>=0?UI.V.pl[me]:null;const has=P&&P.bid!=null&&P.bid>=0;const asking=!!M&&M.kind==='bid';
   const showBack=has&&!G.bidRev;
   if(!P||isPassing()||(!has&&!asking)){if(el._h!==''){el._h='';el.innerHTML=''}return}
-  const S=UI.bs||360;const w=Math.round(Math.max(40,Math.min(60,S*.13))),h=Math.round(w*1.4308);
+  const S=UI.bs||360;const w=Math.round(Math.max(44,Math.min(60,S*.13))),h=Math.round(w*1.4308);
   const glow=asking&&UI.hand!=null,rec=asking&&M.rec&&M.rec.id!=null;const retk=M&&M.kind==='bidRes'&&M.mv.some(m=>m.t==='return')&&!(UI._recShown&&M.sug&&M.sug.t!=='return');   // hints on: the spot glows only when taking your card back IS the suggestion
   const h2='<button class="bspot'+(glow?' glow hot':'')+(glow&&rec?' rec':'')+(has?' full':'')+(retk?' glow':'')+'" id="bidspot" data-a="spot" style="width:'+w+'px;height:'+h+'px" aria-label="'+(has?'Your bid':'Bid spot')+'">'+(has?'<span class="bs-c" data-owner="'+me+'" data-up="1">'+cardEl(P.bid,w).outerHTML+'</span>':'<span class="bs-l">'+ico('crown')+'</span>')+'</button>';
   if(el._h!==h2){el._h=h2;el.innerHTML=h2}}
@@ -84,9 +84,9 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
   const sp=Math.max(1,Math.min(UI.speed||1,4));const done=()=>{if(e.parentNode)e.remove()};
   const chip=seat!=null?document.querySelector('#rivals .rv[data-s="'+seat+'"] .rv-n'):null;
   try{const a=e.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-90%) scale(1.25)',opacity:1,offset:.35},{transform:'translate(-50%,-90%) scale(1.15)',opacity:1,offset:.6},
-      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-chip.getBoundingClientRect().width-18)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.45)',opacity:0}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
+      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-chip.getBoundingClientRect().width-18)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.45)',opacity:0}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:600/sp,easing:'ease-in-out'});
     a.onfinish=()=>{done();if(chip){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}}}catch(x){}
-  setTimeout(done,1400/sp)}
+  setTimeout(done,700/sp)}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
 function regionRect(r){const b=REGBOX[r];const a=mapToClient(b.x,b.y),c=mapToClient(b.x+b.w,b.y+b.h);return {left:a.x,top:a.y,width:c.x-a.x,height:c.y-a.y}}
 function mapToClient(x,y){const el=MAP.m.el,M=el.getScreenCTM&&el.getScreenCTM();if(!M)return {x:0,y:0};return {x:M.a*x+M.e,y:M.d*y+M.f}}
@@ -247,3 +247,46 @@ function autoSkip(h){if(!NET.on&&!hotSeat()&&G&&G.q&&G.q.kind==='edict'&&edictPo
   return humanMoveAuto(d.k)}
 // a move the game makes for you (a season with nothing to use): not a tap, so the tutorial does not gate it
 function humanMoveAuto(k){UI._tutIn=1;try{return humanMove(k)}finally{UI._tutIn=0}}
+// ---------------------------------------------------------------- motion for the moves a newcomer watches: a bid slides to its spot, a stolen Kingdom Card flies
+// from the rival to the thief, Influence pulses on the score. Each effect is <= 0.6 s, lives in #fx (pointer-events none) and is skipped under reduced motion.
+try{const mq=matchMedia('(prefers-reduced-motion: reduce)');UI.reduce=mq.matches;mq.addEventListener&&mq.addEventListener('change',e=>{UI.reduce=e.matches})}catch(e){}
+const FX_MS=560;
+function fxOn(){return !!ANIM&&!UI.reduce&&!!$('#fx')}
+function fxRect(e){if(!e)return null;const r=e.getBoundingClientRect();return r.width&&r.height&&r.bottom>0&&r.top<innerHeight?r:null}
+function fxSeatRect(s){const c=seatEl(s);return fxRect(c&&(c.querySelector('.rv-e')||c))}
+// a flight with a small lift in the middle (reads as a card being carried, not a slide)
+function fxFly(html,from,to,o){o=o||{};const fx=$('#fx');if(!fxOn()||!fx||!from||!to)return;const ms=Math.min(FX_MS,(o.ms||480)/Math.max(1,Math.min(UI.speed||1,4)));
+  const w=o.w||from.width||40,h=o.h||from.height||56;const x0=from.left+from.width/2-w/2,y0=from.top+from.height/2-h/2;
+  const e=document.createElement('div');e.className='fly fxfly';e.innerHTML=html||'';e.style.cssText='left:'+x0+'px;top:'+y0+'px;width:'+w+'px;height:'+h+'px';fx.appendChild(e);
+  const dx=to.left+to.width/2-(x0+w/2),dy=to.top+to.height/2-(y0+h/2),s1=o.s1||1.25,s2=Math.max(.3,Math.min(1.4,o.s2||(to.width/w)));
+  const done=()=>{if(e.parentNode)e.remove()};
+  try{e.animate([{transform:'translate(0,0) scale(1) rotate(0deg)',opacity:.4},{transform:'translate('+(dx*.5)+'px,'+(dy*.5-(o.lift||26))+'px) scale('+s1+') rotate('+(o.rot||-6)+'deg)',opacity:1,offset:.5},{transform:'translate('+dx+'px,'+dy+'px) scale('+s2+') rotate(0deg)',opacity:1}],{duration:ms,easing:'cubic-bezier(.3,.7,.3,1)'}).onfinish=()=>{done();if(o.land)fxLand(o.land)}}catch(x){}
+  setTimeout(done,ms+120)}
+// the place a card or Influence lands gives a short pulse
+function fxLand(el){if(!el||!fxOn())return;try{el.animate([{transform:el===$('#spots .bspot')?'translate(-50%,-50%) scale(1)':'scale(1)'},{transform:el===$('#spots .bspot')?'translate(-50%,-50%) scale(1.18)':'scale(1.18)',filter:'brightness(1.5)'},{transform:el===$('#spots .bspot')?'translate(-50%,-50%) scale(1)':'scale(1)'}],{duration:300,easing:'ease-out'})}catch(e){}}
+function fxInf(s,n){if(!fxOn()||!n)return;const c=seatEl(s);const chip=c&&c.querySelector('.rv-n');if(!chip)return;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');
+  try{c.animate([{boxShadow:'0 0 0 0 '+(n>0?'rgba(255,214,90,.9)':'rgba(220,60,60,.9)')},{boxShadow:'0 0 0 9px rgba(255,214,90,0)'}],{duration:FX_MS,easing:'ease-out'})}catch(x){}}
+function fxSnap(){try{if(!G||!UI.V)return null;return {g:G,round:G.round,bid:UI.V.pl.map(p=>p.bid!=null&&p.bid!==false),ks:G.pl.map(p=>(p.ks||[]).map(t=>t&&t.kc).filter(Boolean)),inf:G.pl.map(p=>p.inf)}}catch(e){return null}}
+function fxDiff(a,b){if(!a||!b||a.g!==b.g||!fxOn())return;const me=vs();
+  // bids: a rival's face-down card drops into its seat; your own card slides from your hand to the bid spot (unless your tap already flew it)
+  if(a.round===b.round)b.bid.forEach((on,s)=>{if(!on||a.bid[s])return;
+    if(s===me){if(Date.now()-(UI._bidFly||0)<900)return;const sp=$('#spots .bspot');const to=fxRect(sp);const hr=fxRect($('#handw'));if(to&&hr)fxFly(BACK_HTML,{left:hr.left+hr.width/2-20,top:hr.top+8,width:40,height:56},to,{land:sp})}
+    else{const c=seatEl(s),bc=c&&c.querySelector('.bidc');const to=fxRect(bc)||fxSeatRect(s);const fr=fxSeatRect(s);if(fr&&to)fxFly(BACK_HTML,{left:fr.left,top:fr.bottom+30,width:fr.width,height:fr.height},to,{w:30,h:42,lift:10,land:bc||c})}});
+  // Kingdom Cards that changed hands (a steal): the card flies from the rival who lost it to the one who took it
+  b.ks.forEach((list,s)=>{for(const kc of list){if(a.ks[s].includes(kc))continue;const v=a.ks.findIndex((l,i)=>i!==s&&l.includes(kc));if(v<0)continue;
+    const fr=fxSeatRect(v),to=fxSeatRect(s);let html='';try{html=kcEl(kc,44).outerHTML}catch(e){html=BACK_HTML}
+    if(fr&&to)fxFly(html,fr,to,{w:44,h:63,s1:1.6,s2:.7,lift:-60,rot:8,land:seatEl(s)})}});
+  // Influence: the score number pulses and a small +n / -n rises from it (the track token moves on the map at the same time)
+  b.inf.forEach((v,s)=>{const d=v-a.inf[s];if(d)fxInf(s,d)})}
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{const b=fxSnap();fxDiff(UI._fxS,b);UI._fxS=b;mapTextFit()}catch(e){}return r}})();
+(function(){const o=drawOverlay;drawOverlay=function(){const r=o.apply(this,arguments);try{mapTextFit()}catch(e){}return r}})();
+// map words at phone size: any label that would draw under 14 px grows to 14 px; a small coin or marker grows with its number
+function mapTextFit(){const s=MAP.m&&MAP.m.el;if(!s||!s.viewBox||!s.viewBox.baseVal)return;const R=s.getBoundingClientRect();const vb=s.viewBox.baseVal.width||1000;if(!R.width)return;const k=R.width/vb;
+  for(const t of s.querySelectorAll('text')){if(t._k===k||t.getAttribute('opacity')==='0')continue;t._k=k;let f=t._f0;if(f==null){f=t._f0=parseFloat(t.getAttribute('font-size')||getComputedStyle(t).fontSize)||0}if(!f)continue;
+    const need=14.2/k;if(f>=need){if(t._fit){t.style.fontSize='';t._fit=0}const g=t.parentNode;if(g&&g._t0!=null){g.setAttribute('transform',g._t0);g._t0=null}continue}
+    const g=t.parentNode,kids=g&&g.tagName==='g'?[...g.children]:[];let small=false;try{small=kids.length>1&&g.getBBox().width<140}catch(e){}
+    if(small&&kids.length<=3&&kids.filter(x=>x.tagName==='text').length===1&&kids.every(x=>/^(circle|rect|path|text)$/.test(x.tagName))){if(g._t0==null)g._t0=g.getAttribute('transform')||'';g.setAttribute('transform',g._t0+' scale('+(need/f).toFixed(3)+')')}
+    else{t.style.fontSize=need.toFixed(1)+'px';t._fit=1;
+      if(t._tl0==null)t._tl0=t.getAttribute('textLength')||'';if(t._tl0)t.setAttribute('textLength',(parseFloat(t._tl0)*need/f).toFixed(1));
+      // a grown label stays inside the board: nudge it in from the edge it would cross
+      try{const bb=t.getBoundingClientRect(),pad=3;let dx=0;if(bb.left<R.left+pad)dx=R.left+pad-bb.left;else if(bb.right>R.right-pad)dx=R.right-pad-bb.right;if(t._tr0==null)t._tr0=t.getAttribute('transform')||'';if(dx)t.setAttribute('transform',(t._tr0+' translate('+(dx/k).toFixed(1)+' 0)').trim())}catch(e){}}}}

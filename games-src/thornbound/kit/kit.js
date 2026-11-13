@@ -906,7 +906,7 @@ TB.map = function (opts) {
       for (i = 0; i <= Math.min(steps, 60); i++) { var q = inflXY(seat, from + dir * i); fr.push({ transform: 'translate(' + q.x + 'px,' + q.y + 'px)' }); }
       var e = inflXY(seat, v); el.style.transform = 'translate(' + e.x + 'px,' + e.y + 'px)';
       if (fr.length < 2 || (o && o.immediate)) return Promise.resolve();
-      return anim(el, fr, Math.min(1600, 120 * steps + 250), 'linear');
+      return anim(el, fr, Math.min(600, 70 * steps + 250), 'linear');
     },
     influence: function (seat) { return S.infl[seat] || 0; },
     setRound: function (n, total) { S.round = { n: n, total: total || S.round.total }; buildRound(); return api; },
