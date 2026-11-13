@@ -100,7 +100,8 @@ function gloss(text){if(text==null)return '';text=String(text);const hits=[];con
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
 function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glSeen=UI.glSeen||{};UI.glSeen[k]=1;
-  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
+  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.style.top='';try{const rv=$('#rivals'),q=rv&&rv.getBoundingClientRect();if(q&&q.width>innerWidth*.6&&q.bottom>0&&q.bottom<innerHeight*.4)el.style.top=Math.round(q.bottom+6)+'px'}catch(x){}   /* the word card opens under the rival chips, never over them */
+  el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
 function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
 // ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
