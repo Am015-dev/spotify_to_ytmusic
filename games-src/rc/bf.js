@@ -48,7 +48,7 @@ function legalRows(id,cur){if(!cur)return [];let rows=[];try{rows=PHO.tileRows(i
   // a helper pawn (not a castaway, not Friday) can only join a job a castaway or Friday already leads
   try{const pi=pawnInfo(cur.id);if(pi&&pi.c==null&&!pi.f)rows=rows.filter(r=>{const a=findActAny(r.type,r.tgt,r.alt);return !!a&&a.pw.some(q=>{const o=pawnInfo(q);return o&&(o.c!=null||o.f)})})}catch(e){}return rows}
 function canPay(r,cur){try{const a={type:r.type,tgt:r.tgt,alt:r.alt||0,pw:[cur.id]};if(afford(a))return true;if(r.type==='build'&&['shelter','roof','pal'].includes(r.tgt.k)){for(const pay of ['fur','wood']){a.pay=pay;if(afford(a))return true}}return false}catch(e){return true}}
-function legalTiles(cur){if(!cur)return [];const k=planSig()+'|'+cur.id+'|'+G.logN+'|'+JSON.stringify(G.res);if(BF._lk===k)return BF._lt;const out=[];for(const m of MAP)if(legalRows(m.id,cur).length)out.push(m.id);BF._lk=k;BF._lt=out;return out}
+function legalTiles(cur){if(!cur)return [];const k=planSig()+'|'+cur.id+'|'+G.logN+'|'+JSON.stringify(G.res);const C=BF._lc||(BF._lc={});if(C[k])return C[k];if(Object.keys(C).length>40)BF._lc={};const out=[];for(const m of MAP)if(legalRows(m.id,cur).length)out.push(m.id);(BF._lc||(BF._lc={}))[k]=out;return out}
 BF.legal=legalTiles;BF.recTile=(c)=>recTile(c);window.legalRowsDbg=id=>{const c=curPawn();return legalRows(id,c).map(r=>r.title)};
 function recTile(cur){if(!cur)return null;const rec=recPlan().map[cur.id];if(!rec||placeWhy(cur.id,rec.type,rec.tgt,rec.alt))return null;
   const same=r=>r.type===rec.type&&JSON.stringify(r.tgt)===JSON.stringify(rec.tgt)&&(r.alt||0)===(rec.alt||0);for(const m of MAP)if(legalRows(m.id,cur).some(same))return {id:m.id,rec};return null}
@@ -289,8 +289,10 @@ function wantPile(){let n=advPileN();try{const r=UI.rec;if(r&&r.fresh&&r.round==
 BF.hintOn=()=>{try{if(/[?&]hint=1/.test(location.search)||localStorage.getItem('swi_hint')==='1')return true;if(localStorage.getItem('swi_hint')==='0')return false}catch(e){}
   return !!(typeof G!=='undefined'&&G&&G.diff==='easy'&&!G.cmp&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))};
 // the one-line why for a hinted job: the advisor's priority when it has one, else what that kind of job does for the day
-function hintWhy(rec,cur,plain,dflt){let w=dflt?'':String(rec.why||'');if(/computer/.test(w)||w.length>26)w='';if(!w){const t=rec.type,L=String(rec.label||''),k=rec.tgt&&rec.tgt.k||(/shelter/i.test(L)?'shelter':/roof/i.test(L)?'roof':/palisade/i.test(L)?'pal':/fire/i.test(L)?'fire':'');
-  w=t==='rest'?'heals 1 life':t==='gather'?(/wood/i.test(L)?'wood for fire and pile':'food for tonight'):t==='build'?(k==='shelter'?'stops night wounds':k==='roof'?'keeps the rain off':k==='pal'?'stops storm damage':k==='fire'?'half of the rescue':'helps every day'):t==='explore'?'new land to use':t==='threat'?'clears a threat':t==='hunt'?'food, but it bites':t==='camp'?'morale':''}
+function hintWhy(rec,cur,plain,dflt){
+  // R44 T2: the advisor's rec.why is a priority title (it repeats the job), so the ✨ line always gives the job's own reason, 8 words at most
+  const t=rec.type,L=String(rec.label||''),k=rec.tgt&&rec.tgt.k||(/shelter/i.test(L)?'shelter':/roof/i.test(L)?'roof':/palisade/i.test(L)?'pal':/fire/i.test(L)?'fire':'');
+  let w=t==='rest'?'heals 1 life':t==='gather'?(/wood/i.test(L)?'fuel for the fire and pile':'so nobody goes hungry tonight'):t==='build'?(k==='shelter'?'stops night wounds':k==='roof'?'keeps the rain off':k==='pal'?'stops storm damage':k==='fire'?'half of the rescue':'helps every day'):t==='explore'?'new land to use':t==='threat'?'it strikes at dawn otherwise':t==='hunt'?'food, but it bites':t==='camp'?'lifts morale':t==='special'?'moves the rescue closer':'moves the rescue closer';
   if(!plain&&!rec.sure&&rec.odds)w+=(w?' · ':'')+'🎲';return w}
 // R42 P7: the ✨ line is whole, never cut, and fits the status line's 8 words: a shorter job name, then the job's plain why, then fewer extras
 const nW=t=>String(t).trim().split(/\s+/).filter(Boolean).length;

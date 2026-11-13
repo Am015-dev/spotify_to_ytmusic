@@ -17,7 +17,11 @@ function resetPlanSteps(){UI.ps={round:0,step:1,skip:[],pick:false};UI.rec=null;
 function setPStep(n){pstep();UI.ps.step=Math.max(1,Math.min(4,n));UI.ps.pick=false;if(UI.ps.step!==2)UI.sel=null;UI.toTop=1}
 // the pawns you plan for, in order: your castaways' pawns, then the helpers (Friday, the dog, ...)
 function wizPawns(){const hs=new Set(G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i));const hm=typeof helperMine!=='function'||helperMine();const all=allPawns().filter(p=>p.c!=null?hs.has(p.c):hm);return all.filter(p=>p.c!=null).concat(all.filter(p=>p.c==null))}
-function curPawn(){const placed=placedIds();const free=wizPawns().filter(p=>!placed.has(p.id)&&!UI.ps.skip.includes(p.id));if(UI.sel&&free.some(p=>p.id===UI.sel))return pawnInfo(UI.sel);return free.find(p=>p.c!=null)||free[0]||null}
+function curPawn(){const placed=placedIds();const free=wizPawns().filter(p=>!placed.has(p.id)&&!UI.ps.skip.includes(p.id));
+  // R44 T1: the pawn in hand must be able to take a job; else the first castaway that can (glowing places), then any castaway, then a helper
+  const can=p=>{try{return typeof BF!=='undefined'&&BF.on&&BF.legal?BF.legal(pawnInfo(p.id)).length>0:true}catch(e){return true}};
+  if(UI.sel&&free.some(p=>p.id===UI.sel)){const s=free.find(p=>p.id===UI.sel);if(can(s))return pawnInfo(UI.sel)}
+  return free.find(p=>p.c!=null&&can(p))||free.find(can)||free.find(p=>p.c!=null)||free[0]||null}
 function pawnNice(p){if(p.c==null)return pawnLabel(p);const c=P(p.c);const n=pawnsOf(c);return n>1?`${c.nm} (${p.id.endsWith('_0')?'1st':'2nd'} pawn)`:c.nm}
 function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return `<b class="warn">Not enough pawns: needs ${n.need-k} more</b>`;
   if(n.roll&&k<n.max){const dt=dtype(a);const o=dt?diceOdds(dt):{s:80,w:1,q:3};return `<b class="roll">Rolls the dice: ${o.s}% chance it works, ${o.w} in 6 chance of a wound.</b> <small>Add 1 more pawn to make it certain.</small>`}
