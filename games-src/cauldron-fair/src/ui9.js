@@ -202,7 +202,7 @@ function marketEl(p, q) {
   const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
-  const stalls = h('div.stalls');
+  const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
@@ -240,17 +240,17 @@ function stFit(st) {
   if (!st.isConnected) return; st.style.maxHeight = ''; st.classList.remove('c3', 'tight');
   const btn = st.parentElement && st.parentElement.querySelector('.smore'); if (btn) btn.hidden = true;   // the pill takes room: measure without it first
   const fits = () => st.scrollHeight <= st.clientHeight + 2;
-  if (fits()) return;
-  // R28: use the empty floor before hiding anything: 3 columns, then tighter rows; the pill only shows if they still do not fit
   const portrait = !matchMedia('(orientation:landscape)').matches;
-  if (portrait) { st.classList.add('c3'); if (fits()) return; st.classList.add('tight'); if (fits()) return; }
+  // R37: two columns only (a chip stays >= 44 px wide); portrait is always the tighter rows (so the layout never flips under a tap); the scroll pill only shows if they still do not fit
+  if (portrait) st.classList.add('tight');
+  if (fits()) return;
   if (btn) btn.hidden = false;
   const top = st.getBoundingClientRect().top, H = st.clientHeight; let best = 0;
   [...st.children].forEach(c => { const b = c.getBoundingClientRect().bottom - top; if (b <= H + 1 && b > best) best = b; });
   if (best > 60) st.style.maxHeight = Math.ceil(best + 2) + 'px';
 }
 // a rotation or resize refits the open shop (the fitted height was measured for the old size)
-addEventListener('resize', () => { const st = document.querySelector('.mkt .stw > .stalls'), mb = st && st.parentElement.querySelector('.smore'); if (!st || !mb) return; requestAnimationFrame(() => { smoreUpd(st, mb); stFit(st); smoreUpd(st, mb); }); });
+addEventListener('resize', () => { const st = document.querySelector('.mkt .stw > .stalls'), mb = st && st.parentElement.querySelector('.smore'); if (!st || !mb) return; const fit = () => { smoreUpd(st, mb); stFit(st); smoreUpd(st, mb); }; fit(); requestAnimationFrame(fit); });   // R37: refit at once (the help finger reads the layout right after a rotation), and once more next frame
 // R8: at 375 the stalls scroll; say how many are below and fade the bottom edge
 function smoreUpd(st, btn) {
   if (!st.isConnected) return; const b = st.getBoundingClientRect().bottom, n = [...st.children].filter(c => c.getBoundingClientRect().bottom > b + 6).length;
