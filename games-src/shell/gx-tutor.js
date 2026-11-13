@@ -116,9 +116,10 @@
   function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
   function topLimit() { return stripH() + 4; }
   // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
-  function place(b, hs, side) {
+  function stAvoid(st) { try { return st.avoid ? st.avoid() : null; } catch (e) { return null; } }
+  function place(b, hs, side, avoid) {   // avoid: optional extra rects the bubble should not cover (e.g. the board area the step talks about)
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
-    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var T = hs.map(function (r) { return inflate(r, 8, v); }).concat((avoid || []).filter(Boolean).map(function (r) { return inflate(r, 4, v); }));
     var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
     function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
     var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
@@ -174,13 +175,13 @@
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
-    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side, stAvoid(st)); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
     add(b); S.bub = b; S.say = say;
     var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-    place(b, H, st.side);
+    place(b, H, st.side, stAvoid(st));
     return true;
   }
   // cfg.live (opt-in): ()=>el|[el] the game's own controls that must stay tappable while no step is shown (e.g. a Continue on a roll card)
