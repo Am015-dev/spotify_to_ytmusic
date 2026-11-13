@@ -210,3 +210,12 @@ function tutOffer(btn){const hadPulse=btn.classList.contains('pulse');btn.classL
   document.body.appendChild(d);
   d.addEventListener('click',ev=>{const b=ev.target.closest('[data-tutoffer]');if(!b)return;ev.stopPropagation();const k=b.dataset.tutoffer;d.remove();if(hadPulse)btn.classList.add('pulse');try{localStorage.setItem('dkd_offer','1')}catch(x){}
     if(k==='learn')tutStart();else{UI._offerOk=1;try{btn.click()}finally{UI._offerOk=0}}})}
+// while the tutorial dims the screen, controls under a dim cell cannot be tapped (the cell takes the tap and shakes the bubble):
+// mark them inert too, so nothing reports them as "covered"; the spotlit target keeps its taps
+(function(){const SEL='button,[role=button],a[href],[data-act],[data-mv],.btn';let was=false;
+  function tick(){try{const on=!!document.querySelector('.gxt-cell');
+    if(on||was){document.querySelectorAll('.dk-tutoff').forEach(e=>e.classList.remove('dk-tutoff'));was=false}
+    if(on){const hit=[];for(const e of document.querySelectorAll(SEL)){if(e.closest('.gxt-top,.gxt-bub,[data-help]'))continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
+        const t=document.elementFromPoint(Math.max(1,Math.min(innerWidth-1,r.left+r.width/2)),Math.max(1,Math.min(innerHeight-1,r.top+r.height/2)));if(t&&t.classList&&t.classList.contains('gxt-cell'))hit.push(e)}
+      hit.forEach(e=>e.classList.add('dk-tutoff'));was=true}}catch(e){}setTimeout(tick,120)}
+  setTimeout(tick,120)})();

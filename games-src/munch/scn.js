@@ -378,7 +378,8 @@
       { kind: 'visible', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'Tips Off button' },
       { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="0"]', name: 'tap Tips Off', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === true && b === false) || 'Tips switch did not turn off'; } },
       { kind: 'fn', name: 'no tip bubble while Tips are off', fn: function () { return !document.querySelector('.gxh-bub.on') || 'bubble still shown'; } },
-      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } }
+      { kind: 'tap', sel: '#tipsprobe [data-gxh=tips][data-v="1"]', name: 'tap Tips On', state: function () { return GXH.enabled(); }, expect: function (a, b) { return (a === false && b === true) || 'Tips switch did not turn on'; } },
+      { kind: 'fn', name: 'the test-only Tips probe is put away (it is not part of the game screen)', fn: function () { var d = document.getElementById('tipsprobe'); if (d) d.remove(); return true; } }
     ]
   });
   // painted icons and 3D hero renders: every wired file loads, and each is applied where it belongs
@@ -424,7 +425,7 @@
       setup: function () {
         table(70 + i); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
         var boss = idOf(k); pull(boss); G.door.push(boss); G.phase = 'main'; G.active = 0; UI.pause = true; render();
-        return new Promise(function (r) { setTimeout(function () { var d = document.querySelector('.bfdoor'); if (d) d.click(); setTimeout(r, 500); }, 300); });
+        return new Promise(function (r) { setTimeout(function () { var d = document.querySelector('.bfdoor'); if (d) d.click(); var t0 = Date.now(); (function w() { var p = document.querySelector('.pile.pl'); if (Date.now() - t0 > 2500 || (Date.now() - t0 > 500 && !(p && p.getAnimations().length))) r(); else setTimeout(w, 60); })(); }, 300);   /* the door pile swings open: check once it has landed */ });
       },
       checks: [{ kind: 'fn', name: 'the ' + k + ' clip element is there', fn: function () { return !!document.getElementById('bfclip') || document.querySelector('.arena .row.mons .card') ? true : 'neither clip nor monster card'; } }]
     });

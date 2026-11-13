@@ -394,3 +394,4 @@ html.ph .arena.tight3>:is(.vs,.row.mons,.row.small,.rollbox){display:none!import
 html.ph .arena.tight3:has(>.sline){padding-top:30px}
 html.ph .arena.tight3:has(>.vs){grid-template-rows:auto;align-content:start}
 html.ph .arena.tight3>.fbtns{grid-row:1!important}html.ph .arena.tight3>.fbtns button{min-height:44px}
+.dk-tutoff{pointer-events:none!important}
