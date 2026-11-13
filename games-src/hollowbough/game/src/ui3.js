@@ -153,7 +153,7 @@ function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
 // the finger stays on its target when a row scrolls under it
 // R39: the finger tip sits on the target but off every card name: try a few spots, keep the one covering the least name text
 function fingerSpot(r) {
-  const c = ctr(r), fb = $('#board').getBoundingClientRect(), names = [...document.querySelectorAll('.pvc-name,.hcn,.tcn,.cn,.nm,.pv-name')].map(e => e.getBoundingClientRect()).filter(b => b.width > 2 && b.height > 2);
+  const c = ctr(r), fb = $('#board').getBoundingClientRect(), names = [...document.querySelectorAll('.pvc-name,.hcn,.tcn,.cn,.nm,.pv-name,.cost,.ci,.zcost,.rew,.rw')].map(e => e.getBoundingClientRect()).filter(b => b.width > 2 && b.height > 2);
   const spots = [[c.x, c.y], [c.x, r.y + 2], [r.x + r.w * .75, r.y + 4], [r.x + r.w * .25, r.y + 4], [c.x, r.y + 12], [c.x, r.y + r.h * .3], [c.x, r.y + r.h * .72], [r.x + r.w * .78, r.y + r.h * .78], [r.x + r.w * .22, r.y + r.h * .78], [c.x, r.y + r.h - 6], [r.x + r.w * .5, r.y + r.h + 4]];
   let best = spots[0], bo = 1e9;
   for (const [x, y] of spots) { const L = fb.left + x - 23, T = fb.top + y - 8, o = names.reduce((s, b) => s + Math.max(0, Math.min(b.right, L + 48) - Math.max(b.left, L)) * Math.max(0, Math.min(b.bottom, T + 58) - Math.max(b.top, T)), 0); if (o < bo) { bo = o; best = [x, y]; } if (!o) break; }

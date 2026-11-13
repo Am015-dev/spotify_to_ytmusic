@@ -134,7 +134,7 @@ function hlpMarks() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'hollowbough', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn' });
+  GXH.init({ game: 'hollowbough', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn', avoidPad: 6 });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {
