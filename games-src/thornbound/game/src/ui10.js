@@ -214,7 +214,8 @@ function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
 // planFor(M,rm): where the move rm is made on the board: {from,to} points (from = the card to pick up first), fromR/toR rects, key. Used by the ghost finger and by the lightbulb.
 function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
   let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);if(!e)return null;let r=e.getBoundingClientRect();
-    const hid=()=>{if(!r.width)return false;if(r.bottom>innerHeight-2||r.top<0)return true;const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !(t&&(t===e||e.contains(t)||t.closest('#finger,.tapring,.fly')))};
+    const hid=()=>{if(!r.width)return false;if(r.bottom>innerHeight-2||r.top<0)return true;const sc0=e.closest('#main');if(sc0){const a=sc0.getBoundingClientRect();return r.top<a.top-1||r.bottom>a.bottom+1}   /* in the sheet: scroll only when the button is outside it (a bubble over it is not a reason to scroll, or the sheet runs away) */
+      const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return !(t&&(t===e||e.contains(t)||t.closest('#finger,.tapring,.fly')))};
     if(hid()){try{const sc=e.closest('#main');if(sc){const a=sc.getBoundingClientRect(),q=e.getBoundingClientRect();sc.scrollTop+=q.top+q.height/2-(a.top+a.height/2)}}catch(x){}r=e.getBoundingClientRect()}   /* only the sheet scrolls: scrollIntoView also moved the clipped page */   // a suggested button scrolled out of the dock is brought into view first
     return r};const K=rm.k;
   const T=r=>{toR=r;return ctr(r)},F=r=>{fromR=r;return ctr(r)};
