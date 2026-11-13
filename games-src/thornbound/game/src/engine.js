@@ -430,7 +430,7 @@ AG.locReward=d=>{const {seat,l}=d;stat('loc'+l);if(!d.noInf)gainInf(seat,D.LOCS[
   locText(seat,l)};
 function locText(seat,l){const P=G.pl[seat];
   if(l===0){const src=P.hand.concat(cardsOfSeatActive(seat)).filter(id=>votesOf(id)>=1);if(!src.length)return;const o=[];
-    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:'Govern '+cname(id)+' ('+vtxt(votesOf(id))+') into '+councilName(c)});
+    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:cname(id)+' ('+vtxt(votesOf(id))+') \u2192 '+councilName(c).replace(/^Council of /,'')+' Council'});
     o.push({k:'skip',skip:1,label:'Skip the Spire Court'});askPick(seat,'castle','Spire Court: Govern with one Active or hand card?',o,'castle',{})}
   else if(l===1){const src=journeySources(seat,true);if(!src.length)return;
     askPick(seat,'wilderness','Thornwild: Journey with one Active or hand card?',src.map(id=>({k:'j'+id,id,label:'Journey with '+cname(id)+' (+'+eff(id).l+' Lore)'})).concat([{k:'skip',skip:1,label:'Skip Thornwild'}]),'wilderness',{})}

@@ -16,6 +16,18 @@ document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.c
 document.addEventListener('pointerup',e=>{const p=UI._pd;UI._pd=null;if(!p||p.t.isConnected||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
   const n=document.elementFromPoint(e.clientX,e.clientY),t=n&&n.closest&&n.closest('#act [data-a],#main [data-a],#ppop [data-a]');
   if(!t||t.dataset.a!==p.a||(t.dataset.k||'')!==p.k||(t.dataset.aut||t.dataset.v||'')!==p.v||t.disabled)return;t.click();UI._ncT=Date.now()+350},true);
+// a new finger on the glass ends the previous tap's "swallow its click" window (a replayed tap whose real click never came must not eat the next tap)
+document.addEventListener('pointerdown',()=>{UI._ncT=0},true);
+// a clean tap whose click never comes (the browser drops the tap that stops a swipe's fling, e.g. a tap right after dragging a card):
+// pointerdown + pointerup landed on the same button and no click followed within 180 ms, so the tap is played as a click once
+(function(){let pd=null,mc=null;const sel='button,[data-a],#handw .hc';
+  document.addEventListener('pointerdown',e=>{if(mc){clearTimeout(mc);mc=null}const t=e.pointerType!=='mouse'&&e.target.closest&&e.target.closest(sel);pd=t?{t,x:e.clientX,y:e.clientY,at:Date.now()}:null},true);
+  document.addEventListener('pointerup',e=>{const p=pd;pd=null;if(!p||!p.t.isConnected||p.t.disabled||Date.now()-p.at>450||Math.hypot(e.clientX-p.x,e.clientY-p.y)>12)return;
+    if(UI._nc||(UI._ncT&&Date.now()<UI._ncT)||UI.dragging)return;   // a tap that skipped a narration, ended a hold or a drag: it must not act
+    const n=document.elementFromPoint(e.clientX,e.clientY);if(!n||!(n===p.t||p.t.contains(n)))return;const t=p.t;
+    mc=setTimeout(()=>{mc=null;if(!t.isConnected||t.disabled||(UI._ncT&&Date.now()<UI._ncT))return;t.click();UI._ncT=Date.now()+350},180)},true);
+  document.addEventListener('pointercancel',()=>{pd=null},true);
+  document.addEventListener('click',()=>{if(mc){clearTimeout(mc);mc=null}},true)})();
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('[data-a]');
   // an open detail sheet closes on any tap outside it (that tap does nothing else)

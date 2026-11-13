@@ -166,7 +166,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
      h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
      if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
      if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
-     else{const rk=recK();h+='<div class="opts">'+mv.slice().sort((a,b)=>(b.k===rk)-(a.k===rk)).map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     else{const rk=(M.sug&&M.sug.k)||recK();h+='<div class="opts">'+mv.slice().sort((a,b)=>(b.k===rk)-(a.k===rk)).map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
      h+='</div>';sheet=true}}
   set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
@@ -217,7 +217,7 @@ function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.ga
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
-  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
+  const rk=(UI.bf&&UI.bf.sug&&UI.bf.sug.k)||recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
   const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
   for(const [g,nmG] of GORD){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+L.map(m=>rowHTML(s,m,day)).join('')}
   return {h,f:''}}
