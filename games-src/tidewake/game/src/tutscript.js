@@ -19,16 +19,16 @@
 //   a leviathan landing on a tile destroys it and sinks the junk on it ... sunk (turn 9, Cobalt)
 // Not taught (the lightbulb and the Rules drawer cover them): Rift Gate, Maelstrom, elimination bonus, blocked-start relocation, teams and solo.
 const TS={on:false,seed:11,me:0,co:1,
-  start:{x:3,y:5,e:5},myStart:{x:2,y:5,e:5},
+  start:{x:3,y:6,e:5},myStart:{x:2,y:6,e:5},   // 7x7 board: the script's 6x6 game sits one row down (bottom edge = row 7)
   // five leviathans (ids index their arrows in data.js): 4 will block you at turn 8, 7 will sink Cobalt at turn 9, the others just roam
-  mons:[{id:0,x:0,y:0,r:0},{id:2,x:5,y:0,r:0},{id:5,x:0,y:4,r:0},{id:4,x:5,y:3,r:0},{id:7,x:2,y:2,r:0}],
+  mons:[{id:0,x:0,y:1,r:0},{id:2,x:5,y:1,r:0},{id:5,x:0,y:5,r:0},{id:4,x:5,y:4,r:0},{id:7,x:2,y:3,r:0}],
   hands:[[22,14,4],[1,36,0]],
-  deck:[35,9,10,57,11,12,13,15,16,17,18,19,20,21,23,24,25,26,27,28,29,30],
+  deck:[35,9,10,11,12,13,15,16,17,18,19,20,21,23,24,25,26,27,28,29,30],
   // dice per turn (a 6, 7 or 8 wakes the leviathans); anything not listed is a calm 1+2
   dice:{1:[1,2],2:[3,4],3:[1,3],4:[1,2],5:[1,2],6:[2,3],7:[1,2],8:[3,4],9:[3,4]},
   // what each leviathan does when the leviathans wake: a compass direction (the die that makes it go that way is looked up), or 'rot' = turns on the spot
-  mon:{2:{0:'E',2:'S',5:'N'},8:{4:'W'},9:{7:'E'}},
-  wave:{x:1,y:5,r:0,at:5,die:{6:[5,4]}},            // the Rogue Wave rises at the start of turn 5, heading north; you roll 5 (needs 3), then 4 when your path crosses its row
+  mon:{2:{0:'E',2:'S',5:'N'},8:{4:'rot'},9:{7:'E'}},   // turn 8: leviathan 4 only turns, one square from your bow (the danger warning)
+  wave:{x:1,y:6,r:0,at:5,die:{6:[5,4]}},            // the Rogue Wave rises at the start of turn 5, heading north; you roll 5 (needs 3), then 4 when your path crosses its row
   coMove:{a:'place',t:0,r:0,s:1}                     // Cobalt's tile every time: the first tile in her hand, unturned
 };
 const TUT_DIRN={N:0,E:1,S:2,W:3};
@@ -42,16 +42,15 @@ function tutDice(kind,arg){if(!TS.on||!G)return null;
   return null}
 // call right after newGame (a fresh game of 2 captains, human seat 0, computer seat 1, first:1, no expansions): fix the sea, the hands and the pile
 function tutRig(){const g=G;g.q=null;g.ag=[];g.wave=null;g.arr=null;
-  g.exp.wave=1;g.exp.cannon=1;
+  g.exp.wave=0;g.exp.cannon=0;   // base game only: add-ons are taught in Setup when switched on
   g.mons=TS.mons.map(m=>({id:m.id,k:'L',x:m.x,y:m.y,r:m.r}));
-  g.mdeck=[];for(let i=0;i<10;i++)if(!g.mons.some(m=>m.id===i))g.mdeck.push(i);g.mdeck.push(WAVE_ID);g.mgone=[];
+  g.mdeck=[];for(let i=0;i<10;i++)if(!g.mons.some(m=>m.id===i))g.mdeck.push(i);g.mgone=[];
   g.hands=TS.hands.map(h=>h.slice());g.deck=TS.deck.slice();
   const used=new Set([].concat(...g.hands,g.deck));for(let i=0;i<NCUR;i++)if(!used.has(i))g.deck.push(i);   // the rest of the currents follow
-  for(const c of CANNON_IDS)if(!used.has(c))g.deck.push(c);   // and the other four Deck Cannons, far down the pile
-  g.stats={};g.log=[];g.logN=0;lg('Tutorial: you against Cobalt.','big');
+    g.stats={};g.log=[];g.logN=0;lg('Tutorial: you against Cobalt.','big');
   for(const k in _tutWq)delete _tutWq[k]}
 // the Rogue Wave appears at the start of turn 5 (Cobalt's turn), owned by you, so it first moves (and rolls) at the start of turn 6
-{const _ts=AG.turnStart;AG.turnStart=function(d){_ts(d);const w=TS.wave;if(TS.on&&G&&G.turn===w.at&&!G.wave&&G.mdeck.includes(WAVE_ID)){
+{const _ts=AG.turnStart;AG.turnStart=function(d){_ts(d);const w=TS.wave;if(TS.on&&G&&G.exp.wave&&G.turn===w.at&&!G.wave&&G.mdeck.includes(WAVE_ID)){
   G.mdeck=G.mdeck.filter(x=>x!==WAVE_ID);G.wave={x:w.x,y:w.y,r:w.r,n:0,owner:TS.me,pt:G.turn};lg(`A Rogue Wave rises at column ${w.x+1}, row ${w.y+1}, heading ${DNAME[w.r]}.`,'big')}}}
 // Cobalt's moves: the start mark, then the same unturned tile every turn. Everything else (a question) is left to the normal computer.
 function tutAI(seat){if(!TS.on||!G||seat!==TS.co)return null;
