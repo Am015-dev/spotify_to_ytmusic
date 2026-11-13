@@ -154,8 +154,8 @@ function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chips
 // a tap that misses every glowing place (the camera was still easing, or it fell on a neighbour) lands on the nearest glowing place within a thumb's reach
 BF.snap=function(x,y,id){if(!BF.on||!UI.pick||!UI.pick.length||(id!=null&&UI.pick.includes(id)))return null;let best=null,bd=46;for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-x,r.top+r.height/2-y);if(d<bd){bd=d;best=g}}return best?+best.dataset.t:null};
 BF.place=function(){const gl=q('#bfglow');if(gl){const pts=[...gl.children].map(g=>tilePt(+g.dataset.t)).filter(Boolean);let md=99;for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)md=Math.min(md,Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y));
-    // R42 P6: rings never overlap: close places get smaller rings (44 px at least, the tap still snaps to the nearest)
-    const rs=Math.max(44,Math.min(52,Math.floor(md-3)));if(gl._rs!==rs){gl._rs=rs;gl.style.setProperty('--rs',rs+'px')}}
+    // R42 P6: rings never overlap, even at the top of their pulse (scale 1.18): close places get smaller rings (taps still snap to the nearest)
+    const rs=Math.max(34,Math.min(52,Math.floor((md-3)/1.18)));if(gl._rs!==rs){gl._rs=rs;gl.style.setProperty('--rs',rs+'px')}}
   if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const hr=(gl._rs||52)/2;const tr=Math.round(p.x-hr)+','+Math.round(p.y-hr);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-hr)+'px';g.style.top=Math.round(p.y-hr)+'px'}}
   const host=q('#bfchips');if(!host)return;const hr=host.getBoundingClientRect();const busy=[];
   // R36 stopper: a plate (or its "+N" / take-back button) must never sit on a glowing place's centre, or the finger lands on the plate and the tap dies
