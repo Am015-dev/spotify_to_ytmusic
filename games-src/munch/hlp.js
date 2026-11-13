@@ -178,7 +178,7 @@ function hlpCores0(){return [...document.querySelectorAll(HLP_CORE)].filter(e=>!
     .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2-2,t:cy-h/2-2,r:cx+w/2+2,b:cy+h/2+2}})}
 function hlpOwn(b){const st=b.dataset.phase&&HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();const T=te&&te.getBoundingClientRect();return T&&T.width?{l:T.left-4,t:T.top-4,r:T.right+4,b:T.bottom+4}:null}
 const hlpBubs=()=>[...document.querySelectorAll('.gxh-bub.on:not(.gxt-bub)')];
-const hlpBox=b=>{const r=b.getBoundingClientRect();return {l:r.left,t:r.top,r:r.right,b:r.bottom}};
+const hlpBox=b=>({l:b.offsetLeft,t:b.offsetTop,r:b.offsetLeft+b.offsetWidth,b:b.offsetTop+b.offsetHeight});   // the layout box: not the 4 px entrance slide
 function hlpBadAt(b,c,cs){const T=hlpOwn(b);return (T&&hlpHit(c,T))||cs.some(q=>hlpHit(c,q))}
 function hlpCovers(){const bs=hlpBubs();if(!bs.length)return false;const cs=hlpCores();return bs.some(b=>hlpBadAt(b,hlpBox(b),cs))}
 function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
@@ -189,7 +189,7 @@ function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
   b.style.left=Math.round(c.l)+'px';b.style.top=Math.round(c.t)+'px';const a=b.querySelector('.gxh-arr');
   if(a&&T){const side=c.b<=T.t+6?'bottom':c.t>=T.b-6?'top':'';b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+(side?' gxh-a-'+side:'');
     a.style.top='';a.style.visibility=side?'':'hidden';if(side)a.style.left=Math.round(Math.max(14,Math.min(c.r-c.l-26,(T.l+T.r)/2-c.l-6)))+'px'}
-  return !hlpBadAt(b,hlpBox(b),cs)}
+  return true}
 function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(!hlpCovers())return;
   const cs=hlpCores();for(const b of hlpBubs())if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}   // no spot at all on this screen: the glowing spots speak for themselves
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
