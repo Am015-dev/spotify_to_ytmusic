@@ -82,9 +82,14 @@ html.ph .ps-riv li:last-child{color:#ffe7a3;font-weight:700}
   html.ph-p .ps-ctl .pb .lbl{display:none}
   html.ph-p .ps-line:empty{display:none}
   html.ph .ps-goal{margin-top:4px;padding:6px 8px;min-height:44px}
+  /* R38: with the (i) / Use ★ line the Goal strip was pushed 23-30 px below the fold at 375x667: tighter gaps and 60 px tiles keep it on screen */
+  html.ph-p #ps{gap:3px;padding:4px 8px}html.ph-p .ps-x:empty{display:none}
+  html.ph-p .ps-turn{padding:3px 9px;margin:0 0 2px}html.ph-p .ps-main{gap:6px}
+  html.ph-p .pt{width:clamp(56px,16vw,60px);height:clamp(56px,16vw,60px)}
 }
 @media (orientation:portrait) and (max-height:600px){
   html.ph-p .pt{width:56px;height:56px}
+  html.ph-p #ps{padding:3px 8px 1px}
 }
 
 .goal[data-goal]{cursor:pointer;font-size:max(1rem,16px)}.goal[data-goal] u{color:#0f5d66;font-weight:700}
@@ -186,3 +191,5 @@ html.ph #pc .prompt[data-over] .row .btn[data-gx=rulesd]{display:none}
 .opts.bopts .bswap .bl{font-size:14px;line-height:1.1}
 .opts.bopts .bp .hc img,.opts.bopts .bp .hc svg{width:100%;height:100%;display:block}
 .opts.bopts .bl{font-size:13px;line-height:1}
+/* the danger note wraps as one box (R38 quick warn: its wrapped inline box overlapped "Your turn") */
+html.ph .ps-turn .warn-l,html.ph .ps-stat .warn-l{display:inline-block;max-width:100%}

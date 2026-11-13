@@ -179,9 +179,18 @@ function ovPos(force){const root=$('#ov');if(!root||!OV.items.length)return;cons
   const tfm=(el,p)=>{if(!p){el.style.display='none';return}el.style.display='';el.style.transform=`translate(${p[0].toFixed(1)}px,${p[1].toFixed(1)}px)`};
   for(const it of OV.items){const ds=it.ds;
     if(it.poly){const pts=ds.k==='route'?ds.pts:[ds.a,ds.b];const pp=pts.map(q=>P(q[0],.06,q[1]));if(pp.some(x=>!x))continue;const s=pp.map(x=>x[0].toFixed(1)+','+x[1].toFixed(1)).join(' ');it.poly[0].setAttribute('points',s);it.poly[1].setAttribute('points',s);
-      if(ds.k==='route'){const e=pp[pp.length-1];tfm(it.el,e);tfm(it.el2,pp[0]);const sp=it.el.lastChild,Bw=document.getElementById('board').clientWidth;if(sp){sp.style.left='0px';const w=sp.offsetWidth;const dx=Math.min(0,Bw-6-(e[0]+w/2))+Math.max(0,6-(e[0]-w/2));sp.style.left=dx.toFixed(0)+'px'}}
+      if(ds.k==='route'){const e=pp[pp.length-1];tfm(it.el,e);tfm(it.el2,pp[0]);ovRouteLabels(it,root)}
       else{const a=pp[pp.length-2]||pp[0],b=pp[pp.length-1];const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);const L=14,W=8;const h=[[b[0],b[1]],[b[0]-L*Math.cos(ang)+W*Math.sin(ang),b[1]-L*Math.sin(ang)-W*Math.cos(ang)],[b[0]-L*Math.cos(ang)-W*Math.sin(ang),b[1]-L*Math.sin(ang)+W*Math.cos(ang)]];it.head.setAttribute('points',h.map(x=>x.join(',')).join(' '))}}
     else tfm(it.el,P(ds.wx,ds.wy||.05,ds.wz))}}
+// the route's Stop label stays inside the chart (R38: "Off the edge" ran past the right edge at 375x553), and the small "start" label never sits on it:
+// it goes below its point, else above, else it hides (R38: Stop / start overlap)
+function ovRouteLabels(it,root){const sp=it.el&&it.el.lastChild,st=it.el2&&it.el2.firstChild;if(!sp)return;const R=root.getBoundingClientRect();
+  const ins=r=>({dx:Math.min(0,R.right-4-r.right)+Math.max(0,R.left+4-r.left),dy:Math.min(0,R.bottom-3-r.bottom)+Math.max(0,R.top+3-r.top)});
+  sp.style.left='0px';sp.style.top='0px';let a=ins(sp.getBoundingClientRect());sp.style.left=a.dx.toFixed(0)+'px';sp.style.top=a.dy.toFixed(0)+'px';
+  if(!st)return;const hit=(p,q)=>!(p.right<=q.left-2||q.right<=p.left-2||p.bottom<=q.top-2||q.bottom<=p.top-2);const pin=it.el.firstChild,S=sp.getBoundingClientRect(),P=pin?pin.getBoundingClientRect():null;
+  st.style.visibility='';for(const y of ['4px','calc(-100% - 22px)']){st.style.translate='-50% '+y;st.style.left='0px';st.style.top='0px';const r=st.getBoundingClientRect(),b=ins(r);st.style.left=b.dx.toFixed(0)+'px';st.style.top=b.dy.toFixed(0)+'px';
+    const r2=st.getBoundingClientRect();if(!hit(r2,S)&&!(P&&hit(r2,P)))return}
+  st.style.visibility='hidden'}
 function ovLoop(){try{if(!document.hidden&&OV.items.length)ovPos()}catch(e){}OV.raf=requestAnimationFrame(ovLoop)}
 document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('[data-mon]');const id=t&&t.dataset.mon!=null&&t.dataset.mon!==''?+t.dataset.mon:null;if(t&&t.classList.contains('otag'))return;if(id!==UI.hov){UI.hov=id;ovUpdate()}});
 // ---------- the Pieces drawer: what is on the board right now ----------

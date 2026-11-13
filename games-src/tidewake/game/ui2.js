@@ -2,17 +2,51 @@
 function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};if(text&&UI.busy){UI.rivLines=UI.rivLines||[];const t=String(text);if(UI.rivLines[UI.rivLines.length-1]!==t)UI.rivLines.push(t)}renderRes();const l=$('#live');if(l)l.textContent=text}
 async function kitWait(p,max){if(!p||!p.then)return;await Promise.race([p,sleep(max||2500)])}
 function stepsLen(steps){return steps.length}
+// a computer's turn while a person watches (not online, not the tutorial)
+function rivFast(){return !NET.on&&humans().length>0&&!(typeof TUTG!=='undefined'&&TUTG.on)&&UI.curTurn!=null&&!!G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human}
+// the same clock covers the leviathans that wake at the start of YOUR turn (UI.wakeT0, one playback only): they are the sea's move, not yours
+function autoOk(){return !NET.on&&humans().length>0&&!(typeof TUTG!=='undefined'&&TUTG.on)}
+const RIV_BUDGET=1400;function rivOver(){const n=performance.now();return autoOk()&&(!!UI.rivT0&&rivFast()&&n-UI.rivT0>=RIV_BUDGET||!!UI.wakeT0&&n-UI.wakeT0>=RIV_BUDGET)}
 async function playEvents(evs,gen){
-  UI.skip=!!UI.skipAll;UI.mphLive=true;
-  // a computer's turn replays faster (about 5 s a turn at the default speed); your own turn and the tutorial keep their pace
-  const base=UI.speed||1,fast=()=>!NET.on&&humans().length>0&&!(typeof TUTG!=='undefined'&&TUTG.on)&&UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;
+  UI.skip=!!UI.skipAll;UI.mphLive=true;if(UI.rivGen!==gen){UI.rivGen=gen;UI.rivT0=0}UI.wakeT0=0;
+  // a computer's turn replays faster; your own turn and the tutorial keep their pace
+  const base=UI.speed||1,fast=rivFast;
   const pace=sp=>{if(UI.speed!==sp){UI.speed=sp;try{TWKit.setSpeed(sp)}catch(x){}}};
-  // a computer's turn never takes more than ~2 s: after that the rest of it runs instantly (R34: 15-36 s of waiting per round)
-  let rv0=0;const cap=setInterval(()=>{if(UI.gen!==gen||!UI.started){clearInterval(cap);return}if(!fast()){rv0=0;return}if(!rv0){rv0=Date.now();return}if(Date.now()-rv0>=2000){UI.skip=true;sleepFlush()}},100);
-  try{for(const e of evs){if(UI.skip||UI.gen!==gen||!UI.started)break;if(e.t!=='arrive')UI.arrow=null;pace(fast()?base*2.1:base);try{await playEv(e,gen)}catch(x){console.error(x)}ovUpdate()}}finally{clearInterval(cap);pace(base)}
+  // a computer's turn, leviathan wake-ups included, shows at most ~2 s from its 'turn' beat (UI.rivT0); the rest of THAT turn then runs instantly and
+  // silently, and the next turn plays normally again. A turn spans two moves (its roll and its tile), so the clock lives on UI, not in this call.
+  // (R38: 23 of 137 rival turns took 11-19 s when leviathans woke). Skip / a tap still skips.
+  const cap=setInterval(()=>{if(UI.gen!==gen||!UI.started){clearInterval(cap);return}if(!UI.rush&&!UI.keep&&rivOver()){UI.rush=true;pace(1000);sleepFlush()}},50);
+  try{for(const e of evs){if(UI.gen!==gen||!UI.started)break;
+    if(e.t==='turn'){const cpu=!!(G.seats[e.seat]&&!G.seats[e.seat].human);UI.rivT0=cpu?performance.now():0;UI.wakeT0=cpu?0:performance.now();UI.rush=false;if(!UI.skipAll)UI.skip=false}
+    if(e.t!=='arrive')UI.arrow=null;
+    let inst=UI.skip||UI.rush||rivOver();if(inst)UI.rush=true;if(inst&&!UI.skip&&e.t==='sink'&&G.seats[e.seat]&&G.seats[e.seat].human){inst=false;UI.keep=true}UI.hush=inst;   // your own junk sinking always plays
+    // fast-forward: a skipped beat is applied to the board at once, with no animation and no wait (a drawn beat costs 30-150 ms even at top speed)
+    if(inst&&e.t!=='turn'){try{evNow(e)}catch(x){console.error(x)}continue}
+    pace(inst?1000:fast()||UI.wakeT0&&autoOk()?base*2.1:base);try{await playEv(e,gen)}catch(x){console.error(x)}UI.keep=false;ovUpdate()}}finally{clearInterval(cap);UI.keep=false;UI.hush=false;UI.rush=false;UI.wakeT0=0;pace(base)}
   UI.mphLive=false;UI.hiMon=null;UI.arrow=null;
   if(UI.gen===gen){UI.res=null}
 }
+// one beat applied instantly: the same board bookkeeping as playEv, no animation, no sound, no wait
+function evNow(e){const key=e.x+','+e.y;
+  switch(e.t){
+  case 'log':if(!e.skip&&UI.busy){UI.rivLines=UI.rivLines||[];const t=String(e.text);if(UI.rivLines[UI.rivLines.length-1]!==t)UI.rivLines.push(t)}break;
+  case 'dice':{const nx=UI.mphNext;if(nx&&nx.d[0]===e.d[0]&&nx.d[1]===e.d[1]){UI.mph=nx;UI.mphNext=null}if(UI.mph){UI.mph.roll=false}break}
+  case 'monact':{UI.trig.move=1;if(e.turned){const m=monById(e.id);if(m&&KS.mons[m.x+','+m.y]){TWKit.placeLeviathan(m.x,m.y,{arrows:levArrows(m.id),rot:m.r,animate:false});KS.mons[m.x+','+m.y]=m.id+':'+m.r}}break}
+  case 'place':KS.tiles[key]=e.card[0]+':'+e.card[1];TWKit.ghost(null);TWKit.placeTile(e.x,e.y,{paths:pathsOf(e.card[0],e.card[1]),animate:false});break;
+  case 'sail':{const id=sid(e.seat);if(!KS.ships[id]||!e.steps.length)break;const last=e.steps[e.steps.length-1],p={c:last.c,r:last.r,port:last.to};TWKit.setShipAt(id,p);KS.ships[id]=p;if(e.st==='edge'||e.st==='mon')KS.hold[e.seat]=1;break}
+  case 'warp':{const id=sid(e.seat);if(!KS.ships[id])break;const p={c:e.to[0],r:e.to[1],port:0};TWKit.setShipAt(id,p);KS.ships[id]=p;break}
+  case 'gate':TWKit.riftGate(e.x,e.y,true,{color:'violet'});KS.gates[key]=1;break;
+  case 'arrive':{UI.trig.lev=1;if(e.spawn)UI.trig.move=1;
+    if(e.k==='M'){if(e.from){TWKit.maelstrom(e.from[0],e.from[1],false);delete KS.mael[e.from[0]+','+e.from[1]]}if(KS.tiles[key]){TWKit.removeTile(e.x,e.y);delete KS.tiles[key]}TWKit.maelstrom(e.x,e.y,true);KS.mael[key]=1;break}
+    if(e.from){TWKit.removeLeviathan(e.from[0],e.from[1],{silent:true});delete KS.mons[e.from[0]+','+e.from[1]]}
+    if(KS.tiles[key]){TWKit.removeTile(e.x,e.y);delete KS.tiles[key]}
+    TWKit.placeLeviathan(e.x,e.y,{arrows:levArrows(e.id),rot:e.r,kind:e.id%2?'dragon':'serpent',animate:false});KS.mons[key]=e.id+':'+e.r;break}
+  case 'destroy':if(KS.tiles[key]){TWKit.removeTile(e.x,e.y);delete KS.tiles[key]}break;
+  case 'rmon':if(e.k==='M'){TWKit.maelstrom(e.x,e.y,false);delete KS.mael[key]}else{TWKit.removeLeviathan(e.x,e.y,{silent:true});delete KS.mons[key]}break;
+  case 'sink':{sunkAdd(e);UI.trig.sunk=1;const id=sid(e.seat);if(KS.ships[id]){TWKit.removeShip(id);delete KS.ships[id]}delete KS.hold[e.seat];break}
+  case 'wavenew':kitWave({x:e.x,y:e.y,r:e.r});break;
+  case 'wave':kitWave(e.to);break;
+  default:break}}
 async function playEv(e,gen){
   switch(e.t){
   case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');const riv=UI.curTurn!=null&&G.seats[UI.curTurn]&&!G.seats[UI.curTurn].human;await sleep(riv?(e.c==='bad'?1100:650):e.c==='bad'?950:560)}break}

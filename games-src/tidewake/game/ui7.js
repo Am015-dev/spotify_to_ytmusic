@@ -69,7 +69,10 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?(phTileNote(K,dd,hand,sel,rm)||phTileHint(K,dd,hand,sel)):'Pick an option.');
   return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span>${dangerHTML()}</div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?(G&&G.phase==='setup'&&innerHeight<600?'':phCrews()):phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
+// short portrait phones (<= 600 px tall): the line's (i) and Use ★ buttons join the Turn / Place row, so the line stays one text row and the Goal
+// strip stays on screen (R38: cut by 24 px at 375x553). The buttons keep their data-ph / data-a, so the same delegated taps work.
+function phShortCtl(el){try{if(PH.land||innerHeight>600)return;const ctl=el.querySelector('.ps-ctl'),ln=el.querySelector('.ps-line');if(!ctl||!ln)return;ln.querySelectorAll('.sdet,[data-a=sugg]').forEach(b=>ctl.appendChild(b))}catch(e){}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?(G&&G.phase==='setup'&&innerHeight<600?'':phCrews()):phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;phShortCtl(el);if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
@@ -246,8 +249,15 @@ function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kin
     else if(G.gates.some(g=>g.x===sq[0]&&g.y===sq[1]))pd={k:'gate',x:sq[0],y:sq[1]};
     else if(G.wave&&G.wave.x===sq[0]&&G.wave.y===sq[1])pd={k:'wave'}}
   if(pd&&phInfoData(pd)){sfx('click');phOpen('info',pd)}else if(PH.pop)phClose()}
-// the tap that closes a card must never reach the board under it (R34: "Got it" opened a leviathan's rules): a press on a card button, then a board tap within 0.6 s, is dropped
-document.addEventListener('pointerdown',e=>{if(PH.on&&e.target.closest&&e.target.closest('#pc button,.gxh-bub,#twgoal'))PH.closeT=Date.now()},true);
+// a press that starts on a bubble, card or sheet never reaches the board, however long it is held (R38: the coach bubble is removed on pointerdown, so a held
+// "Got it" or a tap on the bubble body let the click land on the board). The press's click is dropped unless it lands inside a bubble/card that is still there;
+// a second press that starts within 0.6 s of that press ending (a double tap) is dropped the same way.
+const PG_SEL='.gxh-bub,.gxh-rules,#pc,#ppop,#twgoal';const PG={on:false,up:0};
+document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL));PG.on=inG||(PG.up>0&&Date.now()-PG.up<600);PG.up=0},true);
+document.addEventListener('pointerup',e=>{if(PG.on)PG.up=Date.now()},true);
+document.addEventListener('pointercancel',e=>{if(PG.on)PG.up=Date.now()},true);
+document.addEventListener('click',e=>{if(!PG.on)return;if(PG.up&&Date.now()-PG.up>1000){PG.on=false;return}const t=e.target;
+  if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;e.stopPropagation();e.stopImmediatePropagation();if(e.cancelable)e.preventDefault()},true);
 // taps inside the strip / pop-up / cards
 document.addEventListener('click',e=>{if(!PH.on)return;
   if(Date.now()-PH.swipeT<350&&e.target.closest&&e.target.closest('#ppop')){e.stopPropagation();e.preventDefault();return}
