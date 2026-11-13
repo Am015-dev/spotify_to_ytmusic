@@ -22,7 +22,7 @@ function scorePose(s,p,m,enemyPoses,friends,lv){let sc=0;const b=B(s);
   for(const [e,poses] of enemyPoses){let o=0,d=0;for(const ep of poses){o+=threatTo(s,p,e,ep)*(1+1.4/Math.max(1,remaining(e)));d+=threatTo(e,ep,s,p);near=Math.min(near,len(sub(ep,p)))}off+=o/poses.length;def+=d/poses.length}
   // reward shots, fear return fire less than we value our own; flanking (a shot with no return fire) is the ideal
   sc+=off*AIW.off-def*(AIW.def+(remaining(s)<=2?.8:0))*(1-AIW.tough*Math.min(1,remaining(s)/6));if(off>.3&&def<.15)sc+=1.2;
-  if(near>330)sc-=(near-330)/60;
+  if(near>330)sc-=(near-330)/60;if(lv.chase)sc-=Math.min(near,600)*lv.chase;// first-game rival: always closes on you, so the fight never drifts apart
   if(lv.noise)sc+=(rnd(1000)/1000-.5)*lv.noise*2;return sc}
 function aiPlan(k){const lv=LV[G.players[k].lvl]||LV.normal;const mine=alive().filter(s=>s.side===k).sort((a,b)=>psOf(a)-psOf(b));
   const enemyPoses=enemiesOf(mine[0]||{side:k}).map(e=>[e,enemyGuess(e,lv.samples)]);const friends=[];

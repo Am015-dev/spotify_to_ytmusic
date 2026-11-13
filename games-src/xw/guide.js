@@ -48,9 +48,11 @@ function trackStats(){if(!G)return;if(UI.statG!==G){UI.statLast={};UI.statChg={}
   for(const s of G.ships){const v={ps:psOf(s),a:primary(s),g:agility(s),h:s.alive?s.hull-hullDmg(s):0,s:s.sh};const o=UI.statLast[s.id];if(o)for(const k in v)if(v[k]!==o[k])(UI.statChg[s.id]=UI.statChg[s.id]||{})[k]=now;UI.statLast[s.id]=v}}
 const pulse=(s,k)=>{const c=UI.statChg[s.id];return c&&c[k]&&Date.now()-c[k]<2600?' pulse':''};
 // ---- recommended setup spots (the highlighted default) and auto-placement ----
-function recOpt(q){if(q.key==='rock'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const m=/^([A-E])([1-5])$/.exec(o.l);if(!m)continue;const v=Math.abs('ABCDE'.indexOf(m[1])-2)+Math.abs(+m[2]-4)*1.2;if(v<bv){bv=v;best=o}}
+// the suggested spot varies between games (not within one): pick among the near-best by a hash of the game's seed and the question
+function recPick(q,sc){const a=q.opts.map(o=>[o,sc(o)]).filter(x=>x[1]!=null).sort((x,y)=>x[1]-y[1]);if(!a.length)return q.opts[0];const ok=a.filter(x=>x[1]<=a[0][1]+1.3);let h=((G&&G.seed|0)^Math.imul((q.kid|0)+1,2246822519))>>>0;h=Math.imul(h^h>>>15,2654435761)>>>0;return ok[(h>>>8)%ok.length][0]}
+function recOpt(q){if(q.key==='rock'){const best=recPick(q,o=>{const m=/^([A-E])([1-5])$/.exec(o.l);return m?Math.abs('ABCDE'.indexOf(m[1])-2)+Math.abs(+m[2]-4)*1.2:null});
     return {o:best,why:'in their half, where it blocks their approach and not yours'}}
-  if(q.key==='deploy'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const n=+String(o.l).slice(5);const v=Math.abs(n-5);if(v<bv){bv=v;best=o}}return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
+  if(q.key==='deploy'){const best=recPick(q,o=>Math.abs(+String(o.l).slice(5)-5));return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
   return {o:q.opts[0],why:''}}
 // Auto-place answers every remaining setup question of the human side at once, with the recommended spot
 function autoPlaceAll(){if(typeof isClient==='function'&&isClient()){if(humanTurn())netSend({act:'autoplace'});return}let guard=0;while(G&&G.round<1&&!G.winner&&G.phase==='ask'&&G.q&&['rock','deploy'].includes(G.q.key)&&humanTurn()&&guard++<40){const kid=G.q.kid;uiAct({act:'ask',k:recOpt(G.q).o.k});if(G.q&&G.q.kid===kid)break}render()}

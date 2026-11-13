@@ -44,6 +44,17 @@ function world(G, seat, rng) {
 // ---------- evaluation ----------
 const RV = { twig: 0.24, resin: 0.40, pebble: 0.52, berry: 0.34 };
 const SEASONF = [0.7, 0.6, 0.5, 0.3];
+const CITYB = [1.4, 1.2, 1.0, 0.4];
+const HANDB = 0.25;
+const HANDW = 0.5;
+const RESW = 3;
+let GENTLE = 0;
+// the default rival eases off while it leads (GK + GSLOPE x lead, capped at GMAX), never while its score is under GFLOOR for the season
+const GK = 0.6;
+const GCARD = 1.5;
+const GMAX = 0.9;
+const GSLOPE = 0.05;
+const GFLOOR = [4, 10, 16, 25];
 // rough worth of achieving each special event (points + effect) and the extra growth expected after it is owned
 const EVV = { sev_grand_market_scheme: 6, sev_hurry_scurry_dash: 5.5, sev_night_of_sparklers: 5, sev_lost_parchments_unearthed: 4, sev_acorn_bandits_seized: 3.5, sev_marsh_fever_remedy: 2.5, sev_wingborne_healers: 3, sev_commencement_of_pupils: 4.5, sev_counsel_for_scoundrels: 3, sev_pilgrims_trail: 4, sev_resident_minstrel: 5, sev_gilded_shrine_vault: 5, sev_vigil_of_remembrance: 4, sev_toll_holiday: 6, sev_grand_hollow_games: 9, sev_change_of_proprietors: 5 };
 const EVX = { sev_counsel_for_scoundrels: 2, sev_pilgrims_trail: 2.5, sev_vigil_of_remembrance: 2.5, sev_wingborne_healers: 1 };
@@ -100,7 +111,8 @@ function pubVal(W, i) { // cheap public value of an opponent seat
 }
 function V(W, seat, noOpp) {
   const p = W.players[seat], s = HB.score(W, seat), rem = remProd(p);
-  let v = s.total;
+  // the default rival, while it leads, eases off: it counts built cards a bit more and points a bit less (it still fills its city)
+  let v = s.total * (1 - GENTLE) + GENTLE * GCARD * Math.min(p.city.length, 15);
   for (const e of p.city) v += extraVal(key(e.id), e, p, rem);
   // hand
   const need = { twig: 0, resin: 0, pebble: 0, berry: 0 };
@@ -109,10 +121,12 @@ function V(W, seat, noOpp) {
     for (const r of RES) { const n = cost[r] || 0; tot += n; got += Math.min(n, p.res[r]); need[r] += n; }
     const aff = tot ? got / tot : 1;
     const cv = cardVal(W, p, id);
-    v += (cv <= 0 ? 0.1 : 0.25 + 0.5 * aff * cv) * SEASONF[p.season];
+    v += (cv <= 0 ? 0.1 : HANDB + HANDW * aff * cv) * SEASONF[p.season];
   }
-  for (const r of RES) v += (RV[r] * Math.min(p.res[r], need[r] + 2) + 0.03 * Math.max(0, p.res[r] - need[r] - 2)) * SEASONF[p.season] / 0.7 * 0.8;
+  for (const r of RES) v += (RV[r] * Math.min(p.res[r], need[r] + 2) + 0.03 * Math.max(0, p.res[r] - need[r] - 2)) * SEASONF[p.season] / 0.7 * RESW;
   v += 0.3 * (p.workers - p.dep.length);
+  // a built card keeps paying (events, combos, the 15-card race); a full hand is worth less than a growing city
+  v += CITYB[p.season] * Math.min(p.city.length, 15);
   // events
   const grimPer = W.grim ? (W.grim.diff === 1 ? 3 : 6) : 0.8;
   for (const e of W.bev) if (e.o === -1) { const nd = D.basicEvents[e.k].need; for (const c in nd) { const pr = Math.min(colorN(p, COLORKEY[c]), nd[c]) / nd[c]; v += (1.65 + (W.grim ? 0.5 : 0)) * pr * pr; } }
@@ -246,7 +260,18 @@ function pickBest(ranks, G, rng, noise) {
   ranks.forEach((r, i) => { const v = r.v + (noise ? (rng() - 0.5) * noise : 0) - (isPass(r.m) ? 0.25 : 0); if (v > bv) { bv = v; bi = i; } });
   return bi;
 }
-function chooseNormal(G, seat, rng) {
+// how gentle the default rival is right now: it eases off while it leads and plays at full strength while behind,
+// so a newcomer gets a close game and a strong player still meets a real rival
+function gentleNow(G, seat) {
+  if (G.grim || G.players.length < 2) return GK;
+  const mine = HB.score(G, seat).total, p = G.players[seat];
+  if (mine < GFLOOR[p.season]) return 0;   // never eases off below a real city's pace
+  const me = mine + 1.2 * G.players[seat].city.length; let opp = -1e9;
+  G.players.forEach((p, i) => { if (i !== seat) opp = Math.max(opp, HB.score(G, i).total + 1.2 * p.city.length); });
+  return Math.max(0, Math.min(GMAX, GK + GSLOPE * (me - opp)));
+}
+function chooseNormal(G, seat, rng) { GENTLE = gentleNow(G, seat); try { return chooseNormal0(G, seat, rng); } finally { GENTLE = 0; } }
+function chooseNormal0(G, seat, rng) {
   const ms = HB.moves(G, seat);
   if (ms.length === 1) return ms[0];
   const W0 = world(G, seat, rng);
@@ -306,6 +331,7 @@ function choose(G, seat, level, opts) {
   const rng = mkRng(seedOf(G, seat));
   if (level === 'easy') return chooseEasy(G, seat, rng);
   if (level === 'hard') return chooseHard(G, seat, rng, (opts && opts.budget) || 220);
+  if (level === 'coach') return chooseNormal0(G, seat, rng);   // the helper's pick for the player: normal strength, never eased off
   return chooseNormal(G, seat, rng);
 }
 // play the next move for whoever must act (helper for UIs and tests); returns the move or null

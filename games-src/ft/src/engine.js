@@ -69,14 +69,14 @@ function doBid(m){const mk=G.bidQueue.shift();const p=P(mk.p);const pr=Math.min(
     G.order=G.bids.slice().sort((a,b)=>G.track[b.spot].cost-G.track[a.spot].cost||b.n-a.n).map(b=>b.mk);G.phase='turn';G.turnIdx=0;G.nextBid=[];startTurn()}}
 // ---------- turns ----------
 function startTurn(){const mk=G.order[G.turnIdx];G.cur=mk.p;G.nextBid.push(mk);G.turn++;const p=P(mk.p);p.used={};p.itemUsed=0;G.turnFx={};G.move=null;G.act=null;G.step='move';
-  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){lg(`${p.nm} has no legal move and passes.`);G.step='sell'}}
+  lg(`— ${p.nm}'s turn —`,'turn');fx('turn',p.i);if(!legalStarts().length){G.noMove=1;lg(`${p.nm} has no legal move: djinn powers only, then the game ends this round.`);G.step='sell'}}   // published rule: no legal meeple move ends the game; that player and those after use powers only, the turn finishes, scores are counted
 function endTurn(){if(G.q){G.pendingEnd=1;return}G.turnIdx++;G.move=null;G.act=null;G.step=null;
    // rulebook: the game ends at the end of the TURN (= round) in which the last camel is dropped, after every player has acted; endRound() finishes it
 if(G.turnIdx>=G.order.length)return endRound();startTurn()}
 function endRound(){refillMarket();refillDjinns();if(G.ex.thieves&&!G.thRow.length&&G.thDeck.length)G.thRow.push(G.thDeck.shift());
   if(G.tut){lg('The tutorial round is over: the game ends.','big');return finish()}
   if(G.endTrig){lg('The last camel has been placed: the game ends.','big');return finish()}
-  if(!legalStarts().length){lg('No legal move remains anywhere on the board.','big');return finish()}
+  if(G.noMove||!legalStarts().length){lg('No legal move remains on the board: the game ends.','big');return finish()}
   G.round++;G.bidQueue=G.nextBid.slice();G.bids=[];G.phase='bid';lg(`— Round ${G.round}: bid for turn order —`,'round');fx('round')}
 // ---------- movement ----------
 function handCounts(h){const o={};for(const c of h)o[c]=(o[c]||0)+1;return o}
@@ -254,7 +254,7 @@ function goodsScore(res){const c={};for(const r of res)c[r]=(c[r]||0)+1;let tot=
 function goodsBest(p){const w=hasDj(p,'zarifa')?Math.floor(p.fk/2):0;if(!w)return goodsScore(p.res);const kinds=Object.keys(RNAME).filter(k=>k!=='fakir');let best=0;
   const rec=(res,left)=>{if(!left){best=Math.max(best,goodsScore(res));return}for(const k of kinds)rec(res.concat([k]),left-1)};if(w<=3)rec(p.res,w);else{let r=p.res.slice();for(let i=0;i<w;i++){let bk=kinds[0],bv=-1;for(const k of kinds){const v=goodsScore(r.concat([k]));if(v>bv){bv=v;bk=k}}r.push(bk)}best=goodsScore(r)}return best}
 function finish(){if(G.over)return;const sc=G.pl.map(p=>({p,s:scoreOf(p)}));sc.sort((a,b)=>b.s.total-a.s.total);const top=sc[0].s.total;const winners=sc.filter(x=>x.s.total===top).map(x=>x.p);
-  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
+  G.over={scores:sc.map(x=>({p:x.p.i,s:x.s})),win:winners.map(w=>w.i)};G.winner=winners.map(w=>w.nm).join(' & ');G.winText=`${G.winner} ${winners.length>1?'share the win':winners[0].nm==='You'?'win':'wins'} with ${top} points.`;G.phase='over';lg('🏆 '+G.winText,'big');fx('win')}
 // ---------- invariants and test hooks ----------
 function checkInvariants(){const v=[];if(!G)return v;let n=G.bag.length;for(const t of G.board){n+=t.m.length;if(t.block&&t.m.length)v.push('meeple on a blocked tile')}if(G.move)n+=G.move.hand.length;if(G.act&&!G.act.tribeDone)n+=G.act.n;
   for(const p of G.pl){n+=p.vz+p.el+p.art;if(p.coins<0)v.push(p.nm+' coins negative');if(p.fk<0)v.push(p.nm+' mystics negative');if(p.camels<0)v.push('camels negative');if(p.el<0||p.vz<0||p.art<0)v.push('kept meeples negative')}

@@ -22,7 +22,7 @@ const TUT_KEYS={   // tile index -> [kind, value] (value only where several exis
 const TUT_PEOPLE={   // tile index -> its three people (the rest of the bazaar is filled from what is left)
   11:['elder','elder','elder'],8:['elder','elder','elder'],5:['vizier','vizier','vizier'],2:['vizier','vizier','vizier'],
   24:['merchant','merchant','merchant'],27:['merchant','merchant','merchant'],19:['builder','vizier','vizier'],15:['builder','builder','builder'],13:['vizier','assassin','assassin']};
-const TUT_MARKET=['fish','wheat','silk','pottery','fakir','spice','jewels','papyrus','gold'];
+const TUT_MARKET=['fish','wheat','silk','pottery','fakir','spice','fakir','jewels','papyrus'];
 const TUT_DJ=['nakhla','wazira','hikma'];
 function tutBuild(){
   // 1. the tiles: the keyed positions get their kind, everything else keeps the order the seed gave

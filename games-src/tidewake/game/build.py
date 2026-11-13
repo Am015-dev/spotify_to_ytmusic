@@ -76,6 +76,19 @@ kit=rd(os.path.join(SP,'tidewake','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
 if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
+# BOARD 7x7 (the published board): the kit is drawn for 6x6; widen it here (G = grid half-size, centres at c - 3, edge numbers 1-6 over columns/rows 1-6)
+def _b7(k):
+  n0=k
+  k=k.replace('var G = 3, M = 1.45','var G = 3.5, M = 1.45').replace('cells: 6,','cells: 7,').replace('6 by 6 squares','7 by 7 squares').replace('rrShape(9.6, 9.6,','rrShape(10.6, 10.6,')
+  k=re.sub(r'(\w) - 2\.5\b',r'\1 - 3',k)
+  k=k.replace('index - 3.5','index - 4').replace('var u = n - 3.5','var u = n - 4')
+  for v in ['r','c','e','rr','cc','r2','c2','wr','wc']:k=re.sub(r'\b%s < 6\b'%v,'%s < 7'%v,k)
+  k=k.replace('if (c === 5 && (p === 2 || p === 3))','if (c === 6 && (p === 2 || p === 3))').replace('if (r === 5 && (p === 4 || p === 5))','if (r === 6 && (p === 4 || p === 5))').replace('if (c && c < 5 && r && r < 5) continue;','if (c && c < 6 && r && r < 6) continue;')
+  # a tap in the frame just outside the chart picks the nearest edge square (the start-mark pop-up then offers that square's marks as big buttons)
+  k=k.replace("  var cc = Math.floor(x + G), rr = Math.floor(z + G);\n","  var cc = Math.floor(x + G), rr = Math.floor(z + G);\n  if ((cc < 0 || cc > 6 || rr < 0 || rr > 6) && Math.abs(x) < G + 1 && Math.abs(z) < G + 1) { cc = Math.max(0, Math.min(6, cc)); rr = Math.max(0, Math.min(6, rr)); }\n")
+  k=k.replace('l <= 6;','l <= 7;').replace('c + dc < 6','c + dc < 7').replace('r + dr < 6','r + dr < 7')
+  return k
+kit=_b7(kit)
 # ui.js is the join of ui1..ui5.js (kept in parts for editing)
 open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,11)))
 T=os.path.join(SP,'node_modules','three','build','three.min.js')

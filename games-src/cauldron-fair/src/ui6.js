@@ -192,7 +192,7 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
+  const go = () => { UI.shopSel = []; UI.shopInfo = null; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) { const me = mineP(); if (me) UI.instrNote = { ver: me.ver, text: 'That did not work. Pick again.' }; } };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;
@@ -211,4 +211,5 @@ function renderRat(p, legal) {
   const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
   if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
   c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
+  try { if (typeof GXH !== 'undefined') setTimeout(() => GXH.relayout(), 0); } catch (e) { }   // a bubble placed before this pill appeared must move off it
 }

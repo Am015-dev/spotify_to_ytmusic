@@ -1,38 +1,38 @@
-# Vale of Banners - tutorial coverage (W379, coached first game)
+# Vale of Banners - tutorial coverage (W505, guided first game)
 
-The tutorial is a coached first game: a real 2-player game, 1 season (5 rounds), against the real easy AI (seed 77), from setup to the final
-count. Only the very first action is spotlit (2 forced steps: take a tile, Take). After that every legal move is allowed. Before each of your
-turns in rounds 2-5 the table is stacked (your dice set, a Keep / Moot Hall / Lore / Pasture put in the stalls) so the cases come up, but you
-choose. Old Odo (the guide, STORY.md) explains each rule the first time it matters, comments on a good or poor move and on rival moves worth
-learning: one bubble at a time, it never blocks input (only its × is tappable), it closes by itself. Lines live in `src/story.js` (coach).
-At the end the result card walks through the final count with your real numbers, then a "Things you'll meet later" card lists every rule that
-did not come up. Proof: `node tut-end.js` plays the coached game with any legal move through visible, uncovered UI (no scripted tap list) at
-390x763 and 1440x860, and asserts every rule below was explained in play or on the later card. Last run: 14/20 in play, 6 on the later card.
+The tutorial is a guided first game: a real 2-player game against the real easy AI (seed 77). Every step is one line of 12 words or fewer
+plus one glowing tap (a game piece, a pop-up button, or Next on an info step). Before each of your turns the table is staged (dice, storage,
+goods, stalls) so that step's rule comes up; the rival plays real turns in between. After the last step the end card offers
+"Play a real game" (a normal 5-season game starts). No "learn later" list: every core rule is taught in the walk.
+Steps live in `src/ui.js` (`tutSteps`, staging in `tutStage`). Proof: `node tut-walk.js` taps every step by touch at 390x844 and 375x667 and
+by mouse at 1440x900, checks each target is on screen and uncovered, each line has 12 words or fewer, every rule below appears in this order,
+the end card is reached and a real game starts. `SHOTS=1 node tut-walk.js` saves `playable-shots/gameplay/tut-N.png`.
 
-| Rule (coach id) | Explained when | Story beat / line |
-|---|---|---|
-| [x] Two dice, one action each; take a tile into storage | forced steps 1-2 | "Your two dice are your two hands today..." |
-| [x] Build: colour, number, touching land (build) | first time a stored tile can be built | "That tile wants a home..." |
-| [x] End turn (end) | first time both dice are used | "Both dice spent..." |
-| [x] Rival turn + turn order by banner track (rival) | first rival turn | "Tobin's turn. The banner track decides..." |
-| [x] White die places goods (white) | round 2 | "See the white die?..." |
-| [x] Sell goods: points per crate + silver (sell) | first time a sale is legal | "You can sell!..." |
-| [x] Max 3 kinds of goods (kinds) | when you hold 3 kinds | "Your barn holds three kinds..." |
-| [x] Workers: take 2, each bends a die by 1, 6-1 wrap (workers) | first workers move | "Workers! Each one nudges a die..." |
-| [x] Bend a die to reach a tile (bend) | first take that costs a worker | "Tiles marked with a worker..." |
-| [x] Back lane: 2 silver, once per turn, no die (back) | first time a buy is legal | "You have 2 silver..." |
-| [x] Keep: free action (keep) | when you build a Keep | "A keep! One free action..." |
-| [x] Buildings: instant, one kind per quarter (bld) | when you build a Building | "Buildings act the moment they land..." |
-| [x] Moot Hall chain (hall) | when you build a Moot Hall | "Moot Hall: build again at once..." |
-| [x] Lore (lore) | when you build Lore | "Lore bends one rule..." |
-| [x] Mine: silver at season end (mine) | when you build a Mine | "A mine pays you a silver..." |
-| [x] Pasture scoring (pas) | first Pasture you can take or build | "Pastures score every animal..." |
-| [x] Barge (barge) | when you build a Barge | "A barge loads every crate..." |
-| [x] Region scoring + season bonus (region) | first region filled (yours or the rival's) | "A whole region filled!..." |
-| [x] Colour bonus (colour) | first colour completed | "Every space of one colour filled..." |
-| [x] Storage full: drop a tile (discard) | first discard question | "Storage is full..." |
-| [x] Season end, game end (season) | end of the season | "The season ends: mines pay out..." |
-| [x] Final count: silver, goods, 2 workers, Lore; tie-break | result card, with your numbers | "How your score was counted" |
-| [x] Good / poor move, rival lessons | chain, region; workers when a build was possible; rival region/sale/chain | coachGood / coachPoor / coachRival |
-| [x] Anything not met in this game | result card | "Things you'll meet later" (rule text from story.js) |
-| [ ] Solo and 2 v 2 teams | - | Quick game setup + Rules drawer |
+| # | Rule | Step ids | Tap |
+|---|---|---|---|
+| 1 | Two dice, one action each | dice | Next |
+| 2 | Goal: most points after five seasons | goal | Next |
+| 3 | Take: die number = stall | take, take2 | stall tile, Take |
+| 4 | Storage holds three | store | stored tile |
+| 5 | Build: same colour, die number, touching your land | build | glowing space |
+| 6 | Region scoring + season bonus | region | Next |
+| 7 | End turn after both dice | end1 (again end2-end5) | End turn |
+| 8 | Turn order by banner track | order | Next (after the rival's real turn) |
+| 9 | White die puts goods on a stall | white | Next |
+| 10 | Sell all goods of a number: 1 silver + 2 per crate | sell, sell2 | goods, Sell |
+| 11 | Any die = 2 workers | workers | workers button |
+| 12 | At most 3 kinds of goods | kinds | Next |
+| 13 | A worker moves a die by 1 | bend, bend2 | stall tile, Take (1 worker) |
+| 14 | 6 and 1 are neighbours | wrap | Next |
+| 15 | Back lane: 2 silver, no die, once per turn | buy, buy2 | back-lane tile, Buy |
+| 16 | Keep: one free action | keep, keep2, free | keep, space, Moot Hall |
+| 17 | Buildings act once; no two alike per region | free2, bld | space, Next |
+| 18 | Moot Hall builds one more tile | hall | stored sheep |
+| 19 | Pasture scoring (same animals in the meadow) | pas, pas2 | space, Next |
+| 20 | Lore bends a rule | lore, lore2 | lore tile, space |
+| 21 | Barge: goods from one stall + move up the track | barge, barge2, barge3 | barge, space, crates |
+| 22 | Full storage forces a discard | full, full2, discard, discard2 | stall tile, Take, tile, Throw away |
+| 23 | Colour bonus (5 first, 2 second) | colour, colour2, colour3 | keep, space, Next |
+| 24 | Season end: mines pay, stalls refill, crates stay | season, refill | Next |
+| 25 | Final count: silver, goods, worker pairs | final | Next |
+| 26 | Tie-break: more empty spaces | tie | Next |

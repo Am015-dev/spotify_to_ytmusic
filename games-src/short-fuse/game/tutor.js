@@ -11,12 +11,12 @@
 //   validation token on the track when all four of a number are cut ................. crew2
 //   solo cut: you hold every wire left of a number (all four, or the last two) ...... solo (and Plum does one in crew1)
 //   equipment unlocks when two of its number are cut, then works once ................ hit (unlock), gear (use)
-//   personal tool: the Twin Probe, once per job ....................................... probe
+//   personal tool: the Twin Probe, once per job (used for the practice miss) ........... probe, wrong1b
 //   yellow wires: a yellow matches only a yellow, you must hold one to say "yellow" .. yellow1, yellow2
-//   red wires: never point at one; a hand of only reds is revealed for you ............ red, win
+//   red wires: tap yours; never point at one; a hand of only reds reveals itself ..... red, win
 // The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1-3 (four each), yellows 1.1 and 2.1, red 2.5.
 //   You   : Y 2 2 2 R 3        Teal: 1 1 2 3        Plum: 1 1 Y 3 3      fuse 3 steps, one gear card (Rewind, unlocked by two 2s)
-//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you miss on Plum's 2nd wire (token 1) · T5 Teal uses that token ·
+//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Twin Probe on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
 //   T6 Plum hits Teal's last 1 · T7 you use Rewind and cut the last yellow · T8 you solo your 2s, your red is revealed for you, defused.
 // The computer never moves by itself in here: the steps that say "the crew plays" run its scripted moves (tutMove) and wait for them.
 const TUT_GAME='short-fuse';
@@ -78,36 +78,43 @@ async function tutAct(seat,tok){const m=tutMove(seat);if(!m||!tutAlive(tok))retu
 async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.over;n++){const s=sideToAct();if(s<0||isHuman(s))break;if(!await tutAct(s,tok))break}}
 // ---------------------------------------------------------------- the steps
 const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
+// review R1 (row 2): the Twin Probe and red are taught by doing
+const tutProbeIdx=()=>(TBL.items||[]).findIndex(x=>x.t==='tool'&&x.tool==='dd');
+const tutIsProbe=n=>n===tutProbeIdx();
+const tutProbeChip=()=>{const i=tutProbeIdx();const e=i>=0&&document.querySelector('#mine .chip[data-chip="'+i+'"]');return e&&e.getBoundingClientRect().width?e:null};
+const tutProbeSel=n=>!!UI.sel&&UI.sel.mode==='dual'&&UI.sel.tool==='dd'&&UI.sel.tg.length===n&&UI.sel.v==null;
+// Plum chooses which of the two probed wires gets the miss token (the rules let the wire's owner choose): the crew answers that one question only
+async function tutQ(){const tok=UI.tutTok;for(let n=0;n<4&&tutAlive(tok)&&G.q&&!isHuman(G.q.who);n++){if(!await tutAct(G.q.who,tok))break}}
+// the red wire is not a legal tap, so the board ignores it: during the red step the tutorial listens for it
+document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target.closest&&e.target.closest('#mine .tile');if(!t||!G)return;const sl=G.st[+t.dataset.s]&&G.st[+t.dataset.s].w[+t.dataset.k];if(sl&&sl.id===49&&!sl.cut)GXT.act({type:'tap',what:'red'})});
 const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,7)];return t&&t.cut};
 function tutSteps(){return tutStory([
- {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires before the fuse burns out. The whole crew wins or loses together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.q},
+ {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires together; a miss burns the fuse, red means boom.',target:tq('#cutc'),also:tq('#fuse'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
- {id:'crew',title:'Their wires',say:'Teal and Plum hold the rest. You see only their backs, and they never see yours.',target:()=>tq(innerWidth>=900?'#crew .sg':'#crew')(),wait:null},
- {id:'fuse',title:'The fuse',say:'A wrong cut burns one step. The bomb explodes when no step is left. It also explodes if a red wire is cut.',target:tq('#fuse'),wait:null},
  {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 3: a token tells the crew its number.',target:tutEl(0,8),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
- {id:'tokens2',title:'Their tokens',say:'Teal and Plum each showed a wire too. Tokens are clues the whole crew can use.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>!!G&&tutMyTurn()},
- {id:'point',title:'Point at a wire',say:'Your turn. Teal\'s token says 2. Tap that wire to point at it.',target:tutEl(1,7),
+ {id:'point',title:'Point at a wire',ai:tutCrew,say:'Your turn. Teal\'s token says 2. Tap that wire to point at it.',target:tutEl(1,7),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===7},ready:()=>tutMyTurn()&&!UI.sel},
  {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 2s. If Teal has a 2, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,7)},
  {id:'hit',title:'A hit!',say:'Match! Both 2s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
- {id:'crew1',title:'Crew turns',say:'Teal used your token to cut your 3. Plum held every 3 left, so he cut them alone.',target:tq('#crew'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
- {id:'wrong1',title:'A wrong guess',say:'Let\'s guess wrong on purpose. Plum\'s wires are hidden: tap his second wire.',target:tutEl(2,3),
-   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&!UI.sel},
- {id:'wrong2',title:'Name a number',say:'Say 2. It is really a 1, so this will miss.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(2,3)},
+ {id:'probe',title:'Your Twin Probe',ai:tutCrew,say:'Tap your Twin Probe: it tests two wires at once.',target:tutProbeChip,
+   wait:{type:'tap',match:a=>a.what==='chip'&&tutIsProbe(a.n)},ready:()=>tutMyTurn()&&!UI.sel&&!!tutProbeChip()},
+ {id:'wrong1',title:'A wrong guess',say:'No clue is sure here, so guess: tap Plum\'s second wire.',target:tutEl(2,3),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&tutProbeSel(0)},
+ {id:'wrong1b',title:'Two wires',say:'Now tap his third wire too.',target:tutEl(2,60),
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&tutProbeSel(1)},
+ {id:'wrong2',title:'Name a number',say:'Say 2, a risky guess: nothing proves it is a 2.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutProbeSel(2)},
  {id:'wrongres',title:'A miss',say:()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Wrong! The fuse burned one step, and a token shows the true number: a '+(t?t.v:1)+'.'},
-   target:tutEl(2,3),also:tq('#fuse'),wait:null,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
- {id:'crew2',title:'Using clues',say:'Teal used that token to cut a 1. Plum cut the last 1. Fully cut numbers get a green check.',target:tq('#track'),wait:null,ai:tutCrew,ready:()=>tutMyTurn()},
- {id:'probe',title:'Your Twin Probe',say:'Once per job, point at two wires and name one number. It hits if either wire matches.',target:tq('#mine .chip'),wait:null,ready:()=>tutMyTurn()&&!!document.querySelector('#mine .chip')},
- {id:'gear',title:'Use equipment',say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
+   target:tutEl(2,3),also:tq('#fuse'),wait:null,ai:tutQ,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
+ {id:'gear',title:'Use equipment',ai:tutCrew,say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
    wait:{type:'tap',match:a=>a.what==='eq'&&a.id==='eq6'},ready:()=>tutMyTurn()&&!!document.querySelector('#gear .eqk.glow')},
  {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s last wire must be the other: tap it.',target:tutEl(2,60),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===60},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},
  {id:'yellow2',title:'Say yellow',say:'Name your yellow wire. A yellow can only be matched with another yellow.',target:tutEl(0,59),
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===59},ready:()=>tutMyTurn()&&tutSelTo(2,60)},
- {id:'red',title:'Red wires',say:'Never point at red: the bomb explodes. If red is all you have left, it reveals itself.',target:tutEl(0,49),wait:null,ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
+ {id:'red',title:'Red wires',say:'Tap your red: never say red or point at one.',target:tutEl(0,49),wait:{type:'tap',match:a=>a.what==='red'},ready:()=>tutMyTurn()&&!!G.st[2].w[tutIdx(2,60)].cut},
  {id:'solo',title:'Solo cut',say:'You hold every 2 left, so cut them alone. Tap one: both are cut, with no risk.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===2&&a.k===myTwoK()},ready:()=>tutMyTurn()},
  {id:'win',title:'Defused!',say:'Every wire is cut: defused! Your last red was revealed for you. Win together, or lose together.',target:tq('#cutc'),wait:null,ready:()=>!!G&&!!G.over&&G.over.win}
@@ -119,14 +126,15 @@ function tutStory(steps){const wires=()=>G.st.reduce((a,s)=>a+s.w.length,0);
 // ---------------------------------------------------------------- the kit hooks
 function storyOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
-function tutStartOld(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+function tutStart(o){if(typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);o=pro?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
     endTitle:STORY.tut.endTitle,endText:o?STORY.tut.endText:STORY.tut.endTextPlain,
-    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:[{id:'job1',label:'Play job 1'}],   // the guided job ends in a real one
     setup:tutNew,
     onDone:r=>{tutLeave();const c=r&&r.choice;
       if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='job1'){UI.setup=UI.setup||defaultSetup();startJob({job:1,np:3,seats:['human','ai','ai'],lv:'easy',names:DEFNAMES.slice(),chars:[],captain:0})}
       else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
       else showStart()},
     onExit:()=>{tutLeave();showStart();if(pro&&typeof GXC!=='undefined')GXC.open()}})}   // skipping the Story prologue opens the chapter map
@@ -150,3 +158,7 @@ function tutOffer(){return false;if(typeof GXT==='undefined'||!firstTime()||GXT.
 (function(){const o=renderOverlays;renderOverlays=function(V){o(V);if(UI.tut){const ov=document.getElementById('over');if(ov)ov.hidden=true}}})();
 // while the crew waits for its scripted move the status line says whose turn it is (the real "is thinking" would be a lie)
 (function(){const o=sayText;sayText=function(V){const t=o(V);if(UI.tut&&G&&!G.over&&/ is thinking$| is choosing$/.test(t)){const s=decider();if(s>=0)return nm(s)+"'s turn"}return t}})();
+// Learn to play: every tap off the target answers, each time: the ring around what to tap (or the bubble's Next) pulses again
+(function(){let n=0;const st=document.createElement('style');st.textContent='.gxt-ring.sf-nudge,.sf-nudge{animation:sfNudge .5s ease-out 2}@keyframes sfNudge{0%{transform:scale(1)}40%{transform:scale(1.12);filter:brightness(1.6)}100%{transform:scale(1)}}';
+  (document.head||document.documentElement).appendChild(st);
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('.gxt-cell'))return;n++;const tx=document.querySelector('.gxh-tx');const bub=tx&&tx.parentElement;let R=[...document.querySelectorAll('.gxt-ring')];if(!R.length&&bub)R=[...bub.querySelectorAll('button')];if(!R.length&&!bub){try{toast(n%2?'Watch the crew…':'Watch the crew. Next step soon.')}catch(_){}}if(bub)bub.classList.toggle('sf-n1',n%2===1);R.forEach(r=>{r.classList.remove('sf-nudge');void r.offsetWidth;r.classList.add('sf-nudge');r.classList.toggle('sf-n1',n%2===1)})},true)})();
