@@ -1,14 +1,16 @@
-// Guided tutorial walked by real touch taps at 390x844, 375x667 and 360x640 (phone; touch targets must be 44x44) and mouse at 1440x900: every step's glowing target must be on
+// Guided tutorial walked by real touch taps at 390x844, 375x667, 360x640 and 375x553 (phone; touch targets must be 44x44) and mouse at 1440x900: every step's glowing target must be on
 // screen and uncovered (elementFromPoint), every line one sentence of 12 words or fewer, every core rule must appear in order, then
 // "Play a real game" must start a real 5-season game. SHOTS=1 saves playable-shots/gameplay/tut-N.png (390x844). node tut-walk.js
 const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
-const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html');
+/* STAGED build (the page players get, shell included): VB_URL, else build-all's GX_URL, else gx-serve on GX_STAGE. VB_HTML=<file> tests a bare html. */
+let URL = process.env.VB_URL || (process.env.VB_HTML ? 'file://' + process.env.VB_HTML : null);
 const RULES = ['dice', 'goal', 'take', 'storage', 'build', 'region', 'end', 'order', 'white', 'sell', 'workers', 'kinds', 'bend', 'wrap', 'back', 'keep',
   'building', 'hall', 'pasture', 'lore', 'barge', 'discard', 'colour', 'season', 'final', 'tie'];
 const SHOTDIR = path.join(__dirname, 'playable-shots', 'gameplay');
 (async () => {
+  if (!URL) URL = await require('../scripts/gx-serve.js').url('vale-of-banners');
   const b = await chromium.launch(); let bad = 0;
-  for (const [name, vp, touch] of [['phone', { width: 390, height: 844 }, true], ['phone-s', { width: 375, height: 667 }, true], ['phone-xs', { width: 360, height: 640 }, true], ['pc', { width: 1440, height: 900 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
+  for (const [name, vp, touch] of [['phone', { width: 390, height: 844 }, true], ['phone-s', { width: 375, height: 667 }, true], ['phone-xs', { width: 360, height: 640 }, true], ['phone-xxs', { width: 375, height: 553 }, true], ['pc', { width: 1440, height: 900 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }), page = await ctx.newPage(), errs = [], fails = [];
     page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });   // picture slots without a local file are expected
     await page.goto(URL); await page.evaluate(() => localStorage.clear()); await page.reload(); await page.waitForTimeout(500);

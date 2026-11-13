@@ -47,7 +47,11 @@
     return null;
   }
   function holesOf(st) {
-    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) {
+      // opt-in (cfg.fallbackMs): a next-button step whose target is missing/hidden for that long shows an untargeted bubble instead of blocking
+      if (cfg.fallbackMs && !st.wait && S && S.step === st && Date.now() - S.since > cfg.fallbackMs) { var v0 = vp(); var fh = norm({ left: v0.w / 2 - 22, top: v0.h * 0.4, width: 44, height: 44 }); fh.fb = 1; return [fh]; }
+      return null;
+    }
     var out = [p], al = null;
     try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
     if (al && !Array.isArray(al)) al = [al];
@@ -163,7 +167,7 @@
     S.holes = H; S.key = rkey(hs);
     var nextStep = !st.wait;
     drawCells(H, nextStep);
-    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    if (!hs[0].fb) H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
     add(topStrip());
     if (st.wait && st.wait.type !== 'event') {
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);

@@ -1007,6 +1007,7 @@ function tutSteps() {
   var tapW = function (what, f) { return { type: 'tap', match: function (a) { return a.what === what && (!f || f(a)); } }; };
   var ev = function (what) { return { type: 'event', match: function (a) { return a.what === what; } }; };
   var btn = function (txt) { return function () { var b = [].slice.call(document.querySelectorAll('#tv .acts .btn:not(.alt)')); return b.filter(function (x) { return !txt || x.textContent.indexOf(txt) >= 0; })[0] || null; }; };
+  var vpT = function () { var e = document.getElementById('r-vp'); return e && e.offsetWidth ? e : scoreEl(UI.view); };   /* the points chip is hidden on very short phones (<=600 px tall): point at the points on the view tab instead */
   var id = function (s) { return function () { return document.getElementById(typeof s === 'function' ? s() : s); }; };
   var st = function (f) { return function () { var i = storeIdx(f); return i < 0 ? null : document.getElementById('st-' + i); }; };
   var stw = function (f) { return tapW('store', function (a) { return a.s === storeIdx(f); }); };
@@ -1018,7 +1019,7 @@ function tutSteps() {
     { id: 'take2', rule: 'take', tab: 'market', say: 'Tap Take. It goes into your storage.', target: btn('Take'), wait: ev('take') },
     { id: 'store', rule: 'storage', tab: 'estate', say: 'Storage holds three tiles. Tap your mine to build it.', target: st(is('mine')), wait: stw(is('mine')) },
     { id: 'build', rule: 'build', tab: 'estate', say: 'Build next to your land: same colour, same number as a die.', target: id('ec-12'), wait: tapW('cell', function (a) { return a.cell === 12; }) },
-    { id: 'region', rule: 'region', tab: 'estate', say: 'A full outlined region scores. Early seasons pay a bigger bonus.', target: id('r-vp'), wait: null },
+    { id: 'region', rule: 'region', tab: 'estate', say: 'A full outlined region scores. Early seasons pay a bigger bonus.', target: vpT, wait: null },
     { id: 'end1', rule: 'end', tab: 'estate', say: 'Both dice used. Tap End turn.', target: id('endB'), wait: ev('end') },
     { id: 'order', rule: 'order', tab: 'estate', say: 'Your rival played. Higher on the banner track plays first.', target: id('opp'), wait: null, ai: rivalThen(2) },
     { id: 'white', rule: 'white', tab: 'market', say: 'Each round the white die puts a goods crate on a stall.', target: function () { return document.getElementById('gs-' + G.white); }, wait: null },
@@ -1056,7 +1057,7 @@ function tutSteps() {
     { id: 'discard2', rule: 'discard', tab: 'estate', say: 'Throw it away. Lost tiles score nothing.', target: btn('Throw'), wait: ev('discard') },
     { id: 'colour', rule: 'colour', tab: 'estate', say: 'Tap your keep. It fills every keep space you have.', target: st(is('castle')), wait: stw(is('castle')) },
     { id: 'colour2', rule: 'colour', tab: 'estate', say: 'Build it on the glowing 5 for a colour bonus.', target: id('ec-24'), wait: tapW('cell', function (a) { return a.cell === 24; }) },
-    { id: 'colour3', rule: 'colour', tab: 'estate', say: 'First to fill a colour gets 5 points, second gets 2.', target: id('r-vp'), wait: null },
+    { id: 'colour3', rule: 'colour', tab: 'estate', say: 'First to fill a colour gets 5 points, second gets 2.', target: vpT, wait: null },
     { id: 'hire', rule: 'keep', tab: 'estate', say: 'Another free action. Take two workers this time.', target: id('wkxB'), wait: ev('workers') },
     { id: 'end5', rule: 'end', tab: 'estate', say: 'Tap End turn.', target: id('endB'), wait: ev('end') },
     { id: 'season', rule: 'season', tab: 'estate', say: 'Five rounds end a season. Each mine pays one silver.', target: id('r-silver'), wait: null, ai: rivalThen('season') },
@@ -1106,7 +1107,7 @@ function tutStart(o) {
     stp.onEnter = function () { if (L.tabs) UI.tab = tab; if (G) render(); if (en0) en0(); };
     stp.ready = function () { if (!G || UI.busy) return false; if (L.tabs && UI.tab !== tab && !G.over && !tvOpen()) { UI.tab = tab; render(); } return true; };
   });
-  GXT.start({ game: 'vale-of-banners', story: true, endTitle: VSTORY.endTitle, endText: VSTORY.endText, setup: tutSetup, steps: steps, onDone: function (r) {
+  GXT.start({ game: 'vale-of-banners', fallbackMs: 2500, story: true, endTitle: VSTORY.endTitle, endText: VSTORY.endText, setup: tutSetup, steps: steps, onDone: function (r) {
     UI.mode = 'quick'; try { GXT.markDone('vale-of-banners'); } catch (e) { }
     if (r && r.choice === 'story') storyOpen(); else { UI.lastOpts = { n: 2, ai: 'gentle' }; startGame(UI.lastOpts); }
   }, onExit: function () { UI.mode = 'quick'; showTitle(); } });
