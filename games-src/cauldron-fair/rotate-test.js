@@ -69,7 +69,9 @@ async function pass(p, tag) {
   await tapSel(p, tag, 'thumb', '#others .th', { optional: true }); await p.waitForTimeout(300);
   await p.evaluate(() => { UI.focus = viewSeat(); render(); }); await p.waitForTimeout(200);
   for (const id of ['scored', 'rulesd', 'setd']) {
-    await tapSel(p, tag, 'bar ' + id, `.gx-bar [data-gx=${id}]`);
+    // a phone keeps only Menu in the top bar (W471 clean play mode): a hidden bar button is opened the way its drawer opens, then checked the same way
+    const vis = await p.evaluate(id => { const e = document.querySelector(`.gx-bar [data-gx=${id}]`); const r = e && e.getBoundingClientRect(); return !!(r && r.width && getComputedStyle(e).display !== 'none'); }, id);
+    if (vis) await tapSel(p, tag, 'bar ' + id, `.gx-bar [data-gx=${id}]`); else await p.evaluate(id => GX.show(id), id);
     const on = await p.evaluate(() => !!document.querySelector('.gx-drawer.on')); if (!on) fail(tag, 'drawer did not open', id);
     await scrollCheck(p, tag + ' drawer ' + id); await closeDrawer(p);
   }
@@ -78,7 +80,7 @@ async function pass(p, tag) {
 }
 // after Stop: tap through the day report / shop / questions with real touches (each tap measured) until Draw is back
 async function toNextTurn(p, tag) {
-  const sels = [['report take', '#rs [data-a=take],#rs [data-a=hotgo]'], ['report continue', '#rs [data-a=rscont]'], ['shop buy', '#rs [data-a=shopbuy]'], ['report choice', '#rs .dec [data-a=mv]'], ['tip ok', '#pc [data-a=tipok]'], ['question', '#qbox [data-a=mv]']];
+  const sels = [['goal card', '#goalcard .gcok'], ['report take', '#rs [data-a=take],#rs [data-a=hotgo]'], ['report continue', '#rs [data-a=rscont]'], ['shop buy', '#rs [data-a=shopbuy]'], ['report choice', '#rs .dec [data-a=mv]'], ['tip ok', '#pc [data-a=tipok]'], ['question', '#qbox [data-a=mv]']];
   for (let k = 0; k < 60; k++) {
     if (await p.$('#acts .drawb') && await p.evaluate(() => document.querySelector('#rs').hidden)) { await p.waitForTimeout(300); return; }
     let did = false;
@@ -93,7 +95,7 @@ async function startGame(p) {
   await p.touchscreen.tap(...await centre(p, '[data-a=play]')); await p.waitForTimeout(400);
   await p.evaluate(() => { UI.prefs.blgSeen = true; UI.seed = 5; UI.coach.level = 'off'; });
   await p.touchscreen.tap(...await centre(p, '[data-start=vs]')); await p.waitForTimeout(1200);
-  for (let k = 0; k < 30; k++) { if (await p.$('#acts .drawb')) break; const q = await p.$('#qbox [data-a=mv],#acts [data-a=mv],#pc [data-a=tipok]'); if (q) await q.tap().catch(() => { }); await p.waitForTimeout(400); }
+  for (let k = 0; k < 30; k++) { const gc = await p.$('#goalcard .gcok'); if (gc) { await p.touchscreen.tap(...await centre(p, '#goalcard .gcok')); await p.waitForTimeout(300); } if (await p.$('#acts .drawb') && !(await p.$('#goalcard'))) break; const q = await p.$('#qbox [data-a=mv],#acts [data-a=mv],#pc [data-a=tipok]'); if (q) await q.tap().catch(() => { }); await p.waitForTimeout(400); }
 }
 const centre = (p, s) => p.evaluate(s => { const r = document.querySelector(s).getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, s);
 async function lat(p) { return p.evaluate(() => { const o = []; return new Promise(res => { let n = 0, last = performance.now(), mx = 0; const t = setInterval(() => { const now = performance.now(); mx = Math.max(mx, now - last - 50); last = now; if (++n > 20) { clearInterval(t); res(Math.round(mx)); } }, 50); }); }); }
