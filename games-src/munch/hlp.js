@@ -171,29 +171,31 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();
 // re-place it with the kit, and if that is still crowded place it ourselves anywhere on screen (the top bar may be covered for a moment: any tap closes the bubble)
 const HLP_CORE='.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse';
 const hlpHit=(a,c)=>a.l<c.r&&a.r>c.l&&a.t<c.b&&a.b>c.t;
-function hlpCores(){return [...document.querySelectorAll(HLP_CORE)].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<innerWidth&&q.top<innerHeight)
+// the rings (the target, and the card a bulb finger starts from) stay clear too
+const hlpRings=()=>[...document.querySelectorAll('.gxh-ring')].map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height).map(q=>({l:q.left,t:q.top,r:q.right,b:q.bottom}));
+function hlpCores(){return hlpCores0().concat(hlpRings())}
+function hlpCores0(){return [...document.querySelectorAll(HLP_CORE)].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<innerWidth&&q.top<innerHeight)
     .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2-2,t:cy-h/2-2,r:cx+w/2+2,b:cy+h/2+2}})}
 function hlpOwn(b){const st=b.dataset.phase&&HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();const T=te&&te.getBoundingClientRect();return T&&T.width?{l:T.left-4,t:T.top-4,r:T.right+4,b:T.bottom+4}:null}
 const hlpBubs=()=>[...document.querySelectorAll('.gxh-bub.on:not(.gxt-bub)')];
 const hlpBox=b=>{const r=b.getBoundingClientRect();return {l:r.left,t:r.top,r:r.right,b:r.bottom}};
-// the rings (the target, and the card a bulb finger starts from) stay clear too
-const hlpRings=()=>[...document.querySelectorAll('.gxh-ring')].map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height).map(q=>({l:q.left,t:q.top,r:q.right,b:q.bottom}));
-function hlpBadAt(b,c,cs){const T=hlpOwn(b);return (T&&hlpHit(c,T))||cs.some(q=>hlpHit(c,q))||hlpRings().some(q=>hlpHit(c,q))}
+function hlpBadAt(b,c,cs){const T=hlpOwn(b);return (T&&hlpHit(c,T))||cs.some(q=>hlpHit(c,q))}
 function hlpCovers(){const bs=hlpBubs();if(!bs.length)return false;const cs=hlpCores();return bs.some(b=>hlpBadAt(b,hlpBox(b),cs))}
 function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
   const scan=()=>{const w=b.offsetWidth,h=b.offsetHeight,W=innerWidth,H=innerHeight,xs=[Math.max(6,(W-w)/2),6,Math.max(6,W-w-6)];let best=null,bd=1e9;
     for(let y=2;y<=H-h-2;y+=4)for(const x of xs){const c={l:x,t:y,r:x+w,b:y+h};if(hlpBadAt(b,c,cs))continue;const d=T?Math.abs(y+h/2-(T.t+T.b)/2)+Math.abs(x+w/2-(T.l+T.r)/2)*.5:y;if(d<bd){bd=d;best=c}}return best};
-  let c=scan();if(!c){b.classList.add('gxh-compact');c=scan()}if(!c)return false;
+  b.style.width=b.offsetWidth+'px';   // its width must not change with where it goes
+  let c=scan();if(!c){b.classList.add('gxh-compact');b.style.width='';b.style.width=b.offsetWidth+'px';c=scan()}if(!c)return false;
   b.style.left=Math.round(c.l)+'px';b.style.top=Math.round(c.t)+'px';const a=b.querySelector('.gxh-arr');
   if(a&&T){const side=c.b<=T.t+6?'bottom':c.t>=T.b-6?'top':'';b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+(side?' gxh-a-'+side:'');
     a.style.top='';a.style.visibility=side?'':'hidden';if(side)a.style.left=Math.round(Math.max(14,Math.min(c.r-c.l-26,(T.l+T.r)/2-c.l-6)))+'px'}
-  return true}
+  return !hlpBadAt(b,hlpBox(b),cs)}
 function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(!hlpCovers())return;
   const cs=hlpCores();for(const b of hlpBubs())if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}   // no spot at all on this screen: the glowing spots speak for themselves
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
 (function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}requestAnimationFrame(loop)})();
 // the kit places a bubble from a timer: check it before anything else runs (a microtask), not one frame later
-(function(){const mo=new MutationObserver(()=>{try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}});const go=()=>mo.observe(document.body,{childList:true});document.body?go():addEventListener('DOMContentLoaded',go)})();
+(function(){const done=new WeakSet();const mo=new MutationObserver(()=>{try{if(typeof GXH==='undefined'||!_hlpInit)return;const cs=hlpCores();for(const b of hlpBubs()){if(done.has(b))continue;done.add(b);if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}}catch(e){}});const go=()=>mo.observe(document.body,{childList:true});document.body?go():addEventListener('DOMContentLoaded',go)})();
 (function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter();hlpUncover()}catch(e){UI.lastErr='hlp '+e}return r}})();
 // pick-ups, asks and overlays change the phase without a render: look again now and then (cheap, idempotent)
 (function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit){GXH.phase(hlpPhase());hlpUncover()}}catch(e){}return r}})();
