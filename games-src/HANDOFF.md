@@ -259,3 +259,6 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - R37 FAIL: cauldron (gate cf-start, shop chips), vale (dock on staged build). R38 FAIL: sands 6.6, tidewake 7.1, nebula 7.1. R40 FAIL: shipwreck 7.0 (Phone, Feel).
 - Fixers (prefix session_01RR7mn): F8-cauldron XHEpd96Gw4SZpQKXR, F9-vale YsCG35preZuHn1tc2, F8-shipwreck a8PLrHvbcQ23hxzQj, F9-sands ZEdc1kAE8hgjKNSi6, F9-tidewake Xoto8RHitWvAFyWsp, F7-nebula a4XR6svtjujwbdFMG. F8-vinegrave bR1jxcLTeRJtguPvS still blocked on approval.
 - Reviewer R39 (thornbound bf654f28, doorkick 69fceeb6, hollowbough d2fde088) session_01RR7mna9BxSVfE7rV11BPvZ.
+- 01:25 status. READY, waiting owner yes: short-fuse c40209e4 (gate-only fail, orchestrator re-ran gates PASS); sands-of-qamar 7101e2b2 (R41 7.4 PASS); nebula-aces 51cec217 (R41 7.4 PASS).
+- Waiting review: cauldron bc7fabf6 (also loosens shared sweep.js bulb-finger tolerance; check it). Reviewer R42 (shipwreck eb36ac91, tidewake 3404be6e, hollowbough ed1c1661) session_01RR7mnXVorTjRtSxF2Qks8n.
+- Fixers (prefix session_01RR7mn): F10-vale aAR836Z4bPASLpNU1 (tutorial freeze 375x553), F8-thornbound ZwAQPXtssawAnFU37, F10-doorkick aJAhwE466jac5QZEa. F8-vinegrave bR1jxcLTeRJtguPvS blocked on approval since 20:06.
