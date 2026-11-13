@@ -289,9 +289,12 @@ function wantPile(){let n=advPileN();try{const r=UI.rec;if(r&&r.fresh&&r.round==
 BF.hintOn=()=>{try{if(/[?&]hint=1/.test(location.search)||localStorage.getItem('swi_hint')==='1')return true;if(localStorage.getItem('swi_hint')==='0')return false}catch(e){}
   return !!(typeof G!=='undefined'&&G&&G.diff==='easy'&&!G.cmp&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))};
 // the one-line why for a hinted job: the advisor's priority when it has one, else what that kind of job does for the day
-function hintWhy(rec,cur){let w=String(rec.why||'');if(/computer/.test(w)||w.length>26)w='';if(!w){const t=rec.type,L=String(rec.label||''),k=rec.tgt&&rec.tgt.k||(/shelter/i.test(L)?'shelter':/roof/i.test(L)?'roof':/palisade/i.test(L)?'pal':/fire/i.test(L)?'fire':'');
+function hintWhy(rec,cur,plain,dflt){let w=dflt?'':String(rec.why||'');if(/computer/.test(w)||w.length>26)w='';if(!w){const t=rec.type,L=String(rec.label||''),k=rec.tgt&&rec.tgt.k||(/shelter/i.test(L)?'shelter':/roof/i.test(L)?'roof':/palisade/i.test(L)?'pal':/fire/i.test(L)?'fire':'');
   w=t==='rest'?'heals 1 life':t==='gather'?(/wood/i.test(L)?'wood for fire and pile':'food for tonight'):t==='build'?(k==='shelter'?'stops night wounds':k==='roof'?'keeps the rain off':k==='pal'?'stops storm damage':k==='fire'?'half of the rescue':'helps every day'):t==='explore'?'new land to use':t==='threat'?'clears a threat':t==='hunt'?'food, but it bites':t==='camp'?'morale':''}
-  if(!rec.sure&&rec.odds)w+=(w?' · ':'')+'🎲';return w}
+  if(!plain&&!rec.sure&&rec.odds)w+=(w?' · ':'')+'🎲';return w}
+// R42 P7: the ✨ line is whole, never cut, and fits the status line's 8 words: a shorter job name, then the job's plain why, then fewer extras
+const nW=t=>String(t).trim().split(/\s+/).filter(Boolean).length;
+function fit8(...alts){for(const a of alts)if(a&&nW(a)<=8)return a;return alts[alts.length-1]}
 BF.hintWhy=hintWhy;
 BF.wantPile=()=>wantPile();
 // R40: the whole plan's extras (a skill like Thrifty, an item, fur instead of wood) that the pawn-by-pawn hints would lose: still to do today?
@@ -310,10 +313,14 @@ BF.hint=function(){let pre='';const castFree=()=>humanFree().some(p=>p.c!=null||
   // a job's leader first (the leader rolls, takes the wounds and brings the skills: the whole plan's order, R40 sim 15/40 -> 30/40 with the extras)
   {const fid=new Set(free.map(p=>p.id));const recs=cand.map(p=>[p,recTile(p)]).filter(x=>x[1]);const pick=recs.find(([p,r])=>r.rec.lead===p.id||!fid.has(r.rec.lead))||recs[0];if(pick){cur=pick[0];rt=pick[1]}}
   if(!rt&&cur&&cur.c==null){const f=free.find(p=>p.c!=null);if(f)cur=f}
-  if(!cur||!free.some(p=>p.c!=null)&&!rt){BF.hintId=null;BF.say(pre+'Every pawn has a job: Start day',0,true);render();return}
+  if(!cur||!free.some(p=>p.c!=null)&&!rt){BF.hintId=null;const pn=/🔥 Pile \+\d+/.exec(pre);BF.say(fit8(pre+'Every pawn has a job: Start day',pre+'All set: Start day',(pn?pn[0]+'. ':'')+'All set: Start day','All set: Start day'),0,true);render();return}
   UI.sel=cur.id;const nm=pawnLabel(cur).split(' ')[0];
   if(!rt){BF.hintId=null;BF.say(pre+`No clear pick for ${nm}: any glow`,0,true);render();return}
-  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'');const why=hintWhy(rt.rec,cur);BF.hintTxt=why;BF.say(`${pre?pre.replace(/\.\s*$/,'')+' · ':''}✨ ${nm} → ${lb.replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat')}${why?': '+why:''}`,8000,true);render()};
+  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'').replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat');
+  const job=lb.replace(/^Arrange the camp$/,'Camp').replace(/^Gather (\w+).*$/,'Gather $1').replace(/^Build (the )?/,'Build ');const dice=!rt.rec.sure&&rt.rec.odds?' 🎲':'';
+  const why=hintWhy(rt.rec,cur,true),why0=hintWhy(rt.rec,cur,true,true);BF.hintTxt=why;const pp=pre?pre.replace(/\.\s*$/,'')+' · ':'';
+  const L=(a,j2,w,d)=>`${a}✨${nm} → ${j2}${w?': '+w:''}${d}`;
+  BF.say(fit8(L(pp,lb,why,dice),L(pp,job,why,dice),L(pp,job,why0,dice),L('',job,why,dice),L('',job,why0,dice),L('',job,why0,''),L('',job,'',dice),L('',job,'','')),8000,true);render()};
 BF.ghostPlace=function(){const gh=q('#bfgh');if(!gh)return;let s=null;try{s=ghostSpot()}catch(e){}if(!s){gh.hidden=true;BF.ghostAt=null;return}gh.hidden=false;gh.style.left=Math.round(s.x-14)+'px';gh.style.top=Math.round(s.y-12)+'px';BF.ghostAt=s};
 // ---------- details drawer: the story text and the day's needs live here ----------
 BF.info=function(){const d=GX.drawer('detd','Details',null);fillInfo();GX.show('detd');return d};
