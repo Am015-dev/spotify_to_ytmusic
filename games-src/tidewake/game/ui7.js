@@ -15,7 +15,7 @@ function phApply(){const R=document.documentElement;const was=PH.on;PH.on=phDete
   const bs=PH.land?Math.min(h-I.t-I.b,w-I.l-I.r-300):Math.max(Math.round((w-I.l-I.r)*.78),Math.min(w-I.l-I.r,h-I.t-I.b-bar-250));
   R.classList.toggle('ph-l',PH.land);R.classList.toggle('ph-p',!PH.land);
   R.style.setProperty('--bs',Math.max(200,Math.floor(bs))+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
-// ---------- camera: flat top-down, the 6x6 board + edge numbers fill the square ----------
+// ---------- camera: flat top-down, the 7x7 board + edge numbers fill the square ----------
 function phZoom(){if(!PH.on||!kitOk())return;let c=null,r=null;
   if(PH.zoom&&G&&UI.started){const vs=viewSeat(),sd=sideToAct(),i=vs>=0?vs:sd;let S=i>=0?G.ships[i]:null;let p=S&&shipPos(S);if(!p){S=G.ships.find(x=>shipPos(x));p=S&&shipPos(S)}if(p){c=p.c;r=p.r}}
   const key=c!=null?c+','+r:'';if(key===PH.zk)return;PH.zk=key;try{if(key)TWKit.focus(c,r,1.7);else TWKit.focus(null)}catch(e){}}
@@ -32,6 +32,10 @@ function phMini(card,rot,A){const ps=TWKit.rotate(BASE_PATHS[CUR_TYPE[card]],rot
     const e=PH_P[en];s+=`<circle cx="${6+e[0]*88}" cy="${6+e[1]*88}" r="6.5" fill="#fff" stroke="#14232b" stroke-width="3"/>`}
   return s+'</svg>'}
 function phWhy(A){if(!A)return '';if(A.coll)return 'collision';if(A.st==='edge')return 'off the edge';if(A.st==='mon')return 'hits a monster';if(A.st==='gate')return 'Rift Gate';if(A.st==='ok')return (A.n||1)+(A.n>1?' currents':' current')+(A.mons&&A.mons.length?' · monster near':'');return ''}
+// why a tile cannot go down this way (R34: a tap on an X tile gave no sign): a short line in the strip
+function phCantMsg(m,seat){try{if(!m||m.a!=='place')return '';const A=analyse(knowledge(seat),seat,m);if(!A||!A.bad)return '';
+  return "Can't: "+(A.coll?'another junk is in the way':A.st==='mon'?'a leviathan is ahead':A.st==='edge'?'no room ahead':'that way sinks you')+'. Turn the tile.'}catch(e){return ''}}
+function phCardNote(){if(!PH.on||!UI.sel||UI.busy)return;const d=sideToAct();PH.toast=phCantMsg({a:'place',t:UI.sel.t,r:UI.sel.r,s:UI.sel.s},d)}
 // ---------- what the player may do right now ----------
 function phPlaceCtx(){if(!G||!UI.started||G.over||UI.busy)return null;const d=sideToAct();if(d<0||!G.seats[d].human||mustPass(d))return null;if(NET.on&&d!==NET.mySeat)return null;if(G.q||G.phase!=='play'||G.step!=='act')return null;
   const K=knowledge(d);return {d,K,hand:K.hands[d],sel:UI.sel,pl:(UI.moves||[]).filter(m=>m.a==='place')}}
@@ -46,34 +50,75 @@ function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+
 var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-stat"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-stat">${G.over?'<b>The last moves play out</b>':now>=0?dot(now)+' '+phWhose(now)+dangerHTML():'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${G.over?'Skip':humans().length===1&&!NET.on&&youSeat()>=0&&G.ships[youSeat()]&&!G.ships[youSeat()].alive?'See the result':humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div>${phRivalFeed()||`<div class="ps-line">${phHint()}</div>`}`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
   if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-stat">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
-  if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
+  if(!dh)return `<div class="ps-main"><div class="ps-stat">${dot(d)} ${phWhose(d)} <small>(computer)</small>${dangerHTML()}</div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-line">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-stat">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
-  if(G.phase==='setup'){let best='';try{const m=!hotSeat()||humans().length===1?aiMove(d,'hard'):null;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}">Safe start for me</button>`}catch(e){}
-    return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark on the edge to start.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
+  if(G.phase==='setup'){let best='';try{const sb=!hotSeat()||humans().length===1?safeStart(knowledge(d),d):null,m=sb&&sb.m;if(m&&m.a==='start')best=`<button class="pb pri" data-a="startmark" data-x="${m.x}" data-y="${m.y}" data-e="${m.e}" aria-label="Safest start: ${riskPct(sb.r1)} chance a leviathan blocks or sinks you before your first turn">Safest start &middot; ${riskPct(sb.r1)}</button>`}catch(e){}
+    return `<div class="ps-main"><div class="ps-stat">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> tap a gold mark to start.':dot(d)+' <b>Your turn:</b> tap a gold mark.'}</div><div class="ps-ctl">${best}${zb}</div></div>${G.turn||tipOn()||UI.tut?'':`<div class="ps-intro introcard"><b>${TW_GOAL[0]}</b><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
-  const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
+  const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';let rm=null;try{rm=can&&!UI.tut?recMove(dd):null}catch(e){}
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
-    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
+    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const re=recEntry({t,r,s:sel.s});const rk=re&&re.info.rk!=null?re.info.rk>=.15:!!phRisk(K,A);const bm=rm&&rm.a==='place'&&rm.t===t,bs=bm&&rm.r===r&&!A.bad;bd=bs?`<i class="bd best">&#9733;</i>`:`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`+(bm?`<i class="bd bst">&#9733;</i>`:'');lab=(bs?', best move':bm?', best tile: turn it':'')+(A.bad?', sinks':re&&re.info.rk!=null?', '+riskPct(re.info.rk)+' leviathan risk before your next turn':rk?', a leviathan could swim onto your path next roll':', does not sink now')}
       tiles+=`<button class="pt${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="Tile ${t+1}${lab}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[card]],{rot:r,size:80,uid:'s'+t})}">${bd}</button>`}
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
-  const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Pick an option.');
-  return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span></div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?phCrews():phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
+  const hint=PH.pop==='tiles'?'':(can?(phTileNote(K,dd,hand,sel,rm)||phTileHint(K,dd,hand,sel)):'Pick an option.');
+  return `<div class="ps-turn">${dot(dd)} ${phWhose(dd)}<span>: lay a current.</span>${dangerHTML()}</div><div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-line">${PH.toast?esc(PH.toast):hint}</div>`}
+// short portrait phones (<= 600 px tall): the line's (i) and Use ★ buttons join the Turn / Place row, so the line stays one text row and the Goal
+// strip stays on screen (R38: cut by 24 px at 375x553). The buttons keep their data-ph / data-a, so the same delegated taps work.
+// R42: at 375x667 a 2-line danger note or a 4-junk race pushed the Goal strip 13-38 px off screen. When the strip overflows, step down: the Goal on one
+// line ("Goal" + the race, the full text stays in its aria-label), then the danger note without the leviathan's name (still in its title / aria-label).
+function phFit(el){try{el.classList.remove('fit1','fit2');if(!PH.on||PH.land)return;const over=()=>el.scrollHeight>el.clientHeight+1;if(!over())return;el.classList.add('fit1');if(over())el.classList.add('fit2')}catch(e){}}
+function phShortCtl(el){try{if(PH.land||innerHeight>600)return;const ctl=el.querySelector('.ps-ctl'),ln=el.querySelector('.ps-line');if(!ctl||!ln)return;ln.querySelectorAll('.sdet,[data-a=sugg]').forEach(b=>ctl.appendChild(b))}catch(e){}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+(UI.busy||G&&G.phase==='setup'?(G&&G.phase==='setup'&&innerHeight<600?'':phCrews()):phFeed())):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){const o=document.getElementById('osk');PH.strip=h;el.innerHTML=h;phShortCtl(el);phFit(el);if(o&&typeof OSK!=='undefined'&&OSK.cur)el.insertBefore(o,el.firstChild)}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
 function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
   if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
+// what one placement does: sinks you / sinks a rival / the counted chance a leviathan sinks or blocks you before your next turn / rival pushed to the edge
+function recEntry(m){const a=UI.recA||[];return a.find(x=>x.m.a==='place'&&x.m.t===m.t&&x.m.r===m.r&&x.m.s===m.s)||null}
+function phNote(K,d,m){const A=analyse(K,d,m);const o={A,bad:A.bad,rk:null,sinks:[],push:[],e:null};
+  for(const x of A.others)if(x.coll||x.st==='edge'||x.st==='mon')o.sinks.push(x.i);if(A.bad)return o;
+  try{const h=hypo(K,K.ships[m.s],K.hands[d][m.t],m.r),S=h.B.ships[m.s];o.e=recEntry(m);
+    if(o.e&&o.e.info.rk!=null)o.rk=o.e.info.rk;else if(S&&S.alive&&S.x!=null)o.rk=sinkRisk(h.B,d);
+    if(S&&S.x!=null)o.end=[S.x,S.y];
+    for(const x of A.others){if(o.sinks.includes(x.i))continue;const R=h.B.ships[x.i];if(R&&R.alive&&R.x!=null&&Math.min(R.x,R.y,BW-1-R.x,BW-1-R.y)===0)o.push.push(x.i)}}catch(e){}
+  o.pc=o.rk==null?0:Math.round(o.rk*100);return o}
+function phNoteTxt(o){if(o.bad)return 'sinks you';const p=[];if(o.sinks.length)p.push('sinks '+o.sinks.map(i=>esc(nm(i))).join(' and ')+'!');
+  if(o.rk!=null)p.push(riskWord(o.rk));if(o.e&&o.e.info.n===0)p.push('and next turn you depend on the tile you draw');if(o.push.length)p.push('pushes '+o.push.map(i=>esc(nm(i))).join(' and ')+' to the edge');return p.join(', ')}
+// why the star beats a move with the same rounded risk: the real tie-break, in words
+function phWhyBest(K,b,o){if(!b||!o||b.bad)return '';if(b.pc<o.pc)return '';const bi=b.e&&b.e.info,oi=o.e&&o.e.info;
+  if(b.sinks.length>o.sinks.length)return 'it sinks a rival';
+  if(bi&&oi&&bi.n!=null&&oi.n!=null&&bi.n!==oi.n)return `it leaves ${bi.n} safe placement${bi.n===1?'':'s'} for your next turn (this way: ${oi.n})`;
+  if(bi&&oi&&bi.s2!=null&&oi.s2!=null&&Math.round((1-bi.s2)*100)<Math.round((1-oi.s2)*100))return `less chance of being boxed in after that (${Math.round((1-bi.s2)*100)}% vs ${Math.round((1-oi.s2)*100)}%)`;
+  const ed=q=>q?Math.min(q[0],q[1],BW-1-q[0],BW-1-q[1]):0;if(b.end&&o.end&&ed(b.end)>ed(o.end))return 'it stops farther from the edge';
+  if(b.end&&o.end&&distMon(K,b.end)>distMon(K,o.end))return 'it stops farther from the leviathans';
+  return 'same odds; either is fine'}
+// the line under the tiles: what the chosen tile does, and the ★ best move with its real reason when this one is worse or only equal
+function phTileNote(K,d,hand,sel,rm){try{if(UI.tut||!isCur(hand[sel.t]))return '';const m={a:'place',t:sel.t,r:sel.r,s:sel.s};const o=phNote(K,d,m);
+  // one short line (R25: max 12 words); the reasons sit behind the (i) button, opened on purpose
+  const isB=rm&&rm.a==='place'&&rm.t===m.t&&rm.r===m.r&&rm.s===m.s;const pc=x=>riskPct(x.rk)||'0%';
+  const keeps=x=>x.e&&x.e.info.n!=null?(x.e.info.n>0?`keeps ${Math.min(x.e.info.n,9)} move${x.e.info.n===1?'':'s'} open`:'next turn depends on your draw'):'';
+  const det=`<button class="pb small sdet" data-ph="stardet" aria-label="Why" aria-expanded="${PH.det?'true':'false'}">i</button>`;
+  let h,full;
+  if(isB){h=`<b>&#9733; Safest:</b> ${pc(o)} risk${keeps(o)?', '+keeps(o):''}`;full=`<b>&#9733; Safest move:</b> ${phNoteTxt(o)}.`}
+  else{h=o.bad?'<b class="warn-l">&#10007; This way sinks you.</b>':o.pc>=15?`<b class="warn-l">&#9888; This way: ${pc(o)} risk.</b>`:`This way: ${pc(o)} risk.`;full=`This way: ${phNoteTxt(o)}.`;
+    if(rm&&rm.a==='place'){const ob=phNote(K,d,rm);if(!ob.bad){const tw=rm.t===m.t?'Turn it':'Tile '+(rm.t+1);const why=o.bad?'':phWhyBest(K,ob,o);
+      h+=` <b>&#9733; ${tw}: ${pc(ob)}</b> <button class="pb small" data-a="sugg">Use &#9733;</button>`;full+=` <b>&#9733; Best: ${rm.t===m.t?'turn this tile':'tile '+(rm.t+1)}</b>: ${phNoteTxt(ob)}${why?' ('+why+')':''}.`}}}
+  return h+det+(PH.det?`<div class="sdetx" data-help role="note">${full} Risk counts leviathans and rival tiles.</div>`:'')}catch(e){console.error(e);return ''}}
 // each tile keeps its own turn (Turn used to turn all three previews at once)
 function phRot(t){return (UI.rots&&UI.rots[t])||0}
 function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
 // whose turn it is, in plain words
-function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>"}
+// the danger warning: a leviathan one move from your bow square or your tile (it strikes only on a roll of 6, 7 or 8)
+function dangerMons(){const me=youSeat();if(me<0||hotSeat()||!G||G.phase!=='play'||UI.tut)return [];const S=G.ships[me];if(!S||!S.alive||S.x==null)return [];
+  const sq=[[S.x,S.y]];if(S.on)sq.push(S.on);return G.mons.filter(m=>m.k==='L'&&monHits(m,sq).length)}
+function dangerHTML(){const d=dangerMons();if(!d.length)return '';const full=`${d.map(m=>levName(m.id)).join(' and ')} can reach your junk if the dice show 6, 7 or 8.`;return `<span class="warn-l" data-danger="1" title="${esc(full)}" aria-label="Danger: ${esc(full)}"> &#9888; <span class="wn">${d.length>1?d.length+' leviathans':esc(levName(d[0].id))}: </span>6-8 reaches you</span>`}
+function phWhose(i){const me=youSeat();return (i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>")}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
 function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
   if(risk)return '<b>!</b> A leviathan may reach you.';
@@ -83,7 +128,7 @@ function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const c
   if(safeTurn)return 'Press Turn to find a safe route.';
   return 'Every tile sinks you.'}
 // the goal in one sentence + 3 bullets (Learn to play first screen, Goal card, title)
-const TW_GOAL=['Last junk afloat wins the lantern.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks meet: both sink.'];
+const TW_GOAL=['Last junk afloat wins the lantern.','Lay a tile, sail its line.','Edge or leviathan sinks you.','Two junks forced onto one spot both sink.'];
 function goalCardHTML(){return `<div class="gxt-endc twgoal"><div class="gxt-et">${TW_GOAL[0]}</div><ul>${TW_GOAL.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul><div class="gxt-eb"><button type="button" class="gxt-b pri" data-goalok>Got it</button></div></div>`}
 function openGoal(){const o=document.getElementById('twgoal');if(o){o.remove();return}const d=document.createElement('div');d.id='twgoal';d.className='gxt-end';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','Goal');d.innerHTML=goalCardHTML();document.body.appendChild(d);
   const close=()=>{d.remove();document.removeEventListener('keydown',k)},k=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',k);
@@ -99,11 +144,11 @@ function phCrews(){if(!G||!UI.started||!PH.on)return '';const me=youSeat();
 function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
   if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal" data-goal>${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
   const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
-  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal: last junk afloat</span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
+  return `<button type="button" class="ps-goal" data-goal aria-label="Goal: be the last junk still afloat. Tap for the rules in short."><span class="gl">Goal<span class="gl2">: last junk afloat</span></span><span class="race">${up.map(lab).join('')}${dn.length?`<s>${dn.map(lab).join('')}</s>`:''}</span></button>`}
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
-  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
+  if(innerHeight<760)return '';const keep=L.slice(-4),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn&&!/ \(you\)$/.test(mn)?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
   return `<div class="ps-feed"><h5>Since your last move</h5><ol>${keep.map(l=>`<li class="${l.c==='bad'?'bad':l.c==='big'?'big':''}">${you(l.t)}</li>`).join('')}</ol>${more?`<p class="tiny">${more} earlier line${more>1?'s':''} in the Log.</p>`:''}</div>`}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
@@ -135,7 +180,7 @@ function phInfoData(pd){if(!G||!pd)return null;
   if(pd.k==='wave'){const w=G.wave;if(!w)return null;return {t:'Rogue Wave',at:[w.x,w.y],h:`<p><b>A rogue wave</b> sweeping ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, heading ${DNAME[w.r]}, strength ${waveStr()}. Any junk in that band rolls a die and capsizes if it does not reach ${waveStr()}.</p>`}}
   return null}
 function phInfoHTML(){const I=phInfoData(PH.pd);if(!I)return null;return `<div class="ph-head"><b>${esc(I.t)}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body">${I.h}</div>`}
-function phStartHTML(){const d=sideToAct();const pd=PH.pd;let info=[];try{info=startInfo(d).filter(o=>o.m.x===pd.x&&o.m.y===pd.y)}catch(e){}if(!info.length)return null;  return `<div class="ph-head"><b>Start here?</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body"><p class="tiny">Pick a gold mark on this square. A mark in the middle of an edge is safest; next to a corner you may run out of room.</p><div class="ph-marks">${info.map(o=>`<button class="pb big" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}">${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark</button>`).join('')}</div></div>`}
+function phStartHTML(){const d=sideToAct();const pd=PH.pd;let info=[];try{info=startInfo(d).filter(o=>o.m.x===pd.x&&o.m.y===pd.y)}catch(e){}if(!info.length)return null;  return `<div class="ph-head"><b>Start here?</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body"><p class="tiny">Pick a mark. Mid-edge marks are safest.</p><div class="ph-marks">${info.map(o=>`<button class="pb big" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}">${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark</button>`).join('')}</div></div>`}
 function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
   if(PH.on&&G&&UI.started&&!(PH.cur&&PH.cur.block&&PH.pop!=='info')){
     if(PH.pop==='tiles'){const c=phPlaceCtx();h=c?phTilesHTML(c):null}
@@ -151,9 +196,14 @@ function phNeed(){if(!G||!UI.started)return null;const d=sideToAct();
   if(!G.over&&!UI.busy&&G.q&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat))return 'q';
   if(UI.sunk&&UI.sunk.length)return 'sunk';
   if(G.over&&!UI.busy&&PH.ovHide!==G.over)return 'over';
-  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy))return 'mph';
+  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy)){if(!UI.tut){phRollToast(UI.mph);PH.mphHide=UI.mph}else return 'mph'}
   if(!UI.busy&&!G.over&&(UI.confirm||UI.guide==='full'&&nextLesson()))return 'coach';
   return null}
+// the wake roll outside the tutorial: a one-line toast over the board that never blocks a tap (R25: the card cost 2-19 taps a game)
+function phRollToast(mp){let t=document.getElementById('rtoast');if(!t){t=document.createElement('div');t.id='rtoast';t.setAttribute('role','status');t.setAttribute('aria-live','polite');document.body.appendChild(t)}
+  const show=()=>{if(!mp||mp.roll)return false;const who=G&&G.seats[mp.seat]?(mp.seat===youSeat()&&!hotSeat()?'You':nm(mp.seat)):'Roll';
+    t.innerHTML=`<b>${esc(who)} rolled ${mp.total}</b> ${mp.wake?'· leviathans wake!':'· calm sea'}`;t.className=mp.wake?'on wake':'on';clearTimeout(t._tm);t._tm=setTimeout(()=>{t.className=''},2600/(UI.tickRate||1));return true};
+  if(!show()){const iv=setInterval(()=>{if(UI.mph!==mp){clearInterval(iv);return}if(show())clearInterval(iv)},120);setTimeout(()=>clearInterval(iv),4000)}}
 const PH_SRC={pass:'#main .passbox',over:'#main [data-over]',q:'#main [data-qkind]',sunk:'#cards > *',mph:'#res .mph',coach:'#coach .coach:not(.light)'};
 function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():null;
   if(!kind){PH.cur=null;if(!pc.hidden){pc.hidden=true;pc.innerHTML=''}clearTimeout(PH.tmr);PH.tmr=0;try{phPopup()}catch(e){}return}
@@ -182,8 +232,8 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
    const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length,es=G.variant==='easysolo',so=G.variant==='solo';
    const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
    el.innerHTML=`<span class="chip" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${G.deck.length} tiles${so?' &middot; '+toRise+' to rise':''}</small></span></span>`};
- const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;phAfter()}return r};
- const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(!PH.on)return _onPick(p);phPick(p)}}
+ const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;if(G.seats[s]&&G.seats[s].human)PH.toast=phCantMsg(m,s);phAfter()}return r};
+ const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(Date.now()-(PH.closeT||0)<450)return;if(!PH.on)return _onPick(p);phPick(p)}}
 function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kind!=='coach'&&PH.cur.kind!=='mph'&&PH.cur.kind!=='sunk'&&PH.cur.kind!=='q')return;
   const d=sideToAct(),mine=!UI.busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat);
   let sq=null,ship=null;if(p){if(p.kind==='ship')ship=+String(p.id).slice(1);else if(p.kind==='square'||p.kind==='start')sq=[p.c,p.r]}
@@ -202,15 +252,49 @@ function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kin
     else if(G.gates.some(g=>g.x===sq[0]&&g.y===sq[1]))pd={k:'gate',x:sq[0],y:sq[1]};
     else if(G.wave&&G.wave.x===sq[0]&&G.wave.y===sq[1])pd={k:'wave'}}
   if(pd&&phInfoData(pd)){sfx('click');phOpen('info',pd)}else if(PH.pop)phClose()}
+// a press that starts on a bubble, card or sheet never reaches the board, however long it is held (R38: the coach bubble is removed on pointerdown, so a held
+// "Got it" or a tap on the bubble body let the click land on the board). The press's click is dropped unless it lands inside a bubble/card that is still there;
+// a second press that starts within 0.6 s of that press ending (a double tap) is dropped the same way.
+const PG_SEL='.gxh-bub,.gxh-rules,#pc,#ppop,#twgoal';const PG={on:false,up:0,chain:false,x:-99,y:-99};
+// R42: a gold start mark's touch area reached over the bubble's edge, so a tap at (or just below) the bubble's corner opened "Start here?". While a bubble or
+// card is up, a press on the board within 12 px of it counts as a press on the bubble; marks near it also lose their hit area (pgClip).
+const PG_NEAR='.gxh-bub.on,#pc:not([hidden]),.gxh-rules';
+function pgRects(){const o=[];for(const e of document.querySelectorAll(PG_NEAR)){if(!e.getClientRects().length)continue;const r=e.getBoundingClientRect();if(r.width>4&&r.height>4)o.push(r)}return o}
+function pgNear(x,y,m){for(const r of pgRects())if(x>=r.left-m&&x<=r.right+m&&y>=r.top-m&&y<=r.bottom+m)return true;return false}
+const pgBoard=t=>!!(t&&t.closest&&t.closest('#ov,#board,canvas')&&!t.closest('button:not(.opip),.gx-bar,.gx-dock,#ps'));
+function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll('#ov .opip')){let near=false;if(R.length){const q=e.getBoundingClientRect(),cx=(q.left+q.right)/2,cy=(q.top+q.bottom)/2;
+  near=R.some(r=>cx>=r.left-36&&cx<=r.right+36&&cy>=r.top-36&&cy<=r.bottom+36)}e.classList.toggle('nearbub',near)}}catch(e){}}
+setInterval(()=>{if(PH.on&&G&&G.phase==='setup')pgClip()},250);
+document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL))||(pgBoard(t)&&pgNear(e.clientX,e.clientY,12));
+  const ch=!inG&&PG.up>0&&Date.now()-PG.up<600;PG.on=inG||ch;PG.chain=ch&&!(Math.abs(e.clientX-PG.x)<30&&Math.abs(e.clientY-PG.y)<30);PG.up=0;if(inG)PH.closeT=Date.now();if(PG.on&&!ch){PG.x=e.clientX;PG.y=e.clientY}},true);
+// every press that started on a bubble/card (it may close it) blocks board picks for a short while after it ends (R42: PH.closeT was no longer set)
+document.addEventListener('pointerup',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
+document.addEventListener('pointercancel',e=>{if(PG.on){PG.up=Date.now();PH.closeT=Date.now()}},true);
+document.addEventListener('click',e=>{if(!PG.on)return;if(PG.up&&Date.now()-PG.up>1000){PG.on=false;return}const t=e.target;
+  if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;
+  // a 2nd press within 0.6 s loses its click when it lands on the board or near the first press (a double tap); a control elsewhere (Place, Pass, a tile) answers
+  if(PG.chain&&t&&t.isConnected&&!pgBoard(t))return;
+  e.stopPropagation();e.stopImmediatePropagation();if(e.cancelable)e.preventDefault()},true);
+// R42 (sweep under load): a redraw of the strip / pop-up between the press and the release replaced the pressed button, so the click went nowhere.
+// If the pressed control is gone, the same control (same action and data) now under the finger gets the click.
+{let pr=null,hit=false;const key=b=>b?[b.dataset.a,b.dataset.t,b.dataset.d,b.dataset.s].join('|'):'';
+ document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#ppop [data-a],#ps [data-a],#dockbody [data-a]');pr=b?{el:b,k:key(b),ts:Date.now()}:null;hit=false},true);
+ document.addEventListener('click',e=>{if(!pr||!e.isTrusted)return;const b=e.target&&e.target.closest&&e.target.closest('[data-a]');if(b&&key(b)===pr.k)hit=true},true);
+ document.addEventListener('pointerup',e=>{const q=pr;if(!q)return;const x=e.clientX,y=e.clientY;
+   setTimeout(()=>{if(pr!==q)return;pr=null;if(hit||q.el.isConnected||Date.now()-q.ts>1500)return;const h=document.elementFromPoint(x,y),b=h&&h.closest&&h.closest('[data-a]');
+     if(b&&!b.disabled&&key(b)===q.k)b.click()},350)},true)}
 // taps inside the strip / pop-up / cards
 document.addEventListener('click',e=>{if(!PH.on)return;
   if(Date.now()-PH.swipeT<350&&e.target.closest&&e.target.closest('#ppop')){e.stopPropagation();e.preventDefault();return}
+  if(e.target.closest&&e.target.closest('#pc [data-a=coachok],#pc [data-a=sunkok],#pc [data-ph=dismiss],#pc [data-a=skip],.gxh-ok,.gxh-bub,#twgoal'))PH.closeT=Date.now();
   const t=e.target.closest&&e.target.closest('[data-ph]');
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
-    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
+    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');phCardNote();render()}}
+    else if(a==='pip'){sfx('click');phOpen('start',{x:+t.dataset.x,y:+t.dataset.y})}
+    else if(a==='stardet'){PH.det=!PH.det;sfx('click');render()}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}
-    else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph')PH.mphHide=UI.mph;else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}
+    else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph'){if(!(typeof tutHold==='function'&&tutHold('mph')))PH.mphHide=UI.mph;if(UI.busy&&!NET.on){UI.skip=true;sleepFlush()}}else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}
     else if(a==='showover'){PH.ovHide=null;phAfter()}
     return}
   // a tap on the board (or anywhere that is not a control) while the tile pop-up is open closes it
@@ -225,7 +309,7 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
 // ---------- drag a hand tile onto your junk's bow square (phone and PC): the square glows, the tile snaps there, a vibrate tick, then it is laid ----------
 const DRG={on:false,t:-1,el:null,gh:null,tg:null,x0:0,y0:0,hot:false,eat:0};
 function drgTarget(){const c=phPlaceCtx?phPlaceCtx():null;if(!c||!UI.sel)return null;const S=G.ships[UI.sel.s];if(!S||S.x==null)return null;
-  const a=hproj(S.x-2.5,S.y-2.5),b=hproj(S.x-1.5,S.y-2.5);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
+  const a=hproj(S.x-BC,S.y-BC),b=hproj(S.x-BC+1,S.y-BC);if(!a||!b)return null;return {x:a.x,y:a.y,sq:Math.max(28,Math.hypot(b.x-a.x,b.y-a.y))}}
 function drgEnd(){if(DRG.gh)DRG.gh.remove();if(DRG.tg)DRG.tg.remove();if(DRG.el)DRG.el.classList.remove('dragsrc');Object.assign(DRG,{on:false,el:null,gh:null,tg:null,hot:false,t:-1})}
 document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('[data-a=card]');if(!b||UI.busy||!UI.sel||e.button>0)return;
   DRG.t=+b.dataset.t;DRG.el=b;DRG.x0=e.clientX;DRG.y0=e.clientY;DRG.on=false},true);
