@@ -46,7 +46,7 @@ function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySele
   // a very short table (a tall hand or prompt below it): slim score line, no dice box (the prompt says the roll), cards down to 26 px
   if(out()){ar.classList.add('tight2');for(let k=0;k<8&&out()&&cw>26;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
   // a big pick in the dock (loot a body: 7 choices) leaves a sliver of table: only the score line and the buttons stay
-  if(out())ar.classList.add('tight3')}
+  if(out()&&!(typeof TUTG!=='undefined'&&TUTG))ar.classList.add('tight3')}   // the tutorial points at the hero's side: it keeps it
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
   const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};
