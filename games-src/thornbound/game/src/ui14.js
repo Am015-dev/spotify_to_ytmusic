@@ -49,3 +49,8 @@ document.addEventListener('pointerdown',e=>{if(UI._nextQ&&!(e.target&&e.target.c
 // ---- an info sheet never swallows a tap: a tap on its body (not on one of its buttons) closes it, so the board under it is back at once
 document.addEventListener('click',e=>{if(!UI.pop||!G||!UI.started)return;const t=e.target;if(!t||!t.closest||!t.closest('#ppop'))return;
   if(t.closest('button,a,input,select,[data-a],[data-kc],.pp-scroll,[role=button]'))return;closePop();e.stopPropagation()},true);
+
+// A coach bubble sits over the seat chips on short phones: when its OK tap removes it on pointerup, the browser's click can land on the chip underneath (opening a rival sheet).
+// The first click after a press on a bubble is swallowed unless it is on the bubble itself. (Separate from the ui5 click-replay logic.)
+document.addEventListener('pointerdown',e=>{UI._bubT=(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))?Date.now()+700:0},true);
+document.addEventListener('click',e=>{const t=UI._bubT;if(!t)return;UI._bubT=0;if(Date.now()<t&&!(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))){e.stopPropagation();e.preventDefault()}},true);

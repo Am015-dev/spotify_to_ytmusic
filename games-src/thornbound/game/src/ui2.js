@@ -41,7 +41,7 @@ function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44
 function mapTap(id,info){if(!G||!UI.started)return;
   if(UI.card&&UI.card.kind!=='pass'&&UI.card.kind!=='tip'){bfSkip();return}
   if(UI.pop){closePop(true)}
-  if(id==='throne'){openPop('kingdom');return}
+  if(id==='throne'){if(document.documentElement.classList.contains('bf-w'))openPop('kingdom');return}   // phones: the Kingdom sheet opens only from its own chips (#cstrip), never from a stray tap on the map
   const l=LOCID.indexOf(id);if(l<0)return;
   if(info&&info.seat!=null){regionTap(regOfLoc(l));return}
   locTap(l)}

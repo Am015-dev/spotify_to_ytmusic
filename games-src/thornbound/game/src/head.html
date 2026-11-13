@@ -77,7 +77,7 @@ button{font:inherit;color:inherit}
 .ppop:not([hidden]){display:flex;flex-direction:column;background:#f3e6bf;color:#231a10;border-top:3px solid #c99a35}
 .ppop.in,.pcard.in{animation:ppin .16s ease-out}@keyframes ppin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .pp-h{display:flex;align-items:center;gap:6px;padding:0 4px 0 12px;min-height:44px;font:700 1.1rem var(--fd);flex:0 0 auto}.pp-h b{flex:1;min-width:0}
-.pp-x{min-width:44px;min-height:44px;border:0;background:none;color:#231a10;cursor:pointer}
+.pp-x{min-width:44px;min-height:44px;border:2px solid #f6e6b4;border-radius:50%;background:#2a1a10;color:#fff3cf;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.45)}.pp-x svg{width:22px;height:22px;stroke-width:3}
 .pp-b{flex:1;min-height:0;overflow:auto;padding:0 12px 10px;font-size:1rem}
 .pp-row{display:flex;gap:10px;align-items:flex-start}.pp-card{flex:0 0 auto;line-height:0}.pp-info{flex:1;min-width:0}
 .pp-info h4{margin:0 0 2px;font:700 1.05rem var(--fd)}
@@ -144,7 +144,7 @@ button{font:inherit;color:inherit}
 .gl{appearance:none;border:0;background:none;padding:0 1px;margin:0;font:inherit;color:inherit;cursor:help;text-decoration:underline dotted;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:var(--gold)}
 .gl.new{color:#ffe08a;font-weight:700}.ppop .gl,.nbox .gl,#start .gl{text-decoration-color:#7c1b2c}.ppop .gl.new{color:#7c1b2c}
 /* tap target for a glossary chip (inline words stay readable; the tap area grows invisibly) */
-.gl{position:relative}.gl::after{content:'';position:absolute;left:-12px;right:-12px;top:-13px;bottom:-13px}
+.gl{position:relative;padding:11px 7px;margin:-11px -7px;min-width:44px;box-sizing:border-box;text-align:center}.gl::after{content:'';position:absolute;left:-12px;right:-12px;top:-13px;bottom:-13px}
 .coach{margin:2px 0 6px;padding:8px 10px;border-radius:12px;background:linear-gradient(rgba(232,200,103,.20),rgba(232,200,103,.10));border:1.5px solid rgba(232,200,103,.55);font-size:1rem;line-height:1.35}
 .coach .ck{display:block;font:700 .82rem var(--fb);letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:2px}
 .coach.info{font-size:1.05rem}
@@ -413,7 +413,9 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 .hc{position:absolute;top:10px;padding:0;border:0;background:none;line-height:0;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transform-origin:50% 140%;transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));transition:transform .16s,opacity .16s}
 .hc.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
 .hcb{position:absolute;left:3px;right:3px;bottom:3px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:2px 1px 3px;border-radius:0 0 5px 5px;background:linear-gradient(rgba(18,10,12,.82),rgba(18,10,12,.94));color:#fbeed2;line-height:1.05;pointer-events:none;text-align:center;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-.hcb b{font-size:12.5px;font-weight:700;letter-spacing:-.2px;white-space:nowrap}.hcb i{font-style:normal;font-size:12px;color:#ffd98a;white-space:nowrap}
+/* the cost coin drawn on a miniature is 6 px at hand size and sits under the name band anyway: hide it there (the card sheet shows the cost) */
+.hc .tb-card g:has(>circle[r="31"]),.bs-c .tb-card g:has(>circle[r="31"]){display:none}
+.hcb b{font-size:14px;font-weight:700;letter-spacing:-.5px;white-space:nowrap;text-shadow:0 0 3px #120a0c,0 0 3px #120a0c}.hcb i{font-style:normal;font-size:14px;letter-spacing:-.5px;color:#ffd98a;white-space:nowrap;text-shadow:0 0 3px #120a0c,0 0 3px #120a0c}.hcb{overflow:visible}
 html.desk .hcb b{font-size:14px}html.desk .hcb i{font-size:13px}
 .hc.glow svg{filter:drop-shadow(0 0 5px #ffd24a)}
 .hc.dim{opacity:.55}
@@ -528,12 +530,12 @@ html.desk .race-c.four .rv-t b{display:block}
 #bulbbtn.on{box-shadow:0 0 0 2px #f0c860,0 0 14px rgba(240,200,96,.55)}
 /* short portrait phones (375x553 etc.): tighter strips so the board keeps >=55% of the screen */
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #rivals{padding-top:2px;padding-bottom:calc(2px + var(--sab))}html:not(.bf-w) #act{min-height:44px;padding:0 8px}
-html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:13px}
-html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 8px)}html:not(.bf-w) #handw .hand>.hc{top:1px}
+html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:14px}
+html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw .hand>.hc{top:-3px}
 html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:13px;white-space:normal;line-height:1.1}}
 /* short portrait phones: the pile chips stand in a column right of the map, so the map keeps the full board height (>=80% of the width) */
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #mapwrap{padding-bottom:0;justify-content:flex-start;padding-left:2px}
-html:not(.bf-w) #cstrip{left:auto;right:3px;top:3px;bottom:3px;width:62px;flex-direction:column;gap:3px}
-html:not(.bf-w) #cstrip .cs-c{min-height:0;padding:1px 2px;font-size:11px}html:not(.bf-w) #cstrip .cs-c span{font-size:11px}html:not(.bf-w) #cstrip .cs-c em{font-size:10px}
+html:not(.bf-w) #cstrip{left:auto;right:3px;top:3px;bottom:3px;width:72px;flex-direction:column;gap:3px}
+html:not(.bf-w) #cstrip .cs-c{min-height:44px;padding:1px 2px;font:700 14px/1.05 Georgia,serif;letter-spacing:-.2px}html:not(.bf-w) #cstrip .cs-c span{font-size:14px}html:not(.bf-w) #cstrip .cs-c em{font-size:14px}html:not(.bf-w) #cstrip .cs-c i{font-size:14px}
 html:not(.bf-w) #act .btn{max-height:44px;flex-direction:row;gap:6px;align-items:center;justify-content:center}html:not(.bf-w) #act .btn b{display:inline-block}}
 </style></head>

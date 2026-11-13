@@ -283,7 +283,8 @@ function fxDiff(a,b){if(!a||!b||a.g!==b.g||!fxOn())return;const me=vs();
 (function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{if(UI.card&&!UI.card._at)UI.card._at=Date.now();const b=fxSnap();fxDiff(UI._fxS,b);UI._fxS=b;mapTextFit()}catch(e){}return r}})();
 (function(){const o=drawOverlay;drawOverlay=function(){const r=o.apply(this,arguments);try{mapTextFit()}catch(e){}return r}})();
 // map words at phone size: any label that would draw under 14 px grows to 14 px; a small coin or marker grows with its number
-function mapTextFit(){const s=MAP.m&&MAP.m.el;if(!s||!s.viewBox||!s.viewBox.baseVal)return;const R=s.getBoundingClientRect();const vb=s.viewBox.baseVal.width||1000;if(!R.width)return;const k=R.width/vb;
+function mapTextFit(){const s=MAP.m&&MAP.m.el;if(!s||!s.viewBox||!s.viewBox.baseVal)return;if(!s._mo&&window.MutationObserver){s._mo=new MutationObserver(()=>{cancelAnimationFrame(s._mr);s._mr=requestAnimationFrame(()=>{try{mapTextFit()}catch(e){}})});s._mo.observe(s,{childList:true,subtree:true})}   // the kit redraws slot cards on its own (bid reveals): fit the new numerals too
+  const R=s.getBoundingClientRect();const vb=s.viewBox.baseVal.width||1000;if(!R.width)return;const k=R.width/vb;
   for(const t of s.querySelectorAll('text')){if(t._k===k||t.getAttribute('opacity')==='0')continue;t._k=k;let f=t._f0;if(f==null){f=t._f0=parseFloat(t.getAttribute('font-size')||getComputedStyle(t).fontSize)||0}if(!f)continue;
     const need=14.2/k;if(f>=need){if(t._fit){t.style.fontSize='';t._fit=0}const g=t.parentNode;if(g&&g._t0!=null){g.setAttribute('transform',g._t0);g._t0=null}continue}
     const g=t.parentNode,kids=g&&g.tagName==='g'?[...g.children]:[];let small=false;try{small=kids.length>1&&g.getBBox().width<140}catch(e){}
