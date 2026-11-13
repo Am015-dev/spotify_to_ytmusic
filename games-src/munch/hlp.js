@@ -175,8 +175,8 @@ const hlpHit=(a,c)=>a.l<c.r&&a.r>c.l&&a.t<c.b&&a.b>c.t;
 const hlpRings=()=>[...document.querySelectorAll('.gxh-ring')].map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height).map(q=>({l:q.left,t:q.top,r:q.right,b:q.bottom}));
 function hlpCores(){return hlpCores0().concat(hlpRings())}
 function hlpCores0(){return [...document.querySelectorAll(HLP_CORE)].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<innerWidth&&q.top<innerHeight)
-    .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2-2,t:cy-h/2-2,r:cx+w/2+2,b:cy+h/2+2}})}
-function hlpOwn(b){const st=b.dataset.phase&&HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();const T=te&&te.getBoundingClientRect();return T&&T.width?{l:T.left-4,t:T.top-4,r:T.right+4,b:T.bottom+4}:null}
+    .map(q=>{const w=Math.min(q.width,q.width>56?32:q.width),h=Math.min(q.height,q.height>56?32:q.height),cx=q.left+q.width/2,cy=q.top+q.height/2;return {l:cx-w/2-6,t:cy-h/2-6,r:cx+w/2+6,b:cy+h/2+6}})}   // 6 px: the bubble slides 4 px as it appears
+function hlpOwn(b){const st=b.dataset.phase&&HLP_STEPS[b.dataset.phase];const te=st&&st.target&&st.target();const T=te&&te.getBoundingClientRect();return T&&T.width?{l:T.left-6,t:T.top-6,r:T.right+6,b:T.bottom+6}:null}
 const hlpBubs=()=>[...document.querySelectorAll('.gxh-bub.on:not(.gxt-bub)')];
 const hlpBox=b=>({l:b.offsetLeft,t:b.offsetTop,r:b.offsetLeft+b.offsetWidth,b:b.offsetTop+b.offsetHeight});   // the layout box: not the 4 px entrance slide
 function hlpBadAt(b,c,cs){const T=hlpOwn(b);return (T&&hlpHit(c,T))||cs.some(q=>hlpHit(c,q))}
