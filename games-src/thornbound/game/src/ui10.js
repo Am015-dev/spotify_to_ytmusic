@@ -160,7 +160,7 @@ document.addEventListener('pointerdown',e=>{if(!G||!UI.started)return;const tg=e
   if(!UI.card&&!G.over&&G.q&&viewSeatForQ()==null&&!UI.pop&&!tg.closest(skipSel)&&tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){tbTapAhead();tapRing(e.clientX,e.clientY);UI._nc=1;return}   // a rival's turn: a tap hurries it
   if(!UI.card||(UI.card.kind!=='event'&&UI.card.kind!=='news'))return;
   if(tg.closest('#ppop,.gx-drawer,#start,#netbox,#tbgoal,#tbcend,.gxh-bub,.gxt-top,.gxt-end,.tbt-goal,.tbt-skip,.tbt-term,.gx-bar button:not(#barstat)'))return;
-  if(tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){if(bfSkip())UI._nc=1;else tapRing(e.clientX,e.clientY)}},true);
+  if(tg.closest('#board,.gx-bar #barstat,#rivals,#tbturn,#main,#handw,#cstrip,#spots,#mapbox,.gx-main')){const c0=UI.card;if(bfSkip()){if(!(c0&&c0._at&&Date.now()-c0._at<600&&tg.closest('#act [data-a=mv],#main [data-a=mv],#handw .hc,#spots .bspot')))UI._nc=1}else tapRing(e.clientX,e.clientY)}},true);   // a narration that pops up under a finger already on its way to a choice: the tap skips it AND still makes the choice (legal() checks it)
 // ---------------------------------------------------------------- long-press: a small tooltip near the thing (8 words or fewer)
 const LOC_SHORT=['Govern','Journey','Favour','','Deck bottom','Recover cards'];
 function tipFor(kind,arg){const V=UI.V;if(!V)return '';
@@ -280,7 +280,7 @@ function fxDiff(a,b){if(!a||!b||a.g!==b.g||!fxOn())return;const me=vs();
     if(fr&&to)fxFly(html,fr,to,{w:44,h:63,s1:1.6,s2:.7,lift:-60,rot:8,land:seatEl(s)})}});
   // Influence: the score number pulses and a small +n / -n rises from it (the track token moves on the map at the same time)
   b.inf.forEach((v,s)=>{const d=v-a.inf[s];if(d)fxInf(s,d)})}
-(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{const b=fxSnap();fxDiff(UI._fxS,b);UI._fxS=b;mapTextFit()}catch(e){}return r}})();
+(function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{if(UI.card&&!UI.card._at)UI.card._at=Date.now();const b=fxSnap();fxDiff(UI._fxS,b);UI._fxS=b;mapTextFit()}catch(e){}return r}})();
 (function(){const o=drawOverlay;drawOverlay=function(){const r=o.apply(this,arguments);try{mapTextFit()}catch(e){}return r}})();
 // map words at phone size: any label that would draw under 14 px grows to 14 px; a small coin or marker grows with its number
 function mapTextFit(){const s=MAP.m&&MAP.m.el;if(!s||!s.viewBox||!s.viewBox.baseVal)return;const R=s.getBoundingClientRect();const vb=s.viewBox.baseVal.width||1000;if(!R.width)return;const k=R.width/vb;
