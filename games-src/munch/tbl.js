@@ -39,14 +39,17 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(.8) rotate(-10deg)`,opacity:0},{transform:`translate(${sx}px,${sy}px) scale(1) rotate(-6deg)`,opacity:1,offset:.12},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-34}px) scale(1.12) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.55)`,opacity:0}],{duration:ms||620,delay:delay||0,easing:'cubic-bezier(.3,.7,.3,1)',fill:'both'});a.onfinish=()=>e.remove()}
 // the fight must fit inside the table: shrink the cards (never the buttons) until nothing pokes out of it
 function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
-  if(!ar.querySelector(':scope>.vs'))return;const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
+  if(!ar.querySelector(':scope>.vs'))return;let moving=false;const anim=e=>{for(let x=e;x&&x!==ar;x=x.parentElement)if(x.getAnimations().some(an=>an.playState==='running'&&an.effect&&an.effect.getComputedTiming().iterations!==Infinity))return true;return false};
+  // an entering card is still sliding: judge the layout box where it lands, and fit again once it has landed
+  const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){if(anim(e)){moving=true;continue}const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
   let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.getBoundingClientRect().width;
   ar.classList.remove('tight','tight2','tight3');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
   if(out()){ar.classList.add('tight');for(let k=0;k<6&&out()&&cw>36;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
   // a very short table (a tall hand or prompt below it): slim score line, no dice box (the prompt says the roll), cards down to 26 px
   if(out()){ar.classList.add('tight2');for(let k=0;k<8&&out()&&cw>26;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
   // a big pick in the dock (loot a body: 7 choices) leaves a sliver of table: only the score line and the buttons stay
-  if(out()&&!(typeof TUTG!=='undefined'&&TUTG)){ar.classList.add('tight3');for(let k=0;k<6&&out()&&cw>18;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}}   // the tutorial points at the hero's side: it keeps it
+  if(out()&&!(typeof TUTG!=='undefined'&&TUTG)){ar.classList.add('tight3');for(let k=0;k<6&&out()&&cw>18;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}
+  if(moving){clearTimeout(TB.fitT);TB.fitT=setTimeout(()=>{try{tbFit()}catch(e){}},700)}}   // the tutorial points at the hero's side: it keeps it
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
   const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};
