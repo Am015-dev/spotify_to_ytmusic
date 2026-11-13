@@ -543,15 +543,15 @@ test('scoring: leftover resources only count through Architect (max 6)', () => {
 });
 test('end of game: when every player has passed; winner by points, then events, then resources', () => {
   const G = T.game(2); T.city(G, 0, ['farm']); T.city(G, 1, ['farm']);
-  T.cur(G, 0); T.act(G, 0, { type: 'pass' }); eq(G.phase, 'play'); eq(G.cur, 1); T.act(G, 1, { type: 'pass' }); eq(G.phase, 'over'); ok(G.over.tie || G.over.winner === 0);
+  T.cur(G, 0); T.pass(G, 0); eq(G.phase, 'play'); eq(G.cur, 1); T.pass(G, 1); eq(G.phase, 'over'); ok(G.over.tie || G.over.winner === 0);
   const H2 = T.game(2); T.city(H2, 0, ['farm']); T.city(H2, 1, ['farm']); H2.bev[0].o = -1; H2.players[1].res.twig = 4; H2.players[0].pts = 1; H2.players[1].pts = 1;
-  T.act(H2, 0, { type: 'pass' }); T.act(H2, 1, { type: 'pass' }); eq(H2.over.winner, 1, 'more leftover resources breaks the tie');
+  T.pass(H2, 0); T.pass(H2, 1); eq(H2.over.winner, 1, 'more leftover resources breaks the tie');
   const H3 = T.game(2); T.city(H3, 0, ['farm']); T.city(H3, 1, ['farm']); H3.players[0].pts = 3; H3.players[1].pts = 3; H3.players[0].res.twig = 4; H3.bev[0].o = 1; H3.players[1].pts = 0; H3.players[0].pts = 0;
-  H3.players[0].pts = 3; T.act(H3, 0, { type: 'pass' }); T.act(H3, 1, { type: 'pass' }); eq(H3.over.winner, 1, 'higher score first');
-  const H4 = T.game(2); H4.bev[0].o = 0; H4.players[0].pts = 0; H4.players[1].pts = 3; T.act(H4, 0, { type: 'pass' }); T.act(H4, 1, { type: 'pass' }); eq(H4.over.scores[0].total, 3); eq(H4.over.scores[1].total, 3); eq(H4.over.winner, 0, 'tie on points: most events');
+  H3.players[0].pts = 3; T.pass(H3, 0); T.pass(H3, 1); eq(H3.over.winner, 1, 'higher score first');
+  const H4 = T.game(2); H4.bev[0].o = 0; H4.players[0].pts = 0; H4.players[1].pts = 3; T.pass(H4, 0); T.pass(H4, 1); eq(H4.over.scores[0].total, 3); eq(H4.over.scores[1].total, 3); eq(H4.over.winner, 0, 'tie on points: most events');
 });
 test('a passed player is skipped; the others keep taking turns', () => {
-  const G = T.game(3); T.act(G, 0, { type: 'pass' }); eq(G.cur, 1); T.act(G, 1, { type: 'pass' }); eq(G.cur, 2); basicW(G, 2, 'basic_berry_patch'); eq(G.cur, 2, 'only seat 2 remains'); eq(G.phase, 'play');
+  const G = T.game(3); T.pass(G, 0); eq(G.cur, 1); T.pass(G, 1); eq(G.cur, 2); basicW(G, 2, 'basic_berry_patch'); eq(G.cur, 2, 'only seat 2 remains'); eq(G.phase, 'play');
 });
 
 // ---------------- pending decisions ----------------
@@ -584,13 +584,13 @@ test('solo scoring: 2 per card (3 per purple), 3 per basic event he claims, per 
   const s = HB.grimScore(G); eq(s.cards, 3); eq(s.total, 2 + 3 + 2 + 3 + 4 * 3 + 3 + 2, '7 + 3 + special 4x3 + journey 3 + tokens 2');
   const H = T.solo(2); H.grim.city = []; H.grim.ji = 1; eq(HB.grimScore(H).total, 4 * 6 + 4);
   const E = T.solo(1); E.sev.forEach(e => e.o = 0); E.grim.city = []; E.grim.ji = -1; E.players[0].pts = 6; const P0 = sc(E, 0).total;
-  E.grim.pts = P0; T.cur(E, 0); T.act(E, 0, { type: 'pass' }); ok(E.over); eq(E.over.grim.total, P0); eq(E.over.win, false, 'tie = loss');
-  const F = T.solo(1); F.sev.forEach(e => e.o = 0); F.players[0].pts = 6; const P1 = sc(F, 0).total; F.grim.pts = P1 - 1; T.act(F, 0, { type: 'pass' }); eq(F.over.win, true, 'strictly more wins');
+  E.grim.pts = P0; T.cur(E, 0); T.pass(E, 0); ok(E.over); eq(E.over.grim.total, P0); eq(E.over.win, false, 'tie = loss');
+  const F = T.solo(1); F.sev.forEach(e => e.o = 0); F.players[0].pts = 6; const P1 = sc(F, 0).total; F.grim.pts = P1 - 1; T.pass(F, 0); eq(F.over.win, true, 'strictly more wins');
 });
 test('solo: he claims basic events he qualifies for at his prepare and at game end', () => {
   const G = T.solo(1); G.grim.city = ['farm', 'mine', 'resin_refinery', 'twig_barge'].map(k => T.take(G, k)); basicW(G, 0, 'basic_berry_patch'); basicW(G, 0, 'basic_berry_patch'); T.cur(G, 0); T.act(G, 0, m => m.type === 'prepare');
   ok(G.bev.some(e => e.o === 'G'), 'claimed at prepare');
-  const H = T.solo(1); H.grim.city = ['bard', 'wanderer', 'ranger'].map(k => T.take(H, k)); T.act(H, 0, { type: 'pass' }); ok(H.bev.some(e => e.o === 'G'), 'claimed at game end');
+  const H = T.solo(1); H.grim.city = ['bard', 'wanderer', 'ranger'].map(k => T.take(H, k)); T.pass(H, 0); ok(H.bev.some(e => e.o === 'G'), 'claimed at game end');
 });
 test('solo: gifts to the automa are discarded; Inn and Dovecote Depot in his city may be visited (he gains 1 point token)', () => {
   const G = T.solo(1); G.grim.city = [T.take(G, 'post_office')]; T.hand(G, 0, ['farm', 'mine']); const d = G.discard.length;

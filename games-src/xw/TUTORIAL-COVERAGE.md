@@ -1,31 +1,33 @@
-# Nebula Aces: tutorial coverage (the coached first game, "Convoy Run")
+# Nebula Aces: tutorial coverage (the guided first game, "Convoy Run")
 
-The lesson is a real game: fixed seed (Kael Varro vs the raider Slate, one rock, easy AI), real dice, every legal move allowed from the first turn. Only two actions are forced with a spotlight: touch your ship, then pick any maneuver. Then a card ("Fly free") hands over, and Marshal Brecken (or Slate) speaks in ONE dismissible bubble that never blocks input, the first time a rule matters. At the result, a card walks through the player's real numbers and lists "Things you will meet later" (rules that did not come up this game, plus the always-later list). Words are in `lore.js` (`LORE.coach`); `rule:1` entries are the checklist below. `node tutor-test.js` plays a game through the UI with any legal move at 390x763 and 1440x860 and asserts each rule was explained in play OR listed on the later card.
+The lesson is a guided first game: fixed seed, Kael Varro vs the raider Slate, one rock, scripted dice and scripted enemy moves for rounds 1-2, so every core rule comes up every time, in the same order. Each step is ONE line of 12 words or fewer, plus ONE highlighted tap: the spotlight for the first three steps, then the ghost finger. During the scripted rounds only the taught move and action are accepted; a tap on the highlighted control moves the coach to the next line. After round 2 the same battle continues free, then the end card offers a real game. Words are in `lore.js` (`LORE.tut`, `LORE.coach`).
 
-Rule | Taught when (trigger) | Story beat (speaker)
----|---|---
-Goal: destroy every enemy ship | opening bubble `goal` | Slate raids the convoy (Brecken)
-Plan in secret, ship then maneuver | forced steps `ship`, `dial` | pilots plan in secret (Brecken)
-Dials revealed together | `fly`: every ship has a dial | neither of you can peek (Brecken)
-Green easy / red stress; asteroids hurt and skip the action | `marks`: round 2+ planning | red strains the engines, ! marks a rock (Brecken)
-Activation order (lowest skill first), combat order (highest first) | `order`: first move step | Slate moves first, you shoot first (Brecken)
-One action per turn | `action`: your action step | focus sharpens your shot (Brecken)
-Target lock and reroll | `lock`: Lock is offered | lock on for a surer shot (Brecken)
-Firing arc, range 1-3, target choice, range dice bonus | `shoot`: your target step | in your sights (Brecken)
-Hit / crit / focus / blank | `dice`: your attack dice | read the dice (Brecken)
-Focus token turns focus into hit | `usefocus`: a focus mod is offered | spend focus (Brecken)
-Defence dice, evade cancels hits, evade token | `res1`: first shot result | hits minus evades (Brecken)
-Pilot ability (Kael) | `defend`: a defence mod is offered | pilot power (Brecken)
-Shields first, then hull; crits face up | `res2`: first damage | shields first (Brecken)
-Stressed ship: no action, no red next | `stress`: any ship gets stress | stress (Brecken)
-End of round: focus/evade vanish, locks stay | `endround`: round 2 begins | round end (Brecken)
-How a battle ends, final scoring | result card | your numbers, your ships left (Brecken)
-Good / poor move feedback | `goodshot` (you hit), `gothit` (Slate hits) | nice shot / got you (Brecken, Slate)
+`node lesson-test.js [390x844]` (GX_URL set) walks it by tapping only what is highlighted, and checks every rule below was taught, in this order, at 12 words or fewer, with a highlighted control for every tap-now line. It also checks that another move or action is refused, that ships fly lowest skill first, and that the end card starts a real game. `node tutor-test.js` (URL set) still covers bubble placement and the end card.
+
+# | Rule | Taught when | Line (12 words or fewer) | Tap
+---|---|---|---|---
+1 | Goal | spotlight step `goal0` | Destroy Slate’s ship before he destroys yours. | Next
+2 | Plan in secret | spotlight `ship` | Tap your ship to plan its move in secret. | your ship
+3 | Maneuver dial, green easy | spotlight `dial` | Tap the green straight 2. Green moves are easy. | straight 2
+4 | Dials revealed together | `fly` | Both dials stay hidden. Tap Fly to reveal them. | Fly
+5 | Activation: lowest skill first | `order` | Lowest pilot skill moves first. Slate is 3, you are 8. | (watch; ships fly one by one)
+6 | One action | `action` | After moving, take one action. Focus first. | Focus
+7 | Boost and barrel roll | `moves` | Some ships can also boost forward or barrel roll sideways. | (watch: Kael has neither)
+8 | Combat order, arc, range 1-3 | `shoot` | Highest skill fires first. Shoot an enemy in your arc, range 1-3. | Slate
+9 | Attack dice faces | `dice` | Hit and crit hurt. Focus needs a token. Blank misses. | (watch)
+10 | Spend focus | `usefocus` | Spend your focus token: focus faces become hits. | Use focus
+11 | Range 3 defence bonus, evades cancel hits | `res1` | Range 3 gave him a defence die. Each evade cancels a hit. | continue
+12 | Shields, hull, face-up crits | `res2` | Damage takes shields first, then hull. Crits are face-up cards. | continue
+13 | Pilot ability | `defend` | Kael turns one focus result into an evade. | (defence step)
+14 | End of round | `endround` | Unused focus and evade tokens vanish. Locks stay. | continue
+15 | Rocks | `marks` | A path through a rock hurts and skips your action. | straight 1
+16 | Stress | `stress` | Red move means stress: no action, no red until green. | (watch Slate's red turn)
+17 | Target lock | `lock` | Lock on: you may reroll attack dice against him. | Lock
 
 ## Things you will meet later (end card, always)
 Barrel roll and boost, bumping, flying off the mat, torpedoes, tied pilot skill. Any rule above that did not come up in this game is added to the card automatically.
 
 ## Honest gaps
-- Which rules come up depends on the player's choices; the seed only fixes the start. A typical game explains 12-13 of 14.
+- Bumping, flying off the mat, torpedoes and tied pilot skill are listed on the end card, not played.
 - Chapters are no longer separately resumable: leaving (Leave lesson) ends the coached game; the lesson restarts from the menu.
 - Missions of the core box (special objectives) are not in the game: no verified source for their objectives in the repo, so none were invented.

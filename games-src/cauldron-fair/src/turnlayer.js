@@ -34,12 +34,16 @@ function instrInfo() {
   const v = viewSeat(); if (v < 0 || hotSeat() || UI.pass != null) return null;
   const me = G.players[v], wait = G.players.filter(p => p.seat !== v && ((G.phase === 'brew' && (p.st === 'draw')) || (G.phase !== 'brew' && p.q))).map(p => p.name);
   if (G.phase === 'brew' && me.st === 'draw' && !me.lock && !me.q) {
-    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day: pick Draw or Stop in secret. Everyone reveals together.' };
+    if (G.round === LASTD()) return { who: 'YOUR TURN', text: 'Last day! Draw or Stop. All reveal together.' };
     if (!me.pot.length) return { who: 'YOUR TURN', text: 'Tap the bag to draw your first chip.' };
     const ws = CF.whiteSum(me), lim = CF.limitOf(G, me), safe = lim - ws;
-    return { who: 'YOUR TURN', text: safe <= 0 ? 'The pot is full of white (' + ws + '/' + lim + '). Another white chip explodes it. Draw, or Stop and score.' : 'White ' + ws + ' of ' + lim + '. Draw another chip, or Stop to keep your space.' };
+    return { who: 'YOUR TURN', text: safe <= 0 ? 'Whites ' + ws + '/' + lim + ': one more white explodes. Draw or Stop?' : 'Whites ' + ws + '/' + lim + '. Draw, or Stop to keep this space.' };
   }
-  if (me.q && !EVAL_Q[me.q.h]) { const t = promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' }; }
+  if (G.phase === 'brew' && me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 };   // R28: once decided it is never "YOUR TURN" (day 9)
+  if (me.q && !EVAL_Q[me.q.h]) {
+    const FQ = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, restart: 1 };   // fortune choices: the card name is already on the NOW chip and the sheet title, so the bar says only what to do
+    const t = FQ[me.q.h] && QINFO[me.q.h] ? QINFO[me.q.h][1](me, me.q.d) : promptInfo().text; return { who: 'YOUR TURN', text: t || 'Make your choice.' };
+  }
   if (G.phase === 'brew') { if (me.lock) return { who: 'WAITING', text: 'You decided. Waiting for ' + (wait.join(' and ') || 'everyone') + '.', rival: 1 }; return { who: wait.length ? wait[0].toUpperCase() + '\'S TURN' : 'DAY ENDS', text: (me.boom ? 'Your pot exploded. ' : 'You stopped. ') + (wait.length ? 'Watch ' + wait.join(' and ') + ' draw, one chip at a time.' : 'Counting the day.'), rival: 1 }; }
   return null;
 }
@@ -53,7 +57,10 @@ function instrBar() {
   if (vis) { e.hidden = true; return; }           // wide screens already show the prompt line in the panel
   if (!isPh() && db) { if (e.parentElement !== db) db.prepend(e); e.classList.add('indock'); e.style.bottom = ''; return; }   // W471: on desktop it is the first line of the panel, not floating over it
   if (e.parentElement !== document.body) { document.body.appendChild(e); e.classList.remove('indock'); }
-  const top = db ? db.getBoundingClientRect().top : innerHeight - 200; e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  let top = db ? db.getBoundingClientRect().top : innerHeight - 200;
+  if (db) for (const c of db.children) { if (c === e || c.hidden) continue; const r = c.getBoundingClientRect(); if (r.height > 2 && r.bottom > 0) top = Math.min(top, r.top); }   // R8: sit above the panel's content, never over a fortune title or a choice button
+  e.style.bottom = Math.max(0, innerHeight - top + 4) + 'px';
+  { const bd = $('#board'), er = e.getBoundingClientRect(), ih = Math.max(Math.ceil(er.height) + 8, bd ? Math.ceil(bd.getBoundingClientRect().bottom - er.top) + 4 : 0); if (UI.instrH !== ih) { UI.instrH = ih; document.documentElement.style.setProperty('--instrh', ih + 'px'); } }   // the board keeps its bottom ring clear of the bar
 }
 // ---- the turn banner: slides in when the turn changes hands
 let TB = { key: '', tm: 0 };
@@ -68,14 +75,11 @@ function turnBanner() {
   } else if (G.phase === 'eval') { key = 'ev' + G.round; text = 'Day ' + G.round + ' · Counting up'; cls = 'ev'; } else return;
   if (key === TB.key) return; TB.key = key; if (!text || !msgOK()) return;
   let b = $('#tbanner'); if (!b) { b = h('div#tbanner', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(b); }
-  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 4500);
+  b.textContent = text; b.className = cls; void b.offsetWidth; b.classList.add('on'); clearTimeout(TB.tm); TB.tm = setTimeout(() => b.classList.remove('on'), 1200);   // R8: a short flash, it never sits over content
 }
 setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $('#lpb') && !(LP.src && LP.src.closest && LP.src.closest('#rs'))) lpHide(); } catch (e) { } }, 200);
 // ---- story voice in the tutorial: text from story-data.js, the guide's portrait on the bubble
 (function () {
-  const ts = tutSteps; tutSteps = function () {
-    return ts().map(s => { const t = STORY.steps[s.id]; if (t) { s.title = t[0]; s.say = t[1]; } return s; });
-  };
   const mo = new MutationObserver(() => { document.querySelectorAll('.gxt-bub .gxh-bd:not([data-por])').forEach(bd => { bd.dataset.por = 1; const im = h('img.tutpor', { src: STORY.guide.img, alt: STORY.guide.name, width: 36, height: 36 }); bd.insertBefore(im, bd.firstChild); }); });
   try { mo.observe(document.body, { childList: true, subtree: true }); } catch (e) { }
 })();
@@ -94,74 +98,6 @@ setInterval(() => { try { rfScan(); instrBar(); turnBanner(); if (UI.rsOpen && $
 (function () {
   const sf = showFinal; showFinal = function () { const r = sf.apply(this, arguments); try { if (!UI.camp && UI.mode !== 'tutorial' && G) { const v = viewSeat(), w = $('#rs .win > div'); if (w && !w.querySelector('.rsvoice')) { const line = G.winners.length > 1 ? STORY.quickTie : v >= 0 && G.winners.indexOf(v) >= 0 ? STORY.quickWin : STORY.quickLose; w.appendChild(h('div.rsvoice', line)); } } } catch (e) { console.error(e); } return r; };
 })();
-// ===================== the coached first game (replaces the forced tap steps): a real two-day game with free choices from turn 1.
-// The guide speaks just-in-time, one bubble at a time, never blocking input; it can be dismissed. No spotlight, no forced taps.
-// Rules that did not come up are named on the "Things you'll meet later" card at the end. window.COACH.shown / .later feed the test. =====
-const COACH = window.COACH = { on: false, shown: [], later: [], q: [], cur: null, prologue: false, tm: 0, ids: [] };
-const coachBox = () => { let e = $('#coach'); if (!e) { e = h('div#coach.coach', { role: 'status', 'aria-live': 'polite' }); document.body.appendChild(e); e.addEventListener('click', ev => { if (ev.target.closest('[data-cx=ok]')) coachNext(); else if (ev.target.closest('[data-cx=leave]')) coachLeave(); }); } return e; };
-const cMe = () => G && G.players[0];
-const COACH_RULES = [
-  ['goal', () => G.phase !== 'over' && G.round === 1, 'The goal', 'Have the most points after two days. \u2022 Chips from your bag fill your pot. \u2022 Stop before the white chips pass 7. \u2022 Your last space pays coins and points.'],
-  ['fortune', () => cMe().q && cMe().q.h === 'pick', 'Fortune card', 'Each day starts with a fortune card. Purple ones happen now. Pick any reward.'],
-  ['draw', () => G.phase === 'brew' && cMe().st === 'draw' && !cMe().q && cMe().pot.length === 0 && G.round === 1, 'Your bag', 'Tap the bag to pull a chip. It moves as many spaces as its number.'],
-  ['spiral', () => G.phase === 'brew' && cMe().pot.length >= 1 && G.round === 1, 'The spiral', () => 'Your chip is on space ' + cMe().pot[cMe().pot.length - 1].pos + '. Stop now to keep its coins and points.'],
-  ['whites', () => cMe().pot.some(c => c.c === 'W'), 'White Fizzpods', () => 'White chips fill the meter: ' + CF.whiteSum(cMe()) + ' of ' + CF.limitOf(G, cMe()) + '. Go over and it explodes.'],
-  ['flask', () => G.phase === 'brew' && cMe().flask !== false && CF.whiteSum(cMe()) >= 4 && cMe().st === 'draw', 'The flask', 'Getting hot? Tap the flask. Your last white chip goes back. Once a day.'],
-  ['seven', () => G.phase === 'brew' && cMe().st === 'draw' && CF.whiteSum(cMe()) === CF.limitOf(G, cMe()), 'Exactly seven', 'Seven is still safe. One more white chip explodes the pot.'],
-  ['boom', () => cMe().boom && G.round === 1, 'Boom!', 'Boom! Today you get points or coins, not both. No bonus die either.'],
-  ['stopped', () => cMe().st === 'done' && !cMe().boom && G.round === 1 && G.phase === 'brew', 'Safe stop', 'Good, you keep your space. Safe pots may roll the bonus die.'],
-  ['rival2', () => G.players[1] && G.players[1].st === 'done' && !G.players[1].boom && G.round === 1 && G.phase === 'brew', 'Wynne', 'Wynne stopped early. Safe, but a smaller score.'],
-  ['rival', () => G.players[1] && G.players[1].boom && G.round === 1, 'Wynne', 'Wynne\'s pot exploded. She went over the limit.'],
-  ['report', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 1, 'Counting the day', 'Now each pot is counted. Coins, points, and a die for safe pots.'],
-  ['shop', () => cMe().q && cMe().q.h === 'shop', 'The stalls', 'Spend coins on up to two chips of different colours. Hold a chip to read its power.'],
-  ['rubies', () => cMe().q && cMe().q.h === 'shop' && cMe().rubies >= 2, 'Rubies', 'Two rubies move your droplet on, or refill your flask.'],
-  ['day2', () => G.round === 2 && G.phase === 'brew', 'The last day', 'Day two is the last. Blue fortune cards last all day.'],
-  ['lastday', () => G.round === LASTD() && G.phase === 'brew' && cMe().st === 'draw', 'Secret choice', 'Today you both pick Draw or Stop in secret. No shop today.'],
-  ['peek', () => cMe().q && cMe().q.h === 'crow', 'Peek and pick', 'A feather chip peeks ahead. Place the chip, or send it back.'],
-  ['d2count', () => UI.rsOpen && UI.rsMode === 'report' && G.round === 2, 'Final count', 'Last day: 5 coins make 1 point. So do 2 rubies.']
-];
-Object.defineProperty(window, 'GXCOACH', { get: () => ({ running: !!COACH.on, explained: COACH.shown.filter(i => i !== 'end'), later: COACH.later, done: !!COACH.finished }), configurable: true });
-COACH.ids = COACH_RULES.map(r => r[0]).concat(['end']);
-const COACH_LATER = [['Purple chips (from day 3) and black chips', 'purple'], ['The other 22 fortune cards', 'cards'], ['Rat tails: players behind start further ahead', 'rat'], ['A full game lasts 9 days. Ties go to the furthest chip', 'ties']];
-function coachShow(id, title, text) {
-  const b = coachBox(), t = typeof text === 'function' ? text() : text;
-  const tp = t.replace(/</g, '&lt;').split(' \u2022 '), body = '<span>' + tp[0] + '</span>' + (tp.length > 1 ? '<ul class="cxl">' + tp.slice(1).map(x => '<li>' + x + '</li>').join('') + '</ul>' : '');
-  b.innerHTML = '<img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><div class="cxb"><b>' + title.replace(/</g, '&lt;') + '</b>' + body + '</div><div class="cxr"><button type="button" data-cx="ok">Got it</button><button type="button" data-cx="leave" class="lv">Leave tutorial</button></div>';
-  b.className = 'on' + (UI.rsOpen ? ' top' : ''); COACH.cur = id; COACH.shown.push(id); clearTimeout(COACH.tm); COACH.tm = setTimeout(coachNext, Math.max(9000, 4000 + 1000 * Math.ceil(t.split(/\s+/).length / 10)));   // reading time: at least 4 s + 1 s per 10 words
-}
-function coachNext() { clearTimeout(COACH.tm); const b = coachBox(); COACH.cur = null; b.className = ''; let n = COACH.q.shift(); while (n && !(() => { try { return n[3](); } catch (e) { return false; } })()) n = COACH.q.shift(); if (n) setTimeout(() => { if (COACH.on && !COACH.cur) coachShow(n[0], n[1], n[2]); }, 250); }
-function coachTick() {
-  { const b = $('#coach'); if (b) b.classList.toggle('top', !!(typeof UI !== 'undefined' && UI.rsOpen)); }
-  if (!COACH.on || !G || UI.mode !== 'tutorial') return;
-  if (G.phase === 'over' && UI.rsMode === 'final') { if (COACH.shown.indexOf('end') < 0 && !$('#coachend')) coachEnd(); return; }
-  for (const [id, when, title, text] of COACH_RULES) {
-    if (COACH.shown.indexOf(id) >= 0 || COACH.q.some(q => q[0] === id)) continue;
-    let ok = false; try { ok = !!when(); } catch (e) { }
-    if (ok) { if (!COACH.cur) coachShow(id, title, text); else COACH.q.push([id, title, text, when]); break; }
-  }
-}
-setInterval(() => { try { coachTick(); } catch (e) { } }, 300);
-function coachEnd() {
-  const a = G.players[0], b = G.players[1]; COACH.shown.push('end'); COACH.finished = 1; coachNext(); COACH.q = [];
-  COACH.later = COACH.ids.filter(i => COACH.shown.indexOf(i) < 0 && i !== 'end');
-  const lines = COACH_RULES.filter(r => COACH.later.indexOf(r[0]) >= 0).map(r => r[2]).concat(COACH_LATER.map(x => x[0]));
-  const win = G.winner === 0 ? 'You win ' + a.vp + ' to ' + b.vp + '!' : G.winner < 0 ? 'A tie, ' + a.vp + ' each!' : b.name + ' wins ' + b.vp + ' to ' + a.vp + '.';
-  const d = h('div#coachend', { role: 'dialog', 'aria-label': 'Tutorial finished' });
-  d.innerHTML = '<div class="ce"><img class="tutpor" src="' + STORY.guide.img + '" alt="" width="36" height="36"><h3>' + win + '</h3><p>You made ' + a.vp + ' points. ' + b.name + ' made ' + b.vp + '.</p><p>On the last day, 5 coins or 2 rubies made 1 point.</p><h4>Rules you have not seen yet</h4><ul>' + lines.map(l => '<li>' + l.replace(/</g, '&lt;') + '</li>').join('') + '</ul><p>Hask: "Tomorrow it is for real."</p><div class="cb">' + (COACH.prologue ? '<button type="button" data-ce="chapter">Start chapter 1</button>' : '') + '<button type="button" data-ce="play">Play a game</button></div></div>';
-  document.body.appendChild(d); d.addEventListener('click', ev => { const k = ev.target.closest('[data-ce]'); if (k) coachFinish(k.dataset.ce); });
-}
-function coachClean() { COACH.on = false; clearTimeout(COACH.tm); COACH.q = []; COACH.cur = null; ['#coach', '#coachend'].forEach(s => { const e = $(s); if (e) e.remove(); }); }
-function coachFinish(choice) {
-  const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
-  coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave();
-  if (choice === 'chapter' && first && typeof GXC !== 'undefined') { showStart(); GXC.play(first.id); } else { UI.sv = 'setup'; UI.cfgOpen = false; showStart(); UI.sv = 'setup'; renderStart(); }
-}
-function coachLeave() { coachClean(); try { GXT.markDone(TUT_GAME); } catch (e) { } tutLeave(); showStart(); }
-tutStart = function (o) {
-  coachClean(); try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false;
-  newGame('tutorial'); Object.assign(COACH, { on: true, finished: 0, shown: [], later: [], q: [], cur: null, prologue: !!(o && o.prologue) });
-};
-
 // ---- W471 Goal card: one plain sentence and three bullets. Opens on day 1 of a Quick game and from the Day chip; stays until tapped.
 function goalCard(force) {
   let e = $('#goalcard'); if (e) e.remove(); if (!G) return;
@@ -169,15 +105,13 @@ function goalCard(force) {
 
   const n = LASTD();
   e = h('div#goalcard', { role: 'dialog', 'aria-label': 'The goal' });
-  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the white chips pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
+  e.innerHTML = '<div class="gc"><div class="gck">The goal</div><h3>Have the most points after ' + n + ' days.</h3><ul><li>Chips from your bag move along your pot.</li><li>Stop before the whites pass 7, or it explodes.</li><li>Your last space pays coins and points.</li></ul><button type="button" class="gcok">Let\u2019s brew</button></div>';
   e.addEventListener('click', () => { e.remove(); });
   document.body.appendChild(e);
 }
 window.goalCard = goalCard;
 document.addEventListener('click', ev => { const d = ev.target.closest && ev.target.closest('#barstat .dayn'); if (d && !UI.camp) goalCard(true); });
 
-// W471: the coached first game is free play, not a GXT spotlight script; report it as a running tutor so shared drivers find it
-(function () { if (typeof GXT === 'undefined') return; const r = GXT.running, s = GXT.state; GXT.running = function () { return !!COACH.on || r.apply(this, arguments); }; GXT.state = function () { return COACH.on && !r.call(GXT) ? null : s.apply(this, arguments); }; })();
 // W471: phone text floor. Owner rule: no text under 14px on a phone. Any element with its own text that computes smaller is raised to 14px.
 (function () {
   let t = 0;
