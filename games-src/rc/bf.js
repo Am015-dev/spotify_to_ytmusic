@@ -153,7 +153,10 @@ function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chips
   BF.place()}
 // a tap that misses every glowing place (the camera was still easing, or it fell on a neighbour) lands on the nearest glowing place within a thumb's reach
 BF.snap=function(x,y,id){if(!BF.on||!UI.pick||!UI.pick.length||(id!=null&&UI.pick.includes(id)))return null;let best=null,bd=46;for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-x,r.top+r.height/2-y);if(d<bd){bd=d;best=g}}return best?+best.dataset.t:null};
-BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const tr=Math.round(p.x-26)+','+Math.round(p.y-26);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-26)+'px';g.style.top=Math.round(p.y-26)+'px'}}
+BF.place=function(){const gl=q('#bfglow');if(gl){const pts=[...gl.children].map(g=>tilePt(+g.dataset.t)).filter(Boolean);let md=99;for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)md=Math.min(md,Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y));
+    // R42 P6: rings never overlap: close places get smaller rings (44 px at least, the tap still snaps to the nearest)
+    const rs=Math.max(44,Math.min(52,Math.floor(md-3)));if(gl._rs!==rs){gl._rs=rs;gl.style.setProperty('--rs',rs+'px')}}
+  if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const hr=(gl._rs||52)/2;const tr=Math.round(p.x-hr)+','+Math.round(p.y-hr);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-hr)+'px';g.style.top=Math.round(p.y-hr)+'px'}}
   const host=q('#bfchips');if(!host)return;const hr=host.getBoundingClientRect();const busy=[];
   // R36 stopper: a plate (or its "+N" / take-back button) must never sit on a glowing place's centre, or the finger lands on the plate and the tap dies
   const glows=[];if(UI.pick&&UI.pick.length)for(const id of UI.pick){const t=tilePt(id);if(t)glows.push({l:t.x-17,t:t.y-17,r:t.x+17,b:t.y+17})}busy.push(...glows);
@@ -174,6 +177,8 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
       for(const [s2,bm] of [[true,58],[false,58],[true,4],[false,4]]){let bd=1e9;for(let Y=top+py;Y<=p.h-h-bm;Y+=4)for(let X=2+px;X<=p.w-w-2-px;X+=6){if(!free(X,Y,s2))continue;const d=Math.hypot(X-ax,(Y-ay)*1.3);if(d<bd){bd=d;best=[X,Y]}}if(best)break}return best};
     if(!free(x,y,false)){let best=seek();if(!best){g.classList.add('mini');w=g.offsetWidth;h=g.offsetHeight;x=Math.max(2,Math.min(p.w-w-2,p.x-w/2));y=Math.max(top,Math.min(p.h-h-58,p.y+8));if(!free(x,y,false))best=seek()}
       if(best){x=best[0];y=best[1]}}
+    // still nowhere free (most of the board glows): the plate waits off the board until the glows go; the tray names every pawn's job
+    const off=!free(x,y,false);if(g.classList.contains('off')!==off)g.classList.toggle('off',off);if(off)continue;
     const me={l:x,t:y,r:x+w,b:y+h};g.classList.toggle('pass',glows.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t));busy.push(me);hard.push({l:x-px,t:y-py,r:x+w+px,b:y+h+py});const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
   // a label still under a plate after all that steps aside (the plate names the job there; the label comes back when the plate moves)
   const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t))}

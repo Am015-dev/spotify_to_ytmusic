@@ -8,12 +8,12 @@ const LIVE=path.join(__dirname,'../../games/shipwreck-isle');const sleep=ms=>new
 const MEASURE=()=>{const vis=e=>{if(!e||e.closest('[hidden]'))return false;const s=getComputedStyle(e);if(s.visibility==='hidden'||s.display==='none'||+s.opacity<.05)return false;const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
   const R=e=>e.getBoundingClientRect();const inter=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
   const pl=[...document.querySelectorAll('#bfchips .bfa,#bfchips .bfmore')].filter(vis).map(e=>({e,r:R(e),g:e.parentElement}));
-  const gl=[...document.querySelectorAll('#bfglow .bfgl')].filter(vis).map(e=>{const r=R(e);return {t:+e.dataset.t,x:r.left+r.width/2,y:r.top+r.height/2}});
+  const gl=[...document.querySelectorAll('#bfglow .bfgl')].filter(vis).map(e=>{const r=R(e);return {t:+e.dataset.t,x:r.left+r.width/2,y:r.top+r.height/2,w:r.width}});
   const out={plate:[],pg:[],zg:[],minRing:null,board:null};
   for(let i=0;i<pl.length;i++)for(let j=i+1;j<pl.length;j++){if(pl[i].g===pl[j].g)continue;const a=inter(pl[i].r,pl[j].r);if(a>4)out.plate.push(pl[i].e.textContent.trim().slice(0,14)+' x '+pl[j].e.textContent.trim().slice(0,14)+' '+Math.round(a))}
   for(const p of pl)for(const g of gl){const c={left:g.x-17,right:g.x+17,top:g.y-17,bottom:g.y+17};if(inter(p.r,c)>4)out.pg.push(p.e.textContent.trim().slice(0,14)+' on '+g.t)}
   for(const z of [...document.querySelectorAll('#bfzoom .gx-ibtn')].filter(vis)){const r=R(z);for(const g of gl){const c={left:g.x-26,right:g.x+26,top:g.y-26,bottom:g.y+26};if(inter(r,c)>4)out.zg.push((z.dataset.ph||'z')+' on '+g.t)}}
-  for(let i=0;i<gl.length;i++)for(let j=i+1;j<gl.length;j++){const d=Math.hypot(gl[i].x-gl[j].x,gl[i].y-gl[j].y);if(out.minRing==null||d<out.minRing)out.minRing=Math.round(d)}
+  for(let i=0;i<gl.length;i++)for(let j=i+1;j<gl.length;j++){const d=Math.hypot(gl[i].x-gl[j].x,gl[i].y-gl[j].y);if(out.minRing==null||d<out.minRing)out.minRing=Math.round(d);const ov=(gl[i].w+gl[j].w)/2-d;if(ov>0.5)out.ringOv=(out.ringOv||0)+1;out.minRs=Math.min(out.minRs||99,Math.round(gl[i].w),Math.round(gl[j].w))}
   const b=document.querySelector('.gx-board');if(b){const r=R(b);out.board=Math.round(r.height)}{const lb=document.querySelector('#phlabel');if(lb&&vis(lb)){const t=lb.textContent;out.hint=/✨/.test(t);out.cut=out.hint&&(/…/.test(t)||lb.scrollHeight>lb.clientHeight+1)?t:''}}out.n=gl.length;out.np=pl.length;if(out.pg.length)out.dbg=JSON.stringify({pick:UI.pick,gl:gl.map(g=>[g.t,Math.round(g.x),Math.round(g.y)]),pl:pl.map(p=>[p.e.textContent.trim().slice(0,8),Math.round(p.r.left),Math.round(p.r.top),Math.round(p.r.width),Math.round(p.r.height)]),gtr:[...document.querySelectorAll('#bfchips .bfg')].map(g=>g.style.transform+' '+g.className)});return out};
 (async()=>{const br=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const tot={hints:0,cuts:0,frames:0,plate:0,pg:0,zg:0,minRing:999,ringsUnder52:0,board:999,wins:0,games:0,errs:[],ex:new Set()};
@@ -28,7 +28,7 @@ const MEASURE=()=>{const vis=e=>{if(!e||e.closest('[hidden]'))return false;const
  const centre=sel=>p.evaluate(sel=>{for(const e of document.querySelectorAll(sel)){if(e.disabled)continue;const r=e.getBoundingClientRect();if(r.width<6||r.height<6)continue;const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const t=document.elementFromPoint(x,y);if(t&&(t===e||e.contains(t)))return [x,y]}return null},sel);
  const tap=async sel=>{const c=await centre(sel);if(!c)return false;await p.touchscreen.tap(c[0],c[1]);return true};
  const meas=async tag=>{await sleep(120);const m=await p.evaluate(MEASURE);if(m.hint){tot.hints++;if(m.cut){tot.cuts++;if(tot.ex.size<12)tot.ex.add(tag+': cut ✨ '+m.cut)}}if(!m.n&&!m.np)return;tot.frames++;if(m.dbg&&process.env.DBG){console.log(tag,m.dbg);const dd=await p.evaluate(()=>{const host=document.querySelector('#bfchips');const hr=host.getBoundingClientRect();return [...host.children].map(g=>{const p=BF.tilePt(+g.dataset.t);return {w:g.offsetWidth,h:g.offsetHeight,p:p&&[Math.round(p.x),Math.round(p.y),p.w,p.h],top:Math.round(document.querySelector('#bfres').getBoundingClientRect().bottom-hr.top+4),cur:!!g.querySelector('.cur')}})});console.log('  groups',JSON.stringify(dd));const m2=await p.evaluate(M=>{BF.place();return eval('('+M+')')()},MEASURE.toString());console.log('  after place:',m2.pg.length,m2.dbg)}tot.plate+=m.plate.length;tot.pg+=m.pg.length;tot.zg+=m.zg.length;
-   if(m.minRing!=null){tot.minRing=Math.min(tot.minRing,m.minRing);if(m.minRing<52)tot.ringsUnder52++}if(m.board)tot.board=Math.min(tot.board,m.board);
+   if(m.minRing!=null){tot.minRing=Math.min(tot.minRing,m.minRing);if(m.ringOv)tot.ringsUnder52++;if(m.minRs)tot.minRs=Math.min(tot.minRs||99,m.minRs)}if(m.board)tot.board=Math.min(tot.board,m.board);
    for(const x of [...m.plate.map(s=>'plate '+s),...m.pg.map(s=>'plate-glow '+s),...m.zg.map(s=>'zoom '+s)])if(tot.ex.size<12){tot.ex.add(tag+': '+x);if(process.env.SHOTS)await p.screenshot({path:path.join(process.env.SHOTS,`${MODE}-${W}x${H}-${tot.ex.size}.png`)})}};
  await tap('#modal [data-a=start]');await sleep(600);
  const t0=Date.now();let stall=0,last='';
@@ -63,7 +63,7 @@ const MEASURE=()=>{const vis=e=>{if(!e||e.closest('[hidden]'))return false;const
    await sleep(300)}
   const r=await p.evaluate(()=>({win:!!(G&&G.over&&G.over.win),day:G&&G.round,pile:G&&G.sc&&G.sc.pile}));tot.games++;if(r.win)tot.wins++;console.log(`  game ${gi+1}: ${r.win?'RESCUED':'lost'} day ${r.day} pile ${r.pile}`)}
  await ctx.close()}
- const bad=tot.plate+tot.pg+tot.zg+tot.cuts;
- console.log(`lay ${MODE} ${W}x${H}: ${bad?'FAIL':'PASS'} frames ${tot.frames} · plate overlaps ${tot.plate} · plate on glow ${tot.pg} · zoom on glow ${tot.zg} · min ring gap ${tot.minRing} px (frames under 52: ${tot.ringsUnder52}) · min board ${tot.board} px · ✨ lines ${tot.hints} cut ${tot.cuts}${MODE==='game'?` · wins ${tot.wins}/${tot.games}`:''} · errors ${tot.errs.length?tot.errs.slice(0,3).join(' | '):0}`);
+ const bad=tot.plate+tot.pg+tot.zg+tot.cuts+tot.ringsUnder52;
+ console.log(`lay ${MODE} ${W}x${H}: ${bad?'FAIL':'PASS'} frames ${tot.frames} · plate overlaps ${tot.plate} · plate on glow ${tot.pg} · zoom on glow ${tot.zg} · min ring gap ${tot.minRing} px · rings overlapping on ${tot.ringsUnder52} frames · smallest ring ${tot.minRs||52} px · min board ${tot.board} px · ✨ lines ${tot.hints} cut ${tot.cuts}${MODE==='game'?` · wins ${tot.wins}/${tot.games}`:''} · errors ${tot.errs.length?tot.errs.slice(0,3).join(' | '):0}`);
  for(const x of tot.ex)console.log('   ',x);
  await br.close();process.exit(bad||tot.errs.length?1:0)})();
