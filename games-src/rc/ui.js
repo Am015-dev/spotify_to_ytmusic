@@ -160,7 +160,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <details class="quick setup" open><summary>Game setup: ${esc(SCENARIOS[o.scen].n)} · ${o.chars.length} player${o.chars.length>1?'s':''} · ${o.diff==='easy'?'Easy island':o.diff==='hard'?'Hard':'Normal'}</summary>
    ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
    ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
-   ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</details>
+   ${seg('Difficulty',[['easy','Easy island'],['standard','Normal'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}${o.diff!=='easy'?`<p class="diffwarn" role="note">⚠ ${o.diff==='hard'?'Hard':'Normal'} is hard: the full rules, and ✨ hints won’t carry you.</p>`:''}</details>
    <details class="morep"><summary>Play online with friends</summary>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];

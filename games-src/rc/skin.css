@@ -70,3 +70,34 @@ html.sk .gx-drawer a{color:#5a3200;text-decoration:underline}
 @keyframes bfClashR{0%{opacity:0;transform:translateX(46px)}70%{opacity:1;transform:translateX(-8px)}100%{transform:none}}
 @keyframes bfWound{0%{opacity:0;transform:scale(1.8)}60%{opacity:1;transform:scale(.92)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.bffight b,.bffight em{animation:none!important;opacity:1!important;transform:none!important}.bfpop{animation:none!important;opacity:1!important}}
+
+/* R42 phone: the zoom buttons step off glowing places (bf.js BF.zoomDodge) */
+html.bf #bfzoom.bfz-l:not([hidden]){left:6px!important;right:auto!important}
+html.bf #bfzoom.bfz-off{visibility:hidden!important;pointer-events:none!important}
+/* R42 P6: short phones (<= 600 px tall, html.phtight from ph.js) give the board more height: a slimmer turn line, a one-row tray
+   without the helpers line, a 2-line Day chip. The tray budget in ph.js (140 px) matches these sizes. */
+#bfres .tk[data-r=day] i{display:none}
+html.ph.bf.ph-p.phtight .gx-app,html.ph.bf.ph-p.phtight .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhb,var(--bh)) 52px minmax(0,1fr)}
+html.ph.bf.ph-p.phtight .gx-app[data-bft=lite]{grid-template-rows:44px var(--bhbs,var(--bhb,var(--bh))) 52px minmax(0,1fr)}
+html.bf.phtight #phview:not([hidden]){min-height:52px}
+html.bf.phtight #phview #phlabel{max-height:52px}
+html.bf.phtight #phview #phlabel .bft{font-size:16px;line-height:1.12}
+html.bf.phtight #phview #phlabel .bfb{margin-bottom:1px;line-height:1.1}
+html.bf.phtight #bf{gap:4px;padding:4px 8px calc(4px + var(--sab,0px))}
+html.bf.phtight #bf .bfhelp{display:none}
+html.bf.phtight .bfpc .bfpw{width:40px;height:40px;min-width:40px}
+html.bf.phtight .bfpw svg.role{width:23px;height:23px}
+html.bf.phtight .bfpc{gap:1px}
+html.bf.phtight .bfpn{line-height:1.05}
+html.bf.phtight .bf-main .btn,html.bf.phtight .gx-ibtn.bf-s{min-height:48px;height:48px}
+html.bf.phtight #bfres{gap:2px 6px;padding:3px 8px}
+html.bf.phtight #bfres .tk[data-r=pile] i{display:none}
+/* R42 P5: a plate and its "+N" stay on one row (a 2-row group could find no free spot on a crowded board) */
+html.bf .bfg{max-width:230px}
+/* R42 P7: the ✨ reason wraps to two lines, never an ellipsis; a line that needs the room hides the turn tag (bf.js adds .long) */
+html.bf #phview #phlabel .bft{overflow-wrap:anywhere}
+html.bf #phview #phlabel.long .bfb{display:none}
+html.bf.phtight #phview #phlabel.long .bft{font-size:15px}
+html.bf .bfg.mini .bfa .bfw,html.bf .bfg.mini .bfa em{display:none}
+/* R42 A2: the setup screen says Normal / Hard is hard (✨ advice wins Easy, not Normal) */
+.mbox.start .diffwarn{font:700 15px/1.3 var(--sans);color:#8a2a18;margin:6px 0 2px}

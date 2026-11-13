@@ -85,7 +85,7 @@ BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=n
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};
 // owner 8 Nov: a message stays at least 4 s plus 1 s per 10 words, so it can be read before it goes
 const readMs=(t,ms)=>Math.max(ms||0,4000+1000*Math.ceil(String(t||'').split(/\s+/).filter(Boolean).length/10));
-BF.say=function(t,ms){t=w8(t);ms=readMs(t,ms);BF.msg={t,until:Date.now()+ms};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},ms+30)};
+BF.say=function(t,ms,full){t=full?String(t==null?'':t).replace(/\s+/g,' ').trim():w8(t);ms=readMs(t,ms);BF.msg={t,until:Date.now()+ms};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},ms+30)};
 // whose turn it is: a small banner above the one instruction line (owner 7 Nov: "if I cannot understand it in a minute it is unplayable")
 function turnBanner(){const st=PHO.st;if(st==='plan'||st==='plan2')return ['you','Your turn: plan the day'];if(st==='over')return ['end','Game over'];
   if(st==='story'){const i=storyIdx();if(i<0)return ['isl',''];const last=i>=UI.beats.length-1;if(last&&humanQ())return ['you','Your choice'];const k=UI.beats[i].kind;
@@ -111,7 +111,9 @@ function goalRoad(day){if(!G||G.scen!=='marooned'||G.over||!G.sc)return null;con
   const f=fire?'Fire ✓':'Fire ✗ (build it at camp)';if(!left)return {late:false,text:`Rescue: ${f}, pile 15/15 done. Hold on to day 10-12.`};
   return {late:left>days,text:`Rescue: ${f}. Next pile stage +${next} wood; ${left} stage${left>1?'s':''} left, one a day, ${days} day${days>1?'s':''} left.`}}
 BF.paint=function(){if(G&&R.dataset.scen!==G.scen)R.dataset.scen=G.scen;const rs=q('#bfres');if(rs&&G){const h=resStrip();if(rs.dataset.h!==h){rs.dataset.h=h;rs.innerHTML=h}}const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.status();const bn=turnBanner();const key=bn[0]+'|'+bn[1]+'|'+s;if(lb.dataset.k===key)return;lb.dataset.k=key;
-  lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`};
+  lb.innerHTML=(bn[1]?`<small class="bfb ${bn[0]}">${E(bn[1])}</small>`:'')+`<span class="bft">${E(s)}</span>`;
+  // R42 P7: a long line (the ✨ why) wraps instead of being cut; if the tag and two lines don't fit, the line keeps the room
+  lb.classList.remove('long');if(lb.scrollHeight>lb.clientHeight+1)lb.classList.add('long')};
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 // the advisor's pick on a choice (the same aiChoose the bulb uses), worked out on a copy so the game is untouched; cached per question
@@ -158,15 +160,30 @@ BF.place=function(){const gl=q('#bfglow');if(gl)for(const g of gl.children){cons
   for(const l of document.querySelectorAll('.tl:not([hidden])')){const r=l.getBoundingClientRect();if(r.width)busy.push({l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top})}const nl=busy.length;
   const hit=(a,b)=>a.l<b.r+2&&a.r>b.l-2&&a.t<b.b+2&&a.b>b.t-2;const sr=q('#bfres');const top=Math.max(2,sr?Math.round(sr.getBoundingClientRect().bottom-hr.top+4):2);
   const gs=[...host.children].map(g=>({g,p:tilePt(+g.dataset.t)})).filter(o=>{if(!o.p){o.g.style.visibility='hidden';return false}o.g.style.visibility='';return true}).sort((a,b)=>a.p.y-b.p.y);
-  for(const {g,p} of gs){const w=g.offsetWidth,h=g.offsetHeight;let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=Math.max(top,Math.min(p.h-h-58,p.y+8));
+  // R42 P5: plates (and glowing places) are hard: no plate may cover another or a glow; place labels are soft (they step aside, below)
+  const hard=[...glows];const soft=busy.slice(glows.length);
+  for(const {g,p} of gs){if(g.classList.contains('mini'))g.classList.remove('mini');let w=g.offsetWidth,h=g.offsetHeight;const ce=g.querySelector('.cur');const px=ce?Math.ceil(ce.offsetWidth*.075)+1:0,py=ce?Math.ceil(ce.offsetHeight*.075)+1:0;let x=Math.max(2,Math.min(p.w-w-2,p.x-w/2)),y=Math.max(top,Math.min(p.h-h-58,p.y+8));
     // slide down past whatever it would cover (other plates first, then labels); if it runs off the bottom, go above the place instead
     for(let n=0;n<12;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;y=o.b+3;if(y+h>p.h-58){y=Math.max(top,p.y-h-30);break}}
     // G6 review: still on top of another plate or a label (top edge, crowded camp)? try going up, then sideways, before giving up
     for(let n=0;n<10;n++){const me={l:x,t:y,r:x+w,b:y+h};const o=busy.find(b=>hit(me,b));if(!o)break;const up=o.t-h-3;if(up>=top&&n<5){y=up;continue}const rx=o.r+3,lx=o.l-w-3;if(rx+w<=p.w-2){x=rx}else if(lx>=2){x=lx}else break}
-    const me={l:x,t:y,r:x+w,b:y+h};g.classList.toggle('pass',glows.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t));busy.push(me);const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
+    // R42 P5: still on a plate or a glow (short phone, crowded camp)? take the nearest free spot on the board: free of labels too if one exists
+    const free=(X,Y,s2)=>{const me={l:X-px,t:Y-py,r:X+w+px,b:Y+h+py};return !hard.some(b=>hit(me,b))&&(!s2||!soft.some(b=>hit(me,b)))};
+    // no room at all: the plate goes small (icon and pawn dots, the name stays in its label) and looks again
+    const seek=()=>{const ax=p.x-w/2,ay=p.y+8;let best=null;
+      for(const [s2,bm] of [[true,58],[false,58],[true,4],[false,4]]){let bd=1e9;for(let Y=top+py;Y<=p.h-h-bm;Y+=4)for(let X=2+px;X<=p.w-w-2-px;X+=6){if(!free(X,Y,s2))continue;const d=Math.hypot(X-ax,(Y-ay)*1.3);if(d<bd){bd=d;best=[X,Y]}}if(best)break}return best};
+    if(!free(x,y,false)){let best=seek();if(!best){g.classList.add('mini');w=g.offsetWidth;h=g.offsetHeight;x=Math.max(2,Math.min(p.w-w-2,p.x-w/2));y=Math.max(top,Math.min(p.h-h-58,p.y+8));if(!free(x,y,false))best=seek()}
+      if(best){x=best[0];y=best[1]}}
+    const me={l:x,t:y,r:x+w,b:y+h};g.classList.toggle('pass',glows.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t));busy.push(me);hard.push({l:x-px,t:y-py,r:x+w+px,b:y+h+py});const tr=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;if(g._tr!==tr){g._tr=tr;g.style.transform=tr}}
   // a label still under a plate after all that steps aside (the plate names the job there; the label comes back when the plate moves)
   const plates=busy.slice(nl);for(const l of document.querySelectorAll('#labels .tl:not([hidden])')){const r=l.getBoundingClientRect();const me={l:r.left-hr.left,t:r.top-hr.top,r:r.right-hr.left,b:r.bottom-hr.top};l.classList.toggle('lowc',!!r.width&&plates.some(b=>me.l<b.r&&me.r>b.l&&me.t<b.b&&me.b>b.t))}
-  BF.ghostPlace()};
+  BF.ghostPlace();BF.zoomDodge()};
+// R42 B1: the zoom buttons never sit on a glowing place or the hint finger: bottom right, else bottom left, else out of the way until the glow moves
+BF.zoomDodge=function(){const bz=q('#bfzoom'),bd=q('.gx-board');if(!bz||!bd||bz.hidden)return;const r=bz.getBoundingClientRect();if(!r.width){bz.classList.remove('bfz-l','bfz-off');return}const br=bd.getBoundingClientRect();
+  const sp=[];for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const e=g.getBoundingClientRect();sp.push({l:e.left-4,t:e.top-4,r:e.right+4,b:e.bottom+4})}
+  const gh=BF.ghostAt;if(gh&&gh.why==='tile')sp.push({l:gh.x-30,t:gh.y-30,r:gh.x+30,b:gh.y+30});
+  const clear=l=>!sp.some(b=>l<b.r&&l+r.width>b.l&&r.top<b.b&&r.bottom>b.t);const R0=br.right-6-r.width,L0=br.left+6;
+  const k=clear(R0)?'':clear(L0)?'l':'off';bz.classList.toggle('bfz-l',k==='l');bz.classList.toggle('bfz-off',k==='off')};
 // ---------- floating scores, dice, results ----------
 BF.pop=function(id,html,cls,delay,k){const ov=q('#bfov');if(!ov||!BF.on)return;const p=tilePt(id);if(!p)return;const el=document.createElement('div');el.className='bfpop '+(cls||'');el.style.setProperty('--d',(delay||0)+'ms');
   el.innerHTML=html;el.style.left='0px';el.style.top='0px';ov.appendChild(el);const w=el.offsetWidth;el.style.left=Math.round(Math.max(w/2+4,Math.min(p.w-w/2-4,p.x)))+'px';el.style.top=Math.round(Math.max(96,Math.min(p.h-72,p.y-(k||0)*38)))+'px';setTimeout(()=>el.remove(),2400+(delay||0))};
@@ -288,10 +305,10 @@ BF.hint=function(){let pre='';const castFree=()=>humanFree().some(p=>p.c!=null||
   // a job's leader first (the leader rolls, takes the wounds and brings the skills: the whole plan's order, R40 sim 15/40 -> 30/40 with the extras)
   {const fid=new Set(free.map(p=>p.id));const recs=cand.map(p=>[p,recTile(p)]).filter(x=>x[1]);const pick=recs.find(([p,r])=>r.rec.lead===p.id||!fid.has(r.rec.lead))||recs[0];if(pick){cur=pick[0];rt=pick[1]}}
   if(!rt&&cur&&cur.c==null){const f=free.find(p=>p.c!=null);if(f)cur=f}
-  if(!cur||!free.some(p=>p.c!=null)&&!rt){BF.hintId=null;BF.say(pre+'Every pawn has a job. Start day');render();return}
+  if(!cur||!free.some(p=>p.c!=null)&&!rt){BF.hintId=null;BF.say(pre+'Every pawn has a job: Start day',0,true);render();return}
   UI.sel=cur.id;const nm=pawnLabel(cur).split(' ')[0];
-  if(!rt){BF.hintId=null;BF.say(pre+`No clear pick for ${nm}: any glow`);render();return}
-  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'');const why=hintWhy(rt.rec,cur);BF.hintTxt=why;BF.say(`${pre?pre.replace(/\.\s*$/,'')+' · ':''}✨ ${nm} → ${lb.replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat')}${why?': '+why:''}`,8000);render()};
+  if(!rt){BF.hintId=null;BF.say(pre+`No clear pick for ${nm}: any glow`,0,true);render();return}
+  BF.hintId=cur.id;UI.sel=cur.id;const lb=String(rt.rec.label||TNAME[rt.rec.type]||rt.rec.type).replace(/\s*\(.*\)$/,'');const why=hintWhy(rt.rec,cur);BF.hintTxt=why;BF.say(`${pre?pre.replace(/\.\s*$/,'')+' · ':''}✨ ${nm} → ${lb.replace(/\s*at place \d+/,'').replace(/^Threat: .*/,'Threat')}${why?': '+why:''}`,8000,true);render()};
 BF.ghostPlace=function(){const gh=q('#bfgh');if(!gh)return;let s=null;try{s=ghostSpot()}catch(e){}if(!s){gh.hidden=true;BF.ghostAt=null;return}gh.hidden=false;gh.style.left=Math.round(s.x-14)+'px';gh.style.top=Math.round(s.y-12)+'px';BF.ghostAt=s};
 // ---------- details drawer: the story text and the day's needs live here ----------
 BF.info=function(){const d=GX.drawer('detd','Details',null);fillInfo();GX.show('detd');return d};
@@ -347,7 +364,7 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   // the camp chip flashes when a number changes
   const chip=q('#phchip');if(chip){const v=chip.dataset.h;if(BF._chip!=null&&BF._chip!==v){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}BF._chip=v}
   // R40: the zoom buttons never sit over a card or a pop-up (they covered the event card and the day summary at 375x667)
-  const bz=q('#bfzoom'),pv=q('#phview');if(bz&&pv){const ppo=q('#ppop'),pz=q('#pzoom');const v=pv.hidden||!!q('#bfcard')||!!(ppo&&!ppo.hidden)||!!(pz&&!pz.hidden);if(bz.hidden!==v)bz.hidden=v}
+  const bz=q('#bfzoom'),pv=q('#phview');if(bz&&pv){const ppo=q('#ppop'),pz=q('#pzoom');const v=pv.hidden||!!q('#bfcard')||!!(ppo&&!ppo.hidden)||!!(pz&&!pz.hidden);if(bz.hidden!==v)bz.hidden=v;BF.zoomDodge()}
   if(GX.open==='detd')fillInfo();
   // the game-over card sits over the lower part of the screen
   if(st==='over'&&bd){const r=bd.getBoundingClientRect();const top=Math.round(r.top+r.height*.28);R.style.setProperty('--dz-t',top+'px');R.style.setProperty('--dz-l','0px');R.style.setProperty('--dz-w',innerWidth+'px');R.style.setProperty('--dz-h',(innerHeight-top)+'px')}
