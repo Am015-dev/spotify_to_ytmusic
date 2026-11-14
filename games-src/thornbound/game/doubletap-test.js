@@ -1,4 +1,4 @@
-// Double-tap test (R64): a second fast tap on the Goal card's "Got it" (or any overlay's close) must not reach the panel underneath.
+// Double-tap test (R64, R71): a second fast tap on the Goal card's "Got it", the coach bubble's "Got it" or the bulb bubble must not reach what is underneath; legit taps 550 ms apart are never eaten.
 // A probe button is put exactly under "Got it"; double-taps by touch and by mouse must leave it untouched, a tap 450 ms later must reach it.
 // node doubletap-test.js [size=375x667]
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();

@@ -108,7 +108,9 @@ function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
 function hlpSuggest(){const M=UI.bf;if(!M||!M.kind||UI.card||UI.dragging||!M.sug)return null;
   const plan=()=>planFor(UI.bf,UI.bf.sug,{full:1});const p=planFor(M,M.sug,{full:1});if(!p||!p.toR)return null;
   const why=whyShort(M,M.sug);if(!why)return null;
-  return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.toR)||p.toR},from:p.fromR?()=>{const q=plan();return (q&&q.fromR)||p.fromR}:null}}
+  // one lit target (R71): a two-step move (pick up a card, then put it somewhere) points at its first step only, the card; the spot lights after the pick-up
+  if(p.fromR)return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.fromR)||(q&&q.toR)||p.fromR},from:null};
+  return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.toR)||p.toR},from:null}}
 function tacName(id){try{for(const f in DD.TACTICS)for(const t of DD.TACTICS[f])if(t.id===id)return t.nm}catch(e){}return ''}
 // ---- one helper while the bulb's bubble is open (R64): target glows go off, and the bubble sits right next to the thing its finger shows
 const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
