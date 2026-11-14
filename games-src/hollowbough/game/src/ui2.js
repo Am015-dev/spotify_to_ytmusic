@@ -425,7 +425,7 @@ function chipEl(s, n) {
 }
 // a choice of which effect goes first: each option names the card and says in one line what it does
 const effQ = () => !!(G && G.q && (G.q.kind === 'trigger' || G.q.kind === 'production'));
-function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').split(/\s+/); return w.length > 10 ? w.slice(0, 9).join(' ') + '…' : w.join(' '); }
+function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').replace(' in your own city', '').split(/\s+/); return w.length > 8 ? w.slice(0, 7).join(' ') + '…' : w.join(' '); }
 // ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips
 function trayChip(m, i, tg) {
   let inner;
