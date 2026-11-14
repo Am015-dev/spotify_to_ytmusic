@@ -28,7 +28,7 @@ function buildMap(){const wrap=$('#mapwrap');if(!wrap)return;
   MAP.heraldAt={};MAP.slotSig={};MAP.slotPrev=null}
 function drawPanels(){const f=[];
   REGBOX.forEach((b,r)=>{f.push('<g data-reg="'+r+'"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="34" fill="#f4e6b8" fill-opacity=".13" stroke="#e8c867" stroke-opacity=".55" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/>'+
-    '<text x="'+b.lab[0]+'" y="'+b.lab[1]+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="36" textLength="'+Math.min(262,REG[r].length*26)+'" lengthAdjust="spacingAndGlyphs" fill="#f6e6b4" fill-opacity=".85" stroke="#000" stroke-opacity=".6" stroke-width="3" paint-order="stroke">'+esc(REG[r].toUpperCase())+'</text></g>')});
+    '<text x="'+b.lab[0]+'" y="'+(b.lab[1]+(UI.phone&&r===0&&(UI.bs||360)<420?26:0))+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="36" textLength="'+Math.min(262,REG[r].length*26)+'" lengthAdjust="spacingAndGlyphs" fill="#f6e6b4" fill-opacity=".85" stroke="#000" stroke-opacity=".6" stroke-width="3" paint-order="stroke">'+esc(REG[r].toUpperCase())+'</text></g>')});
   MAP.pan.innerHTML=f.join('')}
 function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44:38,sh=CP?62:54,gap=CP?6:6,n=G.np;
   for(let r=0;r<3;r++){const a=LOCID[2*r],b=LOCID[2*r+1],pa=m.locPos(a),S=STRIP[r];
@@ -41,7 +41,7 @@ function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44
 function mapTap(id,info){if(!G||!UI.started)return;
   if(UI.card&&UI.card.kind!=='pass'&&UI.card.kind!=='tip'){bfSkip();return}
   if(UI.pop){closePop(true)}
-  if(id==='throne'){openPop('kingdom');return}
+  if(id==='throne'){if(document.documentElement.classList.contains('bf-w'))openPop('kingdom');return}   // phones: the Kingdom sheet opens only from its own chips (#cstrip), never from a stray tap on the map
   const l=LOCID.indexOf(id);if(l<0)return;
   if(info&&info.seat!=null){regionTap(regOfLoc(l));return}
   locTap(l)}
@@ -57,7 +57,7 @@ function renderMap(){if(!G||!UI.started)return;const wrap=$('#mapwrap');if(!wrap
   const sig=G.pl.map(p=>p.fac).join()+'|'+(UI.phone?1:0);
   if(!MAP.m||MAP.sig!==sig||UI.mapReset){buildMap();UI.mapReset=false}
   const m=MAP.m,V=UI.V;
-  m.setRound(Math.max(1,G.round),G.rounds);
+  MAP._rn='';syncRound();
   // influence
   for(let s=0;s<G.np;s++){const v=G.pl[s].inf;if(m.influence(s)!==v){const p=ANIM&&!UI.noAnim?m.setInfluence(s,v):m.setInfluence(s,v,{immediate:true});if(ANIM&&p&&p.then){UI.busy=true;p.then(()=>{UI.busy=false})}}}
   // heralds (public). unplaced = at court (dimmed)
@@ -94,7 +94,7 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
       f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
   regionChips(f);
   if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
-    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=36,words=name.split(' ');const lines=name.length>8&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
+    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=Math.max(36,Math.ceil(14.2*1000/(UI.bs||360))),words=name.split(' ');const lines=name.length*fs*.6+18>330&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
       const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
       f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".82"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
   ov.innerHTML=f.join('')}
@@ -128,3 +128,10 @@ function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=v
     let x=CHIPPOS[r][0]-tot/2;const y=CHIPPOS[r][1];
     f.push('<g class="rchip" data-reg="'+r+'">'+pills.map(p=>{const w=pw(p);const tc=sealOf(p.s),seal=tc&&p.txt.length<=3;const g='<g transform="translate('+Math.round(x)+' '+(y-ph/2)+')">'+(seal?'<image href="media/token-strength-'+tc+'.webp" x="'+Math.round((w-ph)/2)+'" y="0" width="'+ph+'" height="'+ph+'"/>'+(p.win?'<circle cx="'+Math.round(w/2)+'" cy="'+ph/2+'" r="'+(ph/2-2)+'" fill="none" stroke="#ffd24a" stroke-width="7"/>':''):'<rect width="'+Math.round(w)+'" height="'+ph+'" rx="'+ph/2+'" fill="'+fcol(p.s)+'" stroke="'+(p.win?'#ffd24a':'#fff3c4')+'" stroke-width="'+(p.win?8:3)+'"/>')+
       '<text x="'+Math.round(w/2)+'" y="'+(ph/2+fs*.36)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#fff" stroke="#000" stroke-opacity=".45" stroke-width="3" paint-order="stroke">'+esc(p.txt)+(p.s===me?'':'')+'</text></g>';x+=w+gap;return g}).join('')+'</g>')}}
+// the Councils, the Favour and your Tactics sit on the board (bottom edge): who sits in each Council (votes per house), who holds the Favour, Tactics left
+function renderCouncils(){const el=$('#cstrip');if(!el)return;const V=UI.V;if(!V||!G){el.innerHTML='';return}const me=vs();
+  const chip=(c)=>{const per={};for(const id of V.council[c]){const s=ownerOf(id);per[s]=(per[s]||0)+(cinfo(id).votes||0)}
+    const seats=Object.keys(per);return '<button class="cs-c" data-a="road4" data-c="'+c+'" aria-label="Council of '+SUIT_N[c]+'"><b>'+SUIT_N[c]+'</b><span>'+(seats.length?seats.map(s=>'<i style="--c:'+fcol(+s)+'">'+per[s]+'</i>').join(''):'<em>empty</em>')+'</span></button>'};
+  const fh=V.fav.h;const fav='<button class="cs-c cs-f" data-a="road4" aria-label="Kingdom\u2019s Favour"><b>\u2605 Favour</b><span>'+(fh>=0?'<i style="--c:'+fcol(fh)+'">'+V.fav.u+'</i>':'<em>Meadow</em>')+'</span></button>';
+  let tac='';if(me>=0){const P=V.pl[me];const left=P.tac.filter(t=>!t.ex&&!t.burn).length;tac='<button class="cs-c cs-t" data-a="rival" data-s="'+me+'" aria-label="Your Tactics"><b>Tactics</b><span><i style="--c:'+fcol(me)+'">'+left+'</i></span></button>'}
+  const h=DD.COUNCILS.map(chip).join('')+fav+tac;if(el._h!==h){el._h=h;el.innerHTML=h}}

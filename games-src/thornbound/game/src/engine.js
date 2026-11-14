@@ -11,7 +11,7 @@
 const TB=g.TB=g.TB||{};const D=TB.DATA;
 let G=null;
 const COUNCILS=D.COUNCILS,NLOC=6,NREG=3;
-const LEN={short:4,standard:5,extended:6,tutorial:1};   // 'tutorial' = one round, used only by the staged tutorial game
+const LEN={short:4,standard:5,extended:6,tutorial:2};   // 'tutorial' = two rounds (the staged tutorial ends after round 2's steal), used only by the staged tutorial game
 // ---------------------------------------------------------------- rng
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)|0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);const x=a[i];a[i]=a[j];a[j]=x}return a}
@@ -430,7 +430,7 @@ AG.locReward=d=>{const {seat,l}=d;stat('loc'+l);if(!d.noInf)gainInf(seat,D.LOCS[
   locText(seat,l)};
 function locText(seat,l){const P=G.pl[seat];
   if(l===0){const src=P.hand.concat(cardsOfSeatActive(seat)).filter(id=>votesOf(id)>=1);if(!src.length)return;const o=[];
-    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:'Govern '+cname(id)+', '+vtxt(votesOf(id))+', into the '+councilName(c)+'. Discard the rest.'});
+    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:cname(id)+' ('+vtxt(votesOf(id))+') \u2192 '+councilName(c).replace(/^Council of /,'')+' Council'});
     o.push({k:'skip',skip:1,label:'Skip the Spire Court'});askPick(seat,'castle','Spire Court: Govern with one Active or hand card?',o,'castle',{})}
   else if(l===1){const src=journeySources(seat,true);if(!src.length)return;
     askPick(seat,'wilderness','Thornwild: Journey with one Active or hand card?',src.map(id=>({k:'j'+id,id,label:'Journey with '+cname(id)+' (+'+eff(id).l+' Lore)'})).concat([{k:'skip',skip:1,label:'Skip Thornwild'}]),'wilderness',{})}
@@ -822,7 +822,7 @@ TB.invariants=function(Gx){const E=[];G=Gx;const np=Gx.np;
   if(Gx.fav.u<1||Gx.fav.u>3)E.push('favour uses');
   return E};
 // ---------------------------------------------------------------- UI helpers
-TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
+TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),cmp:JSON.parse(JSON.stringify(e.cm)),fx:[...e.fx],votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
 // what the Night step and the tally would give if nothing else happened (pure: works on a copy; a stripped view is enough because Clash cards are face up)
 TB.clashPreview=function(Gx){if(!Gx||!Gx.clash)return null;const keep=G;const S=clone(Gx);G=S;try{const c=S.clash;const all=[];for(const s of c.parts)for(const id of (c.cards[s]||[]))if(id>=0)all.push(id);
     const dead=[],saved=[];if(!c.skip){const E=nightMarks(all);for(const id of all){if(!E[id])continue;const W=elimWhy(id,E[id]);if(eff(id).tr.has('inv'))saved.push({id,t:W.t,by:W.by});else dead.push({id,t:W.t,why:W.why,by:W.by,res:eff(id).tr.has('res')})}}

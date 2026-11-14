@@ -103,3 +103,7 @@ html.tb-bk-choir .bidc.back[data-b=choir]{background:#120b0e url(media/back-moth
 /* chapter map: one message at a time (only the newest "Beat chapter N first." note shows) */
 .gxc .gxc-toast:not(:last-child){display:none}
 @media (min-width:900px){.rank.pic,.ovwhy{max-width:640px;margin-left:auto;margin-right:auto}.ovcard{max-width:960px;margin-left:auto;margin-right:auto}}
+body.tb-bubturn #tbturn{visibility:hidden}
+/* chapter map at phone width: the title takes its own row above Back / Tutorial / stars and wraps on spaces only; each Act band grows to fit its two lines instead of spilling */
+@media (max-width:520px){.gxc .gxc-head{flex-wrap:wrap;justify-content:space-between;row-gap:4px}.gxc .gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:normal;hyphens:none;font-size:20px}}
+.gxc .gxc-act{height:auto;min-height:38px;padding:3px 0;margin-top:0}

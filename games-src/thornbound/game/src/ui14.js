@@ -38,3 +38,19 @@ function renderMusic(){const b=$('#musbody');if(!b)return;const on=UI.music;let 
   const h='<div class="music"><div class="mtop"><button class="mchip'+(on?' on':'')+'" data-a="mmus">Music: '+(on?'on':'off')+'</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="'+vol+'" aria-label="Music volume"></label></div><div class="mtop"><button class="mchip'+(MLOOPS.every(k=>MS.pick[k]==='all')?' on':'')+'" data-a="mall">⇄ Shuffle all songs</button></div>'+rows+'</div>';
   if(b._h!==h){b._h=h;b.innerHTML=h}}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
+// ---- a tap on the tutorial's Next button is never dropped: the kit ignores taps in the first 600 ms of a new bubble (gesture tail); this keeps the
+// tap and presses Next as soon as the bubble can take it (within ~0.6 s), and the button shows it was pressed at once.
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('.gxt-next');if(!b||typeof GXT==='undefined'||!GXT.active())return;
+  const i0=GXT.index();b.classList.add('gxt-pressed');b.style.transform='scale(.94)';b.style.filter='brightness(1.25)';
+  const bub=b.closest('.gxt-bub');clearInterval(UI._nextQ);
+  setTimeout(()=>{if(!GXT.active()||GXT.index()!==i0||GXT.state().phase!=='show')return;   // the kit took the tap itself: nothing to keep
+    const t0=Date.now();clearInterval(UI._nextQ);UI._nextQ=setInterval(()=>{if(!GXT.active()||GXT.index()!==i0||!bub||!bub.isConnected||Date.now()-t0>900){clearInterval(UI._nextQ);return}try{GXT.next()}catch(x){}},110)},0)},true);
+document.addEventListener('pointerdown',e=>{if(UI._nextQ&&!(e.target&&e.target.closest&&e.target.closest('.gxt-next'))){clearInterval(UI._nextQ);UI._nextQ=0}},true);
+// ---- an info sheet never swallows a tap: a tap on its body (not on one of its buttons) closes it, so the board under it is back at once
+document.addEventListener('click',e=>{if(!UI.pop||!G||!UI.started)return;const t=e.target;if(!t||!t.closest||!t.closest('#ppop'))return;
+  if(t.closest('button,a,input,select,[data-a],[data-kc],.pp-scroll,[role=button]'))return;closePop();e.stopPropagation()},true);
+
+// A coach bubble sits over the seat chips on short phones: when its OK tap removes it on pointerup, the browser's click can land on the chip underneath (opening a rival sheet).
+// The first click after a press on a bubble is swallowed unless it is on the bubble itself. (Separate from the ui5 click-replay logic.)
+document.addEventListener('pointerdown',e=>{UI._bubT=(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))?Date.now()+700:0},true);
+document.addEventListener('click',e=>{const t=UI._bubT;if(!t)return;UI._bubT=0;if(Date.now()<t&&!(e.target&&e.target.closest&&e.target.closest('.gxh-bub'))){e.stopPropagation();e.preventDefault()}},true);

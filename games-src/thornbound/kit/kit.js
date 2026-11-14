@@ -438,7 +438,7 @@ function backPattern(f, P) {
   for (i = 0; i < 6; i++) for (j = 0; j < 8; j++) s += '<circle cx="' + (22 + i * 43.2) + '" cy="' + (22 + j * 47) + '" r="1.5" fill="' + P.accent + '" opacity=".28"/>';
   return s;
 }
-/* painted art (optional): TB.setArt({id: url}) for sp.img, TB.setBack(url) for the face-down back. Without them the procedural SVG art is used. */
+/* painted art (optional): TB.setArt({id: url}) for sp.img, */
 var IMG = {}, BACK = '';
 TB.setArt = function (m) { IMG = m || {}; TB.clearCache(); };
 TB.setBack = function (u) { if (u === BACK) return; BACK = u || ''; TB.clearCache(); };
@@ -468,7 +468,7 @@ function cardBackInner(f, lite) {
   return s;
 }
 function fitTitle(t, maxW, start, min) { var px = start; while (px > min && measure(t, 'bold ' + px + 'px ' + DISPLAY) > maxW) px -= .5; return px; }
-function cardFaceInner(sp, lite) {
+function cardFaceInner(sp, lite, noNum) {
   var f = FAC[sp.faction] ? sp.faction : 'neutral', P = FAC[f], s = '';
   var type = TYPES[sp.type] ? sp.type : 'unit', tl = sp.typeLabel || TYPES[type];
   s += '<g clip-path="url(#tb-clip-card)"><rect width="260" height="372" fill="url(#tb-f-' + f + ')"/>';
@@ -479,10 +479,10 @@ function cardFaceInner(sp, lite) {
   s += '<rect x="14" y="14" width="232" height="336" rx="5" fill="' + P.paper + '"/>' + (lite ? '' : '<rect x="15" y="15" width="230" height="334" rx="5" filter="url(#tb-stain)" opacity=".5"/>');
   if (lite) {
     /* compact layout for thumbnails: huge number, art, icon + cost */
-    s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + mix(P.main, '#1a0a0c', .55) + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
+    if (!noNum) s += '<text x="130" y="84" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="92" fill="' + mix(P.main, '#1a0a0c', .55) + '" stroke="' + P.dark + '" stroke-width="2.5" paint-order="stroke">' + (sp.value == null ? '' : esc(sp.value)) + '</text>';
     s += '<g transform="translate(20 96)"><rect x="-2" y="-2" width="224" height="156" rx="7" fill="url(#tb-gold)"/>' + (paintedArt(sp) || artSVG(sp.art, f, true)) + '</g>';
     s += '<rect x="20" y="258" width="220" height="90" rx="6" fill="' + P.dark + '"/><g transform="translate(70 303) scale(3.6)">' + typeIcon(type, '#f1e3c3') + '</g>';
-    if (sp.cost != null) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
+    if (sp.cost != null && !noNum) s += '<g transform="translate(190 303)"><circle r="31" fill="url(#tb-gold)" stroke="#4a3208" stroke-width="2"/><text y="14" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="40" fill="#2b1808">' + esc(sp.cost) + '</text></g>';
     return s;
   }
   /* title banner */
@@ -511,7 +511,7 @@ function cardFaceInner(sp, lite) {
   s += '</g>';
   /* footer */
   s += '<g transform="translate(130 362) scale(.4)" opacity=".95">' + emblem(f) + '</g>';
-  s += '<text x="20" y="364" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1.2" fill="' + P.glyph + '" opacity="1">' + esc(P.short.toUpperCase()) + '</text>';
+  s += '<text x="20" y="362" font-family="' + DISPLAY + '" font-weight="700" font-size="14" letter-spacing="1.2" fill="' + P.glyph + '" opacity="1">' + esc(P.short.toUpperCase()) + '</text>';
   if (sp.num != null) s += '<text x="240" y="364" text-anchor="end" font-family="' + DISPLAY + '" font-weight="700" font-size="10" letter-spacing="1" fill="' + P.glyph + '" opacity="1">' + esc(sp.num) + '</text>';
   return s;
 }
@@ -674,7 +674,7 @@ function mapDefs() {
     lg('tbm-ribbon', [[0, '#e8d9b0'], [1, '#c1ab78']], 0, 0, 0, 1) + lg('tbm-lane', [[0, '#120b07'], [1, '#2a1a10']], 0, 0, 0, 1);
 }
 
-/* painted map (optional): TB.setMapImg(url) puts a painting under the roads, locations and track; CSS html[data-mapimg] then lets it show through. */
+/* painted map (optional): TB.setMapImg(url) puts a painting */
 var MAPIMG = '';
 function mapImgEl(W, H) { return '<image class="tb-bg-img" href="' + MAPIMG + '" x="0" y="0" width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice"/>'; }
 TB.setMapImg = function (u) {
@@ -685,7 +685,7 @@ TB.setMapImg = function (u) {
     if (MAPIMG && v && vb) v.insertAdjacentHTML('afterend', mapImgEl(vb.width, vb.height));
   });
 };
-/* painted track lane (tile) and throne (transparent centrepiece): optional, applied to every mounted map and to maps built later */
+/* painted track lane (tile) and throne (transparent */
 var TRACKIMG = '', THRONEIMG = '';
 function surfApply(root) {
   Array.prototype.forEach.call((root || document).querySelectorAll('.tb-m-static'), function (g) {
@@ -827,9 +827,10 @@ TB.map = function (opts) {
     s += '<rect x="2" y="3" width="' + sw + '" height="' + sh + '" rx="5" fill="#000" opacity=".5"/>';
     s += '<g class="tb-slotcard">';
     if (st.faceDown !== false && !st.card && st.value == null) s += '<use href="#tb-back-' + f + '" width="' + sw + '" height="' + sh + '"/>';
-    else if (st.card) s += '<svg x="0" y="0" width="' + sw + '" height="' + sh + '" viewBox="0 0 260 372">' + cardFaceInner(st.card, true) + '</svg>';
+    else if (st.card) s += '<svg x="0" y="0" width="' + sw + '" height="' + sh + '" viewBox="0 0 260 372">' + cardFaceInner(st.card, true, true) + '</svg>';
     else s += '<rect width="' + sw + '" height="' + sh + '" rx="5" fill="' + P.paper + '" stroke="url(#tb-gold)" stroke-width="2.4"/><text x="' + sw / 2 + '" y="' + (sh / 2 + 11) + '" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="32" fill="' + P.main + '" stroke="' + P.dark + '" stroke-width="1" paint-order="stroke">' + esc(st.value) + '</text>';
     s += '</g>';
+    if (st.card && st.card.value != null) s += '<g class="tb-sbadge" transform="translate(10 11)"><circle r="10" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="1.8"/><text y="5.4" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="14" fill="#f6e6b4">' + st.card.value + '</text></g>';
     if (st.winner) s += '<rect x="-3" y="-3" width="' + (sw + 6) + '" height="' + (sh + 6) + '" rx="7" fill="none" stroke="#ffe9a0" stroke-width="3.4" class="tb-win"/>';
     if (st.count > 1) s += '<g transform="translate(' + (sw - 3) + ' 4)"><circle r="9.5" fill="#1b0b10" stroke="url(#tb-gold)" stroke-width="1.8"/><text y="5.4" text-anchor="middle" font-family="' + DISPLAY + '" font-weight="700" font-size="14" fill="#f6e6b4">' + st.count + '</text></g>';
     if (st.loser) s += '<rect width="' + sw + '" height="' + sh + '" rx="5" fill="#000" opacity=".5"/>';
@@ -906,14 +907,14 @@ TB.map = function (opts) {
       for (i = 0; i <= Math.min(steps, 60); i++) { var q = inflXY(seat, from + dir * i); fr.push({ transform: 'translate(' + q.x + 'px,' + q.y + 'px)' }); }
       var e = inflXY(seat, v); el.style.transform = 'translate(' + e.x + 'px,' + e.y + 'px)';
       if (fr.length < 2 || (o && o.immediate)) return Promise.resolve();
-      return anim(el, fr, Math.min(1600, 120 * steps + 250), 'linear');
+      return anim(el, fr, Math.min(600, 70 * steps + 250), 'linear');
     },
     influence: function (seat) { return S.infl[seat] || 0; },
     setRound: function (n, total) { S.round = { n: n, total: total || S.round.total }; buildRound(); return api; },
     highlight: function (ids) { S.hl = ids ? [].concat(ids) : []; applyHl(); return api; },
     select: function (id) { S.sel = id || null; applyHl(); return api; },
     pulse: function (id) { var g = locEls[id]; if (!g) return Promise.resolve(); var ring = g.querySelector('.tb-ring'); return anim(ring, [{ opacity: 0, transform: 'scale(.8)' }, { opacity: 1, transform: 'scale(1.15)' }, { opacity: 0, transform: 'scale(1.4)' }], 900, 'ease-out'); },
-    /* revealSlots(loc, [{seat, card:spec, value, winner}], {stagger}) -> Promise: flips the face-down slot cards one by one then marks the winner(s). */
+    /* revealSlots(loc, [{seat, card:spec, value, winner}], */
     revealSlots: function (loc, entries, o) {
       o = o || {}; var g = locEls[loc], p = S.pos[loc], p0 = Promise.resolve(), fx = g.querySelector('.tb-lfx');
       fx.innerHTML = '<g transform="translate(0 -4)" opacity="0">' + tokenInner('clash') + '</g>'; var mk = fx.firstChild;
@@ -951,10 +952,10 @@ CSS = '.tb-card{display:block;filter:drop-shadow(0 3px 5px rgba(0,0,0,.55));font
   '.tb-map{display:block;width:100%;height:auto;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}' +
   '.tb-map .tb-loc{cursor:pointer;outline:none}.tb-map .tb-ring{transform-box:fill-box;transform-origin:center}' +
   '.tb-map .tb-loc:hover .tb-ring,.tb-map .tb-loc:focus-visible .tb-ring{opacity:.85!important}' +
-  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 7s linear infinite,tb-breathe 1.6s ease-in-out infinite}' +
+  '.tb-map .tb-loc.tb-hl .tb-ring{opacity:1!important;animation:tb-dash 4s linear 1,tb-breathe 1.6s ease-in-out 3}' +
   '.tb-map .tb-loc.tb-sel .tb-ring{opacity:1!important;stroke:#fff;stroke-dasharray:none}' +
   '.tb-map.tb-compact .tb-name{display:none}.tb-map.tb-compact .tb-loc.tb-sel .tb-name,.tb-map.tb-compact .tb-loc.tb-hl .tb-name{display:inline}.tb-map .tb-herald,.tb-map .tb-infl{pointer-events:none}.tb-map .tb-herald,.tb-map .tb-infl{will-change:transform}' +
-  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}' +
+  '.tb-map .tb-win{animation:tb-breathe 1.2s ease-in-out 3;transform-box:fill-box;transform-origin:center}' +
   '@keyframes tb-dash{to{stroke-dashoffset:-160}}@keyframes tb-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}' +
   '.tb-flipcard{position:relative;display:inline-block;perspective:900px;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s,opacity .5s}' +
   '.tb-flip-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.3,.7,.2,1)}' +
@@ -987,8 +988,7 @@ TB.flipCard = function (spec, size) {
   d.setResult = function (r) { d.classList.remove('tb-winner', 'tb-loser', 'tb-tied'); if (r) d.classList.add('tb-' + r); };
   return d;
 };
-/* clash(entries,{stagger,sparkParent,tie}) entries: [{el: flipCard element, winner:bool, col?: wrapper to mark}] -> Promise.
-   Flips every card in turn, plays a spark, then lifts + glows the winner(s) and dims the rest. */
+/* clash(entries,{stagger,sparkParent,tie}) entries: [{el: */
 TB.clash = function (entries, o) {
   o = o || {}; var st = o.stagger != null ? o.stagger : 420, p = Promise.resolve(), parent = o.sparkParent;
   entries.forEach(function (en) { p = p.then(function () { return en.el.flip(); }).then(function () { if (en.col) en.col.classList.add('tb-shown'); return sleep(st); }); });
