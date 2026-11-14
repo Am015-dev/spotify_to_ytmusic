@@ -214,7 +214,7 @@ function helpInit() {
 }
 /* F11 (R63 L2): the help bubble never covers a glowing piece, the market or the research track; if the kit's spot does, it goes slim to the top bar */
 function bubClear() {
-  try { const b = document.querySelector('.gxh-bub.on'); if (!b) return;
+  try { const b = document.querySelector('.gxh-bub.on:not(.gxt-bub)'); if (!b || UI.mode === 'tutorial') return;   /* the guided tutor places its own bubble */
     const ov = r => [...document.querySelectorAll('#map .site.glow,#row,#track,#extra .tag.glow,#hand .cd.glow,#pacts .btn')].some(e => { const q = e.getBoundingClientRect(); return q.width && !(q.right <= r.left || q.left >= r.right || q.bottom <= r.top || q.top >= r.bottom); });
     if (!ov(b.getBoundingClientRect())) return;
     b.classList.add('vg-bubtop', 'gxh-compact'); b.style.maxWidth = 'min(350px,calc(100vw - 12px))';
