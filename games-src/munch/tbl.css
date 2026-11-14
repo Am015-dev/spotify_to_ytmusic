@@ -461,3 +461,5 @@ html.ph #prompt.bfq{gap:4px!important;row-gap:4px!important}
 html.ph #prompt.bfq>p.say{margin:2px 0 2px!important}
 html.ph #prompt.bfq .acts.main .btn.pickchip{white-space:normal;line-height:1.1;min-height:44px;max-height:48px;padding:2px 6px;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center}
 html.ph #prompt.bfq>.acts.main{bottom:auto!important;top:auto!important}   /* the old sticky bottom:-12px pushed the relative buttons 12 px out of the dock */
+/* F16: the fight buttons span the whole table now: keep the pulsing Fight! (it scales up) inside the table edge */
+html.ph .arena:has(>.vs)>.fbtns{padding-left:7px!important;padding-right:7px!important;box-sizing:border-box}
