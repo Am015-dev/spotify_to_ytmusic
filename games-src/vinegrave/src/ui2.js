@@ -186,11 +186,11 @@ function moveEl(m, s) {
 function moveCaption(m, s) {
   const n = short(s), you = n === 'You', v = (a, b) => you ? a : b, p = s >= 0 ? G.p[s] : null;
   switch (m.t) {
-    case 'play': { const c = p && V.CARDS[p.hand[m.i]]; return c ? `${n} ${v('play', 'plays')} ${c.name}.` : `${n} ${v('play', 'plays')} a card.`; }
+    case 'play': { const c = p && V.CARDS[p.hand[m.i]]; return c ? `${n} ${v('play', 'plays')} ${c.name} (${effShort(c)}).` : `${n} ${v('play', 'plays')} a card.`; }
     case 'dig': return `${n} ${v('send', 'sends')} an explorer to ${siteName(G.sites[m.s])}.`;
     case 'disc': return `${n} ${v('explore', 'explores')} a hidden ruin!`;
     case 'beat': return `${n} ${v('fight', 'fights')} the guardian!`;
-    case 'buy': return `${n} ${v('buy', 'buys')} ${V.CARDS[G.row[m.r]].name}.`;
+    case 'buy': { const c = V.CARDS[G.row[m.r]]; return `${n} ${v('buy', 'buys')} ${c.name} (${effShort(c)}).`; }   /* F11: the market shows no names, so the effect says which card */
     case 'res': return `${n} ${v('climb', 'climbs')} the research track.`;
     case 'temple': return `${n} ${v('buy', 'buys')} a temple tile.`;
     case 'pass': return `${n} ${v('pass', 'passes')} for this round.`;

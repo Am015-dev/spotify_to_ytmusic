@@ -122,7 +122,8 @@ function scoresEl() {
   if (G.rival) t += `<p>${esc(G.rival.name)}: <b>${VG.rivalScore(G)}</b> points (research row ${G.rival.rows}). It plays one card after each of your actions.</p>`;
   d.innerHTML = t; return d;
 }
-function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}</div>`).join('') : ''; return d; }
+function logEf(t) { if (!/ (buys|takes|plays) /.test(t || '')) return ''; const c = Object.values(V.CARDS).find(c => c.name && t.indexOf(' ' + c.name) >= 0); return c ? ` <small class="lgef">(${esc(effShort(c))})</small>` : ''; }   /* F11: a card named in the log says what it does */
+function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}${logEf(l.t)}</div>`).join('') : ''; return d; }
 const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
@@ -208,7 +209,16 @@ function helpInit() {
       { phase: 'guard', title: 'Overcome', text: 'Pay its cost while you are there: 5 points and a boon.', pic: P('guard') },
       { phase: 'idol', title: 'Shrines', text: 'Set idols in shrines for a free boon. Each slot once.', pic: P('idol') }],
     avoid: '.glow,#pacts .btn,#qbox .btn,#insp' });
+  try { new MutationObserver(() => requestAnimationFrame(bubClear)).observe(document.body, { childList: true }); addEventListener('resize', () => setTimeout(bubClear, 60)); } catch (e) { }
   if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
+}
+/* F11 (R63 L2): the help bubble never covers a glowing piece, the market or the research track; if the kit's spot does, it goes slim to the top bar */
+function bubClear() {
+  try { const b = document.querySelector('.gxh-bub.on'); if (!b) return;
+    const ov = r => [...document.querySelectorAll('#map .site.glow,#row,#track,#extra .tag.glow,#hand .cd.glow,#pacts .btn')].some(e => { const q = e.getBoundingClientRect(); return q.width && !(q.right <= r.left || q.left >= r.right || q.bottom <= r.top || q.top >= r.bottom); });
+    if (!ov(b.getBoundingClientRect())) return;
+    b.classList.add('vg-bubtop', 'gxh-compact'); b.style.maxWidth = 'min(350px,calc(100vw - 12px))';
+    const r = b.getBoundingClientRect(); b.style.left = Math.round(Math.max(6, (innerWidth - r.width) / 2)) + 'px'; b.style.top = '4px'; } catch (e) { }
 }
 // ---------------------------------------------------------------- music (silent until files exist in media/music)
 function musicSlot() { if (!G || !$('#start').hidden) return ['tavern', 0]; if (G.phase === 'over') return [G.winner === UI.humans[0] ? 'victory' : 'defeat', 1]; if (UI.camp && UI.camp.boss) return ['fight', 0]; return ['main', 0]; }

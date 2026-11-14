@@ -97,7 +97,8 @@ function coachEvent(e, s) {   /* events: guardian wakes, round end, fleeing, the
 }
 function coachRival(m) {   /* a short lesson on every rival move */
   if (!coachOn() || !m || !G || G.phase !== 'play') return; coachSay('rival'); if (m.t === 'pass') { coachSay('pass'); return; }
-  const L = { dig: 'Tamsin dug a camp. It is closed to you this round.', disc: 'Tamsin explored a ruin. She gets an idol, and a guardian wakes.',
+  const x = m.t === 'dig' && G.sites[m.s], full = x && !(x.cap > 1 && x.occ2 === -1);   /* F11 (R63 R-1): a camp keeps a second space, open to anyone at double travel */
+  const L = { dig: x && x.lvl === 0 && !full ? 'Tamsin dug a camp. Its second space costs double travel.' : 'Tamsin dug a site. It is full until the round ends.', disc: 'Tamsin explored a ruin. She gets an idol, and a guardian wakes.',
     beat: 'Tamsin overcame a guardian: 5 points and a boon.', buy: 'Tamsin bought a card. A new one slides in.', play: 'Tamsin played a card.',
     res: 'Tamsin climbed the research track. Those rows score at the end.', temple: 'Tamsin bought a temple tile for big points.', boon: 'Tamsin used a guardian boon.', idol: 'Tamsin set an idol in a shrine for a boon.' };
   if (L[m.t]) coachSay(null, L[m.t]);
