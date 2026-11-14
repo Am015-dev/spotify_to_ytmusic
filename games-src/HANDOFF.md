@@ -268,3 +268,9 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Open: R45 thornbound session_01RR7mnbDn4tA4SvpCj1ihvr, R46 shipwreck session_01RR7mnZbLYUHMYur6TYNoQu, F11-doorkick session_01RR7mnYWzaLq4i4fHCHkH2p, F8-vinegrave blocked.
 - 14 Nov 15:05. NEW REVIEW BAR (after owner bug reports on twin-thrones and hollowbough): reviewers check rules vs the ORIGINAL game (not just our notes) and clutter (max 1 helper on screen, no infinite animations). Most live games probably fail the clutter check -> after hollowbough proves a calm pattern and the owner agrees, roll out a shelf-wide calm pass.
 - Not live / in work (prefix session_01RR7mn): F1-twin-thrones XqpNwCd7hrdtXH7DE (shelf/W520-twin-thrones-rules), R52 hollowbough YcC7czEgZR4ksasTV (shelf/W521-hollowbough-rules 06901ebc), F14-doorkick XX6k587WSBg7CnmDd, F11-shipwreck Y3VbyzkcKeiyc9nLn (beast vs palisade rule), F11-thornbound bgj44sbfMxDTNyMy2 (CMD_L hint text). F8-vinegrave bR1jxcLTeRJtguPvS blocked since 12 Nov 20:06.
+
+## 14 Nov 21:45 UTC: Hollowbough live (owner yes)
+- R62 PASS 7.1 (strict bar). Deployed 7fd69fc4 + a 1-line fix (start title plate box-sizing, look-check panels|div#start). Live check clean (only the site-root favicon 404).
+- In review: R68 twin-thrones (d60ea103), R69 vinegrave (7f6ced76). Fixing: F16 doorkick, F14 shipwreck, F13 thornbound.
+- Hollowbough small follow-ups (not blocking): answer hand taps on rival turn, stop result-screen tree sway, 553 city choice under tray, glow fewer in normal games.
+- Proposal pending owner yes: shelf-wide calm pass (shell gxh-pulse finite), one build-all.
