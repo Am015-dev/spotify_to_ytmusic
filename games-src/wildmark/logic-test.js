@@ -380,11 +380,22 @@ R('Elk C: any connected group of elk scores by size 2, 4, 7, 10, 14, 18, 23, 28 
 R('Elk D: elk around one space score by number around it: 2, 5, 8, 12, 16, 21 (1..6).', () => eq([2, 5, 8, 12, 16, 21], [1, 2, 3, 4, 5, 6].map(n => B(D6.slice(0, n).map(d => [d[0], d[1], 'elk']), 'elk', 'd'))), 'table recalled');
 R('Salmon B: runs of 1..5+ score 2, 4, 9, 11, 17.', () => eq([2, 4, 9, 11, 17, 17], [1, 2, 3, 4, 5, 6].map(n => B(Array.from({ length: n }, (_, i) => [i, 0, 'salmon']), 'salmon', 'b'))), 'table recalled');
 R('Salmon C: only runs of 3, 4, 5+ score: 10, 12, 15; runs of 1 or 2 score 0.', () => eq([0, 0, 10, 12, 15, 15], [1, 2, 3, 4, 5, 6].map(n => B(Array.from({ length: n }, (_, i) => [i, 0, 'salmon']), 'salmon', 'c'))), 'table recalled');
-R('Salmon D: each run scores 1 per salmon plus 1 per adjacent other-animal token (run of 2 touching a bear and an elk = 4).', () => eq(4, B([[0, 0, 'salmon'], [1, 0, 'salmon'], [0, 1, 'bear'], [1, -1, 'elk']], 'salmon', 'd')));
+R('Salmon D: each run of 3+ salmon scores 1 per salmon plus 1 per adjacent other-animal token (run of 3 touching a bear and an elk = 5); a run of 2 scores 0.', () => { eq(5, B([[0, 0, 'salmon'], [1, 0, 'salmon'], [2, 0, 'salmon'], [0, 1, 'bear'], [1, -1, 'elk']], 'salmon', 'd')); eq(0, B([[0, 0, 'salmon'], [1, 0, 'salmon'], [0, 1, 'bear'], [1, -1, 'elk']], 'salmon', 'd')); });
 R('Hawks C: 3 points per straight line of sight between two hawks (counted once per pair).', () => eq(3, B([[0, 0, 'hawk'], [1, 0], [2, 0, 'hawk']], 'hawk', 'c')));
-R('Hawks D: a pair of hawks in sight scores by the number of different animals between them: 4, 7, 9, 11; each hawk is in one pair.', () => { eq(4, B([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'hawk']], 'hawk', 'd')); eq(7, B([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'elk'], [3, 0, 'hawk']], 'hawk', 'd')); }, 'table recalled');
+R('Hawks D: a pair of hawks in sight scores by the number of different animals between them: 4, 7, 9 for 1, 2, 3+ kinds (4 kinds still 9); each hawk is in one pair.', () => { eq(4, B([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'hawk']], 'hawk', 'd')); eq(7, B([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'elk'], [3, 0, 'hawk']], 'hawk', 'd')); eq(9, B([[0, 0, 'hawk'], [1, 0, 'bear'], [2, 0, 'elk'], [3, 0, 'fox'], [4, 0, 'salmon'], [5, 0, 'hawk']], 'hawk', 'd')); });
 R('Fox C: each fox scores the number of the most common neighbouring animal (foxes excluded).', () => eq(2, B([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear'], [0, 1, 'elk']], 'fox', 'c')));
 R('Fox B: each fox scores 3 / 5 / 7 for 1 / 2 / 3 different PAIRS of the same animal around it (foxes excluded).', () => { eq(3, B([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear']], 'fox', 'b')); eq(5, B([[0, 0, 'fox'], [1, 0, 'bear'], [-1, 0, 'bear'], [0, 1, 'elk'], [0, -1, 'elk']], 'fox', 'b')); }, 'table recalled');
+
+// ======================================================================= W507: rulebook re-read (nature tokens unlimited, sweep chains)
+S('Rulebook re-read (W507)');
+R('No limit on acorns per turn: two replaces in one turn are both allowed, each costs its own acorn.', () => {
+  const G = game(2, 3, { acorns: [2, 0] }); setMarket(G, fourT(), ['bear', 'elk', 'salmon', 'hawk']); G.bag = bagOf({ fox: 2, elk: 40 }); G.acornPool = 23;
+  W.apply(G, { t: 'wipe', idx: [0] }); W.apply(G, { t: 'wipe', idx: [2] }); eq([0, 25, 'pick'], [G.seats[0].acorns, G.acornPool, G.stage]);
+});
+R('A three-token sweep that leaves four alike is wiped again automatically.', () => {
+  const G = game(2, 3); setMarket(G, fourT(), ['elk', 'elk', 'elk', 'fox']); G.bag = bagOf({ fox: 3 });
+  W.apply(G, { t: 'wipe3' }); const t = G.market.toks.filter(Boolean); eq(false, t.length === 4 && t.every(x => x === t[0]), 'four alike left after the sweep'); eq(1, G.wiped4 || 0);
+});
 
 // ======================================================================= run
 if (process.argv.includes('--list')) {

@@ -423,7 +423,7 @@ function H(G, p, m) {
       break;
     }
     case 'y1': {
-      if (m.yes === true) { const w = p.pot[d.idx]; if (!w || w.c !== 'W') return 'no white chip there'; p.pot.splice(d.idx, 1); bagInsert(p, w); ev(G, { t: 'flask', seat: p.seat, chip: { i: w.i, c: w.c, v: w.v }, free: true }); lg(G, nm(G, p) + ' puts the white chip back (Kind cut).'); use(G, 'y1'); }
+      if (m.yes === true) { const w = p.pot[d.idx]; if (!w || w.c !== 'W') return 'no white chip there'; p.pot.splice(d.idx, 1); bagInsert(p, w); ev(G, { t: 'flask', seat: p.seat, chip: { i: w.i, c: w.c, v: w.v }, free: true }); lg(G, nm(G, p) + ' puts the white chip back (Send a white back).'); use(G, 'y1'); }
       else if (m.yes !== false) return 'bad choice';
       p.q = null; break;
     }

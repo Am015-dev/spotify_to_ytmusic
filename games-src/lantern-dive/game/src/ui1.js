@@ -99,13 +99,13 @@ const wait = ms => ANIM ? new Promise(r => setTimeout(r, UI.fastT ? 60 : ms * (A
 function cap(t, kind, sub) {
   const el = document.getElementById('cap'); if (!el) return;
   if (!t) return;                                          // a caption is removed only by its own timer or a tap
-  if (!msgOK()) return; const now = Date.now(); if (cap.until > now) return;   // one at a time, never replaced early
+  if (!msgOK()) return; const now = Date.now(); if (cap.until > now && kind !== 'good' && kind !== 'bad') return;   // one at a time; only a trick or job outcome replaces a play line
   const ms = readMs(t + ' ' + (sub || '')); cap.until = now + ms;
   el.className = 'on tap' + (kind ? ' ' + kind : ''); el.textContent = t; if (sub) { const s = document.createElement('small'); s.textContent = sub; el.appendChild(s); }
   clearTimeout(cap.t); cap.t = setTimeout(() => { cap.until = 0; el.classList.remove('on', 'tap'); }, ms);
 }
 document.addEventListener('click', e => { const c = e.target && e.target.closest && e.target.closest('#cap.on'); if (c) { clearTimeout(cap.t); cap.until = 0; c.classList.remove('on', 'tap'); } }, true);
-document.addEventListener('pointerdown', e => { if (UI.busy && e.target && e.target.closest && e.target.closest('#cap,#felt')) UI.fastT = true; }, true);
+document.addEventListener('pointerdown', e => { if (UI.busy && e.target && e.target.closest && e.target.closest('#cap,#felt,#table,#slots,#hand,#mine,.seat')) UI.fastT = true; }, true);
 // ---- the logbook: progress saved on this device ----
 const Prog = {
   d: null,

@@ -169,3 +169,102 @@ shots per game before anything goes live. No 20-min sweep loop.
 - W482 hollowbough, W483 twin, W484 stitchwise (new, session_01RR7mnaHNL8z2uvUgNj528c), W468 shipwreck all briefed 10:40.
 - 10:50 OWNER: emberclimb "extremely simplistic, doubt it is like the original". Benchmark = official phone app of the roguelike deckbuilder it adapts (map with branching paths, enemy intents, card fan, relic bar, card art). Next in queue when a worker slot frees.
 - 10:55 OWNER: vinegrave art "horrible/ugly", game "spreadsheet". Benchmark = official digital app of the 1920s jungle expedition deckbuilder + worker placement it adapts. No owner art in assets-inbox/vinegrave, so reuse owner art from other games (sands-of-qamar, rampart-and-vine, thornbound...) for sites, cards, board. Queue after emberclimb.
+- 11:08 W485 emberclimb (session_01RR7mnZKx5sGFdfSb3CppFW) and W486 nebula aces (session_01RR7mnXVRJ3nmHLZfKQcn2X: bugs + reverse arrows wrong + table feel) started. Offline + Install app buttons on shelf live 11:05. TT + Shipwreck shots sent to owner, waiting yes. Stitchwise W484 fixing -157 pts + time track.
+- 11:26 OWNER queue: rampart W487 (session_01RR7mnZN5pevMTvqAe1jUwv, sloppy dialogs/board, unused art), short-fuse W488 Sonnet (session_01RR7mnY6USFebc5jKeRBc9e, bomb+fuse bar sprites), thornbound W489 (session_01RR7mnXBVXyZZeELVdD2XnN, wrong gameplay + tutorial). 30 idle sessions archived 11:10. Archive each worker when its game is done.
+
+## 12:00 OWNER RULE: "for all games focus on gameplay"
+Gameplay gate (every game, before any looks work counts): read the real rules + a playthrough (web; local notes only, never name it); play a full game by touch as a new player; list every rule/turn-flow difference; fix each with a logic-test case; tutorial = guided first game teaching EVERY core rule in order (one sentence <=12 words + one highlighted tap per step), plus a test that walks it and checks each rule step. No game is "ready" without this.
+- In progress with gameplay gate: hollowbough W482, nebula W486, rampart W487, thornbound W489, vinegrave W490, stitchwise W491 (stitchwise W484 first-turn version live 11:58).
+- Queue for gameplay gate, waves of ~4 as workers free: twin-thrones, shipwreck-isle, emberclimb, short-fuse (these 4 had only looks/benchmark rounds), then redline-rally, sands-of-qamar, tidewake, kaiten-kitchen, crown-city-smash, sunglaze, doorkick-dungeon, cauldron-fair, lantern-dive, vale-of-banners, final-approach, wildmark, perch-and-plume.
+- 13:37 Gameplay wave 2 started: redline W496 (session_01RR7mnZcmsJ1AziSmytZLss), sands W497 (session_01RR7mnbfxvE3DYS9T9GDU7X), tidewake W498 (session_01RR7mnZFiLzPyAcPzorCAtf), kaiten W499 (session_01RR7mnaCmmgYB2W2rGw1wjt). Passed gameplay gate, waiting owner yes: stitchwise PR262, thornbound PR261, rampart PR263, vinegrave PR264, twin-thrones PR255, emberclimb PR258 (polish). Still running: hollowbough W482, nebula W486, shipwreck W493, short-fuse W495. Wave 3 next: crown-city-smash, sunglaze, doorkick-dungeon, cauldron-fair, lantern-dive, vale, final-approach, wildmark, perch.
+- 13:39 OWNER "use multiple workers": wave 3 started all at once: crown W500 (..aJSLMnN8WBDwXhAWZ), sunglaze W501 (..Z6uXDX6RatbMpESrk), doorkick W502 (..b17ZdbgJaeRq2RK84), cauldron W503 (..aL16EzmoUS75sired), lantern W504 (..bF5Sz88zQkVmDD1AH), vale W505 (..Xu46gXqfD3HYComUX), final-approach W506 (..YcEqT6NGeAgEFLaeW), wildmark W507 (..aQQ1mfzjWYcsu5gMx), perch W508 (..bbz3PjX6MELouaqi2). Session prefix session_01RR7mn. Every live/new game now has a gameplay worker or has passed.
+
+## 15:47 GAMEPLAY GATE STATUS (owner must say yes before any deploy)
+Passed, waiting owner yes (branch/PR): stitchwise W491 PR262, thornbound W489 PR261, rampart W487 PR263, vinegrave W490 PR264, twin-thrones shelf/W483-twin PR255, nebula W486 PR260, emberclimb shelf/W485 PR258, kaiten W499 PR268, sunglaze W501 PR270, perch W508 PR271, sands W497 PR267, lantern W504 PR266, redline W496 PR265, wildmark W507 PR273, final-approach W506 PR269, shipwreck shelf/W468-shipwreck-lean PR256, cauldron W503 PR274, short-fuse shelf/W488 PR259, crown W500 PR272, tidewake W498 PR276, vale W505 PR277, doorkick W502 PR275.
+Running: hollowbough W509 (session_01RR7mnaDzgd2f6tQ2xrJQ97) on shelf/W482-hollowbough PR254 (old W482 sat waiting for "go" 12:03-15:32; never let workers ask).
+Shared shell fix committed (tutor dots under Skip): ships with the next build of each game; deploy all approved games in ONE build-all call.
+Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
+- 18:10 OWNER "run strict reviewers on gameplay and score them": 8 Opus reviewers G1-G8 (review/G<n>-gameplay, rubric games-src/reviews/GAMEPLAY-RUBRIC.md), 23 games. Sessions: G1 ..XKkNsmqtMGRReDni1, G2 ..Ysx9Tw5deqp7qSojW, G3 ..ZmgedzzG91eed3N7N, G4 ..bm4kTbhEYwiQpXzaT, G5 ..Z6d9Pp8CXwGzrvk1u, G6 ..ZXYLxq5J7mweiNUXg, G7 ..YsFyM6u5HYDCGgj8r, G8 ..YqFBKektxQacoKyHn (prefix session_01RR7mn). Compile a score table for the owner; FAILs go back to a fixer worker.
+
+## 19:20 UTC update
+- G4: perch 4.0 (stopper), sands 6.5, lantern 7.0, all FAIL. Fixers: F-perch session_01RR7mnYuasbfM6BQnvnc28o, F-sands session_01RR7mnYd3DLgPyALbQAynK8, F-lantern session_01RR7mnYW9jTP3TVUbFP2gwm.
+- Fixed and archived: stitchwise, vale, short-fuse. R1 re-review (those 3): session_01RR7mnXrTLHozUcvFKKnXVN, branch review/R1-gameplay.
+- Round 2 sent: tidewake (hand at 375, replay speed, Rogue Wave/Deck Cannon), wildmark (salmon D rules case).
+- Next: batch fixed games 3 per fresh re-reviewer (R2, R3...), same rubric; only PASS games go to the owner.
+
+## 20:01 UTC update
+- R1: stitchwise 6.9, vale 4.0 (stopper at 375), short-fuse 7.3, all FAIL. F2 fixers: stitchwise session_01RR7mnXfX1dLT1mFJrehys9, vale session_01RR7mnYVzoTezWpE54DwGdF, short-fuse session_01RR7mnZqEiW4qnZ2dCBkBid.
+- R3: cauldron 7.1, shipwreck 6.4, redline 6.3, all FAIL. F2 fixers: cauldron session_01RR7mnXk95RsBJXHDfeF1wD, shipwreck session_01RR7mnYhLw1DfnEfpNZSgcU, redline session_01RR7mnXSsW29UsNgB7a7CMV.
+- Lesson: fixers' sim/bot claims (taps, win rates) were wrong twice; demand touch-measured numbers.
+- Running reviewers: R2 (vinegrave, thornbound, wildmark) session_01RR7mnYeN67c3gxAPrhaNx1; R4 (hollowbough, rampart, final-approach) session_01RR7mnXTEKxqpPJVQtBoHJc; R5 (tidewake, sands, lantern) session_01RR7mnaA15Nj5vtwBiWPHpw.
+- Waiting for a reviewer: sunglaze. First-round fixers still running: crown, kaiten, twin, nebula, perch; r2: doorkick, emberclimb.
+- 20:04: perch fixed (stopper gone), waits with sunglaze for a reviewer. NOTE: shelf/W508-perch-gameplay merge commit 9d8868f0 has the container default author; when integrating perch, squash it (never force-push).
+
+## 20:41 UTC update
+- R2: vinegrave 5.6, thornbound 4.0 (stopper, dead taps). F2: thornbound session_01RR7mnaCnm2BxASv5LYf5bp, vinegrave session_01RR7mnaK3J3MR4wBDnaNAX7. R2 still scoring wildmark (session_01RR7mnYeN67c3gxAPrhaNx1).
+- R4: hollowbough 6.5, rampart 6.9, final-approach 4.0. F2: hollowbough session_01RR7mnZtXQUadm8SabpwQCd, rampart session_01RR7mnborBQnkrcUNcWGJiw; final-approach fixed (brake frozen at 2nd engine die, rule quoted) -> R6.
+- R5: tidewake 7.0, sands 6.5, lantern 6.9. F2: tidewake session_01RR7mnYyABfvTarj4FQBF8T, sands session_01RR7mnY6FJi6HojBs7QXSWp, lantern session_01RR7mnZmYxdcCW9TuxCFZW5.
+- R6 (sunglaze, perch, final-approach) session_01RR7mnY9XjyFfPRsVjbpyUq. R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW.
+- Other fixers: F2 cauldron/shipwreck/redline (redline on r2), F2 vale, F2 short-fuse, doorkick r2, kaiten, twin, nebula.
+- No game has passed a re-review yet (12 re-reviewed).
+
+## 21:23 UTC update
+- PASS: sunglaze 7.9 (R6). Awaiting owner yes before deploy.
+- R6: perch 6.5 -> F2 done (waiting reviewer); final-approach 4.0 (tutorial stuck at 27/27) -> F3 session_01RR7mnYdcSckU54JmryfewK.
+- R2 wildmark 7.1 -> F2 session_01RR7mnbdQ8QMtWED5pJRDCw.
+- R8: short-fuse 7.4, cauldron 7.4, shipwreck 6.5. F3: short-fuse session_01RR7mnXWDfUEtVvAkFm1qGq, cauldron session_01RR7mnZPWu53Cxvm34NEWui, shipwreck session_01RR7mnYtTuPeGioq6qaXqFT.
+- Running reviewers: R7 (stitchwise, crown, emberclimb) session_01RR7mnXtR9eqWMsfjpryuzW; R9 (doorkick, rampart, redline) session_01RR7mnYXu9gtAcDbJHWwJ2c; R10 (sands, vale, hollowbough) session_01RR7mnZjsGBCGZ8NtDWxAHq.
+- Fixers: F2 thornbound, F2 tidewake (r2: board size check), F2 lantern (r2 feel), F2 vinegrave (r2 assistants), kaiten, twin, nebula (first round, no report yet).
+- Waiting reviewer: perch.
+- Shared shell note: gx-tutor.js ignores taps for 600 ms after a bubble shows (deliberate debounce); consider 350 ms later.
+
+## 12 Nov 11:08 UTC
+- Weekly usage limit stopped every worker on 8 Nov 21:30; resumed today.
+- LIVE: sunglaze (deployed c48746443, 0 errors).
+- R7: stitchwise 7.0, crown 7.1, emberclimb 5.9. R9: rampart 7.3, redline 4.0 (rules stopper: discard/boost). R10: sands 6.6, hollowbough 7.0. R13: lantern 7.0, twin 7.0. Doorkick/vale/perch with R12 session_01RR7mnXeaxYbsvBMtyF1mRQ.
+- New fixers: F3-lantern session_01RR7mnZm6BLWzdPPXCs7ciW, F2-twin session_01RR7mna6NYWCERVdnXkZpi6, F3-stitchwise session_01RR7mnXi6YCTvaHmW1BQhu6, F2-crown session_01RR7mnZYF1KYv2BXV1e8yKS, F4-emberclimb session_01RR7mnZXpxHZ77HDqa9B4C4, F3-rampart session_01RR7mna9d1mUKys5mHLej2a, F3-redline session_01RR7mnas1tsFM9BAczLp4S1, F3-sands session_01RR7mnakUzknpQBowTqVJ96, F3-hollowbough session_01RR7mnZtC4qZFDbCGFrwqof.
+- Resumed (same sessions as before): final-approach, wildmark, thornbound, tidewake, vinegrave, short-fuse, cauldron, shipwreck, kaiten, nebula.
+
+## 12 Nov 12:41 UTC
+- PASSED, awaiting owner yes to deploy together (one build-all incl. shell W520): kaiten (7.8 R16), lantern-dive (7.3 R15), twin-thrones (7.3 R15), final-approach (7.4 R14). Shell branch shelf/W520-gxhelp-dismiss: gx-help dismiss fix done; gx-tutor 600 ms tap window fix in progress (session_01RR7mnZ8HreGzy7h4s7dayF).
+- In review: R18 (stitchwise, rampart, short-fuse) session_01RR7mnXZy9BuvyExJMFUv26; R19 (crown, perch, redline) session_01RR7mnbqNxdwSJoAJhNoj3B.
+- Waiting reviewer: sands.
+- Fixers: F3-tidewake session_01RR7mnXaVtQJrdGbtT2CG6y, F3-wildmark session_01RR7mnYN4JWm3R6Ded6nQQi, F2-nebula session_01RR7mna67RYshWobDKgkqJH, F5-emberclimb session_01RR7mna6z1fTf8TdAeg4cZb, F2-thornbound (r2) session_01RR7mnaCnm2BxASv5LYf5bp, F3-vale session_01RR7mnYrLuSvGhXPMHAAmCN, F3-doorkick session_01RR7mnXTZB4sSGrcGn3U3JK, F3-shipwreck session_01RR7mnYtTuPeGioq6qaXqFT, F4-hollowbough session_01RR7mnadGQyRLaPCaCsreMS, F4-cauldron session_01RR7mnaB1bwawUj6ecrwvhX, F3-vinegrave session_01RR7mnbv9SQMjnjZQ5Zytx3.
+- 13:33 UTC deployed 16 games with shell tap fixes (gx-help/gx-tutor), live and 0 errors: kaiten + rampart (strict-review builds), sunglaze, and rebuilds of cauldron, crown(old src), doorkick, emberclimb, nebula, redline, shipwreck, short-fuse, thornbound, tidewake, vale, wildmark, vinegrave. Gate FAIL, not deployed: final-approach, lantern-dive, stitchwise, twin-thrones (G1 fixer session_01RR7mnbAxQ1Z5GKMpfg1iKb, branch shelf/G1-gate-fixes), hollowbough, sands (in review), perch (in fixer).
+- R19: crown 7.5 PASS (waiting owner yes, branch shelf/W500-crown-gameplay), perch 6.9 + redline 6.8 FAIL -> fixers perch session_01RR7mnbPC7NHERF2hyBrThx, redline session_01RR7mnYdYUkhpkMF9JzGBnQ.
+- Reviewers: R20 (sands, tidewake, vinegrave) session_01RR7mnbJ1ZSBS4WuSNY3Vx7; R21 (vale, emberclimb, hollowbough) session_01RR7mnb7WnD66CoRoJmh2dq; R22 (cauldron, short-fuse, nebula) session_01RR7mnbAuS3mmdrmbhwSwSD.
+- Fixers: F4-doorkick session_01RR7mnYTxWrFaXNeEGMqj6X, F3-wildmark session_01RR7mnYN4JWm3R6Ded6nQQi, F3-shipwreck session_01RR7mnYtTuPeGioq6qaXqFT, F2-thornbound session_01RR7mnaCnm2BxASv5LYf5bp.
+- 14:13 deployed final-approach, lantern-dive, stitchwise, twin-thrones (G1 gate fixes); 14:42 crown-city-smash. 8 strict-review games live, 0 errors.
+- GATE NOTE: plain `build-all.py <slug>` skips the phone-check; workers must prove with `--full` (or --deploy). Always say so in briefs.
+- In review: R24 (emberclimb, redline, hollowbough) session_01RR7mnXAUGZ6UmoGwHh8Lbf; R25 (tidewake, sands, vinegrave) session_01RR7mnZ6nZwu469kNmvUUU9.
+- Fixers: F5-doorkick ..XLu5TCHhPnY6jM2Lf, F4-shipwreck ..agUeAvgKJ8XFTGH87, F4-vale ..ZVMsfdiav99rdznZo, F3-thornbound ..YCiySpRmFggryJ4TY, F2-perch ..Y3ikEjERN4LK34REF, F4-wildmark ..YmTE668iz66Jf2W1q, F5-cauldron ..aNHm16KBK2PcX6dJk, F5-short-fuse ..aDD4M17xVVi156Ako, F3-nebula ..ZjrWhCQkKWyktnchv (prefix session_01RR7mn).
+- 16:07 status. Live strict-review PASS: sunglaze, kaiten, rampart, final-approach, lantern, stitchwise, twin, crown (9th PASS waiting owner yes: wildmark R26 7.5, branch shelf/W507-wildmark-gameplay).
+- Reviewers: R27 (redline, perch, sands) session_01RR7mnXyzWD33pEFbQLnAcv; R28 (nebula, vale, cauldron) session_01RR7mnX7oXx19Jdh8bhox4p.
+- Fixers (prefix session_01RR7mn): F5-tidewake YHZShYMpcmFP7hJgN, F5-vinegrave Xwk5U5cFqdan8rF8o, F5-shipwreck bUa4C8me6zUKwkqKZ, F6-short-fuse XjYMqkokZLNAbtvGr, F4-thornbound Y4RfFnrCcTabDUXxS, F8-emberclimb X96RQXztLjcYXHWi5 (Gentle mode decision), F7-hollowbough XftavGRwMUDD5Mwmx (bulb in all modes), F6-doorkick bqUuG1JzGADACv5vV.
+- Decisions: help bulb shows on phones in every mode (UI-BAR); emberclimb may add a labelled "Gentle" player-side mode if the rulebook has no easier setup; Playwright in games-src must be 1.63.0 to match /opt/pw-browsers.
+- 17:49 status. 9th PASS still waiting owner yes: wildmark (R26 7.5). Reviewer: R31 (sands, hollowbough, vale) session_01RR7mnX9n6zrxXvRe2P92M7.
+- Fixers (prefix session_01RR7mn): F4-nebula XxHKtwa4sP9bvqch2, F6-cauldron ZSqa2t34kmD5SDBxr, F6-shipwreck ZGetttip3CUGYB4vN, F9-short-fuse XhWpRhi4kPd7yBxuy, F5-thornbound b7scNB1aGiudcKfR3, F7-doorkick Y5TRSMQMvoWQNE6BH (also fixes shared phone-check.js skip tap: reviewer R30 found it weakens gate), F5-perch agtTHrmscTLHuMPw1, F4-redline YmdTz8ftETyRvcpFt, F6-tidewake Yt7KZLRVj2AN25HzN, F9-emberclimb Z3sSvCfM5EPv2tzvz (verify boss card, hide invented story acts), F7-vinegrave Zt7r9JjCknEamZuwS.
+- Watch: fixers sometimes edit shared games-src/scripts/{phone-check,sweep}.js; review those diffs before merging. Some branches lost reviewed commits (tidewake b0c13c4d, hollowbough c876cedb, redline 82af847a) and were re-merged.
+- 19:04 status. PASS waiting owner yes: wildmark R26 7.5 (shelf/W507-wildmark-gameplay), emberclimb R33 7.1 (shelf/W485-emberclimb-bench), perch R33 7.3 (shelf/W508-perch-gameplay), redline R32 7.4 (shelf/W496-redline-gameplay). Squash on merge (some worker commits carry AI trailers).
+- Reviewer R34 (sands, tidewake, vale) session_01RR7mnXBnPoYwPV47GtkSYS. Waiting review: doorkick (phone-check.js skip fix in its branch).
+- Fixers (prefix session_01RR7mn): F7-cauldron XdMnazBPV3P7dF8xg, F5-nebula bfkmUcn7vtZmBL38B, F10-short-fuse autnHzEpJjy2Vyn8d, F6-thornbound Y9CA3k4e4zAmFAiYd, F6-shipwreck ZGetttip3CUGYB4vN, F9-hollowbough ZnwYthN9aPJSGMEDj, F7-vinegrave Zt7r9JjCknEamZuwS, G3-sunglaze ZofCqiW23UzzGsB49 (live sunglaze fails sweep at 375x553).
+- Reviewer briefs must say: fetch + checkout origin/<branch> fresh and record the commit hash (stale checkouts happened).
+- 20:45 status. LIVE strict-review PASS (12): sunglaze (+375 fix), kaiten, rampart, stitchwise, crown, redline, final-approach, lantern, twin, wildmark, emberclimb, perch.
+- Deploy runs scenario tests: workers must prove BOTH `build-all.py --quick` (scenarios) and `--full` (phone-check+sweep).
+- Reviewer R36 (shipwreck, thornbound, nebula) session_01RR7mnY71BvDP17ccBUoj81. Waiting review: short-fuse (9198c40d).
+- Fixers (prefix session_01RR7mn): F8-sands bg5rsRVppoU1AQpQj, F8-tidewake Y82TesPtiQuy9gQbn, F8-vale b8Egh22twkJx1Ghu9, F8-doorkick atFZkcGiEaNB85fk7, F8-vinegrave bR1jxcLTeRJtguPvS, F10-hollowbough YiMCC92cqcaBM5pEd, F7-cauldron XdMnazBPV3P7dF8xg.
+- 21:48 status. Fixed, in review: R37 (short-fuse 9198c40d, cauldron 93ae36dd, vale 512dd83a) session_01RR7mnZpRrRZvKoeeL6M8Zh; R38 (sands 9a490a85, tidewake 6acc0f67, nebula fd818e08) session_01RR7mnbbL6k4qkA5aofGeGR.
+- Still fixing (prefix session_01RR7mn): F7-thornbound Zmz1cSJERPDnFxz9N, F7-shipwreck aGrqQmwnBawztrDxR, F9-doorkick ZvWTggjk1G2UGEem2, F10-hollowbough YiMCC92cqcaBM5pEd. F8-vinegrave bR1jxcLTeRJtguPvS stuck on a Bash approval prompt since 20:06 (owner told).
+- 23:05 status. READY, waiting owner yes: short-fuse c40209e4 (R37 raw 7.5 all rows >=7; only gate failed; orchestrator re-ran --quick and --full: PASS).
+- R37 FAIL: cauldron (gate cf-start, shop chips), vale (dock on staged build). R38 FAIL: sands 6.6, tidewake 7.1, nebula 7.1. R40 FAIL: shipwreck 7.0 (Phone, Feel).
+- Fixers (prefix session_01RR7mn): F8-cauldron XHEpd96Gw4SZpQKXR, F9-vale YsCG35preZuHn1tc2, F8-shipwreck a8PLrHvbcQ23hxzQj, F9-sands ZEdc1kAE8hgjKNSi6, F9-tidewake Xoto8RHitWvAFyWsp, F7-nebula a4XR6svtjujwbdFMG. F8-vinegrave bR1jxcLTeRJtguPvS still blocked on approval.
+- Reviewer R39 (thornbound bf654f28, doorkick 69fceeb6, hollowbough d2fde088) session_01RR7mna9BxSVfE7rV11BPvZ.
+- 01:25 status. READY, waiting owner yes: short-fuse c40209e4 (gate-only fail, orchestrator re-ran gates PASS); sands-of-qamar 7101e2b2 (R41 7.4 PASS); nebula-aces 51cec217 (R41 7.4 PASS).
+- Waiting review: cauldron bc7fabf6 (also loosens shared sweep.js bulb-finger tolerance; check it). Reviewer R42 (shipwreck eb36ac91, tidewake 3404be6e, hollowbough ed1c1661) session_01RR7mnXVorTjRtSxF2Qks8n.
+- Fixers (prefix session_01RR7mn): F10-vale aAR836Z4bPASLpNU1 (tutorial freeze 375x553), F8-thornbound ZwAQPXtssawAnFU37, F10-doorkick aJAhwE466jac5QZEa. F8-vinegrave bR1jxcLTeRJtguPvS blocked on approval since 20:06.
+- 03:58 status. READY, waiting owner yes (5): short-fuse c40209e4, sands 7101e2b2 (R41 7.4), nebula 51cec217 (R41 7.4), cauldron bc7fabf6 (R43 7.5; gx-help tapFirst opt-in, cauldron-only sweep copy), vale 0ed6b60e (R43 7.1; gx-tutor fallbackMs opt-in shell change -> shell rule: build-all for all games at deploy).
+- Waiting review: tidewake ea284382, hollowbough dbbb8417. Fixers (prefix session_01RR7mn): F9-shipwreck boP9cn7uYBqp5WcYZ, F9-thornbound bLD1uCfLY4WJ8K32z (full sweep 11/13 fails), F11-doorkick YWzaLq4i4fHCHkH2p. Vinegrave F8 still blocked.
+- 07:45 DEPLOYED (owner yes): short-fuse, sands-of-qamar, nebula-aces, cauldron-fair, vale-of-banners, tidewake, hollowbough; shell change so all games rebuilt (deep-signal, overdrive, lab.html reverted). Live check 0 errors on all 7 + sunglaze, thornbound; short-fuse shows one 404 on a first mobile load only (cause not found yet). live-err.js was rewritten in scratchpad (needs games-src/node_modules: npm i --no-save @playwright/test@1.63.0 playwright@1.63.0 three).
+- Open: R45 thornbound session_01RR7mnbDn4tA4SvpCj1ihvr, R46 shipwreck session_01RR7mnZbLYUHMYur6TYNoQu, F11-doorkick session_01RR7mnYWzaLq4i4fHCHkH2p, F8-vinegrave blocked.
+- 14 Nov 15:05. NEW REVIEW BAR (after owner bug reports on twin-thrones and hollowbough): reviewers check rules vs the ORIGINAL game (not just our notes) and clutter (max 1 helper on screen, no infinite animations). Most live games probably fail the clutter check -> after hollowbough proves a calm pattern and the owner agrees, roll out a shelf-wide calm pass.
+- Not live / in work (prefix session_01RR7mn): F1-twin-thrones XqpNwCd7hrdtXH7DE (shelf/W520-twin-thrones-rules), R52 hollowbough YcC7czEgZR4ksasTV (shelf/W521-hollowbough-rules 06901ebc), F14-doorkick XX6k587WSBg7CnmDd, F11-shipwreck Y3VbyzkcKeiyc9nLn (beast vs palisade rule), F11-thornbound bgj44sbfMxDTNyMy2 (CMD_L hint text). F8-vinegrave bR1jxcLTeRJtguPvS blocked since 12 Nov 20:06.

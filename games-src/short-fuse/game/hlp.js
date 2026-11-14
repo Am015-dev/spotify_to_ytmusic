@@ -88,7 +88,7 @@ function hlpPlan(){const V=UI.V;if(!V||V.seat<0||!G||G.over||UI.brief||passTo()>
     if(o.d.seat!=null)return {kind:'q',to:{seat:o.d.seat},why:'The crew advisor\'s best pick here.'};
     const n=TBL.items&&TBL.items.findIndex(it=>it.t==='q'&&it.i===i);if(n>=0)return {kind:'q',to:{chip:n},why:'The crew advisor\'s best pick here.'};return null}
   if(!V.legal||decider()!==me||V.q)return null;
-  const W=wwk(V);const sg=W&&W.suggestion,m=sg&&sg.m;if(!m||legal(m,me))return null;const why=hlpWhy(sg.why,15);if(!why)return null;
+  const W=wwk(V);const sg=W&&W.suggestion,m=sg&&sg.m;if(!m||legal(m,me))return null;const why=hlpWhy((typeof scHint==='function'&&scHint(V,m))||'The best move now.',24);   // plain words from the visible clues, never oddsif(!why)return null;
   const tgt=m.a==='dual'?(G.st[m.st]&&G.st[m.st].w[m.ks[0]]):null;
   if(m.a==='dual'&&!m.tool&&!m.two&&m.ks.length===1&&!m.own&&tgt){const mine=hlpMine(V,m.v);if(!mine)return null;
     if(!sel)return {kind:'dual',from:{u:mine.u},to:{u:tgt.u},why};

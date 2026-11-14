@@ -142,3 +142,4 @@ Credit line for the game's credits screen: "Medieval Hexagon Pack by Kay Lousber
 | w-sunken-harbor.webp | KayKit Medieval Hexagon Pack renders |
 | w-terraced-orchard.webp | KayKit Medieval Hexagon Pack renders |
 | w-thunder-idol.webp | KayKit Medieval Hexagon Pack renders |
+| table-wood.webp | Poly Haven "Wood Table 001" texture, CC0 (polyhaven.com/a/wood_table_001) |

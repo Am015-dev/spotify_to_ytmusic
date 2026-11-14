@@ -10,7 +10,7 @@ The Goal card (ui3.js:89, `goalHtml`) states the aim in ONE sentence: ok. Curren
 | file:line | old line | new line |
 |---|---|---|
 | lore.js:9 | `The Sultan left no heir, child. Most points when the bazaar closes takes the throne: coins, tribes, land, goods, djinns.` | `The throne is empty, child. Whoever scores the most points wins it.` |
-| lore.js:10 | `Five tribes crowd the bazaar, three to a tile, each colour with its own gift. Farid the Water-Boy wants the throne for his village well.` | `Five tribes, three per tile. Each colour does something different.` |
+| lore.js:10 | `The tribes crowd the bazaar, three to a tile, each colour with its own gift. Farid the Water-Boy wants the throne for his village well.` | `The tribes, three per tile. Each colour does something different.` |
 | lore.js:11 | `Who walks first? Dearer spots play earlier, but coins are points too. Take the 5-coin spot.` | `Pricey spots play first. Take the 5-coin spot.` |
 | lore.js:12 | `Two caravans each, so two markers. Put the second on the free 0-coin spot: cheap, but last.` | `You have two markers. Put the second on a free spot.` |
 | lore.js:13 | `The order is set: Farid, you, Farid, you. Same price? The later bidder goes first. Watch Farid walk.` | `Play order: Farid, you, Farid, you. Watch Farid go first.` |

@@ -27,7 +27,7 @@ async function coachGame(b, W, H, tag) {
   await p.goto(URL); await sleep(900);
   const learn = await p.$('#modal .gxt-menu'); if (!learn) { note(tag + ' no tutorial button on the title'); return; }
   await p.screenshot({ path: process.env.SHOTS ? path.join(process.env.SHOTS, 'coach-title-' + W + '.png') : '/dev/null' }).catch(() => { });
-  await tapUI(p, learn, 'Learn button'); await sleep(900);
+  await p.evaluate(() => coachStart()); await sleep(900);   // since 8 Nov the Learn button opens the guided game (tut-walk-test.js); the coached free game is started directly here
   const st = await p.evaluate(() => ({ r: GXCOACH.running, ui: !!UI.coach, g: !!G }));
   if (!st.r || !st.g) { note(tag + ' coached game did not start ' + JSON.stringify(st)); return; }
   let bubbles = 0, idle = 0, moves = 0, shots = 0; const t0 = Date.now();

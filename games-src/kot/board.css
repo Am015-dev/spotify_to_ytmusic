@@ -199,7 +199,8 @@ html.sk #pacts .btn .bl{background:rgba(50,14,0,.85)}
 html.sk #pacts .btn small{background:rgba(50,14,0,.85);border-radius:6px;padding:0 6px;color:#fff;text-shadow:none}
 html.ph .pchip span em{background:#fffdf5!important}
 /* Play with Hints off: no first-time help bubbles or tooltips (one instruction line only) */
-html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail),html:not(.pp-hints) .gxh-tt:not(#arttail *){display:none!important}
+html:not(.pp-hints) .gxh-bub:not(#arttail *):not(#arttail):not(.gxt-bub),html:not(.pp-hints) .gxh-tt:not(#arttail *):not(.gxt-bub *){display:none!important}
+html.gxt-on #bline,html.gxt-on #pppreview{display:none!important}   /* the guided tutorial: its bubble is the one sentence on screen */
 /* desktop: secondary text 16px */
 html:not(.ph) :is(.menu .btn small,#title small,details.custom .small,#modal p.small,.gxc-act small){font-size:16px!important}
 /* campaign header art at its natural scale (it was stretched 2-3x) */
@@ -257,3 +258,11 @@ html.ph #choice .btn img.evopic{max-height:110px}
 html:not(.ph) #pacts .btn{color:#1a1320!important;text-shadow:0 1px 0 rgba(255,255,255,.35)!important}
 html:not(.ph) #pacts .btn .bl,html:not(.ph) #pacts .btn small{color:#fff!important;text-shadow:none!important}
 .gx-dock-head .gx-ibtn{background:#fff7dd!important;border-image-source:none!important}
+html.ph #bcity{display:none;position:absolute;left:50%;transform:translateX(-50%);z-index:5;padding:5px 12px;border-radius:999px;background:#1a1320;border:2px solid #e63946;color:#fff;font:900 15px/1.2 Nunito,sans-serif;white-space:nowrap;pointer-events:none;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+html.ph #bcity.on{display:block}
+/* W500: under the board line on a computer's turn: a one-line recap of the last computer turn + "Tap to skip" */
+#bsub{position:fixed;left:50%;transform:translateX(-50%);z-index:2147481999;max-width:calc(100vw - 24px);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}
+#bsub[hidden],#bsub [hidden]{display:none!important}
+#brecap{max-width:100%;box-sizing:border-box;padding:3px 10px;border-radius:999px;background:rgba(26,19,32,.82);color:#ffe9a8;font:800 14px/1.2 Nunito,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#bskip{padding:2px 10px;border-radius:999px;background:rgba(255,210,63,.92);color:#1a1320;font:900 14px/1.2 Nunito,sans-serif}
+html:not(.ph) #bsub,html.gxt-on #bsub,html.cc-over #bsub,html.cc-tut #bsub{display:none!important}

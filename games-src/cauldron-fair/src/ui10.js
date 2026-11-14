@@ -11,7 +11,7 @@ const hq = s => () => { const e = document.querySelector(s); return e && e.getBo
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
   first: { target: hfirst('#acts .bagb:not(.off)', '#acts .bagb'), title: 'Pull a chip', text: 'Tap the bag. The chip moves as many spaces as its number.', pic: () => hpics([['ico', 'bag']]) },
-  brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Draw to score more, or Stop to keep your space. Keep whites at 7 or less.', pic: () => hpics([['chip', 'W2']]) },
+  brew: { target: hfirst('#acts .brow', '#acts .stopb'), title: 'Draw or stop', text: 'Each space shows coins (big number), points (small badge) and rubies. Draw for more, or Stop to keep it.', pic: () => hpics([['chip', 'W2']]) },
   hot: { target: hfirst('#acts .stopb', '#acts .brow'), title: 'Close to boiling', text: 'Another white chip may explode the pot. Stop, or use the flask.', pic: () => hpics([['ico', 'boom']]) },
   last: { target: hfirst('#acts .brow', '#acts .bagb'), title: 'The last day', text: 'Everyone picks Draw or Stop in secret. Then all show. No shop today.', pic: () => hpics([['ico', 'bag']]) },
   card: { target: hfirst('#qbox [data-a=mv].sug', '#qbox [data-a=mv]', '#qbox'), title: 'Fortune card', text: 'Today\'s card gives a choice. Tap the one you want.', pic: () => hpics([['ico', 'ruby']]) },
@@ -63,7 +63,7 @@ function hlpPhase() {
     if (!G || !UI.started || G.phase === 'over' || tutOn()) return null;
     const v = viewSeat(); if (v < 0 || (hotSeat() && UI.holder < 0)) return null;
     const p = G.players[v];
-    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? 'shop' : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
+    if (UI.rsOpen) { if (UI.rsMode !== 'report' || STG.run || !p.q) return null; const q = p.q.h; return q === 'de' ? 'boom' : q === 'shop' ? (innerHeight < 700 && innerWidth < 600 ? null : 'shop') : q === 'ruby' ? 'ruby' : EVAL_Q[q] ? 'power' : null; }
     if (p.q) return HP_CARDQ[p.q.h] ? 'card' : HP_CHIPQ[p.q.h] ? 'chip' : null;
     if (G.phase !== 'brew' || p.st !== 'draw' || p.lock || BF.pulling || focusSeat() !== v) return null;
     if (G.round === LASTD()) return 'last';
@@ -123,7 +123,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'cauldron-fair', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
+  GXH.init({ game: 'cauldron-fair', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, tapFirst: true, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {

@@ -45,7 +45,7 @@ function schedule() {
   if (UI.cards.length && !NET.on) return;
   const ai = KK.pending(G).filter(s => G.players[s].ai);
   if (ai.length) {
-    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.2 + .55 * Math.random()));
+    const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.12 + .3 * Math.random()));
     const tok = UI.seq; UI.tm = setTimeout(() => { if (tok === UI.seq) aiPick(ai[0]); }, d); return;
   }
   if (hotSeat()) hotNext();
@@ -167,7 +167,7 @@ async function playResolve(evs, preHand) {
     UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, scoring: !!sc, say: 'Everyone has chosen. The plates are under covers…' };
     if (!hand && v < 0) UI.fz.hand = null;
     UI.sel = []; UI.twin = false; UI.rec = null;
-    UI.fast = false; render(); { const t0 = (PX.on && PX.serveT) || UI.serveT || 0, left = t0 ? 860 - (performance.now() - t0) : 0; await wait(Math.max(300, left)); } if (tok !== UI.seq) return;   // let your dish land on your tray first
+    UI.fast = false; render(); { const t0 = (PX.on && PX.serveT) || UI.serveT || 0, left = t0 ? 500 - (performance.now() - t0) : 0; await wait(Math.max(120, left)); } if (tok !== UI.seq) return;   // let your dish land on your tray first
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
     try { UI.fz.news0 = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.fz.news0 = null; }
     UI.fz.msg = sayT('cover'); renderDock(); try { coachMove(); } catch (e) { }
@@ -185,13 +185,13 @@ async function playResolve(evs, preHand) {
     try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
     UI.fz.msg = sayT(sc ? 'roundEnd' : 'land'); UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
-    render(); stageClear(); snd('clink'); try { scorePops(before, T); } catch (e) { } await wait(800); if (tok !== UI.seq) return;
+    render(); stageClear(); snd('clink'); try { scorePops(before, T); } catch (e) { } await wait(450); if (tok !== UI.seq) return;
     if (ps) {
       UI.fz.msg = sayT('pass'); renderDock();
       // 4: every hand moves one seat on, visibly: your dishes ride the belt off to the next diner, the next hand rides in
       if (ANIM) { try { await passAlong(ps.sizes); } catch (e) { console.error(e); } }
       UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render(); passDone();
-      await wait(ANIM ? 450 : 0); if (tok !== UI.seq) return;
+      await wait(ANIM ? 250 : 0); if (tok !== UI.seq) return;
       UI.busy = false; render(); schedule(); drainQ(); if (NET.on && isHost()) netPush(true); return;
     }
     if (sc) {

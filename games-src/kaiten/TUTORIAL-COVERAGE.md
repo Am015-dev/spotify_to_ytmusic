@@ -1,33 +1,41 @@
-# Tutorial coverage: every rule, and where the coached game explains it
+# Tutorial coverage: every rule, taught in order
 
-The tutorial is a COACHED FIRST GAME (Addendum 4): a real 3-round meal for three diners (you, Odile, Kofi) against the easy chefs, with free
-choices from turn 1 (any legal move). Auntie Suzu (and Odile for rival moments) speak just in time: one bubble at a time, never blocking
-input, dismissible with the x. There are no forced taps and no spotlight steps. A rule is explained the first time it becomes relevant;
-rules that did not come up in this game are listed on the end card ("Things you will meet later"). Wording: `game/src/story.js` (`coach`).
-`game/tutorial-end.js` plays the coached game at 390x763 and 1440x860 with random legal moves through the UI and asserts that every id below was
-explained during play or listed on the end card. `window.GXCOACH = {running, explained:[ids], later:[ids], done}` exposes it for qa-bot.
+The tutorial (Learn to play) is a STAGED first meal (W499): you and one chef, one round of 10 dishes dealt from a fixed script
+(`game/src/ui11.js`, `tutDeal`). Every step is ONE sentence of 12 words or fewer and ONE glowing thing to tap. Pick steps move on when you
+take the glowing dish; look steps move on when you tap the glowing seat, tray or belt. There are no Next buttons and no "learn later"
+list: every core rule has its own step. The end card's "Play a real game" starts a real 3-round meal against two Easy chefs.
+Wording: `game/src/story.js` (`tut`). `game/tut-walk.js` walks it by touch at 390x844 and 375x667, checks every id below appears in
+order with at most 12 words, then plays the real game to the result by touch.
 
-| Rule | id | Trigger (when Suzu / Odile speak) |
-|---|---|---|
-| Goal, free pick, the custard bet (story) | intro | the first turn |
-| Reveal together, hands pass on | pass | after the first pass (turn 2) |
-| Crispy Prawn pair = 5 | pair, pair2 | you serve your first prawn; again at a pair |
-| Fish Slice set of three = 10 | fish | your first Fish Slice |
-| Steam Bun ladder | bun | your first bun |
-| Roll race (most 6, second 3) | roll | the first roll served by anyone |
-| Nigiri values | nigiri | the first nigiri served by anyone |
-| Fire Paste triples the next nigiri | paste | paste in your hand or on your counter |
-| Nigiri landing on paste | pasteNigiri | the first time a nigiri lands on a paste |
-| Twin Sticks | sticks | sticks in your hand or on your counter |
-| Custard cups kept to the end | custard | the first custard in a hand or on a counter |
-| Rival moves worth learning | rival | the rival takes paste (Odile) / rolls (rival2) |
-| Good and poor picks, one line why | good, poor | after your pick: +5 or more, or a clearly better dish was in the hand |
-| Rounds 2 and 3 (new hand, custard carried) | rounds, round3 | the start of rounds 2 and 3 |
-| Round scoring walked with your real numbers | walk, walk0..2 | after each round's count: sets, roll race, nigiri, totals |
-| Roll-race tie | makiTie | when a tie happens (else the end card) |
-| Custard at the end, fewest loses 6 with 3+ diners | custardEnd, penalty | at the end of the game, with the real cup counts |
-| Custard tie | custardTie | when a tie for most or fewest happens (else the end card) |
-| Equal totals: more cups wins | tieBreak | when it happens (else the end card) |
+| # | id | Rule | Tap |
+|--:|---|---|---|
+| 1 | goal | Most points after three rounds wins | your seat |
+| 2 | chef | The chef picks at the same time, same rules | chef's seat |
+| 3 | pick1 | Take one dish a turn; picks are secret | Crispy Prawn |
+| 4 | passed | Picks flip together, then hands pass on | the belt |
+| 5 | pick2 | Prawn pair = 5 | Crispy Prawn |
+| 6 | paste | Fire Paste triples the next nigiri | Fire Paste |
+| 7 | nigiri | Moon 3 on paste = 9 | Moon Nigiri |
+| 8 | nigiriVals | Nigiri alone: Sun 1, Sunset 2, Moon 3 | your paste tray |
+| 9 | sticksTake | Twin Sticks: two dishes on a later turn | Twin Sticks |
+| 10 | sticksUse | Use the sticks | your sticks |
+| 11 | twinA | Fish Slice: three = 10, one or two = 0 | Fish Slice |
+| 12 | twinB | Sticks go back into the passed hand | Fish Slice |
+| 13 | fish3 | Third Fish Slice completes the set | Fish Slice |
+| 14 | roll | Roll race: most 6, second 3 | 3-icon roll |
+| 15 | bun | Steam Buns 1, 3, 6, 10, 15 | Steam Bun |
+| 16 | custard | Custard stays to the end of the meal | Custard Cup |
+| 17 | scoreSets | Sets scored with your real numbers | your counter |
+| 18 | scoreRoll | Roll race result | your rolls |
+| 19 | rollTie | Tie for most rolls splits 6, no second | your rolls |
+| 20 | scoreNigiri | Nigiri on paste scored | your paste tray |
+| 21 | scoreChef | Same rules for the chef; lone dish = 0 | chef's seat |
+| 22 | clear | After a round all but custard is cleared | your counter |
+| 23 | rounds | Three rounds, fresh hands each round | your seat |
+| 24 | custardEnd | End: most cups +6 | custard shelf |
+| 25 | penalty | 3+ diners: fewest cups -6 | custard shelf |
+| 26 | custardTie | Custard ties split, rounded down | custard shelf |
+| 27 | tieBreak | Equal totals: more cups wins | your seat |
 
-Ties cannot be forced without stacking the deck, so makiTie, custardTie and tieBreak usually appear on the end card ("Things you will meet later").
-Not applicable to this game: empty market, can't-place, bonus tiles. Hand sizes for 2, 4 and 5 diners, hot-seat and online play: help drawer only.
+Not taught (help drawer only): hand sizes for 3 to 5 diners, hot-seat and online play.
+The older coached free game (`coachBegin`, `tutorial-end.js`) stays in the code but is no longer what Learn to play opens.

@@ -18,7 +18,7 @@ function campTwist(g, t) {
 function campWon(g) { return !!(g && g.result && g.result.win); }
 function campMetrics(g) {
   const u = g.used || {};
-  return { won: campWon(g), maxTilt: u.maxTilt || 0, levelRounds: u.levelRounds || 0, spare: u.spare || 0, coffee: g.coffee, rerolls: g.rrHand, fuel: g.pl.kero, coffeeSpent: u.coffeeSpend || 0, radio: u.radioClear || 0, brakeMargin: g.landSpeed >= 0 ? FA.brakeVal(g) - g.landSpeed : 0 };
+  return { won: campWon(g), maxTilt: u.maxTilt || 0, levelRounds: u.levelRounds || 0, spare: u.spare || 0, coffee: g.coffee, rerolls: g.rrHand, fuel: g.pl.kero, coffeeSpent: u.coffeeSpend || 0, radio: u.radioClear || 0, brakeMargin: g.landSpeed >= 0 ? (g.landBrake >= 0 ? g.landBrake : FA.brakeVal(g)) - g.landSpeed : 0 };
 }
 function campStart(def) {
   const s = def.setup || {}; UI.seed = s.seed != null ? s.seed : null;

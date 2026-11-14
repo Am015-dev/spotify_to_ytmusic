@@ -48,3 +48,46 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - PC gears: disabled gears stay readable (dashed, #9aa7bd); name tag is a dark pill ahead of the car in its lane, drawn last.
 - drag-test.js: real CDP touch drag + real mouse drag; asserts lift (scale), gold glow, drop zone, snap class, play; tap works.
 - tut-test.js: waits 700 ms before forced-step taps (the shell now ignores taps in a step's first 600 ms).
+
+## W496 fix round (shelf/W496-redline-gameplay): reviewer G5 (4.0 FAIL, stopper)
+- Stopper: tutorial questions (boost, slipstream, discard) that the current step does not teach are never shown (ui.js askBoost/askSlip/askDiscard);
+  answered questions leave the screen at once. tut-test.js watches for question buttons that stay visible but untappable (dead taps).
+- Rules: computer cars commit gear and cards in startResolve (simultaneous, face down, start-of-round board); boost decided in their own react
+  step (ai.js aiBoost). logic-test R70-R72; RULES-CHECKLIST 69-70.
+- Pacing: rival turns ~1 s (UI.rival scales waits/tweens; shift/cool/done steps only update the HUD); tap = faster still. Discard step keeps all after 5 s.
+- Difficulty: Easy is the default; easy rivals never use gear 4 or boost and are heat-shy. Suggest always plans at hard strength.
+  Sim (200 races, 5 cars, 2 laps): careful newcomer bot podium 67% on easy, following Suggest 75%; normal/hard unchanged.
+- Small screens: top bar fits 375 (pill words hidden < 390), pops drawn in screen space inside the board and clear of the minimap,
+  opaque minimap, start lights a small strip top-left on short boards, podium title on a dark plate, place-aware losing line.
+- Tutorial spin-out: the Stress card now shows in hand; the stall uses it as the one playable card. race-touch.js = full default race by touch.
+
+## W496 round 4 (R9 re-review 4.0 FAIL fixes)
+- Rules: boost toggle removed; boost is asked after the reveal every turn with 1+ engine heat ("No boost" default after 2.5 s,
+  "risky" tag, Suggested mark with Hints). Discard step offered every round (no slow-card / every-third-round gate), nothing
+  pre-selected, "Keep all" default after 2.5 s. Wording quoted in rules-notes.md. Logic R73-R75.
+- Tutorial: discard any non-Heat/Stress card, boost question after the reveal (as raced), Brake/Burst line.
+- Easy rivals slower (ai.js AIP.easy): sim plain newcomer who boosts at 5+ heat avg 2.6-2.7, podium ~78%.
+- Board: last round's pops cleared when you plan; one preview label ("safe · slip +2"); round rating banner left of the minimap.
+- race-touch.js: plain player = sim-levels D (biggest cards, gear down near corners, boost at 5+ heat); gate counts skip taps.
+- r2: 375 board has no dashboard (gear, heat, next corner in the dock line, race.js dashOff); 1.5 s defaults, tap-anywhere;
+  ?seed= now seeds the game. Touch placings: 390 seeds 11/21-24: 1,2,2,3,3; 375: 5,1,4,3. Go->next ~10 s in the test.
+
+## W496 round 5 (R19 re-review 6.8 FAIL fixes)
+- Planning camera (ui.js planFrame): frames your car, the next corner sign and the move preview; zooms out as far as needed
+  (grass beyond the board), the next corner sign keeps a readable size and pulses gold.
+- No timers: boost and discard questions wait for a tap (qTimer is a no-op). Boost is offered even when any flip spins you
+  ("spins you" tag); line says "flip to the next speed card".
+- Waits: rivals ~0.7 s each (UI.rival 0.16), own turn pace 0.38. newcomer-touch.js: tap->next decision avg 1.3 s, max <= 4 s.
+- Easy rivals gentler (AIP.easy noise 10, mis 0.8/5, lift 0.97): sim plain newcomer vs 4 Easy win 65%, podium 99%.
+  Normal/Hard unchanged; ladder order holds.
+- Plan line: "Corner 5 in 4: speed 5 or less is safe." (planAdvice); hints off still shows corner burn / spin.
+- Podium line fits the race (spins / heat / shift sooner); 375 result card compact (no scrolling under the buttons).
+- Tests: newcomer-touch.js (R19 gate, shots in playable-shots/r19/), tut-test.js now counts ignored taps.
+
+## R24 fix (planning camera, boost odds, phone-check)
+- Cause of "trees, no car" at 375: the camera eased per frame from the last rival's car, so the first 0.3-1 s of planning (and any
+  resize of the board when the panel redraws, which reset the zoom) showed the old spot. Now planFor cuts straight to the plan frame
+  (camToPlan), a resize while planning re-frames, and easing is time-based. Frame also leaves 50 px for the message pill.
+- Boost question: plan line "Boost +1 to +4: spin-out risk 25%." from the speed cards left in your deck; the Suggested badge says why
+  ("+3 spaces, safe at limit 5" / "50% spin: corner in 3, limit 4").
+- Gate: plan-cam-touch.js (car box inside the board at t+0, +250, +600 ms of every planning decision).

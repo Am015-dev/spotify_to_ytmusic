@@ -32,12 +32,13 @@ function pickFirst(G) { while (G.pend.length) { var M = E.validMoves(G); E.apply
 sect('A. Setup');
 R('Each player starts with 7 coins.', function () { var G = E.newGame({ seed: 1 }); eq([7, 7], [coins(G, 0), coins(G, 1)]); });
 R('12 wonders exist; 8 are drawn for the draft (two groups of 4); all different.', function () { var G = E.newGame({ seed: 2 }); eq(12, D.WONDERS.length); eq(8, new Set(G.draft.pool).size); });
-R('Wonder draft round 1: first player picks 1, second picks 2, first gets the last of the 4 (order 0,1,1,0).', function () {
-  var G = E.newGame({ seed: 3 }), o = []; for (var i = 0; i < 4; i++) { o.push(E.sideToAct(G)); E.apply(G, E.validMoves(G)[0]); } eq([0, 1, 1, 0], o); });
-R('Wonder draft round 2 uses the other 4 wonders; second player picks 1, first picks 2, second gets the last (order 1,0,0,1).', function () {
-  var G = E.newGame({ seed: 3 }), o = [], first = G.draft.avail.slice(); for (var i = 0; i < 4; i++) E.apply(G, E.validMoves(G)[0]);
+R('Wonder draft round 1: first player picks 1, second picks 2, first gets the last of the 4 (order 0,1,1,0; the last one is automatic).', function () {
+  var G = E.newGame({ seed: 3, first: 0 }), o = []; for (var i = 0; i < 3; i++) { o.push(E.sideToAct(G)); E.apply(G, E.validMoves(G)[0]); }
+  eq([0, 1, 1], o); eq([2, 2], G.players.map(function (P) { return P.wonders.length; })); eq(4, G.draft.n); });
+R('Wonder draft round 2 uses the other 4 wonders; second player picks 1, first picks 2, second gets the last automatically (order 1,0,0,1).', function () {
+  var G = E.newGame({ seed: 3, first: 0 }), o = [], first = G.draft.avail.slice(); for (var i = 0; i < 3; i++) E.apply(G, E.validMoves(G)[0]);
   eq(false, G.draft.avail.some(function (w) { return first.indexOf(w) >= 0; })); eq(4, G.draft.avail.length);
-  for (i = 0; i < 4; i++) { o.push(E.sideToAct(G)); E.apply(G, E.validMoves(G)[0]); } eq([1, 0, 0, 1], o); });
+  for (i = 0; i < 3; i++) { o.push(E.sideToAct(G)); E.apply(G, E.validMoves(G)[0]); } eq([1, 0, 0], o); eq([4, 4], G.players.map(function (P) { return P.wonders.length; })); eq('play', G.phase); });
 R('After the draft each player owns 4 wonders, unbuilt.', function () { var G = fresh(4); eq([4, 4], G.players.map(function (P) { return P.wonders.length; })); eq(0, G.built); });
 R('10 progress tokens: 5 face up on the board, 5 in the box (all different).', function () { var G = E.newGame({ seed: 4 }); eq(5, G.tokensUp.length); eq(5, G.tokensBox.length); eq(10, new Set(G.tokensUp.concat(G.tokensBox)).size); });
 R('The military pawn starts on the centre space (0) of a -9..+9 track; no loot taken yet.', function () { var G = E.newGame({ seed: 4 }); eq(0, G.mil); eq([[0, 0], [0, 0]], G.loot); });
@@ -54,7 +55,11 @@ R('Rows alternate face up / face down and the front (takeable) row is face up, i
   [1, 2, 3].forEach(function (a) { var G = toAge(a), last = Math.max.apply(null, G.pyr.map(function (c) { return c.r; })), up = {};
     G.pyr.forEach(function (c) { up[c.r] = c.up; }); for (var r = 0; r <= last; r++) { if (up[r] !== ((last - r) % 2 === 0 ? 1 : 0)) throw { exp: 'age ' + a + ' row ' + r + ' up=' + ((last - r) % 2 === 0 ? 1 : 0), got: up[r] }; } }); });
 R('The first player (the one who picked the first wonder) takes the first turn of Age I.', function () {
-  for (var s = 1; s <= 12; s++) { var G = fresh(s); if (G.turn !== 0) throw { exp: 'seat 0 starts (seed ' + s + ')', got: 'seat ' + G.turn }; } });
+  var seen = {}; for (var s = 1; s <= 12; s++) { var G0 = E.newGame({ seed: s }), f = E.sideToAct(G0), G = fresh(s); seen[f] = 1; if (G.turn !== f) throw { exp: 'seat ' + f + ' starts (seed ' + s + ')', got: 'seat ' + G.turn }; } });
+R('The first player is random: over 12 seeds both seats sometimes pick the first wonder.', function () {
+  var seen = {}; for (var s = 1; s <= 12; s++) seen[E.sideToAct(E.newGame({ seed: s }))] = 1; eq({ 0: 1, 1: 1 }, seen); });
+R('With seat 1 first, the draft order is 1,0,0 then 0,1,1 and seat 1 opens Age I.', function () {
+  var G = E.newGame({ seed: 3, first: 1 }), o = []; for (var i = 0; i < 6; i++) { o.push(E.sideToAct(G)); E.apply(G, E.validMoves(G)[0]); } eq([1, 0, 0, 0, 1, 1], o); eq(1, G.turn); });
 
 sect('B. Pyramid');
 R('Only uncovered cards can be taken: at the start of Age I exactly the 6 front-row cards are available.', function () { var G = fresh(7); eq([6, [4]], [E.available(G).length, [E.available(G)[0].r]]); });

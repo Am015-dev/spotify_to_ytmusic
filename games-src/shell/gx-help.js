@@ -7,7 +7,8 @@
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
   'use strict';
-  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '', lastTap = 0;
+  var QUIET = 750;   // a new coach bubble never opens within 750 ms of a tap: it waits until the player's hands are still (a bubble that pops up right after a tap looks like it ignored the tap)
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
@@ -34,13 +35,13 @@
   // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
   var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
   function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
-  function avoidRects(k) {
+  function avoidRects(k, snug) {
     var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
     var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
+      out.push(infl(core(r, k), snug ? 2 : (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }
@@ -84,7 +85,29 @@
       b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
       var cw = [350, 292, 236];
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
-      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
+      b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
+        var wt = [0, 236, 196, 164, -350, -292, -236, -196, -164];   // negative: the slim one-line version at that width
+        for (var wj = 0; wj < wt.length; wj++) {
+          var cw2 = Math.abs(wt[wj]); b.classList.toggle('gxh-compact', wt[wj] < 0); b.style.maxWidth = cw2 ? cw2 + 'px' : ''; b.dataset.gxhShrunk = '1';
+          var r4 = place(b, tr); if (r4.tapClear || r4.free) { delete b.dataset.gxhShrunk; return r4; }
+        }
+        b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      }
+      delete b.dataset.gxhShrunk;
+    }
+    var tapClear = false;
+    if (!best && cfg && cfg.tapFirst) {   // game opt-in: when nothing is fully free, keep every tappable target clear and let the bubble sit over plain text/board art
+      var avT = avoidRects(32, true), bt = null, bts = 1e9;
+      for (var xj = 0; xj < xs.length; xj++) for (var yy = top; yy <= bot - h; yy += 3) {
+        var cc = { left: xs[xj], top: yy, right: xs[xj] + w, bottom: yy + h };
+        if (hit(cc, T)) continue;
+        var ot = 0; for (var kk = 0; kk < avT.length; kk++) if (hit(cc, avT[kk])) ot += inter(cc, avT[kk]) || 1;
+        var ox = 0; for (var kx = 0; kx < txt.length; kx++) if (hit(cc, txt[kx])) ox += inter(cc, txt[kx]) || 1;
+        var sc = ot * 1e4 + ox * 4 + Math.abs(cc.left + w / 2 - tr.cx) * 0.5 + Math.abs(yy + h / 2 - tr.cy);
+        if (sc < bts) { bts = sc; bt = cc; bt.ot = ot; }
+      }
+      if (bt) { tapClear = !bt.ot; soft = bt; }
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -97,7 +120,7 @@
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
-    c2.free = !!best;
+    c2.free = !!best; c2.tapClear = tapClear;
     return c2;
   }
   function ringAt(r, cls) {
@@ -123,15 +146,16 @@
   function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
   function hide() {
     if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
-    cur = null; D.removeEventListener('pointerdown', onDown, true);
+    cur = null;
   }
-  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
   function onDown(e) {
+    lastTap = Date.now();
+    if (pend) defer();   // a bubble waiting to open must not pop up under the finger that just tapped
     if (rulesEl || !cur) return;
     var t = e.target;
     if (t && t.closest) {
       if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
-      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+      if (bulbEl && bulbEl.contains(t)) skipUntil = Date.now() + 450;   // a tap on the bulb while any help is open only closes that help (no second bubble opens under the same tap)
     }
     hide();   // the tap is not swallowed: it still reaches whatever was tapped
   }
@@ -147,11 +171,14 @@
   }
   // ------------------------------------------------------------------ coach bubbles
   function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function quietLeft() { return Math.max(0, lastTap + QUIET - Date.now()); }
+  function defer() { var id = pend.id, n = pend.n || 0; clearTimeout(pend.t); pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; }
   function tryShow(id, n) {
     pend = null;
-    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur || rulesEl) return;
+    if (quietLeft() > 0) { pend = { id: id, n: n, t: setTimeout(function () { tryShow(id, n); }, quietLeft() + 20) }; return; }
     var tr = toRect(step.target);
-    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    if (!tr) { if (n < 8) { pend = { id: id, n: n + 1, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
     st.seen[id] = 1; save(); shown.push(id);
     cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
       var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
@@ -159,12 +186,12 @@
       b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
       return b;
     } };
-    draw(); arm();
+    draw();
   }
   function phase(id) {
     if (!cfg) return;
     if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
-    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); /* and fall through: the new phase's bubble is queued now, not at the next call */ else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
     if (pend) { if (pend.id === id) return; cancelPend(); }
     if (!st.on || st.seen[id] || !cfg.steps[id]) return;
     pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
@@ -185,7 +212,7 @@
       return b;
     } };
     if (bulbEl) bulbEl.classList.add('lit');
-    draw(); arm();
+    draw();
   }
   function bulb(o) {
     if (!cfg) return; bulbOpts = o || {};
@@ -248,7 +275,7 @@
   function init(o) {
     cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
     if (wired) return GXH; wired = true;
-    D.addEventListener('click', onClick, true);
+    D.addEventListener('click', onClick, true); D.addEventListener('pointerdown', onDown, true);
     if (window.GXV) GXV.watch(relayout);
     else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
     return GXH;

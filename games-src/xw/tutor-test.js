@@ -15,15 +15,15 @@ async function run(b,W,H,skipMode,story){const tag=W+'x'+H+(skipMode?' skip':'')
   const tap=(x,y)=>mob?p.touchscreen.tap(x,y):p.mouse.click(x,y);
   const find=sel=>p.evaluate(sel=>{for(const e of document.querySelectorAll(sel)){const r=e.getBoundingClientRect();if(r.width<4||r.height<4||getComputedStyle(e).visibility==='hidden')continue;const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const t=document.elementFromPoint(x,y);if(t&&(t===e||e.contains(t)))return [x,y]}return null},sel);
   let c=await find(story?'[data-a=story]':'#modal .dlg.start [data-gxt-open]');if(!c){note(tag,'no lesson button');await ctx.close();return}await tap(c[0],c[1]);await sleep(1000);
-  // forced step 1 and 2: tap the spotlight centre (any legal maneuver for step 2)
-  for(let k=0;k<2;k++){let st;for(let t=0;t<60;t++){st=await p.evaluate(()=>GXT.state());if(st.shown)break;await sleep(100)}
+  // forced steps (goal card, ship, the scripted maneuver): Next on the card, else tap the spotlight centre
+  for(let k=0;k<8;k++){if(await find('[data-gxt-end=free]'))break;let st;for(let t=0;t<60;t++){st=await p.evaluate(()=>GXT.state());if(st.shown)break;await sleep(100)}
     if(!st.shown){note(tag,'forced step '+k+' never shown');break}
-    if(skipMode&&k===1){const sk=await find('.gxt-skip');if(!sk){note(tag,'no Skip');break}await tap(sk[0],sk[1]);await sleep(600);
+    if(skipMode&&k>=1){const sk=await find('.gxt-skip');if(!sk){note(tag,'no Skip');break}await tap(sk[0],sk[1]);await sleep(600);
       const o=await p.evaluate(()=>({run:GXT.running(),start:!!document.querySelector('#modal .dlg.start')}));if(o.run||!o.start)note(tag,'Skip did not return to the title');await ctx.close();return}
-    for(let tries=0;tries<5;tries++){const i0=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);const el=await p.evaluate(()=>{const s=GXT.state();return s.hole?[s.hole.cx,s.hole.cy]:null});if(!el){await sleep(300);continue}await tap(el[0],el[1]);await sleep(700);const i1=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);if(i1!==i0||!(await p.evaluate(()=>GXT.running())))break}}
+    for(let tries=0;tries<5;tries++){const i0=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);const nx=await find('.gxt-bub .gxt-next');if(nx){await tap(nx[0],nx[1]);await sleep(700);break}const el=await p.evaluate(()=>{const cur=GXT.current&&GXT.current();try{const tg=cur&&cur.target&&cur.target();const r=tg&&tg.getBoundingClientRect?tg.getBoundingClientRect():tg;if(r&&r.width)return [r.left+r.width/2,r.top+r.height/2]}catch(e){}const s=GXT.state();return s.hole?[s.hole.cx,s.hole.cy]:null});if(!el){await sleep(300);continue}await tap(el[0],el[1]);await sleep(700);const i1=await p.evaluate(()=>GXT.state().i+'|'+GXT.state().phase);if(i1!==i0||!(await p.evaluate(()=>GXT.running())))break}}
   // the interstitial card
   let ok=false;for(let t=0;t<40;t++){const e=await find('[data-gxt-end=free]');if(e){await tap(e[0],e[1]);ok=true;break}await sleep(150)}
-  if(!ok){note(tag,'no "Fly free" card after the forced steps');await ctx.close();return}await sleep(700);
+  if(!ok){note(tag,'no "Fly free" card after the forced steps '+JSON.stringify(await p.evaluate(()=>({st:GXT.state(),id:GXT.current&&GXT.current()&&GXT.current().id,draft:UI.draft,sel:BF.sel}))));await ctx.close();return}await sleep(700);
   await p.evaluate(()=>{AIDELAY=150});
   const bubbles=new Set();let over=false,lastSig='',lastT=Date.now(),maxVis=0;
   for(let i=0;i<4000;i++){
@@ -32,7 +32,8 @@ async function run(b,W,H,skipMode,story){const tag=W+'x'+H+(skipMode?' skip':'')
     st.shown.forEach(x=>bubbles.add(x));maxVis=Math.max(maxVis,st.vis);if(!st.w)note(tag,'coach bubble outside the screen');
     if(st.end){over=true;break}
     const sig=JSON.stringify([st.ph,st.r,st.h,st.shown.length]);if(sig!==lastSig){lastSig=sig;lastT=Date.now()}else if(Date.now()-lastT>20000){note(tag,'stuck '+sig);await p.screenshot({path:'/tmp/claude-0/s/coach-stuck-'+W+'.png'});break}
-    let done=false;for(const sel of SEL){const q=await find(sel);if(q){await tap(q[0],q[1]);done=true;await sleep(120);break}}
+    let done=false;{const f=await p.evaluate(()=>{const e=BF.fing;if(!e||!document.body.contains(e)||!e.offsetParent)return null;const r=e.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});if(f){await tap(f[0],f[1]);done=true;await sleep(120)}}
+    if(!done)for(const sel of SEL){const q=await find(sel);if(q){await tap(q[0],q[1]);done=true;await sleep(120);break}}
     if(!done)await sleep(250)}
   if(!over){note(tag,'no end card');await ctx.close();return}
   await sleep(400);

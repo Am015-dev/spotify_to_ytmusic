@@ -7,7 +7,7 @@ Our names: current tile (wake tile), leviathan (monster), deck cannon, rift gate
 - 1 board; 56 wake tiles; 10 leviathan tiles; 8 ships (one colour each); 2 dice (1 gold, 1 blue). 2-8 players, 20-40 min.
 - Wake tile: 4 wake lines linking 8 edge points (2 per side); lines may cross, movement follows a single line.
 - Board: gold numbers 1-6 along top, blue numbers 1-6 along left side (dice coordinates). Short white start marks on the outside edge.
-- Board grid size: CONFLICT. One source says 7x7 (49 squares), another 8x8 (6x6 sub-board usable for the classic base game), dice only reach 1-6 ("some spaces monsters cannot appear"). UNRESOLVED; see guessed section.
+- Board grid size: 7x7 [RESOLVED 8 Nov 2026, now used by the game]. The rulebook text (rulespal / retailer PDF text, read 8 Nov 2026) never states the size; it says only: "Lay out the game board", "Find the result of the gold die roll in the gold numbers along the top of the game board", "the blue numbers along the left side of game board", "Locate the square at the intersection of these two numbers and place a [monster] tile face down in that square", and "any of the start marks (short white marks) on the outside edge of the game board". The size comes from published descriptions, all agreeing: Wikipedia (the original 6x6 game's article): "the board is also slightly larger, 7x7 instead of 6x6" for this sequel; a review: "49 squares in a 7 x 7 grid, compared with the original's 36"; a retailer listing: "played on a 7x7 grid". A long review adds: "some spaces where they can't appear at all" and "You can sail around the edges of the board and avoid [monster] spawning ground", which fits 1-6 dice on a 7-wide grid. The earlier "8x8" came from a forum comment about a hypothetical board. Exactly which column/row lacks a number is not given in any text we found. DESIGN CHOICE: numbers 1-6 sit over columns/rows 1-6, so column 7 and row 7 are never rolled (gold frame on the chart).
 
 ## Setup [CONFIRMED]
 - Each player picks a ship; shuffle wake tiles; deal 3 face down to each (hand 3); rest = draw pile.
@@ -51,7 +51,7 @@ Requires the base game; all rules optional by agreement; each piece can be used 
 ## Confirmed vs guessed
 CONFIRMED: component counts above, setup counts, turn order, all leviathan and elimination rules, expansion contents and rules.
 UNVERIFIED / GUESSED (official PDF and the catalogue page blocked by captcha/403; publisher pages blocked):
-- Board squares: 7x7 vs 8x8 vs 6x6 numbered. Suggest 6x6 playable field with dice 1-6 coordinates and start marks on edge (matches the dice and the classic base game); open question.
+- Board squares: RESOLVED, 7x7 (see Components). Dice numbers 1-6 over columns/rows 1-6 (our choice of which edge lacks a number).
 - Exact multiset of the 56 wake tiles: 35 distinct tiles known (every matching of 8 ports), 21 duplicates unknown. See tiles.json.
 - Per-leviathan arrow layouts, rotation numbers 1-10 and which tiles carry gold arrows: not found. Design our own.
 - Rogue Wave "gold 4/blue" arrow geometry text is ambiguous; implement as described (row perpendicular to travel direction).

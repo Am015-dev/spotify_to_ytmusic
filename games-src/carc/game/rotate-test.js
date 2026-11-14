@@ -16,7 +16,7 @@ const STATE = () => { const bd = document.querySelector('#board').getBoundingCli
   for (const [W, H] of [[390, 763], [375, 553]]) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA }), p = await ctx.newPage(), errs = [];
     p.on('pageerror', e => errs.push(e.message)); await p.goto(URL); await sleep(300);
-    await p.evaluate(() => { UI.speed = 30; UI.first = false; }); await p.tap('[data-a=play]'); await sleep(500);
+    await p.evaluate(() => { UI.speed = 30; UI.first = false; }); await p.tap('[data-a=play]'); await sleep(500); for (let k = 0; k < 4; k++) { const d = await p.$('#modal [data-a=go]:visible, #goalok:visible'); if (!d) break; await d.tap(); await sleep(400); }   // the 'New here?' prompt and the Goal card come first since Addendum 7
     const act = async tag => { // make one move with a real tap
       for (let i = 0; i < 80; i++) { const s = await p.evaluate(STATE); if (s.tw || !s.mine) { await sleep(100); continue; } const t = s.spots[0] || s.skip; if (!t) { await sleep(150); continue; } await p.touchscreen.tap(t.x, t.y); await sleep(250); return true; }
       fail(W + 'x' + H, tag, 'no tappable target'); return false; };

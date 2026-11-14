@@ -1647,7 +1647,7 @@
    },
    "engines2": {
     "title": "The last thrust",
-    "say": "Speed is your {d3} plus {rival}'s {en1}. It must stay within the brakes: {brake}."
+    "say": "Speed is your {d3} plus {rival}'s {en1}. It must be below the brakes: {brake}."
    },
    "landed": {
     "title": "Down and stopped",
@@ -1687,7 +1687,7 @@
    "coffee": "Coffee earns a token. A token nudges a die by one.",
    "reroll": "A reroll token lets both of us roll again.",
    "rounds": "We drop 1000 ft each round. Reach the airport first.",
-   "final": "Landing round: speed must not beat the brakes."
+   "final": "Landing round: speed must be below the brakes."
   },
   "later": [
    "Traffic die: some airports add planes (chapter 7).",

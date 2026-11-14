@@ -42,6 +42,14 @@ research repository (`final-approach-research/`), never here. Names, text and ar
   position), then collision (any plane token on that space loses), then you step. Stepping beyond the airport is an overshoot: loss. Advancing zero spaces is never checked.
   Arriving at the airport before the last round puts you in a holding pattern: every later engine result must advance 0.
   **Last round:** the plane does not move. Instead the speed must be no greater than the brake value, and the brake value must be at least 2.
+  **Timing (published rule, checked 8 Nov 2026):** the comparison happens WHEN THE SECOND ENGINE DIE IS PLACED. The rulebook says:
+  > "During the final round, when playing the second engine die, instead of comparing your speed with the Aerodynamics markers, compare it WITH YOUR BRAKES."
+  and in the final win conditions:
+  > "Your Speed is less than your Brakes when you placed your Engine dice."
+  So a brake placed after the second engine die does not help. The engine freezes the brake value at that moment (`G.landBrake`) and, if the speed is
+  above it (or no brake is set), the flight is lost at once (`afterEngines`). The other checks (planes, gear, flaps, axis) are still judged at the end
+  of the round. A speed EQUAL to the brake value still lands (the red marker sits just past the printed number), and with no brake set nothing lands.
+  Logic tests: logic-test.js "Timing:" rules (3); rules-test.js "final round: the speed is judged WHEN THE SECOND ENGINE DIE IS PLACED" and "a brake set BEFORE".
 - **Radio (optional).** Pilot 1 space, co-pilot 2 spaces, any value. Count that many spaces from the plane (value 1 = the space it stands on) and remove one plane token there if there is one (nothing happens otherwise).
 - **Landing gear (optional, Pilot).** Three spaces: values 1-2, 3-4, 5-6, any order. The first time a gear's light turns green the blue marker advances one. Using it again is allowed and does nothing.
 - **Flaps (optional, Co-pilot).** Four spaces: 1-2, 2-3, 4-5, 5-6, strictly in this order (a later one needs the earlier ones green). Each first deployment advances the orange marker one.

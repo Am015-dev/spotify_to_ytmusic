@@ -3,7 +3,7 @@
 // (the element at the centre of the target must be the target or inside it).   node tests/ui-play.js [phone|pc] [quick|story|all] [url]
 const { chromium } = require('playwright');
 const SIZE = process.argv[2] || 'phone', WHAT = process.argv[3] || 'all', URL = process.argv[4] || 'http://127.0.0.1:8765/perch-and-plume/';
-const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : { width: 390, height: 763 }, TOUCH = SIZE !== 'pc';
+const VP = SIZE === 'pc' ? { width: 1440, height: 860 } : { width: +(process.env.VPW || 390), height: +(process.env.VPH || 763) }, TOUCH = SIZE !== 'pc';   // VPW/VPH env: other phone sizes (390x844, 375x667)
 let fails = 0, covered = 0; const log = (ok, m) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + SIZE + ' ' + m); };
 async function tapEl(p, h) {
   const el = h.asElement ? h.asElement() : h; if (!el) return false;

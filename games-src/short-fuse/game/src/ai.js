@@ -13,7 +13,7 @@
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
 //   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Damper kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
-const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
+const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:160,noise:0,tools:1,think:2,ch:2,info:.12},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.hist.length);mix(K.ann.length);mix(K.q?K.q.opts?K.q.opts.length:1:0);mix(K.legal?K.legal.plain.length:0);mix(Math.round(K.clock));return h>>>0}
@@ -136,6 +136,13 @@ function targetInfo(K,Z){const out={};const S=Z.samples,n=S.length;if(n<20)retur
     const gs=Object.values(groups);if(gs.length<2)return;let post=0;for(const g of gs)post+=g.length/n*ent(g,h);out[st.i+':'+k]=Math.max(0,ent(all,h)-post)})}return out}
 function certainCheck(K,st,k,code,rnd,L){const M=buildModel(K,L.forget);const h=M.ref[st+':'+k];if(h==null)return true;let any=0;for(let t=0;t<M.T.length;t++)if(M.T[t].code===code){if(M.ok[h][t])any=1;M.ok[h][t]=0}
   if(!any)return true;const r=sampleDeals(M,3,rnd);return !r.exact}
+// can this crewmate wire be red? A red still in play fits its place in the sorted stand and its tokens (the deduction behind the
+// player's "!" hint, without sampling: it never calls a possible red safe)
+function canBeRed(Z,st,k){const M=Z.M;const key=st+':'+k;if(M.known[key]!=null)return M.known[key]===14;const h=M.ref[key];if(h==null)return false;
+  for(let t=0;t<M.T.length;t++)if(M.T[t].code===14&&M.ok[h][t])return true;return false}
+// ...and is there a whole deal that fits every clue with a red on it? (the real deduction; four searches before calling it safe)
+function redDeal(K,Z,st,k,rnd){if(!canBeRed(Z,st,k))return false;if(Z.M.known[st+':'+k]!=null)return true;
+  for(let i=0;i<4;i++){const M=buildModel(K,0);const h=M.ref[st+':'+k];for(let t=0;t<M.T.length;t++)if(M.T[t].code!==14)M.ok[h][t]=0;if(sampleDeals(M,1,rnd).exact)return true}return false}
 function pAt(Z,st,k,code){const key=st+':'+k;if(Z.M.known[key]!=null)return Z.M.known[key]===code?1:0;const h=Z.M.ref[key];return h==null?0:Z.P[h][code]}
 function pJoint(Z,cells,fn){if(!Z.samples.length)return 0;let n=0;for(const s of Z.samples){const vals=cells.map(([st,k])=>{const key=st+':'+k;return Z.M.known[key]!=null?Z.M.known[key]:s[Z.M.ref[key]]});if(fn(vals))n++}const p=n/Z.samples.length;return Z.exact?p:Math.min(p,.85)}
 // ---------- scoring helpers ----------
@@ -282,6 +289,13 @@ function mainDecision(K,rnd,L){const lg2=K.legal;const held=heldCounts(K);const 
     if(!certainCheck(K,m.st,m.ks[0],CODE(m.v),rnd,L)){c.p=.8;c.ev-=.2*mc+.4;cand.sort((a,b)=>b.ev-a.ev);i=-1}else break}
   let top=cand[0];if(AIDBG)AIDBG.cand=cand.slice(0,8).map(c=>({m:JSON.stringify(c.m),ev:+c.ev.toFixed(2),p:+c.p.toFixed(2)}));
   if(L.sloppy&&cand.length>1){const ok=cand.filter(c=>c.ev>top.ev-L.sloppy&&c.ev>-BOOM/2);top=ok[Math.floor(rnd()*ok.length)]||top}
+  // never point at a wire that might be red (the same check as the player's "!" hint, then proved with a real deal) while a move
+  // that cannot hit a red exists; when every option is risky, take the one least likely to go off
+  if(top&&!K.tfx.damper){const rc={};const red1=k=>{const key=m0+':'+k;return rc[key]!=null?rc[key]:(rc[key]=pAt(Z,+m0,k,14)>0||redDeal(K,Z,+m0,k,rnd))};let m0=0;
+    // a single wire goes off if red; a probe only if every wire it points at is red (job 13: if any is)
+    const risky=c=>{const m=c.m;if(m.st==null||!Array.isArray(m.ks)||!m.ks.length)return false;m0=m.st;return m.ks.length===1||K.rules.includes('redTriple')?m.ks.some(red1):m.ks.every(red1)};
+    if(risky(top)){const safe=cand.find(c=>c.ev>-BOOM/2&&!risky(c));
+      if(safe)top=safe}}
   // Damper before a risky dual cut; Sweep when nothing is safe; Coffee Break when every option is bad
   if(top&&top.m.a==='dual'&&top.p<.93&&!K.tfx.damper){const dm=pickEq('eq9');if(dm.length&&(F<=2||top.p<.7||(L.think>=2&&top.p<.85&&forcedJob(K))))return dm[0]}
   if(top&&top.p<.75&&top.m.a==='dual'&&!K.ann.some(a=>a.k==='sweep'&&a.turn===K.turn&&a.by===K.seat)){const sw=pickEq('eq8').concat(lg2.eq.filter(m=>m.a==='item'&&m.k==='sweep'));if(sw.length&&rnd()<L.tools)return bestSweep(K,Z,sw)}

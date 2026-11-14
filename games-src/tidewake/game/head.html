@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tidewake</title>
-<meta name="description" content="Tidewake: lantern-ship captains steer junks along wake currents on a haunted 6x6 sea, dodging leviathans. A tile-laying survival game for 1-8 players with computer captains, hot-seat and a guided first game.">
+<link rel="icon" type="image/png" sizes="32x32" href="../icons/favicon-32.png">
+<meta name="description" content="Tidewake: lantern-ship captains steer junks along wake currents on a haunted 7x7 sea, dodging leviathans. A tile-laying survival game for 1-8 players with computer captains, hot-seat and a guided first game.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /*SHELL_CSS*/
@@ -71,6 +72,8 @@ p{margin:4px 0 6px}
 .prompt.alert{background:#ffe9d6;border-color:var(--red)}
 .prompt.ask{background:#efe3ff;border-color:var(--viol)}
 .opts{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+#twswap{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;width:min(360px,calc(100vw - 24px));text-align:center}#twswap .swrow{display:flex;gap:8px;justify-content:center;margin:2px 0 6px}#twswap .hc{width:64px;height:64px;padding:2px}#twswap .hc img{width:100%;height:100%}#twswap .hc.sel{outline:3px solid #ffd76a;outline-offset:1px}#twswap .btn{min-height:44px}
+.rlrow{display:flex;gap:6px;align-items:flex-start;margin-top:6px}.rlrow>.btn{flex:0 0 auto}.rlmore{flex:1;min-width:0}.rlmore[open]{flex-basis:100%}.rlrow:has(.rlmore[open]){flex-wrap:wrap}.rlmore summary{list-style:none;cursor:pointer}.rlmore summary::-webkit-details-marker{display:none}.rlgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-top:6px;max-height:32vh;overflow:auto}.rlgrid .btn{min-height:44px;flex-direction:column;line-height:1.1;white-space:normal}.rlgrid small,.opts small{opacity:.9;font-size:14px}
 .opts .btn{justify-content:flex-start;text-align:left;white-space:normal;line-height:1.1}
 .qtimer{height:7px;border-radius:5px;background:rgba(20,35,43,.18);overflow:hidden;margin-top:5px}
 .qtimer i{display:block;height:100%;width:100%;background:var(--red)}
@@ -188,7 +191,12 @@ details.online:not([open])>#netblock{display:none}
 #ov .rtg.bad .ln{stroke:#ff3b2a}
 #ov .arg .out{stroke:#000;stroke-width:9;opacity:.6}#ov .arg .ln{stroke:#ff9ad0;stroke-width:5}#ov .arg .head{fill:#ff9ad0;stroke:#000;stroke-width:1.5}
 @keyframes dashf{to{stroke-dashoffset:-23}}
+html.ph .ps-line .sdet{min-width:44px;min-height:44px;margin-left:6px;padding:0 8px;border-radius:50%;font-style:italic;font-weight:800}.sdetx{margin-top:4px;font-size:14px;line-height:1.3;white-space:normal}
+#rtoast{position:fixed;left:50%;top:52px;translate:-50% -8px;z-index:40;pointer-events:none;opacity:0;transition:opacity .25s,translate .25s;background:#fff8e1;color:#10262d;border:2px solid #8a6a2a;border-radius:999px;padding:6px 14px;font:700 15px/1.2 var(--fb);white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.45)}#rtoast.on{opacity:1;translate:-50% 0}#rtoast.wake{background:#ffe1d6;border-color:#b0381e}
 #ov>div{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
+#ov .opip.pickable{pointer-events:auto;cursor:pointer;touch-action:manipulation}#ov .opip.pickable::after{content:'';position:absolute;left:50%;top:50%;width:18px;height:48px;margin:-24px 0 0 -9px}#ov .opip.pickable.pv::after{width:48px;height:18px;margin:-9px 0 0 -24px}
+/* the tap zone reaches inward only, so it never sits on the edge numbers outside the marks (gate: text not topmost) */
+#ov .opip.pickable.e-top::after{margin-top:-6px}#ov .opip.pickable.e-bottom::after{margin-top:-42px}#ov .opip.pickable.e-left::after{margin-left:-6px}#ov .opip.pickable.e-right::after{margin-left:-42px}
 .otag{font:700 .72rem/1 var(--fb);color:#fff;background:rgba(11,42,51,.86);border:1px solid rgba(255,226,140,.8);border-radius:8px;padding:2px 6px;margin:-4px 0 0 0;translate:-50% -100%;text-shadow:0 1px 1px #000;display:inline-flex;gap:4px;align-items:center}
 .otag i{width:9px;height:9px;border-radius:50%;border:1.5px solid #fff;display:inline-block}
 .otag.mon{background:rgba(70,20,110,.9);border-color:#e6c8ff}
@@ -212,7 +220,7 @@ details.online:not([open])>#netblock{display:none}
 .ostop.bad i{background:#ff3b2a;border-radius:50%;rotate:0deg;box-shadow:0 0 10px 3px rgba(255,59,42,.9)}
 .ostop span{position:relative;font:800 .72rem/1 var(--fb);color:#14232b;background:#ffd24a;border:1.5px solid #14232b;border-radius:7px;padding:2px 6px;margin-top:3px}
 .ostop.bad span{background:#ff3b2a;color:#fff}
-.ostart{margin:-3px 0 0 -3px}.ostart span{display:block;font:800 .62rem/1 var(--fb);background:#14232b;color:#ffd24a;border-radius:6px;padding:1px 4px;translate:-50% 4px}
+.ostart{margin:-3px 0 0 -3px}.ostart span{display:block;position:relative;font:800 max(13px,.8rem)/1 var(--fb);background:#14232b;color:#ffd24a;border-radius:6px;padding:1px 4px;translate:-50% 4px}
 /* dice, wake roll card */
 .mph{background:#f1e6ff;border:2px solid var(--viol);border-radius:12px;padding:6px 9px}
 .mph.wake{background:#ffe9d6;border-color:var(--red)}
@@ -308,6 +316,7 @@ html.ph .zoom svg.ico{stroke:#14232b}
 html.ph .btn,html.ph .btn.small,html.ph .gsw,html.ph .gx-x{min-height:44px}
 html.ph .gx-x{min-width:44px}
 /* landscape rail: tiles stacked on the left, controls on the right */
+@media (max-height:600px){html.ph-p #ps{gap:3px;padding:4px 8px}html.ph-p .ps-turn{padding:3px 9px;margin:0 0 2px}html.ph-p .ps-main{gap:6px}}
 html.ph-l .ps-main{flex-wrap:nowrap;align-items:flex-start;justify-content:flex-start}
 html.ph-l .ps-tiles{flex-direction:column;gap:7px}
 html.ph-l .pt{width:56px;height:56px}
@@ -361,7 +370,7 @@ html.ph .otag{display:none!important}
 html.ph .otag.ship.me{display:inline-flex!important}
 html.ph #ps>*{flex-shrink:0}
 @media (max-height:700px){html.ph-p .ph-t .mini,html.ph-p .ph-t svg.cardart{max-width:58px}html.ph-p .ph-t small{min-height:0}html.ph-p .ph-head{min-height:36px}html.ph-p .ph-tiles{gap:6px}}
-html.ph .bd.risk{background:#e3a21a;color:#14232b}html.ph .pt .bd.risk{background:#e3a21a;color:#14232b}
+html.ph .bd.risk{background:#e3a21a;color:#14232b}html.ph .bd.best{background:#f2c14e;color:#14232b;box-shadow:0 0 0 3px rgba(242,193,78,.45)}html.ph .pt .bd.bst{right:auto;top:auto;left:-5px;bottom:-6px;background:#f2c14e;color:#14232b}html.ph .pt .bd.risk{background:#e3a21a;color:#14232b}
 /* the bar now holds the Hint bulb as well: 6 buttons + the turn chip must fit a 375px phone */
 html.ph .gx-bar .gx-ibtn{min-width:40px;width:40px}html.ph .gx-bar{gap:3px}html.ph .chip{padding:2px 6px;gap:5px;min-width:0;max-width:100%;overflow:hidden}html.ph .chip .c2 small{font-size:.7rem}
 body:has(.gxc:not([hidden])) .gx-bar{visibility:hidden}
@@ -373,11 +382,11 @@ html.ph .ps-goal{margin:6px 4px 0;font:600 .86rem/1.3 var(--fb);color:#cfe9e4;te
 .chip .c2{display:flex;flex-direction:column;line-height:1.1}.chip .c2 small{font-size:.66rem;font-weight:600;opacity:.9;white-space:nowrap}
 .pb .lbl{font-size:.78rem;margin-left:2px}
 html.ph .opip b{display:none}
-html.ph .opip{width:12px;height:12px;margin:-6px 0 0 -6px;border-width:2px;box-shadow:0 0 0 2px rgba(255,210,74,.5),0 0 5px 1px rgba(255,210,74,.8)}
+html.ph .opip{width:18px;height:18px;margin:-9px 0 0 -9px;border-width:2px;box-shadow:0 0 0 2px rgba(255,210,74,.5),0 0 5px 1px rgba(255,210,74,.8)}
 html.ph .opip.best{width:20px;height:20px;margin:-10px 0 0 -10px;box-shadow:0 0 0 3px rgba(126,240,160,.6),0 0 8px 2px rgba(126,240,160,.9)}
 html.ph .opip u{display:none}
 html.ph .oring{width:52px;height:52px;margin:-26px 0 0 -26px}
-html.ph .ostop span,html.ph .ostart span{font-size:.62rem}
+html.ph .ostop span,html.ph .ostart span{font-size:max(13px,.8rem)}
 html.ph .omark span{display:none}
 html.ph .omark{margin:-13px 0 0 -13px}
 html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}

@@ -7,7 +7,7 @@ const LORE={
   chapters:{goal:{n:1,t:'Empty Throne'},lift:{n:2,t:'First Walk'},advisors:{n:3,t:'Rival Moves'},score:{n:4,t:'The Count'}},
   tut:{
     goal:{say:'Most points wins the throne. Almost everything you own scores.'},
-    tribes:{say:'Five tribes, three per tile. Each colour does something different.',react:'Farid grins. "I get the first walk!"'},
+    tribes:{say:'The tribes, three per tile. Each colour does something different.',react:'Farid grins. "I get the first walk!"'},
     bid1:{say:'Pricey spots play first. Take the 5-coin spot.',react:'Five coins down. Bold, child.'},
     bid2:{say:'You have two markers. Put the second on a free spot.',react:'A thrifty second caravan.'},
     order:{say:'Play order: Farid, you, Farid, you. Watch Farid go first.'},
@@ -35,7 +35,9 @@ const LORE={
   endStory:'Hadiya smiles: "Bid, walk, take a tribe, claim land, sell goods. Now the real caravans come."',
   quickIntro:'Collect tribes, claim land, and score the most points.',
   win:['The bazaar sings your name. The throne of Qamar is yours!','Your camels hold the best land. Qamar bows to you.'],
-  lose:['Your rival won this time. Want to try again?','So close! Want another game?'],
+  lose:['Your rival won this time. Want to try again?','Another try? Every game teaches something.'],
+  loseClose:['So close! Just a few points short. Another game?','A hair\'s breadth! One better walk and it was yours.'],
+  loseFar:['The rival ran away with this one. Try grabbing more land and selling goods in sets.','A tough game. Next time aim for big Advisor and Sage hauls and full goods sets.'],
   turn:{you:'Your turn',bid:'Bid for turn order'}
 };
 // ---- the coached first game: Hadiya explains each rule when it first matters (coach.js decides when; ids = TUTORIAL-COVERAGE.md) ----
@@ -45,7 +47,7 @@ LORE.coach={
   bid:{say:'Pick a spot. Dearer spots play first, but coins are points.',later:'Bid for turn order: dearer plays first, coins are points.'},
   markers:{say:'Place your second marker. A tie goes to the later bidder.',later:'Two markers each. Same price: later bidder plays first.'},
   order:{say:o=>'Play order: '+o+'. Dearest spot goes first.',later:'Turn order follows the track, dearest first.'},
-  tribes:{say:'Five tribes, three people per tile. Each colour has its own gift.',later:'Five tribes, three per tile, each with its own gift.'},
+  tribes:{say:'The tribes, three people per tile. Each colour has its own gift.',later:'The tribes, three per tile, each with its own gift.'},
   lift:{say:'Tap a glowing tile to pick up everyone on it.',later:'A move picks up everyone from one tile.'},
   drop:{say:'Drop one person per tile. Never go straight back.',later:'Drop one person per tile, never straight back.'},
   lastcolour:{say:'Your last person must land on their own colour.',later:'The last person must land on their own colour.'},

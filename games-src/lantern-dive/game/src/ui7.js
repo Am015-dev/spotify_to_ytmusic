@@ -92,9 +92,10 @@ function pxFace(id, w) {
   const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
   const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
   const fi = PX.img['face' + s], dk = lan || (fi && (s === 0 || s === 3));   // painted card frame (media/card-face-*.webp), cropped inside its ragged paper edge; coral and sunstar are dark scenes so their numerals go light
-  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
+  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); if (!lan) { x.globalCompositeOperation = 'color'; x.globalAlpha = .62; x.fillStyle = su.c; x.fillRect(0, 0, w, H); x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1; const fb = Math.max(2.5, w * .065); rr(bw / 2 + fb / 2, bw / 2 + fb / 2, w - bw - fb, H - bw - fb, rad * .8); x.lineWidth = fb; x.strokeStyle = su.c; x.stroke(); } x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
   else {
-    const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
+    const g = x.createLinearGradient(0, 0, w, H); const TINT = [['#fde3e9', '#f2b3c2'], ['#e3eefc', '#b7cff2'], ['#e2f4e7', '#b4ddc0'], ['#fff4c8', '#f3d36e']][s] || ['#fffaf0', '#e9dfc2'];   // R5: same per-colour paper as the kit's cards
+    g.addColorStop(0, lan ? '#16336b' : TINT[0]); g.addColorStop(1, lan ? '#0a1730' : TINT[1]);
     rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
     rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
     if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
@@ -106,9 +107,17 @@ function pxFace(id, w) {
   if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
   const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
-    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = dk ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : dk ? ['#ffc9d6', '#cfe2ff', '#c9f0d6', '#ffd873'][s] : su.dk; x.fillText(String(v), w * .15, w * .36);
     if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
   corner(false);
+  if (!lan) {   // R5: each colour's own shape at the foot (circle, triangle, diamond, star): Coral and Sunstar never look alike, colour-blind included
+    const cx = w / 2, cy = H * .855, R = w * .13; x.beginPath();
+    if (s === 0) x.arc(cx, cy, R * .9, 0, 7);
+    else if (s === 1) { x.moveTo(cx, cy - R); x.lineTo(cx + R * 1.1, cy + R * .85); x.lineTo(cx - R * 1.1, cy + R * .85); x.closePath(); }
+    else if (s === 2) { x.moveTo(cx, cy - R * 1.1); x.lineTo(cx + R, cy); x.lineTo(cx, cy + R * 1.1); x.lineTo(cx - R, cy); x.closePath(); }
+    else { for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? R * .48 : R * 1.15; i ? x.lineTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q) : x.moveTo(cx + Math.cos(a) * q, cy + Math.sin(a) * q); } x.closePath(); }
+    x.fillStyle = su.c; x.fill(); x.lineJoin = 'round'; x.lineWidth = Math.max(1, w * .022); x.strokeStyle = fi ? '#fff' : su.dk; x.stroke();
+  }
   const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
 }
 function pxBack(w) {
@@ -135,11 +144,13 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
-  if (PADIMG && R.w <= 760 && R.h <= 520) pxPad(R); else {
+  const tp = document.querySelector('#tpad'), TR = tp && !tp.hidden && PX.B ? pxRect(tp, PX.B) : null, padTR = !!(PADIMG && TR && TR.w > 40);   // G4: the pad sits under the trick
+  if (PADIMG && !padTR && R.w <= 760 && R.h <= 520) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
   }
-  if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
+  if (padTR) { pxPad({ x: TR.x - 4, y: TR.y - 2, w: TR.w + 8, h: TR.h + 4 }); try { const L = PX.L.felt, mi = L.getChildIndex(PX.mat); if (L.getChildIndex(PX.padS) < mi) L.setChildIndex(PX.padS, mi); } catch (e) { } }
+  else if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;
@@ -179,7 +190,7 @@ function pxSync() {
     if (fresh) {
       if (isTrick) {
         const sr = o.seatOf >= 0 ? pxSeatRect(o.seatOf, B) : null;
-        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 500, 'out'); } else { o.x = R.x; o.y = R.y; o.w = R.w; }
+        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .25; o.y = sr.y + sr.h / 2 - R.w * .35; o.w = R.w * .5; o.a = .95; PX.nPlay++; pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 300, 'out'); }   // R5: the card is visible all the way from the seat (was a 0-alpha fade that read as a pop) else { o.x = R.x; o.y = R.y; o.w = R.w; }
       } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 32; o.rot = -.4 + hi * .06; o.flip = 1; o.flipUntil = now + 1100 + hi * 40; }
       else { o.x = R.x; o.y = R.y; o.w = R.w; }
     }

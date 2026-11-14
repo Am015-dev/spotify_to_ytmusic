@@ -28,6 +28,8 @@ function aiYield(q,lost){
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
+// Easy (the newcomer default): flips some keeps, stops rolling early, often skips the shop
+var EZROLL=1,EZFLIP=.4,EZSKIP=.6;
 var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
 // chance that q is knocked out before its next turn if it stays in the city
 function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inCity(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
@@ -72,7 +74,7 @@ function aiMark(p){
 function curseBad(p){return exOn('curse')&&['k_ego','k_sand','k_hotep','k_set','k_build','k_ra','k_horus','k_false','k_sphinx','k_scribe','k_flood'].includes(G.curse)}
 function aiMarkLvl(p){if(p.lvl==='hard'||p.lvl==='hard0'){const sp=G.dice.filter(d=>d.t);const nd=G.dice.length-sp.length;
     if(sp.length||nd>7){const all=G.dice;sp.forEach(d=>{d.k=d.t==='b'?d.f!=='O':(d.f==='FA'||d.f==='FW'||(d.f==='FE'&&curseBad(p)))});G.dice=all.filter(d=>!d.t);
-      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
+      try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<EZFLIP)d.k=!d.k})}}
 var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
 function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inCity(p.i);
   const need=winAt(p)-p.vp;const others=alive().filter(q=>q.i!==p.i);const lead=others.reduce((a,q)=>q.vp>a.vp?q:a,{vp:-1});
@@ -135,7 +137,7 @@ function aiRollStep(p){
   if(!G.aiMarked){aiMarkLvl(p);G.dice.forEach(d=>{if(noReroll(d))d.k=true});G.aiMarked=true;refresh();return}
   G.aiMarked=false;
   const free=G.dice.filter(d=>!d.k&&!noReroll(d)).length;
-  if(free&&G.rolls>0){doReroll('roll');return}
+  if(free&&G.rolls>0&&!(p.lvl==='easy'&&G.rolls<=EZROLL)){doReroll('roll');return}
   if(free>=2&&p.cult>0&&!G.tf.uses.cr&&p.lvl!=='easy'){G.tf.uses.cr=1;useCult(p,'r');return}
   if(free>=2&&has(p,'smoke')&&p.tok.smoke>0){doReroll('smoke');return}
   if(free>=2&&has(p,'mind')&&p.en>=4){doReroll('mind');return}
@@ -221,6 +223,7 @@ function aiBuyStep(p){const U=G.tf.uses;
   if(has(p,'lab')&&!U.lab&&G.deck.length){labPeek(p);return}
   if(hasE(p,12)&&!U.catch&&G.disc.length){luckyScoop(p);return}
   if(has(p,'para')&&!U.paraAI){U.paraAI=1;if(paraList(p).some(x=>cardValue(p,x.id)>1)){paraBuy(p);return}}
+  if(p.lvl==='easy'&&Math.random()<EZSKIP){endTurn();return}
   let best=-1,bv=(p.lvl==='hard'||p.lvl==='hard0')?-0.2:-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id)+(p.lvl==='easy'?Math.random()*6-3:0);if(v>bv){bv=v;best=k}});
   if(best>=0){buy(best);return}
   const maxv=Math.max(-99,...G.market.map(id=>cardValue(p,id)));

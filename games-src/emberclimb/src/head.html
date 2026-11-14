@@ -395,4 +395,252 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 @media (min-width:1024px){.w4num i,.w4pv i,.w4inc,.w4ntag,.w4vt{font-size:16px}.w4pv b{font-size:26px}.w4hb,.w4hbf{font-size:16px}.w4rate{font-size:18px}.w4bt p{font-size:20px}}
 @media (prefers-reduced-motion:reduce){.intent.w4atk,.intent.w4danger,#stage.w4quake,.w4impact,.picks .card.w4rw.rare::after,.w4boss,.w4boss .w4bimg.zoom{animation:none!important}}
 /* end W420 juice */
+
+/* ===== W485 stage layout (phone, body.ec-stage; ?stage=0 turns it off) ===== */
+html body.ec-stage:not(.learn):not(.hints-on) .gx-dock,html body.ec-stage:not(.learn):not(.hints-on) .gx-reopen{display:none!important}
+html body.ec-stage #stage{--hh:172px}
+html body.ec-stage #stage>.ctl{display:none}
+.w485top{position:relative;z-index:9;display:flex;align-items:center;gap:6px;padding:4px 8px;min-height:44px;background:linear-gradient(rgba(10,7,5,.92),rgba(10,7,5,.55));border-bottom:1px solid rgba(201,162,39,.35);flex:none}
+.w485rel{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.w485r{width:44px;height:44px;flex:none;padding:0;border:1px solid rgba(201,162,39,.6);border-radius:50%;background:#1a120e;overflow:hidden}
+.w485r .art{width:100%;height:100%;border-radius:50%;background-size:cover}
+.w485none{font-size:13px;color:var(--mute);align-self:center}
+.w485fl{flex:none;font-size:13px;font-weight:700;color:#f5e9d8;background:rgba(0,0,0,.5);border-radius:999px;padding:3px 9px}
+html body .w485top .pots{gap:4px}html body .w485top .pot{width:44px;height:44px;padding:2px}
+.w8diff button{min-height:44px;padding:4px 12px}.w8dline{font-size:13px}
+@media (max-height:600px){#title .w8diff+.w8dline{margin-top:-4px}}
+@media (max-height:500px) and (orientation:landscape){#title .w8hint,#title .heroes+.refline:not(.w24note){display:none}}
+html body.ec-stage #stage .arena{position:relative;z-index:2;flex:1;min-height:0;display:flex;align-items:flex-end;gap:4px;padding:0 6px;margin-bottom:calc(var(--hh) + 72px)}
+html body.ec-stage #stage .arena::before{content:'';position:absolute;left:-10px;right:-10px;bottom:-30px;height:38%;background:radial-gradient(ellipse 70% 60% at 50% 70%,rgba(255,170,80,.16),transparent 70%),linear-gradient(transparent,rgba(8,5,3,.72) 55%);pointer-events:none;z-index:-1}
+html body.ec-stage #stage .hside{flex:0 0 42%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;min-width:0}
+html body.ec-stage #stage .hside:is([style*="--n:2"],[style*="--n: 2"]){flex-direction:row;align-items:flex-end}
+html body.ec-stage #stage .enemies{flex:1;display:flex;align-items:flex-end;justify-content:space-around;gap:2px;padding:0;min-height:0}
+html body.ec-stage #stage .en,html body.ec-stage #stage .hfig{position:relative;display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;max-width:200px!important;padding:0;border-radius:0;outline:none!important;background:none}
+html body.ec-stage #stage .hfig{max-width:175px!important;width:100%}
+html body.ec-stage #stage .en .art,html body.ec-stage #stage .w485fig .art{width:100%!important;aspect-ratio:1;border:none!important;border-radius:0!important;box-shadow:none!important;background-size:122%!important;background-position:50% 38%!important;-webkit-mask-image:radial-gradient(ellipse 50% 54% at 50% 46%,#000 58%,transparent 78%);mask-image:radial-gradient(ellipse 50% 54% at 50% 46%,#000 58%,transparent 78%);transition:filter .15s,transform .15s}
+html body.ec-stage #stage .w485fig{position:relative;width:100%}
+html body.ec-stage #stage .en .art::after,html body.ec-stage #stage .w485fig::after{content:''}
+html body.ec-stage #stage .en>.art,html body.ec-stage #stage .w485fig{filter:drop-shadow(0 10px 6px rgba(0,0,0,.6))}
+html body.ec-stage #stage .en::after,html body.ec-stage #stage .hfig::after{content:'';position:absolute;left:18%;right:18%;top:calc(var(--fy,0px) + 72%);height:12px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.55),transparent 70%);z-index:-1}
+html body.ec-stage #stage .hfig.act .w485fig{filter:drop-shadow(0 0 10px rgba(255,190,90,.65)) drop-shadow(0 10px 6px rgba(0,0,0,.6))}
+html body.ec-stage #stage .en.glow{animation:none}
+html body.ec-stage #stage .en.glow>.art{filter:drop-shadow(0 0 7px #ffd36a) drop-shadow(0 0 2px #ffd36a);animation:w485tg 1s infinite}
+@keyframes w485tg{50%{filter:drop-shadow(0 0 14px #ffb35c) drop-shadow(0 0 3px #ffd36a)}}
+html body.ec-stage #stage .en.w4drop{transform:none}
+html body.ec-stage #stage .en.w4drop>.art{filter:drop-shadow(0 0 16px #fff2a8) drop-shadow(0 0 4px #ffd36a) brightness(1.15)!important;transform:scale(1.06)}
+html body.ec-stage #stage .en.w4drop .bar{box-shadow:0 0 0 2px #ffd36a}
+html body.ec-stage #stage .en .nm,html body.ec-stage #stage .hfig .nm{font-size:13px!important;color:#e9d8bf;margin:0;line-height:1.15;text-shadow:0 1px 2px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;order:3}
+html body.ec-stage #stage .en .bar,html body.ec-stage #stage .hfig .bar{order:2;width:86%;height:18px;margin-top:-6px;overflow:visible;border:1px solid #000;border-radius:9px;background:#2a0d0d}
+html body.ec-stage #stage .bar i{border-radius:9px}
+html body.ec-stage #stage .bar b{font-size:13px!important;line-height:18px!important;font-weight:800}
+html body.ec-stage #stage .en>.art,html body.ec-stage #stage .w485fig{order:1}
+html body.ec-stage #stage .en .stc,html body.ec-stage #stage .hfig .stc{order:4;min-height:0}
+html body.ec-stage #stage .en .stc span,html body.ec-stage #stage .hfig .stc span{font-size:13px!important;padding:0 4px}
+html body.ec-stage #stage .w4inc,html body.ec-stage #stage .w4hb,html body.ec-stage #stage .w4pv,html body.ec-stage #stage .w485stance,html body.ec-stage #stage .orbs{order:5}
+html body.ec-stage #stage .en>.blkchip{display:none}
+html body.ec-stage #stage .spkchip{position:absolute;top:30%;right:0;z-index:4}
+.w485shield{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:30px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:linear-gradient(#5fa6ec,#2a62a8);clip-path:polygon(50% 0,100% 14%,100% 52%,50% 100%,0 52%,0 14%);text-shadow:0 1px 2px #000;z-index:3}
+html body.ec-stage #stage .intent{order:0;position:relative;z-index:4;background:none!important;border:none;padding:0;margin:0 0 -8px;min-height:34px;gap:2px;filter:drop-shadow(0 2px 2px #000)}
+html body.ec-stage #stage .intent>span{background:none!important;font-size:22px!important;font-weight:900;line-height:1;-webkit-text-stroke:1px #1a0a04;paint-order:stroke fill}
+html body.ec-stage #stage .intent.atk>span{color:#ff6a55!important}html body.ec-stage #stage .intent.def>span{color:#9fd0ff!important}html body.ec-stage #stage .intent.buf>span{color:#ffd36a!important}html body.ec-stage #stage .intent.deb>span{color:#d9a2ff!important}
+html body.ec-stage #stage .intent .art{width:30px!important;height:30px!important}
+html body.ec-stage #stage .w4inc{font-size:13px!important}
+html body.ec-stage #stage .w485stance{font-size:13px;font-weight:700;border-radius:999px;padding:0 8px;background:#000a}.w485stance.s-w{color:#ff8b7a}.w485stance.s-c{color:#8ec1ff}
+html body.ec-stage #stage .lunge{animation:w485lungeL .45s}html body.ec-stage #stage .hfig.lunge{animation:w485lungeR .45s}
+@keyframes w485lungeL{40%{transform:translateX(-34px) scale(1.05)}}@keyframes w485lungeR{40%{transform:translateX(34px) scale(1.05)}}
+html body.ec-stage #stage .w4impact>.art{filter:brightness(2.2) saturate(.3)}
+/* corners: energy orb + draw pile (left), discard + End turn (right) */
+html body.ec-stage #stage>.energy{position:absolute;z-index:9;left:8px;bottom:calc(var(--hh) + 4px);width:62px;height:62px;margin:0}
+html body.ec-stage #stage>.energy span{font-size:19px!important;font-weight:900;width:70%;height:70%}
+html body.ec-stage #stage>.energy .enl{display:none}
+.w485pile{position:absolute;z-index:9;bottom:calc(var(--hh) + 8px);width:46px;height:54px;padding:0;border:none;background:none;color:#fff}
+.w485pile.draw{left:78px}.w485pile.disc{right:132px}
+.w485pc{position:absolute;inset:0 6px 8px 0;border-radius:6px;border:2px solid #c9a227;background:linear-gradient(135deg,#5a2a16,#2a120a);box-shadow:4px 4px 0 -1px #3a1a0c,4px 4px 0 1px #c9a22788}
+.w485pile.disc .w485pc{background:linear-gradient(135deg,#283a5a,#121a2a);border-color:#7aa6d8;box-shadow:4px 4px 0 -1px #1a2433,4px 4px 0 1px #7aa6d888}
+.w485pile b{position:absolute;right:-2px;bottom:-2px;min-width:26px;height:26px;border-radius:13px;background:#140e0a;border:2px solid #c9a227;font-size:14px;font-weight:800;line-height:22px;text-align:center}
+.w485pile.disc b{border-color:#7aa6d8}
+html body.ec-stage #stage .w485end{position:absolute;z-index:9;right:8px;bottom:calc(var(--hh) + 10px);min-width:112px;min-height:48px;padding:0 14px;font-size:17px;font-weight:800;border-radius:12px}
+.w485wait{display:flex;align-items:center;justify-content:center;background:#2a1d16;color:var(--mute);border:1px solid var(--line)}
+/* the fanned hand */
+html body.ec-stage #stage .hand.fan{z-index:10!important;position:absolute;left:0;right:0;bottom:0;height:var(--hh);margin:0;padding:6px 4px 0;align-items:flex-start;justify-content:center;overflow:visible}
+html body.ec-stage #stage .hand.fan .card{height:calc(var(--cw)*1.5)!important;margin:0 calc(var(--cw)*-.15)!important;transform:translateY(var(--dy,0px)) rotate(var(--rot,0deg))!important;transform-origin:50% 130%;transition:transform .16s ease-out,box-shadow .16s;border-radius:9px;box-shadow:0 4px 10px rgba(0,0,0,.6)}
+html body.ec-stage #stage .hand.fan .card.ok{box-shadow:0 0 0 2px #7dff9a,0 0 12px #7dff9a99,0 4px 10px rgba(0,0,0,.6)}
+html body.ec-stage #stage .hand.fan .card.sel{transform:translate(var(--sx,0px),var(--sy,calc(var(--cw)*-1.05))) scale(1.32) rotate(0deg)!important;z-index:40!important;box-shadow:0 0 0 3px #ffd36a,0 0 22px #ffb35c,0 10px 26px #000}
+html body.ec-stage #stage .hand.fan .card .cart{height:calc(var(--cw)*.6)!important}
+html body.ec-stage #stage .hand.fan .card .cb{display:block!important;font-size:13px!important;line-height:1.12;padding:3px 5px;font-weight:700;color:#2a1a0e}
+html body.ec-stage #stage .hand.fan .card .cl:not(:first-child){display:none}
+html body.ec-stage #stage .hand.fan .card.sel .cl:not(:first-child){display:block}
+html body.ec-stage #stage .hand.fan .card .ck,html body.ec-stage #stage .hand.fan .card .cty{display:none!important}
+html body.ec-stage #stage .hand.fan .card .ct{font-size:13px!important;padding-left:calc(var(--cw)*.3);min-height:calc(var(--cw)*.24)}
+html body.ec-stage #stage .hand.fan .card .cx{width:30px;height:30px;font-size:17px!important;left:1px;top:1px;border:2px solid #2b1700;box-shadow:0 2px 4px #000;z-index:4}
+html body.ec-stage #stage .hand.fan .card .ct{padding-left:34px}
+html body.ec-stage #stage .w4ghost{transform-origin:50% 50%}
+/* map: tall scroll with clear room icons */
+html body.ec-stagemap #map{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+html body.ec-stagemap #map .w485mapin{position:relative;min-height:100%}
+html body.ec-stagemap #map .w485mapin>.bg{position:absolute;inset:0;background-size:cover;background-position:center top;background-repeat:repeat-y}
+
+html body.ec-stagemap #map{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+html body.ec-stagemap #map .w485mapin>.bg{background-size:cover!important;background-repeat:no-repeat!important}
+html body.ec-stagemap #map .w485mapin>.bg::after{content:'';position:absolute;inset:0;background:rgba(20,12,8,.35)}
+html body.ec-stagemap #map .node{width:54px;height:54px;margin:-27px 0 0 -27px;background:#efe0bf;border:3px solid #6b4a2e;box-shadow:0 3px 6px rgba(0,0,0,.6)}
+html body.ec-stagemap #map .node .art{opacity:.22;filter:sepia(1)}
+html body.ec-stagemap #map .node .w485ni{position:absolute;inset:11px;color:#3a2414;z-index:2}
+html body.ec-stagemap #map .node.t-e .w485ni{color:#9a1f1f}html body.ec-stagemap #map .node.t-r .w485ni{color:#c25a12}html body.ec-stagemap #map .node.t-s .w485ni{color:#1f5f8a}html body.ec-stagemap #map .node.t-t .w485ni{color:#8a6a10}html body.ec-stagemap #map .node.t-v .w485ni{color:#4a3a6a}html body.ec-stagemap #map .node.t-b .w485ni{color:#9a1f1f;inset:12px}
+html body.ec-stagemap #map .node.t-b{width:78px;height:78px;margin:-39px 0 0 -39px;border-color:#c9a227}
+html body.ec-stagemap #map .node.vis{opacity:.55;background:#a89878}
+html body.ec-stagemap #map .node.here{border-color:#fff;box-shadow:0 0 0 3px #f2872b,0 3px 6px #000}
+html body.ec-stagemap #map .node.glow{border-color:#f2872b;background:#fff4dc}
+html body.ec-stagemap #map .node:disabled:not(.vis):not(.here){opacity:.82}
+.w485nl{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-size:13px;font-weight:800;color:#fff4dc;background:rgba(20,10,4,.85);border-radius:999px;padding:1px 8px;white-space:nowrap;z-index:3}
+html body.ec-stagemap #map .w4ntag{display:none!important}
+
+.w485mapsp{height:56px}
+html body.ec-stagemap #map svg line{stroke:#f3e2bf;stroke-opacity:.75;stroke-width:3px}
+html body.ec-stagemap #map svg line[stroke="#f2872b"]{stroke:#ff9a3c;stroke-opacity:1;stroke-width:4px}
+
+body.ec-dragging .hand .card.sel{visibility:hidden}
+body.ec-dragging .hand.hassel .card:not(.sel){opacity:.7;filter:none}
+html body.ec-stage #stage .en.glow{filter:drop-shadow(0 0 8px #ffd36a);animation:w485tg 1s infinite}
+html body.ec-stage #stage .en.glow>.art{filter:none;animation:none}
+html body.ec-stage #stage .en.w4drop{filter:drop-shadow(0 0 14px #fff2a8) drop-shadow(0 0 4px #ffd36a) brightness(1.12)!important;animation:none}
+html body.ec-stage #stage .en.w4drop>.art{filter:none!important}
+html body.ec-stage #stage .stc span{white-space:nowrap}
+html body.ec-stage .w4num b{font-size:calc(var(--fs,26px)*1.75);-webkit-text-stroke:2px #2a0804;paint-order:stroke fill}
+
+/* W485 round 2: solid intent badge, bigger figures standing higher, arrow, played card, map legend */
+html body.ec-stage #stage .intent{background:rgba(14,8,4,.88)!important;border:2px solid currentColor!important;border-radius:999px;padding:2px 10px 2px 3px!important;margin:0 0 4px!important;min-height:38px!important;gap:3px;box-shadow:0 3px 8px rgba(0,0,0,.6);filter:none}
+html body.ec-stage #stage .intent.atk{color:#ff6a55!important}html body.ec-stage #stage .intent.def{color:#7fb8f5!important}html body.ec-stage #stage .intent.buf{color:#ffd36a!important}html body.ec-stage #stage .intent.deb{color:#d9a2ff!important}
+html body.ec-stage #stage .intent .art{width:28px!important;height:28px!important}
+html body.ec-stage #stage .intent .art .ph{color:inherit!important}
+html body.ec-stage #stage .intent>span{font-size:21px!important;-webkit-text-stroke:0;color:#fff4e6!important}
+html body.ec-stage #stage .arena{padding-bottom:34px}
+html body.ec-stage #stage .arena::before{height:62%;bottom:-20px;background:radial-gradient(ellipse 75% 45% at 50% 78%,rgba(255,170,80,.2),transparent 70%),linear-gradient(transparent,rgba(8,5,3,.55) 30%,rgba(8,5,3,.85))}
+html body.ec-stage #stage .hside{flex:0 0 44%}
+html body.ec-stage #stage .hfig{max-width:none!important}
+html body.ec-stage #stage .en{max-width:300px!important}
+html body.ec-stage #stage .en>.art,html body.ec-stage #stage .w485fig .art{width:136%!important;margin:0 -18%;max-width:none}
+html body.ec-stage #stage .enemies[style*="--n:2"] .en>.art{width:122%!important;margin:0 -11%}
+html body.ec-stage #stage .enemies[style*="--n:3"] .en>.art,html body.ec-stage #stage .enemies[style*="--n:4"] .en>.art{width:112%!important;margin:0 -6%}
+html body.ec-stage #stage .w485fig{display:flex;justify-content:center}
+html body.ec-stage #stage .en .bar,html body.ec-stage #stage .hfig .bar{margin-top:-12px}
+html body.ec-stage #stage .en .spkchip{top:40%}
+#w485arrow{position:fixed;inset:0;width:100vw;height:100vh;z-index:94;pointer-events:none;color:rgba(255,240,220,.9);filter:drop-shadow(0 2px 3px #000)}
+#w485arrow.hit{color:#ffd36a}
+.w485play{transform-origin:50% 50%;box-shadow:0 0 0 3px #ffd36a,0 0 30px #ffb35c,0 16px 40px #000!important}
+.w485play .cb{display:block!important;font-size:13px!important}.w485play .ck,.w485play .cty{display:none!important}
+.w485leg{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;flex:1 1 100%}
+.w485lgi{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:700;color:#f5e9d8}
+.w485lgi .w485ni{display:inline-block;width:18px;height:18px;border-radius:50%;background:#efe0bf;color:#3a2414;padding:2px}
+.w485lgi.t-e .w485ni{color:#9a1f1f}.w485lgi.t-r .w485ni{color:#c25a12}.w485lgi.t-s .w485ni{color:#1f5f8a}.w485lgi.t-t .w485ni{color:#8a6a10}.w485lgi.t-v .w485ni{color:#4a3a6a}
+.w485lgi svg{display:block;width:100%;height:100%}
+html body.ec-stagemap #dockact{flex-wrap:wrap!important;gap:6px 12px}
+/* W494: the guided tutorial has 30 steps, so on a phone the dot row would run under Skip: keep only the "n/30" count */
+@media (max-width:700px){.gxt-dots{display:none}.gxt-prog{min-width:0}}
+/* W494 polish: one dim layer around the spotlight (the shared kit's dim cells left 1px seams where their rounded edges meet); the cells
+   stay as invisible input blockers. Top bar: on narrow phones the three pills wrap to two rows so HP, gold and Act all show in full.
+   Shop preview card: the text box fits its text instead of a fixed tall area. */
+.gxt-cell{background:transparent!important;box-shadow:none!important}
+.gxt-ring:not(.soft)::before{content:'';position:absolute;inset:-3px;border-radius:inherit;box-shadow:0 0 0 200vmax var(--gxt-dim,rgba(8,4,10,.62));pointer-events:none}
+.gxt-ring:not(.soft){animation:ec-tpulse 1.6s ease-in-out infinite}@keyframes ec-tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@media (max-width:480px){#hud{flex-wrap:wrap;row-gap:2px;align-content:center;overflow:visible}#hud .chip{font-size:12.5px!important;line-height:1.1!important;padding:1px 6px!important;min-height:0!important}}
+.shopdet .card.big{height:auto!important;min-height:0!important}
+.shopdet .card.big .cb{min-height:0!important;height:auto!important;flex:0 0 auto!important;padding-bottom:8px}
+/* G3: short phones (375x667): figures shrink so the enemy intent badge always sits below the potion / relic bar */
+@media (max-height:760px){html body.ec-stage #stage .en .art,html body.ec-stage #stage .w485fig .art{max-width:max(110px,calc(100dvh - 500px))!important;margin-left:auto!important;margin-right:auto!important}}
+/* card names wrap only between words (no "Sweepin g"), shrinking instead */
+html body .card .ct{overflow-wrap:normal!important;word-break:normal!important;hyphens:manual}
+html body .card .cl.stb{color:#1f6b1f;font-weight:800}
+/* G3: the result screen scrolls, so the relic row is never under the sticky Play again / Title bar */
+html body .over.res{justify-content:flex-start!important;overflow-y:auto!important;min-height:0;max-height:100%}
+.ec-phase{position:fixed;left:50%;top:30%;transform:translateX(-50%);z-index:60;min-width:min(320px,90vw);padding:12px 18px;border-radius:14px;background:rgba(40,8,4,.94);border:2px solid #ff6a3d;color:#fff;text-align:center;box-shadow:0 0 30px rgba(255,90,40,.6);pointer-events:none;animation:ecph .35s ease-out}
+.ec-phase b{display:block;font-family:'Cinzel',Georgia,serif;font-size:28px;color:#ffb36a;letter-spacing:.08em}.ec-phase span{display:block;font-size:16px;margin-top:4px}
+@keyframes ecph{from{transform:translateX(-50%) scale(.6);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+.ec-potpop{position:fixed;left:50%;top:112px;transform:translateX(-50%);z-index:55;width:min(340px,calc(100vw - 32px));padding:12px 14px;border-radius:14px;background:rgba(20,14,10,.97);border:2px solid var(--ember2,#f2872b);color:#f5e9d8;box-shadow:0 8px 24px rgba(0,0,0,.7)}
+.ec-potpop b{display:block;font-size:18px}.ec-potpop>span{display:block;font-size:16px;margin:4px 0 10px}.ec-potpop .row{display:flex;flex-wrap:wrap;gap:8px}.ec-potpop .btn{min-height:44px;min-width:44px;font-size:16px;padding:8px 14px}.ec-potpop .potnote{font-size:15px;align-self:center;flex:1 0 100%}
+html body .pot.sel{outline:3px solid #fff;outline-offset:1px}
+/* G3 r2: upgrade preview (before -> after, then confirm) */
+.ec-upv{position:sticky;top:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:8px 0 10px;background:rgba(14,10,8,.96);border-bottom:1px solid rgba(201,162,39,.35)}
+.ec-upv .card{--cw:clamp(96px,28vw,150px)}.ec-upv .arr{font-size:28px;color:var(--ember2,#f2872b);font-weight:900}.ec-upv .btn{flex:1 0 100%;max-width:320px;min-height:48px}.ec-upv .sub{font-size:16px}
+.ov .grid .card.sel{outline:3px solid #fff;outline-offset:2px}
+/* G3 r2: readable shop tiles: picture, name, type, what it does, price; 2 columns on phones, every tile well over 44px */
+html body .reward .items:has(.shoptile){display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;width:100%;max-width:640px}
+html body .item.shoptile{display:grid!important;grid-template-columns:52px 1fr;grid-template-rows:auto auto 1fr auto;column-gap:8px;row-gap:1px;align-items:start;text-align:left;min-height:96px;width:auto!important;height:auto!important;padding:8px!important}
+html body .item.shoptile>.art{grid-row:1/5;width:52px!important;height:52px!important;align-self:center}
+html body .item.shoptile .stn{font-size:15px!important;line-height:1.15;color:#f5e9d8}html body .item.shoptile .sty{font-size:13px!important;font-style:normal;color:#c9a227}
+html body .item.shoptile .sds{font-size:14px!important;line-height:1.2;color:#e6d6bd;white-space:normal}html body .item.shoptile .price{font-size:15px!important;font-weight:800;color:#ffd36a;justify-self:start}
+html body .item.shoptile.poor .price{color:#ff8a7a}
+/* G3 r2: 44px tap targets: relic and potion buttons, intent badge */
+html body .w485top{min-height:52px}html body .w485top .w485r,html body .w485top .pot,html body .pots .pot{width:44px!important;height:44px!important;min-width:44px;min-height:44px}
+html body.ec-stage #stage .intent{min-height:44px!important}
+html body .ov .grid{align-items:start;grid-auto-rows:max-content;display:grid!important;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));justify-items:center;gap:8px}html body .ov .grid .card{--cw:104px}html body .ov .grid .card{height:calc(var(--cw)*1.4)!important;align-self:start}
+html body .ec-phase{top:44%}
+
+/* R7 fix: phone text never below 14px (375x667 and up) */
+@media (max-width:1023px){
+html body #hud .chip,html body .chip,html body .w485fl,html body .w485nl,html body .w485lgi,html body .item.shoptile .sty{font-size:14px!important}
+html body.ec-stage #stage .en .nm,html body.ec-stage #stage .hfig .nm,html body .en .nm,html body .bar b,html body .stc span{font-size:14px!important}
+html body.ec-stage #stage .hand.fan .card .ct,html body .card .ct{font-size:14px!important;line-height:1.05}
+}
+@media (max-width:1023px){html body.ec-stage #stage .bar b,html body.ec-stage #stage .en .stc span,html body.ec-stage #stage .hfig .stc span{font-size:14px!important}}
+.reward .rwact{position:sticky;bottom:0;display:flex;gap:10px;justify-content:center;padding:8px 0 2px;width:100%;background:linear-gradient(rgba(20,16,14,0),rgba(20,16,14,.92) 40%);z-index:3}
+@media (max-height:720px){.reward{gap:6px;padding-top:6px}.reward h2{font-size:24px;margin:0}.reward .picks .card.w4rw{min-height:0}html body .reward .item:not(.shoptile){flex-direction:row!important;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 8px;min-height:0!important;height:auto!important;padding:4px 10px!important;width:auto!important;max-width:100%}html body .reward .item:not(.shoptile)>:first-child{width:36px!important;height:36px!important;min-height:0!important;flex:none}}
+.reward .item.taken{opacity:.55;filter:grayscale(.6);cursor:default}.reward .w7done{font-weight:700;color:#e9f5d8;min-height:24px}
+.w485top{position:relative}
+.w7now{position:absolute;left:50%;top:calc(100% + 4px);transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);text-align:center;font-size:14px;font-weight:700;line-height:1.2;color:#fff4dc;background:rgba(20,10,4,.82);border:1px solid rgba(242,135,43,.55);border-radius:999px;padding:4px 12px;pointer-events:none;z-index:6}
+.w7now:empty{display:none}
+/* W485-r16: coach bubble / toasts / prompt pill never cover the top bar, an enemy intent or the result; the result deck scrolls above its buttons; reward text wraps */
+@media (max-width:1023px){
+html body .ec-say,html body .toast{top:auto!important;bottom:var(--ecslot,64px)!important;left:0!important;right:0!important;margin:0 auto!important;transform:none!important;animation:none!important;width:max-content;max-width:min(94vw,520px);padding:6px 10px;gap:8px}
+html body .toast{white-space:normal;text-align:center;font-size:14px;line-height:1.2;border-radius:14px;padding:5px 10px}
+html body .ec-say{padding:4px 8px}html body .ec-say .art{width:30px;height:30px}
+html body .ec-say b{display:inline;margin-right:6px;font-size:13px}html body .ec-say span{display:inline;font-size:14px;line-height:1.2}
+html body .w7now{display:none!important}
+html body .toast.mid{top:42%!important;bottom:auto!important}
+html body .picks .card{--cw:clamp(100px,29vw,150px);height:auto;min-height:calc(var(--cw)*1.4);overflow:visible}
+html body .picks .card .cb,html body .picks .card .cb .cl,html body .picks .card .cl{font-size:13px!important;line-height:1.2;overflow:visible!important;text-overflow:clip!important;-webkit-line-clamp:unset!important;max-height:none!important;white-space:normal}
+}
+html body .over.res{overflow:hidden!important;padding:0!important;gap:0!important}
+html body .over.res>.rscroll{flex:1;min-height:0;width:100%;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 12px 12px}
+html body .over.res>.rbtns{position:relative!important;flex:none;margin:0;background:#14100e;box-shadow:0 -1px 0 rgba(255,255,255,.08)}
+.ec-endc ul[hidden]{display:none}.ec-endc .ec-sum{list-style:none;padding-left:0}.ec-endc .ec-showall{min-height:44px;margin:6px 0 4px;width:100%}
+/* R24: many foes (split boss, 3 sentries, two heroes): two rows of smaller foes, every one fully on screen and tappable */
+html body.ec-stage #stage .arena.w24many .hside{flex:0 0 33%!important}
+html body.ec-stage #stage .enemies.w24many{flex-wrap:wrap;align-content:flex-end;justify-content:center;row-gap:2px;column-gap:2px;min-width:0}
+html body.ec-stage #stage .enemies.w24many .en{flex:0 0 calc(50% - 2px)!important;max-width:calc(50% - 2px)!important}
+html body.ec-stage #stage .enemies.w24six .en{flex:0 0 calc(33.3% - 2px)!important;max-width:calc(33.3% - 2px)!important}
+html body.ec-stage #stage .enemies.w24many .en>.art{width:100%!important;max-width:min(100%,calc((100dvh - 420px) / 2))!important;margin:0 auto!important}
+html body.ec-stage #stage .enemies.w24many .intent{min-height:30px!important;padding:1px 6px 1px 2px!important;margin:0 0 2px!important;max-width:100%;overflow:hidden}
+html body.ec-stage #stage .enemies.w24many .intent .art{width:20px!important;height:20px!important}
+html body.ec-stage #stage .enemies.w24many .intent>span{font-size:15px!important}
+html body.ec-stage #stage .enemies.w24many .en .bar{width:96%;height:16px;margin-top:-4px}
+html body.ec-stage #stage .enemies.w24many .en .bar b{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .nm{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .stc span{font-size:12px!important}
+html body.ec-stage #stage .enemies.w24many .en .w4pv{transform:scale(.8)}
+/* R24: Quick setup in a short landscape phone (844x390): smaller title and hero tiles so Start climb, + Second hero and Back fit */
+@media (max-height:520px) and (orientation:landscape){
+html body #title.pick{gap:4px!important;padding-top:4px!important;padding-bottom:4px!important;justify-content:center!important;overflow:hidden}
+html body #title.pick h1{font-size:30px!important;margin:0!important;line-height:1.05}
+html body #title.pick .sub{display:none!important}
+html body #title.pick .heroes{gap:6px!important}
+html body #title.pick .hero{padding:3px!important}
+html body #title.pick .hero .art{height:min(30vh,120px)!important;width:auto!important;aspect-ratio:4/5!important}
+html body #title.pick .refline{margin:0!important;padding:2px 8px!important}
+html body #title.pick .row{margin:0!important}
+html body #title.pick .btn{min-height:44px!important;padding-top:4px!important;padding-bottom:4px!important}
+}
+.refline.w24note{color:#ffe2a0!important}.refline.w24n0{animation:w24n0 .35s ease-out}.refline.w24n1{animation:w24n1 .35s ease-out}
+@keyframes w24n0{from{transform:scale(1.08)}to{transform:none}}@keyframes w24n1{from{transform:scale(1.08)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.refline.w24n0,.refline.w24n1{animation:none}}
+/* R24: stage on a short landscape phone: hand low between the corner controls, the arena gets the height */
+html body.ec-stage #stage.w24ls .arena{margin-bottom:calc(var(--hh) + 6px)!important;padding-bottom:0!important}
+html body.ec-stage #stage.w24ls .hand.fan{left:150px!important;right:150px!important}
+html body.ec-stage #stage.w24ls>.energy{bottom:6px!important;left:8px!important;width:54px!important;height:54px!important}
+html body.ec-stage #stage.w24ls .w485end{bottom:8px!important;right:8px!important;min-width:104px!important}
+html body.ec-stage #stage.w24ls .w485pile{bottom:4px!important}html body.ec-stage #stage.w24ls .w485pile.draw{left:68px!important}html body.ec-stage #stage.w24ls .w485pile.disc{right:118px!important}html body.ec-stage #stage.w24ls .hand.fan{left:126px!important;right:172px!important}
+html body.ec-stage #stage.w24ls .en>.art,html body.ec-stage #stage.w24ls .w485fig .art{max-width:min(96px,calc(100dvh - 300px))!important;margin-left:auto!important;margin-right:auto!important}
+html body.ec-stage #stage.w24ls .enemies.w24many .en>.art{max-width:min(70px,calc((100dvh - 300px) / 2))!important}
+.itip-scrim{position:fixed;inset:0;z-index:69;background:rgba(0,0,0,.18)}
+.itip-x{position:absolute;top:4px;right:4px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,.08);color:#ffd9b0;font-size:20px;cursor:pointer}
 </style></head>

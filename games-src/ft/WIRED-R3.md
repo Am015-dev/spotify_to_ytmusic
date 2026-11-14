@@ -3,7 +3,7 @@
 **3D models: 5 of 5 wired.**
 - `palm`, `palace`, `camel` -> `models/*@512.webp` stack sprites and camel token (`html.sp3`, skin.css), already wired.
 - `lamp` -> `models/lamp-turn.webp` 24-frame turntable in the djinn summon pop-up (`#summon .sm-lamp`), already wired.
-- `meeple` -> `models/meeple@512.webp` (new): the blue builder figure replaces the flat drawn builder in the help/rules card pictures (`HP.meeple` in hlp.js, only when `html.sp3` is on; the drawn SVG stays otherwise). One colour only, because the model is a single blue base mesh; the other five tribes keep their painted meeples.
+- `meeple` -> `models/meeple@512.webp` (new): the blue builder figure replaces the flat drawn builder in the help/rules card pictures (`HP.meeple` in hlp.js, only when `html.sp3` is on; the drawn SVG stays otherwise). One colour only, because the model is a single blue base mesh; the other the tribes keep their painted meeples.
 
 **2D wired: 6.**
 - `back-copper`, `back-lamp` -> card back unlocked by campaign rewards (paint.js `BACKS`, built name `back-<id>`). The asset check missed it because the name is built at runtime. Verified in campaign.json.

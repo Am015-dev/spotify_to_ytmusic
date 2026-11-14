@@ -1,7 +1,7 @@
 // ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
 // ---------- tips: one at a time, never stacked; each tip once per device ----------
 const TIPS = [
-  { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, so you pick a job first. You also lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Commander.' },
+  { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Captain' : pname(G.cap) + ' is the Captain', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, so you pick a job first. You also lead the first trick.' : pname(G.cap) + ' holds Lantern 4, so picks a job first and leads the first trick.') + ' The gold badge on an avatar marks the Captain.' },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card, then Take this job. Pick one your cards can do.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'Distress flare (optional)', body: 'Light it and everyone passes one card to a neighbour. It adds one attempt to the logbook. You can skip it.' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signal (optional)', body: 'Once per dive, show one card: your highest, lowest or only card of a colour. Or skip.' },
@@ -44,7 +44,7 @@ function openJob(i) {
   kids.push(h('div.kv', h('span', 'Difficulty (' + G.np + ' divers)'), h('b', jobDiff(i))));
   kids.push(h('div.kv', h('span', 'State'), h('b', st > 0 ? 'Done' : st < 0 ? 'Failed' : 'Open')));
   if (d.k === 'pred' && t.pn >= 0) kids.push(h('div.kv', h('span', 'Prediction'), h('b', d.open || G.phase === 'over' || ctlSeat(t.owner) === viewSeat() ? (t.pn === -2 ? 'secret' : t.pn) : 'secret')));
-  if (!d.cap) kids.push(h('p.sm', 'The Commander cannot take this job.'));
+  if (!d.cap) kids.push(h('p.sm', 'The Captain cannot take this job.'));
   kids.push(h('p.sm', hintFor(d)));
   openPop(d.s, 'Job card', kids);
 }
@@ -63,10 +63,10 @@ const CAMP_BY_NAME = { Nerea: 'nerea', Bram: 'bram', Sumi: 'sumi', Dag: 'dag', E
 function campPortrait(s, p) { const k = CAMP_BY_NAME[p.helper ? 'Echo' : p.name]; return k ? '<img src="media/camp-' + k + '.webp" alt="" width="56" height="56" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)">' : ''; }
 function openSeat(s) {
   if (!G) return; const p = G.players[s], kids = [];
-  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: campPortrait(s, p) || avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
+  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: campPortrait(s, p) || avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Captain)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
   kids.push(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
   kids.push(h('div.kv', h('span', 'Tricks won'), h('b', tricksWon()[s])));
-  if (!p.helper) kids.push(h('div.kv', h('span', 'Ping'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));
+  if (!p.helper) kids.push(h('div.kv', h('span', 'Signal'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));
   const sh = shownBy(s); sh.forEach(x => kids.push(h('div.kv', h('span', 'Showed'), h('b', cname(x.c) + (x.k === 'high' ? ' (highest)' : x.k === 'low' ? ' (lowest)' : x.k === 'only' ? ' (only one)' : '')))));
   const js = jobs(s); kids.push(h('h4', { style: 'margin:6px 0 0' }, js.length ? 'Jobs' : 'No jobs'));
   js.forEach(i => kids.push(h('div.rjob' + (jobSt(i) > 0 ? '.ok' : jobSt(i) < 0 ? '.bad' : ''), h('span.mk', { html: jobSt(i) > 0 ? KIT.iconSVG('tick', 22) : jobSt(i) < 0 ? KIT.iconSVG('cross', 22) : KIT.iconSVG('list', 22) }), h('span', jobText(i)))));

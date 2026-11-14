@@ -41,7 +41,7 @@
       { kind: 'visible', sel: '.awn', name: 'awning with the coin purse' },
       { kind: 'visible', sel: '.stalls .stall', name: 'stall board' },
       { kind: 'fn', name: 'every shown price is >= 12 px', fn: function () { var bad = [].slice.call(document.querySelectorAll('.stall .tok .pc')).filter(function (e) { return parseFloat(getComputedStyle(e).fontSize) < 12; }); return bad.length === 0 || bad.length + ' prices under 12 px'; } },
-      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 32 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
+      { kind: 'fn', name: 'a stall chip is tappable (>= 44 px high)', fn: function () { var t = document.querySelector('.stall .tok:not([disabled])'); if (!t) return 'no buyable chip'; var r = t.getBoundingClientRect(); return (r.width >= 44 && r.height >= 44) || Math.round(r.width) + 'x' + Math.round(r.height); } }
     ]
   });
   GXS.add({
@@ -123,7 +123,7 @@
     setup: function () { try { GXH.setEnabled(false); } catch (e) { } try { GX.close(); } catch (e) { } UI.sv = 'title'; renderStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
     checks: [
       { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn.go'); return n.length === 1 || n.length + ' green primary buttons'; } },
-      { kind: 'fn', name: 'quick game row: players 2/3/4 in one style', fn: function () { var b = document.querySelectorAll('#start .tseg .chipb'); return b.length === 3 || b.length + ' options'; } },
+      { kind: 'fn', name: 'quick game row: players 2/3/4 in one style', fn: function () { var b = document.querySelectorAll('#start .tseg:first-child .chipb'); return b.length === 3 || b.length + ' options'; } },
       { kind: 'fn', name: 'Continue only when a save exists', fn: function () { var c = !!document.querySelector('#start [data-a=loadsave]'); return c === !!hasSave() || 'Continue ' + c + ' but save ' + hasSave(); } },
       { kind: 'fn', name: 'no character roster on the start screen', fn: function () { return !document.querySelector('#start .dcard,#start #roster') || 'roster shown'; } },
       { kind: 'fn', name: 'start buttons at least 44 px tall', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#start button'), function (b) { if (b.getBoundingClientRect().height < 44) bad.push(b.textContent.slice(0, 12)); }); return uiBad(bad); } },

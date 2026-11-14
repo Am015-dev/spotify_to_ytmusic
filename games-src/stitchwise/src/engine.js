@@ -66,7 +66,7 @@ function swApply(G, m) { // returns {ok, why}. Mutates G.
 function swScore(G, s) { var b = G.btn[s], e = swEmpty(G.board[s]); return { btn: b, bonus: G.bonus === s ? SW.BONUS_PTS : 0, empty: e, pen: e * SW.EMPTY_PEN, total: b + (G.bonus === s ? SW.BONUS_PTS : 0) - e * SW.EMPTY_PEN }; }
 function swWinner(G) { var a = swScore(G, 0).total, b = swScore(G, 1).total; if (a !== b) return a > b ? 0 : 1; return G.stamp[0] < G.stamp[1] ? 0 : 1; } // tie: the player who finished first... the one who reached the end first wins
 function swCheck(G) { // invariants
-  for (var s = 0; s < 2; s++) { var n = 0; G.board[s].forEach(function (c) { if (c !== -1 && c !== 99) n++; }); var want = 0; G.owned[s].forEach(function (pid) { want += PATCHES[pid].n; }); G.board[s].forEach(function (c) { if (c === 100) want++; });
+  for (var s = 0; s < 2; s++) { var n = 0; G.board[s].forEach(function (c) { if (c !== -1 && c !== 99) n++; }); var want = 0; G.owned[s].forEach(function (pid) { want += PATCHES[pid].n; }); G.board[s].forEach(function (c) { if (c >= 100) want++; }); /* 100 leather, 101 old patchwork (practice quilt) */
     if (n !== want) return 'cells ' + s + ': ' + n + ' vs ' + want; if (G.btn[s] < 0) return 'negative buttons'; if (G.pos[s] > SW.TRACK) return 'pos'; }
   var tot = G.ring.length + G.owned[0].length + G.owned[1].length; if (tot !== 33) return 'patch count ' + tot; return null; }
 if (typeof module !== 'undefined') module.exports = { SW: SW, PATCHES: PATCHES };

@@ -100,7 +100,7 @@ function buildGeo(t){if(GEO[t])return GEO[t];const d=TT[t],segs=tileSegs(t),fix=
 function r2len(R){return lineLen(R.pts)}
 // ---------- SVG painter (catalogue, 2D board, dock preview) ----------
 const PAL={field:'#a9b86a',field2:'#c2c077',town:'#e3c89a',townEdge:'#8a5a33',roof:'#c0613a',road:'#efe2bf',roadEdge:'#9c8458',river:'#4d93c2',riverEdge:'#2f6f99',mon:'#f1e6cf',hedge:'#5d7a35'};
-let TEXSET={};const TX=(k,fb)=>TEXSET[k]?`url(#tx-${k}) ${fb}`:fb;// painted textures (paint.js) under the flat colours
+let TEXSET={},TXR=0;const TX=(k,fb)=>TEXSET[k]?`url(#tx-${k}-${TXR&3}) ${fb}`:fb;// painted textures (paint.js) under the flat colours
 function polyD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')+'Z'}
 function lineD(p){return 'M'+p.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join('L')}
 function tileSVG(t,opt){opt=opt||{};const g=buildGeo(t),d=TT[t];let s='';
@@ -118,7 +118,7 @@ function tileSVG(t,opt){opt=opt||{};const g=buildGeo(t),d=TT[t];let s='';
     if(c.p)s+=`<path d="M${sp[0]+7} ${sp[1]-12}h9v7l-4.5 3l-4.5-3z" fill="#2c5fb8" stroke="#f0c44c" stroke-width="1.2"/>`;
     if(c.g)s+=`<circle cx="${sp[0]-9}" cy="${sp[1]+6}" r="5" fill="${GOODS_COL[c.g]}" stroke="#3a2a18" stroke-width=".8"/>`});
   if(d.gar){const fs=g.spots[d.C.length+d.R.length];if(fs)s+=`<rect x="${fs[0]-5}" y="${fs[1]+5}" width="10" height="7" rx="2" fill="${TX('garden','#6e9a3c')}" stroke="#3f5f22" stroke-width="1"/>`}
-  if(TEXSET.field)s+=`<rect width="100" height="100" fill="url(#tshade)" pointer-events="none"/>`;
+  
   if(opt.spots)g.spots.forEach((p,i)=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff" stroke="#000" stroke-width="1"/><text x="${p[0]}" y="${p[1]+2}" font-size="5" text-anchor="middle">${i}</text>`});
   return s}
 const GOODS_COL={wine:'#7a1f3d',grain:'#e3b23c',cloth:'#3f6fb5'};

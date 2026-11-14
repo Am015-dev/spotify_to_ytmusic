@@ -21,7 +21,8 @@ const $ = s => /^#[\w-]+$/.test(s) ? document.getElementById(s.slice(1)) : docum
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = KIT.PLAYERS.map(p => p.name);
-const DEF = { np: 3, level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'], seats: [2, 3] };
+const DEF = { np: 3, level: 'easy', lv: ['easy', 'easy', 'easy', 'easy'], seats: [2, 3] };   // easy chefs until the player has won once (bench-newplayer.js)
+const DEF_WON = { level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'] };
 const NIG = { salmon: 2, squid: 3, egg: 1 };
 const ICONS = { roll1: 1, roll2: 2, roll3: 3 };
 const tkey = id => KK.cardKey(id);
@@ -151,10 +152,11 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 4000 + Math.ceil(String(t).trim().split(/\s+/).length / 10) * 1000); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
+function loadPrefs() { try { if (lsGet('kk_won')) Object.assign(DEF, { level: DEF_WON.level, lv: DEF_WON.lv.slice() }); const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 // UI.fast: the player tapped the table to hurry this reveal / pass along
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
+const PACE = .34;   // default pause scale: a pick -> reveal -> pass cycle is about 2 s; tap the table to skip the rest
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * PACE * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
 function buildNews(before, after, picks, scored) {

@@ -22,7 +22,7 @@ function tone(f,dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const o
   osc.connect(g);g.connect(SND.fxBus);env(g,t,o.a||.008,o.v||.25,dur);osc.start(t);osc.stop(t+dur+.05)}
 function noise(dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const s=c.createBufferSource();s.buffer=SND.nb;const fl=c.createBiquadFilter();fl.type=o.ft||'bandpass';fl.frequency.setValueAtTime(o.f||1500,t);if(o.fto)fl.frequency.exponentialRampToValueAtTime(o.fto,t+dur);fl.Q.value=o.q||1;
   const g=c.createGain();s.connect(fl);fl.connect(g);g.connect(SND.fxBus);env(g,t,o.a||.004,o.v||.25,dur);s.start(t,Math.random());s.stop(t+dur+.05)}
-function sfx(name,o){o=o||{};if(!SND.on)return;const m=SND_MAP[name];if(!m)return;const now=performance.now();if(now-(SND.last[name]||0)<(m.cooldown||(name==='click'?30:60)))return;SND.last[name]=now;
+function sfx(name,o){o=o||{};if(!SND.on||typeof UI!=='undefined'&&UI.hush)return;const m=SND_MAP[name];if(!m)return;const now=performance.now();if(now-(SND.last[name]||0)<(m.cooldown||(name==='click'?30:60)))return;SND.last[name]=now;
   if(m.s&&window.GA&&GA.has(m.s)){SND.fired[name]='sample';GA.play(m.s,{vol:m.vol,jitter:m.jitter,at:o.at});return}
   if(!SND.ctx||SND.ctx.state!=='running'){SND.fired[name]=SND.fired[name]||'silent';return}SND.fired[name]='synth';const at=o.at||0;
   try{switch(name){
