@@ -71,7 +71,7 @@
     actStep('trade', 'a1-bathhouse', 'build', 'Buy stone: 2 coins plus 1 per rival stone card.'),
     cardStep('yellow', 'a1-roadside-inn', 'Yellow cards bring coins. Tap the inn.'),
     actStep('yellow-build', 'a1-roadside-inn', 'build', 'Build it: you get 4 coins now.'),
-    infoStep('depot', 'Yellow depots make one resource cost 1 coin to buy.', function () { return $('s0') || $('pyr'); }),
+    infoStep('depot', 'A depot makes one resource cost only 1 coin.', function () { return $('s0') || $('pyr'); }),
     cardStep('science', 'a1-weights-hall', 'Green cards carry science symbols. Tap this one.'),
     actStep('science-build', 'a1-weights-hall', 'build', 'Missing papyrus costs 2 coins. Build it.'),
     { id: 'next-age', rule: 'next-age', say: 'Fewer shields than the rival? You choose who starts.', target: function () { return document.querySelector('[data-first="0"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'first' && a.who === 0; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'first' && G().age === 2; } },
