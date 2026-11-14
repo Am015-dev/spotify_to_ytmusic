@@ -326,7 +326,7 @@ var TT_TEST = {};
     a.classList.toggle('ttsheet', on);
     if (on !== was && G && G.phase === 'play' && P.children.length) { if (!on) d.style.cssText = ''; renderPyr(); }
     if (!on) { if (was) d.style.cssText = ''; return; }
-    var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; var tr = $('mil') || $('tokrow'), tt = tr ? tr.getBoundingClientRect().bottom : r.top; d.style.maxHeight = Math.max(r.height, r.bottom - Math.min(r.top, tt) - 2) + 'px'; // FIXED4: a choice sheet may rise over the war track so all choices fit; the rest scrolls with a fade cue
+    var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; var rc = $('s1'), tr = $('mil') || $('tokrow'), tt = rc ? rc.getBoundingClientRect().top : tr ? tr.getBoundingClientRect().bottom : r.top; d.style.maxHeight = Math.max(r.height, r.bottom - Math.min(r.top, tt) - 2) + 'px'; // F6: while a choice is open the sheet rises over the war track (and the rival's card strip), keeping the turn banner in view, so 5+ rows show; the rest scrolls with a fade cue
     var hk = d.querySelector('.picker .arm') || d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
   }
   function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
@@ -495,6 +495,7 @@ var TT_TEST = {};
       else items = items.slice(0, age ? 3 : (U.aiChain || 0) > 1 ? 1 : 2);
       items.forEach(function (x) { x.ms = isAI(p) ? ((U.aiChain || 0) > 1 ? 450 : 650) : 900; }); if (!isAI(p)) U.aiChain = 0;
     }
+    { var nq = E.sideToAct(G); if (U.mode === 'cpu' && !isAI(p) && nq != null && isAI(nq)) items.forEach(function (x) { if (x.tag === 'You' || x.tag === 'Rating') { x.tag = whoTag(nq); x.kind = 'rival'; } }); } // F6: the tag names the next side the moment the turn passes, not "You" / "Rating"
     narrate(items, function () { U.busy = false; after(); });
   }
   // FIXED2: the star (and the glowing popup button) waits until you tap Hints or sit still for about 8 s, then pulses 3 times and holds
