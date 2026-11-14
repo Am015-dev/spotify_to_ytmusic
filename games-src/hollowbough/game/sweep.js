@@ -25,6 +25,7 @@ async function playGame(browser, W, H, gi, mode) {
   await p.goto(URL); await sleep(500);
   await p.evaluate(([m, s]) => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2 + (s % 3), level: 'normal', solo: 1 }; newGame(m); }, [mode, 11 + gi * 3]);
   const tipsOn = gi % 5 !== 4; if (!tipsOn) await p.evaluate(() => GXH.setEnabled(false));
+  const coached = await p.evaluate(() => hlpCoached());
   await sleep(400);
   const seenPh = new Set(); let bulbN = 0; const HT = { bubbles: {}, bulbs: 0, nul: 0, rules: 0 }; helpTotals.push(HT);
   const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
@@ -51,8 +52,10 @@ async function playGame(browser, W, H, gi, mode) {
     { const hs = await p.evaluate(() => ({ ph: hlpPhase(), st: GXH.state() }));
       if (hs.st.rules) { fail(tag, 'rules overlay stuck open'); await p.evaluate(() => GXH.hide()); continue; }
       if (!tipsOn && hs.st.shown.length) fail(tag, 'tips off but bubbles shown: ' + hs.st.shown.join());
-      // 1) the first-time bubble of this phase
-      if (tipsOn && hs.ph && !seenPh.has(hs.ph)) {
+      // 1) the first-time bubble of this phase: only in the guided first game. A normal game stays clean (FIXED13, owner: "confusing and distracting"):
+      //    no coach bubble may appear there in any phase; help is the bulb (on demand) or the 8 s idle nudge
+      if (!coached && hs.ph && !seenPh.has(hs.ph)) { seenPh.add(hs.ph); await sleep(700); if (await p.evaluate(() => !!document.querySelector('.gxh-bub.on[data-phase]'))) fail(tag, 'coach bubble in a normal game (' + hs.ph + ')'); if (await p.evaluate(() => { const f = document.getElementById('finger'); return !!(f && !f.hidden); })) fail(tag, 'ghost finger in a normal game (' + hs.ph + ')'); }
+      if (coached && tipsOn && hs.ph && !seenPh.has(hs.ph)) {
         seenPh.add(hs.ph); let b = null; const t1 = Date.now();
         while (Date.now() - t1 < 2500) {
           b = await p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect(); return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, hs.ph).catch(() => null);
