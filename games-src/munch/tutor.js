@@ -219,3 +219,16 @@ function tutOffer(btn){const hadPulse=btn.classList.contains('pulse');btn.classL
         const t=document.elementFromPoint(Math.max(1,Math.min(innerWidth-1,r.left+r.width/2)),Math.max(1,Math.min(innerHeight-1,r.top+r.height/2)));if(t&&t.classList&&t.classList.contains('gxt-cell'))hit.push(e)}
       hit.forEach(e=>e.classList.add('dk-tutoff'));was=true}}catch(e){}setTimeout(tick,120)}
   setTimeout(tick,120)})();
+// sound and speed stay in reach during the tutorial: the header buttons sit under its dim layer, so two small buttons ride in its top strip
+(function(){const sp=()=>UI.speed<1?'slow':UI.speed>1?'fast':'normal';
+  function paint(w){const so=typeof SND!=='undefined'?SND.on:true;const s=w.querySelector('[data-dkt="snd"]'),v=w.querySelector('[data-dkt="speed"]');
+    if(s){s.innerHTML=ic(so?'sound':'mute');s.setAttribute('aria-label','Sound effects: '+(so?'on':'off'));s.title=s.getAttribute('aria-label')}
+    if(v){v.innerHTML=ic(sp());v.setAttribute('aria-label','Computer speed: '+sp());v.title=v.getAttribute('aria-label')}}
+  function tick(){try{const top=document.querySelector('.gxt-top');if(top&&!top.querySelector('.dktc')){const w=document.createElement('span');w.className='dktc';w.setAttribute('data-help','');
+      w.innerHTML='<button type="button" class="dkt-b" data-dkt="snd"></button><button type="button" class="dkt-b" data-dkt="speed"></button>';
+      w.addEventListener('click',ev=>{const b=ev.target.closest('[data-dkt]');if(!b)return;ev.stopPropagation();ev.preventDefault();
+        if(b.dataset.dkt==='snd'&&typeof toggleSound==='function')toggleSound();
+        if(b.dataset.dkt==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){}}
+        paint(w);try{syncMenu()}catch(e){}});
+      const sk=top.querySelector('.gxt-skip');top.insertBefore(w,sk||null);paint(w)}}catch(e){}setTimeout(tick,200)}
+  setTimeout(tick,200)})();

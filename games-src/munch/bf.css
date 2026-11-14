@@ -195,3 +195,8 @@ html.ph .bfline{white-space:normal!important;overflow:visible!important;text-ove
 .bfhero.lvup.down{filter:drop-shadow(0 0 8px #ff8a7a)}
 @keyframes bfLvPulse{0%{scale:1}20%{scale:1.35}45%{scale:1}65%{scale:1.2}100%{scale:1}}
 @media (prefers-reduced-motion:reduce){.slv.lvup,.bfhero.lvup{animation:none}}
+/* short portrait phones (375x553): the start card grows into the art instead of hiding its last buttons (Tutorial) below the screen */
+@media (orientation:portrait) and (max-height:640px){html.ph .modal.art-title .dlg.start{max-height:calc(100dvh - 12px)}
+  html.ph .modal.art-title .dlg.start.dk2{gap:6px;padding-top:10px;padding-bottom:10px}
+  html.ph .modal.art-title .dlg.start .tagline{margin-bottom:0}
+  html.ph .modal.art-title .dlg.start .btn.bigb{height:auto;min-height:50px;font-size:16px}}
