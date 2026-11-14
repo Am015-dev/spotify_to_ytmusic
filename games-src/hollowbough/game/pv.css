@@ -22,8 +22,7 @@
 #bd.pv .rs.wk{gap:0;padding-left:6px;border-left:2px solid rgba(59,42,28,.25)}
 #bd.pv .pv-meeple{display:inline-flex;margin:0 -3px;touch-action:none;cursor:default;transition:transform .15s}
 #bd.pv .pv-meeple.out{opacity:.25;filter:grayscale(1)}
-#bd.pv .pv-meeple.can{cursor:grab;animation:pvbob 1.6s ease-in-out infinite}
-#bd.pv .pv-meeple.can:nth-child(2){animation-delay:.2s}#bd.pv .pv-meeple.can:nth-child(3){animation-delay:.4s}#bd.pv .pv-meeple.can:nth-child(4){animation-delay:.6s}
+#bd.pv .pv-meeple.can{cursor:grab}
 #bd.pv .pv-meeple.pv-lifted{opacity:.2;animation:none}
 #bd.pv .pv-wn{font-size:14px!important;font-weight:700;margin-left:6px;white-space:nowrap}
 @keyframes pvbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
@@ -33,7 +32,7 @@
 #bd.pv .pv-tab .pv-tn{font-size:14px;white-space:nowrap;background:rgba(255,255,255,.14);border-radius:8px;padding:1px 6px}
 #bd.pv .pv-tab.on{background:var(--pv-paper);color:var(--pv-ink);box-shadow:0 2px 0 rgba(0,0,0,.35)}
 #bd.pv .pv-tab.on .pv-tn{background:rgba(59,42,28,.12)}
-#bd.pv .pv-tab.hot::after{content:'';position:absolute;right:7px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--pv-gold);box-shadow:0 0 0 2px #5a3c22,0 0 8px 2px rgba(255,210,90,.9);animation:glowp 1.3s ease-in-out infinite}
+#bd.pv .pv-tab.hot::after{content:'';position:absolute;right:7px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--pv-gold);box-shadow:0 0 0 2px #5a3c22,0 0 6px 1px rgba(255,210,90,.7)}
 #bd.pv .pv-tab.on.hot::after{display:none}
 /* ---- stage + panels */
 #bd.pv .pv-stage{flex:1 1 0;min-height:0;position:relative}
@@ -494,3 +493,6 @@ html #bd.pv .mc.nudge .pvc,html #bd.pv .hc.nudge .pvc,html #bd.pv .sc.nudge .pvm
 @media (prefers-reduced-motion:reduce){.nudge{animation:none}}
 /* FIXED13: with the tokens column (r5) a 375 px phone cut "workers": one meeple is enough there, the number says how many */
 @media (max-width:400px){#bd.pv .resrow.r5 .rs.wk .pv-meeple~.pv-meeple{display:none}#bd.pv .resrow.r5 .rs.wk .pv-wn{margin-left:2px}#bd.pv .resrow.r5 .rs.wk .rsw{font-size:.8em!important;letter-spacing:-.2px}#bd.pv .resrow.r5 .rs.wk{padding-left:3px}}
+
+/* one helper at a time: the tab dot steps aside while the nudge or the bulb's ring shows */
+body:has(.nudge,.gxh-ring) #bd.pv .pv-tab.hot::after{display:none}

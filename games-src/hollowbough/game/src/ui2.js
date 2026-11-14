@@ -483,7 +483,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', 'aria-disabled': 'true', 'data-a': 'noprep', 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -872,6 +872,19 @@ function pvFitWords(root) {
 }
 // ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
 // Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
+// bring el fully on screen: open its phone tab, then move every scrolling ancestor (rows sideways, lists up and down) by real rectangles
+function pvReveal(el) {
+  if (!el || !el.closest) return;
+  const p = el.closest('#bd.pv .pv-panel'); if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
+  for (let a = el.parentElement, n = 0; a && a !== document.body && n < 12; a = a.parentElement, n++) {
+    const cs = getComputedStyle(a), sx = /auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 1, sy = /auto|scroll/.test(cs.overflowY) && a.scrollHeight > a.clientHeight + 1;
+    if (!sx && !sy) continue;
+    const r = el.getBoundingClientRect(), q = a.getBoundingClientRect();
+    if (sx && (r.left < q.left + 6 || r.right > q.right - 6)) a.scrollLeft += r.left - q.left - (parseFloat(cs.scrollPaddingLeft) || 8);   // align the card's left edge: a snapping row (scroll-snap start, 8px padding) lands exactly there
+    if (sy) { if (r.top < q.top + 4) a.scrollTop += r.top - q.top - 6; else if (r.bottom > q.bottom - 4) a.scrollTop += r.bottom - q.bottom + 6; }
+    if (a.classList.contains('pv-mead')) UI.pvMx = a.scrollLeft; else if (a.classList.contains('pv-board-t')) UI.pvBx = a.scrollLeft; else if (a.classList.contains('hscroll')) { UI.hsx = a.scrollLeft; UI.hsy = a.scrollTop; }
+  }
+}
 function pvScrollTo(el) {
   const p = el && el.closest && el.closest('#bd.pv .pv-panel');
   if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);

@@ -2,9 +2,25 @@
 // ---- shake: "not here"
 function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); setTimeout(() => el.classList.remove('shk'), 420); snd('error', { vol: .3 }); }
 // ---- tap on a board target
+// a tap on something that cannot be used right now answers with one short line (never silent)
+function deadSay(tg) {
+  try {
+    const a = HB.actor(G), p = G.players[a]; if (!p || p.ai || (typeof NET !== 'undefined' && NET.on && a !== viewSeat())) return;
+    if (G.q) { toast('Finish the choice first'); return; }
+    const m = /^x:([hm])(\d+)$/.exec(tg);
+    if (m) {
+      const id = +m[2], c = cdef(id), cost = c.cost || {}, miss = [];
+      for (const r of HB.RES) { const n = (cost[r] || 0) - (p.res[r] || 0); if (n > 0) miss.push(n + ' more ' + (r === 'berry' ? (n > 1 ? 'berries' : 'berry') : r === 'resin' ? 'resin' : r + (n > 1 ? 's' : ''))); }
+      if (miss.length) { toast('Needs ' + miss.join(' and ')); return; }
+      if (p.city.length >= HB.CITY) { toast('Your city is full'); return; }
+      toast(m[1] === 'm' ? 'You cannot build that one now' : 'You cannot build that now'); return;
+    }
+    toast(availW(p) <= 0 ? 'No workers left. Prepare instead' : 'Not available right now');
+  } catch (e) { }
+}
 function onTarget(tg, el) {
   if (!G || UI.cards.length) return;
-  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); return; }
+  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); if (/^x:/.test(tg) && !UI.animBusy) deadSay(tg); return; }
   const mm = myMoves();
   if (tg === 'pass') {
     const m = mm.find(x => x.type === 'pass'); if (!m) return;

@@ -112,7 +112,7 @@ function hlpSuggest() {
   const a = HB.actor(G);
   try { computeRec(true); } catch (e) { return null; }
   const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
-  try { const pn = hlpEl(m).closest('.pv-panel'); if (pn && !pn.classList.contains('on')) pvSetTab(pn.dataset.p, true); pvScrollTo(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
+  try { pvReveal(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
   const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
   // the helper's target may sit on another phone tab (Meadow, City, Goals): bring that panel forward so the finger and glow are visible
   return { why: hlpWhy(m, a), key: mk, m, target: () => hlpEl(m) };
@@ -161,7 +161,7 @@ function hlpNudge() {
     if (!hlpPhase()) { UI.idleT = setTimeout(hlpNudge, 1500); return; }   // cards flying or a card open: wait, then try again
     if (typeof GXH !== 'undefined') { const s = GXH.state(); if (!s.on || s.cur || s.rules) return; }
     computeRec(true); const m = UI.rec && UI.rec.m; let el = hlpEl(m); if (!el || (m.type === 'pass')) return;
-    const pn = el.closest && el.closest('.pv-panel'); if (pn && !pn.classList.contains('on')) { const tb = document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]'); if (tb) el = tb; } else { try { pvScrollTo(el); } catch (e) { } }
+    try { pvReveal(el); } catch (e) { }   // open the right tab and scroll the target into view first, then outline it there (the tab dot hides meanwhile)
     el.classList.add('nudge');
   } catch (e) { }
 }
