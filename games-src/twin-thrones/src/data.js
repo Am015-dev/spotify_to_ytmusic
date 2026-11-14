@@ -96,18 +96,18 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
   Wn('w-archive-of-dust', 'Archive of Dust', 'W3 G1 P1', { vp: 4, library: 1 }, 'a vast library hall with towering scroll shelves', '4 points, pick a progress token from 3');
   Wn('w-marble-barrow', 'Marble Barrow', 'C2 G2 P1', { vp: 2, revive: 1 }, 'a gleaming white tomb with mourning statues', '2 points, rebuild a discarded card free');
   Wn('w-stone-riddle', 'Stone Riddle', 'S1 C1 G2', { vp: 6, again: 1 }, 'a giant stone beast with a woman\'s face in the desert', '6 points, play again');
-  Wn('w-beacon-isle', 'Beacon Isle', 'P2 S1 G1', { vp: 4, choice: ['wood', 'clay', 'stone'] }, 'a tall lighthouse on a rocky isle at night', '4 points, 1 raw material of your choice each turn');
+  Wn('w-beacon-isle', 'Beacon Isle', 'P2 S1 W1', { vp: 4, choice: ['wood', 'clay', 'stone'] }, 'a tall lighthouse on a rocky isle at night', '4 points, 1 raw material of your choice each turn');
   Wn('w-grand-arena', 'Grand Arena', 'S2 W1 G1', { vp: 3, shields: 1, destroy: 'grey' }, 'a roaring chariot arena beneath a huge banner', '3 points, 1 shield, discard a rival grey card');
-  Wn('w-thunder-idol', 'Thunder Idol', 'W1 S1 P2', { vp: 3, shields: 1, destroy: 'brown' }, 'a towering ivory-and-gold idol holding lightning', '3 points, 1 shield, discard a rival brown card');
+  Wn('w-thunder-idol', 'Thunder Idol', 'W1 C1 S1 P2', { vp: 3, shields: 1, destroy: 'brown' }, 'a towering ivory-and-gold idol holding lightning', '3 points, 1 shield, discard a rival brown card');
   Wn('w-merchant-road', 'Merchant Road', 'S2 C2 P1', { vp: 3, coin: 3, steal: 3, again: 1 }, 'a long paved road lined with statues and mule trains', '3 points, +3 coins, rival loses 3, play again');
   Wn('w-sunken-harbor', 'Sunken Harbor', 'W2 S1 C1', { vp: 2, again: 1, choice: ['glass', 'papyrus'] }, 'a sheltered harbour with sunken mosaic quays', '2 points, play again, 1 glass or papyrus each turn');
   var TOKENS = [
     { id: 't-agriculture', stem: 't-agriculture', nm: 'Fertile Fields', vp: 4, coin: 6, text: '6 coins now, 4 points', art: 'golden wheat fields with a plough ox' },
     { id: 't-architecture', stem: 't-architecture', nm: 'Master Builders', text: 'Wonders cost 2 fewer resources', art: 'a drafting compass over a stone blueprint' },
-    { id: 't-economy', stem: 't-economy', nm: 'Open Trade', text: 'You gain the coins your rival pays to trade', art: 'two merchants shaking hands over a scale' },
+    { id: 't-economy', stem: 't-economy', nm: 'Open Trade', text: "Rival's trade payments go to you", art: 'two merchants shaking hands over a scale' },
     { id: 't-law', stem: 't-law', nm: 'Code of Law', sci: 'law', text: 'Counts as a science symbol', art: 'a stone tablet with a balance carved on it' },
     { id: 't-masonry', stem: 't-masonry', nm: 'Fine Masonry', text: 'Blue cards cost 2 fewer resources', art: 'a mason fitting a carved cornerstone' },
-    { id: 't-mathematics', stem: 't-mathematics', nm: 'Number Lore', text: '3 points per progress token you own, at the end', art: 'an abacus beside a counting board' },
+    { id: 't-mathematics', stem: 't-mathematics', nm: 'Number Lore', text: '3 points per progress token, at game end', art: 'an abacus beside a counting board' },
     { id: 't-philosophy', stem: 't-philosophy', nm: 'Deep Thought', vp: 7, text: '7 points', art: 'a bearded thinker under an olive tree' },
     { id: 't-strategy', stem: 't-strategy', nm: 'War Doctrine', text: 'New red cards give +1 shield', art: 'a general\'s map table with carved figures' },
     { id: 't-theology', stem: 't-theology', nm: 'Sacred Rites', text: 'Your wonders all let you play again', art: 'priests raising a flame at a hilltop altar' },

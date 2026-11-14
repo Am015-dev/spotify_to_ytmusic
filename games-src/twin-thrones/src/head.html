@@ -520,4 +520,18 @@ html,body{background:#3a1f0e}
 .card.v4 .nm.t2{padding-left:1px;padding-right:0;letter-spacing:-.07em}
 .tokrow .tok.pickable{box-shadow:0 0 0 3px #f2c230,0 0 14px 4px rgba(242,194,48,.8)}
 .tokrow .tok.arm{box-shadow:0 0 0 3px #fff,0 0 18px 6px rgba(255,255,255,.85);transform:scale(1.12);animation:none;z-index:2}
+/* FIXED2 calm: no endless loops. Takeable cards get a still edge; pulses run 2-3 times then hold. The star waits for Hint or ~8 s idle. */
+.card.av{animation:none!important;box-shadow:0 0 0 2px rgba(242,194,48,.9),0 2px 4px rgba(0,0,0,.45)}
+.card.best.av{box-shadow:0 0 0 3px #fff,0 0 0 6px #f2c230,0 2px 4px rgba(0,0,0,.45)}
+.card.hint.av{box-shadow:0 0 0 3px #6fe38a,0 2px 4px rgba(0,0,0,.45)}
+.card.best .bv{animation:bvpop .7s ease-in-out 3}
+@keyframes bvpop{50%{transform:scale(1.35)}}
+.wcard.go,.wt.pickable,.tok.pickable,.tokrow .tok.pickable{animation-iteration-count:2!important}
+.place{animation:placeglow 1.1s ease-in-out 2 alternate!important}
+#finger{animation-iteration-count:3!important}
+.gxt-ring,.gxh-ring,.gxt-pill.gxt-wait i,.gxc-node.next .gxc-disc,html.sk .gxc-node.next .gxc-disc{animation-iteration-count:3!important}
+.zb.hint,.zb.sell.hint{animation:bvpop0 .7s ease-in-out 2}
+@keyframes bvpop0{50%{transform:scale(1.05)}}
+@media (max-height:600px){#goal{display:none}}
+.card.v4 .nm.t3{font-size:12px;letter-spacing:-.04em}
 </style></head>

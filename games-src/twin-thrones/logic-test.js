@@ -226,6 +226,8 @@ R('Lookout (the free watchtower) costs nothing, gives 1 shield and has no chain.
 R('Age I science: Herb Garden (wheel) and Weights Hall (scale) are worth 1 point; Scribe Room (quill) and Remedy Shop (mortar) cost 2 coins, are worth 0 and carry a chain.', function () {
   eq([1, 1, 0, 0], ['a1-herb-garden', 'a1-weights-hall', 'a1-scribe-room', 'a1-remedy-shop'].map(function (i) { return E.C(i).vp || 0; })); eq(['book', 'gear'], [E.C('a1-scribe-room').gives, E.C('a1-remedy-shop').gives]); eq(['coin2', 'coin2'], [CO('a1-scribe-room'), CO('a1-remedy-shop')]); });
 R('Science symbols per age: Age I and Age II each hold mortar, quill, scale, wheel; Age III holds 2 globes and 2 sundials.', function () { eq('mortar,quill,scale,wheel', SCI(1)); eq('mortar,quill,scale,wheel', SCI(2)); eq('globe,globe,sundial,sundial', SCI(3)); });
+R('Beacon Isle (wonder) costs 2 papyrus, 1 stone and 1 wood (no glass).', function () { eq('wood1 stone1 papyrus2', CO('w-beacon-isle')); });
+R('Thunder Idol (wonder) costs 2 papyrus, 1 stone, 1 wood and 1 clay (5 resources).', function () { eq('wood1 clay1 stone1 papyrus2', CO('w-thunder-idol')); });
 R('Age II science: Scholars\' Court (quill, S1 W1 G1, 2 pts) chains from Scribe Room; Healers\' House (mortar, C2 S1, 2 pts) chains from Remedy Shop; Herbarium (wheel, W1 P2, 1 pt) and Measure Hall (scale, W1 G2, 1 pt) give chains.', function () {
   eq(['wood1 stone1 glass1', 'clay2 stone1', 'wood1 papyrus2', 'wood1 glass2'], ['a3-scholar-court', 'a3-apothecary-guild', 'a2-herbarium', 'a2-measure-hall'].map(CO));
   eq([2, 2, 1, 1], ['a3-scholar-court', 'a3-apothecary-guild', 'a2-herbarium', 'a2-measure-hall'].map(function (i) { return E.C(i).vp; }));
@@ -251,7 +253,7 @@ if (process.argv.indexOf('--md') >= 0) {
     'Source: the published structure of the 2-player card-draft duel this game adapts (rulebook from knowledge, cross-checked with its public English rulebook text). Names are never written here.',
     'Every line is one numbered rule. `node logic-test.js` asserts each against the real engine (state set up exactly, one action, exact result); a failure prints `FAIL rule N: expected X, got Y`.', '',
     'Rulebook points checked from the web text: first player starts Age I; weaker-military player chooses the next starter; with the pawn centred the last active player (took the last card) chooses; looting costs the rival 2 / 5 coins and never below 0; 3 and 6 steps loot, 9 steps wins.', '',
-    '**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L, the Beacon Isle and Thunder Idol wonder costs, and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).', ''];
+    '**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).', ''];
   RULES.forEach(function (r) { if (SECT[r.n]) out.push('', '## ' + SECT[r.n], ''); out.push(r.n + '. ' + r.text); });
   console.log(out.join('\n')); process.exit(0);
 }

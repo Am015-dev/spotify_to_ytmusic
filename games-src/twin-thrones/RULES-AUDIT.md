@@ -46,7 +46,7 @@ Each fixed rule has a test in `logic-test.js` (RULES-CHECKLIST.md) or `tutorial-
 | Moon Grove costs wood + stone + glass + papyrus (code: wood + glass + 2 papyrus) | data | **WRONG, fixed** |
 | Grand Arena costs 2 stone + wood + glass (code: clay instead of wood) | data | **WRONG, fixed** |
 | Sunken Harbor costs 2 wood + stone + clay (code: clay, glass, papyrus) | data | **WRONG, fixed** |
-| Beacon Isle and Thunder Idol costs | data | UNSURE (kept) |
+| Beacon Isle and Thunder Idol costs | data | FIXED2: Beacon Isle P2 S1 W1, Thunder Idol P2 S1 W1 C1 (tested) |
 
 ## Age change and end
 | Rule | Code | Tag |
