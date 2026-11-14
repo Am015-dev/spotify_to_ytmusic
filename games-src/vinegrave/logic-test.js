@@ -213,6 +213,22 @@ rule('M6', 'Blocking tiles: 2 players block all 5 camp second spaces, 3 players 
 rule('M7', 'With 4 players two explorers can dig at the same camp (its second space).', () => {
   const G = VG.newGame({ np: 4, seed: 2 }); G.p.forEach(p => { p.hand = ['grant', 'grant', 'grant', 'grant', 'grant']; }); go(G, { t: 'dig', s: 0 }); go(G, { t: 'dig', s: 0 }); return eq([0, 1], [G.sites[0].occ, G.sites[0].occ2]); });
 rule('M8', 'Exile can take a card from your play area.', () => { const G = G2(); const p = G.p[0]; p.play = ['trail']; p.guards = [{ id: 'ember-hound', used: false }]; go(G, { t: 'boon', k: 0 }); go(G, { t: 'ans', v: { z: 'play', i: 0 } }); return eq([0, ['trail']], [p.play.length, p.exiled]); });
+
+sec('Z. Rulebook audit (FIXED9, see RULES-AUDIT.md)');
+const dreadN = p => p.deck.concat(p.hand, p.play, p.disc).filter(c => c === 'dread').length;
+rule('Z1', 'A camp site has two spaces; the second one costs two icons (a Boot site: 2 Boots), the first one icon.', () => { const G = G2(1, 4), p = G.p[0], q = G.p[1]; p.hand = ['trail', 'trail', 'trail', 'trail', 'trail']; q.hand = ['trail', 'grant', 'grant', 'grant', 'grant'];
+  const s = G.sites.findIndex(x => x.cost.length === 1 && x.cost[0] === 'boot'); go(G, { t: 'dig', s });
+  const one = VG.moves(G).some(m => m.t === 'dig' && m.s === s) ? 1 : 0; q.res.coin = 0; q.hand = ['trail'];
+  const canOne = VG.moves(G).some(m => m.t === 'dig' && m.s === s); q.hand = ['trail', 'trail']; const canTwo = VG.moves(G).some(m => m.t === 'dig' && m.s === s); return eq([false, true], [canOne, canTwo]); });
+rule('Z2', 'Every archaeologist taken back from a site with a guardian brings a Fear (Dread) card: both spaces of a camp site.', () => { const G = G2(1, 4), p = G.p[0], q = G.p[1]; p.hand = ['trail', 'trail', 'trail', 'trail', 'trail']; q.hand = ['trail', 'trail', 'trail', 'trail', 'trail'];
+  const s = G.sites.findIndex(x => x.cost[0] === 'boot'); go(G, { t: 'dig', s }); go(G, { t: 'dig', s }); G.sites[s].guard = Object.keys(V.GUARD)[0]; const a = dreadN(p), b = dreadN(q), r0 = G.round; passAll(G); return eq([a + 1, b + 1, r0 + 1], [dreadN(p), dreadN(q), G.round]); });
+rule('Z3', 'A guardian can be overcome by an archaeologist on either space of its site.', () => { const G = G2(1, 4), p = G.p[0], q = G.p[1]; p.hand = ['trail', 'trail', 'trail', 'trail', 'trail']; q.hand = ['trail', 'trail', 'trail', 'trail', 'trail'];
+  const s = G.sites.findIndex(x => x.cost[0] === 'boot'); go(G, { t: 'dig', s }); go(G, { t: 'dig', s }); const gid = Object.keys(V.GUARD)[0]; G.sites[s].guard = gid; G.turn = 1; Object.keys(V.GUARD[gid].cost).forEach(k => { q.res[k] = 9; });
+  return eq(true, VG.moves(G).some(m => m.t === 'beat' && m.s === s)); });
+rule('Z4', 'Several idols may be set in shrine slots in one turn (free actions); each of the 4 slots only once.', () => { const G = G2(), p = G.p[0]; p.idols = [{ id: Object.keys(V.IDOL)[0], used: false }, { id: Object.keys(V.IDOL)[1], used: false }]; go(G, { t: 'idol', k: 0, sh: 0, free: true }); const second = VG.moves(G).some(m => m.t === 'idol' && m.k === 1); return eq([true, 0], [second, G.turn]); });
+rule('Z5', 'A Fear card can still pay one Boot of travel (it only has no effect).', () => { const G = G2(), p = G.p[0]; p.res.coin = 0; p.hand = ['dread']; return eq(true, !!VG.payPlan(G, 0, ['boot'])); });
+rule('Z6', 'No shuffling during a round: with an empty deck a draw gives nothing.', () => { const G = G2(), p = G.p[0]; p.deck = []; p.disc = []; p.play = ['grant']; const n = p.hand.length; p.hand = p.hand.slice(0, 2); const before = p.hand.length; p.hand.length; return eq([2, 0], [before, p.deck.length]); });
+
 if (process.argv.includes('--md')) {
   const lines = []; let n = 0; R.forEach(r => { if (r.sec) lines.push('', '## ' + r.sec, ''); else { n++; lines.push('- **' + r.id + '** ' + r.text); } });
   console.log(lines.join('\n') + '\n\nTOTAL ' + n); process.exit(0);

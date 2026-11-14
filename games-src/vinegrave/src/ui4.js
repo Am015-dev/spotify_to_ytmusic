@@ -78,7 +78,7 @@ function coachCheck(L) {   /* called from render: explain a rule the first time 
   if (t.dig) coachSay('dig');
   if (t.disc) coachSay('discover');
   if (L.some(m => m.t === 'disc' && G.sites[m.s].lvl === 2)) coachSay('deep');
-  if (L.some(m => (m.t === 'dig' || m.t === 'disc') && (VG.payPlan(G, UI.view, G.sites[m.s].cost) || {}).coins)) coachSay('plane');
+  if (L.some(m => (m.t === 'dig' || m.t === 'disc') && (VG.payPlan(G, UI.view, VG.siteCost(G.sites[m.s])) || {}).coins)) coachSay('plane');
   if (t.idol) { coachSay('shrine'); coachSay('slots'); }
   if (t.beat) coachSay('overcome');
   if (t.boon) coachSay('boon');

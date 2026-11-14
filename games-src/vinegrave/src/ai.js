@@ -26,7 +26,7 @@
     p.guards.forEach(function (g) { if (!g.used) v += opVal(V.GUARD[g.id].boon) * 0.8; });
     (p.asst || []).forEach(function (a) { var d = V.ASSTBY[a.id], uses = Math.max(0, left - (a.ex ? 1 : 0)); v += opVal(a.gold ? d.gd : d.s) * uses * 0.6; });   /* assistants: what their remaining uses are worth */
     p.idols.forEach(function (d) { if (!d.used && f > 0.5) v += 0.6; });
-    G.sites.forEach(function (x) { if (x.occ === s && x.guard) v -= VG.has(p, V.GUARD[x.guard].cost) ? 0.3 : 1.6; });
+    G.sites.forEach(function (x) { if ((x.occ === s || x.occ2 === s) && x.guard) v -= VG.has(p, V.GUARD[x.guard].cost) ? 0.3 : 1.6; });
     if (lvl === 'hard') { v += p.glass * 0.35 * f + (p.glass >= V.TOP ? 1 : 0); v += Math.min(p.res.jewel, 3) * 0.2 * f; }
     if (G.q && G.q.seat === s) v -= 0.01;
     return v;

@@ -128,16 +128,16 @@ const RULES_HTML = `<div class="rules">
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
 <h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
 <h3>Your turn</h3><p>Do one main action, then the next explorer goes. Playing a starting coin or compass card is free. Pass to sit out.</p>
-<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread does nothing.</li>
-<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then is discarded. A Plane pays any icon.</li>
+<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread has no effect, but you can spend it as a Boot of travel.</li>
+<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then waits in your play area until the round ends. A Plane pays any icon (2 coins make one). At a camp, the second explorer on a site pays double.</li>
 <li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>
 <li><b>Fight</b> a guardian where your explorer stands. Pay its cost for 5 points and a boon.</li>
 <li><b>Buy</b>: items go under your deck. Artifacts work at once.</li>
 <li><b>Research</b>: climb the track. Pay each row's cost for its bonus.</li></ul>
-<h3>Free actions</h3><p>Use a boon, or set one idol in a shrine.</p>
-<h3>End of a round</h3><p>Explorers come home. Anyone with a guardian gains Dread.</p>
+<h3>Free actions</h3><p>Use a boon once (then it is spent). Set idols in shrines: as many as you like in a turn, but each of the 4 slots only once.</p>
+<h3>End of a round</h3><p>Explorers come home. Each explorer leaving a site that still has a guardian brings back a Dread card. Played cards are shuffled under your deck.</p>
 <h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>One idol a turn into a shrine. 4 shrine slots. Boons come at once.</li><li>No helpers and no research bonus tiles. First arrivals get rewards.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
+<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>Shrine bonuses, assistants and research bonuses are this game's own.</li><li>The research track is a plain ladder of rows, not a map of paths.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -206,7 +206,7 @@ function helpInit() {
       { title: 'Travel', text: 'Each card pays one travel icon. A Plane pays any icon.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses flip a hidden ruin. You get an idol and loot.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay its cost while you are there: 5 points and a boon.', pic: P('guard') },
-      { phase: 'idol', title: 'Shrines', text: 'Set one idol a turn in a shrine for a boon.', pic: P('idol') }],
+      { phase: 'idol', title: 'Shrines', text: 'Set idols in shrines for a free boon. Each slot once.', pic: P('idol') }],
     avoid: '.glow,#pacts .btn,#qbox .btn,#insp' });
   if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
 }

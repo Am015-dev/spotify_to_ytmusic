@@ -62,7 +62,7 @@
   function draw(G, p, n) {
     var got = 0;
     for (var i = 0; i < n; i++) {
-      if (!p.deck.length) { if (!p.disc.length) break; p.deck = shuf(G, p.disc); p.disc = []; }
+      if (!p.deck.length) break;   /* rulebook FAQ: no shuffling during a round; an empty deck draws nothing */
       p.hand.push(p.deck.shift()); got++;
     }
     return got;
@@ -107,6 +107,8 @@
     (plan.tv || []).slice().sort(function (a, b) { return b - a; }).forEach(function (i) { p.tv.splice(i, 1); });
     (plan.boons || []).forEach(function (k) { p.guards[k].used = true; log(G, s, nm(G, s) + ' uses the boon of ' + V.GUARD[p.guards[k].id].name + ' as travel.', { k: 'boon' }); });
   }
+  /* rulebook: the second space of a camp site costs two icons ("the next player to use the site will need to cover a cost of 2 Boots") */
+  function siteCost(x) { return x.lvl === 0 && x.occ !== -1 && x.cap > 1 && x.occ2 === -1 ? x.cost.concat(x.cost) : x.cost; }
   function freeSite(G, s, i) { var x = G.sites[i]; return x && (x.occ === -1 || (x.cap > 1 && x.occ2 === -1)) && (x.lvl === 0 || x.tile); }
   // ------------------------------------------------------------ whose turn
   function actor(G) { if (G.phase !== 'play') return -1; if (G.q) return G.q.seat; return G.turn; }
@@ -123,12 +125,12 @@
     p.hand.forEach(function (id, i) { var c = card(id); if (c.t === 'fear') return; if (c.t === 'art' && p.res.tablet < 1) return; out.push(c.t === 'basic' || c.fa ? { t: 'play', i: i, free: true } : { t: 'play', i: i }); });   /* rulebook: the starting coin / compass cards are free actions */
     if (p.ex > 0) G.sites.forEach(function (x, i) {
       if (x.occ !== -1 && !(x.cap > 1 && x.occ2 === -1)) return;
-      if (x.lvl === 0 || x.tile) { if (payPlan(G, s, x.cost)) out.push({ t: 'dig', s: i }); }
+      if (x.lvl === 0 || x.tile) { if (payPlan(G, s, siteCost(x))) out.push({ t: 'dig', s: i }); }
       else if (p.res.compass >= V.DISC[x.lvl] && (x.lvl === 1 ? G.s1 : G.s2).length) {
         var pl = payPlan(G, s, x.cost); if (pl && p.res.coin - pl.coins >= 0) out.push({ t: 'disc', s: i });
       }
     });
-    G.sites.forEach(function (x, i) { if (x.occ === s && x.guard && has(p, V.GUARD[x.guard].cost)) out.push({ t: 'beat', s: i }); });
+    G.sites.forEach(function (x, i) { if ((x.occ === s || x.occ2 === s) && x.guard && has(p, V.GUARD[x.guard].cost)) out.push({ t: 'beat', s: i }); });
     G.row.forEach(function (id, r) { if (id && has(p, cardCost(id))) out.push({ t: 'buy', r: r }); });
     if (p.glass < V.TOP && has(p, V.TRACK[p.glass + 1].cost)) out.push({ t: 'res', k: 'g' });
     if (p.note < p.glass && p.note + 1 < V.TOP && has(p, V.TRACK[p.note + 1].cost)) out.push({ t: 'res', k: 'n' });
@@ -212,7 +214,7 @@
       log(G, s, nm(G, s) + ' plays ' + c.name + (c.t === 'art' ? ' (1 tablet)' : '') + '.', { k: 'play', card: id });
       runOps(G, s, c.ops, true); return { ok: true };
     }
-    if (m.t === 'dig') { var x = G.sites[m.s]; spendTravel(G, s, payPlan(G, s, x.cost)); digSite(G, s, m.s); endTurn(G); return { ok: true }; }
+    if (m.t === 'dig') { var x = G.sites[m.s]; spendTravel(G, s, payPlan(G, s, siteCost(x))); digSite(G, s, m.s); endTurn(G); return { ok: true }; }
     if (m.t === 'disc') {
       var y = G.sites[m.s], pl = payPlan(G, s, y.cost); spendTravel(G, s, pl); p.res.compass -= V.DISC[y.lvl];
       y.tile = (y.lvl === 1 ? G.s1 : G.s2).pop(); p.found = (p.found || 0) + 1;
@@ -262,7 +264,8 @@
   function endRound(G) {
     G.sites.forEach(function (x) {
       if (x.occ >= 0) { var p = G.p[x.occ]; if (x.guard) { var tile = takeDread(G, x.occ, 'play'); log(G, x.occ, nm(G, x.occ) + ' flees ' + V.GUARD[x.guard].name + (tile ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p.ex++; }
-      x.occ = -1; if (x.occ2 != null && x.occ2 >= 0) { G.p[x.occ2].ex++; x.occ2 = -1; }
+      x.occ = -1;
+      if (x.occ2 != null && x.occ2 >= 0) { var p2 = G.p[x.occ2]; if (x.guard) { var tile2 = takeDread(G, x.occ2, 'play'); log(G, x.occ2, nm(G, x.occ2) + ' flees ' + V.GUARD[x.guard].name + (tile2 ? ' and takes a fear tile (-2): no Dread cards left.' : ' and takes a Dread card.'), { k: 'fear' }); } p2.ex++; x.occ2 = -1; }   /* rulebook: a Fear card for EACH archaeologist taken back from a guardian's site */
     });
     G.p.forEach(function (p) { p.deck = p.deck.concat(shuf(G, p.play.concat(p.disc))); p.disc = []; p.play = []; p.passed = false; p.idolTurn = false; (p.asst || []).forEach(function (a) { a.ex = false; }); });   /* rulebook: the play area is shuffled and put under the deck (items bought this round stay above it) */
     if (G.round >= G.rounds) return endGame(G);
@@ -336,6 +339,6 @@
   function text(G) {
     return 'Round ' + G.round + '/' + G.rounds + ' turn ' + G.turn + (G.q ? ' q=' + G.q.h : '') + '\n' + G.p.map(function (p, i) { return i + ' ' + p.name + ' ' + JSON.stringify(p.res) + ' hand ' + p.hand.join(',') + ' note ' + p.note + ' glass ' + p.glass + ' vp ' + score(G, i).total; }).join('\n');
   }
-  var VG = { newGame: newGame, moves: moves, apply: apply, actor: actor, score: score, rivalScore: rivalScore, check: check, text: text, clone: clone, payPlan: payPlan, card: card, cardCost: cardCost, has: has, same: same, rng: rng, V: V };
+  var VG = { newGame: newGame, moves: moves, apply: apply, actor: actor, score: score, rivalScore: rivalScore, check: check, text: text, clone: clone, payPlan: payPlan, siteCost: siteCost, card: card, cardCost: cardCost, has: has, same: same, rng: rng, V: V };
   if (typeof module !== 'undefined' && module.exports) module.exports = VG; else root.VG = VG;
 })(typeof window !== 'undefined' ? window : this);

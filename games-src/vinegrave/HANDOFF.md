@@ -1,3 +1,13 @@
+# FIXED9 (14 Nov 2026): R35 7.1 FAIL (tap size, Easy win), stricter bar (rules, helpers, loops)
+- Tap size (style.css, ui1.js): site discs >= 46 px (`max(46px, ...)`), score chips 44, chooser cards >= 48. At <= 600 px tall (375x553) the market is one row of six small cards
+  and the three site rows are straight (`B2FLAT`, map < 205 px tall), so 15 discs never overlap. A tall chooser/selection panel that squeezes the map away hides it (`vg-squeeze`).
+- Helpers (ui1.js `glowSet`): ONE glow in normal play (the single strongest move; free plays only when nothing else). Pawns no longer glow, track cell hint only when the track glows,
+  rival mark (aimark) is single, fades after 1.8 s and is cleared when your turn starts. Choosers and hot-seat still light every legal choice. Hints/bulb stay off by default.
+- Loops: every `infinite` animation now runs 3 times (6 half-cycles for alternate) then holds still (gdpulse, siteinvite, pawnbob, rays, aimark, vgNudge).
+- Rules: RULES-AUDIT.md (second camp space costs double, fear card for each explorer incl. second space, overcome from either space, no mid-round reshuffle, text fixes). logic-test Z1-Z6.
+- Measure: `node measure.js 2 375x667 [built html]` and `375x553` plays real touch games and prints smallest tap target, max helpers at once, infinite animations.
+  `node bench-glow.js 100` = headless glow follower vs Easy (~50%).
+
 # R29 fix (12 Nov 2026): newcomer can win on Easy; nothing covers your turn
 - Glow = advice (src/ui1.js `glowSet`): in a real game only the 3 strongest places glow (computer's own scoring, within 1.5 of the best);
   other legal moves get a faint ring (.can) and still work. Prompt: "Your turn. What glows is a strong move." Tutorial: only the step's

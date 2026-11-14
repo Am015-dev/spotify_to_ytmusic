@@ -7,7 +7,7 @@ function refreshInsp() {
   if (I.kind === 'site') {
     const x = G.sites[I.x], hid = !x.tile;
     h += `<h3>${esc(siteName(x))}</h3><div class="irow"><div class="big"><div class="site l${x.lvl}${hid ? ' hid' : ''}"><span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span></div></div><div>`;
-    h += `<p>Travel: ${x.cost.map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card pays one icon.</p>`;
+    h += `<p>Travel: ${VG.siteCost(x).map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card pays one icon.</p>`;
     h += hid ? `<p>Explore: pay ${V.DISC[x.lvl]} compasses and the travel.</p><p>You find an idol and loot. A guardian wakes.</p>` : `<p>Dig: get ${resWords(V.SITE[x.tile].rew)}.</p>`;
     if (x.occ !== -1) h += `<p>${esc(who(x.occ))} is here this round.</p>`;
     if (x.guard) { const gd = V.GUARD[x.guard]; h += `<div class="gport" data-art="guard-${x.guard}"><svg><use href="#s-guard"/></svg></div><p><b>${esc(gd.name)}</b> guards it.</p><p>Fight it: pay ${resWords(gd.cost)}. Win 5 points and a boon.</p><p>Boon: ${esc(V.opText(gd.boon))}.</p><p>Still here at round end? Take a Dread card.</p>`; }
@@ -39,7 +39,7 @@ function refreshInsp() {
     if (!a.ex && !L.some(m => m.t === 'asst' && m.k === I.x) && myTurn()) h += '<p class="sm">You cannot pay its cost yet.</p>';
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
-    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end.</p><p>Set it in a shrine for a free boon now.</p><p class="sm">One idol a turn. Each empty shrine slot is worth points too.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
+    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end.</p><p>Set it in a shrine for a free boon now.</p><p class="sm">Each of the 4 shrine slots works once. Each empty slot is worth points too.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'idol' && m.k === I.x) add(m, 'Shrine: ' + V.SHRINE[m.sh].text, ''); });
   }
   $('#insp').innerHTML = `<button type="button" class="ix" data-a="ix" aria-label="Close">×</button>` + h + (btns.length ? `<div class="ibtns">${btns.join('')}</div>` : '');
@@ -160,7 +160,7 @@ function aiStep() {
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
-  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) el0.classList.add('aimark'); rivalCap(cap); }
+  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) { document.querySelectorAll('.aimark').forEach(e => e.classList.remove('aimark')); el0.classList.add('aimark'); setTimeout(() => el0.classList.remove('aimark'), 1800); } rivalCap(cap); }
   turnWait(UI.fast ? 0 : UI.quick ? 260 : 600, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
     const b = snapS(s), F = m ? fxBefore(m, s) : {};
@@ -229,7 +229,7 @@ function reducedMo() { return document.documentElement.classList.contains('gx-re
 function fxBefore(m, s) {
   if (UI.fast || !G || !m) return {}; const F = {}, R = el => el && el.getBoundingClientRect();
   if (m.t === 'dig' || m.t === 'disc') { F.pawn = UI.dropFrom || (s === UI.view ? R($('#pawns .pawn.mine:last-of-type') || $('#pawns .pawn.mine')) : R(chipOf(s))); F.ps = s;
-    if (s === UI.view) { const pl = VG.payPlan(G, s, G.sites[m.s].cost); if (pl) F.pay = pl.cards.map(i => { const e = $(`#hand .cd[data-i="${i}"]`); return e ? { r: R(e), html: e.outerHTML } : null; }).filter(Boolean); } }
+    if (s === UI.view) { const pl = VG.payPlan(G, s, VG.siteCost(G.sites[m.s])); if (pl) F.pay = pl.cards.map(i => { const e = $(`#hand .cd[data-i="${i}"]`); return e ? { r: R(e), html: e.outerHTML } : null; }).filter(Boolean); } }
   if (m.t === 'buy' || (m.t === 'play' && s === UI.view)) { const e = moveEl(m, s); if (e) F.card = { r: UI.dropFrom || R(e), html: e.outerHTML }; }
   if (m.t === 'play' && s !== UI.view && s >= 0 && G.p[s].hand[m.i] && chipOf(s)) F.card = { r: R(chipOf(s)), html: cardHTML(G.p[s].hand[m.i]), w: 64, h: 90 };
   if (s >= 0 && G.p[s]) F.pts = VG.score(G, s).total;

@@ -67,11 +67,11 @@ function pawnSVG(s, cls) { return `<svg class="meep ${cls || ''}" viewBox="0 0 2
 function siteName(x) { return x.tile ? V.SITE[x.tile].name : (x.lvl === 1 ? 'Hidden ruin' : 'Deep ruin'); }
 function siteHTML(x, i, glow, sel) {
   const hid = !x.tile, nm = siteName(x), occ = x.occ === -1 ? '' : x.occ === -2 ? (G.rival ? G.rival.name : 'Rival') : G.p[x.occ].name;
-  const lab = nm + '. Travel ' + x.cost.map(t => V.TNAME[t]).join(' + ') + (hid ? '. Explore for ' + V.DISC[x.lvl] + ' compasses' : '. Dig for ' + resWords(V.SITE[x.tile].rew)) + (x.guard ? '. Guardian: ' + V.GUARD[x.guard].name : '') + (occ ? '. ' + occ + ' is here' : '');
+  const lab = nm + '. Travel ' + VG.siteCost(x).map(t => V.TNAME[t]).join(' + ') + (hid ? '. Explore for ' + V.DISC[x.lvl] + ' compasses' : '. Dig for ' + resWords(V.SITE[x.tile].rew)) + (x.guard ? '. Guardian: ' + V.GUARD[x.guard].name : '') + (occ ? '. ' + occ + ' is here' : '');
   const rew = hid ? `<b>${V.DISC[x.lvl]}</b>${ic('compass')}` : Object.keys(V.SITE[x.tile].rew).map(k => `<b>${V.SITE[x.tile].rew[k]}</b>${ic(k)}`).join('');
   return `<button type="button" class="site l${x.lvl}${hid ? ' hid' : ''}${glow === 2 ? ' can' : glow ? ' glow' : ''}${sel ? ' sel' : ''}${x.occ !== -1 && !(x.cap > 1 && x.occ2 === -1) ? ' taken' : ''}" data-a="site" data-i="${i}" aria-label="${esc(lab)}">
     <span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span>
-    <span class="cost">${x.cost.map(t => ic(t)).join('')}</span>
+    <span class="cost">${VG.siteCost(x).map(t => ic(t)).join('')}</span>
     <span class="nm">${esc(nm)}</span>
     ${x.guard ? `<span class="gd" data-art="guard-${x.guard}"><svg aria-hidden="true"><use href="#s-guard"/></svg></span>` : ''}
     ${occ ? `<span class="occ"${x.occ >= 0 ? ` data-art="explorer-${x.occ}"` : ''}>${pawnSVG(x.occ)}</span>` : ''}${x.occ2 != null && x.occ2 >= 0 ? `<span class="occ occ2" data-art="explorer-${x.occ2}">${pawnSVG(x.occ2)}</span>` : ''}${x.lvl === 0 && x.cap > 1 && x.occ2 === -1 && x.occ !== -1 ? '<span class="sp2" aria-hidden="true">+1</span>' : ''}
@@ -100,6 +100,7 @@ const B2 = !/[?&]b2=0\b/.test(location.search);
 if (B2 && typeof ResizeObserver !== 'undefined') try { const fit = () => { const m = document.getElementById('map'); if (!m) return; const h = m.getBoundingClientRect().height; m.style.setProperty('--ms', h ? Math.max(0.62, Math.min(1, h / 290)).toFixed(2) : 1); };
   addEventListener('DOMContentLoaded', () => { const m = document.getElementById('map'); if (m) new ResizeObserver(fit).observe(m); fit(); }); if (document.getElementById('map')) new ResizeObserver(fit).observe(document.getElementById('map')); } catch (e) { }   /* sites scale with the map's height */
 if (B2) document.body.classList.add('vg-b2');
+const B2FLAT = { 0: [[15, 82], [33, 82], [51, 82], [69, 82], [87, 82]], 1: [[15, 47], [33, 47], [51, 47], [69, 47], [87, 47]], 2: [[21, 12], [42, 12], [63, 12], [84, 12]] };   /* short maps: three straight rows so 46 px discs never overlap */
 const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
   0: [[15, 69], [33, 79], [51, 69], [69, 79], [87, 69]],
   1: [[15, 41], [33, 53], [51, 41], [69, 53], [87, 41]],
@@ -107,24 +108,25 @@ const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
 };
 function mapB2(gS, S) {
   const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
-  const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = (B2POS[lv][k] || [50, 50]); }));
+  const mh = document.getElementById('map') ? document.getElementById('map').clientHeight : 999, flat = mh > 0 && mh < 205;
+  const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = ((flat ? B2FLAT : B2POS)[lv][k] || [50, 50]); }));
   let path = ''; const line = (a, b) => { path += `M${a[0]} ${a[1]}L${b[0]} ${b[1]}`; };
   per[0].forEach((i, k) => { if (k) line(pos[per[0][k - 1]], pos[i]); const up = per[1][k]; if (up != null) line(pos[i], pos[up]); });
   per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
   per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
   const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
-  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', 36) + sign('Camp', 69)
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', flat ? 38 : 36) + sign('Camp', flat ? 72 : 69)
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
-/* which legal main moves glow: in a real game only the 3 strongest places (by the computer's own scoring, within 1.5 points of the best),
+/* which legal main moves glow: in a real game only the single strongest move (by the computer's own scoring, within 1.5 points of the best),
    so a newcomer who taps what glows plays well; the tutorial, a pending question and hot-seat keep every legal move glowing */
 function glowSet(L, q) {
   if (G && UI.mode === 'tutorial' && !q) return tutGlow(L);
   if (q || !G || UI.mode === 'hot' || typeof evalMoves !== 'function') return L;
-  let ev = []; try { ev = evalMoves(); } catch (x) { return L; } if (!ev.length) return L;
+  let ev = []; try { ev = evalMoves(); } catch (x) { return L; } if (!ev.length) { const f = L.find(m => m.t !== 'pass'); return f ? [f] : L; }   /* only free plays left: the first one glows */
   const key = m => m.t === 'res' || m.t === 'temple' ? 't' : m.t === 'buy' ? 'r' + m.r : m.t === 'play' ? 'h' + m.i : m.s != null ? 's' + m.s : m.t;
-  const top = ev[0].v, keys = []; ev.forEach(e => { const k = key(e.m); if (keys.length < 3 && e.v >= top - 1.5 && keys.indexOf(k) < 0) keys.push(k); });
+  const top = ev[0].v, keys = []; ev.forEach(e => { const k = key(e.m); if (keys.length < 1 && e.v >= top - 1.5 && keys.indexOf(k) < 0) keys.push(k); });
   return L.filter(m => keys.indexOf(key(m)) >= 0);
 }
 /* guided first game: only what the current step asks for glows (a glowing site during "Play a card" was a dead tap) */
@@ -136,7 +138,7 @@ function tutGlow(L) {
   return f.length ? f : L;
 }
 function render() {
-  if (!G) return; if (yourTurnClear()) { const t = $('#toast'); if (t) t.classList.remove('on'); } UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
+  if (!G) return; if (yourTurnClear()) { const t = $('#toast'); if (t) t.classList.remove('on'); } if (myTurn()) document.querySelectorAll('.aimark').forEach(e => e.classList.remove('aimark'));   /* the rival's mark never sits beside your glow */ UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
   const actor = VG.actor(G);
   if (UI.sel && (!myTurn() || UI.sel.at !== G.turns + ':' + G.round + ':' + G.p[UI.view].hand.length)) UI.sel = null;
   const S = UI.sel || {};
@@ -160,7 +162,7 @@ function render() {
   const trG = GL.some(m => m.t === 'res' || m.t === 'temple'), trC = !trG && L.some(m => m.t === 'res' || m.t === 'temple');
   let tr = ''; for (let r = 0; r <= V.TOP; r++) {
     const mk = G.p.map((p, i) => (p.glass === r ? `<i class="mg" style="--pc:${HEX[i]}" title="${esc(p.name)}: magnifier"></i>` : '') + (p.note === r ? `<i class="nb" style="--pc:${HEX[i]}" title="${esc(p.name)}: notebook"></i>` : '')).join('') + (G.rival && Math.min(V.TOP, G.rival.rows) === r ? '<i class="mg" style="--pc:#9a9486"></i>' : '');
-    const nx = myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
+    const nx = trG && myTurn() && (L.some(m => m.t === 'res' && m.k === 'g') && me.glass + 1 === r || L.some(m => m.t === 'res' && m.k === 'n') && me.note + 1 === r);
     tr += `<span class="tc${r === V.TOP ? ' top' : ''}${nx ? ' nx' : ''}"><span class="tn">${r === V.TOP ? '<svg class="star" aria-label="temple"><use href="#s-star"/></svg>' : r}</span>${V.ASST_REC.indexOf(r) >= 0 ? '<span class="tas" aria-label="notebook here: hire an assistant" title="Notebook here: hire an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}${V.ASST_UP.indexOf(r) >= 0 ? '<span class="tas gold" aria-label="notebook here: upgrade an assistant" title="Notebook here: upgrade an assistant"><svg><use href="#s-meep"/></svg></span>' : ''}<span class="tp">${V.GLASS_VP[r]}</span><span class="tm">${mk}</span></span>`;
   }
   const tb = $('#track'); tb.innerHTML = `<span class="tl">Research</span><span class="tcs">${tr}</span>`; tb.classList.toggle('glow', trG); tb.classList.toggle('can', trC); tb.classList.toggle('sel', S.k === 'track'); tb.dataset.a = 'track';
@@ -176,8 +178,9 @@ function render() {
   if (window.GXH) try { GXH.phase(helpPhase()); } catch (e) { }
   if (UI.insp) refreshInsp();
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
-  { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(myTurn() && !q && !UI.sel && G.phase === 'play' && /research/i.test($('#prompt').textContent))); }
+  { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(tb.classList.contains('glow') && myTurn() && !q && !UI.sel && G.phase === 'play')); }
   guidedGlow();
+  try { const mp = $('#map'); document.body.classList.toggle('vg-squeeze', !!(mp && mp.clientHeight < 80)); } catch (x) { }   /* a tall chooser (exile) squeezes the board away: it is not a tap target then */
 }
 setInterval(() => { if (typeof UI !== 'undefined' && UI.mode === 'tutorial') guidedGlow(); }, 250);   /* the tutor changes step without a render */
 /* guided tutorial step: only the step's target glows, so a tap on anything else is never a dead tap on a glowing piece */
@@ -208,7 +211,7 @@ function renderTray(L, q, me, actor) {
   const qc = qb.querySelector('.qcards'), qg = qc && qc.querySelector('.cd.glow'); if (qg) qc.scrollLeft = Math.max(0, qg.offsetLeft - qc.offsetLeft - 8);   /* the suggested card is in view (R29: cut at 375) */
   // your explorers (drag one onto a glowing site), then your goods in words
   const canGo = mine && !q && GL.some(m => m.t === 'dig' || m.t === 'disc');
-  $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${canGo ? ' glow' : ''}${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site"><span class="pa" data-art="explorer-${UI.view}"></span>${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
+  $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site"><span class="pa" data-art="explorer-${UI.view}"></span>${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
   $('#myres').innerHTML = V.RES.map(k => `<span class="rc${me.res[k] ? '' : ' zero'}"><span class="rv">${ic(k)}<b>${me.res[k]}</b></span><span class="rl">${rw(k, me.res[k] === 1 ? 1 : 2).replace('arrowheads', 'arrows').replace('arrowhead', 'arrow')}</span></span>`).join('');
   let ex = '';
   me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
@@ -218,7 +221,7 @@ function renderTray(L, q, me, actor) {
   $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex);
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = Math.min(play[m.i] || 2, gl(m)); });
   $('#hand').classList.toggle('many', me.hand.length > 5);
-  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: play[i] && !q, sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
+  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: q ? 0 : play[i], sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
 }
 /* what the selected thing does, in one or two short lines, plus the move a second tap makes */
 function selInfo(S) {
@@ -232,7 +235,7 @@ function selInfo(S) {
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
     if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
     if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
-    const pay = payWords(VG.payPlan(G, UI.view, x.cost));
+    const pay = payWords(VG.payPlan(G, UI.view, VG.siteCost(x)));
     if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
     return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
   if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
