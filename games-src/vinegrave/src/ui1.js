@@ -170,7 +170,7 @@ function render() {
   const gR = {}; L.forEach(m => { if (m.t === 'buy') gR[m.r] = Math.min(gR[m.r] || 2, gl(m)); }); if (q && q.h === 'buy') VG.moves(G).forEach(m => { if (m.v != null) gR[m.v] = 1; });
   const canMain = myTurn() && !q && L.some(m => m.t !== 'pass' && !m.free);
   const needOf = id => { if (!canMain) return 0; const c = V.CARDS[id], k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); return n > 0 ? n : 0; };
-  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => { const n = id && !gR[r] ? needOf(id) : 0, kk = id && V.CARDS[id].t === 'item' ? 'coin' : 'compass'; return id ? mktHTML(id, { r, glow: gR[r], sel: S.k === 'row' && S.x === r, need: n ? '−' + n + ic(kk) : '', needT: n ? 'You need ' + n + ' more ' + rw(kk, n) + '.' : '' }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>'; }).join('') + '</div>';
+  $('#row').innerHTML = `<span class="tl">Market<span class="lx"> · coins or compasses</span></span><div class="cards">` + G.row.map((id, r) => { const n = id && !gR[r] ? needOf(id) : 0, kk = id && V.CARDS[id].t === 'item' ? 'coin' : 'compass'; return id ? mktHTML(id, { r, glow: gR[r], sel: S.k === 'row' && S.x === r, need: n ? '<span class="nw">need</span>' + n + ic(kk) : '', needT: n ? 'You need ' + n + ' more ' + rw(kk, n) + '.' : '' }) : '<span class="cd back" data-art="card-back" aria-hidden="true"></span>'; }).join('') + '</div>';
   renderTray(L, q, me, actor);
   document.body.classList.toggle('vg-mine', myTurn() && G.phase === 'play');
   if (typeof artApply === 'function') artApply();
@@ -180,7 +180,7 @@ function render() {
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
   { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(tb.classList.contains('glow') && myTurn() && !q && !UI.sel && G.phase === 'play')); }
   guidedGlow();
-  try { const mp = $('#map'); document.body.classList.toggle('vg-squeeze', !!(mp && mp.clientHeight < 80)); } catch (x) { }   /* a tall chooser (exile) squeezes the board away: it is not a tap target then */
+  try { const mp = $('#map'); const qo = !$('#qbox').hidden; document.body.classList.toggle('vg-squeeze', !!(qo && mp && mp.clientHeight < 80)); } catch (x) { }   /* only a tall open chooser (exile) may squeeze the board away; dock buttons never do (F11) */
 }
 setInterval(() => { if (typeof UI !== 'undefined' && UI.mode === 'tutorial') guidedGlow(); }, 250);   /* the tutor changes step without a render */
 /* guided tutorial step: only the step's target glows, so a tap on anything else is never a dead tap on a glowing piece */

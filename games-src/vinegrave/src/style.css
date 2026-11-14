@@ -608,3 +608,42 @@ body.vg-squeeze #map,body.vg-squeeze #track{visibility:hidden;pointer-events:non
 }
 #row .cd.mc[data-badge]::after{display:none}   /* the market card's glow already points; the badge would cover its Free chip */
 @media (max-width:999px){body.vg-b2 #track .tcs{min-height:0}body.vg-b2 #track .tc{min-height:0}}   /* every phone height: the nine rows shrink to fit instead of running under the dock */
+/* F11 (R63 P1/P2): on phones up to 700 px tall the boon / idol / assistant buttons share one line with your goods, so the island
+   keeps about 150 px and the research track stays in view whatever the dock holds. Goods show icon + number; buttons are 44 px
+   chips (icon over a 14 px word) that scroll sideways if a fifth one ever comes. Your explorers are counted in your score chip. */
+@media (max-width:999px) and (max-height:700px){
+  body.vg-b2.vg-hasex #dockbody{display:grid!important;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"pr pr" "q q" "my ex" "hand hand";column-gap:6px;row-gap:3px}
+  body.vg-b2.vg-hasex #promptrow{grid-area:pr}body.vg-b2.vg-hasex #qbox{grid-area:q}body.vg-b2.vg-hasex #myrow{grid-area:my;min-height:44px;gap:0}body.vg-b2.vg-hasex #extra{grid-area:ex}body.vg-b2.vg-hasex #hand{grid-area:hand}
+  body.vg-b2.vg-hasex #pawns{display:none}
+  body.vg-b2.vg-hasex #myres{gap:3px;justify-content:flex-start}
+  body.vg-b2.vg-hasex .rc .rl{display:none}
+  body.vg-b2.vg-hasex .rc .rv{flex-direction:column;gap:0}
+  body.vg-b2.vg-hasex .rc .rv .ic{width:20px;height:20px}
+  body.vg-b2.vg-hasex .rc .rv b{font-size:17px;line-height:18px}
+  body.vg-b2.vg-hasex .rc{min-width:26px}
+  body.vg-b2.vg-hasex #extra{gap:3px;align-items:center;justify-content:flex-end;overscroll-behavior-x:contain}
+  body.vg-b2.vg-hasex #extra .tag{flex-direction:column;justify-content:center;gap:0;min-width:44px;height:44px;min-height:44px;padding:1px 3px;font-size:14px;line-height:15px;border-radius:9px}
+  body.vg-b2.vg-hasex #extra .tag .ic{width:24px;height:24px;border-radius:6px;flex:none}
+  body.vg-b2.vg-hasex #extra .tag.asst .aic{width:24px;height:24px;font-size:14px}
+  body.vg-b2.vg-hasex #extra .tag.tvc .ic{background:none}
+}
+@media (max-width:999px) and (max-height:600px){
+  body.vg-b2 #hand .cd .pic,body.vg-b2.vg-hasex #hand .cd .pic{height:16px}
+  body.vg-b2 #hand .cd .tr{width:16px;height:16px;top:2px}body.vg-b2 #hand .cd .vp{top:1px}
+  body.vg-b2 #dockbody{padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}
+}
+/* F11 (R63 L1/L2): the help ring pulses three times, then holds still; a bubble moved off the board sits slim in the top bar */
+.gxh-ring{animation-iteration-count:3!important}
+.gxh-bub.vg-bubtop .gxh-arr{display:none}
+/* F11 (R63 P3): the shortfall chip says "need 2", the row signs sit inside the screen, chooser card names never split mid-word */
+.cd .need .nw{margin-right:2px;font-weight:800}
+@media (max-width:999px) and (max-height:600px){
+  body.vg-b2 #row .cd.mc .mef{left:46px}
+  body.vg-b2 #row .cd.mc .need{font-size:12px;line-height:16px;padding:0 2px;left:2px;max-width:42px}
+  body.vg-b2 #row .cd.mc .need .ic{display:none}
+  body.vg-b2 #row .cd.mc .need .nw{margin-right:1px}
+}
+@media (max-width:999px){body.vg-b2 .msign{left:-1px}}
+#qbox .qcards .cd .cn{overflow-wrap:normal;word-break:normal;hyphens:none;letter-spacing:-.03em}
+@media (max-width:999px){#qbox .qcards .cd{flex:1 0 66px;min-width:66px;max-width:88px}}
+.loglist .lgef{font-size:14px;opacity:.8}
