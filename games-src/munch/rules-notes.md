@@ -126,7 +126,11 @@ Treasures:
 
 ## Not included
 - Trading items between players (you can still give away cards through charity, looting and Mind If I Borrow That?).
-- The optional "Listen at the door" and shared-victory rules.
+- Charity among several players tied for lowest: the rulebook says to split the extras as evenly as you can. Here you give each extra card to any of them freely.
+- Cleric Resurrection covers the two face-up draws this version has: kicking open the door, and the treasure of a fight won with help. Treasure won alone is drawn face-down, as in the rulebook.
+
+## Included since the last check
+- The Quick game (the rulebook's own faster-play option) is now in and is the default: listen at the door (a free face-down door card) at the start of every turn, and a helper who gives the winning level wins too. "Game length: Full" turns it off. The tutorial plays the full rules and says that Quick games listen every turn.
 - Online play. It needs private hands per player, so it's left for a later version. Friends on one device use a pass-the-device screen that hides hands.
 
 ## Expansions

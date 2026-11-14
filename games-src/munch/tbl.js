@@ -4,7 +4,7 @@ const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
 // every hand card shows its whole name: shrink the type (not below 10 px) until no word is cut and it fits in 3 lines
 function tbFitNames(cs){cs.forEach(c=>{const m=c.querySelector('.cn');if(!m)return;m.style.removeProperty('font-size');let fs=parseFloat(getComputedStyle(m).fontSize)||14;
-  const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;for(let i=0;i<10&&bad()&&fs>10;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
+  const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;const fl=c.closest('.arena')?11:10;for(let i=0;i<10&&bad()&&fs>fl;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
 function tbFan(){tbFitNames([...document.querySelectorAll('.arena .card,.bfstage .card')]);const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
   const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0){if((tbFan.n=(tbFan.n||0)+1)<25){clearTimeout(tbFan.t);tbFan.t=setTimeout(tbFan,200)}return}tbFan.n=0;   // hand not laid out yet (board hidden behind a screen): fit it again when it shows
@@ -48,7 +48,8 @@ function tbBox(e){const r=e.getBoundingClientRect();if(!e.getAnimations().length
 // taller (or wider) than the table, the whole fight is scaled into the table box (a final transform from measured sizes, so it cannot poke out);
 // and the arena and its children are watched, so any later size change re-fits before the next paint.
 function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;
-  if(TB.fitting)return;TB.fitting=1;try{tbFit0(ar,tb)}finally{TB.fitting=0}
+  if(TB.fitting)return;TB.fitting=1;if(TB.mo)TB.mo.disconnect();   // the fit's own edits (a shortened name) must not wake the watcher: that refit for ever
+  try{tbFit0(ar,tb)}finally{TB.fitting=0;if(TB.mo&&TB.roA&&TB.roA.isConnected)TB.mo.observe(TB.roA,{childList:true,subtree:true})}
   try{tbWatch(ar,tb)}catch(e){}}
 // one observer for the table, the arena and every child of the arena: fit again at once (observer callbacks run before paint), at most 8 times a frame
 function tbWatch(ar,tb){if(typeof ResizeObserver!=='function')return;
@@ -60,7 +61,12 @@ function tbWatch(ar,tb){if(typeof ResizeObserver!=='function')return;
 function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('transform');ar.style.removeProperty('transform-origin');
   ar.classList.remove('tight','tight2','tight3','cmp','cmp2','squash');if(!ar.querySelector(':scope>.vs'))return;
   // the score pill never outgrows the table (a long rival name next to its portrait): shrink it to fit
-  {const sl=ar.querySelector(':scope>.sline .sl1');if(sl){sl.style.removeProperty('zoom');const w=sl.getBoundingClientRect().width,aw=ar.clientWidth-6;if(w>aw&&aw>100)sl.style.zoom=(aw/w).toFixed(3)}}
+  // F16: never by shrinking the type under 11 px: first the portrait goes, then a long name is shortened with …, and only then a last small zoom (>= .79)
+  {const sl=ar.querySelector(':scope>.sline .sl1');if(sl){sl.style.removeProperty('zoom');sl.classList.remove('nosav');const W=()=>sl.getBoundingClientRect().width,aw=ar.clientWidth-6;
+    const nm=sl.querySelector('.sy i');if(nm){if(nm.dataset.full==null)nm.dataset.full=nm.textContent;nm.textContent=nm.dataset.full}
+    if(W()>aw)sl.classList.add('nosav');
+    if(nm&&W()>aw){let t=nm.dataset.full;while(W()>aw&&t.length>4){t=t.slice(0,-1);nm.textContent=t.trim()+'…'}}
+    const w=W();if(w>aw&&aw>100)sl.style.zoom=Math.max(.79,aw/w).toFixed(3)}}
   const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
   // every visible box of the fight (decoration aside: the spinning-die sprite, the crossed swords), judged where it lands
   const boxes=()=>{const o=[],moving=[];for(const e of ar.querySelectorAll('*')){if(e.closest('.die3sp,.vsx,svg,.die3'))continue;if(moving.some(m=>m.contains(e)))continue;if(!shown(e))continue;const r=tbBox(e);if(!r.width||!r.height)continue;if(e.getAnimations().length)moving.push(e);o.push([e,r])}return o};   // a card still flying in is judged by its landing box; its insides fly with it
@@ -72,6 +78,11 @@ function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('
   const compact=()=>{ar.style.removeProperty('--cw');ar.classList.remove('tight','tight2');ar.classList.add('cmp');ar.querySelectorAll('.cn').forEach(m=>m.style.removeProperty('font-size'))};
   if(n>=3||(c&&cw<56))compact();
   else{shrink(56,3);if(out()){ar.classList.add('tight');shrink(56,8)}if(out()){ar.classList.add('tight2');shrink(56,8)}if(out())compact()}
+  // F16: the card size guesses room for a roll box and chips even when a tight step hid them: grow the cards into the free table height
+  // (measured, a step at a time, back one step as soon as anything pokes out), then fit the names again at the bigger size (11 px floor)
+  if(c&&!ar.classList.contains('cmp')&&!out()){let good=c.offsetWidth;for(let k=0;k<12;k++){const nx=Math.min(230,good*1.1);ar.style.setProperty('--cw',nx.toFixed(1)+'px');const w=c.offsetWidth;
+      if(w<good+1||out()){ar.style.setProperty('--cw',good.toFixed(1)+'px');break}good=w}
+    tbFitNames([...ar.querySelectorAll('.row.mons .card')]);if(out()){tbFitNames([...ar.querySelectorAll('.row.mons .card')])}}
   // a big pick in the dock leaves a sliver of table: keep the readout; the monster tiles go while the question is open (nothing can be dropped on them then)
   if(ar.classList.contains('cmp')&&out()&&!ar.querySelector('.fbtns')&&typeof G!=='undefined'&&G.q)ar.classList.add('cmp2');
   // last step, from measured sizes: scale the whole fight into the table box (it can only shrink, never poke out)
@@ -105,8 +116,8 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
     return `<div class="toast${fresh?' fresh':''}" role="alert" title="${esc(t.t)}"><b>💥 Ouch!</b> ${esc(bfCap(first,6))}</div>`};
   const _p=promptHTML;promptHTML=function(me){let h=_p(me);if(!tbPh()||!G||!G.q||me<0||sideToAct()!==me||!P(me).human)return h;const q=G.q;let s='';
     if(q.kind==='help')s=`${P(q.from).nm.split(/[ ,]/)[0]} offers ${q.n} treasure${q.n===1?'':'s'}. Help?`;
-    else if(q.kind==='rescue')s='Caught! Escape, or take Bad Stuff?';
-    else if(q.kind==='pick')s=bfCap(String(q.text||'Choose one.').replace(/<[^>]+>/g,''),8);
+    else if(q.kind==='rescue'){const vm=validMoves(me);s=vm.some(m=>m.act==='use')?'Caught! Tap a glowing card to escape.':vm.some(m=>m.act==='reroll')?'Caught! Discard a card to roll again?':'Caught! Take the Bad Stuff.'}
+    else if(q.kind==='pick')s=q.why==='loot'&&G.loot?`Loot a card from ${P(G.loot.v).nm.split(/[ ,]/)[0]}:`:bfCap(String(q.text||'Choose one.').replace(/<[^>]+>/g,''),8);
     else if(q.kind==='ward')s='A curse is coming! Cancel it?';
     else if(q.kind==='glue')s='Make them roll again?';
     else if(q.kind==='lawyer')s='Swap 2 treasures for 2 new?';
@@ -149,3 +160,17 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   // painted HUD pieces: each class goes on <html> once its file has loaded (the CSS fallback stays until then)
   [['dk-slot','ui-slot-head'],['dk-chip','ui-rival-chip'],['dk-gi','icon-gear'],['dk-clash','ui-clash-hero'],['dk-med','ui-medallion'],['dk-par','ui-parchment'],['dk-pile','pile-door'],['dk-curse','token-curse'],['dk-hand','icon-hand'],['dk-lv','icon-level'],['dk-bt','ui-bubble-tail']].forEach(([c,f])=>{const im=new Image();im.onload=()=>R.classList.add(c);im.src='media/'+f+'.webp'});
 })();
+// F16: a toast or a note ("Not worn: no free slot", "Ouch!") never sits on the fight's readout (the YOU vs MONSTERS pill, the score pills):
+// while a fight shows, each one is moved off the readout: first onto the rivals' strip above the table, else just under the table
+function tbToastPlace(){try{if(!tbPh())return;const ms=[...document.querySelectorAll('#prompt .toast,#prompt .winwarn,.bfbub.note')];if(!ms.length)return;
+  const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!ar.querySelector(':scope>.sline,:scope>.vs'))return;
+  const rs=[...ar.querySelectorAll('.sline .sl1,.sline .sd,.vs .score')].map(e=>e.getBoundingClientRect()).filter(r=>r.width>2&&r.height>2);if(!rs.length)return;
+  const hit=r=>rs.some(q=>Math.min(r.right,q.right)-Math.max(r.left,q.left)>1&&Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top)>1);
+  const bar=document.querySelector('.gx-bar'),b0=bar?bar.getBoundingClientRect().bottom:0,t=tb.getBoundingClientRect();let used=[];
+  for(const m of ms){const r=m.getBoundingClientRect();if(!r.width)continue;if(!hit(r)&&!used.some(u=>Math.min(r.bottom,u.bottom)-Math.max(r.top,u.top)>1)){used.push(r);continue}
+    const h=r.height,tryAt=[t.top-h-3,t.bottom+3,t.top-2*h-6];
+    for(const y of tryAt){if(y<b0+1&&y<t.top)continue;const q={left:r.left,right:r.right,top:y,bottom:y+h};if(hit(q)||used.some(u=>Math.min(q.bottom,u.bottom)-Math.max(q.top,u.top)>1))continue;
+      m.style.setProperty('position','fixed','important');m.style.setProperty('top',y.toFixed(0)+'px','important');m.style.setProperty('bottom','auto','important');m.style.setProperty('translate','none');m.style.setProperty('left',r.left.toFixed(0)+'px','important');m.style.setProperty('right','auto','important');m.style.setProperty('width',r.width.toFixed(0)+'px');m.style.setProperty('margin','0','important');used.push(q);break}}}catch(e){}}
+(function(){const _r=render;render=function(){const x=_r.apply(this,arguments);tbToastPlace();return x}})();
+setInterval(tbToastPlace,200);
+(function(){const _n=bfNote;bfNote=function(){const x=_n.apply(this,arguments);tbToastPlace();return x}})();

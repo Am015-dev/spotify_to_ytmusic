@@ -168,6 +168,7 @@ const CONT={
   loot:(c,v)=>{const L=G.loot;const o=P(c.o);const i=L.pool.indexOf(v);if(i>=0){L.pool.splice(i,1);o.hand.push(v);lg(o.i,`${o.nm} loots ${cname(v)} from the body.`)}lootNext()},
   tongue:(c,v)=>{if(v!=null)loseCard(P(c.p),v,'before the fight')},
   dowse:(c,v)=>{const p=P(c.p);for(const z of ['dd','td']){const i=G[z].indexOf(v);if(i>=0){G[z].splice(i,1);gain(p,v);lg(p.i,`${p.nm} digs ${cname(v)} out of the discards.`);break}}},
+  resTr:(c,v)=>{const W=G.resW,p=P(G.cb.who);if(v==null||v==='draw'||!G.td.length){W.stop=1}else{const top=G.td.pop();spend(p,v);W.res.push(top);W.left--;lg(p.i,`${p.nm} pays ${cname(v)} and resurrects ${cname(top)} from the treasure discards.`)}resTrNext()},
   sell:()=>{},
   none:()=>{}};
 // ---- death and looting the body [R §7] ----
@@ -237,11 +238,18 @@ function resolveWin(){const cb=G.cb,p=P(cb.who);let lv=0,tr=cb.tr||0;const all=c
   cb.won=true;cb.wonLv=lv;cb.wonTr=tr;G.mom=G.mom||[];G.mom.push({k:'kill',who:cb.who,help:cb.help,mon:all[0].def.n,lvl:Math.max(...all.map(k=>k.def.lvl||0)),stolen:!!cb.transfer&&cb.thief===cb.who,turn:G.turn});
   p.st.kills+=kills.length;
   if(cb.help>=0){const h=P(cb.help);h.st.helps++;if(isRace(h,'elf')&&kills.length)gainLv(h,kills.length,'helping as an Elf',false)}
+  // a helped fight draws its treasure face-up, so a Cleric may resurrect instead of drawing [R: Cleric, Resurrection]
+  G.resW={lv,left:tr,res:[],stop:0,nm:all[0].def.n};resTrNext()}
+function resTrNext(){const W=G.resW,cb=G.cb,p=P(cb.who);
+  if(!W.stop&&W.left>0&&cb.help>=0&&isCls(p,'cleric')&&G.td.length&&p.hand.length){const top=G.td[G.td.length-1];
+    choose(p.i,'resTr',['draw',...p.hand],{k:'resTr'},`Resurrect ${cname(top)}? Pay a card, or draw.`);return}
+  resolveWin2()}
+function resolveWin2(){const cb=G.cb,p=P(cb.who),W=G.resW;G.resW=null;const lv=W.lv;
   // treasure: the helper takes the promised number first [H1]
-  const got=[];for(let i=0;i<tr;i++){const t=drawOne('treasure');if(t==null)break;got.push(t)}
+  const got=[];for(let i=0;i<W.left;i++){const t=drawOne('treasure');if(t==null)break;got.push(t)}const n=got.length;got.push(...W.res);
   const give=cb.help>=0?Math.min(cb.offer,got.length):0;if(give){const h=P(cb.help);got.splice(0,give).forEach(t=>gain(h,t));lg(cb.help,`${P(cb.help).nm} takes ${give} treasure${give>1?'s':''} as agreed.`)}
-  got.forEach(t=>gain(p,t));if(got.length)lg(cb.who,`${p.nm} draws ${got.length} treasure${got.length>1?'s':''}.`);
-  const lvName=all[0].def.n,hp=cb.help;endCombat();if(lv){G.shareHelp=hp;try{gainLv(p,lv,`defeating ${lvName}`,true)}finally{G.shareHelp=-1}}}
+  got.forEach(t=>gain(p,t));if(n)lg(cb.who,`${p.nm} draws ${n} treasure${n>1?'s':''}.`);
+  const lvName=W.nm,hp=cb.help;endCombat();if(lv){G.shareHelp=hp;try{gainLv(p,lv,`defeating ${lvName}`,true)}finally{G.shareHelp=-1}}}
 // ---- running away [R §6] ----
 function runMod(p,cb,m){let x=0;if(isRace(p,'elf'))x+=1;for(const id of eqItems(p))x+=cd(id).run||0;x+=mdef(m).runm||0;if(m.like!=null)x-=1;return x}
 function startRun(){const cb=G.cb;cb.stage='run';cb.runs=[];cb.lv0={};for(const f of fighters(cb))cb.lv0[f.i]=f.lvl;for(const w of fighters(cb))for(const m of cb.mons)cb.runs.push({w:w.i,m:m.id,r:null,ok:null,done:false,auto:!!cb.wall,pen:false});

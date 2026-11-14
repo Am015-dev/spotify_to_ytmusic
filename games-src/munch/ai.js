@@ -21,6 +21,7 @@ function aiPick(p,why,opts,cont){const worth=id=>id==='hand'?3:itemWorth(p,id)+c
   case 'lose':case 'taxpay':case 'slug':return opts.slice().sort((a,b)=>worth(a)-worth(b))[0];
   case 'trait':return opts.slice().sort((a,b)=>cardValue(p,a)-cardValue(p,b))[0];
   case 'handOr':return p.hand.length<=2||(p.lvl<=2)?'hand':(p.hand.reduce((a,id)=>a+cardValue(p,id),0)>14?'lvl':'hand');
+  case 'resTr':{const top=G.td[G.td.length-1],pay=opts.filter(x=>x!=='draw').sort((a,b)=>cardValue(p,a)-cardValue(p,b))[0];return top!=null&&pay!=null&&cardValue(p,top)>cardValue(p,pay)+3?pay:'draw'}
   case 'take':case 'loot':case 'dowse':return opts.slice().sort((a,b)=>(b==='hand'?3:cardValue(p,b))-(a==='hand'?3:cardValue(p,a)))[0];
   }return opts[0]}
 function aiWantsWindow(o){const cur=curPl();if(!cur||cur===o)return false;const vm=playsFor(o.i).filter(m=>{const c=cd(m.card);return c.t==='curse'||c.t==='level'||c.sp==='steal'||c.sp==='hire'});

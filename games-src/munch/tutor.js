@@ -15,6 +15,8 @@
 //   ask a rival for help, the helper's strength adds, Elf helper levels  help, who, fight
 //   win: levels + treasure (Treasure Pile draws 3) ................. win
 //   run away: roll 5 or 6, Elf +1, fail = Bad Stuff (even death) ... run, bad
+//   death: keep level, lose cards; rivals loot one card each; fresh hand next turn . death, body, body2 (Next)
+//   listen at the door (Quick game: every turn, the default) ......... listen
 //   curses can be played on anyone, before their door .............. curse
 //   a curse behind the door hits at once ............................ kick3, doorcurse
 //   no monster behind the door: loot a card or look for trouble ..... trouble (do), loot (do)
@@ -118,6 +120,12 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
  {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+': caught! Its Bad Stuff ate your hat.',target:tq('.mine .gear','.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
+ {id:'death',title:'Death',say:'Some Bad Stuff kills. You keep your level but lose your cards.',target:tq('.mine .top'),wait:null,
+   ready:()=>G.phase==='post'&&!G.cb&&tclear()},
+ {id:'body',title:'Loot the body',say:'Each rival loots one card from a dead body.',target:tq('#phopps','#app .opps'),wait:null,
+   ready:()=>G.phase==='post'&&!G.cb&&tclear()},
+ {id:'body2',title:'Back to life',say:'Next turn you get a fresh hand and play on.',target:tq('.mine .top'),wait:null,
+   ready:()=>G.phase==='post'&&!G.cb&&tclear()},
  {id:'end1',title:'End your turn',say:'Nothing more to do. Tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
    ready:()=>G.phase==='post'&&tmine()},
  {id:'curse',title:'Curse a rival',say:'Anyone may curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
@@ -128,7 +136,7 @@ function tutSteps(){
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
  {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
- {id:'listen',title:'Listen at the door',say:'A free door card, just this once. Tap your new card.',target:()=>tcard('lizards'),
+ {id:'listen',title:'Listen at the door',say:'Quick games give you a free door card every turn. Tap it.',target:()=>tcard('lizards'),
    wait:{type:'tap',match:a=>a.what==='card'&&kdef(a.id)==='lizards'},ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!tcard('lizards')&&tclear()},
  {id:'kick2',title:'Your turn again',say:'Your turn. Kick the door again.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
@@ -152,7 +160,7 @@ function tutSteps(){
    ready:()=>G.phase==='after'&&G.active===0&&tmine()},
  {id:'loot',title:'Loot the room',say:'No fight this turn, so loot the room. Tap Loot.',target:tq(mv('loot')),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='loot'},ready:()=>G.phase==='after'&&G.active===0&&tmine()&&!!tq(mv('loot'))()},
- {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. You are level '+P(0).lvl+'. Go win!',target:tq('.mine .top'),wait:null,
+ {id:'finale',onEnter:()=>{UI.pause=true},title:'You know the rules',say:()=>'First to level 10 wins. You are level '+P(0).lvl+'. Go win!',wrong:'Tap Finish.',target:tq('.mine .top'),wait:null,
    ready:()=>!G.winner&&(G.active!==0||tclear())}
   ]}
 // ---------------------------------------------------------------- the kit hooks

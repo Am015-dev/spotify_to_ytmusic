@@ -38,7 +38,11 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     const o3=await p.evaluate(()=>({offer:!!document.getElementById('tutoffer'),g:!!G&&!G.tut}));if(o3.offer||!o3.g)note(tag,'the offer came back a second time '+JSON.stringify(o3));
     // fresh profile again: "Learn in 5 minutes" starts the tutorial
     await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(2000);
-    await (await p.evaluate(()=>{UI.quick=true;render()}),await sleep(900),tapSel('#modal [data-start="F"]'));await p.waitForSelector('#tutoffer [data-tutoffer=learn]');await sleep(700);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
+    // the title screen settles after a reload (fonts, art, the goal card): tap Start again until the offer shows, up to 5 tries
+    await p.waitForFunction(()=>typeof render==='function'&&typeof GXT!=='undefined'&&!!document.getElementById('modal'),null,{timeout:10000}).catch(()=>{});
+    let offered=false;for(let k=0;k<5&&!offered;k++){await p.evaluate(()=>{G=null;UI.quick=true;render()});await sleep(700);await tapSel('#modal [data-start="F"]');
+      offered=await p.waitForSelector('#tutoffer [data-tutoffer=learn]',{timeout:3000}).then(()=>true).catch(()=>false)}
+    if(!offered)note(tag,'a fresh profile was not offered the tutorial in 5 taps');await sleep(700);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
     const o4=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut,i:GXT.state().i}));if(!o4.run||!o4.tut||o4.i!==0)note(tag,'"Learn in 5 minutes" did not start the tutorial '+JSON.stringify(o4));
     totals.runs++;console.log(tag,'done');await ctx.close();return}
   if(mode==='storyskip'){
@@ -188,7 +192,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   // ---- the end
   const fin=await state();
   // every core rule has its own step, in this order (the gameplay gate's rule list)
-  if(mode==='clean'){const RULE_STEPS=['goal','elf','powers','bucket','ready','sellbtn','kick','potion','run','bad','end1','curse','meddle','kick2','trouble','help','who','fight','win','charity','kick3','doorcurse','loot','finale'];
+  if(mode==='clean'){const RULE_STEPS=['goal','elf','powers','bucket','ready','sellbtn','kick','potion','run','bad','death','body','body2','end1','curse','meddle','kick2','trouble','help','who','fight','win','charity','kick3','doorcurse','loot','finale'];
     let at=-1;for(const r of RULE_STEPS){const k=seenIds.indexOf(r);if(k<0)note(tag,'rule step missing: '+r);else if(k<at)note(tag,'rule step out of order: '+r);else at=k}}
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
   else if(mode==='story'){
