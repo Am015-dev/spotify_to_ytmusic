@@ -29,5 +29,9 @@ const [W,H]=(process.argv[2]||'375x667').split('x').map(Number);const sleep=ms=>
   at=await open();const under=await p.evaluate(([x,y])=>{const pr=document.getElementById('dtprobe');pr.style.display='none';const g=document.getElementById('tbgoal');g.style.visibility='hidden';const e=document.elementFromPoint(x,y);g.style.visibility='';return e?(e.id||e.className||e.tagName)+'':'none'},at);
   await p.touchscreen.tap(...at);await sleep(100);await p.touchscreen.tap(...at);await sleep(200);s=await state();
   say(s.log===0,'second tap on whatever sits under "Got it" ('+String(under).slice(0,40)+') changed the game log by '+s.log);
+  // 5. map Location tap areas are at least 44x44 px and really answer at their edges
+  {const r=await p.evaluate(()=>{const g0=document.getElementById('tbgoal');if(g0)g0.remove();return [...document.querySelectorAll('.tb-loc:not(.tb-throne)')].map(g=>{const R=g.querySelector('.tb-hit').getBoundingClientRect();
+    const on=(x,y)=>{const e=document.elementFromPoint(x,y);return !!(e&&e.closest('.tb-loc')===g)};return {id:g.dataset.id,w:Math.round(R.width),h:Math.round(R.height),edges:[on(R.left+R.width/2,R.top+R.height/2-20),on(R.left+R.width/2,R.top+R.height/2+20),on(R.left+R.width/2-20,R.top+R.height/2),on(R.left+R.width/2+20,R.top+R.height/2)].every(Boolean)}})});
+    const small=r.filter(x=>x.w<44||x.h<44||!x.edges);say(r.length>=6&&!small.length,'map Locations >= 44x44 px: '+r.map(x=>x.id+' '+x.w+'x'+x.h+(x.edges?'':' (covered)')).join(', '))}
   say(errs.length===0,'page errors '+errs.length+(errs[0]?' '+errs[0]:''));
   await b.close();console.log(bad?'doubletap-test FAIL '+bad:'doubletap-test PASS ('+W+'x'+H+')');process.exit(bad?1:0)})();

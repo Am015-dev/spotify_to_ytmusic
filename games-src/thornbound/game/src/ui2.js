@@ -22,10 +22,21 @@ function buildMap(){const wrap=$('#mapwrap');if(!wrap)return;
   MAP.sg=document.createElementNS(NSS,'g');MAP.sg.setAttribute('class','tbx-selname');MAP.sg.setAttribute('pointer-events','none');svg.appendChild(MAP.sg);
   svg.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest||t.closest('.tb-loc'))return;const g=t.closest('[data-reg]');if(g&&G&&UI.started)regionTap(+g.getAttribute('data-reg'))});
   drawPanels();relayoutSlots();
+  locHits();if(!MAP.hitObs){MAP.hitObs=1;addEventListener('resize',()=>requestAnimationFrame(locHits))}
+  {let q=0;new MutationObserver(()=>{if(!q){q=1;requestAnimationFrame(()=>{q=0;locHits()})}}).observe(svg,{childList:true,subtree:true})}
   // heralds start "at court" (dimmed, on the throne) until placed
   for(let s=0;s<G.np;s++)MAP.m.setHerald(s,'throne');
   MAP.infl={};for(let s=0;s<G.np;s++){MAP.m.setInfluence(s,G.pl[s].inf,{immediate:true})}
   MAP.heraldAt={};MAP.slotSig={};MAP.slotPrev=null}
+// every map Location's tap area is at least 48x48 screen px (R64: 44 px minimum at 375 px wide); grows around its centre, kept inside the map
+function locHits(){const svg=MAP.m&&MAP.m.el;if(!svg||!svg.isConnected)return;const B=svg.getBoundingClientRect();if(!B.width)return;
+  for(const h of svg.querySelectorAll('.tb-loc .tb-hit')){const m=h.getScreenCTM();if(!m)continue;const sx=Math.hypot(m.a,m.b)||1,sy=Math.hypot(m.c,m.d)||1;
+    let x=+h.getAttribute('x'),y=+h.getAttribute('y'),w=+h.getAttribute('width'),hh=+h.getAttribute('height');const mw=48/sx,mh=48/sy;let ch=0;
+    if(w<mw){x-=(mw-w)/2;w=mw;ch=1}if(hh<mh){y-=(mh-hh)/2;hh=mh;ch=1}if(!ch)continue;
+    h.setAttribute('x',x.toFixed(2));h.setAttribute('y',y.toFixed(2));h.setAttribute('width',w.toFixed(2));h.setAttribute('height',hh.toFixed(2));
+    const r=h.getBoundingClientRect();let dx=0,dy=0;if(r.bottom>B.bottom)dy=-(r.bottom-B.bottom)/sy;if(r.top+dy*sy<B.top)dy=(B.top-r.top)/sy;
+    if(r.right>B.right)dx=-(r.right-B.right)/sx;if(r.left+dx*sx<B.left)dx=(B.left-r.left)/sx;
+    if(dx||dy){h.setAttribute('x',(x+dx).toFixed(2));h.setAttribute('y',(y+dy).toFixed(2))}}}
 function drawPanels(){const f=[];
   REGBOX.forEach((b,r)=>{f.push('<g data-reg="'+r+'"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="34" fill="#f4e6b8" fill-opacity=".13" stroke="#e8c867" stroke-opacity=".55" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/>'+
     '<text x="'+b.lab[0]+'" y="'+(b.lab[1]+(UI.phone&&r===0&&(UI.bs||360)<420?26:0))+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="36" textLength="'+Math.min(262,REG[r].length*26)+'" lengthAdjust="spacingAndGlyphs" fill="#f6e6b4" fill-opacity=".85" stroke="#000" stroke-opacity=".6" stroke-width="3" paint-order="stroke">'+esc(REG[r].toUpperCase())+'</text></g>')});
