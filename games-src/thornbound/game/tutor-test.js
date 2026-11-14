@@ -7,7 +7,7 @@
 // playtest/tutor-early.png, tutor-bid.png, tutor-clash.png, tutor-end.png.
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path');
-const html=fs.readFileSync(__dirname+'/thornbound.html');
+const html=fs.readFileSync(__dirname+'/thornbound.html');const HS=require('./helper-sample.js');
 const SIZES=(process.argv[2]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));
 const SHOTS=path.join(__dirname,'..','playtest');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -18,7 +18,7 @@ const totals={steps:0,wrong:0,runs:0,ids:[]};
 async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.now();
   const ctx=await browser.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
-  const p=await ctx.newPage();p.setDefaultTimeout(15000);
+  const p=await ctx.newPage();p.setDefaultTimeout(15000);await p.addInitScript(HS.inPage);
   if(process.env.TDBG)await p.addInitScript(()=>{window.__gxh=[];setInterval(()=>{try{const s=GXT.state();const k=s.i+'|'+s.phase+'|'+s.count;if(window.__gxk!==k){window.__gxk=k;window.__gxh.push(k+'@'+(Date.now()%100000));if(window.__gxh.length>12)window.__gxh.shift()}}catch(e){}},20);
     document.addEventListener('pointerdown',e=>{try{window.__gxh.push('PD '+(e.target.className&&e.target.className.baseVal!=null?e.target.className.baseVal:e.target.className)+'@'+(Date.now()%100000))}catch(x){}},true)});
   p.on('pageerror',e=>note(tag,'PAGE ERROR '+e.message+' '+(e.stack||'').split('\n').slice(0,3).join('|')));
@@ -140,6 +140,9 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   }
   // ---- the end
   const fin=await state();
+  // one helper at a time and no endless loop, through the whole tutorial and 3 s on the end card (R57): sampled every second
+  {await sleep(3000);const S=await p.evaluate(()=>{window.__tbSample();return window.__tbHS||[]});const sm=HS.summary(S);console.log(HS.line('tutorial '+tag,sm));
+    if(sm.max>1)note(tag,'more than one helper at once in '+sm.multi+' of '+sm.n+' samples '+JSON.stringify(sm.combos));if(sm.loops)note(tag,'endless animation in '+sm.loops+' samples '+JSON.stringify(sm.loopNames))}
   // every core rule has its own step (orchestrator gate, W489): goal, bid, Kingdom Card, Herald, hidden cards, Supporters, Clash, claim, scoring, Tactics,
   // hand size / Attrition, the Favour, Day/Night card powers, Govern into a Council, Journey, Winter, the win condition
   if(mode!=='skip')for(const need of ['goal','tactic','attrition','bid1','takeback','kc','tie','tieb','tiec','lore','bid3','favour','herald','cmds','place1','supp','order','clash','claim','score','govern','council','journey','round','end'])if(!seenIds.includes(need))note(tag,'the tutorial never taught step '+need);

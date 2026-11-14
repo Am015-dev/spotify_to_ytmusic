@@ -13,7 +13,7 @@ body.in-start #pc,body.in-start #ppop,body.in-start #tbturn{visibility:hidden!im
 #tbturn .tbt-line.sm{font-size:14px;line-height:1.2}
 html.bf-w #tbturn{height:auto;min-height:72px}
 @media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-chip{padding:5px 8px}}
-#tbturn .tbt-term{display:inline-block;box-sizing:border-box;min-height:0;min-width:44px;padding:12px 7px;margin:-12px -7px;text-align:center;vertical-align:baseline;line-height:inherit;border:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted #f0c860 2px;text-underline-offset:3px;cursor:help}
+#tbturn .tbt-term{display:inline-block;box-sizing:border-box;min-height:44px;min-width:44px;padding:13px 7px;margin:-13px -7px;text-align:center;vertical-align:baseline;line-height:inherit;border:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted #f0c860 2px;text-underline-offset:3px;cursor:help}
 #tbturn .tbt-term:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:3px}
 #tbturn .tbt-info{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 italic 18px Georgia,serif}
 #tbturn .tbt-goal{flex:0 0 auto;min-height:44px;min-width:56px;padding:0 10px;border-radius:8px;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 14px Cinzel,Georgia,serif}

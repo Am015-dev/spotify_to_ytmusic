@@ -5,3 +5,4 @@ node rules-test.js | tail -3; node hidden-test.js 12 | tail -2; node ui-test.js 
 node click.js 0 9 1 | tail -3
 node sweep.js 20 390x763,375x553 4
 node finger-test.js
+node loop-test.js 375x553 | tail -3

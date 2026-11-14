@@ -822,7 +822,7 @@ TB.invariants=function(Gx){const E=[];G=Gx;const np=Gx.np;
   if(Gx.fav.u<1||Gx.fav.u>3)E.push('favour uses');
   return E};
 // ---------------------------------------------------------------- UI helpers
-TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
+TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),cmp:JSON.parse(JSON.stringify(e.cm)),fx:[...e.fx],votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
 // what the Night step and the tally would give if nothing else happened (pure: works on a copy; a stripped view is enough because Clash cards are face up)
 TB.clashPreview=function(Gx){if(!Gx||!Gx.clash)return null;const keep=G;const S=clone(Gx);G=S;try{const c=S.clash;const all=[];for(const s of c.parts)for(const id of (c.cards[s]||[]))if(id>=0)all.push(id);
     const dead=[],saved=[];if(!c.skip){const E=nightMarks(all);for(const id of all){if(!E[id])continue;const W=elimWhy(id,E[id]);if(eff(id).tr.has('inv'))saved.push({id,t:W.t,by:W.by});else dead.push({id,t:W.t,why:W.why,by:W.by,res:eff(id).tr.has('res')})}}

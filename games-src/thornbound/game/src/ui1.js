@@ -70,9 +70,20 @@ function cardEl(id,w){return TBKit.card(cardSpec(id),w)}
 // the words printed on a hand card: its role and its power in one or two words; cardLine = the full one-line effect (tap/hold for the whole text)
 const ROLE_S={ruse:'Ruse',trader:'Trader',agent:'Agent',follower:'Follower',cavalry:'Cavalry',war_machine:'Engine',captain:'Captain',champion:'Champion',heir:'Heir',scheme:'Scheme'};
 const CMD_S={ambush:'Ambush',retreat:'Retreat',flank:'Flank',rally:'Rally',deploy:'Deploy',deadly:'Deadly',ambret:'Ambush'};
-const CMD_L={ambush:'Day: Ambush, joins a fight late',retreat:'Day: Retreat, leaves a lost fight',flank:'Day: Flank, moves this card to another region that has not fought yet',rally:'Autumn: Rally, returns your Active cards to hand',deploy:'Autumn: Deploy, puts a hand card face-up next to a region',deadly:'Night: Deadly, Eliminates ALL rival Active cards in this Clash (the Agent dies too if a rival Follower is here)',ambret:'Day: Ambush or Retreat'};
+const CMD_L={ambush:'Day: Ambush, adds a face-down card from your hand to this fight',retreat:'Day: Retreat, sends your cards here back to your hand (Herald and Supporters back to your board)',flank:'Day: Flank, moves this card to another region that has not fought yet',rally:'Autumn: Rally, returns your Active cards to hand',deploy:'Autumn: Deploy, puts this card from your hand face-up next to a region',deadly:'Night: Deadly, Eliminates ALL rival Active cards in this Clash',ambret:'Day: Ambush or Retreat, adds a face-down card from your hand to this fight, or sends your cards here back to your hand'};
 function cardWords(id){const i=cinfo(id);const c=(i.commands||[])[0];return {role:i.kind==='hq'?'HQ':(ROLE_S[i.archetype]||'Card'),fx:c?(CMD_S[c]||c):(i.traits||[]).includes('inv')?'Safe':'Strength'}}
-function cardLine(id){const i=cinfo(id);const c=(i.commands||[])[0];if(c&&CMD_L[c])return CMD_L[c]+'.';if((i.traits||[]).includes('inv'))return 'Cannot be Eliminated. Fights with its Strength.';return 'No power: fights with its Strength.'}
+// one line per command, built from THIS card's own parameters (cmp: self / x, fx: drawbacks)
+function cmdLine(n,P,i){P=P||{};const fx=i.fx||[];
+  if(n==='rally')return P.self?'Autumn: Rally, returns this card to your hand':'Autumn: Rally, returns up to '+(P.x||1)+' of your Active cards to your hand';
+  if(n==='deploy'){const x=P.x||1;return 'Autumn: Deploy, puts this card from your hand face-up next to a region; it stays '+x+' more Winter'+(x>1?'s':'')}
+  if(n==='deadly')return CMD_L.deadly+(fx.includes('agentDrawback')?' (but a rival Active Follower Eliminates this card)':'');
+  return CMD_L[n]||null}
+function cardLineI(i){const cp=i.cmp||{};const L=(i.commands||[]).map(n=>cmdLine(n,cp[n],i)).filter(Boolean);
+  const extra=(i.kind!=='basic'&&i.kind!=='heir'&&i.text)?i.text:'';
+  if(L.length)return L.join('. ')+'.'+(extra?' '+extra:'');
+  if(extra)return extra;
+  if((i.traits||[]).includes('inv'))return 'Cannot be Eliminated. Fights with its Strength.';return 'No power: fights with its Strength.'}
+function cardLine(id){return cardLineI(cinfo(id))}
 function cardBand(id){const w=cardWords(id);return '<span class="hcb" aria-hidden="true"><b>'+esc(w.role)+'</b><i>'+esc(w.fx)+'</i></span>'}
 function kcEl(n,w){return TBKit.card(kcSpec(n),w)}
 // plain-words detail of a faction card (HTML), used by the enlarged card pop-up

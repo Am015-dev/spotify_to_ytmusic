@@ -123,8 +123,8 @@ function bfMsgPlace(el){try{const vis=e=>{if(!e)return null;const r=e.getBoundin
   let y=a?a.top-h-8:innerHeight*.6;if(y<top+6)y=top+6;el.style.top=Math.round(y)+'px';el.style.bottom='auto'}catch(e){}}
 function bfMsg(t){toast(t);let el=$('#tbhmsg');if(!el){el=document.createElement('div');el.id='tbhmsg';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=t;el.hidden=false;bfMsgPlace(el);clearTimeout(bfMsg._t);bfMsg._t=setTimeout(()=>{el.hidden=true},2200)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||!!$('#tbgoal')||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
-  GXH.phase(busy?null:hlpPhase())}
+  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||!!$('#tbgoal')||(typeof tutOn==='function'&&tutOn())||!!(UI.cfg&&UI.cfg.tutorial)||(st&&!st.hidden)||isPassing();
+  GXH.phase(busy?null:hlpPhase());if(busy&&UI.cfg&&UI.cfg.tutorial){try{GXH.hide()}catch(e){}}}   // the staged tutorial (and its end card) never shows the free-play coach
 (function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();
 // a help bubble never covers a glowing tap spot: on a crowded phone the kit's spot search can settle on one (it also avoids all text);
 // then the bubble moves to the nearest spot clear of every glowing core and of its own rings (text under it is fine)
@@ -162,3 +162,8 @@ setInterval(()=>{if(G&&UI.started&&!G.over)try{hlpAfter()}catch(e){}},300);
     for(const e of document.querySelectorAll(AV)){if(e.closest('[data-help]')||e.closest('[hidden]'))continue;const q=e.getBoundingClientRect();if(!q.width||!q.height)continue;const c=core(q);
       if(r.left<c.r&&r.right>c.l&&r.top<c.b&&r.bottom>c.t){GXH.relayout();return}}}catch(e){}};
   renderAll=function(){const x=o.apply(this,arguments);if(typeof GXH!=='undefined'&&document.querySelector('.gxh-bub.on')){requestAnimationFrame(check);setTimeout(check,260)}return x}})();
+
+// no endless loops (R57): an animation started with Infinity iterations (the help kit's finger, rings) plays 3 times, then holds still
+(function(){let q=0;const cap=()=>{q=0;try{for(const a of document.getAnimations()){const e=a.effect,t=e&&e.getTiming();if(t&&t.iterations===Infinity)e.updateTiming({iterations:3,fill:'forwards'})}}catch(x){}};
+  const kick=()=>{if(!q){q=1;requestAnimationFrame(cap)}};
+  try{new MutationObserver(kick).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','hidden','style']});setInterval(kick,500)}catch(x){}})();

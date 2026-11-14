@@ -21,13 +21,13 @@ var TBSTORY={
     kc:'The top bid takes a Kingdom Card first. You keep its power.',
     herald:'Place your Herald on a location. It pays if you win that region.',
     place:'Hide one card at each region. Put big cards where you want to win.',
-    supp:'Each Supporter adds +1 in a region. Tap a region, then Done.',
+    supp:'Each Supporter adds +1 in a region\u2019s first fight. Tap a region, then Done.',
     order:'You pick which region fights first. Tap them in order.',
     clash:()=>{const ev=UI.card&&UI.card.ev;if(!ev||!ev.tot)return '';const t=ev.tot,me=t[0],o=Math.max(...Object.keys(t).filter(s=>+s!==0).map(s=>t[s]));return ev.winner===0?'Cards flip: your '+me+' beats '+o+'. The region is yours.':ev.winner<0?'Cards flip: '+me+' each. Nobody wins here.':'Cards flip: Tamsin\'s '+o+' beats your '+me+'. Hide bigger cards where you want to win.'},
     claim:'You won the region. Claim one of its two locations.',
     score:()=>'You have '+myInf()+' Influence now. Tamsin has '+rivInf()+'.',
-    round:'Round over. Supporters go home and played cards are discarded.',
-    later:['Day and Night commands (Ambush, Retreat, Flank, Deadly)','Autumn: Govern and Journey, Lore, your Site of Power','Councils, the Favour and Tactics','Attrition when your deck runs out','Tied Clashes: the tied players clash again, then nobody scores']
+    round:'Round over. Supporters on the map go to the Lost Pile and played cards are discarded.',
+    later:['Day and Night commands (Ambush, Retreat, Flank, Deadly)','Autumn: Govern and Journey, Lore, your Site of Power','Councils, the Favour and Tactics','Attrition when your deck runs out','Tied Clashes: the tied players may add a card and clash again; if nobody adds one, nobody scores']
   },
   // the always-visible line, by decision kind (<= 2 short lines)
   ask:{bid:'Tap a card to bid it in secret. The highest bid picks first.',

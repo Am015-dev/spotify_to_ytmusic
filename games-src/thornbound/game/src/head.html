@@ -36,7 +36,7 @@ button{font:inherit;color:inherit}
 .opt{display:flex;align-items:center;gap:8px;text-align:left;min-height:44px;padding:6px 10px;border:2px solid var(--line);border-radius:12px;background:rgba(255,255,255,.07);cursor:pointer}
 .opt.rec,.lbtn.rec{border-color:#ffd24a;background:rgba(255,210,74,.14)}
 .opt .ot{flex:1;font-size:.98rem}
-.rtag{display:inline-flex;align-items:center;gap:3px;font-size:.8rem;color:#ffd24a;font-weight:700}
+.rtag{display:inline-flex;align-items:center;gap:3px;font-size:max(14px,.8rem);color:#ffd24a;font-weight:700}
 .rtag .ico{width:14px;height:14px;fill:#ffd24a;stroke:none}
 .th{display:inline-block;line-height:0}.th svg{filter:none}
 .locgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -474,6 +474,21 @@ html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
 @media (prefers-reduced-motion:reduce){.tbx-pan g.rglow rect,.bspot.glow,.hc.rg svg,.kcb.rg>*{animation:none}}
 /* no endless loops: the help ring pulses a few times, then holds still */
 .gxh-ring{animation-iteration-count:3!important}
+.gxt-ring,.gxt-pill.gxt-wait i,.pulse,.coachhl{animation-iteration-count:3!important}
+/* one helper at a time (R57). Order of precedence: a bubble (coach, hint, tutorial) with its own pointer > the suggested card > a target > playable cards */
+/* 1. a target or a suggestion is up: playable cards stop glowing */
+body:has(.bspot.glow,.bspot.rec,.tbx-pan g.rglow,.tbx-pan g.rrec,.tb-loc.glow,.tb-loc.rec,.kcb.glow,.kcb.rg,#handw .hc.rg) #handw .hc:not(.rg) svg{filter:none!important}
+/* 2. a suggested card is up: it is the one thing to tap, so targets wait until it is picked */
+body:has(#handw .hc.rg,.kcb.rg) .bspot.glow,body:has(#handw .hc.rg,.kcb.rg) .bspot.rec{box-shadow:none!important;animation:none!important}
+body:has(#handw .hc.rg,.kcb.rg) .tbx-pan g.rglow rect,body:has(#handw .hc.rg,.kcb.rg) .tbx-pan g.rrec rect{stroke-width:2!important;stroke-opacity:.35!important;fill-opacity:.1!important;animation:none!important}
+body:has(#handw .hc.rg,.kcb.rg) .tb-map .tb-loc.glow .tb-ring,body:has(#handw .hc.rg,.kcb.rg) .tb-map .tb-loc.rec .tb-ring{opacity:0!important}
+body:has(#handw .hc.rg,.kcb.rg) .kcb.glow:not(.rg)>*,body:has(#handw .hc.rg,.kcb.rg) .kcb.glow:not(.rg) svg{filter:none!important}
+/* 3. a bubble is up: only the bubble and the one thing its pointer shows */
+body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) #handw .hc svg,body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .kcb>*,body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .kcb svg{filter:none!important;animation:none!important}
+body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .bspot{box-shadow:none!important;animation:none!important}
+body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .tbx-pan g[data-reg] rect{stroke-width:2!important;stroke-opacity:.35!important;fill-opacity:.1!important;animation:none!important}
+body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .tb-map .tb-loc .tb-ring{opacity:0!important}
+body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .coachhl,body:has(.gxh-bub.on,.gxt-bub,#finger:not([hidden])) .pulse{outline:none!important;animation:none!important}
 
 /* painted extras */
 @media (max-width:700px),(max-height:700px){.endart{height:72px;max-height:none;margin-bottom:6px}}
@@ -534,7 +549,7 @@ html.desk .race-c.four .rv-t b{display:block}
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #rivals{padding-top:2px;padding-bottom:calc(2px + var(--sab))}html:not(.bf-w) #act{min-height:44px;padding:0 8px}
 html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:14px}
 html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw .hand>.hc{top:-3px}
-html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:13px;white-space:normal;line-height:1.1}}
+html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:14px;white-space:normal;line-height:1.1}}
 /* short portrait phones: the pile chips stand in a column right of the map, so the map keeps the full board height (>=80% of the width) */
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #mapwrap{padding-bottom:0;justify-content:flex-start;padding-left:2px}
 html:not(.bf-w) #cstrip{left:auto;right:3px;top:3px;bottom:3px;width:72px;flex-direction:column;gap:3px}
