@@ -261,8 +261,7 @@ function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) retur
 function promptLine(L) {
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
   const nr = researchNudge(); if (nr) return nr;
-  let best = ''; if (UI.prefs.hints && UI.mode !== 'tutorial') try { const ev = typeof evalMoves === 'function' ? evalMoves() : []; if (ev.length) best = 'Try: ' + shortLabel(ev[0].m) + '.'; } catch (x) { }
-  return best || (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. What glows is a strong move.');
+  return (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. What glows is a strong move.');
 }
 /* research is the big lever (R25): when climbing (or a temple tile) is about as strong as your best move, the prompt says so, with the reason, and the track pulses */
 function researchNudge() {

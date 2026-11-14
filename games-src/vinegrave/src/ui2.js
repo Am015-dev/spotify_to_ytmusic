@@ -343,7 +343,10 @@ function evalMoves() {   /* every main move you can make now, simulated on a cop
   const s = VG.actor(G), me = G.p[s], key = G.turns + ':' + G.round + ':' + JSON.stringify(me.res) + me.hand.join() + G.row.join() + me.ex;
   if (evalMoves.k === key) return evalMoves.v; const out = [];
   VG.moves(G).forEach(m => { if (m.free || m.t === 'pass' || m.t === 'ans') return; try { const c = VG.clone(G), r = VG.apply(c, m); if (!r || !r.ok) return; out.push({ m, v: VAI.value(c, s, 'hard'), d: diffOn(c, s) }); } catch (x) { } });
-  out.sort((x, y) => y.v - x.v); evalMoves.k = key; evalMoves.v = out; return out;
+  out.sort((x, y) => y.v - x.v);
+  /* the glow is what the strong computer player would do (looks one turn ahead), not just the best single step */
+  try { const hm = VAI.choose(G, 'hard'), hi = hm ? out.findIndex(x => sameMv(x.m, hm)) : -1; if (hi > 0) out.unshift(out.splice(hi, 1)[0]); } catch (x) { }
+  evalMoves.k = key; evalMoves.v = out; return out;
 }
 const sameMv = (a, b) => !!a && !!b && (VG.same ? VG.same(a, b) : JSON.stringify(a) === JSON.stringify(b));
 function previewText(m) {
@@ -357,12 +360,12 @@ function shortLabel(m) {
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
     case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
-function bestBadges() {   /* gold badges: the strongest site and the strongest market card for you right now */
+function bestBadges() {   /* one gold badge on the strongest move (the glowing piece) */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
   if (!hintsOn()) return; const ev = evalMoves(); if (!ev.length) return;
-  const top = ev[0], site = ev.find(x => x.m.s != null && /dig|disc|beat/.test(x.m.t)), buy = ev.find(x => x.m.t === 'buy');
+  const top = ev[0];
   const mark = (x, t) => { if (!x) return; const el = moveEl(x.m, UI.view); if (el && !el.dataset.badge) el.dataset.badge = t; };
-  mark(top, 'Best'); mark(site, 'Best site'); mark(buy, 'Best buy');
+  mark(top, 'Best');   /* one pointer only: the best move already glows, so no second or third badge */
 }
 function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest move */
   if (!ev || !ev.length) return null; const i = ev.findIndex(x => sameMv(x.m, m)), best = ev[0];

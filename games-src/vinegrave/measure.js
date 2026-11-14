@@ -21,7 +21,7 @@ const SAMPLE = () => {
   const S = await serve(), b = await chromium.launch(); let wins = 0; const rows = [], allMin = {}, hpMax = [], infSeen = {}; let hpOver = 0, samples = 0, qMax = 0;
   for (let g = 0; g < N; g++) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true });
-    await ctx.addInitScript(() => { try { localStorage.setItem('vinegrave-prefs', JSON.stringify({ played: true })); localStorage.setItem('gxt-vinegrave', JSON.stringify({ done: true })); } catch (e) { } });
+    await ctx.addInitScript(h => { try { localStorage.setItem('vinegrave-prefs', JSON.stringify({ played: true, hints: h })); localStorage.setItem('gxt-vinegrave', JSON.stringify({ done: true })); } catch (e) { } }, !!process.env.HINTS);
     const p = await ctx.newPage(), errs = []; p.on('pageerror', e => errs.push(String(e)));
     let rs = 9001 + g * 7919; const R = () => ((rs = (rs * 16807) % 2147483647) / 2147483647);
     const tapSel = async (sel, nth) => { const r = await p.evaluate(([s, n]) => { const e = [...document.querySelectorAll(s)].filter(x => { const q = x.getBoundingClientRect(); return q.width > 0 && q.height > 0; })[n || 0]; if (!e) return null; e.scrollIntoView({ block: 'nearest' }); const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, t = document.elementFromPoint(x, y); return { x, y, ok: !!t && (t === e || e.contains(t)) }; }, [sel, nth]);

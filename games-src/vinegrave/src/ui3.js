@@ -99,7 +99,7 @@ function showResult() {
   const tied = P.length > 1 && P[1].sc.total === P[0].sc.total, tb = tied && G.winner !== -1 ? `Tie on ${P[0].sc.total}. ${G.winner === me ? 'You win' : short(G.winner) + ' wins'} the tiebreak.` : '';
   const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : tied && myT === P[0].sc.total ? 'Close loss' : 'Defeat';
   const sub = def && !cWon ? (G.winner === 0 ? 'You won, but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again.'
-    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
+    : tb ? tb + ' First into the temple wins ties, else the higher research.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
   const blk = (x, k) => `<div class="rp${k === 0 ? ' first' : ''}"><div class="rph"><span class="crest" style="--pc:${x.i >= 0 ? HEX[x.i] : '#9a9486'}"></span><span class="rpn">${esc(x.name)}</span><span class="rpt"><b data-n="${x.sc.total}">${x.sc.total}</b> points</span></div>
     <div class="rcats">${CATS.filter(c => x.sc[c[0]]).map(c => `<span class="rcat${x.sc[c[0]] < 0 ? ' neg' : ''}">${ic(c[1], c[2])}<b data-n="${x.sc[c[0]]}">${x.sc[c[0]]}</b><small>${c[2]}</small></span>`).join('') || '<span class="rcat"><small>No points yet</small></span>'}</div></div>`;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
@@ -126,7 +126,7 @@ function logEl() { const d = document.createElement('div'); d.className = 'logli
 const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
-<h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
+<h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point. Tie: first into the temple wins, else the higher research.</p>
 <h3>Your turn</h3><p>Do one main action, then the next explorer goes. Playing a starting coin or compass card is free. Pass to sit out.</p>
 <ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread has no effect, but you can spend it as a Boot of travel.</li>
 <li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then waits in your play area until the round ends. A Plane pays any icon (2 coins make one). At a camp, the second explorer on a site pays double.</li>
@@ -137,7 +137,7 @@ const RULES_HTML = `<div class="rules">
 <h3>Free actions</h3><p>Use a boon once (then it is spent). Set idols in shrines: as many as you like in a turn, but each of the 4 slots only once.</p>
 <h3>End of a round</h3><p>Explorers come home. Each explorer leaving a site that still has a guardian brings back a Dread card. Played cards are shuffled under your deck.</p>
 <h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>Shrine bonuses, assistants and research bonuses are this game's own.</li><li>The research track is a plain ladder of rows, not a map of paths.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
+<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>Shrine bonuses, assistants and research bonuses are this game's own.</li><li>The research track is a plain ladder of rows, not a map of paths.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li><li>An artifact's effect always applies when you buy it.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {

@@ -2,7 +2,7 @@
    easy = steady and cautious (2nd/3rd best moves, ends its round early; a newcomer who follows the prompt wins ~half) · normal = greedy · hard = greedy with better weights and planning for guardians / the temple. VAI.choose(G, level) -> move */
 (function (root) {
   var VG = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.VG, V = VG.V;
-  var EASY = { p0: 0.75, p1: 0.2, cap: 10, noise: 0 };   /* R29: with 'what glows is strong', a newcomer wins about half */   /* easy: P(best main move), P(2nd best), log steps per round before it passes */
+  var EASY = { p0: 0.65, p1: 0.25, cap: 10, noise: 0 };   /* R29: with 'what glows is strong', a newcomer wins about half */   /* easy: P(best main move), P(2nd best), log steps per round before it passes */
   if (typeof process !== 'undefined' && process.env && process.env.VG_EASY) { var ev0 = process.env.VG_EASY.split(',').map(Number); EASY.p0 = ev0[0]; EASY.p1 = ev0[1]; EASY.cap = ev0[2]; }
   var W = { coin: 0.45, compass: 0.4, tablet: 0.75, arrow: 0.6, jewel: 1.3 };
   function opVal(ops) {

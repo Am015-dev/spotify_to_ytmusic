@@ -249,12 +249,12 @@
     },
     // coached first game: every rule, said once, the first time it matters (TUTORIAL-COVERAGE.md lists the same ids)
     coach: {
-      setup: 'You hold 5 cards. Two are Dread: -1 point each.',
+      setup: 'You hold 5 cards. Dread cards are -1 point each.',
       oneaction: 'One action a turn, then Tamsin takes hers.',
       play: 'Playing a card gives what it shows. Trail Notes: +1 compass.',
       rival: 'Tamsin plays by the same rules: one action, then you.',
-      travel: 'Sites show travel icons. A card pays one, then is discarded.',
-      dig: 'Glowing camps are open. Send an explorer to dig. One per site.',
+      travel: 'Sites show travel icons. A card pays one, then waits in your play area.',
+      dig: 'Glowing camps are open. Send an explorer to dig. A camp holds two; the second pays double.',
       discover: '3 compasses! You can explore a hidden ruin now.',
       deep: 'Deep ruins pay more but cost 6 compasses.',
       plane: 'Missing an icon? 2 coins buy a Plane, which pays any icon.',
@@ -274,7 +274,7 @@
       roundend: 'New round. Explorers come home and you draw to 5.',
       fear: 'An explorer fled a guardian and took a Dread card.',
       score: 'Final score: research, temple, idols, shrines, guardians and cards, minus Dread.',
-      tiebreak: 'Ties go to whoever reached the temple first.',
+      tiebreak: 'Ties: first into the temple wins, else higher research.',
       rounds: 'A full game lasts 5 rounds. This one was 1.'
     },
     coachGood: 'Good move: ', coachTip: 'Tip: ',
