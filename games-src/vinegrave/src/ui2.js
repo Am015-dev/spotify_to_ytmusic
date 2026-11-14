@@ -119,13 +119,13 @@ function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode 
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, r = VG.apply(G, m);
+  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, cap0 = m.t !== 'ans' ? moveCaption(m, s) : '', r = VG.apply(G, m);   /* F12: the caption is read before the move (a bought card leaves the market) */
   if (!r.ok) { render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
   const delay = showEvents(s);
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
   const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
-  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = moveCaption(m, s) + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
+  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = cap0 + (dp > 0 ? ` +${dp} ${dp === 1 ? 'point' : 'points'}.` : dp < 0 ? ` ${dp} ${dp === -1 ? 'point' : 'points'}.` : '');
   UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(500, Math.min(delay, 800)));
 }
 function after() {
@@ -191,7 +191,7 @@ function moveCaption(m, s) {
     case 'dig': return `${n} ${v('send', 'sends')} an explorer to ${siteName(G.sites[m.s])}.`;
     case 'disc': return `${n} ${v('explore', 'explores')} a hidden ruin!`;
     case 'beat': return `${n} ${v('fight', 'fights')} the guardian!`;
-    case 'buy': { const c = V.CARDS[G.row[m.r]]; return `${n} ${v('buy', 'buys')} ${c.name} (${effShort(c)}).`; }   /* F11: the market shows no names, so the effect says which card */
+    case 'buy': { const c = V.CARDS[G.row[m.r]]; return c ? `${n} ${v('buy', 'buys')} ${c.name} (${effShort(c)}).` : `${n} ${v('buy', 'buys')} a card.`; }   /* F11: the market shows no names, so the effect says which card */
     case 'res': return `${n} ${v('climb', 'climbs')} the research track.`;
     case 'temple': return `${n} ${v('buy', 'buys')} a temple tile.`;
     case 'pass': return `${n} ${v('pass', 'passes')} for this round.`;

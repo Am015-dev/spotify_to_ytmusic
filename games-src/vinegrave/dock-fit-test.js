@@ -2,14 +2,15 @@
 // at least 150 px tall, the research track shows, and every site's centre hits that site (elementFromPoint), never the dock.
 // F12 (R69 stopper): 5-8 chips from real holdings (2 guardians, 3 idols, 2 assistants, a travel token, some spent): every chip is swiped into
 // view on the strip by a real touch drag, then tapped; its sheet must open, and a ready boon / idol / assistant must fire from that sheet.
+// ONLY=touch360 node dock-fit-test.js runs just the 360x640 touch game.
 // node dock-fit-test.js   (python3 build.py first)   SHOTS=dir writes a screenshot per case
 const { chromium } = require('playwright'), serve = require('./serve.js');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const S = await serve(), b = await chromium.launch(); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-  for (const [w, h] of [[375, 553], [360, 640], [375, 667]]) {
+  if (!process.env.ONLY) for (const [w, h] of [[375, 553], [360, 640], [375, 667]]) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0;
-    p.on('pageerror', e => { errs++; console.log('  err', String(e).slice(0, 160)); });
+    p.on('pageerror', e => { errs++; console.log('  err', String(e.stack || e).slice(0, 300)); });
     await p.goto(S.url); await p.waitForSelector('#start [data-a=tut]'); await sleep(400);
     await p.evaluate(() => { UI.fast = true; try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } startGame('vs', { np: 2, lvl: 'normal', seed: 5 }); });
     await sleep(600);
@@ -44,9 +45,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await ctx.close();
   }
   // F12: 5-8 chips at each phone size: swipe the strip by touch until the chip is in view, tap it, its sheet opens and its action fires
-  for (const [w, h] of [[375, 553], [360, 640], [375, 667]]) {
+  if (!process.env.ONLY) for (const [w, h] of [[375, 553], [360, 640], [375, 667]]) {
     const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0;
-    p.on('pageerror', e => { errs++; console.log('  err', String(e).slice(0, 160)); });
+    p.on('pageerror', e => { errs++; console.log('  err', String(e.stack || e).slice(0, 300)); });
     const cdp = await ctx.newCDPSession(p);
     const swipe = async (x0, y, dx) => { const steps = 8; await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y }] });
       for (let k = 1; k <= steps; k++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + dx * k / steps, y }] }); await sleep(16); }
@@ -111,8 +112,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await ctx.close();
   }
   // by touch at 375x553: a rich explorer follows the glow until holding a boon, an idol and an assistant; every turn the glowing sites must take the tap
-  { const ctx = await b.newContext({ viewport: { width: 375, height: 553 }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0, dead = 0, hid = 0, turns = 0, held = null, full = 0;
-    p.on('pageerror', e => { errs++; console.log('  err', String(e).slice(0, 160)); });
+  if (!process.env.ONLY) { const ctx = await b.newContext({ viewport: { width: 375, height: 553 }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0, dead = 0, hid = 0, turns = 0, held = null, full = 0;
+    p.on('pageerror', e => { errs++; console.log('  err', String(e.stack || e).slice(0, 300)); });
     await p.goto(S.url); await p.waitForSelector('#start [data-a=tut]'); await sleep(400);
     await p.evaluate(() => { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } startGame('vs', { np: 2, lvl: 'easy', seed: 11 }); const me = G.p[0]; me.res = { coin: 6, compass: 8, tablet: 3, arrow: 4, jewel: 4 }; render(); });
     const tapAt = async sel => { const r = await p.evaluate(s => { const e = [...document.querySelectorAll(s)].find(e => { const q = e.getBoundingClientRect(); return q.width > 2 && q.bottom > 0 && q.top < innerHeight; }); if (!e) return null; const q = e.getBoundingClientRect(), x = q.left + q.width / 2, y = q.top + q.height / 2, h = document.elementFromPoint(x, y); return { x, y, hit: !!h && (h === e || e.contains(h)) }; }, sel); if (!r) return 0; if (!r.hit) return -1; await p.touchscreen.tap(r.x, r.y); return 1; };
@@ -148,7 +149,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   // F12: a real touch game at 360x640 to 2 guardians, 3 idols and 2 assistants; every boon is used by tapping its chip (swiped into view if needed), then
   // the sheet's button. Each turn every chip must be reachable on the strip, and the glowing sites must take the tap.
   { const W = 360, H = 640, ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0, dead = 0, turns = 0, unreach = 0, maxChips = 0, boonsUsed = 0, chipUses = 0, best = { b: 0, i: 0, a: 0 }, sq = 0;
-    p.on('pageerror', e => { errs++; console.log('  err', String(e).slice(0, 160)); });
+    p.on('pageerror', e => { errs++; console.log('  err', String(e.stack || e).slice(0, 300)); });
     const cdp = await ctx.newCDPSession(p);
     const swipe = async (x0, y, dx) => { await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y }] }); for (let k = 1; k <= 8; k++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: x0 + dx * k / 8, y }] }); await sleep(16); } await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await sleep(250); };
     await p.goto(S.url); await p.waitForSelector('#start [data-a=tut]'); await sleep(400);
@@ -176,11 +177,12 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       if (chips.length >= 5 && turns % 3 === 0) { for (const c of chips) { const r = await chipTap(c); if (r !== 1) { unreach++; console.log('  unreachable chip', c); } else { await sleep(250); await tapAt('#insp .ix'); await sleep(150); } } }
       const chk = await p.evaluate(() => { const out = []; document.querySelectorAll('#map .site.glow').forEach(s => { const q = s.getBoundingClientRect(), e = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); if (!e || !(e === s || s.contains(e))) out.push(s.dataset.i); }); return { out, sq: document.body.classList.contains('vg-squeeze') }; });
       dead += chk.out.length; if (chk.sq) sq++; turns++;
-      await p.evaluate(() => { const me = G.p[0]; me.res.compass = Math.max(me.res.compass, 6); me.res.coin = Math.max(me.res.coin, 4); ['tablet', 'arrow', 'jewel'].forEach(k => me.res[k] = Math.max(me.res[k], 3)); });   /* rich enough to fight and climb each round */
+      await p.evaluate(() => { const me = G.p[0]; me.res.compass = Math.max(me.res.compass, 9); me.res.coin = Math.max(me.res.coin, 6); ['tablet', 'arrow', 'jewel'].forEach(k => me.res[k] = Math.max(me.res[k], 3)); });   /* rich enough to fight and climb each round */
       const want = await p.evaluate(() => { const me = G.p[0], L = VG.moves(G), f = t => L.find(m => m.t === t);
         const res = L.filter(m => m.t === 'res'), rn = res.find(m => m.k === 'n' && me.note < me.glass), rg = res.find(m => m.k === 'g');
-        const m = f('boon') || (me.idols.length < 3 && f('disc')) || (me.guards.length < 2 && f('beat')) || ((me.asst || []).length < 2 && (rn || rg)) || f('beat') || (typeof evalMoves === 'function' && (evalMoves()[0] || {}).m) || L[0];
-        return m ? { t: m.t, k: m.k, idx: mvIndex(m) } : null; });
+        const m = (me.idols.length < 3 && f('disc')) || (me.guards.length < 2 && f('beat')) || f('boon') || ((me.asst || []).length < 2 && (rn || rg)) || f('beat') || (typeof evalMoves === 'function' && L.find(x => evalMoves().some(e => VG.same(e.m, x) && VG.same(x, e.m)) && x.t !== 'pass')) || L[0];
+        return m ? { t: m.t, k: m.k, idx: mvIndex(m), r: G.round, ex: me.ex, discs: L.filter(x => x.t === 'disc').length, hid: G.sites.filter(x => !x.tile).length } : null; });
+      if (process.env.DBG) console.log('  dbg', JSON.stringify(want), JSON.stringify(st.ex));
       let done = false;
       if (want && (want.t === 'boon' || want.t === 'idol' || want.t === 'asst')) {
         const sel = `#extra button.tag[data-a="${want.t === 'boon' ? 'guard' : want.t}"][data-k="${want.k}"]`, r = await chipTap(sel);
