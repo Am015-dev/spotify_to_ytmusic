@@ -77,7 +77,7 @@ function capFor(i){const b=UI.beats[i];if(!b)return '';const d=b.data||{};const 
   default:return ''}}
 function planCap(st){const cur=curPawn();const pb=planProblems();
   if(UI.confirm&&planOpen())return brief(String(UI.confirm).replace(/^⚠\s*/,''));
-  if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
+  if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;const gl=BF.glowRound===G.round||(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done)||G.tut||G.coach;if(!gl)return 'Tap a pawn to see where it works';return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
   if(pb.length)return badActs().size?'Tap a pulsing pawn to fix it':brief(pb[0]);return 'All set. Start the day!'}
 BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=null;
   const st=PHO.st;if(st==='story'){const i=storyIdx();if(i<0)return '';const last=i>=UI.beats.length-1;if(last&&humanQ())return posQ()?'Tap a glowing space':brief(G.q.title);return w8(capFor(i))}

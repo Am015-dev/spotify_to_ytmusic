@@ -147,3 +147,5 @@ Games usually run to round 6–9 before hunger and weather win. These numbers ar
 | `click.js` | A random clicker plays the real page in jsdom (2D map fallback), through the start screen, priorities, job categories, every story scene type and every choice | 0 errors in 6 games |
 | `watch.js` | All-computer game with the story on auto-play, to the end | 0 errors |
 | Playwright screenshots | Desktop and phone, including the 3D diorama with fog, crosses, pawns and camp | Checked visually |
+
+- **Rain/winter die faces: unverified.** No authoritative source for the exact face counts was found; the faces are left as they are.
