@@ -250,7 +250,7 @@ Every rule of the base game that the engine has to apply, numbered. `logic-test.
 | N10 | Big Leaves (discovery token): ignore 1 rain cloud. | nothing lost |
 | N11 | Hungry animals "discard 1 food": food -1; with no food each castaway takes 1 wound. | food 2 -> 1; food 0 -> wounds [1,1] |
 | N12 | Hungry animals "palisade -1": palisade 2 -> 1; at 0 each castaway takes 1 wound. | pal 1; wounds [1,1] |
-| N13 | Hungry animals "fight strength 3": each castaway takes 1 wound per missing weapon level (weapon 1: 2 each; weapon 3: none). | [2,2] then [0,0] |
+| N13 | Hungry animals "fight strength 3": each castaway takes 1 wound per missing PALISADE level (palisade 1: 2 each; palisade 3: none; weapon does not matter). | [2,2] then [0,0] |
 | N14 | If the scenario and a card both call for the hungry animals die it is rolled once. | one animals die in round 7 with a card token |
 | N15 | Storm token: palisade -1; if it cannot go down each castaway takes 1 wound. | pal 1 -> 0, no wound; pal 0 -> wounds [1,1] |
 | N16 | With no weather dice only the weather on tokens applies (round 3, 2 rain clouds, roof 0). | food 5 -> 3, wood 5 -> 3 |
