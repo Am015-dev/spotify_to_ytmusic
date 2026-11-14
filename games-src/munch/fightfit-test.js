@@ -46,8 +46,9 @@ const CHECK = () => {
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message + ' @' + ((e.stack || '').split('\n')[1] || '').trim().slice(0, 60) + ' [' + (p.__tag || '') + ']')); p.on('crash', () => console.log('CRASH at', W + 'x' + H, ''));
     await p.goto('https://gns.test/?phone=1'); await sleep(900); await p.evaluate(() => { try { localStorage.clear(); localStorage.setItem('dkd_offer', '1') } catch (e) { } }); await p.reload(); await sleep(1200);
     await p.addStyleTag({ content: '#dkgoal{display:none!important}' });
+    await p.evaluate(() => { window.schedule = function () { }; });   // the computer must not play on from a staged fight
     for (const s of SHAPES) {
-      await p.evaluate(sd => { ANIM = 0; setSeed(11 + sd.n); newGame('solo', 4); UI.speed = 4; UI.hints = true; const g = document.getElementById('dkgoal'); if (g) g.remove(); const m = document.getElementById('modal'); if (m) m.hidden = true; try { GX.close && GX.close() } catch (e) { } }, s); await sleep(150);
+      await p.evaluate(sd => { ANIM = 0; setSeed(11 + sd.n); newGame('solo', 4); UI.speed = 4; UI.hints = true; try { if (aiTimer) { clearTimeout(aiTimer); aiTimer = null } } catch (e) { } const g = document.getElementById('dkgoal'); if (g) g.remove(); const m = document.getElementById('modal'); if (m) m.hidden = true; try { GX.close && GX.close() } catch (e) { } }, s); await sleep(150);
       if (process.env.TRACE) console.log(W + 'x' + H, JSON.stringify(s));
       p.__tag = `n${s.n} enh${s.enh} r${s.rival} roll${s.roll} q${s.q}`;
       let err = null; try { await p.evaluate(`(${STAGE})(${JSON.stringify(s)})`) } catch (e) { err = e.message.split('\n')[0] }
