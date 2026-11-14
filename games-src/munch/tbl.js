@@ -43,11 +43,13 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
 function tbBox(e){const r=e.getBoundingClientRect();if(!e.getAnimations().length)return r;const h=e.offsetHeight,w=e.offsetWidth;   // layout box: the offset chain is untouched by transforms
   let p=e.offsetParent;if(!p)return r;const q=p.getBoundingClientRect();const top=q.top+p.clientTop+e.offsetTop-p.scrollTop;return {top,bottom:top+h,width:w,height:h}}
 function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
+  // the table can change size without a render (the dock grows, a toast, the address bar): fit again on the next frame
+  try{if(TB.roT!==tb&&typeof ResizeObserver==='function'){TB.ro=TB.ro||new ResizeObserver(()=>{cancelAnimationFrame(TB.raf);TB.raf=requestAnimationFrame(()=>{try{tbFit()}catch(e){}})});TB.ro.disconnect();TB.ro.observe(tb);TB.roT=tb}}catch(e){}
   ar.classList.remove('tight','tight2','tight3','cmp','cmp2');if(!ar.querySelector(':scope>.vs'))return;
   const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
   // out: anything of the fight above or below the table, or a monster tile under the score line
   const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline .sl1');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
-    for(const e of ar.querySelectorAll('.fbtns,.score .num,.score .yn,.row.mons .mon,.row.mons .card,.hsav,.rollbox,.row.small')){if(!shown(e))continue;const r=tbBox(e);if(!r.width)continue;
+    for(const e of ar.querySelectorAll('.fbtns,.score .num,.score .yn,.row.mons .mon,.row.mons .card,.row.mons .mon>.row,.row.mons .gchip,.hsav,.rollbox,.row.small')){if(!shown(e))continue;const r=tbBox(e);if(!r.width)continue;
       if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
   const n=ar.querySelectorAll('.row.mons .mon').length;let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.offsetWidth;
   const shrink=(min,steps)=>{for(let k=0;k<steps&&out()&&cw>min;k++){cw=Math.max(min,cw*.9);ar.style.setProperty('--cw',cw.toFixed(1)+'px')}};
