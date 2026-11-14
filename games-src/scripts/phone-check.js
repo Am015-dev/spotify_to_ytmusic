@@ -200,13 +200,37 @@ async function nextCandidate(page, used) {
   function innerArea() { return 1e9; }
 }
 
+const SKIP_PT = "(() => { const b = document.querySelector('[data-gxt-skip]'); if (!b) return null; const r = b.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; })()";
+const SKIP_CONFIRM_PT = "(() => { const b = document.querySelector('[data-gxt-dlg=exit],[data-gxt-end=skip],[data-gxt-skip-yes]'); if (!b) return null; const r = b.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; })()";
+
+// a first-run tutorial (shell/gx-tutor.js) shields everything but its one spotlight: a blind tapper leaves it through its own Skip button.
+// The skip is a real tap: timed like a move and counted (a dead Skip is a dead tap), and the tutorial must be gone afterwards.
+// It never replaces a real move: the caller still makes its full number of real moves after it.
+async function skipTutorial(page, st) {
+  const sk = await page.evaluate(SKIP_PT).catch(() => null);
+  if (!sk) return false;
+  const before = await page.evaluate('window.__pc.snap()').catch(() => '');
+  await tap(page, sk[0], sk[1]); st.moves++; st.skips++;
+  const lat = await waitChange(page, before, 1000);
+  if (lat < 0) { st.unresp++; st.unrespWhat.push('Skip tutorial'); } else { st.lat.push(lat); (st.lbl = st.lbl || []).push('Skip tutorial'); }
+  await sleep(700);
+  const cf = await page.evaluate(SKIP_CONFIRM_PT).catch(() => null);
+  if (cf) { await tap(page, cf[0], cf[1]); st.moves++; await sleep(700); }
+  if (await page.evaluate("!!document.querySelector('[data-gxt-skip]')").catch(() => false)) { st.skipFail = true; return 'stuck'; }
+  return true;
+}
+
 async function doMoves(page, n, st, used) {
+  st.wantReal = (st.wantReal || 0) + n;
   for (let i = 0; i < n; i++) {
+    const s = await skipTutorial(page, st);
+    if (s === 'stuck') break;
+    if (s && st.skips > 3) { st.skipFail = true; break; } // the tutorial keeps coming back
     const c = await nextCandidate(page, used);
     if (!c) { st.noCandidate = true; break; }
     used.add(Math.round(c.x / 4) + ',' + Math.round(c.y / 4));
     const before = await page.evaluate('window.__pc.snap()').catch(() => '');
-    await tap(page, c.x, c.y); st.moves++;
+    await tap(page, c.x, c.y); st.moves++; st.real++;
     const lat = await waitChange(page, before, 1000);
     if (lat < 0) { st.unresp++; st.unrespWhat.push(c.t || 'tap'); } else { st.lat.push(lat); (st.lbl = st.lbl || []).push((c.t || '').slice(0, 14)); }
     await sleep(500);
@@ -227,7 +251,7 @@ async function audit(page, st, tag) {
 }
 
 async function runScenario(browser, slug, sc, deadline) {
-  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), smallBoard: new Set(), skinMoved: new Set(), skinCheck: sc.id === 'portrait' || sc.id === 'small', errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
+  const st = { moves: 0, real: 0, skips: 0, skipFail: false, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), smallBoard: new Set(), skinMoved: new Set(), skinCheck: sc.id === 'portrait' || sc.id === 'small', errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
   const ctx = await browser.newContext({ viewport: { width: sc.start.w, height: sc.start.h }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   page.on('pageerror', e => st.errors.push(String(e.message || e).split('\n')[0].slice(0, 120)));
@@ -294,10 +318,13 @@ function verdict(st) {
   if (st.wordy.size) r.push('text >8 words: ' + [...st.wordy].slice(0, 2).join(', '));
   if (st.unresp > 1) r.push(st.unresp + ' dead taps (' + st.unrespWhat.slice(0, 2).join(' | ').slice(0, 100) + ')');
   if (st.stuck) r.push('stuck 8s');
+  if (st.skipFail) r.push('tutorial Skip did not close the tutorial');
+  // after a tutorial skip the game itself must still be played: every planned real move has to happen
+  if (st.skips && !st.skipFail && st.real < st.wantReal) r.push('only ' + st.real + '/' + st.wantReal + ' real moves after tutorial skip');
   if (st.notes.length) r.push(st.notes[0]);
   const lat = st.lat.length ? Math.max(...st.lat) : 0;
   const med = st.lat.length ? [...st.lat].sort((a, b) => a - b)[st.lat.length >> 1] : 0;
-  const tail = ` (${st.moves}mv, ${med}ms, lat ${st.lat.map((l, i) => l + (l > 400 ? ':' + (st.lbl && st.lbl[i]) : '')).join('/')}${st.unresp === 1 ? ', 1 dead' : ''}${st.moves === 0 ? ', no moves found' : ''})`;
+  const tail = ` (${st.moves}mv, ${med}ms, lat ${st.lat.map((l, i) => l + (l > 400 ? ':' + (st.lbl && st.lbl[i]) : '')).join('/')}${st.unresp === 1 ? ', 1 dead' : ''}${st.moves === 0 ? ', no moves found' : ''}${st.skips ? (st.skipFail ? ', tutorial skip failed' : ', tutorial skipped') : ''})`;
   if (lat > 800) r.push('slow ' + lat + 'ms');
   return { ok: r.length === 0, text: (r.length ? 'FAIL ' + r.join('; ') : 'PASS') + tail };
 }

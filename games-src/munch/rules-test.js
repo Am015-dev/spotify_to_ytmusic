@@ -1,7 +1,7 @@
 // scenario tests: each builds a tiny position and checks one rule from rules.md
 const {JSDOM}=require('jsdom');const fs=require('fs');const html=fs.readFileSync('doorkick.html','utf8');
 let pass=0,fail=0;const out=[];
-function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',url:'http://localhost/'});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
+function T(name,code,ui){const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/',beforeParse(w){w.matchMedia=w.matchMedia||(()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}}))}});const w=dom.window;const errs=[];w.console.error=(...a)=>errs.push(a.join(' '));
   // ui=true keeps the real render(), so a test can look at the dock and click its buttons
   w.eval(ui?'ANIM=0;AIDELAY=0;schedule=function(){};setSeed(5);newGame("hot",4);UI.lastSeat=0;UI.pass=null':'ANIM=0;AIDELAY=0;render=function(){};schedule=function(){};refresh=function(){};setSeed(5);newGame("hot",4)');
   // helpers inside the page: give(seat,key) moves a card instance of key into a zone; fresh() clears hands
@@ -23,7 +23,7 @@ T('cannot sell to level 10','P(0).lvl=9;give(0,"parrot");return !validMoves(0).s
 T('sell needs 1000 at once','P(0).lvl=2;const a=give(0,"stompy");const b=give(0,"swash");const r=performMove({act:"sell",cards:a+","+b},0);return !r.success');
 T('sell 1300 gives 1 level, no change','P(0).lvl=2;const a=give(0,"parrot");act({act:"sell",cards:""+a},0);return P(0).lvl===3');
 T('halfling sells one item double','P(0).lvl=2;P(0).race.push(inst("halfling"));const a=give(0,"stompy");const b=give(0,"swash");act({act:"sell",cards:a+","+b},0);return P(0).lvl===3');
-T('halfling -1 to run away','P(0).race.push(inst("halfling"));fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===-1');
+T('halfling may discard a card to roll again after a failed run (no -1)','P(0).race.push(inst("halfling"));fightNow(0,"hatmuncher");const x=give(0,"stompy");const m0=runMod(P(0),G.cb,G.cb.mons[0]);const _r=rnd;rnd=function(n){return n===6?0:_r(n)};act({act:"run"},0);return m0===0&&validMoves(0).some(m=>m.act==="reroll"&&m.card===x)');
 T('elf +1 run, sneakers +2','P(0).race.push(inst("elf"));wear(0,"sneakers");fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===3');
 T('mixed heritage single halfling has no -1','P(0).race.push(inst("halfling"));P(0).half=inst("mixed");fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===0');
 T('monster bonus vs elf','P(0).race.push(inst("elf"));fightNow(0,"leech");return monStr(G.cb)===14');
@@ -52,6 +52,8 @@ T('sudden gust takes worn headgear','const h=wear(1,"bucket");const g=give(0,"he
 T('hen hat: -1 to die rolls, gone with headgear','const h=wear(1,"bucket");const g=give(0,"hexhen");act({act:"play",card:g,tgt:1},0);const a=persMod(P(1),"die")===-1;const g2=give(0,"hexgust");act({act:"play",card:g2,tgt:1},0);return a&&persMod(P(1),"die")===0');
 T('gender swap: -5 next fight','P(1).lvl=6;const g=give(0,"hexsex");act({act:"play",card:g,tgt:1},0);return P(1).sex==="m"&&pStr(P(1))===1');
 T('elf helper gains a level','P(0).lvl=1;P(1).lvl=5;P(1).race.push(inst("elf"));P(1).human=false;fightNow(0,"sirens");act({act:"ask",tgt:1,opt:1},0);if(G.q)act({act:"opt",opt:"yes"},1);if(G.cb.help!==1)return "no help";act({act:"fight"},0);let n=0;while(G.phase==="combat"&&n++<9)act({act:"pass"});return P(1).lvl===6&&P(0).lvl===2');
+T('cleric resurrects the face-up treasure of a helped win instead of drawing','P(0).lvl=1;P(1).lvl=8;P(0).cls.push(inst("cleric"));P(0).human=true;P(1).human=false;const top=inst("parrot");G.td.push(top);const pay=give(0,"dwarf");fightNow(0,"imp");act({act:"ask",tgt:1,opt:1},0);if(G.q&&G.q.kind==="help")act({act:"opt",opt:"yes"},1);if(G.cb.help!==1)return "no help";act({act:"fight"},0);let n=0;while(G.phase==="combat"&&!G.q&&n++<9)act({act:"pass"});if(!G.q||G.q.why!=="resTr")return "no resurrection offer "+JSON.stringify(G.q);const i=G.q.opts.indexOf(pay);act({act:"pick",opt:i},0);while(G.q&&G.q.why==="resTr")act({act:"pick",opt:0},0);return (P(0).hand.includes(top)||P(1).hand.includes(top))&&!G.td.includes(top)&&!P(0).hand.includes(pay)&&G.dd.includes(pay)&&!G.cb');
+T('cleric alone draws treasure face-down: no resurrection offer','P(0).lvl=8;P(0).cls.push(inst("cleric"));P(0).human=true;G.td.push(inst("parrot"));give(0,"dwarf");fightNow(0,"imp");act({act:"fight"},0);let n=0;while(G.phase==="combat"&&!G.q&&n++<9)act({act:"pass"});return !G.q&&!G.cb');
 T('pergola: no help','fightNow(0,"pergola");return !validMoves(0).some(m=>m.act==="ask")');
 T('shieldmaiden gives a woman 1 treasure','P(0).sex="f";const n=P(0).hand.length;fightNow(0,"amazon");return G.phase==="post"&&P(0).hand.length===n+1');
 T('divine: clerics go up','P(2).cls.push(inst("cleric"));P(2).lvl=4;const d=inst("favor");gain(P(0),d);return P(2).lvl===5');

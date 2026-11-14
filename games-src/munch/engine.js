@@ -1,9 +1,9 @@
 // ---------- Doorkick Dungeon engine: all rules live here. State is G (plain JSON); every move goes through gameAct(ds, seat). ----------
 // Rule ids [R..]/[H..] refer to rules-notes.md.
-var ANIM=1, AIDELAY=600, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
+var ANIM=1, AIDELAY=420, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
 const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CHARM_MIN:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
-let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};
+let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null,fast:true};
 // ---- random ----
 function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
@@ -65,11 +65,13 @@ function bigWhy(p,id){const c=cd(id);if(!c.big)return null;return bigCount(p,id)
 // ---- setup ----
 function newGame(mode,n){n=n||DEFN;const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
   const ids=[];const C={};let k=0;for(const def of CARDS){if(def.x3&&!DEFEX[def.x3])continue;for(let c=0;c<(def.cp||1);c++){C[k]=def.k;ids.push(k++)}}
-  G={v:2,gid:Date.now()%1e9,rng:seed,seed,mode,C,door:[],tr:[],dd:[],td:[],pl:[],turn:1,active:0,phase:'setup',cb:null,q:null,ops:[],then:null,log:[],winner:null,winText:'',ex:Object.assign({},DEFEX),kicked:null,fought:false,lastRoll:null,win:null};
+  G={v:2,gid:Date.now()%1e9,rng:seed,seed,mode,C,door:[],tr:[],dd:[],td:[],pl:[],turn:1,active:0,phase:'setup',cb:null,q:null,ops:[],then:null,log:[],winner:null,winText:'',ex:Object.assign({},DEFEX),kicked:null,fought:false,lastRoll:null,win:null,cowin:-1};
+  // Faster Play (the rulebook's own option): Listen at the Door each turn + a shared win for the helper. On by default since its touch run passed (FLAG: UI.fast; Game length: Full turns it off); off in the tutorial and the story.
+  G.fast=UI.fast===true&&!(typeof TUTG!=='undefined'&&TUTG)&&!(typeof CMP_GO!=='undefined'&&CMP_GO);
   for(const id of ids)(D(C[id]).d==='door'?G.door:G.tr).push(id);shuffle(G.door);shuffle(G.tr);
   const names=UI.names||HERO_NAMES;
   for(let i=0;i<n;i++){const human=mode==='hot'?true:mode==='ai'?false:i===0;
-    G.pl.push({i,nm:names[i]||('Hero '+(i+1)),sex:(UI.sexes&&UI.sexes[i])||(i%2?'f':'m'),lvl:1,hand:[],eq:[],race:[],cls:[],curse:[],half:null,sup:null,hire:null,human,lv:(LVMIX&&LVMIX[i])||UI.lvl||'normal',gone:false,dead:false,fresh:false,soldT:false,halfT:false,sexPen:false,st:{kills:0,helps:0,deaths:0,runs:0,cursed:0,levels:0}})}
+    G.pl.push({i,nm:names[i]||('Hero '+(i+1)),sex:(UI.sexes&&UI.sexes[i])||(i%2?'f':'m'),lvl:1,hand:[],eq:[],race:[],cls:[],curse:[],half:null,sup:null,hire:null,human,lv:(LVMIX&&LVMIX[i])||UI.lvl||(G.fast?'easy':'normal'),gone:false,dead:false,fresh:false,soldT:false,halfT:false,sexPen:false,st:{kills:0,helps:0,deaths:0,runs:0,cursed:0,levels:0}})}
   lg(-1,'A new dungeon opens. Everyone draws 4 door and 4 treasure cards.');
   for(const p of G.pl){drawTo(p,'door',R.START);drawTo(p,'treasure',R.START)}
   // who starts: everyone rolls, highest goes first [R: "roll dice and argue about it"]
@@ -81,7 +83,7 @@ const HERO_NAMES=['Pip','Morwen','Grub','Tansy','Bodkin','Wrenna'];
 // ---- levels and victory [R §12] ----
 function gainLv(p,n,why,canWin){if(n<=0||p.dead)return 0;const cap=canWin?R.WIN:R.WIN-1;const before=p.lvl;p.lvl=Math.max(before,Math.min(cap,p.lvl+n));const got=p.lvl-before;if(got>0){p.st.levels+=got;fx('lvl',p.i)}
   if(got<n&&!canWin&&p.lvl===R.WIN-1)lg(p.i,`${p.nm} stays at level ${R.WIN-1}. The last level needs a monster kill.`);
-  if(p.lvl>=R.WIN&&!G.winner){G.winner='P'+(p.i+1);G.winText=`${p.nm} reaches level ${R.WIN} by ${why}!`;lg(p.i,G.winText);fx('win',p.i)}return got}
+  if(p.lvl>=R.WIN&&!G.winner){G.winner='P'+(p.i+1);G.winText=`${p.nm} reaches level ${R.WIN} by ${why}!`;if(G.fast&&G.shareHelp!=null&&G.shareHelp>=0&&G.shareHelp!==p.i){G.cowin=G.shareHelp;G.winText+=` ${P(G.cowin).nm} helped, so ${P(G.cowin).nm} wins too!`}lg(p.i,G.winText);fx('win',p.i)}return got}
 function loseLv(p,n){const b=p.lvl;p.lvl=Math.max(1,p.lvl-n);return b-p.lvl}
 // ---- choices: anything a player must decide mid-effect becomes G.q (humans answer through validMoves, the AI through aiPick) ----
 function choose(who,why,opts,cont,text){if(!opts.length){resume(cont,null);return}
@@ -166,6 +168,7 @@ const CONT={
   loot:(c,v)=>{const L=G.loot;const o=P(c.o);const i=L.pool.indexOf(v);if(i>=0){L.pool.splice(i,1);o.hand.push(v);lg(o.i,`${o.nm} loots ${cname(v)} from the body.`)}lootNext()},
   tongue:(c,v)=>{if(v!=null)loseCard(P(c.p),v,'before the fight')},
   dowse:(c,v)=>{const p=P(c.p);for(const z of ['dd','td']){const i=G[z].indexOf(v);if(i>=0){G[z].splice(i,1);gain(p,v);lg(p.i,`${p.nm} digs ${cname(v)} out of the discards.`);break}}},
+  resTr:(c,v)=>{const W=G.resW,p=P(G.cb.who);if(v==null||v==='draw'||!G.td.length){W.stop=1}else{const top=G.td.pop();spend(p,v);W.res.push(top);W.left--;lg(p.i,`${p.nm} pays ${cname(v)} and resurrects ${cname(top)} from the treasure discards.`)}resTrNext()},
   sell:()=>{},
   none:()=>{}};
 // ---- death and looting the body [R §7] ----
@@ -235,13 +238,20 @@ function resolveWin(){const cb=G.cb,p=P(cb.who);let lv=0,tr=cb.tr||0;const all=c
   cb.won=true;cb.wonLv=lv;cb.wonTr=tr;G.mom=G.mom||[];G.mom.push({k:'kill',who:cb.who,help:cb.help,mon:all[0].def.n,lvl:Math.max(...all.map(k=>k.def.lvl||0)),stolen:!!cb.transfer&&cb.thief===cb.who,turn:G.turn});
   p.st.kills+=kills.length;
   if(cb.help>=0){const h=P(cb.help);h.st.helps++;if(isRace(h,'elf')&&kills.length)gainLv(h,kills.length,'helping as an Elf',false)}
+  // a helped fight draws its treasure face-up, so a Cleric may resurrect instead of drawing [R: Cleric, Resurrection]
+  G.resW={lv,left:tr,res:[],stop:0,nm:all[0].def.n};resTrNext()}
+function resTrNext(){const W=G.resW,cb=G.cb,p=P(cb.who);
+  if(!W.stop&&W.left>0&&cb.help>=0&&isCls(p,'cleric')&&G.td.length&&p.hand.length){const top=G.td[G.td.length-1];
+    choose(p.i,'resTr',['draw',...p.hand],{k:'resTr'},`Resurrect ${cname(top)}? Pay a card, or draw.`);return}
+  resolveWin2()}
+function resolveWin2(){const cb=G.cb,p=P(cb.who),W=G.resW;G.resW=null;const lv=W.lv;
   // treasure: the helper takes the promised number first [H1]
-  const got=[];for(let i=0;i<tr;i++){const t=drawOne('treasure');if(t==null)break;got.push(t)}
+  const got=[];for(let i=0;i<W.left;i++){const t=drawOne('treasure');if(t==null)break;got.push(t)}const n=got.length;got.push(...W.res);
   const give=cb.help>=0?Math.min(cb.offer,got.length):0;if(give){const h=P(cb.help);got.splice(0,give).forEach(t=>gain(h,t));lg(cb.help,`${P(cb.help).nm} takes ${give} treasure${give>1?'s':''} as agreed.`)}
-  got.forEach(t=>gain(p,t));if(got.length)lg(cb.who,`${p.nm} draws ${got.length} treasure${got.length>1?'s':''}.`);
-  const lvName=all[0].def.n;endCombat();if(lv)gainLv(p,lv,`defeating ${lvName}`,true)}
+  got.forEach(t=>gain(p,t));if(n)lg(cb.who,`${p.nm} draws ${n} treasure${n>1?'s':''}.`);
+  const lvName=W.nm,hp=cb.help;endCombat();if(lv){G.shareHelp=hp;try{gainLv(p,lv,`defeating ${lvName}`,true)}finally{G.shareHelp=-1}}}
 // ---- running away [R §6] ----
-function runMod(p,cb,m){let x=0;if(isRace(p,'elf'))x+=1;if(isRace(p,'halfling')&&!pureRace(p))x-=1;for(const id of eqItems(p))x+=cd(id).run||0;x+=mdef(m).runm||0;if(m.like!=null)x-=1;return x}
+function runMod(p,cb,m){let x=0;if(isRace(p,'elf'))x+=1;for(const id of eqItems(p))x+=cd(id).run||0;x+=mdef(m).runm||0;if(m.like!=null)x-=1;return x}
 function startRun(){const cb=G.cb;cb.stage='run';cb.runs=[];cb.lv0={};for(const f of fighters(cb))cb.lv0[f.i]=f.lvl;for(const w of fighters(cb))for(const m of cb.mons)cb.runs.push({w:w.i,m:m.id,r:null,ok:null,done:false,auto:!!cb.wall,pen:false});
   lg(cb.who,`${P(cb.who).nm} can't win and runs for it!`);nextRun()}
 function runMon(r){return G.cb.mons.find(m=>m.id===r.m)}
@@ -258,8 +268,11 @@ function nextRun(){const cb=G.cb;if(!cb)return;const r=cb.runs.find(x=>!x.done);
 function roll(r){const cb=G.cb,p=P(r.w),m=runMon(r),c=mdef(m);const v=d6(),mod=runMod(p,cb,m)+(r.w===cb.who||r.w===cb.help?(cb.used['f'+r.w]||0):0)+persMod(p,'die');r.r=v;r.mod=mod;r.ok=v+mod>=R.RUN;p.st.runs++;
   G.lastRoll={v,mod,need:R.RUN,who:r.w,ok:r.ok,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'run'};fx('roll',r.w);
   lg(r.w,`${p.nm} rolls ${v}${mod?` ${mod>0?'+':''}${mod}`:''} to escape ${c.n}: ${r.ok?'gets away!':'caught!'}`);
-  if(!r.ok&&rescueOpts(p,r).length){G.q={who:r.w,kind:'rescue',run:cb.runs.indexOf(r)};return}
+  if(!r.ok&&(rescueOpts(p,r).length||canReroll(p,r))){G.q={who:r.w,kind:'rescue',run:cb.runs.indexOf(r)};return}
   finishRun(r)}
+// Halfling: after a failed run-away roll, discard a card to roll once more [original rule]
+function canReroll(p,r){return isRace(p,'halfling')&&!r.rerolled&&p.hand.length>0}
+function doReroll(p,id){const q=G.q;G.q=null;const r=G.cb.runs[q.run];r.rerolled=true;lg(p.i,`${p.nm} discards ${cname(id)} to roll again.`);spend(p,id);roll(r)}
 function rescueOpts(p,r){const c=mdef(runMon(r));const o=[];for(const id of p.hand){const x=cd(id);if(x.sp==='invis'||x.sp==='die'||(x.sp==='lamp'&&p.i===G.active&&!G.cb.transfer))o.push(id)}for(const e of p.eq)if(cd(e.id).sp==='ratstick'&&c.lvl<=8)o.push(e.id);return o}
 // after a successful escape, a holder of Sticky Paste may force a reroll
 function finishRun(r){const cb=G.cb;
@@ -274,8 +287,12 @@ function nextTurn(){const n=G.pl.length;let i=G.active;do{i=(i+1)%n}while(P(i).g
   G.phase='main';G.fought=false;G.afterFight=false;G.kicked=null;G.cb=null;G.q=null;G.stole=false;p.soldT=false;p.halfT=false;
   lg(p.i,`— ${p.nm}'s turn (level ${p.lvl}) —`);fx('turn',p.i);
   if(p.fresh){p.fresh=false;drawTo(p,'door',R.START);drawTo(p,'treasure',R.START);lg(p.i,`${p.nm} is back with a fresh hand of cards.`)}
+  listenDoor(p);
   if(G.turn>R.MAXTURN&&!G.winner){const b=alive().sort((a,b)=>b.lvl-a.lvl)[0];G.winner='P'+(b.i+1);G.winText=`Time's up: ${b.nm} leads at level ${b.lvl}.`}
   openWindow()}
+// tutorial: listening is taught once, on your second turn, with a set card (G.tutListen = its key); everyone else stays off so the scripted deal holds
+function listenDoor(p){if(p.dead)return;if(G.tut){if(!G.tutListen||p.i!==0||G.turn<2)return;const k=G.tutListen,i=G.door.findIndex(id=>G.C[id]===k);G.tutListen=null;if(i>=0)G.door.push(G.door.splice(i,1)[0])}else if(!G.fast)return;const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} listens at the door and draws a face-down door card.`)}}
+function wonBy(i){return !!G&&!!G.winner&&(G.winner==='P'+(i+1)||G.cowin===i)}
 function kick(){const p=curPl();const id=drawOne('door');if(id==null){G.phase='after';return}takeKicked(p,id)}
 function takeKicked(p,id,res){const kv=res?'reaches into the discards':'kicks open the door';G.kicked=id;const c=cd(id);fx('door',id);
   if(c.t==='monster'){startCombat(p.i,id,'kick');return}
@@ -381,7 +398,7 @@ function qMoves(q){const mv=[];const p=P(q.who);
   switch(q.kind){
   case 'help':case 'glue':case 'lawyer':case 'fetch':mv.push({act:'opt',opt:'yes'},{act:'opt',opt:'no'});break;
   case 'ward':mv.push({act:'opt',opt:'yes'},{act:'opt',opt:'no'});break;
-  case 'rescue':{const r=G.cb.runs[q.run];for(const id of rescueOpts(p,r))mv.push({act:'use',card:id});mv.push({act:'opt',opt:'no'});break}
+  case 'rescue':{const r=G.cb.runs[q.run];for(const id of rescueOpts(p,r))mv.push({act:'use',card:id});if(canReroll(p,r))for(const id of new Set(p.hand))mv.push({act:'reroll',card:id});mv.push({act:'opt',opt:'no'});break}
   case 'pick':q.opts.forEach((v,i)=>mv.push({act:'pick',opt:i}));break}
   return mv}
 const mvKey=m=>[m.act,m.card,m.tgt,m.opt].map(x=>x===undefined?'':x).join('|');
@@ -399,7 +416,7 @@ function norm(m){const o={act:String(m.act)};if(m.card!==undefined&&m.card!==''&
 function gameAct(ds,seat){const r=performMove(ds,seat);if(!r.success){UI.rej=(UI.rej||0)+1;UI.lastErr=r.error;return false}refresh();return true}
 function apply(m,s){const p=P(s);const cb=G.cb;
   switch(m.act){
-  case 'ready':G.setupI++;if(G.setupI>=G.setupOrd.length){G.phase='main';lg(G.active,`— ${curPl().nm}'s turn (level ${curPl().lvl}) —`);openWindow()}break;
+  case 'ready':G.setupI++;if(G.setupI>=G.setupOrd.length){G.phase='main';lg(G.active,`— ${curPl().nm}'s turn (level ${curPl().lvl}) —`);listenDoor(curPl());openWindow()}break;
   case 'kick':kick();break;
   case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards. No new door.`);takeKicked(p,id,1);break}
   case 'loot':lootRoom();break;
@@ -417,6 +434,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'opt':answer(m.opt,s);break;
   case 'pick':{const q=G.q;G.q=null;resume(q.cont,q.opts[m.opt]);break}
   case 'use':useRescue(p,m.card);break;
+  case 'reroll':doReroll(p,m.card);break;
   case 'fight':cb.stage='others';cb.ord=[];for(let j=1;j<G.pl.length;j++){const o=P((cb.who+j)%G.pl.length);if(!o.gone)cb.ord.push(o.i)}cb.oi=0;if(!cb.ord.length)resolveWin();else lg(s,`${p.nm} is ready to fight. Last chance to interfere!`);break;
   case 'pass':if(G.phase==='window'){G.win.i++;if(G.win.i>=G.win.ord.length){G.phase=G.win.back;G.win=null}break}
     cb.oi++;if(cb.oi>=cb.ord.length){if(winning(cb))resolveWin();else reopen()}break;
@@ -449,7 +467,7 @@ function answer(opt,s){const q=G.q;G.q=null;const p=P(s);
   if(!G.q)runOps()}
 function useRescue(p,id){const q=G.q;G.q=null;const cb=G.cb;const r=cb.runs[q.run];const c=cd(id);
   if(c.sp==='invis'){spend(p,id);r.ok=true;lg(p.i,`${p.nm} drinks ${c.n} and vanishes!`);r.glued=r.glued||false;return finishRun(r)}
-  if(c.sp==='die'){spend(p,id);r.r=6;r.ok=6+r.mod>=R.RUN;G.lastRoll=Object.assign({},G.lastRoll,{v:6,ok:r.ok,id:G.lastRoll.id+1});lg(p.i,`${p.nm} uses ${c.n}: it's a 6${r.ok?'':' and still not enough'}!`);if(!r.ok&&rescueOpts(p,r).length){G.q={who:p.i,kind:'rescue',run:q.run};return}return finishRun(r)}
+  if(c.sp==='die'){spend(p,id);r.r=6;r.ok=6+r.mod>=R.RUN;G.lastRoll=Object.assign({},G.lastRoll,{v:6,ok:r.ok,id:G.lastRoll.id+1});lg(p.i,`${p.nm} uses ${c.n}: it's a 6${r.ok?'':' and still not enough'}!`);if(!r.ok&&(rescueOpts(p,r).length||canReroll(p,r))){G.q={who:p.i,kind:'rescue',run:q.run};return}return finishRun(r)}
   if(c.sp==='ratstick'){loseCard(p,id,'tossed as a snack');r.ok=true;return finishRun(r)}
   if(c.sp==='lamp'){spend(p,id);const mi=cb.mons.findIndex(m=>m.id===r.m);const mm=cb.mons.splice(mi,1)[0];discard(mm.id);mm.enh.forEach(discard);cb.runs.filter(x=>x.m===r.m).forEach(x=>{x.done=true;x.ok=true});lg(p.i,`${p.nm} rubs ${c.n}: ${cname(mm.id)} vanishes!`);return nextRun()}}
 // ---- playing a card ----

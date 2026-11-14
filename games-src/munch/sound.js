@@ -61,7 +61,7 @@ function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
 // light background groove (optional)
 // which recorded track fits the screen: title -> tavern, game -> main, fight with a level 12+ monster or a boss -> fight, end screens -> victory/defeat
 function musicWant(){if(typeof G==='undefined'||!G)return ['tavern',0];
-  if(G.winner){const me=typeof viewSeat==='function'?viewSeat():-1;const won=me>=0&&G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';return [won?'victory':'defeat',1]}
+  if(G.winner){const me=typeof viewSeat==='function'?viewSeat():-1;const won=me>=0&&wonBy(me)&&P(me).human&&G.mode!=='ai';return [won?'victory':'defeat',1]}
   const cb=G.cb;if(cb&&cb.mons&&cb.mons.some(m=>{try{const d=mdef(m);return (d.lvl||0)>=12||(typeof BOSS_CLIPS!=='undefined'&&BOSS_CLIPS[d.k])}catch(e){return false}}))return ['fight',0];
   return ['main',0]}
 // ---- music picker: each slot (tavern=Menu, main=Dungeon, fight, victory, defeat) has a saved choice: a, b, shuffle, off or classic

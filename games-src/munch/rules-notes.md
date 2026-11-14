@@ -43,7 +43,7 @@ A browser version of the rules of the original game (original publisher, 2001). 
   - Rewards only arrive when the fight ends. Removing the last monster ends the fight at once (the July 2018 ruling).
   - One helper, who is bribed with a promised number of treasures. The helper takes the promised cards first [H1]. The helper gains no level, except an Elf, who gains one per monster killed (never the winning level [H5]).
 - **Running away:** roll a d6 for each monster; 5+ gets away.
-  - Elf +1, Halfling −1 (base printing), item and monster modifiers apply.
+  - Elf +1, item and monster modifiers apply. A Halfling has no run-away penalty: after a failed roll they may discard a card to roll again, once.
   - Wizard flight gives +1 per discarded card, up to 3.
   - A monster that "won't pursue" level X or below lets such heroes walk away. Bad Stuff applies monster by monster.
   - Removing one monster and fleeing the rest gives no reward.
@@ -57,7 +57,7 @@ A browser version of the rules of the original game (original publisher, 2001). 
   - A Halfling doubles one item's price once a turn.
   - You can't sell to reach level 10.
 - **Winning:** level 10, but only from killing a monster. Heavenly Favor (the divine-intervention card) is the one card that may also give it to Clerics. Go-up-a-level cards and selling stop at 9.
-- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Mixed Heritage has no −1 to run away, and monsters get no bonus against that race.
+- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Mixed Heritage keeps the Halfling perks, and monsters get no bonus against that race.
 
 ## Every card effect is implemented
 Monsters' special texts are all live. Some examples:
@@ -126,7 +126,11 @@ Treasures:
 
 ## Not included
 - Trading items between players (you can still give away cards through charity, looting and Mind If I Borrow That?).
-- The optional "Listen at the door" and shared-victory rules.
+- Charity among several players tied for lowest: the rulebook says to split the extras as evenly as you can. Here you give each extra card to any of them freely.
+- Cleric Resurrection covers the two face-up draws this version has: kicking open the door, and the treasure of a fight won with help. Treasure won alone is drawn face-down, as in the rulebook.
+
+## Included since the last check
+- The Quick game (the rulebook's own faster-play option) is now in and is the default: listen at the door (a free face-down door card) at the start of every turn, and a helper who gives the winning level wins too. "Game length: Full" turns it off. The tutorial plays the full rules and says that Quick games listen every turn.
 - Online play. It needs private hands per player, so it's left for a later version. Friends on one device use a pass-the-device screen that hides hands.
 
 ## Expansions
@@ -139,3 +143,9 @@ The inventory (`inventory.md`) has the full card data for original expansions 3,
   - `gauntlet.js` and `cover.js` played computer games with 0 errors and 0 rule-check failures after the fixes.
   - Games last about 45–75 turns with 4 heroes (11–19 rounds each).
 - **Random clicker:** `click.js` played every human flow in both "me vs computer" and "friends on one device": 0 rejected moves.
+
+## Newcomer guidance (R12 fix, 12 Nov 2026): rules relied on
+Checked against the published rulebook online. No rule changed; the ★ only marks the move the advisor would make.
+- Fight or run: only Fight is offered when you win, only Run when you lose (the rulebook: if you can't defeat the monster and no one helps, you must run away).
+- Help: "If you cannot win a combat on your own, you may ask any other player to help you. If that player says no, you may ask another player."
+- Curses are among the actions you "may take at any time", on any player, so the ★ may suggest one on a rival.

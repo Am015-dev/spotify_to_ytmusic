@@ -27,7 +27,7 @@ function aiSafe(s){const p=P(s);const lv=p.lv,rng=G.rng;try{p.lv='normal';return
 // ---- the "about to win" check ----
 function fightGain(cb){let lv=0;const pure=cb.help<0&&cb.pb===0&&cb.bers===0&&itemBonus(P(cb.who),cb)===0;for(const m of cb.mons){const d=mdef(m);lv+=d.lv||1;if(d.sp==='fire'&&cb.fire)lv++;if(d.sp==='pure'&&pure)lv++}for(const k of cb.killed)if(k.kill){lv+=k.def.lv||1;if(k.def.sp==='pure'&&pure)lv++;if(k.def.sp==='fire'&&cb.fire)lv++}return lv}
 function winThreat(cb){cb=cb||(G&&G.cb);if(!cb||G.winner||(!cb.mons.length&&!cb.killed.length))return null;if(cb.stage==='run'||!winning(cb))return null;const f=P(cb.who);const g=fightGain(cb);if(f.lvl+g<R.WIN)return null;return {who:cb.who,gain:g}}
-function stopEval(who){if(G.winner)return G.winner==='P'+(who+1)?{stop:false,m:99}:{stop:true,m:-99};const cb=G.cb;if(!cb)return {stop:true,m:-99};if(cb.who!==who)return {stop:true,m:-50};
+function stopEval(who){if(G.winner)return wonBy(who)?{stop:false,m:99}:{stop:true,m:-99};const cb=G.cb;if(!cb)return {stop:true,m:-99};if(cb.who!==who)return {stop:true,m:-50};
   const d=sideStr(cb)-monStr(cb);return {stop:!winThreat(cb),m:d}}
 function counterCands(me,who){return validMoves(me).filter(m=>{if(!['play','join','backstab'].includes(m.act)||m.card==null)return false;const c=cd(m.card);
   if(m.act==='play'&&m.tgt==='p')return false;if(c.t==='level'||c.t==='race'||c.t==='class'||c.t==='item')return false;if(c.t==='curse'&&m.tgt!==who)return false;if(c.t==='enh'&&c.b<0)return false;if(c.sp==='steal'&&m.tgt!==who)return false;return true})}
@@ -106,14 +106,16 @@ function coach(me){if(!G||me<0||!P(me)||!P(me).human)return {};const key=[G.ln,G
 function vm0(me){return validMoves(me)}
 function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)return r;const cb=G.cb;
   if(G.q){const q=G.q;const m=aiSafe(me);r.rec=m;
-    if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
+    if(q.kind==='help'){const f=P(q.from);const g=fightGain(cb);if(f.lvl+g>=R.WIN&&G.fast&&(sideStr(cb)+pStr(p)>monStr(cb)||(sideStr(cb)+pStr(p)===monStr(cb)&&(isCls(p,'warrior')||isCls(f,'warrior'))))){r.rec={act:'opt',opt:'yes'};r.why=`Help! Together you win: ${esc(f.nm)} reaches level ${R.WIN} and, as the helper, you WIN TOO.`}
+    else if(f.lvl+g>=R.WIN){r.rec={act:'opt',opt:'no'};r.why=`Refuse! Winning this fight makes ${esc(f.nm)} level ${R.WIN}: ${f.sex==='f'?'she':'he'} would WIN THE GAME.`}
       else{const tot=sideStr(cb)+pStr(p),mb=monStr(cb);const w=tot>mb||(tot===mb&&(isCls(p,'warrior')||isCls(f,'warrior')));const elf=isRace(p,'elf');const ahead=f.lvl-p.lvl;
         if(!w){r.rec={act:'opt',opt:'no'};r.why=`Refuse: even together you lose ${tot} vs ${mb}. You would both run.`}
         else if((q.n>=1||elf)&&ahead<3){r.rec={act:'opt',opt:'yes'};r.why=`Say yes: together you win ${tot} vs ${mb}. You get ${q.n} treasure${plural(q.n)}${elf?', plus a level (Elf)':''}. ${esc(f.nm)} gains ${g} level${plural(g)}.`}
         else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win, but ${esc(f.nm)} is ${ahead} levels ahead. They would gain ${g} more.`:`Refuse: you’d win, but there’s no pay. ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
     else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s mild. Keep your ring for something worse.';
     else if(q.kind==='rescue'){const c=mdef(runMon(cb.runs[q.run]));const ops=c.bad||[];const heavy=ops.some(o=>['death','orcs','dread','race','cls','clsOr','clsOr1','swap','hippo','troll','pixie','lowest','gold','handOr','slugs'].includes(o[0])||(o[0]==='lvl'&&(o[1]==='all'||o[1]>=2))||(o[0]==='item'&&o[2]==='all'));const use=vm0(me).filter(x=>x.act==='use').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card));
-      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
+      const rr=vm0(me).filter(x=>x.act==='reroll').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];
+      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else if(rr&&(heavy||cardValue(p,rr.card)<=4)){r.rec=rr;r.why=`Roll again: a spare card is cheaper than the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
     else if(q.kind==='pick'&&m){const v=q.opts[m.opt];r.why=typeof v==='number'?`Pick ${esc(cname(v))}.`:''}
     return r}
   const ph=G.phase;

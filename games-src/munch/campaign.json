@@ -50,17 +50,17 @@
     {
       "act": 1,
       "title": "The Cellar Doors",
-      "blurb": "Learn to kick, fight and run in the shallow cellars under Crookhill."
+      "blurb": "Learn to kick, fight and run."
     },
     {
       "act": 2,
       "title": "The Long Corridor",
-      "blurb": "Four heroes, sharper rivals: curses, deals and back-stabs."
+      "blurb": "Sharper rivals, curses and deals."
     },
     {
       "act": 3,
       "title": "The Vault of the Golden Boot",
-      "blurb": "The cleverest heroes in the dungeon, and every trick they own."
+      "blurb": "The cleverest heroes, every trick."
     }
   ],
   "twists": [
