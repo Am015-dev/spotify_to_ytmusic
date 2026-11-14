@@ -327,7 +327,7 @@ var TT_TEST = {};
     if (on !== was && G && G.phase === 'play' && P.children.length) { if (!on) d.style.cssText = ''; renderPyr(); }
     if (!on) { if (was) d.style.cssText = ''; return; }
     var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; var tr = $('mil') || $('tokrow'), tt = tr ? tr.getBoundingClientRect().bottom : r.top; d.style.maxHeight = Math.max(r.height, r.bottom - Math.min(r.top, tt) - 2) + 'px'; // FIXED4: a choice sheet may rise over the war track so all choices fit; the rest scrolls with a fade cue
-    var hk = d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
+    var hk = d.querySelector('.picker .arm') || d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
   }
   function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
   function dock0() {
@@ -344,13 +344,13 @@ var TT_TEST = {};
       acts.innerHTML = '<button class="btn' + hc(p) + '" data-first="' + p + '">I start</button><button class="btn alt' + hc(1 - p) + '" data-first="' + (1 - p) + '">Rival starts</button>';
     } else if (pd && pd.type === 'token') {
       msg.textContent = 'Progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
-      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + hc(t) + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small>' + esc(U.tokArm === t ? 'Tap again to take it' : 'Tap to see') + '</small></button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + hc(t) + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small class="ds">' + esc(d.text) + '</small>' + (U.tokArm === t ? '<small class="go">Tap again to take it</small>' : '') + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'destroy') {
       msg.textContent = 'Discard a rival card'; instr(p, 'Pick one rival card to throw away.');
       acts.innerHTML = '<div class="picker">' + pd.list.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-destroy="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(COLN[d.col]) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'revive') {
       msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
-      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-revive="' + t + '"><b>' + esc(d.nm) + '</b><small class="ds">' + esc(describe(d)) + '</small></button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.revArm === t ? ' arm' : '') + hc(t) + '" data-revive="' + t + '"><b>' + esc(d.nm) + '</b><small class="ds">' + esc(describe(d)) + '</small>' + (U.revArm === t ? '<small class="go">Tap again to build it free</small>' : '') + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
       msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder. You get 4.');
     } else if (U.sel != null) {
@@ -697,7 +697,7 @@ var TT_TEST = {};
     if ((b = q('[data-first]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'first', who: +b.dataset.first }) === false) return; step({ t: 'first', who: +b.dataset.first }); return; }
     if ((b = q('[data-token]'))) { var dt0 = b.dataset.token; if (!U.tut && U.tokArm !== dt0) { U.tokArm = dt0; SND.play('tick'); toast([BY[dt0].nm + ':', BY[dt0].text + '.', 'Tap again to take it.'], 3200); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: dt0 }) === false) return; U.tokArm = null; clearToast(); step({ t: 'token', id: dt0 }); return; }
     if ((b = q('[data-destroy]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'destroy' }) === false) return; step({ t: 'destroy', id: b.dataset.destroy }); return; }
-    if ((b = q('[data-revive]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; step({ t: 'revive', id: b.dataset.revive }); return; }
+    if ((b = q('[data-revive]'))) { var rv = b.dataset.revive; if (!U.tut && U.revArm !== rv) { U.revArm = rv; SND.play('tick'); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; U.revArm = null; step({ t: 'revive', id: rv }); return; }
     if (q('[data-zclose]') || t.id === 'zoom' || (q('#zoom .lift') && !q('button'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'other' }) === false) return; closeZoom(); return; }
     if ((b = q('[data-a]'))) { if (b.disabled || U.sel == null) return; if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.why || 'Not available now.', 3200); return; } var a = b.dataset.a; if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: a, w: b.dataset.w || null }) === false) return; step(a === 'wonder' ? { t: 'wonder', i: U.sel, w: b.dataset.w } : { t: a, i: U.sel }); return; }
     if ((b = q('.card.av')) && canAct() && !U.G.pend.length && U.G.phase === 'play') {
