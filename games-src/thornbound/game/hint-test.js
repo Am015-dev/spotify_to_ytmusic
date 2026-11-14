@@ -53,8 +53,11 @@ for(let s=0;s<4;s++)for(let k=0;k<19;k++){const id=s*100+k;const i=TB.cardInfo(G
   const dnorm=c=>c.n+(c.self?':self1':'')+(c.x&&!(c.n==='rally'&&c.self)?':x'+c.x:'');
   let sites=0;for(const f of F)for(const d of TB.DATA.SITE[f]){const j=out.find(o=>o.id===d.id);if(!j){if(d.kind!=='hq'){fails++;console.log('FAIL site',d.id,'not in cards.json')}continue}
     sites++;const a=j.commands.map(norm).sort().join(','),b=d.cm.map(dnorm).sort().join(',');
-    if(a!==b){fails++;console.log('FAIL site',d.id,d.nm,'| cards.json',a||'(none)','| data.js',b||'(none)')}}
-  if(sites<14){fails++;console.log('FAIL only',sites,'Site cards compared with cards.json')}else console.log('site commands vs cards.json:',sites,'cards')}
+    if(a!==b){fails++;console.log('FAIL site',d.id,d.nm,'| cards.json',a||'(none)','| data.js',b||'(none)')}
+    const TR={resilient:'res',invulnerable:'inv',pathfinder:'path'};const ta=(j.traits||[]).map(t=>TR[t]||t).sort().join(','),tb=(d.tr||[]).slice().sort().join(',');
+    if(ta!==tb){fails++;console.log('FAIL site traits',d.id,d.nm,'| cards.json',ta||'(none)','| data.js',tb||'(none)')}
+    for(const [jk,dk] of [['strength','s'],['archetype','ar'],['lore_cost','lc']])if(j[jk]!=null&&String(j[jk])!==String(d[dk])){fails++;console.log('FAIL site',jk,d.id,d.nm,'| cards.json',j[jk],'| data.js',d[dk])}}
+  if(sites<14){fails++;console.log('FAIL only',sites,'Site cards compared with cards.json')}else console.log('site commands, traits, strength, archetype, cost vs cards.json:',sites,'cards')}
 // 6. the Great Road's discard line stays within phone-check's 8-word limit for every Kingdom Card name (R64 flake)
 {const es=fs.readFileSync(__dirname+'/src/engine.js','utf8');const m=es.match(/lg\('([^']*)'\+kname\(road\[i\]\)\+'([^']*)'\)/);
   const words=t=>t.replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(w=>/[a-z][a-z]/i.test(w)).length;

@@ -87,6 +87,8 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
       chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-chip.getBoundingClientRect().width-18)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.45)',opacity:0}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:600/sp,easing:'ease-in-out'});
     a.onfinish=()=>{done();if(chip){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}}}catch(x){}
   setTimeout(done,700/sp)}
+// a score pop by a seat starts just under its chip, so it never covers the seat's name or number (R64)
+function seatPopRect(s){const ch=seatEl(s);if(!ch)return null;const r=ch.getBoundingClientRect(),n=ch.querySelector('.rv-n'),q=n?n.getBoundingClientRect():r;return {left:q.left,top:r.bottom+26,width:q.width,height:20}}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
 function regionRect(r){const b=REGBOX[r];const a=mapToClient(b.x,b.y),c=mapToClient(b.x+b.w,b.y+b.h);return {left:a.x,top:a.y,width:c.x-a.x,height:c.y-a.y}}
 function mapToClient(x,y){const el=MAP.m.el,M=el.getScreenCTM&&el.getScreenCTM();if(!M)return {x:0,y:0};return {x:M.a*x+M.e,y:M.d*y+M.f}}
@@ -95,7 +97,7 @@ function locFromText(t){for(let l=0;l<6;l++)if(t.indexOf(LOCN[l])>=0)return l;re
 function bfNews(c){if(!ANIM)return;
   for(const it of c.items){const m=it.m;if(!m||(m.k!=='inf'&&m.k!=='steal'))continue;
     const doPop=(seat,n)=>{if(!n)return;let rect=null;const l=locFromText(it.text||'');if(l>=0)rect=locRect(l);else if(G.clash&&G.clash.r!=null)try{const R=regionRect(G.clash.r);rect={left:R.left+R.width/2,top:R.top+R.height/2,width:0,height:0}}catch(e){}
-      if(!rect){const ch=seatEl(seat);if(ch)rect=ch.getBoundingClientRect()}
+      if(!rect)rect=seatPopRect(seat);
       bfPopAt(rect,(n>0?'+':'−')+Math.abs(n),fcol(seat),seat)};
     if(m.k==='inf')doPop(m.s,m.n);else{doPop(m.s,m.n);doPop(m.v,-m.n)}}
   if(typeof sfx==='function'&&c.items.some(infK))sfx('inf')}
@@ -139,8 +141,8 @@ function bfBanner(t,sub,col){try{if(!ANIM||UI.reduce)return;const bd=$('#board')
   e.innerHTML='<b>'+esc(t)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');fx.appendChild(e);setTimeout(()=>e.remove(),1500/spd())}catch(x){}}
 (function(){const st=document.createElement('style');st.textContent='.tbban{position:fixed;transform:translate(-50%,-50%);z-index:60;pointer-events:none;min-width:200px;max-width:88vw;text-align:center;padding:10px 18px;border-radius:12px;background:rgba(20,12,26,.9);border:3px solid var(--bc);box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 24px var(--bc);color:#fff;animation:tbban 1.45s cubic-bezier(.2,1.4,.4,1) forwards}.tbban b{display:block;font:700 22px/1.2 Cinzel,Georgia,serif;color:var(--bc)}.tbban small{display:block;font:600 16px/1.3 "EB Garamond",Georgia,serif;margin-top:2px}@keyframes tbban{0%{transform:translate(-50%,-50%) scale(1.8);opacity:0}14%{transform:translate(-50%,-50%) scale(1);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-62%) scale(.96);opacity:0}}';document.head.appendChild(st)})();
 function bfSummary(c){const ev=c.ev;renderBar();
-  try{const me=vs(),d=ev.inf1[me]-ev.inf0[me];bfBanner(ev.round>=ev.rounds?'Final round over':'Round '+ev.round+' over',(d>0?'You +'+d+' Influence':'You held '+ev.inf1[me])+' \u00b7 '+ev.inf1.map((v,s)=>shortName(s)+' '+v).filter((x,s)=>s!==me).join(', '),'#f0c860')}catch(x){}
-  if(ANIM)ev.inf1.forEach((v,s)=>{const d=v-ev.inf0[s];if(d){const ch=seatEl(s);if(ch)bfPopAt(ch.getBoundingClientRect(),(d>0?'+':'−')+Math.abs(d),fcol(s),s)}});
+  try{const me=vs(),d=ev.inf1[me]-ev.inf0[me];bfBanner(ev.round>=ev.rounds?'Final round over':'Round '+ev.round+' over',[me,...ev.inf1.map((v,s)=>s).filter(s=>s!==me)].map(s=>{const g=ev.inf1[s]-ev.inf0[s];return (s===me?'You':shortName(s))+' '+ev.inf1[s]+' ('+(g<0?'\u2212':'+')+Math.abs(g)+')'}).join(' \u00b7 '),'#f0c860')}catch(x){}
+  if(ANIM)ev.inf1.forEach((v,s)=>{const d=v-ev.inf0[s];if(d){const r=seatPopRect(s);if(r)bfPopAt(r,(d>0?'+':'−')+Math.abs(d),fcol(s),s)}});
   bfAuto(c,1400)}
 // a tap on the board or the status line skips the narration
 // Every tap does something you can see (owner, 8 Nov): a narration card is skipped from anywhere on the table (board, strip, hand, dock),
