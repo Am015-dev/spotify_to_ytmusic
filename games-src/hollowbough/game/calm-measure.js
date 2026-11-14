@@ -7,7 +7,7 @@ const path = require('path');
 const gx = require('../../scripts/gx-serve.js');
 const NG = +process.argv[2] || (process.env.QUICK ? 1 : 2), SIZES = (process.argv[3] || '375x667,375x553').split(',').map(s => s.split('x').map(Number));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const T = { anim: 0, helpersMax: 0, bulbOff: 0, nudgeOff: 0, silent: 0, bulbTaps: 0, nudges: 0, deadTaps: 0, prepTaps: 0, games: 0 }; let bad = 0;
+const T = { loops: 0, bulbSamples: 0, selTaps: 0, qHandTaps: 0, anim: 0, helpersMax: 0, bulbOff: 0, nudgeOff: 0, silent: 0, bulbTaps: 0, nudges: 0, deadTaps: 0, prepTaps: 0, games: 0 }; let bad = 0;
 function fail(tag, m) { bad++; if (bad < 40) console.log('FAIL', tag, m); }
 async function game(browser, W, H, gi) {
   const tag = `${W}x${H} g${gi}`;
@@ -35,6 +35,10 @@ async function game(browser, W, H, gi) {
     if (st.over && !st.cards) break;
     if (st.cards) { const ok = await p.$('#pc:not([hidden]) [data-a=cont],#pc:not([hidden]) [data-a=take]'); if (ok) await ok.tap().catch(() => { }); await sleep(150); continue; }
     if (!st.mine || st.busy) { await sleep(100); continue; }
+    if (steps % 3 === 0) {
+      const hc = await p.evaluate(() => { if (!G.q || UI.sel) return null; const e = [...document.querySelectorAll('.hc')].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) .contains(x) || x.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)); }); if (!e || e.classList.contains('glow')) return null; document.getElementById('toast').classList.remove('on'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, kind: G.q.kind }; });
+      if (hc) { T.qHandTaps++; await p.touchscreen.tap(hc.x, hc.y); await sleep(150); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : ''; }); if (!tx) { T.silent++; fail(tag, 'silent hand-card tap during choice ' + hc.kind); } }
+    }
     const s = await sample(); if (s.anims.length) { T.anim++; fail(tag, 'continuous animation: ' + s.anims.slice(0, 4).join(' | ')); }
     if (s.helpers > T.helpersMax) T.helpersMax = s.helpers; if (s.helpers > 1) fail(tag, 'helpers at once ' + s.helpers + ' ' + JSON.stringify({ kit: s.kit, finger: s.fing, nudge: s.nudge, dot: s.dot }));
     const hasPh = await p.evaluate(() => !!hlpPhase());
@@ -43,6 +47,8 @@ async function game(browser, W, H, gi) {
       const bb = await (await p.$('#bulbbtn')).boundingBox(); await p.touchscreen.tap(bb.x + bb.width / 2, bb.y + bb.height / 2); await sleep(350); T.bulbTaps++;
       const r = await p.evaluate(`(() => { const inV = ${inView}; const ring = [...document.querySelectorAll('.gxh-ring:not(.from)')][0]; const f = document.querySelector('.gxh-finger'); const rr = ring && ring.getBoundingClientRect(); return { has: !!ring, ok: inV(rr, 4), box: rr && [rr.left, rr.top, rr.right, rr.bottom].map(Math.round).join(','), x: rr && Math.round(rr.left + rr.width / 2), y: rr && Math.round(rr.top + rr.height / 2), rules: !!document.querySelector('.gxh-rules'), fx: f && +f.dataset.tx, fy: f && +f.dataset.ty }; })()`);
       if (r.has && (!r.ok || (r.fx != null && (r.fx < 0 || r.fx > W || r.fy < 0 || r.fy > H)))) { T.bulbOff++; fail(tag, 'bulb ring off screen at ' + r.x + ',' + r.y + ' box ' + r.box + ' tx ' + r.fx + ',' + r.fy); await p.screenshot({ path: path.join(__dirname, 'shots', 'calm_bulb_' + W + 'x' + H + '_' + gi + '.png') }).catch(() => { }); }
+      // after a bulb tap: sample once a second (15 s for the first two taps of a game, 7 s after that); no infinite animation may run, and the ring and finger must be gone or still
+      { const secs = T.bulbTaps % 7 < 2 ? 15 : 7; for (let k = 0; k < secs; k++) { const s2 = await sample(); T.bulbSamples++; if (s2.anims.length) { T.loops++; fail(tag, 'bulb answer still loops at ' + (k + 1) + ' s: ' + s2.anims.slice(0, 3).join(' | ')); } await sleep(1000); } }
       await p.evaluate(() => { GXH.hide(); document.querySelectorAll('.gxh-rules .gxh-x').forEach(e => e.click()); }); await sleep(100);
     }
     // idle nudge: fire it now; its outline (or nothing) must be on screen, and alone
@@ -69,6 +75,11 @@ async function game(browser, W, H, gi) {
     });
     if (!tg.length) { const pb = await p.$('#acts .pass'); if (pb) { await pb.tap().catch(() => { }); await sleep(120); const pb2 = await p.$('#acts .pass'); if (pb2) await pb2.tap().catch(() => { }); } await sleep(250); continue; }
     const pick = tg[Math.floor(Math.random() * tg.length)]; await p.touchscreen.tap(pick.x, pick.y); await sleep(250);
+    // a second tap on the already-selected card must answer; a hand-card tap during a "tap a meadow card" choice must answer
+    if (steps % 2 === 0) {
+      const sel = await p.evaluate(() => { if (!UI.sel || !UI.tgEls[UI.sel.tg]) return null; const r = UI.tgEls[UI.sel.tg].getBoundingClientRect(); if (r.width < 4 || r.left < 0 || r.right > innerWidth || r.top < 0 || r.bottom > innerHeight) return null; document.getElementById('toast').classList.remove('on'); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      if (sel) { T.selTaps++; await p.touchscreen.tap(sel.x, sel.y); await sleep(150); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : ''; }); if (!tx) { T.silent++; fail(tag, 'silent second tap on the selected card'); } else await p.evaluate(() => { UI.sel = null; render(); }); }
+    }
   }
   if (!(await p.evaluate(() => G.phase === 'over'))) fail(tag, 'game did not finish in ' + steps + ' steps');
   console.log(tag, 'done, steps', steps); await ctx.close();
@@ -80,6 +91,6 @@ let URL;
   const b = await PW.chromium.launch();
   for (const [W, H] of SIZES) for (let g = 0; g < NG; g++) await game(b, W, H, g).catch(e => fail(`${W}x${H} g${g}`, 'crash ' + String(e.message).slice(0, 200)));
   await b.close();
-  console.log('CALM MEASURE: games ' + T.games + ', continuous-animation samples ' + T.anim + ', max helpers at once ' + T.helpersMax + ', bulb taps ' + T.bulbTaps + ' (off-screen ' + T.bulbOff + '), idle nudges ' + T.nudges + ' (off-screen ' + T.nudgeOff + '), Prepare taps ' + T.prepTaps + ', dead-card taps ' + T.deadTaps + ', silent taps ' + T.silent);
+  console.log('CALM MEASURE: games ' + T.games + ', continuous-animation samples ' + T.anim + ', max helpers at once ' + T.helpersMax + ', bulb taps ' + T.bulbTaps + ' (off-screen ' + T.bulbOff + '), idle nudges ' + T.nudges + ' (off-screen ' + T.nudgeOff + '), Prepare taps ' + T.prepTaps + ', dead-card taps ' + T.deadTaps + ', after-bulb samples ' + T.bulbSamples + ' (loops ' + T.loops + '), second taps on a selected card ' + T.selTaps + ', hand taps in a choice ' + T.qHandTaps + ', silent taps ' + T.silent);
   console.log(bad ? 'CALM FAIL ' + bad : 'CALM PASS'); process.exit(bad ? 1 : 0);
 })();

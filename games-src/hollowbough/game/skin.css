@@ -106,3 +106,5 @@ html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 @media (max-width:600px){.gxc-head{flex-wrap:wrap;row-gap:4px}.gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;font-size:17px}}
 /* R10: story map stage labels 14px on phones (no label under 14px) */
 .gxc-lab{font-size:14px!important}
+/* calm play: the bulb's ring pulses three times, then holds still */
+html.calm .gxh-ring:not(.from){animation-iteration-count:3}
