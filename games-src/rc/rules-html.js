@@ -14,7 +14,7 @@ const RULES_HTML=`<h2>How to play</h2>
 <li><b>Morale</b>. The first player gains or loses determination to match morale (−3 to +2; at +3 choose 2 determination or 1 heal). Solo: morale rises by 1 first.</li>
 <li><b>Production</b>. Each unused source on the camp tile gives 1: wood gives wood, fish and birds give food.</li>
 <li><b>Actions</b>. Place every character pawn (2 each), then resolve in order: threats, hunting, building, gathering, exploring, arranging the camp, resting. Resources you gain arrive only after all actions.</li>
-<li><b>Weather</b>. Roll the dice the scenario shows for this round, plus any cloud markers. Each snow cloud burns 1 wood for heating. Every cloud (rain or snow) above your roof level ruins 1 food and 1 wood. The animals die can take food, knock down the palisade or attack (strength 3 against your palisade: each castaway takes 1 wound per level it falls short). A storm lowers the palisade.</li>
+<li><b>Weather</b>. Roll the dice the scenario shows for this round, plus any cloud markers. Each snow cloud burns 1 wood for heating. Every cloud (rain or snow) above your roof level ruins 1 food and 1 wood. The animals die can take food, knock down the palisade or attack (strength 3 against your weapon). A storm lowers the palisade.</li>
 <li><b>Night</b>. Each castaway eats 1 food or takes 2 wounds. Without a shelter everyone takes 1 wound. Normal food spoils; dry food keeps. You may move the camp to a neighbouring tile (roof and palisade are halved, or lost without a built shelter). The first player passes on.</li></ol>
 <h3>Actions and pawns</h3>
 <table><tr><th>Action</th><th>Pawns</th><th>What it does</th></tr>

@@ -675,9 +675,9 @@ html.bf #ppop .pp-h{min-height:44px}
 .bfr:active{background:#f6c46e}
 .detscene{font-size:16px;line-height:1.4}.detscene h2{font:1.3rem var(--title);margin:4px 0}
 @media (max-height:640px){.bf-main .btn,html.bf .gx-ibtn.bf-s{min-height:52px;height:52px}}
-#bfglow{position:absolute;inset:0;pointer-events:none}
+#bfglow{position:absolute;inset:0;pointer-events:none}html:has(#ppop:not([hidden])) #bfglow{visibility:hidden}
 .bfgl{position:absolute;left:0;top:0;width:52px;height:52px;border-radius:50%;border:4px solid #ffd37a;background:radial-gradient(circle,rgba(255,211,122,.45),rgba(255,211,122,0) 70%);box-shadow:0 0 14px 4px rgba(255,200,90,.7);animation:bfGl 1.1s ease-in-out 3;pointer-events:none}
-@keyframes bfGl{50%{transform:scale(1.18);opacity:.65}}
+@keyframes bfGl{50%{transform:scale(1.06);opacity:.65}}
 /* event card flip, rain, flying gains */
 .bfcard{position:absolute;left:10px;top:52px;width:168px;height:104px;z-index:8;pointer-events:auto;perspective:700px;cursor:pointer;touch-action:manipulation;-webkit-touch-callout:none;user-select:none}
 .bfcard.bfq{display:none!important}

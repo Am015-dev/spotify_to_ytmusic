@@ -155,7 +155,7 @@ function renderChips(st){const host=q('#bfchips');if(!host)return;const cs=chips
 BF.snap=function(x,y,id){if(!BF.on||!UI.pick||!UI.pick.length||(id!=null&&UI.pick.includes(id)))return null;let best=null,bd=46;for(const g of document.querySelectorAll('#bfglow .bfgl')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-x,r.top+r.height/2-y);if(d<bd){bd=d;best=g}}return best?+best.dataset.t:null};
 BF.place=function(){const gl=q('#bfglow');if(gl){const pts=[...gl.children].map(g=>tilePt(+g.dataset.t)).filter(Boolean);let md=99;for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++)md=Math.min(md,Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y));
     // R42 P6: rings never overlap, even at the top of their pulse (scale 1.18): close places get smaller rings (taps still snap to the nearest)
-    const rs=Math.max(34,Math.min(52,Math.floor((md-3)/1.18)));if(gl._rs!==rs){gl._rs=rs;gl.style.setProperty('--rs',rs+'px')}}
+    const rs=Math.max(44,Math.min(52,Math.floor((md-3)/1.06)));if(gl._rs!==rs){gl._rs=rs;gl.style.setProperty('--rs',rs+'px')}}
   if(gl)for(const g of gl.children){const p=tilePt(+g.dataset.t);if(!p){g.style.visibility='hidden';continue}g.style.visibility='';const hr=(gl._rs||52)/2;const tr=Math.round(p.x-hr)+','+Math.round(p.y-hr);if(g._tr!==tr){g._tr=tr;g.style.left=Math.round(p.x-hr)+'px';g.style.top=Math.round(p.y-hr)+'px'}}
   const host=q('#bfchips');if(!host)return;const hr=host.getBoundingClientRect();const busy=[];
   // R36 stopper: a plate (or its "+N" / take-back button) must never sit on a glowing place's centre, or the finger lands on the plate and the tap dies
@@ -276,7 +276,7 @@ BF.autoSet=function(i){clearTimeout(BF.autoT);BF.autoT=null;if(!BF.autoOk(i))ret
   const fire=()=>{BF.autoT=null;if(!BF.on||PHO.st!=='story'||storyIdx()!==i)return;if(UI.pause||GX.open||document.hidden||(typeof tutClaimed==='function'&&tutClaimed(i))){BF.autoT=setTimeout(fire,600);return}storyNext()};BF.autoT=setTimeout(fire,ms/(UI.speed||1))};
 BF.autoTap=function(e){if(BF.autoT==null||!BF.on||PHO.st!=='story')return;const t=e.target;if(t.closest&&t.closest('#bfzoom,#phview,#bfcard,.gx-bar,.gx-drawer,#modal'))return;BF.skipAuto()};
 // ---------- ghost finger: shows the first move, and is gone once you have made it ----------
-function ghostSpot(){if(!BF.on||PHO.st!=='plan2')return null;const cur=curPawn();const hint=!!cur&&BF.hintId===cur.id;if(!hint&&(BF.ghostDone||G.round>1||G.plan.acts.length))return null;const rt=recTile(cur);if(!rt)return null;
+function ghostSpot(){if(!BF.on||PHO.st!=='plan2')return null;if(BF.glowRound!==G.round&&!(G.tut||G.coach))return null;const cur=curPawn();const hint=!!cur&&BF.hintId===cur.id;if(!hint&&(BF.ghostDone||G.round>1||G.plan.acts.length))return null;const rt=recTile(cur);if(!rt)return null;
   const pop=PHO.pop;if(pop){if(pop.k!=='tile'||pop.id!==rt.id)return null;const r=document.querySelector('#ppop [data-rec="1"]');if(!r)return null;const b=r.getBoundingClientRect();return {x:b.left+b.width-28,y:b.top+b.height/2,why:'row'}}
   const p=tilePt(rt.id);if(!p)return null;return {x:p.ox+p.x,y:p.oy+p.y,why:'tile',id:rt.id}}
 BF.ghostSpot=ghostSpot;
@@ -354,7 +354,7 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(!BF.on){UI.pick=null;return}
   if(BF._st!==st){BF._st=st;BF.msg=null}
   // glowing places: where the pawn in hand can work
-  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=legalTiles(cur);try{if(BF.pileNag!==G.round+':'+G.logN&&!humanFree().some(p=>p.c!=null||recTile(p))&&(wantPile()>0||BF.hintOn()&&recExtras().length)){BF.pileNag=G.round+':'+G.logN;const n=wantPile();BF.say(n>0?`🔥 ✨ adds ${n} wood to the pile`:'✨ has one more tip for today',6000)}}catch(e){}}else if(st==='story'&&posQ())UI.pick=posQ().map(x=>x.pos);else UI.pick=null;
+  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=(BF.glowRound===G.round||(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done)||G.tut||G.coach)?legalTiles(cur):null;try{if(BF.pileNag!==G.round+':'+G.logN&&!humanFree().some(p=>p.c!=null||recTile(p))&&(wantPile()>0||BF.hintOn()&&recExtras().length)){BF.pileNag=G.round+':'+G.logN;const n=wantPile();BF.say(n>0?`🔥 ✨ adds ${n} wood to the pile`:'✨ has one more tip for today',6000)}}catch(e){}}else if(st==='story'&&posQ())UI.pick=posQ().map(x=>x.pos);else UI.pick=null;
   { // the glow under each place the pawn in hand can work
     const gl=q('#bfglow');if(gl){const ids=UI.pick||[];const sig=ids.join(',');if(gl.dataset.s!==sig){gl.dataset.s=sig;gl.innerHTML=ids.map(i=>`<i class="bfgl" data-t="${i}"></i>`).join('');BF.place()}}}
   // the tray
@@ -411,4 +411,7 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   // a small tick when a job lands in the plan, however it was placed
   let n=-1;setInterval(()=>{try{if(!BF.on||!G||!G.plan)return;const k=G.plan.acts.reduce((s,a)=>s+a.pw.length,0);if(n>=0&&k>n)buzz();n=k}catch(e){}},200)})();
 
+// R55: a calm day start: no glows and no finger until a pawn or the hint button is tapped this day
+document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('#bf .bfpw,#bf [data-a=suggest],#bf [data-pawn]');if(t&&G&&BF.glowRound!==G.round){BF.glowRound=G.round;try{render()}catch(err){}}},true);
+document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('#bf .bfpw');if(t&&G&&BF.glowRound!==G.round)BF.glowRound=G.round},true);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#bfchips .bfmore');if(!b)return;e.stopPropagation();const k=+b.dataset.exp;BF.exp=BF.exp===k?null:k;try{renderChips(PHO.st)}catch(err){}},true);

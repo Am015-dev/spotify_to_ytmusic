@@ -228,7 +228,7 @@ FN.weather2=fr=>{const w=G.wxNow;
   const over=Math.max(0,w.rain+w.snow-G.camp.roof);if(over){lg(`${over} cloud${over>1?'s get':' gets'} past the roof: ${over} food and ${over} wood are ruined.`,'bad');for(let i=0;i<over;i++){const m1=pay('food',1,living(),true),m2=pay('wood',1,living(),true);if(m1+m2)for(const c of living())wound(c,m1+m2,'soaked and cold')}}
   if(w.animal==='discard 1 food'){const m=pay('food',1,living(),true);if(m)for(const c of living())wound(c,1,'hungry animals')}
   if(w.animal==='palisade -1'){roofPal('pal',-1)}
-  if(w.animal==='fight beast strength 3'){const s=Math.max(0,3-G.camp.pal);lg(`Hungry animals attack the camp (strength 3 vs palisade ${G.camp.pal}).`,'bad');if(s)for(const c of living())wound(c,s,'hungry animals')}
+  if(w.animal==='fight beast strength 3'){const s=Math.max(0,3-G.weapon);lg(`Hungry animals attack the camp (strength 3 vs weapon ${G.weapon}).`,'bad');if(s)for(const c of living())wound(c,s,'hungry animals')}
   if(w.storm){lg('The storm batters the camp.','bad');for(let i=0;i<w.storm;i++)roofPal('pal',-1)}
   const wf=(SCENARIOS[G.scen].wxFood||{})[G.round];if(wf){lg(`Lean season: ${wf} food must be discarded.`,'bad');const m=pay('food',wf,living(),true);if(m)for(const c of living())wound(c,m,'the lean season')}
   G.wx={rain:0,snow:0,storm:0,animals:0};SC().afterWeather&&SC().afterWeather()};
