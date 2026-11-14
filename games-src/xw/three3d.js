@@ -142,20 +142,22 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
   const moon=V3.moon=new THREE.Mesh(new THREE.SphereGeometry(60,48,32),new THREE.MeshStandardMaterial({map:mt,roughness:.95,metalness:0,envMapIntensity:0}));moon.position.set(1250,-420,-1500);moon.renderOrder=-7;sc.add(moon)}
 // ---- the play mat: a dark glass plate with a holographic range grid, deployment bands, ruler ticks, a glowing frame and corner emitters ----
 function playMat(){const g=new THREE.Group();const M=91.4;
-  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x2f374d,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x0a0d1c,roughness:.7,metalness:0,transparent:true,opacity:.96,envMapIntensity:.08}));
   plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.renderOrder=-3;plate.receiveShadow=true;g.add(plate);
   const grid=V3.gridMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},c0:{value:new THREE.Color(0xff8a3a)},c1:{value:new THREE.Color(0xff3050)},cg:{value:new THREE.Color(0x5fb8ff)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:`uniform float t;uniform vec3 c0,c1,cg;varying vec2 vP;
       float line(float v,float w){float d=abs(fract(v)-.5);float fw=fwidth(v);return smoothstep(.5-w-fw,.5-w+fw*.2,d);}
       void main(){vec2 p=vP;float M=91.4;vec2 q=p/M;
-        float major=max(line(p.x/10.+.5,.006),line(p.y/10.+.5,.006));float minor=max(line(p.x/2.5+.5,.008),line(p.y/2.5+.5,.008));
-        vec2 dd=abs(fract(p/2.5)-.5);float dots=1.-smoothstep(.015,.04,length(dd-.5));
-        float edge=min(min(p.x,M-p.x),min(p.y,M-p.y));float border=exp(-edge*1.6)*.7+exp(-edge*.25)*.04;
-        float sweep=exp(-pow((q.y-fract(t*.035))*40.,2.))*.35;
-        float tick=0.;if(edge<1.4){float along=(p.x<1.4||p.x>M-1.4)?p.y:p.x;tick=line(along/2.5+.5,.03)*(1.-smoothstep(.2,1.4,edge));}
-        float vig=1.-.5*smoothstep(.3,.72,length(q-.5));
-        vec3 c=cg*(major*.13+minor*.028+dots*.018+sweep*(major*.6+.05)+tick*.45)*vig+cg*border*.8;
+        float h1=fract(sin(dot(floor(p*3.),vec2(12.9898,78.233)))*43758.5453);vec2 sp=fract(p*3.)-.5;
+        float star=step(.965,h1)*(1.-smoothstep(.03,.11+.08*fract(h1*91.),length(sp)))*(.6+.4*sin(t*1.7+h1*40.));
+        float h2=fract(sin(dot(floor(p*.9),vec2(39.3,11.7)))*24634.63);vec2 sp2=fract(p*.9)-.5;float big=step(.985,h2)*(1.-smoothstep(.02,.16,length(sp2)));
+        float n=0.;vec2 r=q*3.;for(int i=0;i<4;i++){n+=(.5+.5*sin(r.x*1.7+sin(r.y*1.3+float(i))*1.9))*(.5+.5*sin(r.y*1.9+sin(r.x*1.1)*1.7))/pow(2.,float(i));r=r*2.03+vec2(1.7,-.9);}
+        vec3 neb=mix(vec3(.10,.05,.22),vec3(.03,.14,.24),smoothstep(.2,.8,q.x+q.y*.4))*smoothstep(.35,1.1,n)*.3;
+        float edge=min(min(p.x,M-p.x),min(p.y,M-p.y));float border=exp(-edge*1.6)*.7;
+        float tick=0.;if(edge<1.4){float along=(p.x<1.4||p.x>M-1.4)?p.y:p.x;tick=line(along/10.+.5,.05)*(1.-smoothstep(.2,1.4,edge));}
+        float vig=1.-.45*smoothstep(.3,.75,length(q-.5));
+        vec3 c=(neb+vec3(.85,.9,1.)*(star*.75+big*1.1))*vig+cg*(border*.6+tick*.5);
         float z0=smoothstep(10.2,9.6,p.y),z1=smoothstep(10.2,9.6,M-p.y);
         c+=c0*(z0*.07+smoothstep(.5,0.,abs(p.y-10.))*.55);
         c+=c1*(z1*.07+smoothstep(.5,0.,abs(M-p.y-10.))*.55);
@@ -355,6 +357,13 @@ function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[
   const base=new THREE.Mesh(baseGeo(b),plastic);base.castShadow=true;base.receiveShadow=true;g.add(base);
   const tok=new THREE.Mesh(new THREE.PlaneGeometry(b-.5,b-.5),new THREE.MeshStandardMaterial({map:tokenTex(s),roughness:.55,metalness:0}));tok.rotation.x=-PI/2;tok.rotation.z=0;tok.position.y=.53;tok.receiveShadow=true;g.add(tok);
   const rimC=new THREE.Color(fc.eng);const rim=new THREE.Mesh(new THREE.PlaneGeometry(b*1.45,b*1.45),new THREE.MeshBasicMaterial({map:ringTex(),color:rimC.clone().multiplyScalar(1.2),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));rim.rotation.x=-PI/2;rim.position.y=.06;g.add(rim);
+  // table look: a round faction-coloured stand rim under the square base, and the firing arc painted on the mat as a coloured wedge
+  {const T0=SHIPS[s.type]||{},arc=T0.arc||'F',big=s.base==='L',half=(big?84.05:80.9)/2*PI/180,ec=new THREE.Color(fc.eng);
+    const disc=new THREE.Mesh(new THREE.RingGeometry(b*.74,b*.86,48),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.85,depthWrite:false}));disc.rotation.x=-PI/2;disc.position.y=.04;g.add(disc);
+    const dm=new THREE.Mesh(new THREE.CircleGeometry(b*.74,48),new THREE.MeshBasicMaterial({color:0x07080f,transparent:true,opacity:.7,depthWrite:false}));dm.rotation.x=-PI/2;dm.position.y=.03;g.add(dm);
+    const wm=new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.26,depthWrite:false,side:THREE.DoubleSide});const wedge=(rot)=>{const w=new THREE.Mesh(new THREE.RingGeometry(b*.87,b*1.75,24,1,rot-half,2*half),wm);w.rotation.x=-PI/2;w.position.y=.035;g.add(w);
+      const e=new THREE.Mesh(new THREE.RingGeometry(b*1.7,b*1.78,24,1,rot-half,2*half),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide}));e.rotation.x=-PI/2;e.position.y=.036;g.add(e)};
+    if(arc==='T'){const r=new THREE.Mesh(new THREE.RingGeometry(b*1.2,b*1.28,48),wm.clone());r.material.opacity=.5;r.rotation.x=-PI/2;r.position.y=.035;g.add(r);wedge(0)}else{wedge(0);if(arc==='A')wedge(PI)}}
   const acr=new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false});
   const sock=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.3,16),plastic);sock.position.y=.66;g.add(sock);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,3.2,12),acr);peg.position.y=2.2;g.add(peg);
@@ -643,7 +652,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   const anyAnim=Object.keys(V3.anim).length>0;
   V3.busy=!!(anyAnim||easing||V3.fxq.length||V3.later.length||V3.ez||V3.drag||V3.shake>0||V3.flashT>0||PH&&PH.testing);
   engineBed(nMove>0);
-  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
+  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){{const low=document.documentElement.classList.contains('bf')&&V3.view==='top';placeEl(el,m.position.clone().add(low?new THREE.Vector3(0,.5,S3(B(s))*.98*(Math.cos(V3.cam.yaw||0)<0?-1:1)):new THREE.Vector3(0,8.4,0)))}if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
   // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
   let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}

@@ -169,8 +169,8 @@ R('Selling stays correct after Moot Hall chains (a chained placement still score
 S('F. End of a season');
 R('At season end the stalls are emptied and refilled (full stalls again)', () => { const G = G0(2); G.depots[1] = [null, null]; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq('2/2', G.phase === 1 ? G.depots[1].filter(Boolean).length + '/' + G.depots[6].filter(Boolean).length : 'no phase'); });
 R('At season end the back lane is refilled', () => { const G = G0(2); G.black = [null, null, null, null]; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq(4, G.black.filter(Boolean).length); });
-R('At season end goods left on the stalls are removed', () => { const G = G0(2); G.goodsAt[3] = [1, 2, 3]; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq(1, Object.values(G.goodsAt).reduce((a, b) => a + b.length, 0)); });
-R('At season end five new goods tiles are laid out for the new season', () => { const G = G0(2); G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq(5, G.rg.filter(Boolean).length + Object.values(G.goodsAt).reduce((a, b) => a + b.length, 0)); });
+R('At season end goods left on the stalls stay there (only the hexagon tiles are cleared)', () => { const G = G0(2); for (let d = 1; d <= 6; d++) G.goodsAt[d] = []; G.goodsAt[3] = [1, 2, 3]; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq('3 + 1 new', (G.goodsAt[3].slice(0, 3).join() === '1,2,3' ? 3 : 0) + ' + ' + (Object.values(G.goodsAt).reduce((a, b) => a + b.length, 0) - 3) + ' new'); });
+R('At season end five new goods tiles are laid out for the new season', () => { const G = G0(2); for (let d = 1; d <= 6; d++) G.goodsAt[d] = []; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq(5, G.rg.filter(Boolean).length + Object.values(G.goodsAt).reduce((a, b) => a + b.length, 0)); });
 R('At season end players keep their silver, workers, goods, storage and track position', () => { const G = G0(2), p = G.P[0]; p.goods = { 2: 1 }; p.store = [tile('mine')]; p.pos = 2; p.workers = 5; p.silver = 4; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq('1/1/2/5/4', p.goods[2] + '/' + p.store.length + '/' + p.pos + '/' + p.workers + '/' + p.silver); });
 R('A new season starts with round 1 and a new roll', () => { const G = G0(2); G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq('1/0/false', G.phase + '/' + G.round + '/' + G.P[0].used[0]); });
 R('The turn order carries over into the new season', () => { const G = G0(2); G.P[1].pos = 3; G.round = 4; G.ti = 1; G.P[1].dice = [1, 1]; burn(G); return eq('1,0', G.order.join()); });
@@ -183,7 +183,7 @@ R('Final: a single worker is worth nothing', () => { const G = G0(2), p = G.P[0]
 R('Final: tiles still in storage score nothing', () => { const G = G0(2), p = G.P[0]; p.silver = 0; p.workers = 0; p.goods = {}; p.store = [tile('mine'), tile('ship')]; VB.forceEnd(G); return eq(0, p.vp); });
 R('Final: points from play are kept and the end bonus is added on top', () => { const G = G0(2), p = G.P[0]; p.vp = 30; p.silver = 2; p.workers = 0; p.goods = {}; VB.forceEnd(G); return eq(32, p.vp); });
 R('The player with most points wins', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; }); G.P[0].vp = 40; G.P[1].vp = 41; VB.forceEnd(G); return eq(1, G.winner); });
-R('Tie: the player with fewer empty estate spaces wins', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; p.vp = 30; }); G.P[1].estate[19] = filler(19); G.P[0].pos = 0; G.P[1].pos = 5; VB.forceEnd(G); return eq(1, G.winner); });
+R('Tie: the player with more empty estate spaces wins (corrected rule)', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; p.vp = 30; }); G.P[1].estate[19] = filler(19); G.P[0].pos = 5; G.P[1].pos = 0; VB.forceEnd(G); return eq(0, G.winner); });
 R('Tie on points and spaces: the player further back on the turn track wins', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; p.vp = 30; }); G.P[0].pos = 3; G.P[1].pos = 1; VB.forceEnd(G); return eq(1, G.winner); });
 R('Tie on points, spaces and step: the player lower in the stack wins', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; p.vp = 30; p.pos = 2; }); G.P[0].arr = 5; G.P[1].arr = 9; VB.forceEnd(G); return eq(0, G.winner); });
 R('Tie-break does not override a points difference (more points wins even with more empty spaces)', () => { const G = G0(2); G.P.forEach(p => { p.silver = 0; p.workers = 0; p.goods = {}; }); G.P[0].vp = 31; G.P[1].vp = 30; G.P[1].estate[19] = filler(19); G.P[0].pos = 9; VB.forceEnd(G); return eq(0, G.winner); });
@@ -245,7 +245,11 @@ if (process.argv.includes('--md')) {
     'cross-checked on 8 Nov 2026 against a rulebook summary page, plus our own `rules-notes.md`. The existing `rules-test.js` was written by the builders and is not used as evidence.', '',
     'Own, on purpose (not rule checks): the estate map and its numbers, the tile pool mix, the 26 Lore tiles (section H tests that each does what its own text says).',
     'Not original rules and not tested here: the solo and 2 v 2 team modes.', '',
-    'Not decidable from the published text: whether one meadow may hold two animal kinds. Our engine allows it (kinds are scored separately); no rule is asserted.', ''];
+    'Not decidable from the published text: whether one meadow may hold two animal kinds. Our engine allows it (kinds are scored separately); no rule is asserted.', '',
+    'W505 gameplay gate (8 Nov 2026), checked against the rulebook text and two rules pages: goods crates left on the stalls now stay into the next season (only',
+    'hexagon tiles are cleared), and a tie now goes to the player with MORE empty estate spaces (the English rulebook says fewest; the rules pages call that a',
+    'translation error). Still different on purpose: the stall spaces of the original are colour-coded (a fixed colour per space, and in 3-player games',
+    'stall 6 holds a keep or a mine by season); its exact layout was not found, so our stalls draw at random from the normal tiles.', ''];
   rules.forEach((r, i) => { secs.filter(s => s.at === i).forEach(s => { out.push('', '## ' + s.name, s.note ? '_' + s.note + '_' : '', ''); }); out.push((i + 1) + '. ' + r.text); });
   console.log(out.join('\n')); process.exit(0);
 }

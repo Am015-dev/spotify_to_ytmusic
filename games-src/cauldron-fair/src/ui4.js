@@ -40,7 +40,7 @@ function renderReport() {
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
-  UI.advAt = Date.now();
+  UI.advAt = tapMark();
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
@@ -55,7 +55,8 @@ function sugMark(box, p, q, legal) {
       box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
       return;
     }
-    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m; const js = JSON.stringify(stripM ? stripM(m) : m);
+    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m;
+    if (UI.mode === 'tutorial') { const want = q.h === 'y1' ? legal.find(x => x.yes) : q.h === 'crow' ? legal.find(x => x.idx >= 0 && p.hold[x.idx] && p.hold[x.idx].c !== 'W') : null; if (want) m = want; }   // the tutorial's ask and the best tag always agree const js = JSON.stringify(stripM ? stripM(m) : m);
     const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
     const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
   } catch (e) {}
@@ -98,7 +99,7 @@ function showFinal() {
   box.appendChild(body);
   box.appendChild(h('div.rsfoot', h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, UI.camp && typeof GXC !== 'undefined' && GXC.active() ? h('button.btn.go', { 'data-a': 'campfin', type: 'button' }, 'Continue the story') : (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), (UI.camp ? null : h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu')))));
   const conf = h('div.conf'); const cols = ['#f2b81e', '#d6392f', '#3fa04a', '#3b82d6', '#8a55c4']; for (let i = 0; i < 26; i++) { const c = h('i'); c.style.cssText = 'left:' + Math.random() * 100 + '%;background:' + cols[i % 5] + ';animation-delay:' + Math.random() * 2 + 's;animation-duration:' + (2 + Math.random() * 2) + 's'; conf.appendChild(c); }
-  rs.innerHTML = ''; rs.appendChild(box); if (!UI.sim) rs.appendChild(conf);
+  rs.innerHTML = ''; rs.appendChild(box); const vw = viewSeat(), lost = vw >= 0 && G.winners.indexOf(vw) < 0 && !hotSeat(); if (!UI.sim && !lost) rs.appendChild(conf);   // confetti only when you (or a hot-seat friend) won
 }
 // ---------- the old guided tips are retired: first-time help is the help kit (ui10.js), the staged tutorial is ui11.js ----------
 const mineP = () => { const v = viewSeat(); return G && v >= 0 ? G.players[v] : null; };

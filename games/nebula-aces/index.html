@@ -359,6 +359,8 @@ table.dial th,table.dial th.cw,table.dial th.sp,.mv .rs,.mv small,.na-guide b,.g
 .dlg .launchbar h1{position:static}
 .gx-dock div:has(>.btn.sm[data-dial]){display:flex;flex-wrap:wrap;gap:6px;max-width:100%;box-sizing:border-box;padding-right:8px}
 
+.kico{display:inline-block;vertical-align:-.12em}
+
 </style>
 <style>
 /* ===== Phone layout (html.ph): the mat first, decisions in pop-ups next to it. Every rule starts with html.ph so desktop and tablets are untouched. ===== */
@@ -577,9 +579,9 @@ html.ph #tags .tag .tgl{font-size:13px}
 /* menu test v2: 44px icon buttons get a slim painted frame so the icon sits inside it */
 html.sk.ph .gx-bar>.btn[data-gx],html.sk.ph .gx-bar>.btn[data-a="rules"],html.sk.ph .gx-gear{border-width:10px;border-image-width:10px;padding:0}
 /* text keeps 8px from the column the framed rows use */
-html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:8px;padding-right:8px}
+html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear{border-width:10px;border-image-width:10px;padding:0}
-html.sk .dlg h4{padding-left:8px;padding-right:8px}
+html.sk .dlg h4{padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear:not(.sm):not(.ghost){border-width:10px;border-image-width:10px;padding:0}
 html.sk.ph .btn#phcam{border-width:10px;border-image-width:10px;padding:0}
 /* owner rule (8 Nov): no phone text under 14 px. Ship tags, the score strip, maneuver cards and the legend */
@@ -606,6 +608,11 @@ details.na-opts{margin:12px 0;border:1px solid rgba(255,200,107,.35);border-radi
 details.na-opts>summary{cursor:pointer;font:700 16px/1.3 "Exo 2",sans-serif;color:var(--gold,#ffc86b);padding:8px 0;min-height:28px}
 /* big screens: the ship info / card sheet is a side panel on the right, so the board and the action ring stay reachable */
 html.ph.ph-big #ppop,html.ph.ph-big #pc{left:auto;width:min(440px,36vw);border-left:2px solid var(--gold);border-radius:14px 0 0 0}
+/* board-first phones: asteroid and deployment spots are tapped on the mat itself */
+html.ph.bf .prompt .acts.grid{display:none}
+/* landscape with a card up: the card covers the dock, so the prompt under it (A1-E5 grid) is hidden, not left half off screen */
+html.ph.ph-l.ph-card .gx-dock-body{visibility:hidden}
+html.ph .pm-grid .mv .rk.om{top:auto;bottom:1px;right:1px;font-size:9px;background:#d92b2b;color:#fff;border-radius:4px;padding:0 3px;line-height:1.3;white-space:nowrap}
 
 /* ===== Board-first portrait (html.bf): the board is the screen. Every rule starts with html.bf. ===== */
 html.bf.ph-p .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) minmax(0,1fr)}
@@ -629,13 +636,15 @@ html.bf #tags .tag .tgl{display:none}
 .bfp.on{stroke-width:6;opacity:1;filter:drop-shadow(0 0 6px currentColor)}
 .bfp.set{stroke-width:4;opacity:.8}
 .bfp.ghost{stroke:#66ddff;stroke-width:2.5;opacity:.9;stroke-dasharray:5 4}
+.bfp.ghost.g{stroke:#46f08a}.bfp.ghost.w{stroke:#e8eeff}.bfp.ghost.r{stroke:#ff6b6b}.bfp.ghost.on{stroke-dasharray:none;fill:rgba(255,255,255,.12)}
+.bfnose{fill:#e8eeff;stroke:#0a1020;stroke-width:1.5;opacity:.95}.bfnose.g{fill:#46f08a}.bfnose.r{fill:#ff6b6b}
 .bfshot{fill:none;stroke-linecap:round}
 .bfshot.aim{stroke:#ff6070;stroke-width:2.5;stroke-dasharray:8 7;opacity:.85;animation:bfdash 1s linear infinite}
 .bfshot.fire{stroke:#ffd27a;stroke-width:5;filter:drop-shadow(0 0 6px #ff7040) drop-shadow(0 0 2px #fff);animation:bfzap .5s ease-out}
 @keyframes bfdash{to{stroke-dashoffset:-30}}
 @keyframes bfzap{from{stroke-width:14;opacity:.2}to{stroke-width:5;opacity:1}}
 /* maneuver end markers */
-.bfm{width:42px;height:42px;border-radius:50%;border:3px solid #e8eeff;background:rgba(10,12,34,.86);color:#fff;font:800 17px/1 "Exo 2",sans-serif;display:flex;align-items:center;justify-content:center;gap:0;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer;touch-action:manipulation}
+.bfm{width:44px;height:44px;border-radius:50%;border:3px solid #e8eeff;background:rgba(10,12,34,.86);color:#fff;font:800 17px/1 "Exo 2",sans-serif;display:flex;align-items:center;justify-content:center;gap:0;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.6);cursor:pointer;touch-action:manipulation}
 .bfm b{font-size:13px;margin-left:1px}
 .bfm.g{border-color:#46f08a;color:#b8ffd3}.bfm.r{border-color:#ff5a5a;color:#ffc0c0}
 .bfm.sug{box-shadow:0 0 0 3px rgba(127,212,255,.55),0 3px 10px rgba(0,0,0,.6)}
@@ -689,18 +698,18 @@ html.bf #tags .tag .tgl{display:none}
 .bfd-r{display:flex;align-items:center;gap:6px;justify-content:center}
 .bfd-r .who{font:700 12px/1 "Exo 2",sans-serif;color:#cfd3ff;width:62px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bfd-r .dice{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-start;min-height:52px;align-items:center;flex:1}
-#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .5s ease-out}
+#bfdice .die{width:48px;height:52px;display:inline-block;animation:bfroll .7s cubic-bezier(.2,.7,.3,1) backwards}
 #bfdice .die svg{width:48px;height:52px}#bfdice .die i{display:none}
 #bfdice .die.pick{cursor:pointer;border-radius:10px;outline:2px dashed rgba(127,212,255,.7)}
 #bfdice .die.pick.on{outline:3px solid #ffc86b;transform:translateY(-4px)}
-@keyframes bfroll{from{transform:rotate(-200deg) scale(.3);opacity:0}}
+@keyframes bfroll{0%{transform:translate(-140px,-60px) rotate(-560deg) scale(.6);opacity:0}55%{transform:translate(8px,6px) rotate(20deg) scale(1.08);opacity:1}75%{transform:translate(-3px,-5px) rotate(-8deg)}100%{transform:none}}
 .bfd-out{margin:4px 0;font:800 22px/1.1 Orbitron,"Exo 2",sans-serif}
 .bfd-out small{display:block;font:600 11px "Exo 2",sans-serif;color:#aab}
 .bfd-out .hit{color:#ffd27a}.bfd-out .miss{color:#9db4ff}.bfd-out .kill{color:#ff6a50;font-size:28px}
 #bfdice.res .bfd-out{font-size:30px;animation:bfpop .5s ease-out}
 @keyframes bfpop{from{transform:scale(2.2);opacity:0}}
 /* banner */
-#bfban{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
+#bfban{position:absolute;left:50%;top:36%;transition:top .2s;transform:translate(-50%,-50%);text-align:center;color:#fff;pointer-events:none;background:rgba(8,6,24,.82);border:2px solid #ffc86b;border-radius:18px;padding:12px 20px;max-width:90%}
 #bfban[hidden]{display:none}
 #bfban b{display:block;font:800 26px/1.15 Orbitron,"Exo 2",sans-serif;color:#ffc86b}
 #bfban span{display:block;font:600 14px/1.3 "Exo 2",sans-serif;margin-top:4px}
@@ -744,14 +753,14 @@ html.bf #tags .tag .tgl{display:none}
 html.sk-cards .mv.w,html.sk-cards .mv.g,html.sk-cards .mv.r{background-size:cover!important;background-position:center top!important}
 
 /* coached game: one non-blocking bubble under the top bar */
-#na-coach{position:fixed;z-index:60;left:8px;right:8px;top:50px;max-width:480px;margin:0 auto;display:flex;gap:10px;align-items:flex-start;background:#f6e7bd;color:#2a1608;border:2px solid #7a2236;border-radius:14px;padding:8px 10px;box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none}
+#na-coach{position:fixed;z-index:60;left:8px;right:8px;top:50px;max-width:480px;margin:0 auto;display:flex;gap:10px;align-items:flex-start;background:#f6e7bd;color:#2a1608;border:2px solid #7a2236;border-radius:14px;padding:6px 6px 6px 10px;box-shadow:0 4px 14px rgba(0,0,0,.5);pointer-events:none}
 #na-coach[hidden]{display:none}
 #na-coach .na-por{flex:0 0 44px;width:44px;height:44px;border-radius:50%;border:2px solid #7a2236;background:#3a6ea5 url(media/camp-brecken.webp) center/cover no-repeat}
 #na-coach.na-slate .na-por{border-color:#b0413e;background-color:#7d8590;background-image:url(media/camp-drill.webp)}
 #na-coach .na-ct{flex:1;min-width:0}#na-coach b{display:block;font:800 14px/1.2 "Exo 2",sans-serif}#na-coach span{display:block;font:600 14px/1.3 "Exo 2",sans-serif}
-#na-coach .na-cx{pointer-events:auto;flex:0 0 44px;height:44px;margin:-6px -6px 0 0;border:0;background:transparent;color:#7a2236;font:800 20px/1 sans-serif}
+#na-coach .na-rt{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;align-self:stretch;justify-content:space-between}#na-coach .na-cx{pointer-events:auto;width:44px;height:44px;margin:0;border:0;background:transparent;color:#7a2236;font:800 20px/1 sans-serif}
 .na-later{margin:4px 0 0;padding-left:18px;text-align:left;font-size:14px;line-height:1.3}
-#na-coach .na-lv{pointer-events:auto;display:block;margin-top:2px;padding:6px 0;border:0;background:transparent;color:#7a2236;font:700 14px/1 "Exo 2",sans-serif;text-decoration:underline}
+#na-coach .na-lv{pointer-events:auto;display:block;margin:0;padding:0 6px;min-height:44px;min-width:44px;border:0;background:transparent;color:#7a2236;font:700 14px/1 "Exo 2",sans-serif;text-decoration:underline}
 /* touch targets: every tappable thing is at least 44 px */
 .bfm.small{width:44px;height:44px}
 html.ph.ph-p .road .ph{height:44px;min-height:44px}
@@ -821,6 +830,77 @@ html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{background:transparent!important;box-
 html.ph.ph-p.ph-info:not(.ph-big) .gx-dock>*:not(#ppop){visibility:hidden}
 html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{position:fixed;z-index:40;top:auto;left:8px;right:8px;bottom:8px;max-height:min(52%,340px);border:2px solid var(--gold,#ffc86b);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
 
+
+#bfban.top{top:74px;width:max-content;transform:translate(-50%,0);padding:5px 14px;border-radius:16px;max-width:92%}#bfban.top b{font-size:17px}#bfban.top span{font-size:13px;margin-top:1px}html.ph.ph-big #bfban.top b{font-size:19px}html.ph.ph-big #bfban.top span{font-size:15px}
+
+.bfrng{fill:none;stroke-width:2;stroke-dasharray:2 6;stroke-linecap:round;opacity:.75}.bfrng.r1{stroke:#ffd27a}.bfrng.r2{stroke:#ffb05a;opacity:.6}.bfrng.r3{stroke:#ff8a4a;opacity:.45}
+.bfrlab{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 system-ui,sans-serif;color:#1a1020;background:#ffd27a;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.6)}.bfrlab.r2{background:#ffb05a}.bfrlab.r3{background:#ff8a4a}
+
+/* name plate under the base, like a printed plate on the stand */
+html.bf #tags .tag{transform:translate(-50%,0);border-radius:4px;border-bottom-width:1px;border-top:2px solid var(--c0)}html.bf #tags .tag.s1{border-top-color:var(--c1)}
+
+/* the secret dial: a big wheel in the thumb zone; the top window shows the chosen move */
+#bfdial{--dd:min(340px,92vw);--dr:calc(var(--dd) * .38);position:absolute;left:50%;bottom:calc(-.5 * var(--dd) + 128px + var(--sab,0px));width:var(--dd);height:var(--dd);transform:translateX(-50%);pointer-events:none;z-index:6}
+#bfdial[hidden]{display:none}
+#bfdial .dface{position:absolute;inset:0;border-radius:50%;pointer-events:auto;touch-action:none;cursor:grab;
+  background:radial-gradient(circle at 50% 50%,#1c2238 0 22%,#0e1222 23% 60%,#151b30 61% 100%);
+  box-shadow:0 0 0 4px #3a4258,0 0 0 7px #11141f,0 -6px 30px rgba(0,0,0,.7),inset 0 0 0 2px rgba(255,255,255,.08)}
+#bfdial .dface::before{content:"";position:absolute;inset:6px;border-radius:50%;background:repeating-conic-gradient(from calc(var(--rot,0rad)),rgba(255,255,255,.10) 0 1deg,transparent 1deg 7.5deg);-webkit-mask:radial-gradient(circle,transparent 0 88%,#000 89%);mask:radial-gradient(circle,transparent 0 88%,#000 89%)}
+#bfdial .ditem{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 17px/1 "Exo 2",sans-serif;color:#fff;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.25);transition:transform .12s ease-out}
+#bfdial .ditem.g{color:#7df5b0;border-color:#2fc873}#bfdial .ditem.r{color:#ff8a86;border-color:#e23c3c}#bfdial .ditem.danger{box-shadow:0 0 0 2px #ff5a5a inset}
+#bfdial .ditem.on{background:#ffc86b;color:#1a1020;border-color:#fff;transform-origin:center}
+#bfdial .dhub{position:absolute;left:50%;top:50%;width:22%;height:22%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle at 40% 35%,#59627e,#1b2033 70%);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#bfdial .dwin{position:absolute;left:50%;bottom:calc(100% - 4px);transform:translateX(-50%);min-width:190px;padding:6px 14px 8px;border-radius:14px 14px 6px 6px;background:rgba(8,6,24,.92);border:2px solid #ffc86b;color:#fff;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 4px 14px rgba(0,0,0,.6)}
+#bfdial .dwin::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:9px solid transparent;border-top-color:#ffc86b}
+#bfdial .dmv{font:800 26px/1 "Exo 2",sans-serif}#bfdial .dmv.g{color:#7df5b0}#bfdial .dmv.r{color:#ff8a86}
+#bfdial .dwd{font-size:14px;opacity:.92}#bfdial .rk{color:#ff6b6b}#bfdial .r{color:#ff8a86}
+@media (prefers-reduced-motion:reduce){#bfdial .ditem{transition:none}}
+
+html.bf #bfbar{z-index:8}
+
+/* loose dice on the mat next to the target */
+.bfloose{position:absolute;left:0;top:0;width:34px;height:38px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.7))}
+.bfloose>i .die i,.bfloose>i i:not(:first-child){display:none!important}.bfloose>i{display:block;width:34px;height:38px;animation:bfroll .7s cubic-bezier(.2,.7,.3,1) backwards}.bfloose>i svg,.bfloose>i .die{width:34px!important;height:38px!important}
+/* a damage card that lands face-down and flips face-up */
+.bfcard{position:absolute;left:0;top:0;width:118px;height:76px;perspective:500px;pointer-events:none;z-index:7}
+.bfcard .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:bfflip .6s cubic-bezier(.3,.7,.3,1.2) both}
+.bfcard .cb,.bfcard .cf{position:absolute;inset:0;border-radius:8px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 4px 12px rgba(0,0,0,.6)}
+.bfcard .cb{background:repeating-linear-gradient(45deg,#5a1420 0 6px,#7a1c2c 6px 12px);border:2px solid #d9a24a;display:grid;place-items:center;color:#ffd27a;font-size:26px}
+.bfcard .cf{transform:rotateY(180deg);background:linear-gradient(180deg,#fff7e8,#f0dcc0);border:2px solid #c2203a;color:#2a1010;padding:6px 8px;display:flex;flex-direction:column;gap:3px;text-align:left}
+.bfcard .cf b{font:800 13px/1.1 "Exo 2",sans-serif;color:#a0101e}.bfcard .cf span{font-size:11px;line-height:1.2}
+@keyframes bfflip{0%{transform:translateY(-30px) rotateY(0)}40%{transform:translateY(0) rotateY(0)}100%{transform:rotateY(180deg)}}
+@media (prefers-reduced-motion:reduce){.bfcard .in{animation:none;transform:rotateY(180deg)}}
+/* ship info = a pull-up drawer: grab bar, slides up; the numbers live behind "Ship card" */
+html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info{border-radius:18px 18px 10px 10px;animation:ppup .22s cubic-bezier(.2,.8,.3,1)}
+html.ph.ph-p.ph-info:not(.ph-big) #ppop.pp-info::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.4);margin:6px auto 0}
+@keyframes ppup{from{transform:translateY(60%);opacity:.3}}
+#ppop .pp-more{margin-top:6px;border-top:1px solid rgba(255,255,255,.12);padding-top:6px}
+#ppop .pp-more>summary{cursor:pointer;font-weight:700;color:#ffc86b;list-style:none;min-height:36px;display:flex;align-items:center;gap:6px}
+#ppop .pp-more>summary::before{content:"▴";transition:transform .2s}#ppop .pp-more[open]>summary::before{transform:rotate(180deg)}
+#ppop .pp-more>summary::-webkit-details-marker{display:none}
+/* the dock is see-through while the ship drawer is up: it must not swallow taps meant for the board and its buttons */
+html.ph.ph-p.ph-info:not(.ph-big) .gx-dock{pointer-events:none!important}html.ph.ph-p.ph-info:not(.ph-big) #ppop{pointer-events:auto!important}
+
+/* fire step: a plain-words label over the best target; defence/attack modifier buttons carry a one-line explanation */
+.bftlab{position:absolute;left:0;top:0;z-index:3;pointer-events:none;white-space:nowrap;padding:6px 12px;border-radius:12px;background:rgba(40,6,14,.92);border:2px solid #ffc86b;color:#fff;font:800 14px/1.1 "Exo 2",sans-serif;box-shadow:0 3px 10px rgba(0,0,0,.6)}
+#bfl>.bftlab{z-index:3}
+#bfbtns .btn small.msub{display:block;margin-top:2px;font:600 11px/1.15 "Exo 2",sans-serif;opacity:.85;white-space:normal}
+html.ph #bfbtns .btn small.msub{font-size:11px}
+/* maneuver dial: a compact grid above the bottom bar (every option visible, nothing under the buttons, the ship stays clear) */
+#bfdial{bottom:calc(var(--dbar,122px) + var(--sab,0px));height:auto;width:min(352px,94vw);left:50%}
+#bfdial .dface{position:relative;inset:auto;border-radius:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px;justify-items:center;background:rgba(8,6,24,.9);border:2px solid rgba(255,255,255,.2);touch-action:manipulation;cursor:pointer}
+#bfdial .dface::before,#bfdial .dhub{display:none}
+#bfdial .ditem{position:static;margin:0;width:56px;height:44px;border-radius:12px;transform:none!important}
+#bfdial .dwin{bottom:calc(100% + 6px)}
+/* off-mat warning: a red tag on every move whose end leaves the mat (the ship is lost) */
+.bfm em.rk.om{width:auto;height:auto;border-radius:4px;padding:1px 3px;font-size:9px;line-height:1.1;white-space:nowrap;font-style:normal;right:-10px}
+#bfdial .rk.om{color:#fff;background:#d92b2b;border-radius:4px;padding:0 4px}
+button.mv em.om,button.mv em.rk{position:absolute;right:1px;bottom:1px;font-style:normal;font-size:9px;font-weight:800;background:#d92b2b;color:#fff;border-radius:4px;padding:0 3px;line-height:1.3;white-space:nowrap;pointer-events:none}
+button.mv{position:relative}
+/* new tappable chips fade in where they will stay (opacity only: a chip that moves under the finger eats the tap) */
+.bfact,.bftgt,.bfm,.bfspot{animation-name:bffade;animation-duration:.18s;animation-timing-function:ease-out}
+.bftgt{animation:bffade .18s ease-out,bftg 1s ease-in-out .18s infinite}
+@keyframes bffade{from{opacity:0}}
 
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -2557,6 +2637,8 @@ function randomSquad(f,limit,ex,r){r=r||(n=>Math.floor(Math.random()*n));const p
   for(const e of sq){const slots=PILOTS[e.p].u.slice();for(const s of slots){const ups=upgradesFor(e.p,ex).filter(k=>UPGRADES[k].slot===s&&!e.u.includes(k)&&!(UPGRADES[k].uniq&&used.has(uname(UPGRADES[k])))&&UPGRADES[k].pts+cost<=limit);if(ups.length&&r(3)){const u=ups[r(ups.length)];e.u.push(u);cost+=UPGRADES[u].pts;if(UPGRADES[u].uniq)used.add(uname(UPGRADES[u]));if(UPGRADES[u].addSlot)slots.push(UPGRADES[u].addSlot)}}}
   return sq}
 const CORE_DUEL=[[{p:'kael',u:['u_plasma','u_tinker']}],[{p:'knife',u:[]},{p:'slate',u:[]}]];// the core-set learning battle: one heavy fighter against two light fighters
+// the very first game a new player flies (bench-first.js): the core-set duel, one heavy fighter against two light fighters; no round limit (base rules: fight to destruction)
+const FIRST_GAME={sq:[[{p:'kael',u:['u_plasma']}],[{p:'knife',u:[]},{p:'nightjar',u:[]}]],ex:{}};
 function defaultSquad(f){return f===0?CORE_DUEL[0]:CORE_DUEL[1]}
 const SIZES=[
   {k:'core',n:'Core duel',d:'1 heavy fighter vs 2 light fighters',squad:(f,ex)=>f===0?CORE_DUEL[0].map(e=>({p:e.p,u:e.u.slice()})):f===1?CORE_DUEL[1].map(e=>({p:e.p,u:[]})):randomSquad(f,36,ex,n=>rnd(n))},
@@ -2937,6 +3019,9 @@ const UI={choice:null,roll:null,pick:null,busy:false,info:true,sel:null,peek:nul
 // ---- seeded random numbers (mulberry32); all dice, shuffles and AI randomness go through rnd() ----
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)>>>0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
+// a new default game: a fresh seed from the system's entropy (never the page's Math.random, which a test run may have fixed), unless a seed is chosen on purpose: setSeed() or ?seed=N
+function freshSeed(){if(DEFSEED!=null)return DEFSEED;const m=/[?&]seed=(\d+)/.exec((typeof location!=='undefined'&&location.search)||'');if(m)return m[1]>>>0;
+  try{const a=new Uint32Array(2);crypto.getRandomValues(a);return (a[0]^Math.imul(a[1],2654435761)^Date.now())>>>0}catch(e){return (Date.now()*7919+((typeof performance!=='undefined'?performance.now():0)*1000|0))>>>0}}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 const ATK_FACES=['hit','hit','hit','crit','focus','focus','blank','blank'];// [R1]
 const DEF_FACES=['evade','evade','evade','focus','focus','blank','blank','blank'];// [R2]
@@ -2976,7 +3061,7 @@ function newGame(opts){if(typeof opts==='string'){const m=opts;opts={players:m==
   for(const k in KONT)delete KONT[k];
   G={v:2,seed,rng:seed>>>0,round:0,turn:0,phase:'setup',step:0,log:[],ships:[],rocks:[],deck:[],disc:[],winner:null,winText:'',
     fac:opts.fac||[0,1],players:(opts.players||[{human:true,lvl:'normal'},{human:false,lvl:'normal'}]).map(p=>Object.assign({human:false,lvl:'normal'},p)),
-    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,bombs:[],nb:0,q:null,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{},pendS:[],inCombat:false,bonus:null,again:false};
+    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,bombs:[],nb:0,q:null,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{},pendS:[],inCombat:false,bonus:null,again:false,close:!!opts.close};
   if(LVMIX)G.players.forEach((p,k)=>{p.lvl=LVMIX[k%LVMIX.length];p.human=false});
   G.deck=shuffle(buildDamageDeck());
   const z=opts.sizeK&&SIZES.find(z=>z.k===opts.sizeK);const squads=opts.squads||(z?[z.squad(G.fac[0],G.ex),z.squad(G.fac[1],G.ex)]:[defaultSquad(G.fac[0]),defaultSquad(G.fac[1])]);
@@ -3005,7 +3090,8 @@ function placeRocks(k){const n=G.ex.noRocks?0:6;const shapes=[];for(let i=0;i<n;
     if(isHuman(pl)){const sp=rockSpots(o,pl);if(sp.length)return ask(pl,'rock',`Place asteroid ${i} of ${n}`,'Choose a spot (outlined on the mat; hover a button to highlight it): columns A-E from your left, rows 1-5 from your edge. Asteroids stay beyond range 2 of every edge and beyond range 1 of each other.',sp,a=>{const c=sp.find(c=>c.k===a);o.x=c.p.x;o.y=c.p.y;G.rocks.push(o);lg(pl,`${sideName(pl)} places an asteroid.`);next()})}
     aiPlace(o);next()};
   next()}
-const DEPLOY_Y=s=>s.side===0?RANGE-B(s)/2-5:MAT-RANGE+B(s)/2+5;// the whole base inside range 1 of its own edge
+const CLOSE_MM=150;// first-game option (G.close): both squads start this far further in, so the dogfight begins in round 2
+const DEPLOY_Y=s=>{const c=G&&G.close?CLOSE_MM:0;return s.side===0?RANGE-B(s)/2-5+c:MAT-RANGE+B(s)/2+5-c};// the whole base inside range 1 of its own edge (less the first-game push in)
 function deploySpots(){for(const side of [0,1]){const mine=G.ships.filter(s=>s.side===side),n=mine.length;
   mine.forEach((s,k)=>Object.assign(s,{x:MAT/2+(k-(n-1)/2)*Math.min(170,(MAT-160)/Math.max(1,n)),y:DEPLOY_Y(s),h:side===0?Math.PI/2:-Math.PI/2}))}}
 function deploy(k){const I=s=>s.side===G.init?0:1;const order=G.ships.slice().sort((a,b)=>(psOf(a)-psOf(b))||(I(a)-I(b)));const placed=[];// ascending pilot skill, initiative first on ties
@@ -3287,8 +3373,12 @@ function checkWin(){if(G.winner)return true;const a=[0,1].map(k=>G.ships.some(s=
   if(a[0]&&a[1])return missionCheck();
   if(!a[0]&&!a[1]){const w=G.init;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: both squadrons were destroyed together, and ${sideName(w)} has initiative.`}else{const w=a[0]?0:1;G.winner='P'+(w+1);G.winText=`${sideName(w)} wins: every enemy ship is destroyed.`}
   G.phase='over';G.step=5;lg(-1,G.winText);return true}
-function missionCheck(){if(G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));const w=sc[0]===sc[1]?-1:sc[0]>sc[1]?0:1;
-    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?'Time: a draw on points destroyed.':`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
+// Base game: no round limit, fight until one side has no ships. Optional (off by default) tournament-style clock: when time is
+// called the round in progress is finished, then more points destroyed wins and equal points is a draw [#35, rules-notes T1].
+// ex.roundCap is the same scoring at a set round (campaign chapters only).
+function missionCheck(){const clock=G.ex.clockMin&&G.t0&&G.phase==='end'&&Date.now()-G.t0>=G.ex.clockMin*60000;if(clock||G.round>=(G.ex.roundCap||ROUND_CAP)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));
+    const w=sc[0]===sc[1]?-1:sc[0]>sc[1]?0:1;
+    G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?`Time: a draw on points destroyed (${sc[0]} each).`:`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
 function endPhase(){G.phase='end';G.step=4;G.inCombat=false;for(const s of alive())if(s.flags.doomed&&hullDmg(s)>=s.hull)destroy(s,`${sname(s)} finally breaks apart.`);if(checkWin()){refresh();return}
   for(const s of alive()){if(!exKeepFocus(s))s.focus=0;else if(s.focus)mark('kite');s.evade=0;s.flags.juke=false;s.flags.dead=false;s.flags.allin=false;s.flags.psT=null}// [R13] unused focus/evade tokens are removed; target locks stay
   exEndPhase(()=>{G.phase='end';if(!checkWin()){lg(-1,`End of round ${G.round}.`);if(ANIM)setTimeout(()=>{if(G&&!G.winner)startRound()},AIDELAY*.8);else startRound()}refresh()})}
@@ -3359,7 +3449,7 @@ function scorePose(s,p,m,enemyPoses,friends,lv){let sc=0;const b=B(s);
   for(const [e,poses] of enemyPoses){let o=0,d=0;for(const ep of poses){o+=threatTo(s,p,e,ep)*(1+1.4/Math.max(1,remaining(e)));d+=threatTo(e,ep,s,p);near=Math.min(near,len(sub(ep,p)))}off+=o/poses.length;def+=d/poses.length}
   // reward shots, fear return fire less than we value our own; flanking (a shot with no return fire) is the ideal
   sc+=off*AIW.off-def*(AIW.def+(remaining(s)<=2?.8:0))*(1-AIW.tough*Math.min(1,remaining(s)/6));if(off>.3&&def<.15)sc+=1.2;
-  if(near>330)sc-=(near-330)/60;
+  if(near>330)sc-=(near-330)/60;if(lv.chase)sc-=Math.min(near,600)*lv.chase;// first-game rival: always closes on you, so the fight never drifts apart
   if(lv.noise)sc+=(rnd(1000)/1000-.5)*lv.noise*2;return sc}
 function aiPlan(k){const lv=LV[G.players[k].lvl]||LV.normal;const mine=alive().filter(s=>s.side===k).sort((a,b)=>psOf(a)-psOf(b));
   const enemyPoses=enemiesOf(mine[0]||{side:k}).map(e=>[e,enemyGuess(e,lv.samples)]);const friends=[];
@@ -3668,20 +3758,22 @@ function buildSky(){const sc=V3.scene,C=new THREE.Vector3(45.7,0,45.7);
   const moon=V3.moon=new THREE.Mesh(new THREE.SphereGeometry(60,48,32),new THREE.MeshStandardMaterial({map:mt,roughness:.95,metalness:0,envMapIntensity:0}));moon.position.set(1250,-420,-1500);moon.renderOrder=-7;sc.add(moon)}
 // ---- the play mat: a dark glass plate with a holographic range grid, deployment bands, ruler ticks, a glowing frame and corner emitters ----
 function playMat(){const g=new THREE.Group();const M=91.4;
-  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x2f374d,roughness:.55,metalness:0,transparent:true,opacity:.86,envMapIntensity:.12}));
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(M+1.2,.6,M+1.2),new THREE.MeshStandardMaterial({color:0x0a0d1c,roughness:.7,metalness:0,transparent:true,opacity:.96,envMapIntensity:.08}));
   plate.position.set(M/2,-.32,M/2);V3.plate=plate;plate.renderOrder=-3;plate.receiveShadow=true;g.add(plate);
   const grid=V3.gridMat=new THREE.ShaderMaterial({uniforms:{t:{value:0},c0:{value:new THREE.Color(0xff8a3a)},c1:{value:new THREE.Color(0xff3050)},cg:{value:new THREE.Color(0x5fb8ff)}},transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
     vertexShader:'varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
     fragmentShader:`uniform float t;uniform vec3 c0,c1,cg;varying vec2 vP;
       float line(float v,float w){float d=abs(fract(v)-.5);float fw=fwidth(v);return smoothstep(.5-w-fw,.5-w+fw*.2,d);}
       void main(){vec2 p=vP;float M=91.4;vec2 q=p/M;
-        float major=max(line(p.x/10.+.5,.006),line(p.y/10.+.5,.006));float minor=max(line(p.x/2.5+.5,.008),line(p.y/2.5+.5,.008));
-        vec2 dd=abs(fract(p/2.5)-.5);float dots=1.-smoothstep(.015,.04,length(dd-.5));
-        float edge=min(min(p.x,M-p.x),min(p.y,M-p.y));float border=exp(-edge*1.6)*.7+exp(-edge*.25)*.04;
-        float sweep=exp(-pow((q.y-fract(t*.035))*40.,2.))*.35;
-        float tick=0.;if(edge<1.4){float along=(p.x<1.4||p.x>M-1.4)?p.y:p.x;tick=line(along/2.5+.5,.03)*(1.-smoothstep(.2,1.4,edge));}
-        float vig=1.-.5*smoothstep(.3,.72,length(q-.5));
-        vec3 c=cg*(major*.13+minor*.028+dots*.018+sweep*(major*.6+.05)+tick*.45)*vig+cg*border*.8;
+        float h1=fract(sin(dot(floor(p*3.),vec2(12.9898,78.233)))*43758.5453);vec2 sp=fract(p*3.)-.5;
+        float star=step(.965,h1)*(1.-smoothstep(.03,.11+.08*fract(h1*91.),length(sp)))*(.6+.4*sin(t*1.7+h1*40.));
+        float h2=fract(sin(dot(floor(p*.9),vec2(39.3,11.7)))*24634.63);vec2 sp2=fract(p*.9)-.5;float big=step(.985,h2)*(1.-smoothstep(.02,.16,length(sp2)));
+        float n=0.;vec2 r=q*3.;for(int i=0;i<4;i++){n+=(.5+.5*sin(r.x*1.7+sin(r.y*1.3+float(i))*1.9))*(.5+.5*sin(r.y*1.9+sin(r.x*1.1)*1.7))/pow(2.,float(i));r=r*2.03+vec2(1.7,-.9);}
+        vec3 neb=mix(vec3(.10,.05,.22),vec3(.03,.14,.24),smoothstep(.2,.8,q.x+q.y*.4))*smoothstep(.35,1.1,n)*.3;
+        float edge=min(min(p.x,M-p.x),min(p.y,M-p.y));float border=exp(-edge*1.6)*.7;
+        float tick=0.;if(edge<1.4){float along=(p.x<1.4||p.x>M-1.4)?p.y:p.x;tick=line(along/10.+.5,.05)*(1.-smoothstep(.2,1.4,edge));}
+        float vig=1.-.45*smoothstep(.3,.75,length(q-.5));
+        vec3 c=(neb+vec3(.85,.9,1.)*(star*.75+big*1.1))*vig+cg*(border*.6+tick*.5);
         float z0=smoothstep(10.2,9.6,p.y),z1=smoothstep(10.2,9.6,M-p.y);
         c+=c0*(z0*.07+smoothstep(.5,0.,abs(p.y-10.))*.55);
         c+=c1*(z1*.07+smoothstep(.5,0.,abs(M-p.y-10.))*.55);
@@ -3881,6 +3973,13 @@ function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));const fc=FACCOL[
   const base=new THREE.Mesh(baseGeo(b),plastic);base.castShadow=true;base.receiveShadow=true;g.add(base);
   const tok=new THREE.Mesh(new THREE.PlaneGeometry(b-.5,b-.5),new THREE.MeshStandardMaterial({map:tokenTex(s),roughness:.55,metalness:0}));tok.rotation.x=-PI/2;tok.rotation.z=0;tok.position.y=.53;tok.receiveShadow=true;g.add(tok);
   const rimC=new THREE.Color(fc.eng);const rim=new THREE.Mesh(new THREE.PlaneGeometry(b*1.45,b*1.45),new THREE.MeshBasicMaterial({map:ringTex(),color:rimC.clone().multiplyScalar(1.2),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));rim.rotation.x=-PI/2;rim.position.y=.06;g.add(rim);
+  // table look: a round faction-coloured stand rim under the square base, and the firing arc painted on the mat as a coloured wedge
+  {const T0=SHIPS[s.type]||{},arc=T0.arc||'F',big=s.base==='L',half=(big?84.05:80.9)/2*PI/180,ec=new THREE.Color(fc.eng);
+    const disc=new THREE.Mesh(new THREE.RingGeometry(b*.74,b*.86,48),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.85,depthWrite:false}));disc.rotation.x=-PI/2;disc.position.y=.04;g.add(disc);
+    const dm=new THREE.Mesh(new THREE.CircleGeometry(b*.74,48),new THREE.MeshBasicMaterial({color:0x07080f,transparent:true,opacity:.7,depthWrite:false}));dm.rotation.x=-PI/2;dm.position.y=.03;g.add(dm);
+    const wm=new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.26,depthWrite:false,side:THREE.DoubleSide});const wedge=(rot)=>{const w=new THREE.Mesh(new THREE.RingGeometry(b*.87,b*1.75,24,1,rot-half,2*half),wm);w.rotation.x=-PI/2;w.position.y=.035;g.add(w);
+      const e=new THREE.Mesh(new THREE.RingGeometry(b*1.7,b*1.78,24,1,rot-half,2*half),new THREE.MeshBasicMaterial({color:ec,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide}));e.rotation.x=-PI/2;e.position.y=.036;g.add(e)};
+    if(arc==='T'){const r=new THREE.Mesh(new THREE.RingGeometry(b*1.2,b*1.28,48),wm.clone());r.material.opacity=.5;r.rotation.x=-PI/2;r.position.y=.035;g.add(r);wedge(0)}else{wedge(0);if(arc==='A')wedge(PI)}}
   const acr=new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false});
   const sock=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.3,16),plastic);sock.position.y=.66;g.add(sock);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.13,.16,3.2,12),acr);peg.position.y=2.2;g.add(peg);
@@ -4169,7 +4268,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   const anyAnim=Object.keys(V3.anim).length>0;
   V3.busy=!!(anyAnim||easing||V3.fxq.length||V3.later.length||V3.ez||V3.drag||V3.shake>0||V3.flashT>0||PH&&PH.testing);
   engineBed(nMove>0);
-  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
+  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){{const low=document.documentElement.classList.contains('bf')&&V3.view==='top';placeEl(el,m.position.clone().add(low?new THREE.Vector3(0,.5,S3(B(s))*.98*(Math.cos(V3.cam.yaw||0)<0?-1:1)):new THREE.Vector3(0,8.4,0)))}if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
   // tags never sit under the score strip / legend at the top of the board: one that would is moved just below them
   let SB=null;try{const cr=V3.r.domElement.getBoundingClientRect();const bt=[document.getElementById('bftop'),document.querySelector('#bf .bfleg')].filter(e=>e&&e.offsetHeight&&!e.hidden).map(e=>e.getBoundingClientRect());if(bt.length)SB={l:Math.min(...bt.map(r=>r.left))-cr.left,r:Math.max(...bt.map(r=>r.right))-cr.left,b:Math.max(...bt.map(r=>r.bottom))-cr.top}}catch(e){}
@@ -4468,13 +4567,13 @@ const GX={key:'gx',open:null,
   // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
   var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
   function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
-  function avoidRects(k) {
+  function avoidRects(k, snug) {
     var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
     var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
+      out.push(infl(core(r, k), snug ? 2 : (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }
@@ -4518,7 +4617,29 @@ const GX={key:'gx',open:null,
       b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
       var cw = [350, 292, 236];
       for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
-      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
+      b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      if (cfg && cfg.tapFirst) {   // no fully free spot at any width: take the narrowest bubble that keeps every tappable target clear
+        var wt = [0, 236, 196, 164, -350, -292, -236, -196, -164];   // negative: the slim one-line version at that width
+        for (var wj = 0; wj < wt.length; wj++) {
+          var cw2 = Math.abs(wt[wj]); b.classList.toggle('gxh-compact', wt[wj] < 0); b.style.maxWidth = cw2 ? cw2 + 'px' : ''; b.dataset.gxhShrunk = '1';
+          var r4 = place(b, tr); if (r4.tapClear || r4.free) { delete b.dataset.gxhShrunk; return r4; }
+        }
+        b.classList.remove('gxh-compact'); b.style.maxWidth = '';
+      }
+      delete b.dataset.gxhShrunk;
+    }
+    var tapClear = false;
+    if (!best && cfg && cfg.tapFirst) {   // game opt-in: when nothing is fully free, keep every tappable target clear and let the bubble sit over plain text/board art
+      var avT = avoidRects(32, true), bt = null, bts = 1e9;
+      for (var xj = 0; xj < xs.length; xj++) for (var yy = top; yy <= bot - h; yy += 3) {
+        var cc = { left: xs[xj], top: yy, right: xs[xj] + w, bottom: yy + h };
+        if (hit(cc, T)) continue;
+        var ot = 0; for (var kk = 0; kk < avT.length; kk++) if (hit(cc, avT[kk])) ot += inter(cc, avT[kk]) || 1;
+        var ox = 0; for (var kx = 0; kx < txt.length; kx++) if (hit(cc, txt[kx])) ox += inter(cc, txt[kx]) || 1;
+        var sc = ot * 1e4 + ox * 4 + Math.abs(cc.left + w / 2 - tr.cx) * 0.5 + Math.abs(yy + h / 2 - tr.cy);
+        if (sc < bts) { bts = sc; bt = cc; bt.ot = ot; }
+      }
+      if (bt) { tapClear = !bt.ot; soft = bt; }
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -4531,7 +4652,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
-    c2.free = !!best;
+    c2.free = !!best; c2.tapClear = tapClear;
     return c2;
   }
   function ringAt(r, cls) {
@@ -4705,6 +4826,7 @@ const GX={key:'gx',open:null,
 //   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
 //              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             live?:()=>el|[el] /* game controls kept tappable between steps, e.g. a roll card's Continue */,
 //             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
@@ -4749,7 +4871,11 @@ const GX={key:'gx',open:null,
     return null;
   }
   function holesOf(st) {
-    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) {
+      // opt-in (cfg.fallbackMs): a next-button step whose target is missing/hidden for that long shows an untargeted bubble instead of blocking
+      if (cfg.fallbackMs && !st.wait && S && S.step === st && Date.now() - S.since > cfg.fallbackMs) { var v0 = vp(); var fh = norm({ left: v0.w / 2 - 22, top: v0.h * 0.4, width: 44, height: 44 }); fh.fb = 1; return [fh]; }
+      return null;
+    }
     var out = [p], al = null;
     try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
     if (al && !Array.isArray(al)) al = [al];
@@ -4782,7 +4908,7 @@ const GX={key:'gx',open:null,
   function swallow(e) { e.preventDefault(); e.stopPropagation(); }
   function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
   // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
-  function drawCells(hs, shield) {
+  function drawCells(hs, shield, clearOut) {
     var v = vp(), xs = [0, v.w], ys = [0, v.h];
     hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
     xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
@@ -4790,7 +4916,7 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
       var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
       for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
-      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], !!clearOut));
     }
     if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
   }
@@ -4813,9 +4939,10 @@ const GX={key:'gx',open:null,
   function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
   function topLimit() { return stripH() + 4; }
   // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
-  function place(b, hs, side) {
+  function stAvoid(st) { try { return st.avoid ? st.avoid() : null; } catch (e) { return null; } }
+  function place(b, hs, side, avoid) {   // avoid: optional extra rects the bubble should not cover (e.g. the board area the step talks about)
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
-    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var T = hs.map(function (r) { return inflate(r, 8, v); }).concat((avoid || []).filter(Boolean).map(function (r) { return inflate(r, 4, v); }));
     var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
     function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
     var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
@@ -4865,23 +4992,32 @@ const GX={key:'gx',open:null,
     S.holes = H; S.key = rkey(hs);
     var nextStep = !st.wait;
     drawCells(H, nextStep);
-    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    if (!hs[0].fb) H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
     add(topStrip());
     if (st.wait && st.wait.type !== 'event') {
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
-    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side, stAvoid(st)); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
     add(b); S.bub = b; S.say = say;
     var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-    place(b, H, st.side);
+    place(b, H, st.side, stAvoid(st));
     return true;
   }
-  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
-    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  // cfg.live (opt-in): ()=>el|[el] the game's own controls that must stay tappable while no step is shown (e.g. a Continue on a roll card)
+  function liveRects() {
+    if (!cfg || typeof cfg.live !== 'function') return null;
+    var a = null; try { a = cfg.live(); } catch (e) { a = null; } if (!a) return null; if (!Array.isArray(a)) a = [a];
+    var out = []; a.forEach(function (x) { var r = toRect(x); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out.length ? out : null;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim; only cfg.live controls stay live
+    var v = vp(), L = liveRects(); S.liveKey = L ? rkey(L) : '';
+    if (L) drawCells(L, false, true); else add(cell(0, 0, v.w, v.h, true));
+    add(topStrip());
   }
   function enter(i) {
     var st = cfg.steps[i]; if (!st) { finish(); return; }
@@ -4897,6 +5033,7 @@ const GX={key:'gx',open:null,
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
+      if (!hs && cfg.live) { var L0 = liveRects(), k0 = L0 ? rkey(L0) : ''; if (k0 !== (S.liveKey || '')) { clearVisuals(); drawWaiting(); } }
       if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
@@ -5282,9 +5419,11 @@ function trackStats(){if(!G)return;if(UI.statG!==G){UI.statLast={};UI.statChg={}
   for(const s of G.ships){const v={ps:psOf(s),a:primary(s),g:agility(s),h:s.alive?s.hull-hullDmg(s):0,s:s.sh};const o=UI.statLast[s.id];if(o)for(const k in v)if(v[k]!==o[k])(UI.statChg[s.id]=UI.statChg[s.id]||{})[k]=now;UI.statLast[s.id]=v}}
 const pulse=(s,k)=>{const c=UI.statChg[s.id];return c&&c[k]&&Date.now()-c[k]<2600?' pulse':''};
 // ---- recommended setup spots (the highlighted default) and auto-placement ----
-function recOpt(q){if(q.key==='rock'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const m=/^([A-E])([1-5])$/.exec(o.l);if(!m)continue;const v=Math.abs('ABCDE'.indexOf(m[1])-2)+Math.abs(+m[2]-4)*1.2;if(v<bv){bv=v;best=o}}
+// the suggested spot varies between games (not within one): pick among the near-best by a hash of the game's seed and the question
+function recPick(q,sc){const a=q.opts.map(o=>[o,sc(o)]).filter(x=>x[1]!=null).sort((x,y)=>x[1]-y[1]);if(!a.length)return q.opts[0];const ok=a.filter(x=>x[1]<=a[0][1]+1.3);let h=((G&&G.seed|0)^Math.imul((q.kid|0)+1,2246822519))>>>0;h=Math.imul(h^h>>>15,2654435761)>>>0;return ok[(h>>>8)%ok.length][0]}
+function recOpt(q){if(q.key==='rock'){const best=recPick(q,o=>{const m=/^([A-E])([1-5])$/.exec(o.l);return m?Math.abs('ABCDE'.indexOf(m[1])-2)+Math.abs(+m[2]-4)*1.2:null});
     return {o:best,why:'in their half, where it blocks their approach and not yours'}}
-  if(q.key==='deploy'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const n=+String(o.l).slice(5);const v=Math.abs(n-5);if(v<bv){bv=v;best=o}}return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
+  if(q.key==='deploy'){const best=recPick(q,o=>Math.abs(+String(o.l).slice(5)-5));return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
   return {o:q.opts[0],why:''}}
 // Auto-place answers every remaining setup question of the human side at once, with the recommended spot
 function autoPlaceAll(){if(typeof isClient==='function'&&isClient()){if(humanTurn())netSend({act:'autoplace'});return}let guard=0;while(G&&G.round<1&&!G.winner&&G.phase==='ask'&&G.q&&['rock','deploy'].includes(G.q.key)&&humanTurn()&&guard++<40){const kid=G.q.kid;uiAct({act:'ask',k:recOpt(G.q).o.k});if(G.q&&G.q.kid===kid)break}render()}
@@ -5398,7 +5537,7 @@ const guideMode=()=>LS.get('na_guide')||'auto';
 function guided(){const m=guideMode();if(m==='full')return true;if(m==='light')return false;return !tourOff()&&(!G||roundShown()<=1)}
 function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=guided();b.innerHTML=`📘 Guide: <b>${on?'full':'light'}</b>`;b.setAttribute('aria-pressed',String(on));b.title=on?'Step-by-step help is on. Tap for short help only.':'Short help. Tap for step-by-step help.'}}
 // ---- where we are: the summary of round N shows at the start of round N+1, before any dial is set ----
-function sumPending(){return !!(G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
+function sumPending(){return !!(G&&!(typeof BF!=="undefined"&&BF.on)&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
 function roundShown(){return G?(sumPending()?G.round-1:G.round):0}
 function stepShown(){if(!G)return 0;if(G.winner)return 5;if(G.round===0)return 0;if(sumPending())return 4;return G.phase==='plan'?1:Math.min(4,G.step||1)}
 // guided pauses stop the host's engine, so online games never pause
@@ -5491,6 +5630,10 @@ const MVW={T:'Turn',B:'Bank',S:'Straight',K:'K-turn'};
 function mvWords(m){return m.s===0?'Full stop':m.t==='S'?`Straight ${m.s}`:m.t==='K'?`K-turn ${m.s} (turn around)`:`${MVW[m.t]} ${m.d<0?'left':'right'} ${m.s}`}
 const colWords=c=>c==='g'?'green = easy, clears a stress token':c==='r'?'red = hard, gives a stress token (no action while stressed)':'white = normal';
 function rockHits(s,m){const key=[G.round,s.id,s.x,s.y,s.h,m.s,m.t,m.d||0].join('|');const C=UI.rhC=(UI.rhC&&UI.rhC.g===G)?UI.rhC:{g:G,v:{}};if(key in C.v)return C.v[key];return C.v[key]=rockHits0(s,m)}
+// the final pose leaves the mat: the ship is destroyed (marked red "off mat!" on every dial)
+function offMat(s,m){return offBoard(finalPose(s,B(s),m),B(s))}
+// a move the ★ must never pick while any safe move exists: off the mat, onto or through a rock, or a red while stressed
+function unsafeMv(s,m){return offMat(s,m)||rockHits(s,m)>0||(exColor(s,m).c==='r'&&!!s.stress)}
 function rockHits0(s,m){const b=B(s),p=finalPose(s,b,m);if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))return 2;return tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2))?1:0}
 function recBox(s,sug){if(!UI.hints)return '';const m=dialOf(s)[sug],c=exColor(s,m).c;const si=sugInfo(s,sug);
   const bad=dialOf(s).filter((x,i)=>i!==sug&&rockHits(s,x)).length;const rock=bad&&!rockHits(s,m)?` It also avoids the asteroids that ${bad} other move${bad>1?'s':''} would hit.`:'';
@@ -5616,8 +5759,8 @@ function recMod(){const A=G.atk;if(!A)return null;
 // ---------- interface ----------
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'normal',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
-try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'normal',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
+Object.assign(UI,{mode:'solo',fac:[0,1],lvl:'easy',size:'core',draft:{},ex:{},hints:true,pass:null,dieFace:{}});
+try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.assign(UI,{lvl:st.lvl||'easy',size:st.size||'core',fac:st.fac||[0,1],ex:st.ex||{}})}catch(e){}
 function saveSetup(){try{localStorage.setItem('na_setup',JSON.stringify({lvl:UI.lvl,size:UI.size,fac:UI.fac,ex:UI.ex}))}catch(e){}}
 function announce(t){const el=$('live');if(el)el.textContent=t}
 // which human side is planning right now (hot-seat hides the other side's dials behind a pass screen)
@@ -5630,36 +5773,49 @@ function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e)
 // ---- step bar ----
 function renderSteps(){renderRoad()}
 // ---- dial picker ----
-const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+// K-turn icon: up the left leg, over the top, DOWN the right leg; the head points backwards (the ship ends facing the way it came)
+var KICO='<svg class="kico" viewBox="0 0 16 16" width="1em" height="1em" aria-hidden="true"><path d="M4 15V6.5a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M8.6 9.4h6.8L12 14.6z" fill="currentColor"/></svg>';
+// owner bug (12 Nov): every move arrow is drawn relative to the ship's CURRENT facing on screen (after a K-turn "straight" points down).
+// shipDeg(s): clockwise degrees from screen-up to the ship's nose as seen now (3D camera if on, else the flat top-down board).
+function shipDeg(s){if(!s)return 0;const f={x:Math.cos(s.h),y:Math.sin(s.h)};
+  try{if(typeof V3!=='undefined'&&V3.on&&V3.camera&&typeof W==='function'){V3.camera.updateMatrixWorld();const a=W(s.x,s.y).project(V3.camera),b=W(s.x+f.x*30,s.y+f.y*30).project(V3.camera);const dx=b.x-a.x,dy=-(b.y-a.y);if(Math.hypot(dx,dy)>1e-6)return Math.round(Math.atan2(dx,-dy)*180/Math.PI)}}catch(e){}
+  return Math.round(Math.atan2(f.x,f.y)*180/Math.PI)}
+function rotIco(ic,s,deg){const d=deg!=null?deg:shipDeg(s);return d?`<i class="mva" data-deg="${d}" style="display:inline-block;font-style:normal;transform:rotate(${d}deg)">${ic}</i>`:`<i class="mva" data-deg="0" style="display:inline-block;font-style:normal">${ic}</i>`}
+const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
 const COLW=['Turn left','Bank left','Straight','Bank right','Turn right','K-turn'];
-function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=COLS.map(([t,dd])=>d.some(m=>m.t===t&&(m.d||0)===dd&&m.s>0));
+function dialGrid(s,sug){const d=dialOf(s);const DG=shipDeg(s);const pick=UI.draft[s.id];const has=COLS.map(([t,dd])=>d.some(m=>m.t===t&&(m.d||0)===dd&&m.s>0));
   let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
   for(let sp=5;sp>=1;sp--){let row='';let any=false;for(const [t,dd,ic] of COLS){const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);
       if(i<0){row+='<td></td>';continue}any=true;const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;
-      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${ic}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
+      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}"><b class="mvic">${rotIco(ic,s,DG)}</b><small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}${offMat(s,d[i])?'<em class="om">off mat!</em>':rockHits(s,d[i])?'<em class="rk">rock!</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 // the result line for the player reading it: "You win/lose: …" in a solo or online game, the neutral line in hot-seat or watch
 function winLine(){const me=soloSide();if(!G||!G.winner||me<0||G.winner==='draw')return G?G.winText:'';const won=G.winner==='P'+(me+1);
   const why=/both squadrons/.test(G.winText)?`both squadrons fell together, and ${won?'you':sideName(1-me)} had initiative`:/^Time/.test(G.winText)?'on points destroyed when time ran out':won?'every enemy ship is destroyed':'all your ships are destroyed';
   return `${won?'You win':'You lose'}: ${why}.`}
+var SUGFIGHT=1,SUGSTR=.2;
 function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>x.id+':'+UI.draft[x.id]).join(',');
-  if(UI.sugCache&&UI.sugCache.k===G.round+'|'+s.id+'|'+dk)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
+  // the cache key carries the game, every ship's pose and stress and the rocks: a ★ worked out for another game or for poses still flying is never reused
+  const ck=[G.round,s.id,s.stress?1:0,dk,alive().map(x=>x.id+'@'+Math.round(x.x*10)+','+Math.round(x.y*10)+','+Math.round(x.h*1000)).join(';'),G.rocks.map(o=>Math.round(o.x)+','+Math.round(o.y)).join(';')].join('|');
+  if(UI.sugCache&&UI.sugCache.g===G&&UI.sugCache.k===ck)return UI.sugCache.v;const anySafe=dialOf(s).some(m=>!unsafeMv(s,m));const lv={samples:10,noise:0,look:1};/* the ★ is the strong planner's pick (bench-sugg.js: a player who always follows it wins about half or more) */
   // wingmen whose dials are already set: don't suggest ending on top of them
   const friends=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>({s:x,p:finalPose(x,B(x),dialOf(x)[UI.draft[x.id]])}));
-  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
+  const save=G.rng;G.rng=((G.round|0)*2654435761+[...String(s.id)].reduce((h,ch)=>(h*31+ch.charCodeAt(0))>>>0,7))>>>0;/* same position, same suggestion */const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
+    if(v>-500&&!offBoard(p,B(s))){let nx=-1e9,safe=0;for(const m2 of dialOf(s)){if(exColor(s,m2).c==='r'&&(s.stress||c.c==='r'))continue;const p2=finalPose(p,B(s),m2);if(offBoard(p2,B(s)))continue;safe++;let t=0;for(const [e,ps] of enemyPoses)t+=threatTo(s,p2,e,ps[0]);nx=Math.max(nx,t)}v+=Math.max(0,nx)*.7;if(safe===0)v-=300;else if(safe<3)v-=(3-safe)*6}/* never steer into a corner where next round's moves all leave the mat *//* look one round ahead, like the hard rival */
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
     if(c.c==='r'&&s.stress)v-=1e6;
+    if(offBoard(p,B(s)))v-=1e6;/* never suggest leaving the mat */ if(m.t==='S'&&c.c!=='r')v+=SUGSTR;/* tie-break: a plain straight that stays on the mat */
     // a suggestion for a new player should look for a fight: reward ending with an enemy (where it is now) inside the arc, closer is better; a red move costs next round's action
-    {let best=0;for(const e of enemiesOf(s)){const r=arcReach(p,B(s),e,B(e),s.arc);if(r){const rg=rangeOf(r.d);if(rg<=3)best=Math.max(best,rg===1?3:rg===2?2.5:1.5)}}v+=best;if(c.c==='r')v-=1.5}
+    {let best=0;for(const e of enemiesOf(s)){const r=arcReach(p,B(s),e,B(e),s.arc);if(r){const rg=rangeOf(r.d);if(rg<=3)best=Math.max(best,rg===1?1:rg===2?.8:.5)}}v+=SUGFIGHT*best;if(c.c==='r')v-=1.5}
 
     // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
     {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
-const rk=rockHits(s,m);if(rk)v-=40*rk;
+const rk=rockHits(s,m);if(rk)v-=400*rk;if(anySafe&&unsafeMv(s,m))v-=1e6;/* hard rule: never a rock, the edge or a blocked red while a safe move exists *//* a rock costs more than any move that stays clear and on the mat */
     else{const P=corners(p,B(s));const near=Math.min(...G.rocks.map(o=>{const R=rockPoly(o);return Math.min(...P.map(q=>polyPointDist(q,R)))}),1e9);if(near<30)v-=(30-near)/6}
     sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
-  UI.sugCache={k:G.round+'|'+s.id+'|'+dk,v:best,sc};return best}
+  UI.sugCache={g:G,k:ck,v:best,sc};return best}
 function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];if(offBoard(p,b))return '<b class="bad">Flies off the battlefield: the ship would be destroyed!</b>';
   if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))bits.push('<b class="bad">lands on an asteroid (damage roll, no action, no shot)</b>');
   else if(tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2)))bits.push('<b class="bad">clips an asteroid (damage roll, no action)</b>');
@@ -5693,7 +5849,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
 function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
   if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
 function setupText(q){const r=recOpt(q);const rock=q.key==='rock';
-  return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place (recommended)<small>Places your ${rock?'asteroids and ship':'ships'} in sensible spots. In a first game it doesn't matter much.</small></button></div>
+  return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place<small>Sensible spots for your ${rock?'rocks':'ships'}.</small></button></div>
   ${rock&&G.rocks.length?`<p class="small">Both sides take turns placing 6 asteroids. ${G.rocks.length} ${G.rocks.length===1?'is':'are'} already down: the grey rocks.</p>`:''}${rock?'<p class="small">Flying through an asteroid hurts and skips your action. Shooting past one gives the defender +1 die.</p>':''}
   <p class="small muted"><b>Or place ${rock?'it':'it'} yourself:</b> tap an outlined spot, or pick one below. ${rock?'Columns A-E run from your left. Rows 1-5 run from your edge.':'Spots 1-9 run along your edge, left to right.'} ★ <b>${esc(r.o.l)}</b> is suggested. Why: ${r.why}.</p>`}
 // long lists of short choices (asteroid spots A1…E5 and the like) become a compact grid; the spots are laid out like the mat
@@ -5774,10 +5930,11 @@ ${UI.optsOpen?`  <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['ho
   <h3>Factions</h3><div class="row">${[0,1].map(k=>`<label>${k?'Opponent':'You'}: <select data-fac="${k}">${FACTIONS.map((f,i)=>`<option value="${i}" ${UI.fac[k]===i?'selected':''} ${f.ex&&!UI.ex[f.ex]?'disabled':''}>${esc(f.n)}</option>`).join('')}</select><small class="bio">${esc(FACTION_BIO[UI.fac[k]]||'')}</small></label>`).join(' ')}</div>
   <h3>Battle size</h3><div class="row">${SIZES.map(z=>`<button class="btn ${UI.size===z.k?'on':''}" data-size="${z.k}">${esc(z.n)}<small>${esc(z.d)}</small></button>`).join('')}</div>
   <h3>Computer skill</h3><div class="row">${['easy','normal','hard'].map(l=>`<button class="btn ${UI.lvl===l?'on':''}" data-lvl="${l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div>
+  <h3>Game length</h3><div class="row"><button class="btn ${!UI.ex.clockMin?'on':''}" data-a="clock" data-k="0">Fight to the end<small>base rules: until one side has no ships</small></button><button class="btn ${UI.ex.clockMin?'on':''}" data-a="clock" data-k="20">Timed, 20 min<small>tournament style: points destroyed, a tie is a draw</small></button></div>
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
 `:''}  </details>
-  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':`<button class="btn primary" data-start="${UI.mode}">Launch</button>`}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
+  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':''}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><ul><li>Art and music by Am015-dev</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2><div class="turn5"><h3>How a turn works</h3><ol><li><b>Plan:</b> tap your ship, then tap where it flies.</li><li><b>Fly:</b> tap Fly. Every ship moves, lowest pilot skill first.</li><li><b>Act:</b> pick one action, like Focus, after you move.</li><li><b>Shoot:</b> tap a glowing enemy. Highest skill fires first.</li><li><b>Dice:</b> hits minus evades is damage; shields go first.</li></ol></div>${RULES_HTML}<h3>Simplified on purpose</h3><p>Asteroids are placed for you (6 of them, spaced apart). Ships start facing the enemy from set spots. The barrel-roll slide is offered in 5 steps. A battle with no winner after 100 rounds goes to the side that destroyed more points.</p>${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
@@ -5844,6 +6001,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='build'){UI.squads=UI.squads||[[],[]];UI.build=+ds.k;render();return}
   if(ds.a==='bdone'){UI.build=null;render();return}
   if(ds.a==='bclear'){UI.squads[UI.build]=[];saveSquads();render();return}
+  if(ds.a==='clock'){UI.ex.clockMin=+ds.k||0;if(!UI.ex.clockMin)delete UI.ex.clockMin;saveSetup();render();return}
   if(ds.a==='brand'){UI.squads[UI.build]=randomSquad(UI.fac[UI.build],100,UI.ex).map(e=>({p:e.p,u:e.u.slice()}));saveSquads();render();return}
   if(ds.a==='rules'){UI.rules=true;render();return}if(ds.a==='close'){UI.rules=false;UI.stats=false;render();return}
   if(ds.a==='stats'){UI.stats=true;render();return}if(ds.a==='new'){UI.info=true;UI.stats=false;render();return}
@@ -5878,8 +6036,8 @@ function startGame(mode,sortie){try{boot3D()}catch(e){}if(typeof NET!=='undefine
   UI.mode=mode;const players=mode==='solo'?[{human:true},{human:false,lvl:UI.lvl}]:mode==='hot'?[{human:true},{human:true}]:[{human:false,lvl:UI.lvl},{human:false,lvl:UI.lvl}];
   const squads=customSquads();
   if(sortie!=null&&SORTIES[sortie]){const so=SORTIES[sortie];UI.mode='solo';
-    newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{})});G.sortie=sortie}
-  else{newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});if(mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads)G.sortie=0}
+    newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{}),seed:freshSeed()});G.sortie=sortie}
+  else{const first=mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads;newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads:first?FIRST_GAME.sq.map(q=>q.map(e=>({p:e.p,u:e.u.slice()}))):squads,ex:Object.assign({},UI.ex,first?FIRST_GAME.ex:{}),close:first,seed:freshSeed()});if(first)G.sortie=0;if(G.ex.clockMin){G.t0=Date.now();lg(-1,`Timed game (tournament style): when ${G.ex.clockMin} minutes are up, the round is finished, then more points destroyed wins; equal points is a draw.`)}}
   resetGuide();if(bothHuman())UI.pass=0;camView('tilt');render()}
 // the squads built in the squad builder (battle size "custom"), checked; null = use the battle size's squads
 function customSquads(){const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
@@ -6007,14 +6165,14 @@ const sigNow=()=>G?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step,planSid
 PHN.openPop=function(kind,id){PHN.pop={kind,id};PHN.popSig=sigNow();if(typeof sfx==='function')sfx('click');render()};
 PHN.closePop=function(){if(!PHN.pop)return;PHN.pop=null;if(typeof V3!=='undefined')UI.hoverDial=null;render()};
 // ---- pop-ups (live in the dock zone: under the board in portrait, in the right rail in landscape; they never cover the mat) ----
-const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
-function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
-  let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const rk=rockHits(s,d[i]);
-      return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${ic}${sug===i?'<em class="rs">★</em>':''}${rk?'<em class="rk">!</em>':''}</button>`}).join('');
+const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,KICO]];
+function dialPopHTML(s){const DG=shipDeg(s);const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
+  let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const om=offMat(s,d[i]),rk=rockHits(s,d[i]);
+      return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${om?', leaves the mat: ship lost':rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${rotIco(ic,s,DG)}${sug===i?'<em class="rs">★</em>':''}${om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':''}</button>`}).join('');
     if(cells.includes('data-pd'))g+=`<span class="pm-sp">${sp}</span>${cells}`}
   const read=pick!=null?moveRead(s,pick):`<span class="muted">Tap a maneuver: the ghost on the mat shows where ${nm(s)} ends. Rows are speed, arrows the direction.${sug>=0?` ★ is recommended.`:''}</span>`;
   return `<div class="pp-h"><b>${nm(s)} · set the dial</b><span class="pp-n">${my.length>1?`ship ${idx+1}/${my.length}`:''}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
-  <div class="pp-b"><div class="pm-grid" role="group" aria-label="Maneuver dial">${g}</div><div class="pm-leg"><span class="sw g"></span>easy <span class="sw w"></span>normal <span class="sw r"></span>hard (stress)${sug>=0?' · ★ suggested':''}${d.some(m=>rockHits(s,m))?' · <b class="rkl">!</b> hits an asteroid':''}${s.stress?' · <span class="warn">stressed: red is blocked</span>':''}</div><p class="pm-read">${read}</p></div>
+  <div class="pp-b"><div class="pm-grid" role="group" aria-label="Maneuver dial">${g}</div><div class="pm-leg"><span class="sw g"></span>easy <span class="sw w"></span>normal <span class="sw r"></span>hard (stress)${sug>=0?' · ★ suggested':''}${d.some(m=>rockHits(s,m))?' · <b class="rkl">!</b> hits an asteroid':''}${d.some(m=>offMat(s,m))?' · <b class="rkl">off mat!</b> ship lost':''}${s.stress?' · <span class="warn">stressed: red is blocked</span>':''}</div><p class="pm-read">${read}</p></div>
   <div class="pp-f">${sug>=0&&pick!==sug?`<button class="btn" data-ph="rec">★ Use suggested</button>`:''}<button class="btn primary" data-ph="set" ${pick==null?'disabled':''}>Set</button></div>`}
 function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsFor(s))for(const t of w.targets)if(t.id===d.id){const sd=shotDice(s,w,t,d);rows.push({w,t,sd,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
   const best=rows.slice().sort((a,b)=>b.e-a.e)[0];const t0=rows[0];const tl=s.tl===d.id||s.tl2===d.id;
@@ -6031,10 +6189,11 @@ function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-
   const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
   let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
   return `<div class="pp-h">${porHTML(s)}<b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
-  <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
-  <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  <div class="pp-b"><div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  ${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}
+  <details class="pp-more"><summary>Ship card: numbers, pilot, upgrades</summary><div class="stats big">${statSpans(s)}</div>
   <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
-  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}</div>
+  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}</details></div>
   <div class="pp-f">${typeof V3!=='undefined'&&V3.on?`<button class="btn" data-ph="zoomto" data-id="${s.id}">${IC.focus} Zoom to it</button>`:''}<button class="btn primary" data-ph="x">Close</button></div>`}
 // ---- strip (planning): which ships still need a dial, recommended-for-all, lock ----
 function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const nset=my.filter(s=>UI.draft[s.id]!=null).length,all=nset===my.length;const g=guided();
@@ -6043,7 +6202,7 @@ function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps)
   <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
 // ---- the render hook ----
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
-function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown();
+function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown()+(G.ex&&G.ex.roundCap?'/'+G.ex.roundCap:'');
   const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
 function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
   if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};
@@ -6702,7 +6861,7 @@ var BF={on:false,sel:null,sub:null,wave:null,flyUntil:0,key:'',fkey:'',items:[],
 const R=document.documentElement;
 const v3=()=>typeof V3!=='undefined'&&V3.on&&!!V3.camera;
 const net=()=>typeof NET!=='undefined'&&NET.on;
-const ARROW={T:['↰','↱'],B:['↖','↗'],S:['↑','↑'],K:['⤺','⤺']};
+const ARROW={T:['↰','↱'],B:['↖','↗'],S:['↑','↑'],K:[KICO,KICO]};
 const ACT_ICO={F:'◉',E:'✦',TL:'⌖',BR:'⇆',BO:'⇑',EH:'⇆',DD:'⤺',JK:'✦',MK:'◉',SL:'⌖',SB:'⚡',skip:'✕'};
 const ACT_W={F:'Focus',E:'Evade',TL:'Lock',BR:'Roll',BO:'Boost',EH:'Roll',skip:'Skip'};
 const off=/[?&]bf=0/.test(location.search||'');// ?bf=0: the older dock interface
@@ -6715,7 +6874,7 @@ let ov,svg,lay,bar,hint,btns,dice,top,ban,fing;
 function build(){if(ov)return;const st=$('stage');if(!st)return;ov=document.createElement('div');ov.id='bf';
   ov.innerHTML='<svg id="bfsvg" aria-hidden="true"></svg><div id="bfl"></div><div id="bftop" aria-live="polite"></div><div id="bfdice" hidden></div><div id="bfban" hidden></div><div id="bffing" hidden aria-hidden="true">👆</div><div id="bfbar"><p id="bfhint" aria-live="polite"></p><div id="bfbtns"></div></div>';
   st.appendChild(ov);svg=$('bfsvg');lay=$('bfl');bar=$('bfbar');hint=$('bfhint');btns=$('bfbtns');dice=$('bfdice');top=$('bftop');ban=$('bfban');fing=$('bffing');
-  ov.addEventListener('click',onClick);requestAnimationFrame(loop)}
+  ov.addEventListener('click',onClick);ov.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');BF.pd=t?{t,x:e.clientX,y:e.clientY,at:performance.now()}:null},true);ov.addEventListener('pointerup',e=>{const d=BF.pd;BF.pd=null;if(d&&!document.body.contains(d.t)&&d.t.dataset&&d.t.dataset.bfq!=null&&performance.now()-d.at<=700){const n=ov.querySelector('[data-bfq="'+d.t.dataset.bfq+'"]');if(n&&n.classList.contains('pick')){e.preventDefault();n.click()}return}if(!d||!document.body.contains(d.t)||performance.now()-d.at>700||Math.hypot(e.clientX-d.x,e.clientY-d.y)>14)return;const u=document.elementFromPoint(e.clientX,e.clientY);if(u&&d.t.contains(u))return;BF.pdHit=d.t;BF.pdSup=performance.now();setTimeout(()=>{if(BF.pdHit===d.t){BF.pdHit=null;d.t.click()}},0)},true);requestAnimationFrame(loop)}
 // ---- projection ----
 function px(x,y,h){const v=W(x,y,h||0).project(V3.camera);const c=V3.r.domElement;return [(v.x+1)/2*c.clientWidth,(1-v.y)/2*c.clientHeight,v.z]}
 function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b=px(s.x+f.x*B(s)/2,s.y+f.y*B(s)/2);return Math.max(14,Math.hypot(a[0]-b[0],a[1]-b[1]))}
@@ -6723,8 +6882,8 @@ function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b
 function shownXY(s){const m=V3.ships[s.id];if(!m)return {x:s.x,y:s.y};return {x:m.position.x*10,y:MAT-m.position.z*10}}
 // ---- camera: frame the points that matter, inside the part of the board that is not under the bars ----
 function rayGround(sx,sy){const c=V3.r.domElement;const v=new THREE.Vector2(sx/c.clientWidth*2-1,-(sy/c.clientHeight)*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.camera);const p=new THREE.Vector3();return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),p)?p:null}
-function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10,sd=side||12;minW=minW||230;
+function fit(pts,minW,side,topPad,botPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10+(botPad||0),sd=side||12;minW=minW||230;
   let a=1e9,b=-1e9,d=1e9,e=-1e9;for(const p of pts){a=Math.min(a,p.x);b=Math.max(b,p.x);d=Math.min(d,p.y);e=Math.max(e,p.y)}
   if(b-a<minW){const m=(a+b)/2;a=m-minW/2;b=m+minW/2}if(e-d<minW){const m=(d+e)/2;d=m-minW/2;e=m+minW/2}
   const box=[{x:a,y:d},{x:b,y:d},{x:a,y:e},{x:b,y:e}];C.tx=S3((a+b)/2);C.tz=S3(MAT-(d+e)/2);
@@ -6736,10 +6895,10 @@ function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,c
 const XY=s=>({x:s.x,y:s.y});
 function around(s,r){r=r||B(s)*1.2;return [{x:s.x-r,y:s.y-r},{x:s.x+r,y:s.y+r}]}
 function framePts(k){const all=alive();const pts=[];const add=a=>{for(const p of a)pts.push(p)};
-  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return {pts,min:200,sd:30,tp:104}}
+  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return dialOn()?{pts,min:200,sd:20,tp:60,bp:270}:{pts,min:200,sd:30,tp:104}}
   if(k==='action'||k==='sub'){const s=ship(G.cur);add(around(s,B(s)*1.6));if(k==='sub'&&BF.sub){if(BF.sub.opts)BF.sub.opts.forEach(o=>o.p&&add(around(o.p,B(s)*.8)));if(BF.sub.targets)BF.sub.targets.forEach(id=>add(around(ship(id))))}return {pts,min:400}}
   if(k==='target'){const s=ship(G.cur);add(around(s));for(const w of weaponsFor(s))for(const t of w.targets)add(around(ship(t.id)));return {pts,min:380}}
-  if(k==='dice'&&G.atk){add(around(ship(G.atk.a)));add(around(ship(G.atk.d)));all.forEach(s=>add(around(s)));return {pts,min:380}}
+  if(k==='dice'&&G.atk){add(around(ship(G.atk.a),B(ship(G.atk.a))*1.3));add(around(ship(G.atk.d),B(ship(G.atk.d))*1.3));return {pts,min:240,tp:60,bp:Math.min(300,Math.round(innerHeight*.34))}}
   if(k==='setup'&&G.q){G.q.opts.forEach(o=>o.p&&pts.push(XY(o.p)));all.forEach(s=>add(around(s)));return {pts,min:300}}
   all.forEach(s=>add(around(s)));return {pts,min:300}}
 // ---- what is going on ----
@@ -6766,37 +6925,75 @@ function capture(){if(!UI.fx.length)return;const keep=[];for(const f of UI.fx){
 function speedUp(){if(BF.aid==null){BF.aid=AIDELAY;AIDELAY=Math.min(AIDELAY,90)}}
 function slowDown(){if(BF.aid!=null){AIDELAY=BF.aid;BF.aid=null}}
 function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const ids=w.order.filter(id=>V3.ships[id]);
-  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(900,Math.min(1500,w.dur||1000)):0;BF.flyUntil=performance.now()+reveal+D+150;
-  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+D);
+  // ships fly ONE AT A TIME in activation order (lowest pilot skill first), like revealing dials around the table
+  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(800,Math.min(1300,w.dur||1000)):0,step=ids.length>1?Math.round(D*.8):0,tot=D+step*Math.max(0,ids.length-1);BF.flyUntil=performance.now()+reveal+tot+150;BF.flyOrder=ids.slice();
+  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+tot);
   if(ids.length)sfx('lock');
-  const go=()=>{const now=performance.now();for(const id of ids){const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:now,dur:Math.max(1,D)}}if(ids.length)sfx('engine');
-    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;render()};if(D)setTimeout(land,D+60);else land()};
+  const fly=(id,k)=>{const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:performance.now(),dur:Math.max(1,D)};if(k===0||ANIM)sfx('engine')};
+  const go=()=>{ids.forEach((id,k)=>{if(step)setTimeout(()=>fly(id,k),k*step);else fly(id,k)});
+    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;if(ban&&!ban.hidden&&/Ships move/.test(ban.innerHTML)){clearTimeout(BF.banT);ban.hidden=true;BF.banUntil=0}render()};if(tot)setTimeout(land,tot+60);else land()};
   if(reveal)setTimeout(go,reveal);else go();
-  if(ids.length>1)banner('<b>Ships move!</b>',reveal+D*.6)}
+  if(ids.length>1)banner('<b>Ships move</b><span>Lowest skill first</span>',reveal+tot*.6)}
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
 // ---- one-line text, banners, pops ----
 function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
 // owner rule (8 Nov): a message stays at least 4 s plus 1 s per 10 words; one at a time; a newer one waits its turn (latest 2 kept)
 function readMs(h){const w=String(h).replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;return 4000+w*100}
 function banner(h,ms){if(!ban)return;const now=performance.now();if(!ban.hidden&&BF.banUntil&&now<BF.banUntil&&ms<1e9&&BF.banMs<1e9){BF.banQ=(BF.banQ||[]).concat([[h,ms]]).slice(-2);return}
-  ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
-  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms)}
-function mvLabel(m){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return (m.d>0?a[1]:a[0])+'<b>'+m.s+'</b>'}
-function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?'⇆':mvLabel(c.m);lay.appendChild(el);
+  ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('top');ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
+  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms);ban.dataset.py='';placeBan()}
+// keep the timed banner off the ships and fully on screen: it sits low (above the bottom bar) when it can, else the first free height; it only moves when it would cover a ship
+function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ban){ban.style.left=ban.style.top=ban.style.transform=ban.style.transition=ban.style.maxWidth=''}return}
+  if(!(typeof v3==='function'&&v3()&&G))return;const o=ov.getBoundingClientRect(),c=V3.r.domElement.getBoundingClientRect(),dx=c.left-o.left,dy=c.top-o.top,Wd=o.width,Ht=o.height;if(!(Wd>0))return;
+  const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
+  const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
+  const tg=[];document.querySelectorAll('#tags .tag').forEach(t=>{if(t.hidden||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)tg.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
+  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
+  const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
+  const ys=[yB];for(let y=yB-24;y>=60;y-=24)ys.push(y);ys.push(Math.max(m,Math.min(yB,74)));
+  const cur=parseFloat(ban.dataset.py);if(cur>=0&&ban.dataset.pw==String(w)+'x'+h&&hit(left,cur)===0)ys.unshift(cur);
+  for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
+  ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
+  clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
+// the lesson bubble: same rule as the banner. Never over a ship or its name plate, always inside the stage (viewport coords, it is position:fixed)
+BF.placeCoach=function(e){if(!e||e.hidden||!ov||!(typeof v3==='function'&&v3()&&G))return;
+  const o=ov.getBoundingClientRect(),m=8,W=innerWidth;e.style.transition='none';e.style.top='0px';const h=e.offsetHeight;
+  const bt=bar&&!bar.hidden?bar.getBoundingClientRect().top:o.bottom,lo=Math.max(o.top+m,8),hi=Math.max(lo,bt-h-6),hi2=Math.max(hi,o.bottom-h-m);
+  const rr=[];try{for(const c of BF.circ()){const R=c[2]*1.15+6;rr.push([c[0]-R,c[1]-R,c[0]+R,c[1]+R])}}catch(x){}
+  document.querySelectorAll('#tags .tag').forEach(t=>{if(getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)rr.push([q.left-4,q.top-4,q.right+4,q.bottom+4])});
+  document.querySelectorAll('.bfact,.bftgt,.bfm,[data-bf],#bffing').forEach(t=>{if(t.closest('#na-coach')||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4&&q.width<o.width*.9)rr.push([q.left-2,q.top-2,q.right+2,q.bottom+2,.01])});
+  const l=e.getBoundingClientRect(),x0=l.left,x1=l.right;
+  const area=y=>{let a=0;for(const q of rr){const ox=Math.min(x1,q[2])-Math.max(x0,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=ox*oy*(q[4]||1)}return a};
+  const ys=[];for(let y=Math.min(Math.max(50,lo),hi);y<=hi;y+=8)ys.push(y);for(let y=Math.min(Math.max(50,lo),hi)-8;y>=lo;y-=8)ys.push(y);for(let y=hi+8;y<=hi2;y+=8)ys.push(y);
+  let best=null;for(const y of ys){const a=area(y);if(best==null||a<best[0]){best=[a,y];if(!a)break}}
+  e.style.top=(best?best[1]:50).toFixed(0)+'px';clearTimeout(BF.coachT);BF.coachT=setTimeout(()=>BF.placeCoach(e),100)};
+BF.circ=()=>{const c=V3.r.domElement.getBoundingClientRect();return alive().map(s=>{const p=XY(s),q=px(p.x,p.y,1);return[q[0]+c.left,q[1]+c.top,shipR(s)]})};
+function mvLabel(m,s,deg){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return rotIco(m.d>0?a[1]:a[0],s,deg)+'<b>'+m.s+'</b>'}
+function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?rotIco('⇆',s):mvLabel(c.m,s);lay.appendChild(el);
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
 // ---- render: rebuild the overlay when the situation changes ----
 function legend(h){const el=document.createElement('div');el.className='bfleg';el.innerHTML=h;ov.appendChild(el);BF.leg=el}
-function clear(){if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
+function clear(){if(BF.dial&&!(G&&G.phase==='plan'&&BF.sel))BF.dial.hidden=true;if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
 function setBtns(h){if(btns&&btns._h!==h){btns._h=h;btns.innerHTML=h}}
 function item(html,cls,o){const el=document.createElement(o&&o.tag||'button');if(el.tagName==='BUTTON')el.type='button';el.className=cls;el.innerHTML=html;for(const k in (o&&o.data)||{})el.dataset[k]=o.data[k];if(o&&o.label)el.setAttribute('aria-label',o.label);el.style.visibility='hidden';lay.appendChild(el);const it=Object.assign({el},o||{});BF.items.push(it);return it}
 function pathW(pts,cls,h){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('class',cls);svg.appendChild(p);BF.paths.push({el:p,pts,h:h||.4});return p}
+// ghost of the ship where a maneuver ends: the base outline plus a nose wedge that shows the FINAL facing (a K-turn's nose points back)
+function ghostW(s,m,cls,solid){const b=B(s),p=finalPose(s,b,m),c=corners(p,b),f=fwd(p.h),l=leftOf(p.h),F=add(p,mul(f,b/2));if(solid)(BF.g3w=BF.g3w||[]).push({id:s.id,p});
+  pathW(c.concat([c[0]]),'bfp ghost '+(cls||''));pathW([add(F,mul(l,b*.32)),add(F,mul(f,b*.42)),sub(F,mul(l,b*.32)),add(F,mul(l,b*.32))],'bfnose '+(cls||''));return p}
+// a see-through copy of the real ship model standing where the move ends, turned to its final facing
+let GHM=null;
+function ghost3D(){const want=BF.g3w||[];BF.g3w=[];const key=want.map(g=>g.id+':'+g.p.x.toFixed(1)+','+g.p.y.toFixed(1)+','+g.p.h.toFixed(2)).join('|');if(BF.g3k===key)return;BF.g3k=key;
+  for(const o of (BF.g3||[]))if(o.parent)o.parent.remove(o);BF.g3=[];if(!v3()||typeof W!=='function')return;
+  if(!GHM)GHM=new THREE.MeshBasicMaterial({color:0xaee9ff,transparent:true,opacity:.38,depthWrite:false});
+  for(const g of want){const src=V3.ships[g.id];if(!src||!src.parent||!src.userData.mdl)continue;const mdl=src.userData.mdl,c=new THREE.Group(),mc=mdl.clone(true);mc.position.copy(mdl.position);mc.rotation.copy(mdl.rotation);mc.scale.copy(mdl.scale);c.add(mc);c.traverse(o=>{if(o.isMesh){o.material=GHM;o.castShadow=false;o.receiveShadow=false}else if(o.isSprite||o.isPoints||o.isLight)o.visible=false});
+    c.position.copy(W(g.p.x,g.p.y));c.rotation.y=g.p.h;c.userData.bfGhost=1;src.parent.add(c);BF.g3.push(c)}}
 function sideCol(s){return s.side===me()?'mine':'foe'}
 function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('bf',on);if(!on){R.classList.remove('bf-play','bf-sheet');if(ov)ov.hidden=true;if(BF.wave)release()}requestAnimationFrame(()=>{try{resize3D()}catch(e){}BF.key='';BF.fkey='';if(BF.on)bfRender()})}
   if(!on)return;build();if(!ov)return;ov.hidden=false;if(G&&G.winner){if(BF.overG!==G){BF.overG=G;BF.wantStats=false}if(UI.stats&&!BF.wantStats){UI.stats=false;setTimeout(render,0)}}const play=playing();R.classList.toggle('bf-play',play);
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
   // my ship had nobody to shoot: say so on the board, with the fix
-  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} only shoots ahead. Next time pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
   const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)&&performance.now()>=(BF.banUntil||0)){ban.hidden=true;BF.noshotT=0}
@@ -6807,41 +7004,69 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
   const sheet=k==='ask'||(!!PHN.pop&&PHN.pop.kind==='info');R.classList.toggle('bf-sheet',sheet);
   topLine(k);
-  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp))}
+  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);BF.fitP=1;requestAnimationFrame(()=>{BF.fitP=0;fit(f.pts,f.min,f.sd,f.tp,f.bp)})}
   if(key===BF.key)return;BF.key=key;clear();dice.hidden=true;
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
-  else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s)}
+  else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s);try{ghost3D()}catch(e){console.error(e)}}
 // "whose turn, doing what": one short banner each time the turn changes hands (the lesson has its own bubbles)
 function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.winner||G.round<1||UI.hold||BF.wave)return;const s=G.cur&&ship(G.cur);let id='',h='';const T=LORE.turn;
   if(k==='plan'){id='p'+G.round;h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${T.plan[1]}</span>`}
   else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
   else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
   else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
-  if(!id||id===BF.tbId)return;BF.tbId=id;banner(h,1100);BF.noshotT=0}
+  if(!id||id===BF.tbId)return;BF.tbId=id;if(k!=='watch'){BF.banQ=[];BF.banUntil=0}/* my turn now: a queued 'Rival's turn' line is stale, drop it and show this one at once */banner(h,1100);if(ban)ban.classList.toggle('top',k!=='plan');BF.noshotT=0;placeBan()}
 function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0=me();const hp=side=>alive().filter(s=>s.side===side).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);
   const n=side=>alive().filter(s=>s.side===side).length;const h=`<span class="y">You <b>${n(k0)}</b>✈ ♥${hp(k0)}</span><span class="vs">vs</span><span class="e">Enemy <b>${n(1-k0)}</b>✈ ♥${hp(1-k0)}</span>`;if(top._h!==h){top._h=h;top.innerHTML=h}}
 // ---- the guided first game: a ghost finger shows the one thing to tap ----
-function finger(el){BF.fing=guided()&&el?el:null}
+function finger(el){BF.fing=(guided()||(typeof TUT!=='undefined'&&TUT.coach&&typeof tutStaged==='function'&&tutStaged()))&&el?el:null}
 // ---- screens ----
 function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<div data-keep><b class="na-gt">Goal: destroy ${foe===1?'the enemy ship':'every enemy ship'} before they get yours.</b><ul class="na-goal"><li>Pick a secret move for each ship.</li><li>Fly, then shoot enemies in front of you.</li><li>Hits break shields first, then the hull.</li></ul><span>Yours ${G.ships.filter(s=>s.side===k0).length>1?'are':'is'} at the bottom. Theirs at the top.</span></div>`,1e9);
   setBtns(`<button class="btn" data-bf="briefset" aria-label="Place the asteroids and your ship yourself">Set up myself</button><button class="btn primary big" data-bf="brief">Start ▶</button>`);finger(btns.querySelector('.primary'))}
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
   setBtns(`<button class="btn big" data-a="autoplace">✨ Auto-place all</button>`)}
-function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+function planUI(){dropLoose();if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round;UI.sugCache=null}/* a new round starts with no move set: last round's move must never stay pre-picked (it flew newcomers into rocks and off the mat) */const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+  /* the 'Round N: plan' bubble is only for the start of planning: once a ship is picked or planned, the hint line takes over */
+  if(ban&&!ban.hidden&&/^p\d/.test(BF.tbId||'')&&(BF.sel||my.some(s=>UI.draft[s.id]!=null))){ban.hidden=true;BF.banUntil=0;clearTimeout(BF.banT)}
   if(BF.sel&&!my.some(s=>s.id===BF.sel))BF.sel=null;
-  for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);item(mvLabel(m),'bfm small set '+exColor(s,m).c,{x:finalPose(s,B(s),m).x,y:finalPose(s,B(s),m).y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
+  for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);const gp=ghostW(s,m,exColor(s,m).c,true),lp=add(gp,mul(leftOf(gp.h),B(s)*1.05));item(mvLabel(m,s),'bfm small set '+exColor(s,m).c,{x:lp.x,y:lp.y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
     if(s.id!==BF.sel){const it=item('','bfring'+(pk==null?' need':' done'),{ship:s.id,data:{bfship:s.id},label:s.name+(pk==null?': plan its move':': change its move'),ring:true});if(pk==null&&!BF.fingT){BF.fingT=it.el}}}
-  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];
+  if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
+  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=(UI.hints||(typeof tutStaged==='function'&&tutStaged()))?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
-      const p=finalPose(s,b,m);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:p.x,y:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
-      if(sug===i&&pick==null)BF.fingT=it.el});
-    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
+      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const om=offBoard(p,b),rk=rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m,s)+(sug===i?'<em class="st">★</em>':'')+(om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk||offBoard(p,b)?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(om?', leaves the mat: the ship is destroyed':rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
+      if(sug===i&&(pick==null||(pick!==sug&&typeof tutStaged==='function'&&tutStaged())))BF.fingT=it.el});
+    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock · <b class="rk">off mat!</b> lost');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
   setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
-  if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');finger(BF.fingT)}
+  if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');if(typeof tutPlanHook==='function'){const f=tutPlanHook();if(f)BF.fingT=f}finger(BF.fingT)}
+// ---- the secret dial: a big wheel you spin with your thumb; the move in the window is the one you fly ----
+function dialOn(){return !/[?&]dial=0/.test(location.search||'')&&!(typeof tutOn==='function'&&tutOn())&&!(typeof tutStaged==='function'&&tutStaged())}
+function dialList(s){const dk=m=>m.s*10+(m.t==='K'?5:m.t==='S'?2:m.t==='B'?(m.d<0?1:3):(m.d<0?0:4));return dialOf(s).map((m,i)=>({m,i})).filter(o=>!(exColor(s,o.m).c==='r'&&s.stress)).sort((a,b)=>dk(a.m)-dk(b.m))}
+function dialEl(){if(BF.dial)return BF.dial;const el=document.createElement('div');el.id='bfdial';el.hidden=true;el.innerHTML='<div class="dwin" aria-live="polite"></div><div class="dface" role="slider" aria-label="Maneuver dial: spin to choose a move"></div><div class="dhub"></div>';ov.appendChild(el);BF.dial=el;
+  const face=el.querySelector('.dface');let D=null;
+  const ang=e=>{const r=face.getBoundingClientRect();return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))};
+  face.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();try{face.setPointerCapture(e.pointerId)}catch(_){}D={a0:ang(e),r0:BF.drot||0,x:e.clientX,y:e.clientY,moved:false,it:e.target.closest('.ditem')}});
+  face.addEventListener('pointermove',e=>{if(!D)return;if(BF.dgrid!==false)return;/* grid layout: tap a chip, no spinning */e.stopPropagation();let da=ang(e)-D.a0;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;if(Math.hypot(e.clientX-D.x,e.clientY-D.y)>8)D.moved=true;if(!D.moved)return;BF.drot=D.r0+da;D.a0=ang(e);D.r0=BF.drot;dialSpin(false)});
+  const up=e=>{if(!D)return;e.stopPropagation();const d0=D;D=null;if(!d0.moved&&d0.it){const k=+d0.it.dataset.k;BF.drot=-k*BF.dstep}dialSpin(true)};
+  face.addEventListener('pointerup',up);face.addEventListener('pointercancel',up);face.addEventListener('click',e=>e.stopPropagation());return el}
+function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return;const n=L.length,st=BF.dstep;let k=Math.round(-BF.drot/st);k=((k%n)+n)%n;if(snap)BF.drot=-Math.round(-BF.drot/st)*st;
+  el.querySelectorAll('.ditem').forEach(it=>{const a=+it.dataset.k*st+BF.drot;it.classList.toggle('on',+it.dataset.k===k)});
+  el.querySelector('.dface').style.setProperty('--rot',BF.drot+'rad');
+  const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
+function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
+  if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
+  const el=dialEl(),face=el.querySelector('.dface'),key=G.round+'|'+sug+'|'+s.id+':'+L.map(o=>o.i).join(',')+'@'+Math.round(shipDeg(s)/5);BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
+  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m)||offMat(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m,s)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  if(pick0==null||!L.some(o=>o.i===pick0))BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep;/* a fresh dial opens ON the ★ move: the wheel's old rotation from last round must not pick for you */
+  el.hidden=false;el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');dialSpin(false);
+  const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
+  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m,s)}</span><span class="dwd">${esc(mvWords(m))}${om?' · <b class="rk om">off mat!</b>':rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
+  pathW(tplPoints(s,b,m,4),'bfp on '+c);ghostW(s,m,c+' on',true);item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
+  setHint(`Tap a move for ${esc(shortName(s))}`);
+  setBtns(`<button class="btn" data-bf="dclose" aria-label="Close the dial">✕</button><button class="btn primary big" data-bf="dlock">Lock move ✓</button>`);el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');finger(null)}
 function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
   if(BF.sub){const a=BF.sub;setHint(a.a==='TL'?'Tap the enemy to lock on':'Tap where to go');
     if(a.targets)a.targets.forEach(id=>{const t=ship(id);const it=item('<span>⌖</span><i>Lock</i>','bftgt lock',{ship:id,data:{bfarg:id},label:'Lock onto '+t.name});finger(it.el)});
@@ -6853,10 +7078,14 @@ function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
     const it=item(`<span>${ic}</span><i>${esc(w)}</i>`,'bfact'+(a.a===rec?' rec':'')+(a.a==='skip'?' skip':''),{ship:s.id,ring:false,arc:{i,n},data:{bfa:a.a},label:(a.l||a.a)+(a.d?': '+a.d:'')});
     if(a.a===rec)finger(it.el)});
   if(!rec)finger(null);setBtns('')}
-function targetUI(s){if(!s)return;const ws=weaponsFor(s);const opts=[];for(const w of ws)for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
+// range ruler: bands 1, 2 and 3 measured from the attacker's base edge, like laying the ruler on the table
+function rangeBands(s){const b=B(s);const c=corners(s,b);for(let k=1;k<=3;k++){const r=RANGE*k,pts=[];for(let i=0;i<4;i++){for(let j=0;j<=6;j++){const a=s.h+(i+j/6)*Math.PI/2;pts.push(add(c[i],V(Math.cos(a)*r,Math.sin(a)*r)))}}pts.push(pts[0]);pathW(pts,'bfrng r'+k,.3);
+    const lp=add(s,mul(fwd(s.h),b/2+r-RANGE*.5));item(String(k),'bfrlab r'+k,{x:lp.x,y:lp.y,tag:'div'})}}
+function targetUI(s){if(!s)return;try{rangeBands(s)}catch(e){console.error(e)}const ws=weaponsFor(s);const opts=[];for(const w of ws)for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
   const best=opts.slice().sort((a,b)=>b.e-a.e)[0];const per={};
   for(const o of opts){const j=per[o.d.id]=(per[o.d.id]||0)+1;const p=XY(o.d);const a0=shownXY(s);pathW([a0,p],'bfshot aim');
     const it=item(`<span>${o===best?'★':''}🎯</span><i>${o.n}<small>vs</small>${o.m}</i>${o.w.k!=='P'?`<em>${esc(o.w.n.split(' ')[0])}</em>`:''}`,'bftgt'+(o===best?' rec':''),{ship:o.d.id,dy:j>1?1.1*(j-1):0,data:{bfw:o.w.k,bft:o.d.id},label:`Shoot ${o.d.name}: ${o.n} attack dice against ${o.m} defence`});if(o===best)finger(it.el)}
+  {const o=best;if(o){let rg='';try{const r=arcReach(s,B(s),o.d,B(o.d),s.arc);rg=r?rangeOf(r.d):''}catch(e){}item(esc(`Fire at ${shortName(o.d)}${rg?` · range ${rg}`:''} · ${o.n} dice vs ${o.m}`),'bftlab',{ship:o.d.id,dy:-1.9,tag:'div'})}}
   setHint(opts.length?'Tap a glowing enemy to shoot':'No enemy in your arc');
   setBtns(`<button class="btn" data-act="fire" data-w="skip">Hold fire</button>`)}
 function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:0}:preview(A);const rolled=!!(A.def&&A.def.length)||A.step!=='amod';
@@ -6868,13 +7097,15 @@ function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:
   <div class="bfd-out">${out}</div>
   <div class="bfd-r def"><span class="who">DODGE</span><div class="dice">${res?res.def.map(f=>die(f,'def')).join(''):dd||(rolled?'<i class="muted">no dice</i>':'<i class="muted">rolls next</i>')}</div></div>`}
 function shotLine(aId,dId){const a=ship(aId),d=ship(dId);if(!a||!d)return;pathW([shownXY(a),shownXY(d)],'bfshot fire',2.5)}
-function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
+function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==A.a+'>'+A.d+G.round)dropLoose();BF.looseK=A.a+'>'+A.d+G.round;const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
   if(G.phase==='ask'){const q=G.q;setHint(esc(q.title));
     // picking dice to reroll: tap the dice themselves
     if(q.key==='dice'){const row=dice.querySelector(/Defen/.test(q.opts[0]&&q.opts[0].l)?'.def .dice':'.atk .dice');const els=row?row.querySelectorAll('.die'):[];
       q.opts.forEach(o=>{const m=/^[td](\d+)$/.exec(o.k);if(!m||!els[+m[1]])return;const el=els[+m[1]];el.dataset.bfq=o.k;el.setAttribute('role','button');el.setAttribute('aria-label',o.l);el.classList.add('pick');if(/^☑/.test(o.l))el.classList.add('on')});
       if(els.length)setHint(q.opts.some(o=>o.k==='ok')?'Tap dice to reroll, then Reroll':'Tap the die');
-      setBtns(q.opts.filter(o=>!/^[td]\d+$/.test(o.k)).map(o=>`<button class="btn${o.k==='ok'?' primary':''}" data-bfq="${esc(o.k)}">${o.k==='ok'?'⌖ Reroll':o.k==='x'?'Cancel':esc(o.l)}</button>`).join(''));finger(dice.querySelector('.die.pick:not(.on)')||btns.querySelector('.primary'));return}
+      setBtns(q.opts.filter(o=>!/^[td]\d+$/.test(o.k)).map(o=>`<button class="btn${o.k==='ok'?' primary':''}" data-bfq="${esc(o.k)}">${o.k==='ok'?'⌖ Reroll':o.k==='x'?'Cancel':esc(o.l)}</button>`).join(''));// the finger points only at dice worth rerolling: blanks, and focus results when the roller has no focus token to spend
+      {const roller=/Defen/.test(q.opts[0]&&q.opts[0].l)?d:a;const worth=[...els].filter(el=>el.classList.contains('pick')&&!el.classList.contains('on')&&(/blank/i.test(el.getAttribute('aria-label')||'')||(/focus/i.test(el.getAttribute('aria-label')||'')&&!(roller&&roller.focus))));
+       worth.forEach(el=>el.classList.add('worth'));finger(worth[0]||btns.querySelector('.primary'))}return}
     setBtns(q.opts.map((o,i)=>`<button class="btn${(q.opts.some(x=>x.pri)?o.pri:i===0)?' primary':''}" data-bfq="${esc(o.k)}">${esc(o.l)}</button>`).join(''));return}
   if(!humanTurn()){setHint(G.phase==='amod'?`⏳ ${esc(shortName(a))} aims at ${mineS(d)?'you':esc(shortName(d))}`:`⏳ ${esc(shortName(d))} tries to dodge`);setBtns('');return}
   if(G.phase==='damod'){setHint('Tamper with the attack dice?');setBtns(exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}</button>`).join('')+`<button class="btn primary" data-act="damod" data-k="done">Done</button>`);return}
@@ -6882,22 +7113,33 @@ function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(
   const pv=preview(A);setHint(G.phase==='amod'?(mods.length?'Improve your dice, then Roll':'Your shot. Tap Roll'):(mods.length?'Defend: use a token, or Done':pv.hits+pv.crits?'Hit! Tap Done':'Dodged! Tap Done'));
   // nothing to decide while defending: carry on by itself after a beat
   if(G.phase==='dmod'&&!mods.length){const kk=BF.key;setTimeout(()=>{if(BF.key===kk&&G&&G.phase==='dmod'&&humanTurn())uiAct({act:'dmod',k:'done'})},ANIM?1400:0)}
-  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
+  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}${m.d?`<small class="msub">${esc(m.d.length>34?m.d.slice(0,33)+'…':m.d)}</small>`:''}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
   finger(btns.querySelector('.rec')||btns.querySelector('.primary'))}
 const modIco=k=>/focus/i.test(k)?'◉':/tl|lock|rr|reroll/i.test(k)?'⌖':/evade/i.test(k)?'✦':'★';
-function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
-function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
+function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/focus\s*→\s*evade|focus.*(into|to) an? evade/i.test(l))return 'Focus → evade';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
+// dice stay where they landed, loose on the mat beside the target, until the next attack; crit cards flip face-up
+function dropLoose(){if(!BF.loose)return;for(const it of BF.loose)it.el.remove();BF.items=BF.items.filter(x=>!BF.loose.includes(x));BF.loose=null;BF.looseT=0}
+function looseDice(R){if(BF.looseT===R.t)return;dropLoose();BF.looseT=R.t;BF.loose=[];const a=ship(R.a),d=ship(R.d);if(!a||!d||typeof die!=='function')return;
+  const bd=B(d),toA=Math.atan2(a.y-d.y,a.x-d.x);let seed=(R.t%9973)||7;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const put=(list,k,base)=>list.forEach((f,i)=>{const n=list.length,ang=base+(i-(n-1)/2)*.42+(rr()-.5)*.18,dist=bd*(1.25+rr()*.4);const x=d.x+Math.cos(ang)*dist,y=d.y+Math.sin(ang)*dist;
+    const it=item(`<i style="transform:rotate(${Math.round(rr()*80-40)}deg);animation-delay:${(i*.08).toFixed(2)}s">${die(f,k)}</i>`,'bfloose '+k,{x,y,tag:'div',tmp:true});BF.loose.push(it)});
+  put(R.dice||[],'atk',toA);put(R.def||[],'def',toA+Math.PI)}
+function critCards(R){if(!R.crits||!R.crits.length||BF.critT===R.t||typeof DAMAGE==='undefined')return;BF.critT=R.t;R.crits.forEach((c,i)=>{const D=DAMAGE[c];if(!D)return;
+  const it=item(`<div class="in" style="animation-delay:${(.45+i*.5).toFixed(2)}s"><div class="cb">✦</div><div class="cf"><b>${esc(D.n)}</b><span>${esc(String(D.t).split('. ')[0].slice(0,70))}</span></div></div>`,'bfcard',{ship:R.d,dy:-1.9-i*1.2,tag:'div',tmp:true});
+  setTimeout(()=>{it.el.remove();BF.items=BF.items.filter(x=>x!==it)},5200)})}
+function resUI(){const R=UI.hold.R;try{looseDice(R);critCards(R)}catch(e){console.error(e)}{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
-function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
+function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(((G.seed|0)%a.length)+a.length)%a.length]||a[0];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
-function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
+function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'){const dd=[...dice.querySelectorAll('[data-bfq].pick')];const hit=dd.find(x=>{const r=x.getBoundingClientRect();return e.clientX>=r.left-10&&e.clientX<=r.right+10&&e.clientY>=r.top-10&&e.clientY<=r.bottom+10});if(hit){e.preventDefault();hit.click()}return}if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}if(typeof tutAllow==='function'&&!tutAllow(ds)){e.preventDefault();e.stopPropagation();try{GX.buzz(30)}catch(_){}if(BF.fing)BF.fing.classList.add('na-nudge');return}if(typeof tutStaged==='function'&&tutStaged()&&typeof NCH!=='undefined'&&NCH.cur)try{coachHide()}catch(_){}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
+  if(ds.bf==='dlock'||ds.bf==='dclose'){BF.sel=null;if(BF.dial)BF.dial.hidden=true;sfx('token');try{GX.buzz(18)}catch(e){}render();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();try{GX.buzz(18)}catch(e){}const b=document.querySelector('[data-a="lock"]');lockIn();return}
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
@@ -6914,7 +7156,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
 function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
-PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup||0)<400)return true;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
   let best=null,bd=1e9;for(const s of alive()){const p=px(s.x,s.y,1.2);const dd=Math.hypot(p[0]-x,p[1]-y);if(dd<Math.max(30,shipR(s)*1.4)&&dd<bd){bd=dd;best=s}}
   const k=ctx();
@@ -6927,15 +7169,21 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&t
   return false};
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
 function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
-function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=shownXY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
+function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;if(typeof NCH!=='undefined'&&NCH.cur&&BF.fing&&BF.fing.offsetParent)(NCH.fs=NCH.fs||{})[NCH.cur]=1;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  // tappable chips sit where they will END from their first frame: projected with the camera's target (not the glide in progress) and the ship's real
+  // pose (not the mesh still flying), so a quick tap never lands where a chip used to be. Paths and rings below still follow what is drawn.
+  const cam=V3.camera,glide=!!(V3.ez&&!V3.debugCam);let sp0,sq0;if(glide){sp0=cam.position.clone();sq0=cam.quaternion.clone();placeCam(0,0,V3.cam);cam.updateMatrixWorld()}
+  if(BF.fitP){if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}return}// the camera target is set next frame: keep new chips hidden until then
+  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=it.ring?shownXY(s):XY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
       if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86);const base=y<Ht-230?Math.PI/2:-Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}
-      if(it.dy)y+=it.dy*(r*1.3+26)}
+      if(it.dy)y+=it.dy*(r*1.3+26);
+      else if(/\block\b/.test(it.el.className)&&G.cur&&G.cur!==it.ship){const m=ship(G.cur);if(m){const mq=px(XY(m).x,XY(m).y,1);y+=(y<=mq[1]?-1:1)*(r*1.3+26)*.6}}}   // the Lock chip sits on the far side of the enemy from your ship, clear of your name plate
     else{const q=px(it.x,it.y,.5);x=q[0];y=q[1]}
-    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:0;if(it.relax||it.r)rel.push(it)}
+    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:/bftlab/.test(cl)?122:0;if(it.relax||it.r)rel.push(it)}
   relaxItems(rel,Wd,Ht);
   for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(/bfm/.test(it.el.className)?Ht-(bar?bar.offsetHeight:90)-20:Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
+  if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
   if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}
@@ -7186,9 +7434,9 @@ const LORE={
   // tutorial prologue "Convoy Run": chapters open with a title line, the payoff comes with the next step's first words
   tut:{
     goal:{t:'Ch 1 · Scramble',s:'Slate is raiding our convoy. Smash his ship before it reaches the freighters. Yours is at the bottom.'},
-    ship:{t:'Brecken: Plan first',s:'Pilots plan in secret, Varro. Slate is doing it right now. Touch your ship to see where it can fly.'},
+    ship:{t:'Brecken: Plan in secret',s:'Tap your ship to plan its move in secret.'},
     marks:{t:'Brecken: Red and rocks',s:'Red moves strain the engines: stress token. A ! marks paths through the rock, which hurts and skips your action.'},
-    dial:{t:'Brecken: Choose a line',s:'Number is speed, arrow is direction, green is easy. Fly the green straight 2 to meet him head on.'},
+    dial:{t:'Brecken: Choose a line',s:'Tap the green straight 2. Green moves are easy.'},
     fly:{t:'Brecken: Dials are secret',s:'Neither of you can peek. When you are set, reveal the dials and let the ships move together.'},
     order:{t:'Ch 2 · First Contact',s:'Slate shows his hand! Lowest skill moves first: Slate (3), then you (8). Highest shoots first, so you do.'},
     action:{t:'Brecken: One action',s:'After flying, every ship gets one action. Sharpen your aim with a focus token before you fire.'},
@@ -7213,31 +7461,41 @@ const LORE={
     {n:3,name:'Point Blank',steps:['auto','fly2','stress','lock','shoot2','reroll','confirm','roll2']},{n:4,name:'Convoy Saved',steps:['win']}],
   // quick game: a line of flavour before the first turn and a result line in the game's voice
   quick:{intro:'The Armada hits the convoy lane. Clear the way.',win:['The raiders break and run. The convoy slips through.','Clean flying: the lane is clear.'],lose:['Your wing is gone. The convoy scatters.','The Armada owns the lane today.'],draw:'Both wings are spent. The lane stays quiet.'},
-  turn:{plan:['Round {r}: plan','Choose a move for each of your ships.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
+  turn:{plan:['Round {r}: plan your move','Tap your ship, pick a move, then tap Fly.'],mine:'Your turn',rival:'Rival’s turn',combat:'Combat'}};
 
 // coached first game (free play): the guide speaks the first time a rule matters. rule:true = counted in TUTORIAL-COVERAGE.md and listed on the end card if it never came up
-LORE.coachIntro={title:'Your move, pilot',text:'From here you fly free: every legal move is yours. Brecken speaks up when a rule matters.',btn:'Fly free'};
+LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One rule at a time.',btn:'Start'};
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
-LORE.laterShort=['Barrel roll and boost: extra sideways moves.','Bumping a ship skips your action.','Flying off the mat destroys your ship.'];
+LORE.laterShort=['After you move, tap Roll or Boost to slide.','Bump into a ship and you skip your action.','Fly off the mat and your ship is lost.'];
 LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
+LORE.drillNext='One more minute: a flight drill teaches barrel roll, boost, the mat edge and bumping.';
+LORE.drillEnd={t:'Drill done. You know every rule.',s:'Roll, boost, mind the edge, and don’t ram. Tied pilot skill: fewer squad points acts first.'};
 LORE.coach={
-  goal:{rule:1,t:'Brecken: Your goal',s:'Slate is raiding our convoy. Destroy his ship; yours is at the bottom.'},
-  fly0:{t:'Brecken: Free flight',s:'Your move is set. Plan, then reveal the dials with Fly. I will call out rules as they matter.'},
-  fly:{rule:1,t:'Brecken: Dials are secret',s:'Neither of you can peek. Reveal the dials with Fly and the ships move together.'},
-  marks:{rule:1,t:'Brecken: Red and rocks',s:'Red moves strain the engines: a stress token. A ! marks paths through a rock: it hurts and skips your action.'},
-  order:{rule:1,t:'Brecken: Who goes first',s:'Lowest pilot skill moves first: Slate (3), then you (8). The highest shoots first, so you do.'},
-  action:{rule:1,t:'Brecken: One action',s:'After flying, every ship gets one action. Focus sharpens your next shot.'},
-  lock:{rule:1,t:'Brecken: Target lock',s:'A lock lets you reroll attack dice against that enemy. Take it if you want a surer shot.'},
-  shoot:{rule:1,t:'Brecken: In your sights',s:'Pick a glowing enemy in your arc. Range 1 adds an attack die; range 3 adds a defence die.'},
-  dice:{rule:1,t:'Brecken: Read the dice',s:'Hits and crits hurt him. A focus face does nothing, unless you spend your focus token.'},
-  usefocus:{rule:1,t:'Brecken: Spend focus',s:'Your focus token turns a focus face into a hit. Spend it before you roll.'},
-  res1:{rule:1,t:'Brecken: Hits minus evades',s:'Each evade cancels one hit. Defence dice and evade tokens are how a ship dodges.'},
-  defend:{rule:1,t:'Brecken: Pilot power',s:'Kael can turn one focus result into an evade. Use it when you defend.'},
-  res2:{rule:1,t:'Brecken: Shields first',s:'Damage strips shields before hull. Crits are dealt face up with lasting effects.'},
-  goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Stay in his arc and keep the pressure on.'},
-  gothit:{t:'Slate: Got you!',s:'Ouch. Stay out of his front arc. Or take an evade token first.'},
-  stress:{rule:1,t:'Brecken: Stress',s:'A stressed ship can not act. No red moves until it flies green.',who:'brecken'},
-  endround:{rule:1,t:'Brecken: Round end',s:'At the end of each round unused focus and evade tokens vanish. Target locks stay.'}};
+  goal:{rule:1,t:'Brecken: Your goal',s:'Destroy Slate’s ship before he destroys yours.'},
+  fly0:{t:'Brecken: Your first battle',s:'Tap the glowing thing each time. I explain as we go.'},
+  fly:{rule:1,act:1,t:'Brecken: Secret dials',s:'Both dials stay hidden. Tap Fly to reveal them.'},
+  order:{rule:1,t:'Brecken: Who moves first',s:'Lowest pilot skill moves first. Slate is 3, you are 8.'},
+  action:{rule:1,act:1,t:'Brecken: One action',s:'After moving, take one action. Focus first.'},
+  moves:{rule:1,t:'Brecken: Boost and roll',s:'Some ships can also boost or barrel roll. The drill tries both.'},
+  shoot:{rule:1,act:1,t:'Brecken: Arc, range, order',s:'Highest skill fires first. Shoot an enemy in your arc, range 1-3.'},
+  dice:{rule:1,t:'Brecken: Read the dice',s:'Hit and crit hurt. Focus needs a token. Blank misses.'},
+  usefocus:{rule:1,act:1,t:'Brecken: Spend focus',s:'Spend your focus token: focus faces become hits.'},
+  res1:{rule:1,t:'Brecken: Range 3 and evades',s:'His evades cancelled your hits. At range 3 he rolls one more.'},
+  dodge:{t:'Brecken: You dodged',s:'Your evades cancelled his hits. At range 3 you roll one more.'},
+  defend:{rule:1,t:'Brecken: Pilot power',s:'Kael turns one focus result into an evade.'},
+  res2:{rule:1,t:'Brecken: Shields first',s:'Damage takes shields first, then hull. Crits are face-up cards.'},
+  goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Keep him in your arc.'},
+  gothit:{t:'Slate: Got you!',s:'Stay out of my front arc next time.'},
+  stress:{rule:1,t:'Brecken: Stress',s:'Red move means stress: no action, no red until green.'},
+  marks:{rule:1,act:1,t:'Brecken: Rocks',s:'A path through a rock hurts and skips your action.'},
+  lock:{rule:1,act:1,t:'Brecken: Target lock',s:'Lock on: you may reroll attack dice against him.'},
+  endround:{rule:1,t:'Brecken: Round end',s:'Unused focus and evade tokens vanish. Locks stay.'},
+  drill0:{t:'Brecken: Flight drill',s:'Three quick moves in a captured interceptor. Same rules.'},
+  roll:{rule:1,act:1,t:'Brecken: Barrel roll',s:'Slide sideways, same facing. Tap Roll, then a spot.'},
+  boost:{rule:1,act:1,t:'Brecken: Boost',s:'A free extra straight 1 or bank 1. Tap Boost.'},
+  edge:{rule:1,act:1,t:'Brecken: The mat edge',s:'A move ending off the mat loses the ship. Tap the cross.'},
+  edgeno:{t:'Brecken: Ship lost',s:'See? That ship would be gone. Fly straight 2 instead.'},
+  bump:{rule:1,t:'Brecken: Bump',s:'You hit his base: you stop short and skip your action.'}};
 // the speaker's portrait on a tutorial bubble: the title starts with the speaker's name
 (function(){if(typeof MutationObserver==='undefined'||!document.body)return;
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1)continue;const b=n.matches&&n.matches('.gxt-bub')?n:(n.querySelector&&n.querySelector('.gxt-bub'));if(!b)continue;
@@ -7266,7 +7524,8 @@ LORE.coach={
 //  target lock and the torpedo (range 2-3, spends the lock) ............. lock, locktgt, torp
 //  end of round: unused focus and evade tokens vanish, locks stay ........ res2
 //  how a battle ends: the last enemy ship is destroyed ................... win
-// Not taught by doing (explained by the rules cards and the bulb): barrel roll and boost moves, bumping, flying off the mat, initiative ties.
+//  barrel roll, boost, the mat edge, bumping: the flight drill after the duel (three staged rounds) .. roll, boost, edge, bump
+// Not taught by doing (explained by the rules cards and the bulb): initiative ties.
 const TUT_GAME='nebula-aces';
 const TUT={on:false,dice:[],seed:20261008};
 const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&TUT.on&&!!G&&!!G.tut;
@@ -7284,15 +7543,28 @@ const TUT_DICE=()=>[{k:'a',f:['hit','focus','blank']},{k:'d',f:['blank','blank',
 const TUT_REROLL=[3,0];
 // Kael's moves: round 1 straight 2, round 2 straight 1 (both green)
 const TUT_ME=[{s:2,t:'S'},{s:1,t:'S'}];
+// Kael's actions in the scripted lesson: round 1 focus (so the focus rule comes up), round 2 target lock (lock + reroll)
+const TUT_ACT=['F','TL'];
+// the scripted lesson: only the taught move and action are accepted, everything else stays a real tap on the real board
+const tutStaged=()=>!!(TUT.on&&!TUT.free&&G&&G.tut&&G.round<=(TUT.drill?3:2));
+const tutScripted=()=>!!(TUT.on&&!TUT.free&&G&&G.tut);
+function tutAllow(ds){if(!tutStaged()||!TUT.coach)return true;const s=ship('s1');if(!s)return true;
+  if(ds.bfm!=null&&NCH.q.some(x=>LORE.coach[x].act)){coachHide();return false}   // a line that explains this tap is still waiting: show it first
+  if(ds.bfm!=null){if(drillEdge()){if(+ds.bfm===drillOffIx()){TUT.edgeSeen=true;TUT.did.edge=1;coachSay('edgeno');BF.key='';setTimeout(render,0)}return false}return +ds.bfm===dialIx(s,tutMove())}
+  if(ds.bfa!=null)return ds.bfa===tutAct();
+  return true}
+{const o=recAct;recAct=function(s){if(tutStaged()&&s&&s.side===0)return tutAct();return o.apply(this,arguments)}}
 const dialIx=(s,m)=>dialOf(s).findIndex(x=>x.s===m.s&&x.t===m.t&&(m.d==null||x.d===m.d));
-const tutRound=()=>Math.max(1,Math.min(2,G?G.round:1));
+const tutRound=()=>Math.max(1,Math.min(TUT.drill?3:2,G?G.round:1));
+const tutMove=()=>(TUT.drill?DRILL_ME:TUT_ME)[tutRound()-1];
+const tutAct=()=>(TUT.drill?DRILL_ACT:TUT_ACT)[tutRound()-1];
 {const o=rollN;rollN=function(faces,n){if(TUT.on&&!TUT.free&&G&&G.tut&&TUT.dice.length){const k=faces===ATK_FACES?'a':faces===DEF_FACES?'d':'';
     if(k&&TUT.dice[0].k===k){const q=TUT.dice.shift().f.slice(0,n);while(q.length<n)q.push(faces[rnd(8)]);return q}}
   return o.apply(this,arguments)}}
 {const o=aiPlan;aiPlan=function(k){if(!(G&&G.tut&&!TUT.free&&k===1))return o.apply(this,arguments);
-    for(const s of alive().filter(x=>x.side===1)){const i=dialIx(s,TUT_FOE[tutRound()-1].m);if(i>=0)s.dial=i;else return o.apply(this,arguments)}}}
-{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&!TUT.free&&s.side===1))return o.apply(this,arguments);const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
-{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&!TUT.free&&s.side===0){const i=dialIx(s,TUT_ME[tutRound()-1]);if(i>=0)return i}return o.apply(this,arguments)}}
+    for(const s of alive().filter(x=>x.side===1)){const i=dialIx(s,TUT.drill?DRILL_FOE:TUT_FOE[tutRound()-1].m);if(i>=0)s.dial=i;else return o.apply(this,arguments)}}}
+{const o=aiAction;aiAction=function(s,acts){if(!(G&&G.tut&&!TUT.free&&s.side===1))return o.apply(this,arguments);if(TUT.drill)return ['skip'];const a=TUT_FOE[tutRound()-1].act;acts=acts||actionsFor(s);return a&&acts.some(x=>x.a===a)?[a]:['skip']}}
+{const o=suggestDial;suggestDial=function(s){if(G&&G.tut&&!TUT.free&&s.side===0){const i=dialIx(s,tutMove());if(i>=0)return i}return o.apply(this,arguments)}}
 {const o=rnd;rnd=function(n){if(TUT.on&&G&&G.tut&&TUT.force&&TUT.force.length&&n===8)return TUT.force.shift();return o.apply(this,arguments)}}
 {const o=applyAtkMod;applyAtkMod=function(k,sel){if(TUT.on&&!TUT.free&&G&&G.tut&&k==='tl'&&sel&&sel.length)TUT.force=TUT_REROLL.slice(0,sel.length);return o.apply(this,arguments)}}
 {const o=save;save=function(){if(TUT.on&&G&&G.tut)return;return o.apply(this,arguments)}}
@@ -7302,7 +7574,7 @@ function tutStage(){
   window.TUTPH=true;try{PHN.apply()}catch(e){}   // every step points at the board-first layer: desktop and tablets get it for the lesson
   try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
-  TUT.on=true;TUT.free=true;TUT.dice=[];coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
+  TUT.on=true;TUT.free=false;TUT.drill=false;TUT.did={};TUT.dice=TUT_DICE();TUT.force=null;coachReset();try{BF.seenBrief=TUT.seed;PHN.briefSeen=TUT.seed}catch(e){}
   Object.assign(UI,{mode:'solo',camp:null,info:false,stats:false,rules:false,build:null,draft:{},pass:null,sel:null,sugCache:null,autoSetup:false,advOpen:false,hints:false,hold:null,holdK:[],paused:false,sumSeen:0});
   newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'easy'}],squads:TUT_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed});
   G.tut=1;G.rocks.push(Object.assign({},TUT_ROCK,{k:TUT_ROCK.k.slice()}));
@@ -7311,6 +7583,34 @@ function tutStage(){
   Object.assign(me,TUT_START.me,{h:Math.PI/2});Object.assign(foe,TUT_START.foe,{h:-Math.PI/2});
   resetGuide();flowReset();UI.sumSeen=0;try{BF.seenBrief=G.seed;PHN.briefSeen=G.seed}catch(e){}
   UI.wonSnd=G.seed;try{BF.hideBan()}catch(e){}camView('tilt');render()}
+// ---------------------------------------------------------------- the flight drill: after the duel, three staged rounds in a captured interceptor
+// round 1 barrel roll, round 2 boost, round 3 the mat edge (a move off the mat is tried and refused) and a bump into the parked rival
+const DRILL_SQ=[[{p:'vengsq',u:[]}],[{p:'knife',u:[]}]];
+const DRILL_START={me:{x:230,y:110,h:Math.PI/2},foe:{x:720,y:90,h:Math.PI/2}};
+const DRILL_R3={me:{x:44,y:360,h:Math.PI/2},foe:{x:44,y:490,h:Math.PI/2}};   // you hug the left edge, the rival sits one straight 2 ahead
+const DRILL_ME=[{s:2,t:'S'},{s:2,t:'S'},{s:2,t:'S'}];
+const DRILL_ACT=['BR','BO',null];
+const DRILL_FOE={s:2,t:'S'};
+const drillOffIx=()=>{const s=ship('s1');if(!s)return -1;const d=dialOf(s);let best=-1;d.forEach((m,i)=>{if(best<0&&m.t!=='S'&&exColor(s,m).c!=='r'&&offBoard(finalPose(s,B(s),m),B(s)))best=i});return best};
+const drillEdge=()=>!!(TUT.drill&&G&&G.round===3&&G.phase==='plan'&&!TUT.edgeSeen&&drillOffIx()>=0);
+function drillStart(){const d=document.getElementById('na-coachend');if(d)d.remove();
+  TUT.drill=true;TUT.free=false;TUT.dice=[];TUT.force=null;TUT.r3=false;TUT.edgeSeen=false;TUT.endT=0;
+  newGame({fac:[0,1],players:[{human:true},{human:false,lvl:'easy'}],squads:DRILL_SQ.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))),ex:{noRocks:true},seed:TUT.seed+1});
+  G.tut=1;
+  while(G.phase==='ask'&&G.q&&G.q.key==='deploy'&&G.round===0){const q=G.q;resolveAsk(q.opts[Math.floor(q.opts.length/2)].k);if(G.q&&G.q.kid===q.kid)break}
+  const me=G.ships.find(s=>s.side===0),foe=G.ships.find(s=>s.side===1);Object.assign(me,DRILL_START.me);Object.assign(foe,DRILL_START.foe);
+  resetGuide();flowReset();UI.sumSeen=0;UI.draft={};UI.hold=null;UI.holdK=[];try{BF.seenBrief=G.seed;PHN.briefSeen=G.seed;BF.key='';BF.fkey='';BF.sel=null;BF.sub=null;BF.hideBan()}catch(e){}
+  UI.wonSnd=G.seed;NCH.on=true;NCH.finished=false;TUT.coach=true;camView('tilt');render();coachSay('drill0')}
+// round 3 starts: both ships glide to the edge lesson
+function drillR3(){if(TUT.r3)return;TUT.r3=true;for(const s of G.ships){const to=DRILL_R3[s.side===0?'me':'foe'];const from={x:s.x,y:s.y,h:s.h};Object.assign(s,to);try{fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:500})}catch(e){}}BF.key='';BF.fkey='';setTimeout(render,0)}
+function drillEnd(){if(document.getElementById('na-coachend'))return;NCH.on=false;NCH.finished=true;TUT.coach=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;
+  const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+LORE.drillEnd.t+'</div><div class="gxt-ex">'+LORE.drillEnd.s+'</div>'
+    +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
+  document.body.appendChild(d)}
+// during the drill the off-mat moves carry a red cross, and the edge step points at one of them
+function tutPlanHook(){try{if(TUT.drill&&G&&G.tut&&BF.sel){const s=ship(BF.sel);document.querySelectorAll('.bfm[data-bfm]').forEach(el=>{const m=dialOf(s)[+el.dataset.bfm];if(m&&offBoard(finalPose(s,B(s),m),B(s))&&!el.classList.contains('off')){el.classList.add('off','danger');el.insertAdjacentHTML('beforeend','<em class="rk">\u2715</em>');el.setAttribute('aria-label',(el.getAttribute('aria-label')||'')+': ends off the mat, ship lost')}});
+    if(drillEdge())return document.querySelector(`.bfm[data-bfm="${drillOffIx()}"]`)}}catch(e){console.error(e)}return null}
 // ---------------------------------------------------------------- where each step points
 const tq=sel=>()=>hv(sel);
 const tqAll=sel=>()=>[...document.querySelectorAll(sel)].filter(e=>!e.closest('[hidden],[data-help]')&&e.getBoundingClientRect().width>2);
@@ -7322,9 +7622,9 @@ const tutMyTurn=ph=>!!(G&&BF.on&&G.phase===ph&&G.cur==='s1'&&humanTurn()&&tutIdl
 const tutHoldRes=who=>!!(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&UI.hold.R[who]==='s1');
 const tutIx=n=>{const s=ship('s1');return s?dialIx(s,TUT_ME[n]):-1};
 function tutSteps(){return tutStory([
- {id:'goal0',title:'How you win',say:'Destroy Slate’s ship before he gets yours.\n• Pick a secret move for your ship.\n• Fly, then shoot enemies in front of you.\n• Hits break shields first, then the hull.',wait:null,target:shipRect('s2'),side:'bottom',ready:()=>tutPlan()&&!!shipRect('s2')()},
+ {id:'goal0',title:'How you win',say:'Destroy Slate’s ship before he destroys yours.',wait:null,target:shipRect('s2'),side:'bottom',ready:()=>tutPlan()&&!!shipRect('s2')()},
  {id:'ship',title:'Plan in secret',say:'Touch your ship to see where it can fly.',target:tq('.bfring.need'),wait:{type:'tap',match:a=>a.what==='ship'&&a.id==='s1'},ready:()=>tutPlan()&&!!hv('.bfring.need')},
- {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv('.bfm:not(.set)'),also:tqAll('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
+ {id:'dial',title:'Pick a maneuver',say:'Any line you like. Green is easy, red strains the engines.',target:()=>hv(`.bfm[data-bfm="${tutIx(0)}"]`)||hv('.bfm:not(.set)'),wait:{type:'tap',match:a=>a.what==='dial'&&a.i===tutIx(0)},ready:()=>BF.sel==='s1'&&tutIdle()&&!!hv('.bfm:not(.set)')}
 ])}
 function tutStory(steps){for(const st of steps){const L=LORE.tut[st.id];if(L){st.title=L.t;st.say=L.s}}return steps}
 // ---------------------------------------------------------------- the kit hooks
@@ -7345,46 +7645,54 @@ function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;c
 const NCH={shown:{},q:[],cur:null,on:false,o:null,first:null,tm:0};
 // for external checks (qa-bot coached mode): running = the free-play part is on, explained = rule ids spoken so far, done = the result card was shown
 window.GXCOACH={get running(){return !!NCH.on},get explained(){return Object.keys(NCH.shown)},get done(){return !!NCH.finished},get rules(){return Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule)}};
-function coachReset(){NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
-function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
-function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;NCH.q.push(id);coachPump()}
-function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;let e=document.getElementById('na-coach');
+function coachReset(){NCH.log=[];NCH.fs={};NCH.finished=false;NCH.shown={};NCH.q=[];NCH.cur=null;NCH.on=false;clearTimeout(NCH.tm);document.querySelectorAll('#na-coach,#na-coachend').forEach(e=>e.remove())}
+function coachStart(o,first){NCH.on=true;NCH.o=o;NCH.first=first;TUT.coach=true;try{BF.key='';BF.fkey=''}catch(e){}try{GXT.markDone(TUT_GAME)}catch(e){}NCH.shown.goal=1;coachSay('fly0');render()}
+function coachSay(id){if(!NCH.on||NCH.shown[id]||!LORE.coach[id])return;NCH.shown[id]=1;if(LORE.coach[id].act&&tutScripted()){let k=0;NCH.q.forEach((x,i)=>{if(LORE.coach[x].rule)k=i+1});NCH.q.splice(k,0,id)}else NCH.q.push(id);   // a line that asks for a tap goes ahead of queued taunts, after queued rules
+  // the scripted lesson keeps pace with the board: a rule line replaces a taunt at once, or any line that has been up a moment
+  if(NCH.cur&&tutScripted()&&LORE.coach[id].rule&&(!LORE.coach[NCH.cur].rule||LORE.coach[id].act||performance.now()-(NCH.curAt||0)>1100)){coachHide();if(LORE.coach[id].act)coachPump();return}coachPump()}
+function coachPump(){if(NCH.cur||!NCH.q.length)return;const id=NCH.q.shift(),L=LORE.coach[id];NCH.cur=id;(NCH.log=NCH.log||[]).push(id);NCH.curAt=performance.now();let e=document.getElementById('na-coach');
   if(!e){e=document.createElement('div');e.id='na-coach';e.setAttribute('data-help','');e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e)}
-  e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button>';e.hidden=false;
+  e.className=(L.who==='slate'?'na-slate':'');e.innerHTML='<i class="na-por"></i><div class="na-ct"><b>'+L.t+'</b><span>'+L.s+'</span></div><div class="na-rt"><button type="button" class="na-cx" data-na="dismiss" aria-label="Dismiss">\u2715</button><button type="button" class="na-lv" data-na="leave">Leave lesson</button></div>';e.hidden=false;if(window.BF&&BF.placeCoach)BF.placeCoach(e);
   clearTimeout(NCH.tm);NCH.tm=setTimeout(coachHide,Math.max(5200,L.s.length*70,4000+(L.t+' '+L.s).split(/\s+/).length*100))}
-function coachHide(){clearTimeout(NCH.tm);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
+function coachHide(){clearTimeout(NCH.tm);if(window.BF)clearTimeout(BF.coachT);NCH.cur=null;const e=document.getElementById('na-coach');if(e)e.hidden=true;setTimeout(coachPump,350)}
 // rules that came up are explained at that moment; this runs after every render
-function coachTick(){if(!NCH.on||!G||!G.tut)return;const me=G.ships.find(x=>x.side===0);if(!me)return;
-  if(G.winner){coachEnd();return}
+function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NCH.q.length&&performance.now()-(NCH.curAt||0)>1100)coachHide();const me=G.ships.find(x=>x.side===0);if(!me)return;
+  if(G.winner&&!TUT.drill){coachEnd();return}
   const ht=humanTurn(),ph=G.phase;
-  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2)coachSay('marks')}
+  if(ph==='plan'&&planSide()>=0){if(me.alive&&UI.draft&&UI.draft[me.id]!=null)coachSay('fly');if(BF.sel&&G.round>=2&&document.querySelector('.bfm'))coachSay('marks')}
   if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
-  if(ph==='action'&&ht){coachSay('action');try{if(actionsFor(me).some(a=>a.a==='TL'))coachSay('lock')}catch(e){}}
+  const idle=!(BF.flyUntil>performance.now())&&!BF.wave;
+  if(ph==='action'&&ht&&idle&&document.querySelector('.bfact')){coachSay('action');coachSay('moves');if(G.round>=2)coachSay('lock')}
   if(ph==='target'&&ht)coachSay('shoot');
   if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
   if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
-  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'res1');if(R.dmg)coachSay('res2')}
+  if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&!(G.atk&&G.atk.a!==UI.hold.R.a)){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'dodge');if(R.dmg)coachSay('res2')}
     if(R.dmg)coachSay('res2')}
   if(G.ships.some(x=>x.alive&&x.stress>0))coachSay('stress');
-  if(G.round>=2)coachSay('endround')}
+  if(G.round>=2&&!TUT.drill)coachSay('endround');
+  if(TUT.drill){if(G.round===3&&ph==='plan')drillR3();
+    if(ph==='action'&&ht&&idle&&G.cur===me.id){if(G.round===1)coachSay('roll');if(G.round===2)coachSay('boost')}
+    if(G.round===3&&ph==='plan'&&BF.sel&&drillEdge())coachSay('edge');
+    if(G.log.some(l=>/barrel rolls/.test(l.t)&&l.s===0))TUT.did.roll=1;if(G.log.some(l=>/ boosts\./.test(l.t)&&l.s===0))TUT.did.boost=1;
+    if(G.round>=3&&G.log.some(l=>l.s===0&&/ bumps into /.test(l.t))){TUT.did.bump=1;coachSay('bump');if(!TUT.endT)TUT.endT=setTimeout(drillEnd,5200)}}}
 {const o=render;render=function(){const r=o.apply(this,arguments);try{coachTick()}catch(e){console.error(e)}return r}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-na]');if(!b)return;const k=b.dataset.na;
   if(k==='dismiss')coachHide();
+  else if(k==='drill')drillStart();
   else if(k==='leave'){tutLeave();lsPlayed();UI.info=true;render()}
   else if(k==='play'||k==='story'||k==='chapter'){const o=NCH.first;coachReset();tutLeave();lsPlayed();
     if(k==='chapter'&&o){GXC.play(o.id)}else if(k==='story'&&typeof GXC!=='undefined'){UI.info=true;render();GXC.open()}else{try{BF.seenBrief=null;PHN.briefSeen=null}catch(e){}startGame('solo')}}},true);
-// the end: the real numbers walked through, then what did not come up
+// the duel's end: the real numbers walked through, then the flight drill
 function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NCH.on=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;NCH.finished=true;
   const mine=G.ships.filter(x=>x.side===0),foe=G.ships.filter(x=>x.side===1),won=G.winner==='P1';
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
-  const later=LORE.laterAlways.concat(Object.keys(LORE.coach).filter(k=>LORE.coach[k].rule&&!NCH.shown[k]).map(k=>LORE.coach[k].t.replace(/^[A-Z][a-z]+: /,'')+'. '+LORE.coach[k].s));
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
-    +'<div class="gxt-ex"><b>Coming up later</b><ul class="na-later">'+LORE.laterShort.map(t=>'<li>'+t+'</li>').join('')+'</ul>The rest is in Rules.</div>'
-    +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
+    +'<div class="gxt-ex">'+LORE.drillNext+'</div>'
+    +'<div class="gxt-eb"><button type="button" class="gxt-b pri" data-na="drill">Flight drill</button></div></div>';
   document.body.appendChild(d);TUT.coach=false}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
-function tutLeave(){TUT.on=false;TUT.free=false;TUT.coach=false;try{coachReset()}catch(e){}if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
+function tutLeave(){TUT.on=false;TUT.free=false;TUT.coach=false;TUT.drill=false;clearTimeout(TUT.endT);TUT.endT=0;try{coachReset()}catch(e){}if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
   UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}
 function lsPlayed(){try{localStorage.setItem('na_played','1')}catch(e){}}
 // first-time players who tap Launch are offered the lesson first
