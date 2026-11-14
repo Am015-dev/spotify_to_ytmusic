@@ -7,7 +7,7 @@ const RULES = ['goal', 'g-play', 'g-play2', 'g-free', 'g-free2', 'g-plane', 'g-p
   'g-item', 'g-item2', 'g-art', 'g-art2', 'g-res', 'g-res2', 'g-note', 'g-note2', 'g-asst', 'g-asst2', 'g-asst3', 'g-temple', 'g-temple2', 'g-tbon', 'g-temple3', 'g-temple4', 'g-pass', 'score1', 'score2', 'score3'];
 (async () => {
   const S = await serve(), b = await chromium.launch(); let fails = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) fails++; };
-  for (const [w, h] of [[390, 844], [375, 667]]) {
+  for (const [w, h] of (process.env.SIZES ? process.env.SIZES.split(",").map(s => s.split("x").map(Number)) : [[390, 844], [375, 667]])) {   // SIZES=375x667,375x553
     const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }); const p = await ctx.newPage(); let errs = 0;
     p.on('pageerror', e => { errs++; console.log('  err', String(e).slice(0, 160)); });
     const tap = (x, y) => p.touchscreen.tap(x, y);
