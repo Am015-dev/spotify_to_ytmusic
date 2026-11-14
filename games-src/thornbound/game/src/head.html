@@ -548,7 +548,7 @@ html.desk .race-c.four .rv-t b{display:block}
 /* short portrait phones (375x553 etc.): tighter strips so the board keeps >=55% of the screen */
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #rivals{padding-top:2px;padding-bottom:calc(2px + var(--sab))}html:not(.bf-w) #act{min-height:44px;padding:0 8px}
 html:not(.bf-w) body #tbturn{height:40px;padding:2px 10px}html:not(.bf-w) body #tbturn .tbt-line{font-size:14px;line-height:1.16;max-height:34px}html:not(.bf-w) body #tbturn .tbt-chip{padding:3px 7px;font-size:14px}
-html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw .hand>.hc{top:-3px}
+html:not(.bf-w) #handw{height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw:has(.roadrow){height:calc(var(--ch,72px) + 2px)}html:not(.bf-w) #handw .roadrow .kcb{max-height:100%;overflow:hidden;justify-content:flex-start}html:not(.bf-w) #handw .roadrow .kcb .kn{-webkit-line-clamp:1;flex:0 0 auto}html:not(.bf-w) #handw .hand>.hc{top:-3px}
 html:not(.bf-w) #act:has(.autc){flex-wrap:nowrap;padding:0 6px}html:not(.bf-w) #act .autc{flex-wrap:nowrap;gap:4px}html:not(.bf-w) #act .autc .btn{flex:1 1 0;min-width:0;min-height:44px;padding:2px 6px;font-size:14px;white-space:normal;line-height:1.1}}
 /* short portrait phones: the pile chips stand in a column right of the map, so the map keeps the full board height (>=80% of the width) */
 @media (max-height:620px) and (orientation:portrait){html:not(.bf-w) #mapwrap{padding-bottom:0;justify-content:flex-start;padding-left:2px}
