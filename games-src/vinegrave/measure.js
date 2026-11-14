@@ -18,7 +18,7 @@ const SAMPLE = () => {
   return { dbg, tg, hp, inf, q: !!(window.G && G.q), tut: !!(window.UI && UI.mode === 'tutorial') };
 };
 (async () => {
-  const S = await serve(), b = await chromium.launch(); let wins = 0; const rows = [], allMin = {}, hpMax = [], infSeen = {}; let hpOver = 0, samples = 0;
+  const S = await serve(), b = await chromium.launch(); let wins = 0; const rows = [], allMin = {}, hpMax = [], infSeen = {}; let hpOver = 0, samples = 0, qMax = 0;
   for (let g = 0; g < N; g++) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: true, isMobile: true });
     await ctx.addInitScript(() => { try { localStorage.setItem('vinegrave-prefs', JSON.stringify({ played: true })); localStorage.setItem('gxt-vinegrave', JSON.stringify({ done: true })); } catch (e) { } });
@@ -30,7 +30,7 @@ const SAMPLE = () => {
     let done = false, t0 = Date.now(), prevInf = {};
     const sampler = (async () => { while (!done) { await p.waitForTimeout(1000); if (done) break; const s = await p.evaluate(SAMPLE).catch(() => null); if (!s) continue; samples++;
       s.tg.forEach(t => { const k = t.s, m = Math.min(t.w, t.h); if (!(k in allMin) || m < allMin[k].m) allMin[k] = { m, w: t.w, h: t.h }; });
-       hpMax.push(s.hp.length); if (s.hp.length > 1 && !s.tut && !s.q) { hpOver++; if (hpOver < 6) console.log('  >1 helper:', s.hp.join(' | ')); }
+       if (!s.q && !s.tut) hpMax.push(s.hp.length); else qMax = Math.max(qMax, s.hp.length); if (s.hp.length > 1 && !s.tut && !s.q) { hpOver++; if (hpOver < 6) console.log('  >1 helper:', s.hp.join(' | ')); }
       s.inf.forEach(k => { infSeen[k] = (infSeen[k] || 0) + 1; }); } })();
     for (let k = 0; k < 700 && Date.now() - t0 < 300000; k++) {
       await p.waitForFunction(() => (window.G && myTurn()) || G.phase === 'over' || !document.querySelector('#fx').hidden, null, { timeout: 60000 }).catch(() => { });
@@ -52,6 +52,6 @@ const SAMPLE = () => {
   }
   const small = Object.entries(allMin).sort((a, b) => a[1].m - b[1].m);
   console.log('SMALLEST TAP TARGETS (min side px):'); small.slice(0, 12).forEach(([k, v]) => console.log('  ', v.m, v.w + 'x' + v.h, k));
-  console.log(`MIN TAP ${small.length ? small[0][1].m : '?'} px; samples ${samples}; max helpers at once ${Math.max(0, ...hpMax)}; samples with >1 helper ${hpOver}; infinite animations seen: ${JSON.stringify(infSeen)}`);
+  console.log(`MIN TAP ${small.length ? small[0][1].m : '?'} px; samples ${samples}; max helpers at once in normal play ${Math.max(0, ...hpMax)} (while a chooser is open every legal choice lights: up to ${qMax}); samples with >1 helper ${hpOver}; infinite animations seen: ${JSON.stringify(infSeen)}`);
   console.log(`SUMMARY ${W}x${H}: won ${wins}/${N}`); await b.close(); S.close();
 })();
