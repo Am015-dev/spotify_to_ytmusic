@@ -235,7 +235,7 @@ SEL.offering=(S,seat,q)=>q.items.map(it=>it.v).filter(id=>keepValue(S,seat,id)<1
 const LV={easy:{noise:3,cunning:0.2,rnd:0.5},normal:{noise:0.6,cunning:1,rnd:0,sup:1.5,jb:0,gb:0,bidT:0,hb:1,kcw:1,oaths:1},hard:{noise:0.3,cunning:1,rnd:0,sup:1.5,jb:0,gb:0,bidT:0,hb:1,kcw:1,oaths:1}};
 for(const k of ['easy']){LV[k].sup=1.5;LV[k].jb=0;LV[k].gb=0;LV[k].bidT=0;LV[k].hb=1;LV[k].kcw=1}
 // Easy (owner, Nov 2026): sensible play, weaker judgement; 'newcomer' models a careful first-time player for the balance test (never offered in the menu)
-Object.assign(LV.easy,{noise:3.5,cunning:0.3,rnd:0,lead:3,ease:3});
+Object.assign(LV.easy,{noise:5,cunning:0,rnd:0,lead:1,ease:3});   // F14: gentler default rival (a newcomer who follows the suggestions wins most games; Normal and Hard unchanged)
 LV.newcomer=Object.assign({},LV.normal,{noise:1.6,cunning:0.6});
 if(typeof globalThis!=='undefined'&&globalThis.TB_LV)for(const k in globalThis.TB_LV)Object.assign(LV[k]||(LV[k]={}),globalThis.TB_LV[k]);
 function policy(S,seat,lv,rng){const q=S.q;const mv=TB.moves(S,seat);if(mv.length<=1)return mv[0];

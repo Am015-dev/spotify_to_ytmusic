@@ -1,4 +1,6 @@
 // Glow-follow: a newcomer who follows the suggested glow by touch; prints the final score. (Derived from newcomer-wait.js.)
+// F14: it taps the real suggestion first (the button carrying the suggested move, the .rg card, the .rec spot / location, the .rrec region), and only
+// then any glow; before, it put cards and Supporters in the FIRST glowing region and took the first option of every follow-up choice.
 // Newcomer wait check: a default game from the title (Play -> Start, no settings touched) played by touch on a phone, through the real UI only.
 // Each poll it taps what a newcomer would tap (a coach bubble's button, the suggested glowing thing, any glowing thing, the main button), never a forced move.
 // Measures the longest stretch where NOTHING is tappable and NOTHING moves on screen (a still, dead screen). Fails if any such stretch is over 4 s, or on a page error.
@@ -21,7 +23,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
       const s=await p.evaluate(()=>{const vis=e=>{const r=e.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>innerHeight)return null;const cx=Math.min(Math.max(r.left+Math.min(r.width/2,22),1),innerWidth-1),cy=r.top+r.height/2;const t=document.elementFromPoint(cx,cy);const hs=e.closest('.tb-loc')||e.closest('g.rglow')||e;if(t&&e.closest('g.rglow')&&t.closest('#mapbox'))return [cx,cy];if(!t||!(t===hs||hs.contains(t)||t.contains(hs)))return null;return [cx,cy]};
         const pick=sels=>{for(const s of sels)for(const e of document.querySelectorAll(s)){const c=vis(e);if(c)return {s,c}}return null};
         const over=!!(G&&G.over);
-        const t=pick(['.gxh-bub.on .gxh-ok','#tbgoal button','#pc [data-a=take]','#ppop [data-a=mv]','#act .autc [data-aut]','#handw .hc.glow.rg','#spots .bspot.glow','.tb-loc.glow.rec .tb-ring','.tbx-pan g.rglow rect','#handw .kcb.glow.rg','#handw .hc.glow','.tb-loc.glow .tb-ring','#handw .kcb.glow','#main [data-a=mv]','#act [data-a=mv]']);
+        const rk=UI._rec&&UI._recShown!==false?UI._rec.k:null;const esc=v=>String(v).replace(/["\\]/g,'\\$&');
+        const t=pick(['.gxh-bub.on .gxh-ok','#tbgoal button','#pc [data-a=take]'].concat(rk!=null?['#ppop [data-a=mv][data-k="'+esc(rk)+'"]','#act [data-a=mv][data-k="'+esc(rk)+'"]','#main [data-a=mv][data-k="'+esc(rk)+'"]']:[]).concat(['#ppop .rec[data-a=mv]','#ppop .rec [data-a=mv]','#ppop [data-a=mv]','#act .autc [data-aut]','#handw .hc.glow.rg','#handw .kcb.glow.rg','#spots .bspot.rec','.tb-loc.glow.rec .tb-ring','.tbx-pan g.rrec rect','#main .rec[data-a=mv]','#main .rec [data-a=mv]','#act .rec[data-a=mv]','#spots .bspot.glow','.tb-loc.glow.rec .tb-ring','.tbx-pan g.rglow rect','#handw .kcb.glow.rg','#handw .hc.glow','.tb-loc.glow .tb-ring','#handw .kcb.glow','#main [data-a=mv]','#act [data-a=mv]']));
         const h=document.body.innerHTML;let k=h.length;for(let i=0;i<h.length;i+=11)k=(k*31+h.charCodeAt(i))|0;
         return {over,t,snap:k+'|'+(UI.card&&UI.card.kind)+'|'+G.logN,st:(document.querySelector('#tbturn .tbt-line')||{}).textContent||'',card:UI.card&&(UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')),q:G.q&&G.q.kind}});
       if(s.over)break;
