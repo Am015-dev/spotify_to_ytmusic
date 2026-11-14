@@ -33,7 +33,7 @@
     var before = ev(g, o); try { E.apply(g, { t: 'build', i: cellI }); } catch (e) { return 0; }
     return Math.max(0, ev(g, o) - before);
   }
-  var SLIP = { easy: [0.6, 5], normal: [0.1, 3] };
+  var SLIP = { easy: [0.6, 5], medium: [0.42, 4], normal: [0.1, 3] };
   // FIXED1: 'hint' = the greedy one-ply pick with no slips (the star you see with Hints on); Normal searches like Hard but slips, so a star-follower wins about half
   function deep(level) { return level === 'hard' || level === 'normal'; }
   function pick(G, level, rng) {

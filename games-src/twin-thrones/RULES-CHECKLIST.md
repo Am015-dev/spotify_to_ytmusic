@@ -5,7 +5,7 @@ Every line is one numbered rule. `node logic-test.js` asserts each against the r
 
 Rulebook points checked from the web text: first player starts Age I; weaker-military player chooses the next starter; with the pawn centred the last active player (took the last card) chooses; looting costs the rival 2 / 5 coins and never below 0; 3 and 6 steps loot, 9 steps wins.
 
-**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L, the Beacon Isle and Thunder Idol wonder costs, and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).
+**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).
 
 
 ## A. Setup
@@ -159,10 +159,12 @@ Rulebook points checked from the web text: first player starts Age I; weaker-mil
 114. Lookout (the free watchtower) costs nothing, gives 1 shield and has no chain.
 115. Age I science: Herb Garden (wheel) and Weights Hall (scale) are worth 1 point; Scribe Room (quill) and Remedy Shop (mortar) cost 2 coins, are worth 0 and carry a chain.
 116. Science symbols per age: Age I and Age II each hold mortar, quill, scale, wheel; Age III holds 2 globes and 2 sundials.
-117. Age II science: Scholars' Court (quill, S1 W1 G1, 2 pts) chains from Scribe Room; Healers' House (mortar, C2 S1, 2 pts) chains from Remedy Shop; Herbarium (wheel, W1 P2, 1 pt) and Measure Hall (scale, W1 G2, 1 pt) give chains.
-118. Age III science: two sundials worth 3 (S1 W1 G2; W2 G1 P1) and two globes worth 2 (C1 G1 P1 from Herbarium; S1 P2 from Measure Hall).
-119. Every chain links the right pair of cards (17 links, none dangling).
-120. Yellow card costs: Open Bazaar 3 coins + 1 clay; Caravan Post 2 coins + glass + papyrus; Armory S2 G1; Sand Arena C1 S1 W1.
-121. Red card costs: Archery Range S1 W1 P1; Bastion S2 C1 P1; Siege Yard W3 G1; War Pavilion 8 coins (3 shields); High Fort C2 S2; City Wall S2 with no chain.
-122. Blue card costs: Hall of Many Gods C1 W1 P2; Council Hall S3 W2; Grand Fountain C2 S1 P1; Sky Obelisk and Judges' Hall have no chain.
-123. Wonder costs: Sky Tomb S3 P1; Moon Grove W1 S1 G1 P1; Grand Arena S2 W1 G1; Sunken Harbor W2 S1 C1.
+117. Beacon Isle (wonder) costs 2 papyrus, 1 stone and 1 wood (no glass).
+118. Thunder Idol (wonder) costs 2 papyrus, 1 stone, 1 wood and 1 clay (5 resources).
+119. Age II science: Scholars' Court (quill, S1 W1 G1, 2 pts) chains from Scribe Room; Healers' House (mortar, C2 S1, 2 pts) chains from Remedy Shop; Herbarium (wheel, W1 P2, 1 pt) and Measure Hall (scale, W1 G2, 1 pt) give chains.
+120. Age III science: two sundials worth 3 (S1 W1 G2; W2 G1 P1) and two globes worth 2 (C1 G1 P1 from Herbarium; S1 P2 from Measure Hall).
+121. Every chain links the right pair of cards (17 links, none dangling).
+122. Yellow card costs: Open Bazaar 3 coins + 1 clay; Caravan Post 2 coins + glass + papyrus; Armory S2 G1; Sand Arena C1 S1 W1.
+123. Red card costs: Archery Range S1 W1 P1; Bastion S2 C1 P1; Siege Yard W3 G1; War Pavilion 8 coins (3 shields); High Fort C2 S2; City Wall S2 with no chain.
+124. Blue card costs: Hall of Many Gods C1 W1 P2; Council Hall S3 W2; Grand Fountain C2 S1 P1; Sky Obelisk and Judges' Hall have no chain.
+125. Wonder costs: Sky Tomb S3 P1; Moon Grove W1 S1 G1 P1; Grand Arena S2 W1 G1; Sunken Harbor W2 S1 C1.

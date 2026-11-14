@@ -15,13 +15,24 @@ var TT_TEST = {};
   function delay() { return typeof window.AIDELAY === 'number' ? window.AIDELAY : 850; }
   function isAI(p) { return U.mode === 'watch' ? true : U.mode === 'cpu' ? p === 1 : false; }
   function name(p) { return U.mode === 'cpu' ? (p === 0 ? 'You' : (U.rivalName || (U.camp ? U.camp.opponent.name : 'Rival'))) : U.mode === 'two' ? 'Player ' + (p + 1) : (p === 0 ? 'Gold' : 'Teal') + ' (' + U.lvl + ')'; }
-  function toast(t, ms) { var e = $('toast'); e.textContent = ''; e.textContent = t; e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { e.style.display = 'none'; }, ms || 1600); }
+  // FIXED2: every line the player has to read during play is 8 words or fewer (counted like phone-check: words of 2+ letters)
+  function wc(t) { return String(t || '').replace(/[^a-zA-Z0-9'\u2019]+/g, ' ').trim().split(' ').filter(function (w) { return /[a-z][a-z]/i.test(w); }).length; }
+  function short8(t) {
+    t = String(t || ''); if (wc(t) <= 8) return t;
+    var parts = t.split(/([.!?:;,]\s+)/), out = '';
+    for (var i = 0; i < parts.length; i += 2) { var cand = out + parts[i]; if (wc(cand) > 8) break; out = cand + (parts[i + 1] || ''); }
+    out = out.replace(/[\s,;:]+$/, ''); if (out) return /[.!?]$/.test(out) ? out : out + '.';
+    var ws = t.split(/\s+/), o = []; for (var j = 0; j < ws.length && wc(o.concat(ws[j]).join(' ')) <= 8; j++) o.push(ws[j]); return o.join(' ').replace(/[,;:]$/, '') + '\u2026';
+  }
+  function toast(t, ms, help) { var e = $('toast'), b = $('banner'); if (b) b.style.display = 'none'; if (help) e.setAttribute('data-help', '1'); else e.removeAttribute('data-help');
+    if (Array.isArray(t)) { e.innerHTML = t.map(function (l) { return '<span style="display:block">' + esc(short8(l)) + '</span>'; }).join(''); } else e.textContent = help ? t : short8(t); e.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { e.style.display = 'none'; }, ms || 1600); }
 
   // ---------- turn layer: the always-visible instruction line, the turn banner, and step-by-step captions (tap to speed up)
   function whoTag(p) { return isAI(p) ? name(p) + (U.mode === 'cpu' ? "'s turn" : ' plays') : U.mode === 'two' ? name(p) + "'s turn" : 'Your turn'; }
-  function setInstr(tag, kind, text) { var e = $('instr'); if (!e) return; e.dataset.k = kind; e.querySelector('.tg').textContent = tag; e.querySelector('.tx').textContent = text; }
+  function setInstr(tag, kind, text) { var e = $('instr'); if (!e) return; if (!U.tut) text = short8(text); e.dataset.k = kind; e.querySelector('.tg').textContent = tag; e.querySelector('.tx').textContent = text; }
+  function clearToast() { var e = $('toast'); if (e) { e.style.display = 'none'; clearTimeout(toast.t); } }
   function banner(text, kind, ms) {
-    var b = $('banner'); if (!b) return; ms = ms || Math.max(560, delay() * 1.05); b.className = 'k-' + kind; b.textContent = text; b.style.display = 'block'; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = 'bann ' + ms + 'ms ease forwards';
+    var b = $('banner'); if (!b) return; var zm = $('zoom'); if ((zm && !zm.hidden) || document.querySelector('.gxt-bub, .gxh-bub')) return; var tt = $('toast'); if (tt && tt.style.display === 'block') return; /* FIXED2: one helper at a time; the instruction line already names whose turn it is */ ms = ms || Math.max(560, delay() * 1.05); b.className = 'k-' + kind; b.textContent = text; b.style.display = 'block'; b.style.animation = 'none'; void b.offsetWidth; b.style.animation = 'bann ' + ms + 'ms ease forwards';
     clearTimeout(banner.t); banner.t = setTimeout(function () { b.style.display = 'none'; }, ms + 30);
   }
   function stepMs() { return U.fast ? 70 : Math.max(60, delay() * (U.tut ? 0.5 : 0.85)); }
@@ -31,10 +42,11 @@ var TT_TEST = {};
       clearTimeout(U.nt); if (seq !== U.seq) { U.narr = false; return; }
       if (i >= items.length) { U.narr = false; U.skipNarr = null; if (done) done(); return; }
       var it = items[i++]; setInstr(it.tag, it.kind, it.text); if (it.fn) { try { it.fn(); } catch (e) { console.error(e); } }
-      U.nt = setTimeout(next, U.fast ? 70 : delay() >= 300 ? readMs(it.text) : stepMs() + (it.extra || 0));
+      U.nt = setTimeout(next, U.fast ? 70 : quick() ? (it.ms || 700) : delay() >= 300 ? readMs(it.text) : stepMs() + (it.extra || 0));
     }
     U.skipNarr = function () { U.fast = true; next(); }; next();
   }
+  function quick() { return U.mode === 'cpu' && !U.tut && delay() >= 300; } // FIXED2: rival turn about 3 s from your tap to your next move (was median 9-10 s); tap skips
   function readMs(t) { var w = String(t || '').split(/\s+/).length; return Math.min(2600, 1000 + 120 * w); } // W492: was 4-6 s per line, a round took ~30 s of waiting
   function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
   function snapState() { var G = U.G; return { av: E.available(G).map(function (c) { return c.i; }), sc: [E.score(G, 0).total, E.score(G, 1).total], coins: [G.players[0].coins, G.players[1].coins] }; }
@@ -45,7 +57,7 @@ var TT_TEST = {};
     evs.forEach(function (ev) {
       var k = kindOf(ev.p != null ? ev.p : p), tg = who(ev.p != null ? ev.p : p);
       if (ev.t === 'pick') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.w].nm, BY[ev.w].text) });
-      else if (ev.t === 'build') { var c = BY[ev.id]; it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' build ', ' builds ') + c.nm + (ev.paid ? ', paying ' + plural(ev.paid, 'coin') + '.' : ev.chain ? ' free (chain symbol).' : ' free.') + ' ' + cap(describe(c)) + '.' }); }
+      else if (ev.t === 'build') { var c = BY[ev.id]; it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' build ', ' builds ') + c.nm + (ev.paid ? ' for ' + plural(ev.paid, 'coin') + '.' : ev.chain ? ' free by chain.' : ' free.') }); }
       else if (ev.t === 'discard') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' sell ', ' sells ') + BY[ev.id].nm + ' for +' + plural(ev.n, 'coin') + '.' });
       else if (ev.t === 'wonder') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' raise ', ' raises ') + BY[ev.w].nm, BY[ev.w].text) });
       else if (ev.t === 'token') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.id].nm, BY[ev.id].text) });
@@ -60,10 +72,10 @@ var TT_TEST = {};
         if (ev.t === 'mil') it.push({ tag: 'Conflict', kind: kindOf(p), text: 'The pawn moves ' + plural(ev.n, 'step') + ' toward ' + (U.mode === 'cpu' ? (ev.p === 0 ? 'the rival city' : 'your city') : name(1 - ev.p) + "'s city") + '.' });
         if (ev.t === 'loot') it.push({ tag: 'Looted', kind: kindOf(p), text: who(ev.p) + verb(ev.p, ' lose ', ' loses ') + plural(ev.n, 'coin') + ': the pawn passed a marked space.', fn: function () { popNum('-' + ev.n + '$', $('s' + ev.p)); } });
       });
-      var pdn = G.pend[0]; if (pdn && pdn.type === 'token' && pdn.from !== 'lib') it.push({ tag: who(pdn.pl), kind: kindOf(pdn.pl), text: 'A matching pair of symbols! ' + (isAI(pdn.pl) ? who(pdn.pl) + ' picks' : 'Pick') + ' a progress token.' });
+      var pdn = G.pend[0]; if (pdn && pdn.type === 'token' && pdn.from !== 'lib') it.push({ tag: who(pdn.pl), kind: kindOf(pdn.pl), text: 'A science pair! ' + (isAI(pdn.pl) ? who(pdn.pl) + ' picks' : 'Pick') + ' a progress token.' });
       if (it.length < 4 && !evs.some(function (e) { return e.t === 'age'; })) {
         var fresh = E.available(G).filter(function (c) { return snap.av.indexOf(c.i) < 0; }).map(function (c) { return c.i; });
-        if (fresh.length) it.push({ tag: 'Pyramid', kind: 'info', text: 'Now free to take: ' + fresh.slice(0, 3).map(function (i) { return BY[G.pyr[i].id].nm; }).join(', ') + (fresh.length > 3 ? '...' : '') + '.', fn: function () { fresh.forEach(function (i) { var e = $('c' + i); if (e) { e.classList.add('newfree'); setTimeout(function () { e.classList.remove('newfree'); }, 1400); } }); } });
+        if (fresh.length) it.push({ tag: 'Pyramid', kind: 'info', text: (function () { var nm = fresh.map(function (i) { return BY[G.pyr[i].id].nm; }), o = []; for (var q = 0; q < nm.length && wc('Now free: ' + o.concat(nm[q]).join(', ')) <= 8; q++) o.push(nm[q]); return o.length ? 'Now free: ' + o.join(', ') + (o.length < nm.length ? ' and more.' : '.') : 'New cards are free to take.'; })(), fn: function () { fresh.forEach(function (i) { var e = $('c' + i); if (e) { e.classList.add('newfree'); setTimeout(function () { e.classList.remove('newfree'); }, 1400); } }); } });
       }
     }
     evs.forEach(function (ev) { if (ev.t === 'age') it.push({ tag: 'Age ' + AGE[ev.age], kind: 'info', text: 'Age ' + AGE[ev.age] + ' begins: a fresh pyramid.', }); });
@@ -71,8 +83,8 @@ var TT_TEST = {};
     if (!it.length) it.push({ tag: who(p), kind: kindOf(p), text: '...' });
     return it;
   }
-  function wtx(t) { return String(t).replace(/play again/g, 'take another turn'); }
-  function fit(a, b) { b = wtx(b); var t = a + ': ' + b; return t.split(/\s+/).length <= 12 ? t + '.' : a + '.'; }
+  function wtx(t) { return String(t).replace(/let you play again/g, 'give an extra turn').replace(/play again/g, 'extra turn'); } // FIXED2: keeps every wonder line at 8 words or fewer
+  function fit(a, b) { b = wtx(b); var t = a + ': ' + b; return wc(t) <= 8 ? t + '.' : a + '.'; }
   function cap(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
   // the rival's intention, said before it acts (the card is lifted while this shows)
   function intentLine(G, p, m) {
@@ -80,7 +92,7 @@ var TT_TEST = {};
     if (m.t === 'pick') return tg + ' eyes ' + BY[m.w].nm + '.';
     if (m.t === 'first') return tg + ' decides who starts the age.';
     if (m.t === 'token') return tg + ' studies the progress tokens.';
-    if (m.t === 'destroy') return tg + ' picks one of your cards to throw away.';
+    if (m.t === 'destroy') return tg + ' will throw away one of your cards.';
     if (m.t === 'revive') return tg + ' looks through the thrown-away cards.';
     var c = BY[G.pyr[m.i].id]; return tg + ' takes ' + c.nm + (m.t === 'build' ? ' to build it.' : m.t === 'discard' ? ' to sell it for coins.' : ' to raise a wonder.');
   }
@@ -100,7 +112,7 @@ var TT_TEST = {};
     if (c.shields) return c.shields + (c.shields > 1 ? ' shields' : ' shield');
     if (c.sci) return 'science';
     if (c.coin) return '+' + c.coin + ' coins';
-    if (c.vp) return c.vp + ' points';
+    if (c.vp) return c.vp + (c.vp === 1 ? ' point' : ' points');
     if (c.perCol || c.perWonder) return 'coins now';
     if (c.guild) return 'guild';
     return '';
@@ -109,7 +121,7 @@ var TT_TEST = {};
     var h = '';
     if (c.prod) for (var r in c.prod) h += '<span class="chip r-' + r + '" title="makes ' + r + '">' + slot('res-' + r) + '<b>+' + c.prod[r] + '</b></span>';
     if (c.choice) h += c.choice.map(function (r) { return '<span class="chip r-' + r + '" title="' + r + '"><b>+1</b></span>'; }).join('');
-    if (c.price) h += c.price.map(function (r) { return '<span class="chip r-' + r + '" title="trade ' + r + ' for 1 coin"><b>$1</b></span>'; }).join('');
+    if (c.price) h += c.price.map(function (r) { return '<span class="chip r-' + r + '" title="buy ' + r + ' for only 1 coin"><b>$1</b></span>'; }).join('');
     if (c.shields) h += '<span class="bdg sh">' + slot('icon-shield') + '<b>' + c.shields + '</b></span>';
     if (c.sci) h += '<span class="bdg sc" title="science: ' + c.sci + '">' + slot('sci-' + c.sci) + '<span class="l">' + SYM[c.sci] + '</span></span>';
     if (c.coin) h += '<span class="bdg co">' + slot('coin') + '<b>$' + c.coin + '</b></span>';
@@ -143,8 +155,8 @@ var TT_TEST = {};
     var h = ''; Object.keys(c.cost).forEach(function (k) { h += '<span class="c1">' + slot(k === 'coin' ? 'coin' : 'res-' + k) + '<b>' + c.cost[k] + '</b></span>'; });
     return h || '<span class="fr">Free</span>';
   }
-  var SUF = ['house', 'blower', 'gazers', 'ground', 'arium', 'ecary', 'nade', 'acks', 'enal', 'tain', 'ment', 'ory'];
-  function nmHy(nm) { return esc(nm).split(' ').map(function (w) { if (w.length < 8 || w.indexOf("'") >= 0) return w; for (var i = 0; i < SUF.length; i++) { var k = w.toLowerCase().lastIndexOf(SUF[i]); if (k > 2 && k + SUF[i].length === w.length) return w.slice(0, k) + '&shy;' + w.slice(k); } return w.slice(0, w.length - 4) + '&shy;' + w.slice(-4); }).join(' '); }
+  var SUF = ["owners'", "lenders'", "trates'", "cians'", "chants'", "olars'", "ilders'", 'house', 'blower', 'gazers', 'ground', 'arium', 'ecary', 'nade', 'acks', 'enal', 'tain', 'ment', 'ory', 'dens', 'ber', 'side', 'sure', 'toms'];
+  function nmHy(nm) { return esc(nm).split(' ').map(function (w) { if (w.length < 7) return w; for (var i = 0; i < SUF.length; i++) { var k = w.toLowerCase().lastIndexOf(SUF[i]); if (k > 2 && k + SUF[i].length === w.length) return w.slice(0, k) + '&shy;' + w.slice(k).replace(/^(lend)(ers')$/, '$1&shy;$2'); } if (w.length < 8) return w; return w.slice(0, w.length - 4) + '&shy;' + w.slice(-4); }).join(' '); }
   function cardHtml(c, cw, tag) {
     return slot(c.stem) + '<div class="nm">' + nmHy(c.nm) + '</div><div class="ef">' + efHtml(c) + '</div><div class="pr">' + (tag || prHtml(c)) + '</div>';
   }
@@ -161,11 +173,21 @@ var TT_TEST = {};
   function cardEl(c, cw) {
     var d = document.createElement('div'); d.className = 'card' + (cw < 100 ? ' sm' : ''); d.dataset.col = c.col; d.style.setProperty('--cw', cw + 'px'); d.style.setProperty('--cc', 'var(--c-' + c.col + ')'); d.classList.add('v4'); d.innerHTML = cardHtml(c, cw); fillArt(d); return d;
   }
+  var COLN = { brown: 'brown', grey: 'grey', blue: 'blue', green: 'green', yellow: 'yellow', red: 'red', wonder: 'wonder', purple: 'guild' };
+  function colList(cols) { return cols.map(function (k) { return COLN[k] || k; }).join(' or '); }
   function describe(c) {
     var t = []; if (c.prod) for (var r in c.prod) t.push('makes ' + c.prod[r] + ' ' + r);
-    if (c.choice) t.push('makes 1 of ' + c.choice.join('/') + ' each turn'); if (c.price) t.push('your ' + c.price[0] + ' costs 1 coin to trade');
-    if (c.shields) t.push(c.shields + ' shield' + (c.shields > 1 ? 's' : '')); if (c.sci) t.push('science: ' + c.sci); if (c.coin) t.push('+' + c.coin + ' coins');
-    if (c.perCol) t.push('coins for cards in your city'); if (c.guild) t.push('guild: points from the biggest city'); if (c.vp) t.push(c.vp + ' points');
+    if (c.choice) t.push('makes 1 of ' + c.choice.join('/') + ' each turn');
+    if (c.price) t.push(c.price.join(' or ') + ' cost' + (c.price.length > 1 ? '' : 's') + ' you only 1 coin each to buy');
+    if (c.shields) t.push(c.shields + ' shield' + (c.shields > 1 ? 's' : '')); if (c.sci) t.push('science: ' + c.sci);
+    if (c.coin) t.push('+' + c.coin + ' coins');
+    if (c.perCol) t.push('+' + c.perCol.coin + ' coin' + (c.perCol.coin > 1 ? 's' : '') + ' per ' + colList(c.perCol.cols) + ' card in your city');
+    if (c.perWonder) t.push('+' + c.perWonder + ' coins per wonder you built');
+    if (c.guild) {
+      var g = c.guild, u = g.cols[0] === 'wonder' ? 'wonder' : colList(g.cols) + ' card';
+      if (g.per3) t.push('scores 1 point per 3 coins in the richer city');
+      else t.push('scores ' + g.vp + ' point' + (g.vp > 1 ? 's' : '') + ' per ' + u + ' in the city that has more' + (g.coin ? ', and pays ' + g.coin + ' coin per ' + u + ' now' : ''));
+    } else if (c.vp) t.push(c.vp + (c.vp === 1 ? ' point' : ' points'));
     if (c.from) t.push('free if you own a chain symbol'); return t.join(', ') || 'a city card';
   }
 
@@ -183,7 +205,7 @@ var TT_TEST = {};
     var P = $('pyr'), W = P.clientWidth, H = P.clientHeight, rows = TT.LAYOUT[U.G.age] || TT.LAYOUT[1], n = rows.length, xm = 0;
     rows.forEach(function (r) { r.xs.forEach(function (x) { xm = Math.max(xm, Math.abs(x)); }); });
     var span = 2 * xm + 1.9, w = Math.min(1.9 * W / span, 124), h = Math.min(1.95 * w, 186), ms = Math.max(70, 0.5 * h);
-    if (h + (n - 1) * ms > H) { h = Math.max(40, H - (n - 1) * ms); if (h < 1.4 * w) { var ovr = n >= 6 ? 0.36 : 0.5; h = H / (1 + ovr * (n - 1)); ms = ovr * h; w = Math.min(w, h / 1.1); } }
+    if (h + (n - 1) * ms > H) { h = Math.max(40, H - (n - 1) * ms); if (h < 1.4 * w) { var ovr = H < 190 ? 0.3 : n >= 6 ? 0.36 : 0.5; /* FIXED2: short phones overlap the covered rows more so takeable cards stay >= 44 px */ h = H / (1 + ovr * (n - 1)); ms = ovr * h; w = Math.min(w, h / 1.1); } }
     var step = Math.max(ms, Math.min(0.8 * h, (H - h) / Math.max(1, n - 1))), u = w / 1.9;
     return { u: u, w: w, h: h, step: step, W: W, H: H, n: n, ox: W / 2, oy: Math.max(0, (H - (h + (n - 1) * step)) / 2) };
   }
@@ -246,8 +268,8 @@ var TT_TEST = {};
       if (!hm || hm.i == null) return null; var bv = AI.value(G, hm, p), mv = AI.value(G, m, p), best = hm; // FIXED1: rated against the same move the star shows, so the two never disagree
       if (mv == null || bv == null) return null; var d = bv - mv;
       if (d <= 1) return { g: 'good', t: 'Good move: about as good as the star.' };
-      if (d <= 3.5) return { g: 'okay', t: 'Okay move: ' + moveName(G, best) + ' was a bit better.' };
-      return { g: 'poor', t: 'Poor move: ' + moveName(G, best) + ' was clearly better.' };
+      if (d <= 3.5) return { g: 'okay', t: 'Okay. Best was ' + moveName(G, best) + '.' };
+      return { g: 'poor', t: 'Poor move. Best was ' + moveName(G, best) + '.' };
     } catch (e) { return null; }
   }
   function renderMil() {
@@ -261,8 +283,8 @@ var TT_TEST = {};
   function renderPyr(flips) {
     var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
-    var bestCell = -1; if (U.hintsOn && human && G.phase === 'play' && !G.pend.length) { try { var bm = hintMove(G); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
-    if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = hintMove(G); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
+    var bestCell = -1; if (U.hintsOn && U.hintShow && human && G.phase === 'play' && !G.pend.length) { try { var bm = hintMove(G); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
+    if (U.camp && U.camp.hints && U.hintShow && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = hintMove(G); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
       e.className = 'card v4' + (d.w < 76 ? ' sm' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
@@ -283,10 +305,10 @@ var TT_TEST = {};
       var f = document.createElement('div'); f.id = 'finger'; f.textContent = '☝'; var t = $('c' + av[0]); f.style.left = (parseFloat(t.style.left) + d.w / 2 - 10) + 'px'; f.style.top = (parseFloat(t.style.top) + d.h / 2) + 'px'; P.appendChild(f);
     }
   }
-  function fitNames(root) { root.querySelectorAll('.card.v4 .nm').forEach(function (e) { if (e.scrollWidth > e.clientWidth + 1) { e.classList.add('t1'); if (e.scrollWidth > e.clientWidth + 1) e.classList.add('t2'); } }); }
+  function fitNames(root) { root.querySelectorAll('.card.v4 .nm').forEach(function (e) { var o = function () { return e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1; }; if (o()) { e.classList.add('t1'); if (o()) { e.classList.add('t2'); if (o()) e.classList.add('t3'); } } }); }
   function renderDraft() {
     var G = U.G, P = $('pyr'), human = canAct(); P.innerHTML = '';
-    var d = document.createElement('div'); d.id = 'draft'; var hw = (human && U.hintsOn && !U.tut && U.mode === 'cpu') ? hintMove(G) : null; // FIXED1: the star also marks the best wonder in the draft
+    var d = document.createElement('div'); d.id = 'draft'; var hw = (human && U.hintsOn && U.hintShow && !U.tut && U.mode === 'cpu') ? hintMove(G) : null; // FIXED1: the star also marks the best wonder in the draft
     G.draft.avail.forEach(function (id) {
       var w = BY[id], b = document.createElement('button'); b.className = 'wcard' + (human ? ' go' : '') + (hw && hw.w === id ? ' hint' : ''); b.dataset.pick = id; if (!human) b.disabled = true;
       b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(wtx(w.text)) + '</small><div class="costs">' + costHtml(w.cost, true) + '</div>'; d.appendChild(b);
@@ -304,8 +326,8 @@ var TT_TEST = {};
     a.classList.toggle('ttsheet', on);
     if (on !== was && G && G.phase === 'play' && P.children.length) { if (!on) d.style.cssText = ''; renderPyr(); }
     if (!on) { if (was) d.style.cssText = ''; return; }
-    var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; d.style.maxHeight = r.height + 'px';
-    var hk = d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
+    var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; var tr = $('mil') || $('tokrow'), tt = tr ? tr.getBoundingClientRect().bottom : r.top; d.style.maxHeight = Math.max(r.height, r.bottom - Math.min(r.top, tt) - 2) + 'px'; // FIXED4: a choice sheet may rise over the war track so all choices fit; the rest scrolls with a fade cue
+    var hk = d.querySelector('.picker .arm') || d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
   }
   function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
   function dock0() {
@@ -316,30 +338,31 @@ var TT_TEST = {};
     if (!human && !U.narr && !isAI(p)) setInstr('Please wait', 'info', 'One moment...');
     if (!human) { msg.textContent = U.narr ? 'Turn in progress' : isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
     var M = E.validMoves(G);
-    var hp = (pd && U.hintsOn && !U.tut && U.mode === 'cpu' && !isAI(p)) ? hintMove(G) : null, hc = function (id) { return hp && (hp.id === id || hp.who === id) ? ' hint' : ''; };
+    var hp = (pd && U.hintsOn && U.hintShow && !U.tut && U.mode === 'cpu' && !isAI(p)) ? hintMove(G) : null, hc = function (id) { return hp && (hp.id === id || hp.who === id) ? ' hint' : ''; };
     if (pd && pd.type === 'first') {
       msg.textContent = 'Age ' + AGE[G.age] + ': who starts?'; instr(p, 'Choose who plays first in this age.');
       acts.innerHTML = '<button class="btn' + hc(p) + '" data-first="' + p + '">I start</button><button class="btn alt' + hc(1 - p) + '" data-first="' + (1 - p) + '">Rival starts</button>';
     } else if (pd && pd.type === 'token') {
       msg.textContent = 'Progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
-      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + hc(t) + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small>' + esc(U.tokArm === t ? 'Tap again to take it' : 'Tap to see') + '</small></button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + hc(t) + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small class="ds">' + esc(d.text) + '</small>' + (U.tokArm === t ? '<small class="go">Tap again to take it</small>' : '') + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'destroy') {
       msg.textContent = 'Discard a rival card'; instr(p, 'Pick one rival card to throw away.');
       acts.innerHTML = '<div class="picker">' + pd.list.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-destroy="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(COLN[d.col]) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'revive') {
       msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
-      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.revArm === t ? ' arm' : '') + hc(t) + '" data-revive="' + t + '"><b>' + esc(d.nm) + '</b><small class="ds">' + esc(describe(d)) + '</small>' + (U.revArm === t ? '<small class="go">Tap again to build it free</small>' : '') + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
       msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder. You get 4.');
     } else if (U.sel != null) {
       var cell = G.pyr[U.sel], c = BY[cell.id], bi = E.buildInfo(G, p, c), has = function (t, w) { return M.some(function (m) { return m.t === t && m.i === cell.i && (w == null || m.w === w); }); };
       msg.textContent = c.nm; sub.textContent = describe(c) + '. Cost: ' + (bi.chain ? 'free by chain' : bi.coins + ' coin' + (bi.coins === 1 ? '' : 's') + (bi.trade ? ' (' + bi.trade + ' for trade)' : ''));
-      instr(p, 'Build it, sell it, or use it for a wonder.');
+      instr(p, 'Build it, sell it, or raise a wonder.');
     } else {
-      msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, U.hintsOn ? 'Tap a glowing card. The star is best.' : 'Tap or drag a glowing card.');
+      msg.textContent = 'Tap a glowing card'; sub.textContent = ''; instr(p, U.hintsOn && U.hintShow ? 'Tap a glowing card. The star is best.' : U.hintsOn ? 'Tap a glowing card. Stuck? Tap Hints.' : 'Tap or drag a glowing card.');
     }
   }
   // ---------- zoom: the tapped card big, every detail, and the three ways to use it
+  function chainOwned(G, p, c) { var src = TT.CARDS.filter(function (x) { return x.gives === c.from && G.players[p].cards.indexOf(x.id) >= 0; })[0] || TT.CARDS.filter(function (x) { return x.gives === c.from; })[0]; return src ? src.nm + ' (chain)' : 'its chain card'; }
   function chainLines(c) {
     var l = [];
     if (c.from) { var src = TT.CARDS.filter(function (x) { return x.gives === c.from; })[0]; l.push('Free to build if you own ' + (src ? src.nm : 'its chain card') + '.'); }
@@ -370,21 +393,21 @@ var TT_TEST = {};
     var pr = $('pyr').getBoundingClientRect(), cw = Math.min(140, Math.round(pr.width * 0.38)), ch = Math.round(cw * 1.4), bw = Math.min(pr.width - 12, 360);
     if (U.liftCh && U.liftCh < ch) { ch = U.liftCh; cw = Math.round(ch / 1.4); }
     var free = bi.chain || !bi.coins, pay = free ? '<span class="pay fr">Free</span>' : '<span class="pay' + (okB ? '' : ' no') + '">' + slot('coin') + '<b>' + bi.coins + '</b></span>';
-    var why = free ? (bi.chain ? 'Free: you own its chain card.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' to buy what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
+    var why = free ? (bi.chain ? 'Free: you own ' + chainOwned(G, p, c) + '.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' for what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
     var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
     var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - bw / 2) + 'px;top:' + top + 'px;width:' + bw + 'px"><div class="zcard" id="zcard" style="width:' + cw + 'px;height:' + ch + 'px">' + pay + '</div>';
-    h += '<p class="lt"><b>' + esc(cap(describe(c))) + '.</b> ' + esc(why) + '</p><div class="zb3">';
+    h += '<p class="lt"><b>' + esc(short8(cap(describe(c)) + '.')) + '</b> <span>' + esc(short8(why)) + '</span></p><div class="zb3">';
+    var hm = (U.hintsOn && U.hintShow && !U.tut && !isAI(p)) ? hintMove(G) : null; if (hm && hm.i !== cell.i) hm = null; // FIXED2: read before the Build button (was declared after it, so Build never glowed)
     h += '<button class="btn zb' + (okB ? '' : ' off') + (hm && hm.t === 'build' ? ' hint' : '') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
-    h += '<button class="btn zb sell" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
-    var hm = (U.hintsOn && !U.tut && !isAI(p)) ? hintMove(G) : null; if (hm && hm.i !== cell.i) hm = null;
+    h += '<button class="btn zb sell' + (hm && hm.t === 'discard' ? ' hint' : '') + '" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
     var w0 = (hm && hm.t === 'wonder' && wok.filter(function (q) { return q.m.w === hm.w; })[0]) || wok[0];
-    h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (wok.length > 1 ? 'or tap one below' : esc(BY[w0.m.w].nm)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
+    h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (function (wi) { return (wi.coins ? 'pay ' + wi.coins : 'free') + (wok.length > 1 ? ', pick below' : ' \u00b7 ' + esc(BY[w0.m.w].nm)); })(E.wonderInfo(G, p, w0.m.w)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
     if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
-    z.innerHTML = h; z.hidden = false; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
+    z.innerHTML = h; z.hidden = false; var bn0 = $('banner'); if (bn0) bn0.style.display = 'none'; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
     // the lift may rise over the war track and token row (not over either city) before the card shrinks
-    var le = z.querySelector('.lift'), lt0 = parseFloat(le.style.top), lb = { top: lt0, bottom: lt0 + le.offsetHeight }, s1 = $('s1'), rt = s1 ? s1.getBoundingClientRect().bottom + 4 : pr.top + 4, over = lb.bottom - (pr.bottom - 4);
+    var le = z.querySelector('.lift'), lt0 = parseFloat(le.style.top), lb = { top: lt0, bottom: lt0 + le.offsetHeight }, s1 = $('mil'), rt = s1 ? s1.getBoundingClientRect().bottom + 4 : pr.top + 4, /* FIXED2: never over the war track */ over = lb.bottom - (pr.bottom - 4);
     if (over > 0 && lb.top > rt) { var up = Math.min(over, lb.top - rt); le.style.top = (parseFloat(le.style.top) - up) + 'px'; over -= up; }
-    if (over > 1 && ch > 72 && !U.liftFit) { U.liftCh = Math.max(72, Math.floor(ch - over)); U.liftFit = true; zoomRender(); U.liftFit = false; return; }
+    if (over > 1 && ch > 60 && !U.liftFit) { U.liftCh = Math.max(60, Math.floor(ch - over)); U.liftFit = true; zoomRender(); U.liftFit = false; return; }
   }
   function liftDust(i) { var u = TTA.url('fx-lift-dust'), e = $('c' + i); if (!u || !e) return; var r = e.getBoundingClientRect(), f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.bottom - 30) + 'px;background-image:url("' + u + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   function closeZoom() { if (U.sel == null) return; U.sel = null; renderPyr(); dock(); }
@@ -420,6 +443,7 @@ var TT_TEST = {};
   function popNum(txt, near, kind) {
     var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : ''); e.textContent = txt; document.body.appendChild(e);
     e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 4200 : 1000);
+    var gl = $('goal'); if (gl) { var gr = gl.getBoundingClientRect(), er0 = e.getBoundingClientRect(); if (gr.width && er0.bottom > gr.top && er0.top < gr.bottom) e.style.top = (gr.bottom + 2) + 'px'; }
     document.querySelectorAll('#acts button, #zoom .zb, #dock .gx-ibtn').forEach(function (bt) { var br = bt.getBoundingClientRect(), er = e.getBoundingClientRect(); if (br.width && er.right > br.left && er.left < br.right && er.bottom + 2 > br.top && er.top < br.bottom + 30) e.style.top = Math.max(4, br.top - er.height - 32) + 'px'; });
     var fu = TTA.url('fx-coin-burst'); if (fu) { var f = document.createElement('div'); f.className = 'fxa'; f.style.cssText = 'left:' + (r.left + r.width / 2 - 23) + 'px;top:' + (r.top - 10) + 'px;background-image:url("' + fu + '")'; document.body.appendChild(f); setTimeout(function () { f.remove(); }, 1000); }
   }
@@ -445,9 +469,9 @@ var TT_TEST = {};
     var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '', snap = G.phase === 'play' ? snapState() : null;
     if (m.i != null) { pre = rectOf('c' + m.i); var c = BY[G.pyr[m.i].id]; preHtml = cardHtml(c, pre ? pre.width : 60); var ghostCol = c.col; }
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
-    var rated = (U.hintsOn && U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
+    var rated = (U.hintsOn && !U.tut && U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
     if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
-    E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++;
+    E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++; U.hintShow = false; clearTimeout(U.idleT); if (!isAI(p)) U.aiChain = 0;
     U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
     G.ev.forEach(function (ev) { var l = lineOf(ev, G); if (l) { U.logs.push(l); G.log.push(l); } });
     render(flips);
@@ -464,30 +488,43 @@ var TT_TEST = {};
     if (G.ev.some(function (e) { return e.t === 'age'; })) $('pyr').querySelectorAll('.card').forEach(function (e) { e.classList.add('pop'); });
     if (G.over) return;
     U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    if (quick()) { // FIXED2: one line for your move, up to two for the rival's (three when an age turns)
+      var age = items.some(function (x) { return /^Age /.test(x.tag); }), tokp = items.filter(function (x) { return /progress token\.$/.test(x.text) && /Pick /.test(x.text); });
+      var ages = items.filter(function (x) { return /^Age /.test(x.tag); });
+      if (!isAI(p)) items = (rated ? [items.filter(function (x) { return x.tag === 'Rating'; })[0]] : items.slice(0, 1)).concat(tokp, ages).filter(function (x, k, a) { return x && a.indexOf(x) === k; });
+      else items = items.slice(0, age ? 3 : (U.aiChain || 0) > 1 ? 1 : 2);
+      items.forEach(function (x) { x.ms = isAI(p) ? ((U.aiChain || 0) > 1 ? 450 : 650) : 900; }); if (!isAI(p)) U.aiChain = 0;
+    }
     narrate(items, function () { U.busy = false; after(); });
   }
+  // FIXED2: the star (and the glowing popup button) waits until you tap Hints or sit still for about 8 s, then pulses 3 times and holds
+  function armIdle() {
+    clearTimeout(U.idleT); var G = U.G; if (!G || G.over || !U.hintsOn || U.hintShow || U.tut || U.mode !== 'cpu' || !canAct()) return;
+    var k = G.log.length + ':' + G.pend.length; U.idleT = setTimeout(function () { if (U.G === G && G.log.length + ':' + G.pend.length === k && canAct()) showHint(); }, typeof window.TT_IDLE === 'number' ? window.TT_IDLE : 8000);
+  }
+  function showHint() { clearTimeout(U.idleT); U.hintShow = true; if (!U.G || U.G.over) return; if (U.G.phase !== 'draft') renderPyr(); render0(); }
   function dock0Lock() { $('acts').innerHTML = ''; var z = $('zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
   function after() {
     var G = U.G; if (G.over) return;
     var p = E.sideToAct(G); clearTimeout(U.aiTimer);
-    if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; if (U.hintsOn) banner(whoTag(p), isAI(p) ? 'rival' : 'you'); }
+    if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; /* FIXED4: no turn pill; the instruction line names whose turn it is */ }
     if (G.phase === 'play' && G.pend.length && U.lastSide !== p) U.lastSide = p;
     if (isAI(p)) {
-      U.busy = true; render0(); var seq = U.seq;
+      U.busy = true; render0(); var seq = U.seq; if (!U.narr) setInstr(whoTag(p), 'rival', name(p) + ' is choosing a move...');
       U.aiTimer = setTimeout(function () {
         if (seq !== U.seq || U.G !== G) return;
         if (U.tut && window.TT_TUTOR && TT_TUTOR.holdRival && TT_TUTOR.holdRival()) { U.busy = false; U.aiTimer = setTimeout(function () { if (seq === U.seq && U.G === G) after(); }, 300); return; } // the guided game: the rival waits while a rule bubble is up
         var rng = function () { return E.rnd(G); }, lv = U.lvl, m = (U.tut && window.TT_TUTOR && TT_TUTOR.rivalMove && TT_TUTOR.rivalMove(G)) || AI.pick(G, lv, rng);
         if (!m) { U.busy = false; return; }
-        narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
+        var chain = U.aiChain = (U.aiChain || 0) + 1; narrate([{ tag: whoTag(p), kind: 'rival', text: intentLine(G, p, m), ms: chain > 1 ? 250 : 650, fn: function () { if (m.i != null) { var e = $('c' + m.i); if (e) e.classList.add('aipick'); } else if (m.t === 'pick') { var w = document.querySelector('[data-pick="' + m.w + '"]'); if (w) w.classList.add('aipick'); } } }],
           function () { if (seq !== U.seq || U.G !== G) return; U.busy = false; doMove(m); });
-      }, stepMs());
-    } else { U.busy = false; render0(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
+      }, quick() ? 200 : stepMs());
+    } else { U.busy = false; render0(); armIdle(); if (U.tut && window.TT_TUTOR && TT_TUTOR.onTurn) TT_TUTOR.onTurn(G); }
   }
   // the star on the computer's best pick among the glowing cards (only on your turn)
   function markBest() {
     var P = $('pyr'); if (!P) return; P.querySelectorAll('.bv').forEach(function (e) { e.remove(); }); P.querySelectorAll('.card.best').forEach(function (e) { e.classList.remove('best'); });
-    var G = U.G; if (!U.hintsOn || !G || G.phase !== 'play' || G.pend.length || !canAct()) return;
+    var G = U.G; if (!U.hintsOn || !U.hintShow || !G || G.phase !== 'play' || G.pend.length || !canAct()) return;
     try { var bm = hintMove(G); if (bm && bm.i != null) { var e = $('c' + bm.i); if (e && e.classList.contains('av')) { e.classList.add('best'); e.insertAdjacentHTML('beforeend', '<i class="bv" title="Best value">&#9733;</i>'); } } } catch (er) { }
   }
   function render0() { if (setClean() && U.G.phase !== 'draft') renderPyr(); dock(); renderScore(); markBest(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
@@ -498,7 +535,7 @@ var TT_TEST = {};
     var lv = U.lvl, prog = '';
     try { if (window.GXC && window.CAMPAIGN) { var p = GXC.progress(), n = window.CAMPAIGN.chapters.filter(function (c) { return p.ch[c.id] && p.ch[c.id].beaten; }).length; prog = n ? n + ' of ' + window.CAMPAIGN.chapters.length + ' chapters done' : 'The Twin Crowns: 10 chapters'; } } catch (e) { }
     s.innerHTML = '<div class="lid" id="lid"><h1>Twin Thrones</h1></div><p>Two rival cities, one pyramid of cards. Build the better city.</p>' +
-      '<div class="seg" id="lvls">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === lv ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === lv) + '">' + l + '</button>'; }).join('') + '</div>' +
+      '<div class="seg" id="lvls">' + ['easy', 'medium', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === lv ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === lv) + '">' + l + '</button>'; }).join('') + '</div>' +
       '<button class="btn go big" data-start="1" data-a="play">Quick game</button>' +
       '<div class="tgrid"><button class="btn alt sm" data-story="1"><b>Story</b><span>' + esc(prog) + '</span></button>' + tutBtn() + '<button class="btn alt sm" data-start="2">Two players</button><button class="btn alt sm" data-start="0">Watch</button><button class="btn alt sm" data-gx="rulesd">How to play</button><button class="btn alt sm snd" data-snd="1" aria-label="Sound">' + sndLabel() + '</button></div>';
     U.tut = false; SND.sync(); bgSlot($('lid'), 'title-bg');
@@ -529,22 +566,29 @@ var TT_TEST = {};
     if (!me) return name(w) + ' raises the crown and the other city kneels.';
     if (G.reason === 'military') return w === 0 ? 'Your banners reach their gate. ' + who + ' hands over the keys.' : 'Their banners reach your gate. The city falls before dawn.';
     if (G.reason === 'science') return w === 0 ? 'Six symbols, one great discovery. The scholars crown you.' : who + "'s scholars solve what yours could not.";
-    return w === 0 ? 'The crown is yours. ' + who + ' bows to the better builder.' : who + ' wears the crown this time. Build faster next round.';
+    var sa = G.final ? G.final[0] : E.score(G, 0), sb = G.final ? G.final[1] : E.score(G, 1), LB = { blue: 'civic cards', green: 'science cards', yellow: 'trade cards', guild: 'guilds', wonder: 'wonders', token: 'science bonuses', coins: 'coins', mil: 'war points' };
+    function lead(x, y) { return Object.keys(LB).filter(function (k) { return x[k] > y[k]; }).sort(function (i, j) { return (x[j] - y[j]) - (x[i] - y[i]); }).slice(0, 2).map(function (k) { return LB[k] + ' (+' + (x[k] - y[k]) + ')'; }).join(' and '); }
+    var ld = lead(w === 0 ? sb : sa, w === 0 ? sa : sb);
+    if (G.reason === 'tiebreak') return w === 0 ? 'Level on points, and your civic points decided it, ' + sa.blue + ' to ' + sb.blue + '.' : 'Level on points, and ' + who + "'s civic points decided it, " + sb.blue + ' to ' + sa.blue + '. Civic cards break ties: build more of them.';
+    if (w === 0) return 'The crown is yours' + (ld ? ': ' : '.') + (ld ? 'you led on ' + lead(sa, sb) + '.' : '');
+    return who + ' wins by ' + (sb.total - sa.total) + (ld ? ', ahead on ' + ld + '. Close that gap to turn it around.' : '.');
   }
-  function shortWhy(G, a, b) {   // one line: how it was won, and the 2 categories that won it
-    if (G.winner < 0) return 'A draw: same points, same civic points.';
-    var w = G.winner === 0 ? a : b, l = G.winner === 0 ? b : a, wn = U.mode === 'cpu' ? (G.winner === 0 ? 'You' : name(1)) : name(G.winner);
-    if (G.reason === 'military') return wn + ' won by war: the pawn reached the capital.';
+  function shortWhy(G, a, b) {   // one line, true for each end type: war, science, points, civic tie-break, draw
+    var cpu = U.mode === 'cpu';
+    if (G.winner < 0) return 'A draw: ' + a.total + ' to ' + b.total + ' points and ' + a.blue + ' civic points each.';
+    var w = G.winner === 0 ? a : b, l = G.winner === 0 ? b : a, wn = cpu ? (G.winner === 0 ? 'You' : name(1)) : name(G.winner), win = (cpu && G.winner === 0) ? ' win' : ' wins';
+    if (G.reason === 'military') return wn + (cpu && G.winner === 0 ? ' won' : ' won') + ' by war: the pawn reached the capital.';
     if (G.reason === 'science') return wn + ' won by science: six different symbols.';
+    if (G.reason === 'tiebreak') return 'Tie ' + w.total + '-' + l.total + ': ' + wn + win + ' on civic points ' + w.blue + ' to ' + l.blue + '.';
     var LB = { blue: 'civic cards', green: 'science', yellow: 'trade cards', guild: 'guilds', wonder: 'wonders', token: 'tokens', coins: 'coins', mil: 'war' };
     var ks = Object.keys(LB).sort(function (x, y) { return (w[y] - l[y]) - (w[x] - l[x]); }).slice(0, 2).filter(function (k) { return w[k] > l[k]; });
-    return wn + ' won ' + w.total + ' to ' + l.total + (G.reason === 'tiebreak' ? ' on civic points' : '') + (ks.length ? ', thanks to ' + ks.map(function (k) { return LB[k] + ' (+' + (w[k] - l[k]) + ')'; }).join(' and ') : '') + '.';
+    return wn + ' won ' + w.total + ' to ' + l.total + ' on points' + (ks.length ? '. Biggest gaps: ' + ks.map(function (k) { return LB[k] + ' +' + (w[k] - l[k]); }).join(', ') : '') + '.';
   }
   function reasonText(G) {
-    var mine = U.mode === 'cpu' ? G.winner === 0 : true; return { military: mine ? 'Military supremacy: the conflict pawn reached the rival capital.' : 'Military supremacy: the conflict pawn reached your capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Won the tie on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
+    var mine = U.mode === 'cpu' ? G.winner === 0 : true; return { military: mine ? 'Military supremacy: the conflict pawn reached the rival capital.' : 'Military supremacy: the conflict pawn reached your capital.', science: 'Science supremacy: six different symbols.', points: 'Victory on points.', tiebreak: 'Tied on points, won on civic points.', draw: 'A perfect draw.' }[G.reason] || G.reason;
   }
   function showResult() {
-    var G = U.G, r = $('res'); if (!r.hidden) return; clearTimeout(U.aiTimer); U.busy = true;
+    var G = U.G, r = $('res'); if (!r.hidden) return; clearToast(); clearTimeout(U.aiTimer); U.busy = true;
     if (U.camp && window.GXC && GXC.active()) { if (!U.finished) { U.finished = true; if (!U.tut) SND.play(G.winner === 0 ? 'win' : 'lose'); var fin = function () { try { GXC.finish(G); } catch (e) { console.error(e); } }, def = U.camp; setTimeout(function () { if (G.winner !== 0 && def.outroLose && GXC.scene) GXC.scene(def.outroLose, { def: def, title: def.title, last: 'Continue' }).then(fin); else fin(); }, 900); } return; }
     r.hidden = false;
     var win = G.winner >= 0 && (U.mode !== 'cpu' || G.winner === 0); if (!U.tut) SND.play(win ? 'win' : 'lose');
@@ -555,8 +599,9 @@ var TT_TEST = {};
     var h = '<div class="rbx"><div class="rcity" id="rcity"><span class="rpt">' + slot('portrait-p' + (wp + 1)) + '</span><div class="rcards">' + top.map(function (c) { return '<span class="rc">' + slot(c.stem) + '</span>'; }).join('') + '</div></div><h2>' + esc(head) + '</h2><p class="rwhy">' + esc(shortWhy(G, a, b)) + '</p>';
     h += '<details class="rtab"' + (U.tut ? ' open' : '') + '><summary>Full score</summary><table><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
     [['Civic cards', 'blue'], ['Science', 'green'], ['Trade cards', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Science bonus', 'token'], ['Coins', 'coins'], ['War', 'mil']].forEach(function (k) { if (!a[k[1]] && !b[k[1]]) return; h += '<tr><td>' + k[0] + '</td><td class="cu" data-n="' + a[k[1]] + '">0</td><td class="cu" data-n="' + b[k[1]] + '">0</td></tr>'; });
-    h += '<tr class="hl"><td>Points</td><td class="cu" data-n="' + a.total + '">0</td><td class="cu" data-n="' + b.total + '">0</td></tr></table></details>' + (G.reason && G.reason !== 'points' ? '<p class="sm">An early ' + (G.reason === 'military' ? 'war' : 'science') + ' win: points do not decide this game.</p>' : '');
-    h += '<p class="line">' + esc(resultLine(G)) + '</p><button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button></div>'; r.innerHTML = h; bgSlot($('rcity'), 'city-board-p' + (wp + 1)); fillArt(r); countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
+    h += '<tr class="hl"><td>Points</td><td class="cu" data-n="' + a.total + '">0</td><td class="cu" data-n="' + b.total + '">0</td></tr></table></details>' + (G.reason === 'military' || G.reason === 'science' ? '<p class="sm">An early ' + (G.reason === 'military' ? 'war' : 'science') + ' win: points do not decide this game.</p>' : G.winner < 0 ? '<p class="sm">A tie: same points and same civic points, so nobody wins.</p>' : '');
+    var nudge = ''; if (!U.tut && !U.camp && U.mode === 'cpu' && (U.lvl === 'easy' || U.lvl === 'medium')) { var nx = U.lvl === 'easy' ? 'medium' : 'normal', nk = 'tt_w_' + U.lvl, ew = 0; try { ew = G.winner === 0 ? (+localStorage.getItem(nk) || 0) + 1 : 0; localStorage.setItem(nk, ew); } catch (e) { ew = G.winner === 0 ? 1 : 0; } if (ew >= 2) nudge = '<p class="sm">You beat ' + U.lvl[0].toUpperCase() + U.lvl.slice(1) + ' ' + ew + ' times in a row. Try ' + nx[0].toUpperCase() + nx.slice(1) + '?</p><button class="btn alt" data-trylvl="' + nx + '">Play ' + nx[0].toUpperCase() + nx.slice(1) + '</button>'; }
+    h += nudge + '<p class="line">' + esc(resultLine(G)) + '</p><button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button></div>'; r.innerHTML = h; bgSlot($('rcity'), 'city-board-p' + (wp + 1)); fillArt(r); countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
   }
 
   // ---------- drawers
@@ -620,13 +665,15 @@ var TT_TEST = {};
   function step(m) { if (!canAct()) return; doMove(m); }
   document.addEventListener('click', function (ev) {
     var t = ev.target, q = function (s) { return t.closest ? t.closest(s) : null; }, b;
-    if ((b = q('[data-lvl]'))) { U.lvl = b.dataset.lvl; try { localStorage.setItem('tt_lvl', U.lvl); } catch (e) { } $('lvls').innerHTML = ['easy', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === U.lvl ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === U.lvl) + '">' + l + '</button>'; }).join(''); return; }
+    if ((b = q('[data-lvl]'))) { U.lvl = b.dataset.lvl; try { localStorage.setItem('tt_lvl', U.lvl); } catch (e) { } $('lvls').innerHTML = ['easy', 'medium', 'normal', 'hard'].map(function (l) { return '<button class="btn alt' + (l === U.lvl ? ' on' : '') + '" data-lvl="' + l + '" aria-pressed="' + (l === U.lvl) + '">' + l + '</button>'; }).join(''); return; }
     if (q('[data-story]')) { if (window.GXC && window.CAMPAIGN) GXC.open(); return; }
     if ((b = q('[data-start]'))) { var k = b.dataset.start; var sd = +(new URLSearchParams(location.search).get('seed')) || undefined; newGame(k === '1' ? 'cpu' : k === '2' ? 'two' : 'watch', U.first ? undefined : sd); U.first = true; return; }
+    if ((b = q('[data-trylvl]'))) { U.lvl = b.dataset.trylvl; try { localStorage.setItem('tt_lvl', U.lvl); localStorage.setItem('tt_w_easy', '0'); localStorage.setItem('tt_w_medium', '0'); } catch (e) { } newGame(U.mode); return; }
     if ((b = q('[data-again]'))) { newGame(U.mode); return; }
     if (q('[data-title]')) { showStart(); return; }
     if (q('#menubtn')) { GX.show('menud'); return; }
-    if ((b = q('#hintbtn'))) { U.hintsOn = !U.hintsOn; try { localStorage.setItem('tt_hints', U.hintsOn ? '1' : '0'); } catch (e) { } b.setAttribute('aria-pressed', U.hintsOn); b.classList.toggle('on', U.hintsOn); if (U.G && !U.G.over) { if (U.G.phase !== 'draft') renderPyr(); dock(); markBest(); } return; }
+    if ((b = q('#hintbtn')) && U.hintsOn && !U.hintShow && U.G && !U.G.over && !U.tut && canAct()) { showHint(); return; } // FIXED2: Hints = show the best move now; tap again to turn hints off
+    if ((b = q('#hintbtn'))) { U.hintsOn = !U.hintsOn; U.hintShow = U.hintsOn; clearTimeout(U.idleT); try { localStorage.setItem('tt_hints', U.hintsOn ? '1' : '0'); } catch (e) { } b.setAttribute('aria-pressed', U.hintsOn); b.classList.toggle('on', U.hintsOn); if (U.G && !U.G.over) { if (U.G.phase !== 'draft') renderPyr(); dock(); markBest(); } return; }
     if (q('[data-menu="cards"]')) { GX.close(); GX.show('cardsd'); return; }
     if (q('[data-menu="title"]')) { GX.close(); showStart(); return; }
     if ((b = q('[data-snd]'))) { SND.setOn(!SND.isOn()); SND.play('coin'); b.textContent = sndLabel(); return; }
@@ -642,15 +689,15 @@ var TT_TEST = {};
     if ((q('[data-peekx]') || t.id === 'peek') && !$('peek').querySelector('[data-goalgo]')) { $('peek').hidden = true; return; }
     if (q('[data-goal]')) { peek(goalHtml()); return; }
     if ((b = q('[data-score]'))) { peekScore(); return; }
-    if ((b = q('#sbar'))) { var a0 = sbreak(U.G, 0), b0 = sbreak(U.G, 1); toast('Civic = cards, Sci = green cards + tokens, War = pawn zone, Won = wonders, Coin = 1 per 3 coins. You ' + a0.tot + ', ' + name(1) + ' ' + b0.tot + '.', 4200); return; }
+    if ((b = q('#sbar'))) { var a0 = sbreak(U.G, 0), b0 = sbreak(U.G, 1); toast('Civic = cards, Sci = green cards + tokens, War = pawn zone, Won = wonders, Coin = 1 per 3 coins. You ' + a0.tot + ', ' + name(1) + ' ' + b0.tot + '.', 4200, true); return; }
     if ((b = q('[data-city]'))) { showCity(+b.dataset.city); return; }
-    if ((b = q('[data-tok]'))) { var tpd = U.G.pend[0]; if (tpd && tpd.type === 'token' && canAct() && (tpd.from === 'lib' ? tpd.list : U.G.tokensUp).indexOf(b.dataset.tok) >= 0) { var tid = b.dataset.tok; if (!U.tut && U.tokArm !== tid) { U.tokArm = tid; SND.play('tick'); toast(BY[tid].nm + ': ' + BY[tid].text + '. Tap it again to take it.', 3200); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: tid }) === false) return; U.tokArm = null; step({ t: 'token', id: tid }); return; } peekItem(b.dataset.tok, 't'); return; }
+    if ((b = q('[data-tok]'))) { var tpd = U.G.pend[0]; if (tpd && tpd.type === 'token' && canAct() && (tpd.from === 'lib' ? tpd.list : U.G.tokensUp).indexOf(b.dataset.tok) >= 0) { var tid = b.dataset.tok; if (!U.tut && U.tokArm !== tid) { U.tokArm = tid; SND.play('tick'); toast([BY[tid].nm + ':', BY[tid].text + '.', 'Tap it again to take it.'], 3200); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: tid }) === false) return; U.tokArm = null; step({ t: 'token', id: tid }); return; } peekItem(b.dataset.tok, 't'); return; }
     if ((b = q('[data-wonder]'))) { peekItem(b.dataset.wonder, 'w'); return; }
     if ((b = q('[data-pick]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'pick', id: b.dataset.pick }) === false) return; step({ t: 'pick', w: b.dataset.pick }); return; }
     if ((b = q('[data-first]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'first', who: +b.dataset.first }) === false) return; step({ t: 'first', who: +b.dataset.first }); return; }
-    if ((b = q('[data-token]'))) { var dt0 = b.dataset.token; if (!U.tut && U.tokArm !== dt0) { U.tokArm = dt0; SND.play('tick'); toast(BY[dt0].nm + ': ' + BY[dt0].text + '. Tap again to take it.', 3200); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: dt0 }) === false) return; U.tokArm = null; step({ t: 'token', id: dt0 }); return; }
+    if ((b = q('[data-token]'))) { var dt0 = b.dataset.token; if (!U.tut && U.tokArm !== dt0) { U.tokArm = dt0; SND.play('tick'); toast([BY[dt0].nm + ':', BY[dt0].text + '.', 'Tap again to take it.'], 3200); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'token', id: dt0 }) === false) return; U.tokArm = null; clearToast(); step({ t: 'token', id: dt0 }); return; }
     if ((b = q('[data-destroy]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'destroy' }) === false) return; step({ t: 'destroy', id: b.dataset.destroy }); return; }
-    if ((b = q('[data-revive]'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; step({ t: 'revive', id: b.dataset.revive }); return; }
+    if ((b = q('[data-revive]'))) { var rv = b.dataset.revive; if (!U.tut && U.revArm !== rv) { U.revArm = rv; SND.play('tick'); dock(); return; } if (window.GXT && GXT.act({ type: 'tap', kind: 'revive' }) === false) return; U.revArm = null; step({ t: 'revive', id: rv }); return; }
     if (q('[data-zclose]') || t.id === 'zoom' || (q('#zoom .lift') && !q('button'))) { if (window.GXT && GXT.act({ type: 'tap', kind: 'other' }) === false) return; closeZoom(); return; }
     if ((b = q('[data-a]'))) { if (b.disabled || U.sel == null) return; if (b.getAttribute('aria-disabled') === 'true') { toast(b.dataset.why || 'Not available now.', 3200); return; } var a = b.dataset.a; if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: a, w: b.dataset.w || null }) === false) return; step(a === 'wonder' ? { t: 'wonder', i: U.sel, w: b.dataset.w } : { t: a, i: U.sel }); return; }
     if ((b = q('.card.av')) && canAct() && !U.G.pend.length && U.G.phase === 'play') {
@@ -692,6 +739,7 @@ var TT_TEST = {};
     d.g.remove(); d.t.remove(); d.el.style.opacity = '';
     if (z && z.ok && ev.type === 'pointerup') { try { navigator.vibrate && navigator.vibrate(20); } catch (e) { } if (window.GXT && GXT.act({ type: 'tap', kind: 'act', a: z.m.t, w: z.m.w || null }) === false) return; U.sel = d.i; step(z.m); }
   }
+  document.addEventListener('pointerdown', function () { if (U.idleT && !U.hintShow) armIdle(); }, true); // any touch restarts the 8 s idle clock
   document.addEventListener('pointerup', endDrag); document.addEventListener('pointercancel', endDrag);
   document.addEventListener('click', function (ev) { if (U.dragJust && Date.now() - U.dragJust < 400) { ev.stopPropagation(); ev.preventDefault(); } }, true);
   document.addEventListener('keydown', function (e) { var pk = $('peek'); if (e.key === 'Escape' && pk && !pk.hidden) { if (pk.querySelector('[data-goalgo]')) { pk.hidden = true; U.busy = false; after(); } else pk.hidden = true; } });
