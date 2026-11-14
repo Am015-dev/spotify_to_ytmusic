@@ -66,7 +66,7 @@ function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('
   const boxes=()=>{const o=[];for(const e of ar.querySelectorAll('*')){if(e.closest('.die3sp,.vsx,svg,.die3'))continue;if(!shown(e))continue;const r=tbBox(e);if(!r.width||!r.height)continue;o.push([e,r])}return o};
   // out: anything of the fight above or below the table, or a monster card under the score line
   const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
-    for(const [e,r] of boxes()){if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
+    for(const [e,r] of boxes()){if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;const x=e.getBoundingClientRect();if(x.left<t.left-0.5||x.right>t.right+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
   const n=ar.querySelectorAll('.row.mons .mon').length;let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.offsetWidth;
   const shrink=(min,steps)=>{for(let k=0;k<steps&&out()&&cw>min;k++){cw=Math.max(min,cw*.9);ar.style.setProperty('--cw',cw.toFixed(1)+'px')}};
   const compact=()=>{ar.style.removeProperty('--cw');ar.classList.remove('tight','tight2');ar.classList.add('cmp');ar.querySelectorAll('.cn').forEach(m=>m.style.removeProperty('font-size'))};
