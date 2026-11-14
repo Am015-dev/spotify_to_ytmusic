@@ -26,7 +26,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   await p.reload();await sleep(900);
   if(mode==='offer'){
     const tapSel=async sel=>{const r=await p.evaluate(sel=>{const b=document.querySelector(sel);if(!b)return null;b.scrollIntoView({block:'center'});const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},sel);if(!r)return false;await p.touchscreen.tap(r[0],r[1]);return true};
-    await p.evaluate(()=>{G=null;render()});await sleep(300);
+    await p.evaluate(()=>{try{localStorage.clear()}catch(e){}G=null;render()});await sleep(300);   // cleared again: the old page may have saved on unload
     if(!await (await p.evaluate(()=>{UI.quick=true;render()}),await sleep(900),tapSel('#modal [data-start="F"]')))note(tag,'no Start button');await sleep(400);
     const o1=await p.evaluate(()=>({offer:!!document.getElementById('tutoffer'),g:!!G,btns:[...document.querySelectorAll('#tutoffer button')].map(b=>b.textContent)}));
     if(!o1.offer)note(tag,'first Play did not offer the tutorial');else if(o1.g)note(tag,'the game started behind the offer');
@@ -38,11 +38,12 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
     const o3=await p.evaluate(()=>({offer:!!document.getElementById('tutoffer'),g:!!G&&!G.tut}));if(o3.offer||!o3.g)note(tag,'the offer came back a second time '+JSON.stringify(o3));
     // fresh profile again: "Learn in 5 minutes" starts the tutorial
     await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(2000);
+    // the old page saves its game as it unloads (a race with the clear above), so clear again after the reload;
     // the title screen settles after a reload (fonts, art, the goal card): tap Start again until the offer shows, up to 5 tries
     await p.waitForFunction(()=>typeof render==='function'&&typeof GXT!=='undefined'&&!!document.getElementById('modal'),null,{timeout:10000}).catch(()=>{});
-    let offered=false;for(let k=0;k<5&&!offered;k++){await p.evaluate(()=>{G=null;UI.quick=true;render()});await sleep(700);await tapSel('#modal [data-start="F"]');
+    let offered=false;for(let k=0;k<5&&!offered;k++){await p.evaluate(()=>{try{localStorage.clear()}catch(e){}G=null;UI.quick=true;render()});await sleep(700);await tapSel('#modal [data-start="F"]');
       offered=await p.waitForSelector('#tutoffer [data-tutoffer=learn]',{timeout:3000}).then(()=>true).catch(()=>false)}
-    if(!offered)note(tag,'a fresh profile was not offered the tutorial in 5 taps');await sleep(700);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
+    if(!offered)note(tag,'a fresh profile was not offered the tutorial in 5 taps '+JSON.stringify(await p.evaluate(()=>({ls:Object.keys(localStorage),g:!!G,modal:!document.getElementById('modal').hidden,start:!!document.querySelector('#modal [data-start="F"]'),seen:GXT.status(TUT_GAME)}))));await sleep(700);await tapSel('#tutoffer [data-tutoffer=learn]');await sleep(900);
     const o4=await p.evaluate(()=>({run:GXT.running(),tut:!!G&&!!G.tut,i:GXT.state().i}));if(!o4.run||!o4.tut||o4.i!==0)note(tag,'"Learn in 5 minutes" did not start the tutorial '+JSON.stringify(o4));
     totals.runs++;console.log(tag,'done');await ctx.close();return}
   if(mode==='storyskip'){
