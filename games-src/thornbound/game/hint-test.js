@@ -46,5 +46,14 @@ for(let s=0;s<4;s++)for(let k=0;k<19;k++){const id=s*100+k;const i=TB.cardInfo(G
   const sup=(sto.match(/supp:'([^']*)'/)||[])[1]||'';if(!/first fight/.test(sup)){fails++;console.log('FAIL coach.supp must say Supporters count in the first fight only:',sup)}
   if(!/Lost Pile/.test(step('round'))){fails++;console.log('FAIL tutorial Winter step must send Supporters to the Lost Pile')}
   if(/higher seat/.test(tut)){fails++;console.log('FAIL bid ties go to the higher on the Order Track')}}
+// 5. every Site of Power card's printed commands (cards.json, the card images) match the game's data.js cm list
+{const CJ=JSON.parse(fs.readFileSync(__dirname+'/../cards.json','utf8'));const out=[];
+  (function walk(o){if(Array.isArray(o))o.forEach(walk);else if(o&&typeof o==='object'){if(o.id&&Array.isArray(o.commands))out.push(o);Object.values(o).forEach(walk)}})(CJ);
+  const norm=c=>c.name==='rally_self'?'rally:self1':c.name==='ambush_or_retreat'?'ambret':c.name+(c.x?':x'+c.x:'');
+  const dnorm=c=>c.n+(c.self?':self1':'')+(c.x&&!(c.n==='rally'&&c.self)?':x'+c.x:'');
+  let sites=0;for(const f of F)for(const d of TB.DATA.SITE[f]){const j=out.find(o=>o.id===d.id);if(!j){if(d.kind!=='hq'){fails++;console.log('FAIL site',d.id,'not in cards.json')}continue}
+    sites++;const a=j.commands.map(norm).sort().join(','),b=d.cm.map(dnorm).sort().join(',');
+    if(a!==b){fails++;console.log('FAIL site',d.id,d.nm,'| cards.json',a||'(none)','| data.js',b||'(none)')}}
+  if(sites<14){fails++;console.log('FAIL only',sites,'Site cards compared with cards.json')}else console.log('site commands vs cards.json:',sites,'cards')}
 console.log(fails?'hint-test FAIL '+fails:'hint-test PASS ('+n+' cards, each hint vs its own text and params)');
 process.exit(fails?1:0);
