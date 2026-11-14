@@ -133,3 +133,6 @@ html.ph .gx-drawer .btn,html.ph .gx-drawer .ctabs button,html.ph .gx-drawer summ
 html.ph .gx-drawer .row{min-height:44px}
 html.ph #cardsbody .card{cursor:pointer}
 html.ph .gfxpop button{min-height:44px}
+
+/* short phones (board under 300px so the tray fits): the zoom buttons would sit on places; pinch and drag still zoom and pan */
+html.ph.phshort #phview .gx-ibtn,html.ph.phshort #bfzoom{display:none!important}

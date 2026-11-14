@@ -123,7 +123,7 @@ function doOp(op,ctx){const [k,a,b,c2]=op;const who=w=>whoList(w,ctx);
   case 'weaponTo':if(G.weapon>a){lg(`Weapon drops to ${a}.`,'bad');G.weapon=a}break;
   case 'roofOrPal':{const need=b==='shelter';if(a>0&&need&&!hasShelter())break;
     const o=[{l:`Roof ${a>0?'+':''}${a}`,ops:[['roof',a]]},{l:`Palisade ${a>0?'+':''}${a}`,ops:[['pal',a]]}];ask('team',a>0?'Which gets better?':'Which one suffers?',o,{kind:'roofpal',sign:a});break}
-  case 'halfRoofOrPal':{const o=[{l:`Lose half the roof (${Math.floor(G.camp.roof/2)})`,ops:[['roof',-Math.floor(G.camp.roof/2)]]},{l:`Lose half the palisade (${Math.floor(G.camp.pal/2)})`,ops:[['pal',-Math.floor(G.camp.pal/2)]]}];ask('team','Which one takes the damage?',o,{kind:'roofpal',sign:-1});break}
+  case 'halfRoofOrPal':{const hl=(nm,v)=>{const n=Math.floor(v/2);return n?`${nm} ${v} → ${v-n} (lose ${n})`:`${nm} is ${v}: nothing to lose`};const o=[{l:hl('Roof',G.camp.roof),ops:[['roof',-Math.floor(G.camp.roof/2)]]},{l:hl('Palisade',G.camp.pal),ops:[['pal',-Math.floor(G.camp.pal/2)]]}];ask('team','Which one takes the damage?',o,{kind:'roofpal',sign:-1});break}
   case 'halfRoof':roofPal('roof',-Math.floor(G.camp.roof/2),false,true);break;
   case 'wx':G.wx[a]++;lg(`${{rain:'A rain cloud',snow:'A snow cloud',storm:'A storm',animals:'The hungry-animals die'}[a]} is added to this round's weather.`,'bad');break;
   case 'actTok':G.tok[a][b]=1;lg(`A ${{adv:'"?" adventure',reroll:'reroll-a-success',time:'slow-work (+1 pawn)',wood:'+1 wood cost',black:'wasted-effort',beast:'danger'}[b]} marker goes on the ${TNAME[a].toLowerCase()} action.`);break;

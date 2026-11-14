@@ -89,7 +89,7 @@ const HLP_RULES=[
  {phase:'beatWork',title:'Jobs play out',text:'Jobs play one by one. The food and wood you win arrive in the evening.',pic:()=>hpics([['pawn','Work'],'>',['food','Food'],['wood','Wood']])},
  {phase:'beatWork',title:'The dice',text:'Tick: the job worked. Blood drop: a wound. Question mark: an adventure card. Two pawns mean no dice.',pic:()=>hpics([['tick','Worked'],['drop','Wound'],['ask','Adventure']])},
  {phase:'beatWeather',title:'Weather',text:'Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',pic:()=>hpics([['cloud','Cloud'],'>',['food','-1'],['wood','-1']])},
- {phase:'beatWeather',title:'Roof and palisade',text:'Build the roof before the rain. Build the palisade before storms: each level soaks up one hit.',pic:()=>hpics([['tent','Roof'],'>',['cloud','Soaked up']])},
+ {phase:'beatWeather',title:'Roof and palisade',text:'Build the roof before the rain. Build the palisade before storms: each level soaks up one hit. Hungry animals attack at strength 3 against your weapon: each castaway takes 1 wound per level short.',pic:()=>hpics([['tent','Roof'],'>',['cloud','Soaked up']])},
  {phase:'beatNight',title:'Night',text:'Everyone eats 1 food. Anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',pic:()=>hpics([['moon','Night'],'>',['food','Eat'],['heart','Wounds']])},
  {phase:'beatNight',title:'Build a shelter early',text:'Build a shelter on day 1 or 2. It costs 2 wood and spares everyone a wound each night.',pic:()=>hpics([['tent','Shelter'],'>',['heart','Safe']])}
 ];

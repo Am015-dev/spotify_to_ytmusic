@@ -98,7 +98,7 @@ These were researched from the 1st-edition English rulebook, card scans and fan 
 - **"Discard invention cards":** taken from the top of the invention deck.
 - **Wreckage:** "Food Crates" always starts on the right threat slot. The random-wreckage variant is not offered.
 - **Soldier:** skill costs Tracker 2, Fortify 2, Battle Rage 3, Drive the Game 4. The rulebook advises against the Soldier with 1-2 players; the engine allows it (open rule A16 in `RULES-CHECKLIST.md`).
-- **Hungry-animals fight (strength 3):** every castaway takes the shortfall, as the rulebook's unfulfilled-demand note says.
+- **Hungry-animals fight (strength 3):** strength 3 is compared to the WEAPON level only (rulebook weather section; publisher FAQ 1.01 confirms); every castaway takes 1 wound per level it falls short, and the weapon does not drop.
 - **Settlers weather:** the "−N food" icons are read as discarding N food in the weather phase.
 - **Stranded Friend:** a "?" on the rescue roll is a wound, not an adventure, as the raft card shows.
 - **Skills:**
@@ -147,3 +147,5 @@ Games usually run to round 6–9 before hunger and weather win. These numbers ar
 | `click.js` | A random clicker plays the real page in jsdom (2D map fallback), through the start screen, priorities, job categories, every story scene type and every choice | 0 errors in 6 games |
 | `watch.js` | All-computer game with the story on auto-play, to the end | 0 errors |
 | Playwright screenshots | Desktop and phone, including the 3D diorama with fog, crosses, pawns and camp | Checked visually |
+
+- **Rain/winter die faces: unverified.** No authoritative source for the exact face counts was found; the faces are left as they are.

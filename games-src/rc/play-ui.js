@@ -6,8 +6,10 @@ const mode=process.argv[2]||'quick';const [W,H]=(process.argv[3]||'390x763').spl
 const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{const br=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const ctx=await br.newContext({viewport:{width:W,height:H},isMobile:W<600,hasTouch:true});
- await ctx.route('**/*',r=>new URL(r.request().url()).host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+ const SHOTS=process.env.SHOTS||'';const ctx=await br.newContext({viewport:{width:W,height:H},isMobile:W<600,hasTouch:true,deviceScaleFactor:SHOTS?2:1});const shot={};
+ const LIVE=path.join(__dirname,'../../games/shipwreck-isle');   // the deployed art, so shots show the real pictures
+ await ctx.route('**/*',r=>{const u=new URL(r.request().url());if(u.host!=='swi.test')return r.abort();const pp=decodeURIComponent(u.pathname);if(pp==='/')return r.fulfill({status:200,contentType:'text/html',body:html});
+  const f=path.join(LIVE,pp);if(fs.existsSync(f)&&fs.statSync(f).isFile())return r.fulfill({status:200,path:f});return r.fulfill({status:404,body:''})});
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))errs.push(m.text())});
  await p.goto('https://swi.test/');await sleep(1000);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(1500);
  // a visible, uncovered element's centre, or null
@@ -20,6 +22,9 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
  while(Date.now()-t0<(+process.env.MAXMS||540000)){
    over=await p.evaluate(()=>{const r=document.querySelector('.gxc-res-on');if(r&&r.getBoundingClientRect().width)return {win:/won/.test(r.className),round:G?G.round:null,res:1};return G&&G.over?{win:!!G.over.win,round:G.round}:null});
    if(over)break;
+   if(SHOTS){const ps=await p.evaluate(()=>({st:PHO.st,r:G&&G.round,pop:!!PHO.pop,n:G&&G.plan?G.plan.acts.reduce((a,x)=>a+x.pw.length,0):0}));
+     if(ps.st==='plan2'&&!ps.pop){if(!shot.first&&ps.r===1){shot.first=1;await sleep(3500);await p.screenshot({path:path.join(SHOTS,'first-turn.png')})}
+       if(!shot.mid&&ps.r>=6&&ps.n>=2){shot.mid=1;await sleep(600);await p.screenshot({path:path.join(SHOTS,'mid-game.png')})}}}
    let did=null;
    for(const sel of ['.gxh-bub .gxh-ok','#modal button:not([data-a=new]):not([data-a=rules]):not([data-a=cards]):not([data-a=close])','.bf-opts .opt','.gxc-btn.go,.gxc-btn.pri,.gxc-btn:not(.ghost)','.gxc-node.open.next','#bf [data-a=go][data-force]','#bf [data-a=next]','#bf [data-a=suggest]','#bf [data-a=go]']){
      if(sel==='#bf [data-a=suggest]'){const need=await p.evaluate(()=>PHO.st==='plan'||PHO.st==='plan2');if(!need)continue;
@@ -34,7 +39,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
    await sleep(did?250:400)}
  const info=over?{over:{win:over.win},round:over.round,res:over.res}:await p.evaluate(()=>({over:G&&G.over?{win:!!G.over.win}:null,round:G&&G.round,cmp:G&&G.cmp&&G.cmp.id,dead:G&&G.chars.filter(c=>c.dead).length}));
  const shotDir=path.join(__dirname,'playtest');fs.mkdirSync(shotDir,{recursive:true});
- await sleep(1500);await p.screenshot({path:path.join(process.env.TMPDIR||'/tmp','swi-result-'+mode+'-'+W+'.png')});
+ for(let k=0;k<40;k++){const done=await p.evaluate(()=>!!document.querySelector('.gxc-res-on')||!!(UI.modal&&UI.modal!=='start')||PHO.st!=='story'||storyIdx()>=UI.beats.length);if(done)break;await tap('#bf [data-a=next]');await sleep(500)}
+ await sleep(1500);await p.screenshot({path:SHOTS?path.join(SHOTS,'result.png'):path.join(process.env.TMPDIR||'/tmp','swi-result-'+mode+'-'+W+'.png')});
  const resShown=await p.evaluate(()=>!!document.querySelector('#bf [data-a=next],#modal button,.bf-opts')||!!(G&&G.over));
  console.log(`${mode} ${W}x${H}: ${info.over?'PASS result reached ('+(info.over.win?'rescued':'lost')+') day '+info.round:'FAIL no result (day '+info.round+')'} taps=${taps} errors=${errs.length} ${log.join(' ')}`);
  if(errs.length)console.log(errs.slice(0,4).join('\n'));

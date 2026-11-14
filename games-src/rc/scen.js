@@ -21,7 +21,7 @@ const SCEN={
   pileAdd(n){const room=this.pileRoom();const free=G.res.wood-committed().wood;n=Math.min(n,room,free);if(n<=0)return false;G.res.wood-=n;G.sc.pile+=n;if(PILE_CUM.includes(G.sc.pile))G.sc.stageRound=G.round;lg(`${n} wood goes onto the signal pile (${G.sc.pile}/15).`,'good');fx('build');return true},
   pileWood(n){G.sc.pile=Math.min(15,G.sc.pile+n);lg(`+${n} wood straight onto the signal pile (${G.sc.pile}/15).`,'good')},
   check(){if(G.round>=10&&has('fire')&&G.sc.pile>=15)win('A sail on the horizon! The signal fire blazes and the ship turns toward the island.')},
-  afterActions(){this.check()},endRound(){this.check()}},
+  endRound(){this.check()}},
  hexed:{
   setup(){G.sc={crosses:[],totemN:0,temple:null,templeDone:false}},
   goal(){return `Crosses raised: ${G.sc.crosses.length}/5 (each on a different tile)`},
@@ -49,7 +49,7 @@ const SCEN={
   night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg('☠ Ada is gone. The castaways have lost.','bad');fx('lose')}}},
   built(){},
   check(){if(G.sc.rescued&&has('lifeboat'))win('With Ada aboard, the lifeboat pushes through the surf. You are going home!')},
-  afterActions(){this.check()},endRound(){this.check()}},
+  endRound(){this.check()}},
  settlers:{
   setup(){G.sc={kids:0,goals:G.inv.board.filter(k=>INVENTIONS[k]&&INVENTIONS[k].kind==='normal')}},
   goal(){const g=G.sc.goals.filter(has).length;return `Home: shelter ${hasShelter()?'✓':'✗'}, roof ${G.camp.roof}, palisade ${G.camp.pal}, weapon ${G.weapon} (each 1+) · inventions ${g}/${G.sc.goals.length} · children ${G.sc.kids}`},

@@ -8,7 +8,7 @@ const html=fs.readFileSync(path.join(__dirname,'shipwreck.html'));const sleep=ms
  const ctx=await br.newContext({viewport:{width:W,height:H},isMobile:W<600,hasTouch:true});
  await ctx.route('**/*',r=>{const u=new URL(r.request().url());u.host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort()});
  const p=await ctx.newPage();const errs=[],probs=[];p.on('pageerror',e=>errs.push(e.message));
- await p.goto('https://swi.test/');await sleep(900);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(1500);
+ await p.goto('https://swi.test/?coach=1');await sleep(900);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.reload();await sleep(1500);
  const centre=sel=>p.evaluate(sel=>{for(const e of document.querySelectorAll(sel)){if(e.disabled)continue;const r=e.getBoundingClientRect();if(r.width<8||r.height<8)continue;const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const t=document.elementFromPoint(x,y);if(t&&(t===e||e.contains(t)))return [x,y]}return null},sel);
  const tap=async sel=>{const c=await centre(sel);if(!c)return false;await p.touchscreen.tap(c[0],c[1]);return true};
  await tap('#modal [data-a=start]');await sleep(500);await tap('.tutoffer [data-tutoffer=learn]');await sleep(1500);
