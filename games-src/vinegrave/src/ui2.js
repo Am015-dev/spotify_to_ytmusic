@@ -360,12 +360,8 @@ function shortLabel(m) {
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
     case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
-function bestBadges() {   /* one gold badge on the strongest move (the glowing piece) */
+function bestBadges() {   /* hints add no second pointer: the one glowing piece IS the best move, so no gold badge (it only ever doubled the glow or went stale) */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
-  if (!hintsOn()) return; const ev = evalMoves(); if (!ev.length) return;
-  const top = ev[0];
-  const mark = (x, t) => { if (!x) return; const el = moveEl(x.m, UI.view); if (el && !el.dataset.badge) el.dataset.badge = t; };
-  mark(top, 'Best');   /* one pointer only: the best move already glows, so no second or third badge */
 }
 function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest move */
   if (!ev || !ev.length) return null; const i = ev.findIndex(x => sameMv(x.m, m)), best = ev[0];
