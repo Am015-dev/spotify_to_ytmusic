@@ -100,7 +100,7 @@ function reasonFor(s,m){const q=G.q,k=q.kind;
   if(k==='helm')return m.yes?'Your eliminated card comes back to your hand instead of staying lost.':'';
   if(k==='placeLoc')return 'Whenever anyone claims '+LOCN[m.loc]+', you gain 1 Influence.';
   if(k==='flank'){const r=m.r;return 'The card moves to '+REG[r]+'. It has not fought yet. Its Strength still counts there.'}
-  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') returns to your hand in Winter, not the discard pile.'}
+  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') returns to your hand now, not the discard pile.'}
   if(q.t==='sel'&&(k==='shrine'||k==='ossuary')&&m.t==='seldone')return 'Keep your cards: nothing here needs to go.';
   if(k==='councilOut')return m.to==='hand'?'Back in your hand, the card can fight again next round.':'';
   return ''}   // not sure: no suggestion
@@ -124,8 +124,8 @@ function actWhy(s,m){const a=m.a||'',L=(m.label||'').replace(/^[^:]*:\s*/,'');
   if(a.startsWith('fav:'))return 'Your Favour ('+(G.fav.h===s?G.fav.u+' uses left':'')+'): '+lcFirst(L)+'.';
   if(a==='journey'){const id=m.p.id,l=cinfo(id).lore,P=G.pl[s];const mn=P.site.length?Math.min(...P.site.map(x=>cinfo(x).cost)):0;return '+'+l+' Lore (you would have '+(P.lore+l)+')'+(P.site.length?'; your cheapest Site of Power card costs '+mn+'.':'.')}
   if(a==='govern'){const c=m.p.c;return cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes>1?'s':'')+' into the '+DD.COUNCIL_NAMES[c]+': '+CPLAIN[c]}
-  if(a==='cmd:rally')return 'Rally: in Winter the card returns to hand, not the discard pile.';
-  if(a==='cmd:deploy')return 'Deploy: the card stays on the map through Winter. It fights there next round.';
+  if(a==='cmd:rally')return 'Rally: your chosen Active cards return to hand now, not the discard pile.';
+  if(a==='cmd:deploy')return 'Deploy: a hand card goes face-up next to a region and stays Active through Winter.';
   if(a==='council:oaths')return 'Council of Pledges: Supporters come back to your board for next round.';
   return lcFirst(L)?L.replace(/^./,c=>c.toUpperCase()).replace(/\.?$/,'.'):''}
 function adviseDay(s,mv){const me=s;const P0=preview();if(!P0)return null;const o0=outcome(P0,me);const done=mv.find(m=>m.t==='done');

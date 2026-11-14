@@ -78,7 +78,7 @@ function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
     if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards. Buying one now improves your deck for the rest of the game.';
     if(k==='shrine')return 'Cards at the bottom of your deck come back after a reshuffle. Weak cards there leave room for better draws.';
     if(k==='ossuary')return 'It brings a useful card back from your discard pile.';
-    if(k==='rally'||k==='brine')return 'Taking strong cards back to your hand saves them from Winter\'s discard.';
+    if(k==='rally'||k==='brine')return 'Taking your Active cards back to your hand saves them from Winter\'s discard.';
     return 'Of the choices here this one gains you the most.'}
   if(k==='occupier')return 'The card under a Kingdom Card cannot fight.';
   if(k==='slot')return 'Replace the Kingdom Card that helps you least now.';
@@ -94,11 +94,11 @@ function menuWhy(m){if(m.t==='done')return 'Nothing else here helps right now, s
   if(a.startsWith('t:'))return 'A Tactic of your faction ('+tacUses(vs(),a.slice(2))+').';
   if(a.startsWith('fav:'))return 'Your Favour power has limited uses; this is a good one.';
   if(a.startsWith('council:'))return 'Your Council cards allow this once a round.';
-  if(a==='cmd:rally')return 'Rally brings strong cards back to your hand before Winter discards them.';
+  if(a==='cmd:rally')return 'Rally returns your Active cards to your hand before Winter discards them.';
   if(a==='cmd:ambush')return 'Ambush adds a hidden card from your hand to this Clash.';
   if(a==='cmd:retreat')return 'Retreat saves your cards from a Clash you cannot win.';
   if(a==='cmd:flank')return 'Flank moves this card to a region where it does more good.';
-  if(a==='cmd:deploy')return 'Deploy puts a card on the map that stays through Winter.';
+  if(a==='cmd:deploy')return 'Deploy puts a hand card face-up next to a region, where it stays Active.';
   return 'Worth doing before you finish this step.'}
 const lcFirst=t=>t?t.charAt(0).toLowerCase()+t.slice(1).replace(/\.$/,''):''
 // ---------------------------------------------------------------- the main prompt: body (#main, scrolls) + the action row (#act, pinned)

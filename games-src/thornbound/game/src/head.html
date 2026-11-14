@@ -63,7 +63,7 @@ button{font:inherit;color:inherit}
 .hand{position:relative;margin:0 4px;z-index:0;isolation:isolate}
 .hc{position:absolute;top:10px;padding:0;border:0;background:none;line-height:0;cursor:pointer;transition:transform .15s}
 .hc.on{transform:translateY(-8px)}.hc.pl svg{filter:drop-shadow(0 0 5px #ffd24a)}.hc.dim{opacity:.55}
-.hc.rg{transform:translateY(-10px)}.hc.rg svg{filter:drop-shadow(0 0 9px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}@keyframes rgp{50%{filter:drop-shadow(0 0 14px #fff2a8) drop-shadow(0 0 6px #ffd24a)}}
+.hc.rg{transform:translateY(-10px)}.hc.rg svg{filter:drop-shadow(0 0 9px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out 3}@keyframes rgp{50%{filter:drop-shadow(0 0 14px #fff2a8) drop-shadow(0 0 6px #ffd24a)}}
 .picker{display:flex;gap:6px;flex-wrap:wrap}.picker .hc{position:static;min-width:52px;min-height:44px}
 /* rivals */
 #rivals{flex:0 0 auto;display:flex;gap:4px;padding:4px 6px calc(4px + var(--sab));border-top:1px solid var(--line)}
@@ -420,13 +420,13 @@ html.desk .hcb b{font-size:14px}html.desk .hcb i{font-size:13px}
 .hc.glow svg{filter:drop-shadow(0 0 5px #ffd24a)}
 .hc.dim{opacity:.55}
 .hc.lifted{opacity:.3}
-.hc.rg{transform:translateY(-8px) rotate(var(--rot,0deg))}.hc.rg svg{filter:drop-shadow(0 0 9px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
+.hc.rg{transform:translateY(-8px) rotate(var(--rot,0deg))}.hc.rg svg{filter:drop-shadow(0 0 9px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out 3}
 .hc.rg.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
 .hc.pk{position:static}
 .roadrow{display:flex;gap:6px;justify-content:center;align-items:center;height:100%}
 .kcb{position:relative;flex:0 0 auto;border:0;background:none;padding:0;line-height:0;border-radius:7px;cursor:pointer;touch-action:manipulation}
 .kcb.glow svg,.kcb.glow>*{filter:drop-shadow(0 0 6px #ffd24a)}
-.kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
+.kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out 3}
 .kcb.dim{opacity:.5}
 .kcb{display:flex;flex-direction:column;align-items:center;gap:3px}.roadrow .kcb{flex:0 1 96px;min-width:0}.roadrow{overflow:hidden;padding:0 2px}.kcb .kn{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;width:100%;font:700 .78rem/1.08 var(--fb);color:#fff3cf;text-align:center;overflow:hidden;text-shadow:0 1px 2px #000,0 0 3px #000}
 @media (max-height:600px){.kcb{gap:1px}.kcb .kn{font-size:.74rem;width:calc(100% + 8px);margin:0 -4px}}
@@ -439,7 +439,7 @@ html.bf-w #main.on{position:static;flex:1 1 auto;max-height:none;border-radius:0
 #main .step h3.st{font-size:1.02rem;margin:0 0 2px}
 /* glowing targets on the map */
 .tbx-pan g[data-reg]{cursor:pointer}
-.tbx-pan g.rglow rect{stroke:#ffe9a0;stroke-opacity:1;stroke-dasharray:none;stroke-width:6;fill-opacity:.3;animation:rgl 1.1s ease-in-out infinite}
+.tbx-pan g.rglow rect{stroke:#ffe9a0;stroke-opacity:1;stroke-dasharray:none;stroke-width:6;fill-opacity:.3;animation:rgl 1.1s ease-in-out 3}
 .tbx-pan g.rrec rect{stroke:#fff;stroke-width:9;fill:#ffe9a0;fill-opacity:.4}
 @keyframes rgl{50%{stroke-opacity:.45;fill-opacity:.16}}
 .tb-map .tb-loc.glow .tb-ring{opacity:1!important}
@@ -449,7 +449,7 @@ html.bf-w #main.on{position:static;flex:1 1 auto;max-height:none;border-radius:0
 .bspot .bs-l .ico{width:26px;height:26px;stroke:#f6e6b4;opacity:.8}
 .bspot.full{border-style:solid;border-color:#e8c867;background:none}
 .bspot .bs-c{display:block;line-height:0}
-.bspot.glow{border-color:#ffe9a0;border-style:solid;box-shadow:0 0 0 4px rgba(255,233,160,.45),0 0 20px #ffd24a;animation:spotp 1s ease-in-out infinite}
+.bspot.glow{border-color:#ffe9a0;border-style:solid;box-shadow:0 0 0 4px rgba(255,233,160,.45),0 0 20px #ffd24a;animation:spotp 1s ease-in-out 3}
 .bspot.rec{border-color:#fff;box-shadow:0 0 0 6px rgba(255,255,255,.5),0 0 26px #fff2a8}
 body.over-t .bspot.hot{transform:translate(-50%,-50%) scale(1.2)}
 @keyframes spotp{50%{box-shadow:0 0 0 8px rgba(255,233,160,.15),0 0 8px #ffd24a}}
@@ -472,6 +472,8 @@ html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
 .pcard:not([hidden]){position:fixed;inset:0;z-index:56}
 #gdef{position:fixed;left:6px;right:6px;top:calc(var(--barh,44px) + 6px);z-index:57;max-height:50dvh;overflow:auto;box-sizing:border-box}
 @media (prefers-reduced-motion:reduce){.tbx-pan g.rglow rect,.bspot.glow,.hc.rg svg,.kcb.rg>*{animation:none}}
+/* no endless loops: the help ring pulses a few times, then holds still */
+.gxh-ring{animation-iteration-count:3!important}
 
 /* painted extras */
 @media (max-width:700px),(max-height:700px){.endart{height:72px;max-height:none;margin-bottom:6px}}

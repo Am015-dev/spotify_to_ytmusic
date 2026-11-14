@@ -97,8 +97,8 @@ function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
     else if(a==='supp'){const n=m.p.n;t='Send '+n+' Supporter'+(n>1?'s':'')+': +'+n+' Strength in '+REG[m.p.r]+'\'s first Clash.'}
     else if(a==='journey')t='A Journey gains Lore, which buys Site of Power cards.';
     else if(a==='govern')t='Votes into a Council give a lasting power.';
-    else if(a==='cmd:rally')t='Rally: the card returns to your hand in Winter.';
-    else if(a==='cmd:deploy')t='Deploy: the card stays on the map and fights next round.';
+    else if(a==='cmd:rally')t='Rally: your chosen Active cards return to your hand now.';
+    else if(a==='cmd:deploy')t='Deploy: the card goes face-up next to a region and stays Active.';
     else if(a==='council:oaths')t='Supporters come back to your board next round.';
     else if(a.startsWith('t:'))t='This Tactic helps you most right now.';
     else if(a.startsWith('fav:'))t='Use your Favour while you hold it.';
