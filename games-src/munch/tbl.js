@@ -46,9 +46,11 @@ function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySele
   // the table can change size without a render (the dock grows, a toast, the address bar): fit again on the next frame
   try{if(TB.roT!==tb&&typeof ResizeObserver==='function'){TB.ro=TB.ro||new ResizeObserver(()=>{cancelAnimationFrame(TB.raf);TB.raf=requestAnimationFrame(()=>{try{tbFit()}catch(e){}})});TB.ro.disconnect();TB.ro.observe(tb);TB.roT=tb}}catch(e){}
   ar.classList.remove('tight','tight2','tight3','cmp','cmp2');if(!ar.querySelector(':scope>.vs'))return;
+  // the score pill never outgrows the table (a long rival name next to its portrait): shrink it to fit
+  {const sl=ar.querySelector(':scope>.sline .sl1');if(sl){sl.style.removeProperty('zoom');const w=sl.getBoundingClientRect().width,aw=ar.clientWidth-6;if(w>aw&&aw>100)sl.style.zoom=(aw/w).toFixed(3)}}
   const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
   // out: anything of the fight above or below the table, or a monster tile under the score line
-  const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline .sl1');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
+  const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
     for(const e of ar.querySelectorAll('.fbtns,.score .num,.score .yn,.row.mons .mon,.row.mons .card,.row.mons .mon>.row,.row.mons .gchip,.hsav,.rollbox,.row.small')){if(!shown(e))continue;const r=tbBox(e);if(!r.width)continue;
       if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
   const n=ar.querySelectorAll('.row.mons .mon').length;let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.offsetWidth;

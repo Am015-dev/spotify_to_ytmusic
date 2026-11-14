@@ -15,7 +15,7 @@ const CARDS=[
 {ref:'dk-cleric',k:'cleric',d:'door',t:'class',cls:'cleric',n:'Cleric',art:'cleric',cp:3,x:'Resurrection: take the top door discard instead of kicking. Then discard a card. Turning: discard up to 3 cards against undead, +3 each.'},
 {ref:'dk-elf',k:'elf',d:'door',t:'race',race:'elf',n:'Elf',art:'elf',cp:3,x:'+1 to run away. Go up a level for each monster you help someone kill.'},
 {ref:'dk-dwarf',k:'dwarf',d:'door',t:'race',race:'dwarf',n:'Dwarf',art:'dwarf',cp:3,x:'Carry any number of Big items. Hold up to 6 cards.'},
-{ref:'dk-halfling',k:'halfling',d:'door',t:'race',race:'halfling',n:'Halfling',art:'half',cp:3,x:'-1 to run away. Once per turn, sell one item for double its price.'},
+{ref:'dk-halfling',k:'halfling',d:'door',t:'race',race:'halfling',n:'Halfling',art:'half',cp:3,x:'Sell one item a turn for double its price. If you fail to run away, discard a card to roll again.'},
 {ref:'dk-mixed',k:'mixed',d:'door',t:'special',sp:'half',n:'Mixed Heritage',cp:2,x:'You may have two races. With one race, you get its perks and none of its drawbacks.'},
 {ref:'dk-double',k:'double',d:'door',t:'special',sp:'super',n:'Double Major',cp:2,x:'You may have two classes. With one class, you get its perks and none of its drawbacks.'},
 // ---- monsters (37) ----

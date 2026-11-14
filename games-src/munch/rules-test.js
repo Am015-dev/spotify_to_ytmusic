@@ -23,7 +23,7 @@ T('cannot sell to level 10','P(0).lvl=9;give(0,"parrot");return !validMoves(0).s
 T('sell needs 1000 at once','P(0).lvl=2;const a=give(0,"stompy");const b=give(0,"swash");const r=performMove({act:"sell",cards:a+","+b},0);return !r.success');
 T('sell 1300 gives 1 level, no change','P(0).lvl=2;const a=give(0,"parrot");act({act:"sell",cards:""+a},0);return P(0).lvl===3');
 T('halfling sells one item double','P(0).lvl=2;P(0).race.push(inst("halfling"));const a=give(0,"stompy");const b=give(0,"swash");act({act:"sell",cards:a+","+b},0);return P(0).lvl===3');
-T('halfling -1 to run away','P(0).race.push(inst("halfling"));fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===-1');
+T('halfling may discard a card to roll again after a failed run (no -1)','P(0).race.push(inst("halfling"));fightNow(0,"hatmuncher");const x=give(0,"stompy");const m0=runMod(P(0),G.cb,G.cb.mons[0]);const _r=rnd;rnd=function(n){return n===6?0:_r(n)};act({act:"run"},0);return m0===0&&validMoves(0).some(m=>m.act==="reroll"&&m.card===x)');
 T('elf +1 run, sneakers +2','P(0).race.push(inst("elf"));wear(0,"sneakers");fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===3');
 T('mixed heritage single halfling has no -1','P(0).race.push(inst("halfling"));P(0).half=inst("mixed");fightNow(0,"inferno");return runMod(P(0),G.cb,G.cb.mons[0])===0');
 T('monster bonus vs elf','P(0).race.push(inst("elf"));fightNow(0,"leech");return monStr(G.cb)===14');

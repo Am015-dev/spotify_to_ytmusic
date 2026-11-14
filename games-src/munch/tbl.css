@@ -33,7 +33,7 @@ html.ph .opp.seat .sbd{gap:5px}
 .fbtns .fightb{flex:1.35 1 0;font-size:21px}
 .fbtns .helpb{flex:0 0 auto;min-width:60px}
 .fbtns .btn.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 0 #3a2213,0 0 0 3px #7fd0ff}
-.fbtns .btn.pulse{animation:tblPulse 1.1s ease-in-out infinite}
+.fbtns .btn.pulse{animation:tblPulse 1.1s ease-in-out 3}
 @keyframes tblPulse{50%{transform:scale(1.04);filter:brightness(1.12)}}
 .hsav{display:block;position:relative;width:var(--hav,84px);height:var(--hav,84px)}
 .hsav .hsavi{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #ffd76a;background:radial-gradient(#4a2412,#1a0904);box-shadow:0 6px 14px rgba(0,0,0,.6);display:block}
@@ -430,3 +430,12 @@ html.ph .arena .row.mons .card.fly{animation:dkLand .5s cubic-bezier(.2,1,.3,1)}
 .gxt-top .dktc{display:flex;gap:4px;flex:0 0 auto}
 .gxt-top .dkt-b{width:44px;height:44px;min-height:44px;display:grid;place-items:center;padding:0;border-radius:12px;border:1px solid rgba(243,230,191,.35);background:transparent;color:#f3e6bf;cursor:pointer}
 .gxt-top .dkt-b .ic{width:22px;height:22px}
+/* one helper at a time: the ★ card, a held card or the door's own nudge wins; nothing else pulses, glows or points while it shows */
+html:has(.mine .bf-best) .pulse,html.bf-holding .pulse,html:has(.mine .bf-best) .bfdoor .bfdi,html:has(.mine .bf-best) .bfdoor .bfkick,html:has(.mine .bf-best) .bfdoor .bfboot,html.bf-holding .bfdoor .bfdi,html.bf-holding .bfdoor .bfkick,html.bf-holding .bfdoor .bfboot,html:has(.bfdoor) #prompt .pulse{animation:none!important}
+html.bf-holding .hcue,*:has(>.hand .bf-best)>.hcue,*:has(>.hand .bf-picked)>.hcue{display:none!important}
+/* the fighter's portrait sits on the score line (a rival's fight shows who is fighting) */
+.sline .sy .sav{flex:none;align-self:center;display:block;position:relative;width:30px;height:30px}
+.sline .sy .savi{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #ffd76a;background:radial-gradient(#4a2412,#1a0904);display:block}
+html.ph .sline .sy .sav{width:26px;height:26px}
+/* the "+N ›" cue waits until the turn-start nudges (door, boot, suggested button) have finished: never two helpers at once */
+.hcue{animation:hcueShow .25s ease 5s both}@keyframes hcueShow{from{opacity:0;pointer-events:none}to{opacity:1;pointer-events:auto}}

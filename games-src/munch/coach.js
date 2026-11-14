@@ -114,7 +114,8 @@ function coachNow(me){const s=sideToAct();const p=P(me);const r={};if(s!==me)ret
         else{r.rec={act:'opt',opt:'no'};r.why=ahead>=3?`Refuse: you’d win, but ${esc(f.nm)} is ${ahead} levels ahead. They would gain ${g} more.`:`Refuse: you’d win, but there’s no pay. ${esc(f.nm)} gains ${g} level${plural(g)}.`}}}
     else if(q.kind==='ward')r.why=m&&m.opt==='yes'?'Cancel it: this curse would really hurt.':'Let it happen: it’s mild. Keep your ring for something worse.';
     else if(q.kind==='rescue'){const c=mdef(runMon(cb.runs[q.run]));const ops=c.bad||[];const heavy=ops.some(o=>['death','orcs','dread','race','cls','clsOr','clsOr1','swap','hippo','troll','pixie','lowest','gold','handOr','slugs'].includes(o[0])||(o[0]==='lvl'&&(o[1]==='all'||o[1]>=2))||(o[0]==='item'&&o[2]==='all'));const use=vm0(me).filter(x=>x.act==='use').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card));
-      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
+      const rr=vm0(me).filter(x=>x.act==='reroll').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];
+      if(heavy&&use.length){r.rec=use[0];r.why=`Use ${esc(cname(use[0].card))}: losing the card beats the Bad Stuff.`}else if(rr&&(heavy||cardValue(p,rr.card)<=4)){r.rec=rr;r.why=`Roll again: a spare card is cheaper than the Bad Stuff.`}else{r.rec={act:'opt',opt:'no'};r.why=`Take it: this Bad Stuff is mild. Keep your escape card.`}}
     else if(q.kind==='pick'&&m){const v=q.opts[m.opt];r.why=typeof v==='number'?`Pick ${esc(cname(v))}.`:''}
     return r}
   const ph=G.phase;

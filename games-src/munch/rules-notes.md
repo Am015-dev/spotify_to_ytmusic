@@ -57,7 +57,7 @@ A browser version of the rules of the original game (original publisher, 2001). 
   - A Halfling doubles one item's price once a turn.
   - You can't sell to reach level 10.
 - **Winning:** level 10, but only from killing a monster. Heavenly Favor (the divine-intervention card) is the one card that may also give it to Clerics. Go-up-a-level cards and selling stop at 9.
-- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Mixed Heritage has no −1 to run away, and monsters get no bonus against that race.
+- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Mixed Heritage keeps the Halfling perks, and monsters get no bonus against that race.
 
 ## Every card effect is implemented
 Monsters' special texts are all live. Some examples:

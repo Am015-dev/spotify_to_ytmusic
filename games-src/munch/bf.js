@@ -82,7 +82,7 @@ function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who=
 // No motion (reduced-motion, jsdom), a clip that fails to load, or no first frame within 700 ms: nothing is shown and the normal card reveal runs.
 const BOSS_CLIPS={wyrm:1,inferno:1,tentacles:1,pharaoh:1,skygrif:1,dread:1};let bossSeen={gid:null,k:{}};
 function bfResched(){try{if(typeof aiTimer!=='undefined'&&aiTimer){clearTimeout(aiTimer);aiTimer=null}if(typeof schedule==='function')schedule()}catch(e){}}
-function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.motion()||!G||typeof document==='undefined'||!document.body||document.getElementById('bfclip'))return false;
+function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||who!==viewSeat()||!BF.motion()||!G||typeof document==='undefined'||!document.body||document.getElementById('bfclip'))return false;
   const tb=document.querySelector('.table');const T=tb&&tb.getBoundingClientRect();if(!T||T.width<150||T.height<150)return false;
   if(bossSeen.gid!==G.gid)bossSeen={gid:G.gid,k:{}};if(bossSeen.k[k])return false;
   const mine=who===viewSeat()&&G.mode!=='ai';const door=document.querySelector('.bfdoor')||document.querySelector('.pile.pl');const D=door&&door.getBoundingClientRect();

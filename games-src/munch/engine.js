@@ -243,7 +243,7 @@ function resolveWin(){const cb=G.cb,p=P(cb.who);let lv=0,tr=cb.tr||0;const all=c
   got.forEach(t=>gain(p,t));if(got.length)lg(cb.who,`${p.nm} draws ${got.length} treasure${got.length>1?'s':''}.`);
   const lvName=all[0].def.n,hp=cb.help;endCombat();if(lv){G.shareHelp=hp;try{gainLv(p,lv,`defeating ${lvName}`,true)}finally{G.shareHelp=-1}}}
 // ---- running away [R §6] ----
-function runMod(p,cb,m){let x=0;if(isRace(p,'elf'))x+=1;if(isRace(p,'halfling')&&!pureRace(p))x-=1;for(const id of eqItems(p))x+=cd(id).run||0;x+=mdef(m).runm||0;if(m.like!=null)x-=1;return x}
+function runMod(p,cb,m){let x=0;if(isRace(p,'elf'))x+=1;for(const id of eqItems(p))x+=cd(id).run||0;x+=mdef(m).runm||0;if(m.like!=null)x-=1;return x}
 function startRun(){const cb=G.cb;cb.stage='run';cb.runs=[];cb.lv0={};for(const f of fighters(cb))cb.lv0[f.i]=f.lvl;for(const w of fighters(cb))for(const m of cb.mons)cb.runs.push({w:w.i,m:m.id,r:null,ok:null,done:false,auto:!!cb.wall,pen:false});
   lg(cb.who,`${P(cb.who).nm} can't win and runs for it!`);nextRun()}
 function runMon(r){return G.cb.mons.find(m=>m.id===r.m)}
@@ -260,8 +260,11 @@ function nextRun(){const cb=G.cb;if(!cb)return;const r=cb.runs.find(x=>!x.done);
 function roll(r){const cb=G.cb,p=P(r.w),m=runMon(r),c=mdef(m);const v=d6(),mod=runMod(p,cb,m)+(r.w===cb.who||r.w===cb.help?(cb.used['f'+r.w]||0):0)+persMod(p,'die');r.r=v;r.mod=mod;r.ok=v+mod>=R.RUN;p.st.runs++;
   G.lastRoll={v,mod,need:R.RUN,who:r.w,ok:r.ok,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'run'};fx('roll',r.w);
   lg(r.w,`${p.nm} rolls ${v}${mod?` ${mod>0?'+':''}${mod}`:''} to escape ${c.n}: ${r.ok?'gets away!':'caught!'}`);
-  if(!r.ok&&rescueOpts(p,r).length){G.q={who:r.w,kind:'rescue',run:cb.runs.indexOf(r)};return}
+  if(!r.ok&&(rescueOpts(p,r).length||canReroll(p,r))){G.q={who:r.w,kind:'rescue',run:cb.runs.indexOf(r)};return}
   finishRun(r)}
+// Halfling: after a failed run-away roll, discard a card to roll once more [original rule]
+function canReroll(p,r){return isRace(p,'halfling')&&!r.rerolled&&p.hand.length>0}
+function doReroll(p,id){const q=G.q;G.q=null;const r=G.cb.runs[q.run];r.rerolled=true;lg(p.i,`${p.nm} discards ${cname(id)} to roll again.`);spend(p,id);roll(r)}
 function rescueOpts(p,r){const c=mdef(runMon(r));const o=[];for(const id of p.hand){const x=cd(id);if(x.sp==='invis'||x.sp==='die'||(x.sp==='lamp'&&p.i===G.active&&!G.cb.transfer))o.push(id)}for(const e of p.eq)if(cd(e.id).sp==='ratstick'&&c.lvl<=8)o.push(e.id);return o}
 // after a successful escape, a holder of Sticky Paste may force a reroll
 function finishRun(r){const cb=G.cb;
@@ -387,7 +390,7 @@ function qMoves(q){const mv=[];const p=P(q.who);
   switch(q.kind){
   case 'help':case 'glue':case 'lawyer':case 'fetch':mv.push({act:'opt',opt:'yes'},{act:'opt',opt:'no'});break;
   case 'ward':mv.push({act:'opt',opt:'yes'},{act:'opt',opt:'no'});break;
-  case 'rescue':{const r=G.cb.runs[q.run];for(const id of rescueOpts(p,r))mv.push({act:'use',card:id});mv.push({act:'opt',opt:'no'});break}
+  case 'rescue':{const r=G.cb.runs[q.run];for(const id of rescueOpts(p,r))mv.push({act:'use',card:id});if(canReroll(p,r))for(const id of new Set(p.hand))mv.push({act:'reroll',card:id});mv.push({act:'opt',opt:'no'});break}
   case 'pick':q.opts.forEach((v,i)=>mv.push({act:'pick',opt:i}));break}
   return mv}
 const mvKey=m=>[m.act,m.card,m.tgt,m.opt].map(x=>x===undefined?'':x).join('|');
@@ -423,6 +426,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   case 'opt':answer(m.opt,s);break;
   case 'pick':{const q=G.q;G.q=null;resume(q.cont,q.opts[m.opt]);break}
   case 'use':useRescue(p,m.card);break;
+  case 'reroll':doReroll(p,m.card);break;
   case 'fight':cb.stage='others';cb.ord=[];for(let j=1;j<G.pl.length;j++){const o=P((cb.who+j)%G.pl.length);if(!o.gone)cb.ord.push(o.i)}cb.oi=0;if(!cb.ord.length)resolveWin();else lg(s,`${p.nm} is ready to fight. Last chance to interfere!`);break;
   case 'pass':if(G.phase==='window'){G.win.i++;if(G.win.i>=G.win.ord.length){G.phase=G.win.back;G.win=null}break}
     cb.oi++;if(cb.oi>=cb.ord.length){if(winning(cb))resolveWin();else reopen()}break;
@@ -455,7 +459,7 @@ function answer(opt,s){const q=G.q;G.q=null;const p=P(s);
   if(!G.q)runOps()}
 function useRescue(p,id){const q=G.q;G.q=null;const cb=G.cb;const r=cb.runs[q.run];const c=cd(id);
   if(c.sp==='invis'){spend(p,id);r.ok=true;lg(p.i,`${p.nm} drinks ${c.n} and vanishes!`);r.glued=r.glued||false;return finishRun(r)}
-  if(c.sp==='die'){spend(p,id);r.r=6;r.ok=6+r.mod>=R.RUN;G.lastRoll=Object.assign({},G.lastRoll,{v:6,ok:r.ok,id:G.lastRoll.id+1});lg(p.i,`${p.nm} uses ${c.n}: it's a 6${r.ok?'':' and still not enough'}!`);if(!r.ok&&rescueOpts(p,r).length){G.q={who:p.i,kind:'rescue',run:q.run};return}return finishRun(r)}
+  if(c.sp==='die'){spend(p,id);r.r=6;r.ok=6+r.mod>=R.RUN;G.lastRoll=Object.assign({},G.lastRoll,{v:6,ok:r.ok,id:G.lastRoll.id+1});lg(p.i,`${p.nm} uses ${c.n}: it's a 6${r.ok?'':' and still not enough'}!`);if(!r.ok&&(rescueOpts(p,r).length||canReroll(p,r))){G.q={who:p.i,kind:'rescue',run:q.run};return}return finishRun(r)}
   if(c.sp==='ratstick'){loseCard(p,id,'tossed as a snack');r.ok=true;return finishRun(r)}
   if(c.sp==='lamp'){spend(p,id);const mi=cb.mons.findIndex(m=>m.id===r.m);const mm=cb.mons.splice(mi,1)[0];discard(mm.id);mm.enh.forEach(discard);cb.runs.filter(x=>x.m===r.m).forEach(x=>{x.done=true;x.ok=true});lg(p.i,`${p.nm} rubs ${c.n}: ${cname(mm.id)} vanishes!`);return nextRun()}}
 // ---- playing a card ----

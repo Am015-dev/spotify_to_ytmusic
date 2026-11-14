@@ -125,7 +125,8 @@ function aiAnswer(p,vm){const q=G.q;const yes={act:'opt',opt:'yes'},no={act:'opt
     const would=sideStr(cb)+pStr(p)>monStr(cb)||(sideStr(cb)+pStr(p)===monStr(cb)&&(isCls(p,'warrior')||isCls(f,'warrior')));const worth=q.n>=1||isRace(p,'elf');const risky=cb.mons.some(m=>isDeadly(mdef(m)));
     if(wins)return G.fast&&would?yes:no;const friend=threat(f)<=threat(p)+15||p.lv==='easy';return (would&&worth&&friend&&!(risky&&!would))?yes:no}
   case 'rescue':{const r=G.cb.runs[q.run];const c=mdef(runMon(r));const bad=isDeadly(c)||(c.bad||[]).some(o=>o[0]==='lvl'&&(o[1]==='all'||o[1]>=2))||c.lvl>=10;const use=vm.filter(m=>m.act==='use');
-    const cheap=use.find(m=>cd(m.card).sp==='ratstick')||use.find(m=>cd(m.card).sp==='die');if(cheap)return cheap;if(use.length&&bad)return use[0];return no}
+    const cheap=use.find(m=>cd(m.card).sp==='ratstick')||use.find(m=>cd(m.card).sp==='die');if(cheap)return cheap;if(use.length&&bad)return use[0];
+    const rr=vm.filter(m=>m.act==='reroll').sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];if(rr&&(bad||cardValue(p,rr.card)<=4))return rr;return no}
   case 'pick':{const v=aiPick(p,q.why,q.opts,q.cont);return {act:'pick',opt:Math.max(0,q.opts.indexOf(v))}}
   case 'glue':return aiGlue(p,G.cb.runs[q.run])?yes:no;
   case 'lawyer':return yes;
@@ -139,7 +140,7 @@ function schedule(){if(aiTimer||!G||G.winner||UI.pause)return;if(G.mode==='net'&
   // table during a rival turn (UI.ff) the rest of that turn runs fast until it is your call again
   const tut=typeof tutOn==='function'&&tutOn();if(!UI.rt||UI.rt.turn!==G.turn)UI.rt={turn:G.turn,t:Date.now()};
   // a rival's whole turn shows in about 3 s: after 2.2 s the rest of it runs fast (a tap on the table skips at once)
-  const late=!P(G.active).human&&Date.now()-UI.rt.t>2200;const ff=!tut&&(UI.ff===G.turn||late),side=!tut&&s!==G.active;const base=ANIM?(tut?600:ff?60:side?AIDELAY*.3:AIDELAY)/(UI.speed||1):0;const hold=ANIM&&UI.hold&&!ff?UI.hold-Date.now():0;aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold))}
+  const late=!P(G.active).human&&Date.now()-UI.rt.t>2200;const ff=!tut&&(UI.ff===G.turn||late),side=!tut&&s!==G.active;const base=ANIM?(tut?600:ff?60:side?AIDELAY*.3:AIDELAY)/(UI.speed||1):0;const hold=ANIM&&UI.hold&&!ff?UI.hold-Date.now():0;if(late&&typeof BF!=='undefined'&&BF.revClose)try{BF.revClose()}catch(e){}aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(base,hold))}
 function aiStep(){if(!G||G.winner)return;const s=sideToAct();if(s<0||P(s).human)return;const m=aiMove(s);if(!m){console.error('AI has no move in '+G.phase);return}
   const r=performMove(m,s);if(!r.success){console.error('AI move rejected: '+r.error+' '+mvKey(m));const vm=validMoves(s).filter(x=>x.act!=='sell');if(vm.length)performMove(vm[vm.length-1],s)}
   refresh()}
