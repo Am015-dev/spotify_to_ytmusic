@@ -100,7 +100,7 @@ function whyShort(M,m){const s=M.s,k=M.kind,q=G.q;let t='';
     else if(a==='cmd:rally')t='Rally: your chosen Active cards return to your hand now.';
     else if(a==='cmd:deploy')t='Deploy: the card goes face-up next to a region and stays Active.';
     else if(a==='council:oaths')t='Supporters come back to your board next round.';
-    else if(a.startsWith('t:'))t='This Tactic helps you most right now.';
+    else if(a.startsWith('t:')){const tn=tacName(a.slice(2));t=tn?'Play '+tn+': this Tactic helps you most now.':'This Tactic helps you most right now.'}
     else if(a.startsWith('fav:'))t='Use your Favour while you hold it.';
     else t='The best option at this step right now.'}
   else{const w=String(UI._recWhy||'').split(/(?<=[.!?:;])\s+/)[0].replace(/[.:;]$/,'.');t=w}
@@ -109,6 +109,30 @@ function hlpSuggest(){const M=UI.bf;if(!M||!M.kind||UI.card||UI.dragging||!M.sug
   const plan=()=>planFor(UI.bf,UI.bf.sug,{full:1});const p=planFor(M,M.sug,{full:1});if(!p||!p.toR)return null;
   const why=whyShort(M,M.sug);if(!why)return null;
   return {why,key:M.sug.k,target:()=>{const q=plan();return (q&&q.toR)||p.toR},from:p.fromR?()=>{const q=plan();return (q&&q.fromR)||p.fromR}:null}}
+function tacName(id){try{for(const f in DD.TACTICS)for(const t of DD.TACTICS[f])if(t.id===id)return t.nm}catch(e){}return ''}
+// ---- one helper while the bulb's bubble is open (R64): target glows go off, and the bubble sits right next to the thing its finger shows
+const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
+(function(){let was=false;
+  function anchor(b){const ring=document.querySelector('.gxh-ring:not(.from)');if(!b||!ring||!b.classList.contains('on'))return;
+    const px=(e,k)=>parseFloat(e.style[k]);   // the set position, not the animated box (both pop in with a scale)
+    const R={left:px(ring,'left'),top:px(ring,'top'),width:px(ring,'width'),height:px(ring,'height')};R.right=R.left+R.width;R.bottom=R.top+R.height;
+    const B={left:px(b,'left'),top:px(b,'top'),width:b.offsetWidth,height:b.offsetHeight};B.right=B.left+B.width;B.bottom=B.top+B.height;if(!(R.width>0)||!B.width||isNaN(B.top))return;
+    const gapY=B.top>=R.bottom?B.top-R.bottom:R.top>=B.bottom?R.top-B.bottom:0;if(gapY<=18&&(B.bottom<=R.top+2||B.top>=R.bottom-2)){b.dataset.tbAnch='1';return}   // already beside its target
+    const tb=document.getElementById('bulbbtn');const top=Math.max(6,tb&&tb.offsetWidth?tb.getBoundingClientRect().bottom+4:6),W=innerWidth,H=innerHeight,w=B.width,h=B.height,gap=10;
+    let y,side;if(R.top-gap-h>=top){y=R.top-gap-h;side='bottom'}else if(R.bottom+gap+h<=H-6){y=R.bottom+gap;side='top'}else return;b.dataset.tbAnch='1';
+    const x=Math.max(6,Math.min(W-w-6,R.left+R.width/2-w/2));b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px';
+    b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const arr=b.querySelector('.gxh-arr');if(arr){arr.style.top='';arr.style.left=Math.round(Math.max(14,Math.min(w-26,R.left+R.width/2-x-6)))+'px'}}
+  function sync(){const on=bulbOpenNow();document.documentElement.classList.toggle('tb-bulbon',on);if(on)anchor(document.querySelector('.gxh-bulbb'));
+    if(on!==was){was=on;try{applyHl()}catch(e){}}}
+  const go=()=>{new MutationObserver(sync).observe(document.body,{childList:true});sync()};if(document.body)go();else document.addEventListener('DOMContentLoaded',go)})();
+// while it is open only the map spot its finger points at keeps its glow class; the other locations and regions stop glowing
+(function(){const o=applyHl;applyHl=function(){if(!bulbOpenNow()||!MAP.m)return o.apply(this,arguments);const h=MAP.hl,hr=MAP.hlR,rc=MAP.rec;
+  const ring=document.querySelector('.gxh-ring:not(.from)'),q=ring&&ring.getBoundingClientRect(),cx=q?q.left+q.width/2:-1e4,cy=q?q.top+q.height/2:-1e4;
+  const inR=(e,pad)=>{if(!e)return false;const r=e.getBoundingClientRect();return r.width>0&&cx>=r.left-pad&&cx<=r.right+pad&&cy>=r.top-pad&&cy<=r.bottom+pad};
+  const keepL=(h||[]).filter(l=>inR(MAP.m.locEl(LOCID[l]),10));
+  const keepR=keepL.length?[]:(hr||[]).filter(r=>{const g=MAP.pan&&MAP.pan.querySelector('[data-reg="'+r+'"]');return inR(g&&g.querySelector('rect'),0)});
+  MAP.hl=keepL;MAP.hlR=keepR;MAP.rec={loc:keepL.includes(rc&&rc.loc)?rc.loc:undefined,reg:keepR.includes(rc&&rc.reg)?rc.reg:undefined};
+  try{return o.apply(this,arguments)}finally{MAP.hl=h;MAP.hlR=hr;MAP.rec=rc}}})();
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
@@ -128,7 +152,7 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
 (function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();
 // a help bubble never covers a glowing tap spot: on a crowded phone the kit's spot search can settle on one (it also avoids all text);
 // then the bubble moves to the nearest spot clear of every glowing core and of its own rings (text under it is fine)
-function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub'))return;const W=innerWidth,H=innerHeight;
+function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub')||b.dataset.tbAnch)return;const W=innerWidth,H=innerHeight;
   const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {left:cx-w/2-3,top:cy-h/2-3,right:cx+w/2+3,bottom:cy+h/2+3}};
   const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(core);
   const rings=[...document.querySelectorAll('.gxh-ring')].map(e=>{const q=e.getBoundingClientRect();return {left:q.left-4,top:q.top-4,right:q.right+4,bottom:q.bottom+4,main:!e.classList.contains('from')}});

@@ -6,4 +6,5 @@ node click.js 0 9 1 | tail -3
 node sweep.js 20 390x763,375x553 4
 node finger-test.js
 node doubletap-test.js 375x667 | tail -2
+node bulb-calm-test.js 375x667 2 | tail -3; MODE=tutorial node bulb-calm-test.js 375x553 | tail -2
 node loop-test.js 375x553 | tail -3
