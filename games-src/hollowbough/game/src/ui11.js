@@ -39,7 +39,7 @@ const HLP_RULES = [
   { phase: 'prepare', title: 'Your own seasons', text: 'Each player goes through Winter, Spring, Summer and Autumn alone.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
   { phase: 'lastCall', title: 'Nothing left? Pass', text: 'With nothing left to do, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
   { phase: 'lastCall', title: 'Your city still scores', text: 'When all have passed, cards, tokens, events and Long Road workers score.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
-  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
+  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. Ties: more events, then more leftover goods.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
   { phase: 'how', title: 'Several ways', text: 'This can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
   { phase: 'how', title: 'Pay or play free', text: 'Pay the price. Or play a critter free into its open matching building.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
   { phase: 'how', title: 'Cheaper plays', text: 'Some of your cards make a play cheaper. They show as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
@@ -87,7 +87,8 @@ function hlpWhy(m, a) {
     else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
-    if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
+    if (HB.cardKey(m.card) === 'fool') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
+    else if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
     else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
     else t = 'Play ' + nm + ' the cheaper way.';
   } else if (m.type === 'prepare') t = 'All workers are out: Prepare for ' + SEASN[Math.min(3, p.season + 1)] + '. They come home.';
@@ -141,5 +142,31 @@ function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
   // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
-  void st; void nb; try { GXH.phase(hlpPhase()); } catch (e) { }
+  void st; void nb;
+  // FIXED13: coach bubbles only in the guided first game; a normal game is clean (the bulb answers on demand and closes when the moment changes)
+  try { const ph = hlpPhase(); if (hlpCoached()) GXH.phase(ph); else { const s = GXH.state(); if (s.cur && (s.cur.kind === 'coach' || (s.cur.phase != null && s.cur.phase !== ph))) GXH.hide(); } } catch (e) { }
 }
+function hlpCoached() { return UI.mode === 'guided' || !!(UI.cfg && UI.cfg.coached); }
+// ---------------------------------------------------------------- the idle nudge (FIXED13): a normal game shows no helper; after 8 s without a tap
+// on your turn, the helper's pick gets one soft gold outline (no finger, no bubble). Tips off in the Menu turns it off too.
+const HLP_IDLE_MS = 8000;
+function hlpIdleClear() { clearTimeout(UI.idleT); document.querySelectorAll('.nudge').forEach(e => e.classList.remove('nudge')); }
+function hlpIdleArm() {
+  hlpIdleClear();
+  if (!G || !UI.started || G.phase === 'over' || hlpCoached() || guideOn() || (UI.cfg && UI.cfg.tutorial)) return;
+  UI.idleT = setTimeout(hlpNudge, HLP_IDLE_MS);
+}
+function hlpNudge() {
+  try {
+    if (!hlpPhase()) { UI.idleT = setTimeout(hlpNudge, 1500); return; }   // cards flying or a card open: wait, then try again
+    if (typeof GXH !== 'undefined') { const s = GXH.state(); if (!s.on || s.cur || s.rules) return; }
+    computeRec(true); const m = UI.rec && UI.rec.m; let el = hlpEl(m); if (!el || (m.type === 'pass')) return;
+    const pn = el.closest && el.closest('.pv-panel'); if (pn && !pn.classList.contains('on')) { const tb = document.querySelector('#bd .pv-tab[data-v="' + pn.dataset.p + '"]'); if (tb) el = tb; } else { try { pvScrollTo(el); } catch (e) { } }
+    el.classList.add('nudge');
+  } catch (e) { }
+}
+document.addEventListener('pointerdown', () => { if (typeof hlpIdleArm === 'function' && UI.started) hlpIdleArm(); }, true);
+// the guided game: when a coach bubble closes (a tap), the finger comes back (it hides while a bubble shows: one helper at a time)
+document.addEventListener('pointerup', () => { if (!UI.started || !hlpCoached()) return; clearTimeout(UI.fbk); UI.fbk = setTimeout(() => { try { const f = document.getElementById('finger'); if (f && f.hidden && !GXH.state().cur) placeFinger(); } catch (e) { } }, 400); }, true);
+// one helper at a time (FIXED13): the moment a coach bubble or the bulb's answer appears, the ghost finger steps aside (it comes back on the next tap)
+try { new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList && n.classList.contains('gxh-bub')) { const f = document.getElementById('finger'); if (f) f.hidden = true; hlpIdleClear(); return; } }).observe(document.body, { childList: true }); } catch (e) { }

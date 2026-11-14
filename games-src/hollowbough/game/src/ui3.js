@@ -37,7 +37,7 @@ function openZoom(spec) {
       box.appendChild(h('div.zinfo', k === 'deck' ? [h('b', 'Draw pile'), h('p', G.deck.length + ' cards')] : k === 'disc' ? [h('b', 'Discards'), h('p', G.discard.length + ' cards')] : [h('b', 'Seasons'), h('p', 'Prepare to move on.')]));
     } else {
       const t = h('div.ztile.tile.t-' + k, tileFace({ kind: k, i }, true)); box.appendChild(t);
-      box.appendChild(h('div.zinfo', h('b', info.name || ''), h('p', (info.text || '').replace(/ Shared\.$/, '')), h('p.sm', info.shared ? 'Any number of workers.' : 'One worker.')));
+      box.appendChild(h('div.zinfo', h('b', info.name || ''), h('p', (info.text || '').replace(/ Shared\.$/, '')), h('p.sm', info.slots || (info.shared ? 'Any number of workers.' : 'One worker.'))));
     }
   }
   z.appendChild(box); z.hidden = false; UI.zoomAt = Date.now();
@@ -146,7 +146,7 @@ function fingerWanted() {
   if (UI.mode === 'guided') return true;
   if (typeof guideOn === 'function' && guideOn()) return true;   // R35: the finger shows by default in vs games too (hints off turns it off)
   if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
-  return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
+  return false;   // FIXED13: a normal game shows no finger unless Hints are on (the first game is the guided one)
 }
 // a hand chip outside the sideways-scrolling hand row: bring it into view (the row remembers where it was)
 function hscrollTo(el) { hscrollTo0(el); fingerFollow(); }
@@ -167,6 +167,7 @@ function placeFinger() {
   let f = $('#finger'); if (!f) { f = h('div#finger', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 40 48"><rect x="13" y="2" width="13" height="30" rx="6.500" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/><rect x="7" y="22" width="27" height="25" rx="11" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/></svg>' }); $('#board').appendChild(f); }
   f.hidden = true;
   if (!fingerWanted() || !UI.rec || !UI.rec.m || !myMoves().length) return;
+  try { const s = GXH.state(); if (s.cur || s.rules) return; } catch (e) { }   // a coach bubble or the bulb is showing: it is the one helper on screen
   let tg = tgOf(UI.rec.m);
   if (UI.sel) { const i = UI.sel.ms.findIndex(x => sameM(x, UI.rec.m)); if (i >= 0) tg = 'o:' + i; else return; }
   let el = UI.tgEls && UI.tgEls[tg];

@@ -476,3 +476,21 @@ html.ph #prompt,html.ph .gx-bar #prompt{-webkit-line-clamp:unset!important;displ
 html.ph .gx-bar{min-height:52px}
 html.ph #barprompt{max-height:none!important;overflow:visible!important}
 #acts.tray .tchip.tcard.tbig{align-self:flex-start}
+/* FIXED13 calm play (owner: "confusing and distracting"): a normal game has no finger, no coach bubble, no pulsing.
+   Legal places and cards keep a soft steady gold edge; one gentle nudge outline after 8 s idle (src/ui11.js hlpNudge).
+   The Hints switch lives in the Menu: the top-bar Hints button looked like a second bulb. */
+#hintsbtn{display:none!important}
+html.calm #bd.pv .tile.glow,html.calm #bd.pv.tall .pv-board .tile.glow{animation:none!important}
+html.calm #bd.pv .tile.glow::before,html.calm #bd.pv.tall .pv-board .tile.glow::before,html.calm #bd.pv.tall .pv-board .tile.pv-place.glow::before{animation:none!important;border-color:#e9b93a!important;box-shadow:0 0 0 1px rgba(255,214,90,.55),0 0 6px 1px rgba(255,214,90,.35)!important}
+html.calm #bd.pv .mc.glow .pvc,html.calm #bd.pv .hc.glow .pvc,html.calm #bd.pv .strip.city .sc.glow .pvm{box-shadow:0 0 0 2px var(--pv-gold),0 3px 0 rgba(0,0,0,.4)!important}
+html.calm .tile.glow .face,html.calm .tile.glow .face::after,html.calm .mc.glow .cd,html.calm .sc.glow .cd,html.calm .tchip.glow,html.calm .cvc.glow .cd,html.calm #acts .btn.prep.glow,html.calm .pv-tab.glow{animation:none!important}
+.nudge{outline:3px solid #fff1a8!important;outline-offset:2px;animation:hbnudge 1.6s ease-in-out 3}
+html #bd.pv .tile.nudge{outline:0!important;animation:none}
+html #bd.pv .tile.nudge::before,html.calm #bd.pv.tall .pv-board .tile.pv-place.nudge::before{border-width:4px!important;border-color:#fff1a8!important;box-shadow:0 0 0 2px #ffb81f,0 0 14px 4px rgba(255,214,90,.8)!important;animation:hbnudgeb 1.6s ease-in-out 3!important}
+html #bd.pv .mc.nudge,html #bd.pv .hc.nudge,html #bd.pv .sc.nudge{outline:0!important;animation:none}
+html #bd.pv .mc.nudge .pvc,html #bd.pv .hc.nudge .pvc,html #bd.pv .sc.nudge .pvm{box-shadow:0 0 0 4px #fff1a8,0 0 0 6px #ffb81f,0 0 14px 4px rgba(255,214,90,.8)!important}
+@keyframes hbnudge{0%,100%{outline-color:#fff1a8}50%{outline-color:#ffb81f}}
+@keyframes hbnudgeb{0%,100%{border-color:#fff1a8}50%{border-color:#ffb81f}}
+@media (prefers-reduced-motion:reduce){.nudge{animation:none}}
+/* FIXED13: with the tokens column (r5) a 375 px phone cut "workers": one meeple is enough there, the number says how many */
+@media (max-width:400px){#bd.pv .resrow.r5 .rs.wk .pv-meeple~.pv-meeple{display:none}#bd.pv .resrow.r5 .rs.wk .pv-wn{margin-left:2px}#bd.pv .resrow.r5 .rs.wk .rsw{font-size:.8em!important;letter-spacing:-.2px}#bd.pv .resrow.r5 .rs.wk{padding-left:3px}}
