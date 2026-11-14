@@ -1,3 +1,10 @@
+> **[REVIEW R63] summary (the scheduled report to the orchestrator was refused, so it is here):** vinegrave 75cff6df. Gates: quick PASS,
+> full PASS x2, guided tutorial PASS at 667 and 553. Rules: engine and all reachable texts right (one wrong line only in hidden
+> `?tut=coach`, ui4.js:100). Clutter: hints off max 1 helper, 0 loops. Hints on max 2 (1 sample), 1 endless loop (help bubble pulse).
+> **STOPPER at 375x553:** `vg-squeeze` (ui1.js:183, style.css:582) hides the map and research track when the dock has 3 buttons;
+> 32 of 149 turns affected, 15 dead taps. Fairness: glow follower 61 %. Rows 7/8/7/6/4/7/7/5, average 6.4, capped at 4.0. **FAIL.**
+> Top fix: use vg-squeeze only while a chooser is open, and keep the map about 150 px at 553.
+
 # R63 strict gameplay review: vinegrave (14 Nov 2026)
 
 Build reviewed: `shelf/W490-vinegrave-bench` at **75cff6dfbd1d0a7746abd0b2c66dbaaae1ac2eea** ("hints add no second pointer").
