@@ -234,10 +234,10 @@ function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
 function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey())||(typeof tutOn==='function'&&tutOn()))return null;return planFor(M,rm)}
 function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
   if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
-  if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}
+  if(f._k===p.key&&(!f.hidden||f._done===p.key))return;f._k=p.key;f._done='';f.hidden=false;   // after its 3 demos the finger hides and stays hidden for this movetry{f._a&&f._a.cancel()}catch(e){}
   const a=p.from||p.to,b=p.to;const kf=p.from?[{transform:'translate('+a.x+'px,'+a.y+'px) scale(1.25)',opacity:0},{transform:'translate('+a.x+'px,'+a.y+'px) scale(1)',opacity:1,offset:.14},{transform:'translate('+a.x+'px,'+a.y+'px) scale(.9)',opacity:1,offset:.28},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.9)',opacity:1,offset:.72},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.2)',opacity:.9,offset:.86},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.4)',opacity:0}]
     :[{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.3)',opacity:0},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1)',opacity:1,offset:.3},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.85)',opacity:1,offset:.55},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.35)',opacity:0}];
-  try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:3,fill:'forwards',easing:'ease-in-out'})}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
+  try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:3,fill:'forwards',easing:'ease-in-out'});const k=p.key;f._a.onfinish=()=>{if(f._k===k){f.hidden=true;f._done=k}}}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
 function bfAfter(){bfFinger();if(typeof hlpAfter==='function')hlpAfter()}
 // the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
 // Crown's Edict asks only when it changes who picks first (your bid already first: using it would only waste it)
