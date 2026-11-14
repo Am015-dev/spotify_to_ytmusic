@@ -37,6 +37,6 @@ await sleep(1500);
     console.log('g'+g+' '+W+'x'+H+': '+(over?'finished':'NOT finished')+' in '+Math.round((Date.now()-t0)/1000)+' s, '+taps+' taps, longest still dead screen '+(worst.ms/1000).toFixed(1)+' s '+(worst.what||'')+', page errors '+errs.length+(errs.length?' '+errs[0]:''));
     {const S=await p.evaluate(()=>window.__tbHS||[]);const all=HS.summary(S),hw=HS.summary(S.filter(r=>r.mark===1));
       console.log(HS.line('game g'+g+' '+W+'x'+H,all));console.log(HS.line('after-hint g'+g+' '+W+'x'+H+' ('+hintsDone+' hints x 15 s)',hw));if(all.max>1||all.loops||hw.max>1)bad++;
-      if(!['hand','suggest','target'].some(k=>all.kinds[k])){console.log('FAIL: no glow was ever visible (a helper rule hides them all)');bad++}}
+      if(!Object.keys(all.kinds).length){console.log('FAIL: no helper was ever visible');bad++}}   // (that the glow comes back after the finger is checked in loop-test.js)
     if(!over||errs.length)bad++;await ctx.close()}
   await b.close();console.log(bad?'FAIL':'PASS');process.exit(bad?1:0)})();

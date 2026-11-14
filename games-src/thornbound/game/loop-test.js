@@ -28,6 +28,10 @@ const tapSel=async(p,sel)=>{const r=await p.evaluate(s=>{const e=[...document.qu
     if(r.loops.length||errs.length||steps.size<20)bad++;await ctx.close()}
   // ---- a quick game, following the glow; the bulb once
   {const {ctx,p,errs}=await page(b);await p.evaluate(()=>showStart());await tapSel(p,'#start [data-a=play]');await sleep(500);await tapSel(p,'#start [data-a=start]');await sleep(800);
+    // the hint finger demos the move 3 times and hides; then the suggested card's glow is back (one helper, never none)
+    {for(let i=0;i<9;i++){await tapSel(p,'.gxh-bub.on .gxh-ok');await tapSel(p,'#tbgoal button');await sleep(1000)}
+      const g=await p.evaluate(()=>{const f=document.getElementById('finger'),e=document.querySelector('#handw .hc.rg svg');return {finger:!!f&&!f.hidden,bub:!!document.querySelector('.gxh-bub.on'),glow:!!e&&/drop-shadow\(rgb\(255, 2/.test(getComputedStyle(e).filter)}});
+      out.push('AFTER FINGER: finger '+(g.finger?'still shown':'hidden')+', suggested-card glow '+(g.glow?'back':'MISSING'));if(g.finger||g.bub||!g.glow)bad++}
     const t0=Date.now();let bulb=false,taps=0;
     while(Date.now()-t0<90000){
       if(!bulb&&Date.now()-t0>30000){bulb=await tapSel(p,'#bulbbtn');if(bulb){await sleep(6000);continue}}
