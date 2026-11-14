@@ -2,14 +2,18 @@
 // Rules, engine and AI are untouched. Everything here is looks and touch; the moves still come from validMoves() through uiAct().
 const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
-function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
+// every hand card shows its whole name: shrink the type (not below 10 px) until no word is cut and it fits in 3 lines
+function tbFitNames(cs){cs.forEach(c=>{const m=c.querySelector('.cn');if(!m)return;m.style.removeProperty('font-size');let fs=parseFloat(getComputedStyle(m).fontSize)||14;
+  const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;for(let i=0;i<10&&bad()&&fs>10;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
+function tbFan(){tbFitNames([...document.querySelectorAll('.arena .card,.bfstage .card')]);const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
-  const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0){if((tbFan.n=(tbFan.n||0)+1)<25){clearTimeout(tbFan.t);tbFan.t=setTimeout(tbFan,200)}return}tbFan.n=0;   // hand not laid out yet (board hidden behind a screen): fit it again when it shows
+  
   // portrait phone, 5+ cards: a fan hides every name, so the hand becomes a row of whole, readable cards that scrolls sideways
-  if(document.documentElement.classList.contains('ph-p')&&n<=5){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
-    // up to 5 cards always fit: shrink them a little instead of scrolling (names stay 14px); 6+ use the overlapping fan below
-    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100)hd.style.setProperty('--hw',Math.max(64,fw)+'px')}
-    hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*wN+(n-1)*gap>room);hd.classList.remove('tight');cs.forEach(c=>{const m=c.querySelector('.cn');if(m)m.style.fontSize=''});return}
+  if(document.documentElement.classList.contains('ph-p')){const gap=6;hd.style.setProperty('--ov',gap+'px');hd.style.setProperty('--vis','100%');
+    // up to 5 cards always fit; 6+ shrink to 72 px and the row scrolls sideways (every card keeps its art, whole name and bonus)
+    const room=hd.clientWidth-8;{const fw=Math.floor((room-gap*(n-1))/n);if(fw<100){const mn=n>5?72:64;let hw=Math.max(mn,fw);if(n>5&&n*mn+(n-1)*gap>room){const g2=14,full=hd.clientWidth,m=Math.max(1,Math.floor((full+g2)/(mn+g2)));hw=Math.floor((full-g2*(m-1))/m);hd.style.setProperty('--ov',g2+'px')}hd.style.setProperty('--hw',hw+'px')}}   // scrolling row: the card width is chosen so a whole number of cards fills the strip (the first view cuts no card in half)
+    hd.classList.add('row');const wN=parseFloat(hd.style.getPropertyValue('--hw'))||100;hd.classList.toggle('scrolls',n*wN+(n-1)*gap>room);hd.classList.remove('tight');tbFitNames(cs);return}
   // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
   let w=w0;if(n>1){const fit=avail-MS*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
   const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<MS,step=sc?MS:Math.min(w*.8,need);
@@ -33,12 +37,26 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
   const w=e.firstElementChild?e.firstElementChild.getBoundingClientRect().width||54:54,h=e.firstElementChild?e.firstElementChild.getBoundingClientRect().height||54:54;
   const sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-h/2,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-h/2;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(.8) rotate(-10deg)`,opacity:0},{transform:`translate(${sx}px,${sy}px) scale(1) rotate(-6deg)`,opacity:1,offset:.12},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-34}px) scale(1.12) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.55)`,opacity:0}],{duration:ms||620,delay:delay||0,easing:'cubic-bezier(.3,.7,.3,1)',fill:'both'});a.onfinish=()=>e.remove()}
-// the fight must fit inside the table: shrink the cards (never the buttons) until nothing pokes out of it
+// the fight must fit inside the table: shrink the cards (never the buttons) until nothing pokes out of it. Cards never go under 56 px:
+// below that (3+ monsters, a short table) the fight turns compact: a "YOU 6 vs 8 MONSTERS" readout and a list of named monster tiles.
+// Every box is judged where it LANDS (its layout box), not mid-animation, so a card still sliding in is fitted at once, never skipped.
+function tbBox(e){const r=e.getBoundingClientRect();if(!e.getAnimations().length)return r;const h=e.offsetHeight,w=e.offsetWidth;   // layout box: the offset chain is untouched by transforms
+  let p=e.offsetParent;if(!p)return r;const q=p.getBoundingClientRect();const top=q.top+p.clientTop+e.offsetTop-p.scrollTop;return {top,bottom:top+h,width:w,height:h}}
 function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
-  if(!ar.querySelector(':scope>.vs'))return;const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
-  let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.getBoundingClientRect().width;
-  ar.classList.remove('tight');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
-  if(out()){ar.classList.add('tight');for(let k=0;k<6&&out()&&cw>36;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}}
+  ar.classList.remove('tight','tight2','tight3','cmp','cmp2');if(!ar.querySelector(':scope>.vs'))return;
+  const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
+  // out: anything of the fight above or below the table, or a monster tile under the score line
+  const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline .sl1');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
+    for(const e of ar.querySelectorAll('.fbtns,.score .num,.score .yn,.row.mons .mon,.row.mons .card,.hsav,.rollbox,.row.small')){if(!shown(e))continue;const r=tbBox(e);if(!r.width)continue;
+      if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
+  const n=ar.querySelectorAll('.row.mons .mon').length;let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.offsetWidth;
+  const shrink=(min,steps)=>{for(let k=0;k<steps&&out()&&cw>min;k++){cw=Math.max(min,cw*.9);ar.style.setProperty('--cw',cw.toFixed(1)+'px')}};
+  const compact=()=>{ar.style.removeProperty('--cw');ar.classList.remove('tight','tight2');ar.classList.add('cmp');ar.querySelectorAll('.cn').forEach(m=>m.style.removeProperty('font-size'))};
+  if(n>=3||(c&&cw<56))compact();
+  else{shrink(56,3);if(out()){ar.classList.add('tight');shrink(56,8)}if(out()){ar.classList.add('tight2');shrink(56,8)}if(out())compact()}
+  // a big pick in the dock leaves a sliver of table: keep the readout; the monster tiles go while the question is open (nothing can be dropped on them then)
+  if(ar.classList.contains('cmp')&&out()&&!ar.querySelector('.fbtns')&&typeof G!=='undefined'&&G.q)ar.classList.add('cmp2');
+  clearTimeout(TB.fitT);if(ar.querySelector('.row.mons .card')&&[...ar.querySelectorAll('*')].some(e=>e.getAnimations().length))TB.fitT=setTimeout(()=>{try{tbFit()}catch(e){}},700)}
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
   const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};
@@ -46,7 +64,7 @@ function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySele
 function tbDiff(S,N){if(!S||!N||S.gid!==N.gid||!S.hc||!N.hc||!BF.motion())return;const me=viewSeat();
   const seat=s=>s===me?document.querySelector('.mine .hand .card:last-child')||document.querySelector('.mine .hand'):document.querySelector(`#app .opps [data-opp="${s}"]`);
   const deck=(S.trn>N.trn)?'.pile.pr .stack':(S.drn>N.drn)?'.pile.pl .stack':'';
-  const dk=deck?document.querySelector(deck):null,dr=dk?dk.getBoundingClientRect():null;
+  const dk=deck?document.querySelector(deck):null,dr0=dk?dk.getBoundingClientRect():null,dr=dr0&&dr0.width?dr0:null;   // a hidden deck (a 3-monster fight takes the table) flies nothing
   const back=deck&&deck.includes('pr')?'tr':'door';
   N.hc.forEach((h,i)=>{const d=h-S.hc[i];if(d<=0||!dr)return;const to=seat(i);if(!to)return;const r=to.getBoundingClientRect();
     for(let k=0;k<Math.min(d,4);k++)tbFly(`<div style="width:44px;height:62px;border-radius:5px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.6)">${cardBack(back)}</div>`,dr,r,560,k*130)});

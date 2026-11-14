@@ -253,3 +253,9 @@ Open interpretations ([H]): Halfling keeps the printed -1 to run away (the 2010 
 199. Uninvited Guest can only be played during a fight, with a monster from your hand.
 200. Sticky Paste: a hero who gets away must roll again.
 201. Porter can be played at any time, even in a fight.
+
+## Turn
+
+202. With no monster met you must loot the room or look for trouble: ending the turn is not offered yet.
+203. A curse kicked from the door still leaves the room to loot afterwards.
+204. After a won fight the turn goes straight to tidy-up: no loot and no trouble.

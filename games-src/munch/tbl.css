@@ -193,7 +193,7 @@ html.ph .arena.tight .row.mons{margin-bottom:6px}
 /* the tutorial's progress dots: 23+ steps must fit beside "Skip tutorial" on a 375px phone */
 .gxt-top .gxt-dots{gap:2px}.gxt-top .gxt-dots i{width:4px;height:4px}.gxt-top .gxt-dots i.on{transform:scale(1.5)}.gxt-top .gxt-n{font-size:11px}
 /* the tutorial entry in the start dialog and the menu */
-.btn.gxt-menu{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
+.btn.gxt-menu{padding-top:8px;padding-bottom:8px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;box-sizing:border-box;text-align:left;white-space:normal;line-height:1.2;margin:6px 0}
 .btn.gxt-menu span{font-weight:600;font-size:.82em;opacity:.8}
 .btn.gxt-menu.gxt-first{border-color:#c99a35;box-shadow:0 0 0 2px rgba(201,154,53,.45)}
 /* painted extras */
@@ -313,10 +313,116 @@ html:not(.ph) .card .kind{box-sizing:border-box;padding-right:22px;overflow:hidd
 html:not(.ph) .card .cx{margin-top:8px}
 /* phone fight row: a bonus card's +N is already on the score line; a monster keeps its level gem with a one-line name */
 html.ph .arena .card:not(.t-monster) .tag{display:none!important}
-html.ph .arena .card.t-monster .cn{-webkit-line-clamp:1!important}
+html.ph .arena .card.t-monster .cn{-webkit-line-clamp:2!important;overflow-wrap:normal;word-break:normal;hyphens:none}
 /* portrait phone, 6+ cards: the overlapping fan; a covered card shows its art and number, the top card shows everything */
 html.ph-p .mine .hand:not(.row) .card:not(:last-child) :is(.cn,.gold){display:none!important}
 /* PC: the price tag sits clear of the kind line */
 html:not(.ph) .card .aw .gold{translate:0 -8px}
 /* phone hand names: up to 3 lines, long words break, so no name is cut */
-html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:anywhere;hyphens:auto}
+html.ph-p .mine .hand .card .cn{-webkit-line-clamp:3!important;overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* portrait phone: while the card panel is open (it stops above the action bar, ui.js dkCardFit) the action bar stays on top and tappable */
+html.ph-p.dk-cardup:has(#dkCard.on) .gx-dock{position:relative;z-index:42;pointer-events:auto}
+/* phone: level floats sit on the table under the seat they belong to, below any open panel, smaller */
+html.ph .bffloat{z-index:39;font-size:22px}
+html.ph .bffloat.big{font-size:34px}
+/* portrait phone: the door reveal sits over the table, clear of your hero and item strip; a rival's curse names the rival */
+html.ph-p .bfrev{align-content:start;padding-top:calc(var(--ph-bar,44px) + 64px)}
+html.ph-p .bfrev .bfrc .card{--w:min(42vw,200px,24dvh)}
+.bfrev.them.k-curse .bfban{font-size:clamp(24px,8vw,40px);text-align:center;max-width:92vw}
+@media (max-height:700px){html.ph-p .bfrev{padding-top:calc(var(--ph-bar,44px) + 36px)}html.ph-p .bfrev .bfrc .card{--w:min(36vw,170px,20dvh)}}
+/* quick-game menu: Start sticks to the bottom of the menu, so it is visible without scrolling on any phone */
+.dlg .dkstart{position:sticky;bottom:0;z-index:3;box-shadow:0 -8px 14px rgba(40,20,6,.35),0 4px 0 #5a2a0c}
+/* phone fight: the hero's name sits clear below the portrait frame's gem */
+html.ph .arena:has(>.vs) .score.hero .sl{margin-top:10px!important}
+/* phone: the stage captions wrap inside the table, never cut */
+html.ph .bfstage .bfcap{white-space:normal!important;overflow:visible;text-overflow:clip;max-width:calc(100% - 8px);line-height:1.15}
+/* names never cut at 375: rival plates use a tighter face, the result table keeps portrait + name on one line */
+html.ph .opp.seat{column-gap:3px;padding-right:4px;max-width:none}
+html.ph .opp.seat .snm{font-size:12.5px;letter-spacing:-.02em;text-overflow:clip}
+.dlg.end table td:first-child{white-space:nowrap}
+.dlg.end table td:first-child .ptok{vertical-align:middle;margin-right:4px}
+html.ph .score .sl{max-width:none;white-space:normal;text-overflow:clip;overflow:visible;font-size:12.5px;line-height:1.1;text-align:center;overflow-wrap:normal;word-break:keep-all;hyphens:none}
+/* desktop Sell confirm: a full 44 px tap target like every other control */
+.sellbar .btn{min-height:44px}
+
+/* phone: the fight score chip is a real 44 px target (tutorial lights it) */
+html.ph .arena:has(>.vs) .vs .score.hero{min-height:44px}
+/* phone result card: the whole table sits above the button bar (no scroll at 375x667): small hero, tight table, no footer line */
+html.ph .dlg.end{padding-bottom:0}
+html.ph .dlg.end .win3d{width:84px;height:84px;margin-bottom:0}html.ph .dlg.end .winp{width:56px;height:56px;margin-bottom:4px}
+html.ph .dlg.end .confetti{font-size:14px;line-height:1.1;margin:0}
+html.ph .dlg.end h2{font-size:1.25rem;line-height:1.15;margin:2px 0 4px}
+html.ph .dlg.end>p{margin:2px 0 4px;font-size:13px;line-height:1.25}
+html.ph .dlg.end>p.small.muted:last-of-type{display:none}
+html.ph .dlg.end table{font-size:13px;table-layout:fixed;margin-bottom:16px}
+html.ph .dlg.end table th{font-size:11px;padding:0 1px;white-space:nowrap}
+html.ph .dlg.end table td{padding:2px 1px}
+html.ph .dlg.end table td:first-child{width:40%;white-space:normal;overflow-wrap:anywhere;line-height:1.15;font-size:12.5px}
+html.ph .dlg.end table td:first-child .ptok{width:22px;height:22px;margin-right:2px}
+html.ph .dlg.end .recap p{margin:0 0 2px;font-size:13px;line-height:1.25}
+html.ph .dlg.end .recap{margin:0 0 4px}
+
+/* result card: a level float from the last fight must not sit on the headline */
+html:has(#modal:not([hidden]) .dlg.end) .bffloat{display:none!important}
+.opts .btn.opt.rec{box-shadow:0 0 0 3px #ffe27a,0 0 10px rgba(255,200,60,.6)}.optstar{color:#c98a00;font-weight:900}html.sk .optstar,html.sk .btn.rec .optstar{color:#ffe27a;text-shadow:0 1px 0 #3a2213}
+/* touch size: every gear chip is at least 44 px tall, wherever it sits (hero row, rival panel, fight, card panel) */
+html.ph .gchip,html.ph .arena .mon .gchip,html.ph .gear .gchip,html.ph .phlist .gchip,.gchip.eqoff{min-height:44px!important;box-sizing:border-box}
+@media (pointer:coarse),(max-width:480px){.gchip,.arena .mon .gchip{min-height:44px!important;box-sizing:border-box}}
+
+/* the tutorial strip sits over the header: its buttons hide while it is up, so Skip never covers Menu */
+html:has(.gxt-top) header .gx-ibtn{visibility:hidden}
+/* result table: the name sits beside its portrait (never wraps under it); short phones drop the winner art so the last row clears Play again */
+.dlg.end .enm{display:flex;align-items:center;gap:4px;min-width:0}
+.dlg.end .enm>span{min-width:0;overflow-wrap:break-word;line-height:1.1}
+html.ph .dlg.end table th:first-child{width:38%}
+html.ph .dlg.end table td:first-child{overflow-wrap:break-word}
+.dlg.end .enm .ptok{flex:0 0 auto;margin-right:0!important}
+@media (max-height:620px){html.ph .dlg.end :is(.win3d,.winp){display:none}html.ph .dlg.end table{margin-bottom:20px}}
+/* tbl.js tbFit last step: the fight still pokes out of a very short table */
+html.ph .arena.tight2:has(>.vs){align-content:start;row-gap:2px}
+html.ph .arena.tight2>.rollbox,html.ph .arena.tight2 .fightnote{display:none}
+html.ph .arena.tight2:has(>.sline){padding-top:32px}
+html.ph .arena.tight2 .mon>.small.mstr{display:none!important}
+html.ph .arena.tight2 .vs .score.hero .num{margin-top:0}
+html.ph .arena.tight2 .sline .sl1{padding:0 14px 1px}
+html.ph .arena.tight2 .sline .n{font-size:26px;-webkit-text-stroke-width:1px;text-shadow:0 2px 0 #0d0603}
+html.ph .arena.tight2 .sline .sl1 i{font-size:.72rem}
+html.ph .arena.tight2 .sline>:not(.sl1){display:none}
+html.ph .arena.tight2 .row.mons{margin-bottom:2px}
+/* compact fight (3+ monsters, or a table too short for 48 px cards): a "YOU 6 vs 8 MONSTERS" readout made of the two drop targets,
+   then one named tile per monster (name 14 px, tile 44 px tall), then the buttons. Replaces the old 18 px cards. */
+.arena .yn,.arena .mlv{display:none}
+html.ph .arena.cmp:has(>.vs){display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;padding:2px!important}
+html.ph .arena.cmp>:is(.sline,.rollbox,.row.small){display:none!important}
+html.ph .arena.cmp .vs{display:flex!important;align-items:center;justify-content:center;gap:8px;width:100%}
+html.ph .arena.cmp .vs .vsx{display:none!important}
+html.ph .arena.cmp .vs .score{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:5px!important;width:auto!important;height:44px!important;min-height:44px;margin:0!important;padding:0 11px!important;border-radius:22px!important;background:rgba(18,8,3,.86)!important;box-shadow:0 0 0 2px #0d0603!important;border:0!important;align-self:center!important;animation:none}
+html.ph .arena.cmp .vs .score :is(.sl,.hsav){display:none!important}
+html.ph .arena.cmp .vs .score .yn{display:block!important;order:0;font:700 14px/1 var(--title);font-style:normal;letter-spacing:.02em;color:#f3e3c0;white-space:nowrap}
+html.ph .arena.cmp .vs .score .num,html.dk-clash.dk-clash .arena.cmp .vs .score .num{display:block!important;order:0!important;margin:0!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;filter:none!important;font:900 26px/1 var(--title)!important;color:#fff;-webkit-text-stroke:1px #0d0603;paint-order:stroke fill;text-shadow:0 2px 0 #0d0603}
+html.ph .arena.cmp .vs .score.hero.win .num{color:#9dff8a!important}html.ph .arena.cmp .vs .score.hero.lose .num{color:#ff8a7a!important}
+html.ph .arena.cmp .vs .score.mons .yn{order:2}html.ph .arena.cmp .vs .score.mons .num{color:#ff9d88!important}html.ph .arena.cmp .vs .score.mons.win .num{color:#ff6a55!important}
+html.ph .arena.cmp .row.mons{display:flex;flex-wrap:nowrap;gap:5px;justify-content:center;margin:10px 0 0!important;width:100%}
+html.ph .arena.cmp .row.mons .mon{position:relative;display:block;flex:1 1 0;min-width:0;max-width:200px;min-height:46px}
+html.ph .arena.cmp .row.mons .mon>:is(.small.mstr,.row){display:none!important}
+html.ph .arena.cmp .row.mons .card{--w:100%;width:100%;height:46px;aspect-ratio:auto;margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:1fr;align-items:center;column-gap:6px;padding:2px 3px;border-radius:9px;container-type:normal;animation:dkTileIn .35s ease-out}
+html.ph .arena.cmp .row.mons .card>:not(.cn):not(.aw):not(.hit){display:none!important}
+html.ph .arena.cmp .row.mons .card .aw{grid-column:1;grid-row:1;width:38px;height:38px;margin:0;border-radius:6px}
+html.ph .arena.cmp .row.mons .card .aw>:not(.art):not(svg){display:none!important}
+html.ph .arena.cmp .row.mons .card .cn{grid-column:2;grid-row:1;padding:0;font:800 14px/1 var(--cardt)!important;letter-spacing:-.02em;max-height:42px;text-align:left;white-space:normal;overflow-wrap:break-word;hyphens:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .arena.cmp .row.mons .mon .mlv{display:grid;place-items:center;position:absolute;z-index:4;right:4px;top:-12px;min-width:22px;height:20px;padding:0 5px;border-radius:10px;background:#5a1408;color:#fff;font:800 14px/1 var(--title);box-shadow:0 0 0 1.5px #0d0603;pointer-events:none}
+/* three or more: no art, the whole tile is the name */
+html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card{grid-template-columns:minmax(0,1fr);padding:2px 3px}
+html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card .aw{display:none!important}html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card .cn{grid-column:1}
+html.ph .arena.cmp>.fbtns{width:100%;max-width:330px;align-self:center;justify-content:center}html.ph .arena.cmp>.fbtns button{min-height:44px}
+html.ph .arena.cmp2 .row.mons{display:none!important}
+html.ph .arena.cmp .row.mons .card .cn{-webkit-line-clamp:3!important}
+/* three or more monsters: the decks step aside and the fight takes the whole table, so every name fits at 14 px */
+html.ph .felt:has(>.arena.cmp .row.mons .mon:nth-child(3))>.pile{display:none!important}
+html.ph .felt:has(>.arena.cmp .row.mons .mon:nth-child(3))>.arena{grid-column:1/-1}
+@keyframes dkTileIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+/* phone fight: the monster card lands with a scale-in that never leaves its own box (the slam from 70 px above poked out of the table) */
+html.ph .arena .row.mons .card.fly{animation:dkLand .5s cubic-bezier(.2,1,.3,1)}
+@keyframes dkLand{0%{transform:scale(.55) rotate(-6deg);opacity:0}60%{transform:scale(1) rotate(1deg);opacity:1}80%{transform:scale(.97)}100%{transform:none}}
+.dk-tutoff{pointer-events:none!important}

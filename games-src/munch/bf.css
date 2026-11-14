@@ -50,7 +50,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 .bfrev .bfrc{position:relative;perspective:800px}
 .bfrev .bfrc .card{--w:min(46vw,210px);visibility:hidden;box-shadow:0 18px 40px rgba(0,0,0,.7)}
 .bfrev.open .bfrc .card{visibility:visible;animation:bfFlip .6s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
-.bfrev:not(.mine) .bfrc .card{--w:min(36vw,160px)}
+.bfrev:not(.own) .bfrc .card{--w:min(36vw,160px)}
 @keyframes bfFlip{from{transform:rotateY(90deg) scale(.3)}to{transform:none}}
 .bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .3s cubic-bezier(.2,1.6,.4,1) both;visibility:hidden}
 .bfrev.open .bfban,.bfrev.open .bfsub{visibility:visible}
@@ -177,3 +177,21 @@ html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mo
 #dkgoal .dkgy{margin:0 0 14px;font-size:16px}
 #dkgoal .btn{width:100%;min-height:48px;font-size:17px;justify-content:center;text-align:center}
 #phchip,#docktitle{cursor:pointer}
+/* the advisor's one best move: a gold ★ on the card (shown on phones too), a steady pulse on the button */
+.mine .hand .card.bf-best::before,.mine .gear .gchip.bf-best::before{content:"★";position:absolute;top:-10px;right:-6px;z-index:9;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff6c8,#ffc93c 60%,#c8860e);color:#4a2400;font:900 15px/24px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #4a2400,0 0 10px rgba(255,200,60,.9);pointer-events:none}
+.mine .hand .card.bf-best::after{box-shadow:0 0 0 3px #ffe27a,0 0 0 7px rgba(255,200,60,.55),0 0 18px 6px rgba(255,190,50,.45)!important}
+.mine .gear .gchip.bf-best{position:relative;box-shadow:0 0 0 3px #ffe27a,0 0 12px rgba(255,200,60,.7)!important}
+/* the hand scroll cue: a 44px tab at the edge with the number of hidden cards */
+.hcue{position:absolute;z-index:12;min-width:48px;height:44px;padding:0 8px;border-radius:22px;border:2px solid #4a2400;background:linear-gradient(#fff2c4,#f0bf4c);color:#3a1a00;font:800 15px/40px system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.55);cursor:pointer}
+.hcue.r{right:2px}.hcue.l{left:2px}
+/* the "what to do now" line never cuts a word: it may take a second line */
+html.ph .bfline{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+#dkCard .gx-x{min-width:45px;min-height:45px}
+/* level change: the hero's own badge pulses green (up) or red (down) instead of a floating "+1 Lv" over other plates */
+.slv.lvup,.bfhero.lvup{animation:bfLvPulse 1.8s ease-out}
+.slv.lvup.up{box-shadow:0 0 0 3px #7dffb2,0 0 14px 4px rgba(125,255,178,.85)}
+.slv.lvup.down{box-shadow:0 0 0 3px #ff8a7a,0 0 14px 4px rgba(255,138,122,.85)}
+.bfhero.lvup.up{filter:drop-shadow(0 0 8px #7dffb2)}
+.bfhero.lvup.down{filter:drop-shadow(0 0 8px #ff8a7a)}
+@keyframes bfLvPulse{0%{scale:1}20%{scale:1.35}45%{scale:1}65%{scale:1.2}100%{scale:1}}
+@media (prefers-reduced-motion:reduce){.slv.lvup,.bfhero.lvup{animation:none}}

@@ -103,13 +103,16 @@ html.dk-bt .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(medi
 html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.dk-bt .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.dk-bt .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
 .win3d{display:block;margin:0 auto 2px;width:min(44vw,160px);height:min(44vw,160px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
 
-html.sk .btn.bigb,html.sk .btn.primary,html.sk .btn.gxt-menu{border-image-width:9px 12px;padding-top:8px;padding-bottom:8px}
+html.sk .btn.bigb,html.sk .btn.primary{border-image-width:9px 12px;padding-top:8px;padding-bottom:8px}
+html.sk .btn.gxt-menu{border-image-width:9px 12px}
 body:has(.gxh-bub.on) #prompt .bfline{display:none}
 html.sk .gx-drawer{padding:33px}
+html.sk .gx-drawer-head,html.sk .gx-drawer-body{margin-left:-2px;margin-right:-2px}
 
 /* start screen (one column): every row the same width, text 15px+, 16px inset for bare text inside the framed column */
-html.sk .dlg.dk2{max-width:480px;padding-left:30px;padding-right:30px;display:flex;flex-direction:column;gap:10px}
-html.sk.ph .dlg.dk2{padding-left:26px;padding-right:26px;gap:8px}
+/* layout of the title dialog holds with the skin on or off (GXSK.audit: the skin must not move boxes) */
+.dlg.dk2{max-width:480px;padding-left:30px;padding-right:30px;display:flex;flex-direction:column;gap:10px}
+html.ph .dlg.dk2{padding-left:26px;padding-right:26px;gap:8px}
 .dlg.dk2>*{margin:0}
 .dlg.dk2 h2{font-size:2rem!important;text-align:center;padding:0 16px;margin:0;line-height:1.1}
 .dlg.dk2 h2 span{color:inherit}
@@ -185,4 +188,13 @@ html:not(.ph) #prompt .tip{font-size:16px}
   html:not(.ph) .pile .stack .n{font-size:16px;min-width:30px;height:30px;top:-10px;right:-6px}
   html:not(.ph) .pile .card.xs{--w:clamp(84px,7vw,120px)}
   html:not(.ph) .bfcap,html:not(.ph) .bfcap.sm{font-size:20px}
+}
+/* the skin never changes a layout box: story-map nodes keep the base 64 px (the painted disc is drawn inside it) */
+html.sk.sk .gxc-node,html.sk.sk .gxc-disc{width:64px;height:64px}
+html.sk.sk .gxc-node.boss .gxc-disc{width:62px;height:62px}
+/* story map header on a phone: the title gets its own row and never breaks inside a word; act banners stay one line so they don't run into the path labels */
+@media (max-width:560px){
+  .gxc-head{flex-wrap:wrap;row-gap:4px}
+  .gxc-head .gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;hyphens:none;font-size:clamp(17px,5.4vw,21px)}
+  .gxc-act small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }

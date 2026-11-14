@@ -10,7 +10,7 @@ const gx = require('../scripts/gx-serve.js');   // one shared http server (build
 const QUICK = !!process.env.QUICK;              // QUICK=1: 4 games, one rotation each, for iterating
 const N = +process.argv[2] || (QUICK ? 4 : 24), FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 8;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
-const SIZES = [[390, 763], [375, 553]];
+const SIZES = process.env.SIZES ? process.env.SIZES.split(",").map(s => s.split("x").map(Number)) : [[390, 763], [375, 553]];
 const NPS = [4, 3, 5, 4, 6, 4];
 let URL;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
