@@ -670,8 +670,8 @@
   },
   {
    "id": "hb-hand-chips",
-   "name": "Hand chips: readable, tappable",
-   "ask": "Tap the glowing hand chip",
+   "name": "Hand cards: readable, tappable",
+   "ask": "Tap the glowing hand card",
    "sizes": "all",
    "group": "Cards",
    "mut": 0
@@ -693,9 +693,9 @@
    "mut": 0
   },
   {
-   "id": "hb-handtoggle",
-   "name": "Hide and show the hand",
-   "ask": "Tap the hand toggle. Does the row hide?",
+   "id": "hb-tabs",
+   "name": "Panel tabs (phone): Places, Meadow, City, Goals",
+   "ask": "Tap Meadow, then City. Does the panel change?",
    "sizes": "phone",
    "group": "Board",
    "mut": 0
