@@ -568,9 +568,9 @@ var TT_TEST = {};
     if (G.reason === 'science') return w === 0 ? 'Six symbols, one great discovery. The scholars crown you.' : who + "'s scholars solve what yours could not.";
     var sa = G.final ? G.final[0] : E.score(G, 0), sb = G.final ? G.final[1] : E.score(G, 1), LB = { blue: 'civic cards', green: 'science cards', yellow: 'trade cards', guild: 'guilds', wonder: 'wonders', token: 'science bonuses', coins: 'coins', mil: 'war points' };
     function lead(x, y) { return Object.keys(LB).filter(function (k) { return x[k] > y[k]; }).sort(function (i, j) { return (x[j] - y[j]) - (x[i] - y[i]); }).slice(0, 2).map(function (k) { return LB[k] + ' (+' + (x[k] - y[k]) + ')'; }).join(' and '); }
-    var ld = lead(w === 0 ? sb : sa, w === 0 ? sa : sb);
+    var ld = w === 0 ? lead(sa, sb) : lead(sb, sa);   // the WINNER's leads over the loser
     if (G.reason === 'tiebreak') return w === 0 ? 'Level on points, and your civic points decided it, ' + sa.blue + ' to ' + sb.blue + '.' : 'Level on points, and ' + who + "'s civic points decided it, " + sb.blue + ' to ' + sa.blue + '. Civic cards break ties: build more of them.';
-    if (w === 0) return 'The crown is yours' + (ld ? ': ' : '.') + (ld ? 'you led on ' + lead(sa, sb) + '.' : '');
+    if (w === 0) return 'The crown is yours' + (ld ? ': ' : '.') + (ld ? 'you led on ' + ld + '.' : '');
     return who + ' wins by ' + (sb.total - sa.total) + (ld ? ', ahead on ' + ld + '. Close that gap to turn it around.' : '.');
   }
   function shortWhy(G, a, b) {   // one line, true for each end type: war, science, points, civic tie-break, draw
@@ -764,6 +764,7 @@ var TT_TEST = {};
   }
   window.TT_UI = { after: function () { after(); }, campStart: campStart, U: U, E: E, BY: BY, $: $, canAct: canAct, newGame: newGame, renderPyr: renderPyr, dock: dock, render: render, showStart: showStart, closeZoom: closeZoom };
   TT_TEST.U = U; TT_TEST.E = E;
+  TT_TEST.forceResult = function (fin, winner, reason) { var G = U.G; U.mode = 'cpu'; U.camp = null; U.tut = false; G.final = fin; G.winner = winner; G.reason = reason; G.over = true; G.pend = []; var r = $('res'); r.hidden = true; showResult(); var q = function (s) { var e = r.querySelector(s); return e ? e.textContent : ''; }; return { line: q('.line'), why: q('.rwhy') }; };
   TT_TEST.forceEnd = function (seat) { var G = U.G; G.over = true; G.winner = seat; G.reason = 'military'; G.pend = []; render(); };
   TT_TEST.newGame = newGame;
   TT_TEST.pop = function (t, k) { popNum(t, $('pts0') || $('s0'), k); };
