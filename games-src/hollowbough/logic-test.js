@@ -305,6 +305,12 @@ R('Solo: anything you must give a rival (Post Office cards, Monk berries) is sim
 
 R('Passing is allowed only in Autumn: in Winter, Spring and Summer the year goes on (no Pass move).', () => { const G = mk(2); const canPass = () => HB.moves(G, 0).some(m => m.type === 'pass'); T.cur(G, 0); const seen = []; for (let s = 0; s < 4; s++) { P(G).season = s; seen.push(canPass()); } eq(seen, [false, false, false, true]); });
 
+// FIXED13 rules audit (RULES-AUDIT.md): one block per fix
+R('Every Critter names a real Construction (or any) as its free home: no broken links in the card data.', () => { const keys = new Set(D.cards.map(c => c.key)); const bad = D.cards.filter(c => c.kind === 'critter' && c.linked && c.linked !== 'any' && !keys.has(c.linked)).map(c => c.key + '->' + c.linked); eq(bad, [], 'broken links'); });
+R('Mudpie Jester (fool) moves in free when its Midsummer Green (fair_grounds) is open, and is planted in a rival city.', () => { const G = mk(2); city(G, 0, ['fair_grounds']); const [h] = hand(G, 0, ['fool']); yes(HB.moves(G, 0).some(m => m.type === 'play' && m.card === h && m.how === 'occupy'), 'a free play'); play(G, 0, h, 'occupy'); eq([E(G, 0, 'fair_grounds').occ, inCity(G, 1, 'fool')], [true, true]); });
+R('Player text: rules drawer and coach say Pass is only in Autumn, production pays in Spring and Autumn, Summer gives up to 2 meadow cards.', () => { const fs = require('fs'), src = f => fs.readFileSync(path.join(__dirname, 'game', 'src', f), 'utf8'); const r6 = src('ui6.js'), r12 = src('ui12.js');
+  yes(/Pass only in Autumn/.test(r6), 'drawer: Pass only in Autumn'); yes(/up to 2 meadow cards/.test(r6), 'drawer: up to 2 meadow cards'); no(/pay again each season|paying every season|production pays\./i.test(r12), 'coach: production every season'); yes(/id: 'pass', when: \(p\) => [^\n]*p\.season >= 3/.test(r12), 'coach: Pass tip only in Autumn'); no(/permanent helper hold two/.test(r6), 'drawer: second slot misdescribed'); });
+
 // ============================================================ RUNNER
 if (process.argv.includes('--md')) {
   let cur = '';

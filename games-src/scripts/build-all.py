@@ -53,7 +53,7 @@ SWEEPS = {
     "doorkick-dungeon": ("munch",               ["sweep.js"]),
     "emberclimb":       ("emberclimb",          ["sweep.js"]),
     "final-approach":   ("final-approach/game", ["sweep.js"]),
-    "hollowbough":      ("hollowbough/game",    ["sweep.js"]),
+    "hollowbough":      ("hollowbough/game",    ["sweep.js", "calm-measure.js"]),
     "kaiten-kitchen":   ("kaiten/game",         ["sweep.js"]),
     "lantern-dive":     ("lantern-dive/game",   ["sweep.js", "rotate-test.js"]),
     "nebula-aces":      ("xw",                  ["rules-test.js", "sweep.js"]),
