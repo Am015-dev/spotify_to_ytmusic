@@ -11,8 +11,11 @@ body.in-start #pc,body.in-start #ppop,body.in-start #tbturn{visibility:hidden!im
 #tbturn .tbt-chip.wt{background:#2a2036;color:#f6ecd2;border-color:#8a7aa0}
 #tbturn .tbt-line{flex:1 1 auto;min-width:0;max-height:60px;overflow:hidden;color:#f8efd6;font:600 16px/1.25 'EB Garamond',Georgia,serif}
 #tbturn .tbt-line.sm{font-size:14px;line-height:1.2}
+#tbturn .tbt-line.xs{font-size:14px;line-height:1.12;max-height:64px}
+/* F14: a long line on a short phone gets the room: the chip wraps to two short lines and the Goal button narrows (all text stays 14 px) */
+@media (max-height:620px){html:not(.bf-w) body #tbturn.tbxs{gap:6px;padding-left:8px;padding-right:8px}html:not(.bf-w) body #tbturn.tbxs .tbt-chip{max-width:60px;white-space:normal;line-height:1;padding:1px 5px;letter-spacing:0}html:not(.bf-w) body #tbturn.tbxs .tbt-line.xs{line-height:1.1;max-height:34px;letter-spacing:-.01em}html:not(.bf-w) body #tbturn.tbxs .tbt-goal{min-width:46px;padding:0 4px}}
 html.bf-w #tbturn{height:auto;min-height:72px}
-@media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-chip{padding:5px 8px}}
+@media (max-height:620px){html:not(.bf-w) #tbturn{height:54px;padding:4px 10px}#tbturn .tbt-line{max-height:42px;font-size:15px;line-height:1.2}#tbturn .tbt-line.sm{font-size:14px;line-height:1.2}#tbturn .tbt-line.xs{max-height:46px;font-size:14px;line-height:1.08;letter-spacing:-.01em}#tbturn .tbt-chip{padding:5px 8px}}
 #tbturn .tbt-term{display:inline-block;box-sizing:border-box;min-height:44px;min-width:44px;padding:13px 7px;margin:-13px -7px;text-align:center;vertical-align:baseline;line-height:inherit;border:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted #f0c860 2px;text-underline-offset:3px;cursor:help}
 #tbturn .tbt-term:focus-visible{outline:2px solid #fff;outline-offset:2px;border-radius:3px}
 #tbturn .tbt-info{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:2px solid #f0c860;background:transparent;color:#f0c860;font:700 italic 18px Georgia,serif}
@@ -60,7 +63,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
     if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});const mph=(k==='menu'||G.q.t==='menu')?menuPhase(G.q):'';key='me'+k+(G.q.t||'')+mph+(UI.autCard!=null?'c':'');const line=mph?(UI.autCard!=null&&ask.menuAutumnCard?ask.menuAutumnCard:(ask['menu'+mph]||ask.menu)):ask[k];
-      const t=line||(typeof promptText==='function'?promptText(G.q,s)+'.':'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>';
+      const t=line||(typeof promptText==='function'?(t0=>/[.!?…]$/.test(t0)?t0:t0+'.')(String(promptText(G.q,s)).trim()):'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>';
       if(UI.hand!=null&&typeof cardLine==='function'){try{const ci=cinfo(UI.hand);key+='h'+UI.hand;html='<span class="tbt-chip">'+esc2(ci.strength)+'</span><span class="tbt-line"><b>'+esc2(ci.name)+'</b>: '+esc2(cardLine(UI.hand))+' Tap again or tap a spot.</span><button class="tbt-info" data-tbinfo="'+UI.hand+'" type="button" aria-label="Full text of '+esc2(ci.name)+'">i</button>'}catch(x){}}}
     else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));const cp=UI._tbCap&&UI._tbCapT&&Date.now()-UI._tbCapT<5000?UI._tbCap:null;const cs=cp?cp.s:a;key='ai'+a+(cp?cp.t:'');e.style.setProperty('--c',fcol(cs));html='<span class="tbt-chip rv">'+esc2(poss(shortName(cs)))+' turn</span><span class="tbt-line">'+(cp?esc2(shortT(cp.t)):'Thinking\u2026 tap to hurry them.')+'</span>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
@@ -69,7 +72,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   if(e.dataset.key!==key&&/^me/.test(key)&&UI.pop&&UI._popRival){try{closePop(true)}catch(x){}}   // an info card opened during the rival's turn must not cover your own move
   if(cls==='voice')e.removeAttribute('data-fa-skip');else e.setAttribute('data-fa-skip','');
   if(e.dataset.key!==key)UI._jgKey=key;
-  if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+(cls==='voice'?' pulse':'');e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&ln.scrollHeight>ln.clientHeight+1)ln.classList.add('sm')}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
+  if(e.dataset.key!==key){e.dataset.key=key;e.className=cls+(cls==='voice'?' pulse':'');e.innerHTML=html;try{const ln=e.querySelector('.tbt-line');if(ln&&tbLineOver(ln))ln.classList.add('sm');if(ln&&tbLineOver(ln)){ln.classList.add('xs');e.classList.add('tbxs')}}catch(x){}try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}
   else{try{document.documentElement.classList.toggle('tb-dim',!!(UI.bf&&(UI.bf.kind==='herald'||UI.bf.kind==='location')&&!UI.card))}catch(x){}}}
 // the full text of the message on screen (news, clash, bids, round end): shown whole in the strip, timed by its length
 function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.big&&c.items.every(infK))return {t:newsHead(c.items[0],c.items)+'.',s:null};const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,3).map(x=>plain(x.text)).join(' ');return {t:it,s:c.items[0].s}}
@@ -204,6 +207,9 @@ window.tbShowGoal=showGoal;
 // the tutorial can start holding a message that is already on screen: keep the strip's words true (repaints only when they change)
 window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.started&&UI.card&&typeof GXT!=='undefined'&&GXT.active())paint()}catch(x){}},200);
 })();
+// does the strip's line hide any of its text? (judged by the text's own boxes: a glossary term's 44 px tap area may overhang on purpose)
+window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document.createTreeWalker(ln,NodeFilter.SHOW_TEXT,null),rg=document.createRange();let n;
+  while((n=w.nextNode())){if(!/\S/.test(n.nodeValue))continue;rg.selectNodeContents(n);for(const r of rg.getClientRects())if(r.width&&(r.bottom>L.bottom+1||r.top<L.top-1))return true}return false}catch(e){return ln.scrollHeight>ln.clientHeight+1}};
 // ---- tap guard (R64): a fast second tap must not fall through to the panel under an overlay that just closed.
 // For 350 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
 // (a double-tap) is swallowed. Taps elsewhere on the screen still work at once.
