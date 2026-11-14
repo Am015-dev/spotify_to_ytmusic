@@ -469,7 +469,7 @@ var TT_TEST = {};
     var G = U.G, p = E.sideToAct(G), prevUp = {}, pre = null, preHtml = '', snap = G.phase === 'play' ? snapState() : null;
     if (m.i != null) { pre = rectOf('c' + m.i); var c = BY[G.pyr[m.i].id]; preHtml = cardHtml(c, pre ? pre.width : 60); var ghostCol = c.col; }
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
-    var rated = (U.hintsOn && U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
+    var rated = (U.hintsOn && !U.tut && U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
     if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
     E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++; U.hintShow = false; clearTimeout(U.idleT); if (!isAI(p)) U.aiChain = 0;
     U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
@@ -510,7 +510,7 @@ var TT_TEST = {};
     if (G.phase === 'play' && !G.pend.length && U.lastSide !== p) { U.lastSide = p; /* FIXED4: no turn pill; the instruction line names whose turn it is */ }
     if (G.phase === 'play' && G.pend.length && U.lastSide !== p) U.lastSide = p;
     if (isAI(p)) {
-      U.busy = true; render0(); var seq = U.seq;
+      U.busy = true; render0(); var seq = U.seq; if (!U.narr) setInstr(whoTag(p), 'rival', name(p) + ' is choosing a move...');
       U.aiTimer = setTimeout(function () {
         if (seq !== U.seq || U.G !== G) return;
         if (U.tut && window.TT_TUTOR && TT_TUTOR.holdRival && TT_TUTOR.holdRival()) { U.busy = false; U.aiTimer = setTimeout(function () { if (seq === U.seq && U.G === G) after(); }, 300); return; } // the guided game: the rival waits while a rule bubble is up
