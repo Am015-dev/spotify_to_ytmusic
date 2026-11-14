@@ -566,7 +566,12 @@ var TT_TEST = {};
     if (!me) return name(w) + ' raises the crown and the other city kneels.';
     if (G.reason === 'military') return w === 0 ? 'Your banners reach their gate. ' + who + ' hands over the keys.' : 'Their banners reach your gate. The city falls before dawn.';
     if (G.reason === 'science') return w === 0 ? 'Six symbols, one great discovery. The scholars crown you.' : who + "'s scholars solve what yours could not.";
-    return w === 0 ? 'The crown is yours. ' + who + ' bows to the better builder.' : who + ' wears the crown this time. Build faster next round.';
+    var sa = G.final ? G.final[0] : E.score(G, 0), sb = G.final ? G.final[1] : E.score(G, 1), LB = { blue: 'civic cards', green: 'science cards', yellow: 'trade cards', guild: 'guilds', wonder: 'wonders', token: 'science bonuses', coins: 'coins', mil: 'war points' };
+    function lead(x, y) { return Object.keys(LB).filter(function (k) { return x[k] > y[k]; }).sort(function (i, j) { return (x[j] - y[j]) - (x[i] - y[i]); }).slice(0, 2).map(function (k) { return LB[k] + ' (+' + (x[k] - y[k]) + ')'; }).join(' and '); }
+    var ld = lead(w === 0 ? sb : sa, w === 0 ? sa : sb);
+    if (G.reason === 'tiebreak') return w === 0 ? 'Level on points, and your civic points decided it, ' + sa.blue + ' to ' + sb.blue + '.' : 'Level on points, and ' + who + "'s civic points decided it, " + sb.blue + ' to ' + sa.blue + '. Civic cards break ties: build more of them.';
+    if (w === 0) return 'The crown is yours' + (ld ? ': ' : '.') + (ld ? 'you led on ' + lead(sa, sb) + '.' : '');
+    return who + ' wins by ' + (sb.total - sa.total) + (ld ? ', ahead on ' + ld + '. Close that gap to turn it around.' : '.');
   }
   function shortWhy(G, a, b) {   // one line, true for each end type: war, science, points, civic tie-break, draw
     var cpu = U.mode === 'cpu';
@@ -595,7 +600,7 @@ var TT_TEST = {};
     h += '<details class="rtab"' + (U.tut ? ' open' : '') + '><summary>Full score</summary><table><tr><th></th><th>' + esc(U.mode === 'cpu' ? 'You' : name(0)) + '</th><th>' + esc(name(1)) + '</th></tr>';
     [['Civic cards', 'blue'], ['Science', 'green'], ['Trade cards', 'yellow'], ['Guilds', 'guild'], ['Wonders', 'wonder'], ['Science bonus', 'token'], ['Coins', 'coins'], ['War', 'mil']].forEach(function (k) { if (!a[k[1]] && !b[k[1]]) return; h += '<tr><td>' + k[0] + '</td><td class="cu" data-n="' + a[k[1]] + '">0</td><td class="cu" data-n="' + b[k[1]] + '">0</td></tr>'; });
     h += '<tr class="hl"><td>Points</td><td class="cu" data-n="' + a.total + '">0</td><td class="cu" data-n="' + b.total + '">0</td></tr></table></details>' + (G.reason === 'military' || G.reason === 'science' ? '<p class="sm">An early ' + (G.reason === 'military' ? 'war' : 'science') + ' win: points do not decide this game.</p>' : G.winner < 0 ? '<p class="sm">A tie: same points and same civic points, so nobody wins.</p>' : '');
-    var nudge = ''; if (!U.tut && !U.camp && U.mode === 'cpu' && (U.lvl === 'easy' || U.lvl === 'medium') && G.winner === 0) { var nx = U.lvl === 'easy' ? 'medium' : 'normal', nk = 'tt_w_' + U.lvl, ew = 0; try { ew = (+localStorage.getItem(nk) || 0) + 1; localStorage.setItem(nk, ew); } catch (e) { ew = 1; } if (ew >= 2) nudge = '<p class="sm">You beat ' + U.lvl[0].toUpperCase() + U.lvl.slice(1) + ' ' + ew + ' times. Try ' + nx[0].toUpperCase() + nx.slice(1) + '?</p><button class="btn alt" data-trylvl="' + nx + '">Play ' + nx[0].toUpperCase() + nx.slice(1) + '</button>'; }
+    var nudge = ''; if (!U.tut && !U.camp && U.mode === 'cpu' && (U.lvl === 'easy' || U.lvl === 'medium')) { var nx = U.lvl === 'easy' ? 'medium' : 'normal', nk = 'tt_w_' + U.lvl, ew = 0; try { ew = G.winner === 0 ? (+localStorage.getItem(nk) || 0) + 1 : 0; localStorage.setItem(nk, ew); } catch (e) { ew = G.winner === 0 ? 1 : 0; } if (ew >= 2) nudge = '<p class="sm">You beat ' + U.lvl[0].toUpperCase() + U.lvl.slice(1) + ' ' + ew + ' times in a row. Try ' + nx[0].toUpperCase() + nx.slice(1) + '?</p><button class="btn alt" data-trylvl="' + nx + '">Play ' + nx[0].toUpperCase() + nx.slice(1) + '</button>'; }
     h += nudge + '<p class="line">' + esc(resultLine(G)) + '</p><button class="btn" data-again="1">Play again</button><button class="btn alt" data-title="1">Title</button></div>'; r.innerHTML = h; bgSlot($('rcity'), 'city-board-p' + (wp + 1)); fillArt(r); countUp(r); if (U.tut && window.TT_TUTOR && TT_TUTOR.onResult) TT_TUTOR.onResult(G);
   }
 
