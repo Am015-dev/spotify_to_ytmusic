@@ -119,8 +119,12 @@ const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
     const B={left:px(b,'left'),top:px(b,'top'),width:b.offsetWidth,height:b.offsetHeight};B.right=B.left+B.width;B.bottom=B.top+B.height;if(!(R.width>0)||!B.width||isNaN(B.top))return;
     const gapY=B.top>=R.bottom?B.top-R.bottom:R.top>=B.bottom?R.top-B.bottom:0;if(gapY<=18&&(B.bottom<=R.top+2||B.top>=R.bottom-2)){b.dataset.tbAnch='1';return}   // already beside its target
     const tb=document.getElementById('bulbbtn');const top=Math.max(6,tb&&tb.offsetWidth?tb.getBoundingClientRect().bottom+4:6),W=innerWidth,H=innerHeight,w=B.width,h=B.height,gap=10;
-    let y,side;if(R.top-gap-h>=top){y=R.top-gap-h;side='bottom'}else if(R.bottom+gap+h<=H-6){y=R.bottom+gap;side='top'}else return;b.dataset.tbAnch='1';
-    const x=Math.max(6,Math.min(W-w-6,R.left+R.width/2-w/2));b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px';
+    // never over a glowing target or a tray button (the same cores hlpUnblock keeps clear), nor over its own ring
+    const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(q=>{let cw=q.width,ch=q.height;const cx=q.left+cw/2,cy=q.top+ch/2;if(cw>56)cw=32;if(ch>56)ch=32;return {left:cx-cw/2-3,top:cy-ch/2-3,right:cx+cw/2+3,bottom:cy+ch/2+3}});
+    const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;const ringBox={left:R.left-4,top:R.top-4,right:R.right+4,bottom:R.bottom+4};
+    let pick=null;for(const [yy,sd] of [[R.top-gap-h,'bottom'],[R.bottom+gap,'top']]){if(yy<top||yy+h>H-6)continue;
+      for(const xx of [R.left+R.width/2-w/2,6,W-w-6].map(v=>Math.max(6,Math.min(W-w-6,v)))){const c={left:xx,top:yy,right:xx+w,bottom:yy+h};if(hit(c,ringBox)||cores.some(k=>hit(c,k)))continue;pick={x:xx,y:yy,side:sd};break}if(pick)break}
+    if(!pick)return;const x=pick.x,y=pick.y,side=pick.side;b.dataset.tbAnch='1';b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px';
     b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const arr=b.querySelector('.gxh-arr');if(arr){arr.style.top='';arr.style.left=Math.round(Math.max(14,Math.min(w-26,R.left+R.width/2-x-6)))+'px'}}
   function sync(){const on=bulbOpenNow();document.documentElement.classList.toggle('tb-bulbon',on);if(on)anchor(document.querySelector('.gxh-bulbb'));
     if(on!==was){was=on;try{applyHl()}catch(e){}}}
