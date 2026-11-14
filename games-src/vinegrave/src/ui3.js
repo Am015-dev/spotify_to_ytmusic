@@ -191,7 +191,7 @@ function helpPhase() {
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'play') return $(`#hand .cd[data-i="${m.i}"]`); if (m.s != null) return $(`.site[data-i="${m.s}"]`); if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
-  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`); if (m.t === 'asst') return $(`#extra [data-a=asst][data-k="${m.k}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return exShow($(`#extra [data-a=guard][data-k="${m.k}"]`)); if (m.t === 'idol') return exShow($(`#extra [data-a=idol][data-k="${m.k}"]`)); if (m.t === 'asst') return exShow($(`#extra [data-a=asst][data-k="${m.k}"]`));
   if (m.t === 'ans') { if (G.q.h === 'site' && m.v != null) return $(`.site[data-i="${m.v}"]`); if (G.q.h === 'buy' && m.v != null) return $(`#row .cd[data-r="${m.v}"]`); return $('#qbox'); }
   return null;
 }

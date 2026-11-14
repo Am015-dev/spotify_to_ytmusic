@@ -180,6 +180,7 @@ function render() {
   if (UI.mode === 'tutorial' && typeof coachCheck === 'function') coachCheck(L);
   { const tb = $('#track'); if (tb) tb.classList.toggle('nudge', !!(tb.classList.contains('glow') && myTurn() && !q && !UI.sel && G.phase === 'play')); }
   guidedGlow();
+  if (typeof yourTurnNow === 'function' && yourTurnNow()) { if (typeof rivalCap === 'function') rivalCap(''); document.querySelectorAll('.vpop:not(.onchip)').forEach(e => e.remove()); }   /* F12: your turn starts with a clear board */
   try { const mp = $('#map'); const qo = !$('#qbox').hidden; document.body.classList.toggle('vg-squeeze', !!(qo && mp && mp.clientHeight < 80)); } catch (x) { }   /* only a tall open chooser (exile) may squeeze the board away; dock buttons never do (F11) */
 }
 setInterval(() => { if (typeof UI !== 'undefined' && UI.mode === 'tutorial') guidedGlow(); }, 250);   /* the tutor changes step without a render */
@@ -207,22 +208,41 @@ function renderTray(L, q, me, actor) {
   $('#prompt').textContent = txt; $('#pacts').innerHTML = acts;
   // choices: a pending question, or the research track's options
   const qb = $('#qbox'); let qh = q ? qHTML(q) : (S && S.k === 'track' ? trackChoices() : '');
+  if (q && qh && mine) { const t = document.createElement('div'); t.innerHTML = qh; const bs = t.querySelectorAll('button');   /* F12 (R69 P2): a chooser with one button is a dock button, never a box that squeezes the island */
+    if (bs.length === 1 && !t.querySelector('.cd')) { const b = bs[0];
+      if (b.classList.contains('go')) { txt = b.textContent; b.textContent = { asst: me.apend > 0 ? 'Hire' : 'Upgrade', tbon: 'Take it' }[q.h] || 'Take it'; b.setAttribute('aria-label', txt); }
+      if (!b.id) b.id = 'gobtn'; acts = b.outerHTML + acts; qh = ''; $('#prompt').textContent = txt; $('#pacts').innerHTML = acts; } }
   qb.hidden = !qh; qb.innerHTML = qh;
   const qc = qb.querySelector('.qcards'), qg = qc && qc.querySelector('.cd.glow'); if (qg) qc.scrollLeft = Math.max(0, qg.offsetLeft - qc.offsetLeft - 8);   /* the suggested card is in view (R29: cut at 375) */
   // your explorers (drag one onto a glowing site), then your goods in words
   const canGo = mine && !q && GL.some(m => m.t === 'dig' || m.t === 'disc');
   $('#pawns').innerHTML = [0, 1].map(k => k < me.ex ? `<button type="button" class="pawn mine${S && S.k === 'pawn' && k === me.ex - 1 ? ' sel' : ''}" data-a="pawn" aria-label="Your explorer: drag it to a glowing site"><span class="pa" data-art="explorer-${UI.view}"></span>${pawnSVG(UI.view)}</button>` : `<span class="pawn gone" aria-label="Explorer out on the island">${pawnSVG(UI.view, 'out')}</span>`).join('');
   $('#myres').innerHTML = V.RES.map(k => `<span class="rc${me.res[k] ? '' : ' zero'}"><span class="rv">${ic(k)}<b>${me.res[k]}</b></span><span class="rl">${rw(k, me.res[k] === 1 ? 1 : 2).replace('arrowheads', 'arrows').replace('arrowhead', 'arrow')}</span></span>`).join('');
-  let ex = '';
-  me.guards.forEach((g, k) => { ex += `<button type="button" class="tag${g.used ? ' used' : ''}" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}${g.used ? ', boon used' : ', boon ready'}"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>${g.used ? 'Used' : 'Boon'}</span></button>`; });
-  me.idols.forEach((d, k) => { ex += `<button type="button" class="tag${d.used ? ' used' : ''}" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}${d.used ? ', in a shrine' : ''}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>${d.used ? 'Set' : 'Idol'}</span></button>`; });
-  (me.asst || []).forEach((a, k) => { const d = V.ASSTBY[a.id]; ex += `<button type="button" class="tag asst${a.ex ? ' used' : ''}${a.gold ? ' gold' : ''}" data-a="asst" data-k="${k}" aria-label="${esc(d.name)}${a.gold ? ' (gold)' : ''}${a.ex ? ', resting until next round' : ', ready'}"><span class="ic aic">A</span><span>${esc(d.name.split(' ')[0])}</span></button>`; });
+  /* F12 (R69 stopper): ready chips come first, one each; spent ones of a kind merge into one chip ("Set x3"), so the strip stays short and what you can use is in view */
+  let ex = '', sp = '';
+  const spent = (a, ks, ic0, word, aria) => { if (!ks.length) return ''; const n = ks.length; return `<button type="button" class="tag used${n > 1 ? ' many' : ''}" data-a="${a}" data-k="${ks[0]}" aria-label="${n} ${aria}"><span class="ic" ${ic0}</span><span>${word}${n > 1 ? '<i class="xn">×' + n + '</i>' : ''}</span></button>`; };
+  me.guards.forEach((g, k) => { if (!g.used) ex += `<button type="button" class="tag" data-a="guard" data-k="${k}" aria-label="${esc(V.GUARD[g.id].name)}, boon ready"><span class="ic" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></span><span>Boon</span></button>`; });
+  me.idols.forEach((d, k) => { if (!d.used) ex += `<button type="button" class="tag" data-a="idol" data-k="${k}" aria-label="${esc(V.IDOL[d.id].name)}"><span class="ic" data-art="${d.id}"><svg><use href="#s-idol"/></svg></span><span>Idol</span></button>`; });
+  (me.asst || []).forEach((a, k) => { const d = V.ASSTBY[a.id], h = `<button type="button" class="tag asst${a.ex ? ' used' : ''}${a.gold ? ' gold' : ''}" data-a="asst" data-k="${k}" aria-label="${esc(d.name)}${a.gold ? ' (gold)' : ''}${a.ex ? ', resting until next round' : ', ready'}"><span class="ic aic">A</span><span>${esc(d.name.split(' ')[0])}</span></button>`; if (a.ex) sp += h; else ex += h; });
   (me.tv || []).forEach(t => { ex += `<span class="tag tvc" aria-label="${V.TNAME[t]} of travel, this turn only"><span class="ic">${ic(t)}</span><span>${V.TNAME[t]} now</span></span>`; });
-  $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex);
+  const ug = me.guards.map((g, k) => g.used ? k : -1).filter(k => k >= 0), ui = me.idols.map((d, k) => d.used ? k : -1).filter(k => k >= 0);
+  ex += spent('guard', ug, ug.length ? `data-art="guard-${me.guards[ug[0]].id}"><svg><use href="#s-guard"/></svg>` : '', 'Used', ug.length === 1 ? 'boon used' : 'boons used')
+    + spent('idol', ui, ui.length ? `data-art="${me.idols[ui[0]].id}"><svg><use href="#s-idol"/></svg>` : '', 'Set', ui.length === 1 ? 'idol in a shrine' : 'idols in shrines') + sp;
+  $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex); exFit();
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = Math.min(play[m.i] || 2, gl(m)); });
   $('#hand').classList.toggle('many', me.hand.length > 5);
   $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: q ? 0 : play[i], sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
 }
+/* F12: the chip strip scrolls sideways when it is full; an edge fades where more chips wait, and a glowing chip is scrolled into view */
+function exFit() {
+  const e = $('#extra'); if (!e) return;
+  if (!e.dataset.f) { e.dataset.f = '1'; e.addEventListener('scroll', exFade, { passive: true }); }
+  const sig = [...e.children].map(c => (c.dataset.a || 't') + (c.dataset.k || '') + (c.classList.contains('used') ? 'u' : '')).join(','), nw = sig !== e.dataset.sig; e.dataset.sig = sig;
+  requestAnimationFrame(() => { if (nw) e.scrollLeft = 0;   /* new or changed chips: back to the start, where the ready ones are */
+    exShow(e.querySelector('.tag.glow, .tag.gxh-on')); exFade(); });
+}
+function exShow(g) { const e = $('#extra'); if (g && e && e.contains(g) && e.scrollWidth > e.clientWidth + 1) { const er = e.getBoundingClientRect(), r = g.getBoundingClientRect(); if (r.left < er.left + 2 || r.right > er.right - 2) { e.scrollLeft += r.left - er.left - 8; exFade(); } } return g; }   /* a hinted chip is scrolled into view */
+function exFade() { const e = $('#extra'); if (!e) return; const m = e.scrollWidth - e.clientWidth; e.classList.toggle('fl', m > 1 && e.scrollLeft > 2); e.classList.toggle('fr', m > 1 && e.scrollLeft < m - 2); }
 /* what the selected thing does, in one or two short lines, plus the move a second tap makes */
 function selInfo(S) {
   const me = G.p[UI.view], ms = movesFor(S.k, S.x);
@@ -235,16 +255,21 @@ function selInfo(S) {
   if (S.k === 'site') { const x = G.sites[S.x], m = ms[0];
     if (!m) return { t: siteName(x) + '. ' + (x.tile ? 'Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' : '') + whyNotSite(x) };
     if (m.t === 'beat') { const gd = V.GUARD[x.guard]; return { t: 'Fight the ' + gd.name + '. Pay ' + resWords(gd.cost) + '. Win 5 points and a boon.', go: m, label: 'Fight' }; }
-    const pay = payWords(VG.payPlan(G, UI.view, VG.siteCost(x)));
-    if (m.t === 'disc') return { t: 'Explore this ruin for ' + V.DISC[x.lvl] + ' compasses. ' + pay + ' A guardian wakes!', go: m, label: 'Explore' };
-    return { t: siteName(x) + '. Dig for ' + resWords(V.SITE[x.tile].rew) + '. ' + pay, go: m, label: 'Dig' }; }
-  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : 'Climb' } : { t: 'Research: pick what climbs.' }; }
+    const pay = payShort(VG.payPlan(G, UI.view, VG.siteCost(x)));   /* F12 (R69 P2): two short lines at most; Details has the full pay line */
+    if (m.t === 'disc') return { t: 'Explore: ' + V.DISC[x.lvl] + ' compasses' + pay + '. A guardian wakes!', go: m, label: 'Explore' };
+    return { t: 'Dig: ' + resWords(V.SITE[x.tile].rew) + pay + '.', go: m, label: 'Dig' }; }
+  if (S.k === 'track') { if (!ms.length) return { t: trackWhy() }; return ms.length === 1 ? { t: trackLine(ms[0]), go: ms[0], label: ms[0].t === 'temple' ? 'Buy tile' : ms[0].k === 'g' ? 'Magnifier up' : 'Notebook up' } : { t: 'Research: pick what climbs.' }; }
   return { t: '' };
 }
 function trackWhy() {   /* why the research path cannot climb now: the missing goods, in words */
   const me = G.p[UI.view], miss = c => { const o = {}; Object.keys(c).forEach(k => { if ((me.res[k] || 0) < c[k]) o[k] = c[k] - (me.res[k] || 0); }); return o; };
   if (me.glass >= V.TOP) { const t = V.TEMPLE.find((x, k) => G.temple[k] > 0); return t ? 'Temple tile: you need ' + resWords(miss(t.cost)) + ' more.' : 'No temple tiles left.'; }
   return 'Next row costs ' + resWords(V.TRACK[me.glass + 1].cost) + '. You need ' + resWords(miss(V.TRACK[me.glass + 1].cost)) + ' more. Person marks: your notebook there hires an assistant.';
+}
+function payShort(pl) {   /* ' + Bone Whistle + 2 coins' : what the travel costs you, in as few words as fit */
+  if (!pl) return ''; const me = G.p[UI.view], n = pl.cards.length, parts = n === 1 ? [V.CARDS[me.hand[pl.cards[0]]].name] : n ? [n + ' cards'] : [];
+  if (pl.coins) parts.push(pl.coins + ' coins'); if ((pl.tv || []).length) parts.push('token'); if ((pl.boons || []).length) parts.push('boon');
+  return parts.length ? ' + ' + parts.join(' + ') : '';
 }
 function payWords(pl) {
   if (!pl) return ''; const me = G.p[UI.view], cards = pl.cards.map(i => V.CARDS[me.hand[i]].name), list = cards.length > 1 ? cards.slice(0, -1).join(', ') + ' and ' + cards[cards.length - 1] : cards[0];
@@ -259,7 +284,8 @@ function trackLine(m) {
 }
 function trackChoices() { const ms = movesFor('track'); if (ms.length < 2) return ''; return `<div class="qchoices">${ms.map(m => mvBtn(m, esc(trackLine(m)), 'go')).join('')}</div>`; }
 function promptLine(L) {
-  if (!L.some(m => m.t !== 'pass' && !m.free)) return 'Nothing left to do. Tap Pass.';
+  if (!L.some(m => m.t !== 'pass')) return 'Nothing left to do. Tap Pass.';
+  if (!L.some(m => m.t !== 'pass' && !m.free)) return 'A free play is left: tap what glows, or Pass.';   /* F12 (R69): never "nothing left" while a free card glows */
   const nr = researchNudge(); if (nr) return nr;
   return (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. What glows is a strong move.');
 }

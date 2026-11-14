@@ -8,6 +8,7 @@ function refreshInsp() {
     const x = G.sites[I.x], hid = !x.tile;
     h += `<h3>${esc(siteName(x))}</h3><div class="irow"><div class="big"><div class="site l${x.lvl}${hid ? ' hid' : ''}"><span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span></div></div><div>`;
     h += `<p>Travel: ${VG.siteCost(x).map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card pays one icon.</p>`;
+    { const pl = VG.payPlan(G, UI.view, VG.siteCost(x)); if (pl) h += `<p class="sm">${esc(payWords(pl))}</p>`; }   /* F12: the full pay line lives here; the prompt keeps it short */
     h += hid ? `<p>Explore: pay ${V.DISC[x.lvl]} compasses and the travel.</p><p>You find an idol and loot. A guardian wakes.</p>` : `<p>Dig: get ${resWords(V.SITE[x.tile].rew)}.</p>`;
     if (x.occ !== -1) h += `<p>${esc(who(x.occ))} is here this round.</p>`;
     if (x.guard) { const gd = V.GUARD[x.guard]; h += `<div class="gport" data-art="guard-${x.guard}"><svg><use href="#s-guard"/></svg></div><p><b>${esc(gd.name)}</b> guards it.</p><p>Fight it: pay ${resWords(gd.cost)}. Win 5 points and a boon.</p><p>Boon: ${esc(V.opText(gd.boon))}.</p><p>Still here at round end? Take a Dread card.</p>`; }
@@ -211,6 +212,7 @@ function diffText(s, b) {
 function popAt(rect, t, n) {
   if (!rect || !t || (!t.vp && !t.res)) return;
   { const fx = document.getElementById('fx'); if (fx && !fx.hidden && (n || 0) < 12) { setTimeout(() => popAt(rect, t, (n || 0) + 1), 450); return; } }   /* never stack pills on the guardian card: they wait until it closes */
+  if (yourTurnNow() && !t.mine) return;
   const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
   e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
   document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
@@ -271,7 +273,8 @@ function gainFly(b, from) {
 }
 /* a rival's pill on the board; your own on your chip */
 function popUnder(chip, t) {
-  if (!chip) return; const r = chip.getBoundingClientRect(), mp = $('#map');
+  if (!chip) return;
+  if (yourTurnNow()) { if (chip === chipOf(UI.view)) { const b = chip.querySelector('.pts') || chip; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); } return; }   /* F12 (R69): on your turn no pill covers the map, the market or your score chip; your chip's number just bumps */ const r = chip.getBoundingClientRect(), mp = $('#map');
   if (mp && chip !== chipOf(UI.view)) { const m = mp.getBoundingClientRect(); popAt({ left: r.left, width: r.width, top: m.top + 64, height: 0 }, t); return; }   /* a rival's pill sits on the board, never on the market */ popAt(r, Object.assign({ chip: true }, t));   /* your own pill pops ON your chip: never over the market or the research track (R25) */
 }
 /* the chip's points count up to the new total */
@@ -283,9 +286,11 @@ function tickPts(s, from) {
 }
 /* the rival's move in one line on the board, where your eyes are */
 function rivalCap(t) {
+  if (t && yourTurnNow()) t = '';   /* F12: a rival's caption never sits on the map during your turn */
   let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }
   if (!t) { e.classList.remove('on'); return; } const m = $('#map'); e.style.top = ((m ? m.getBoundingClientRect().top : 120) + 6) + 'px'; e.textContent = t; e.classList.add('on');
 }
+function yourTurnNow() { return !!(G && G.phase === 'play' && UI.mode !== 'tutorial' && myTurn() && !UI.busy); }
 function turnWait(ms, fn) { clearTimeout(turnWait.t); turnWait.fn = fn; turnWait.t = setTimeout(() => { turnWait.fn = null; fn(); }, ms); }
 function speedUp() { if (!turnWait.fn || !G || myTurn()) return; const f = turnWait.fn; turnWait.fn = null; clearTimeout(turnWait.t); f(); }
 document.addEventListener('pointerdown', e => { if (turnWait.fn && G && !myTurn() && !(e.target.closest && e.target.closest('.gx-drawer,.gx-scrim,#insp,.gx-bar,.gxt-top,.gxt-end,#fx'))) speedUp(); }, true);
