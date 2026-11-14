@@ -2,7 +2,7 @@
 var TT_TEST = {};
 (function () {
   var E = TT.E, AI = TT.AI, BY = TT.BYID;
-  var U = { hintsOn: (function () { try { return localStorage.getItem('tt_hints') === '1'; } catch (e) { return false; } })(), G: null, mode: 'cpu', lvl: (function () { try { return localStorage.getItem('tt_lvl') || 'easy'; } catch (e) { return 'easy'; } })(), /* W492: a first game is Easy; your pick is remembered */ ai: [false, true], busy: false, sel: null, seq: 0, logs: [], aiTimer: 0 };
+  var U = { hintsOn: (function () { try { return localStorage.getItem('tt_hints') !== '0'; } catch (e) { return true; } })(), G: null, mode: 'cpu', lvl: (function () { try { return localStorage.getItem('tt_lvl') || 'easy'; } catch (e) { return 'easy'; } })(), /* W492: a first game is Easy; your pick is remembered */ ai: [false, true], busy: false, sel: null, seq: 0, logs: [], aiTimer: 0 };
   var COLN = { brown: 'Raw', grey: 'Goods', blue: 'Civic', green: 'Science', yellow: 'Trade', red: 'War', purple: 'Guild' };
   var SYM = { wheel: 'Wh', scale: 'Sc', quill: 'Qu', mortar: 'Mo', sundial: 'Su', globe: 'Gl', law: 'La' };
   var RS = { wood: 'W', clay: 'C', stone: 'S', glass: 'G', papyrus: 'P' };
@@ -237,13 +237,15 @@ var TT_TEST = {};
     if (m.t === 'discard') return 'selling ' + BY[G.pyr[m.i].id].nm; if (m.t === 'build') return 'building ' + BY[G.pyr[m.i].id].nm;
     if (m.t === 'wonder') return 'raising ' + BY[m.w].nm; return 'that';
   }
+  // FIXED1: the hint (the star on a card + the glowing button in its popup) = the computer's plain one-step best; cached per position
+  function hintMove(G) { var k = G.log.length + ':' + G.turn + ':' + G.pend.length + ':' + G.age; if (U.hintK === k && U.hintG === G) return U.hintM; U.hintK = k; U.hintG = G; U.hintM = null; try { U.hintM = AI.pick(G, 'hint', function () { return 0.5; }); } catch (e) { } return U.hintM; }
   // rating of the move just played: rank by the computer's own evaluation of the position after each legal move
   function rateMove(G, p, m) {
     try {
-      var M = E.validMoves(G).filter(function (x) { return x.i != null; }), best = null, bv = -1e9, mv = null;
-      M.forEach(function (x) { var g = E.clone(G); try { E.apply(g, x); } catch (e) { return; } var v = AI.ev(g, p); if (v > bv) { bv = v; best = x; } if (x.t === m.t && x.i === m.i && (x.w || null) === (m.w || null)) mv = v; });
-      if (mv == null || best == null) return null; var d = bv - mv, same = best.t === m.t && best.i === m.i && (best.w || null) === (m.w || null);
-      if (same || d <= 1) return { g: 'good', t: 'Good move: ' + (same ? 'the best choice here.' : 'about as good as any.') };
+      var hm = hintMove(G); if (hm && hm.t === m.t && hm.i === m.i && (hm.w || null) === (m.w || null)) return { g: 'good', t: 'Good move: the best choice here.' };
+      if (!hm || hm.i == null) return null; var bv = AI.value(G, hm, p), mv = AI.value(G, m, p), best = hm; // FIXED1: rated against the same move the star shows, so the two never disagree
+      if (mv == null || bv == null) return null; var d = bv - mv;
+      if (d <= 1) return { g: 'good', t: 'Good move: about as good as the star.' };
       if (d <= 3.5) return { g: 'okay', t: 'Okay move: ' + moveName(G, best) + ' was a bit better.' };
       return { g: 'poor', t: 'Poor move: ' + moveName(G, best) + ' was clearly better.' };
     } catch (e) { return null; }
@@ -259,8 +261,8 @@ var TT_TEST = {};
   function renderPyr(flips) {
     var G = U.G, P = $('pyr'), d = layoutDims(); P.innerHTML = ''; if (U.pyrRO) U.pyrRO.observe(P); P.classList.toggle('tight', d.step < 68); P.classList.toggle('vtight', d.step < 44);
     var av = E.available(G).map(function (c) { return c.i; }), human = canAct(), hintCell = -1;
-    var bestCell = -1; if (U.hintsOn && human && G.phase === 'play' && !G.pend.length) { try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
-    if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = AI.pick(G, 'normal', function () { return 0.5; }); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
+    var bestCell = -1; if (U.hintsOn && human && G.phase === 'play' && !G.pend.length) { try { var bm = hintMove(G); if (bm && bm.i != null) bestCell = bm.i; } catch (e) { } }
+    if (U.camp && U.camp.hints && human && !U.tut && G.phase === 'play' && !G.pend.length) { try { var hm = hintMove(G); if (hm && hm.i != null) hintCell = hm.i; } catch (e) { } }
     G.pyr.forEach(function (cell) {
       var c = BY[cell.id], e = document.createElement('div');
       e.className = 'card v4' + (d.w < 76 ? ' sm' : ''); e.dataset.col = c.col; e.id = 'c' + cell.i; e.style.setProperty('--cw', d.w + 'px'); e.style.setProperty('--cc', 'var(--c-' + c.col + ')');
@@ -284,9 +286,9 @@ var TT_TEST = {};
   function fitNames(root) { root.querySelectorAll('.card.v4 .nm').forEach(function (e) { if (e.scrollWidth > e.clientWidth + 1) { e.classList.add('t1'); if (e.scrollWidth > e.clientWidth + 1) e.classList.add('t2'); } }); }
   function renderDraft() {
     var G = U.G, P = $('pyr'), human = canAct(); P.innerHTML = '';
-    var d = document.createElement('div'); d.id = 'draft';
+    var d = document.createElement('div'); d.id = 'draft'; var hw = (human && U.hintsOn && !U.tut && U.mode === 'cpu') ? hintMove(G) : null; // FIXED1: the star also marks the best wonder in the draft
     G.draft.avail.forEach(function (id) {
-      var w = BY[id], b = document.createElement('button'); b.className = 'wcard' + (human ? ' go' : ''); b.dataset.pick = id; if (!human) b.disabled = true;
+      var w = BY[id], b = document.createElement('button'); b.className = 'wcard' + (human ? ' go' : '') + (hw && hw.w === id ? ' hint' : ''); b.dataset.pick = id; if (!human) b.disabled = true;
       b.innerHTML = slot(w.stem) + '<b>' + esc(w.nm) + '</b><small>' + esc(wtx(w.text)) + '</small><div class="costs">' + costHtml(w.cost, true) + '</div>'; d.appendChild(b);
     });
     P.appendChild(d); fillArt(d);
@@ -303,6 +305,7 @@ var TT_TEST = {};
     if (on !== was && G && G.phase === 'play' && P.children.length) { if (!on) d.style.cssText = ''; renderPyr(); }
     if (!on) { if (was) d.style.cssText = ''; return; }
     var r = P.getBoundingClientRect(); d.style.left = r.left + 'px'; d.style.width = r.width + 'px'; d.style.top = 'auto'; d.style.bottom = Math.max(0, innerHeight - r.bottom) + 'px'; d.style.maxHeight = r.height + 'px';
+    var hk = d.querySelector('.picker .hint'); if (hk && hk.scrollIntoView) try { hk.scrollIntoView({ block: 'nearest' }); } catch (e) { } // FIXED1: a long revive list scrolls; the hinted choice is brought into view
   }
   function instr(p, text) { if (U.narr) return; setInstr(whoTag(p), isAI(p) ? 'rival' : 'you', text); }
   function dock0() {
@@ -313,18 +316,19 @@ var TT_TEST = {};
     if (!human && !U.narr && !isAI(p)) setInstr('Please wait', 'info', 'One moment...');
     if (!human) { msg.textContent = U.narr ? 'Turn in progress' : isAI(p) ? name(p) + ' is thinking...' : 'Wait...'; return; }
     var M = E.validMoves(G);
+    var hp = (pd && U.hintsOn && !U.tut && U.mode === 'cpu' && !isAI(p)) ? hintMove(G) : null, hc = function (id) { return hp && (hp.id === id || hp.who === id) ? ' hint' : ''; };
     if (pd && pd.type === 'first') {
       msg.textContent = 'Age ' + AGE[G.age] + ': who starts?'; instr(p, 'Choose who plays first in this age.');
-      acts.innerHTML = '<button class="btn" data-first="' + p + '">I start</button><button class="btn alt" data-first="' + (1 - p) + '">Rival starts</button>';
+      acts.innerHTML = '<button class="btn' + hc(p) + '" data-first="' + p + '">I start</button><button class="btn alt' + hc(1 - p) + '" data-first="' + (1 - p) + '">Rival starts</button>';
     } else if (pd && pd.type === 'token') {
       msg.textContent = 'Progress token'; instr(p, 'Pick a progress token: a bonus you keep for the whole game.'); var l = pd.from === 'lib' ? pd.list : G.tokensUp;
-      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small>' + esc(U.tokArm === t ? 'Tap again to take it' : 'Tap to see') + '</small></button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + l.map(function (t) { var d = BY[t]; return '<button class="tk' + (U.tokArm === t ? ' arm' : '') + hc(t) + '" data-token="' + t + '"><b>' + esc(d.nm) + '</b><small>' + esc(U.tokArm === t ? 'Tap again to take it' : 'Tap to see') + '</small></button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'destroy') {
       msg.textContent = 'Discard a rival card'; instr(p, 'Pick one rival card to throw away.');
-      acts.innerHTML = '<div class="picker">' + pd.list.map(function (t) { var d = BY[t]; return '<button class="tk" data-destroy="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(COLN[d.col]) + '</button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + pd.list.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-destroy="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(COLN[d.col]) + '</button>'; }).join('') + '</div>';
     } else if (pd && pd.type === 'revive') {
       msg.textContent = 'Revive a discarded card'; instr(p, 'Pick a thrown-away card to build for free.');
-      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
+      acts.innerHTML = '<div class="picker">' + G.discard.map(function (t) { var d = BY[t]; return '<button class="tk' + hc(t) + '" data-revive="' + t + '"><b>' + esc(d.nm) + '</b>' + esc(describe(d)) + '</button>'; }).join('') + '</div>';
     } else if (G.phase === 'draft') {
       msg.textContent = 'Wonder draft'; sub.textContent = ''; instr(p, 'Pick a wonder. You get 4.');
     } else if (U.sel != null) {
@@ -370,10 +374,11 @@ var TT_TEST = {};
     var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
     var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - bw / 2) + 'px;top:' + top + 'px;width:' + bw + 'px"><div class="zcard" id="zcard" style="width:' + cw + 'px;height:' + ch + 'px">' + pay + '</div>';
     h += '<p class="lt"><b>' + esc(cap(describe(c))) + '.</b> ' + esc(why) + '</p><div class="zb3">';
-    h += '<button class="btn zb' + (okB ? '' : ' off') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
+    h += '<button class="btn zb' + (okB ? '' : ' off') + (hm && hm.t === 'build' ? ' hint' : '') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
     h += '<button class="btn zb sell" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
-    var w0 = wok[0];
-    h += '<button class="btn zb won' + (w0 ? '' : ' off') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (wok.length > 1 ? 'or tap one below' : esc(BY[w0.m.w].nm)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
+    var hm = (U.hintsOn && !U.tut && !isAI(p)) ? hintMove(G) : null; if (hm && hm.i !== cell.i) hm = null;
+    var w0 = (hm && hm.t === 'wonder' && wok.filter(function (q) { return q.m.w === hm.w; })[0]) || wok[0];
+    h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (wok.length > 1 ? 'or tap one below' : esc(BY[w0.m.w].nm)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
     if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
     z.innerHTML = h; z.hidden = false; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
     // the lift may rise over the war track and token row (not over either city) before the card shrinks
@@ -483,7 +488,7 @@ var TT_TEST = {};
   function markBest() {
     var P = $('pyr'); if (!P) return; P.querySelectorAll('.bv').forEach(function (e) { e.remove(); }); P.querySelectorAll('.card.best').forEach(function (e) { e.classList.remove('best'); });
     var G = U.G; if (!U.hintsOn || !G || G.phase !== 'play' || G.pend.length || !canAct()) return;
-    try { var bm = AI.pick(G, 'normal', function () { return 0.5; }); if (bm && bm.i != null) { var e = $('c' + bm.i); if (e && e.classList.contains('av')) { e.classList.add('best'); e.insertAdjacentHTML('beforeend', '<i class="bv" title="Best value">&#9733;</i>'); } } } catch (er) { }
+    try { var bm = hintMove(G); if (bm && bm.i != null) { var e = $('c' + bm.i); if (e && e.classList.contains('av')) { e.classList.add('best'); e.insertAdjacentHTML('beforeend', '<i class="bv" title="Best value">&#9733;</i>'); } } } catch (er) { }
   }
   function render0() { if (setClean() && U.G.phase !== 'draft') renderPyr(); dock(); renderScore(); markBest(); if (U.G.phase !== 'draft') { var P = $('pyr'); P.querySelectorAll('.card.av').forEach(function (e) { e.classList.toggle('dim', !canAct()); }); } else renderDraft(); strip(0); strip(1); }
 

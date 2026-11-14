@@ -71,6 +71,7 @@
     actStep('trade', 'a1-bathhouse', 'build', 'Buy stone: 2 coins plus 1 per rival stone card.'),
     cardStep('yellow', 'a1-roadside-inn', 'Yellow cards bring coins. Tap the inn.'),
     actStep('yellow-build', 'a1-roadside-inn', 'build', 'Build it: you get 4 coins now.'),
+    infoStep('depot', 'Yellow depots make one resource cost 1 coin to buy.', function () { return $('s0') || $('pyr'); }),
     cardStep('science', 'a1-weights-hall', 'Green cards carry science symbols. Tap this one.'),
     actStep('science-build', 'a1-weights-hall', 'build', 'Missing papyrus costs 2 coins. Build it.'),
     { id: 'next-age', rule: 'next-age', say: 'Fewer shields than the rival? You choose who starts.', target: function () { return document.querySelector('[data-first="0"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'first' && a.who === 0; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'first' && G().age === 2; } },
@@ -82,12 +83,13 @@
     infoStep('again', 'This wonder gives 6 coins and another turn now.', function () { return $('s0') || $('pyr'); }, function () { return G().built === 1; }),
     infoStep('seven', 'Only seven wonders get built. The eighth one is lost.', function () { return $('s0') || $('pyr'); }),
     cardStep('pair-card', 'a2-measure-hall', 'A second scale symbol makes a pair. Tap it.'),
-    actStep('pair-build', 'a2-measure-hall', 'build', 'Buy the stone and build it.'),
-    { id: 'pair', rule: 'pair', say: 'A pair earns a progress token. Take this one.', target: function () { return document.querySelector('[data-token="t-strategy"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'token' && a.id === 't-strategy'; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'token'; } },
+    actStep('pair-build', 'a2-measure-hall', 'build', 'Buy the two glass and build it.'),
+    { id: 'pair', rule: 'pair', say: 'A pair earns a progress token. This one gives 6 coins.', target: function () { return document.querySelector('[data-token="t-agriculture"]'); }, wait: { type: 'tap', match: function (a) { return a.kind === 'token' && a.id === 't-agriculture'; } }, ready: function () { var pd = G().pend[0]; return idle() && pd && pd.type === 'token'; } },
     holdStep('science-win', 'Six different science symbols is an instant win.', function () { return $('s0') || $('pyr'); }, function () { return G().players[0].tokens.length === 1; }),
     infoStep('tie-start', 'Tied shields: the last card taker chose. You start.', function () { return $('pyr'); }, function () { return G().age === 3 && !G().pend.length; }),
-    cardStep('age3', 'a3-war-pavilion', 'Last age. Horse Yard chains to this. Tap it.'),
-    actStep('loot-build', 'a3-war-pavilion', 'build', 'Free by chain, plus one extra shield from your token.'),
+    infoStep('guild', 'Purple guilds hide in Age Three. They score from the best city.', function () { return $('pyr'); }, function () { return G().age === 3 && !G().pend.length; }),
+    cardStep('age3', 'a3-war-pavilion', 'Last age. This red card costs 8 coins. Tap it.'),
+    actStep('loot-build', 'a3-war-pavilion', 'build', 'Build it: three shields push the pawn.'),
     holdStep('loot', 'Pawn crossed a coin space: the rival lost 2 coins.', pawn, function () { return G().mil >= 3; }),
     cardStep('sell-card', 'a3-high-fort', 'The last card. Tap it.'),
     actStep('sell', 'a3-high-fort', 'discard', 'Sell it: 2 coins plus 1 per yellow card.'),
@@ -95,7 +97,7 @@
     { id: 'tie', rule: 'tie', say: 'Tied on points? More blue card points wins.', target: function () { return document.querySelector('#res table'); }, wait: null, ready: function () { return !!G() && G().over && !$('res').hidden; } }
   ];
   // rules every step teaches (the e2e walks the tutorial and checks each appears)
-  var RULES = ['goal', 'draft', 'draft-last', 'draft-2', 'pyramid', 'build-free', 'flip', 'own-resource', 'shield', 'military-win', 'trade', 'yellow-build', 'science-build', 'next-age', 'chain', 'wonder', 'again', 'seven', 'pair', 'science-win', 'tie-start', 'age3', 'loot', 'sell', 'score', 'tie'];
+  var RULES = ['goal', 'draft', 'draft-last', 'draft-2', 'pyramid', 'build-free', 'flip', 'own-resource', 'shield', 'military-win', 'trade', 'yellow-build', 'depot', 'science-build', 'next-age', 'chain', 'wonder', 'again', 'seven', 'pair', 'science-win', 'tie-start', 'guild', 'age3', 'loot', 'sell', 'score', 'tie'];
   STEPS.forEach(function (s) { var on = s.onEnter; s.onEnter = function () { T.seen[s.id] = 1; if (on) on(); }; });
   // ---------------------------------------------------------------- start / end
   function off() { T.active = false; document.body.classList.remove('ttguided'); layout(false); U.tut = false; U.rivalName = null; }
