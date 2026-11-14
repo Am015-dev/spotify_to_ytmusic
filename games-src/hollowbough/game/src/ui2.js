@@ -521,6 +521,7 @@ function qShort(q) {
 function chipText(label) {
   let s = String(label || '');
   let m;
+  if ((m = s.match(/^Long Road \d+ - discard (\d+) cards?; .*scores (\d+)/))) return 'discard ' + m[1] + ' \u00b7 ' + m[2] + ' pts';
   if ((m = s.match(/^Do not use /))) return 'Skip: repeat nothing';
   if ((m = s.match(/^Spend a token: repeat (.*)$/))) s = 'Repeat ' + m[1];
   if ((m = s.match(/^Give 1 berry to (\S+) and take 2 point tokens/))) return 'Give ' + m[1] + ' a berry: +2 tokens';

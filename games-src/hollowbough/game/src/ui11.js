@@ -171,10 +171,9 @@ document.addEventListener('pointerup', () => { if (!UI.started || !hlpCoached())
 // one helper at a time (FIXED13): the moment a coach bubble or the bulb's answer appears, the ghost finger steps aside (it comes back on the next tap)
 try { new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList && n.classList.contains('gxh-bub')) { const f = document.getElementById('finger'); if (f) f.hidden = true; hlpIdleClear(); return; } }).observe(document.body, { childList: true }); } catch (e) { }
 
-// calm play: the bulb's ring pulses 3 times (CSS) and its finger taps twice, then both hold still / go away (the shared kit loops them forever)
+// every mode (guided too): the bulb's ring pulses 3 times (CSS) and its finger taps twice, then both hold still / go away (the shared kit loops them forever)
 try {
   new MutationObserver(ms => {
-    if (!document.documentElement.classList.contains('calm')) return;
     for (const m of ms) for (const n of m.addedNodes) {
       if (!n.classList || !n.classList.contains('gxh-finger') || !n.getAnimations) continue;
       for (const a of n.getAnimations()) { try { a.effect.updateTiming({ iterations: 2 }); a.onfinish = () => { n.style.display = 'none'; }; } catch (e) { } }

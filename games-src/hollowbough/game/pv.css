@@ -58,7 +58,7 @@
 #bd.pv .pv-small .pv-sw b{font-size:14px}
 #bd.pv .pv-sw span{font-size:14px;font-weight:600;opacity:.78;margin-top:1px}
 #bd.pv .tile.glow{border-color:#7a5200;box-shadow:0 0 0 2px var(--pv-gold),0 3px 0 rgba(0,0,0,.4),0 0 14px 2px rgba(255,210,90,.75);animation:none}
-#bd.pv .tile.glow::before{content:'';position:absolute;inset:-4px;border-radius:15px;border:3px solid var(--pv-gold);animation:glowp 1.3s ease-in-out infinite;pointer-events:none}
+#bd.pv .tile.glow::before{content:'';position:absolute;inset:-4px;border-radius:15px;border:3px solid var(--pv-gold);animation:glowp 1.3s ease-in-out 3;pointer-events:none}
 #bd.pv .tile.no{opacity:.62;filter:saturate(.55)}
 #bd.pv .tile.taken{opacity:.7;filter:grayscale(.35)}
 #bd.pv .tile.done{opacity:.55}
@@ -495,4 +495,6 @@ html #bd.pv .mc.nudge .pvc,html #bd.pv .hc.nudge .pvc,html #bd.pv .sc.nudge .pvm
 @media (max-width:400px){#bd.pv .resrow.r5 .rs.wk .pv-meeple~.pv-meeple{display:none}#bd.pv .resrow.r5 .rs.wk .pv-wn{margin-left:2px}#bd.pv .resrow.r5 .rs.wk .rsw{font-size:.8em!important;letter-spacing:-.2px}#bd.pv .resrow.r5 .rs.wk{padding-left:3px}}
 
 /* one helper at a time: the tab dot steps aside while the nudge or the bulb's ring shows */
-body:has(.nudge,.gxh-ring) #bd.pv .pv-tab.hot::after{display:none}
+body:has(.nudge,.gxh-ring,#finger:not([hidden])) #bd.pv .pv-tab.hot::after{display:none}
+/* FIXED16: the hand cards sit ~14px above the hand strip; every scrolling panel ends with room for them, so the last row (Goals) is never covered at 375x553 */
+#bd.pv .pv-scrolly,#bd.pv .pv-goals{padding-bottom:26px!important;scroll-padding-bottom:26px}

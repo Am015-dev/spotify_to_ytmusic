@@ -1,5 +1,6 @@
 // Calm-play measure: plays normal games (html.calm) through the real page with touch taps and counts what made the owner call it "confusing and distracting".
-//   NODE_PATH=/opt/node-tools/node_modules node calm-measure.js [games=2] [sizes=375x667,375x553]
+//   NODE_PATH=/opt/node-tools/node_modules node calm-measure.js [games=2] [sizes=375x667,375x553] [modes=calm,guided]
+// Runs every mode: 'calm' (normal vs game, html.calm) and 'guided' (the newcomer's first game). Prints loops and max helpers per mode.
 // Counts (all must hold): continuous animations = 0, helpers on screen at once <= 1, bulb / idle-nudge targets off screen = 0, silent taps = 0.
 // A "helper" is: the kit's bubble/ring/finger (bulb answer, one helper), the ghost finger, an idle-nudge outline; the tab dot counts when it competes with another.
 const PW = (() => { try { return require('playwright'); } catch (e) { return require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright'); } })();
@@ -7,18 +8,19 @@ const path = require('path');
 const gx = require('../../scripts/gx-serve.js');
 const NG = +process.argv[2] || (process.env.QUICK ? 1 : 2), SIZES = (process.argv[3] || '375x667,375x553').split(',').map(s => s.split('x').map(Number));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const T = { loops: 0, bulbSamples: 0, selTaps: 0, qHandTaps: 0, anim: 0, helpersMax: 0, bulbOff: 0, nudgeOff: 0, silent: 0, bulbTaps: 0, nudges: 0, deadTaps: 0, prepTaps: 0, games: 0 }; let bad = 0;
+const MODES = (process.argv[4] || 'calm,guided').split(','); let MODE = 'calm';
+const mkT = () => ({ loops: 0, bulbSamples: 0, selTaps: 0, qHandTaps: 0, anim: 0, helpersMax: 0, bulbOff: 0, nudgeOff: 0, silent: 0, bulbTaps: 0, nudges: 0, deadTaps: 0, prepTaps: 0, games: 0 }); let T = mkT(), bad = 0;
 function fail(tag, m) { bad++; if (bad < 40) console.log('FAIL', tag, m); }
 async function game(browser, W, H, gi) {
-  const tag = `${W}x${H} g${gi}`;
+  const tag = `${MODE} ${W}x${H} g${gi}`;
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
   const p = await ctx.newPage(); p.setDefaultTimeout(8000);
   p.on('pageerror', e => fail(tag, 'pageerror ' + e.message));
   await p.goto(URL); await sleep(500);
   const seed = 22 + gi;
-  await p.evaluate(s => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame('vs'); }, seed);
+  await p.evaluate(([s, m]) => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2, level: 'normal', solo: 1 }; newGame(m); }, [seed, MODE === 'guided' ? 'guided' : 'vs']);
   await sleep(500);
-  if (!(await p.evaluate(() => document.documentElement.classList.contains('calm')))) fail(tag, 'not a calm game');
+  if ((await p.evaluate(() => document.documentElement.classList.contains('calm'))) !== (MODE === 'calm')) fail(tag, 'wrong mode: calm class ' + (MODE === 'calm' ? 'missing' : 'present'));
   T.games++;
   const sample = () => p.evaluate(() => {
     const vis = e => { if (!e || e.closest('[hidden]')) return false; const r = e.getBoundingClientRect(); return r.width > 1 && r.height > 1 && getComputedStyle(e).visibility !== 'hidden'; };
@@ -89,8 +91,12 @@ let URL;
   URL = await gx.url('hollowbough', { file: path.join(__dirname, 'hollowbough.html') });
   require('fs').mkdirSync(path.join(__dirname, 'shots'), { recursive: true });
   const b = await PW.chromium.launch();
-  for (const [W, H] of SIZES) for (let g = 0; g < NG; g++) await game(b, W, H, g).catch(e => fail(`${W}x${H} g${g}`, 'crash ' + String(e.message).slice(0, 200)));
+  for (const m of MODES) {
+    MODE = m; T = mkT();
+    for (const [W, H] of SIZES) for (let g = 0; g < NG; g++) await game(b, W, H, g).catch(e => fail(`${W}x${H} g${g}`, 'crash ' + String(e.message).slice(0, 200)));
+    console.log('CALM MEASURE [' + MODE + ']: games ' + T.games + ', continuous-animation samples ' + T.anim + ', max helpers at once ' + T.helpersMax + ', bulb taps ' + T.bulbTaps + ' (off-screen ' + T.bulbOff + '), idle nudges ' + T.nudges + ' (off-screen ' + T.nudgeOff + '), Prepare taps ' + T.prepTaps + ', dead-card taps ' + T.deadTaps + ', after-bulb samples ' + T.bulbSamples + ' (loops ' + T.loops + '), second taps on a selected card ' + T.selTaps + ', hand taps in a choice ' + T.qHandTaps + ', silent taps ' + T.silent);
+    console.log('MODE ' + MODE + ': infinite loops ' + (T.anim + T.loops) + ' (must be 0), max helpers at once ' + T.helpersMax + ' (must be <= 1)');
+  }
   await b.close();
-  console.log('CALM MEASURE: games ' + T.games + ', continuous-animation samples ' + T.anim + ', max helpers at once ' + T.helpersMax + ', bulb taps ' + T.bulbTaps + ' (off-screen ' + T.bulbOff + '), idle nudges ' + T.nudges + ' (off-screen ' + T.nudgeOff + '), Prepare taps ' + T.prepTaps + ', dead-card taps ' + T.deadTaps + ', after-bulb samples ' + T.bulbSamples + ' (loops ' + T.loops + '), second taps on a selected card ' + T.selTaps + ', hand taps in a choice ' + T.qHandTaps + ', silent taps ' + T.silent);
   console.log(bad ? 'CALM FAIL ' + bad : 'CALM PASS'); process.exit(bad ? 1 : 0);
 })();
