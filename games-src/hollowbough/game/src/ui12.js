@@ -1,5 +1,5 @@
 // ===================== part 12: the tutorial (shell/gx-tutor.js): a staged short game that teaches every rule by doing it once =====================
-// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings; you play Winter, Spring, Summer and Autumn (Bramble passes after Spring).
+// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings; you play Winter, Spring, Summer and Autumn; Bramble plays the same year on shared places and passes in Autumn.
 // Bramble is scripted (tutAi) so each rule appears on cue. Nothing of it is saved, scored or counted. Each step spotlights one thing; only that thing answers;
 // the step moves on only when the game reports that exact tap (GXT.act from onTarget).
 const TUT_GAME = 'hollowbough', TUT_SEED = 4242;
@@ -29,7 +29,6 @@ function tutStage(g) {
   const bard = tutTake(g, 'bard', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
   { const mk = D.specialEvents.findIndex(e => e.key === 'sev_resident_minstrel'), j = g.sev.findIndex(e => e.k === mk); if (j > 0) g.sev[j].k = g.sev[0].k; g.sev[0].k = mk; }   // Inn + that card = this special event
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
-  g.tale = true;          // the lesson is a short year: it may end before Autumn (a real game passes only in Autumn)
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
@@ -49,11 +48,15 @@ const isDone = o => o.card === undefined && o.res === undefined;
   HB.AI.choose = function (g, seat, level) {
     if (UI.cfg && UI.cfg.coached && UI.coachEnd && g === G && seat === 1) { const ps = HB.moves(g, 1).find(m => m.type === 'pass'); if (ps) return ps; }
     if (UI.cfg && UI.cfg.tutorial && !UI.cfg.coached && g === G && seat === 1) {
-      const p = g.players[1], mv = HB.moves(g, 1), key = (p.season === 0 ? 'w' : 's') + p.dep.length;
+      // FIXED13: Bramble plays the whole year legally (passing is only allowed in Autumn): Winter as scripted, then only shared basic places
+      // (never blocks a place the lesson needs), Prepare when her workers are out, no Summer meadow cards (the lesson's cards stay), Pass in Autumn
+      const p = g.players[1], mv = HB.moves(g, 1);
       const basic = k => mv.find(m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === k);
-      const want = { w0: () => basic('basic_pebble_bank'), w1: () => basic('basic_kindling_glen'), w2: () => mv.find(m => m.type === 'prepare'),
-        s0: () => basic('basic_gossip_glade'), s1: () => basic('basic_amber_weep'), s2: () => mv.find(m => m.type === 'pass') };
-      const m = want[key] && want[key](); if (m) return m;
+      if (g.q) { const st = mv.find(m => m.type === 'choose' && /^Stop/.test(m.label || '')); if (st) return st; return o.apply(this, arguments); }
+      if (p.season === 0) { const w = [() => basic('basic_pebble_bank'), () => basic('basic_kindling_glen')][p.dep.length]; const m = w && w(); if (m) return m; }
+      else { const order = p.season === 1 ? ['basic_gossip_glade', 'basic_amber_weep', 'basic_kindling_glen'] : ['basic_amber_weep', 'basic_kindling_glen', 'basic_berry_patch'];
+        for (let k = 0; k < order.length; k++) { const m = basic(order[(p.dep.length + k) % order.length]); if (m) return m; } }
+      const pr = mv.find(m => m.type === 'prepare') || mv.find(m => m.type === 'pass'); if (pr) return pr;
     }
     return o.apply(this, arguments);
   };

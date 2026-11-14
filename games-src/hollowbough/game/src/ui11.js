@@ -168,3 +168,5 @@ function hlpNudge() {
 document.addEventListener('pointerdown', () => { if (typeof hlpIdleArm === 'function' && UI.started) hlpIdleArm(); }, true);
 // the guided game: when a coach bubble closes (a tap), the finger comes back (it hides while a bubble shows: one helper at a time)
 document.addEventListener('pointerup', () => { if (!UI.started || !hlpCoached()) return; clearTimeout(UI.fbk); UI.fbk = setTimeout(() => { try { const f = document.getElementById('finger'); if (f && f.hidden && !GXH.state().cur) placeFinger(); } catch (e) { } }, 400); }, true);
+// one helper at a time (FIXED13): the moment a coach bubble or the bulb's answer appears, the ghost finger steps aside (it comes back on the next tap)
+try { new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList && n.classList.contains('gxh-bub')) { const f = document.getElementById('finger'); if (f) f.hidden = true; hlpIdleClear(); return; } }).observe(document.body, { childList: true }); } catch (e) { }

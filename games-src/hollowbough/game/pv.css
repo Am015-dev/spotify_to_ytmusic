@@ -492,3 +492,5 @@ html #bd.pv .mc.nudge .pvc,html #bd.pv .hc.nudge .pvc,html #bd.pv .sc.nudge .pvm
 @keyframes hbnudge{0%,100%{outline-color:#fff1a8}50%{outline-color:#ffb81f}}
 @keyframes hbnudgeb{0%,100%{border-color:#fff1a8}50%{border-color:#ffb81f}}
 @media (prefers-reduced-motion:reduce){.nudge{animation:none}}
+/* FIXED13: with the tokens column (r5) a 375 px phone cut "workers": one meeple is enough there, the number says how many */
+@media (max-width:400px){#bd.pv .resrow.r5 .rs.wk .pv-meeple~.pv-meeple{display:none}#bd.pv .resrow.r5 .rs.wk .pv-wn{margin-left:2px}}

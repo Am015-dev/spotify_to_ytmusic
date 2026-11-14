@@ -505,7 +505,7 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
-  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : p.season < 3 ? 'Build or Prepare' : 'Build or Pass';   // phone: one short line (Pass only in Autumn)
+  if (isPh() && !hotSeat() && humans().length <= 1) { const canB = myMoves().some(m => m.type === 'play'); return n > 0 ? (canB ? 'Place a worker or build' : 'Place a worker') : p.season < 3 ? (canB ? 'Build or Prepare' : 'Prepare') : (canB ? 'Build or Pass' : 'Pass'); }   // phone: one short line (Pass only in Autumn)
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
   const last = p.season < 3 ? 'Prepare' : 'Pass';
   return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build or ' + last + '.' : 'play a card or ' + last + '.'));
@@ -585,7 +585,7 @@ const PV_SPECIAL = {
   forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a basic place', '+ 1 card', 'copy'],
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
-const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
+const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a basic place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
 const PV_TCOL = { production: 'green', destination: 'red', governance: 'blue', traveler: 'tan', prosperity: 'purple' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
