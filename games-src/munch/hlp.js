@@ -205,8 +205,8 @@ hlpAfter();
 // the bubble gets an OK button, and while it is open the ★ badge and every other pulse step aside (tbl.css)
 (function(){const done=new WeakSet();const tame=()=>{for(const f of document.querySelectorAll('.gxh-finger')){if(done.has(f))continue;done.add(f);for(const a of f.getAnimations())try{a.effect.updateTiming({iterations:3})}catch(e){}}
   for(const b of document.querySelectorAll('.gxh-bulbb')){if(b.querySelector('.dk-bok'))continue;const r=b.querySelector('.gxh-row2')||b;const k=document.createElement('button');k.type='button';k.className='gxh-ok dk-bok';k.textContent='OK';k.addEventListener('click',e=>{e.stopPropagation();try{GXH.hide()}catch(x){}});r.appendChild(k);
-    // the button made the bubble taller after the kit placed it: place it again, and keep it on the screen
-    try{GXH.relayout()}catch(x){}hlpClamp(b)}};
+    // the kit redraws (a fresh bubble) on every relayout, so never relayout from here (that loops): just keep the bubble on the screen
+    hlpClamp(b)}};
   try{new MutationObserver(()=>{try{tame()}catch(e){}}).observe(document.body,{childList:true})}catch(e){}})();
 // a help bubble never leaves the screen (it can grow after the kit placed it)
 function hlpClamp(b){const q=b.getBoundingClientRect();if(!q.width)return;const W=innerWidth,H=innerHeight;let dx=0,dy=0;if(q.bottom>H-2)dy=H-2-q.bottom;if(q.top+dy<2)dy=2-q.top;if(q.right>W-2)dx=W-2-q.right;if(q.left+dx<2)dx=2-q.left;if(dx)b.style.left=(b.offsetLeft+dx)+'px';if(dy)b.style.top=(b.offsetTop+dy)+'px'}
