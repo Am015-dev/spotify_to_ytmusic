@@ -193,7 +193,7 @@ function hlpForce(b){const cs=hlpCores(),T=hlpOwn(b);
 function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())return;GXH.relayout();if(!hlpCovers())return;
   const cs=hlpCores();for(const b of hlpBubs())if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}   // no spot at all on this screen: the glowing spots speak for themselves
 // cards slide and fan after a bubble appears: while one is up, check every frame (cheap: one query when a bubble is on)
-(function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}requestAnimationFrame(loop)})();
+(function loop(){try{if(document.querySelector('.gxh-bub.on:not(.gxt-bub)'))hlpUncover()}catch(e){}try{for(const b of document.querySelectorAll('.gxh-bub.on'))hlpClamp(b)}catch(e){}requestAnimationFrame(loop)})();
 // the kit places a bubble from a timer: check it before anything else runs (a microtask), not one frame later
 (function(){const done=new WeakSet();const mo=new MutationObserver(()=>{try{if(typeof GXH==='undefined'||!_hlpInit)return;const cs=hlpCores();for(const b of hlpBubs()){if(done.has(b))continue;done.add(b);if(hlpBadAt(b,hlpBox(b),cs)&&!hlpForce(b))GXH.hide()}}catch(e){}});const go=()=>mo.observe(document.body,{childList:true});document.body?go():addEventListener('DOMContentLoaded',go)})();
 (function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter();hlpUncover()}catch(e){UI.lastErr='hlp '+e}return r}})();
@@ -204,5 +204,9 @@ hlpAfter();
 // the bulb's help is ONE helper that settles: its ring pulses 3 times and its finger taps 3 times, then both hold still (the kit loops them);
 // the bubble gets an OK button, and while it is open the ★ badge and every other pulse step aside (tbl.css)
 (function(){const done=new WeakSet();const tame=()=>{for(const f of document.querySelectorAll('.gxh-finger')){if(done.has(f))continue;done.add(f);for(const a of f.getAnimations())try{a.effect.updateTiming({iterations:3})}catch(e){}}
-  for(const b of document.querySelectorAll('.gxh-bulbb')){if(b.querySelector('.dk-bok'))continue;const r=b.querySelector('.gxh-row2')||b;const k=document.createElement('button');k.type='button';k.className='gxh-ok dk-bok';k.textContent='OK';k.addEventListener('click',e=>{e.stopPropagation();try{GXH.hide()}catch(x){}});r.appendChild(k)}};
+  for(const b of document.querySelectorAll('.gxh-bulbb')){if(b.querySelector('.dk-bok'))continue;const r=b.querySelector('.gxh-row2')||b;const k=document.createElement('button');k.type='button';k.className='gxh-ok dk-bok';k.textContent='OK';k.addEventListener('click',e=>{e.stopPropagation();try{GXH.hide()}catch(x){}});r.appendChild(k);
+    // the button made the bubble taller after the kit placed it: place it again, and keep it on the screen
+    try{GXH.relayout()}catch(x){}hlpClamp(b)}};
   try{new MutationObserver(()=>{try{tame()}catch(e){}}).observe(document.body,{childList:true})}catch(e){}})();
+// a help bubble never leaves the screen (it can grow after the kit placed it)
+function hlpClamp(b){const q=b.getBoundingClientRect();if(!q.width)return;const W=innerWidth,H=innerHeight;let dx=0,dy=0;if(q.bottom>H-2)dy=H-2-q.bottom;if(q.top+dy<2)dy=2-q.top;if(q.right>W-2)dx=W-2-q.right;if(q.left+dx<2)dx=2-q.left;if(dx)b.style.left=(b.offsetLeft+dx)+'px';if(dy)b.style.top=(b.offsetTop+dy)+'px'}
