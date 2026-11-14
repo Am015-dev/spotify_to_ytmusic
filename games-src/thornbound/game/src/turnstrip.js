@@ -207,16 +207,17 @@ window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.s
 // ---- tap guard (R64): a fast second tap must not fall through to the panel under an overlay that just closed.
 // For 350 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
 // (a double-tap) is swallowed. Taps elsewhere on the screen still work at once.
-(function(){const MS=350,R=64,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
+(function(){const MS=350,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
   const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'));
   const arm=()=>{const now=performance.now();if(now-down.t>600)return;until=now+MS;at={x:down.x,y:down.y}};
   window.TBTAPGUARD={get until(){return until},get at(){return at},arm,ms:MS,radius:R,get on(){return performance.now()<until}};
   const pt=e=>{const t=e.changedTouches&&e.changedTouches[0]||e.touches&&e.touches[0]||e;return {x:t.clientX,y:t.clientY}};
-  const note=e=>{if(e.isTrusted===false)return;const q=pt(e);if(q.x==null)return;if(!(performance.now()<until))down={t:performance.now(),x:q.x,y:q.y}};
-  window.addEventListener('pointerdown',note,{capture:true,passive:true});window.addEventListener('touchstart',note,{capture:true,passive:true});
-  const block=e=>{if(!(performance.now()<until)||e.isTrusted===false||!at)return;const q=pt(e);if(q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)>R)return;
-    if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()};
-  for(const t of ['pointerdown','pointerup','mousedown','mouseup','touchstart','touchend','click','dblclick'])window.addEventListener(t,block,{capture:true,passive:false});
+  // decided once per gesture, at its pointerdown: only a NEW tap that starts inside the window near the closing tap is swallowed (all of its events);
+  // the rest of the tap that closed the overlay is never touched
+  let gest=false;const kill=e=>{if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()};
+  window.addEventListener('pointerdown',e=>{if(e.isTrusted===false)return;const q=pt(e),now=performance.now();
+    gest=!!(at&&now<until&&q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)<=R);if(gest){kill(e);return}down={t:now,x:q.x,y:q.y}},{capture:true,passive:false});
+  for(const t of ['pointerup','mousedown','mouseup','touchstart','touchend','click','dblclick'])window.addEventListener(t,e=>{if(gest&&e.isTrusted!==false)kill(e)},{capture:true,passive:false});
   // a tap inside an overlay that closes it (checked right after the tap's own handlers ran)
   window.addEventListener('click',e=>{const o=e.target&&e.target.closest&&e.target.closest(OV);if(!o)return;setTimeout(()=>{if(gone(o))arm()},0)},true);
   // overlays closed from code during a tap (removed modal cards, or the message/pop-up panels getting hidden)
