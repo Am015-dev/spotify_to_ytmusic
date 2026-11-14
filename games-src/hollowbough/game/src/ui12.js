@@ -228,15 +228,15 @@ const COACH = [
   { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for cards. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
   { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
   { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
-  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production cards pay again each season.', later: 'Buildings stay in your city. Production pays each season.' },
+  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Green cards pay again in Spring and Autumn.', later: 'Cards stay in your city. Green cards pay in Spring and Autumn.' },
   { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
   { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
   { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
-  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'All workers are out. Prepare: they come home, you gain one, production pays.', later: 'Prepare: workers come home, +1 worker, production pays.' },
-  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer draws cards. Autumn brings extra workers.', later: 'Seasons: Winter, Spring, Summer (draw cards), Autumn (extra workers).' },
+  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: p => 'All workers are out. Prepare: they come home and you gain ' + (p.season === 2 ? 'two more' : 'one more') + '. ' + (p.season === 1 ? 'Summer: take up to 2 meadow cards.' : 'Green cards pay.'), later: 'Prepare: workers come home. Spring and Autumn: green cards pay. Summer: take up to 2 meadow cards.' },
+  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer lets you take meadow cards. Autumn brings two more workers.', later: 'Seasons: Spring +1 worker, Summer +1 (meadow cards), Autumn +2.' },
   { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers. Rivals share the Berry Patch.', later: 'Shared places take many workers.' },
-  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
-  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when all have passed. Unused workers are wasted.', later: 'Pass ends your game. Unused workers are wasted.' }
+  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => G.np >= 4 ? 'The forest pays more goods. Each spot takes two workers, never two of yours.' : 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
+  { id: 'pass', when: (p) => !p.passed && myTurnC() && p.season >= 3 && p.workers - p.dep.length === 0, say: () => 'Autumn is the last season. When you are done, Pass. The game ends when all have passed.', later: 'Pass only in Autumn, after your last Prepare. Unused workers are wasted.' }
 ];
 // rules that need a situation we cannot count on: told at the end
 const COACH_TALE = 1e9;   // the first game plays the whole year (R21: ending it after 14 actions left the rival with 4 cards); the cut-off code stays for a future short mode
@@ -244,7 +244,7 @@ const COACH_LATER = [
   { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
   { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
   { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
-  { id: 'special', later: 'Special events need certain buildings and cost goods.' },
+  { id: 'special', later: 'Each special event needs two named cards in your city.' },
   { id: 'tie', later: 'Ties go to most events, then most leftover goods.' }
 ];
 const myTurnC = () => !!G && UI.started && G.phase !== 'over' && !UI.cards.length && !UI.animBusy && HB.actor(G) === 0;
@@ -262,7 +262,7 @@ function coachFeedback(p) {
   if (!b || b.season !== snap.season && snap.dep === 0) return null;
   const say = (k, t) => { const L = UI.fbLog = UI.fbLog || []; if (L.filter(x => x === k).length >= 2) return null; L.push(k); return t; };
   if (snap.passed && !b.passed) return snap.un > 0 ? say('poor:pass', 'You passed with ' + snap.un + ' worker' + (snap.un > 1 ? 's' : '') + ' still home. Each was a lost action.') : say('good:pass', 'Good: every worker was used before you passed.');
-  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : '. It will keep paying every season.')); }
+  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : (e && HB.cardOf(e.id).color === 'green' ? '. It pays again in Spring and Autumn.' : '.'))); }
   if (snap.pts >= b.pts + 3) return say('good:points', 'Good: +' + (snap.pts - b.pts) + ' points in one move. Events and big cards pay best.');
   if (snap.hand >= 8 && b.hand < 8) return say('poor:hand', 'Careful: your hand is full at 8. Extra cards are lost. Play one soon.');
   if (snap.dep > b.dep && snap.res <= b.res && snap.hand <= b.hand && snap.pts <= b.pts) return say('poor:empty', 'That worker gained nothing. Check what glows before you send one.');

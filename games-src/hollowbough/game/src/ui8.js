@@ -28,6 +28,7 @@ function kitSettings() {
       S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
       if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
+      S.appendChild(GX.row('Hints', GX.onoff(!!UI.hints, v => { UI.hints = !!v; try { localStorage.setItem('hb_hints', v ? '1' : '0'); } catch (x) { } UI.gtop = null; UI.recKey = ''; render(); }, 'Hints'), 'Finger on the best move, previews and ratings'));
     },
     about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game. Art and music by Am015-dev.' }
   });
