@@ -2,7 +2,7 @@
 // All wording is original. Numbers (difficulty per team size, counts, thresholds) follow the rules research (rules-notes.md).
 // Suits 0..3 are the colour suits (cards 1-9); suit 4 is the trump suit, the Lanterns (cards 1-4).
 // Job card kinds (see engine.js `jobStatus`): cmp trick pred with cards valn coln colx avoidc avoidv avoidsub allcol onecol
-//   subx nolead skip none ntr pos run pred eqcol morecol.  d = [3 divers, 4 divers, 5 divers] difficulty, cap:0 = the Commander may not take it.
+//   subx nolead skip none ntr pos run pred eqcol morecol.  d = [3 divers, 4 divers, 5 divers] difficulty, cap:0 = the Captain may not take it.
 (function (g) {
 'use strict';
 const SUITS = [
@@ -22,9 +22,9 @@ const TASKS = [
   /* 0 */ J([2, 3, 3], 'Win more tricks than every other diver.', { k: 'cmp', op: 'more', vs: 'each' }),
   /* 1 */ J([3, 4, 5], 'Win more tricks than all other divers together.', { k: 'cmp', op: 'more', vs: 'all' }),
   /* 2 */ J([2, 2, 3], 'Win fewer tricks than every other diver.', { k: 'cmp', op: 'fewer', vs: 'each' }),
-  /* 3 */ J([2, 2, 3], 'Win more tricks than the Commander does.', { k: 'cmp', op: 'more', vs: 'cap', cap: 0 }),
-  /* 4 */ J([2, 2, 2], 'Win fewer tricks than the Commander does.', { k: 'cmp', op: 'fewer', vs: 'cap', cap: 0 }),
-  /* 5 */ J([4, 3, 3], 'Win exactly as many tricks as the Commander does.', { k: 'cmp', op: 'eq', vs: 'cap', cap: 0 }),
+  /* 3 */ J([2, 2, 3], 'Win more tricks than the Captain does.', { k: 'cmp', op: 'more', vs: 'cap', cap: 0 }),
+  /* 4 */ J([2, 2, 2], 'Win fewer tricks than the Captain does.', { k: 'cmp', op: 'fewer', vs: 'cap', cap: 0 }),
+  /* 5 */ J([4, 3, 3], 'Win exactly as many tricks as the Captain does.', { k: 'cmp', op: 'eq', vs: 'cap', cap: 0 }),
   /* 6 */ J([2, 3, 3], 'Win a trick where every card is below 7. No Lanterns.', { k: 'trick', p: 'lt', v: 7 }),
   /* 7 */ J([2, 3, 4], 'Win a trick where every card is above 5.', { k: 'trick', p: 'gt', v: 5 }),
   /* 8 */ J([2, 3, 3], 'Win a trick by playing a 6.', { k: 'with', v: 6 }),
@@ -116,7 +116,7 @@ const TASKS = [
   /* 94 */ J([1, 1, 1], 'Win more Sunstar than Tide cards. Zero Tide is fine.', { k: 'morecol', a: SU, b: TI }),
   /* 95 */ J([1, 1, 1], 'Win more Coral than Kelp cards. Zero Kelp is fine.', { k: 'morecol', a: CO, b: KE })
 ];
-const SHORT = ['Most tricks', 'More than all others', 'Fewest tricks', 'More than Commander', 'Fewer than Commander', 'Same as Commander', 'Trick all below 7', 'Trick all above 5', 'Win with a 6', 'Win with a 5', 'Win with a 3', 'Win a 5 with a 7', 'Win an 8 with a 4', 'Win a 6 with a 6', 'Win with a 2',
+const SHORT = ['Most tricks', 'More than all others', 'Fewest tricks', 'More than Captain', 'Fewer than Captain', 'Same as Captain', 'Trick all below 7', 'Trick all above 5', 'Win with a 6', 'Win with a 5', 'Win with a 3', 'Win a 5 with a 7', 'Win an 8 with a 4', 'Win a 6 with a 6', 'Win with a 2',
   'Coral 3', 'Sunstar 1', 'Tide 4', 'Kelp 6', 'All four 3s', 'Three or more 5s', 'Three or more 9s', 'Two or more 7s', 'All four 9s', 'Exactly three 6s', 'Exactly two 9s', 'Tide 1, 2, 3', 'Tide 6 + Sunstar 7', 'Coral 5 + Sunstar 6', 'Kelp 5 + Tide 8', 'Tide 5 + Coral 8', 'Coral 9 + Sunstar 8', 'Coral 1 + Kelp 7', 'Sunstar 9 + Tide 7', 'Kelp 3, Sunstar 4+5', 'Kelp 2 in last trick',
   'One Coral, one Kelp', '7+ Sunstar cards', '5+ Coral cards', 'Exactly 2 Kelp', 'Exactly 2 Tide', 'Exactly 1 Coral', 'No Coral', 'One of each colour', 'A whole colour', 'Trick of evens', 'Trick of odds', 'High-total trick', 'Low-total trick', 'Trick of 22 or 23', 'Exactly one Lantern', 'Lantern 1 only', 'Lantern 2 only', 'Lantern 3', 'Exactly two Lanterns', 'Exactly three Lanterns', 'No Lanterns', 'Coral 7 by Lantern', 'Kelp 9 by Lantern',
   'Lead no Coral/Sun/Tide', 'Lead no Coral/Kelp', 'No Kelp', 'No Sunstar', 'No Coral or Tide', 'No Sunstar or Kelp', 'No 8s or 9s', 'No 9s', 'No 5s', 'No 1s', 'No 1s, 2s, 3s', 'None of first four', 'None of first three', 'None of first five', 'No tricks', 'Never two in a row', 'The last trick', 'First three tricks', 'First two tricks', 'The first trick', 'First and last', 'Only the last', 'Only the first', 'Exactly 1 trick', 'Exactly 2 tricks', '2 tricks in a row', '3 tricks in a row', 'Exactly 4 tricks', 'Exactly 3 in a row', 'Exactly 2 in a row', 'Predict (open)', 'Predict (secret)', 'Coral = Sunstar', 'Kelp = Sunstar in a trick', 'Coral = Tide in a trick', 'Sunstar over Tide', 'Coral over Kelp'];
@@ -136,23 +136,23 @@ const MISSIONS = [
   M(6, 'One Diver Swims Alone', 5, { sel: 'vote', rule: 'Agree on one diver to take every job. Do not talk about cards.', brief: 'A porthole opened too early. Fix it fast.' }),
   M(7, 'Mapping the Slope', 6, { brief: 'Your first real trip. Map the ground around the base.' }),
   M(8, 'Share the Pearls', 6, { guess: 1, gap: { v: 9, gap: 2 }, rule: 'No diver may ever hold two more 9s than another diver.', brief: 'The pearls are running out. Share them fairly.' }),
-  M(9, 'The Old Wreck', 7, { cmt: 'murky', rule: 'Murky water: show a card, but put the ping token beside it, spent side up.', brief: 'An old ship lies close by. Strong currents blur your signals.' }),
-  M(10, 'The Inscription', 4, { sel: 'cmd', rule: 'The Commander takes every job, or hands them all to a willing diver. If handed over, signal before the first trick.', brief: 'Inside the wreck is a carved tablet, broken at the bottom.' }),
-  M(11, 'Whispers', 8, { cmt: 'narc', rule: 'Deep narcosis: ping tokens sit in the middle, two fewer than divers. Anyone may take one between tricks and signal at once. One diver may signal many times.', brief: 'The base answered. Only you are surprised. Switch to a private channel.' }),
+  M(9, 'The Old Wreck', 7, { cmt: 'murky', rule: 'Murky water: show a card, but put the signal token beside it, spent side up.', brief: 'An old ship lies close by. Strong currents blur your signals.' }),
+  M(10, 'The Inscription', 4, { sel: 'cmd', rule: 'The Captain takes every job, or hands them all to a willing diver. If handed over, signal before the first trick.', brief: 'Inside the wreck is a carved tablet, broken at the bottom.' }),
+  M(11, 'Whispers', 8, { cmt: 'narc', rule: 'Deep narcosis: signal tokens sit in the middle, two fewer than divers. Anyone may take one between tricks and signal at once. One diver may signal many times.', brief: 'The base answered. Only you are surprised. Switch to a private channel.' }),
   M(12, 'The Quiet Lead', 6, { guess: 1, m12: 1, rule: 'Never lead a trick with Coral or a Lantern.', brief: 'The tablet is fragile. Work slowly and quietly.' }),
-  M(13, 'Charting the Region', 5, { sel: 'cmd', rule: 'The Commander takes every job, or hands them all to a willing diver. If handed over, signal before the first trick.', brief: 'The carvings show a coast that is not here. Plan a survey.' }),
+  M(13, 'Charting the Region', 5, { sel: 'cmd', rule: 'The Captain takes every job, or hands them all to a willing diver. If handed over, signal before the first trick.', brief: 'The carvings show a coast that is not here. Plan a survey.' }),
   M(14, 'Emergency Drill', 4, { guess: 1, sel: 'one', timer: { sec: 210, alt: 'murky' }, rule: 'One volunteer takes all jobs. Beat the 3:30 clock, or play with murky water and no clock.', brief: 'An alarm drill at a bad moment.' }),
   M(15, 'Jellyfish Bloom', 5, { guess: 1, sel: 'one', timer: { sec: 180, alt: 'narc' }, rule: 'One volunteer takes all jobs. Beat the 3:00 clock, or play with deep narcosis and no clock.', brief: 'Jellyfish drift into the base. One diver is stuck outside.' }),
   M(16, 'The Leak', 6, { sel: 'one', timer: { sec: 150, alt: 'none' }, rule: 'One volunteer takes all jobs. Beat the 2:30 clock, or play with no signals and no clock.', brief: 'An injured diver needs care. The infirmary is flooding.' }),
   M(17, 'The Singing Statues', 9, { sel: 'free', rule: 'Open briefing: talk about who takes which job. Never talk about cards. One diver may take all jobs.', brief: 'The statues are older than any record. Work as one team.' }),
   M(18, 'The Hollow', 9, { brief: 'The next chamber is close. Something feels wrong.' }),
-  M(19, 'The Narrow Cave', 9, { sel: 'hard', rule: 'The Commander takes the hardest job first.', brief: 'A drone found a maze of tunnels. Some fit only one diver.' }),
+  M(19, 'The Narrow Cave', 9, { sel: 'hard', rule: 'The Captain takes the hardest job first.', brief: 'A drone found a maze of tunnels. Some fit only one diver.' }),
   M(20, 'The Labyrinth', 10, { cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card before dealing. 1-3 normal, 4-6 murky water, 7-9 deep narcosis. No diver may ever hold two more 1s than another diver.', brief: 'The tunnels keep forking. The radio keeps cutting out.' }),
   M(21, 'Echoes', 10, { guess: 1, cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: draw a colour card first. 1-3 normal, 4-6 murky, 7-9 deep narcosis. No diver may ever hold two more 1s than another diver.', brief: 'The base computer finished its scan. It has named itself.' }),
   M(22, 'The Sunken Archive', 11, { cmt: 'unknown', rule: 'Unknown waters: draw a colour card first (1-3 normal, 4-6 murky, 7-9 deep narcosis).', brief: 'Rooms full of shelves. Nobody you know built them.' }),
   M(23, 'Single File', 11, { guess: 1, cmt: 'unknown', m23: 1, rule: 'Unknown waters: draw a colour card first. Signal just before trick 2. The first trick\'s winner must always have the most tricks.', brief: 'A narrow, dangerous bend. Follow the leader.' }),
   M(24, 'Cold Rations', 12, { cmt: 'unknown', rule: 'Unknown waters: draw a colour card first (1-3 normal, 4-6 murky, 7-9 deep narcosis).', brief: 'Not deep now, but it feels deep. Dinner is paste in a tube.' }),
-  M(25, 'The Lightbearer', 12, { cmt: 'unknown', sel: 'cmdnone', rule: 'Unknown waters: draw a colour card first. The Commander takes no job. Skip them each round.', brief: 'Creatures flee your lamps into the cracks.' }),
+  M(25, 'The Lightbearer', 12, { cmt: 'unknown', sel: 'cmdnone', rule: 'Unknown waters: draw a colour card first. The Captain takes no job. Skip them each round.', brief: 'Creatures flee your lamps into the cracks.' }),
   M(26, 'The Giant in the Dark', 10, { cmt: 'unknown', sel: 'two', timer: { sec: 300, alt: null, altD: 12 }, rule: 'Unknown waters: draw a colour card first. Two volunteers take all jobs, one each at least. Beat the 5:00 clock at difficulty 10, or skip the clock at 12.', brief: 'A giant squid fills the tunnel behind you. Use everything you have!' }),
   M(27, 'The Glow Path', 12, { guess: 1, cmt: 'unknown', m27: 1, rule: 'Unknown waters: draw a colour card first. The Sunstar 5 must be the last card played in the final trick. With three divers, it may not be the card left over.', brief: 'Lights mark a path through the weeds. A yellow glow waits at the end.' }),
   M(28, 'The Paved Road', 14, { sel: 'free', rule: 'Open briefing: talk freely about who takes which job, but never about your cards.', brief: 'The sea floor looks paved. Someone walked here long ago.' }),
@@ -166,12 +166,12 @@ const NAMES = ['Nerea', 'Bram', 'Sumi', 'Dag', 'Lio'];
 const BLURBS = [
   { story: 'Nerea was a harbour pilot. She counts everything twice.', enjoy: 'Pick Nerea for a careful teammate who plans ahead.', lv: 'hard' },
   { story: 'Bram fixes pumps and trusts his hands. He plays and hopes for the best.', enjoy: 'Pick Bram for a steady teammate. He rarely panics.', lv: 'normal' },
-  { story: 'Sumi studies deep-sea fish. She pings the moment she sees something useful.', enjoy: 'Pick Sumi for a teammate who pings a lot.', lv: 'normal' },
+  { story: 'Sumi studies deep-sea fish. She signals the moment she sees something useful.', enjoy: 'Pick Sumi for a teammate who signals a lot.', lv: 'normal' },
   { story: 'Dag is new to diving and takes every job he can. He is cheerful about it.', enjoy: 'Pick Dag for a relaxed first dive.', lv: 'easy' }
 ];
-const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in two rows. The Commander flies it.' };
+const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in two rows. The Captain flies it.' };
 const DATA = {
-  // the staged tutorial's fixed deal (ui12 / tutor.js): you are the Commander (Lantern 4). Jobs: you "Win the Lantern 3", Dag "Win the first trick".
+  // the staged tutorial's fixed deal (ui12 / tutor.js): you are the Captain (Lantern 4). Jobs: you "Win the Lantern 3", Dag "Win the first trick".
   tutorial: { tasks: [53, 78], hands: ['L4 L3 C2 C6 C9 K3 K5 K8 S1 S2 S4 S7 S9', 'L2 C4 C5 C7 T2 T4 T6 T9 K4 K7 S3 S5 S6', 'L1 C1 C3 C8 T1 T3 T5 T7 T8 K1 K2 K6 K9 S8'] },
   v: 1, suits: SUITS, tasks: TASKS, missions: MISSIONS, deep: DEEP, names: NAMES, blurbs: BLURBS, helper: HELPER,
   ncards: 40, ntasks: TASKS.length,

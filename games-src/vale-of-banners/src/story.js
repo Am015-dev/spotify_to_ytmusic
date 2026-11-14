@@ -67,13 +67,13 @@ window.VSTORY = {
   coachGood: { chain: 'Two builds from one die. Nice.', region: 'Lovely. That filled a region.' },
   coachPoor: { workers: 'You could have built there. Tiles beat workers.' },
   coachRival: { region: 'Tobin filled a region. He goes for small ones.', sell: 'Tobin sold goods. That also gave him silver.', chain: 'Tobin built twice in one go.' },
-  laterTitle: 'Things you\'ll meet later',
   endTitle: 'You know how to play',
   endText: 'That was the whole game. Ready for a real one?',
   /* Quick game: one flavour line at the start, one result line */
   quickIntro: ['New season. Build fast.', 'Five seasons. Best estate wins.', 'Your rival wants the same tiles.'],
-  quickWin: 'Well played.',
-  quickLose: 'Close one. Try again?',
+  /* result lines by margin (N = 'X points'): close <= 8, clear <= 25, big beyond */
+  quickWin: { close: 'Won by just N. Well played.', clear: 'Won by N. Well played.', big: 'A big win, by N.' },
+  quickLose: { close: 'Close one: just N short. Try again?', clear: 'Lost by N. Follow the ★ Best hint next time.', big: 'A clear loss, N behind. Try a gentler rival, or follow ★ Best.' },
   soloWin: 'Every space built. Well played.',
   soloLose: 'A few gaps left. Try again?',
   /* Story: a loss outro per chapter (wins use campaign.json outro) */

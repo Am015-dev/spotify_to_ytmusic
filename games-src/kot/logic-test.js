@@ -107,7 +107,7 @@ R('A monster with 20 stars at the end of its turn wins.', () => { game(); set(0,
 R('A monster with 19 stars does not win.', () => { game(); set(0, { vp: 19 }); S(`G.city=1`); roll(['E', '1', '2', '2', '3', '3']); endT(); return [null, S(`G.winner`)] });
 R('A monster that scores past 20 (e.g. 18 + a triple of 3s) wins.', () => { game(); set(0, { vp: 18 }); S(`G.city=1`); roll(['3', '3', '3', 'E', 'E', 'E']); endT(); return ['P1', S(`G.winner`)] });
 R('If every remaining monster is eliminated at the same moment, nobody wins.', () => { game(); S(`G.pl.forEach(p=>p.hp=0);deaths()`); return ['draw', S(`G.winner`)] });
-R('Reaching 20 stars wins the game immediately (the moment the stars are scored, mid-turn).', () => { game(); set(0, { vp: 18 }); S(`G.city=1`); S(`G.phase='roll';G.dice=['3','3','3','E','E','E'].map(f=>({f,k:true}));G.tf=Object.assign(tfBase(),{startIn:[G.city,G.bay]});resolve()`); return ['P1', S(`G.winner`)] });
+R('Reaching 20 stars mid-turn does not end the game: you may still buy, and win when the turn ends.', () => { game(); set(0, { vp: 18 }); S(`G.city=1`); S(`G.phase='roll';G.dice=['3','3','3','E','E','E'].map(f=>({f,k:true}));G.tf=Object.assign(tfBase(),{startIn:[G.city,G.bay]});resolve()`); const mid = S(`G.winner`), ph = S(`G.phase`); endT(); return [J([null, 'buy', 'P1']), J([mid, ph, S(`G.winner`)])] });
 
 /* =========================== G. BUYING POWER CARDS =========================== */
 grp('Buying power cards');
@@ -206,6 +206,9 @@ R('Bargain Hunter (3): when a new card is revealed another monster holding it ma
 R('Leech Tendrils (4): may buy Keep cards from other monsters, paying the owner the cost.', () => { game(); set(0, { cards: ['para'], en: 10 }); set(1, { cards: ['alpha'] }); S(`G.phase='buy'`); return [true, S(`paraList(P(0)).length>0`)] });
 R('The 66-card deck contains exactly 17 Discard cards (kiosk, train, tower, needle, surge, sirens x2, flame, refinery, patch, carpet, jetsq, militia, reactor, tanks, cyclone, rush, skydive).', () => { const d = S(`BASEDECK.filter(k=>CARDS[k.split('#')[0]].t==='D').length`); return [18, d] });
 R('The 66-card deck contains Keep cards only of the printed list (no duplicate except Second Skull).', () => { const k = S(`BASEDECK.filter(k=>CARDS[k.split('#')[0]].t==='K').length`); return [48, k] });
+
+grp('Winning at turn end');
+R('A monster that reaches 20 stars but is knocked out in the same turn does not win (Jet Squadron at 4 hearts).', () => { game(); set(0, { vp: 16, hp: 4 }); S(`G.city=1;G.deck=['kiosk','kiosk','kiosk']`); market(['jetsq', 'kiosk', 'kiosk']); buyAt(0, 5); S(`deaths()`); return [J([false, null]), J([get(0, 'alive'), S(`G.winner`)])] });
 
 /* ---------------- run ---------------- */
 if (process.argv.includes('--md')) {

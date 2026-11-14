@@ -1386,6 +1386,17 @@
    "wave": 3,
    "slot": "Glow behind the sliding pawn",
    "prompt": "A soft golden radial glow with tiny sparks. One single object centered on a flat plain white background, no ground shadow, clean edges so it can be keyed out."
+  },
+  {
+   "stem": "table-wood",
+   "kind": "bg",
+   "w": 1024,
+   "h": 1024,
+   "ratio": "1:1",
+   "alpha": false,
+   "wave": 3,
+   "slot": "Wooden table under the play mat",
+   "prompt": "CC0 wood table texture (Poly Haven wood_table_001)"
   }
  ]
 }

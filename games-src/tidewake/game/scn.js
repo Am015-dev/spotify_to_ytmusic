@@ -20,7 +20,10 @@
     AIDELAY = 60; startGame(JSON.parse(JSON.stringify(s))); try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     return GXS.wait(function () { return G && G.phase === 'setup' && !UI.busy && sideToAct() === 0; }, 15000).then(function () { return idle(600); }).then(function () {
       var si = startInfo(0); act(si[Math.floor(si.length / 2)].m, 0);
-      return GXS.wait(function () { return G.phase === 'play' && G.step === 'act' && !UI.busy && sideToAct() === 0 && $('button[data-a=card]'); }, 25000);
+      return GXS.wait(function () {
+        // a leviathan rose on your start square (6 leviathans at the start): move to the first free mark offered, as a player would
+        if (G.q && G.q.who === 0 && !UI.busy) { var k = G.q.opts.findIndex(function (o) { return o.h === 'dReloc'; }); try { act({ a: 'q', i: k >= 0 ? k : 0 }, 0); } catch (e) { } return false; }
+        return G.phase === 'play' && G.step === 'act' && !UI.busy && sideToAct() === 0 && $('button[data-a=card]'); }, 25000);
     }).then(function () { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } if (UI.mph) { PH.mphHide = UI.mph; try { phAfter(); } catch (e) { } } return idle(1500); });
   }
 

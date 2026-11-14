@@ -40,6 +40,13 @@ The original publisher's official PDFs and the board-game catalogue site were bl
 - **[R9] Initiative:** the side with fewer squad points has it. On a tie the second-named side has it (core rulebook; W391 fix, no die roll).
 - **Winning:** destroy every enemy ship. If both sides' last ships are destroyed at the same time, the side with initiative wins [confirmed, 1e rulebook].
 - **Round limit:** 1e has none (tournaments use a clock). A safety cap of 100 rounds stops a game that can't end; it is then decided on points destroyed. No test game has come near it.
+- **[T1] No round limit in any game started from Launch (12 Nov fix).** The first game used to stop after 8 rounds and break a tie on
+  "more health left". Neither is in the rules: the base game is fought "until one player has destroyed all of the opponent's ships", and
+  the tournament regulations use a clock, not a round count: "If time runs out before one player is eliminated, the player who has
+  destroyed the most total squad points worth of ships wins; if both players destroyed the same number of squad points, the game is a
+  draw" (summary of the first-edition tournament rules, early regulations; later editions broke ties with a dice roll-off). Health left
+  is never a tiebreak. Now: fight to the end by default; **Options → Game length → Timed, 20 min** is the tournament approach as an
+  option (time is checked at the end of a round, so the round in progress is finished; then points destroyed; a tie is a draw).
 
 ## Setup [27]
 1. **Initiative** is settled first (above).

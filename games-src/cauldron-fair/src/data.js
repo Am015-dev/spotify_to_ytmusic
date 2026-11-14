@@ -53,7 +53,7 @@ var BOOKS = {
     4: { price: [7, 11, 17], eff: 'r4', title: 'Pod skipper', text: 'Once it is in your pot, later white 1s move 2 spaces. They still count 1 towards exploding.' }
   },
   Y: {
-    1: { price: [8, 12, 18], eff: 'y1', title: 'Kind cut', text: 'Drawn right after a white chip? You may put that white back. Its space stays empty. The yellow chip stays put.' },
+    1: { price: [8, 12, 18], eff: 'y1', title: 'Send a white back', text: 'Drawn right after a white chip? You may put that white back. Its space stays empty. The yellow chip stays put.' },
     2: { price: [9, 13, 19], eff: 'y2', title: 'Double step', text: 'The next chip you place moves twice as far as its number.' },
     3: { price: [8, 12, 18], eff: 'y3', title: 'Roomier pot', text: 'One yellow chip in your pot: you explode past 8. Three or more: past 9.' },
     4: { price: [8, 12, 18], eff: 'y4', title: 'Sunroot stretch', text: 'Your 1st yellow moves 1 extra space. Your 2nd moves 2 extra. Your 3rd moves 3 extra. Later ones get nothing.' }

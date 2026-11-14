@@ -4,7 +4,8 @@
 //   node logic-test.js          run all rules; one line per failure: "FAIL R<n> expected ... got ..."
 //   node logic-test.js --md     rewrite RULES-CHECKLIST.md from the rule table below
 const {load}=require('./game/tools/load');const fs=require('fs');
-const X=load(['data.js','engine.js']);const E=X.E,ctx=X.ctx;
+// the rule table's scenarios use 6x6 coordinates (the rules do not depend on the size; the 7x7 board's own checks are in game/rules-test.js)
+const X=load(['data.js','engine.js'],';BW=6;BC=2.5;');const E=X.E,ctx=X.ctx;
 const ORND=ctx.rnd;let DQ=[];ctx.rnd=function(n){return (n===6&&DQ.length)?DQ.shift()-1:ORND(n)};   // scripted d6: DQ holds the faces to roll next
 const J=JSON.stringify;
 function eq(got,exp,what){if(J(got)!==J(exp))throw new Error(`expected ${J(exp)} got ${J(got)}${what?'  ['+what+']':''}`)}
@@ -289,6 +290,11 @@ R('base','The oldest player goes first (the app lets the host or the dice choose
 R('base','Tiles in hand are kept hidden from the other players (the app shows each player only their own hand).',null);
 R('base','Teams: teammates may not show each other their tiles (a table courtesy; the app hides hands).',null);
 R('exp-wave','The blue Rogue Wave marker tile sits on the board edge to show where the wave is heading (the app draws the wave directly).',null);
+
+S('L. Turn timing (found in the W498 playthrough)');
+R('base','A ship blocked by a leviathan at the start of its turn rolls first: if the leviathans move it away, the ship survives and plays.',()=>{
+  mk(3);rig({cur:0,tiles:[{x:4,y:3,id:1}],ships:[{x:2,y:0,e:0},{x:4,y:4,e:1,on:[4,3]},{x:5,y:3,e:2}],mons:[{id:0,x:4,y:4},...FILL],fill:false});
+  startTurn(1,[3,4,2,RDIE[7],RDIE[8],RDIE[9]]);eq(pos(mon(0)),[5,4],'the leviathan swam east');eq(ship(1).alive,true,'not sunk');eq([X.G.cur,X.G.step],[1,'act'],'its turn goes on')});
 
 if(process.argv.includes('--md')){
   const out=['# Tidewake rules checklist','','One numbered entry per rule of the original rulebook and its expansion, in our own words and names (current = wake tile, leviathan = monster, Rift Gate, Rogue Wave, Maelstrom, Deck Cannon). Every entry marked TEST has exactly one assertion in `logic-test.js` with the same number (`node logic-test.js`). Written from the rulebook text recorded in `rules-notes.md` and a web search; items the sources disagree on are listed at the end.','',

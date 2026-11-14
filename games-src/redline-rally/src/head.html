@@ -72,6 +72,8 @@ button.qt{appearance:none;border:0;background:transparent;color:var(--gold);curs
 .reveal{display:flex;gap:6px;justify-content:center;align-items:center;min-height:calc(var(--cw)*1.4)}
 .slipq{display:flex;gap:8px}.slipq button{flex:1;min-height:52px;border-radius:12px;border:2px solid #3b4a68;background:#1d2636;font-weight:900;font-size:17px}
 .slipq .y{background:linear-gradient(#1f7a46,#175c35);color:#fff;border:0}
+.slipq .y.risk{background:linear-gradient(#8a5a12,#6b430b)}
+.slipq button.qt{background:linear-gradient(90deg,#33476b calc(var(--qt)*100%),#1d2636 calc(var(--qt)*100%))}
 /* ---- modal ---- */
 #modal{position:fixed;inset:0;background:rgba(5,8,14,.82);display:flex;align-items:center;justify-content:center;padding:14px;z-index:50}
 .sheet{position:relative;width:min(520px,100%);max-height:100%;overflow:auto;background:var(--panel);border:1px solid #3a4866;border-radius:16px;padding:18px 16px 16px}
@@ -112,6 +114,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 #banner.on{display:flex;animation:bnIn .3s ease-out}
 #banner i{width:14px;height:14px;border-radius:50%;background:var(--bc,#ffc23a);flex:0 0 auto}
 #banner.round i{display:none}
+#banner.rate{left:8px;transform:none;max-width:calc(100% - 140px);font-size:15px;padding:6px 12px}   /* the round rating stays clear of the minimap (top right) */
 @keyframes bnIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
 #msg{font-size:16px;line-height:1.3;min-height:44px;display:flex;align-items:center;justify-content:center;padding:6px 12px;max-height:3.3em;overflow:hidden}
 #gears .gl{font-size:14px;line-height:1.1;max-width:46px;font-weight:800}
@@ -158,6 +161,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 #trk .phs{display:flex;gap:3px;list-style:none;margin:0;padding:0}
 #trk .phs li{flex:1;text-align:center;font-size:14px;font-weight:700;padding:1px 0;border-radius:6px;background:var(--panel2);color:var(--mute)}
 #trk .phs li.on{background:var(--gold);color:#1a1405}
+#trk .phs li.dm{color:var(--ink)}#trk .phs li.dm.hot b{color:#ff8f7a}#trk .phs .sgn{display:inline-block;min-width:20px;border:2px solid #d62020;border-radius:50%;background:#fff;color:#111;line-height:16px;font-size:14px}
 #trk .rate{margin-top:5px;font-size:14px;font-weight:700;padding:4px 8px;border-radius:8px;background:var(--panel2)}
 #trk .rate.good{color:#8cf0b4}#trk .rate.okay{color:#ffd27a}#trk .rate.poor{color:#ff8f7a}
 .pod3{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin:8px auto 4px;max-width:320px}
@@ -181,7 +185,7 @@ table.champ tr.you td{color:var(--gold);font-weight:700}
 @media (min-width:1280px){#game{--gx-dock-w:clamp(470px,44vw,620px)}html #game{--cw:68px}}
 body:has(.gx-drawer.on) #gxscn-tag{display:none}   /* the ?scn= test tag must not sit on top of the open rules drawer */
 @media (min-width:1000px){html body .gx-drawer{bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}}   /* lines scrolled below the drawer end over its own panel, not over the dark page */
-#trk .score{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:40px;margin:0 0 4px;padding:3px 10px;border-radius:8px;border:1px solid #3b4a68;background:#1d2636;color:var(--ink);font-weight:800;font-size:14px;text-align:left}
+#trk .score{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:44px;margin:0 0 4px;padding:3px 10px;border-radius:8px;border:1px solid #3b4a68;background:#1d2636;color:var(--ink);font-weight:800;font-size:14px;text-align:left}
 #trk .score i{font-style:normal;font-weight:700;color:var(--gold);font-size:14px}
 #hintT.on{border-color:var(--gold);color:var(--gold)}
 ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;line-height:1.35}.wxl{font-size:15px;color:#8ce6ff}
@@ -214,5 +218,23 @@ ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;
   html #game #tray{grid-area:tray}
   html #game #panel:not(:has(#gears)){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center}
 }
+/* W496: 375px phones: the top bar fits (Menu stayed 7px past the edge); podium title readable over the art */
+@media (max-width:389px){.gx-bar .pill .pw{display:none}.gx-bar .pill{padding:3px 5px}}
+button.pill#posChip{font:inherit;color:inherit;border:0;min-height:44px;cursor:pointer}
+.stl{list-style:decimal;padding-left:26px;margin:8px 0 14px}.stl li{display:flex;align-items:center;gap:8px;min-height:40px;font-weight:800;font-size:17px}.stl li i{width:10px;height:22px;border-radius:3px}.stl li span{margin-left:auto;color:var(--mute);font-weight:700}.stl li.me{color:var(--gold)}
+/* R3: short phones (375x667): the board gets at least ~45% of the screen; the dock tightens */
+@media (max-width:600px) and (max-height:700px) and (orientation:portrait){
+  html #game .gx-dock-head{display:none}html #game #trk .phs{display:none}
+  html #game #msg{min-height:30px;padding:3px 10px;font-size:14px}html #game #panel{gap:4px;padding:4px 8px 6px}
+  html #game .gb{min-height:44px}html #game #acts button{min-height:44px}html #game #acts .go{min-height:46px}
+}
+/* R3: Suggest's answer to a boost / slipstream question */
+.slipq button.sug{outline:3px solid var(--gold);outline-offset:1px}.slipq .sgt{display:block;font-style:normal;font-size:14px;color:var(--gold);line-height:1}.slipq .sgw{display:block;font-size:13px;font-weight:700;line-height:1.15;color:#f3e6c0;margin:2px 0}
+/* R3: phones: with Hints on (bulb shown) Menu ran past the edge. Sound lives in Menu on phones; bar buttons stay 44px */
+@media (max-width:600px){#game .gx-bar .pill .pw{display:none}#game .gx-bar #sndB{display:none}#game .gx-bar .gx-ibtn{min-height:44px;min-width:44px}}
+.podium h2{display:inline-block;position:relative;z-index:1;background:rgba(10,14,24,.78);padding:4px 14px;border-radius:10px;margin-top:64px}
+@media (max-width:600px){.podium h2{margin-top:44px}}
+/* R19: the 375x667 result card fits without scrolling, so Race again never sits over a row */
+@media (max-width:600px) and (max-height:760px){.podium{padding:10px 10px 10px}.podium h2{margin-top:8px;font-size:20px}.podium .ic{display:none!important}.pod3{margin:4px auto 2px}.pod3 .p1 .blk{height:34px}.pod3 .p2 .blk{height:26px}.pod3 .p3 .blk{height:20px}.pod3 .blk{font-size:16px;padding-top:1px}.podium .rl{font-size:15px;margin-top:4px}.stand{margin:3px 0;padding:3px 6px}.stand .pt{width:30px;height:30px}#modal .sheet{padding:12px 12px 8px}}
 </style>
 </head>

@@ -1,6 +1,7 @@
 // ===================== part 3: game flow (new game, computer crew, human actions, hot-seat, timer, end) =====================
 const mkey = m => JSON.stringify(m);
 function newGame(mode, o) {
+  UI.chip = null; clearTimeout(UI.chipT); if (typeof document !== 'undefined') document.querySelectorAll('#pz .rchip').forEach(e => e.remove());   // no leftover reason chip from the tutorial or the last flight
   o = o || {}; clearTimeout(UI.tm); UI.seq++;
   const cfg = UI.cfg = Object.assign({ scenario: 'g1', role: 0, level: 'normal', abil: [] }, UI.opt || {}, o);
   const sc = FA.scen(cfg.scenario);
@@ -92,7 +93,7 @@ function doAction(a, t) {
   switch (a) {
     case 'ready': sendMove(v, { t: 'ready' }); break;
     case 'say': sendMove(v, { t: 'say', c: t.dataset.c }); break;
-    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); toast('Spend a token? Tap again.'); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
+    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
       UI.rrAsk = false; sendMove(v, { t: 'rr' }); break;
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;

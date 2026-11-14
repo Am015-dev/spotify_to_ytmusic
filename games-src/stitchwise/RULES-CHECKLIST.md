@@ -89,3 +89,13 @@ Where the rulebook is silent, the rule says INTERPRETATION. Patch/track tables a
 
 Not tested (cannot be proven here): that each of the 33 printed patch shapes/costs/times/incomes equals the printed set.
 Two entries are still marked UNCONFIRMED in `rules-notes.md` (the long cost-1 patch and the cost-2/time-2 patch).
+
+## Owner's rule list, end to end (W491, logic-test.js R66-R73)
+66. Ring + neutral token: only the 3 after it can be bought; the next offer starts after the bought patch.
+67. Pay buttons, move by time; the player furthest behind goes next, several turns in a row if still behind.
+68. Landing on the opponent's space puts you on top; you go next.
+69. Advance: to just past the opponent, 1 button per space.
+70. Passing a button mark pays income = button icons on your quilt.
+71. Leather: the first to pass places it at once; nothing else first; the second passer gets nothing.
+72. First full 7x7 square gets the 7-point tile, once.
+73. Rotations legal, inside 9x9, no overlap; the game ends when both reach the last space; score = buttons + bonus - 2 per empty.

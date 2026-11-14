@@ -214,9 +214,9 @@ html.ph #tags .tag .tgl{font-size:13px}
 /* menu test v2: 44px icon buttons get a slim painted frame so the icon sits inside it */
 html.sk.ph .gx-bar>.btn[data-gx],html.sk.ph .gx-bar>.btn[data-a="rules"],html.sk.ph .gx-gear{border-width:10px;border-image-width:10px;padding:0}
 /* text keeps 8px from the column the framed rows use */
-html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:8px;padding-right:8px}
+html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear{border-width:10px;border-image-width:10px;padding:0}
-html.sk .dlg h4{padding-left:8px;padding-right:8px}
+html.sk .dlg h4{padding-left:10px;padding-right:10px}
 html.sk.ph .btn.gx-gear:not(.sm):not(.ghost){border-width:10px;border-image-width:10px;padding:0}
 html.sk.ph .btn#phcam{border-width:10px;border-image-width:10px;padding:0}
 /* owner rule (8 Nov): no phone text under 14 px. Ship tags, the score strip, maneuver cards and the legend */
@@ -243,3 +243,8 @@ details.na-opts{margin:12px 0;border:1px solid rgba(255,200,107,.35);border-radi
 details.na-opts>summary{cursor:pointer;font:700 16px/1.3 "Exo 2",sans-serif;color:var(--gold,#ffc86b);padding:8px 0;min-height:28px}
 /* big screens: the ship info / card sheet is a side panel on the right, so the board and the action ring stay reachable */
 html.ph.ph-big #ppop,html.ph.ph-big #pc{left:auto;width:min(440px,36vw);border-left:2px solid var(--gold);border-radius:14px 0 0 0}
+/* board-first phones: asteroid and deployment spots are tapped on the mat itself */
+html.ph.bf .prompt .acts.grid{display:none}
+/* landscape with a card up: the card covers the dock, so the prompt under it (A1-E5 grid) is hidden, not left half off screen */
+html.ph.ph-l.ph-card .gx-dock-body{visibility:hidden}
+html.ph .pm-grid .mv .rk.om{top:auto;bottom:1px;right:1px;font-size:9px;background:#d92b2b;color:#fff;border-radius:4px;padding:0 3px;line-height:1.3;white-space:nowrap}

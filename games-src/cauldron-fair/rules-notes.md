@@ -183,7 +183,7 @@ effects match what I remember of the box).
 2. Rat tails beyond the picture (after space 27): assumed to continue after every even number.
 3. Rat stone: always moved the full distance (the rules say "can"). An optional "fewer" stepper exists before the
    first draw.
-4. A player must draw at least one chip before stopping.
+4. A player must draw at least one chip before stopping (confirmed 8 Nov: the rulebook puts the stop-or-draw choice after each placed chip).
 5. Left neighbour = the next seat clockwise (also used for "Spilled Brew").
 6. "Any 2-chip / any 4-chip / any 1-chip" fortune picks exclude white; only colours whose book is out are offered. Haggler's Hour only upgrades coloured chips; with none it gives a Mossback 1 (also at 2 or 3 players, where white 2s are in the supply).
 7. Twice Rolled: both die results count (the text only says "roll it twice").

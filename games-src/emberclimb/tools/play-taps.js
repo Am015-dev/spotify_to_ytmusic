@@ -4,7 +4,7 @@ const { chromium } = require('playwright'), path = require('path'), { serve, sle
 const MODE = process.argv[2] || 'both', SHOTS = path.join(__dirname, '..', 'shots');
 (async () => {
   const { srv, base } = await serve(); const br = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] }); let bad = 0;
-  const ctx = await br.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true }); const pg = await ctx.newPage(), errs = [];
+  const ctx = await br.newContext({ viewport: { width: +(process.env.VW || 390), height: +(process.env.VH || 763) }, hasTouch: true, isMobile: true }); const pg = await ctx.newPage(), errs = [];
   pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => { if (m.type() === 'error' && !/404/.test(m.text())) errs.push(m.text()); });
   const T = async s => { const r = await tap(pg, true, s); if (r) console.log('  skip-tap', r); return !r; };
   const byText = async (sel, re) => { for (const x of await pg.$$(sel)) { const t = (await x.innerText().catch(() => '')).trim(); if (re.test(t) && await x.isVisible()) return x; } return null; };
@@ -17,6 +17,7 @@ const MODE = process.argv[2] || 'both', SHOTS = path.join(__dirname, '..', 'shot
       if (stuck > 80) { await pg.screenshot({ path: path.join(SHOTS, 'stuck-' + label + '.png') }); console.log('FAIL', label, 'stuck at', key); return false; }
       if (s.mode !== 'title') sawGame = true;
       if (label === 'quick' && s.scr === 'over') { console.log('PASS quick reached result:', s.won ? 'won' : 'lost'); return true; }
+      { const gb = await pg.$('.ec-goal button'); if (gb && await gb.isVisible()) { await T(gb); continue; } }
       if (s.end) { const b = await pg.$('.gxt-end .gxt-b.pri'); if (b) { await T(b); continue; } }
       if (s.tut && !s.tut.free) {
         if (!s.tut.ready) continue;

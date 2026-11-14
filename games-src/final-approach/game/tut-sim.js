@@ -1,26 +1,14 @@
-// Tutorial dice check: node tut-sim.js -> plays the coached flight with the computer in both seats (= the coach's advice) and prints the outcome per script.
-const FA = require('./src/engine.js'); require('./src/ai.js');
-const SCRIPT = JSON.parse(process.argv[2] || 'null');
-const ALLOW = [['axis', 'engines', 'conc'], ['axis', 'engines', 'conc', 'radio', 'gear'], ['axis', 'engines', 'conc', 'radio', 'gear', 'flaps', 'brakes'], null];
-function advise(G, seat) {
-  let al = ALLOW[Math.min(G.round, 3)]; if (G.round === 0 && (!G.slots['ax' + seat] || !G.slots['en' + seat])) al = ['axis', 'engines']; const V = FA.stripView(G, seat); V.nolog = true; let best = null, bc = 1e9;
-  if (G.phase === 'place' && !G.pend) for (const m of FA.validMoves(V, seat)) { if (m.t !== 'place' || m.d === 'p' || (m.c || 0) !== 0) continue; if (al && !al.includes(FA.SLOT[m.to].grp)) continue;
-    const S = FA.cloneLite(V); FA.performMove(S, m, seat, true); const c = FA.AI.cost(S, seat) - (seat === 1 && G.round >= 2 && FA.SLOT[m.to].grp === 'flaps' && !G.pl.sw.fl[FA.SLOT[m.to].ix] ? 5 : 0); if (c < bc) { bc = c; best = m; } }
-  return best || FA.AI.move(G, seat, 'normal', { noMC: true });
+// Tutorial plan check: node tut-sim.js -> plays the guided first landing (tut-plan.js) through the engine, prints every move and the result (must be a landing).
+const FA = require('./src/engine.js'); const P = require('./tut-plan.js');
+const G = FA.newGame(P.setup); const idx = [0, 0]; let rrDone = false; const log = [];
+const go = (s, m) => { const r = FA.performMove(G, m, s); if (!r.ok) { console.log('REFUSED', s, JSON.stringify(m), r.error, 'round', G.round); process.exit(1); } };
+for (let n = 0; n < 200 && !G.result; n++) {
+  if (G.phase === 'brief') { for (const s of [0, 1]) if (!G.ready[s]) go(s, { t: 'ready' }); idx[0] = idx[1] = 0; continue; }
+  if (G.pend && G.pend.h === 'rr') { if (!G.pend.d.m[0]) go(0, { t: 'rrpick', m: [0, 1, 2, 3].map(i => i === P.rrDie) }); if (G.pend && !G.pend.d.m[1]) go(1, { t: 'rrpick', m: [false, false, false, false] }); continue; }
+  const s = G.turn;
+  if (s === 0 && G.round === P.rrAt[0] && idx[0] === P.rrAt[1] && !rrDone) { rrDone = true; go(0, { t: 'rr' }); continue; }
+  const q = s ? P.cop[G.round][idx[1]++] : P.pil[G.round][idx[0]++];
+  const before = G.pl.pos; go(s, { t: 'place', d: q[0], to: q[1], c: q[2] || 0 });
+  log.push('r' + (G.round + 1) + (s ? 'C' : 'P') + ':' + q[1] + ' pos' + before + '>' + G.pl.pos + ' ax' + G.pl.axis + ' cof' + G.coffee);
 }
-function play(script, rnd) {
-  const G = FA.newGame({ scenario: 'tt', seed: 23, row0: 3, pre: { script } });
-  let n = 0; const trail = [];
-  while (!G.result && n++ < 400) {
-    const pend = FA.pending(G); if (!pend.length) break; const s = pend[0];
-    let m = null;
-    if (G.phase === 'brief') m = { t: 'ready' };
-    else { const vm = FA.validMoves(G, s); m = (rnd && s === 0 && Math.random() < rnd) ? (vm.filter(x => x.t === 'place')[Math.floor(Math.random() * vm.filter(x => x.t === 'place').length)] || vm[0]) : advise(G, s); }
-    if (m.t === 'place') trail.push('r' + (G.round + 1) + ' ' + (s ? 'C' : 'P') + ':' + (m.d === 'p' ? 'p' : G.dice[s][m.d].v) + (m.c ? (m.c > 0 ? '+' : '') + m.c : '') + '>' + m.to);
-    const r = FA.performMove(G, m, s); if (!r.ok) { trail.push('REFUSED ' + JSON.stringify(m) + r.error); break; }
-  }
-  return { G, trail };
-}
-const r = play(SCRIPT);
-console.log(r.G.result ? (r.G.result.win ? 'WIN' : 'LOSE ' + JSON.stringify(r.G.result)) : 'NO RESULT'); console.log(r.trail.join('  '));
-let w = 0; for (let i = 0; i < 200; i++) if (play(SCRIPT, 0.25).G.result.win) w++; console.log('pilot 25% random moves: win ' + w + '/200');
+console.log(log.join('\n')); console.log(JSON.stringify(G.result));

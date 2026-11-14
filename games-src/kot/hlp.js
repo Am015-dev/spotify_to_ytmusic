@@ -47,7 +47,7 @@ const HLP_STEPS={
   roll:{target:()=>HLP_Q('#dice'),title:'Tap dice to keep',text:'Tap the dice you like. They turn yellow and stay. Then press Roll.',pic:()=>hlpFaces(['3'],'',[0])},
   reroll:{target:()=>HLP_Q('#pacts [data-act="reroll"]'),title:'Roll the rest',text:'Press Roll to throw the dice you did not keep.',pic:()=>hlpFaces(['2','C'],'')},
   done:{target:()=>HLP_Q('#pacts [data-act="resolve"]'),title:'Use your dice',text:'Tap SMASH! over the city to score them: stars, energy, hearts and claws.',pic:()=>hlpFaces(['E','C','H'],'')},
-  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Hold a card to read it, tap to buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
+  buy:{target:()=>HLP_Q('#pshop:not(:empty)')||HLP_Q('#buymini'),title:'Buy a power card',text:'Tap a card to read it, then tap Buy. Or tap End turn to save your ⚡.',pic:()=>hlpIcons([HLP_CARD],'',60)},
   watch:{target:()=>{const e=HLP_Q('#bline');return e&&e.getClientRects().length&&e.textContent?e:HLP_Q('#ptop')},title:'Others are playing',text:'Watch their dice. Tap the board to speed them up.',pic:()=>hlpIcons([HLP_CROWN],'',60)}};
 const HLP_RULES=[
   {title:'How a turn works',text:'1  Roll the dice, up to 3 times.\n2  Tap dice to keep them. Roll the rest.\n3  Tap SMASH! to use the dice.\n4  Buy a power card with ⚡, or skip.\n5  Tap End turn.',pic:()=>hlpFaces(['1','2','3','E','C','H'],'')},

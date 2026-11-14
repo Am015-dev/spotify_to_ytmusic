@@ -121,8 +121,8 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='star
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   const lvAll=o.lv[1]||'normal';
   const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
-  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>
-   <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>${NET.on?'':'<div class="acts"><button class="btn" data-a="tutorial">Learn to play</button></div>'}
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Take tiles, fill rows, score the most stars.</p>${NET.on?'':'<div class="acts"><button class="btn" style="min-height:48px" data-a="tutorial">New here? Learn to play</button></div>'}
+   <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>
    ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
    <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
    ${(()=>{const RO=sgRoster();if(!RO.length||NET.on)return '';const cur=o.rival||'tamsin';return `<div class="qrow sg-rvrow"><span>Rival</span><div class="sg-rivals" role="radiogroup" aria-label="Rival">${RO.map(r=>`<button class="sg-rv${r.id===cur?' on':''}" data-rival="${r.id}" role="radio" aria-checked="${r.id===cur}" aria-label="${esc(r.nm)}" title="${esc(r.nm)}"><img src="media/${r.pic}" alt="" loading="eager"></button>`).join('')}</div></div><div class="sg-rvname">${esc((RO.find(r=>r.id===cur)||RO[0]).nm)}</div>`})()}
@@ -223,7 +223,7 @@ function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.tut&&!UI.cg)||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.tut&&!UI.cg)||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?1.2:0.6;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.tut&&!UI.cg)||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
   try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}

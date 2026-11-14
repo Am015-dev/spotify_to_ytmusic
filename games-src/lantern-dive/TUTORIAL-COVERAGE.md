@@ -1,14 +1,18 @@
-# Lantern Dive: tutorial coverage (W409, 8 Nov 2026)
+# Lantern Dive: tutorial coverage (G4 fix, 8 Nov 2026)
 
-The tutorial is now a COACHED FIRST DIVE (`game/src/ui12.js`): ONE forced tap (take a job, spotlight from shell/gx-tutor.js), then the kit is stopped and
-the dive is a real free game on the stacked deal (data.js `tutorial`) against the normal computer divers. Brack (one bubble at a time, never blocks a tap,
-x dismisses, "Skip tutorial" always visible) explains each rule the first time it matters: jobs, flare, signals and reading a ping, lead/Captain, follow suit,
-void and trumps, who wins a trick, Last, and reacts when a job is done (good) or broken (poor). The end card walks the real result (jobs done/broken with
-the reason, tricks won) and lists "Things you'll meet later": every rule that did not come up in that dive plus the special dives (hand-over/vote, murky
-water, narcosis, clock, predictions, drone). A lost dive offers "Dive again" on the same deal.
-Proof: `game/playable-tutorial-end.js [sizes] [seed]` plays random legal moves by touch taps through the UI at 390x763 and 1440x860 to the end card and asserts
-<= 2 forced taps, one bubble at a time, every rule explained in play or listed on the end card: PASS (seeds 5, 7, 11, 21).
-(The chapters/steps list below is the OLD 21-step tutorial, kept for the rule wording.)
+The tutorial is a GUIDED FIRST DIVE (`game/src/ui12.js`): 20 steps on a fixed deal (data.js `tutorial`), each one sentence of 12 words or fewer.
+16 steps are done by touch: 6 real moves (take a job, skip the flare, signal Kelp 3, lead, follow, trump) and 10 "tap the spotlit thing" steps
+(the jobs, your job, Dag, your Lanterns, your spent token, Sumi's token, Dag's card twice, Dag's done job, the finished jobs). Only 4 are Next-only
+reading (lose, win1, void, trumpwin). The crewmates are scripted (`TUT_AI`).
+
+Step order (`TUT_RULES` in ui12.js): goal - take - mine - theirs - lose - flare - notrump (Lanterns can never be signalled) - ping (highest/lowest/only) -
+pingonce (one signal per dive, token spent) - readping - lead - follow1 - win1 - done1 - winlead - nowin - void - trump - trumpwin - won.
+
+Proof: `game/tutor-test.js 390x844,375x667` walks it by touch taps; every TUT_RULES step reached in order, wrong taps never advance.
+Not in the tutorial (special dives, each gets a one-time "New rule" step in play, RULE_STEPS in ui12.js): hand-over/vote/volunteer, murky water,
+deep narcosis, the clock, predictions, the drone.
+
+(Older notes below.)
 
 ## Rules checklist (step that teaches each: by doing = D, by seeing = S)
 - [x] The crew wins or loses together; every job done = dive won ................ goal (S), won (S)

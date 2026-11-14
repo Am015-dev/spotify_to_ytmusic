@@ -44,8 +44,8 @@ function refresh(){if(!G||!UI.started||UI.acting)return;kitSync();render()}
 // ---------- interrupt timer ----------
 function qTimerSync(){const q=G&&G.q;if(!q||q.kind!=='doom'||(UI.qTime<=0&&!NET.on)||UI.busy||!G.seats[q.who].human||(NET.on?isClient()&&q.who!==NET.mySeat:mustPass(q.who))){UI.qKey=null;return}
   const key=G.logN+':'+q.who;if(UI.qKey!==key){UI.qKey=key;UI.qT0=Date.now()}}
-setInterval(()=>{try{if(!G||!UI.qKey||UI.pause)return;const q=G.q;if(!q){UI.qKey=null;return}const QT=UI.qTime>0?UI.qTime:25;const el=(Date.now()-UI.qT0)/1000*(UI.tickRate||1),left=QT-el;const b=$('#qbar');if(b)b.style.width=Math.max(0,left/QT*100)+'%';const tx=$('#qtxt');if(tx)tx.textContent=Math.max(0,Math.ceil(left))+' s left to decide, then the computer\'s best advice is used.';
-  if(left<=0){if(isClient())return;UI.qKey=null;const who=q.who;let m=null;try{m=aiMove(who,'hard')}catch(e){}if(!m||m.a!=='q')m={a:'q',i:q.opts.length-1};say('Time is up: the computer chose for '+nm(who)+'.','bad');NET.autoDecl++;actAs(m,who)}}catch(e){console.error(e)}},200);
+setInterval(()=>{try{if(!G||!UI.qKey||UI.pause)return;const q=G.q;if(!q){UI.qKey=null;return}const QT=UI.qTime>0?UI.qTime:25;const el=(Date.now()-UI.qT0)/1000*(UI.tickRate||1),left=QT-el;const b=$('#qbar');if(b)b.style.width=Math.max(0,left/QT*100)+'%';const tx=$('#qtxt');if(tx)tx.textContent=Math.max(0,Math.ceil(left))+(tx.dataset.short?' s left, then the ★ is used.':' s left to decide, then the computer\'s best advice is used.');
+  if(left<=0){if(isClient())return;UI.qKey=null;const who=q.who;let m=null;try{m=q.kind==='doom'&&UI.rl&&UI.rl[0]&&q.opts[UI.rl[0].i]&&q.opts[UI.rl[0].i].h==='dReloc'&&!q.opts.some(o=>o.h==='dCannon'||o.h==='dGate')?{a:'q',i:UI.rl[0].i}:aiMove(who,'hard')}catch(e){}if(!m||m.a!=='q')m={a:'q',i:q.opts.length-1};say('Time is up: the computer chose for '+nm(who)+'.','bad');NET.autoDecl++;actAs(m,who)}}catch(e){console.error(e)}},200);
 // ---------- acting ----------
 function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;if(G.seats[seat]&&G.seats[seat].human)UI.rivLines=[];
   if(!NET.on&&G.seats[seat]&&G.seats[seat].human&&humans().length===1&&m.a!=='q'){try{UI.snap={json:JSON.stringify(G)}}catch(e){}}
@@ -62,7 +62,7 @@ function afterMove(evs){saveAll();UI.stepNow=0;
   if(ANIM&&evs.some(e=>e.t!=='log')&&UI.started){const gen=UI.gen;UI.busy=true;render();playEvents(evs,gen).then(()=>{if(UI.gen!==gen)return;finish()})}
   else finish()}
 function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');UI.trig.end=1;if(!UI.tut)clearSave();if(campOn()){const gg=G;setTimeout(()=>{if(G===gg)campFinish()},1400)}}}
-function schedule(){clearTimeout(UI.tm);if(isClient()||!G||!UI.started||G.over||UI.busy||UI.pause)return;const d=sideToAct();if(d<0||G.seats[d].human)return;UI.tm=setTimeout(aiAct,Math.max(0,(AIDELAY||0)/(UI.speed||1)))}
+function schedule(){clearTimeout(UI.tm);if(isClient()||!G||!UI.started||G.over||UI.busy||UI.pause)return;const d=sideToAct();if(d<0||G.seats[d].human)return;UI.tm=setTimeout(aiAct,rivFast()?(rivOver()?0:Math.min(AIDELAY||0,200)):Math.max(0,(AIDELAY||0)/(UI.speed||1)))}
 function aiAct(){if(isClient()||!G||!UI.started||UI.busy||UI.pause||G.over)return;const d=sideToAct();if(d<0||G.seats[d].human)return;const st=aiStep();if(!st)return;act(st.m,st.seat)}
 function doPlace(){const d=sideToAct();const s=UI.sel;if(!s)return;const m={a:'place',t:s.t,r:s.r,s:s.s};act(m,d)&&sfx('confirm')}
 function pickSquare(c,r){const d=sideToAct();if(d<0||!G.seats[d].human||UI.busy||mustPass(d))return;
@@ -76,8 +76,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   if(netClick(a,t))return;
   if(['card','rot','sugg','place','startmark'].indexOf(a)<0)sfx('click');
   switch(a){
-  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');render();break}
-  case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');render();break}
+  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');try{if(typeof phCardNote==='function')phCardNote()}catch(e){}render();break}
+  case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');try{if(typeof phCardNote==='function')phCardNote()}catch(e){}render();break}
   case 'place':doPlace();break;
   case 'target':if(UI.sel){UI.sel.s=+D.s;render()}break;
   case 'startmark':{const m={a:'start',x:+D.x,y:+D.y,e:+D.e};const er=G&&!G.over?(UI.busy?'the sea is still moving.':legal(m,d<0?0:d)):null;if(er&&!NET.on){say(d>=0&&G.seats[d]&&!G.seats[d].human?'Wait: '+nm(d)+' is choosing a start.':'That mark is not free now: '+er,'bad');sfx('error');break}act(m,d);break}
@@ -143,8 +143,13 @@ function piecesHTML(){const cnt=t=>1+(EXTRA_TYPES.indexOf(t)>=0?1:0);
   <h3>Other things on the board</h3><ul><li><b>Gold marks</b> on the edge: where junks start (two per number).</li><li><b>Gold line</b> on a tile preview: the exact path your junk will sail.</li><li><b>Teal frames</b>: squares you may choose.</li><li><b>Blue strip</b>: the Rogue Wave's row or column.</li></ul>`}
 // ---------- start screen ----------
 function teamN(s){const n=s.np;if(s.variant!=='teams')return n;return [4,6,8].includes(n)?n:n<4?4:n%2?n-1:n}
-function defaultSetup(){const s=lsGet('tw_setup',null);const seats=[];for(let i=0;i<8;i++)seats.push({h:i===0,lv:'normal',col:[0,3,2,1,4,5,6,7][i]});
-  return Object.assign({mode:'me',np:3,seats,exp:{rift:0,wave:0,maelstrom:0,cannon:0},variant:null,noMon:false},s&&s.seats&&s.seats.length===8?s:{})}
+// the short add-on lesson, shown in Setup under each add-on once it is ticked (the base tutorial teaches the base game only)
+const ADDON_LESSON={rift:'Hold it, and play it instead of a tile or when you are about to sink, even on a rival\'s turn. Dice pick the square your junk jumps to.',
+  wave:'Rises like a leviathan. Each round it moves one square. A junk in its row rolls one die: equal or beat its strength (2, then 3, then 4) or capsize.',
+  maelstrom:'Rises like a leviathan. On calm rolls it moves (5 or 6: it stays) and destroys any tile, junk or leviathan in the square it enters.',
+  cannon:'Keep it or discard it when drawn. Fire it when a leviathan would sink you, even on a rival\'s turn, or instead of a tile at a leviathan next to your line.'};
+function defaultSetup(){const s=lsGet('tw_setup',null);const seats=[];for(let i=0;i<8;i++)seats.push({h:i===0,lv:i===0?'normal':'easy',col:[0,3,2,1,4,5,6,7][i]});
+  return Object.assign({mode:'me',np:3,seats,exp:{rift:0,wave:0,maelstrom:0,cannon:0},variant:null,noMon:false,calmV:false},s&&s.seats&&s.seats.length===8?s:{})}
 function applyMode(s,mode){s.mode=mode;s.seats.forEach((x,i)=>{x.h=mode==='hot'?true:mode==='me'?i===0:false})}
 function modeOf(s){const n=s.variant==='solo'||s.variant==='easysolo'?1:s.np;const h=s.seats.slice(0,n).filter(x=>x.h).length;return h===0?'watch':h===1?'me':'hot'}
 function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSetup();const solo=s.variant==='solo'||s.variant==='easysolo';const n=solo?1:teamN(s);const mode=modeOf(s);const onl=isHost(),nOnl=onl?Math.min(8,NET.peers.length||1):0,onPlan=onl?netPlan(s):null;
@@ -161,8 +166,9 @@ function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSe
   <div class="stmore"><button type="button" class="stmore-t" data-more aria-expanded="${UI.moreOpen?'true':'false'}">${UI.moreOpen?'&#9662;':'&#9656;'} Custom game: players, variants, extras</button>${UI.moreOpen?'':'</div>'}${UI.moreOpen?`
   <div class="stcols"><div class="stcard"><h2>How to play</h2><div class="row">${onl?'<span class="tiny">Online game: captains take seats in join order.</span>':seg('mode',mode,[['me','Me vs computers'],['hot','Hot-seat'],['watch','Watch']])}</div><p class="tiny">${onl?'Seats without an online captain are computers.':mode==='me'?'You are the first captain; the others are computers.':mode==='hot'?'Everyone shares this screen. Hands are hidden between players behind a pass screen.':'The computers play each other. Sit back.'}</p>
    <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams, every other seat. You may lay for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
-   <label class="opt"><input type="checkbox" data-a="nomon" ${s.noMon?'checked':''}><span>No leviathans (calm seas)<small>The official "no monsters" option.</small></span></label></div>
-  <div class="stcard"><h2>Expansions: Deepwater Perils</h2><p class="tiny">Four optional extra pieces that make the sea nastier. <b>Recommended for a first game: none.</b> Add them one at a time later.</p>${ex.map(([k,l,d])=>`<label class="opt"><input type="checkbox" data-a="exp" data-k="${k}" ${s.exp[k]?'checked':''}><span><b>${l}</b><small>${d}</small></span></label>`).join('')}</div></div>
+   <label class="opt"><input type="checkbox" data-a="nomon" ${s.noMon?'checked':''}><span>No leviathans (calm seas)<small>The official "no monsters" option.</small></span></label>
+   <label class="opt"><input type="checkbox" data-a="calm" ${s.calmV?'checked':''}><span>Variant: Calm sea start (off by default)<small>Not the rulebook start: begin with 3 leviathans instead of 6. Every other rule is the same.</small></span></label></div>
+  <div class="stcard"><h2>Expansions: Deepwater Perils</h2><p class="tiny">Four optional extra pieces that make the sea nastier. <b>Recommended for a first game: none.</b> Add them one at a time later.</p>${ex.map(([k,l,d])=>`<label class="opt"><input type="checkbox" data-a="exp" data-k="${k}" ${s.exp[k]?'checked':''}><span><b>${l}</b><small>${d}</small>${s.exp[k]&&ADDON_LESSON[k]?`<small class="addon-lesson" data-lesson="${k}"><b>How it works:</b> ${ADDON_LESSON[k]}</small>`:''}</span></label>`).join('')}</div></div>
   <div class="stcard"><h2>Captains ${solo?'(solo: one junk)':''}</h2>${solo?'':`<div class="row" style="margin-bottom:6px"><span>Players:</span>${seg('np',n,(s.variant==='teams'?[4,6,8]:[2,3,4,5,6,7,8]).map(k=>[k,k]))}</div>`}${Array.from({length:Math.max(n,nOnl)},(_,i)=>sv(i)).join('')}</div>
   <div class="row"><button class="btn pri" data-a="start" id="startbtn">Set sail</button><button class="btn" data-gx="rulesd">Rules</button><button class="btn" data-gx="piecesd">Pieces</button><button class="btn" data-gx="credd">Credits</button></div></div>`:''}</div>`}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-more]');if(b){e.stopPropagation();UI.moreOpen=!UI.moreOpen;renderStart()}},true);
@@ -184,13 +190,14 @@ document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.datase
   if(t.dataset.a==='col'){const i=+t.dataset.i,v=+t.value;const j=s.seats.findIndex((x,k)=>k!==i&&x.col===v);if(j>=0)s.seats[j].col=s.seats[i].col;s.seats[i].col=v;renderStart()}
   else if(t.dataset.a==='lv'){s.seats[+t.dataset.i].lv=t.value}
   else if(t.dataset.a==='exp'){s.exp[t.dataset.k]=t.checked?1:0}
-  else if(t.dataset.a==='nomon'){s.noMon=t.checked}});
+  else if(t.dataset.a==='nomon'){s.noMon=t.checked}
+  else if(t.dataset.a==='calm'){s.calmV=t.checked}});
 function startGuided(){try{hlpInit();GXH.reset();GXH.setEnabled(true)}catch(e){}const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};UI.setup=s;startGame(JSON.parse(JSON.stringify(s)),{guided:true})}
 function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats.forEach((x,i)=>{x.h=i<plan.hum.length});o.guided=false}
   UI.gen++;clearTimeout(UI.tm);kitReset();
   const solo=s.variant==='solo'||s.variant==='easysolo';let np=solo?1:teamN(s);const seats=s.seats.slice(0,np);
-  seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name});UI.cols=seats.map(x=>x.col);
-  newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon,first:o.first,goalTurns:o.goalTurns,names:o.names,bossCannon:o.bossCannon,bossSeat:o.bossSeat,seed:o.seed});if(plan)netBound(plan);
+  const _1h=!plan&&seats.filter(x=>x.h).length===1&&!o.tutorial;seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name+(_1h&&x.h?' (you)':'')});UI.cols=seats.map(x=>x.col);
+  newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon,startLev:(s.calmV&&!o.tutorial&&!s.noMon&&!(s.variant==='solo'||s.variant==='easysolo'))?3:undefined,first:o.first,goalTurns:o.goalTurns,names:o.names,bossCannon:o.bossCannon,bossSeat:o.bossSeat,seed:o.seed});if(plan)netBound(plan);
   if(o.tutorial&&typeof tutRig==='function')tutRig();else if(!UI.tut){try{localStorage.setItem('tw_played','1')}catch(e){}}
   UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
   UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.myLogI=null;UI.curTurnN=null;UI.mphNext=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;

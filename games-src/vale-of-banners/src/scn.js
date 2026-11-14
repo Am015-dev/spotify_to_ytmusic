@@ -3,7 +3,7 @@
   if (!window.GXS) return;
   var booted = function () { return typeof G !== 'undefined' && typeof startGame === 'function' && typeof UI !== 'undefined'; };
   function begin(o, tab) { UI.fast = true; startGame(Object.assign({ n: 2, ai: 'normal' }, o)); UI.tab = tab || 'estate'; UI.pinTab = UI.tab; render(); }   /* phone portrait: one view at a time; each scenario opens the view it tests */
-  GXS.boardOpen = function () { if (!booted()) return; UI.fast = false; startGame({ n: 2, ai: 'normal', seed: 4 }); };
+  GXS.boardOpen = function () { if (!booted()) return; UI.fast = false; startGame({ n: 2, ai: 'normal', seed: 4 }); var gb = document.getElementById('goalB'); if (gb) gb.click(); };   /* the play screen, not the goal card lying over the score bar */
   GXS.add({
     id: 'vb-board', name: 'Turn: take a tile', ask: 'Tap a glowing stall tile, then Take', seed: 5, when: booted,
     setup: function () { begin({ seed: 5 }, 'market'); return new Promise(function (r) { setTimeout(r, 400); }); },

@@ -1,7 +1,7 @@
 // ---------- computer players ----------
 // easy: random legal placement with a bias toward points; normal: greedy value of placement + follower incl. completion odds;
 // hard: adds field/majority weighting and a one-ply look at the tiles still in the bag (can each open side still be filled?).
-let AIPLAN=null;var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
+let AIPLAN=null;var EASYK={good:25,drop:50,claim:30,keep:2};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
 const LVL={easy:{opp:.3,slots:false},normal:{opp:.8,slots:false},hard:{opp:.9,slots:true}};
 function lvOf(s){return LVL[P(s).lv]?P(s).lv:'normal'}
 // ---- what is still in the bag (public: anyone can count the tiles) ----
@@ -69,8 +69,11 @@ function aiPlan(s,lvIn){const lv=lvIn||lvOf(s),t=G.cur.t,places=legalPlacements(
     const tot=pv.v+bonus+bfv;const c={q,v:tot,pv,bf,bfv,bonus,pr};all.push(c);if(!best||tot>best.v)best=c}
   if(lv==='hard'&&all.length>1&&tilesLeft()>1)best=lookAhead(s,all)||best;
   if(lv==='easy'&&all.length){// mostly random, nudged toward points
-    const r=rnd(100);if(r<45){all.sort((a,b)=>b.pv.dl[s]-a.pv.dl[s]);best=all[rnd(Math.min(3,all.length))]}else best=all[rnd(all.length)];
-    if(best.bf&&rnd(100)<40)best.bf=null;if(!best.bf&&rnd(100)<35){const ops=figOptionsFromProbe(best.pr,s).filter(o=>o.k==='f');if(ops.length)best.bf=ops[rnd(ops.length)]}}
+    // a beatable first rival: mostly a random spot, one claim now and then, never a farmer
+    const r=rnd(100);if(r<EASYK.good){all.sort((a,b)=>b.pv.dl[s]-a.pv.dl[s]);best=all[rnd(Math.min(4,all.length))]}else best=all[rnd(all.length)];
+    if(best.bf&&(best.bf.g.ty==='F'||rnd(100)<EASYK.drop))best.bf=null;
+    if(!best.bf&&rnd(100)<EASYK.claim){const ops=figOptionsFromProbe(best.pr,s).filter(o=>o.k==='f'&&o.g.ty!=='F');if(ops.length)best.bf=ops[rnd(ops.length)]}
+    if(best.bf&&P(s).sup.f<=EASYK.keep)best.bf=null}
   const place={act:'place',x:best.q.x,y:best.q.y,r:best.q.r};const fig=best.bf?{act:'fig',k:best.bf.k,l:best.bf.l}:{act:'skip'};
   return {place,fig,why:best.pv.why,bonus:best.bonus,figOpt:best.bf,v:best.v,pr:best.pr}}
 // hard: one ply ahead. For the best few plans, play them on a copy of the state and ask what the next rival could

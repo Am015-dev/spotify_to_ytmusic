@@ -8,7 +8,7 @@ var BF={on:false,sel:null,sub:null,wave:null,flyUntil:0,key:'',fkey:'',items:[],
 const R=document.documentElement;
 const v3=()=>typeof V3!=='undefined'&&V3.on&&!!V3.camera;
 const net=()=>typeof NET!=='undefined'&&NET.on;
-const ARROW={T:['↰','↱'],B:['↖','↗'],S:['↑','↑'],K:['⤺','⤺']};
+const ARROW={T:['↰','↱'],B:['↖','↗'],S:['↑','↑'],K:[KICO,KICO]};
 const ACT_ICO={F:'◉',E:'✦',TL:'⌖',BR:'⇆',BO:'⇑',EH:'⇆',DD:'⤺',JK:'✦',MK:'◉',SL:'⌖',SB:'⚡',skip:'✕'};
 const ACT_W={F:'Focus',E:'Evade',TL:'Lock',BR:'Roll',BO:'Boost',EH:'Roll',skip:'Skip'};
 const off=/[?&]bf=0/.test(location.search||'');// ?bf=0: the older dock interface
@@ -21,7 +21,7 @@ let ov,svg,lay,bar,hint,btns,dice,top,ban,fing;
 function build(){if(ov)return;const st=$('stage');if(!st)return;ov=document.createElement('div');ov.id='bf';
   ov.innerHTML='<svg id="bfsvg" aria-hidden="true"></svg><div id="bfl"></div><div id="bftop" aria-live="polite"></div><div id="bfdice" hidden></div><div id="bfban" hidden></div><div id="bffing" hidden aria-hidden="true">👆</div><div id="bfbar"><p id="bfhint" aria-live="polite"></p><div id="bfbtns"></div></div>';
   st.appendChild(ov);svg=$('bfsvg');lay=$('bfl');bar=$('bfbar');hint=$('bfhint');btns=$('bfbtns');dice=$('bfdice');top=$('bftop');ban=$('bfban');fing=$('bffing');
-  ov.addEventListener('click',onClick);requestAnimationFrame(loop)}
+  ov.addEventListener('click',onClick);ov.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');BF.pd=t?{t,x:e.clientX,y:e.clientY,at:performance.now()}:null},true);ov.addEventListener('pointerup',e=>{const d=BF.pd;BF.pd=null;if(d&&!document.body.contains(d.t)&&d.t.dataset&&d.t.dataset.bfq!=null&&performance.now()-d.at<=700){const n=ov.querySelector('[data-bfq="'+d.t.dataset.bfq+'"]');if(n&&n.classList.contains('pick')){e.preventDefault();n.click()}return}if(!d||!document.body.contains(d.t)||performance.now()-d.at>700||Math.hypot(e.clientX-d.x,e.clientY-d.y)>14)return;const u=document.elementFromPoint(e.clientX,e.clientY);if(u&&d.t.contains(u))return;BF.pdHit=d.t;BF.pdSup=performance.now();setTimeout(()=>{if(BF.pdHit===d.t){BF.pdHit=null;d.t.click()}},0)},true);requestAnimationFrame(loop)}
 // ---- projection ----
 function px(x,y,h){const v=W(x,y,h||0).project(V3.camera);const c=V3.r.domElement;return [(v.x+1)/2*c.clientWidth,(1-v.y)/2*c.clientHeight,v.z]}
 function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b=px(s.x+f.x*B(s)/2,s.y+f.y*B(s)/2);return Math.max(14,Math.hypot(a[0]-b[0],a[1]-b[1]))}
@@ -29,8 +29,8 @@ function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b
 function shownXY(s){const m=V3.ships[s.id];if(!m)return {x:s.x,y:s.y};return {x:m.position.x*10,y:MAT-m.position.z*10}}
 // ---- camera: frame the points that matter, inside the part of the board that is not under the bars ----
 function rayGround(sx,sy){const c=V3.r.domElement;const v=new THREE.Vector2(sx/c.clientWidth*2-1,-(sy/c.clientHeight)*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.camera);const p=new THREE.Vector3();return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),p)?p:null}
-function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10,sd=side||12;minW=minW||230;
+function fit(pts,minW,side,topPad,botPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10+(botPad||0),sd=side||12;minW=minW||230;
   let a=1e9,b=-1e9,d=1e9,e=-1e9;for(const p of pts){a=Math.min(a,p.x);b=Math.max(b,p.x);d=Math.min(d,p.y);e=Math.max(e,p.y)}
   if(b-a<minW){const m=(a+b)/2;a=m-minW/2;b=m+minW/2}if(e-d<minW){const m=(d+e)/2;d=m-minW/2;e=m+minW/2}
   const box=[{x:a,y:d},{x:b,y:d},{x:a,y:e},{x:b,y:e}];C.tx=S3((a+b)/2);C.tz=S3(MAT-(d+e)/2);
@@ -42,10 +42,10 @@ function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,c
 const XY=s=>({x:s.x,y:s.y});
 function around(s,r){r=r||B(s)*1.2;return [{x:s.x-r,y:s.y-r},{x:s.x+r,y:s.y+r}]}
 function framePts(k){const all=alive();const pts=[];const add=a=>{for(const p of a)pts.push(p)};
-  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return {pts,min:200,sd:30,tp:104}}
+  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return dialOn()?{pts,min:200,sd:20,tp:60,bp:270}:{pts,min:200,sd:30,tp:104}}
   if(k==='action'||k==='sub'){const s=ship(G.cur);add(around(s,B(s)*1.6));if(k==='sub'&&BF.sub){if(BF.sub.opts)BF.sub.opts.forEach(o=>o.p&&add(around(o.p,B(s)*.8)));if(BF.sub.targets)BF.sub.targets.forEach(id=>add(around(ship(id))))}return {pts,min:400}}
   if(k==='target'){const s=ship(G.cur);add(around(s));for(const w of weaponsFor(s))for(const t of w.targets)add(around(ship(t.id)));return {pts,min:380}}
-  if(k==='dice'&&G.atk){add(around(ship(G.atk.a)));add(around(ship(G.atk.d)));all.forEach(s=>add(around(s)));return {pts,min:380}}
+  if(k==='dice'&&G.atk){add(around(ship(G.atk.a),B(ship(G.atk.a))*1.3));add(around(ship(G.atk.d),B(ship(G.atk.d))*1.3));return {pts,min:240,tp:60,bp:Math.min(300,Math.round(innerHeight*.34))}}
   if(k==='setup'&&G.q){G.q.opts.forEach(o=>o.p&&pts.push(XY(o.p)));all.forEach(s=>add(around(s)));return {pts,min:300}}
   all.forEach(s=>add(around(s)));return {pts,min:300}}
 // ---- what is going on ----
@@ -72,37 +72,75 @@ function capture(){if(!UI.fx.length)return;const keep=[];for(const f of UI.fx){
 function speedUp(){if(BF.aid==null){BF.aid=AIDELAY;AIDELAY=Math.min(AIDELAY,90)}}
 function slowDown(){if(BF.aid!=null){AIDELAY=BF.aid;BF.aid=null}}
 function release(){const w=BF.wave;BF.wave=null;slowDown();if(!w)return;const ids=w.order.filter(id=>V3.ships[id]);
-  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(900,Math.min(1500,w.dur||1000)):0;BF.flyUntil=performance.now()+reveal+D+150;
-  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+D);
+  // ships fly ONE AT A TIME in activation order (lowest pilot skill first), like revealing dials around the table
+  const reveal=ANIM&&!reduceMotion()?520:0,D=ANIM?Math.max(800,Math.min(1300,w.dur||1000)):0,step=ids.length>1?Math.round(D*.8):0,tot=D+step*Math.max(0,ids.length-1);BF.flyUntil=performance.now()+reveal+tot+150;BF.flyOrder=ids.slice();
+  chips(ids.map(id=>({id,m:w.moves[id].m,roll:w.moves[id].roll})),reveal+tot);
   if(ids.length)sfx('lock');
-  const go=()=>{const now=performance.now();for(const id of ids){const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:now,dur:Math.max(1,D)}}if(ids.length)sfx('engine');
-    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;render()};if(D)setTimeout(land,D+60);else land()};
+  const fly=(id,k)=>{const p=w.moves[id].path;V3.anim[id]={path:p.length<2?[p[0],p[0]]:p,t0:performance.now(),dur:Math.max(1,D)};if(k===0||ANIM)sfx('engine')};
+  const go=()=>{ids.forEach((id,k)=>{if(step)setTimeout(()=>fly(id,k),k*step);else fly(id,k)});
+    const land=()=>{for(const f of w.fx)UI.fx.push(f);try{drainFx()}catch(e){}BF.flyUntil=0;if(ban&&!ban.hidden&&/Ships move/.test(ban.innerHTML)){clearTimeout(BF.banT);ban.hidden=true;BF.banUntil=0}render()};if(tot)setTimeout(land,tot+60);else land()};
   if(reveal)setTimeout(go,reveal);else go();
-  if(ids.length>1)banner('<b>Ships move!</b>',reveal+D*.6)}
+  if(ids.length>1)banner('<b>Ships move</b><span>Lowest skill first</span>',reveal+tot*.6)}
 function maybeRelease(){if(!BF.wave)return;if(!stepTwo()||humanTurn()||performance.now()-BF.wave.t0>7000)release()}
 // ---- one-line text, banners, pops ----
 function setHint(t){if(hint&&hint.innerHTML!==t)hint.innerHTML=t}
 // owner rule (8 Nov): a message stays at least 4 s plus 1 s per 10 words; one at a time; a newer one waits its turn (latest 2 kept)
 function readMs(h){const w=String(h).replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(Boolean).length;return 4000+w*100}
 function banner(h,ms){if(!ban)return;const now=performance.now();if(!ban.hidden&&BF.banUntil&&now<BF.banUntil&&ms<1e9&&BF.banMs<1e9){BF.banQ=(BF.banQ||[]).concat([[h,ms]]).slice(-2);return}
-  ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
-  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms)}
-function mvLabel(m){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return (m.d>0?a[1]:a[0])+'<b>'+m.s+'</b>'}
-function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?'⇆':mvLabel(c.m);lay.appendChild(el);
+  ms=ms>=1e9?ms:Math.max(ms||0,readMs(h));BF.banMs=ms;BF.banUntil=now+Math.min(ms,readMs(h));ban.innerHTML=h;ban.hidden=false;ban.classList.remove('top');ban.classList.remove('go');void ban.offsetWidth;ban.classList.add('go');clearTimeout(BF.banT);
+  BF.banT=setTimeout(()=>{ban.hidden=true;BF.banUntil=0;const n=(BF.banQ||[]).shift();if(n)setTimeout(()=>banner(n[0],n[1]),250)},ms);ban.dataset.py='';placeBan()}
+// keep the timed banner off the ships and fully on screen: it sits low (above the bottom bar) when it can, else the first free height; it only moves when it would cover a ship
+function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ban){ban.style.left=ban.style.top=ban.style.transform=ban.style.transition=ban.style.maxWidth=''}return}
+  if(!(typeof v3==='function'&&v3()&&G))return;const o=ov.getBoundingClientRect(),c=V3.r.domElement.getBoundingClientRect(),dx=c.left-o.left,dy=c.top-o.top,Wd=o.width,Ht=o.height;if(!(Wd>0))return;
+  const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
+  const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
+  const tg=[];document.querySelectorAll('#tags .tag').forEach(t=>{if(t.hidden||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)tg.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
+  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
+  const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
+  const ys=[yB];for(let y=yB-24;y>=60;y-=24)ys.push(y);ys.push(Math.max(m,Math.min(yB,74)));
+  const cur=parseFloat(ban.dataset.py);if(cur>=0&&ban.dataset.pw==String(w)+'x'+h&&hit(left,cur)===0)ys.unshift(cur);
+  for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
+  ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
+  clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
+// the lesson bubble: same rule as the banner. Never over a ship or its name plate, always inside the stage (viewport coords, it is position:fixed)
+BF.placeCoach=function(e){if(!e||e.hidden||!ov||!(typeof v3==='function'&&v3()&&G))return;
+  const o=ov.getBoundingClientRect(),m=8,W=innerWidth;e.style.transition='none';e.style.top='0px';const h=e.offsetHeight;
+  const bt=bar&&!bar.hidden?bar.getBoundingClientRect().top:o.bottom,lo=Math.max(o.top+m,8),hi=Math.max(lo,bt-h-6),hi2=Math.max(hi,o.bottom-h-m);
+  const rr=[];try{for(const c of BF.circ()){const R=c[2]*1.15+6;rr.push([c[0]-R,c[1]-R,c[0]+R,c[1]+R])}}catch(x){}
+  document.querySelectorAll('#tags .tag').forEach(t=>{if(getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)rr.push([q.left-4,q.top-4,q.right+4,q.bottom+4])});
+  document.querySelectorAll('.bfact,.bftgt,.bfm,[data-bf],#bffing').forEach(t=>{if(t.closest('#na-coach')||t.closest('[hidden]'))return;const q=t.getBoundingClientRect();if(q.width>4&&q.height>4&&q.width<o.width*.9)rr.push([q.left-2,q.top-2,q.right+2,q.bottom+2,.01])});
+  const l=e.getBoundingClientRect(),x0=l.left,x1=l.right;
+  const area=y=>{let a=0;for(const q of rr){const ox=Math.min(x1,q[2])-Math.max(x0,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=ox*oy*(q[4]||1)}return a};
+  const ys=[];for(let y=Math.min(Math.max(50,lo),hi);y<=hi;y+=8)ys.push(y);for(let y=Math.min(Math.max(50,lo),hi)-8;y>=lo;y-=8)ys.push(y);for(let y=hi+8;y<=hi2;y+=8)ys.push(y);
+  let best=null;for(const y of ys){const a=area(y);if(best==null||a<best[0]){best=[a,y];if(!a)break}}
+  e.style.top=(best?best[1]:50).toFixed(0)+'px';clearTimeout(BF.coachT);BF.coachT=setTimeout(()=>BF.placeCoach(e),100)};
+BF.circ=()=>{const c=V3.r.domElement.getBoundingClientRect();return alive().map(s=>{const p=XY(s),q=px(p.x,p.y,1);return[q[0]+c.left,q[1]+c.top,shipR(s)]})};
+function mvLabel(m,s,deg){if(!m)return '';if(m.s===0)return '■';const a=ARROW[m.t]||['↑','↑'];return rotIco(m.d>0?a[1]:a[0],s,deg)+'<b>'+m.s+'</b>'}
+function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;const col=c.m?(exColor(s,c.m).c):'w';const el=document.createElement('div');el.className='bfchip '+col+' s'+s.side;el.innerHTML=c.roll&&!c.m?rotIco('⇆',s):mvLabel(c.m,s);lay.appendChild(el);
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
 // ---- render: rebuild the overlay when the situation changes ----
 function legend(h){const el=document.createElement('div');el.className='bfleg';el.innerHTML=h;ov.appendChild(el);BF.leg=el}
-function clear(){if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
+function clear(){if(BF.dial&&!(G&&G.phase==='plan'&&BF.sel))BF.dial.hidden=true;if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
 function setBtns(h){if(btns&&btns._h!==h){btns._h=h;btns.innerHTML=h}}
 function item(html,cls,o){const el=document.createElement(o&&o.tag||'button');if(el.tagName==='BUTTON')el.type='button';el.className=cls;el.innerHTML=html;for(const k in (o&&o.data)||{})el.dataset[k]=o.data[k];if(o&&o.label)el.setAttribute('aria-label',o.label);el.style.visibility='hidden';lay.appendChild(el);const it=Object.assign({el},o||{});BF.items.push(it);return it}
 function pathW(pts,cls,h){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('class',cls);svg.appendChild(p);BF.paths.push({el:p,pts,h:h||.4});return p}
+// ghost of the ship where a maneuver ends: the base outline plus a nose wedge that shows the FINAL facing (a K-turn's nose points back)
+function ghostW(s,m,cls,solid){const b=B(s),p=finalPose(s,b,m),c=corners(p,b),f=fwd(p.h),l=leftOf(p.h),F=add(p,mul(f,b/2));if(solid)(BF.g3w=BF.g3w||[]).push({id:s.id,p});
+  pathW(c.concat([c[0]]),'bfp ghost '+(cls||''));pathW([add(F,mul(l,b*.32)),add(F,mul(f,b*.42)),sub(F,mul(l,b*.32)),add(F,mul(l,b*.32))],'bfnose '+(cls||''));return p}
+// a see-through copy of the real ship model standing where the move ends, turned to its final facing
+let GHM=null;
+function ghost3D(){const want=BF.g3w||[];BF.g3w=[];const key=want.map(g=>g.id+':'+g.p.x.toFixed(1)+','+g.p.y.toFixed(1)+','+g.p.h.toFixed(2)).join('|');if(BF.g3k===key)return;BF.g3k=key;
+  for(const o of (BF.g3||[]))if(o.parent)o.parent.remove(o);BF.g3=[];if(!v3()||typeof W!=='function')return;
+  if(!GHM)GHM=new THREE.MeshBasicMaterial({color:0xaee9ff,transparent:true,opacity:.38,depthWrite:false});
+  for(const g of want){const src=V3.ships[g.id];if(!src||!src.parent||!src.userData.mdl)continue;const mdl=src.userData.mdl,c=new THREE.Group(),mc=mdl.clone(true);mc.position.copy(mdl.position);mc.rotation.copy(mdl.rotation);mc.scale.copy(mdl.scale);c.add(mc);c.traverse(o=>{if(o.isMesh){o.material=GHM;o.castShadow=false;o.receiveShadow=false}else if(o.isSprite||o.isPoints||o.isLight)o.visible=false});
+    c.position.copy(W(g.p.x,g.p.y));c.rotation.y=g.p.h;c.userData.bfGhost=1;src.parent.add(c);BF.g3.push(c)}}
 function sideCol(s){return s.side===me()?'mine':'foe'}
 function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('bf',on);if(!on){R.classList.remove('bf-play','bf-sheet');if(ov)ov.hidden=true;if(BF.wave)release()}requestAnimationFrame(()=>{try{resize3D()}catch(e){}BF.key='';BF.fkey='';if(BF.on)bfRender()})}
   if(!on)return;build();if(!ov)return;ov.hidden=false;if(G&&G.winner){if(BF.overG!==G){BF.overG=G;BF.wantStats=false}if(UI.stats&&!BF.wantStats){UI.stats=false;setTimeout(render,0)}}const play=playing();R.classList.toggle('bf-play',play);
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
   // my ship had nobody to shoot: say so on the board, with the fix
-  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} only shoots ahead. Next time pick a 🎯 move.</span>`,1500);BF.noshotT=1}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
   const k=ctx();if(BF.noshotT&&ban&&['dice','res','target','plan'].includes(k)&&performance.now()>=(BF.banUntil||0)){ban.hidden=true;BF.noshotT=0}
@@ -113,41 +151,69 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
   const sheet=k==='ask'||(!!PHN.pop&&PHN.pop.kind==='info');R.classList.toggle('bf-sheet',sheet);
   topLine(k);
-  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp))}
+  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);BF.fitP=1;requestAnimationFrame(()=>{BF.fitP=0;fit(f.pts,f.min,f.sd,f.tp,f.bp)})}
   if(key===BF.key)return;BF.key=key;clear();dice.hidden=true;
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
-  else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s)}
+  else if(k==='dice')diceUI();else if(k==='res')resUI();else if(k==='note')noteUI();else if(k==='over')overUI();else if(k==='ask')askUI();else if(k==='fly')setHint('');else watchUI(s);try{ghost3D()}catch(e){console.error(e)}}
 // "whose turn, doing what": one short banner each time the turn changes hands (the lesson has its own bubbles)
 function turnBanner(k){if(typeof tutOn==='function'&&tutOn())return;if(!G||G.winner||G.round<1||UI.hold||BF.wave)return;const s=G.cur&&ship(G.cur);let id='',h='';const T=LORE.turn;
   if(k==='plan'){id='p'+G.round;h=`<b>${T.plan[0].replace('{r}',G.round)}</b><span>${T.plan[1]}</span>`}
   else if((k==='action'||k==='sub')&&s){id='a'+G.round+G.cur;h=`<b>${T.mine}</b><span>${esc(shortName(s))} flew. Now pick an action.</span>`}
   else if(k==='target'&&s){id='t'+G.round+G.cur;h=`<b>${T.mine}: ${T.combat}</b><span>${esc(shortName(s))} can shoot. Pick a target.</span>`}
   else if(k==='watch'&&s&&!mineS(s)){id='w'+G.round+G.phase+G.cur;h=`<b>${T.rival}</b><span>${esc(shortName(s))} ${G.step===3?'takes aim':'moves'}</span>`}
-  if(!id||id===BF.tbId)return;BF.tbId=id;banner(h,1100);BF.noshotT=0}
+  if(!id||id===BF.tbId)return;BF.tbId=id;if(k!=='watch'){BF.banQ=[];BF.banUntil=0}/* my turn now: a queued 'Rival's turn' line is stale, drop it and show this one at once */banner(h,1100);if(ban)ban.classList.toggle('top',k!=='plan');BF.noshotT=0;placeBan()}
 function topLine(k){if(!G||G.round<1){top.innerHTML='';top._h='';return}const k0=me();const hp=side=>alive().filter(s=>s.side===side).reduce((a,s)=>a+Math.max(0,s.hull-hullDmg(s))+s.sh,0);
   const n=side=>alive().filter(s=>s.side===side).length;const h=`<span class="y">You <b>${n(k0)}</b>✈ ♥${hp(k0)}</span><span class="vs">vs</span><span class="e">Enemy <b>${n(1-k0)}</b>✈ ♥${hp(1-k0)}</span>`;if(top._h!==h){top._h=h;top.innerHTML=h}}
 // ---- the guided first game: a ghost finger shows the one thing to tap ----
-function finger(el){BF.fing=guided()&&el?el:null}
+function finger(el){BF.fing=(guided()||(typeof TUT!=='undefined'&&TUT.coach&&typeof tutStaged==='function'&&tutStaged()))&&el?el:null}
 // ---- screens ----
 function briefUI(){const k0=me();const foe=G.ships.filter(s=>s.side!==k0).length;setHint('');banner(`<div data-keep><b class="na-gt">Goal: destroy ${foe===1?'the enemy ship':'every enemy ship'} before they get yours.</b><ul class="na-goal"><li>Pick a secret move for each ship.</li><li>Fly, then shoot enemies in front of you.</li><li>Hits break shields first, then the hull.</li></ul><span>Yours ${G.ships.filter(s=>s.side===k0).length>1?'are':'is'} at the bottom. Theirs at the top.</span></div>`,1e9);
   setBtns(`<button class="btn" data-bf="briefset" aria-label="Place the asteroids and your ship yourself">Set up myself</button><button class="btn primary big" data-bf="brief">Start ▶</button>`);finger(btns.querySelector('.primary'))}
 function setupUI(){const q=G.q;const rock=q.key==='rock';setHint(rock?'Tap a square to place a rock':'Tap a spot for your ship');
   const rk=recOpt(q).o.k;q.opts.forEach((o,i)=>{if(!o.p)return;const it=item(rock?'':'✈','bfspot'+(o.k===rk?' rec':''),{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true});if(o.k===rk)finger(it.el)});
   setBtns(`<button class="btn big" data-a="autoplace">✨ Auto-place all</button>`)}
-function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+function planUI(){dropLoose();if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round;UI.sugCache=null}/* a new round starts with no move set: last round's move must never stay pre-picked (it flew newcomers into rocks and off the mat) */const ps=planSide();const my=alive().filter(s=>s.side===ps);const all=my.every(s=>UI.draft[s.id]!=null);
+  /* the 'Round N: plan' bubble is only for the start of planning: once a ship is picked or planned, the hint line takes over */
+  if(ban&&!ban.hidden&&/^p\d/.test(BF.tbId||'')&&(BF.sel||my.some(s=>UI.draft[s.id]!=null))){ban.hidden=true;BF.banUntil=0;clearTimeout(BF.banT)}
   if(BF.sel&&!my.some(s=>s.id===BF.sel))BF.sel=null;
-  for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);item(mvLabel(m),'bfm small set '+exColor(s,m).c,{x:finalPose(s,B(s),m).x,y:finalPose(s,B(s),m).y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
+  for(const s of my){const pk=UI.draft[s.id];if(pk!=null&&s.id!==BF.sel){const m=dialOf(s)[pk];pathW(tplPoints(s,B(s),m,4),'bfp set '+exColor(s,m).c);const gp=ghostW(s,m,exColor(s,m).c,true),lp=add(gp,mul(leftOf(gp.h),B(s)*1.05));item(mvLabel(m,s),'bfm small set '+exColor(s,m).c,{x:lp.x,y:lp.y,data:{bfship:s.id},label:s.name+': '+mvWords(m)})}
     if(s.id!==BF.sel){const it=item('','bfring'+(pk==null?' need':' done'),{ship:s.id,data:{bfship:s.id},label:s.name+(pk==null?': plan its move':': change its move'),ring:true});if(pk==null&&!BF.fingT){BF.fingT=it.el}}}
-  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];
+  if(BF.sel&&dialOn()){dialPlan(ship(BF.sel),all);return}
+  if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=(UI.hints||(typeof tutStaged==='function'&&tutStaged()))?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
-      const p=finalPose(s,b,m);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:p.x,y:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
-      if(sug===i&&pick==null)BF.fingT=it.el});
-    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
+      const p=finalPose(s,b,m);if(pick===i||(pick==null&&sug===i)||m.t==='K')ghostW(s,m,c+(pick===i?' on':''),pick===i);const om=offBoard(p,b),rk=rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m,s)+(sug===i?'<em class="st">★</em>':'')+(om?'<em class="rk om">off mat!</em>':rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk||offBoard(p,b)?' danger':''),{x:pick===i?p.x+leftOf(p.h).x*b*1.05:p.x,y:pick===i?p.y+leftOf(p.h).y*b*1.05:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(om?', leaves the mat: the ship is destroyed':rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
+      if(sug===i&&(pick==null||(pick!==sug&&typeof tutStaged==='function'&&tutStaged())))BF.fingT=it.el});
+    item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock · <b class="rk">off mat!</b> lost');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
   else setHint(all?'Ready? Tap <b>Fly</b>':my.length>1?'Tap a ship to plan its move':'Tap your ship to plan its move');
   setBtns(`<button class="btn" data-bf="auto" aria-label="Suggested moves for every ship">★ Auto</button><button class="btn primary big" data-bf="fly" ${all?'':'disabled'}>${all?'Fly ▶':'Plan your ships first'}</button>`);
-  if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');finger(BF.fingT)}
+  if(all&&!BF.sel)BF.fingT=btns.querySelector('[data-bf="fly"]');if(typeof tutPlanHook==='function'){const f=tutPlanHook();if(f)BF.fingT=f}finger(BF.fingT)}
+// ---- the secret dial: a big wheel you spin with your thumb; the move in the window is the one you fly ----
+function dialOn(){return !/[?&]dial=0/.test(location.search||'')&&!(typeof tutOn==='function'&&tutOn())&&!(typeof tutStaged==='function'&&tutStaged())}
+function dialList(s){const dk=m=>m.s*10+(m.t==='K'?5:m.t==='S'?2:m.t==='B'?(m.d<0?1:3):(m.d<0?0:4));return dialOf(s).map((m,i)=>({m,i})).filter(o=>!(exColor(s,o.m).c==='r'&&s.stress)).sort((a,b)=>dk(a.m)-dk(b.m))}
+function dialEl(){if(BF.dial)return BF.dial;const el=document.createElement('div');el.id='bfdial';el.hidden=true;el.innerHTML='<div class="dwin" aria-live="polite"></div><div class="dface" role="slider" aria-label="Maneuver dial: spin to choose a move"></div><div class="dhub"></div>';ov.appendChild(el);BF.dial=el;
+  const face=el.querySelector('.dface');let D=null;
+  const ang=e=>{const r=face.getBoundingClientRect();return Math.atan2(e.clientX-(r.left+r.width/2),-(e.clientY-(r.top+r.height/2)))};
+  face.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();try{face.setPointerCapture(e.pointerId)}catch(_){}D={a0:ang(e),r0:BF.drot||0,x:e.clientX,y:e.clientY,moved:false,it:e.target.closest('.ditem')}});
+  face.addEventListener('pointermove',e=>{if(!D)return;if(BF.dgrid!==false)return;/* grid layout: tap a chip, no spinning */e.stopPropagation();let da=ang(e)-D.a0;if(da>Math.PI)da-=2*Math.PI;if(da<-Math.PI)da+=2*Math.PI;if(Math.hypot(e.clientX-D.x,e.clientY-D.y)>8)D.moved=true;if(!D.moved)return;BF.drot=D.r0+da;D.a0=ang(e);D.r0=BF.drot;dialSpin(false)});
+  const up=e=>{if(!D)return;e.stopPropagation();const d0=D;D=null;if(!d0.moved&&d0.it){const k=+d0.it.dataset.k;BF.drot=-k*BF.dstep}dialSpin(true)};
+  face.addEventListener('pointerup',up);face.addEventListener('pointercancel',up);face.addEventListener('click',e=>e.stopPropagation());return el}
+function dialSpin(snap){const el=BF.dial,L=BF.dlist;if(!el||!L||!L.length)return;const n=L.length,st=BF.dstep;let k=Math.round(-BF.drot/st);k=((k%n)+n)%n;if(snap)BF.drot=-Math.round(-BF.drot/st)*st;
+  el.querySelectorAll('.ditem').forEach(it=>{const a=+it.dataset.k*st+BF.drot;it.classList.toggle('on',+it.dataset.k===k)});
+  el.querySelector('.dface').style.setProperty('--rot',BF.drot+'rad');
+  const s=ship(BF.sel);if(!s)return;const o=L[k];if(UI.draft[s.id]!==o.i){UI.draft[s.id]=o.i;try{sfx('click');GX.buzz(8)}catch(e){}if(snap||true){BF.dkeep=1;render()}}}
+function dialPlan(s,all){const b=B(s),L=dialList(s),pick0=UI.draft[s.id];let pick=pick0;const sug=suggestDial(s);
+  if(pick==null||!L.some(o=>o.i===pick)){pick=sug>=0&&L.some(o=>o.i===sug)?sug:L[0].i;UI.draft[s.id]=pick}
+  const el=dialEl(),face=el.querySelector('.dface'),key=G.round+'|'+sug+'|'+s.id+':'+L.map(o=>o.i).join(',')+'@'+Math.round(shipDeg(s)/5);BF.dlist=L;BF.dstep=2*Math.PI/Math.max(L.length,8);
+  if(BF.dkey!==key){BF.dkey=key;face.innerHTML=L.map((o,k)=>{const c=exColor(s,o.m).c;const rk=rockHits(s,o.m)||offMat(s,o.m);return `<div class="ditem ${c}${rk?' danger':''}${o.i===sug?' sug':''}" data-k="${k}">${mvLabel(o.m,s)}</div>`}).join('');BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep}
+  if(pick0==null||!L.some(o=>o.i===pick0))BF.drot=-L.findIndex(o=>o.i===pick)*BF.dstep;/* a fresh dial opens ON the ★ move: the wheel's old rotation from last round must not pick for you */
+  el.hidden=false;el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');dialSpin(false);
+  const m=dialOf(s)[pick],c=exColor(s,m).c,om=offMat(s,m),rk=om?0:rockHits(s,m);let aim=false;try{aim=!rk&&!om&&inArcOf(s,finalPose(s,b,m)).length>0}catch(e){}
+  el.querySelector('.dwin').innerHTML=`<span class="dmv ${c}">${mvLabel(m,s)}</span><span class="dwd">${esc(mvWords(m))}${om?' · <b class="rk om">off mat!</b>':rk?' · <b class="rk">rock!</b>':aim?' · 🎯':''}${m.c==='r'?' · <b class="r">stress</b>':''}</span>`;
+  pathW(tplPoints(s,b,m,4),'bfp on '+c);ghostW(s,m,c+' on',true);item('','bfring sel',{ship:s.id,ring:true,tag:'div'});
+  setHint(`Tap a move for ${esc(shortName(s))}`);
+  setBtns(`<button class="btn" data-bf="dclose" aria-label="Close the dial">✕</button><button class="btn primary big" data-bf="dlock">Lock move ✓</button>`);el.style.setProperty('--dbar',((bar?bar.offsetHeight:114)+8)+'px');finger(null)}
 function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
   if(BF.sub){const a=BF.sub;setHint(a.a==='TL'?'Tap the enemy to lock on':'Tap where to go');
     if(a.targets)a.targets.forEach(id=>{const t=ship(id);const it=item('<span>⌖</span><i>Lock</i>','bftgt lock',{ship:id,data:{bfarg:id},label:'Lock onto '+t.name});finger(it.el)});
@@ -159,10 +225,14 @@ function actionUI(s){if(!s)return;const acts=actionsFor(s);const rec=recAct(s);
     const it=item(`<span>${ic}</span><i>${esc(w)}</i>`,'bfact'+(a.a===rec?' rec':'')+(a.a==='skip'?' skip':''),{ship:s.id,ring:false,arc:{i,n},data:{bfa:a.a},label:(a.l||a.a)+(a.d?': '+a.d:'')});
     if(a.a===rec)finger(it.el)});
   if(!rec)finger(null);setBtns('')}
-function targetUI(s){if(!s)return;const ws=weaponsFor(s);const opts=[];for(const w of ws)for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
+// range ruler: bands 1, 2 and 3 measured from the attacker's base edge, like laying the ruler on the table
+function rangeBands(s){const b=B(s);const c=corners(s,b);for(let k=1;k<=3;k++){const r=RANGE*k,pts=[];for(let i=0;i<4;i++){for(let j=0;j<=6;j++){const a=s.h+(i+j/6)*Math.PI/2;pts.push(add(c[i],V(Math.cos(a)*r,Math.sin(a)*r)))}}pts.push(pts[0]);pathW(pts,'bfrng r'+k,.3);
+    const lp=add(s,mul(fwd(s.h),b/2+r-RANGE*.5));item(String(k),'bfrlab r'+k,{x:lp.x,y:lp.y,tag:'div'})}}
+function targetUI(s){if(!s)return;try{rangeBands(s)}catch(e){console.error(e)}const ws=weaponsFor(s);const opts=[];for(const w of ws)for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
   const best=opts.slice().sort((a,b)=>b.e-a.e)[0];const per={};
   for(const o of opts){const j=per[o.d.id]=(per[o.d.id]||0)+1;const p=XY(o.d);const a0=shownXY(s);pathW([a0,p],'bfshot aim');
     const it=item(`<span>${o===best?'★':''}🎯</span><i>${o.n}<small>vs</small>${o.m}</i>${o.w.k!=='P'?`<em>${esc(o.w.n.split(' ')[0])}</em>`:''}`,'bftgt'+(o===best?' rec':''),{ship:o.d.id,dy:j>1?1.1*(j-1):0,data:{bfw:o.w.k,bft:o.d.id},label:`Shoot ${o.d.name}: ${o.n} attack dice against ${o.m} defence`});if(o===best)finger(it.el)}
+  {const o=best;if(o){let rg='';try{const r=arcReach(s,B(s),o.d,B(o.d),s.arc);rg=r?rangeOf(r.d):''}catch(e){}item(esc(`Fire at ${shortName(o.d)}${rg?` · range ${rg}`:''} · ${o.n} dice vs ${o.m}`),'bftlab',{ship:o.d.id,dy:-1.9,tag:'div'})}}
   setHint(opts.length?'Tap a glowing enemy to shoot':'No enemy in your arc');
   setBtns(`<button class="btn" data-act="fire" data-w="skip">Hold fire</button>`)}
 function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:0}:preview(A);const rolled=!!(A.def&&A.def.length)||A.step!=='amod';
@@ -174,13 +244,15 @@ function diceBox(A,res){const a=ship(A.a),d=ship(A.d);const r=res?{hits:0,crits:
   <div class="bfd-out">${out}</div>
   <div class="bfd-r def"><span class="who">DODGE</span><div class="dice">${res?res.def.map(f=>die(f,'def')).join(''):dd||(rolled?'<i class="muted">no dice</i>':'<i class="muted">rolls next</i>')}</div></div>`}
 function shotLine(aId,dId){const a=ship(aId),d=ship(dId);if(!a||!d)return;pathW([shownXY(a),shownXY(d)],'bfshot fire',2.5)}
-function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
+function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==A.a+'>'+A.d+G.round)dropLoose();BF.looseK=A.a+'>'+A.d+G.round;const a=ship(A.a),d=ship(A.d);shotLine(A.a,A.d);dice.innerHTML=diceBox(A);dice.hidden=false;dice.className='';
   if(G.phase==='ask'){const q=G.q;setHint(esc(q.title));
     // picking dice to reroll: tap the dice themselves
     if(q.key==='dice'){const row=dice.querySelector(/Defen/.test(q.opts[0]&&q.opts[0].l)?'.def .dice':'.atk .dice');const els=row?row.querySelectorAll('.die'):[];
       q.opts.forEach(o=>{const m=/^[td](\d+)$/.exec(o.k);if(!m||!els[+m[1]])return;const el=els[+m[1]];el.dataset.bfq=o.k;el.setAttribute('role','button');el.setAttribute('aria-label',o.l);el.classList.add('pick');if(/^☑/.test(o.l))el.classList.add('on')});
       if(els.length)setHint(q.opts.some(o=>o.k==='ok')?'Tap dice to reroll, then Reroll':'Tap the die');
-      setBtns(q.opts.filter(o=>!/^[td]\d+$/.test(o.k)).map(o=>`<button class="btn${o.k==='ok'?' primary':''}" data-bfq="${esc(o.k)}">${o.k==='ok'?'⌖ Reroll':o.k==='x'?'Cancel':esc(o.l)}</button>`).join(''));finger(dice.querySelector('.die.pick:not(.on)')||btns.querySelector('.primary'));return}
+      setBtns(q.opts.filter(o=>!/^[td]\d+$/.test(o.k)).map(o=>`<button class="btn${o.k==='ok'?' primary':''}" data-bfq="${esc(o.k)}">${o.k==='ok'?'⌖ Reroll':o.k==='x'?'Cancel':esc(o.l)}</button>`).join(''));// the finger points only at dice worth rerolling: blanks, and focus results when the roller has no focus token to spend
+      {const roller=/Defen/.test(q.opts[0]&&q.opts[0].l)?d:a;const worth=[...els].filter(el=>el.classList.contains('pick')&&!el.classList.contains('on')&&(/blank/i.test(el.getAttribute('aria-label')||'')||(/focus/i.test(el.getAttribute('aria-label')||'')&&!(roller&&roller.focus))));
+       worth.forEach(el=>el.classList.add('worth'));finger(worth[0]||btns.querySelector('.primary'))}return}
     setBtns(q.opts.map((o,i)=>`<button class="btn${(q.opts.some(x=>x.pri)?o.pri:i===0)?' primary':''}" data-bfq="${esc(o.k)}">${esc(o.l)}</button>`).join(''));return}
   if(!humanTurn()){setHint(G.phase==='amod'?`⏳ ${esc(shortName(a))} aims at ${mineS(d)?'you':esc(shortName(d))}`:`⏳ ${esc(shortName(d))} tries to dodge`);setBtns('');return}
   if(G.phase==='damod'){setHint('Tamper with the attack dice?');setBtns(exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}</button>`).join('')+`<button class="btn primary" data-act="damod" data-k="done">Done</button>`);return}
@@ -188,22 +260,33 @@ function diceUI(){const A=G.atk;if(!A)return watchUI();const a=ship(A.a),d=ship(
   const pv=preview(A);setHint(G.phase==='amod'?(mods.length?'Improve your dice, then Roll':'Your shot. Tap Roll'):(mods.length?'Defend: use a token, or Done':pv.hits+pv.crits?'Hit! Tap Done':'Dodged! Tap Done'));
   // nothing to decide while defending: carry on by itself after a beat
   if(G.phase==='dmod'&&!mods.length){const kk=BF.key;setTimeout(()=>{if(BF.key===kk&&G&&G.phase==='dmod'&&humanTurn())uiAct({act:'dmod',k:'done'})},ANIM?1400:0)}
-  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
+  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}${m.d?`<small class="msub">${esc(m.d.length>34?m.d.slice(0,33)+'…':m.d)}</small>`:''}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
   finger(btns.querySelector('.rec')||btns.querySelector('.primary'))}
 const modIco=k=>/focus/i.test(k)?'◉':/tl|lock|rr|reroll/i.test(k)?'⌖':/evade/i.test(k)?'✦':'★';
-function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
-function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
+function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/focus\s*→\s*evade|focus.*(into|to) an? evade/i.test(l))return 'Focus → evade';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
+// dice stay where they landed, loose on the mat beside the target, until the next attack; crit cards flip face-up
+function dropLoose(){if(!BF.loose)return;for(const it of BF.loose)it.el.remove();BF.items=BF.items.filter(x=>!BF.loose.includes(x));BF.loose=null;BF.looseT=0}
+function looseDice(R){if(BF.looseT===R.t)return;dropLoose();BF.looseT=R.t;BF.loose=[];const a=ship(R.a),d=ship(R.d);if(!a||!d||typeof die!=='function')return;
+  const bd=B(d),toA=Math.atan2(a.y-d.y,a.x-d.x);let seed=(R.t%9973)||7;const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const put=(list,k,base)=>list.forEach((f,i)=>{const n=list.length,ang=base+(i-(n-1)/2)*.42+(rr()-.5)*.18,dist=bd*(1.25+rr()*.4);const x=d.x+Math.cos(ang)*dist,y=d.y+Math.sin(ang)*dist;
+    const it=item(`<i style="transform:rotate(${Math.round(rr()*80-40)}deg);animation-delay:${(i*.08).toFixed(2)}s">${die(f,k)}</i>`,'bfloose '+k,{x,y,tag:'div',tmp:true});BF.loose.push(it)});
+  put(R.dice||[],'atk',toA);put(R.def||[],'def',toA+Math.PI)}
+function critCards(R){if(!R.crits||!R.crits.length||BF.critT===R.t||typeof DAMAGE==='undefined')return;BF.critT=R.t;R.crits.forEach((c,i)=>{const D=DAMAGE[c];if(!D)return;
+  const it=item(`<div class="in" style="animation-delay:${(.45+i*.5).toFixed(2)}s"><div class="cb">✦</div><div class="cf"><b>${esc(D.n)}</b><span>${esc(String(D.t).split('. ')[0].slice(0,70))}</span></div></div>`,'bfcard',{ship:R.d,dy:-1.9-i*1.2,tag:'div',tmp:true});
+  setTimeout(()=>{it.el.remove();BF.items=BF.items.filter(x=>x!==it)},5200)})}
+function resUI(){const R=UI.hold.R;try{looseDice(R);critCards(R)}catch(e){console.error(e)}{const el=document.createElement('div');el.className='bfdmg '+(R.dmg?'hit':'miss');el.textContent=R.dead?'💥':R.dmg?'−'+R.dmg:'MISS';lay.appendChild(el);const it={el,ship:R.d,dy:-.6,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},2600)}shotLine(R.a,R.d);dice.innerHTML=diceBox({a:R.a,d:R.d,dice:R.dice,def:R.def,step:'done'},R);dice.hidden=false;dice.className='res';setHint('Tap to continue');setBtns('');
   const d=ship(R.d);if(d&&R.dmg)sfx(R.dead?'boom':'hull')}
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(typeof tutHold==='function'&&tutHold(k))return;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
-function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(G.seed|0)%a.length];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
+function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);{const Q=LORE.quick,pick=a=>a[(((G.seed|0)%a.length)+a.length)%a.length]||a[0];const line=G.winner==='draw'?Q.draw:won?pick(Q.win):pick(Q.lose);banner(`<div data-keep><b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${line}</span><span>${esc(w)}</span><span>Round ${G.round}. Ships left: you ${alive().filter(s=>s.side===k0).length}, rival ${alive().filter(s=>s.side!==k0).length}.</span></div>`,1e9)};setHint('');
   setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Rival’s turn: ${esc(shortName(s))} takes aim`:`⏳ Rival’s turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
 // ---- taps ----
-function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
+function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq]')){if(G&&G.phase==='ask'&&G.q&&G.q.key==='dice'){const dd=[...dice.querySelectorAll('[data-bfq].pick')];const hit=dd.find(x=>{const r=x.getBoundingClientRect();return e.clientX>=r.left-10&&e.clientX<=r.right+10&&e.clientY>=r.top-10&&e.clientY<=r.bottom+10});if(hit){e.preventDefault();hit.click()}return}if(typeof tutOn==='function'&&tutOn()&&!tutGate({what:'dicebox'}))return;const b=btns.querySelector('.btn.primary')||btns.querySelector('.btn');if(b&&!b.disabled){e.preventDefault();b.click();return}if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return}}const t=e.target.closest('[data-bf],[data-bfm],[data-bfship],[data-bfa],[data-bfarg],[data-bfw],[data-bfq]');if(!t||t.disabled)return;const ds=t.dataset;if(typeof tutOn==='function'&&tutOn()){const ta=ds.bf?{what:ds.bf}:ds.bfship!=null?{what:'ship',id:ds.bfship}:ds.bfm!=null?{what:'dial',i:+ds.bfm}:ds.bfa!=null?{what:'action',a:ds.bfa}:ds.bfarg!=null?{what:'arg',v:ds.bfarg}:ds.bfw!=null?{what:'fire',w:ds.bfw,t:ds.bft}:{what:'ask',k:ds.bfq};if(!tutGate(ta)){e.preventDefault();e.stopPropagation();return}}if(typeof tutAllow==='function'&&!tutAllow(ds)){e.preventDefault();e.stopPropagation();try{GX.buzz(30)}catch(_){}if(BF.fing)BF.fing.classList.add('na-nudge');return}if(typeof tutStaged==='function'&&tutStaged()&&typeof NCH!=='undefined'&&NCH.cur)try{coachHide()}catch(_){}e.preventDefault();e.stopPropagation();BF.taps++;sfx('click');
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();bfRender()}else bfRender();return}
+  if(ds.bf==='dlock'||ds.bf==='dclose'){BF.sel=null;if(BF.dial)BF.dial.hidden=true;sfx('token');try{GX.buzz(18)}catch(e){}render();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();try{GX.buzz(18)}catch(e){}const b=document.querySelector('[data-a="lock"]');lockIn();return}
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
@@ -220,7 +303,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
 function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
-PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+PHN.tapBF=function(e){if(!BF.on||!G)return false;if(performance.now()-(BF.pdSup||0)<400)return true;if(typeof tutOn==='function'&&tutOn())return true;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
   let best=null,bd=1e9;for(const s of alive()){const p=px(s.x,s.y,1.2);const dd=Math.hypot(p[0]-x,p[1]-y);if(dd<Math.max(30,shipR(s)*1.4)&&dd<bd){bd=dd;best=s}}
   const k=ctx();
@@ -233,15 +316,21 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;if(typeof tutOn==='function'&&t
   return false};
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
 function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
-function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=shownXY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
+function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;if(typeof NCH!=='undefined'&&NCH.cur&&BF.fing&&BF.fing.offsetParent)(NCH.fs=NCH.fs||{})[NCH.cur]=1;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  // tappable chips sit where they will END from their first frame: projected with the camera's target (not the glide in progress) and the ship's real
+  // pose (not the mesh still flying), so a quick tap never lands where a chip used to be. Paths and rings below still follow what is drawn.
+  const cam=V3.camera,glide=!!(V3.ez&&!V3.debugCam);let sp0,sq0;if(glide){sp0=cam.position.clone();sq0=cam.quaternion.clone();placeCam(0,0,V3.cam);cam.updateMatrixWorld()}
+  if(BF.fitP){if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}return}// the camera target is set next frame: keep new chips hidden until then
+  const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=it.ring?shownXY(s):XY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
       if(it.arc){const n=it.arc.n,i=it.arc.i;const R0=Math.max(r*1.5+40,86);const base=y<Ht-230?Math.PI/2:-Math.PI/2;const span=Math.min(Math.PI*1.1,(n-1)*74/R0);const ang=base+(n>1?(i/(n-1)-.5)*span:0);x+=Math.cos(ang)*R0;y+=Math.sin(ang)*R0}
-      if(it.dy)y+=it.dy*(r*1.3+26)}
+      if(it.dy)y+=it.dy*(r*1.3+26);
+      else if(/\block\b/.test(it.el.className)&&G.cur&&G.cur!==it.ship){const m=ship(G.cur);if(m){const mq=px(XY(m).x,XY(m).y,1);y+=(y<=mq[1]?-1:1)*(r*1.3+26)*.6}}}   // the Lock chip sits on the far side of the enemy from your ship, clear of your name plate
     else{const q=px(it.x,it.y,.5);x=q[0];y=q[1]}
-    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:0;if(it.relax||it.r)rel.push(it)}
+    it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:/bftlab/.test(cl)?122:0;if(it.relax||it.r)rel.push(it)}
   relaxItems(rel,Wd,Ht);
   for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(/bfm/.test(it.el.className)?Ht-(bar?bar.offsetHeight:90)-20:Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
+  if(glide){cam.position.copy(sp0);cam.quaternion.copy(sq0);cam.updateMatrixWorld()}
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
   if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}

@@ -217,7 +217,7 @@ function advanceClock(sec){G.clock+=sec;hook('tick')}
 // ---------- fuse ----------
 function advance(n,why,ctx){if(G.over||n<=0)return;if(hookAny('dialAdv',n,ctx||{}))return;G.dial-=n;lg(`The fuse burns ${n} step${n>1?'s':''} (${why}). ${Math.max(0,G.dial)} left.`,'bad');if(G.dial<=0)explode('the fuse burnt down')}
 function rewind(n,why){if(G.dial==null)return;const b=G.dial;G.dial=Math.min(DIAL_MAX,G.dial+n);if(G.dial>b)lg(`The fuse turns back (${why}). ${G.dial} left.`,'good')}
-function explode(why){if(G.over)return;G.over={win:false,why};G.winText='BOOM! '+why;G.phase='over';G.q=null;G.ag=[];lg('BOOM! '+why,'big')}
+function explode(why){if(G.over)return;G.over={win:false,why,by:G.actor!=null?G.actor:null};G.winText='BOOM! '+why;G.phase='over';G.q=null;G.ag=[];lg('BOOM! '+why,'big')}
 function checkWin(){if(G.over)return;if(G.st.some(s=>s.w.some(x=>!x.cut)))return;if(G.robot&&G.robot.w.length)return;const r=hookAny('winBlock');if(r){explode(r);return}
   G.over={win:true,why:'every wire is safe'};G.winText='Defused! Every wire is safe.';G.phase='over';G.q=null;G.ag=[];lg('Defused! The crew made it.','big')}
 // ---------- cutting ----------

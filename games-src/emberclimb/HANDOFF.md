@@ -39,3 +39,45 @@ Loader proven with 3 dummy files (hero portrait, card art, background) and the d
 - Juice + addendum 5 (ui.js W420 parts, head.html W420 blocks, sound.js): hit-stop + shake, flying numbers, draw/play animations, pulsing intents, boss intro video (UI.bossIntro, ?scn=bossintro), victory fanfare, rarity glow, damage preview per foe (E.previewPlay), Incoming chip, reason pops, reward/path value hints, one-line fight rating.
 - Not done: KayKit renders and game-icons badges (no local packs; normal foes stay pixel art next to illustrated bosses), owner UI plates (ui-panel/buttons) not wired, 1-4 players, tutor-test.js still expects 7 guide steps (fails the same on the previous commit), visual baselines need owner approval.
 - W420 urgent (8 Nov 02:00): enemy tap restored (`tools/tap-enemy.js`, touch + mouse, wins a fight). ALL pictures are now owner Doorkick art: `owner-art/install.py` maps every slot (heroes, foes, cards, relics, potions, events, rooms, backgrounds) to doorkick-dungeon media/cards and removes anything else; contact sheet `playable-shots/v4-contact-sheet.webp`.
+
+## R21 fixes (12 Nov 2026)
+- Difficulty: foes now use the same tabletop conversion as heroes (data.js KE = [8, 5, 8, 5]: HP /8, damage and Block /5, x SCALE 8).
+  Before, foes were converted at /3.5 (harsher than the hero cards). First fight draws from a gentle 1st-encounter pool (ENC.first), like the
+  tabletop's separate 1st Encounter deck. Bench: `node bench-newcomer.js 300 w` (no AI moves, reads intents, blocks when hit, attacks the weakest).
+  Before: floor 1 survived 99%, boss reached 37%, boss beaten 11%. After: 100% / 84% / 47% (Rogue 61%).
+- Touch proof: `VW=375 VH=667 RUNS=3 node tools/newcomer-taps.js` (Quick, real taps), `TUT=1 ...` (coached climb).
+- Fidelity: Strength / Poison chips show the x8 value; Quick game is Act 1 only (setup no longer offers 3 acts; acts 2-3 used shelf-made foes),
+  boss drawn at random from the 3 act-1 bosses; rules drawer says so. Campfire no longer names the tabletop. Story chapters in later acts keep
+  shelf-made foes (said in the rules drawer).
+- Coach "Fully blocked" only after a real attack was fully blocked (stale hp0 cleared).
+- Elite reward at 375x667: compact potion/relic rows, Skip + Continue in one sticky row: everything fits.
+- Not confirmed online: the boss split timing (rulebook PDF host was down); kept as is.
+
+## R24 fixes (12 Nov 2026, shelf/W485-emberclimb-bench)
+- Foe row: dead/split corpses leave the stage; 4+ foes wrap to two rows (`w24many`, `w24six`). `?scn=ec-split` / `ec-split-two` (gate) prove
+  3 and 6 slimes fully on screen and tappable at 390x844 and 375x667 (playable-shots/r24/).
+- Act 1 foes = printed tabletop cards x8 (`tab:1` in data.js, table in rules-notes.md "Act 1 foes"): first-encounter sides, Hunker,
+  2-row die, elite Skill tax, one-time idle step, wyrm guard switch + Thorn Hide, death spores, elite/boss HP per hero, sentries per hero.
+  Tests: rules-test R10/R20/R29, logic rules 30/35 updated.
+- Setup says "Act 1 only"; rules card too. Short landscape gets its own stage layout (`w24ls`) and a compact setup screen.
+  Intent/relic popup is modal (scrim + close button, tap passes through). Shorter intent lines (<= 8 words).
+- Gate `build-all.py --full emberclimb`: PASS (phone-check 6/6, scenarios incl. the 2 new ones). Needs
+  `npm install --no-save @playwright/test@1.63.0 playwright@1.63.0` in games-src in a fresh container.
+- OPEN: difficulty. With the tabletop cards a newcomer by touch won 0/3 (floors 7, 3, 3); bench-newcomer 200 runs: beat boss 1%.
+  Normal fights cost a newcomer 22-41 HP of 80. Elites never kill a passive full-HP hero in under 3 turns (min 3, wardens).
+  Next: decide a faithful lever (the tabletop's own easier setup / starting bonus, potions, or rest frequency) or accept the hard curve.
+
+## R25 Gentle difficulty (12 Nov 2026, shelf/W485-emberclimb-bench)
+- Research: the rulebook has no easier mode or first-game setup. It only recommends the Warrior/Rogue as easier heroes; the solo
+  die relic's exact text was not confirmed (rulebook PDF host down), so it is not built. So: setup screen difficulty choice.
+- Gentle (first climb), default until the first full win (`ec-won1`) or a pick (`ec-diff`): x6 max HP, start with 3 Healing Draughts,
+  Rest heals 8 x SCALE (64) instead of 3 (24). Only player numbers (D.GENTLE in data.js, G.gentle in engine.js); foes untouched.
+  Rules drawer card "Gentle or Tabletop" says it is an easier mode, NOT the rulebook; result screen says "Played on Gentle".
+- Why x6: the boss is the wall. Tabletop Gate Wyrm gains 40 Block every turn (5 x 8) and only shifts after 48 HP damage, so a starter
+  deck (about 24 damage a turn) almost never hurts it: beaten 10-12% even with x5-x6 HP. HP x1.5/x2/x3/x4/x6: beat boss 3/7/16/22/39%.
+  OPEN for the orchestrator: check the printed Gate Wyrm card (rules-notes "one source"); if its Block is lower, Gentle can drop to ~x2.
+- Bench (300 runs, `GENTLE=1 node bench-newcomer.js 300 w`, DIED=1 adds a per-boss table): Gentle w 39% / s 66%; Tabletop w 0% / s 7%.
+- Also: top-bar potion and relic buttons 44 px (were 36); win-screen relics open the same explain popup as the top bar (+ title).
+  Short landscape hides the hero mech line and tap hint on setup so Start climb fits (`node tools/probe-setup.js` PASS at 4 sizes).
+- Touch proof (Gentle default, Warrior, 390x844, `RUNS=3 node tools/newcomer-taps.js`): LOST at boss / WON / LOST at boss, all reached floor 10, 0 page errors.
+  An earlier run (before the script fix) also WON; its other run hit a script-only softlock (event card picker inside #app), now fixed.

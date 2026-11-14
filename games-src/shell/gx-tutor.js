@@ -3,6 +3,7 @@
 //   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
 //              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
+//             live?:()=>el|[el] /* game controls kept tappable between steps, e.g. a roll card's Continue */,
 //             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
@@ -12,6 +13,15 @@
   'use strict';
   var D = document, cfg = null, S = null, wired = false, mem = {}, launchers = {}, dlg = null;
   var DIM = 'rgba(8,4,10,.62)';
+  // gesture tracking: one press (pointer or key) is one gesture. A tap the tutorial accepted must not also count its own trailing
+  // pointerup/click (e.g. a long press whose click lands on a Next button that appeared meanwhile), but a NEW press always counts.
+  var G = { id: 0, down: 0, upAt: 0 };
+  function gDown() { G.id++; G.down++; }
+  function gUp() { if (G.down > 0) G.down--; G.upAt = Date.now(); }
+  addEventListener('pointerdown', gDown, true); addEventListener('pointerup', gUp, true); addEventListener('pointercancel', gUp, true);
+  addEventListener('keydown', function (e) { if (!e.repeat) gDown(); }, true); addEventListener('keyup', gUp, true);
+  function sameGesture() { return !!S && S.gid === G.id && G.id > 0 && (G.down > 0 || Date.now() - G.upAt < 150); }
+  function tookGesture() { if (S) S.gid = G.id; }
   function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function words(t) { return String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; }
@@ -38,7 +48,11 @@
     return null;
   }
   function holesOf(st) {
-    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) return null;
+    var p = toRect(st.target); if (!p || p.width < 2 || p.height < 2) {
+      // opt-in (cfg.fallbackMs): a next-button step whose target is missing/hidden for that long shows an untargeted bubble instead of blocking
+      if (cfg.fallbackMs && !st.wait && S && S.step === st && Date.now() - S.since > cfg.fallbackMs) { var v0 = vp(); var fh = norm({ left: v0.w / 2 - 22, top: v0.h * 0.4, width: 44, height: 44 }); fh.fb = 1; return [fh]; }
+      return null;
+    }
     var out = [p], al = null;
     try { al = typeof st.also === 'function' ? st.also() : st.also; } catch (e) {}
     if (al && !Array.isArray(al)) al = [al];
@@ -64,14 +78,14 @@
   }
   function add(e) { D.body.appendChild(e); S.vis.push(e); return e; }
   function cell(l, t, w, h, clear) {
-    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); c.style.cssText = 'left:' + Math.round(l) + 'px;top:' + Math.round(t) + 'px;width:' + Math.round(w) + 'px;height:' + Math.round(h) + 'px';
+    var c = mk('div', 'gxt-cell' + (clear ? ' gxt-clear' : '')); var L = Math.round(l), T = Math.round(t); c.style.cssText = 'left:' + L + 'px;top:' + T + 'px;width:' + (Math.round(l + w) - L) + 'px;height:' + (Math.round(t + h) - T) + 'px'; // edges snap to the same pixel as the neighbour: no seam lines, no double-dim overlaps
     c.addEventListener('pointerdown', onBlocked); c.addEventListener('click', swallow); c.addEventListener('touchstart', function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
     return c;
   }
   function swallow(e) { e.preventDefault(); e.stopPropagation(); }
   function onBlocked(e) { e.preventDefault(); e.stopPropagation(); wrong(); }
   // everything outside the holes is a dim, input-eating cell (no overlay can be "tapped through"); holes stay live unless the step is a Next step
-  function drawCells(hs, shield) {
+  function drawCells(hs, shield, clearOut) {
     var v = vp(), xs = [0, v.w], ys = [0, v.h];
     hs.forEach(function (r) { xs.push(Math.max(0, Math.min(v.w, r.left)), Math.max(0, Math.min(v.w, r.right))); ys.push(Math.max(0, Math.min(v.h, r.top)), Math.max(0, Math.min(v.h, r.bottom))); });
     xs = xs.sort(function (a, b) { return a - b; }).filter(function (x, i, a) { return i === 0 || x - a[i - 1] > 0.5; });
@@ -79,7 +93,7 @@
     for (var i = 0; i < xs.length - 1; i++) for (var j = 0; j < ys.length - 1; j++) {
       var cx = (xs[i] + xs[i + 1]) / 2, cy = (ys[j] + ys[j + 1]) / 2, inH = false;
       for (var k = 0; k < hs.length; k++) if (cx > hs[k].left && cx < hs[k].right && cy > hs[k].top && cy < hs[k].bottom) { inH = true; break; }
-      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], false));
+      if (!inH) add(cell(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j], !!clearOut));
     }
     if (shield) hs.forEach(function (r) { add(cell(r.left, r.top, r.width, r.height, true)); });
   }
@@ -102,9 +116,10 @@
   function stripH() { var b = D.querySelector('.gx-bar'); if (b) { var r = b.getBoundingClientRect(); if (r.height > 20 && r.height < 80 && r.top < 4) return Math.ceil(r.bottom); } return 34; }
   function topLimit() { return stripH() + 4; }
   // the bubble goes where it covers none of the holes: below or above them, nearest the first (primary) hole
-  function place(b, hs, side) {
+  function stAvoid(st) { try { return st.avoid ? st.avoid() : null; } catch (e) { return null; } }
+  function place(b, hs, side, avoid) {   // avoid: optional extra rects the bubble should not cover (e.g. the board area the step talks about)
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad, P = hs[0];
-    var T = hs.map(function (r) { return inflate(r, 8, v); });
+    var T = hs.map(function (r) { return inflate(r, 8, v); }).concat((avoid || []).filter(Boolean).map(function (r) { return inflate(r, 4, v); }));
     var x = Math.max(pad, Math.min(v.w - w - pad, P.cx - w / 2));
     function ok(c) { if (c.top < top - 0.5 || c.bottom > bot + 0.5) return false; for (var i = 0; i < T.length; i++) if (hit(c, T[i])) return false; return true; }
     var hull = { top: Math.min.apply(null, hs.map(function (r) { return r.top; })), bottom: Math.max.apply(null, hs.map(function (r) { return r.bottom; })) };
@@ -154,23 +169,32 @@
     S.holes = H; S.key = rkey(hs);
     var nextStep = !st.wait;
     drawCells(H, nextStep);
-    H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
+    if (!hs[0].fb) H.forEach(function (r, i) { ring(r, i ? 'soft' : ''); });
     add(topStrip());
     if (st.wait && st.wait.type !== 'event') {
       var fr = st.wait.type === 'drag' && st.from ? toRect(st.from) : null; finger(fr, H[0]);
     }
     var say = stepText(st, 'say'), title = stepText(st, 'title');
-    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side); return true; }
+    if (keep) { S.vis.push(keep); S.bub = keep; S.say = say; place(keep, H, st.side, stAvoid(st)); return true; }
     var b = mk('div', 'gxh-bub gxt-bub' + (nextStep ? '' : ' gxt-nobtn')); b.setAttribute('role', 'status'); b.setAttribute('aria-live', 'polite'); b.dataset.step = st.id || S.i;
     b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd"><div>' + (title ? '<div class="gxh-tt">' + esc(title) + '</div>' : '') + '<div class="gxh-tx">' + esc(say) + '</div></div></div>' +
       (nextStep ? '<div class="gxh-row2"><button type="button" class="gxh-ok gxt-next">' + (S.i === cfg.steps.length - 1 ? 'Finish' : 'Next') + '</button></div>' : '');
     add(b); S.bub = b; S.say = say;
     var nb = b.querySelector('.gxt-next'); if (nb) nb.addEventListener('click', function (e) { e.stopPropagation(); next(); });
-    place(b, H, st.side);
+    place(b, H, st.side, stAvoid(st));
     return true;
   }
-  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim
-    var v = vp(); add(cell(0, 0, v.w, v.h, true)); add(topStrip());
+  // cfg.live (opt-in): ()=>el|[el] the game's own controls that must stay tappable while no step is shown (e.g. a Continue on a roll card)
+  function liveRects() {
+    if (!cfg || typeof cfg.live !== 'function') return null;
+    var a = null; try { a = cfg.live(); } catch (e) { a = null; } if (!a) return null; if (!Array.isArray(a)) a = [a];
+    var out = []; a.forEach(function (x) { var r = toRect(x); if (r && r.width > 1 && r.height > 1) out.push(r); });
+    return out.length ? out : null;
+  }
+  function drawWaiting() {   // between steps (the game is moving on): nothing to tap, nothing hidden by a dim; only cfg.live controls stay live
+    var v = vp(), L = liveRects(); S.liveKey = L ? rkey(L) : '';
+    if (L) drawCells(L, false, true); else add(cell(0, 0, v.w, v.h, true));
+    add(topStrip());
   }
   function enter(i) {
     var st = cfg.steps[i]; if (!st) { finish(); return; }
@@ -186,6 +210,7 @@
     if (S.phase === 'pend') {
       var rdy = !S.aiBusy; try { if (rdy && st.ready) rdy = !!st.ready(); } catch (e) { rdy = false; }
       var hs = rdy ? holesOf(st) : null;
+      if (!hs && cfg.live) { var L0 = liveRects(), k0 = L0 ? rkey(L0) : ''; if (k0 !== (S.liveKey || '')) { clearVisuals(); drawWaiting(); } }
       if (!hs) { S.stable = 0; if (!S.pill && Date.now() - S.since > 900) { S.pill = add(mk('div', 'gxt-pill gxt-wait', '<i></i><i></i><i></i>')); S.pill.setAttribute('role', 'status'); S.pill.setAttribute('aria-label', st.pending || 'Watch the board'); /* no words: a short wait must not be text that vanishes unread */ } return; }
       if (S.stable_k && !moved(hs, S.stable_k)) S.stable++; else { S.stable_k = rkey(hs); S.stable = 0; }
       if (S.stable >= 2) { S.phase = 'show'; S.stable_k = ''; if (draw()) { S.shown = true; S.shownAt = Date.now(); } }
@@ -204,7 +229,8 @@
   }
   function next() {
     if (!S || S.phase !== 'show' || S.step.wait) return;
-    if (S.shownAt && Date.now() - S.shownAt < 600) return;   // the tail of the previous gesture, not a tap on Next
+    if (sameGesture()) return;   // the tail of the gesture that finished the previous step, not a tap on Next
+    tookGesture();
     try { if (S.step.onNext) S.step.onNext(); } catch (e) { console.warn('gxt onNext', e); }
     advance();
   }
@@ -222,8 +248,8 @@
     if (!S || S.phase === 'end') return true;
     a = a || {};
     if (S.phase !== 'show') return a.type === 'event' ? true : false;
-    // a tap within 600 ms of a new bubble is the tail of the previous gesture (its click landing on a button that just appeared): ignore it
-    if (a.type !== 'event' && S.shownAt && Date.now() - S.shownAt < 600) return false;
+    // the trailing pointerup/click of the press that finished the previous step is not a new tap: ignore it (a new press always counts)
+    if (a.type !== 'event' && sameGesture()) return false;
     var st = S.step, w = st.wait;
     if (a.type === 'event') {
       if (w && w.type === 'event' && (!w.match || w.match(a))) { S.count++; if (S.count >= (w.times || 1)) advance(); }
@@ -232,7 +258,7 @@
     if (!w || w.type === 'event') { wrong(); return false; }
     var okm = true; try { okm = !w.match || !!w.match(a); } catch (e) { okm = false; }
     if (!okm) { wrong(); return false; }
-    S.count++;
+    S.count++; tookGesture();
     if (S.count >= (w.times || 1)) advance(); else { S.phase = 'pend'; S.stable = 0; S.stable_k = ''; S.since = Date.now(); clearVisuals(); drawWaiting(); }
     return true;
   }

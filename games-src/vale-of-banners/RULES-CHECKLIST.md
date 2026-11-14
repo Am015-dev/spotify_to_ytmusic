@@ -12,6 +12,11 @@ Not original rules and not tested here: the solo and 2 v 2 team modes.
 
 Not decidable from the published text: whether one meadow may hold two animal kinds. Our engine allows it (kinds are scored separately); no rule is asserted.
 
+W505 gameplay gate (8 Nov 2026), checked against the rulebook text and two rules pages: goods crates left on the stalls now stay into the next season (only
+hexagon tiles are cleared), and a tie now goes to the player with MORE empty estate spaces (the English rulebook says fewest; the rules pages call that a
+translation error). Still different on purpose: the stall spaces of the original are colour-coded (a fixed colour per space, and in 3-player games
+stall 6 holds a keep or a mine by season); its exact layout was not found, so our stalls draw at random from the normal tiles.
+
 
 ## A. Setup
 _The estate map, the tile pool and the Lore tiles are our own; the counts and the numbering rules are the published ones._
@@ -164,7 +169,7 @@ _The estate map, the tile pool and the Lore tiles are our own; the counts and th
 
 127. At season end the stalls are emptied and refilled (full stalls again)
 128. At season end the back lane is refilled
-129. At season end goods left on the stalls are removed
+129. At season end goods left on the stalls stay there (only the hexagon tiles are cleared)
 130. At season end five new goods tiles are laid out for the new season
 131. At season end players keep their silver, workers, goods, storage and track position
 132. A new season starts with round 1 and a new roll
@@ -180,7 +185,7 @@ _The estate map, the tile pool and the Lore tiles are our own; the counts and th
 138. Final: tiles still in storage score nothing
 139. Final: points from play are kept and the end bonus is added on top
 140. The player with most points wins
-141. Tie: the player with fewer empty estate spaces wins
+141. Tie: the player with more empty estate spaces wins (corrected rule)
 142. Tie on points and spaces: the player further back on the turn track wins
 143. Tie on points, spaces and step: the player lower in the stack wins
 144. Tie-break does not override a points difference (more points wins even with more empty spaces)

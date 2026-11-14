@@ -113,7 +113,7 @@ Allowed only after all your current workers are placed. You recall every deploye
 Production cards are activated in any order you like (FAQ 2.3.2). Clock Tower is used before recalling. Autumn is the last Prepare action. Green cards played during summer still fire on play. After autumn you keep placing remaining workers and playing cards until you pass.
 
 ## 4. End of game and scoring
-You pass when you cannot or do not want to act; passed players cannot be given cards or resources. Workers stay where they are. Game ends when everyone has passed.
+You pass only after your Autumn Prepare, when you cannot or do not want to act (rule 215; before Autumn the year goes on); passed players cannot be given cards or resources. Workers stay where they are. Game ends when everyone has passed.
 
 Score per player:
 1. Base points printed on each card in the city (Fool is -2; Dungeon prisoners score nothing).

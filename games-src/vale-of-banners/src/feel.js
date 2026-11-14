@@ -172,7 +172,8 @@ function flyPts(from, toEl, txt) {
   var ms = animMs(650); requestAnimationFrame(function () { requestAnimationFrame(function () { e.style.transition = 'transform ' + ms / 1000 + 's cubic-bezier(.5,0,.3,1),opacity .2s ' + (ms * .85) / 1000 + 's'; e.style.transform = 'translate(' + (to.left + to.width / 2 - from.left - from.width / 2) + 'px,' + (to.top + to.height / 2 - from.top - from.height / 2) + 'px) translate(-50%,-50%) scale(.7)'; e.style.opacity = '0'; }); });
   return wait(ms).then(function () { e.remove(); toEl.classList.remove('ptbump'); void toEl.offsetWidth; toEl.classList.add('ptbump'); });
 }
-function scoreEl(seat) { return seat === UI.view ? ($('.och[data-seat="' + seat + '"] .pts') || $('#r-vp')) : ($('.och[data-seat="' + seat + '"] .pts') || $('#opp')); }
+function scoreEl(seat) { var o = $('.och[data-seat="' + seat + '"] .pts'); if (o && o.offsetWidth) return o; if (L.tiny && $('#tabs')) return seat === UI.view ? $('#tab-estate') : $('#tab-rival');   /* very short phones: the points are on the view tabs */
+  return seat === UI.view ? (o || $('#r-vp')) : (o || $('#opp')); }
 function rivalPeek(ev) {   /* a card with the rival's estate; the tile flies onto its space */
   if (UI.fast || QS.get('scn')) return Promise.resolve();
   var old = $('#peek'); if (old) old.remove(); var s = ev.p, n = G.seats[s].name;

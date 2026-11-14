@@ -1,0 +1,9 @@
+390x844 job1 {"mine":"12 58x77","crew":"12 56x73","cmp":"-","zm":false,"scroll":false,"names":"Teal|Plum|You"}
+390x844 job2 {"mine":"18 44x49","crew":"16 44x49","cmp":"-","zm":false,"scroll":false,"names":"Teal|Plum|You"}
+390x844 job3 {"mine":"21 44x49","crew":"20 51x57","cmp":"-","zm":false,"scroll":false,"names":"Teal|Plum|You"}
+390x844 job4 {"mine":"26 44x44","crew":"13 54x70","cmp":"1 rows h=58 tiles 22x24 font>=14","zm":true,"scroll":false,"names":"Teal|Plum|You"}
+375x667 job1 {"mine":"12 44x49","crew":"12 56x73","cmp":"-","zm":false,"scroll":false,"names":"Teal|Plum|You"}
+375x667 job2 {"mine":"18 44x44","crew":"8 54x70","cmp":"1 rows h=44 tiles 28x30 font>=14","zm":true,"scroll":false,"names":"Teal|Plum|You"}
+375x667 job3 {"mine":"21 44x44","crew":"10 54x70","cmp":"1 rows h=44 tiles 24x30 font>=14","zm":true,"scroll":false,"names":"Teal|Plum|You"}
+375x667 job4 {"mine":"26 44x44","crew":"13 49x49","cmp":"1 rows h=58 tiles 22x24 font>=14","zm":true,"scroll":false,"names":"Teal|Plum|You"}
+errs 0

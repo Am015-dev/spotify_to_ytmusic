@@ -1,7 +1,7 @@
-// Real touch at 390x844 (owner verdict 8 Nov): tap card -> Sell, then a touch DRAG onto the drop tray. node touch-test.js [html in games/twin-thrones/] [shotdir]
+// Real touch at 390x844 (owner verdict 8 Nov): tap card -> Sell, then a touch DRAG onto the drop tray. TW=375 TH=667 node touch-test.js (size optional) [html in games/twin-thrones/] [shotdir]
 const { chromium } = require('playwright');
 (async () => {
-  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: +(process.env.TW||390), height: +(process.env.TH||844) }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   const pg = await ctx.newPage(); const errs = []; pg.on('pageerror', e => errs.push(e.message));
   await pg.goto('file://' + require('path').resolve(process.argv[2] || require('path').join(__dirname, '..', '..', 'games', 'twin-thrones', 'index.html')) + '?seed=11'); await pg.waitForTimeout(600);
   const tapSel = async s => { const r = await pg.locator(s).first().boundingBox(); await pg.touchscreen.tap(r.x + r.width / 2, r.y + r.height / 2); };
@@ -31,6 +31,6 @@ const { chromium } = require('playwright');
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await pg.waitForTimeout(1500);
   const n2 = await pg.evaluate(() => TT_TEST.U.G.log.length);
   const ok = goal === 1 && zoom === 1 && n1 > n0 && tray === 1 && n2 > n1 && !errs.length;
-  console.log((ok ? 'PASS' : 'FAIL') + ' touch 390x844 goalCard=' + goal + ' tapZoom=' + zoom + ' tapMove=' + (n1 > n0) + ' dragTray=' + tray + ' dragMove=' + (n2 > n1) + ' errors=' + errs.length + ' ' + errs.slice(0, 2).join('|'));
+  console.log((ok ? 'PASS' : 'FAIL') + ' touch ' + (process.env.TW || 390) + 'x' + (process.env.TH || 844) + ' goalCard=' + goal + ' tapZoom=' + zoom + ' tapMove=' + (n1 > n0) + ' dragTray=' + tray + ' dragMove=' + (n2 > n1) + ' errors=' + errs.length + ' ' + errs.slice(0, 2).join('|'));
   await b.close();
 })();
