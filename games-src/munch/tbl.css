@@ -439,3 +439,10 @@ html.bf-holding .hcue,*:has(>.hand .bf-best)>.hcue,*:has(>.hand .bf-picked)>.hcu
 html.ph .sline .sy .sav{width:26px;height:26px}
 /* the "+N ›" cue waits until the turn-start nudges (door, boot, suggested button) have finished: never two helpers at once */
 .hcue{animation:hcueShow .25s ease 5s both}@keyframes hcueShow{from{opacity:0;pointer-events:none}to{opacity:1;pointer-events:auto}}
+/* the bulb's ring pulses 3 times, then holds (the kit's ring loops); while its bubble is open it is the only helper: no ★, no other pulse */
+.gxh-ring{animation-iteration-count:3!important}
+html:has(.gxh-bulbb.on) .bf-best::before,html:has(.gxh-bulbb.on) .hcue{display:none!important}
+html:has(.gxh-bulbb.on) .pulse,html:has(.gxh-bulbb.on) .rec{animation:none!important}
+/* a dock question reads top-down: its text first, then its choice buttons (never under or behind them) */
+html.ph #prompt.bfq>p.say{order:-10!important;position:relative;z-index:1;flex:none;margin:6px 0 6px;color:#3a2410!important;text-shadow:none!important;font:700 15px/1.25 var(--title)!important;text-align:center}
+html.ph #prompt.bfq>.acts.main{order:-9!important;position:relative;flex:none}

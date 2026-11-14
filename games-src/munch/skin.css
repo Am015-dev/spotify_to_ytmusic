@@ -198,3 +198,6 @@ html.sk.sk .gxc-node.boss .gxc-disc{width:62px;height:62px}
   .gxc-head .gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:keep-all;hyphens:none;font-size:clamp(17px,5.4vw,21px)}
   .gxc-act small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
+/* the bulb bubble: its link and its OK button share one row in the flow (the kit pins a row to the corner for coach bubbles) */
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 0}
+.gxh-bub.gxh-bulbb .dk-bok{flex:none;min-width:56px;margin:-8px -8px -8px auto}

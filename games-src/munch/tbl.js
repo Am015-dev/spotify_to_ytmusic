@@ -42,17 +42,31 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
 // Every box is judged where it LANDS (its layout box), not mid-animation, so a card still sliding in is fitted at once, never skipped.
 function tbBox(e){const r=e.getBoundingClientRect();if(!e.getAnimations().length)return r;const h=e.offsetHeight,w=e.offsetWidth;   // layout box: the offset chain is untouched by transforms
   let p=e.offsetParent;if(!p)return r;const q=p.getBoundingClientRect();const top=q.top+p.clientTop+e.offsetTop-p.scrollTop;return {top,bottom:top+h,width:w,height:h}}
-function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
-  // the table can change size without a render (the dock grows, a toast, the address bar): fit again on the next frame
-  try{if(TB.roT!==tb&&typeof ResizeObserver==='function'){TB.ro=TB.ro||new ResizeObserver(()=>{cancelAnimationFrame(TB.raf);TB.raf=requestAnimationFrame(()=>{try{tbFit()}catch(e){}})});TB.ro.disconnect();TB.ro.observe(tb);TB.roT=tb}}catch(e){}
-  ar.classList.remove('tight','tight2','tight3','cmp','cmp2');if(!ar.querySelector(':scope>.vs'))return;
+// ROOT CAUSE (R47-R53 clips): the fight was sized from guessed heights (--res), the ladder's last step (compact) could still be taller than
+// the table, and the fit ran only on a render or a table resize, so a roll box, an image or a font arriving later went unchecked.
+// Now: every visible box is MEASURED; the ladder tries normal > tight > tight2 > compact > compact without tiles; if the measured content is still
+// taller (or wider) than the table, the whole fight is scaled into the table box (a final transform from measured sizes, so it cannot poke out);
+// and the arena and its children are watched, so any later size change re-fits before the next paint.
+function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;
+  if(TB.fitting)return;TB.fitting=1;try{tbFit0(ar,tb)}finally{TB.fitting=0}
+  try{tbWatch(ar,tb)}catch(e){}}
+// one observer for the table, the arena and every child of the arena: fit again at once (observer callbacks run before paint), at most 8 times a frame
+function tbWatch(ar,tb){if(typeof ResizeObserver!=='function')return;
+  if(!TB.ro){TB.ro=new ResizeObserver(()=>{const f=performance.now()|0;if(TB.roF!==f>>4){TB.roF=f>>4;TB.roN=0}if(++TB.roN>8){cancelAnimationFrame(TB.raf);TB.raf=requestAnimationFrame(()=>{try{tbFit()}catch(e){}});return}try{tbFit()}catch(e){}});
+    TB.mo=typeof MutationObserver==='function'?new MutationObserver(()=>{try{tbFit()}catch(e){}}):null}
+  const kids=[...ar.children,...ar.querySelectorAll('.vs>*,.row.mons>.mon,img')];const key=kids.length;if(TB.roT===tb&&TB.roA===ar&&TB.roK===key)return;
+  TB.ro.disconnect();TB.ro.observe(tb);TB.ro.observe(ar);for(const k of kids)TB.ro.observe(k);TB.roT=tb;TB.roA=ar;TB.roK=key;
+  if(TB.mo){TB.mo.disconnect();TB.mo.observe(ar,{childList:true,subtree:true})}}
+function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('transform');ar.style.removeProperty('transform-origin');
+  ar.classList.remove('tight','tight2','tight3','cmp','cmp2','squash');if(!ar.querySelector(':scope>.vs'))return;
   // the score pill never outgrows the table (a long rival name next to its portrait): shrink it to fit
   {const sl=ar.querySelector(':scope>.sline .sl1');if(sl){sl.style.removeProperty('zoom');const w=sl.getBoundingClientRect().width,aw=ar.clientWidth-6;if(w>aw&&aw>100)sl.style.zoom=(aw/w).toFixed(3)}}
   const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
-  // out: anything of the fight above or below the table, or a monster tile under the score line
+  // every visible box of the fight (decoration aside: the spinning-die sprite, the crossed swords), judged where it lands
+  const boxes=()=>{const o=[];for(const e of ar.querySelectorAll('*')){if(e.closest('.die3sp,.vsx,svg,.die3'))continue;if(!shown(e))continue;const r=tbBox(e);if(!r.width||!r.height)continue;o.push([e,r])}return o};
+  // out: anything of the fight above or below the table, or a monster card under the score line
   const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
-    for(const e of ar.querySelectorAll('.fbtns,.score .num,.score .yn,.row.mons .mon,.row.mons .card,.row.mons .mon>.row,.row.mons .gchip,.hsav,.rollbox,.row.small')){if(!shown(e))continue;const r=tbBox(e);if(!r.width)continue;
-      if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
+    for(const [e,r] of boxes()){if(r.top<t.top-0.5||r.bottom>t.bottom+0.5)return true;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
   const n=ar.querySelectorAll('.row.mons .mon').length;let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.offsetWidth;
   const shrink=(min,steps)=>{for(let k=0;k<steps&&out()&&cw>min;k++){cw=Math.max(min,cw*.9);ar.style.setProperty('--cw',cw.toFixed(1)+'px')}};
   const compact=()=>{ar.style.removeProperty('--cw');ar.classList.remove('tight','tight2');ar.classList.add('cmp');ar.querySelectorAll('.cn').forEach(m=>m.style.removeProperty('font-size'))};
@@ -60,6 +74,11 @@ function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySele
   else{shrink(56,3);if(out()){ar.classList.add('tight');shrink(56,8)}if(out()){ar.classList.add('tight2');shrink(56,8)}if(out())compact()}
   // a big pick in the dock leaves a sliver of table: keep the readout; the monster tiles go while the question is open (nothing can be dropped on them then)
   if(ar.classList.contains('cmp')&&out()&&!ar.querySelector('.fbtns')&&typeof G!=='undefined'&&G.q)ar.classList.add('cmp2');
+  // last step, from measured sizes: scale the whole fight into the table box (it can only shrink, never poke out)
+  if(out()){const t=tb.getBoundingClientRect(),a=ar.getBoundingClientRect();let T=1e9,B=-1e9,L=1e9,R=-1e9;
+    for(const [e,r] of boxes()){const x=e.getBoundingClientRect();T=Math.min(T,r.top);B=Math.max(B,r.bottom);L=Math.min(L,x.left);R=Math.max(R,x.right)}
+    if(B>T){const k=Math.min(1,(t.height-4)/(B-T),(t.width-4)/Math.max(1,R-L));const dy=t.top+2+((t.height-4)-k*(B-T))/2-a.top-k*(T-a.top),dx=(t.left+t.right)/2-a.left-k*((L+R)/2-a.left);
+      ar.classList.add('squash');ar.style.transformOrigin='0 0';ar.style.transform=`translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${k.toFixed(4)})`}}
   clearTimeout(TB.fitT);if(ar.querySelector('.row.mons .card')&&[...ar.querySelectorAll('*')].some(e=>e.getAnimations().length))TB.fitT=setTimeout(()=>{try{tbFit()}catch(e){}},700)}
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};

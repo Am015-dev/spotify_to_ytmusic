@@ -43,7 +43,7 @@ A browser version of the rules of the original game (original publisher, 2001). 
   - Rewards only arrive when the fight ends. Removing the last monster ends the fight at once (the July 2018 ruling).
   - One helper, who is bribed with a promised number of treasures. The helper takes the promised cards first [H1]. The helper gains no level, except an Elf, who gains one per monster killed (never the winning level [H5]).
 - **Running away:** roll a d6 for each monster; 5+ gets away.
-  - Elf +1, Halfling −1 (base printing), item and monster modifiers apply.
+  - Elf +1, item and monster modifiers apply. A Halfling has no run-away penalty: after a failed roll they may discard a card to roll again, once.
   - Wizard flight gives +1 per discarded card, up to 3.
   - A monster that "won't pursue" level X or below lets such heroes walk away. Bad Stuff applies monster by monster.
   - Removing one monster and fleeing the rest gives no reward.

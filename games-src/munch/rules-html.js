@@ -36,7 +36,7 @@ const RULES_HTML=`
 <li><b>Warrior:</b> win ties. Discard up to 3 cards in a fight for +1 each.</li>
 <li><b>Wizard:</b> discard up to 3 cards for +1 each to run away. Discard your whole hand (3+ cards) to charm a single monster away and keep its treasure.</li>
 <li><b>Thief:</b> discard a card to give a player in a fight −2 (once per victim per fight). Discard a card to try to steal a small item: roll 4+ or lose a level.</li>
-<li><b>Cleric:</b> discard up to 3 cards for +3 each against undead.</li>
+<li><b>Cleric:</b> Resurrection: on your turn, instead of kicking open a new door, take the top door discard and discard a card from your hand to pay. Turning: discard up to 3 cards for +3 each against undead.</li>
 </ul>
 <p class="small muted">A half-blood card lets you have two races, and a double-class card two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. Names, card texts and art in this game are original. The rules follow the real card game.</p>
 <section class="credits-audio">

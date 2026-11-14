@@ -201,3 +201,8 @@ function hlpUncover(){if(typeof GXH==='undefined'||!_hlpInit||!hlpCovers())retur
 (function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit){GXH.phase(hlpPhase());hlpUncover()}}catch(e){}return r}})();
 setInterval(()=>{try{if(_hlpInit&&G){hlpClean();GXH.phase(hlpPhase());hlpUncover()}}catch(e){}},250);
 hlpAfter();
+// the bulb's help is ONE helper that settles: its ring pulses 3 times and its finger taps 3 times, then both hold still (the kit loops them);
+// the bubble gets an OK button, and while it is open the ★ badge and every other pulse step aside (tbl.css)
+(function(){const done=new WeakSet();const tame=()=>{for(const f of document.querySelectorAll('.gxh-finger')){if(done.has(f))continue;done.add(f);for(const a of f.getAnimations())try{a.effect.updateTiming({iterations:3})}catch(e){}}
+  for(const b of document.querySelectorAll('.gxh-bulbb')){if(b.querySelector('.dk-bok'))continue;const r=b.querySelector('.gxh-row2')||b;const k=document.createElement('button');k.type='button';k.className='gxh-ok dk-bok';k.textContent='OK';k.addEventListener('click',e=>{e.stopPropagation();try{GXH.hide()}catch(x){}});r.appendChild(k)}};
+  try{new MutationObserver(()=>{try{tame()}catch(e){}}).observe(document.body,{childList:true})}catch(e){}})();

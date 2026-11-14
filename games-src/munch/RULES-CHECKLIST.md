@@ -3,7 +3,7 @@
 Every rule of the original rulebook this game adapts (the 2001 base game, current rules sheet), numbered. Each number has exactly one assertion in `logic-test.js` that builds the position in the real engine, acts, and checks the exact result. Written from the published rules, not from the engine or the builders' tests. Regenerate with `node logic-test.js --md`.
 
 Sources: the published rulebook and FAQ (public rules pages), cross-checked against `rules-notes.md`.
-Open interpretations ([H]): Halfling keeps the printed -1 to run away (the 2010 errata removed it); Charm needs at least 3 cards (2010 errata); Resurrection takes the top door discard (the rules sheet text).
+Open interpretations ([H]): Halfling has no -1 to run away and may discard a card to reroll a failed run-away once (rows 76-78, 124); Charm needs at least 3 cards (2010 errata); Resurrection takes the top door discard (the rules sheet text).
 
 ## Setup
 

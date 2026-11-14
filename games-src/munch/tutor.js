@@ -128,7 +128,7 @@ function tutSteps(){
    ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
  {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
- {id:'listen',title:'Listen at the door',say:'Each turn starts with a free door card. Tap your new card.',target:()=>tcard('lizards'),
+ {id:'listen',title:'Listen at the door',say:'You listened at the door: a free door card, just this once. Tap your new card.',target:()=>tcard('lizards'),
    wait:{type:'tap',match:a=>a.what==='card'&&kdef(a.id)==='lizards'},ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!tcard('lizards')&&tclear()},
  {id:'kick2',title:'Your turn again',say:'Your turn. Kick the door again.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
