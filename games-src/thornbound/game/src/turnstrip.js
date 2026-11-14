@@ -204,3 +204,19 @@ window.tbShowGoal=showGoal;
 // the tutorial can start holding a message that is already on screen: keep the strip's words true (repaints only when they change)
 window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.started&&UI.card&&typeof GXT!=='undefined'&&GXT.active())paint()}catch(x){}},200);
 })();
+// ---- tap guard (R64): a fast second tap must not fall through to the panel under an overlay that just closed.
+// For 350 ms after any overlay closes (Goal card, message card, pop-up, glossary, a modal, or a hint bubble closed by a tap) every tap is swallowed.
+(function(){const MS=350,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0;
+  const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'));
+  const arm=()=>{until=performance.now()+MS};
+  window.TBTAPGUARD={get until(){return until},arm,ms:MS,get on(){return performance.now()<until}};
+  const block=e=>{if(performance.now()<until&&e.isTrusted!==false){if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()}};
+  for(const t of ['pointerdown','pointerup','mousedown','mouseup','touchstart','touchend','click','dblclick'])window.addEventListener(t,block,{capture:true,passive:false});
+  // a tap inside an overlay that closes it (checked right after the tap's own handlers ran)
+  window.addEventListener('click',e=>{const o=e.target&&e.target.closest&&e.target.closest(OV);if(!o)return;setTimeout(()=>{if(gone(o))arm()},0)},true);
+  // overlays that close on their own or from code: removed modal cards, or the message/pop-up panels getting hidden
+  const isOv=n=>n.nodeType===1&&n.matches&&(n.matches('#tbgoal,[aria-modal="true"],.gx-goal')||!!n.querySelector('#tbgoal,[aria-modal="true"],.gx-goal'));
+  const mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='childList'){for(const n of m.removedNodes)if(isOv(n)){arm();return}}
+    else if(m.type==='attributes'&&m.target.hidden&&m.oldValue===null&&/^(pc|ppop|gdef|start)$/.test(m.target.id)){arm();return}}});
+  const go=()=>mo.observe(D.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden'],attributeOldValue:true});
+  if(D.body)go();else D.addEventListener('DOMContentLoaded',go)})();
