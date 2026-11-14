@@ -390,9 +390,39 @@ html.ph .arena.tight2 .sline .n{font-size:26px;-webkit-text-stroke-width:1px;tex
 html.ph .arena.tight2 .sline .sl1 i{font-size:.72rem}
 html.ph .arena.tight2 .sline>:not(.sl1){display:none}
 html.ph .arena.tight2 .row.mons{margin-bottom:2px}
-/* tight3: the drop targets (hero side, monster cards) always stay; the score overlay goes instead */
-html.ph .arena.tight3>:is(.sline,.row.small,.rollbox){display:none!important}
-html.ph .arena.tight3:has(>.sline){padding-top:0}
-html.ph .arena.tight3:has(>.vs){grid-template-rows:auto;align-content:start}
-html.ph .arena.tight3>.fbtns{grid-row:2!important}html.ph .arena.tight3>.fbtns button{min-height:44px}
+/* compact fight (3+ monsters, or a table too short for 48 px cards): a "YOU 6 vs 8 MONSTERS" readout made of the two drop targets,
+   then one named tile per monster (name 14 px, tile 44 px tall), then the buttons. Replaces the old 18 px cards. */
+.arena .yn,.arena .mlv{display:none}
+html.ph .arena.cmp:has(>.vs){display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:5px;padding:2px!important}
+html.ph .arena.cmp>:is(.sline,.rollbox,.row.small){display:none!important}
+html.ph .arena.cmp .vs{display:flex!important;align-items:center;justify-content:center;gap:8px;width:100%}
+html.ph .arena.cmp .vs .vsx{display:none!important}
+html.ph .arena.cmp .vs .score{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:5px!important;width:auto!important;height:44px!important;min-height:44px;margin:0!important;padding:0 11px!important;border-radius:22px!important;background:rgba(18,8,3,.86)!important;box-shadow:0 0 0 2px #0d0603!important;border:0!important;align-self:center!important;animation:none}
+html.ph .arena.cmp .vs .score :is(.sl,.hsav){display:none!important}
+html.ph .arena.cmp .vs .score .yn{display:block!important;order:0;font:700 14px/1 var(--title);font-style:normal;letter-spacing:.02em;color:#f3e3c0;white-space:nowrap}
+html.ph .arena.cmp .vs .score .num,html.dk-clash.dk-clash .arena.cmp .vs .score .num{display:block!important;order:0!important;margin:0!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;filter:none!important;font:900 26px/1 var(--title)!important;color:#fff;-webkit-text-stroke:1px #0d0603;paint-order:stroke fill;text-shadow:0 2px 0 #0d0603}
+html.ph .arena.cmp .vs .score.hero.win .num{color:#9dff8a!important}html.ph .arena.cmp .vs .score.hero.lose .num{color:#ff8a7a!important}
+html.ph .arena.cmp .vs .score.mons .yn{order:2}html.ph .arena.cmp .vs .score.mons .num{color:#ff9d88!important}html.ph .arena.cmp .vs .score.mons.win .num{color:#ff6a55!important}
+html.ph .arena.cmp .row.mons{display:flex;flex-wrap:nowrap;gap:5px;justify-content:center;margin:10px 0 0!important;width:100%}
+html.ph .arena.cmp .row.mons .mon{position:relative;display:block;flex:1 1 0;min-width:0;max-width:200px;min-height:46px}
+html.ph .arena.cmp .row.mons .mon>:is(.small.mstr,.row){display:none!important}
+html.ph .arena.cmp .row.mons .card{--w:100%;width:100%;height:46px;aspect-ratio:auto;margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:1fr;align-items:center;column-gap:6px;padding:2px 3px;border-radius:9px;container-type:normal;animation:dkTileIn .35s ease-out}
+html.ph .arena.cmp .row.mons .card>:not(.cn):not(.aw):not(.hit){display:none!important}
+html.ph .arena.cmp .row.mons .card .aw{grid-column:1;grid-row:1;width:38px;height:38px;margin:0;border-radius:6px}
+html.ph .arena.cmp .row.mons .card .aw>:not(.art):not(svg){display:none!important}
+html.ph .arena.cmp .row.mons .card .cn{grid-column:2;grid-row:1;padding:0;font:800 14px/1 var(--cardt)!important;letter-spacing:-.02em;max-height:42px;text-align:left;white-space:normal;overflow-wrap:break-word;hyphens:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .arena.cmp .row.mons .mon .mlv{display:grid;place-items:center;position:absolute;z-index:4;right:4px;top:-12px;min-width:22px;height:20px;padding:0 5px;border-radius:10px;background:#5a1408;color:#fff;font:800 14px/1 var(--title);box-shadow:0 0 0 1.5px #0d0603;pointer-events:none}
+/* three or more: no art, the whole tile is the name */
+html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card{grid-template-columns:minmax(0,1fr);padding:2px 3px}
+html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card .aw{display:none!important}html.ph .arena.cmp .row.mons:has(.mon:nth-child(3)) .card .cn{grid-column:1}
+html.ph .arena.cmp>.fbtns{width:100%;max-width:330px;align-self:center;justify-content:center}html.ph .arena.cmp>.fbtns button{min-height:44px}
+html.ph .arena.cmp2 .row.mons{display:none!important}
+html.ph .arena.cmp .row.mons .card .cn{-webkit-line-clamp:3!important}
+/* three or more monsters: the decks step aside and the fight takes the whole table, so every name fits at 14 px */
+html.ph .felt:has(>.arena.cmp .row.mons .mon:nth-child(3))>.pile{display:none!important}
+html.ph .felt:has(>.arena.cmp .row.mons .mon:nth-child(3))>.arena{grid-column:1/-1}
+@keyframes dkTileIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+/* phone fight: the monster card lands with a scale-in that never leaves its own box (the slam from 70 px above poked out of the table) */
+html.ph .arena .row.mons .card.fly{animation:dkLand .5s cubic-bezier(.2,1,.3,1)}
+@keyframes dkLand{0%{transform:scale(.55) rotate(-6deg);opacity:0}60%{transform:scale(1) rotate(1deg);opacity:1}80%{transform:scale(.97)}100%{transform:none}}
 .dk-tutoff{pointer-events:none!important}
