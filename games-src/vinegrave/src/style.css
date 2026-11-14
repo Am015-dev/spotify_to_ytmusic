@@ -580,3 +580,31 @@ body.vg-pick #row .cd.mc:not(.glow){filter:none}
   body.vg-b2 #hand .cd{min-height:0}
 }
 body.vg-squeeze #map,body.vg-squeeze #track{visibility:hidden;pointer-events:none}
+/* FIXED10: at 375x553 the whole research track fits above the dock; the market is 3 x 2 compact cards with the effect in 14px text */
+@media (max-width:999px) and (max-height:600px){
+  body.vg-b2 #bd{gap:3px 4px}
+  body.vg-b2 #map{min-height:0}
+  body.vg-b2 #track{padding:2px 3px;gap:0}
+  body.vg-b2 #track .tcs{gap:1px;min-height:0}
+  body.vg-b2 .tc .tm{min-height:0;gap:1px;flex-wrap:nowrap}
+  body.vg-b2 #track .tc{padding:0;min-height:0;border-radius:6px}
+  body.vg-b2 .tc .tn{font-size:14px;line-height:14px}
+  body.vg-b2 .tc .tn .star{width:14px;height:14px}
+  body.vg-b2 .tc .tm i{width:11px;height:11px;border-width:1.5px}
+  body.vg-b2 #row .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+  body.vg-b2 #row .cd.mc{--mh:47px;min-width:0}
+  body.vg-b2 #row .cd.mc .pic{inset:0;height:100%!important;opacity:.35}
+  body.vg-b2 #row .cd.mc .pic::after{display:none}
+  body.vg-b2 #row .cd.mc .mef{display:flex;left:36px;right:0;top:0;bottom:0;min-height:0;padding:0 3px;border-top:0;border-left:2px solid #c9a35a;justify-content:flex-start;gap:2px;text-align:left;font-size:14px;line-height:15px}
+  body.vg-b2 #row .cd.mc .mef .ic{display:none}
+  body.vg-b2 #row .cd.mc .mef span{-webkit-line-clamp:3}
+  body.vg-b2 #row .cd.mc .mtop{display:contents}
+  body.vg-b2 #row .cd.mc .mcost{position:absolute;left:5px;top:3px}
+  body.vg-b2 #row .cd.mc .tr,body.vg-b2 #row .cd.mc .msp{display:none}
+  body.vg-b2 #row .cd.mc .mfree,body.vg-b2 #row .cd.mc .mvp{position:absolute;left:2px;bottom:3px;z-index:5;height:18px;line-height:18px;padding:0 3px;font-size:14px;gap:0}
+  body.vg-b2 #row .cd.mc .mfree{background:#3fa07a;border-radius:9px}
+  body.vg-b2 #row .cd.mc .need{left:2px;right:auto;top:auto;bottom:3px;line-height:18px;padding:0 3px;gap:1px}
+  body.vg-b2 #row .cd.mc .need .ic{width:12px;height:12px}
+}
+#row .cd.mc[data-badge]::after{display:none}   /* the market card's glow already points; the badge would cover its Free chip */
+@media (max-width:999px){body.vg-b2 #track .tcs{min-height:0}body.vg-b2 #track .tc{min-height:0}}   /* every phone height: the nine rows shrink to fit instead of running under the dock */
