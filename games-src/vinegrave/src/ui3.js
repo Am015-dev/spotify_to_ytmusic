@@ -127,17 +127,17 @@ const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
 <h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
-<h3>Your turn</h3><p>Do one action, then the next explorer goes. Pass to sit out.</p>
-<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread does nothing.</li>
-<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then is discarded. A Plane pays any icon.</li>
+<h3>Your turn</h3><p>Do one main action, then the next explorer goes. Playing a starting coin or compass card is free. Pass to sit out.</p>
+<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread has no effect, but you can spend it as a Boot of travel.</li>
+<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then waits in your play area until the round ends. A Plane pays any icon (2 coins make one). At a camp, the second explorer on a site pays double.</li>
 <li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>
 <li><b>Fight</b> a guardian where your explorer stands. Pay its cost for 5 points and a boon.</li>
 <li><b>Buy</b>: items go under your deck. Artifacts work at once.</li>
 <li><b>Research</b>: climb the track. Pay each row's cost for its bonus.</li></ul>
-<h3>Free actions</h3><p>Use a boon, or set one idol in a shrine.</p>
-<h3>End of a round</h3><p>Explorers come home. Anyone with a guardian gains Dread.</p>
+<h3>Free actions</h3><p>Use a boon once (then it is spent). Set idols in shrines: as many as you like in a turn, but each of the 4 slots only once.</p>
+<h3>End of a round</h3><p>Explorers come home. Each explorer leaving a site that still has a guardian brings back a Dread card. Played cards are shuffled under your deck.</p>
 <h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>One idol a turn into a shrine. 4 shrine slots. Boons come at once.</li><li>No helpers and no research bonus tiles. First arrivals get rewards.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
+<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>Shrine bonuses, assistants and research bonuses are this game's own.</li><li>The research track is a plain ladder of rows, not a map of paths.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -148,12 +148,13 @@ function refInit() {
     { id: 'arts', title: 'Artifacts', items: V.ARTS.map(cardItem) },
     { id: 'basic', title: 'Starting cards', items: ['grant', 'trail', 'dread'].map(cardItem) },
     { id: 'guards', title: 'Guardians', items: V.GUARDS.map(g => ({ id: 'g-' + g, name: V.GUARD[g].name, text: 'Overcome: pay ' + V.resText(V.GUARD[g].cost) + '. ' + V.GUARD[g].text, tags: ['Guardian'], meta: '5 points', pic: { guard: g } })) },
+    { id: 'assistants', title: 'Assistants', items: V.ASST.map(a => ({ id: a.id, name: a.name, text: 'Once a round: ' + V.opText(a.s) + '. Gold side: ' + V.opText(a.gd) + '.', tags: ['Notebook rows ' + V.ASST_REC.join(' and ') + ' hire, ' + V.ASST_UP.join(' and ') + ' upgrade'].concat(a.main ? ['Your action'] : ['Free']) })) },
     { id: 'ruins', title: 'Ruins', items: V.S1.concat(V.S2).map(t => ({ id: 's-' + t, name: V.SITE[t].name, text: 'Dig: gain ' + V.resText(V.SITE[t].rew) + '.', tags: ['Level ' + V.SITE[t].lvl], meta: 'Discover for ' + V.DISC[V.SITE[t].lvl] + ' compasses', pic: { site: t } })) },
     { id: 'camp', title: 'Camp sites', items: V.CAMP.map(c => ({ id: 's-' + c.id, name: c.name, text: 'Dig: gain ' + V.resText(c.rew) + '. Travel: ' + c.cost.map(t => V.TNAME[t]).join(' + ') + '.', tags: ['Camp'], meta: 'always open', pic: { site: c.id } })) },
     { id: 'idols', title: 'Idols', items: V.IDOLS.map(i => ({ id: 'i-' + i, name: V.IDOL[i].name, text: 'Found when you discover a ruin: gain ' + V.resText(V.IDOL[i].gift) + '. Worth 3 points.', tags: ['Idol'], meta: '3 points', pic: { idol: i } })) }
   ];
   GX.reference(S, { id: 'refd', title: 'All cards', label: 'Cards', button: false,
-    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic;
+    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic; if (!P) return null;
       if (P.card) return `<div style="width:${w}px;--cw:${w}px">${cardHTML(P.card, {})}</div>`;
       const st = P.guard ? 'guard-' + P.guard : P.site ? 'site-' + P.site : P.idol, sym = P.guard ? 'guard' : P.site ? 'leaf' : 'idol';
       const d = document.createElement('div'); d.style.cssText = `width:${w}px;height:${w}px;border-radius:12px;background:#3c5a3f;display:flex;align-items:center;justify-content:center`; d.setAttribute('data-art', st);
@@ -189,7 +190,7 @@ function helpPhase() {
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'play') return $(`#hand .cd[data-i="${m.i}"]`); if (m.s != null) return $(`.site[data-i="${m.s}"]`); if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
-  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`); if (m.t === 'asst') return $(`#extra [data-a=asst][data-k="${m.k}"]`);
   if (m.t === 'ans') { if (G.q.h === 'site' && m.v != null) return $(`.site[data-i="${m.v}"]`); if (G.q.h === 'buy' && m.v != null) return $(`#row .cd[data-r="${m.v}"]`); return $('#qbox'); }
   return null;
 }
@@ -205,7 +206,7 @@ function helpInit() {
       { title: 'Travel', text: 'Each card pays one travel icon. A Plane pays any icon.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses flip a hidden ruin. You get an idol and loot.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay its cost while you are there: 5 points and a boon.', pic: P('guard') },
-      { phase: 'idol', title: 'Shrines', text: 'Set one idol a turn in a shrine for a boon.', pic: P('idol') }],
+      { phase: 'idol', title: 'Shrines', text: 'Set idols in shrines for a free boon. Each slot once.', pic: P('idol') }],
     avoid: '.glow,#pacts .btn,#qbox .btn,#insp' });
   if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
 }

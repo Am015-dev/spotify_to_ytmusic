@@ -62,7 +62,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .site .rew{position:absolute;left:4px;right:4px;bottom:4px;display:flex;justify-content:center;align-items:center;gap:1px 3px;flex-wrap:wrap;background:rgba(20,12,4,.88);color:#fff3d6;border-radius:6px;padding:0 3px;line-height:20px}
 .site .rew b{font-size:16px;font-weight:900}.site .rew .ic{width:16px;height:16px;margin-right:1px}
 .site .nm{display:none}
-.site .gd{position:absolute;left:22%;right:22%;top:16%;bottom:30%;border-radius:50%;background:radial-gradient(circle,rgba(122,42,26,.9) 0,rgba(42,13,8,.65) 62%,transparent 70%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,90,40,.75);z-index:2;animation:gdpulse 2.4s ease-in-out infinite}
+.site .gd{position:absolute;left:22%;right:22%;top:16%;bottom:30%;border-radius:50%;background:radial-gradient(circle,rgba(122,42,26,.9) 0,rgba(42,13,8,.65) 62%,transparent 70%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,90,40,.75);z-index:2;animation:gdpulse 2.4s ease-in-out 3}
 .site .gd svg{width:70%;height:70%}.site .gd.hasart{background-size:contain!important}.site .gd.hasart svg{display:none}
 .site .occ{position:absolute;right:3px;top:2px;width:24px;height:33px;z-index:3}
 .site.taken .pic{filter:brightness(.82)}
@@ -70,9 +70,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* glow = you can use it now; the rest dims while it is your pick */
 .site.glow,.cd.glow,#track.glow{box-shadow:inset 0 0 0 2px var(--vg-paper),0 0 0 3px var(--glow),0 0 16px 4px rgba(255,211,106,.65)}
 .site.glow,.cd.glow{border-color:#7a4f10}
+.site.can,.cd.can,#track.can{box-shadow:0 0 0 2px rgba(255,226,160,.55)}
 body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick #hand .cd:not(.glow){filter:saturate(.55) brightness(.68)}
 .site.sel,#row .cd.sel{transform:translateY(-4px) scale(1.06);z-index:4;box-shadow:inset 0 0 0 2px var(--vg-paper),0 0 0 3px #fff,0 0 0 6px var(--glow),0 10px 22px rgba(0,0,0,.6)}
-#map.pawnsel .site.glow{animation:siteinvite 1s ease-in-out infinite alternate}
+#map.pawnsel .site.glow{animation:siteinvite 1s ease-in-out 6 alternate}
 @keyframes siteinvite{to{box-shadow:inset 0 0 0 2px var(--vg-paper),0 0 0 4px #fff,0 0 22px 8px rgba(255,211,106,.85)}}
 /* ---------- research track: rows left to right, the temple last ---------- */
 #track{grid-area:track;display:flex;flex-direction:column;gap:3px;padding:4px 6px;border-radius:12px;background:rgba(20,14,6,.9);border:2px solid #7a6440;color:#fff3d6;text-align:center;min-width:0}
@@ -129,13 +130,15 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 .btn:has(.pv){flex-wrap:wrap;text-align:center}
 #qbox{display:flex;flex-direction:column;gap:6px;background:#fff3d6;border:2px solid var(--gx-accent);border-radius:12px;padding:8px}
 #qbox .qchoices{display:flex;flex-direction:column;gap:6px}
-#qbox .qcards{display:flex;gap:6px;overflow-x:auto;padding:4px 2px}
+#qbox .qcards{display:flex;gap:4px;overflow-x:auto;padding:4px 2px}
 #qbox .qcards .cd{flex:0 0 72px}
+@media (max-width:999px){#qbox .qcards{overflow-x:auto}#qbox .qcards .cd{flex:1 0 48px;min-width:48px;max-width:84px;margin:0}}
 #myrow{display:flex;align-items:center;gap:8px;min-height:46px}
 #pawns{display:flex;gap:2px;flex:none}
-.pawn{display:block;width:34px;height:46px;padding:2px 3px;border:0;background:transparent;border-radius:10px}
+span.pawn{width:34px;padding:2px 3px}
+.pawn{display:block;width:44px;height:48px;padding:2px 8px;border:0;background:transparent;border-radius:10px}
 .pawn.mine{touch-action:none;cursor:grab}
-.pawn.glow{background:rgba(255,211,106,.5);box-shadow:0 0 0 2px #c98a2e;animation:pawnbob 1.4s ease-in-out infinite}
+.pawn.glow{background:rgba(255,211,106,.5);box-shadow:0 0 0 2px #c98a2e;animation:pawnbob 1.4s ease-in-out 3}
 .pawn.sel{background:#ffd36a;box-shadow:0 0 0 3px #7a4f10;transform:translateY(-4px)}
 @keyframes pawnbob{50%{transform:translateY(-3px)}}
 #myres{display:flex;flex:1;justify-content:space-around;gap:2px;min-width:0}
@@ -162,7 +165,7 @@ body.vg-pick #map .site:not(.glow),body.vg-pick #row .cd:not(.glow),body.vg-pick
 #board.dropok{outline-offset:-6px}
 .site.drophover{transform:scale(1.1);z-index:5}
 @media (max-width:999px) and (max-height:720px){
-  #opp .op{min-height:40px}#opp .op .pts b{font-size:19px}
+  #opp .op{min-height:44px}#opp .op .pts b{font-size:19px}
   #row .cd .cn{display:none}
   #track .tl,#row .tl{display:none!important}
   #track .tc{min-height:40px}
@@ -264,7 +267,7 @@ html.gx-reduce .rban,html.gx-reduce .rstars span{animation:none}
 #fx.good:not([hidden]){background:radial-gradient(circle,rgba(60,48,8,.3),rgba(0,0,0,.55))}
 .fxcard{position:relative;overflow:visible;min-width:min(300px,86vw)}
 .fxcard .por{width:min(180px,44vw);height:min(180px,44vw);position:relative;z-index:1}
-.fxcard .rays{position:absolute;left:50%;top:96px;width:340px;height:340px;margin:-170px 0 0 -170px;background:repeating-conic-gradient(rgba(255,140,80,.22) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:rays 6s linear infinite;pointer-events:none;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+.fxcard .rays{position:absolute;left:50%;top:96px;width:340px;height:340px;margin:-170px 0 0 -170px;background:repeating-conic-gradient(rgba(255,140,80,.22) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:rays 6s linear 3;pointer-events:none;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
 .fxcard.good .rays{background:repeating-conic-gradient(rgba(255,215,110,.3) 0 10deg,transparent 10deg 20deg)}
 .fxcard b{font-size:1.6em;position:relative;z-index:1}.fxcard span,.fxcard small{position:relative;z-index:1}.fxcard small{display:block;opacity:.7;margin-top:4px}
 #bd.shake{animation:shake .5s ease}
@@ -281,7 +284,7 @@ body:has(.gx-drawer.on) #toast,body:has(.gxc-res-on) #toast{display:none}
 .gxc-lock{font-size:0!important;width:18px;height:18px;background:center/contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4' y='10' width='16' height='12' rx='2' fill='%23e8b93a' stroke='%233a2a12' stroke-width='2'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='%233a2a12' stroke-width='2.4'/%3E%3C/svg%3E")}
 .gxc-node .gxc-disc{background-image:none!important}
 body:has(#fx:not([hidden])) #toast{display:none}
-.aimark{outline:4px solid #ff9a3c;outline-offset:2px;animation:aimark .6s ease-in-out infinite alternate;z-index:5}
+.aimark{outline:4px solid #ff9a3c;outline-offset:2px;animation:aimark .6s ease-in-out 6 alternate;z-index:5}
 @keyframes aimark{from{box-shadow:0 0 0 0 rgba(255,154,60,.9)}to{box-shadow:0 0 0 8px rgba(255,154,60,0)}}
 .landed{animation:landed .42s cubic-bezier(.3,1.6,.5,1)}@keyframes landed{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 .vpop{position:fixed;z-index:73;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border-radius:12px;background:#1d2a14;color:#fff;border:2px solid #ffd36a;box-shadow:0 6px 18px rgba(0,0,0,.55);font-size:15px;font-weight:700;white-space:nowrap;animation:vpop 1.7s ease-out forwards}
@@ -363,3 +366,217 @@ html.gx-reduce .site .gd,html.gx-reduce .pawn.glow,html.gx-reduce #map.pawnsel .
 
 .rbtns{position:sticky;bottom:-18px;margin:0 -18px -18px;padding:10px 18px 18px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(rgba(10,22,15,0),rgba(10,22,15,.96) 22%);z-index:2}
 .rbox.many .rart{display:none}
+/* ================= W490 board view (body.vg-b2; ?b2=0 = old terraces) =================
+   one painted map with sites as places on trails, a vertical research path, guardians as big figures, a fanned hand */
+body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 54px;grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"opp opp" "row row" "map track";gap:5px 4px;padding:5px 6px 6px}
+body.vg-b2 #bd.hasart{background-size:cover!important;background-position:center!important;background-blend-mode:normal}
+body.vg-b2 #bd::before{background:radial-gradient(ellipse at 50% 55%,rgba(255,240,200,.05),rgba(10,16,10,.45))}
+body.vg-b2 #map{display:block;position:relative;min-height:250px;border-radius:16px;
+  background:radial-gradient(ellipse at 50% 50%,rgba(250,236,196,.0),rgba(60,40,10,.18));overflow:visible}
+body.vg-b2 #map .trails{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+body.vg-b2 #map .trails path{fill:none;stroke:#6a4318;stroke-width:1.1;stroke-dasharray:1.6 1.8;stroke-linecap:round;vector-effect:non-scaling-stroke;stroke-width:3;opacity:.75}
+body.vg-b2 .msign{position:absolute;left:-4px;writing-mode:vertical-rl;transform:rotate(180deg);font:800 14px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 2px;letter-spacing:.03em;pointer-events:none;z-index:1;box-shadow:0 2px 3px rgba(0,0,0,.35)}
+/* a site = a painted round place, its name on a banner, travel cost and loot as tokens */
+body.vg-b2 .site{--sd:56px;position:absolute;width:max(46px,calc(var(--sd) * var(--ms,1)));height:max(46px,calc(var(--sd) * var(--ms,1)));max-width:none;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #f4e6c0;padding:0;overflow:visible;background:#3c5a3f;
+  box-shadow:0 0 0 2px #5a3a14,0 6px 10px rgba(0,0,0,.55);flex:none;z-index:2}
+body.vg-b2 .site .pic{inset:0;border-radius:50%}
+body.vg-b2 .site.l0{--sd:54px}
+body.vg-b2 .site.l2{--sd:58px}
+body.vg-b2 .site .cost{left:-8px;top:-6px;bottom:auto;transform:none;flex-direction:column;padding:1px 3px;border-radius:9px;border:1px solid #6a4318;z-index:3}
+body.vg-b2 .site .cost .ic{width:14px;height:14px}
+body.vg-b2 .site .rew{left:auto;right:-10px;top:-8px;bottom:auto;width:auto;flex-wrap:nowrap;border-radius:10px;padding:0 4px;line-height:18px;background:#2a1a08;border:1.5px solid #f4e6c0;z-index:3}
+body.vg-b2 .site .rew b{font-size:14px}body.vg-b2 .site .rew .ic{width:14px;height:14px}
+body.vg-b2 .site .nm{display:block;position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);white-space:normal;text-align:center;width:max-content;font:800 14px/1.05 var(--gx-font,Georgia,serif);color:#3a240c;background:#f4e6c0;border:1px solid #6a4318;border-radius:3px;padding:0 4px;z-index:3;max-width:88px}
+body.vg-b2 .site.hid .nm{display:none}
+body.vg-b2 .site.hid .rew{right:auto;left:50%;transform:translateX(-50%);top:auto;bottom:-9px}
+body.vg-b2 .site .occ{right:-14px;left:auto;top:auto;bottom:4px;width:30px;height:38px;z-index:4;filter:drop-shadow(0 3px 2px rgba(0,0,0,.6))}
+body.vg-b2 .site .occ.hasart{background-size:contain!important;background-position:center bottom!important}
+body.vg-b2 .site .occ.hasart .meep{opacity:0}
+/* guardian: a big figure standing on the site */
+body.vg-b2 .site .gd{left:calc(var(--sd) * -.11);top:auto;right:auto;bottom:34%;width:calc(var(--sd) * 1.22);height:calc(var(--sd) * 1.22);transform-origin:50% 100%;border-radius:50%;border:3px solid #ff8a4a;background:#3a120a;box-shadow:0 0 0 2px #5a1a08,0 0 16px 4px rgba(255,90,40,.7);z-index:3}
+body.vg-b2 .site .gd.hasart{background-size:cover!important}
+body.vg-b2 .site.glow{box-shadow:0 0 0 3px var(--glow),0 0 18px 6px rgba(255,211,106,.8)}
+body.vg-b2 .site.sel{transform:translate(-50%,-50%) scale(1.12);z-index:6}
+body.vg-b2 .site.drophover{transform:translate(-50%,-50%) scale(1.18);z-index:6}
+body.vg-b2.vg-pick #map .site:not(.glow){filter:saturate(.7) brightness(.8)}
+/* research: a vertical path, the temple at the top, your notebook and magnifier climb it */
+body.vg-b2 #track{flex-direction:column;padding:4px 3px;border-radius:14px;background:linear-gradient(rgba(30,22,10,.55),rgba(30,22,10,.55)),url(media/track-bg.webp) center/cover;border:2px solid #c9a35a;gap:2px}
+body.vg-b2 #track .tl{display:block;font-size:14px;padding:0 2px;letter-spacing:0;background:none}
+body.vg-b2 #track .tcs{display:flex;flex-direction:column-reverse;gap:2px;flex:1}
+body.vg-b2 .tc{flex:1;min-height:0;border-radius:8px;background:rgba(244,230,192,.16);padding:1px 0;justify-content:center;flex-direction:row;flex-wrap:wrap;gap:1px}
+body.vg-b2 .tc .tn{font-size:13px;line-height:15px;width:100%}
+body.vg-b2 .tc .tm{min-height:0}
+body.vg-b2 .tc .tm i{width:15px;height:15px;border-radius:50%;border:2px solid var(--pc);background:#f4e6c0 url(media/token-notebook.webp) center/90% no-repeat}
+body.vg-b2 .tc .tm i.mg{background-image:url(media/token-glass.webp)}
+body.vg-b2 .tc.top{background:rgba(217,164,65,.5)}
+/* market: cards laid on the table */
+body.vg-b2 #row .tl{display:none}
+body.vg-b2 #row .cards{gap:4px}
+body.vg-b2 #row .cd{transform:rotate(calc((var(--r,0) - 2.5) * .6deg))}
+:root{--mpic:clamp(34px,6vh,64px)}
+/* tray: explorers as figures, goods as tokens with words, a fanned hand */
+body.vg-b2 .pawn{position:relative}
+body.vg-b2 .pawn .pa{position:absolute;inset:0}
+body.vg-b2 .pawn .pa.hasart{background-size:contain!important;background-position:center bottom!important}
+body.vg-b2 .pawn .pa.hasart+.meep{opacity:0}
+body.vg-b2 .rc .rv .ic{width:24px;height:24px;border-radius:50%}
+body.vg-b2 .rc .rv .ic.hasart svg{display:none}
+body.vg-b2 #hand{gap:0;padding-top:6px}
+body.vg-b2 #hand .cd{margin:0 2px;transform:rotate(calc(var(--k,0) * 2deg)) translateY(calc(var(--k,0) * var(--k,0) * .5px));transform-origin:50% 120%}
+body.vg-b2 #hand .cd.sel{transform:translateY(-16px) scale(1.08);z-index:5}
+@media (max-height:720px) and (max-width:999px){
+  body.vg-b2 #map{min-height:0}
+  body.vg-b2 .site{--sd:52px}body.vg-b2 .site.l0{--sd:48px}body.vg-b2 .site.l2{--sd:54px}
+  body.vg-b2 .site .nm{font-size:14px}
+  body.vg-b2 #track .tc{min-height:0}body.vg-b2 #track .tl{display:none!important}
+}
+@media (min-width:1000px){
+  body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 84px minmax(300px,26vw);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"opp opp opp" "map track row";padding:10px 16px;gap:10px 14px}
+  body.vg-b2 .site{--sd:min(110px,11vh)}body.vg-b2 .site.l0{--sd:min(100px,10vh)}body.vg-b2 .site.l2{--sd:min(118px,12vh)}
+  body.vg-b2 .site .nm{font-size:15px;max-width:160px}
+  body.vg-b2 .site .cost .ic,body.vg-b2 .site .rew .ic{width:18px;height:18px}
+  body.vg-b2 .site .occ{width:44px;height:56px;left:-20px}
+  body.vg-b2 .msign{font-size:15px}
+  body.vg-b2 #track .tl{font-size:14px}
+  body.vg-b2 .tc .tn{font-size:16px}body.vg-b2 .tc .tm i{width:20px;height:20px}
+  body.vg-b2 #row .tl{display:block}
+}
+/* G2 review R4: guided steps: only the target glows */
+body.vg-guided .glow.gq{box-shadow:none!important;animation:none!important;outline:none!important}
+body.vg-guided.vg-pick #map .site.gq,body.vg-guided.vg-pick #row .cd.gq,body.vg-guided.vg-pick #hand .cd.gq{filter:saturate(.55) brightness(.68)}
+/* ================= FIXED2 (R2 review): phone words, no clipped labels, 14px floor ================= */
+@media (max-width:999px){
+  body.vg-b2 #row .cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 5px}
+  body.vg-b2 #row .cd{transform:none}
+  body.vg-b2 #row .cd .pic{height:clamp(28px,4.4vh,40px)}
+  body.vg-b2 #row .cd .ef{display:block;font-size:14px;line-height:17px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:clip;letter-spacing:-.02em}
+  body.vg-b2 #row .cd .cost{top:3px;left:3px;font-size:14px;line-height:19px}
+  body.vg-b2 #row .cd .tr{top:3px;right:3px;width:20px;height:20px}
+  body.vg-b2 #row .cd .vp{top:3px;right:27px}
+  body.vg-b2 .site .nm{display:none}
+  body.vg-b2 .msign{font-size:14px;padding:6px 1px;left:-6px}
+  body.vg-b2 .tc .tn{font-size:14px}
+  body.vg-b2 #track .tl{display:none!important}
+  body.vg-b2 #bd{grid-template-columns:minmax(0,1fr) 68px}
+  body.vg-b2 #track{position:relative;padding-left:21px}
+  body.vg-b2 #track::before{content:'Research';position:absolute;left:2px;top:50%;translate:0 -50%;writing-mode:vertical-rl;transform:rotate(180deg);font:800 14px/1 var(--gx-font,Georgia,serif);color:#3a240c;background:rgba(246,232,196,.92);border:1.5px solid #6a4318;border-radius:4px 10px 10px 4px;padding:6px 1px;pointer-events:none;z-index:2}
+}
+@media (max-width:999px) and (max-height:760px){
+  body.vg-b2 #hand .cd .pic{aspect-ratio:auto;height:28px}
+  body.vg-b2 .msign .lx{display:none}
+  body.vg-b2 #promptrow{min-height:40px}
+  body.vg-b2 #hand{padding-top:2px}
+  body.vg-b2 #dockbody{gap:3px;padding-top:4px}
+  body.vg-b2 #map{min-height:200px}
+  body.vg-b2 .site{--sd:46px}body.vg-b2 .site.l0{--sd:44px}body.vg-b2 .site.l2{--sd:48px}
+  body.vg-b2 .tc{flex-wrap:nowrap;align-items:center;gap:2px}
+  body.vg-b2 .tc .tn{width:auto;line-height:14px}
+  body.vg-b2 .tc .tm i{width:13px;height:13px}
+}
+/* research assistants */
+.tag.asst .aic{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#c9cfd6;color:#1d2430;font:900 14px/1 var(--gx-font,Georgia,serif)}
+.tag.asst.gold .aic{background:#e8b84a;color:#3a240c}
+.tag.asst{min-height:44px;font-size:14px}
+.tc .tas{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#c9cfd6;color:#1d2430;font:900 14px/1 var(--gx-font,Georgia,serif);flex:none}
+@media (max-width:999px) and (max-height:760px){
+  body.vg-b2.vg-hasex #row .cd .pic{height:20px}
+  body.vg-b2.vg-hasex #hand .cd .pic{height:14px}
+  body.vg-b2.vg-hasex #extra .tag{min-height:44px;padding-top:0;padding-bottom:0}
+}
+.tc .tas.gold{background:#e8b84a;color:#3a240c}
+.tag.tvc{min-height:44px;font-size:14px;background:#e7f0ff}
+body.vg-b2 .site .occ2{right:auto;left:-14px}
+body.vg-b2 .site .sp2{position:absolute;left:-8px;bottom:-6px;font:800 14px/18px var(--gx-font,Georgia,serif);background:#f4e6c0;color:#3a240c;border:1px solid #6a4318;border-radius:9px;padding:0 4px;z-index:3}
+body.vg-b2 #extra{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+body.vg-b2 #extra .tag{flex:none}
+@media (max-width:400px){body.vg-b2 #extra{gap:4px}body.vg-b2 #extra .tag{padding:0 6px 0 3px;gap:3px}body.vg-b2 #extra .tag .ic{width:30px;height:30px}}
+/* ================= FIXED3 (R17): market words whole, missing cost on cards you cannot buy, pieces that move ================= */
+.cd .need{position:absolute;left:2px;right:2px;top:2px;z-index:4;display:flex;align-items:center;justify-content:center;gap:2px;font:800 14px/17px var(--gx-font,Georgia,serif);color:#fff3d6;background:rgba(40,14,8,.9);border:1.5px solid #e46a5a;border-radius:8px;padding:1px 3px;text-align:center;white-space:nowrap}
+.cd .need .ic{width:16px;height:16px;flex:none}
+body.vg-pick #row .cd:not(.glow) .need{filter:none}
+@media (max-width:999px){
+  body.vg-b2 #row .cd .ef{white-space:normal;overflow:visible;line-height:16px;min-height:32px;display:flex;align-items:center;justify-content:center;text-align:center;letter-spacing:0;overflow-wrap:normal;word-break:keep-all}
+  body.vg-b2 #row .cd .pic{height:clamp(22px,3.4vh,34px)}
+}
+@media (max-width:999px) and (max-height:760px){body.vg-b2.vg-hasex #row .cd .pic{height:16px}}
+
+.walker{position:fixed;z-index:72;pointer-events:none;width:40px;height:54px;filter:drop-shadow(0 6px 6px rgba(0,0,0,.55))}
+.walker svg{width:100%;height:100%}
+.op .pts b.tick{display:inline-block;animation:vgtick .5s ease-out}
+@keyframes vgtick{0%{transform:scale(1)}40%{transform:scale(1.45);color:#fff}100%{transform:scale(1)}}
+.rc.bump{animation:vgtick .5s ease-out}
+#rcap{position:fixed;left:50%;transform:translateX(-50%);z-index:71;pointer-events:none;max-width:calc(100vw - 32px);background:rgba(14,10,4,.9);color:#fff3d6;border:2px solid #c9a35a;border-radius:12px;padding:6px 14px;font:800 16px/1.25 var(--gx-font,Georgia,serif);text-align:center;opacity:0;transition:opacity .2s}
+#rcap.on{opacity:1}
+body.vg-b2 #hand .cd .ef{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:normal}
+/* FIXED4: market = a row of real cards. Art fills the card, cost is a coin/compass token, points a star, effect = icon + plain words on a paper band */
+#row .cd.mc{--mh:clamp(66px,10vh,96px);height:var(--mh);padding:0;overflow:hidden;display:block;border-radius:10px;border:2px solid #3a2810;background:#2a1d0e;box-shadow:0 2px 0 rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.35)}
+#row .cd.mc.art{border-color:#1e3527;background:#1e3527}
+#row .cd.mc .pic{position:absolute!important;inset:0 0 auto 0;height:62%!important;border-radius:0;aspect-ratio:auto}
+#row .cd.mc .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,0) 45%)}
+#row .cd.mc .mtop{position:absolute;left:3px;right:3px;top:3px;display:flex;align-items:center;gap:3px;z-index:3}
+#row .cd.mc .msp{flex:1}
+#row .cd.mc .mcost{position:relative;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe7a0,#d9a441 60%,#8a5a1b);border:2px solid #fff3d6;box-shadow:0 1px 3px rgba(0,0,0,.6)}
+#row .cd.mc .mcost.compass{background:radial-gradient(circle at 35% 30%,#d9f0e2,#3fa07a 60%,#1f5a40)}
+#row .cd.mc .mcost .ic{position:absolute;inset:3px;width:auto;height:auto;opacity:.28}
+#row .cd.mc .mcost b{position:relative;font:900 17px/1 var(--gx-font,Georgia,serif);color:#2a1d0e;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+#row .cd.mc .mcost.compass b{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+#row .cd.mc .mvp{display:inline-flex;align-items:center;gap:1px;height:22px;padding:0 4px;border-radius:11px;background:rgba(20,12,4,.88);color:#ffd36a;font:900 14px/1 var(--gx-font,Georgia,serif)}
+#row .cd.mc .mvp .ic{width:13px;height:13px;color:#ffd36a}
+#row .cd.mc .tr{position:static!important;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:rgba(239,226,192,.92)}
+#row .cd.mc .tr .ic{width:16px;height:16px}
+#row .cd.mc .mfree{height:20px;padding:0 5px;border-radius:10px;background:#3fa07a;color:#fff;font:800 14px/20px var(--gx-font,Georgia,serif)}
+#row .cd.mc .mef{position:absolute;left:0;right:0;bottom:0;min-height:42%;display:flex;align-items:center;justify-content:center;gap:4px;padding:2px 4px 3px;background:var(--vg-paper);border-top:2px solid #c9a35a;color:var(--vg-ink);font:700 14px/15px var(--gx-font,Georgia,serif);text-align:left;z-index:2}
+#row .cd.mc.art .mef{background:#e3ead2;border-top-color:#3fa07a}
+#row .cd.mc .mef .ic{flex:none;width:18px;height:18px}
+#row .cd.mc .mef span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:normal;word-break:normal}
+#row .cd.mc .need{position:absolute;left:auto;right:3px;top:3px;z-index:4;font-size:14px;line-height:20px;padding:0 6px;border-radius:10px;border-width:1.5px}
+#row .cd.mc.poor .pic{filter:grayscale(.7) brightness(.7)}
+#row .cd.mc.poor .mcost{box-shadow:0 0 0 2px #e46a5a,0 1px 3px rgba(0,0,0,.6)}
+#row .cd.mc.poor .tr,#row .cd.mc.poor .mvp,#row .cd.mc.poor .mfree{display:none}
+#row .cd.mc.poor .mef{opacity:.8}
+body.vg-pick #row .cd.mc:not(.glow){filter:none}
+#row .cd.mc.glow{border-color:var(--glow);box-shadow:0 0 0 2px var(--glow),0 0 14px rgba(255,211,106,.75)}
+@media (min-width:1000px){#row .cd.mc{--mh:clamp(110px,16vh,170px)}#row .cd.mc .mef{font-size:15px;line-height:17px}}
+/* FIXED4: phone hand never hides a card name under the next card */
+@media (max-width:420px){body.vg-b2 #hand .cd{margin:0 1px;flex:0 1 calc((100% - 12px) / 5)}body.vg-b2 #hand .cd .cn{overflow-wrap:normal;word-break:normal;hyphens:none}}
+@media (max-width:420px){body.vg-b2 #hand .cd{padding-left:1px;padding-right:1px}body.vg-b2 #hand .cd .cn{margin:0 -1px;letter-spacing:-.035em;width:auto;max-width:none}}
+@media (max-width:420px){body.vg-b2 #hand .cd .vp{top:3px;left:3px;right:auto}}
+#row .cd.mc .mef span{-webkit-line-clamp:3}
+@media (max-height:760px){#row .cd.mc{--mh:clamp(72px,10.9vh,84px)}#row .cd.mc .mef{line-height:14px;padding:1px 3px 2px;gap:3px}#row .cd.mc .mcost{width:24px;height:24px}#row .cd.mc .mcost b{font-size:16px}#row .cd.mc .need{line-height:18px}}
+.tc .tas svg{width:11px;height:14px;fill:currentColor;color:#1d2430}.tc .tas.gold svg{color:#3a240c}
+/* R25: research nudge, the track breathes when the prompt points at it */
+#track.nudge{animation:vgNudge 1.6s ease-in-out 3}
+@keyframes vgNudge{0%,100%{box-shadow:0 0 0 2px var(--glow)}50%{box-shadow:0 0 0 5px var(--glow),0 0 18px var(--glow)}}
+@media (prefers-reduced-motion:reduce){#track.nudge{animation:none;box-shadow:0 0 0 4px var(--glow)}}
+/* R25: on short phones the result buttons sit below the breakdown (not over it) */
+@media (max-height:700px){.rbtns{position:static;margin:4px 0 0;padding:0;background:none}.rbox .rart{display:none}.rplayers{gap:6px}}
+/* R25: "need" is a small corner badge, the card art stays visible */
+#row .cd.mc .need{left:auto;right:2px;top:2px;font-size:12px;line-height:16px;padding:0 4px;gap:1px;border-radius:8px;background:rgba(40,14,8,.82)}
+#row .cd.mc .need .ic{width:12px;height:12px}
+.vpop.onchip{padding:3px 10px;animation-name:vpopChip}
+@keyframes vpopChip{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.12)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+
+/* ================= FIXED6: phone in landscape = board left, tray right, so the map is never behind the tray ================= */
+@media (orientation:landscape) and (max-height:560px) and (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr) minmax(300px,36vw)!important;grid-template-rows:minmax(0,1fr)!important}
+  .gx-dock{grid-column:2;grid-row:1;min-height:0;overflow-y:auto;border-top:0;border-left:3px solid var(--vg-ink);box-shadow:-6px 0 22px rgba(0,0,0,.45)}
+  body.vg-b2 #map{min-height:0}
+  body.vg-b2 #row .cards{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:calc((100% - 10px) / 3);overflow-x:auto;scrollbar-width:none}
+  body.vg-b2 #row .cd .ef{min-height:0}body.vg-b2 #row .cd .pic{display:none}
+  body.vg-b2 #hand .cd{flex:0 1 calc((100% - 12px) / 5)}
+}
+
+/* R29: the map never runs under the tray (short phones, or when the tray grows): it may shrink, and its sites scale with it (--ms set in ui1.js) */
+@media (max-width:999px){body.vg-b2 #map{min-height:0}}
+#row .cd.mc.can{box-shadow:0 0 0 2px rgba(255,226,160,.6),0 3px 8px rgba(0,0,0,.35)}
+
+/* FIXED9: very short phones (375x553): the market is one row of six small cards (art, cost, points; Details tells the rest), so the 15 sites keep 46 px discs */
+@media (max-width:999px) and (max-height:600px){
+  body.vg-b2 #row{padding-top:2px;padding-bottom:2px}
+  body.vg-b2 #row .tl{display:none}
+  body.vg-b2 #row .cards{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-flow:row;grid-auto-columns:auto;overflow:visible;gap:3px}
+  body.vg-b2 #row .cd.mc{--mh:64px;min-width:46px}
+  body.vg-b2 #row .cd.mc .mef,body.vg-b2 #row .cd.mc .tr{display:none}
+  body.vg-b2 #hand .cd{min-height:0}
+}
+body.vg-squeeze #map,body.vg-squeeze #track{visibility:hidden;pointer-events:none}

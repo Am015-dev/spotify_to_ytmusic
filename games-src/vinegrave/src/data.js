@@ -97,19 +97,19 @@
   // ---- guardians: overcome one for 5 points; its boon is a one-time free action. [id, name, cost, boon, boon text] ----
   var GU = [
     ['mire-crawler', 'Mire Crawler', { arrow: 1, coin: 2 }, [{ g: { jewel: 1 } }]],
-    ['stone-ape', 'Stone Ape', { arrow: 2 }, [{ d: 2 }]],
-    ['glass-moth', 'Glass Moth', { tablet: 1, jewel: 1 }, [{ r: 'g' }]],
-    ['rootback-boar', 'Rootback Boar', { arrow: 1, compass: 2 }, [{ g: { coin: 3 } }]],
-    ['tide-serpent', 'Tide Serpent', { jewel: 1, arrow: 1 }, [{ fd: 1 }]],
+    ['stone-ape', 'Sleeping Idol', { arrow: 2 }, [{ d: 2 }]],
+    ['glass-moth', 'Ash Wisp', { tablet: 1, jewel: 1 }, [{ r: 'g' }]],
+    ['rootback-boar', 'Root Rat', { arrow: 1, compass: 2 }, [{ tv: 'car' }, { tv: 'car' }]],
+    ['tide-serpent', 'Jade Serpent', { jewel: 1, arrow: 1 }, [{ fd: 1 }]],
     ['ember-hound', 'Ember Hound', { arrow: 2, coin: 1 }, [{ x: 1 }]],
-    ['moss-golem', 'Moss Golem', { tablet: 2, arrow: 1 }, [{ g: { arrow: 1, tablet: 1 } }]],
-    ['howl-bat', 'Howler Bat', { compass: 3, coin: 1 }, [{ g: { compass: 3 } }]],
-    ['vine-widow', 'Vine Widow', { jewel: 1, coin: 2 }, [{ r: 'n' }]],
+    ['moss-golem', 'Snare Tree', { tablet: 2, arrow: 1 }, [{ tv: 'ship' }, { tv: 'ship' }]],
+    ['howl-bat', 'Sky Griffin', { compass: 3, coin: 1 }, [{ tv: 'plane' }]],
+    ['vine-widow', 'Swamp Beast', { jewel: 1, coin: 2 }, [{ r: 'n' }]],
     ['thunder-toad', 'Thunder Toad', { arrow: 1, tablet: 1, coin: 1 }, [{ b: 'a', o: 3 }]],
-    ['bone-heron', 'Bone Heron', { tablet: 2, coin: 1 }, [{ g: { jewel: 1 } }]],
-    ['ash-jaguar', 'Ash Jaguar', { arrow: 2, jewel: 1 }, [{ g: { jewel: 1, arrow: 1 } }]],
-    ['canopy-wyrm', 'Canopy Wyrm', { jewel: 2 }, [{ r: 'g' }, { r: 'n' }]],
-    ['temple-cat', 'Temple Lynx', { compass: 2, tablet: 1 }, [{ b: 'i', o: 3 }]],
+    ['bone-heron', 'Bone Caller', { tablet: 2, coin: 1 }, [{ g: { jewel: 1 } }]],
+    ['ash-jaguar', 'Ember Brute', { arrow: 2, jewel: 1 }, [{ g: { jewel: 1, arrow: 1 } }]],
+    ['canopy-wyrm', 'Ashen Wraith', { jewel: 2 }, [{ r: 'g' }, { r: 'n' }]],
+    ['temple-cat', 'Tomb King', { compass: 2, tablet: 1 }, [{ b: 'i', o: 3 }]],
     ['old-warden', 'The Old Warden', { arrow: 1, jewel: 1, tablet: 1 }, [{ g: { coin: 2, compass: 2 } }]]
   ];
   // ---- dig sites. Level 0 (camp) sites are printed on the board; level 1 and 2 slots are hidden until discovered. ----
@@ -161,7 +161,32 @@
   var NOTE_VP = [0, 1, 2, 4, 6, 9, 12, 15, 19], GLASS_VP = [0, 0, 1, 2, 3, 4, 6, 8, 10], TOP = 8;
   // temple tiles (bought with the research action once your glass is in the temple)
   // three stacks: 6 points for the left two cost parts, 6 for the right two, 11 for all three (parts: 2 tablets | 1 jewel | 2 arrowheads)
-  var TEMPLE = [{ vp: 6, cost: { tablet: 2, jewel: 1 }, n: 8 }, { vp: 6, cost: { jewel: 1, arrow: 2 }, n: 8 }, { vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 }, n: 4 }];
+  // ---- research assistants (rulebook p.15-16): 12 tiles, silver side up, 3 face-down stacks of 4 (only each top is known); your NOTEBOOK
+  // on a row with the silver symbol recruits one of the (usually 3) available assistants; on a row with the gold symbol it upgrades one (flip
+  // to gold, which also refreshes it). 2 assistant squares per player board. Using one = turn it sideways (once a round, all refresh at round
+  // end); a free action unless it has no free-action icon. Effects printed in the rulebook: a choice of a coin or a Plane (a-guide), a buy
+  // discount of 1 / 2 that is your main action (a-broker), a Boot of travel paid to make an arrowhead (a-fletch). The other 9 effects and all
+  // gold sides not described in the rulebook text are our own. main:true = the effect is your turn's main action. ----
+  var ASST = [
+    { id: 'a-guide', name: 'Trail Guide', s: [{ or: [[{ g: { coin: 1 } }], [{ tv: 'plane' }]] }], gd: [{ or: [[{ g: { coin: 2 } }], [{ tv: 'plane' }, { g: { coin: 1 } }]] }] },
+    { id: 'a-broker', name: 'Broker', main: true, s: [{ b: '*', o: 1 }], gd: [{ b: '*', o: 2 }] },
+    { id: 'a-fletch', name: 'Fletcher', s: [{ tp: ['boot'] }, { g: { arrow: 1 } }], gd: [{ g: { arrow: 1 } }] },
+    { id: 'a-map', name: 'Map Reader', s: [{ g: { compass: 1 } }], gd: [{ g: { compass: 2 } }] },
+    { id: 'a-purse', name: 'Purse Keeper', s: [{ g: { coin: 1 } }], gd: [{ g: { coin: 2 } }] },
+    { id: 'a-scribe', name: 'Scribe', s: [{ g: { tablet: 1 } }], gd: [{ g: { tablet: 1, coin: 1 } }] },
+    { id: 'a-gem', name: 'Gem Cutter', s: [{ p: { coin: 2 } }, { g: { jewel: 1 } }], gd: [{ p: { coin: 1 } }, { g: { jewel: 1 } }] },
+    { id: 'a-runner', name: 'Runner', s: [{ d: 1 }], gd: [{ d: 2 }] },
+    { id: 'a-cook', name: 'Camp Cook', s: [{ g: { coin: 1, compass: 1 } }], gd: [{ g: { coin: 2, compass: 1 } }] },
+    { id: 'a-mason', name: 'Mason', s: [{ p: { compass: 1 } }, { g: { tablet: 1 } }], gd: [{ g: { tablet: 1 } }] },
+    { id: 'a-healer', name: 'Healer', s: [{ x: 1 }], gd: [{ x: 1 }, { d: 1 }] },
+    { id: 'a-porter', name: 'Porter', s: [{ tv: 'boot' }], gd: [{ tv: 'car' }] }
+  ];
+  var ASST_REC = [2, 4], ASST_UP = [3, 5], ASST_MAX = 2, ASST_STACKS = 3;   // notebook rows with the silver / gold symbol (rows are our own: board icons); 2 squares
+  // free-action (lightning) items: playing them does not use your main action (rulebook p.13: "some item effects are free actions"; which ones is ours)
+  var FREE_ITEMS = ['machete', 'canteen', 'rope', 'lamp', 'whistle', 'kettle', 'brush', 'sling'];
+  // Lost Temple bonus tiles: a stack of as many tiles as players; the magnifier reaching the temple picks one (rulebook p.14). Values are ours.
+  var TBONUS = [{ jewel: 1 }, { arrow: 2 }, { tablet: 2 }, { coin: 3, compass: 2 }, { jewel: 1, coin: 1 }, { arrow: 1, tablet: 1 }];
+  var TEMPLE = [{ vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 } }, { vp: 6, cost: { tablet: 2, jewel: 1 } }, { vp: 6, cost: { jewel: 1, arrow: 2 } }, { vp: 2, cost: { tablet: 2 } }, { vp: 2, cost: { jewel: 1 } }, { vp: 2, cost: { arrow: 2 } }];   // rulebook p.14 + setup: 1 x 11, 2 x 6, 3 x 2 stacks, each as many tiles as players; the 11 pays all three costs, a 6 two, a 2 one
   var TEMPLE_ARRIVE = [10, 8, 6, 4];   // magnifier points in the temple row, by order of arrival
   var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, IDOL_SLOT_VP = [1, 1, 1, 2], ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
   var START = [{ coin: 2, compass: 0 }, { coin: 1, compass: 1 }, { coin: 2, compass: 1 }, { coin: 1, compass: 2 }];   // by turn order (rulebook)
@@ -187,15 +212,18 @@
       if (o.d) return 'draw ' + o.d + ' card' + (o.d > 1 ? 's' : '');
       if (o.x) return 'exile a card';
       if (o.r) return 'free research step (' + (o.r === 'g' ? 'magnifier' : 'notebook') + ')';
-      if (o.b) return 'buy ' + (o.b === 'i' ? 'an item' : 'an artifact') + ' ' + o.o + ' cheaper';
+      if (o.b) return 'buy ' + (o.b === 'i' ? 'an item' : o.b === 'a' ? 'an artifact' : 'an item or artifact') + ' ' + o.o + ' cheaper';
+      if (o.tv) return 'a ' + TNAME[o.tv] + ' of travel this turn';
+      if (o.tp) return 'pay ' + o.tp.map(function (t) { return 'a ' + TNAME[t]; }).join(' and ') + ' of travel';
       if (o.fd) return 'dig at any free site with no travel';
       if (o.or) return o.or.map(function (x) { return x.length ? opText(x) : 'nothing'; }).join(' OR ');
       return '';
     }).join(', then ');
   }
   function resText(r) { return Object.keys(r).map(function (k) { return r[k] + ' ' + RNAME[k] + (r[k] > 1 ? (k === 'compass' ? 'es' : 's') : ''); }).join(' + '); }
+  FREE_ITEMS.forEach(function (k) { if (CARDS[k]) CARDS[k].fa = true; });
   Object.keys(CARDS).forEach(function (k) { var c = CARDS[k]; if (!c.text) c.text = opText(c.ops).replace(/^./, function (m) { return m.toUpperCase(); }) + '.'; });
-  Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.text = 'Boon: ' + opText(g.boon) + '.'; });
+  Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.tv = g.boon.every(function (o) { return o.tv; }) ? g.boon.map(function (o) { return o.tv; }) : null; g.text = g.tv ? 'Boon: travel value ' + g.tv.map(function (t) { return TNAME[t]; }).join(' + ') + ', once, when you dig or explore.' : 'Boon: ' + opText(g.boon) + '.'; });
 
   // ---- STORY: every narrative line of the guided prologue and Quick games in one place (Story chapters live in campaign.json). See STORY.md.
   var STORY = {
@@ -207,7 +235,7 @@
       disc: ['Ch 2 · The ruin', 'Your two Dread cards can pay the two Boots.'],
       idol: ['Ch 2 · The ruin', 'An idol, worth 3 points! Set it in a shrine.'],
       shrine: ['Ch 2 · The ruin', 'The shrine gives 3 coins. Its slot was only worth 1 point.'],
-      beat: ['Ch 2 · The guardian', 'The Glass Moth guards the ruin. You can face it.'],
+      beat: ['Ch 2 · The guardian', 'The Ash Wisp guards the ruin. You can face it.'],
       over: ['Ch 2 · The guardian', 'Pay its price for 5 points and a boon.'],
       boon: ['Ch 3 · Supplies', 'Tamed! Its boon is free. Use it now.'],
       useboon: ['Ch 3 · Supplies', 'The Moth lets your magnifier climb a research row.'],
@@ -256,7 +284,7 @@
   };
   var VD = { STORY: STORY, RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
-    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE,
+    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE, ASST: ASST, ASSTBY: ASST.reduce(function (o, a) { return (o[a.id] = a, o); }, {}), ASST_REC: ASST_REC, ASST_UP: ASST_UP, ASST_MAX: ASST_MAX, ASST_STACKS: ASST_STACKS, FREE_ITEMS: FREE_ITEMS, TBONUS: TBONUS,
     GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
   if (typeof module !== 'undefined' && module.exports) module.exports = VD; else root.VD = VD;
 })(typeof window !== 'undefined' ? window : this);

@@ -33,16 +33,22 @@ const TUT_GAME = 'vinegrave', TUT_SITE = 5;   // the first level-1 ruin (travel:
 const tq = sel => () => { const e = typeof sel === 'function' ? sel() : $(sel); return e && e.getBoundingClientRect().width ? e : null; };
 const tinsp = txt => () => [...document.querySelectorAll('#insp .btn')].find(b => b.textContent.indexOf(txt) === 0) || null;
 const tmine = () => !!(G && UI.mode === 'tutorial' && myTurn() && !UI.busy && $('#fx').hidden);
-function tutAI() { return null; }   /* coached game: Tamsin is the real (easy) computer */
+function tutAI() {   /* guided game: Tamsin really plays (cards, camp digs, market middle, research) but never takes what the next lesson needs */
+  if (!GUIDED || UI.coachFree) return null; if (G.q) return null; const L = VG.moves(G), me = G.p[0];
+  const safe = L.filter(m => m.t === 'play' || m.t === 'res' || (m.t === 'buy' && m.r >= 1 && m.r <= 4) || (m.t === 'dig' && m.s !== 2 && G.sites[m.s] && G.sites[m.s].lvl === 0));
+  if (!me.passed && safe.length) { const b = VAI.choose(G, 'easy'); return (b && safe.find(m => VG.same ? VG.same(m, b) : JSON.stringify(m) === JSON.stringify(b))) || safe.find(m => m.t === 'play') || safe.find(m => m.t === 'dig') || safe[0]; }
+  return L.find(m => m.t === 'play') || L.find(m => m.t === 'pass') || null;
+}   /* guided game: Tamsin only plays cards, then passes; coached play: the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
   const me = G.p[0], tm = G.p[1];
-  me.hand = ['trail', 'dread', 'grant', 'dread', 'trail']; me.deck = ['grant'];
+  me.hand = ['trail', 'dread', 'machete', 'dread', 'trail']; me.deck = ['grant'];   /* Brush Machete: a free-action (lightning) item */
   me.res = { coin: 2, compass: 2, tablet: 1, arrow: 0, jewel: 1 };
   tm.hand = ['dread', 'grant', 'dread', 'trail', 'grant']; tm.deck = ['trail'];
   const gi = G.guards.indexOf('glass-moth'); if (gi >= 0) { G.guards.splice(gi, 1); G.guards.push('glass-moth'); }
   const li = G.items.indexOf('lamp'); if (li >= 0) { G.items[li] = G.row[0]; G.row[0] = 'lamp'; } else { const ri = G.row.indexOf('lamp'); if (ri > 0) { G.row[ri] = G.row[0]; G.row[0] = 'lamp'; } }
+  const ao = ['a-map', 'a-purse', 'a-scribe'], rest = [].concat.apply([], G.aSt).filter(x => ao.indexOf(x) < 0); G.aSt = ao.map((id, k) => [id].concat(rest.slice(k * 3, k * 3 + 3)));   /* the helper you hire first asks nothing */
   G.turn = 0; G.first = 0; render();
 }
 const TS = id => { const t = V.STORY.tut[id]; return { title: t[0], say: t[1] }; };
@@ -72,7 +78,7 @@ function coachCheck(L) {   /* called from render: explain a rule the first time 
   if (t.dig) coachSay('dig');
   if (t.disc) coachSay('discover');
   if (L.some(m => m.t === 'disc' && G.sites[m.s].lvl === 2)) coachSay('deep');
-  if (L.some(m => (m.t === 'dig' || m.t === 'disc') && (VG.payPlan(G, UI.view, G.sites[m.s].cost) || {}).coins)) coachSay('plane');
+  if (L.some(m => (m.t === 'dig' || m.t === 'disc') && (VG.payPlan(G, UI.view, VG.siteCost(G.sites[m.s])) || {}).coins)) coachSay('plane');
   if (t.idol) { coachSay('shrine'); coachSay('slots'); }
   if (t.beat) coachSay('overcome');
   if (t.boon) coachSay('boon');
@@ -106,24 +112,102 @@ function coachMove(m, best) {   /* one line why, for a strong or a weaker move (
 }
 const COVER = () => Object.keys(V.STORY.coach);
 window.coachReport = () => { const all = COVER(), seen = all.filter(id => CO.seen[id]); return { all, seen, later: all.filter(id => !CO.seen[id]) }; };
+/* one step counter over both tutor runs (rules + score walk): "16/35", never "16/33" */
+const TUTN = { off: 0, tot: 0 };
+function tutCount() {
+  if (!TUTN.tot) return; document.querySelectorAll('.gxt-n').forEach(e => { const m = /^(\d+)\/(\d+)$/.exec(e.textContent); if (!m || +m[2] === TUTN.tot) return; e.textContent = (+m[1] + TUTN.off) + '/' + TUTN.tot; const d = e.parentNode && e.parentNode.querySelector('.gxt-dots'); if (d) d.setAttribute('aria-label', 'Step ' + (+m[1] + TUTN.off) + ' of ' + TUTN.tot); });
+}
+try { new MutationObserver(tutCount).observe(document.documentElement, { childList: true, subtree: true, characterData: true }); } catch (e) { }
 function coachScoreStart() {   /* game over in the coached game: a second tutor run walks the score and shows the end card */
   if (typeof GXT === 'undefined' || !UI.coachFree) return; CO.q = []; if (CO.cur) { setTimeout(coachScoreStart, 400); return; }   /* Pell finishes his line first */
   UI.coachFree = false; CO.over = true; coachHide();
   const steps = tutSteps().filter(x => /^score/.test(x.id)), c = Object.assign({}, TUTCFG, { steps, setup: () => { } });
-  TUTCFG = c; GXT.start(c);
+  TUTN.off = TUTN.tot - steps.length; TUTCFG = c; GXT.start(c);
+}
+/* W490 guided first game (owner, 8 Nov: gameplay first): every core rule in order, one sentence of 12 words or fewer,
+   one highlighted tap per step, on a real board; then the score walk and a real game. ?tut=coach = the older coached free play. */
+const GUIDED = !/[?&]tut=coach\b/.test(location.search);
+const TOP_UP = r => { const me = G.p[0]; Object.keys(r).forEach(k => { me.res[k] = Math.max(me.res[k], r[k]); }); render(); };
+const tsel = (sel, test) => () => { const e = [...document.querySelectorAll(sel)].find(x => x.getBoundingClientRect().width && (!test || test(x))); return e || null; };
+function guidedSteps() {
+  const step = (id, title, say, target, wait, extra) => { const o = Object.assign({ id, title, say, target, wait, ready: () => tmine() }, extra || {}), oe = o.onEnter;
+    o.onEnter = function () { const r = oe ? oe.apply(this, arguments) : undefined; setTimeout(() => { if (G && UI.mode === 'tutorial') render(); }, 0); return r; }; return o; };   /* re-glow for the new step */
+  const site = lv => tsel('.site.l' + lv + '.glow');
+  const isSite = lv => a => a.what === 'site' && G.sites[a.x] && G.sites[a.x].lvl === lv;
+  const site2 = () => $('.site.l2') || $('#map');
+  const selSite = () => tq(() => $('.site.sel'));
+  const mine = id => (G.sites.findIndex(x => x.occ === 0 && x.guard) === -1 ? null : $(`.site[data-i="${G.sites.findIndex(x => x.occ === 0 && x.guard)}"]`));
+  const artNoQ = () => {   /* put an artifact whose effect asks nothing in the last market slot, so the next step can follow at once */
+    const ids = [G.row[5]].concat(G.arts || []).filter(Boolean);
+    for (const id of ids) { const H = VG.clone(G); H.row[5] = id; const pp = H.p[0]; pp.res.compass = 9; const m = VG.moves(H).find(x => x.t === 'buy' && x.r === 5); if (!m) continue; VG.apply(H, m); if (!H.q) { const k = G.arts.indexOf(id); if (k >= 0) G.arts[k] = G.row[5]; G.row[5] = id; return V.CARDS[id].cost; } }
+    return 3; };
+  const choice = re => tq(() => [...document.querySelectorAll('#qbox [data-a=mv]')].find(b => re.test(b.textContent)) || $('#gobtn'));
+  const inspOpen = () => tmine() && !$('#insp').hidden;
+  const toTemple = () => { const me = G.p[0]; if (me.glass < V.TOP) { me.glass = V.TOP; G.templeOrder = G.templeOrder || []; if (G.templeOrder.indexOf(0) < 0) G.templeOrder.push(0); } TOP_UP(V.TEMPLE[0].cost); };
+  return [
+    step('g-play', 'Free cards', 'Starting cards are free to play. Tap Trail Notes.', tq(() => $('#hand .cd[data-id="trail"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }),
+    step('g-play2', 'Free cards', 'Tap Play: plus 1 compass. Your turn goes on.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+      { ready: () => tmine() && !!$('#hand .cd.sel') }),
+    step('g-free', 'Free items', 'Lightning items are free too. Tap Brush Machete.', tq(() => $('#hand .cd[data-id="machete"]')), { type: 'tap', match: a => a.what === 'hand' && a.id === 'machete' }),
+    step('g-free2', 'Free items', 'Tap Play: a coin and a compass. Still your turn.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' },
+      { ready: () => tmine() && !!$('#hand .cd.sel') }),
+    step('g-plane', 'Travel by Plane', 'This camp needs a Boat. No Boat card? Tap it.', tsel('.site[data-i="2"].glow'), { type: 'tap', match: a => a.what === 'site' && a.x === 2 },
+      { onEnter: () => TOP_UP({ coin: 2 }), ready: () => tmine() && !!$('.site[data-i="2"].glow') }),
+    step('g-plane2', 'Travel by Plane', 'Tap Dig: 2 coins buy a Plane. Take its goods.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'dig' }),
+    step('g-disc', 'Discover a ruin', 'Ruins cost 3 compasses, deep ruins 6, plus travel. Tap one.', site(1), { type: 'tap', match: isSite(1) },
+      { onEnter: () => TOP_UP({ compass: 3 }), ready: () => tmine() && !!$('.site.l1.glow') }),
+    step('g-disc2', 'Dread pays travel', 'Tap Explore. Dread cards pay boots too.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'disc' }),
+    step('g-idol', 'Idols', 'You found an idol: 3 points. Tap it.', tq(() => $('#extra [data-a=idol]')), { type: 'tap', match: a => a.what === 'idol' },
+      { ready: () => tmine() && !!$('#extra [data-a=idol]') }),
+    step('g-shrine', 'Shrines', 'Set it in a shrine: a free bonus now.', tinsp('Shrine'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'idol' }, { ready: inspOpen }),
+    step('g-beat', 'A guardian wakes', 'A guardian woke! Pay its cost to beat it. Tap it.', tq(mine), { type: 'tap', match: a => a.what === 'site' },
+      { onEnter: () => { const x = G.sites.find(z => z.occ === 0 && z.guard); if (x) TOP_UP(V.GUARD[x.guard].cost); } }),
+    step('g-beat2', 'Overcome it', 'Tap Fight: 5 points. Unbeaten guardians give Dread.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'beat' }),
+    step('g-boon', 'Boons', 'You won its boon. Tap it.', tq(() => $('#extra [data-a=guard]')), { type: 'tap', match: a => a.what === 'guard' },
+      { ready: () => tmine() && !!$('#extra [data-a=guard]') }),
+    step('g-boon2', 'Boons', 'Use it now: once per game, and free.', tinsp('Use the boon'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'boon' }, { ready: inspOpen }),
+    step('g-item', 'Buy an item', 'Items cost coins. Tap the first market card.', tq('#row .cd[data-r="0"]'), { type: 'tap', match: a => a.what === 'row' && a.x === 0 },
+      { onEnter: () => TOP_UP({ coin: V.CARDS[G.row[0]].cost }) }),
+    step('g-item2', 'Buy an item', 'Tap Buy: it goes under your deck.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }),
+    step('g-art', 'Buy an artifact', 'Artifacts cost compasses and work at once. Tap it.', tq('#row .cd[data-r="5"]'), { type: 'tap', match: a => a.what === 'row' && a.x === 5 },
+      { onEnter: () => { const c = artNoQ(); TOP_UP({ compass: c }); } }),
+    step('g-art2', 'Buy an artifact', 'Tap Buy: you use it at once.', tq(() => $('#gobtn')), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'buy' }),
+    step('g-res', 'Research', 'Pay to climb the magnifier. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => TOP_UP(V.TRACK[G.p[0].glass + 1].cost) }),
+    step('g-res2', 'Research', 'Tap Magnifier: up one row, take its bonus.', choice(/^Magnifier/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'g' }),
+    step('g-note', 'Notebook', 'Now the notebook, to row 2. Tap the research path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => { const me = G.p[0]; if (me.note < 1) me.note = 1; TOP_UP(V.TRACK[me.note + 1].cost); } }),
+    step('g-note2', 'Notebook', 'Tap Notebook. It follows, never passing the magnifier.', choice(/^Notebook/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'n' }),
+    step('g-asst', 'Assistants', 'Your notebook hired help. Tap the Map Reader.', choice(/^Map Reader/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
+      { ready: () => tmine() && !!G.q && G.q.h === 'asst' }),
+    step('g-asst2', 'Assistants', 'Your assistant works once a round, free. Tap it.', tq(() => $('#extra [data-a=asst]')), { type: 'tap', match: a => a.what === 'asst' },
+      { ready: () => tmine() && !!$('#extra [data-a=asst]') }),
+    step('g-asst3', 'Assistants', 'Use it now: plus 1 compass. It rests until next round.', tinsp('Use it'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'asst' }, { ready: inspOpen }),
+    step('g-temple', 'Temple', 'Practice jump: magnifier near the top. Tap the path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => { const me = G.p[0]; me.glass = Math.max(me.glass, V.TOP - 1); TOP_UP(V.TRACK[V.TOP].cost); } }),
+    step('g-temple2', 'Temple', 'Tap Magnifier: into the temple, the top row.', choice(/^Magnifier/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'res' && a.m.k === 'g' }),
+    step('g-tbon', 'Temple bonus', 'First time in the temple: pick a bonus tile.', choice(/^Bonus/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'ans' },
+      { ready: () => tmine() && !!G.q && G.q.h === 'tbon' }),
+    step('g-temple3', 'Temple tiles', 'Now research buys temple tiles. Tap the path.', tq('#track'), { type: 'tap', match: a => a.what === 'track' },
+      { onEnter: () => TOP_UP(V.TEMPLE[1].cost), ready: () => tmine() && !G.q }),
+    step('g-temple4', 'Temple tiles', 'Tap a 6 point tile: big points at the end.', choice(/^Temple tile, 6/), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'temple' }),
+    step('g-pass', 'Pass', 'Pass ends your round. Played cards go under your deck.', tq('#passbtn'), { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'pass' },
+      { ready: () => tmine() && !!$('#passbtn') })
+  ];
 }
 function tutSteps() {
   const sc = () => { const a = VG.score(G, 0), b = VG.score(G, 1); return [a, b]; };
   const scoreTarget = () => (G && G.phase === 'over' && !$('#rs').hidden && $('#rs .rplayers')) || $('#opp');
   return [
-    { id: 'goal', title: 'How to win', say: 'Most points after the last round wins. Score with research, ruins and cards.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
-    { id: 'hand', title: 'Your first move', say: 'Each turn you do one thing. Tap Trail Notes in your hand.', target: tq(() => $('#hand .cd[data-id="trail"]')),
+    { id: 'goal', title: 'How to win', say: 'Most points after 5 rounds wins. One main action per turn.', target: tq('#opp'), wait: null, ready: () => tmine(), onEnter: () => { CO.seen.setup = CO.seen.oneaction = 1; } },
+    { id: 'hand', title: 'Your first move', say: 'Starting cards are free to play. Tap Trail Notes.', target: tq(() => $('#hand .cd[data-id="trail"]')),
       wait: { type: 'tap', match: a => a.what === 'hand' && a.id === 'trail' }, ready: () => tmine() },
-    { id: 'play', title: 'Your first move', say: 'It gives 1 compass. Tap it again, or drag it up.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
+    { id: 'play', title: 'Your first move', say: 'Tap it again: plus 1 compass. Your turn goes on.', target: tq(() => $('#hand .cd.sel') || $('#gobtn')),
       wait: { type: 'tap', match: a => a.what === 'mv' && a.m.t === 'play' }, ready: () => !!(UI.sel && UI.sel.k === 'hand' && $('#hand .cd.sel')), onEnter: () => { CO.seen.play = 1; } },
+    ...(GUIDED ? guidedSteps() : []),
     { id: 'free', title: 'Your expedition', say: 'Free play.', target: tq('#map'), wait: null, ready: () => true,
       onEnter: () => { UI.coachFree = true; setTimeout(() => { try { GXT.stop(); } catch (x) { } render(); }, 0); } },   /* the tutor steps aside: free play, Pell coaches */
-    { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
+    { id: 'score1', title: 'The count', say: () => { const [a, b] = sc(); document.body.classList.remove('vg-coached'); coachHide(); CO.seen.score = 1; return `Research and temple: you ${a.research + a.temple}, Tamsin ${b.research + b.temple}. Higher rows score more.`; },
       target: tq(scoreTarget), wait: null, ready: () => true },
     { id: 'score2', title: 'The count', say: () => { const [a, b] = sc(); return `Idols, shrines and guardians: you ${a.idols + a.slots + a.guards}, Tamsin ${b.idols + b.slots + b.guards}.`; }, target: tq(scoreTarget), wait: null, ready: () => true },
     { id: 'score3', title: 'The count', say: () => { const [a, b] = sc(); CO.seen.tiebreak = CO.seen.rounds = 1;
@@ -137,17 +221,18 @@ function tutStart(o) {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters[0];
   CO.seen = {}; CO.q = []; CO.cur = null; CO.fb = 0; CO.over = false;
   UI.coachFree = false;
-  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id)), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
+  TUTCFG = { game: TUT_GAME, steps: tutSteps().filter(x => !/^score/.test(x.id) && !(GUIDED && (x.id === 'hand' || x.id === 'play'))), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
     endTitle: 'Prologue complete', endText: o ? 'Pell: "You played a full expedition. Now the coast awaits."' : 'Pell: "That was one round. A real game has 5."',
     endButtons: o && first ? [{ id: 'chapter', label: 'Start stage 1' }] : null,
     setup: tutSetup,
-    onDone: r => { const c = r && r.choice; coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
+    onDone: r => { const c = r && r.choice; coachEnd(); tutSeen(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp();
       if (c === 'chapter' && first) GXC.play(first.id); else if (c === 'story') { $('#start').hidden = true; GXC.open(); } else if (c === 'play') UIACT.quick(); else showTitle(); },
-    onExit: () => { coachEnd(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } };
-  GXT.start(TUTCFG);
+    onExit: () => { coachEnd(); tutSeen(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); } };
+  TUTN.off = 0; TUTN.tot = TUTCFG.steps.filter(x => x.id !== 'free').length + tutSteps().filter(x => /^score/.test(x.id)).length; GXT.start(TUTCFG);
 }
+function tutSeen() { UI.prefs.played = true; try { savePrefs(); } catch (x) { } }   /* skipped or finished: Play becomes the big button, so Play never restarts the tutorial */
 function coachEnd() { document.body.classList.remove('vg-coached'); UI.coachFree = false; CO.q = []; coachHide(); }
-UIACT.tutleave = () => { coachEnd(); try { GXT.markDone(TUT_GAME); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); };
+UIACT.tutleave = () => { coachEnd(); tutSeen(); try { GXT.markDone(TUT_GAME); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; closeInsp(); showTitle(); };
 // ---------------------------------------------------------------- the Story map fits the screen (no scrolling: every stage visible at once)
 // gx-campaign lays the stages out 74 px apart (about 900 px for 10 stages); here the rows are pulled closer so the whole map fits the
 // viewport. Text sizes are untouched; only the vertical positions, the path height and the painted road scale.
@@ -174,7 +259,7 @@ function boot() {
     toast(n.classList.contains('locked') ? 'Win the stage before it to unlock this one.' : /star/i.test(n.getAttribute('aria-label') || n.textContent) ? 'Win stages to earn stars and portraits.' : /back/i.test(n.textContent) ? 'Back to the title.' : 'One moment…', 1800); }, true);
   // Escape leaves the guided round
   document.addEventListener('keydown', e => { if (e.key !== 'Escape') return;
-    if (typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial') { try { GXT.stop(); } catch (x) { } clearTimeout(schedule.t); G = null; UI.mode = 'vs'; showTitle(); return; }
+    if (typeof GXT !== 'undefined' && GXT.active() && UI.mode === 'tutorial') { try { GXT.stop(); } catch (x) { } tutSeen(); clearTimeout(schedule.t); G = null; UI.mode = 'vs'; showTitle(); return; }
     const ov = document.querySelector('body > .gxc:not([hidden])'); if (ov && !(typeof GXC !== 'undefined' && GXC.active())) { try { GXC.close(); } catch (x) { } if (!G || G.phase !== 'play') showTitle(); } });
   if (window.GXS && GXS.on) { showTitle(); return; }
   showTitle();
@@ -182,3 +267,11 @@ function boot() {
 }
 window.UI = UI; Object.defineProperty(window, 'G', { get: () => G, configurable: true });
 boot();
+/* G2 review R4: in a guided step only the step's target glows; every other glow goes quiet (class gq) so one thing asks for the tap */
+setInterval(() => {
+  const on = typeof GXT !== 'undefined' && UI.mode === 'tutorial' && GXT.active() && !UI.coachFree;
+  document.body.classList.toggle('vg-guided', !!on);
+  let t = null; if (on) { try { const st = GXT.current(); t = st && typeof st.target === 'function' ? st.target() : null; } catch (x) { t = null; } }
+  document.querySelectorAll('.glow').forEach(e => e.classList.toggle('gq', !!on && !(t && (t === e || t.contains(e) || e.contains(t)))));
+  if (!on) document.querySelectorAll('.gq').forEach(e => e.classList.remove('gq'));
+}, 200);

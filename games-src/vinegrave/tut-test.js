@@ -1,3 +1,4 @@
+// W490: the default tutorial is now the guided game (guided-tut-test.js); this test covers the older coached free play (?tut=coach).
 // Coached-tutorial-to-end test (ADDENDUM 4): fresh storage, tap "Learn to play", do the 2 forced first steps by tapping the spotlit
 // centre (elementFromPoint must be the target), then PLAY the coached game freely through the UI: tap any glowing site/card (any legal
 // move, picked in rotation, not a scripted list), its action button, answer questions, use the tabs, pass when nothing glows. The rival
@@ -11,7 +12,7 @@ const OUT = process.argv[2] || null;
   for (const [name, vp, touch] of [['phone', { width: 390, height: 763 }, true], ['pc', { width: 1440, height: 860 }, false]]) {
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1 }), page = await ctx.newPage(), errs = [];
     page.on('pageerror', e => errs.push(String(e))); page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-    await page.goto(S.url, { waitUntil: 'load' });
+    await page.goto(S.url + '?tut=coach', { waitUntil: 'load' });
     const tapAt = async (x, y) => touch ? page.touchscreen.tap(x, y) : page.mouse.click(x, y);
     const shot = async n => { if (OUT) await page.screenshot({ path: `${OUT}/${n}-${name}.png` }); };
     const vis = sel => page.locator(sel).filter({ visible: true });
