@@ -69,7 +69,9 @@ function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('
     const w=W();if(w>aw&&aw>100)sl.style.zoom=Math.max(.79,aw/w).toFixed(3)}}
   const shown=e=>{const cs=getComputedStyle(e);return cs.display!=='none'&&cs.visibility!=='hidden'&&e.getClientRects().length>0};
   // every visible box of the fight (decoration aside: the spinning-die sprite, the crossed swords), judged where it lands
-  const boxes=()=>{const o=[],moving=[];for(const e of ar.querySelectorAll('*')){if(e.closest('.die3sp,.vsx,svg,.die3'))continue;if(moving.some(m=>m.contains(e)))continue;if(!shown(e))continue;const r=tbBox(e);if(!r.width||!r.height)continue;if(e.getAnimations().length)moving.push(e);o.push([e,r])}return o};   // a card still flying in is judged by its landing box; its insides fly with it
+  // F16: a card hidden for a moment (visibility:hidden while the big reveal plays) still takes its room: judge it too, or it is grown into space it does not have
+  const laid=e=>getComputedStyle(e).display!=='none'&&e.getClientRects().length>0;
+  const boxes=()=>{const o=[],moving=[];for(const e of ar.querySelectorAll('*')){if(e.closest('.die3sp,.vsx,svg,.die3'))continue;if(moving.some(m=>m.contains(e)))continue;if(!laid(e))continue;const r=tbBox(e);if(!r.width||!r.height)continue;if(e.getAnimations().length)moving.push(e);o.push([e,r])}return o};   // a card still flying in is judged by its landing box; its insides fly with it
   // out: anything of the fight above or below the table, or a monster card under the score line
   const out=()=>{const t=tb.getBoundingClientRect();const sl=ar.querySelector(':scope>.sline');const s=sl&&shown(sl)?sl.getBoundingClientRect():null;
     for(const [e,r] of boxes()){if(r.top<t.top-0.5||r.bottom>t.bottom+0.5||r.left<t.left-0.5||r.right>t.right+0.5)return true;const x=r;if(s&&e.matches('.row.mons .card')&&r.top<s.bottom+2){const x=e.getBoundingClientRect();if(x.right>s.left&&x.left<s.right)return true}}return false};
@@ -80,7 +82,9 @@ function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('
   else{shrink(56,3);if(out()){ar.classList.add('tight');shrink(56,8)}if(out()){ar.classList.add('tight2');shrink(56,8)}if(out())compact()}
   // F16: the card size guesses room for a roll box and chips even when a tight step hid them: grow the cards into the free table height
   // (measured, a step at a time, back one step as soon as anything pokes out), then fit the names again at the bigger size (11 px floor)
-  if(c&&!ar.classList.contains('cmp')&&!out()){let good=c.offsetWidth;for(let k=0;k<12;k++){const nx=Math.min(230,good*1.1);ar.style.setProperty('--cw',nx.toFixed(1)+'px');const w=c.offsetWidth;
+  const gk=typeof G!=='undefined'&&G&&G.cb?G.turn+':'+G.cb.who+':'+G.cb.mons.length+':'+Math.round(tb.getBoundingClientRect().height):'';
+  const grew=c&&!TB.noGrow&&TB.noGrowK!==gk&&!ar.classList.contains('cmp')&&!out();
+  if(grew){let good=c.offsetWidth;for(let k=0;k<12;k++){const nx=Math.min(230,good*1.1);ar.style.setProperty('--cw',nx.toFixed(1)+'px');const w=c.offsetWidth;
       if(w<good+1||out()){ar.style.setProperty('--cw',good.toFixed(1)+'px');break}good=w}
     tbFitNames([...ar.querySelectorAll('.row.mons .card')]);if(out()){tbFitNames([...ar.querySelectorAll('.row.mons .card')])}}
   // a big pick in the dock leaves a sliver of table: keep the readout; the monster tiles go while the question is open (nothing can be dropped on them then)
@@ -90,6 +94,9 @@ function tbFit0(ar,tb){ar.style.removeProperty('--cw');ar.style.removeProperty('
     for(const [e,r] of boxes()){T=Math.min(T,r.top);B=Math.max(B,r.bottom);L=Math.min(L,r.left);R=Math.max(R,r.right)}
     if(B>T){const k=Math.min(1,(t.height-4)/(B-T),(t.width-4)/Math.max(1,R-L));const dy=t.top+2+((t.height-4)-k*(B-T))/2-a.top-k*(T-a.top),dx=(t.left+t.right)/2-a.left-k*((L+R)/2-a.left);
       ar.classList.add('squash');ar.style.transformOrigin='0 0';ar.style.transform=`translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${k.toFixed(4)})`}}
+  // F16: a grown fight is checked again after it paints (next frame, and 300 ms on); if anything is out by then, fit again without growing,
+  // and this fight stays ungrown for the rest of the turn (no grow/shrink flicker)
+  if(grew){const verify=()=>{if(!ar.isConnected||TB.fitting||TB.noGrowK===gk)return;if(out()){TB.noGrowK=gk;try{tbFit()}catch(e){}}};requestAnimationFrame(verify);setTimeout(verify,300)}
   clearTimeout(TB.fitT);if(ar.querySelector('.row.mons .card')&&[...ar.querySelectorAll('*')].some(e=>e.getAnimations().length))TB.fitT=setTimeout(()=>{try{tbFit()}catch(e){}},700)}
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
