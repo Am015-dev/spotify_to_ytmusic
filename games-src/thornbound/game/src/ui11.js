@@ -117,7 +117,7 @@ const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
     const px=(e,k)=>parseFloat(e.style[k]);   // the set position, not the animated box (both pop in with a scale)
     const R={left:px(ring,'left'),top:px(ring,'top'),width:px(ring,'width'),height:px(ring,'height')};R.right=R.left+R.width;R.bottom=R.top+R.height;
     const B={left:px(b,'left'),top:px(b,'top'),width:b.offsetWidth,height:b.offsetHeight};B.right=B.left+B.width;B.bottom=B.top+B.height;if(!(R.width>0)||!B.width||isNaN(B.top))return;
-    const gapY=B.top>=R.bottom?B.top-R.bottom:R.top>=B.bottom?R.top-B.bottom:0;if(gapY<=18&&(B.bottom<=R.top+2||B.top>=R.bottom-2)){b.dataset.tbAnch='1';return}   // already beside its target
+    const gapY=B.top>=R.bottom?B.top-R.bottom:R.top>=B.bottom?R.top-B.bottom:0;if(gapY<=18&&(B.bottom<=R.top+2||B.top>=R.bottom-2))return;   // already beside its target
     const tb=document.getElementById('bulbbtn');const top=Math.max(6,tb&&tb.offsetWidth?tb.getBoundingClientRect().bottom+4:6),W=innerWidth,H=innerHeight,w=B.width,h=B.height,gap=10;
     // never over a glowing target or a tray button (the same cores hlpUnblock keeps clear), nor over its own ring
     const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(q=>{let cw=q.width,ch=q.height;const cx=q.left+cw/2,cy=q.top+ch/2;if(cw>56)cw=32;if(ch>56)ch=32;return {left:cx-cw/2-3,top:cy-ch/2-3,right:cx+cw/2+3,bottom:cy+ch/2+3}});
@@ -156,12 +156,13 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
 (function(){const o=renderAll;renderAll=function(){const r=o.apply(this,arguments);try{bulbState()}catch(e){}return r}})();
 // a help bubble never covers a glowing tap spot: on a crowded phone the kit's spot search can settle on one (it also avoids all text);
 // then the bubble moves to the nearest spot clear of every glowing core and of its own rings (text under it is fine)
-function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub')||b.dataset.tbAnch)return;const W=innerWidth,H=innerHeight;
+function hlpUnblock(){if(typeof tutOn==='function'&&tutOn())return;const b=document.querySelector('.gxh-bub.on');if(!b||b.closest('.gxt-root')||b.classList.contains('gxt-bub'))return;const W=innerWidth,H=innerHeight;
   const core=q=>{let w=q.width,h=q.height;const cx=q.left+w/2,cy=q.top+h/2;if(w>56)w=32;if(h>56)h=32;return {left:cx-w/2-3,top:cy-h/2-3,right:cx+w/2+3,bottom:cy+h/2+3}};
   const cores=[...document.querySelectorAll('.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot')].filter(e=>!e.closest('[data-help]')&&!e.closest('[hidden]')).map(e=>e.getBoundingClientRect()).filter(q=>q.width&&q.height&&q.right>0&&q.bottom>0&&q.left<W&&q.top<H).map(core);
   const rings=[...document.querySelectorAll('.gxh-ring')].map(e=>{const q=e.getBoundingClientRect();return {left:q.left-4,top:q.top-4,right:q.right+4,bottom:q.bottom+4,main:!e.classList.contains('from')}});
   const hit=(a,c)=>a.left<c.right&&a.right>c.left&&a.top<c.bottom&&a.bottom>c.top;
   const r=b.getBoundingClientRect();
+  if(b.dataset.tbAnch){if(!cores.some(c=>hit(r,c)))return;delete b.dataset.tbAnch}   // the bulb bubble stays beside its target unless a glowing target is now under it
   const T=rings.find(x=>x.main)||rings[0]||{left:W/2,top:H/2,right:W/2,bottom:H/2};const tcx=(T.left+T.right)/2,tcy=(T.top+T.bottom)/2;
   const bar=document.querySelector('.gx-bar');const top=bar?Math.ceil(bar.getBoundingClientRect().bottom)+4:6;
   // labels (score track, round, region names, chips) stay readable: find the spot that covers the fewest of them (none if it can),
