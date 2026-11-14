@@ -202,9 +202,11 @@ function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3
 function startFix(msg){const a=G.plan.acts.find(x=>x.pw.length<actNeed(x).need);if(!a){BF.say(msg,6000);return}
   const pos=a.type==='explore'?a.tgt:a.type==='gather'?a.tgt.pos:a.type==='build'&&a.tgt&&a.tgt.cross!=null?a.tgt.cross:G.camp.pos;
   const p=humanFree().find(q=>!pawnWhy(q.id,a));if(p){UI.sel=p.id;UI.ps.skip=UI.ps.skip.filter(x=>x!==p.id);BF.say(`${pawnLabel(p).split(' ')[0]}: tap place ${pos+1} to help`,8000)}
-  else{for(const id of a.pw.slice())unplace(id);BF.say(`Too few pawns for place ${pos+1}: pawn back`,8000)}
+  else{const nd=actNeed(a).need;for(const id of a.pw.slice())unplace(id);BF.say(`Place ${pos+1} needs ${nd} pawns: give yours another job`,8000)}
   if(pstep()!==2)setPStep(2)}
 function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);if(!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done&&G.tut))try{startFix(pb[0])}catch(e){}render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
+  // F14 (R67): a signal-pile stage is due and the wood is spare: ask once a day before the day starts
+  if(!force&&typeof BF!=='undefined'&&BF.on&&!G.tut&&!(typeof GUIDE!=='undefined'&&GUIDE.on&&!GUIDE.done)&&BF.pileAsk!==G.round){let n=0;try{n=BF.wantPile()}catch(e){}if(n>0){BF.pileAsk=G.round;UI.confirm=`Pile needs ${n} wood today: tap ✨`;UI.confirmSig=planSig();render();return}}
   UI.confirm=null;const r=startActions();if(r){toast(r);render()}else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}

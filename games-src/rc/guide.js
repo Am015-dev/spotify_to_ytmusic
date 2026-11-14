@@ -80,7 +80,10 @@ const GUIDE_STEPS=[
  {id:'go3',day:3,rule:'roll',when:gPlan,kind:'act',say:'Tap Start day and watch the dice.',tgt:()=>gdq('#bf [data-a=go]'),done:()=>!gPlan()},
  {id:'roll',day:3,rule:'roll',beat:'act',when:gDiceBeat,kind:'info',say:'The dice: ✔ success, 🩸 a wound, ❓ an adventure.',tgt:()=>null},
  {id:'advc',day:3,rule:'adventure',beat:'adventure',kind:'info',say:'The ? token drew this adventure card. It happens now.',tgt:()=>gdq('#bfcard')},
- {id:'end',day:3,rule:'real',beat:'daysum',kind:'info',say:'That is every rule. Play on, or start a real game!',tgt:()=>null}
+ {id:'wx1',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Days 4 to 6 roll a rain die. Build a roof first.',tgt:()=>null},
+ {id:'wx2',day:3,rule:'weather',beat:'daysum',kind:'info',say:'From day 7, snow burns 1 wood. Storms knock down the palisade.',tgt:()=>null},
+ {id:'wx3',day:3,rule:'weather',beat:'daysum',kind:'info',say:'Hungry animals take food, palisade, or fight: strength 3 against your weapon.',tgt:()=>null},
+ {id:'end',day:3,rule:'real',beat:'daysum',kind:'info',say:'Now you know the rules. Play on, or start a real game!',tgt:()=>null}
 ];
 const GUIDE_RULES=[...new Set(GUIDE_STEPS.map(s=>s.rule))];
 window.GXGUIDE={get running(){return GUIDE.on},get step(){const s=GUIDE_STEPS[GUIDE.i];return s?s.id:null},get seen(){return GUIDE.seen.slice()},rules:GUIDE_RULES,steps:GUIDE_STEPS.map(s=>({id:s.id,rule:s.rule,say:s.say})),get done(){return GUIDE.done}};
@@ -109,7 +112,8 @@ function gShow(s,el){const e=gEl();const r=gRing();e.classList.add('guide');e.hi
   e.innerHTML='<b class="cn">'+n+'/'+N+'</b><span class="ct"></span>'+(el&&s.kind!=='info'?'':'<button type="button" class="gnext" data-guide="next">Next ▶</button>');e.querySelector('.ct').textContent=s.say;
   if(el&&el.closest&&el.closest('#ppop')){try{el.scrollIntoView({block:'center'})}catch(err){}}
   const tgt=el||e.querySelector('.gnext');const tr=tgt.getBoundingClientRect();const pad=6;
-  r.hidden=false;r.style.left=(tr.left-pad)+'px';r.style.top=(tr.top-pad)+'px';r.style.width=(tr.width+pad*2)+'px';r.style.height=(tr.height+pad*2)+'px';
+  r.hidden=false;r.classList.remove('nudge');r.style.animation='none';void r.offsetWidth;r.style.animation='';   // F14: each step's ring pulses 3 times, then holds
+  r.style.left=(tr.left-pad)+'px';r.style.top=(tr.top-pad)+'px';r.style.width=(tr.width+pad*2)+'px';r.style.height=(tr.height+pad*2)+'px';
   document.body.classList.add('guiding');
   // the bubble sits away from the highlight
   const pp=el&&el.closest&&el.closest('#ppop');   // G6 review: inside a place's job list the bubble sits outside the list, never over its rows
