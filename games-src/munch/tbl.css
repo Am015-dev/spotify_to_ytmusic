@@ -447,4 +447,4 @@ html:has(.gxh-bulbb.on) .pulse,html:has(.gxh-bulbb.on) .rec{animation:none!impor
 html.ph #prompt.bfq>p.say{order:-10!important;position:relative;z-index:1;flex:none;margin:6px 0 6px;color:#3a2410!important;text-shadow:none!important;font:700 15px/1.25 var(--title)!important;text-align:center}
 html.ph #prompt.bfq>.acts.main{order:-9!important;position:relative;flex:none}
 /* compact readout: a long rival name shortens with … instead of pushing a score box past the table edge */
-html.ph .arena.cmp .vs .score{min-width:0;max-width:calc(50% - 6px)}html.ph .arena.cmp .vs .score .yn{min-width:0;overflow:hidden;text-overflow:ellipsis}
+html.ph .arena.cmp .vs .score{min-width:0;max-width:calc(50% - 6px)}html.ph .arena.cmp .vs .score.hero .yn{min-width:0;overflow:hidden;text-overflow:ellipsis}
