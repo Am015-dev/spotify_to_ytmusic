@@ -82,7 +82,7 @@ var TT_TEST = {};
     if (!it.length) it.push({ tag: who(p), kind: kindOf(p), text: '...' });
     return it;
   }
-  function wtx(t) { return String(t).replace(/play again/g, 'take another turn'); }
+  function wtx(t) { return String(t).replace(/let you play again/g, 'give an extra turn').replace(/play again/g, 'extra turn'); } // FIXED2: keeps every wonder line at 8 words or fewer
   function fit(a, b) { b = wtx(b); var t = a + ': ' + b; return wc(t) <= 8 ? t + '.' : a + '.'; }
   function cap(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
   // the rival's intention, said before it acts (the card is lifted while this shows)
