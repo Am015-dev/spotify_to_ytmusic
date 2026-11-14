@@ -33,5 +33,27 @@ const [W,H]=(process.argv[2]||'375x667').split('x').map(Number);const sleep=ms=>
   {const r=await p.evaluate(()=>{const g0=document.getElementById('tbgoal');if(g0)g0.remove();return [...document.querySelectorAll('.tb-loc:not(.tb-throne)')].map(g=>{const R=g.querySelector('.tb-hit').getBoundingClientRect();
     const on=(x,y)=>{const e=document.elementFromPoint(x,y);return !!(e&&e.closest('.tb-loc')===g)};return {id:g.dataset.id,w:Math.round(R.width),h:Math.round(R.height),edges:[on(R.left+R.width/2,R.top+R.height/2-20),on(R.left+R.width/2,R.top+R.height/2+20),on(R.left+R.width/2-20,R.top+R.height/2),on(R.left+R.width/2+20,R.top+R.height/2)].every(Boolean)}})});
     const small=r.filter(x=>x.w<44||x.h<44||!x.edges);say(r.length>=6&&!small.length,'map Locations >= 44x44 px: '+r.map(x=>x.id+' '+x.w+'x'+x.h+(x.edges?'':' (covered)')).join(', '))}
+  // 6. hint bubbles (R71): a double-tap on the coach bubble's "Got it" and on the bulb bubble must not reach the Goal button (or anything) below
+  {const reset=async()=>{await p.evaluate(()=>{const g=document.getElementById('tbgoal');if(g)g.remove();try{GXH.hide()}catch(e){}});await sleep(400)};
+    const bubAt=sel=>p.evaluate(sel=>{const e=[...document.querySelectorAll(sel)].find(x=>x.offsetWidth&&x.getBoundingClientRect().height);if(!e)return null;const q=e.getBoundingClientRect();return [q.left+q.width/2,q.top+q.height/2]},sel);
+    const goalOpen=()=>p.evaluate(()=>!!document.getElementById('tbgoal'));
+    const dtap=async(at,gap)=>{const e0=await p.evaluate(()=>TBTAPGUARD.eaten);await p.evaluate(()=>{window.__clk=0;window.__cl=e=>{if(!(e.target.closest&&e.target.closest('.gxh-bub')))window.__clk++};document.body.addEventListener('click',window.__cl,false)});
+      await p.touchscreen.tap(...at);await sleep(gap);await p.touchscreen.tap(...at);await sleep(250);
+      const r=await p.evaluate(()=>{document.body.removeEventListener('click',window.__cl,false);return {clk:window.__clk,bub:!!document.querySelector('.gxh-bub.on')}});r.goal=await goalOpen();r.eaten=(await p.evaluate(()=>TBTAPGUARD.eaten))-e0;return r};
+    let coach=0,bulb=0;
+    for(const gap of [110,180,250]){await reset();
+      // coach bubble: force the free-play coach to show its bubble for the current phase
+      await p.evaluate(()=>{try{GXH.reset&&GXH.reset()}catch(e){}try{GXH.phase(null);GXH.phase(hlpPhase())}catch(e){}});await sleep(1600);
+      let at=await bubAt('.gxh-bub.on:not(.gxh-bulbb) .gxh-ok');
+      if(at){coach++;const r=await dtap(at,gap);say(!r.goal&&r.clk===0,'coach bubble "Got it" double-tap '+gap+' ms: Goal card open '+r.goal+', clicks reaching the board '+r.clk+', guard ate '+r.eaten)}
+      await reset();
+      // bulb bubble
+      const bb=await bubAt('#bulbbtn');if(bb){await p.touchscreen.tap(...bb);await sleep(700);at=await bubAt('.gxh-bulbb .gxh-ok')||await bubAt('.gxh-bulbb .gxh-tx')||await bubAt('.gxh-bulbb');
+        if(at){bulb++;const r=await dtap(at,gap);say(!r.goal&&r.clk===0,'bulb bubble double-tap '+gap+' ms: Goal card open '+r.goal+', clicks reaching the board '+r.clk+', guard ate '+r.eaten)}}}
+    say(coach>=2,'coach bubble double-tap cases run: '+coach);say(bulb>=2,'bulb bubble double-tap cases run: '+bulb);
+    // legit taps: single taps 500+ ms apart on the Goal button are never eaten
+    await reset();const e0=await p.evaluate(()=>TBTAPGUARD.eaten);let opened=0;
+    for(let i=0;i<4;i++){const g=await bubAt('#tbturn .tbt-goal');if(!g)break;await p.touchscreen.tap(...g);await sleep(550);if(await goalOpen())opened++;const ok=await bubAt('#tbgoal button');if(ok){await p.touchscreen.tap(...ok);await sleep(600)}}
+    const eat=(await p.evaluate(()=>TBTAPGUARD.eaten))-e0;say(eat===0&&opened>=1,'legit taps (550 ms apart): Goal card opened '+opened+' times, legit taps eaten '+eat)}
   say(errs.length===0,'page errors '+errs.length+(errs[0]?' '+errs[0]:''));
   await b.close();console.log(bad?'doubletap-test FAIL '+bad:'doubletap-test PASS ('+W+'x'+H+')');process.exit(bad?1:0)})();

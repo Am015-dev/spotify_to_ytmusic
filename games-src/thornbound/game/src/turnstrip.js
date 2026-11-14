@@ -208,21 +208,22 @@ window.tbStripPaint=()=>{try{paint()}catch(x){}};setInterval(()=>{try{if(G&&UI.s
 // For 350 ms after a tap closes any overlay (Goal card, message card, pop-up, glossary, a modal, or a hint bubble), a tap near that same spot
 // (a double-tap) is swallowed. Taps elsewhere on the screen still work at once.
 (function(){const MS=350,R=40,D=document,OV='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub,#pc,#ppop,#gdef,#start';let until=0,at=null,down={t:-1e9,x:0,y:0};
-  const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'));
+  const gone=e=>!e.isConnected||e.hidden||(e.closest&&e.closest('[hidden]'))||(e.classList&&e.classList.contains('gxh-bub')&&!e.classList.contains('on'));
   const arm=()=>{const now=performance.now();if(now-down.t>600)return;until=now+MS;at={x:down.x,y:down.y}};
-  window.TBTAPGUARD={get until(){return until},get at(){return at},arm,ms:MS,radius:R,get on(){return performance.now()<until}};
+  let eaten=0;window.TBTAPGUARD={get eaten(){return eaten},get until(){return until},get at(){return at},arm,ms:MS,radius:R,get on(){return performance.now()<until}};
   const pt=e=>{const t=e.changedTouches&&e.changedTouches[0]||e.touches&&e.touches[0]||e;return {x:t.clientX,y:t.clientY}};
   // decided once per gesture, at its pointerdown: only a NEW tap that starts inside the window near the closing tap is swallowed (all of its events);
   // the rest of the tap that closed the overlay is never touched
   let gest=false;const kill=e=>{if(e.cancelable)e.preventDefault();e.stopImmediatePropagation();e.stopPropagation()};
   window.addEventListener('pointerdown',e=>{if(e.isTrusted===false)return;const q=pt(e),now=performance.now();
-    gest=!!(at&&now<until&&q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)<=R);if(gest){kill(e);return}down={t:now,x:q.x,y:q.y}},{capture:true,passive:false});
+    gest=!!(at&&now<until&&q.x!=null&&Math.hypot(q.x-at.x,q.y-at.y)<=R);if(gest){eaten++;kill(e);return}down={t:now,x:q.x,y:q.y}},{capture:true,passive:false});
   for(const t of ['pointerup','mousedown','mouseup','touchstart','touchend','click','dblclick'])window.addEventListener(t,e=>{if(gest&&e.isTrusted!==false)kill(e)},{capture:true,passive:false});
   // a tap inside an overlay that closes it (checked right after the tap's own handlers ran)
   window.addEventListener('click',e=>{const o=e.target&&e.target.closest&&e.target.closest(OV);if(!o)return;setTimeout(()=>{if(gone(o))arm()},0)},true);
-  // overlays closed from code during a tap (removed modal cards, or the message/pop-up panels getting hidden)
-  const isOv=n=>n.nodeType===1&&n.matches&&(n.matches('#tbgoal,[aria-modal="true"],.gx-goal')||!!n.querySelector('#tbgoal,[aria-modal="true"],.gx-goal'));
+  // overlays closed from code during a tap (removed modal cards or hint bubbles (gx-help removes them at the tap's pointerdown), a bubble losing its 'on' class, or the message/pop-up panels getting hidden)
+  const OVR='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub';const isOv=n=>n.nodeType===1&&n.matches&&(n.matches(OVR)||!!n.querySelector(OVR));
   const mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='childList'){for(const n of m.removedNodes)if(isOv(n)){arm();return}}
+    else if(m.type==='attributes'&&m.attributeName==='class'){const t=m.target;if(t.classList&&t.classList.contains('gxh-bub')&&!t.classList.contains('on')&&/(^|\s)on(\s|$)/.test(m.oldValue||'')){arm();return}}
     else if(m.type==='attributes'&&m.target.hidden&&m.oldValue===null&&/^(pc|ppop|gdef|start)$/.test(m.target.id)){arm();return}}});
-  const go=()=>mo.observe(D.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden'],attributeOldValue:true});
+  const go=()=>mo.observe(D.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class'],attributeOldValue:true});
   if(D.body)go();else D.addEventListener('DOMContentLoaded',go)})();
