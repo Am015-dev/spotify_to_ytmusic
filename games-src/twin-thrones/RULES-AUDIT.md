@@ -78,4 +78,8 @@ Count: 31 rule lines checked = 26 MATCH + 5 WRONG wonder/card-rule lines.
 The card data had about 40 wrong values (costs, points, chains, ages) across 32 cards, now fixed. MISSING rules: none found in the engine.
 
 ## What made it unplayable / not fun (touch play, see PLAYABLE.md for the test log)
-Listed in the FIXED1 section of `PLAYABLE.md`.
+Listed in the FIXED1 section of `PLAYABLE.md`. Briefly:
+- Hints were off by default.
+- Long choice lists ran under the city panel.
+- The move rating contradicted the star.
+- Normal was too easy (a star-follower won 73%; now 50%).

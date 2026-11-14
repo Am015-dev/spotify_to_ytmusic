@@ -84,6 +84,8 @@
     var sl = SLIP[level]; if (sl && scored.length > 1 && rng() < sl[0]) return scored[1 + Math.floor(rng() * Math.min(sl[1], scored.length - 1))][1];
     return scored[0][1];
   }
-  var API = { SLIP: SLIP, pick: pick, ev: ev, wval: wval, PRM: PRM };
+  // value of a move for p after its own follow-up choices (token / revive / burn) are settled; used to rate your move
+  function value(G, m, p) { var g = tryApply(G, m); if (!g) return null; settle(g, p); return ev(g, p); }
+  var API = { SLIP: SLIP, pick: pick, ev: ev, wval: wval, PRM: PRM, value: value };
   if (typeof module !== 'undefined') module.exports = API; else TT.AI = API;
 })();
