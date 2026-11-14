@@ -259,7 +259,7 @@ PICKH.bidRes=(seat,opt)=>{const P=G.pl[seat],bid=P.bid;
 AG.bidEnd=()=>{refillRoad(G.taken?1:2);G.bq=[]};
 function drawKingdom(){if(!G.kdeck.length&&G.kdisc.length){G.kdeck=shuffle(G.kdisc.splice(0));lg('The Kingdom Discard is shuffled into a new Kingdom Deck.')}return G.kdeck.length?G.kdeck.shift():0}
 function refillRoad(discards){const road=G.road;
-  for(let n=0;n<discards;n++){for(let i=3;i>=0;i--)if(road[i]){G.kdisc.push(road[i]);lg('The Great Road discards '+kname(road[i])+'.');road[i]=0;break}}
+  for(let n=0;n<discards;n++){for(let i=3;i>=0;i--)if(road[i]){G.kdisc.push(road[i]);lg('Great Road discards '+kname(road[i])+'.');road[i]=0;break}}
   const cards=road.filter(Boolean);road.fill(0);for(let i=0;i<cards.length;i++)road[4-cards.length+i]=cards[i];
   for(let i=3;i>=0;i--)if(!road[i]){const c=drawKingdom();if(c)road[i]=c}}
 // ---------------------------------------------------------------- acquiring Kingdom Cards

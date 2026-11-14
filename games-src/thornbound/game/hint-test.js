@@ -55,5 +55,10 @@ for(let s=0;s<4;s++)for(let k=0;k<19;k++){const id=s*100+k;const i=TB.cardInfo(G
     sites++;const a=j.commands.map(norm).sort().join(','),b=d.cm.map(dnorm).sort().join(',');
     if(a!==b){fails++;console.log('FAIL site',d.id,d.nm,'| cards.json',a||'(none)','| data.js',b||'(none)')}}
   if(sites<14){fails++;console.log('FAIL only',sites,'Site cards compared with cards.json')}else console.log('site commands vs cards.json:',sites,'cards')}
+// 6. the Great Road's discard line stays within phone-check's 8-word limit for every Kingdom Card name (R64 flake)
+{const es=fs.readFileSync(__dirname+'/src/engine.js','utf8');const m=es.match(/lg\('([^']*)'\+kname\(road\[i\]\)\+'([^']*)'\)/);
+  const words=t=>t.replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(w=>/[a-z][a-z]/i.test(w)).length;
+  if(!m){fails++;console.log('FAIL Great Road discard line not found in engine.js')}else{let worst='',wn=0;for(const k of TB.DATA.KC){const t=m[1]+k.nm+m[2];if(words(t)>wn){wn=words(t);worst=t}}
+    if(wn>8){fails++;console.log('FAIL road discard line has',wn,'words:',worst)}else console.log('road discard line: at most',wn,'words ('+worst+')')}}
 console.log(fails?'hint-test FAIL '+fails:'hint-test PASS ('+n+' cards, each hint vs its own text and params)');
 process.exit(fails?1:0);
