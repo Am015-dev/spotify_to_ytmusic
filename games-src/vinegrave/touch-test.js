@@ -32,6 +32,6 @@ const { chromium } = require('playwright'), serve = require('./serve.js');
     if (await p.locator('#qbox:not([hidden]) .btn').count()) fail = await tapSel('#qbox .btn:not([disabled])');
     await p.waitForTimeout(600); if ((await p.evaluate(() => G.turns || 0)) > t0) turns++;
   }
-  console.log((fail || errs.length || turns < Math.min(want, 4) ? 'FAIL' : 'PASS') + ' touch ' + (process.env.W || 390) + 'x' + (process.env.H || 844) + (process.env.FULL ? ' full game to ' + (await p.evaluate(() => G.phase)) : '') + ': ' + turns + ' turns by touchscreen.tap' + (fail ? ', ' + fail : '') + (errs.length ? ', error ' + errs[0] : ''));
+  console.log((fail || errs.length || turns < Math.min(want, 4) ? 'FAIL' : 'PASS') + ' touch ' + (process.env.W || 390) + 'x' + (process.env.H || 844) + (process.env.FULL ? ' full game to ' + (await p.evaluate(() => G.phase + ', you ' + VG.score(G, 0).total + ' vs ' + G.p.slice(1).map((q, i) => q.name + ' ' + VG.score(G, i + 1).total).join(', ') + (G.winner === 0 ? ' (you win)' : ' (you lose)'))) : '') + ': ' + turns + ' turns by touchscreen.tap' + (fail ? ', ' + fail : '') + (errs.length ? ', error ' + errs[0] : ''));
   await b.close(); S.close();
 })();

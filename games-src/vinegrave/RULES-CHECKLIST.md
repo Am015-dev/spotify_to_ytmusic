@@ -11,7 +11,9 @@ check that the engine applies its own table exactly, not that it equals the prin
 Known open (not fixed, reason): A13/A14/A15 box has 6 level-II sites, 16 idols, 40 items; the game has 8 / 12 / 35 (content and art slots in
 assets.json, needs new cards/pictures). H4 exile from the play area: needs a UI change (the exile picker reads the discard pile, W427 owns UI).
 K3 the rival stack is 8 tiles, not 10 (our own rival design, changing it needs a solo balance sign-off). Also simplified on purpose, no test:
-guardian boons that are travel values, free-action (lightning) cards, assistants, bonus tiles in the temple, blocking tiles, the other board side.
+guardian boons that are travel values, free-action (lightning) cards, bonus tiles in the temple, blocking tiles, the other board side.
+FIXED2 r2: research assistants are now built (section L: offer of 3, hire on rows 2/5 with the magnifier, gold upgrade with the notebook,
+once a round free, max 2; names, abilities, rows and the limit are our own).
 
 ## A. Setup
 
@@ -34,7 +36,7 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## B. Rounds and turns
 
-- **B1** A turn is exactly one main action (play a card), then play passes to the next explorer.
+- **B1** A turn is exactly one main action (play an item card), then play passes to the next explorer.
 - **B2** Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).
 - **B3** If everyone else has passed, the last player takes turns one after another.
 - **B4** The round ends when all players have passed: next round starts, explorers return to the board owners.
@@ -111,7 +113,9 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## H. Play a card
 
-- **H1** Playing a card gives its effect and uses the main action (funding card: +1 coin).
+- **H1** Playing a starting coin card gives its effect as a FREE action: +1 coin, still your turn.
+- **H1b** Playing a starting compass card is free too; you can play both and still take a main action.
+- **H1c** Playing an item card for its effect uses the main action.
 - **H2** Dread cards have no effect and cannot be played.
 - **H3** Exile removes a card from the game for good (hand card exiled, then the rest of the effect).
 - **H4** Exile can also take a card from your PLAY area (including the card just played).
@@ -156,4 +160,30 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 - **K5** Solo: the rival overcoming a guardian scores 5 points.
 - **K6** Solo: the rival discovering a site takes an idol worth 3 points.
 
-TOTAL 110
+## L. Research assistants
+
+- **L1** Setup: 12 assistants, silver side up, in 3 stacks of 4; nobody has one.
+- **L2** Notebook onto a silver-symbol row: choose the top assistant of a stack; it joins silver side up; then the turn ends.
+- **L3** The magnifier on that row recruits nobody (assistants come from the notebook).
+- **L4** Notebook onto a gold-symbol row: flip one assistant to gold, and it is refreshed even if used this round.
+- **L5** Using an assistant turns it sideways (once a round); a free-action assistant does not end the turn.
+- **L6** All assistants are refreshed at the end of the round.
+- **L7** The gold side has the stronger effect.
+- **L8** Two assistant squares: with 2 assistants a recruit can only upgrade.
+- **L9** The discount assistant (no free-action icon) is your main action: buy an item or artifact 1 cheaper (2 when gold).
+- **L10** The choice assistant gives a coin or a Plane; the Plane pays a travel icon this turn.
+- **L11** The travel assistant needs a Boot of travel (paid like a dig) to make an arrowhead.
+- **L12** A free notebook step (a boon) onto a silver-symbol row also recruits.
+
+## M. Free items, travel boons, temple, blocking, exile
+
+- **M1** A lightning (free-action) item is played without using your main action.
+- **M2** A travel boon pays a travel cost like a card, once; then it is used.
+- **M3** Temple stacks: one 11, two 6 and three 2 point stacks, each with as many tiles as players.
+- **M4** A 2-point temple tile pays one of the three costs.
+- **M5** Magnifier reaching the Lost Temple: choose one bonus tile from a stack of as many tiles as players.
+- **M6** Blocking tiles: 2 players block all 5 camp second spaces, 3 players block 3, 4 players none.
+- **M7** With 4 players two explorers can dig at the same camp (its second space).
+- **M8** Exile can take a card from your play area.
+
+TOTAL 132
