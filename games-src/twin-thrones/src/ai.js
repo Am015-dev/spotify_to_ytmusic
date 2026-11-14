@@ -33,7 +33,9 @@
     var before = ev(g, o); try { E.apply(g, { t: 'build', i: cellI }); } catch (e) { return 0; }
     return Math.max(0, ev(g, o) - before);
   }
-  var SLIP = { easy: [0.6, 5], normal: [0.28, 3] };
+  var SLIP = { easy: [0.6, 5], normal: [0.1, 3] };
+  // FIXED1: 'hint' = the greedy one-ply pick with no slips (the star you see with Hints on); Normal searches like Hard but slips, so a star-follower wins about half
+  function deep(level) { return level === 'hard' || level === 'normal'; }
   function pick(G, level, rng) {
     var p = E.sideToAct(G), M = E.validMoves(G);
     if (!M.length) return null; if (M.length === 1) return M[0];
@@ -49,7 +51,7 @@
       if (dn[m.i] == null) dn[m.i] = 0.45 * denial(S, p, m.i);
       v += dn[m.i];
       if (m.t === 'discard' && hasBuild[m.i]) v -= PRM.sellpen + 0.15 * Math.max(0, G.players[p].coins - 8);   // do not sell what you can build, least of all while rich
-      if (level === 'hard' && !g.over && E.sideToAct(g) === 1 - p) {
+      if (deep(level) && !g.over && E.sideToAct(g) === 1 - p) {
         var worst = 1e9, R = E.validMoves(g);
         if (!R.length) worst = ev(g, p);
         R.forEach(function (r) { var g2 = tryApply(g, r); if (!g2) return; settle(g2, 1 - p); var u = ev(g2, p); if (u < worst) worst = u; });
@@ -58,7 +60,7 @@
       scored.push([v + rng() * 0.05, m]);
     });
     scored.sort(function (a, b) { return b[0] - a[0]; });
-    if (level === 'hard' && scored.length > 1) {   // 3-ply on the best few: my move, their best reply, my best follow-up (still on the masked copy)
+    if (deep(level) && scored.length > 1) {   // 3-ply on the best few: my move, their best reply, my best follow-up (still on the masked copy)
       var top = scored.slice(0, PRM.topk);
       top.forEach(function (sc) {
         var g = null; hardG.forEach(function (h) { if (h[0] === sc[1]) g = h[1]; });
@@ -73,7 +75,9 @@
         });
         if (worst < 1e9) sc[0] = (1 - PRM.h3) * sc[0] + PRM.h3 * (worst + dn[sc[1].i] * 0.5);
       });
-      top.sort(function (a, b) { return b[0] - a[0]; }); return top[0][1];
+      top.sort(function (a, b) { return b[0] - a[0]; });
+      var sh = SLIP[level]; if (sh && top.length > 1 && rng() < sh[0]) return top[1 + Math.floor(rng() * Math.min(sh[1], top.length - 1))][1];
+      return top[0][1];
     }
     if (!scored.length) return M[0];
     // W492: Easy and Normal slip like a human: sometimes they take a lesser move from their top few (Normal ~2 of 3 vs a sensible new player)

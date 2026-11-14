@@ -5,7 +5,7 @@ Every line is one numbered rule. `node logic-test.js` asserts each against the r
 
 Rulebook points checked from the web text: first player starts Age I; weaker-military player chooses the next starter; with the pawn centred the last active player (took the last card) chooses; looting costs the rival 2 / 5 coins and never below 0; 3 and 6 steps loot, 9 steps wins.
 
-**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** individual Age I-III card costs and chain pairs other than those used above, Piraeus wonder cost, and which exact 3 cards are left out of each age. Cost-only; see rules-notes.md UNSURE lines.
+**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L, the Beacon Isle and Thunder Idol wonder costs, and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).
 
 
 ## A. Setup
@@ -54,7 +54,7 @@ Rulebook points checked from the web text: first player starts Age I; weaker-mil
 33. Customs Quay makes glass and papyrus cost 1 each.
 34. A yellow choice card (Caravan Post) supplies ONE unit of one of its resources, not two.
 35. A built wonder with a resource choice supplies one unit (Beacon Isle: wood/clay/stone; Sunken Harbor: glass/papyrus).
-36. A card with a coin cost AND resource cost adds trading coins to the printed coins.
+36. A card with a coin cost AND resource cost adds trading coins to the printed coins (Caravan Post: 2 coins + glass + papyrus).
 37. Trading coins are paid to the bank, the rival gets nothing (without Economy).
 38. Economy token: the owner receives the coins the rival pays for trading resources.
 39. Economy pays only for traded resources, not for the printed coin cost of a card.
@@ -112,8 +112,8 @@ Rulebook points checked from the web text: first player starts Age I; weaker-mil
 ## I. Wonders
 
 78. Colossus: 3 points, 2 shields; cost 3 clay + 1 glass.
-79. Pyramids: 9 points; cost 3 stone + 1 glass + 1 papyrus.
-80. Temple of Artemis: 12 coins and play again; cost 1 wood + 1 glass + 2 papyrus.
+79. Pyramids: 9 points; cost 3 stone + 1 papyrus.
+80. Temple of Artemis: 12 coins and play again; cost 1 wood + 1 stone + 1 glass + 1 papyrus.
 81. Hanging Gardens: 3 points, 6 coins, play again; cost 2 wood + 1 glass + 1 papyrus.
 82. Great Library: 4 points; draw 3 of the 5 boxed tokens, pick one.
 83. Mausoleum: 2 points; build one card from the discard pile for free.
@@ -153,3 +153,16 @@ Rulebook points checked from the web text: first player starts Age I; weaker-mil
 111. Tie on points and on blue points: shared victory (draw).
 112. Instant victories (military, science) end the game immediately and beat points.
 113. Full random games always reach a legal end (no stuck state, no negative coins, no duplicate card).
+
+## L. Card data checked against the original card list (FIXED1)
+
+114. Lookout (the free watchtower) costs nothing, gives 1 shield and has no chain.
+115. Age I science: Herb Garden (wheel) and Weights Hall (scale) are worth 1 point; Scribe Room (quill) and Remedy Shop (mortar) cost 2 coins, are worth 0 and carry a chain.
+116. Science symbols per age: Age I and Age II each hold mortar, quill, scale, wheel; Age III holds 2 globes and 2 sundials.
+117. Age II science: Scholars' Court (quill, S1 W1 G1, 2 pts) chains from Scribe Room; Healers' House (mortar, C2 S1, 2 pts) chains from Remedy Shop; Herbarium (wheel, W1 P2, 1 pt) and Measure Hall (scale, W1 G2, 1 pt) give chains.
+118. Age III science: two sundials worth 3 (S1 W1 G2; W2 G1 P1) and two globes worth 2 (C1 G1 P1 from Herbarium; S1 P2 from Measure Hall).
+119. Every chain links the right pair of cards (17 links, none dangling).
+120. Yellow card costs: Open Bazaar 3 coins + 1 clay; Caravan Post 2 coins + glass + papyrus; Armory S2 G1; Sand Arena C1 S1 W1.
+121. Red card costs: Archery Range S1 W1 P1; Bastion S2 C1 P1; Siege Yard W3 G1; War Pavilion 8 coins (3 shields); High Fort C2 S2; City Wall S2 with no chain.
+122. Blue card costs: Hall of Many Gods C1 W1 P2; Council Hall S3 W2; Grand Fountain C2 S1 P1; Sky Obelisk and Judges' Hall have no chain.
+123. Wonder costs: Sky Tomb S3 P1; Moon Grove W1 S1 G1 P1; Grand Arena S2 W1 G1; Sunken Harbor W2 S1 C1.

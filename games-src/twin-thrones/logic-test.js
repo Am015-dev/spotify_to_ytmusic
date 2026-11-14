@@ -219,12 +219,39 @@ R('Instant victories (military, science) end the game immediately and beat point
 R('Full random games always reach a legal end (no stuck state, no negative coins, no duplicate card).', function () {
   for (var s = 1; s <= 60; s++) { var G = E.newGame({ seed: s * 13 }), k = 0; while (!G.over && k++ < 400) { var M = E.validMoves(G); if (!M.length) throw { exp: 'moves', got: 'stuck seed ' + s }; E.apply(G, M[Math.floor(E.rnd(G) * M.length)]); var inv = E.checkInvariants(G); if (inv.length) throw { exp: 'clean', got: inv.join() + ' seed ' + s }; } if (!G.over) throw { exp: 'ended', got: 'seed ' + s }; } });
 
+sect('L. Card data checked against the original card list (FIXED1)');
+function CO(id) { var c = E.C(id).cost, o = []; ['coin', 'wood', 'clay', 'stone', 'glass', 'papyrus'].forEach(function (k) { if (c[k]) o.push(k + c[k]); }); return o.join(' '); }
+function SCI(a) { return D.CARDS.filter(function (c) { return c.age === a && c.sci; }).map(function (c) { return c.sci; }).sort().join(','); }
+R('Lookout (the free watchtower) costs nothing, gives 1 shield and has no chain.', function () { eq(['', 1, undefined], [CO('a1-lookout'), E.C('a1-lookout').shields, E.C('a1-lookout').gives]); eq(7, buildCoins(blank(), 0, 'a1-lookout') + 7); });
+R('Age I science: Herb Garden (wheel) and Weights Hall (scale) are worth 1 point; Scribe Room (quill) and Remedy Shop (mortar) cost 2 coins, are worth 0 and carry a chain.', function () {
+  eq([1, 1, 0, 0], ['a1-herb-garden', 'a1-weights-hall', 'a1-scribe-room', 'a1-remedy-shop'].map(function (i) { return E.C(i).vp || 0; })); eq(['book', 'gear'], [E.C('a1-scribe-room').gives, E.C('a1-remedy-shop').gives]); eq(['coin2', 'coin2'], [CO('a1-scribe-room'), CO('a1-remedy-shop')]); });
+R('Science symbols per age: Age I and Age II each hold mortar, quill, scale, wheel; Age III holds 2 globes and 2 sundials.', function () { eq('mortar,quill,scale,wheel', SCI(1)); eq('mortar,quill,scale,wheel', SCI(2)); eq('globe,globe,sundial,sundial', SCI(3)); });
+R('Age II science: Scholars\' Court (quill, S1 W1 G1, 2 pts) chains from Scribe Room; Healers\' House (mortar, C2 S1, 2 pts) chains from Remedy Shop; Herbarium (wheel, W1 P2, 1 pt) and Measure Hall (scale, W1 G2, 1 pt) give chains.', function () {
+  eq(['wood1 stone1 glass1', 'clay2 stone1', 'wood1 papyrus2', 'wood1 glass2'], ['a3-scholar-court', 'a3-apothecary-guild', 'a2-herbarium', 'a2-measure-hall'].map(CO));
+  eq([2, 2, 1, 1], ['a3-scholar-court', 'a3-apothecary-guild', 'a2-herbarium', 'a2-measure-hall'].map(function (i) { return E.C(i).vp; }));
+  var G = blank(); city(G, 0, ['a1-scribe-room', 'a1-remedy-shop']); eq([0, 0], [buildCoins(G, 0, 'a3-scholar-court'), buildCoins(G, 0, 'a3-apothecary-guild')]); });
+R('Age III science: two sundials worth 3 (S1 W1 G2; W2 G1 P1) and two globes worth 2 (C1 G1 P1 from Herbarium; S1 P2 from Measure Hall).', function () {
+  eq(['stone1 wood1 glass2', 'wood2 glass1 papyrus1', 'clay1 glass1 papyrus1', 'stone1 papyrus2'].map(function (x) { return x.split(' ').sort().join(' '); }), ['a3-planetarium', 'a2-star-gazers', 'a3-globe-hall', 'a2-chart-room'].map(function (i) { return CO(i).split(' ').sort().join(' '); }));
+  eq([3, 3, 2, 2], ['a3-planetarium', 'a2-star-gazers', 'a3-globe-hall', 'a2-chart-room'].map(function (i) { return E.C(i).vp; }));
+  var G = blank(); city(G, 0, ['a2-herbarium', 'a2-measure-hall']); eq([0, 0], [buildCoins(G, 0, 'a3-globe-hall'), buildCoins(G, 0, 'a2-chart-room')]); });
+R('Every chain links the right pair of cards (17 links, none dangling).', function () {
+  var L = {}; D.CARDS.forEach(function (c) { if (c.from) { var src = D.CARDS.filter(function (x) { return x.gives === c.from; })[0]; L[c.id] = src ? src.id : null; } });
+  var X = { 'a2-hero-monument': 'a1-open-stage', 'a2-sun-temple': 'a1-shrine', 'a2-water-arch': 'a1-bathhouse', 'a3-scholar-court': 'a1-scribe-room', 'a3-apothecary-guild': 'a1-remedy-shop', 'a2-horse-yard': 'a1-pony-pen', 'a2-barracks': 'a1-barrack-yard',
+    'a3-pantheon': 'a2-sun-temple', 'a3-gardens': 'a2-hero-monument', 'a3-fountain': 'a2-podium', 'a3-globe-hall': 'a2-herbarium', 'a2-chart-room': 'a2-measure-hall', 'a3-beacon-quay': 'a1-roadside-inn', 'a3-sand-arena': 'a2-brewhouse',
+    'a3-bastion': 'a1-stake-fence', 'a3-siege-yard': 'a2-archery-range', 'a3-high-fort': 'a2-parade-ground' }, XS = {}; Object.keys(X).sort().forEach(function (k) { XS[k] = X[k]; }); eq(XS, (function () { var o = {}; Object.keys(L).sort().forEach(function (k) { o[k] = L[k]; }); return o; })());
+  eq(17, Object.keys(L).length); });
+R('Yellow card costs: Open Bazaar 3 coins + 1 clay; Caravan Post 2 coins + glass + papyrus; Armory S2 G1; Sand Arena C1 S1 W1.', function () { eq(['coin3 clay1', 'coin2 glass1 papyrus1', 'stone2 glass1', 'wood1 clay1 stone1'], ['a2-open-bazaar', 'a2-caravan-post', 'a3-armory', 'a3-sand-arena'].map(CO)); });
+R('Red card costs: Archery Range S1 W1 P1; Bastion S2 C1 P1; Siege Yard W3 G1; War Pavilion 8 coins (3 shields); High Fort C2 S2; City Wall S2 with no chain.', function () {
+  eq(['wood1 stone1 papyrus1', 'clay1 stone2 papyrus1', 'wood3 glass1', 'coin8', 'clay2 stone2', 'stone2'], ['a2-archery-range', 'a3-bastion', 'a3-siege-yard', 'a3-war-pavilion', 'a3-high-fort', 'a2-city-wall'].map(CO)); eq([3, undefined], [E.C('a3-war-pavilion').shields, E.C('a2-city-wall').from]); });
+R('Blue card costs: Hall of Many Gods C1 W1 P2; Council Hall S3 W2; Grand Fountain C2 S1 P1; Sky Obelisk and Judges\' Hall have no chain.', function () { eq(['wood1 clay1 papyrus2', 'wood2 stone3', 'clay2 stone1 papyrus1'], ['a3-pantheon', 'a3-town-hall', 'a3-fountain'].map(CO)); eq([undefined, undefined], [E.C('a3-obelisk').from, E.C('a2-judges-hall').gives]); });
+R('Wonder costs: Sky Tomb S3 P1; Moon Grove W1 S1 G1 P1; Grand Arena S2 W1 G1; Sunken Harbor W2 S1 C1.', function () { eq(['stone3 papyrus1', 'wood1 stone1 glass1 papyrus1', 'wood1 stone2 glass1', 'wood2 clay1 stone1'], ['w-sky-tomb', 'w-moon-grove', 'w-grand-arena', 'w-sunken-harbor'].map(CO)); });
+
 if (process.argv.indexOf('--md') >= 0) {
   var out = ['# Twin Thrones: rules checklist (W435)', '',
     'Source: the published structure of the 2-player card-draft duel this game adapts (rulebook from knowledge, cross-checked with its public English rulebook text). Names are never written here.',
     'Every line is one numbered rule. `node logic-test.js` asserts each against the real engine (state set up exactly, one action, exact result); a failure prints `FAIL rule N: expected X, got Y`.', '',
     'Rulebook points checked from the web text: first player starts Age I; weaker-military player chooses the next starter; with the pawn centred the last active player (took the last card) chooses; looting costs the rival 2 / 5 coins and never below 0; 3 and 6 steps loot, 9 steps wins.', '',
-    '**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** individual Age I-III card costs and chain pairs other than those used above, Piraeus wonder cost, and which exact 3 cards are left out of each age. Cost-only; see rules-notes.md UNSURE lines.', ''];
+    '**Not asserted (could not be confirmed to the rulebook, so no test pretends to):** the costs of the Age I-III cards not listed in section L, the Beacon Isle and Thunder Idol wonder costs, and which exact 3 cards are left out of each age (random, as in the original). Section L was checked against the original card list in FIXED1 (RULES-AUDIT.md).', ''];
   RULES.forEach(function (r) { if (SECT[r.n]) out.push('', '## ' + SECT[r.n], ''); out.push(r.n + '. ' + r.text); });
   console.log(out.join('\n')); process.exit(0);
 }
