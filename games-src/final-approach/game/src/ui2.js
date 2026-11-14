@@ -104,7 +104,7 @@ function render() {
     // speed gauge: the blue marker (up to it the plane stays) and the orange marker (up to it one space, above it two) in their own corners, clear of the needles
     if (r.gauge && G.keys.includes('en0')) pz.appendChild(css(h('div.gau', { 'data-b': G.pl.aeroB, 'data-o': G.pl.aeroO, 'data-s': UI.gSpd || 0, 'aria-label': 'Speed gauge: engine sum up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves one space, more moves two' + (G.speed >= 0 ? '; last speed ' + G.speed : '') }, h('span.mk.b', { title: 'Blue marker: a sum up to this stays put' }, '≤' + G.pl.aeroB), h('span.mk.o', { title: 'Orange marker: up to this moves 1, above moves 2' }, '≤' + G.pl.aeroO)), r.gauge));
     const bv = FA.brakeVal(G);
-    if (r.brk && (G.keys.includes('br0') || G.mods.ice)) pz.appendChild(css(h('div.badge.brk', { 'aria-label': 'Brake value ' + bv + ': the last-round speed must be no more than this' }, h('span', 'Brakes'), h('b', String(bv))), r.brk));
+    if (r.brk && (G.keys.includes('br0') || G.mods.ice)) pz.appendChild(css(h('div.badge.brk', { 'aria-label': 'Brake value ' + bv + ': the landing speed may be at most this, checked when the second engine die is placed' }, h('span', 'Brakes'), h('b', String(bv))), r.brk));
   }
   // ---- coffee, rerolls
   if (r.coffee) { const cf = h('div.chipr'); for (let i = 0; i < 3; i++) cf.appendChild(h('i.tk.cf' + (i < G.coffee ? '' : '.off'))); pz.appendChild(css(cf, r.coffee));
@@ -120,9 +120,11 @@ function render() {
     const rrmode = G.pend && G.pend.h === 'rr' && me === s && mayAct(s) && !G.pend.d.m[s];
     for (let i = 0; i < nd; i++) {
       const d = G.dice[s][i], used = d.u || G.phase !== 'place', sel = UI.sel === i && me === s, cv = sel && UI.cof ? d.v + UI.cof : d.v;   // coffee changes the face shown
+      if (!show && !used) { tr2.appendChild(h('div.die.cover', { 'data-s': s, 'data-d': i, 'aria-hidden': 'true', style: 'width:' + ds + 'px;height:' + ds + 'px' }, dvEl('?', (s === 0 ? 'b' : 'o') + ' q'))); continue; }   // a hidden die is a picture; the whole tray is the tap target (below)
       const b = h('button.die' + (used ? '.used' : '') + (show && !used && mayAct(s) ? '' : '.cover') + (sel ? '.sel' : '') + (show && !used && !sel && mayAct(s) && !G.result && FA.pending(G).includes(s) && G.phase === 'place' && (!G.pend || G.pend.h === 'rr') ? '.can' : '') + (rrmode && UI.rrm[i] ? '.rrm' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': i, style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': used ? 'used' : (show ? pname(s) + ' die showing ' + cv + (cv !== d.v ? ' (with coffee, rolled ' + d.v + ')' : '') : pname(s) + ' die, hidden'), disabled: (used || !(show && mayAct(s))) ? true : null });
       b.appendChild(dvEl(show ? cv : '?', (s === 0 ? 'b' : 'o') + (show ? '' : ' q') + (show && cv !== d.v ? ' cof' : ''))); tr2.appendChild(b);
     }
+    if (!show && G.phase === 'place' && !G.result) { const left = G.dice[s].filter(d => !d.u).length; if (left) tr2.appendChild(h('button.trayhit', { type: 'button', 'data-a': 'hidtap', 'data-s': s, 'aria-label': pname(s) + ': ' + left + ' hidden ' + (left > 1 ? 'dice' : 'die') + '. Tap to learn why.' })); }
     if (G.pend && (G.pend.h === 'intern' && G.pend.d.seat === s || G.pend.h === 'sync' && s === 1) && (show || sharedSeat() === s)) { const val = G.pend.d.val + (UI.sel === 'p' && G.pend.h === 'sync' ? UI.cof : 0); tr2.appendChild(h('button.die' + (UI.sel === 'p' ? '.sel' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': 'p', style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': (G.pend.h === 'intern' ? 'Trainee token ' : 'Traffic die ') + val }, dvEl(val, (G.pend.h === 'intern' ? 't' : 'k') + (val !== G.pend.d.val ? ' cof' : '')))); }
     pz.appendChild(tr2);
   }
@@ -282,7 +284,7 @@ function actions(v) {
   if (G.pend) return f;
   const selD = typeof UI.sel === 'number' && UI.sel >= 0;
   // free actions (any time, also on the partner's turn)
-  if (has('rr').length) b(UI.rrAsk ? 'Spend 1 of ' + G.rrHand + ' rerolls?' : 'Reroll (' + G.rrHand + ')', 'rr', UI.rrAsk ? 'go' : 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
+  if (has('rr').length) b(UI.rrAsk ? 'Spend 1 of ' + G.rrHand + ' rerolls?' : 'Reroll token: ' + G.rrHand, 'rr', UI.rrAsk ? 'go' : 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
   if (has('adapt').length && selD) b('Flip this die', 'adapt', 'alt');
   if (has('wt').length && selD) b('Hand-over with this die', 'wt', 'alt');
   if (G.turn !== v) return f;

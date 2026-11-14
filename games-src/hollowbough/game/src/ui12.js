@@ -1,5 +1,5 @@
 // ===================== part 12: the tutorial (shell/gx-tutor.js): a staged short game that teaches every rule by doing it once =====================
-// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings, a short season (Winter, then Spring, then both pass).
+// The staged game: you and Bramble, one fixed deal (seed 4242), a city that already holds three red buildings; you play Winter, Spring, Summer and Autumn; Bramble plays the same year on shared places and passes in Autumn.
 // Bramble is scripted (tutAi) so each rule appears on cue. Nothing of it is saved, scored or counted. Each step spotlights one thing; only that thing answers;
 // the step moves on only when the game reports that exact tap (GXT.act from onTarget).
 const TUT_GAME = 'hollowbough', TUT_SEED = 4242;
@@ -23,23 +23,40 @@ function tutStage(g) {
   while (p.hand.length) g.discard.push(p.hand.pop());
   for (const k of ['mine', 'twig_barge', 'resin_refinery', 'farm', 'wife']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
   for (const k of ['inn', 'post_office', 'lookout']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
-  const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad;
+  // Bramble starts with a small city of her own too, so the demo ends close (you just ahead), not 22 to 1
+  for (const k of ['castle', 'farm', 'mine', 'twig_barge', 'architect']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
+  const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad; out.push(toad);
+  const bard = tutTake(g, 'bard', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
+  { const mk = D.specialEvents.findIndex(e => e.key === 'sev_resident_minstrel'), j = g.sev.findIndex(e => e.k === mk); if (j > 0) g.sev[j].k = g.sev[0].k; g.sev[0].k = mk; }   // Inn + that card = this special event
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
 const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'barge_toad');
+let TUT_BARD = -1; const tutBard = () => TUT_BARD;
+const tutInn = () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'inn'); return e ? e.id : -1; };
+// a pending choice of mine: the index of the first option that passes f, and its button
+const myQ = kind => !!G && !!G.q && G.q.who === 0 && (!kind || G.q.kind === kind) && !UI.cards.length && !UI.animBusy;
+const qIdx = f => (G && G.q ? G.q.opts.findIndex(f) : -1);
+const qEl = f => () => { const i = qIdx(f); return i < 0 ? null : tgEl('q:' + i)(); };
+const qTap = f => ({ type: 'tap', match: a => { const m = /^q:(\d+)$/.exec(a.tg || ''); return !!m && !!G.q && !!G.q.opts[+m[1]] && !!f(G.q.opts[+m[1]]); } });
+const tutRoad = () => (UI.sel && UI.sel.ms ? UI.sel.ms.findIndex(m => m.type === 'worker' && m.k === 'journey' && D.journey[m.i].points === 2) : -1);
+const isDone = o => o.card === undefined && o.res === undefined;
 // ---------------------------------------------------------------- Bramble is scripted: the same spots every time, then she passes
 (function () {
   const o = HB.AI.choose;
   HB.AI.choose = function (g, seat, level) {
     if (UI.cfg && UI.cfg.coached && UI.coachEnd && g === G && seat === 1) { const ps = HB.moves(g, 1).find(m => m.type === 'pass'); if (ps) return ps; }
     if (UI.cfg && UI.cfg.tutorial && !UI.cfg.coached && g === G && seat === 1) {
-      const p = g.players[1], mv = HB.moves(g, 1), key = (p.season === 0 ? 'w' : 's') + p.dep.length;
+      // FIXED13: Bramble plays the whole year legally (passing is only allowed in Autumn): Winter as scripted, then only shared basic places
+      // (never blocks a place the lesson needs), Prepare when her workers are out, no Summer meadow cards (the lesson's cards stay), Pass in Autumn
+      const p = g.players[1], mv = HB.moves(g, 1);
       const basic = k => mv.find(m => m.type === 'worker' && m.k === 'basic' && D.basic[m.i].key === k);
-      const want = { w0: () => basic('basic_pebble_bank'), w1: () => basic('basic_kindling_glen'), w2: () => mv.find(m => m.type === 'prepare'),
-        s0: () => basic('basic_gossip_glade'), s1: () => basic('basic_amber_weep'), s2: () => mv.find(m => m.type === 'pass') };
-      const m = want[key] && want[key](); if (m) return m;
+      if (g.q) { const st = mv.find(m => m.type === 'choose' && /^Stop/.test(m.label || '')); if (st) return st; return o.apply(this, arguments); }
+      if (p.season === 0) { const w = [() => basic('basic_pebble_bank'), () => basic('basic_kindling_glen')][p.dep.length]; const m = w && w(); if (m) return m; }
+      else { const order = p.season === 1 ? ['basic_gossip_glade', 'basic_amber_weep', 'basic_kindling_glen'] : ['basic_amber_weep', 'basic_kindling_glen', 'basic_berry_patch'];
+        for (let k = 0; k < order.length; k++) { const m = basic(order[(p.dep.length + k) % order.length]); if (m) return m; } }
+      const pr = mv.find(m => m.type === 'prepare') || mv.find(m => m.type === 'pass'); if (pr) return pr;
     }
     return o.apply(this, arguments);
   };
@@ -69,7 +86,7 @@ function tutReact(txt, ms) {
 }
 function tutSteps() {
   const S = HBS.steps, L = [
-    { id: 'goal', title: () => 'Ch 1 · Hazel', say: tsay('goal'), target: tq('#bd .chips'), wait: null, ready: myTurn },
+    { id: 'goal', title: S.goal.title, say: tsay('goal'), target: tq('#bd .chips'), wait: null, ready: myTurn },
     { id: 'places', title: S.places.title, say: tsay('places'), target: tutUnion('#bd .tile.t-basic, #bd .tile.t-forest'), wait: null, ready: myTurn },
     { id: 'twig', title: S.twig.title, say: tsay('twig'), target: tgEl('w:basic:4'), wait: tapIs('w:basic:4'), ready: () => myTurn() && !!tgEl('w:basic:4')() },
     { id: 'stock', title: S.stock.title, say: () => tsay('stock', G.players[0].res.twig), target: tq('#bd .resrow'), wait: null,
@@ -77,16 +94,16 @@ function tutSteps() {
     { id: 'rival', title: S.rival.title, say: () => tsay('rival', pname(1)), target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
       ready: () => G.players[1].dep.length === 1 && myTurn() },
     { id: 'resin', title: S.resin.title, say: tsay('resin'), target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
-    { id: 'hand', title: () => 'Ch 2 · Building', say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
+    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
     { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
       ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'city', title: S.city.title, say: () => tsay('city', G.players[0].city.length), target: tq('#bd .strip.city'), wait: null,
+    { id: 'city', title: S.city.title, say: () => tsay('city', HB.cityCount(G, 0)), target: tq('#bd .strip.city'), wait: null,
       ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
     { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },
     { id: 'spring', title: S.spring.title, say: () => tsay('spring', G.players[0].workers, G.players[0].res.berry), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].season === 1 && !UI.cards.length },
-    { id: 'berry', title: () => 'Ch 3 · Sharing', say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
+    { id: 'berry', title: S.berry.title, say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
     { id: 'toad', title: S.toad.title, say: tsay('toad'), target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
       wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'barge_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
     { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
@@ -94,33 +111,72 @@ function tutSteps() {
     { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
     { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
-    { id: 'pass', title: () => 'Ch 4 · Winter ends', say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
+    { id: 'prep2', title: S.prep2.title, say: tsay('prep2'), target: tgEl('prep'), wait: tapIs('prep'), ready: () => myTurn() && G.players[0].season === 1 && !!tgEl('prep')() },
+    { id: 'summer', title: S.summer.title, say: tsay('summer'), target: qEl(o => o.card !== undefined && o.card !== tutBard()), wait: { type: 'tap', times: 2, match: a => /^q:/.test(a.tg || '') && qTap(o => o.card !== undefined && o.card !== tutBard()).match(a) },
+      ready: () => !!G && !!G.q && HB.actor(G) === 0 && !UI.cards.length && !UI.animBusy && !!tq('#bd [data-t^="q:"]')() },
+    { id: 'inn', title: S.inn.title, say: tsay('inn'), target: () => tgEl('d:' + tutInn())(), wait: tapIs(() => 'd:' + tutInn()),
+      ready: () => myTurn() && G.players[0].season === 2 && !!tgEl('d:' + tutInn())() },
+    { id: 'innbuy', title: S.innbuy.title, say: () => tsay('innbuy', cname(tutBard())), target: qEl(o => o.card === tutBard()), wait: qTap(o => o.card === tutBard()),
+      ready: () => myQ('inn') && !!qEl(o => o.card === tutBard())() },
+    { id: 'bard', title: S.bard.title, say: tsay('bard'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
+    { id: 'special', title: S.special.title, say: () => tsay('special', cname(tutInn()), cname(tutBard())), target: tgEl('w:sev:0'), wait: tapIs('w:sev:0'), ready: () => myTurn() && !!tgEl('w:sev:0')() },
+    { id: 'stack', title: S.stack.title, say: tsay('stack'), target: qEl((o, i) => i === 0), wait: qTap(o => o === G.q.opts[0]), ready: () => myQ('stack') && !!qEl((o, i) => i === 0)() },
+    { id: 'haven', title: S.haven.title, say: tsay('haven'), target: tgEl('w:haven'), wait: tapIs('w:haven'), ready: () => myTurn() && !!tgEl('w:haven')() },
+    { id: 'havenq', title: S.havenq.title, say: tsay('havenq'), target: qEl(o => o.card !== undefined), wait: Object.assign(qTap(o => o.card !== undefined), { times: 2 }),
+      ready: () => myQ('discard') && !!qEl(o => o.card !== undefined)() },
+    { id: 'havendone', title: S.havendone.title, say: tsay('havendone'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
+    { id: 'havenres', title: S.havenres.title, say: tsay('havenres'), target: qEl(o => o.res === 'berry'), wait: qTap(o => o.res !== undefined),
+      ready: () => myQ('resource') && !!qEl(o => o.res === 'berry')() },
+    { id: 'gossip', title: S.gossip.title, say: tsay('gossip'), target: tgEl('w:basic:5'), wait: tapIs('w:basic:5'), ready: () => myTurn() && !!tgEl('w:basic:5')() },
+    { id: 'prep3', title: S.prep3.title, say: tsay('prep3'), target: tgEl('prep'), wait: tapIs('prep'),
+      ready: () => { const ok = myTurn() && G.players[0].season === 2 && !!tgEl('prep')(); if (ok) UI.tutRes = Object.assign({}, G.players[0].res); return ok; } },
+    { id: 'autumn', title: S.autumn.title, say: () => { const p = G.players[0], b = UI.tutRes || p.res, got = HB.RES.filter(r => p.res[r] > b[r]).map(r => (p.res[r] - b[r]) + ' ' + rname(r, p.res[r] - b[r]));
+        return tsay('autumn', p.workers, got.length ? got.join(', ') : 'nothing'); }, target: tq('#bd .resrow'), wait: null, ready: () => myTurn() && G.players[0].season === 3 },
+    { id: 'journey', title: S.journey.title, say: tsay('journey'), target: tgEl('w:journey'), wait: tapIs('w:journey'), ready: () => myTurn() && !!tgEl('w:journey')() },
+    { id: 'road', title: S.road.title, say: tsay('road'), sel: true, target: () => tutRoad() < 0 ? null : tgEl('o:' + tutRoad())(), wait: tapIs(() => 'o:' + tutRoad()),
+      ready: () => !!G && !!UI.sel && tutRoad() >= 0 && !!tgEl('o:' + tutRoad())() },
+    { id: 'journeyq', title: S.journeyq.title, say: () => tsay('journeyq', (G.q && G.q.opts[0] && G.q.opts[0].d && G.q.opts[0].d.max) || 2), target: qEl(o => o.card !== undefined),
+      wait: Object.assign(qTap(o => o.card !== undefined), { times: 2 }), ready: () => myQ('discard') && !!qEl(o => o.card !== undefined)() },
+    { id: 'pass', title: S.pass.title, say: tsay('pass'), target: tgEl('pass'), wait: { type: 'tap', times: 2, match: a => a.tg === 'pass' },
       ready: () => myTurn() && !!tgEl('pass')() },
-    { id: 'score', title: S.score.title, say: () => tsay('score', sc0()), target: tq('#pc .kv.tot'), wait: null,
+    { id: 'score', title: S.score.title, say: () => tsay('score', sc0(), pname(1), G.over.scores[1].total), target: tq('#pc table.vs'), wait: null,
+      hold: c => c.kind === 'over-score', ready: () => !!cardTitle('over-score') && !!document.querySelector('#pc:not([hidden]) table.vs') },
+    { id: 'bonus', title: S.bonus.title, say: tsay('bonus'), target: tq('#pc table.vs'), wait: null,
       hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
-      ready: () => /^Final score: You/.test(cardTitle('over-score')) },
-    { id: 'rscore', title: S.rscore.title, say: () => tsay('rscore', pname(1), G.over.scores[1].total), target: tq('#pc .kv.tot'), wait: null,
-      hold: c => c.kind === 'over-score', onNext: () => { UI._tutIn = 1; try { nextCard(); } finally { UI._tutIn = 0; } },
-      ready: () => new RegExp('^Final score: ' + pname(1)).test(cardTitle('over-score')) },
+      ready: () => !!cardTitle('over-score') && !!document.querySelector('#pc:not([hidden]) table.vs') },
     { id: 'end', title: S.end.title, say: () => tsay('end', G.over.winner === 0, G.over.scores[0].total, G.over.scores[1].total),
-      target: tq('#pc .kv.tot'), wait: null, hold: c => c.kind === 'over', ready: () => !!cardTitle('over') }
+      target: tq('#pc:not([hidden]) > :first-child'), wait: null, hold: c => c.kind === 'over', ready: () => !!cardTitle('over') && !!tq('#pc:not([hidden])')() }
   ];
   // reaction beat after each action, and the next step waits until it has been read
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
-    st.onEnter = () => { UI.tutLog.push(st.id); };
-    if (r) st.onDone = () => { tutReact(r, st.id === 'resin' || st.id === 'forest' ? 3000 : 2300); };
-    st.ready = () => (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd());
+    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', inn: 'city', innbuy: 'meadow', special: 'goals', gossip: 'places' }[st.id];
+    if (st.id === 'goal') st.avoid = () => ['#bd .resrow', '#bd .pv-tabs', '#bd .strip.hand'].map(q => document.querySelector(q)).filter(Boolean).map(e => e.getBoundingClientRect()).filter(r => r.width);   // step 1 talks about the score chips: keep goods, tabs and hand clear
+    if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
+    st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
+    st.ready = () => { if (tab && G && UI.pvTab !== tab && HB.actor(G) === 0 && !UI.cards.length) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } }
+      try { const el = st.target && st.target(); if (el && typeof pvScrollTo === 'function') pvScrollTo(el); const row = el && el.closest && el.closest('.hscroll'); if (row) { const r = el.getBoundingClientRect(), q = row.getBoundingClientRect(); if (r.left < q.left - 1 || r.right > q.right + 1) { row.scrollLeft += r.left - q.left - (q.width - r.width) / 2; UI.pvMx = row.scrollLeft; } } } catch (e) { }   // the target is never half off screen
+      return (!UI.reactUntil || Date.now() >= UI.reactUntil) && (!rd || rd()); };
   });
   return L;
+}
+// a "look" step: tap the real thing on the board to learn it; the tap teaches, it does not move a worker
+function tutLook(id, target, isIt) {
+  const S = HBS.steps;
+  return { id, title: S[id].title, say: tsay(id), target, look: isIt, wait: tapIs('look:' + id), ready: () => myTurn() && !!target() };
 }
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c) { if (typeof GXT === 'undefined' || !GXT.active()) return false; const st = GXT.current(); return !!(st && st.hold && st.hold(c)); }
 function storyOpen() { if (typeof GXC === 'undefined') return; if (typeof GXT !== 'undefined' && !GXT.isDone(TUT_GAME)) tutStart({ prologue: true }); else campOpen(); }
 function tutStart(o) {
   const pro = !!(o && o.prologue);
-  try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutLog = []; UI.coachDone = {}; UI.coachUntil = 0; UI.coachT0 = Date.now(); UI.coachPro = pro; UI.coachActs = 0; UI.coachKey = 0; UI.coachEnd = 0; UI.coachSnap = null; UI.fbLog = []; UI.fbQ = []; UI.seed = TUT_SEED; window.GXCOACH = { running: true, explained: [], done: false };
+  try { GX.close(); } catch (e) { } closePop(); UI.camp = null; UI.reactUntil = 0; UI.tutTab = null; UI.tutLog = []; UI.coachDone = {}; UI.coachUntil = 0; UI.coachT0 = Date.now(); UI.coachPro = pro; UI.coachActs = 0; UI.coachKey = 0; UI.coachEnd = 0; UI.coachSnap = null; UI.fbLog = []; UI.fbQ = []; UI.seed = TUT_SEED; window.GXCOACH = { running: true, explained: [], done: false };
   newGame('tutorial');
+  // Learn to play: one step at a time. Each step names the exact thing to tap, glows it, and waits for that tap.
+  if (typeof GXT !== 'undefined') GXT.start({ game: TUT_GAME, steps: tutSteps(), endTitle: 'You know the rules', endText: HBS.end.text,
+    endButtons: pro && window.CAMPAIGN && window.CAMPAIGN.chapters ? [{ id: 'chapter', label: 'Start chapter 1' }] : null,
+    onDone: o => { tutLeave(); const c = o && o.choice; if (c === 'play') { newGame('vs'); return; } if (c === 'chapter' || c === 'story') { const f = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0]; if (c === 'chapter' && f && typeof GXC !== 'undefined') GXC.play(f.id); else campOpen(); } else showStart(); },
+    onExit: () => { tutLeave(); showStart(); } });
 }
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave() { clearTimeout(UI.tm); clearTimeout(UI.tr); UI.started = false; UI.cards = []; UI.sel = null; UI.cfg = null; G = null; fxClear(); try { GXH.hide(); } catch (e) { } try { const f = $('#finger'); if (f) f.hidden = true; } catch (e) { }
@@ -138,10 +194,30 @@ function tutOffer(go) {
 (function () {
   const o = onTarget;
   onTarget = function (tg, el) {
-    if (tutOn() && !UI._tutIn) { if (!G || UI.cards.length) return; if (!/^x:/.test(tg) && !UI.animBusy && !GXT.act({ type: 'tap', tg })) return; }
+    if (tutOn() && !UI._tutIn) { if (!G || UI.cards.length) return;
+      const st = GXT.current(); if (st && st.look) { let hit = false; try { hit = !!st.look(String(tg)); } catch (e) { } GXT.act({ type: 'tap', tg: hit ? 'look:' + st.id : String(tg) }); return; }
+      if (!/^x:/.test(tg) && !UI.animBusy && !GXT.act({ type: 'tap', tg })) return; }
     return o.apply(this, arguments);
   };
 })();
+// a choice chip in the tray (not a board target) still tells the lesson, and only the asked-for one answers
+function tutGate(tg, sel) { if (!tutOn() || UI._tutIn) return true; if (sel) { const st = GXT.current(); if (!st || !st.sel) return true; } if (!G || UI.cards.length || UI.animBusy) return false; return !!GXT.act({ type: 'tap', tg: String(tg) }); }
+// While a tutorial step is up, only what the step spotlights may glow: places under the dim shield (or anything while the step is waiting
+// for Bramble) do not answer a tap, so they must not look tappable. The class is parked as .tgoff and comes back when its turn comes.
+function tutGlowSweep() {
+  const bd = document.getElementById('bd'); if (!bd) return;
+  const els = bd.querySelectorAll('.glow,.tgoff');
+  if (!tutOn()) { els.forEach(e => { if (e.classList.contains('tgoff')) { e.classList.remove('tgoff'); e.classList.add('glow'); } }); return; }
+  const st = GXT.state() || {}, holes = st.phase === 'show' && st.wait ? (st.holes || []) : [];
+  els.forEach(e => {
+    const r = e.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const lit = holes.some(h => cx >= h.left && cx <= h.left + h.width && cy >= h.top && cy <= h.top + h.height);
+    if (lit && e.classList.contains('tgoff')) { e.classList.remove('tgoff'); e.classList.add('glow'); }
+    else if (!lit && e.classList.contains('glow')) { e.classList.remove('glow'); e.classList.add('tgoff'); }
+  });
+}
+(function () { const o = render; render = function () { const r = o.apply(this, arguments); try { tutGlowSweep(); } catch (e) { } return r; }; })();
+setInterval(() => { try { if (tutOn() || document.querySelector('#bd .tgoff')) tutGlowSweep(); } catch (e) { } }, 120);
 (function () { const o = doUndo; doUndo = function () { if (tutOn()) return; return o.apply(this, arguments); }; })();
 (function () { const o = nextCard; nextCard = function () { if (tutOn() && !UI._tutIn && UI.cards.length && UI.cards[0].kind !== 'pass') return; return o.apply(this, arguments); }; })();
 // ===================== part 14: the coached first game (replaces the forced tap-by-tap tutorial) =====================
@@ -155,23 +231,23 @@ const COACH = [
   { id: 'stock', when: (p) => p.dep.length >= 1, say: p => 'Twigs, resin, pebbles and berries pay for cards. You hold ' + p.res.twig + ' twigs, ' + p.res.resin + ' resin, ' + p.res.pebble + ' pebbles and ' + p.res.berry + ' berries.', later: 'Goods pay for cards.' },
   { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
   { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
-  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Production cards pay again each season.', later: 'Buildings stay in your city. Production pays each season.' },
+  { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Green cards pay again in Spring and Autumn.', later: 'Cards stay in your city. Green cards pay in Spring and Autumn.' },
   { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
   { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
   { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
-  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: () => 'All workers are out. Prepare: they come home, you gain one, production pays.', later: 'Prepare: workers come home, +1 worker, production pays.' },
-  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer draws cards. Autumn brings extra workers.', later: 'Seasons: Winter, Spring, Summer (draw cards), Autumn (extra workers).' },
+  { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: p => 'All workers are out. Prepare: they come home and you gain ' + (p.season === 2 ? 'two more' : 'one more') + '. ' + (p.season === 1 ? 'Summer: take up to 2 meadow cards.' : 'Green cards pay.'), later: 'Prepare: workers come home. Spring and Autumn: green cards pay. Summer: take up to 2 meadow cards.' },
+  { id: 'spring', when: (p) => p.season >= 1, say: p => 'A new season! You have ' + p.workers + ' workers. Summer lets you take meadow cards. Autumn brings two more workers.', later: 'Seasons: Spring +1 worker, Summer +1 (meadow cards), Autumn +2.' },
   { id: 'shared', when: (p) => myTurnC() && p.season >= 1, say: () => 'Shared places take many workers. Rivals share the Berry Patch.', later: 'Shared places take many workers.' },
-  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
-  { id: 'pass', when: (p) => !p.passed && myTurnC() && (p.season >= 2 || (p.season >= 1 && p.workers - p.dep.length === 0)), say: () => 'When you are done, Pass. The game ends when all have passed. Unused workers are wasted.', later: 'Pass ends your game. Unused workers are wasted.' }
+  { id: 'forest', when: (p) => myTurnC() && p.dep.length >= 2, say: () => G.np >= 4 ? 'The forest pays more goods. Each spot takes two workers, never two of yours.' : 'The forest pays more goods. Each spot holds one worker.', later: 'Forest places pay more.' },
+  { id: 'pass', when: (p) => !p.passed && myTurnC() && p.season >= 3 && p.workers - p.dep.length === 0, say: () => 'Autumn is the last season. When you are done, Pass. The game ends when all have passed.', later: 'Pass only in Autumn, after your last Prepare. Unused workers are wasted.' }
 ];
 // rules that need a situation we cannot count on: told at the end
-const COACH_TALE = 14;   // the first game is a short tale: after this many of your own actions Hazel passes for you
+const COACH_TALE = 1e9;   // the first game plays the whole year (R21: ending it after 14 actions left the rival with 4 cards); the cut-off code stays for a future short mode
 const COACH_LATER = [
   { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
   { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
   { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
-  { id: 'special', later: 'Special events need certain buildings and cost goods.' },
+  { id: 'special', later: 'Each special event needs two named cards in your city.' },
   { id: 'tie', later: 'Ties go to most events, then most leftover goods.' }
 ];
 const myTurnC = () => !!G && UI.started && G.phase !== 'over' && !UI.cards.length && !UI.animBusy && HB.actor(G) === 0;
@@ -189,7 +265,7 @@ function coachFeedback(p) {
   if (!b || b.season !== snap.season && snap.dep === 0) return null;
   const say = (k, t) => { const L = UI.fbLog = UI.fbLog || []; if (L.filter(x => x === k).length >= 2) return null; L.push(k); return t; };
   if (snap.passed && !b.passed) return snap.un > 0 ? say('poor:pass', 'You passed with ' + snap.un + ' worker' + (snap.un > 1 ? 's' : '') + ' still home. Each was a lost action.') : say('good:pass', 'Good: every worker was used before you passed.');
-  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : '. It will keep paying every season.')); }
+  if (snap.city > b.city) { const e = p.city[p.city.length - 1], sp = e && spec(e.id); return say('good:build', 'Good: ' + (sp ? sp.name : 'a building') + ' is built' + (sp && sp.points ? ', worth ' + sp.points + ' point' + (sp.points > 1 ? 's' : '') + ' for good.' : (e && HB.cardOf(e.id).color === 'green' ? '. It pays again in Spring and Autumn.' : '.'))); }
   if (snap.pts >= b.pts + 3) return say('good:points', 'Good: +' + (snap.pts - b.pts) + ' points in one move. Events and big cards pay best.');
   if (snap.hand >= 8 && b.hand < 8) return say('poor:hand', 'Careful: your hand is full at 8. Extra cards are lost. Play one soon.');
   if (snap.dep > b.dep && snap.res <= b.res && snap.hand <= b.hand && snap.pts <= b.pts) return say('poor:empty', 'That worker gained nothing. Check what glows before you send one.');

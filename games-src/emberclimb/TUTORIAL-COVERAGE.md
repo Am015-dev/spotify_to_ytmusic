@@ -1,3 +1,26 @@
+# Emberclimb tutorial: rule coverage (W494)
+
+## R7 (Nov 2026): every rule by doing, no "meet later" list
+After the guided first fight, the coached climb's path holds every room type: floor 2 is a real choice (a fight or a ? event), then
+treasure (relic), campfire (rest heals 30% or smith a card), shop (buy or remove), an elite with two foes (pick a target; it adds Dazed),
+and the act boss, which splits into slimes when it falls. The Warrior deck gets a hit-all attack and a die card so both come up in play.
+The map step no longer lists room types in one Next line; each room's rule is said the first time you enter it. The end card ticks off
+what you did (no count, no list of rules for later). Hero-only rules (Shivs, Orbs, stances, Scry, Retain), two-hero rules, Frail and
+multi-act climbs show once as a tip the first time they happen in a real game (src/tutor.js tips()).
+Proof: `node tools/tut-end.js` fails if any core rule in `EC_TUT_CORE` (minus lose, preview, piles, event) was not met by doing, or if the
+end card shows a count or a "later" list.
+
+W494 replaced the two forced steps with a guided first fight plus the first map screen. Each step is one line of 12 words or fewer and
+one highlighted tap (a card, End turn, the potion, a reward card, Continue, a map room, or Next on an info step). Order:
+goal, intent, energy (3 a turn), draw (5 a turn), Vulnerable (Anvil Blow), Vulnerable doubles hits, Block (Plate Guard), End turn,
+discard pile, Block resets, enemy patterns, Strength (Kindle, a Power), Exhaust (Roar), Weak, potion + Poison, Ethereal / Retain,
+finish with Strikes, gold, card reward (1 of 3 or Skip), deck growth + upgrades, Continue, branching map, campfire (heal or upgrade),
+shop (buy or remove), event, elite (relic), boss (relic), three acts, then tap a room: the real climb goes on with the coach.
+Proof: `node tools/tut-walk.js` (390x844 + 375x667, real touch taps, checks every step id in `EC_TUT_RULES` in order and the word cap).
+Shots: `playable-shots/w494/tut-1..tut-29.png`.
+
+The older notes below describe the coach that still speaks during the rest of the climb.
+
 # Emberclimb coached first climb: rule coverage
 
 The tutorial is a real short climb (Warrior, seed 7, a branching 6-floor map: fight, then treasure or fight, fight or ?, campfire or shop,

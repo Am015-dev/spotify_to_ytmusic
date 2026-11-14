@@ -1,10 +1,11 @@
 // Plays a whole Quick game by DRAGGING pieces (dice onto stalls/spaces/goods, tiles onto spaces, workers onto dice) with real pointer moves.
-// Taps are used only for buttons (End turn, workers, pop-up choices). node drag-play.js ; phone 390x844 and PC 1440x900.
+// Taps are used only for buttons (End turn, workers, pop-up choices). SHOTS=1 saves playable-shots/gameplay/first-turn, mid-game, result (390x844). node drag-play.js ; phones 390x844 + 375x667 (touch) and PC 1440x900.
 const { chromium } = require('playwright'); const path = require('path');
 const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1';
 (async () => {
   const b = await chromium.launch(); let fails = 0;
-  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]]) {
+  for (const [name, vp, touch] of [['phone-touch', { width: 390, height: 844 }, true], ['phone-s-touch', { width: 375, height: 667 }, true], ['pc-mouse', { width: 1440, height: 900 }, false]].filter(x => !process.env.ONLY || x[0] === process.env.ONLY)) {
+    const SHOT = process.env.SHOTS && name === 'phone-touch' ? path.join(__dirname, 'playable-shots', 'gameplay') : null, shots = {}; if (SHOT) require('fs').mkdirSync(SHOT, { recursive: true });
     const ctx = await b.newContext({ viewport: vp, hasTouch: touch, isMobile: touch }), page = await ctx.newPage(), errs = [];
     const cdp = touch ? await ctx.newCDPSession(page) : null; let tp = { x: 0, y: 0 };
     const tch = (type, x, y) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x, y, id: 1 }] });
@@ -21,6 +22,7 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       const st = await page.evaluate(() => ({ over: G.over, mine: !G.over && G.seats[VB.actor(G)].human && !UI.busy, tv: !document.getElementById('tv').hidden, top: !!pend() }));
       if (st.over) break;
       if (st.tv) { const b1 = page.locator('#tv .acts .btn:not(.alt)'); if (await b1.count()) await tapSel(b1.first()); else await tapSel(page.locator('#tvClose')); taps++; continue; }
+      if (SHOT && st.mine && !st.tv && !st.top) { const k = await page.evaluate(() => G.phase + '/' + G.round); if (k === '0/0' && !shots.first) { shots.first = 1; await page.waitForTimeout(400); await page.screenshot({ path: SHOT + '/first-turn.png' }); } if (k === '2/2' && !shots.mid) { shots.mid = 1; await page.evaluate(() => { if (L.tabs) { UI.tab = 'estate'; render(); } }); await page.waitForTimeout(400); await page.screenshot({ path: SHOT + '/mid-game.png' }); } }
       if (!st.mine) { await page.waitForTimeout(25); if (++stuck > 4000) { console.log(name, 'FAIL waiting'); break; } continue; } stuck = 0;
       const plan = await page.evaluate(() => {
         if (pend()) return { k: 'tap' };
@@ -44,13 +46,15 @@ const URL = 'file://' + path.join(__dirname, 'vale-of-banners.html') + '?fast=1'
       if (ok && plan.k !== 'worker') { await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); await page.waitForTimeout(plan.k === 'combo' ? 120 : 0); await page.waitForFunction(() => !UI.busy, null, { timeout: 5000 }).catch(() => { }); const seq1 = await page.evaluate(() => G.seq); if (seq1 === seq0) { drags[plan.k]--; missed++; ok = false; } else if (plan.k === 'combo' && seq1 - seq0 < 2) { combo1++; } }
       if (!ok || plan.k === 'tap') {
         const order = ['#endB', '#es .glow', '#store .glow', '#mk .stgoods.glow', '#goods .glow', '#mk .tilebtn.glow', '#tabs .tab.has', '#acts .btn.alt'].map(x => x + ' >> visible=true');
-        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { await tapSel(l.first()); taps++; did = true; break; } }
+        let did = false; for (const s of order) { const l = page.locator(s); if (await l.count()) { if (process.env.DBG && taps > 300 && taps < 306) console.log(name, 'tap', s, plan.k, await page.evaluate(() => JSON.stringify({ tv: !document.getElementById('tv').hidden, busy: UI.busy, sel: UI.sel, die: UI.die, bump: UI.bump, actor: VB.actor(G), round: G.phase + '/' + G.round, store: G.P[VB.actor(G)].store.length, tab: UI.tab, pend: pend(), dice: G.P[VB.actor(G)].dice, used: G.P[VB.actor(G)].used, fit: L.mkFit, vm: VB.validMoves(G).slice(0, 4) }))); await tapSel(l.first()); taps++; did = true; break; } }
         if (!did) { console.log(name, 'FAIL nothing to do', plan.k); fails++; break; }
+        if (taps > 400) { console.log(name, 'FAIL stuck: 400 fallback taps; state', await page.evaluate(() => JSON.stringify({ tv: !document.getElementById('tv').hidden, tvText: document.getElementById('tv').innerText.slice(0, 120), busy: UI.busy, sel: UI.sel, die: UI.die, bump: UI.bump, actor: VB.actor(G), round: G.phase + '/' + G.round, tab: UI.tab, tabs: L.tabs, pend: pend(), p: G.P[VB.actor(G)], vm: VB.validMoves(G).slice(0, 8), glows: [...document.querySelectorAll('.glow')].map(e => e.id || e.className).slice(0, 12) }))); fails++; break; }
       }
       await page.waitForTimeout(20);
     }
     await page.waitForSelector('#rs:not([hidden]) #again', { timeout: 30000 }).catch(() => { });
     const done = await page.locator('#rs:not([hidden]) #again').count();
+    if (SHOT && done) { await page.waitForTimeout(1500); await page.screenshot({ path: SHOT + '/result.png' }); }
     console.log(name, done ? 'PASS full game by drag' : 'FAIL no result', JSON.stringify(drags), 'button taps', taps, 'missed drops', missed, 'combo-take-only', combo1, 'scores', await page.evaluate(() => G.P.map(p => p.vp).join('/')), 'errors', errs.length, errs[0] || '');
     if (!done || errs.length || drags.combo + drags.build + drags.take < 10) fails++;
     await ctx.close();

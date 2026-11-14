@@ -89,6 +89,8 @@ async function rulesCheck(page, note, ph) {
 }
 // returns true when it did something (the caller then looks at the page again)
 async function helpFlow(page, note, seenPh, bulbN) {
+  // play mode is clean (owner, Addendum 7): no coach bubbles in play, and the bulb is a hints on/off switch (scorecard.js scBulb), so there is nothing to check here
+  if (await page.evaluate(() => typeof scBulb === 'function')) return false;
   const hs = await page.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], on: GXH.enabled(), rules: GXH.state().rules, sig: __sw.sig() }));
   if (hs.rules) { note('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }
   if (!hs.ph) return false;

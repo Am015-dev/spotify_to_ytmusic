@@ -124,3 +124,5 @@ table.dial th,table.dial th.cw,table.dial th.sp,.mv .rs,.mv small,.na-guide b,.g
 .dlg.start h1{position:static;display:block}
 .dlg .launchbar h1{position:static}
 .gx-dock div:has(>.btn.sm[data-dial]){display:flex;flex-wrap:wrap;gap:6px;max-width:100%;box-sizing:border-box;padding-right:8px}
+
+.kico{display:inline-block;vertical-align:-.12em}

@@ -28,6 +28,7 @@ function kitSettings() {
       S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
       if (typeof GXT !== 'undefined') { const tb = tutNode('gx-sb'); if (tb) { tb.querySelector('span') && tb.querySelector('span').remove(); S.appendChild(GX.row('Tutorial', tb)); } }
       if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
+      S.appendChild(GX.row('Hints', GX.onoff(!!UI.hints, v => { UI.hints = !!v; try { localStorage.setItem('hb_hints', v ? '1' : '0'); } catch (x) { } UI.gtop = null; UI.recKey = ''; render(); }, 'Hints'), 'Finger on the best move, previews and ratings'));
     },
     about: { name: 'Hollowbough', version: 'preview', text: 'A woodland city-building game. Art and music by Am015-dev.' }
   });
@@ -65,8 +66,8 @@ function refCardId(id) { return 'c' + D.cards.indexOf(cdef(id)); }
 function revealed(a, b) { return !a || a.deck.length !== b.deck.length || a.rng !== b.rng || a.discard.length > b.discard.length || JSON.stringify(a.limbo) !== JSON.stringify(b.limbo) || a.phase !== b.phase; }
 function kitUndo() {
   GX.undo.config({
-    get: () => G, owner: g => g && g.phase !== 'over' ? (humans().length === 1 ? humans()[0] : HB.actor(g)) : null, online: () => NET.on,
-    set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = []; UI.mmc = null; fxClear(); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
+    get: () => G, owner: g => g && g.phase !== 'over' ? HB.actor(g) : null,   // R24: the seat that acts now, so the stack seals the moment the turn passes to a rival (no undo while Bramble plays) online: () => NET.on,
+    set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = []; UI.mmc = null; fxClear(); closePop(); UI.lastAi = ''; save(); render(); schedule(); if (hintsActive()) toast('Step undone.'); },
     onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started && UI.lay) renderBoard(); } }
   });
 }

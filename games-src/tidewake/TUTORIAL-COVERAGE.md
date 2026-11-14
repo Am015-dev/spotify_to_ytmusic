@@ -1,35 +1,47 @@
-# Tidewake: tutorial coverage (the Lantern Race, a coached first game)
+# Tidewake: tutorial coverage (the Lantern Race, a guided first game)
 
-Since W411 the tutorial is a REAL game, not forced steps. You (Vermilion) race Cobalt (the real computer, easy) under Grandmother Osk's eye.
-Every legal move is allowed from turn 1. The only forced taps are the intro bubble ("Next") and its card ("Cast off"): 2.
-The piles are only reordered (`oskRig` in `game/ui10.js`): the Rift Gate is in your first hand, two Deck Cannons are on top of the tile pile, and the Maelstrom and the Rogue Wave rise early.
-Osk speaks just in time: once per rule, the first time it matters, in one bubble docked in the side panel. It never sits over the board, never blocks a tap and closes with x.
-She also comments on Cobalt's moves and on a good or poor move of yours. At the end a 4-card walk counts the race with your real numbers.
-Its last card, "Things you'll meet later", lists every rule that did not come up.
-Words: `game/texts.js` (`OSK_TEXT`, `OSK_RIVAL`). Logic: `game/ui10.js`. Story: STORY.md (the prologue "The Lantern Race"; finishing it offers "Start chapter 1").
-Proof: `game/coach-test.js` plays the whole game from fresh storage with random legal moves, all by UI taps, at 390x763 and 1440x860.
-It asserts that every rule below was seen on screen or on the later card, at most 2 forced taps, the bubble is never over the board, never two bubbles, and 0 console errors.
+Since W498 the tutorial is a short FIXED game against Cobalt, one step at a time. It replaces the free coached game (W411) and its
+"Things you'll meet later" list: every base rule is now shown on the board, in order, when it happens.
 
-| Rule (id) | When Osk explains it (trigger) | Story beat |
-|---|---|---|
-| [x] goal: last junk afloat wins (goal) | intro step before the first move | "Cobalt swears the Reach is his. Last junk afloat keeps the lantern." |
-| [x] choose a start mark; blocked-start relocation (reloc) | as soon as your junk sits on its mark; again if a relocation choice appears | "If a leviathan blocks your start before you sail, move to another free mark" |
-| [x] dice: 6, 7 or 8 wakes the leviathans, other totals calm (roll) | first roll, with the real total | "Dice at dawn" |
-| [x] leviathan move: one square along an arrow, or a turn (levmove) | first leviathan move in the log | "The deep stirs" |
-| [x] lay a tile at your bow: pick, turn, place; SAFE / SINKS (lay) | your first lay turn | "Lay a current" |
-| [x] sail to the end of the wake; draw back to 3 (sail) | after your first tile | "Well sailed!" |
-| [x] sail on through other captains' tiles (chain) | Cobalt's first tile (rival comment) | "Cobalt moves" |
-| [x] two junks on one wake both sink (collide) | Cobalt's second tile, or a collision | "Mind his wake" |
-| [x] a leviathan entering a square destroys the tile and sinks the junk (levsink) | first such event, or your junk next to a leviathan | "Leviathans bite" |
-| [x] Deck Cannon: keep it, fire it to save yourself (cannon) | you draw one (the keep/discard card) or hold one | "A Deck Cannon!" |
-| [x] Rogue Wave: roll its strength or capsize, it grows (wave) | the wave rises | "Rogue Wave!" |
-| [x] Rift Gate: lay it, or keep it to escape when you would sink (gate) | you hold it (first lay turn) or one opens | "A Rift Gate" |
-| [x] Maelstrom: moves on calm rolls, swallows what it enters (mael) | it rises | "The Maelstrom" |
-| [x] elimination swap: sink a rival, swap tiles with his hand (swap) | your second lay turn while Cobalt floats, or the swap card | "Sink him, gain tiles" |
-| [x] end: last junk afloat wins (end) | game over: Osk's line, then walk card 3 "The one rule that scores" | "The lantern" |
-| [x] tie: the last junks sink together = draw (tie) | if it happens; else the later card | "A shared fate" |
-| [x] teams and solo variants (more) | always on the later card (not in a 2-captain race) | "Teams and solo" |
+- Script (engine layer): `game/src/tutscript.js`. Fixed seed, leviathans, hands, tile pile, dice and Cobalt's moves. Proof: `game/tutscript-test.js`.
+- Steps (page layer): `game/ui10.js` (`tutSteps`, ids in `TUT_RULES`), run through the shared tutor kit (`shell/gx-tutor.js`).
+- Each step = one sentence of 12 words or fewer + one highlighted thing to tap. Only the highlight takes input; Cobalt waits while a step is up.
+- At the end: "You know the rules" card, then **Play a real game** (2 captains, base rules, random everything). From Story: **Start chapter 1**.
+- Proof: `game/tutor-test.js` (real touch taps on the highlight only, 390x844 and 375x667): every rule step shown in order,
+  every sentence <= 12 words, one highlight per step, bubble never over the highlight, the real game starts after, 0 console errors.
+  Shots: `playable-shots/w498/tut-1..tut-34.png`.
 
-Measured (coach-test.js, random legal moves, 2 runs per size): 13-15 of 17 rules came up on screen during the game. The rest (usually tie, more, sometimes cannon) were on the later card.
-Scoring walk (4 cards): How it ended (each junk's fate), Currents laid (yours and Cobalt's, number of turns), The one rule that scores (who won and why), Things you'll meet later.
-The old forced-step tutorial (17 spotlight steps, `game/tutor-test.js`) was removed. `src/tutscript.js` (its scripted dice) stays in the build, unused, and its own engine test still passes.
+| # | step id | rule taught | sentence |
+|--:|---|---|---|
+| 1 | goal | last junk afloat wins | Last junk afloat wins. Tap the sea chart to begin. |
+| 2 | order | turn order; every junk starts before any tile | Cobalt chose his start first. Every junk starts before any tile. |
+| 3-4 | mark, mark2 | pick a start mark on the edge | Tap this gold mark on the edge to start there. / Tap this mark. Your junk starts here. |
+| 5 | reloc | blocked start: move to another free mark | A leviathan on your start square? Move to another free mark. |
+| 6 | roll | a turn starts with two dice | Every turn starts with a roll of two dice. |
+| 7 | wake | 6, 7 or 8 wakes the leviathans | 6, 7 or 8 wakes the leviathans. Any other total: calm. |
+| 8 | levmove | one die per leviathan: step or turn | Each leviathan rolled one die: one square, or a quarter turn. |
+| 9 | six | a 6 raises a new leviathan | A 6 on its die raises a new leviathan instead. |
+| 10 | hand | three tiles in hand | These are your three tiles. This one would sink you. |
+| 11 | edge | sailing off the edge sinks you | Its line runs to the chart edge. Off the edge, you sink. |
+| 12 | turn | turn a tile a quarter | Tap Turn to spin the tile a quarter. |
+| 13 | never | no loops, leviathans or shared wakes | Also never into a loop, a leviathan or a rival's path. |
+| 14 | place | lay the tile at your bow | Tap Place. The tile goes on the square at your bow. |
+| 15 | sail | sail along the line to its open end | Your junk sailed along that line to its open end. |
+| 16 | calm | calm roll: nothing moves | Cobalt laid a tile. Now you rolled a 3: calm, nothing moved. |
+| 17 | draw | draw back up to three | After each turn you draw back up to three tiles. |
+| 18 | chain | sail on through other tiles | This tile meets Cobalt's tile. Tap Place: you sail through both. |
+| 19 | push | a tile at another junk's line end moves it too | Lay a tile at any junk's line end, and it sails too. |
+| 20 | keep | Deck Cannon: keep or discard (expansion piece in the script) | You drew a Deck Cannon. Keep it for a leviathan. |
+| 21 | collide | two junks on one wake both sink | Two junks on one line, same way, both sink. |
+| 22-23 | wave, waveroll | Rogue Wave (expansion piece in the script) | A Rogue Wave! It sweeps its whole row each round. / In its row, roll its strength or capsize. Tap Place. |
+| 24 | blocked | a leviathan at your bow sinks you | A leviathan swam in front of your bow. That sinks you! |
+| 25 | cannon | fire a Deck Cannon to be saved | Tap Fire. Your Deck Cannon blasts it away. |
+| 26 | offboard | a leviathan off the chart is gone | A leviathan pushed off the chart is gone for good. |
+| 27 | min3 | at least 3 leviathans | Fewer than three leviathans? The next turn adds new ones. |
+| 28-30 | turn2, turn2b, place2 | (practice: two turns, then place) | This tile needs two quarter turns. Tap Turn. / Tap Turn once more. / Tap Place. |
+| 31 | levsink | a leviathan on a tile destroys it and sinks junks there | A leviathan swam onto Cobalt's tile. He sinks with it! |
+| 32 | swap | elimination bonus: swap tiles | Sink rivals with your tile, and swap tiles with their hands. |
+| 33 | win | last junk afloat wins | Yours is the last junk afloat. You win the lantern! |
+
+Not in the tutorial: the Rift Gate and the Maelstrom (expansion pieces, off in a default game; the Rules drawer explains them when switched on),
+teams and solo (variants picked in the setup).

@@ -1,138 +1,133 @@
-// ===================== part 10: the tutorial = a COACHED FIRST GAME ("The Lantern Race") =====================
-// A real game against Cobalt (the real computer) with every legal move allowed from turn 1; nothing is forced. The deck is only stacked so the
-// Rift Gate is in your first hand, a Deck Cannon comes early and the Rogue Wave and Maelstrom rise soon. Grandmother Osk speaks just in time:
-// the first time a rule matters, when you make a good or a poor move, and on Cobalt's moves. One bubble at a time, docked in the side panel
-// (never over the board), never blocks input, dismissible. At the end: a walk through the result with your real numbers, then
-// "Things you'll meet later" for any rule that did not come up. Words: OSK_TEXT / OSK_RIVAL in texts.js. Rule ids: TUTORIAL-COVERAGE.md.
+// ===================== part 10: the tutorial = a GUIDED FIRST GAME ("The Lantern Race") =====================
+// A fixed short game against Cobalt (src/tutscript.js: fixed seed, piles, dice and Cobalt's moves), run through the shared tutor kit (gx-tutor.js).
+// Every step = ONE sentence of 12 words or fewer + ONE highlighted thing to tap. Only the highlight takes input. Every base rule appears in order,
+// on the board, when it happens; nothing is left for "later". After the last step: "Play a real game" (or chapter 1 when opened from Story).
+// The step list is TUT_STEPS (ids = TUT_RULES, checked by tutor-test.js). Cobalt only moves while no step is shown (TUTG.freeze holds him and the answer timer).
 const TUT_GAME='tidewake';
-const OSK={on:false,said:{},later:[],q:[],cur:null,t0:0,logI:0,riv:0,rivN:0,myLays:0,walk:null,prologue:false,tmr:0};
-window.TW_OSK=OSK;                                                 // tests read .said / .later / .cur
-const OSK_RULES=['goal','reloc','roll','lay','sail','chain','collide','levmove','levsink','cannon','wave','gate','mael','swap','end','tie','more'];
-function tutOn(){return !!UI.tut&&OSK.on}
+const OSK={on:false,cur:null};function oskPlace(){}            // the old coached game's bubble (ui7.js still asks for it)
+const TUTG={on:false,tap:null,hold:false,prologue:false,tmr:0,seen:[]};
+window.TW_TUT=TUTG;                                                 // tests read .seen (step ids shown, in order)
+function tutOn(){return !!UI.tut&&TUTG.on}
 function firstTime(){try{return !localStorage.getItem('tw_played')&&!localStorage.getItem('tw_offered')}catch(e){return true}}
-function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart}).replace('Learn in 5 minutes','Play with Osk\'s help').replace('Short, one tap at a time, no reading','One real game, tips as you go').replace('Learn by doing, step by step','One real game with Osk\'s tips')}
-function tutHold(){return false}
+function tutBtn(cls){return typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart})}
+function tutHold(k){return k==='mph'&&TUTG.on&&TUTG.hold}
+// ---------------------------------------------------------------- what the steps point at
+function tvis(sel){let off=null;for(const e of document.querySelectorAll(sel)){if(e.closest('[hidden]'))continue;const r=e.getBoundingClientRect();if(r.width>2&&r.height>2){if(r.bottom>0&&r.top<innerHeight)return e;off=off||e}}
+  // a control scrolled out of the phone's bottom panel: bring it back into view
+  if(off){try{off.scrollIntoView({block:'nearest'})}catch(x){}const r=off.getBoundingClientRect();if(r.bottom>0&&r.top<innerHeight)return off}return null}
+function tcell(x,y){const a=hproj(x-BW/2,y-BW/2),b=hproj(x-BW/2+1,y-BW/2+1);if(!a||!b)return null;const l=Math.min(a.x,b.x),t=Math.min(a.y,b.y);return {left:l,top:t,width:Math.abs(b.x-a.x),height:Math.abs(b.y-a.y)}}
+function tmon(id){const m=G&&monById(id);return m?tcell(m.x,m.y):null}
+function tship(i){const s=G&&G.ships[i];return s&&s.x!=null?tcell(s.x,s.y):null}
+function ttile(i){return tvis(`[data-a=card][data-t="${i}"],[data-ph=pcard][data-t="${i}"]`)}
+function trot(){return tvis('[data-a=rot][data-d="1"]')}
+function tplace(){return tvis('[data-a=place]:not([disabled])')}
+function tmph(){const m=tvis('#pc .mph,#res .mph');const w=m&&m.closest('#pc .pc-in');return w&&w.querySelector('[data-ph=dismiss]')?w:m}   // on a phone the card AND its Continue: either tap counts
+function tqbtn(h){if(!G||!G.q)return null;const i=G.q.opts.findIndex(o=>o.h===h);return i<0?null:tvis(`[data-a=q][data-i="${i}"]`)||[...document.querySelectorAll('[data-a=q]')].filter(e=>!e.closest('[hidden]'))[i]||null}
+function tcalm(){return !!G&&UI.started&&!UI.busy}
+function tmine(turn){return tcalm()&&G.turn===turn&&G.cur===TS.me&&G.step==='act'&&!G.q}
+function tsel(t,r){UI.sel={t:t,r:r||0,s:0};render()}
+// ---------------------------------------------------------------- the steps (say: 12 words or fewer; tap: tap the highlight to go on)
+// run: Cobalt and the sea may move while this step waits; hold: keep the roll card up until it is tapped
+const TUT_RULES=['goal','order','mark','reloc','roll','wake','levmove','six','hand','edge','turn','never','place','sail','calm','draw','chain','push','collide','place3','blocked','offboard','min3','turn2','turn2b','place2','levsink','swap','swap2','swap3','win'];
+function tutSteps(){const ph=!!PH.on;const S=[
+  {id:'goal',say:'Last junk afloat wins. Tap the sea chart to begin.',target:()=>document.getElementById('board'),tap:1,ready:()=>!!G&&UI.started&&G.phase==='setup'},
+  {id:'order',say:'Cobalt chose his start first. Every junk starts before any tile.',target:()=>tship(TS.co),tap:1,run:1,ready:()=>tcalm()&&G.ships[TS.co].x!=null&&sideToAct()===TS.me},
+  ph?{id:'mark',say:'Tap this gold mark on the edge to start there.',target:()=>{const p=hproj(TS.myStart.x-BC,TS.myStart.y-BC+.5);return p?{x:p.x,y:p.y}:null},until:()=>PH.pop==='start'||G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me}:null,
+  {id:ph?'mark2':'mark',say:'Tap this mark. Your junk starts here.',target:()=>tvis(`[data-a=startmark]:not(.pri)[data-x="${TS.myStart.x}"][data-y="${TS.myStart.y}"][data-e="${TS.myStart.e}"]`),until:()=>G.ships[TS.me].x!=null,ready:()=>tcalm()&&sideToAct()===TS.me},
+  {id:'reloc',say:'A leviathan on your start square? Move to another free mark.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.ships[TS.me].x!=null},
+  {id:'roll',say:'Every turn starts with a roll of two dice.',target:tmph,tap:1,run:1,hold:1,ready:()=>tcalm()&&G.turn===2&&!!tmph()},
+  {id:'wake',say:'6, 7 or 8 wakes the leviathans. Any other total: calm.',target:tmph,tap:1,hold:1,ready:()=>!!tmph(),done:tmphHide},
+  {id:'levmove',say:'Each leviathan rolled one die: one square, or a quarter turn.',target:()=>tmon(0),tap:1,ready:()=>tmine(2)},
+  {id:'six',say:'A 6 on its die raises a new leviathan instead.',target:()=>tmon(5),tap:1,ready:()=>tmine(2)},
+  {id:'hand',say:'These are your three tiles. This one would sink you.',target:()=>ttile(0),tap:1,ready:()=>tmine(2),enter:()=>tsel(0,0)},
+  {id:'edge',say:'Its line runs to the chart edge. Off the edge, you sink.',target:()=>tcell(TS.myStart.x,TS.myStart.y),tap:1,ready:()=>tmine(2)},
+  {id:'turn',say:'Tap Turn to spin the tile a quarter.',target:trot,until:()=>UI.sel&&UI.sel.t===0&&UI.sel.r===1,ready:()=>tmine(2)},
+  {id:'never',say:'Also never into a loop, a leviathan or a rival\'s path.',target:()=>ttile(0),tap:1,ready:()=>tmine(2)&&UI.sel&&UI.sel.r===1},
+  {id:'place',say:'Tap Place. The tile goes on the square at your bow.',target:tplace,until:()=>G.turn>2,ready:()=>tmine(2)&&UI.sel&&UI.sel.r===1},
+  {id:'sail',say:'Your junk sailed along that line to its open end.',target:()=>tship(TS.me),tap:1,ready:()=>tcalm()&&G.turn===3&&G.ships[TS.me].y===5},
+  {id:'calm',say:'Cobalt laid a tile. Now you rolled a 3: calm, nothing moved.',target:()=>tmon(7),tap:1,run:1,ready:()=>tmine(4)},
+  {id:'draw',say:'After each turn you draw back up to three tiles.',target:()=>ttile(2),tap:1,ready:()=>tmine(4),enter:()=>tsel(0,0)},
+  {id:'chain',say:'This tile meets Cobalt\'s tile. Tap Place: you sail through both.',target:tplace,until:()=>G.turn>4,ready:()=>tmine(4)&&UI.sel&&UI.sel.t===0&&UI.sel.r===0},
+  {id:'push',say:'Lay a tile at any junk\'s line end, and it sails too.',target:()=>tship(TS.co),tap:1,ready:()=>tcalm()&&G.turn===5&&G.cur===TS.co},
+  {id:'collide',say:'Two junks on one line, same way, both sink.',target:()=>tship(TS.co),tap:1,ready:()=>tcalm()&&G.turn===5&&G.cur===TS.co},
+  {id:'place3',say:'This tile is safe: the green tick. Tap Place.',target:tplace,until:()=>G.turn>6,run:1,ready:()=>tmine(6),enter:()=>tsel(0,0)},
+  {id:'blocked',say:'Danger! If it swims in front of your bow, you sink.',target:()=>tmon(4),tap:1,run:1,ready:()=>tmine(8)},
+  {id:'offboard',say:'A leviathan pushed off the chart is gone for good.',target:()=>tmon(0),tap:1,ready:()=>tmine(8)},
+  {id:'min3',say:'Fewer than three leviathans? The next turn adds new ones.',target:()=>tmon(7),tap:1,ready:()=>tmine(8)},
+  {id:'turn2',say:'This tile needs two quarter turns. Tap Turn.',target:trot,until:()=>UI.sel&&UI.sel.r===1,ready:()=>tmine(8),enter:()=>tsel(0,0)},
+  {id:'turn2b',say:'Tap Turn once more.',target:trot,until:()=>UI.sel&&UI.sel.r===2,ready:()=>tmine(8)&&UI.sel&&UI.sel.r===1},
+  {id:'place2',say:'Tap Place.',target:tplace,until:()=>G.turn>8,ready:()=>tmine(8)&&UI.sel&&UI.sel.r===2},
+  {id:'levsink',say:'A leviathan swam onto Cobalt\'s tile. He sinks with it!',target:()=>tvis('#pc [data-a=sunkok],#cards [data-a=sunkok]'),until:()=>!(UI.sunk&&UI.sunk.length),run:1,ready:()=>tcalm()&&!!G.over&&!!tvis('#pc [data-a=sunkok],#cards [data-a=sunkok]')},
+  {id:'swap',say:'Sink a rival with your tile? Swap with their hand. Tap yours.',target:()=>tvis('#twswap [data-sw=me][data-i="1"]'),until:()=>TSW.a!=null,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length),enter:()=>swOpen()},
+  {id:'swap2',say:'Now tap the sunken crew\'s tile to take it.',target:()=>tvis('#twswap [data-sw=co][data-i="0"]'),until:()=>TSW.n>0,ready:()=>!!tvis('#twswap')},
+  {id:'swap3',say:'Swapped! Tap Keep this hand when you are done.',target:()=>tvis('#twswap [data-sw=keep]'),until:()=>!TSW.on,ready:()=>!!tvis('#twswap')},
+  {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over}
+ ].filter(Boolean);
+ return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
+   wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
+   onEnter:()=>{TUTG.tap=null;TUTG.cur=s;TUTG.hold=!!s.hold;TUTG.freeze=!s.run;if(s.run)schedule();try{s.enter&&s.enter()}catch(e){console.error(e)}try{ovUpdate()}catch(e){}},
+   onDone:()=>{TUTG.seen.push(s.id);TUTG.cur=null;TUTG.hold=false;try{s.done&&s.done()}catch(e){console.error(e)}TUTG.freeze=false;schedule();render()}}))}
+// between steps the game's own Continue / Skip buttons stay live holes in the tutor layer (a visible button never eats taps)
+function tutLive(){return [...document.querySelectorAll('#pc [data-ph=dismiss],[data-a=skip]')].filter(e=>!e.closest('[hidden]')&&e.offsetWidth>0)}
+function tmphHide(){try{PH.mphHide=UI.mph;phAfter()}catch(e){}}
+// a tap on the highlight of a "tap" step: swallowed (the game never sees it) and counted
+function tutTapIn(e){const s=TUTG.on&&TUTG.cur;if(!s||!s.tap||typeof GXT==='undefined')return false;const st=GXT.state();if(!st.shown||st.id!==s.id)return false;
+  let r=null;try{const t=s.target();r=t&&t.getBoundingClientRect?t.getBoundingClientRect():t&&t.left!=null?t:t&&t.x!=null?{left:t.x-22,top:t.y-22,width:44,height:44}:null}catch(x){}
+  if(!r)return false;const p=e.changedTouches?e.changedTouches[0]:e;const x=p.clientX,y=p.clientY;if(x>=r.left-4&&x<=r.left+r.width+4&&y>=r.top-4&&y<=r.top+r.height+4)return true;
+  // a "look at this" step also goes on from a tap anywhere on the chart (a near miss on a small junk was a dead tap)
+  const bd=document.getElementById('board'),B=bd&&bd.getBoundingClientRect();return !!(B&&B.width>0&&x>=B.left&&x<=B.right&&y>=B.top&&y<=B.bottom&&!(e.target&&e.target.closest&&e.target.closest('button,[data-a],.gxt-top')))}
+for(const ev of ['pointerdown','pointerup','mousedown','mouseup','touchstart','touchend','click'])window.addEventListener(ev,e=>{if(!tutTapIn(e))return;e.stopPropagation();if(e.cancelable&&ev!=='touchstart')e.preventDefault();
+  if(ev==='pointerup'||ev==='click'){const s=TUTG.cur;if(s&&TUTG.tap!==s.id){TUTG.tap=s.id;GXT.act({type:'event',k:'tap'})}}},true);
+// the "until" steps finish when the game reaches their state (polled)
+// while a step is on screen nothing else moves (Cobalt, the 25 s answer timer); a "run" step lets the game go on until its moment comes
+setInterval(()=>{try{const s=TUTG.on&&TUTG.cur;if(!s||typeof GXT==='undefined')return;const sh=GXT.state().shown;
+  {const want=sh?TUTG.base:Math.max(TUTG.base||1,2);if(want&&UI.speed!==want){UI.speed=want;try{TWKit.setSpeed(want)}catch(x){}}}
+  if(sh&&!TUTG.freeze){TUTG.freeze=true}else if(!sh&&s.run&&TUTG.freeze){TUTG.freeze=false;schedule()}
+  if(TUTG.freeze&&UI.qKey)UI.qT0=Date.now()
+  if(sh&&!s.tap&&s.until&&s.until())GXT.act({type:'event',k:'poll'})}catch(e){}},150);
 // ---------------------------------------------------------------- start / leave
-// opened through the shared tutor kit: ONE intro step (tap Next) and its card (tap "Cast off") are the only forced taps; then the real game is free
-function tutStart(o){if(NET.on)return;const pro=!!(o&&o.prologue);
-  if(typeof GXT==='undefined'){oskBegin(pro);return}
-  GXT.start({game:TUT_GAME,story:false,steps:[{id:'goal',title:TW_GOAL[0],say:TW_GOAL.slice(1).map(x=>'\u2022 '+x).join('\n'),target:()=>document.getElementById('board'),wait:null,
-      ready:()=>!!G&&UI.started}],
-    endTitle:'Your race begins',endText:'Play freely: every move is yours. Grandmother Osk speaks up when a rule first matters.',endButtons:[{id:'go',label:'Cast off'}],
-    setup:()=>oskBegin(pro),
-    onDone:()=>{OSK.ready=1;OSK.said.goal=OSK.said.goal&&OSK.said.goal!=='queued'?OSK.said.goal:'intro';render()},
+function tutStart(o){if(NET.on||typeof GXT==='undefined')return;const pro=!!(o&&o.prologue);TUTG.prologue=pro;TUTG.seen=[];
+  try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
+  tutBegin();
+  const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
+  GXT.start({game:TUT_GAME,story:false,steps:tutSteps(),live:tutLive,
+    endTitle:'You know the rules',endText:'Now a real game against a computer. Add-ons are off; tick one in Setup to see how it works.',
+    endButtons:pro&&first?[{id:'chapter',label:'Start chapter 1'},{id:'menu',label:'Menu'}]:[{id:'play',label:'Play a real game'},{id:'menu',label:'Menu'}],
+    onDone:r=>{const c=r&&r.choice;tutLeave();try{GXT.markDone(TUT_GAME)}catch(e){}
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}else if(c==='play'){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0].h=true;s.seats[1].h=false;startGame(s)}else showStart()},
     onExit:()=>{tutLeave();showStart()}})}
-function oskBegin(pro){OSK.prologue=pro;try{GX.close()}catch(e){}try{localStorage.setItem('tw_offered','1')}catch(e){}
-  const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:1,wave:1,maelstrom:1,cannon:1};
+function tutBegin(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};
   s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};
-  UI.tut=1;OSK.starting=1;try{startGame(s,{seed:20261107})}finally{OSK.starting=0}oskRig();
-  Object.assign(OSK,{ready:typeof GXT==='undefined'?1:0,on:true,said:{},later:[],q:[],cur:null,t0:0,logI:G.logN,riv:0,rivN:0,myLays:0,walk:null});
-  UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}
-  clearInterval(OSK.tmr);OSK.tmr=setInterval(oskTick,250);render();oskTick()}
-// stack the piles (only order changes; every piece is a real one): Rift Gate in your hand, a cannon 3rd from the top, the wave and the Maelstrom rise early
-function oskRig(){try{const h=G.hands[0],gi=G.deck.indexOf(56);if(gi>=0&&h.indexOf(56)<0){G.deck[gi]=h[2];h[2]=56}
-  for(let k=0;k<2;k++){const ci=G.deck.findIndex((c,j)=>c>=57&&j>=k);if(ci>k){const c=G.deck.splice(ci,1)[0];G.deck.splice(k,0,c)}}
-  for(const [id,at] of [[MAEL_ID,1],[WAVE_ID,3]]){const k=G.mdeck.indexOf(id);if(k>at){G.mdeck.splice(k,1);G.mdeck.splice(at,0,id)}}}catch(e){console.error(e)}}
-function tutLeave(){OSK.on=false;clearInterval(OSK.tmr);oskHide();oskWalkClose();UI.tut=0;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
+  TUTG.base=UI.speed||1;TS.on=true;TUT=tutDice;UI.tut=1;TUTG.on=true;TUTG.starting=1;try{setSeed(TS.seed);setAiSeed(3)}catch(e){}
+  try{startGame(s,{tutorial:true,first:TS.co,seed:TS.seed,names:['Vermilion','Cobalt']})}finally{TUTG.starting=0}
+  TUTG.freeze=true;UI.guide='light';UI.confirm=null;try{GXH.hide()}catch(e){}render()}
+function tutLeave(){try{TSW.on=false;swRender()}catch(e){}if(TUTG.base){UI.speed=TUTG.base;try{TWKit.setSpeed(UI.speed)}catch(x){}TUTG.base=0}TUTG.on=false;TUTG.cur=null;TUTG.hold=false;TS.on=false;TUT=null;UI.tut=0;TUTG.freeze=false;clearTimeout(UI.tm);UI.gen++;UI.started=false;UI.busy=false;UI.sel=null;UI.sunk=[];UI.mph=null;
   try{GXH.hide()}catch(e){}try{kitReset()}catch(e){}try{PH.pop=null;PH.pd=null;PH.cur=null;phAfter()}catch(e){}}
-// Story is preceded by the coached game (the prologue) until it has been finished once
+// Story is preceded by the guided game (the prologue) until it has been finished once
 function storyOpen(){if(typeof GXC==='undefined')return;if(typeof GXT!=='undefined'&&!NET.on&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else campOpen()}
-// a first-time player tapping Play is offered the coached game once
+// a first-time player tapping Play is offered the guided game once
 function tutOffer(go){if(typeof GXT==='undefined'||NET.on||!firstTime()||GXT.status(TUT_GAME).seen)return false;
   try{localStorage.setItem('tw_offered','1')}catch(e){}
   const d=document.createElement('div');d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-label','New here?');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Play one real game against Cobalt. Grandmother Osk explains each rule when it matters.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Play with Osk\'s help</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">New here?</div><div class="gxt-ex">Learn by playing one short game, one tap at a time.</div><div class="gxt-eb"><button type="button" class="gxt-b pri" data-tutoffer="learn">Learn to play</button><button type="button" class="gxt-b" data-tutoffer="play">Just play</button></div></div>';
   document.body.appendChild(d);
   d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tutoffer]');if(!b)return;e.stopPropagation();d.remove();if(b.dataset.tutoffer==='learn')tutStart();else go()});
   return true}
-// ---------------------------------------------------------------- the bubble (one at a time, in the panel flow: it pushes the panel down, never covers the board)
-function oskFill(id,v){const t=OSK_TEXT[id]||[id,''];v=v||{};const f=x=>String(x).replace(/\{(\w+)\}/g,(m,k)=>v[k]!=null?v[k]:k==='riv'?nm(1):k==='me'?nm(0):'');return [f(t[0]),f(t[1])]}
-// queue a line; rule ids are spoken once. pri: lower goes first
-function oskSay(id,v,o){o=o||{};if(!OSK.on||OSK.walk)return;const rule=OSK_RULES.indexOf(id)>=0;if(rule&&(OSK.said[id]||OSK.q.some(x=>x.id===id)))return;
-  const [title,line]=o.text||oskFill(id,v);if(rule)OSK.said[id]=OSK.said[id]||'queued';OSK.q.push({id,title,line,also:o.also||[],pri:o.pri||5,rival:!!o.rival});OSK.q.sort((a,b)=>a.pri-b.pri)}
-function oskTutBusy(){return typeof GXT!=='undefined'&&GXT.running&&GXT.running()}
-function oskCalm(){const pc=document.getElementById('pc');return !UI.busy&&!(pc&&!pc.hidden)&&!document.querySelector('.gxt-end,#twgoal,.gx-goal,[aria-modal="true"]:not([hidden]),.gx-drawer.open,.gx-drawer[open]')}
-function oskShowNext(){if(!OSK.q.length||oskTutBusy()||!oskCalm()||(typeof GXT!=='undefined'&&!OSK.ready))return;const n=OSK.q.shift();OSK.cur=n;OSK.t0=Date.now();
-  for(const id of [n.id].concat(n.also))if(OSK_RULES.indexOf(id)>=0)OSK.said[id]=G?'turn '+G.turn:'shown';oskPlace()}
-function oskHide(){OSK.cur=null;const e=document.getElementById('osk');if(e)e.remove()}
-function oskHTML(c){return `<div class="osk-p" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="#2c4a5e" stroke="#e3b24b" stroke-width="2"/><path d="M9 33c2-7 6-10 11-10s9 3 11 10" fill="#cfd8dc"/><circle cx="20" cy="16" r="7" fill="#f1c9a5"/><path d="M12 15c1-7 15-7 16 0-3-3-13-3-16 0z" fill="#eceff1"/><circle cx="31" cy="9" r="3.4" fill="#ffcf5a"/></svg><span>Osk</span></div><div class="osk-t"><b>${esc(c.title)}</b><span>${esc(c.line)}</span></div><button type="button" class="osk-x" data-osk="x" aria-label="Dismiss Osk's tip">&times;</button>`}
-function oskPlace(){const c=OSK.cur;let e=document.getElementById('osk');if(!c||!OSK.on||oskTutBusy()){if(e)e.remove();return}
-  const vis=id=>{const x=document.getElementById(id);return x&&!x.hidden?x:null};
-  const host=PH.on?(vis('pc')||vis('ppop')||document.getElementById('ps')):(document.getElementById('main')||{}).parentNode;if(!host)return;
-  if(!e){e=document.createElement('div');e.id='osk';e.className='osk-card';e.setAttribute('role','status');e.setAttribute('data-help','');e.setAttribute('aria-live','polite')}
-  if(e.dataset.k!==c.id+c.line){e.innerHTML=oskHTML(c);e.dataset.k=c.id+c.line;e.classList.toggle('riv',!!c.rival);e.classList.add('fresh');clearTimeout(OSK.fT);OSK.fT=setTimeout(()=>e.classList.remove('fresh'),350)}
-  const ref=PH.on?host.firstChild:document.getElementById('main');if(e.parentNode!==host||(PH.on&&host.firstChild!==e))host.insertBefore(e,ref)}
-// keep the tip on top when a card or pop-up opens over the strip (it moves with them, so it is never covered)
-setInterval(()=>{try{if(OSK.on&&OSK.cur)oskPlace()}catch(e){}},100);
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-osk]');if(!b)return;e.stopPropagation();
-  if(b.dataset.osk==='x'){oskHide();OSK.hideT=Date.now()}else oskWalkStep(b.dataset.osk)},true);
-{const _r=render;render=function(){const r=_r.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r};
- const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);if(OSK.on)try{oskPlace()}catch(e){}return r}}
-// ---------------------------------------------------------------- when each rule first matters (polled; reads the game, never changes it)
-function oskTick(){if(!OSK.on||!G||!UI.started){return}
-  if(typeof GXT!=='undefined'&&GXT.running&&GXT.running()){oskHide();return}
-  const me=0,riv=1,S=G.ships[me],R=G.ships[riv];
-  if(G.phase==='setup'&&sideToAct()===me&&!(typeof GXT!=='undefined'&&GXT.running&&GXT.running()))oskSay('goal',null,{pri:0});
-  if(S.x!=null)oskSay('reloc',null,{pri:1});
-  // new log lines since the last look
-  const fresh=G.log.filter(l=>l.i>OSK.logI).reverse();OSK.logI=G.logN;
-  for(const l of fresh){const t=l.t;let m;
-    if((m=t.match(/rolls (\d)\+(\d)=(\d+)/))){const n=+m[3];oskSay('roll',{n:m[1]+'+'+m[2]+'='+n,wake:n>=6&&n<=8?'a 6, 7 or 8 wakes the leviathans.':'calm. The leviathans sleep.'},{pri:2})}
-    if(/ moves | turns |swims/.test(t)&&/^(?!The Maelstrom)/.test(t)&&!/Rogue Wave/.test(t)&&G.mons.some(x=>t.indexOf(levName(x.id))===0))oskSay('levmove',null,{pri:3});
-    if(/torn from the sea|ran into|crushed|blocked by/.test(t))oskSay('levsink',null,{pri:2});
-    if(/Rogue Wave rises/.test(t))oskSay('wave',null,{pri:1});
-    if(/Maelstrom/.test(t))oskSay('mael',null,{pri:1});
-    if(/Rift Gate/.test(t))oskSay('gate',null,{pri:2});
-    if(/Deck Cannon/.test(t)&&t.indexOf(nm(me))===0)oskSay('cannon',null,{pri:1});
-    if(/meet on one wake/.test(t))oskSay('collide',null,{pri:1});
-    if(/swaps a tile/.test(t))oskSay('swap',null,{pri:1});
-    if(/relocates the start/.test(t))oskSay('reloc',null,{pri:1});
-    if(t.indexOf(nm(me)+' lays a current')===0||t.indexOf(nm(me)+' opens a Rift Gate')===0){OSK.myLays++;if(OSK.myLays===1)oskSay('sail',null,{pri:2});else oskJudge()}
-    if(t.indexOf(nm(riv)+' lays a current')===0||t.indexOf(nm(riv)+' opens')===0){OSK.rivN++;
-      if(!OSK.said.chain)oskSay('chain',null,{pri:3,rival:true,also:[]});else if(!OSK.said.collide)oskSay('collide',null,{pri:3,rival:true});
-      else if(OSK.rivN%2===0){const k=OSK.riv++%OSK_RIVAL.length;const steps=(G.log.find(x=>x.i>l.i-1&&/sails? (\d+)/.test(x.t))||{}).t;const n=R.x!=null?'a few':'0';
-        oskSay('rival'+OSK.rivN,null,{pri:8,rival:true,text:['Cobalt\'s move',OSK_RIVAL[k].replace(/\{riv\}/g,nm(riv)).replace('{n}',n)]})}}}
-  // state that matters now
-  if(G.q&&G.q.who===me){if(G.q.kind==='cannonDraw')oskSay('cannon',null,{pri:0});if(G.q.kind==='bonus')oskSay('swap',null,{pri:0});
-    if(G.q.opts.some(o=>o.h==='dReloc'))oskSay('reloc',null,{pri:0});if(/^gate/.test(G.q.kind))oskSay('gate',null,{pri:0})}
-  if(G.phase==='play'&&sideToAct()===me&&!UI.busy){try{if(hlpPhase()==='lay')oskSay('lay',null,{pri:1})}catch(e){}
-    const h=G.hands[me]||[];if(h.indexOf(56)>=0&&OSK.said.lay)oskSay('gate',null,{pri:3});if(h.some(c=>c>=57))oskSay('cannon',null,{pri:2})}
-  if(G.wave)oskSay('wave',null,{pri:1});if(G.mons.some(m=>m.k==='M'))oskSay('mael',null,{pri:1});
-  if(S.alive&&R.alive&&OSK.myLays>=2)oskSay('swap',null,{pri:4});
-  try{if(S.alive&&S.x!=null&&!UI.busy&&adjMons(G,S).length)oskSay('levsink',null,{pri:3})}catch(e){}
-  if(G.over&&!UI.busy){oskSay('end',{why:oskEndWhy()},{pri:0})}
-  // show: nothing up -> next; a tip up for 6 s (rival lines 4 s) gives way to a waiting rule
-  const age=Date.now()-OSK.t0;
-  const need=4000+Math.ceil(String(OSK.cur?OSK.cur.title+' '+OSK.cur.line:'').split(/\s+/).length/10)*1000;
-  if(!OSK.cur){if(Date.now()-(OSK.hideT||0)>1200)oskShowNext()}else if(OSK.q.length&&age>need)oskShowNext();
-  else oskPlace();
-  if(G.over&&!UI.busy&&!OSK.walk&&OSK.said.end&&OSK.cur&&OSK.cur.id==='end'&&age>2500)oskWalkOpen()}
-// one line on your move: good (it sinks Cobalt) or poor (your bow now faces a leviathan's arrow)
-function oskJudge(){try{const S=G.ships[0],R=G.ships[1];
-  if(!R.alive&&S.alive){oskSay('good'+G.turn,null,{pri:2,text:oskFill('good',{why:'Your current sank '+nm(1)+'. A tile that ends a rival is the strongest move there is.'})});return}
-  if(S.alive&&S.x!=null&&adjMons(G,S).length)oskSay('poor'+G.turn,null,{pri:4,text:oskFill('poor',{why:'Your junk now sits next to a leviathan. Its arrow points at you? A 6, 7 or 8 can sink you.'})})}catch(e){}}
-function oskEndWhy(){const w=(G.over&&G.over.win)||[];if(!w.length)return 'Both junks went down together, so nobody keeps the lantern.';
-  return w.indexOf(0)>=0?'Yours is the last junk afloat: the lantern is yours, child.':nm(1)+' is the last junk afloat, so he keeps the lantern. Tomorrow we race again.'}
-// ---------------------------------------------------------------- the end: walk through the result with the real numbers, then "Things you'll meet later"
-function oskWalkData(){const W=(G.over&&G.over.win)||[],out=s=>s.alive?'still afloat':String(s.out||'sank');const L=G.log.slice().reverse();
-  const lays=i=>L.filter(l=>l.t.indexOf(nm(i)+' lays a current')===0||l.t.indexOf(nm(i)+' opens a Rift Gate')===0).length;
-  const steps=[
-    ['How it ended',`You: ${out(G.ships[0])}. ${nm(1)}: ${out(G.ships[1])}.`],
-    ['Currents laid',`You laid ${lays(0)} tile${lays(0)===1?'':'s'}, ${nm(1)} laid ${lays(1)}. The race lasted ${G.turn} turns.`],
-    ['The one rule that scores',`Last junk afloat wins. ${W.length?(W.indexOf(0)>=0?'That is you!':nm(1)+' outlasted you this time.'):'Nobody was left, so it is a draw.'}`]];
-  OSK.later=OSK_RULES.filter(id=>!OSK.said[id]||OSK.said[id]==='queued');if(OSK.later.indexOf('more')<0)OSK.later.push('more');
-  steps.push(['Things you\'ll meet later',OSK.later.map(id=>OSK_TEXT[id]?oskFill(id,{n:'6+2=8',wake:'a 6, 7 or 8 wakes the leviathans.',why:''})[0]+': '+oskFill(id,{n:'A roll',wake:'a 6, 7 or 8 wakes the leviathans.',why:''})[1]:'').filter(Boolean).join(' | ')]);
-  for(const id of OSK.later)OSK.said[id]=OSK.said[id]&&OSK.said[id]!=='queued'?OSK.said[id]:'later card';
-  return steps}
-function oskWalkOpen(){oskHide();OSK.q=[];const steps=oskWalkData();OSK.walk={i:0,steps};
-  const d=document.createElement('div');d.id='oskwalk';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-label','The race, counted');document.body.appendChild(d);oskWalkDraw()}
-function oskWalkDraw(){const d=document.getElementById('oskwalk'),w=OSK.walk;if(!d||!w)return;const s=w.steps[w.i],last=w.i===w.steps.length-1;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  const later=last?'<ul class="osk-later">'+s[1].split(' | ').map(x=>{const k=x.indexOf(': ');return `<li><b>${esc(x.slice(0,k))}</b> ${esc(x.slice(k+2))}</li>`}).join('')+'</ul>':`<div class="gxt-ex">${esc(s[1])}</div>`;
-  d.innerHTML=`<div class="gxt-endc osk-walk"><div class="osk-step">${w.i+1} / ${w.steps.length}</div><div class="gxt-et">${esc(s[0])}</div>${later}<div class="gxt-eb">${last?(OSK.prologue&&first?'<button type="button" class="gxt-b pri" data-osk="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-osk="again">Play a real game</button>')+'<button type="button" class="gxt-b" data-osk="menu">Menu</button>':'<button type="button" class="gxt-b pri" data-osk="next">Next</button>'}</div></div>`}
-function oskWalkClose(){const d=document.getElementById('oskwalk');if(d)d.remove();OSK.walk=null}
-function oskWalkStep(a){const w=OSK.walk;if(!w)return;if(a==='next'){w.i=Math.min(w.i+1,w.steps.length-1);oskWalkDraw();return}
-  OSK.done=Object.assign({},OSK.said);try{GXT.markDone(TUT_GAME)}catch(e){}const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
-  tutLeave();showStart();if(a==='chapter'&&first)GXC.play(first.id);else if(a==='again'){try{localStorage.setItem('tw_played','1')}catch(e){}}}
-// leaving the coached game any other way (Menu > New game, Story, the title) switches Osk off
-{const _sg=startGame;startGame=function(s,o){if(OSK.on&&!OSK.starting){OSK.on=false;clearInterval(OSK.tmr);oskHide();oskWalkClose();UI.tut=0}return _sg.apply(this,arguments)}
- const _ss=showStart;showStart=function(){if(OSK.on){OSK.on=false;clearInterval(OSK.tmr);oskHide();oskWalkClose();UI.tut=0}return _ss.apply(this,arguments)}}
+// the freeze: Cobalt waits while a step is on screen
+{const _sc=schedule;schedule=function(){if(TUTG.on&&TUTG.freeze){clearTimeout(UI.tm);return}return _sc.apply(this,arguments)}
+ const _aa=aiAct;aiAct=function(){if(TUTG.on&&TUTG.freeze)return;return _aa.apply(this,arguments)}}
+// leaving the guided game any other way (Menu > New game, Story, the title) switches it off
+{const _sg=startGame;startGame=function(s,o){if(TUTG.on&&!TUTG.starting){try{GXT.stop()}catch(e){}tutLeave()}return _sg.apply(this,arguments)}
+ const _ss=showStart;showStart=function(){if(TUTG.on){try{GXT.stop()}catch(e){}tutLeave()}return _ss.apply(this,arguments)}}
+
+// ---------- the tutorial's practice swap (the elimination bonus): your three tiles, the sunken crew's three; tap one of yours, then one of
+// theirs, and they change places, exactly as the real swap card does after your tile sinks a rival; Keep this hand ends it ----------
+const TSW={on:false,a:null,n:0,me:[],co:[]};
+function swOpen(){TSW.on=true;TSW.a=null;TSW.n=0;TSW.me=(G&&G.hands[TS.me]&&G.hands[TS.me].filter(isCur).length>=3?G.hands[TS.me].filter(isCur).slice(0,3):[12,13,15]);TSW.co=[35,9,10];swRender()}
+function swRender(){let el=document.getElementById('twswap');if(!TSW.on){if(el)el.remove();return}
+  if(!el){el=document.createElement('div');el.id='twswap';el.className='prompt ask';document.body.appendChild(el)}
+  const t=(c,k,i)=>`<button class="hc${k==='me'&&TSW.a===i?' sel':''}" data-sw="${k}" data-i="${i}" aria-label="${k==='me'?'Your':'Sunken crew\'s'} tile ${i+1}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'sw'+k+i,size:96})}"></button>`;
+  el.innerHTML=`<h4>Practice: the swap</h4><p class="tiny">Your tiles</p><div class="swrow">${TSW.me.map((c,i)=>t(c,'me',i)).join('')}</div><p class="tiny">Sunken crew's tiles</p><div class="swrow">${TSW.co.map((c,i)=>t(c,'co',i)).join('')}</div><button class="btn pri" data-sw="keep">Keep this hand</button>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#twswap [data-sw]');if(!b||!TSW.on)return;e.stopPropagation();const k=b.dataset.sw,i=+b.dataset.i;
+  if(k==='me'){TSW.a=i;try{sfx('tile_rotate')}catch(x){}}else if(k==='co'&&TSW.a!=null){const x=TSW.me[TSW.a];TSW.me[TSW.a]=TSW.co[i];TSW.co[i]=x;TSW.a=null;TSW.n++;try{sfx('tile_place')}catch(x){}}
+  else if(k==='keep'){TSW.on=false}swRender()},true);

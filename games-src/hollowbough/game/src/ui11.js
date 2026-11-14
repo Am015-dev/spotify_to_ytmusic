@@ -17,10 +17,10 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
-  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
-  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'All workers are out. Tap Prepare. They come home and you gain more.', pic: () => hnode(() => HP.season(1)) },
-  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice. Your city still scores.', pic: () => hnode(HP.tree) },
-  how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'This can be done in several ways. Tap the option you want.', pic: () => hnode(HP.cost) },
+  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing place or card.', pic: () => hnode(HP.worker) },
+  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'Tap Prepare. Workers come home.', pic: () => hnode(() => HP.season(1)) },
+  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card, or tap Pass twice.', pic: () => hnode(HP.tree) },
+  how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'Tap the way you want.', pic: () => hnode(HP.cost) },
   pickCard: { target: hfirst('#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a card', text: 'The power needs a card. Tap one that glows.', pic: () => hnode(HP.card) },
   pickRes: { target: hfirst('#acts .tchip'), title: 'Pick a resource', text: 'Tap the resource you want, in the row below the board.', pic: () => hnode(() => HP.res('berry')) },
   pickPlace: { target: hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a place', text: 'Tap the glowing place or worker the power should use.', pic: () => hnode(HP.haven) },
@@ -39,7 +39,7 @@ const HLP_RULES = [
   { phase: 'prepare', title: 'Your own seasons', text: 'Each player goes through Winter, Spring, Summer and Autumn alone.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
   { phase: 'lastCall', title: 'Nothing left? Pass', text: 'With nothing left to do, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
   { phase: 'lastCall', title: 'Your city still scores', text: 'When all have passed, cards, tokens, events and Long Road workers score.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
-  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
+  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. Ties: more events, then more leftover goods.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
   { phase: 'how', title: 'Several ways', text: 'This can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
   { phase: 'how', title: 'Pay or play free', text: 'Pay the price. Or play a critter free into its open matching building.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
   { phase: 'how', title: 'Cheaper plays', text: 'Some of your cards make a play cheaper. They show as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
@@ -87,7 +87,8 @@ function hlpWhy(m, a) {
     else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
-    if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
+    if (HB.cardKey(m.card) === 'fool') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
+    else if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
     else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
     else t = 'Play ' + nm + ' the cheaper way.';
   } else if (m.type === 'prepare') t = 'All workers are out: Prepare for ' + SEASN[Math.min(3, p.season + 1)] + '. They come home.';
@@ -111,8 +112,10 @@ function hlpSuggest() {
   const a = HB.actor(G);
   try { computeRec(true); } catch (e) { return null; }
   const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
+  try { pvReveal(hlpEl(m)); } catch (x) { }   // and scrolled into view   // the target may sit on another phone tab: bring it forward
   const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
-  return { why: hlpWhy(m, a), key: mk, m, target: () => { const e = hlpEl(m); return hlpEl(m); } };
+  // the helper's target may sit on another phone tab (Meadow, City, Goals): bring that panel forward so the finger and glow are visible
+  return { why: hlpWhy(m, a), key: mk, m, target: () => hlpEl(m) };
 }
 // ---------------------------------------------------------------- wiring
 // the middle of every button is a spot a bubble must not cover (the kit avoids [data-gxh-avoid]); invisible 2px markers, redrawn with the board
@@ -132,12 +135,48 @@ function hlpMarks() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'hollowbough', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn' });
+  GXH.init({ game: 'hollowbough', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn', avoidPad: 6 });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
-  // the dense board has no free spot for a bubble (it would cover cards and counts); the caption line in the bar already says the same, so no bubble here
-  void st; void nb; GXH.phase(null);
+  // first time in each phase: one short coach bubble (the kit keeps it off glowing targets and buttons); tapping the lightbulb asks again
+  void st; void nb;
+  // FIXED13: coach bubbles only in the guided first game; a normal game is clean (the bulb answers on demand and closes when the moment changes)
+  try { const ph = hlpPhase(); if (hlpCoached()) GXH.phase(ph); else { const s = GXH.state(); if (s.cur && (s.cur.kind === 'coach' || (s.cur.phase != null && s.cur.phase !== ph))) GXH.hide(); } } catch (e) { }
 }
+function hlpCoached() { return UI.mode === 'guided' || !!(UI.cfg && UI.cfg.coached); }
+// ---------------------------------------------------------------- the idle nudge (FIXED13): a normal game shows no helper; after 8 s without a tap
+// on your turn, the helper's pick gets one soft gold outline (no finger, no bubble). Tips off in the Menu turns it off too.
+const HLP_IDLE_MS = 8000;
+function hlpIdleClear() { clearTimeout(UI.idleT); document.querySelectorAll('.nudge').forEach(e => e.classList.remove('nudge')); }
+function hlpIdleArm() {
+  hlpIdleClear();
+  if (!G || !UI.started || G.phase === 'over' || hlpCoached() || guideOn() || (UI.cfg && UI.cfg.tutorial)) return;
+  UI.idleT = setTimeout(hlpNudge, HLP_IDLE_MS);
+}
+function hlpNudge() {
+  try {
+    if (!hlpPhase()) { UI.idleT = setTimeout(hlpNudge, 1500); return; }   // cards flying or a card open: wait, then try again
+    if (typeof GXH !== 'undefined') { const s = GXH.state(); if (!s.on || s.cur || s.rules) return; }
+    computeRec(true); const m = UI.rec && UI.rec.m; let el = hlpEl(m); if (!el || (m.type === 'pass')) return;
+    try { pvReveal(el); } catch (e) { }   // open the right tab and scroll the target into view first, then outline it there (the tab dot hides meanwhile)
+    el.classList.add('nudge');
+  } catch (e) { }
+}
+document.addEventListener('pointerdown', () => { if (typeof hlpIdleArm === 'function' && UI.started) hlpIdleArm(); }, true);
+// the guided game: when a coach bubble closes (a tap), the finger comes back (it hides while a bubble shows: one helper at a time)
+document.addEventListener('pointerup', () => { if (!UI.started || !hlpCoached()) return; clearTimeout(UI.fbk); UI.fbk = setTimeout(() => { try { const f = document.getElementById('finger'); if (f && f.hidden && !GXH.state().cur) placeFinger(); } catch (e) { } }, 400); }, true);
+// one helper at a time (FIXED13): the moment a coach bubble or the bulb's answer appears, the ghost finger steps aside (it comes back on the next tap)
+try { new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList && n.classList.contains('gxh-bub')) { const f = document.getElementById('finger'); if (f) f.hidden = true; hlpIdleClear(); return; } }).observe(document.body, { childList: true }); } catch (e) { }
+
+// every mode (guided too): the bulb's ring pulses 3 times (CSS) and its finger taps twice, then both hold still / go away (the shared kit loops them forever)
+try {
+  new MutationObserver(ms => {
+    for (const m of ms) for (const n of m.addedNodes) {
+      if (!n.classList || !n.classList.contains('gxh-finger') || !n.getAnimations) continue;
+      for (const a of n.getAnimations()) { try { a.effect.updateTiming({ iterations: 2 }); a.onfinish = () => { n.style.display = 'none'; }; } catch (e) { } }
+    }
+  }).observe(document.body, { childList: true });
+} catch (e) { }

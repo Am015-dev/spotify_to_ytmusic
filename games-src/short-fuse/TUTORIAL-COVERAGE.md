@@ -21,9 +21,9 @@ Words: `game/story.js` (`STORY.coach`, `STORY.later`). Proof: `game/coach-test.j
 | [x] The crew plays by the same rules (tokens, sort order) | `crew2` | when a rival hits | "Your crew plays by the same rules" |
 | [x] Validation check mark when all four of a number are cut | `check` | when it happens | "the green check goes up" |
 | [x] Equipment unlocks after two of its number are cut, works once | `gear` | when Rewind unlocks | "Rewind is ready" |
-| [x] Personal tool: the Twin Probe, once per job | `probe` | your second turn | "Your trick, once per job" |
+| [x] Personal tool: the Twin Probe, once per job, BY DOING | `probe`, `wrong1b` | guided step 11: tap the probe, then Plum's 2nd and 3rd wires, say 2: the practice miss is a probe miss and Plum tags the 1 | "Tap your Twin Probe: once per job, it tests two wires." |
 | [x] Yellow wires match only yellow; you must hold one to say it | `yellow` | your turn, while you hold the yellow | "Quill loves yellow" |
-| [x] Red wires: never point at one; a hand of only reds reveals itself | `red` | your turn, while you hold the red | Quill: "Never red" |
+| [x] Red wires: never point at one; a hand of only reds reveals itself, BY DOING | `red`, `win` | guided step 20: tap your red; the last step says your lone red revealed itself | Quill: "Tap your red: never say red or point at one." |
 | [x] A computer crewmate can miss too (rival comment from Quill) | `rmiss` | when a rival misses | Quill: "Even they slip" |
 | [x] The end and the scoring (animated count-up) (guesses that hit, solo cuts, misses, fuse left, wires cut) | end card | when the bomb is defused or explodes | "The rig is silent" / "Everybody breathes. Again." |
 

@@ -189,7 +189,7 @@
     "berry": 3
    },
    "base_points": -2,
-   "linked": "fairgrounds",
+   "linked": "fair_grounds",
    "spec": {
     "timing": [
      "on_play"
@@ -651,7 +651,7 @@
     ],
     "unlocks": "cemetery second plot"
    },
-   "new_text": "Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Grove plot."
+   "new_text": "Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Mossgrave Glade plot."
   },
   {
    "role": "wanderer",

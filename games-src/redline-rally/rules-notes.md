@@ -50,3 +50,29 @@ Weather and legends modules, online play, campaign. Tracks are 2; a track editor
 - Cooldown happens in the React step (after the cards are played), then boost.
 - Weather (optional): Dry; Rain = corner limits -1, never below 2; Heatwave = 1 engine heat starts in the discard; Tailwind = slipstream 3.
 - Championship: Sunline, Hairpin Hill, Harbour Ring (new track); points 9-6-4-3-2-1; ties: more wins, then the better last race.
+
+## W496 rules check (against the printed rulebook text)
+- CHANGED: adrenaline +1 is speed and counts at corners; optional (skipped when it would cost more heat). Was: +1 space, ignored at corners.
+- CHANGED: the race runs until every car has finished; finishers leave the track at the end of their round. Was: stop after the first finisher's round.
+- CHANGED to CORE: too few playable cards = fill with heat from the hand (to the discard), no move, gear 1, skip cooldown and boost (already built that way).
+- VERIFIED: spin out pays all engine heat, 1 stress (gear 1-2) or 2 (gear 3-4), gear 1, back behind the corner; slipstream 2, not speed, never across the line; boost once, 1 heat, counts at corners; cooldown 3/1/0/0.
+- CHANGED (round 2): boost is asked in the react step after the reveal; the discard step comes right after moving, before drawing back to 7. No known rule differences left in the base game.
+
+## R9 re-review fix (W496 round 4): discard and boost restored to the published wording
+Quoted from the published rulebook (read online, 12 Nov 2026):
+- Boost (React step): "Regardless of which gear you are in you may pay 1 Heat (see p. 7) to boost once per turn."
+  The React step comes after Reveal and Move, so the choice is made after your cards are shown.
+- Discard (step 8): "You may discard cards from your hand if you do not want to save them for future rounds."
+  "You can never choose to discard Stress or Heat cards (even the Upgrade ones)."
+As built now:
+- Boost: no planning toggle. After the reveal you are asked every turn you hold 1+ engine heat (the only legal limit):
+  "No boost" / "Boost -1 heat" (marked "risky" when a big flip could spin you, "spins you" when any flip would). R19: no countdown;
+  the question waits for a tap, and it is asked even when a flip would spin you (a legal choice). The line says "flip to the next
+  speed card" (the rule flips until a speed card shows). With Hints on, Boost is marked "Suggested" when it is the better play.
+- Discard: offered every round after moving, whenever the hand holds a card that may go. Nothing is pre-selected; Heat and
+  Stress cannot be picked. R19: no countdown; "Keep all" or "Discard n" is always a tap.
+- Tutorial teaches both exactly as raced (discard any non-Heat, non-Stress card; boost question after the reveal).
+- Logic tests R73 (discard offered every round, a 3 may go), R74 (boost asked after the reveal only with heat), R75 (UI has no gate/toggle).
+
+Round 2 (orchestrator): countdowns are now 1.5 s and a tap anywhere outside the panel takes the default (touching the panel stops it).
+Boost is not asked when even the smallest flip (1) would spin you (no real choice). Discard is asked only when a card may go.

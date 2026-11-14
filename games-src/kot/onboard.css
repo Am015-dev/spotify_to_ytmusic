@@ -1,5 +1,5 @@
 /* ===== Play on the board (see onboard.js): dice, Roll, SMASH!, End turn, painted cards for sale, your cards, questions ===== */
-#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:min(60px,calc((var(--obw,360px) - 44px)/6.3))}
+#ob{position:absolute;inset:0;overflow:clip;z-index:6;pointer-events:none;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:10px;padding:0 14px calc(10px + var(--sab,0px));box-sizing:border-box;--dw:max(44px,min(60px,calc((var(--obw,360px) - 44px)/6.3)))}
 #ob button,#ob .die,#ob #choice{pointer-events:auto}
 #ob #obown,#ob #obmid,#ob #obtoast,#ob #obcard{position:absolute}
 #ob #obact,#ob #pacts{position:static!important}
@@ -114,3 +114,18 @@ html.ph-p #ob #pacts [data-act="end"]{min-width:0;flex:1 1 150px}
 html.ob .gx-board{overflow:clip}
 html.ph-l #ob #pacts>.btn{flex:none}
 html.ph-l #ob #pacts [data-act="end"]{min-height:60px}
+#ob #obcard.on{pointer-events:none}
+#ob .obbig .obbtns{display:flex;gap:8px;justify-content:center;margin-top:10px;pointer-events:auto}
+#ob .obbig .obbtns .btn{min-height:46px;min-width:110px;font-size:17px;font-weight:800;border-radius:12px;border:3px solid #1a1320;cursor:pointer}
+#ob .obbig .obbuy{background:#1f9d5c;color:#fff}
+#ob .obbig .obx{background:#fff;color:#1a1320}
+
+/* W500: with a pinned card the big card lives in the space above the shop row; its art gives way when the screen is short */
+#ob #obcard.on{align-items:center;grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr)}
+#ob .obbig{max-height:100%;justify-self:center;display:flex;flex-direction:column}
+#ob .obbig>*{flex:none}
+#ob .obbig>.bart{flex:1 1 150px;min-height:0;aspect-ratio:auto}
+#ob .obbig .obbtns.dlg{padding:0;border:0;background:none;box-shadow:none;margin-top:6px}
+#ob .obbig{padding:8px 12px 10px}
+#ob .obbig h3{margin:4px 0 0;font-size:24px}
+#ob .obbig p{margin:2px 0 0;font-size:14px;line-height:1.25}

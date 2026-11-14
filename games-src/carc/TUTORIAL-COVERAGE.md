@@ -1,34 +1,42 @@
-# Tutorial coverage: Rampart & Vine (coached first game, ADDENDUM 4)
+# Tutorial coverage: Rampart & Vine (guided first game, owner rule 8 Nov 2026: gameplay first)
 
-The tutorial is now a COACHED FIRST GAME: a real game against the real AI (Hob) with free legal moves from turn 1 and no forced taps (the brief allows two).
-A fixed 30-tile deck (`COACH_DECK` in `game/src/coach.js`) only makes sure a banner town, roads, towns and priories come up. Old Tamsin (guide) and Hob (rival) speak
-just in time: one small bubble at a time, taps pass through it, Got it / auto-dismiss, "Leave tutorial" always visible. Each rule is explained the first time it matters
-(`window.GXCOACH = {running, explained:[ids], done, later:[ids]}`). At the end the score is walked through rule by rule with the player's real numbers, then a
-"Things you will meet later" card lists the rules that did not come up. Text: `game/src/story.js` (`STORY.coach`, `coachEnd`, `coachLater`).
-Proof: `game/coach-test.js` plays the coached game to the end with random legal moves through the UI at 390x763 and 1440x860 and asserts the core rules were explained and
-every other rule was explained or is on the later card.
+"Learn in 5 minutes" (and the Story prologue) is a GUIDED FIRST GAME (`tutStart` in `game/src/tutor.js`, shell/gx-tutor.js): a fixed 11-tile valley against Hob.
+Each step is one sentence of 12 words or fewer (`STORY.tut` in `game/src/story.js`) and one highlighted tap: the glowing square, the follower circle, Skip, or Next on an
+explain step. Every core rule is taught in order; nothing is put on a "learn later" list. The end card's "Play a real game" starts a normal game
+(the prologue's button starts chapter 1).
+Proof: `game/tut-walk-test.js` taps only the highlighted targets at 390x844 and 375x667. It checks that every step in `TUT_RULES` appears in order, that each is 12 words or fewer,
+that no "learn later" list appears, and that a real game is running afterwards. `game/learn-touch-test.js` now runs this walk.
 
-| Rule | Coach id | When it is explained (in play) | Fallback |
+| # | Step | Rule taught | How |
 |---|---|---|---|
-| goal, most points wins | goal | your first placement turn (Tamsin) | |
-| turn the tile, edges must match | match | first placement turn | |
-| town banner: +2 per banner | banner | the first time you hold a banner tile (the deck gives you one early) | later card |
-| follower: road, town, priory, field; seven; skip | follower | first time you may place one | |
-| follower on a road / town / priory / field (farmer) | claim_road / claim_town / claim_priory / claim_field | when you place that kind of follower, with its scoring | |
-| one owner per feature | one_owner | when Hob first claims something (Hob speaks) | |
-| finished road 1 per tile, follower goes home | score_road | when your road finishes, with the real numbers | later card |
-| finished town 2 per tile + 2 per banner | score_town | when your town finishes | later card |
-| priory 9 when ringed (else 1 + neighbours) | score_priory | when it scores | later card |
-| majority: most followers wins, others get nothing | majority | when a feature you had a follower in is won by Hob | later card |
-| tie: all tied players score in full | tie | when it happens | later card |
-| rival scores | rival_score | Hob's first score (Hob speaks) | |
-| tile that fits nowhere is set aside | discard | when it happens | later card |
-| no followers left | nofig | when you run out | |
-| game end: last tile, unfinished features 1 per tile, farmers 3 per finished town | last, then the score walk | last two tiles, then roads, towns, priories, fields, total, each with your real numbers | |
-| River, Taverns & Basilicas (inns, basilica, large follower), Merchants & Masons (goods, mason, hog) | (not in play) | "Things you will meet later" card at the end, and the lightbulb | card |
+| 1 | goal | lay tiles, claim with followers, most points wins | explain (Next) |
+| 2 | turn | draw your tile and turn it | tap the tile |
+| 3 | place1 | every touching edge must match (road to road) | tap the glowing square |
+| 4 | fig_road | one follower on the tile just laid, or none; you have seven | tap the follower circle |
+| 5 | computer | the rival lays a tile and may claim | explain |
+| 6 | claimed | a claimed road, town or field takes no second follower | explain |
+| 7 | place2 | followers go only on the tile just laid; closing a road | tap the square |
+| 8 | fig_priory | priory: 9 when ringed by eight tiles | tap the circle |
+| 9 | road_done | finished road 1 per tile, the follower comes home | explain |
+| 10 | place3 | town meets town | tap the square |
+| 11 | fig_town | claim a town before it closes | tap the circle |
+| 12 | town_done | finished town 2 per tile, the follower comes home | explain |
+| 13 | pennant | each banner shield in a finished town adds 2 | explain |
+| 14 | place4 | the priory needs all eight neighbours | tap the square |
+| 15 | fig_farmer | farmer in a field, never comes home | tap the circle |
+| 16 | majority | most followers in a feature takes all its points | explain |
+| 17 | tie | tied for most: each scores in full | explain |
+| 18 | place5 | a follower is optional | tap the square |
+| 19 | discard | a tile that fits nowhere is swapped | explain |
+| 20 | place6 | completing the priory ring | tap the square |
+| 21 | skip | skip the follower to keep it | tap Skip |
+| 22 | priory_done | the priory scores 9, the follower comes home | explain |
+| 23 | final | game end: open features 1 per tile (banners 1), farmers 3 per finished town | explain |
+| 24 | winner | most points wins | explain, then "Play a real game" |
 
-Honest limits: because play is free, ties, majority fights and unplaceable tiles may not come up in a given game; they are then on the later card, not taught by doing.
-The expansions are never in the coached game (base rules only). Story prologue: Story launches the same coached game (Chapter 0) and ends with "Start chapter 1".
+Honest limits: majority, tie, banner and swapped-tile rules are taught by an explain step on the real board, not by a move of their own. The scripted valley has no
+contested feature or banner tile. The coached free game (`coach.js`, `coachStart`) is no longer launched from the menu. Its end no longer shows a "later" card.
+`game/coach-test.js` starts it directly.
 
 ## Rules check (games-src/rules-check/rampart-and-vine.md)
 WRONG 0, MISSING 1 (garden/abbot tiles belong to an expansion we do not have), SIMPLIFIED 4 (stated in the Help card "House rules"). Nothing to fix in the engine.

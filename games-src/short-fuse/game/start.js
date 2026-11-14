@@ -13,12 +13,13 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   const seatsTxt=nh===0?'Watch':nh===1?'You + computers':nh+' players, one phone';
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
+   <p class="st-goal">A team bomb puzzle: guess your crew's hidden wires from the clues and cut them all before the fuse burns out.</p>
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size"><span class="seglbl">Crew</span>${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level"><span class="seglbl">Computer</span>${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
       <button class="big go" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
    <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small><span class="cast" aria-hidden="true"><i class="c-brix"></i><i class="c-quill"></i><i class="c-mole"></i></span></button>
-   <button class="btn wide" data-a="offeryes">${ico('book')}Learn to play<small>A coached first game</small></button>
+   <button class="btn wide" data-a="offeryes">${ico('book')}Learn to play<small>A guided first job</small></button>
    ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <details class="more"${more?' open data-full="1"':''}><summary>More: seats, online play, all jobs <span aria-hidden="true">▾</span></summary>${more?`
     <div class="seg"><button class="btn small${seatMode(s)==='solo'?' on':''}" data-a="preset" data-v="solo">${ico('user')}Solo</button><button class="btn small${seatMode(s)==='hot'?' on':''}" data-a="preset" data-v="hot">${ico('four')}One phone</button><button class="btn small${seatMode(s)==='watch'?' on':''}" data-a="preset" data-v="watch">${ico('eye')}Watch</button></div>
@@ -29,7 +30,11 @@ document.addEventListener('toggle',e=>{if(e.target&&e.target.classList&&e.target
 function flashBtn(a,v){const e=document.querySelector('#start [data-a="'+a+'"][data-v="'+v+'"]');if(e){e.classList.add('tap');setTimeout(()=>e.classList.remove('tap'),260)}}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
-function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
+function startJob(s){if(isClient())return;
+  // gentle first jobs: until the player flips the bulb themselves, hints (the odds badges) are on for jobs 1-3 and off from job 4
+  if(lsGet('sf_hints',-1)===-1){UI.hints=false;   // hints only behind the bulb (review G6: no help on the wires by default)
+  try{scBulb()}catch(e){}}
+  lsSet('sf_played',1);s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;
   if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.camp)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names});UI.lastSetup=s.camp?UI.lastSetup:s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars&&s.chars[i]){chars[i]=s.chars[i];any=1}
@@ -38,6 +43,7 @@ function startJob(s){if(isClient())return;lsSet('sf_played',1);s=Object.assign({
   UI.ghost=lsGet('sf_ghost',{info:1,turn:1});if(s.camp&&s.camp.hints&&!lsGet('sf_ghost_'+s.camp.id,0)){lsSet('sf_ghost_'+s.camp.id,1);UI.ghost={info:1,turn:1}}if(s.camp&&!s.camp.hints)UI.ghost={info:0,turn:0};
   if(typeof GXH!=='undefined'){UI.ghost={info:0,turn:0};if(s.camp&&s.camp.hints)GXH.setEnabled(true)}
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}
+  if(s.captain==null&&s.job===1&&!s.camp&&!NET.on&&seats.indexOf('human')>=0)s.captain=seats.indexOf('human');   // review R1: job 1, you are the foreman: you go first and hold the two labelled stands
   if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;if(s.twist)o.twist=s.twist;if(s.lvs)o.lv=s.lvs;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
   if(plan)netBound(plan)}finally{NET.starting=false}

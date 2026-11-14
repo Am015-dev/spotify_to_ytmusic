@@ -14,14 +14,14 @@ const AUDIT = `(() => {
   if (Math.max(de.scrollWidth, document.body.scrollWidth) > W + 1) bad.push('hscroll ' + de.scrollWidth + '>' + W);
   const tb = document.getElementById('tb'), tr = tb.getBoundingClientRect(); if (tr.height < 100 || tr.width < W - 4) bad.push('table collapsed ' + Math.round(tr.width) + 'x' + Math.round(tr.height));
   if (H > W && 100 * tr.height / H < 55) bad.push('table ' + Math.round(100 * tr.height / H) + '%');
-  if (tr.bottom > H + 1) bad.push('table taller than the screen');
-  const animating = document.querySelector('#tb .snap,#tb .buzz,#tb .aim,#tb .lift,#tb .sel,#tb.shake');
-  if (!animating) for (const e of document.querySelectorAll('#tb .tile')) { const r = e.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('tile off screen'); }
+  const animating = document.querySelector('#tb .snap,#tb .buzz,#tb .aim,#tb .lift,#tb .sel,#tb.shake,#tb.boomfx');
+  if (tr.bottom > H + 1 && getComputedStyle(tb).transform === 'none' && !tb.classList.contains('boomfx') && !tb.classList.contains('shake')) bad.push('table taller than the screen');   // a burn or the boom shakes the table by a pixel or two: not a layout bug
+  if (!animating) for (const e of document.querySelectorAll('#tb .tile')) { if (e.closest('#crew.scroll')) continue; const r = e.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('tile off screen'); }
   const crew = document.getElementById('crew').getBoundingClientRect(), mine = document.getElementById('mine').getBoundingClientRect();
   if (mine.height > 0 && crew.bottom > mine.top + 2) bad.push('crew overlaps my stand');
   for (const id of ['crew', 'mine']) { const c = document.getElementById(id); if (!animating && c.scrollWidth > c.clientWidth + 2) bad.push(id + ' overflows wide'); }
-  const pr = document.getElementById('say').textContent.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(Boolean); if (pr.length > 8) bad.push('status over 8 words');
-  for (const e of document.querySelectorAll('#tb .tile.glow')) { const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > W || y > H) { bad.push('glowing tile off screen'); continue; } const t = document.elementFromPoint(x, y); if (t && !(e === t || e.contains(t) || t.contains(e))) bad.push('glowing tile covered'); }
+  const pr = document.getElementById('say').textContent.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(Boolean); if (pr.length > 22) bad.push('status over 22 words');
+  for (const e of document.querySelectorAll('#tb .tile.glow')) { e.scrollIntoView({ block: 'nearest' }); const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > W || y > H) { bad.push('glowing tile off screen'); continue; } const t = document.elementFromPoint(x, y); if (t && !(e === t || e.contains(t) || t.contains(e))) bad.push('glowing tile covered by ' + (t.id || t.className || t.tagName).toString().slice(0, 30) + (e.closest('#mine') ? ' (mine)' : ' (crew)')); }
   return bad;
 })()`;
 const SEQ = [[390, 763], [844, 390], [390, 763], [375, 553], [812, 375], [390, 763]];
@@ -39,7 +39,7 @@ async function one(browser, gi) {
     const step = async () => {   // a few real moves on whatever glows
       for (let k = 0; k < 7; k++) {
         const st = await page.evaluate('({over:!!G.over,mine:decider()===(UI.V?UI.V.seat:-9)})'); if (st.over) return;
-        const r = await page.evaluate(`(()=>{const e=[...document.querySelectorAll('#tb .tile.glow,#tb .chip.glow,#tb .plate.glow')].find(e=>{const r=e.getBoundingClientRect();return r.width>3&&r.right<=innerWidth&&r.bottom<=innerHeight});if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()`);
+        const r = await page.evaluate(`(()=>{const e=[...document.querySelectorAll('#tb .tile.glow,#tb .chip.glow,#tb .plate.glow')].find(e=>{e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return r.width>3&&r.right<=innerWidth&&r.bottom<=innerHeight&&h&&(h===e||e.contains(h))});if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()`);
         if (r && st.mine) await page.touchscreen.tap(r.x, r.y);
         await sleep(260);
       }

@@ -20,8 +20,9 @@ const $ = s => /^#[\w-]+$/.test(s) ? document.getElementById(s.slice(1)) : docum
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = D.CHARS.map(c => c.name);
-const TEMPER = ['normal', 'easy', 'hard', 'normal'];   // the default level of each fair-goer
-const DEF = { np: 3, me: 0, seats: [1, 2], lvBy: { 1: 'easy', 2: 'hard', 3: 'normal', 0: 'normal' }, sets: 1 };
+const TEMPER = ['easy', 'easy', 'normal', 'normal'];   // the default level of each fair-goer
+// default table: you against one easy rival (a sensible new player wins about half of these; newbie-bench.js). Normal and hard stay one tap away.
+const DEF = { np: 2, me: 0, seats: [1], lvBy: { 1: 'easy', 2: 'normal', 3: 'normal', 0: 'easy' }, sets: 1 };
 // tiny element builder: h('div.cls#id', {attr:..}, ...kids)
 function h(sel, at) {
   const m = /^([a-z0-9]*)((?:[.#][\w-]+)*)$/i.exec(sel) || [0, 'div', ''];

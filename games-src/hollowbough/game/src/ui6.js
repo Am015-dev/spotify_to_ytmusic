@@ -1,14 +1,14 @@
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
 // (the old guided-game advice cards are gone: first-time help is the gx-help kit, see ui11.js)
 // ---- drawers
-const RULES = `<h3>How a turn works</h3><ol class="hwt"><li>The banner shows whose turn it is. The top line says what to do.</li><li>Tap a glowing place for a worker. Tap a glowing card to build it.</li><li>The move plays out, then your points or goods show.</li><li>Rivals play the same way.</li><li>When all workers are out, Prepare. When you are done, Pass.</li></ol>
+const RULES = `<h3>How a turn works</h3><ol class="hwt"><li>The banner shows whose turn it is. The top line says what to do.</li><li>Tap a glowing place for a worker. Tap a glowing card to build it.</li><li>The move plays out, then your points or goods show.</li><li>Rivals play the same way.</li><li>When all workers are out, Prepare. After your Autumn Prepare, Pass when you are done.</li></ol>
 <h3>The goal</h3><p>Build the best city. A city holds up to 15 cards. When all have passed, add up your points. Cards, tokens, bonuses, events and the Long Road all count. The highest total wins.</p>
-<h3>How a turn goes</h3><p>On your turn, do <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare</b> (only when all your workers are out).</li></ul><p>When you are done, <b>Pass</b>. You take no more turns. Your city still scores.</p>
+<h3>How a turn goes</h3><p>On your turn, do <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare</b> (only when all your workers are out).</li></ul><p>Pass only in Autumn, after your last Prepare. When you are done, <b>Pass</b>. You take no more turns. Your city still scores.</p>
 <h3>Places for workers</h3><ul><li><b>Brown places</b> give resources, cards or a point token. Some are Shared. Others take one worker.</li><li><b>Forest places</b> (green) take one worker. In a four-player game, two can share.</li><li><b>The Barter Burrow</b> trades cards for resources. Discard 2 cards, get 1 resource.</li><li><b>The Long Road</b> opens in Autumn. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.</li><li><b>Destinations</b> are red cards in your city. A worker there uses the card. Open ones can be visited by rivals. The owner gets a point token.</li><li><b>Events</b> need a worker and the right city. Each can be claimed once.</li></ul>
 <h3>Playing cards</h3><p>Pay the price in twigs, resin, pebbles and berries. Play from your hand or the eight-card meadow. Your hand holds 8 cards. A <b>unique</b> card can be in your city once. A common card can be in as often as you like.</p><p><b>Playing free:</b> each critter has one matching building. If you own it and it has no token, play the critter free. Put a token on the building. Each building does this once.</p><p>Some cards (Lantern Rest, Pulley Lift, Thornhold Cells, Gavel Marten, Hostler Hedgehog) change the price. They show as extra buttons when you play a card.</p>
-<h3>Changes in this version</h3><ul><li>Resources never run out.</li><li>Each destination holds one worker. Cards with a permanent helper hold two.</li><li>Solo: a tie with the bear is a loss.</li><li>A worker on a claimed event comes home like the others.</li><li>The cemetery shows the top four cards of the discard pile.</li><li>An empty deck is refilled from the discard pile.</li></ul>
+<h3>Changes in this version</h3><ul><li>Resources never run out.</li><li>The Glade and the Cloister take a second worker once you own their critter (the Sexton or Brother Moss).</li><li>Solo: a tie with the bear is a loss.</li><li>A worker on a claimed event comes home like the others.</li><li>An empty deck is refilled from the discard pile.</li></ul>
 <h3>Card colours</h3><ul><li><b>Tan, Traveler:</b> works once when played.</li><li><b>Green, Production:</b> works when played, then every Spring and Autumn.</li><li><b>Red, Destination:</b> a place for workers.</li><li><b>Blue, Governance:</b> a lasting bonus or discount.</li><li><b>Purple, Prosperity:</b> bonus points at the end.</li></ul>
-<h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. <b>Spring</b> gives +1 worker and runs production. <b>Summer</b> gives +1 worker and 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Each player moves through seasons alone.</p>
+<h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. <b>Spring</b> gives +1 worker and runs production. <b>Summer</b> gives +1 worker and up to 2 meadow cards (no production). <b>Autumn</b> gives +2 workers and runs production again. Each player moves through seasons alone.</p>
 <h3>Scoring</h3><p>Count printed card points, point tokens, purple bonuses, events and Long Road workers. Ties go to more events, then more leftover resources.</p>
 <h3>Solo play</h3><p>You play Old Grimbeard. He picks places and cards by dice. You win with more points than he has. Pick Grumpy, Gruff or Ghastly.</p>
 <h3>Tips</h3><ul><li>Build production early. It pays every Spring and Autumn.</li><li>Keep cheap cards in hand. Watch the meadow too.</li><li>Tap the lightbulb for a good move and why.</li></ul>`;
@@ -39,7 +39,7 @@ function renderRival(seat) {
 }
 function rowCard(id, e) {
   const c = cdef(id); const bits = []; if (e) { if (e.occ) bits.push('occupied'); if (e.tok) bits.push(e.tok + ' tokens'); if (e.w) bits.push(e.w + ' workers'); if (e.pris && e.pris.length) bits.push(e.pris.length + ' prisoners'); }
-  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), h('div.sm', c.text)));
+  return h('div.rc', cardEl(id, 54, { entry: e }), h('div', h('b', c.name), h('div.sm', TYPEN[c.type] + ' · ' + c.pts + ' pt' + (bits.length ? ' · ' + bits.join(', ') : '')), ...textLines(c.text).map(t => h('div.sm', t))));
 }
 function renderDrawers() {
   if (!GX.open || !G) return;
@@ -72,6 +72,8 @@ function renderStart() {
   s.appendChild(card);
 }
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
+// card text in short lines (one idea per line, ~12 words): split at ; and at sentence ends, then at commas when still long
+function textLines(t) { const out = []; String(t || '').split(/;\s*|(?<=\.)\s+/).forEach(s => { s = s.trim(); if (!s) return; if (s.split(/\s+/).length <= 12) { out.push(s); return; } let cur = ''; s.split(/,\s*/).forEach(c => { const n = cur ? cur + ', ' + c : c; if (cur && n.split(/\s+/).length > 12) { out.push(cur + ','); cur = c; } else cur = n; }); if (cur) out.push(cur); }); return out.flatMap(s => { const w = s.split(/\s+/); if (w.length <= 12) return [s]; const r = []; for (let i = 0; i < w.length; i += 10) r.push(w.slice(i, i + 10).join(' ')); return r; }); }
 // ---- events
 document.addEventListener('click', ev => {
   if (UI.zoomAt && Date.now() - UI.zoomAt < 450) { ev.preventDefault(); return; }
@@ -84,15 +86,17 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 't': onTarget(d.t, t); break;
-    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { if (typeof tutGate === 'function' && !tutGate(UI.sel ? 'o:' + d.mi : tgOf(m), !!UI.sel)) break; UI.sel = null; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
     case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
     case 'handtog': UI.handHide = !UI.handHide; snd('click', { vol: .4 }); render(); break;
     case 'cityx': UI.cityOpen = null; render(); break;
     case 'noop': break;
+    case 'noprep': { const p = G && G.players[HB.actor(G)]; const n = p ? availW(p) : 0; toast(n > 0 ? 'Place your workers first (' + n + ' left)' : 'Prepare is not available now'); snd('error', { vol: .3 }); break; }
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;
+    case 'reresult': if (G && G.phase === 'over' && !UI.cards.length) { UI.resultDone = true; queueOver(); } break;
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
     case 'menu': UI.camp = null; showStart(); break;

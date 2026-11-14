@@ -1,5 +1,16 @@
 # Cauldron Fair: tutorial coverage
 
+**UPDATE (W503, 8 Nov 2026): the tutorial is a GUIDED FIRST GAME again (shared gx-tutor spotlight), and the coached free-play version is gone.**
+33 steps in the order the rules happen; each step is ONE sentence of 12 words or fewer (`src/story-data.js` STORY.steps) and ONE highlighted tap
+(the action itself or Next). There is no "learn later" list: rat tails, die faces, ruby spaces, stop any time, the day-6 white and the tie-break all have
+a step. The end card has one button, "Play a real game", which starts a 9-day game at once (Story prologue: "Start chapter 1").
+Rule list -> steps: `TUT_RULES` in `src/ui11.js`. `tutor-test.js` taps every step by touch (390x844, 375x667, rotate, leave, skip, anim, story),
+checks the word and sentence limits, that every rule's steps were all shown, and that a real game starts. Shots: `playable-shots/gameplay/tut-*.png`.
+Steps: goal, fortune, draw1, spiral, ring, whites, keep, stopany, keep2, flask, seven, push, report, die, ruby, choose, shops1, shops2, shops3, shops4,
+buy, droplet, refill, confirm, day2, rat, d2draw, peek, d2stop, d2report, ties, six, end.
+
+## Older notes (history)
+
 **UPDATE (addendum 4, round 2: window.GXCOACH exposes running, explained ids and done): the tutorial is now a COACHED FIRST GAME.** No forced taps or spotlight: the player plays the same real two-day game with free choices from turn 1 (fixed seed and stacked bags only make sure cases come up). Granny Hask speaks just-in-time, one bubble at a time, never blocking input, dismissible ("Got it", "Leave tutorial"). Bubble ids (src/turnlayer.js COACH_RULES): goal, fortune, draw, spiral, whites, flask, seven, boom, stopped, rival, report, shop, rubies, day2, lastday, peek, d2count, end. A bubble only shows while its situation is still true; any that did not come up are named on the end card ("Things you'll meet later", with the player's real final numbers). `coach-test.js` plays the game by tapping legal moves through the UI at 390x763 and 1440x860 and asserts every bubble id was either shown or listed on the end card. The step ids in the table below are the old forced-step names, kept as the rule list.
 
 The tutorial ("The Night Before") is ONE real guided game against the real computer (Wynne), cut to two days (day 1 full brew + shop, day 2 the last day) with a fixed seed so each case comes up on cue. Nothing is saved. It cannot cover a 9-day game; the rules that only appear on later days are listed under "Not covered".

@@ -14,6 +14,14 @@
   UI.campStart = start;
   document.addEventListener('click', function (e) { var b = e.target && e.target.closest && e.target.closest('.gxc-score'); if (b) b.setAttribute('data-opened', String(Date.now())); }, true);
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  // R29: only Act 1 chapters ship (acts 2-3 still use shelf-made foes). ?story=all shows the rest for testing. The Monk unlock moves to chapter 3.
+  window.EC_STORY_ALL = /[?&]story=all/.test(location.search);
+  if (!window.EC_STORY_ALL) {
+    var CA = window.CAMPAIGN, late = CA.chapters.filter(function (c) { return c.act > 1; }), last1 = CA.chapters.filter(function (c) { return c.act === 1; }).pop();
+    late.forEach(function (c) { (c.unlock || []).forEach(function (u) { if (u.type === 'portrait' && last1) last1.unlock.push(u); }); });
+    CA.chapters = CA.chapters.filter(function (c) { return c.act === 1; });
+    CA.acts = CA.acts.map(function (a) { return a.act === 1 ? Object.assign({}, a, { blurb: a.blurb + ' More chapters are coming soon.' }) : a; });
+  }
   // story text comes from src/story.js (EC_STORY): chapter intros and win outros replace campaign.json's lines; loss outros and boss lines are added here
   var ST = (window.EC_STORY || {}).chapters || {}, L = function (a) { return (a || []).map(function (x) { return { who: x[0], text: x[1] }; }); };
   window.CAMPAIGN.chapters.forEach(function (c) { var s = ST[c.id]; if (!s) return; if (s.intro) c.intro = L(s.intro); if (s.win) c.outro = L(s.win); });

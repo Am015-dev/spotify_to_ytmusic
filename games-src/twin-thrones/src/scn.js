@@ -21,7 +21,7 @@
     checks: [
       { kind: 'visible', sel: '[data-a="discard"]', name: 'Sell button' },
       { kind: 'visible', sel: '[data-a="build"]', name: 'Build button' },
-      { kind: 'visible', sel: '#zoom .zc', name: 'cost line' }
+      { kind: 'visible', sel: '#zoom .zcard .pay', name: 'cost chip' }
     ]
   });
   GXS.add({

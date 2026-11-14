@@ -5,7 +5,7 @@
 const CO={on:false,done:false};
 window.GXCOACH={get running(){return !!(UI.coach&&!CO.done&&G)},get explained(){return UI.coach?Object.keys(UI.coach.seen):(CO.last||[])},get done(){return CO.done}};
 const coOn=()=>!!(typeof UI!=='undefined'&&UI.coach&&G);
-function tutStart(o){const pro=!!(o&&o.prologue);try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
+function coStart(o){const pro=!!(o&&o.prologue);try{const d=document.getElementById('offer');if(d)d.remove()}catch(e){}
   try{GX.close()}catch(e){}hideStart();try{GXH.hide()}catch(e){}
   UI.coach={seen:{},q:[],cur:null,pro:pro,t:0,turns:0};CO.done=false;coClear();
   if(!MISSIONS[67]){MISSIONS[67]=Object.assign({},MISSIONS[1],{n:67,nm:'Training run',text:'A tiny practice bomb: 15 wires, three crew, one gear card.',pl:[3],blue:3,red:null,yel:null,eq:{n:0},rules:[],info:'std',tok:'num',audio:false,timer:null});BRIEFS[67]='A tiny practice bomb.';TUT.mission=true}
@@ -48,7 +48,7 @@ function coEnd(){const c=UI.coach;if(!c||CO.done)return;clearTimeout(CO.t);const
   try{GXT.markDone(TUT_GAME)}catch(e){}CO.done=true;CO.last=Object.keys(c.seen);const sk=document.getElementById('coachskip');if(sk)sk.remove()}
 // the result card (tbl.js, the same painted card as a real game) carries the Learn buttons: data-ce
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ce]');const c=UI.coach;if(!b||!c)return;const k=b.dataset.ce,pro=c.pro;
-  if(k==='again'){tutStart(pro?{prologue:true}:null);return}
+  if(k==='again'){coStart(pro?{prologue:true}:null);return}
   coClear();UI.coach=null;tutLeave();showStart();const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   if(k==='chapter'&&first)GXC.play(first.id);else if(k==='story'&&typeof GXC!=='undefined')GXC.open()});
 function coCount(d){const ns=[...d.querySelectorAll('.cn')];ns.forEach((e,i)=>{const to=+e.dataset.to;if(!to){return}const t0=performance.now()+i*350,dur=600;const f=t=>{const k=Math.min(1,Math.max(0,(t-t0)/dur));e.textContent=Math.round(to*k);if(k<1)requestAnimationFrame(f);else e.textContent=to};requestAnimationFrame(f)})}

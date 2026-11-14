@@ -1,8 +1,9 @@
 // ===================== Tidewake data =====================
-// Board: 6x6 squares, columns/rows numbered 1-6 (gold die = column, blue die = row). Ports on a square run clockwise from the
+// Board: 7x7 squares (the published board; see rules-notes.md). Gold numbers 1-6 over columns 1-6, blue 1-6 over rows 1-6 (gold die = column, blue die = row):
+// column 7 and row 7 carry no number, so leviathans (and Rift Gate jumps) can never be rolled onto them; ships sail everywhere. Ports on a square run clockwise from the
 // top-left: 0,1 top (left to right), 2,3 right (top to bottom), 4,5 bottom (right to left), 6,7 left (bottom to top).
 // Direction of port p = p>>1 (0 N, 1 E, 2 S, 3 W). Rotating a current 90 degrees clockwise adds 2 to every port.
-var BW=6;
+var BW=7,BC=(BW-1)/2;   // BC: board centre, for square -> world coordinates
 var SHIP_NAMES=['Crimson','Azure','Jade','Amber','Violet','Teal','Ivory','Onyx'];
 var SHIP_HEX=['#c0392b','#2f6fb5','#2e9c6a','#d9a21b','#7b4fb5','#1fa3a3','#e8e1cf','#2a2f3a'];
 // the 35 distinct currents = every perfect matching of the 8 ports (CONFIRMED set, same as the original tile set)

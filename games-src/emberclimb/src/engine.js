@@ -13,14 +13,14 @@
     var done = false;
     function go(o) {
       if (done) return o; o = o.slice(); var k = o[0];
-      if (k === 'dmg' || k === 'all' || k === 'blk') { o[1] += 3; done = true; }
-      else if (k === 'hit') { o[2] += 2; done = true; }
-      else if (k === 'dmgx') { o[1] += 4; done = true; }
+      if (k === 'dmg' || k === 'all' || k === 'blk') { o[1] += SC; done = true; }   // upgrades: +1 tabletop unit
+      else if (k === 'hit') { o[2] += SC; done = true; }
+      else if (k === 'dmgx') { o[1] += SC; done = true; }
       else if (k === 'poison' || k === 'poisonAll') { o[1] += 1; done = true; }
-      else if (k === 'shiv' || k === 'heal') { o[1] += 2; done = true; }
+      else if (k === 'shiv') { o[1] += 1; done = true; } else if (k === 'heal') { o[1] += SC; done = true; }
       else if (k === 'scry' || k === 'mir') { o[1] += 1; done = true; }
       else if (k === 'str' || k === 'draw' || k === 'nrg' || k === 'vuln' || k === 'weak' || k === 'weakAll') { o[1] += 1; done = true; }
-      else if (k === 'power') { o[2] += (o[1] === 'plated' || o[1] === 'mental' ? 2 : 1); done = true; }
+      else if (k === 'power') { o[2] += (o[1] === 'plated' || o[1] === 'mental' ? SC : 1); done = true; }
       else if (k === 'chanX') { o[2] = (o[2] || 0) + 1; done = true; }
       else if (k === 'evokeX') { o[1] = (o[1] || 0) + 1; done = true; }
       else if (k === 'roll') { o = ['roll', o[1].map(go2), o[2].map(go2), o[3].map(go2)]; }
@@ -34,12 +34,13 @@
     if (c.u) { var o2 = upOps(d.ops); if (JSON.stringify(o2) === JSON.stringify(d.ops) && typeof d.cost === 'number' && d.cost > 0) r.cost = d.cost - 1; else r.ops = o2; }
     return r;
   }
-  function lines(e) {
-    var out = [];
+  // b = the hero's Strength: attack numbers on the card show the real damage per hit (before the target's Block / Vulnerable)
+  function lines(e, b) {
+    var out = []; b = b || 0;
     function one(o) {
       var k = o[0];
       switch (k) {
-        case 'dmg': return 'Deal ' + o[1] + '.'; case 'hit': return 'Deal ' + o[2] + ' x' + o[1] + '.'; case 'all': return 'Deal ' + o[1] + ' to ALL.';
+        case 'dmg': return 'Deal ' + Math.max(0, o[1] + b) + '.'; case 'hit': return 'Deal ' + Math.max(0, o[2] + b) + ' x' + o[1] + '.'; case 'all': return 'Deal ' + Math.max(0, o[1] + b) + ' to ALL.';
         case 'dmgx': return 'Deal ' + o[1] + ' + ' + o[2] + 'x Str.'; case 'bodyslam': return 'Deal damage = Block.';
         case 'blk': return 'Gain ' + o[1] + ' Block.'; case 'str': return 'Gain ' + o[1] + ' Strength.'; case 'dblStr': return 'Double your Strength.';
         case 'vuln': return 'Vulnerable ' + o[1] + '.'; case 'weak': return 'Weak ' + o[1] + '.'; case 'weakAll': return 'ALL Weak ' + o[1] + '.';
@@ -63,7 +64,7 @@
     if (e.fl.indexOf('x') >= 0 && e.type !== 'P') out.push('Exhaust.');
     if (e.fl.indexOf('u') >= 0) out.push('Unplayable.');
     if (e.fl.indexOf('b') >= 0) out.push('End of turn in hand: lose 2 HP.');
-    if (e.fl.indexOf('r') >= 0) out.push('Held at end: 1 HP per card.');
+    if (e.fl.indexOf('r') >= 0) out.push('Held at end: ' + SC + ' HP per card.');
     if (e.fl.indexOf('d') >= 0) out.push('End of turn in hand: Weak 1.');
     if (e.fl.indexOf('e') >= 0) out.push('Exhausts at turn end.');
     return out;
@@ -71,7 +72,7 @@
   // ---------- setup
   function newGame(opt) {
     opt = opt || {}; var ks = (opt.heroes && opt.heroes.length ? opt.heroes : ['w']).slice(0, 2);
-    G = { v: 2, seed: opt.seed == null ? (Math.random() * 1e9) | 0 : opt.seed, uid: 0, q: [], msg: '', hs: [], gold: 99, relics: [], pots: [], pslots: 3, scr: 'map', b: null, rw: null, shop: null, evn: null, rest: null, at: -1, map: [], lucky: 0, revived: 0, floor: 0, wins: 0 };
+    G = { v: 2, seed: opt.seed == null ? (Math.random() * 1e9) | 0 : opt.seed, uid: 0, q: [], msg: '', hs: [], gold: 4 * SC, relics: [], pots: [], pslots: 3, scr: 'map', b: null, rw: null, shop: null, evn: null, rest: null, at: -1, map: [], lucky: 0, revived: 0, floor: 0, wins: 0 };
     G.rs = G.seed | 0; G.pslots = 3 * ks.length;
     G.asc = Math.max(0, Math.min(13, opt.asc | 0));   // Ascension (optional): 1 potion limit 2 each, 2 lose 5 max HP, 3 start with Regret, 4 smaller heal after an act boss, 5 dearer removal, 6 start at 90% HP. Levels 7-13 are not built.
     if (G.asc >= 1) G.pslots = 2 * ks.length;
@@ -82,6 +83,10 @@
     if (G.asc >= 2) G.hs.forEach(function (h) { h.mhp -= 5; h.hp = h.mhp; });
     if (G.asc >= 3) G.hs.forEach(function (h) { h.deck.push(mk('regret')); });
     if (G.asc >= 6) G.hs.forEach(function (h) { h.hp = Math.ceil(h.mhp * 0.9); });
+    // Gentle (first climb): an easier mode made for the screen, NOT the rulebook. Only the player's numbers change (start HP, starting potions,
+    // rest heal); foes stay exactly tabletop. Tuned so a newcomer who blocks shown hits beats the boss about 1 climb in 3 (bench-newcomer GENTLE=1).
+    G.gentle = opt.gentle ? 1 : 0;
+    if (G.gentle) { var GM = D.GENTLE; G.hs.forEach(function (h) { h.mhp = Math.round(h.mhp * GM.hp); h.hp = h.mhp; }); for (var gp = 0; gp < GM.pots && G.pots.length < G.pslots; gp++) G.pots.push(GM.pot); }
     G.boss = D.ENC.boss[ri(3)][0]; if (opt.boss) G.boss = opt.boss;
     G.F = opt.floors || 9; G.ehp = opt.hpPct || 100; G.acts = opt.acts === 4 ? 4 : Math.max(1, Math.min(3, opt.acts || 1)); /* 4 = the optional Act IV; larger values fall back to the three standard acts */ G.act = 1;
     // final act (act 4, optional): one more climb to the Ember Tyrant after act 3. startAct: a story chapter set in a later act
@@ -89,6 +94,7 @@
     if (G.acts > 1 && !opt.boss) G.boss = D.ACTBOSS[G.act]; G.lastStand = opt.lastStand === 0 ? 0 : 1;
     G.rd = {}; G.rr = {}; G.hs.forEach(function (h) { G.rd[h.k] = rewardPool(h.k, 0); G.rr[h.k] = rewardPool(h.k, 1); }); if (opt.relic && G.relics.indexOf(opt.relic) < 0) G.relics.push(opt.relic);
     genMap(); resetCombat();
+    if (opt.bless) { G.evn = { id: 'first-ember', res: null, start: 1 }; G.scr = 'event'; }   // opening blessing: one free choice before the first room
     return G;
   }
   function resetCombat() { G.hs.forEach(function (h) { h.draw = []; h.hand = []; h.disc = []; h.exh = []; h.en = 0; h.blk = 0; h.st = {}; h.orbs = []; h.stance = 'n'; h.pw = {}; h.mir = 0; }); }
@@ -174,10 +180,10 @@
   }
   // one hit: base (+Strength, +Wrath SCALE) then Weak -SCALE (floor 0) then Vulnerable x2; a Weak attacker on a Vulnerable target: neither applies
   function hitCalc(base, weak, vul) { var d = base; if (!(weak && vul)) { if (weak) d -= SC; d = Math.max(0, d); if (vul) d *= 2; } return Math.max(0, d); }
-  function dmgBase(h, base, card) { return base + st(h, 'str') + (card && card.type === 'A' && has('smoking-censer') ? 1 : 0) + (h.stance === 'w' ? SC : 0); }
+  function dmgBase(h, base, card) { return base + st(h, 'str') * SC + (card && card.type === 'A' && has('smoking-censer') ? SC : 0) + (h.stance === 'w' ? SC : 0); }
   var SPK_CARD = null;
   function hitEnemy(h, e, base, card) {
-    if (e.dead) return;
+    if (e.dead || !G.b || G.scr !== 'battle') return;   // a hero killed by Spikes mid-card ends the fight: later hits do nothing
     if (e.spk > 0 && card && card.type === 'A' && SPK_CARD !== card) { SPK_CARD = card; fx('hitme', 'h' + G.hs.indexOf(h), e.spk, 'spikes'); hurtHero(h, e.spk); if (G.scr !== 'battle' || h.dead) return; }
     var ei = G.b.en.indexOf(e), weak = ATK ? ATK.weak : st(h, 'weak') > 0, vul;
     if (ATK) { ATK.any = 1; if (ATK.vt[ei] == null) ATK.vt[ei] = st(e, 'vuln') > 0; vul = ATK.vt[ei]; } else vul = st(e, 'vuln') > 0;
@@ -187,10 +193,20 @@
     if (real > 0) {
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addPoison(e, h.pw.envenom);
-      if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); }
+      if (e.hp <= 0) killE(e); else hurtE(e, real);
     }
   }
-  function losePoisonKill(e) { if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
+  function losePoisonKill(e) { if (e.hp <= 0) killE(e); }
+  // R24 tabletop foe reactions: Hunker (Block the first time it is hurt), Mode Shift (the wyrm turns defensive when its Block was broken),
+  // death spores (heroes become Vulnerable when it dies)
+  function hurtE(e, real) {
+    var d = D.ENEMIES[e.id], ei = 'e' + G.b.en.indexOf(e);
+    if (d.curl && !e.curled) { e.curled = 1; e.blk += d.curl * SC; fx('blk', ei, d.curl * SC); }
+  }
+  function killE(e) {
+    e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0);
+    var d = D.ENEMIES[e.id]; if (d.deathVuln) aliveHs().forEach(function (h) { addSt(h, 'vuln', d.deathVuln); fx('debuff', 'h' + G.hs.indexOf(h), d.deathVuln, 'vuln'); });
+  }
   function lowest() { var l = alive().sort(function (a, b) { return a.hp - b.hp; }); return l[0]; }
   function chan(h, k) {
     var slots = 3 + (h.pw.slots || 0);
@@ -199,14 +215,14 @@
   }
   function evoke(h, remove) {
     var o = h.orbs[0]; if (!o) return; var f = h.pw.focus || 0;
-    if (o.k === 'L') { var t = alive()[ri(alive().length)]; if (t) hitRaw(t, 8 + f); }
-    else if (o.k === 'F') { gainBlk(h, 5 + f); fx('blk', 'h' + G.hs.indexOf(h), 5 + f); }
-    else { var l = lowest(); if (l) hitRaw(l, 6 + (o.v || 0) + f); }
+    if (o.k === 'L') { var t = alive()[ri(alive().length)]; if (t) hitRaw(t, SC * (2 + f)); }   // orbs in tabletop units x SCALE: Lightning evoke 2, Frost evoke 1, Dark evoke 1 + stored; Focus +1 unit
+    else if (o.k === 'F') { gainBlk(h, SC * (1 + f)); fx('blk', 'h' + G.hs.indexOf(h), SC * (1 + f)); }
+    else { var l = lowest(); if (l) hitRaw(l, SC * (1 + f) + (o.v || 0)); }
     if (remove) h.orbs.shift();
   }
   function hitRaw(e, d) {
     if (e.dead || d <= 0) return; var a = Math.min(e.blk, d); e.blk -= a; var real = d - a; fx('dmg', 'e' + G.b.en.indexOf(e), d, '');
-    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) { e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0); } }
+    if (real > 0) { e.hp -= real; e.asleep = 0; if (e.hp <= 0) killE(e); else hurtE(e, real); }
   }
   function setStance(h, s) {
     if (h.stance === s) return; if (h.stance === 'c') gainEn(h, 2); h.stance = s; fx('stance', 'h' + G.hs.indexOf(h), 0, s);
@@ -219,10 +235,10 @@
       switch (k) {
         case 'dmg': if (e) hitEnemy(h, e, o[1], card); break;
         case 'hit': if (e) for (var i = 0; i < o[1]; i++) hitEnemy(h, e, o[2], card); break;
-        case 'dmgx': if (e) hitEnemy(h, e, o[1] + 0 + st(h, 'str') * (o[2] - 1), card); break;
-        case 'bodyslam': if (e) hitEnemy(h, e, h.blk - st(h, 'str'), card); break;
+        case 'dmgx': if (e) hitEnemy(h, e, o[1] + 0 + st(h, 'str') * SC * (o[2] - 1), card); break;
+        case 'bodyslam': if (e) hitEnemy(h, e, h.blk - st(h, 'str') * SC, card); break;
         case 'all': for (var r = 0; r < (X != null ? X : 1); r++) alive().forEach(function (t) { hitEnemy(h, t, o[1], card); }); break;
-        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? 1 : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
+        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? SC : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
         case 'str': addSt(h, 'str', o[1]); fx('buff', hi, o[1], 'str'); break;
         case 'dblStr': addSt(h, 'str', st(h, 'str')); fx('buff', hi, 0, 'str'); break;
         case 'vuln': case 'weak': if (e && !e.dead) { addSt(e, k, o[1]); fx('debuff', 'e' + tgt, o[1], k); } break;
@@ -252,34 +268,56 @@
   }
   // ---------- battle flow
   function mkEnemy(id) {
-    var d = D.ENEMIES[id], hp = d.hp[0] + ri(d.hp[1] - d.hp[0] + 1); hp = Math.round(hp * (D.EHP[G.hs.length] || 1) * (1 + 0.25 * ((G.act || 1) - 1))); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
-    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0 };
+    var d = D.ENEMIES[id], pf = !!(d.hpF && G.fights === 0 && G.b0first), hp = pf ? d.hpF : d.hp[0] + ri(d.hp[1] - d.hp[0] + 1);
+    if (d.hpN && d.hpN[G.hs.length]) hp = Math.round(d.hpN[G.hs.length] * SC / G.hs.length);   // printed total HP for this party size (the card is not a flat per-hero number)
+    // R24 tabletop foes: normal foes have flat HP (one card per hero), elite and boss HP is printed per hero; shelf-made foes keep the old x1.6 duo rule
+    var hm = d.tab ? ((d.elite || d.boss) && !d.flat ? G.hs.length : 1) : (D.EHP[G.hs.length] || 1);
+    hp = Math.round(hp * hm * (1 + 0.25 * ((G.act || 1) - 1))); if (G.ehp && G.ehp !== 100) hp = Math.round(hp * G.ehp / 100);
+    return { id: id, hp: hp, mhp: hp, blk: 0, st: {}, i: -1, intent: null, asleep: d.sleep || 0, dead: 0, acted: 0, spk: 0, row: 0, pf: pf ? 1 : 0, mode: 0, taken: 0 };
   }
   function plan(e) {
-    var d = D.ENEMIES[e.id], step;
+    var d = D.ENEMIES[e.id], step, pat = e.pf && d.patF ? d.patF : e.mode && d.pat2 ? d.pat2 : d.pat;
     if (e.asleep > 0) { e.intent = { sleep: 1 }; return; }
-    if (d.mode === 'rand') { var k; do { k = ri(d.pat.length); } while (k === e.i && d.pat.length > 1); e.i = k; }
-    else e.i = (e.i + 1) % d.pat.length;
-    step = d.pat[e.i]; var dn = 0;
-    if (step.die) { dn = G.b.die || 1; step = step.die[dn <= 2 ? 0 : dn <= 4 ? 1 : 2]; }
+    if (d.first && !e.fd) { e.fd = 1; e.intent = JSON.parse(JSON.stringify(d.first)); e.intent.tg = e.row; return; }   // R24: a one-time opening step (the elite's idle turn)
+    if (e.mode && e.i + 1 >= pat.length) { e.mode = 0; e.taken = 0; e.i = -1; pat = d.pat; }   // R24: the defensive mode ends after its last step, back to attack mode
+    if (d.mode === 'rand') { var k; do { k = ri(pat.length); } while (k === e.i && pat.length > 1); e.i = k; }
+    else e.i = (e.i + 1) % pat.length;
+    step = pat[e.i]; var dn = 0;
+    if (step.die) { dn = G.b.die || 1; step = step.die.length === 2 ? step.die[dn <= 3 ? 0 : 1] : step.die[dn <= 2 ? 0 : dn <= 4 ? 1 : 2]; }
     e.intent = JSON.parse(JSON.stringify(step)); if (dn) e.intent.die = dn;
     var tg = e.row; if (!G.hs[tg] || G.hs[tg].dead) tg = G.hs.indexOf(aliveHs()[0]); e.intent.tg = tg;
   }
+  // tabletop split (act-1 boss): when it dies combat goes on; at the start of the next round (after the enemy turn) each hero's row gets
+  // its listed slimes in order. The dead boss takes no action. pendingSplit() keeps the fight from ending in between.
+  function pendingSplit() { return !!(G.b && G.b.en.some(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })); }
+  function doSplits() {
+    G.b.en.slice().forEach(function (e) {
+      var d = D.ENEMIES[e.id]; if (!e.dead || !d.split || e.splitDone) return; e.splitDone = 1;
+      G.hs.forEach(function (h, r) { if (h.dead) return; d.split.forEach(function (id) { var s = mkEnemy(id); s.row = r; s.spawn = 1; G.b.en.push(s); }); });
+      fx('split', 'e' + G.b.en.indexOf(e), d.split.length, e.id);
+    });
+  }
+  // rest: tabletop 'Heal 3 HP' on a ~10 HP board = 30%; at the shelf's 70-80 HP scale that is 30% of max HP (rules-notes R09)
+  function restHeal(h) { return (G.gentle ? D.GENTLE.rest : 3) * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
   function startBattle(kind) {
-    var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights < 3 ? P.weak : P.strong);
+    var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights === 0 && P.first ? P.first : G.fights < 3 ? P.weak : P.strong);
     var ids = pool[ri(pool.length)].slice();
+    if (G.tutEnc && G.tutEnc[G.floor]) ids = G.tutEnc[G.floor].slice();   // coached first climb: fixed foes per floor (src/tutor.js)
+    if (G.tutHp && G.tutHp[G.floor]) G.ehp = G.tutHp[G.floor];
     if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
       while (ids.length > G.hs.length) ids.pop();
       for (var gt = 0; ids.length < G.hs.length && gt < 20; gt++) { var og = pool[ri(pool.length)]; if (og[0]) ids.push(og[0]); }
     }
+    if (kind === 'e' && ids.length > 1 && G.hs.length > 1) { var one = ids.slice(); for (var eh = 1; eh < G.hs.length; eh++) ids = ids.concat(one); }   // R24: the 3-warden elite card is 3 per hero
     resetCombat();
+    G.b0first = kind !== 'e' && kind !== 'b' && G.fights === 0 && !(G.tutEnc && G.tutEnc[G.floor]);
     G.b = { en: ids.map(mkEnemy), turn: 0, ph: 'p', cur: 0, kind: kind, die: 0, scry: null };
     G.b.en.forEach(function (e, i) { e.row = i % G.hs.length; });
     G.scr = 'battle'; G.fights++;
     G.hs.forEach(function (h) {
       if (h.dead) return;
       h.draw = shuffle(h.deck.slice());
-      if (has('iron-bangle')) gainBlk(h, 4); if (has('spark-core') && h.k === 'a') chan(h, 'L'); if (has('prayer-beads') && h.k === 'm') h.mir = Math.min(CAP.mir, 1);
+      if (has('iron-bangle')) gainBlk(h, SC); if (has('spark-core') && h.k === 'a') chan(h, 'L'); if (has('prayer-beads') && h.k === 'm') h.mir = Math.min(CAP.mir, 1);
     });
     if (has('spark-core') && !G.hs.some(function (h) { return h.k === 'a'; })) { /* only the Automaton benefits */ }
     G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); });
@@ -289,8 +327,10 @@
     G.b.turn++; G.b.ph = 'p'; G.b.cur = -1;
     // one shared enemy die per round, rolled before the heroes act so die-based intents are visible
     G.b.die = ri(6) + 1; fx('die', '', G.b.die);
+    if (pendingSplit()) doSplits();
     G.b.en.forEach(function (e) { if (!e.dead) plan(e); });
-    G.hs.forEach(function (h) { if (!h.dead) { h.blk = 0; h.started = 0; } });
+    // Block is cleared each new round, but not on round 1: start-of-fight Block (Iron Bangle) must last through the first round
+    G.hs.forEach(function (h) { if (!h.dead) { if (G.b.turn > 1) h.blk = 0; h.started = 0; } });
     nextHero(0);
   }
   function nextHero(from) {
@@ -298,7 +338,7 @@
     return false;
   }
   function startHeroTurn(h) {
-    h.blk = 0; h.en = Math.min(CAP.en, 3 + (has('dawnstone') ? 1 : 0) + (h.pw.deva || 0) + (G.b.turn === 1 && has('lantern') ? 1 : 0));
+    if (G.b.turn > 1) h.blk = 0; h.en = Math.min(CAP.en, 3 + (has('dawnstone') ? 1 : 0) + (h.pw.deva || 0) + (G.b.turn === 1 && has('lantern') ? 1 : 0));
     var n = 5 + (has('gale-cloak') ? 1 : 0) + (G.b.turn === 1 ? (h.k === 's' && has('whetstone-ring') ? 2 : 0) + (has('candle-stub') ? 1 : 0) : 0);
     if (h.pw.noxious) alive().forEach(function (e) { addPoison(e, h.pw.noxious); });
     if (h.pw.reactor) chan(h, 'L');
@@ -308,17 +348,17 @@
   function endHeroTurn(h) {
     var hi = G.hs.indexOf(h), f = h.pw.focus || 0;
     h.orbs.forEach(function (o) {
-      if (o.k === 'L') { var t = alive()[ri(alive().length)]; if (t) hitRaw(t, 3 + f); }
-      else if (o.k === 'F') { gainBlk(h, 2 + f); fx('blk', 'h' + hi, 2 + f); }
-      else o.v += 6 + f;
+      if (o.k === 'L') { var t = alive()[ri(alive().length)]; if (t) hitRaw(t, SC * (1 + f)); }
+      else if (o.k === 'F') { gainBlk(h, SC * (1 + f)); fx('blk', 'h' + hi, SC * (1 + f)); }
+      else o.v += Math.max(0, SC * (1 + f));
     });
     if (h.pw.ritual) { addSt(h, 'str', h.pw.ritual); fx('buff', 'h' + hi, h.pw.ritual, 'str'); }
     if (h.pw.plated) { gainBlk(h, h.pw.plated); fx('blk', 'h' + hi, h.pw.plated); }
     var held = h.hand.length, keep = [];
     h.hand.forEach(function (c) {
       var fl = D.CARDS[c.id].fl;
-      if (fl.indexOf('b') >= 0) { fx('hitme', 'h' + hi, 2, 'burn'); hurtHero(h, 2, true); }
-      if (fl.indexOf('r') >= 0) hurtHero(h, held, true);
+      if (fl.indexOf('b') >= 0) { fx('hitme', 'h' + hi, SC, 'burn'); hurtHero(h, SC, true); }
+      if (fl.indexOf('r') >= 0) hurtHero(h, held * SC, true);
       if (fl.indexOf('d') >= 0) addSt(h, 'weak', 1);
       if (fl.indexOf('t') >= 0) keep.push(c); else if (fl.indexOf('e') >= 0) h.exh.push(c); else h.disc.push(c);
     });
@@ -330,9 +370,9 @@
     if (G.scr !== 'battle') return;
     if (!nextHero(G.b.cur + 1)) { tickPoison(); if (G.scr !== 'battle') return; G.b.ph = 'e'; G.b.ei = 0; G.b.cur = -1; }
   }
-  // tabletop poison: at the end of the heroes' turn each poisoned enemy loses 1 HP per token (ignores Block); tokens stay until it dies
+  // tabletop poison: at the end of the heroes' turn each poisoned enemy loses SCALE HP per token (ignores Block); tokens stay until it dies
   function tickPoison() {
-    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); } });
+    alive().forEach(function (e) { var p = e.st.poison || 0; if (p > 0) { p *= SC; e.hp -= p; fx('dmg', 'e' + G.b.en.indexOf(e), p, 'poison'); losePoisonKill(e); } });
     if (!alive().length) winBattle();
   }
   // one enemy acts per call; returns true while enemy phase continues
@@ -342,7 +382,7 @@
     if (G.b.ei >= G.b.en.length) { finishRound(); return false; }
     G.b.ei++;
     if (e.dead) return true;
-    e.blk = 0;
+    if (!D.ENEMIES[e.id].keepBlk) e.blk = 0;   // the wyrm keeps its Block until its Mode Shift step
     act(e);
     if (G.scr !== 'battle') return false;
     return true;
@@ -353,22 +393,19 @@
     var hs = aliveHs(), h = G.hs[it.tg]; if (!h || h.dead) h = hs[0]; if (!h) return;
     var tgs = it.all ? hs : [h];
     var ei = 'e' + G.b.en.indexOf(e); G.lastHit = e.id;
+    // printed boss Mode Shift: Block still up -> it drops the Block and attacks; Block broken -> no attack, it turns defensive (Sharp Hide)
+    if (it.guard) { if (e.blk > 0) e.blk = 0; else { e.mode = 1; e.i = -1; e.spk = (d.hide || 1) * SC; fx('act', ei, 0, 'cast', G.hs.indexOf(h)); fx('buff', ei, e.spk, 'spikes'); return; } }
     fx('act', ei, 0, it.atk ? 'atk' : 'cast', G.hs.indexOf(h));
     e.spk = 0; if (it.spikes) { e.spk = it.spikes; fx('buff', ei, it.spikes, 'spikes'); }
-    if (it.str) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
-    if (it.blk) { e.blk += it.blk; fx('blk', ei, it.blk); }
-    tgs.forEach(function (t) {
-      if (it.weak) addSt(t, 'weak', it.weak); if (it.vuln) addSt(t, 'vuln', it.vuln); if (it.frail) addSt(t, 'frail', it.frail);
-      if (it.weak || it.vuln) fx('debuff', 'h' + G.hs.indexOf(t), it.weak || it.vuln, it.weak ? 'weak' : 'vuln');
-      if (it.add) addCard(t, it.add[0], it.add[1], 'disc');
-    });
+    if (it.blk) { var bk = it.blk * (it.blkH ? G.hs.length : 1); e.blk += bk; fx('blk', ei, bk); }   // blkH: printed 'per hero' Block
+    if (it.str && !it.atk) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }
     if (it.atk) {
       var weak = st(e, 'weak') > 0;   // Weak/Vulnerable are spent once per whole attack action, not per hit
       for (var j = 0; j < tgs.length && G.scr === 'battle'; j++) {
         var t = tgs[j], vul = st(t, 'vuln') > 0;
         for (var i = 0; i < (it.hits || 1); i++) {
           if (t.dead || G.scr !== 'battle') break;
-          var dm = hitCalc(it.atk + st(e, 'str'), weak, vul);
+          var dm = hitCalc(it.atk + st(e, 'str') * SC, weak, vul);
           var a = Math.min(t.blk, dm); fx('hitme', 'h' + G.hs.indexOf(t), dm, a === dm ? 'blocked' : (st(e, 'str') > 0 ? 'str' : ''));
           hurtHero(t, dm);
         }
@@ -377,6 +414,13 @@
       if (G.scr === 'battle' && weak && e.st.weak > 0) e.st.weak--;
     }
     if (G.scr !== 'battle') return;
+    if (it.str && it.atk) { addSt(e, 'str', it.str); fx('buff', ei, it.str, 'str'); }   // R24: card text reads top to bottom, the hit lands before the Strength
+    // the action's text resolves top to bottom: the hit lands first, then its debuffs / added cards (so a Vulnerable it applies cannot double its own hit)
+    tgs.forEach(function (t) { if (t.dead) return;
+      if (it.weak) addSt(t, 'weak', it.weak); if (it.vuln) addSt(t, 'vuln', it.vuln); if (it.frail) addSt(t, 'frail', it.frail);
+      if (it.weak || it.vuln) fx('debuff', 'h' + G.hs.indexOf(t), it.weak || it.vuln, it.weak ? 'weak' : 'vuln');
+      if (it.add) addCard(t, it.add[0], it.add[1], 'disc');
+    });
     e.acted++; if (d.ritual && e.acted > 1) addSt(e, 'str', d.ritual);
   }
   function finishRound() {
@@ -385,10 +429,11 @@
   }
   function settle() { var n = 0; while (G.b && G.b.ph === 'e' && n++ < 200) step(); }
   function winBattle() {
-    var kind = G.b.kind, gold = kind === 'b' ? 60 + ri(30) : kind === 'e' ? 25 + ri(11) : 10 + ri(11);
-    if (has('gold-tooth')) gold = Math.floor(gold * 1.5);
+    if (pendingSplit()) { var sp = G.b.en.filter(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })[0]; if (!sp.splitSaid) { sp.splitSaid = 1; fx('splitsoon', 'e' + G.b.en.indexOf(sp), D.ENEMIES[sp.id].split.length, sp.id); } return; }
+    var kind = G.b.kind, gold = SC * (kind === 'b' ? 2 + ri(3) : kind === 'e' ? 1 + ri(2) : 1);   // tabletop coins x SCALE
+    if (has('gold-tooth')) gold = SC * Math.round(gold * 1.5 / SC);
     G.gold += gold;
-    if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + 6); });
+    if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + SC); });
     var cards = {}, ps = null;
     G.hs.forEach(function (h, i) { if (!h.dead) cards[i] = cardChoices(h, kind); });
     if (ri(100) < (kind === 'm' ? 40 : 60) && G.pots.length < G.pslots) { var pk = Object.keys(D.POTIONS); ps = pk[ri(pk.length)]; }
@@ -411,13 +456,14 @@
   function pickRelic(rars) { var l = Object.keys(D.RELICS).filter(function (k) { return rars.indexOf(D.RELICS[k].rar) >= 0 && !has(k) && LOCK.indexOf(k) < 0; }); return l.length ? l[ri(l.length)] : null; }
   function gainRelic(id) {
     if (!id || has(id)) return; G.relics.push(id);
-    if (id === 'lucky-coin') G.gold += 25; if (id === 'oak-heart') G.hs.forEach(function (h) { h.mhp += 8; h.hp += 8; }); if (id === 'pocket-satchel') G.pslots++;
+    if (id === 'lucky-coin') G.gold += SC; if (id === 'oak-heart') G.hs.forEach(function (h) { h.mhp += SC; h.hp += SC; }); if (id === 'pocket-satchel') G.pslots++;
     fx('relic', 'p', 0, id);
   }
   // ---------- actions
   function cost(h, c) { var e = eff(c); return e.cost === 'X' ? h.en : e.cost; }
   function canPlay(h, c) {
-    var e = eff(c); if (e.fl.indexOf('u') >= 0) return false; if (e.cost === 'X') return true;
+    var e = eff(c); if (e.fl.indexOf('u') >= 0) return false; if (e.tgt && G.b && !alive().length) return false;   // no living target (e.g. a fallen boss about to split): the card does not glow
+    if (e.cost === 'X') return true;
     return e.cost <= h.en;
   }
   function play(hi, ci, ti) {
@@ -425,6 +471,8 @@
     if (e.cost === 'X') { X = h.en; h.en = 0; } else h.en -= e.cost;
     h.hand.splice(ci, 1);
     fx('play', 'h' + hi, ci, c.id, ti);
+    if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].skillTax && G.b.turn >= 2) { fx('hitme', 'h' + hi, D.ENEMIES[en.id].skillTax * SC, 'enraged'); hurtHero(h, D.ENEMIES[en.id].skillTax * SC, 1); } });   // R24 tabletop elite: from its 2nd turn each Skill costs the player 1 HP
+    if (G.scr !== 'battle') return true;
     if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].onSkill) { addSt(en, 'str', D.ENEMIES[en.id].onSkill); fx('buff', 'e' + G.b.en.indexOf(en), D.ENEMIES[en.id].onSkill, 'str'); } });
     if (h.pw.afterimg) { gainBlk(h, h.pw.afterimg); }
     ATK = { weak: st(h, 'weak') > 0, vt: {}, any: 0 };
@@ -442,14 +490,14 @@
   function usePot(pi, ti) {
     var id = G.pots[pi], h = G.hs[G.b.cur], hi = 'h' + G.b.cur; G.pots.splice(pi, 1); fx('pot', hi, 0, id);
     switch (id) {
-      case 'fire-flask': hitRaw(G.b.en[ti], 20); break;
-      case 'block-brew': gainBlk(h, 12); fx('blk', hi, 12); break;
-      case 'strength-tonic': addSt(h, 'str', 2); break;
+      case 'fire-flask': hitRaw(G.b.en[ti], 4 * SC); break;
+      case 'block-brew': gainBlk(h, 2 * SC); fx('blk', hi, 2 * SC); break;
+      case 'strength-tonic': addSt(h, 'str', 1); break;
       case 'swift-draught': draw(h, 3); break;
       case 'energy-vial': gainEn(h, 2); break;
-      case 'venom-vial': addPoison(G.b.en[ti], 4); break;
+      case 'venom-vial': addPoison(G.b.en[ti], 2); break;
       case 'frost-gas': alive().forEach(function (e) { addSt(e, 'weak', 3); }); break;
-      case 'healing-draught': h.hp = Math.min(h.mhp, h.hp + 20); fx('heal', hi, 20); break;
+      case 'healing-draught': h.hp = Math.min(h.mhp, h.hp + 3 * SC); fx('heal', hi, 3 * SC); break;
       case 'fortune-die': G.lucky = 2; break;
     }
     if (!alive().length) winBattle();
@@ -458,23 +506,24 @@
     var n = G.map[id]; n.vis = 1; G.at = id; G.floor = n.f; G.fights = G.fights || 0;
     if (n.t === 'm' || n.t === 'e' || n.t === 'b') startBattle(n.t);
     else if (n.t === 'r') { G.rest = { todo: G.hs.map(function (h, i) { return h.dead ? -1 : i; }).filter(function (i) { return i >= 0; }) }; G.scr = 'rest'; }
-    else if (n.t === 't') { G.rw = { gold: 0, cards: {}, relics: pickRelics('cu', G.hs.length), took: {}, treasure: 1, nrel: G.hs.length }; G.rw.gold = 20 + ri(30); G.gold += G.rw.gold; G.scr = 'reward'; }
+    else if (n.t === 't') { G.rw = { gold: 0, cards: {}, relics: pickRelics('cu', G.hs.length), took: {}, treasure: 1, nrel: G.hs.length }; G.rw.gold = SC * (1 + ri(2)); G.gold += G.rw.gold; G.scr = 'reward'; }
     else if (n.t === 's') genShop();
-    else { var ks = Object.keys(D.EVENTS); G.evn = { id: ks[ri(ks.length)], res: null }; G.scr = 'event'; }
+    else { var ks = Object.keys(D.EVENTS).filter(function (k) { return !D.EVENTS[k].start; }); G.evn = { id: ks[ri(ks.length)], res: null }; G.scr = 'event'; }
   }
   function genShop() {
     var items = [], ks = G.hs.map(function (h) { return h.k; });
     for (var i = 0; i < 3 * ks.length; i++) {
       var k = ks[Math.floor(i / 3)], rar = ['c', 'u', 'r'][i % 3], pool = D.ORDER.filter(function (id) { var d = D.CARDS[id]; return d.hero === k && d.rar === rar; }), id = pool[ri(pool.length)];
-      items.push({ t: 'card', id: id, p: { c: 50, u: 75, r: 150 }[rar], sold: 0 });
+      items.push({ t: 'card', id: id, p: SC * { c: 2, u: 3, r: 6 }[rar], sold: 0 });
     }
-    var neu = shuffle(['n-bandage', 'n-good-instincts', 'n-finesse', 'n-panic-button', 'n-hand-of-greed']); neu.slice(0, 3).forEach(function (id) { items.push({ t: 'card', id: id, p: { c: 50, u: 75, r: 150 }[D.CARDS[id].rar], sold: 0 }); });   // 3 colourless cards, priced by rarity (2 / 3 / 6 gold units of 25)
+    var neu = shuffle(['n-bandage', 'n-good-instincts', 'n-finesse', 'n-panic-button', 'n-hand-of-greed']); neu.slice(0, 3).forEach(function (id) { items.push({ t: 'card', id: id, p: SC * { c: 2, u: 3, r: 6 }[D.CARDS[id].rar], sold: 0 }); });   // 3 colourless cards, priced by rarity (2 / 3 / 6 gold units of 25)
     // 3 relics + 3 potions; the first (top-left) of each is one price step (15 gold) cheaper
-    pickRelics('cu', 3).forEach(function (r, j) { items.push({ t: 'relic', id: r, p: (D.RELICS[r].rar === 'u' ? 220 : 150) - (j === 0 ? 25 : 0), sold: 0 }); });
-    var pk = Object.keys(D.POTIONS); for (var j = 0; j < 3; j++) items.push({ t: 'pot', id: pk[ri(pk.length)], p: 50 - (j === 0 ? 25 : 0), sold: 0 });
-    G.shop = { items: items, rm: (G.asc >= 5 ? 100 : 75), removed: 0, remh: [] }; G.scr = 'shop';   // removed = every hero has used their removal; remh = heroes who did
+    pickRelics('cu', 3).forEach(function (r, j) { items.push({ t: 'relic', id: r, p: SC * ((D.RELICS[r].rar === 'u' ? 9 : 6) - (j === 0 ? 1 : 0)), sold: 0 }); });
+    var pk = Object.keys(D.POTIONS); for (var j = 0; j < 3; j++) items.push({ t: 'pot', id: pk[ri(pk.length)], p: SC * (2 - (j === 0 ? 1 : 0)), sold: 0 });
+    G.shop = { items: items, rm: SC * (G.asc >= 5 ? 4 : 3), removed: 0, remh: [] }; G.scr = 'shop';   // removed = every hero has used their removal; remh = heroes who did
   }
   function leaveNode() {
+    if (G.evn && G.evn.start) { G.evn = null; G.scr = 'map'; return; }   // after the opening blessing: back to the map, still before floor 1
     if (G.at < 0) G.at = G.map.filter(function (n) { return n.f === 1; })[0].id;
     if (G.rw && G.rw.cards) Object.keys(G.rw.cards).forEach(function (hi) { if (!G.rw.took['c' + hi]) returnCards(G.hs[hi].k, G.rw.cards[hi]); });
     G.rw = null; G.shop = null; G.evn = null; G.rest = null;
@@ -486,11 +535,20 @@
     }
     G.scr = 'map';
   }
+  // applies an event result and returns a plain line of what changed ("+50 gold. Gained Cinder Strike.") so the player sees the outcome
   function applyEff(d) {
-    if (d.gold) G.gold += d.gold; if (d.heal) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + d.heal); });
+    var say = [], nm = function (id) { return D.CARDS[id] ? D.CARDS[id].name : id; }, g0 = G.gold, h0 = G.hs[0] ? G.hs[0].hp : 0;
+    if (d.gold) G.gold = Math.max(0, G.gold + d.gold); if (d.heal) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + d.heal); });
     if (d.hp) G.hs.forEach(function (h) { if (!h.dead) { h.hp = Math.max(1, h.hp + d.hp); } }); if (d.mhp) G.hs.forEach(function (h) { h.mhp += d.mhp; h.hp += d.mhp; });
-    if (d.relic) gainRelic(pickRelic('cu')); if (d.curse) G.hs.forEach(function (h) { h.deck.push(mk(d.curse)); });
-    if (d.card) G.hs.forEach(function (h) { var ch = cardChoices(h, 'm'); h.deck.push(mk(ch[0])); returnCards(h.k, ch.slice(1)); });
+    if (G.gold !== g0) say.push((G.gold > g0 ? '+' : '') + (G.gold - g0) + ' gold.');
+    if (G.hs[0] && G.hs[0].hp !== h0) say.push((G.hs[0].hp > h0 ? '+' : '') + (G.hs[0].hp - h0) + ' HP.');
+    if (d.mhp) say.push('+' + d.mhp + ' max HP.');
+    if (d.relic) { var rl = pickRelic('cu'); gainRelic(rl); if (rl && D.RELICS[rl]) say.push('Relic: ' + D.RELICS[rl].name + ' (' + D.RELICS[rl].t + ')'); }
+    if (d.curse) { G.hs.forEach(function (h) { h.deck.push(mk(d.curse)); }); say.push('Curse added: ' + nm(d.curse) + '.'); }
+    if (d.card) G.hs.forEach(function (h) { var ch = cardChoices(h, 'm'); h.deck.push(mk(ch[0])); returnCards(h.k, ch.slice(1)); say.push('Gained ' + nm(ch[0]) + '.'); });
+    if (d.rare) G.hs.forEach(function (h) { var rid = drawReward(h.k, 1); h.deck.push(mk(rid)); say.push('Gained rare card ' + nm(rid) + '.'); });
+    if (d.pot) { var np = 0; for (var pi = 0; pi < d.pot && G.pots.length < G.pslots; pi++) { var pk2 = Object.keys(D.POTIONS); G.pots.push(pk2[ri(pk2.length)]); np++; } if (np) say.push('+' + np + ' potion' + (np > 1 ? 's' : '') + '.'); else say.push('Potion slots full.'); }
+    return say.join(' ') || 'Nothing changed.';
   }
   // ---------- moves
   function validMoves() {
@@ -528,6 +586,7 @@
     return m;
   }
   function performMove(mv) {
+    if (G && mv && mv.t === 'toss') { if (!G.pots[mv.p]) return false; G.pots.splice(mv.p, 1); return true; }   // discard a potion (any screen); kept out of validMoves so bots never throw potions away
     if (!G) return false; var ok = validMoves().some(function (v) { return JSON.stringify(v) === JSON.stringify(mv); }); if (!ok) return false;
     switch (mv.t) {
       case 'go': enterNode(mv.n); break;
@@ -543,24 +602,24 @@
       case 'skip': G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h]); break;
       case 'leave': leaveNode(); break;
       case 'stop': G.rw = null; G.scr = 'over'; G.won = 1; break;
-      case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + 3 * SC + (has('healing-moss') ? 10 : 0)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
+      case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + restHeal(hh)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
       case 'upg': G.hs[mv.h].deck[mv.c].u = 1; G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
       case 'buy': var it = G.shop.items[mv.i]; G.gold -= it.p; it.sold = 1;
         if (it.t === 'card') { var hk = D.CARDS[it.id].hero, tg = G.hs.filter(function (x) { return x.k === hk; })[0] || G.hs[0]; tg.deck.push(mk(it.id)); } else if (it.t === 'relic') gainRelic(it.id); else G.pots.push(it.id); break;
       case 'remove': G.gold -= G.shop.rm; (G.shop.remh = G.shop.remh || []).push(mv.h); G.shop.removed = G.shop.remh.length >= G.hs.length ? 1 : 0; G.hs[mv.h].deck.splice(mv.c, 1); break;
       case 'opt':
         var ev = D.EVENTS[G.evn.id], o = ev.o[mv.i];
-        if (o.roll) { var v = roll(), eff2 = o.roll.length === 3 ? o.roll[v <= 2 ? 0 : v <= 4 ? 1 : 2] : o.roll[v - 1]; applyEff(eff2); G.evn.res = 'Rolled ' + v + '.'; }
-        else { var dd = o.do; if (dd.upg || dd.rem || dd.xform) { applyEff({ hp: dd.hp || 0 }); G.evn.pend = dd.upg ? 'upg' : dd.xform ? 'xform' : 'rem'; break; } applyEff(dd); G.evn.res = o.t; }
+        if (o.roll) { var v = roll(), eff2 = o.roll.length === 3 ? o.roll[v <= 2 ? 0 : v <= 4 ? 1 : 2] : o.roll[v - 1]; var out = applyEff(eff2); G.evn.res = 'Rolled ' + v + ': ' + (out === 'Nothing changed.' ? (o.cost ? 'a draw. You keep your ' + o.cost + ' gold.' : 'no effect this time.') : out); }
+        else { var dd = o.do; if (dd.upg || dd.rem || dd.xform) { applyEff({ hp: dd.hp || 0 }); G.evn.pend = dd.upg ? 'upg' : dd.xform ? 'xform' : 'rem'; break; } var out2 = applyEff(dd); G.evn.res = out2 === 'Nothing changed.' ? o.t : out2; }
         break;
-      case 'evpick': if (G.evn.pend === 'upg') G.hs[0].deck[mv.c].u = 1; else if (G.evn.pend === 'xform') { G.hs[0].deck.splice(mv.c, 1); G.hs[0].deck.push(mk(drawReward(G.hs[0].k, 0))); /* transform: remove a non-curse card, gain the top card of the rewards deck */ } else G.hs[0].deck.splice(mv.c, 1); G.evn.pend = null; G.evn.res = 'Done.'; break;
+      case 'evpick': var pkn = D.CARDS[G.hs[0].deck[mv.c].id].name, pres = ''; if (G.evn.pend === 'upg') { G.hs[0].deck[mv.c].u = 1; pres = 'Upgraded ' + pkn + ' to ' + pkn + '+.'; } else if (G.evn.pend === 'xform') { G.hs[0].deck.splice(mv.c, 1); G.hs[0].deck.push(mk(drawReward(G.hs[0].k, 0))); /* transform: remove a non-curse card, gain the top card of the rewards deck */ } else G.hs[0].deck.splice(mv.c, 1); if (!pres) pres = G.evn.pend === 'xform' ? 'Transformed ' + pkn + ' into ' + D.CARDS[G.hs[0].deck[G.hs[0].deck.length - 1].id].name + '.' : 'Removed ' + pkn + '.'; G.evn.pend = null; G.evn.res = pres; break;
     }
     return true;
   }
   // UI: damage per hit the enemy's current intent would deal to hero hi (after Strength, Weak, Vulnerable); 0 if it does not attack
   function previewHit(ei, hi) {
     if (!G || !G.b) return 0; var e = G.b.en[ei]; if (!e || e.dead || !e.intent || !e.intent.atk) return 0;
-    var t = G.hs[hi != null ? hi : e.intent.tg] || G.hs[0]; return hitCalc(e.intent.atk + st(e, 'str'), st(e, 'weak') > 0, st(t, 'vuln') > 0);
+    var t = G.hs[hi != null ? hi : e.intent.tg] || G.hs[0]; return hitCalc(e.intent.atk + st(e, 'str') * SC, st(e, 'weak') > 0, st(t, 'vuln') > 0);
   }
   function sideToAct() { return G && G.scr === 'battle' && G.b.ph === 'p' ? G.b.cur : -1; }
   function checkInvariants() {
@@ -593,13 +652,15 @@
   }
   // end W420 previewPlay
   EC.E = {
+    restHeal: function (h) { return restHeal(h); },
     lock: function (a) { LOCK = a || []; },
     newGame: function (o) { var g = newGame(o); g.fights = 0; return g; }, G: function () { return G; }, set: function (g) { G = g; },
-    validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,
+    upOps: upOps, validMoves: validMoves, performMove: performMove, step: step, settle: settle, sideToAct: sideToAct, checkInvariants: checkInvariants,
     eff: eff, lines: lines, previewHit: previewHit, previewPlay: previewPlay, canPlay: canPlay, cost: cost, reachable: reachable, save: save, load: load, clear: clear, has: has,
     debug: {
       boss: function () { enterNode(G.map.length - 1); }, hurt: function (hi, n) { hurtHero(G.hs[hi], n, 1); },
-      win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; }); winBattle(); } },
+      split: function () { if (G.b) { G.b.en.forEach(function (e) { if (D.ENEMIES[e.id].split) { e.hp = 0; e.dead = 1; } }); doSplits(); } },   // R24 ?scn=ec-split: the boss bursts at once
+      win: function () { if (G.b) { G.b.en.forEach(function (e) { e.hp = 0; e.dead = 1; e.splitDone = 1; }); winBattle(); } },
       shop: function () { G.at = G.map.filter(function (n) { return n.f === 3; })[0].id; G.floor = 3; G.gold = 400; genShop(); },
       rest: function () { G.at = G.map.filter(function (n) { return n.f === 9; })[0].id; G.rest = { todo: G.hs.map(function (h, i) { return i; }) }; G.scr = 'rest'; G.hs.forEach(function (h) { h.hp = Math.floor(h.mhp * 0.5); }); },
       event: function (id) { G.at = G.map.filter(function (n) { return n.f === 4; })[0].id; G.evn = { id: id, res: null }; G.scr = 'event'; },

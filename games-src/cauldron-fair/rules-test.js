@@ -135,6 +135,18 @@ test('last round: no shop; 5 coins = 1 VP, 2 rubies = 1 VP at the very end; most
   // seat 0: space 13 -> vp 2 + 13 coins/5 = 2 + 2 (+die) + rubies (5 + 1 ruby space 13? ) / 2
   const h = G.hist.find(x => x.seat === 0); yes(P(G, 0).vp >= 2 + 2 + 3, 'converted ' + P(G, 0).vp); eq(G.winners.length >= 1, true);
 });
+test('a 2-day game (the guided tutorial) treats day 2 as the last day: secret draws, no shop, 5 coins and 2 rubies = 1 VP', () => {
+  const G = T.game(2); G.last = 2; G.round = 2; T.order(G, 0, ['O1', 'O1', 'O1']); T.order(G, 1, ['O1']); P(G, 0).rubies = 4; P(G, 1).rubies = 0;
+  eq(CF.lastOf(G), 2); T.ok(G, 0, { t: 'draw' }); yes(P(G, 0).pot.length === 0 && P(G, 0).lock, 'day 2 draw held back until both chose');
+  T.run9(G, [3, 1]); let shop = false; T.finish(G, (s, q) => { if (q.h === 'shop') shop = true; return null; }); eq(G.phase, 'over'); eq(shop, false, 'a shop was offered on the last day');
+  eq(P(G, 0).vp, 2, 'space 4 pays 4 coins (0 VP) and 0 VP from coins, 4 rubies = 2 VP');
+});
+test('the tutorial script: whites 2+3+1 = 6, the flask returns the 1, 2 more = exactly 7 is safe, the next white explodes', () => {
+  const G = T.game(2); T.order(G, 0, ['W2', 'W3', 'W1', 'W2', 'O1']); T.draw(G, 0, 3); eq(CF.whiteSum(P(G, 0)), 6);
+  T.ok(G, 0, { t: 'flask' }); eq([CF.whiteSum(P(G, 0)), P(G, 0).flask], [5, false]); const rk = { O1: 0, W1: 1, W2: 2 }; P(G, 0).bag.sort((x, y) => rk[x.c + x.v] - rk[y.c + y.v]);   // a draw takes the end of the bag: W2, then W1
+  T.draw(G, 0); eq([CF.whiteSum(P(G, 0)), P(G, 0).boom], [7, false]);
+  yes(T.bad(G, 0, { t: 'flask' }), 'flask only once a day'); T.draw(G, 0); eq(P(G, 0).boom, true);
+});
 test('tie on points: the player who got furthest in the last round wins; still tied: shared', () => {
   const G = T.game(2); G.round = 9; T.order(G, 0, ['O1', 'O1', 'O1']); T.order(G, 1, ['O1', 'O1']); P(G, 0).vp = 40; P(G, 1).vp = 40; P(G, 0).rubies = 0; P(G, 1).rubies = 0;
   T.run9(G, [3, 2]); T.finish(G); eq(G.phase, 'over');

@@ -20,10 +20,10 @@ function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typ
 function ttlSrc(land) { try { return matchMedia('(max-aspect-ratio:4/5)').matches ? 'media/title-phone.webp' : land; } catch (e) { return land; } }
 function ttlImg(land) { const im = h('img.ttl-bg', { src: ttlSrc(land), alt: '' }); im.addEventListener('error', () => { if (im.src.indexOf('title-phone') > -1) im.src = land; }); return im; }
 function titleEl() {
-  const bg = ART.title ? ttlImg(ART.title) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
+  const bg = ART.title ? ttlImg(ART.title) : h('div.ttl-bg.ttl-plain'), sv = hasSave(), tutNew = typeof GXT !== 'undefined' && !GXT.isDone('final-approach');   // a new player sees "New here? Learn in 5 minutes" first, above Play
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
-      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutEl('ttut'))));
+    h('div.tbtns', tutNew ? tutEl('ttut') : null, h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
+      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null), tutNew ? null : tutEl('ttut'))));
 }
 function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;
@@ -54,7 +54,7 @@ function onlineEl() {
     h('p.ssub', 'Host a flight and send a friend the code or the link. Browsers connect directly; each of you only ever sees your own dice. An empty seat goes to the computer.'),
     h('details.online#onl', { open: true }, h('summary', 'Free, peer to peer'), h('div#netblock', netInner())));
 }
-function showStart() { try { GX.close(); } catch (e) { } closePass(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } UI.sv = 'title'; UI.cfgOpen = false; closeRS(); clearTimeout(UI.tm); UI.seq++; renderStart(); }
+function showStart() { try { GX.close(); } catch (e) { } try { if (typeof roHide === 'function') roHide(); } catch (e) { }   /* a Goal or round card never stays over the menu */ closePass(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } UI.sv = 'title'; UI.cfgOpen = false; closeRS(); clearTimeout(UI.tm); UI.seq++; renderStart(); }
 function loadSave() { try { const o = JSON.parse(localStorage.getItem('fa_save')); if (!o || !o.G) return false; G = o.G; UI.mode = o.mode; UI.seat = o.seat; UI.holder = o.mode === 'hot' ? -1 : o.seat; UI.cfg = o.cfg; UI.started = true; UI.sel = -1; UI.cof = 0; UI.over = null; UI.overShown = false; UI.coach = { level: UI.prefs.guide || 'off', seen: {}, tip: '' }; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null; const st = $('#start'); if (st) st.hidden = true; render(); sndMusic(); schedule(); return true; } catch (e) { return false; } }
 // ---------- events ----------
 document.addEventListener('click', ev => {
@@ -64,6 +64,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'die': dieTap(+d.s, d.d === 'p' ? 'p' : +d.d); break;
+    case 'hidtap': toast(name(+d.s) + '’s dice stay hidden until placed. Watch the board.'); break;
     case 'slot': slotTap(d.slot); break;
     case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': doAction(a, t); break;
     case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;

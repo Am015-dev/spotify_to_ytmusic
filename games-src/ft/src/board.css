@@ -318,7 +318,7 @@ html.ti .mbox.start canvas.t3d,.mbox.start canvas.t3d{position:absolute;top:-46p
 .tile .tv{top:-7px;right:-5px;z-index:4}.tile .tn{max-width:calc(100% - 4px)!important;text-overflow:clip;letter-spacing:-.2px}
 #gw{overflow:visible}#grid{margin-top:6px}
 .coachend .ce-box{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);overflow:auto}.ce-a{position:sticky;bottom:0;background:#fff6dc;padding:8px 0 2px;margin-top:6px;display:flex;gap:8px;flex-wrap:wrap}.ce-a .btn{min-height:48px}
-.plpop{pointer-events:none}.plpop span{display:none}
+.plpop{pointer-events:none}.plpop span{display:inline;font-size:14px;max-width:62vw}
 html .tile .ms .mp,html.tp .tile .ms .mp{filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 2px 1px rgba(30,15,5,.85))}
 .tile .tv{top:-3px;right:-3px}
 @media (min-width:1024px){.coach{flex-wrap:wrap}.coach span{flex:1 1 150px}.coach button{flex:1 1 100%}}
@@ -388,3 +388,68 @@ html.land #feed:not([hidden]){display:flex;flex-direction:column;gap:6px;positio
 #feed .fd-row{display:flex;gap:8px;align-items:flex-start;font:700 16px/1.25 var(--gx-body,system-ui)}
 #feed .fd-dot{flex:0 0 12px;height:12px;border-radius:50%;margin-top:5px;border:2px solid #4a2a05;box-sizing:border-box}
 #coach.on~#feed,#turnover.on~#feed{display:none!important}
+/* the guided first game (guide.js): the one tap each step asks for glows; undo is hidden while guided */
+.gd-hl{outline:4px solid #ffcf3f!important;outline-offset:2px;box-shadow:0 0 0 7px rgba(255,207,63,.45),0 0 18px 6px rgba(255,180,40,.75)!important;animation:gdpulse .9s ease-in-out infinite alternate;z-index:6}
+@keyframes gdpulse{from{outline-color:#ffcf3f}to{outline-color:#fff3b8}}
+@media (prefers-reduced-motion:reduce){.gd-hl{animation:none}}
+body.guiding [data-ui="undodrop"],body.guiding [data-mv*='"undo"']{display:none!important}
+
+.gd-off{opacity:.45;filter:grayscale(.5);animation:none!important;box-shadow:none!important;outline:0!important}
+/* R27: nine spots do not fit one row at 44 px on a phone: two rows of five and four, every spot 44 tall; the place label sits on its top edge */
+.bidt.two{grid-auto-flow:row;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-columns:auto;gap:3px}
+.bidt.two .spot{min-height:44px;height:44px;padding:0;justify-content:center}
+.bidt.two .spot .ord{position:absolute;top:0;left:0;z-index:1;font-size:13px!important;padding:0 4px!important;line-height:1.05;border-radius:6px 0 6px 0!important}
+.bidt.two .sp-b{min-height:44px;height:44px;padding-top:8px}.bidt.two .spot .sp-c{line-height:44px;padding-top:6px}
+html.land .bidt.two{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.guiding .gd-hl{min-height:44px;min-width:44px;box-sizing:border-box}
+.plpop,.plpop *,.fl,.fl *{pointer-events:none!important}
+/* round 2: quiet dear bids, best chooser tag */
+.sp-b.dear{opacity:.62;border-color:#b08a5a}.chb .chbest{display:block;font:800 14px/1 var(--ff-b,system-ui);color:#1f6a2a;margin-top:2px}
+
+/* R25: while a chooser is open only the chooser and its tile/card stay lit; everything else is dimmed and stops glowing */
+html.chzon .glow:not(.chb):not(.chzanc){animation:none!important;outline:0!important;box-shadow:none!important}
+html.chzon #grid .tile:not(.chzanc),html.chzon .dcard:not(.chzanc),html.chzon .mcard:not(.chzanc),html.chzon .sch:not(.chzanc),html.chzon .sp-b,html.chzon #acts button,html.chzon #mine .glow{filter:saturate(.4) brightness(.6)!important;transition:filter .15s}
+html.chzon #chz{z-index:60}
+/* R25 (GXSK rule): the unskinned action button has the same content box as the painted one (plate 14/18 px + no padding),
+   so turning the skin on or off never resizes Undo / Put them back. One line of text is 16 px tall either way. */
+html body .ab{line-height:16px}
+html:not(.sk) body .ab{padding:12px 16px!important}
+/* R25: landscape phones (390 px tall): the full market (5 rows) plus 3 djinns must fit under the top bar in every step */
+html.land.short #mkt .mcard{height:40px!important}html.land.short #mkt .mrow{gap:2px!important}
+/* R34 Earn list: ONE row (- Mystic | Earn N | + Mystic) so the bazaar keeps its tiles on a 375x667 phone */
+#acts .arow.earn{flex-wrap:nowrap;gap:6px;width:100%;max-width:420px;margin:0 auto;align-items:stretch}
+html body #acts .arow.earn .ab{height:48px;min-height:44px!important;max-height:52px;padding:0 8px!important;margin:0}
+#acts .arow.earn .ab.ern{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+#acts .arow.earn .ab.ern b{font-size:17px;font-weight:800;white-space:nowrap}#acts .arow.earn .ab.ern small{font-size:12px;opacity:.85;white-space:nowrap}
+#acts .arow.earn .ab.ern-s{flex:0 0 64px;font-size:16px;white-space:nowrap}#acts .arow.earn .ab.ern-s:disabled{opacity:.4}
+/* R34 feel (juice.js): decoration only, never over 0.6 s, never takes a tap */
+.jdip{animation:jdip .3s ease-out}@keyframes jdip{35%{transform:translateY(3px) scale(.95)}100%{transform:none}}
+.jland{animation:jland .55s cubic-bezier(.3,1.5,.5,1);z-index:3}@keyframes jland{0%{transform:scale(1)}25%{transform:scale(1.1,.88)}55%{transform:scale(.96,1.06)}100%{transform:scale(1)}}
+.jring{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:4px solid var(--jc);box-shadow:0 0 12px var(--jc);pointer-events:none;animation:jring .55s ease-out forwards}.jring.big{border-width:6px}
+@keyframes jring{0%{transform:scale(.3);opacity:1}100%{transform:scale(4.2);opacity:0}}.jring.big{animation-name:jringb}@keyframes jringb{0%{transform:scale(.3);opacity:1}100%{transform:scale(6);opacity:0}}
+.fl.jgold,.fl.jcn{z-index:2}.jsp{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fffbe0 0,#ffd35a 45%,rgba(255,170,0,0) 72%);box-shadow:0 0 10px 3px rgba(255,200,60,.8)}
+.jcoin{display:block;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3b0,#e8b030 55%,#a8721a);border:1px solid #7a4e0e;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.jglow{animation:jglow .26s ease-out}@keyframes jglow{0%{box-shadow:0 0 0 0 rgba(255,211,90,.95)}40%{box-shadow:0 0 0 6px rgba(255,211,90,.7),0 0 22px 6px rgba(255,200,60,.6)}100%{box-shadow:0 0 0 0 rgba(255,211,90,0)}}
+.jhurt{animation:jhurt .5s ease-out}@keyframes jhurt{20%,60%{transform:translateX(-3px)}40%,80%{transform:translateX(3px)}0%,100%{transform:none}}
+.jhaul{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 0 rgba(255,200,60,0);animation:jhaul .55s ease-out forwards}@keyframes jhaul{30%{box-shadow:inset 0 0 60px 18px rgba(255,200,60,.55)}100%{box-shadow:inset 0 0 0 0 rgba(255,200,60,0)}}
+@media (prefers-reduced-motion:reduce){.jdip,.jland,.jglow,.jhurt{animation:none!important}.jring,.jhaul{display:none}}
+
+/* R38: the score pop sits in the score bar over the step tracker (never on the tiles); djinn powers and goods stay one row */
+.plpop.inbar{box-sizing:border-box;max-width:none;padding:0 10px;border-radius:10px;justify-content:center;overflow:hidden;transform-origin:center}
+.plpop.inbar span{max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ce-r.ce-s{padding:3px 0}.ce-r.ce-s span{font-weight:700}.ce-r.ce-s b{font-size:16px}
+#acts .arow.pws{flex-wrap:nowrap;justify-content:safe center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:100%;padding:0 2px}
+#acts .arow.pws::-webkit-scrollbar{display:none}
+#acts .arow.pws .ab.pw{flex:0 0 auto;white-space:nowrap;min-height:44px!important;padding:0 10px}
+#mine{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;justify-content:safe center;max-width:100%;padding:1px 2px}#mine::-webkit-scrollbar{display:none}
+#mine .gchip{flex:0 0 auto}
+html.short:not(.land) .ab.pw{min-height:44px!important}
+html.mk-off:not(.land) #mkt{display:none}
+html.short:not(.land) .mcard:not(.empty),html.short:not(.land) .dcard{min-height:44px!important}
+/* R38: a short phone keeps the market on one row, but every card stays 44 px wide; the row slides sideways when it is full */
+html.short:not(.land) #mkt .mrow{display:flex!important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:3px}
+html.short:not(.land) #mkt .mrow::-webkit-scrollbar{display:none}
+html.short:not(.land) #mkt .mrow>*{flex:0 0 auto}html.short:not(.land) #mkt .mrow .mcard{width:44px;min-width:44px}
+html.dj-off:not(.land) #mkt .drow,html.mr-off:not(.land) #mkt .mrow{display:none!important}
+html.short.bid-mk:not(.land) #mkt,html.short.pw-on:not(.land) #mkt .drow{display:none!important}
+html.short:not(.land) #trk{display:none!important}   /* the one-line prompt above says what to do; the score pop then lands on the scorer's seat chip */

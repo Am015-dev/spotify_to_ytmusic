@@ -95,7 +95,7 @@ function newGame(o){o=o||{};const seed=o.seed!=null?o.seed>>>0:DEFSEED!=null?DEF
   lg(`Tidewake: ${np} captain${np>1?'s':''}${variant?' ('+variant+')':''}. ${SN(G.order[0])} sails first.`,'big');
   for(let i=0;i<np;i++)later('draw',{seat:G.order[i]});
   if(o.bossCannon)later('bossCannon',{seat:o.bossSeat||1,n:o.bossCannon});
-  if(!G.opts.noMon)later('setupMon',{n:(solo?(o.soloLev||(variant==='easysolo'?4:6)):LEV_AT_START[np]),placed:0});
+  if(!G.opts.noMon)later('setupMon',{n:(solo?(o.soloLev||(variant==='easysolo'?4:6)):(o.startLev||LEV_AT_START[np])),placed:0});  // startLev: the 'Calm sea' option (fewer leviathans at the start; the min-3 rule still holds)
   flow();return G}
 AG.bossCannon=d=>{const h=G.hands[d.seat];if(!h)return;for(let k=0;k<d.n;k++){if(h.filter(isCannon).length>=2)break;const di=G.deck.findIndex(isCannon);if(di<0)break;const hi=h.map((c,i)=>isCannon(c)?-1:i).filter(i=>i>=0).pop();if(hi==null)break;const cn=G.deck.splice(di,1)[0],old=h[hi];h[hi]=cn;G.deck.push(old);stat('bossCannon')}};  // campaign twist: the boss starts with a Deck Cannon
 AG.setupMon=d=>{if(d.placed>=d.n||!G.mdeck.length){now('fill',{});return}  // min-3 rule applies from the start (specials drawn at set-up may leave fewer than 3 leviathans)

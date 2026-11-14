@@ -15,13 +15,14 @@ function tutPick() {
   var f = function (fn) { var b = bs.find(function (x) { return !used[x.id] && fn(x); }); if (b) used[b.id] = 1; return b && b.id; };
   var T = {
     f1: f(function (b) { return b.h.indexOf('F') >= 0 && b.pw === 'cacheS'; }),
-    f2: f(function (b) { return b.h.indexOf('F') >= 0 && b.pw === 'draw1'; }),
+    f2: f(function (b) { return b.h.indexOf('F') >= 0 && b.pw === 'tuckDraw'; }) || f(function (b) { return b.h.indexOf('F') >= 0 && b.pw === 'draw1'; }),
     g1: f(function (b) { return b.h.indexOf('G') >= 0 && b.pw === 'laySelf' && b.e >= 3; }),
-    play: f(function (b) { return b.h.indexOf('G') >= 0 && b.c.length === 1 && b.c[0] === 'seed' && (!b.pw || PP.power(b.id).col === 'brown') && b.e >= 2; }),
+    play: f(function (b) { return b.h === 'G' && b.c.length === 1 && PP.FOODS.indexOf(b.c[0]) >= 0 && b.pw && PP.power(b.id).col === 'white' && PP.power(b.id).k !== 'wPlay' && PP.power(b.id).k !== 'wBonus'; }) ||
+      f(function (b) { return b.h.indexOf('G') >= 0 && b.c.length === 1 && PP.FOODS.indexOf(b.c[0]) >= 0 && b.pw && PP.power(b.id).col === 'white' && PP.power(b.id).k !== 'wPlay' && PP.power(b.id).k !== 'wBonus'; }),
     h2: f(function (b) { return b.h === 'W' && b.c.length >= 2 && b.c.indexOf('fish') >= 0; }),
     h3: f(function (b) { return b.h.indexOf('F') >= 0 && b.c.length >= 2 && b.c.indexOf('rodent') >= 0; }),
     w1: f(function (b) { return b.pw && PP.power(b.id).col === 'white' && PP.power(b.id).k === 'wFood' && b.c.length === 1; }),
-    pk: f(function (b) { return b.pw && PP.power(b.id).k === 'pEgg'; })
+    pk: f(function (b) { return b.pw && PP.power(b.id).k === 'pEgg' && b.e >= 1; })
   };
   return T;
 }
@@ -38,6 +39,7 @@ function tutPrep(Gx) {
   me.board[0] = [{ id: T.f1, eggs: 0, cache: 0, tuck: 0 }, { id: T.f2, eggs: 0, cache: 0, tuck: 0 }];
   me.board[1] = [{ id: T.g1, eggs: 1, cache: 0, tuck: 0 }];
   if (T.pk) Gx.pl[1].board['FGW'.indexOf(PP.DATA.birds.find(function (b) { return b.id === T.pk; }).h[0])].push({ id: T.pk, eggs: 0, cache: 0, tuck: 0 });
+  var pc = PP.DATA.birds.find(function (b) { return b.id === T.play; }).c[0]; me.food[pc] = Math.max(1, me.food[pc] || 0);   // the first bird is always affordable
   Gx.feeder = ['seed', 'fish', 'berry', 'grub', 'rodent'];
   Gx.fx = [];
 }

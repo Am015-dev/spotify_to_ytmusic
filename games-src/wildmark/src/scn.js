@@ -12,7 +12,7 @@
       { kind: 'visible', sel: '#mk .mt[data-i="0"]', name: 'market tile' },
       { kind: 'visible', sel: '#mk .mk[data-i="0"]', name: 'market token' },
       { kind: 'visible', sel: '#map .hx', name: 'starter tiles' },
-      { kind: 'text', sel: '#line', re: /pick/i, name: 'instruction line' },
+      { kind: 'text', sel: '#line', re: /drag or tap a tile/i, name: 'instruction line' },
       { kind: 'eq', name: 'turn counter', a: function () { return +(/Turn (\d+)/.exec(document.getElementById('barstat').textContent) || [])[1]; }, b: function () { return G.seats[0].done + 1; } },
       { kind: 'tap', sel: '#mk .mt[data-i="1"]', name: 'take pair 2', state: function () { return G.stage; }, expect: function (b, a) { return b === 'pick' && a === 'tile' || 'stage ' + b + '->' + a; } }
     ]

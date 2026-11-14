@@ -30,3 +30,15 @@ Rules check for this game: WRONG 0, MISSING 0, SIMPLIFIED 6. rules fixed 0/0. Th
 - Tutorial to the end (`game/tutor-e2e.js`, fresh storage, taps only): see the DONE line for the final run; 20 of 20 steps shown, end card reached, saved, centre of every target uncovered.
 - Quick game and Story stage 1 by taps only at 390x763 (`game/play-ui.js`): played to the result card. Where to tap comes from the game's own hint (lightbulb recommendation), never engine calls.
 - ui-audit (before the desktop help-text bump): phone A0 B14 C7 D0 E2 F0, phone-s A0 B17 C7 D0 E0 F0, pc A99 B12 C8 D0 E3 F0. NOT zero: these are old findings (board text 13-15 px on 1366 px wide screens, "Play" button 2.5:1 contrast on the green title button, the table mat stretched, "Host/Join" and "Draw pile" read as dead because the audit runs offline). I only fixed the ones in my own new Help text. The rest is the next job for the shared kit/skin and was not changed in this pass.
+
+## W482 (8 Nov 2026): Learn to play is followable on a phone
+Owner verdict: "coached game unplayable, like a spreadsheet, unknown icons, impossible to follow, mistakes".
+- Learn is now step by step again (shell/gx-tutor.js, steps in src/ui12.js `tutSteps`, words in src/story.js): each step names the exact thing,
+  glows only it, waits for that tap, and opens the right panel (Places / Meadow / City / Goals) itself. 19 steps: goal, places, worker,
+  goods, rival, build, city, Prepare, season, shared place, meadow buy, free critter, goal claim, forest, Pass, scoring, winner.
+- The free-play coach chips (timed, not tied to a target, "start with 3 twigs" while the best badge pointed elsewhere) are off in Learn.
+- Every step text checked against the engine data (Twig Heap 3 twigs, Resin Pool 2 resin, Allotment 2 twigs + 1 resin, Toad 2 berries,
+  Wayfarers' Fair needs 3 red cards for 3 points, Bumper Bramble 3 berries). Score step reads the one combined result card.
+- Words with icons: goods bar "3 / twigs", workers "2 / workers", card costs "1 twig / 1 resin" lines, "Costs ..." on big cards, "3 pts".
+- Bar: one line, never wraps (data-fa-skip); the duplicate bulb button is hidden on phones.
+- Touch driver: `node game/learn-touch.js 390x844,375x667` (taps from the title's Learn button to the end card, never Skip).

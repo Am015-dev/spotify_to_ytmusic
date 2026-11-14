@@ -1,3 +1,4 @@
+// SUPERSEDED by tut-walk.js (W499): Learn to play now opens the staged step-by-step tutorial, not the coached free game this file tests.
 // Coached first game, played to the end (W394b): from FRESH storage, at 390x763 (touch) and 1440x860 (mouse), by choosing ANY legal move through the UI
 // (a random visible hand card each turn, whatever the coach says; no scripted tap list), then the end card.
 //   node tutorial-end.js [sizes=390x763,1440x860]     prints PASS/FAIL lines, exit 1 on a problem

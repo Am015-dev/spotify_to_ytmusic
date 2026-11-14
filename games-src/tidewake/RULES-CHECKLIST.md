@@ -126,6 +126,10 @@ Source tags: base = base game, exp-gate / exp-wave / exp-mael / exp-cannon = the
 87. **[base]** Teams: teammates may not show each other their tiles (a table courtesy; the app hides hands). — TABLE-ONLY, no test
 88. **[exp-wave]** The blue Rogue Wave marker tile sits on the board edge to show where the wave is heading (the app draws the wave directly). — TABLE-ONLY, no test
 
+## L. Turn timing (found in the W498 playthrough)
+
+89. **[base]** A ship blocked by a leviathan at the start of its turn rolls first: if the leviathans move it away, the ship survives and plays. — TEST R89
+
 ## Rules the sources do not settle (our decisions; not scored as failures)
 
 - Board size: sources say 6x6, 7x7 or 8x8; the dice only reach 1-6. We keep 6x6 (planner decision, see `game/RULES-AUDIT.md` 2). Consequence: "last available square" and "play every tile" endings are not reachable in practice.

@@ -1,34 +1,30 @@
-# Tutorial coverage: coached first game "The Sunline Seat" (addendum 4)
+# Tutorial coverage: guided first race (W496)
 
-A real game (Practice Loop, 30 spaces, 1 lap, you + Kit Marlow + Juno, real AI). Only the very first action is forced (2 spotlight steps: gear 2, then any two cards).
-After that: FREE PLAY with every legal choice. Hands are stacked each round (rounds 1-6) and the rivals sit near you, so the situations come up. Coach Mara speaks just-in-time
-(`coachSay` in `src/tutor.js`, text in `COACH_TXT`): one bubble at a time, never blocks input, "Got it" dismisses, "Skip" leaves. Good/poor-move lines follow your corner results.
-The end: your score walked through rule by rule with your real numbers, then "Things you will meet later" lists every rule that did not come up.
-`tut-test.js` plays the coached game with random legal moves by UI taps (phone + PC) and asserts every rule below was explained in game or listed on the later card.
+One real race on the Practice Loop (30 spaces, 1 lap, you + Kit Marlow + Juno Vega, real engine), 7 rounds, 39 steps.
+Every step is one sentence of 12 words or fewer and one highlighted tap. Hands, deck tops, rival cards and spaces are stacked per round
+(`TUT_CH` in `src/tutor.js`) so every rule really happens: you burn heat, spin out, stall, cool down, slipstream, discard and boost.
+Then the end card starts a real race. No "learn later" list. `tut-test.js` walks it by touch at 390x844 and 375x667, checks every rule
+below appears in this order, and that the spin out, stall, slipstream and boost really happened (car stats).
 
-| Rule | Explained when (trigger) | Status |
-|---|---|---|
-| goal (first over the line) | start, + finish | [x] always |
-| gear = cards played | start (forced step 1) | [x] always |
-| cards add up to speed | start (forced step 2) | [x] always |
-| shift two gears = 1 heat | the moment you select a gear two away | [x] if it happens, else later card |
-| corner limit | a corner within 8 spaces | [x] when it comes up |
-| burning heat over the limit (+ good/poor line) | preview over the limit, and when you burn or take it clean | [x] when it comes up |
-| heat cards are dead | a heat card is in your hand (staged round 4) | [x] |
-| stress card | a stress card is in your hand (staged round 4) | [x] |
-| cooldown | your cool-down event | [x] if you use gear 1/2 with heat in hand |
-| rivals move in turn | first rival turn | [x] always |
-| adrenaline | your adrenaline event (rivals staged ahead in round 4) | [x] if you are last |
-| slipstream | the slipstream prompt | [x] if offered, else later card |
-| boost | you toggle boost / from round 5 with spare heat | [x] |
-| finish and order | you cross the line | [x] always |
-| spin out | your spin-out; else later card | later card if it did not happen |
-| two cars per space | later card | explained, not played |
-| too few cards (stall) | later card | explained, not played |
-| swap cards (optional discard) | button "Swap" next to Suggest (all games); later card | explained, usable now |
-| Upgrades mode | later card | explained, not played |
-| tie / race goes on until all finish | scoring walkthrough + later card | [x] |
-| starting upgrades (Brake 0, Burst 5, +1 heat; house values) | later card | explained, not played (the coached race uses the plain deck so its staged hands stay exact) |
-| weather (rain, heatwave, tailwind; house rules) | later card | explained, not played |
-| championship (3 tracks, 9-6-4-3-2-1) | later card | explained, not played |
-| turn phases (shift, play, move, react, discard) | tracker row in the side panel, lit live | always visible |
+| # | Rule (TUT_RULES id) | Round | How it is taught |
+|---|---|---|---|
+| 1 | goal | 1 | info: one lap, first over the line |
+| 2 | gear = cards played | 1 | tap gear 2 |
+| 3 | cards add up to speed | 1 | tap the 3, tap the 2 |
+| 4 | everyone reveals at once | 1 | tap Go |
+| 5 | cars move one by one, leader first | 2 | info after watching round 1 |
+| 6 | adrenaline (+1 speed, +1 cooldown) | 2 | you started last and got it in round 1 |
+| 7 | two cars per space | 2 | info |
+| 8 | corner speed limit | 2 | info, limit-5 corner ahead |
+| 9 | engine heat | 2 | info on the engine meter |
+| 10 | over the limit burns heat | 2 | play 4+4 = 8 into the limit 5: burn 3 |
+| 11 | spin out | 3 | play 4+4 into the limit-4 corner with 3 heat: real spin out |
+| 12 | heat cards are dead | 4 | your hand is 6 heat cards |
+| 13 | stall | 4 | gear 2 with one playable card, Go: real stall |
+| 14 | cooldown | 5 | stay in gear 1: 4 heat back (with adrenaline) |
+| 15 | stress card | 5 | play it: it flips a 2 |
+| 16 | shifting two gears costs 1 heat | 6 | tap gear 3 from gear 1 |
+| 17 | slipstream | 6 | land beside Juno, tap Slipstream |
+| 18 | discard step | 6 | right after moving: throw away a 3, draw back to 7 |
+| 19 | boost (after the reveal) | 7 | cards shown, then tap Boost: +3 |
+| 20 | finish, race runs until all finish | 7 | you cross the line and win |

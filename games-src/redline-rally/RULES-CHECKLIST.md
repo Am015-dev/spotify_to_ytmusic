@@ -28,6 +28,7 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 17. [CORE] If the deck runs out while flipping, the discard pile is shuffled into a new deck.
 
 ## Turn 3: reveal, boost
+18b. [CORE] Boost is decided in the react step, after the cards are revealed (W496: a question after the reveal; test R69).
 18. [CORE] Boost costs 1 heat (engine to discard) and needs at least 1 heat in the engine.
 19. [CORE] Boost: flip until a speed card shows and add its value to the speed.
 20. [CORE] The boost value counts as speed for corner checks.
@@ -40,10 +41,10 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 25. [CORE] Cooldown only takes heat cards out of the hand (never from the discard pile or deck).
 
 ## Adrenaline
-26. [CORE] The last car to move gets +1 space.
+26. [CORE] The last car to move gets +1 speed (adrenaline). It is optional: the car skips it when it would cost more corner heat.
 27. [CORE] The last car to move gets +1 cooldown, also in gears 3 and 4.
 28. [CORE] With fewer than 5 cars only the last car gets it; with 5 or more, the last two.
-29. [CORE] The +1 space does not count as speed for corners.
+29. [CORE] The adrenaline +1 counts as speed for corner checks (W496 fix: it used to be ignored at corners).
 30. [CORE] Cars that are not last get nothing.
 
 ## Slipstream
@@ -76,19 +77,19 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 
 ## Replenish
 53. [CORE] After moving, draw back to 7 cards.
-54. [CORE] Before drawing you may discard non-heat, non-stress cards, once per turn.
+54. [CORE] Right after moving (discard step, before drawing) you may discard non-heat, non-stress cards (W496: moved from the next plan to its real place).
 55. [CORE] Heat and stress cards cannot be discarded this way.
 56. [CORE] Empty deck: the discard pile is shuffled to make a new deck.
 
 ## Stall
-57. [EXT] Too few playable cards for the gear (hand full of heat): play what you have, do not move, go to gear 1.
+57. [CORE] Too few playable cards for the gear (hand full of heat): play what you have, heat cards from the hand fill the rest and go to the discard, do not move, go to gear 1, no cooldown or boost.
 
 ## Finish
 58. [CORE] The finish line is crossed after laps x track length spaces.
 59. [CORE] A car that has finished does not play again.
-60. [CORE] The round in which the first car crosses is played to the end, then the race is over.
+60. [CORE] The race goes on until every car has finished (W496 fix: it used to stop after the first finisher's round). When no human is still racing, the computer cars run out the race at once.
 61. [CORE] Several cars finishing in the same round: the one furthest past the line wins, then second furthest, and so on.
-62. [CORE] Cars that did not finish are ranked behind the finishers by distance.
+62. [CORE] While the race runs, cars still racing rank behind the finishers by distance.
 63. [CORE] Equal distance: the car that arrived first on that space ranks higher (the original uses the lane; this game has no lane tie-break) [EXT tie rule].
 
 ## Modules of the original
@@ -96,3 +97,6 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 65. [NB] Weather and road-condition event cards.
 66. [EXT] Legends (option `legends:k`, up to 3): automated cars with no hand or heat; each turn a Legend plays the next card of its pace deck, brakes to take every corner on its path without penalty, and takes a free slipstream boost when safe; it never gets the last-place boost. This game's own rules for the module, tested for self-consistency only.
 67. [EXT] Garage upgrades (option `garage:true`): a face-up market of 6 from a pile of 2 copies of each of the 6 upgrade types; the back of the grid chooses first, snake order, 2 picks each, market refilled after every pick; the picks are shuffled into the deck. Different from the 3-pick draft (`upg`). Own design, tested for self-consistency only.
+68. [CORE] Finishers leave the track at the end of the round they cross: they no longer fill a space or offer slipstream.
+69. [CORE] Simultaneous planning: every car shifts and commits its cards face down at the same time, before any car moves; computer cars commit from the same start-of-round board the player sees (logic-test R70, R71).
+70. [CORE] Boost is a react choice after a car's own cards are revealed, for computer cars too (logic-test R72).

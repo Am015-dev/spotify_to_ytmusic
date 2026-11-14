@@ -21,7 +21,14 @@
       { kind: 'play', name: 'play a card', snap: snapBattle, steps: [{ sel: '.hand .card.ok', until: function () { return !!document.querySelector('.hand .card.sel'); }, max: 1 }, { sel: '.hand .card.sel', after: 500 }], idle: function () { return !UI.busy; }, verify: function (b, a) { return (a.hand < b.hand || a.scr !== 'battle') ? true : 'card was not played'; } },
       { kind: 'tap', sel: '#end', name: 'End turn', state: snapBattle, expect: function (b, a) { return a.ph === 'e' || a.turn > b.turn || a.scr !== 'battle'; } }] });
   GXS.add({ id: 'ec-fight-two', name: 'Fight: two heroes', ask: 'Do both heroes show?', seed: 6, when: booted,
-    setup: function () { fight(['s', 'm'], 6); }, checks: [{ kind: 'visible', sel: '.heropan', name: 'hero panel' }, { kind: 'visible', sel: '#end', name: 'End turn button' }] });
+    setup: function () { fight(['s', 'm'], 6); }, checks: [{ kind: 'visible', sel: '.hfig, .heropan', name: 'hero panel' }, { kind: 'visible', sel: '#end', name: 'End turn button' }] });
+  function splitFight(heroes) { begin(heroes, 4); E().newGame({ heroes: heroes, seed: 4, boss: 'mire-behemoth' }); E().debug.boss(); E().debug.split(); UI.render(); }
+  GXS.add({ id: 'ec-split', name: 'Boss split: every slime on screen', ask: 'Can you see and tap all three slimes?', seed: 4, when: booted, sizes: 'phone',
+    setup: function () { splitFight(['w']); },
+    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e2"]', name: 'second slime' }, { kind: 'visible', sel: '.en[data-w="e3"]', name: 'third slime' }] });
+  GXS.add({ id: 'ec-split-two', name: 'Boss split, two heroes: six slimes', ask: 'Can you see all six slimes?', seed: 4, when: booted, sizes: 'phone',
+    setup: function () { splitFight(['w', 's']); },
+    checks: [{ kind: 'visible', sel: '.en[data-w="e1"]', name: 'first slime' }, { kind: 'visible', sel: '.en[data-w="e6"]', name: 'sixth slime' }] });
   GXS.add({ id: 'ec-reward', name: 'Reward: pick a card', ask: 'Pick one of three cards', seed: 7, when: booted,
     setup: function () { fight(['a'], 7); E().debug.win(); UI.render(); },
     checks: [{ kind: 'visible', sel: '.picks .card', name: 'reward card' },

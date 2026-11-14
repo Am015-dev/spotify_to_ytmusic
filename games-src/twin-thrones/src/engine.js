@@ -23,13 +23,13 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
     var a3 = shuffle(G, D.CARDS.filter(function (c) { return c.age === 3 && c.col !== 'purple'; }).map(function (c) { return c.id; })).slice(0, 17);
     var gl = shuffle(G, D.CARDS.filter(function (c) { return c.col === 'purple'; }).map(function (c) { return c.id; })).slice(0, 3);
     G.decks[3] = shuffle(G, a3.concat(gl));
-    G.firstSeat = rnd(G) < 0.5 ? 0 : 1; // who starts the first age
+    G.firstSeat = o.first != null ? o.first : rnd(G) < 0.5 ? 0 : 1; // random first player: picks the first wonder and opens Age I (W492)
     return G;
   }
   function sideToAct(G) {
     if (G.over) return null;
     if (G.pend.length) return G.pend[0].pl;
-    if (G.phase === 'draft') return DRAFT_ORDER[G.draft.n];
+    if (G.phase === 'draft') return DRAFT_ORDER[G.draft.n] ^ (G.firstSeat | 0);
     return G.turn;
   }
   // ---- city queries
@@ -197,8 +197,9 @@ var TT = (typeof TT !== 'undefined') ? TT : {};
     if (m.t === 'pick') {
       var k = G.draft.avail.indexOf(m.w); if (k < 0) throw new Error('bad pick');
       G.draft.avail.splice(k, 1); P.wonders.push({ id: m.w, card: null }); G.draft.n++; G.ev.push({ t: 'pick', p: p, w: m.w });
+      if (G.draft.avail.length === 1) { var lp = DRAFT_ORDER[G.draft.n] ^ (G.firstSeat | 0), lw = G.draft.avail.pop(); G.players[lp].wonders.push({ id: lw, card: null }); G.draft.n++; G.ev.push({ t: 'pick', p: lp, w: lw, auto: 1 }); } // the last wonder of a group goes to its player without a choice (W492)
       if (G.draft.n === 4) G.draft.avail = G.draft.pool.slice(4, 8);
-      if (G.draft.n >= 8) { G.phase = 'play'; startAge(G, 1); G.turn = DRAFT_ORDER[0]; } // the player who picked the first wonder opens Age I
+      if (G.draft.n >= 8) { G.phase = 'play'; startAge(G, 1); G.turn = G.firstSeat | 0; } // the player who picked the first wonder opens Age I
       return G;
     }
     if (m.t === 'first') { G.turn = m.who; G.pend.shift(); G.ev.push({ t: 'first', who: m.who }); return G; }

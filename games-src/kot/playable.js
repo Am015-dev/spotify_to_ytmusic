@@ -25,6 +25,14 @@
   }
   // ---- 3) + 4) the line on the board (board.js bfLineText passes its text through here)
   const turnLogs = () => { const n0 = (typeof RECAP !== 'undefined' && RECAP.turnN) || 0; return G.log.filter(l => l.n > n0 && l.s === G.active) };
+  // a rival's caption, at most 8 words: "Magmaw resolves: 3★ from 3×3, 1⚡, smashes A −2, B −2" -> "Magmaw: 3★, 1⚡, hits 2 rivals −2"
+  const words = x => x.split(/\s+/).filter(Boolean).length;
+  function short(s) {
+    s = s.replace(/ resolves:/, ':').replace(/ from \d+×\d+/g, '').replace(/\bsmashes\b/, 'hits').replace(/ \((one-shot|permanent)[^)]*\)/i, '').replace(/[“”]/g, '').replace(/\.$/, '');
+    if (words(s) > 8) s = s.replace(/hits ((?:[^,−]+ −\d+,? ?)+)/, (m, l) => { const t = l.match(/−\d+/g) || []; return `hits ${t.length} ${t.length === 1 ? 'rival' : 'rivals'} ${t.every(x => x === t[0]) ? t[0] : ''}`.trim() });
+    if (words(s) > 8) s = s.split(/\s+/).slice(0, 7).join(' ') + '…';
+    return s;
+  }
   window.ppLine = function (t) {
     try {
       if (!(typeof G !== 'undefined' && G) || G.winner || UI.intro || UI.choice || quiet()) return t;
@@ -32,10 +40,10 @@
       if (!humanTurn() && !(NET.on && G.pl[G.active].human)) {
         const ev = turnLogs()[0]; const s = ev ? String(ev.t).replace(/\s+/g, ' ') : '';
         if (G.phase === 'roll' && !s) return `${mname(p)} is rolling the dice…`;
-        return s ? (s.length > 64 ? s.slice(0, 61) + '…' : s) : `${mname(p)} is thinking…`;
+        return s ? short(s) : `${mname(p)} is thinking…`;
       }
-      if (humanTurn() && G.phase === 'roll' && G.dice.length) { const tot = rerollsOf(p) + 1, n = Math.min(tot, Math.max(1, tot - G.rolls)); return `Roll ${n} of ${tot} · ${t}` }
-      if (humanTurn() && G.phase === 'buy') return 'Buy phase · ' + t;
+      if (humanTurn() && G.phase === 'roll' && G.dice.length) { const tot = rerollsOf(p) + 1, n = Math.min(tot, Math.max(1, tot - G.rolls)); return `Roll ${n}/${tot} · ${t}` }
+      if (humanTurn() && G.phase === 'buy') return 'Buy · ' + t;
     } catch (e) { }
     return t;
   };
@@ -163,8 +171,9 @@
     let el = $('pppop'); if (!el) { el = document.createElement('div'); el.id = 'pppop'; el.setAttribute('aria-live', 'polite'); document.body.appendChild(el) }
     el.classList.toggle('short', !(window.ppHintsOn && ppHintsOn()));
     el.innerHTML = `${window.ppHintsOn && ppHintsOn() ? '<b>You smashed:</b>' : ''}<ul>${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>${rating ? `<p>${rating}</p>` : ''}`;
+    // never over the dice or the buttons: sit above the dice tray, and let taps through (it is only a caption)
+    try { const dw = ($('dicewrap') || $('dice')).getBoundingClientRect(), bar = ($('pchips') || document.body).getBoundingClientRect(); el.style.top = dw.width ? Math.max((bar.bottom || 0) + 6, dw.top - el.offsetHeight - 8) + 'px' : '' } catch (e) { }
     el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), (window.ppHintsOn && ppHintsOn()) ? 4200 : 2600);
-    if (!el._tap) { el._tap = 1; el.addEventListener('click', () => { try { GX.show('dr-log') } catch (e) { } }) }
   }
   // ---- score strip: the leader is marked; the best-value card wears a badge
   function strip() {
