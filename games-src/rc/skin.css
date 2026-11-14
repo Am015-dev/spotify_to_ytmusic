@@ -84,7 +84,7 @@ html.bf.phtight #phview #phlabel .bft{font-size:16px;line-height:1.12}
 html.bf.phtight #phview #phlabel .bfb{margin-bottom:1px;line-height:1.1}
 html.bf.phtight #bf{gap:4px;padding:4px 8px calc(4px + var(--sab,0px))}
 html.bf.phtight #bf .bfhelp{display:none}
-html.bf.phtight .bfpc .bfpw{width:40px;height:40px;min-width:40px}
+html.bf.phtight .bfpc .bfpw{width:44px;height:44px;min-width:44px}
 html.bf.phtight .bfpw svg.role{width:23px;height:23px}
 html.bf.phtight .bfpc{gap:1px}
 html.bf.phtight .bfpn{line-height:1.05}
@@ -113,3 +113,7 @@ html:has(.gxh-ring) #bfgh{display:none!important}
 .start .seg .sg{min-width:48px}
 /* F14: a place label on a glowing ring hides while the rings show (bf.js labDodge) */
 #labels .tl.bfoff{visibility:hidden!important}
+/* F14: the cards drawer's link was a 16 px tap target */
+#cardsbody a[href="cards.html"]{display:inline-flex;align-items:center;min-height:44px}
+/* F14: after the list scrolled, the search box took the taps meant for the drawer's close button: the head stays on top */
+.gx-drawer .gx-drawer-head{position:relative;z-index:3}

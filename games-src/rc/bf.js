@@ -431,8 +431,15 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
     const side=best.bottom<=T.top+2?'bottom':best.top>=T.bottom-2?'top':best.right<=T.left+2?'right':'left';b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;
     const ar=b.querySelector('.gxh-arr');if(ar){ar.style.left=ar.style.top='';if(side==='top'||side==='bottom')ar.style.left=Math.round(Math.max(14,Math.min(w-26,T.left+T.width/2-best.left-6)))+'px';else ar.style.top=Math.round(Math.max(14,Math.min(h-26,T.top+T.height/2-best.top-6)))+'px'}}
   new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes){if(n.nodeType!==1||!n.classList)continue;if(n.classList.contains('gxh-finger'))finite(n);else if(n.classList.contains('gxh-bub'))requestAnimationFrame(()=>dodge(n))}}).observe(document.body,{childList:true})})();
-// F14 (R67 row 5): while places glow, a place label that sits on a glow ring steps out of the way (375x553: "Hills" over ring 3)
+// F14 (R67 row 5): while places glow, a place label that sits on a glow ring moves just above it (hidden only when there is no free spot),
+// so the place numbers stay readable without covering the rings (375x553: "Hills" sat on ring 3)
 (function(){if(typeof placeLabels!=='function')return;const pl=placeLabels;
+  const hitR=(r,g)=>Math.min(r.right,g.right-4)-Math.max(r.left,g.left+4)>1&&Math.min(r.bottom,g.bottom-4)-Math.max(r.top,g.top+4)>1;
   const dodge=()=>{try{if(!V3.lab)return;const gs=[...document.querySelectorAll('#bfglow .bfgl')].filter(g=>g.style.visibility!=='hidden').map(g=>g.getBoundingClientRect()).filter(r=>r.width>4);
-    for(const id in V3.lab){const el=V3.lab[id];let off=false;if(gs.length&&!el.hidden){const r=el.getBoundingClientRect();off=gs.some(g=>Math.min(r.right,g.right-6)-Math.max(r.left,g.left+6)>2&&Math.min(r.bottom,g.bottom-6)-Math.max(r.top,g.top+6)>2)}if(el.classList.contains('bfoff')!==off)el.classList.toggle('bfoff',off)}}catch(e){}};
+    const bd=document.querySelector('.gx-board');const B=bd?bd.getBoundingClientRect():{top:0,bottom:innerHeight};const rs=document.querySelector('html.bf #bfres');const top=Math.max(B.top,rs&&rs.offsetParent?rs.getBoundingClientRect().bottom:0)+2;
+    for(const id in V3.lab){const el=V3.lab[id];let dy=0,off=false;
+      if(gs.length&&!el.hidden){const c=el.getBoundingClientRect(),d0=el.style.transform===el._dyT?(el._dy||0):0;const r={left:c.left,right:c.right,top:c.top-d0,bottom:c.bottom-d0};const g=gs.find(x=>hitR(r,x));
+        if(g){off=true;for(const d of [Math.round(g.top-2-r.bottom),Math.round(g.bottom+2-r.top)]){const m={left:r.left,right:r.right,top:r.top+d,bottom:r.bottom+d};if(m.top>=top&&m.bottom<=B.bottom-2&&!gs.some(x=>hitR(m,x))){dy=d;off=false;break}}}}
+      const cur=el.style.transform===el._dyT?(el._dy||0):0;if(cur!==dy){el.style.transform=(el._tr||'')+(dy?` translateY(${dy}px)`:'');el._dy=dy;el._dyT=el.style.transform}
+      if(el.classList.contains('bfoff')!==off)el.classList.toggle('bfoff',off)}}catch(e){}};
   placeLabels=function(){const r=pl.apply(this,arguments);dodge();return r};const bp=BF.place;BF.place=function(){const r=bp.apply(this,arguments);dodge();return r};BF.labDodge=dodge})();
