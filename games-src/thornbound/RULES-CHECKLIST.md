@@ -213,6 +213,11 @@ _Not every one of the 51 Kingdom Cards / 16 Tactics / 19 Site cards has its own 
 162. Winning a Clash gives the Location Reward only for the CHOSEN Location: the other Location of that Region gets nothing.
 163. Region reward is per Clash: a player may win several Regions in one Summer and collect each reward.
 
+## O. The round in table order
+
+164. One round runs in the table order: secret bids, bids resolve, Heralds, face-down cards, Spring actions, Clash Markers, Clashes (claim a Location), Autumn actions, then Winter and the next Round.
+165. Autumn: the same Action Step offers both Govern (a card with Votes) and Journey (a card with Lore); each is used once.
+
 ## Not covered by a numbered rule (honest gap list)
 
 - 41 of the 51 Kingdom Cards (only those named in section L have a test) and 11 of 16 Tactics (Edict, Masonry, Midnight Pressure, Tempests, Martial Writ are tested); the 4 Favour actions are tested.

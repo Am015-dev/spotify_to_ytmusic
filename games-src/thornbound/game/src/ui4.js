@@ -14,14 +14,18 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
-  const PAD=UI.desk?32:16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
+  // hints on and the suggestion is a button (Done, Pass, Keep...): the cards stay tappable but don't glow, so the glow always shows the suggestion
+  const quiet=!!(M&&M.rec&&M.rec.id==null);
+  // one helper at a time: with a card selected only its target (region / bid spot) glows; with a suggested card only that card pulses
+  const selH=UI.hand!=null&&ids0.includes(UI.hand);
+  const PAD=UI.desk?32:(UI.short&&!UI.land?8:16);const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
   ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
-    h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+'</button>'});
+    h+='<button class="hc'+(on?' on':'')+(pl?((quiet||selH||(rcId!=null&&rcId!==id))?' pl':' glow pl'):'')+(rcId===id&&!selH?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'. '+esc(cardLine(id))+'">'+cardEl(id,UI.desk?Math.min(cw,110):cw).outerHTML+cardBand(id)+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
-const roadX=()=>{const x=innerHeight<600?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read
+const roadX=()=>{const x=innerHeight<620?0:innerHeight<820?16:40;document.documentElement.style.setProperty('--roadx',x+'px');return x}; // extra height the kingdom-card row gets on a portrait phone, so the paintings and names can be read
 function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal');const V=UI.V;const items=[];
   for(let i=0;i<V.road.length;i++){const kc=V.road[i];if(!kc)continue;items.push({kc,m:take.find(x=>x.kc===kc&&x.i===i)||null})}
   for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
@@ -29,8 +33,8 @@ function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),st
   if(!items.length)return '<div class="hand roadrow"></div>';
   const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24+(UI.land?0:roadX());let w=Math.max(34,Math.min(UI.land?60:72,Math.floor((zone-(innerHeight<600?40:34))/1.4308),Math.floor(W/items.length)-8));if(UI.desk)w=Math.max(70,Math.min(124,Math.floor((($('.gx-dock')||{}).clientWidth||W)/Math.max(4,items.length))-26));const rk=recK();
   return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
-    const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
-    return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,UI.desk?Math.min(w,110):w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+    const att=m?(it.steal&&!(typeof tutOn==='function'&&tutOn())?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
+    return '<button class="kcb'+(m?((rk&&!rec)?'':' glow'):' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+Math.max(w+4,Math.min(84,Math.floor(W/items.length)-6))+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,UI.desk?Math.min(w,110):w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
 // desktop: the Great Road stays on the table above the hand (taking a card, when it is your turn, happens here)
 function renderDeskRoad(){const el=$('#road');if(!el)return;
   if(!UI.desk||!G||!UI.V||isPassing()||G.over){if(UI.desk){el.hidden=true;el.innerHTML='';el._h=''}return}
@@ -127,7 +131,7 @@ function popKingdom(){const V=UI.V;let h='';
 // ---------------------------------------------------------------- the one card (events, pass the device, coach tips, game over)
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
-function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
+function showOver(){if(UI.cfg&&UI.cfg.tutorial)return;try{if(!UI.camp&&UI.mode==='me')localStorage.setItem('tb_fin','1')}catch(e){}if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first. The card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. Win a region and claim the location where your Herald stands. You gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],

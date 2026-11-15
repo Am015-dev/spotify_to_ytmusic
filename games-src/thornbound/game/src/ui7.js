@@ -32,7 +32,7 @@ function renderNow(){const el=$('#now');if(!el||!G)return;
 const GLOSS=[
  ['influence',/\bInfluence\b/,'Influence','The score. Most Influence when the last round ends wins the throne. You gain it by winning Clashes and claiming locations.'],
  ['kingdom card',/\bKingdom Cards?\b/,'Kingdom Card','A shared power card. Win one with your bid. It sits on your board, with your bid card tucked under it. Its power works while you keep it (at most two).'],
- ['great road',/\bGreat Road\b/,'Great Road','The row of four face-up Kingdom Cards you can bid for. Cards nobody takes slide along. The oldest is thrown away each round.'],
+ ['great road',/\bGreat Road\b/,'Great Road','The row of four face-up Kingdom Cards you can bid for. Cards nobody takes slide along. The oldest is thrown away each round (two if nobody took one).'],
  ['herald',/\bHeralds?\b/,'Herald','Your one public envoy. Put it on a location in Spring. Then win that region and claim that location. You gain +1 Influence and take 1 from every rival Herald there.'],
  ['supporter',/\bSupporters?\b/,'Supporter','Five small helpers on your board. Each one you send adds +1 Strength in that region\'s first Clash. In Winter, Supporters on the map go to the Lost Pile. They are gone unless a Council of Pledges brings them back. Other powers can too.'],
  ['clash',/\bClash(es)?\b/,'Clash','The fight in one region. Everyone\'s hidden cards there are flipped and abilities are used. The highest total Strength (cards + Supporters) wins the region.'],
@@ -48,15 +48,15 @@ const GLOSS=[
  ['council',/\bCouncils?\b/,'Council','Three Councils (Coin, Whispers, Pledges). Cards with votes placed there give you a lasting benefit every round.'],
  ['attrition',/\bAttrition\b/,'Attrition','Empty deck on a draw? Your discard pile becomes the new deck. Your hand size drops by one (never below 3).'],
  ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Gleaning Meadow. While you hold it, use your faction\'s Favour power (three uses). If Influence is tied when the game ends, the holder wins. It does not decide Clash ties.'],
- ['order track',/\bOrder Track\b/,'Order Track','The turn order. Each round, the player with the most Influence goes first. The last player chooses the Clash order. Ties go to the player higher on it.'],
+ ['order track',/\bOrder Track\b/,'Order Track','The turn order. Each round, the player with the most Influence goes first. The last player chooses the Clash order. Players tied on Influence swap places: whoever was lower goes first.'],
  ['winter',/\bWinter\b/,'Winter','The end of a round. Heralds go home. Supporters on the map go to the Lost Pile. Played cards go to the discard pile.'],
  ['autumn',/\bAutumn\b/,'Autumn','After the Clashes, you may Govern and Journey once each. You may also use Autumn abilities such as Rally.'],
  ['ambush',/\bAmbush\b/,'Ambush','A Day ability. Add a hidden card from your hand to this Clash.'],
  ['retreat',/\bRetreat\b/,'Retreat','A Day ability. Pull your cards, Herald or Supporters out of this region.'],
  ['flank',/\bFlank\b/,'Flank','A Day ability. Move this card to a region that has not fought yet.'],
- ['deadly',/\bDeadly\b/,'Deadly','A Night effect. Every opposing card in the Clash is Eliminated unless Invulnerable. It goes to the Lost Pile. Two Deadly cards eliminate each other.'],
- ['rally',/\bRally\b/,'Rally','An Autumn ability. Take your cards on the map back to hand before Winter.'],
- ['deploy',/\bDeploy\b/,'Deploy','An Autumn ability. Put a card face up next to a region. It stays through the next Winter(s).'],
+ ['deadly',/\bDeadly\b/,'Deadly','A Night effect. Every opposing Active card in the Clash is Eliminated unless Invulnerable. It goes to the Lost Pile (Resilient: the Discard Pile). Two Deadly cards eliminate each other.'],
+ ['rally',/\bRally\b/,'Rally','An Autumn ability. Return some of your Active cards to your hand, before Winter.'],
+ ['deploy',/\bDeploy\b/,'Deploy','An Autumn ability. Put a card from your hand face up next to a region, where it stays Active.'],
  ['lost pile',/\bLost Pile\b/,'Lost Pile','Where Eliminated cards and spent Supporters go. They do not come back when your deck is reshuffled.'],
  ['hand size',/\bhand size\b/i,'Hand size','Draw up to this many cards each round. You start at 6. Attrition lowers it.'],
  ['occupier',/\boccup(ier|ying|ies|y)\b/i,'Occupier','The card tucked under a Kingdom Card (your bid card). It cannot fight. A rival can steal the Kingdom Card with a stronger bid. Then your bid card comes back to your hand.'],
@@ -100,7 +100,8 @@ function gloss(text){if(text==null)return '';text=String(text);const hits=[];con
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
 function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glSeen=UI.glSeen||{};UI.glSeen[k]=1;
-  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
+  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.style.top='';try{const rv=$('#rivals'),q=rv&&rv.getBoundingClientRect();if(q&&q.width>innerWidth*.6&&q.bottom>0&&q.bottom<innerHeight*.4)el.style.top=Math.round(q.bottom+6)+'px'}catch(x){}   /* the word card opens under the rival chips, never over them */
+  el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
 function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
 // ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
@@ -172,7 +173,10 @@ const STORY={
  clans:{story:'From the cold coasts the clans ride in with the tide. They move fast and bring many hands. They strike where the valley folk least expect.',enjoy:'Choose the Heathbound Clans for big swings, region-switching riders and Supporters.',tag:'Speed and numbers · easy to learn'},
  uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising for bluffs, ambushes and knocking out rival cards.',tag:'Tricks and ambushes · medium'},
  gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them. Small cards win their fights. Patience is their weapon.',enjoy:'Choose the Pale Choir for clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
-const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['normal','normal','normal','normal']};
+const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'off',levels:['easy','easy','easy','easy']};
+// a newcomer's first game (until one real game is finished): hints on, one Easy rival, 4 rounds
+function newcomer(){try{return !localStorage.getItem('tb_fin')}catch(e){return true}}
+if(newcomer())Object.assign(sv,{np:2,length:'short',guide:'full',levels:['easy','easy','easy','easy']});
 function titleArtSvg(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
  '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
  '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+

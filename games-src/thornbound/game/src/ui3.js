@@ -14,7 +14,10 @@ const STEP_HELP=[
  'Winter. Heralds go home and Supporters are lost. Played cards go to the discard pile. The next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
-function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
+// the one round number the header and the board both show (a round-end summary still shows the round that just ended)
+function shownRound(){try{const c=UI.card;if(c&&c.kind==='event'&&c.ev&&c.ev.round)return c.ev.round;if(c&&c.kind==='news'&&c.items&&c.items[0]&&c.items[0].round)return c.items[0].round}catch(e){}return Math.max(1,G.round)}
+function syncRound(){try{if(MAP.m&&G){const r=shownRound();if(MAP._rn!==r+'/'+G.rounds){MAP._rn=r+'/'+G.rounds;MAP.m.setRound(r,G.rounds)}}}catch(e){}}
+function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=shownRound();syncRound();
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
 function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
@@ -51,9 +54,10 @@ function renderRoad(){}
 // ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
+  if(!A&&mv&&mv.length){try{const m=suggest(s);const mm=m&&mv.find(x=>x.k===m.k);if(mm)A={m:mm,why:genericWhy(s,mm)}}catch(e){}}   // never a decision without a suggestion
   UI._adv=A;UI._rec=A?A.m:null;UI._recWhy=A?A.why:'';return UI._rec}
-// suggestions are on in the guided game and in rounds 1-2; later only on request (the "Suggest a move" button)
-function hintsAuto(){return isGuided()||UI.guide!=='off'&&G.round<=2}
+// suggestions: always with hints On (the first game's default), rounds 1-2 with Light; otherwise on request (the "Suggest a move" button)
+function hintsAuto(){return isGuided()||UI.guide==='full'||UI.guide==='light'&&G.round<=2}
 function hintsShown(s,mv){return hintsAuto()||UI.hintQ===qKey(s,mv)}
 const recK=()=>UI._recShown&&UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
@@ -74,7 +78,7 @@ function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
     if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards. Buying one now improves your deck for the rest of the game.';
     if(k==='shrine')return 'Cards at the bottom of your deck come back after a reshuffle. Weak cards there leave room for better draws.';
     if(k==='ossuary')return 'It brings a useful card back from your discard pile.';
-    if(k==='rally'||k==='brine')return 'Taking strong cards back to your hand saves them from Winter\'s discard.';
+    if(k==='rally'||k==='brine')return 'Taking your Active cards back to your hand saves them from Winter\'s discard.';
     return 'Of the choices here this one gains you the most.'}
   if(k==='occupier')return 'The card under a Kingdom Card cannot fight.';
   if(k==='slot')return 'Replace the Kingdom Card that helps you least now.';
@@ -90,11 +94,11 @@ function menuWhy(m){if(m.t==='done')return 'Nothing else here helps right now, s
   if(a.startsWith('t:'))return 'A Tactic of your faction ('+tacUses(vs(),a.slice(2))+').';
   if(a.startsWith('fav:'))return 'Your Favour power has limited uses; this is a good one.';
   if(a.startsWith('council:'))return 'Your Council cards allow this once a round.';
-  if(a==='cmd:rally')return 'Rally brings strong cards back to your hand before Winter discards them.';
+  if(a==='cmd:rally')return 'Rally returns your Active cards to your hand before Winter discards them.';
   if(a==='cmd:ambush')return 'Ambush adds a hidden card from your hand to this Clash.';
   if(a==='cmd:retreat')return 'Retreat saves your cards from a Clash you cannot win.';
   if(a==='cmd:flank')return 'Flank moves this card to a region where it does more good.';
-  if(a==='cmd:deploy')return 'Deploy puts a card on the map that stays through Winter.';
+  if(a==='cmd:deploy')return 'Deploy puts a hand card face-up next to a region, where it stays Active.';
   return 'Worth doing before you finish this step.'}
 const lcFirst=t=>t?t.charAt(0).toLowerCase()+t.slice(1).replace(/\.$/,''):''
 // ---------------------------------------------------------------- the main prompt: body (#main, scrolls) + the action row (#act, pinned)
@@ -150,6 +154,9 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
    case 'clashOrder':{M.nextRegs().forEach(r=>hr.push(r));if(rm&&rm.order){const nx=rm.order[(UI.ord||[]).length];if(nx!=null)recT.reg=nx}
      if((UI.ord||[]).length)f+='<button class="btn" data-a="ordundo">'+ico('x')+'<span>Undo</span></button>';break}
    case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
+     if(M.aut){if(UI.autCard!=null&&!M.use.has(UI.autCard))UI.autCard=null;if(UI.autCard!=null)f+='<div class="autc" role="group" aria-label="Autumn choices">'+autMoves(UI.autCard).map(m=>'<button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'" data-aut="'+m.a+'">'+esc(autLabel(m))+'</button>').join('')+'</div>'}else UI.autCard=null;
+     // hints on and the suggestion is a power: it is one tap, first in the tray (following the glow never skips it for Done)
+     if(rm&&rm.t==='act'&&rm.a!=='supp'){const w=recBtnText(rm).replace(/\s*\([^)]*\)/g,'').split(/\s+/);f+=pbtn(rm,w.slice(0,4).join(' ')+(w.length>4?'\u2026':''),pulse)}
      if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
      if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
        if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}
@@ -159,7 +166,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
      h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
      if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
      if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
-     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     else{const rk=(M.sug&&M.sug.k)||recK();h+='<div class="opts">'+mv.slice().sort((a,b)=>(b.k===rk)-(a.k===rk)).map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
      h+='</div>';sheet=true}}
   set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
@@ -178,7 +185,7 @@ function promptText(q,s){const t=q.title||'';
     case 'applause':return 'Set the turn order';
     case 'clashOrder':return 'Choose the Clash order';
     default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'Use a power, or tap Done':'Use a power, or tap Done'}return shortT(plain(t))}}
-function shortT(x){const w=String(x||'').split(/\s+/).filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
+function shortT(x){let w=String(x||'').split(/\s+/).filter(Boolean);if(w.length>8){const f=String(x).split(/(?<=[.?!])\s+/)[0].split(/\s+/).filter(Boolean);if(f.length<=8)return f.join(' ')}return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(UI._recWhy||'')+'</span></span></p>'}
@@ -210,7 +217,7 @@ function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.ga
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
-  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
+  const rk=(UI.bf&&UI.bf.sug&&UI.bf.sug.k)||recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
   const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
   for(const [g,nmG] of GORD){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+L.map(m=>rowHTML(s,m,day)).join('')}
   return {h,f:''}}

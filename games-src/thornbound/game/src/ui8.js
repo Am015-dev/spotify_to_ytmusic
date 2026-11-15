@@ -2,7 +2,8 @@
 // ---------------------------------------------------------------- teaching layers (guided game only; normal games show the full rules)
 // round 1: cards, bids, Herald, hidden cards, Supporters, clashes, claiming. round 2 adds Lore, Sites of Power, Autumn and card abilities.
 // round 3 adds Tactics, the Favour, Councils (Govern) and Kingdom Card powers.
-const LAYER={1:{},2:{lore:1,site:1,autumn:1,cmd:1},3:{lore:1,site:1,autumn:1,cmd:1,tactic:1,favour:1,council:1,govern:1,kc:1}};
+// Govern and Journey (Autumn) are the table game's core loop, so they are taught from round 1 (the tutorial teaches Journey)
+const LAYER={1:{lore:1,autumn:1,govern:1},2:{lore:1,site:1,autumn:1,cmd:1,govern:1},3:{lore:1,site:1,autumn:1,cmd:1,tactic:1,favour:1,council:1,govern:1,kc:1}};
 function layer(){if(!isGuided()||!G)return null;return LAYER[Math.min(3,Math.max(1,G.round))]}
 function taught(kind){const L=layer();return !L||kind==='supp'||!!L[kind]}
 function actKind(a){a=a||'';if(a==='supp')return 'supp';if(a==='journey')return 'lore';if(a==='govern')return 'govern';const p=a.split(':')[0];
@@ -85,9 +86,12 @@ function advise(s,mv){if(!G||!G.q||!mv||!mv.length)return null;const q=G.q,k=q.k
   if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?adviseDay(s,mv):adviseMenu(s,mv,ph)}
   if(k==='occupier'){const ids=mv.filter(m=>m.id!=null).map(m=>m.id);if(!ids.length)return null;const sc=id=>{const i=cinfo(id);return i.strength*10+i.votes+i.lore};const w=ids.slice().sort((a,b)=>sc(a)-sc(b))[0];const m=mv.find(x=>x.id===w);
     return {m,why:cinfo(w).name+' ('+cinfo(w).strength+') is your weakest card. A card under a Kingdom Card cannot fight. (A stronger one would make the Kingdom Card harder to steal.)'}}
-  if(k==='slot'||k==='order'||k==='applause'||k==='discardDown'||k==='discardPick')return null;
   if(k==='clashOrder')return adviseOrder(s,mv);
-  const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return why?{m,why}:null}
+  const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return {m,why:why||genericWhy(s,m)}}
+// every decision gets a suggestion (owner, Nov 2026): when no specific reason applies, a plain one
+function genericWhy(s,m){const k=G.q.kind;if(m.t==='seldone'||m.t==='done')return 'Nothing here helps you more than keeping what you have.';if(m.skip)return 'Keep what you have: this bonus is worth less.';
+  if(k==='discardDown'||k==='discardPick')return 'Let go of the card you need least.';if(k==='steal'||m.t==='steal')return 'Take it: you gain its power and they lose it.';if(m.t==='return')return 'Keep your card: nothing on offer is worth it.';
+  return 'A safe choice for this moment.'}
 function reasonFor(s,m){const q=G.q,k=q.kind;
   if(['bid','herald','place','tie','bidRes','location'].includes(k))return whyFor(s,m);
   if(k==='siteBuy'){if(m.t==='seldone')return 'Keep your Lore: '+(q.chosen&&q.chosen.length?'you have bought enough for now.':'nothing here is worth it yet.');const i=cinfo(m.v);return i.kind==='hq'?i.name+' is an HQ. It is a permanent power in front of you. It never goes to your hand. '+lcFirst(i.text)+'.':i.name+' goes to your hand: Strength '+i.strength+(i.text?', and '+lcFirst(i.text):'')+'.'}
@@ -96,7 +100,7 @@ function reasonFor(s,m){const q=G.q,k=q.kind;
   if(k==='helm')return m.yes?'Your eliminated card comes back to your hand instead of staying lost.':'';
   if(k==='placeLoc')return 'Whenever anyone claims '+LOCN[m.loc]+', you gain 1 Influence.';
   if(k==='flank'){const r=m.r;return 'The card moves to '+REG[r]+'. It has not fought yet. Its Strength still counts there.'}
-  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') returns to your hand in Winter, not the discard pile.'}
+  if(q.t==='sel'&&(k==='rally'||k==='brine')){if(m.t==='seldone')return 'That is enough cards back in your hand.';return cinfo(m.v).name+' ('+cinfo(m.v).strength+') returns to your hand now, not the discard pile.'}
   if(q.t==='sel'&&(k==='shrine'||k==='ossuary')&&m.t==='seldone')return 'Keep your cards: nothing here needs to go.';
   if(k==='councilOut')return m.to==='hand'?'Back in your hand, the card can fight again next round.':'';
   return ''}   // not sure: no suggestion
@@ -107,7 +111,7 @@ function tacUses(seat,id){const i=DD.TACTICS[G.pl[seat].fac].findIndex(t=>t.id==
 // one short line per Council for the Govern rows (<= 8 words)
 const CSHORT={relics:'Its votes become Influence at a Herald Reward.',secrets:'Its votes place markers that claim location bonuses.',oaths:'Its votes bring Supporters home in Autumn.'};
 const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get Influence equal to their votes.',secrets:'in Autumn you place markers on locations. Four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote. Get one more for the most votes there.'};
-function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a)))return null;const a=m.a||'';
+function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a))){const mm=mv.find(x=>x.k===m.k);return mm?{m:mm,why:(typeof actWhy==='function'?actWhy(s,mm):'')||genericWhy(s,mm)}:null}const a=m.a||'';
   // the last Autumn: only Influence still counts
   if(ph==='Autumn'&&G.round>=G.rounds&&m.t==='act'&&!/Influence/.test(m.label||'')&&!(a==='journey'&&!G.pl[s].site.length)){const d=mv.find(x=>x.t==='done');const inf=mv.find(x=>x.t==='act'&&/Influence/.test(x.label||'')&&taught(actKind(x.a)));
     if(inf)return {m:inf,why:'This is the last round: only Influence counts now. '+actWhy(s,inf)};return d?{m:d,why:'This is the last round. Only Influence counts now, and nothing here gives Influence.'}:null}
@@ -120,8 +124,8 @@ function actWhy(s,m){const a=m.a||'',L=(m.label||'').replace(/^[^:]*:\s*/,'');
   if(a.startsWith('fav:'))return 'Your Favour ('+(G.fav.h===s?G.fav.u+' uses left':'')+'): '+lcFirst(L)+'.';
   if(a==='journey'){const id=m.p.id,l=cinfo(id).lore,P=G.pl[s];const mn=P.site.length?Math.min(...P.site.map(x=>cinfo(x).cost)):0;return '+'+l+' Lore (you would have '+(P.lore+l)+')'+(P.site.length?'; your cheapest Site of Power card costs '+mn+'.':'.')}
   if(a==='govern'){const c=m.p.c;return cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes>1?'s':'')+' into the '+DD.COUNCIL_NAMES[c]+': '+CPLAIN[c]}
-  if(a==='cmd:rally')return 'Rally: in Winter the card returns to hand, not the discard pile.';
-  if(a==='cmd:deploy')return 'Deploy: the card stays on the map through Winter. It fights there next round.';
+  if(a==='cmd:rally')return 'Rally: your chosen Active cards return to hand now, not the discard pile.';
+  if(a==='cmd:deploy')return 'Deploy: a hand card goes face-up next to a region and stays Active through Winter.';
   if(a==='council:oaths')return 'Council of Pledges: Supporters come back to your board for next round.';
   return lcFirst(L)?L.replace(/^./,c=>c.toUpperCase()).replace(/\.?$/,'.'):''}
 function adviseDay(s,mv){const me=s;const P0=preview();if(!P0)return null;const o0=outcome(P0,me);const done=mv.find(m=>m.t==='done');
@@ -144,3 +148,5 @@ function confirmHTML(k){const s=viewSeatForQ();if(s==null)return '';const m=lega
   else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders is a Tactic, once per game. Take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand. You tuck a card from your hand under it.')+'</p>'}
   else body='<p class="cf-p">'+esc(m.label)+'</p>';
   return popShell('Before you do it','<div class="cf">'+body+'<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(k)+'">'+esc(m.t==='steal'?'Steal it':'Do it')+'</button><button class="btn" data-a="pclose">Not now</button></div></div>','cf-b')}
+// hints On (the first game): every decision gets a suggestion and its finger, also the small choices (slot, order, discard) the advisor above skips
+(function(){const o=advise;advise=function(s,mv){const r=o(s,mv);if(r||!UI||UI.guide!=='full'||isGuided())return r;const m=suggest(s);return m?{m,why:'A strong choice right now.'}:null}})();

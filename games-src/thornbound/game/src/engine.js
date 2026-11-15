@@ -11,7 +11,7 @@
 const TB=g.TB=g.TB||{};const D=TB.DATA;
 let G=null;
 const COUNCILS=D.COUNCILS,NLOC=6,NREG=3;
-const LEN={short:4,standard:5,extended:6,tutorial:1};   // 'tutorial' = one round, used only by the staged tutorial game
+const LEN={short:4,standard:5,extended:6,tutorial:2};   // 'tutorial' = two rounds (the staged tutorial ends after round 2's steal), used only by the staged tutorial game
 // ---------------------------------------------------------------- rng
 function rnd(n){let t=(G.rng=(G.rng+0x6D2B79F5)|0);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);const x=a[i];a[i]=a[j];a[j]=x}return a}
@@ -259,7 +259,7 @@ PICKH.bidRes=(seat,opt)=>{const P=G.pl[seat],bid=P.bid;
 AG.bidEnd=()=>{refillRoad(G.taken?1:2);G.bq=[]};
 function drawKingdom(){if(!G.kdeck.length&&G.kdisc.length){G.kdeck=shuffle(G.kdisc.splice(0));lg('The Kingdom Discard is shuffled into a new Kingdom Deck.')}return G.kdeck.length?G.kdeck.shift():0}
 function refillRoad(discards){const road=G.road;
-  for(let n=0;n<discards;n++){for(let i=3;i>=0;i--)if(road[i]){G.kdisc.push(road[i]);lg('The Great Road discards '+kname(road[i])+'.');road[i]=0;break}}
+  for(let n=0;n<discards;n++){for(let i=3;i>=0;i--)if(road[i]){G.kdisc.push(road[i]);lg('Great Road discards '+kname(road[i])+'.');road[i]=0;break}}
   const cards=road.filter(Boolean);road.fill(0);for(let i=0;i<cards.length;i++)road[4-cards.length+i]=cards[i];
   for(let i=3;i>=0;i--)if(!road[i]){const c=drawKingdom();if(c)road[i]=c}}
 // ---------------------------------------------------------------- acquiring Kingdom Cards
@@ -430,7 +430,7 @@ AG.locReward=d=>{const {seat,l}=d;stat('loc'+l);if(!d.noInf)gainInf(seat,D.LOCS[
   locText(seat,l)};
 function locText(seat,l){const P=G.pl[seat];
   if(l===0){const src=P.hand.concat(cardsOfSeatActive(seat)).filter(id=>votesOf(id)>=1);if(!src.length)return;const o=[];
-    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:'Govern '+cname(id)+', '+vtxt(votesOf(id))+', into the '+councilName(c)+'. Discard the rest.'});
+    for(const id of src)for(const c of COUNCILS)o.push({k:'g'+id+c,id,c,label:cname(id)+' ('+vtxt(votesOf(id))+') \u2192 '+councilName(c).replace(/^Council of /,'')+' Council'});
     o.push({k:'skip',skip:1,label:'Skip the Spire Court'});askPick(seat,'castle','Spire Court: Govern with one Active or hand card?',o,'castle',{})}
   else if(l===1){const src=journeySources(seat,true);if(!src.length)return;
     askPick(seat,'wilderness','Thornwild: Journey with one Active or hand card?',src.map(id=>({k:'j'+id,id,label:'Journey with '+cname(id)+' (+'+eff(id).l+' Lore)'})).concat([{k:'skip',skip:1,label:'Skip Thornwild'}]),'wilderness',{})}
@@ -493,7 +493,7 @@ SELH.orderCards=(seat,ch,d)=>placeOrdered(seat,ch,d.where,d.draw);
 act('supp','spring',seat=>{const b=G.pl[seat].supp.b;if(!b)return[];const o=[];for(let r=0;r<NREG;r++)for(let n=1;n<=b;n++)o.push({id:r+'n'+n,p:{r,n},label:'Place '+n+' Supporter'+(n>1?'s':'')+' on '+regionName(r)});return o},
   (seat,p)=>{const s=G.pl[seat].supp;s.b-=p.n;s.r[p.r]+=p.n;lg(nm(seat)+' places '+p.n+' Supporter'+(p.n>1?'s':'')+' in '+regionName(p.r)+'.',seat)});
 tactic('nob_t1','spring',()=>[{label:'Doctrine of Masonry: your Supporters give 2 Strength. They stay on the Map in Winter'}],seat=>{G.rm.masonry.push(seat)});
-tactic('nob_t2','spring',seat=>{const o=[];for(let r=0;r<NREG;r++)if(G.reg[r].up.some(id=>own(id)===seat&&eff(id).ar==='war_machine'))o.push({id:r,p:{r},label:'Martial Writ: lock '+regionName(r)+'. Rivals cannot add, move or swap cards into it'});return o},(seat,p)=>{G.rm.lock[p.r]=seat});
+tactic('nob_t2','spring',seat=>{const o=[];for(let r=0;r<NREG;r++)if(G.reg[r].up.some(id=>own(id)===seat&&eff(id).ar==='war_machine'))o.push({id:r,p:{r},label:'Martial Writ: lock '+regionName(r)+'. Rivals cannot add, move or swap cards into it during its first Clash'});return o},(seat,p)=>{G.rm.lock[p.r]=seat});
 tactic('cln_t1','spring',()=>[{label:'Doctrine of Tempests: you place Clash Markers. You earn Supporter and Active card bonuses'}],seat=>{G.rm.tempests=seat});
 tactic('upr_t1','spring',()=>[{label:'Doctrine of Back Lanes: your Heirs gain Deadly. Each elimination earns 1 Influence and 1 Lore'}],seat=>{G.rm.lanes.push(seat)});
 tactic('upr_t3','spring',seat=>{const n=occCount(seat);if(!n||!others(seat).some(o=>G.pl[o].hand.length))return[];return [{label:'Midnight Pressure: each opponent discards '+n+' card'+(n>1?'s':'')+' from hand'}]},seat=>{const n=occCount(seat);for(const o of others(seat))now('mpDiscard',{seat:o,n,by:seat})});
@@ -822,7 +822,7 @@ TB.invariants=function(Gx){const E=[];G=Gx;const np=Gx.np;
   if(Gx.fav.u<1||Gx.fav.u>3)E.push('favour uses');
   return E};
 // ---------------------------------------------------------------- UI helpers
-TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
+TB.cardInfo=function(Gx,id){G=Gx;if(id<0)return {hidden:true,owner:-id-1};const e=eff(id),d=cdef(id);return {id,name:cname(id),owner:own(id),kind:d.kind,strength:e.s,archetype:e.ar,traits:[...e.tr],commands:Object.keys(e.cm),cmp:JSON.parse(JSON.stringify(e.cm)),fx:[...e.fx],votes:e.v,lore:e.l,cost:d.lc,text:d.txt,tokens:(Gx.cmod[id]&&Gx.cmod[id].tok)||0}};
 // what the Night step and the tally would give if nothing else happened (pure: works on a copy; a stripped view is enough because Clash cards are face up)
 TB.clashPreview=function(Gx){if(!Gx||!Gx.clash)return null;const keep=G;const S=clone(Gx);G=S;try{const c=S.clash;const all=[];for(const s of c.parts)for(const id of (c.cards[s]||[]))if(id>=0)all.push(id);
     const dead=[],saved=[];if(!c.skip){const E=nightMarks(all);for(const id of all){if(!E[id])continue;const W=elimWhy(id,E[id]);if(eff(id).tr.has('inv'))saved.push({id,t:W.t,by:W.by});else dead.push({id,t:W.t,why:W.why,by:W.by,res:eff(id).tr.has('res')})}}
