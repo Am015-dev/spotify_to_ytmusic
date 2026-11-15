@@ -103,8 +103,9 @@ async function playGame(browser,W,H,gi){
         if(!pre.legal)note(tag,'bulb suggestion not legal ('+pre.sug+')');
         if(!r.f&&!checks._s3){checks._s3=1;await p.screenshot({path:'/tmp/tb-nofinger_'+W+'_'+gi+'.png'}).catch(()=>{})}
         if(!r.f)note(tag,'bulb tapped, no finger ('+hs.ph+') plan now '+await p.evaluate(()=>{try{return JSON.stringify(planFor(UI.bf,UI.bf.sug,{full:1}).toR)+' main='+document.querySelector('#main').className+' '+document.querySelector('#main').innerHTML.length+' pop='+UI.pop+' card='+(UI.card&&UI.card.kind)+' st='+JSON.stringify(GXH.state())+' phase='+hlpPhase()+' qk='+(G.q&&G.q.kind)+' sugnow='+(()=>{const x=hlpSuggest();return x?JSON.stringify([x.why,!!x.target(),x.from&&!!x.from()]):'null'})()}catch(e){return 'none '+e.message}}));
-        else{if(Math.abs(+r.f.tx-pre.plan.to.x)>2||Math.abs(+r.f.ty-pre.plan.to.y)>2)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != suggestion '+Math.round(pre.plan.to.x)+','+Math.round(pre.plan.to.y)+' ('+hs.ph+')');
-          if(pre.plan.from&&(!r.f.fx||Math.abs(+r.f.fx-pre.plan.from.x)>2||Math.abs(+r.f.fy-pre.plan.from.y)>2))note(tag,'bulb finger start != the suggested card ('+hs.ph+')');}
+        else{const T=pre.plan.from||pre.plan.to;   // F14 (R71 one lit target): a card-then-spot move points at its first step, the card, and nowhere else
+          if(Math.abs(+r.f.tx-T.x)>2||Math.abs(+r.f.ty-T.y)>2)note(tag,'bulb finger target '+r.f.tx+','+r.f.ty+' != suggestion '+Math.round(T.x)+','+Math.round(T.y)+' ('+hs.ph+')');
+          if(r.f.fx&&(Math.abs(+r.f.fx-T.x)>2||Math.abs(+r.f.fy-T.y)>2))note(tag,'bulb finger points at two places ('+hs.ph+')');}
         if(!r.ring)note(tag,'bulb: nothing glows at the suggestion');
         if(!r.why||wc(r.why)>15)note(tag,'bulb why '+wc(r.why)+' words: '+r.why);if(!r.link)note(tag,'bulb bubble has no "How does this work?"');
         await checks('bulb '+hs.ph);
