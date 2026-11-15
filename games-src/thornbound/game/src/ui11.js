@@ -128,9 +128,9 @@ const bulbOpenNow=()=>!!document.querySelector('.gxh-bulbb');
       for(const xx of [R.left+R.width/2-w/2,6,W-w-6].map(v=>Math.max(6,Math.min(W-w-6,v)))){const c={left:xx,top:yy,right:xx+w,bottom:yy+h};if(hit(c,ringBox)||cores.some(k=>hit(c,k)))continue;pick={x:xx,y:yy,side:sd};break}if(pick)break}
     if(!pick)return;const x=pick.x,y=pick.y,side=pick.side;b.dataset.tbAnch='1';b.style.left=Math.round(x)+'px';b.style.top=Math.round(y)+'px';
     b.className=b.className.replace(/\bgxh-a-\w+/g,'').trim()+' gxh-a-'+side;const arr=b.querySelector('.gxh-arr');if(arr){arr.style.top='';arr.style.left=Math.round(Math.max(14,Math.min(w-26,R.left+R.width/2-x-6)))+'px'}}
-  function sync(){const on=bulbOpenNow();document.documentElement.classList.toggle('tb-bulbon',on);if(on)anchor(document.querySelector('.gxh-bulbb'));
+  function sync(){const on=bulbOpenNow();document.documentElement.classList.toggle('tb-bulbon',on);document.documentElement.classList.toggle('tb-bubon',!!document.querySelector('.gxh-bub.on'));if(on)anchor(document.querySelector('.gxh-bulbb'));
     if(on!==was){was=on;try{applyHl()}catch(e){}}}
-  const go=()=>{new MutationObserver(sync).observe(document.body,{childList:true});sync()};if(document.body)go();else document.addEventListener('DOMContentLoaded',go)})();
+  const go=()=>{new MutationObserver(sync).observe(document.body,{childList:true});setInterval(sync,250);sync()};if(document.body)go();else document.addEventListener('DOMContentLoaded',go)})();
 // while it is open only the map spot its finger points at keeps its glow class; the other locations and regions stop glowing
 (function(){const o=applyHl;applyHl=function(){if(!bulbOpenNow()||!MAP.m)return o.apply(this,arguments);const h=MAP.hl,hr=MAP.hlR,rc=MAP.rec;
   const ring=document.querySelector('.gxh-ring:not(.from)'),q=ring&&ring.getBoundingClientRect(),cx=q?q.left+q.width/2:-1e4,cy=q?q.top+q.height/2:-1e4;

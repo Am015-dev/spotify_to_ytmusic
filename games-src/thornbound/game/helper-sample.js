@@ -14,6 +14,8 @@ function inPage(){
     if(e.matches('#handw .hc, .kcb')){const s=e.querySelector('svg');const kids=[e,...e.children,s].filter(Boolean);return !kids.some(k=>{const c=getComputedStyle(k);return (c.filter&&c.filter!=='none')||(c.boxShadow&&c.boxShadow!=='none')||(c.outlineStyle&&c.outlineStyle!=='none'&&parseFloat(c.outlineWidth)>0)})}
     if(e.matches('.tb-loc')){const r=e.querySelector('.tb-ring');return !r||+getComputedStyle(r).opacity<0.3}
     if(e.matches('g[data-reg], g.rglow')){const r=e.querySelector('rect');if(!r)return false;const c=getComputedStyle(r);return parseFloat(c.strokeWidth)<3||+c.strokeOpacity<0.4}
+    if(e.matches('.opt, .lbtn, .orow, .offer')){const c=getComputedStyle(e);return !/255, 210, 74/.test(c.borderTopColor)}
+    if(e.matches('.nb')){const c=getComputedStyle(e);return !c.boxShadow||c.boxShadow==='none'}
     if(e.matches('.bspot')){const c=getComputedStyle(e);return (!c.boxShadow||c.boxShadow==='none')&&(!c.outlineStyle||c.outlineStyle==='none')}
     return false}catch(x){return false}};
   const SUG='.rg, .rec, .rrec',TGT='.glow, .rglow';
