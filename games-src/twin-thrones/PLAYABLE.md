@@ -47,3 +47,19 @@ Also: legal cards glow with a pulsing gold ring, covered cards lose colour (not 
 - W429b (owner verdicts, 8 Nov): drag a glowing card and a drop tray appears (Build / Sell / each wonder, legal ones glow, a vibrate tick on hover and drop); tap still opens the big card. `touch-test.js` proves tap and touch-drag at 390x844 with real touch events (PASS). Shot: playable-shots/drag.webp.
 - W429c (BRIEF-GAMEFEEL): Goal card before turn 1 ("Have the most points after 3 ages" + 3 bullets) and the same aim on the first Learn-to-play screen; messages stay 4 s + 1 s per 10 words (tap skips), your own move shows at most 2 lines, the rival's at most 3, no turn banner in Play; text floor 14 px phone / 16 px pc; shield and points badges read as a drawn shield and "N pts"; fixed a CSS clash that put the tutorial's Skip button on top of Next; PC board centred without the empty dock column; Esc closes pop-ups. Gates: build-all --quick PASS, ui-audit A-F 0 (phone, phone-s, pc), rules-test PASS, smoke PASS, touch-test PASS, playtest-ui quick p and d PASS (30 turns each), tutorial-e2e p and d PASS. Review: DESIGN_REVIEW.md. Shots: playable-shots/feel/.
 - W429d (feel gate): `feel-audit.js twin-thrones --secs 120` (a)-(e) all 0, full 120 s sessions in Learn and Play on phone and pc, no tutorial skips. Learn to play now opens straight into the coached game with a "How to win" step (Next), no intro scene. Title buttons carry data-a="learn" / data-a="play" (the Learn button used to say data-a="start", so Play bots opened the tutorial). The instruction line is the turn tracker, no longer role=status. No separate "thinking" line or banners on top of it. Tutorial and move lines are at most 12 words per sentence. Wonder text "play again" shows as "take another turn" (display only). Goal and rules texts no longer say "you win" / "wins" outside the result screen.
+
+## FIXED1 (14 Nov 2026): owner "unplayable, rules not correct, not fun"
+Played on the staged build by touch at 375x667: tutorial, 1 no-hint game, then 10 games following only the glow.
+- **Rules:** the card data had about 40 wrong values (costs, points, chains, which age each science symbol comes in), plus 4 wrong wonder costs. All fixed; see RULES-AUDIT.md and logic-test section L (123 rules pass).
+- **Unplayable for a newcomer:**
+  - Hints were off by default, so a new player saw 6 glowing cards and no idea which is good. A first-glowing-card player lost 19-46 to Normal and ran out of coins by Age II.
+    Now hints are on unless you turn them off. The star marks the card, and the best button in its popup (Build / Sell / Wonder) glows with a star.
+    Token, revive, burn and who-starts choices glow too, and so does the best wonder in the draft.
+  - A long revive list overflowed the bottom sheet, so the lower choices sat under your city panel. The hinted choice now scrolls into view.
+  - The move rating could contradict the star ("Poor move" right after you followed it) because the rating ignored the follow-up choice.
+    Ratings are now measured against the star's move, with follow-ups settled.
+- **Fun:**
+  - Normal was easy: a star-follower won 73%. Normal now looks ahead like Hard but slips 10% of the time, and a star-follower wins 50% over 300 games (Easy 95%, Hard 38%).
+  - A game by touch takes about 6 minutes.
+  - On the final build, 8 touch games following only the glow at Normal: 3 wins, 5 losses (one lost on a 48-48 blue-card tie-break). All 8 finished with 0 dead taps and 0 errors. Headless: the star-follower wins 50-51% (300 and 200 games).
+- **Tutorial:** now 40 steps and teaches depots and guilds too (rules 28/28). The Age III lesson uses an 8-coin red card (pair token = 6 coins), because chains now follow the original.

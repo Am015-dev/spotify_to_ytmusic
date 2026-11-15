@@ -274,3 +274,8 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - In review: R68 twin-thrones (d60ea103), R69 vinegrave (7f6ced76). Fixing: F16 doorkick, F14 shipwreck, F13 thornbound.
 - Hollowbough small follow-ups (not blocking): answer hand taps on rival turn, stop result-screen tree sway, 553 city choice under tray, glow fewer in normal games.
 - Proposal pending owner yes: shelf-wide calm pass (shell gxh-pulse finite), one build-all.
+
+## 14 Nov 23:50 UTC: Twin Thrones live (owner yes)
+- R70 PASS 7.5. Deployed (game-only + endline-test sweep). Live check clean (only site-root favicon 404).
+- Follow-ups (not blocking): clear floating +N pops when sheets open, 375 status line cut, chain-link help text, wonder cost line, soften Easy "Poor move".
+- In review: R72 shipwreck, R73 doorkick. Fixing: F12 vinegrave, F14 thornbound. CALM1 (shelf/W530-calm-pass, owner-approved shell calm pass) triaging sweep failures.
