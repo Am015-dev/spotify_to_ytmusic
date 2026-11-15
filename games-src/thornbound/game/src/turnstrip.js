@@ -228,8 +228,10 @@ window.tbLineOver=function(ln){try{const L=ln.getBoundingClientRect(),w=document
   window.addEventListener('click',e=>{const o=e.target&&e.target.closest&&e.target.closest(OV);if(!o)return;setTimeout(()=>{if(gone(o))arm()},0)},true);
   // overlays closed from code during a tap (removed modal cards or hint bubbles (gx-help removes them at the tap's pointerdown), a bubble losing its 'on' class, or the message/pop-up panels getting hidden)
   const OVR='#tbgoal,[aria-modal="true"],.gx-goal,.gxh-bub';const isOv=n=>n.nodeType===1&&n.matches&&(n.matches(OVR)||!!n.querySelector(OVR));
-  const mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='childList'){for(const n of m.removedNodes)if(isOv(n)){arm();return}}
-    else if(m.type==='attributes'&&m.attributeName==='class'){const t=m.target;if(t.classList&&t.classList.contains('gxh-bub')&&!t.classList.contains('on')&&/(^|\s)on(\s|$)/.test(m.oldValue||'')){arm();return}}
-    else if(m.type==='attributes'&&m.target.hidden&&m.oldValue===null&&/^(pc|ppop|gdef|start)$/.test(m.target.id)){arm();return}}});
+  // (armed on the next task: gx-help removes its bubble in its own pointerdown listener, and this observer can run before ours has recorded the tap)
+  const armSoon=()=>setTimeout(arm,0);
+  const mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='childList'){for(const n of m.removedNodes)if(isOv(n)){armSoon();return}}
+    else if(m.type==='attributes'&&m.attributeName==='class'){const t=m.target;if(t.classList&&t.classList.contains('gxh-bub')&&!t.classList.contains('on')&&/(^|\s)on(\s|$)/.test(m.oldValue||'')){armSoon();return}}
+    else if(m.type==='attributes'&&m.target.hidden&&m.oldValue===null&&/^(pc|ppop|gdef|start)$/.test(m.target.id)){armSoon();return}}});
   const go=()=>mo.observe(D.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','class'],attributeOldValue:true});
   if(D.body)go();else D.addEventListener('DOMContentLoaded',go)})();
