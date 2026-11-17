@@ -47,7 +47,6 @@
         for (i = 0; i < drops.length; i++) { dot(buf, drops[i].x / PX, drops[i].y / PX, FOAM); dot(buf, drops[i].x / PX - drops[i].vx * 0.02 / PX, drops[i].y / PX - drops[i].vy * 0.02 / PX, MID, 0.6); }
         for (i = 0; i < bubbles.length; i++) { u = (t - bubbles[i].t) / 0.3; splash(buf, bubbles[i].x / PX, bubbles[i].y / PX, 1 + u * 1.5, 1 + u, u < 0.6 ? FOAM : LIGHT, 1 - u * 0.8, true); }
       },
-      dim: function () { return 0; },
       stop: function () { t = Math.max(t, 0.95); },
       done: function () { return t > 1.16 && !drops.length && !rings.length && !bubbles.length; }
     };

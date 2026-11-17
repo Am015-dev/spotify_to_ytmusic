@@ -3,8 +3,8 @@
 // (https://www.spritefusion.com/pixel-art-vfx, rain.ts). Kept: three depth layers of slanted streaks with bright heads, splash
 // rings and flying bits with gravity, the palette and speeds. Changed for a board seen from above: each drop falls to its own
 // landing point on the sea (given by the caller, so splashes gather in the wave's row or column) instead of a ground line; rings
-// are whole ellipses; the squall is FINITE (it rains for `dur` seconds, then the drops drain and done() turns true); the
-// side-view mist band is left out. See games-src/THIRD-PARTY.md.
+// are whole one-pass ellipses and fewer mid-layer drops splash (phone frame time); the squall is FINITE (it rains for `dur` seconds, then the drops drain and done() turns true); the
+// side-view mist band is left out; the palette is lifted for the teal sea. See games-src/THIRD-PARTY.md.
 //
 // MIT License
 // Copyright (c) 2026 Hugo Duprez
@@ -22,8 +22,9 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function (g) {
   'use strict';
-  var P = g.TWFXPX, Px = P.Px, dot = P.dot, splash = P.splash, hex = P.hex;
-  var C = { far: hex('#38446e'), farH: hex('#56659a'), mid: hex('#5f74ab'), midH: hex('#9ab0e0'), near: hex('#6f86bd'), nearH: hex('#d6e5ff') };
+  var P = g.TWFXPX, Px = P.Px, dot = P.dot, hex = P.hex;
+  // palette lifted from the original's dusk blues so the streaks hold on Tidewake's teal sea
+  var C = { far: hex('#5a7aa8'), farH: hex('#7d9cc8'), mid: hex('#8fb0d8'), midH: hex('#c4dcf2'), near: hex('#a9c8e8'), nearH: hex('#f2f8ff') };
   var SPEED = [760, 1050, 1450], LEN = [3, 6, 12], BODY = [C.far, C.mid, C.near], HEAD = [C.farH, C.midH, C.nearH];
   var PX = P.PX;
   // o: { land(R) -> [x, y] landing point in CSS px, top: y where drops start, area: CSS px^2 of the board, dur: seconds of rain,
@@ -46,6 +47,11 @@
       for (var i = 0; i < Math.round(ln[1] * k); i++) { var d = { layer: ln[0] }; reset(d); drops.push(d); }
     });
     function again(i) { if (stopped) drops.splice(i, 1); else reset(drops[i]); }
+    // a one-pass ring (the shared splash() draws three passes; dozens of rings at once cost too much on a throttled phone)
+    function ring(buf, cx, cy, rx, ry, c, a) {
+      var n = Math.ceil(rx * 5);
+      for (var j = 0; j < n; j++) { var ang = (j / n) * P.TAU; dot(buf, cx + Math.cos(ang) * rx, cy + Math.sin(ang) * ry, c, a); }
+    }
     function drawLayer(buf, layer) {
       var L = LEN[layer], c = BODY[layer], h = HEAD[layer];
       for (var i = 0; i < drops.length; i++) {
@@ -63,7 +69,7 @@
           d.x += ux * d.sp * dt; d.y += uy * d.sp * dt;
           if (d.layer === 0 && d.y > d.stop) again(i);
           else if (d.y >= d.ly) {
-            if (d.layer === 2 || R.chance(0.6)) splashes.push({ x: d.lx, y: d.ly, t: t });
+            if (d.layer === 2 || R.chance(0.3)) splashes.push({ x: d.lx, y: d.ly, t: t });
             for (var n = 0; n < (d.layer === 2 ? 3 : R.int(0, 2)); n++) bits.push({ x: d.lx, y: d.ly - 1, gy: d.ly, vx: R.range(-90, 70), vy: -R.range(110, 230), life: R.range(0.18, 0.32) });
             again(i);
           }
@@ -80,13 +86,11 @@
         drawLayer(buf, 0); drawLayer(buf, 1);
         for (var i = 0; i < splashes.length; i++) {
           var s = splashes[i], u = (t - s.t) / 0.4, rx = 1 + 5 * Math.sqrt(u);
-          splash(buf, s.x / PX, s.y / PX, rx, rx * 0.4, u < 0.3 ? C.midH : C.mid, 1 - u, true);
+          ring(buf, s.x / PX, s.y / PX, rx, rx * 0.4, u < 0.3 ? C.midH : C.mid, 1 - u);
         }
         for (var j = 0; j < bits.length; j++) dot(buf, bits[j].x / PX, bits[j].y / PX, C.nearH);
         drawLayer(buf, 2);
       },
-      // how much the board is dimmed under the squall, 0..1 (eases in, holds, eases out as the last drops land)
-      dim: function () { var a = Math.min(1, t / 0.35); if (stopped) a = Math.min(a, Math.max(0, 1 - (t - DUR) / 0.6)); return a; },
       stop: function () { stopped = true; },
       done: function () { return stopped && drops.length === 0 && bits.length === 0 && splashes.length === 0; }
     };
