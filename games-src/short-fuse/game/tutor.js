@@ -11,13 +11,13 @@
 //   validation token on the track when all four of a number are cut ................. crew2
 //   solo cut: you hold every wire left of a number (all four, or the last two) ...... solo (and Plum does one in crew1)
 //   equipment unlocks when two of its number are cut, then works once ................ hit (unlock), gear (use)
-//   personal tool: the Twin Probe, once per job (used for the practice miss) ........... probe, wrong1b
+//   personal tool: the Two-Prong Tester, once per job (used for the practice miss) ........... probe, wrong1b
 //   yellow wires: a yellow matches only a yellow, you must hold one to say "yellow" .. yellow1, yellow2
 //   red wires: tap yours; never point at one; a hand of only reds reveals itself ..... red, win
 // The staged job (never saved): three players (you = Amber, the foreman, then Teal, then Plum), 15 wires: blue 1, 6 and 7 (four each), yellows 1.1 and 6.1, red 6.5.
-//   You   : Y 6 6 6 R 7        Teal: 1 1 6 7        Plum: 1 1 Y 7 7      fuse 3 steps, one gear card (Rewind, unlocked by two 6s, its real value)
-//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Twin Probe on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
-//   T6 Plum hits Teal's last 1 · T7 you use Rewind and cut the last yellow · T8 you solo your 6s, your red is revealed for you, defused.
+//   You   : Y 6 6 6 R 7        Teal: 1 1 6 7        Plum: 1 1 Y 7 7      fuse 3 steps, one gear card (Fuse Pinch, unlocked by two 6s, its real value)
+//   T1 you hit Teal's token-2 · T2 Teal hits your token-3 · T3 Plum solo-cuts his 3s · T4 you use the Two-Prong Tester on Plum's 2nd and 3rd wires and miss (Plum tags the 1) · T5 Teal uses that token ·
+//   T6 Plum hits Teal's last 1 · T7 you use Fuse Pinch and cut the last yellow · T8 you solo your 6s, your red is revealed for you, defused.
 // The computer never moves by itself in here: the steps that say "the crew plays" run its scripted moves (tutMove) and wait for them.
 const TUT_GAME='short-fuse';
 const TUT={eqv:null,mission:false};
@@ -25,7 +25,7 @@ const tutOn=()=>typeof GXT!=='undefined'&&GXT.active()&&!!UI.tut;
 const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutStart});
 function firstTime(){return !lsGet('sf_played',0)}
 const tq=sel=>()=>{const e=document.querySelector(sel);return e&&e.getBoundingClientRect().width?e:null};
-// ---------------------------------------------------------------- the fixed layout (wire ids: blue v = (v-1)*4+j, red v.5 = 48+v-1, yellow v.1 = 59+v-1; the rig uses the 6s and 7s so Rewind unlocks at its real value, 6)
+// ---------------------------------------------------------------- the fixed layout (wire ids: blue v = (v-1)*4+j, red v.5 = 48+v-1, yellow v.1 = 59+v-1; the rig uses the 6s and 7s so Fuse Pinch unlocks at its real value, 6)
 const TUT_STANDS=[[59,20,21,22,53,24],[0,1,23,25],[2,3,64,26,27]];
 const tutIdx=(si,id)=>G.st[si].w.findIndex(x=>x.id===id);
 const tutEl=(si,id)=>()=>{if(!G)return null;const k=tutIdx(si,id);const sl=k>=0&&G.st[si].w[k];const e=sl&&tileEl(sl.u);return e&&e.getBoundingClientRect().width?e:null};
@@ -77,7 +77,7 @@ async function tutAct(seat,tok){const m=tutMove(seat);if(!m||!tutAlive(tok))retu
 async function tutCrew(){const tok=UI.tutTok;for(let n=0;n<8&&tutAlive(tok)&&!G.over;n++){const s=sideToAct();if(s<0||isHuman(s))break;if(!await tutAct(s,tok))break}}
 // ---------------------------------------------------------------- the steps
 const tutCalm=()=>!document.querySelector('#tb .snap,#tb .buzz,#tb.shake,#fuse .burn,#fuse .phew');   // the cut / miss animation is over: the spotlight does not move
-// review R1 (row 2): the Twin Probe and red are taught by doing
+// review R1 (row 2): the Two-Prong Tester and red are taught by doing
 const tutProbeIdx=()=>(TBL.items||[]).findIndex(x=>x.t==='tool'&&x.tool==='dd');
 const tutIsProbe=n=>n===tutProbeIdx();
 const tutProbeChip=()=>{const i=tutProbeIdx();const e=i>=0&&document.querySelector('#mine .chip[data-chip="'+i+'"]');return e&&e.getBoundingClientRect().width?e:null};
@@ -96,8 +96,8 @@ function tutSteps(){return tutStory([
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===23},ready:()=>tutMyTurn()&&!UI.sel},
  {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 6s. If Teal has a 6, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,23)},
- {id:'hit',title:'A hit!',say:'Match! Both 6s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
- {id:'probe',title:'Your Twin Probe',ai:tutCrew,say:'Tap your Twin Probe: it tests two wires at once.',target:tutProbeChip,
+ {id:'hit',title:'A hit!',say:'Match! Both 6s are cut and Fuse Pinch unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
+ {id:'probe',title:'Your Two-Prong Tester',ai:tutCrew,say:'Tap your Two-Prong Tester: it tests two wires at once.',target:tutProbeChip,
    wait:{type:'tap',match:a=>a.what==='chip'&&tutIsProbe(a.n)},ready:()=>tutMyTurn()&&!UI.sel&&!!tutProbeChip()},
  {id:'wrong1',title:'A wrong guess',say:'No clue is sure here, so guess: tap Plum\'s second wire.',target:tutEl(2,3),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===3},ready:()=>tutMyTurn()&&tutProbeSel(0)},
@@ -107,7 +107,7 @@ function tutSteps(){return tutStory([
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutProbeSel(2)},
  {id:'wrongres',title:'A miss',say:()=>{const t=G.st[2].w[tutIdx(2,3)].tok[0];return 'Wrong! The fuse burned one step, and a token shows the true number: a '+(t?t.v:1)+'.'},
    target:tutEl(2,3),also:tq('#fuse'),wait:null,ai:tutQ,ready:()=>!!G&&G.dial===2&&G.st[2].w[tutIdx(2,3)].tok.length>0&&tutCalm()},
- {id:'gear',title:'Use equipment',ai:tutCrew,say:'Rewind is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
+ {id:'gear',title:'Use equipment',ai:tutCrew,say:'Fuse Pinch is unlocked. Tap it to turn the fuse back one step. Gear works once.',target:tq('#gear .eqk.glow'),
    wait:{type:'tap',match:a=>a.what==='eq'&&a.id==='eq6'},ready:()=>tutMyTurn()&&!!document.querySelector('#gear .eqk.glow')},
  {id:'yellow1',title:'Yellow wires',say:'Every yellow is just "yellow". You hold one. Plum\'s one uncut wire must be the other: tap the glowing one.',target:tutEl(2,64),
    wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===64},ready:()=>tutMyTurn()&&!UI.sel&&G.dial===3},

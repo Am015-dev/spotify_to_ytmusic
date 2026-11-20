@@ -10,7 +10,7 @@ K.setPlayers(4, 0, { names: ['You', 'Wren', 'Pike', 'Moss'], captain: 1 });
 const mk = (s, n) => Array.from({ length: n }, (_, i) => ({ id: s + '-' + i, known: s === 0, color: i === 3 ? 'red' : i === 5 ? 'yellow' : 'blue', value: i === 3 ? 4.5 : i === 5 ? 5.1 : i + 1, cut: i === 1, infoToken: i === 2 ? 3 : null }));
 for (let s = 0; s < 4; s++) K.setStand(s, 0, mk(s, 13));
 K.setDial(2, 4); K.setTokens({ validation: [11], markers: [{ color: 'red', value: 4.5 }] });
-K.setEquipment([{ id: 'eq6', name: 'Rewind', unlock: { value: 6, count: 2 }, state: 'ready', effect: 'Dial back one.' }]);
+K.setEquipment([{ id: 'eq6', name: 'Fuse Pinch', unlock: { value: 6, count: 2 }, state: 'ready', effect: 'Dial back one.' }]);
 K.setMissionCards({ mission: { number: 9, name: 'Pecking Order', text: 'Cut in order.' }, numbers: [{ value: 5 }, { value: 3 }], sequence: { side: 'A', at: 0 }, constraints: [{ letter: 'A' }], challenges: [{ n: 4 }] });
 K.setCharacters([{ seat: 0, name: 'Tally', item: 'double_probe' }]);
 K.highlight(['1-4', { kind: 'dial' }]);

@@ -76,7 +76,7 @@ const RULE_DOC={
  fakeRed:['bomb','Fake red','One blue value acts as red. Never cut it, it is revealed at the end.'],
  eqCover:['gear','Covered gear','Each gear card needs two wires of its cover number cut. Only then does it unlock.'],
  redTriple:['bomb','Three reds at once','The reds go only together. Point at all three at once.'],
- rookie:['user','The rookie','The foreman-card holder is the rookie. A missed dual cut is a boom, and no Damper.'],
+ rookie:['user','The rookie','The foreman-card holder is the rookie. A missed dual cut is a boom, and no Blast Blanket.'],
  eqDeckReveal:['gear','Hidden gear','Gear lies face down; finishing the shown number turns one up.'],
  liar:['mask','The fibber','The fibber\'s tokens mean "NOT this value". The fibber may not use gear.'],
  searchlight:['eye','Searchlight','Each turn a number is turned up and swept. Then someone is picked to cut it.'],
@@ -107,7 +107,7 @@ const RULE_DOC={
  robotFuse:['robot','Robot fuse','The robot is the fuse: it steps forward after cuts. At 12, boom.'],
  redTide:['drop','Red tide','Reds leak from the pile into hands during the job.'],
  challenges:['trophy','Dares','Meet a dare card to turn the fuse back one step.'],
- unlimitedDD:['probe','Probe party','Every Twin Probe works every turn.'],
+ unlimitedDD:['probe','Probe party','Every Two-Prong Tester works every turn.'],
  robotLine:['robot','Robot guide','Move the robot forward along the number line. Then cut the value under it.'],
  meteor:['star','Meteors','Each finished meteor value turns the fuse back a step.'],
  hotPotato:['cards','Hot potato','Cut only values on your cards. Hand one card on after each turn.'],
@@ -116,7 +116,7 @@ const TOKFAM_DOC={par:'Info tokens show only EVEN or ODD.',cnt:'Count tokens (x1
 const INFO_DOC={rand:'Opening tokens are placed at random.',none:'No opening tokens.',neg:'Opening tokens say two values you do NOT hold.',false:'Opening tokens are false.'};
 // why the job was lost, in plain words, with a tip
 function lossHelp(why){why=String(why||'');
-  if(/fuse burnt/.test(why))return ['The fuse burnt down.','Every miss burns one step. The last step is the explosion. Point at wires the crew knows more about (tokens, sorted order). Use a Twin Probe on a 50/50. Keep Rewind for the last step.'];
+  if(/fuse burnt/.test(why))return ['The fuse burnt down.','Every miss burns one step. The last step is the explosion. Point at wires the crew knows more about (tokens, sorted order). Use a Two-Prong Tester on a 50/50. Keep Fuse Pinch for the last step.'];
   if(/pointed at.*red|red wire/.test(why))return ['Someone pointed at a red wire.','Red wires go off when pointed at. Watch the red markers on the track. They show which values a red sits between. A wire whose neighbours are close to a red value is risky.'];
   if(/clock|time ran out|bus ran out|flooded/.test(why))return ['Time ran out.','In timed jobs, quick certain cuts are worth more than careful 50/50s. Solo cuts and probes save turns.'];
   if(/robot reached 12/.test(why))return ['The robot reached the end.','Misses push the robot two spaces. Cutting the value it stands on pulls it back one.'];
@@ -159,12 +159,12 @@ const RULES_HTML=`
 <h3>Clues</h3><ul><li><b>Sort order:</b> every stand is sorted. A wire between 4 and 6 is a 4, 5 or 6. It could also be a red or yellow in between.</li>
 <li><b>Info tokens</b> show a wire's number. Some jobs use other tokens. Even/odd, counts ("x2 on this stand") or false ("NOT this").</li>
 <li><b>Validation tokens</b>: a value has all four wires cut. A green check goes on the track.</li>
-<li><b>Announcements.</b> Some gear makes the crew answer out loud. A Sweep: "yes, I hold a 7". The dock and What we know show every announcement.</li></ul>
+<li><b>Announcements.</b> Some gear makes the crew answer out loud. A Roll Call: "yes, I hold a 7". The dock and What we know show every announcement.</li></ul>
 <h3>House rules</h3><p>Two things are our own additions, not part of the tabletop game: a hand with no legal cut skips its turn, and after four rounds with no progress the bomb goes off, so a game cannot run forever. Only jobs 9, 16 and 36 blow the bomb on a skipped turn. Also: when only red wires remain, they are revealed for you, and earlier answers stay visible on the page.</p>
 <h3>No free talk</h3><p>You may not tell crewmates what you hold. The page enforces that. You can share only through moves, tokens and required answers.</p>
 <h3>The fuse</h3><p>It starts with one step per player. Some jobs start lower. It can never go above 6. A miss burns one step. At zero the bomb explodes.</p>
 <h3>Equipment</h3><p>From job 3, the board holds one locked gear card per player. Each card unlocks when two wires of its number are cut. Double cards need all four. It then works once. "Any time" cards work even when it is not your turn. Never use one in the middle of a question. "Your turn" cards are part of your action. Open <b>Gear</b> to read them all.</p>
-<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Twin Probe</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 31, new crew members bring other tools.</p>
+<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool. It is usually a <b>Two-Prong Tester</b>. Use it once per job. Point at two wires on one crewmate stand and say a number. It works if either matches. One red plus one other: no explosion. The token goes on the other wire. Both red: boom. From job 31, new crew members bring other tools.</p>
 <h3>Special jobs</h3><p>From job 9, most jobs add a twist. An order, a timer, limits, robots, oxygen... The <b>Job</b> button opens the job card. It shows each special rule as a picture and a line.</p>
 <h3>On this page</h3><ul><li>The <b>dock</b> is beside the board, or under it on a phone. It always says what the game is waiting for. It has a button for every option.</li>
 <li>Tap a <b>glowing wire</b> on the table to pick it. Then tap the value. Then tap the big button.</li>
@@ -183,7 +183,7 @@ function refEntries(){const E=[];const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:
  add('Tokens','Even / odd token',['jobs 21, 33'],'Replaces info tokens. It tells only whether the wire is even or odd. Yellow keeps its own token.',null);
  add('Tokens','Count token (x1, x2, x3)',['jobs 24, 40'],'Replaces info tokens. That value appears that many times on that stand, cut wires included. Never on a red.',null);
  add('Tokens','False token',['jobs 17, 52'],'Means "this wire is NOT this value". Shown on the table as "!5".',null);
- add('Tokens','Equal / unequal tag',['from the Equal and Unequal Tag cards'],'Clipped between two neighbouring wires of one stand. They are the same value, or they are different values.',2);
+ add('Tokens','Equal / unequal tag',['from the Equal and Odd-Pair Clip cards'],'Clipped between two neighbouring wires of one stand. They are the same value, or they are different values.',2);
  add('Tokens','X token',['jobs 20, 35'],'Marks an unsorted wire at the right end of a stand. No gear and no personal tool can touch it.',null);
  add('Tokens','Oxygen token',['jobs 44, 49, 54, 63'],'Paid to cut in the diving jobs. Cannot pay: skip the turn and burn a step.',null);
  add('Tokens','Number card',['1 to 12'],'Used by many jobs. It can be an order to follow. Or a called value. Or a secret prediction. Or a value that acts as red.',12);

@@ -1,5 +1,5 @@
 // ===================== coach.js: the tutorial is a COACHED FIRST GAME (free play, one non-blocking bubble at a time) =====================
-// The staged job (3 players, 15 wires, fuse of 3, Rewind) is played for real: every legal move is allowed, the computer crew plays its real moves.
+// The staged job (3 players, 15 wires, fuse of 3, Fuse Pinch) is played for real: every legal move is allowed, the computer crew plays its real moves.
 // Brix (and Quill) speak just-in-time: when a rule first matters, after your move, after a rival's move. No forced taps at all.
 // Rules that never came up are listed in "Things you'll meet later" on the end card. Words: story.js STORY.coach. Coverage: ../TUTORIAL-COVERAGE.md
 const CO={on:false,done:false};

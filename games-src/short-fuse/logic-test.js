@@ -51,7 +51,7 @@ R('There are 26 info tokens: two for each value 1 to 12, plus two yellow.',()=>{
 R('There are 12 base equipment cards, one per value 1 to 12, each unlocking after the first 2 wires of its value are cut.',()=>{
   const base=['eq1','eq2','eq3','eq4','eq5','eq6','eq7','eq8','eq9','eq10','eq11','eq12'];
   exp(base.map(id=>E.EQUIP[id].v),[1,2,3,4,5,6,7,8,9,10,11,12],'unlock values');exp(base.map(id=>E.EQUIP[id].need),Array(12).fill(2),'wires needed')});
-R('There are 5 base character cards, one of them the Captain, and every one carries the Twin Probe.',()=>{
+R('There are 5 base character cards, one of them the Captain, and every one carries the Two-Prong Tester.',()=>{
   const ids=['ch_captain','ch_base1','ch_base2','ch_base3','ch_base4'];exp(ids.map(i=>E.CHARS[i].item),Array(5).fill('dd'),'personal items');
   exp(ids.filter(i=>E.CHARS[i].captain).length,1,'captain cards')});
 R('The campaign has 66 missions, and the 8 of the base box can be played with 2, 3, 4 or 5 players.',()=>{
@@ -63,22 +63,22 @@ R('Stands per player, 2 players: the Captain and the other player each take 2 st
 R('Stands per player, 3 players: the Captain takes 2 stands, each other player 1.',()=>{for(const cap of [0,1,2]){game(4,3,{captain:cap});const n=X.G.seats.map(s=>E.standsOf(s.i).length);const want=[1,1,1];want[cap]=2;exp(n,want,'captain seat '+cap)}});
 R('Stands per player, 4 and 5 players: everyone takes 1 stand.',()=>{for(const np of [4,5]){game(4,np);exp(X.G.seats.map(s=>E.standsOf(s.i).length),Array(np).fill(1),np+' players')}});
 R('There are 4 stands in a 2, 3 or 4 player game and 5 stands in a 5 player game.',()=>{for(const [np,n] of [[2,4],[3,4],[4,4],[5,5]]){game(4,np);exp(X.G.st.length,n,np+' players')}});
-R('Mission 1 uses only the blue wires 1 to 6 (24 wires): no red and no yellow.',()=>{game(1,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,24,'wires');
-  yes(all.every(id=>E.WIRES[id].c==='b'&&E.WIRES[id].v<=6),'only blue 1-6','other wires present')});
-R('Mission 2 uses blue 1 to 8 plus 2 yellow wires drawn only from yellow 1.1 to 7.1 (34 wires).',()=>{game(2,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,34,'wires');
-  const ys=all.filter(id=>E.WIRES[id].c==='y').map(id=>E.WIRES[id].s);yes(ys.length===2&&ys.every(x=>x>=1.1&&x<=7.1),'2 yellows within 1.1..7.1',J(ys));yes(all.filter(id=>E.WIRES[id].c==='b').every(id=>E.WIRES[id].v<=8),'blue 1-8','higher blue')});
-R('Mission 3 uses blue 1 to 10 plus 1 red wire drawn only from red 1.5 to 9.5 (41 wires).',()=>{game(3,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,41,'wires');
-  const r=all.filter(id=>E.WIRES[id].c==='r').map(id=>E.WIRES[id].s);yes(r.length===1&&r[0]>=1.5&&r[0]<=9.5,'one red within 1.5..9.5',J(r))});
+R('Job 1 uses only the blue wires 1 to 7 (28 wires): no red and no yellow.',()=>{game(1,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,28,'wires');
+  yes(all.every(id=>E.WIRES[id].c==='b'&&E.WIRES[id].v<=7),'only blue 1-7','other wires present')});
+R('Job 2 uses blue 1 to 9 plus 4 yellow wires drawn only from yellow 1.1 to 8.1 (40 wires).',()=>{game(2,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,40,'wires');
+  const ys=all.filter(id=>E.WIRES[id].c==='y').map(id=>E.WIRES[id].s);yes(ys.length===4&&ys.every(x=>x>=1.1&&x<=8.1),'4 yellows within 1.1..8.1',J(ys));yes(all.filter(id=>E.WIRES[id].c==='b').every(id=>E.WIRES[id].v<=9),'blue 1-9','higher blue')});
+R('Job 3 uses blue 1 to 11 plus 1 red wire drawn only from red 2.5 to 10.5 (45 wires).',()=>{game(3,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,45,'wires');
+  const r=all.filter(id=>E.WIRES[id].c==='r').map(id=>E.WIRES[id].s);yes(r.length===1&&r[0]>=2.5&&r[0]<=10.5,'one red within 2.5..10.5',J(r))});
 R('Mission 4 uses all 48 blue wires plus 1 red and 2 yellow wires "x N" (51 wires) and puts N markers on the board, blank side up, showing exactly the values in play.',()=>{
   game(4,4);const all=X.G.st.flatMap(s=>s.w.map(x=>x.id));exp(all.length,51,'wires');const rs=all.filter(id=>E.WIRES[id].c==='r').map(id=>E.WIRES[id].s),ys=all.filter(id=>E.WIRES[id].c==='y').map(id=>E.WIRES[id].s).sort((a,b)=>a-b);
   exp([rs.length,ys.length],[1,2],'[reds,yellows]');const M=X.G.markers;exp([M.red,M.yel,M.redQ,M.yelQ],[rs,ys,0,0],'[red markers,yellow markers,"?" red,"?" yellow]')});
-R('"N out of M": M candidate wires are shown with "?" markers, N of them go in the pool and the other M-N are set aside unseen (mission 8: 1 of 2 red, 2 of 3 yellow).',()=>{
-  game(8,4);const G=X.G;const all=G.st.flatMap(s=>s.w.map(x=>x.id));const rs=all.filter(id=>E.WIRES[id].c==='r'),ys=all.filter(id=>E.WIRES[id].c==='y');
-  exp([rs.length,ys.length,G.aside.length],[1,2,2],'[reds in play,yellows in play,set aside]');exp([G.markers.red.length,G.markers.yel.length,G.markers.redQ,G.markers.yelQ],[2,3,1,1],'[red markers,yellow markers,?,?]');
+R('"N out of M": M candidate wires are shown with "?" markers, N of them go in the pool and the other M-N are set aside unseen (job 6: 1 of 2 red, 2 of 4 yellow).',()=>{
+  game(6,4);const G=X.G;const all=G.st.flatMap(s=>s.w.map(x=>x.id));const rs=all.filter(id=>E.WIRES[id].c==='r'),ys=all.filter(id=>E.WIRES[id].c==='y');
+  exp([rs.length,ys.length,G.aside.length],[1,2,3],'[reds in play,yellows in play,set aside]');exp([G.markers.red.length,G.markers.yel.length,G.markers.redQ,G.markers.yelQ],[2,4,1,1],'[red markers,yellow markers,?,?]');
   yes(rs.every(id=>G.markers.red.includes(E.WIRES[id].s))&&ys.every(id=>G.markers.yel.includes(E.WIRES[id].s)),'in-play wires among the candidates','a played wire is not a candidate');
   yes(G.aside.every(id=>!all.includes(id)),'set-aside wires not dealt','a set-aside wire is on a stand')});
 R('All wires are dealt face down, round-robin per stand, as evenly as possible; no wire is dealt twice.',()=>{for(const np of [2,3,4,5]){game(4,np);const ids=X.G.st.flatMap(s=>s.w.map(x=>x.id));
-  exp(new Set(ids).size,ids.length,np+'p distinct wires');exp(ids.length,np===2?53:51,np+'p wires dealt (2p mission 4: 48 blue + 1 red + 4 yellow)');const n=X.G.st.map(s=>s.w.length);yes(Math.max(...n)-Math.min(...n)<=1,'sizes within 1',J(n))}});
+  exp(new Set(ids).size,ids.length,np+'p distinct wires');exp(ids.length,np===2?54:51,np+'p wires dealt (2p job 4: 48 blue + 2 red + 4 yellow)');const n=X.G.st.map(s=>s.w.length);yes(Math.max(...n)-Math.min(...n)<=1,'sizes within 1',J(n))}});
 R('When the deal is uneven the extra wires go to the stands in turn order from the Captain, so the Captain\'s stand is never shorter than another.',()=>{
   for(const cap of [0,1,2,3]){game(4,4,{captain:cap});const n=X.G.st.map(s=>s.w.length);exp(n,[13,13,13,12],'stand sizes in order Captain first, captain seat '+cap);
     exp(X.G.st[0].pos,cap,'first stand belongs to the Captain')}},{src:'G'});
@@ -191,7 +191,7 @@ R('Cutting a red wire loses at once.',()=>{game(4,4);rig([[B(5,0),B(1)],[RD(3),B
 R('The mission is lost when the fuse reaches the skull (a failure on the last step).',()=>{game(4,4);rig([[B(5,0),B(1)],[B(8),B(2)],[B(3)],[B(4)]]);act(0);X.G.dial=1;must({a:'dual',st:1,ks:[K(1,B(8))],v:5});exp(X.G.over&&X.G.over.win,false,'lost on the last step')});
 R('After the mission ends no further move is accepted.',()=>{game(4,4);rig([[B(5,0),B(1)],[RD(3),B(2)],[B(3)],[B(4)]]);act(0);must({a:'dual',st:1,ks:[K(1,RD(3))],v:5});X.G.step='act';
   const r=mv({a:'dual',st:2,ks:[0],v:1},0);exp(r.success,false,'move accepted after the end')});
-R('The fuse never goes past the dial: the dial maximum is 6 (extra segment) and a Rewind cannot turn it further back.',()=>{game(4,5);ready('eq6');act(0);X.G.dial=6;no({a:'eq',id:'eq6'},0)});
+R('The fuse never goes past the dial: the dial maximum is 6 (extra segment) and a Fuse Pinch cannot turn it further back.',()=>{game(4,5);ready('eq6');act(0);X.G.dial=6;no({a:'eq',id:'eq6'},0)});
 
 // =====================================================================================
 S('8. Equipment: general rules');
@@ -200,27 +200,27 @@ R('An equipment card unlocks the moment the first 2 wires of its value have been
   no({a:'eq',id:'eq6'},0);X.G.dial=2;must({a:'dual',st:1,ks:[K(1,B(6,1))],v:6});exp(X.G.eq[0].st,'ready','card after the first 2 sixes were cut')});
 R('A locked card cannot be used.',()=>{game(4,4);rig(FOUR);X.G.eq[0]={id:'eq4',st:'locked',down:0,cover:null,perm:0};act(0);no({a:'eq',id:'eq4',s:0,k:0},0)});
 R('Each equipment card works once per mission (turned face down after use).',()=>{game(4,4);rig(FOUR);ready('eq6');act(0);X.G.dial=2;must({a:'eq',id:'eq6'},0);exp(X.G.dial,3,'dial after the first use');no({a:'eq',id:'eq6'},0)});
-R('Unless the card says otherwise anyone can use a card at any time, even off their turn.',()=>{game(4,4);rig(FOUR);ready('eq6');act(0);X.G.dial=2;must({a:'eq',id:'eq6'},2);exp(X.G.dial,3,'dial after a non-active seat used Rewind')});
+R('Unless the card says otherwise anyone can use a card at any time, even off their turn.',()=>{game(4,4);rig(FOUR);ready('eq6');act(0);X.G.dial=2;must({a:'eq',id:'eq6'},2);exp(X.G.dial,3,'dial after a non-active seat used Fuse Pinch')});
 R('One player may use several cards in a row, and a card can be used before the player\'s own action.',()=>{game(4,4);rig([[B(9),B(1)],[B(4),B(10)],[B(11)],[B(12)]]);ready('eq4');ready('eq6');act(0);X.G.dial=2;
   must({a:'eq',id:'eq4',s:0,k:0},0);must({a:'eq',id:'eq6'},0);exp([X.G.dial,toks(0,0)],[3,['n:1']],'[dial,token] after two cards in a row')});
-R('Cards marked "on your turn" (Triple Probe, Full Scan, Two-Value Probe, Coffee Break) can only be used by the active player.',()=>{
+R('Cards marked "on your turn" (Fork Tester, Stand Scanner, Either-Or Meter, Hand-Off) can only be used by the active player.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(5,1),B(2),B(3)],[B(4,0),B(4,1),B(7)],[B(8),B(9)]]);for(const id of ['eq3','eq5','eq10','eq11'])ready(id);act(0);
   no({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq3'},2);no({a:'eq',id:'eq11',next:3},2);must({a:'eq',id:'eq11',next:3},0)});
 
 // =====================================================================================
 S('9. Equipment: base cards 1 to 12');
-R('Card 1 (Unequal Tag): put the "not equal" token between 2 neighbouring wires of your own stand with different values; one may already be cut.',()=>{
+R('Card 1 (Odd-Pair Clip): put the "not equal" token between 2 neighbouring wires of your own stand with different values; one may already be cut.',()=>{
   game(4,4);rig([[B(2),B(5),B(7)],[B(1)],[B(3)],[B(4)]]);ready('eq1');act(0);must({a:'eq',id:'eq1',s:0,k:0},0);exp(X.G.marks.map(m=>m.t),['neq'],'tag placed');
   game(4,4);rig([[B(2),B(5),B(7)],[B(1)],[B(3)],[B(4)]]);sl(0)[0].cut=1;ready('eq1');act(0);must({a:'eq',id:'eq1',s:0,k:0},0)});
 R('Card 1: two wires of the same value, two reds or two yellows can never take the Unequal tag.',()=>{
   game(4,4);rig([[B(5,0),B(5,1),RD(2),RD(4),YL(6),YL(8)],[B(1)],[B(3)],[B(4)]]);ready('eq1');act(0);const w=sl(0).map(x=>x.id);
   for(const [a,b] of [[B(5,0),B(5,1)],[RD(2),RD(4)],[YL(6),YL(8)]]){const k=w.indexOf(a);if(w[k+1]!==b)throw new Error('rig order');no({a:'eq',id:'eq1',s:0,k},0)}});
-R('Card 12 (Equal Tag): put the "equal" token between 2 neighbouring wires of your own stand with the same value; one may be cut; any 2 reds or any 2 yellows count as equal.',()=>{
+R('Card 12 (Twin Clip): put the "equal" token between 2 neighbouring wires of your own stand with the same value; one may be cut; any 2 reds or any 2 yellows count as equal.',()=>{
   for(const [a,b] of [[B(5,0),B(5,1)],[RD(2),RD(4)],[YL(6),YL(8)]]){game(4,4);rig([[a,b,B(11)],[B(1)],[B(3)],[B(4)]]);ready('eq12');act(0);must({a:'eq',id:'eq12',s:0,k:0},0);exp(X.G.marks.map(m=>m.t),['eq'],'tag for '+a+','+b)}
   game(4,4);rig([[B(2),B(5),B(7)],[B(1)],[B(3)],[B(4)]]);ready('eq12');act(0);no({a:'eq',id:'eq12',s:0,k:0},0)});
 R('Cards 1 and 12 cannot be used on a teammate\'s stand, and there is only one token of each kind.',()=>{game(4,4);rig([[B(2),B(5)],[B(3),B(6)],[B(3,1),B(3,2)],[B(4)]]);ready('eq1');ready('eq12');act(0);no({a:'eq',id:'eq1',s:1,k:0},0);
   must({a:'eq',id:'eq1',s:0,k:0},0);exp(X.G.marks.filter(m=>m.t==='neq').length,1,'one "not equal" token')});
-R('Card 2 (Handsets): you give an uncut wire face down, the teammate gives one back; each is inserted in sorted position.',()=>{
+R('Card 2 (Swap Bag): you give an uncut wire face down, the teammate gives one back; each is inserted in sorted position.',()=>{
   game(4,4);rig([[B(2),B(6),B(9)],[B(4),B(8),B(11)],[B(1)],[B(3)]]);ready('eq2');act(0);must({a:'eq',id:'eq2',s:0,k:K(0,B(6)),to:1},0);ans(o=>o.d.ru===sl(1)[K(1,B(8))].u);
   exp(sl(0).map(x=>x.id),[B(2),B(8),B(9)],'seat 0 stand');exp(sl(1).map(x=>x.id),[B(4),B(6),B(11)],'seat 1 stand')});
 R('Card 2: red and yellow wires may be swapped too; an info token travels with its wire.',()=>{
@@ -229,35 +229,35 @@ R('Card 2: red and yellow wires may be swapped too; an info token travels with i
 R('Card 2: a 2-stand player puts the incoming wire on the stand the outgoing wire left.',()=>{
   game(4,2);rig([[B(2),B(4)],[B(6),B(9)],[B(5,1),B(7)],[B(8),B(10)]]);ready('eq2');act(0);must({a:'eq',id:'eq2',s:1,k:0,to:1},0);ans(o=>o.d.ru===sl(3)[0].u);
   yes(sl(1).some(x=>x.id===B(8)),'8 arrives on the stand the 6 left','8 not there');yes(sl(3).some(x=>x.id===B(6)),'6 arrives on the stand the 8 left','6 not there')});
-R('Card 3 (Triple Probe): name a number and point at 3 wires on one teammate stand; it works if any of them matches.',()=>{
+R('Card 3 (Fork Tester): name a number and point at 3 wires on one teammate stand; it works if any of them matches.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(5,1),B(2),B(9),B(11)],[B(3)],[B(4)]]);ready('eq3');act(0);const d=X.G.dial;no({a:'dual',st:1,ks:[0,1],v:5,tool:'eq3'},0);must({a:'dual',st:1,ks:[K(1,B(2)),K(1,B(5,1)),K(1,B(11))],v:5,tool:'eq3'});
   exp([sl(1)[K(1,B(5,1))].cut,sl(0)[K(0,B(5,0))].cut,X.G.dial],[1,1,d],'[matching wire cut,own cut,dial]')},{how:'a two-wire attempt is rejected first'});
 R('Card 3: if none of the 3 matches the fuse advances 1 and the teammate tags one of the three with its true value.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(2),B(9),B(11)],[B(3)],[B(4)]]);ready('eq3');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq3'});ans();
   const tagged=sl(1).filter(x=>x.tok.length);exp([X.G.dial,tagged.length],[d-1,1],'[dial,tagged wires]');exp(tagged[0].tok[0].v,E.cv(tagged[0].id),'true value on the token')});
-R('Cards 3, 5 and the Twin Probe can never name yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(6),B(2),B(3)],[B(3,1)],[B(4)]]);ready('eq3');act(0);no({a:'dual',st:1,ks:[0,1,2],v:'Y',tool:'eq3'},0)});
-R('Card 4 (Sticky Note): put an info token with the true value in front of one of your own blue wires (any player, any time).',()=>{game(4,4);rig(FOUR);ready('eq4');act(0);
+R('Cards 3, 5 and the Two-Prong Tester can never name yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(6),B(2),B(3)],[B(3,1)],[B(4)]]);ready('eq3');act(0);no({a:'dual',st:1,ks:[0,1,2],v:'Y',tool:'eq3'},0)});
+R('Card 4 (Chalk Mark): put an info token with the true value in front of one of your own blue wires (any player, any time).',()=>{game(4,4);rig(FOUR);ready('eq4');act(0);
   must({a:'eq',id:'eq4',s:2,k:0},2);exp(toks(2,0),['n:'+E.cv(sl(2)[0].id)],'token on the user\'s own wire')});
 R('Card 4: only on a blue wire of your own (not red, not yellow, not a teammate\'s).',()=>{game(4,4);rig([[B(9),RD(2),YL(3)],[B(4),B(10)],[B(11)],[B(12)]]);ready('eq4');act(0);
   no({a:'eq',id:'eq4',s:0,k:K(0,RD(2))},0);no({a:'eq',id:'eq4',s:0,k:K(0,YL(3))},0);no({a:'eq',id:'eq4',s:1,k:0},0);must({a:'eq',id:'eq4',s:0,k:K(0,B(9))},0);exp(toks(0,K(0,B(9))),['n:9'],'token')});
-R('Card 5 (Full Scan): name a number and point at a teammate\'s whole stand; it works if any wire there matches.',()=>{
+R('Card 5 (Stand Scanner): name a number and point at a teammate\'s whole stand; it works if any wire there matches.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(2),B(5,1),B(9)],[B(3)],[B(4)]]);ready('eq5');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq5'});exp([sl(1)[K(1,B(5,1))].cut,X.G.dial],[1,d],'[match cut,dial]')});
 R('Card 5: if the stand holds no match the fuse advances 1 and the teammate tags a wire of their choice.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(2),B(8),B(9)],[B(3)],[B(4)]]);ready('eq5');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq5'});ans();exp([X.G.dial,sl(1).filter(x=>x.tok.length).length],[d-1,1],'[dial,tagged]')});
-R('Card 6 (Rewind): turns the fuse back 1 step.',()=>{game(4,4);rig(FOUR);ready('eq6');act(0);X.G.dial=2;must({a:'eq',id:'eq6'},0);exp(X.G.dial,3)});
-R('Card 7 (Recharge): 1 or 2 used character cards are turned face up again and their personal item can be used once more.',()=>{
+R('Card 6 (Fuse Pinch): turns the fuse back 1 step.',()=>{game(4,4);rig(FOUR);ready('eq6');act(0);X.G.dial=2;must({a:'eq',id:'eq6'},0);exp(X.G.dial,3)});
+R('Card 7 (Spare Batteries): 1 or 2 used character cards are turned face up again and their personal item can be used once more.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(5,0),B(5,1),B(10)],[B(5,2),B(5,3),B(11)],[B(12)]]);ready('eq7');act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});ans();X.G.q=null;
   X.G.seats[0].chUsed=1;X.G.seats[1].chUsed=1;act(0);must({a:'eq',id:'eq7',who:[0,1]},0);exp([X.G.seats[0].chUsed,X.G.seats[1].chUsed],[0,0],'both Twin Probes ready again')});
-R('Card 8 (Sweep): name a number; every player (you too) says yes if they hold an uncut BLUE wire of it; a 2-stand player answers per stand; red/yellow never count.',()=>{
+R('Card 8 (Roll Call): name a number; every player (you too) says yes if they hold an uncut BLUE wire of it; a 2-stand player answers per stand; red/yellow never count.',()=>{
   game(4,2);rig([[B(5),B(2)],[B(6),B(9)],[B(5,1),RD(7)],[B(8),YL(5)]]);ready('eq8');act(0);must({a:'eq',id:'eq8',v:5},0);exp(X.G.ann.find(a=>a.k==='sweep').res.map(r=>r.yes),[1,0,1,0],'answers per stand');
   game(4,4);rig([[B(5)],[RD(7),B(9)],[B(7),B(10)],[B(11)]]);ready('eq8');act(0);must({a:'eq',id:'eq8',v:7},0);exp(X.G.ann.find(a=>a.k==='sweep').res.map(r=>r.yes),[0,0,1,0],'red 7.5 is not a 7')});
 R('Card 8: cut wires do not answer yes.',()=>{game(4,4);rig([[B(5)],[B(5,1),B(9)],[B(7),B(10)],[B(11)]]);sl(1)[K(1,B(5,1))].cut=1;ready('eq8');act(0);must({a:'eq',id:'eq8',v:5},0);exp(X.G.ann.find(a=>a.k==='sweep').res.map(r=>r.yes),[1,0,0,0])});
-R('Card 9 (Damper): used before your action; if the dual cut fails the fuse does not move.',()=>{game(4,4);rig([[B(9),B(1)],[B(4),B(10)],[B(11)],[B(12)]]);ready('eq9');act(0);const d=X.G.dial;must({a:'eq',id:'eq9'},0);
+R('Card 9 (Blast Blanket): used before your action; if the dual cut fails the fuse does not move.',()=>{game(4,4);rig([[B(9),B(1)],[B(4),B(10)],[B(11)],[B(12)]]);ready('eq9');act(0);const d=X.G.dial;must({a:'eq',id:'eq9'},0);
   must({a:'dual',st:1,ks:[K(1,B(4))],v:9},0);exp([X.G.dial,toks(1,K(1,B(4)))],[d,['n:4']],'[dial,token still placed on a wrong non-red wire]')});
 R('Card 9: if the pointed wire is red the bomb does not explode, and no info token is placed.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),B(4),B(10)],[B(11)],[B(12)]]);ready('eq9');act(0);const d=X.G.dial;must({a:'eq',id:'eq9'},0);
   must({a:'dual',st:1,ks:[K(1,RD(3))],v:9},0);exp([!!X.G.over,X.G.dial,toks(1,K(1,RD(3)))],[false,d,[]],'[over,dial,tokens]')});
 R('Card 9 can only be used at the start of your own turn, before your action.',()=>{game(4,4);rig(FOUR);ready('eq9');act(0);no({a:'eq',id:'eq9'},2);X.G.tfx.acted=1;no({a:'eq',id:'eq9'},0)});
-R('Card 10 (Two-Value Probe): name 2 values for one wire; if the wire is either, the cut works and the crew learns you hold the other value too.',()=>{
+R('Card 10 (Either-Or Meter): name 2 values for one wire; if the wire is either, the cut works and the crew learns you hold the other value too.',()=>{
   game(4,4);rig([[B(9),B(2),B(1)],[B(2,1),B(5),B(10)],[B(11)],[B(12)]]);ready('eq10');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(2,1))],v:9,v2:2,two:'eq10'},0);
   exp([sl(1)[K(1,B(2,1))].cut,sl(0)[K(0,B(2))].cut,X.G.dial],[1,1,d],'[wire cut,own 2 cut,dial]');yes(X.G.ann.some(a=>a.k==='holds'&&a.v===9&&a.yes),'announcement that you also hold the 9','none')});
 R('Card 10: you must hold both values; yellow is allowed as one of them; the values need not be consecutive.',()=>{
@@ -265,83 +265,83 @@ R('Card 10: you must hold both values; yellow is allowed as one of them; the val
   game(4,4);rig([[YL(4),B(2)],[YL(8),B(9)],[B(10)],[B(11)]]);ready('eq10');act(0);must({a:'dual',st:1,ks:[K(1,YL(8))],v:2,v2:'Y',two:'eq10'},0)});
 R('Card 10: if the wire is neither value it is a failure (fuse 1 step, true token).',()=>{
   game(4,4);rig([[B(9),B(2),B(1)],[B(5),B(10)],[B(11)],[B(12)]]);ready('eq10');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(5))],v:9,v2:2,two:'eq10'},0);exp([X.G.dial,toks(1,K(1,B(5)))],[d-1,['n:5']],'[dial,token]')});
-R('Card 11 (Coffee Break): you skip your turn and choose who goes next; play then continues clockwise from that player.',()=>{
+R('Card 11 (Hand-Off): you skip your turn and choose who goes next; play then continues clockwise from that player.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[B(5,1),B(2)],[B(3)],[B(4)]]);ready('eq11');act(0);must({a:'eq',id:'eq11',next:2},0);exp(X.G.actor,2,'chosen player');
   const h=E.heldVals(2);const v=+Object.keys(h)[0];const ts=[0,1,3].find(s=>sl(s).some(x=>!x.cut));mv({a:'dual',st:ts,ks:[sl(ts).findIndex(x=>!x.cut)],v});if(X.G.q)ans();if(!X.G.over)exp(X.G.actor,3,'next after the chosen player is clockwise from them')});
 R('Card 11 uses up the turn: the player cannot also cut in the same turn.',()=>{game(4,4);rig([[B(5,0),B(1)],[B(5,1),B(2)],[B(3)],[B(4)]]);ready('eq11');act(0);must({a:'eq',id:'eq11',next:2},0);no({a:'dual',st:1,ks:[0],v:5},0)});
 
 // =====================================================================================
 S('10. Equipment: campaign cards (rule stickers A and C)');
-R('Hidden Compartment unlocks when a pair of yellows is cut and, instantly, draws 2 more equipment cards into the mission.',()=>{
-  game(9,4);rig([[YL(2),B(1)],[YL(5),B(9)],[B(10)],[B(11)]]);X.G.eq=[{id:'eqY',st:'locked',down:0,cover:null,perm:0}];X.G.eqPool=['eq4','eq6','eq8'];act(0);must({a:'dual',st:1,ks:[K(1,YL(5))],v:'Y'});
+R('False Bottom unlocks when a pair of yellows is cut and, instantly, draws 2 more equipment cards into the mission.',()=>{
+  game(12,4);rig([[YL(2),B(1)],[YL(5),B(9)],[B(10)],[B(11)]]);X.G.eq=[{id:'eqY',st:'locked',down:0,cover:null,perm:0}];X.G.eqPool=['eq4','eq6','eq8'];act(0);must({a:'dual',st:1,ks:[K(1,YL(5))],v:'Y'});
   exp(X.G.eq.length,3,'cards on the board after the compartment opened')});
-R('Hidden Compartment only joins the pile in missions that use yellow wires (from mission 9).',()=>{let n=0;for(let i=0;i<30;i++){game(31,4,{seed:100+i});if(X.G.eq.some(e=>e.id==='eqY')||X.G.eqPool.includes('eqY'))n++}exp(n,0,'times eqY appeared in a yellow-free mission (31 has no yellow)')});
+R('False Bottom only joins the pile in missions that use yellow wires (from job 7).',()=>{let n=0;for(let i=0;i<30;i++){game(12,4,{seed:100+i});if(X.G.eq.some(e=>e.id==='eqY')||X.G.eqPool.includes('eqY'))n++}exp(n,0,'times eqY appeared in a yellow-free job (12 has no yellow)')});
 R('The double-number cards (2-2, 3-3, 9-9, 10-10, 11-11) unlock only when ALL FOUR wires of the value are cut.',()=>{
-  game(55,4);rig([[B(2,0),B(2,1),B(1)],[B(2,2),B(2,3),B(5)],[B(7)],[B(8)]]);X.G.eq=[{id:'eq22',st:'locked',down:0,cover:null,perm:0}];act(0);must({a:'dual',st:1,ks:[K(1,B(2,2))],v:2});exp(X.G.eq[0].st,'locked','card after only 2 twos');
+  game(50,4);rig([[B(2,0),B(2,1),B(1)],[B(2,2),B(2,3),B(5)],[B(7)],[B(8)]]);X.G.eq=[{id:'eq22',st:'locked',down:0,cover:null,perm:0}];act(0);must({a:'dual',st:1,ks:[K(1,B(2,2))],v:2});exp(X.G.eq[0].st,'locked','card after only 2 twos');
   act(0);must({a:'dual',st:1,ks:[K(1,B(2,3))],v:2});exp(X.G.eq[0].st,'ready','card after all four twos')});
-R('Lone Tag (2-2): put a x1 token in front of one of your blue wires; that value appears once on the stand.',()=>{game(55,4);rig(FOUR);ready('eq22');act(0);must({a:'eq',id:'eq22',s:0,k:K(0,B(9))},0);exp(sl(0)[K(0,B(9))].tok.map(t=>[t.t,t.v]),[['c',1]],'x1 token')});
-R('Lone Tag cannot go on a value that appears more than once on that stand.',()=>{game(55,4);rig([[B(9,0),B(9,1),B(1)],[B(4)],[B(7)],[B(8)]]);ready('eq22');act(0);no({a:'eq',id:'eq22',s:0,k:K(0,B(9,0))},0)});
-R('Supply Drop (3-3) is instant: when it unlocks all used equipment cards turn face up and work again.',()=>{
-  game(55,4);rig([[B(3,0),B(3,1),B(1)],[B(3,2),B(3,3),B(5)],[B(7)],[B(8)]]);X.G.eq=[{id:'eq33',st:'locked',down:0,cover:null,perm:0},{id:'eq6',st:'used',down:0,cover:null,perm:0}];act(0);
-  must({a:'dual',st:1,ks:[K(1,B(3,2))],v:3});act(0);must({a:'dual',st:1,ks:[K(1,B(3,3))],v:3});exp(X.G.eq.find(e=>e.id==='eq6').st,'ready','Rewind after the Supply Drop')});
-R('Express Pass (9-9): on your turn solo-cut 2 identical wires from your hand even if more of that value remain uncut elsewhere.',()=>{
-  game(55,4);rig([[B(9,0),B(9,1),B(1)],[B(9,2),B(9,3),B(5)],[B(7)],[B(8)]]);ready('eq99');act(0);no({a:'solo',v:9},0);must({a:'solo',v:9,ep:1},0);exp(cutN(0),2,'wires cut')});
-R('Vaporiser (10-10) is instant: it draws a random info token and everyone cuts every remaining wire of that value they hold.',()=>{
-  game(55,4);rig([[B(10,0),B(10,1),B(1),B(6,0)],[B(10,2),B(10,3),B(5),B(6,1)],[B(6,2),B(7)],[B(6,3),B(8)]]);X.G.eq=[{id:'eq1010',st:'locked',down:0,cover:null,perm:0}];
+R('Only-One Pin (2-2): put a x1 token in front of one of your blue wires; that value appears once on the stand.',()=>{game(50,4);rig(FOUR);ready('eq22');act(0);must({a:'eq',id:'eq22',s:0,k:K(0,B(9))},0);exp(sl(0)[K(0,B(9))].tok.map(t=>[t.t,t.v]),[['c',1]],'x1 token')});
+R('Only-One Pin cannot go on a value that appears more than once on that stand.',()=>{game(50,4);rig([[B(9,0),B(9,1),B(1)],[B(4)],[B(7)],[B(8)]]);ready('eq22');act(0);no({a:'eq',id:'eq22',s:0,k:K(0,B(9,0))},0)});
+R('Van Restock (3-3) is instant: when it unlocks all used equipment cards turn face up and work again.',()=>{
+  game(50,4);rig([[B(3,0),B(3,1),B(1)],[B(3,2),B(3,3),B(5)],[B(7)],[B(8)]]);X.G.eq=[{id:'eq33',st:'locked',down:0,cover:null,perm:0},{id:'eq6',st:'used',down:0,cover:null,perm:0}];act(0);
+  must({a:'dual',st:1,ks:[K(1,B(3,2))],v:3});act(0);must({a:'dual',st:1,ks:[K(1,B(3,3))],v:3});exp(X.G.eq.find(e=>e.id==='eq6').st,'ready','Fuse Pinch after the Van Restock')});
+R('Pair Snip (9-9): on your turn solo-cut 2 identical wires from your hand even if more of that value remain uncut elsewhere.',()=>{
+  game(50,4);rig([[B(9,0),B(9,1),B(1)],[B(9,2),B(9,3),B(5)],[B(7)],[B(8)]]);ready('eq99');act(0);no({a:'solo',v:9},0);must({a:'solo',v:9,ep:1},0);exp(cutN(0),2,'wires cut')});
+R('Number Purge (10-10) is instant: it draws a random info token and everyone cuts every remaining wire of that value they hold.',()=>{
+  game(50,4);rig([[B(10,0),B(10,1),B(1),B(6,0)],[B(10,2),B(10,3),B(5),B(6,1)],[B(6,2),B(7)],[B(6,3),B(8)]]);X.G.eq=[{id:'eq1010',st:'locked',down:0,cover:null,perm:0}];
   for(const k of Object.keys(X.G.tokSup))X.G.tokSup[k]=k==='6'?1:0;act(0);must({a:'dual',st:1,ks:[K(1,B(10,2))],v:10});act(0);must({a:'dual',st:1,ks:[K(1,B(10,3))],v:10});
-  exp([0,1,2,3].reduce((a,s)=>a+sl(s).filter(x=>x.cut&&E.cv(x.id)===6).length,0),4,'sixes cut by the Vaporiser (token 6 drawn)')});
-R('Hook Line (11-11): point at a teammate\'s wire and take it unseen into your hand in sorted position; everyone sees where it left and arrived.',()=>{
-  game(55,4);rig([[B(2),B(9)],[B(4),B(6),B(11)],[B(1)],[B(3)]]);ready('eq1111');act(0);must({a:'eq',id:'eq1111',ts:1,tk:K(1,B(6)),s:0},0);
+  exp([0,1,2,3].reduce((a,s)=>a+sl(s).filter(x=>x.cut&&E.cv(x.id)===6).length,0),4,'sixes cut by the Number Purge (token 6 drawn)')});
+R('Long Grabber (11-11): point at a teammate\'s wire and take it unseen into your hand in sorted position; everyone sees where it left and arrived.',()=>{
+  game(50,4);rig([[B(2),B(9)],[B(4),B(6),B(11)],[B(1)],[B(3)]]);ready('eq1111');act(0);must({a:'eq',id:'eq1111',ts:1,tk:K(1,B(6)),s:0},0);
   exp([sl(0).map(x=>x.id),sl(1).map(x=>x.id)],[[B(2),B(6),B(9)],[B(4),B(11)]],'[taker stand,victim stand]')});
 
-R('Card 10 can be combined with the Twin Probe: two values against two wires; either value on either wire is a hit.',()=>{
+R('Card 10 can be combined with the Two-Prong Tester: two values against two wires; either value on either wire is a hit.',()=>{
   game(4,4);rig([[B(9),B(2),B(1)],[B(5),B(2,1),B(10)],[B(11)],[B(12)]]);ready('eq10');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(5)),K(1,B(2,1))],v:9,v2:2,two:'eq10',tool:'dd'});
   exp([sl(1)[K(1,B(2,1))].cut,sl(0)[K(0,B(2))].cut,X.G.dial],[1,1,d],'[2 cut,own 2 cut,dial]')});
-R('Card 22 (Lone Tag) may go on a wire that is already cut.',()=>{game(55,4);rig([[B(9),B(2,0)],[B(2,1),B(10)],[B(11)],[B(12)]]);sl(0)[K(0,B(9))].cut=1;ready('eq22');act(0);must({a:'eq',id:'eq22',s:0,k:K(0,B(9))},0)},{how:'"cut or not"'});
-R('Express Pass cuts exactly 2 identical wires even when you hold all 4 of the value.',()=>{game(55,4);rig([[B(9,0),B(9,1),B(9,2),B(9,3),B(1)],[B(5)],[B(7)],[B(8)]]);ready('eq99');act(0);must({a:'solo',v:9,ep:1},0);exp(cutN(0),2,'wires cut')});
-R('Damper with a probe: if every pointed wire is red nothing goes off, and no token is placed.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);ready('eq9');must({a:'eq',id:'eq9'},0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'},0);
+R('Card 22 (Only-One Pin) may go on a wire that is already cut.',()=>{game(50,4);rig([[B(9),B(2,0)],[B(2,1),B(10)],[B(11)],[B(12)]]);sl(0)[K(0,B(9))].cut=1;ready('eq22');act(0);must({a:'eq',id:'eq22',s:0,k:K(0,B(9))},0)},{how:'"cut or not"'});
+R('Pair Snip cuts exactly 2 identical wires even when you hold all 4 of the value.',()=>{game(50,4);rig([[B(9,0),B(9,1),B(9,2),B(9,3),B(1)],[B(5)],[B(7)],[B(8)]]);ready('eq99');act(0);must({a:'solo',v:9,ep:1},0);exp(cutN(0),2,'wires cut')});
+R('Blast Blanket with a probe: if every pointed wire is red nothing goes off, and no token is placed.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);ready('eq9');must({a:'eq',id:'eq9'},0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'},0);
   exp([!!X.G.over,sl(1).every(x=>!x.tok.length)],[false,true],'[over,no tokens]')});
-R('Triple Probe / Full Scan: a failure with one red among the pointed wires does not explode; the token goes on a non-red wire.',()=>{
+R('Fork Tester / Stand Scanner: a failure with one red among the pointed wires does not explode; the token goes on a non-red wire.',()=>{
   game(4,4);rig([[B(5,0),B(1)],[RD(3),B(2),B(9)],[B(3)],[B(4)]]);ready('eq3');act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1,2],v:5,tool:'eq3'},0);if(X.G.q)ans();
   exp([!!X.G.over,X.G.dial,sl(1)[K(1,RD(3))].tok.length],[false,d-1,0],'[over,dial,token on the red]')},{src:'G'});
-R('Card 11 (Coffee Break) cannot hand the turn to a player with no wires left.',()=>{game(4,4);rig([[B(5,0),B(1)],[],[B(5,1),B(2)],[B(3)]]);ready('eq11');act(0);no({a:'eq',id:'eq11',next:1},0)});
-R('Card 7 (Recharge) only works on characters whose personal item has been used.',()=>{game(4,4);rig(FOUR);ready('eq7');act(0);no({a:'eq',id:'eq7',who:[1]},0)});
+R('Card 11 (Hand-Off) cannot hand the turn to a player with no wires left.',()=>{game(4,4);rig([[B(5,0),B(1)],[],[B(5,1),B(2)],[B(3)]]);ready('eq11');act(0);no({a:'eq',id:'eq11',next:1},0)});
+R('Card 7 (Spare Batteries) only works on characters whose personal item has been used.',()=>{game(4,4);rig(FOUR);ready('eq7');act(0);no({a:'eq',id:'eq7',who:[1]},0)});
 
 // =====================================================================================
-S('11. Characters: the Twin Probe');
-R('Twin Probe: name a number and point at 2 wires on one teammate\'s stand (they need not be adjacent); it works if at least one is that number.',()=>{
+S('11. Characters: the Two-Prong Tester');
+R('Two-Prong Tester: name a number and point at 2 wires on one teammate\'s stand (they need not be adjacent); it works if at least one is that number.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(9,1),B(3),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[K(1,B(9,1)),K(1,B(10))],v:9,tool:'dd'});exp([sl(1)[K(1,B(9,1))].cut,sl(0)[K(0,B(9))].cut,X.G.dial],[1,1,d],'[match cut,own cut,dial]')});
-R('Twin Probe: if both wires match the teammate picks which one is cut, and says nothing more.',()=>{
+R('Two-Prong Tester: if both wires match the teammate picks which one is cut, and says nothing more.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(9,1),B(9,2),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp([X.G.q&&X.G.q.who,X.G.q&&X.G.q.opts.length],[1,2],'[chooser,options]');
   ans((o,i)=>i===1);exp([sl(1)[0].cut,sl(1)[1].cut],[0,1],'the chosen wire only')});
-R('Twin Probe: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.',()=>{
+R('Two-Prong Tester: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.',()=>{
   game(4,4);rig([[B(9),B(1)],[B(2),B(3),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.q&&X.G.q.opts.length,2,'tag choices');ans();
   exp([X.G.dial,sl(1).filter(x=>x.tok.length).length],[d-1,1],'[dial,tagged wires]')});
-R('Twin Probe: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.',()=>{
+R('Two-Prong Tester: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.',()=>{
   game(4,4);rig([[B(9),B(1)],[RD(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});if(X.G.q)ans();
   exp([!!X.G.over,X.G.dial,toks(1,K(1,B(4))),toks(1,K(1,RD(3)))],[false,d-1,['n:4'],[]],'[over,dial,token on non-red,token on red]')});
-R('Twin Probe: if one pointed wire is red and the other matches, the cut simply works (no explosion).',()=>{
+R('Two-Prong Tester: if one pointed wire is red and the other matches, the cut simply works (no explosion).',()=>{
   game(4,4);rig([[B(9),B(1)],[RD(3),B(9,1),B(10)],[B(11)],[B(12)]]);act(0);const d=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});if(X.G.q)ans();
   exp([!!X.G.over,sl(1)[K(1,B(9,1))].cut,sl(1)[K(1,RD(3))].cut,X.G.dial],[false,1,0,d],'[over,match cut,red cut,dial]')});
-R('Twin Probe: if both pointed wires are red the bomb explodes.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.over&&X.G.over.win,false,'lost')});
-R('The Twin Probe never names yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);no({a:'dual',st:1,ks:[0,1],v:'Y',tool:'dd'},0)});
+R('Two-Prong Tester: if both pointed wires are red the bomb explodes.',()=>{game(4,4);rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});exp(X.G.over&&X.G.over.win,false,'lost')});
+R('The Two-Prong Tester never names yellow.',()=>{game(4,4);rig([[YL(2),B(1)],[YL(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);no({a:'dual',st:1,ks:[0,1],v:'Y',tool:'dd'},0)});
 R('A personal item works once per mission (the character card turns face down).',()=>{game(4,4);rig([[B(9),B(9,3),B(1)],[B(9,1),B(9,2),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});ans();act(0);no({a:'dual',st:1,ks:[1,2],v:9,tool:'dd'},0)});
-R('Twin Probe: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand).',()=>{game(4,2);rig([[B(9),B(1)],[B(2),B(3)],[B(9,1),B(10)],[B(9,2),B(11)]]);act(0);
+R('Two-Prong Tester: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand).',()=>{game(4,2);rig([[B(9),B(1)],[B(2),B(3)],[B(9,1),B(10)],[B(9,2),B(11)]]);act(0);
   must({a:'dual',st:3,ks:[0,1],v:9,tool:'dd'});exp([cutN(2),cutN(3)],[0,1],'[stand 3 cuts,stand 4 cuts] (the 11 was not touched)')},{how:'a single move names a single stand'});
-R('The new characters (Pocket Sweep, Handsets, Triple Probe, Two-Value Probe) appear from mission 31, for non-captains only; the Captain keeps the Captain card.',()=>{
-  game(31,4,{chars:{1:'ch_new1',2:'ch_new3',3:'ch_new4'}});exp(X.G.seats.map(s=>s.ch),['ch_captain','ch_new1','ch_new3','ch_new4'],'cards');
-  game(30,4,{chars:{1:'ch_new1'}});yes(X.G.seats[1].ch!=='ch_new1','no new character before mission 31',X.G.seats[1].ch)});
-R('The Pocket Sweep character item works like card 8 (once per mission, any time).',()=>{game(31,4,{chars:{1:'ch_new1'}});clean();rig([[B(5)],[RD(7),B(9)],[B(7),B(10)],[B(11)]]);act(0);must({a:'item',k:'sweep',v:7},1);exp(X.G.ann.find(a=>a.k==='sweep').res.map(r=>r.yes),[0,0,1,0],'answers');no({a:'item',k:'sweep',v:7},1)});
-R('The Pocket Triple Probe item works like card 3 (3 wires, your turn, once per mission).',()=>{game(31,4,{chars:{1:'ch_new3'}});clean();rig([[B(1)],[B(5,0),B(2)],[B(5,1),B(8),B(9),B(11)],[B(12)]]);act(1);const d=X.G.dial;must({a:'dual',st:2,ks:[0,1,2],v:5,tool:'pt3'},1);
+R('The new characters (Pocket Roll Call, Swap Bag, Fork Tester, Either-Or Meter) appear from mission 31, for non-captains only; the Captain keeps the Captain card.',()=>{
+  game(38,4,{chars:{1:'ch_new1',2:'ch_new3',3:'ch_new4'}});exp(X.G.seats.map(s=>s.ch),['ch_captain','ch_new1','ch_new3','ch_new4'],'cards');
+  game(24,4,{chars:{1:'ch_new1'}});yes(X.G.seats[1].ch!=='ch_new1','no new character before mission 31',X.G.seats[1].ch)});
+R('The Pocket Roll Call character item works like card 8 (once per mission, any time).',()=>{game(38,4,{chars:{1:'ch_new1'}});clean();rig([[B(5)],[RD(7),B(9)],[B(7),B(10)],[B(11)]]);act(0);must({a:'item',k:'sweep',v:7},1);exp(X.G.ann.find(a=>a.k==='sweep').res.map(r=>r.yes),[0,0,1,0],'answers');no({a:'item',k:'sweep',v:7},1)});
+R('The Pocket Fork Tester item works like card 3 (3 wires, your turn, once per mission).',()=>{game(38,4,{chars:{1:'ch_new3'}});clean();rig([[B(1)],[B(5,0),B(2)],[B(5,1),B(8),B(9),B(11)],[B(12)]]);act(1);const d=X.G.dial;must({a:'dual',st:2,ks:[0,1,2],v:5,tool:'pt3'},1);
   exp([sl(2)[K(2,B(5,1))].cut,X.G.dial],[1,d],'[match cut,dial]');act(1);no({a:'dual',st:2,ks:[1,2,3],v:5,tool:'pt3'},1)});
-R('The Pocket Two-Value Probe item works like card 10 (two values, once per mission).',()=>{game(31,4,{chars:{1:'ch_new4'}});clean();rig([[B(1)],[B(9),B(2)],[B(2,1),B(5),B(10)],[B(12)]]);act(1);must({a:'dual',st:2,ks:[K(2,B(2,1))],v:9,v2:2,two:'pt10'},1);
+R('The Pocket Either-Or Meter item works like card 10 (two values, once per mission).',()=>{game(38,4,{chars:{1:'ch_new4'}});clean();rig([[B(1)],[B(9),B(2)],[B(2,1),B(5),B(10)],[B(12)]]);act(1);must({a:'dual',st:2,ks:[K(2,B(2,1))],v:9,v2:2,two:'pt10'},1);
   exp([sl(2)[K(2,B(2,1))].cut,sl(1)[K(1,B(2))].cut],[1,1],'[target cut,own 2 cut]');act(1);no({a:'dual',st:2,ks:[0],v:9,v2:2,two:'pt10'},1)});
-R('The Pocket Handsets item works like card 2 (swap with a teammate, once per mission).',()=>{game(31,4,{chars:{1:'ch_new2'}});clean();rig([[B(2),B(6)],[B(4),B(8)],[B(1)],[B(3)]]);act(0);must({a:'item',k:'handsets',s:1,k2:K(1,B(4)),to:0},1);ans(o=>o.d.ru===sl(0)[K(0,B(6))].u);
+R('The Pocket Swap Bag item works like card 2 (swap with a teammate, once per mission).',()=>{game(38,4,{chars:{1:'ch_new2'}});clean();rig([[B(2),B(6)],[B(4),B(8)],[B(1)],[B(3)]]);act(0);must({a:'item',k:'handsets',s:1,k2:K(1,B(4)),to:0},1);ans(o=>o.d.ru===sl(0)[K(0,B(6))].u);
   exp([sl(1).map(x=>x.id),sl(0).map(x=>x.id)],[[B(6),B(8)],[B(2),B(4)]],'[seat 1,seat 0]')});
 
 // =====================================================================================
 S('12. Restriction cards A to L (campaign)');
-function con(letter,fn){game(32,4);rig([[B(2,0),B(5,0),B(8,0),B(11,0),YL(4)],[B(2,1),B(5,1),B(8,1),B(11,1),YL(8)],[B(3),B(4),B(9)],[B(6),B(7),B(10)]]);X.G.ms.gcon=null;X.G.seats[0].con=letter;act(0);fn()}
+function con(letter,fn){game(58,4);rig([[B(2,0),B(5,0),B(8,0),B(11,0),YL(4)],[B(2,1),B(5,1),B(8,1),B(11,1),YL(8)],[B(3),B(4),B(9)],[B(6),B(7),B(10)]]);X.G.ms.gcon=null;X.G.seats[0].con=letter;act(0);fn()}
 const cutV=(v,st)=>({a:'dual',st:st==null?1:st,ks:[sl(st==null?1:st).findIndex(x=>E.cv(x.id)===v)],v});
 R('Restriction A: you may only cut even values.',()=>{con('A',()=>{no(cutV(5),0);must(cutV(8),0)})});
 R('Restriction B: you may only cut odd values.',()=>{con('B',()=>{no(cutV(8),0);must(cutV(5),0)})});
@@ -350,18 +350,18 @@ R('Restriction D: you may only cut values 7 to 12.',()=>{con('D',()=>{no(cutV(5)
 R('Restriction E: you may only cut values 4 to 9.',()=>{con('E',()=>{no(cutV(2),0);no(cutV(11),0);must(cutV(5),0)})});
 R('Restriction F: you may NOT cut values 4 to 9.',()=>{con('F',()=>{no(cutV(5),0);no(cutV(8),0);must(cutV(2),0)})});
 R('Restriction G: no equipment cards and no personal item.',()=>{con('G',()=>{ready('eq6');X.G.dial=2;no({a:'eq',id:'eq6'},0);no({a:'dual',st:1,ks:[0,1],v:2,tool:'dd'},0)})});
-R('Restriction H: a failed cut places no token; you may not cut a wire that has a token; no Sticky Note.',()=>{con('H',()=>{ready('eq4');no({a:'eq',id:'eq4',s:0,k:1},0);const d=X.G.dial;must({a:'dual',st:1,ks:[sl(1).findIndex(x=>E.cv(x.id)===8)],v:5},0);
+R('Restriction H: a failed cut places no token; you may not cut a wire that has a token; no Chalk Mark.',()=>{con('H',()=>{ready('eq4');no({a:'eq',id:'eq4',s:0,k:1},0);const d=X.G.dial;must({a:'dual',st:1,ks:[sl(1).findIndex(x=>E.cv(x.id)===8)],v:5},0);
   exp([X.G.dial,sl(1).every(x=>!x.tok.length)],[d-1,true],'[dial,no token]');act(0);sl(1)[0].tok.push({t:'n',v:2});no({a:'dual',st:1,ks:[0],v:2},0)})});
 R('Restriction I: you may not cut the right-most wire of a teammate\'s stand.',()=>{con('I',()=>{const last=sl(1).length-1;no({a:'dual',st:1,ks:[last],v:5},0);must({a:'dual',st:1,ks:[K(1,B(5,1))],v:5},0)})});
 R('Restriction J: you may not cut the left-most wire of a teammate\'s stand.',()=>{con('J',()=>{no({a:'dual',st:1,ks:[0],v:2},0);must({a:'dual',st:1,ks:[K(1,B(5,1))],v:5},0)})});
-R('Restriction K: you may not Solo Cut.',()=>{game(32,4);rig([[B(7,0),B(7,1),B(7,2),B(7,3),B(1)],[B(2)],[B(3)],[B(4)]]);X.G.ms.gcon=null;X.G.seats[0].con='K';act(0);no({a:'solo',v:7},0)});
+R('Restriction K: you may not Solo Cut.',()=>{game(58,4);rig([[B(7,0),B(7,1),B(7,2),B(7,3),B(1)],[B(2)],[B(3)],[B(4)]]);X.G.ms.gcon=null;X.G.seats[0].con='K';act(0);no({a:'solo',v:7},0)});
 R('Restriction L: if your cut fails the fuse advances 2 steps instead of 1.',()=>{con('L',()=>{const d=X.G.dial;must({a:'dual',st:1,ks:[sl(1).findIndex(x=>E.cv(x.id)===8)],v:5},0);exp(X.G.dial,d-2,'dial')})});
-R('Restrictions never stop Reveal Reds, and yellow breaks A to E and passes F.',()=>{game(32,4);rig([[RD(3),RD(5)],[B(5,1),B(2)],[B(3)],[B(7)]]);X.G.ms.gcon=null;X.G.seats[0].con='A';act(0);must({a:'reveal'},0);
+R('Restrictions never stop Reveal Reds, and yellow breaks A to E and passes F.',()=>{game(58,4);rig([[RD(3),RD(5)],[B(5,1),B(2)],[B(3)],[B(7)]]);X.G.ms.gcon=null;X.G.seats[0].con='A';act(0);must({a:'reveal'},0);
   con('A',()=>no({a:'dual',st:1,ks:[sl(1).findIndex(x=>E.cv(x.id)==='Y')],v:'Y'},0));con('F',()=>must({a:'dual',st:1,ks:[sl(1).findIndex(x=>E.cv(x.id)==='Y')],v:'Y'},0))},{src:'G'});
 
 // =====================================================================================
 S('13. Challenge cards 1 to 10 (campaign)');
-function chal(id,stands,hist){game(55,4);rig(stands);X.G.dial=3;X.G.ms.chal=[{id,nums:id===8?[5,6]:undefined}];X.G.ms.chalOut=[];X.G.ms.chalDone=[];X.G.hist=hist||[];act(0)}
+function chal(id,stands,hist){game(50,4);rig(stands);X.G.dial=3;X.G.ms.chal=[{id,nums:id===8?[5,6]:undefined}];X.G.ms.chalOut=[];X.G.ms.chalDone=[];X.G.hist=hist||[];act(0)}
 // stand 2 gets `ids` (sorted), the listed indexes already cut; seat 0 then cuts `finalId` on stand 2 by naming value `v`
 function chalCut(id,ids,pre,finalId,v){chal(id,[[B(v,1),B(12,3)],[B(11,3)],ids,[B(10,3)]]);pre.forEach(k=>{sl(2)[k].cut=1});X.G.tot[v]=(X.G.tot[v]||0);
   const stage=sl(2).filter(x=>x.cut).map(x=>E.cv(x.id));for(const c of stage)X.G.tot[c]=(X.G.tot[c]||0);must({a:'dual',st:2,ks:[K(2,finalId)],v},0)}

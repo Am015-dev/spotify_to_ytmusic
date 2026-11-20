@@ -196,7 +196,7 @@ AG.ready=()=>{if(G.over||G.tfx.wait)return;if(G.tfx.skip||G.tfx.acted){G.step='e
   G.step='act';checkStuck()};
 function checkStuck(){if(mainMoves(G.actor,true).length)return;
   if(hookAny('stuck',G.actor))return;lg(`${SP(G.actor).nm} has no legal cut left.`,'bad');
-  if(![9,16,36].includes(G.mission)){skipTurn('no legal cut (no fuse step: only jobs 9, 16 and 36 blow the bomb)',0);return}   // the FAQ names the explosion only for job 9 (16 shares its gate; 36 kept per the audit); W391
+  if(!(hasRule(G.mission,'gate')||hasRule(G.mission,'line5'))){skipTurn('no legal cut (no fuse step: only order-card and line jobs blow the bomb)',0);return}   // the FAQ names the explosion for the order-card rule; the line rule kept per the audit; W391
   explode('a crew member had no legal cut left (the bomb goes off, as the rules say for a hand that cannot be cut)')}
 function endAction(){G.tfx.acted=1;G.blockRun=0;if(G.step==='act'){G.step='end';schedEnd()}}
 function skipTurn(why,dial){G.tfx.acted=1;G.tfx.skipped=1;G.hist.push({seat:G.actor,kind:'skip',turn:G.turn});lg(`${SP(G.actor).nm} skips: ${why}.`);if(dial)advance(dial,'skipped turn');finishSkip()}
@@ -234,13 +234,13 @@ function checkUnlocks(){for(const e of G.eq){if(e.cover!=null&&cutCount(e.cover)
     if(e.st!=='locked'||e.down)continue;const E=EQUIP[e.id];if(e.cover!=null)continue;if(cutCount(E.v)>=E.need){unlockEq(e)}}}
 function unlockEq(e){e.st='ready';e.down=0;const E=EQUIP[e.id];lg(`${E.n} is unlocked.`,'good');if(E.timing==='instant')now('instant',{id:e.id})}
 AG.instant=d=>{const e=G.eq.find(x=>x.id===d.id&&x.st==='ready');if(!e)return;e.st='used';G.stats.eqUse++;const k=EQUIP[d.id].kind;
-  if(k==='more'){const add=G.eqPool.splice(0,2);lg(`Hidden Compartment: ${add.length} more equipment card${add.length===1?'':'s'} join the job.`,'good');for(const id of add)G.eq.push({id,st:'locked',down:0,cover:null,perm:0});checkUnlocks()}
-  else if(k==='refresh'){let n=0;for(const x of G.eq)if(x.st==='used'&&x!==e){x.st='ready';n++}lg(`Supply Drop: ${n} used card${n===1?'':'s'} work again.`,'good')}
+  if(k==='more'){const add=G.eqPool.splice(0,2);lg(`False Bottom: ${add.length} more equipment card${add.length===1?'':'s'} join the job.`,'good');for(const id of add)G.eq.push({id,st:'locked',down:0,cover:null,perm:0});checkUnlocks()}
+  else if(k==='refresh'){let n=0;for(const x of G.eq)if(x.st==='used'&&x!==e){x.st='ready';n++}lg(`Van Restock: ${n} used card${n===1?'':'s'} work again.`,'good')}
   else if(k==='vapor'){vaporise()}};
 function vaporise(){const bag=[];for(const k in G.tokSup)if(k!=='Y')for(let i=0;i<G.tokSup[k];i++)bag.push(+k);shuffle(bag);
   let v=null;while(bag.length){const x=bag.shift();if(remaining(x)>0){v=x;break}}
-  if(v==null){lg('Vaporiser: no usable token in the supply; nothing happens.');return}
-  const hit=allSlots().filter(x=>!x.sl.cut&&cv(x.sl.id)===v);for(const x of hit)cutSlot(x.sl);lg(`Vaporiser draws ${v}: every uncut ${v} on the stands is cut (${hit.length}).`,'good');afterCut({seat:G.actor,v,n:hit.length,kind:'mass',ok:1})}
+  if(v==null){lg('Number Purge: no usable token in the supply; nothing happens.');return}
+  const hit=allSlots().filter(x=>!x.sl.cut&&cv(x.sl.id)===v);for(const x of hit)cutSlot(x.sl);lg(`Number Purge draws ${v}: every uncut ${v} on the stands is cut (${hit.length}).`,'good');afterCut({seat:G.actor,v,n:hit.length,kind:'mass',ok:1})}
 // ---------- restrictions (constraint cards) ----------
 function consOf(seat){const o=[];const p=SP(seat);if(p.con&&!p.conDown&&(!G.ms.mole||(p.role==='weak'&&G.ms.mole.hidden)))o.push(p.con);if(G.ms.gcon)o.push(G.ms.gcon);return o}
 function conFlag(seat,f){return consOf(seat).some(c=>CONSTRAINTS[c][f])}
@@ -271,7 +271,7 @@ function legalDual(seat,m){if(G.step!=='act'||seat!==G.actor||G.tfx.acted)return
   if(!targetsOK(seat,m.st))return 'pick a crewmate stand';if(!Array.isArray(m.ks)||!m.ks.length||new Set(m.ks).size!==m.ks.length)return 'pick wires';
   const tool=m.tool||null,two=m.two||null;
   if(tool&&!['dd','eq3','pt3','eq5'].includes(tool))return 'unknown probe';if(two&&!['eq10','pt10'].includes(two))return 'unknown probe';
-  if(tool==='dd'&&!itemOK(seat,'dd'))return 'Twin Probe not available';if(tool==='pt3'&&!itemOK(seat,'pt3'))return 'probe not available';
+  if(tool==='dd'&&!itemOK(seat,'dd'))return 'Two-Prong Tester not available';if(tool==='pt3'&&!itemOK(seat,'pt3'))return 'probe not available';
   if((tool==='eq3'||tool==='eq5')&&!eqOK(seat,tool))return 'card not available';
   if(two==='eq10'&&!eqOK(seat,'eq10'))return 'card not available';if(two==='pt10'&&!itemOK(seat,'pt10'))return 'probe not available';
   const ctx={tool:tool||two,kind:'dual',m};
@@ -288,8 +288,8 @@ function doDual(seat,m){const tool=m.tool||null,two=m.two||null;const vals=[m.v]
   hook('pay',seat,m.v,m);
   if(tool==='dd'||tool==='pt3')useItem(seat);if(two==='pt10')useItem(seat);if(tool==='eq3'||tool==='eq5')useEq(tool);if(two==='eq10')useEq('eq10');
   G.stats.dual++;const T=m.ks.map(k=>G.st[m.st].w[k]);const owner=ownerOf(m.st);
-  const tn=tool==='dd'?'Twin Probe':tool==='eq3'||tool==='pt3'?'Triple Probe':tool==='eq5'?'Full Scan':'';
-  lg(`${SP(seat).nm} points at ${T.length>1?T.length+' wires':'a wire'} of ${SP(owner).nm} and says "${vals.map(VN).join(' or ')}"${tn?' ('+tn+(two?' + Two-Value':'')+')':two?' (Two-Value Probe)':''}.`);
+  const tn=tool==='dd'?'Two-Prong Tester':tool==='eq3'||tool==='pt3'?'Fork Tester':tool==='eq5'?'Stand Scanner':'';
+  lg(`${SP(seat).nm} points at ${T.length>1?T.length+' wires':'a wire'} of ${SP(owner).nm} and says "${vals.map(VN).join(' or ')}"${tn?' ('+tn+(two?' + Two-Value':'')+')':two?' (Either-Or Meter)':''}.`);
   if((tool||two)&&hasRule(G.mission,'redTriple')&&T.some(sl=>isRed(sl.id))){explode(`${SP(seat).nm}'s probe pointed at a red wire (equipment cannot choose reds)`);return}
   const match=T.filter(sl=>vals.includes(cv(sl.id)));
   const ctx={seat,st:m.st,us:T.map(x=>x.u),vals,v:m.v,tool,two,own:m.own,ownFlip:m.own==='flip',fu:m.fu};
@@ -306,7 +306,7 @@ QH.dualHit=d=>{const f=findU(d.u);const v=cv(f.sl.id);const seat=d.seat;
 function dualMiss(d){const seat=d.seat;const T=d.us.map(u=>findU(u));const owner=ownerOf(d.st);
   const damper=!!G.tfx.damper;
   if(d.ownFlip){explode(`${SP(seat).nm} missed while cutting their own flipped wire`);return}
-  if(T.every(x=>isRed(x.sl.id))){if(damper){lg(`The Damper smothers it: that was red! Nothing happens.`,'good');G.stats.miss++;afterMiss({seat,v:d.v,kind:'dual'});endAction();return}
+  if(T.every(x=>isRed(x.sl.id))){if(damper){lg(`The Blast Blanket smothers it: that was red! Nothing happens.`,'good');G.stats.miss++;afterMiss({seat,v:d.v,kind:'dual'});endAction();return}
     explode(`${SP(seat).nm} pointed at ${T.length>1?'only red wires':'a red wire'}`);return}
   G.stats.miss++;for(const x of T){for(const v of d.vals)if(!x.sl.not.includes(v))x.sl.not.push(v)}
   const boom=hookAny('missExplode',{seat,owner,d});if(boom&&!damper){explode(boom);return}
@@ -314,22 +314,22 @@ function dualMiss(d){const seat=d.seat;const T=d.us.map(u=>findU(u));const owner
   lg(`Miss: none of those is ${d.vals.map(VN).join(' or ')}.`,'bad');
   const silent=conFlag(seat,'silent')||conFlag(owner,'silent');
   const nonRed=T.filter(x=>!isRed(x.sl.id));
-  const fin=()=>{if(damper)lg('The Damper holds the fuse still.','good');else advance(steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat,v:d.v,kind:'dual'});if(!G.q&&!G.over)endAction();else if(!G.over)G.tfx.endAfterQ=1};
+  const fin=()=>{if(damper)lg('The Blast Blanket holds the fuse still.','good');else advance(steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat,v:d.v,kind:'dual'});if(!G.q&&!G.over)endAction();else if(!G.over)G.tfx.endAfterQ=1};
   if(silent||G.tokFam==='none'){fin();return}
   if(nonRed.length>1){ask(owner,'tagPick','Choose which pointed wire gets the info token',nonRed.map(x=>({l:`Tag slot ${x.k+1}`,h:'tagMiss',d:{u:x.sl.u,called:d.v,seat,steps,damper:damper?1:0}})));G.tfx.missFin={steps,damper:damper?1:0,v:d.v};return}
   const x=nonRed[0];putTok(x.s,x.sl,trueTok(x.s,x.sl,d.v));fin()}
-QH.tagMiss=d=>{const f=findU(d.u);putTok(f.s,f.sl,trueTok(f.s,f.sl,d.called));if(d.damper)lg('The Damper holds the fuse still.','good');else advance(d.steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat:d.seat,v:d.called,kind:'dual'});endAction()};
+QH.tagMiss=d=>{const f=findU(d.u);putTok(f.s,f.sl,trueTok(f.s,f.sl,d.called));if(d.damper)lg('The Blast Blanket holds the fuse still.','good');else advance(d.steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat:d.seat,v:d.called,kind:'dual'});endAction()};
 // ---------- solo cut ----------
 function legalSolo(seat,m){if(G.step!=='act'||seat!==G.actor||G.tfx.acted)return 'not your action now';if(conFlag(seat,'noSolo'))return 'restriction: no solo cut';
   const r=canName(seat,m.v,{kind:'solo',m});if(r)return r;const h=heldVals(seat)[m.v]||0;const R=remaining(m.v);
-  if(m.ep){if(!eqOK(seat,'eq99'))return 'Express Pass not available';if(h<2)return 'you need two of that value';return hookAny('legalCut',seat,m,[m.v])||''}
+  if(m.ep){if(!eqOK(seat,'eq99'))return 'Pair Snip not available';if(h<2)return 'you need two of that value';return hookAny('legalCut',seat,m,[m.v])||''}
   if(m.flip){if(!ownFlipSlot(seat,m.fu))return 'name one of your uncut flipped wires (fu)';if(h+1!==R||(R!==2&&R!==4))return 'the rest of that value is not all yours'}
   else if(h!==R||(R!==2&&R!==4))return 'all remaining wires of that value must be in your hand (all 4, or the last 2)';
   return hookAny('legalCut',seat,m,[m.v])||''}
 function doSolo(seat,m){hook('pay',seat,m.v,m);let own=uncutOf(seat).filter(x=>!x.sl.flip&&cv(x.sl.id)===m.v&&!(x.sl.x&&xLocked()));
   if(m.ep){useEq('eq99');own=own.slice(0,2)}
   if(m.flip){const fl=findU(m.fu);if(cv(fl.sl.id)!==m.v){explode(`${SP(seat).nm} solo-cut their flipped wire and it was not ${VN(m.v)}`);return}own.push(fl)}
-  for(const x of own)cutSlot(x.sl);G.stats.solo++;lg(`${SP(seat).nm} solo-cuts ${own.length} × ${VN(m.v)}${m.ep?' (Express Pass)':''}.`,'good');
+  for(const x of own)cutSlot(x.sl);G.stats.solo++;lg(`${SP(seat).nm} solo-cuts ${own.length} × ${VN(m.v)}${m.ep?' (Pair Snip)':''}.`,'good');
   const ev={seat,v:m.v,n:own.length,kind:'solo',ok:1};afterCut(ev);if(G.over)return;hook('afterSolo',ev);if(!G.q&&!G.over)endAction();else if(!G.over)G.tfx.endAfterQ=1}
 // ---------- move lists ----------
 function teamStands(seat){return G.st.filter(s=>ownerOf(s.i)!==seat).map(s=>s.i)}
@@ -430,17 +430,17 @@ function doEq(seat,m){const E=EQUIP[m.id];useEq(m.id);lg(`${SP(seat).nm} uses ${
   case 'eq1':case 'eq12':{const w=G.st[m.s].w;G.marks.push({t:m.id==='eq1'?'neq':'eq',a:w[m.k].u,b:w[m.k+1].u});break}
   case 'eq2':startSwap(seat,m.s,m.k,m.to);break;
   case 'eq4':{const a=G.st[m.s].w[m.k];const tok=G.tokFam==='false'?mkTok('f',m.fv):trueTok(m.s,a);putTok(m.s,a,tok);break}
-  case 'eq6':rewind(1,'Rewind');break;
+  case 'eq6':rewind(1,'Fuse Pinch');break;
   case 'eq7':for(const i of m.who)SP(i).chUsed=0;lg(`${m.who.map(i=>SP(i).nm).join(' and ')} can use their tool again.`);break;
   case 'eq8':sweep(m.v,seat);break;
-  case 'eq9':G.tfx.damper=1;lg('The Damper is armed for this turn\'s dual cut.');break;
+  case 'eq9':G.tfx.damper=1;lg('The Blast Blanket is armed for this turn\'s dual cut.');break;
   case 'eq11':G.tfx.coffee=m.next;lg(`${SP(seat).nm} takes a coffee break; ${SP(m.next).nm} goes next.`);G.hist.push({seat,kind:'coffee',turn:G.turn});hook('coffee',seat);if(!G.over)endAction();break;
   case 'eq22':{G.st[m.s].w[m.k].tok.push({t:'c',v:1});break}
   case 'eq1111':{const t=G.st[m.ts].w.splice(m.tk,1)[0];const from=ownerOf(m.ts);const k=insertSlot(m.s,t);lg(`${SP(seat).nm} hooks a wire from ${SP(from).nm} into stand ${m.s+1}, slot ${k+1}.`);dropStaleAnn(m.ts);dropStaleAnn(m.s);break}}}
 function doItem(seat,m){useItem(seat);lg(`${SP(seat).nm} uses ${ITEMS[m.k].n}.`,'eq');if(m.k==='sweep')sweep(m.v,seat);else startSwap(seat,m.s,m.k2,m.to)}
-// a Sweep: every stand answers yes/no for uncut blue wires of v (X wires ignored)
+// a Roll Call: every stand answers yes/no for uncut blue wires of v (X wires ignored)
 function sweep(v,by){const res=G.st.map(s=>({st:s.i,yes:s.w.some(x=>!x.cut&&!x.x&&!x.flip&&WIRES[x.id].c==='b'&&cv(x.id)===v)?1:0,us:s.w.filter(x=>!x.cut&&!x.x&&!x.flip).map(x=>x.u)}));
-  G.ann.push({k:'sweep',by,v,res,turn:G.turn});lg(`Sweep for ${v}: ${res.map(r=>`${SP(ownerOf(r.st)).nm}${standsOf(ownerOf(r.st)).length>1?' (stand '+(r.st+1)+')':''} ${r.yes?'yes':'no'}`).join(', ')}.`)}
+  G.ann.push({k:'sweep',by,v,res,turn:G.turn});lg(`Roll Call for ${v}: ${res.map(r=>`${SP(ownerOf(r.st)).nm}${standsOf(ownerOf(r.st)).length>1?' (stand '+(r.st+1)+')':''} ${r.yes?'yes':'no'}`).join(', ')}.`)}
 function dropStaleAnn(si){for(const a of G.ann)if(a.k==='side'&&a.st===si)a.stale=1}
 // sorted insert: before the first sorted wire with a higher sort value (X / flipped wires stay at the ends)
 function insertSlot(si,sl){const w=G.st[si].w;let lo=0,hi=w.length;while(lo<hi&&w[lo].flip)lo++;while(hi>lo&&(w[hi-1].x||w[hi-1].flip))hi--;
@@ -507,7 +507,7 @@ RH.redTriple={noReveal(){return true},forcedStart(r,seat){const u=uncutOf(seat);
   legalX(r,m,seat){if(m.kind!=='red3')return 'not this job';if(!(G.np>=4||holdsColour(seat,'R')))return 'you need a red in hand to try this';return legalMulti(seat,m,3,true)},
   doX(r,m,seat){doMulti(seat,m,'R','red','explode')},pub(){return {dealt:G.ms.dealt}}};
 // ---------- 14, 17, 28: roles ----------
-RH.rookie={missExplode(r,c){return SP(c.seat).role==='rookie'?`the rookie (${SP(c.seat).nm}) missed a dual cut`:null},eqBan(r,seat,id){return SP(seat).role==='rookie'&&id==='eq9'?'the rookie may not use the Damper':null},pub(){return {rookie:G.seats.findIndex(s=>s.role==='rookie')}}};
+RH.rookie={missExplode(r,c){return SP(c.seat).role==='rookie'?`the rookie (${SP(c.seat).nm}) missed a dual cut`:null},eqBan(r,seat,id){return SP(seat).role==='rookie'&&id==='eq9'?'the rookie may not use the Blast Blanket':null},pub(){return {rookie:G.seats.findIndex(s=>s.role==='rookie')}}};
 RH.liar={eqBan(r,seat){return SP(seat).role==='liar'?'the fibber may not use equipment':null},pub(){return {liar:G.seats.findIndex(s=>s.role==='liar')}}};
 RH.butterfingers={missExplode(r,c){return c.seat===G.captain?'the foreman fumbled a dual cut':null},eqBan(r,seat){return seat===G.captain?'the foreman may not use equipment':null}};
 // ---------- 15: equipment revealed by a number deck ----------
@@ -702,15 +702,15 @@ RH.oxygen={setup(r){const np=G.np;G.ms.ox={res:0,v:r.variant};
   pay(r,seat,v,m){const c=oxCost(r,v);if(r.variant==='shared'){G.ms.ox.res-=c;SP(seat).ox+=c}else if(r.variant==='gift'){SP(seat).ox-=c;SP(m.oxTo).ox+=c}else{SP(seat).ox-=c;G.ms.ox.res+=c}lg(`${SP(seat).nm} spends ${c} oxygen.`)},
   round(r){if(r.variant==='shared'){G.ms.ox.res=2*G.np;G.seats.forEach(s=>s.ox=0);lg('The reserve is refilled: all oxygen is back in the middle.')}
     if(r.variant==='bundle'&&G.ms.ox.res){const to=clockFrom(G.captain).find(q=>hasWires(q));if(to!=null){SP(to).ox+=G.ms.ox.res;lg(`${SP(to).nm} collects ${G.ms.ox.res} oxygen from the reserve.`);G.ms.ox.res=0}}},
-  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;if(eqOK(seat,'eq9')&&ask(seat,'stuckDamper','You cannot pay: use the Damper to ignore the fuse step?',[{l:'Use the Damper (no step)',h:'stuckDamper',d:{seat,use:1}},{l:'Skip and burn a step',h:'stuckDamper',d:{seat,use:0}}]))return true;skipTurn('not enough oxygen',1);return true},
+  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;if(eqOK(seat,'eq9')&&ask(seat,'stuckDamper','You cannot pay: use the Blast Blanket to ignore the fuse step?',[{l:'Use the Blast Blanket (no step)',h:'stuckDamper',d:{seat,use:1}},{l:'Skip and burn a step',h:'stuckDamper',d:{seat,use:0}}]))return true;skipTurn('not enough oxygen',1);return true},
   moves(r,seat){return r.variant==='shared'||r.variant==='gift'?[{a:'pass',pass:1}]:[]},acts:['pass'],
   legalX(r,m,seat){return G.step==='act'&&seat===G.actor&&!G.tfx.acted&&(r.variant==='shared'||r.variant==='gift')?'':'you may not pass'},
-  doX(r,m,seat){G.tfx.acted=1;G.hist.push({seat,kind:'skip',turn:G.turn});lg(`${SP(seat).nm} passes.`);if(G.tfx.damper)lg('The Damper cancels the step.');else advance(1,'passing');if(!G.over){G.step='end';schedEnd()}},
+  doX(r,m,seat){G.tfx.acted=1;G.hist.push({seat,kind:'skip',turn:G.turn});lg(`${SP(seat).nm} passes.`);if(G.tfx.damper)lg('The Blast Blanket cancels the step.');else advance(1,'passing');if(!G.over){G.step='end';schedEnd()}},
   end(r,seat){if(r.variant==='bundle'&&SP(seat).ox){let to=leftOf(seat);let g=0;while(!hasWires(to)&&to!==seat&&g++<G.np)to=leftOf(to);if(to!==seat){SP(to).ox+=SP(seat).ox;SP(seat).ox=0}}
     if(r.variant==='gift')for(const s of G.seats)if(!hasWires(s.i)&&s.ox){G.ms.ox.lost=(G.ms.ox.lost||0)+s.ox;s.ox=0}},
   valid(r){if(r.variant!=='depth')return;for(const s of clockFrom(G.captain))if(G.ms.ox.res>0){G.ms.ox.res--;SP(s).ox++}lg('Fresh air: everyone takes one oxygen from the reserve (while it lasts).')},
   pub(r){return {res:G.ms.ox.res,v:r.variant,seats:G.seats.map(s=>s.ox)}}};
-QH.stuckDamper=d=>{if(d.use){useEq('eq9');lg('The Damper cancels the step.','good');skipTurn('not enough oxygen',0)}else skipTurn('not enough oxygen',1)};
+QH.stuckDamper=d=>{if(d.use){useEq('eq9');lg('The Blast Blanket cancels the step.','good');skipTurn('not enough oxygen',0)}else skipTurn('not enough oxygen',1)};
 // ---------- 45: volunteers ----------
 RH.volunteer={setup(){G.ms.vol={deck:shuffle(NUMS.slice()),disc:[],v:null,who:null}},noForced(){return true},
   start(r,seat){const s=G.ms.vol;s.who=null;const v=drawNum(s);if(v==null){for(const q of G.seats){const u=uncutOf(q.i);if(u.length&&u.every(x=>isRed(x.sl.id))){for(const x of u)cutSlot(x.sl);lg(`${q.nm} reveals their reds.`)}}G.tfx.skip=1;checkWin();if(!G.over&&!G.seats.some(q=>hasWires(q.i)&&uncutOf(q.i).some(x=>!isRed(x.sl.id))))explode('no number card is left to call');return}s.v=v;s.disc.push(v);lg(`${SP(G.captain).nm} turns up ${v}: who calls it?`);G.tfx.wait=1;G.step='snip'},
@@ -906,6 +906,6 @@ function saveGame(){try{localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function loadGame(){try{const s=localStorage.getItem(SAVE);if(s){G=JSON.parse(s);return true}}catch(e){}return false}
 // real-time jobs: the UI calls tick(seconds) with real elapsed play time (pause it during narration); headless runs add opts.turnSec per turn
 function tick(dt){if(!G||G.over||G.phase!=='turn')return;G.clock+=dt;if(!G.q)hook('tick');flow();if(typeof refresh==='function'&&!UI.sim)refresh()}
-function describeMove(m){if(!m)return '';switch(m.a){case 'dual':return `dual cut ${VN(m.v)}${m.v2!=null?'/'+VN(m.v2):''} at ${SP(ownerOf(m.st)).nm} stand ${m.st+1} slot${m.ks.length>1?'s':''} ${m.ks.map(k=>k+1).join(',')}${m.tool?' with '+(m.tool==='dd'?'Twin Probe':EQUIP[m.tool]?EQUIP[m.tool].n:'Triple Probe'):''}${m.own==='flip'?' using your flipped wire':''}`;
-  case 'solo':return `solo cut ${VN(m.v)}${m.ep?' (Express Pass)':''}${m.flip?' including your flipped wire':''}`;case 'reveal':return 'reveal your reds';case 'eq':return 'use '+EQUIP[m.id].n;case 'item':return 'use '+ITEMS[m.k].n;
+function describeMove(m){if(!m)return '';switch(m.a){case 'dual':return `dual cut ${VN(m.v)}${m.v2!=null?'/'+VN(m.v2):''} at ${SP(ownerOf(m.st)).nm} stand ${m.st+1} slot${m.ks.length>1?'s':''} ${m.ks.map(k=>k+1).join(',')}${m.tool?' with '+(m.tool==='dd'?'Two-Prong Tester':EQUIP[m.tool]?EQUIP[m.tool].n:'Fork Tester'):''}${m.own==='flip'?' using your flipped wire':''}`;
+  case 'solo':return `solo cut ${VN(m.v)}${m.ep?' (Pair Snip)':''}${m.flip?' including your flipped wire':''}`;case 'reveal':return 'reveal your reds';case 'eq':return 'use '+EQUIP[m.id].n;case 'item':return 'use '+ITEMS[m.k].n;
   case 'multi':return `point at ${m.tg.length} wires (${m.kind})`;case 'q':return 'answer: '+(G.q&&G.q.opts[m.i]?G.q.opts[m.i].l:m.i);default:return m.a}}

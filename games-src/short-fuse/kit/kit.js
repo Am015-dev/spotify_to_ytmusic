@@ -36,7 +36,7 @@ var CHALLENGE_TXT = {
   6: '5 isolated uncut wires on one stand', 7: '3 consecutive values cut in a row', 8: 'First 2 validations match the 2 cards',
   9: 'A stand of 6+ odd blue wires only', 10: '7 cut on one stand, both ends uncut'
 };
-var ITEM_NAMES = { double_probe: 'Double Probe', sweep: 'Sweep', handsets: 'Handsets', triple_probe: 'Triple Probe', two_value_probe: 'Two-Value Probe' };
+var ITEM_NAMES = { double_probe: 'Double Probe', sweep: 'Roll Call', handsets: 'Swap Bag', triple_probe: 'Fork Tester', two_value_probe: 'Either-Or Meter' };
 
 /* ------------------------------------------------------------------ state */
 var K = {

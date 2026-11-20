@@ -16,46 +16,46 @@ const DIAL_MAX=6; // the extra segment beyond the 5-player start
 // timing: any (any seat, any time the crew is not mid-resolution), turn (active seat, as part of its action),
 // start (active seat, before its action), instant (fires by itself on unlock)
 const EQUIP={
- eq1:{n:'Unequal Tag',v:1,need:2,timing:'any',pool:'base',kind:'tag',
-   text:'Clip the one "not equal" tag onto your own stand. Put it between two neighbouring wires. They must hold different values. One of them may already be cut. Two reds count as the same value. So do two yellows. Neither pair takes this tag.'},
- eq2:{n:'Handsets',v:2,need:2,timing:'any',pool:'base',kind:'swap',
-   text:'Trade one uncut wire with a crewmate, face down both ways. Each of you slots the new wire into sorted order. A two-stand player puts it on the stand the outgoing wire left. Any colour may be traded. Everyone sees which slots changed. A token in front of a traded wire goes with it. Nobody may ask for a value.'},
- eq3:{n:'Triple Probe',v:3,need:2,timing:'turn',pool:'base',kind:'probe',
-   text:'Use your dual cut. Name a number. Point at three wires on one crewmate stand. It works if any of them matches. They cut one match without saying how many matched. If none match, the fuse burns one step. They tag one of the three with its true value.'},
- eq4:{n:'Sticky Note',v:4,need:2,timing:'any',pool:'base',kind:'note',
-   text:'Pick one of your own blue wires. Put an info token before it. The token shows its true value.'},
- eq5:{n:'Full Scan',v:5,need:2,timing:'turn',pool:'base',kind:'probe',
-   text:'Use your dual cut. Name a number. Point at a crewmate\'s whole stand. It works if any wire there matches. They cut one match without saying how many. If none match, the fuse burns one step. They tag a wire of their choice.'},
- eq6:{n:'Rewind',v:6,need:2,timing:'any',pool:'base',kind:'dial',text:'Turn the fuse back one step.'},
- eq7:{n:'Recharge',v:7,need:2,timing:'any',pool:'base',kind:'recharge',text:'Wake up one or two crew members whose personal tool is spent. Each can use it once more this job.'},
- eq8:{n:'Sweep',v:8,need:2,timing:'any',pool:'base',kind:'sweep',
-   text:'Call a number. Every crew member says yes or no, you too. Yes means one or more uncut blue wires of it. Two-stand players answer for each stand. Nobody says how many or where. Red and yellow never count.'},
- eq9:{n:'Damper',v:9,need:2,timing:'start',pool:'base',kind:'damper',
-   text:'Use before your action. If your dual cut this turn misses, the fuse does not burn. If you pointed at a red, nothing goes off. A wrong non-red wire still gets its token. A red one gets none.'},
- eq10:{n:'Two-Value Probe',v:10,need:2,timing:'turn',pool:'base',kind:'probe2',
-   text:'Use your dual cut. Name two values (yellow allowed) for one wire. You must hold both. If the wire is either one, it works. You cut your matching wire. So the crew also learns you hold the other value. Combine it with the twin, triple or full-scan probe.'},
- eq11:{n:'Coffee Break',v:11,need:2,timing:'turn',pool:'base',kind:'coffee',text:'Skip your action. Pick who goes next, without talking it over. Play goes on clockwise from them.'},
- eq12:{n:'Equal Tag',v:12,need:2,timing:'any',pool:'base',kind:'tag',
-   text:'Put the one "equal" tag between two neighbouring wires on your stand. They must share a value. One may already be cut. Any two reds count as equal. So do any two yellows.'},
- eqY:{n:'Hidden Compartment',v:'Y',need:2,timing:'instant',pool:'yellow',kind:'more',
-   text:'The moment it unlocks, draw two more equipment cards into this job. They may unlock at once if their values are already cut.'},
- eq22:{n:'Lone Tag',v:2,need:4,timing:'any',pool:'double',kind:'lone',
-   text:'Pick one of your blue wires, cut or not. Put a x1 token before it. That value appears only once on that stand. Cut wires count.'},
- eq33:{n:'Supply Drop',v:3,need:4,timing:'instant',pool:'double',kind:'refresh',text:'The moment it unlocks, every used equipment card turns face up. Each works once more.'},
- eq99:{n:'Express Pass',v:9,need:4,timing:'turn',pool:'double',kind:'express',text:'Solo-cut two identical wires from your hand. More of that value may still be uncut elsewhere.'},
- eq1010:{n:'Vaporiser',v:10,need:4,timing:'instant',pool:'double',kind:'vapor',
-   text:'The moment it unlocks, draw a random info token from the supply. Everyone cuts every uncut wire of that number they hold.'},
- eq1111:{n:'Hook Line',v:11,need:4,timing:'any',pool:'double',kind:'hook',
-   text:'Point at a crewmate\'s uncut wire. Pull it, unseen, into your own hand in sorted order. A two-stand player picks the stand. Everyone sees where it came from and went.'}
+ eq1:{n:'Odd-Pair Clip',v:1,need:2,timing:'any',pool:'base',kind:'tag',
+   text:'Clip the odd-pair clip between two side-by-side wires on your stand. Their values differ. One of them may already be cut. Two reds, or two yellows, count as the same value, so they never take this clip.'},
+ eq2:{n:'Swap Bag',v:2,need:2,timing:'any',pool:'base',kind:'swap',
+   text:'Swap one uncut wire with a crewmate, face down both ways. Each of you files the new wire in sorted order. A two-stand player uses the stand the old wire left. Any colour goes. Everyone sees which slots changed. A token in front of a swapped wire travels with it.'},
+ eq3:{n:'Fork Tester',v:3,need:2,timing:'turn',pool:'base',kind:'probe',
+   text:'Spend your dual cut on it. Name a number and point at three wires on one crewmate stand. If any of them matches, they cut one match and keep quiet about the rest. No match: the fuse burns one step and they tag one of the three with its real value.'},
+ eq4:{n:'Chalk Mark',v:4,need:2,timing:'any',pool:'base',kind:'note',
+   text:'Choose one of your own blue wires. Put an info token in front of it, showing its real value.'},
+ eq5:{n:'Stand Scanner',v:5,need:2,timing:'turn',pool:'base',kind:'probe',
+   text:'Spend your dual cut on it. Name a number and point at a crewmate\'s whole stand. If anything there matches, they cut one match and say nothing more. No match: the fuse burns one step and they tag any wire they like.'},
+ eq6:{n:'Fuse Pinch',v:6,need:2,timing:'any',pool:'base',kind:'dial',text:'Pinch the fuse: it goes back one step.'},
+ eq7:{n:'Spare Batteries',v:7,need:2,timing:'any',pool:'base',kind:'recharge',text:'Fresh batteries for one or two crew members whose personal tool is spent. Each may use it once more this job.'},
+ eq8:{n:'Roll Call',v:8,need:2,timing:'any',pool:'base',kind:'sweep',
+   text:'Call out a number. Every crew member answers yes or no, you included. Yes means at least one uncut blue wire of it. Two-stand players answer per stand. Nobody says how many or where. Red and yellow never count.'},
+ eq9:{n:'Blast Blanket',v:9,need:2,timing:'start',pool:'base',kind:'damper',
+   text:'Throw it over the bomb before your action. If your dual cut misses this turn, the fuse does not burn. A red does not go off either. A wrong non-red wire still gets its token; a red one gets none.'},
+ eq10:{n:'Either-Or Meter',v:10,need:2,timing:'turn',pool:'base',kind:'probe2',
+   text:'Spend your dual cut on it. Name two values for one wire, yellow allowed; you must hold both. If the wire is either one, it works and you cut your matching wire. The crew then knows you hold the other value too. It stacks with the two-prong, fork or stand tester.'},
+ eq11:{n:'Hand-Off',v:11,need:2,timing:'turn',pool:'base',kind:'coffee',text:'Skip your action and hand the turn to anyone, without talking it over. Play goes on clockwise from them.'},
+ eq12:{n:'Twin Clip',v:12,need:2,timing:'any',pool:'base',kind:'tag',
+   text:'Clip the twin clip between two side-by-side wires on your stand. They share a value. One may already be cut. Any two reds match, and so do any two yellows.'},
+ eqY:{n:'False Bottom',v:'Y',need:2,timing:'instant',pool:'yellow',kind:'more',
+   text:'As soon as it unlocks, two more gear cards come into this job. They unlock at once if their values are already cut.'},
+ eq22:{n:'Only-One Pin',v:2,need:4,timing:'any',pool:'double',kind:'lone',
+   text:'Pick one of your blue wires, cut or uncut. Put a x1 token in front of it: that value shows up only once on that stand, cut wires included.'},
+ eq33:{n:'Van Restock',v:3,need:4,timing:'instant',pool:'double',kind:'refresh',text:'As soon as it unlocks, every used gear card turns face up again. Each works once more.'},
+ eq99:{n:'Pair Snip',v:9,need:4,timing:'turn',pool:'double',kind:'express',text:'Solo-cut two matching wires from your hand. Others of that value may still be out there.'},
+ eq1010:{n:'Number Purge',v:10,need:4,timing:'instant',pool:'double',kind:'vapor',
+   text:'As soon as it unlocks, draw a random info token from the supply. Everyone cuts every uncut wire of that number they hold.'},
+ eq1111:{n:'Long Grabber',v:11,need:4,timing:'any',pool:'double',kind:'hook',
+   text:'Point at a crewmate\'s uncut wire and pull it, unseen, into your own hand in sorted order. A two-stand player picks the stand. Everyone sees where it left and where it landed.'}
 };
 const EQ_IDS=Object.keys(EQUIP);
 // ---------- characters and personal tools ----------
 const ITEMS={
- dd:{n:'Twin Probe',timing:'turn',text:'Use your dual cut. Name a number (never yellow). Point at two wires on one crewmate stand. It works if either matches. If both do, they quietly pick one. If neither matches, the fuse burns one step. They tag one of the two. If exactly one is red, nothing goes off. The tag goes on the other. If both are red, boom.'},
- sweep:{n:'Pocket Sweep',timing:'any',text:'Your own copy of the Sweep card.'},
- handsets:{n:'Pocket Handsets',timing:'any',text:'Your own copy of the Handsets card.'},
- pt3:{n:'Pocket Triple Probe',timing:'turn',text:'Your own copy of the Triple Probe card.'},
- pt10:{n:'Pocket Two-Value Probe',timing:'turn',text:'Your own copy of the Two-Value Probe card.'}
+ dd:{n:'Two-Prong Tester',timing:'turn',text:'Spend your dual cut on it. Name a number (never yellow). Point at two wires on one crewmate stand. It works if either matches. If both do, they quietly pick one. If neither matches, the fuse burns one step. They tag one of the two. If exactly one is red, nothing goes off. The tag goes on the other. If both are red, boom.'},
+ sweep:{n:'Pocket Roll Call',timing:'any',text:'Your own copy of the Roll Call card.'},
+ handsets:{n:'Pocket Swap Bag',timing:'any',text:'Your own copy of the Swap Bag card.'},
+ pt3:{n:'Pocket Fork Tester',timing:'turn',text:'Your own copy of the Fork Tester card.'},
+ pt10:{n:'Pocket Either-Or Meter',timing:'turn',text:'Your own copy of the Either-Or Meter card.'}
 };
 const CHARS={
  ch_captain:{n:'Foreman Brix',item:'dd',captain:true,from:1,text:'Runs the job: goes first and settles setup choices.'},
@@ -63,42 +63,42 @@ const CHARS={
  ch_base2:{n:'Pike',item:'dd',from:1,text:'Wrecking-ball operator.'},
  ch_base3:{n:'Moss',item:'dd',from:1,text:'Tunnel and trench specialist.'},
  ch_base4:{n:'Tally',item:'dd',from:1,text:'Keeps the count on every charge.'},
- ch_new1:{n:'Echo',item:'sweep',from:32,newc:true,text:'Carries a pocket sweep unit.'},
- ch_new2:{n:'Relay',item:'handsets',from:32,newc:true,text:'Never without a pair of handsets.'},
- ch_new3:{n:'Trident',item:'pt3',from:32,newc:true,text:'Prefers three prongs to two.'},
- ch_new4:{n:'Prism',item:'pt10',from:32,newc:true,text:'Reads two values at once.'}
+ ch_new1:{n:'Hark',item:'sweep',from:32,newc:true,text:'Has ears like a bat and a pocket roll call.'},
+ ch_new2:{n:'Dot',item:'handsets',from:32,newc:true,text:'Trades anything, keeps a swap bag on the belt.'},
+ ch_new3:{n:'Spike',item:'pt3',from:32,newc:true,text:'Never lends out the fork tester.'},
+ ch_new4:{n:'Iris',item:'pt10',from:32,newc:true,text:'Squints at a wire and sees two numbers.'}
 };
 // structure of the job list: new crew from job 32, the False Bottom card from job 7, double gear from job 50
 const NEWCHAR_FROM=32,YEQ_FROM=7,DOUBLE_EQ_FROM=50;
 const BASE_CHARS=['ch_captain','ch_base1','ch_base2','ch_base3','ch_base4'];
 // ---------- constraint cards A-L. A cut value V is 1-12 or 'Y' (yellow has no number: it breaks A-E, passes F) ----------
 const CONSTRAINTS={
- A:{n:'Evens Only',text:'You may only cut even values.',val:v=>v!=='Y'&&v%2===0},
- B:{n:'Odds Only',text:'You may only cut odd values.',val:v=>v!=='Y'&&v%2===1},
- C:{n:'Low Side',text:'You may only cut values 1 to 6.',val:v=>v!=='Y'&&v<=6},
- D:{n:'High Side',text:'You may only cut values 7 to 12.',val:v=>v!=='Y'&&v>=7},
- E:{n:'Middle Band',text:'You may only cut values 4 to 9.',val:v=>v!=='Y'&&v>=4&&v<=9},
- F:{n:'Skip the Middle',text:'You may not cut values 4 to 9.',val:v=>v==='Y'||v<4||v>9},
- G:{n:'Bare Hands',text:'You may not use equipment cards or your personal tool.',noTools:true},
- H:{n:'Radio Silence',text:'No token is placed when your cut misses. Same when a cut aimed at your hand misses. Never cut a wire that has a token in front. Never use the Sticky Note.',silent:true},
- I:{n:'Leave the Top',text:'You may not cut the right-most uncut wire of a crewmate\'s stand.',noRight:true},
- J:{n:'Leave the Bottom',text:'You may not cut the left-most uncut wire of a crewmate\'s stand.',noLeft:true},
- K:{n:'No Solo',text:'You may not solo cut.',noSolo:true},
- L:{n:'Hair Trigger',text:'If your cut misses, the fuse burns two steps instead of one.',double:true}
+ A:{n:'Even Keel',text:'You may only cut even values.',val:v=>v!=='Y'&&v%2===0},
+ B:{n:'Odd Job',text:'You may only cut odd values.',val:v=>v!=='Y'&&v%2===1},
+ C:{n:'Low Road',text:'You may only cut values 1 to 6.',val:v=>v!=='Y'&&v<=6},
+ D:{n:'High Road',text:'You may only cut values 7 to 12.',val:v=>v!=='Y'&&v>=7},
+ E:{n:'Middle Lane',text:'You may only cut values 4 to 9.',val:v=>v!=='Y'&&v>=4&&v<=9},
+ F:{n:'Mind the Gap',text:'You may not cut values 4 to 9.',val:v=>v==='Y'||v<4||v>9},
+ G:{n:'Gloves Off',text:'You may not use equipment cards or your personal tool.',noTools:true},
+ H:{n:'Hush',text:'No token is placed when your cut misses. Same when a cut aimed at your hand misses. Never cut a wire that has a token in front. Never use the Chalk Mark.',silent:true},
+ I:{n:'Top Shelf Off',text:'You may not cut the right-most uncut wire of a crewmate\'s stand.',noRight:true},
+ J:{n:'Bottom Shelf Off',text:'You may not cut the left-most uncut wire of a crewmate\'s stand.',noLeft:true},
+ K:{n:'Buddy System',text:'You may not solo cut.',noSolo:true},
+ L:{n:'Short Temper',text:'If your cut misses, the fuse burns two steps instead of one.',double:true}
 };
 const CON_IDS=Object.keys(CONSTRAINTS);
 // ---------- challenge cards 1-10 (met: discard it and turn the fuse back one step) ----------
 const CHALLENGES={
- 1:{n:'Call the Red',text:'Use this instead of a normal action. Point at a crewmate\'s wire and say "red". If it is red, it is revealed and this is met. If not, boom.'},
- 2:{n:'Even Streak',text:'Four turns in a row each cut an even value.'},
- 3:{n:'Pairs Apart',text:'On one stand the uncut wires form only separate pairs. Groups of exactly two side by side, split by cut wires.'},
- 4:{n:'Eighteen',text:'The first three validation tokens placed add up to 18.'},
- 5:{n:'Solo Duet',text:'Two turns in a row are solo cuts.'},
- 6:{n:'Lonely Five',text:'On one stand, at least five uncut wires each sit alone. Each has cut wires or a stand end on both sides.'},
- 7:{n:'Staircase',text:'Cut consecutive values on three turns in a row. Go up or down, like 8, 9, 10.'},
- 8:{n:'Called Shots',text:'Two number cards are placed on this when it is drawn. Met if the first two validation tokens are exactly those values.'},
- 9:{n:'Odd Wall',text:'One stand holds only odd uncut blue wires. There are at least six of them. Red and yellow are ignored.'},
- 10:{n:'Hollow Middle',text:'On one stand, at least seven wires are cut. Both end wires are still uncut.'}
+ 1:{n:'Spot the Red',text:'Use this instead of a normal action. Point at a crewmate\'s wire and say "red". If it is red, it is revealed and this is met. If not, boom.'},
+ 2:{n:'Even Run',text:'Four turns in a row each cut an even value.'},
+ 3:{n:'Lonely Pairs',text:'On one stand the uncut wires form only separate pairs. Groups of exactly two side by side, split by cut wires.'},
+ 4:{n:'Sum to 18',text:'The first three validation tokens placed add up to 18.'},
+ 5:{n:'Solo Double',text:'Two turns in a row are solo cuts.'},
+ 6:{n:'Five Islands',text:'On one stand, at least five uncut wires each sit alone. Each has cut wires or a stand end on both sides.'},
+ 7:{n:'Steps',text:'Cut consecutive values on three turns in a row. Go up or down, like 8, 9, 10.'},
+ 8:{n:'Called Numbers',text:'Two number cards are placed on this when it is drawn. Met if the first two validation tokens are exactly those values.'},
+ 9:{n:'All Odd',text:'One stand holds only odd uncut blue wires. There are at least six of them. Red and yellow are ignored.'},
+ 10:{n:'Bare Middle',text:'On one stand, at least seven wires are cut. Both end wires are still uncut.'}
 };
 // ---------- the final job's bunker: 3 columns x 4 rows per floor (r,c are 0-based). Walls are between squares. ----------
 const BUNKER={

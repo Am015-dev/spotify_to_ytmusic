@@ -12,7 +12,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 3. In play every red counts as the same value "red" and every yellow as "yellow": a red 7.5 is never a 7.
 4. There are 26 info tokens: two for each value 1 to 12, plus two yellow.
 5. There are 12 base equipment cards, one per value 1 to 12, each unlocking after the first 2 wires of its value are cut.
-6. There are 5 base character cards, one of them the Captain, and every one carries the Twin Probe.
+6. There are 5 base character cards, one of them the Captain, and every one carries the Two-Prong Tester.
 7. The campaign has 66 missions, and the 8 of the base box can be played with 2, 3, 4 or 5 players.
 
 ## 2. Setup
@@ -21,11 +21,11 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 9. Stands per player, 3 players: the Captain takes 2 stands, each other player 1.
 10. Stands per player, 4 and 5 players: everyone takes 1 stand.
 11. There are 4 stands in a 2, 3 or 4 player game and 5 stands in a 5 player game.
-12. Mission 1 uses only the blue wires 1 to 6 (24 wires): no red and no yellow.
-13. Mission 2 uses blue 1 to 8 plus 2 yellow wires drawn only from yellow 1.1 to 7.1 (34 wires).
-14. Mission 3 uses blue 1 to 10 plus 1 red wire drawn only from red 1.5 to 9.5 (41 wires).
+12. Job 1 uses only the blue wires 1 to 7 (28 wires): no red and no yellow.
+13. Job 2 uses blue 1 to 9 plus 4 yellow wires drawn only from yellow 1.1 to 8.1 (40 wires).
+14. Job 3 uses blue 1 to 11 plus 1 red wire drawn only from red 2.5 to 10.5 (45 wires).
 15. Mission 4 uses all 48 blue wires plus 1 red and 2 yellow wires "x N" (51 wires) and puts N markers on the board, blank side up, showing exactly the values in play.
-16. "N out of M": M candidate wires are shown with "?" markers, N of them go in the pool and the other M-N are set aside unseen (mission 8: 1 of 2 red, 2 of 3 yellow).
+16. "N out of M": M candidate wires are shown with "?" markers, N of them go in the pool and the other M-N are set aside unseen (job 6: 1 of 2 red, 2 of 4 yellow).
 17. All wires are dealt face down, round-robin per stand, as evenly as possible; no wire is dealt twice.
 18. When the deal is uneven the extra wires go to the stands in turn order from the Captain, so the Captain's stand is never shorter than another. *(G)*
 19. Each stand is sorted ascending left to right by sort value (reds and yellows by their decimals).
@@ -90,7 +90,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 63. Cutting a red wire loses at once.
 64. The mission is lost when the fuse reaches the skull (a failure on the last step).
 65. After the mission ends no further move is accepted.
-66. The fuse never goes past the dial: the dial maximum is 6 (extra segment) and a Rewind cannot turn it further back.
+66. The fuse never goes past the dial: the dial maximum is 6 (extra segment) and a Fuse Pinch cannot turn it further back.
 
 ## 8. Equipment: general rules
 
@@ -99,72 +99,72 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 69. Each equipment card works once per mission (turned face down after use).
 70. Unless the card says otherwise anyone can use a card at any time, even off their turn.
 71. One player may use several cards in a row, and a card can be used before the player's own action.
-72. Cards marked "on your turn" (Triple Probe, Full Scan, Two-Value Probe, Coffee Break) can only be used by the active player.
+72. Cards marked "on your turn" (Fork Tester, Stand Scanner, Either-Or Meter, Hand-Off) can only be used by the active player.
 
 ## 9. Equipment: base cards 1 to 12
 
-73. Card 1 (Unequal Tag): put the "not equal" token between 2 neighbouring wires of your own stand with different values; one may already be cut.
+73. Card 1 (Odd-Pair Clip): put the "not equal" token between 2 neighbouring wires of your own stand with different values; one may already be cut.
 74. Card 1: two wires of the same value, two reds or two yellows can never take the Unequal tag.
-75. Card 12 (Equal Tag): put the "equal" token between 2 neighbouring wires of your own stand with the same value; one may be cut; any 2 reds or any 2 yellows count as equal.
+75. Card 12 (Twin Clip): put the "equal" token between 2 neighbouring wires of your own stand with the same value; one may be cut; any 2 reds or any 2 yellows count as equal.
 76. Cards 1 and 12 cannot be used on a teammate's stand, and there is only one token of each kind.
-77. Card 2 (Handsets): you give an uncut wire face down, the teammate gives one back; each is inserted in sorted position.
+77. Card 2 (Swap Bag): you give an uncut wire face down, the teammate gives one back; each is inserted in sorted position.
 78. Card 2: red and yellow wires may be swapped too; an info token travels with its wire.
 79. Card 2: a 2-stand player puts the incoming wire on the stand the outgoing wire left.
-80. Card 3 (Triple Probe): name a number and point at 3 wires on one teammate stand; it works if any of them matches. *(a two-wire attempt is rejected first)*
+80. Card 3 (Fork Tester): name a number and point at 3 wires on one teammate stand; it works if any of them matches. *(a two-wire attempt is rejected first)*
 81. Card 3: if none of the 3 matches the fuse advances 1 and the teammate tags one of the three with its true value.
-82. Cards 3, 5 and the Twin Probe can never name yellow.
-83. Card 4 (Sticky Note): put an info token with the true value in front of one of your own blue wires (any player, any time).
+82. Cards 3, 5 and the Two-Prong Tester can never name yellow.
+83. Card 4 (Chalk Mark): put an info token with the true value in front of one of your own blue wires (any player, any time).
 84. Card 4: only on a blue wire of your own (not red, not yellow, not a teammate's).
-85. Card 5 (Full Scan): name a number and point at a teammate's whole stand; it works if any wire there matches.
+85. Card 5 (Stand Scanner): name a number and point at a teammate's whole stand; it works if any wire there matches.
 86. Card 5: if the stand holds no match the fuse advances 1 and the teammate tags a wire of their choice.
-87. Card 6 (Rewind): turns the fuse back 1 step.
-88. Card 7 (Recharge): 1 or 2 used character cards are turned face up again and their personal item can be used once more.
-89. Card 8 (Sweep): name a number; every player (you too) says yes if they hold an uncut BLUE wire of it; a 2-stand player answers per stand; red/yellow never count.
+87. Card 6 (Fuse Pinch): turns the fuse back 1 step.
+88. Card 7 (Spare Batteries): 1 or 2 used character cards are turned face up again and their personal item can be used once more.
+89. Card 8 (Roll Call): name a number; every player (you too) says yes if they hold an uncut BLUE wire of it; a 2-stand player answers per stand; red/yellow never count.
 90. Card 8: cut wires do not answer yes.
-91. Card 9 (Damper): used before your action; if the dual cut fails the fuse does not move.
+91. Card 9 (Blast Blanket): used before your action; if the dual cut fails the fuse does not move.
 92. Card 9: if the pointed wire is red the bomb does not explode, and no info token is placed.
 93. Card 9 can only be used at the start of your own turn, before your action.
-94. Card 10 (Two-Value Probe): name 2 values for one wire; if the wire is either, the cut works and the crew learns you hold the other value too.
+94. Card 10 (Either-Or Meter): name 2 values for one wire; if the wire is either, the cut works and the crew learns you hold the other value too.
 95. Card 10: you must hold both values; yellow is allowed as one of them; the values need not be consecutive.
 96. Card 10: if the wire is neither value it is a failure (fuse 1 step, true token).
-97. Card 11 (Coffee Break): you skip your turn and choose who goes next; play then continues clockwise from that player.
+97. Card 11 (Hand-Off): you skip your turn and choose who goes next; play then continues clockwise from that player.
 98. Card 11 uses up the turn: the player cannot also cut in the same turn.
 
 ## 10. Equipment: campaign cards (rule stickers A and C)
 
-99. Hidden Compartment unlocks when a pair of yellows is cut and, instantly, draws 2 more equipment cards into the mission.
-100. Hidden Compartment only joins the pile in missions that use yellow wires (from mission 9).
+99. False Bottom unlocks when a pair of yellows is cut and, instantly, draws 2 more equipment cards into the mission.
+100. False Bottom only joins the pile in missions that use yellow wires (from job 7).
 101. The double-number cards (2-2, 3-3, 9-9, 10-10, 11-11) unlock only when ALL FOUR wires of the value are cut.
-102. Lone Tag (2-2): put a x1 token in front of one of your blue wires; that value appears once on the stand.
-103. Lone Tag cannot go on a value that appears more than once on that stand.
-104. Supply Drop (3-3) is instant: when it unlocks all used equipment cards turn face up and work again.
-105. Express Pass (9-9): on your turn solo-cut 2 identical wires from your hand even if more of that value remain uncut elsewhere.
-106. Vaporiser (10-10) is instant: it draws a random info token and everyone cuts every remaining wire of that value they hold.
-107. Hook Line (11-11): point at a teammate's wire and take it unseen into your hand in sorted position; everyone sees where it left and arrived.
-108. Card 10 can be combined with the Twin Probe: two values against two wires; either value on either wire is a hit.
-109. Card 22 (Lone Tag) may go on a wire that is already cut. *("cut or not")*
-110. Express Pass cuts exactly 2 identical wires even when you hold all 4 of the value.
-111. Damper with a probe: if every pointed wire is red nothing goes off, and no token is placed.
-112. Triple Probe / Full Scan: a failure with one red among the pointed wires does not explode; the token goes on a non-red wire. *(G)*
-113. Card 11 (Coffee Break) cannot hand the turn to a player with no wires left.
-114. Card 7 (Recharge) only works on characters whose personal item has been used.
+102. Only-One Pin (2-2): put a x1 token in front of one of your blue wires; that value appears once on the stand.
+103. Only-One Pin cannot go on a value that appears more than once on that stand.
+104. Van Restock (3-3) is instant: when it unlocks all used equipment cards turn face up and work again.
+105. Pair Snip (9-9): on your turn solo-cut 2 identical wires from your hand even if more of that value remain uncut elsewhere.
+106. Number Purge (10-10) is instant: it draws a random info token and everyone cuts every remaining wire of that value they hold.
+107. Long Grabber (11-11): point at a teammate's wire and take it unseen into your hand in sorted position; everyone sees where it left and arrived.
+108. Card 10 can be combined with the Two-Prong Tester: two values against two wires; either value on either wire is a hit.
+109. Card 22 (Only-One Pin) may go on a wire that is already cut. *("cut or not")*
+110. Pair Snip cuts exactly 2 identical wires even when you hold all 4 of the value.
+111. Blast Blanket with a probe: if every pointed wire is red nothing goes off, and no token is placed.
+112. Fork Tester / Stand Scanner: a failure with one red among the pointed wires does not explode; the token goes on a non-red wire. *(G)*
+113. Card 11 (Hand-Off) cannot hand the turn to a player with no wires left.
+114. Card 7 (Spare Batteries) only works on characters whose personal item has been used.
 
-## 11. Characters: the Twin Probe
+## 11. Characters: the Two-Prong Tester
 
-115. Twin Probe: name a number and point at 2 wires on one teammate's stand (they need not be adjacent); it works if at least one is that number.
-116. Twin Probe: if both wires match the teammate picks which one is cut, and says nothing more.
-117. Twin Probe: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.
-118. Twin Probe: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.
-119. Twin Probe: if one pointed wire is red and the other matches, the cut simply works (no explosion).
-120. Twin Probe: if both pointed wires are red the bomb explodes.
-121. The Twin Probe never names yellow.
+115. Two-Prong Tester: name a number and point at 2 wires on one teammate's stand (they need not be adjacent); it works if at least one is that number.
+116. Two-Prong Tester: if both wires match the teammate picks which one is cut, and says nothing more.
+117. Two-Prong Tester: if neither matches the fuse advances 1 and the teammate puts ONE info token in front of ONE of the two wires of their choice.
+118. Two-Prong Tester: if exactly one pointed wire is red and the other is not the value, no explosion: the fuse advances 1 and the token goes on the non-red wire.
+119. Two-Prong Tester: if one pointed wire is red and the other matches, the cut simply works (no explosion).
+120. Two-Prong Tester: if both pointed wires are red the bomb explodes.
+121. The Two-Prong Tester never names yellow.
 122. A personal item works once per mission (the character card turns face down).
-123. Twin Probe: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand). *(a single move names a single stand)*
-124. The new characters (Pocket Sweep, Handsets, Triple Probe, Two-Value Probe) appear from mission 31, for non-captains only; the Captain keeps the Captain card.
-125. The Pocket Sweep character item works like card 8 (once per mission, any time).
-126. The Pocket Triple Probe item works like card 3 (3 wires, your turn, once per mission).
-127. The Pocket Two-Value Probe item works like card 10 (two values, once per mission).
-128. The Pocket Handsets item works like card 2 (swap with a teammate, once per mission).
+123. Two-Prong Tester: a teammate with 2 stands is probed on ONE stand at a time (both wires on the same stand). *(a single move names a single stand)*
+124. The new characters (Pocket Roll Call, Swap Bag, Fork Tester, Either-Or Meter) appear from mission 31, for non-captains only; the Captain keeps the Captain card.
+125. The Pocket Roll Call character item works like card 8 (once per mission, any time).
+126. The Pocket Fork Tester item works like card 3 (3 wires, your turn, once per mission).
+127. The Pocket Either-Or Meter item works like card 10 (two values, once per mission).
+128. The Pocket Swap Bag item works like card 2 (swap with a teammate, once per mission).
 
 ## 12. Restriction cards A to L (campaign)
 
@@ -175,7 +175,7 @@ Short Fuse adapts a real-time-free co-op bomb-defusal wire game, so the numbered
 133. Restriction E: you may only cut values 4 to 9.
 134. Restriction F: you may NOT cut values 4 to 9.
 135. Restriction G: no equipment cards and no personal item.
-136. Restriction H: a failed cut places no token; you may not cut a wire that has a token; no Sticky Note.
+136. Restriction H: a failed cut places no token; you may not cut a wire that has a token; no Chalk Mark.
 137. Restriction I: you may not cut the right-most wire of a teammate's stand.
 138. Restriction J: you may not cut the left-most wire of a teammate's stand.
 139. Restriction K: you may not Solo Cut.

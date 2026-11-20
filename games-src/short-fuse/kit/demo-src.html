@@ -49,10 +49,10 @@ SFKit.setDial(2,4);
 SFKit.setTurn(0);
 SFKit.setTokens({validation:[11],markers:[{color:'red',value:7.5},{color:'yellow',value:3.1},{color:'yellow',value:9.1}]});
 SFKit.setEquipment([
- {id:'eq2',name:'Handsets',timing:'any_time',unlock:{value:2,count:2},state:'ready',effect:'Swap one wire with a teammate, face down.'},
- {id:'eq6',name:'Rewind',timing:'any_time',unlock:{value:6,count:2},state:'locked',effect:'Move the detonator dial back one step.'},
- {id:'eq8',name:'Sweep',timing:'any_time',unlock:{value:8,count:2},state:'used',effect:'Call a number: everyone says yes if they hold one.'},
- {id:'eq11',name:'Coffee Break',timing:'your_turn',unlock:{value:11,count:2},state:'ready',effect:'Skip your turn and choose who goes next.'}
+ {id:'eq2',name:'Swap Bag',timing:'any_time',unlock:{value:2,count:2},state:'ready',effect:'Swap one wire with a teammate, face down.'},
+ {id:'eq6',name:'Fuse Pinch',timing:'any_time',unlock:{value:6,count:2},state:'locked',effect:'Move the detonator dial back one step.'},
+ {id:'eq8',name:'Roll Call',timing:'any_time',unlock:{value:8,count:2},state:'used',effect:'Call a number: everyone says yes if they hold one.'},
+ {id:'eq11',name:'Hand-Off',timing:'your_turn',unlock:{value:11,count:2},state:'ready',effect:'Skip your turn and choose who goes next.'}
 ]);
 SFKit.setMissionCards({mission:{number:9,name:'Pecking Order',text:'Lay out 3 number cards. Their wires must be cut in order: 2 of the first value before moving on to the next. The sequence card marks the active value.'},numbers:[{value:5,done:true},{value:3},{value:10}],sequence:{side:'A',at:1}});
 SFKit.setCharacters([{seat:0,name:'Tally',item:'double_probe'},{seat:1,name:'Squad Lead',item:'double_probe',captain:true},{seat:2,name:'Pike',item:'double_probe',used:true},{seat:3,name:'Moss',item:'double_probe'}]);

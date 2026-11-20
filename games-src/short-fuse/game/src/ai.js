@@ -11,7 +11,7 @@
 //   oxygen chain (49), public leaked reds (54), a crewmate's flipped wire costs a real step (56, 64), off-turn signals actually sent.
 // hard (think 2) plans across the crew's next turns: the card row left for the next players (47), the oxygen the next player needs
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
-//   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Damper kept for forced gambles, opening tokens
+//   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Blast Blanket kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
 const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:160,noise:0,tools:1,think:2,ch:2,info:.12},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
@@ -185,7 +185,7 @@ function sampleMasks(K,Z){if(Z._masks)return Z._masks;const base=new Int32Array(
   if(!out.length)out.push(Int32Array.from(base));Z._masks=out;return out}
 function pHolds(masks,seat,mask){let n=0;for(const m of masks)if(m[seat]&mask)n++;return n/masks.length}
 function myTools(K){const me=K.seats[K.seat];const it=me.ch&&typeof CHARS!=='undefined'&&CHARS[me.ch]?CHARS[me.ch].item:null;return {dd:it==='dd'&&!me.chUsed&&!me.noItem&&!me.chDown}}
-// my best single dual cut (or Twin Probe) of value v, from my own knowledge
+// my best single dual cut (or Two-Prong Tester) of value v, from my own knowledge
 function bestFor(K,Z,v,tools){const code=CODE(v);const R=(K.tot[v]||0)-(K.cut[v]||0);const held=heldCounts(K)[v]||0;if(held&&held===R&&(R===2||R===4))return {p:1,pr:0,solo:1};
   const flipJob=K.rules.includes('flip');let best={p:0,pr:0};
   for(const st of K.stands){if(st.mine)continue;const cells=[];st.slots.forEach((x,k)=>{if(x.cut||(x.flip&&flipJob))return;cells.push([k,pAt(Z,st.i,k,code),pAt(Z,st.i,k,14)])});
@@ -296,12 +296,12 @@ function mainDecision(K,rnd,L){const lg2=K.legal;const held=heldCounts(K);const 
     const risky=c=>{const m=c.m;if(m.st==null||!Array.isArray(m.ks)||!m.ks.length)return false;m0=m.st;return m.ks.length===1||K.rules.includes('redTriple')?m.ks.some(red1):m.ks.every(red1)};
     if(risky(top)){const safe=cand.find(c=>c.ev>-BOOM/2&&!risky(c));
       if(safe)top=safe}}
-  // Damper before a risky dual cut; Sweep when nothing is safe; Coffee Break when every option is bad
+  // Blast Blanket before a risky dual cut; Roll Call when nothing is safe; Hand-Off when every option is bad
   if(top&&top.m.a==='dual'&&top.p<.93&&!K.tfx.damper){const dm=pickEq('eq9');if(dm.length&&(F<=2||top.p<.7||(L.think>=2&&top.p<.85&&forcedJob(K))))return dm[0]}
   if(top&&top.p<.75&&top.m.a==='dual'&&!K.ann.some(a=>a.k==='sweep'&&a.turn===K.turn&&a.by===K.seat)){const sw=pickEq('eq8').concat(lg2.eq.filter(m=>m.a==='item'&&m.k==='sweep'));if(sw.length&&rnd()<L.tools)return bestSweep(K,Z,sw)}
   if(!top)return lg2.other[0]||null;
   AILAST={p:top.p,ev:top.ev,why:top.why,exact:Z.exact,n:Z.samples.length};const out=stripWhy(top.m);if(ms.math&&out.calc){const c=top.calc||bestCalc(K,out.v);if(c)out.calc=c}return out}
-// jobs that force the value (or the cutter): the Damper is worth more on the turn's gamble
+// jobs that force the value (or the cutter): the Blast Blanket is worth more on the turn's gamble
 function forcedJob(K){const ms=K.ms;return !!(ms.volunteer||ms.sir||ms.declare||ms.math||ms.hotPotato||ms.searchlight)}
 var AILAST=null,AIDBG=null;
 function stripWhy(m){const o=Object.assign({},m);delete o.example;delete o.pass;return o}
