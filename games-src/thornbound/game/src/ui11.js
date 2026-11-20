@@ -144,6 +144,10 @@ let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
+// F15: one tap on the bulb shows the tip. gx-help treats a bulb tap while any help is open as "close only"; when a coach bubble is open we close it first
+// (window capture runs before gx-help's document listener), so the same tap opens the bulb's tip. A tap on the bulb while its own tip is open still closes it.
+window.addEventListener('pointerdown',e=>{try{const b=document.getElementById('bulbbtn');if(!b||!e.target||!b.contains(e.target))return;
+  if(document.querySelector('.gxh-bub:not(.gxh-bulbb)')&&!document.querySelector('.gxh-bulbb'))GXH.hide()}catch(x){}},true);
 // hints On (the first game's default): every decision shows the suggestion and its finger; the bulb still explains the suggestion
 // (finger, why, How does this work?). Menu > Hints turns them off.
 function bulbState(){const b=$('#bulbbtn');if(!b)return;const on=UI.guide==='full'&&G&&UI.started;b.classList.toggle('on',!!on);b.setAttribute('aria-pressed',on?'true':'false');b.setAttribute('aria-label',on?'Hints are on. Tap to see why':'Hint: what should I do?')}
