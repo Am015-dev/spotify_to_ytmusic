@@ -518,8 +518,9 @@ body.confirming #prompt{display:none}
 #hand .bc.big:not(.sel) .bestb{top:-8px;left:2px;right:auto}
 }
 body:has(.gxh-bulbb) .bestb{display:none}
-@media (max-height:620px){.gx-app:not(.gx-dock-min) .gx-dock-head .gx-ibtn{top:0}#setup .tmenu:last-child,#keepgo{background:none}
+@media (max-height:620px){.gx-app:not(.gx-dock-min) .gx-dock-head .gx-ibtn{top:0}
 #setup .tmenu:last-child{flex-direction:row;gap:8px;width:100%;background:linear-gradient(to top,#16231b 78%,rgba(22,35,27,0));z-index:3;padding:10px 0 6px}#setup .tmenu:last-child .btn{flex:1;min-height:48px;font-size:calc(var(--fs)*1.1)}#setup .tmenu:last-child .btn.big{flex:1.6}}
+@media (min-width:1000px){#opps .scnow{display:none}}
 #keepgo{box-shadow:0 -10px 14px 6px rgba(22,35,27,.85)}
 /* F3: bonus-card progress chip, birds that advance it, "Always skip" */
 #foodrow .fd.bon{max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;flex:0 1 auto;min-width:0}
