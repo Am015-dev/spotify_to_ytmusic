@@ -154,3 +154,5 @@ button{font-family:inherit;color:inherit}
 .logl{font:14px/1.35 var(--tx);border-bottom:1px solid #221c26;padding:2px 0}
 .tut{border:2px solid var(--wax)!important;box-shadow:0 0 14px rgba(232,163,60,.7)!important}
 .rnum{color:var(--flame);font-size:14px}
+.inspd{flex:1;overflow-y:auto;font:15px/1.3 var(--tx);padding:0 4px}
+.inspd p{margin:2px 0}

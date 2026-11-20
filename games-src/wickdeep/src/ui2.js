@@ -128,6 +128,7 @@ function setPrompt(text, btns) {
 function renderDock() {
   var tray = $('tray'); tray.innerHTML = '';
   if (!G) return;
+  if (UI.insp && !UI.busy && !G.done) { setPrompt(UI.insp.t, [{ t: 'Close', id: 'inspx', fn: closeInsp }]); var d = document.createElement('div'); d.className = 'inspd'; d.innerHTML = UI.insp.h; tray.appendChild(d); return; }
   if (G.done) { setPrompt(G.done.won ? 'Victory!' : 'Defeat', [{ t: 'Continue', cls: 'go', fn: showResult }]); return; }
   var A = G.ask; if (!A || UI.busy) { setPrompt(UI.busy ? '' : '…', []); return; }
   var f = curFig(), H = f ? D.HERO[f.cls] : null;
@@ -244,10 +245,11 @@ function onBoardTap(k) {
   var h = G.hex[k]; if (h && E.seen(G, k)) showHex(k);
 }
 function showInsp(title, html) {
+  if (G && UI.mode === 'play' && !UI.busy) { UI.insp = { t: title, h: html }; renderDock(); return; }
   var p = $('insp'); p.innerHTML = '<button class="x" type="button" aria-label="Close">×</button><h3>' + esc(title) + '</h3>' + html; p.hidden = false;
   p.querySelector('.x').addEventListener('click', closeInsp);
 }
-function closeInsp() { $('insp').hidden = true; }
+function closeInsp() { $('insp').hidden = true; if (UI.insp) { UI.insp = null; renderDock(); } }
 function showFig(f) {
   var conds = Object.keys(f.cond).map(function (c) { return D.COND_NAME[c] + ': ' + D.COND_TIP[c]; });
   if (f.kind === 'hero') {
@@ -383,6 +385,7 @@ async function playEv(e) {
     case 'pers': float(e.id, 'Lasting bonus', 'info'); return;
     case 'item': float(e.id, D.ITEM_BY[e.item].n, 'info'); return sleep(speed(150));
     case 'endround': renderBar(); return;
+    case 'noop': float(e.id, e.why, 'info'); toast(e.why); return sleep(speed(700));
     case 'over': return;
   }
 }

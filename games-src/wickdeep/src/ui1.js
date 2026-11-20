@@ -116,7 +116,7 @@ function renderHot() {
   var box = $('hot'); if (!box) return;
   var ks = UI.busy ? [] : Object.keys(UI.glow), sig = ks.join('|') + '@' + CAM.x.toFixed(2) + ',' + CAM.y.toFixed(2) + ',' + CAM.z.toFixed(1) + ',' + BW + 'x' + BH;
   if (box.dataset.sig === sig) return; box.dataset.sig = sig; box.innerHTML = '';
-  var R = CAM.z, sz = Math.max(30, Math.round(R * 1.55));
+  var R = CAM.z, sz = Math.max(40, Math.round(R * 1.7));
   ks.forEach(function (k) {
     var s = toScreen(k); if (s.x < 0 || s.y < 0 || s.x > BW || s.y > BH) return;
     var f = E.figAt(G, k), b = document.createElement('button'); b.type = 'button'; b.className = 'hot glow ' + UI.glow[k]; b.dataset.k = k;

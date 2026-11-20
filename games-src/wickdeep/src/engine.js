@@ -398,7 +398,7 @@
         if (mv <= 0) return null;
         var R = reach(G, f, mv, { jump: a.jump, hero: 1 });
         var ks = Object.keys(R).filter(function (k) { return k !== f.pos && !figAt(G, k) && R[k].c <= mv && G.hex[k].t !== 'o'; });
-        if (!ks.length) return null;
+        if (!ks.length) { ev(G, { e: 'noop', id: f.id, why: 'No room to move' }); return null; }
         return { h: 'move', id: f.id, v: mv, hexes: ks, jump: !!a.jump };
       }
       case 'atk': {
@@ -407,7 +407,7 @@
         a.hits = a.hits || [];
         if (a.hits.length >= (a.tg || 1)) return null;
         var tg = attackTargets(G, f, a).filter(function (o) { return a.hits.indexOf(o.id) < 0; });
-        if (!tg.length) return null;
+        if (!tg.length) { if (!a.hits.length) ev(G, { e: 'noop', id: f.id, why: 'No foe in reach' }); return null; }
         return { h: 'target', id: f.id, ids: tg.map(function (o) { return o.id; }), a: a, left: (a.tg || 1) - a.hits.length };
       }
       case 'heal': {
