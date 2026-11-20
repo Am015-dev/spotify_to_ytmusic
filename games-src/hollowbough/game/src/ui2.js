@@ -437,7 +437,7 @@ function trayChip(m, i, tg) {
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
     if (m.card !== undefined && effQ()) inner = [h('b', cname(m.card)), h('span.eff', effLine(m.card))];
-    else if (m.card !== undefined && G.q && G.q.kind === 'teach') inner = PV_ON ? [pvFace(m.card, { small: true })] : [cardEl(m.card, 78), h('b.tcn', cname(m.card))];   // R39: the choices face up, with names
+    else if (m.card !== undefined && G.q && G.q.kind === 'teach') inner = PV_ON ? [pvFace(m.card, { small: true }), h('span.eff.tk-eff', effLine(m.card))] : [cardEl(m.card, 78), h('b.tcn', cname(m.card)), h('span.eff.tk-eff', effLine(m.card))];   // PLAY1: what the card does, before you keep it   // R39: the choices face up, with names
     else if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
     else if (m.res !== undefined) inner = [ic(m.res, 24), h('b', m.label ? chipText(m.label) : rname(m.res, 1))];
     else inner = [h('b', chipText(m.label) || 'OK')];
@@ -474,7 +474,7 @@ function renderActs(mm, qm, qShown) {
       a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
     }
     chips.forEach(c => a.appendChild(c));
-    if (a.classList.contains('wrap') && (!hasCard || big) && a.scrollHeight > a.clientHeight + 1) { const hh2 = a.scrollHeight + 6; a.style.top = (box.y + box.h - hh2) + 'px'; a.style.height = hh2 + 'px'; }   // G8: grow to fit every choice
+    if (((a.classList.contains('wrap') && (!hasCard || big)) || chips.some(c => c.classList.contains('teff'))) && a.scrollHeight > a.clientHeight + 1) { const hh2 = a.scrollHeight + 6; a.style.top = (box.y + box.h - hh2) + 'px'; a.style.height = hh2 + 'px'; }   // G8: grow to fit every choice
     if (UI.sel) a.appendChild(h('button.tchip.tx', { 'data-a': 'selx', type: 'button', 'aria-label': 'Cancel' }, '×'));
     return;
   }
