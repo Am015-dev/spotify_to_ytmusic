@@ -284,3 +284,8 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Shell calm pass deployed (24/24 PASS, live check clean). Tidewake fx live behind ?fx=1 (owner to say yes/no). Pages workflow now sparse-checks out games/ (full checkout hung twice).
 - In flight: R74 thornbound, R75 doorkick, F13 vinegrave (W490), F15 shipwreck (W468); strict re-reviews R76 emberclimb, R77 redline-rally, R78 short-fuse.
 - Owner goal: tell them when ALL games pass the strict bar and are live. Remaining old games to re-review in waves: sunglaze, kaiten-kitchen, rampart-and-vine, stitchwise, crown-city-smash, final-approach, lantern-dive, wildmark, perch-and-plume, sands-of-qamar, nebula-aces, cauldron-fair, vale-of-banners, tidewake.
+
+## 20 Nov 15:10 UTC: OWNER: "hollowbough and twin thrones are unplayable and not fun" (both had passed strict review)
+- Lesson: the rubric/test pass does not match the owner's eyes. A game goes to the owner only with a before/after webm of the first 3 minutes at 375x667 and a cold-play verdict from an agent that did not build it.
+- PLAY1 hollowbough (shelf/W550-hollowbough-play), PLAY2 twin-thrones (shelf/W551-twin-thrones-play): Opus workers diagnosing and fixing the core play against the original's official app.
+- 21 strict reviews/fixers in flight (R74-R92, F13 vinegrave, F15 shipwreck). Treat their PASS as necessary, not sufficient: add the cold-play video step before asking the owner.
