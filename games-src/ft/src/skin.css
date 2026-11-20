@@ -241,3 +241,16 @@ html.short.mk-buy:not(.land) #mkt .mrow .mcard:not(.glow):not(.sel){display:none
 /* F1: your goods wrap on a phone instead of running off the right edge (power buttons keep their sliding row) */
 @media (max-width:700px){html body #mine{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important}}
 @media (max-width:700px){html body #acts .arow.pws .ab.pw{padding:0 8px!important}}
+/* F2 bidding: one big button per turn spot, naming its place and its price; taken spots name who holds them */
+html body #bd .bidt .spot{min-height:48px!important;height:auto!important;padding:0!important;justify-content:stretch!important;align-items:stretch!important;border-radius:10px!important}
+html body #bd .bidt .spot.shut{opacity:.55}
+html body #bd .bidt .sp-b{flex:1 1 auto;min-height:48px!important;height:auto!important;padding:2px 0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:1px;border-radius:10px}
+html body #bd .bidt .sp-b .ord,html body #bd .bidt .spot .ord{position:static!important;background:none!important;padding:0!important;border-radius:0!important;font:800 13px/1 var(--ff-b,system-ui)!important;color:inherit!important;text-transform:none!important;letter-spacing:.02em;align-self:center}
+html body #bd .bidt .sp-b .spc{font:900 17px/1.05 var(--ff-b,system-ui);white-space:nowrap}
+html body #bd .bidt .sp-b .spc i{font-size:12px!important;margin-right:2px}
+html body #bd .bidt .spot .sp-c{background:none!important;line-height:1.1!important;padding:0!important;font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+html body #bd .bidt .spot.taken .ord,html body #bd .bidt .spot.taken .sp-c{color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+html body #bd .bidt .spot:not(:has(.sp-b)){display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important}
+html body #bd .bidt .sp-b.dear{opacity:1!important;border-color:#b08a5a;background:linear-gradient(#fffaf0,#efe0c0)}
+html body #bd .bidt .sp-b.glow{border-color:#1f6a2a;box-shadow:0 0 0 2px rgba(31,106,42,.35)}
+html body #bd .bidt .spot:last-child{align-items:stretch!important}
