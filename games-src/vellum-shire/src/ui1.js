@@ -118,7 +118,7 @@ function renderEstate(tg) {
   out += '<path class="reg" d="' + path + '" stroke-width="' + Math.max(2, R * 0.11).toFixed(1) + '"/>';
   out += '</svg>';
   $('#estate').innerHTML = out;
-  $('#esttabs').innerHTML = '<button class="etab' + (UI.view === 0 ? ' on' : '') + '" data-view="0">You</button><button class="etab op' + (UI.view === 1 ? ' on' : '') + '" data-view="1">' + nameOf(1) + '</button>';
+  $('#esttabs').innerHTML = '<button class="etab' + (UI.view === 0 ? ' on' : '') + '" data-view="0"><i style="background:var(--me)"></i>You</button><button class="etab op' + (UI.view === 1 ? ' on' : '') + '" data-view="1"><i style="background:var(--opp)"></i>' + nameOf(1) + '</button>';
   var seals = Pl.seals.length ? Pl.seals.length + ' seal' + (Pl.seals.length > 1 ? 's' : '') : '';
   var est = $('#estseal'); if (!est) { est = document.createElement('div'); est.id = 'estseal'; $('#estwrap').appendChild(est); }
   est.textContent = (Pl.board > 1 ? 'Board ' + Pl.board : '') + (seals ? (Pl.board > 1 ? ' \u00b7 ' : '') + seals : '');

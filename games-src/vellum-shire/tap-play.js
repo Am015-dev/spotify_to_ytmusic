@@ -23,6 +23,7 @@ const URL = process.env.VS_URL || 'file://' + path.resolve(__dirname, 'vellum-sh
       const plan = await p.evaluate(() => {
         if (UI.disc) { return { sel: '[data-sto="' + UI.disc[0].disc + '"]' }; }
         if (UI.sel) { return { sel: '[data-a="opt"][data-i="0"]' }; }
+        if (G.pick) { const mm = VSAI.pick(G, 'easy'); return { sel: '[data-h="' + mm.h + '"]' }; }
         const m = VSAI.pick(G, 'easy'); window.__m = m;
         if (m.t === 'end' || m.t === 'skip') return { sel: '[data-a="' + m.t + '"]' };
         const e = moveTarget(m); if (!e) return { err: 'no target ' + JSON.stringify(m) };
@@ -40,6 +41,7 @@ const URL = process.env.VS_URL || 'file://' + path.resolve(__dirname, 'vellum-sh
       await p.touchscreen.tap(bx.x + bx.width / 2, bx.y + bx.height / 2); taps++;
       await p.waitForTimeout(fast ? 15 : 420);
     }
+    if (process.env.SHOT) await p.screenshot({ path: process.env.SHOT });
     const r = await p.evaluate(() => ({ over: G.over, f: G.final && G.final.map(f => f.total), inv: VSE.checkInvariants(G), ph: G.ph, rd: G.rd }));
     console.log('game', g, JSON.stringify(r), 'taps', taps, 'secs', ((Date.now() - t0) / 1000).toFixed(0), errs.length ? 'ERR ' + errs.slice(0, 4).join(' | ') : 'ok');
     if (errs.length || r.inv.length || (!r.over && secs > 1e8)) fails++;

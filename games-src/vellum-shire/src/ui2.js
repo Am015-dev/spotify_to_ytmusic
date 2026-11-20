@@ -147,7 +147,7 @@ function doMove(m) {
   return playEvents(evs, before, s).then(function () { UI.busy = false; try { tutAfter(m); } catch (e) { } flow(); });
 }
 // ---------- animations
-function pop(txt, x, y, gold) { if (!window.ANIM) return; var d = document.createElement('div'); d.className = 'pop' + (gold ? ' gold' : ''); d.textContent = txt; d.style.left = x + 'px'; d.style.top = y + 'px'; $('#fx').appendChild(d); setTimeout(function () { d.remove(); }, 1400); }
+function pop(txt, x, y, gold) { if (!window.ANIM) return; var d = document.createElement('div'); d.className = 'pop' + (gold ? ' gold' : ''); d.textContent = txt; x = Math.max(70, Math.min(innerWidth - 70, x)); y = Math.max(70, Math.min(innerHeight - 40, y)); d.style.left = x + 'px'; d.style.top = y + 'px'; $('#fx').appendChild(d); setTimeout(function () { d.remove(); }, 1400); }
 function popAt(sel, txt, gold) { var r = rectOf(sel); if (r) pop(txt, r.left + r.width / 2, r.top + r.height / 2, gold); }
 function fly(fromR, toEl, html) {
   if (!window.ANIM || !fromR || !toEl) return later(0);
