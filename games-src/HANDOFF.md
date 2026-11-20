@@ -297,3 +297,4 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Data helpers on separate branches (builders do NOT know about them; merge or wire them in when each builder reports):
   DATA4 -> shelf/W563-new-mars-data games-src/_data/mars/; DATA7 -> shelf/W566-new-dungeon-data games-src/_data/dungeon/; DATA8 -> shelf/W567-new-epic-data games-src/_data/epic/.
 - Dropped: a deep-sea co-op trick-taker (duplicate of lantern-dive). Check games-src/ before proposing any new game; GAMES-TODO.md is stale.
+- 15:28 CORRECTION: a data worker refused to copy a game's full card/monster/scenario content renamed (that recreates the specific game). Brief now: identical RULES and component STRUCTURE (types, counts, distributions); our OWN creative content (card designs in big pools, scenarios, maps, event cards, characters). DATA4/7/8 cancelled. NEW4/NEW7/NEW8 restarted on that rule; NEW2/3/5/6 continue (mostly mechanical components).
