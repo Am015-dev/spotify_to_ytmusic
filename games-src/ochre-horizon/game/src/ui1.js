@@ -95,7 +95,7 @@ function renderTop() {
   $('trYou').textContent = s0.total; $('trRiv').textContent = s1.total;
   $('trYou').setAttribute('data-engine', 'score0'); $('trRiv').setAttribute('data-engine', 'score1');
   $('nmYou').textContent = 'You · points'; $('nmRiv').textContent = 'Rival · points';
-  $('vpYou').textContent = 'rating ' + G.pl[0].tr; $('vpRiv').textContent = 'rating ' + G.pl[1].tr;
+  $('vpYou').textContent = G.pl[0].tr + ' from rating'; $('vpRiv').textContent = G.pl[1].tr + ' from rating';
   $('syou').classList.toggle('turn', t === 0 && G.phase === 'action'); $('sriv').classList.toggle('turn', t === 1 && G.phase === 'action');
   var tp = (G.temp + 30) / 38 * 100, op = G.oxy / 14 * 100;
   $('gTemp').className = 'gauge' + (G.temp >= 8 ? ' done' : '');
@@ -130,7 +130,7 @@ function renderBar() {
   var ready = 0; OH.actionSources(0).forEach(function (id) { OH.card(id).action.forEach(function (a, i) { if (OH.actOk(0, id, i)) ready++; }); });
   $('bActS').textContent = ready + ' ready';
   $('bPassT').textContent = G.acts === 1 ? 'Done' : 'Pass';
-  $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'turn comes back' : 'end turn') : 'income +' + (P.prod.mc + P.tr);
+  $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'you go again' : 'end turn') : 'income +' + (P.prod.mc + P.tr);
   $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done, end turn' : 'Pass. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
   ['bProj', 'bAct', 'bPass'].forEach(function (b) { $(b).disabled = !my; });
   $('bCards').disabled = false;

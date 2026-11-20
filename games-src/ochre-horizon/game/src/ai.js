@@ -149,7 +149,7 @@
       if (inc.length) return { t: 'play', id: inc[0], why: 'income' };
     }
     // a newcomer who passes with cards they can play feels stuck: offer the best play instead
-    if (m.t === 'pass' || m.t === 'end') {
+    if (m.t === 'pass' || m.t === 'end' || m.t === 'sell') {
       var best = null, bv = -1e9;
       OH.validMoves().forEach(function (x) { if (x.t !== 'play') return; var v = tryMove(x, p, 0); if (v > bv) { bv = v; best = x; } });
       if (best && bv > evalState(G, p) - 1) return best;

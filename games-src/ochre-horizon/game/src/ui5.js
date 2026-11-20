@@ -67,7 +67,7 @@ var COACH = {
   place: 'Tap a glowing space, see the bonus, tap again to build.',
   proj: 'Projects never run out. Comet strike warms the planet.',
   pass: 'Out of money? Pass. Income comes when both pass.',
-  research: 'Tap a card to buy or skip it. 3 credits each.',
+  research: 'Marked cards are our pick. Tap to change. 3 credits each.',
   research2: 'Income = credit production + your rating. Grow both.',
   bonus: 'White marks on gauges give a bonus: heat production, an ocean.',
   vp: 'VP on a card means points at the end. Not rating.',
@@ -109,7 +109,7 @@ function suggestWords(m) {
   if (m.t === 'act') { var a = OH.card(m.id).action[m.i || 0]; return ['Actions: use ' + OH.card(m.id).name, opsWords(a.do) + '.']; }
   if (m.t === 'mile') return ['Projects, Milestones: claim ' + M.MILESTONES.filter(function (x) { return x.k === m.k; })[0].name, '5 points for 8 credits.'];
   if (m.t === 'award') return ['Projects, Awards: fund ' + M.AWARDS.filter(function (x) { return x.k === m.k; })[0].name, 'You lead it: 5 points at the end.'];
-  if (m.t === 'sell') return ['Sell cards you cannot use', '1 credit each.'];
+  if (m.t === 'sell') return ['Sell ' + plural(m.ids.length, 'card') + ' you cannot play yet', 'Their needs are far off. 1 credit each.'];
   if (m.t === 'end') return ['End your turn', 'Save your credits for later.'];
   if (m.t === 'pass') return ['Pass for this round', 'Next income: +' + (G.pl[0].prod.mc + G.pl[0].tr) + ' credits.'];
   return ['Choose an option', ''];
