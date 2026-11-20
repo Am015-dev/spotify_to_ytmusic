@@ -180,3 +180,17 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 #bf .bf-chip:has(.bf-pj)>i{display:none}
 #bf .bf-chip:has(.bf-pj){gap:2px;padding:0 6px}
 #bf .bf-chip .bf-pj{padding:1px 3px;margin-left:2px}
+/* F1 (R79): 44px hit boxes everywhere at 375x553; the drawn tile keeps its size (--v) inside the box */
+#bf .bf-table>.bf-t svg{position:absolute;left:50%;top:50%;width:var(--v);height:var(--v);margin:calc(var(--v)/-2) 0 0 calc(var(--v)/-2)}
+#bf .bf-table>.bf-t.sun{box-shadow:none;border-radius:0}
+#bf .bf-table>.bf-t.sun svg{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
+#bf .bf-table .bf-t.nofit::after{right:calc(50% - var(--v)*.56);top:calc(50% - var(--v)*.56);width:max(12px,calc(var(--v)*.4));height:max(12px,calc(var(--v)*.4))}
+#bf .bf-table .bf-t.adv{outline:none;animation:none}
+#bf .bf-table .bf-t.adv svg{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out 3}
+#bf .bf-me .bf-rack{min-height:44px;box-sizing:border-box;align-items:center}
+#bf .bf-me .bf-fl{min-height:44px;box-sizing:border-box;align-items:center}
+#bf .bf-c.pick{z-index:2}
+#bf .bf-c.pick>.bf-hit{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:8px}
+/* F1 (R79 P3): the bulb bubble keeps a readable width and stays on screen (the shell's short-phone padding was for a corner OK button it doesn't have) */
+html body .gxh-bub.gxh-bulbb{min-width:min(236px,calc(100vw - 12px));box-sizing:border-box}
+html body .gxh-bub.gxh-bulbb .gxh-tx{padding-right:0}

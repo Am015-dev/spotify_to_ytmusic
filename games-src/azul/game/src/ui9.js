@@ -327,7 +327,7 @@ function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I
   let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,Math.max(46,Math.min(62,H/14))):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
   const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
 function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),Math.max(130,Math.min(W,H)*.3)));   // W466: big kilns on big screens
-  const ax=Math.max(10,W/2-ks/2-6),ay=Math.max(10,H/2-ks/2-6);const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
+  const ax=Math.max(10,W/2-ks/2-12),ay=Math.max(10,H/2-ks/2-6);/* F1: 12px side margin keeps side kilns and their hit boxes inside the frame */const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
   return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
 function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
   const am=can&&UI.coach&&UI.cmp&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
@@ -335,14 +335,14 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
     h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
-    a.forEach((t,k)=>{const key=`f${i}_${k}`;const tight=Math.max(ts,44)>ts*1.12,off=tight?R.ks/4:.56*ts;const x=(k%2?off:-off),y=(k<2?-off:off);const hs=tight?R.ks/2:Math.max(ts,44);   // small kilns: the four hit boxes are the kiln's quadrants, never overlapping (a 44px box on a 20px pitch covered its neighbours)
+    a.forEach((t,k)=>{const key=`f${i}_${k}`;const tight=Math.max(ts,44)>ts*1.12,off=tight?R.ks/4:.56*ts;const x=(k%2?off:-off),y=(k<2?-off:off);const hs=Math.max(44,tight?R.ks/2:ts);   // F1: always a 44px hit box (boxes may overlap on small kilns; bfClick takes the tile nearest the tap)   // small kilns: the four hit boxes are the kiln's quadrants, never overlapping (a 44px box on a 20px pitch covered its neighbours)
       const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
       h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-hs/2}px;top:${R.ks/2+y-hs/2}px;width:${hs}px;height:${hs}px;--v:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
     h+='</div>'});
   const items=S.ctr.map((t,k)=>({t,k})).sort((u,v)=>u.t-v.t||u.k-v.k);if(S.markerIn==='ctr')items.unshift({t:SUN,k:'sun'});const N=items.length;
   if(N){let b=null;for(let c=1;c<=N;c++){const rr=Math.ceil(N/c);const s=Math.min(ts*1.05,R.pw*.9/c,R.ph*.84/rr);if(!b||s>b.s)b={c,rr,s}}const p=b.s,gx=R.cx-b.c*p/2,gy=R.cy-b.rr*p/2;
     items.forEach((it,j)=>{const x=gx+(j%b.c)*p,y=gy+Math.floor(j/b.c)*p;const key=it.k==='sun'?'sun':'c_'+it.k;const up=sel&&sel.src<0&&(it.t===SUN||it.t===sel.c||(it.t===PRISM&&sel.j));
-      h+=`<i class="bf-t${up?' up':''}${it.t===SUN?' sun':nf(it.t)+(isAdv(-1,it.t)?' adv':'')}${BF.hide.has(key)?' hid':''}" data-k="${key}"${it.t===SUN?' title="Sun token"':` role="button" aria-label="${TNAME[it.t]}"`} style="left:${x+p*.05}px;top:${y+p*.05}px;width:${p*.9}px;height:${p*.9}px">${bfUse(it.t)}</i>`})}
+      h+=`<i class="bf-t${up?' up':''}${it.t===SUN?' sun':nf(it.t)+(isAdv(-1,it.t)?' adv':'')}${BF.hide.has(key)?' hid':''}" data-k="${key}"${it.t===SUN?' title="Sun token"':` role="button" aria-label="${TNAME[it.t]}"`} style="left:${x+p/2-Math.max(44,p*.9)/2}px;top:${y+p/2-Math.max(44,p*.9)/2}px;width:${Math.max(44,p*.9)}px;height:${Math.max(44,p*.9)}px;--v:${p*.9}px">${bfUse(it.t)}</i>`})}
   return h}
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
@@ -359,7 +359,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
       if(c===tc&&v<0){cls=' tgt';if(!X.tp)inner+=`<em>+${X.pv.pts}</em>`}
       else if(v<0&&!S.ex.gray&&p.lines[r].length===cap(r)&&lineColour(p.lines[r])>=0&&WALLCOL(lineColour(p.lines[r]),r)===c){cls=' ready';inner=bfTile(lineColour(p.lines[r]),null,'gh')}
       if(S.ex.gray?(blk.startsWith('mosaic')&&v>=0&&(v<5?v:v-10)===sel.c):c===clashC)cls=' clash';
-      if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em>`}
+      if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em><i class="bf-hit" aria-hidden="true"></i>`}
       wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
     h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${badge2}${rk}</div><i class="bf-ar"><b class="bf-rn" aria-hidden="true">${r+1}</b></i><div class="bf-wall">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
@@ -425,9 +425,10 @@ function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
   const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
   if(!G||G.over)return;const hp=me();if(!hp){bfShake(BF.hint);return}BF.fingerOn=false;   // W466: not your turn: the line nudges ("Tamsin is choosing")
-  if(G.phase==='wall'){const c=t.closest('[data-bfcell]');if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
+  if(G.phase==='wall'){let c=t.closest('[data-bfcell]');if(e.clientX!=null&&(c||t.closest('.bf-me'))){let bd=30;for(const el of BF.root.querySelectorAll('[data-bfcell]')){const r=el.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;c=el}}}if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
   if(G.phase!=='offer')return;
   let tile=t.closest('[data-k]');
+  if(tile&&e.clientX!=null&&tile.closest('.bf-table')){let bd=1e9;for(const el of BF.tbl.querySelectorAll('[data-k]:not(.hid)')){const r=bfR(el);if(!r)continue;const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;tile=el}}}   // F1: 44px hit boxes overlap on small kilns: the tile drawn nearest the tap wins
   if(!tile&&e.clientX!=null){const sc=t.closest('[data-bfsrc]');if(sc){const i=+sc.dataset.bfsrc;let best=null,bd=1e9,tw=0;// a tap anywhere on a kiln (or near a courtyard tile) takes the nearest tile
       for(const el of BF.tbl.querySelectorAll(`[data-k^="${i<0?'c_':'f'+i+'_'}"]`)){const r=el.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;best=el;tw=r.width}}
       if(best&&(i>=0||bd<tw*1.7))tile=best}}
