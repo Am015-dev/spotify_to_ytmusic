@@ -94,7 +94,7 @@
     var c = G.city[cid]; if (!c) return null;
     var coins = D.CITY_COIN[c.g] * (1 + c.h.length);
     var goods = emptyGoods();
-    if (c.g === 'brick') { goods.food += 1; goods.brick += 1; } else { goods.brick += 1; goods[c.g] += 1; }
+    if (c.g === 'brick') goods.food += 1; else { goods.brick += 1; goods[c.g] += 1; }   // brick city: 1 grain only
     return { coins: coins, goods: goods };
   };
   function canPay(p, cost) { if (p.coins < (cost.coins || 0)) return false; for (var g in cost.goods) if (p.goods[g] < cost.goods[g]) return false; return true; }
@@ -305,7 +305,7 @@
         var id = G.disp[m.s]; G.disp[m.s] = null; p.hand.push(id); pd.left--;
         lg(G, p.name + ' buys ' + D.CARDS[id].n + '.');
         if (G.deck.length === 0 && G.disp.every(function (x) { return x == null; })) triggerEnd(G, pi, 'bought the last card');
-        if (pd.left <= 0 || G.phase !== 'play') return endTurn(G);
+        if (pd.left <= 0 || G.phase !== 'play' || G.disp.every(function (x) { return x == null; })) return endTurn(G);
         return G;
       }
       if (m.t === 'done') return endTurn(G);

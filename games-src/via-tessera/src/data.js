@@ -26,16 +26,16 @@ VTD.OWL = { brick: 3, food: 3, tool: 3, wine: 4, cloth: 5 };
 // actions: arch (move + build), pref (rule a region / collect taxes), merc (coins + trade), sen (buy 2), cons (buy 1, no surcharge),
 // dipl (copy rival's top card), colo (new carts/ships or coins), trib (take cards back), spec (your cities of one good produce)
 VTD.ACTS = {
-  arch: { n: 'Roadmaster', icon: 'temple', what: 'Move carts and ships, then build houses' },
+  arch: { n: 'Builder', icon: 'temple', what: 'Move carts and ships, then build houses' },
   pref: { n: 'Governor', icon: 'scroll', what: 'A region produces, or collect taxes' },
   merc: { n: 'Trader', icon: 'coins2', what: 'Take coins, then trade 2 kinds of goods' },
   sen: { n: 'Patron', icon: 'laurel', what: 'Buy up to 2 cards from the market' },
-  cons: { n: 'Magistrate', icon: 'toga', what: 'Buy 1 card at its printed price' },
+  cons: { n: 'Censor', icon: 'toga', what: 'Buy 1 card at its printed price' },
   dipl: { n: 'Envoy', icon: 'masks', what: 'Copy the rival’s last card' },
   colo: { n: 'Settler', icon: 'meeple', what: 'New carts or ships, or take coins' },
   trib: { n: 'Herald', icon: 'bugle', what: 'Take your played cards back' },
   spec: { n: 'Maker', icon: 'trowel', what: 'Your cities of one good produce' } };
-VTD.SPEC_NAME = { brick: 'Brickmaker', food: 'Harvester', tool: 'Toolwright', wine: 'Winemaker', cloth: 'Clothier' };
+VTD.SPEC_NAME = { brick: 'Potter', food: 'Reaper', tool: 'Tinker', wine: 'Presser', cloth: 'Dyer' };
 var C = [], mk = function (act, god, cost, deck, extra) { var c = { id: C.length, act: act, god: god, cost: cost || {}, deck: deck }; for (var k in extra || {}) c[k] = extra[k]; c.n = act === 'spec' ? VTD.SPEC_NAME[c.spec] : VTD.ACTS[act].n; C.push(c); return c.id; };
 // starting hand (each player has these 7)
 VTD.START_HAND = [mk('trib', 'shield', {}, 0), mk('arch', 'eagle', {}, 0), mk('pref', 'sickle', {}, 0), mk('pref', 'sickle', {}, 0), mk('merc', 'wing', {}, 0, { coins: 3 }), mk('dipl', 'eagle', {}, 0), mk('sen', 'hearth', {}, 0)];
