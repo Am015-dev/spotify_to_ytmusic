@@ -2,7 +2,7 @@
 
 Every rule of the published rulebook this game adapts (name deliberately not written), numbered. Each id has exactly one headless assertion
 in `logic-test.js` against the real engine (`node logic-test.js`; failure line = rule id, expected, got). `node logic-test.js --md` prints this list.
-Sources: knowledge of the rulebook plus a public rulebook summary page (8 Nov 2026); facts only, nothing copied.
+Sources: knowledge of the rulebook plus a public rulebook summary page (8 Nov 2026), and the rulebook text itself for F14 (20 Nov 2026: path-map research, bonus tiles, optional artifact effect, level-II idols, solo rival tiles); facts only, nothing copied. Component counts: COMPONENTS.md.
 
 Numbers that are the game's own on purpose (not rules; see rules-notes.md): every card, site, guardian and idol value, the research row costs,
 bonuses and points, empty shrine slot values (1,1,1,2), compass costs to discover (3 / 6), temple arrival points (10/8/6/4). Tests for these
@@ -11,7 +11,9 @@ check that the engine applies its own table exactly, not that it equals the prin
 Known open (not fixed, reason): A13/A14/A15 box has 6 level-II sites, 16 idols, 40 items; the game has 8 / 12 / 35 (content and art slots in
 assets.json, needs new cards/pictures). H4 exile from the play area: needs a UI change (the exile picker reads the discard pile, W427 owns UI).
 K3 the rival stack is 8 tiles, not 10 (our own rival design, changing it needs a solo balance sign-off). Also simplified on purpose, no test:
-guardian boons that are travel values, free-action (lightning) cards, assistants, bonus tiles in the temple, blocking tiles, the other board side.
+guardian boons that are travel values, free-action (lightning) cards, bonus tiles in the temple, blocking tiles, the other board side.
+FIXED2 r2: research assistants are now built (section L: offer of 3, hire on rows 2/5 with the magnifier, gold upgrade with the notebook,
+once a round free, max 2; names, abilities, rows and the limit are our own).
 
 ## A. Setup
 
@@ -34,7 +36,7 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## B. Rounds and turns
 
-- **B1** A turn is exactly one main action (play a card), then play passes to the next explorer.
+- **B1** A turn is exactly one main action (play an item card), then play passes to the next explorer.
 - **B2** Passing is a main action; a passed player is skipped for the rest of the round (3 players: 0 passes, 1 acts, 2 acts, then 1 again).
 - **B3** If everyone else has passed, the last player takes turns one after another.
 - **B4** The round ends when all players have passed: next round starts, explorers return to the board owners.
@@ -104,6 +106,8 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 - **G1** Buy an item: pay its coins, it goes face down to the BOTTOM of your deck (not hand/discard), the row refills with an item.
 - **G2** Cannot buy an item without enough coins.
 - **G3** Buy an artifact: pay compasses, it goes to the play area and its effect fires at once with no tablet paid.
+- **G3b** Buying an artifact, using its effect is optional: you may take it into your play area without using it.
+- **F9** A level-II site holds a face-up and a face-down idol: discovering it gives both idols but only the face-up gift.
 - **G4** Buying an artifact is a main action (turn passes).
 - **G5** An artifact played from hand costs 1 tablet.
 - **G6** When a card stack is empty, that slot is not refilled (no card of the other type slides in).
@@ -111,7 +115,9 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 
 ## H. Play a card
 
-- **H1** Playing a card gives its effect and uses the main action (funding card: +1 coin).
+- **H1** Playing a starting coin card gives its effect as a FREE action: +1 coin, still your turn.
+- **H1b** Playing a starting compass card is free too; you can play both and still take a main action.
+- **H1c** Playing an item card for its effect uses the main action.
 - **H2** Dread cards have no effect and cannot be played.
 - **H3** Exile removes a card from the game for good (hand card exiled, then the rest of the effect).
 - **H4** Exile can also take a card from your PLAY area (including the card just played).
@@ -123,7 +129,10 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 - **I1** Research: pay the row cost, move the magnifier up one row, take the row bonus.
 - **I2** The notebook may never rise above the magnifier (equal is fine).
 - **I3** Each arrival (magnifier or notebook) takes the row bonus.
-- **I4** First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.
+- **I4** Research bonus tile: only the FIRST token to reach a space takes its tile (the tile leaves the game); every arrival takes the row effect.
+- **I4b** Research is a path map: you may only move into a space joined to yours (row-1 left joins both row-2 spaces, row-1 right only the right one).
+- **I4c** The cost is the bridge into the chosen space: row 2 left costs 1 arrowhead, row 2 right 1 tablet + 1 coin.
+- **I4d** Setup: 18 research bonus tiles; the Lost Temple stack gets one per player and 8 / 10 / 12 path spaces get one at 2 / 3 / 4 players.
 - **I5** Magnifier in the temple (top row) scores by order of arrival: first 10, second 8 (points).
 - **I6** The notebook can never enter the temple row.
 - **I7** Magnifier already in the temple: research buys a temple tile instead. A 6-point stack needs two of the three costs, the 11-point stack needs all three.
@@ -153,7 +162,46 @@ guardian boons that are travel values, free-action (lightning) cards, assistants
 - **K2** Solo: the rival is the starting player every round, so it takes a tile before your first action.
 - **K3** Solo: the rival action stack has 10 tiles per round.
 - **K4** Solo: the rival keeps playing its tiles after you pass, until all are used.
-- **K5** Solo: the rival overcoming a guardian scores 5 points.
+- **K5** Solo: the rival overcoming a guardian on a site where it camps scores 5 points.
 - **K6** Solo: the rival discovering a site takes an idol worth 3 points.
+- **K7** Solo: each round the stack is all 5 dig tiles plus one tile of each of the 5 green/red pairs; the number of red tiles is the difficulty (Easy 0, Normal 3, Hard 5).
+- **K8** Solo: the green item tile takes the item with the fewest points, the red one the item with the most.
+- **K9** Solo: the rival dig tile puts its explorer on a free site that gives that resource, preferring the higher row.
+- **K10** Solo: the rival never takes Dread and never gains resources (it only scores points).
 
-TOTAL 110
+## L. Research assistants
+
+- **L1** Setup: 12 assistants, silver side up, in 3 stacks of 4; nobody has one.
+- **L2** Notebook onto a silver-symbol row: choose the top assistant of a stack; it joins silver side up; then the turn ends.
+- **L3** The magnifier on that row recruits nobody (assistants come from the notebook).
+- **L4** Notebook onto a gold-symbol row: flip one assistant to gold, and it is refreshed even if used this round.
+- **L5** Using an assistant turns it sideways (once a round); a free-action assistant does not end the turn.
+- **L6** All assistants are refreshed at the end of the round.
+- **L7** The gold side has the stronger effect.
+- **L8** Two assistant squares: with 2 assistants a recruit can only upgrade.
+- **L9** The discount assistant (no free-action icon) is your main action: buy an item or artifact 1 cheaper (2 when gold).
+- **L10** The choice assistant gives a coin or a Plane; the Plane pays a travel icon this turn.
+- **L11** The travel assistant needs a Boot of travel (paid like a dig) to make an arrowhead.
+- **L12** A free notebook step (a boon) onto a silver-symbol row also recruits.
+
+## M. Free items, travel boons, temple, blocking, exile
+
+- **M1** A lightning (free-action) item is played without using your main action.
+- **M2** A travel boon pays a travel cost like a card, once; then it is used.
+- **M3** Temple stacks: one 11, two 6 and three 2 point stacks, each with as many tiles as players.
+- **M4** A 2-point temple tile pays one of the three costs.
+- **M5** Magnifier reaching the Lost Temple: choose one bonus tile from a stack of as many tiles as players.
+- **M6** Blocking tiles: 2 players block all 5 camp second spaces, 3 players block 3, 4 players none.
+- **M7** With 4 players two explorers can dig at the same camp (its second space).
+- **M8** Exile can take a card from your play area.
+
+## Z. Rulebook audit (FIXED9, see RULES-AUDIT.md)
+
+- **Z1** A camp site has two spaces; the second one costs two icons (a Boot site: 2 Boots), the first one icon.
+- **Z2** Every archaeologist taken back from a site with a guardian brings a Fear (Dread) card: both spaces of a camp site.
+- **Z3** A guardian can be overcome by an archaeologist on either space of its site.
+- **Z4** Several idols may be set in shrine slots in one turn (free actions); each of the 4 slots only once.
+- **Z5** A Fear card can still pay one Boot of travel (it only has no effect).
+- **Z6** No shuffling during a round: with an empty deck a draw gives nothing.
+
+TOTAL 147

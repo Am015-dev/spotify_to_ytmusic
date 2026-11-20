@@ -12,7 +12,8 @@ let fails = 0; const ok = (c, msg) => { if (!c) { fails++; console.log('FAIL', m
   p.res.coin = 2; ok(VG.payPlan(G, 0, ['ship']).coins === 2, '2 coins buy a plane for a boat');
   p.res.compass = 3; const d = VG.moves(G).find(m => m.t === 'disc' && G.sites[m.s].lvl === 1 && G.sites[m.s].cost.every(c => c === 'boot'));
   ok(d, 'discover legal with 3 compasses and 2 boots'); VG.apply(G, d); const x = G.sites[d.s];
-  ok(x.tile && x.guard && x.occ === 0 && p.idols.length === 1 && p.res.compass === 0, 'discover: site, guardian, idol, compasses paid');
+  const back = (V.IDOL[p.idols[0] && p.idols[0].id] ? V.IDOL[p.idols[0].id].gift.compass || 0 : 0) + (V.SITE[x.tile].rew.compass || 0);   /* idol gift and site loot can hand compasses back */
+  ok(x.tile && x.guard && x.occ === 0 && p.idols.length === 1 && p.res.compass === back, 'discover: site, guardian, idol, 3 compasses paid');
   ok(G.turn === 1, 'turn passes after a main action');
   VG.apply(G, { t: 'pass' }); ok(G.turn === 0, 'back to me after the other passes');
   p.res.arrow = 5; p.res.jewel = 5; p.res.tablet = 5; p.res.coin = 5; p.res.compass = 5;
@@ -46,14 +47,29 @@ let fails = 0; const ok = (c, msg) => { if (!c) { fails++; console.log('FAIL', m
   p.hand.push('dread'); ok(!VG.moves(G).some(m => m.t === 'play' && p.hand[m.i] === 'dread'), 'Dread cannot be played for an effect'); p.res.tablet = t0;
   VG.apply(G, VG.moves(G).find(m => m.t === 'res')); ok(p.glass === 1 && p.res.tablet === 1 && p.res.coin === 3, 'magnifier row 1: pay tablet, +1 coin');
 }
-{ const G = VG.newGame({ np: 1, seed: 6, solo: true }); ok(G.rival && G.rival.deck.length + G.rival.played.length === 8, 'solo: rival deck of 8');
+{ const G = VG.newGame({ np: 1, seed: 6, solo: true }); ok(G.rival && G.rival.deck.length + G.rival.played.length === 10, 'solo: rival stack of 10 (logic-test K3)');
   const before = G.rival.deck.length; VG.apply(G, VG.moves(G).find(m => m.t === 'dig')); ok(G.rival.deck.length === before - 1, 'rival acts after my main action'); }
 { const G = VG.newGame({ np: 2, seed: 11 }); const a = G.p[0], b = G.p[1]; a.res.tablet = 5; a.res.arrow = 5; b.res.tablet = 5; b.res.arrow = 5;
   VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g'));
-  const t0 = a.res.tablet; VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); ok(a.glass === 2 && a.res.tablet === t0 + 1, 'first magnifier to row 2 takes the extra tablet');
-  const tb = b.res.tablet; VG.apply(G, VG.moves(G).find(m => m.t === 'res' && m.k === 'g')); ok(b.glass === 2 && b.res.tablet === tb, 'second arrival gets no first-arrival reward');
+  const hire = () => { while (G.q && G.q.h === 'asst') VG.apply(G, VG.moves(G)[0]); };   /* row 2 also hires an assistant (logic-test L2) */
+  G.rbt['2_0'] = 10; a.gpos = 0; b.gpos = 0; const j0 = a.res.jewel; VG.apply(G, { t: 'res', k: 'g', to: 0 }); hire(); ok(a.glass === 2 && a.res.jewel === j0 + 1 && !('2_0' in G.rbt), 'first token to a path space takes its research bonus tile');
+  const jb = b.res.jewel; VG.apply(G, { t: 'res', k: 'g', to: 0 }); hire(); ok(b.glass === 2 && b.res.jewel === jb, 'the second arrival finds no tile');
   ok(G.dread === 19 - 4, 'Dread supply = 19 minus 2 per starting deck'); G.dread = 0; const x = G.sites[0]; x.occ = 0; x.guard = 'stone-ape'; a.ex = 1;
   G.p.forEach(p => p.passed = true); G.p[G.turn].passed = false; VG.apply(G, { t: 'pass' }); ok(a.fearTiles === 1 && VG.score(G, 0).fear <= -4, 'empty Dread supply: a fear tile worth -2'); }
+// ---- COMPONENTS (COMPONENTS.md): counts and distributions match the original's structure
+{ const cnt = (a, f) => a.filter(f).length;
+  ok(V.ITEMS.length === 40 && V.ARTS.length === 35 && V.GUARDS.length === 15 && V.S1.length === 10 && V.S2.length === 6 && V.IDOLS.length === 16 && V.ASST.length === 12 && V.DREAD_SUPPLY === 19, 'box counts 40/35/15/10/6/16/12/19');
+  ok(V.RBONUS.length === 18, '18 research bonus tiles');
+  ok(V.TEMPLE.length === 6 && cnt(V.TEMPLE, t => t.vp === 11) === 1 && cnt(V.TEMPLE, t => t.vp === 6) === 2 && cnt(V.TEMPLE, t => t.vp === 2) === 3, 'temple stacks: one 11, two 6, three 2 (24 tiles at 4 players)');
+  ok(V.TEMPLE.every(t => Object.keys(t.cost).length === (t.vp === 11 ? 3 : t.vp === 6 ? 2 : 1)), 'temple costs: 11 pays all three, 6 two, 2 one');
+  ok(V.RIVAL.length === 15 && cnt(V.RIVAL, c => c.a === 'dig') === 5 && ['disc', 'res', 'beat', 'item', 'art'].every(k => cnt(V.RIVAL, c => c.pair === k && c.red) === 1 && cnt(V.RIVAL, c => c.pair === k && !c.red) === 1), '15 rival tiles: 5 dig + 5 green/red pairs');
+  ok(cnt(V.RIVAL, c => c.arrow === 'L') >= 7 && cnt(V.RIVAL, c => c.arrow === 'R') >= 7, 'rival decision arrows split left/right');
+  ok(V.PATH.slice(1, V.TOP).every(r => r.length >= 1 && r.length <= 2) && V.PATH.slice(1, V.TOP).some(r => r.length === 2) && V.START_TO.length === 2, 'research path map: 2 start spaces, rows of 1-2 spaces');
+  ok(V.PATH.slice(1, V.TOP).every((r, i) => r.every(sp => sp.to.every(j => V.PATH[i + 2][j]))), 'every bridge leads to a real space');
+  ok(V.SHRINE.length === 5 && V.SLOTS === 4, 'idol slots: 4, each offers 5 effects');
+  ok(V.ASST_STACKS * 4 === V.ASST.length, 'assistants: 3 stacks of 4');
+  const kinds = {}; V.IDOLS.forEach(id => { const k = V.IDOL[id].kind; kinds[k] = (kinds[k] || 0) + 1; }); ok(Object.values(kinds).every(n => n === 4) && Object.keys(kinds).length === 4, 'idols: 4 kinds of 4');
+  ok(V.EXPL === 2 && V.HAND === 5 && V.ROUNDS === 5 && V.ROW === 6, '2 explorers, hand 5, 5 rounds, row of 6'); }
 // ---- full games
 const N = +process.argv[2] || 200; let stuck = 0, illegal = 0, errs = 0, games = 0; const tot = {}, len = [], wins = {};
 for (let g = 0; g < N; g++) {

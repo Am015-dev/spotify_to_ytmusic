@@ -7,7 +7,9 @@ function refreshInsp() {
   if (I.kind === 'site') {
     const x = G.sites[I.x], hid = !x.tile;
     h += `<h3>${esc(siteName(x))}</h3><div class="irow"><div class="big"><div class="site l${x.lvl}${hid ? ' hid' : ''}"><span class="pic" data-art="${hid ? 'site-hidden-' + x.lvl : 'site-' + x.tile}"></span></div></div><div>`;
-    h += `<p>Travel: ${x.cost.map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card pays one icon.</p>`;
+    h += `<p>Travel to get here: ${VG.siteCost(x).map(t => ic(t) + ' ' + V.TNAME[t]).join(' + ')}. Each card you play pays one icon.</p>`;
+    if (VG.siteCost(x).indexOf('plane') >= 0) h += `<p class="sm"><b>Needs a Plane.</b> Pay with a card that shows a Plane, or give ${G.planeCost || 2} coins for one.</p>`;
+    { const pl = VG.payPlan(G, UI.view, VG.siteCost(x)); if (pl) h += `<p class="sm">${esc(payWords(pl))}</p>`; }   /* F12: the full pay line lives here; the prompt keeps it short */
     h += hid ? `<p>Explore: pay ${V.DISC[x.lvl]} compasses and the travel.</p><p>You find an idol and loot. A guardian wakes.</p>` : `<p>Dig: get ${resWords(V.SITE[x.tile].rew)}.</p>`;
     if (x.occ !== -1) h += `<p>${esc(who(x.occ))} is here this round.</p>`;
     if (x.guard) { const gd = V.GUARD[x.guard]; h += `<div class="gport" data-art="guard-${x.guard}"><svg><use href="#s-guard"/></svg></div><p><b>${esc(gd.name)}</b> guards it.</p><p>Fight it: pay ${resWords(gd.cost)}. Win 5 points and a boon.</p><p>Boon: ${esc(V.opText(gd.boon))}.</p><p>Still here at round end? Take a Dread card.</p>`; }
@@ -18,23 +20,29 @@ function refreshInsp() {
   } else if (I.kind === 'row' || I.kind === 'hand') {
     const id = I.kind === 'row' ? G.row[I.x] : me.hand[I.x]; if (!id) return closeInsp(); const c = V.CARDS[id];
     h += `<h3>${esc(c.name)}</h3><div class="irow"><div class="big">${cardHTML(id, {})}</div><div><p><b>${c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card'}</b>${c.t === 'item' ? ': costs ' + c.cost + ' ' + rw('coin', c.cost) : c.t === 'art' ? ': costs ' + c.cost + ' ' + rw('compass', c.cost) : ''}.</p><p>${esc(c.t === 'fear' ? 'It does nothing. It costs 1 point.' : c.text)}</p>`;
-    h += `<p class="sm">Or use it to pay one ${V.TNAME[c.tr]} of travel.</p>${c.vp ? `<p class="sm">Worth ${c.vp} ${Math.abs(c.vp) === 1 ? 'point' : 'points'} at the end.</p>` : ''}`;
-    if (c.t === 'item') h += '<p class="sm">Bought items go under your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought.</p><p class="sm">Played from your hand, they cost 1 tablet.</p>';
+    h += `<p class="sm">Or use it to pay one ${V.TNAME[c.tr]} of travel.</p>${c.vp ? `<p class="sm">${ic('star', '')} Star badge: worth ${c.vp} ${Math.abs(c.vp) === 1 ? 'point' : 'points'} at the end.</p>` : ''}`;
+    if (I.kind === 'row' && c.t !== 'fear') { const k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); h += `<p class="sm">${n > 0 ? `<b>Need ${n}</b>: you are ${n} ${rw(k, n)} short. Earn ${n === 1 ? 'one' : 'them'} first (dig, play cards, climb research).` : 'You can afford it now.'}</p>`; }
+    if (c.t === 'item') h += '<p class="sm">Bought items go under your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Bought, you may use it at once for free.</p><p class="sm">Played from your hand, it costs 1 tablet.</p>';
     h += `<p><button type="button" class="btn alt" data-a="cards" data-id="${id}">See all cards</button></p></div></div>`;
-    L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
+    L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) { add(m, c.t === 'art' ? 'Buy and use it' : 'Buy it'); if (c.t === 'art') add(Object.assign({}, m, { nofx: 1 }), 'Buy, keep for later'); } if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
     if (q && q.h === 'buy' && I.kind === 'row') VG.moves(G).forEach(m => { if (m.v === I.x) add(m, 'Buy it ' + q.d.o + ' cheaper'); });
   } else if (I.kind === 'track') {
-    h += `<h3>Research track</h3><p>Your magnifier climbs first. Your notebook follows, never past it.</p><p>Each row costs what it shows and gives a bonus.</p><p>The top row is the temple. There you buy temple tiles.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Points</th></tr>`;
-    for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' (you)' : ''}</td><td>${resHTML(V.TRACK[r].cost)}</td><td>${resHTML(V.TRACK[r].bonus)}${V.FIRST[r] && !(G.firstTaken && G.firstTaken[r]) ? ' <span class="sm">first: </span>' + resHTML(V.FIRST[r]) : ''}</td><td>${V.GLASS_VP[r]}</td></tr>`;
+    h += `<h3>Research path</h3><p>Move up to a space joined to yours. Pay the cost on that space.</p><p>First one there takes its bonus tile. Every arrival gets the row bonus.</p><p>Your notebook follows, never past the magnifier. The top row is the temple.</p><table class="sct"><tr><th>Row</th><th>Spaces (cost)</th><th>Row bonus</th><th>Points</th></tr>`;
+    for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' (you)' : ''}</td><td>${V.PATH[r].map((sp, j) => (V.PATH[r].length > 1 ? (j ? 'R ' : 'L ') : '') + resHTML(sp.c) + (G.rbt && G.rbt[r + '_' + j] != null ? ' <span class="sm">tile: </span>' + resHTML(V.RBONUS[G.rbt[r + '_' + j]]) : '') + (r < V.TOP - 1 && V.PATH[r].length + V.PATH[r + 1].length > 2 ? ' <span class="sm">to ' + sp.to.map(k => V.PATH[r + 1].length > 1 ? (k ? 'R' : 'L') : 'up').join('+') + '</span>' : '')).join('<br>')}</td><td>${resHTML(V.TRACK[r].bonus)}</td><td>${V.GLASS_VP[r]}</td></tr>`;
     h += `</table><p class="sm">Points shown are for the magnifier.</p><p class="sm">Temple tiles left:</p>${V.TEMPLE.map((t, k) => `<p class="sm">${t.vp} points: ${G.temple[k]} left</p>`).join('')}`;
     L.forEach(m => { if (m.t === 'res' || m.t === 'temple') add(m, esc(trackLine(m))); });
   } else if (I.kind === 'guard') {
     const g = me.guards[I.x], gd = V.GUARD[g.id];
     h += `<h3>${esc(gd.name)}</h3><div class="gport" data-art="guard-${g.id}"><svg><use href="#s-guard"/></svg></div><p>Beaten: worth 5 points.</p><p>Boon (once, free): ${esc(V.opText(gd.boon))}.</p>${g.used ? '<p class="sm">Boon already used.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'boon' && m.k === I.x) add(m, 'Use the boon (free)'); });
+  } else if (I.kind === 'asst') {
+    const a = me.asst[I.x]; if (!a) return closeInsp(); const d = V.ASSTBY[a.id];
+    h += `<h3>${esc(d.name)}${a.gold ? ' (gold)' : ''}</h3><p>Once a round${d.main ? ' (uses your action)' : ', free'}: ${esc(V.opText(a.gold ? d.gd : d.s))}.</p>${a.gold ? '' : `<p class="sm">Gold side: ${esc(V.opText(d.gd))}.</p>`}<p class="sm">Your notebook on row ${V.ASST_UP.join(' or ')} turns one gold.</p>${a.ex ? '<p class="sm">Resting: ready again next round.</p>' : ''}`;
+    L.forEach(m => { if (m.t === 'asst' && m.k === I.x) add(m, d.main ? 'Use it (your action)' : 'Use it (free)'); });
+    if (!a.ex && !L.some(m => m.t === 'asst' && m.k === I.x) && myTurn()) h += '<p class="sm">You cannot pay its cost yet.</p>';
   } else if (I.kind === 'idol') {
     const d = me.idols[I.x], id = V.IDOL[d.id];
-    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end.</p><p>Set it in a shrine for a free boon now.</p><p class="sm">One idol a turn. Each empty shrine slot is worth points too.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
+    h += `<h3>${esc(id.name)}</h3><p>Worth ${V.IDOL_VP} points at the end.</p><p>Set it in a shrine for a free boon now.</p><p class="sm">Each of the 4 shrine slots works once. Each empty slot is worth points too.</p>${d.used ? '<p class="sm">This idol is in a shrine.</p>' : ''}`;
     L.forEach(m => { if (m.t === 'idol' && m.k === I.x) add(m, 'Shrine: ' + V.SHRINE[m.sh].text, ''); });
   }
   $('#insp').innerHTML = `<button type="button" class="ix" data-a="ix" aria-label="Close">×</button>` + h + (btns.length ? `<div class="ibtns">${btns.join('')}</div>` : '');
@@ -45,18 +53,27 @@ function whyNotSite(x) {
   if (x.occ !== -1) return 'Someone is already here.';
   if (!me.ex) return 'Both explorers are already out.';
   if (!x.tile && me.res.compass < V.DISC[x.lvl]) return 'You need ' + V.DISC[x.lvl] + ' compasses to explore.';
-  return 'You cannot pay this travel. 2 coins buy a Plane.';
+  return VG.siteCost(x).indexOf('plane') >= 0 ? 'Needs a Plane: play a Plane card, or pay ' + (G.planeCost || 2) + ' coins.' : 'You cannot pay this travel yet. Cards with the same icon pay it; 2 coins buy a Plane.';
 }
 // ---------------------------------------------------------------- input: tap selects (it lifts, the line says what it does), tap again does it; or drag it
-function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
+/* F16: one tap acts in real games (the guided tutorial keeps its own steps); a 4 s Undo puts the game back as it was, and the rival waits for it */
+function oneTapOk(k) { return (k === 'hand' || k === 'row' || k === 'site' || k === 'track') && !(UI.mode === 'tutorial' && !UI.coachFree) && UI.humans.length === 1; }
+function actUndo(m) { const snap = JSON.stringify(G), wl = JSON.stringify(UI.whyL || {}); act(m); if (!G || G.phase !== 'play') return; UI.undo = { s: snap, wl, until: Date.now() + 4000 }; undoShow(); }
+function undoShow() { let b = $('#undob'); if (!b) { b = document.createElement('button'); b.type = 'button'; b.id = 'undob'; b.dataset.a = 'undo'; b.textContent = '↶ Undo'; document.body.appendChild(b); }
+  b.hidden = false; clearTimeout(undoShow.t); undoShow.t = setTimeout(undoEnd, Math.max(0, UI.undo.until - Date.now())); }
+function undoEnd() { UI.undo = null; const b = $('#undob'); if (b) b.hidden = true; }
+function undoDo() { const u = UI.undo; if (!u || Date.now() > u.until + 300) { undoEnd(); return; } clearTimeout(schedule.t); clearTimeout(turnWait.t); turnWait.fn = null; clearTimeout(undoShow.t);
+  G = JSON.parse(u.s); UI.whyL = JSON.parse(u.wl); undoEnd(); UI.busy = false; UI.sel = null; try { fxHide(); } catch (e) { } document.querySelectorAll('.vpop').forEach(e => e.remove()); save(); render(); $('#prompt').textContent = 'Undone. ' + promptLine(legal()); };
+function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; undoEnd(); UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
 function pick(k, x, id) {
   if (!G) return;
-  if (k === 'guard' || k === 'idol') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
+  if (k === 'guard' || k === 'idol' || k === 'asst') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
   const ms = movesFor(k, x), S = UI.sel;
   if (G.q && ms.length) { act(ms[0]); return; }   /* answering a question: one tap */
   if (k === 'site' && S && S.k === 'pawn') { const m = ms.find(z => z.t === 'dig' || z.t === 'disc'); if (m) { act(m); return; } }
   const same = S && S.k === k && (k === 'track' || S.x === x);
   if (same && ms.length === 1) { act(ms[0]); return; }
+  if (!same && ms.length === 1 && oneTapOk(k)) { if (!tutAct({ what: k, x, id })) return; actUndo(ms[0]); return; }   /* F16: one tap plays it, with a short Undo (no tap-then-button) */
   if (same && k === 'pawn') { UI.sel = null; render(); return; }
   if (!tutAct({ what: k, x, id })) return;
   sfx.play('tap'); UI.sel = { k, x, at: G.turns + ':' + G.round + ':' + G.p[UI.view].hand.length }; render();
@@ -67,7 +84,7 @@ document.addEventListener('click', e => {
   if (a === 'ix') { closeInsp(); return; }
   if (a === 'mv') { const m = UI.mv[+t.dataset.m]; if (m) act(m); return; }
   if (a === 'details') { const S = UI.sel; if (S) { openInsp(S.k, S.x); } return; }
-  if (a === 'site' || a === 'row' || a === 'hand' || a === 'track' || a === 'guard' || a === 'idol' || a === 'pawn') {
+  if (a === 'site' || a === 'row' || a === 'hand' || a === 'track' || a === 'guard' || a === 'idol' || a === 'asst' || a === 'pawn') {
     const x = a === 'site' || a === 'hand' ? +t.dataset.i : a === 'row' ? +t.dataset.r : +t.dataset.k; pick(a, x, t.dataset.id); return;
   }
   if (UIACT[a]) UIACT[a](t, e);
@@ -107,47 +124,68 @@ $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' &&
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (UI.insp) closeInsp(); else if (UI.sel) { UI.sel = null; render(); } });
 /* a tap on empty board drops the selection */
 document.addEventListener('click', e => { if (!UI.sel || !G) return; if (e.target.closest('[data-a],#dock,.gx-bar,#insp,.gx-drawer,.gxt-cell,.gxt-bub')) return; if (e.target.closest('#board')) { UI.sel = null; render(); } });
-const UIACT = {};
+const UIACT = {}; UIACT.undo = () => undoDo();
 UIACT.hints = () => { UI.prefs.hints = !UI.prefs.hints; savePrefs(); if (window.GXH) try { GXH.setEnabled(hintsOn()); if (!hintsOn()) GXH.hide(); } catch (e) { } render(); };
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
 function doMove(m) {
   if (!G) return; const best = UI.mode === 'tutorial' && typeof coachOn === 'function' && coachOn() && !m.free && m.t !== 'ans' ? VAI.choose(G, 'hard') : null;
-  const s = VG.actor(G), b = snapS(s), F = fxBefore(m, s), r = VG.apply(G, m);
+  const s = VG.actor(G), W = whyPre(), b = snapS(s), F = fxBefore(m, s), sc0 = s >= 0 ? VG.score(G, s).total : 0, cap0 = m.t !== 'ans' ? moveCaption(m, s) : '', r = VG.apply(G, m);   /* F12: the caption is read before the move (a bought card leaves the market) */
   if (!r.ok) { render(); return; }
   if (window.GXH) try { GXH.hide(); } catch (e) { }
-  const delay = showEvents(s);
+  const delay = showEvents(s), why = whyPost(W);
   save(); render(); actFx(m, s, F, b); if (best) coachMove(m, best);
-  if (!UI.fast && m.t !== 'ans' && !m.free) $('#prompt').textContent = moveCaption(m, s);
-  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(650, Math.min(delay, 1200)));
+  const dp = s >= 0 ? VG.score(G, s).total - sc0 : 0;   /* say where points come from, so a rival's jump is never a mystery */
+  if (!UI.fast && m.t !== 'ans' && (!m.free || dp)) $('#prompt').textContent = cap0 + (dp ? ' ' + why + '.' : '') + (G.rival && UI.whyL && UI.whyL[-2] && W.rt !== VG.rivalScore(G) ? ' ' + UI.whyL[-2] + '.' : '');
+  UI.busy = true; setTimeout(() => { UI.busy = false; after(); }, UI.fast ? 0 : Math.max(500, Math.min(delay, 800)));
 }
 function after() {
   if (!G) return; render();
+  if (UI.rcardDue && G.phase === 'play' && !UI.fast && UI.mode !== 'tutorial') { showRoundCard(UI.rcardDue); return; }   /* F15: the round's points, per source, for you and the rival */
   if (G.phase === 'over') { clearSave(); setTimeout(() => { try { if (typeof CO !== 'undefined') { CO.q.length = 0; coachHide(); } } catch (x) { } showResult(); if (UI.mode === 'tutorial' && typeof coachScoreStart === 'function') try { coachScoreStart(); } catch (x) { console.warn(x); } }, UI.fast ? 0 : 900); return; }
   const s = VG.actor(G);
   if (!isHuman(s)) { schedule(); return; }
+  UI.rivalT0 = 0; UI.quick = false;
   if (s !== UI.view) { if (UI.humans.length > 1) showPass(s); else { UI.view = s; render(); } }
 }
-function aiDelay() { const b = typeof GX !== 'undefined' && GX.aiDelay ? GX.aiDelay(650) : 650; return UI.fast ? 0 : b; }
+function aiDelay() { const b = typeof GX !== 'undefined' && GX.aiDelay ? GX.aiDelay(650) : 650; return UI.fast ? 0 : UI.quick ? 150 : b; }
 function schedule() {
   clearTimeout(schedule.t); if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
-  schedule.t = setTimeout(aiStep, aiDelay());
+  const uw = UI.undo ? UI.undo.until - Date.now() : 0;   /* F16: the rival waits while Undo is open */
+  schedule.t = setTimeout(aiStep, Math.max(aiDelay(), uw > 0 ? uw + 50 : 0));
+}
+function finishSolo() {   /* the rest of the rivals' round at once; one line says how many moves they made */
+  const r0 = G.round; let n = 0;
+  while (G.phase === 'play' && !isHuman(VG.actor(G)) && n < 400) { const s = VG.actor(G), m = VAI.choose(G, G.p[s].ai || 'normal'); const r = m ? VG.apply(G, m) : { ok: false }; if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); } n++; }
+  UI.quick = false; G.ev = []; save(); UI.busy = false; rivalCap(''); fxHide();
+  if (n) rlogAdd(-2, (G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')));
+  if (n && G.phase === 'play') toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);   /* F14 (R93): no toast over the game-over score floats */
+  after();
 }
 function aiStep() {
   if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
-  if (!$('#fx').hidden) { schedule.t = setTimeout(aiStep, 400); return; }   /* the guardian card is still up: wait for it */
+  if (UI.undo && UI.undo.until > Date.now()) { schedule(); return; }
+  undoEnd();
+  if (!UI.rivalT0) UI.rivalT0 = Date.now();   /* the wait budget counts from the end of the human's move, guardian card included */
+  if (!$('#fx').hidden) { schedule.t = setTimeout(aiStep, 200); return; }   /* the guardian card is still up: wait for it */
+  /* every human has passed: the rivals finish the round briskly; after 3 s the rest happens at once (no wait over 4 s) */
+  /* wait budget (R20: no wait over 4 s): a rival run starts brisk; after 1.2 s (or once every human passed) steps are quick; after 2.4 s the rest of the run happens at once */
+  const solo = !UI.fast && UI.mode !== 'tutorial' && G.p.every(p => p.ai || p.passed);
+  if (!UI.rivalT0) UI.rivalT0 = Date.now(); const el = Date.now() - UI.rivalT0;
+  UI.quick = !UI.fast && UI.mode !== 'tutorial' && (solo || el > 1200);
+  if (UI.quick && el > 2400) { finishSolo(); return; }
   const m = (UI.mode === 'tutorial' && tutAI(s)) || VAI.choose(G, G.p[s].ai || 'normal') || VG.moves(G).find(x => x.t === 'pass'), g0 = G;
   const cap = m ? moveCaption(m, s) : '', el0 = m ? moveEl(m, s) : null;
   UI.busy = true;
-  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) el0.classList.add('aimark'); }
-  turnWait(UI.fast ? 0 : 900, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
+  if (!UI.fast) { $('#prompt').textContent = cap; $('#pacts').innerHTML = ''; if (el0) { document.querySelectorAll('.aimark').forEach(e => e.classList.remove('aimark')); el0.classList.add('aimark'); setTimeout(() => el0.classList.remove('aimark'), 1800); } rivalCap(cap); }
+  turnWait(UI.fast ? 0 : UI.quick ? 260 : 600, () => {   /* step 1: show what the rival is about to do (caption + its target pulses) */
     if (G !== g0 || G.phase !== 'play' || VG.actor(G) !== s) { UI.busy = false; return; }
-    const b = snapS(s), F = m ? fxBefore(m, s) : {};
+    const b = snapS(s), W = whyPre(), F = m ? fxBefore(m, s) : {};
     const r = m ? VG.apply(G, m) : { ok: false };
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
-    const d = showEvents(s); save(); render(); if (typeof coachRival === 'function') coachRival(m);
+    const d = showEvents(s); whyPost(W); if (m) rlogAdd(s, cap); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#prompt').textContent = cap; actFx(m, s, F, b); }
-    turnWait(UI.fast ? 0 : Math.max(d, 1100), () => { UI.busy = false; after(); });   /* step 2: the result stays readable before the next step */
+    turnWait(UI.fast ? 0 : UI.quick ? 420 : Math.min(Math.max(d, 1000), 1500), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
   });
 }
 // ---------------------------------------------------------------- turn presentation: caption, target pulse, pieces fly, score pop; tap to speed up
@@ -165,32 +203,76 @@ function moveEl(m, s) {
 function moveCaption(m, s) {
   const n = short(s), you = n === 'You', v = (a, b) => you ? a : b, p = s >= 0 ? G.p[s] : null;
   switch (m.t) {
-    case 'play': { const c = p && V.CARDS[p.hand[m.i]]; return c ? `${n} ${v('play', 'plays')} ${c.name}.` : `${n} ${v('play', 'plays')} a card.`; }
+    case 'play': { const c = p && V.CARDS[p.hand[m.i]]; return c ? `${n} ${v('play', 'plays')} ${c.name} (${effShort(c)}).` : `${n} ${v('play', 'plays')} a card.`; }
     case 'dig': return `${n} ${v('send', 'sends')} an explorer to ${siteName(G.sites[m.s])}.`;
     case 'disc': return `${n} ${v('explore', 'explores')} a hidden ruin!`;
     case 'beat': return `${n} ${v('fight', 'fights')} the guardian!`;
-    case 'buy': return `${n} ${v('buy', 'buys')} ${V.CARDS[G.row[m.r]].name}.`;
+    case 'buy': { const c = V.CARDS[G.row[m.r]]; return c ? `${n} ${v('buy', 'buys')} ${c.name} (${effShort(c)}).` : `${n} ${v('buy', 'buys')} a card.`; }   /* F11: the market shows no names, so the effect says which card */
     case 'res': return `${n} ${v('climb', 'climbs')} the research track.`;
     case 'temple': return `${n} ${v('buy', 'buys')} a temple tile.`;
     case 'pass': return `${n} ${v('pass', 'passes')} for this round.`;
     case 'boon': return `${n} ${v('use', 'uses')} a guardian boon.`;
     case 'idol': return `${n} ${v('set', 'sets')} an idol in a shrine.`;
+    case 'asst': { const a = p && p.asst[m.k]; return `${n} ${v('use', 'uses')} ${a ? 'the ' + V.ASSTBY[a.id].name : 'an assistant'}.`; }
     default: return `${n} ${v('choose', 'chooses')}.`;
   }
 }
 function snapS(s) { if (!G || s < 0 || !G.p[s]) return null; const p = G.p[s]; return { res: Object.assign({}, p.res), sc: VG.score(G, s) }; }
 const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', slots: 'shrine slot', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
+/* F15: every score change says where it came from: "+6: idols +3, research +3" */
+const CAT_W = { research: 'research', temple: 'temple tile', idols: 'idols', slots: 'shrine slots', guards: 'guardians', cards: 'card stars', fear: 'Dread' };
+function catWhy(a, b) { return Object.keys(CAT_W).filter(k => (a[k] || 0) !== (b[k] || 0)).map(k => { const d = (a[k] || 0) - (b[k] || 0); return CAT_W[k] + ' ' + (d > 0 ? '+' : '') + d; }).join(', '); }
+function rivalShort() { return G.rival ? G.rival.name.replace(/'s (expedition|crew)$/, '').replace(/ expedition$/, '') : 'Rival'; }
+function whyPre() { return { me: snapS(VG.actor(G)), s: VG.actor(G), rt: G.rival ? VG.rivalScore(G) : 0, n: G.log.length }; }
+function whyPost(w) {   /* after a move: remember the mover's points and the rival's, each with its cause (shown in the strip, the prompt and the round card) */
+  UI.whyL = UI.whyL || {}; let mine = '';
+  if (w.me && w.s >= 0) { const a = VG.score(G, w.s), dv = a.total - w.me.sc.total; if (dv) { const nm = w.s === UI.view && UI.humans.length === 1 ? 'You' : short(w.s); mine = (dv > 0 ? '+' : '') + dv + ': ' + catWhy(a, w.me.sc); UI.whyL[w.s] = nm + ' ' + mine + (UI.humans.indexOf(w.s) >= 0 ? whyFirst(a, w.me.sc) : ''); } }
+  if (G.rival) { const dr = VG.rivalScore(G) - w.rt; if (dr) { const ln = G.log.slice(w.n).filter(l => l.s === -2).map(l => l.t.replace(/^.*? (overcomes|discovers|climbs|studies|takes)/, '$1').replace(/\.$/, '')).join('; ');
+    UI.whyL[-2] = rivalShort() + ' ' + (dr > 0 ? '+' : '') + dr + (ln ? ': ' + ln : ''); } }
+  return mine;
+}
+/* F16: every point source in plain words; the first time one moves for you, the line says what it is */
+const PT_HELP = { research: ['research', 'The higher you climb the research track, the more points at the end.'], temple: ['temple tile', 'Temple tiles: bought at the top of the research track. Points at once.'],
+  idols: ['idols', 'Each idol is 3 points. You find one when you explore a new ruin.'], slots: ['shrine slots', 'Your board has 4 shrine slots, worth 1, 1, 1 and 2 points while empty. Using an idol\'s gift fills a slot and its points go.'],
+  guards: ['guardians', 'Beat a guardian for 5 points: pay its cost while your explorer is at its ruin.'], cards: ['card stars', 'Cards with a star badge are worth that many points at the end.'],
+  fear: ['Dread', 'Each Dread card is -1 point. You get one when a guardian is still awake at your site when the round ends.'] };
+function whyFirst(a, b) { UI.seenCat = UI.seenCat || {}; const k = Object.keys(PT_HELP).find(k => (a[k] || 0) !== (b[k] || 0) && !UI.seenCat[k]); Object.keys(PT_HELP).forEach(k => { if ((a[k] || 0) !== (b[k] || 0)) UI.seenCat[k] = 1; }); return k ? ' (' + PT_SHORT[k] + ')' : ''; }
+const PT_SHORT = { research: 'higher = more points', temple: 'top of research', idols: '3 each', slots: 'empty slots score', guards: '5 each', cards: 'stars score at end', fear: '-1 each' };
+/* phone rule: a line is at most 8 words; an aside goes first, then the line is cut (the tap shows it all) */
+function nWords(t) { return (String(t).match(/[A-Za-z]+/g) || []).length; }
+function fit8(t) { t = String(t || ''); if (nWords(t) <= 8) return t; const u = t.replace(/\s*\([^)]*\)/g, ''); if (nWords(u) <= 8) return u; let n = 0; return u.split(/(\s+)/).filter(w => { if (/[A-Za-z]/.test(w)) n++; return n <= 8; }).join('').replace(/[\s,;:]+$/, '') + '…'; }
+function myPtsLine() { const me = UI.view, a = VG.score(G, me), parts = Object.keys(PT_HELP).filter(k => a[k]).map(k => a[k] + ' ' + PT_HELP[k][0]), nm = (UI.humans.length === 1 ? 'You ' : short(me) + ' ') + a.total, t = nm + ' = ' + (parts.join(' + ') || '0'); return nWords(t) <= 6 ? t : nm + ' points'; }
+function rlogLine() { const L = UI.rlog || []; return L.length ? L[L.length - 1].t : (G.rival || G.p.some(p => p.ai) ? 'Rival moves show here.' : ''); }
+UIACT.pts = () => {   /* F16: where every point comes from, in plain words, plus the rival's last moves */
+  closeInsp(); const me = UI.view, a = VG.score(G, me), g = $('#ptsheet') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'ptsheet', className: 'ov' }));
+  const li = Object.keys(PT_HELP).map(k => `<li><b>${a[k] || 0}</b><span><b>${esc(PT_HELP[k][0][0].toUpperCase() + PT_HELP[k][0].slice(1))}.</b> ${esc(PT_HELP[k][1])}</span></li>`).join('');
+  const rl = (UI.rlog || []).slice(-6).reverse().map(x => `<li><span>Round ${x.r}: ${esc(x.t)}</span></li>`).join('');
+  g.innerHTML = `<div class="tbox gbox ptbox" role="dialog" aria-label="Where points come from"><h2 class="gl">${esc(myPtsLine())}</h2><p class="gh">Where points come from</p><ul class="gu ptl">${li}</ul>
+    ${rl ? `<p class="gh">Rival's last moves</p><ul class="gu rll">${rl}</ul>` : ''}<button type="button" class="tbtn" data-a="ptsx">Back to the game</button></div>`;
+  g.hidden = false; g.onclick = e => { if (e.target === g) UIACT.ptsx(); };
+};
+UIACT.ptsx = () => { const g = $('#ptsheet'); if (g) g.hidden = true; };
+addEventListener('keydown', e => { if (e.key === 'Escape') UIACT.ptsx(); });
+function whyText() { return Object.keys(UI.whyL || {}).map(k => UI.whyL[k]).join('  ·  '); }
 function diffText(s, b) {
   if (!b || !G || s < 0) return null; const a = snapS(s), res = [];
   V.RES.forEach(k => { const d = a.res[k] - b.res[k]; if (d) res.push((d > 0 ? '+' : '') + d + ' ' + rw(k, Math.abs(d))); });
   const dv = a.sc.total - b.sc.total;
-  return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0 };
+  return { vp: dv ? (dv > 0 ? '+' : '') + dv + (Math.abs(dv) === 1 ? ' point' : ' points') : '', res: res.slice(0, 3).join('  '), neg: dv < 0, why: catWhy(a.sc, b.sc) };
 }
-function popAt(rect, t) {
-  if (!rect || !t || (!t.vp && !t.res)) return; const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : ''); e.setAttribute('aria-hidden', 'true');
-  e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
-  document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
-  e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
+function popAt(rect, t, n) {
+  if (!rect || !t || (!t.vp && !t.res)) return;
+  { const fx = document.getElementById('fx'); if (fx && !fx.hidden && (n || 0) < 12) { setTimeout(() => popAt(rect, t, (n || 0) + 1), 450); return; } }   /* never stack pills on the guardian card: they wait until it closes */
+  if (yourTurnNow() && !t.mine) return;
+  const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
+  e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.why ? `<span>${esc(t.why)}</span>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
+  document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
+  /* F14 (R93): pills never overlap each other or the rival caption: a duplicate is dropped, a clash moves down a step */
+  let yy = y; const h = e.offsetHeight, busy = [...document.querySelectorAll('.vpop')].filter(o => o !== e).map(o => o.getBoundingClientRect()), cap = $('#rcap');
+  if (cap && cap.classList.contains('on')) busy.push(cap.getBoundingClientRect());
+  if ([...document.querySelectorAll('.vpop')].some(o => o !== e && o.textContent === e.textContent)) { e.remove(); return; }
+  for (let k = 0; k < 6 && busy.some(r => x < r.right + 2 && x + w > r.left - 2 && yy < r.bottom + 2 && yy + h > r.top - 2); k++) yy = Math.min(innerHeight - h - 4, yy + h + 4);
+  e.style.left = x + 'px'; e.style.top = yy + 'px'; setTimeout(() => e.remove(), 1700);
 }
 function fly(from, html, to, o) {   /* a piece glides from where it was to where it goes */
   if (!from || !html || !to || reducedMo() || UI.fast) return; o = o || {}; const g = document.createElement('div'); g.className = 'flyc'; g.innerHTML = html; const c = g.firstElementChild; if (!c) return;
@@ -205,19 +287,70 @@ function reducedMo() { return document.documentElement.classList.contains('gx-re
 function fxBefore(m, s) {
   if (UI.fast || !G || !m) return {}; const F = {}, R = el => el && el.getBoundingClientRect();
   if (m.t === 'dig' || m.t === 'disc') { F.pawn = UI.dropFrom || (s === UI.view ? R($('#pawns .pawn.mine:last-of-type') || $('#pawns .pawn.mine')) : R(chipOf(s))); F.ps = s;
-    if (s === UI.view) { const pl = VG.payPlan(G, s, G.sites[m.s].cost); if (pl) F.pay = pl.cards.map(i => { const e = $(`#hand .cd[data-i="${i}"]`); return e ? { r: R(e), html: e.outerHTML } : null; }).filter(Boolean); } }
+    if (s === UI.view) { const pl = VG.payPlan(G, s, VG.siteCost(G.sites[m.s])); if (pl) F.pay = pl.cards.map(i => { const e = $(`#hand .cd[data-i="${i}"]`); return e ? { r: R(e), html: e.outerHTML } : null; }).filter(Boolean); } }
   if (m.t === 'buy' || (m.t === 'play' && s === UI.view)) { const e = moveEl(m, s); if (e) F.card = { r: UI.dropFrom || R(e), html: e.outerHTML }; }
+  if (m.t === 'play' && s !== UI.view && s >= 0 && G.p[s].hand[m.i] && chipOf(s)) F.card = { r: R(chipOf(s)), html: cardHTML(G.p[s].hand[m.i]), w: 64, h: 90 };
+  if (s >= 0 && G.p[s]) F.pts = VG.score(G, s).total;
   return F;
 }
 function actFx(m, s, F, b) {   /* after a move: pieces fly to where they go, the place it lands bounces, then what it gave pops */
   if (UI.fast || !G || !m) return; F = F || {}; const el = moveEl(m, s), tr = el && el.getBoundingClientRect();
-  if (F.pawn && tr) fly(F.pawn, `<span class="pawn">${pawnSVG(F.ps)}</span>`, tr, { w: 40, h: 54, end: .7, fade: false, dur: 560 });
+  if (F.pts != null) { const cb = chipOf(s) && chipOf(s).querySelector('.pts b'); if (cb && VG.score(G, s).total !== F.pts) cb.textContent = F.pts; }
+  if (F.pawn && tr) walkTo(F.pawn, m.s, F.ps);
   (F.pay || []).forEach((p, k) => setTimeout(() => fly(p.r, p.html, tr, { end: .3 }), 80 + k * 90));
-  if (F.card) { const dest = m.t === 'buy' ? (s === UI.view ? $('#hand') : chipOf(s)) : $('#map'); fly(F.card.r, F.card.html, dest && dest.getBoundingClientRect(), { end: m.t === 'play' ? 1.3 : .4 }); }
-  if (el && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat' || m.t === 'res' || m.t === 'temple')) { setTimeout(() => { const n = moveEl(m, s); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, m.t === 'dig' || m.t === 'disc' ? 520 : 0); }
-  const vpAt = chipOf(s), resAt = s === UI.view ? $('#myres') : chipOf(s), d = diffText(s, b);
-  if (d) setTimeout(() => { if (d.res) popAt((resAt && resAt.getBoundingClientRect()) || tr, { res: d.res }); if (d.vp) setTimeout(() => popAt(vpAt && vpAt.getBoundingClientRect(), { vp: d.vp, neg: d.neg }), d.res ? 500 : 0); }, 560);
+  if (F.card) { const dest = m.t === 'buy' ? (s === UI.view ? $('#hand') : chipOf(s)) : $('#map'); fly(F.card.r, F.card.html, dest && dest.getBoundingClientRect(), { end: m.t === 'play' ? 1.3 : .4, w: F.card.w, h: F.card.h, dur: m.t === 'play' && s !== UI.view ? 800 : 520 }); }
+  if (el && (m.t === 'beat' || m.t === 'res' || m.t === 'temple' || ((m.t === 'dig' || m.t === 'disc') && !F.pawn))) { setTimeout(() => { const n = moveEl(m, s); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, m.t === 'dig' || m.t === 'disc' ? 520 : 0); }
+  const d = diffText(s, b), late = m.t === 'dig' || m.t === 'disc' ? 900 : 560;
+  if (d) setTimeout(() => {
+    if (d.res) { if (s === UI.view) gainFly(b, tr); else popUnder(chipOf(s), { res: d.res }); }
+    if (d.vp) setTimeout(() => { popUnder(chipOf(s), { vp: d.vp, neg: d.neg, why: d.why }); tickPts(s, F.pts); }, d.res ? 450 : 0);
+  }, late);
 }
+/* the explorer walks the trail: in at the camp edge, up through the nearest site of each lower level, onto its site */
+function walkTo(from, si, ps) {
+  if (!from || reducedMo() || UI.fast) return; const x = G.sites[si], tEl = $(`.site[data-i="${si}"]`), map = $('#map'); if (!tEl || !map) return;
+  const c = e => { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }, mr = map.getBoundingClientRect(), T = c(tEl);
+  const pts = [[from.left + from.width / 2, from.top + from.height / 2], [Math.max(mr.left + 20, Math.min(mr.right - 20, T[0])), mr.bottom - 8]];
+  for (let lv = 0; lv < x.lvl; lv++) { let best = null, bd = 1e9; G.sites.forEach((y, i) => { if (y.lvl !== lv) return; const e = $(`.site[data-i="${i}"]`); if (!e) return; const p = c(e), dd = Math.abs(p[0] - T[0]); if (dd < bd) { bd = dd; best = p; } }); if (best) pts.push(best); }
+  pts.push(T);
+  const occ = tEl.querySelector('.occ'); if (occ) occ.style.opacity = '0';
+  const g = document.createElement('div'); g.className = 'walker'; g.innerHTML = pawnSVG(ps); document.body.appendChild(g);
+  const o = pts[0], frames = pts.map((p, k) => ({ transform: `translate(${p[0] - 20}px,${p[1] - 44}px) rotate(${k % 2 ? -6 : 6}deg)`, offset: k / (pts.length - 1) }));
+  g.style.left = '0px'; g.style.top = '0px'; const dur = 380 + 230 * (pts.length - 1);
+  try { g.animate(frames, { duration: dur, easing: 'ease-in-out', fill: 'forwards' }); } catch (e) { }
+  setTimeout(() => { g.remove(); if (occ) occ.style.opacity = ''; const n = $(`.site[data-i="${si}"]`); if (n) { n.classList.remove('landed'); void n.offsetWidth; n.classList.add('landed'); } }, dur + 40);
+}
+/* your goods: each one flies from where you got it into its counter, and the counter bumps */
+function gainFly(b, from) {
+  if (!b) return; const a = snapS(UI.view), rcs = [...document.querySelectorAll('#myres .rc')];
+  V.RES.forEach((k, j) => { const dlt = a.res[k] - b.res[k], rc = rcs[j]; if (!dlt || !rc) return;
+    if (dlt > 0 && from) for (let n = 0; n < Math.min(dlt, 3); n++) setTimeout(() => fly(from, `<span class="rv">${ic(k)}</span>`, rc.getBoundingClientRect(), { w: 30, h: 30, end: .8, dur: 480 }), n * 110);
+    setTimeout(() => { const r2 = document.querySelectorAll('#myres .rc')[j]; if (r2) { r2.classList.remove('bump'); void r2.offsetWidth; r2.classList.add('bump'); } }, 480 + Math.min(dlt, 3) * 110); });
+}
+/* a rival's pill on the board; your own on your chip */
+function popUnder(chip, t) {
+  if (!chip) return;
+  if (yourTurnNow()) { if (chip === chipOf(UI.view)) { const b = chip.querySelector('.pts') || chip; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); } return; }   /* F12 (R69): on your turn no pill covers the map, the market or your score chip; your chip's number just bumps */ const r = chip.getBoundingClientRect(), mp = $('#map');
+  if (mp && chip !== chipOf(UI.view)) { const m = mp.getBoundingClientRect(); popAt({ left: r.left, width: r.width, top: m.top + 64, height: 0 }, t); return; }   /* a rival's pill sits on the board, never on the market */ popAt(r, Object.assign({ chip: true }, t));   /* your own pill pops ON your chip: never over the market or the research track (R25) */
+}
+/* the chip's points count up to the new total */
+function tickPts(s, from) {
+  const chip = chipOf(s), bEl = chip && chip.querySelector('.pts b'); if (!bEl || from == null) return; const to = VG.score(G, s).total; if (to === from) return;
+  const t0 = performance.now(), dur = 600; bEl.classList.remove('tick'); void bEl.offsetWidth; bEl.classList.add('tick');
+  const st = () => { const k = Math.min(1, (performance.now() - t0) / dur), e = chipOf(s), bb = e && e.querySelector('.pts b'); if (!bb) return; bb.textContent = Math.round(from + (to - from) * k); if (k < 1) requestAnimationFrame(st); };
+  requestAnimationFrame(st);
+}
+/* the rival's move in one line on the board, where your eyes are */
+/* F16: the rival's moves stay in a short log line under the scores (tap: the last moves and the score detail) instead of a pop-up that vanishes */
+function rlogAdd(s, cap) { if (!cap) return; UI.rlog = UI.rlog || []; UI.rlog.push({ r: G.round, t: cap }); if (UI.rlog.length > 30) UI.rlog.shift(); }
+function rivalCap(t) { const e = $('#rcap'); if (e) e.classList.remove('on'); }
+function rivalCapOld(t) {
+  if (t && yourTurnNow()) t = '';   /* F12: a rival's caption never sits on the map during your turn */
+  if (t && G && G.phase === 'over') t = '';   /* F14 (R93): at game over the score walk speaks, no caption on top of it */
+  let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }
+  if (!t) { e.classList.remove('on'); return; } const m = $('#map'); e.style.top = ((m ? m.getBoundingClientRect().top : 120) + 6) + 'px'; e.textContent = t; e.classList.add('on');
+}
+function yourTurnNow() { return !!(G && G.phase === 'play' && UI.mode !== 'tutorial' && myTurn() && !UI.busy); }
 function turnWait(ms, fn) { clearTimeout(turnWait.t); turnWait.fn = fn; turnWait.t = setTimeout(() => { turnWait.fn = null; fn(); }, ms); }
 function speedUp() { if (!turnWait.fn || !G || myTurn()) return; const f = turnWait.fn; turnWait.fn = null; clearTimeout(turnWait.t); f(); }
 document.addEventListener('pointerdown', e => { if (turnWait.fn && G && !myTurn() && !(e.target.closest && e.target.closest('.gx-drawer,.gx-scrim,#insp,.gx-bar,.gxt-top,.gxt-end,#fx'))) speedUp(); }, true);
@@ -228,22 +361,22 @@ function showEvents(s) {
   ev.forEach(e => {
     if (typeof coachEvent === 'function') coachEvent(e, s);
     if (e.k === 'discover') { const el = $(`.site[data-i="${e.site}"]`); wait = Math.max(wait, 1500); sfx.play('discover'); setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('flip'); }, 30); const who = e.s === -2 ? G.rival.name : G.p[e.s].name; setTimeout(() => { const n = $(`.site[data-i="${e.site}"]`); if (n) n.classList.add('burst'); }, 60); note(who + (who === 'You' ? ' discover ' : ' discovers ') + V.SITE[e.tile].name + '!', 1800); }
-    if (e.k === 'guardian') { wait = Math.max(wait, 4800); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', ['Fight it for 5 points and a boon.', 'Still beside it at round end? Take a Dread card.']); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
-    if (e.k === 'beat') { wait = Math.max(wait, 4800); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, (w === 'You' ? 'You beat ' : short(e.s) + ' beats ') + V.GUARD[e.guard].name + '!', ['+5 points and a boon.', 'Boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'], true); }
+    if (e.k === 'guardian') { wait = Math.max(wait, 2600); setTimeout(() => { fxCard('guard', e.guard, V.GUARD[e.guard].name + ' wakes!', ['Fight it for 5 points and a boon.', 'Still beside it at round end? Take a Dread card.']); shake(); }, 600); setTimeout(() => sfx.play('roar'), 600); }
+    if (e.k === 'beat') { wait = Math.max(wait, 2600); sfx.play('win'); const w = G.p[e.s].name; fxCard('guard', e.guard, (w === 'You' ? 'You beat ' : short(e.s) + ' beats ') + V.GUARD[e.guard].name + '!', ['+5 points and a boon.', 'Boon: ' + V.opText(V.GUARD[e.guard].boon) + '.'], true); }
     if (e.k === 'idolfind') { sfx.play('coin'); }
     if (e.k === 'fear') { sfx.play('fear'); note(G.log.filter(l => /Dread/.test(l.t)).slice(-1)[0].t, 2400); wait = Math.max(wait, 900); }
-    if (e.k === 'round') { note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
+    if (e.k === 'round') { if (!UI.fast && UI.mode !== 'tutorial' && G.phase === 'play') UI.rcardDue = e.round - 1; note('Round ' + e.round + ' begins. The market shifts.', 2000); sfx.play('round'); wait = Math.max(wait, 1000); }
     if (e.k === 'gain' || e.k === 'dig' || e.k === 'buy') sfx.play('coin');
     if (e.k === 'research') sfx.play('step');
     if (e.k === 'rival') note(G.log[G.log.length - 1].t, 1800);
   });
-  return UI.fast ? 0 : wait;
+  return UI.fast ? 0 : UI.quick ? Math.min(wait, 400) : wait;
 }
 function fxCard(kind, id, title, text, good) {
-  if (UI.fast) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
+  if (UI.fast || UI.quick) return; const f = $('#fx'); f.hidden = false; f.className = good ? 'good' : 'bad';
   f.innerHTML = `<div class="fxcard${good ? ' good' : ''}" data-help><div class="rays" aria-hidden="true"></div><div class="por" data-art="guard-${id}"><svg><use href="#s-guard"/></svg></div><b>${esc(title)}</b>${[].concat(text).map(l => `<span>${esc(l)}</span>`).join('')}<small class="sm">Tap to close</small></div>`; try { coachHide(); } catch (e) { }
   if (typeof artApply === 'function') artApply(f);
-  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, readMs(title + ' ' + [].concat(text).join(' ')) + 800);   /* readable: 4 s + 1 s per 10 words; a tap closes it sooner */
+  f.onclick = fxHide; clearTimeout(fxCard.t); fxCard.t = setTimeout(fxHide, Math.min(3000, readMs(title + ' ' + [].concat(text).join(' ')) + 800));   /* readable: 4 s + 1 s per 10 words; a tap closes it sooner */
   try { $('#toast').classList.remove('on'); } catch (e) { }   /* gone before the next turn starts (R3 bug 4); a tap closes it sooner */
 }
 function fxHide() { const f = $('#fx'); if (!f) return; clearTimeout(fxCard.t); f.hidden = true; f.innerHTML = ''; f.className = ''; }
@@ -275,7 +408,10 @@ function evalMoves() {   /* every main move you can make now, simulated on a cop
   const s = VG.actor(G), me = G.p[s], key = G.turns + ':' + G.round + ':' + JSON.stringify(me.res) + me.hand.join() + G.row.join() + me.ex;
   if (evalMoves.k === key) return evalMoves.v; const out = [];
   VG.moves(G).forEach(m => { if (m.free || m.t === 'pass' || m.t === 'ans') return; try { const c = VG.clone(G), r = VG.apply(c, m); if (!r || !r.ok) return; out.push({ m, v: VAI.value(c, s, 'hard'), d: diffOn(c, s) }); } catch (x) { } });
-  out.sort((x, y) => y.v - x.v); evalMoves.k = key; evalMoves.v = out; return out;
+  out.sort((x, y) => y.v - x.v);
+  /* the glow is what the strong computer player would do (looks one turn ahead), not just the best single step */
+  try { const hm = VAI.choose(G, 'hard'), hi = hm ? out.findIndex(x => sameMv(x.m, hm)) : -1; if (hi > 0) out.unshift(out.splice(hi, 1)[0]); } catch (x) { }
+  evalMoves.k = key; evalMoves.v = out; return out;
 }
 const sameMv = (a, b) => !!a && !!b && (VG.same ? VG.same(a, b) : JSON.stringify(a) === JSON.stringify(b));
 function previewText(m) {
@@ -287,14 +423,10 @@ function previewText(m) {
 function shortLabel(m) {
   const me = G.p[UI.view];
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
-    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; default: return 'pass'; }
+    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + (V.CARDS[G.row[m.r]] || { name: 'a card' }).name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
-function bestBadges() {   /* gold badges: the strongest site and the strongest market card for you right now */
+function bestBadges() {   /* hints add no second pointer: the one glowing piece IS the best move, so no gold badge (it only ever doubled the glow or went stale) */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
-  if (!hintsOn()) return; const ev = evalMoves(); if (!ev.length) return;
-  const top = ev[0], site = ev.find(x => x.m.s != null && /dig|disc|beat/.test(x.m.t)), buy = ev.find(x => x.m.t === 'buy');
-  const mark = (x, t) => { if (!x) return; const el = moveEl(x.m, UI.view); if (el && !el.dataset.badge) el.dataset.badge = t; };
-  mark(top, 'Best'); mark(site, 'Best site'); mark(buy, 'Best buy');
 }
 function rateMove(m, ev) {   /* good / okay / poor, compared with the strongest move */
   if (!ev || !ev.length) return null; const i = ev.findIndex(x => sameMv(x.m, m)), best = ev[0];

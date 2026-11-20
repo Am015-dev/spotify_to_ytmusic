@@ -97,19 +97,19 @@
   // ---- guardians: overcome one for 5 points; its boon is a one-time free action. [id, name, cost, boon, boon text] ----
   var GU = [
     ['mire-crawler', 'Mire Crawler', { arrow: 1, coin: 2 }, [{ g: { jewel: 1 } }]],
-    ['stone-ape', 'Stone Ape', { arrow: 2 }, [{ d: 2 }]],
-    ['glass-moth', 'Glass Moth', { tablet: 1, jewel: 1 }, [{ r: 'g' }]],
-    ['rootback-boar', 'Rootback Boar', { arrow: 1, compass: 2 }, [{ g: { coin: 3 } }]],
-    ['tide-serpent', 'Tide Serpent', { jewel: 1, arrow: 1 }, [{ fd: 1 }]],
+    ['stone-ape', 'Sleeping Idol', { arrow: 2 }, [{ d: 2 }]],
+    ['glass-moth', 'Ash Wisp', { tablet: 1, jewel: 1 }, [{ r: 'g' }]],
+    ['rootback-boar', 'Root Rat', { arrow: 1, compass: 2 }, [{ tv: 'car' }, { tv: 'car' }]],
+    ['tide-serpent', 'Jade Serpent', { jewel: 1, arrow: 1 }, [{ fd: 1 }]],
     ['ember-hound', 'Ember Hound', { arrow: 2, coin: 1 }, [{ x: 1 }]],
-    ['moss-golem', 'Moss Golem', { tablet: 2, arrow: 1 }, [{ g: { arrow: 1, tablet: 1 } }]],
-    ['howl-bat', 'Howler Bat', { compass: 3, coin: 1 }, [{ g: { compass: 3 } }]],
-    ['vine-widow', 'Vine Widow', { jewel: 1, coin: 2 }, [{ r: 'n' }]],
+    ['moss-golem', 'Snare Tree', { tablet: 2, arrow: 1 }, [{ tv: 'ship' }, { tv: 'ship' }]],
+    ['howl-bat', 'Sky Griffin', { compass: 3, coin: 1 }, [{ tv: 'plane' }]],
+    ['vine-widow', 'Swamp Beast', { jewel: 1, coin: 2 }, [{ r: 'n' }]],
     ['thunder-toad', 'Thunder Toad', { arrow: 1, tablet: 1, coin: 1 }, [{ b: 'a', o: 3 }]],
-    ['bone-heron', 'Bone Heron', { tablet: 2, coin: 1 }, [{ g: { jewel: 1 } }]],
-    ['ash-jaguar', 'Ash Jaguar', { arrow: 2, jewel: 1 }, [{ g: { jewel: 1, arrow: 1 } }]],
-    ['canopy-wyrm', 'Canopy Wyrm', { jewel: 2 }, [{ r: 'g' }, { r: 'n' }]],
-    ['temple-cat', 'Temple Lynx', { compass: 2, tablet: 1 }, [{ b: 'i', o: 3 }]],
+    ['bone-heron', 'Bone Caller', { tablet: 2, coin: 1 }, [{ g: { jewel: 1 } }]],
+    ['ash-jaguar', 'Ember Brute', { arrow: 2, jewel: 1 }, [{ g: { jewel: 1, arrow: 1 } }]],
+    ['canopy-wyrm', 'Ashen Wraith', { jewel: 2 }, [{ r: 'g' }, { r: 'n' }]],
+    ['temple-cat', 'Tomb King', { compass: 2, tablet: 1 }, [{ b: 'i', o: 3 }]],
     ['old-warden', 'The Old Warden', { arrow: 1, jewel: 1, tablet: 1 }, [{ g: { coin: 2, compass: 2 } }]]
   ];
   // ---- dig sites. Level 0 (camp) sites are printed on the board; level 1 and 2 slots are hidden until discovered. ----
@@ -133,11 +133,11 @@
     ['thorn-palace', 'Thorn Palace', { arrow: 2, tablet: 2 }], ['star-pool', 'Star Pool', { jewel: 1, compass: 3 }]
   ];
   // ---- idols: found on a discovered site (immediate gift); 3 points each, also when set in a shrine slot (a one-time boon; each slot once per game). ----
-  var ID = [
-    ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-snake', 'Snake Idol', { arrow: 1 }],
-    ['idol-moon', 'Moon Idol', { coin: 1, compass: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }],
-    ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-bird', 'Heron Idol', { coin: 1, compass: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-star', 'Star Idol', { jewel: 1 }],
-    ['idol-turtle', 'Turtle Idol', { coin: 2 }], ['idol-crane', 'Crane Idol', { compass: 2 }], ['idol-ram', 'Ram Idol', { arrow: 1 }], ['idol-moth', 'Moth Idol', { tablet: 1 }]
+  var ID = [   // 16 idol tiles in 4 kinds of 4 (kind = its gift). The kinds and gifts are ours [unverified]; the count is the box's.
+    ['idol-owl', 'Owl Idol', { coin: 2 }], ['idol-fish', 'Fish Idol', { coin: 2 }], ['idol-turtle', 'Turtle Idol', { coin: 2 }], ['idol-moon', 'Moon Idol', { coin: 2 }],
+    ['idol-frog', 'Frog Idol', { compass: 2 }], ['idol-bat', 'Bat Idol', { compass: 2 }], ['idol-crane', 'Crane Idol', { compass: 2 }], ['idol-bird', 'Heron Idol', { compass: 2 }],
+    ['idol-sun', 'Sun Idol', { tablet: 1 }], ['idol-cat', 'Lynx Idol', { tablet: 1 }], ['idol-moth', 'Moth Idol', { tablet: 1 }], ['idol-star', 'Star Idol', { tablet: 1 }],
+    ['idol-snake', 'Snake Idol', { arrow: 1 }], ['idol-boar', 'Boar Idol', { arrow: 1 }], ['idol-ape', 'Ape Idol', { arrow: 1 }], ['idol-ram', 'Ram Idol', { arrow: 1 }]
   ];
   // shrine slot boons (pick one when you set an idol)
   var SHRINE = [{ id: 'sh-coin', ops: [{ g: { coin: 3 } }], text: '3 coins' }, { id: 'sh-compass', ops: [{ g: { compass: 3 } }], text: '3 compasses' },
@@ -155,30 +155,92 @@
     { cost: { tablet: 1, arrow: 1 }, bonus: { compass: 3 } },
     { cost: { jewel: 1, tablet: 1 }, bonus: { arrow: 1 } }
   ];
-  // first-arrival rewards: only the FIRST magnifier to reach these rows takes the extra reward (every arrival still takes the row bonus)
-  var FIRST = { 2: { tablet: 1 }, 4: { coin: 2, arrow: 1 }, 6: { jewel: 1 }, 7: { tablet: 1, arrow: 1 } };
+  // ---- research PATH MAP (rulebook p.14-15): two starting spaces below row 1; each row has 1 or 2 spaces joined to the next row by bridges.
+  // You may only move into a space joined to yours; the cost is printed on the bridge (ours: every bridge into a space shows the same cost).
+  // The first token to reach a space with a research bonus tile takes it (the tile leaves the game); every arrival takes the ROW's effect
+  // (TRACK[r].bonus, plus the notebook's assistant symbols). Shape and tile spaces are ours to the original's structure; exact board
+  // geography, bridge costs and which spaces need 3-4 players are [unverified].
+  // sp: c = bridge cost into the space, np = fewest players for a bonus tile there, to = spaces joined in the next row (row 0 = start spaces).
+  var START_TO = [0, 1];
+  var PATH = [null,
+    [{ c: { tablet: 1 }, np: 2, to: [0, 1] }, { c: { compass: 1, coin: 1 }, np: 2, to: [1] }],
+    [{ c: { arrow: 1 }, np: 2, to: [0] }, { c: { tablet: 1, coin: 1 }, np: 3, to: [0, 1] }],
+    [{ c: { tablet: 1, coin: 1 }, np: 3, to: [0] }, { c: { arrow: 1, compass: 1 }, np: 2, to: [0] }],
+    [{ c: { jewel: 1 }, np: 2, to: [0, 1] }],
+    [{ c: { tablet: 2 }, np: 2, to: [0, 1] }, { c: { arrow: 1, coin: 2 }, np: 4, to: [1] }],
+    [{ c: { arrow: 1, jewel: 1 }, np: 4, to: [0] }, { c: { arrow: 2, tablet: 1 }, np: 2, to: [0] }],
+    [{ c: { tablet: 1, arrow: 1 }, np: 2, to: [0] }],
+    [{ c: { jewel: 1, tablet: 1 }, np: 9, to: [] }]
+  ];
+  for (var pr = 1; pr < PATH.length; pr++) TRACK[pr].cost = PATH[pr][0].c;   // TRACK[r].cost = the left space's cost (kept for older callers)
+  // 18 research bonus tiles (box count): shuffled, then dealt to the Lost Temple bonus stack (as many as players) and to the tile spaces for
+  // this player count (8 / 10 / 12 spaces at 2 / 3 / 4 players); the rest go back to the box. Tile values are ours [unverified].
+  var RBONUS = [{ coin: 2 }, { coin: 2 }, { compass: 2 }, { compass: 2 }, { tablet: 1 }, { tablet: 1 }, { tablet: 1 }, { arrow: 1 }, { arrow: 1 }, { arrow: 1 },
+    { jewel: 1 }, { jewel: 1 }, { coin: 1, compass: 1 }, { coin: 1, compass: 1 }, { tablet: 1, coin: 1 }, { arrow: 1, coin: 1 }, { coin: 3 }, { compass: 3 }];
+  var FIRST = {};   // retired (F14): first-arrival rewards now live on the research bonus tiles of the path map
   var DREAD_SUPPLY = 19;   // Dread cards in the box (2 start in each deck); when they run out, a fear tile worth -2 instead
   var NOTE_VP = [0, 1, 2, 4, 6, 9, 12, 15, 19], GLASS_VP = [0, 0, 1, 2, 3, 4, 6, 8, 10], TOP = 8;
   // temple tiles (bought with the research action once your glass is in the temple)
   // three stacks: 6 points for the left two cost parts, 6 for the right two, 11 for all three (parts: 2 tablets | 1 jewel | 2 arrowheads)
-  var TEMPLE = [{ vp: 6, cost: { tablet: 2, jewel: 1 }, n: 8 }, { vp: 6, cost: { jewel: 1, arrow: 2 }, n: 8 }, { vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 }, n: 4 }];
+  // ---- research assistants (rulebook p.15-16): 12 tiles, silver side up, 3 face-down stacks of 4 (only each top is known); your NOTEBOOK
+  // on a row with the silver symbol recruits one of the (usually 3) available assistants; on a row with the gold symbol it upgrades one (flip
+  // to gold, which also refreshes it). 2 assistant squares per player board. Using one = turn it sideways (once a round, all refresh at round
+  // end); a free action unless it has no free-action icon. Effects printed in the rulebook: a choice of a coin or a Plane (a-guide), a buy
+  // discount of 1 / 2 that is your main action (a-broker), a Boot of travel paid to make an arrowhead (a-fletch). The other 9 effects and all
+  // gold sides not described in the rulebook text are our own. main:true = the effect is your turn's main action. ----
+  var ASST = [
+    { id: 'a-guide', name: 'Trail Guide', s: [{ or: [[{ g: { coin: 1 } }], [{ tv: 'plane' }]] }], gd: [{ or: [[{ g: { coin: 2 } }], [{ tv: 'plane' }, { g: { coin: 1 } }]] }] },
+    { id: 'a-broker', name: 'Broker', main: true, s: [{ b: '*', o: 1 }], gd: [{ b: '*', o: 2 }] },
+    { id: 'a-fletch', name: 'Fletcher', s: [{ tp: ['boot'] }, { g: { arrow: 1 } }], gd: [{ g: { arrow: 1 } }] },
+    { id: 'a-map', name: 'Map Reader', s: [{ g: { compass: 1 } }], gd: [{ g: { compass: 2 } }] },
+    { id: 'a-purse', name: 'Purse Keeper', s: [{ g: { coin: 1 } }], gd: [{ g: { coin: 2 } }] },
+    { id: 'a-scribe', name: 'Scribe', s: [{ g: { tablet: 1 } }], gd: [{ g: { tablet: 1, coin: 1 } }] },
+    { id: 'a-gem', name: 'Gem Cutter', s: [{ p: { coin: 2 } }, { g: { jewel: 1 } }], gd: [{ p: { coin: 1 } }, { g: { jewel: 1 } }] },
+    { id: 'a-runner', name: 'Runner', s: [{ d: 1 }], gd: [{ d: 2 }] },
+    { id: 'a-cook', name: 'Camp Cook', s: [{ g: { coin: 1, compass: 1 } }], gd: [{ g: { coin: 2, compass: 1 } }] },
+    { id: 'a-mason', name: 'Mason', s: [{ p: { compass: 1 } }, { g: { tablet: 1 } }], gd: [{ g: { tablet: 1 } }] },
+    { id: 'a-healer', name: 'Healer', s: [{ x: 1 }], gd: [{ x: 1 }, { d: 1 }] },
+    { id: 'a-porter', name: 'Porter', s: [{ tv: 'boot' }], gd: [{ tv: 'car' }] }
+  ];
+  var ASST_REC = [2, 4], ASST_UP = [3, 5], ASST_MAX = 2, ASST_STACKS = 3;   // notebook rows with the silver / gold symbol (rows are our own: board icons); 2 squares
+  // free-action (lightning) items: playing them does not use your main action (rulebook p.13: "some item effects are free actions"; which ones is ours)
+  var FREE_ITEMS = ['machete', 'canteen', 'rope', 'lamp', 'whistle', 'kettle', 'brush', 'sling'];
+  // Lost Temple bonus tiles: a stack of as many tiles as players; the magnifier reaching the temple picks one (rulebook p.14). Values are ours.
+  var TBONUS = RBONUS;   // the Lost Temple bonus stack is dealt from the same 18 research bonus tiles (rulebook setup 11)
+  var TEMPLE = [{ vp: 11, cost: { tablet: 2, jewel: 1, arrow: 2 } }, { vp: 6, cost: { tablet: 2, jewel: 1 } }, { vp: 6, cost: { jewel: 1, arrow: 2 } }, { vp: 2, cost: { tablet: 2 } }, { vp: 2, cost: { jewel: 1 } }, { vp: 2, cost: { arrow: 2 } }];   // rulebook p.14 + setup: 1 x 11, 2 x 6, 3 x 2 stacks, each as many tiles as players; the 11 pays all three costs, a 6 two, a 2 one
   var TEMPLE_ARRIVE = [10, 8, 6, 4];   // magnifier points in the temple row, by order of arrival
   var GUARD_VP = 5, IDOL_VP = 3, IDOL_USED_VP = 3, IDOL_SLOT_VP = [1, 1, 1, 2], ROUNDS = 5, HAND = 5, ROW = 6, EXPL = 2;
   var START = [{ coin: 2, compass: 0 }, { coin: 1, compass: 1 }, { coin: 2, compass: 1 }, { coin: 1, compass: 2 }];   // by turn order (rulebook)
-  // ---- rival expedition (solo): one card per turn; each does the first thing it can. ----
+  // ---- rival expedition (solo), rulebook p.20-21: 15 rival action tiles. Each round the stack is 10 tiles: all 5 dig tiles plus ONE tile
+  // from each of the 5 green/red pairs (red = the more aggressive version). Your difficulty is how many red tiles you use (0-5).
+  // The rival starts every round, flips one tile per turn, never passes before all 10 are played, and never gains resources or Dread.
+  // arrow = its decision arrow (left/right tie-break), half of each. d5 = idle in round V. Which resource each dig tile shows, which tiles
+  // idle in round V, the rounds a discovered site gets a guardian, and how the research / guardian reds differ are ours [unverified].
   var RIVAL = [
-    { id: 'rv-camp', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' }, { id: 'rv-camp2', name: 'Pitch camp', text: 'Takes a free camp site.', a: 'camp' },
-    { id: 'rv-buyi', name: 'Raid the market', text: 'Takes the cheapest item: its points.', a: 'buyi' }, { id: 'rv-study2', name: 'Study', text: 'Climbs one research row.', a: 'study' },
-    { id: 'rv-study', name: 'Study', text: 'Climbs one research row.', a: 'study' }, { id: 'rv-buya', name: 'Loot a relic', text: 'Takes the cheapest artifact: its points.', a: 'buya' },
-    { id: 'rv-scout', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' },
-    { id: 'rv-scout2', name: 'Scout ahead', text: 'Discovers a site: 2 points; a guardian wakes.', a: 'scout' }, { id: 'rv-hunt2', name: 'Hunt', text: 'Overcomes a waiting guardian: 4 points.', a: 'hunt' }
+    { id: 'rv-dig-coin', a: 'dig', res: 'coin', arrow: 'L', name: 'Dig for coins', text: 'Takes a site that gives coins.' },
+    { id: 'rv-dig-compass', a: 'dig', res: 'compass', arrow: 'R', name: 'Dig for compasses', text: 'Takes a site that gives compasses.' },
+    { id: 'rv-dig-tablet', a: 'dig', res: 'tablet', arrow: 'L', d5: 1, name: 'Dig for tablets', text: 'Takes a site that gives tablets.' },
+    { id: 'rv-dig-arrow', a: 'dig', res: 'arrow', arrow: 'R', d5: 1, name: 'Dig for arrowheads', text: 'Takes a site that gives arrowheads.' },
+    { id: 'rv-dig-jewel', a: 'dig', res: 'jewel', arrow: 'L', name: 'Dig for jewels', text: 'Takes a site that gives jewels.' },
+    { id: 'rv-disc-g', a: 'disc', pair: 'disc', red: 0, gr: [3, 4, 5], arrow: 'R', name: 'Scout ahead', text: 'Discovers a site (a guardian wakes from round 3).' },
+    { id: 'rv-disc-r', a: 'disc', pair: 'disc', red: 1, gr: [1, 2, 3, 4, 5], arrow: 'L', name: 'Scout hard', text: 'Discovers a site; a guardian always wakes.' },
+    { id: 'rv-res-g', a: 'res', pair: 'res', red: 0, arrow: 'R', name: 'Study', text: 'Climbs one research row and takes an assistant away.' },
+    { id: 'rv-res-r', a: 'res', pair: 'res', red: 1, asst: 1, arrow: 'L', name: 'Study hard', text: 'Climbs two research rows and takes an assistant away.' },
+    { id: 'rv-beat-g', a: 'beat', pair: 'beat', red: 0, arrow: 'R', name: 'Hunt', text: 'Overcomes a guardian where it camps, else studies.' },
+    { id: 'rv-beat-r', a: 'beat', pair: 'beat', red: 1, asst: 1, arrow: 'L', name: 'Hunt hard', text: 'Overcomes a guardian, else studies and takes an assistant.' },
+    { id: 'rv-item-g', a: 'item', pair: 'item', red: 0, arrow: 'R', name: 'Buy an item', text: 'Takes the item with the fewest points.' },
+    { id: 'rv-item-r', a: 'item', pair: 'item', red: 1, arrow: 'L', name: 'Raid the market', text: 'Takes the item with the most points.' },
+    { id: 'rv-art-g', a: 'art', pair: 'art', red: 0, arrow: 'R', name: 'Find a relic', text: 'Takes the artifact with the fewest points.' },
+    { id: 'rv-art-r', a: 'art', pair: 'art', red: 1, arrow: 'L', name: 'Loot a relic', text: 'Takes the artifact with the most points.' }
   ];
+  var RIVAL_RED = { easy: 0, steady: 1, normal: 3, hard: 5 };   // red tiles per difficulty
+  var RIVAL_IDOL = 3, RIVAL_IDOL_DUP = 2;   // each new kind of face-up idol 3; duplicates and face-down idols 2
   function mk(arr, t) { var o = {}; arr.forEach(function (r) { o[r[0]] = { id: r[0], t: t, name: r[1], cost: r[2], tr: r[3], vp: r[4], ops: r[5] }; }); return o; }
   var CARDS = Object.assign({}, BASIC, mk(I, 'item'), mk(A, 'art'));
   var GUARD = {}; GU.forEach(function (r) { GUARD[r[0]] = { id: r[0], name: r[1], cost: r[2], boon: r[3] }; });
   var SITE = {}; S1.forEach(function (r) { SITE[r[0]] = { id: r[0], lvl: 1, name: r[1], rew: r[2] }; }); S2.forEach(function (r) { SITE[r[0]] = { id: r[0], lvl: 2, name: r[1], rew: r[2] }; });
   CAMP.forEach(function (c) { SITE[c.id] = { id: c.id, lvl: 0, name: c.name, rew: c.rew }; });
-  var IDOL = {}; ID.forEach(function (r) { IDOL[r[0]] = { id: r[0], name: r[1], gift: r[2] }; });
+  var IDOL = {}; ID.forEach(function (r) { IDOL[r[0]] = { id: r[0], name: r[1], gift: r[2], kind: Object.keys(r[2]).join('+') }; });
   // plain-words text of an op list
   function opText(ops) {
     return (ops || []).map(function (o) {
@@ -187,15 +249,18 @@
       if (o.d) return 'draw ' + o.d + ' card' + (o.d > 1 ? 's' : '');
       if (o.x) return 'exile a card';
       if (o.r) return 'free research step (' + (o.r === 'g' ? 'magnifier' : 'notebook') + ')';
-      if (o.b) return 'buy ' + (o.b === 'i' ? 'an item' : 'an artifact') + ' ' + o.o + ' cheaper';
+      if (o.b) return 'buy ' + (o.b === 'i' ? 'an item' : o.b === 'a' ? 'an artifact' : 'an item or artifact') + ' ' + o.o + ' cheaper';
+      if (o.tv) return 'a ' + TNAME[o.tv] + ' of travel this turn';
+      if (o.tp) return 'pay ' + o.tp.map(function (t) { return 'a ' + TNAME[t]; }).join(' and ') + ' of travel';
       if (o.fd) return 'dig at any free site with no travel';
       if (o.or) return o.or.map(function (x) { return x.length ? opText(x) : 'nothing'; }).join(' OR ');
       return '';
     }).join(', then ');
   }
   function resText(r) { return Object.keys(r).map(function (k) { return r[k] + ' ' + RNAME[k] + (r[k] > 1 ? (k === 'compass' ? 'es' : 's') : ''); }).join(' + '); }
+  FREE_ITEMS.forEach(function (k) { if (CARDS[k]) CARDS[k].fa = true; });
   Object.keys(CARDS).forEach(function (k) { var c = CARDS[k]; if (!c.text) c.text = opText(c.ops).replace(/^./, function (m) { return m.toUpperCase(); }) + '.'; });
-  Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.text = 'Boon: ' + opText(g.boon) + '.'; });
+  Object.keys(GUARD).forEach(function (k) { var g = GUARD[k]; g.tv = g.boon.every(function (o) { return o.tv; }) ? g.boon.map(function (o) { return o.tv; }) : null; g.text = g.tv ? 'Boon: travel value ' + g.tv.map(function (t) { return TNAME[t]; }).join(' + ') + ', once, when you dig or explore.' : 'Boon: ' + opText(g.boon) + '.'; });
 
   // ---- STORY: every narrative line of the guided prologue and Quick games in one place (Story chapters live in campaign.json). See STORY.md.
   var STORY = {
@@ -207,7 +272,7 @@
       disc: ['Ch 2 · The ruin', 'Your two Dread cards can pay the two Boots.'],
       idol: ['Ch 2 · The ruin', 'An idol, worth 3 points! Set it in a shrine.'],
       shrine: ['Ch 2 · The ruin', 'The shrine gives 3 coins. Its slot was only worth 1 point.'],
-      beat: ['Ch 2 · The guardian', 'The Glass Moth guards the ruin. You can face it.'],
+      beat: ['Ch 2 · The guardian', 'The Ash Wisp guards the ruin. You can face it.'],
       over: ['Ch 2 · The guardian', 'Pay its price for 5 points and a boon.'],
       boon: ['Ch 3 · Supplies', 'Tamed! Its boon is free. Use it now.'],
       useboon: ['Ch 3 · Supplies', 'The Moth lets your magnifier climb a research row.'],
@@ -221,12 +286,12 @@
     },
     // coached first game: every rule, said once, the first time it matters (TUTORIAL-COVERAGE.md lists the same ids)
     coach: {
-      setup: 'You hold 5 cards. Two are Dread: -1 point each.',
+      setup: 'You hold 5 cards. Dread cards are -1 point each.',
       oneaction: 'One action a turn, then Tamsin takes hers.',
       play: 'Playing a card gives what it shows. Trail Notes: +1 compass.',
       rival: 'Tamsin plays by the same rules: one action, then you.',
-      travel: 'Sites show travel icons. A card pays one, then is discarded.',
-      dig: 'Glowing camps are open. Send an explorer to dig. One per site.',
+      travel: 'Sites show travel icons. A card pays one, then waits in your play area.',
+      dig: 'Glowing camps are open. Send an explorer to dig. A camp holds two; the second pays double.',
       discover: '3 compasses! You can explore a hidden ruin now.',
       deep: 'Deep ruins pay more but cost 6 compasses.',
       plane: 'Missing an icon? 2 coins buy a Plane, which pays any icon.',
@@ -246,7 +311,7 @@
       roundend: 'New round. Explorers come home and you draw to 5.',
       fear: 'An explorer fled a guardian and took a Dread card.',
       score: 'Final score: research, temple, idols, shrines, guardians and cards, minus Dread.',
-      tiebreak: 'Ties go to whoever reached the temple first.',
+      tiebreak: 'Ties: first into the temple wins, else higher research.',
       rounds: 'A full game lasts 5 rounds. This one was 1.'
     },
     coachGood: 'Good move: ', coachTip: 'Tip: ',
@@ -256,7 +321,7 @@
   };
   var VD = { STORY: STORY, RES: RES, RNAME: RNAME, TRAVEL: TRAVEL, TNAME: TNAME, CARDS: CARDS, ITEMS: I.map(function (r) { return r[0]; }), ARTS: A.map(function (r) { return r[0]; }),
     GUARD: GUARD, GUARDS: GU.map(function (r) { return r[0]; }), SITE: SITE, CAMP: CAMP, SLOT1: SLOT1, SLOT2: SLOT2, DISC: DISC, S1: S1.map(function (r) { return r[0]; }), S2: S2.map(function (r) { return r[0]; }),
-    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE,
-    GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, opText: opText, resText: resText };
+    IDOL: IDOL, IDOLS: ID.map(function (r) { return r[0]; }), SHRINE: SHRINE, SLOTS: SLOTS, TRACK: TRACK, PATH: PATH, START_TO: START_TO, RBONUS: RBONUS, FIRST: FIRST, DREAD_SUPPLY: DREAD_SUPPLY, NOTE_VP: NOTE_VP, GLASS_VP: GLASS_VP, TOP: TOP, TEMPLE: TEMPLE, TEMPLE_ARRIVE: TEMPLE_ARRIVE, ASST: ASST, ASSTBY: ASST.reduce(function (o, a) { return (o[a.id] = a, o); }, {}), ASST_REC: ASST_REC, ASST_UP: ASST_UP, ASST_MAX: ASST_MAX, ASST_STACKS: ASST_STACKS, FREE_ITEMS: FREE_ITEMS, TBONUS: TBONUS,
+    GUARD_VP: GUARD_VP, IDOL_SLOT_VP: IDOL_SLOT_VP, IDOL_VP: IDOL_VP, IDOL_USED_VP: IDOL_USED_VP, ROUNDS: ROUNDS, HAND: HAND, ROW: ROW, EXPL: EXPL, START: START, RIVAL: RIVAL, RIVAL_RED: RIVAL_RED, RIVAL_IDOL: RIVAL_IDOL, RIVAL_IDOL_DUP: RIVAL_IDOL_DUP, opText: opText, resText: resText };
   if (typeof module !== 'undefined' && module.exports) module.exports = VD; else root.VD = VD;
 })(typeof window !== 'undefined' ? window : this);

@@ -9,19 +9,23 @@ function startGame(mode, o) {
   }
   G = VG.newGame({ np, seats, seed: o.seed, solo: !!o.solo, rivalLevel: o.rivalLevel || o.lvl, rivalName: o.rivalName, twist: o.twist || null, rounds: o.rounds });
   if (mode !== 'tutorial') UI.coachFree = false;   /* the coach belongs to the tutorial game only */
+  UI.flat = innerWidth < 1000 && innerHeight < 700; UI.whyL = {}; UI.rlog = []; UI.seenCat = {}; UI.undo = null; UI.rbase = null; UI.rcardDue = false;
   UI.mode = mode; UI.humans = seats.map((s, i) => s.ai ? -1 : i).filter(i => i >= 0); UI.view = UI.humans[0] || 0; UI.camp = o.camp || null;
+  UI.learn = mode !== 'tutorial' && !UI.camp && UI.humans.length === 1 && !(UI.prefs.games > 0);   /* F16: the first real game teaches one idea per round */
+  if (mode !== 'tutorial') UI.prefs.games = (UI.prefs.games || 0) + 1;
   UI.prefs.played = UI.prefs.played || mode !== 'tutorial'; savePrefs();
   enterGame();
   if (window.GXH) try { GXH.setEnabled(hintsOn()); GXH.hide(); } catch (e) { }
   return G;
 }
 function enterGame() {
+  { const rc = $('#rcard'); if (rc) rc.hidden = true; }
   $('#start').hidden = true; $('#rs').hidden = true; $('#pass').hidden = true; UI.started = true;
   try { GX.close(); } catch (e) { }
   if (window.GX && GX.undo) try { GX.undo.clear(); } catch (e) { }
   render(); musicSync(); UI.bannerFor = null;
   if (!UI.fast && UI.mode !== 'tutorial' && G.round === 1 && !G.log.some(l => /plays|digs|buys|discovers|passes/.test(l.t || ''))) { showGoal(); return; }
-  turnBanner(); goOn();
+  UI.rbase = scoreCats(); turnBanner(); goOn();
 }
 function goOn() {
   const s = VG.actor(G); if (!isHuman(s)) schedule(); else if (s !== UI.view && UI.humans.length > 1) showPass(s);
@@ -63,15 +67,49 @@ function campBest(id, sc) {
 }
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
-function showGoal() {   /* one card before turn 1: how you win in one sentence, three ways to score */
+/* F16: one new idea per round in the first game; ideas not taught yet are drawn quieter */
+const LEARN = { 1: ['Travel and dig', 'Tap a glowing card to play it, or a glowing site to send an explorer there. Digging gives coins, compasses and more to spend.'],
+  2: ['Guardians and idols', 'Exploring a new ruin finds an idol (3 points) and wakes a guardian. Pay its cost to beat it: 5 points. One still awake at round end gives you Dread (-1).'],
+  3: ['Research', 'Pay to climb the track on the right. Each row up is worth more points at the end. Some spaces give a bonus now.'],
+  4: ['Cards and stars', 'Buy market cards: items cost coins, artifacts cost compasses. A star badge is points at the end. "Need 2" means you are 2 short.'] };
+function learnHTML(n) { const L = UI.learn && LEARN[n]; return L ? `<div class="learn"><p class="gh">New this round</p><p class="lt"><b>${esc(L[0])}.</b> ${esc(L[1])}</p></div>` : ''; }
+function showGoal() {
+  if (UI.learn) { const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
+    g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Your first expedition"><h2 class="gl">Most points after ${G.rounds} rounds wins.</h2>${learnHTML(1)}<p class="gs">The line under the scores always says why your points moved. Tap it for detail.</p><button type="button" class="tbtn" data-a="goalgo">Start round 1</button></div>`;
+    g.hidden = false; UI.busy = true; render(); return; }   /* F15: one card before turn 1: "How you score", the main point sources in 4 lines */
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
-  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
-    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Dread cards cost 1.</span></li></ul>
-    <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
+  g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="How you score"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
+    <p class="gh">How you score</p>
+    <ul class="gu"><li>${ic('up', 'research')}<span><b>Research:</b> climb the track. Your row is worth more points the higher you get.</span></li><li>${ic('idol', 'idol')}<span><b>Ruins:</b> each idol is 3 points, each guardian you beat is 5.</span></li><li>${ic('card', 'cards')}<span><b>Cards:</b> artifacts with a star badge score at the end. Dread cards cost 1.</span></li><li>${ic('star', 'temple')}<span><b>Temple:</b> reach the top row to buy a big tile.</span></li></ul>
+    <p class="gf">After every round you see where each side's points came from. ${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
-UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.busy = false; render(); turnBanner(); goOn(); };
+function scoreCats() { const o = {}; G.p.forEach((p, i) => { o[i] = VG.score(G, i); }); if (G.rival) o[-2] = { research: V.GLASS_VP[Math.min(V.TOP, G.rival.rows)], cards: G.rival.vp, total: VG.rivalScore(G) }; return o; }
+function nextTip(mineW, rivW, me, cur) {   /* what to try next: the source the rival gained on that you did not, else the one you are missing */
+  const gain = (w, k) => new RegExp(CAT_W[k] + ' \\+').test(w || '');
+  if (rivW && gain(rivW, 'cards') && !gain(mineW, 'cards')) return 'Try next round: buy a card with a star badge, or beat a guardian (5 points).';
+  if (rivW && gain(rivW, 'research') && !gain(mineW, 'research')) return 'Try next round: climb the research track. Each row is points at the end.';
+  if (!gain(mineW, 'idols') && !cur[me].idols) return 'Try next round: explore a hidden ruin. Each idol is 3 points.';
+  if (!gain(mineW, 'research')) return 'Try next round: climb the research track. It is the steadiest source of points.';
+  if (!gain(mineW, 'cards')) return 'Try next round: buy an artifact with a star badge.';
+  return 'Good round. Keep climbing research and collecting idols.';
+}
+function showRoundCard(n) {
+  const cur = scoreCats(), base = UI.rbase || {}, me = UI.humans[0] || 0, d0 = { research: 0, cards: 0, total: 0 };
+  const rows = []; let mineW = '', rivW = '';
+  const row = (i, name) => { const a = cur[i], b = base[i] || d0, d = a.total - (b.total || 0); let w = catWhy(a, b); if (i === -2) w = w.replace('card stars', 'guardians and cards'); if (i === me) mineW = w; if (i === -2) rivW = w;
+    return `<div class="rcrow${i === me ? ' me' : ''}"><span class="rcn">${esc(name)}</span><b class="rcd">${d >= 0 ? '+' : ''}${d}</b><span class="rcw">${esc(w || 'no new points')}</span><span class="rct">${a.total} in all</span></div>`; };
+  G.p.forEach((p, i) => rows.push(row(i, UI.humans.length === 1 && i === me ? 'You' : short(i))));
+  if (G.rival) rows.push(row(-2, rivalShort()));
+  const tip = UI.humans.length === 1 ? `<p class="gf">${esc(nextTip(mineW, rivW, me, cur))}</p>` : '';
+  const g = $('#rcard') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'rcard', className: 'ov' }));
+  g.innerHTML = `<div class="tbox gbox rcbox" role="dialog" aria-label="Round ${n} scored"><h2 class="gl">Round ${n} scored</h2><div class="rcrows">${rows.join('')}</div>${UI.learn && LEARN[n + 1] ? learnHTML(n + 1) : tip}<button type="button" class="tbtn" data-a="rcgo">Round ${n + 1}</button></div>`;
+  document.querySelectorAll('.vpop').forEach(e => e.remove()); g.hidden = false; UI.busy = true; UI.rcardDue = false;
+  clearTimeout(showRoundCard.t); if (navigator.webdriver) showRoundCard.t = setTimeout(() => { if (!g.hidden) UIACT.rcgo(); }, 4000);   /* scripted players only: a person reads it and taps on */
+}
+UIACT.rcgo = () => { clearTimeout(showRoundCard.t); const g = $('#rcard'); if (!g || g.hidden) return; g.hidden = true; UI.rbase = scoreCats(); UI.busy = false; render(); after(); };
+UIACT.goalgo = () => { const g = $('#goal'); if (g) g.hidden = true; UI.rbase = scoreCats(); UI.busy = false; render(); turnBanner(); goOn(); };
 function showPass(s) {
   const p = $('#pass'); p.innerHTML = `<div class="tbox"><h2 class="logo" style="font-size:28px">Pass the device</h2><p class="tag2">Hand it to ${esc(G.p[s].name)}. Your cards stay hidden.</p><button type="button" class="tbtn" data-a="iam">I am ${esc(G.p[s].name)}</button></div>`;
   p.hidden = false;
@@ -81,6 +119,7 @@ function rows(i) { const s = VG.score(G, i); return [['Research track', s.resear
 const CATS = [['research', 'up', 'Research'], ['temple', 'star', 'Temple'], ['idols', 'idol', 'Idols'], ['slots', 'leaf', 'Shrines'], ['guards', 'guard', 'Guardians'], ['cards', 'card', 'Cards'], ['fear', 'exile', 'Dread']];
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
+  document.querySelectorAll('.vpop').forEach(e => e.remove()); if (typeof rivalCap === 'function') rivalCap('');   /* F14 (R93): the result card opens clean */
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
   const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
   const cWon = def ? campIsWon(G, def) : iWon, m = def ? campMetrics(G) : null;
@@ -99,7 +138,7 @@ function showResult() {
   const tied = P.length > 1 && P[1].sc.total === P[0].sc.total, tb = tied && G.winner !== -1 ? `Tie on ${P[0].sc.total}. ${G.winner === me ? 'You win' : short(G.winner) + ' wins'} the tiebreak.` : '';
   const head = def ? (cWon ? 'Stage won!' : 'Stage lost') : iWon ? 'Victory!' : G.winner === -1 ? 'A tie' : tied && myT === P[0].sc.total ? 'Close loss' : 'Defeat';
   const sub = def && !cWon ? (G.winner === 0 ? 'You won, but missed the goal: ' + def.goal.text : esc(wn) + ' Goal: ' + def.goal.text) + ' Try again.'
-    : tb ? tb + ' First into the temple wins ties.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
+    : tb ? tb + ' First into the temple wins ties, else the higher research.' : UI.humans.length === 1 && P.length > 1 ? (myT > best ? `You won by ${myT - best} point${myT - best === 1 ? '' : 's'}.` : myT < best ? `${esc(wn)} You were ${best - myT} point${best - myT === 1 ? '' : 's'} short.` : esc(wn)) : esc(wn);
   const blk = (x, k) => `<div class="rp${k === 0 ? ' first' : ''}"><div class="rph"><span class="crest" style="--pc:${x.i >= 0 ? HEX[x.i] : '#9a9486'}"></span><span class="rpn">${esc(x.name)}</span><span class="rpt"><b data-n="${x.sc.total}">${x.sc.total}</b> points</span></div>
     <div class="rcats">${CATS.filter(c => x.sc[c[0]]).map(c => `<span class="rcat${x.sc[c[0]] < 0 ? ' neg' : ''}">${ic(c[1], c[2])}<b data-n="${x.sc[c[0]]}">${x.sc[c[0]]}</b><small>${c[2]}</small></span>`).join('') || '<span class="rcat"><small>No points yet</small></span>'}</div></div>`;
   const btns = def ? (cWon ? '<button type="button" class="tbtn" data-a="campfin">Continue the story</button>' : '<button type="button" class="tbtn" data-a="campretry">Try again</button>')
@@ -122,22 +161,23 @@ function scoresEl() {
   if (G.rival) t += `<p>${esc(G.rival.name)}: <b>${VG.rivalScore(G)}</b> points (research row ${G.rival.rows}). It plays one card after each of your actions.</p>`;
   d.innerHTML = t; return d;
 }
-function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}</div>`).join('') : ''; return d; }
+function logEf(t) { if (!/ (buys|takes|plays) /.test(t || '')) return ''; const c = Object.values(V.CARDS).find(c => c.name && t.indexOf(' ' + c.name) >= 0); return c ? ` <small class="lgef">(${esc(effShort(c))})</small>` : ''; }   /* F11: a card named in the log says what it does */
+function logEl() { const d = document.createElement('div'); d.className = 'loglist'; d.innerHTML = G ? G.log.slice(-80).reverse().map(l => `<div>${esc(l.t)}${logEf(l.t)}</div>`).join('') : ''; return d; }
 const RULES_HTML = `<div class="rules">
 <h3>How a turn works</h3><ol class="howturn"><li>Do <b>one</b> action, then the next explorer goes.</li><li><b>Play a card</b> from your hand for its goods.</li><li><b>Go to a site</b>: pay its travel icons with cards.</li><li><b>Buy a card</b>. Items cost coins. Artifacts cost compasses.</li><li>Nothing to do? <b>Pass</b>. After 5 rounds, most points wins.</li></ol>
 <p><button type="button" class="btn" data-a="morerules" aria-expanded="false">Show all the rules</button></p><div class="allrules" hidden>
-<h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point.</p>
-<h3>Your turn</h3><p>Do one action, then the next explorer goes. Pass to sit out.</p>
-<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread does nothing.</li>
-<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then is discarded. A Plane pays any icon.</li>
+<h3>The goal</h3><p>Play 5 rounds. Most points wins. Each Dread card costs 1 point. Tie: first into the temple wins, else the higher research.</p>
+<h3>Your turn</h3><p>Do one main action, then the next explorer goes. Playing a starting coin or compass card is free. Pass to sit out.</p>
+<ul><li><b>Play a card</b> for its effect. Artifacts cost 1 tablet to play. Dread has no effect, but you can spend it as a Boot of travel.</li>
+<li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then waits in your play area until the round ends. A Plane pays any icon (2 coins make one). At a camp, the second explorer on a site pays double.</li>
 <li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>
 <li><b>Fight</b> a guardian where your explorer stands. Pay its cost for 5 points and a boon.</li>
-<li><b>Buy</b>: items go under your deck. Artifacts work at once.</li>
-<li><b>Research</b>: climb the track. Pay each row's cost for its bonus.</li></ul>
-<h3>Free actions</h3><p>Use a boon, or set one idol in a shrine.</p>
-<h3>End of a round</h3><p>Explorers come home. Anyone with a guardian gains Dread.</p>
-<h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>One idol a turn into a shrine. 4 shrine slots. Boons come at once.</li><li>No helpers and no research bonus tiles. First arrivals get rewards.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li></ul></div></div>`;
+<li><b>Buy</b>: items go under your deck. A bought artifact may be used at once, free.</li>
+<li><b>Research</b>: move up the path map to a joined space. Pay the cost on that space. The first one there takes its bonus tile. Every arrival gets the row's bonus.</li></ul>
+<h3>Free actions</h3><p>Use a boon once (then it is spent). Set idols in shrines: as many as you like in a turn, but each of the 4 slots only once.</p>
+<h3>End of a round</h3><p>Explorers come home. Each explorer leaving a site that still has a guardian brings back a Dread card. Played cards are shuffled under your deck.</p>
+<h3>Solo</h3><p>The rival goes first each round and flips one of its 10 tiles after each of your actions. It never passes early. Harder levels use more red tiles. Beat its score.</p>
+<h3>Our own designs</h3><ul><li>Rules, counts and board shape follow the original.</li><li>Each card, guardian, site and helper is our own design.</li><li>No expansions and no second board.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
@@ -148,12 +188,13 @@ function refInit() {
     { id: 'arts', title: 'Artifacts', items: V.ARTS.map(cardItem) },
     { id: 'basic', title: 'Starting cards', items: ['grant', 'trail', 'dread'].map(cardItem) },
     { id: 'guards', title: 'Guardians', items: V.GUARDS.map(g => ({ id: 'g-' + g, name: V.GUARD[g].name, text: 'Overcome: pay ' + V.resText(V.GUARD[g].cost) + '. ' + V.GUARD[g].text, tags: ['Guardian'], meta: '5 points', pic: { guard: g } })) },
+    { id: 'assistants', title: 'Assistants', items: V.ASST.map(a => ({ id: a.id, name: a.name, text: 'Once a round: ' + V.opText(a.s) + '. Gold side: ' + V.opText(a.gd) + '.', tags: ['Notebook rows ' + V.ASST_REC.join(' and ') + ' hire, ' + V.ASST_UP.join(' and ') + ' upgrade'].concat(a.main ? ['Your action'] : ['Free']) })) },
     { id: 'ruins', title: 'Ruins', items: V.S1.concat(V.S2).map(t => ({ id: 's-' + t, name: V.SITE[t].name, text: 'Dig: gain ' + V.resText(V.SITE[t].rew) + '.', tags: ['Level ' + V.SITE[t].lvl], meta: 'Discover for ' + V.DISC[V.SITE[t].lvl] + ' compasses', pic: { site: t } })) },
     { id: 'camp', title: 'Camp sites', items: V.CAMP.map(c => ({ id: 's-' + c.id, name: c.name, text: 'Dig: gain ' + V.resText(c.rew) + '. Travel: ' + c.cost.map(t => V.TNAME[t]).join(' + ') + '.', tags: ['Camp'], meta: 'always open', pic: { site: c.id } })) },
     { id: 'idols', title: 'Idols', items: V.IDOLS.map(i => ({ id: 'i-' + i, name: V.IDOL[i].name, text: 'Found when you discover a ruin: gain ' + V.resText(V.IDOL[i].gift) + '. Worth 3 points.', tags: ['Idol'], meta: '3 points', pic: { idol: i } })) }
   ];
   GX.reference(S, { id: 'refd', title: 'All cards', label: 'Cards', button: false,
-    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic;
+    picture: (it, big) => { const w = big ? 150 : 52, P = it.pic; if (!P) return null;
       if (P.card) return `<div style="width:${w}px;--cw:${w}px">${cardHTML(P.card, {})}</div>`;
       const st = P.guard ? 'guard-' + P.guard : P.site ? 'site-' + P.site : P.idol, sym = P.guard ? 'guard' : P.site ? 'leaf' : 'idol';
       const d = document.createElement('div'); d.style.cssText = `width:${w}px;height:${w}px;border-radius:12px;background:#3c5a3f;display:flex;align-items:center;justify-content:center`; d.setAttribute('data-art', st);
@@ -189,7 +230,7 @@ function helpPhase() {
 function moveTarget(m) {
   if (!m) return null;
   if (m.t === 'play') return $(`#hand .cd[data-i="${m.i}"]`); if (m.s != null) return $(`.site[data-i="${m.s}"]`); if (m.t === 'buy') return $(`#row .cd[data-r="${m.r}"]`);
-  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return $(`#extra [data-a=guard][data-k="${m.k}"]`); if (m.t === 'idol') return $(`#extra [data-a=idol][data-k="${m.k}"]`);
+  if (m.t === 'res' || m.t === 'temple') return $('#track'); if (m.t === 'pass') return $('#passbtn'); if (m.t === 'boon') return exShow($(`#extra [data-a=guard][data-k="${m.k}"]`)); if (m.t === 'idol') return exShow($(`#extra [data-a=idol][data-k="${m.k}"]`)); if (m.t === 'asst') return exShow($(`#extra [data-a=asst][data-k="${m.k}"]`));
   if (m.t === 'ans') { if (G.q.h === 'site' && m.v != null) return $(`.site[data-i="${m.v}"]`); if (G.q.h === 'buy' && m.v != null) return $(`#row .cd[data-r="${m.v}"]`); return $('#qbox'); }
   return null;
 }
@@ -205,9 +246,18 @@ function helpInit() {
       { title: 'Travel', text: 'Each card pays one travel icon. A Plane pays any icon.', pic: P('boot') },
       { title: 'Discover', text: 'Three compasses flip a hidden ruin. You get an idol and loot.', pic: P('compass') },
       { phase: 'guard', title: 'Overcome', text: 'Pay its cost while you are there: 5 points and a boon.', pic: P('guard') },
-      { phase: 'idol', title: 'Shrines', text: 'Set one idol a turn in a shrine for a boon.', pic: P('idol') }],
+      { phase: 'idol', title: 'Shrines', text: 'Set idols in shrines for a free boon. Each slot once.', pic: P('idol') }],
     avoid: '.glow,#pacts .btn,#qbox .btn,#insp' });
+  try { new MutationObserver(() => requestAnimationFrame(bubClear)).observe(document.body, { childList: true }); addEventListener('resize', () => setTimeout(bubClear, 60)); } catch (e) { }
   if (0) GXH.bulb({ el: '#bulbbtn', suggest: () => { if (!myTurn()) return null; const m = VAI.choose(G, 'hard'); const t = moveTarget(m); return t ? { target: () => moveTarget(m), why: VAI.why(G, m) } : null; }, rulesFor: () => helpPhase() });
+}
+/* F11 (R63 L2): the help bubble never covers a glowing piece, the market or the research track; if the kit's spot does, it goes slim to the top bar */
+function bubClear() {
+  try { const b = document.querySelector('.gxh-bub.on:not(.gxt-bub)'); if (!b || UI.mode === 'tutorial') return;   /* the guided tutor places its own bubble */
+    const ov = r => [...document.querySelectorAll('#map .site.glow,#row,#track,#extra .tag.glow,#hand .cd.glow,#pacts .btn')].some(e => { const q = e.getBoundingClientRect(); return q.width && !(q.right <= r.left || q.left >= r.right || q.bottom <= r.top || q.top >= r.bottom); });
+    if (!ov(b.getBoundingClientRect())) return;
+    b.classList.add('vg-bubtop', 'gxh-compact'); b.style.maxWidth = 'min(350px,calc(100vw - 12px))';
+    const r = b.getBoundingClientRect(); b.style.left = Math.round(Math.max(6, (innerWidth - r.width) / 2)) + 'px'; b.style.top = '4px'; } catch (e) { }
 }
 // ---------------------------------------------------------------- music (silent until files exist in media/music)
 function musicSlot() { if (!G || !$('#start').hidden) return ['tavern', 0]; if (G.phase === 'over') return [G.winner === UI.humans[0] ? 'victory' : 'defeat', 1]; if (UI.camp && UI.camp.boss) return ['fight', 0]; return ['main', 0]; }
