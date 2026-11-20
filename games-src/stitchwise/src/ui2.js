@@ -98,7 +98,7 @@ function banner(txt, sub, opp) { var b = $('#turnban'); if (!b) { b = h('div#tur
 function turnCheck() { // banner + plain line when the turn changes (or stays: the player further back plays again)
   if (!G || G.over || G.pend) return; var w = swWho(G), hum = isHuman(w), hot = UI.mode === 'hot', nm = hot ? nameOf(w) + '\u2019s turn' : hum ? 'Your turn' : nameOf(w) + '\u2019s turn', again = w === UI.lastWho, prev = UI.again;
   if (hum) UI.fast = false;
-  UI.again = hum && again ? (hot ? nameOf(w) + ' is still behind on the track, so plays again' : 'You are still behind on the track: play again') : '';
+  UI.again = hum && again ? (hot ? nameOf(w) + ' is behind: plays again' : 'Still behind: play again') : '';
   if (!again) { banner(nm, UI.lastWho >= 0 ? (hum ? 'You are behind now' : nameOf(w) + ' is behind now') : '', !hum && !hot); } else banner(hum ? (hot ? nameOf(w) + ' again' : 'Your turn again') : nameOf(w) + ' plays again', '', !hum && !hot);
   if (UI.coach) { if (!hum && !hot) coachSay('who_next'); if (UI.again) coachSay('again'); else if (!hum && again && !hot) coachSay('again_opp'); }
   UI.lastWho = w; renderDock();
