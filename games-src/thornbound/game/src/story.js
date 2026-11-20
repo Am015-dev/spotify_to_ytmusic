@@ -1,10 +1,10 @@
 // All story text for the tutorial, the turn strip and the quick game lives here, so it can be edited in one place. (Story-mode scenes: ../../campaign.json.)
-// Guide: Old Ysolde the Rune-Reader (you lead the Heathbound Clans). Rival: Tamsin of the Gate (the Gilded Court). Names come from campaign.json `cast`.
+// Guide: Old Ysolde the Bog Chieftain (you lead the Reedfolk). Rival: Tamsin of the Gate (the Salt Crown). Names come from campaign.json `cast`.
 // A function value gets helpers from the game (G, cinfo, ...) at the moment it is shown. Bubbles: at most 2 short lines.
 var TBSTORY={
   guide:'ysolde', rival:'tamsin',
-  quick:{intro:'The king is dead. The heath is yours to take.',
-    win:'The crown is yours, and the heath sings your name.',lose:'{W} take the throne this time. Gather your people and ride again.',tie:'Neither banner falls. The Favour decides the crown.'},
+  quick:{intro:'The king is dead. The reed beds are yours to hold.',
+    win:'The crown is yours, and the marshes sing your name.',lose:'{W} take the throne this time. Gather your people and ride again.',tie:'Neither banner falls. The Favour decides the crown.'},
   // chapters of the tutorial prologue: first step id, title, opening beat, payoff beat (shown after the last step of the chapter)
   // the tutorial's lines live in ui12.js (tutSteps): one sentence per step, no story pop-ups over the board
   chapters:[],

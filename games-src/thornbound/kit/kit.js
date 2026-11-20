@@ -12,10 +12,10 @@ function hex2(h) { h = h.replace('#', ''); if (h.length === 3) h = h[0] + h[0] +
 function mix(a, b, t) { var A = hex2(a), B = hex2(b); return '#' + [0, 1, 2].map(function (i) { var v = Math.round(A[i] + (B[i] - A[i]) * t); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
 
 var FAC = {
-  gilded: { id: 'gilded', name: 'The Gilded Court', short: 'Gilded Court', blurb: 'Fading nobility', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
-  heath: { id: 'heath', name: 'The Heathbound Clans', short: 'Heathbound Clans', blurb: 'Old clans of the land', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
-  lantern: { id: 'lantern', name: 'The Lantern Rising', short: 'Lantern Rising', blurb: "The people's uprising", main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
-  choir: { id: 'choir', name: 'The Pale Choir', short: 'Pale Choir', blurb: 'Moon cult', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
+  gilded: { id: 'gilded', name: 'The Salt Crown', short: 'Salt Crown', blurb: 'Salt-pan lords', main: '#7c1b2c', dark: '#3a0912', light: '#b8404f', accent: '#d4ad55', accent2: '#8f7330', paper: '#f1e3c3', ink: '#2b1511', glyph: '#f1d98a' },
+  heath: { id: 'heath', name: 'The Reedfolk', short: 'Reedfolk', blurb: 'Marsh riders', main: '#4e6c33', dark: '#1d2c15', light: '#88a85a', accent: '#e8dfc4', accent2: '#a9a083', paper: '#eee5c9', ink: '#1f2a15', glyph: '#efe6c9' },
+  lantern: { id: 'lantern', name: 'The Ember Guild', short: 'Ember Guild', blurb: 'Forge conspirators', main: '#d9622a', dark: '#2b2422', light: '#f49a52', accent: '#ffd079', accent2: '#8d8178', paper: '#f2e3c2', ink: '#2a1b12', glyph: '#fff0c0' },
+  choir: { id: 'choir', name: 'The Hollow Synod', short: 'Hollow Synod', blurb: 'A silent order', main: '#7f72b4', dark: '#171230', light: '#c5bde8', accent: '#d9dcea', accent2: '#8c90ad', paper: '#ece6dc', ink: '#1a1530', glyph: '#e9e8f6' },
   neutral: { id: 'neutral', name: 'The Market', short: 'Market', blurb: 'Neutral wares', main: '#7b5b37', dark: '#33220f', light: '#b48c57', accent: '#cfa84e', accent2: '#8a6f3a', paper: '#efe0bd', ink: '#2a1c0e', glyph: '#f0dba0' }
 };
 var FIDS = ['gilded', 'heath', 'lantern', 'choir', 'neutral'];
@@ -307,7 +307,7 @@ var ART = {}, ART_KEYS = [];
 function def(key, f, sc, opt, fn) { ART[key] = { f: f, sc: sc, opt: opt, fn: fn }; ART_KEYS.push(key); }
 var MIST = function (y, op) { return '<rect x="0" y="' + y + '" width="220" height="26" fill="url(#tb-mist)" opacity="' + (op || .5) + '" filter="url(#tb-fog)"/>'; };
 
-/* --- Gilded Court --- */
+/* --- Salt Crown --- */
 def('knight', 'gilded', 'dusk', { ruins: 1 }, function (R, f) { return bannerShape(40, 112, .9, f, R, 1, 62) + person(112, 134, 1.5, { f: f, short: 1, armor: 1, head: 'helm', plume: 1, held: 'sword', hand: [18, -40], shield: 1, tabard: 1, cape: '#4a0f1a', glow: 'warm' }) + ivy(176, 126, 40, -100, R); });
 def('herald', 'gilded', 'dusk', { ruins: 1 }, function (R, f) { return person(104, 134, 1.5, { f: f, head: 'cap', tabard: 1, held: 'trumpet', hand: [14, -50], cape: '#3a0912' }) + bannerShape(176, 126, .8, f, R, 0, 70); });
 def('guard', 'gilded', 'hall', {}, function (R, f) { return person(66, 140, 1.38, { f: f, short: 1, armor: 1, head: 'helm', held: 'halberd', tabard: 1, hand: [16, -34] }) + person(156, 140, 1.38, { f: f, short: 1, armor: 1, head: 'helm', plume: 1, held: 'halberd', tabard: 1, hand: [16, -34] }) + glowAt(110, 70, 36, 'warm'); });
@@ -323,7 +323,7 @@ def('hound', 'gilded', 'dusk', { ruins: 1 }, function (R) { return beast('hound'
 def('duelist', 'gilded', 'stone', { ruins: 1 }, function (R, f) { return person(70, 136, 1.4, { f: f, short: 1, head: 'bareheaded', held: 'sword', hand: [18, -36], cape: '#3a0912' }) + flip(person(-150, 136, 1.4, { f: 'heath', short: 1, head: 'bareheaded', held: 'sword', hand: [18, -36], cape: '#1d2c15' })) + '<path d="M96 78 L124 70" stroke="#fff" stroke-opacity=".5"/>' + glowAt(110, 74, 16, 'white'); });
 def('throne', 'gilded', 'sanct', {}, function (R) { return glowAt(110, 80, 70, 'gold') + '<path d="M70 126 V40 Q70 24 86 24 Q96 40 110 28 Q124 40 134 24 Q150 24 150 40 V126Z" fill="#241014"/><path d="M70 40 Q70 24 86 24 Q96 40 110 28 Q124 40 134 24 Q150 24 150 40" fill="none" stroke="url(#tb-gold)" stroke-width="3"/><rect x="80" y="78" width="60" height="30" rx="4" fill="#5b1424"/><rect x="74" y="106" width="72" height="16" fill="#2c1a10"/>' + ivy(70, 120, 80, -90, R, 3.6) + ivy(150, 120, 64, -92, R, 3.6) + thorn(40, 140, 50, -20, R) + thorn(180, 140, 50, -160, R) + crownShape(110, 76, .8); });
 
-/* --- Heathbound Clans --- */
+/* --- Reedfolk --- */
 def('clan_warrior', 'heath', 'moor', {}, function (R, f) { return person(110, 136, 1.5, { f: f, short: 1, head: 'bareheaded', hair: '#8a4a22', held: 'axe', hand: [17, -34], shield: 1, cape: '#2a3a1c', glow: 'warm' }) + stoneAt(36, 122, 22, 44, -4) + ivy(36, 120, 30, -90, R); });
 def('clan_chief', 'heath', 'moor', { }, function (R, f) { return stoneAt(40, 120, 24, 52, 5) + stoneAt(182, 122, 22, 40, -6) + person(110, 138, 1.58, { f: f, head: 'antlers', held: 'spear', hand: [18, -34], cape: '#e8dfc4', skin: '#d4a77f', glow: 'warm' }); });
 def('hunter', 'heath', 'forest', {}, function (R, f) { return beast('stag', 160, 128, .7, { col: '#6a5440' }) + person(72, 138, 1.45, { f: f, head: 'hood', held: 'bow', hand: [14, -38], cape: '#243b2a' }) + broadTree(20, 128, .9, R, 1); });
@@ -334,7 +334,7 @@ def('boar', 'heath', 'moor', {}, function (R) { return beast('boar', 108, 134, 1
 def('bear', 'heath', 'forest', {}, function (R) { return beast('bear', 104, 136, 1.55, { col: '#4a3a2c' }) + ivy(24, 140, 50, -80, R); });
 def('ravens', 'heath', 'dusk', { ruins: 1 }, function (R) { var s = tower(150, 128, 1.1, '#2a342e', R); for (var i = 0; i < 9; i++) s += beast('raven', 20 + R() * 180, 20 + R() * 70, .7 + R() * .4, { flip: R() > .5 }); return s; });
 
-/* --- Lantern Rising --- */
+/* --- Ember Guild --- */
 def('rioter', 'lantern', 'ember', {}, function (R, f) { var s = ''; [28, 188].forEach(function (x, i) { s += person(x, 130, .95, { f: f, short: 1, head: 'cap', held: i ? 'pitchfork' : 'torch', hand: [16, -34], alpha: .85 }); }); return s + person(108, 140, 1.55, { f: f, short: 1, head: 'cap', held: 'torch', hand: [17, -40], skin: '#c89870', glow: 'warm' }); });
 def('lantern_bearer', 'lantern', 'street', {}, function (R, f) { return person(100, 140, 1.55, { f: f, head: 'cap', held: 'lantern', hand: [16, -34], cape: '#2b2422' }) + glowAt(120, 60, 50, 'warm'); });
 def('barricade', 'lantern', 'ember', {}, function (R, f) { var s = ''; for (var i = 0; i < 7; i++) s += '<rect x="' + (28 + i * 24) + '" y="' + (88 + (i % 2) * 6) + '" width="10" height="48" fill="#4a2c14" transform="rotate(' + (i % 2 ? 8 : -9) + ' ' + (33 + i * 24) + ' 112)"/>'; s += '<path d="M24 118 H196 M30 104 H190" stroke="#3a2210" stroke-width="7"/><circle cx="70" cy="124" r="14" fill="#3a2210"/><circle cx="70" cy="124" r="14" fill="none" stroke="#6a4a2a" stroke-width="3"/><circle cx="160" cy="126" r="12" fill="#3a2210"/>'; return s + bannerShape(112, 92, .9, f, R, 1, 60) + flame(30, 92, 1.6) + flame(194, 94, 1.5); });
@@ -342,7 +342,7 @@ def('bellringer', 'lantern', 'ember', {}, function (R, f) { return '<path d="M60
 def('mob', 'lantern', 'ember', {}, function (R, f) { var s = ''; for (var i = 0; i < 9; i++) { var x = 14 + i * 24 + (R() - .5) * 8, y = 126 + (i % 3) * 5; s += person(x, y, .8 + (i % 3) * .08, { f: f, short: i % 2, head: i % 2 ? 'cap' : 'hood', held: i % 3 === 0 ? 'torch' : i % 3 === 1 ? 'pitchfork' : 'none', hand: [14, -42], alpha: .95 }); } return s; });
 def('beacon', 'lantern', 'night', {}, function (R) { return '<path d="M50 140 L90 80 L120 100 L160 70 L210 140Z" fill="#14172b"/><path d="M96 84 L106 72 L112 84Z" fill="#2a1a12"/>' + glowAt(108, 74, 66, 'warm') + flame(108, 82, 3.2) + '<path d="M80 100 L140 100" stroke="#3a2614" stroke-width="3"/>' + thorn(10, 146, 60, -10, R); });
 
-/* --- Pale Choir --- */
+/* --- Hollow Synod --- */
 def('moon_priest', 'choir', 'night', {}, function (R, f) { return person(110, 140, 1.55, { f: f, head: 'mitre', held: 'staff', orb: 'cool', hand: [17, -34], cape: '#e0def2', skin: '#e6dcd0', glow: 'cool' }) + stoneAt(36, 128, 20, 44, 3) + stoneAt(186, 128, 22, 52, -3); });
 def('choir', 'choir', 'hall', {}, function (R, f) { var s = ''; [48, 90, 132, 174].forEach(function (x, i) { s += person(x, 138 - (i % 2) * 6, 1.1, { f: f, head: 'hood', held: 'candle', hand: [4, -38], lhand: [-4, -38], skin: '#e0d6c8' }); }); return s; });
 def('spirit', 'choir', 'night', { ruins: 1 }, function (R) { return glowAt(110, 70, 64, 'cool') + '<path d="M110 20 Q80 24 80 64 Q80 100 70 130 Q86 120 94 132 Q104 118 110 134 Q116 118 126 132 Q134 120 150 130 Q140 100 140 64 Q140 24 110 20Z" fill="#e6e4fb" opacity=".55" filter="url(#tb-rough)"/><ellipse cx="100" cy="58" rx="6" ry="9" fill="#171230"/><ellipse cx="120" cy="58" rx="6" ry="9" fill="#171230"/><ellipse cx="110" cy="78" rx="4" ry="6" fill="#171230" opacity=".8"/>'; });

@@ -108,7 +108,7 @@ function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts;
   const rows=parts.map(s=>{const ids=(c.cards[s]||[]);const tot=c.tot&&c.tot[s]!=null?c.tot[s]:null;
     return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+(ids.map(id=>cinfo(id).strength).join('+')||'0')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' Supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
   return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (replay '+c.n+')':'')+'</span>'+rows+'</div>'}
-const shortName=s=>(hotSeat()&&!G.pl[s].ai?G.pl[s].name.replace(/ \(.*$/,'').replace('Player ','P')+' · ':'')+kf(s).short.replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
+const shortName=s=>(hotSeat()&&!G.pl[s].ai?G.pl[s].name.replace(/ \(.*$/,'').replace('Player ','P')+' · ':'')+kf(s).short.replace('Salt Crown','Crown').replace('Ember Guild','Guild').replace('Hollow Synod','Synod')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
 function waitingHTML(){const q=G.q;let who='';
   if(q){const names=q.seats.map(s=>shortName(s).replace(' (you)',''));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
   const cur=G.log.slice(-4).map(e=>'<li>'+esc(plain(e.t))+'</li>').join('');
@@ -175,7 +175,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
 function moreCue(){const el=$('#main');if(!el)return;const on=el.scrollHeight>el.clientHeight+8&&el.scrollTop+el.clientHeight<el.scrollHeight-8;el.classList.toggle('more-below',on)}
 document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='main')moreCue()},true);
 function menuTitle(q){const ph=menuPhase(q);if(ph==='Day')return G.clash?'Before the Clash in '+REG[G.clash.r]:'Day';return ph?'Your options this '+ph:'Your options'}
-const QNAME={discardPick:'Discard a card',discardDown:'Too many cards',applause:'Set the turn order',flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
+const QNAME={discardPick:'Discard a card',discardDown:'Too many cards',applause:'Set the turn order',flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ash Heap bonus',shrine:'Wishing Well bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Mud Recovery',edict:'A Tactic',relics:'Purse Council',order:'Turn order'};
 function titleOf(q){if(q.t==='menu'){const ph=menuPhase(q);return ph?ph+' actions':'Your actions'}if(QNAME[q.kind])return QNAME[q.kind];const t=(q.title||'').replace(/^[^:]*:\s*/,'');return t.length>28?'Your choice':t}
 function promptText(q,s){const t=q.title||'';
   switch(q.kind){case 'bid':return 'Pick a secret bid';

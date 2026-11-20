@@ -81,7 +81,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
 // the full text of the message on screen (news, clash, bids, round end): shown whole in the strip, timed by its length
 const one=t=>{t=String(t||'').trim();const m=t.match(/^.+?[.!?](?=\s|$)/);t=m?m[0]:t;
   if(t.length>66)t=t.replace(/\s*\([^()]*(\([^()]*\)[^()]*)*\)\.?$/,'.');   // a long line drops its closing bracket note (the Log keeps it)
-  if(t.length>84){const i=t.lastIndexOf(': ');if(i>30)t=t.slice(0,i)+'.'}return t.replace(/place the Clash Markers: /,'set the Clash order: ').replace(/, then /g,', ').replace(/\bThe (Uplands|Tablelands|Sinks)\b/g,'$1')};window.tbOne=one;
+  if(t.length>84){const i=t.lastIndexOf(': ');if(i>30)t=t.slice(0,i)+'.'}return t.replace(/place the Clash Markers: /,'set the Clash order: ').replace(/, then /g,', ').replace(/\bThe (North Reach|Crossroads|South Weald)\b/g,'$1')};window.tbOne=one;
 // a strip line is at most 8 words (owner rule): faction names go short, then the line is cut at its last clause or preposition (never an ellipsis); the Log keeps the full sentence
 const eight=(t,N)=>{N=N||8;t=String(t||'').trim();const wc=x=>x.replace(/[^a-zA-Z0-9'\u2019]+/g,' ').trim().split(' ').filter(Boolean).length;
   try{G.pl.forEach((p,s)=>{const f=DD.FNAME&&DD.FNAME[p.fac];if(f&&t.indexOf(f)>=0)t=t.split(f).join(sideName(s))})}catch(e){}
@@ -98,14 +98,14 @@ const JARGON={clash:['Clash','The fight in one region. Highest total Strength wi
   govern:['Govern','An Autumn action: move a card with votes into a Council.'],council:['Council','Three Councils give a lasting bonus for the votes there.'],
   favour:['Favour','A disc from the Meadow. It unlocks your faction\u2019s power.'],
   lore:['Lore','A second currency from Journey. It buys your faction\u2019s Site of Power cards.'],journey:['Journey','An Autumn action: send a hand card away to gain its Lore.'],
-  pledges:['Pledges','A Council. Cards Governed there bring your spent Supporters back.'],tactic:['Tactics','Your faction\u2019s special powers, mostly one use each.'],
+  pledges:['Bond','A Council. Cards Governed there bring your spent Supporters back.'],tactic:['Tactics','Your faction\u2019s special powers, mostly one use each.'],
   active:['Active','A card of yours that is face up on the map this round.']};
-const JRE=/\b(Clash(?:es)?|Heralds?|Govern|Councils?|Lore|Journey|Pledges|Tactics?|Active|(?:Kingdom\u2019s |Kingdom's )?Favour)\b/g;
-function jkey(w){w=w.toLowerCase();for(const k of ['clash','herald','govern','council','lore','journey','pledges','tactic','active'])if(w.indexOf(k)===0)return k;return 'favour'}
+const JRE=/\b(Clash(?:es)?|Heralds?|Govern|Councils?|Lore|Journey|Bond|Tactics?|Active|(?:Kingdom\u2019s |Kingdom's )?Favour)\b/g;
+function jkey(w){w=w.toLowerCase();if(w==='bond')return 'pledges';for(const k of ['clash','herald','govern','council','lore','journey','pledges','tactic','active'])if(w.indexOf(k)===0)return k;return 'favour'}
 // the first time a game word shows up anywhere in the strip or the action row, its one plain line pops up for a few seconds (never blocks a tap; remembered)
 (function(){let seen={};try{seen=JSON.parse(localStorage.getItem('tb_terms')||'{}')||{}}catch(e){}
   const st=document.createElement('style');st.textContent='#tbterm{position:fixed;left:50%;width:max-content;transform:translateX(-50%);z-index:58;max-width:min(92vw,520px);box-sizing:border-box;padding:9px 14px;border-radius:10px;background:rgba(20,12,26,.96);border:2px solid #f0c860;color:#fff3c4;font:600 15px/1.3 system-ui,sans-serif;pointer-events:none;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.6)}#tbterm[hidden]{display:none}#tbterm b{color:#f0c860}';document.head.appendChild(st);
-  const RE=[['lore',/\bLore\b/],['journey',/\bJourney\b/],['pledges',/\bPledges\b/],['tactic',/\bTactics?\b/],['active',/\bActive\b/],['govern',/\bGovern\b/],['council',/\bCouncils?\b/],['herald',/\bHeralds?\b/],['clash',/\bClash(es)?\b/],['favour',/\bFavour\b/]];
+  const RE=[['lore',/\bLore\b/],['journey',/\bJourney\b/],['pledges',/\bBond\b/],['tactic',/\bTactics?\b/],['active',/\bActive\b/],['govern',/\bGovern\b/],['council',/\bCouncils?\b/],['herald',/\bHeralds?\b/],['clash',/\bClash(es)?\b/],['favour',/\bFavour\b/]];
   let el=null,until=0,t=0;const busy=()=>{try{return !G||!UI.started||G.over||UI.pop||(typeof GXT!=='undefined'&&GXT.active&&GXT.active())||(typeof GXCOACH!=='undefined'&&GXCOACH.running)||document.querySelector('#tbgoal,.gxh-bub.on,#start:not([hidden])')}catch(e){return true}};
   const scan=()=>{if(busy()||Date.now()<until)return;const root=document.querySelector('#tbturn'),act=document.querySelector('#act');const txt=((root&&!root.hidden?root.textContent:'')+' '+(act?act.textContent:''));
     for(const [k,re] of RE){if(seen[k]||!re.test(txt))continue;seen[k]=1;try{localStorage.setItem('tb_terms',JSON.stringify(seen))}catch(e){}

@@ -58,9 +58,9 @@ const NEWSHEAD={inf:'Influence',steal:'Influence stolen',elim:'Eliminated',kcste
 function newsHead(it,items){const me=vs();if(items&&items.length>1&&items.every(infK)){const d={};for(const x of items){const m=x.m;if(m.k==='inf')d[m.s]=(d[m.s]||0)+m.n;else{d[m.s]=(d[m.s]||0)+m.n;d[m.v]=(d[m.v]||0)-m.n}}
     return Object.keys(d).filter(s=>d[s]).sort((a,b)=>(b==me)-(a==me)).map(s=>(+s===me?'You':sideName(+s))+' '+(d[s]>0?'+':'\u2212')+Math.abs(d[s])).join(' \u00b7 ')+' Influence'}
   const m=it.m||{};if(m.k==='inf')return (m.n>0?'+':'−')+Math.abs(m.n)+' Influence';if(m.k==='steal')return m.v===me?'−'+m.n+' Influence: stolen':'+'+m.n+' Influence: stolen';return NEWSHEAD[m.k]||'What happened'}
-// every score change is told with its cause, one short line: "Court +4: claims Cairn Field +2, Herald on Ossuary +1, ..."
+// every score change is told with its cause, one short line: "Court +4: claims Broken Shield +2, Herald on Ash Heap +1, ..."
 function infWhy(m){const w=String(m.why||''),d=String(m.detail||'');if(LOCN.includes(w))return 'claims '+w;if(w==='Herald Reward')return d?d.replace(/^their Herald stands on /,'Herald on '):'its Herald’s location';
-  if(w==='Council of Coin')return 'cashes in Council votes';if(/^Doctrine of Tempests/.test(w))return 'most Supporters in '+(d.replace(/^most Supporters in /,'')||'a region');if(/Leftover Lore/.test(w))return 'leftover Lore';
+  if(w==='Purse Council')return 'cashes in Council votes';if(/^Horn Call/.test(w))return 'most Supporters in '+(d.replace(/^most Supporters in /,'')||'a region');if(/Leftover Lore/.test(w))return 'leftover Lore';
   return plain(w)+(d?' ('+d+')':'')}
 function infLine(items){const by={},order=[];const me=vs();let any=false;
   for(const x of items){const m=x.m;if(!m)continue;if(m.k==='inf'){any=true;const s=m.s;if(!by[s]){by[s]=[];order.push(s)}by[s].push({n:m.n,w:infWhy(m)})}
@@ -81,7 +81,7 @@ function previewHTML(P,title){if(!P)return '';const me=vs();let h='<div class="p
   for(const d of P.dead)h+='<p class="pv-n warn">'+ico('eye')+'<span>At Night: '+gloss(plain(d.t))+'.</span></p>';
   for(const d of P.saved)h+='<p class="pv-n">'+ico('eye')+'<span>'+gloss(plain(TB.cardName(G,d.id)+' is Invulnerable: it survives the Night'))+'.</span></p>';
   if(P.hidden)h+='<p class="pv-n">'+P.hidden+' face-down card'+(P.hidden>1?'s':'')+' added by Ambush will be revealed before the Night.</p>';
-  if(P.watcher)h+='<p class="pv-n">'+gloss('A Rite of the Watcher is in this Clash. The lowest Strength above 0 wins.')+'</p>';
+  if(P.watcher)h+='<p class="pv-n">'+gloss('A Vow of Smallness is in this Clash. The lowest Strength above 0 wins.')+'</p>';
   const w=P.win;h+='<p class="pv-r">'+(w.length>1?'As it stands: a tie.':w[0]===me?'As it stands: <b>you win</b> this Clash.':'As it stands: <b>'+esc(sideName(w[0]))+'</b> wins this Clash.')+(G.q&&G.q.t==='menu'?' Rivals may still act.':'')+'</p>';
   return h+'</div>'}
 function outcome(P,me){if(!P)return 0;return P.win.length===1?(P.win[0]===me?2:0):(P.win.includes(me)?1:0)}
@@ -122,7 +122,7 @@ function adviseOrder(s,mv){const me=s,V=UI.V;const known=r=>{let t=0;for(const i
 function tacUses(seat,id){const i=DD.TACTICS[G.pl[seat].fac].findIndex(t=>t.id===id);if(i<0)return '';const def=DD.TACTICS[G.pl[seat].fac][i],t=G.pl[seat].tac[i];return def.mk>0?t.mk+' use'+(t.mk===1?'':'s')+' left, once a round':'once per game'}
 // one short line per Council for the Govern rows (<= 8 words)
 const CSHORT={relics:'Its votes become Influence at a Herald Reward.',secrets:'Its votes place markers that claim location bonuses.',oaths:'Its votes bring Supporters home in Autumn.'};
-const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get Influence equal to their votes.',secrets:'in Autumn you place markers on locations. Four on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote. Get one more for the most votes there.'};
+const CPLAIN={relics:'claim your Herald Reward to cash in your cards here. You get 1 Influence per vote, at most 3.',secrets:'in Autumn you place markers on locations. Five on one location claim its bonus.',oaths:'in Autumn you bring Supporters back to your board, one per vote, at least two.'};
 function adviseMenu(s,mv,ph){const m=suggest(s);if(!m)return null;if(m.t==='act'&&!taught(actKind(m.a))){const mm=mv.find(x=>x.k===m.k);return mm?{m:mm,why:(typeof actWhy==='function'?actWhy(s,mm):'')||genericWhy(s,mm)}:null}const a=m.a||'';
   // the last Autumn: only Influence still counts
   if(ph==='Autumn'&&G.round>=G.rounds&&m.t==='act'&&!/Influence/.test(m.label||'')&&!(a==='journey'&&!G.pl[s].site.length)){const d=mv.find(x=>x.t==='done');const inf=mv.find(x=>x.t==='act'&&/Influence/.test(x.label||'')&&taught(actKind(x.a)));
@@ -138,7 +138,7 @@ function actWhy(s,m){const a=m.a||'',L=(m.label||'').replace(/^[^:]*:\s*/,'');
   if(a==='govern'){const c=m.p.c;return cinfo(m.p.id).votes+' vote'+(cinfo(m.p.id).votes>1?'s':'')+' into the '+DD.COUNCIL_NAMES[c]+': '+CPLAIN[c]}
   if(a==='cmd:rally')return 'Rally: your chosen Active cards return to hand now, not the discard pile.';
   if(a==='cmd:deploy')return 'Deploy: a hand card goes face-up next to a region and stays Active through Winter.';
-  if(a==='council:oaths')return 'Council of Pledges: Supporters come back to your board for next round.';
+  if(a==='council:oaths')return 'Bond Council: Supporters come back to your board for next round.';
   return lcFirst(L)?L.replace(/^./,c=>c.toUpperCase()).replace(/\.?$/,'.'):''}
 function adviseDay(s,mv){const me=s;const P0=preview();if(!P0)return null;const o0=outcome(P0,me);const done=mv.find(m=>m.t==='done');
   const vsTxt=P=>youFirst(Object.keys(P.tot).map(Number)).map(x=>(x===me?'you ':sideName(x)+' ')+P.tot[x]).join(' vs ');
@@ -152,12 +152,12 @@ function adviseDay(s,mv){const me=s;const P0=preview();if(!P0)return null;const 
   const fl=acts.find(m=>m.a==='cmd:flank'||m.a==='t:cln_t2');if(fl&&o0===0&&[0,1,2].some(r=>r!==G.clash.r&&!G.reg[r].done))return {m:fl,why:'You cannot win here ('+vsTxt(P0)+'). Flank moves the card to a region yet to fight. It still counts there.'};
   return done?{m:done,why:'Nothing you can do here changes the result ('+vsTxt(P0)+').',P:P0}:null}
 // ---------------------------------------------------------------- confirm sheet: anything that resolves at once and can hurt shows "your N vs their M" first
-function stealPreview(s,m){const P=G.pl[s],V=G.pl[m.s2],T=V.ks[m.j];if(!T)return '';const bid=G.bstr[s],crew=G.pl[s].ks.some(x=>x&&x.kc===9)?3:0;const theirs=cinfo(T.occ).strength+(V.ks.some(x=>x&&x.kc===5)?5:0);
+function stealPreview(s,m){const P=G.pl[s],V=G.pl[m.s2],T=V.ks[m.j];if(!T)return '';const bid=G.bstr[s],crew=G.pl[s].ks.some(x=>x&&x.kc===9)?2:0;const theirs=cinfo(T.occ).strength+(V.ks.some(x=>x&&x.kc===5)?3:0);
   const zero=P.bid!=null&&cinfo(P.bid).text&&/treat the Occupying card's Strength as 0/.test(cinfo(P.bid).text);
-  return 'Your bid '+bid+(crew?' + 3 (Cutthroat Crew) = '+(bid+crew):'')+' vs their '+esc(cinfo(T.occ).name)+' '+(zero?'0 (your card ignores it)':theirs)+': you take '+esc(TB.kingdomInfo(T.kc).name)+'. Their '+esc(cinfo(T.occ).name)+' goes back to their hand. Your bid card is tucked under it.'}
+  return 'Your bid '+bid+(crew?' + 2 (Knife Guild) = '+(bid+crew):'')+' vs their '+esc(cinfo(T.occ).name)+' '+(zero?'0 (your card ignores it)':theirs)+': you take '+esc(TB.kingdomInfo(T.kc).name)+'. Their '+esc(cinfo(T.occ).name)+' goes back to their hand. Your bid card is tucked under it.'}
 function confirmHTML(k){const s=viewSeatForQ();if(s==null)return '';const m=legal(s).find(x=>x.k===k);if(!m)return '';let body='';
   if(m.t==='steal')body='<p class="cf-p">'+stealPreview(s,m)+'</p>';
-  else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders is a Tactic, once per game. Take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand. You tuck a card from your hand under it.')+'</p>'}
+  else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Reed Ambush is a Tactic, once per game. Take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand. You tuck a card from your hand under it.')+'</p>'}
   else body='<p class="cf-p">'+esc(m.label)+'</p>';
   return popShell('Before you do it','<div class="cf">'+body+'<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(k)+'">'+esc(m.t==='steal'?'Steal it':'Do it')+'</button><button class="btn" data-a="pclose">Not now</button></div></div>','cf-b')}
 // hints On (the first game): every decision gets a suggestion and its finger, also the small choices (slot, order, discard) the advisor above skips

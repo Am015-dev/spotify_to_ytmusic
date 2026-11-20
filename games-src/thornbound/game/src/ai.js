@@ -198,7 +198,7 @@ PICK.gate2=(S,seat,q,mv)=>mv.find(m=>!!m.yes);
 PICK.mirror=(S,seat,q,mv)=>mv.slice().sort((a,b)=>cd(S,b.id).s-cd(S,a.id).s)[0];
 PICK.favNob=(S,seat,q,mv)=>mv.find(m=>m.inf);
 PICK.favClan=(S,seat,q,mv)=>{const c=S.clash;const rv=[2*c.r,2*c.r+1];return mv.filter(m=>!m.skip).sort((a,b)=>locValue(S,seat,b.loc)-locValue(S,seat,a.loc))[0]||mv[0]};
-PICK.favClanSup=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>S.pl[seat].supp.r[b.r]-S.pl[seat].supp.r[a.r])[0]||mv.find(m=>m.skip);
+PICK.favClanSup=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>(b.r<0?9:S.pl[seat].supp.r[b.r])-(a.r<0?9:S.pl[seat].supp.r[a.r]))[0]||mv.find(m=>m.skip);
 PICK.favUpr=(S,seat,q,mv)=>mv.slice().sort((a,b)=>regionValue(S,seat,b.r)-regionValue(S,seat,a.r))[0];
 PICK.favUpr2=(S,seat,q,mv)=>mv.find(m=>m.skip);
 PICK.favGath=(S,seat,q,mv)=>mv.filter(m=>!m.skip).sort((a,b)=>cd(S,b.id).s-cd(S,a.id).s)[0];
