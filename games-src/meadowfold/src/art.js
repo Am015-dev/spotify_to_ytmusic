@@ -39,7 +39,7 @@ var ART = (function () {
       if (h > 1) o += '<text x="' + (cx + r * .62) + '" y="' + (cy + r * .72) + '" class="hnum">' + h + '</text>';
       return o;
     }
-    if (top === 'trunk') { o += '<g filter="url(#' + f + 'sh)"><rect x="' + (cx - r * .16) + '" y="' + (ty - r * .45) + '" width="' + r * .32 + '" height="' + r * .8 + '" rx="' + r * .08 + '" fill="' + C.trunk[0] + '" stroke="#fffaf0" stroke-width="' + r * .08 + '"/></g>'; return o; }
+    if (top === 'trunk') { var tw = r * .34; o += disc(cx, ty, r * (.74 - (h - 1) * .06), 'trunk', f) + '<g filter="url(#' + f + 'sh)"><rect x="' + (cx - tw / 2) + '" y="' + (ty - r * .62) + '" width="' + tw + '" height="' + r * .7 + '" rx="' + r * .08 + '" fill="' + C.trunk[2] + '" stroke="#fffaf0" stroke-width="' + r * .08 + '"/><ellipse cx="' + cx + '" cy="' + (ty - r * .62) + '" rx="' + tw / 2 + '" ry="' + tw / 4 + '" fill="' + C.trunk[1] + '"/></g>'; if (h > 1) o += '<text x="' + (cx + r * .62) + '" y="' + (cy + r * .72) + '" class="hnum">' + h + '</text>'; return o; }
     if (top === 'leaf') {
       var tr = r * (.5 + h * .1), tc = ty - (h - 1) * r * .12;
       if (h > 1) o += '<rect x="' + (cx - r * .13) + '" y="' + (tc) + '" width="' + r * .26 + '" height="' + (cy - tc + r * .1) + '" fill="' + C.trunk[0] + '" stroke="#fffaf0" stroke-width="' + r * .06 + '"/>';

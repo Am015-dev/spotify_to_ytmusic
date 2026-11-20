@@ -31,7 +31,7 @@ window.tutAllow = function (m) {
   var st = tutCur(); if (!st || st.end || UI.mode !== 'tut') return true;
   if (G.cur !== 0) return true;
   TUT.lastHand = G.turn.hand.slice();
-  if (m.t === 'take' && st.pocketHas) return G.central[m.i].filter(function (c) { return c === 'mount'; }).length >= 2 && st.ok(m);
+  if (m.t === 'take' && st.pocketHas) return m.i === 0 && st.ok(m);
   if (st.only && m.t === 'place' && m.k !== st.only) return false;
   if (st.sel && m.t === 'place' && G.turn.hand[m.h] !== st.sel) return false;
   return st.ok(m);
@@ -42,13 +42,12 @@ window.tutAfter = function (m) {
   render();
 };
 window.tutRender = function () {
-  var el = document.getElementById('tutbox');
-  var st = tutCur();
-  if (!st || UI.mode !== 'tut' || !G || G.over || G.cur !== 0 || UI.busy) { if (el) el.remove(); return; }
-  if (!el) { el = document.createElement('div'); el.id = 'tutbox'; el.className = 'tut'; document.body.appendChild(el); }
-  el.innerHTML = esc(st.say) + (st.end ? '<button type="button" class="tskip" id="tutok">Got it</button>' : '<small>Step ' + (TUT.i + 1) + ' of ' + (TUT_STEPS.length - 1) + '</small>');
-  if (st.end) { var b = document.getElementById('tutok'); b.onclick = function () { TUT = null; el.remove(); render(); }; return; }
-  if (st.pocketHas && !TUT.fixed) { TUT.fixed = 1; if (!G.central.some(function (sp) { return sp.filter(function (c) { return c === 'mount'; }).length >= 2; }) && G.bag.mount >= 2 && G.bag.trunk >= 1) { G.central[0].forEach(function (c) { G.bag[c]++; }); G.central[0] = ['mount', 'mount', 'trunk']; G.bag.mount -= 2; G.bag.trunk--; setTimeout(render, 0); } }
+  var line = document.getElementById('line'), st = tutCur();
+  if (!st || UI.mode !== 'tut' || !G || G.over || G.cur !== 0 || UI.busy) { if (line) line.classList.toggle('tutline', false); return; }
+  line.classList.add('tutline');
+  line.innerHTML = esc(st.say) + (st.end ? ' <button type="button" class="tskip" id="tutok">Got it</button>' : ' <small>' + (TUT.i + 1) + '/' + (TUT_STEPS.length - 1) + '</small>');
+  if (st.end) { var b = document.getElementById('tutok'); b.onclick = function () { TUT = null; line.classList.toggle('tutline', false); render(); }; return; }
+  if (st.pocketHas && !TUT.fixed) { TUT.fixed = 1; if (G.bag.mount >= 2 && G.bag.trunk >= 1) { G.central[0].forEach(function (c) { G.bag[c]++; }); G.central[0] = ['mount', 'mount', 'trunk']; G.bag.mount -= 2; G.bag.trunk--; setTimeout(render, 0); } }
   // select the taught token / tab so only the taught move glows
   if (st.sel && UI.sel && UI.sel.kind === 'tok' && G.turn.hand[UI.sel.h] !== st.sel) { var h = G.turn.hand.indexOf(st.sel); if (h >= 0) { UI.sel = { kind: 'tok', h: h }; setTimeout(render, 0); } }
   if (st.tab && UI.tab !== st.tab) { UI.tab = st.tab; setTimeout(render, 0); }

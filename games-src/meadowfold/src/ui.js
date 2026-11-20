@@ -122,6 +122,13 @@ function renderMap() {
   var mine = myTurn() && UI.view === G.cur, sel = UI.sel, glow = {}, ghost = null;
   if (mine && sel && sel.kind === 'tok' && G.turn.hand[sel.h]) E.spots(s, G.turn.hand[sel.h]).forEach(function (k) { if (UI.mode !== 'tut' || !window.tutAllow || tutAllow({ t: 'place', h: sel.h, k: k })) glow[k] = 1; });
   if (mine && sel && sel.kind === 'card') { var id = sel.ci === 'S' ? s.spirit.id : (s.cards[sel.ci] || {}).id; if (id) { ghost = E.card(id).an; Object.keys(E.cubeSpots(s, id)).forEach(function (k) { glow[k] = 2; }); } }
+  var gain = {}, base = (mine && sel) ? E.score(s).total : 0;
+  if (mine && sel && Object.keys(glow).length) Object.keys(glow).forEach(function (k) {
+    var c = JSON.parse(JSON.stringify({ board: s.board, cubes: s.cubes, cards: s.cards, done: s.done, spirit: s.spirit }));
+    if (glow[k] === 1) (c.board[k] = c.board[k] || []).push(G.turn.hand[sel.h]);
+    else if (sel.ci === 'S') { c.cubes[k] = 'S'; c.spirit.placed = true; } else { c.cubes[k] = 1; c.cards[sel.ci].left--; }
+    gain[k] = E.score(c).total - base;
+  });
   var o = ART.defs('m');
   // the diorama: layered paper hills behind the valley sheet
   var C = E.cells(G.side), hp = UI.hintMove;
@@ -132,8 +139,9 @@ function renderMap() {
     o += '<g class="' + cls + '" data-k="' + k + '"' + (g ? ' data-legal="1"' : '') + '>';
     o += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 1.5) + '" class="cell" filter="url(#msh)"/>';
     o += ART.stack(st, xy[0], xy[1], r * .82, 'm');
-    if (s.cubes[k]) { var cv = s.cubes[k], an = typeof cv === 'number' ? E.card(cv).an : E.card(+String(cv).slice(1)).an; o += ART.cube(an, xy[0] + r * .32, xy[1] - r * .3, r * .62, typeof cv === 'number' ? '#fdf8ee' : '#f1e3ff', 'm'); }
+    if (s.cubes[k]) { var cv = s.cubes[k], an = typeof cv === 'number' ? E.card(cv).an : E.card(+String(cv).slice(1)).an; o += ART.cube(an, xy[0] + r * .3, xy[1] - r * .28, r * .74, typeof cv === 'number' ? '#fdf8ee' : '#f1e3ff', 'm'); }
     if (g) o += '<polygon points="' + ART.hexPts(xy[0], xy[1], r - 4) + '" class="ring"/>';
+    if (g && gain[k]) o += '<g class="gain"><rect x="' + (xy[0] - 15) + '" y="' + (xy[1] + r * .38) + '" width="30" height="18" rx="9"/><text x="' + xy[0] + '" y="' + (xy[1] + r * .38 + 13.5) + '">' + (gain[k] > 0 ? '+' : '') + gain[k] + '</text></g>';
     if (g === 2 && ghost) o += '<g class="ghost">' + ART.animal(ghost, xy[0] + r * .32, xy[1] - r * .3, r * .55, '#6b4e3a', 'm') + '</g>';
     o += '</g>';
   });
@@ -218,6 +226,7 @@ function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'
 // ---------- input ----------
 function onTap(e) {
   var t = e.target;
+  if (UI.dragged && Date.now() - UI.dragged < 400) return;
   var seatB = t.closest('[data-seat]'); if (seatB) { UI.view = +seatB.dataset.seat; UI.sel = null; render(); return; }
   if (!G) return;
   var p = t.closest('[data-pocket]'); if (p) { if (myTurn()) act({ t: 'take', i: +p.dataset.pocket }); return; }
@@ -236,6 +245,30 @@ function onTap(e) {
   }
   if (t.id === 'endB') { act({ t: 'end' }); return; }
   if (t.id === 'undoB') { undo(); return; }
+}
+// drag a hand token onto a glowing hex (a tap on the token, then on a hex, works too)
+function dragInit() {
+  var d = null;
+  document.addEventListener('pointerdown', function (e) {
+    var ht = e.target.closest('[data-h]'); if (!ht || !myTurn()) return;
+    var h = +ht.dataset.h; UI.sel = { kind: 'tok', h: h };
+    d = { h: h, x: e.clientX, y: e.clientY, el: null, moved: false };
+  });
+  document.addEventListener('pointermove', function (e) {
+    if (!d) return;
+    if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10) return;
+    if (!d.moved) { d.moved = true; render(); d.el = document.createElement('div'); d.el.className = 'dragtok'; d.el.innerHTML = '<svg viewBox="0 0 40 40">' + ART.defs('dg') + ART.token(G.turn.hand[d.h], 20, 20, 16, 'dg') + '</svg>'; document.body.appendChild(d.el); }
+    d.el.style.left = e.clientX + 'px'; d.el.style.top = (e.clientY - 26) + 'px';
+    $$('#map .hx.over').forEach(function (x) { x.classList.toggle('over', false); });
+    var u = document.elementFromPoint(e.clientX, e.clientY - 26), hx = u && u.closest && u.closest('#map [data-legal]'); if (hx) hx.classList.add('over');
+  });
+  function up(e) {
+    if (!d) return; var dd = d; d = null; if (!dd.moved) return;
+    if (dd.el && dd.el.parentNode) dd.el.parentNode.removeChild(dd.el); UI.dragged = Date.now();
+    var u = document.elementFromPoint(e.clientX, e.clientY - 26), hx = u && u.closest && u.closest('#map [data-k]');
+    if (hx && hx.getAttribute('data-legal')) act({ t: 'place', h: dd.h, k: hx.dataset.k }); else render();
+  }
+  document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
 }
 function shake(el) { SND.bad(); el.classList.add('no'); setTimeout(function () { el.classList.remove('no'); }, 400); }
 function flashPockets() { $$('#central .pocket').forEach(function (p) { p.classList.add('hint'); setTimeout(function () { p.classList.remove('hint'); }, 900); }); }
@@ -362,7 +395,7 @@ function boot() {
     if (GX.applyPrefs) GX.applyPrefs();
   } catch (e) { }
   try { UI.prefs = Object.assign(UI.prefs, JSON.parse(localStorage.getItem('mf_prefs') || '{}')); } catch (e) { }
-  document.addEventListener('click', onTap);
+  document.addEventListener('click', onTap); dragInit();
   $('#hintB').onclick = hint;
   GX.onResize(function () { });
   if (window.GXV) GXV.watch(function () { });

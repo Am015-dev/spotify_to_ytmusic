@@ -15,7 +15,7 @@ const { chromium } = require('playwright'); const path = require('path');
   await p.waitForFunction(() => G.cur === 0 && !UI.busy, null, { timeout: 15000 }); await p.waitForTimeout(400);
   await tapSel('.pocket.glow');
   for (let i = 0; i < 3; i++) await tapSel('#map .hx.glow');
-  const s = await step(), txt = await p.textContent('#tutbox').catch(() => '');
+  const s = await step(), txt = await p.textContent('#line').catch(() => '');
   console.log('tutorial reached step', s, '| box:', txt, '| errors:', errs);
   await p.screenshot({ path: process.argv[2] || '/tmp/tut.png' });
   await b.close(); process.exit(s === 11 && !errs.length ? 0 : 1);
