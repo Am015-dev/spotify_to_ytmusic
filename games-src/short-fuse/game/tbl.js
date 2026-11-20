@@ -219,10 +219,11 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const ms=[...mine.querySelectorAll('.stand')].map(st=>st.querySelectorAll('.tile').length);
   const used0=[...tb.children].filter(e=>e!==felt&&e!==mine&&getComputedStyle(e).position!=='absolute'&&!e.hidden).reduce((a,e)=>a+e.offsetHeight,0);
   const gh=gear.offsetHeight,cw=W-12;const maxM=big?92:land?52:60;
-  const CMIN=mineMinW();const crewFit=ch=>{if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:CMIN,max:big?88:54,plate:plateH,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:CMIN,max:big?88:54,plate:plateH,seatGap:6}))}
+  const wide=land&&big&&cs.length>=2&&cs.length<=3;   // F3: PC, 2-3 crewmates: stands side by side in one row
+  const CMIN=mineMinW();const crewFit=ch=>{if(wide)return Math.min(...cs.map(sg=>fitSize([sg],(cw-14*(cs.length-1))/cs.length,ch,{gap:3,ratio:1.3,min:CMIN,max:88,plate:plateH,seatGap:6})));if(land&&cs.length>1){const half=Math.ceil(cs.length/2);return Math.min(fitSize(cs.slice(0,half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:CMIN,max:big?88:54,plate:plateH,seatGap:6}),fitSize(cs.slice(half),(cw-10)/2,ch,{gap:3,ratio:1.3,min:CMIN,max:big?88:54,plate:plateH,seatGap:6}))}
     return fitSize(cs,cw,ch,{gap:3,ratio:1.3,min:CMIN,max:big?88:land?54:56,plate:plateH,seatGap:6})};
   const setMine=tw=>{mine.style.setProperty('--tw',tw+'px');mine.style.setProperty('--th',tileH(tw,1.32)+'px');balance(mine,tw,4)};
-  let tm=0,t1=0;crew.classList.toggle('two',land&&cs.length>1);
+  let tm=0,t1=0;crew.classList.toggle('two',land&&cs.length>1&&!wide);crew.classList.toggle('row3',wide);crew.style.setProperty('--cols',cs.length);
   if(ms.length){mine.style.maxHeight='';mine.style.overflow='';
     // my stand first, as big as it can be while the crew keeps a tile a thumb can still tap
     const capC=Math.min(52,crewFit(1e4));const MINEW=mineMinW();let pick=MINEW;
