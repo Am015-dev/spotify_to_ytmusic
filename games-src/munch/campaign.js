@@ -1,5 +1,6 @@
 // ---------- story mode: the shared chapter map (gx-campaign.js) wired to Doorkick Dungeon. Data: campaign.json ----------
-// A chapter is a normal game with its own table, computer levels and (at most) one twist. Twists exist only here; the rules never change.
+// A chapter is a normal game (full base rules) with its own table, computer levels and (at most) one twist. Twists exist only here and change the SETUP
+// of that chapter (a boss starts higher, gets extra treasure or goes first, or you start with fewer treasures); the turn, fight and win rules never change.
 UI.cmp=null;UI.hintsUser=null;var CMP_FIN=null,CMP_OVER=0,CMP_GO=false;
 function campBoss(def){const nm=def.opponent.name;const s=G.pl.find(p=>p.nm===nm);return s?s.i:1}
 function campMetrics(g){const me=g.pl[0],ca=g.camp||{};const riv=g.pl.slice(1).map(p=>p.lvl);const won=g.winner==='P1';

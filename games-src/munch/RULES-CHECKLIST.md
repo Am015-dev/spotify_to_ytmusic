@@ -3,7 +3,7 @@
 Every rule of the original rulebook this game adapts (the 2001 base game, current rules sheet), numbered. Each number has exactly one assertion in `logic-test.js` that builds the position in the real engine, acts, and checks the exact result. Written from the published rules, not from the engine or the builders' tests. Regenerate with `node logic-test.js --md`.
 
 Sources: the published rulebook and FAQ (public rules pages), cross-checked against `rules-notes.md`.
-Open interpretations ([H]): Halfling has no -1 to run away and may discard a card to reroll a failed run-away once (rows 76-78, 124); Charm needs at least 3 cards (2010 errata); Resurrection takes the top door discard (the rules sheet text).
+Open interpretations ([H]): Halfling keeps the printed -1 to run away (the 2010 errata removed it); Banish needs at least 3 cards (2010 errata); Second Chance takes the top door discard (the rules sheet text).
 
 ## Setup
 
@@ -35,33 +35,33 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 ## Combat
 
 22. A hero's strength is level plus the bonuses of worn items.
-23. A monster's strength is its level (Limping Imp = 1, Hairy Hat-Muncher = 12).
+23. A monster's strength is its level (Cellar Rat Captain = 1, Mer-Karaoke Trio = 12).
 24. Items only count when worn: an item in the hand adds nothing.
 25. The hero wins only with strictly MORE strength than the monster.
 26. A hero with more strength can fight and win.
 27. A hero who is not stronger cannot fight: the only way out is to run away.
 28. A Warrior wins ties.
-29. Winning a fight earns 1 level per monster (Limping Imp = 1 level).
-30. Big monsters give 2 levels (Horned Inferno).
-31. Winning draws the monster's treasure count (Limping Imp = 1, Stampeding Skygrif = 4).
+29. Winning a fight earns 1 level per monster (Cellar Rat Captain = 1 level).
+30. Big monsters give 2 levels (Moss-Stone Colossus).
+31. Winning draws the monster's treasure count (Cellar Rat Captain = 1, Mossy Idol = 4).
 32. Level and treasure come only when the fight ends, then the monster is discarded.
-33. A monster enhancer adds to the monster's strength (Furious +5).
-34. A monster enhancer gives extra treasure if the monster is killed (Furious +1).
-35. Tiny (-5) cannot take a monster below level 1.
-36. Tiny takes away a treasure but never below 1.
+33. A monster enhancer adds to the monster's strength (Rabid +6).
+34. A monster enhancer gives extra treasure if the monster is killed (Rabid +1).
+35. Half-Asleep (-5) cannot take a monster below level 1.
+36. Half-Asleep takes away a treasure but never below 1.
 37. A monster enhancer is played on a monster in a fight, never outside one.
-38. A one-shot item gives its bonus to the hero side for this fight only (Zappy Dart +5).
+38. A one-shot item gives its bonus to the hero side for this fight only (Witch’s Spite +5).
 39. A one-shot item can be played to help the monsters instead (+5 to the monster).
 40. A used one-shot goes to the treasure discard pile after the fight.
-41. Several monsters in one fight add their strengths (Uninvited Guest).
+41. Several monsters in one fight add their strengths (Party Crasher).
 42. Killing several monsters gives the levels of each.
 43. When the hero says Fight, every other player in turn order gets a chance to interfere.
 44. Interfering (a curse, a boost) hands the choice back to the hero, who may then run.
 45. Worn items cannot be changed during a fight.
 46. Race and class cards cannot be played during a fight.
 47. A fight ends with the monster discarded when the hero escapes too (no level, no treasure).
-48. The monsters' special "vs" bonus applies against the named race (Kissy Leech +6 vs Elf).
-49. The "vs" bonus applies against a named class (Off-Key Sirens +5 vs Wizard).
+48. The monsters' special "vs" bonus applies against the named race (Ghoul Picnic +4 vs Elf).
+49. The "vs" bonus applies against a named class (Know-It-All Imp +3 vs Wizard).
 50. No "vs" bonus applies to a hero of another race.
 51. Winning at level 9 with a kill reaches level 10 and wins the game.
 52. Level 10 only comes from killing a monster: monsters run from or sent away give no level.
@@ -76,7 +76,7 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 58. An Elf helper goes up a level for each monster killed while helping.
 59. The helper takes the number of treasures bargained for, the hero the rest.
 60. The helper cannot be promised more treasure than the monsters give.
-61. Nobody can help against Menacing Pergola.
+61. Nobody can help against Shaggy Moocher.
 62. If hero and helper still lose, both must run away, each rolling separately.
 63. A helper's Bad Stuff applies to the helper only; a helper caught gets it too.
 
@@ -84,22 +84,22 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 
 64. A roll of 5 or 6 escapes.
 65. A roll of 4 or less is caught.
-66. A caught hero suffers the monster's Bad Stuff (Limping Imp: lose a level).
+66. A caught hero suffers the monster's Bad Stuff (Cellar Rat Captain: lose a level).
 67. An escaped hero suffers nothing.
-68. Bad Stuff that kills (Horned Inferno): the hero dies.
+68. Bad Stuff that kills (Mossy Idol): the hero dies.
 69. A level can never drop below 1.
 70. With two monsters, roll once for EACH monster.
 71. Escaping one monster but not the other: Bad Stuff only from the one that caught you.
 72. Elves get +1 to run away.
-73. Items that help running away add to the roll (Sprint Sneakers +2).
-74. A monster's own run-away modifier applies (Kamikaze Toads -1; Limping Imp +1).
-75. A hero who fails the roll but holds a way out may use it (Vanishing Tonic).
+73. Items that help running away add to the roll (Winged Boots +1).
+74. A monster's own run-away modifier applies (Snapcrab Swarm -1; Honking Gatekeeper +1).
+75. A hero who fails the roll but holds a way out may use it (Shadow Step).
 76. Halfling: after a failed run-away roll, discard a card to roll again (once).
 77. Halfling: only one reroll per run-away.
 78. Only a Halfling may discard to roll again.
-79. Pop-Up Wall: you and your helper escape automatically.
-80. No hero can be chased by a monster that "won't pursue" their level (Horned Inferno, level 4 or lower).
-81. "Won't pursue" does not protect a hero above that level (level 5 vs Inferno rolls).
+79. Smoke Pellet: you and your helper escape automatically.
+80. No hero can be chased by a monster that "won't pursue" their level (Moss-Stone Colossus, level 4 or lower).
+81. "Won't pursue" does not protect a hero above that level (level 5 vs the Colossus rolls).
 
 ## Death
 
@@ -108,7 +108,7 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 84. Others loot the body, highest level first, one card each.
 85. The best level loots first, so it gets the first pick of the body.
 86. Cards nobody can loot are discarded.
-87. A dead hero keeps the curses on them and the Mixed Heritage / Double Major cards.
+87. A dead hero keeps the curses on them and the Two Bloodlines / Second Calling cards.
 88. The new hero appears at the next player's turn, and draws 4 door + 4 treasure at the start of their own.
 
 ## Items
@@ -120,15 +120,15 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 93. A 2-hand weapon uses both hands (cannot be worn with a 1-hand weapon).
 94. Only one Big item may be carried.
 95. A Dwarf may carry any number of Big items.
-96. Items a hero is not allowed to use are carried but give no bonus (Elves-only bow on a Human).
-97. Class-restricted items need the class (Holy Cheese Grater: Clerics only).
-98. Sex-restricted items need the sex (Dame's Blade: women only).
-99. Items worn by an allowed hero give their bonus (women get Dame's Blade +3).
-100. "Not for" items may not be used by the named class (Leggings: not Warriors).
-101. Loophole lets a hero use one item they would not be allowed to.
+96. Items a hero is not allowed to use are carried but give no bonus (Halflings-only recurve on a Human).
+97. Class-restricted items need the class (Censer of Smiting: Clerics only).
+98. Race-restricted items need the race (Iron Clogs: Humans only).
+99. The Stag Crown gives +2, or +4 to an Elf.
+100. "Not for" items may not be used by the named class (Trousers of Swagger: not Thieves).
+101. Fine Print lets a hero use one item they would not be allowed to.
 102. Selling: 1,000 gold of items buys one level.
-103. Selling: no change given (1,200 gold still buys only one level).
-104. Selling: 2,000 gold buys two levels.
+103. Selling: no change given (1,300 gold still buys only one level).
+104. Selling: 2,200 gold buys two levels.
 105. Selling: less than 1,000 gold at once is not allowed.
 106. Selling: 900 gold is not enough, exactly 1,000 is.
 107. Selling: you cannot sell to reach level 10.
@@ -139,7 +139,7 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 112. A Halfling sells ONE item for double price once per turn.
 113. The Halfling double price works only once per turn.
 114. Dwarf hand limit is 6 cards, not 5.
-115. A Porter allows one extra Big item.
+115. A Pack Mule allows one extra Big item.
 
 ## Levels
 
@@ -147,21 +147,21 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 117. A Go-Up-A-Level card cannot take anyone to level 10.
 118. A Go-Up-A-Level card may be played on another player.
 119. Levels can never go below 1.
-120. Level Heist: victim goes down 1, thief goes up 1.
+120. Steal the Spotlight: victim goes down 1, thief goes up 1.
 121. Reaching level 10 by killing a monster wins the game.
-122. Heavenly Favor: all Clerics go up a level when it is drawn, even to win.
-123. Treasure Pile! gives 3 more treasures as soon as you get it.
+122. Saint’s Day: all Clerics go up a level when it is drawn, even to win.
+123. Hidden Stash! gives 3 more treasures as soon as you get it.
 
 ## Classes
 
 124. A Halfling has no run-away penalty (the power is the reroll).
-125. Mixed Heritage with a single Elf: monsters get no "vs Elf" bonus against you.
-126. Double Major with a single class: no class drawback (monster "vs Warrior" bonus ignored).
+125. Two Bloodlines with a single Elf: monsters get no "vs Elf" bonus against you.
+126. Second Calling with a single class: no class drawback (monster "vs Warrior" bonus ignored).
 
 ## Levels
 
-127. Level Heist cannot be used by a hero at level 9 (it would not be allowed to reach 10).
-128. Level Heist cannot target a hero at level 1.
+127. Steal the Spotlight cannot be used by a hero at level 9 (it would not be allowed to reach 10).
+128. Steal the Spotlight cannot target a hero at level 1.
 
 ## Helping
 
@@ -169,93 +169,93 @@ Open interpretations ([H]): Halfling has no -1 to run away and may discard a car
 
 ## Levels
 
-130. Heavenly Favor kicked from the door: all Clerics go up a level at once.
+130. Saint’s Day kicked from the door: all Clerics go up a level at once.
 
 ## Curses
 
 131. Anyone may play a curse on any player, during a fight, as an interference.
-132. Rotten Luck: lose a level.
-133. Goose of Gloom: lose 2 levels.
-134. Sudden Gust with no headgear worn does nothing.
-135. Rust Storm: lose the armor you wear.
-136. Sock Goblin: lose the footgear you wear.
-137. A curse takes only worn items: a carried item is not lost (Sudden Gust).
-138. Butterfingers: lose the Big item.
-139. Light-Fingered Gremlin: lose a small item of your choice.
-140. Utterly Rotten Hex: lose the item that gives the biggest bonus.
-141. Career Crisis: lose a class card; with none, lose a level.
-142. Identity Crisis: lose your race and become a Human.
-143. Career Change: your class becomes the first class card found in the door discards.
-144. Family Tree Hex: your race becomes the first race card found in the door discards.
+132. Bad Omen: lose a level.
+133. Broken Mirror: lose 2 levels.
+134. Bird’s Nest with no headgear worn does nothing.
+135. Moth Plague: lose the armor you wear.
+136. Stubbed Toe: lose the footgear you wear.
+137. A curse takes only worn items: a carried item is not lost (Bird’s Nest).
+138. Slippery Grip: lose the Big item.
+139. Magpie Raid: lose a small item of your choice.
+140. Jinxed Jewel: lose the item that gives the biggest bonus.
+141. Burnout: lose a class card; with none, lose a level.
+142. Ordinary Tuesday: lose your race and become a Human.
+143. Job Swap: your class becomes the first class card found in the door discards.
+144. Wrong Family Tree: your race becomes the first race card found in the door discards.
 145. A Change-class/race curse does nothing to a hero with none.
-146. Gender Swap: your sex changes.
-147. Hen Hat Hex: -1 to your die rolls while you wear no headgear-losing event.
-148. Hen Hat Hex ends when the headgear is lost.
-149. Hen Hat Hex applies to a run-away roll.
-150. Tax Collector: every player pays an item of equal value or loses all items and a level.
-151. Grabby Neighbours: the players on each side take a random card from your hand.
-152. Spiteful Mirror: no weapon bonus in the next fight only.
+146. Sudden Nap: -4 in your next fight only, then it is gone.
+147. The Jitters: -1 to your die rolls.
+148. The Jitters end when your next fight ends.
+149. The Jitters apply to a run-away roll.
+150. Surprise Audit: every player pays an item of equal value or loses all items and a level.
+151. Nosy Neighbours: the players on each side take a random card from your hand.
+152. Noodle Arms: no weapon bonus in the next fight only.
 153. A curse played on someone is discarded after it takes effect (not kept).
-154. Ring of Undoing cancels a curse (the victim is asked).
-155. Lucky Flip-Flops block curses you kick open, but not curses other players play.
+154. Lucky Charm Bracelet cancels a curse (the victim is asked).
+155. Clover Slippers block curses you kick open, but not curses other players play.
 
 ## Monsters
 
-156. Bad Stuff: Pinch Mites take armor and everything worn below the waist.
-157. You cannot run away from Pinch Mites.
-158. Hairy Hat-Muncher takes your headgear if you are caught.
-159. Kamikaze Toads: lose 2 levels.
-160. The Endless Goblin Horde: roll 1-2 and you die, otherwise lose that many levels.
-161. Gnawers: no items or bonuses count against them, level only.
-162. Gnawers Bad Stuff: your level drops to the lowest at the table.
-163. Timeshare Pitchman: your level does not count.
-164. Hovering Sniffer: an item worth 200+ gold bribes it away.
-165. Garlic Gargle kills a Hovering Sniffer outright.
-166. Shieldmaiden: a woman fighter just gets 1 treasure and no fight.
-167. Litigation Lizards never attack a Thief.
-168. Sleepy Boulderman: you may skip past him (a Halfling may not).
-169. Bat-Cape Poser: a Cleric can shoo him away and take the treasure, with no level.
-170. Furious Rooster: an extra level if beaten with fire.
-171. Barfabunny: extra level if beaten with no help or bonuses.
-172. Undead monsters (Rattlebones): fleeing costs a level even when you get away.
-173. Pharaoh: fleeing costs 2 levels (above level 3) even when you get away.
-174. Forum Troll / Pixie / Skygrif: others take items from you; the Nameless Dread kills all but a Wizard.
+156. Bad Stuff: Snapcrab Swarm takes everything worn below the waist, footgear included (armor stays).
+157. You cannot run away from the Boot-Thief Imp.
+158. Grumbling Dust Bunny takes your headgear if you are caught.
+159. Honking Gatekeeper: lose 2 levels.
+160. Swamp Gulper: roll 1-2 and you die, otherwise lose that many levels.
+161. Wobbling Jelly: no items or bonuses count against it, level only.
+162. Racing Snails Bad Stuff: your level drops to the lowest at the table.
+163. Judge Croak and Clerk: your level does not count.
+164. Toll Wisp: an item worth 200+ gold bribes it away.
+165. Smelling Salts kills a Toll Wisp outright.
+166. Mossy Idol: +4 against Halflings, no bonus against anyone else.
+167. Barghest Pup: throw it a pole and you get away without rolling.
+168. Strangling Arbor: it snatches one item of your choice before the fight.
+169. Moody Night Count: a Cleric can shoo him away and take the treasure, with no level.
+170. Snapping Fern: an extra level if beaten with fire.
+171. Lost Siblings: extra level if beaten with no help or bonuses.
+172. Undead monsters (Bone Butler): fleeing costs a level even when you get away.
+173. Gold-Crazed Griffin: fleeing costs 2 levels (a level 6 hero here) even when you get away.
+174. Spite Sprite: the highest-level rival takes one of your items.
 
 ## Classes
 
-175. Warrior Berserking: discard up to 3 cards, +1 each in the fight.
-176. Wizard Flight: discard up to 3 cards, +1 each to run away.
-177. Wizard Charm needs the whole hand and at least 3 cards.
-178. Wizard Charm with 3+ cards: discards the whole hand, takes the monster's treasure but no level.
-179. Thief Backstab: discard a card to give a player in a fight -2, once per victim per fight.
-180. Thief Steal: discard a card, roll 4+ to steal a small item, fail and lose a level.
+175. Warrior War Cry: discard up to 3 cards, +1 each in the fight.
+176. Wizard Blink: discard up to 3 cards, +1 each to run away.
+177. Wizard Banish needs the whole hand and at least 3 cards.
+178. Wizard Banish with 3+ cards: discards the whole hand, takes the monster's treasure but no level.
+179. Thief Dirty Trick: discard a card to give a player in a fight -2, once per victim per fight.
+180. Thief Pickpocket: discard a card, roll 4+ to steal a small item, fail and lose a level.
 181. A failed Thief steal costs a level.
 182. Thieves cannot steal a Big item.
-183. Cleric Turning: discard up to 3 cards, +3 each against Undead.
-184. Turning works only against Undead.
-185. Cleric Resurrection: instead of kicking, take the top door discard and discard a card from hand.
+183. Cleric Holy Light: discard up to 3 cards, +3 each against Undead.
+184. Holy Light works only against Undead.
+185. Cleric Second Chance: instead of kicking, take the top door discard and discard a card from hand.
 186. A hero may hold only one class (a new class card replaces the old).
 187. A hero may hold only one race (a new race card replaces the old).
-188. Mixed Heritage allows two races.
-189. Double Major allows two classes.
-190. Mixed Heritage can only be played once you have a race.
+188. Two Bloodlines allows two races.
+189. Second Calling allows two classes.
+190. Two Bloodlines can only be played once you have a race.
 191. Elf: +1 to run away.
 192. Class and race cards may be dropped (discarded) at any time on your turn.
 
 ## Special
 
-193. Gone Fishing: all monsters leave and the fighter draws 2 treasures.
-194. Plus-One: the monster brings an identical date and both must be beaten.
-195. Smoke and Mirrors: swap a monster for another from your hand.
-196. Hug Juice: all monsters leave, no treasure.
-197. Parrotify Potion: monster leaves, you take its treasure, no level.
-198. Not-My-Problem Potion: another player takes over the fight and its rewards.
-199. Mirror Twin: doubles your strength when fighting alone.
-200. Wishing Lantern: on your own turn a monster vanishes.
-201. Rummaging Rod: take any card from the discard piles.
-202. Uninvited Guest can only be played during a fight, with a monster from your hand.
-203. Sticky Paste: a hero who gets away must roll again.
-204. Porter can be played at any time, even in a fight.
+193. Shift Change: all monsters leave and the fighter draws 2 treasures.
+194. Brought Its Mum: the monster brings its mum, an identical second monster, and both must be beaten.
+195. Body Double: swap a monster for another from your hand.
+196. White Flag: all monsters leave, no treasure.
+197. Croak Powder: monster leaves, you take its treasure, no level.
+198. Not It!: another player takes over the fight and its rewards.
+199. Second Wind: doubles your strength when fighting alone.
+200. Genie in a Teapot: on your own turn a monster vanishes.
+201. Magpie’s Map: take any card from the discard piles.
+202. Party Crasher can only be played during a fight, with a monster from your hand.
+203. Bucket of Tar: a hero who gets away must roll again.
+204. Pack Mule can be played at any time, even in a fight.
 
 ## Turn
 

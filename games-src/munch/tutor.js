@@ -6,7 +6,7 @@
 //   goal: first to level 10, last level only from a monster ........ goal (Next), finale
 //   start: level 1, 4 door + 4 treasure cards, set up before the 1st turn . elf, powers, bucket, ready
 //   races and classes give powers (Elf +1 run; Warrior, Wizard, Thief, Cleric)  elf (do), powers (Next)
-//   items: wear automatically, add to strength, slots, lost items .. bucket (do), bad (lost hat)
+//   items: wear automatically, add to strength, slots, lost items .. kettle helm (do), bad (lost best item)
 //   sell items worth 1,000 gold for a level ........................ sellbtn, sellpick, sellconfirm
 //   kick open the door: monster = fight; hand / curse / other ..... kick (monster), kick2 (card to hand); curse is played in curse
 //   combat strength = level + items; higher wins; ties to the monster . potion (compare), help (compare)
@@ -31,22 +31,22 @@ const tutSkipped=()=>{try{return !!localStorage.getItem('dkd_tutskip')}catch(e){
 const tutBtn=cls=>typeof GXT==='undefined'||(G&&G.mode==='net'&&!G.winner)?'':GXT.menuHTML({game:TUT_GAME,first:tutFirst(),cls:cls,launch:()=>tutStart()});
 // ---------------------------------------------------------------- the fixed deal
 const TUT_SEED=20261008;
-const kdef=id=>G.C[id];                         // a card's key ('elf', 'imp', ...)
+const kdef=id=>G.C[id];                         // a card's key ('elf', 'cellarrat', ...)
 const myId=key=>P(0).hand.find(i=>kdef(i)===key);
 function tutDeal(){
   for(const p of G.pl){for(const id of p.hand.splice(0))(cd(id).d==='door'?G.door:G.tr).push(id)}
   const take=key=>{for(const dk of [G.door,G.tr]){const i=dk.findIndex(id=>G.C[id]===key);if(i>=0)return dk.splice(i,1)[0]}throw new Error('tutorial card '+key)};
   const deal=(s,keys)=>keys.forEach(k=>P(s).hand.push(take(k)));
-  deal(0,['elf','gargantuan','hexlvl','bucket','swash','fizz','rod']);   // the Lizards come later: you hear them when you listen at the door (turn 2)
-  deal(1,['elf','dwarf','halfling','mixed','rascal','gooey','antler','kneecaps']);
-  deal(2,['dwarf','dwarf','elf','double','stompy','cudgel','pole','sandwich']);
+  deal(0,['elf','bloated','hexomen','kettlehelm','buckler','witchspite','magpiemap']);   // the Platypus Brute comes later: you hear them when you listen at the door (turn 2)
+  deal(1,['elf','dwarf','halfling','mixed','shortsword','leather','stagcrown','spikeknees']);
+  deal(2,['dwarf','dwarf','elf','double','wingboots','cleaver','mop','pie']);
   P(1).lvl=3;P(2).lvl=3;P(1).lv='normal';P(2).lv='normal'}
-// the treasure you draw for beating the Lizards: first draw (Backstabber's Shiv), then the Treasure Pile (3 more cards at once: Sour Drink, Snooze Syrup, Jerkin)
+// the treasure you draw for beating the Platypus Brute: first draw (Sneaky Dagger), then the Hidden Stash (3 more cards at once: Pickle Brine, Angry Bee in a Jar, Chainmail)
 function tutStackTreasure(){const take=key=>{const i=G.tr.findIndex(id=>G.C[id]===key);return i>=0?G.tr.splice(i,1)[0]:null};
-  const order=['jerkin','snooze','sour','pile','shiv'].map(take).filter(x=>x!=null);   // pushed last = drawn first: shiv (first draw), pile, sour, snooze, jerkin
+  const order=['chainmail','beejar','pickle','pile','dagger'].map(take).filter(x=>x!=null);   // pushed last = drawn first: shiv (first draw), pile, sour, snooze, jerkin
   for(const id of order)G.tr.push(id)}
-// a curse for your third door (Rotten Luck: lose a level), and a harmless door card for the computer heroes' second round
-function tutTopCurse(){for(const k of ['hexlvl','hexgoose','hexgust'])if(tutTop(k))return true;return false}
+// a curse for your third door (Bad Omen is in your hand, so Leaky Pockets: discard 2 cards), and a harmless door card for the computer heroes' second round
+function tutTopCurse(){for(const k of ['hexomen','hexleaky','hexnest'])if(tutTop(k))return true;return false}
 function tutTopSafe(){const i=G.door.findIndex(id=>{const c=cd(id);return c.t!=='monster'&&c.t!=='curse'&&c.sp!=='divine'});if(i<0)return false;G.door.push(G.door.splice(i,1)[0]);return true}
 function tutTop(key){const i=G.door.findIndex(id=>G.C[id]===key);if(i<0)return false;const id=G.door.splice(i,1)[0];G.door.push(id);return true}
 // the die: find a generator state whose next d6 is v (rnd() adds 0x6D2B79F5 to G.rng first)
@@ -57,7 +57,7 @@ function tutAI(s){if(!tutOn()||!G||s===0)return null;const vm=validMoves(s),p=P(
   switch(G.phase){
     case 'setup':{const pl=vm.find(m=>(m.act==='play'||m.act==='equip')&&m.card!=null&&(cd(m.card).t==='item'||(cd(m.card).t==='race'&&!p.race.length))&&!(cd(m.card).t==='item'&&cd(m.card).req&&!!equipWhy(p,m.card)));return pl||by('ready')}
     case 'window':return by('pass');
-    case 'main':if(G.turn>3)tutTopSafe();else if(s===1)tutTop('imp');else tutTop('double');return by('kick');
+    case 'main':if(G.turn>3)tutTopSafe();else if(s===1)tutTop('cellarrat');else tutTop('double');return by('kick');
     case 'after':return by('loot');
     case 'post':return by('end');
     case 'charity':return vm.slice().sort((a,b)=>cardValue(p,a.card)-cardValue(p,b.card))[0];
@@ -101,26 +101,26 @@ function tutSteps(){
    wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='elf'},from:()=>tcard('elf'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('elf')&&!!document.querySelector('.bfbig')},
  {id:'powers',title:'Races and classes',say:'Elves run away better. Classes give other powers.',target:tq('.mine .gear'),wait:null,
    ready:()=>G.phase==='setup'&&tmine()&&P(0).race.length>0},
- {id:'bucket',title:'Wear an item',say:()=>'Tap the Bucket, then your hero. Worn items add strength.',target:tq('.bfbig'),also:()=>tcard('bucket'),pick:tpick('bucket'),
-   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bucket'},from:()=>tcard('bucket'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('bucket')&&!!document.querySelector('.bfbig')},
+ {id:'bucket',title:'Wear an item',say:()=>'Tap the Kettle Helm, then your hero. Worn items add strength.',target:tq('.bfbig'),also:()=>tcard('kettlehelm'),pick:tpick('kettlehelm'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='kettlehelm'},from:()=>tcard('kettlehelm'),ready:()=>G.phase==='setup'&&tmine()&&BF.pick==null&&!!tcard('kettlehelm')&&!!document.querySelector('.bfbig')},
  {id:'ready',title:'Ready!',say:'Everyone gears up before the first door. Tap Ready.',target:tq(mv('ready')),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ready'},ready:()=>G.phase==='setup'&&tmine()&&P(0).eq.some(e=>e.on)&&BF.pick==null},
  {id:'sellbtn',title:'Sell for a level',say:'Sell 1,000 gold of items for one level. Tap Sell.',target:tq('#prompt [data-a="sellmode"]'),
    wait:{type:'tap',match:a=>a.what==='sellmode'},ready:()=>G.phase==='main'&&G.active===0&&tmine()&&!UI.sell},
- {id:'sellpick',title:'Pick what to sell',say:()=>'Tap the Rod: it is worth '+cd(myId('rod')).g.toLocaleString('en')+' gold.',target:()=>tcard('rod'),
-   wait:{type:'tap',match:a=>a.what==='sellpick'&&kdef(a.id)==='rod'},ready:()=>tmine()&&!!UI.sell&&!!tcard('rod')},
+ {id:'sellpick',title:'Pick what to sell',say:()=>'Tap the Map: it is worth '+cd(myId('magpiemap')).g.toLocaleString('en')+' gold.',target:()=>tcard('magpiemap'),
+   wait:{type:'tap',match:a=>a.what==='sellpick'&&kdef(a.id)==='magpiemap'},ready:()=>tmine()&&!!UI.sell&&!!tcard('magpiemap')},
  {id:'sellconfirm',title:'Cash it in',say:'Over 1,000 gold. Tap Sell for a free level.',target:tq('.sellbar .btn.primary'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='sell'},ready:()=>tmine()&&!!UI.sell&&UI.sell.length>0&&!!tq('.sellbar .btn.primary:not([disabled])')()},
  {id:'kick',title:'Kick open the door',say:'Tap the door to kick it open.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
-   ready:()=>G.phase==='main'&&G.active===0&&tmine()&&P(0).lvl>=2&&!!document.querySelector('.bfdoor')&&(tutTop('hatmuncher'),true)},
- {id:'potion',title:'Strength vs level',say:()=>{const [a,b]=nowStr();return 'Its level '+b+', your strength '+a+'. Tap potion, then your side.'},target:tq('.arena .score.hero'),also:()=>[tcard('fizz'),tq('.arena .sline')()].filter(Boolean),pick:tpick('fizz'),
-   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='fizz'&&a.z==='fh'},from:()=>tcard('fizz'),
-   ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&BF.pick==null&&!!tcard('fizz')&&!!document.querySelector('.arena .score.hero')},
- {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();let n=5;try{n=runOdds(P(0),G.cb).rows[0].need}catch(e){}return a+' against '+b+': you lose. Tap Run. '+n+'+ escapes'+(isRace(P(0),'elf')?' (elf +1).':'.')},target:tq('.fbtns .runb'),
+   ready:()=>G.phase==='main'&&G.active===0&&tmine()&&P(0).lvl>=2&&!!document.querySelector('.bfdoor')&&(tutTop('eyehood'),true)},
+ {id:'potion',title:'Strength vs level',say:()=>{const [a,b]=nowStr();return 'Its level '+b+', your strength '+a+'. Tap potion, then your side.'},target:tq('.arena .score.hero'),also:()=>[tcard('witchspite'),tq('.arena .sline')()].filter(Boolean),pick:tpick('witchspite'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='witchspite'&&a.z==='fh'},from:()=>tcard('witchspite'),
+   ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&BF.pick==null&&!!tcard('witchspite')&&!!document.querySelector('.arena .score.hero')},
+ {id:'run',title:'Too strong: run!',say:()=>{const [a,b]=nowStr();let n=5;try{n=runOdds(P(0),G.cb).rows[0].need}catch(e){}return 'You lose. Tap Run: '+(isRace(P(0),'elf')?'5 or 6 escapes, Elf +1 makes '+n+'+.':(n===5?'5 or 6 escapes.':n+'+ escapes.'))},target:tq('.fbtns .runb'),
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='run'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&tmine()&&!document.getElementById('bfrev')&&G.cb.os.length>0&&!!document.querySelector('.fbtns .runb')},
- {id:'bad',title:'Caught! Bad Stuff',say:()=>'You rolled '+(G.lastRoll?G.lastRoll.v:1)+': caught! Its Bad Stuff ate your hat.',target:tq('.mine .gear','.mine .top'),wait:null,
+ {id:'bad',title:'Caught! Bad Stuff',say:()=>'Caught (rolled '+(G.lastRoll?G.lastRoll.v:1)+')! Its Bad Stuff takes your best item.',target:tq('.mine .gear','.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&!!G.out&&!G.out.won&&tclear()},
- {id:'death',title:'Death',say:'Some Bad Stuff kills. You keep your level but lose your cards.',target:tq('.mine .top'),wait:null,
+ {id:'death',title:'Death',say:'You keep level, race, class and curses; you lose your cards.',target:tq('.mine .top'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&tclear()},
  {id:'body',title:'Loot the body',say:'Each rival loots one card from a dead body.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.phase==='post'&&!G.cb&&tclear()},
@@ -128,22 +128,22 @@ function tutSteps(){
    ready:()=>G.phase==='post'&&!G.cb&&tclear()},
  {id:'end1',title:'End your turn',say:'Nothing more to do. Tap End turn.',target:tq(mv('end')),wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='end'},
    ready:()=>G.phase==='post'&&tmine()},
- {id:'curse',title:'Curse a rival',say:'Anyone may curse anyone. Tap Rotten Luck, then Morwen.',target:tchip(1),also:()=>tcard('hexlvl'),pick:tpick('hexlvl'),
-   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='hexlvl'&&a.z==='p1'},from:()=>tcard('hexlvl'),
-   ready:()=>G.phase==='window'&&G.active===1&&tmine()&&BF.pick==null&&!!tcard('hexlvl')&&!!tchip(1)()},
- {id:'meddle',title:'Meddle in her fight',say:'Anyone may meddle in fights. Tap Gargantuan, then her monster.',target:tq('.arena .row.mons .mon'),also:()=>tcard('gargantuan'),pick:tpick('gargantuan'),
-   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='gargantuan'},from:()=>tcard('gargantuan'),
-   ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('gargantuan')&&!!document.querySelector('.arena .row.mons .mon')},
+ {id:'curse',title:'Curse a rival',say:'Anyone may curse anyone. Tap Bad Omen, then Morwen.',target:tchip(1),also:()=>tcard('hexomen'),pick:tpick('hexomen'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='hexomen'&&a.z==='p1'},from:()=>tcard('hexomen'),
+   ready:()=>G.phase==='window'&&G.active===1&&tmine()&&BF.pick==null&&!!tcard('hexomen')&&!!tchip(1)()},
+ {id:'meddle',title:'Meddle in her fight',say:'Anyone may meddle in fights. Tap Bloated, then her monster.',target:tq('.arena .row.mons .mon'),also:()=>tcard('bloated'),pick:tpick('bloated'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='bloated'},from:()=>tcard('bloated'),
+   ready:()=>!!G.cb&&G.cb.who===1&&G.cb.stage==='others'&&tmine()&&BF.pick==null&&!!tcard('bloated')&&!!document.querySelector('.arena .row.mons .mon')},
  {id:'rivals',title:'The computer plays too',say:'Morwen and Grub play by the same rules as you.',target:tq('#phopps','#app .opps'),wait:null,
    ready:()=>G.active===2&&!G.winner},
- {id:'listen',title:'Listen at the door',say:'Quick games give you a free door card every turn. Tap it.',target:()=>tcard('lizards'),
-   wait:{type:'tap',match:a=>a.what==='card'&&kdef(a.id)==='lizards'},ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!tcard('lizards')&&tclear()},
+ {id:'listen',title:'Listen at the door',say:'Quick games give you a free door card every turn. Tap it.',target:()=>tcard('platybrute'),
+   wait:{type:'tap',match:a=>a.what==='card'&&kdef(a.id)==='platybrute'},ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!tcard('platybrute')&&tclear()},
  {id:'kick2',title:'Your turn again',say:'Your turn. Kick the door again.',target:tq('.bfdoor'),wait:{type:'tap',match:a=>a.what==='kick'},
    ready:()=>G.phase==='main'&&G.active===0&&G.turn>1&&tmine()&&!!document.querySelector('.bfdoor')&&(tutTop('halfling'),true)},
- {id:'trouble',title:'Look for trouble',say:'No monster? Fight one from your hand. Tap Lizards, then the door.',target:tq('.arena'),also:()=>tcard('lizards'),pick:tpick('lizards'),
-   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='lizards'},from:()=>tcard('lizards'),
-   ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('lizards')},
- {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Lizards '+b+', you '+a+': too strong. Tap Help.'},target:tq('.fbtns .helpb'),
+ {id:'trouble',title:'Look for trouble',say:'No monster? Fight one from your hand: tap Platypus, then the door.',target:tq('.arena'),also:()=>tcard('platybrute'),pick:tpick('platybrute'),
+   wait:{type:'drag',match:a=>a.what==='drop'&&kdef(a.id)==='platybrute'},from:()=>tcard('platybrute'),
+   ready:()=>G.phase==='after'&&tmine()&&BF.pick==null&&!!tcard('platybrute')},
+ {id:'help',title:'Ask for help',say:()=>{const [a,b]=nowStr();return 'Platypus '+b+', you '+a+': too strong. Tap Help.'},target:tq('.fbtns .helpb'),
    wait:{type:'tap',match:a=>a.what==='askmenu'},ready:()=>!!G.cb&&G.cb.stage==='act'&&G.cb.who===0&&G.cb.help<0&&tmine()&&tcanAsk()&&!!document.querySelector('.fbtns .helpb')},
  {id:'who',title:'Pick a helper',say:'Helpers want a treasure share. Elves help for a level. Tap Morwen.',target:()=>{tAskOpen();return tchip(1)()},
    wait:{type:'tap',match:a=>a.what==='move'&&a.m.act==='ask'&&a.m.tgt===1},ready:()=>{tAskOpen();return !!BF.ask&&!!tchip(1)()}},
@@ -171,7 +171,7 @@ function tutSetup(){try{GX.close()}catch(e){}
   try{newGame('F',3)}finally{UI.lvl=lvl0;UI.n=n0;UI.names=nm0;DEFSEED=null}
   G.tut=1;G.learn=false;G.rng=TUT_SEED;
   G.active=G.first=0;G.setupOrd=[0,1,2];G.setupI=0;G.log=[];G.ln=0;lg(-1,'The tutorial dungeon opens: you, Morwen and Grub.');
-  tutDeal();tutStackTreasure();tutTop('hatmuncher');G.tutListen='lizards';{const i=G.door.findIndex(id=>G.C[id]==='lizards');if(i>=0)G.door.unshift(G.door.splice(i,1)[0])}   // the Lizards wait at the bottom of the door deck until you listen
+  tutDeal();tutStackTreasure();tutTop('eyehood');G.tutListen='platybrute';{const i=G.door.findIndex(id=>G.C[id]==='platybrute');if(i>=0)G.door.unshift(G.door.splice(i,1)[0])}   // the Platypus Brute waits at the bottom of the door deck until you listen
   UI.hints=false;render()}
 function tutLeave(){TUTG=false;UI.pause=false;clearTimeout(aiTimer);aiTimer=null;if(UI.spd0!=null){UI.speed=UI.spd0;UI.spd0=null}BF.pick=null;BF.ask=null;
   try{GXH.hide()}catch(e){}G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;UI.pass=null;DEFSEED=null;render()}

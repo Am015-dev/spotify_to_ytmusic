@@ -463,3 +463,5 @@ html.ph #prompt.bfq .acts.main .btn.pickchip{white-space:normal;line-height:1.1;
 html.ph #prompt.bfq>.acts.main{bottom:auto!important;top:auto!important}   /* the old sticky bottom:-12px pushed the relative buttons 12 px out of the dock */
 /* F16: the fight buttons span the whole table now: keep the pulsing Fight! (it scales up) inside the table edge */
 html.ph .arena:has(>.vs)>.fbtns{padding-left:7px!important;padding-right:7px!important;box-sizing:border-box}
+/* a very long hero name in the fight wraps to at most 3 lines, so it never runs into the kill/one-shot chips below it */
+html.ph .arena:has(>.vs) .score.hero .sl{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden!important}

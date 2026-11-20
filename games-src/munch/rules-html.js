@@ -10,7 +10,7 @@ const RULES_HTML=`
 <li><b>If you didn't fight a monster:</b> either <b style="white-space:nowrap">look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
 <li><b>Charity.</b> If you hold more than 5 cards (6 for dwarves), give the extras to the lowest-level player. If that's you, discard them.</li>
 </ol>
-<p><b>Quick game (faster play), on by default.</b> New games use the rulebook's own faster-play option; pick <b>Full</b> under Game length for the full rules. In a Quick game the target stays level 10, but at the start of each turn you <b>listen at the door</b> (draw one door card face down), and if you help a hero win the game in a fight, <b>you win too</b>. The story and the tutorial use the full rules. With it on, the computer heroes default to Easy.</p>
+<p><b>Quick (faster-play variant), optional.</b> New games play the full base rules. Pick <b>Quick</b> under Game length to use the rulebook's own faster-play option instead. In a Quick game the target stays level 10, but at the start of each turn you <b>listen at the door</b> (draw one door card face down), and if you help a hero win the game in a fight, <b>you win too</b>. The story and the tutorial use the full rules. With it on, the computer heroes default to Easy.</p>
 <h3>Fighting</h3>
 <ul>
 <li>Your <b>combat strength</b> is your level plus the bonuses of the items you wear. The monster's strength is its level plus any boosts.</li>
@@ -30,15 +30,15 @@ const RULES_HTML=`
 </ul>
 <h3>Races and classes</h3>
 <ul>
-<li><b>Elf:</b> +1 to run away, and +1 level for each monster you help kill.</li>
-<li><b>Dwarf:</b> any number of Big items, and a 6-card hand.</li>
-<li><b>Halfling:</b> sell one item a turn for double. If you fail to run away, discard a card to roll again.</li>
-<li><b>Warrior:</b> win ties. Discard up to 3 cards in a fight for +1 each.</li>
-<li><b>Wizard:</b> discard up to 3 cards for +1 each to run away. Discard your whole hand (3+ cards) to charm a single monster away and keep its treasure.</li>
-<li><b>Thief:</b> discard a card to give a player in a fight −2 (once per victim per fight). Discard a card to try to steal a small item: roll 4+ or lose a level.</li>
-<li><b>Cleric:</b> Resurrection: whenever you would draw a card face-up, you may take the top card of that discard pile instead, and discard a card from your hand for each one. Face-up draws are kicking open the door and the treasure of a fight you won with help. Turning: discard up to 3 cards for +3 each against undead.</li>
+<li><b>Elf:</b> Light feet: +1 to run away. Good sport: +1 level for each monster you help someone beat.</li>
+<li><b>Dwarf:</b> Strong back: any number of Big items. Deep pockets: a 6-card hand.</li>
+<li><b>Halfling:</b> Haggler: sell one item a turn for double. Second try: if you fail to run away, discard a card to roll again.</li>
+<li><b>Warrior:</b> War Cry: discard up to 3 cards in a fight for +1 each. You win ties.</li>
+<li><b>Wizard:</b> Blink: discard up to 3 cards for +1 each to run away. Banish: discard your whole hand (3+ cards) to send a single monster away and keep its treasure (no level).</li>
+<li><b>Thief:</b> Dirty Trick: discard a card to give a player in a fight −2 (once per victim per fight). Pickpocket: discard a card to try to take a small item: roll 4+ or lose a level.</li>
+<li><b>Cleric:</b> Second Chance: whenever you would draw a card face-up, you may take the top card of that discard pile instead, and discard a card from your hand for each one. Face-up draws are kicking open the door and the treasure of a fight you won with help. Holy Light: discard up to 3 cards for +3 each against undead.</li>
 </ul>
-<p class="small muted">A half-blood card lets you have two races, and a double-class card two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. Names, card texts and art in this game are original. The rules follow the real card game.</p>
+<p class="small muted">Two Bloodlines lets you have two races, and Second Calling two classes. Curses can be played on anyone: here that's on your turn, during fights, or when someone else's turn starts. The rules and the deck's structure (card types and counts) follow the real card game. Every card (name, picture, text and numbers) is our own design.</p>
 <section class="credits-audio">
 <h3>Credits</h3>
 <p>Names, card text and art are original. All card paintings and the six boss reveal clips were painted by Am015-dev.</p>

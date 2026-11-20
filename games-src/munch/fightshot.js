@@ -10,7 +10,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   await p.evaluate(()=>{ANIM=0;setSeed(7);newGame('solo',3);UI.speed=4;});await sleep(500);
   const shot=async n=>{await sleep(1800);await p.screenshot({path:path.join(__dirname,'playtest',`fight-${W}x${H}-${n}.png`)})};
   // scene 1: losing fight, then a one-shot/bonus
-  const info=await p.evaluate(()=>{G.active=0;const me=0;P(0).lvl=4;const mon=CARDS.findIndex(c=>c.ref==='dk-hatmuncher');const id=Object.keys(G.C).map(Number).find(i=>G.C[i]==='hatmuncher'||(cd(i).ref==='dk-hatmuncher'));
+  const info=await p.evaluate(()=>{G.active=0;const me=0;P(0).lvl=4;const mon=CARDS.findIndex(c=>c.ref==='dk-merkaraoke');const id=Object.keys(G.C).map(Number).find(i=>G.C[i]==='merkaraoke'||(cd(i).ref==='dk-merkaraoke'));
     window.__id=id;startCombat(me,id,'kick');render();return {me,id,a:sideStr(G.cb),b:monStr(G.cb),human:P(me).human}});
   console.log(W+'x'+H,JSON.stringify(info),errs.join('|'));await p.addStyleTag({content:'[class*=gxt]{display:none!important}'});await shot('1lose');
   // scene 2: a one-shot is played, then a helper joins, monster boost (shots mid-animation and settled)

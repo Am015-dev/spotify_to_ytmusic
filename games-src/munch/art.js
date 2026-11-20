@@ -367,7 +367,7 @@ function pump(){if(pumping)return;const n=QUEUE.shift();if(!n)return;pumping=tru
 function pic(k,u,w,h){const b=BMP.get(k);if(b)return b;want(k,u,w,h);return u}
 // painted card art (DK_ART data URIs from build.py): one blob URL per key, made once; falls back to a data: URI where blobs are missing
 const PT_URL=new Map();
-function paintedKey(def){if(typeof DK_ART==='undefined'||!def)return null;const k=def.k||(def.t==='race'&&def.art==='half'?'halfling':def.t==='race'?def.art:null);return k&&DK_ART[k]?k:null}
+function paintedKey(def){if(typeof DK_ART==='undefined'||!def)return null;const k=def.pic||def.k||(def.t==='race'&&def.art==='half'?'halfling':def.t==='race'?def.art:null);return k&&DK_ART[k]?k:null}
 function paintedURL(k){let u=PT_URL.get(k);if(u)return u;u=DK_ART[k];
   if(CAN_BLOB&&window.atob){try{const p=u.split(','),bin=atob(p[1]),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);u=URL.createObjectURL(new Blob([a],{type:'image/webp'}))}catch(e){u=DK_ART[k]}}
   PT_URL.set(k,u);return u}

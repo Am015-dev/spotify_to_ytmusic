@@ -149,7 +149,7 @@ function scanLog(){if(!G)return;if(UI.gid!==G.gid){UI.gid=G.gid;UI.ln=G.ln||0;UI
     if(l.s>=0&&!P(l.s).human){let k=null;if(/ curses (?!themselves)/.test(t))k='curse';else if(/ agrees to help/.test(t))k='help';else if(/ refuses to help/.test(t))k='refuse';else if(/ tougher with | for the monsters\.| as an uninvited guest/.test(t))k='boost';else if(/ backstabs /.test(t))k='stab';else if(/ now has to fight!/.test(t))k='steal';
       if(k){const B=BARKS[P(l.s).nm]||BARKS.Pip;const line=pickLine(B[k],l.n);UI.bark[l.s]={t:line,until:now+8000};UI.barkLog.unshift({s:l.s,t:line,n:l.n});UI.barkLog.length=Math.min(UI.barkLog.length,6)}}
     if(human){const e=nm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const re=new RegExp(`curses ${e}:|from ${e}'s hand|from ${e}\\.|^${e} loses|^💀 ${e} dies|^${e} discards \\d|backstabs ${e}|: ${e} now has to fight|steals a level from ${e}|^${e} drops to|^${e} is hit by a curse|^${e} is now|^${e} can no longer`);
-      if(re.test(t)&&!/charity|charms|a bribe|thrown for the hound|snack|to make room|takes off/.test(t))hits.push(youify(t,nm));
+      if(re.test(t)&&!/charity|charms|a bribe|thrown for the monster|snack|to make room|takes off/.test(t))hits.push(youify(t,nm));
       if(l.s===me&&/^Bad Stuff from /.test(t))hits.push(t)}}
   if(hits.length){UI.toast={t:hits.slice(0,4).join(" "),until:now+15000};if(ANIM&&AIDELAY>0)UI.hold=now+1800}}
 function toastHTML(){const t=UI.toast;if(!t||t.until<Date.now())return '';const fresh=UI.toastSeen!==t;UI.toastSeen=t;return `<div class="toast${fresh?' fresh':''}" role="alert"><b>💥 Ouch!</b> ${esc(t.t)}</div>`}

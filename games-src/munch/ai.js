@@ -12,7 +12,7 @@ function cardValue(p,id){const c=cd(id);switch(c.t){
   case 'level':return 9;case 'curse':return 4;case 'monster':return 2+(c.lvl<pStr(p)?3:0);case 'enh':return 3+(c.b>0?1:0);
   case 'race':case 'class':return 5;default:return 4}}
 function aiLootPick(o,loot){return loot.slice().sort((a,b)=>cardValue(o,b)-cardValue(o,a))[0]}
-function aiWantsWard(p,c){const heavy=(c.ops||[]).some(o=>['lvl','death','item','pick','clsOr1','race','cls','swap','tax','pers','sex'].includes(o[0]));return heavy&&(p.lvl>=3||p.eq.length>0)}
+function aiWantsWard(p,c){const heavy=(c.ops||[]).some(o=>['lvl','death','item','itemOr','pick','clsOr1','race','cls','swap','tax','pers','sex'].includes(o[0]));return heavy&&(p.lvl>=3||p.eq.length>0)}
 function aiLawyerSwap(f){return true}
 function aiGlue(o,r){const w=P(r.w);const c=mdef(runMon(r));const nasty=(c.bad||[]).some(x=>x[0]==='death'||(x[0]==='lvl'&&(x[1]==='all'||x[1]>=2)));return (threat(w)>=threat(o)||w.lvl>=8)&&nasty}
 // a choice the rules hand to this seat
@@ -32,7 +32,7 @@ function aiWindowPick(p,vm){const cur=curPl();
   const st=vm.filter(m=>cd(m.card).sp==='steal').sort((a,b)=>P(b.tgt).lvl-P(a.tgt).lvl);if(st.length&&p.lvl<R.WIN-1)return st[0];
   const cs=vm.filter(m=>cd(m.card).t==='curse'&&m.tgt===cur.i);const soft=p.lv==='easy'&&cur.human&&cur.lvl<8;if(cs.length&&!soft&&!tired()&&(threat(cur)>=threat(p)||cur.lvl>=7))return cs.sort((a,b)=>curseHarm(cur,b.card)-curseHarm(cur,a.card))[0];
   return null}
-function curseHarm(t,id){const c=cd(id);let h=0;for(const o of c.ops||[]){if(o[0]==='lvl')h+=o[1]*5;if(o[0]==='item'||o[0]==='pick')h+=itemPool(t,o[1]).length?4:0;if(o[0]==='race'||o[0]==='cls'||o[0]==='clsOr1')h+=3;if(o[0]==='pers')h+=3;if(o[0]==='sex')h+=4;if(o[0]==='tax')h+=2;if(o[0]==='grab')h+=Math.min(2,t.hand.length)*2}return h}
+function curseHarm(t,id){const c=cd(id);let h=0;for(const o of c.ops||[]){if(o[0]==='lvl')h+=o[1]*5;if(o[0]==='item'||o[0]==='pick')h+=itemPool(t,o[1]).length?4:0;if(o[0]==='race'||o[0]==='cls'||o[0]==='clsOr1')h+=3;if(o[0]==='pers')h+=3;if(o[0]==='sex')h+=4;if(o[0]==='tax')h+=2;if(o[0]==='grab'||o[0]==='hand')h+=Math.min(o[0]==='hand'&&o[1]!=='all'?o[1]:2,t.hand.length)*2;if(o[0]==='itemOr')h+=itemPool(t,o[1]).length?4:o[2]*5;if(o[0]==='swap')h+=(o[1]==='cls'?t.cls:t.race).length?3:0;if(o[0]==='pers'&&c.pers&&c.pers.str)h+=Math.min(3,-c.pers.str-1)}return h}
 function handBoost(p){let b=0;for(const id of p.hand){const c=cd(id);if(c.t==='oneshot'&&c.b&&!c.sp)b+=c.b}if(isCls(p,'warrior'))b+=Math.min(R.BERSERK,Math.max(0,p.hand.length-2));return b}
 function isDeadly(c){return (c.bad||[]).some(o=>o[0]==='death'||o[0]==='orcs'||o[0]==='dread')}
 // choose a move for seat s from its legal moves

@@ -11,21 +11,20 @@ A browser version of the rules of the original game (original publisher, 2001). 
 
 ## The deck in this game
 - **168 cards:** 94 door and 74 treasure, 147 different cards.
-- **Checked against the data:** `cards.js` gives each card a `ref` to its real card in `cards-base.json`.
-  - A script compares every copy count, monster level, treasure count, levels gained, "won't pursue" level, run-away modifier and Undead tag with the data.
-  - It does the same for every item's bonus, gold, slot, hands and Big flag, and every one-shot's bonus and gold.
-  - **Result: 0 differences.**
+- **Structure, not copies (owner, 20 Nov 2026):** the deck matches the base game's STRUCTURE (card types, counts, level bands,
+  treasure curve, effect families); every authored card is our own design. `COMPONENTS.md` has the structure table and the
+  balance check; `logic-test.js` row 3 checks the totals (94 door, 74 treasure).
 - **Card types:**
   - 37 monsters
   - 6 monster boosts
   - 19 curses
   - 3 races and 4 classes, 3 copies each
-  - Mixed Heritage ×2 and Double Major ×2 (the two-race and two-class cards)
-  - 2 Uninvited Guests (wandering monsters)
-  - Loophole (the rule-bending card), Heavenly Favor, Mind If I Borrow That?, Smoke and Mirrors and Gone Fishing
-  - 9 go-up-a-level cards, Porter (the hireling), Treasure Pile!, Level Heist
+  - Two Bloodlines ×2 and Second Calling ×2 (the two-race and two-class cards)
+  - 2 Party Crashers (wandering monsters)
+  - Fine Print (the rule-bending card), Saint's Day, Quick Loan, Body Double and Shift Change
+  - 9 go-up-a-level cards, Pack Mule (the hireling), Hidden Stash!, Steal the Spotlight
   - 38 items and 24 one-shots
-- **Race and class names:** the races and classes keep their generic fantasy names (Elf, Dwarf, Halfling, Warrior, Wizard, Thief, Cleric). Every other card has an original name.
+- **Race and class names:** the races and classes keep their generic fantasy names (Elf, Dwarf, Halfling, Warrior, Wizard, Thief, Cleric); their powers have our own names (War Cry, Blink, Banish, Dirty Trick, Pickpocket, Second Chance, Holy Light, ...).
 
 ## Rules implemented [R]
 - **Setup:** each hero starts at level 1 as a Human with no class, and is dealt 4 door and 4 treasure cards. Everyone may play races, classes and items before the first turn. The high roller starts.
@@ -50,87 +49,83 @@ A browser version of the rules of the original game (original publisher, 2001). 
 - **Death:** you keep your level, races, classes, the two-race/two-class cards and curses. The other players loot one card each, highest level first (ties roll). You come back at the next player's turn and draw 4 + 4 cards at the start of your own.
 - **Items:**
   - 1 headgear, 1 armor, 1 footgear, and two hands of weapons.
-  - One Big item (any number for a Dwarf; one extra with a Porter).
+  - One Big item (any number for a Dwarf; one extra with a Pack Mule).
   - Race, class and sex restrictions apply. Items you can't use are carried with no bonus.
   - You can't change what you wear in a fight.
 - **Selling:** on your own turn, outside a fight, sell items worth 1,000 gold or more in one go for one level per 1,000. No change is given.
   - A Halfling doubles one item's price once a turn.
   - You can't sell to reach level 10.
-- **Winning:** level 10, but only from killing a monster. Heavenly Favor (the divine-intervention card) is the one card that may also give it to Clerics. Go-up-a-level cards and selling stop at 9.
-- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Mixed Heritage keeps the Halfling perks, and monsters get no bonus against that race.
+- **Winning:** level 10, but only from killing a monster. Saint's Day (the divine-intervention card) is the one card that may also give it to Clerics. Go-up-a-level cards and selling stop at 9.
+- **The two-race and two-class cards with one card:** you get the perks and none of the drawbacks. For example, a single-race Halfling with Two Bloodlines keeps the Halfling perks, and monsters get no bonus against that race.
 
 ## Every card effect is implemented
 Monsters' special texts are all live. Some examples:
-- **Grave Gnawers:** you fight with your level only; Berserk doesn't help.
-- **Timeshare Pitchman:** bonuses only.
-- **Pinch Mites** and **Hovering Sniffer:** you can't escape them. The Sniffer can be bribed with an item worth 200 or more, and Garlic Gargle kills it.
-- **Shieldmaiden:** a woman just gets 1 treasure.
-- **Litigation Lizards:** they skip a Thief, who may swap 2 treasures.
-- **Pharaoh** and **Grave Twins:** fleeing costs 2 levels above level 3. **Rattlebones:** 1 level.
-- **Snappy Hound:** throw a pole to get away.
-- **Sleepy Boulderman:** walk past it, unless you're a Halfling.
-- **Bat-Cape Poser:** a Cleric shoos him off.
-- **Furious Rooster:** +1 level if beaten with fire.
-- **Barfabunny:** +1 level if beaten with no help or bonuses.
-- **Ficus:** an Elf gets an extra treasure.
-- **Slobber Fiend:** discard an item first.
-- **Tentaclopolis:** chases Elves of any level.
-- **Plus-One:** an identical date with the same boosts, −1 to run away.
+- **Wobbling Jelly:** you fight with your level only; War Cry doesn't help.
+- **Judge Croak and Clerk:** bonuses only.
+- **Boot-Thief Imp** and **Cellar Kraken:** you can't run away.
+- **Toll Wisp:** pay it an item worth 200 or more and it leaves; Smelling Salts pop it.
+- **Gold-Crazed Griffin:** fleeing costs 2 levels above level 3. **Lovesick Worm** and **Bone Butler:** 1 level.
+- **Barghest Pup:** throw a pole to get away.
+- **Moody Night Count:** a Cleric shoos him off.
+- **Snapping Fern:** +1 level if beaten with fire.
+- **Lost Siblings:** +1 level if beaten with no help or bonuses.
+- **Strangling Arbor:** discard an item first.
+- **Furnace Fiend:** chases Elves of any level.
+- **Shaggy Moocher** and **Hood of Many Eyes:** nobody can help.
+- **Brought Its Mum:** an identical second monster with the same boosts.
 
 The Bad Stuff includes:
-- the Horde's roll;
-- losing classes (or 3 levels) and losing all Big items;
+- the Swamp Gulper's roll (1–2 dead, otherwise lose that many levels);
+- losing classes (or 2 levels), races, armor, headgear, footgear, Big items, your best item or all items;
 - dropping to the lowest level at the table;
-- 1,000 gold of items;
-- others taking items or cards (Skygrif, Pixie, Forum Troll, Litigation Lizards);
-- the Turbo Slugs roll;
-- the Nameless Dread sparing Wizards.
+- 600 gold of items;
+- others taking items or cards (Goblin Picket Line, Spite Sprite);
+- the Rotting Nag roll.
 
 All 19 curses work:
 - the class and race swaps from the discard pile;
-- the gender swap (−5 in the next fight);
-- Hen Hat Hex (−1 to die rolls until the headgear goes);
-- Tax Collector;
-- Grabby Neighbours;
-- Spiteful Mirror (no weapon bonuses next fight);
+- Sudden Nap (−4 in the next fight) and The Jitters (−1 to die rolls until the next fight ends);
+- Surprise Audit;
+- Nosy Neighbours and Leaky Pockets;
+- Noodle Arms (no weapon bonuses next fight);
 - losing the best item, and the rest.
 
 Treasures:
-- Mirror Twin doubles your strength; a second one triples it.
-- Sticky Paste forces another roll after an escape.
-- Pop-Up Wall, Vanishing Tonic, Weighted Die and Snack on a Stick are ways to get away.
-- Wishing Lantern works on your own turn, even after being caught.
-- Parrotify Potion removes a monster; you keep its treasure but get no level.
-- Not-My-Problem Potion hands the fight to someone else; you may still loot afterwards.
-- Ring of Undoing cancels a curse.
-- Rummaging Rod lets you take any discarded card.
-- Treasure Pile! draws 3 more treasures when you get it, and Heavenly Favor fires however it is drawn.
+- Second Wind doubles your strength; a second one triples it.
+- Bucket of Tar forces another roll after an escape.
+- Smoke Pellet, Shadow Step, Loaded Bones and Sausage on a Fork are ways to get away.
+- Genie in a Teapot works on your own turn, even after being caught.
+- Croak Powder removes a monster; you keep its treasure but get no level.
+- Not It! hands the fight to someone else; you may still loot afterwards.
+- Lucky Charm Bracelet cancels a curse.
+- Magpie's Map lets you take any discarded card.
+- Hidden Stash! draws 3 more treasures when you get it, and Saint's Day fires however it is drawn.
 
 ## Interpretations [H]
 - **[H1]** The helper takes the promised number of treasures first, from the top of the draw. At the table you would agree who picks.
 - **[H2] Out-of-turn plays:**
-  - Anyone may play curses, go-up-a-level cards, Level Heist and the Porter:
+  - Anyone may play curses, go-up-a-level cards, Steal the Spotlight and the Pack Mule:
     - during any fight;
     - in a short window at the start of each turn, before the door is kicked;
     - on their own turn.
   - The table rule is "any time". A browser game needs fixed moments.
 - **[H3] The "reasonable time" rule:** when the fighter says Fight, every other player in turn order gets one chance to play something. Any play hands the choice back to the fighter.
 - **[H4] Automatic choices:**
-  - *Timeshare Pitchman*: "lose 1,000 gold of items" loses the least useful items automatically.
-  - *Tax Collector*: the other players' payments are chosen automatically.
+  - *Shaggy Moocher*: "lose 600 gold of items" loses the least useful items automatically.
+  - *Surprise Audit*: the other players' payments are chosen automatically.
   - Several monsters are run from in the order they appeared.
-  - Everything else the rules leave to a player is asked of a human: which item to lose, what to loot, whether to use Ring of Undoing, Sticky Paste or an escape card, whether to throw a pole to the Snappy Hound, and so on.
+  - Everything else the rules leave to a player is asked of a human: which item to lose, what to loot, whether to use Lucky Charm Bracelet, Bucket of Tar or an escape card, whether to throw a pole to the Barghest Pup, and so on.
 - **[H5]** An Elf's helper level can't be the winning level. The rules sheet is silent and the FAQ has no ruling, so this is a house-rule choice.
-- **[H6]** Only the fighter's own escape rolls and theft rolls use the Weighted Die and Hen Hat Hex's −1.
+- **[H6]** Only the fighter's own escape rolls and theft rolls use Loaded Bones and The Jitters' −1.
 - **[H7]** A cap of 600 turns ends a stuck game on the highest level. It has never triggered in tests.
 
 ## Not included
-- Trading items between players (you can still give away cards through charity, looting and Mind If I Borrow That?).
+- Trading items between players (you can still give away cards through charity, looting and Quick Loan).
 - Charity among several players tied for lowest: the rulebook says to split the extras as evenly as you can. Here you give each extra card to any of them freely.
-- Cleric Resurrection covers the two face-up draws this version has: kicking open the door, and the treasure of a fight won with help. Treasure won alone is drawn face-down, as in the rulebook.
+- Cleric Second Chance covers the two face-up draws this version has: kicking open the door, and the treasure of a fight won with help. Treasure won alone is drawn face-down, as in the rulebook.
 
 ## Included since the last check
-- The Quick game (the rulebook's own faster-play option) is now in and is the default: listen at the door (a free face-down door card) at the start of every turn, and a helper who gives the winning level wins too. "Game length: Full" turns it off. The tutorial plays the full rules and says that Quick games listen every turn.
+- The Quick game (the rulebook's own faster-play option) is in as an optional variant; the base game is the default (owner, 20 Nov 2026): listen at the door (a free face-down door card) at the start of every turn, and a helper who gives the winning level wins too. "Game length: Quick" turns it on. The tutorial plays the full rules and says that Quick games listen every turn.
 - Online play. It needs private hands per player, so it's left for a later version. Friends on one device use a pass-the-device screen that hides hands.
 
 ## Expansions
@@ -138,7 +133,7 @@ The inventory (`inventory.md`) has the full card data for original expansions 3,
 
 ## Tests (headless)
 - **Rule scenarios:** `rules-test.js` has 42 small positions, each checking one rule above. All pass.
-- **Forced coverage:** `force.js` put every one of the 147 cards into a hand for 3 games of 40 turns each: 0 errors and 0 rule-check failures. Card names were checked in the log as a sign of use; four rarely come up in computer play (Loophole, Mind If I Borrow That?, Smoke and Mirrors, Sudden Gust), and the scenario tests cover them directly.
+- **Forced coverage:** `force.js` put every card into a hand for 3 games of 40 turns each: 0 errors and 0 rule-check failures. Card names were checked in the log as a sign of use; four rarely come up in computer play (the rule-bending, borrow-to-win and swap-a-monster cards, at the last check with the earlier pool), and the scenario tests cover them directly.
 - **Computer games:**
   - `gauntlet.js` and `cover.js` played computer games with 0 errors and 0 rule-check failures after the fixes.
   - Games last about 45–75 turns with 4 heroes (11–19 rounds each).

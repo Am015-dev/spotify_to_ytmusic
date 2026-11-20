@@ -28,7 +28,7 @@
       tutStart();
       return GXS.wait(function () { return GXT.active() && G && G.tut; }, 8000).then(function () {
         // the staged deal: Pip plays Lizards from his hand against the door ("look for trouble"), then the Help step asks for the Help button
-        var id = pull(idOf('lizards')); G.active = 0; G.phase = 'after'; G.fought = false; apply({ act: 'trouble', card: id }, 0); G.cb.stage = 'act'; render();
+        var id = pull(idOf('platybrute')); G.active = 0; G.phase = 'after'; G.fought = false; apply({ act: 'trouble', card: id }, 0); G.cb.stage = 'act'; render();
         GXT.goto('help');
         return GXS.wait(function () { var s = GXT.state(); return s.id === 'help' && s.shown; }, 8000);
       });
@@ -154,7 +154,7 @@
     setup: function () {
       table(12); UI.pause = true; try { GXH.setEnabled(false); } catch (e) { }
       var ob = window.__ko = { door0: 0, door1: 0, card: 0, early: '' };
-      var m = idOf('lizards'); if (m != null) { pull(m); G.door.push(m); }   // a plain monster on top: no boss clip
+      var m = idOf('platybrute'); if (m != null) { pull(m); G.door.push(m); }   // a plain monster on top: no boss clip
       var iv = setInterval(function () {
         var now = performance.now(), r = document.getElementById('bfrev');
         if (r) { if (!ob.door0 && r.classList.contains('door')) ob.door0 = now; var i = r.querySelector('.bfd3 img'); if (!ob.door1 && r.classList.contains('open')) { ob.door1 = now; }
@@ -184,7 +184,7 @@
       table(11); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
       var obs = window.__obs = { clip: false, played: false, rev: false, card: false, sfx: 0, clipUrl: '' };
       var sf = window.sfx; window.sfx = function () { obs.sfx++; return sf && sf.apply(this, arguments); };
-      var boss = idOf('wyrm'); pull(boss); G.door.push(boss);   // top of the door pile
+      var boss = idOf('bogwyrm'); pull(boss); G.door.push(boss);   // top of the door pile
       var iv = setInterval(function () {
         var c = document.getElementById('bfclip'); if (c) { obs.clip = true; var v = c.querySelector('video'); if (v) { obs.clipUrl = v.currentSrc || v.src; if (v.readyState >= 2 && !v.paused) obs.played = true; } }
         if (document.getElementById('bfrev')) obs.rev = true;
@@ -204,7 +204,7 @@
       { kind: 'fn', name: 'the boss clip showed before the card', fn: function () { return window.__obs.clip || 'no #bfclip appeared for a boss'; } },
       { kind: 'fn', name: 'the boss clip file loads over http', fn: function () { return window.__obs.clip ? (window.__obs.clipUrl.indexOf('http') === 0 || 'clip src ' + window.__obs.clipUrl) : true; } },
       { kind: 'fn', name: 'sound played (sfx calls)', fn: function () { return window.__obs.sfx > 0 || 'no sfx() call during the reveal'; } },
-      { kind: 'fn', name: 'the monster is in the fight', fn: function () { return !!G.cb && G.cb.mons.length > 0 && G.C[G.cb.mons[0].id] === 'wyrm' || 'no wyrm in G.cb'; } },
+      { kind: 'fn', name: 'the monster is in the fight', fn: function () { return !!G.cb && G.cb.mons.length > 0 && G.C[G.cb.mons[0].id] === 'bogwyrm' || 'no Bog Wyrm in G.cb'; } },
       { kind: 'visible', sel: '.arena .row.mons .card', name: 'monster card landed' },
       { kind: 'eq', name: 'MONSTERS total', a: function () { return GXS.num('.sline .sm .n'); }, b: function () { return monStr(G.cb); } }
     ]
@@ -292,8 +292,8 @@
   // the gear-up moment: your hero big in the middle, the hand fanned below
   var gearUp = function (seed, longNames) {
     table(seed); G.phase = 'setup'; G.active = 0; G.setupOrd = G.pl.map(function (_, j) { return j; }); G.setupI = 0;
-    if (longNames) {   // the cards from the owner's screenshot: names with long words
-      var want = ['Shady Cloak', 'Soothing Sousaphone', 'Shieldmaiden Champion']; want.forEach(function (n) { var id = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).n === n; })[0]; if (id != null) { pull(id); P(0).hand.unshift(id); } });
+    if (longNames) {   // long card names: the longest words in the deck
+      var want = ['Cape of Dramatic Swishing', 'Greatsword of Mild Peril', 'Door-to-Door Zombie']; want.forEach(function (n) { var id = Object.keys(G.C).map(Number).filter(function (i) { return cd(i).n === n; })[0]; if (id != null) { pull(id); P(0).hand.unshift(id); } });
       P(0).hand = P(0).hand.slice(0, 8); window.__want = want.filter(function (n) { return P(0).hand.some(function (i) { return cd(i).n === n; }); });
     }
     render();
@@ -419,9 +419,10 @@
       checks: [{ kind: 'fn', name: hero + ' is on the end dialog (3D canvas or the @512 picture)', fn: function () { return !!document.querySelector('#modal .win3d') || 'no hero on the end dialog'; } }]
     });
   });
-  ['inferno', 'tentacles', 'pharaoh', 'skygrif', 'dread'].forEach(function (k, i) {
+  [['furnace', 'inferno'], ['kraken', 'tentacles'], ['mummy', 'pharaoh'], ['griffin', 'skygrif'], ['eyehood', 'dread']].forEach(function (kc, i) {
+    var k = kc[0], clip = kc[1];   // the scenario id keeps the clip's name: one clip per painted boss
     GXS.add({
-      id: 'dk-boss-' + k, name: 'Boss clip: ' + k, ask: 'Does the ' + k + ' boss clip play?', ls: { dkd_offer: '1' }, seed: 70 + i, when: booted, group: 'Art',
+      id: 'dk-boss-' + clip, name: 'Boss clip: ' + k, ask: 'Does the ' + k + ' boss clip play?', ls: { dkd_offer: '1' }, seed: 70 + i, when: booted, group: 'Art',
       setup: function () {
         table(70 + i); P(0).lvl = 3; UI.pause = false; try { GXH.setEnabled(false); } catch (e) { }
         var boss = idOf(k); pull(boss); G.door.push(boss); G.phase = 'main'; G.active = 0; UI.pause = true; render();
