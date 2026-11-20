@@ -42,7 +42,7 @@ function lineText(){if(!G)return '';if(G.over){const hs=G.pl.filter(x=>x.human);
   if(!hp){const nm=seatName(p);if(online()&&p.human)return `Waiting for ${nm}`;if(G.q)return `${nm} is choosing`;if(G.phase==='bid')return `${nm} is bidding`;return `${nm} is ${{move:G.move?'moving':'choosing',tribe:'collecting',tile:'acting',sell:'finishing'}[G.step]||'playing'}`}
   {const gs=typeof gdStep==='function'?gdStep():null;if(gs&&gs.who!=='me')return 'Tap Next to go on'}
   if(G.q)return qLine(G.q);if(UI.pendDj||UI.pendItem)return 'Tap a glowing tile';
-  if(G.phase==='bid'){const two=hp.markers>1;return two?'Pick 2 turns: earlier costs more':'Pick your turn: earlier costs more'}   // F2: says what bidding is for, in one plain line
+  if(G.phase==='bid'){const two=hp.markers>1;return two?'Pick 2 turns: earlier costs more':'Pick your turn: earlier costs more (coins are points)'}   // F2: says what bidding is for, in one plain line
   switch(G.step){
   case 'move':if(G.move&&typeof f3Mine==='function'){const f=f3Line();if(f)return f}return !G.move?'Tap a glowing tile to lift people':G.move.hand.length===1?'Last one: land on its colour':'Tap a glowing tile to drop one';
   case 'tribe':return {assassin:'Shadow: remove one person in reach',builder:hp.fk?'Tap Earn to take your coins':'Tap Collect to take your coins',merchant:'Tap Collect to fetch goods',vizier:'Tap Collect: Advisors join you',elder:'Tap Collect: Sages join you',artisan:'Tap Collect: Crafters join you'}[G.act.color]||'';

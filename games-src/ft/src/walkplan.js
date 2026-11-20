@@ -62,5 +62,5 @@ function f3TileTap(i){if(F3.playing)return true;try{if(f3Mine()&&!UI.chz){const 
     if(stepHere)F3.plan=null}}catch(e){console.error(e)}return false}
 function f3ActsHtml(){try{const pl=f3Live();if(pl){const nm=pl.n>1?MPLUR[pl.c]:MNAME[pl.c];
     return `<div class="arow f3row"><button class="ab go f3go" data-ui="f3go">✓ Drop along path · take ${pl.n} ${esc(nm)}</button><button class="ab ghost" data-ui="f3x" aria-label="Clear the path">✕</button></div>`}}catch(e){}return ''}
-function f3Line(){try{if(F3.playing&&G&&G.move)return 'Dropping along the path…';if(f3Live())return 'Tap ✓ to drop along this path';if(f3Mine())return 'Tap where the walk ends, or drop one'}catch(e){}return ''}
+function f3Line(){try{if(F3.playing&&G&&G.move)return 'Dropping along the path…';if(f3Live())return 'Tap ✓ to drop along this path';if(f3Mine())return G.move.hand.length===2?'2 left: the last must land on its colour':'Tap where the walk ends, or drop one'}catch(e){}return ''}
 function f3After(){try{f3Draw();f3Warn();f3Sold();f3Shadow()}catch(e){console.error(e)}}

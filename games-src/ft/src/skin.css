@@ -299,3 +299,6 @@ html body .mbox.over .prompt{overflow:auto!important;min-height:0}html body .mbo
 #grid .tile:has(.why) .gain{display:none!important}
 /* F3: while the rival plays, the status line keeps room for Skip at its right end */
 html.skipon body #line{padding-right:96px!important;box-sizing:border-box}html body #skipai{min-height:28px!important;line-height:1!important}
+
+/* F3 cold play: the moves log never takes a click from the buttons under it (PC) */
+html.land #feed{pointer-events:none}html.land #acts,html.land #mine{z-index:3}
