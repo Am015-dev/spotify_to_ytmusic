@@ -22,7 +22,7 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         seen[b.id] = seen[b.id] || now; if (now - seen[b.id] > 300 && !window.__dead.some(d => d.b === b.id && d.step === (cur && cur.id))) window.__dead.push({ b: b.id || b.textContent, step: cur && cur.id }); }); }, 100); });
     const tb = await p.$('#tutSlot button'); const bb0 = await tb.boundingBox(); await p.touchscreen.tap(bb0.x + bb0.width / 2, bb0.y + bb0.height / 2);
     const seen = [], rulesAll = await p.evaluate(() => TUT_RULES.slice()), total = await p.evaluate(() => tutSteps().length);
-    let k = 0, ended = false, taps = 0, ignored = 0;
+    let k = 0, ended = false, taps = 0, ignored = 0; const covers = [];
     const tsig = () => p.evaluate(() => [GXT.state().i, !!document.querySelector('.gxt-end'), window.G ? G.phase + G.round + (G.pend ? G.pend.t : '') + UI.sel.length + UI.gear + document.querySelectorAll('.cd.sel,.cd.on').length : ''].join('|'));
     const chk = async s0 => { taps++; for (let w = 0; w < 30; w++) { await p.waitForTimeout(100); if ((await tsig()) !== s0) return; } ignored++; problems.push('ignored tap at step ' + s0.split('|')[0]); };
     for (let guard = 0; guard < 200 && !ended; guard++) {
@@ -36,6 +36,10 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
         const words = st.say.trim().split(/\s+/).length, sentences = (st.say.match(/[.!?](\s|$)/g) || []).length;
         if (words > 12) problems.push(st.id + ': ' + words + ' words');
         if (sentences > 1) problems.push(st.id + ': ' + sentences + ' sentences');
+        await p.waitForTimeout(200);   /* F4: the bubble never sits on the line, the gears, Go, Boost or a question button (except the step's own target) */
+        const cv = await p.evaluate(() => { const bub = document.querySelector('.gxt-bub'); if (!bub) return []; const B = bub.getBoundingClientRect(), tg = GXT.current().target && GXT.current().target(), out = [];
+          document.querySelectorAll('#msg, .gb, #goB, #boostT, .slipq button').forEach(e => { if (e === tg || (tg && tg.contains && tg.contains(e))) return; const r = e.getBoundingClientRect(); if (!r.width) return; const ix = Math.min(B.right, r.right) - Math.max(B.left, r.left), iy = Math.min(B.bottom, r.bottom) - Math.max(B.top, r.top); if (ix > 4 && iy > 4) out.push(e.id || e.className); }); return out; });
+        if (cv.length) covers.push(st.id + ':' + cv.join('+'));
         if (shots) { fs.mkdirSync(shots, { recursive: true }); await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, 'tut-' + k + '.png') }); }
       }
       await p.waitForTimeout(650);   // the shell ignores taps in the first 600 ms of a step
@@ -48,7 +52,9 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
     if (JSON.stringify(ruleSeq) !== JSON.stringify(rulesAll)) problems.push('rules in order: got ' + ruleSeq.join(','));
     if (seen.length !== total) problems.push('steps shown ' + seen.length + ' of ' + total);
     const real = await p.evaluate(() => { const s = G.cars[0].stats; return { spins: s.spins, stalls: s.stalls || 0, boosts: s.boosts, slips: s.slips }; });
-    if (real.spins !== 1 || real.stalls !== 1 || real.boosts !== 1 || real.slips !== 1) problems.push('played moves ' + JSON.stringify(real));   // spin out, stall, boost, slipstream really happened
+    if (real.spins !== 0 || real.boosts !== 1 || real.slips !== 1) problems.push('played moves ' + JSON.stringify(real));   // F4: boost and slipstream really happened; no forced spin-out (it is explained, not staged)
+    if (taps > 22) problems.push('tutorial taps ' + taps + ' > 22');
+    if (covers.length) problems.push('bubble covers needed UI: ' + covers.join(','));
     const dead = await p.evaluate(() => window.__dead); if (dead.length) problems.push('dead taps: ' + JSON.stringify(dead));
     if (!ended) problems.push('end card not reached');
     else {

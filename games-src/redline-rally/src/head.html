@@ -131,7 +131,7 @@ html body .gxc-node .gxc-disc{color:#fff!important;background:#2e1c0c!important}
 :root:has(.gxh-bub.on) #banner.rate,:root:has(.gxh-bub.on) #trk .rate{display:none!important}
 .cd.glow{animation:cdGlow 1.4s ease-in-out 3}
 @keyframes cdGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,194,58,0)}50%{box-shadow:0 0 0 3px rgba(255,194,58,.85)}}
-.cd.dim{opacity:.5;filter:saturate(.6)}
+.cd.dim{opacity:.72;filter:saturate(.75)}
 .cd.flip{animation:cdFlip .38s ease-out}
 @keyframes cdFlip{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
 #acts .go.glow{animation:goGlow 1.2s ease-in-out 3}
@@ -211,19 +211,40 @@ ul.goal{margin:6px 0 12px 18px;padding:0}ul.goal li{margin:6px 0;font-size:16px;
 #hand.dropz::before{content:"Drop here to play";position:absolute;left:4px;right:4px;bottom:calc(100% + 4px);height:40px;display:flex;align-items:center;justify-content:center;border:2px dashed var(--gold);border-radius:12px;color:var(--gold);font-weight:800;font-size:15px;background:rgba(20,16,4,.82);z-index:4;pointer-events:none}
 #hand.dropon::before{background:rgba(255,194,58,.28);color:#fff}
 .cd.snap{animation:cdSnap .22s ease-out}@keyframes cdSnap{0%{transform:translateY(-30px) scale(1.12)}100%{transform:translateY(-12px)}}
-/* PC: the board fills the screen; hand, gears and Go are one bottom dock (no cropped board, no empty side panel) */
+/* F4 PC (owner): use the width. Left panel: score, phases, standings; centre: the track, large; right panel: the line, gears, hand, Go.
+   The dock and its body become layout-only (display:contents) so their children sit straight in the three-column grid. */
 @media (min-width:1000px) and (min-height:521px){
-  html #game .gx-main{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) auto!important}
-  html #game .gx-dock{border-left:0;border-top:2px solid #324059;max-height:none;width:auto}
-  html #game .gx-dock-head{display:none}
-  html #game .gx-dock-body{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);grid-template-areas:"trk panel" "msg panel";align-items:center;column-gap:18px;padding:8px 18px 10px;overflow:visible}
-  html #game #trk{grid-area:trk;margin:0}html #game #msg{grid-area:msg;border:0;border-radius:10px;justify-content:flex-start;text-align:left}
-  html #game #panel{grid-area:panel;display:grid;grid-template-columns:auto minmax(0,1fr) 250px;grid-template-areas:"gears hand acts" "tray tray tray";align-items:center;gap:6px 16px;padding:0}
-  html #game #gears{grid-area:gears;display:grid;grid-template-columns:auto 84px 84px;grid-template-rows:auto auto;gap:6px}html #game #gears .gl{grid-row:1/3;width:58px;max-width:none}html #game #gears{background-position:left center;background-size:auto 80%}
-  html #game #hand{grid-area:hand;flex-wrap:nowrap}html #game #acts{grid-area:acts;flex-wrap:wrap}html #game #acts .go{flex:1 1 100%;order:-1;min-height:60px}html #game #acts .bo,html #game #acts .swapb{flex:1 1 0}
-  html #game #tray{grid-area:tray}
-  html #game #panel:not(:has(#gears)){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center}
+  html #game .gx-main{grid-template-columns:clamp(250px,19vw,330px) minmax(0,1fr) clamp(360px,27vw,470px)!important;grid-template-rows:auto minmax(0,1fr)!important;grid-template-areas:"left board msg" "left board panel"!important}
+  html #game .gx-board{grid-area:board;min-width:0;min-height:0}
+  html #game .gx-dock{display:contents}
+  html #game .gx-dock-head,html #game .gx-reopen{display:none!important}
+  html #game .gx-dock-body{display:contents}
+  html #game #trk{grid-area:left;margin:0;padding:12px 12px 10px;background:#121a28;border-right:2px solid #324059;overflow:auto;min-height:0}
+  html #game #msg{grid-area:msg;margin:10px 12px 0;border-radius:10px;text-align:left;justify-content:flex-start;min-height:52px}
+  html #game #panel{grid-area:panel;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:10px 12px 14px;overflow:auto;min-height:0;border-left:0}
+  html #game .gx-main>aside,html #game #panel{background:#121a28}
+  html #game #gears{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:none;padding:0}html #game #gears .gl{display:none}
+  html #game .gb{min-height:58px}
+  html #game #hand{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+  html #game #acts{display:flex;flex-wrap:wrap;gap:8px}html #game #acts .go{flex:1 1 100%;order:-1;min-height:64px;font-size:24px}html #game #acts .bo,html #game #acts #sugB{flex:1 1 0;min-height:48px;font-size:16px}
+  html #game #trk .phs{flex-wrap:wrap}
+  html #game .rlog .rl{font-size:16px;padding:6px 10px}html #game .rlog .rl small{font-size:14px}
 }
+/* F4: lap and place badges look different: lap = outlined grey with its flag, place = solid gold */
+.gx-bar .pill.lapb{background:transparent;border:2px solid #5b6a86;color:#dfe6f3}.gx-bar .pill.lapb b{color:#fff}
+.gx-bar .pill.placeb{background:var(--gold);color:#1a1405;border:2px solid var(--gold)}.gx-bar .pill.placeb b{color:#1a1405}.gx-bar .pill.placeb .ic{filter:brightness(0)}
+/* F4: heat line, boost toggle, round log, standings, end tips */
+.heatl{font-size:14px;line-height:1.3;color:#e6ecf7;text-align:center;padding:4px 8px;border-radius:8px;background:#1a2232;margin:2px 0}.heatl b{color:#ffb27a}.heatl .ok{color:#8cf0b4;font-weight:800;text-decoration:underline}
+#acts .bo{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}#acts .bo small{font-size:12px;font-weight:700;color:#c9d3e6}#acts .bo.on{color:var(--gold)}
+.rlog{display:flex;flex-direction:column;gap:3px;margin-top:6px;width:100%}
+.rlog .rl{display:grid;grid-template-columns:10px minmax(48px,auto) 1fr auto auto;align-items:center;gap:6px;font-size:14px;padding:3px 8px;border-radius:8px;background:#1a2232;color:#e6ecf7}
+.rlog .rl i{width:10px;height:18px;border-radius:3px}.rlog .rl.me{outline:2px solid var(--gold)}.rlog .rl em{font-style:normal;color:#8cf0b4;font-weight:700}.rlog .rl em.bad{color:#ff9a7a}.rlog .rl small{color:#aab6cc;font-size:13px}
+.stl-h{margin:12px 0 4px;font-weight:900;font-size:15px;color:#aab6cc;text-transform:uppercase;letter-spacing:.06em}
+.stand-l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.stand-l li{display:grid;grid-template-columns:34px 10px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;padding:6px 8px;border-radius:8px;background:#1a2232}
+.stand-l li .n{grid-row:1/3;font-weight:900;font-size:18px;color:#fff}.stand-l li i{grid-row:1/3;width:10px;height:30px;border-radius:3px}.stand-l li b{font-size:16px}.stand-l li small{font-size:13px;color:#aab6cc}
+.stand-l li.me{outline:2px solid var(--gold)}.stand-l li.me b{color:var(--gold)}
+.tips{margin:8px 0 6px;padding:8px 12px;border-radius:10px;background:#1a2232;border-left:4px solid var(--gold);text-align:left}.tips b{display:block;font-size:14px;color:var(--gold);text-transform:uppercase;letter-spacing:.05em}.tips p{margin:4px 0;font-size:15px;line-height:1.35}
 /* W496: 375px phones: the top bar fits (Menu stayed 7px past the edge); podium title readable over the art */
 @media (max-width:389px){.gx-bar .pill .pw{display:none}.gx-bar .pill{padding:3px 5px}}
 button.pill#posChip{font:inherit;color:inherit;border:0;min-height:44px;cursor:pointer}

@@ -55,7 +55,7 @@ function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
   RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
   /* leaderboard, top-left */
-  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500;   /* phones: standings live in the Place chip (tap it), nothing over the track */
+  var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500 && !pcWide();   /* F4: PC has a standings side panel */   /* phones: standings live in the Place chip (tap it), nothing over the track */
   if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
   var lx = W - bw - 6, ly = H - (rh * n + 10) - 6; if (H < 260) ly = 6; cx.fillStyle = 'rgba(8,12,20,.78)'; rr(lx, ly, bw, rh * n + 10, 8); cx.fill();
   cx.font = '800 ' + fs + 'px sans-serif'; cx.textBaseline = 'middle';
@@ -122,6 +122,7 @@ function previewSet(ci) {
 }
 
 /* ---------- turn tracker: round, lap, phase, cards left; plus the last round's rating ---------- */
+function pcWide() { return innerWidth >= 1000 && innerHeight >= 521; }
 function setPhase(ph) { RACE.ph = ph; tracker(); }
 function tracker() {
   var d = document.getElementById('trk'); if (!d) { var body = document.querySelector('.gx-dock-body'); if (!body) return; d = document.createElement('div'); d.id = 'trk'; body.insertBefore(d, body.firstChild); }
@@ -129,13 +130,18 @@ function tracker() {
   var mine = G.phase === 'plan' || (curCar(G) && curCar(G).i === me.i) || G.pend;
   var dt = document.getElementById('dockt'); if (dt) dt.textContent = 'Round ' + G.round + ' · Lap ' + lap + '/' + G.laps + ' · Deck ' + me.deck.length + ' · Discard ' + me.disc.length + (G.wx && G.wx !== 'dry' ? ' · ' + WEATHER[G.wx].name : '');
   var rk = rankList(G), pl = rk.indexOf(me.i) + 1, ld = G.cars[rk[0]], gap = ld.pos - me.pos, nm = function (c) { return c.human && !G.hot ? 'You' : c.name.split(' ')[0]; };
-  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' by ' + lead2 + ' over ' + nm(G.cars[rk[1]]) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap > 0 ? nm(ld) + ' leads by ' + gap : ld.fin ? nm(ld) + ' finished first' : 'level with ' + nm(ld));
+  var lead2 = rk[1] != null ? me.pos - G.cars[rk[1]].pos : 0, spc = function (n) { return n + ' space' + (n === 1 ? '' : 's'); }, sc = pl === 1 ? 'You lead' + (rk[1] != null ? (lead2 > 0 ? ' ' + nm(G.cars[rk[1]]) + ' by ' + spc(lead2) : ', level with ' + nm(G.cars[rk[1]])) : '') : 'You ' + ord(pl) + ' of ' + rk.length + ' · ' + (gap > 0 ? nm(ld) + ' is ' + spc(gap) + ' ahead' : ld.fin ? nm(ld) + ' finished first' : 'level with ' + nm(ld));
   var h = '<button type="button" class="score" id="scoreL" title="Race order: tap for why">' + esc(sc) + '<i>why?</i></button><ol class="phs" aria-label="Your turn phases">';
   if (UI.W && dashOff(UI.W, UI.H)) {   /* short boards: the dashboard as one dock line, the board stays clear */
     var ph = PHASES.filter(function (p) { return p[0] === RACE.ph; })[0], nc = nextCorner(me.pos), gr = G.phase === 'plan' && me.i === UI.seat && !me.plan ? UI.gear : me.gear;
     h += '<li class="dm">Gear <b>' + gr + '</b></li><li class="dm' + (me.eng <= 1 ? ' hot' : '') + '">Heat <b>' + me.eng + '</b></li>' + (nc ? '<li class="dm">Corner <b class="sgn">' + nc.limit + '</b> in ' + nc.d + '</li>' : '') + (mine && ph ? '<li class="on">' + ph[1] + '</li>' : '');
   } else PHASES.forEach(function (p) { h += '<li class="' + (mine && RACE.ph === p[0] ? 'on' : '') + '">' + p[1] + '</li>'; });
   h += '</ol>';
+  if (pcWide()) {   /* F4: PC side panel: the standings, with the gap in spaces */
+    h += '<div class="stl-h">Standings</div><ol class="stand-l">'; rk.forEach(function (ci, k) { var x = G.cars[ci], lp = Math.min(G.laps, Math.floor(x.pos / T(G).N) + 1), gp = k ? ld.pos - x.pos : 0;
+      h += '<li class="' + (x.human && !G.hot ? 'me' : '') + '"><span class="n">' + ord(k + 1) + '</span><i style="background:' + COLS[x.col].hex + '"></i><b>' + esc(nm(x)) + '</b><small>' + (x.fin ? 'finished' : !k ? 'leader' : gp ? gp + ' behind' : 'level') + ' · lap ' + lp + ' · gear ' + x.gear + '</small></li>'; });
+    h += '</ol>';
+  }
   d.innerHTML = h; var sb = document.getElementById('scoreL'); if (sb) sb.onclick = scoreWhy;
 }
 /* the computer's best plan for this hand, as a yardstick for the round rating */

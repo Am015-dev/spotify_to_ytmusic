@@ -1,4 +1,4 @@
-/* Records the first 3 minutes of a fresh player at 375x667 by touch (Suggest shows the plan, the player taps the gold gear and cards, then Go) into proof/first-3-min-375x667.webm.  Usage: node proof-record.js */
+/* Records the first 3 minutes of a fresh player at 375x667 by touch (F4: cards are picked for the gear; the player taps Suggest now and then, the gold gear, then Go) into proof/first-3-min-375x667.webm.  Usage: node proof-record.js */
 const path = require('path'), fs = require('fs'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] }), dir = '/tmp/rr-vid';
@@ -11,7 +11,7 @@ const path = require('path'), fs = require('fs'), { chromium } = require(process
     if (st.goal) { await p.tap('#goalB'); } else if (st.modal) { await p.tap('#modal button.big').catch(() => {}); }
     else if (st.ph === 'plan' && !st.busy) {   /* F3: Suggest only shows the plan in gold; the player taps the gear and the cards, reads the trade-off line, then Go */
       if (st.sug && !(await p.$('.gb.sg, .cd.sg'))) { await p.tap('#sugB'); await p.waitForTimeout(1200); }
-      for (let k = 0; k < 6; k++) { const e = await p.$('.gb.sg:not(.on)') || await p.$('#hand .cd.sg:not(.sel)'); if (!e) break; await e.tap(); await p.waitForTimeout(600); }
+      { const e = await p.$('.gb.sg:not(.on)'); if (e) { await e.tap(); await p.waitForTimeout(700); } }
       if (await p.$('#goB:not([disabled])')) { await p.waitForTimeout(900); await p.tap('#goB'); } }
     else if (st.q) { await p.waitForTimeout(1400); const e = await p.$('#panel .slipq button.sug') || await p.$('#discN') || await p.$('#panel .slipq button'); if (e) await e.tap(); }
     await p.waitForTimeout(500);

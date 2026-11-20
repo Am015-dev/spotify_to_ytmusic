@@ -9,14 +9,14 @@ var AIP = { easy: { noise: 3, hw: 1.8, mis: 0.2, misBy: 3, lift: 0.3 }, normal: 
 function aiP(G, c) { return AIP[aiLvl(G, c)] || AIP.normal; }
 function aiNoise(G, c) { return aiP(G, c).noise; }
 function heatW(c, extra, G) { return (G ? aiP(G, c).hw : 1.25) + (c.eng - extra <= 2 ? 0.9 : 0); }
-function aiPlan(G, c) {
+function aiPlan(G, c, onlyG) {   /* onlyG: plan for this one gear (the player's card auto-pick) */
   var N = T(G).N, avg = avgSpeed(c), best = null, handHeat = c.hand.filter(function (x) { return x === 'H'; }).length;
   var play = []; c.hand.forEach(function (x, j) { if (x !== 'H') play.push(j); });
   var adr = G.adr.indexOf(c.i) >= 0 ? 1 : 0, others = G.cars.filter(function (o) { return o !== c; });
   var lv = aiLvl(G, c), easy = lv === 'easy', P = aiP(G, c);
   var mis = P.mis && rnd(G) < P.mis ? P.misBy : 0;   /* rookies misjudge a corner now and then: this round they read every limit higher (spins, burnt heat). Easy often, Normal rarely */   /* easy rivals drive like careful rookies: never top gear, never boost (W496: a new player can reach the podium) */
   var lift = P.lift && rnd(G) < P.lift;   /* rookies sometimes hold their gear instead of shifting up */
-  gearOpts(c).filter(function (go) { return !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
+  gearOpts(c).filter(function (go) { return onlyG == null || go.g === onlyG; }).filter(function (go) { return onlyG != null || !easy || (go.g <= 3 && (!lift || go.g <= c.gear)); }).forEach(function (go) {
     var k = needCards(c, go.g);
     combos(play, k).forEach(function (idx) {
       var base = 0, nx = 0, ul = 0, uc = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { base += UPG[u].sp; ul += UPG[u].lim; uc += UPG[u].cool; } else if (x === 'X') { base += avg; nx++; } else base += +x; });
@@ -61,6 +61,8 @@ function aiBoost(G, c) {   /* react step: boost only if the committed plan wante
   return heat <= c.eng - 1;
 }
 /* Suggest: plans the player's own hand from the player's seat with the strongest planner ('pro'), on a copy of the game */
+/* F4: the cards the planner would play in the gear you picked (no boost: boost is its own toggle) */
+function autoPickPlan(G, c, g) { var g2 = JSON.parse(JSON.stringify(G)), c2 = g2.cars[c.i]; c2.lvl = 'pro'; c2.human = false; g2.adr = g2.adr || []; var p = aiPlan(g2, c2, g); return p && p.gear === g ? (p.idx || []) : null; }
 function suggestPlan(G, c) { var g2 = JSON.parse(JSON.stringify(G)), c2 = g2.cars[c.i]; c2.lvl = 'pro'; c2.human = false; return aiPlan(g2, c2); }
 function suggestBoost(G, c) { var c2 = JSON.parse(JSON.stringify(c)); c2.lvl = 'pro'; c2.plan = { boost: true }; return aiBoost(G, c2); }
 function suggestSlip(G, c) { var q = G.pend; if (!q || q.t !== 'slip') return false; var c2 = JSON.parse(JSON.stringify(c)); c2.lvl = 'pro'; return aiSlip(G, c2, q.from, q.L0, q.L1, q.speed, q.lim); }

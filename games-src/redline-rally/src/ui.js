@@ -58,7 +58,7 @@ function startGame(o) {
   G = newGame({ track: s.track, laps: s.laps, n: s.hum + s.opp, humans: s.hum, diff: s.diff, seed: o && o.seed != null ? o.seed : UI.seedArg, upg: !!s.upg, climit: s.climit, lowheat: s.lowheat, cmp: s.cmp, wx: o && (o.tut || o.cmp) ? 'dry' : wx, sup: !(o && o.tut) && s.sup !== false });
   if (s.hum === 1) { G.cars[0].name = 'You'; G.cars[0].drv = ''; }   /* the player is "You", never a named driver (the story's rival Kit must be someone else) */
   if (o && o.tut) { [['kit', 'Kit Marlow'], ['juno', 'Juno Vega']].forEach(function (d, k) { G.cars[k + 1].drv = d[0]; G.cars[k + 1].name = d[1]; }); }
-  window.G = G; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
+  window.G = G; UI.ts = { ch: 0, w: null, n: 0, gs: 0 }; UI.seat = 0; UI.sel = []; UI.boost = false; UI.busy = false; UI.pops = [];
   UI.vis = G.cars.map(function (c) { return { p: c.pos, rot: 0, glow: 0 }; });
   UI.focus = 0; var blb = $('#bulbbtn'); if (blb) blb.hidden = !hintsOn(); $('#title').hidden = true; $('#game').hidden = false; closeModal();
   $('#tTrk').textContent = TK[G.track].name;
@@ -94,9 +94,26 @@ function you() { return G.cars[UI.seat]; }
 function planFor(ci) {
   if (ci == null) return startRound();
   UI.seat = ci; UI.focus = ci; var c = G.cars[ci];
-  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = [];   /* last round's pops leave before you plan: only the move preview is on the track */
+  UI.sel = []; UI.gear = c.gear; UI.boost = false; UI.pops = []; UI.boostWant = UI.boostWant || {}; UI.boostWant[ci] = false; UI.sel = autoPick(c, UI.gear);   /* last round's pops leave before you plan: only the move preview is on the track */
   if (G.hot) { UI.lockModal = true; modal('<h2>Pass to ' + esc(c.name) + '</h2><p>Hide the other hands. Tap when it is your turn.</p><button class="big" id="rdy" style="width:100%">I am ' + esc(c.name.split(' ')[0]) + '</button>'); $('#mx').hidden = true; $('#rdy').onclick = function () { UI.lockModal = false; closeModal(); drawPlan(); }; return; }
   drawPlan(); camToPlan();
+}
+/* F4: the cards for the gear you pick are chosen for you (the planner's best for that gear; the Suggest plan when it is that gear).
+   Tap a card to swap it. A normal turn is: gear (if it changes), Go. */
+function autoPick(c, g) {
+  var need = needCards(c, g); if (!need) return [];
+  if (UI.mode === 'tutorial' && typeof tutPick === 'function') { var tp = tutPick(c, g); if (tp) return tp; }
+  var idx = null; try { var sp = planOnce(); if (sp && sp.gear === g && sp.idx) idx = sp.idx.slice(); } catch (e) { }
+  if (!idx) try { idx = autoPickPlan(G, c, g); } catch (e) { idx = null; }
+  if (!idx || idx.length !== need) { idx = []; var vals = c.hand.map(function (x, j) { return { j: j, v: x === 'H' ? -9 : x === 'X' ? 2.4 : upgId(x) ? UPG[upgId(x)].sp : +x }; }).filter(function (o) { return o.v > -9; }); vals.sort(function (a, b) { return b.v - a.v; }); idx = vals.slice(0, need).map(function (o) { return o.j; }); }
+  return idx;
+}
+function heatLine(c) {   /* F4: one line: your engine heat, the Heat cards in hand and which gear clears how many (the gear you picked in green) */
+  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, adr = G.adr && G.adr.indexOf(c.i) >= 0 ? 1 : 0, g = UI.gear;
+  var t = '<b>Engine heat ' + c.eng + '/' + ENGINE0 + '</b>';
+  if (!hh) return t + ' · no Heat cards';
+  var part = function (q) { var n = Math.min(hh, COOL[q] + adr); return '<span class="' + (g === q && n ? 'ok' : '') + '">gear ' + q + ' clears ' + n + '</span>'; };
+  return t + ' · ' + hh + ' Heat card' + (hh > 1 ? 's' : '') + ': ' + part(1) + ', ' + part(2);
 }
 function curveInfo() {   /* what the selected cards would do at the next corner */
   var c = you(), sp = 0, nx = 0, ul = 0; UI.sel.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; });
@@ -125,20 +142,22 @@ function drawPlan() {
   h += '</div><div id="hand">';
   var needNow = needCards(c, UI.gear), full = UI.sel.length >= needNow;
   c.hand.forEach(function (x, j) { var on = UI.sel.indexOf(j) >= 0; h += cardHtml(x, on, x === 'H' || (UI.swap && x === 'X'), j, x === 'H' ? '' : on ? '' : full ? 'dim' : tutOn() || sugShown() ? '' : 'glow'); });
-  UI.boost = false;   /* boost is never planned: it is offered after the reveal (React step) */
-  h += '</div>' + cardLegend(c.hand) + '<div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="go" id="goB">Go!</button></div>';
+  UI.boost = false;   /* boost is never planned: the toggle below is your answer to the boost question after the reveal (React step) */
+  UI.boostWant = UI.boostWant || {}; var bw = !!UI.boostWant[c.i], bOk = c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) >= 1; if (!bOk) bw = UI.boostWant[c.i] = false;
+  h += '</div>' + cardLegend(c.hand) + '<div class="heatl" id="heatl">' + heatLine(c) + '</div><div id="acts">' + (hintsOn() ? '<button id="sugB">Suggest</button>' : '') + '<button class="bo' + (bw ? ' on' : '') + '" id="boostT" aria-pressed="' + bw + '"' + (bOk ? '' : ' disabled') + ' title="After the cards show: pay 1 heat, flip one more speed card. Skipped if it could spin you out. Key B">Boost ' + (bw ? 'on' : 'off') + '<small>-1 heat, +1-4</small></button><button class="go" id="goB" title="Key Enter">Go!</button></div>';
   var hh = c.hand.filter(function (x) { return x === 'H'; }).length, pips = ''; for (var q = 0; q < ENGINE0; q++) pips += '<i class="pip' + (q < c.eng ? ' on' : '') + '"></i>';
-  if (hintsOn()) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
+  if (false) h += '<div class="chips tray" id="tray"><span class="eng" title="Engine heat: your fuel. Corners burn it."><em>Engine heat</em><span class="pips">' + pips + '</span><b data-engine="G.cars[' + c.i + '].eng">' + c.eng + '</b></span><span title="Heat cards stuck in your hand. Gear 1 or 2 cools them back."><em>Dead heat in hand</em> <b>' + hh + '</b></span>' + '</div>';
   p.innerHTML = h; artApply(p);
   var sgp = sugShown(), sgDone = sgp && sgp.gear === UI.gear && sgp.idx.length === UI.sel.length && sgp.idx.every(function (j) { return UI.sel.indexOf(j) >= 0; });
   if (sgp) { var gb0 = p.querySelector('.gb[data-g="' + sgp.gear + '"]'); if (gb0) gb0.classList.add('sg'); sgp.idx.forEach(function (j) { var cb = p.querySelector('.cd[data-i="' + j + '"]'); if (cb) cb.classList.add('sg'); }); }
-  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = UI.sel.slice(0, needCards(c, UI.gear)); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
+  p.querySelectorAll('.gb').forEach(function (b) { b.onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'gear', g: +b.getAttribute('data-g') })) return; sfx('gear'); UI.touchedGear = 1; UI.gear = +b.getAttribute('data-g'); UI.sel = autoPick(c, UI.gear); if (c.eng - (Math.abs(UI.gear - c.gear) === 2 ? 1 : 0) < 1) UI.boost = false; drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { b.onclick = function () { var j = +b.getAttribute('data-i'); if (c.hand[j] === 'H') { setMsg('Heat cards cannot be played.', 'warn'); return; } var k = UI.sel.indexOf(j);
     if (tutOn()) { if (k >= 0 || !GXT.act({ type: 'tap', what: 'card', i: j })) return; }
     sfx('card'); UI.note = upgId(c.hand[j]) ? UPG[upgId(c.hand[j])].name + ': ' + UPG[upgId(c.hand[j])].txt : ''; if (k >= 0) UI.sel.splice(k, 1); else { if (UI.sel.length >= needCards(c, UI.gear)) UI.sel.shift(); UI.sel.push(j); } drawPlan(); }; });
   p.querySelectorAll('.cd').forEach(function (b) { cardDrag(b); });
   if (UI.snapI != null) { var sn = p.querySelector('.cd[data-i="' + UI.snapI + '"]'); if (sn) sn.classList.add('snap'); UI.snapI = null; }
   if ($('#sugB')) $('#sugB').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'suggest' })) return; sfx('tap'); suggest(); }; $('#goB').onclick = commit;
+  if ($('#boostT')) $('#boostT').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('tap'); UI.boostWant[c.i] = !UI.boostWant[c.i]; drawPlan(); };
   var ready = UI.sel.length === need; $('#goB').disabled = !ready; $('#goB').classList.toggle('glow', ready);
   if (!ready) setMsg(need === 0 ? 'Only heat cards: press Go.' : UI.sel.length === 0 && !UI.touchedGear ? planAdvice(c, need) : (UI.sel.length ? 'Tap ' + (need - UI.sel.length) + ' more card' + (need - UI.sel.length > 1 ? 's' : '') + '.' : STORY.planCards(need)));
   else if (!hintsOn()) { var cq = curveInfo(); previewSet(null); var tl = tradeLine(cq); setMsg(tl.t, tl.k); }
@@ -158,13 +177,13 @@ function cardFace(x, big) {   /* one card face: type label (top), the key number
   var u = upgId(x);
   if (u) return '<span class="k">' + esc(UPG[u].sn) + '</span><span class="v">' + UPG[u].sp + '</span><span class="t">move ' + UPG[u].sp + '</span>';
   if (x === 'H') return '<span class="k">Heat</span><span class="v">' + FLAME + '</span><span class="t">dead</span>';
-  if (x === 'X') return '<span class="k">Stress</span><span class="v">?</span><span class="t">random</span>';
+  if (x === 'X') return '<span class="k">Stress</span><span class="v">?</span><span class="t">1 to 4</span>';
   return '<span class="k">Speed</span><span class="v">' + x + '</span><span class="t">move ' + x + '</span>';
 }
 function cardText(x) {
   var u = upgId(x); if (u) return UPG[u].name + ': ' + UPG[u].txt;
   if (x === 'H') return 'Heat card: a dead card, it cannot be played.';
-  if (x === 'X') return 'Stress card: flips a random speed card from your deck.';
+  if (x === 'X') return 'Stress card: plays the next speed card of your deck (1 to 4); you see what it drew.';
   return 'Speed ' + x + ': moves you ' + x + ' spaces.';
 }
 function swapMode(c) {   /* optional rulebook step: throw away speed cards you do not want (once per round), then draw back to a full hand */
@@ -207,15 +226,15 @@ function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers 
 }
 function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
 function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
-  var sp = 'Speed ' + ci.sp + (ci.uncertain ? '?' : ''), lim = ci.ks.length ? ci.ks[0].limit : 0;
+  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? ci.ks[0].limit : 0;
   if (ci.spin) return { t: sp + ' · limit ' + lim + ' · spin out!', k: 'warn' };
   if (ci.ks.length) return { t: sp + ' · limit ' + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
   return { t: sp + (ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
 }
 function cardLegend(hand) {   /* F3: one plain line per dead card type in your hand, for the first rounds it is there (then the board gets the room back) */
   var h = '', seen = JSON.parse(lsGet('rr_leg') || '{}'), hasH = hand.indexOf('H') >= 0 && legNew(seen, 'H'), hasX = hand.indexOf('X') >= 0 && legNew(seen, 'X'); if (!hasH && !hasX) return '';
-  if (hasH) h += '<span><b>Heat</b> can\'t be played. Gear 1 or 2 clears it.</span>';
-  if (hasX) h += '<span><b>Stress</b> plays a random card from your deck.</span>';
+  if (hasH) h += '<span><b>Heat</b> cards can\'t be played.</span>';
+  if (hasX) h += '<span><b>Stress</b> = the next speed card of your deck (1-4).</span>';
   return '<div class="legend">' + h + '</div>';
 }
 function commit() {
@@ -232,7 +251,7 @@ function setMsg(t, cls) { var m = $('#msg'); m.textContent = t; m.className = cl
 function hud() {
   if (!G) return; var order = rankList(G), h = G.cars.filter(function (c) { return c.human; })[0] || G.cars[0], me = G.cars[UI.seat] || h;
   var lap = Math.min(G.laps, Math.floor(me.pos / T(G).N) + 1);
-  $('#tLap').textContent = lap + '/' + G.laps; $('#tPos').textContent = (order.indexOf(me.i) + 1) + '/' + G.cars.length;
+  $('#tLap').textContent = 'Lap ' + lap + '/' + G.laps; $('#tPos').textContent = ord(order.indexOf(me.i) + 1) + ' of ' + G.cars.length;
 }
 function banner(txt, col, kind) {
   var b = $('#banner'); if (!b) return; if (!txt) { b.className = ''; b.textContent = ''; return; }
@@ -240,7 +259,7 @@ function banner(txt, col, kind) {
 }
 async function runResolve() {
   var g0 = G; hud(); UI.lastCar = -1; UI.skipStep = false;
-  banner('Everyone has chosen', null, 'round'); setMsg('One car at a time. Tap: faster.'); await wait(300);
+  UI.rlog = []; UI.rlogR = G.round; $('#panel').innerHTML = ''; banner('Everyone has chosen', null, 'round'); setMsg('One car at a time, leader first. Tap: faster.'); await wait(300);
   while (G.phase === 'resolve') {
     var ev = resolveNext(G); await playEvents(ev); if (G !== g0) return;
     while (G.pend) {   /* the human's questions in rulebook order: boost (react, after the reveal), slipstream, discard (after moving) */
@@ -248,7 +267,7 @@ async function runResolve() {
       if (pt === 'boost') { var ub = await askBoost(); if (G !== g0) return; ev = boostChoice(G, ub); }
       else if (pt === 'disc') { var dc = await askDiscard(); if (G !== g0) return; ev = discardChoice(G, G.pend.car, dc); if (typeof ev === 'string') ev = discardChoice(G, G.pend.car, []); }
       else { var use = await askSlip(); if (G !== g0) return; ev = slipChoice(G, use); }
-      await playEvents(ev); if (G !== g0) return;
+      $('#panel').innerHTML = logHtml(); await playEvents(ev); if (G !== g0) return;
     }
   }
   UI.busy = false; banner(''); RACE.spdT = 0; rateRound();
@@ -259,7 +278,7 @@ async function runResolve() {
 function carName(i) { return G.cars[i].human ? G.cars[i].name.split(' ')[0] : G.cars[i].name.split(' ')[0]; }
 function tween(i, to, ms) {
   var v = UI.vis[i], from = v.p; if (window.ANIM === false || UI.fast || ms <= 0 || from === to) { v.p = to; return Promise.resolve(); }
-  ms = ms * (window.AIDELAY || 1) * (UI.rival ? Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.24, UI.rival) : Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
+  ms = ms * (window.AIDELAY || 1) * (UI.rival ? UI.rival * 1.7 : Math.max(UI.mode === 'tutorial' && G.round === 3 ? 0.1 : 0.5, UI.pace || 1)) * (UI.skipStep ? 0.12 : 1); var n = Math.max(1, Math.round(Math.abs(to - from))), dir = to > from ? 1 : -1, last = 0;
   return new Promise(function (res) { var t0 = performance.now(); (function f(now) {   /* space by space: each space eases in and out, a tick on every space */
     var k = Math.min(1, (now - t0) / ms), x = k * n, i = Math.floor(x), fr = x - i, e = fr < .5 ? 2 * fr * fr : 1 - Math.pow(-2 * fr + 2, 2) / 2; if (i >= n) { i = n; e = 0; }
     if (i > last) { last = i; if (G.cars[UI.focus] && G.cars[UI.focus].human) sfx('tick'); }
@@ -277,81 +296,80 @@ async function playEvents(ev) {
       _x = 0, nm = e.car != null ? carName(e.car) : '', you = e.car != null && c.human, who = you && !G.hot ? 'You' : nm;
     if (e.car != null) UI.focus = e.car;
     /* brisk rivals: a computer car's whole turn plays in about 1.2 s (tap anywhere: faster still); your own move keeps its full pace */
-    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : 0.16) : 0;   /* R19: about 0.7 s per rival car */
+    UI.rival = e.car != null && !you ? (UI.mode === 'tutorial' ? (G.round === 3 ? 0.12 : 0.4) : rivalPace()) : 0;   /* F4: all rivals together in about 2.5 s a round */
     if (UI.rival && (e.t === 'shift' || e.t === 'cool' || e.t === 'done')) { hud(); continue; }   /* rival bookkeeping steps show in the HUD only */
     if (UI.mode === 'tutorial') coachEvent(e, you);
-    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; $('#panel').innerHTML = '<div class="who" style="color:' + COLS[c.col].hex + '">' + esc(nm) + ' ' + (you && !G.hot ? 'go' : 'drives') + '</div>'; var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : 'Watch ' + nm + ' play.'); await wait(550); }
+    if (e.car != null && e.car !== UI.lastCar && e.t !== 'done') { UI.lastCar = e.car; UI.skipStep = false; logRow(e.car); var dt0 = $('#dockt'); if (dt0) dt0.textContent = 'Round ' + G.round + ' · ' + (you && !G.hot ? 'your car moves' : nm + ' moves'); banner(you && !G.hot ? 'Your move' : nm + "'s turn", c.col, 'turn'); setMsg(you && !G.hot ? 'Your car goes now.' : nm + ' drives.'); if (!UI.rival) await wait(550); }
     if (you && !G.hot) { var ph = { shift: 'shift', play: 'play', move: 'move', cool: 'react', boost: 'react', slip: 'react', corner: 'react', spin: 'react', done: 'discard', stall: 'discard' }[e.t]; if (ph) RACE.ph = ph; } tracker();
     if (e.t === 'play') RACE.spdT = e.speed; else if (e.t === 'boost') RACE.spdT = e.speed; else if (e.t === 'done') RACE.spdT = 0;
     if (e.t === 'shift') { setMsg(who + (who === 'You' ? ' shift' : ' shifts') + ' to gear ' + e.to + (e.cost ? ' (-1 heat)' : '') + '.'); await wait(700); }
     else if (e.t === 'cool') { setMsg(who + ' cool' + (who === 'You' ? '' : 's') + ' ' + e.n + ' heat back into the engine.'); pop('+' + e.n + ' engine', UI.vis[e.car].p, '#8ce6ff'); await wait(750); }
-    else if (e.t === 'play') { showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + '.'); await wait(you ? 1000 : 950); }
-    else if (e.t === 'boost') { sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
+    else if (e.t === 'play') { if (you && UI.ts) { UI.ts.n++; UI.ts.gs += c.gear; } var sx = stressNote(e); logSet(e.car, { cards: e.cards.map(function (x) { return x.card === 'X' ? 'Stress ' + x.v : x.upg ? UPG[x.upg].sn : x.v; }).join(' + '), sp: e.speed }); if (you) showPlayed(e); sfx('card'); setMsg(who + (who === 'You' ? ' play' : ' plays') + ': speed ' + e.speed + (sx ? ' · ' + sx : '') + '.'); if (sx && you) pop(sx, UI.vis[e.car].p, '#c9a6ff', null); await wait(you ? (sx ? 1500 : 1000) : 950); }
+    else if (e.t === 'boost') { logSet(e.car, { sp: e.speed, out: 'boost +' + e.add }); sfx('boost'); setMsg(who + ' boost' + (who === 'You' ? '' : 's') + ': +' + e.add + ' from a flipped card.'); pop('Boost +' + e.add, UI.vis[e.car].p, '#ffd24a', 'fx-boost-flare'); await wait(800); }
     else if (e.t === 'adr') { setMsg(e.used === 0 ? 'Last place: +1 cool-down. +1 speed skipped, it would burn heat.' : who + ' get' + (who === 'You' ? '' : 's') + ' adrenaline for being last: +1 speed.'); pop(e.used === 0 ? 'Adrenaline: cool +1' : 'Adrenaline +1', UI.vis[e.car].p, '#ffd24a'); await wait(800); }
     else if (e.t === 'move') { var d = Math.abs(e.to - e.from); setMsg(who + ' drive' + (who === 'You' ? '' : 's') + ' ' + d + ' space' + (d === 1 ? '' : 's') + '.'); if (d) sfx('engine'); await tween(e.car, e.to, Math.min(1500, 170 * d + 250)); if (d) { pop('+' + d + ' spaces', UI.vis[e.car].p, '#fff'); await wait(450); } }
-    else if (e.t === 'slip') { sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
-    else if (e.t === 'corner') { if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
-    else if (e.t === 'spin') { sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
+    else if (e.t === 'slip') { logSet(e.car, { out: 'slipstream +' + (e.to - e.from) }); sfx('slip'); setMsg(who + ' slipstream' + (who === 'You' ? '' : 's') + ' +' + (e.to - e.from) + ': free spaces.'); pop('Slipstream +' + (e.to - e.from), UI.vis[e.car].p, '#8ce6ff', 'fx-slipstream-streaks'); await tween(e.car, e.to, 500); await wait(450); }
+    else if (e.t === 'corner') { logSet(e.car, { out: e.cost ? '-' + e.cost + ' heat in a ' + e.limit : 'clean ' + e.limit }); if (you && UI.ts && e.cost) { UI.ts.ch += e.cost; if (!UI.ts.w || e.cost > UI.ts.w.cost) UI.ts.w = { cost: e.cost, sp: e.speed, lim: e.limit }; } if (e.cost) { if (you) sfx('burn'); setMsg(who + ' burn' + (who === 'You' ? '' : 's') + ' ' + e.cost + ' heat: over the limit.', 'warn'); pop('-' + e.cost + ' heat: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#ff6a3a', 'fx-heat-flame'); await wait(900); } else { if (you) sfx('clean'); setMsg(who + ' took the corner clean.', 'good'); pop('Clean: ' + e.speed + ' in a ' + e.limit, UI.vis[e.car].p, '#8cf0b4'); await wait(750); } }
+    else if (e.t === 'spin') { logSet(e.car, { out: 'SPIN OUT' }); sfx('spin'); setMsg(nm + ' spins out: not enough heat.', 'warn'); pop('SPIN: ' + e.speed + ' in a ' + e.limit, e.to, '#ff4d3a', 'fx-spinout-smoke'); raceSpin(e); var v = UI.vis[e.car]; v.rot = 1; await tween(e.car, e.to, 500); await wait(700); v.rot = 0; }
     else if (e.t === 'finish') { setMsg(nm + ' crosses the line!', 'good'); banner(nm + ' crosses the line!', c.col, 'turn'); await wait(800); }
     else if (e.t === 'discard') { if (e.n) { setMsg(who + ' discard' + (who === 'You' ? '' : 's') + ' ' + e.n + ' card' + (e.n > 1 ? 's' : '') + ', then draw' + (who === 'You' ? '' : 's') + ' to 7.'); await wait(600); } }
-    else if (e.t === 'stall') { setMsg(nm + ' has too few playable cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
-    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(450); }
+    else if (e.t === 'stall') { logSet(e.car, { out: 'no move' }); setMsg(nm + ' has too few playable cards: no move, gear 1.', 'warn'); pop('No move', UI.vis[e.car].p, '#ff8f7a'); await wait(1000); }
+    else if (e.t === 'done') { var pl = rankList(G).indexOf(e.car) + 1; logSet(e.car, { pl: pl }); setMsg(nm + ' is now ' + ord(pl) + '.'); await wait(you ? 450 : 300); }
     hud();
   }
   UI.rival = 0; UI.redraw();
 }
+function rivalPace() { var n = G.order.filter(function (i) { return !G.cars[i].human; }).length; return Math.min(0.13, 0.55 / Math.max(1, n)); }
+function stressNote(e) { var xs = e.cards.filter(function (x) { return x.card === 'X'; }); if (!xs.length) return ''; return 'Stress drew ' + xs.map(function (x) { return x.v; }).join(' and ') + (xs.length > 1 ? '' : ''); }
+/* F4: this round, one line per car that has moved (name, cards, speed, what happened, place): readable even at rival speed */
+function logRow(ci) { if (!UI.rlog || UI.rlogR !== G.round) { UI.rlog = []; UI.rlogR = G.round; } if (!UI.rlog.some(function (r) { return r.car === ci; })) UI.rlog.push({ car: ci }); logPaint(); }
+function logSet(ci, o) { if (!UI.rlog) return; var r = UI.rlog.filter(function (x) { return x.car === ci; })[0]; if (!r) return; for (var k in o) { if (k === 'out' && r.out && o.out) r.out += ', ' + o.out; else r[k] = o[k]; } logPaint(); }
+function logHtml() {
+  if (!UI.rlog || !UI.rlog.length) return ''; var h = '<div class="rlog" aria-label="This round">';
+  UI.rlog.forEach(function (r) { var c = G.cars[r.car], me = c.human && !G.hot; h += '<div class="rl' + (me ? ' me' : '') + '"><i style="background:' + COLS[c.col].hex + '"></i><b>' + esc(me ? 'You' : carName(r.car)) + '</b><span>' + (r.cards != null ? esc(String(r.cards)) + ' = <b>' + r.sp + '</b>' : '…') + '</span><em class="' + (/SPIN|heat/.test(r.out || '') ? 'bad' : '') + '">' + esc(r.out || '') + '</em>' + (r.pl ? '<small>' + ord(r.pl) + '</small>' : '') + '</div>'; });
+  return h + '</div>';
+}
+function logPaint() { var p = $('#panel'); if (!p || G.phase !== 'resolve' || G.pend) return; var ex = p.querySelector('.rlog'); if (ex) ex.outerHTML = logHtml(); else p.insertAdjacentHTML('beforeend', logHtml()); }
 function showPlayed(e) {
   var h = '<div class="who" style="color:' + COLS[G.cars[e.car].col].hex + '">' + esc(carName(e.car) === 'You' ? 'You play' : carName(e.car) + ' plays') + '</div><div class="reveal">'; e.cards.forEach(function (x) {
     var stem = x.upg ? 'card-upgrade-' + x.upg : x.card === 'X' ? 'card-stress' : 'card-speed-' + x.card, v = x.v;
-    h += '<div class="cd flip ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="k">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : 'Speed') + '</span><span class="v">' + v + '</span><span class="t">' + (x.card === 'X' ? 'flipped' : 'move ' + v) + '</span></div>';
+    h += '<div class="cd flip ' + (x.upg ? 'U' : x.card === 'X' ? 'X' : 's' + x.card) + '" data-art="' + stem + '"><span class="k">' + (x.upg ? esc(UPG[x.upg].sn) : x.card === 'X' ? 'Stress' : 'Speed') + '</span><span class="v">' + v + '</span><span class="t">' + (x.card === 'X' ? 'drew ' + v : 'move ' + v) + '</span></div>';
   });
-  h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>'; $('#panel').innerHTML = h; artApply($('#panel'));
+  h += '</div><div class="chips"><span>Total speed <b>' + e.speed + '</b></span></div>' + logHtml(); $('#panel').innerHTML = h; artApply($('#panel'));
 }
 function qTimer() {}   /* R19: a player's choice is never answered on a timer; the question waits for a tap */
-function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost, once per turn. Asked only when legal (1+ engine heat). */
-  var p = G.pend, bc = G.cars[p.car], q2 = bc.pl2;
-  /* tutorial: a question the current step does not teach is never shown (its buttons would sit under the tutorial layer as dead taps) */
-  if (tutOn() && !(GXT.current() && GXT.current().id === 'boost')) return Promise.resolve(false);
-  var av = Math.round(avgSpeed(bc)), L0 = q2 ? landing(G, bc, q2.from + p.speed) : 0, risk = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 4), p.speed + 4, q2.lim) > bc.eng - 1;
-  /* a real choice only: if even the smallest flip (1) would spin you, boosting can only hurt, so the question is not asked */
-  var spin1 = !!q2 && cornerCost(G, q2.from, landing(G, bc, q2.from + p.speed + 1), p.speed + 1, q2.lim) > bc.eng - 1;   /* R19: always offered (a legal choice), marked when any flip would spin you */
-  var nc = q2 ? nextCorner(L0 - 1) : null, sug = hintsOn() && UI.mode !== 'tutorial' ? suggestBoost(G, bc) : false;
-  var bo = boostOdds(G, bc); if (sug && bo.spin) sug = false;   /* F3: never suggest a boost that could overshoot into a spin */
-   /* R24: the plan line shows the spin-out risk before you choose, and the badge says why */
-  setPhase('react'); setMsg(bo.line, bo.spin ? 'warn' : '');   /* <= 8 words (phone-check) */
-  var old = $('#bq'); if (old) old.remove();
-  $('#panel').insertAdjacentHTML('beforeend', '<div class="slipq" id="bq"><button id="boostN">No boost</button><button class="y' + (bo.spin ? ' risk' : '') + '" id="boostY">Boost -1 heat' + (bo.all ? ' (spins you)' : bo.spin ? ' (may spin)' : '') + '</button></div>');
-  if (hintsOn() && UI.mode !== 'tutorial') sugMark(sug ? '#boostY' : '#boostN', sug ? bo.yes : bo.no);
-  return new Promise(function (res) {
-    var fin = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#bq'); if (q) q.remove(); res(v); };   /* an answered question leaves the screen at once */
-    $('#boostY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boost' })) return; sfx('boost'); fin(true); };
-    $('#boostN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'boostno' })) return; fin(false); };
-    qTimer(BOOSTMS, 'No boost', '#boostN', function () { fin(false); });   /* no boost by itself; the hint marks Boost when it is the better play */
-    if (UI.fast) setTimeout(function () { fin(false); }, 10);
-  });
+function askBoost() {   /* React step (rulebook): after your cards are revealed you may pay 1 heat to boost. F4: answered by the Boost toggle you set before Go
+     (no extra tap); a boost that could spin you out is skipped and the line says so */
+  var p = G.pend, bc = G.cars[p.car], want = !!(UI.boostWant && UI.boostWant[bc.i]); if (UI.boostWant) UI.boostWant[bc.i] = false;
+  if (!want) return Promise.resolve(false);
+  var bo = boostOdds(G, bc); setPhase('react');
+  if (bo.spin) { setMsg('Boost skipped: a flip could spin you out.', 'warn'); return wait(700).then(function () { return false; }); }
+  return Promise.resolve(true);
 }
 var BOOSTMS = 1500, DISCMS = 1500;
-function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7 */
-  if (tutOn() && !(GXT.current() && /^disc/.test(GXT.current().id))) return Promise.resolve([]);   /* not taught yet: no dead buttons */
-  var c = G.cars[G.pend.car], sel = [], done = null;
-  /* rulebook: every round, after moving, you may discard any cards except Heat and Stress. Nothing is pre-selected; Keep all (or the countdown) skips */
-  setPhase('discard'); UI.discNew = !lsGet('rr_disc1') || UI.discNewR === G.round; if (UI.discNew) { lsSet('rr_disc1', '1'); UI.discNewR = G.round; }   /* F3: the first discard step says what it is for */
+function slowCards(c) { var o = []; c.hand.forEach(function (x, j) { if (x === 'H' || x === 'X') return; var u = upgId(x), v = u ? UPG[u].sp : +x; if (v <= 1) o.push(j); }); return o; }
+function askDiscard() {   /* discard step, right after moving: throw away speed cards you do not want, then draw back to 7.
+     F4: asked only when it matters (2+ slow cards: speed 1 or less), those are picked for you; Keep all is the default. Otherwise everything is kept. */
+  var c = G.cars[G.pend.car], slow = slowCards(c), tutDisc = tutOn() && GXT.current() && /^disc/.test(GXT.current().id);
+  if (tutOn() && !tutDisc) return Promise.resolve([]);   /* not taught yet: no dead buttons */
+  if (!tutOn() && slow.length < 2) return Promise.resolve([]);
+  var sel = slow.slice(), done = null;
+  setPhase('discard');
   var paint = function () {
-    var h = '<div class="who">' + (UI.discNew ? 'Discard step: swap weak cards for fresh ones' : 'Discard step') + '</div><div id="hand">';
+    var h = '<div id="hand">';
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
-    h += '</div>' + cardLegend(c.hand) + '<div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
+    h += '</div><div class="slipq"><button class="y" id="discN">Keep all</button>' + (sel.length ? '<button id="discY">Drop ' + sel.length + ', draw ' + sel.length + '</button>' : '') + '</div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
-    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop slow 1s and 2s to draw faster cards.');
+    setMsg(sel.length ? 'Drop ' + sel.length + ' slow card' + (sel.length > 1 ? 's' : '') + ' and draw new ones?' : 'Tap cards to drop, or keep all.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
       sfx('card'); if (k >= 0) sel.splice(k, 1); else sel.push(j); paint(); }; });
-    if ($('#discY')) $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; done(sel.slice()); };
+    if ($('#discY')) $('#discY').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discgo' })) return; sfx('card'); done(sel.slice()); };
     $('#discN').onclick = function () { if (tutOn() && !GXT.act({ type: 'tap', what: 'discno' })) return; done([]); };
   };
   return new Promise(function (res) {
-    done = function (v) { if (UI.qHalt) { UI.qHalt(); UI.qHalt = null; } var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
-    qTimer(DISCMS, 'Keep all', '#discN', function () { done([]); });   /* keeps everything by itself unless you touch the hand */
+    done = function (v) { var q = $('#panel .slipq'); if (q) q.remove(); res(v); }; paint();
     if (UI.fast) setTimeout(function () { res([]); }, 10);
   });
 }
@@ -372,8 +390,17 @@ function askSlip() {
 function loseLine() {   /* the line fits the place you got: podium praise, or one concrete tip */
   var me = G.cars.filter(function (c) { return c.human; })[0], k = me ? G.rank.indexOf(me.i) + 1 : 0;
   if (G.hot || !k) return pickLine(STORY.quickLose);
-  if (k <= 3) return 'You made the podium in ' + ord(k) + '. ' + (me.stats.spins ? 'One cleaner corner and it is yours.' : me.stats.heat >= 6 ? 'Burn less heat in corners and it is yours.' : 'Shift up sooner on the straights and it is yours.');
-  return 'You finished ' + ord(k) + '. Gear down before corners and keep heat for the last lap.';
+  return k <= 3 ? 'You made the podium in ' + ord(k) + '.' : 'You finished ' + ord(k) + '.';   /* F4: the concrete tips sit in the Next race box below */
+}
+/* F4: one or two concrete tips from how you raced (heat burned in corners, spins, slipstreams, unused heat, low gears) */
+function raceTips(me) {
+  var t = [], s = me.stats, ts = UI.ts || { ch: 0, n: 0, gs: 0 };
+  if (s.spins) t.push('You spun out ' + (s.spins > 1 ? s.spins + ' times' : 'once') + ': when the line says "spin out", take a lower gear first.');
+  if (ts.ch >= 4) t.push('You burned ' + ts.ch + ' heat in corners' + (ts.w ? ' (worst: speed ' + ts.w.sp + ' in a ' + ts.w.lim + ')' : '') + ': brake a gear one turn earlier.');
+  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: switch Boost on for long straights.');
+  if (ts.n && ts.gs / ts.n < 2.6 && t.length < 2) t.push('Your average gear was ' + (ts.gs / ts.n).toFixed(1) + ': shift up to 3 or 4 on straights.');
+  if (!s.slips && t.length < 2) t.push('End your move next to a car to slipstream 2 free spaces.');
+  return t.slice(0, 2);
 }
 function showResult() {
   if (typeof GXC !== 'undefined' && GXC.active && GXC.active() && UI.cmpDef) { var wc = G.cars[G.rank[0]]; sfx(wc.human ? 'win' : 'lose'); return GXC.finish(G); }
@@ -386,7 +413,7 @@ function showResult() {
   });
   var w = G.cars[G.rank[0]]; sfx(w.human ? 'win' : 'lose');
   var line = UI.mode === 'tutorial' ? (w.human ? 'You beat Kit to the line. Coach Mara is grinning: the Sunline seat is yours.' : 'Kit took the flag, but you learned every trick. Coach Mara: "Again. You are close."') : w.human ? STORY.resultWin + ' ' + pickLine(STORY.quickWin) : STORY.resultLose(w.name.split(' ')[0]) + ' ' + loseLine();
-  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
+  modal('<div class="podium" data-art="bg-podium"><h2>' + (w.human ? 'You win!' : esc(w.name) + ' wins') + '</h2><i class="ic" data-art="ui-trophy" style="width:36px;height:36px"></i>' + podiumHtml(G.rank) + '<p class="rl">' + esc(line) + '</p></div>' + (me[0] && !G.hot ? '<div class="tips"><b>Next race</b>' + raceTips(me[0]).map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') + '</div>' : '') + rows + '<div class="row" style="margin-top:10px"><button class="big" id="again">Race again</button><button class="ghostb" id="home">Title</button></div>');
   $('#mx').hidden = true; $('#again').onclick = function () { UI.lockModal = false; startGame(); }; $('#home').onclick = function () { UI.lockModal = false; showTitle(); };
 }
 
@@ -538,6 +565,14 @@ function boot() {
   var q = new URLSearchParams(location.search); if (q.get('seed')) UI.seedArg = +q.get('seed');
   artLoad(); showTitle();
   document.addEventListener('pointerdown', function () { if (UI.busy) UI.skipStep = true; }, true);
+  /* F4 PC keys: 1-4 gear, Enter or Space Go, B boost, Space/Enter also skips rival turns */
+  document.addEventListener('keydown', function (ev) {
+    if (!G || $('#game').hidden || ev.ctrlKey || ev.metaKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
+    if (!$('#modal').hidden) return; var k = ev.key, b = null;
+    if (UI.busy && (k === ' ' || k === 'Enter')) { UI.skipStep = true; ev.preventDefault(); return; }
+    if (/^[1-4]$/.test(k)) b = $('.gb[data-g="' + k + '"]:not([disabled])'); else if (k === 'Enter' || k === ' ') b = $('#goB:not([disabled])') || $('#panel .slipq button.y'); else if (k === 'b' || k === 'B') b = $('#boostT:not([disabled])');
+    if (b) { ev.preventDefault(); b.click(); }
+  });
 }
 /* test hooks */
 UI.sim = function (n) { for (var i = 0; i < (n || 1); i++) { if (!G || G.over) return; if (G.phase === 'plan') { G.cars.forEach(function (c) { if (!c.plan) c.plan = aiPlan(G, c); }); startResolve(G); } while (G.phase === 'resolve') { if (G.pend) slipChoice(G, true); else resolveNext(G); } } };
