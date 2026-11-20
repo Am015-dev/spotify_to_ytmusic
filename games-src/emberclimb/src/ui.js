@@ -53,7 +53,7 @@
   // overlays (coach bubble, toasts) sit just above the dock's button row on phones: never over the top bar, the intents or the result
   function ecSlot() { try { var a = document.getElementById('dockact'), r = a && a.getBoundingClientRect(), v = (r && r.height && r.top > 80 && r.top < innerHeight) ? Math.round(innerHeight - r.top + 6) : 64; document.documentElement.style.setProperty('--ecslot', v + 'px'); } catch (e) { } }
   UI.slot = ecSlot;
-  function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
+  function toast(t, ms, tries) { if (UI.mode === 'game' && !learnOn() && !UI.hints) return; var gz0 = G(); if (gz0 && gz0.scr === 'over') return; var t0 = document.querySelector('.toast'); if (document.querySelector('.ec-say') || document.querySelector('.turnban') || (t0 && Date.now() < (+t0.getAttribute('data-until') || 0))) { if ((tries || 0) < 30) setTimeout(function () { toast(t, ms, (tries || 0) + 1); }, 500); return; }   // wait for the coach bubble: one message at a time
     document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); ecSlot(); var gz = G(), d = h('div', 'toast' + (gz && gz.scr === 'over' ? ' mid' : ''), t), dur = readMs(t, ms); d.style.animation = 'w4tin .2s ease-out'; setTimeout(function () { d.classList.add('w4tout'); }, Math.max(0, dur - 400)); d.setAttribute('data-until', String(Date.now() + dur)); document.body.appendChild(d); setTimeout(function () { d.remove(); }, dur); }
   UI.toast = toast;
   function rectOf(w) { var e = document.querySelector('[data-w="' + w + '"]'); return e ? e.getBoundingClientRect() : null; }
@@ -188,6 +188,7 @@
     tscr.hidden = true; gameEl.hidden = false;
     document.body.classList.toggle('ec-stage', g.scr === 'battle' && STAGE()); document.body.classList.toggle('ec-stagemap', g.scr === 'map' && STAGE());
     if (g.scr !== 'battle') { var tb0 = document.querySelector('.turnban'); if (tb0) tb0.remove(); }
+    if (g.scr === 'over') document.querySelectorAll('.toast,.ec-say').forEach(function (n) { n.remove(); });   // F1: nothing over the result buttons
     if (g.scr === 'map') mapScr(); else if (g.scr === 'battle') battle(); else if (g.scr === 'reward') reward();
     else if (g.scr === 'rest') rest(); else if (g.scr === 'shop') shop(); else if (g.scr === 'event') event(); else if (g.scr === 'over') over();
     if (UI.ov) overlay();
@@ -666,6 +667,7 @@
   // big centre banner: whose turn it is (tap anywhere to dismiss early)
   function banner(txt, cls) {
     var o = document.querySelector('.turnban'); if (o) o.remove(); if (!window.ANIM) return;
+    document.querySelectorAll('.toast').forEach(function (n) { n.remove(); }); var sy0 = document.querySelector('.ec-say'); if (sy0 && UI.coach) { var sp0 = sy0.querySelector('span'); if (sp0) UI.coach.q.unshift({ key: 'say', text: sp0.textContent }); sy0.remove(); }   // F1: the banner is the only helper while it shows
     var d = h('div', 'turnban ' + (cls || ''), null, [h('b', '', txt)]); d.setAttribute('role', 'status'); document.body.appendChild(d);
     setTimeout(function () { if (d.parentNode) d.remove(); }, UI.fast ? 450 : 1000);
   }

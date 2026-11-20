@@ -108,7 +108,7 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 .node{position:absolute;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;border:3px solid var(--line);background:#2a1d16;display:flex;align-items:center;justify-content:center;font-size:20px;padding:0}
 .node .art{position:absolute;inset:2px;border-radius:50%}
 .node.vis{opacity:.45}.node.here{border-color:#fff}
-.node.glow{border-color:var(--ember2);box-shadow:0 0 0 4px rgba(242,135,43,.35),0 0 18px var(--ember);animation:pulse 1.1s infinite}
+.node.glow{border-color:var(--ember2);box-shadow:0 0 0 4px rgba(242,135,43,.35),0 0 18px var(--ember);animation:pulse 1.1s 3}
 .node.t-e{border-color:#c93a3a}.node.t-b{width:64px;height:64px;margin:-32px 0 0 -32px;border-color:#f2c230}
 @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(242,135,43,.15),0 0 26px var(--ember)}}
 .hint{position:absolute;left:0;right:0;bottom:calc(8px + var(--safe));text-align:center;z-index:3;pointer-events:none}
@@ -120,7 +120,7 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 .en{position:relative;display:flex;flex-direction:column;align-items:center;flex:1;max-width:190px;min-width:0;padding:4px 2px;border-radius:12px}
 .en .art{width:min(100%,calc(var(--cw)*2.3));aspect-ratio:1;border-radius:14px}
 .en.dead{opacity:.25;pointer-events:none;filter:grayscale(1)}
-.en.glow{animation:pulse 1s infinite;outline:3px solid var(--ember2)}
+.en.glow{animation:pulse 1s 3;outline:3px solid var(--ember2)}
 .en .nm{font-size:13px;color:var(--mute);margin-top:2px}
 .bar{position:relative;width:88%;height:14px;background:#1a0c0c;border:1px solid #000;border-radius:7px;overflow:hidden;margin-top:2px}
 .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#e0504a,#9c2323);transition:width .3s}
@@ -165,7 +165,7 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 .ctl{position:relative;z-index:7;display:flex;justify-content:space-between;align-items:center;padding:4px 10px;flex:none;width:100%;max-width:640px;margin:0 auto}
 .piles{display:flex;gap:6px}
 .piles .chip{min-height:44px;min-width:44px;justify-content:center}
-.endbtn.pulse{animation:pulse 1.1s infinite}
+.endbtn.pulse{animation:pulse 1.1s 3}
 .die{font-size:60px}
 /* overlays */
 .ov{position:fixed;inset:0;z-index:50;background:rgba(10,6,4,.9);display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(10px + var(--safe))}
@@ -187,7 +187,7 @@ h1,h2,.btn,.ct,.cname{font-family:'Cinzel',Georgia,serif}h1{margin:0;font-size:c
 .opts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:420px}
 .evart{width:min(70vw,260px);aspect-ratio:4/3;border-radius:14px}
 .toast{position:fixed;left:50%;top:42%;transform:translateX(-50%);z-index:65;background:rgba(0,0,0,.75);padding:10px 20px;border-radius:999px;font-size:20px;animation:popup 1.4s forwards;pointer-events:none}
-.ec-ghost{position:fixed;z-index:30;font-size:34px;pointer-events:none;animation:nudge 1.2s infinite}@keyframes nudge{50%{transform:translateY(-14px)}}
+.ec-ghost{position:fixed;z-index:30;font-size:34px;pointer-events:none;animation:nudge 1.2s 3}@keyframes nudge{50%{transform:translateY(-14px)}}
 .over{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative;padding:20px;text-align:center}
 .over>*:not(.bg){position:relative;z-index:1}
 .over.res{justify-content:flex-start;overflow-y:auto;gap:10px;padding:16px 12px 24px}.over.res h1{margin:6px 0 0;font-size:34px}
@@ -357,7 +357,7 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 .fly.w4trail{opacity:.35;filter:blur(2px) brightness(1.5);z-index:59}
 .w4impact{animation:w4imp .3s}@keyframes w4imp{40%{filter:brightness(1.9)}}
 .intent.w4hot{border-color:#ff5a46!important;box-shadow:0 0 0 2px rgba(255,90,70,.5)}
-.intent.w4atk{animation:w4pulse 1.2s ease-in-out infinite}.intent.w4danger{animation:w4pulse2 .9s ease-in-out infinite}
+.intent.w4atk{animation:w4pulse 1.2s ease-in-out 3}.intent.w4danger{animation:w4pulse2 .9s ease-in-out 3}
 @keyframes w4pulse{50%{box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 12px rgba(255,90,70,.55)}}
 @keyframes w4pulse2{50%{box-shadow:0 0 0 5px rgba(255,60,40,.6),0 0 22px rgba(255,60,40,.85)}}
 .turnban.win b{border-color:#f2c230;color:#fff4d6;box-shadow:0 0 40px rgba(242,194,48,.55),0 8px 30px #000a}.turnban.boss b{font-size:clamp(30px,8vw,56px)}
@@ -378,7 +378,7 @@ html body .hand .card.sel{transform:translate(var(--sx,0px),calc(var(--cw)*-1.7)
 .picks .card.w4rw{box-shadow:0 0 0 2px rgba(255,240,220,.35) inset,0 0 14px rgba(255,240,220,.3)}
 .picks .card.w4rw.unc{box-shadow:0 0 0 2px #8ec1ff inset,0 0 18px rgba(110,170,255,.65)}
 .picks .card.w4rw.rare{box-shadow:0 0 0 2px #f2c230 inset,0 0 24px rgba(242,194,48,.75)}
-.picks .card.w4rw.rare::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;background:linear-gradient(115deg,transparent 35%,rgba(255,236,160,.5) 50%,transparent 65%);background-size:260% 100%;animation:w4sheen 2.6s linear infinite}
+.picks .card.w4rw.rare::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;background:linear-gradient(115deg,transparent 35%,rgba(255,236,160,.5) 50%,transparent 65%);background-size:260% 100%;animation:w4sheen 2.6s linear 2}
 @keyframes w4sheen{0%{background-position:130% 0}100%{background-position:-130% 0}}
 .w4vt{position:absolute;top:3px;right:3px;z-index:4;background:rgba(20,10,4,.88);color:#ffe7c2;border-radius:6px;padding:0 6px;font:800 13px/1.35 'Alegreya Sans',sans-serif;pointer-events:none}
 .w4boss{position:fixed;inset:0;z-index:300;background:radial-gradient(circle at 50% 40%,#3a1208,#070302 70%);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding:16px 16px max(24px,env(safe-area-inset-bottom));overflow:hidden;animation:w4bin .35s ease-out}
@@ -424,7 +424,7 @@ html body.ec-stage #stage .en>.art,html body.ec-stage #stage .w485fig{filter:dro
 html body.ec-stage #stage .en::after,html body.ec-stage #stage .hfig::after{content:'';position:absolute;left:18%;right:18%;top:calc(var(--fy,0px) + 72%);height:12px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.55),transparent 70%);z-index:-1}
 html body.ec-stage #stage .hfig.act .w485fig{filter:drop-shadow(0 0 10px rgba(255,190,90,.65)) drop-shadow(0 10px 6px rgba(0,0,0,.6))}
 html body.ec-stage #stage .en.glow{animation:none}
-html body.ec-stage #stage .en.glow>.art{filter:drop-shadow(0 0 7px #ffd36a) drop-shadow(0 0 2px #ffd36a);animation:w485tg 1s infinite}
+html body.ec-stage #stage .en.glow>.art{filter:drop-shadow(0 0 7px #ffd36a) drop-shadow(0 0 2px #ffd36a);animation:w485tg 1s 3}
 @keyframes w485tg{50%{filter:drop-shadow(0 0 14px #ffb35c) drop-shadow(0 0 3px #ffd36a)}}
 html body.ec-stage #stage .en.w4drop{transform:none}
 html body.ec-stage #stage .en.w4drop>.art{filter:drop-shadow(0 0 16px #fff2a8) drop-shadow(0 0 4px #ffd36a) brightness(1.15)!important;transform:scale(1.06)}
@@ -501,7 +501,7 @@ html body.ec-stagemap #map svg line[stroke="#f2872b"]{stroke:#ff9a3c;stroke-opac
 
 body.ec-dragging .hand .card.sel{visibility:hidden}
 body.ec-dragging .hand.hassel .card:not(.sel){opacity:.7;filter:none}
-html body.ec-stage #stage .en.glow{filter:drop-shadow(0 0 8px #ffd36a);animation:w485tg 1s infinite}
+html body.ec-stage #stage .en.glow{filter:drop-shadow(0 0 8px #ffd36a);animation:w485tg 1s 3}
 html body.ec-stage #stage .en.glow>.art{filter:none;animation:none}
 html body.ec-stage #stage .en.w4drop{filter:drop-shadow(0 0 14px #fff2a8) drop-shadow(0 0 4px #ffd36a) brightness(1.12)!important;animation:none}
 html body.ec-stage #stage .en.w4drop>.art{filter:none!important}
@@ -542,7 +542,6 @@ html body.ec-stagemap #dockact{flex-wrap:wrap!important;gap:6px 12px}
    Shop preview card: the text box fits its text instead of a fixed tall area. */
 .gxt-cell{background:transparent!important;box-shadow:none!important}
 .gxt-ring:not(.soft)::before{content:'';position:absolute;inset:-3px;border-radius:inherit;box-shadow:0 0 0 200vmax var(--gxt-dim,rgba(8,4,10,.62));pointer-events:none}
-.gxt-ring:not(.soft){animation:ec-tpulse 1.6s ease-in-out infinite}@keyframes ec-tpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
 @media (max-width:480px){#hud{flex-wrap:wrap;row-gap:2px;align-content:center;overflow:visible}#hud .chip{font-size:12.5px!important;line-height:1.1!important;padding:1px 6px!important;min-height:0!important}}
 .shopdet .card.big{height:auto!important;min-height:0!important}
 .shopdet .card.big .cb{min-height:0!important;height:auto!important;flex:0 0 auto!important;padding-bottom:8px}

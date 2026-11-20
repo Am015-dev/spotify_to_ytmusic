@@ -14,6 +14,7 @@
   UI.say = function (text, ms, who) {
     var old = $('.ec-say'); if (!text) { if (old) old.remove(); return null; }
     var gs = g(); if (gs && gs.scr === 'over') return null;   // no coach line over the result / game-over screen
+    if ($('.turnban')) { C.q.unshift({ key: 'say', text: text, ms: ms }); setTimeout(pump, 700); return null; }   // F1: never over a turn banner
     if (UI.slot) UI.slot();
     // one message at a time: a bubble that has not been on screen long enough is never replaced; the new line waits its turn
     var tw = document.querySelector('.toast');   // a toast still being read is never removed: the bubble waits (R1: relic toast cut after 250 ms)
