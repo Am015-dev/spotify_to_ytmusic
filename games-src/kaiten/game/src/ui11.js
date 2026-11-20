@@ -22,8 +22,8 @@ function tutNode(cls, o) { const t = h('div'); t.innerHTML = tutBtn(cls, o); ret
 // ---------------------------------------------------------------- the script
 // [my picks, chef's picks] by turn. Types; a pair is two types in one turn (Twin Sticks).
 const TUT_ME = { 1: 'tempura', 2: 'tempura', 3: 'wasabi', 4: 'squid', 5: 'chop', 6: ['sashimi', 'sashimi'], 7: 'sashimi', 8: 'roll3', 9: 'dumpling', 10: 'pudding' };
-const TUT_CHEF = { 1: 'roll1', 2: 'sashimi', 3: 'dumpling', 4: 'dumpling', 5: 'salmon', 6: 'egg', 7: 'tempura', 8: 'tempura', 9: 'chop', 10: 'salmon' };
-const TUT_X = ['tempura', 'sashimi', 'dumpling', 'egg', 'wasabi', 'tempura', 'chop', 'salmon', 'dumpling', 'sashimi'];                       // hand X: odd turns for you, even turns for the chef
+const TUT_CHEF = { 1: 'roll1', 2: 'sashimi', 3: 'dumpling', 4: 'dumpling', 5: 'salmon', 6: 'egg', 7: 'tempura', 8: 'roll2', 9: 'chop', 10: 'salmon' };
+const TUT_X = ['tempura', 'sashimi', 'dumpling', 'egg', 'wasabi', 'roll2', 'chop', 'salmon', 'dumpling', 'sashimi'];                       // hand X: odd turns for you, even turns for the chef
 const TUT_Y = ['roll1', 'tempura', 'squid', 'sashimi', 'dumpling', 'roll3', 'salmon', 'sashimi', 'tempura', 'pudding'];                    // hand Y: even turns for you, odd turns for the chef
 var TUT = null;   // { me: {turn: [ids]}, chef: {turn: id} } once dealt
 function tutDeal(Gm) {
@@ -70,18 +70,16 @@ const pickStep = (id, t, title, say, extra) => Object.assign({ id, title, say, t
 const lookStep = (id, title, say, target, ready, extra) => Object.assign({ id, title, say, target, look: true, wait: { type: 'tap', match: a => a.what === 'look' && a.step === id }, ready }, extra || {});
 const shelfOrMe = () => tq('#tbl .seat.me .grp.shelf')() || tq('#tbl .seat.me .ctr')();
 // every rule id the tutorial must teach, in order (tut-walk.js checks each appears as a step)
-const TUT_RULES = ['goal', 'chef', 'pick1', 'passed', 'pick2', 'paste', 'nigiri', 'nigiriVals', 'sticksTake', 'sticksUse', 'twinA', 'twinB', 'fish3', 'roll', 'bun', 'custard', 'scoreSets', 'scoreRoll', 'rollTie', 'scoreNigiri', 'scoreChef', 'clear', 'rounds', 'custardEnd', 'penalty', 'custardTie', 'tieBreak'];
+const TUT_RULES = ['goal', 'pick1', 'passed', 'pick2', 'paste', 'nigiri', 'sticksTake', 'sticksUse', 'twinA', 'twinB', 'fish3', 'roll', 'bun', 'custard', 'scoreSets', 'rollTie', 'clear', 'custardEnd', 'penalty'];   // 19 steps; the chef, nigiri values, chef score, rounds, custard ties and tie-break ride inside these
 function tutStepsRaw() {
   const R = () => pname(1);
   return [
-    lookStep('goal', 'Your goal', 'Most points after three rounds wins the meal.', tq('#tbl .seat.me .av'), () => turnIs(1)),
-    lookStep('chef', 'The chef', () => R() + ' picks at the same time, by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
+    lookStep('goal', 'Your goal', () => 'Most points after three rounds wins. ' + R() + ' plays by the same rules.', tq('#tbl .seat:not(.me) .av'), () => turnIs(1)),
     pickStep('pick1', 1, 'Take one dish', 'Each turn, take one dish. Nobody sees your pick.'),
-    lookStep('passed', 'Flip and pass', 'Picks flipped together. Then the hands passed on.', tq('#belt'), () => turnIs(2)),
+    lookStep('passed', 'Flip and pass', 'Picks flipped together. Then the hands passed on.', tq('#belt'), () => turnIs(2), { side: 'top' }),
     pickStep('pick2', 2, 'A pair scores 5', 'Two Crispy Prawns make a pair: 5 points.'),
     pickStep('paste', 3, 'Fire Paste', 'Fire Paste triples the next nigiri you take.'),
-    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon Nigiri is 3. On your Fire Paste it scores 9.'),
-    lookStep('nigiriVals', 'Nigiri values', 'Nigiri alone: Sun 1, Sunset 2, Moon 3.', trayStarts('pn-'), () => turnIs(5)),
+    pickStep('nigiri', 4, 'Nigiri on paste', 'Moon 3, Sunset 2, Sun 1; on Fire Paste, Moon scores 9.'),
     pickStep('sticksTake', 5, 'Twin Sticks', 'Twin Sticks let you take two dishes on a later turn.'),
     { id: 'sticksUse', title: 'Use the sticks', say: 'Tap your sticks: two dishes this turn.', target: tq('#tbl .seat.me .grp.usable'), wait: { type: 'tap', match: a => a.what === 'twin' }, ready: () => turnIs(6) && !!document.querySelector('#tbl .seat.me .grp.usable') && !UI.twin },
     { id: 'twinA', title: 'First dish', say: 'Three Fish Slices score 10. One or two score nothing.', target: () => beltCard(myPick(6)[0])(), wait: { type: 'tap', match: a => a.what === 'pick' && a.id === myPick(6)[0] }, ready: () => turnIs(6) && UI.twin && UI.sel.length === 0 },
@@ -90,17 +88,11 @@ function tutStepsRaw() {
     pickStep('roll', 8, 'Seaweed Rolls', 'Most roll icons scores 6. Second most scores 3.'),
     pickStep('bun', 9, 'Steam Buns', 'Steam Buns climb: 1, 3, 6, 10, then 15.'),
     pickStep('custard', 10, 'Custard Cup', 'Custard Cups stay on your table until the meal ends.'),
-    lookStep('scoreSets', 'Sets scored', () => 'Prawn pair ' + RS(0).tempura + ', Fish set ' + RS(0).sashimi + ', one bun ' + RS(0).dumpling + '.', tq('#tbl .seat.me .ctr'), tutDone, { pending: 'Counting the round' }),
-    lookStep('scoreRoll', 'Roll race', () => 'Your ' + RS(0).icons + ' icons beat ' + R() + '\'s ' + RS(1).icons + ': +' + RS(0).maki + ' for you.', myTray('roll'), tutDone),
-    lookStep('rollTie', 'Roll tie', 'A tie for most icons splits 6, and nobody gets second.', myTray('roll'), tutDone),
-    lookStep('scoreNigiri', 'Nigiri and paste', () => 'Moon Nigiri on Fire Paste: ' + (RS(0).nigiri + RS(0).wasabi) + ' points.', trayStarts('pn-'), tutDone),
-    lookStep('scoreChef', 'The chef scored', () => R() + ' scored ' + RS(1).total + '. A lone Fish Slice scores nothing.', tq('#tbl .seat:not(.me)'), tutDone),
-    lookStep('clear', 'Round over', 'After a round, every dish except custard leaves the table.', tq('#tbl .seat.me .ctr'), tutDone),
-    lookStep('rounds', 'Three rounds', 'A real meal has three rounds. Each round deals fresh hands.', tq('#tbl .seat.me .av'), tutDone),
-    lookStep('custardEnd', 'Custard counts', 'At the very end, most Custard Cups scores 6.', shelfOrMe, tutDone),
-    lookStep('penalty', 'Fewest cups', 'With three or more diners, fewest cups loses 6.', shelfOrMe, tutDone),
-    lookStep('custardTie', 'Custard ties', 'Custard ties split the points, rounded down.', shelfOrMe, tutDone),
-    lookStep('tieBreak', 'Equal totals', 'Equal totals? The diner with more Custard Cups wins.', tq('#tbl .seat.me .av'), tutDone)
+    lookStep('scoreSets', 'Sets scored', () => 'Pair ' + RS(0).tempura + ', Fish set ' + RS(0).sashimi + ', Moon on paste ' + (RS(0).nigiri + RS(0).wasabi) + ', one bun ' + RS(0).dumpling + '.', tq('#tbl .seat.me .ctr'), tutDone, { pending: 'Counting the round' }),
+    lookStep('rollTie', 'Roll tie', () => 'Tied at ' + RS(0).icons + ' icons: the 6 splits, +' + RS(0).maki + ' each, no second.', myTray('roll'), tutDone, { side: 'bottom' }),
+    lookStep('clear', 'Round over', () => R() + ' scored ' + RS(1).total + '. Only custard stays; three rounds make a meal.', tq('#tbl .seat.me .ctr'), tutDone, { side: 'top' }),
+    lookStep('custardEnd', 'Custard counts', 'Most Custard Cups scores 6 at the end. Ties split.', shelfOrMe, tutDone),
+    lookStep('penalty', 'Fewest cups', 'Fewest loses 6 with 3+ diners. Equal totals: more cups wins.', shelfOrMe, tutDone),
   ];
 }
 // titles and fixed sentences live in story.js (KK.STORY.tut); steps with live numbers keep their own sentence

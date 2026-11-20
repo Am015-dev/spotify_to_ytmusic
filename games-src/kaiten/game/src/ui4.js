@@ -180,7 +180,7 @@ function showFinal() {
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
   if (humans().length || NET.on) lsSet('kk_done', '1');
-  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', '1');
+  if (humanWin && UI.mode !== 'tutorial' && !UI.camp) lsSet('kk_won', String(Math.min(9, (+lsGet('kk_won') || 0) + 1)));
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {

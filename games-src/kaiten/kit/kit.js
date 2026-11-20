@@ -29,7 +29,7 @@ const TYPES = {
   egg:      { name: 'Sun Nigiri',     l: ['Sun', 'Nigiri'],     c: '#f3c933', rule: 'v1',     ruleText: 'Worth 1 point (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 1 },
   wasabi:   { name: 'Fire Paste',     l: ['Fire', 'Paste'],     c: '#94c83d', rule: 'x3',     ruleText: 'Your next Nigiri is worth x3', rim: 'zigzag', group: 'wasabi' },
   chop:     { name: 'Twin Sticks',    l: ['Twin', 'Sticks'],    c: '#9a5b3c', rule: 'swap',   ruleText: 'Later: serve 2 plates; sticks pass on', rim: 'dashes', group: 'chop' },
-  pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6', rim: 'dots', group: 'pudding' }
+  pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6 (no -6 with 2 diners)', rim: 'dots', group: 'pudding' }
 };
 const ORDER = ['tempura', 'sashimi', 'dumpling', 'roll1', 'roll2', 'roll3', 'salmon', 'squid', 'egg', 'wasabi', 'chop', 'pudding'];
 const PLAYERS = [

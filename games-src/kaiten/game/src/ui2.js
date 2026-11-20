@@ -17,10 +17,10 @@ function kkRaceLine(info) {
   const v = viewSeat(), np = G.np, ic = s => info.rs[s].icons, pc = pudCounts();
   const nm = s => s === v ? 'you' : pname(s).replace(/^Auntie /, '').slice(0, 8);
   const seats = Array.from({ length: np }, (_, s) => s).sort((a, b) => (a === v ? -1 : b === v ? 1 : 0) || 0);
-  const list = f => { const o = seats.filter(s => s !== v).sort((a, b) => f(b) - f(a)); return [v].concat(o.slice(0, 2)).map(s => nm(s) + ' ' + f(s)).join(' · ') + (o.length > 2 ? ' · +' + (o.length - 2) : ''); };
+  const list = (f, fmt) => { const o = seats.filter(s => s !== v).sort((a, b) => f(b) - f(a)); return [v].concat(o.slice(0, 2)).map(s => nm(s) + ' ' + (fmt ? fmt(s) : f(s))).join(' · ') + (o.length > 2 ? ' · +' + (o.length - 2) : ''); };
   const out = [];
   if (seats.some(s => ic(s) > 0)) out.push('Rolls: ' + list(ic));
-  if (pc.some(n => n > 0)) out.push('Custard: ' + list(s => pc[s]));
+  if (pc.some(n => n > 0)) { const pp = KK.puddingPoints(pc, np), lvl = Math.max(...pc) === Math.min(...pc), sg = x => x > 0 ? ' +' + x : x < 0 ? ' \u2212' + -x : ''; out.push('Custard at the end: ' + list(s => pc[s], s => pc[s] + (lvl ? '' : ' → ' + (sg(pp[s]).trim() || '0'))) + (lvl ? ' · level' : '')); }
   return out;
 }
 function kkRace() {
@@ -39,7 +39,10 @@ function kkRace() {
   const cur = info.rs[v].maki;
   if (R.pts != null && cur !== R.pts) {
     const top = G.players.map((p, s) => s).filter(s => s !== v).sort((a, b) => info.rs[b].icons - info.rs[a].icons)[0], d = cur - R.pts, mine = info.rs[v].icons, theirs = top == null ? 0 : info.rs[top].icons;
-    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; } if (top != null && !UI.rsOpen && G.turn < G.hand) toast(d < 0 ? 'Roll race: ' + pname(top) + ' has ' + theirs + ' icons to your ' + mine + '. You −' + (-d) + '.' : 'Roll race: your ' + mine + ' icons now beat ' + pname(top) + '\'s ' + theirs + '. You +' + d + '.');
+    const ic = info.rs.map(r => r.icons), me = makiRank(ic)[v], tied = ic.filter(x => x === mine).length > 1 && me.rank > 0;
+    const place = me.rank ? (tied ? 'tied ' + ORD[me.rank] : ORD[me.rank]) : 'behind', lead = (top == null ? 'Nobody' : pname(top)) + ' leads rolls, ' + theirs + ' to ' + mine;
+    const msg = me.rank ? (d > 0 ? (me.rank === 1 && !tied ? 'You lead the roll race. You +' + d + '.' : 'You\'re now ' + place + ' in rolls. You +' + d + '.') : 'Down to ' + place + ' in rolls. You \u2212' + (-d) + '.') : lead + '. You \u2212' + (-d) + '.';
+    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; toast(msg); }
   }
   R.pts = cur;
 }
@@ -227,11 +230,11 @@ function renderBelt() {
   const sl = belt.scrollLeft;
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
-  const m = Math.max(hand.length, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(innerWidth >= 1500 ? 150 : 118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  const m = Math.max(hand.length, 1), avail = beltWidth() - 20, GAP = ph && boardSize().w < boardSize().h ? -3 : 6;   // tall phone: plates overlap a little so up to 6 fit one row, bigger
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(innerHeight < 600 ? 62 : 84, Math.min(innerWidth >= 1500 ? 150 : 118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * GAP) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 4 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
-  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
+  const one = Math.floor((avail - (m - 1) * GAP) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 6 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
+  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * GAP) / k))); }
   else if (ph && hand.length && land) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   // the belt never takes more than about half the board: the counters stay readable on short phones
   if (ph && !land) { const H2 = boardSize().h * .5, cap = Math.floor(two ? (H2 - 92) / 2.8 : (H2 - 84) / 1.4); if (cap < hw) hw = Math.max(44, cap); }
@@ -368,7 +371,7 @@ function openGroup(seat, k) {
   const tab = tables(), info = seatScoreInfo(tab), gs = groupsOf(seat, tab, info).list, g = gs.find(x => x.k === k);
   const p = G.players[seat];
   let type, title, line;
-  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; line = 'End: most +6, fewest −6'; }
+  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; line = G && G.np === 2 ? 'End: most +6 (2 diners: no −6)' : 'End: most +6, fewest −6'; }
   else if (g) { type = g.k === 'roll' ? 'roll2' : g.type; title = g.k === 'roll' ? 'Seaweed Rolls' : g.on ? 'Fire Paste + ' + TY[g.on].name : TY[g.type].name + (g.n > 1 ? 's' : ''); line = /^= /.test(g.hint) ? 'Scores ' + g.hint.slice(2) + ' now' : g.hint.charAt(0).toUpperCase() + g.hint.slice(1); if (g.k === 'wasabi') line = 'Next nigiri scores triple'; if (g.k === 'chop') line = 'Later: grab two dishes'; }
   else return;
   UI.pop = { kind: 'group', seat, k }; clearTimeout(UI.popT); UI.popT = setTimeout(() => { if (UI.pop && UI.pop.k === k) closePop(); }, 3500);

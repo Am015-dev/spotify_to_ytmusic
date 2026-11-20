@@ -132,7 +132,7 @@ function dinerCard(c, o) {
   card.style.setProperty('--dc', pc.c);
   card.append(h('div.dtop', campPic(h('div.dimg', { html: avatarC(c, 120) }), c), h('h3', PN[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', d.story), h('p.enjoy', d.enjoy),
     h('div.drow', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'At the table ✓' : 'Invite'),
-      on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
+      on ? h('span.lvs', ['easy', 'easy+', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
   return card;
 }
 function setupEl() {
@@ -216,7 +216,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop
 // ---------- phone mode ----------
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = GXV.now(), w = vm.w, hh = vm.h, short = Math.min(w, hh);
-  let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
+  const coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  let ph = (short <= 500 && (w < hh || w < 720)) || (coarse && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); if (UI.prefs.tap2 == null) UI.prefs.tap2 = !ph;   // phones: Serve button only by default (no accidental second tap)

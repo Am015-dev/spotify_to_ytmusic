@@ -80,7 +80,7 @@
       "intro": [
         { "who": "kofi", "text": "Room for one more? I just finished my bus route and I want rolls!" },
         { "who": "suzu", "text": "Each round, most roll icons scores 6 and second most scores 3. Count the icons, not the cards." },
-        { "who": "suzu", "text": "Three diners now: hands pass round faster than you think." }
+        { "who": "suzu", "text": "Three diners now: each hand comes back to you every third turn. Remember what was in it." }
       ],
       "outro": [
         { "who": "kofi", "text": "Ha! You out-rolled me. I'm cheering anyway!" },
@@ -91,7 +91,7 @@
         "aiLevel": "easy", "aiStyle": "standard" },
       "setup": { "np": 3, "seats": [3, 4], "level": "easy", "lv": ["easy", "easy", "easy", "easy"] },
       "twist": null,
-      "goal": { "type": "custom", "value": 2, "text": "Win, taking the 6-point roll prize in at least 2 of the 3 rounds." },
+      "goal": { "type": "custom", "value": 2, "text": "Win, finishing first in rolls (alone or tied) in at least 2 of the 3 rounds." },
       "hints": true,
       "stars": [
         { "text": "Take the roll prize in 2 rounds", "test": { "k": "rollWins", "op": ">=", "v": 2 } },
@@ -159,7 +159,7 @@
       "intro": [
         { "who": "kofi", "text": "Dinner shift's over. Budge up, Odile!" },
         { "who": "suzu", "text": "Three at the belt again, and now both of them play well." },
-        { "who": "suzu", "text": "With three diners, fewest Custard Cups loses 6. Don't end with none." }
+        { "who": "suzu", "text": "With three or more diners, fewest Custard Cups loses 6. Don't end with none." }
       ],
       "outro": [
         { "who": "suzu", "text": "Forty points at a full dinner table. The midnight crowd has noticed you." }
@@ -263,7 +263,7 @@
       "intro": [
         { "who": "suzu", "text": "Once a year, the best diner at my belt eats from the Golden Plate." },
         { "who": "taro", "text": "I've held it three years. The house gives the champion a little head start." },
-        { "who": "suzu", "text": "He's sharp, Mina, but he can only take one plate a turn. Same as you." }
+        { "who": "suzu", "text": "He's sharp, Mina. Twin Sticks let him take two plates in one turn, so watch for them." }
       ],
       "outro": [
         { "who": "taro", "text": "The plate is yours. I'll be here tomorrow night. And the next." },

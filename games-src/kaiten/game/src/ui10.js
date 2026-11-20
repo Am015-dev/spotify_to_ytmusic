@@ -22,7 +22,7 @@ const HLP_RULES = [
   { phase: 'twin', title: 'Twin Sticks', text: 'Keep them on the table. On a later turn take two dishes from your hand at once.', pic: () => HPIC.card('chop', 64) },
   { phase: 'twin', title: 'How to use them', text: 'Tap the glowing sticks, then tap two dishes. The sticks return to the hand you pass.', pic: HPIC.belt },
   { phase: 'twin2', title: 'Two dishes', text: 'Tap two dishes from your hand. You take both, then the hand passes on.', pic: () => HPIC.row(['tempura', 'tempura']) },
-  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks are put back into your hand, so the next diner can use them.', pic: () => HPIC.card('chop', 64) },
+  { phase: 'twin2', title: 'Sticks go back', text: 'The Twin Sticks ride back in the hand you pass. Whoever takes them can use them on a later turn.', pic: () => HPIC.card('chop', 64) },
   { phase: 'tally', title: 'Counting a round', text: 'Sets, rolls, buns and nigiri are scored now. Custard waits until the game ends.', pic: () => HPIC.row(['tempura', 'roll2', 'dumpling']) },
   { phase: 'tally', title: 'Three rounds', text: 'The meal lasts three rounds. The highest total after round three wins.', pic: () => HPIC.num(3) }
 ];
