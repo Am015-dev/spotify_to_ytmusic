@@ -254,3 +254,5 @@ html body #bd .bidt .spot:not(:has(.sp-b)){display:flex!important;flex-direction
 html body #bd .bidt .sp-b.dear{opacity:1!important;border-color:#b08a5a;background:linear-gradient(#fffaf0,#efe0c0)}
 html body #bd .bidt .sp-b.glow{border-color:#1f6a2a;box-shadow:0 0 0 2px rgba(31,106,42,.35)}
 html body #bd .bidt .spot:last-child{align-items:stretch!important}
+/* F2: the suggested tile's ★+N badge (top-left corner, inside the tile) */
+html body #grid .tile .why{position:absolute;left:1px;top:1px;z-index:4;padding:1px 4px;border-radius:7px;background:#1f6a2a;color:#fff;font:900 13px/1.15 var(--ff-b,system-ui);box-shadow:0 1px 2px rgba(0,0,0,.45);pointer-events:none;white-space:nowrap}

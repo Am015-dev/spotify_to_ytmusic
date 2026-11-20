@@ -117,3 +117,16 @@ function scGlowHint(){if(!G||G.over||G.tut||online()||(typeof gdStep==='function
 (function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
   R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));R.classList.toggle('mk-buy',!!(G&&!G.over&&UI.pickMk&&UI.pickMk.length));
   const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
+// F2: the one glowing (suggested) tile says why: a ★+N badge on it, and the line names the reason ("Tap ★ for +9: 3 Advisors and a palm")
+function scWhy(){try{if(!G||G.over||G.tut||G.coach||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||G.phase!=='turn'||G.step!=='move'||UI.pick.length!==1)return null;
+  const hp=me();if(!hp||G.cur!==hp.i||G.pl.filter(x=>x.human).length!==1||!scMine())return null;const t=UI.pick[0];let best=null;
+  if(!G.move){scCompute();const sx=SC.starts[t];best=sx&&sx.best}
+  else{const sx=SC.key===G.turn+'|'+G.round?SC.starts[G.move.start]:null;if(sx)for(const x of sx.outs)if(scPrefix(x,G.move.path,t)&&(!best||x.total>best.total))best=x}
+  if(!best||best.total<=0)return null;
+  const lab=s=>s.replace(/^tile (.+)$/,'$1 tile').replace(/^(palm|palace)$/,'a $1').replace(/^goods sets$/,'goods').replace(/^Shadows strike$/,'a strike');
+  const ps=best.parts.filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,2).map(x=>lab(x[1]));if(!ps.length)return null;
+  let txt='+'+best.total+': '+ps.join(' and ');if(('Tap ★ for '+txt).split(/\s+/).length>8)txt='+'+best.total+': '+ps[0];
+  return {tile:t,total:best.total,txt}}catch(e){return null}}
+(function(){const o=lineText;lineText=function(){const t=o.apply(this,arguments);const w=scWhy();return w?'Tap ★ for '+w.txt:t}})();
+(function(){const o=renderGrid;renderGrid=function(){o.apply(this,arguments);const w=scWhy();if(!w)return;const e=document.querySelector('#grid .tile[data-tile="'+w.tile+'"]');
+  if(e&&!e.querySelector('.why'))e.insertAdjacentHTML('beforeend','<b class="why" aria-hidden="true">★+'+w.total+'</b>')}})();
