@@ -26,7 +26,8 @@ body{background-color:var(--lac);background-image:
 .ib{flex:0 0 44px;height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--gold)}
 .ib svg{width:22px;height:22px}
 .ib[aria-pressed="true"]{background:rgba(216,180,90,.18)}
-#status{flex:1 1 auto;min-width:0;text-align:center;font-size:15px;font-weight:700;letter-spacing:.02em;line-height:1.15;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status{flex:1 1 auto;min-width:0;text-align:center;font-size:15px;font-weight:700;letter-spacing:.02em;line-height:1.15;color:var(--ink);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#status.rv{font-size:13px}
 #status.rv{color:#f0a6b0}
 /* player strips */
 .ps{flex:0 0 auto;display:flex;flex-direction:column;gap:2px;padding:3px 2px;position:relative;border-radius:10px;transition:background .3s}

@@ -142,7 +142,8 @@ var UI = (function () {
     if (U.say) { s = U.say; el.classList.toggle('rv', !!U.sayRv); }
     else if (g.over) s = g.over.winner === 0 ? 'You win!' : 'Rival wins';
     else if (g.turn === 1 || U.busy) { s = 'Rival is choosing…'; el.classList.add('rv'); }
-    else if (q) s = q.h === 'wild' ? 'Tap a colour to match' : q.h === 'tok' ? 'Take one more ' + NAME[q.c] : q.h === 'steal' ? "Tap a rival's gem to take" : q.h === 'royal' ? 'Choose a patron' : 'Too many gems: return ' + q.n;
+    else if (U.recap && !q && !U.mode && !U.sel.length) { s = U.recap; el.classList.add('rv'); }
+    else if (q) s = q.h === 'wild' ? 'Tap a colour to match' : q.h === 'tok' ? 'Take one more ' + NAME[q.c] : q.h === 'steal' ? "Tap a rival's gem to take" : q.h === 'royal' ? 'Choose a patron' : 'Tap your gems to return ' + q.n;
     else if (U.mode === 'fav') s = 'Tap any gem to take it';
     else if (U.mode === 'res') s = 'Tap a jewel to keep';
     else if (U.sel.length) s = U.sel.length < 3 ? 'Add gems in line, or Take' : 'Tap Take';
@@ -185,7 +186,7 @@ var UI = (function () {
     var cardR = rectOf(srcCard), stealR = m.t === 'steal' ? rectOf(colEl(1 - p, m.c)) : null;
     var before = { pts: E.points(g.pl[p]), cr: E.crowns(g.pl[p]) };
     var ev = E.performMove(g, m);
-    U.sel = []; U.mode = null; U.resGold = null; U.say = null;
+    U.sel = []; U.mode = null; U.resGold = null; U.say = null; if (p === 0) U.recap = null;
     render();
     var P = g.pl[p];
     if (ev.got) { var got = [].concat(ev.got); got.forEach(function (t, i) { var fr = m.cells ? pre[m.cells[i]] : m.t === 'steal' ? stealR : pre.c; setTimeout(function () { fly(fr, OART.gm(t), colEl(p, t), 34); }, i * 70); }); SND.clink(got.length); }
@@ -201,6 +202,7 @@ var UI = (function () {
       if (dc > 0) setTimeout(function () { pop(nm.children[1], '+' + dc + ' crown'); }, 600);
     }
     if (m.t === 'refill') SND.clink(3);
+    if (m.t === 'disc') { fly(rectOf(colEl(p, m.c)), OART.gm(m.c), $('#refillbtn'), 30); toast((p ? 'Rival returns ' : 'Returned ') + NAME[m.c]); }
     if (m.t === 'royal') { SND.win(); toast(PAT[m.id].n); }
     if (ev.fav) setTimeout(function () { toast(p ? 'You get a Favour' : 'Rival gets a Favour'); }, 300);
     if (ev.again) setTimeout(function () { toast(p ? 'Rival goes again' : 'Encore! Go again'); }, 450);
@@ -239,19 +241,21 @@ var UI = (function () {
   }
   var aiRun = 0;
   function aiTurn() {
-    var run = ++aiRun; U.busy = true; render();
+    var run = ++aiRun, lines = []; U.busy = true; U.recap = null; render();
     (async function () {
       await delay(aiMs(500));
       while (run === aiRun && G() && G().turn === 1 && !G().over) {
         var seq = A.pick(G(), U.level);
         if (!seq.length) break;
         for (var i = 0; i < seq.length && run === aiRun; i++) {
-          rivalShow(seq[i]); await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 900 : 700));
+          rivalShow(seq[i]); lines.push(rivalLine(seq[i], G()).replace(/^Rival /, '').replace(/^takes /, 'took ').replace(/^buys /, 'bought ').replace(/^keeps /, 'kept ').replace(/^refills/, 'refilled').replace(/^uses /, 'used ').replace(/^wins /, 'won ').replace(/^returns /, 'returned ').replace(/^matches /, 'matched '));
+          await delay(aiMs(seq[i].t === 'take' || seq[i].t === 'buy' ? 1300 : 1000));
           if (run !== aiRun) return;
           doMove(seq[i]); U.say = null; await delay(aiMs(550));
         }
       }
       if (run !== aiRun) return;
+      U.recap = lines.length ? lines.join('. ') + '. Your turn' : null;
       U.busy = false; U.say = null; render(); after();
     })();
   }
@@ -350,6 +354,7 @@ var UI = (function () {
     if (t.hasAttribute('data-close')) { closeSheet(); return; }
     if (t.closest('#sheet,.modal,#title,#coach')) return;
     var g = G(); if (!g) return;
+    if (U.recap && t.closest('#board,#pyr,#me,#side')) U.recap = null;
     if (t.id === 'menubtn') return menu();
     if (t.id === 'rulesbtn') return rules();
     if (t.id === 'hintbtn') return hint();

@@ -24,11 +24,12 @@ var OTUT = (function () {
   var STEPS = [
     { say: 'Tap 3 gems in a straight line.', cells: [0, 1, 2], noFav: true, at: '.cell[data-cell="0"]', allow: function (m) { return m.t === 'take' && m.cells.slice().sort().join() === '0,1,2'; } },
     { say: 'You can afford the glowing jewel. Tap it.', card: TARGET, noFav: true, cells: [], at: '.card[data-id="' + TARGET + '"]', allow: function (m) { return m.t === 'buy' && m.l === 0 && U.G.pyr[0][m.i] === TARGET; } },
+    { say: 'Your jewel makes Ruby 1 cheaper, forever.', info: 'Next' },
     { say: 'Tap a gold coin. Gold keeps a jewel.', noFav: true, gold: true, allow: function (m) { return m.t === 'reserve'; } },
-    { say: 'Tap your Favour scroll, then any gem.', at: '#me .favb', cells: null, allow: function (m) { return m.t === 'fav'; } },
+    { say: 'A Favour scroll takes any one gem. Tap yours.', at: '#me .favb', cells: null, allow: function (m) { return m.t === 'fav'; } },
     { say: 'Now take gems or buy. Your move!', cells: null, allow: function () { return true; } },
     { say: 'Win: 20 points, 10 crowns, or 10 in one colour.', info: 'Got it' },
-    { say: 'Crowns win patrons. Refilling gives your rival a Favour.', info: 'Play on' }
+    { say: 'Crowns win patrons. Stuck? The bulb shows a good move.', info: 'Play on' }
   ];
   function coach(text, btn) {
     var c = $('#coach'); if (!c) { c = document.createElement('div'); c.id = 'coach'; document.body.appendChild(c); }
@@ -58,15 +59,16 @@ var OTUT = (function () {
       onMove: function (m, ev) {
         if (ev && ev.p === 1) return;   // the rival's moves never advance the lesson
         var s = STEPS[step]; if (!s || s.info) return;
-        if (m.t === 'fav' && step === 3) { go(4); return; }
+        if (m.t === 'fav' && step === 4) { go(5); return; }
         if (T.lastOk === step && /^(take|buy|reserve)$/.test(m.t)) { T.lastOk = -1; T.waitRival = step + 1; }
       },
       onRender: function () {
         if (T.waitRival !== undefined && U.G.turn === 0 && !U.busy && !U.G.pend) { var n = T.waitRival; T.waitRival = undefined; go(n); return; }
-        if (U.G.turn === 0 && !U.busy) finger(U.mode === 'res' && step === 2 ? '.card.glow' : U.sel.length === 3 && step === 0 ? '#takebtn' : document.querySelector('#sheet [data-buy]:not([disabled])') ? '#sheet [data-buy]' : fingerFor);
+        if (U.G.turn === 0 && !U.busy) finger(U.mode === 'res' && step === 3 ? '.card.glow' : U.sel.length === 3 && step === 0 ? '#takebtn' : document.querySelector('#sheet [data-buy]:not([disabled])') ? '#sheet [data-buy]' : fingerFor);
         else finger(null);
+        var co = $('#coach'); if (co) co.style.visibility = (U.G.turn === 1 || U.busy) && !STEPS[step].info ? 'hidden' : 'visible';
         var c = $('#coach .t');
-        if (c && step === 2 && U.mode === 'res') c.textContent = 'Now tap any jewel to keep it.';
+        if (c && step === 3 && U.mode === 'res') c.textContent = 'Now tap any jewel to keep it.';
         if (c && step === 0 && U.sel.length === 3) c.textContent = 'Tap Take.';
       } };
     UI.newGame('easy', 1, 0); U.tut = T; U.G = setup(); U.sel = []; U.mode = null;
