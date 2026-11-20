@@ -218,3 +218,17 @@ html.kkend #beltz{background:#2f1f1a!important;border-top-color:#1c1210!importan
 #rs.kkrnd .rsbox.bar .btn{flex:1 1 100%;min-height:48px;min-width:0;border-image:none!important;border:3px solid #4a2a22;border-radius:14px;box-shadow:none;background:linear-gradient(180deg,#f47a5f,#d9452c);color:#fff;font-size:18px}
 /* PC: one roster chip per line so "choosing" / "ready" never clips in the narrower side panel */
 @media (min-width:1024px){html:not(.ph) #roster{flex-direction:column;flex-wrap:nowrap}html:not(.ph) #roster .chip{width:100%;min-width:0}html:not(.ph) #roster .chip .ct{min-width:0;overflow:hidden;text-overflow:ellipsis}}
+/* R82 cold-play fixes (ui13.js): live race line, round-over panel in the tutorial, Next on look steps, no bulb in the tutorial */
+#kkrace{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px;min-height:22px;padding:2px 8px 0;font-weight:800;font-size:14px;line-height:20px;color:#ffe7a8;white-space:nowrap;box-sizing:border-box}
+#kkrace[hidden]{display:none}
+#kkrace.kq{visibility:hidden}
+html.kktut #bulbbtn{display:none!important}
+.kktp{margin:0 auto;align-self:center;background:#fff3d6;color:#3a1f17;border:3px solid #4a2a22;border-radius:14px;padding:10px 16px;width:min(320px,calc(100vw - 32px));text-align:center;box-sizing:border-box}
+.kktp b{font-size:16px}
+.kktp ol{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px}
+.kktp li{display:flex;justify-content:space-between;font-weight:800;font-size:18px}
+.kktp li.me{color:#8c3b27}
+.kktp .kts{font-size:14px;opacity:.85}
+@media (max-height:620px){.gxt-bub.kkhasnext .gxh-tt{padding-right:84px!important}.gxt-bub.kkhasnext .gxh-tx{padding-right:92px!important}}
+#toast[data-race="1"]{top:calc(52px + env(safe-area-inset-top,0px));bottom:auto}
+html.ph.ph-p #belt{padding-bottom:10px}

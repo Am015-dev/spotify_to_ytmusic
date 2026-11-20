@@ -9,7 +9,39 @@ function render() {
   try { netRenderHook(); } catch (e) { }
   try { boardFX(); } catch (e) { }
   try { hlpAfter(); } catch (e) { }
+  try { kkRace(); } catch (e) { }
   if (PX.on) pxDirty();
+}
+// ---- 4. running set races made visible: a live "Rolls: you 4 · Odile 5" line, and a toast saying why your points moved
+function kkRaceLine(info) {
+  const v = viewSeat(), np = G.np, ic = s => info.rs[s].icons, pc = pudCounts();
+  const nm = s => s === v ? 'you' : pname(s).replace(/^Auntie /, '').slice(0, 8);
+  const seats = Array.from({ length: np }, (_, s) => s).sort((a, b) => (a === v ? -1 : b === v ? 1 : 0) || 0);
+  const list = f => { const o = seats.filter(s => s !== v).sort((a, b) => f(b) - f(a)); return [v].concat(o.slice(0, 2)).map(s => nm(s) + ' ' + f(s)).join(' · ') + (o.length > 2 ? ' · +' + (o.length - 2) : ''); };
+  const out = [];
+  if (seats.some(s => ic(s) > 0)) out.push('Rolls: ' + list(ic));
+  if (pc.some(n => n > 0)) out.push('Custard: ' + list(s => pc[s]));
+  return out;
+}
+function kkRace() {
+  let el = $('#kkrace'); const bz = $('#beltz');
+  const on = !!(G && UI.started && G.phase !== 'over' && viewSeat() >= 0 && !tutOn() && bz);
+  if (!on) { if (el) el.hidden = true; return; }
+  if (!el) { el = h('div#kkrace', { role: 'status', 'aria-live': 'off' }); bz.insertBefore(el, bz.firstChild); }
+  el.hidden = false;
+  const info = seatScoreInfo(tables()), parts = kkRaceLine(info);
+  const sig = parts.join('|'); if (el.dataset.sig !== sig) { el.dataset.sig = sig; el.replaceChildren(...(parts.length ? parts.map(t => h('span', t)) : [h('span.kq', 'Rolls and custard: nobody has any yet')])); }
+  el.classList.toggle('kq', !parts.length);
+  if (UI.rsOpen || (G.phase === 'pick' && G.turn >= G.hand)) { const t = $('#toast'); if (t && t.dataset.race) { t.classList.remove('on'); } }
+  // why did my points move? only when the picture has settled (not mid-reveal) and a roll race flipped
+  if (UI.fz || G.phase !== 'pick') return;
+  const v = viewSeat(), R = UI.kkRace && UI.kkRace.g === G && UI.kkRace.round === G.round ? UI.kkRace : (UI.kkRace = { g: G, round: G.round, pts: null });
+  const cur = info.rs[v].maki;
+  if (R.pts != null && cur !== R.pts) {
+    const top = G.players.map((p, s) => s).filter(s => s !== v).sort((a, b) => info.rs[b].icons - info.rs[a].icons)[0], d = cur - R.pts, mine = info.rs[v].icons, theirs = top == null ? 0 : info.rs[top].icons;
+    if (top != null && !UI.rsOpen && G.turn < G.hand) { $('#toast').dataset.race = '1'; } if (top != null && !UI.rsOpen && G.turn < G.hand) toast(d < 0 ? 'Roll race: ' + pname(top) + ' has ' + theirs + ' icons to your ' + mine + '. You −' + (-d) + '.' : 'Roll race: your ' + mine + ' icons now beat ' + pname(top) + '\'s ' + theirs + '. You +' + d + '.');
+  }
+  R.pts = cur;
 }
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
@@ -233,6 +265,12 @@ function renderBelt() {
   UI.enter = '';
   belt.scrollLeft = sl;
   try { const s = belt.querySelector('.hc.sel') || belt.querySelector('.hc.rec'); if (s) { const bl = belt.getBoundingClientRect(), sr = s.getBoundingClientRect(); if (sr.left < bl.left) belt.scrollLeft += sr.left - bl.left - 8; else if (sr.right > bl.right) belt.scrollLeft += sr.right - bl.right + 8; } } catch (e) { }
+  // tutorial, after the round is counted: the empty belt shows the round result instead of a dark gap
+  if (tutOn() && UI.tutOver && G.rs && G.rs[0]) {
+    const rs = G.rs[0], order = G.players.map((p, s) => s).sort((a, b) => rs[b].total - rs[a].total);
+    belt.replaceChildren(h('div.kktp', h('b', 'Round 1 scored'), h('ol', ...order.map(s => h('li' + (s === v ? '.me' : ''), h('span.n', s === v ? 'You' : pname(s)), h('span.p', '+' + rs[s].total)))), h('div.kts', 'Custard waits until the meal ends.')));
+    return;
+  }
 }
 // would one more custard put this diner alone in front (worth +6 at the end of the game)?
 function pudLead(v) { const pc = pudCounts(); return pc.every((n, i) => i === v || n < pc[v] + 1) && !pc.every((n, i) => i === v || n < pc[v]); }

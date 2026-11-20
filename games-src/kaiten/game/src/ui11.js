@@ -238,5 +238,24 @@ function coachEnd() {
 // the final score pad is not shown in the tutorial: the table stays under the steps, and the end card closes it
 { const o = showFinal; showFinal = function () {
   if (UI.mode === 'coached') { UI.overShown = true; try { renderDock(); markWinners(); } catch (e) { } coachEnd(); return; }
-  if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); markWinners(); } catch (e) { } return; }
+  if (UI.mode === 'tutorial') { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.overShown = true; UI.tutOver = true; try { renderDock(); renderBelt(); markWinners(); } catch (e) { } return; }
   return o.apply(this, arguments); }; }
+
+// ---- 2. tutorial: a step with nothing required (a "look" step) says Next, and a tap on its bubble moves on; the bulb is hidden while the tutorial runs
+function kkTutLook() { if (!tutOn()) return null; const st = GXT.current(); return st && st.look ? st : null; }
+function kkTutStepOn() { const st = kkTutLook(); if (st) GXT.act({ type: 'tap', what: 'look', step: st.id }); }
+function kkTutNext() {
+  const html = document.documentElement; html.classList.toggle('kktut', tutOn());
+  const st = kkTutLook(), b = document.querySelector('.gxt-bub'); if (!st || !b || b.querySelector('.kknext')) return;
+  const btn = h('button.gxh-ok.kknext', { type: 'button' }, 'Next');
+  btn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); kkTutStepOn(); });
+  b.appendChild(h('div.gxh-row2', btn)); b.classList.add('kkhasnext');
+  b.querySelectorAll('[data-help]').length || b.setAttribute('data-help', '');
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 0);   // the kit re-places the bubble now that it is taller
+}
+setInterval(() => { try { kkTutNext(); } catch (e) { } }, 150);
+window.addEventListener('click', e => {
+  const b = e.target && e.target.closest && e.target.closest('.gxt-bub'); if (!b || e.target.closest('.kknext')) return;
+  if (!kkTutLook()) return; e.stopPropagation(); e.preventDefault(); kkTutStepOn();
+}, true);
+
