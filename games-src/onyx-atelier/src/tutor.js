@@ -24,7 +24,7 @@ var OTUT = (function () {
   var STEPS = [
     { say: 'Tap 3 gems in a straight line.', cells: [0, 1, 2], noFav: true, at: '.cell[data-cell="0"]', allow: function (m) { return m.t === 'take' && m.cells.slice().sort().join() === '0,1,2'; } },
     { say: 'You can afford the glowing jewel. Tap it.', card: TARGET, noFav: true, cells: [], at: '.card[data-id="' + TARGET + '"]', allow: function (m) { return m.t === 'buy' && m.l === 0 && U.G.pyr[0][m.i] === TARGET; } },
-    { say: 'Tap a gold coin. Gold keeps a jewel.', noFav: true, cells: null, at: '.cell[data-cell="12"]', allow: function (m) { return m.t === 'reserve'; } },
+    { say: 'Tap a gold coin. Gold keeps a jewel.', noFav: true, gold: true, allow: function (m) { return m.t === 'reserve'; } },
     { say: 'Tap your Favour scroll, then any gem.', at: '#me .favb', cells: null, allow: function (m) { return m.t === 'fav'; } },
     { say: 'Now take gems or buy. Your move!', cells: null, allow: function () { return true; } },
     { say: 'Win: 20 points, 10 crowns, or 10 in one colour.', info: 'Got it' },
@@ -44,8 +44,9 @@ var OTUT = (function () {
   }
   function go(i) {
     step = i; var s = STEPS[i]; if (!s) return end();
-    T.cells = s.cells || null; T.card = s.card; T.noFav = !!s.noFav; T.allowStep = s.allow;
-    coach(s.say, s.info); fingerFor = s.at || null;
+    T.cells = s.cells || null; T.card = s.card; T.noFav = !!s.noFav; T.allowStep = s.allow; fingerFor = s.at || null;
+    if (s.gold) { T.cells = []; U.G.board.forEach(function (t, k) { if (t === 'o') T.cells.push(k); }); fingerFor = '.cell[data-cell="' + T.cells[0] + '"]'; }
+    coach(s.say, s.info);
     UI.render();
   }
   function end() {
