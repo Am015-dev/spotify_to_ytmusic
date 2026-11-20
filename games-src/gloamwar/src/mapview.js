@@ -172,7 +172,8 @@ MV.init = function () {
     var was = P[e.pointerId]; delete P[e.pointerId]; if (Object.keys(P).length < 2) pinch = null;
     if (!was || moved || Object.keys(P).length) { if (!Object.keys(P).length) start = null; return; }
     start = null; var t = document.elementFromPoint(e.clientX, e.clientY), el = t && t.closest ? t.closest('[data-tap]') : null; if (!el) return;
-    var v = el.getAttribute('data-tap').split(':'); if (MV.onTap) MV.onTap(v[0], v[1], v[2], e);
+    var under = null; try { (document.elementsFromPoint(e.clientX, e.clientY) || []).some(function (x) { if (x.classList && x.classList.contains('rg')) { under = x.id.slice(3); return true; } return false; }); } catch (er) { }
+    var v = el.getAttribute('data-tap').split(':'); if (MV.onTap) MV.onTap(v[0], v[1], v[2], e, under);
   };
   b.addEventListener('pointerup', up); b.addEventListener('pointercancel', function (e) { delete P[e.pointerId]; pinch = null; start = null; });
   b.addEventListener('wheel', function (e) { e.preventDefault(); var r = b.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top, k = Math.max(MV.minK, Math.min(MV.maxK, MV.k * (e.deltaY < 0 ? 1.15 : 0.87))); MV.tx = px - (px - MV.tx) * k / MV.k; MV.ty = py - (py - MV.ty) * k / MV.k; MV.k = k; MV.clamp(); MV.apply(); }, { passive: false });

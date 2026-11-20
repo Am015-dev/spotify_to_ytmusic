@@ -57,7 +57,7 @@ function apply(m, byAI) {
   var before = G.pend && G.pend.h;
   try { performMove(G, m); } catch (e) { console.error(e, m); }
   var evs = G.ev.slice(); G.ev = [];
-  UI.die = null; UI.src = null; UI.split = 0;
+  UI.die = null; UI.src = null; UI.split = 0; UI.sub = null; UI.asFace = null;
   try { if (window.GXT && GXT.active()) GXT.act({ type: 'event', what: 'move', m: m }); } catch (e) { }
   var wait = playEvents(evs, byAI);
   render();
@@ -118,7 +118,7 @@ function renderDice(ms) {
     var used = G.used[me][i], can = !used && G.phase === 'act' && !G.pend && human(sideToAct(G)) && !UI.hold;
     var b = mk('button', 'die' + (me === 'G' ? ' g' : '') + (used ? ' used' : '') + (can ? ' can' : '') + (UI.die === i ? ' sel' : ''), ico(FACE_ICON[f], me === 'G' ? '#f3e2be' : '#1f1812', 34));
     b.type = 'button'; b.setAttribute('aria-label', FACE_NAME[f] + ' die'); b.dataset.i = i; b.dataset.f = f;
-    b.onclick = function () { if (!can) { toast(used ? 'That die is used' : 'Wait for your turn'); return; } if (!tutOk({ type: 'tap', what: 'die', f: f, i: i })) return; sfx('tap'); UI.die = UI.die === i ? null : i; UI.src = null; render(); };
+    b.onclick = function () { if (!can) { toast(used ? 'That die is used' : 'Wait for your turn'); return; } if (!tutOk({ type: 'tap', what: 'die', f: f, i: i })) return; sfx('tap'); UI.die = UI.die === i ? null : i; UI.src = null; UI.sub = null; UI.asFace = null; render(); };
     d.appendChild(b);
   });
   var r = $('#rdice'); r.innerHTML = '';
@@ -172,20 +172,41 @@ function actUI(ms, hl, acts) {
     acts.push({ t: 'Back', key: 'back', f: function () { UI.src = null; render(); } });
     return 'Tap the army that ' + (UI.src.a === 'lmove' ? 'marches' : 'attacks');
   }
+  // the Will of the Dawn: first pick which face it becomes (or a hero)
+  if (f === 'W' && !UI.asFace) {
+    var faces = {}; dms.forEach(function (m) { if (m.as) faces[m.as] = 1; });
+    [['C', 'As Character', 'Company, heroes, leaders'], ['A', 'As Army', 'march or attack'], ['M', 'As Muster', 'stir nations, raise troops'], ['E', 'As Event', 'draw or play a card']].forEach(function (x) { if (faces[x[0]]) acts.push({ t: x[1], s: x[2], key: 'as-' + x[0], cls: x[0] === 'C' ? 'pri' : '', f: function () { UI.asFace = x[0]; render(); } }); });
+    dms.filter(function (m) { return m.a === 'hero'; }).forEach(function (m) { acts.push({ t: CHARS[m.c].short, s: 'rises at ' + rn(m.to), cls: 'red', key: 'hero-' + m.c, f: function () { apply(m); } }); });
+    dms.filter(function (m) { return m.a === 'skip'; }).slice(0, 1).forEach(function (m) { acts.push({ t: 'Set aside', s: 'waste this die', key: 'skip', f: function () { apply(m); } }); });
+    return 'Will of the Dawn: use it as…';
+  }
+  if (f === 'W') { dms = dms.filter(function (m) { return m.as === UI.asFace; }); }
+  if (UI.sub === 'dip' || UI.sub === 'draw') {
+    dms.filter(function (m) { return m.a === UI.sub; }).forEach(function (m) {
+      if (m.a === 'dip') acts.push({ t: NATIONS[m.n].short, s: polText(G, m.n) + ' → ' + (G.pol[m.n].s - 1 === 0 ? 'war' : (G.pol[m.n].s - 1) + ' away'), key: 'dip-' + m.n, f: function () { apply(m); } });
+      else acts.push({ t: m.d[1] === 'C' ? 'Character deck' : 'Strategy deck', s: G.deck[m.d].length + ' cards left', key: 'draw-' + m.d, f: function () { apply(m); } });
+    });
+    acts.push({ t: 'Back', key: 'back', f: function () { UI.sub = null; render(); } });
+    return UI.sub === 'dip' ? 'Which nation steps toward war?' : 'Draw from which deck?';
+  }
+  var skip = null;
   dms.forEach(function (m) {
-    var a = m.a, as = '';
-    if (a === 'dip') { acts.push({ t: 'Stir ' + NATIONS[m.n].short, s: polText(G, m.n) + ' → ' + (G.pol[m.n].s - 1 === 0 ? 'war' : (G.pol[m.n].s - 1) + ' away') + as, key: 'dip-' + m.n, f: function () { apply(m); } }); return; }
+    var a = m.a;
+    if (a === 'skip') { skip = m; return; }
+    if (a === 'dip' || a === 'draw') { if (seen[a]) return; seen[a] = 1; var n = dms.filter(function (x) { return x.a === a; });
+      acts.push({ t: a === 'dip' ? 'Stir a nation' : 'Draw a card', s: a === 'dip' ? n.length + ' can step toward war' : 'from either deck', key: a, f: function () { if (n.length === 1) apply(n[0]); else { UI.sub = a; render(); } } }); return; }
     if (a === 'minion' || a === 'hero') { acts.push({ t: CHARS[m.c].short, s: 'enters at ' + rn(m.to), cls: 'red', key: a + '-' + m.c, f: function () { apply(m); } }); return; }
-    if (a === 'draw') { acts.push({ t: 'Draw ' + (m.d[1] === 'C' ? 'character' : 'strategy'), s: G.deck[m.d].length + ' left' + as, key: 'draw-' + m.d, f: function () { apply(m); } }); return; }
     if (a === 'card') { if (seen.card) return; seen.card = 1; acts.push({ t: 'Play card', s: dms.filter(function (x) { return x.a === 'card'; }).length + ' can be played', key: 'card', f: function () { openCards(); } }); return; }
-    var key = a + (m.as || ''); if (seen[key]) return; seen[key] = 1;
+    if (seen[a]) return; seen[a] = 1;
     var lab = ACT_LABEL[a] || [a, '']; var sub = lab[1];
     if (a === 'cmove') sub = F.road >= 0 ? 'step on the Ashen Road' : 'hunt risk ' + Math.round(riskOfMove(G) * 100) + '%';
-    var x = { t: lab[0], s: sub + as, key: a, cls: a === 'cmove' || a === 'chide' ? 'pri' : a === 'skip' ? '' : '', f: null };
-    if (a === 'attack' || a === 'lattack' || a === 'lmove') { var cnt = dms.filter(function (y) { return y.a === a; }); x.f = function () { if (cnt.length === 1) apply(cnt[0]); else { UI.src = { kind: 'attackFrom', a: a }; render(); } }; }
+    var x = { t: lab[0], s: sub, key: a, cls: a === 'cmove' || a === 'chide' ? 'pri' : '', f: null };
+    if (a === 'attack' || a === 'lattack' || a === 'lmove' || a === 'sortie') { var cnt = dms.filter(function (y) { return y.a === a; }); x.f = function () { if (cnt.length === 1) apply(cnt[0]); else { UI.src = { kind: 'attackFrom', a: a }; render(); } }; }
     else x.f = function () { apply(m); };
     acts.push(x);
   });
+  if (skip) acts.push({ t: 'Set aside', s: 'waste this die', key: 'skip', cls: 'low', f: function () { apply(skip); } });
+  if (f === 'W') acts.push({ t: 'Back', key: 'back', f: function () { UI.asFace = null; render(); } });
   return FACE_NAME[f] + ' die: choose an action';
 }
 function tokId(rid) { var a = G.A[rid]; return 'tok-' + rid + '-' + (a ? armySide(a) : UI.side); }
@@ -289,11 +310,11 @@ function effectUI(ms, hl, acts) {
   return c.n + ': ' + (reg.length ? 'tap a glowing place' : 'choose');
 }
 // ---------------------------------------------------------------- map taps
-function onMapTap(kind, rid, extra) {
+function onMapTap(kind, rid, extra, ev, under) {
   if (!G) return;
   if (kind === 't') kind = 'r';
   if (kind === 'co') kind = 'r';
-  if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; }
+  if (human(sideToAct(G)) && !UI.hold && UI.tap) { if (UI.tap(kind, rid, extra)) return; if (under && under !== rid && UI.tap('r', under)) return; }
   if (kind === 'c') { charInfo(rid); return; }
   regionInfo(rid);
 }

@@ -15,7 +15,8 @@ function openCards(discard) {
   UI.discardMode = !!discard; var me = UI.side, ms = human(sideToAct(G)) && !UI.hold ? validMoves(G) : [], body = '';
   if (discard) body += '<p>Your hand holds more than 6 cards. Tap one to discard it.</p>';
   else body += '<p>' + (UI.die != null ? 'Cards your ' + FACE_NAME[G.dice[me][UI.die]] + ' die can play glow red.' : 'Pick a die first to play a card. An Event die plays any card; Character, Army and Muster dice play their own type.') + '</p>';
-  G.hand[me].forEach(function (cid) {
+  var order = G.hand[me].slice().sort(function (a, b) { var pa = ms.some(function (m) { return m.a === 'card' && m.c === a && (UI.die == null || m.i === UI.die); }) ? 0 : 1, pb = ms.some(function (m) { return m.a === 'card' && m.c === b && (UI.die == null || m.i === UI.die); }) ? 0 : 1; return pa - pb; });
+  order.forEach(function (cid) {
     var play = ms.filter(function (m) { return m.a === 'card' && m.c === cid && (UI.die == null || m.i === UI.die); })[0], dm = ms.filter(function (m) { return m.t === 'discard' && m.c === cid; })[0];
     var btn = discard && dm ? '<button class="btn red play" type="button" data-d="' + cid + '">Discard</button>' : play && UI.die != null ? '<button class="btn pri play" type="button" data-p="' + cid + '">Play</button>' : '';
     body += cardHtml(cid, btn, play && UI.die != null ? 'can' : (!discard && !cardPre(G, me, CARD[cid]) ? 'no' : ''));

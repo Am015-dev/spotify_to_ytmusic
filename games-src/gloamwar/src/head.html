@@ -74,11 +74,12 @@ body.scr-on .gx-app{visibility:hidden}
 #rdice{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
 #hunt{display:flex;align-items:center;gap:2px;font-family:var(--fell);font-size:1rem;color:var(--red)}
 #hunt svg{width:20px;height:20px}
-#acts{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px;min-height:52px}
+#acts{display:flex;flex-wrap:wrap;gap:6px;min-height:50px;max-height:170px;overflow-y:auto;scrollbar-width:thin}
 #acts::-webkit-scrollbar{display:none}
-.act{flex:0 0 auto;min-height:50px;min-width:74px;max-width:160px;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper2);padding:4px 9px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.1}
+.act{flex:1 1 30%;min-height:48px;min-width:96px;max-width:100%;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper2);padding:4px 9px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;line-height:1.1}
 .act b{font-family:var(--fell);font-weight:400;font-size:1.05rem;white-space:nowrap}
-.act small{font-size:.78rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:142px}
+.act small{font-size:.87rem;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.act.low{flex:0 1 auto;min-width:80px;opacity:.85}
 .act.pri{background:var(--ink);color:var(--paper)}.act.pri small{color:#d9c79e}
 .act.red{background:var(--red);color:var(--paper);border-color:var(--red2)}.act.red small{color:#f2d6b8}
 .act:disabled{opacity:.4}
