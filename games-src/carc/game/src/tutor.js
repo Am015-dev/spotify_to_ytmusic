@@ -54,7 +54,8 @@ const tutP=(n,st)=>!!G&&G.turn===n&&myTurn(st);
 const tutAfter=(n,pts)=>!!G&&G.turn===n&&G.step==='place'&&G.cur.p===1&&P(0).score===pts;
 // ---------------------------------------------------------------- the steps
 function tutSteps(){return tutStory(tutSteps0())}
-function tutStory(L){tutStyle();return L.map(st=>{if(st.wait&&st.wait.match&&st.onEnter&&!st.wrong&&/tOn\(\)/.test(String(st.onEnter)))st.wrong='Tap the lit tile.';const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
+const tutTopRect=()=>{const t=document.getElementById('top');return t&&t.offsetHeight?[t.getBoundingClientRect()]:[]};   // the score bar stays visible all lesson
+function tutStory(L){tutStyle();return L.map(st=>{if(!st.avoid)st.avoid=tutTopRect;if(st.wait&&st.wait.match&&st.onEnter&&!st.wrong&&/tOn\(\)/.test(String(st.onEnter)))st.wrong='Tap the lit tile.';const t=STORY.tut[st.id];if(t){st.title=t.title;if(t.say!=null)st.say=t.say}return st})}
 function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let lastCh=0;
   for(const id in STORY.tut){const t=STORY.tut[id],c=STORY[t.who];const sel=`.gxt-bub[data-step="${id}"]`;
     o.push(`${sel} .gxh-bd::before{background-image:url(${c.img});border-color:${c.col}}`);
@@ -62,9 +63,9 @@ function tutStyle(){if(document.getElementById('tutcast'))return;const o=[];let 
   const e=document.createElement('style');e.id='tutcast';e.textContent=o.join('\n');document.head.appendChild(e)}
 // R9: majority and ties shown on the board: example followers stand on the lit road, with a one-line count above it
 function tutDemoOff(){for(const e of UI.tdemo||[])e.remove();UI.tdemo=null;for(const id in UI.mp)UI.mp[id].classList.remove('tdhide')}
-function tutDemo(spec,txt){tutDemoOff();for(const id in UI.mp)UI.mp[id].classList.add('tdhide');const out=[];let top=null;for(const [k,p] of spec){const T=G.tiles[k];if(!T)continue;const l=TSEG[T.t].findIndex(sg=>sg&&sg.ty==='R');if(l<0)continue;const [wx,wy]=spotWorld(k,l);
-    const e=document.createElement('div');e.className='mp tdemo';e.style.setProperty('--c',PCOL[p]);e.innerHTML=pcHtml(FIGICON.f,p);addOv(e,wx,wy,{dy:-4});out.push(e);if(!top||wy<top[1])top=[wx,wy]}
-  if(top&&txt){const t=document.createElement('div');t.className='tdemotag';t.textContent=txt;addOv(t,top[0],top[1],{dy:-46});out.push(t)}UI.tdemo=out;try{placeOverlay()}catch(e){}}
+function tutDemo(spec,txt){tutDemoOff();const out=[],pos=[];let top=null;for(const [k,p] of spec){const T=G.tiles[k];if(!T)continue;const l=TSEG[T.t].findIndex(sg=>sg&&sg.ty==='R');if(l<0)continue;const [wx,wy]=spotWorld(k,l);
+    const e=document.createElement('div');e.className='mp tdemo';e.style.setProperty('--c',PCOL[p]);e.innerHTML=pcHtml(FIGICON.f,p);addOv(e,wx,wy,{dy:-4});out.push(e);pos.push([wx,wy]);if(!top||wy<top[1])top=[wx,wy]}
+  if(top&&txt){const t=document.createElement('div');t.className='tdemotag';t.textContent=txt;addOv(t,top[0],top[1],{dy:-46});out.push(t)}for(const id in UI.mp){const o=UI.mp[id]._o;if(o&&pos.some(q=>Math.hypot(q[0]-o.wx,q[1]-o.wy)<30))UI.mp[id].classList.add('tdhide')}UI.tdemo=out;try{placeOverlay()}catch(e){}}
 function tutSteps0(){
   const placeW=n=>({type:'tap',match:a=>a.what==='place'&&a.x===tutT(n)[1]&&a.y===tutT(n)[2]});
   const figW=n=>({type:'tap',match:a=>a.what==='fig'&&a.k==='f'&&a.l===tutSegOf(n)});
@@ -89,7 +90,7 @@ function tutSteps0(){
  {id:'place3',title:'Make a town',say:'Town meets town. This tile grows the town above. Tap the glowing square.',target:tutGlow(5),wait:placeW(5),ready:()=>tutP(5,'place')&&tutRot(3)},
  {id:'fig_town',title:'Claim the town',say:'Claim the town while it is open. A finished town scores 2 per tile.',target:tutFig(5),wait:figW(5),ready:()=>tutP(5,'fig')},
  {id:'town_done',title:'Town finished',say:'',target:tutCellsFn(['0,0','0,-1','-1,-1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(7,'place')&&P(0).score===12},
- {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,-1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(7,'place')&&P(0).score===12},
+ {id:'pennant',title:'Banners',say:'',target:tutCellsFn(['0,0','0,-1','-1,-1']),wait:tileW,onEnter:tOn,onDone:tOff,ready:()=>tutP(7,'place')&&P(0).score===12},
  {id:'place4',title:'Fill the ring',say:'A priory needs all eight neighbours. This is the fourth. Tap the glowing square.',target:tutGlow(7),wait:placeW(7),ready:()=>tutP(7,'place')&&tutRot(0)},
  {id:'fig_farmer',title:'Send a farmer',say:'A follower in a field is a farmer. At game end it scores 3 per finished town beside it.',target:tutFig(7),wait:figW(7),ready:()=>tutP(7,'fig')},
  {id:'majority',title:'Most followers',say:'',target:tutCellsFn(['0,0','1,0','1,1']),wait:tileW,onEnter:()=>{tOn();tutDemo([['0,0',0],['1,0',0],['1,1',1]],'You 2, Hob 1: only you score')},onDone:()=>{tOff();tutDemoOff()},ready:()=>tutP(9,'place')},

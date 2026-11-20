@@ -4,7 +4,7 @@
 // 4) one line after every turn rating the move good / okay / poor against the computer's best move.
 // All numbers come from the engine's own probe() (what a placement would do, nothing changes) and featPoints().
 const PV_TY = { C: 'town', R: 'road', M: 'priory', F: 'field' };
-function pvMe() { return G.pl.findIndex(p => p.human); }
+function pvMe() { const c = G.cur && !G.over ? G.cur.p : -1; return c >= 0 && P(c).human ? c : G.pl.findIndex(p => p.human); }
 function pvHolders(figs) { const s = strength(figs), top = Math.max(0, ...Object.values(s)); return top > 0 ? Object.keys(s).filter(k => s[k] === top).map(Number) : []; }
 function pvTilesOfRoots(roots, k) { const t = new Set([k]); for (const r of roots) { const F = G.fd[r]; if (F && F.tiles) for (const q of F.tiles) t.add(q); else if (F && F.ty === 'M') t.add(key(F.x, F.y)); } return [...t]; }
 // what placing the current tile at x,y with rotation r would do now. Returns {badge, line, hl:[tile keys], pts}
@@ -27,7 +27,7 @@ function prevCalc(x, y, r) {
     const hl = best.hl;
     if (best.k === 'close' && best.mine) out = { badge: '+' + best.pts, line: 'Finishes your ' + best.name + ': +' + best.pts + ' for you.', hl, pts: best.pts, kind: 'good' };
     else if (best.k === 'close') out = { badge: nm(best.rv[0]) + ' +' + best.pts, line: 'Finishes ' + nm(best.rv[0]) + '’s ' + best.name + ': +' + best.pts + ' for them.', hl, pts: -best.pts, kind: 'bad' };
-    else if (best.k === 'closefree') out = { badge: 'closes', line: 'Closes a ' + best.name + ' nobody holds: no points.', hl, pts: 0 };
+    else if (best.k === 'closefree') out = { badge: 'closes', line: 'Closes a ' + best.name + ' nobody holds. Claim it with a follower to score it.', hl, pts: 0 };
     else if (best.k === 'grow') out = { badge: 'grows', line: 'Grows your ' + best.name + ' to ' + best.n + ' tiles: +' + best.pts + ' when finished.', hl, pts: 0, kind: 'good' };
     else out = { badge: 'helps them', line: 'Grows ' + nm(best.rv[0]) + '’s ' + best.name + ' to ' + best.n + ' tiles.', hl, pts: 0, kind: 'bad' };
   }
@@ -37,11 +37,11 @@ function prevCalc(x, y, r) {
 function prevFig(l) {
   const T = G.tiles[G.cur.k], id = find(T.s0 + +l), F = G.fd[id]; if (!F) return '';
   const nm = PV_TY[F.ty];
-  if (F.ty === 'F') { const n = fieldCities(F).size; return n ? 'farmer +' + 3 * n + ' now' : 'farmer, pays at end'; }   // F2: a number you can read, or the plain word
+  if (F.ty === 'F') { const n = fieldCities(F).size; return n ? 'farmer +' + 3 * n + ' at end' : 'farmer, pays at end'; }   // F2: a number you can read, or the plain word
   if (F.ty === 'M') return 'priory ' + nbrCount(F.x, F.y) + ' of 9';
   const done = F.oe && F.oe.length === 0;
   if (done) return nm + ' +' + featPoints(F, true) + ' now';
-  return nm + ' +' + featPoints(F, true);
+  return nm + ' +' + featPoints(F, true) + ' if closed';
 }
 // highlight a feature's tiles while a spot is held or hovered
 function pvHighlight(keys) { for (const e of document.querySelectorAll('#world .pvhl')) e.classList.remove('pvhl'); if (keys) for (const k of keys) { const e = UI.tl[k]; if (e) e.classList.add('pvhl'); } }

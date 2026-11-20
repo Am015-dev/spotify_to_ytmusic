@@ -1,5 +1,5 @@
 // ---------- all story and tutorial text in one place (edit here; see ../../STORY.md). Original cast only. ----------
-// Tutorial = the prologue of the story: Old Tamsin (guide) teaches Garnet (you) against Hob the Carter (rival, wants the land for his carts).
+// Tutorial = the prologue of the story: Old Tamsin (guide) teaches you against Hob the Carter (rival, wants the land for his carts).
 // Each step: title (<= 4 words), say (<= 20 words: the story reason, then the action, no "click here"), who ('guide'|'rival'), ch (chapter).
 const STORY={
   guide:{name:'Old Tamsin',img:'media/camp-tamsin.webp',col:'#7a8a3c'},
@@ -35,9 +35,9 @@ const STORY={
     discard:{ch:3,who:'guide',title:'No fit',say:'A tile that fits nowhere is swapped for a new one.'},
     winner:{ch:4,who:'guide',title:'The deeds are yours',say:null}
   },
-  prologue:{title:'Prologue',text:'Welcome, Garnet. Vinemoor is empty, and Hob wants it. Play one game with me first. I will explain each rule as it comes up.'},
+  prologue:{title:'Prologue',text:'Welcome. Vinemoor is empty, and Hob wants it. Play one game with me first. I will explain each rule as it comes up.'},
   tutEndTitle:'The deeds are yours',
-  tutEndText:'Tamsin: "Well built, Garnet. Hob wants a rematch."',
+  tutEndText:'Tamsin: "Well built. Hob wants a rematch."',
   tutEndStory:'Tamsin: "Now the real game starts. Hob waits at the first fence."'
 };
 // ---------- the coached first game (free play; Tamsin = guide, Hob = rival). Each rule is explained once, the first time it matters. t = text or fn(ctx).

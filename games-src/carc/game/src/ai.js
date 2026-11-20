@@ -2,7 +2,7 @@
 // easy / medium: the normal reckoning, but it often settles for one of its top few spots and sometimes keeps a follower back
 // (a real rival that closes its own roads and towns, yet leaves chances); normal: greedy value of placement + follower incl. completion odds;
 // hard: adds field/majority weighting and a one-ply look at the tiles still in the bag (can each open side still be filled?).
-let AIPLAN=null;var EASYK={easy:{best:30,k:6,drop:30,keep:2,farm:0},medium:{best:45,k:4,drop:20,keep:1,farm:1}};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
+let AIPLAN=null;var EASYK={easy:{best:15,k:8,drop:45,keep:3,farm:0},medium:{best:45,k:4,drop:20,keep:1,farm:1}};var HARDK={a:2,b:4,f:0,top:3,types:6,w:.6,cap:36};
 const LVL={easy:{opp:.2,slots:false},medium:{opp:.5,slots:false},normal:{opp:.8,slots:false},hard:{opp:.9,slots:true}};
 function lvOf(s){return LVL[P(s).lv]?P(s).lv:'normal'}
 // ---- what is still in the bag (public: anyone can count the tiles) ----

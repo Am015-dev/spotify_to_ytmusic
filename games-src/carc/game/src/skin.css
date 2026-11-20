@@ -294,7 +294,7 @@ html #hinfo .big,html.sk #hinfo .big{display:grid;place-items:center;box-sizing:
 html #hand #hinfo{align-items:center}
 html.sk #hand:has(#hinfo .big){justify-content:center}
 #ground{position:absolute;left:0;top:0;pointer-events:none}
-#ground i{position:absolute;width:100.8px;height:100.8px;background:linear-gradient(rgba(92,66,34,.24),rgba(92,66,34,.24)),url(media/tex-field.webp) 0 0/100px 100px;box-shadow:inset 0 0 14px 6px rgba(40,24,8,.5)}
+#ground i{position:absolute;width:100px;height:100px;box-sizing:border-box;border:2px dashed rgba(246,234,210,.22);border-radius:6px;background:none;box-shadow:none}   /* R108: an empty spot is a faint outline, not a dark square that reads as a hole */
 .seat .sl2{margin-top:2px}html.sk .seat .fl{gap:2px}
 html #hand #hinfo:has(.big){flex:1 1 auto;width:100%;align-items:center}
 @media (max-height:600px){html.sk .card,html.sk .menu,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-width:20px;border-image-width:20px;padding:6px 10px;gap:6px}}
@@ -385,9 +385,14 @@ html.wide #modal .scrim.side .card{max-height:calc(100vh - 24px);width:100%}
 html.wide #recentre{left:14px;right:auto}
 /* F2: potential points on a follower and under the score */
 .mp .pot{position:absolute;left:50%;top:-6px;transform:translateX(-50%);padding:1px 5px;border-radius:9px;background:#ffe9a6;color:#3a2410;border:1.5px solid #7d3418;font:800 12px/1.2 var(--ff);white-space:nowrap;pointer-events:none;z-index:2}
-.seat .pend{font:800 12px/1 var(--ff);color:#ffe9a6;white-space:nowrap}
+.seat .pend{font:800 12px/1 var(--ff);color:#ffe9a6;background:#33200f;padding:3px 6px;border-radius:8px;white-space:nowrap}
 html.wide .seat .pend{font-size:14px}
 #status .rc.tip{color:#ffe9a6;font-size:14px}
 @media(max-width:700px){.seat .pend{display:none}}
 html.wide #side .seat .nm,html.wide #side .seat b{font-size:18px}html.wide #side .seat .fl{font-size:15px}html.wide #side .seat .fl small{font-size:14px}
 @media(max-width:420px){#seats .seat:not(.cur) .nm{display:none!important}}
+
+/* R108: turning a tile that fits only one way (or looks the same turned) gives a short shake, not silence */
+#htile.nope{animation:nope .35s ease-out 1}
+@keyframes nope{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+@media(prefers-reduced-motion:reduce){#htile.nope{animation:none;outline:3px solid #ffd24a}}

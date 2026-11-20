@@ -27,7 +27,7 @@ function capNow(){return UI.cap&&Date.now()<UI.cap.until?UI.cap.t:''}
 const FEATW={C:'town',R:'road',M:'priory',F:'field'};
 function scoreCap(d,final){const F=G.fd[d.r];const ty=F?FEATW[F.ty]:'feature',n=F&&F.ty!=='M'?(F.tiles||[]).length:0;
   const ws=d.win&&d.win.length?d.win:[d.by||0],who=ws.length>2?ws.length+' players':ws.length===2?(ws.some(i=>P(i).human)?'You both':'Both'):seatName(P(ws[0]));   // a shared score stays short
-  const why=F&&F.ty==='F'?`field, ${d.pts/3|0} town${(d.pts/3|0)===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
+  const why=F&&F.ty==='F'?`field, ${d.n||(d.pts/3|0)} town${(d.n||(d.pts/3|0))===1?'':'s'}`:F&&F.ty==='M'?(d.pts>=9?'full priory':'unfinished priory'):`${final?'unfinished ':'finished '}${ty}, ${n} tile${n===1?'':'s'}`;
   return `${who} +${d.pts}: ${why}`}
 // ---------- view: world units are 100 per tile; the world div is translated and scaled ----------
 const boardEl=()=>$('#board');
@@ -64,7 +64,7 @@ function aimCells(){const last=unkey(G.order[G.order.length-1]);const g=UI.legal
 function fitsAt(cells,c){const m=measure();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}return (x1-x0+1)*c<=m.W-24&&(y1-y0+1)*c<=m.H-topSafe()-botSafe()-12}
 // the camera keeps the whole valley in view when the tiles stay readable; otherwise the biggest readable patch around the newest tile
 const GLOWMIN=()=>PHONE()?44:54;   // R9: smallest cell that is still a 44px touch target; used so every glow fits on screen
-const CAMMIN=()=>PHONE()?54:64,CAMMAX=()=>PHONE()?104:(innerWidth>=1024?200:MAXC);
+const CAMMIN=()=>PHONE()?46:64,CAMMAX=()=>PHONE()?84:(innerWidth>=1024?200:MAXC);   // R108: the phone view shows more of the valley (every glow is still 44 px or more)
 function valleyCells(extra,around){const all=G.order.map(unkey).concat(extra||[]);const cmin=CAMMIN();if(fitsAt(all,cmin))return all;
   const c=around||unkey(G.order[G.order.length-1]);const by=all.slice().sort((a,b)=>Math.hypot(a[0]-c[0],a[1]-c[1])-Math.hypot(b[0]-c[0],b[1]-c[1]));const out=[];
   for(const q of by){out.push(q);if(!fitsAt(out,cmin)){out.pop();if(out.length>=4)break}}return out.length?out:[c]}
@@ -173,7 +173,7 @@ function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
-    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}${p.human&&!G.over&&pendTotal(p.i)?`<span class="pend" title="points you get when your open features close">+${pendTotal(p.i)} soon</span>`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
+    return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot"></i><span class="sl1"><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b></span><span class="sl2"><span class="fl" title="followers left">${fi('meeple',p.i)}${s.f}<small> left</small></span>${s.big?`${fi('champ',p.i)}`:''}${s.bld?`${fi('mason',p.i)}`:''}${s.pig?`${fi('hog',p.i)}`:''}${p.human&&!G.over&&pendTotal(p.i)?`<span class="pend" title="Points you would get if your open roads and towns were finished now">+${pendTotal(p.i)} if finished</span>`:''}</span>${p.goods.wine+p.goods.grain+p.goods.cloth?`<span class="fl" title="goods">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</span></div>`}).join('');
   $('#left').innerHTML=`<i class="pile"></i><svg class="plain" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="lt"><b>${tilesLeft()}</b><small>tiles</small></span>`}
 // feedback: a tile lands with a thud + dust ring; a follower pops, then hops home to its owner's chip
 function thud(k){const e=UI.tl[k];if(!e||UI.reduce)return;const [x,y]=unkey(k),w=$('#world');
@@ -209,7 +209,7 @@ function hookDrag(b){if(!b||b._dg)return;b._dg=1;
   b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end)}
 // F2: what the numbers on a follower spot mean, one line
 function figTip(){try{const ty=new Set((UI.figs||[]).map(b=>{const T=G.tiles[G.cur.k];return G.fd[find(T.s0+ +b._m.l)].ty}));
-  if(ty.has('M'))return 'Priory: 1 + one per tile around it.';if(ty.has('F'))return 'Farmer: 3 per finished town, at end.';
+  if(ty.has('M'))return 'Priory: 9 with all 8 neighbours; if open at the end, 1 + one per neighbour.';if(ty.has('F'))return 'Farmer: 3 per finished town, at end.';
   if(ty.has('C'))return 'Town 2 per tile, road 1, when closed.';if(ty.has('R'))return 'Road: 1 point per tile when closed.'}catch(e){}return ''}
 function renderStatus(){let t='',tn='',rc='',tip='';const c=capNow(),sc=c&&UI.cap.score;
   if(sc&&!myTurn('place')){tn='Scoring';t=c}
@@ -217,7 +217,7 @@ function renderStatus(){let t='',tn='',rc='',tip='';const c=capNow(),sc=c&&UI.ca
   else if(UI.tut&&UI.tutTile){tn='Learn';t='Tap the lit tile to go on.'}
   else if(G.cur){const me=myTurn();const p=P(G.cur.p);tn=me?'Your turn':`${p.nm}’s turn`;
     if(me&&c&&(UI.cap.intro||UI.cap.score)&&G.step==='place')rc=c;   // the rival recap sits under the action line, never in its place
-    if(me&&G.step==='place'&&UI.prev)t=UI.prev.t;
+    if(me&&G.step==='place'&&UI.prev&&!UI.sel){t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');tip=UI.prev.t}   // the hover preview has its own line; the instruction stays
     else if(me&&G.step==='place'&&UI.sel){let l='';try{l=prevCalc(UI.sel.x,UI.sel.y,UI.sel.r).line}catch(e){}t=(hintsOn()&&l&&!/^Nothing/.test(l)?l+' ':'')+'Tap Place here to confirm, or your tile to turn it.'}
     else if(me&&G.step==='place')t=G.cur.bonus?'Extra turn! Place your tile.':isRiver(G.cur.t)?'Place it to continue the river.':(UI.rots&&UI.rots.length>1?'Turn, then place on a glow.':'Place your tile on a glow.');
     else if(me){t='Add a follower, or Skip.';tip=figTip()}
@@ -237,9 +237,9 @@ function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows(
 function save(){if(UI.tut||UI.coach)return;try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(UI.coach)try{coachTick()}catch(e){console.error(e)}if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
-function rotate(){if(!myTurn('place')||UI.rots.length<2){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');if(UI.sel){if(UI.legal.some(g=>g.r===n&&g.x===UI.sel.x&&g.y===UI.sel.y))UI.sel.r=n;else UI.sel=null}renderGlows();renderHand();renderStatus();if(UI.sel){try{pvHighlight(prevCalc(UI.sel.x,UI.sel.y,n).hl)}catch(e){}}else{pvHighlight(null);camAim(350)}updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
+function rotate(){if(myTurn('place')&&UI.rots.length<2){const h=$('#htile');if(h){h.classList.remove('nope');void h.offsetWidth;h.classList.add('nope')}return}if(!myTurn('place')){return}if(!tutGate({what:'rotate'}))return;const i=UI.rots.indexOf(UI.rot),n=UI.rots[(i+1)%UI.rots.length];UI.deg+=((n-UI.rot+4)%4||4)*90;UI.rot=n;sfx('click');if(UI.sel){if(UI.legal.some(g=>g.r===n&&g.x===UI.sel.x&&g.y===UI.sel.y))UI.sel.r=n;else UI.sel=null}renderGlows();renderHand();renderStatus();if(UI.sel){try{pvHighlight(prevCalc(UI.sel.x,UI.sel.y,n).hl)}catch(e){}}else{pvHighlight(null);camAim(350)}updateGhost();placeOverlay();ensureGlowVisible();const b=$('#htile');if(b)b.querySelector('.spin').style.transform=`rotate(${UI.deg}deg)`}
 function onGlow(x,y){if(UI.moved||!myTurn('place'))return;if(!isLegal({act:'place',x,y,r:UI.rot},sideToAct()))return;
-  if((UI.lastPT==='touch'||UI.lastPT==='pen')&&!UI.tut&&!(UI.sel&&UI.sel.x===x&&UI.sel.y===y&&UI.sel.r===UI.rot)){selSpot(x,y);return}placeAt(x,y)}
+  if(!UI.tut&&!(UI.sel&&UI.sel.x===x&&UI.sel.y===y&&UI.sel.r===UI.rot)){selSpot(x,y);return}placeAt(x,y)}
 function placeAt(x,y){if(!myTurn('place'))return;{const gc=$('#goal');if(gc)gc.remove()}const m={act:'place',x,y,r:UI.rot};if(!isLegal(m,sideToAct()))return;if(!tutGate({what:'place',x,y}))return;UI.sel=null;UI.hint=null;UI.humanTurns++;pvHide();buzz(14);ratingBegin(x,y,UI.rot);performMove(m,sideToAct())}
 function onFig(m){if(UI.moved||!myTurn('fig'))return;if(!tutGate({what:'fig',k:m.k,l:m.l}))return;UI.hintFig=null;ratingFig(m);buzz(10);const k=G.cur.k;performMove(m,sideToAct());ratingEnd();markSeen();camArea(k)}
 function onSkip(){if(!myTurn('fig'))return;if(!tutGate({what:'skip'}))return;UI.hintFig=null;ratingFig(null);const k=G.cur.k;performMove({act:'skip'},sideToAct());ratingEnd();markSeen();camArea(k)}
@@ -296,7 +296,7 @@ function endView(){const m=measure(),f=fitCells(G.order.map(unkey),m),ts=topSafe
   const w=f.w,h=f.h,c=Math.max(14,Math.min(MAXC,(m.W-16)/w,(m.H-ts-bs-8)/h)),sc=c/100;UI.user=true;
   tweenView({s:sc,x:m.W/2-f.cx*100*sc,y:ts+(m.H-ts-bs)/2-f.cy*100*sc},420)}
 function finalPops(){const fs=finalScores();let n=0;const dets=fs.det.filter(d=>d.ty==='F'?d.n:true).slice(0,10);
-  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win},true),FINAL0+n*FINALSTEP);n++}
+  for(const d of dets){const pts=d.ty==='F'?d.n*(G.figs.some(f=>f.k==='pig'&&find(f.s)===d.r&&d.win.includes(f.p))?4:3):d.pts;if(!pts)continue;setTimeout(()=>scorePop({r:d.r,pts,win:d.win,n:d.ty==='F'?d.n:undefined},true),FINAL0+n*FINALSTEP);n++}
   return n}
 function tutFinalPops(){if(UI.tut)finalPops()}
 function finishUp(){if(UI.endShown)return;UI.endShown=true;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;if(UI.coach){const n=finalPops();setTimeout(()=>{try{coachEnd()}catch(e){console.error(e)}},Math.min(8000,1400+n*700));return}if(UI.tut)return;sfx('win');
@@ -335,13 +335,13 @@ function openMenu(){if($('#menu'))return closeMenu();const d=document.createElem
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
 function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
 function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
-function showRules(){$('#modal').innerHTML=`<div class="scrim side"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, a farmer scores 3 per finished town.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=closeSheets;sheetPos()}
+function showRules(){$('#modal').innerHTML=`<div class="scrim side"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><p class="raim">Score the most points by finishing roads and towns.</p><ul><li>Draw a tile. Turn it and lay it so edges match.</li><li>Then put a follower on a road, town, priory or field.</li><li>Or skip and keep your follower.</li><li>Finish a road or town. Its owner scores and the follower goes home.</li><li>A priory with eight tiles around it scores 9.</li><li>At the end, the most farmers in a field score 3 per finished town beside it.</li><li>Roads, towns and priories still unfinished at the end score 1 per tile.</li><li>Most followers on a road, town or field takes its points.</li><li>Equal followers: each scores in full.</li><li>A tile that fits nowhere is swapped for a new one.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=closeSheets;sheetPos()}
 function sheetPos(){const h=$('#hand'),r=h&&h.getBoundingClientRect(),b=(r&&!WIDE()?Math.max(0,innerHeight-r.top)+8:12)+'px';for(const e of [$('#goal'),$('#modal .scrim.side')])if(e)e.style.setProperty('--sb',b);setTimeout(()=>{if(G&&G.order.length)refit(true)},30)}
 function closeSheets(){const g=$('#goal'),m=$('#modal .scrim.side');if(!g&&!m)return false;if(g)g.remove();if(m)$('#modal').innerHTML='';setTimeout(()=>{if(G&&G.order.length)refit(true)},30);return true}
 // ---------- new game / continue ----------
 function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false);showGoal();}
 function showGoal(){const o=$('#goal');if(o)o.remove();if(UI.coach||UI.tut||UI.sim||!G||!human()||/[?&]scn=/.test(location.search))return;const d=document.createElement('section');d.id='goal';d.setAttribute('aria-label','Goal');
-  d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Farmers in fields score at the very end.</li></ul><button type="button" id="goalok">Got it, start</button>';
+  d.innerHTML='<h2>How you win</h2><p class="gwin">Have the most points when the last tile is laid.</p><ul><li>Put a follower on a road, town or priory.</li><li>Finish it, and you score. Towns pay double.</li><li>Unfinished roads, towns and priories score 1 per tile at the end.</li><li>Farmers in fields score at the very end, if they hold the most.</li></ul><button type="button" id="goalok">Got it, start</button>';
   ($('#side')||$('#app')).prepend(d);$('#goalok').addEventListener('click',closeSheets);sheetPos()}
 function setupOpts(){const s=UI.setup,np=1+s.rivals,seats=[];for(let i=0;i<np;i++)seats.push(i?'ai':'human');return {np,seats,lv:seats.map(()=>s.lv),ex:{river:s.river,ic:s.ic,tb:s.tb}}}
 function resetUI(){UI.recap="";UI.rv=null;UI.rvLine="";UI.capQ=[];UI.cap=null;UI.capCur=0;clearTimeout(UI.capT);UI.fx.length=0;UI.fxSeen=0;UI.turn=-1;UI.stepKey='';UI.endShown=false;UI.handKey=null;UI.aiT&&clearTimeout(UI.aiT);UI.aiT=0;for(const k in UI.tl)UI.tl[k].remove();UI.tl={};for(const k in UI.mp)UI.mp[k].remove();UI.mp={};$('#ov').innerHTML='';UI.seenInit=false;UI.legal=[];UI.hint=null;UI.hintFig=null;closeMenu()}
