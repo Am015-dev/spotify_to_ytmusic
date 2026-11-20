@@ -21,7 +21,7 @@ function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=s
   el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
 // the one status line (8 words or fewer): what to do now, or what the computer just did
 // a button label of at most 8 words that ends before a preposition, never an ellipsis
-function trim8(w){if(w.length<=8)return w.join(' ');for(let k=8;k>=3;k--)if(/^(to|into|from|in|on|at|next|with|for|and|or|then|of|by|so)$/i.test(w[k]))return w.slice(0,k).join(' ');return w.slice(0,8).join(' ')}
+function trim8(w){const cnt=t=>t.replace(/[^a-zA-Z0-9'\u2019]+/g,' ').trim().split(' ').filter(Boolean).length;if(cnt(w.join(' '))<=8)return w.join(' ');let k=w.length-1;while(k>3&&cnt(w.slice(0,k).join(' '))>8)k--;for(let j=k;j>=3;j--)if(/^(to|into|from|in|on|at|next|with|for|and|or|then|of|by|so)$/i.test(w[j]))return w.slice(0,j).join(' ');return w.slice(0,k).join(' ')}
 function words8(x){x=String(x||'').replace(/\s+/g,' ').trim();const w=x.split(' ').filter(Boolean);if(w.length<=8)return x;const c=x.split(/(?<=[.?!:;])\s|\s\(/)[0];return c.split(' ').length>=3?c.replace(/[,:;]$/,''):w.join(' ')}   // never an ellipsis: a long line drops to its first clause
 function statusText(){const o=t=>({text:words8(t),seat:-1});
   if(!G)return o('');if(G.over)return o('The reign is over');
