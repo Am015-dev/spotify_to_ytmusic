@@ -15,6 +15,9 @@ function planSig(){return G?JSON.stringify(G.plan.acts.map(a=>[a.type,a.tgt,a.pw
 function nextFirst(){const n=G.chars.length;if(n<2)return firstC();let i=G.first;for(let k=0;k<n;k++){i=(i+1)%n;if(!P(i).dead&&!P(i).npc)break}return P(i)}
 // place pawns for a job: a sure success if the pawns allow it, otherwise the minimum that rolls the dice.
 // On any problem the plan is put back exactly as it was and the reason is returned.
+// F16: a healthy castaway gathers alone (the gather dice succeed 5 times in 6, a wound 1 in 6): two sources a day instead of one feeds the camp
+var SOLOK=Object.assign({gather:4,explore:0,build:0},typeof SOLOK!=='undefined'?SOLOK:{});
+function soloOk(type,p){const t=SOLOK[type];if(!t||!p||p.c==null)return false;return lifeLeft(P(p.c))>=t}
 function doJob(type,tgt,alt,lead){if(!planOpen())return 'not planning now';
   const snap=JSON.stringify(G.plan),la=UI.lastAct;const fail=m=>{G.plan=JSON.parse(snap);UI.lastAct=la;return m};
   if(lead!=null&&!P(lead).human)return hum(P(lead))?`Another player plans the ${P(lead).nm}.`:`${P(lead).nm} is a computer castaway and plans their own pawns.`;
@@ -27,10 +30,10 @@ function doJob(type,tgt,alt,lead){if(!planOpen())return 'not planning now';
   if(!leadP){const cs=free.filter(p=>p.c!=null);if(lead!=null)return `${P(lead).nm} has no free pawn.`;if(!cs.length)return 'Every castaway pawn already has a job.';const w=placeWhy(cs[0].id,type,tgt,alt);return w?w.charAt(0).toUpperCase()+w.slice(1)+'.':'No free castaway can do that.'}
   let e=place(leadP.id,type,tgt,alt);if(e)return fail(e);const act=G.plan.acts.find(x=>x.id===UI.lastAct);
   let want=n.max-act.pw.length;const add=p=>{if(want<=0||pawnWhy(p.id,act))return;const q=pawnInfo(p.id);if(q.c!=null)act.pw.unshift(p.id);else act.pw.push(p.id);want--};
-  for(const p of humanFree().filter(p=>p.x))add(p);for(const p of humanFree().filter(p=>p.f))add(p);
+  for(const p of humanFree().filter(p=>p.x))add(p);if(!(AW().friSolo&&soloOk(type,leadP)))for(const p of humanFree().filter(p=>p.f))add(p);
   // a second character pawn only when it turns a gamble into a sure thing (or the job needs it); never the pawn someone near death rests with
   const needMin=()=>n.need-act.pw.length;
-  for(const p of humanFree().filter(p=>p.c!=null&&!P(p.c).npc&&!(nearDeath(P(p.c))&&!restPlanned(p.c))).sort((a,b)=>(a.c===leadP.c?-1:1)))if(want>0&&(needMin()>0||want<=1))add(p);
+  for(const p of humanFree().filter(p=>p.c!=null&&!P(p.c).npc&&!(nearDeath(P(p.c))&&!restPlanned(p.c))).sort((a,b)=>(a.c===leadP.c?-1:1)))if(want>0&&(needMin()>0||want<=1&&!soloOk(type,leadP)))add(p);
   if(act.pw.length<n.need)return fail(`Needs ${n.need} pawns: you have ${free.length} free.`);
   if(!afford(act)){const c=actCost(act);const need=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>v+' '+RNAME[r]).join(' + ');return fail(`${actLabel(act)} needs ${need}: you have ${G.res.wood-committed(act.id).wood} wood free.`)}
   const bad=planProblems().filter(x=>!/still has a pawn/.test(x));if(bad.length)return fail(bad[0]);
@@ -55,7 +58,7 @@ function foodOpts(){const o=[];
     o.push({type:'gather',tgt,food:gatherYield(m.id,s.i),pawns:n.max,title:`${s.s==='fish'?'🐟 Fish':'🦜 Birds'} at place ${m.id+1}`,sure:true,v:gatherYield(m.id,s.i)/n.max-(m.tok.beast&&G.weapon<1?.3:0)})}}
   G.ev.threat.forEach((k,i)=>{if(!k)return;const th=CARD[k].th;const f=th.pw==='1-2'?foodIn(th.rw2):foodIn(th.rw);if(!f)return;const alt=threatAlt(i);if(alt<0)return;
     const pw=th.pw==='1-2'?2:th.pw;o.push({type:'threat',tgt:i,alt,food:f,pawns:pw,title:th.n,sure:true,v:f/pw+.2})});
-  if(!targetWhy('hunt',null)&&G.weapon>=2)o.push({type:'hunt',tgt:null,food:2,pawns:2,title:'Hunt a beast',sure:true,v:.9-Math.max(0,3-G.weapon)*.3});
+  if(!targetWhy('hunt',null)&&G.weapon>=AW().hunt)o.push({type:'hunt',tgt:null,food:2,pawns:2,title:'Hunt a beast',sure:true,v:.9-Math.max(0,3-G.weapon)*.3});
   return o.sort((a,b)=>b.v-a.v)}
 // food already coming from today's plan
 function plannedFood(){let n=0;for(const a of G.plan.acts){if(a.type==='gather'){const s=srcs(a.tgt.pos).find(x=>x.i===a.tgt.i);if(s&&s.s!=='wood')n+=gatherYield(a.tgt.pos,a.tgt.i)}
@@ -65,7 +68,7 @@ function threatAlt(i){const k=G.ev.threat[i];if(!k)return -1;const r=CARD[k].th.
 function haveText(r){if(!r)return '';const parts=[];const one=o=>{for(const x of o.items||[])parts.push(has(x)?`a ${(INVENTIONS[x]||{}).n}`:'');if(o.weapon)parts.push(`weapon ${G.weapon}`);for(const k in o.res||{})parts.push(`${G.res[k]-committed()[k]} ${RNAME[k]}`)};(r.alt||[r]).forEach(one);const p=[...new Set(parts.filter(Boolean))];return p.length?`you have ${p.join(', ')}`:"you have none of these"}
 // ---------- what can hurt tonight or at dawn ----------
 function wxFoodLoss(){const c=clouds();return Math.max(0,Math.floor(c.est)-G.camp.roof)}
-function clouds(){const S=SCENARIOS[G.scen];const wx=wxTab()[G.round]||[];return {dice:wx,est:wx.filter(x=>x!=='animals').length*1.5+G.wx.rain+G.wx.snow}}
+function clouds(){const S=SCENARIOS[G.scen];const wx=wxTab()[G.round]||[];return {dice:wx,est:(AW().wxPess?wx.filter(x=>x==='rain').length*AW().wxPess+wx.filter(x=>x==='snow').length*2:wx.filter(x=>x!=='animals').length*1.5)+G.wx.rain+G.wx.snow}}
 function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.scen];const add=p=>{o.push(p);return p};
   const need=eatersNeed(),have=food(),planF=plannedFood();
   // near death: the hard rule
@@ -89,7 +92,7 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   if(!hasShelter()){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const probe={id:-1,type:'build',tgt:{k:'shelter'},pw:[],pay:'wood'};const can=jobPlanned('build',{k:'shelter'})||afford(probe)||afford(Object.assign({},probe,{pay:'fur'}));
     if(can)add({w:90,icon:'🏠',title:'Build a shelter',why:`${tb.wood} wood or ${tb.fur} fur. Without one, every castaway takes a wound each night.`,act:{type:'build',tgt:{k:'shelter'}},done:jobPlanned('build',{k:'shelter'})});
     else{const wd=bestWood(),ex=bestExplore();const freeW=G.res.wood-committed().wood;const wg=G.plan.acts.filter(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood').length;
-      add({w:88,icon:'🪵',title:'Collect wood for a shelter',why:`A shelter needs ${tb.wood} wood (you have ${freeW} free). Without one, everyone takes a wound each night.${wd?'':' No wood in reach yet: explore.'}`,act:wd?{type:'gather',tgt:wd}:ex!=null?{type:'explore',tgt:ex}:null,done:freeW+wg>=tb.wood})}}
+      add({w:G.round<=AW().shelDays?AW().shelW:88,icon:'🪵',title:'Collect wood for a shelter',why:`A shelter needs ${tb.wood} wood (you have ${freeW} free). Without one, everyone takes a wound each night.${wd?'':' No wood in reach yet: explore.'}`,act:wd?{type:'gather',tgt:wd}:ex!=null?{type:'explore',tgt:ex}:null,done:freeW+wg>=tb.wood||!wd&&G.plan.acts.some(a=>a.type==='explore')})}}
   // storm tonight
   if(G.wx.storm){const hurt=Math.max(0,G.wx.storm-G.camp.pal);const planned=G.plan.acts.filter(a=>a.type==='build'&&a.tgt.k==='pal').length;
     if(hurt>0)add({w:hurt>=Math.min(...living().map(lifeLeft))?99:78,red:hurt>=Math.min(...living().map(lifeLeft)),icon:'⛈️',title:'Storm tonight',why:`The storm knocks the palisade down by ${G.wx.storm}: palisade ${G.camp.pal} → everyone −${hurt} life. Each palisade level soaks up one storm hit.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'pal'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'a palisade needs a shelter first',done:planned>=hurt})}
@@ -101,13 +104,19 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   if(cl.est>G.camp.roof&&(hasShelter()||jobPlanned('build',{k:'shelter'}))){const names=cl.dice.map(x=>({rain:'🌧 rain die',snow:'❄️ winter die',animals:'🐾 animals die'}[x])).concat(G.wx.rain?[`+${G.wx.rain} rain`]:[],G.wx.snow?[`+${G.wx.snow} snow`]:[]);
     const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const rp={id:-1,type:'build',tgt:{k:'roof'},pw:[],pay:'wood'};const canPay=jobPlanned('build',{k:'roof'})||afford(rp)||afford(Object.assign({},rp,{pay:'fur'}));
     add({w:80,icon:'☂️',title:'Raise the roof',why:`Weather tonight (${names.join(', ')}): each cloud above roof ${G.camp.roof} ruins 1 food and 1 wood, and what you can’t pay is a wound each. Roof +1 costs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur.`,act:{type:'build',tgt:{k:'roof'}},cant:canPay?null:`needs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur: you have ${G.res.wood-committed().wood} wood and ${G.res.fur-committed().fur} fur free`,done:jobPlanned('build',{k:'roof'})})}
-  else if(!cl.dice.length&&(wxTab()[G.round+1]||[]).length&&G.camp.roof<2)add({w:40,icon:'☂️',title:'Get ready for the weather',why:`Weather dice start tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'needs a shelter first',done:jobPlanned('build',{k:'roof'})});
+  else if(!cl.dice.length&&(wxTab()[G.round+1]||[]).length&&G.camp.roof<2)add({w:AW().roofSoon,icon:'☂️',title:'Get ready for the weather',why:`Weather dice start tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()||jobPlanned('build',{k:'shelter'})?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()||jobPlanned('build',{k:'shelter'})?null:'needs a shelter first',done:jobPlanned('build',{k:'roof'})});
+  // F17: the roof before the rain: roof 2 before the rain dice start, 3 before the winter die (each cloud above it ruins 1 food and 1 wood, or wounds everyone)
+  {const goal=roofGoal(),sh=hasShelter()||jobPlanned('build',{k:'shelter'});if(sh&&G.camp.roof<goal&&!o.some(p=>p.title==='Raise the roof')){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const rp={id:-1,type:'build',tgt:{k:'roof'},pw:[],pay:'wood'};const planned=jobPlanned('build',{k:'roof'});
+    const canPay=planned||afford(rp)||afford(Object.assign({},rp,{pay:'fur'}));const day=wxFrom();
+    if(canPay)add({w:AW().roof,icon:'☂️',title:'Raise the roof before the rain',why:`${day>G.round?'Rain starts on day '+day:'Rain is falling'}: each cloud above roof ${G.camp.roof} ruins 1 food and 1 wood. Roof +1 costs ${tb.wood+G.cost.roof} wood or ${tb.fur} fur.`,act:{type:'build',tgt:{k:'roof'}},done:planned});
+    else{const wd=bestWood();const freeW=G.res.wood-committed().wood;const wg=G.plan.acts.filter(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood').length;
+      add({w:AW().roofWood,icon:'🪵',title:'Collect wood for the roof',why:`Roof +1 costs ${tb.wood+G.cost.roof} wood (you have ${freeW} free). ${day>G.round?'Rain starts on day '+day:'Rain is falling'}: a low roof loses food and wood.`,act:wd?{type:'gather',tgt:wd}:null,cant:wd?null:'no wood in reach',done:freeW+wg>=tb.wood+G.cost.roof})}}}
   if((wxTab()[G.round]||[]).includes('snow')&&G.res.wood-committed().wood<2)add({w:60,icon:'🪵',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone takes a wound.',act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(s=>s.i===a.tgt.i)||{}).s==='wood')});
   // the threat that strikes at the next dawn
   if(G.ev.threat[0]&&G.ev.threat[1]){const k=G.ev.threat[0],c=CARD[k];const harm=opsValue(c.te);if(harm<0){const r=c.th.req;const al=threatAlt(0);const rq=reqText(r);
-    add({w:70,icon:'⚠️',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)} ${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?`, needs ${rq}: ${haveText(r)}`:''}.`,act:al>=0?{type:'threat',tgt:0,alt:al}:null,cant:al>=0?null:`needs ${rq}`,done:jobPlanned('threat',0)})}}
+    add({w:AW().threat,icon:'⚠️',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)} ${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?`, needs ${rq}: ${haveText(r)}`:''}.`,act:al>=0?{type:'threat',tgt:0,alt:al}:null,cant:al>=0?null:`needs ${rq}`,done:jobPlanned('threat',0)})}}
   for(const g of goalSteps())add(g);
-  if(G.morale<0){const nf=nextFirst();add({w:G.morale<=-2?68:50,icon:'🎶',title:`Lift the mood (morale ${G.morale})`,why:`Tomorrow morning ${nf.nm} (first player) loses ${-G.morale} ✊ determination, and each one they can’t pay is a wound (they have ${nf.det}). Arranging the camp gives morale +1.`,act:{type:'camp',tgt:null},done:G.plan.acts.some(a=>a.type==='camp')})}
+  if(G.morale<0){const nf=nextFirst();add({w:G.morale<=-2?AW().mor2:AW().mor1,icon:'🎶',title:`Lift the mood (morale ${G.morale})`,why:`Tomorrow morning ${nf.nm} (first player) loses ${-G.morale} ✊ determination, and each one they can’t pay is a wound (they have ${nf.det}). Arranging the camp gives morale +1.`,act:{type:'camp',tgt:null},done:G.plan.acts.some(a=>a.type==='camp')})}
   if(G.round<=3&&bestExplore()!=null)add({w:45,icon:'🧭',title:'Explore the island',why:'New land brings wood, food, discoveries and the terrain your inventions need.',act:{type:'explore',tgt:bestExplore()},done:G.plan.acts.some(a=>a.type==='explore')});
   return o.filter(p=>p.act||p.cant||p.pile||p.info)}
 // the list shown in the panel: not-done first by weight, each checked against the plan and the free pawns
@@ -134,9 +143,9 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
       else if(room&&G.round>=3)o.push({w:(PACE_T[G.round+1]&&G.sc.pile<PACE_T[G.round+1])?77:58,icon:'🔥',title:`Signal pile ${G.sc.pile}/15: no spare wood`,why:`${stage}. Gather wood today: you need ${woodLeft} more wood in all.`,act:bestWood()?{type:'gather',tgt:bestWood()}:null,cant:bestWood()?null:'no wood in reach',done:G.plan.acts.some(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood')})}
     // R42 A2: the pile deadline. Wood gathered today goes on the pile tomorrow at the earliest; when the wood still missing (after the spare
     // wood in camp) is about as much as the days left to gather it, gathering wood comes before nice-to-haves (the rules are unchanged)
-    if(G.sc.pile<15&&G.round>=(PILEK.from)){const spare=Math.max(0,G.res.wood-committed().wood-shelterReserve());const left=15-G.sc.pile-spare;const gDays=Math.max(1,12-G.round);
+    if(G.sc.pile<15&&G.round>=(AW().pileFrom!=null?AW().pileFrom:PILEK.from)){const spare=Math.max(0,G.res.wood-committed().wood-shelterReserve());const left=15-G.sc.pile-spare;const gDays=Math.max(1,12-G.round);
       const gw=G.plan.acts.filter(a=>a.type==='gather'&&(srcs(a.tgt.pos).find(q=>q.i===a.tgt.i)||{}).s==='wood').length;const want=left>=gDays*PILEK.two?2:1;
-      if(left>0&&left>=gDays-PILEK.slack){const bw=bestWood();o.push({w:PILEK.w,icon:'🪵',title:`Gather wood: the pile needs ${15-G.sc.pile} more by day 12`,why:`Only ${gDays} day${gDays===1?'':'s'} left to gather it. One stage a day goes on the pile.`,act:bw&&gw<want?{type:'gather',tgt:bw}:null,cant:bw||gw>=want?null:'no wood in reach',done:gw>=want,pile:1})}}
+      if(left>0&&left>=gDays-PILEK.slack){const bw=bestWood();o.push({w:AW().pileW!=null?AW().pileW:PILEK.w,icon:'🪵',title:`Gather wood: the pile needs ${15-G.sc.pile} more by day 12`,why:`Only ${gDays} day${gDays===1?'':'s'} left to gather it. One stage a day goes on the pile.`,act:bw&&gw<want?{type:'gather',tgt:bw}:null,cant:bw||gw>=want?null:'no wood in reach',done:gw>=want,pile:1})}}
     if(G.round>=8){const need=15-G.sc.pile;const stages=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;o.push({w:66,info:true,icon:'⛵',title:G.round>=10?'The rescue window is open':'The rescue window opens on day 10',why:`Fire ${has('fire')?'✓':'✗'}, pile ${G.sc.pile}/15: you need ${need} more wood (${stages} stage${stages===1?'':'s'}, one a day)${has('fire')?'':', plus Fire'}. A ship can come on day 10, 11 or 12.`,done:false})}
     break}
   case 'hexed':{const t=G.map.filter(m=>tileAt(m.id)&&!G.sc.crosses.includes(m.id)).sort((a,b)=>(a.fog?1:0)-(b.fog?1:0)||dist(G.camp.pos,a.id)-dist(G.camp.pos,b.id))[0];if(t){const tgt={k:'cross',cross:t.id};const tw=targetWhy('build',tgt);o.push({w:G.round>=5?78:58,icon:'✝️',title:`Raise a cross (${G.sc.crosses.length}/5)`,why:`Five crosses on five different places break the curse. Each costs 2 wood.`,act:{type:'build',tgt},cant:tw&&tw!=='already planned'?tw:(G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')||G.res.wood-committed().wood>=2?null:'needs 2 wood: gather some'),done:G.plan.acts.some(a=>a.type==='build'&&a.tgt.k==='cross')})}if(G.sc.temple!=null&&!G.sc.templeDone)o.push({w:50,icon:'🛕',title:'Search the dark temple',why:'An explore action there draws mystery cards: up to 3 treasures.',act:{type:'special',tgt:'temple'},cant:targetWhy('special','temple')==='already planned'?null:targetWhy('special','temple'),done:jobPlanned('special','temple')})}break;
@@ -145,12 +154,25 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
   return o}
 // R3 review: the rescue pace (Marooned: fire, then a 15-wood pile by day 10-12). Shared by the pace line, the day summary and ✨.
 const PACE_T={5:4,6:5,7:6,8:7,9:9,10:11,11:13,12:15};
+// F17 knobs: ADVW = Standard/Hard (the old weights), ADVWE = the Easy first game (diff 'easy'), tuned with easy-sim.js:
+// hunt only with weapon 4+, the roof before the rain, the Cook's broth when food is short, the pile's wood urgency later and lower,
+// and ✨ fills only the urgent priorities (w >= minW) before the computer plans the rest.
+var ADVW=Object.assign({mor1:50,mor2:68,threat:70,roofSoon:40,hunt:2,roof:0,roofWood:0,rg1:2,rg2:3,ahead:2,broth:0,friSolo:0,wxPess:0,minW:0,pileW:null,pileFrom:null,shelW:88,shelDays:0},typeof ADVW!=='undefined'?ADVW:{});
+var ADVWE=Object.assign({},ADVW,{hunt:4,roof:92,roofWood:91,broth:1,minW:91,pileW:60,pileFrom:5,shelW:92,shelDays:1},typeof ADVWE!=='undefined'?ADVWE:{});
+function AW(){return G&&G.diff==='easy'&&!G.learn&&!G.tut?ADVWE:ADVW}
+// the roof the coming weather asks for (F17): 2 for the rain die, 3 once the winter die joins, looking AW().ahead days ahead
+function roofGoal(){if(!AW().roof)return 0;let g=0;for(let r=G.round;r<=G.round+AW().ahead;r++){const d=wxTab()[r]||[];if(d.includes('snow'))g=Math.max(g,AW().rg2);else if(d.length)g=Math.max(g,AW().rg1)}return g}
+function wxFrom(){for(let r=G.round;r<=12;r++)if((wxTab()[r]||[]).length)return r;return 99}
 var PILEK=Object.assign({from:2,slack:2,two:1.6,w:95},typeof PILEK!=='undefined'?PILEK:{});
 // wood kept back for a shelter that is not built or planned yet (the pile never eats it)
 function shelterReserve(){if(hasShelter()||jobPlanned('build',{k:'shelter'}))return 0;return SRP_COST[Math.min(4,Math.max(2,G.np))].wood}
+// F16: wood kept back for the roof while weather dice are due (today or the next 2 days) and the roof is under 2: a roofless camp loses food, wood and life
+var ROOFK=Object.assign({to:2,ahead:2},typeof ROOFK!=='undefined'?ROOFK:{});
+function wxSoon(){for(let r=G.round;r<=G.round+ROOFK.ahead;r++)if((wxTab()[r]||[]).length)return true;return false}
+function roofReserve(){if(G.camp.roof>=ROOFK.to||!wxSoon()||jobPlanned('build',{k:'roof'}))return 0;return SRP_COST[Math.min(4,Math.max(2,G.np))].wood+G.cost.roof}
 // how much wood ✨ puts on the pile today: whenever the pace says behind (today or tomorrow), the stages left need every day, or there is plenty
 function advPileN(){if(G.scen!=='marooned'||typeof SCEN==='undefined')return 0;const room=SCEN.marooned.pileRoom();if(!room)return 0;
-  const spare=G.res.wood-committed().wood-shelterReserve()-((wxTab()[G.round]||[]).includes('snow')?1:0);if(spare<=0)return 0;
+  const urgent=12-G.round<=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const spare=G.res.wood-committed().wood-shelterReserve()-(urgent?0:roofReserve())-((wxTab()[G.round]||[]).includes('snow')?1:0);if(spare<=0)return 0;
   const stagesLeft=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const daysLeft=12-G.round;const t=Math.max(PACE_T[G.round]||0,PACE_T[G.round+1]||0);
   const behind=(t&&G.sc.pile<t)||daysLeft<=stagesLeft+1||(G.round>=4&&spare>=2);return behind||spare>=room?Math.min(room,spare):0}
 // the red priorities that are still open and could be fixed: Start the day asks first
@@ -162,8 +184,10 @@ function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c
   const note=(before,why)=>{for(const a of G.plan.acts){const ids=a.pw.filter(id=>{const p=pawnInfo(id);return !before.has(id)&&p&&(p.c==null||P(p.c).human)});if(ids.length){lines.push(`${pawnGroup(ids)} → ${actLabel(a)}${why?' ('+why+')':''}`);const k=JSON.stringify([a.type,a.tgt]);if(why&&!whyBy[k])whyBy[k]=why}}};
   // 1. the hard rule
   for(const c of living().filter(c=>c.human&&nearDeath(c)&&!restPlanned(c.i))){const p=humanFree().find(p=>p.c===c.i);if(p&&!place(p.id,'rest',null)){lines.push(`${c.nm} → Rest (${lifeLeft(c)} life left)`);whyBy[JSON.stringify(['rest',null])]=`${c.nm} has only ${lifeLeft(c)} life left`}}
+  // 1b. F17: the Cook's Pebble Broth (3 determination → 1 food) when tonight's food is short, rain losses included
+  if(AW().broth){const ck=living().find(c=>c.human&&c.k==='cook');if(ck&&!skillWhy(ck.i,'broth')&&eatersNeed()+wxFoodLoss()-food()>0&&!useSkill(ck.i,'broth'))lines.push(`${ck.nm} → Pebble Broth (+1 food)`)}
   // 2. every open priority, most important first
-  for(let g=0;g<10;g++){if(!humanFree().some(p=>p.c!=null))break;const pr=priorities().filter(p=>!p.done&&p.act&&p.can&&p.w>=(typeof ADVMINW!=='undefined'?ADVMINW:0));if(!pr.length)break;let did=false;
+  for(let g=0;g<10;g++){if(!humanFree().some(p=>p.c!=null))break;const pr=priorities().filter(p=>!p.done&&p.act&&p.can&&p.w>=(typeof ADVMINW!=='undefined'?ADVMINW:AW().minW));if(!pr.length)break;let did=false;
     for(const p of pr){const before=placedIds();if(!doJob(p.act.type,p.act.tgt,p.act.alt,p.lead)){note(before,p.title.replace(/\s*\(.*\)$/,''));did=true;break}}if(!did)break}
   // 3. the computer plans what is left
   const before=placedIds(),mark=G.logN;if(humanFree().some(p=>p.c!=null)){aiPlanBest(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)));note(before,'the computer’s pick')}
