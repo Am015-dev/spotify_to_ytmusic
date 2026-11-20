@@ -41,6 +41,7 @@ function tutAI() {   /* guided game: Tamsin really plays (cards, camp digs, mark
 }   /* guided game: Tamsin only plays cards, then passes; coached play: the real (easy) computer */
 function tutSetup() {   /* a REAL 2-round game, stacked so every case comes up once (TUTORIAL-COVERAGE.md) */
   try { GX.close(); } catch (e) { } closeRes(); UI.fast = false;
+  document.body.classList.remove('vg-tutcalm'); clearTimeout(UI.tutCalmT); UI.tutCalmT = setTimeout(() => document.body.classList.add('vg-tutcalm'), 9000);   /* F14 (R93): the tutor ring and dot pulse for the first steps only, then stay still */
   startGame('tutorial', { np: 2, seed: 77, lvl: 'easy', names: ['Tamsin Reed'], rounds: 1 });   /* one short round: a newcomer (or a random tapper) reaches the final count quickly */
   const me = G.p[0], tm = G.p[1];
   me.hand = ['trail', 'dread', 'machete', 'dread', 'trail']; me.deck = ['grant'];   /* Brush Machete: a free-action (lightning) item */

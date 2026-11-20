@@ -709,3 +709,23 @@ body.vg-b2 #extra.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#00
 @media (max-width:999px){body.vg-b2 #track::before{display:none}body.vg-b2 #track{padding-left:3px!important;padding-right:3px!important}body.vg-b2 #track .tcs{padding-left:0!important;margin-left:0!important}}
 #track .sp .tm{position:absolute;left:1px;top:50%;translate:0 -50%;z-index:1}
 #track .sp.one .tm{left:3px}
+/* F14 (R93 calm): the tutor's ring and wait-dot pulse 2 times, never re-pulse, and are still for good after the first steps */
+.gxt-ring{animation-iteration-count:2!important}
+.gxt-ring.gxt-again{animation:none!important}
+.gxt-pill.gxt-wait i{animation-iteration-count:2!important}
+body.vg-tutcalm .gxt-ring,body.vg-tutcalm .gxt-pill.gxt-wait i{animation:none!important}
+/* F14 (R93 P4): compact island grid (#map.flat, map under 205 px): 32 px circles, 16 px icons, 14 px loot, nothing overlaps */
+body.vg-b2 #map.flat .site,body.vg-b2 #map.flat .site.l0,body.vg-b2 #map.flat .site.l2{--sd:32px;width:32px;height:32px;border-width:2px}
+body.vg-b2 #map.flat .site .cost{left:auto;right:calc(100% + 1px);top:50%;transform:translateY(-50%);flex-direction:column;padding:1px;gap:0;border-radius:7px}
+body.vg-b2 #map.flat .site .cost .ic{width:16px;height:16px}
+body.vg-b2 #map.flat .site.l2 .cost{display:grid;grid-template-columns:16px 16px;gap:0}
+body.vg-b2 #map.flat .site .rew,body.vg-b2 #map.flat .site.hid .rew{left:50%;right:auto;top:calc(100% + 1px);bottom:auto;transform:translateX(-50%);line-height:16px;padding:0 3px;gap:0;white-space:nowrap;border-width:1px}
+body.vg-b2 #map.flat .site .rew b{font-size:14px;line-height:16px;letter-spacing:-.02em}
+body.vg-b2 #map.flat .site .rew .ic{width:16px;height:16px}
+body.vg-b2 #map.flat .site .occ{width:18px;height:24px;right:-8px;bottom:-2px}
+body.vg-b2 #map.flat .site .occ2{left:auto;right:-8px;bottom:12px}
+body.vg-b2 #map.flat .site .sp2{left:auto;right:-10px;top:-8px;bottom:auto;font-size:12px;line-height:14px;padding:0 3px}
+body.vg-b2 #map.flat .site .gd{width:38px;height:38px;left:-3px;bottom:auto;top:-3px}
+body.vg-b2 #map.flat .site .nm{display:none}
+body.vg-b2 #map.flat .site.sel{transform:translate(-50%,-50%) scale(1.15)}
+body.vg-b2 #map.flat .site.l2 .cost{padding:0 1px;top:calc(50% - 2px)}

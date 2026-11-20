@@ -145,7 +145,7 @@ function finishSolo() {   /* the rest of the rivals' round at once; one line say
   const r0 = G.round; let n = 0;
   while (G.phase === 'play' && !isHuman(VG.actor(G)) && n < 400) { const s = VG.actor(G), m = VAI.choose(G, G.p[s].ai || 'normal'); const r = m ? VG.apply(G, m) : { ok: false }; if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); } n++; }
   UI.quick = false; G.ev = []; save(); UI.busy = false; rivalCap(''); fxHide();
-  if (n) toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 || G.phase !== 'play' ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);
+  if (n && G.phase === 'play') toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);   /* F14 (R93): no toast over the game-over score floats */
   after();
 }
 function aiStep() {
@@ -216,7 +216,12 @@ function popAt(rect, t, n) {
   const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
   e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
   document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
-  e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
+  /* F14 (R93): pills never overlap each other or the rival caption: a duplicate is dropped, a clash moves down a step */
+  let yy = y; const h = e.offsetHeight, busy = [...document.querySelectorAll('.vpop')].filter(o => o !== e).map(o => o.getBoundingClientRect()), cap = $('#rcap');
+  if (cap && cap.classList.contains('on')) busy.push(cap.getBoundingClientRect());
+  if ([...document.querySelectorAll('.vpop')].some(o => o !== e && o.textContent === e.textContent)) { e.remove(); return; }
+  for (let k = 0; k < 6 && busy.some(r => x < r.right + 2 && x + w > r.left - 2 && yy < r.bottom + 2 && yy + h > r.top - 2); k++) yy = Math.min(innerHeight - h - 4, yy + h + 4);
+  e.style.left = x + 'px'; e.style.top = yy + 'px'; setTimeout(() => e.remove(), 1700);
 }
 function fly(from, html, to, o) {   /* a piece glides from where it was to where it goes */
   if (!from || !html || !to || reducedMo() || UI.fast) return; o = o || {}; const g = document.createElement('div'); g.className = 'flyc'; g.innerHTML = html; const c = g.firstElementChild; if (!c) return;
@@ -287,6 +292,7 @@ function tickPts(s, from) {
 /* the rival's move in one line on the board, where your eyes are */
 function rivalCap(t) {
   if (t && yourTurnNow()) t = '';   /* F12: a rival's caption never sits on the map during your turn */
+  if (t && G && G.phase === 'over') t = '';   /* F14 (R93): at game over the score walk speaks, no caption on top of it */
   let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }
   if (!t) { e.classList.remove('on'); return; } const m = $('#map'); e.style.top = ((m ? m.getBoundingClientRect().top : 120) + 6) + 'px'; e.textContent = t; e.classList.add('on');
 }

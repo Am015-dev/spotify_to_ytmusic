@@ -110,12 +110,17 @@ function mapB2(gS, S) {
   const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
   const mh = document.getElementById('map') ? document.getElementById('map').clientHeight : 999, flat = mh > 0 && mh < 205;
   const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = ((flat ? B2FLAT : B2POS)[lv][k] || [50, 50]); }));
+  /* F14 (R93 P4): short phones use a strict grid so no pill overlaps: each site = cost column (16 px icons) + 32 px circle, loot pill
+     under the circle (14 px text); rows of 51 px (deep, ruins, camp); deep sites get a 2-column cost block in wider cells */
+  const mw = document.getElementById('map') ? document.getElementById('map').clientWidth : 300;
+  if (flat) [0, 1, 2].forEach(lv => { const n = per[lv].length, cw = mw / n, rowY = (lv === 2 ? 0 : lv === 1 ? 1 : 2), cy = 2 + 16 + rowY * Math.max(51, (mh - 4) / 3);
+    per[lv].forEach((i, k) => { const off = lv === 2 ? 36 + 16 : 18 + 16; pos[i] = [100 * (k * cw + Math.min(cw - 16, off + Math.max(0, (cw - off - 18) / 2))) / mw, 100 * cy / mh]; }); });
   let path = ''; const line = (a, b) => { path += `M${a[0]} ${a[1]}L${b[0]} ${b[1]}`; };
   per[0].forEach((i, k) => { if (k) line(pos[per[0][k - 1]], pos[i]); const up = per[1][k]; if (up != null) line(pos[i], pos[up]); });
   per[1].forEach((i, k) => { if (k) line(pos[per[1][k - 1]], pos[i]); const up = per[2][Math.min(per[2].length - 1, Math.round(k * (per[2].length - 1) / Math.max(1, per[1].length - 1)))]; if (up != null) line(pos[i], pos[up]); });
   per[2].forEach((i, k) => { if (k) line(pos[per[2][k - 1]], pos[i]); });
   const sign = (t, y) => `<span class="msign" style="top:${y}%">${t}</span>`;
-  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', flat ? 38 : 36) + sign('Camp', flat ? 72 : 69)
+  return `<svg class="trails" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>` + (flat ? '' : sign('Deep<span class="lx"> ruins</span>', 2) + sign('Ruins', 36) + sign('Camp', 69))
     + G.sites.map((x, i) => siteHTML(x, i, gS[i], S.k === 'site' && S.x === i).replace('<button ', `<button style="left:${pos[i][0]}%;top:${pos[i][1]}%" `)).join('');
 }
 // ---------------------------------------------------------------- render
@@ -156,7 +161,7 @@ function render() {
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = Math.min(gS[m.s] || 2, gl(m)); });
   if (q && q.h === 'site') VG.moves(G).forEach(m => { if (m.v != null) gS[m.v] = 1; });
   const ter = (lv, label) => `<div class="ter t${lv}"><span class="tl">${label}</span><div class="tiles">${G.sites.map((x, i) => x.lvl === lv ? siteHTML(x, i, gS[i], S.k === 'site' && S.x === i) : '').join('')}</div></div>`;
-  if (B2) $('#map').innerHTML = mapB2(gS, S); else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
+  if (B2) { $('#map').innerHTML = mapB2(gS, S); const mh2 = $('#map').clientHeight; $('#map').classList.toggle('flat', mh2 > 0 && mh2 < 205); } else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
   $('#map').classList.toggle('pawnsel', S.k === 'pawn');
   // research track: rows 0..8 left to right, the temple last
   const trG = GL.some(m => m.t === 'res' || m.t === 'temple'), trC = !trG && L.some(m => m.t === 'res' || m.t === 'temple');

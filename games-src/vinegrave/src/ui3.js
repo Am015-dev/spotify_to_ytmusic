@@ -67,7 +67,7 @@ function showGoal() {   /* one card before turn 1: how you win in one sentence, 
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
   g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Goal"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
-    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Dread cards cost 1.</span></li></ul>
+    <ul class="gu"><li>${ic('up', 'research')}<span>Climb the research track. Higher rows score more.</span></li><li>${ic('idol', 'idol')}<span>Explore ruins. Idols are 3 points, guardians 5.</span></li><li>${ic('card', 'cards')}<span>Buy cards with coins or compasses. Each Dread card is -1 point.</span></li></ul>
     <p class="gf">${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
@@ -81,6 +81,7 @@ function rows(i) { const s = VG.score(G, i); return [['Research track', s.resear
 const CATS = [['research', 'up', 'Research'], ['temple', 'star', 'Temple'], ['idols', 'idol', 'Idols'], ['slots', 'leaf', 'Shrines'], ['guards', 'guard', 'Guardians'], ['cards', 'card', 'Cards'], ['fear', 'exile', 'Dread']];
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
+  document.querySelectorAll('.vpop').forEach(e => e.remove()); if (typeof rivalCap === 'function') rivalCap('');   /* F14 (R93): the result card opens clean */
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
   const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
   const cWon = def ? campIsWon(G, def) : iWon, m = def ? campMetrics(G) : null;
