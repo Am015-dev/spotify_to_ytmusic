@@ -237,13 +237,14 @@ async function bfStep(e){const S=BF.disp;
     bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');if(UI.cg)try{cgRound()}catch(er){}sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
     await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
   if(e.t==='win'){if(UI.tut)await tutPause('floor');await bfFloors();if(UI.tut)await tutPause('bonus');await bfBonus();if(UI.tut)await tutPause('final');sfx('win');return}}
-async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
+async function bfTake(x){let q=null;try{q=rvPre(x)}catch(e){}await bfTake0(x);try{if(q)rvPost(x,q)}catch(e){}}   // rival.js: the denial cheers
+async function bfTake0(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
   const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
   a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
   const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
   if(!focus||!pl||!pl.human||NET.on){BF.lastRival=1;bfTurn(pl.nm+"'s turn");await bfWait(120)}
-  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw();
-    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(150)}}   // W466: show which kiln the rival takes from
+  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'prism':TNAME[x.c].toLowerCase()} → ${x.line<5?'rack '+(x.line+1):'floor'}`;bfDraw();
+    const se=bfQ(`[data-bfsrc="${x.src}"]`);if(se&&bfAnimOK()){se.classList.add('rv-src');await bfWait(UI.tut?150:1100)}}   // W466: show which kiln the rival takes from
   // 1. the tiles lift (the player's own selection is already up)
   let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
   for(const o of rest){const el=bfEl(o.key);if(el&&x.src>=0)el.classList.add('nud')}
@@ -260,7 +261,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(x.src<0)rest.forEach((o,i)=>bfFlip(bfEl('c_'+i),o.r));else ctrOld.forEach((r,k)=>bfFlip(bfEl('c_'+k),r));
   // 3. fly: chosen tiles to the rack (or to a rival's chip), the rest slides to the middle
   const chip=bfChipR(x.p);const fl=[];sfx('take');
-  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:50),dur:focus?600:480,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
+  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,o.to&&(focus||bfSlot(o.to))?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:50),dur:focus?600:480,lift:focus?42:90,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to);else if(!focus){const ce=bfQ(`[data-bfchip="${x.p}"]`);if(ce){ce.classList.remove('hit');void ce.offsetWidth;ce.classList.add('hit')}}})));
   rest.forEach((o,i)=>{if(!restTo[i])return;fl.push(bfFly(o.t,o.r,bfR(bfSlot(restTo[i])),{delay:200+i*60,dur:520,lift:12}).then(()=>{bfShow(restTo[i]);const el=bfEl(restTo[i]);if(el&&bfAnimOK())el.animate([{transform:'scale(1.25)'},{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:bfD(260)});sfx('place')}))});
   if(hadSun)fl.push(bfFly(SUN,sunR,focus?bfR(bfSlot(sunKey)):chip,{dur:600,lift:60}).then(()=>bfShow(sunKey)));
   await Promise.all(fl);BF.hide.clear();sfx('place');
@@ -270,9 +271,9 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   const brk=got.filter(o=>o.brk);const pen=floorPenalty(p.floor.length)-floorPenalty(f0);
   if(brk.length||hadSun){if(focus){for(const o of brk){const el=o.to&&bfEl(o.to);if(el){el.classList.remove('crash');void el.offsetWidth;el.classList.add('crash')}}
       const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
-    else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
+    else if(pen&&!(BF.rvp&&!BF.rvp.hidden))bfChipPop(x.p,String(pen).replace('-','−'),'bad');
     if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(focus?(brk.length?820:420):(brk.length?300:0))}
-  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(100)}
+  else if(!focus){if(!(BF.rvp&&!BF.rvp.hidden))bfChipPop(x.p,x.line<5?'rack '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(UI.tut?100:450)}
   if(focus&&pl&&pl.human)BF.seen.took=1}
 // end of round: each full rack sends one tile to the wall; the lines it joins light up and the points pop
 function bfRun1(w,r,c){const o=[[r,c]];for(let x=c-1;x>=0&&w[r][x]>=0;x--)o.push([r,x]);for(let x=c+1;x<5&&w[r][x]>=0;x++)o.push([r,x]);
@@ -320,11 +321,11 @@ async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
     p.score+=add;bfScore(p.i,p.score);bfChipPop(p.i,'+'+add,'good');await bfWait(300)}}
 // ---------- drawing ----------
 function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
-  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite" data-fa-skip></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
-  document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-line');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
+  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-riv" hidden aria-label="Rival board"></div><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite" data-fa-skip></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
+  document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-line');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');BF.rvp=r.querySelector('.bf-riv');r.addEventListener('pointerover',e=>{try{rvHover(e)}catch(_){}});
   r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
 function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
-  let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,Math.max(46,Math.min(62,H/14))):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
+  const rv=typeof bfRivHTML==='function'&&G&&G.np>=2;let cs=land?Math.min((H-44-44-24)/6.5,(W*(rv&&W>=900?.4:.52)-60)/10.45,Math.max(46,Math.min(62,H/14))):Math.min((W-52)/10.45,(H-44-44-(rv&&H>=640?68:0))*(rv&&H>=640?.4:.43)/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');BF.root.style.setProperty('--rc',(land?(W>=900?Math.max(16,Math.floor(cs*.6)):6):(H<640?6:W<400?10:12))+'px');document.documentElement.classList.toggle('bf-short',H<640);document.documentElement.classList.toggle('bf-wide',land&&W>=900);
   const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
 function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),Math.max(130,Math.min(W,H)*.3)));   // W466: big kilns on big screens
   const ax=Math.max(10,W/2-ks/2-12),ay=Math.max(10,H/2-ks/2-6);/* F1: 12px side margin keeps side kilns and their hit boxes inside the frame */const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
@@ -347,17 +348,18 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
   let rec=-1;if(sel&&UI.coach&&UI.cmp){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&(!!a.j)===(!!sel.j)&&ms.some(m=>m.line===a.line))rec=a.line}}catch(e){}}
-  const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
+  const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';const rdy={};if(!S.ex.gray&&S.phase==='offer'){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;rdy[r]=adjPts2(w,r,c);w[r][c]=lc}}
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
       if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
     const badge=(rec===r?'<span class="bf-bd rec">best</span>':'')+(X&&X.tp?`<span class="bf-bd ${X.net<0?'bad':'good'}${rec===r?' r2':''}">${X.net<0?'−'+(-X.net):'+'+X.net}</span>`:'');
     const badge2=sel&&!o?'<span class="bf-bd bad">✗</span>':'';
-    const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
+    const tc2=X&&!X.pv.full&&!S.ex.gray&&sel.c<NC?WALLCOL(sel.c,r):-1;const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
     const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('wall')&&sel.c<NC?WALLCOL(sel.c,r):-1;
     let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
       if(c===tc&&v<0){cls=' tgt';if(!X.tp)inner+=`<em>+${X.pv.pts}</em>`}
-      else if(v<0&&!S.ex.gray&&p.lines[r].length===cap(r)&&lineColour(p.lines[r])>=0&&WALLCOL(lineColour(p.lines[r]),r)===c){cls=' ready';inner=bfTile(lineColour(p.lines[r]),null,'gh')}
+      else if(c===tc2&&v<0){cls=' tgt2';inner+=`<em class="soon" title="Scores this when rack ${r+1} is full at round end">+${adjPts2(p.wall,r,c)}</em>`}
+      else if(v<0&&!S.ex.gray&&p.lines[r].length===cap(r)&&lineColour(p.lines[r])>=0&&WALLCOL(lineColour(p.lines[r]),r)===c){cls=' ready';inner=bfTile(lineColour(p.lines[r]),null,'gh')+(rdy[r]!=null?`<em class="soon on" title="Rack ${r+1} is full: this tile scores +${rdy[r]} at round end">+${rdy[r]}</em>`:'')}
       if(S.ex.gray?(blk.startsWith('wall')&&v>=0&&(v<5?v:v-10)===sel.c):c===clashC)cls=' clash';
       if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em><i class="bf-hit" aria-hidden="true"></i>`}
       wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
@@ -392,11 +394,11 @@ function bfOvHTML(){if(!G)return '';
     return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="sg-endart ${you?'win':'lose'}" aria-hidden="true"></div><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
       <div class="bf-rk"><span>tiles</span><span>floor</span><span>bonus</span></div>
       ${L.map(r=>{const p=P(r.p),s=r.s;const bon=s.rows+s.cols+s.colours;return `<div class="bf-rr" style="--pc:${PCOL[r.p]}"><i></i><b>${isYou(r.p)?'You':esc(p.nm)}</b><span class="g">+${s.place}</span><span class="r">${s.floor?String(s.floor).replace('-','−'):'0'}</span><span class="g">${bon?'+'+bon:''}</span><b class="t">★${s.total}</b></div>`}).join('')}
-      <div class="bf-btns">${isClient()?'':'<button class="bf-go" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
+      ${(()=>{const up=bfLvUp();return up&&you?`<div class="bf-lvup">You beat ${esc(up.nm)} on ${up.from}. Ready for ${up.to}?</div>`:''})()}<div class="bf-btns">${(()=>{const up=bfLvUp();return up&&you?`<button class="bf-go" data-bf="lvup">Try ${up.to}</button>`:''})()}${isClient()?'':`<button class="bf-go${bfLvUp()&&you?' ghost':''}" data-a="new">Play again</button>`}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
   return ''}
 function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.classList.add('empty');BF.top.innerHTML='';BF.tbl.innerHTML='';BF.me.innerHTML='';BF.hint.innerHTML='';BF.ov.hidden=true;bfFinger(null);return}
   BF.root.classList.remove('empty');if(!BF.busy)BF.root.classList.remove('tapfx');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
-  BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
+  BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);try{bfRivDraw()}catch(e){}
   BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
   const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
   if(live)bfGuide(hp);if(typeof hlpAfter==='function')hlpAfter();
@@ -421,6 +423,7 @@ function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();BF.root.classList.toggle('tapfx');return}   // W466: a tap during the rival's move speeds it up (and shows it: the line gets a fast-forward mark)
+  {const wx=typeof rvWhyX==='function'&&!UI.tut?rvWhyX(t):'';if(wx){rvTip(wx);if(t.closest('.bf-bd'))return}}
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
   const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
@@ -447,7 +450,10 @@ function bfAct(a){switch(a){
   case 'close':BF.menu=false;BF.peek=null;BF.boss=false;if(G&&G.over)BF.resHide=true;bfDraw();return;
   case 'res':BF.resHide=false;bfDraw();return;
   case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();try{const hp=me();if(hp&&!isClient()&&!bfAdvice(hp)){BF.tip='No clear best move: your call';bfHintSet();clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},bfReadMs(BF.tip))}}catch(e){}return;
-  case 'prism':uiAct('prism');return}}
+  case 'prism':uiAct('prism');return;
+  case 'lvup':{const up=bfLvUp();if(!up)return;UI.setup.np=G.np;UI.setup.seats=G.pl.map(p=>p.human?'human':'ai');UI.setup.lv=UI.setup.lv.map(()=>up.k);BF.resHide=false;sfx('click');beginGame();UI.modal=null;refresh();try{schedule()}catch(e){}return}}}
+// the difficulty ladder: after a win against the computer (not story mode), offer the next level
+function bfLvUp(){if(!G||!G.over||UI.cmp||NET.on||UI.tut)return null;const ai=G.pl.filter(p=>!p.human);if(!ai.length||ai.length!==G.np-1)return null;const L=['easy','normal','hard'],N=['Easy','Normal','Hard'];const k=Math.max(...ai.map(p=>L.indexOf(p.lv||'normal')));if(k<0||k>=2)return null;return {nm:ai[0].nm,from:N[k],to:N[k+1],k:L[k+1]}}
 // ---------- wiring into the rest of the page ----------
 function bfApply(){const on=bfWanted();const was=BF.on;BF.on=on;document.documentElement.classList.toggle('bf',on);if(on){bfEnsure();if(G&&!BF.busy){bfSync();BF.disp=bfClone(G)}bfDraw()}else if(was&&BF.root)BF.root.hidden=true;if(on&&BF.root)BF.root.hidden=false}
 try{if(!localStorage.getItem('sgz_guided'))UI.setup.lv=UI.setup.lv.map(()=>'easy')}catch(e){}

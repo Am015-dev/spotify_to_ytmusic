@@ -2,7 +2,7 @@
 // easy: greedy on the immediate gain, with frequent slips
 // normal: greedy with the breakage cost and a look at the best take left for the next player
 // hard: two-ply lookahead (me, the next rival's best replies, my follow-up), which also rewards denial
-const LVL={easy:{slip:.3,top:4},normal:{alpha:.55},hard:{alpha:.6,K:10,roll:2}};
+const LVL={easy:{slip:.42,top:4},normal:{alpha:.55},hard:{alpha:.6,K:10,roll:2}};
 function aRand(n){return Math.floor(Math.random()*n)}
 function endNear(S){// will the game end after this round? (someone has a row one tile short with that rack complete or nearly)
   return S.pl.some(p=>p.wall.some((row,r)=>row.filter(v=>v>=0).length===4&&p.lines[r].length>=cap(r)-1))}
