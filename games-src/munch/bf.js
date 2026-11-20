@@ -227,7 +227,7 @@ document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();
 document.addEventListener('pointerdown',e=>{if(BF.revClose){BF.revClose();BF.revClose=null}if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
   if(!bfMoves(viewSeat(),id).length)return;BF.down={id,x:e.clientX,y:e.clientY,el:c,pid:e.pointerId}},{passive:true});
 document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
-  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&(d.el.closest('.gear')||d.el.closest('.hand.scrolls'))){BF.down=null;return}
+  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*.7&&(d.el.closest('.gear')||d.el.closest('.hand.scrolls'))){BF.down=null;return}
     const r=d.el.getBoundingClientRect();const g=d.el.cloneNode(true);g.className+=' bfghost';g.removeAttribute('data-card');g.style.width=r.width+'px';document.body.appendChild(g);
     BF.drag={id:d.id,g,ox:d.x-r.left,oy:d.y-r.top,w:r.width,h:r.height};BF.pick=null;bfFinger(null);bfMark();d.el.classList.add('bf-lift')}
   const D=BF.drag;D.g.style.transform=`translate(${e.clientX-D.w/2}px,${e.clientY-D.h*.75}px) scale(1.12) rotate(${Math.max(-10,Math.min(10,dx/12))}deg)`;
@@ -299,7 +299,7 @@ function bfMarkBest(){const me=viewSeat();document.querySelectorAll('.bf-best').
   for(const e of btns){let mk=null;try{mk=e.dataset.a==='askmenu'?(b.m.act==='ask'?k:'ask?'):mvKey(JSON.parse(e.dataset.mv))}catch(x){}
     if(!hit&&b.card==null&&mk===k){e.classList.add('bf-best','pulse','primary');hit=true}else e.classList.remove('pulse')}
   if(!hit&&b.m.act==='kick'){const d=document.querySelector('.bfdoor');if(d){d.classList.add('bf-best');hit=true}}
-  let t=hit?bfBestLine(me,b):null;if(t&&bfWords(t)>8)t=bfBestShort(me,b);if(t)bfSay(t)}
+  let t=hit?bfBestLine(me,b):null;if(t&&bfWords(t)>8)t=bfBestShort(me,b);if(t)bfSay(t);if(typeof dkStar==='function')dkStar()}
 const bfWords=t=>String(t).split(/\s+/).filter(Boolean).reduce((a,x)=>a+(x.split(/[-–—]+/).filter(Boolean).length||1),0);
 function bfBestShort(me,b){if(b.card==null)return null;if(G.phase==='charity')return 'Too many cards: give away ★';const c=cd(b.card);if(G.cb)return 'Tap the ★ card';if(c.t==='item')return equipWhy(P(me),b.card)?'Carry the ★ item':'Wear the ★ item';return 'Play the ★ card'}
 {const _a=bfAfter;bfAfter=function(S){const r=_a.apply(this,arguments);try{bfMarkBest()}catch(e){UI.lastErr='best '+e}return r}}

@@ -187,3 +187,8 @@ function tbToastPlace(){try{if(!tbPh())return;const ms=[...document.querySelecto
 (function(){const _r=render;render=function(){const x=_r.apply(this,arguments);tbToastPlace();return x}})();
 setInterval(tbToastPlace,200);
 (function(){const _n=bfNote;bfNote=function(){const x=_n.apply(this,arguments);tbToastPlace();return x}})();
+// the ★ / suggested card is never left off-screen in a scrolling hand: when it changes, the hand scrolls it into view (once, so a manual swipe is never fought)
+let dkStarLast=null;function dkStar(){try{const hd=document.querySelector('.mine .hand.scrolls');
+  const e=hd&&hd.querySelector('.card.bf-best,.card.sug');const k=e?e.dataset.card:null;
+  if(k!==dkStarLast){dkStarLast=k;if(e){const go=()=>{const a=e.getBoundingClientRect(),b=hd.getBoundingClientRect();if(a.right>b.right-4||a.left<b.left+4)dkReveal(e)};go();setTimeout(go,350)}}}catch(_){}}
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);dkStar();return x}})();

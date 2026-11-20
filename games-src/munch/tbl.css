@@ -476,3 +476,8 @@ html.ph #prompt .acts.main.resg .btn{min-height:44px;max-height:44px;min-width:0
 html.ph .bfdoor{min-width:44px;min-height:44px}   /* the door is the main button: never under a 44 px finger, however short the table (F17) */
 /* a very long hero name in the fight wraps to at most 3 lines, so it never runs into the kill/one-shot chips below it */
 html.ph .arena:has(>.vs) .score.hero .sl{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden!important}
+/* F19: a scrolling hand is easy to swipe: snaps card by card, stays inside the strip, shows an edge cue */
+html.ph .mine .hand.scrolls{scroll-snap-type:x proximity;scroll-padding:0 8px;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+html.ph .mine .hand.scrolls::-webkit-scrollbar{display:none}
+html.ph .mine .hand.scrolls .card{scroll-snap-align:start}
+html.ph .mine .hand.scrolls::after{content:"";flex:0 0 8px}

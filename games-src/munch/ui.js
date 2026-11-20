@@ -60,8 +60,12 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(!G&&typeof 
   $('#docktitle').textContent=dockTitle(me);
   setHTML($('#dkLogBody'),logHTML());setHTML($('#dkOppBody'),oppsFullHTML(me));
   // card details / card actions: a closable popup
+  // a card popup never outlives its card: if the card was used (or moved) while it was open, close it instead of showing a used card
+  {const cid0=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;if(cid0!=null&&me>=0&&P(me)&&P(me).hand.length&&!P(me).hand.includes(cid0)&&UI.menuHand===true){UI.menu=null;UI.zoom=null}}
   const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
-  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard');dkCardFit()}
+  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;{let hh='';try{hh=UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML()}catch(e){UI.lastErr='card '+e}
+    if(!hh||hh.replace(/<[^>]+>/g,'').trim().length<4){const c0=cd(cid);hh=`<div class="zoom"><p><b>${esc(c0.n)}</b></p><p class="small">${esc(c0.x||'')}</p><div class="acts"><button class="btn" data-a="close">Close</button></div></div>`}
+    setHTML($('#dkCardBody'),hh)}const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard');dkCardFit()}
   else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
   let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();if(G.mode==='net'&&typeof netModalHTML==='function')m=netModalHTML()||m;
   if(m&&GX.open)GX.close();
@@ -173,7 +177,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   case 'main':say='Get ready, then kick open the door.';acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=by('resurrect').length?'As a Cleric, you may take the top door discard. Tap a card to pay for it.':'';break;
   case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} (Lv ${cd(m.card).lvl})`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
   case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.'+(over>0?` You hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'');acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
-  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards. You may keep ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}. Extras go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
+  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`Too many cards: ${t.length?`give ${ex} to ${t.map(i=>esc(P(i).nm)).join(' or ')}`:`discard ${ex}`}. One tap, or pick your own.`;acts=co.card!=null?`<button class="btn primary pulse" data-a="autocharity">${t.length?'Give':'Discard'} ${ex} card${ex>1?'s':''} (best picks)</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
       ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll '+(()=>{try{return runOdds(P(me),cb).rows[0].need}catch(e){return 5}})()+' or more on a die for each monster.'];
@@ -217,7 +221,7 @@ function moveLabel(m){const c=m.card!=null?cd(m.card):null;const me=viewSeat();c
   default:return m.act}}
 function askHTML(me){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='ask');const who=[...new Set(opts.map(m=>m.tgt))];const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const offs=UI.hints?helpOffers(me):[];
     return `<div class="asks" role="group" aria-label="Ask for help"><b>Ask for help</b><span class="small">Pick a helper and your offer, out of ${cbTreasure(cb)} treasures. They add their strength. If you still lose, you both run.</span>${who.map(i=>{const o=offs.find(x=>x.i===i);return `<div><b>${esc(P(i).nm)}</b> <span class="small">(strength ${pStr(P(i))}${pStr(P(i))+sideStr(cb)>monStr(cb)?', enough to win':', not enough'}${o&&o.yes!=null?`; will say yes for ${o.yes}`:o&&o.wins&&!o.human?'; will say no':''})</span><div class="acts" style="margin:.2rem 0">${opts.filter(m=>m.tgt===i).map(m=>`<button class="btn${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>offer ${m.opt}</button>`).join('')}</div></div>`}).join('')}<div><button class="btn" data-a="close">Cancel</button></div></div>`}
-function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}.<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)}. ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'}. ${c.g||0} gold${c.req?`. ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
+function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}.<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)}. ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'}. ${c.g||0} gold${c.req?`. ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}${c.more?`<p class="small">${esc(c.more)}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
 function menuHTML(me){const u=UI.menu;
   const id=u.card;const ms=cardMoves(me,id);const c=cd(id);const co=coach(me);const bb=typeof bfBest==='function'&&co.card===id?bfBest(me):null;const recK=UI.hints&&co.rec?mvKey(co.rec):bb&&bb.m?mvKey(bb.m):null;const rk=riskyCard(me,id);
   return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}${UI.hints&&co.card===id&&co.why?`<p class="why">💡 ${co.why}</p>`:''}
@@ -289,7 +293,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
     if(UI.sell){if(me>=0&&sellable(P(me)).includes(id)){const i=UI.sell.indexOf(id);if(i>=0)UI.sell.splice(i,1);else UI.sell.push(id);render()}return}
     const ms=cardMoves(me,id);
     if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)&&!document.documentElement.classList.contains('ph')){uiAct(ms[0]);return}
-    if(ms.length){UI.menu={card:id};render();return}UI.zoom=id;render();return}
+    UI.menuHand=me>=0&&P(me).hand.includes(id);if(ms.length){UI.menu={card:id};render();return}UI.zoom=id;render();return}
 });
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='Escape'){UI.menu=null;UI.zoom=null;UI.rules=false;if(G)render();return}
   if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('span[data-gx]')){e.preventDefault();e.target.click();return}

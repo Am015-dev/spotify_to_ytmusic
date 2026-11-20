@@ -267,7 +267,7 @@ function nextRun(){const cb=G.cb;if(!cb)return;const r=cb.runs.find(x=>!x.done);
   roll(r)}
 function roll(r){const cb=G.cb,p=P(r.w),m=runMon(r),c=mdef(m);const v=d6(),mod=runMod(p,cb,m)+(r.w===cb.who||r.w===cb.help?(cb.used['f'+r.w]||0):0)+persMod(p,'die');r.r=v;r.mod=mod;r.ok=v+mod>=R.RUN;p.st.runs++;
   G.lastRoll={v,mod,need:R.RUN,who:r.w,ok:r.ok,id:(G.lastRoll?G.lastRoll.id:0)+1,what:'run'};fx('roll',r.w);
-  lg(r.w,`${p.nm} rolls ${v}${mod?` ${mod>0?'+':''}${mod}`:''} to escape ${c.n}: ${r.ok?'gets away!':'caught!'}`);
+  const rn=eqItems(p).filter(id=>cd(id).run).map(cname);lg(r.w,`${p.nm} rolls ${v}${mod?` ${mod>0?'+':''}${mod}`:''}${rn.length?` (${rn.join(', ')} helps)`:''} to escape ${c.n}: ${r.ok?'gets away!':'caught!'}`);
   if(!r.ok&&(rescueOpts(p,r).length||canReroll(p,r))){G.q={who:r.w,kind:'rescue',run:cb.runs.indexOf(r)};return}
   finishRun(r)}
 // Halfling: after a failed run-away roll, discard a card to roll once more [original rule]
