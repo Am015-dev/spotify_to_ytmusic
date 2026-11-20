@@ -76,3 +76,9 @@ As built now:
 
 Round 2 (orchestrator): countdowns are now 1.5 s and a tap anywhere outside the panel takes the default (touching the panel stops it).
 Boost is not asked when even the smallest flip (1) would spin you (no real choice). Discard is asked only when a card may go.
+
+## F1 strict pass (R77): the two UNSURE rules
+Printed rulebook text is not reachable from this sandbox (a web search returned only fan notes that confirm "stress: flip until a speed card shows" and "over the limit: pay the difference, else spin out"; nothing on the two points below). So neither was changed on a guess. Both stay as W496 verified them against the printed text, and are left flagged for the owner's own check of the paper rulebook.
+- Stress flip and the starting 0 / 5 cards: the flip stops only on a speed card 1 to 4 (`isSpeed`, `src/engine.js:5`); the Brake (0) and Burst (5) are upgrade cards, a separate card type, so they are passed over. The player-facing sentence that claimed "the printed rules give no numbers" was wrong (the numbers are on the cards) and is fixed.
+- Spin-out pays all remaining engine heat (`src/engine.js:225`): kept (W496 VERIFIED, text above). Not changed.
+- Player text fixed: spin means too little heat to pay (not "no heat"); turn order is leader first; adrenaline is +1 speed that counts at corners; stall means too few playable cards; the Rules turn strip lists React (cooldown, boost), Slipstream, Corners and Discard as separate steps.

@@ -40,7 +40,7 @@ function raceWorld(now) {
   /* path dots and ghost car at the landing space */
   var c = G.cars[pv.car]; cx.fillStyle = 'rgba(255,255,255,.75)';
   for (var p = c.pos + 1; p <= pv.L; p++) { var q2 = tk.space(p, 0); cx.beginPath(); cx.arc(q2.x, q2.y, 7, 0, 7); cx.fill(); }
-  var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = 0.5 + 0.25 * Math.sin(now / 180); cx.translate(g.x, g.y); cx.rotate(g.a);
+  var g = tk.space(pv.spin ? pv.stop : pv.L, 0); cx.save(); cx.globalAlpha = pulse('gh' + pv.car + ':' + pv.L + ':' + G.round, now, 1100, 0.4, 0.75); cx.translate(g.x, g.y); cx.rotate(g.a);
   cx.strokeStyle = pv.spin ? '#ff3b30' : '#fff'; cx.lineWidth = 5; cx.setLineDash([10, 8]); rr(-40, -20, 80, 40, 9); cx.stroke(); cx.setLineDash([]); cx.restore();
   var lb = (pv.spin ? 'SPIN' : pv.burn ? '-' + pv.burn + ' heat' : 'safe') + (pv.slip && !pv.spin ? ' · slip +' + slipN(G) : '');   /* one label at the ghost car, not two */
   cx.font = '900 30px sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'bottom'; cx.lineWidth = 7; cx.strokeStyle = '#000'; cx.fillStyle = pv.spin ? '#ff5a4a' : pv.burn ? '#ffb347' : '#8cf0b4';
@@ -145,11 +145,11 @@ function rateStart(c) {
 }
 function rateRound() {
   var s = RACE.start; if (!s || !G || !G.cars[s.ci]) { RACE.start = null; return; } var c = G.cars[s.ci], d = c.pos - s.pos, ht = c.stats.heat - s.heat, sp = c.stats.spins > s.spins, b = RACE.best ? RACE.best.sp : d, k, t;
-  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' spaces, just as planned.'; }   /* a scripted tutorial move is the right play */
+  if (!G.hot && UI.mode === 'tutorial' && !sp) { k = 'good'; t = 'Good: ' + d + ' space' + (d === 1 ? '' : 's') + ', just as planned.'; }   /* a scripted tutorial move is the right play */
   else if (sp) { k = 'poor'; t = 'Poor: you spun out. Brake earlier next time.'; }
-  else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' spaces for ' + ht + ' heat.'; }
-  else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' spaces. The best play went about ' + b + '.'; }
-  else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' spaces, ' + ht + ' heat burned.'; }
+  else if (d >= b - 1 && ht <= 2) { k = 'good'; t = 'Good: ' + d + ' space' + (d === 1 ? '' : 's') + ' for ' + ht + ' heat.'; }
+  else if (d < b - 2) { k = 'okay'; t = 'Okay: ' + d + ' space' + (d === 1 ? '' : 's') + '. The best play went about ' + b + '.'; }
+  else { k = ht > 2 ? 'okay' : 'good'; t = (ht > 2 ? 'Okay: ' : 'Good: ') + d + ' space' + (d === 1 ? '' : 's') + ', ' + ht + ' heat burned.'; }
   RACE.rate = t; RACE.rateK = k; RACE.start = null; RACE.rateShow = 1; tracker();
 }
 
@@ -193,7 +193,7 @@ function scoreWhy() {
 /* ---------- Play mode: one "Goal" card before turn 1 ---------- */
 function goalCard(then) {
   UI.lockModal = true;
-  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast with no heat? You spin.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
+  modal('<h2>Goal: first across the line after ' + G.laps + ' lap' + (G.laps > 1 ? 's' : '') + '</h2><ul class="goal"><li><b>Gear = cards.</b> Gear 3 means you play 3 cards.</li><li><b>Add them up.</b> The total is how far you drive.</li><li><b>Corners burn heat.</b> Too fast for your heat? You spin.</li></ul>' + (G.sup ? '<p class="wxl"><b>Brake</b> = speed 0, safe in corners. <b>Burst</b> = speed 5, one big push. Stuck? Tap <b>Suggest</b>.</p>' : '') +
     (G.wx && G.wx !== 'dry' ? '<p class="wxl"><b>' + esc(WEATHER[G.wx].name) + ':</b> ' + esc(WEATHER[G.wx].txt) + '</p>' : '') + '<button class="big" id="goalB" style="width:100%">Start the race</button>');
   $('#mx').hidden = true; $('#goalB').onclick = function () { UI.lockModal = false; closeModal(); then(); };
 }

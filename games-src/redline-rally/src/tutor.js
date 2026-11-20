@@ -120,18 +120,25 @@ function tutStart(o) {
 }
 function chapterMenu() { tutStart(); }
 /* help drawer: rules cards through the shared help kit (lightbulb in the top bar: suggested move, "How does this work?" opens the cards) */
+/* Hint text: the move itself (gear and cards from the strongest planner), not a generic tip */
+function hintWhy() {
+  try {
+    var c = you(), p = suggestPlan(G, c), nm = p.idx.map(function (i) { var x = c.hand[i]; return x === 'X' ? 'the Stress card' : isSpeed(x) ? 'the ' + x : cardText(x).split(/[:.]/)[0].replace(/ card$/, ''); }); nm = nm.map(function (t) { return /^(Burst|Brake)/.test(t) ? 'the ' + t : t; });
+    return 'Take gear ' + p.gear + ' and play ' + (nm.length > 1 ? nm.slice(0, -1).join(', ') + ' and ' + nm[nm.length - 1] : nm[0]) + '. Tap Suggest to fill it in, then Go.';
+  } catch (e) { return 'Tap Suggest and the computer picks a gear and cards for you. Then tap Go.'; }
+}
 function helpBoot() {
   if (typeof GXH === 'undefined') return;
   var R = [
-    { title: 'How a turn works', text: 'Pick a gear (cards to play). Tap that many cards: they add up to your speed. Press Go. Mind the corner limits. Then each rival drives in turn.' },
+    { title: 'How a turn works', text: 'Pick a gear (cards to play). Tap that many cards: they add up to your speed. Press Go. Mind the corner limits. Cars then move one at a time, leader first.' },
     { title: 'Gear and cards', text: 'Your gear is how many cards you play. Shift one gear free, or two gears for 1 heat. The cards add up to your speed.' },
-    { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. No heat left means a spin-out.' },
+    { title: 'Corners', text: 'Each corner has a speed limit. Every point you go over costs 1 heat from your engine. Too little heat in your engine to pay means a spin-out.' },
     { title: 'Heat', text: 'Heat you pay goes to your discard pile and comes back as dead cards in your hand. Gears 1 and 2 send heat back to the engine.' },
     { title: 'Slipstream and boost', text: 'End next to or right behind a car to glide 2 more spaces. Boost: pay 1 heat to flip an extra speed card.' },
     { title: 'Upgrades', text: 'With Upgrades on you draft 3 cards before the race. They are played like speed cards and add a bonus.' }
   ];
-  GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R });
+  GXH.init({ game: 'redline-rally', defaultOn: false, steps: {}, rules: R, top: function () { var dk = document.querySelector('.gx-dock'); if (innerHeight < 600 && dk) { var r = dk.getBoundingClientRect(); if (r.top > innerHeight * 0.3) return Math.ceil(r.top) + 4; } var b = document.querySelector('.gx-bar'), rb = b && b.getBoundingClientRect(); return rb && rb.bottom > 0 && rb.bottom < innerHeight / 2 ? Math.ceil(rb.bottom) + 4 : 6; } });   /* short phones: the Hint bubble stays over the dock, never over the board */
   GXH.bulb({ el: '#bulbbtn', rulesFor: function () { return null; }, suggest: function () {
-    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('#sugB'); }, why: 'Tap Suggest and the computer picks a gear and cards for you. Then tap Go.' };
+    if (!G || G.phase !== 'plan' || !$('#sugB')) return null; return { target: function () { return $('#sugB'); }, why: hintWhy() };
   } });
 }

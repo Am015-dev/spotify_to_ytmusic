@@ -93,8 +93,8 @@ Tags: [CORE] must match the original. [EXT] house extension, not in the original
 63. [CORE] Equal distance: the car that arrived first on that space ranks higher (the original uses the lane; this game has no lane tie-break) [EXT tie rule].
 
 ## Modules of the original
-64. [NB] Championship (several races, points per place).
-65. [NB] Weather and road-condition event cards.
+64. [EXT] Championship (several races, points per place).
+65. [EXT] Weather and road-condition event cards.
 66. [EXT] Legends (option `legends:k`, up to 3): automated cars with no hand or heat; each turn a Legend plays the next card of its pace deck, brakes to take every corner on its path without penalty, and takes a free slipstream boost when safe; it never gets the last-place boost. This game's own rules for the module, tested for self-consistency only.
 67. [EXT] Garage upgrades (option `garage:true`): a face-up market of 6 from a pile of 2 copies of each of the 6 upgrade types; the back of the grid chooses first, snake order, 2 picks each, market refilled after every pick; the picks are shuffled into the deck. Different from the 3-pick draft (`upg`). Own design, tested for self-consistency only.
 68. [CORE] Finishers leave the track at the end of the round they cross: they no longer fill a space or offer slipstream.
