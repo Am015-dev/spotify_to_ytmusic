@@ -135,7 +135,7 @@ function hlpWhy(m,co,me){const cb=G.cb;let c=[];const tail=(co.why?sentences(co.
     case 'fight':if(cb)c.push(winning(cb)?`You lead ${sideStr(cb)} to ${monStr(cb)}: fight now.`:'');break;
     case 'run':if(cb)c.push(`You lose ${sideStr(cb)} to ${monStr(cb)} and no card wins it: run.`);break;
     case 'ask':c.push(`Ask ${nm(m.tgt)}: they would help, and together you win.`);break;
-    case 'give':case 'toss':{const w=strip(discardWhy(m.card,me));c.push(`Your weakest card: ${w}.`);break}
+    case 'give':case 'toss':{const w=strip(discardWhy(m.card,me)).replace(/:\s*/g,', ');c.push(`Pick a card to ${m.act==='give'?'give away':'lose'}: your weakest is ${strip(cname(m.card))} (${w}).`,`Pick a card to ${m.act==='give'?'give away':'lose'}: ${strip(cname(m.card))} is your weakest.`);break}
     case 'pass':if(G.phase==='window')c.push(`Nothing worth playing now: let ${nm(G.active)} go on.`);else c.push('Nothing worth a card: let it be.');break;
     case 'opt':case 'use':c.push(capW(tail[0],15),capW(tail[1],15));break;
     case 'play':case 'equip':case 'unequip':{const cc=m.card!=null?cd(m.card):null;const x=co.plan&&co.plan[0];const mine=x&&x.m&&mvKey(x.m)===mvKey(m);const w=mine?strip(x.why):'';
@@ -153,6 +153,10 @@ function hlpWhy(m,co,me){const cb=G.cb;let c=[];const tail=(co.why?sentences(co.
 // the bulb's suggestion: the move the advisor would make now, legal, with a place on the board and a short honest reason; else null (rules cards only)
 function hlpSuggest(){try{
   const me=viewSeat();if(!G||G.winner||me<0||sideToAct()!==me||!P(me).human||UI.sell||BF.ask||BF.pick!=null||BF.drag||UI.menu||UI.zoom!=null)return null;
+  if(G.q&&G.q.kind==='pick'&&typeof tbWeakest==='function'){const w=tbWeakest(me);if(w==null)return null;const i=G.q.opts.indexOf(w);   // a Bad Stuff card pick: point at the one that costs least, in plain words
+    const el=()=>[...document.querySelectorAll('#prompt [data-mv]')].find(e=>{try{const v=JSON.parse(e.dataset.mv);return v.act==='pick'&&v.opt===i}catch(x){return false}})||document.querySelector(`.mine [data-card="${w}"]`);
+    if(!el())return null;const r=strip(discardWhy(w,me)).replace(/:\s*/g,', ');const why=capW(`Pick a card to lose: your weakest is ${strip(cname(w))} (${r}).`,15)||`Pick a card to lose: ${strip(cname(w))} is your weakest.`;
+    return {why,key:'pick'+i,target:el,from:null}}
   if(G.q&&['pick','glue','lawyer','fetch'].includes(G.q.kind))return null;   // no reason that is surely right: show the rules instead
   const co=coach(me);const m=co&&co.rec;if(!m||!validMoves(me).some(x=>mvKey(x)===mvKey(m)))return null;
   const p0=hlpPlan(m,me);if(!p0)return null;const why=hlpWhy(m,co,me);if(!why)return null;
