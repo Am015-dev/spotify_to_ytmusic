@@ -17,18 +17,18 @@ Style block (in front of every prompt): Flat 2D hand-stitched quilting illustrat
 | icon-button | icon | 128x128 | 1:1 | yes | Button currency icon (contain) |
 | icon-hourglass | icon | 128x128 | 1:1 | yes | Time cost icon (contain) |
 | patch-leather | token | 256x256 | 1:1 | yes | Single leather patch square (cover) |
-| fabric-01 | token | 256x256 | 1:1 | no | Fabric of the patch 'Ribbon Scrap' (square seamless tile, cover over the patch) |
-| fabric-02 | token | 256x256 | 1:1 | no | Fabric of the patch 'Bias Binding' (square seamless tile, cover over the patch) |
-| fabric-03 | token | 256x256 | 1:1 | no | Fabric of the patch 'Corner Patch' (square seamless tile, cover over the patch) |
-| fabric-04 | token | 256x256 | 1:1 | no | Fabric of the patch 'Tile Square' (square seamless tile, cover over the patch) |
-| fabric-05 | token | 256x256 | 1:1 | no | Fabric of the patch 'Long Strip' (square seamless tile, cover over the patch) |
-| fabric-06 | token | 256x256 | 1:1 | no | Fabric of the patch 'Boot Patch' (square seamless tile, cover over the patch) |
-| fabric-07 | token | 256x256 | 1:1 | no | Fabric of the patch 'Tab Patch' (square seamless tile, cover over the patch) |
-| fabric-08 | token | 256x256 | 1:1 | no | Fabric of the patch 'Wave Patch' (square seamless tile, cover over the patch) |
-| fabric-09 | token | 256x256 | 1:1 | no | Fabric of the patch 'Ruler Strip' (square seamless tile, cover over the patch) |
-| fabric-10 | token | 256x256 | 1:1 | no | Fabric of the patch 'Hook Patch' (square seamless tile, cover over the patch) |
-| fabric-11 | token | 256x256 | 1:1 | no | Fabric of the patch 'Step Patch' (square seamless tile, cover over the patch) |
-| fabric-12 | token | 256x256 | 1:1 | no | Fabric of the patch 'Pocket Patch' (square seamless tile, cover over the patch) |
+| fabric-01 | token | 256x256 | 1:1 | no | Fabric of the patch 'Snip' (square seamless tile, cover over the patch) |
+| fabric-02 | token | 256x256 | 1:1 | no | Fabric of the patch 'Selvedge' (square seamless tile, cover over the patch) |
+| fabric-03 | token | 256x256 | 1:1 | no | Fabric of the patch 'Thimble' (square seamless tile, cover over the patch) |
+| fabric-04 | token | 256x256 | 1:1 | no | Fabric of the patch 'Pincushion' (square seamless tile, cover over the patch) |
+| fabric-05 | token | 256x256 | 1:1 | no | Fabric of the patch 'Yardstick' (square seamless tile, cover over the patch) |
+| fabric-06 | token | 256x256 | 1:1 | no | Fabric of the patch 'Heel Tab' (square seamless tile, cover over the patch) |
+| fabric-07 | token | 256x256 | 1:1 | no | Fabric of the patch 'Collar' (square seamless tile, cover over the patch) |
+| fabric-08 | token | 256x256 | 1:1 | no | Fabric of the patch 'Gingham Wave' (square seamless tile, cover over the patch) |
+| fabric-09 | token | 256x256 | 1:1 | no | Fabric of the patch 'Tulip Bud' (square seamless tile, cover over the patch) |
+| fabric-10 | token | 256x256 | 1:1 | no | Fabric of the patch 'Lantern' (square seamless tile, cover over the patch) |
+| fabric-11 | token | 256x256 | 1:1 | no | Fabric of the patch 'Hearth Corner' (square seamless tile, cover over the patch) |
+| fabric-12 | token | 256x256 | 1:1 | no | Fabric of the patch 'Apron Pocket' (square seamless tile, cover over the patch) |
 | portrait-wren | portrait | 512x512 | 1:1 | no | Aunt Wren portrait (story map, intro and result screen, cover) |
 | portrait-poppy | portrait | 512x512 | 1:1 | no | Dame Poppy portrait (story map, intro and result screen, cover) |
 
@@ -36,27 +36,27 @@ Style block (in front of every prompt): Flat 2D hand-stitched quilting illustrat
 
 | stem | kind | size | ratio | alpha | slot |
 |---|---|---|---|---|---|
-| fabric-13 | token | 256x256 | 1:1 | no | Fabric of the patch 'Anchor Patch' (square seamless tile, cover over the patch) |
-| fabric-14 | token | 256x256 | 1:1 | no | Fabric of the patch 'Cup Patch' (square seamless tile, cover over the patch) |
-| fabric-15 | token | 256x256 | 1:1 | no | Fabric of the patch 'Elbow Patch' (square seamless tile, cover over the patch) |
-| fabric-16 | token | 256x256 | 1:1 | no | Fabric of the patch 'Stair Patch' (square seamless tile, cover over the patch) |
-| fabric-17 | token | 256x256 | 1:1 | no | Fabric of the patch 'Cross Patch' (square seamless tile, cover over the patch) |
-| fabric-18 | token | 256x256 | 1:1 | no | Fabric of the patch 'Banner Patch' (square seamless tile, cover over the patch) |
-| fabric-19 | token | 256x256 | 1:1 | no | Fabric of the patch 'Lightning Patch' (square seamless tile, cover over the patch) |
-| fabric-20 | token | 256x256 | 1:1 | no | Fabric of the patch 'Leaf Patch' (square seamless tile, cover over the patch) |
-| fabric-21 | token | 256x256 | 1:1 | no | Fabric of the patch 'Wide Block' (square seamless tile, cover over the patch) |
-| fabric-22 | token | 256x256 | 1:1 | no | Fabric of the patch 'Ladder Patch' (square seamless tile, cover over the patch) |
-| fabric-23 | token | 256x256 | 1:1 | no | Fabric of the patch 'Kite Patch' (square seamless tile, cover over the patch) |
-| fabric-24 | token | 256x256 | 1:1 | no | Fabric of the patch 'Bridge Patch' (square seamless tile, cover over the patch) |
-| fabric-25 | token | 256x256 | 1:1 | no | Fabric of the patch 'Hammer Patch' (square seamless tile, cover over the patch) |
-| fabric-26 | token | 256x256 | 1:1 | no | Fabric of the patch 'Zigzag Patch' (square seamless tile, cover over the patch) |
-| fabric-27 | token | 256x256 | 1:1 | no | Fabric of the patch 'Arch Patch' (square seamless tile, cover over the patch) |
-| fabric-28 | token | 256x256 | 1:1 | no | Fabric of the patch 'Pennant Patch' (square seamless tile, cover over the patch) |
-| fabric-29 | token | 256x256 | 1:1 | no | Fabric of the patch 'Windmill Patch' (square seamless tile, cover over the patch) |
-| fabric-30 | token | 256x256 | 1:1 | no | Fabric of the patch 'Long Stair' (square seamless tile, cover over the patch) |
-| fabric-31 | token | 256x256 | 1:1 | no | Fabric of the patch 'Snowflake Patch' (square seamless tile, cover over the patch) |
-| fabric-32 | token | 256x256 | 1:1 | no | Fabric of the patch 'Frame Patch' (square seamless tile, cover over the patch) |
-| fabric-33 | token | 256x256 | 1:1 | no | Fabric of the patch 'Flag Patch' (square seamless tile, cover over the patch) |
+| fabric-13 | token | 256x256 | 1:1 | no | Fabric of the patch 'Flag Iron' (square seamless tile, cover over the patch) |
+| fabric-14 | token | 256x256 | 1:1 | no | Fabric of the patch 'Garden Path' (square seamless tile, cover over the patch) |
+| fabric-15 | token | 256x256 | 1:1 | no | Fabric of the patch 'Weathervane' (square seamless tile, cover over the patch) |
+| fabric-16 | token | 256x256 | 1:1 | no | Fabric of the patch 'Hem Line' (square seamless tile, cover over the patch) |
+| fabric-17 | token | 256x256 | 1:1 | no | Fabric of the patch 'Long Hook' (square seamless tile, cover over the patch) |
+| fabric-18 | token | 256x256 | 1:1 | no | Fabric of the patch 'Chevron' (square seamless tile, cover over the patch) |
+| fabric-19 | token | 256x256 | 1:1 | no | Fabric of the patch 'Cascade' (square seamless tile, cover over the patch) |
+| fabric-20 | token | 256x256 | 1:1 | no | Fabric of the patch 'Lightning Seam' (square seamless tile, cover over the patch) |
+| fabric-21 | token | 256x256 | 1:1 | no | Fabric of the patch 'Clover Sprig' (square seamless tile, cover over the patch) |
+| fabric-22 | token | 256x256 | 1:1 | no | Fabric of the patch 'Hearth Block' (square seamless tile, cover over the patch) |
+| fabric-23 | token | 256x256 | 1:1 | no | Fabric of the patch 'Bolt End' (square seamless tile, cover over the patch) |
+| fabric-24 | token | 256x256 | 1:1 | no | Fabric of the patch 'Staircase' (square seamless tile, cover over the patch) |
+| fabric-25 | token | 256x256 | 1:1 | no | Fabric of the patch 'Teapot' (square seamless tile, cover over the patch) |
+| fabric-26 | token | 256x256 | 1:1 | no | Fabric of the patch 'Crook' (square seamless tile, cover over the patch) |
+| fabric-27 | token | 256x256 | 1:1 | no | Fabric of the patch 'Rickrack' (square seamless tile, cover over the patch) |
+| fabric-28 | token | 256x256 | 1:1 | no | Fabric of the patch 'River Bend' (square seamless tile, cover over the patch) |
+| fabric-29 | token | 256x256 | 1:1 | no | Fabric of the patch 'Signpost' (square seamless tile, cover over the patch) |
+| fabric-30 | token | 256x256 | 1:1 | no | Fabric of the patch 'Big Corner' (square seamless tile, cover over the patch) |
+| fabric-31 | token | 256x256 | 1:1 | no | Fabric of the patch 'Cottage' (square seamless tile, cover over the patch) |
+| fabric-32 | token | 256x256 | 1:1 | no | Fabric of the patch 'Comet Tail' (square seamless tile, cover over the patch) |
+| fabric-33 | token | 256x256 | 1:1 | no | Fabric of the patch 'Bow Tie' (square seamless tile, cover over the patch) |
 | portrait-tilly | portrait | 512x512 | 1:1 | no | Tilly Thimble portrait (story map, intro and result screen, cover) |
 | portrait-odette | portrait | 512x512 | 1:1 | no | Odette Loom portrait (story map, intro and result screen, cover) |
 | portrait-bram | portrait | 512x512 | 1:1 | no | Bram Seam portrait (story map, intro and result screen, cover) |

@@ -108,7 +108,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Ribbon Scrap' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Snip' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: red and white gingham, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -119,7 +119,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Bias Binding' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Selvedge' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: navy blue with small white polka dots, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -130,7 +130,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Corner Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Thimble' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: mustard yellow with thin cream stripes, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -141,7 +141,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Tile Square' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Pincushion' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: soft green with tiny white daisies, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -152,7 +152,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Long Strip' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Yardstick' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: dusty rose with a diamond lattice pattern, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -163,7 +163,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Boot Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Heel Tab' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: teal with a white wave pattern, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -174,7 +174,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Tab Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Collar' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: terracotta with cream cross-stitch, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -185,7 +185,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Wave Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Gingham Wave' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: sky blue with white clouds, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -196,7 +196,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Ruler Strip' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Tulip Bud' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: plum purple with gold stars, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -207,7 +207,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Hook Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Lantern' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: cream linen with a blue leaf print, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -218,7 +218,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Step Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Hearth Corner' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: forest green tartan, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -229,7 +229,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 1,
-   "slot": "Fabric of the patch 'Pocket Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Apron Pocket' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: coral pink with white hearts, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -240,7 +240,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Anchor Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Flag Iron' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: indigo with white paisley, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -251,7 +251,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Cup Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Garden Path' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: sunflower yellow with brown seeds pattern, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -262,7 +262,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Elbow Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Weathervane' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: mint green with white stripes, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -273,7 +273,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Stair Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Hem Line' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: burgundy with a cream floral vine, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -284,7 +284,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Cross Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Long Hook' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: pale grey with navy triangles, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -295,7 +295,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Banner Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Chevron' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: orange with a white zigzag, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -306,7 +306,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Lightning Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Cascade' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: lavender with small white tulips, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -317,7 +317,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Leaf Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Lightning Seam' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: olive green with mustard dots, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -328,7 +328,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Wide Block' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Clover Sprig' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: denim blue with orange stitching, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -339,7 +339,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Ladder Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Hearth Block' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: rose pink with grey chevrons, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -350,7 +350,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Kite Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Bolt End' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: brown with cream feathers, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -361,7 +361,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Bridge Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Staircase' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: turquoise with yellow flowers, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -372,7 +372,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Hammer Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Teapot' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: charcoal with white pinstripes, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -383,7 +383,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Zigzag Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Crook' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: peach with teal scallops, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -394,7 +394,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Arch Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Rickrack' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: red with a white snowflake pattern, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -405,7 +405,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Pennant Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'River Bend' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: blue and white checkerboard, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -416,7 +416,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Windmill Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Signpost' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: yellow with red cherries, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -427,7 +427,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Long Stair' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Big Corner' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: green with cream leaves and acorns, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -438,7 +438,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Snowflake Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Cottage' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: magenta with gold diamonds, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -449,7 +449,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Frame Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Comet Tail' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: teal and cream herringbone, soft cotton weave, no border, fills the whole picture."
   },
   {
@@ -460,7 +460,7 @@
    "ratio": "1:1",
    "alpha": false,
    "wave": 2,
-   "slot": "Fabric of the patch 'Flag Patch' (square seamless tile, cover over the patch)",
+   "slot": "Fabric of the patch 'Bow Tie' (square seamless tile, cover over the patch)",
    "prompt": "A seamless square fabric swatch seen straight from above: navy with a red and gold sunburst, soft cotton weave, no border, fills the whole picture."
   },
   {

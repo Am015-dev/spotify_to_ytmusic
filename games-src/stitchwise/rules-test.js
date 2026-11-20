@@ -24,7 +24,7 @@ L.swApply(G, { t: 'leather', x: 4, y: 4 }); ok(G.board[0][40] === 100 && !G.pend
 // buy
 G = L.swNew({ seed: 5 }); G.btn[0] = 30; const off = L.swOffer(G); ok(off.length === 3, '3 offered'); const k = 1, pid = off[k], p = PATCHES[pid]; const ring0 = G.ring.length;
 r = L.swApply(G, { t: 'buy', k, o: 0, x: 0, y: 0 }); const inc5 = p.time >= 5 ? p.inc : 0; ok(r.ok && G.btn[0] === 30 - p.cost + inc5 && G.pos[0] === p.time && G.ring.length === ring0 - 1, 'buy pays, time, ring'); ok(G.inc[0] === p.inc, 'income recorded');
-ok(!L.swApply(G, { t: 'buy', k: 0, o: 0, x: 0, y: 0 }).ok || L.swWho(G) === 1, 'turn passes');
+ok(L.swWho(G) === 1, 'turn passes to the player behind');
 // overlap & off-board refused
 G = L.swNew({ seed: 6 }); G.btn[0] = 99; L.swApply(G, { t: 'buy', k: 0, o: 0, x: 0, y: 0 }); G.cur = 0; G.pos = [0, 9]; G.stamp = [1, 2]; ok(!L.swApply(G, { t: 'buy', k: 0, o: 0, x: 0, y: 0 }).ok, 'overlap refused'); ok(!L.swApply(G, { t: 'buy', k: 0, o: 0, x: 8, y: 8 }).ok, 'off board refused');
 // bonus 7x7

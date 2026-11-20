@@ -12,39 +12,39 @@ Every distinct card/tile/piece/character/boss/board/background/icon id that the 
 
 | id | what | in assets.json | Flow prompt | wave |
 |---|---|---|---|---|
-| fabric-01 | patch: Ribbon Scrap | yes | yes | 1 |
-| fabric-02 | patch: Bias Binding | yes | yes | 1 |
-| fabric-03 | patch: Corner Patch | yes | yes | 1 |
-| fabric-04 | patch: Tile Square | yes | yes | 1 |
-| fabric-05 | patch: Long Strip | yes | yes | 1 |
-| fabric-06 | patch: Boot Patch | yes | yes | 1 |
-| fabric-07 | patch: Tab Patch | yes | yes | 1 |
-| fabric-08 | patch: Wave Patch | yes | yes | 1 |
-| fabric-09 | patch: Ruler Strip | yes | yes | 1 |
-| fabric-10 | patch: Hook Patch | yes | yes | 1 |
-| fabric-11 | patch: Step Patch | yes | yes | 1 |
-| fabric-12 | patch: Pocket Patch | yes | yes | 1 |
-| fabric-13 | patch: Anchor Patch | yes | yes | 2 |
-| fabric-14 | patch: Cup Patch | yes | yes | 2 |
-| fabric-15 | patch: Elbow Patch | yes | yes | 2 |
-| fabric-16 | patch: Stair Patch | yes | yes | 2 |
-| fabric-17 | patch: Cross Patch | yes | yes | 2 |
-| fabric-18 | patch: Banner Patch | yes | yes | 2 |
-| fabric-19 | patch: Lightning Patch | yes | yes | 2 |
-| fabric-20 | patch: Leaf Patch | yes | yes | 2 |
-| fabric-21 | patch: Wide Block | yes | yes | 2 |
-| fabric-22 | patch: Ladder Patch | yes | yes | 2 |
-| fabric-23 | patch: Kite Patch | yes | yes | 2 |
-| fabric-24 | patch: Bridge Patch | yes | yes | 2 |
-| fabric-25 | patch: Hammer Patch | yes | yes | 2 |
-| fabric-26 | patch: Zigzag Patch | yes | yes | 2 |
-| fabric-27 | patch: Arch Patch | yes | yes | 2 |
-| fabric-28 | patch: Pennant Patch | yes | yes | 2 |
-| fabric-29 | patch: Windmill Patch | yes | yes | 2 |
-| fabric-30 | patch: Long Stair | yes | yes | 2 |
-| fabric-31 | patch: Snowflake Patch | yes | yes | 2 |
-| fabric-32 | patch: Frame Patch | yes | yes | 2 |
-| fabric-33 | patch: Flag Patch | yes | yes | 2 |
+| fabric-01 | patch: Snip | yes | yes | 1 |
+| fabric-02 | patch: Selvedge | yes | yes | 1 |
+| fabric-03 | patch: Thimble | yes | yes | 1 |
+| fabric-04 | patch: Pincushion | yes | yes | 1 |
+| fabric-05 | patch: Yardstick | yes | yes | 1 |
+| fabric-06 | patch: Heel Tab | yes | yes | 1 |
+| fabric-07 | patch: Collar | yes | yes | 1 |
+| fabric-08 | patch: Gingham Wave | yes | yes | 1 |
+| fabric-09 | patch: Tulip Bud | yes | yes | 1 |
+| fabric-10 | patch: Lantern | yes | yes | 1 |
+| fabric-11 | patch: Hearth Corner | yes | yes | 1 |
+| fabric-12 | patch: Apron Pocket | yes | yes | 1 |
+| fabric-13 | patch: Flag Iron | yes | yes | 2 |
+| fabric-14 | patch: Garden Path | yes | yes | 2 |
+| fabric-15 | patch: Weathervane | yes | yes | 2 |
+| fabric-16 | patch: Hem Line | yes | yes | 2 |
+| fabric-17 | patch: Long Hook | yes | yes | 2 |
+| fabric-18 | patch: Chevron | yes | yes | 2 |
+| fabric-19 | patch: Cascade | yes | yes | 2 |
+| fabric-20 | patch: Lightning Seam | yes | yes | 2 |
+| fabric-21 | patch: Clover Sprig | yes | yes | 2 |
+| fabric-22 | patch: Hearth Block | yes | yes | 2 |
+| fabric-23 | patch: Bolt End | yes | yes | 2 |
+| fabric-24 | patch: Staircase | yes | yes | 2 |
+| fabric-25 | patch: Teapot | yes | yes | 2 |
+| fabric-26 | patch: Crook | yes | yes | 2 |
+| fabric-27 | patch: Rickrack | yes | yes | 2 |
+| fabric-28 | patch: River Bend | yes | yes | 2 |
+| fabric-29 | patch: Signpost | yes | yes | 2 |
+| fabric-30 | patch: Big Corner | yes | yes | 2 |
+| fabric-31 | patch: Cottage | yes | yes | 2 |
+| fabric-32 | patch: Comet Tail | yes | yes | 2 |
+| fabric-33 | patch: Bow Tie | yes | yes | 2 |
 | portrait-wren | character: Aunt Wren | yes | yes | 1 |
 | portrait-poppy | character: Dame Poppy | yes | yes | 1 |
 | portrait-tilly | character: Tilly Thimble | yes | yes | 2 |
