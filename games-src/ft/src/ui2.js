@@ -1,5 +1,6 @@
 // ---------- UI part 2: fitting the grid, animating what changed between two renders, the chooser pop-over, the ghost finger ----------
-function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,H=G.H,gap=3;const bw=gw.clientWidth,bh=gw.clientHeight;if(bw<20||bh<20)return;
+function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,H=G.H,gap=3;const RR=document.documentElement;RR.classList.remove('sq');let bw=gw.clientWidth,bh=gw.clientHeight;if(bw<20||bh<20)return;
+  if(!RR.classList.contains('land')&&innerWidth<=700&&Math.floor((bh-(H-1)*gap)/H)<44){RR.classList.add('sq');bw=gw.clientWidth;bh=gw.clientHeight}   // F1: tiles keep 44 px on a short phone
   let cw=Math.floor((bw-(W-1)*gap)/W),ch=Math.floor((bh-(H-1)*gap)/H);ch=Math.min(ch,Math.round(cw*1.55));cw=Math.min(cw,Math.round(ch*1.6));
   g.style.width=(cw*W+(W-1)*gap)+'px';g.style.height=(ch*H+(H-1)*gap)+'px';
   const ms=Math.max(10,Math.min(26,Math.round(Math.min(cw*.27,(ch-27)/2.36))));g.style.setProperty('--ms',ms+'px');g.style.setProperty('--cw',cw+'px');g.style.setProperty('--ch',ch+'px');

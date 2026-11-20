@@ -115,5 +115,5 @@ function scGlowHint(){if(!G||G.over||G.tut||online()||(typeof gdStep==='function
   R.classList.toggle('dj-off',after&&!UI.pickDj.length);R.classList.toggle('mr-off',after&&!UI.pickMk.length&&!(G.step==='tribe'&&G.act&&G.act.color==='merchant'))}catch(e){}}})();
 // R38 (375x553): a short phone hides the market while bidding, and the djinn row while djinn powers fill the button row
 (function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
-  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));
+  R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));R.classList.toggle('mk-buy',!!(G&&!G.over&&UI.pickMk&&UI.pickMk.length));
   const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
