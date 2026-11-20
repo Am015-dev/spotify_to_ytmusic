@@ -11,7 +11,20 @@ function myTurn() { if (!G || G.phase === 'over') return false; var s = PP.sideT
 // replace a part only when its HTML really changed: a tap that lands during a re-render keeps its button (never a dead tap)
 function setH(el, h) { if (!el || el._h === h) return; el._h = h; el.innerHTML = h; }
 function q() { return G && G.q; }
-function toast(t, ms, tap) { if (!tap && !hintsOn()) return; var w = $('#toast'), d = document.createElement('div'); d.className = 't'; d.textContent = t; w.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2600); while (w.children.length > 3) w.firstChild.remove(); }
+// one toast at a time: new ones wait in a queue (max 3 waiting, same text never twice), never stacked
+var TQ = { q: [], on: false };
+function toast(t, ms, tap) {
+  if (!tap && !hintsOn()) return;
+  if (TQ.q.some(function (x) { return x.t === t; }) || (TQ.cur === t)) return;
+  TQ.q.push({ t: t, ms: ms || 2600 }); while (TQ.q.length > 3) TQ.q.shift(); toastNext();
+}
+function toastNext() {
+  if (TQ.on || !TQ.q.length) return;
+  var x = TQ.q.shift(), w = $('#toast'); if (!w) return;
+  TQ.on = true; TQ.cur = x.t; w.innerHTML = '';
+  var d = document.createElement('div'); d.className = 't'; d.textContent = x.t; d.style.animationDuration = x.ms + 'ms'; w.appendChild(d);
+  setTimeout(function () { d.remove(); TQ.on = false; TQ.cur = null; toastNext(); }, x.ms);
+}
 // R19: the wait between your turns has a budget: after 2 s of rival play (round-end scoring, two rival turns in a row) the rest runs 6x faster
 function spd() { var sp = UI.speed || 1; if (UI.rvT0 && Date.now() - UI.rvT0 > 2000) sp = Math.max(sp, 6); return sp; }
 function aMs(ms) { if (UI.fast) return 0; var sp = spd(); try { return Math.round((GX.animMs ? GX.animMs(ms) : ms) / sp); } catch (e) { return ms; } }
@@ -56,7 +69,7 @@ function render() {
   var vs = UI.view, p = G.pl[vs], cur = PP.sideToAct(G);
   $('#barstat').textContent = '';
   $$('#bd .firing,#bd .landed,#bd .pulse').forEach(function (e) { e.classList.remove('firing', 'landed', 'pulse'); });   // parts are kept when unchanged (setH): clear one-shot effects
-  renderOpps(cur); renderMid(); renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
+  renderOpps(cur); renderMid(); try { renderSide(); } catch (e) { } renderMat(p, vs); renderDock(p, vs, cur); renderGoalbar(); fitMat();
   glow(); try { markBest(); } catch (e) { } try { glowOne(); } catch (e) { } try { dockToActs(); } catch (e) { } try { bestInView(); } catch (e) { }
   if (UI.pend) [40, 160, 420].forEach(function (ms) { setTimeout(function () { try { if (UI.pend) dockToActs(); } catch (e) { } }, ms); });   // late layout (card art, the chosen card's scroll) must not push Play/Cancel out of the panel
   try { rateStart(); showRate(); } catch (e) { }
@@ -84,11 +97,30 @@ function renderOpps(cur) {   // the always-visible score breakdown: every player
   setH($('#opps'), hintsOn() ? scoreHTML() : scoreLineHTML());
 }
 function portraitHTML(face) { var st = 'portrait-' + face; return ART.items[st] ? artHTML(st) : '<span class="art ph">' + placeholder('portrait-' + face) + '</span>'; }
+// PC side panel: the rival's board (names, points, eggs) and the round goals with the live counts; hidden on phones by CSS
+function renderSide() {
+  var f = $('#fernbd'), g = $('#sidegoals'); if (!f || !g || !G) return;
+  var h = '';
+  G.pl.forEach(function (q, i) {
+    if (i === UI.view || q.auto) return;
+    h += '<h3>' + esc(q.name) + "'s board</h3>";
+    for (var r = 0; r < 3; r++) {
+      h += '<div class="fb h' + r + '"><span class="fbn">' + HABN[r] + '</span>' + (q.board[r].filter(Boolean).length ? q.board[r].filter(Boolean).map(function (s) { return '<span class="fbc" data-a="oppbird" title="' + esc(B[s.id].n) + '"><b>' + esc(B[s.id].n) + '</b> ' + B[s.id].p + ' pt' + (s.eggs ? ' &middot; ' + s.eggs + ' egg' + (s.eggs === 1 ? '' : 's') : '') + '</span>'; }).join('') : '<span class="fbe">nothing yet</span>') + '</div>';
+    }
+  });
+  setH(f, h);
+  var me = UI.view;
+  setH(g, '<h3>Round goals</h3>' + G.goals.map(function (gid, r) {
+    var res = G.gres[r], cur = r === G.round && G.phase !== 'over';
+    var d = res ? res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ') : G.pl.map(function (q, i) { return (i === me ? 'You' : q.name) + ' ' + PP.goalCount(G, i, gid); }).join(', ');
+    return '<div class="sg' + (cur ? ' now' : '') + '"><b>R' + (r + 1) + ' ' + esc(PP.GOL[gid].n) + '</b><span>' + esc(d) + '</span></div>';
+  }).join('') + (G.pl[me].bonus.length ? '<h3>Your bonus card</h3>' + G.pl[me].bonus.map(function (id) { return '<div class="sg"><b>' + esc(PP.BON[id].n) + '</b><span>' + esc(bonusLine(G.pl[me], id)) + '</span></div>'; }).join('') : ''));
+}
 function renderMid() {
   var f = '';
   for (var i = 0; i < 5; i++) { var d = G.feeder[i]; f += d ? '<button type="button" class="die" data-a="die" data-i="' + i + '" aria-label="' + (d === 'gs' ? 'grub or seed' : d) + ' die">' + foodIcon(d) + '<small>' + (d === 'gs' ? 'either' : d) + '</small></button>' : '<span class="die gone"></span>'; }
   setH($('#feeder'), f);
-  setH($('#tray'), G.tray.map(function (id, i) { return id ? '<div class="tcard">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join(''));
+  setH($('#tray'), G.tray.map(function (id, i) { return id ? '<div class="tcard' + (bonusAdv(G.pl[UI.view], id) ? ' bonadv' : '') + '">' + cardHTML(id, 'tray', null, 'data-a="tray" data-i="' + i + '" role="button" tabindex="0"') + '</div>' : '<div class="tcard"></div>'; }).join(''));
   $('#deckb').innerHTML = '<span>Deck</span><span>' + G.deck.length + '</span>';
 }
 function rowLabel(p, h) {
@@ -128,7 +160,7 @@ function renderDock(p, vs, cur) {
   setH($('#acts'), mine ? (idle ? act4HTML() : actsHTML()) : '');
   var have = PP.FOODS.filter(function (f) { return p.food[f]; });
   setH($('#foodrow'), '<span class="fl">Your food</span>' + (have.length ? have.map(function (f) { return '<span class="fd" aria-label="' + f + ' ' + p.food[f] + '">' + foodIcon(f) + '<b data-engine="G.pl[' + vs + '].food.' + f + '">' + p.food[f] + '</b><small>' + f + '</small></span>'; }).join('') : '<span class="fd none">none yet</span>') +
-    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card">&#9733; bonus card</button>' : ''));
+    (p.bonus.length ? '<button type="button" class="fd bon" data-gx="goalsd" aria-label="Your secret bonus card: ' + esc(p.bonus.map(function (id) { return PP.BON[id].n + ', ' + bonusLine(p, id); }).join('; ')) + '">' + bonusChip(p) + '</button>' : ''));
   var ok = {}; if (mine && (!Q || Q.h === 'play2')) PP.playable(G, vs, Q && Q.h === 'play2' ? Q.d.hab : null).forEach(function (x) { ok[x.i] = 1; });
   var hm = mine && !Q && bestOn() && UI.pickBird && UI.sel == null ? hintMove() : null, bp = hm && hm.t === 'play' ? { i: hm.i } : null;   // Best on a hand card only once you chose Play a bird
   var tuckQ = mine && Q && (Q.h === 'pwTuck' || Q.h === 'bonus');
@@ -141,8 +173,9 @@ function renderDock(p, vs, cur) {
     else if (!Q) st = '<div class="bk-st no">' + esc(whyCant(id)) + '</div>';
     else st = '';
     var cls = (UI.sel === i ? 'sel' : '') + (mine && !Q && !ok[i] ? ' cant' : '') + (bp && bp.i === i ? ' bestc' : '');
+    var adv = mine ? bonusAdv(p, id) : null; if (adv) { cls += ' bonadv'; st = st ? st.replace(/<\/div>$/, ' \u00b7 &#9733; ' + esc(adv) + '</div>') : '<div class="bk-st go">&#9733; Counts for ' + esc(adv) + '</div>'; }
     return bigCardHTML(id, 'data-a="hand" data-i="' + i + '" role="button" tabindex="0"', (bp && bp.i === i ? '<em class="bestb">Best</em>' : '') + st, cls);
-  }).join('') : '<span class="empty">No birds in hand. Use Draw birds to get some.</span>');
+  }).join('') : '<span class="empty">' + (G.phase === 'setup' ? 'Your starting birds are being chosen in the window above.' : !mine ? 'Your hand is empty right now.' : 'No birds in hand. Use Draw birds to get some.') + '</span>');
   if (UI.hix == null || UI.hix >= p.hand.length) UI.hix = 0;
   handScrollSync(); handPager();
   var hc = $('#hand').querySelectorAll('.bc')[UI.hix]; if (hc) $('#hand').scrollLeft = hc.offsetLeft - $('#hand').offsetLeft - 6;
@@ -186,6 +219,7 @@ function promptText(mine) {
   }
   return '';
 }
+function alwaysBtn(k) { return UI.mode === 'tutorial' || UI.mode === 'tutfree' ? '' : '<button type="button" class="btn alw" data-a="always" data-k="' + k + '">Always skip this kind</button>'; }
 function mvBtn(m, label, cls) { return '<button type="button" class="btn ' + (cls || '') + '" data-a="mv" data-m="' + esc(JSON.stringify(m)) + '">' + label + '</button>'; }
 function actsHTML() {
   var Q = G.q, p = G.pl[UI.view];
@@ -199,13 +233,24 @@ function actsHTML() {
   if (!Q) return '<button type="button" class="btn" data-a="cancel">Back</button>' + (UI.sel != null ? '<button type="button" class="btn" data-a="zoom" data-i="' + UI.sel + '">Read card</button>' : '');
   switch (Q.h) {
     case 'die': return PP.allSame(G) ? mvBtn({ t: 'reroll' }, 'Reroll the feeder') : '';
-    case 'bonus': return Q.d.kind === 'food' ? PP.FOODS.filter(function (f) { return p.food[f]; }).map(function (f) { return mvBtn({ t: 'bonus', yes: true, f: f }, 'Pay ' + foodIcon(f)); }).join('') + mvBtn({ t: 'bonus', yes: false }, 'No thanks') : mvBtn({ t: 'bonus', yes: false }, 'No thanks');
+    case 'bonus': return (Q.d.kind === 'food' ? PP.FOODS.filter(function (f) { return p.food[f]; }).map(function (f) { return mvBtn({ t: 'bonus', yes: true, f: f }, 'Pay ' + foodIcon(f)); }).join('') : '') + mvBtn({ t: 'bonus', yes: false }, 'No thanks') + alwaysBtn('bonus-' + Q.d.kind);
     case 'pwMay': return mvBtn({ t: 'use' }, 'Use it', 'pri') + mvBtn({ t: 'skip' }, 'Skip');
-    case 'pwTuck': case 'pwTrade': case 'play2': return mvBtn({ t: 'skip' }, 'Skip');
+    case 'pwTuck': case 'pwTrade': return mvBtn({ t: 'skip' }, 'Skip') + alwaysBtn(Q.h);
+    case 'play2': return mvBtn({ t: 'skip' }, 'Skip');
     case 'bonusPick': return Q.d.opts.map(function (id, i) { var bc = PP.BON[id]; return '<button type="button" class="bonc" data-a="mv" data-m="' + esc(JSON.stringify({ t: 'pickb', i: i })) + '"><b>' + esc(bc.n) + '</b>' + esc(bc.txt) + '<br>' + bonusTiers(bc) + '</button>'; }).join('');
   }
   return '';
 }
+// bonus-card progress in plain words: "3 of 4 small birds: 3 pts now, 7 pts at 6"
+function bonusLine(p, id) {
+  var bc = PP.BON[id], sc = PP.bonusScore(p, id), what = bc.txt.charAt(0).toLowerCase() + bc.txt.slice(1);
+  if (typeof bc.sc === 'string') return sc.n + ' counted \u00b7 ' + sc.pts + ' pts now (' + bc.sc + ' each)';
+  var nx = null; bc.sc.forEach(function (t) { if (!nx && sc.n < t[0]) nx = t; });
+  return sc.n + (nx ? ' of ' + nx[0] : '') + ' counted \u00b7 ' + sc.pts + ' pts now' + (nx ? ', ' + nx[1] + ' pts at ' + nx[0] : ', top tier');
+}
+function bonusChip(p) { return p.bonus.map(function (id) { var bc = PP.BON[id], sc = PP.bonusScore(p, id); return '&#9733; ' + esc(bc.n) + ' ' + sc.n + (typeof bc.sc === 'string' ? '' : '/' + (bc.sc.filter(function (t) { return sc.n < t[0]; })[0] || bc.sc[bc.sc.length - 1])[0]) + ' \u00b7 ' + sc.pts + ' pts'; }).join(' ; '); }
+// would this bird (card id, in hand or tray) move one of my bonus cards forward?
+function bonusAdv(p, bid) { var out = null; p.bonus.forEach(function (id) { if (!out && PP.bonusHit(id, B[bid], null)) out = PP.BON[id].n; }); return out; }
 function bonusTiers(bc) { return typeof bc.sc === 'string' ? bc.sc + ' point' + (bc.sc === '1' ? '' : 's') + ' each' : bc.sc.map(function (t) { return t[0] + '+: ' + t[1] + ' pts'; }).join(', '); }
 // glowing legal targets (only while the shown seat decides)
 // legal targets carry data-legal (no glow: they stay bright while the rest dims); the single suggested one glows (glowOne)

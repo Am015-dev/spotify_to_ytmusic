@@ -35,7 +35,7 @@ var STORY = {
     die2: 'Two forest birds give two food. Take another die.',
     tuck: 'Brown powers fire right to left. Tuck a card here.',
     cache: 'Tucked cards and stored food are 1 point each.',
-    twofor1: 'Missing a food? Any 2 of your food pay for 1.',
+    twofor1: 'Missing a food? Any 2 pay for 1. The star chip is your bonus card: it counts up, gold-edged birds add to it.',
     trade: 'Some row spaces add a trade: pay food for an extra egg.',
     eggs: 'Action three: lay eggs. The grassland lays them.',
     nest: 'Tap a bird. Each egg is 1 point, up to its nest.',
@@ -43,7 +43,7 @@ var STORY = {
     cards: 'Action four: draw birds. The wetland draws cards.',
     tray: 'Take a tray card. The tray refills after your turn.',
     goalr: 'Round over: the round goal paid for grassland birds.',
-    bonus: 'Your secret bonus card scores at the end too.',
+    bonus: 'Your bonus card scores at the end: the star chip showed its count, gold-edged birds were the ones that added.',
     final: 'Birds, eggs, goals, bonus, food and tucks add up.',
     real: 'You know every rule now. Tap to play a real game.'
   },

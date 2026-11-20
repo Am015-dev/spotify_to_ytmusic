@@ -171,7 +171,9 @@ function bootDrawers() {
         var b2 = document.createElement('button'); b2.className = 'btn'; b2.type = 'button'; b2.textContent = 'New quick game'; b2.onclick = function () { GX.close(); showConfig(); };
         var b3 = document.createElement('button'); b3.className = 'btn'; b3.type = 'button'; b3.textContent = 'Story map'; b3.onclick = function () { GX.close(); openStory(); };
         var b4 = document.createElement('button'); b4.className = 'btn'; b4.type = 'button'; b4.textContent = 'Restart'; b4.onclick = function () { GX.close(); restartGame(); };
-        S.appendChild(GX.row('This game', [b4, b1, b2, b3])); },
+        S.appendChild(GX.row('This game', [b4, b1, b2, b3]));
+        if (UI.skipKinds == null) loadAsk();
+        S.appendChild(GX.row('Ask me about optional powers', GX.onoff(UI.askOpt, function (v) { setAsk(v); if (v) { UI.skipKinds = {}; try { localStorage.removeItem('pp-skipk'); } catch (e) { } } }), 'Off: tuck, spend-an-egg and pay-for-extra steps are skipped for you. On also clears every "Always skip".')); },
       sound: function (S) { S.appendChild(GX.row('Sound effects', GX.onoff(SND.on, function (v) { SND.on = v; try { localStorage.setItem('pp-snd', v ? '1' : '0'); } catch (e) { } }))); var mb = document.createElement('button'); mb.className = 'btn'; mb.type = 'button'; mb.textContent = (window.PP_MUSIC || []).length ? 'Pick songs' : 'No songs yet'; mb.disabled = !(window.PP_MUSIC || []).length; mb.onclick = function () { try { GXMUS.open(); } catch (e) { } }; S.appendChild(GX.row('Music', [mb], 'Songs play here once the music files are added.')); },
       help: function (S) { var r = document.createElement('button'); r.className = 'btn'; r.type = 'button'; r.textContent = 'Rules'; r.onclick = function () { GX.show('rulesd'); };
         var c = document.createElement('button'); c.className = 'btn'; c.type = 'button'; c.textContent = 'All cards'; c.onclick = function () { GX.close(); try { GX.refOpen(); } catch (e) { } };

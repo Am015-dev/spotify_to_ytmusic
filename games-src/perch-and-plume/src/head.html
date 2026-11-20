@@ -516,5 +516,37 @@ body.confirming #prompt{display:none}
 #hand .bc.big:not(.sel) .bk-st{display:none}
 #hand .bc.big:not(.sel) .bestb{top:-8px;left:2px;right:auto}
 }
+/* F3: bonus-card progress chip, birds that advance it, "Always skip" */
+#foodrow .fd.bon{max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;flex:0 1 auto;min-width:0}
+.bc.bonadv,.tcard.bonadv .bc{outline:3px solid #e0a948;outline-offset:-1px}
+.bc.bonadv .bk-nm::before{content:"\2605 ";color:#b8801f}
+.bonb{position:absolute;left:4px;top:4px;max-width:58%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:3;background:#e0a948;color:#2a2116;font:700 12px/1.2 system-ui,sans-serif;padding:3px 6px;border-radius:7px;font-style:normal;text-align:center;pointer-events:none}
+.tcard.bonadv{position:relative}.tcard.bonadv::after{content:"\2605";position:absolute;top:2px;right:4px;background:#e0a948;color:#2a2116;border-radius:50%;width:20px;height:20px;font-size:13px;line-height:20px;text-align:center;font-weight:700;pointer-events:none;z-index:3}
+.btn.alw{font-size:13px;opacity:.9}
+#toast .t{max-width:100%}
+#side{display:none}
+/* F3 PC (>=1100 wide, >=600 high): the board in the centre, rival board + feeder + tray + goals in a left panel, the hand and actions in the dock on the right. */
+@media (min-width:1100px) and (min-height:600px){
+#bd{display:grid;grid-template-columns:clamp(260px,22vw,360px) minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr);gap:8px 10px;padding:8px 10px;align-content:stretch}
+#goalbar{grid-column:1/-1}
+#opps{grid-column:1;grid-row:2;flex-direction:column;overflow:visible;gap:4px}
+#opps .opp{border-radius:12px}
+#mid{grid-column:1;grid-row:3;flex-direction:column;align-items:stretch;gap:8px;padding:8px;border-radius:12px;background:rgba(0,0,0,.18)}
+#feeder{width:100%;grid-template-columns:repeat(5,1fr)}
+#tray{flex-wrap:wrap;justify-content:flex-start;gap:6px}
+.tcard{width:calc(33% - 6px)!important;min-height:0}
+.deck{width:100%!important;min-height:44px!important;flex-direction:row;gap:8px}
+#side{display:flex;flex-direction:column;gap:6px;grid-column:1;grid-row:4;min-height:0;overflow:auto;color:var(--paper);font-size:13px}
+#side h3{margin:4px 0 2px;font-size:13px;font-weight:700;color:#e0a948;text-transform:none}
+#fernbd .fb{display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:3px 5px;border-radius:8px;margin-bottom:3px;min-height:28px;font-size:12px}
+#fernbd .fb.h0{background:rgba(70,120,70,.45)}#fernbd .fb.h1{background:rgba(160,130,50,.45)}#fernbd .fb.h2{background:rgba(50,110,130,.5)}
+#fernbd .fbn{font-weight:700;text-transform:capitalize;min-width:62px}
+#fernbd .fbc{background:rgba(255,255,255,.14);border-radius:6px;padding:1px 5px}#fernbd .fbc b{font-weight:700}
+#fernbd .fbe{opacity:.75}
+#sidegoals .sg{display:flex;flex-direction:column;padding:4px 7px;border-radius:8px;background:rgba(0,0,0,.22);margin-bottom:3px;font-size:12px}
+#sidegoals .sg.now{outline:2px solid #e0a948}#sidegoals .sg b{font-weight:700}
+#mat{grid-column:2;grid-row:2/5}
+#foodrow .fd.bon{font-size:13px}
+}
 </style>
 </head>

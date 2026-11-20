@@ -29,6 +29,7 @@ document.addEventListener('click', function (e) {
     else if (a === 'tray' && G.tray[i]) showCard(G.tray[i]);
     return;
   }
+  if (a === 'always') { var ak = t.getAttribute('data-k'); skipKind(ak, true); toast('Okay: this kind is skipped from now on. Turn it back on in Menu: "Ask me about optional powers".', 3600, 1); var Qa = G.q; if (Qa && myTurn()) apply(Qa.h === 'bonus' ? { t: 'bonus', yes: false } : { t: 'skip' }, UI.view); return; }
   if (a === 'cancel') { if (!tutGate({ type: 'tap', what: 'cancel' })) return; UI.sel = null; UI.pend = null; UI.gsDie = null; UI.pickBird = false; render(); return; }
   if (a === 'mv') { var m = JSON.parse(t.dataset.m); if (!tutGate(Object.assign({ type: 'tap', what: 'mv' }, m))) return; UI.gsDie = null; human(m); return; }
   if (a === 'playgo') { if (!tutGate({ type: 'tap', what: 'playgo' })) return; var inf = PP.playInfo(G, UI.view, p.hand[UI.pend.i], UI.pend.h, Q && Q.h === 'play2' ? Q.d.hab : null); var mv = { t: 'play', i: UI.pend.i, id: p.hand[UI.pend.i], h: UI.pend.h, pay: inf.pays[UI.pend.k % inf.pays.length] }; UI.pend = null; UI.sel = null; human(mv); return; }
@@ -192,6 +193,24 @@ function reveal(id, label, seat) {
   document.body.appendChild(d);
   return wait(aMs(1100)).then(function () { d.classList.add('out'); return wait(aMs(350)); }).then(function () { dropEl(d); });
 }
+// steps that need no decision resolve by themselves with one readable line: an optional power you chose to skip (setting, or
+// "Always skip this kind"), and a step with exactly one legal move (the only bird that can take the egg, the last die). Every rule choice stays possible.
+var OPTK = { pwTuck: 'tuck a card', pwTrade: 'spend an egg', bonus: 'pay for the extra' };
+function optKey(Q) { return Q.h === 'bonus' ? 'bonus-' + Q.d.kind : Q.h; }
+function loadAsk() { try { UI.askOpt = localStorage.getItem('pp-askopt') !== '0'; UI.skipKinds = JSON.parse(localStorage.getItem('pp-skipk') || '{}') || {}; } catch (e) { UI.askOpt = true; UI.skipKinds = {}; } }
+function setAsk(v) { UI.askOpt = v; try { localStorage.setItem('pp-askopt', v ? '1' : '0'); } catch (e) { } }
+function skipKind(k, on) { UI.skipKinds = UI.skipKinds || {}; if (on) UI.skipKinds[k] = 1; else delete UI.skipKinds[k]; try { localStorage.setItem('pp-skipk', JSON.stringify(UI.skipKinds)); } catch (e) { } }
+function autoStep(s) {
+  var Q = G.q; if (!Q || Q.seat !== s || humans().length !== 1 || G.phase !== 'play') return null;
+  if (UI.mode === 'tutorial' || UI.mode === 'tutfree' || (typeof coachOn === 'function' && coachOn())) return null;
+  if (UI.skipKinds == null) loadAsk();
+  if (OPTK[Q.h]) { var k = optKey(Q); if (!UI.askOpt || UI.skipKinds[k]) return { m: Q.h === 'bonus' ? { t: 'bonus', yes: false } : { t: 'skip' }, line: 'Skipped: ' + OPTK[Q.h] + (UI.askOpt ? ' (always skip is on; change it in Menu)' : ' (optional powers are off in Menu)') }; return null; }
+  if (Q.h === 'egg' || Q.h === 'die') {
+    var mv = PP.validMoves(G, s); if (!mv || mv.length !== 1 || mv[0].t === 'reroll') return null;
+    var m = mv[0]; return { m: m, line: Q.h === 'egg' ? 'Only one bird can take the egg: placed.' : 'Only one food left: taken.' };
+  }
+  return null;
+}
 function pump() {
   clearTimeout(UI.pumpT);
   if (!G || UI.busy) return;
@@ -204,6 +223,7 @@ function pump() {
   if (G.phase === 'play' && !G.q && UI.turnKey !== tk) { UI.turnKey = tk; var tut = typeof coachOn === 'function' && coachOn(); UI.speed = !isHuman(s) ? (tut ? 6 : (UI.rvT0 && UI.speed > 1 ? UI.speed : 1)) : (tut ? 2 : 1); turnBanner(s); return; }   // a skip tap lasts for the whole wait, not into your turn
   if (isHuman(s)) {
     if (s !== UI.view) { if (humans().length > 1) { askPass(s, function () { UI.view = s; render(); }); return; } UI.view = s; }
+    var au = autoStep(s); if (au) { caption(au.line); UI.busy = false; apply(au.m, s); return; }
     render(); try { GX.showDock(); } catch (e) { } return;
   }
   render();
