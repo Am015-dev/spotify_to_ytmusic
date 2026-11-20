@@ -37,3 +37,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## game-icons.net animal silhouettes (Meadowfold)
+
+- Source: https://game-icons.net (repo https://github.com/game-icons/icons)
+- Authors: Lorc, Delapouite, Caro Asercion, Skoll
+- Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+- Files: `meadowfold/src/icons.js` (42 icon paths: list with authors in `meadowfold/ASSETS.md`)
+- Shown to players: Meadowfold Menu > About.

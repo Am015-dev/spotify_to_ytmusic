@@ -36,7 +36,7 @@ var MF = {
     {"id":26,"an":"mole","name":"Furrow Mole","pts":[2,5,9,14],"pat":[{"d":-1,"n":"field"},{"d":3,"n":"mount1","cube":1}]},
     {"id":27,"an":"mouse","name":"Granary Mouse","pts":[4,9],"pat":[{"d":-1,"n":"build"},{"d":2,"n":"field","cube":1},{"d":3,"n":"build"}]},
     {"id":28,"an":"sheep","name":"Hill Sheep","pts":[5,12],"pat":[{"d":-1,"n":"mount2"},{"d":3,"n":"field"},{"d":3,"n":"field","cube":1}]},
-    {"id":29,"an":"hummingbird","name":"Orchard Hummingbird","pts":[5,10,17],"pat":[{"d":-1,"n":"tree2"},{"d":2,"n":"field","cube":1},{"d":3,"n":"tree2"}]},
+    {"id":29,"an":"hummingbird","name":"Nectar Bird","pts":[5,10,17],"pat":[{"d":-1,"n":"tree2"},{"d":2,"n":"field","cube":1},{"d":3,"n":"tree2"}]},
     {"id":30,"an":"bee","name":"Delta Bee","pts":[6,12],"pat":[{"d":-1,"n":"water"},{"d":2,"n":"field","cube":1},{"d":4,"n":"water"},{"d":2,"n":"water"}]},
     {"id":31,"an":"butterfly","name":"Meadow Butterfly","pts":[2,5,8,12,17],"pat":[{"d":-1,"n":"tree1"},{"d":3,"n":"field","cube":1}]},
     {"id":32,"an":"donkey","name":"Lane Donkey","pts":[5,11],"pat":[{"d":-1,"n":"tree2"},{"d":3,"n":"tree2"},{"d":3,"n":"field","cube":1}]}],

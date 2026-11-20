@@ -26,15 +26,18 @@ var AI = (function () {
     return false;
   }
   function evalSeat(s, lvl) {
-    var sc = E.score(s), v = sc.total, C = E.cells(G.side);
+    var sc = E.score(s), v = sc.total, C = E.cells(G.side), rem = Math.min(1, E.empties(s) / 12);   // potential fades as the board fills
+    var W = function (k) { var x = s.board[k]; return x && x.length ? x[x.length - 1] : null; };
     C.list.forEach(function (k) {
       var st = s.board[k] || [], h = st.length, t = st[h - 1];
-      if (t === 'trunk' && !s.cubes[k]) v += h === 1 ? 1.2 : 3;
-      if (t === 'mount' && h < 3 && !s.cubes[k]) v += .6 * h;
-      if (t === 'build' && h === 1) v -= 1;
-      if (t === 'field' && !E.nb(G.side, k).some(function (y) { var x = s.board[y]; return x && x[x.length - 1] === 'field'; })) v += 1.5;
+      if (!h || s.cubes[k]) return;
+      if (t === 'trunk') v += (h === 1 ? 2.6 : 5.2) * rem;
+      if (t === 'mount' && h < 3) { var adj = E.nb(G.side, k).some(function (y) { return W(y) === 'mount'; }); v += (adj ? 1.6 * h : .9) * rem; }
+      if (t === 'build' && h === 1) v -= 1.5;
+      if (t === 'field' && !E.nb(G.side, k).some(function (y) { return W(y) === 'field'; })) v += 2.2 * rem;
+      if (h === 2 && t === 'build') { var cols = {}, free = 0; E.nb(G.side, k).forEach(function (y) { var w = W(y); if (w) cols[w] = 1; else free++; }); if (Object.keys(cols).length < 3 && Object.keys(cols).length + free >= 3) v += 2.5 * rem; }
     });
-    s.cards.forEach(function (c) { var p = E.card(c.id).pts, nxt = p[p.length - c.left] - (E.cardPts(c)); v += Math.min(2.5, near(s, c.id)) * nxt * (lvl === 'hard' ? .45 : .3); });
+    s.cards.forEach(function (c) { var p = E.card(c.id).pts, nxt = p[p.length - c.left] - (E.cardPts(c)); v += Math.min(3, near(s, c.id)) * nxt * .35 * (.4 + .6 * rem); });
     if (s.spirit && !s.spirit.placed) v += Math.min(2, near(s, s.spirit.id)) * 3;
     return v;
   }
@@ -61,21 +64,30 @@ var AI = (function () {
       // take a card first so the tokens can build toward it
       if (E.active(s) < 4 && G.row.length && (lvl !== 'easy' || Math.random() < .7)) {
         var best = -1, bvv = -1; G.row.forEach(function (id, i) { var v = cardValue(s, id, lvl); if (v > bvv) { bvv = v; best = i; } });
-        if (best >= 0 && (E.active(s) < 3 || bvv > 9)) { var mc = { t: 'card', i: best }; E.apply(mc); out.push(mc); cubesGreedy(out); }
+        if (best >= 0 && (lvl !== 'easy' || E.active(s) < 3 || bvv > 9)) { var mc = { t: 'card', i: best }; E.apply(mc); out.push(mc); cubesGreedy(out); }
       }
       // try every pocket; place its three tokens greedily (hard: also keeps the second-best line for each first token)
       var base = clone(G), opts = [];
+      function greedy(n, seq) {   // place the rest of the hand greedily; returns final value
+        for (; n < 3; n++) {
+          var ps = E.moves().filter(function (m) { return m.t === 'place'; }); if (!ps.length) break;
+          var sc = ranked(ps), bm = sc[0][1];
+          if (lvl === 'easy') bm = sc[Math.min(sc.length - 1, Math.floor(Math.random() * 4))][1];
+          E.apply(bm); seq.push(bm); cubesGreedy(seq);
+        }
+        return evalSeat(E.seat(), lvl);
+      }
+      function ranked(ps) { var cur = clone(G), sc = []; ps.forEach(function (m) { G = clone(cur); E.apply(m); cubesGreedy([]); sc.push([evalSeat(E.seat(), lvl), m]); }); G = cur; sc.sort(function (x, y) { return y[0] - x[0]; }); return sc; }
       base.central.forEach(function (sp, i) {
         if (!sp.length) return;
-        G = clone(base); var seq = [], mt = { t: 'take', i: i }; E.apply(mt); seq.push(mt);
-        for (var n = 0; n < 3; n++) {
-          var ps = E.moves().filter(function (m) { return m.t === 'place'; }); if (!ps.length) break;
-          var bm = null, bv2 = -1e9, cur = clone(G), sc = [];
-          ps.forEach(function (m) { G = clone(cur); E.apply(m); var tmpOut = []; cubesGreedy(tmpOut); var v = evalSeat(E.seat(), lvl); sc.push([v, m]); if (v > bv2) { bv2 = v; bm = m; } });
-          if (lvl === 'easy') { sc.sort(function (a, b) { return b[0] - a[0]; }); bm = sc[Math.min(sc.length - 1, Math.floor(Math.random() * 4))][1]; }
-          G = cur; E.apply(bm); seq.push(bm); cubesGreedy(seq);
+        G = clone(base); var mt = { t: 'take', i: i }; E.apply(mt);
+        if (lvl === 'hard') {   // look at the 4 best first placements, finish each greedily
+          var afterTake = clone(G), firsts = ranked(E.moves().filter(function (m) { return m.t === 'place'; })).slice(0, 4);
+          firsts.forEach(function (f) { G = clone(afterTake); var seq = [mt]; E.apply(f[1]); seq.push(f[1]); cubesGreedy(seq); opts.push({ v: greedy(1, seq), seq: seq }); });
+          return;
         }
-        opts.push({ v: evalSeat(E.seat(), lvl) + (lvl === 'easy' ? Math.random() * 6 : 0), seq: seq });
+        var seq = [mt]; var v = greedy(0, seq);
+        opts.push({ v: v + (lvl === 'easy' ? Math.random() * 6 : 0), seq: seq });
       });
       opts.sort(function (a, b) { return b.v - a.v; });
       G = base; if (opts[0]) opts[0].seq.forEach(function (m) { if (E.legal(m)) { E.apply(m); out.push(m); } });

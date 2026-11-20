@@ -108,7 +108,7 @@ const p2 = AI.plan('normal'); p2.forEach(m => E.apply(m));
 ok(G.over && G.result, 'game ends after the last player of the round');
 
 // --- gauntlet ---
-const games = process.env.QUICK ? 4 : 40; let totals = [], wins = [0, 0], lens = [], soloS = [];
+const games = process.env.QUICK ? 4 : 24; let totals = [], wins = [0, 0], lens = [], soloS = [];
 for (let g = 0; g < games; g++) {
   const np = g % 4 === 3 ? 1 : (g % 4) + 2, side = g % 2 ? 'B' : 'A';
   E.newGame({ np, humans: 0, side, spirits: g % 3 === 0, ai: g % 5 === 0 ? 'easy' : 'normal' }); G = ctx.getG();

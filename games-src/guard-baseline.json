@@ -113,21 +113,20 @@
    "emberclimb/src/data.js",
    "emberclimb/src/engine.js",
    "emberclimb/src/ai.js",
-   "emberclimb/core.js",
    "emberclimb/src/ui.js",
    "emberclimb/src/sound.js",
    "emberclimb/src/tutor.js",
    "emberclimb/src/camp.js",
    "emberclimb/src/scn.js",
    "emberclimb/src/story.js",
-   "emberclimb/src/help.js",
-   "emberclimb/x.js"
+   "emberclimb/src/help.js"
   ],
   "final-approach": [
    "final-approach/game/scn.js",
    "final-approach/game/src/data.js",
    "final-approach/game/src/layout.js",
    "final-approach/game/src/engine.js",
+   "final-approach/game/tut-plan.js",
    "final-approach/game/src/aiw.js",
    "final-approach/game/src/ai.js",
    "final-approach/game/src/netstrip.js",
@@ -264,8 +263,7 @@
    "perch-and-plume/src/data.js",
    "perch-and-plume/src/engine.js",
    "perch-and-plume/src/ai.js",
-   "perch-and-plume/src/art.js",
-   "perch-and-plume/x.js"
+   "perch-and-plume/src/art.js"
   ],
   "deep-signal": [
    "deep-signal/src/scn.js",
@@ -290,7 +288,9 @@
    "carc/game/src/preview.js",
    "carc/game/src/bf.js",
    "carc/game/src/camp.js",
-   "carc/game/src/paint.js"
+   "carc/game/src/paint.js",
+   "carc/game/src/models3d.js",
+   "carc/game/src/assets.js"
   ],
   "sands-of-qamar": [
    "ft/src/scn.js",
@@ -313,7 +313,12 @@
    "ft/src/lore.js",
    "ft/src/playable.js",
    "ft/src/coach.js",
+   "ft/src/guide.js",
    "ft/src/score.js",
+   "ft/src/drag.js",
+   "ft/src/clean.js",
+   "ft/src/feed.js",
+   "ft/src/juice.js",
    "ft/src/assetlist.js",
    "ft/src/assets.js",
    "ft/src/models3d.js"
@@ -362,6 +367,7 @@
    "short-fuse/game/ui.js",
    "short-fuse/game/tbl.js",
    "short-fuse/game/playable.js",
+   "short-fuse/game/clues.js",
    "short-fuse/game/scorecard.js",
    "short-fuse/game/extras.js",
    "short-fuse/game/tutor.js",
@@ -452,6 +458,8 @@
    "vale-of-banners/src/ai.js",
    "vale-of-banners/src/art.js",
    "vale-of-banners/src/story.js",
+   "vale-of-banners/src/feel.js",
+   "vale-of-banners/src/phone.js",
    "vale-of-banners/src/ui.js"
   ],
   "wildmark": [
@@ -488,6 +496,16 @@
    "vinegrave/src/ui2.js",
    "vinegrave/src/ui3.js",
    "vinegrave/src/ui4.js"
+  ],
+  "meadowfold": [
+   "meadowfold/src/scn.js",
+   "meadowfold/src/icons.js",
+   "meadowfold/src/data.js",
+   "meadowfold/src/engine.js",
+   "meadowfold/src/ai.js",
+   "meadowfold/src/art.js",
+   "meadowfold/src/ui.js",
+   "meadowfold/src/tutor.js"
   ],
   "mainhattan-nightrun": [
    "nightrun/parts/render/bg.js",

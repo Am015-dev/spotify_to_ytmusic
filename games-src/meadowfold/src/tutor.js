@@ -39,7 +39,7 @@ window.tutAllow = function (m) {
 window.tutAfter = function (m) {
   var st = tutCur(); if (!st || UI.mode !== 'tut') return;
   if (!st.end) TUT.i++;
-  tutRender();
+  render();
 };
 window.tutRender = function () {
   var el = document.getElementById('tutbox');
