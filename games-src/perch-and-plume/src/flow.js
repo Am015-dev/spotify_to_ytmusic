@@ -13,7 +13,9 @@ document.addEventListener('click', function (e) {
   if (a === 'rvsum') return;
   var mine = myTurn(), Q = G.q, p = G.pl[UI.view];
   // F2: a finger tap that lands within 250 ms of the prompt changing is dropped, so a double tap never falls into the next question
-  if (e.isTrusted && Date.now() - (UI.qT || 0) < 250 && /^(die|tray|deck|bird|hand|slot|ract|a4|mv|playgo|eggall)$/.test(a) && !t.closest('#pop')) return;
+  // (only a REPEAT tap near the previous one is dropped; a tap on another thing always counts, so no glowing target is ever dead)
+  var tx = e.clientX, ty = e.clientY, lt = UI.lastTap || { t: 0, x: -999, y: -999 }; UI.lastTap = { t: Date.now(), x: tx, y: ty };
+  if (e.isTrusted && Date.now() - (UI.qT || 0) < 250 && Date.now() - lt.t < 350 && Math.abs(tx - lt.x) < 36 && Math.abs(ty - lt.y) < 36 && /^(die|tray|deck|bird|hand|slot|ract|a4|mv|playgo|eggall)$/.test(a) && !t.closest('#pop')) return;
   // your choice is pending but your birds are still animating: keep the tap and apply it the moment they finish (never a dead tap)
   if (!mine && UI.busy && (Q || /^(ract|slot|playgo|a4|hand)$/.test(a) || (a === 'bird' && t.hasAttribute('data-legal'))) && G.phase !== 'over' && !UI.passing && PP.sideToAct(G) === UI.view && isHuman(UI.view) && /^(die|tray|deck|bird|hand|mv|ract|slot|playgo|a4)$/.test(a) && !t.closest('#pop')) {
     var qk0 = qKey(), sel = '[data-a="' + a + '"]' + ['i', 'h', 'c', 'm', 'k'].map(function (k) { return t.dataset[k] != null ? '[data-' + k + '="' + String(t.dataset[k]).replace(/["\\]/g, '\\$&') + '"]' : ''; }).join(''), n = 0;
@@ -21,7 +23,7 @@ document.addEventListener('click', function (e) {
     (function later() { if (UI.busy && n++ < 60) { setTimeout(later, 80); return; } var x = myTurn() && qKey() === qk0 && document.querySelector(sel); if (x && (!/^(bird|die|tray|hand|slot)$/.test(a) || x.hasAttribute('data-legal'))) x.click(); })();
     return;
   }
-  if (e.isTrusted && Date.now() - (UI.rvGone || 0) < 700 && /^(die|deck|tray|bird|hand|ract|a4)$/.test(a)) return;   // F2: the tap meant for the rival summary's button, which just closed
+  if (e.isTrusted && Date.now() - (UI.rvGone || 0) < 400 && /^(die|deck|tray|bird|hand|ract|a4)$/.test(a)) return;   // F2: the tap meant for the rival summary's button, which just closed
   // F2: while a question waits, the feeder, deck and tray never open tips or the big card: a shake says "answer the question"
   if (mine && Q && ((a === 'tray' && Q.h !== 'draw') || (a === 'deck' && Q.h !== 'draw') || (a === 'die' && Q.h !== 'die'))) { nope(t, 'Answer the question first'); return; }
   sfx('tap');
@@ -187,7 +189,7 @@ function playFx(list, actor) {
           var res = e.res, txt = 'Round ' + (e.r + 1) + ' goal (' + PP.GOL[res.gid].n + '): ' + res.pts.map(function (v, i) { return G.pl[i].name + ' ' + v; }).join(', ');
           toast(txt, 3600); sfx('goal'); return wait(aMs(900));
         }
-        case 'round': toast('Round ' + (e.r + 1) + ': ' + G.cubes[e.r] + ' actions each. Goal: ' + PP.GOL[G.goals[e.r]].n, 3200); return wait(aMs(500));
+        case 'round': return wait(aMs(300));   // one message at a turn start: the turn banner carries the round, actions and goal
         case 'auto': { var o2 = $('.opp[data-s="' + e.seat + '"]'); if (o2) o2.classList.add('pulse'); caption(G.pl[e.seat].name + ' ' + e.txt); return wait(aMs(850)).then(function () { if (o2) o2.classList.remove('pulse'); }); }
         case 'bonusTrade': return;
         case 'over': return;
@@ -207,7 +209,7 @@ function caption(t) {
 // F2: after a rival's turn, one readable card: what it did and the points it made; stays until tapped or about 2.5 s; one tap shows its board
 function rvSummary(s, done) {
   var R = UI.rv; UI.rv = { seat: null, lines: [] };
-  if (UI.fast || !R || R.seat !== s || UI.mode === 'tutfree') { done(); return; }
+  if (UI.fast || !R || R.seat !== s || !R.lines.length || UI.mode === 'tutfree') { done(); return; }   // no step was taken: nothing to summarise (never a false "passed")
   var nm = G.pl[s].name, gain = PP.scoreOf(G, s).total - R.s0, seen = {};
   var lines = R.lines.map(function (t) { return t.indexOf(nm + "'s ") === 0 ? t.slice(nm.length + 3) : t.indexOf(nm + ' ') === 0 ? t.slice(nm.length + 1) : t; })
     .filter(function (t) { if (seen[t]) return false; seen[t] = 1; return true; });
@@ -229,7 +231,7 @@ function turnBanner(s) {
   var me = isHuman(s), solo = humans().length <= 1, nm = me ? (solo ? 'Your turn' : G.pl[s].name + "'s turn") : G.pl[s].name + "'s turn";
   $$('.turnban').forEach(dropEl);
   var d = document.createElement('div'); d.className = 'turnban ' + (me ? 'me' : 'rv'); d.setAttribute('data-volatile', ''); d.setAttribute('role', 'status');
-  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left this round' : 'Watch each step. Tap to skip.') + '</span>';
+  d.innerHTML = '<b>' + esc(nm) + '</b><span>' + esc(me ? 'Round ' + (G.round + 1) + ' · ' + G.pl[s].cubes + (G.pl[s].cubes === 1 ? ' action' : ' actions') + ' left · Goal: ' + PP.GOL[G.goals[G.round]].n : 'Watch each step. Tap to skip.') + '</span>';
   document.body.appendChild(d); UI.busy = true;
   UI.cap = me ? null : G.pl[s].name + ' is choosing an action.'; render();
   var done = false, fin = function () { if (done) return; done = true; dropEl(d); UI.busy = false; pump(); };

@@ -33,7 +33,11 @@ function eggRoom(p) { return PP.birds(p).reduce(function (a, x) { return a + Mat
 // cached per decision so the badge does not jump between renders
 var HINT = { k: null, m: null };
 function hintMove() {
-  if (!G || G.phase === 'over' || !hintsOn() || !myTurn() || (typeof coachOn === 'function' && coachOn()) || !window.PPAI || !PPAI.hint) return null;
+  if (!G || G.phase === 'over' || !hintsOn() || (typeof coachOn === 'function' && coachOn())) return null;
+  return hintAny();
+}
+function hintAny() {   // the one hint source: the Best badge and the bulb bubble both read this, so they always name the same move
+  if (!G || G.phase === 'over' || !myTurn() || !window.PPAI || !PPAI.hint) return null;
   var p = G.pl[UI.view], k = JSON.stringify([G.turn, G.round, G.q, p.cubes, p.hand, p.food, p.board.map(function (r) { return r.map(function (x) { return x.eggs; }); }), G.feeder, G.tray]);
   if (HINT.k !== k) { HINT.k = k; try { HINT.m = PPAI.hint(G, UI.view); } catch (e) { HINT.m = null; } }
   return HINT.m;
