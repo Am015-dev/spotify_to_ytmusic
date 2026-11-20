@@ -56,6 +56,33 @@ var ART = (function () {
     }
     return o;
   }
+
+  // TERRAIN: the valley as raised paper sheets. Each token is a hex of cut paper; a stack lifts sheet on sheet, so height
+  // reads at a glance (diorama), and the top sheet carries the terrain's glyph. Used on the board and on the cards.
+  function terrain(st, cx, cy, r, f, small) {
+    f = f || 'p'; if (!st || !st.length) return '';
+    var h = st.length, lift = r * (small ? .2 : .17), o = '', i, top = st[h - 1], ty = cy - (h - 1) * lift, rr = r * .95;
+    for (i = 0; i < h; i++) {
+      var y = cy - i * lift, p = C[st[i]];
+      o += '<g filter="url(#' + f + 'sh)"><polygon points="' + hexPts(cx, y, rr) + '" fill="' + (i === h - 1 ? p[0] : p[2]) + '" stroke="#fffaf0" stroke-width="' + (r * .06).toFixed(1) + '" stroke-linejoin="round"/></g>';
+    }
+    var P = C[top], k = r * .5;
+    // a soft light edge on the top sheet (cut-paper bevel)
+    o += '<polygon points="' + hexPts(cx, ty, rr * .8) + '" fill="none" stroke="' + P[1] + '" stroke-width="' + (r * .07).toFixed(1) + '" opacity=".7" stroke-dasharray="' + (r * .9).toFixed(1) + ' ' + (r * 3.9).toFixed(1) + '" stroke-dashoffset="' + (r * .3).toFixed(1) + '"/>';
+    if (top === 'water') o += '<path d="M' + (cx - k * 1.1) + ',' + (ty - k * .25) + ' q' + k * .28 + ',-' + k * .3 + ' ' + k * .55 + ',0 t' + k * .55 + ',0 t' + k * .55 + ',0 t' + k * .55 + ',0 M' + (cx - k * .85) + ',' + (ty + k * .4) + ' q' + k * .28 + ',-' + k * .3 + ' ' + k * .55 + ',0 t' + k * .55 + ',0 t' + k * .55 + ',0" fill="none" stroke="' + P[1] + '" stroke-width="' + (r * .1).toFixed(1) + '" stroke-linecap="round"/>';
+    else if (top === 'field') o += [-.55, 0, .55].map(function (d) { var x = cx + d * k; return '<path d="M' + x + ',' + (ty + k * .75) + ' l0,-' + k * 1.1 + '" stroke="' + P[2] + '" stroke-width="' + (r * .07).toFixed(1) + '" stroke-linecap="round"/><ellipse cx="' + x + '" cy="' + (ty - k * .45) + '" rx="' + k * .16 + '" ry="' + k * .38 + '" fill="' + P[2] + '"/><ellipse cx="' + (x - k * .03) + '" cy="' + (ty - k * .5) + '" rx="' + k * .08 + '" ry="' + k * .26 + '" fill="' + P[1] + '"/>'; }).join('');
+    else if (top === 'mount') { var s = k * (1 + h * .12); o += '<path d="M' + (cx - s) + ',' + (ty + s * .55) + ' L' + cx + ',' + (ty - s * .8) + ' L' + (cx + s) + ',' + (ty + s * .55) + 'Z" fill="' + P[1] + '" stroke="' + P[2] + '" stroke-width="' + (r * .04).toFixed(1) + '" stroke-linejoin="round"/>' +
+        '<path d="M' + cx + ',' + (ty - s * .8) + ' L' + (cx + s) + ',' + (ty + s * .55) + ' L' + (cx + s * .2) + ',' + (ty + s * .55) + 'Z" fill="' + P[2] + '" opacity=".45"/>' +
+        '<path d="M' + (cx - s * .3) + ',' + (ty - s * .35) + ' L' + cx + ',' + (ty - s * .8) + ' L' + (cx + s * .3) + ',' + (ty - s * .35) + ' l-' + s * .15 + ',' + s * .12 + ' l-' + s * .15 + ',-' + s * .1 + ' l-' + s * .15 + ',' + s * .1 + 'Z" fill="#fffaf0"/>'; }
+    else if (top === 'trunk') o += '<circle cx="' + cx + '" cy="' + ty + '" r="' + k * .78 + '" fill="' + P[1] + '" stroke="' + P[2] + '" stroke-width="' + (r * .06).toFixed(1) + '"/><circle cx="' + cx + '" cy="' + ty + '" r="' + k * .42 + '" fill="none" stroke="' + P[2] + '" stroke-width="' + (r * .045).toFixed(1) + '"/><circle cx="' + cx + '" cy="' + ty + '" r="' + k * .1 + '" fill="' + P[2] + '"/>';
+    else if (top === 'leaf') { var t = k * (.62 + h * .08); o += '<rect x="' + (cx - k * .12) + '" y="' + (ty) + '" width="' + k * .24 + '" height="' + k * .75 + '" rx="' + k * .06 + '" fill="' + C.trunk[2] + '"/>' +
+        '<circle cx="' + (cx - t * .55) + '" cy="' + (ty + t * .05) + '" r="' + t * .6 + '" fill="' + P[2] + '"/><circle cx="' + (cx + t * .55) + '" cy="' + (ty + t * .05) + '" r="' + t * .6 + '" fill="' + P[2] + '"/><circle cx="' + cx + '" cy="' + (ty - t * .4) + '" r="' + t * .75 + '" fill="' + P[1] + '" stroke="' + P[2] + '" stroke-width="' + (r * .04).toFixed(1) + '"/><circle cx="' + (cx - t * .25) + '" cy="' + (ty - t * .6) + '" r="' + t * .25 + '" fill="#fffaf0" opacity=".45"/>'; }
+    else if (top === 'build') { var b = k * .95; o += '<path d="M' + (cx - b) + ',' + (ty + b * .65) + ' L' + (cx - b) + ',' + (ty - b * .15) + ' L' + cx + ',' + (ty - b * 1) + ' L' + (cx + b) + ',' + (ty - b * .15) + ' L' + (cx + b) + ',' + (ty + b * .65) + 'Z" fill="' + P[1] + '" stroke="' + P[2] + '" stroke-width="' + (r * .05).toFixed(1) + '" stroke-linejoin="round"/>' +
+        '<rect x="' + (cx - b * .22) + '" y="' + (ty + b * .05) + '" width="' + b * .44 + '" height="' + b * .6 + '" fill="' + P[2] + '"/>'; }
+    if (h > 1 && !small) o += '<g class="hbadge"><circle cx="' + (cx + r * .52) + '" cy="' + (ty + r * .5) + '" r="' + r * .22 + '" fill="#fffaf0" stroke="' + C[top][2] + '" stroke-width="' + (r * .05).toFixed(1) + '"/><text x="' + (cx + r * .52) + '" y="' + (ty + r * .5 + r * .1) + '" class="hnum hb">' + h + '</text></g>';
+    return o;
+  }
+  function topY(st, cy, r) { return cy - Math.max(0, (st || []).length - 1) * r * .17; }
   // a single loose token (market, hand): flat paper disc with its colour mark
   function token(c, cx, cy, r, f) { f = f || 'p'; var p = C[c];
     return '<g filter="url(#' + f + 'sh)"><circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + p[0] + '" stroke="#fffaf0" stroke-width="' + (r * .16).toFixed(1) + '"/>' + mark(c, cx, cy, r) + '</g>'; }
@@ -78,5 +105,5 @@ var ART = (function () {
   // animal cube placed on a hex: a small paper tag with the animal
   function cube(kind, cx, cy, r, col, f) { f = f || 'p';
     return '<g filter="url(#' + f + 'sh2)"><rect x="' + (cx - r * .5) + '" y="' + (cy - r * .55) + '" width="' + r + '" height="' + r + '" rx="' + r * .2 + '" fill="' + (col || '#fdf8ee') + '" stroke="#fff" stroke-width="' + r * .08 + '"/></g>' + animal(kind, cx, cy - r * .05, r * .82, '#6b4e3a', f); }
-  return { C: C, NAME: NAME, defs: defs, hexPts: hexPts, stack: stack, token: token, animal: animal, cube: cube, mark: mark };
+  return { C: C, NAME: NAME, defs: defs, hexPts: hexPts, stack: stack, terrain: terrain, topY: topY, token: token, animal: animal, cube: cube, mark: mark };
 })();

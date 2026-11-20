@@ -107,6 +107,25 @@ if (!G.over && G.cur === 0) {} else ok(G.last && !G.over && G.cur === 1, 'two em
 const p2 = AI.plan('normal'); p2.forEach(m => E.apply(m));
 ok(G.over && G.result, 'game ends after the last player of the round');
 
+
+// --- F1: the former [unverified] items, now settled ---
+const need = n => n === 'water' || n === 'field' ? [n] : n === 'build' ? ['mount', 'build'] : n.indexOf('mount') === 0 ? Array(+n[5]).fill('mount') : Array(+n[4] - 1).fill('trunk').concat(['leaf']);
+const lay = (side, id, origin, mirror) => { const b = {}; let k = origin; for (const [i, p] of E.card(id).pat.entries()) { if (i) k = E.step(side, k, mirror ? [4, 3, 2, 1, 0, 5][p.d] : p.d); if (!k) return null; b[k] = need(p.n); } return b; };
+E.newGame({ np: 2, humans: 0, side: 'A' }); G = ctx.getG();
+// mirror images: every habitat (animals and spirits) equals its own mirror image turned some way, so the mirror question never changes a game
+let mirrorSame = 0, all = MF.CARDS.concat(MF.SPIRITS);
+for (const c of all) for (const o of E.cells('A').list) { const bm = lay('A', c.id, o, true), bn = lay('A', c.id, o, false); if (!bm || !bn) continue;
+  if (Object.keys(E.cubeSpots(mk(bn), c.id)).length && Object.keys(E.cubeSpots(mk(bm), c.id)).length) mirrorSame++; break; }
+ok(mirrorSame === all.length, 'every habitat matches its mirror image by rotation (' + mirrorSame + '/' + all.length + ')');
+// empty animal pile: the row is not refilled, nothing breaks
+E.newGame({ np: 2, humans: 0 }); G = ctx.getG(); G.deck = []; E.apply({ t: 'take', i: 0 }); E.apply({ t: 'card', i: 0 });
+while (G.turn.hand.length) E.apply(E.moves().find(x => x.t === 'place')); E.apply({ t: 'end' });
+ok(G.row.length === 4 && E.check() === null, 'empty animal pile: the row stays short');
+// first player: seat 1 starts
+E.newGame({ np: 3, humans: 1 }); G = ctx.getG(); ok(G.cur === 0, 'seat 1 starts (players choose; you go first)');
+// tie-break counts animal cubes only, not the spirit cube
+ok(E.cubesPlaced({ cubes: { '0,0': 3, '1,1': 'S7' } }) === 1, 'tie-break: the spirit cube is not an animal cube');
+
 // --- gauntlet ---
 const games = process.env.QUICK ? 4 : 24; let totals = [], wins = [0, 0], lens = [], soloS = [];
 for (let g = 0; g < games; g++) {

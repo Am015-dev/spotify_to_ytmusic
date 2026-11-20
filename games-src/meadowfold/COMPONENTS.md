@@ -16,7 +16,7 @@
 | Animal cubes | 75 | unlimited in play |
 | Spirit cubes | 4 | one per kept spirit |
 
-Pattern notation: first hex, then the direction from the previous hex (flat-top: N, NE, SE, S, SW, NW); any rotation, no mirror.
+Pattern notation: first hex, then the direction from the previous hex (flat-top: N, NE, SE, S, SW, NW); any rotation (every habitat equals its own mirror image turned, so mirroring never matters). Spirit cube: not an animal cube for the tie-break.
 
 ## Animal cards (32)
 

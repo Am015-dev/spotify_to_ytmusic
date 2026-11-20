@@ -51,11 +51,14 @@ group-type spirit (fields, buildings, water groups), +0 with a count-type spirit
 Nothing in the rules. Digital conveniences only: Undo inside your own turn (no hidden information is revealed before the turn ends),
 a hint button, and a tutorial that starts from a scripted pocket and card (the tokens are swapped with the pouch so counts stay exact).
 
-## [unverified] (told to the orchestrator)
-- Mirror images: the rulebook only shows rotations; we allow rotation only.
-- Empty draw pile: not covered; the row simply stays short.
-- Tie-break with a spirit cube: we count animal cubes only (rulebook wording).
-- First player: flavour text in the rulebook; seat 1 (you) starts.
-- Solo spirit sun bonus: we use the type of the spirit you kept, settled or not.
-- Card geometry and tracks come from a structured transcription, not checked card by card against printed art.
-- Side B shape (columns 4,3,4,3,4,3,4) comes from the implementation that cites the rulebook diagram.
+## Former [unverified] items (fixer F1, 20 Nov 2026)
+Settled (each has a rules-test assert):
+- Mirror images: the rulebook allows turning a habitat. A check of all 42 habitats shows each one equals its own mirror image
+  turned some way, so allowing or banning mirrors never changes a game. Engine: rotation only (same result).
+- Empty animal pile: the row refills "while cards remain"; with none left it stays short. No other rule applies.
+- Tie-break: the rulebook counts animal cubes on the board. The spirit cube is not an animal cube and does not count.
+- First player: the rulebook leaves it to the table (a flavour line). Seat 1 starts; the round always finishes, so turns stay equal.
+Still open (cannot be settled without the printed components):
+- Solo sun bonus by spirit type (+2 none, +1 group type, +0 count type) and the +1 sun for side A.
+- Card habitats and tracks come from a structured transcription; not compared card by card with printed art.
+- Side B shape (columns 4,3,4,3,4,3,4, 25 hexes): from an implementation that cites the rulebook diagram.
