@@ -87,7 +87,7 @@ function playEvents(first) {
         case 'die': snd('die'); break;
         case 'gain': if (e.k === 'ruby') snd('ruby'); else if (e.k === 'vp') snd('coin'); else if (e.k === 'drop') snd('plop'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'buy': snd('buy'); break;
-        case 'fortune': snd('page'); break;
+        case 'fortune': snd('page'); fortBanner(); break;
         case 'round': snd('pass'); break;
         case 'eval': snd('round'); break;
         case 'gameEnd': snd('win'); break;
@@ -139,4 +139,14 @@ function loadSave() {
     UI.coach = { level: UI.coach.level, seen: {} }; const st = $('#start'); if (st) st.hidden = true; closeRS && closeRS(true);
     afterApply(true); sndMusic(); toast('Welcome back.'); return true;
   } catch (e) { console.error(e); return false; }
+}
+// F2: a fortune card says what it does the moment it appears (ignores taps, fades by itself)
+function fortBanner() {
+  try {
+    if (UI.sim || !G || !G.fcard || !bfAnim()) return; const c = D.FORTUNE.find(x => x.id === G.fcard); if (!c) return;
+    const old = $('#fbanner'); if (old) old.remove();
+    const b = h('div#fbanner.' + c.kind, { 'aria-hidden': 'true' }, h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name), h('span', fortShort(c)));
+    document.body.appendChild(b); const dk = $('#dock'), r = dk && dk.getBoundingClientRect(); if (r && r.width > innerWidth * .8) { b.style.top = 'auto'; b.style.bottom = Math.round(innerHeight - r.top + 6) + 'px'; } else if (r) { b.style.top = 'auto'; b.style.bottom = '24px'; b.style.left = Math.round(r.left / 2 + 125) + 'px'; }
+    setTimeout(() => b.classList.add('out'), 1800); setTimeout(() => b.remove(), 2200);
+  } catch (e) { }
 }

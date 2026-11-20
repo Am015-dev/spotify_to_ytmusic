@@ -68,7 +68,8 @@ function stgRow(d, v, anim) {
   const tile = h('div.dtile');
   if (q) {
     const legal = mvList(p.seat); UI.legal[p.seat] = legal; const dec = h('div.dec.dec-de');
-    legal.forEach(m => dec.appendChild(h('button.dpick' + (m.o === 'vp' ? '.dpv' : '.dpc'), { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button', 'aria-label': m.o === 'vp' ? 'Take ' + q.d.vp + ' points' : 'Shop with ' + q.d.coins + ' coins' }, h('span', { html: ico(m.o === 'vp' ? 'vp' : 'coin', 34) }), h('b', m.o === 'vp' ? '+' + q.d.vp : q.d.coins), h('small.dpl', m.o === 'vp' ? 'Take points' : 'Take coins'))));
+    legal.forEach(m => dec.appendChild(h('button.dpick' + (m.o === 'vp' ? '.dpv' : '.dpc'), { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button', 'aria-label': m.o === 'vp' ? 'Take ' + q.d.vp + ' points' : 'Shop with ' + q.d.coins + ' coins' }, h('span', { html: ico(m.o === 'vp' ? 'vp' : 'coin', 34) }), h('b', m.o === 'vp' ? '+' + q.d.vp : q.d.coins), h('small.dpl', m.o === 'vp' ? 'Score points now' : 'Spend at the shop'))));
+    if (q.h === 'de') dec.appendChild(h('p.dechint', 'Tap points to score them now, or coins to buy chips for your bag.'));
     tile.appendChild(dec); try { sugMark(dec, p, q, legal); } catch (e) { }
   } else {
     const dimC = lose && d.mode === 'vp', dimV = lose && d.mode === 'buy';
@@ -103,7 +104,7 @@ function stgCount(el, from, to, ms) {
 }
 function stgPlay(box, ds, R) {
   STG.run = true; STG.round = R.round; STG.tm = []; STG.iv = []; STG.dirty = false;
-  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(440, Math.min(700, Math.round(1500 / Math.max(1, n))));
+  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(260, Math.min(380, Math.round(1000 / Math.max(1, n))));
   const at = (ms, fn) => STG.tm.push(setTimeout(() => { if (STG.run && STG.round === R.round) { try { fn(); } catch (e) { console.error(e); } } }, ms));
   const FACES = ['vp1', 'vp2', 'ruby', 'drop', 'orange', 'vp1'];
   let t = 200, last = 0;
@@ -113,9 +114,9 @@ function stgPlay(box, ds, R) {
     let tt = T0 + 300;
     if (d.die.length) {
       const dd = row.querySelector('.ddie');
-      at(tt, () => { dd.classList.add('roll'); snd('click'); let k = 0; const iv = setInterval(() => { [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, FACES[(k + j * 2) % FACES.length]); }); k++; }, 75); STG.iv.push(iv); setTimeout(() => clearInterval(iv), 440); });
-      at(tt + 480, () => { dd.classList.remove('roll', 'pend'); [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, d.die[j]); }); snd('coin'); });
-      tt += 560;
+      at(tt, () => { dd.classList.add('roll'); snd('click'); let k = 0; const iv = setInterval(() => { [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, FACES[(k + j * 2) % FACES.length]); }); k++; }, 75); STG.iv.push(iv); setTimeout(() => clearInterval(iv), 300); });
+      at(tt + 330, () => { dd.classList.remove('roll', 'pend'); [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, d.die[j]); }); snd('coin'); });
+      tt += 380;
     }
     at(tt, () => {
       if (d.gain !== 0 && tile) stgFlyTo(tile, chip, ico('vp', 22) + '<b>' + (d.gain > 0 ? '+' : '') + d.gain + '</b>', 'dfv', 420, 0, () => { chip.classList.add('pop'); snd('coin'); stgCount(tn, d.start, d.after, 320); });
@@ -123,7 +124,7 @@ function stgPlay(box, ds, R) {
       if (d.rg > 0 && tile) for (let k = 0; k < Math.min(3, d.rg); k++) stgFlyTo(tile, drb, ico('ruby', 20), 'dfr', 460, 120 + k * 90, k === 0 ? () => { drb.classList.add('pop'); snd('ruby'); } : null);
       if (d.boom && !d.prot) row.classList.add('shake');
     });
-    last = tt + 480; t += (d.die.length ? step + 300 : step);
+    last = tt + 330; t += (d.die.length ? step + 160 : step);
   });
   at(Math.max(last, t) + 160, () => { stgFinish(); });
 }
@@ -203,18 +204,19 @@ function marketEl(p, q) {
   const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
   wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
   const stalls = h('div.stalls' + (matchMedia('(orientation:landscape)').matches ? '' : '.tight'));   // R37: portrait is always the tight layout: it never flips under a tap
+  const goodNow = UI.shopGoodNow = shopGood(p, q, sel);
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
     const bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
-    st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
+    st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c]), h('button.sinfb', { 'data-a': 'shopinfo', 'data-c': c, type: 'button', 'aria-label': 'What ' + D.COLORS[c].name + ' does' }, 'i')));
     st.appendChild(h('div.sdo', h('span.sl', bk ? (STALL_DO[bk.eff] || bk.title) : ''), h('span.ss', bk ? (STALL_DO3[bk.eff] || STALL_DO[bk.eff] || bk.title) : '')));   // what the chip does, in a few words (long-press or tap it for the full text)
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
-      const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
+      const isGood = goodNow.some(g => g.key === key), on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
       const dis = !out || left < 1 || price + others > coins;
       const why = dis && !on ? (!out ? 'Opens on day ' + D.BOOK_ROUND[c] : left < 1 ? 'Sold out' : 'Costs ' + price + (others ? ' (+' + others + ' in your bag)' : '') + ', you have ' + coins) : '';   // R90 B1: a chip you cannot buy still answers the tap
-      row.appendChild(h('div.tokw', { 'data-lp': 'chip:' + key }, h('button.tok' + (on ? '.on' : '') + (dis && !on ? '.dis' : '.can'), { 'data-a': 'shopsel', 'data-k': key, 'data-why': why || null, type: 'button', 'aria-disabled': dis && !on ? 'true' : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
+      row.appendChild(h('div.tokw', { 'data-lp': 'chip:' + key }, h('button.tok' + (isGood && !on ? '.gnow' : '') + (on ? '.on' : '') + (dis && !on ? '.dis' : '.can'), { 'data-a': 'shopsel', 'data-k': key, 'data-why': why || null, type: 'button', 'aria-disabled': dis && !on ? 'true' : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
         chipN(key, 44), h('span.pc', h('span', { html: ico('coin', 13) }), left < 1 ? '—' : price))));
     });
     st.appendChild(row); stalls.appendChild(st);
@@ -228,7 +230,7 @@ function marketEl(p, q) {
   stalls.addEventListener('click', ev => { const b = ev.target.closest('.tok,.rbt'), sx = ev.target.closest('.stall,.rbar'); if ((b && b.classList.contains('tcut')) || (!b && sx && sx.querySelector('.tout'))) { const s = sx; if (s) setTimeout(() => { const ns = s.isConnected ? s : null; if (ns) ns.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 0); } });
   { const k = sel[sel.length - 1], bk = k ? (k[0] === 'O' ? D.BOOKS.O[0] : k[0] === 'K' ? D.BOOKS.K[0] : D.BOOKS[k[0]][G.sets[k[0]]]) : null;
     const ri = UI.shopInfo && UI.rubyShown ? RUBY_INFO[UI.shopInfo] : null;
-    wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : 'Tap a chip to see what it does. Buy up to 2, different colours.')); }
+    wrap.appendChild(h('div.sinfo', UI.shopWhy ? h('span.swhy', h('b', UI.shopWhy)) : ri ? h('span', h('b', ri.split(':')[0] + ':'), ri.slice(ri.indexOf(':') + 1)) : bk ? h('span', h('b', keyName(k) + ': '), bk.text) : goodNow.length ? h('span', h('b', 'Good for your bag now: '), keyName(goodNow[0].key) + '. ' + goodNow[0].why) : 'Tap a chip to buy it. Tap i for what it does. Up to 2, different colours.')); }
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
   UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
@@ -258,7 +260,7 @@ function smoreUpd(st, btn) {
   st.classList.toggle('more', n > 0); btn.hidden = !n; if (n) btn.textContent = n + ' more stall' + (n > 1 ? 's' : '') + ' \u25BC';
   // R17/R22: a chip cut by the scroll edge (tcut) stays visible and buys on a tap, then its stall slides into view; one whose centre is past the edge
   // (tout) cannot take a tap at its centre, so it is hidden and inert until it scrolls in (a tap on its stall scrolls it in)
-  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); const out = r.height > 0 && (cy > b - 4 || cy < t + 4); e.classList.toggle('tout', out); if (out && !e.disabled) { e.disabled = true; e.dataset.cut = '1'; } else if (!out && e.dataset.cut) { e.disabled = false; delete e.dataset.cut; } });
+  const t = st.getBoundingClientRect().top; st.querySelectorAll('.tok,.rbt,.sinfb').forEach(e => { const r = e.getBoundingClientRect(); const cy = (r.top + r.bottom) / 2; e.classList.toggle('tcut', r.height > 0 && (r.bottom > b + 1 || r.top < t - 1)); const out = r.height > 0 && (cy > b - 4 || cy < t + 4); e.classList.toggle('tout', out); if (out && !e.disabled) { e.disabled = true; e.dataset.cut = '1'; } else if (!out && e.dataset.cut) { e.disabled = false; delete e.dataset.cut; } });
 }
 // ---------- rubies: tap the droplet's next space, tap the flask ----------
 function rubyState(p) {
@@ -305,3 +307,33 @@ function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the drople
     h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop), h('em.rlb', 'Start space'))));
   return wrap;
 }
+// ---------- F2: the shop says what each chip does (a big sheet on the "i" button) and marks 1-2 chips that suit your bag now ----------
+const CWHAT = { G: ['green', 'greens'], B: ['blue', 'blues'], R: ['red', 'reds'], Y: ['yellow', 'yellows'], P: ['purple', 'purples'], O: ['orange', 'oranges'], K: ['moth', 'moths'] };
+function shopBook(c) { return c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]]; }
+function shopHave(p, c) { return p.bag.concat(p.hold || [], p.newChips || []).filter(x => x && x.c === c).length; }
+// up to two chips worth buying for this bag, each with a one-line reason
+function shopGood(p, q, sel) {
+  const out = []; let keys = []; try { keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; } catch (e) { }
+  const have = c => shopHave(p, c);
+  for (const k of keys) {
+    const c = k[0]; if (!CWHAT[c] || out.some(o => o.key[0] === c) || G.supply[k] < 1 || !CF.bookOut(G, c)) continue;
+    const bk = shopBook(c), n = have(c), w = CWHAT[c], tail = n === 0 ? 'You have no ' + w[1] + ' yet.' : 'You have ' + n + ' ' + w[n === 1 ? 0 : 1] + '.';
+    out.push({ key: k, why: (bk && STALL_DO[bk.eff] ? STALL_DO[bk.eff] + '. ' : '') + tail });
+    if (out.length >= 2) break;
+  }
+  return out;
+}
+function shopSheet(c) {
+  shopSheetClose(); const bk = shopBook(c), p = mineP(); if (!bk || !p) return; const out = CF.bookOut(G, c);
+  const rows = D.COLORS[c].vals.filter(v => !(c === 'W' || (c === 'O' && v !== 1))).map(v => h('div.shrow', h('span', { html: chipHTML(c + v, 44) }), h('b', cname(c + v) + ' ' + v), h('span', { html: ico('coin', 18) }), h('b', String(CF.price(G, c, v))), h('i', G.supply[c + v] < 1 ? 'sold out' : (G.supply[c + v] + ' left'))));
+  const good = (UI.shopGoodNow || []).find(g => g.key[0] === c);
+  const box = h('div#shsheet', { role: 'dialog', 'aria-modal': 'true', 'aria-label': D.COLORS[c].name },
+    h('button.shx', { 'data-a': 'shopinfox', type: 'button', 'aria-label': 'Close' }, '✕'),
+    h('div.shh', h('b', D.COLORS[c].name), h('span', bk.title)),
+    h('p.shtx', bk.text), out ? null : h('p.shtx', 'Opens on day ' + D.BOOK_ROUND[c] + '.'),
+    good ? h('p.shgd', h('b', 'Good for your bag now: '), good.why) : null, h('div.shrows', ...rows));
+  document.body.appendChild(box); UI.shopSheetOn = true;
+}
+function shopSheetClose() { const b = $('#shsheet'); if (b) b.remove(); UI.shopSheetOn = false; }
+document.addEventListener('pointerdown', e => { if (UI.shopSheetOn && !(e.target.closest && e.target.closest('#shsheet,.sinfb'))) shopSheetClose(); }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.shopSheetOn) shopSheetClose(); });

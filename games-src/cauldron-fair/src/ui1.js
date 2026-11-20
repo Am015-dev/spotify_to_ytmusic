@@ -1,5 +1,5 @@
 // ===================== part 1: globals, helpers, small model helpers, sound, save / load =====================
-var ANIM = 1, AIDELAY = 650;
+var ANIM = 1, AIDELAY = 450;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, focus: 0, pop: null, seq: 0, evN: 0, over: null, overShown: false, rep: false, repLog: 0, repV: [], repDay: 0, tm: {}, tipq: [], tipShown: {}, tip: null,
   coach: { level: 'full', seen: {} }, prefs: { sound: true, music: true, gfx: 'auto', hint: true }, busy: false, shopSel: [], legal: {}, sim: false, rsOpen: false, aiHold: {} };

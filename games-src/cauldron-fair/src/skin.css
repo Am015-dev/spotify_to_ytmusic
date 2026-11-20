@@ -194,7 +194,7 @@ html:not(.ph) #me,html:not(.ph) #me *:not(svg):not(path){font-size:16px}
 .sug::after,.rt.sug::after{font:900 12px/18px system-ui,sans-serif!important;background:#2b1a12!important;color:#ffd774!important;border:1px solid #ffd774}
 html.ph .gx-bar [data-gx=scored],html.ph .gx-bar [data-gx=rulesd]{display:none!important}html.ph .gx-bar{gap:8px}html.ph .gx-bar .gx-ibtn{min-width:52px}
 .dpick .dpl{display:block;font:800 14px/1.1 system-ui,sans-serif;color:inherit;margin-top:2px}.rsfoot .btn.go:not(.off){background:#c4602a!important;color:#fff7e0!important}
-@media (max-height:760px){.dpick .dpl{display:none}}
+@media (max-height:760px){.dpick .dpl{font-size:12px}}
 /* W471 round 2: desktop text >= 16px on the title button sublines and the Goal card label */
 html:not(.ph) .tbtn span,html:not(.ph) .tbtn.gxt-menu span{font-size:16px!important}
 html:not(.ph) #goalcard .gck{font-size:16px}
@@ -282,3 +282,39 @@ body:has(#rs:not([hidden])) :is(#others,#acts,#qbox,#ratchip){visibility:hidden}
   body:has(#others > .th:only-child) #fortchip .fk{display:none}
   body:has(#others > .th:only-child) #ratchip{top:8px;bottom:auto!important;right:4px}
 }
+/* F2: the rival's day in plain words; a tap during the pull gives a small cue */
+.th .ti .ts{white-space:normal;font-size:12px;line-height:1.15;max-width:230px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .th{max-width:min(96vw,370px)}html.ph .th .ti .ts{max-width:none}
+.bagb.bump{animation:f2bump .28s ease 1}
+@keyframes f2bump{40%{transform:scale(.94)}}
+/* F2 shop: info button, "good now" mark, big readable sheet */
+.stall .sth{position:relative}
+.sinfb{appearance:none;border:2px solid #ffe08a;background:rgba(36,23,48,.85);color:#ffe9a8;font:800 16px/1 Georgia,serif;font-style:italic;min-width:44px;min-height:44px;border-radius:50%;display:inline-grid;place-items:center;cursor:pointer;margin:-10px -6px -10px auto;padding:0}
+.tok.gnow{box-shadow:0 0 0 3px #7fe08a,0 0 14px rgba(127,224,138,.7)}
+.tok{position:relative}
+#shsheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100vw);max-height:80vh;overflow:auto;z-index:2400;background:#2a1c38;color:#f8eed8;border:3px solid #ffe08a;border-bottom:0;border-radius:18px 18px 0 0;padding:14px 16px 18px;box-shadow:0 -10px 40px rgba(0,0,0,.6)}
+#shsheet .shx{position:absolute;right:8px;top:8px;min-width:44px;min-height:44px;border-radius:50%;border:2px solid #ffe08a;background:transparent;color:#ffe9a8;font-size:20px;cursor:pointer}
+#shsheet .shh{display:flex;flex-direction:column;gap:2px;padding-right:50px}#shsheet .shh b{font-size:22px}#shsheet .shh span{font-size:16px;color:#ffe9a8}
+#shsheet .shtx{font-size:18px;line-height:1.3;margin:8px 0}#shsheet .shgd{font-size:16px;color:#a8e69a;margin:6px 0}
+#shsheet .shrow{display:flex;align-items:center;gap:10px;font-size:16px;padding:4px 0}#shsheet .shrow i{margin-left:auto;opacity:.8}
+#fortchip{max-width:min(92%,420px);padding:3px 12px 3px 4px}#fortchip .fcx{display:flex;flex-direction:column;gap:2px;min-width:0;text-align:left}#fortchip .fcx b{font-size:13px}#fortchip .fcx i{font:700 12px/1.15 var(--font);font-style:normal;white-space:normal}
+#fbanner{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:2300;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:min(92vw,460px);padding:10px 18px;border-radius:16px;border:3px solid #fff6dc;color:#fff;text-align:center;box-shadow:0 6px 26px rgba(0,0,0,.6);animation:f2in .25s ease}
+#fbanner.blue{background:#2d6fc0}#fbanner.purple{background:#6a3aa5}#fbanner b{font-size:20px}#fbanner span:last-child{font-size:16px;line-height:1.25}#fbanner .fk{font:800 12px/1 var(--font);background:rgba(0,0,0,.3);border-radius:10px;padding:3px 8px}
+#fbanner.out{opacity:0;transition:opacity .35s}
+@keyframes f2in{from{opacity:0;transform:translate(-50%,-10px)}}
+.dec .dechint{flex:1 0 100%;margin:4px 0 0;font:700 12px/1.25 var(--font);color:#ffe9a8;text-align:center}
+/* F2 PC (mouse, wide): rivals in a left side panel, the cauldron large in the centre, the dock (bag, shop, tips) on the right; never a phone column */
+@media (min-width:1000px) and (min-height:560px){
+  html:not(.ph) #bd{display:grid;grid-template-columns:minmax(220px,250px) 1fr;grid-template-rows:1fr}
+  html:not(.ph) #others{grid-column:1;grid-row:1;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:12px 10px;overflow-y:auto;overflow-x:hidden;min-height:0;background:rgba(30,18,40,.38);border-right:2px solid rgba(255,240,210,.18)}
+  html:not(.ph) #cz{grid-column:2;grid-row:1}
+  html:not(.ph) .th{padding:8px 10px 8px 12px;gap:10px;border-radius:14px}
+  html:not(.ph) .th .tp{width:64px;height:64px}
+  html:not(.ph) .th .ti{flex:1 1 auto;gap:3px}html:not(.ph) .th .ti b{font-size:16px;max-width:none}html:not(.ph) .th .ti .tv{font-size:15px}
+  html:not(.ph) .th .ti .ts{font-size:14px;max-width:none;-webkit-line-clamp:4}
+  html:not(.ph) .th .av{left:-6px;top:-8px}
+  #fbanner b{font-size:22px}
+}
+.sbc{min-width:44px;min-height:44px}
+@media (min-width:1000px){.stall .sth b{font-size:17px}.stall .sdo{font-size:15px}.mkt .sinfo{font-size:16px}.stall .tok .pc{font-size:14px}}
+html.ph #fortchip{max-width:62%}html.ph #fortchip .fcx i{display:none}

@@ -145,9 +145,9 @@ function tutStart(o) {
   const first = window.CAMPAIGN && window.CAMPAIGN.chapters && window.CAMPAIGN.chapters[0];
   GXT.start({
     game: TUT_GAME, steps: tutSteps(), story: !!(window.CAMPAIGN && typeof GXC !== 'undefined'),
-    endTitle: 'Now a real game',
-    endText: o ? 'You know the basics. Hold any chip to read its power. Chapter 1 is next.' : 'You know the basics. Hold any chip to read its power. Your first real game starts now.',
-    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'real', label: 'Play a real game' }],
+    endTitle: 'You know the basics',
+    endText: o ? 'Hold any chip to read its power. Chapter 1 is next.' : 'Hold any chip to read its power. Play a real game when you are ready, or go back to the menu.',
+    endButtons: o && first ? [{ id: 'chapter', label: 'Start chapter 1' }] : [{ id: 'real', label: 'Play a real game' }, { id: 'menu', label: 'Back to menu' }],
     setup: () => { try { GX.close(); } catch (e) { } const st = $('#start'); if (st) st.hidden = true; closeRS(true); UI.seed = TUT_SEED; UI.tut = {}; BF.pulling = false; newGame('tutorial'); },
     onDone: r => {
       tutLeave(); const c = r && r.choice;

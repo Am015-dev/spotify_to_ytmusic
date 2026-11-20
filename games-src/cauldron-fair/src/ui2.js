@@ -80,6 +80,19 @@ function liveChips(p) {
   return row;
 }
 UI.thN = UI.thN || {};
+// a rival's day in plain words ("Odo drew 6 chips, stopped at 21, bought 2 blues")
+const CWORD = { G: ['green', 'greens'], B: ['blue', 'blues'], R: ['red', 'reds'], Y: ['yellow', 'yellows'], P: ['purple', 'purples'], K: ['moth', 'moths'] };
+function rivalLine(p) {
+  const s = seatState(p), n = p.pot.length, nm = p.name, ch = n + (n === 1 ? ' chip' : ' chips');
+  if (s === 'draw' || s === 'locked') return n ? nm + ' has drawn ' + ch + ', white ' + CF.whiteSum(p) + ' of ' + CF.limitOf(G, p) + '.' : nm + ' is about to draw.';
+  if (s === 'boom') return nm + ' drew ' + ch + ' and exploded' + (p.prot ? ' (safe).' : '.');
+  if (s === 'done' || s === 'post') {
+    const b = {}; ((p.res && p.res.bought) || []).forEach(k => { b[k[0]] = (b[k[0]] || 0) + 1; });
+    const bt = Object.keys(b).map(c => b[c] + ' ' + (CWORD[c] ? CWORD[c][b[c] > 1 ? 1 : 0] : 'chip' + (b[c] > 1 ? 's' : '')));
+    return nm + ' drew ' + ch + ', stopped at ' + CF.spaceOf(p) + (bt.length ? ', bought ' + nameList(bt) : '') + '.';
+  }
+  return nm + ' is ' + stateLabel(p) + '.';
+}
 function renderOthers() {
   const o = $('#others'); if (!o) return; const f = focusSeat(); o.innerHTML = '';
   for (const p of G.players) {
@@ -87,7 +100,7 @@ function renderOthers() {
     const kN = p.seat + ':' + G.round, pulled = G.phase === 'brew' && UI.thN[kN] != null && p.pot.length > UI.thN[kN]; UI.thN[kN] = p.pot.length;   // a computer's pull pops its little cauldron
     const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : '') + (pulled ? '.pulled' : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
     t.append(h('span.av', { html: avHTML(p.seat, 26) }), h('span.tp', { html: KIT.potSVG(potOpts(p, true)).replace(/width="\d+" height="\d+"/, '') }),
-      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', seatState(p) === 'draw' && p.pot.length ? liveChips(p) : stateLabel(p))));
+      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', rivalLine(p))));
     o.appendChild(t);
   }
   o.style.display = G.np > 1 && o.children.length ? '' : 'none';
@@ -146,13 +159,13 @@ function renderFort() {
   let fc = $('#fortchip'); if (!fc) { const bd = $('#bd'); if (bd) { fc = h('button#fortchip', { type: 'button', 'data-a': 'fortchip', 'data-lp': 'fort' }); bd.appendChild(fc); } }
   if (!c || G.phase === 'over') { e.hidden = true; if (fc) fc.hidden = true; return; } e.hidden = false; e.className = c.kind; e.setAttribute('data-lp', 'fort');
   e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(fortImg(c, 'fpic'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
-  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(fortImg(c, 'fcimg'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
+  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(fortImg(c, 'fcimg'), h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('span.fcx', h('b', c.name), h('i', fortShort(c)))); }
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
   for (const p of G.players) {
     const b = h('button.rc' + (isMine(p.seat) ? '.me' : '') + (seatCls(p) ? '.' + seatCls(p) : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ' ' + stateLabel(p) });
-    b.append(h('span.cav', { html: avHTML(p.seat, 28) }), h('span.ct', h('b', isMine(p.seat) ? 'You' : p.name), h('i', stateLabel(p) + ' · ' + p.vp + ' VP')));
+    b.append(h('span.cav', { html: avHTML(p.seat, 28) }), h('span.ct', h('b', isMine(p.seat) ? 'You' : p.name), h('i', isMine(p.seat) ? stateLabel(p) + ' · ' + p.vp + ' VP' : rivalLine(p) + ' ' + p.vp + ' VP')));
     r.appendChild(b);
   }
 }

@@ -90,6 +90,7 @@ async function run(browser, W, H, mode) {
       if (info.skip && b.top < info.skip.bottom - 1 && b.left < info.skip.right && b.right > info.skip.left) note(tag, id + ': bubble covers the top strip');
     }
     const h = s.hole;
+    if (h && Math.min(h.width, h.height) < 44) console.log("SMALL", tag, id, Math.round(h.width), Math.round(h.height));
     if (!h) note(tag, id + ': no spotlight'); else {
       const vis = Math.max(0, Math.min(h.left + h.width, V.w) - Math.max(h.left, 0)) * Math.max(0, Math.min(h.top + h.height, V.h) - Math.max(h.top, 0));
       if (vis < 0.9 * h.width * h.height) note(tag, id + ': target not fully on screen');
@@ -200,8 +201,8 @@ async function run(browser, W, H, mode) {
     await sleep(300);
     const e = await p.evaluate(() => { const c = document.querySelector('.gxt-end'); if (!c) return null; const r = c.querySelector('.gxt-endc').getBoundingClientRect(); return { t: c.querySelector('.gxt-et').textContent, btns: [...c.querySelectorAll('[data-gxt-end]')].map(b => ({ t: b.textContent, k: b.dataset.gxtEnd, r: (() => { const q = b.getBoundingClientRect(); return [q.left, q.top, q.right, q.bottom, q.width, q.height]; })() })), inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
     if (!e) note(tag, 'no end card'); else {
-      if (!/real game/i.test(e.t)) note(tag, 'end card title: ' + e.t);
-      const ks = e.btns.map(b => b.k).join(); if (ks !== 'real') note(tag, 'end card buttons (want only "real"): ' + ks);
+      if (!/basics|real game/i.test(e.t)) note(tag, 'end card title: ' + e.t);
+      const ks = e.btns.map(b => b.k).join(); if (ks !== 'real,menu') note(tag, 'end card buttons (want "real" then "menu", no auto-started game): ' + ks);
       if (/later|not seen/i.test(await p.evaluate(() => document.body.innerText))) note(tag, 'a "learn later" list is on screen');
       if (!e.inside) note(tag, 'end card outside the screen');
       for (const b of e.btns) if (b.r[5] < 40) note(tag, 'end button too small: ' + b.t);

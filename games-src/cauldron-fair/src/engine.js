@@ -271,13 +271,13 @@ function moves(G, seat) {
   const q = p.q, d = q.d;
   switch (q.h) {
     case 'pick': {
-      if (G.supply.K1 > 0) out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 3 rubies')); break;
+      if (G.supply.K1 > 0) out.push(L({ t: 'pick', o: 'K1' }, 'Take a Cinder Moth: a black chip for your bag')); for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'pick', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'pick', o: 'rubies' }, 'Take 3 rubies: spend them at the market')); break;
     }
-    case 'swap': out.push(L({ t: 'swap', o: '' }, 'Keep my ruby')); for (const c of oneChips(G)) if (G.supply[c + 1] > 0) out.push(L({ t: 'swap', o: c + 1 }, 'Trade a ruby for a ' + nameOf(c + 1))); break;
-    case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 4 points')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1 from my bag')); break;
+    case 'swap': out.push(L({ t: 'swap', o: '' }, 'Keep my ruby: trade nothing')); for (const c of oneChips(G)) if (G.supply[c + 1] > 0) out.push(L({ t: 'swap', o: c + 1 }, 'Trade a ruby for a ' + nameOf(c + 1))); break;
+    case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 4 points now')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1: fewer chips that can explode')); break;
     case 'bribe': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'bribe', n }, n ? 'Move the rat stone back ' + n + ' for ' + n + ' ' + (n > 1 ? 'rubies' : 'ruby') : 'Keep the rat stone')); break;
     case 'bounty': for (const k of chipsOfValue(G, 4)) out.push(L({ t: 'bounty', o: k }, 'Take a ' + nameOf(k))); if (bountyVp(G, p) > 0) out.push(L({ t: 'bounty', o: 'vp' }, 'Score ' + bountyVp(G, p) + ' point' + (bountyVp(G, p) === 1 ? '' : 's') + ' for the rat tails')); break;
-    case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Droplet 2 spaces')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a Dusk Sigh')); break;
+    case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Move your droplet 2 spaces ahead')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a purple chip (Dusk Sigh) for your bag')); break;
     case 'haggle': out.push(L({ t: 'haggle', idx: -1 }, 'Keep all as they are')); for (const u of upgrades(G, p.hold, true)) out.push(L({ t: 'haggle', idx: u.idx }, 'Swap the ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'crow': out.push(L({ t: 'crow', idx: -1 }, 'Place none, put them all back')); p.hold.forEach((c, i) => out.push(L({ t: 'crow', idx: i }, 'Place the ' + nameOf(ck(c))))); break;
     case 'y1': out.push(L({ t: 'y1', yes: true }, 'Put the white chip back in the bag'), L({ t: 'y1', yes: false }, 'Leave it')); break;

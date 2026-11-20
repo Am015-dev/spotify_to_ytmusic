@@ -5,7 +5,7 @@
 const BF = { pulling: false, fast: false, seq: 0, lastWs: {}, fxUntil: 0, heat: 0, launch: null, repT: 0 };
 const bfAnim = () => ANIM && !UI.sim && !(typeof pxRM === 'function' && pxRM()) && !/jsdom/i.test(navigator.userAgent || '');
 // how long the hand rummages in the bag: a short beat, longer when the next chip may explode the pot
-function pullMs(p) { if (!bfAnim() || UI.pullMs === 0) return 0; const r = CF.risk(G, p.seat); return Math.round(480 + 820 * Math.min(1, r.pBoom * 2.4)); }
+function pullMs(p) { if (!bfAnim() || UI.pullMs === 0) return 0; const r = CF.risk(G, p.seat); return Math.round(360 + 540 * Math.min(1, r.pBoom * 2.4)); }
 function heatOf(p) { if (!p || !G) return 0; const lim = CF.limitOf(G, p), ws = CF.whiteSum(p); if (p.boom) return 1; let pb = 0; try { if (G.phase === 'brew' && p.st === 'draw' && p.bag.length && p.bag[0]) pb = CF.risk(G, p.seat).pBoom; } catch (e) { } return Math.max(0, Math.min(1, Math.max(ws / Math.max(1, lim + 1), pb * 2.2))); }
 const bfHand = () => '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 60 C14 50 12 40 16 30 L18 14 C18 10 24 10 24 14 L25 28 L27 8 C27 3 34 3 34 8 L34 27 L37 10 C37 5 44 5 44 10 L42 29 L46 18 C47 13 53 14 52 19 L48 40 C46 50 42 56 38 60 Z" fill="#f3d2b0" stroke="#5a3a1a" stroke-width="2.4" stroke-linejoin="round"/></svg>';
 function bfPull(m, v) {
@@ -108,7 +108,7 @@ function bfHeat() {
 // ---------- the explosion ----------
 function bfBoom(e) {
   if (!bfAnim()) return; const mine = isMine(e.seat), f = focusSeat(); if (e.seat !== f && !mine) return;
-  const big = mine, T = big ? 460 : 220, TOT = big ? 1600 : 1000;           // a tension beat on the deciding draw, then the bang, then the result
+  const big = mine, T = big ? 300 : 180, TOT = big ? 1000 : 700;           // a tension beat on the deciding draw, then the bang, then the result
   BF.fxUntil = Date.now() + TOT + 40; clearTimeout(BF.repT);
   const o = h('div.boomfx' + (e.prot ? '.prot' : '') + (big ? '' : '.small'), { 'aria-hidden': 'true' }, h('div.btense'), h('div.bflash'), h('div.bword', e.prot ? 'BOOM… safe!' : 'BOOM!'), h('div.bsub', 'White ' + CF.whiteSum(G.players[e.seat]) + ' > ' + CF.limitOf(G, G.players[e.seat])));
   o.style.setProperty('--T', T + 'ms'); o.style.setProperty('--S', big ? 1 : .6);

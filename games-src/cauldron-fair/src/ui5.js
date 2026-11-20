@@ -106,7 +106,7 @@ function renderMenu() {
   if (isPh()) row('Look up', h('button.btn', { 'data-gx': 'scored', type: 'button' }, 'Scores'), h('button.btn', { 'data-gx': 'rulesd', type: 'button' }, 'Rules'));   // W471: on a phone these live in the Menu, not the top bar
   if (online) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
+  if (!online) row('Computer speed', ...[['Fast', 150], ['Normal', 450], ['Slow', 1000]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   if (!online) b.appendChild(tutNode('btn', true));
   if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = h('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, 'Choose music'));
@@ -212,7 +212,7 @@ document.addEventListener('click', ev => {
     case 'mv': {
       const v = viewSeat(); if (openedUnder(UI.qT) && t.closest('#qbox')) break;   // only the trailing click of the press that opened a choice is ignored; a new tap always counts
       if (openedUnder(UI.advAt) && t.closest('#acts')) break;
-      if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
+      if (BF.pulling) { BF.fast = true; { const bg = document.querySelector('.bagb'); if (bg) { bg.classList.remove('bump'); void bg.offsetWidth; bg.classList.add('bump'); } } break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; UI.instrNote = { ver: pl.ver, text: 'Only one white chip. Tap the flask again to use it.' }; render(); try { instrBar(); } catch (e) { } document.querySelectorAll('.flb').forEach(fb => { fb.classList.add('armed'); fb.setAttribute('aria-label', 'Tap again to use the flask'); }); break; } }
@@ -237,6 +237,8 @@ document.addEventListener('click', ev => {
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': if (!tutAct({ what: 'rscont' })) break; repContinue(); break;
     case 'shopsel': if (!tutAct({ what: 'shopsel', k: d.k })) break; UI.shopInfo = null; shopToggle(d.k); break;
+    case 'shopinfo': shopSheet(d.c); snd('click'); break;
+    case 'shopinfox': shopSheetClose(); break;
     case 'shopbuy': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'shopbuy' })) break; pressFb(t); shopBuy(); break;
     case 'rubysel': if (!tutAct({ what: 'rubysel', k: d.k })) break; UI.shopInfo = d.ri || null; rubySelect(d.k); break;
     case 'rubygo': if (t.classList.contains('busy')) break; if (!tutAct({ what: 'rubygo' })) break; pressFb(t); rubyGo(); break;
