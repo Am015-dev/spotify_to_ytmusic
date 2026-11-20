@@ -245,7 +245,7 @@
   function quick() {
     var s = h('div', 'pick'); s.id = 'title';
     s.appendChild(BG('bg-title'));
-    var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Climb the tower. Build your deck.')]); s.appendChild(t);
+    var t = h('div', '', null, [h('h1', '', 'EMBERCLIMB'), h('p', 'sub', 'Pick your hero. Each has its own cards.')]); s.appendChild(t);
     var hs = h('div', 'heroes');
     ['w', 's', 'a', 'm'].forEach(function (k) {
       var H = D.H[k], lk = !heroOpen(k), b = h('button', 'hero' + (UI.pick.indexOf(k) >= 0 ? ' sel' : '') + (lk ? ' locked' : ''), null, [A('hero-' + k, H.name.split(' ')[0], { ph: TONE[k] }), h('b', '', H.name.split(' ')[0]), h('i', '', lk ? '\uD83D\uDD12 Story' : H.role)]);
@@ -256,7 +256,7 @@
     var mid = h('div', '', null, [hs, h('div', 'refline' + (UI.heroNote ? ' w24note w24n' + ((UI.noteN || 0) % 2) : ''), UI.heroNote || D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
-    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 3;
+    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
     // difficulty: Gentle (first climb, player-side numbers only) is the default until the first win or a pick; Tabletop = rulebook numbers
     UI.diff = UI.diff || diffDefault(); var dg = h('div', 'seg w8diff'); dg.setAttribute('role', 'group'); dg.setAttribute('aria-label', 'Difficulty');
@@ -718,7 +718,7 @@
     var act = h('div', 'rwact');   // R21: Skip + Continue in one row that sticks to the bottom of the reward, so it never falls below the fold
     Object.keys(r.cards).forEach(function (hi) {
       if (r.took['c' + hi]) { s.appendChild(h('div', 'sub w7done', (UI.rwNote && UI.rwNote[rk + ':' + hi]) || 'Card choice done.')); return; } if (g.hs.length > 1) s.appendChild(h('div', 'chip', D.H[g.hs[hi].k].name + ': pick a card'));
-      else s.appendChild(h('div', 'sub', 'Add one card to your deck'));
+      else s.appendChild(h('div', 'sub', 'Add one ' + D.H[g.hs[hi].k].role + ' card to your deck'));
       var pk = h('div', 'picks'); r.cards[hi].forEach(function (id, i) { var c = cardEl({ id: id, u: 0 }); c.setAttribute('data-pick', i); c.classList.add('w4rw'); (c.querySelector('.cart') || c).appendChild(h('span', 'w4vt', valTag(id))); on(c, function () { if (!tutOk({ type: 'tap', w: 'pick', i: i })) return; UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = '\u2713 ' + D.CARDS[id].name + ' added to your deck.'; E.performMove({ t: 'pick', h: +hi, i: i }); render(); }); pk.appendChild(c); }); s.appendChild(pk);
       (g.hs.length === 1 ? act : s).appendChild(on(h('button', 'btn alt', 'Skip'), function () { UI.rwNote = UI.rwNote || {}; UI.rwNote[rk + ':' + hi] = 'Card skipped: your deck stays lean.'; E.performMove({ t: 'skip', h: +hi }); render(); }));
     });

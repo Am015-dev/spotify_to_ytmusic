@@ -27,7 +27,9 @@ logic-test rule 52 and rules-test check that every card has one and that it is s
 | Relics | 19 | 8 open after Story chapters (RLOCK in ui.js) |
 | Potions | 9 | 3 slots per hero; Pocket Satchel adds 1 |
 | Events | 13 | |
-| Climb length | 1 act, 3 acts (default), 3 acts + final | setup screen |
+| Climb length | 1 act (default), 3 acts, 3 acts + final | setup screen |
+| Act map | branching, 4 lanes, 9 floors + boss, treasure on floor 5, rest before the boss | every real climb, the first one included (F2); only the guide uses a short fixed map. [unverified] the printed board's row count |
+| Card rewards | pick 1 of 3 from your hero's own class pool (commons/uncommons, rares from elites/bosses) | neutral cards only in shops and events |
 | Difficulty | Tabletop (default, rulebook numbers), Gentle (opt-in: 5x HP, 3 Healing Draughts, Rest heals 8) | |
 
 ## Not identical to the original

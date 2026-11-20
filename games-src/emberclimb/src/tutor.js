@@ -155,7 +155,7 @@
   function node(t) { return function () { return $('#map .node.t-' + t); }; }
   function goldEl() { var xs = document.querySelectorAll('.reward .chip'); for (var i = 0; i < xs.length; i++) if (/gold/.test(xs[i].textContent)) return xs[i]; return null; }
   // Every core rule in order, one line of 12 words or fewer, one highlighted tap each. ids = the rule keys tools/tut-walk.js checks.
-  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map', 'go'];   // G3 r2: mostly doing steps, 4 Next-only lines
+  var RULES = ['intent', 'energy', 'vuln', 'block', 'endturn', 'pattern', 'strength', 'exhaust', 'potion', 'finish', 'reward', 'leave', 'map'];   // G3 r2: mostly doing steps, 4 Next-only lines
   function steps() {
     var tap = function (id, n) { return { type: 'tap', times: n || 2, match: function (a) { return a.w === 'card' && a.id === id; } }; };
     var info = function (id, target, say, ready, side) { return { id: id, title: 'Warden Ashgrove', target: target, say: say, wait: null, ready: ready || battleP, side: side }; };
@@ -175,10 +175,9 @@
       { id: 'finish', title: 'Finish it', target: function () { return cardEl('w-strike'); }, say: 'Tap each Strike twice to finish it.', wait: tap('w-strike', 4), ready: turn2, also: foes, avoid: foeR },
       { id: 'reward', title: 'Card reward', target: function () { return $('.picks .card') && $('.picks .card').parentNode; }, say: 'Gold won! Pick 1 of 3 cards for your deck.', wait: { type: 'tap', match: function (a) { return a.w === 'pick'; } }, ready: scr('reward') },
       { id: 'leave', title: 'Onward', target: function () { return $('#leave'); }, say: 'Tap Continue to climb.', wait: { type: 'event', match: function (a) { return a.scr === 'map'; } }, ready: scr('reward') },
-      info('map', function () { return $('#map'); }, 'Choose your path. The boss waits at the top.', scr('map')),
-      { id: 'go', title: 'Your climb', target: function () { return $('#map .node.glow'); }, also: function () { return [].slice.call(document.querySelectorAll('#map .node.glow')).slice(1); }, say: 'Tap a glowing room: a fight or a ? event.', wait: { type: 'event', match: function (a) { return a.scr !== 'map'; } }, ready: scr('map') },
-      { id: 'free', title: 'Your climb', target: function () { return $('#app'); }, say: 'Your climb now.', wait: null, ready: function () { return true; },
-        onEnter: function () { setTimeout(function () { try { GXT.stop(); } catch (e) { } C.on = true; ['intent', 'vuln', 'energy', 'block', 'endturn', 'weak', 'poison', 'strength', 'power', 'exhaust', 'potion', 'reward', 'gold', 'map'].forEach(function (k) { C.seen[k] = 1; }); UI.render(); }, 60); } }
+      // F2: the guide ends at the map. The first real climb is the full branching act with a hero pick (the end card's main button)
+      info('map', function () { return $('#map'); }, 'Paths branch. Pick rooms; the boss waits on top.', scr('map'))
+
     ];
   }
   window.EC_TUT_RULES = RULES;
@@ -196,7 +195,7 @@
   UI.coachFinish = finish;
   UI.tutStart = function () {
     if (!window.GXT) return;
-    GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'Your climb', endText: '', onDone: function () { }, onExit: function () { if (C.on) return; if (UI.camp) { C.on = true; C.seen.intent = 1; UI.render(); } else finish(false); } });
+    GXT.start({ game: 'emberclimb', setup: stage, steps: steps(), story: false, endTitle: 'You know the basics', endText: 'Now pick your hero. The real climb: a branching map, 9 floors, then a boss.', endButtons: [{ id: 'pick', label: 'Pick your hero' }, { id: 'title', label: 'Title' }], onDone: function (r) { finish(!r || r.choice !== 'title'); }, onExit: function () { if (C.on) return; if (UI.camp) { C.on = true; C.seen.intent = 1; UI.render(); } else finish(false); } });
     try { if (GXT.active()) UI.render(); } catch (e) { }
   };
   UI.tutFree = function () { return false; };

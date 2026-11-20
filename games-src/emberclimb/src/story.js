@@ -101,7 +101,7 @@ window.EC_STORY = {
     },
     good: { kill: 'Clean kill!', double: 'Double damage on a Vulnerable foe. Nicely done.', blocked: 'Fully blocked. That is how a warden fights.' },
     poor: { hurt: 'Ouch. A Block card would have soaked some of that.', spikes: 'Spikes bit you. On its Spikes turn, block instead.', leftover: 'You ended with energy left. Spend it all next time.' },
-    end: { title: 'You climbed the tower', did: 'You beat the climb. You used:', heroes: 'Each other hero brings one new trick. Its first fight shows it.', play: 'Play a real game', title2: 'Title' }
+    end: { title: 'You know the basics', did: 'You learned:', heroes: 'Now pick your hero. Each one has its own cards and its own trick.', play: 'Pick your hero', title2: 'Title' }
   },
   // Story mode scenes per chapter (id from campaign.json): intro (2-3 lines), win and loss outros, boss lines before and after
   chapters: {
