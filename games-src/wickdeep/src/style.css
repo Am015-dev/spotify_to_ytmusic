@@ -196,3 +196,4 @@ button{font-family:inherit;color:inherit}
 }
 @media (max-width:420px){#legend{right:52px;top:auto;bottom:4px;font-size:11px;line-height:1.2}#legend span{display:none}}
 @media (min-width:800px) and (hover:hover){.cd .nm{padding-left:32px}#legend{top:56px}}
+@media (min-width:800px) and (hover:hover){.cd.play{height:auto;min-height:112px}.cd .basic button{min-height:28px;font-size:12px}}
