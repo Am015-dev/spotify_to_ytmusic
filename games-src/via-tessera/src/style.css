@@ -18,7 +18,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 #app { position: fixed; inset: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 /* top bar: a strip of marble with the race */
 .bar { flex: none; height: 46px; display: flex; align-items: center; gap: 6px; padding: 0 6px; background: linear-gradient(#3b2a1e, #2b2018); color: var(--marble); border-bottom: 3px solid var(--terra2); }
-.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
+.brand { display: flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; height: 38px; min-width: 44px; color: var(--gold); font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: .04em; }
 .brand span { white-space: nowrap; }
 .race { flex: 1; display: flex; gap: 6px; justify-content: center; min-width: 0; }
 .chip { display: flex; align-items: center; gap: 5px; height: 32px; padding: 0 9px 0 5px; border-radius: 16px; background: rgba(241,233,218,.12); font-size: 14px; white-space: nowrap; }
@@ -32,7 +32,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 @media (max-width: 400px) { .brand span { display: none; } .tb span { display: none; } }
 
 /* board: the mosaic map */
-.board { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; background: #1b467f; touch-action: none; }
+.board { position: relative; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: hidden; background: #1b467f; touch-action: none; }
 #map { width: 100%; height: 100%; display: block; user-select: none; -webkit-user-select: none; }
 .zoom { position: absolute; right: 6px; top: 6px; display: flex; flex-direction: column; gap: 6px; }
 .zoom button { width: 44px; height: 44px; border-radius: 10px; border: 2px solid var(--grout); background: var(--marble); color: var(--ink); font-size: 24px; font-weight: 700; line-height: 1; box-shadow: 0 2px 6px rgba(0,0,0,.35); }
@@ -192,20 +192,24 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--gold);
 @media (max-height: 600px) { #hand { height: 86px; } .cd { height: 80px; } .cd .art { width: 28px; height: 28px; margin-top: 2px; } .bar { height: 42px; } .prow { min-height: 44px; } }
 /* wide screens: a side dock */
 @media (min-width: 900px) and (min-aspect-ratio: 4/3) {
-  #app { flex-direction: row; flex-wrap: wrap; }
-  .bar { width: 100%; }
-  .board { flex: 1 1 0; height: calc(100% - 46px); }
-  .dock { width: 380px; height: calc(100% - 46px); border-top: 0; border-left: 3px solid var(--terra2); }
+  #app { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: 46px minmax(0, 1fr); }
+  .bar { grid-column: 1 / 3; }
+  .board { height: auto; }
+  .dock { height: auto; border-top: 0; border-left: 3px solid var(--terra2); overflow-y: auto; }
   #hand { flex-wrap: wrap; height: auto; overflow: visible; }
   .sheet { left: auto; width: 420px; right: 0; }
 }
 /* landscape phones: the dock goes to the right */
 @media (max-height: 500px) and (min-aspect-ratio: 3/2) {
-  #app { flex-direction: row; flex-wrap: wrap; }
-  .bar { width: 100%; height: 40px; }
-  .board { flex: 1 1 0; height: calc(100% - 40px); }
-  .dock { width: 300px; height: calc(100% - 40px); border-top: 0; border-left: 3px solid var(--terra2); overflow-y: auto; }
+  #app { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: 40px minmax(0, 1fr); }
+  .bar { grid-column: 1 / 3; height: 40px; } .brand, .tb { height: 34px; } .tb.sq { height: 34px; }
+  .board { height: auto; }
+  .dock { height: auto; border-top: 0; border-left: 3px solid var(--terra2); overflow-y: auto; }
   #hand { flex-wrap: wrap; height: auto; overflow: visible; }
   .cd { height: 76px; } .cd .art { width: 26px; height: 26px; }
   .sheet { left: auto; width: 380px; right: 0; max-height: 90%; }
+  .prow { flex-wrap: wrap; } #prompt { flex-basis: 100%; font-size: 15px; }
+  .title-art { height: 64px; } .title-art h1 { font-size: 24px; bottom: 6px; }
+  .panel .tgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8px; }
+  .ov { padding: 8px; } .panel { padding: 10px 12px; } .panel > p { margin-bottom: 4px; }
 }

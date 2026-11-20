@@ -25,15 +25,15 @@ function showTitle() {
   try { var o = JSON.parse(sv); has = o && o.G && o.G.phase === 'play'; } catch (e) { }
   var art = UI.mosaic || (UI.mosaic = VTART.mosaic(D, 2));
   s.innerHTML = '<div class="panel"><div class="title-art" style="background-image:url(' + (art || '') + ')"><h1>Via Tessera</h1></div>' +
-    '<p>Spread carts and ships across the sea. Build, trade, and win the patrons.</p>' +
+    '<p>Spread carts and ships. Build, trade, win patrons.</p><div class="tgrid">' +
     (has ? '<button type="button" class="btn" id="tcont">Continue game</button>' : '') +
     '<button type="button" class="btn' + (has ? ' alt' : '') + '" id="tlearn">Learn to play</button>' +
-    '<div class="seg" role="group" aria-label="Computer level">' + ['easy', 'normal', 'hard'].map(function (l) { return '<button type="button" data-l="' + l + '" aria-pressed="' + (UI.lvl === l) + '">' + l[0].toUpperCase() + l.slice(1) + '</button>'; }).join('') + '</div>' +
+    '<button type="button" class="btn alt" id="tlvl" aria-label="Rival level">Level: ' + UI.lvl[0].toUpperCase() + UI.lvl.slice(1) + ' \u25B8</button>' +
     '<button type="button" class="btn alt" id="tvs">Play vs computer</button>' +
     '<button type="button" class="btn alt" id="thot">Two players, one phone</button>' +
-    '<button type="button" class="btn alt" id="trules">How to play</button></div>';
+    '<button type="button" class="btn alt" id="trules">How to play</button></div></div>';
   s.hidden = false;
-  s.querySelectorAll('[data-l]').forEach(function (b) { b.onclick = function () { UI.lvl = b.getAttribute('data-l'); LS.set('lvl', UI.lvl); showTitle(); }; });
+  $('#tlvl').onclick = function () { var L = ['easy', 'normal', 'hard']; UI.lvl = L[(L.indexOf(UI.lvl) + 1) % 3]; LS.set('lvl', UI.lvl); showTitle(); };
   var c = $('#tcont'); if (c) c.onclick = function () { var o = JSON.parse(LS.get('save')); G = o.G; UI.mode = o.mode; UI.lvl = o.lvl; UI.learn = o.learn; UI.tipsSeen = {}; s.hidden = true; buildMap(); setView({ x: 0, y: 0, w: VTART.W }); homeView(); render(); if (!isHuman(VT.sideToAct(G))) setTimeout(runAI, 600); };
   $('#tlearn').onclick = function () { UI.lvl = 'easy'; startGame('vs', { learn: true, lvl: 'easy' }); };
   $('#tvs').onclick = function () { startGame('vs', { lvl: UI.lvl }); };

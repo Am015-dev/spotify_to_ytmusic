@@ -78,7 +78,7 @@ function renderMap() {
     var u = el('use', { href: '#i-' + (st.up ? st.g : 'coins'), x: -11, y: -11, width: 22, height: 22, fill: st.up ? '#fff' : '#3b2416' }, g);
     if (!st.up) { el('text', { x: 13, y: 15, 'class': 'slotn', style: 'fill:#fff;paint-order:stroke;stroke:#2b2018;stroke-width:3px' }, g).textContent = D.BONUS_COIN[st.g]; }
     el('rect', { 'class': 'mkring', x: -19, y: -19, width: 38, height: 38, rx: 7 }, g);
-    el('rect', { 'class': 'hit', x: -26, y: -26, width: 52, height: 52 }, g);
+    el('rect', { 'class': 'hit', x: -48, y: -38, width: 96, height: 64 }, g);   // covers the label too, so the glow's centre answers a tap
   });
   // route slots (where carts and ships stop)
   L.slots.innerHTML = '';
