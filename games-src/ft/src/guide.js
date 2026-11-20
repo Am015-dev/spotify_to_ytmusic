@@ -39,7 +39,7 @@ const GD=(()=>{
    {id:'lift3',who:'me',m:S(29),say:'Lift these three. A Shadow will end on Shadows.'},
    {id:'s1',who:'me',m:D(28,'vizier'),say:'The Advisor drops here.'},
    {id:'s2',who:'me',m:D(22,'merchant'),say:'The Trader drops here.'},
-   {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. Last camel: this is the final round.'},
+   {id:'s3',who:'me',m:D(23,'assassin'),say:'The Shadow joins three Shadows. This lesson gives 3 camels (a real game 11). Last camel: final round.'},
    {id:'shadows',who:'me',m:{act:'tribe',kill:{pl:1,c:'vizier',fk:0}},say:'One tile per Shadow, or a rival’s Advisor. Tap Farid’s glowing box.'},
    {id:'noaction',who:'me',m:{act:'tile',skip:1},say:'A Shrine needs two Sages. You have none: skip it.'},
    {id:'done3',who:'me',m:{act:'end'},say:'Tap End turn.'},

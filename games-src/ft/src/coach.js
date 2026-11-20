@@ -71,11 +71,12 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
   const row=(l,x,y,why)=>`<div class="ce-r"><span>${l}</span><b>${x}</b><b>${y}</b><p>${why}</p></div>`;
   const hd='<div class="ce-h"><span></span><b>You</b><b>Farid</b></div>';
   const tiles=G.board.filter(t=>owner(t)===0).length,tilesB=G.board.filter(t=>owner(t)===1).length;
+  const pv=p=>hasDj(p,'nakhla')?5:3,sv=p=>hasDj(p,'hikma')?4:2;
   const gs=p=>{const c={};for(const r of p.res)c[r]=(c[r]||0)+1;return Object.keys(c).length};
   const pages=[
    {t:'Coins and land',h:hd+row('Coins',a.coins,b.coins,'Every coin is a point.')+row('Land',a.tiles,b.tiles,'You hold '+tiles+' tile'+(tiles===1?'':'s')+', Farid '+tilesB+'. Each scores the number printed on it.')},
-   {t:'Palms and palaces',h:hd+row('Palms',a.palms,b.palms,'3 points per palm on a tile you hold. You: '+(a.palms/3)+' palm'+(a.palms===3?'':'s')+'.')+row('Palaces',a.palaces,b.palaces,'5 points per palace on a tile you hold. You: '+(a.palaces/5)+'.')},
-   {t:'People',h:hd+row('Sages',a.sages,b.sages,'2 points each. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
+   {t:'Palms and palaces',h:hd+row('Palms',a.palms,b.palms,'Each palm on a tile you hold: '+pv(pa)+' points for you, '+pv(pb)+' for Farid'+(hasDj(pb,'nakhla')?' (his djinn Nakhla)':'')+'. You: '+(a.palms/pv(pa))+' palm'+(a.palms===pv(pa)?'':'s')+'.')+row('Palaces',a.palaces,b.palaces,'5 points per palace on a tile you hold. You: '+(a.palaces/5)+'.')},
+   {t:'People',h:hd+row('Sages',a.sages,b.sages,'Each Sage: '+sv(pa)+' points for you, '+sv(pb)+' for Farid'+(hasDj(pb,'hikma')?' (his djinn Hikma)':'')+'. You have '+pa.el+', Farid '+pb.el+'.')+row('Advisors',a.advisors,b.advisors,'1 each, plus 10 for every rival with fewer. You have '+pa.vz+', Farid '+pb.vz+'.')},
    {t:'Djinns and goods',h:hd+row('Djinns',a.djinns,b.djinns,'You hold '+pa.dj.length+', Farid '+pb.dj.length+'; each scores its own points.')+row('Goods',a.goods,b.goods,'Sets of different kinds score 1, 3, 7, 13. Your goods: '+pa.res.filter(r=>r!=='fakir').length+' cards in '+gs({res:pa.res.filter(r=>r!=='fakir')})+' kinds.')},
    {t:'The count',h:hd+[['Land',a.tiles,b.tiles],['Coins',a.coins,b.coins],['Palms',a.palms,b.palms],['Palaces',a.palaces,b.palaces],['Sages',a.sages,b.sages],['Advisors',a.advisors,b.advisors],['Djinns',a.djinns,b.djinns],['Goods',a.goods,b.goods]].filter(x=>x[1]||x[2]).map(x=>`<div class="ce-r ce-s"><span>${x[0]}</span><b>${x[1]}</b><b>${x[2]}</b></div>`).join('')+row('Total',a.total,b.total,esc(plName(G.winText)))}];   // R38 row 2: the last page shows how each total was made, source by source
   const later=Object.keys(LORE.coach).filter(id=>!COACH.seen[id]).slice(0,6).map(id=>'<li>'+esc(LORE.coach[id].later)+'</li>').concat(['Everything else is in How to play.']).map(x=>x.startsWith('<li>')?x:'<li>'+esc(x)+'</li>').join('');
@@ -88,7 +89,7 @@ function coachFinal(){COACH.done=true;coachHide();if(UI.modal)UI.modal=null;let 
       if(k==='next'){COACH.pg++;coachDraw()}else if(k==='back'){COACH.pg--;coachDraw()}
       else{try{GXT.markDone(TUT_GAME)}catch(x){}const story=UI.coachStory;tutLeave();if(k==='chapter'&&window.CAMPAIGN&&typeof GXC!=='undefined')GXC.play(window.CAMPAIGN.chapters[0].id);else if(k==='story'&&typeof GXC!=='undefined')GXC.open();else{UI.modal='start';render()}}});coachDraw()}}
 function coachDraw(){const o=document.getElementById('coachend');if(!o||!COACH.pages)return;const P_=COACH.pages,i=Math.max(0,Math.min(P_.length-1,COACH.pg)),pg=P_[i];
-  const voice=i===0?'<p class="ce-v"><i>'+LORE.guide.face+'</i><span><b>Hadiya</b> The game is over, child. Let us count it together.</span></p>':'';
+  const voice=i===0?'<p class="ce-v"><i>'+LORE.guide.face+'</i><span><b>Hadiya:</b> The game is over, child. Let us count it together.</span></p>':'';
   const btns=pg.last?(UI.coachStory&&window.CAMPAIGN?'<button class="btn go big" data-ce="chapter">Start chapter 1</button>':'<button class="btn go big" data-ce="play">Play a real game</button>')+(window.CAMPAIGN&&!UI.coachStory?'<button class="btn big" data-ce="story">Story mode</button>':''):'<button class="btn go big" data-ce="next">Next</button>';
   o.innerHTML='<div class="ce-box"><h2>'+esc(pg.t)+'</h2>'+voice+pg.h+'<div class="ce-a">'+(i>0?'<button class="btn" data-ce="back">Back</button>':'')+btns+'</div><small class="ce-d">'+(i+1)+' / '+P_.length+'</small></div>'}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{coachAfter()}catch(e){console.error(e)}}})();

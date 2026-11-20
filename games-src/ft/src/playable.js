@@ -42,8 +42,7 @@ function plAfter(){if(!G){return}
     if(e.c==='turn'){const m=/— (.+)'s turn —/.exec(e.t);const nm=m?m[1]:'';const mine=G.pl.some(p=>p.nm===nm&&p.human)&&G.pl.filter(p=>p.human).length===1;plBanner(mine?LORE.turn.you:nm+"'s turn",mine?'Tap a glowing tile to start':'Watch each step. Tap the board to speed up.',mine?'mine':'rival')}
     else if(e.c==='round'&&G.round>1)plBanner(LORE.turn.bid,'Dearer spots play earlier','')}}
   const tot=G.pl.map(p=>shownTotal(p)),parts=G.pl.map(p=>scoreOf(p));if(PL.tot&&PL.tot.length===tot.length&&PL.parts&&!G.over)tot.forEach((v,i)=>{const d=v-PL.tot[i];if(d&&G.phase!=='bid'&&!(G.log[0]&&/ bids? /.test(G.log[0].t)))plPop(i,d,plWhy(i,d,PL.parts[i],parts[i]))});PL.tot=tot;PL.parts=parts;
-  if(typeof tutOn==='function'&&tutOn()){const st=GXT.state();if(st&&st.shown&&st.id!==PL.lastId){const prev=PL.lastId;PL.lastId=st.id;const L=LORE.tut[prev];if(L&&L.react){const t=typeof L.react==='function'?L.react():L.react;const who=['sages','advisors'].includes(prev)?LORE.rival:LORE.guide;plSay(prev==='tribes'||prev==='sages'||prev==='advisors'?LORE.rival:LORE.guide,t)}}}
-  else PL.lastId=null}
+  PL.lastId=null}
 (function(){const o=render;render=function(){o.apply(this,arguments);try{plAfter()}catch(e){console.error(e)}}})();
 // the instruction line: the rival's turn is told step by step in plain words (the engine's own log line), the pick-who-stays popup says so
 // the rival's caption stays one short line: no bracketed detail, 8 words at most
@@ -55,13 +54,6 @@ function plCap(t){const w=String(t).replace(/\s*\([^)]*\)/g,'').trim().split(/\s
   return t}})();
 // the result speaks in the game's voice
 (function(){const o=overHtml;overHtml=function(){let h=o();try{const mp=viewP();const won=mp&&G.over.win.includes(mp.i);const tops=G.pl.map(x=>shownTotal(x)),gap=mp?Math.max(...tops)-shownTotal(mp):0,rel=gap/Math.max(1,Math.max(...tops));const a=won?LORE.win:(gap<=10||rel<=0.08)?LORE.loseClose:(rel>=0.35?LORE.loseFar:LORE.lose);const t=a[Math.abs(parseInt(G.seed,10)||G.logN||0)%a.length];h=h.replace('</h2>','</h2><p class="voice">'+esc(t)+'</p>');if(mp&&G.pl.filter(x=>x.human).length===1)h=h.split(mp.nm).join('You')}catch(e){}return h}})();
-// the tutorial as the prologue: the guide's and the rival's words replace the plain lessons (same ids, same targets, same waits)
-function tutStory(steps){return steps.map(s=>{const L=LORE.tut[s.id];if(!L)return s;const ch=LORE.chapters[s.id];const rival=['order','sages','advisors'].includes(s.id);const who=rival?LORE.rival:LORE.guide;
-  const say=()=>{const v=L.say;if(typeof v!=='function')return v;
-    if(s.id==='drop'||s.id==='dropC')return v(dropsDone());
-    if(s.id==='masons')return v(bluesAround(TUT_ME.t2.path[2][0]).length);
-    if(s.id==='score'){const sc=G.over?G.over.scores:[];const a=sc.find(x=>x.p===0),b=sc.find(x=>x.p===1);return v(a?a.s.total:0,b?b.s.total:0)}return ''};
-  return Object.assign({},s,{title:()=>ch?'Ch.'+ch.n+' '+ch.t:who.face+' '+who.name,say})})}
 
 // ---- W497: a visible Skip button while the computer plays (a tap on the table still works too) ----
 (function(){const r=render;render=function(){r.apply(this,arguments);try{let b=document.getElementById('skipai');

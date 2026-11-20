@@ -2,7 +2,7 @@
 // cost: null (always on) | 'EF' (1 Sage or 1 Mystic) | 'EEF' (1 Sage + 1 Sage-or-Mystic) | 'F' (1 Mystic) | 'F+' (1+ Mystics, bidding)
 const DJINNS=[
  {k:'zarifa',n:'Zarifa',vp:5,cost:null,x:'At the end, 2 Mystics count as 1 good.'},
- {k:'tamuz',n:'Tamuz',vp:8,cost:'EF',x:'Fill an empty tile from the bag.'},
+ {k:'tamuz',n:'Tamuz',vp:8,cost:'EF',x:'Put 3 people from the bag on a tile with nothing on it (no people, camel, tent, palm or palace).'},
  {k:'harith',n:'Harith',vp:6,cost:null,x:'Any djinn summoned: +1 coin (you), +2 (rival).'},
  {k:'sadim',n:'Sadim',vp:6,cost:null,x:'Shadows cannot take your Advisors or Sages (or Crafters).'},
  {k:'nuraya',n:'Nuraya',vp:6,cost:'EF',x:'Place a palace on any Hamlet.'},
@@ -10,9 +10,9 @@ const DJINNS=[
  {k:'wahha',n:'Wahha',vp:8,cost:'EF',x:'Plant a palm tree on any Oasis.'},
  {k:'burhan',n:'Burhan',vp:10,cost:'EF',x:'A palace may go on a nearby tile.'},
  {k:'nakhla',n:'Nakhla',vp:8,cost:null,x:'Each palm of yours scores 5, not 3.'},
- {k:'ghulam',n:'Ghulam',vp:8,cost:'EF',x:'Shadows take 2 people from one tile.'},
+ {k:'ghulam',n:'Ghulam',vp:8,cost:'EF',x:'Use when your Shadows act: this turn they take 2 people, both from one tile or 2 of one rival\'s Advisors, Sages or Crafters.'},
  {k:'wazira',n:'Wazira',vp:6,cost:null,x:'Your Advisors score 3 each instead of 1.'},
- {k:'sirra',n:'Sirra',vp:6,cost:null,x:'Shadows keep what they take.'},
+ {k:'sirra',n:'Sirra',vp:6,cost:null,x:'What your Shadows take pays you: a taken Advisor or Sage joins you, a Trader gives you the top goods card, a Mason pays 1 coin per blue tile around, a Crafter joins you with an item.'},
  {k:'dalil',n:'Dalil',vp:6,cost:'F+',x:'Each Mystic cuts a bid by one spot.'},
  {k:'rawda',n:'Rawda',vp:10,cost:'EF',x:'A palm may go on a nearby tile.'},
  {k:'jamal',n:'Jamal',vp:4,cost:'EEF',x:'Put one of your camels on an empty tile.'},
