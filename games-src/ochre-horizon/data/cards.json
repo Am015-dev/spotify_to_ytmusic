@@ -105,9 +105,13 @@
   "id": "p006",
   "name": "Ration Contract",
   "type": "auto",
-  "cost": 10,
+  "cost": 12,
   "tags": [],
   "play": [
+   {
+    "op": "tile",
+    "t": "special"
+   },
    {
     "op": "prod",
     "r": "mc",
@@ -119,7 +123,7 @@
     "n": 3
    }
   ],
-  "text": "Raise credits production 2. Gain 3 credits."
+  "text": "Place a special tile. Raise credits production 2. Gain 3 credits."
  },
  {
   "id": "p007",
@@ -148,9 +152,13 @@
   "id": "p008",
   "name": "Salvage Charter",
   "type": "auto",
-  "cost": 11,
+  "cost": 12,
   "tags": [],
   "play": [
+   {
+    "op": "tile",
+    "t": "special"
+   },
    {
     "op": "prod",
     "r": "mc",
@@ -167,7 +175,7 @@
     "n": 1
    }
   ],
-  "text": "Raise credits production 1. Gain 3 steel. Gain 1 titanium."
+  "text": "Place a special tile. Raise credits production 1. Gain 3 steel and 1 titanium."
  },
  {
   "id": "p009",
@@ -247,18 +255,22 @@
   "id": "p013",
   "name": "Tin Roof Foundry",
   "type": "auto",
-  "cost": 15,
+  "cost": 17,
   "tags": [
    "building"
   ],
   "play": [
+   {
+    "op": "tile",
+    "t": "special"
+   },
    {
     "op": "prod",
     "r": "steel",
     "n": 2
    }
   ],
-  "text": "Raise steel production 2."
+  "text": "Place a special tile. Raise steel production 2."
  },
  {
   "id": "p014",
@@ -3178,7 +3190,7 @@
     "which": "city"
    }
   ],
-  "text": "Standard projects(city)  cost 4 less."
+  "text": "The City standard project costs 4 less."
  },
  {
   "id": "p130",

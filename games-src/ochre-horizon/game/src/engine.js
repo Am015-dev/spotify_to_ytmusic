@@ -12,6 +12,7 @@
   var TAGS = ['building', 'space', 'science', 'power', 'earth', 'jovian', 'plant', 'microbe', 'animal', 'city'];
   var TEMP_MIN = -30, TEMP_MAX = 8, OXY_MAX = 14, OCEAN_MAX = 9;
   var STD = { sell: 0, power: 11, asteroid: 14, aquifer: 18, greenery: 23, city: 25 };
+  var RW = { mc: 'credits', steel: 'steel', ti: 'titanium', plant: 'plants', energy: 'energy', heat: 'heat' };
   var STD_NAME = { sell: 'Sell cards', power: 'Power plant', asteroid: 'Comet strike', aquifer: 'Aquifer', greenery: 'Greenery', city: 'City' };
   var AWARD_COST = [8, 14, 20];
   var G = null;
@@ -190,8 +191,8 @@
         case 'prod': P.prod[o.r] = Math.max(o.r === 'mc' ? -5 : 0, P.prod[o.r] + o.n); ev({ k: 'prod', p: p, r: o.r, n: o.n }); break;
         case 'gain': P[o.r] += o.n; ev({ k: 'gain', p: p, r: o.r, n: o.n }); break;
         case 'lose': P[o.r] = Math.max(0, P[o.r] - o.n); break;
-        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + o.r + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + o.r + ' production to lose.'); break; }
-        case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + o.r + '.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + o.r + ' to lose.'); break; }
+        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + (RW[o.r] || o.r) + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' production to lose.'); break; }
+        case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + (RW[o.r] || o.r) + '.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + (RW[o.r] || o.r) + ' to lose.'); break; }
         case 'temp': raise(p, 'temp', o.n); break;
         case 'oxy': raise(p, 'oxy', o.n); break;
         case 'tr': P.tr += o.n; ev({ k: 'tr', p: p, n: o.n }); break;
@@ -278,21 +279,24 @@
   }
 
   // ---------- scoring ----------
-  function awardMetric(p, m) {
+  function ownMapTiles(p) { var out = []; for (var s in G.tiles) { var t = G.tiles[s]; if (t.o === p && !MAP.OFFMAP[s] && MAP.spaces[s]) out.push(s); } return out; }
+  function goalMetric(p, m) {
     var P = G.pl[p];
-    if (m === 'tilesOnMap') return tilesOnMap(p);
-    if (m === 'mcProd') return P.prod.mc;
-    if (m === 'heat') return P.heat;
-    if (m === 'stProd') return P.prod.steel + P.prod.ti;
-    if (m.indexOf('tag:') === 0) return tagCount(p, m.slice(4));
+    if (m === 'tagKinds') { var k = {}; P.played.forEach(function (id) { var c = CARDS[id]; if (c && c.type !== 'event') (c.tags || []).forEach(function (t) { k[t] = 1; }); }); if (P.corp) (CORPS[P.corp].tags || []).forEach(function (t) { k[t] = 1; }); return Object.keys(k).length; }
+    if (m === 'gardenCity') return ownMapTiles(p).filter(function (s) { return G.tiles[s].t === 'city' && MAP.spaces[s].adj.filter(function (a) { return G.tiles[a] && G.tiles[a].t === 'greenery' && G.tiles[a].o === p; }).length >= 2; }).length;
+    if (m === 'prodKinds') return Object.keys(P.prod).filter(function (r) { return P.prod[r] > 0; }).length;
+    if (m === 'actions') return actionSources(p).length;
+    if (m === 'coastTiles') return ownMapTiles(p).filter(function (s) { return MAP.spaces[s].adj.some(function (a) { return G.tiles[a] && G.tiles[a].t === 'ocean'; }); }).length;
+    if (m === 'cardVP') { var v = 0; P.played.forEach(function (id) { v += cardVP(p, id); }); return v; }
+    if (m === 'ehProd') return P.prod.energy + P.prod.heat;
+    if (m === 'lasting') return P.played.filter(function (id) { return CARDS[id] && CARDS[id].type === 'active'; }).length;
+    if (m === 'stStock') return P.steel + P.ti;
+    if (m === 'edgeTiles') return ownMapTiles(p).filter(function (s) { return MAP.spaces[s].adj.length < 6; }).length;
     return 0;
   }
-  function mileMetric(p, m) {
-    var P = G.pl[p];
-    if (m === 'tr') return P.tr; if (m === 'cities') return cities(p); if (m === 'plantProd') return P.prod.plant;
-    if (m.indexOf('tag:') === 0) return tagCount(p, m.slice(4));
-    return 0;
-  }
+  function awardMetric(p, m) { return goalMetric(p, m); }
+  function mileMetric(p, m) { return goalMetric(p, m); }
+  function goalName(list, k) { var x = list.filter(function (a) { return a.k === k; })[0]; return x ? x.name : k; }
   function cardVP(p, id) {
     var c = card(id), P = G.pl[p]; if (!c || !c.vp) return 0;
     if (typeof c.vp === 'number') return c.vp;
@@ -471,8 +475,8 @@
       }
       case 'green': { var gc = greenCost(p); if (P.plant < gc || !legalSpaces(p, 'greenery').length) return false; P.plant -= gc; queueOps(p, [{ op: 'tile', t: 'greenery' }], 'conv'); break; }
       case 'heat': { if (P.heat < 8 || G.temp >= TEMP_MAX) return false; P.heat -= 8; queueOps(p, [{ op: 'temp', n: 1 }], 'conv'); break; }
-      case 'mile': { if (!mileOk(p, m.k)) return false; P.mc -= 8; G.milestones[m.k] = p; ev({ k: 'mile', p: p, m: m.k }); log(p, (p === 0 ? 'You' : 'Rival') + ' claimed the ' + m.k + ' milestone.'); break; }
-      case 'award': { if (!awardOk(p, m.k)) return false; P.mc -= AWARD_COST[G.awards.length]; G.awards.push(m.k); ev({ k: 'award', p: p, a: m.k }); log(p, (p === 0 ? 'You' : 'Rival') + ' funded the ' + m.k + ' award.'); break; }
+      case 'mile': { if (!mileOk(p, m.k)) return false; P.mc -= 8; G.milestones[m.k] = p; ev({ k: 'mile', p: p, m: m.k }); log(p, (p === 0 ? 'You' : 'Rival') + ' claimed the ' + goalName(MAP.MILESTONES, m.k) + ' milestone.'); break; }
+      case 'award': { if (!awardOk(p, m.k)) return false; P.mc -= AWARD_COST[G.awards.length]; G.awards.push(m.k); ev({ k: 'award', p: p, a: m.k }); log(p, (p === 0 ? 'You' : 'Rival') + ' funded the ' + goalName(MAP.AWARDS, m.k) + ' award.'); break; }
       case 'act': {
         if (!actOk(p, m.id, m.i)) return false;
         var a = card(m.id).action[m.i]; P.used[m.id] = true;

@@ -1,21 +1,26 @@
 // ===== part 4: drawers (cards, projects, actions, players, log) and pop-up choices =====
 function openSheet(kind, tab) {
   UI.sheet = kind; UI.tab = tab || UI.tab;
-  $('scrim').classList.add('on'); $('sheet').classList.add('on');
-  $('app').inert = true;
-  UI.refreshSheet();
+  $('sheet').classList.add('on');
+  if (!UI.pc) { $('scrim').classList.add('on'); $('app').inert = true; }
+  UI.sheetSig = ''; UI.refreshSheet(); $('shB').scrollTop = 0;
 }
-function closeSheet() { UI.sheet = null; $('sheet').classList.remove('on'); if (!$('modal').classList.contains('on')) $('scrim').classList.remove('on'); $('app').inert = false; }
+function closeSheet() { if (UI.pc && G && !$('start').style.display.match(/flex/)) { UI.tab = null; UI.sheet = 'cards'; UI.refreshSheet(); return; } UI.sheet = null; $('sheet').classList.remove('on'); if (!$('modal').classList.contains('on')) $('scrim').classList.remove('on'); $('app').inert = false; }
 function tabs(list, cur) { return list.map(function (t) { return '<button data-tab="' + t[0] + '" class="' + (t[0] === cur ? 'on' : '') + '">' + t[1] + '</button>'; }).join(''); }
-UI.refreshSheet = function () {
+UI.refreshSheet = function (auto) {
   var k = UI.sheet; if (!k || !G) return;
+  if (k === 'cards') {   // never re-sort the list under the finger: only rebuild when the hand itself changes
+    var sig = UI.tab + '|' + G.pl[0].hand.join() + '|' + G.pl[0].played.length;
+    if (auto && sig === UI.sheetSig) { $('shB').querySelectorAll('.cw[data-card]').forEach(function (b) { var id = b.getAttribute('data-card'), cd = b.querySelector('.card'); if (cd && G.pl[0].hand.indexOf(id) >= 0) cd.classList.toggle('no', !OH.playable(0, id)); }); return; }
+    UI.sheetSig = sig;
+  }
   var P = G.pl[0], T = '', B = '', title = '';
   if (k === 'cards') {
     var playable = P.hand.filter(function (id) { return OH.playable(0, id); });
     var tab = UI.tab === 'all' || UI.tab === 'played' || UI.tab === 'play' ? UI.tab : (playable.length ? 'play' : 'all');
     title = 'Your cards';
-    T = tabs([['play', 'Can play ' + playable.length], ['all', 'Hand ' + P.hand.length], ['played', 'Played ' + P.played.length]], tab);
-    var list = tab === 'play' ? playable : tab === 'all' ? P.hand.slice().sort(function (a, b) { return (OH.playable(0, b) ? 1 : 0) - (OH.playable(0, a) ? 1 : 0); }) : (P.corp ? [P.corp] : []).concat(P.played.slice().reverse());
+    T = tabs([['play', 'Can play ' + playable.length], ['all', 'Hand ' + P.hand.length + ' · by cost'], ['played', 'Played ' + P.played.length]], tab);
+    var list = tab === 'play' ? playable : tab === 'all' ? P.hand.slice().sort(function (a, b) { return OH.CARDS[a].cost - OH.CARDS[b].cost || (a < b ? -1 : 1); }) : (P.corp ? [P.corp] : []).concat(P.played.slice().reverse());
     B = list.length ? '<div class="grid">' + list.map(function (id) { return '<button class="cw" data-card="' + id + '" aria-label="' + esc(OH.card(id).name) + '">' + cardHTML(id, { no: tab !== 'played' && !OH.playable(0, id) }) + '</button>'; }).join('') + '</div>'
       : '<div class="empty">' + (tab === 'play' ? 'Nothing affordable yet. Try Projects, or pass to get income.' : 'No cards here.') + '</div>';
   } else if (k === 'proj') {
@@ -53,7 +58,7 @@ UI.refreshSheet = function () {
     title = p ? 'Rival' : 'You';
     T = tabs([['p0', 'You'], ['p1', 'Rival']], p ? 'p1' : 'p0');
     B = '<div class="row"><div class="rt"><b>' + esc(Q2.corp ? OH.card(Q2.corp).name : '—') + '</b><span>' + esc(Q2.corp ? OH.card(Q2.corp).text : '') + '</span></div></div>';
-    B += '<div style="margin:6px 0 10px">' + OH.RES.map(function (r) { return A.resPill(r, Q2[r]) + ' <small>+' + Q2.prod[r] + '</small>'; }).join(' ') + '</div>';
+    B += '<div style="margin:6px 0 10px">' + OH.RES.map(function (r) { return A.resPill(r, Q2[r]) + ' <small>' + (Q2.prod[r] >= 0 ? '+' : '') + Q2.prod[r] + '</small>'; }).join(' ') + '</div>';
     B += scoreTable(p);
     B += '<div class="gen-sep">Played cards (' + Q2.played.length + ')</div><div class="grid">' + Q2.played.slice().reverse().map(function (id) { return '<button class="cw" data-card="' + id + '" data-owner="' + p + '">' + cardHTML(id, { owner: p }) + '</button>'; }).join('') + '</div>';
   } else if (k === 'log') {
@@ -69,6 +74,7 @@ UI.refreshSheet = function () {
     else if (tb2 === 'r-board') B = boardRefHTML();
     else { var ty = tb2.slice(2); var cs = DATAC().cards.filter(function (c) { return c.type === ty; }); B = '<p style="opacity:.85;margin:2px">' + cs.length + ' cards</p><div class="grid">' + cs.map(function (c) { return '<div>' + cardHTML(c.id, { flavor: 1 }) + '</div>'; }).join('') + '</div>'; }
   }
+  $('sheet').classList.toggle('docked', !!UI.pc && k === 'cards');
   $('shT').textContent = title; $('shTabs').innerHTML = T; $('shTabs').style.display = T ? '' : 'none'; $('shB').innerHTML = B;
 };
 function DATAC() { return window.OH_DATA; }
@@ -86,7 +92,7 @@ function boardRefHTML() {
 $('shX').addEventListener('click', closeSheet);
 $('scrim').addEventListener('click', function () { if ($('modal').classList.contains('on')) { if (UI.modalClosable) closeModal(); return; } closeSheet(); });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if ($('modal').classList.contains('on')) { if (UI.modalClosable) closeModal(); } else if (UI.sheet) closeSheet(); } });
-$('shTabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (!b) return; UI.tab = b.getAttribute('data-tab'); UI.refreshSheet(); });
+$('shTabs').addEventListener('click', function (e) { var b = e.target.closest('[data-tab]'); if (!b) return; UI.tab = b.getAttribute('data-tab'); UI.refreshSheet(); $('shB').scrollTop = 0; });
 $('shB').addEventListener('click', function (e) {
   var t = e.target.closest('button'); if (!t) return;
   if (t.hasAttribute('data-card')) return showCard(t.getAttribute('data-card'), +(t.getAttribute('data-owner') || 0));
@@ -105,20 +111,27 @@ function modal(html, closable) {
   $('modal').classList.add('on'); $('scrim').classList.add('on'); $('app').inert = true;
   if (UI.modalClosable) $('mxb').addEventListener('click', closeModal);
 }
-function closeModal() { $('modal').classList.remove('on'); if (!UI.sheet) { $('scrim').classList.remove('on'); $('app').inert = false; } }
+function closeModal() { $('modal').classList.remove('on'); if (!UI.sheet || UI.pc) { $('scrim').classList.remove('on'); $('app').inert = false; } }
 $('modal').addEventListener('click', function (e) { if (e.target === $('modal') && UI.modalClosable) closeModal(); });
 function preview(m) {
   var G0 = OH.G, b = JSON.parse(JSON.stringify(G0)), out = [];
   OH.G = JSON.parse(JSON.stringify(G0)); OH.G.ev = []; OH.G.log = [];
   try {
     if (OH.performMove(m)) {
-      var a = OH.G.pl[0], z = b.pl[0];
-      OH.RES.forEach(function (r) { var d = a.prod[r] - z.prod[r]; if (d) out.push((d > 0 ? '+' : '') + d + ' ' + RN[r] + ' prod'); });
+      var a = OH.G.pl[0], z = b.pl[0], pay = m.t === 'play' ? OH.maxPay(0, OH.CARDS[m.id], OH.cardCost(0, m.id)) : {};
+      OH.RES.forEach(function (r) { var d = a.prod[r] - z.prod[r]; if (d) out.push((d > 0 ? '+' : '') + d + ' ' + RN[r] + ' production'); });
       if (a.tr - z.tr) out.push('+' + (a.tr - z.tr) + ' rating');
-      ['plant', 'steel', 'ti', 'heat', 'energy'].forEach(function (r) { var d = a[r] - z[r] + (m.t === 'play' && OH.maxPay(0, OH.CARDS[m.id], OH.cardCost(0, m.id))[r] || 0); if (d > 0) out.push('+' + d + ' ' + RN[r]); });
+      ['mc', 'plant', 'steel', 'ti', 'heat', 'energy'].forEach(function (r) { var d = a[r] - z[r] + (pay[r] || 0); if (d > 0) out.push('+' + d + ' ' + RN[r]); });
       var dh = a.hand.length - z.hand.length + (m.t === 'play' ? 1 : 0); if (dh > 0) out.push('+' + plural(dh, 'card'));
-      var r1 = OH.G.pl[1], r0 = b.pl[1]; OH.RES.forEach(function (r) { var d = r1.prod[r] - r0.prod[r]; if (d < 0) out.push('rival ' + d + ' ' + RN[r] + ' prod'); var e = r1[r] - r0[r]; if (e < 0) out.push('rival ' + e + ' ' + RN[r]); });
+      var rs = 0; for (var k in a.res) rs += (a.res[k] || 0) - (z.res[k] || 0); if (rs > 0) out.push('+' + rs + ' on a card');
+      var r1 = OH.G.pl[1], r0 = b.pl[1]; OH.RES.forEach(function (r) { var d = r1.prod[r] - r0.prod[r]; if (d < 0) out.push('rival ' + d + ' ' + RN[r] + ' production'); var e = r1[r] - r0[r]; if (e < 0) out.push('rival ' + e + ' ' + RN[r]); });
       if (OH.G.pending && OH.G.pending.h === 'place') out.push('place a tile');
+      if (m.t === 'play') {
+        var c = OH.CARDS[m.id];
+        if (c.vp) out.push(typeof c.vp === 'number' ? (c.vp > 0 ? c.vp + ' VP at the end' : c.vp + ' VP at the end') : 'VP at the end (' + vpWords(c.vp) + ')');
+        if (c.type === 'active' && c.action && c.action.length) out.push('a new action each round');
+        if (c.type === 'active' && c.effect && c.effect.length) out.push('a lasting effect');
+      }
     }
   } catch (e) { }
   OH.G = G0;
@@ -132,7 +145,7 @@ function showCard(id, owner) {
       var cost = OH.cardCost(0, id), pay = OH.maxPay(0, c, cost), parts = [];
       if (pay.steel) parts.push(pay.steel + ' steel'); if (pay.ti) parts.push(pay.ti + ' titanium'); if (pay.heat) parts.push(pay.heat + ' heat'); parts.push(pay.mc + ' credits');
       var gets = my ? preview({ t: 'play', id: id }) : [];
-      if (my) h += '<div class="' + (gets.length ? 'row' : 'why') + '" style="min-height:0;margin-top:8px">' + (gets.length ? 'You get now: ' + esc(gets.join(', ')) : 'Careful: this gives you nothing right now.') + '</div>';
+      if (my) h += '<div class="' + (gets.length ? 'row' : 'why') + '" style="min-height:0;margin-top:8px">' + (gets.length ? 'Gives: ' + esc(gets.join(', ')) : 'No gain right now. Check the card text.') + '</div>';
       h += '<button class="btn pickable" id="mPlay"' + (my ? '' : ' disabled') + '>Play it<small>Pay ' + parts.join(' + ') + (my ? '' : ' · wait for your turn') + '</small></button>';
     } else h += '<div class="why">' + esc(whyNot(0, id)) + '</div>';
     h += '<button class="btn alt" id="mSell"' + (my ? '' : ' disabled') + '>Sell for 1 credit</button>';
@@ -161,19 +174,20 @@ function showPickRes() {
   modal('<h3>Add ' + d.n + ' ' + esc(d.kind) + '</h3><p style="margin:0 0 4px">Which card gets it?</p>' + d.cards.map(function (id) { return '<button class="btn cr pickable" data-pr="' + id + '">' + esc(OH.card(id).name) + '<small>' + (G.pl[0].res[id] || 0) + ' there now · ' + esc(vpWords(OH.card(id).vp)) + '</small></button>'; }).join(''), false);
   $('mb').querySelectorAll('[data-pr]').forEach(function (b) { b.addEventListener('click', function () { closeModal(); doMove({ t: 'pickres', id: b.getAttribute('data-pr') }); }); });
 }
-function suggestBuys(ids, budget) { try { var save = OH.G; var r = OHAI_buys(ids, budget); OH.G = save; return r; } catch (e) { return []; } }
+function suggestBuys(ids, budget) { try { var save = OH.G; var r = OHAI.chooseBuys(0, ids, Math.max(0, budget), 'normal'); OH.G = save; return r; } catch (e) { return []; } }
 function OHAI_buys(ids, budget) { var sc = ids.map(function (id) { return { id: id, w: OHAI.cardWorth(0, id) }; }).sort(function (a, b) { return b.w - a.w; }), out = []; sc.forEach(function (s) { if (s.w > 2 && (out.length + 1) * 3 <= budget) out.push(s.id); }); return out; }
 function showSetup() {
   var P = G.pl[0], st = UI.setup || (UI.setup = { step: 0, corp: null, keep: {} });
   if (st.step === 0) {
     var cs = P.offer.corps.slice(); if (cs.indexOf('c00') < 0 && UI.tut) cs.push('c00');
-    modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { return '<button class="cw pickable" data-corp="' + id + '">' + cardHTML(id, { flavor: 1 }) + '</button>'; }).join('') + '</div>', false);
+    var first = UI.tut || !LS.get('oh_done'); if (cs.indexOf('c00') >= 0) { cs.splice(cs.indexOf('c00'), 1); cs.unshift('c00'); }
+    modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { var rec = first && id === 'c00'; return '<button class="cw pickable" data-corp="' + id + '">' + (rec ? '<span class="recb">Best for a first game</span>' : '') + cardHTML(id, { flavor: 1, pick: rec, chk: 'Pick' }) + '</button>'; }).join('') + '</div>', false);
     $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); if (!OH.CORPS[st.corp].beginner) coachShow('keep'); showSetup(); }); });
     coachShow('corp'); return;
   }
   var C = OH.CORPS[st.corp], n = Object.keys(st.keep).length, beg = !!C.beginner;
   modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Suggested ones are marked.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
-  $('mb').querySelectorAll('[data-keep]').forEach(function (b) { b.addEventListener('click', function () { if (beg) return; var id = b.getAttribute('data-keep'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= C.mc) st.keep[id] = 1; showSetup(); }); });
+  $('mb').querySelectorAll('[data-keep]').forEach(function (b) { b.addEventListener('click', function () { if (beg) { b.querySelector('.card').classList.remove('pop'); void b.offsetWidth; b.querySelector('.card').classList.add('pop'); toast('<b>' + esc(OH.card(b.getAttribute('data-keep')).name) + ': kept</b>Open Charter keeps all 10 cards for free.', true, 2000, { now: true, key: 'beg' }); return; } var id = b.getAttribute('data-keep'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= C.mc) st.keep[id] = 1; else { toast('Not enough credits: each card costs 3.', true, 2000, { now: true, key: 'buy' }); return; } showSetup(); }); });
   $('mKeep').addEventListener('click', function () { var m = { t: 'setup', corp: st.corp, buy: Object.keys(st.keep) }; UI.setup = null; closeModal(); doMove(m); });
   $('mBack').addEventListener('click', function () { st.step = 0; showSetup(); });
 }
@@ -181,8 +195,8 @@ function showResearch() {
   var P = G.pl[0], st = UI.research;
   if (!st || st.gen !== G.gen) { st = UI.research = { gen: G.gen, keep: {} }; suggestBuys(P.research, P.mc - 3).forEach(function (id) { st.keep[id] = 1; }); }
   var n = Object.keys(st.keep).length;
-  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Buy for 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw pickable" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
-  $('mb').querySelectorAll('[data-rk]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-rk'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= P.mc) st.keep[id] = 1; showResearch(); }); });
+  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Tap a card to buy or skip it. 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw pickable" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
+  $('mb').querySelectorAll('[data-rk]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-rk'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= P.mc) st.keep[id] = 1; else { toast('Not enough credits: each card costs 3.', true, 2000, { now: true, key: 'buy' }); return; } showResearch(); }); });
   $('mBuy').addEventListener('click', function () { closeModal(); doMove({ t: 'buy', ids: Object.keys(st.keep) }); });
   coachShow('research');
 }
@@ -201,7 +215,7 @@ function showPass() {
   if (G.acts === 1) { doMove({ t: 'end' }); return; }
   var playN = G.pl[0].hand.filter(function (id) { return OH.playable(0, id); }).length;
   if (!playN && G.pl[0].mc < 11) { doMove({ t: 'pass' }); return; }
-  modal('<h3>Pass this round?</h3><p>You sit out until next round. ' + (playN ? 'You can still play ' + plural(playN, 'card') + '.' : '') + '</p><button class="btn" id="mPassY">Yes, pass</button><button class="btn alt" id="mPassN">Keep playing</button>');
+  modal('<h3>Pass this round?</h3><p>You sit out until next round. Income next round: <b>+' + (G.pl[0].prod.mc + G.pl[0].tr) + ' credits</b>. ' + (playN ? 'You can still play ' + plural(playN, 'card') + '.' : '') + '</p><button class="btn" id="mPassY">Yes, pass</button><button class="btn alt" id="mPassN">Keep playing</button>');
   $('mPassY').addEventListener('click', function () { closeModal(); doMove({ t: 'pass' }); });
   $('mPassN').addEventListener('click', closeModal);
 }

@@ -14,10 +14,39 @@ function sfx(k) {
   } catch (e) { }
 }
 function vib(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { } }
-function toast(html, me, ms) {
-  var d = document.createElement('div'); d.className = 'tst' + (me ? ' me' : ''); d.innerHTML = html;
-  var box = $('toast'); while (box.children.length > 1) box.removeChild(box.firstChild);
-  box.appendChild(d); setTimeout(function () { d.remove(); }, ms || 2400);
+// one helper at a time (R99): coach bubbles and toasts share one queue; user-asked toasts jump the line
+var HQ = [], HCUR = null;
+function toast(html, me, ms, o) {
+  o = o || {};
+  var it = { html: html, me: me, ms: ms || 2400, key: o.key || '' };
+  if (it.key) HQ = HQ.filter(function (x) { return x.key !== it.key; });
+  if (o.drop) HQ = HQ.filter(function (x) { return o.drop.indexOf(x.key) < 0; });
+  if (o.now) {
+    if (HCUR && HCUR.coach) { $('coach').classList.remove('on'); clearTimeout(HCUR.tm); HQ.unshift(HCUR); HCUR = null; }
+    else if (HCUR) helperEnd(true);
+    HQ.unshift(it);
+  } else { HQ.push(it); while (HQ.length > 4) HQ.splice(HQ.findIndex(function (x) { return !x.coach; }), 1); }
+  helperNext();
+}
+function helperNext() {
+  if (HCUR) return;
+  var it = HQ.shift(); if (!it) return;
+  HCUR = it;
+  if (it.coach) {
+    UI.coachDone[it.k] = 1; UI.coachKey = it.k;
+    $('coachT').textContent = COACH[it.k]; $('coach').classList.add('on');
+    if (it.k === 'goal' || it.k === 'bonus') ['gTemp', 'gOxy', 'gOcean'].forEach(function (g) { $(g).classList.remove('pulse'); void $(g).offsetWidth; $(g).classList.add('pulse'); });
+    it.tm = setTimeout(function () { if (HCUR === it) coachHide(); }, 12000);
+    return;
+  }
+  var d = document.createElement('div'); d.className = 'tst' + (it.me ? ' me' : ''); d.innerHTML = it.html;
+  var box = $('toast'); box.innerHTML = ''; box.appendChild(d); it.el = d;
+  it.tm = setTimeout(function () { if (HCUR === it) helperEnd(); }, it.ms);
+}
+function helperEnd(noNext) {
+  if (!HCUR || HCUR.coach) return;
+  clearTimeout(HCUR.tm); if (HCUR.el) HCUR.el.remove(); HCUR = null;
+  if (!noNext) helperNext();
 }
 function floatAt(x, y, txt, col) {
   var d = document.createElement('div'); d.className = 'float'; d.textContent = txt; d.style.left = (x - 30) + 'px'; d.style.top = (y - 14) + 'px'; if (col) d.style.color = col;
@@ -40,23 +69,24 @@ function playEvents() {
         var gid = e.k === 'temp' ? 'gTemp' : 'gOxy'; $(gid).classList.remove('pulse'); void $(gid).offsetWidth; $(gid).classList.add('pulse');
         var c2 = elCenter(e.p === 0 ? 'syou' : 'sriv'); floatAt(c2[0], c2[1] + 20, '+1 rating'); sfx('raise');
       } else if (e.k === 'tr' && e.p >= 0) { var c3 = elCenter(e.p === 0 ? 'syou' : 'sriv'); floatAt(c3[0], c3[1] + 20, '+' + e.n + ' rating'); if ($('gOcean')) { $('gOcean').classList.remove('pulse'); void $('gOcean').offsetWidth; $('gOcean').classList.add('pulse'); } }
-      else if (e.k === 'production') { toast('<b>Income!</b>Credits = production + rating', true, 2200); sfx('win'); }
+      else if (e.k === 'production') { toast('<b>Income!</b>Credits = credit production + rating', true, 2200, { key: 'inc' }); sfx('win'); }
     }, d);
     if (e.k === 'tile' || e.k === 'temp' || e.k === 'oxy') d += UI.AIDELAY > 100 ? 260 : 0;
   })(evs[i]);
   // rival lines become toasts
   var rl = logs.filter(function (l) { return l.p === 1; });
   if (rl.length) { UI.rivalLine = rl[rl.length - 1].s.replace(/\.$/, '').split(' ').slice(0, 8).join(' '); UI.rivalLines = (UI.rivalLines || []).concat(rl.map(function (l) { return l.s; })).slice(-6); }
-  if (rl.length) { var pl = G.ev.slice(seen).filter(function (e) { return e.k === 'play' && e.p === 1; })[0]; toast((pl ? '<b>Rival: ' + esc(OH.card(pl.id).name) + '</b>' + esc(OH.card(pl.id).text) : '<b>Rival</b>') + (pl ? '' : esc(rl.map(function (l) { return l.s.replace(/^Rival /, ''); }).join(' '))), false, Math.max(2200, UI.AIDELAY * 2.2)); }
+  var pls = G.ev.slice(seen).filter(function (e) { return e.k === 'play' && e.p === 1; });
+  pls.forEach(function (pl) { var c = OH.card(pl.id); toast('<b>Rival plays ' + esc(c.name) + '</b>' + esc(c.text), false, Math.max(2200, UI.AIDELAY * 2.2), { key: 'rv' + pl.id }); });
   return d;
 }
 function save() { if (!G || UI.scn) return; LS.set('oh_save', JSON.stringify({ G: OH.G, level: UI.level, tut: UI.tut, coach: UI.coachDone })); }
 function doMove(m) {
   if (UI.busy && !m.force) return false;
   var ok = OH.performMove(m);
-  if (!ok) { sfx('bad'); toast('That move is not allowed right now.', true); return false; }
+  if (!ok) { sfx('bad'); toast('That move is not allowed right now.', true, 2400, { now: true }); return false; }
   if (m.t === 'play') sfx('card');
-  UI.sel = null;
+  UI.sel = null; UI.lastMove = m.t;
   var d = playEvents();
   render(); save();
   coachCheck(m);
@@ -82,11 +112,18 @@ function pump() {
     return;
   }
   UI.busy = false;
+  if (UI.autoZ && !(G.pending && G.pending.h === 'place')) { UI.autoZ = false; fitView(); }
   if (p !== 0) return;
-  if (UI.rivalLines && UI.rivalLines.length && G.phase === 'action' && !G.pending) { toast('<b>Your turn. The rival:</b>' + UI.rivalLines.slice(-4).map(function (s) { return esc(s.replace(/^Rival /, '')); }).join('<br>'), true, 4200); }
+  if (UI.rivalLines && UI.rivalLines.length && G.phase === 'action' && !G.pending) {
+    var rvl = UI.rivalLines.slice(-4).map(function (s) { return s.replace(/^Rival /, '').replace(/\.$/, ''); });
+    var drop = HQ.filter(function (x) { return /^rv/.test(x.key); }).map(function (x) { return x.key; });
+    if (rvl.length === 1 && /^passed/.test(rvl[0])) toast('<b>Rival passed</b>It is out this round. Your turn again.', true, 3600, { key: 'sum', drop: drop });
+    else toast('<b>Your turn. The rival:</b>' + rvl.map(esc).join('<br>') + (G.pl[1].passed ? '<br><b>Rival is out this round</b>' : ''), true, 4200, { key: 'sum', drop: drop });
+  } else if (UI.lastMove === 'end' && G.pl[1].passed && G.phase === 'action' && !G.pending) toast('<b>Rival is out</b>Your turn again. Pass when you are done.', true, 2600, { key: 'out' });
+  UI.lastMove = '';
   UI.rivalLine = ''; UI.rivalLines = [];
   if (G.pending) {
-    if (G.pending.h === 'place') { closeModal(); closeSheet(); var pd = G.pending.d; if (pd.spaces.length && UI.view.s > 1.05) focusSpace(pd.spaces[0]); coachShow('place'); return; }
+    if (G.pending.h === 'place') { closeModal(); closeSheet(); var pd = G.pending.d; var mapS = pd.spaces.filter(function (x) { return M.spaces[x]; }); if (mapS.length && hexPx() < 47) autoZoomPlace(mapS); else if (pd.spaces.length && UI.view.s > 1.05) focusSpace(pd.spaces[0]); coachShow('place'); return; }
     if (G.pending.h === 'choose') return showChoose();
     if (G.pending.h === 'pickres') return showPickRes();
   }

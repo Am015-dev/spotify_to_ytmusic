@@ -49,67 +49,102 @@ function startGame(o) {
   UI.level = o.level || UI.level; UI.tut = !!o.tut; UI.draft = !!o.draft; UI.setup = null; UI.research = null; UI.coachDone = {};
   OH.newGame({ seed: o.seed || (o.tut ? 20261120 : (Date.now() % 1e9)), draft: UI.draft, beginner: true });
   UI.evSeen = 0; UI.logSeen = 0;
-  hideStart(); closeModal(); closeSheet(); fitView(); render(); save(); pump();
+  hideStart(); closeModal(); closeSheet(); if (UI.pc) openSheet('cards'); fitView(); render(); save(); pump();
 }
 function loadGame() {
-  try { var d = JSON.parse(LS.get('oh_save')); OH.G = d.G; UI.level = d.level || 'normal'; UI.tut = !!d.tut; UI.coachDone = d.coach || {}; UI.evSeen = OH.G.ev.length; UI.logSeen = OH.G.log.length; hideStart(); fitView(); pump(); }
+  try { var d = JSON.parse(LS.get('oh_save')); OH.G = d.G; UI.level = d.level || 'normal'; UI.tut = !!d.tut; UI.coachDone = d.coach || {}; UI.evSeen = OH.G.ev.length; UI.logSeen = OH.G.log.length; hideStart(); if (UI.pc) openSheet('cards'); fitView(); pump(); }
   catch (e) { LS.del('oh_save'); showStart(); }
 }
 // ---------- coach (learn to play: one bubble at a time, 12 words or fewer) ----------
 var COACH = {
-  corp: 'Pick a company. Open Charter is the simple one.',
+  corp: 'Pick a company. Open Charter is best for a first game.',
   keep: 'Keep cards you can use soon. Each costs 3.',
-  goal: 'Warm it, give it air, fill the oceans. Each step: +1 point.',
+  goal: 'Warm it, give it air, fill the oceans. Each step: +1 rating.',
   cards: 'Tap Cards. Play one: pay its cost, get its effect.',
-  turn2: 'You get two actions, then the rival takes a turn.',
+  turn2: 'Take 1 or 2 actions, then the rival plays.',
+  rating: 'Rating counts as points. Cards, tiles and goals add more.',
+  prod: 'Production pays you every round. Income cards early pay most.',
   place: 'Tap a glowing space, see the bonus, tap again to build.',
   proj: 'Projects never run out. Comet strike warms the planet.',
   pass: 'Out of money? Pass. Income comes when both pass.',
-  research: 'New round: buy cards you like, 3 credits each.',
+  research: 'Tap a card to buy or skip it. 3 credits each.',
   research2: 'Income = credit production + your rating. Grow both.',
+  bonus: 'White marks on gauges give a bonus: heat production, an ocean.',
+  vp: 'VP on a card means points at the end. Not rating.',
   plants: 'Glowing plants? Tap them: 8 plants make a greenery.',
   goals: 'Projects tab holds milestones and awards: 5 points each.',
+  out: 'Rival is out. Keep taking turns until you pass too.',
   end: 'Game ends when all three gauges hit their goals.'
 };
 function coachShow(k) {
   if (!UI.tut || UI.coachDone[k] || UI.scn) return;
-  if ($('coach').classList.contains('on')) return;   // one helper at a time
+  if (HCUR && HCUR.coach || HQ.some(function (x) { return x.coach; })) return;   // one helper at a time
   if (k === 'turn') {
     var P = G.pl[0], playN = P.hand.filter(function (id) { return OH.playable(0, id); }).length;
-    var when = { cards: true, turn2: G.acts === 1, proj: UI.coachDone.cards && G.acts === 0 && G.gen >= 1 && UI.coachDone.turn2, plants: P.plant >= OH.greenCost(0), pass: !playN && P.mc < 14, goals: G.gen >= 3, end: G.gen >= 4 };
-    var order = ['cards', 'turn2', 'plants', 'proj', 'pass', 'goals', 'end'];
+    var hasVP = P.hand.concat(P.played).some(function (id) { return OH.CARDS[id] && OH.CARDS[id].vp; });
+    var when = { cards: true, turn2: G.acts === 1, rating: P.tr > 20, prod: UI.coachDone.turn2 && G.acts === 0, out: G.pl[1].passed, bonus: G.temp >= -26 || G.oxy >= 6, vp: hasVP && UI.coachDone.rating, plants: P.plant >= OH.greenCost(0), proj: UI.coachDone.cards && G.acts === 0 && UI.coachDone.turn2, pass: !playN && P.mc < 14, goals: G.gen >= 3, end: G.gen >= 4 };
+    var order = ['cards', 'turn2', 'rating', 'out', 'plants', 'prod', 'bonus', 'vp', 'proj', 'pass', 'goals', 'end'];
     for (var i = 0; i < order.length; i++) if (!UI.coachDone[order[i]] && when[order[i]]) { k = order[i]; break; }
     if (k === 'turn') return;
   }
-  UI.coachDone[k] = 1; UI.coachKey = k;
-  $('coachT').textContent = COACH[k]; $('coach').classList.add('on');
-  if (k === 'goal') { ['gTemp', 'gOxy', 'gOcean'].forEach(function (g) { $(g).classList.remove('pulse'); void $(g).offsetWidth; $(g).classList.add('pulse'); }); }
+  HQ.push({ coach: true, k: k, key: 'coach' }); helperNext();
 }
-function coachHide() { $('coach').classList.remove('on'); }
+function coachHide() {
+  $('coach').classList.remove('on');
+  if (HCUR && HCUR.coach) { clearTimeout(HCUR.tm); HCUR = null; helperNext(); }
+}
 $('coachB').addEventListener('click', function () { coachHide(); });
-function coachCheck(m) { if (!UI.tut) return; if ($('coach').classList.contains('on') && (m.t === 'play' || m.t === 'place' || m.t === 'setup' || m.t === 'buy' || m.t === 'pass')) coachHide(); }
-// ---------- suggestion (lightbulb): the computer's own pick for you ----------
+function coachCheck(m) {
+  if (!UI.tut) return;
+  if (m.t === 'play' || m.t === 'place' || m.t === 'setup' || m.t === 'buy' || m.t === 'pass') { HQ = HQ.filter(function (x) { return !x.coach; }); if (HCUR && HCUR.coach) coachHide(); }
+}
+// ---------- suggestion (lightbulb): the computer's own pick for you, with a one-line why ----------
+function suggestWords(m) {
+  var g = function () { var w = preview(m); return w.length ? w.slice(0, 3).join(', ') : ''; };
+  if (m.t === 'play') { var c = OH.card(m.id), w = g(); return ['Play ' + c.name, m.why === 'income' ? 'Income card: it pays you every round.' : (w ? 'Gives: ' + w + '.' : 'Best value in your hand.')]; }
+  if (m.t === 'std') return ['Projects: ' + OH.STD_NAME[m.k], { power: 'More energy every round.', asteroid: 'Warms the planet: +1 rating.', aquifer: 'An ocean: +1 rating and a bonus.', greenery: 'Greenery: +1 point and more air.', city: 'A city: +1 credit production.' }[m.k] || ''];
+  if (m.t === 'place') return ['Build on the highlighted space', 'It has the best bonus.'];
+  if (m.t === 'green') return ['Tap your plants: plant a greenery', '+1 point and more air.'];
+  if (m.t === 'heat') return ['Tap your heat: warm the air', '+1 rating for 8 heat.'];
+  if (m.t === 'act') { var a = OH.card(m.id).action[m.i || 0]; return ['Actions: use ' + OH.card(m.id).name, opsWords(a.do) + '.']; }
+  if (m.t === 'mile') return ['Projects, Milestones: claim ' + M.MILESTONES.filter(function (x) { return x.k === m.k; })[0].name, '5 points for 8 credits.'];
+  if (m.t === 'award') return ['Projects, Awards: fund ' + M.AWARDS.filter(function (x) { return x.k === m.k; })[0].name, 'You lead it: 5 points at the end.'];
+  if (m.t === 'sell') return ['Sell cards you cannot use', '1 credit each.'];
+  if (m.t === 'end') return ['End your turn', 'Save your credits for later.'];
+  if (m.t === 'pass') return ['Pass for this round', 'Next income: +' + (G.pl[0].prod.mc + G.pl[0].tr) + ' credits.'];
+  return ['Choose an option', ''];
+}
 $('hintbtn').addEventListener('click', function () {
-  if (!G || OH.sideToAct() !== 0 || G.phase !== 'action' && !G.pending) { toast('Suggestions work on your turn.', true); return; }
-  var m = OHAI.decide('normal'); if (!m) return;
-  var t = m.t === 'play' ? 'Play ' + OH.card(m.id).name : m.t === 'std' ? 'Use ' + OH.STD_NAME[m.k] : m.t === 'place' ? 'Build on the highlighted space' : m.t === 'green' ? 'Plant a greenery' : m.t === 'heat' ? 'Warm the air with heat' : m.t === 'act' ? 'Use ' + OH.card(m.id).name : m.t === 'mile' ? 'Projects, Milestones: claim ' + m.k : m.t === 'award' ? 'Projects, Awards: fund ' + m.k : m.t === 'sell' ? 'Sell cards you cannot use' : m.t === 'end' ? 'End your turn' : m.t === 'pass' ? 'Pass for this round' : 'Choose an option';
-  if (m.t === 'place') { UI.sel = m.s; renderBoard(); }
-  toast('<b>Try this</b>' + esc(t), true, 3000);
+  if (!G || OH.sideToAct() !== 0 || G.phase !== 'action' && !G.pending) { toast('Suggestions work on your turn.', true, 2000, { now: true }); return; }
+  var m = OHAI.suggest(0); if (!m) return;
+  var t = suggestWords(m);
+  if (m.t === 'place') { UI.sel = m.s; focusSpace(m.s); renderBoard(); }
+  toast('<b>Try this</b>' + esc(t[0]) + (t[1] ? '<br><small>' + esc(t[1]) + '</small>' : ''), true, 3600, { now: true, key: 'hint' });
 });
 // ---------- end screen ----------
 function showEnd() {
   if (UI.endShown === G.seed + ':' + G.gen) return; UI.endShown = G.seed + ':' + G.gen;
-  var s0 = G.final[0], s1 = G.final[1], win = G.winner === 0;
+  var s0 = G.final[0], s1 = G.final[1], win = G.winner === 0; LS.set('oh_done', '1');
   sfx(win ? 'win' : 'bad'); LS.del('oh_save');
   var row = function (n, k) { return '<tr><td>' + n + '</td><td>' + s0[k] + '</td><td>' + s1[k] + '</td></tr>'; };
   modal('<h3>' + (win ? 'You win!' : 'Rival wins') + '</h3><p>' + (win ? 'Ochre remembers your name.' : 'So close. The red world waits.') + ' Generation ' + G.gen + '.</p><table class="sc2"><tr><td></td><td>You</td><td>Rival</td></tr>' + row('Rating', 'tr') + row('Milestones', 'mile') + row('Awards', 'award') + row('Greeneries', 'green') + row('Cities', 'city') + row('Cards', 'cards') + '<tr class="tot"><td>Total</td><td>' + s0.total + '</td><td>' + s1.total + '</td></tr></table><button class="btn" id="mAgain">Play again</button><button class="btn alt" id="mHome">Title screen</button>', false);
   $('mAgain').addEventListener('click', function () { closeModal(); startGame({ level: UI.level, draft: UI.draft }); });
   $('mHome').addEventListener('click', function () { closeModal(); showStart(); });
 }
+// ---------- PC (wide screen, mouse): map in the middle, cards docked left, rival panel right ----------
+function setPC() {
+  var pc = window.matchMedia && matchMedia('(min-width: 1100px) and (min-height: 620px)').matches;
+  if (pc === UI.pc) return;
+  UI.pc = pc; document.body.classList.toggle('pc', pc);
+  if (pc) { $('scrim').classList.remove('on'); $('app').inert = false; if (G && G.pl) openSheet(UI.sheet || 'cards', UI.tab); renderRival(); }
+  else if (UI.sheet) { UI.sheet = null; $('sheet').classList.remove('on'); }
+  setTimeout(applyView, 30);
+}
 // ---------- boot ----------
 (function boot() {
   UI.sound = LS.get('oh_sound') !== '0'; UI.level = LS.get('oh_level') || 'normal';
   buildBoard();
+  setPC(); window.addEventListener('resize', setPC);
   if (window.GXV && GXV.watch) GXV.watch(function () { applyView(); }); else window.addEventListener('resize', applyView);
   if (window.ResizeObserver) new ResizeObserver(function () { applyView(); }).observe($('bw'));
   UI.ready = true;

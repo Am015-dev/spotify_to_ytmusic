@@ -43,7 +43,7 @@ rules), written from the builder's own knowledge. Items marked [unverified] coul
 ## Simplified on purpose (interface only, never rules)
 - Payment is chosen automatically (titanium/steel first, never overpaying beyond one unit); [the original lets you pick the mix].
 - "Decrease any production" always targets the rival; the original also lets you target yourself if you want [unverified edge].
-- Card effects that trigger on your own tags don't trigger on the card that creates them.
+- Card effects that trigger on your own tags don't trigger on the card that creates them [unverified: believed to match the original, where only cards that say "including this" count themselves; rules-test asserts it].
 
 ## Not in this version
 - Solo rules and the 3-5 player game (this is a 2-player game: you vs a computer rival). No expansion content.

@@ -129,7 +129,7 @@
     var scored = mv.map(function (m) { return { m: m, v: tryMove(m, p, 0) }; });
     var passV = evalState(G, p) - (level === 'easy' ? 0.5 : AI.PASSOFF);   // value of doing nothing (easy gives up sooner)
     scored.forEach(function (s) { if (s.m.t === 'pass') s.v = passV - 0.01; if (s.m.t === 'end') s.v = passV; });
-    if (level === 'easy') { scored = scored.filter(function (s) { return s.m.t !== 'mile' && s.m.t !== 'award'; }); scored.forEach(function (s) { s.v += Math.random() * 16; if (s.m.t === 'pass') s.v += 6; }); }
+    if (level === 'easy') { scored = scored.filter(function (s) { return s.m.t !== 'award'; }); scored.forEach(function (s) { s.v += Math.random() * 14; if (s.m.t === 'pass') s.v += 2; }); }
     scored.sort(function (a, b) { return b.v - a.v; });
     var top = scored[0].m;
     // awards: fund only when clearly ahead
@@ -138,6 +138,24 @@
   }
   // how good a move is, in words (for the hint): same evaluation as decide()
   function rank(level) { return decide(level || 'normal'); }
-  var AI = root.OHAI = { PASSOFF: +(typeof process !== 'undefined' && process.env.OH_PASSOFF) || 4, decide: decide, rank: rank, value: value, gensLeft: gensLeft, cardWorth: cardWorth };
+  // the lightbulb: normal play, but early on it steers newcomers to income cards (R99: early game felt stuck at 0 credits)
+  function incomeOf(id) { var n = 0; (OH.CARDS[id].play || []).forEach(function (o) { if (o.op === 'prod' && o.r === 'mc' && o.n > 0) n += o.n; }); return n; }
+  function suggest(p) {
+    var m = decide('normal'), G = OH.G; if (!m) return m;
+    if (G.phase !== 'action' || G.pending) return m;
+    if (m.t === 'play' && incomeOf(m.id) > 0) { m.why = 'income'; return m; }
+    if (G.gen <= 4 && (m.t === 'end' || m.t === 'pass' || m.t === 'std' || m.t === 'sell')) {
+      var inc = G.pl[p].hand.filter(function (id) { return OH.playable(p, id) && incomeOf(id) > 0; }).sort(function (a, b) { return incomeOf(b) - incomeOf(a); });
+      if (inc.length) return { t: 'play', id: inc[0], why: 'income' };
+    }
+    // a newcomer who passes with cards they can play feels stuck: offer the best play instead
+    if (m.t === 'pass' || m.t === 'end') {
+      var best = null, bv = -1e9;
+      OH.validMoves().forEach(function (x) { if (x.t !== 'play') return; var v = tryMove(x, p, 0); if (v > bv) { bv = v; best = x; } });
+      if (best && bv > evalState(G, p) - 1) return best;
+    }
+    return m;
+  }
+  var AI = root.OHAI = { suggest: suggest, chooseBuys: chooseBuys, incomeOf: incomeOf, PASSOFF: +(typeof process !== 'undefined' && process.env.OH_PASSOFF) || 4, decide: decide, rank: rank, value: value, gensLeft: gensLeft, cardWorth: cardWorth };
   if (typeof module !== 'undefined') module.exports = AI;
 })(typeof window !== 'undefined' ? window : globalThis);

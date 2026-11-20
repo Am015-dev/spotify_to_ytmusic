@@ -139,7 +139,7 @@ function tapSpace(s) {
     else if (S.reserved) parts.push('Reserved: only one card can build here');
     var g = gainsAt(0, 'city', s).filter(function (x) { return !/VP/.test(x); }); parts.push(g.length ? 'Bonus: ' + g.join(', ') : 'No bonus');
   }
-  toast(parts.join(' · '), true, 1800);
+  toast(parts.join(' · '), true, 1800, { now: true, key: 'space' });
 }
 function confirmPlace() {
   var pend = G.pending && G.pending.d; if (!pend || !UI.sel) return;
@@ -151,4 +151,11 @@ $('zin').addEventListener('click', function () { zoomBy(1.4); });
 $('zout').addEventListener('click', function () { zoomBy(1 / 1.4); });
 $('zfit').addEventListener('click', fitView);
 function hexCenterPx(s) { var xy = spaceXY(s), svg = $('board'), m = svg.getScreenCTM(); if (!m) return null; var pt = svg.createSVGPoint(); pt.x = xy[0]; pt.y = xy[1]; var q = pt.matrixTransform(m); return [q.x, q.y]; }
+// taps >= 44 px (R99): when you place a tile on a small screen, zoom so each hex is at least 46 px wide
+function hexPx() { var sz = bwSize(); return HR * SQ3 * Math.min(sz[0], sz[1]) / 420 * UI.view.s; }
+function autoZoomPlace(spaces) {
+  var px = hexPx(); if (px >= 47 || !spaces.length) return;
+  var xs = 0, ys = 0; spaces.forEach(function (s) { var xy = spaceXY(s); xs += xy[0]; ys += xy[1]; });
+  UI.view.s = Math.min(3.2, UI.view.s * 48 / px); UI.view.x = xs / spaces.length; UI.view.y = ys / spaces.length; clampView(); applyView(); UI.autoZ = true;
+}
 function focusSpace(s) { if (UI.view.s > 1.05) { var xy = spaceXY(s); UI.view.x = xy[0]; UI.view.y = xy[1]; clampView(); applyView(); } }

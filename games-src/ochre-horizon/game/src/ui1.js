@@ -130,7 +130,8 @@ function renderBar() {
   var ready = 0; OH.actionSources(0).forEach(function (id) { OH.card(id).action.forEach(function (a, i) { if (OH.actOk(0, id, i)) ready++; }); });
   $('bActS').textContent = ready + ' ready';
   $('bPassT').textContent = G.acts === 1 ? 'Done' : 'Pass';
-  $('bPassS').textContent = G.acts === 1 ? 'end turn' : 'out this round';
+  $('bPassS').textContent = G.acts === 1 ? (G.pl[1].passed ? 'turn comes back' : 'end turn') : 'income +' + (P.prod.mc + P.tr);
+  $('bPass').setAttribute('aria-label', G.acts === 1 ? 'Done, end turn' : 'Pass. Income next round: ' + (P.prod.mc + P.tr) + ' credits');
   ['bProj', 'bAct', 'bPass'].forEach(function (b) { $(b).disabled = !my; });
   $('bCards').disabled = false;
 }
@@ -142,14 +143,27 @@ function hintNow() {
   if (G.over) return 'Game over';
   var p = OH.sideToAct();
   if (p === 1) return UI.rivalLine || 'Rival is thinking…';
-  if (G.pending) { if (G.pending.h === 'place') return 'Tap a glowing space'; return 'Make a choice'; }
+  if (G.pending) { if (G.pending.h === 'place') return UI.autoZ ? 'Tap a glowing space · drag to look' : 'Tap a glowing space'; return 'Make a choice'; }
   if (G.phase === 'setup') return 'Pick your company';
   if (G.phase === 'research' || G.phase === 'draft') return 'New round: pick cards';
   if (G.phase === 'final') return 'Last chance: plant greenery';
-  if (G.phase === 'action') return G.acts === 1 ? 'Action 2 of 2, or Done' : 'Your turn: action 1 of 2';
+  if (G.phase === 'action') { if (G.pl[1].passed) return G.acts === 1 ? 'Rival is out · action 2, or Done' : 'Rival is out: your turn again'; return G.acts === 1 ? 'Action 2 of 2, or Done' : 'Your turn: 1 or 2 actions'; }
   return '';
 }
+// rival panel (PC: always visible on the right)
+function renderRival() {
+  var el = $('rpanel'); if (!el || !G || !UI.pc) return;
+  var R = G.pl[1], s = OH.score(1), lines = G.log.filter(function (l) { return l.p === 1; }).slice(-7).reverse();
+  el.innerHTML = '<h2>Rival</h2><div class="rpsc"><b>' + s.total + '</b> points · rating ' + R.tr + (R.passed ? ' · <i>passed</i>' : '') + '</div>' +
+    '<div class="rpc"><b>' + esc(R.corp ? OH.card(R.corp).name : '—') + '</b><span>' + esc(R.corp ? OH.card(R.corp).text : '') + '</span></div>' +
+    '<div class="rpres">' + OH.RES.map(function (r) { return '<div class="rpr" style="background:' + A.RES[r].col + ';color:' + A.RES[r].fg + '"><b>' + R[r] + '</b><span>' + (R.prod[r] >= 0 ? '+' : '') + R.prod[r] + ' ' + A.RES[r].name + '</span></div>'; }).join('') + '</div>' +
+    '<div class="rpk">' + R.hand.length + ' cards in hand · ' + R.played.length + ' played</div>' +
+    '<h3>Last moves</h3>' + (lines.length ? lines.map(function (l) { return '<div class="logl p1">' + esc(l.s.replace(/^Rival /, '')) + '</div>'; }).join('') : '<div class="logl">Nothing yet.</div>') +
+    '<button class="btn alt" id="rpMore">Rival details</button>';
+  $('rpMore').onclick = function () { openSheet('player', 'p1'); };
+}
 function render() {
-  renderTop(); renderRes(); renderBar(); renderBoard(); setHint(hintNow());
-  if (UI.sheet && UI.refreshSheet) UI.refreshSheet();
+  renderTop(); renderRes(); renderBar(); renderBoard(); setHint(hintNow()); renderRival();
+  document.body.classList.toggle('placing', !!(G && G.pending && G.pending.h === 'place' && OH.sideToAct() === 0));
+  if (UI.sheet && UI.refreshSheet) UI.refreshSheet(true);
 }

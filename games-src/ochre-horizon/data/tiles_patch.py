@@ -19,6 +19,9 @@ tile('p029','special','volcanic',cost=2,text='Place a special tile on a volcano.
 tile('p143','special','isolated',cost=2,text=C['p143']['text'].rstrip('.')+'. Place a special tile with no neighbours.')
 tile('p096','special',cost=2,text='Place a special tile. Raise energy production 2, steel production 1.')
 tile('p057','special',cost=2,vp={"per":"cityAdj","t":"city"},text='Place a special tile. Raise credits production 2. 1 VP per city next to it.')
+tile('p008','special',cost=1,text='Place a special tile. Raise credits production 1. Gain 3 steel and 1 titanium.')
+tile('p013','special',cost=2,text='Place a special tile. Raise steel production 2.')
+tile('p006','special',cost=2,text='Place a special tile. Raise credits production 2. Gain 3 credits.')
 for x in c:
     x['text']=x['text'].replace(' a ocean',' an ocean').replace('a oceans','oceans')
 json.dump(c,open(P,'w',encoding='utf-8'),indent=1,ensure_ascii=False)

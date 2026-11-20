@@ -156,7 +156,7 @@ def d_eff(e,card):
     if k=='steelVal': return "Steel is worth %d more to you."%e['n']
     if k=='tiVal': return "Titanium is worth %d more to you."%e['n']
     if k=='reqSlack': return "Global requirements are %d easier for you."%e['n']
-    if k=='stdDisc': return "Standard projects%s cost %d less."%(('(%s) '%e['which']) if e.get('which') and e['which']!='all' else '',e['n'])
+    if k=='stdDisc': return ("The %s standard project costs %d less."%({'city':'City','power':'Power plant','asteroid':'Comet strike','aquifer':'Aquifer','greenery':'Greenery'}.get(e['which'],e['which']),e['n'])) if e.get('which') and e['which']!='all' else "Standard projects cost %d less."%e['n']
     if k=='greenCost': return "Greeneries cost %d plants."%e['n']
     if k=='heatAsMc': return "Heat counts as credits for you."
     if k=='onPay': return "Each time you play a card costing %d+: %s"%(e['min'],d_ops(e['do'],card))

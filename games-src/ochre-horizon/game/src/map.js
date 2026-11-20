@@ -38,19 +38,20 @@
     m1: { id: 'm1', name: 'Lantern Moon Port', offmap: true, adj: [], bonus: [] },
     m2: { id: 'm2', name: 'Far-Moon Habitat', offmap: true, adj: [], bonus: [] }
   };
+  // our own goal concepts (R99): breadth, gardens, mixed economy, machines, coasts / patrons, power grid, collections, stockpiles, frontier
   var MILESTONES = [
-    { k: 'steward', name: 'Steward', text: 'Terraform rating 34 or more', need: 34, m: 'tr' },
-    { k: 'founder', name: 'Founder', text: 'Own 3 cities', need: 3, m: 'cities' },
-    { k: 'grower', name: 'Grower', text: 'Plant production 4 or more', need: 4, m: 'plantProd' },
-    { k: 'engineer', name: 'Engineer', text: '7 building tags', need: 7, m: 'tag:building' },
-    { k: 'navigator', name: 'Navigator', text: '5 space tags', need: 5, m: 'tag:space' }
+    { k: 'polymath', name: 'Polymath', text: 'Tags of 7 different kinds in play', need: 7, m: 'tagKinds' },
+    { k: 'landholder', name: 'Landholder', text: 'A city of yours with 2 of your greeneries next to it', need: 1, m: 'gardenCity' },
+    { k: 'quartermaster', name: 'Quartermaster', text: 'Production of 5 different kinds', need: 5, m: 'prodKinds' },
+    { k: 'machinist', name: 'Machinist', text: '3 card actions in play', need: 3, m: 'actions' },
+    { k: 'coastkeeper', name: 'Coastkeeper', text: '3 of your tiles next to oceans', need: 3, m: 'coastTiles' }
   ];
   var AWARDS = [
-    { k: 'surveyor', name: 'Surveyor', text: 'Most tiles on the map', m: 'tilesOnMap' },
-    { k: 'financier', name: 'Financier', text: 'Highest credit production', m: 'mcProd' },
-    { k: 'visionary', name: 'Visionary', text: 'Most science tags', m: 'tag:science' },
-    { k: 'stoker', name: 'Stoker', text: 'Most heat in stock', m: 'heat' },
-    { k: 'prospector', name: 'Prospector', text: 'Most steel + titanium production', m: 'stProd' }
+    { k: 'patron', name: 'Patron', text: 'Most VP printed on your cards', m: 'cardVP' },
+    { k: 'gridkeeper', name: 'Grid Keeper', text: 'Most energy + heat production', m: 'ehProd' },
+    { k: 'collector', name: 'Collector', text: 'Most Lasting cards in play', m: 'lasting' },
+    { k: 'outfitter', name: 'Outfitter', text: 'Most steel + titanium in stock', m: 'stStock' },
+    { k: 'frontier', name: 'Frontier', text: 'Most of your tiles on the map edge', m: 'edgeTiles' }
   ];
   root.OH_MAP = { ROWS: ROWS, spaces: spaces, order: order, OFFMAP: OFFMAP, MILESTONES: MILESTONES, AWARDS: AWARDS };
   if (typeof module !== 'undefined') module.exports = root.OH_MAP;
