@@ -200,7 +200,7 @@ function sugShown() { return hintsOn() && UI.sugK && UI.pk && UI.pk.g === G && U
 function planSpeed(c, idx) { var sp = 0, nx = 0, ul = 0; idx.forEach(function (j) { var x = c.hand[j], u = upgId(x); if (u) { sp += UPG[u].sp; ul += UPG[u].lim; } else if (x === 'X') nx++; else sp += +x; }); return { sp: Math.round(sp + nx * avgSpeed(c)), nx: nx, ul: ul }; }
 function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers the preview uses (<= 8 words, numbers free) */
   var q = planSpeed(c, p.idx), ks = cornersIn(G, c.pos, c.pos + q.sp), burn = 0, lim = 0; ks.forEach(function (k) { burn += Math.max(0, q.sp - k.limit - q.ul); lim = lim || k.limit; });
-  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, cool = p.gear <= 2 ? Math.min(hh, COOL[p.gear] || 0) : 0, nc = nextCorner(c.pos), head = 'Hint: gear ' + p.gear + ', speed ' + q.sp + (q.nx ? '?' : '');
+  var hh = c.hand.filter(function (x) { return x === 'H'; }).length, cool = p.gear <= 2 ? Math.min(hh, COOL[p.gear] || 0) : 0, nc = nextCorner(c.pos), head = 'Tap gold: gear ' + p.gear + ', speed ' + (q.nx ? 'about ' : '') + q.sp;
   if (cool) return head + ' · cools ' + cool + ' Heat';
   if (ks.length) return head + ' · limit ' + lim + (burn ? ', costs ' + burn + ' heat' : ', no heat');
   return head + (nc ? ' · corner ' + nc.limit + ' in ' + nc.d : ' · road clear');
@@ -341,7 +341,7 @@ function askDiscard() {   /* discard step, right after moving: throw away speed 
     c.hand.forEach(function (x, j) { h += cardHtml(x, sel.indexOf(j) >= 0, x === 'H' || x === 'X', j, ''); });
     h += '</div>' + cardLegend(c.hand) + '<div class="slipq">' + (sel.length ? '<button id="discN">Keep all</button><button class="y" id="discY">Discard ' + sel.length + '</button>' : '<button class="y" id="discN">Keep all</button>') + '</div>';
     $('#panel').innerHTML = h; artApply($('#panel'));
-    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop unwanted cards, or keep all.');
+    setMsg(sel.length ? 'Throw away ' + sel.length + ', then draw back to 7.' : 'Drop slow 1s and 2s to draw faster cards.');
     document.querySelectorAll('#panel .cd').forEach(function (b) { var j = +b.getAttribute('data-i'); b.onclick = function () {
       if (c.hand[j] === 'H' || c.hand[j] === 'X') { setMsg('Heat and Stress cards stay in your hand.', 'warn'); return; }
       var k = sel.indexOf(j); if (tutOn() && (k >= 0 || !GXT.act({ type: 'tap', what: 'dcard', i: j }))) return;
