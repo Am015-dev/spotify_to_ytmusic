@@ -53,7 +53,7 @@ function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44
       el.setAttribute('data-reg',r);el.style.cursor='pointer'}
     const lf=m.locEl(a)&&m.locEl(a).querySelector('.tb-lfx');if(lf)lf.setAttribute('transform','translate('+Math.round(S.cx-pa.x)+' '+Math.round(S.cy-pa.y+ (rows*sh)/2+22)+')')}}
 function mapTap(id,info){if(!G||!UI.started)return;
-  if(UI.card&&UI.card.kind!=='pass'&&UI.card.kind!=='tip'){bfSkip();return}
+  if(UI.card&&UI.card.kind!=='pass'&&UI.card.kind!=='tip'){const c0=UI.card,fresh=c0._at&&Date.now()-c0._at<600;if(bfSkip()&&fresh&&info&&info.seat!=null){const rr=regOfLoc(LOCID.indexOf(id));setTimeout(()=>{if(G&&!UI.card&&rr!=null&&!isNaN(rr))regionTap(rr)},120)}return}   // F16b: a tap that lands as a narration pops up is queued, not dropped
   if(UI.pop){closePop(true)}
   if(id==='throne'){if(document.documentElement.classList.contains('bf-w'))openPop('kingdom');return}   // phones: the Kingdom sheet opens only from its own chips (#cstrip), never from a stray tap on the map
   const l=LOCID.indexOf(id);if(l<0)return;
@@ -145,7 +145,7 @@ function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=v
 // the Councils, the Favour and your Tactics sit on the board (bottom edge): who sits in each Council (votes per house), who holds the Favour, Tactics left
 function renderCouncils(){const el=$('#cstrip');if(!el)return;const V=UI.V;if(!V||!G){el.innerHTML='';return}const me=vs();
   const chip=(c)=>{const per={};for(const id of V.council[c]){const s=ownerOf(id);per[s]=(per[s]||0)+(cinfo(id).votes||0)}
-    const seats=Object.keys(per);return '<button class="cs-c" data-a="road4" data-c="'+c+'" aria-label="Council of '+SUIT_N[c]+'"><b>'+SUIT_N[c]+'</b><span>'+(seats.length?seats.map(s=>'<i style="--c:'+fcol(+s)+'">'+per[s]+'</i>').join(''):'<em>empty</em>')+'</span></button>'};
+    const seats=Object.keys(per);return '<button class="cs-c" data-a="road4" data-c="'+c+'" aria-label="'+SUIT_N[c]+' Council"><b>'+SUIT_N[c]+'</b><span>'+(seats.length?seats.map(s=>'<i style="--c:'+fcol(+s)+'">'+per[s]+'</i>').join(''):'<em>empty</em>')+'</span></button>'};
   const fh=V.fav.h;const fav='<button class="cs-c cs-f" data-a="road4" aria-label="Kingdom\u2019s Favour"><b>\u2605 Favour</b><span>'+(fh>=0?'<i style="--c:'+fcol(fh)+'">'+V.fav.u+'</i>':'<em>Meadow</em>')+'</span></button>';
   let tac='';if(me>=0){const P=V.pl[me];const left=P.tac.filter(t=>!t.ex&&!t.burn).length;tac='<button class="cs-c cs-t" data-a="rival" data-s="'+me+'" aria-label="Your Tactics"><b>Tactics</b><span><i style="--c:'+fcol(me)+'">'+left+'</i></span></button>'}
   const h=DD.COUNCILS.map(chip).join('')+fav+tac;if(el._h!==h){el._h=h;el.innerHTML=h}}

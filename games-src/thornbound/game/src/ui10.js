@@ -15,7 +15,7 @@ function bfModel(s,mv,rm){const q=G.q,k=q.kind;const M={s,q,mv,rec:rm,kind:'othe
   return M}
 const autOn=()=>!(UI.cfg&&UI.cfg.oldAutumn);
 function autMoves(id){const M=UI.bf;if(!M||!M.aut)return [];return M.mv.filter(m=>m.t==='act'&&(m.a==='govern'||m.a==='journey')&&m.p&&m.p.id===id)}
-function autLabel(m){if(m.a==='journey')return 'Journey: +'+cinfo(m.p.id).lore+' Lore';return 'Govern: '+({relics:'Council of Coin',secrets:'Council of Whispers',oaths:'Council of Pledges'}[m.p.c]||m.p.c)}
+function autLabel(m){if(m.a==='journey')return 'Journey: +'+cinfo(m.p.id).lore+' Lore';return 'Govern: '+({relics:'Purse Council',secrets:'Veil Council',oaths:'Bond Council'}[m.p.c]||m.p.c)}
 function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
   for(const m of M.mv){if(m.id!==id&&!(typeof m.v==='number'&&m.v===id))continue;
     if(M.kind==='bid')out.push({type:'spot',k:m.k});
@@ -139,7 +139,7 @@ function bfClashHit(r,col,tie){if(!ANIM||UI.reduce)return;const fx=$('#fx');if(!
 (function(){const st=document.createElement('style');st.textContent='.tbhit{position:fixed;width:60px;height:60px;border-radius:50%;border:5px solid var(--hc);box-shadow:0 0 18px var(--hc),inset 0 0 14px var(--hc);pointer-events:none;z-index:59}.tbspark{position:fixed;width:8px;height:8px;border-radius:50%;background:var(--hc);box-shadow:0 0 8px var(--hc),0 0 2px #fff;pointer-events:none;z-index:59}';document.head.appendChild(st)})();
 // a big stamp over the board for the moments that matter (a Clash won or lost, a round ending): it lands, holds, fades; never blocks a tap
 function bfBanner(t,sub,col){try{if(!ANIM||UI.reduce)return;const bd=$('#board');if(!bd)return;const R=bd.getBoundingClientRect();const fx=$('#fx')||document.body;
-  const e=document.createElement('div');e.className='tbban';e.style.cssText='left:'+(R.left+R.width/2)+'px;top:'+(R.top+R.height*0.42)+'px;--bc:'+(col||'#f0c860');
+  const e=document.createElement('div');e.className='tbban';e.style.cssText='left:'+(R.left+R.width/2)+'px;top:'+Math.max(R.top+R.height*0.42,96)+'px;--bc:'+(col||'#f0c860');
   e.innerHTML='<b>'+esc(t)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');fx.appendChild(e);setTimeout(()=>e.remove(),1500/spd())}catch(x){}}
 (function(){const st=document.createElement('style');st.textContent='.tbban{position:fixed;transform:translate(-50%,-50%);z-index:60;pointer-events:none;min-width:200px;max-width:88vw;text-align:center;padding:10px 18px;border-radius:12px;background:rgba(20,12,26,.9);border:3px solid var(--bc);box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 24px var(--bc);color:#fff;animation:tbban 1.45s cubic-bezier(.2,1.4,.4,1) forwards}.tbban b{display:block;font:700 22px/1.2 Cinzel,Georgia,serif;color:var(--bc)}.tbban small{display:block;font:600 16px/1.3 "EB Garamond",Georgia,serif;margin-top:2px}@keyframes tbban{0%{transform:translate(-50%,-50%) scale(1.8);opacity:0}14%{transform:translate(-50%,-50%) scale(1);opacity:1}80%{opacity:1}100%{transform:translate(-50%,-62%) scale(.96);opacity:0}}';document.head.appendChild(st)})();
 function bfSummary(c){const ev=c.ev;renderBar();
@@ -245,7 +245,7 @@ function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?f
   try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:3,fill:'forwards',easing:'ease-in-out'});const k=p.key;f._a.onfinish=()=>{if(f._k===k){f.hidden=true;f._done=k}}}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
 function bfAfter(){bfFinger();if(typeof hlpAfter==='function')hlpAfter()}
 // the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
-// Crown's Edict asks only when it changes who picks first (your bid already first: using it would only waste it)
+// Royal Audit asks only when it changes who picks first (your bid already first: using it would only waste it)
 function edictPointless(){try{if(!G.q||G.q.kind!=='edict')return false;const s=G.q.seats[0],b=G.bstr||[];return G.order.filter(x=>G.pl[x].bid!=null).sort((a,c)=>b[c]-b[a]||G.order.indexOf(a)-G.order.indexOf(c))[0]===s}catch(e){return false}}
 function autoSkip(h){if(!NET.on&&!hotSeat()&&G&&G.q&&G.q.kind==='edict'&&edictPointless()){const no=legal(h).find(m=>m.yes===0);if(no)return humanMoveAuto(no.k)}
   if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;

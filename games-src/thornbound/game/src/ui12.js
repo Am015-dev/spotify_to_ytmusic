@@ -1,5 +1,5 @@
 // ===================== part 12: the tutorial (shell/gx-tutor.js): a staged one-round game that teaches every rule by doing it once =====================
-// The staged game is the guided deal (seed 23, you lead the Heathbound Clans against the Gilded Court on Easy) cut to ONE round (engine length 'tutorial').
+// The staged game is the guided deal (seed 23, you lead the Reedfolk against the Salt Crown on Easy) cut to ONE round (engine length 'tutorial').
 // The computer is scripted by the fixed seed plus the teaching moves below (tutRec): the same cards every time, so each rule appears on cue.
 // Each step spotlights one thing; only that thing answers; the step moves on only when the game reports that exact action (GXT.act).
 const TUT_GAME='thornbound';
@@ -9,11 +9,11 @@ const tutBtn=cls=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:
 const tutHand=()=>G.pl[0].hand.slice();
 const tutHeir=()=>tutHand().find(id=>cinfo(id).archetype==='heir');
 const tutNamed=re=>tutHand().find(id=>re.test(cinfo(id).name));
-const tutVK=()=>tutNamed(/Verse-Keeper/);   // the Site of Power card bought with Lore in Autumn; round 2 bids it to steal
-const tutTieId=()=>tutNamed(/Sailing Hall/); // the card taken back in round 1 and added to the tied Clash
-const tutBidId=()=>{const h=tutHand();if(G.round>=2&&tutVK()!=null)return tutVK();return h.find(id=>/Sailing Hall/.test(cinfo(id).name))||h.slice().sort((a,b)=>cinfo(a).strength-cinfo(b).strength).find(id=>cinfo(id).strength>=3&&cinfo(id).archetype!=='heir')};
+const tutVK=()=>tutNamed(/Reed Herald/);   // the Site of Power card bought with Lore in Autumn; round 2 bids it to steal
+const tutTieId=()=>tutNamed(/Punt Catapult/); // the card taken back in round 1 and added to the tied Clash
+const tutBidId=()=>{const h=tutHand();if(G.round>=2&&tutVK()!=null)return tutVK();return h.find(id=>/Punt Catapult/.test(cinfo(id).name))||h.slice().sort((a,b)=>cinfo(a).strength-cinfo(b).strength).find(id=>cinfo(id).strength>=3&&cinfo(id).archetype!=='heir')};
 const tutPlaced=()=>{try{return UI.V.reg.reduce((a,R)=>a+R.down.filter(id=>id>=0&&ownerOf(id)===0).length,0)}catch(e){return 0}};
-// the next hidden card (the engine takes the regions in order: Uplands, Tablelands, Sinks): the strongest ordinary card, then the Heir where both Heralds wait, then the next strongest
+// the next hidden card (the engine takes the regions in order: North Reach, Crossroads, South Weald): the strongest ordinary card, then the Heir where both Heralds wait, then the next strongest
 function tutPlace(){const n=tutPlaced(),left=tutHand(),heir=tutHeir();
   if(n===1)return heir!=null&&left.includes(heir)?[heir,1]:null;
   const h=left.filter(id=>id!==heir).sort((a,b)=>cinfo(b).strength-cinfo(a).strength);return h.length?[h[0],n]:null}
@@ -21,13 +21,13 @@ function tutRec(s,mv){const q=G.q,k=q.kind;
   if(k==='bid'){const id=tutBidId();return mv.find(m=>m.id===id)||undefined}
   if(k==='bidRes')return mv.find(m=>m.t===(G.round>=2?'steal':'return'))||undefined;
   if(k==='tie'){const id=tutTieId();return mv.find(m=>m.id===id)||undefined}
-  if(k==='siteBuy'){const v=G.pl[0].site.find(id=>/Verse-Keeper/.test(cinfo(id).name));return mv.find(m=>m.t==='sel'&&m.v===v)||mv.find(m=>m.t==='seldone')||undefined}
+  if(k==='siteBuy'){const v=G.pl[0].site.find(id=>/Reed Herald/.test(cinfo(id).name));return mv.find(m=>m.t==='sel'&&m.v===v)||mv.find(m=>m.t==='seldone')||undefined}
   if(k==='place'){const p=tutPlace();if(!p)return undefined;return mv.find(m=>m.id===p[0]&&m.r===p[1])||mv.find(m=>m.id===p[0])||undefined}
   if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'){if(G.pl[s].supp.r[1]<2){const m=mv.find(x=>x.a==='supp'&&x.p&&x.p.r===1&&x.p.n===1);if(m)return m}return mv.find(m=>m.t==='done')||undefined}return undefined}
   if(k==='clashOrder'){const m=mv.find(x=>x.order&&x.order.join()==='0,1,2');return m||undefined}
   return undefined}
-// ---------------------------------------------------------------- the Court is scripted too (the cards are fixed by the seed): it bids its 4 and takes Paper Diadems (stolen in round 2),
-// takes Cairn Field, wins the Uplands, leaves the Tablelands (where your Herald and Supporters are) to you, ties the Sinks 7-7 and adds its Heir to the re-Clash.
+// ---------------------------------------------------------------- the Court is scripted too (the cards are fixed by the seed): it bids its 4 and takes Ribbon Charter (stolen in round 2),
+// takes Broken Shield, wins the North Reach, leaves the Crossroads (where your Herald and Supporters are) to you, ties the South Weald 7-7 and adds its Heir to the re-Clash.
 // Round 2: it bids its weakest card. Everything else it plays by the normal Easy AI.
 function tutAI(seat){if(!(UI.cfg&&UI.cfg.tutorial)||!G||!G.q||seat!==1||G.round>2)return null;const k=G.q.kind,mv=legal(seat);
   if(G.round===2){if(k==='bid'){const w=mv.filter(m=>cinfo(m.id).archetype!=='heir').sort((a,b)=>cinfo(a.id).strength-cinfo(b.id).strength)[0];return w||null}
@@ -64,7 +64,7 @@ const tutAutCard=want=>{try{const M=UI.bf;if(!M||!M.aut)return null;const ids=[.
 const tutAuto=(ms,then,cond)=>({wait:{type:'event',match:a=>a.what==='auto'},onEnter:()=>{const st=GXT.current();const t=setInterval(()=>{const s=GXT.state();if(!s.active||GXT.current()!==st){clearInterval(t);return}
   if(s.shown&&Date.now()-(s.shownAt||0)>=ms&&(!cond||cond())){clearInterval(t);const r=GXT.act({type:'event',what:'auto'});if(!r)console.warn('gxt auto rejected');try{if(then)then()}catch(e){console.warn('gxt auto then',e)}}},100)}});
 const tutClash=()=>UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='clash'?UI.card.ev:null;
-const tutSiteOpt=()=>{const v=G.pl[0].site.find(id=>/Verse-Keeper/.test(cinfo(id).name));const m=UI.bf&&UI.bf.mv&&UI.bf.mv.find(x=>x.t==='sel'&&x.v===v);return m?document.querySelector('[data-a=mv][data-k="'+CSS.escape(m.k)+'"]'):null};
+const tutSiteOpt=()=>{const v=G.pl[0].site.find(id=>/Reed Herald/.test(cinfo(id).name));const m=UI.bf&&UI.bf.mv&&UI.bf.mv.find(x=>x.t==='sel'&&x.v===v);return m?document.querySelector('[data-a=mv][data-k="'+CSS.escape(m.k)+'"]'):null};
 const myCouncil=()=>{try{return ['relics','secrets','oaths'].find(c=>UI.V.council[c].some(id=>ownerOf(id)===0))||null}catch(e){return null}};
 function tutSteps(){
   let p2=null,p3=null,clashSeen=null,tieSay='',c2Say='',taSay='';
@@ -82,23 +82,23 @@ function tutSteps(){
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='bids'&&UI.card.rank&&UI.card.revN>=UI.card.rank.length)},
  {id:'takeback',title:'Keep your card',say:'Bids win Kingdom Cards, or you take your card back. Tap it.',target:tq('#bidspot.glow'),
    wait:{type:'tap',match:a=>isMove(a,'bidRes')&&a.mv&&a.mv.t==='return'},ready:()=>tkind('bidRes')&&!!document.querySelector('#bidspot.glow')},
- {id:'favour',title:'The Favour',say:'Win the Gleaning Meadow to hold the Favour: a power and tiebreaker.',target:tq('#cstrip .cs-f'),wait:null,ready:()=>tkind('herald')},
+ {id:'favour',title:'The Favour',say:'Win the Market Cross to hold the Favour: a power and tiebreaker.',target:tq('#cstrip .cs-f'),wait:null,ready:()=>tkind('herald')},
  {id:'herald',title:'Your Herald',say:()=>'Put your Herald on '+(UI.bf&&UI.bf.rec?locOf(UI.bf.rec):'the glowing location')+'. Win there for a bonus.',target:tutLoc,
    wait:{type:'tap',match:a=>isMove(a,'herald')},ready:()=>tkind('herald')&&!!tutLoc()},
  {id:'cmds',title:'Card powers',say:'Day powers act first, then Night effects (like Deadly), and only then is Strength counted.',target:()=>{const id=tutPlace()&&tutPlace()[0];return id!=null?tutHandRect(id):null},wait:null,ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
  {id:'place1',title:'Hide a card',say:()=>'Hide one card at each region. Tap your '+cinfo(tutPlace()[0]).strength+'.',target:()=>tutHandRect(tutPlace()&&tutPlace()[0]),
    wait:{type:'tap',match:a=>a.what==='select'&&tutPlace()&&a.id===tutPlace()[0]},ready:()=>tkind('place')&&tutPlaced()===0&&UI.hand==null},
- {id:'place1b',title:'Where it fights',say:'Tap the Uplands. It stays hidden until the fight.',target:tutReg(0),
+ {id:'place1b',title:'Where it fights',say:'Tap the North Reach. It stays hidden until the fight.',target:tutReg(0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===0},ready:()=>tkind('place')&&tutPlaced()===0&&tutPlace()&&UI.hand===tutPlace()[0]},
- {id:'place2',title:'Your Heir',say:'Your Heir card is your strongest. Hide it in the Tablelands, where your Herald stands.',target:tutReg(1),also:()=>tutHandRect(p2||0),
+ {id:'place2',title:'Your Heir',say:'Your Heir card is your strongest. Hide it in the Crossroads, where your Herald stands.',target:tutReg(1),also:()=>tutHandRect(p2||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===1},ready:()=>tkind('place')&&tutPlaced()===1&&!!tutPlace()&&(p2=tutPlace()[0],tutSelect(p2))},
- {id:'place3',title:'Last card',say:'Last card: tap the Sinks.',target:tutReg(2),also:()=>tutHandRect(p3||0),
+ {id:'place3',title:'Last card',say:'Last card: tap the South Weald.',target:tutReg(2),also:()=>tutHandRect(p3||0),
    wait:{type:'tap',match:a=>isMove(a,'place')&&a.mv&&a.mv.r===2},ready:()=>tkind('place')&&tutPlaced()===2&&!!tutPlace()&&(p3=tutPlace()[0],tutSelect(p3))},
- {id:'supp',title:'Supporters',say:'Each Supporter adds +1 in the first fight there. Tap the Tablelands twice.',target:tutReg(1),
+ {id:'supp',title:'Supporters',say:'Each Supporter adds +1 in the first fight there. Tap the Crossroads twice.',target:tutReg(1),
    wait:{type:'tap',times:2,match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='supp'&&a.mv.p&&a.mv.p.r===1},ready:()=>tkind('menu')&&G.pl[0].supp.r[1]<2&&/Spring/.test(G.q.title||'')},
  {id:'spring',title:'Spring ends',say:'Tap Done to end Spring.',target:tfirst('#act [data-a=mv].pri','#act [data-a=mv]'),
    wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.t==='done'},ready:()=>tkind('menu')&&G.pl[0].supp.r[1]>=2&&/Spring/.test(G.q.title||'')},
- {id:'order',title:'Summer: fights',say:'Pick the fight order. Tap the Uplands, then the Tablelands.',target:()=>tutReg((UI.ord||[]).length?1:0)(),
+ {id:'order',title:'Summer: fights',say:'Pick the fight order. Tap the North Reach, then the Crossroads.',target:()=>tutReg((UI.ord||[]).length?1:0)(),
    wait:{type:'tap',times:2,match:a=>a.what==='order'},ready:()=>tkind('clashOrder')},
  {id:'clash',title:'The Clash',say:()=>{const ev=UI.card&&UI.card.ev;if(!ev)return '';const t=ev.tot,me=t[0],o=Math.max(...Object.keys(t).filter(s=>+s!==0).map(s=>t[s]));return ev.winner===0?'Cards flip. Your '+me+' beats '+o+': highest total wins.':ev.winner<0?'Cards flip. A tie: nobody wins here.':'Cards flip. Their '+o+' beats your '+me+'. Highest wins.'},
    target:()=>{const ev=UI.card&&UI.card.ev;return ev?tutReg(ev.r)():null},wait:null,hold:c=>c.kind==='event'&&c.ev.t==='clash'&&!clashSeen,onNext:()=>{clashSeen=1;evDone()},
@@ -114,9 +114,9 @@ function tutSteps(){
    target:tutReg(2),hold:c=>c.kind==='event'&&c.ev.t==='clash'&&c.ev.r===2,ready:()=>{const ev=tutClash();return !!(ev&&ev.r===2&&ev.winner<0)}},tutAuto(2000,()=>{if(tutClash())evDone()},()=>!!UI.clashRes[2]||!tutClash())),
  {id:'tie',title:'Add a card',say:()=>'Each side may add one hidden card, or pass. Tap your '+cinfo(tutTieId()).strength+'.',target:()=>tutHandRect(tutTieId()),
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutTieId()},ready:()=>tkind('tie')&&UI.hand==null&&tutTieId()!=null},
- {id:'tieb',title:'Fight again',say:'Tap the Sinks. Only the new cards fight now.',target:tutReg(2),also:()=>tutHandRect(tutTieId()),
+ {id:'tieb',title:'Fight again',say:'Tap the South Weald. Only the new cards fight now.',target:tutReg(2),also:()=>tutHandRect(tutTieId()),
    wait:{type:'tap',match:a=>isMove(a,'tie')&&a.mv&&a.mv.id!=null},ready:()=>tkind('tie')&&tutTieId()!=null&&tutSelect(tutTieId())},
- Object.assign({id:'tiec',title:'The new fight',say:()=>{const ev=tutClash();if(!ev)return tieSay||'';const t=ev.tot,me=t[0]||0,o=t[1]||0;return tieSay=ev.winner===0?'Your '+me+' beats their '+o+'. The Sinks are yours.':'Their new '+o+' beats your '+me+'. They take the Sinks.'},
+ Object.assign({id:'tiec',title:'The new fight',say:()=>{const ev=tutClash();if(!ev)return tieSay||'';const t=ev.tot,me=t[0]||0,o=t[1]||0;return tieSay=ev.winner===0?'Your '+me+' beats their '+o+'. The South Weald are yours.':'Their new '+o+' beats your '+me+'. They take the South Weald.'},
    target:tutReg(2),hold:c=>c.kind==='event'&&c.ev.t==='clash',
    ready:()=>{const ev=tutClash();return !!(ev&&ev.r===2&&!ev.tied&&UI.clashRes[2])}},tutAuto(2400,()=>{if(tutClash())evDone()})),
  {id:'autumn1',title:'Autumn',say:'Autumn: tap the glowing card that has votes.',target:()=>{const id=tutAutCard('govern');return id!=null?tutHandRect(id):null},
@@ -129,14 +129,14 @@ function tutSteps(){
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutAutCard('journey')},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard==null&&tutAutCard('journey')!=null},
  {id:'journey',title:'Journey',say:'Journey trades the card for Lore. Lore buys stronger cards.',target:tfirst('#act .autc [data-aut=journey]'),
    wait:{type:'tap',match:a=>isMove(a,'menu')&&a.mv&&a.mv.a==='journey'},ready:()=>tkind('menu')&&/Autumn/.test(G.q.title||'')&&UI.autCard!=null&&!!document.querySelector('#act .autc [data-aut=journey]')},
- {id:'lore',title:'Spend Lore',say:'Two Lore: buy a Site of Power card. Tap the Verse-Keeper.',target:tutSiteOpt,
+ {id:'lore',title:'Spend Lore',say:'Two Lore: buy a Site of Power card. Tap the Reed Herald.',target:tutSiteOpt,
    wait:{type:'tap',match:a=>isMove(a,'siteBuy')},ready:()=>!!(G.q&&G.q.kind==='siteBuy'&&!UI.card&&tutSiteOpt())},
  {id:'lore2',title:'Bought',say:'Tap Done. The card joins your hand.',target:()=>{const m=UI.bf&&UI.bf.mv&&UI.bf.mv.find(x=>x.t==='seldone');return m?document.querySelector('#act [data-a=mv][data-k="'+CSS.escape(m.k)+'"]'):null},
    wait:{type:'tap',match:a=>isMove(a,'siteBuy')&&a.mv&&a.mv.t==='seldone'},ready:()=>!!(G.q&&G.q.kind==='siteBuy'&&!UI.card&&(G.q.chosen||[]).length)},
  {id:'round',title:'Winter',say:()=>'Winter: played cards are discarded, Supporters go to the Lost Pile. You '+myInf()+', the Court '+rivInf()+'.',target:tq('#rivals'),wait:null,
    hold:c=>c.kind==='event'&&c.ev.t==='summary',onNext:()=>evDone(),
    ready:()=>!!(UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='summary')},
- {id:'bid3',title:'Round 2',say:()=>'Round 2. Bid your new Verse-Keeper: Strength '+cinfo(tutVK()).strength+'.',target:()=>tutHandRect(tutVK()),
+ {id:'bid3',title:'Round 2',say:()=>'Round 2. Bid your new Reed Herald: Strength '+cinfo(tutVK()).strength+'.',target:()=>tutHandRect(tutVK()),
    wait:{type:'tap',match:a=>a.what==='select'&&a.id===tutVK()},ready:()=>G.round===2&&tkind('bid')&&UI.hand==null&&tutVK()!=null},
  {id:'bid4',title:'Face down',say:'Tap the crown spot.',target:tq('#bidspot'),from:()=>tutHandRect(tutVK()),
    wait:{type:'tap',match:a=>isMove(a,'bid')},ready:()=>G.round===2&&tkind('bid')&&UI.hand===tutVK()&&!!document.querySelector('#bidspot.glow')},
@@ -161,7 +161,7 @@ function tutStart(o){if(typeof GXT==='undefined'||window.TB_COACH_TUT){if(window
       if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open();return}
       showStart();UI.sv='setup';UI.cfgOpen=false;renderStart()},   // Play a real game: the setup screen, one tap from a real game
     onExit:()=>{tutLeave();showStart();if(pro&&window.CAMPAIGN&&typeof GXC!=='undefined')GXC.open()}})}   // Skip in the Story prologue: on to the chapter map
-// the staged deal: the seed's opening hand with the Dockside Broker (2 Lore, for the Lore buy) in place of the Hearth Priestesses; the computer plays at x6 (animations cap at x4) so no wait is long
+// the staged deal: the seed's opening hand with the Ferry Trader (2 Lore, for the Lore buy) in place of the Heron Watch; the computer plays at x6 (animations cap at x4) so no wait is long
 function tutStage(){const P=G.pl[0],a=P.hand.indexOf(4),b=P.deck.indexOf(1);if(a>=0&&b>=0){P.hand[a]=1;P.deck[b]=4;const o=G.q&&G.q.o&&G.q.o[0];if(o)o.forEach(m=>{if(m.id===4){m.id=1;m.k='b:1';m.label='Bid with '+cinfo(1).name}})}
   if(UI._tutSpd==null)UI._tutSpd=UI.speed;UI.speed=6}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
@@ -188,3 +188,10 @@ function tutQueue(fn){clearTimeout(UI._tutQT);try{if(UI._lastPt&&typeof tapRing=
 // watch steps (a Next button) move on by themselves 2.5 s after they appear; a tap on Next still skips at once
 (function(){let id=null,t0=0;setInterval(()=>{try{if(typeof GXT==='undefined'||!tutOn()){id=null;return}const S=GXT.state();if(!S||!S.active||S.phase!=='show'||!S.shown||S.wait){id=null;return}
   const k=S.i+':'+S.id;if(k!==id){id=k;t0=Date.now();return}if(Date.now()-t0>=2500/Math.max(1,Math.min(UI.speed||1,4))){id=null;GXT.next()}}catch(e){}},100)})();
+// F16b: a Next that does nothing never survives. (1) a tap on Next that the tutorial swallowed (it counted as the tail of the previous tap) is repeated 260 ms later if the same step still shows.
+// (2) a step that waits for something that already happened (its action was done another way) is left after 6 s: the tutorial goes to the first later step whose moment has come.
+(function(){document.addEventListener('click',e=>{try{if(!(e.target&&e.target.closest&&e.target.closest('.gxt-next'))||typeof GXT==='undefined')return;const s0=GXT.state();if(!s0||!s0.active)return;const i=s0.i;
+  setTimeout(()=>{try{const s=GXT.state();if(s&&s.active&&s.i===i&&s.phase==='show'&&!s.wait)GXT.next()}catch(x){}},260)}catch(x){}},true);
+  let key='',t0=0;setInterval(()=>{try{if(typeof GXT==='undefined'||!tutOn()){key='';return}const S=GXT.state();if(!S||!S.active||S.phase==='end'||S.phase==='show'||S.phase==='gap'){key='';return}
+    const k=S.i+':'+S.phase;if(k!==key){key=k;t0=Date.now();return}if(Date.now()-t0<6000)return;key='';
+    const st=tutSteps();const cur=st[S.i];if(!cur||(cur.ready&&cur.ready()))return;for(let j=S.i+1;j<st.length;j++){if(st[j].ready&&st[j].ready()){GXT.goto(st[j].id);return}}}catch(e){}},1000)})();

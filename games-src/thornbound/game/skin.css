@@ -63,6 +63,8 @@ html.sk .gx-drawer{background-color:#e9d7a8}
 }
 /* the round badge: the number sits clear of the ROUND label */
 #mapbox text[font-size="46"]{transform:translateY(7px)}
+/* F16b: Order/score track numbers stay >= 11px rendered at the smallest map (36 units x 0.305 was 10.98px) */
+#mapbox text[font-size="36"]{font-size:40px;letter-spacing:-.5px}
 .pp-note{font-size:.9rem;opacity:.85;margin:6px 0}
 @media (max-height:620px) and (max-width:700px){.kcb .kn{line-height:.95!important}.kcb{gap:0!important}}
 /* ---- owner art in normal play (W473 art gate) ---- */
@@ -107,3 +109,11 @@ body.tb-bubturn #tbturn{visibility:hidden}
 /* chapter map at phone width: the title takes its own row above Back / Tutorial / stars and wraps on spaces only; each Act band grows to fit its two lines instead of spilling */
 @media (max-width:520px){.gxc .gxc-head{flex-wrap:wrap;justify-content:space-between;row-gap:4px}.gxc .gxc-htitle{order:-1;flex:1 0 100%;overflow-wrap:normal;word-break:normal;hyphens:none;font-size:20px}}
 .gxc .gxc-act{height:auto;min-height:38px;padding:3px 0;margin-top:0}
+/* F16b: PC, a pick list (Ossuary, Pledges...) fills the right column: the Great Road cards must not show in the gap under the list / above "Choose none" */
+html.desk:has(#main .opts) #road>*{visibility:hidden}
+/* F16b: round summary: one line per Region (who won, the Strength on each side) */
+.cd-sum .regs{list-style:none;margin:2px 0 6px;padding:0;display:flex;flex-direction:column;gap:3px;font-size:.95rem;line-height:1.25;text-align:left;max-width:34em}
+.cd-sum .regs li{padding:3px 8px;border-left:3px solid var(--line,#5a4a30);background:rgba(255,255,255,.05);border-radius:4px}
+.cd-sum .regs .rg-n{font-weight:700;color:#e8c867;margin-right:4px}
+/* F16b: phone portrait (taller than 620px): a slimmer turn strip gives the map ~10px more (two 16px lines still fit) */
+@media (min-height:621px) and (max-width:700px){html:not(.bf-w) #tbturn{height:62px;padding:3px 10px}html:not(.bf-w) #tbturn .tbt-line{max-height:54px}}
