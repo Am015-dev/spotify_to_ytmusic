@@ -67,9 +67,12 @@ function scShowCard(html,cls,ms){SC.card={h:html,cls:cls||''};clearTimeout(SC.ca
   try{if(r&&r.success!==false&&G&&(m.a==='dual'||m.a==='solo'||m.a==='eq'||m.a==='multi')){const dc=scCut()-c0,missed=G.dial!=null&&d0!=null&&G.dial<d0;SC.by[seat]=(SC.by[seat]||0)+dc;
       const who=scName(seat);let what;
       if(m.a==='solo')what=`cut ${dc} wire${dc===1?'':'s'} alone, no risk`;
+      else if(m.a==='dual'&&m.v!=null){let tg='';try{const ow=ownerOf(m.st);tg=' on '+(ow===plSeat()?'your':nm(ow)+"'s")+' wire'}catch(e){}   // F4: say what the computer did
+        const sd=VN(m.v)+(m.v2!=null?' or '+VN(m.v2):'');
+        if(dc>0)what=`said ${sd}${tg}: a match, ${dc} wire${dc===1?'':'s'} cut`;else what=`said ${sd}${tg}: a miss`+(missed?`, fuse −${d0-G.dial}`:'')}
       else if(dc>0)what=`guessed right, ${dc} wires cut`;
-      else if(missed)what=`guessed wrong, fuse −${d0-G.dial}`;
-      else what=m.a==='eq'?'used a gear card':'made a move';
+      else if(missed)what=`missed, fuse −${d0-G.dial}`;
+      else what=m.a==='eq'?'used a gear card':'played a card';
       const rate=null;   // per-move grades removed (not in the rules)
       const nextS=(()=>{try{return G.over?-1:decider()}catch(e){return -1}})();
       const nx=nextS>=0&&nextS!==seat?` Next: ${nextS===plSeat()?'you':nm(nextS)}.`:'';

@@ -192,7 +192,7 @@ function cmpU(e,root){let u=null;const t=e.target.closest&&e.target.closest('.ti
 function cmpPick(u){if(u==null)return;setTimeout(()=>{const el=document.querySelector('#crew .tile.glow[data-u="'+u+'"]');if(el&&!el.closest('.cmp,.stc')){try{el.scrollIntoView({block:'nearest'})}catch(x){}tapTile(+el.dataset.s,+el.dataset.k)}},0)}
 document.addEventListener('click',e=>{const s=e.target.closest&&e.target.closest('#crew.zm .sg.cmp');if(!s||e.target.closest('.plate.glow'))return;e.stopPropagation();e.preventDefault();const u=cmpU(e,s);zoomTo(+s.dataset.seat);cmpPick(u)},true);
 // lays out the compact rows and the zoomed crewmate; returns false when it cannot fit (the crew area then scrolls)
-function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll');
+function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('zm');crew.classList.remove('rowy','scroll','strip');
   if(tm<52)mine.style.setProperty('--th',Math.max(TMIN,tm)+'px');   // zoom: my wires square below 52 px (a 44 px wire is 44x44), the crew gets the rows saved
   balance(mine,tm,4,mine.querySelector('.stand.two')?20:0);
   // R95: a short screen gives the crew the height: each of my stands on ONE row (wires 44 px tall, as wide as fits)
@@ -216,6 +216,9 @@ function zoomLayout(tb,crew,mine,tm){tb.classList.add('zm');crew.classList.add('
   if(!fits())tighten();
   if(!TBL.zhint&&sgs.length>1&&!lsGet('sf_zhint',0)){TBL.zhint=1;lsSet('sf_zhint',1);const t0=Date.now();setTimeout(()=>{if((TBL.tapAt||0)>t0)return;toast('Tap a crewmate to see their wires');TBL.zhintT=TBL.sayT},400)}
   return {tw,fit:crew.scrollHeight<=crew.clientHeight+1}}
+function stripPlan(ch){const crew=document.getElementById('crew');const gp=2,wA=crew.clientWidth-12;let m=1e9,need=4;const sgs=[...crew.querySelectorAll('.sg')];
+  sgs.forEach(sg=>{const sts=sg.querySelectorAll('.stand');need+=36;sts.forEach(st=>{const n=st.querySelectorAll('.tile').length;m=Math.min(m,Math.floor((wA-(st.querySelector('.side')?44:0)-(n-1)*gp)/Math.max(1,n)));need+=46+(sts.length>1?20:0)})});
+  return sgs.length&&m>=44&&need<=ch?{tw:Math.min(54,m)}:null}
 const RACK={rg:9,lb:12};   // extra px: the gap between wrapped rows (return arrow) and the label above each of two stands (table.css)
 // tile sizes: as large as fit; stands wrap to more rows rather than shrink below a thumb
 function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
@@ -253,8 +256,12 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
   for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=CMIN)break;t1-=1}
   // before scrolling: crew rows put each name plate beside its wires (one plate height saved per seat)
-  crew.classList.remove('rowy');
-  if(!TBL.relaid&&!land&&crew.scrollHeight>crew.clientHeight+1){const sh0=crew.scrollHeight,t0=t1;crew.classList.add('rowy');plateH=0;t1=crewFit(ch);
+  crew.classList.remove('rowy','strip');
+  // F4 strip: a slim name pill above ONE row of wires (44 px or more) per stand, when the plain layout would scroll and the strip fits
+  const sp=land?null:stripPlan(ch);
+  if(sp&&!TBL.zm&&!TBL.relaid&&crew.scrollHeight>crew.clientHeight+1){const sh0=crew.scrollHeight,t0=t1,tw=sp.tw;crew.classList.add('strip');crew.style.setProperty('--tw',tw+'px');crew.style.setProperty('--th','46px');crew.querySelectorAll('.stand').forEach(st=>{st.style.maxWidth='none';st.classList.remove('wrapd')});
+    if(crew.scrollHeight<sh0)t1=tw;else{crew.classList.remove('strip');crew.style.setProperty('--tw',t0+'px');crew.style.setProperty('--th',tileH(t0,1.3)+'px');balance(crew,t0,3)}}
+  if(!TBL.relaid&&!land&&!crew.classList.contains('strip')&&crew.scrollHeight>crew.clientHeight+1){const sh0=crew.scrollHeight,t0=t1;crew.classList.add('rowy');plateH=0;t1=crewFit(ch);
     for(let i=0;i<60;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=CMIN)break;t1-=1}
     plateH=44;if(crew.scrollHeight>=sh0){crew.classList.remove('rowy');t1=t0;crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',tileH(t1,1.3)+'px');balance(crew,t1,3)}}
   // still too tall at the smallest (44px) crew tile, short landscape: my name plate moves beside my stand; after that the crew area scrolls (never a wire under 44px)
@@ -264,7 +271,7 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   if((crowd||t1<TMINW+4)&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
   if(!crowd&&t1>=TMINW+12&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
   // portrait screen (any height) and the crew still does not fit at 44 px wires: compact rows + one zoomed crewmate
-  const zmOn=!land&&crowd&&crew.querySelectorAll('.sg').length>0;
+  const zmOn=!land&&!sp&&crowd&&crew.querySelectorAll('.sg').length>0;   // F4: only when even the one-row strip cannot fit
   if(zmOn!==!!TBL.zm&&!TBL.zrr){TBL.zm=zmOn;TBL.zrr=1;try{crew._s=null;renderTable(UI.V)}finally{TBL.zrr=0}return}
   if(zmOn){const z=zoomLayout(tb,crew,mine,tm);t1=z.tw;crew.classList.toggle('scroll',!z.fit);atEnd()}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);

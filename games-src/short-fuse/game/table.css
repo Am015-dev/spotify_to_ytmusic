@@ -468,3 +468,21 @@ html.short #sc .tr span:nth-child(2){display:none}
 .gx-bar .gxh-bulb{display:inline-flex;align-items:center;justify-content:center}
 @media (min-width:640px){.gx-bar .gxh-bulb>span.bl{margin-left:4px}}
 @media (max-width:639px){html.sk .gx-bar .gx-ibtn{border-image-width:5px;border-width:5px}.gx-bar .gxh-bulb{min-width:66px!important}.gx-bar .gx-ibtn svg{margin-top:0}}
+
+/* F4 strip: portrait crew, one row of 44 px+ wires per stand under a slim name pill; same layout every turn */
+#crew.strip{row-gap:4px;justify-content:flex-start}
+#crew.strip .sg{align-items:flex-start;gap:2px}
+#crew.strip .plate{height:30px;min-height:30px;padding:0 9px 0 6px;margin-left:2px}
+#crew.strip .plate.glow{height:44px}
+#crew.strip .stand{flex-wrap:nowrap;gap:2px;width:100%;justify-content:center}
+
+/* F4: PC key legend, a margin under my hand, and the arrow-key ring */
+#keys{display:none}
+.kf{outline:4px solid #fff!important;outline-offset:2px;z-index:5;box-shadow:0 0 0 7px #14163a!important}
+@media (hover:hover) and (pointer:fine) and (min-width:900px){
+ #keys{display:block;position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:30;max-width:96%;padding:3px 12px;border-radius:12px;background:rgba(10,18,30,.82);border:1.5px solid #ffd34d;color:#fff;font:700 14px/22px var(--fb);white-space:nowrap}
+ #keys[hidden]{display:none}
+ #keys b{color:#ffd34d;margin-right:4px}
+ #keys kbd{display:inline-block;min-width:22px;padding:0 5px;margin:0 2px;border-radius:5px;background:#fff6dc;color:#14163a;border-bottom:2px solid #b9892a;font:800 13px/20px var(--fb);text-align:center}
+ #mine{padding-bottom:34px;box-sizing:border-box}
+}
