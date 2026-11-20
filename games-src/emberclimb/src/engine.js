@@ -81,7 +81,7 @@
       var H = D.H[k], h = { k: k, hp: H.hp, mhp: H.hp, deck: H.start.map(function (id) { return mk(id); }), dead: 0 };
       G.hs.push(h); G.relics.push(H.relic);
     });
-    if (G.asc >= 2) G.hs.forEach(function (h) { h.mhp -= 5; h.hp = h.mhp; });
+    if (G.asc >= 2) G.hs.forEach(function (h) { h.mhp -= SC; h.hp = h.mhp; });
     if (G.asc >= 3) G.hs.forEach(function (h) { h.deck.push(mk('regret')); });
     if (G.asc >= 6) G.hs.forEach(function (h) { h.hp = Math.ceil(h.mhp * 0.9); });
     // Gentle (first climb): an easier mode made for the screen, NOT the rulebook. Only the player's numbers change (start HP, starting potions,
@@ -103,6 +103,10 @@
   function rewardPool(k, rare) { return shuffle(D.ORDER.filter(function (id) { var d = D.CARDS[id]; return d.hero === k && (rare ? d.rar === 'r' : (d.rar === 'c' || d.rar === 'u')); })); }
   function drawReward(k, rare) { var dk = rare ? G.rr : G.rd; if (!dk[k].length) dk[k] = rewardPool(k, rare); return dk[k].pop(); }
   function returnCards(k, ids) { if (!ids || !ids.length) return; ids.forEach(function (id) { (D.CARDS[id].rar === 'r' ? G.rr : G.rd)[k].push(id); }); shuffle(G.rd[k]); shuffle(G.rr[k]); }
+  // would an edge from column a (floor f) to column b (floor f+1) cross an edge already drawn between the same two floors?
+  function crosses(f, a, b, nodes) {
+    return Object.keys(nodes).some(function (k) { var o = nodes[k]; return o.f === f && o.c !== a && o.nx.some(function (t) { var tc = t % 10; return (o.c < a && tc > b) || (o.c > a && tc < b); }); });
+  }
   function genMap() {
     var W = 4, F = G.F || 9, nodes = {}, paths = [];
     var starts = shuffle([0, 1, 2, 3]).slice(0, 3);
@@ -113,10 +117,29 @@
         var key = f * 10 + c, n = nodes[key] || (nodes[key] = { f: f, c: c, nx: [], t: 'm' });
         if (prev && prev.nx.indexOf(key) < 0) prev.nx.push(key);
         prev = n;
-        var opts = [c - 1, c, c + 1].filter(function (x) { return x >= 0 && x < W; });
-        c = opts[ri(opts.length)];
+        var opts = [c - 1, c, c + 1].filter(function (x) { return x >= 0 && x < W; }), c0 = c, ok = opts.filter(function (x) { return !crosses(f, c0, x, nodes); });   // F3: lines never cross
+        if (ok.length) opts = ok; c = opts[ri(opts.length)];
       }
     });
+    // F3: a plain walk gave a one-exit room 77% of the time (5 of 8 steps forced). Give each lone-exit room a second way up (a neighbouring column, no crossing
+    // lines) so most steps are a real choice. The printed tabletop map layout is [unverified]; the rows / branching / room mix here are the shelf's own.
+    for (var f2 = 1; f2 < F; f2++) {
+      Object.keys(nodes).map(Number).filter(function (k) { return nodes[k].f === f2 && nodes[k].nx.length === 1; }).sort(function (a, b) { return a - b; }).forEach(function (k) {
+        var n = nodes[k]; 
+        var cands = shuffle([n.c - 1, n.c + 1].filter(function (x) { return x >= 0 && x < W; })).filter(function (cc) {
+          var tk = (f2 + 1) * 10 + cc; if (n.nx.indexOf(tk) >= 0) return false;
+          return !crosses(f2, n.c, cc, nodes);
+        });
+        if (!cands.length) return; var cc = cands[0], tk2 = (f2 + 1) * 10 + cc;
+        if (!nodes[tk2]) { nodes[tk2] = { f: f2 + 1, c: cc, nx: [], t: 'm' }; if (f2 + 1 < F + 1) { /* gets its own way up when floor f2+1 is processed */ } }
+        n.nx.push(tk2);
+      });
+      // a node created above (no exit yet) climbs on to the nearest column of the next floor
+      Object.keys(nodes).map(Number).filter(function (k) { return nodes[k].f === f2 + 1 && nodes[k].nx.length === 0 && f2 + 1 < F; }).forEach(function (k) {
+        var n = nodes[k], opts = [n.c, n.c - 1, n.c + 1].filter(function (x) { return x >= 0 && x < W; }), cc = opts[0], tk = (f2 + 2) * 10 + cc;
+        if (!nodes[tk]) nodes[tk] = { f: f2 + 2, c: cc, nx: [], t: 'm' }; n.nx.push(tk);
+      });
+    }
     var keys = Object.keys(nodes).map(Number).sort(function (a, b) { return a - b; }), idOf = {}, arr = [];
     keys.forEach(function (k, i) { idOf[k] = i; });
     keys.forEach(function (k) {
@@ -202,11 +225,11 @@
   // death spores (heroes become Vulnerable when it dies)
   function hurtE(e, real) {
     var d = D.ENEMIES[e.id], ei = 'e' + G.b.en.indexOf(e);
-    if (d.curl && !e.curled) { e.curled = 1; e.blk += d.curl * SC; fx('blk', ei, d.curl * SC); }
+    if (d.curl && !e.curled) { e.curled = 1; e.blk += d.curl * SC; fx('trig', ei, 0, 'Curls up'); fx('blk', ei, d.curl * SC); }
   }
   function killE(e) {
     e.hp = 0; e.dead = 1; fx('kill', 'e' + G.b.en.indexOf(e), 0);
-    var d = D.ENEMIES[e.id]; if (d.deathVuln) aliveHs().forEach(function (h) { addSt(h, 'vuln', d.deathVuln); fx('debuff', 'h' + G.hs.indexOf(h), d.deathVuln, 'vuln'); });
+    var d = D.ENEMIES[e.id]; if (d.deathVuln) fx('trig', 'e' + G.b.en.indexOf(e), 0, 'Death spores'); if (d.deathVuln) aliveHs().forEach(function (h) { addSt(h, 'vuln', d.deathVuln); fx('debuff', 'h' + G.hs.indexOf(h), d.deathVuln, 'vuln'); });
   }
   function lowest() { var l = alive().sort(function (a, b) { return a.hp - b.hp; }); return l[0]; }
   function chan(h, k) {
@@ -239,7 +262,7 @@
         case 'dmgx': if (e) hitEnemy(h, e, o[1] + 0 + st(h, 'str') * SC * (o[2] - 1), card); break;
         case 'bodyslam': if (e) hitEnemy(h, e, h.blk - st(h, 'str') * SC, card); break;
         case 'all': for (var r = 0; r < (X != null ? X : 1); r++) alive().forEach(function (t) { hitEnemy(h, t, o[1], card); }); break;
-        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? SC : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
+        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? SC : 0); if (st(h, 'frail') > 0) b = Math.max(0, b - SC);   /* F2: Frail = 1 less Block per card on the tabletop scale (mirrors Weak) */ gainBlk(h, b); fx('blk', hi, b); break;
         case 'str': addSt(h, 'str', o[1]); fx('buff', hi, o[1], 'str'); break;
         case 'dblStr': addSt(h, 'str', st(h, 'str')); fx('buff', hi, 0, 'str'); break;
         case 'vuln': case 'weak': if (e && !e.dead) { addSt(e, k, o[1]); fx('debuff', 'e' + tgt, o[1], k); } break;
@@ -432,7 +455,7 @@
   function winBattle() {
     if (pendingSplit()) { var sp = G.b.en.filter(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })[0]; if (!sp.splitSaid) { sp.splitSaid = 1; fx('splitsoon', 'e' + G.b.en.indexOf(sp), D.ENEMIES[sp.id].split.length, sp.id); } return; }
     var kind = G.b.kind, gold = SC * (kind === 'b' ? 2 + ri(3) : kind === 'e' ? 1 + ri(2) : 1);   // tabletop coins x SCALE
-    if (has('gold-tooth')) gold = SC * Math.round(gold * 1.5 / SC);
+    if (has('gold-tooth')) gold = Math.round(gold * 1.5);   // F3: a true +50% (was rounded to whole coins: 8 became 16)
     G.gold += gold;
     if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + SC); });
     var cards = {}, ps = null;
@@ -472,7 +495,7 @@
     if (e.cost === 'X') { X = h.en; h.en = 0; } else h.en -= e.cost;
     h.hand.splice(ci, 1);
     fx('play', 'h' + hi, ci, c.id, ti);
-    if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].skillTax && G.b.turn >= 2) { fx('hitme', 'h' + hi, D.ENEMIES[en.id].skillTax * SC, 'enraged'); hurtHero(h, D.ENEMIES[en.id].skillTax * SC, 1); } });   // R24 tabletop elite: from its 2nd turn each Skill costs the player 1 HP
+    if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].skillTax && G.b.turn >= 2) { fx('trig', 'e' + G.b.en.indexOf(en), 0, 'Skill tax: -' + D.ENEMIES[en.id].skillTax * SC + ' HP'); fx('hitme', 'h' + hi, D.ENEMIES[en.id].skillTax * SC, 'enraged'); hurtHero(h, D.ENEMIES[en.id].skillTax * SC, 1); } });   // R24 tabletop elite: from its 2nd turn each Skill costs the player 1 HP
     if (G.scr !== 'battle') return true;
     if (e.type === 'S') G.b.en.forEach(function (en) { if (!en.dead && D.ENEMIES[en.id].onSkill) { addSt(en, 'str', D.ENEMIES[en.id].onSkill); fx('buff', 'e' + G.b.en.indexOf(en), D.ENEMIES[en.id].onSkill, 'str'); } });
     if (h.pw.afterimg) { gainBlk(h, h.pw.afterimg); }
@@ -601,7 +624,9 @@
       case 'relic': gainRelic(G.rw.relics[mv.i]); G.rw.took['r' + mv.i] = 1; G.rw.took.rn = (G.rw.took.rn || 0) + 1; if (G.rw.took.rn >= (G.rw.nrel || 1)) G.rw.took.relic = 1; break;
       case 'pick': var cid = G.rw.cards[mv.h][mv.i]; G.hs[mv.h].deck.push(mk(cid)); G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h].filter(function (x, i) { return i !== mv.i; })); break;
       case 'skip': G.rw.took['c' + mv.h] = 1; returnCards(G.hs[mv.h].k, G.rw.cards[mv.h]); break;
-      case 'leave': leaveNode(); break;
+      case 'leave': if (G.scr === 'reward' && G.rw && G.rw.pot && !G.rw.took.pot && G.pots.length < G.pslots) { G.pots.push(G.rw.pot); G.rw.took.pot = 1; }   // F3: a won potion is never lost by tapping Continue
+        if (G.scr === 'reward' && G.rw && G.rw.relics) { var offered = G.rw.relics.filter(Boolean); if (offered.length <= (G.rw.nrel || 1)) G.rw.relics.forEach(function (rid, ri2) { if (rid && !G.rw.took['r' + ri2]) { gainRelic(rid); G.rw.took['r' + ri2] = 1; } }); }   // F3: a treasure / elite relic with no choice to make is never lost by tapping Continue (a boss choice of 3 still needs a pick)
+        leaveNode(); break;
       case 'stop': G.rw = null; G.scr = 'over'; G.won = 1; break;
       case 'heal': var hh = G.hs[mv.h]; hh.hp = Math.min(hh.mhp, hh.hp + restHeal(hh)); G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;
       case 'upg': G.hs[mv.h].deck[mv.c].u = 1; G.rest.todo.splice(G.rest.todo.indexOf(mv.h), 1); if (!G.rest.todo.length) leaveNode(); break;

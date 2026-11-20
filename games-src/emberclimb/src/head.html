@@ -706,4 +706,19 @@ html body.ec-stage #stage .hand.dense.fan .card.sel .cb{display:block!important}
   body:not(.ec-stage) #stage>.mid .heropan .inf{width:100%;min-width:0}
   body:not(.ec-stage) #stage>.mid .heropan .stc{justify-content:center}
 }
+.stc .notechip{background:#3a1d5a!important;color:#fff;border:1px solid #d9b3ff;font-weight:700;cursor:pointer;white-space:normal!important}
+.stc .notechip.trig{animation:ecnote 1s ease-out}
+@keyframes ecnote{0%{transform:scale(1)}15%{transform:scale(1.35);background:#ff4d3d;box-shadow:0 0 14px #ff4d3d}100%{transform:scale(1)}}
+.pop.die.big{width:160px;text-align:center;background:rgba(20,8,4,.94);border:2px solid #ffd36a;border-radius:14px;padding:6px 8px 8px;font-size:22px!important;color:#fff;animation:ecdie 1.5s ease-out forwards;z-index:90}
+.pop.die.big .dieart{display:block;margin:0 auto 2px;width:64px;height:64px}
+@keyframes ecdie{0%{transform:scale(.4) rotate(-40deg);opacity:0}15%{transform:scale(1.15) rotate(8deg);opacity:1}25%{transform:scale(1) rotate(0)}85%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+html body.ec-stage #stage .hand.fan .card.sel.long .cb{font-size:10.5px!important;line-height:1.04!important;padding:2px 4px}
+html body .hand .card.sel.long .cb{font-size:10.5px!important;line-height:1.04!important}
+html body .reward .sub.evres{color:#fff3e0!important;opacity:1!important;background:rgba(16,11,8,.94);border:1px solid #c9a15a;border-radius:12px;padding:10px 14px;font-size:17px!important;font-weight:700;text-align:center;max-width:92%;text-shadow:none}
+html body .stc span{white-space:nowrap!important;overflow-wrap:normal!important;flex:none!important;cursor:pointer}html body.ec-stage #stage .stc{gap:2px 3px}
+.w2more{position:fixed;z-index:60;min-height:40px;padding:0 16px;border-radius:20px;background:rgba(20,12,10,.92);color:#f3e6d0;border:1px solid rgba(243,230,208,.4);font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.5)}.w2more[hidden]{display:none}
+.w2cancel{position:absolute;z-index:40;min-height:44px;padding:0 14px;border-radius:22px;background:rgba(20,12,10,.88);color:#f3e6d0;border:1px solid rgba(243,230,208,.35);font-weight:700}
+html body.ec-stage #stage .en .stc{flex-wrap:wrap!important;justify-content:center;max-width:100%;width:100%;box-sizing:border-box}html body.ec-stage #stage .en{min-width:0;max-width:100%}
+html body.ec-stage #stage .en .stc span,html body.ec-stage #stage .hfig .stc span{width:max-content!important;max-width:none!important;overflow:visible!important;box-sizing:content-box}
+html body .stc span>.art.noph,html body .stc span>.art.k-icon{display:none!important}
 </style></head>
