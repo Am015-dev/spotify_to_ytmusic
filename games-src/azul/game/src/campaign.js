@@ -27,13 +27,13 @@ var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(th
 // ---- starting a chapter ----
 function campStart(def){if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;const g=CMP_RES.g;CMP_RES=null;campLvlReset();G=g;UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.coach=!!def.hints;
     const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);UI.modal=null;const t=def.twist;if(t&&t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14}
-    if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400);return}
+    if(def.opponent.aiLevel==='easy')LVL.easy.slip=Math.min(.9,(CMP_SLIP[def.id]!=null?CMP_SLIP[def.id]:.3)+(CMP_SLIP[def.id]!=null&&def.easy?.15:0));resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400);return}
   const s=def.setup||{};const np=Math.max(2,Math.min(4,s.np||2));const ex=Object.assign({gray:false,prism:false},s.ex||{});
   const lv=['normal'];for(let i=1;i<np;i++)lv.push(def.opponent.aiLevel||'normal');const names=['You'].concat(CMP_NAMES[def.id]||(np===2?[def.opponent.name]:[def.opponent.name+' 1',def.opponent.name+' 2']));
   UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;
   UI.coach=!!def.hints;const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);
   UI.modal=null;const seats=['human'];for(let i=1;i<np;i++)seats.push('ai');
-  newGame({np,seats,lv,names,ex,mode:'x'});G.campId=def.id;G.campEasy=!!def.easy;campApplyTwist(def);if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));
+  newGame({np,seats,lv,names,ex,mode:'x'});G.campId=def.id;G.campEasy=!!def.easy;campApplyTwist(def);if(def.opponent.aiLevel==='easy')LVL.easy.slip=Math.min(.9,(CMP_SLIP[def.id]!=null?CMP_SLIP[def.id]:.3)+(CMP_SLIP[def.id]!=null&&def.easy?.15:0));
   try{localStorage.removeItem(SAVE)}catch(e){}resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
 // a saved story game resumes inside its chapter: GXC.play with its intro and boss card skipped, then campStart restores the saved state
 var CMP_RES=null;
