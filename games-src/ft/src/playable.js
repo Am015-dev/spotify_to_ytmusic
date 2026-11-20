@@ -6,21 +6,21 @@ function plName(t){if(!G)return t;const hs=G.pl.filter(x=>x.human);if(hs.length=
   const V={lifts:'lift',bids:'bid',ends:'end',takes:'take',keeps:'keep',claims:'claim',pitches:'pitch',buys:'buy',sells:'sell',summons:'summon',plants:'plant',raises:'raise',hires:'hire',sends:'send',uses:'use',has:'have',finds:'find',brings:'bring',wins:'win'};
   return t.replace(/\bYou (lifts|bids|ends|takes|keeps|claims|pitches|buys|sells|summons|plants|raises|hires|sends|uses|has|finds|brings|wins)\b/g,(m,v)=>'You '+V[v])}
 function plBanner(title,sub,cls){return;   // Addendum 7: no toasts in Play; the coach and the tracker say it
-  const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?2200:200)}
+  const b=plEl('plban','plban');b.className='plban '+(cls||'');b.innerHTML='<b>'+esc(title)+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'');void b.offsetWidth;b.classList.add('on');clearTimeout(PL.banT);PL.banT=setTimeout(()=>b.classList.remove('on'),ANIM?1300:200)}
 const PLQ=[];let PLQB=false;
 function plPop(i,d,why){if(G&&G.coach)return;   // in Learn to play the coach explains every change, one message at a time
-  PLQ.push([i,d,why]);while(PLQ.length>3)PLQ.shift();plPopNext()}
-function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,700);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();if(G&&!G.over&&me()&&me().i!==i&&G.phase==='turn'){plPopNext();return}   // a rival's pop never lands during your own turn
+  PLQ.push([i,d,why]);while(PLQ.length>2)PLQ.shift();plPopNext()}
+function plPopNext(){if(PLQB||!PLQ.length)return;const cb=document.getElementById('coach'),to=document.getElementById('turnover');if((cb&&cb.classList.contains('on'))||(to&&to.classList.contains('on'))||document.getElementById('summon')){setTimeout(plPopNext,350);return}if(!G||G.over){PLQ.length=0;return}const [i,d,why]=PLQ.shift();if(G&&!G.over&&me()&&me().i!==i&&G.phase==='turn'){plPopNext();return}   // a rival's pop never lands during your own turn
   const s=typeof seatEl==='function'?seatEl(i):null;if(!s){plPopNext();return}const r=s.getBoundingClientRect();if(!r.width){plPopNext();return}
   const e=document.createElement('div');e.className='plpop '+(d>0?'up':'dn');e.setAttribute('data-help','');e.setAttribute('aria-hidden','true');
   e.innerHTML=why?'<span>'+esc(why)+'</span>':'<b>'+(d>0?'+':'\u2212')+Math.abs(d)+'</b>';document.body.appendChild(e);PLQB=true;
   // R38 row 4: the pop lives IN the score bar (it covers the step tracker, or the scorer's seat chip), never on the tile grid
   const bar=()=>{const t2=document.getElementById('trk');if(t2&&!t2.hidden){const q=t2.getBoundingClientRect();if(q.width>40&&q.height>8)return q}const s2=seatEl(i);return s2?s2.getBoundingClientRect():r};
   const place=()=>{const q=bar();e.style.left=Math.round(q.left)+'px';e.style.top=Math.round(q.top)+'px';e.style.width=Math.round(q.width)+'px';e.style.height=Math.max(22,Math.round(q.height))+'px'};
-  e.classList.add('inbar');place();const ms=ANIM?4000+String(why||'').split(' ').length*100+400:100;
+  e.classList.add('inbar');place();const ms=ANIM?1500+String(why||'').split(' ').length*70:100;
   const keep=setInterval(()=>{if(e.isConnected)place()},120);
   setTimeout(()=>{clearInterval(keep);e.remove();PLQB=false;plPopNext()},ms)}
-function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?2600:200)}
+function plSay(who,text){const e=plEl('plreact','plreact');e.innerHTML='<i>'+who.face+'</i><span><b>'+esc(who.name)+'</b> '+esc(text)+'</span>';void e.offsetWidth;e.classList.add('on');clearTimeout(PL.reactT);PL.reactT=setTimeout(()=>e.classList.remove('on'),ANIM?1600:200)}
 // R25: every score pop's number is the sum of the reasons it names. One part changed: "You lose 3 pts: spent 3 coins" /
 // "Teal scores 5 pts from palaces". Several parts: "You score 2 pts: palaces +5, coins \u22123" (the listed numbers add up to the headline).
 const PL_LAB={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',palms:'palms',palaces:'palaces',goods:'goods sets',items:'treasures',cities:'cities',tiles:'tiles held'};

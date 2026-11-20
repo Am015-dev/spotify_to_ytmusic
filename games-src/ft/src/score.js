@@ -97,13 +97,13 @@ function scStepBest(ms){const good=scWalkOuts();if(!good||!G.move)return -1;cons
 // R38 row 6: the glow IS the hint. A newcomer who taps only what glows should win about half of the games on defaults.
 // Bid: only the suggested spot glows (the others stay tappable). Start: the suggested start plus the 2 best other starts glow.
 // Walk: on the suggested start the glow follows the suggested route (the planner's, not the points-now greedy one).
-function scGlowHint(){if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
+function scGlowHint(){UI.bestTile=-1;if(!G||G.over||G.tut||online()||(typeof gdStep==='function'&&gdStep())||G.q||UI.pendDj||UI.pendItem||typeof hlpAdvice!=='function')return;const hp=me();if(!hp||G.pl.filter(x=>x.human).length!==1)return;
   if(G.phase==='bid'){if(!UI.pickSpot.length)return;const m=hlpAdvice();if(m&&m.act==='bid'&&UI.pickSpot.includes(m.spot))UI.pickSpot=[m.spot];return}
   if(G.phase!=='turn'||G.step!=='move'||G.cur!==hp.i)return;
   if(!G.move){const m=hlpAdvice();scCompute();const rk=Object.keys(SC.starts).map(Number).filter(s=>UI.pick.includes(s)&&SC.starts[s].best).sort((a,b)=>SC.starts[b].best.total-SC.starts[a].best.total);
     const keep=[];if(m&&m.act==='start'&&UI.pick.includes(m.tile))keep.push(m.tile);for(const s of rk){if(keep.length>=1)break;if(!keep.includes(s))keep.push(s)}if(keep.length)UI.pick=keep;return}
   const pl=typeof HPL!=='undefined'?HPL.plan:null;if(!pl||pl.seed!==G.seed||pl.turn!==G.turn)return;const path=G.move.path,q=pl.o.path;if(q.length<=path.length||!path.every((x,i)=>x===q[i]))return;
-  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.pick=[nx]}
+  const nx=q[path.length];if(UI.pick.includes(nx)||validMoves(hp.i).some(m=>m.act==='step'&&m.tile===nx))UI.bestTile=nx}   // F4: every legal next tile keeps glowing; the planner's is only starred, never picked for you
 (function(){const oc=computePick;computePick=function(){oc.apply(this,arguments);try{scGlowHint()}catch(e){}}})();
 // on a step with several colours the chooser lists the planned colour first, so the first glowing chip is the planned one
 // R38 row 5: on the steps where the market cannot be touched (Earn, Shadows, selling) a phone hides it, so the tiles keep >= 44 px
@@ -117,3 +117,8 @@ function scGlowHint(){if(!G||G.over||G.tut||online()||(typeof gdStep==='function
 (function(){const o=renderMarket;renderMarket=function(){o.apply(this,arguments);try{const hp=me(),R=document.documentElement;
   R.classList.toggle('bid-mk',!!(G&&!G.over&&G.phase==='bid'));R.classList.toggle('mk-buy',!!(G&&!G.over&&UI.pickMk&&UI.pickMk.length));
   const pw=!!(G&&!G.over&&hp&&G.phase==='turn'&&!G.q&&!UI.pickDj.length&&validMoves(hp.i).some(m=>m.act==='djinn'||m.act==='item'));R.classList.toggle('pw-on',pw)}catch(e){}}})();
+
+// F4: walk clarity. The walk so far is numbered on the board (1, 2, 3 ...), the planned next tile wears a star, every other glowing tile stays tappable.
+(function(){const o=renderGrid;renderGrid=function(){o.apply(this,arguments);try{const g=document.getElementById('grid');if(!g||!G||G.over)return;
+  const mv=G.move;if(mv&&mv.path)mv.path.forEach((ti,n)=>{const el=g.querySelector('[data-tile="'+ti+'"]');if(el)el.setAttribute('data-walk',n===0?'start':String(n))});
+  if(UI.bestTile>=0&&mv){const el=g.querySelector('[data-tile="'+UI.bestTile+'"]');if(el)el.classList.add('best')}}catch(e){}}})();

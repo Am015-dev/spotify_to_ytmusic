@@ -453,3 +453,12 @@ html.short:not(.land) #mkt .mrow>*{flex:0 0 auto}html.short:not(.land) #mkt .mro
 html.dj-off:not(.land) #mkt .drow,html.mr-off:not(.land) #mkt .mrow{display:none!important}
 html.short.bid-mk:not(.land) #mkt,html.short.pw-on:not(.land) #mkt .drow{display:none!important}
 html.short:not(.land) #trk{display:none!important}   /* the one-line prompt above says what to do; the score pop then lands on the scorer's seat chip */
+
+/* F4: walk clarity, PC bid buttons, end points */
+.tile[data-walk]::before{content:attr(data-walk);position:absolute;left:4px;top:4px;z-index:3;min-width:22px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:11px;background:#3b1c0e;color:#fff6dc;font:800 14px/22px var(--ff-b,system-ui);text-align:center;pointer-events:none}
+.tile[data-walk="start"]::before{content:"start";font-size:12px}
+.tile.best.glow{outline:3px solid #ffd84a;outline-offset:-3px}
+.tile.best.glow::after{content:"★ planned";position:absolute;left:50%;bottom:3px;transform:translateX(-50%);z-index:3;padding:0 6px;border-radius:9px;background:#ffd84a;color:#3b1c0e;font:800 12px/18px var(--ff-b,system-ui);pointer-events:none}
+.ab[data-ui="undodrop"],.ab.ghost[data-act="undo"]{min-height:48px;font-size:16px;border:2px solid #8e3a1c;background:#fff6dc;color:#3b1c0e}
+.sch .dje{color:#5a2a8a;font-weight:800}
+@media (min-width:1024px){.bidt .spot{min-height:60px;min-width:72px}.bidt .spot .sp-b{min-height:56px;min-width:68px;font-size:18px!important}.bidt .spot .sp-c{font-size:16px}.bidt .spot .ord{font-size:14px}}

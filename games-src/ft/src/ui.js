@@ -55,7 +55,7 @@ function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
   return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss"><i class="sti">★</i>${shownTotal(p)}</b>
-   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}</span>
+   <span class="s2"><span class="st">${E2('🪙','coin')}${p.coins}<em class="w"> coins</em></span><span class="st">${E2('🐪','camel')}${p.camels}<em class="w"> camel${p.camels===1?'':'s'} left</em></span>${p.tent?'<span class="st">⛺</span>':''}${(()=>{const dj=scoreOf(p).djinns;return dj?`<span class="st dje" title="Djinn points, counted at the end">🧞+${dj}<em class="w"> at end</em></span>`:''})()}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">${E2('🧺','basket')}${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">${E2('🧞','djinn')}${p.dj.length}</span>`:''}</span></div>`}
 function renderSeats(){const el=$('#seats');if(!el)return;const h=G.pl.map(seatHtml).join('');el.dataset.n=G.pl.length;el.innerHTML=h}
 // ---------- the bazaar ----------
@@ -212,5 +212,5 @@ function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!
 // ---------- the computer: one step at a time, about 0.6 s a drop; tap the table to hurry ----------
 const modalStops=()=>UI.modal&&UI.modal!=='lobby';
 let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops()||tutHeld())return;const s=sideToAct();if(s<0||P(s).human)return;
-  const drop=G.step==='move'&&G.move;const base=drop?320:420;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
+  const drop=G.step==='move'&&G.move;const base=drop?170:230;/* W497: a rival turn takes about 2-3 s; Skip or a tap on the table hurries it */const d=ANIM?Math.max(0,base/(UI.speed||1)*(UI.hurry?.12:1)):0;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||tutHeld()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},d)}
