@@ -36,7 +36,7 @@ function coWatch(){const c=UI.coach;if(!c||!G||G.over)return;const me=0;
   if(G.q&&G.q.who===me&&G.q.kind==='infoStd')coPush('token');
   if(G.phase==='turn'){coPush('tokens2');
     if(decider()===me&&!G.q&&UI.V&&UI.V.legal){c.turns++;coPush('point');
-      const mine=G.st[0].w.filter(x=>!x.cut);if(mine.some(x=>String(x.id)===String(59)))coPush('yellow');if(mine.some(x=>x.id===49))coPush('red');
+      const mine=G.st[0].w.filter(x=>!x.cut);if(mine.some(x=>String(x.id)===String(59)))coPush('yellow');if(mine.some(x=>x.id===53))coPush('red');
       if(c.turns>1&&document.querySelector('#mine .chip'))coPush('probe')}
     if(G.eq&&G.eq[0]&&G.eq[0].st!=='locked')coPush('gear')}}
 function coAfter(m,seat,L,dc,missed){const c=UI.coach;if(!c||!m)return;const txt=L.map(e=>e.t).join(' ');

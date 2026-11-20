@@ -85,15 +85,15 @@ const tutProbeSel=n=>!!UI.sel&&UI.sel.mode==='dual'&&UI.sel.tool==='dd'&&UI.sel.
 // Plum chooses which of the two probed wires gets the miss token (the rules let the wire's owner choose): the crew answers that one question only
 async function tutQ(){const tok=UI.tutTok;for(let n=0;n<4&&tutAlive(tok)&&G.q&&!isHuman(G.q.who);n++){if(!await tutAct(G.q.who,tok))break}}
 // the red wire is not a legal tap, so the board ignores it: during the red step the tutorial listens for it
-document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target.closest&&e.target.closest('#mine .tile');if(!t||!G)return;const sl=G.st[+t.dataset.s]&&G.st[+t.dataset.s].w[+t.dataset.k];if(sl&&sl.id===49&&!sl.cut)GXT.act({type:'tap',what:'red'})});
+document.addEventListener('click',e=>{if(!tutOn())return;const t=e.target.closest&&e.target.closest('#mine .tile');if(!t||!G)return;const sl=G.st[+t.dataset.s]&&G.st[+t.dataset.s].w[+t.dataset.k];if(sl&&sl.id===53&&!sl.cut)GXT.act({type:'tap',what:'red'})});
 const hitTxt=()=>{const t=G.st[1].w[tutIdx(1,23)];return t&&t.cut};
 function tutSteps(){return tutStory([
  {id:'goal',title:'The goal',say:()=>'Cut all '+G.st.reduce((a,s)=>a+s.w.length,0)+' wires together; a miss burns the fuse, red means boom.',target:tq('#cutc'),also:tq('#fuse'),wait:null,ready:()=>!!G&&!!G.q},
  {id:'mine',title:'Your wires',say:'These wires are yours. Only you see the numbers. Every stand is sorted, lowest on the left.',target:tq('#mine'),wait:null},
  {id:'token',title:'Show a wire',say:'Everyone starts by showing one wire. Tap your 7: a token tells the crew its number.',target:tutEl(0,24),
-   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===8},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
+   wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&a.id===24},ready:()=>!!G&&!!G.q&&G.q.who===0&&G.q.kind==='infoStd'},
  {id:'point',title:'Point at a wire',ai:tutCrew,say:'Your turn. Teal\'s token says 6. Tap that wire to point at it.',target:tutEl(1,23),
-   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===7},ready:()=>tutMyTurn()&&!UI.sel},
+   wait:{type:'tap',match:a=>a.what==='tile'&&!a.own&&a.id===23},ready:()=>tutMyTurn()&&!UI.sel},
  {id:'name',title:'Name a number',say:'Now say a number you hold. Tap one of your 6s. If Teal has a 6, you both cut.',target:()=>{const k=myTwoK();return k>=0?tileEl(G.st[0].w[k].u):null},
    wait:{type:'tap',match:a=>a.what==='tile'&&a.own&&cv(a.id)===6&&a.k===myTwoK()},ready:()=>tutMyTurn()&&tutSelTo(1,23)},
  {id:'hit',title:'A hit!',say:'Match! Both 6s are cut and Rewind unlocked. One cut per turn, then it passes clockwise.',target:tq('#gear .eqk'),wait:null,ready:()=>hitTxt()&&!G.over&&tutCalm()},
