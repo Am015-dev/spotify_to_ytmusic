@@ -9,7 +9,7 @@
 // easy: often picks a random non-suicidal move, ignores monster risk. normal: 1-ply. hard: adds the look-ahead and rival pressure.
 // R92: Easy rivals also court leviathan risk (rk < 0: they sail into reach and start near leviathans), so a first-timer wins about half: rk in 3+ player games,
 // rk2 heads-up (newcomer sim, tools/newcomer.js). easyT = the old Easy, kept for the guided game (its rival's moves are part of the lesson).
-const AILV={easy:{noise:30,rnd:.45,rk:-200,rk2:-70,mob:2,look:0,kill:250,push:0,draw:0},easyT:{noise:30,rnd:.45,rk:0,mob:2,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
+const AILV={easy:{noise:30,rnd:.3,rk:-300,rk2:-300,mob:0,look:0,kill:250,push:0,draw:0},easyT:{noise:30,rnd:.45,rk:0,mob:2,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
 let AISALT=12345;function setAiSeed(s){AISALT=s>>>0}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.sp);mix(K.mons.length);
@@ -61,8 +61,9 @@ function evalPos(B,seat,L,handAfter){let sc=0;
       const d=Math.min(S.x,S.y,BW-1-S.x,BW-1-S.y);sc-=(d===0?(L.e0!=null?L.e0:26):d===1?(L.e1!=null?L.e1:7):0)*w;
       if(B.wave&&inRowK(front,B))sc-=45*w;
       if(S.i===seat&&handAfter){const n=safeOpts(B,S,handAfter);sc+=Math.min(n,7)*L.mob;
+        if(L.minSafe&&n<L.minSafe)sc-=L.minPen*(L.minSafe-n);
         if(L.draw){const fd=drawSafe(B,S);if(n===0)sc-=380*(1-fd)+60}else if(n===0)sc-=150}
-      sc-=Math.max(0,3-distMon(B,front))*5*w}
+      sc-=Math.max(0,3-distMon(B,front))*(L.dm||5)*w}
     else if(L.push){const d=Math.min(S.x,S.y,BW-1-S.x,BW-1-S.y);sc+=(d===0?L.push*2:d===1?L.push*.6:0)}}
   return sc}
 function inRowK(sq,B){const w=B.wave;if(!w||!sq)return false;return (w.r&1)?sq[0]===w.x:sq[1]===w.y}
@@ -84,8 +85,8 @@ function scoreMove(K,seat,m,L){const hand=K.hands[seat];let sc=0,B,dead=[];
   return 0}
 function startScore(K,seat,m,L,rng){const front=[m.x,m.y];let sc=0;const B=K;sc-=monRisk(B,front,null,L,null)*L.rk;
   const corner=(m.x===0||m.x===BW-1)&&(m.y===0||m.y===BW-1);if(corner)sc-=40;
-  let dmin=9;for(const s of K.ships)if(s.i!==seat&&s.x!=null)dmin=Math.min(dmin,Math.abs(s.x-m.x)+Math.abs(s.y-m.y));sc+=Math.min(dmin,6)*3;
-  sc-=Math.max(0,3-distMon(K,front))*10;
+  let dmin=9;for(const s of K.ships)if(s.i!==seat&&s.x!=null)dmin=Math.min(dmin,Math.abs(s.x-m.x)+Math.abs(s.y-m.y));sc+=Math.min(dmin,6)*3-(dmin===0?400:0);
+  sc-=Math.max(0,3-distMon(K,front))*(L.dm?L.dm*2:10);
   // prefer the port whose tile paths curve away from the nearest edge
   sc+=rng()*6;return sc}
 function aiAnswer(K,seat,L,rng){const q=K.q;const opts=q.opts;const hand=K.hands[seat];const byH=h=>opts.findIndex(o=>o.h===h);
@@ -104,13 +105,17 @@ function aiAnswer(K,seat,L,rng){const q=K.q;const opts=q.opts;const hand=K.hands
     default:return Math.floor(rng()*opts.length)}}
 function posVal(K,seat,r,L){if(r.st==='edge'||r.st==='mon')return -1000;if(r.st==='gate')return -200;const f=[r.x,r.y];const d=Math.min(f[0],f[1],BW-1-f[0],BW-1-f[1]);return -monRisk(K,f,r.on,L,null)*(L.rk||1)-(d===0?26:d===1?7:0)}
 let CAMP_PUSH=null;  // campaign twist 'harrier': {seat,v} makes that seat steer rivals toward the edge
-function decide(K,seat,lv){let L0=AILV[lv]||AILV.normal;if(lv==='easy'&&typeof TS!=='undefined'&&TS&&TS.on)L0=AILV.easyT;if(L0.rk2!=null&&K.ships.length===2)L0=Object.assign({},L0,{rk:L0.rk2});const L=CAMP_PUSH&&seat===CAMP_PUSH.seat?Object.assign({},L0,{push:CAMP_PUSH.v}):L0;const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
+const EARLY_TURNS=5,EARLY_RK=4000,EARLY_PEN=500,EARLY_SLACK=60,EARLY_KILL=-450,EARLY_DM=40;
+function decide(K,seat,lv){let L0=AILV[lv]||AILV.normal;if(lv==='easy'&&typeof TS!=='undefined'&&TS&&TS.on)L0=AILV.easyT;if(L0.rk2!=null&&K.ships.length===2)L0=Object.assign({},L0,{rk:L0.rk2});let L=CAMP_PUSH&&seat===CAMP_PUSH.seat?Object.assign({},L0,{push:CAMP_PUSH.v}):L0;
+  // F3: every level, turns 1-5: no leviathan gambling (an Easy captain's reach for risk waits until the game is under way) and never leave myself under 2 safe follow-ups
+  if(K.turn<=EARLY_TURNS)L=Object.assign({},L,{rk:Math.max(L.rk,EARLY_RK),minSafe:2,minPen:EARLY_PEN,dm:EARLY_DM,mob:Math.max(L.mob,7),draw:1,kill:Math.min(L.kill,EARLY_KILL)});
+  const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
   if(K.q){if(K.q.who!==seat)return null;return {a:'q',i:aiAnswer(K,seat,L,rng)}}
   const mv=genMoves(K,seat);if(!mv.length)return null;
   if(K.phase==='setup'){let best=mv[0],bs=-1e9;for(const m of mv){const sc=startScore(K,seat,m,L,rng);if(sc>bs){bs=sc;best=m}}return best}
   if(mv.length===1)return mv[0];
   const sc=mv.map(m=>scoreMove(K,seat,m,L)+(L.noise?(rng()-.5)*L.noise:0));
-  if(L.rnd&&rng()<L.rnd){const ok=mv.filter((m,i)=>sc[i]>-500);if(ok.length)return ok[Math.floor(rng()*ok.length)]}
+  if(L.rnd&&rng()<L.rnd){const early=L.minSafe&&K.phase!=='setup';const th=early?Math.max(-500,Math.max(...sc)-EARLY_SLACK):-500;const ok=mv.filter((m,i)=>sc[i]>th);if(ok.length)return ok[Math.floor(rng()*ok.length)]}
   let bi=0;for(let i=1;i<mv.length;i++)if(sc[i]>sc[bi])bi=i;return mv[bi]}
 function aiMove(seat,lv){return decide(knowledge(seat),seat,lv||(G&&G.seats[seat]&&G.seats[seat].lv)||'normal')}
 function aiStep(force){if(!G||G.phase==='over')return null;const s=sideToAct();if(s<0)return null;if(G.seats[s].human&&!force)return null;const m=aiMove(s);return m?{seat:s,m}:null}
