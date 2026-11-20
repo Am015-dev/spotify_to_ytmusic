@@ -429,3 +429,8 @@ html.wm-goal .gxh-bub{visibility:hidden}
 #whyc{position:fixed;z-index:60;max-width:calc(100vw - 16px);padding:6px 10px;border-radius:12px;font-size:14px;font-weight:800;line-height:1.25;background:#f3ead2;color:#1d2420;border:2px solid #3f7a4a;box-shadow:0 3px 12px rgba(0,0,0,.45);pointer-events:none;opacity:0;transform:translateY(-4px);transition:opacity .25s,transform .25s}
 #whyc.dn{border-color:#b5523b}
 #whyc.on{opacity:1;transform:none}
+/* F2 / R86-8: the Hints switch is a toggle (knob right = on), so it never looks like the Hint bulb next to it; at phone width it shows a short word under it */
+.hintsw svg .knob{fill:currentColor;stroke:none;transition:transform .2s}
+.hintsw:not(.on) svg .knob{transform:translateX(-10px)}
+#bulbbtn,#hintsB{position:relative}
+@media (max-width:999px){#bulbbtn::after,#hintsB::after{position:absolute;left:0;right:0;bottom:1px;text-align:center;font-size:11px;font-weight:800;line-height:1;pointer-events:none;color:currentColor}#bulbbtn::after{content:"Hint"}#hintsB::after{content:"On"}#hintsB:not(.on)::after{content:"Off"}#bulbbtn svg,#hintsB svg{margin-top:-8px}}
