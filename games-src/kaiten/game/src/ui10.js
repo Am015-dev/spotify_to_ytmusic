@@ -42,16 +42,17 @@ function hlpWhy(v, mv) {
   let t;
   if (k === 'tempura') t = g > 0 ? 'Pairs up with your Crispy Prawn:' + plus : 'Two Crispy Prawns score 5; you need a partner.';
   else if (k === 'sashimi') t = g > 0 ? 'Completes three Fish Slices:' + plus : 'Three Fish Slices score 10; this starts a set.';
-  else if (k === 'dumpling') t = 'Every Steam Bun scores more than the last.' + plus;
+  else if (k === 'dumpling') t = 'Each bun is worth more, up to five (15).' + plus;
   else if (k === 'roll1' || k === 'roll2' || k === 'roll3') t = 'Roll icons: the most this round scores 6.';
   else if (k === 'salmon' || k === 'squid' || k === 'egg') t = c.wasabiUnused > 0 ? 'Lands on your Fire Paste and scores triple:' + plus : TY[k].name + ' scores' + plus.replace(' now.', ' now.');
   else if (k === 'wasabi') { const n = G.players[v].hand.filter(i => NIG[tkey(i)]).length; t = n ? 'Triples your next nigiri; this hand has ' + n + '.' : 'Fire Paste triples the next nigiri you take.'; }
   else if (k === 'chop') t = 'Twin Sticks let you take two dishes later.';
-  else if (k === 'pudding') t = 'Custard Cups pay at the end: most scores 6.';
+  else if (k === 'pudding') t = 'Custard pays at the end: most +6, fewest loses 6 (3+ diners).';
   else t = 'The best dish for you right now.';
   let alt = -1; try { const hd = G.players[v].hand; for (const o of hd) if (tkey(o) !== k) alt = Math.max(alt, gainOf(v, [o])); } catch (e) { }
-  if (g > 0 && alt >= 0) t = t.replace(/\s*\+\d+ now\.?$/, '').replace(/[:.]$/, '') + ': +' + g + ' now, next best +' + alt + '.';
-  return hlpCap(t.replace(/:\s*\+/, ': +'), 18);
+  if (g > 0 && alt >= 0) { const b = t.replace(/\s*\+\d+ now\.?$/, '').replace(/[:.]$/, ''); t = alt > g ? b + ': +' + g + ' now, sets up more.' : b + ': +' + g + ' now, next best +' + alt + '.'; }
+  else if (g === 0 && alt > 0) t = t.replace(/[.]$/, '') + ' (sets up a later score).';
+  return hlpCap(t.replace(/:\s*\+/, ': +'), 20);
 }
 // R82: never open with Fire Paste when there is no nigiri in this hand to land on it: take the next best dish by the same values
 function hlpSane(v, mv) {
@@ -88,7 +89,7 @@ const GOAL = {
   how: [
     ['tempura', 'Take one dish, then pass your hand on.'],
     ['sashimi', 'Dishes score in sets: two prawns make 5.'],
-    ['pudding', 'Custard counts at the end: most cups wins 6.']
+    ['pudding', 'Custard counts at the end: most cups wins 6, fewest loses 6 (3+ diners).']
   ]
 };
 function goalOpen() { return !!document.querySelector('#kkgoal.on'); }

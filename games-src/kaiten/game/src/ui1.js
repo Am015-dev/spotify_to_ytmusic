@@ -151,7 +151,7 @@ function whyPick(ids) {
   const x = k[0];
   if (x === 'tempura') return c.tempura % 2 ? 'This finishes a pair of prawns: +5.' : 'The start of a prawn pair (5 points once you have two).';
   if (x === 'sashimi') return c.sashimi % 3 === 2 ? 'This finishes a set of fish slices: +10.' : 'Fish slices only score in sets of three.';
-  if (x === 'dumpling') return 'Each extra bun is worth more: now ' + KK.dumplingPts(c.dumpling) + ' after, then ' + KK.dumplingPts(c.dumpling + 1) + '.';
+  if (x === 'dumpling') return 'Each bun is worth more, up to five (15): now ' + KK.dumplingPts(c.dumpling) + ' after, then ' + KK.dumplingPts(c.dumpling + 1) + '.';
   if (ICONS[x]) return 'Roll icons race for the most this round (6 points, second 3).';
   if (NIG[x]) return c.wasabiUnused ? 'Your Fire Paste is waiting: this nigiri scores triple (+' + NIG[x] * 3 + ').' : 'A nigiri is worth ' + NIG[x] + ' point' + (NIG[x] > 1 ? 's' : '') + ' straight away.';
   if (x === 'wasabi') return 'Fire Paste triples the next nigiri you serve.';
