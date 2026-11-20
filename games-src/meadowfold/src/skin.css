@@ -213,3 +213,4 @@ button{font:inherit;color:inherit}
   .gx-dock-body{padding:4px 8px 4px}
 }
 .rdy.fitb{background:#3f7fb0}
+.pill b{min-width:2ch;text-align:right;font-variant-numeric:tabular-nums}

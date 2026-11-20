@@ -39,3 +39,29 @@ Not fixed (shared kit, not this game's files): menu tab labels overflowing ("Acc
 
 ## Proof
 games-src/meadowfold/proof/first-3-min.webm (375x667), proof/1-title.png, 2-settle-animal.png, 3-animal-card.png, 4-results.png
+
+# F1 fixer round (20 Nov 2026)
+
+## Rules: the 7 [unverified] items
+Settled, each with a rules-test assert: mirror images (all 42 habitats equal their own mirror image turned, so the rule never
+changes a game), empty animal pile (row stays short), tie-break (spirit cube is not an animal cube), first player (table's choice; seat 1).
+Still open: solo sun bonus by spirit type and the side A sun, card data vs printed art, side B shape. rules-test: 74/74 (full), 54/54 quick.
+
+## The 5 reasons a person would still say no, and the fix
+1. First 30 s: the title was a settings form and "Start game" sat below the fold at 375x667. Now: Learn to play + Play now, options folded.
+2. Flat, pale look: small discs on white hexes, not a diorama. Now every token is a raised paper hex sheet; stacks lift sheet on sheet.
+3. Cards unreadable, choice unclear: tiny habitat drawings. Now cards use the same colour sheets, bigger; "Fits now" on cards you can settle.
+4. No payoff: a small "+4" pill. Now the animal hops out big and settles in, the card's new number pulses, and a finished card gets a banner.
+5. Rival turn unreadable: valley swap plus a toast. Now blue rings mark each changed hex, a tinted "rival's turn" line, a held recap with
+   where the points came from ("Rival +10: animals +6, trees +4").
+Calm rules: the dashed ring animation is now 4 beats (no infinite animations), text >= 11 px, taps >= 44 px at 375x667 and 375x553.
+
+## Cold play (independent tester, no history), verdict as-is
+Could you play? Yes. Nothing blocked me. Fun 3/5: placing tokens and watching the score jump feels good; the rival's big jumps felt
+unexplained; lost 52-56 on the last turn. Play again? Probably yes, once. Exciting moment: the rival settled two Herons in one turn and tied.
+Confused: token order in the hand, end trigger, cards I could not build yet, field/building scoring, the rival's valley scoring.
+Fixed after: the recap names where the rival's points came from, the end line says "Ends when a valley is full" / "Last round: a valley
+is full", clearer field and building tips, steady score pills. (Not done: two text taps that failed were driver/label issues.)
+
+## Proof
+proof/first-3-min.webm (375x667, recorded before the tester's text fixes), proof/1-title.png, 2-settle-animal.png, 3-animal-card.png, 4-results.png

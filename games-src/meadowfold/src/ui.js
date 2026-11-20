@@ -73,7 +73,7 @@ function act(m, how) {   // a human move
 function undo() { if (!UI.undo.length || UI.busy) return; G = JSON.parse(UI.undo.pop()); UI.sel = G.turn.hand.length ? { kind: 'tok', h: 0 } : null; render(); }
 function runAI() {
   if (!G || G.over) return; var s = E.seat(); if (!s.ai) return nextActor();
-  UI.busy = true; UI.rivalMark = {}; var plan = AI.plan(s.ai), i = 0, start = E.score(s).total, got = [];
+  UI.busy = true; UI.rivalMark = {}; var plan = AI.plan(s.ai), i = 0, start = E.score(s).total, got = [], sc0all = E.score(s);
   (function stepAI() {
     if (!G || G.over) { UI.busy = false; return nextActor(); }
     if (i >= plan.length) { UI.busy = false; return nextActor(); }
@@ -83,7 +83,8 @@ function runAI() {
     if (m.k) UI.rivalMark[m.k] = 1; if (fx) UI.justCard = fx.id;
     if (m.t === 'cube') got.push(E.card(typeof s.cubes[m.k] === 'number' ? s.cubes[m.k] : +String(s.cubes[m.k]).slice(1)).name.split(' ').pop());
     if (m.t === 'end') {
-      var d = E.score(s).total - start; UI.recap = s.name + ' scored +' + d + (got.length ? ', settled ' + got.slice(0, 2).join(' and ') : '') + '.';
+      var d = E.score(s).total - start, sc1 = E.score(s), why = [['animals', 'animals'], ['trees', 'trees'], ['mounts', 'peaks'], ['fields', 'fields'], ['builds', 'buildings'], ['water', G.side === 'A' ? 'river' : 'islands']].map(function (q) { return [q[1], (sc1[q[0]] || 0) - (sc0all[q[0]] || 0)]; }).filter(function (q) { return q[1] > 0; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 2);
+      UI.recap = s.name + ' +' + d + (why.length ? ': ' + why.map(function (q) { return q[0] + ' +' + q[1]; }).join(', ') : '') + (got.length ? ' (' + got.slice(0, 2).join(', ') + ')' : '') + '.';
       save(); if (!UI.fast) SND.card();
       if (UI.fast || G.over) { UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
       render(); UI.aiT = setTimeout(function () { UI.busy = false; UI.rivalMark = null; UI.view = G.cur; nextActor(); }, Math.max(2000, AIDELAY * 3.4)); return;
@@ -211,7 +212,7 @@ function renderDock() {
   h += '</div>';
   $('#dockbody').innerHTML = h; UI.justCard = null;
 }
-var TOKEN_TIP = { water: 'Water: a longer river scores more.', mount: 'Mountain: stack up to 3, beside another.', trunk: 'Trunk: put leaves on it later.', leaf: 'Leaves: a tree. Taller trees score more.', field: 'Field: 5 points per pair or more.', build: 'Building: on a token, 3 colours around.' };
+var TOKEN_TIP = { water: 'Water: a longer river scores more.', mount: 'Mountain: stack up to 3, beside another.', trunk: 'Trunk: put leaves on it later.', leaf: 'Leaves: a tree. Taller trees score more.', field: 'Fields: each group of 2+ scores 5.', build: 'Building: 5 if 3 colours touch it.' };
 function renderLine() {
   var t = '', T = G.turn, s = E.seat();
   if (G.over) t = 'The valley is finished.';
@@ -225,8 +226,8 @@ function renderLine() {
   else if (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; })) t = 'An animal can move in! Tap its card.';
   else t = 'Done? Tap End turn.';
   if (UI.recap && !UI.busy && UI.view === G.cur && G.turn.took < 0 && !G.over) t = UI.recap;
-  if (G.last && !G.over) t += ' Last round!';
-  else if (!G.over && G.seats.some(function (x) { return E.empties(x) <= 5; })) t += ' Ending soon!';
+  if (G.last && !G.over) t += ' Last round: a valley is full.';
+  else if (!G.over && G.seats.some(function (x) { return E.empties(x) <= 5; })) t += ' Ends when a valley is full.';
   $('#line').textContent = t; $('#line').classList.toggle('rv', !!(UI.busy || (s.ai && !G.over)));
   $('#board').classList.toggle('rivalv', !!(G.seats[UI.view] && G.seats[UI.view].ai && !G.over));
 }
