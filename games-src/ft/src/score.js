@@ -11,12 +11,12 @@ function scParts(p,o){const t=G.board[o.e],parts=[];
   const claim=owner(t)==null&&remain<=0&&p.camels>0,mine=claim||owner(t)===p.i;
   if(claim&&tileWorth(t)>0)parts.push([tileWorth(t),'tile '+TILEDEF[t.k].n]);
   switch(o.c){
-   case 'vizier':{parts.push([o.n*(hasDj(p,'wazira')?3:1),o.n+' Advisor'+(o.n>1?'s':'')]);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz+o.n&&!(q.vz<p.vz))parts.push([10,'passing '+plName(q.nm)]);break}
-   case 'elder':parts.push([o.n*(hasDj(p,'hikma')?4:2),o.n+' Sage'+(o.n>1?'s':'')]);break;
+   case 'vizier':{parts.push([o.n*(hasDj(p,'wazira')?DJN.wazira:1),o.n+' Advisor'+(o.n>1?'s':'')]);for(const q of G.pl)if(q.i!==p.i&&q.vz<p.vz+o.n&&!(q.vz<p.vz))parts.push([10,'passing '+plName(q.nm)]);break}
+   case 'elder':parts.push([o.n*(hasDj(p,'hikma')?DJN.hikma:2),o.n+' Sage'+(o.n>1?'s':'')]);break;
    case 'merchant':{const cards=G.market.slice(0,o.n);const g=goodsGain(p,cards)-cards.filter(r=>r==='fakir').length*1.2;if(g>0)parts.push([Math.round(g),'goods sets']);break}
    case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;if(o.n*blues>0)parts.push([o.n*blues,o.n+' Mason coins']);break}
    case 'assassin':parts.push([0,'Shadows strike']);break}
-  if(mine&&t.k==='village')parts.push([5,'palace']);if(mine&&t.k==='oasis')parts.push([hasDj(p,'nakhla')?5:3,'palm']);
+  if(mine&&t.k==='village')parts.push([5,'palace']);if(mine&&t.k==='oasis')parts.push([hasDj(p,'nakhla')?DJN.nakhla:3,'palm']);
   return parts}
 const scTotal=ps=>ps.reduce((a,x)=>a+x[0],0);
 const scText=ps=>ps.filter(x=>x[0]>0||ps.length===1).map(x=>x[1]+' +'+x[0]).join(', ')||'no points';

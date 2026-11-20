@@ -1,6 +1,6 @@
 # Sands of Qamar: rules notes
 
-A browser version of the original game (by the original designer and publisher), with its expansions. The rules and numbers follow the real game. Every name, text and piece of art is original, for copyright reasons. The djinns keep the real cards' effects under new names.
+A browser game for 2 to 5 players, with its expansions. Every name, text, number set and piece of art is our own. The djinns, goods, tiles and item values are original to this game.
 
 ## Components (as in the real game)
 - **Board:** 30 tiles, 6×5.

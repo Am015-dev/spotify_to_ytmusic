@@ -71,7 +71,7 @@ function coachPages(){const sc=G.over.scores;const A=sc.find(x=>x.p===0),B=sc.fi
   const row=(l,x,y,why)=>`<div class="ce-r"><span>${l}</span><b>${x}</b><b>${y}</b><p>${why}</p></div>`;
   const hd='<div class="ce-h"><span></span><b>You</b><b>Farid</b></div>';
   const tiles=G.board.filter(t=>owner(t)===0).length,tilesB=G.board.filter(t=>owner(t)===1).length;
-  const pv=p=>hasDj(p,'nakhla')?5:3,sv=p=>hasDj(p,'hikma')?4:2;
+  const pv=p=>hasDj(p,'nakhla')?DJN.nakhla:3,sv=p=>hasDj(p,'hikma')?DJN.hikma:2;
   const gs=p=>{const c={};for(const r of p.res)c[r]=(c[r]||0)+1;return Object.keys(c).length};
   const pages=[
    {t:'Coins and land',h:hd+row('Coins',a.coins,b.coins,'Every coin is a point.')+row('Land',a.tiles,b.tiles,'You hold '+tiles+' tile'+(tiles===1?'':'s')+', Farid '+tilesB+'. Each scores the number printed on it.')},

@@ -1,37 +1,38 @@
-// ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Original names; effects follow the published cards. ----------
+// ---------- djinns: 22 base + 3 promos + 2 Crafters + 1 Cutpurse djinn. Our own names, point values and numbers. ----------
+const DJN={wazira:4,hikma:5,nakhla:4,majlis:4,jawhar:4,sana:3};
 // cost: null (always on) | 'EF' (1 Sage or 1 Mystic) | 'EEF' (1 Sage + 1 Sage-or-Mystic) | 'F' (1 Mystic) | 'F+' (1+ Mystics, bidding)
 const DJINNS=[
- {k:'zarifa',n:'Zarifa',vp:5,cost:null,x:'At the end, 2 Mystics count as 1 good.'},
- {k:'tamuz',n:'Tamuz',vp:8,cost:'EF',x:'Put 3 people from the bag on a tile with nothing on it (no people, camel, tent, palm or palace).'},
- {k:'harith',n:'Harith',vp:6,cost:null,x:'Any djinn summoned: +1 coin (you), +2 (rival).'},
- {k:'sadim',n:'Sadim',vp:6,cost:null,x:'Shadows cannot take your Advisors or Sages (or Crafters).'},
- {k:'nuraya',n:'Nuraya',vp:6,cost:'EF',x:'Place a palace on any Hamlet.'},
- {k:'qirsh',n:'Qirsh',vp:4,cost:'EEF',x:'This turn your Masons earn double.'},
- {k:'wahha',n:'Wahha',vp:8,cost:'EF',x:'Plant a palm tree on any Oasis.'},
- {k:'burhan',n:'Burhan',vp:10,cost:'EF',x:'A palace may go on a nearby tile.'},
- {k:'nakhla',n:'Nakhla',vp:8,cost:null,x:'Each palm of yours scores 5, not 3.'},
- {k:'ghulam',n:'Ghulam',vp:8,cost:'EF',x:'Use when your Shadows act: this turn they take 2 people, both from one tile or 2 of one rival\'s Advisors, Sages or Crafters.'},
- {k:'wazira',n:'Wazira',vp:6,cost:null,x:'Your Advisors score 3 each instead of 1.'},
- {k:'sirra',n:'Sirra',vp:6,cost:null,x:'What your Shadows take pays you: a taken Advisor or Sage joins you, a Trader gives you the top goods card, a Mason pays 1 coin per blue tile around, a Crafter joins you with an item.'},
- {k:'dalil',n:'Dalil',vp:6,cost:'F+',x:'Each Mystic cuts a bid by one spot.'},
- {k:'rawda',n:'Rawda',vp:10,cost:'EF',x:'A palm may go on a nearby tile.'},
- {k:'jamal',n:'Jamal',vp:4,cost:'EEF',x:'Put one of your camels on an empty tile.'},
- {k:'tariq',n:'Tariq',vp:6,cost:null,x:'Dropped on your tile: +1 coin (+2 rival).'},
- {k:'qasra',n:'Qasra',vp:6,cost:null,x:'Any palace placed: +1 coin (you), +2 (rival).'},
- {k:'khanjar',n:'Khanjar',vp:6,cost:null,x:'Shadows take a person: +1 coin (+2 rival).'},
- {k:'hikma',n:'Hikma',vp:6,cost:null,x:'Your Sages score 4 each instead of 2.'},
- {k:'ruya',n:'Ru’ya',vp:4,cost:'EEF',x:'Look at 3 djinns. Keep 1.'},
- {k:'suqra',n:'Suqra',vp:8,cost:'F',x:'Take the top card of the goods deck.'},
- {k:'fath',n:'Fath',vp:4,cost:'EEF',x:'Put a camel on a tile with only people.'},
+ {k:'zarifa',n:'Zarifa',vp:6,cost:null,x:'At the end, every 2 Mystics you hold count as 1 good.'},
+ {k:'tamuz',n:'Tamuz',vp:7,cost:'EF',x:'Drop 3 people from the bag onto any bare tile.'},
+ {k:'harith',n:'Harith',vp:5,cost:null,x:'Each time a djinn is summoned: you gain 1 coin if it is yours, 2 if it is a rival\'s.'},
+ {k:'sadim',n:'Sadim',vp:7,cost:null,x:'Shadows cannot remove your Advisors, Sages or Crafters.'},
+ {k:'nuraya',n:'Nuraya',vp:7,cost:'EF',x:'Build a palace on any Hamlet.'},
+ {k:'qirsh',n:'Qirsh',vp:5,cost:'EEF',x:'This turn your Masons pay out twice.'},
+ {k:'wahha',n:'Wahha',vp:7,cost:'EF',x:'Plant a palm on any Oasis.'},
+ {k:'burhan',n:'Burhan',vp:9,cost:'EF',x:'You may build a palace on a tile beside your finish.'},
+ {k:'nakhla',n:'Nakhla',vp:10,cost:null,x:`Each palm you hold is worth ${DJN.nakhla} points, not 3.`},
+ {k:'ghulam',n:'Ghulam',vp:9,cost:'EF',x:'When your Shadows strike this turn they remove 2 people: both from one tile, or 2 Advisors, Sages or Crafters of one rival.'},
+ {k:'wazira',n:'Wazira',vp:4,cost:null,x:`Each Advisor you keep is worth ${DJN.wazira} points, not 1.`},
+ {k:'sirra',n:'Sirra',vp:7,cost:null,x:'Whatever your Shadows remove pays you: an Advisor or Sage joins your tribe, a Trader gives you a goods card, a Mason pays 1 coin per nearby blue tile, a Crafter joins you with an item.'},
+ {k:'dalil',n:'Dalil',vp:5,cost:'F+',x:'Bidding: each Mystic you spend lets you jump one spot up the track.'},
+ {k:'rawda',n:'Rawda',vp:9,cost:'EF',x:'You may plant a palm on a tile beside your finish.'},
+ {k:'jamal',n:'Jamal',vp:5,cost:'EEF',x:'Place one of your camels on any bare tile.'},
+ {k:'tariq',n:'Tariq',vp:5,cost:null,x:'Whenever someone drops on a tile you hold: 1 coin to you if you drop, 2 if a rival does.'},
+ {k:'qasra',n:'Qasra',vp:7,cost:null,x:'Each palace built anywhere: 1 coin to you if it is yours, 2 if a rival\'s.'},
+ {k:'khanjar',n:'Khanjar',vp:7,cost:null,x:'Each time Shadows remove a person: 1 coin to you if yours, 2 if a rival\'s.'},
+ {k:'hikma',n:'Hikma',vp:4,cost:null,x:`Each Sage you keep is worth ${DJN.hikma} points, not 2.`},
+ {k:'ruya',n:'Ru’ya',vp:4,cost:'EEF',x:'Peek at 3 djinns and keep 1.'},
+ {k:'suqra',n:'Suqra',vp:7,cost:'F',x:'Take the top goods card from the deck.'},
+ {k:'fath',n:'Fath',vp:5,cost:'EEF',x:'Place a camel on a tile that holds only people.'},
  // promos
- {k:'amir',n:'Amir',vp:6,cost:null,set:'promos',x:'Advisors taken: +1 coin (you), +2 (rival).'},
- {k:'majlis',n:'Majlis',vp:0,cost:null,set:'promos',x:'At the end, +5 points per djinn you own.',assumed:'printed VP'},
- {k:'dukkan',n:'Dukkan',vp:0,cost:null,set:'promos',x:'Rival ends on a Bazaar: you take a good.'},
+ {k:'amir',n:'Amir',vp:5,cost:null,set:'promos',x:'Each time Advisors are taken: 1 coin to you if yours, 2 if a rival\'s.'},
+ {k:'majlis',n:'Majlis',vp:0,cost:null,set:'promos',x:`At the end, every djinn you own earns ${DJN.majlis} extra points.`,},
+ {k:'dukkan',n:'Dukkan',vp:0,cost:null,set:'promos',x:'When a rival finishes on a Bazaar you take a good.'},
  // Crafters expansion
- {k:'jawhar',n:'Jawhar',vp:6,cost:null,set:'artisans',x:'Each precious item you own scores 3 more.',assumed:'printed VP'},
- {k:'sana',n:'San’a',vp:6,cost:null,set:'artisans',x:'Each Crafter you keep scores 2 more.',assumed:'printed VP'},
+ {k:'jawhar',n:'Jawhar',vp:5,cost:null,set:'artisans',x:`Each precious item you hold earns ${DJN.jawhar} extra points.`,},
+ {k:'sana',n:'San’a',vp:5,cost:null,set:'artisans',x:`Each Crafter you keep earns ${DJN.sana} extra points.`,},
  // Cutpurse expansion
- {k:'hafiz',n:'Hafiz',vp:6,cost:null,set:'thieves',x:'Cutpurses cannot touch you.',assumed:'name and printed VP'}];
+ {k:'hafiz',n:'Hafiz',vp:5,cost:null,set:'thieves',x:'Cutpurses cannot touch you.'}];
 const DJ={};for(const d of DJINNS)DJ[d.k]=d;
 function DJINNS_FOR(ex){return DJINNS.filter(d=>!d.set||ex[d.set])}
 function hasDj(p,k){return p.dj.includes(k)}
