@@ -21,20 +21,20 @@ function tutTake(g, key, avoid) {
 function tutStage(g) {
   const p = g.players[0], out = [];
   while (p.hand.length) g.discard.push(p.hand.pop());
-  for (const k of ['mine', 'twig_barge', 'resin_refinery', 'farm', 'wife']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
-  for (const k of ['inn', 'post_office', 'lookout']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
+  for (const k of ['flintpit', 'kindling_raft', 'amber_still', 'bramble_allotment', 'goodwife_vole']) { const id = tutTake(g, k, out); p.hand.push(id); out.push(id); }
+  for (const k of ['lantern_rest', 'dovecote_depot', 'spyglass_perch']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(0, id)); out.push(id); }
   // Bramble starts with a small city of her own too, so the demo ends close (you just ahead), not 22 to 1
-  for (const k of ['castle', 'farm', 'mine', 'twig_barge', 'architect']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
-  const toad = tutTake(g, 'barge_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad; out.push(toad);
-  const bard = tutTake(g, 'bard', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
+  for (const k of ['stonecrown_keep', 'bramble_allotment', 'flintpit', 'kindling_raft', 'master_lathwright']) { const id = tutTake(g, k, out); HB._.withG(g, () => HB._.placeInCity(1, id)); out.push(id); }
+  const toad = tutTake(g, 'reedpunt_toad', out); const old = g.meadow[2]; if (old >= 0) g.discard.push(old); g.meadow[2] = toad; out.push(toad);
+  const bard = tutTake(g, 'ballad_finch', out); const o5 = g.meadow[5]; if (o5 >= 0) g.discard.push(o5); g.meadow[5] = bard; TUT_BARD = bard;   // bought at the Inn in Summer
   { const mk = D.specialEvents.findIndex(e => e.key === 'sev_resident_minstrel'), j = g.sev.findIndex(e => e.k === mk); if (j > 0) g.sev[j].k = g.sev[0].k; g.sev[0].k = mk; }   // Inn + that card = this special event
   g.forest = [6, 1, 5];   // Bumper Bramble, Foragers Crossing, Mixed Glade
   g.nolog = false;
 }
 const tutId = k => { const h = G && G.players[0].hand.find(id => HB.cardKey(id) === k); return h == null ? -1 : h; };
-const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'barge_toad');
+const tutToad = () => G.meadow.find(id => id >= 0 && HB.cardKey(id) === 'reedpunt_toad');
 let TUT_BARD = -1; const tutBard = () => TUT_BARD;
-const tutInn = () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'inn'); return e ? e.id : -1; };
+const tutInn = () => { const e = G && G.players[0].city.find(c => HB.cardKey(c.id) === 'lantern_rest'); return e ? e.id : -1; };
 // a pending choice of mine: the index of the first option that passes f, and its button
 const myQ = kind => !!G && !!G.q && G.q.who === 0 && (!kind || G.q.kind === kind) && !UI.cards.length && !UI.animBusy;
 const qIdx = f => (G && G.q ? G.q.opts.findIndex(f) : -1);
@@ -94,31 +94,31 @@ function tutSteps() {
     { id: 'rival', title: S.rival.title, say: () => tsay('rival', pname(1)), target: () => { const e = document.querySelector('#bd .tile[data-k="basic"][data-i="3"]'); return e && e.getBoundingClientRect().width ? e : null; }, wait: null,
       ready: () => G.players[1].dep.length === 1 && myTurn() },
     { id: 'resin', title: S.resin.title, say: tsay('resin'), target: tgEl('w:basic:6'), wait: tapIs('w:basic:6'), ready: () => myTurn() && !!tgEl('w:basic:6')() },
-    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
-    { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('farm')), wait: tapIs(() => 'p:hand:' + tutId('farm')),
-      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('farm'))() },
+    { id: 'hand', title: S.hand.title, say: tsay('hand'), target: tq('#bd .strip.hand'), wait: null, ready: () => myTurn() && !!tgEl('p:hand:' + tutId('bramble_allotment'))() },
+    { id: 'build', title: S.build.title, say: tsay('build'), target: () => tutHandRect('p:hand:' + tutId('bramble_allotment')), wait: tapIs(() => 'p:hand:' + tutId('bramble_allotment')),
+      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('bramble_allotment'))() },
     { id: 'city', title: S.city.title, say: () => tsay('city', HB.cityCount(G, 0)), target: tq('#bd .strip.city'), wait: null,
-      ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'farm') && !UI.cards.length },
+      ready: () => !!G && G.players[0].city.some(e => HB.cardKey(e.id) === 'bramble_allotment') && !UI.cards.length },
     { id: 'prep', title: S.prep.title, say: tsay('prep'), target: tgEl('prep'), wait: tapIs('prep'),
       ready: () => myTurn() && !!tgEl('prep')() },
     { id: 'spring', title: S.spring.title, say: () => tsay('spring', G.players[0].workers, G.players[0].res.berry), target: tq('#bd .resrow'), wait: null,
       ready: () => !!G && G.players[0].season === 1 && !UI.cards.length },
     { id: 'berry', title: S.berry.title, say: tsay('berry'), target: tgEl('w:basic:0'), wait: tapIs('w:basic:0'), ready: () => myTurn() && !!tgEl('w:basic:0')() },
     { id: 'toad', title: S.toad.title, say: tsay('toad'), target: () => { const id = tutToad(); return id == null ? null : tgEl('p:meadow:' + id)(); },
-      wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'barge_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
-    { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('wife')), wait: tapIs(() => 'p:hand:' + tutId('wife')),
-      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('wife'))() },
+      wait: { type: 'tap', match: a => /^p:meadow:/.test(a.tg || '') && HB.cardKey(+a.tg.split(':')[2]) === 'reedpunt_toad' }, ready: () => myTurn() && tutToad() != null && !!tgEl('p:meadow:' + tutToad())() },
+    { id: 'free', title: S.free.title, say: tsay('free'), target: () => tutHandRect('p:hand:' + tutId('goodwife_vole')), wait: tapIs(() => 'p:hand:' + tutId('goodwife_vole')),
+      ready: () => myTurn() && !!tgEl('p:hand:' + tutId('goodwife_vole'))() },
     { id: 'event', title: S.event.title, say: tsay('event'), target: tgEl('w:bev:1'), wait: tapIs('w:bev:1'),
       ready: () => myTurn() && !!tgEl('w:bev:1')() },
     { id: 'forest', title: S.forest.title, say: tsay('forest'), target: tgEl('w:forest:0'), wait: tapIs('w:forest:0'), ready: () => myTurn() && !!tgEl('w:forest:0')() },
     { id: 'prep2', title: S.prep2.title, say: tsay('prep2'), target: tgEl('prep'), wait: tapIs('prep'), ready: () => myTurn() && G.players[0].season === 1 && !!tgEl('prep')() },
     { id: 'summer', title: S.summer.title, say: tsay('summer'), target: qEl(o => o.card !== undefined && o.card !== tutBard()), wait: { type: 'tap', times: 2, match: a => /^q:/.test(a.tg || '') && qTap(o => o.card !== undefined && o.card !== tutBard()).match(a) },
       ready: () => !!G && !!G.q && HB.actor(G) === 0 && !UI.cards.length && !UI.animBusy && !!tq('#bd [data-t^="q:"]')() },
-    { id: 'inn', title: S.inn.title, say: tsay('inn'), target: () => tgEl('d:' + tutInn())(), wait: tapIs(() => 'd:' + tutInn()),
+    { id: 'lantern_rest', title: S.lantern_rest.title, say: tsay('lantern_rest'), target: () => tgEl('d:' + tutInn())(), wait: tapIs(() => 'd:' + tutInn()),
       ready: () => myTurn() && G.players[0].season === 2 && !!tgEl('d:' + tutInn())() },
     { id: 'innbuy', title: S.innbuy.title, say: () => tsay('innbuy', cname(tutBard())), target: qEl(o => o.card === tutBard()), wait: qTap(o => o.card === tutBard()),
-      ready: () => myQ('inn') && !!qEl(o => o.card === tutBard())() },
-    { id: 'bard', title: S.bard.title, say: tsay('bard'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
+      ready: () => myQ('lantern_rest') && !!qEl(o => o.card === tutBard())() },
+    { id: 'ballad_finch', title: S.ballad_finch.title, say: tsay('ballad_finch'), target: qEl(isDone), wait: qTap(isDone), ready: () => myQ('discard') && !!qEl(isDone)() },
     { id: 'special', title: S.special.title, say: () => tsay('special', cname(tutInn()), cname(tutBard())), target: tgEl('w:sev:0'), wait: tapIs('w:sev:0'), ready: () => myTurn() && !!tgEl('w:sev:0')() },
     { id: 'stack', title: S.stack.title, say: tsay('stack'), target: qEl((o, i) => i === 0), wait: qTap(o => o === G.q.opts[0]), ready: () => myQ('stack') && !!qEl((o, i) => i === 0)() },
     { id: 'haven', title: S.haven.title, say: tsay('haven'), target: tgEl('w:haven'), wait: tapIs('w:haven'), ready: () => myTurn() && !!tgEl('w:haven')() },
@@ -150,7 +150,7 @@ function tutSteps() {
   // reaction beat after each action, and the next step waits until it has been read
   L.forEach(st => {
     const r = HBS.steps[st.id].react, rd = st.ready; UI.tutLog = UI.tutLog || [];
-    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', inn: 'city', innbuy: 'meadow', special: 'goals', gossip: 'places' }[st.id];
+    const tab = { twig: 'places', places: 'places', resin: 'places', rival: 'places', berry: 'places', forest: 'places', toad: 'meadow', event: 'goals', city: 'city', summer: 'meadow', haven: 'places', journey: 'goals', lantern_rest: 'city', innbuy: 'meadow', special: 'goals', gossip: 'places' }[st.id];
     if (st.id === 'goal') st.avoid = () => ['#bd .resrow', '#bd .pv-tabs', '#bd .strip.hand'].map(q => document.querySelector(q)).filter(Boolean).map(e => e.getBoundingClientRect()).filter(r => r.width);   // step 1 talks about the score chips: keep goods, tabs and hand clear
     if (tab) st.avoid = () => { const pn = document.querySelector('#bd .pv-panel.on'); return pn ? [pn.getBoundingClientRect()] : null; };   // the bubble keeps the board it talks about visible
     st.onEnter = () => { UI.tutLog.push(st.id); UI.tutTab = tab || null; if (tab) { UI.pvTab = tab; try { pvSetTab(tab, true); } catch (e) { } } };
@@ -232,7 +232,7 @@ const COACH = [
   { id: 'rival', when: (p, r) => r.dep.length >= 1 && p.dep.length >= 1, say: (p, r) => r.name + ' sent a worker. A place without the Shared mark holds one worker. It is closed to you.', later: 'A place without the Shared mark holds one worker.' },
   { id: 'hand', when: (p) => myTurnC() && p.hand.length > 0 && p.dep.length >= 1, say: () => 'Your hand holds plans. Glowing ones are affordable. Pay the price to build. City holds 15, hand holds 8.', later: 'Hand holds 8, city holds 15. Glowing cards are affordable.' },
   { id: 'build', when: (p) => p.city.length > 3, say: () => 'A building! It stays in your city. Green cards pay again in Spring and Autumn.', later: 'Cards stay in your city. Green cards pay in Spring and Autumn.' },
-  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'wife') && p.city.some(e => HB.cardKey(e.id) === 'farm') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
+  { id: 'free', when: (p) => !!p.hand.find(id => HB.cardKey(id) === 'goodwife_vole') && p.city.some(e => HB.cardKey(e.id) === 'bramble_allotment') && myTurnC(), say: () => 'The Goodwife fits your Allotment. She moves in free. Play her from your hand.', later: 'A critter moves into its matching building free.' },
   { id: 'meadow', when: (p) => myTurnC() && p.dep.length >= 2 && p.res.berry >= 1, say: () => 'Anyone can buy from the meadow. Critters cost berries. The meadow refills.', later: 'The meadow holds 8 cards for anyone. Critters cost berries.' },
   { id: 'event', when: (p) => myTurnC() && p.season >= 1, say: () => 'Flags are events. Build what one needs, then claim it for three points. Only one player can.', later: 'Events: build what they need, claim first, 3 points.' },
   { id: 'prep', when: (p) => !p.passed && p.season < 3 && p.workers - p.dep.length === 0 && myTurnC(), say: p => 'All workers are out. Prepare: they come home and you gain ' + (p.season === 2 ? 'two more' : 'one more') + '. ' + (p.season === 1 ? 'Summer: take up to 2 meadow cards.' : 'Green cards pay.'), later: 'Prepare: workers come home. Spring and Autumn: green cards pay. Summer: take up to 2 meadow cards.' },
@@ -244,7 +244,7 @@ const COACH = [
 // rules that need a situation we cannot count on: told at the end
 const COACH_TALE = 1e9;   // the first game plays the whole year (R21: ending it after 14 actions left the rival with 4 cards); the cut-off code stays for a future short mode
 const COACH_LATER = [
-  { id: 'inn', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
+  { id: 'lantern_rest', later: 'The Inn and Post Office are open. You play a rival\'s open card. They get a point.' },
   { id: 'haven', later: 'The Haven turns two discarded cards into one resource.' },
   { id: 'longroad', later: 'The Long Road opens in Autumn only.' },
   { id: 'special', later: 'Each special event needs two named cards in your city.' },

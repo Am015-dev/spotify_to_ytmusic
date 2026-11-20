@@ -433,7 +433,7 @@ function trayChip(m, i, tg) {
     const c = cdef(m.card);
     if (m.how === 'pay') inner = [costEl(c.cost, 20)];
     else if (m.how === 'occupy') inner = [h('b', 'free'), cardEl(m.via, 26)];
-    else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
+    else inner = [h('b', ({ hostler_hedgehog: 'Inn −3', pulley_lift: 'Crane −3', thornhold_cells: 'Cells −3', gavel_marten: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
     if (m.card !== undefined && effQ()) inner = [h('b', cname(m.card)), h('span.eff', effLine(m.card))];
@@ -490,7 +490,7 @@ function renderActs(mm, qm, qShown) {
 function renderPrompt() {
   const pr = $('#prompt'); if (!pr || !G) return;
   pr.textContent = promptText();
-  pr.classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
+  pr.classList.toggle('flintpit', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
 }
 function renderBar() { }
 function renderDock() { renderPrompt(); }
@@ -513,7 +513,7 @@ function promptText() {
 // the line for a pending decision: plain, whole, 12 words at most (wraps to 2 lines in the bar; the long wording stays in the log)
 function qShort(q) {
   if (q.kind === 'discard') { const d = q.opts[0] && q.opts[0].d, c = (d && d.count) || 0, mx = d && d.max; if (c || (mx && mx < 9)) { const mn = (d && d.min) || 0, ex = mn && mn === mx; return c + (mx && mx < 9 ? ' of ' + mx : '') + ' discarded. ' + (ex ? 'Tap ' + (mx - c) + ' more.' : c >= mn ? 'Tap more, or Done.' : 'Tap ' + (mn - c) + ' more.'); } }   // a running count before Done
-  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', ruins: 'Raze a building for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Pick which effect goes first.', queen: 'Play a card worth up to 3 free.', inn: 'Play a meadow card 3 cheaper.', university: 'Remove a card for its cost back.', cemetery: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', ranger: 'Pick a worker, then where it goes.', tuck: 'Tuck a critter under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Keep one; your rival gets the other.', pigeon: 'Play a shown card free, or skip.', waive: 'Pick resources to leave off the cost.', judge: 'Pick a resource in the cost to swap.', spend: 'Spend goods for tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep it, or tuck it for 1 point?', clock: 'Belfry: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick a stack for the cellar.' })[q.kind];
+  const m = ({ discard: 'Tap cards to discard, then tap Done.', resource: 'Pick the resource you want to gain.', meadow: 'Tap a meadow card to take it.', production: 'Pick which green card works next.', toppled_hall: 'Raze a building for its cost back.', recipient: 'Pick the rival who gets it.', give: 'Pick what to give away.', stack: 'Pick how many to put here.', trigger: 'Pick which effect goes first.', thistle_regent: 'Play a card worth up to 3 free.', lantern_rest: 'Play a meadow card 3 cheaper.', lorewood_college: 'Remove a card for its cost back.', mossgrave_glade: 'Reveal 4 from the deck or discards?', copy: 'Tap a place to copy its reward.', prisoner: 'Tap a critter to lock in the cells.', clear: 'Tap a meadow card to clear away.', recall: 'Tap a worker to bring back to you.', trailwarden_fox: 'Pick a worker, then where it goes.', tuck: 'Tuck a critter under the goal.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove from the game.', teach: 'Keep one; your rival gets the other.', pigeon: 'Play a shown card free, or skip.', waive: 'Pick resources to leave off the cost.', gavel_marten: 'Pick a resource in the cost to swap.', spend: 'Spend goods for tokens, or stop.', trade: 'Trade up to 2 goods for any 2.', bazaar: 'Play one card you took for 1 less?', scroll: 'Keep it, or tuck it for 1 point?', clock: 'Belfry: repeat a place, or skip.', mole: 'Pick a rival green card to copy.', chip: 'Pick a green card to run again.', stock: 'Pick a stack for the cellar.' })[q.kind];
   const n = qLeft(q), t = m || wordsCap(q.title, 12);
   return n > 1 ? t.replace(/[.?]$/, '') + ': ' + n + ' left.' : t;
 }
@@ -732,7 +732,7 @@ function pvRender() {
       const short = PV_BOARD[fk] || (kind === 'haven' ? '2 cards for any 1' : [w.main.replace(/ \+ /g, ', '), (w.sub || '').replace(/\s*·?\s*shared/, '')].filter(Boolean).join(', '));
       const parts = short.split(', '); e.appendChild(h('span.pv-tin', h('span.pv-sw', h('b', parts.length < 2 ? short : parts.flatMap((t, j) => j ? [' ', h('span.pv-it', t + (j < parts.length - 1 ? ',' : ''))] : [h('span.pv-it', t + (parts.length > 1 ? ',' : ''))])))));   // each item stays whole on its line
       if (sh) e.appendChild(h('span.pv-shtag', 'shared'));
-      if (kind === 'haven' && HBKit.paintedHref) { const ph = HBKit.paintedHref('general_store'); if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the haven has no painting of its own: the trading post card fits it
+      if (kind === 'haven' && HBKit.paintedHref) { const ph = HBKit.paintedHref('cranny_market'); if (ph) { e.style.setProperty('--pa', 'url("' + ph + '")'); e.classList.add('pv-painted'); } }   // the haven has no painting of its own: the trading post card fits it
     } else
     e.appendChild(h('span.pv-tin', h('span.pv-sico', ic(w.ico, small ? 22 : 26)), h('span.pv-sw', h('b', w.main), w.sub ? h('span', w.sub) : null)));
     const legal = tg && okw.has(tg);
