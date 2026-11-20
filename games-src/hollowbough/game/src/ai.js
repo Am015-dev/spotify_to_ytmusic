@@ -59,25 +59,25 @@ const GFLOOR = [4, 10, 16, 25];
 const EVV = { sev_grand_market_scheme: 6, sev_hurry_scurry_dash: 5.5, sev_night_of_sparklers: 5, sev_lost_parchments_unearthed: 4, sev_acorn_bandits_seized: 3.5, sev_marsh_fever_remedy: 2.5, sev_wingborne_healers: 3, sev_commencement_of_pupils: 4.5, sev_counsel_for_scoundrels: 3, sev_pilgrims_trail: 4, sev_resident_minstrel: 5, sev_gilded_shrine_vault: 5, sev_vigil_of_remembrance: 4, sev_toll_holiday: 6, sev_grand_hollow_games: 9, sev_change_of_proprietors: 5 };
 const EVX = { sev_counsel_for_scoundrels: 2, sev_pilgrims_trail: 2.5, sev_vigil_of_remembrance: 2.5, sev_wingborne_healers: 1 };
 const remProd = p => p.season === 0 ? 2 : p.season < 3 ? 1 : 0;
-const farms = p => { let n = 0; for (const e of p.city) if (key(e.id) === 'farm') n++; return n; };
+const farms = p => { let n = 0; for (const e of p.city) if (key(e.id) === 'bramble_allotment') n++; return n; };
 const costVal = c => { let v = 0; for (const r of RES) v += (c[r] || 0) * RV[r]; return v; };
 function extraVal(k, e, p, rem) {
   const nf = farms(p), fut = p.season < 3 ? 3 : 1.2, vis = p.season < 3 ? 1 : 0.6;
   switch (k) {
-    case 'farm': return 0.5 * rem;
-    case 'general_store': return (0.5 + (nf ? 0.5 : 0)) * rem;
-    case 'mine': return 0.8 * rem; case 'resin_refinery': return 0.55 * rem; case 'twig_barge': return 0.6 * rem;
-    case 'barge_toad': return 0.6 * nf * rem + 0.2;
-    case 'fair_grounds': return 1.4 * rem;
-    case 'husband': return e.pair != null && nf ? 0.55 * rem : 0;
-    case 'chip_sweep': return 0.8 * rem; case 'doctor': return 1.3 * rem; case 'woodcarver': return 1.1 * rem;
-    case 'monk': return 1.6 * rem; case 'peddler': return 0.4 * rem; case 'teacher': return 0.8 * rem; case 'miner_mole': return 0.9 * rem;
-    case 'storehouse': { let s = 0; if (e.stock) for (const r of RES) s += e.stock[r] * RV[r]; return 1.0 * rem + s * 0.9; }
-    case 'historian': return 0.7 * fut; case 'shopkeeper': return 0.5 * fut; case 'courthouse': return 0.5 * fut * 0.7;
-    case 'judge': return 1.5; case 'crane': return 1.4; case 'dungeon': return 1.4; case 'innkeeper': return 1.1;
-    case 'clock_tower': return e.tok * 0.6;
-    case 'chapel': return 1.5 * vis; case 'inn': return 1.8 * vis; case 'post_office': return 1.0 * vis; case 'queen': return 2.5 * vis;
-    case 'cemetery': return 3.0 * vis; case 'lookout': return 1.8 * vis; case 'monastery': return 3.0 * vis; case 'university': return 1.5 * vis;
+    case 'bramble_allotment': return 0.5 * rem;
+    case 'cranny_market': return (0.5 + (nf ? 0.5 : 0)) * rem;
+    case 'flintpit': return 0.8 * rem; case 'amber_still': return 0.55 * rem; case 'kindling_raft': return 0.6 * rem;
+    case 'reedpunt_toad': return 0.6 * nf * rem + 0.2;
+    case 'midsummer_green': return 1.4 * rem;
+    case 'goodman_vole': return e.pair != null && nf ? 0.55 * rem : 0;
+    case 'tinder_chipmunk': return 0.8 * rem; case 'poultice_badger': return 1.3 * rem; case 'whittle_beaver': return 1.1 * rem;
+    case 'brother_moss': return 1.6 * rem; case 'haggle_magpie': return 0.4 * rem; case 'slate_schoolmarm': return 0.8 * rem; case 'echo_mole': return 0.9 * rem;
+    case 'hoard_cellar': { let s = 0; if (e.stock) for (const r of RES) s += e.stock[r] * RV[r]; return 1.0 * rem + s * 0.9; }
+    case 'chronicle_owl': return 0.7 * fut; case 'tallyshop_mouse': return 0.5 * fut; case 'mosswood_assize': return 0.5 * fut * 0.7;
+    case 'gavel_marten': return 1.5; case 'pulley_lift': return 1.4; case 'thornhold_cells': return 1.4; case 'hostler_hedgehog': return 1.1;
+    case 'dewdrop_belfry': return e.tok * 0.6;
+    case 'candlewick_shrine': return 1.5 * vis; case 'lantern_rest': return 1.8 * vis; case 'dovecote_depot': return 1.0 * vis; case 'thistle_regent': return 2.5 * vis;
+    case 'mossgrave_glade': return 3.0 * vis; case 'spyglass_perch': return 1.8 * vis; case 'quietstone_cloister': return 3.0 * vis; case 'lorewood_college': return 1.5 * vis;
   }
   return 0;
 }
@@ -85,14 +85,14 @@ const pe = { pair: null, tok: 0, stock: null };
 function projBonus(k, p) {
   const cc = (pred) => { let n = 0; for (const e of p.city) if (pred(def(e.id))) n++; return n; };
   switch (k) {
-    case 'castle': return cc(c => c.kind === 'construction' && !c.unique) + 2;
-    case 'palace': return cc(c => c.kind === 'construction' && c.unique) + 2;
-    case 'school': return cc(c => c.kind === 'critter' && !c.unique) + 2;
-    case 'theater': return cc(c => c.kind === 'critter' && c.unique) + 2;
-    case 'ever_tree': return cc(c => c.color === 'purple') + 2;
-    case 'king': return 3;
-    case 'architect': return Math.min(6, p.res.resin + p.res.pebble) + 1;
-    case 'wife': return p.city.some(e => key(e.id) === 'husband' && e.pair == null) ? 3 : 1.2;
+    case 'stonecrown_keep': return cc(c => c.kind === 'construction' && !c.unique) + 2;
+    case 'gildenfern_court': return cc(c => c.kind === 'construction' && c.unique) + 2;
+    case 'acorn_academy': return cc(c => c.kind === 'critter' && !c.unique) + 2;
+    case 'glowworm_playhouse': return cc(c => c.kind === 'critter' && c.unique) + 2;
+    case 'elderheart_oak': return cc(c => c.color === 'purple') + 2;
+    case 'bramble_sovereign': return 3;
+    case 'master_lathwright': return Math.min(6, p.res.resin + p.res.pebble) + 1;
+    case 'goodwife_vole': return p.city.some(e => key(e.id) === 'goodman_vole' && e.pair == null) ? 3 : 1.2;
   }
   return 0;
 }
@@ -181,13 +181,13 @@ function quickQ(W, seat) {
     case 'spend': return 0;
     case 'trade': { let bi = o.length - 1, bv = 0.12; o.forEach((x, i) => { if (!x.res) return; const gain = Math.max(...RES.map(r => resGain(W, seat, r))) - RV[x.res] * 0.8; if (gain > bv) { bv = gain; bi = i; } }); return bi; }
     case 'stock': return argmax(x => { const k = Object.keys(x.d.o)[0]; return x.d.o[k] * RV[k]; });
-    case 'meadow': case 'inn': case 'queen': case 'cemetery': case 'pigeon': case 'bazaar': {
+    case 'meadow': case 'lantern_rest': case 'thistle_regent': case 'mossgrave_glade': case 'pigeon': case 'bazaar': {
       return argmax(x => { if (x.card === undefined) return x.label && /deck/.test(x.label) ? 0.3 : x.label && /discard pile/.test(x.label) ? 0.2 : x.label && /Stop|Do not|none|neither/.test(x.label) ? -0.5 : 0; const c = def(x.card); return cardVal(W, p, x.card) - costVal(c.cost) * (q.kind === 'meadow' ? 0.3 : 1) * 0.9; });
     }
     case 'clear': return argmax(x => -cardVal(W, W.players[(seat + 1) % W.players.length], x.card) + 0.1 * cardVal(W, p, x.card));
     case 'prisoner': return argmax(x => -cardVal(W, p, x.card) - def(x.card).pts);
-    case 'ruins': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)));
-    case 'university': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)) - projBonus(key(x.card), p));
+    case 'toppled_hall': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)));
+    case 'lorewood_college': return argmax(x => costVal(def(x.card).cost) - def(x.card).pts - extraVal(key(x.card), pe, p, remProd(p)) - projBonus(key(x.card), p));
     case 'cityDisc': return argmax(x => -(def(x.card).pts + extraVal(key(x.card), pe, p, remProd(p)) + projBonus(key(x.card), p)));
     case 'banish': return argmax(x => def(x.card).pts + (def(x.card).color === 'purple' ? 1 : 0));
     case 'teach': return argmax(x => hv(x.card));
@@ -201,7 +201,7 @@ function quickQ(W, seat) {
     case 'chip': case 'mole': return argmax(x => extraVal(key(x.card), pe, p, 1));
     case 'copy': return argmax(x => locVal(W, seat, x.d.loc));
     case 'clock': return argmax(x => x.d && x.d.loc ? locVal(W, seat, x.d.loc) - 0.5 : 0.3);
-    case 'ranger': {
+    case 'trailwarden_fox': {
       if (o.length === 1) return 0;
       if (o[0].h === 'rangerPlace') return argmax(x => locVal(W, seat, x.d.loc));
       let bi = o.length - 1, bv = 0.3;

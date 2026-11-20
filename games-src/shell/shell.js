@@ -6,10 +6,24 @@ const GX={key:'gx',open:null,
     document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
       if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // keyboard basics: Enter/Space presses the focused control, or the main action when nothing is focused. Runs last (window, bubble)
+    // and only if the game did not handle the key itself (preventDefault); games can opt out with GX.noKeys=true.
+    window.addEventListener('keydown',e=>this.key1(e));
     // resize hook for boards
     const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
   // a drawer is modal: the page behind it is inert and hidden from assistive tech, so nothing under the sheet is a live tap target
   bg(on){const a=this.app;if(!a)return;if(on){a.setAttribute('aria-hidden','true');a.inert=true}else{a.removeAttribute('aria-hidden');a.inert=false}},
+  PRIMARY:'[data-gx-primary],.gx-primary,.gxh-ok,.gxc-btn.go,button.pri,.btn.pri,.pb.pri,button.primary,.btn.primary,button.go,.btn.go',
+  key1(e){if(this.noKeys||e.defaultPrevented||e.repeat||e.ctrlKey||e.metaKey||e.altKey||(e.key!=='Enter'&&e.key!==' '))return;
+    const t=e.target;if(t&&t.closest&&t.closest('input,textarea,select,[contenteditable=""],[contenteditable="true"]'))return;
+    if(t&&t!==document.body&&t!==document.documentElement){if(t.matches('button,a[href],summary,input'))return; // native controls press themselves
+      if(t.matches('[role=button],[role=menuitem],[role=tab],[role=option],[tabindex]')){e.preventDefault();t.click()}return}
+    const b=this.primary();if(b){e.preventDefault();b.click()}},
+  // the main action: the first visible, enabled primary button (inside the open popup if there is one)
+  primary(){const root=this.open&&document.getElementById(this.open)||document;
+    for(const b of root.querySelectorAll(this.PRIMARY)){if(b.disabled||b.getAttribute('aria-disabled')==='true'||b.closest('[inert],[aria-hidden="true"],[hidden]'))continue;
+      const r=b.getBoundingClientRect();if(r.width<4||r.height<4||r.bottom<0||r.right<0||r.top>innerHeight||r.left>innerWidth)continue;
+      const s=getComputedStyle(b);if(s.visibility==='hidden'||s.pointerEvents==='none'||+s.opacity<.1)continue;return b}return null},
   _rs:[],onResize(f){this._rs.push(f)},
   boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
   toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
