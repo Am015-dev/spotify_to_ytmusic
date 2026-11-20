@@ -48,7 +48,7 @@ function qTimerSync(){const q=G&&G.q;if(!q||q.kind!=='doom'||(UI.qTime<=0&&!NET.
 setInterval(()=>{try{if(!G||!UI.qKey||UI.pause)return;const q=G.q;if(!q){UI.qKey=null;return}const QT=UI.qTime>0?UI.qTime:25;const el=(Date.now()-UI.qT0)/1000*(UI.tickRate||1),left=QT-el;const b=$('#qbar');if(b)b.style.width=Math.max(0,left/QT*100)+'%';const tx=$('#qtxt');if(tx)tx.textContent=Math.max(0,Math.ceil(left))+(tx.dataset.short?' s left, then the ★ is used.':' s left to decide, then the computer\'s best advice is used.');
   if(left<=0){if(isClient())return;UI.qKey=null;const who=q.who;let m=null;try{m=q.kind==='doom'&&UI.rl&&UI.rl[0]&&q.opts[UI.rl[0].i]&&q.opts[UI.rl[0].i].h==='dReloc'&&!q.opts.some(o=>o.h==='dCannon'||o.h==='dGate')?{a:'q',i:UI.rl[0].i}:aiMove(who,'hard')}catch(e){}if(!m||m.a!=='q')m={a:'q',i:q.opts.length-1};say('Time is up: the computer chose for '+nm(who)+'.','bad');NET.autoDecl++;actAs(m,who)}}catch(e){console.error(e)}},200);
 // ---------- acting ----------
-function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;if(G.seats[seat]&&G.seats[seat].human)UI.rivLines=[];
+function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;if(G.seats[seat]&&G.seats[seat].human){UI.rivLines=[];if(m&&m.a==='place')UI.lastPick=pickNote(m)}
   if(!NET.on&&G.seats[seat]&&G.seats[seat].human&&humans().length===1&&m.a!=='q'){try{UI.snap={json:JSON.stringify(G)}}catch(e){}}
   if(G.seats[seat]&&G.seats[seat].human){UI.sunk=[];UI.marks=[];UI.mph=null}
   UI.rec=[];UI.acting=1;UI.actor=seat;let r;try{r=performMove(m,seat)}finally{UI.acting=0}const evs=UI.rec;UI.rec=null;

@@ -119,14 +119,19 @@ function phTileNote(K,d,hand,sel,rm){try{if(UI.tut||!isCur(hand[sel.t]))return '
   const isB=rm&&rm.a==='place'&&rm.t===m.t&&rm.r===m.r&&rm.s===m.s;const pc=x=>riskPct(x.rk)||'0%';const star=phStarOn();
   const det=`<button class="pb small sdet" data-ph="stardet">i</button>`;
   if(o.bad)return `<b class="warn-l">&#10007; This way sinks you. Turn it or pick another.</b>`+det+(PH.det?`<div class="sdetx" data-help role="note">This way: ${phNoteTxt(o)}.</div>`:'');
-  const f=[];f.push(`<span class="tf${o.pc>=15?' hot':''}">Risk <b>${pc(o)}</b></span>`);
-  const inf=o.e&&o.e.info;if(inf&&inf.n!=null)f.push(`<span class="tf${inf.n===0||inf.s2!=null&&inf.s2<.5?' hot':''}">Next turn <b>${inf.n>0?Math.min(inf.n,9)+' safe':'0 sure safe'}</b></span>`);
-  const S=K.ships[m.s];const ed=q=>q?Math.min(q[0],q[1],BW-1-q[0],BW-1-q[1]):0;
-  if(o.end&&S&&S.x!=null){const a=ed([S.x,S.y]),b=ed(o.end);if(b>a)f.push(`<span class="tf good">&#10003; To open water</span>`);else if(b<a||b===0)f.push(`<span class="tf hot">&#9888; ${b===0?'Ends at the edge':'Toward the edge'}</span>`)}
+  // F4: ONE plain verdict, now and later ("Safe now · edge later"), instead of a low Risk chip beside a contradictory "Ends at the edge"
+  const f=[];const inf=o.e&&o.e.info;const S=K.ships[m.s];const ed=q=>q?Math.min(q[0],q[1],BW-1-q[0],BW-1-q[1]):0;
+  const nowW=o.pc<8?'Safe now':o.pc<20?'Some risk now':'Risky now';let later='',lbad=false;
+  if(inf&&inf.n===0){later='boxed in next turn';lbad=true}
+  else if(o.end&&S&&S.x!=null){const a=ed([S.x,S.y]),b=ed(o.end);if(b===0){later='edge later';lbad=true}else if(b<a){later='toward the edge';lbad=true}else if(b>a)later='open water'}
+  if(!later&&o.end){let nl=null,nd=9;for(const mo of K.mons)if(mo.k==='L'){const dd=Math.abs(mo.x-o.end[0])+Math.abs(mo.y-o.end[1]);if(dd<nd){nd=dd;nl=mo}}if(nl&&nd<=1){later='beside '+levName(nl.id);lbad=true}}
+  const tr=later?(o.pc<8&&lbad?' but ':o.pc>=20&&!lbad?' but ':' &middot; '):'';
+  f.push(`<span class="tf vd${o.pc>=15||lbad?' hot':o.pc<8&&later==='open water'?' good':''}">${nowW} <b>${pc(o)}</b>${later?tr+later:''}</span>`);
+  if(inf&&inf.n!=null)f.push(`<span class="tf${inf.n===0||inf.s2!=null&&inf.s2<.5?' hot':''}">Next turn <b>${inf.n>0?Math.min(inf.n,9)+' safe':'0 sure safe'}</b></span>`);
   if(o.sinks.length)f.push(`<span class="tf good">Sinks ${o.sinks.map(i=>esc(nm(i))).join(', ')}!</span>`);else if(o.push.length)f.push(`<span class="tf good">Pushes ${o.push.map(i=>esc(nm(i))).join(', ')} to the edge</span>`);
   let h=f.join(''),full=`This way: ${phNoteTxt(o)}.`;
   if(star&&rm&&rm.a==='place'){if(isB)h=`<span class="tf star">&#9733; this one</span>`+h;else{const ob=phNote(K,d,rm);if(!ob.bad){const why=phWhyBest(K,ob,o);h=`<span class="tf star">&#9733; ${rm.t===m.t?'turned':'tile '+(rm.t+1)}: ${pc(ob)}</span>`+h;full+=` <b>&#9733; ${rm.t===m.t?'turn this tile':'tile '+(rm.t+1)}</b>: ${phNoteTxt(ob)}${why?' ('+why+')':''}.`}}}
-  return h+det+(PH.det?`<div class="sdetx" data-help role="note">${full} Risk counts leviathans and rival tiles before your next turn. "Next turn" counts safe ways with the tiles you keep.</div>`:'')}catch(e){console.error(e);return ''}}
+  return h+det+(PH.det?`<div class="sdetx" data-help role="note">${full} Risk counts leviathans and rival tiles before your next turn; the red squares on the water are where a leviathan can swim before then. "Next turn" counts safe ways with the tiles you keep.</div>`:'')}catch(e){console.error(e);return ''}}
 // hemmed in: every route left keeps you near trouble for the next two turns (R93: a loss came with all three tiles red and no warning before)
 function boxedInfo(d){try{if(!G||G.phase!=='play'||hotSeat())return null;const S=G.ships[d];if(!S||!S.alive||S.x==null)return null;recMove(d);const ok=(UI.recA||[]).filter(x=>x.m.a==='place'&&x.info.tier!==0),a=ok.filter(x=>x.info.s2!=null);if(!a.length)return null;
   // tuned with tools/warn-check.js: a careless player who later had every tile sinking was warned on one of the 2 turns before in ~85% of 2-player games

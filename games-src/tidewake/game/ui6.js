@@ -107,11 +107,21 @@ const youSeat=()=>{try{return viewSeat()}catch(e){return -1}};
 function sunkAdd(e){if(!G||UI.sunkSeen&&UI.sunkSeen[e.key])return;(UI.sunkSeen=UI.sunkSeen||{})[e.key]=1;const c=causeOf(e.why);
   // F3: back-to-back Sunk! cards are one card: every captain sunk while a card is still open joins it
   let card=UI.sunk.length?UI.sunk[UI.sunk.length-1]:null;
+  const me0=youSeat();if(e.seat===me0&&humans().length===1&&!NET.on){const av=avoidLine(c.k);if(av)c.t+=' '+av}
   if(card){if(!card.seats.includes(e.seat)){card.seats.push(e.seat);card.items.push({seat:e.seat,k:c.k,t:c.t})}if(c.k==='collision'&&card.k!=='collision')card.k2=1}
   else{card={id:Math.random().toString(36).slice(2),seats:[e.seat],items:[{seat:e.seat,k:c.k,t:c.t}],k:c.k,t:c.t,key0:e.key0,cur:e.cur,actor:e.actor};UI.sunk.push(card)}
   if(e.at)UI.marks=(UI.marks||[]).filter(x=>x.seat!==e.seat).concat([{seat:e.seat,at:e.at,id:card.id}]);
   if(!humans().length){const id=card.id;setTimeout(()=>{UI.sunk=UI.sunk.filter(x=>x.id!==id);UI.marks=(UI.marks||[]).filter(x=>x.id!==id);renderCards();ovUpdate()},9000/(UI.speed||1))}
   renderCards();ovUpdate()}
+// F4: the one-line "why, and what would have avoided it" for your own sink: your last tile's counted risk against the safest one you had
+function pickNote(m){try{if(UI.tut||!UI.recA)return null;const a=UI.recA.filter(x=>x.m.a==='place'&&x.info&&x.info.rk!=null);const me=a.find(x=>x.m.t===m.t&&x.m.r===m.r&&x.m.s===m.s);if(!me)return null;
+  const best=a.reduce((b,x)=>x.info.rk<b.info.rk?x:b,me);return {turn:G.turn,pc:Math.round(me.info.rk*100),best:Math.round(best.info.rk*100),bt:best.m.t,same:best.m.t===m.t}}catch(e){return null}}
+function avoidLine(k){const p=UI.lastPick;if(!p||!G||G.turn-p.turn>G.np)return '';
+  if(k==='edge')return 'Next time: a tile whose wake stays on the chart; the line under the tiles says "edge later" before you commit.';
+  if(k==='collision')return 'Next time: when a rival shares your bow square, its tile moves you too. Pick a stop away from its path.';
+  if(k==='crush'||k==='block'||k==='mon'){if(p.best+3<p.pc)return `You stopped on ${p.pc}% risk; ${p.same?'turning that tile':'tile '+(p.bt+1)} gave ${p.best}%. Red squares on the water are a leviathan's reach.`;
+    return `Your tile was already the safest (${p.pc}%): the dice beat good play this time.`}
+  return ''}
 function sunkNames(seats){const me=youSeat();const l=seats.map(i=>i===me?'Your junk':nm(i)+"'s junk");return l.length>1?l.slice(0,-1).join(', ')+' and '+l[l.length-1]:l[0]}
 function sunkWhy(c){const it=c.items;if(it.length<2||it.every(x=>x.t===it[0].t))return `<p><b>Because</b> ${esc(it[0].t)}</p>`;
   return '<ul class="sunkwhy">'+it.map(x=>`<li>${dot(x.seat)} <b>${esc(x.seat===youSeat()?'Your junk':nm(x.seat)+"'s junk")}:</b> ${esc(x.t)}</li>`).join('')+'</ul>'}
@@ -143,8 +153,14 @@ function mphHTML(){const mp=UI.mph;if(!mp||G&&G.over&&!UI.busy)return '';
   <div class="scale" aria-label="Leviathans wake on a total of 6, 7 or 8">${sc.join('')}</div>
   ${shown.length?`<ol class="mlines">${shown.map((l,i)=>`<li class="${i===shown.length-1&&UI.mphLive?'now':''}${l.bad?' bad':''}">${l.plain?'':`<b data-mon="${l.id}">${esc(l.nm)}</b> `}${esc(l.txt)}</li>`).join('')}</ol>`:''}</div>`}
 // ---------- the overlay descriptors ----------
+// F4 heat: before you lay a tile, the water each leviathan's next rolls can reach, as the chance one swims there before your next turn
+// (16/36 wakes them on each roll, its 5 arrows by facing; a 6 rises anywhere and is left out). Under 5% is not drawn.
+function heatSquares(g){const out=[];const rolls=Math.max(1,g.ships.filter(s=>s.alive).length);const P={};
+  for(const m of g.mons){if(m.k!=='L')continue;for(let die=1;die<=5;die++){const a=LEV[m.id].arr[die-1];if(a==='R')continue;const dd=DIR[(DIRN[a]+m.r)%4],x=m.x+dd[0],y=m.y+dd[1];if(!inB(x,y))continue;const k=x+','+y;P[k]=(P[k]||0)+1/6}}
+  for(const k in P){const per=Math.min(.95,16/36*P[k]),pc=Math.round((1-Math.pow(1-per,rolls))*100);if(pc<5)continue;const a=k.split(',').map(Number);out.push({x:a[0],y:a[1],pc})}return out}
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}
+  if(myTurn&&G.phase==='play'&&!UI.tut&&!G.q)for(const h of heatSquares(G))D.push({k:'heat',id:'h'+h.x+','+h.y+':'+h.pc,wx:h.x-BC,wz:h.y-BC,pc:h.pc,lv:h.pc>=25?3:h.pc>=12?2:1});
   for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-BC,wy:.95,wz:a[1]-BC,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
   for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-BC,wy:.5,wz:a[1]-BC,t:'Maelstrom',cls:'piece mael'})}
   for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-BC,wy:.55,wz:a[1]-BC,t:'Rift Gate',cls:'piece gate'})}
@@ -175,6 +191,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
       else if(ds.k==='ring')e.className='oring';
       else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'')+(ds.dim?' dim':'');if(!ds.dim&&ds.pk){e.className+=' pickable';e.setAttribute('role','button');e.setAttribute('aria-label','Start here: '+ds.t);try{const pe=TWKit.portEdge(ds.mx,ds.my,ds.me);if(pe&&pe.edge)e.className+=' e-'+pe.edge;if(pe&&(pe.edge==='left'||pe.edge==='right'))e.className+=' pv'}catch(_){}if(ds.zb)e.className+=' zoned';if(UI.tut||PH.on)e.dataset.ph='pip';else e.dataset.a='startmark';e.dataset.x=ds.mx;e.dataset.y=ds.my;e.dataset.e=ds.me}e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='zone'){e.className='ozone pickable z-'+ds.band;e.setAttribute('role','button');e.setAttribute('aria-label','Start marks on this square');e.dataset.ph='pip';e.dataset.x=ds.mx;e.dataset.y=ds.my}
+      else if(ds.k==='heat'){e.className='oheat l'+ds.lv;e.setAttribute('aria-hidden','true');e.innerHTML=`<span>${ds.pc}%</span>`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
       root.appendChild(e);it.el=e}
     OV.items.push(it)}
@@ -186,6 +203,7 @@ function ovPos(force){const root=$('#ov');if(!root||!OV.items.length)return;cons
     if(it.poly){const pts=ds.k==='route'?ds.pts:[ds.a,ds.b];const pp=pts.map(q=>P(q[0],.06,q[1]));if(pp.some(x=>!x))continue;const s=pp.map(x=>x[0].toFixed(1)+','+x[1].toFixed(1)).join(' ');it.poly[0].setAttribute('points',s);it.poly[1].setAttribute('points',s);
       if(ds.k==='route'){const e=pp[pp.length-1];tfm(it.el,e);tfm(it.el2,pp[0]);ovRouteLabels(it,root)}
       else{const a=pp[pp.length-2]||pp[0],b=pp[pp.length-1];const ang=Math.atan2(b[1]-a[1],b[0]-a[0]);const L=14,W=8;const h=[[b[0],b[1]],[b[0]-L*Math.cos(ang)+W*Math.sin(ang),b[1]-L*Math.sin(ang)-W*Math.cos(ang)],[b[0]-L*Math.cos(ang)-W*Math.sin(ang),b[1]-L*Math.sin(ang)+W*Math.cos(ang)]];it.head.setAttribute('points',h.map(x=>x.join(',')).join(' '))}}
+    else if(ds.k==='heat'){const q=P(ds.wx,.04,ds.wz),q2=q&&P(ds.wx+.5,.04,ds.wz);tfm(it.el,q);if(q2){const w=Math.max(16,Math.hypot(q2[0]-q[0],q2[1]-q[1])*1.8);it.el.style.width=it.el.style.height=w.toFixed(0)+'px';it.el.style.margin=(-w/2).toFixed(0)+'px 0 0 '+(-w/2).toFixed(0)+'px'}}
     else if(ds.k==='zone')tfm(it.el,zonePos(P,ds));
     else if(ds.zb){const q=P(ds.wx,.05,ds.wz),q2=q&&P(ds.wx+ds.nx*.1,.05,ds.wz+ds.nz*.1);if(!q||!q2){tfm(it.el,q);continue}const dx=q2[0]-q[0],dy=q2[1]-q[1],L=Math.hypot(dx,dy)||1,m=ds.zb==='out'?7:ds.zb==='c'?0:-5;tfm(it.el,[q[0]+dx/L*m,q[1]+dy/L*m])}
     else tfm(it.el,P(ds.wx,ds.wy||.05,ds.wz))}}
