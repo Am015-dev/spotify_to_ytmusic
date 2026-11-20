@@ -166,7 +166,7 @@ html.bf-land #bf .bf-line .bf-say{background:rgba(10,20,50,.72);padding:4px 14px
 #bf .bf-c .pr{inset:5%;opacity:.3;filter:saturate(.45)}
 #bf .bf-wall .bf-c>.bf-t{box-shadow:0 2px 4px rgba(0,0,0,.45)}
 /* rival turn: the kiln it takes from glows; its chip pulses as the tiles arrive */
-#bf .rv-src{animation:rvSrc .9s ease-in-out infinite;border-radius:50%}
+#bf .rv-src{animation:rvSrc .9s ease-in-out 3;border-radius:50%}
 @keyframes rvSrc{0%,100%{box-shadow:0 0 0 0 rgba(255,214,90,0)}50%{box-shadow:0 0 0 6px rgba(255,214,90,.9),0 0 28px 8px rgba(255,190,60,.7)}}
 #bf .bf-chip.hit{animation:chipHit .45s ease-out}
 @keyframes chipHit{40%{transform:scale(1.12)}100%{transform:none}}

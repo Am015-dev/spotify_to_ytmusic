@@ -57,9 +57,9 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-c>.bf-t{inset:1px}
 .bf-t svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1.5px 1px rgba(0,0,0,.4))}
 .bf-t.hid{visibility:hidden}
-.bf-t.gh{opacity:.42;animation:bfGh 1.1s ease-in-out infinite}
+.bf-t.gh{opacity:.42;animation:bfGh 1.1s ease-in-out 3}
 @keyframes bfGh{50%{opacity:.22}}
-.bf-row.ok .bf-rack{box-shadow:0 0 0 3px #ffc63a,0 0 14px 2px rgba(255,198,58,.8);animation:bfGlow 1.1s ease-in-out infinite}
+.bf-row.ok .bf-rack{box-shadow:0 0 0 3px #ffc63a,0 0 14px 2px rgba(255,198,58,.8);animation:bfGlow 1.1s ease-in-out 3}
 @keyframes bfGlow{50%{box-shadow:0 0 0 3px #fff2b0,0 0 22px 6px rgba(255,214,90,.95)}}
 .bf-row.dim{opacity:.5}
 .bf-row.no{animation:bfShake .4s}
@@ -70,9 +70,9 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-c em{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);font-style:normal;color:#1d5a2a;text-shadow:0 0 3px #fff,0 0 3px #fff;z-index:2}
 .bf-c.clash{box-shadow:inset 0 0 0 3px #e0402a,0 0 10px #ff6a50;z-index:2}
 .bf-row.dim.rclash .bf-rack .bf-c:not(.no){box-shadow:inset 0 0 0 2px #e0402a}
-.bf-c.ready{animation:bfReady 1.2s ease-in-out infinite}@keyframes bfReady{50%{box-shadow:0 0 0 2px #ffe680,0 0 12px 3px #ffd24a}}
+.bf-c.ready{animation:bfReady 1.2s ease-in-out 3}@keyframes bfReady{50%{box-shadow:0 0 0 2px #ffe680,0 0 12px 3px #ffd24a}}
 .bf-c.tgt{box-shadow:inset 0 0 0 2px #2f8a4a,0 0 8px #6fd38a}
-.bf-c.pick{cursor:pointer;box-shadow:inset 0 0 0 3px #ffb400,0 0 12px #ffd24a;animation:bfGlow 1.1s infinite}
+.bf-c.pick{cursor:pointer;box-shadow:inset 0 0 0 3px #ffb400,0 0 12px #ffd24a;animation:bfGlow 1.1s 3}
 .bf-c.lit{animation:bfLit .55s ease-out both;animation-delay:var(--d,0ms);z-index:3}
 @keyframes bfLit{0%{box-shadow:0 0 0 0 #fff}40%{transform:scale(1.18);box-shadow:0 0 0 3px #fff,0 0 18px 6px #ffd24a}100%{transform:scale(1.05);box-shadow:0 0 0 3px #ffe680,0 0 12px 3px #ffd24a}}
 .bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
@@ -102,7 +102,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-k.allno.can{box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55)}
 .bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
 .bf-t.nofit::after{content:'✗';position:absolute;right:4%;top:4%;width:38%;height:38%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
-.bf-t.adv{padding:0;border:0;background:none;display:block;box-shadow:none;outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
+.bf-t.adv{padding:0;border:0;background:none;display:block;box-shadow:none;outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out 3}
 .bf-t.adv::before{content:none;position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
 .bf-t.sun{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
 .bf-t.deal{animation:bfDeal .5s cubic-bezier(.3,1.5,.5,1) both}
@@ -119,7 +119,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-ban small{display:block;margin-top:6px;font:800 16px var(--ff);color:#fff;text-shadow:0 1px 3px #000}
 .bf-tip{position:fixed;left:50%;top:var(--tipy,60%);transform:translate(-50%,-100%);z-index:25;max-width:min(230px,60vw);padding:6px 12px;border-radius:14px;background:#fff4d6;color:#3a2410;font:800 14px/1.25 var(--ff);text-align:center;box-shadow:0 0 0 2px #c99a3e,0 8px 20px rgba(0,0,0,.45);pointer-events:none;animation:bfTipIn .35s ease-out}
 @keyframes bfTipIn{from{transform:translateY(8px);opacity:0}}
-.bf-fing{position:fixed;z-index:63;pointer-events:none;transform-origin:37% 7%;animation:bfTap 1.15s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:left .45s ease,top .45s ease}
+.bf-fing{position:fixed;z-index:63;pointer-events:none;transform-origin:37% 7%;animation:bfTap 1.15s ease-in-out 3;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:left .45s ease,top .45s ease}
 .bf-fing svg{width:100%;height:100%;display:block}
 @keyframes bfTap{0%,100%{transform:translate(10px,14px) scale(1)}45%{transform:translate(0,0) scale(.92)}55%{transform:translate(0,0) scale(.92)}}
 /* pop-ups */
