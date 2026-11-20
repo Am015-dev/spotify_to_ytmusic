@@ -420,7 +420,7 @@ function raceTips(me) {
   var t = [], s = me.stats, ts = UI.ts || { ch: 0, n: 0, gs: 0 };
   if (s.spins) t.push('You spun out ' + (s.spins > 1 ? s.spins + ' times' : 'once') + ': when the line says "spin out", take a lower gear first.');
   if (ts.ch >= 4) t.push('You burned ' + ts.ch + ' heat in corners' + (ts.w ? ' (worst: speed ' + ts.w.sp + ' in a ' + ts.w.lim + ')' : '') + ': brake a gear one turn earlier.');
-  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: in the last lap spend it on a higher gear or Boost (the picked plan does).');
+  if (me.eng >= 3 && t.length < 2) t.push('You finished with ' + me.eng + ' heat unused: in the last lap spend it on a higher gear or Boost.');
   if ((ts.low || 0) >= 3 && t.length < 2) t.push(ts.low + ' turns you took a lower gear than the picked one: on straights the gold gear gains spaces.');
   else if (!UI.hints && ts.n && ts.gs / ts.n < 2 && t.length < 2) t.push('Your average gear was ' + (ts.gs / ts.n).toFixed(1) + ': shift up to 3 or 4 on straights.');
   if (!s.slips && t.length < 2) t.push('End your move next to a car to slipstream 2 extra spaces (no cards needed).');

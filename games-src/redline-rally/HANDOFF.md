@@ -123,3 +123,8 @@ Next: upgrade cards, weather and legends, sound, online, a second pass on AI (dr
 - Post-race tips compare you with the picked plan (turns in a lower gear than picked; heat unused in the last lap).
 - Phone result: standings above the tips, one-row stats; all 5 rows above the buttons at 375x553/667. Tutorial bubbles avoid #scoreL;
   end text "a full grid". Phone minimap 84 px wide and moves to the bottom when it would cover a corner sign.
+- Cold check (independent, F6 build): could play yes; fun 3/5; would play again probably; Suggest-following phone race 3rd of 5 vs
+  own-choice desktop race 5th (8 spins). Open from it: discard prompt has no Suggested mark; Suggest feels conservative ("speed 4 every
+  turn"); "Your turn"/"Your move" banners; "-1 heat" gear label reads like the gear's effect.
+- Gates (F6 final): full build PASS, tut-test PASS (390x844, 375x667), hint-test PASS, cam-test 3 seeds x 2 sizes PASS, f5-shots 5 sizes
+  PASS (proof/shots-f6/), calm loops 0 / max helpers 1, sim-levels PASS.
