@@ -4,7 +4,7 @@
 // glowing thing takes the tap. The board is staged (the last round of a game) so scoring, the game end and the bonuses all happen for real.
 // The rival's four moves are scripted so every lesson comes up in the same order every time. Proved by game/tutor-e2e.js (walks it by touch).
 const TUT_GAME='sunglaze';
-const TUT={at:null,res:null,coach:true,pro:null,rv:0,want:null};
+const TUT={at:null,res:null,coach:true,pro:null,rv:0,rvi:0,rvWait:0,tick:0,want:null};
 const tutOn=()=>!!UI.tut;
 const firstTime=()=>{try{return !localStorage.getItem('sgz_guided')&&!localStorage.getItem('sgz_offer')&&!GXT.status(TUT_GAME).seen}catch(e){return true}};
 const tutBtn=(cls,sub)=>typeof GXT==='undefined'?'':GXT.menuHTML({game:TUT_GAME,first:firstTime(),cls:cls,launch:tutLaunch,sub:sub});
@@ -43,25 +43,27 @@ const atBeat=n=>()=>TUT.at===n;
 // one step = one sentence + one tap. kind: 'pick' (a tile), 'move' (a rack), 'look' (tap the glowing thing to go on); at = a round-end beat it holds
 function tutSteps(){
   const S=(id,say,o)=>Object.assign({id,say},o);
-  const tR=q=>{const e=tq(q);return e?e.getBoundingClientRect():null};   // F1: the bubble keeps off what the player needs next (the kilns on a take, the other racks and the floor on a rack tap)
-  const pick=(src,c)=>({target:tKiln(src,c),ready:myTurn,avoid:()=>[tR('.bf-table')],wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
-  const move=line=>({target:tRack(line),ready:()=>myTurn()&&!!UI.sel,avoid:()=>[tR('.bf-fl')].concat([0,1,2,3,4].filter(r=>r!==line).map(r=>tR(`[data-bfrow="${r}"]`))),wait:{type:'tap',match:a=>a.k==='move'&&a.line===line}});
-  const look=(target,ready,o)=>Object.assign({target,ready,look:1,wait:{type:'tap',match:a=>a.k==='look'}},o||{});
-  const rival=n=>({onDone:()=>tutRival(TUT_RIVAL[n])});
-  const beat=(n,target,o)=>look(target,atBeat(n),Object.assign({at:n},o||{}));
+  // no bubble may cover its target or the next thing to tap: while tiles are on the table the kilns, the five racks and the floor are all off limits,
+  // so the bubble sits in the strip between the table and the racks (rects are shrunk 6px: the kit adds 4px of margin back)
+  const sh=e=>{if(!e)return null;const r=e.getBoundingClientRect();if(r.width<2)return null;const d=0,L=r.left+d,T=r.top+d,W=Math.max(1,r.width-2*d),H=Math.max(1,r.height-2*d);return {left:L,top:T,width:W,height:H,right:L+W,bottom:T+H,x:L,y:T,cx:L+W/2,cy:T+H/2}};
+  const keepOff=()=>{const out=[];if(G&&(G.ctr.length||G.fac.some(a=>a.length)))out.push(sh(tq('.bf-table')));[0,1,2,3,4].forEach(r=>out.push(sh(tq(`[data-bfrow="${r}"]`))));out.push(sh(tq('.bf-fl')));return out.filter(Boolean)};
+  const pick=(src,c)=>({target:tKiln(src,c),ready:myTurn,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='pick'&&a.src===src&&a.c===c}});
+  const move=line=>({target:tRack(line),ready:()=>myTurn()&&!!UI.sel,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='move'&&a.line===line}});
+  const look=(target,ready,o)=>Object.assign({target,ready,look:1,avoid:()=>keepOff(),wait:{type:'tap',match:a=>a.k==='look'}},o||{});
+    const beat=(n,target,o)=>look(target,atBeat(n),Object.assign({at:n},o||{}));
   return [
     S('goal','Most points wins. A full wall row ends the game.',look(()=>tq('[data-bfrow="0"] .bf-wall'),myTurn)),
     S('take','Kilns hold four tiles. Tap red: you take every red.',pick(0,2)),
     S('rows','Rack 2 holds two tiles of one colour. Tap it.',move(1)),
-    S('slide','The leftover tiles slid to the middle. Tap the middle.',Object.assign(look(()=>tq('[data-bfsrc="-1"]'),rivalTurn),rival(0))),
+    S('slide','The leftover tiles slid to the middle. Tap the middle.',look(()=>tq('[data-bfsrc="-1"]'),myTurn)),
     S('rival','Tamsin took four snowflakes. Now tap a red in kiln 3.',pick(2,2)),
-    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',Object.assign(move(3),rival(1))),
+    S('blocked','Rack 3 is shut: its wall row has red. Tap rack 4.',move(3)),
     S('middle','Tap a yellow in the middle. First one there gets the Sun.',pick(-1,1)),
     S('sun','Tap rack 3. The Sun token goes on your floor.',move(2)),
-    S('keep','Rack 3 is not full. It keeps its tiles for later.',Object.assign(look(tRack(2),rivalTurn),rival(2))),
+    S('keep','Rack 3 is not full. It keeps its tiles for later.',look(tRack(2),myTurn)),
     S('again','Tamsin’s leftovers joined the middle. Tap the two yellows.',pick(-1,1)),
     S('overflow','Rack 3 has one space. The extra yellow falls to the floor.',move(2)),
-    S('floor','Floor tiles cost points: −1, −1, −2, −2, −2, −3, −3.',Object.assign(look(()=>tq('.bf-fl'),rivalTurn),rival(3))),
+    S('floor','Floor tiles cost points: −1, −1, −2, −2, −2, −3, −3.',look(()=>tq('.bf-fl'),myTurn)),
     S('last','Tap the snowflake in the middle. It fits rack 1.',pick(-1,4)),
     S('roundend','Tap rack 1. When all tiles are gone, the round ends.',move(0)),
     S('tiling','Each full rack moves one tile to its wall spot.',beat('tiling',tRow(0),{hold:1})),
@@ -76,8 +78,9 @@ function tutSteps(){
 const TUT_RULES=['goal','take','rows','slide','rival','blocked','middle','sun','keep','again','overflow','floor','last','roundend','tiling','chain','alone','floorpen','gameend','bonus','win'];
 window.__tutSeen=[];
 
-// Tamsin's scripted move: waits for her turn and a still board, then plays it through the normal move path (animated like any rival move)
-function tutRival(m){tutWait(()=>!tutOn()||rivalTurn(),20000).then(()=>{if(!tutOn()||!rivalTurn())return;TUT.rv=1;try{go(m)}finally{TUT.rv=0}})}
+// Tamsin's scripted moves play by themselves: about 0.6 s after her turn starts she takes (the board animates it: her kiln lights, the tiles lift and fly, "Tamsin takes 4 Snowflake" shows)
+function tutRivalTick(){if(!tutOn()||!rivalTurn()||TUT.rvWait)return;const m=TUT_RIVAL[TUT.rvi];if(!m)return;
+  TUT.rvWait=setTimeout(()=>{TUT.rvWait=0;if(!tutOn()||!rivalTurn())return;TUT.rvi++;TUT.rv=1;try{go(m)}finally{TUT.rv=0}},600)}
 
 // ---------------------------------------------------------------- round-end beats: the animation queue waits here until the step's tap
 function tutPause(name,x){return new Promise(res=>{
@@ -101,11 +104,11 @@ document.addEventListener('click',e=>{if(!tutOn()||typeof GXT==='undefined'||!GX
 
 // ---------------------------------------------------------------- start, leave, story
 function tutSetup(){try{GX.close()}catch(e){}try{GXH.hide()}catch(e){}
-  clearTimeout(aiTimer);aiTimer=null;TUT.at=null;TUT.res=null;TUT.coach=UI.coach;UI.coach=false;UI.tut=1;UI.cg=0;UI.pause=false;window.__tutSeen=[];
+  clearTimeout(aiTimer);aiTimer=null;TUT.at=null;TUT.res=null;TUT.rvi=0;clearTimeout(TUT.rvWait);TUT.rvWait=0;clearInterval(TUT.tick);TUT.tick=setInterval(tutRivalTick,100);TUT.coach=UI.coach;UI.coach=false;UI.tut=1;UI.cg=0;UI.pause=false;window.__tutSeen=[];
   const m=document.getElementById('modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}
   window.__tutPh=1;phApply();bfApply();                                  // the board-first table, on any screen
   tutBuild()}
-function tutLeave(){tutRelease();UI.tut=0;UI.cg=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
+function tutLeave(){tutRelease();clearInterval(TUT.tick);TUT.tick=0;clearTimeout(TUT.rvWait);TUT.rvWait=0;UI.tut=0;UI.cg=0;UI.coach=TUT.coach;UI.sel=null;UI.tgt=null;UI.adv=null;clearTimeout(aiTimer);aiTimer=null;
   try{if(GXT.running())GXT.stop()}catch(e){}
   try{bfSpeedUp()}catch(e){}BF.q.length=0;BF.gk='';BF.disp=null;BF.resHide=false;BF.menu=false;BF.peek=null;G=null;
   try{GXH.hide()}catch(e){}window.__tutPh=0;phApply();bfApply();try{resetScene()}catch(e){}}

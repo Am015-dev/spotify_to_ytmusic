@@ -197,3 +197,6 @@ html body .gxh-bub.gxh-bulbb .gxh-tx{padding-right:0}
 /* the drawn tile takes the pointer, so a neighbour's 44px box never covers a tile's centre; a tap in the box margin reaches the kiln/middle/table and bfClick takes the nearest tile */
 #bf .bf-table .bf-t{pointer-events:none}
 #bf .bf-table .bf-t>svg{pointer-events:auto}
+/* guided game: a compact bubble (two lines of 13px) so it fits the strip between the kilns and the racks on a phone */
+html body .gxt-bub{max-width:min(352px,calc(100vw - 12px));padding:2px 9px}
+html body .gxt-bub .gxh-tx{font-size:13px;line-height:1.15}
