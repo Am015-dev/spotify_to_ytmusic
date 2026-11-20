@@ -23,7 +23,7 @@ function netStrip(G0,seat){
   const blank=a=>a.map(x=>typeof x==='number'?0:typeof x==='string'?'':Array.isArray(x)?[]:x&&typeof x==='object'?{}:x);
   const scr=o=>{if(!o||typeof o!=='object')return;for(const k in o){const v=o[k];if(Array.isArray(v)&&(k==='deck'||k==='fl'||k==='box'))o[k]=blank(v);else if(v&&typeof v==='object'&&!Array.isArray(v))scr(v)}};scr(P.ms);
   if(P.ms.mr&&P.ms.mr.fd&&P.ms.mr.fd.from!==seat)P.ms.mr.fd.v=1;
-  for(const q of P.seats){if(q.i===seat)continue;if(P.mission===29||P.mission===39)q.cards=q.cards.map(()=>1);
+  for(const q of P.seats){if(q.i===seat)continue;if(hasRule(P.mission,'mindRead')||(hasRule(P.mission,'special4')||{}).reward==='numInfo')q.cards=q.cards.map(()=>1);
     if(P.ms.mole&&P.ms.mole.hidden&&q.con){q.con='A';if(q.role==='weak'&&!(mine&&P.seats[seat].role==='weak'))q.role=null}
     if(P.ms.roleHidden&&q.chDown)q.ch='ch_base1'}
   if(P.q&&P.q.who!==seat)P.q={who:P.q.who,kind:P.q.kind,title:P.q.title,opts:[]};

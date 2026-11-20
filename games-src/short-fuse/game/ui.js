@@ -79,7 +79,7 @@ function kitMe(){if(NET.on&&NET.mySeat<0)return 0;const v=viewer();if(v>=0)retur
 // a spectator view (watch mode with x-ray, or the neutral hot-seat view with every hidden wire turned away)
 function spectatorView(xray){const K=knowledge(kitMe());
   for(const st of K.stands){st.mine=false;const S=G.st[st.i];st.slots.forEach((x,k)=>{const sl=S.w[k];if(xray){x.v=cv(sl.id);x.s=WIRES[sl.id].s;x.c=WIRES[sl.id].c}else if(!x.cut){x.v=null;x.s=null;x.c=null}})}
-  K.seat=-1;K.legal=null;K.q=G.q?{who:G.q.who,kind:G.q.kind}:null;K.off=[];if(!xray)for(const q of K.seats){q.cards=G.mission===65?q.cards:null;if(q.con&&G.ms.mole)q.con='?'}return K}
+  K.seat=-1;K.legal=null;K.q=G.q?{who:G.q.who,kind:G.q.kind}:null;K.off=[];if(!xray)for(const q of K.seats){q.cards=hasRule(G.mission,'hotPotato')?q.cards:null;if(q.con&&G.ms.mole)q.con='?'}return K}
 function view(){const v=viewer();if(v>=0)return knowledge(v);return spectatorView(modeOf()==='watch'&&UI.xray&&!NET.on)}
 function posOf(s){return G.pos[s]}
 function seatStands(seat){return standsOf(seat).slice().sort((a,b)=>a-b)}

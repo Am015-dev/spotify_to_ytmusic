@@ -15,7 +15,7 @@ function poison(G,seat){const P=JSON.parse(JSON.stringify(G));const holes=[];
   for(const e of P.eq)if(e.down)e.id=pshuf(Object.keys(E.EQUIP))[0];pshuf(P.eqDeck);pshuf(P.eqPool);
   const scr=o=>{if(!o||typeof o!=='object')return;for(const k in o){const v=o[k];if(Array.isArray(v)&&(k==='deck'||k==='fl'||k==='box'))pshuf(v);else if(v&&typeof v==='object'&&!Array.isArray(v))scr(v)}};scr(P.ms);
   if(P.ms.mr&&P.ms.mr.fd&&P.ms.mr.fd.from!==seat)P.ms.mr.fd.v=1+Math.floor(prnd()*12);
-  for(const q of P.seats){if(q.i===seat)continue;if(P.mission===29||P.mission===39)q.cards=q.cards.map(()=>1+Math.floor(prnd()*12));
+  for(const q of P.seats){if(q.i===seat)continue;if(X.E.hasRule(P.mission,'mindRead')||(X.E.hasRule(P.mission,'special4')||{}).reward==='numInfo')q.cards=q.cards.map(()=>1+Math.floor(prnd()*12));
     if(P.ms.mole&&P.ms.mole.hidden&&q.con){q.con='ABCDE'[Math.floor(prnd()*5)];if(q.role==='weak'&&P.seats[seat].role!=='weak'){q.role=null;const others=P.seats.filter(o=>o.i!==seat);others[Math.floor(prnd()*others.length)].role='weak'}}
     if(P.ms.roleHidden&&q.chDown)q.ch=pshuf(['ch_base1','ch_base2','ch_base3','ch_base4','ch_captain'])[0]}
   P.rng=(P.rng^0x9e3779b9)|0;return P}

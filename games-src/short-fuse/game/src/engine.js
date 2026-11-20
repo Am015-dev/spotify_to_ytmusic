@@ -120,10 +120,10 @@ function setupChars(M,o){const n=G.mission;let mode=M.chars;
     if(want&&allowed.includes(want)&&!G.seats.some(q=>q.ch===want))s.ch=want;else{while(G.seats.some(q=>q.ch==='ch_base'+nb))nb++;s.ch='ch_base'+nb;nb++}}
   if(mode==='no_personal_items')G.seats.forEach(s=>s.noItem=1);
   if(mode==='captain_has_none')SP(G.captain).ch=null}
-function allowedChars(n,np){const M=MISSIONS[n];let a=['ch_base1','ch_base2','ch_base3','ch_base4'];if(n>=31&&M.chars!=='base_only')a=a.concat(['ch_new1','ch_new2','ch_new3','ch_new4']);return a.filter(c=>!M.chEx.includes(c))}
+function allowedChars(n,np){const M=MISSIONS[n];let a=['ch_base1','ch_base2','ch_base3','ch_base4'];if(n>=NEWCHAR_FROM&&M.chars!=='base_only')a=a.concat(['ch_new1','ch_new2','ch_new3','ch_new4']);return a.filter(c=>!M.chEx.includes(c))}
 function missionHasYellow(M){return !!colSpec(M,G.np,'yel')}
 function setupEquip(M){const n=G.mission;const e=M.eq||{};
-  let pool=[];if(n>=3)pool=EQ_IDS.filter(id=>EQUIP[id].pool==='base');if(n>=9&&missionHasYellow(M))pool.push('eqY');if(n>=55)pool=pool.concat(EQ_IDS.filter(id=>EQUIP[id].pool==='double'));
+  let pool=[];if(n>=3)pool=EQ_IDS.filter(id=>EQUIP[id].pool==='base');if(n>=YEQ_FROM&&missionHasYellow(M))pool.push('eqY');if(n>=DOUBLE_EQ_FROM)pool=pool.concat(EQ_IDS.filter(id=>EQUIP[id].pool==='double'));
   pool=pool.filter(id=>!(e.ex||[]).includes(id));shuffle(pool);
   const done=()=>{const used=new Set(G.eq.map(x=>x.id).concat(G.eqPool,G.eqDeck));G.eqOut=EQ_IDS.filter(id=>!used.has(id))};
   if(e.fixed){G.eq=e.fixed.map(id=>({id,st:'ready',down:0,cover:null,perm:1}));G.eqPool=[];done();return}
@@ -136,7 +136,7 @@ function infoSetup(M){let mode=M.info;const two=G.np===2&&M.two;
   for(const seat of clockFrom(G.captain)){
     if(two&&two.capNoInfo&&seat===G.captain)continue;
     if(two&&two.capRandInfo&&seat===G.captain){later('infoRand',{seat,redrawY:1});continue}
-    if(mode==='rand'){later('infoRand',{seat,redrawY:G.mission!==41});continue}
+    if(mode==='rand'){later('infoRand',{seat,redrawY:!hasRule(G.mission,'tripwire')});continue}
     if(mode==='neg'){later('infoNeg',{seat,left:2});continue}
     if(mode==='false2'){later('infoFalse',{seat,left:2,red:1});continue}
     if(SP(seat).role==='liar'){later('infoFalse',{seat,left:2,red:0});continue}
@@ -851,7 +851,7 @@ QH.bkArrange=d=>{const b=G.ms.bk;if(d.sw){const t=b.sides[d.sw];b.sides[d.sw]=b.
 function slotView(seat,si,sl){const own=ownerOf(si)===seat;const vis=sl.cut||(own&&!sl.flip)||(!own&&sl.flip);
   const o={u:sl.u,cut:sl.cut,x:sl.x,flip:sl.flip,na:sl.na,tok:sl.tok.map(t=>({t:t.t,v:t.v})),not:sl.not.slice()};
   if(vis){o.v=cv(sl.id);o.s=sv(sl.id);o.c=WIRES[sl.id].c}else{o.v=null;o.s=null;o.c=null}return o}
-function seatView(seat,q){const self=q.i===seat;const roleVis=self||!G.ms.roleHidden;const conVis=self||!G.ms.mole;const cardsVis=self||G.mission===65;
+function seatView(seat,q){const self=q.i===seat;const roleVis=self||!G.ms.roleHidden;const conVis=self||!G.ms.mole;const cardsVis=self||!!hasRule(G.mission,'hotPotato');
   return {i:q.i,nm:q.nm,pos:G.pos[q.i],human:q.human,lv:q.lv,ch:(self||!q.chDown)?q.ch:null,chDown:q.chDown,chUsed:q.chUsed,noItem:q.noItem,role:roleVis?q.role:null,
     con:conVis?q.con:(q.con?'?':null),conDown:q.conDown,ox:q.ox,cards:cardsVis?q.cards.slice():null,nCards:q.cards.length,nUncut:uncutOf(q.i).length,stands:standsOf(q.i)}}
 function knowledge(seat){if(!G)return null;const M=MISSIONS[G.mission];
