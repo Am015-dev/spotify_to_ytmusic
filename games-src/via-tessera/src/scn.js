@@ -23,7 +23,7 @@
     mut: [{ name: 'free build', js: 'VT.buildCost = function(){ return {coins:0, goods:{}}; }' }] });
   GXS.add({ id: 'vt-govern', name: 'Governor: a region produces', ask: 'Does the region give you goods?', seed: 6, when: booted,
     setup: function () { return go(6).then(function () { VTUI.move({ t: 'play', i: 2 }); }); },
-    checks: [{ kind: 'play', name: 'produce', snap: function () { return { n: VT.nGoods(G.pl[0]) }; }, steps: [{ sel: '.prov.glow .hit' }, { sel: '#acts .btn' }], idle: function () { return !VTUI.UI.busy; },
+    checks: [{ kind: 'play', name: 'produce', snap: function () { return { n: VT.nGoods(G.pl[0]) }; }, steps: [{ sel: function () { return [].slice.call(document.querySelectorAll('.prov.glow .hit')).filter(function (e) { var r = e.getBoundingClientRect(); return r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight; })[0]; } }, { sel: '#acts .btn' }], idle: function () { return !VTUI.UI.busy; },
       verify: function (b) { return VT.nGoods(G.pl[0]) > b.n || 'no goods'; } }],
     mut: [{ name: 'no bonus', js: 'G.prov && Object.keys(G.prov).forEach(function(k){ G.prov[k].g = null; })' }] });
   GXS.add({ id: 'vt-market', name: 'Market: buy a card', ask: 'Can you buy a card with goods?', seed: 7, when: booted,
