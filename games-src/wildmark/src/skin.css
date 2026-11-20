@@ -404,8 +404,9 @@ button.tuthl{animation:tutp 1.1s ease-in-out 3;position:relative;z-index:8}
 
 /* R86: one helper at a time. Goal card open: no flavour toast or turn banner over it. A coach or hint bubble open: no gold best-column frame, no edge arrows; short phones also lose the zoom stack under the Next button. */
 html.wm-goal #toast,html.wm-goal #turnban{display:none!important}
-html.wm-coach .pair.top{box-shadow:none}
-html.wm-coach .gain.best{background:#24362b;color:#e9f3df;border-color:rgba(255,255,255,.25)}
-html.wm-coach #edgea{display:none}
-@media (max-height:700px){html.wm-coach #zoom{display:none}}
+html.wm-coach .pair.top,html.wm-cb .pair.top{box-shadow:none}
+html.wm-coach .gain.best,html.wm-cb .gain.best{background:#24362b;color:#e9f3df;border-color:rgba(255,255,255,.25)}
+html.wm-coach #edgea,html.wm-cb #edgea{display:none}
+@media (max-height:700px){html.wm-coach #zoom,html.wm-cb #zoom{display:none}}
 #edgea .ea small{pointer-events:none}
+html.wm-goal .gxh-bub{visibility:hidden}

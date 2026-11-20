@@ -32,6 +32,6 @@ function helpInit() {
 }
 // one instruction line on the board: while a coach bubble or tutorial bubble is up, the status line steps aside
 (function () {
-  function sync() { var on = !!document.querySelector('.gxh-bub, .gxh-tx'); document.documentElement.classList.toggle('wm-coach', on); }
-  if (window.MutationObserver) new MutationObserver(sync).observe(document.documentElement, { childList: true, subtree: true });
+  function sync() { var on = !!document.querySelector('.gxh-bub, .gxh-tx'); document.documentElement.classList.toggle('wm-coach', on); var cb = document.getElementById('coachb'); document.documentElement.classList.toggle('wm-cb', !!cb && !cb.hidden); }
+  if (window.MutationObserver) new MutationObserver(sync).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
 })();
