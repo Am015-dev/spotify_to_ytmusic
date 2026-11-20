@@ -70,7 +70,9 @@ function toast(msg, ms) {   /* toast lane = the dock title row: it never covers 
   t.textContent = msg; ms = Math.max(ms || 0, readMs(msg)); t.classList.add('on'); dh && dh.classList.add('toasting'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); dh && dh.classList.remove('toasting'); }, ms || 1800);
 }
 function popupsOk() { return !!UI.hintsOn && UI.mode !== 'tutorial' && UI.mode !== 'story'; }   /* pop-ups only with Hints on in a Quick game; Learn uses Odo, Play the line */
-function lineSay(msg, ms) {   /* show a note in the instruction line for a readable time, then go back to the instruction */
+function tutVoice() { try { return UI.mode === 'tutorial' && typeof GXT !== 'undefined' && GXT.active() && !!document.querySelector('.gxt-bub'); } catch (e) { return false; } }   /* one voice per tutorial step: while the lesson bubble is open, no prompt note, coach line, banner or toast speaks */
+function lineSay(msg, ms) {
+  if (tutVoice()) return;   /* show a note in the instruction line for a readable time, then go back to the instruction */
   var pr = $('#prompt'); if (!pr) return; UI.note = msg; pr.textContent = msg; starAdd(pr); pr.classList.add('note'); clearTimeout(lineSay.t);
   lineSay.t = setTimeout(function () { UI.note = null; pr.classList.remove('note'); if (G) { pr.textContent = promptText(); starAdd(pr); } }, Math.max(ms || 0, readMs(msg)));
 }
@@ -102,7 +104,7 @@ function coach(id, text) {
 }
 function coachPump() {
   if (UI.cBusy || !UI.cq || !UI.cq.length) return; var t = UI.cq.shift(); if (!t) return coachPump();
-  UI.cBusy = true; var tutOn = false; try { tutOn = typeof GXT !== 'undefined' && GXT.active(); } catch (e) { } if (tutOn) lineSay(VSTORY.guide.name + ': ' + t); else say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : readMs(VSTORY.guide.name + ' ' + t) + 900);
+  var tutOn = false; try { tutOn = typeof GXT !== 'undefined' && GXT.active(); } catch (e) { } if (tutOn && tutVoice()) return coachPump(); UI.cBusy = true; if (tutOn) lineSay(VSTORY.guide.name + ': ' + t); else say(t); UI.cT = setTimeout(function () { UI.cBusy = false; coachPump(); }, UI.fast ? 0 : readMs(VSTORY.guide.name + ' ' + t) + 900);
 }
 function coachCheck(m, s, evs) {   /* after a move (m by seat s, events evs) and at turn starts (m null) */
   if (UI.mode !== 'tutorial' || !G || (typeof GXT !== 'undefined' && GXT.running())) return;
@@ -137,9 +139,9 @@ function turnBanner() {
   var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
-  try { var orr = $('#opp').getBoundingClientRect(); if (orr.height) { b.style.top = Math.round(orr.top + orr.height / 2) + 'px'; b.classList.add('top'); } else if (L.tiny) { var brr = document.querySelector('.gx-bar').getBoundingClientRect(); b.style.top = Math.round(brr.top + brr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
+  try { var orr = $('#opp').getBoundingClientRect(); if (orr.height) { b.style.top = Math.round(orr.top + orr.height / 2) + 'px'; b.classList.add('top'); } else if (L.tiny) { var brr = ($('#tabs') || document.querySelector('.gx-bar')).getBoundingClientRect(); b.style.top = Math.round(brr.top + brr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
   UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
-  if (UI.fast || QS.get('scn')) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
+  if (UI.fast || QS.get('scn') || tutVoice()) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice'); rollDice(b, G.P[a].dice);
 }
 function describe(m, s) {
   var n = G.seats[s].name, p = G.P[s], t;
@@ -354,7 +356,7 @@ function render() {
   try { GXH.phase(myTurn() && !UI.camp || myTurn() ? helpPhase() : null); } catch (e) { }
 }
 /* every ★ says why (R21): one short reason line under the prompt, also in the tile card and the bulb */
-var TWHY = { castle: 'a free action when built', mine: 'pays silver every season', ship: 'loads goods, banner up the track', pas: 'animals score when the region fills', know: 'bends one rule for you',
+var TWHY = { castle: 'a free action when built', mine: 'pays silver every season', ship: 'loads goods, banner up the track', pas: 'scores its meadow\'s animals now', know: 'bends one rule for you',
   hall: 'build one more tile at once', carp: 'then take any Building', chapel: 'then take a Keep, Mine or Lore', mkt: 'then take a Barge or Pasture', inn: 'gives 4 workers', mint: 'gives 2 silver', tower: 'scores 4 points', store: 'sell goods with any die' };
 function tileWhy(t) { return t ? (t.t === 'bld' ? TWHY[t.k] : TWHY[t.t]) || 'more land' : ''; }
 function starWhy(m) {
@@ -814,7 +816,7 @@ function gameOver() { try { localStorage.removeItem('vob_save'); } catch (e) { }
 function showResult() {
   var rs = $('#rs'); toastOff(); rs.innerHTML = ''; UI.cq = []; clearTimeout(UI.cT); UI.cBusy = false; var gd0 = $('#guide'); if (gd0) gd0.classList.remove('on'); var c = h('div.card', { role: 'dialog', 'aria-label': 'Result' });
   var w = G.winner, you = G.seats.filter(function (s) { return s.human; }).length === 1, won = G.teams ? w % 2 === 0 : w === 0; c.classList.add(won || !you ? 'rwin' : 'rlose'); setTimeout(function () { sfx(won ? 'score' : 'bad'); }, 150);
-  c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', style: 'height:8px' }));
+  c.appendChild(h('div', { 'data-art': won && you ? 'ui-result-win' : 'ui-result-lose', 'class': 'resart' }));
   c.appendChild(h('h2', { text: G.solo ? (won ? 'Every space built. You win.' : 'So close: ' + G.soloFilled + ' of 37 spaces') : G.teams ? (won ? 'Your team wins, ' + G.teamVP[0] + ' to ' + G.teamVP[1] : G.seats[1].name + ' and ' + G.seats[3].name + ' win, ' + G.teamVP[1] + ' to ' + G.teamVP[0]) : you ? (w === 0 ? 'You win!' : G.seats[w].name + ' wins this time') : G.seats[w].name + ' wins' }));
   var tb = h('table.rsrc'), SR = G.rank.map(function (s) { return srcOf(s); });
   tb.appendChild(h('tr', {}, [''].concat(G.rank.map(function (s) { return G.seats[s].name; })).map(function (x) { return h('th', { text: x }); })));
@@ -908,15 +910,15 @@ var RULES_HTML = '<div class="rules"><h3>How a turn works</h3><ol class="howturn
   '<h3>Tiles</h3><ul><li><b>Keep</b> (dark green): one free action, any number.</li><li><b>Mine</b> (grey): 1 silver after every season.</li>' +
   '<li><b>Lore</b> (yellow): changes one rule for you, all game.</li>' +
   '<li><b>Buildings</b> (tan): work as soon as you build them. No two the same inside one outline. The <b>Moot Hall</b> lets you build again straight away.</li>' +
-  '<li><b>Pasture</b> (light green): points for every animal of that kind nearby.</li>' +
+  '<li><b>Pasture</b> (light green): points for every animal of that kind in the same meadow.</li>' +
   '<li><b>Barge</b> (blue): take one stall\'s goods. Move up the track.</li></ul>' +
-  '<h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
+  '<h3>Length and limits</h3><ul><li>A game is 5 seasons of 5 rounds.</li><li>Storage holds 3 tiles. A 4th makes you drop one.</li><li>You hold at most 3 kinds of goods.</li><li>The track sets turn order: higher goes first.</li></ul><h3>Points</h3><p>The light outlines on your estate mark regions. Fill every space in one to score it. Bigger regions pay more: 1 space pays 1, 8 spaces pay 36.</p><p>Season 1 adds 10 extra. Later seasons add 8, 6, 4, 2.</p>' +
   '<p>First to fill every space of one colour gets 5 to 7 points. Second gets 2 to 4.</p>' +
   '<p>Each round the white die puts new goods on its stall.</p>' +
   '<p>At the end: +1 per silver, +1 per unsold crate, +1 per 2 workers, plus lore. Most points wins. A tie goes to the emptier estate.</p>' +
   '<h3>Solo and teams</h3>' +
   '<p><b>Solo</b>: 25 rounds. You win only if you build all 37 spaces. <b>Teams</b> (4 players): partners share silver, workers and goods.</p>' +
-  '<h3>Our own changes</h3><ul><li>The estate map and its numbers are ours.</li><li>All tiles come from one shuffled pile.</li><li>The 26 lore tiles are ours.</li><li>A fourth kind of goods does not fit and is lost.</li><li>Goods come from one bag.</li></ul></div>';
+  '<h3>Our own changes</h3><ul><li>The estate map and its numbers are ours.</li><li>The back lane gets only its own black-backed tiles.</li><li>The 26 lore tiles are ours.</li><li>A fourth kind of goods stays on its stall.</li><li>Goods come from one bag.</li></ul></div>';
 function drawers() {
   var r = h('div', { html: RULES_HTML }); GX.drawer('rulesd', 'How to play', r);
   var tr = h('button.btn.alt', { type: 'button', text: 'Play the lesson game', style: 'margin-top:8px', onclick: function () { GX.close(); tutStart(); } }); r.appendChild(tr);

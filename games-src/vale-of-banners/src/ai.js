@@ -73,11 +73,11 @@
     if (lvl === 'random') return M[Math.floor(V.rnd(G) * M.length)];
     var sc = M.map(function (m) { var c = apply(G, m); return { m: m, c: c, v: V.evalSeat(c, s) }; });
     if (lvl === 'easy') { sc.forEach(function (x) { x.v += noise(G) * 6; }); }
-    /* gentle = first-game rival: steady but loose, so following the ★ (one-step best) wins about 2 in 3, and a careful reader can win too */
+    /* gentle = first-game rival: loose (wide noise), so a newcomer who ignores the ★ wins about 1 in 2 (64/120 headless) and a ★ follower nearly always wins */
     if (lvl === 'gentle') {
       /* a rare whim (any move but ending early); the rest greedy with some noise */
       if (noise(G) < 0.02) { var ne = M.filter(function (m) { return m.k !== 'end'; }); if (ne.length) return ne[Math.floor(noise(G) * ne.length)]; }
-      sc.forEach(function (x) { x.v += noise(G) * 0.8; });
+      sc.forEach(function (x) { x.v += noise(G) * 8; });
     }
     sc.sort(function (a, b) { return b.v - a.v; });
     if (lvl === 'hard') {
