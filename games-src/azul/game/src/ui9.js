@@ -25,6 +25,7 @@ html.bf-land .bf-say{font-size:15px}
 .bf-side{flex:none;display:flex;flex-direction:column;align-items:center;padding:0 6px 6px;position:relative;z-index:1}
 html.bf-land .bf-mid{flex-direction:row}
 html:not(.bf-land) .bf-line{position:absolute;left:0;right:0;top:-30px;height:28px;pointer-events:none;z-index:2}html:not(.bf-land) .bf-line button,html:not(.bf-land) .bf-line .bf-bw{pointer-events:auto}
+html:not(.bf-land) .bf-line .bf-bw{position:absolute;left:4px;top:-12px}
 html:not(.bf-land) .bf-line .bf-say{background:rgba(10,20,50,.78);padding:2px 12px;border-radius:14px;font-size:15px}
 html.bf-land .bf-table{margin:4px 0 4px 6px}
 html.bf-land .bf-side{justify-content:center;padding:4px 8px}
@@ -99,7 +100,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-pl{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:2px;white-space:nowrap;font:800 13px var(--ff);color:#d8f1f2;text-shadow:0 1px 2px #000;pointer-events:none;letter-spacing:.02em}
 .bf-pool::after{content:'';position:absolute;inset:10%;border-radius:12%;border:2px dashed rgba(216,241,242,.3);pointer-events:none}
 .bf-pool.can{box-shadow:inset 0 0 0 3px #ffd66b,0 0 18px 4px rgba(255,214,107,.55)}
-.bf-say.thk>span::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:bfDots 1s steps(4) infinite;overflow:hidden;vertical-align:bottom}
+.bf-say.thk>span::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:bfDots 1s steps(4) 6;overflow:hidden;vertical-align:bottom}
 @keyframes bfDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 .bf-table .bf-t{transition:transform .22s cubic-bezier(.3,1.6,.5,1),opacity .2s,filter .2s}
 .bf-table .bf-t.up{transform:translateY(-16%) scale(1.2);z-index:4;filter:drop-shadow(0 0 6px #fff7b0) drop-shadow(0 6px 4px rgba(0,0,0,.5))}
