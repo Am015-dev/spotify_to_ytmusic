@@ -97,11 +97,11 @@ function resStrip(){let o=null;try{withView(()=>{o={f:food(),need:eatersNeed(),w
   // resources as tokens: the owner's icon, a big number, the name under it (owner 8 Nov: "a spreadsheet")
   const tk=(bad,ic,n,nm)=>`<span class="tk ${bad?'bad':''}" data-r="${{food:'food',wood:'wood','❤':'life',shelter:'shelter','🔥':'pile','📅':'day'}[ic]||''}">${ic.length>2?`<img src="media/icon-res-${ic}.webp" alt="">`:`<i>${ic}</i>`}<b>${n}</b><small>${nm}</small></span>`;
   let pc=null;try{withView(()=>{pc=goalPace()})}catch(e){}
-  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Life')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')+(pc?tk(pc.behind,'🔥',pc.pile+'/15','Pile'):'')+(pc&&pc.behind?`<span class="pace" role="alert">⚠ ${E(pc.text)}</span>`:'')}
+  return tk(false,'📅',o.d+'/'+o.r,'Day')+tk(o.f<o.need,'food',o.f,'Food · eat '+o.need)+tk(false,'wood',o.w,'Wood')+tk(o.low<=3,'❤',o.low,'Weakest')+tk(!o.sh,'shelter',o.sh?'✓':'✗','Shelter')+(pc?tk(pc.behind,'🔥',pc.pile+'/15','Pile'):'')+(pc&&pc.behind?`<span class="pace" role="alert">⚠ ${E(pc.text)}</span>`:'')}
 // R3 review: say during play when the rescue goal is behind schedule (Marooned: fire, then a 15-wood pile by day 10-12). Targets come from
 // easy-sim.js: winning games average pile 6 by day 6, 10 by day 9; losing games are 2-3 behind that.
 function goalPace(day){if(!G||G.scen!=='marooned'||G.over||!G.sc)return null;const d=Math.min(G.rounds,day||G.round),pile=G.sc.pile|0,fire=!!(G.inv&&G.inv.built&&G.inv.built.fire);
-  if(!fire&&d>=4)return {pile,behind:true,text:`No fire yet, day ${d}: build the fire first`};
+  if(!fire&&d>=4){let m=null;try{m=missingTerrain('fire')}catch(e){}return {pile,behind:true,text:m?`No fire yet, day ${d}: explore to find ${m}`:`No fire yet, day ${d}: build the fire first`}}   // F16 cold play: Fire needs mountains; say so when none are found
   const t=PACE_T[d];if(t&&pile<t&&pile<15)return {pile,behind:true,text:`Pile ${pile}/15, day ${d}: build faster (aim for ${t})`};
   return {pile,behind:false,text:''}}
 // R36 review (own-plan games lost on day 12 twice): the day summary spells out the road to the rescue in numbers, every day:
