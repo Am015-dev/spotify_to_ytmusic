@@ -198,7 +198,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'iron-bangle': { name: 'Iron Bangle', t: 'Start fights with 8 Block.', rar: 'c', art: 'thick iron bracelet with a rune notch' },
     'lantern': { name: 'Tin Lantern', t: '+1 energy on turn 1.', rar: 'c', art: 'small dented tin lantern lit from within' },
     'bag-of-marbles': { name: 'Bag of Marbles', t: 'Enemies start Vulnerable 1.', rar: 'c', art: 'leather pouch spilling glass marbles' },
-    'clover-dice': { name: 'Clover Dice', t: 'Dice rolls get +1 (max 6).', rar: 'c', art: 'carved bone die with a four-leaf clover on it' },
+    'clover-dice': { name: 'Clover Dice', t: 'Cards with a die (like Wild Swing): every roll gets +1, up to 6.', rar: 'c', art: 'carved bone die with a four-leaf clover on it' },
     'healing-moss': { name: 'Healing Moss', t: 'Rest sites heal 8 more.', rar: 'c', art: 'clump of glowing green moss on a stone' },
     'gold-tooth': { name: 'Gold Tooth', t: '+50% gold from fights.', rar: 'c', art: 'single gold tooth on a velvet scrap' },
     'oak-heart': { name: 'Oak Heart', t: '+8 max HP now.', rar: 'c', art: 'heart-shaped knot cut from an oak branch' },
@@ -219,7 +219,7 @@ var EC = (typeof EC !== 'undefined') ? EC : {};
     'venom-vial': { name: 'Venom Vial', t: 'Poison an enemy 2.', tgt: 1, art: 'skull-stoppered green vial' },
     'frost-gas': { name: 'Frost Gas', t: 'All enemies Weak 3.', art: 'pale blue misty bottle' },
     'healing-draught': { name: 'Healing Draught', t: 'Heal 24.', art: 'rosy pink potion in a heart-shaped flask' },
-    'fortune-die': { name: 'Fortune Die', t: 'Next 2 dice rolls show 6.', art: 'golden die floating inside a glass bottle' }
+    'fortune-die': { name: 'Fortune Die', t: 'Drink it before a card with a die (like Wild Swing). Your next 2 die rolls land on 6.', art: 'golden die floating inside a glass bottle' }
   };
   var EVENTS = {
     'ember-shrine': { name: 'Ember Shrine', q: 'A shrine hums with warm light.', art: 'small stone shrine with floating embers', o: [{ t: 'Pray: heal 16', do: { heal: 15 } }, { t: 'Offer 8 HP: upgrade a card', do: { hp: -6, upg: 1 } }, { t: 'Walk on', do: {} }] },

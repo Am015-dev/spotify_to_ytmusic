@@ -291,7 +291,7 @@
   function dock(g) {
     var m = document.getElementById('dockmsg'), a = document.getElementById('dockact'), t = document.getElementById('dockt'); m.textContent = ''; a.innerHTML = ''; a.parentNode.querySelectorAll('.pcinfo').forEach(function (n) { n.remove(); });
     var txt = '', ttl = 'Your move';
-    if (g.scr === 'map') { txt = 'Pick a glowing room.'; ttl = 'Climb'; }
+    if (g.scr === 'map') { txt = 'Pick a glowing room. ' + aheadLine(g) + '.'; ttl = 'Climb'; }
     else if (g.scr === 'battle') {
       var b = g.b, ch = g.hs[b.cur >= 0 ? b.cur : 0]; ttl = b.ph === 'p' ? 'Your turn' : 'Enemy turn';
       var anyOk = b.ph === 'p' && ch.hand.some(function (c) { return E.canPlay(ch, c) && (E.cost(ch, c) <= ch.en || E.eff(c).cost === 'X'); });
@@ -320,7 +320,7 @@
   function mapScr() {
     var g = G(); hud();
     var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); var SGM = STAGE(), mroot = m;
-    if (SGM) { app.appendChild(relicBar(g)); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
+    if (SGM) { app.appendChild(relicBar(g)); app.appendChild(h('div', 'f4ahead', aheadLine(g))); var mi = h('div', 'w485mapin'); mi.style.height = Math.max(560, ((g.F || 9) + 2) * 86) + 'px'; m.appendChild(mi); m.appendChild(h('div', 'w485mapsp')); mroot = m; m = mi; }
     m.appendChild(BG('bg-map'));
     function pos(n) { return { x: (n.c + 0.5) / 4 * 100, y: 100 - (n.f - 0.5) / ((G().F || 9) + 1.5) * 100 }; }
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
@@ -338,7 +338,12 @@
     });
     var QI = (window.EC_STORY || {}).quick; if (QI && UI.hints && !UI.camp && g.at < 0 && !(window.GXT && GXT.active()) && UI.qIntro !== g.seed && UI.say) { UI.qIntro = g.seed; setTimeout(function () { UI.say(QI.intro[Math.abs(g.seed | 0) % QI.intro.length], 4200); }, 200); }
     app.appendChild(mroot);
-    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; }); }
+    if (SGM) { var fy = null; g.map.forEach(function (n) { if (rc.indexOf(n.id) >= 0) { var y = pos(n).y; fy = fy == null ? y : Math.max(fy, y); } }); var sy = UI.mapY != null && UI.mapAt === g.at ? UI.mapY : (fy == null ? 1e6 : m.offsetHeight * fy / 100 - mroot.clientHeight * .7); mroot.scrollTop = sy; mroot.addEventListener('scroll', function () { UI.mapY = mroot.scrollTop; UI.mapAt = g.at; });
+      // F4: glowing rooms are never under the bottom panel: pad the map by the panel height, then scroll the lowest glowing room into view
+      var fixView = function () { var dk = document.querySelector('.gx-dock'), sp = mroot.querySelector('.w485mapsp'); if (!dk || !mroot.isConnected) return; var lim = Math.min(innerHeight, dk.getBoundingClientRect().top > 0 ? dk.getBoundingClientRect().top : innerHeight), mr = mroot.getBoundingClientRect(); lim = Math.min(lim, mr.bottom); if (sp) sp.style.height = Math.max(0, mr.bottom - lim + 24) + 'px';
+        var low = -1e9, top0 = 1e9; mroot.querySelectorAll('.node.glow').forEach(function (n) { var q = n.getBoundingClientRect(); low = Math.max(low, q.bottom); top0 = Math.min(top0, q.top); });
+        if (low > lim - 10) mroot.scrollTop += low - lim + 22; UI.mapY = mroot.scrollTop; };
+      setTimeout(fixView, 30); setTimeout(fixView, 350); } 
   }
   var NODEL = { m: 'Fight', e: 'Elite', r: 'Rest', s: 'Shop', v: 'Event', t: 'Chest', b: 'Boss' };
   var NODEI = { m: '<path d="M3 19 15 7l1.6 1.6L4.6 20.6zM14 4.5l5.5-1-1 5.5-2.2-1.1zM21 19 9 7 7.4 8.6l12 12zM10 4.5 4.5 3.5l1 5.5 2.2-1.1z"/>',
@@ -408,7 +413,7 @@
   };
   function stChips(o) {
     var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'Block 25% less'; } };
-    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
+    [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var say = p[1] + ' ' + n + ': ' + SAY[p[0]](n), sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n)]); sp.title = say; sp.setAttribute('role', 'button'); sp.setAttribute('aria-label', say); sp.style.cursor = 'help'; sp.addEventListener('click', function (ev) { ev.stopPropagation(); UI.explain([{ k: p[0], s: 'st-' + p[0], say: say }]); }); w.appendChild(sp); } });
     return w;
   }
   // W485 stage layout (phone): heroes left, foes right on one floor, fanned hand, orb / piles / End turn in the corners. ?stage=0 = the old layout
@@ -418,7 +423,7 @@
   var lsWas = null; window.addEventListener('resize', function () { var n = LSC(); if (n !== lsWas) { lsWas = n; try { var g = G(); if (g && g.scr === 'battle' && UI.mode === 'game' && !UI.busy && !UI.dragging) render(); } catch (e) { } } });   // R24: rotation flips the stage between portrait and the short-landscape layout
   function relicBar(g) {
     var r = h('div', 'w485top');
-    var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
+    var rl = h('div', 'w485rel' + ((g.relics || []).length > 4 ? ' many' : '')); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
     if (!(g.relics || []).length) rl.appendChild(h('span', 'w485none', 'No relics yet'));
     r.appendChild(rl);
     r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
@@ -515,7 +520,8 @@
     st.appendChild(ctl);
     var hand = h('div', 'hand'), hc = b.ph === 'p' ? cur.hand : []; var nn = hc.length;
     if (SG && LSC()) { hand.classList.add('fan'); var cwl = Math.max(60, Math.min(78, Math.floor((document.documentElement.clientWidth - 300) / (1 + .7 * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cwl + 'px'); st.style.setProperty('--hh', Math.round(cwl * 0.95 + 10) + 'px'); st.classList.add('w24ls'); }   // R24: short landscape phone: a low hand that peeks up, controls in the bottom corners
-    else if (SG) { hand.classList.add('fan'); var ov0 = nn <= 5 ? .05 : .15, cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + (1 - 2 * ov0) * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); hand.style.setProperty('--ov', String(ov0)); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
+    else if (SG) { hand.classList.add('fan'); if (nn >= 6) hand.classList.add('dense'); var ov0 = nn <= 5 ? .05 : .15, cw0 = Math.max(64, Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / (1 + (1 - 2 * ov0) * Math.max(0, nn - 1))))); hand.style.setProperty('--cw', cw0 + 'px'); hand.style.setProperty('--ov', String(ov0)); st.style.setProperty('--hh', Math.round(Math.min(112, Math.floor((document.documentElement.clientWidth - 16) / 3.8)) * 1.5 + 26) + 'px'); } else if (nn > 5 && window.innerWidth >= 1024) { var bw = (document.querySelector('.gx-board') || document.documentElement).clientWidth; hand.style.setProperty('--cw', Math.max(80, Math.min(150, Math.floor((bw - 28) / nn) - 8)) + 'px'); }   // F4: PC hand: every card whole, side by side
+    else if (nn > 5) { hand.classList.add('dense'); hand.style.setProperty('--cw', 'min(var(--hw),' + Math.floor((document.documentElement.clientWidth - 12) / (1 + .82 * (nn - 1))) + 'px)'); }
     hc.forEach(function (c, i) {
       var ok = E.canPlay(cur, c) && (E.cost(cur, c) <= cur.en || E.eff(c).cost === 'X'), co = { str: E.eff(c).type === 'A' ? (cur.st.str || 0) * D.SCALE + (cur.stance === 'w' ? D.SCALE : 0) + (E.has('smoking-censer') ? D.SCALE : 0) : 0 }, el = cardEl(c, co); el.classList.add(ok ? 'ok' : 'no'); if (UI.sel === i) el.classList.add('sel');
       if (SG) { var off = i - (nn - 1) / 2; el.style.setProperty('--rot', (off * (nn > 6 ? 3.5 : 5)) + 'deg'); el.style.setProperty('--dy', Math.min(22, off * off * (nn > 6 ? 2 : 4)) + 'px'); el.style.zIndex = 10 + i; }
@@ -531,6 +537,7 @@
       var sd = on(h('button', 'btn', 'Done'), function () { var keep = []; top.forEach(function (c, k) { if (!UI.scryOut[k]) keep.push(k); }); UI.scryOut = {}; E.performMove({ t: 'scry', keep: keep }); render(); }); sd.id = 'scry-done'; so.appendChild(sd);
       st.appendChild(so);
     }
+    st.addEventListener('click', function (ev) { if (UI.sel >= 0 && !UI.busy && !ev.target.closest('.card, .en, button, .intent, .stc, .itip')) { UI.sel = -1; render(); } });   // F4: tap empty table = put the lifted card back
     app.appendChild(st);
     if (SG) fitFoes(st);   // F1: every foe fully on screen and never under the top bar (3 per row)
     var dk = b.turn + ':' + b.cur; if (b.ph === 'p' && UI.drawKey !== dk && !b.scry) { UI.drawKey = dk; dealIn(hand); }   // W420 draw animation
@@ -704,6 +711,7 @@
     var rk = g.act + ':' + g.floor + ':' + g.at, wasB = g.map[g.at] && g.map[g.at].t === 'b';
     if (!r.treasure && UI.fanKey !== rk) { UI.fanKey = rk; fanfare(wasB); }
     if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(rateLine(g, UI.fs));   // W420 fight rating
+    if (!r.treasure && UI.fs && UI.fs.key === rk) s.appendChild(hpLine(g, UI.fs));   // F4: what the fight cost, and a tip when HP is low
     s.appendChild(h('div', 'chip', '● +' + r.gold + ' gold'));
     // R7: a taken potion / relic stays as a greyed "Taken" tile, so nothing below jumps under the next tap
     if (r.pot) { var pb = on(h('button', 'item' + (r.took.pot ? ' taken' : ''), null, [A('pot-' + r.pot, D.POTIONS[r.pot].name, { ph: '#5a8a5a' }), h('span', '', (r.took.pot ? '\u2713 Taken: ' : '') + D.POTIONS[r.pot].name)]), function () { if (r.took.pot) return; E.performMove({ t: 'takepot' }); render(); }); if (r.took.pot) pb.disabled = true; pb.style.width = '140px'; s.appendChild(pb); }
@@ -724,6 +732,23 @@
     var t = good ? 'Good fight: lost ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent' : ', no wasted energy') : 'Poor fight: took ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent over ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') : lost > 0 ? ', block more before big hits' : '');
     if (f.over >= 10) t += ', ' + f.over + ' overkill';
     return h('div', 'w4rate ' + (good ? 'good' : 'poor'), t);
+  }
+  function hpLine(g, f) {
+    var now = g.hs.reduce(function (a, x) { return a + Math.max(0, x.hp); }, 0), mx = g.hs.reduce(function (a, x) { return a + x.mhp; }, 0), lost = Math.max(0, f.hp0 - now);
+    var d = h('div', 'f4hp' + (now <= mx * .4 ? ' low' : ''), null, [h('b', '', (lost > 0 ? '-' + lost : '0') + ' HP this fight'), document.createTextNode(' (' + now + '/' + mx + ' left)')]);
+    if (now <= mx * .4) { var ahead = aheadCount(g); d.appendChild(h('span', 'f4tip', now <= mx * .25 ? 'HP is very low. ' + (ahead.r ? 'Rest at the next campfire.' : 'Block more, and use a potion early.') : (ahead.r ? 'HP is low. Rest at the next campfire.' : 'HP is low. Block more before big hits.'))); }
+    return d;
+  }
+  // F4: rooms still ahead of you on the map, by kind, so recovery is plannable
+  function aheadCount(g) {
+    var f0 = g.at >= 0 && g.map[g.at] ? g.map[g.at].f : 0, seen = {}, q = (g.at >= 0 && g.map[g.at] ? g.map[g.at].nx : g.map.filter(function (n) { return n.f === Math.min.apply(null, g.map.map(function (m) { return m.f; })); }).map(function (n) { return n.id; })).slice(), c = { r: 0, s: 0, e: 0, v: 0, t: 0, b: 0 }, minF = {};
+    while (q.length) { var k = q.pop(); if (seen[k] || !g.map[k]) continue; seen[k] = 1; var n = g.map[k]; if (n.f > f0) { c[n.t] = (c[n.t] || 0) + 1; } n.nx.forEach(function (j) { q.push(j); }); }
+    return c;
+  }
+  function aheadLine(g) {
+    var c = aheadCount(g), p = [];
+    if (c.r) p.push(c.r + (c.r > 1 ? ' campfires' : ' campfire')); if (c.s) p.push(c.s + (c.s > 1 ? ' shops' : ' shop')); if (c.e) p.push(c.e + (c.e > 1 ? ' elites' : ' elite'));
+    return p.length ? 'Ahead: ' + p.join(', ') : 'Ahead: the boss';
   }
   function valTag(id) {
     var e = E.eff({ id: id, u: 0 }), s = JSON.stringify(e.ops);
