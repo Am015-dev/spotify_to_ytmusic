@@ -61,7 +61,7 @@ function tutSteps(){const ph=!!PH.on;const S=[
   {id:'swap',say:'Only YOUR tile sinking a rival earns a swap. Practise: tap yours.',target:()=>tvis('#twswap [data-sw=me][data-i="1"]'),until:()=>TSW.a!=null,ready:()=>tcalm()&&!!G.over&&!(UI.sunk&&UI.sunk.length),enter:()=>swOpen()},
   {id:'swap2',say:'Now tap the sunken crew\'s tile to take it.',target:()=>tvis('#twswap [data-sw=co][data-i="0"]'),until:()=>TSW.n>0,ready:()=>!!tvis('#twswap')},
   {id:'swap3',say:'Swapped! Tap Keep this hand when you are done.',target:()=>tvis('#twswap [data-sw=keep]'),until:()=>!TSW.on,ready:()=>!!tvis('#twswap')},
-  {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),tap:1,ready:()=>tcalm()&&!!G.over}
+  {id:'win',say:'Yours is the last junk afloat. You win the lantern!',target:()=>document.getElementById('board'),enter:()=>{TUTG.winT=Date.now()},until:()=>Date.now()-(TUTG.winT||Date.now())>3000,ready:()=>tcalm()&&!!G.over}   // R92 cold play: the result card covered the board, so a tap-the-board step looked frozen; it now moves on by itself
  ].filter(Boolean);
  return S.map(s=>({id:s.id,say:s.say,title:s.title,target:s.target,ready:s.ready,pad:4,
    wait:{type:'event',match:()=>s.tap?TUTG.tap===s.id:!!(s.until&&s.until())},
