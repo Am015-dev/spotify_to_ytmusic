@@ -32,12 +32,12 @@ const HLP_STEPS = {
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Tap a button below. Each one says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who takes every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or skip.', pic: () => HP.flare() },
-  pass: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
+  pass: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
   predict: { target: hfirst('#acts .btn'), title: 'Predict your tricks', text: 'Tap how many tricks you will win. You need exactly that many.', pic: () => HP.num('?') },
   signal: { target: hfirst('#acts [data-a=signal]', '#acts [data-a=nosig]'), title: 'Signal your crew', text: 'Tap Signal to show a card, or tap No signal.', pic: () => HP.ping('') },
-  lead: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
-  follow: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
-  free: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
+  lead: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
+  follow: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
+  free: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
   drone: { target: hfirst('#opp .dc.can', '#opp .dc'), title: 'Play for the drone', text: 'The drone is on your team. Tap one of its glowing cards.', pic: () => HP.drone() }
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
@@ -143,7 +143,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'lantern-dive', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn,#opp .dc.can,.tc,.tslot,#lead,#hand .hc,.jcard,.gx-ibtn' });
+  GXH.init({ game: 'lantern-dive', defaultOn: false, tapFirst: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,.tslot,#lead,#hand .hc,.jcard,.gx-bar' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
   try { GXH.setEnabled(!!UI.prefs.hints); } catch (e) { }
   applyHints();
@@ -155,4 +155,4 @@ function applyHints() {
   document.documentElement.classList.toggle('hintsoff', !on);
 }
 function hintsToggle() { UI.prefs.hints = !UI.prefs.hints; savePrefs(); try { GXH.setEnabled(UI.prefs.hints); } catch (e) { } if (UI.coach && UI.mode !== 'tutorial') UI.coach.level = UI.prefs.hints ? 'light' : 'off'; applyHints(); }
-function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(UI.rstep ? null : hlpPhase()); }   // F1: one helper: no coach bubble while a New-rule step is up

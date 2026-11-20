@@ -187,7 +187,7 @@ function seatSpots(geo, list) {
   }
   if (geo.line) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - (kk - 1) / 2) * (seatW + 6), y0, seatW); }); return out; }
   if (geo.row3) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - 1) * (seatW + 8), y0, seatW); }); return out; }
-  if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
+  if (kk === 2) { out[0] = sp(geo.small ? L : W * .24, y0); out[1] = sp(geo.small ? R : W * .76, y0); }   // F1: a short table: seats to the edges, clear of the trick
   else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
   else { out[0] = sp(L, mid + 18); out[1] = sp(W * .31, y0); out[2] = sp(W * .69, y0); out[3] = sp(R, mid + 18); }
   return out;
@@ -340,7 +340,7 @@ function renderHand(v) {
   const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = box.parentNode.parentNode.classList.contains('side') ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .78), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  const rowStep = Math.max(44, Math.round(ch * .72)), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 16;   // F1: >= 44 px of the back row shows; a little more table
   box.classList.toggle('two', rows === 2); box.style.setProperty('--rs', rowStep + 'px');
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {
@@ -431,7 +431,8 @@ function renderActs(v) {
   pr.textContent = M.p || '';
   const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
   { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy ) && !(pl && pl.childNodes.length)); }
-  ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
+  ac.classList.toggle('many', M.acts.length > 5); ac.classList.toggle('line', !!(UI.geo && UI.geo.line)); { const pl = $('#pile'); ac.classList.toggle('lp', !!(UI.geo && UI.geo.line && pl && pl.childNodes.length)); }   // F1: line layout: the buttons sit right of your slot, never on it
+   ac.innerHTML = '';
   M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
 }
 function renderTip() { }   // no tip cards: play happens on the table

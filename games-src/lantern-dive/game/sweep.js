@@ -17,11 +17,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const PAGE = `(() => {
   const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 3 && r.height > 3 && s.visibility !== 'hidden' && s.display !== 'none' && !e.closest('[hidden]'); };
   window.__sw = {
-    sig() { return JSON.stringify([G.phase, G.tricks.length, G.trick ? G.trick.plays.length : -1, G.tasks.map(t => t.owner).join(''), G.pings.length, UI.busy ? 1 : 0, !!UI.fz, G.players.map(p => p.hand.length).join(','), UI.dlg ? 1 : 0, UI.cards.length, document.getElementById('prompt').textContent]); },
+    sig() { return JSON.stringify([G.phase, G.tricks.length, G.trick ? G.trick.plays.length : -1, G.tasks.map(t => t.owner).join(''), G.pings.length, UI.busy ? 1 : 0, !!UI.fz, G.players.map(p => p.hand.length).join(','), UI.dlg ? 1 : 0, UI.cards.length, !!UI.rstep, document.getElementById('prompt').textContent]); },
     st() { return { ph: G.phase, must: iMustAct(), busy: UI.busy, dlg: !!UI.dlg, cards: UI.cards.length, rs: !document.getElementById('rs').hidden, tr: G.tricks.length, pl: G.trick ? G.trick.plays.length : -1 }; },
     cands() {
       const out = [], add = (sel, kind) => { for (const e of document.querySelectorAll(sel)) { if (!vis(e) || e.disabled) continue; const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue; const t = document.elementFromPoint(x, y); if (t && t !== e && !e.contains(t) && !t.contains(e)) continue; out.push({ kind, x, y, t: (e.getAttribute('aria-label') || e.textContent || '').slice(0, 30) }); } };
-      add('#pool .jcard.glow', 'job'); add('.pspot', 'ping'); add('#hand .hc.glow', 'card'); add('#opp .dc.glow', 'dcard'); add('.seat.glow', 'seat'); add('.me.glow', 'me'); add('#acts button', 'btn'); add('#rs button', 'rs'); add('#dlg button', 'dlg'); add('#pass button', 'pass');
+      add('#pool .jcard.glow', 'job'); add('.pspot', 'ping'); add('#hand .hc.glow', 'card'); add('#opp .dc.glow', 'dcard'); add('.seat.glow', 'seat'); add('.me.glow', 'me'); add('#acts button', 'btn'); add('#rs button', 'rs'); add('#dlg button', 'dlg'); add('#rstep button', 'dlg'); add('#pass button', 'pass');
       return out;
     },
     audit() {
@@ -62,6 +62,7 @@ async function helpFlow(page, st, ctl, tapAt, W, H) {
   const hs = await page.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state() }));
   if (hs.st.rules) { note('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }
   if (!hs.ph) return false;
+  if (await page.evaluate(() => !!UI.rstep)) return false;   // F1: a New-rule step is up: its OK comes first, the phase bubble after
   // 1) the first-time bubble of this phase
   if (tipsOn && hs.step && !seenPh.has(hs.ph)) {
     seenPh.add(hs.ph); let b = null; const t1 = Date.now();
@@ -89,6 +90,7 @@ async function helpFlow(page, st, ctl, tapAt, W, H) {
     }
   }
   // 2) the lightbulb: the first time in every phase, then now and then
+  if (!tipsOn) return false;   // F1: no bulb while Hints are off
   if (!(ctl.bulbN < 16 && (!seenPh.has('bulb:' + hs.ph) || Math.random() < .2))) return false;
   seenPh.add('bulb:' + hs.ph); ctl.bulbN++; stats.bulbs++;
   const pre = await page.evaluate(() => { const v = viewSeat(); const c = r => { const e = r && (typeof r === 'function' ? r() : r); if (!e) return null; const q = e.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; };
@@ -150,6 +152,7 @@ async function playGame(browser, size, gi, rep) {
     const mission = MISSIONS[gi % MISSIONS.length], np = NPS[gi % NPS.length], mode = 'vs';
     await page.evaluate(`AIDELAY=${160};UI.seed=${gi * 977 + 11};UI.fingerOn=${gi % 3 === 0};newGame('${mode}',{np:${np},mission:${mission},kind:'log',level:'${['easy', 'normal', 'hard'][gi % 3]}'})`);
     if (!tipsOn) await page.evaluate(() => { window.__tipsOff = true; GXH.setEnabled(false); });
+    else await page.evaluate(() => { if (!UI.prefs.hints) hintsToggle(); render(); });   // F1: Hints are off by default (addendum 7): a tips-on sweep turns them on, as a player would
     let last = '', lastAt = Date.now(), noCand = 0, audits = 0, overAt = 0;
     const t0 = Date.now();
     while (Date.now() - t0 < 150000) {

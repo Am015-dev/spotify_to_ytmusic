@@ -203,3 +203,10 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 @media (max-width:520px){html .seat .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}html .seat .jc{overflow:visible;height:auto}}
 /* F1: short phones: a seat's cards and tricks share one line (icon + number), so the trick keeps room above a two-row hand */
 html.ph-short .seat:not(.drone) .bdgs{flex-direction:row;align-items:center;justify-content:flex-start;gap:4px}html.ph-short .seat:not(.drone) .bdg .bl{display:none}
+/* F1: short phones: your seat, signal token and job chips share one row (44 px chips), so the table keeps over half the screen */
+html.ph-short #bd:not(.side) #mine{flex-wrap:nowrap}html.ph-short #bd:not(.side) #mine .mjobs{flex:1 1 0;min-width:0}
+html.ph-short #mine .me .who .nm,html.ph-short #mine .sigst .sgt{display:none}
+#mine:has(> #bulbbtn:not([hidden])){padding-right:56px}
+html.ph-short #bd:not(.side) #mine .mjobs{flex-wrap:nowrap}html.ph-short #bd:not(.side) #mine .mjobs .jc{flex:1 1 0;min-width:0}
+html.ph-short #bd:not(.side) #mine .mjobs:has(.jc:nth-child(3)){flex-wrap:wrap}html.ph-short #bd:not(.side) #mine .mjobs:has(.jc:nth-child(3)) .jc{flex:1 1 40%}
+html.ph-short #mine .me .bdg .bl{display:none}

@@ -163,7 +163,7 @@ function ruleBox(sel) {
 }
 function ruleStepShow(r) {
   const box = ruleBox(r.target); if (!box) return false;
-  UI.rstep = r.id;
+  UI.rstep = r.id; try { GXH.phase(null); } catch (e) { }   // F1: one helper: a queued coach bubble waits for this rule's OK
   const o = document.createElement('div'); o.id = 'rstep'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'New rule'); o.dataset.rule = r.id;
   o.innerHTML = '<div class="rsh"></div><div class="rsb gxh-bub gxt-bub on"><div class="gxh-bd"><div class="gxh-tt">New rule</div><div class="gxh-tx"></div></div><div class="gxh-row2"><button type="button" class="gxh-ok rsok">OK</button></div></div>';
   o.querySelector('.gxh-tx').textContent = r.say;
