@@ -15,6 +15,12 @@ const MASK = ['#gxscn-tag', '#gxlab-bar', '[data-gx-skip]', '[data-volatile]', '
   const b = await PW.chromium.launch({ args: ['--no-sandbox'] });
   for (const [proj, use] of Object.entries(PROJ)) for (const step of ['title', 'menu', 'board']) {
     const ctx = await b.newContext({ ...use, reducedMotion: 'reduce' }), page = await ctx.newPage();
+    if (step === 'title') {   // R108: the real title screen (the game's own start card), not scenario 0 (which was the board)
+      await page.goto(URL, { waitUntil: 'load', timeout: 45000 }); await page.waitForTimeout(2500);
+      const f0 = path.join(OUT, `${proj}-title.png`);
+      await page.screenshot({ path: f0, animations: 'disabled', caret: 'hide', mask: [page.locator(MASK)], maskColor: '#ff00ff' });
+      console.log(proj, step, path.relative(process.cwd(), f0)); await ctx.close(); continue;
+    }
     await page.goto(URL + '?scn=menu', { waitUntil: 'load', timeout: 45000 });
     await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 60000 });
     const name = await page.evaluate(step => { const l = GXS.menuList(); const sf = step === 'title' ? l[0] : step === 'board' ? l.find(x => x.board) : l.find(x => /^panel /.test(x.name)); return sf ? GXS.menuOpenSf(sf) : null; }, step);
