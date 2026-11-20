@@ -275,8 +275,9 @@ document.addEventListener('pointerup',e=>{if(PG.on&&!PG.ch){PG.up=Date.now();PH.
 document.addEventListener('pointercancel',e=>{if(PG.on&&!PG.ch){PG.up=Date.now();PH.closeT=Date.now()}},true);
 document.addEventListener('click',e=>{if(!PG.on)return;if(PG.up&&Date.now()-PG.up>1000){PG.on=false;return}const t=e.target;
   if(t&&t.isConnected&&t.closest&&t.closest(PG_SEL))return;
-  // a 2nd press within 0.6 s loses its click when it lands on the board or near the first press (a double tap); a control elsewhere (Place, Pass, a tile) answers
-  if(PG.chain&&t&&t.isConnected&&!pgBoard(t))return;
+  // a 2nd press within 0.4 s loses its click only when it lands near the first press (a double tap); a tap elsewhere (Place, a tile, a far gold mark) answers
+  // (R92: a far board tap 0.38 s after a bubble tap was swallowed; marks under the bubble's edge are covered by pgNear / nearbub)
+  if(PG.chain&&t&&t.isConnected)return;
   e.stopPropagation();e.stopImmediatePropagation();if(e.cancelable)e.preventDefault()},true);
 // R42 (sweep under load): a redraw of the strip / pop-up between the press and the release replaced the pressed button, so the click went nowhere.
 // If the pressed control is gone, the same control (same action and data) now under the finger gets the click.
