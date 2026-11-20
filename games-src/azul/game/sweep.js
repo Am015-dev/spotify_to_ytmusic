@@ -117,6 +117,7 @@ async function humanMove(p,ctx){
   else{const key=await p.evaluate(m=>{const a=m.src<0?G.ctr:G.fac[m.src];const k=a.findIndex(t=>m.c===PRISM?t===PRISM:t===m.c);return k<0?null:(m.src<0?'c_':'f'+m.src+'_')+k},m);
     if(!key){await fail('legal move exists',ctx,'source tile missing '+JSON.stringify(m),p);return false}
     await tapEl(p,`[data-k="${key}"]`);await sleep(250);
+    if(await p.evaluate(n=>G.logN!==n,before.logN)){await chk(m.line===5,'nothing fits: one tap sent it to the floor',ctx,JSON.stringify(m),p);return true}   // no rack can take it
     const sel=await p.evaluate(()=>UI.sel&&{src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?1:0});
     await chk(sel&&sel.src===m.src&&sel.c===m.c,'tile tap selects it',ctx,JSON.stringify(sel)+' for '+JSON.stringify(m),p);
     if(sel&&m.c<5&&(sel.j?1:0)!==(m.j?1:0)){await tapEl(p,'[data-bf=prism]');await sleep(200)}

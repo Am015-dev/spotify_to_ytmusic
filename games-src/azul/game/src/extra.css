@@ -232,3 +232,13 @@ html:not(.bf-land) #bf.hasrv .bf-sack{top:calc(var(--sat,0px) + 50px);right:12px
 #bf .rv-row.could{box-shadow:0 0 0 2px rgba(232,162,0,.85)}
 #bf .bf-chip:has(.rv-mini){padding:0 5px;gap:3px}#bf .bf-chip .rv-mini .rv-row{gap:1px}#bf .bf-chip:has(.rv-mini) .bf-sc{font-size:14px}
 #bf .bf-chip:has(.rv-mini) i.pic{width:20px;height:20px;min-width:20px}#bf .bf-chip .rv-bd.rv-mini{margin:0}#bf .bf-chip:has(.rv-mini) .bf-sc{margin-left:auto}
+/* guided game: a compact bubble (two lines of 13px) so it fits the strip between the kilns and the racks on a phone */
+html body .gxt-bub{max-width:min(352px,calc(100vw - 12px));padding:2px 9px}
+html body .gxt-bub .gxh-tx{font-size:13px;line-height:1.15}
+
+/* tutorial: look-only steps say how to go on (not part of the step's one sentence); a wrong tap swaps the whole line for a step-specific hint */
+html body .gxt-bub:is([data-step=goal],[data-step=slide],[data-step=keep],[data-step=floor],[data-step=tiling],[data-step=chain],[data-step=alone],[data-step=floorpen],[data-step=gameend],[data-step=bonus],[data-step=win]) .gxh-tx::after{content:' Tap the glow to go on.';font-weight:700;color:#8a4b00}
+html body .gxt-bub.gxt-shake .gxh-tx::after{content:none}
+/* the bubble has its own band between the kilns and the racks on phones, so it never sits on a tile */
+html.sg-tut.bf:not(.bf-land) #bf .bf-line{height:58px}
+html body .gxt-bub.gxt-nobtn .gxh-tx{padding-right:0}
