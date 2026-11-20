@@ -61,7 +61,8 @@ function plCap(t){const w=String(t).replace(/\s*\([^)]*\)/g,'').trim().split(/\s
   const on=!!(G&&!G.over&&!UI.modal&&G.pl.some(p=>p.human)&&sideToAct()>=0&&!P(sideToAct()).human&&!online()&&!tutHeld()&&!UI.hurry);
   if(!b&&on){b=document.createElement('button');b.id='skipai';b.type='button';b.textContent='Skip \u25B6\u25B6';b.setAttribute('aria-label','Skip the rival turn');
     b.addEventListener('click',e=>{e.stopPropagation();UI.hurry=true;b.hidden=true;if(aiTimer){clearTimeout(aiTimer);aiTimer=null;schedule()}});document.body.appendChild(b)}
-  if(b){b.hidden=!on;const l=document.getElementById('line');if(on&&l){const q=l.getBoundingClientRect();if(q.height)b.style.top=Math.round(q.top+q.height/2-22)+'px'}}}catch(e){}}})();
+  document.documentElement.classList.toggle('skipon',on);   // F3: Skip sits INSIDE the status line (the line keeps room for it), never over the seat chips
+  if(b){b.hidden=!on;const pos=()=>{const l=document.getElementById('line');if(!b.hidden&&l){const q=l.getBoundingClientRect();if(q.height){const bh=Math.max(28,Math.round(q.height-2));b.style.height=bh+'px';b.style.top=Math.round(q.top+(q.height-bh)/2)+'px';b.style.right=Math.max(4,Math.round(innerWidth-q.right+2))+'px'}}};pos();if(on)requestAnimationFrame(pos)}}catch(e){}}})();   // placed again after the later render steps (seat chips grow)
 
 // ---- R25: nothing under an open sheet (drawer, menu, result) keeps its glow: it could not be tapped there, so it must not look tappable ----
 function plCover(){try{const cov=!!((typeof GX!=='undefined'&&GX.open)||document.querySelector('.gx-drawer.on')||(G&&UI.modal));const IN='.gx-drawer,#modal,.mbox,#chz';
