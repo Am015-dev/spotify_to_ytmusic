@@ -230,7 +230,7 @@
   var HNEED = { s: ['hero-s', 'Beat Story chapter 2 to unlock'], a: ['hero-a', 'Beat Story chapter 3 to unlock'], m: ['hero-m', 'Beat Story chapter 4 to unlock'] };
   if (!/[?&]story=all/.test(location.search)) HNEED.m[1] = 'Beat Story chapter 3 to unlock';
   function heroOpen(k) {
-    if (!HNEED[k] || /unlock=all/.test(Q)) return true;
+    return true;   // F1: every hero is playable in the normal game from the start (Story chapters no longer gate heroes)
     try { if (!window.GXC || !GXC.data || !GXC.data()) return true; return GXC.unlocked().some(function (u) { return u.id === HNEED[k][0]; }); } catch (e) { return true; }
   }
   UI.heroOpen = heroOpen;
@@ -256,20 +256,19 @@
     var mid = h('div', '', null, [hs, h('div', 'refline' + (UI.heroNote ? ' w24note w24n' + ((UI.noteN || 0) % 2) : ''), UI.heroNote || D.H[UI.pick[UI.pick.length - 1]].mech)]); mid.style.cssText = 'display:flex;flex-direction:column;gap:8px;align-items:center;width:100%';
     s.appendChild(mid);
     // climb length: one act (default), all three acts, or three acts + the final act (Ember Tyrant)
-    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 1;
+    var seg = h('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Climb length'); UI.acts = UI.acts || 3;
     [[1, '1 act'], [3, '3 acts'], [4, '3 acts + finale']].forEach(function (o) { var b = on(h('button', UI.acts === o[0] ? 'on' : '', o[1]), function () { UI.acts = o[0]; render(); }); b.setAttribute('data-acts', o[0]); b.setAttribute('aria-pressed', String(UI.acts === o[0])); seg.appendChild(b); });
-    UI.acts = 1;
     // difficulty: Gentle (first climb, player-side numbers only) is the default until the first win or a pick; Tabletop = rulebook numbers
     UI.diff = UI.diff || diffDefault(); var dg = h('div', 'seg w8diff'); dg.setAttribute('role', 'group'); dg.setAttribute('aria-label', 'Difficulty');
-    [['g', 'Gentle (first climb)'], ['t', 'Tabletop (rulebook)']].forEach(function (o) { var b = on(h('button', UI.diff === o[0] ? 'on' : '', o[1]), function () { UI.diff = o[0]; try { localStorage.setItem('ec-diff', o[0]); } catch (e) { } render(); }); b.setAttribute('data-diff', o[0]); b.setAttribute('aria-pressed', String(UI.diff === o[0])); dg.appendChild(b); });
-    mid.appendChild(dg); mid.appendChild(h('div', 'refline w24act w8dline', 'Act 1 only: 9 floors, then a boss. ' + (UI.diff === 'g' ? 'Easier: more HP and potions.' : 'Rulebook numbers. Hard.')));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
+    [['t', 'Tabletop (rulebook)'], ['g', 'Gentle (easier)']].forEach(function (o) { var b = on(h('button', UI.diff === o[0] ? 'on' : '', o[1]), function () { UI.diff = o[0]; try { localStorage.setItem('ec-diff', o[0]); } catch (e) { } render(); }); b.setAttribute('data-diff', o[0]); b.setAttribute('aria-pressed', String(UI.diff === o[0])); dg.appendChild(b); });
+    mid.appendChild(seg); mid.appendChild(dg); mid.appendChild(h('div', 'refline w24act w8dline', (UI.acts === 1 ? 'Act 1: 9 floors, then a boss. ' : UI.acts === 3 ? 'Full climb: 3 acts, 3 bosses. ' : '3 acts, then the final boss. ') + (UI.diff === 'g' ? 'Easier: more HP and potions.' : 'Rulebook numbers.')));   // R21: Quick game = Act 1 only, the faithful part (acts 2-3 had shelf-made foes)
     var row = h('div', 'row'); row.appendChild(on(h('button', 'btn alt', UI.duo ? '− Second hero' : '+ Second hero'), function () { UI.duo = !UI.duo; if (!UI.duo) UI.pick = [UI.pick[UI.pick.length - 1]]; render(); })); row.appendChild(on(h('button', 'btn alt', 'Back'), function () { UI.sub = ''; render(); })); var go = on(h('button', 'btn', UI.pick.length > 1 ? 'Start climb together' : 'Start climb'), function () { UI.heroNote = ''; start(); }); go.id = 'play'; row.appendChild(go);
     var wrap = h('div', '', null, [h('div', 'refline w8hint', UI.duo ? 'Two heroes share the map. Tap both.' : 'Tap a hero. + Second hero plays together.'), row]); wrap.style.cssText = 'display:flex;flex-direction:column;gap:10px;align-items:center';
     s.appendChild(wrap); tscr.appendChild(s);
   }
   UI.restart = function () { var g = G(); if (!g) return; var hs = g.hs.map(function (x) { return x.k; }), ga = g.acts || 1; E.clear(); E.newGame({ heroes: hs, acts: Math.min(3, ga), final: ga > 3 ? 1 : 0, gentle: g.gentle ? 1 : 0 }); UI.ov = null; UI.sel = -1; UI.mode = 'game'; render(); };
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
-  function diffDefault() { try { var v = localStorage.getItem('ec-diff'); if (v === 'g' || v === 't') return v; return localStorage.getItem('ec-won1') ? 't' : 'g'; } catch (e) { return 'g'; } }
+  function diffDefault() { try { var v = localStorage.getItem('ec-diff'); if (v === 'g' || v === 't') return v; return 't'; } catch (e) { return 't'; } }   // F1: the rulebook game is the default; Gentle is opt-in
   function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1, gentle: (UI.diff || diffDefault()) === 'g' ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
@@ -378,11 +377,11 @@
     }
     if (it.blk) { var bk = it.blk * (it.blkH ? g.hs.length : 1); P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + bk, cap: 'raises ' + bk + ' Block', say: 'Block: +' + bk + (D.ENEMIES[e.id].keepBlk ? '. It keeps it. Break it to stop the next hit.' : '. Your hits do less.') }); }
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak', say: 'Weak: your hits deal 8 less.' });
-    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable', say: 'Vulnerable: you take double damage.' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak (' + it.weak + ')', say: 'Weak ' + it.weak + ': your next attack deals 8 less per hit. One Weak is used per attack (max 3).' });
+    if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable (' + it.vuln + ')', say: 'Vulnerable ' + it.vuln + ': the next attack on you deals double. One is used per attack (max 3).' });
     if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
-    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you', say: 'Poison: lose 8 HP each turn.' });
-    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your deck', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard.' }); }
+    if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you (+' + it.poison + ')', say: 'Poison +' + it.poison + ': you lose ' + D.SCALE + ' HP per Poison token at the end of each turn. Tokens stay.' });
+    if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your discard pile', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard pile.' }); }
     if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
     return P;
@@ -408,7 +407,7 @@
     document.body.appendChild(sc); document.body.appendChild(t); setTimeout(function () { if (t.parentNode) close(); }, 9000);
   };
   function stChips(o) {
-    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'takes double damage'; }, weak: function () { return 'hits deal ' + D.SCALE + ' less'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP a turn'; }, frail: function () { return 'Block 25% less'; } };
+    var w = h('div', 'stc'); var SAY = { str: function (n) { return '+' + n * D.SCALE + ' per hit'; }, vuln: function () { return 'next attack x2, 1 used per attack'; }, weak: function () { return 'next attack ' + D.SCALE + ' less per hit, 1 used'; }, poison: function (n) { return 'loses ' + n * D.SCALE + ' HP at turn end (' + D.SCALE + ' per token)'; }, frail: function () { return 'Block 25% less'; } };
     [['str', 'Strength'], ['vuln', 'Vulnerable'], ['weak', 'Weak'], ['poison', 'Poison'], ['frail', 'Frail']].forEach(function (p) { var n = o.st[p[0]]; if (n) { var sp = h('span', '', null, [A('st-' + p[0], '', { noph: 1 }), document.createTextNode(p[1] + ' ' + n + ': ' + SAY[p[0]](n))]); sp.title = p[1] + ' ' + n + ': ' + SAY[p[0]](n); w.appendChild(sp); } });
     return w;
   }
