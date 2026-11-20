@@ -67,7 +67,7 @@ function paint(){const e=strip();if(!e)return;if(!G||!UI.started||UI.card&&UI.ca
   else if(G.over){key='over';html='<span class="tbt-chip">Game over</span><span class="tbt-line">The last round is done.</span>'}
   else if(G.q){const s=viewSeatForQ();
     if(s!=null){const k=G.q.kind;const ask=(ST().ask||{});const mph=(k==='menu'||G.q.t==='menu')?menuPhase(G.q):'';key='me'+k+(G.q.t||'')+mph+(UI.autCard!=null?'c':'');const line=mph?(UI.autCard!=null&&ask.menuAutumnCard?ask.menuAutumnCard:(ask['menu'+mph]||ask.menu)):ask[k];
-      const t=line||(typeof promptText==='function'?(t0=>/[.!?…]$/.test(t0)?t0:t0+'.')(String(promptText(G.q,s)).trim()):'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(t))+'</span>';
+      const t=line||(typeof promptText==='function'?(t0=>/[.!?…]$/.test(t0)?t0:t0+'.')(String(promptText(G.q,s)).trim()):'Your move.');html='<span class="tbt-chip">Your turn</span><span class="tbt-line">'+jargon(esc2(eight(t)))+'</span>';
       if(UI.hand!=null&&typeof cardLine==='function'){try{const ci=cinfo(UI.hand);key+='h'+UI.hand;html='<span class="tbt-chip">'+esc2(ci.strength)+'</span><span class="tbt-line"><b>'+esc2(ci.name)+'</b>: '+esc2(((l0,l1)=>eight(l1,Math.max(3,8-ci.name.split(/\s+/).length)))(0,one(cardLine(UI.hand))))+'</span><button class="tbt-info" data-tbinfo="'+UI.hand+'" type="button" aria-label="Full text of '+esc2(ci.name)+'">i</button>'}catch(x){}}}
     else{const w=whoActs();const a=w.ai[0];if(a!=null){key='ai'+a;e.style.setProperty('--c',fcol(a));const cp=UI._tbCap&&UI._tbCapT&&Date.now()-UI._tbCapT<5000?UI._tbCap:null;const cs=cp?cp.s:a;key='ai'+a+(cp?cp.t:'');e.style.setProperty('--c',fcol(cs));html='<span class="tbt-chip rv">'+esc2(poss(shortName(cs)))+' turn</span><span class="tbt-line">'+(cp?esc2(eight(one(shortT(cp.t)))):esc2(shortName(a))+' is thinking\u2026')+'</span><button class="tbt-skip2" data-tbskip type="button" aria-label="Skip the rivals\u2019 turn">Skip</button>'}
       else{key='w';html='<span class="tbt-chip wt">Wait</span><span class="tbt-line">Waiting for the other players.</span>'}}}
@@ -83,11 +83,12 @@ const one=t=>{t=String(t||'').trim();const m=t.match(/^.+?[.!?](?=\s|$)/);t=m?m[
   if(t.length>66)t=t.replace(/\s*\([^()]*(\([^()]*\)[^()]*)*\)\.?$/,'.');   // a long line drops its closing bracket note (the Log keeps it)
   if(t.length>84){const i=t.lastIndexOf(': ');if(i>30)t=t.slice(0,i)+'.'}return t.replace(/place the Clash Markers: /,'set the Clash order: ').replace(/, then /g,', ').replace(/\bThe (Uplands|Tablelands|Sinks)\b/g,'$1')};window.tbOne=one;
 // a strip line is at most 8 words (owner rule): faction names go short, then the line is cut at its last clause or preposition (never an ellipsis); the Log keeps the full sentence
-const eight=(t,N)=>{N=N||8;t=String(t||'').trim();const wc=x=>x.split(/\s+/).filter(Boolean).length;
+const eight=(t,N)=>{N=N||8;t=String(t||'').trim();const wc=x=>x.replace(/[^a-zA-Z0-9'\u2019]+/g,' ').trim().split(' ').filter(Boolean).length;
   try{G.pl.forEach((p,s)=>{const f=DD.FNAME&&DD.FNAME[p.fac];if(f&&t.indexOf(f)>=0)t=t.split(f).join(sideName(s))})}catch(e){}
   if(wc(t)<=N)return t;t=t.replace(/ from the Great Road/,'').replace(/ the Tactic /,' Tactic ').replace(/\s*\([^()]*\)/g,'');if(wc(t)<=N)return t;
-  const w=t.split(/\s+/);for(let k=Math.min(N,w.length-1);k>=3;k--){if(/^(to|into|from|in|on|at|with|for|and|or|then|while|but|so|because|after|before|of|by)$/i.test(w[k])||/[,;:]$/.test(w[k-1])){return w.slice(0,k).join(' ').replace(/[,;:]$/,'')+(/[.!?]$/.test(w[k-1])?'':'.')}}
-  return w.slice(0,N).join(' ').replace(/[,;:]$/,'')+'.'};window.tbEight=eight;   // a step is told in its first sentence (the log has the rest)
+  const w=t.split(/\s+/);let k=w.length-1;while(k>3&&wc(w.slice(0,k).join(' '))>N)k--;
+  for(let j=k;j>=3;j--){if(/^(to|into|from|in|on|at|with|for|and|or|then|while|but|so|because|after|before|of|by)$/i.test(w[j])||/[.!?,;:]$/.test(w[j-1]))return w.slice(0,j).join(' ').replace(/[,;:]$/,'')+(/[.!?]$/.test(w[j-1])?'':'.')}
+  return w.slice(0,k).join(' ').replace(/[,;:]$/,'')+'.'};window.tbEight=eight;   // a step is told in its first sentence (the log has the rest)
 function cardMsg(c){try{if(c.kind==='news'&&c.items&&c.items.length){if(c.items.every(infK)){const il=infLine(c.items);if(il)return {t:eight(il),s:c.big?null:c.items[0].s}}
     const s0=c.items[0].s;const it=c.items.filter((x,i)=>i===0||x.s!==s0).slice(0,1).map(x=>eight(infK(x)?(infLine([x])||one(plain(x.text))):one(plain(x.text)))).join(' ');return {t:it,s:c.items[0].s}}
   if(c.kind==='event'){const e=c.ev;if(e.t==='bids')return {t:'Bids flip. The highest bid picks first.',s:null};if(e.t==='clash')return {t:UI._clashLine||('The Clash in '+REG[e.r]),s:null};if(e.t==='summary')return {t:e.last?'The last round is over.':'Round '+e.round+' is over.',s:null}}}catch(x){}
