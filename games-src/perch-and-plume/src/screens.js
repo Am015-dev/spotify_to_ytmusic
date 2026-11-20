@@ -55,7 +55,7 @@ function quickStart() {
   if (CFG.n === 1) seats.push({ name: 'Rival Flock', kind: 'automa', lvl: CFG.lvl, face: 'corvin' });
   for (var i = 1; i < CFG.n; i++) seats.push({ name: NAMES[i - 1], kind: CFG.kinds[i] === 'human' ? 'human' : 'ai', lvl: CFG.lvl, face: FACES[i - 1] });
   if (seats.filter(function (s) { return s.kind === 'human'; }).length > 1) seats[0].name = 'Player 1';
-  setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
+  if (window.innerHeight > 640) setTimeout(function () { var L = STORY.quickIntro; toast(L[Math.floor(Math.random() * L.length)], 2600); }, 300);
   startGame({ seats: seats, mode: seats.some(function (s, k) { return k && s.kind === 'human'; }) ? 'hot' : CFG.n === 1 ? 'solo' : 'vs', goalSide: CFG.side === 'blue' ? 'blue' : 'green', first: CFG.first === 'random' ? 'random' : 0 });
 }
 // ---------------- the starting hand: keep 5 in total (birds + food), pick 1 of 2 bonus cards

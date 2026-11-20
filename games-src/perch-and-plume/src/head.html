@@ -518,6 +518,9 @@ body.confirming #prompt{display:none}
 #hand .bc.big:not(.sel) .bestb{top:-8px;left:2px;right:auto}
 }
 body:has(.gxh-bulbb) .bestb{display:none}
+@media (max-height:620px){.gx-app:not(.gx-dock-min) .gx-dock-head .gx-ibtn{top:0}#setup .tmenu:last-child,#keepgo{background:none}
+#setup .tmenu:last-child{flex-direction:row;gap:8px;width:100%;background:linear-gradient(to top,#16231b 78%,rgba(22,35,27,0));z-index:3;padding:10px 0 6px}#setup .tmenu:last-child .btn{flex:1;min-height:48px;font-size:calc(var(--fs)*1.1)}#setup .tmenu:last-child .btn.big{flex:1.6}}
+#keepgo{box-shadow:0 -10px 14px 6px rgba(22,35,27,.85)}
 /* F3: bonus-card progress chip, birds that advance it, "Always skip" */
 #foodrow .fd.bon{max-width:100%;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;flex:0 1 auto;min-width:0}
 .bc.bonadv,.tcard.bonadv .bc{outline:3px solid #e0a948;outline-offset:-1px}
@@ -558,7 +561,7 @@ body:has(.gxh-bulbb) .bestb{display:none}
 .sr2 b{font-size:22px;color:#ffe2a0}.sr2.me span{text-decoration:none}
 .sr2 small{font-size:13px;font-weight:600;opacity:.9;text-decoration:underline}
 .sr2:active{background:rgba(255,255,255,.12)}
-#opps .scnow{margin-left:auto;font-size:13px;color:#fff6e0;opacity:.9;white-space:nowrap}
+#opps .scnow{margin-left:auto;font-size:14px;font-weight:700;color:#fff6e0;opacity:.9;white-space:nowrap}
 .nope{animation:nope .36s ease-in-out 1}
 @keyframes nope{20%{transform:translateX(-6px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}}
 .nopefx{position:fixed;z-index:90;transform:translate(-50%,-100%);background:#3a1e14;color:#fff3e0;font-weight:800;font-size:14px;padding:4px 10px;border-radius:10px;pointer-events:none;box-shadow:0 4px 10px rgba(0,0,0,.4);white-space:nowrap}

@@ -177,7 +177,7 @@ function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern
   return '<div class="scb" role="group" aria-label="Score now: ' + esc(ord.map(function (i) { return lbl[i] + ' ' + sc[i]; }).join(', ')) + '">' +
     ord.map(function (i) { return '<button type="button" class="sr2' + (i === me ? ' me' : ' opp') + '" data-a="' + (i === me ? 'mysc' : 'opp') + '" data-s="' + i + '" aria-label="' + esc(lbl[i] + ' ' + sc[i] + ' points now' + (i === me ? ', tap for how it adds up' : ', tap to see their board')) + '">' +
       '<span>' + esc(lbl[i]) + '</span><b>' + sc[i] + '</b>' + (i === me ? '' : '<small>board</small>') + '</button>'; }).join('<i aria-hidden="true">&middot;</i>') +
-    '<span class="scnow">points now</span></div>';
+    '<span class="scnow" title="Round and actions left">' + (G.phase === 'over' ? 'Game over' : 'Round ' + (G.round + 1) + '/' + G.rounds + ' · ' + G.pl[me].cubes + (G.pl[me].cubes === 1 ? ' action' : ' actions') + ' left') + '</span></div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;
