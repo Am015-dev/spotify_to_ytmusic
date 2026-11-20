@@ -15,7 +15,7 @@ function tOnBoard(id) { var b = G.pl[UI.view].board; for (var r = 0; r < 3; r++)
 function tQ(h) { return !!(G.q && G.q.h === h && PP.sideToAct(G) === UI.view); }
 // the steps, in teaching order. t() = the one element to tap; done() = the step is over (info steps: their target was tapped).
 var TSTEPS = [
-  { id: 'goal', info: 1, t: function () { return tq('#opps .sline') || tq('#opps'); } },
+  { id: 'goal', info: 1, t: function () { return tq('#opps .sr2.me') || tq('#opps'); } },
   { id: 'turns', info: 1, t: function () { return tq('#trk'); } },
   { id: 'keep', info: 1, t: function () { return tq('#hand'); } },
   { id: 'play', t: function () { return tq('.a4[data-k="play"]'); }, done: function () { return UI.pickBird || UI.sel != null || !!tOnBoard(TUT.ids.play); } },
@@ -65,7 +65,7 @@ function coachSay(s) {
   if (COACH.cur && COACH.cur.dataset.rule === s.id && COACH.cur.isConnected) return;
   if (COACH.cur && COACH.cur.parentNode) COACH.cur.parentNode.removeChild(COACH.cur);
   var d = document.createElement('div'); d.className = 'coachb'; d.setAttribute('data-help', 'coach'); d.setAttribute('role', 'status'); d.setAttribute('aria-live', 'polite'); d.dataset.rule = s.id;
-  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><b>Step ' + n + ' of ' + TSTEPS.length + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
+  d.innerHTML = faceHTML('ottilie', STORY.cast.ottilie) + '<span class="saytx"><small class="stepn">Step ' + n + ' of ' + TSTEPS.length + '</small><b class="tgoal">Goal: ' + esc((STORY.coachGoal || {})[s.id] || '') + '</b>' + esc(txt) + '</span>' + (s.info && !s.res ? '<button type="button" class="coachnext btn" data-coach-next="1">Next</button>' : '');
   var host, at;
   if (s.res) { host = $('#result'); at = host && host.querySelector('.walk'); }
   else { host = $('#dockbody'); at = $('#prompt'); }

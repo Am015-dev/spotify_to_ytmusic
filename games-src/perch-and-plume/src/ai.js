@@ -7,7 +7,7 @@
   var PP = root.PP || require('./engine.js');
   var B = PP.B, FOODS = PP.FOODS;
   var PWV = { gainF: .75, gainS: .9, cacheS: 1, cacheF: .8, tuckDraw: .9, tuckEgg: 1.1, tuckFood: 1, flock: 1, laySelf: .9, layNest: 1.4, draw1: .55, hunt: .5, huntDie: .45, allFood: .6, allDraw: .4, trade: .5 };
-  var AIW = { eng: .6, row: .25, kk: 2.5 }, EASY_RND = .6;   // hard's tuned weights (tuned by ai-gate duels)
+  var AIW = { eng: .6, row: .25, kk: 2.5 }, EASY_RND = .3;   // hard's tuned weights (tuned by ai-gate duels)
   function turnsLeft(G, seat) { var t = G.pl[seat].cubes; for (var r = G.round + 1; r < G.rounds; r++) t += G.cubes[r]; return t; }
   function need(G, seat) {   // how much each food is wanted by the birds in hand (missing food weighs more)
     var p = G.pl[seat], w = { grub: .2, seed: .2, fish: .2, berry: .2, rodent: .2 };
@@ -123,30 +123,38 @@
     G.rng = (Math.random() * 4294967296) >>> 0;
     PP.shuffle(G, G.deck);
   }
+  // per level: look-ahead samples, the value() model it plans with, noise on each estimate, how often it takes a lesser move.
+  // 'hint' = the Best badge: an honest one-sample plan that favours points now (the move it shows is the move it rates highest),
+  // below normal so a newcomer who follows Best has a real game: easy is close to it, normal and hard value engines and goals.
+  // Measured by tests/best-duel.js (200 seeds) and ai-gate.js.
+  var LV = {
+    hint: { sims: 1, model: 'easy', noise: 0, alt: 0 },      // Best: points-now plan, one sample
+    easy: { sims: 1, model: 'easy', noise: 0, alt: .1, spread: 2 },
+    normal: { sims: 1, model: 'normal', noise: 0, alt: 0 },
+    hard: { sims: 4, model: 'hard', noise: 0, alt: 0 }
+  };
+  try { if (typeof process !== 'undefined' && process.env && process.env.PP_LV) Object.assign(LV, JSON.parse(process.env.PP_LV)); } catch (e) { }
   function choose(G, seat, lvl) {
     lvl = lvl || G.pl[seat].lvl || 'normal';
-    if (G.q) return sub(G, seat, lvl);
+    var L = LV[lvl] || LV.normal, mdl = L.model;
+    if (G.q) return sub(G, seat, mdl === 'hard' ? 'hard' : lvl === 'easy' ? 'easy' : 'normal');
     var mv = PP.validMoves(G, seat), seen = {}, cands = [];
     mv.forEach(function (m) {
-      if (m.t === 'play') { var k = m.id + ':' + m.h; if (seen[k] && lvl !== 'hard') return; if (seen[k] >= 2) return; seen[k] = (seen[k] || 0) + 1; }
+      if (m.t === 'play') { var k = m.id + ':' + m.h; if (seen[k] && mdl !== 'hard') return; if (seen[k] >= 2) return; seen[k] = (seen[k] || 0) + 1; }
       cands.push(m);
     });
     var known = G.pl[seat].hand.concat(G.tray.filter(Boolean));
     var scored = cands.map(function (m) {
-      var sims = lvl === 'hard' ? (m.t === 'act' ? 4 : 3) : 1, tot = 0;
+      var sims = m.t === 'act' ? L.sims + (L.sims > 1 ? 1 : 0) : L.sims, tot = 0;
       for (var k = 0; k < sims; k++) {
         var G2 = PP.clone(G); scramble(G2);
         var r = PP.performMove(G2, m, seat); if (!r.ok) return { m: m, v: -1e9 };
-        finishTurn(G2, seat, lvl);
-        tot += value(G2, seat, lvl, known);
+        finishTurn(G2, seat, mdl === 'hard' ? 'hard' : lvl === 'easy' ? 'easy' : 'normal');
+        tot += value(G2, seat, mdl, known);
       }
-      var v = tot / sims;
-      if (lvl === 'easy') v += (Math.random() - .5) * 32;
-      else if (lvl === 'normal') v += (Math.random() - .5) * 3;
-      return { m: m, v: v };
+      return { m: m, v: tot / sims + (L.noise ? (Math.random() - .5) * L.noise : 0) };
     }).sort(function (a, b) { return b.v - a.v; });
-    if (lvl === 'normal' && scored.length > 1 && Math.random() < .3) return scored[1].m;   // normal: a fair player who sometimes takes the second-best move
-    if (lvl === 'easy' && scored.length > 2 && Math.random() < .75) return scored[1 + Math.floor(Math.random() * Math.min(6, scored.length - 1))].m;
+    if (L.alt && scored.length > 1 && Math.random() < L.alt) return scored[1 + Math.floor(Math.random() * Math.min(L.spread || 1, scored.length - 1))].m;
     return scored[0].m;
   }
   // why (<= 15 words) for the hint bulb
@@ -161,8 +169,8 @@
     return 'A sensible choice right now.';
   }
   // the Best hint: the strongest player's choice (hard look-ahead: engines, round goal, bonus cards)
-  function hint(G, seat) { return choose(G, seat, 'hard'); }
-  var AI = { W: AIW, choose: choose, hint: hint, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
+  function hint(G, seat) { return choose(G, seat, 'hint'); }
+  var AI = { LV: LV, W: AIW, choose: choose, hint: hint, sub: sub, value: value, setup: setup, why: why, turnsLeft: turnsLeft };
   root.PPAI = AI;
   if (typeof module !== 'undefined') module.exports = AI;
 })(typeof window !== 'undefined' ? window : globalThis);

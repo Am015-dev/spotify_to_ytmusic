@@ -164,20 +164,16 @@ function trGoalHTML() {
   var gid = G.goals && G.goals[G.round], g = gid && PP_DATA.goals.filter(function (x) { return x.id === gid; })[0]; if (!g) return '';
   var me = UI.view, cnt = G.pl.map(function (p, i) { return (i === me ? 'you ' : p.name + ' ') + PP.goalCount(G, i, gid); });
   cnt.unshift(cnt.splice(me, 1)[0]);
-  return '<span class="tr-g" data-a="trgoal"><b>Round goal:</b> ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
+  return '<span class="tr-g" data-a="trgoal"><b>Round goal</b> (scored at round end): ' + esc(g.n) + ' · ' + esc(cnt.join(', ')) + '</span>';
 }
-function scoreHTML() {
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i); }), top = Math.max.apply(null, sc.map(function (s) { return s.total; }));
-  var tot0 = G.cubes[Math.min(G.round, G.cubes.length - 1)] || 0, moved = G.round > 0 || G.pl.some(function (q) { return q.cubes < tot0; });
-  var lead = moved && sc.filter(function (s) { return s.total === top; }).length === 1 && top > 0;
-  var rows = G.pl.map(function (p, i) {
-    var s = sc[i], oth = s.goals + s.bonus + s.cache + s.tuck + s.lead, me = i === UI.view, L = lead && s.total === top;
-    return '<button type="button" class="sr' + (me ? ' me' : '') + (L ? ' lead' : '') + '" data-a="' + (me ? 'mysc' : 'opp') + '" data-s="' + i + '" data-br="birds ' + s.birds + ' · eggs ' + s.eggs + ' · other ' + oth + '" aria-label="' + esc((me ? 'You' : p.name) + ': ' + s.total + ' points' + (L ? ', leading' : '')) + '">' +
-      '<span class="sn">' + (L ? '<em class="crown" aria-hidden="true">&#9733;</em>' : '') + esc(me && humans().length === 1 ? 'You' : p.name) + '</span>' +
-      '<span class="sp"><b>' + s.birds + '</b><small>bird pts</small></span><span class="sp"><b>' + s.eggs + '</b><small>eggs</small></span><span class="sp"><b>' + oth + '</b><small>other</small></span>' +
-      '<span class="st"><b>' + s.total + '</b><small>' + (L ? 'leads' : 'pts') + '</small></span></button>';
-  }).join('');
-  return '<div class="scb" role="group" aria-label="Score">' + rows + '</div>';
+function scoreHTML() {   // F2: real points now, in plain words ("You 32 · Fern 28"); tap a name: you = how it adds up, a rival = their board
+  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), me = UI.view, ord = G.pl.map(function (p, i) { return i; });
+  ord.splice(ord.indexOf(me), 1); ord.unshift(me);
+  var lbl = G.pl.map(function (p, i) { return i === me && humans().length === 1 ? 'You' : p.name; });
+  return '<div class="scb" role="group" aria-label="Score now: ' + esc(ord.map(function (i) { return lbl[i] + ' ' + sc[i]; }).join(', ')) + '">' +
+    ord.map(function (i) { return '<button type="button" class="sr2' + (i === me ? ' me' : ' opp') + '" data-a="' + (i === me ? 'mysc' : 'opp') + '" data-s="' + i + '" aria-label="' + esc(lbl[i] + ' ' + sc[i] + ' points now' + (i === me ? ', tap for how it adds up' : ', tap to see their board')) + '">' +
+      '<span>' + esc(lbl[i]) + '</span><b>' + sc[i] + '</b>' + (i === me ? '' : '<small>board</small>') + '</button>'; }).join('<i aria-hidden="true">&middot;</i>') +
+    '<span class="scnow">points now</span></div>';
 }
 document.addEventListener('click', function (e) {
   var t = e.target.closest('[data-a="mysc"]'); if (!t || !G) return;
@@ -249,12 +245,7 @@ document.addEventListener('click', function (e) {
   render(); toast(UI.hintPref ? 'Hints on: previews, Best badges and a rating after each turn.' : 'Hints off.', 0, 1);
 });
 // one compact score line: you vs the rival(s), leader starred; tap = the score drawer
-function scoreLineHTML() {
-  var sc = G.pl.map(function (p, i) { return PP.scoreOf(G, i).total; }), top = Math.max.apply(null, sc), one = sc.filter(function (v) { return v === top; }).length === 1 && top > 0;
-  return '<button type="button" class="sline" data-a="mysc" aria-label="Score: ' + esc(G.pl.map(function (p, i) { return (i === UI.view ? 'you' : p.name) + ' ' + sc[i]; }).join(', ')) + '. Tap for how it adds up">' +
-    G.pl.map(function (p, i) { return '<span class="sl' + (i === UI.view ? ' me' : '') + '">' + (one && sc[i] === top ? '<em aria-hidden="true">&#9733;</em>' : '') + esc(i === UI.view && humans().length === 1 ? 'You' : p.name) + ' <b>' + sc[i] + '</b></span>'; }).join('<i>vs</i>') +
-    (G.round === 0 && G.pl[UI.view].cubes === G.cubes[0] && UI.mode !== 'tutfree' ? '<span class="slw goal1">Goal: most points in ' + G.rounds + ' rounds</span>' : '<span class="slw">why?</span>') + '</button>';   // the first screen says the goal in one line
-}
+function scoreLineHTML() { return scoreHTML(); }
 // the score drawer: every number's why, for every player
 function showScore() {
   var rows = [['birds', 'Birds', 'points printed on birds played'], ['eggs', 'Eggs', '1 point each'], ['goals', 'Round goals', 'judged at each round end'], ['bonus', 'Bonus card', 'your secret card'], ['cache', 'Stored food', '1 point each'], ['tuck', 'Tucked cards', '1 point each']];
