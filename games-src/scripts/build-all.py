@@ -44,6 +44,7 @@ GAMES = {
     "vale-of-banners":  ("vale-of-banners",      "python3 build.py", "vale-of-banners.html"),
     "wildmark":         ("wildmark",             "python3 build.py", "wildmark.html"),
     "vinegrave":        ("vinegrave",            "python3 build.py", "vinegrave.html"),
+    "onyx-atelier":     ("onyx-atelier",         "python3 build.py", "onyx-atelier.html"),
 }
 
 # slug -> (dir relative to games-src with the game's own sweeps, [scripts]). Full run = the script's own default size (the gate); QUICK=1 makes it 4 games.
@@ -72,6 +73,7 @@ SWEEPS = {
     "vale-of-banners":  ("vale-of-banners",     ["rules-test.js"]),
     "wildmark":         ("wildmark",            ["rules-test.js"]),
     "vinegrave":        ("vinegrave",           ["rules-test.js"]),
+    "onyx-atelier":     ("onyx-atelier",        ["rules-test.js"]),
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)

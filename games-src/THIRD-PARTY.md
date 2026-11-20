@@ -37,3 +37,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Onyx Atelier (games-src/onyx-atelier): fonts
+- Limelight, Sorkin Type Co, https://fonts.google.com/specimen/Limelight, SIL Open Font License 1.1, file `onyx-atelier/fonts/limelight-400.woff2` (licence `onyx-atelier/fonts/OFL-limelight.txt`). Inlined as base64 in the built page.
+- Josefin Sans, The Josefin Sans Project Authors, https://fonts.google.com/specimen/Josefin+Sans, SIL Open Font License 1.1, file `onyx-atelier/fonts/josefin-sans-var.woff2` (licence `onyx-atelier/fonts/OFL-josefin-sans.txt`). Inlined as base64.
+- Everything else in Onyx Atelier (gems, pearl, gold, cards, patrons, icons, sunburst, sounds) is drawn or synthesised in code.
