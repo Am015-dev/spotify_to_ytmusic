@@ -363,7 +363,7 @@ function previewText(m) {
 function shortLabel(m) {
   const me = G.p[UI.view];
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
-    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
+    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + (V.CARDS[G.row[m.r]] || { name: 'a card' }).name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
 function bestBadges() {   /* hints add no second pointer: the one glowing piece IS the best move, so no gold badge (it only ever doubled the glow or went stale) */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));
