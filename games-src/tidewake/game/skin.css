@@ -248,3 +248,5 @@ html.ph-p .ps-main:has(.ps-tiles){position:relative}html.ph-p .ps-main:has(.ps-t
 html.ph .ps-warns{display:flex;flex-direction:column;gap:3px}html.ph .ps-warns .ps-warn{margin:0}
 html.ph #pc [data-a=sunkok],html.ph #pc [data-a=coachok],html.ph #pc [data-ph=dismiss]{margin-top:12px}
 html.ph-w .pside .ps-crews .crew span,html.ph-w .pside .ps-crews .crew b{font-size:16px}
+.sunkwhy{margin:.3em 0;padding:0;list-style:none}.sunkwhy li{margin:.2em 0}
+#bulbbtn.spent{opacity:.7}

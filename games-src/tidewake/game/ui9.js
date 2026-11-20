@@ -102,9 +102,18 @@ function hlpPlan(){const d=hlpSeat();if(d==null)return null;const ph=hlpPhaseRaw
   if(m.a==='gate')return {ph,why:'It moves you away from danger.',key:'gate:'+m.t,from:null,to:hq('[data-a=gate][data-t="'+m.t+'"][data-s="'+m.s+'"]','[data-a=gate][data-t="'+m.t+'"]')};
   if(m.a==='pass')return {ph,why:'You have nothing to play.',key:'pass',from:null,to:hq('[data-a=pass]')};
   return null}
+// F3: Hint is limited (3 on Easy, 2 Normal, 1 Hard; unlimited in the guided game): a question answer is free, a move suggestion costs one
+function hintQuota(seats){const r={easy:3,normal:2,hard:1},ai=seats.filter(x=>!x.h);return ai.length?Math.min(...ai.map(x=>r[x.lv]||2)):3}
+// one budget for both Hint buttons; asking again on the same turn is free; unlimited (null) in the guided game
+function hintSpend(d){if(UI.hintsLeft==null)return true;const k=G.logN+':'+d;if(UI.hintPaid===k)return true;if(UI.hintsLeft<=0)return false;UI.hintsLeft--;UI.hintPaid=k;try{hintLabel()}catch(e){}return true}
+function hintTxt(){return UI.hintsLeft==null?'':' ('+UI.hintsLeft+')'}
+function hintLabel(){const b=document.getElementById('bulbbtn');if(!b)return;const sp=b.querySelector('span');const n=UI.hintsLeft;const t=n==null?'Hint':'\u2605 Hint ('+n+')';if(sp&&sp.textContent!==t)sp.textContent=t;b.setAttribute('aria-label',n==null?'Hint':'Hint, '+n+' left this game');b.classList.toggle('spent',n===0)}
 function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p)return null;
+  const paid=UI.hintsLeft!=null&&G&&UI.started&&!UI.tut&&!/^q:/.test(p.key||'');
+  if(paid&&UI.hintPaid!==G.logN+':'+sideToAct()&&UI.hintsLeft<=0)return {why:'No Hints left this game. The warning chips still show danger.',key:'nohint',target:()=>document.getElementById('bulbbtn')};
   if(p.apply)p.apply();
   const to=p.to();if(!to)return null;
+  if(paid)hintSpend(sideToAct());
   return {why:p.why,key:p.key,target:p.to,from:p.from&&p.from()?p.from:null}}
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;

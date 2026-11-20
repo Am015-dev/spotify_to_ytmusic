@@ -30,6 +30,7 @@ function kitOverlay(){if(!G||!kitOk())return;let legal=[];const gh=UI.gh;UI.gh=n
 function musicEval(){if(!G||!G.ships)return;let tense=false;const alive=G.ships.filter(s=>s.alive);if(alive.length<=2&&G.np>2)tense=true;
   for(const s of alive){const p=shipPos(s);if(!p)continue;for(const m of G.mons)if(m.k==='L'&&Math.abs(m.x-p.c)+Math.abs(m.y-p.r)<=2)tense=true}musicMood(tense&&!G.over?'tension':'calm')}
 function render(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake()}catch(e){}
+  try{hintLabel()}catch(e){}
   UI.gh=null;UI.fronts=null;UI.canPlace=false;UI.A=null;UI.pinH='';UI.route=null;
   const d=sideToAct();const key=G.over?'over':d+':'+G.logN+':'+G.phase+(G.q?G.q.kind:'');
   const html=mainHTML();$('#main').innerHTML=html;{const pn=$('#pin');if(pn){pn.innerHTML=UI.pinH||'';pn.hidden=!UI.pinH}}
@@ -89,8 +90,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;sleepFlush();render();break;
   case 'pause':UI.pause=!UI.pause;if(!UI.pause)schedule();render();break;
   case 'hint':UI.hint=true;UI.campHints=(UI.campHints||0)+1;{const m=recMove(d);if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s}}}render();break;
-  case 'starhint':{UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;render();break}
-  case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
+  case 'starhint':{if(!hintSpend(d)){PH.toast='No Hints left this game.';render();break}UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;render();break}
+  case 'sugg':{if(!hintSpend(d)){PH.toast='No Hints left this game.';render();break}const m=UI.recM||recMove(d);UI.hint=true;UI.starKey=G.logN+':'+d;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
   case 'sunkok':{const id=D.id;UI.sunk=(UI.sunk||[]).filter(c=>c.id!==id);UI.marks=(UI.marks||[]).filter(c=>c.id!==id);renderCards();ovUpdate();break}
   case 'rewind':rewindLast();break;
   case 'coachok':{const c=nextLesson();if(c){UI.seen[c.id]=1;if(G&&G.phase==='play')UI.lessonT=G.turn;saveAll();render()}break}
@@ -201,7 +202,7 @@ function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){
   const _1h=!plan&&seats.filter(x=>x.h).length===1&&!o.tutorial;seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name+(_1h&&x.h?' (you)':'')});UI.cols=seats.map(x=>x.col);
   newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon,startLev:(s.calmV&&!o.tutorial&&!s.noMon&&!(s.variant==='solo'||s.variant==='easysolo'))?3:undefined,first:o.first,goalTurns:o.goalTurns,names:o.names,bossCannon:o.bossCannon,bossSeat:o.bossSeat,seed:o.seed});if(plan)netBound(plan);
   if(o.tutorial&&typeof tutRig==='function')tutRig();else if(!UI.tut){try{localStorage.setItem('tw_played','1')}catch(e){}}
-  UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
+  UI.hintsLeft=(o.tutorial||o.guided)?null:hintQuota(seats);UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
   UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.myLogI=null;UI.curTurnN=null;UI.mphNext=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
   const h=humans();UI.holder=h.length===1?h[0]:-1;UI.started=true;hideStart();GX.close();
   try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}

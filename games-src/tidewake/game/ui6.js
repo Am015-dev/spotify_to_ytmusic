@@ -105,17 +105,20 @@ function causeOf(why){const w=String(why||'');let m;
   return {k:'other',t:w+'.'}}
 const youSeat=()=>{try{return viewSeat()}catch(e){return -1}};
 function sunkAdd(e){if(!G||UI.sunkSeen&&UI.sunkSeen[e.key])return;(UI.sunkSeen=UI.sunkSeen||{})[e.key]=1;const c=causeOf(e.why);
-  let card=c.k==='collision'?UI.sunk.find(x=>x.k==='collision'&&x.key0===e.key0):null;
-  if(card){if(!card.seats.includes(e.seat))card.seats.push(e.seat)}
-  else{card={id:Math.random().toString(36).slice(2),seats:[e.seat],k:c.k,t:c.t,key0:e.key0,cur:e.cur,actor:e.actor};UI.sunk.push(card);if(UI.sunk.length>4)UI.sunk.shift()}
+  // F3: back-to-back Sunk! cards are one card: every captain sunk while a card is still open joins it
+  let card=UI.sunk.length?UI.sunk[UI.sunk.length-1]:null;
+  if(card){if(!card.seats.includes(e.seat)){card.seats.push(e.seat);card.items.push({seat:e.seat,k:c.k,t:c.t})}if(c.k==='collision'&&card.k!=='collision')card.k2=1}
+  else{card={id:Math.random().toString(36).slice(2),seats:[e.seat],items:[{seat:e.seat,k:c.k,t:c.t}],k:c.k,t:c.t,key0:e.key0,cur:e.cur,actor:e.actor};UI.sunk.push(card)}
   if(e.at)UI.marks=(UI.marks||[]).filter(x=>x.seat!==e.seat).concat([{seat:e.seat,at:e.at,id:card.id}]);
   if(!humans().length){const id=card.id;setTimeout(()=>{UI.sunk=UI.sunk.filter(x=>x.id!==id);UI.marks=(UI.marks||[]).filter(x=>x.id!==id);renderCards();ovUpdate()},9000/(UI.speed||1))}
   renderCards();ovUpdate()}
 function sunkNames(seats){const me=youSeat();const l=seats.map(i=>i===me?'Your junk':nm(i)+"'s junk");return l.length>1?l.slice(0,-1).join(', ')+' and '+l[l.length-1]:l[0]}
+function sunkWhy(c){const it=c.items;if(it.length<2||it.every(x=>x.t===it[0].t))return `<p><b>Because</b> ${esc(it[0].t)}</p>`;
+  return '<ul class="sunkwhy">'+it.map(x=>`<li>${dot(x.seat)} <b>${esc(x.seat===youSeat()?'Your junk':nm(x.seat)+"'s junk")}:</b> ${esc(x.t)}</li>`).join('')+'</ul>'}
 function renderCards(){const el=$('#cards');if(!el)return;if(!G||!UI.sunk||!UI.sunk.length){el.innerHTML='';el.hidden=true;return}el.hidden=false;
   const me=youSeat();
   el.innerHTML=UI.sunk.map(c=>{const mine=c.seats.includes(me);const who=sunkNames(c.seats);const dots=c.seats.map(dot).join('');
-    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out: the rulebook has no way back in.'+(G.over?'':(humans().length===1&&!NET.on?' Watch the rest, see the result now, or play again.':' Watch the rest of the game.')):''}</p>${mine&&humans().length===1&&!NET.on&&!G.over?'<button class="btn small pri" data-a="again">Play again</button> <button class="btn small" data-a="skip">See the result</button> ':''}<button class="btn small" data-a="sunkok" data-id="${c.id}">${mine?(G.over?'Continue':'Watch'):'Got it'}</button></div>`}).join('')}
+    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4>${sunkWhy(c)}<p class="tiny">${c.items.some(x=>x.k==='collision')?'Colliding junks are both out. ':''}It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out: the rulebook has no way back in.'+(G.over?'':(humans().length===1&&!NET.on?' Watch the rest, see the result now, or play again.':' Watch the rest of the game.')):''}</p>${mine&&humans().length===1&&!NET.on&&!G.over?'<button class="btn small pri" data-a="again">Play again</button> <button class="btn small" data-a="skip">See the result</button> ':''}<button class="btn small" data-a="sunkok" data-id="${c.id}">${mine?(G.over?'Continue':'Watch'):'Got it'}</button></div>`}).join('')}
 function sunkClear(){UI.sunk=[];UI.marks=[];UI.sunkSeen={};renderCards()}
 // ---------- the monster-phase card ----------
 // builds the card's lines from the recorded events: roll, then one line per leviathan move / rise / swim-off, in the order they happen
