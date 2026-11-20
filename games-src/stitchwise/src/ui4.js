@@ -139,6 +139,7 @@ function ringStrip() {
   var L = G.ring.length; box.classList.add('ring');
   box.insertBefore(h('span.ntok', { title: 'The spool: only the 3 patches after it are for sale', 'aria-label': 'Spool. The 3 patches after it are for sale' }, h('i')), box.firstChild);
   var cs = document.documentElement.classList.contains('sm') ? 8 : 10;
+  if (L > 3 && document.documentElement.classList.contains('swpc')) box.appendChild(h('div.uphead', 'Coming later, not for sale yet')); /* F3 */
   for (var k = 3; k < L; k++) {
     var pid = G.ring[(G.start + k) % L], p = PATCHES[pid], bb = bbox(p.cells);
     var c = h('div.offer.up', { 'data-a': 'upnext', 'data-pid': pid, role: 'button', tabindex: '-1', 'aria-label': p.name + ', not for sale yet: ' + p.cost + ' buttons, ' + p.time + ' time, ' + p.inc + ' income' });

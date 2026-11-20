@@ -64,7 +64,7 @@ function tapPlace(c, wasSug) { // F2: a tap puts the patch on the tapped square 
   drawGhost(); }
 function bindQuilt() {
   var bd = $('#bd'); if (bd._b) return; bd._b = 1;
-  bd.addEventListener('pointerdown', function (ev) { try { if (UI.coach && UI.coach.line) { UI.coach.line = ''; coachRender(); } } catch (e) { } /* W470: any board touch closes Aunt Wren */ var q = ev.target.closest && (ev.target.closest('#quilt') || (G && G.pend ? ev.target.closest('.qframe') : null)); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = leatherAt(ev); if (c) doLeather(c[0], c[1]); return; }
+  bd.addEventListener('pointerdown', function (ev) { try { if (UI.coach && UI.coach.line) { UI.coach.line = ''; coachRender(); } } catch (e) { } /* W470: any board touch closes Aunt Wren */ var q = ev.target.closest && (ev.target.closest('#quilt') || (G && G.pend ? ev.target.closest('.qframe') : null)); if (!q) return; if (G && G.pend && isHuman(swWho(G)) && !UI.busy) { var c = leatherAt(ev); if (c) doLeather(c[0], c[1]); else { var pr = $('#prompt'); if (pr) { pr.textContent = 'That square is taken: tap an empty (cream) one'; pr.classList.remove('flash'); void pr.offsetWidth; pr.classList.add('flash'); } sfx('bad'); } return; } /* F3: no silent click */
     if (UI.sel < 0 || UI.busy) { var c2 = cellAt(ev), pid = c2 && G.board[viewSeat()][c2[1] * 9 + c2[0]]; if (pid >= 0 && pid < 99) showPatch(pid); return; }
     var wasSug = UI.placed === false, tc = cellAt(ev); UI.placed = true; DR.on = true; DR.moved = false; DR.touch = ev.pointerType === 'touch'; DR.c0 = tc; DR.sug = wasSug; DR.x0 = ev.clientX; DR.y0 = ev.clientY; try { q.setPointerCapture(ev.pointerId); } catch (e) { } if (!DR.touch) dragTo(ev); else { var g0 = $('#ghost'); if (g0) { g0.classList.remove('sug'); var l0 = $('.sgl', g0); if (l0) l0.remove(); } } ev.preventDefault(); });
   bd.addEventListener('pointermove', function (ev) { if (!DR.on) return; if (!DR.moved && Math.abs(ev.clientX - DR.x0) + Math.abs(ev.clientY - DR.y0) < 8) return; /* F2: finger jitter is still a tap */ DR.moved = true; dragTo(ev); });
@@ -118,7 +118,7 @@ function explainOnce() { // F3: leather and the 7x7 bonus are explained where th
   if (!G || G.over || UI.tutorial || UI.coach || !isHuman(swWho(G))) return; UI.told = UI.told || {}; var me = swWho(G);
   var nl = SW.LEATHER_SPOTS.filter(function (l, i) { return G.leather[i] === null && l > G.pos[me] && l - G.pos[me] <= 8; })[0];
   if (nl && !UI.told.lea) { UI.told.lea = 1; UI.note = 'Cream track square = leather: first past gets a free 1\u00D71'; return; }
-  if (G.bonus === null && !UI.told.b7 && best7(G.board[me]) >= 30) { UI.told.b7 = 1; UI.note = 'First to fill a whole 7\u00D77 block: +7 points'; }
+  if (G.bonus === null && !UI.told.b7 && best7(G.board[me]) >= 24) { UI.told.b7 = 1; UI.note = 'First to fill a whole 7\u00D77 block: +7 points'; }
 }
 function afterMove() { if (G && !G.over && isHuman(swWho(G))) UI.rvPrev = -1; if (UI.coach) coachCheck(); render(); if (UI.mode === 'hot' && !G.over && !G.pend) toast(nameOf(swWho(G)) + ', your turn'); else explainOnce(); renderDock(); schedule(); }
 function sp(ms) { return amt(UI.fast ? ms * .3 : ms); }
