@@ -5,7 +5,7 @@
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--tx);font-size:15px;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;color:inherit}
 .gx-bar{background:linear-gradient(#1b1520,#120e15);border-bottom:2px solid #000;box-shadow:0 1px 0 #3a2e2a;gap:6px;padding:0 6px}
-.gx-bar h1{font:700 14px/1 var(--px);letter-spacing:.5px;color:var(--flame);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw;text-shadow:0 0 6px rgba(255,180,80,.45)}
+.gx-bar h1{font:700 14px/1 var(--px);letter-spacing:.5px;color:var(--flame);margin:0;white-space:nowrap;overflow:hidden;text-shadow:0 0 6px rgba(255,180,80,.45)}
 .chip{font:700 12px/1 var(--px);color:var(--dim);white-space:nowrap}
 #els{display:flex;gap:2px}
 .el{width:18px;height:18px;border-radius:3px;display:grid;place-items:center;font:700 10px/1 var(--px);background:#000;border:1px solid #2a2330;opacity:.32;filter:grayscale(1)}
@@ -54,7 +54,7 @@ button{font-family:inherit;color:inherit}
 .btn.go{background:linear-gradient(#e8a33c,#a8641c);color:#1a0f05;box-shadow:inset 0 1px 0 #ffd98a,0 0 10px rgba(232,163,60,.45)}
 .btn.warn{background:linear-gradient(#a0402e,#6a2618)}
 .btn:disabled{opacity:.4;box-shadow:none}
-#tray{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:2px 2px 4px;flex:1;min-height:0;scrollbar-width:thin;align-items:stretch}
+#tray{display:flex;gap:6px;overflow-x:auto;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);overflow-y:hidden;padding:2px 2px 4px;flex:1;min-height:0;scrollbar-width:thin;align-items:stretch}
 .htabs{display:flex;gap:4px;flex:0 0 auto}
 /* ability cards */
 .cd{position:relative;flex:0 0 116px;min-height:128px;max-height:150px;border-radius:6px;background:#efe4cc;color:#1d1619;border:2px solid #000;box-shadow:inset 0 0 0 2px #b49a72;display:flex;flex-direction:column;overflow:hidden;cursor:pointer;padding:0;text-align:left;font-family:var(--tx)}

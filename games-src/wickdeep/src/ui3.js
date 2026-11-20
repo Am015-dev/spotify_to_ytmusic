@@ -89,13 +89,17 @@ function showBrief(id) {
   monTypes(sc).forEach(function (t) { var d = el('span', 'mon'); d.appendChild(tileCanvas(D.MON[t] ? D.MON[t].tile : D.BOSS[t].tile, D.BOSS[t] ? 'rgba(160,30,20,.25)' : '')); d.appendChild(document.createTextNode(D.MON[t] ? D.MON[t].n : D.BOSS[t].n)); ml.appendChild(d); });
   p.appendChild(el('h3', '', 'Foes')); p.appendChild(ml);
   s.appendChild(p);
+  var pend = CAMP.party.some(function (h) { return C.cardPending(h) || D.HERO[h.cls].hand !== h.hand.length; });
+  var m = el('div', 'menu'); m.style.marginTop = '10px';
+  m.appendChild(btn(pend ? 'Level up your heroes first' : 'Enter', 'go', function () { if (pend) { showHero(CAMP.party.findIndex(function (h) { return C.cardPending(h) || D.HERO[h.cls].hand !== h.hand.length; })); return; } startScenario(id); }, 'enterbtn'));
+  s.appendChild(m);
   // secret goals: each hero picks one of two
   var seed = (CAMP.history.length + 1) * 7 + id * 3;
   UI.goals = CAMP.party.map(function (h, i) { return C.goalsFor(seed + i * 5)[0]; });
   var gp = el('div', 'panel'); gp.appendChild(el('h3', '', 'Secret goals'));
   CAMP.party.forEach(function (h, i) {
     var opts = C.goalsFor(seed + i * 5), row = el('div', 'goalpick');
-    row.appendChild(el('span', 'chip', esc(D.HERO[h.cls].n)));
+    row.appendChild(el('div', 'chip', esc(D.HERO[h.cls].n))); row.lastChild.style.width = '100%';
     opts.forEach(function (gid) { var b = btn(D.GOAL_BY[gid].text, UI.goals[i] === gid ? 'on' : '', function () { UI.goals[i] = gid; row.querySelectorAll('.btn').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); }); row.appendChild(b); });
     gp.appendChild(row);
   });
@@ -106,10 +110,6 @@ function showBrief(id) {
   dp.appendChild(el('p', '', 'Traps ' + D.trapDmg(L) + ' · coins worth ' + D.goldPerCoin(L) + 'g · win bonus ' + D.bonusXp(L) + ' XP'));
   var dr = el('div', 'row'); [[-1, 'Easier'], [0, 'Normal'], [1, 'Harder']].forEach(function (x) { var b = btn(x[1], CAMP.diff === x[0] ? 'go' : '', function () { CAMP.diff = x[0]; C.save(CAMP); showBrief(id); }); dr.appendChild(b); });
   dp.appendChild(dr); s.appendChild(dp);
-  var m = el('div', 'menu'); m.style.marginTop = '10px';
-  var pend = CAMP.party.some(function (h) { return C.cardPending(h) || D.HERO[h.cls].hand !== h.hand.length; });
-  m.appendChild(btn(pend ? 'Level up your heroes first' : 'Enter', 'go', function () { if (pend) { showHero(CAMP.party.findIndex(function (h) { return C.cardPending(h) || D.HERO[h.cls].hand !== h.hand.length; })); return; } startScenario(id); }, 'enterbtn'));
-  s.appendChild(m);
   showOnly('camp'); s.scrollTop = 0;
 }
 function startScenario(id, o) {

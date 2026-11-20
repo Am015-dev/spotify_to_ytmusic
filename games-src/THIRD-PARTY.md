@@ -37,3 +37,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Wickdeep (games-src/wickdeep)
+
+- **Sprite Fusion pixel-art VFX (code, MIT, Copyright (c) 2026 Hugo Duprez)**: `wickdeep/fx/slash.js`, `impact.js`, `heal.js`, `shield.js`,
+  from https://www.spritefusion.com/downloads/pixel-art-vfx/<name>.zip. TypeScript types stripped with esbuild and wrapped as globals
+  (SF_slash, SF_impact, SF_heal, SF_shield); MIT header kept in each file (licence text above). One-shot only (slash/impact on hits,
+  heal on heals, shield on shields), off with reduced motion or animations off. Not used: fire, ice, poison, lightning, sparkle.
+- **Tiny Dungeon by Kenney (art, CC0 1.0)**: `wickdeep/art/tiny-dungeon.png` (the packed 12x11 tilemap), licence in
+  `wickdeep/art/tiny-dungeon-LICENSE.txt`. Source: https://opengameart.org/content/tiny-dungeon (kenney_tinydungeon.zip), www.kenney.nl.
+  Hero, monster, door, trap, chest and pillar sprites; some monsters recoloured in code.
+- **Silkscreen font (OFL 1.1, Copyright 2001 The Silkscreen Project Authors)**: `wickdeep/art/silkscreen-400.woff2`, `silkscreen-700.woff2`,
+  licence `wickdeep/art/OFL-silkscreen.txt`. Source: Google Fonts (https://fonts.google.com/specimen/Silkscreen).
+- Credits line shown in the game's Menu > About.
