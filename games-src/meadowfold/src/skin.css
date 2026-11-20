@@ -53,7 +53,7 @@ button{font:inherit;color:inherit}
 .htok.sel{background:#fde9c8;box-shadow:0 0 0 3px #e8907e,var(--sh);transform:translateY(-3px)}
 .btn{min-height:44px;padding:8px 14px;border-radius:14px;border:2px solid #fff;background:#f6efe2;box-shadow:var(--sh);font-weight:700;font-size:15px;cursor:pointer;color:var(--ink)}
 .btn.primary{background:#e8907e;color:#fff;text-shadow:0 1px 0 rgba(120,50,40,.35)}
-.btn.primary:disabled{background:#e9ddd0;color:#9c8b7a;text-shadow:none;cursor:default}
+.btn.primary:disabled,.btn.primary[aria-disabled=true]{background:#e9ddd0;color:#9c8b7a;text-shadow:none;cursor:default}
 .btn.go{animation:mfgo 1s ease-in-out 2}
 @keyframes mfgo{50%{transform:scale(1.06)}}
 .btn.big{min-height:52px;font-size:17px;width:100%}
@@ -175,3 +175,4 @@ button{font:inherit;color:inherit}
   .setup{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:4px 8px}
   .setup .btn.big{grid-column:1/-1}
 }
+.tab em.rd{background:#7b5aa8;color:#fff}

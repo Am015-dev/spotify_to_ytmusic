@@ -54,10 +54,11 @@ function act(m, how) {   // a human move
   var before = JSON.stringify(G), sc0 = E.score(E.seat()).total;
   if (!E.apply(m)) { SND.bad(); return false; }
   if (m.t !== 'end') UI.undo.push(before); else UI.undo = [];
+  UI.recap = null;
   UI.hintMove = null;
   var s = G.seats[UI.view], gain = G.over ? 0 : E.score(s).total - sc0;
   if (m.t === 'take') { SND.take(); UI.sel = { kind: 'tok', h: 0 }; }
-  if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: 0 } : null; if (!T.hand.length) UI.tab = 'mine'; }
+  if (m.t === 'place') { SND.place(); UI.flash = m.k; buzz(8); var T = G.turn; UI.sel = T.hand.length ? { kind: 'tok', h: Math.min(m.h, T.hand.length - 1) } : null; }
   if (m.t === 'card') { SND.card(); UI.tab = 'mine'; }
   if (m.t === 'cube') { SND.animal(); UI.flash = m.k; buzz([10, 40, 10]); UI.sel = null; }
   if (m.t === 'spirit') UI.tab = 'mine';
@@ -70,14 +71,20 @@ function act(m, how) {   // a human move
 function undo() { if (!UI.undo.length || UI.busy) return; G = JSON.parse(UI.undo.pop()); UI.sel = G.turn.hand.length ? { kind: 'tok', h: 0 } : null; render(); }
 function runAI() {
   if (!G || G.over) return; var s = E.seat(); if (!s.ai) return nextActor();
-  UI.busy = true; var plan = AI.plan(s.ai), i = 0;
+  UI.busy = true; var plan = AI.plan(s.ai), i = 0, start = E.score(s).total, got = [];
   (function stepAI() {
     if (!G || G.over) { UI.busy = false; return nextActor(); }
     if (i >= plan.length) { UI.busy = false; return nextActor(); }
     var m = plan[i++];
     if (!E.legal(m)) { m = { t: 'end' }; if (!E.legal(m)) { var ms = E.moves(); m = ms.find(function (x) { return x.t === 'place'; }) || ms[0]; } }
-    var sc0 = E.score(s).total; E.apply(m);
-    if (m.t === 'end') { save(); if (!UI.fast) SND.card(); UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
+    var sc0 = E.score(s).total; if (m.t === 'end') { UI.busy = true; } E.apply(m);
+    if (m.t === 'cube') got.push(E.card(typeof s.cubes[m.k] === 'number' ? s.cubes[m.k] : +String(s.cubes[m.k]).slice(1)).name.split(' ').pop());
+    if (m.t === 'end') {
+      var d = E.score(s).total - start; UI.recap = s.name + ' scored +' + d + (got.length ? ', settled ' + got.slice(0, 2).join(' and ') : '') + '.';
+      save(); if (!UI.fast) SND.card();
+      if (UI.fast || G.over) { UI.busy = false; UI.view = G.over ? UI.view : G.cur; return nextActor(); }
+      render(); toast(UI.recap); UI.aiT = setTimeout(function () { UI.busy = false; UI.view = G.cur; nextActor(); }, Math.max(700, AIDELAY * 1.6)); return;
+    }
     if (m.t === 'place') { UI.flash = m.k; SND.place(); }
     if (m.t === 'take') { UI.lastPocket = m.i; SND.take(); }
     if (m.t === 'cube') { UI.flash = m.k; SND.animal(); }
@@ -176,7 +183,7 @@ function renderHand() {
   if (!T.hand.length) h += '<span class="hn">All placed. Settle animals?</span>';
   h += '<span class="sp"></span>';
   if (UI.undo.length) h += '<button type="button" class="btn ghostb" id="undoB">Undo</button>';
-  var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' disabled') + '>End turn</button>';
+  var canEnd = E.legal({ t: 'end' }); h += '<button type="button" class="btn primary' + (canEnd ? ' go' : '') + '" id="endB"' + (canEnd ? '' : ' aria-disabled="true"') + '>End turn</button>';
   $('#central').innerHTML = h + '</div>';
 }
 function renderDock() {
@@ -185,7 +192,7 @@ function renderDock() {
   var act = s.cards.length + (s.spirit && !s.spirit.placed ? 1 : 0);
   var canTake = mine && !T.tookCard && !T.swapped && E.active(cs) < 4;
   h += '<div class="tabs" role="tablist"><button type="button" role="tab" class="tab' + (UI.tab === 'row' ? ' on' : '') + '" data-tab="row" aria-selected="' + (UI.tab === 'row') + '">Animals to invite' + (canTake ? ' <em>take 1</em>' : '') + '</button>' +
-    '<button type="button" role="tab" class="tab' + (UI.tab === 'mine' ? ' on' : '') + '" data-tab="mine" aria-selected="' + (UI.tab === 'mine') + '">' + (s.name === 'You' ? 'Your' : esc(s.name) + '\'s') + ' cards <em>' + act + '/4</em></button></div>';
+    '<button type="button" role="tab" class="tab' + (UI.tab === 'mine' ? ' on' : '') + '" data-tab="mine" aria-selected="' + (UI.tab === 'mine') + '">' + (s.name === 'You' ? 'Your' : esc(s.name) + '\'s') + ' cards <em>' + act + '/4</em>' + (UI.tab === 'row' && mine && s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; }) ? ' <em class="rd">home ready</em>' : '') + '</button></div>';
   h += '<div class="cards">';
   if (UI.tab === 'row') {
     G.row.forEach(function (id, i) { var hint = UI.hintMove && UI.hintMove.t === 'card' && UI.hintMove.i === i; h += cardHTML(id, { attr: 'data-row="' + i + '"', hint: hint, dim: !canTake, can: canTake }); });
@@ -199,6 +206,7 @@ function renderDock() {
   h += '</div>';
   $('#dockbody').innerHTML = h;
 }
+var TOKEN_TIP = { water: 'Water: a longer river scores more.', mount: 'Mountain: stack up to 3, beside another.', trunk: 'Trunk: put leaves on it later.', leaf: 'Leaves: a tree. Taller trees score more.', field: 'Field: 5 points per pair or more.', build: 'Building: on a token, 3 colours around.' };
 function renderLine() {
   var t = '', T = G.turn, s = E.seat();
   if (G.over) t = 'The valley is finished.';
@@ -207,9 +215,10 @@ function renderLine() {
   else if (s.offer) t = 'Keep one spirit card.';
   else if (UI.sel && UI.sel.kind === 'card') t = $$('#map .glow').length ? 'Tap a glowing hex: the animal moves in.' : 'Its habitat is not on your board yet.';
   else if (T.took < 0) t = 'Tap a pocket: take its 3 tokens.';
-  else if (T.hand.length) t = 'Tap a glowing hex to place ' + ART.NAME[T.hand[UI.sel && UI.sel.kind === 'tok' ? UI.sel.h : 0] || T.hand[0]] + '.';
+  else if (T.hand.length) t = TOKEN_TIP[T.hand[UI.sel && UI.sel.kind === 'tok' ? UI.sel.h : 0] || T.hand[0]];
   else if (s.cards.some(function (c) { return Object.keys(E.cubeSpots(s, c.id)).length; })) t = 'An animal can move in! Tap its card.';
   else t = 'Done? Tap End turn.';
+  if (UI.recap && !UI.busy && UI.view === G.cur && G.turn.took < 0 && !G.over) t = UI.recap;
   if (G.last && !G.over) t += ' Last round!';
   $('#line').textContent = t;
 }
@@ -238,12 +247,12 @@ function onTap(e) {
   var hx = t.closest('[data-k]');
   if (hx && myTurn()) {
     var k = hx.dataset.k;
-    if (UI.sel && UI.sel.kind === 'tok') { if (!act({ t: 'place', h: UI.sel.h, k: k })) shake(hx); return; }
+    if (UI.sel && UI.sel.kind === 'tok') { if (!act({ t: 'place', h: UI.sel.h, k: k })) { shake(hx); toast(whyNot(G.seats[UI.view], k, G.turn.hand[UI.sel.h])); } return; }
     if (UI.sel && UI.sel.kind === 'card') { if (!act({ t: 'cube', ci: UI.sel.ci, k: k })) shake(hx); return; }
     if (G.turn.took < 0) { toast('First tap a pocket of tokens above.'); flashPockets(); }
     return;
   }
-  if (t.id === 'endB') { act({ t: 'end' }); return; }
+  if (t.id === 'endB') { if (!E.legal({ t: 'end' })) { toast(G.turn.took < 0 ? 'Take a pocket first.' : 'Place all your tokens first.'); return; } act({ t: 'end' }); return; }
   if (t.id === 'undoB') { undo(); return; }
 }
 // drag a hand token onto a glowing hex (a tap on the token, then on a hex, works too)
@@ -271,6 +280,19 @@ function dragInit() {
   document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
 }
 function bump(sel) { var e = $(sel); if (!e) return; e.classList.add('bump'); setTimeout(function () { e.classList.toggle('bump', false); }, 350); }
+function whyNot(s, k, c) {
+  var st = s.board[k] || [], top = st[st.length - 1], n = ART.NAME[c];
+  if (s.cubes[k]) return 'An animal lives there. Nothing stacks on it.';
+  if (c === 'water' || c === 'field') return n.charAt(0).toUpperCase() + n.slice(1) + ' only goes on an empty hex.';
+  if (top === 'water' || top === 'field') return 'Nothing stacks on ' + ART.NAME[top] + '.';
+  if (top === 'leaf') return 'Nothing goes on top of leaves.';
+  if (top === 'build') return 'Nothing goes on a building.';
+  if (c === 'mount') return st.length >= 3 ? 'Mountains are 3 high at most.' : 'Mountains stack only on grey.';
+  if (c === 'trunk') return 'Trunks: two at most, on trunks only.';
+  if (c === 'leaf') return 'Leaves go on trunks, or alone.';
+  if (c === 'build') return 'Buildings go on one grey, trunk or red.';
+  return 'That hex does not fit.';
+}
 function shake(el) { SND.bad(); el.classList.add('no'); setTimeout(function () { el.classList.remove('no'); }, 400); }
 function flashPockets() { $$('#central .pocket').forEach(function (p) { p.classList.add('hint'); setTimeout(function () { p.classList.remove('hint'); }, 900); }); }
 function bigCard(i, idOnly) {

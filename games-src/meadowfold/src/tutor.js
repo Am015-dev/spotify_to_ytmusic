@@ -22,7 +22,7 @@ var TUT_STEPS = [
   { say: 'Take the pocket with two grey tokens.', ok: function (m) { return m.t === 'take'; }, pocketHas: 'mount' },
   { say: 'Stack grey on grey: taller scores more.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
   { say: 'Mountains score only beside another mountain.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,2'; }, only: '3,2' },
-  { say: 'Trunks lift leaves: taller trees score more.', sel: 'trunk', ok: function (m) { return m.t === 'place'; } },
+  { say: 'Trunk now; leaves on top later.', sel: 'trunk', ok: function (m) { return m.t === 'place'; } },
   { say: 'Now finish the game. Hint helps.', end: true }
 ];
 function G0hand(m) { return m && m.h != null && TUT && TUT.lastHand ? TUT.lastHand[m.h] : null; }
