@@ -105,6 +105,8 @@
     if (M.length === 1) return { moves: [M[0]] };
     var sc = M.map(function (m) { var c = apply(G, m); return { m: m, c: c, v: V.evalSeat(c, s) }; });
     sc.sort(function (a, b) { return b.v - a.v; });
+    /* F4: never plan a take into a full storage (it forces a throw-away) when anything else is possible */
+    var pp = G.P[s]; if (pp.store.length >= V.cap(pp)) { var nf = sc.filter(function (x) { return ['take', 'grab', 'buy'].indexOf(x.m.k) < 0; }); if (nf.length) sc = nf; }
     var best = null;
     for (var i = 0; i < Math.min(width || 8, sc.length); i++) {
       var c = sc[i].c, seq = [sc[i].m], k = 0;

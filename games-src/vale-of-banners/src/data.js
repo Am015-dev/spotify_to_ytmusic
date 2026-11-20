@@ -17,7 +17,7 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   V.GOODS = ['', 'Wool', 'Cheese', 'Honey', 'Cider', 'Linen', 'Salt'];
   V.BLD = {
     hall:  { name: 'Moot Hall',      short: 'Build one more (not a Building)', text: 'Build one more tile from your storage at once, with any number. It can be anything except a Building.' },
-    carp:  { name: "Joiner's Yard",  short: 'Grab from a next stall', text: 'Take any tile from a market stall whose number is one above or one below this space\'s number.' },
+    carp:  { name: "Joiner's Yard",  short: 'Take from stall ±1', text: 'Take any tile from the market stall whose number is one more or one less than this space\'s number (6 and 1 count as next to each other).' },
     chapel:{ name: 'Bell Chapel',    short: '2 pts per Lore tile', text: 'Score 2 points for each Lore tile on your land (at least 2).' },
     mkt:   { name: 'Fair Green',     short: '1 silver per goods kind', text: 'Take 1 silver for each kind of goods you hold (at least 1).' },
     inn:   { name: "Drovers' Inn",   short: '3 workers + 1 silver', text: 'Take 3 workers and 1 silver.' },

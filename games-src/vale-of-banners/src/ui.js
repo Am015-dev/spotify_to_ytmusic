@@ -139,7 +139,7 @@ function turnBanner() {
   var txt = isHuman(a) ? (hu > 1 ? G.seats[a].name + ', your turn' : 'Your turn') : G.seats[a].name + '\'s turn';
   var b = $('#tbanner'); if (!b) { b = h('div', { id: 'tbanner', 'aria-hidden': 'true' }); document.body.appendChild(b); }
   b.innerHTML = ''; b.appendChild(h('span', { text: txt })); b.appendChild(h('span.rds', {}, G.P[a].dice.map(function (v) { return h('span.rd', { text: v }); }))); b.style.setProperty('--sc', VB.SEATCOL[a] || '#2a2014');
-  try { var dh = document.querySelector('.gx-dock-head'), drr = dh && dh.getBoundingClientRect(); if (drr && drr.height && drr.top > 80) { b.style.top = Math.round(drr.top + drr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* F2: over the dock's title row; never over the score strip or a glowing target */   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
+  try { var dh = document.querySelector('.gx-dock-head'), drr = dh && dh.getBoundingClientRect(); if (innerWidth < 520 && innerHeight > innerWidth) { b.style.top = '52px'; b.classList.add('top'); } else if (drr && drr.height && drr.top > 80) { b.style.top = Math.round(drr.top + drr.height / 2) + 'px'; b.classList.add('top'); } } catch (e) { }   /* F2: over the dock's title row; never over the score strip or a glowing target */   /* very short phones (no strip): over the top bar; it lets taps through */   /* sit over the rival strip: never over a glowing target */
   UI.hold = UI.fast ? 0 : Date.now() + animMs(isHuman(a) ? 900 : 500);
   if (UI.fast || QS.get('scn') || tutVoice()) return; b.classList.remove('on'); void b.offsetWidth; b.classList.add('on'); sfx('dice');   /* F2: the banner shows the real dice at once (a tumbling number read as the wrong roll) */
 }
@@ -164,7 +164,7 @@ function aiPlay(m) {
   setTimeout(function () { UI.busy = false; if (el) el.classList.remove('aipick'); if (!G || G.over || isHuman(VB.actor(G))) return; doMove(m); }, m.k === 'end' ? Math.round(stepMs() * .6) : stepMs());
 }
 /* ---------------- turn flow + scoring you can see (tracker, sources, previews, best badges, move rating, beats) ---------------- */
-var SRC_LBL = { region: 'Finished areas', colour: 'Colour sets', animals: 'Animals', goods: 'Goods sold', tower: 'Beacon Tower points', chapel: 'Bell Chapel points', lore: 'Lore scrolls', other: 'Mines and lore', e_silver: 'Silver left over', e_goods: 'Goods left over', e_workers: 'Workers left over', e_lore: 'Lore at the end', end: 'End-of-game extras' };
+var SRC_LBL = { region: 'Finished areas', colour: 'Colour sets', animals: 'Animals', goods: 'Goods sold', tower: 'Beacon Tower points', chapel: 'Bell Chapel points', lore: 'Lore scrolls', other: 'Mines and lore', e_silver: 'Silver left over', e_goods: 'Goods left over', e_workers: 'Workers left over', e_lore: 'Lore at the end', end: 'Other points (mines, lore)' };
 var SRC_ORDER = ['region', 'colour', 'animals', 'goods', 'tower', 'lore', 'other', 'e_silver', 'e_goods', 'e_workers', 'e_lore', 'end'];
 function hints() { return UI.mode === 'tutorial' || !!UI.hintsOn; }   /* PLAY is clean; HINTS (top-bar toggle, off by default) or LEARN TO PLAY show previews, badges, ratings */
 function hintSync() {
@@ -360,7 +360,7 @@ function render() {
 }
 /* every ★ says why (R21): one short reason line under the prompt, also in the tile card and the bulb */
 var TWHY = { castle: 'a free action when built', mine: 'pays silver every season', ship: 'loads goods, banner up the track', pas: 'scores its meadow\'s animals now', know: 'a rule change or end-game points for you',
-  hall: 'build one more tile at once (not a Building)', carp: 'take a tile from the stall one above or below', chapel: 'scores 2 per Lore tile', mkt: 'gives 1 silver per goods kind', inn: 'gives 3 workers and 1 silver', mint: 'gives 1 silver + 1 per Mine', tower: 'scores 2 + 1 per Building here', store: 'sells your biggest goods pile' };
+  hall: 'build one more tile at once (not a Building)', carp: 'take a tile from the stall numbered one more or one less', chapel: 'scores 2 per Lore tile', mkt: 'gives 1 silver per goods kind', inn: 'gives 3 workers and 1 silver', mint: 'gives 1 silver + 1 per Mine', tower: 'scores 2 + 1 per Building here', store: 'sells your biggest goods pile' };
 function tileWhy(t) { return t ? (t.t === 'bld' ? TWHY[t.k] : TWHY[t.t]) || 'more land' : ''; }
 function renderBar() {
   $('#barstat').textContent = G.over ? 'Game over' : (innerWidth <= 640 ? 'Season ' + (G.phase + 1) + ' of ' + G.nPhases + ' · round ' + Math.min(G.round + 1, nRounds()) : VB.PHASES[Math.min(G.phase, 4)] + ' · season ' + (G.phase + 1) + ' of ' + G.nPhases); trackWire();   /* phones: the short form fits the bar, no clipped text */
@@ -538,7 +538,7 @@ function promptText() {
   if (G.over) return 'Game over. Let\'s count the points.';
   var a = VB.actor(G); if (!isHuman(a)) return UI.cap || G.seats[a].name + ' is thinking...';
   var top = pend(), p = G.P[a];
-  if (top) return { castle: 'Keep: one free action. Tap any glowing tile, or Skip it.', hall: 'Moot Hall: tap a stored tile (not a Building), then any glowing space. Or Skip.', grab: 'Joiner\'s Yard: tap a glowing tile on the stall one above or below, then Take it, free.', store: 'Granary: tap your biggest goods pile, then Sell. Or Skip.', ship: 'Barge: tap a glowing stall\'s goods to load them. Or Skip.', discard: 'Storage is full. Tap a stored tile, then Throw this away.' }[top.t];
+  if (top) return { castle: 'Keep: one free action. Tap any glowing tile, or Skip it.', hall: 'Moot Hall: tap a stored tile (not a Building), then any glowing space. Or Skip.', grab: 'Joiner\'s Yard: tap a glowing tile (stall number one more or one less), then Take it, free.', store: 'Granary: tap your biggest goods pile, then Sell. Or Skip.', ship: 'Barge: tap a glowing stall\'s goods to load them. Or Skip.', discard: 'Storage is full. Tap a stored tile, then Throw this away.' }[top.t];
   if (UI.sel != null) { try { coach('preview'); } catch (e) { } return (UI.pre === UI.sel ? 'Your new tile is in hand: tap a glowing space to build it. ' : '') + (hints() ? 'Glowing spaces: +N scores now, 2/5 is region progress.' : 'Put it on a glowing space. Tap the tile again to put it back.'); }
   if (p.used[0] && p.used[1]) return 'Both dice used. Tap End turn.';
   var sm = UI.die == null && hints() ? hardMove() : null;   /* with hints on, the line names the same move as the star (R21: never two instructions) */
@@ -814,6 +814,8 @@ function showResult() {
   c.appendChild(tb); countUp(tb);
   var p0 = G.P[0]; var pl = function (n, a, b) { return n + ' ' + (n === 1 ? a : b); };
   c.appendChild(h('p.tip', { text: 'You filled ' + pl(p0.stat.regions, 'region', 'regions') + ' and sold ' + pl(p0.stat.sales, 'time', 'times') + '.' }));
+  /* F4: how the lead moved, season by season, so the result explains itself */
+  if (G.hist && G.hist.length && G.n === 2 && you) { var lt = G.hist.map(function (v, i) { var d = v[0] - v[1]; return VB.PHASES[i] + ' ' + (d > 0 ? 'you +' + d : d < 0 ? G.seats[1].name + ' +' + (-d) : 'level'); }); c.appendChild(h('p.rlead', { text: 'Lead after each season: ' + lt.join(' · ') + '. Final: ' + (G.P[0].vp - G.P[1].vp >= 0 ? 'you +' + (G.P[0].vp - G.P[1].vp) : G.seats[1].name + ' +' + (G.P[1].vp - G.P[0].vp)) + ' after end-of-game points.' })); }
   if (UI.mode === 'tutorial') {   /* the final count, rule by rule with your real numbers, then what you have not met yet */
     var e0 = G.P[0].end || {}, ul0 = h('ul.walk');
     [['Points during the game', G.P[0].vpPlay], ['Silver, 1 each (' + G.P[0].silver + ')', e0.silver], ['Unsold goods, 1 each', e0.goods], ['Workers, 1 per 2 (' + G.P[0].workers + ')', e0.workers], ['Lore scrolls', e0.lore]].forEach(function (x) { ul0.appendChild(h('li', { text: x[0] + ': ' + (x[1] || 0) })); });

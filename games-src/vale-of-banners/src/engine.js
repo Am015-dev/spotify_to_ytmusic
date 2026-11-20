@@ -298,6 +298,7 @@
       p.silver += mines; if (p.know['mineWk']) p.workers += mines; if (p.know['mineVP']) p.vp += mines;
     });
     G.log.push({ k: 'season', phase: G.phase });
+    G.hist = G.hist || []; G.hist.push(G.P.map(function (p) { return p.vp; }));
     G.phase++;
     if (G.phase >= G.nPhases) { finalScore(G); return; }
     startPhase(G);
