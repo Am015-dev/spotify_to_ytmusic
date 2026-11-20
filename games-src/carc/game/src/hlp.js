@@ -64,10 +64,13 @@ const HLP_ALL=[
 ];
 // the cards the shell shows: the same array, refilled with the cards for this game's expansions
 const HLP_RULES=[];
-function hlpRulesSync(){const ex=(G&&G.ex)||{};const l=HLP_ALL.filter(r=>!r.ex||ex[r.ex]);if(l.length!==HLP_RULES.length||l.some((r,i)=>r!==HLP_RULES[i]))HLP_RULES.splice(0,HLP_RULES.length,...l)}
+// expansion games show their own cards in the place / fig phases ('placex' / 'figic' tags), base-only cards step aside (each list stays 2 to 4 cards)
+let _hlpRK=null;
+function hlpRulesSync(){const ex=(G&&G.ex)||{},px=!!(ex.ic||ex.tb),fx=!!ex.ic,k=px+':'+fx+':'+!!ex.ic+':'+!!ex.tb;if(k===_hlpRK)return;_hlpRK=k;
+  const map=p=>p==='placex'?(px?'place':null):p==='figic'?(fx?'fig':null):p==='place'?(px?null:'place'):p==='fig'?(fx?null:'fig'):p;
+  const l=[];for(const r of HLP_ALL){if(r.ex&&!ex[r.ex])continue;if(r.phase==null){l.push(r);continue}const ph=[...new Set([].concat(r.phase).map(map).filter(Boolean))];if(ph.length)l.push(Object.assign({},r,{phase:ph}))}
+  HLP_RULES.splice(0,HLP_RULES.length,...l)}
 hlpRulesSync();
-// the rules cards for this moment: expansion games swap in their own cards (each list stays 2 to 4 cards)
-function hlpRulesFor(){const ph=hlpPhase();if(!G||!G.ex)return ph;if(ph==='place'&&(G.ex.ic||G.ex.tb))return 'placex';if(ph==='fig'&&G.ex.ic)return 'figic';return ph}
 // ---------------------------------------------------------------- the advice: the normal computer's own pick
 const HLPS={key:'',plan:null};
 function hlpPlan(){if(!G||G.over||!G.cur||UI.sim||!myTurn())return null;const s=G.cur.p;
@@ -107,7 +110,7 @@ function hlpQuiet(){try{const k='gxh-rampart-and-vine';const o=JSON.parse(localS
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;hlpQuiet();
   GXH.init({game:'rampart-and-vine',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,top:()=>{const t=$('#top');return t?Math.ceil(t.getBoundingClientRect().bottom)+4:6},
     avoid:'.glow,.fglow,#htile.mine,#hskip,#status'});
-  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpRulesFor});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   setInterval(()=>{try{GXH.phase(hlpPhase())}catch(e){}},500)}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;try{GXH.phase(hlpPhase())}catch(e){}}
 hlpInit();

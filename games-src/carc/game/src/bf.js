@@ -44,7 +44,8 @@ function viewFor(f,m){const s=f.c/100,top=topSafe(),bot=botSafe();return {s,x:m.
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
   f=fitCells(gl.concat([last]),m);return viewFor(f,m)}
-function ensureGlowVisible(){if(!myTurn('place')||UI.tw||UI.user)return;if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'))return;
+function ensureGlowVisible(){if(!myTurn('place')||UI.tw)return;   // even after a pan: a turn with no square in view would leave the player stuck
+  placeOverlay();if([...document.querySelectorAll('#world .glow')].some(g=>g.style.visibility!=='hidden'))return;
   const g=UI.legal.filter(q=>q.r===UI.rot);if(!g.length)return;const last=unkey(G.order[G.order.length-1]);g.sort((a,b)=>Math.hypot(a.x-last[0],a.y-last[1])-Math.hypot(b.x-last[0],b.y-last[1]));
   const m=measure();tweenView(viewFor({c:Math.max(MINC,UI.view.s*100),cx:g[0].x+.5,cy:g[0].y+.5},m),300)}
 function refit(anim){if(!G||!G.order.length)return;UI.user=false;tweenView(fitTarget(),anim?420:0)}
@@ -101,7 +102,7 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
     try{const pv=prevCalc(g.x,g.y,UI.rot);if(pv.badge&&hintsOn()){b.insertAdjacentHTML('beforeend',`<span class="pvb ${pv.kind||''}">${esc(pv.badge)}</span>`);b._rk=pvRank(pv)}}catch(e){}
     const gx=g.x,gy=g.y;b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'&&hintsOn())pvShow(b,gx,gy)});b.addEventListener('pointerdown',()=>{if(hintsOn())pvShow(b,gx,gy)});
     b.addEventListener('pointerleave',()=>pvHide());b.addEventListener('pointercancel',()=>pvHide());
-    b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}layoutTags()}
+    b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}layoutTags();clearTimeout(UI.egvT);UI.egvT=setTimeout(ensureGlowVisible,60)}
 // ---------- overlay: followers on the map, follower spots, ghost finger, pops (screen-sized items that follow the map) ----------
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
 // follower spots stay hidden while the camera moves, so a button never slides away under a finger
@@ -248,7 +249,7 @@ function aiFly(m,s){const sp=1/(UI.speed||1),w=$('#world'),t=G.cur.t;UI.aiFly=tr
     T(1550,()=>{f.style.transition=`transform ${Math.round(180*sp)}ms ease-in`;f.style.transform=`rotate(${r1}deg) scale(1)`});
     T(1760,()=>{f.remove();UI.aiFly=false;if(sideToAct()!==s||!G.cur||G.cur.t!==t)return;const r=performMove(m,s);if(!r.success)console.error('ai move failed',r.error)})};
   setTimeout(go,Math.round(480*sp))}
-function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;UI.aiT=setTimeout(aiAct,Math.max((G.step==='place'?AIDELAY:AIDELAY*1.1)/UI.speed,capRemain()))}
+function schedAI(){if(UI.aiT||!G||G.over)return;const s=sideToAct();if(s<0||P(s).human)return;UI.aiT=setTimeout(aiAct,Math.max((G.step==='place'?AIDELAY:AIDELAY*1.1)/UI.speed,Math.min(capRemain(),3000/(UI.speed||1))))}   // captions still queued keep showing; the rival waits at most 3 s for them
 function aiNow(){if(UI.capQ&&UI.capQ.length)UI.capQ.length=0;if(UI.aiT){clearTimeout(UI.aiT);aiAct()}}
 // ---------- effects: scores light up the feature and fly to the seat chip ----------
 function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n=0;
@@ -257,7 +258,7 @@ function playFx(){const list=UI.fx.slice(UI.fxSeen);UI.fxSeen=UI.fx.length;let n
 
   for(const f of list){if(f.t==='place'){sfx('place');try{thud(f.x)}catch(e){}buzz(18)}else if(f.t==='fig')sfx('fig');else if(f.t==='home')sfx('home');else if(f.t==='goods')sfx('goods');else if(f.t==='discard')sfx('bad');else if(f.t==='turn'&&!P(f.x).human)sfx('turn');
     else if(f.t==='score'){const d=f.x,delay=n++*520;try{capSet(scoreCap(d,false),1500,true)}catch(e){}setTimeout(()=>scorePop(d),delay)}}}
-// one line per rival turn: "Cobalt placed a road and a follower: +3"
+// one line per rival turn: "Cobalt: road and follower, +3" (short: it sits under your action line)
 function rvTrack(f){const R=UI.rv;
   if(f.t==='turn'){rvFlush();if(G&&!P(f.x).human&&human())UI.rv={p:f.x,ty:'',fig:'',pts:0};return}
   if(!R)return;
@@ -265,7 +266,7 @@ function rvTrack(f){const R=UI.rv;
   else if(f.t==='fig'){const e=G.log.slice(0,8).map(l=>l.t.match(/^(.+?) (?:sets|puts) an? (.+?)(?: \(\w+\))? on the (\w+)\.$/)).find(Boolean);if(e&&e[1]===P(R.p).nm){R.fig=e[2];R.ty=e[3]}}
   else if(f.t==='score'){const d=f.x,w=d.win&&d.win.length?d.win:[d.by];if(w.includes(R.p))R.pts+=d.pts}}
 function rvFlush(){const R=UI.rv;UI.rv=null;if(!R||!R.ty||!G)return;const nm=(n=>n.split(" ").length>2?n.split(" ").pop():n)(seatName(P(R.p)));   // R9: a long story name ("The Sable Baron") keeps the caption to 8 words
-  const line=`${nm} placed a ${R.ty}${R.fig?' and a '+R.fig:''}${R.pts?': +'+R.pts:'.'}`;UI.rvLine=line;capSet(line,3400,false,true,true)}
+  const line=`${nm}: ${R.ty}${R.fig?' and '+R.fig:''}${R.pts?', +'+R.pts:''}`;UI.rvLine=line;capSet(line,3400,false,true,true)}
 function featCells(r){const F=G.fd[r];if(!F)return [];if(F.ty==='M')return [[F.x,F.y]];return (F.tiles||[]).map(unkey)}
 function scorePop(d,final){if(!G)return;const cells=featCells(d.r);if(!cells.length)return;sfx('score');
   for(const [x,y] of cells){const e=UI.tl[key(x,y)];if(e){e.classList.remove('lit');void e.offsetWidth;e.classList.add('lit')}}

@@ -355,8 +355,8 @@ body:has(#endplate) #hand #hinfo{visibility:hidden}
 .gedge b{color:#ffd24a;font-size:14px}
 .gedge[hidden]{display:none}
 body:has(#modal .scrim) .gedges{display:none}
-/* F1: at phone width the seats never run under the tile count: the count drops its "tiles" word (the tile icon says it), gaps tighten */
-@media(max-width:420px){html.sk #left .lt small{display:none!important}}
 /* F1: the story line fades in from 40%, never from nothing, so it is readable (and checkable) from its first frame */
 @keyframes rv-scin{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
 .gxc-scene .gxc-sc-text.in{animation:rv-scin .3s ease-out}
+/* F1: at phone width the two seats keep clear of the tile count (same in both looks, so the painted skin moves no box) */
+@media(max-width:420px){html #seats,html.sk #seats{gap:1px}}

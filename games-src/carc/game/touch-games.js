@@ -26,7 +26,7 @@ const mark = (p, q) => p.evaluate(q => { document.querySelectorAll('[data-tg]').
     const lv = await p.evaluate(() => G.pl[1].lv); const t0 = Date.now(); let overAt = 0, idle = 0, shotCap = false; const caps = new Set();
     while (Date.now() - t0 < 420000) {
       const s = await p.evaluate(() => ({ over: !!G.over, res: !!document.querySelector('.card[aria-label=Result]'), me: myTurn(), step: G.step, ins: (document.querySelector('#status .ins') || {}).textContent || '' }));
-      if (/ placed a /.test(s.ins)) { caps.add(s.ins); if (!shotCap && /: \+/.test(s.ins)) { shotCap = true; await p.screenshot({ path: path.join(OUT, 'tg-' + W + '-caption.png') }); } }
+      if (/ placed a |^\S+: (road|town|priory|field)/.test(s.ins)) { caps.add(s.ins); if (!shotCap && /: \+/.test(s.ins)) { shotCap = true; await p.screenshot({ path: path.join(OUT, 'tg-' + W + '-caption.png') }); } }
       if (s.res) break;
       if (s.over) { if (!overAt) { overAt = Date.now(); await sleep(900); await p.screenshot({ path: path.join(OUT, 'tg-' + W + '-count.png') }); } await sleep(120); continue; }
       if (!s.me) { await sleep(150); continue; }

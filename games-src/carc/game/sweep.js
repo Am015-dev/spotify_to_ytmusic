@@ -44,7 +44,7 @@ const PROBE = () => {
   const ht = document.querySelector('#htile'); out.htile = ht && !ht.disabled && vis(ht) ? center(ht) : null; out.rots = UI.rots ? UI.rots.length : 0; out.rot = UI.rot;
   const gh = document.querySelector('#ghost'); out.ghost = gh ? center(gh) : null; out.hint = UI.hint; out.hintFig = UI.hintFig;
   out.legalAtRot = UI.legal ? UI.legal.filter(g => g.r === UI.rot).length : 0;
-  out.status = document.querySelector('#status').textContent; out.words = out.status.trim().split(/\s+/).length;
+  out.status = document.querySelector('#status').textContent; { const st = document.querySelector('#status'), rc = st.querySelector('.rc'), ln = [...st.childNodes].filter(n => n !== rc).map(n => n.textContent).join(' '); out.words = ln.trim().split(/\s+/).length; out.rcWords = rc ? rc.textContent.trim().split(/\s+/).length : 0; }   // UI-BAR 5: the instruction line <= 8 words; the rival recap is its own line
   // on-screen = engine
   G.pl.forEach(p => { const c = document.querySelector('.seat[data-i="' + p.i + '"]'); if (!c) { out.bad.push('no chip ' + p.i); return; }
     const sc = +c.querySelector('b').textContent; if (sc !== p.score) out.bad.push('score ' + p.nm + ' shows ' + sc + ' engine ' + p.score);
@@ -61,6 +61,7 @@ const PROBE = () => {
   if (out.mine && out.step === 'place' && !out.glows.length && !out.over) out.bad.push('my turn: no glowing square (' + out.legalAtRot + ' legal at this turn) dbg ' + JSON.stringify({ tw: UI.tw, user: UI.user, rot: UI.rot, all: document.querySelectorAll('#world .glow').length, hid: [...document.querySelectorAll('#world .glow')].filter(e => e.style.visibility === 'hidden').length, view: UI.view, gx: UI.legal.filter(g => g.r === UI.rot).slice(0, 3), board: [bd.width, bd.height], help: GXH.state().cur }));
   if (out.mine && out.step === 'fig' && !out.fglows.length && !out.skip) out.bad.push('my turn: no follower spot and no Skip');
   if (out.words > 8) out.bad.push('status > 8 words: ' + out.status);
+  if (out.rcWords > 8) out.bad.push('rival recap > 8 words: ' + out.status);
   // portrait: board >= 55% of the screen
   if (innerHeight > innerWidth) { const a = Math.round(100 * bd.width * bd.height / (innerWidth * innerHeight)); out.board = a; if (a < 55) out.bad.push('board only ' + a + '%'); }
   // wordy text anywhere (play screen)
@@ -75,7 +76,8 @@ async function tapAt(p, x, y) { await p.touchscreen.tap(x, y); }
 
 // ---------- help kit checks: each bubble once, never covers its target, dismisses on a tap; the bulb's finger = the advice; rules cards ----------
 const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
-const NEUTRAL = [40, 24];
+const NEUTRAL = [40, 24];   // fallback; a dismiss tap goes on the status card (the seats open the score sheet, the board places tiles)
+const neutralAt = p => p.evaluate(() => { const e = document.querySelector('#status'); if (!e || !e.offsetHeight) return null; const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }).then(v => v || NEUTRAL).catch(() => NEUTRAL);
 const hstat = { bubbles: {}, bulbs: 0, bulbNull: 0, rules: 0 };
 async function rulesCheck(p, tag, ph) {
   hstat.rules++;
@@ -86,7 +88,7 @@ async function rulesCheck(p, tag, ph) {
   if (ph && (R.n < 2 || R.n > 4)) await fail(p, tag, 'help', 'rules for ' + ph + ' have ' + R.n + ' cards');
   for (const c of R.cards) { if (wc(c.x) > 20) await fail(p, tag, 'help', 'rules card over 20 words: ' + c.x); if (wc(c.t) > 4) await fail(p, tag, 'help', 'rules title over 4 words: ' + c.t); if (!c.pic) await fail(p, tag, 'help', 'rules card without a picture: ' + c.t); }
   if (!R.inside) await fail(p, tag, 'help', 'rules card outside the screen (' + ph + ')');
-  await p.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await sleep(100);
+  await p.evaluate(() => { const x = document.querySelector('.gxh-rules .gxh-x'); if (x) x.click(); }); await sleep(100);
   if (await p.evaluate(() => !!document.querySelector('.gxh-rules'))) await fail(p, tag, 'help', 'rules cards did not close');
 }
 // returns true when it did something (the caller re-probes)
@@ -109,7 +111,7 @@ async function helpFlow(p, tag, st, o) {
     if (!b.arrow || !b.ok) await fail(p, tag, 'help', 'bubble without arrow or Got it (' + ph + ')');
     if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) await fail(p, tag, 'help', 'bubble covers its target (' + ph + ')'); }
     for (const m of (await probe(p)).bad) if (/help bubble/.test(m)) await fail(p, tag, 'help', m);
-    await tapAt(p, ...NEUTRAL); await sleep(150);
+    await tapAt(p, ...(await neutralAt(p))); await sleep(150);
     if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) await fail(p, tag, 'help', 'bubble did not dismiss on a tap (' + ph + ')');
     return true; }
   if (!tipsOn && await p.evaluate(() => !!document.querySelector('.gxh-bub[data-phase]'))) await fail(p, tag, 'help', 'a coach bubble with tips off');
@@ -119,18 +121,21 @@ async function helpFlow(p, tag, st, o) {
     if (pre.has && JSON.stringify(pre.move) !== JSON.stringify(pre.adv)) await fail(p, tag, 'help', 'bulb suggestion ' + JSON.stringify(pre.move) + ' differs from the advice function ' + JSON.stringify(pre.adv));
     if (pre.has && !pre.legal) await fail(p, tag, 'help', 'bulb suggestion not legal');
     const bb = await p.evaluate(() => { const r = document.querySelector('#bulbbtn').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+    await p.evaluate(() => GXH.hide()); await sleep(500);   // any open help first (a bulb tap while help is open only closes it)
     await tapAt(p, ...bb); await sleep(450);
+    if (await p.evaluate(() => !document.querySelector('.gxh-bub.on,.gxh-bulbb,.gxh-rules'))) { await sleep(500); await tapAt(p, ...bb); await sleep(450); }
     const r = await p.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), h = hlpPlan(); let el = null;
       if (h) { const m = h.move; el = m.act === 'place' ? hGlow(m.x, m.y) : m.act === 'skip' ? document.querySelector('#hskip') : (UI.figs || []).find(q => q._m.k === m.k && q._m.l === m.l); }
       const q = el && el.getBoundingClientRect(); const cr = q && { x: q.left + q.width / 2, y: q.top + q.height / 2 };
-      return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!document.querySelector('.gxh-rules'), el: !!el, cr, hasPlan: !!h, sig: G.turn + ':' + G.step + ':' + G.order.length + ':' + G.figs.length }; });
+      return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, rr: (() => { const g = document.querySelector('.gxh-ring:not(.from)'); if (!g) return null; const q = g.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; })(), why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!document.querySelector('.gxh-rules'), el: !!el, cr, hasPlan: !!h, sig: G.turn + ':' + G.step + ':' + G.order.length + ':' + G.figs.length }; });
     if (pre.has && r.hasPlan) {
       if (!r.el) await fail(p, tag, 'help', 'bulb: the suggested spot is not on screen (' + ph + ')');
-      else if (!r.f) await fail(p, tag, 'help', 'bulb tapped, no finger (' + ph + ')');
-      else { if (Math.abs(+r.f.tx - r.cr.x) > 2 || Math.abs(+r.f.ty - r.cr.y) > 2) await fail(p, tag, 'help', 'bulb finger ' + r.f.tx + ',' + r.f.ty + ' != suggestion ' + Math.round(r.cr.x) + ',' + Math.round(r.cr.y) + ' (' + ph + ')');
+      else if (!r.f && !r.rr) await fail(p, tag, 'help', 'bulb tapped, nothing marks the suggestion (' + ph + ')');
+      else { if (!r.f) { if (Math.hypot(r.rr.x - r.cr.x, r.rr.y - r.cr.y) > 6) await fail(p, tag, 'help', 'bulb ring ' + Math.round(r.rr.x) + ',' + Math.round(r.rr.y) + ' != suggestion ' + Math.round(r.cr.x) + ',' + Math.round(r.cr.y) + ' (' + ph + ')'); }   // calm contract: no finger unless the game asks for one; the ring marks the spot
+        else if (Math.abs(+r.f.tx - r.cr.x) > 2 || Math.abs(+r.f.ty - r.cr.y) > 2) await fail(p, tag, 'help', 'bulb finger ' + r.f.tx + ',' + r.f.ty + ' != suggestion ' + Math.round(r.cr.x) + ',' + Math.round(r.cr.y) + ' (' + ph + ')');
         if (!r.ring) await fail(p, tag, 'help', 'bulb: nothing glows at the suggestion'); if (!r.why || wc(r.why) > 15) await fail(p, tag, 'help', 'bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) await fail(p, tag, 'help', 'bulb bubble has no "How does this work?"');
         for (const m of (await probe(p)).bad) if (/help bubble/.test(m)) await fail(p, tag, 'help', m);
-        if (rnd() < .4 && r.link) { await p.evaluate(() => document.querySelector('.gxh-bub .gxh-link').click()); await sleep(250); await rulesCheck(p, tag, ph); } }
+        if (rnd() < .4 && r.link) { if (await p.evaluate(() => { const l = document.querySelector('.gxh-bub .gxh-link'); if (l) l.click(); return !!l; })) { await sleep(250); await rulesCheck(p, tag, ph); } } }
     } else { hstat.bulbNull++; if (r.f) await fail(p, tag, 'help', 'bulb with no suggestion still pointed a finger'); if (!r.rules) await fail(p, tag, 'help', 'bulb with no suggestion did not open the rules'); else await rulesCheck(p, tag, ph); }
     await p.evaluate(() => GXH.hide());
     const a = await p.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: G.turn + ':' + G.step + ':' + G.order.length + ':' + G.figs.length }));
@@ -144,7 +149,7 @@ async function playGame(b, W, H, variant, tag, opt) {
   opt = opt || {}; const p = await newPage(b, W, H); const hst = { seen: new Set() }; let steps = 0, rotated = false, lastSig = '', lastT = Date.now(), maxStuck = 0;
   try {
     await p.evaluate(v => { UI.speed = 30; UI.first = !!v.first; UI.offered = true; UI.setup.river = !!v.river; UI.setup.ic = !!v.ic; UI.setup.tb = !!v.tb; UI.setup.rivals = v.rivals || 1; UI.setup.lv = v.lv || 'normal'; try { localStorage.removeItem('rv_seen'); } catch (e) { } }, { ...variant, first: opt.first });
-    await p.evaluate(() => showStart()); await p.tap('[data-a=play]'); await sleep(500); for (let k = 0; k < 4; k++) { const d = await p.$('#modal [data-a=go]:visible, #goalok:visible'); if (!d) break; await d.tap(); await sleep(400); }   // the 'New here?' prompt and the Goal card come first since Addendum 7
+    await p.evaluate(() => showStart()); await p.tap('[data-a=play]', { timeout: 20000 }).catch(async () => { await sleep(800); await p.evaluate(() => showStart()); await p.tap('[data-a=play]', { timeout: 20000 }); }); await sleep(500); for (let k = 0; k < 4; k++) { const d = await p.$('#modal [data-a=go]:visible, #goalok:visible'); if (!d) break; await d.tap(); await sleep(400); }   // the 'New here?' prompt and the Goal card come first since Addendum 7
     const seen = new Set(); if (opt.tipsOff) await p.evaluate(() => GXH.setEnabled(false));
     for (let it = 0; it < 900; it++) {
       const o = await probe(p); steps++; stat.steps++;
@@ -153,7 +158,7 @@ async function playGame(b, W, H, variant, tag, opt) {
       if (o.tw && !o.over) { await sleep(80); continue; }
       for (const m of o.bad) await fail(p, tag, 'check', m);
       if (o.over) break;
-      if (o.sig !== lastSig) { lastSig = o.sig; lastT = Date.now(); } else { const st = Date.now() - lastT; maxStuck = Math.max(maxStuck, st); if (st > 8000) { await fail(p, tag, 'stuck', 'no change for 8 s at ' + o.sig); break; } }
+      if (o.sig !== lastSig) { lastSig = o.sig; lastT = Date.now(); } else { const st = Date.now() - lastT; maxStuck = Math.max(maxStuck, st); if (st > 8000) { const dg = await p.evaluate(() => JSON.stringify({ aiT: !!UI.aiT, fly: !!UI.aiFly, cap: Math.round(capRemain()), q: (UI.capQ || []).length, tw: !!UI.tw, p: G.cur && G.cur.p, hum: G.cur && P(G.cur.p).human, step: G.step, gxh: !!document.querySelector('.gxh-bub,.gxh-rules'), modal: !!document.querySelector('#modal .scrim') })).catch(e => e.message); await fail(p, tag, 'stuck', 'no change for 8 s at ' + o.sig + ' ' + dg); break; } }
       if (!o.mine) { await sleep(120); continue; }
       if (await helpFlow(p, tag, hst, o)) continue;
       // ghost finger must sit on the control it points at, and that move must be legal
