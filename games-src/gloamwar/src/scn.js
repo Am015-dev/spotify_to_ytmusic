@@ -22,7 +22,7 @@
     mut: [{ name: 'dead die', js: 'renderDice = function(){}' }] });
   GXS.add({ id: 'gw-muster', name: 'Stir a nation', ask: 'Tap the Muster die, then stir a nation', seed: 9, when: booted,
     setup: function () { begin({ side: 'D', seed: 9, dice: DICE }); toAct('D'); return wait(300); },
-    checks: [{ kind: 'play', name: 'nation steps', snap: function () { return NAT_ORDER.reduce(function (t, n) { return t + G.pol[n].s; }, 0); }, steps: [{ sel: '#mydice .die[data-f="M"]' }, { sel: '#acts .act[data-key^="dip-"]' }], idle: function () { return true; },
+    checks: [{ kind: 'play', name: 'nation steps', snap: function () { return ['gr', 'df', 'au', 'hl', 'va'].reduce(function (t, n) { return t + G.pol[n].s; }, 0); }, steps: [{ sel: '#mydice .die[data-f="M"]' }, { sel: '#acts .act[data-key^="dip-"]' }], idle: function () { return true; },
       verify: function (b, a) { return a === b - 1 || 'political sum ' + b + ' -> ' + a; } }] });
   GXS.add({ id: 'gw-cards', name: 'Card drawer', ask: 'Do your cards read clearly?', seed: 4, when: booted,
     setup: function () { begin({ side: 'D', seed: 4, dice: DICE }); toAct('D'); return wait(300); },

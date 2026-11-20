@@ -3,7 +3,6 @@
   <div id="top">
     <button class="ib" data-gx="setd" id="menuB" type="button" aria-label="Menu"></button>
     <div id="race">
-      <div class="chip turn" id="cTurn" role="button" tabindex="0" aria-label="Turn and log"><span>Turn</span><b id="vTurn">1</b></div>
       <div class="chip" id="cD" role="button" tabindex="0" aria-label="Dawn victory points"><span>Dawn</span><b id="vD">0/4</b></div>
       <div class="chip g" id="cG" role="button" tabindex="0" aria-label="Gloam victory points"><span>Gloam</span><b id="vG">0/10</b></div>
       <div class="chip t" id="cT" role="button" tabindex="0" aria-label="Taint and the Company"><span>Taint</span><b id="vT">0/12</b></div>
@@ -11,9 +10,9 @@
     <button class="ib gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
     <button class="ib" id="helpB" type="button" aria-label="Rules">?</button>
   </div>
-  <div class="gx-board" id="board" data-board><div id="map"></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
+  <div class="gx-board" id="board" data-board><div id="map"></div><div id="zoomb"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div><div id="rival" aria-label="Rival dice"><span class="rl" id="rlab">Rival dice</span><div id="rdice"></div><div id="hunt" title="Dice in the hunt box"></div></div></div>
   <div id="dock">
-    <div id="msg" aria-live="polite"></div>
+    <div id="msg" aria-live="polite" role="button" tabindex="0" aria-label="Chronicle of the war"></div>
     <div id="drow"><div id="mydice" style="display:flex;gap:6px"></div></div>
     <div id="acts"></div>
     <div id="tabs">

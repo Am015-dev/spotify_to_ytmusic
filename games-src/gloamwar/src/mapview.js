@@ -62,7 +62,7 @@ function mapStatic() {
   // labels
   REGIONS.forEach(function (r) {
     var major = !!r.set || ['whisperwood', 'cinderplain'].indexOf(r.id) >= 0, c = setPos(r), fs = r.set === 'strong' ? 30 : r.set === 'city' ? 28 : major ? 25 : 19;
-    var y = r.set ? c[1] + (r.set === 'strong' ? 52 : 44) : r.y + 6;
+    var y = r.set ? c[1] + (r.set === 'strong' ? 56 : 48) : r.y + 34;
     h.push('<text class="lbl' + (major ? '' : ' minor') + '" x="' + (r.set ? c[0] : r.x) + '" y="' + y + '" font-size="' + fs + '" text-anchor="middle">' + r.n + '</text>');
   });
   // cartouche, compass, sea names
@@ -89,17 +89,17 @@ function compass(x, y) {
   return g;
 }
 function setPos(r) { return [r.x, r.y - 6]; }
-function tokPos(rid) { var r = REG[rid]; return r.set ? [r.x + 30, r.y + 18] : [r.x, r.y - 6]; }
+function tokPos(rid) { var r = REG[rid]; return r.set ? [r.x, Math.max(52, r.y - 66)] : [r.x, Math.max(52, r.y - 22)]; }
 // ---------------------------------------------------------------- dynamic layer
 function tokenSvg(G, rid, side, a, garrison) {
-  var p = tokPos(rid); if (garrison) p = [REG[rid].x - 24, REG[rid].y - 34];
+  var p = tokPos(rid); if (garrison) p = [REG[rid].x + 2, REG[rid].y - 4];
   var u = units(a), l = leaders(a), riders = side === 'G' && a.pt ? a.pt[2] : 0, el = 0; for (var n in a) el += a[n][1];
   var g = side === 'G', fill = g ? '#7c1810' : '#f3e7c6', ink = g ? '#f3e2be' : '#1f1812', r = 31;
   var s = '<g class="tok" data-tap="t:' + rid + (garrison ? ':in' : '') + '" id="tok-' + rid + (garrison ? '-in' : '') + '-' + side + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="64"/>';
   if (u > 0) {
     if (garrison) s += '<rect x="-30" y="-30" width="60" height="60" rx="4" fill="' + fill + '" stroke="#1f1812" stroke-width="4"/><path d="M-30,-30 h12 v-8 h12 v8 h12 v-8 h12 v8 h12" fill="none" stroke="#1f1812" stroke-width="3"/>';
     else s += '<circle r="' + (r + 4) + '" fill="#1f1812"/><circle r="' + r + '" fill="' + fill + '" stroke="' + ink + '" stroke-width="2" stroke-dasharray="4 3"/>';
-    s += '<text y="11" text-anchor="middle" font-size="34" fill="' + ink + '" font-family="IM Fell English, Georgia, serif">' + u + '</text>';
+    s += '<text y="11" pointer-events="none" text-anchor="middle" font-size="34" fill="' + ink + '" font-family="IM Fell English, Georgia, serif">' + u + '</text>';
     if (el) s += '<g transform="translate(-26,-24)"><circle r="13" fill="' + (g ? '#f3e2be' : '#1f1812') + '"/><text y="5.5" text-anchor="middle" font-size="16" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" font-family="IM Fell English, Georgia, serif">' + el + '</text></g>';
     if (l - riders > 0) s += '<g transform="translate(26,-24)"><circle r="13" fill="#a8842c" stroke="#1f1812" stroke-width="1.5"/>' + icoPath('leader', 0, 0, 18, '#1f1812') + '</g>';
   }
@@ -108,13 +108,13 @@ function tokenSvg(G, rid, side, a, garrison) {
   return s;
 }
 function charBadges(G, rid, list) {
-  var p = tokPos(rid), s = ''; list.forEach(function (c, i) { var d = CHARS[c], g = d.side === 'G', x = p[0] - 34 - i * 30, y = p[1] + 30;
+  var r0 = REG[rid], s = ''; list.forEach(function (c, i) { var d = CHARS[c], g = d.side === 'G', x = r0.x + 46 + (i % 3) * 32, y = (r0.set ? r0.y - 46 : r0.y - 26) - Math.floor(i / 3) * 32;
     s += '<g class="tok ch" data-tap="c:' + c + '" transform="translate(' + x + ',' + y + ')"><circle class="hit" r="30"/><circle r="17" fill="' + (g ? '#7c1810' : '#f3e7c6') + '" stroke="#1f1812" stroke-width="2.5"/>' + icoPath(d.icon, 0, 0, 24, g ? '#f3e2be' : '#1f1812') + '</g>'; });
   return s;
 }
 function companySvg(G, viewer) {
   var F = G.F, p;
-  if (F.road >= 0) p = ROAD_PTS[Math.min(F.road, ROAD_PTS.length - 1)]; else { var r = REG[F.loc]; p = [r.x - 32, r.y + 26]; }
+  if (F.road >= 0) p = ROAD_PTS[Math.min(F.road, ROAD_PTS.length - 1)]; else { var r = REG[F.loc]; p = r.set ? [r.x + 50, r.y + 6] : [r.x - 60, r.y - 18]; }
   var s = '<g class="tok co" id="company" data-tap="co:' + F.loc + '" transform="translate(' + p[0] + ',' + p[1] + ')"><circle class="hit" r="54"/>';
   s += '<circle r="27" fill="' + (F.hid ? '#1f1812' : '#9a2117') + '" stroke="#efe2bd" stroke-width="3"/>' + icoPath('lantern', 0, -1, 34, '#f6dd8a');
   if (F.prog > 0 && F.road < 0) s += '<g transform="translate(24,-22)"><circle r="14" fill="#efe2bd" stroke="#1f1812" stroke-width="2"/><text y="6" text-anchor="middle" font-size="18" fill="#1f1812" font-family="IM Fell English, Georgia, serif">+' + F.prog + '</text></g>';
@@ -132,7 +132,7 @@ MV.render = function (G, hl, viewer) {
     if (!r.set || !r.nat) return; var b = document.getElementById('ban-' + r.id); if (!b) return; var c = setPos(r), own = controller(G, r.id), lost = own !== ownerSide(r.id);
     var col = lost ? (own === 'G' ? '#7c1810' : '#1f1812') : NATIONS[r.nat].col; var key = col + lost;
     if (b.getAttribute('data-k') === key) return; b.setAttribute('data-k', key);
-    var x = c[0] + 16, y = c[1] - 58; b.innerHTML = '<path d="M' + x + ',' + (y + 46) + ' L' + x + ',' + y + '" stroke="#1f1812" stroke-width="3"/><path d="M' + x + ',' + y + ' h26 l-7,9 l7,9 h-26z" fill="' + col + '" stroke="#1f1812" stroke-width="2"/>' + (lost ? '<path d="M' + (x + 4) + ',' + (y + 4) + ' l12,10 M' + (x + 16) + ',' + (y + 4) + ' l-12,10" stroke="#f1e5c4" stroke-width="2.4"/>' : '');
+    var x = c[0] - 48, y = c[1] - 58; b.innerHTML = '<path d="M' + x + ',' + (y + 46) + ' L' + x + ',' + y + '" stroke="#1f1812" stroke-width="3"/><path d="M' + x + ',' + y + ' h26 l-7,9 l7,9 h-26z" fill="' + col + '" stroke="#1f1812" stroke-width="2"/>' + (lost ? '<path d="M' + (x + 4) + ',' + (y + 4) + ' l12,10 M' + (x + 16) + ',' + (y + 4) + ' l-12,10" stroke="#f1e5c4" stroke-width="2.4"/>' : '');
   });
   Object.keys(G.A).forEach(function (rid) { var a = G.A[rid], sd = armySide(a); if (sd && units(a) + leaders(a) > 0) s.push(tokenSvg(G, rid, sd, a, false)); });
   Object.keys(G.IN).forEach(function (rid) { var a = G.IN[rid]; if (a && units(a)) s.push(tokenSvg(G, rid, armySide(a), a, true)); });
@@ -154,11 +154,13 @@ MV.focus = function (rid, k, smooth) {
   var m = document.getElementById('map'); if (smooth !== false && m && !UI.fast) { m.style.transition = 'transform .45s cubic-bezier(.2,.8,.2,1)'; setTimeout(function () { m.style.transition = ''; }, 480); }
   MV.apply();
 };
+MV.zoomBy = function (f) { var b = document.getElementById('board'), cx = b.clientWidth / 2, cy = b.clientHeight / 2, k = Math.max(MV.minK, Math.min(MV.maxK, MV.k * f)); MV.tx = cx - (cx - MV.tx) * k / MV.k; MV.ty = cy - (cy - MV.ty) * k / MV.k; MV.k = k; MV.clamp(); MV.apply(); };
 MV.seen = function (rid) { var b = document.getElementById('board'); if (!b || !REG[rid]) return true; var p = REG[rid], x = p.x * MV.k + MV.tx, y = p.y * MV.k + MV.ty; return x > 30 && y > 30 && x < b.clientWidth - 30 && y < b.clientHeight - 30; };
 MV.init = function () {
   var m = document.getElementById('map'); m.innerHTML = '<svg xmlns="' + SVGNS + '" width="' + MAPW + '" height="' + MAPH + '" viewBox="0 0 ' + MAPW + ' ' + MAPH + '">' + mapStatic() + '<path id="flash" class="rgflash" d=""/><g id="dyn"></g></svg>';
   m.style.width = MAPW + 'px'; m.style.height = MAPH + 'px';
   var b = document.getElementById('board'), P = {}, start = null, moved = false, pinch = null;
+  b.addEventListener('scroll', function () { if (b.scrollTop || b.scrollLeft) { b.scrollTop = 0; b.scrollLeft = 0; } });
   b.addEventListener('pointerdown', function (e) { P[e.pointerId] = { x: e.clientX, y: e.clientY }; var ids = Object.keys(P); if (ids.length === 1) { start = { x: e.clientX, y: e.clientY, tx: MV.tx, ty: MV.ty }; moved = false; } else if (ids.length === 2) { var a = P[ids[0]], c = P[ids[1]]; pinch = { d: Math.hypot(a.x - c.x, a.y - c.y), k: MV.k, cx: (a.x + c.x) / 2, cy: (a.y + c.y) / 2, tx: MV.tx, ty: MV.ty }; moved = true; } });
   b.addEventListener('pointermove', function (e) {
     if (!P[e.pointerId]) return; P[e.pointerId] = { x: e.clientX, y: e.clientY }; var ids = Object.keys(P), r = b.getBoundingClientRect();

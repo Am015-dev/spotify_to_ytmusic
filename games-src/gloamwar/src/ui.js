@@ -26,7 +26,7 @@ function startGame(o) {
   AI.s = (o.seed || Date.now()) & 0xffff;
   G = newGame({ seed: o.seed || (Date.now() & 0x7fffffff), deal: o.deal });
   if (o.dice) G.flags.forceDice = o.dice;
-  ['title', 'res'].forEach(function (id) { $('#' + id).classList.remove('on'); }); closeSheet(); battleClose();
+  ['title', 'res'].forEach(function (id) { $('#' + id).classList.remove('on'); }); document.body.classList.remove('scr-on'); closeSheet(); battleClose();
   ls('gw-side', UI.side);
   MV.fit(); MV.focus(UI.side === 'D' ? 'lanternvale' : 'blackgate', MV.k0, false);
   render(); later(step, UI.fast ? 20 : 400);
@@ -93,7 +93,7 @@ function phaseId() { if (!G) return null; if (G.pend) return G.pend.h; return G.
 // ---------------------------------------------------------------- render
 function render() {
   if (!G) return;
-  $('#vTurn').textContent = G.turn; $('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf(G, 'G') + '/' + VPWIN.G;
+$('#vD').textContent = vpOf(G, 'D') + '/' + VPWIN.D; $('#vG').textContent = vpOf(G, 'G') + '/' + VPWIN.G;
   $('#vT').textContent = G.F.taint + '/12';
   var s = sideToAct(G), me = UI.side, ms = human(s) && !UI.hold ? validMoves(G) : [];
   var hl = { regions: [], tokens: [] };
@@ -106,7 +106,7 @@ function render() {
   else if (G.phase === 'hunt') msg = huntUI(ms, acts);
   else if (G.phase === 'act') msg = actUI(ms, hl, acts);
   if (G.win) msg = G.win.side === me ? 'Victory!' : 'Defeat';
-  $('#msg').innerHTML = msg;
+  $('#msg').innerHTML = '<span id="vturn">Turn ' + G.turn + '</span>' + msg;
   renderDice(ms); renderActs(acts); renderTabs(ms);
   MV.render(G, hl, me);
   if (G.pend && G.pend.h === 'battle') battleRender(ms); else if (!UI.roundShow) battleClose();
@@ -337,9 +337,9 @@ function showResult() {
   $('#resP').textContent = { taint: 'The Hollow Crown overcame the Bearers. The Gloam rules the dark.', kiln: 'The Hollow Crown was unmade in the Kiln of Kaldur. Dawn breaks.', vp: w.side === 'G' ? 'The Gloam took ten points of Dawn cities and strongholds.' : 'The Dawn League took four points of Gloam strongholds.' }[w.why] + ' Turn ' + G.turn + '.';
   var row = $('#resRow'); row.innerHTML = '';
   [['Play again', function () { startGame({ side: UI.side, level: UI.level }); }, 'pri'], ['Switch sides', function () { startGame({ side: other(UI.side), level: UI.level }); }, ''], ['Title', showTitle, '']].forEach(function (x) { var b = mk('button', 'btn big ' + x[2], x[0]); b.type = 'button'; b.onclick = x[1]; row.appendChild(b); });
-  $('#res').classList.add('on');
+  $('#res').classList.add('on'); document.body.classList.add('scr-on');
 }
-function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); tutMenu(); }
+function showTitle() { clearTimeout(UI.timer); try { if (window.GXT && GXT.active()) GXT.stop(); } catch (e) { } closeSheet(); battleClose(); $('#res').classList.remove('on'); $('#title').classList.add('on'); document.body.classList.add('scr-on'); tutMenu(); }
 function tutMenu() { try { $('#tutSlot').innerHTML = GXT.menuHTML({ game: 'gloamwar', first: !ls('gw-played'), cls: 'btn', launch: function () { startTutorial(); } }); } catch (e) { } }
 // ---------------------------------------------------------------- boot
 function crest() {
@@ -351,7 +351,7 @@ function crest() {
 }
 function boot() {
   UI.side = ls('gw-side') || 'D'; UI.level = ls('gw-lv') || 'normal';
-  crest(); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
+  crest(); if ($('#title').classList.contains('on')) document.body.classList.add('scr-on'); MV.init(); MV.onTap = onMapTap; menuInit(); helpInit();
   var seg = $('#segL'); [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']].forEach(function (x) { var b = mk('button', UI.level === x[0] ? 'on' : '', x[1]); b.type = 'button'; b.onclick = function () { UI.level = x[0]; ls('gw-lv', x[0]); seg.querySelectorAll('button').forEach(function (y) { y.classList.toggle('on', y === b); }); }; seg.appendChild(b); });
   $('#playD').onclick = function () { ls('gw-played', 1); startGame({ side: 'D', level: UI.level }); };
   $('#playG').onclick = function () { ls('gw-played', 1); startGame({ side: 'G', level: UI.level }); };
@@ -359,7 +359,8 @@ function boot() {
   $('#helpB').onclick = function () { GXH.rules(phaseId() || undefined); };
   $('#menuB').innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1f1812" stroke-width="2.4" stroke-linecap="round"/></svg>';
   $('#tCards').onclick = function () { openCards(); }; $('#tNat').onclick = openNations; $('#tComp').onclick = openCompany;
-  $('#cT').onclick = openCompany; $('#cTurn').onclick = openLog; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
+  $('#cT').onclick = openCompany; $('#msg').onclick = openLog;
+  $('#zin').onclick = function () { MV.zoomBy(1.4); }; $('#zout').onclick = function () { MV.zoomBy(1 / 1.4); }; $('#cD').onclick = function () { openVP('D'); }; $('#cG').onclick = function () { openVP('G'); };
   $('#scrim').onclick = closeSheet;
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
   try { GXV.watch(function () { MV.fit(); if (G) render(); }); } catch (e) { addEventListener('resize', function () { MV.fit(); if (G) render(); }); }
