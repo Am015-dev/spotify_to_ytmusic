@@ -37,3 +37,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Ochre Horizon (games-src/ochre-horizon)
+| Asset | Source | Author | Licence | Files |
+|---|---|---|---|---|
+| Righteous font | https://fonts.google.com/specimen/Righteous | Astigmatic | SIL OFL 1.1 | ochre-horizon/fonts/righteous-400.woff2 |
+| Space Grotesk font | https://fonts.google.com/specimen/Space+Grotesk | Florian Karsten | SIL OFL 1.1 | ochre-horizon/fonts/space-grotesk.woff2 |
+All other art (planet, hexes, card scenes, icons, halftone and grain) is our own code art; sounds are synthesised in code.
