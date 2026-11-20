@@ -517,7 +517,7 @@ function insetRender() {
   e.innerHTML = rivSvg(I.seat, [I.c, I.tok]) + '<span>' + esc(G.seats[I.seat].name) + "'s valley</span>";
   e.dataset.seat = I.seat; e.hidden = false;
   var sr = safeRect(), bh = bd.clientHeight, top = Math.round(sr.t), env = G.seats[UI.view].env, n = 0;   // the corner over the fewest of your own tiles
-  Object.keys(env).forEach(function (c) { var q = pix(c), x = UI.pan.tx + q[0] * UI.pan.z, y = UI.pan.ty + q[1] * UI.pan.z; if (x > bd.clientWidth - 150 && y > top - 20 && y < top + 135) n++; });
+  Object.keys(env).forEach(function (c) { var q = pix(c), x = UI.pan.tx + q[0] * UI.pan.z, y = UI.pan.ty + q[1] * UI.pan.z; if (x < 150 && y > top - 20 && y < top + 135) n++; });
   e.classList.toggle('low', n > 0 && sr.b - 120 > top + 130);
   e.style.top = e.classList.contains('low') ? Math.round(sr.b - 116) + 'px' : top + 'px';
 }

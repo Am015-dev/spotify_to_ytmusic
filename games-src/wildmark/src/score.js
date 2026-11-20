@@ -46,7 +46,7 @@ function pvCardLine(a, seat) {
   return ({ bear: 'Bears', elk: 'Elk', salmon: 'Salmon', hawk: 'Hawks', fox: 'Foxes' })[a] + ': ' + who + ' ' + w.text + ' = ' + pvPl(v, 'point', 'points') + (pvSetA(a) ? ' (' + PV_TABLE[a] + ')' : ' (' + cinfo(a).rule + ')');
 }
 var PV_SHORT = { bear: 'Bear pair', elk: 'Elk line', salmon: 'Salmon run', hawk: 'lone Hawk', fox: 'Fox neighbours' };
-function pvPop(p) { if (hintsOn()) return pvText(p); return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }
+function pvPop(p) { return p.slice(0, 2).map(function (x) { return (x.d > 0 ? '+' : '') + x.d + ' ' + (x.a ? (pvSetA(x.a) ? PV_SHORT[x.a] : WM.ANI_NAME[x.a]) : x.t ? WM.TER_NAME[x.t].toLowerCase() : 'acorn'); }).join(', '); }
 function pvSum(p) { return p.reduce(function (n, x) { return n + x.d; }, 0); }
 function pvText(p) { return p.length ? p.map(function (x) { return x.label; }).join(', ') : 'no points now'; }
 // cells to light for a part (the pattern the move completes, or the habitat it grows)

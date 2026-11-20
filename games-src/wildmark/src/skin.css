@@ -478,3 +478,6 @@ html.wm-coach #pv,html.wm-coach #whyc{display:none!important}
 #pv,#pv *{pointer-events:none!important}
 .vd.neg span{font-weight:800}
 @media (min-width:1000px){#acts .held svg{height:44px!important}#acts{height:auto;max-height:none;flex-wrap:wrap;justify-content:flex-end}#acts .ab{flex:0 0 auto}}
+/* F3 (cold play): score pops stay short and inside the screen; the phone rival inset sits left, clear of the zoom buttons */
+.pop{max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
+@media (max-width:999px){#rinset{right:auto;left:6px}}
