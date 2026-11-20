@@ -8,7 +8,7 @@ function phPrompt() {
   if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : (crewPlan(v) || 'Tap Roll to start.')) : 'Crew getting ready.';
   if (G.pend) {
     const p = G.pend, me = mine && pend.includes(v);
-    if (p.h === 'rr') return me && !p.d.m[v] ? 'Tap dice to reroll, or keep.' : 'Waiting for the reroll.';
+    if (p.h === 'rr') return me && !p.d.m[v] ? 'Reroll: tap dice to roll again, or keep.' : 'Waiting for ' + name(1 - v) + ' to reroll.';
     if (p.h === 'intern') return me && v === p.d.seat ? 'Tap the token, then a space.' : 'Trainee token being placed.';
     if (p.h === 'sync') return me && v === 1 ? 'Place the cross-check die.' : 'Cross-check die being placed.';
     if (p.h === 'wt') return me && v === 1 - p.d.a ? 'Pick one die to swap.' : 'Waiting for the hand-over.';

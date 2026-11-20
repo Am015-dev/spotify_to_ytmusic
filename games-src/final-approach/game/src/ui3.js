@@ -77,13 +77,13 @@ function slotTap(k) {
   const m = { t: 'place', d: UI.sel, to: k, c: UI.cof };
   if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) {
     // the last dice are needed on the empty Axis / Engines: a second tap on the same space places anyway
-    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Save a die for ' + needNames(mi.need) + '. Tap again to skip.'); return; }
+    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast(needNames(mi.need) + (mi.need.length > 1 ? ' need' : ' needs') + ' a die. Tap again.'); return; }
     // this die here ends the flight at once: the first tap only explains, a second tap places it
-    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('This ends the flight' + (UI.deadWhy && UI.deadWhy[k] ? ': ' + UI.deadWhy[k] : '') + '. Tap again to do it.'); return; }
+    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast((UI.deadWhy && UI.deadWhy[k] ? 'Crash: ' + UI.deadWhy[k].split(' ').slice(0, 4).join(' ').replace(/[!.,]+$/, '') : 'This ends the flight') + '. Tap again.'); return; }
     UI.warnK = null; sendMove(v, m); return; }
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + UI.cof; const S = FA.SLOT[k];
   const fix = S.vals && S.vals.length ? Math.min(...S.vals.map(n => Math.abs(n - val))) : 99;
-  const why = S.s !== null && S.s !== v ? 'That is ' + name(S.s) + '’s space (' + (S.s === 0 ? 'blue' : 'orange') + ').' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: flap ' + S.ix + ' first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column is open.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'Must differ from the next trainee token.' : S.vals ? SLOTWORD[S.grp] + ' ' + SLOTLAB(k) + ' takes ' + (S.vals.length === 1 ? 'a ' + S.vals[0] : S.vals.join(' or ')) + '. Yours is ' + val + '.' + (fix <= G.coffee - Math.abs(UI.cof || 0) ? ' Coffee can fix it.' : '') : 'That die does not fit here.';
+  const why = S.s !== null && S.s !== v ? 'That is ' + name(S.s) + '’s space (' + (S.s === 0 ? 'blue' : 'orange') + ').' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: flap ' + S.ix + ' first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column is open.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'Must differ from the next trainee token.' : S.vals ? SLOTWORD[S.grp] + ' ' + SLOTLAB(k) + ' needs ' + (S.vals.length === 1 ? 'a ' + S.vals[0] : S.vals.join(' or ')) + (fix <= G.coffee - Math.abs(UI.cof || 0) ? ': use coffee.' : ', not ' + val + '.') : 'That die does not fit here.';
   snd('error'); toast(why);
 }
 // route: online clients send to the host, everybody else applies at once
@@ -94,8 +94,8 @@ function doAction(a, t) {
   switch (a) {
     case 'ready': sendMove(v, { t: 'ready' }); break;
     case 'say': sendMove(v, { t: 'say', c: t.dataset.c }); break;
-    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
-      UI.rrAsk = false; sendMove(v, { t: 'rr' }); break;
+    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); toast('Tap again to spend a reroll token.'); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
+      UI.rrAsk = false; sendMove(v, { t: 'rr' }); toast('Reroll: tap dice to roll again.'); break;
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
     case 'cof': UI.cof = +t.dataset.c; render(); break;

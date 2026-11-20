@@ -103,9 +103,9 @@ function aiChip(m, seat) {
   if (!m || m.t !== 'place' || m.d === 'p') return null;
   const S = FA.SLOT[m.to], val = G.dice[seat][m.d].v + (m.c || 0), o = 1 - seat, last = FA.isFinal(G), wm = FA.windMod(G);
   switch (S.grp) {
-    case 'axis': { const x = G.slots['ax' + o]; if (!x) return 'Axis die down. Yours decides the tilt.'; const nx = G.pl.axis + (seat === 0 ? x.v - val : val - x.v); return nx === 0 ? 'Keeps the plane level.' : 'Tilt ' + Math.abs(nx) + (nx < 0 ? ' left.' : ' right.') + (Math.abs(nx) >= 2 ? ' Watch it!' : ''); }
-    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Engine die down. Yours adds to it.'; const sm = val + x.v + wm; if (last) return FA.slowOk(G, sm) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
-    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'Radio clears the plane ahead.' : 'Radio: nothing to clear.'; }
+    case 'axis': { const x = G.slots['ax' + o]; if (!x) return 'Your die sets the tilt.'; const nx = G.pl.axis + (seat === 0 ? x.v - val : val - x.v); return nx === 0 ? 'Keeps the plane level.' : 'Tilt ' + Math.abs(nx) + (nx < 0 ? ' left.' : ' right.') + (Math.abs(nx) >= 2 ? ' Watch it!' : ''); }
+    case 'engines': { const x = G.slots['en' + o]; if (!x) return 'Your die adds to it.'; const sm = val + x.v + wm; if (last) return FA.slowOk(G, sm) ? 'Speed ' + sm + '. Slow enough.' : 'Speed ' + sm + '. Too fast!'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Speed ' + sm + (adv ? ': moves ' + adv + (adv > 1 ? ' spaces.' : ' space.') : ': holds position.'); }
+    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'Clears a plane.' : 'Nothing to clear.'; }
     case 'gear': return G.pl.sw.lg[S.ix] ? 'Gear already down.' : 'Lowers a landing gear.';
     case 'flaps': return G.pl.sw.fl[S.ix] ? 'Flap already out.' : 'Extends a flap.';
     case 'brakes': return G.pl.sw.br[S.ix] ? 'Brake already set.' : 'Sets the brakes to ' + S.vals[0] + '.';
@@ -118,7 +118,7 @@ function aiChip(m, seat) {
 function showChip(k, text) { UI.chip = { k, text, until: Date.now() + 5000 }; clearTimeout(UI.chipT); UI.chipT = setTimeout(() => { UI.chip = null; $$('#pz .rchip').forEach(e => e.remove()); }, 5050); }
 function chipEl(r) {
   const c = UI.chip; if (!c || c.until < Date.now() || !r[c.k]) return null; const q = r[c.k], txt = clamp8(c.text);
-  const e = h('div.rchip', { 'aria-hidden': 'true', style: 'left:' + Math.round(q.x + q.w / 2) + 'px;top:' + Math.round(Math.max(2, q.y - 6)) + 'px' }, txt);
+  const e = h('div.rchip', { 'aria-hidden': 'true', style: 'left:' + Math.round(Math.max(96, Math.min(((UI.LY && UI.LY.W) || innerWidth) - 96, q.x + q.w / 2))) + 'px;top:' + Math.round(Math.max(2, q.y - 6)) + 'px' }, txt);
   return e;
 }
 
@@ -221,7 +221,8 @@ function roShow(a) {
 function goalCard(inStory) {
   const n = D.rounds - G.row0, mods = scenOf().mods.map(m => D.mods[m] && D.mods[m].name).filter(Boolean);
   // a short visual checklist: the landing conditions, each with its icon and an empty tick box that the in-game checklist fills
-  const rows = [['air', 'At the airport'], ['planes', 'No planes ahead'], ['gear', 'Gear 3 down'], ['flaps', 'Flaps 4 out'], ['axis', 'Wings level'], ['speed', 'Speed ≤ brakes']];
+  const own = s => s === viewSeat() ? 'you' : name(s);
+  const rows = [['air', 'At the airport'], ['planes', 'No planes ahead'], ['gear', 'Gear 3 down: ' + own(0)], ['flaps', 'Flaps 4 out: ' + own(1)], ['axis', 'Wings level'], ['speed', 'Speed ≤ brakes']];
   if (scenOf().mods.includes('intern')) rows.push(['intern', 'Trainee done']); if (scenOf().mods.includes('ice')) rows.push(['ice', 'Icy brakes done']);
   const ico = k => h('i.gci', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (CK_ICO[k] || '') + '</svg>' });
   return h('div.fgoal', h(inStory ? 'h3' : 'b', 'Land together in round ' + n),
@@ -317,7 +318,7 @@ function f2Why(t) {
   const w = b.offsetWidth, hh = b.offsetHeight, x = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2));
   let y = r.top - hh - 8; if (y < 52) y = r.bottom + 8;
   b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px';
-  clearTimeout(F2.whyT); F2.whyT = setTimeout(() => { try { b.remove(); } catch (e) { } }, 3200);
+  clearTimeout(F2.whyT); F2.whyT = setTimeout(() => { try { b.remove(); } catch (e) { } }, 2600);
 }
 // ---------- the round card: below the banner and the altitude line, above the dock; shown once the board has stopped moving ----------
 function f2PlaceRo(el) {
@@ -393,6 +394,6 @@ function f2EndCard() {
     '#fx .endb.f2end{display:flex!important;flex-direction:column;align-items:center;gap:4px;bottom:10%;padding:12px 12px 10px}.endb.f2end b{font-size:clamp(26px,8vw,36px);letter-spacing:.02em}.endb.f2end.win b{color:#7dff95}.endb.f2end.lose b{color:#ff8a78}' +
     '.f2ew{font-size:16px;font-weight:800;line-height:1.25}.f2ec{font-size:15px;font-weight:900;color:#ffd76a}.f2cks{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin-top:2px}' +
     '.f2ck{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:13px;font-weight:800;background:rgba(255,255,255,.12)}.f2ck.ok i{color:#7dff95;font-style:normal}.f2ck.no{background:rgba(224,64,44,.3)}.f2ck.no i{color:#ff8a78;font-style:normal}' +
-    '.f2tap{font-size:12px;opacity:.8}';
+    '.f2tap{font-size:12px;opacity:.8}#goal .ck[data-k=gear]{box-shadow:inset 0 -4px 0 #3d7fe0}#goal .ck[data-k=flaps]{box-shadow:inset 0 -4px 0 #f08a24}.f2why{max-width:min(240px,calc(100vw - 16px))!important}';
   document.head.appendChild(st);
 })();
