@@ -166,6 +166,7 @@ function pop(c, text, cls, anchors) { UI.popAt = Date.now();   // score pops sit
   $$('.pop').forEach(function (o) { if (o.dataset.anc === key) o.parentNode.removeChild(o); });
   var e = document.createElement('div'); e.className = 'pop ' + (cls || ''); e.textContent = text; e.dataset.anc = key; e.style.top = Math.round(r.top + r.height / 2) + 'px';
   document.body.appendChild(e); var hw = e.offsetWidth / 2 + 6, x = r.left + r.width / 2; e.style.left = Math.max(hw, Math.min(innerWidth - hw, x)) + 'px';
+  var wc = $('#whyc'); if (wc && wc.classList.contains('on')) { var q = wc.getBoundingClientRect(), pr = e.getBoundingClientRect(); if (pr.bottom > q.top && pr.top < q.bottom && pr.right > q.left && pr.left < q.right) e.style.top = Math.round(q.bottom + pr.height / 2 + 6) + 'px'; }   // never on top of the "because" chip
   if (el) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); setTimeout(function () { el.classList.remove('bump'); }, 700); }
   setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 1300);
 }
@@ -418,14 +419,15 @@ function scoreWhy(fin) {
   if (!P.length) return;
   P.sort(function (x, y) { return Math.abs(y.d) - Math.abs(x.d); });
   var txt = sg(d) + ' because ' + P.slice(0, 2).map(function (x) { return x.t; }).join(', ') + (P.length > 2 ? ' and more (Scores)' : '');
-  clearTimeout(scoreWhy.t); scoreWhy.t = setTimeout(function () { whyChip(txt, d); }, UI.popAt && Date.now() - UI.popAt < 600 ? 250 : 0);
+  var wait = UI.popAt ? 1350 - (Date.now() - UI.popAt) : 0;   // one message at a time: a score pop on screen goes first
+  clearTimeout(scoreWhy.t); scoreWhy.t = setTimeout(function () { whyChip(txt, d); }, Math.max(0, wait));
 }
 function whyChip(txt, d) {
   var a = $('#seats .seat[data-seat="' + meSeat() + '"]'); if (!a || !a.offsetWidth) a = $('#barstat .pill:last-child'); if (!a) return; var r = a.getBoundingClientRect(); if (!r.width) return;
   var e = $('#whyc'); if (!e) { e = document.createElement('div'); e.id = 'whyc'; e.setAttribute('role', 'status'); document.body.appendChild(e); }
   e.className = d > 0 ? 'up' : 'dn'; e.textContent = txt; e.style.top = Math.round(r.bottom + 4) + 'px';
   var w = Math.min(e.offsetWidth || 200, innerWidth - 16); e.style.left = Math.round(Math.max(8, Math.min(innerWidth - w - 8, r.left))) + 'px';
-  e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); clearTimeout(whyChip.t); whyChip.t = setTimeout(function () { e.classList.remove('on'); }, 3200);
+  e.classList.remove('on'); void e.offsetWidth; e.classList.add('on'); clearTimeout(whyChip.t); whyChip.t = setTimeout(function () { e.classList.remove('on'); }, 2800);
 }
 function rivalOf(i) { var b = -1, fin = G.over ? G.res : WM.final(G); G.seats.forEach(function (s, j) { if (j !== i && (b < 0 || fin[j].total > fin[b].total)) b = j; }); return b; }
 function renderTop() {
