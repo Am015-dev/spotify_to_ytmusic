@@ -190,8 +190,8 @@
         case 'prod': P.prod[o.r] = Math.max(o.r === 'mc' ? -5 : 0, P.prod[o.r] + o.n); ev({ k: 'prod', p: p, r: o.r, n: o.n }); break;
         case 'gain': P[o.r] += o.n; ev({ k: 'gain', p: p, r: o.r, n: o.n }); break;
         case 'lose': P[o.r] = Math.max(0, P[o.r] - o.n); break;
-        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + o.r + ' production.'); } break; }
-        case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + o.r + '.'); } break; }
+        case 'rprod': { var fl = o.r === 'mc' ? -5 : 0, cut = Math.min(o.n, R.prod[o.r] - fl); if (cut > 0) { R.prod[o.r] -= cut; ev({ k: 'prod', p: other(p), r: o.r, n: -cut }); log(p, (p === 0 ? 'You' : 'Rival') + ' cut ' + cut + ' ' + o.r + ' production.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + o.r + ' production to lose.'); break; }
+        case 'rres': { var c2 = Math.min(o.n, R[o.r]); if (c2 > 0) { R[o.r] -= c2; ev({ k: 'gain', p: other(p), r: o.r, n: -c2 }); log(p, (p === 0 ? 'You' : 'Rival') + ' removed ' + c2 + ' ' + o.r + '.'); } else log(p, (p === 0 ? 'Rival' : 'You') + ' had no ' + o.r + ' to lose.'); break; }
         case 'temp': raise(p, 'temp', o.n); break;
         case 'oxy': raise(p, 'oxy', o.n); break;
         case 'tr': P.tr += o.n; ev({ k: 'tr', p: p, n: o.n }); break;

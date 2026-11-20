@@ -126,7 +126,7 @@ function showSell() {
   var P = G.pl[0], picks = {};
   function draw() {
     var n = Object.keys(picks).length;
-    modal('<h3>Sell cards</h3><p style="margin:0 0 8px;opacity:.85">Tap cards to sell. 1 credit each.</p><div class="grid">' + P.hand.map(function (id) { return '<button class="cw pickable" data-sp="' + id + '">' + cardHTML(id, { pick: picks[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mSellGo"' + (n ? '' : ' disabled') + '>Sell ' + plural(n, 'card') + '<small>+' + n + ' credits</small></button></div>');
+    modal('<h3>Sell cards</h3><p style="margin:0 0 8px;opacity:.85">Tap cards to sell. 1 credit each.</p><div class="grid">' + P.hand.map(function (id) { return '<button class="cw pickable" data-sp="' + id + '">' + cardHTML(id, { pick: picks[id], chk: 'Sell' }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mSellGo"' + (n ? '' : ' disabled') + '>Sell ' + plural(n, 'card') + '<small>+' + n + ' credits</small></button></div>');
     $('mb').querySelectorAll('[data-sp]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-sp'); if (picks[id]) delete picks[id]; else picks[id] = 1; draw(); }); });
     $('mSellGo').addEventListener('click', function () { closeModal(); closeSheet(); doMove({ t: 'sell', ids: Object.keys(picks) }); });
   }

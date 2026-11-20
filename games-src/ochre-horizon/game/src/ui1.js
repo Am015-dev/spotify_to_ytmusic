@@ -83,7 +83,7 @@ function cardHTML(id, opt) {
   if (opt.flavor && c.flavor) h += '<div class="fl">' + esc(c.flavor) + '</div>';
   h += '</div>';
   if (c.vp) h += '<span class="vp">' + esc(vpWords(c.vp)) + '</span>';
-  h += '<span class="chk">Keep</span></div>';
+  h += '<span class="chk">' + (opt.chk || 'Keep') + '</span></div>';
   return h;
 }
 
@@ -141,12 +141,12 @@ function hintNow() {
   if (!G) return '';
   if (G.over) return 'Game over';
   var p = OH.sideToAct();
-  if (p === 1) return 'Rival is thinking…';
+  if (p === 1) return UI.rivalLine || 'Rival is thinking…';
   if (G.pending) { if (G.pending.h === 'place') return 'Tap a glowing space'; return 'Make a choice'; }
   if (G.phase === 'setup') return 'Pick your company';
   if (G.phase === 'research' || G.phase === 'draft') return 'New round: pick cards';
   if (G.phase === 'final') return 'Last chance: plant greenery';
-  if (G.phase === 'action') return G.acts === 1 ? 'One more action, or Done' : 'Your turn: play a card or project';
+  if (G.phase === 'action') return G.acts === 1 ? 'Action 2 of 2, or Done' : 'Your turn: action 1 of 2';
   return '';
 }
 function render() {

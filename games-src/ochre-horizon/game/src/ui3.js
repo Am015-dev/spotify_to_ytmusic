@@ -46,6 +46,7 @@ function playEvents() {
   })(evs[i]);
   // rival lines become toasts
   var rl = logs.filter(function (l) { return l.p === 1; });
+  if (rl.length) UI.rivalLine = rl[rl.length - 1].s.replace(/\.$/, '').split(' ').slice(0, 8).join(' ');
   if (rl.length) { var pl = G.ev.slice(seen).filter(function (e) { return e.k === 'play' && e.p === 1; })[0]; toast((pl ? '<b>Rival: ' + esc(OH.card(pl.id).name) + '</b>' + esc(OH.card(pl.id).text) : '<b>Rival</b>') + (pl ? '' : esc(rl.map(function (l) { return l.s.replace(/^Rival /, ''); }).join(' '))), false, Math.max(2200, UI.AIDELAY * 2.2)); }
   return d;
 }
@@ -82,6 +83,8 @@ function pump() {
   }
   UI.busy = false;
   if (p !== 0) return;
+  if (UI.rivalLine && G.phase === 'action' && !G.pending) { toast('<b>Your turn</b>Rival\'s last move: ' + esc(UI.rivalLine), true, 2600); }
+  UI.rivalLine = '';
   if (G.pending) {
     if (G.pending.h === 'place') { closeModal(); closeSheet(); var pd = G.pending.d; if (pd.spaces.length && UI.view.s > 1.05) focusSpace(pd.spaces[0]); coachShow('place'); return; }
     if (G.pending.h === 'choose') return showChoose();
