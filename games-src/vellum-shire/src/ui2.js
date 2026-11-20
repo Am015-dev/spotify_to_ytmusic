@@ -72,7 +72,7 @@ function renderDock(tg) {
     var o = UI.sel.opts, m0 = o[0];
     setPrompt(title(m0));
     var pv = preview(m0); if (pv) det = '<b>' + pv + '</b>';
-    if ((m0.t === 'take' || m0.t === 'buy' || m0.t === 'grab') && !pv) det = shortFx(T(m0.tile));
+    if ((m0.t === 'take' || m0.t === 'buy' || m0.t === 'grab') && !pv) det = 'To storage. Placed: ' + shortFx(T(m0.tile), 5);
     if (m0.t === 'place') { var t0 = T(P(s).sto[m0.s]); if (!pv && t0.col !== 'K') det = shortFx(t0); }
     acts = o.map(function (m, i) {
       var lbl = o.length === 1 ? 'Do it' : (m.die >= 0 ? 'Use ' : '') + (dieTxt(m) || 'Do it');
@@ -88,9 +88,10 @@ function renderDock(tg) {
     if (tg.skip) acts += '<button class="btn" data-a="skip">Skip</button>';
     if (tg.end) acts += '<button class="btn go" data-a="end">End turn</button>';
   }
+  if (det && innerHeight < 620 && UI.sel) { $('#prompt').textContent += ': ' + det.replace(/<[^>]+>/g, '').replace(/^To storage\. Placed: .*/, 'to storage'); det = ''; }
   $('#detail').innerHTML = det; $('#acts').innerHTML = acts;
 }
-function shortFx(t) { var f = VS.tileFx(t), w = f.split(' '); return w.length <= 8 ? f : w.slice(0, 7).join(' ').replace(/[,.:]$/, '') + '\u2026'; }
+function shortFx(t, n) { n = n || 8; var f = VS.tileFx(t), w = f.split(' '); return w.length <= n ? f : w.slice(0, n - 1).join(' ').replace(/[,.:]$/, '') + '\u2026'; }
 // ---------- input
 function bindBoard() {
   document.addEventListener('click', function (e) {

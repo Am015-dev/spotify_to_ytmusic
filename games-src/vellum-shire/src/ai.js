@@ -42,7 +42,7 @@ var VSAI = (function () {
   function endLore(G, s, n) { var f = E.final(G, s); var P = G.p[s]; var save = P.lore; P.lore = [n]; var x = E.final(G, s).lore; P.lore = save; return x; }
   function turnOver(G0, G1, s) { return G1.over || E.side(G1) !== s || (G1.p[s].used[0] && G1.p[s].used[1] && !G1.pend.length); }
   function prune(G, ms, wkCap) { return ms.filter(function (m) { return !(m.w > wkCap); }); }
-  var budget = 0;
+  var budget = 0, NOISE = 0;
   function best(G, s, depth, lvl) {
     var ms = prune(G, E.validMoves(G), lvl === 'hard' ? 3 : 1);
     var bestV = -1e9, bestM = null;
@@ -54,6 +54,7 @@ var VSAI = (function () {
       if (turnOver(G, g, s) || depth <= 0 || budget <= 0) v = value(g, s);
       else v = best(g, s, depth - 1, lvl).v;
       if (m.w) v -= m.w * 0.15;
+      if (NOISE && depth === 2) v += (Math.random() - 0.5) * NOISE;
       if (v > bestV) { bestV = v; bestM = m; }
     }
     if (!bestM) return { v: value(G, s), m: ms[0] };
@@ -65,7 +66,8 @@ var VSAI = (function () {
     if (ms.length === 1) return ms[0];
     if (ms[0].t === 'start') { var P0 = G.p[s]; return ms.slice().sort(function (a, b) { return startVal(P0, b.h) - startVal(P0, a.h); })[0]; }
     if (lvl === 'simple') return ms[Math.floor(Math.random() * ms.length)];
-    if (lvl === 'easy') {
+    if (lvl === 'easy') { NOISE = 7; budget = 500; var r = best(G, s, 2, 'easy').m; NOISE = 0; return r; }
+    if (lvl === 'oneply') {
       // one step ahead with noise
       var sc = ms.filter(function (m) { return !(m.w > 1); }).map(function (m) { var g = E.clone(G); E.apply(g, m); return { m: m, v: value(g, s) + Math.random() * 6 - (m.w || 0) * 0.5 }; });
       sc.sort(function (a, b) { return b.v - a.v; });

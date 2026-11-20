@@ -42,7 +42,7 @@ function layout() {
   var land = W > H * 1.25 && W < 1100;
   bd.classList.toggle('land', land);
   var stallW = land ? Math.min(W * 0.48, 420) : W;
-  var unit = (stallW - 24) / 7.7, ts = Math.floor(Math.max(22, Math.min(unit - 6, 40, Math.max(26, ((land ? H : H) * (land ? 0.42 : 0.27) - 40) / 2.2))));
+  var unit = (stallW - 24) / 7.7, ts = Math.floor(Math.max(27, Math.min(unit - 6, 40, Math.max(27, ((land ? H : H) * (land ? 0.42 : 0.27) - 40) / 2.2))));
   document.documentElement.style.setProperty('--ts', ts + 'px');
   var ss = Math.max(30, Math.min(44, Math.floor(ts * 1.15)));
   document.documentElement.style.setProperty('--ss', ss + 'px');

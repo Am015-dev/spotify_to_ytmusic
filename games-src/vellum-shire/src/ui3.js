@@ -19,8 +19,8 @@ function showStart() {
 document.addEventListener('click', function (e) {
   var b = e.target.closest('#start [data-s],#start [data-lvl],#start [data-brd],#rs [data-r]'); if (!b) return;
   if (b.dataset.brd) { UI.boards = b.dataset.brd; showStart(); return; }
-  try { localStorage.setItem('vs_seen', '1'); } catch (x) { }
   if (b.dataset.lvl) { UI.lvl = b.dataset.lvl; try { localStorage.setItem('vs_lvl', UI.lvl); } catch (x) { } showStart(); return; }
+  try { localStorage.setItem('vs_seen', '1'); } catch (x) { }
   var a = b.dataset.s || b.dataset.r;
   if (a === 'cont') { var o = loadSave(); if (o) { G = o.G; UI.mode = o.mode; UI.lvl = o.lvl; UI.human = o.human; UI.started = true; UI.view = 0; UI.busy = false; $('#start').hidden = true; G.ev = []; render(); flow(); } return; }
   if (a === 'vs') newGame('vs', { lvl: UI.lvl, boards: UI.boards });

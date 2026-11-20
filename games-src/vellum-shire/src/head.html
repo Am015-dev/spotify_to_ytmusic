@@ -34,7 +34,7 @@ button{font:inherit;color:inherit}
 #detail:empty{display:none}
 #detail b{color:var(--ink)}
 #acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-#acts:empty{display:none}
+#acts{min-height:46px}
 .btn{appearance:none;min-height:44px;min-width:44px;padding:6px 14px;border-radius:10px;border:1.5px solid var(--ink2);background:#fffaf0;color:var(--ink);font:700 1rem var(--fb);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .btn.go{background:linear-gradient(#f6dc84,#c9972b 60%,#a77a1f);border-color:#6b4a12;color:#2b1d10;box-shadow:0 1px 0 #fff8 inset,0 2px 4px #0004}
 .btn.red{background:var(--verm);border-color:#6d140f;color:#fff8e8}
@@ -53,8 +53,8 @@ button{font:inherit;color:inherit}
 #stalls{display:flex;gap:3px;justify-content:center;width:100%;flex:0 0 auto;position:relative;z-index:1}
 .stall{flex:1 1 0;max-width:62px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 1px 3px;border-radius:8px;background:rgba(255,250,235,.55);border:1px solid rgba(90,65,38,.35)}
 .stall.blk{flex:1.7 1 0;max-width:96px;background:linear-gradient(#3a2a1c,#21170e);border-color:#000;color:var(--parch)}
-.stall .sh{display:flex;align-items:center;justify-content:center;height:20px}
-.stall .sh svg{width:20px;height:20px}
+.stall .sh{display:flex;align-items:center;justify-content:center;height:26px}
+.stall .sh svg{width:26px;height:26px}
 .stall .sh b{font:400 .8rem var(--fh);color:var(--gold1);white-space:nowrap}
 .stall .tl{display:flex;flex-direction:column;gap:2px;align-items:center;width:100%;min-height:calc(2 * var(--ts) + 2px)}
 .stall.blk .tl{flex-direction:row;flex-wrap:wrap;justify-content:center;width:100%;gap:1px}
@@ -117,15 +117,15 @@ button{font:inherit;color:inherit}
 /* fx layer */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:30}
 .fly{position:fixed;left:0;top:0;transition:transform .55s cubic-bezier(.3,.7,.3,1),opacity .55s;z-index:31;will-change:transform}
-.pop{position:fixed;font:700 22px var(--fh);color:var(--verm);text-shadow:0 0 3px #fff8e0,0 0 6px #fff8e0;animation:pop 1.3s ease-out 1 forwards;white-space:nowrap;transform:translate(-50%,-50%)}
+.pop{position:fixed;font:700 20px var(--fh);color:var(--verm);background:#fbf1d6;border:2px solid var(--gold2);border-radius:10px;padding:2px 10px;box-shadow:0 3px 10px #0006;animation:pop 1.3s ease-out 1 forwards;white-space:nowrap;transform:translate(-50%,-50%)}
 .pop.gold{color:#8a5a08;font-size:26px}
 @keyframes pop{0%{opacity:0;margin-top:6px}15%{opacity:1}70%{opacity:1;margin-top:-26px}100%{opacity:0;margin-top:-38px}}
 #banner{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:35;pointer-events:none;opacity:0;text-align:center}
 #banner.on{animation:ban 1.9s ease-out 1 forwards}
-#banner .bi{background:linear-gradient(#fbf1d6,#ecd8a8);border:3px double var(--gold2);border-radius:12px;padding:10px 22px;box-shadow:0 8px 30px #0008;color:var(--ink)}
+#banner .bi{background:linear-gradient(#fbf1d6,#ecd8a8);opacity:1;border:3px double var(--gold2);border-radius:12px;padding:10px 22px;box-shadow:0 8px 30px #0008;color:var(--ink)}
 #banner .bi b{display:block;font:400 1.6rem var(--fh);color:var(--verm)}
 #banner .bi span{font:700 1rem var(--fb)}
-@keyframes ban{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+@keyframes ban{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}8%{opacity:1;transform:translate(-50%,-50%) scale(1)}88%{opacity:1}100%{opacity:0}}
 /* overlays */
 .ov{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#4a2c18,#1c0f07);padding:12px;overflow:auto}
 .ov[hidden]{display:none}

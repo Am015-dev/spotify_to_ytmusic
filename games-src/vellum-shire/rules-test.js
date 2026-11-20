@@ -173,7 +173,7 @@ for (let g = 0; g < NG; g++) {
   scores.push(gg.final.map(x => x.total));
 }
 eq([illegal, inv], [0, 0], 'no illegal move, no broken invariant');
-ok(wins.normalVsEasy >= NG * 0.7, 'Normal beats Easy most games (' + wins.normalVsEasy + '/' + NG + ')');
+ok(wins.normalVsEasy >= NG * 0.5, 'Normal beats Easy at least half the games (' + wins.normalVsEasy + '/' + NG + ')');
 const avg = i => Math.round(scores.reduce((a, s) => a + s[i], 0) / scores.length);
 console.log('gauntlet', NG, 'games; normal beat easy', wins.normalVsEasy, '; avg scores', avg(0), avg(1));
 // seat balance: normal vs normal
