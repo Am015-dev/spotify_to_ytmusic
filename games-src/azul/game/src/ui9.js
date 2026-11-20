@@ -24,9 +24,11 @@ html.bf-land .bf-say{font-size:15px}
 .bf-table{position:relative;flex:1;min-height:0;margin:2px 6px 0}
 .bf-side{flex:none;display:flex;flex-direction:column;align-items:center;padding:0 6px 6px;position:relative;z-index:1}
 html.bf-land .bf-mid{flex-direction:row}
+html:not(.bf-land) .bf-line{position:absolute;left:0;right:0;top:-30px;height:28px;pointer-events:none;z-index:2}html:not(.bf-land) .bf-line button,html:not(.bf-land) .bf-line .bf-bw{pointer-events:auto}
+html:not(.bf-land) .bf-line .bf-say{background:rgba(10,20,50,.78);padding:2px 12px;border-radius:14px;font-size:15px}
 html.bf-land .bf-table{margin:4px 0 4px 6px}
 html.bf-land .bf-side{justify-content:center;padding:4px 8px}
-.bf-line{height:44px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:100%}
+.bf-line{height:34px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:100%}
 .bf-say{display:flex;align-items:center;gap:6px;min-width:0;flex:0 1 auto;overflow:hidden;font:800 17px var(--ff);color:#fff1c8;text-shadow:0 1px 2px #000;white-space:nowrap}
 .bf-say>span{overflow:hidden;text-overflow:ellipsis}
 .bf-tipl{color:#ffe08a;font-size:15px;white-space:normal;line-height:1.1;animation:bfTipIn .3s}
@@ -78,10 +80,11 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
 .bf-floor .bf-fl{padding:1px;border-radius:8px}
 .bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
-.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 max(13px,calc(var(--cs)*.42)) var(--ff);color:#a8302a}
+.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 max(15px,calc(var(--cs)*.5)) var(--ff);color:#8f2118}
+.bf-floor{padding:3px 4px;background:rgba(168,73,58,.14);border-radius:10px}
 .bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
 .bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
-.bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}
+.bf-fll{font:800 14px var(--ff);color:#8a3a22}
 .bf-t.cr::after{content:'';position:absolute;inset:0;background:no-repeat center/100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23fff' stroke-width='6' fill='none' stroke-linejoin='round'/%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23000' stroke-opacity='.5' stroke-width='2' fill='none'/%3E%3C/svg%3E")}
 .bf-t.crash{animation:bfCrash .6s cubic-bezier(.3,.6,.4,1)}
 @keyframes bfCrash{0%{transform:translateY(-40%) rotate(-8deg)}35%{transform:translateY(8%) rotate(10deg) scale(1.08)}55%{transform:translateX(-10%) rotate(-9deg)}75%{transform:translateX(6%) rotate(5deg)}100%{transform:none}}
@@ -92,9 +95,12 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-k::before{content:'';position:absolute;inset:9%;border-radius:50%;border:1.5px dashed rgba(255,230,180,.45)}
 .bf-k.can{box-shadow:0 0 0 3px #ffd66b,0 0 0 5px #7a4a20,0 0 18px 4px rgba(255,214,107,.6)}
 .bf-k.empty{opacity:.55}
-.bf-pool{position:absolute;border-radius:46%;background:radial-gradient(ellipse at 50% 45%,#f6e6c4,#e0c08e 70%,#c99a62);box-shadow:inset 0 0 0 3px #a0703e,inset 0 0 18px rgba(120,70,20,.4),0 4px 12px rgba(0,0,0,.45);cursor:pointer}
-.bf-pool::after{content:'';position:absolute;inset:12%;border-radius:50%;background:repeating-conic-gradient(rgba(160,100,40,.18) 0 8deg,transparent 8deg 22.5deg);pointer-events:none}
+.bf-pool{position:absolute;border-radius:18%;background:radial-gradient(ellipse at 50% 45%,#5d8f9c,#3f6e7d 72%,#2e5563);box-shadow:inset 0 0 0 3px #9fd0d6,inset 0 0 0 5px #1f4250,inset 0 0 18px rgba(0,30,40,.5),0 4px 12px rgba(0,0,0,.45);cursor:pointer}
+.bf-pl{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:2px;white-space:nowrap;font:800 13px var(--ff);color:#d8f1f2;text-shadow:0 1px 2px #000;pointer-events:none;letter-spacing:.02em}
+.bf-pool::after{content:'';position:absolute;inset:10%;border-radius:12%;border:2px dashed rgba(216,241,242,.3);pointer-events:none}
 .bf-pool.can{box-shadow:inset 0 0 0 3px #ffd66b,0 0 18px 4px rgba(255,214,107,.55)}
+.bf-say.thk>span::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:bfDots 1s steps(4) infinite;overflow:hidden;vertical-align:bottom}
+@keyframes bfDots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 .bf-table .bf-t{transition:transform .22s cubic-bezier(.3,1.6,.5,1),opacity .2s,filter .2s}
 .bf-table .bf-t.up{transform:translateY(-16%) scale(1.2);z-index:4;filter:drop-shadow(0 0 6px #fff7b0) drop-shadow(0 6px 4px rgba(0,0,0,.5))}
 .bf-table .bf-t.nud{transform:translate(var(--nx),var(--ny)) scale(.9);opacity:.6}
@@ -168,7 +174,7 @@ function bfClone(g){return JSON.parse(JSON.stringify({fac:g.fac,ctr:g.ctr,marker
 const bfFocus=()=>{try{return focusSeat()}catch(e){return 0}};
 // ---------- timing: tap anywhere during an animation to speed it up ----------
 function bfAnimOK(){return !!ANIM&&typeof Element!=='undefined'&&!!Element.prototype.animate&&!/jsdom/i.test(navigator.userAgent)}
-function bfD(ms){return ms*(BF.fast?.22:BF.tile&&!UI.tut?.3:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
+function bfD(ms){return ms*(BF.actor>=0&&BF.busy&&BF.actor!==bfFocus()&&!UI.tut?.6:1)*(BF.fast?.22:BF.tile&&!UI.tut?.3:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
 function bfWait(ms){return bfAnimOK()&&ms>0?new Promise(r=>setTimeout(r,bfD(ms))):Promise.resolve()}
 function bfTrack(a){BF.anims.push(a);if(BF.fast)a.playbackRate=4;const done=()=>{const i=BF.anims.indexOf(a);if(i>=0)BF.anims.splice(i,1)};a.finished.then(done,done);return a}
 function bfSpeedUp(){if(BF.fast)return;BF.fast=true;for(const a of BF.anims)try{a.playbackRate=4}catch(e){}}
@@ -209,7 +215,7 @@ function bfBanTap(){const d=BF.banOn;if(d&&d.__end&&Date.now()-(d.__t0||0)>0)d._
 function bfTurn(t){BF.say=t;try{bfDraw()}catch(e){}}   // the instruction line announces the turn (a floating pill failed the text-topmost check and covered the score chips)
 // one idea at a time, in two short lines at most, above the action (guided game only, each once)
 const BF_TIPS={nofit:'Red ✗ colours fit no rack.',slide:'Leftovers slid to the middle.',tiling:'Each full rack sends one tile to the wall!',chain:'Touching tiles score more!',
-  floor:'Extra tiles break: minus points.',sun:'☀ takes a floor space, but you start next.',bonus:'Full column +7 at the end!',
+  floor:'Extra tiles break: minus points.',sun:'☀ is the start tile: −1 on your floor, but you go first next round.',bonus:'Full column +7 at the end!',
   end:'A full wall row ends the game.',keep:'Unfinished racks wait for next round.'};
 function bfTipSeen(k){try{return (localStorage.getItem('sgz_tips')||'').split(',').includes(k)}catch(e){return false}}
 function bfTipMark(k){try{const a=(localStorage.getItem('sgz_tips')||'').split(',').filter(Boolean);if(!a.includes(k)){a.push(k);localStorage.setItem('sgz_tips',a.join(','))}}catch(e){}}
@@ -322,9 +328,9 @@ async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
 function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
   r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-line" aria-live="polite" data-fa-skip></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
   document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-line');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
-  r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
+  r.addEventListener('click',bfClick);r.addEventListener('pointerdown',e=>{bfBanTap();try{if(!BF.busy&&aiTimer&&G&&!G.over&&!UI.pause&&!UI.modal&&!UI.tut&&!BF.menu&&BF.peek==null&&!e.target.closest('button,[data-bf],[data-gx]')){const s=sideToAct();if(s>=0&&!P(s).human&&!NET.on){clearTimeout(aiTimer);aiTimer=null;const m=aiMove(s);if(m)go(m)}}}catch(er){}if(BF.busy)bfSpeedUp();else bfDragDown(e)});return r}
 function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
-  let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,Math.max(46,Math.min(62,H/14))):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
+  let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,Math.max(46,Math.min(62,H/14))):Math.min((W-52)/10.45,(H-44-44)*.40/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
   const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
 function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),Math.max(130,Math.min(W,H)*.3)));   // W466: big kilns on big screens
   const ax=Math.max(10,W/2-ks/2-12),ay=Math.max(10,H/2-ks/2-6);/* F1: 12px side margin keeps side kilns and their hit boxes inside the frame */const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
@@ -332,7 +338,7 @@ function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.
 function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
   const am=can&&UI.coach&&UI.cmp&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
-  let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
+  let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"><span class="bf-pl" data-fa-skip>Middle</span></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
     h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
     a.forEach((t,k)=>{const key=`f${i}_${k}`;const tight=Math.max(ts,44)>ts*1.12,off=tight?R.ks/4:.56*ts;const x=(k%2?off:-off),y=(k<2?-off:off);const hs=Math.max(44,tight?R.ks/2:ts);   // F1: always a 44px hit box (boxes may overlap on small kilns; bfClick takes the tile nearest the tap)   // small kilns: the four hit boxes are the kiln's quadrants, never overlapping (a 44px box on a 20px pitch covered its neighbours)
@@ -372,16 +378,16 @@ function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
   return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points">${(()=>{const pc=!isYou(p.i)&&typeof sgPicOf==='function'&&sgPicOf(p.nm);return pc?`<i class="pic" style="background-image:url(media/${pc})"></i>`:'<i></i>'})()}<b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?`<em>${bfSun()}</em>`:''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><span class="bf-sack" title="Tiles left in the clay sack" aria-label="${G.bag.length} tiles left in the sack"><i class="sg-back" aria-hidden="true"></i><b>${G.bag.length}</b></span><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
-function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
+function bfHintHTML(S,hp){let say='',chip='',tg='',thk='';const live=!BF.busy;
   if(!live)say=BF.say||'';
   else if(G.over)say=bfWinLine();
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing rack';
     const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-gxh-avoid data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
   else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':'Your turn: tap a colour');}
-  else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
+  else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):'';if(s>=0&&!P(s).human)thk=' thk'}
   if(BF.tip){say=BF.tip;chip='';tg=''}
-  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-gxh-avoid data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<span class="bf-bw" data-gxh-avoid><button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button></span>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-gxh-avoid data-bf="res">Result</button>`:''}`}
+  return `<span class="bf-say${BF.tip?' bf-tipl':''}${thk}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-gxh-avoid data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over&&!UI.tut?`<span class="bf-bw" data-gxh-avoid><button class="bf-ib bf-bulb gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?"></button></span>`:''}${live&&G.over&&BF.resHide&&!UI.tut?`<button class="bf-b" data-gxh-avoid data-bf="res">Result</button>`:''}`}
 function bfOvHTML(){if(!G)return '';
   if(BF.boss&&UI.cmp&&UI.cmp.twist)return `<div class="bf-card bf-bosscard" role="dialog" aria-label="Rule"><b>${esc(UI.cmp.twist.text||'')}</b><button class="bf-go" data-bf="close">Got it</button></div>`;
   if(BF.busy)return '';
@@ -392,7 +398,7 @@ function bfOvHTML(){if(!G)return '';
     return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="sg-endart ${you?'win':'lose'}" aria-hidden="true"></div><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
       <div class="bf-rk"><span>tiles</span><span>floor</span><span>bonus</span></div>
       ${L.map(r=>{const p=P(r.p),s=r.s;const bon=s.rows+s.cols+s.colours;return `<div class="bf-rr" style="--pc:${PCOL[r.p]}"><i></i><b>${isYou(r.p)?'You':esc(p.nm)}</b><span class="g">+${s.place}</span><span class="r">${s.floor?String(s.floor).replace('-','−'):'0'}</span><span class="g">${bon?'+'+bon:''}</span><b class="t">★${s.total}</b></div>`}).join('')}
-      <div class="bf-btns">${isClient()?'':'<button class="bf-go" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
+      <div class="bf-btns">${isClient()?'':(you&&!NET.on&&G.pl.every(q=>q.human||q.lv==='easy')&&G.pl.some(q=>!q.human)?'<button class="bf-go" data-a="trynormal">Try Normal</button>':'')+'<button class="bf-go'+(you&&!NET.on&&G.pl.every(q=>q.human||q.lv==='easy')?' ghost':'')+'" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
   return ''}
 function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.classList.add('empty');BF.top.innerHTML='';BF.tbl.innerHTML='';BF.me.innerHTML='';BF.hint.innerHTML='';BF.ov.hidden=true;bfFinger(null);return}
   BF.root.classList.remove('empty');if(!BF.busy)BF.root.classList.remove('tapfx');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
@@ -415,7 +421,7 @@ function bfGuide(hp){clearTimeout(BF.idleT);
   if(hp&&!G.over&&(guided||BF.fingerOn))bfFinger(bfFingerTarget(hp));else bfFinger(null);
   if(hp&&!G.over&&!BF.fingerOn&&!guided)BF.idleT=setTimeout(()=>{if(!BF.busy&&me()){BF.fingerOn=true;bfDraw()}},UI.coach?9000:16000);
   if(hp&&G.phase==='offer'&&!G.over){try{if(!UI.tut&&phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
-    if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
+    if(G.markerIn==='ctr')bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
 // ---------- input: everything is a tap on the thing itself ----------
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
