@@ -382,7 +382,7 @@ function actModel(v) {
     case 'distress': {
       if (!must) { M.p = who === 'You' ? 'Use the flare?' : who + ' decides on the flare…'; return M; }
       M.cls = 'mine'; const lit = G.distress;
-      M.p = lit ? 'Pass cards again?' : 'Light the flare? Everyone passes one card to a neighbour. +1 attempt.';
+      M.p = lit ? 'Pass cards again?' : 'Light the flare? Pass 1 card, +1 attempt.';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
       const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light it', 'dist', { on: true, dir: 1, cls: 'alt' });
       else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
@@ -390,7 +390,7 @@ function actModel(v) {
     }
     case 'pass': {
       if (!must || !mv.length) { M.p = 'Waiting for the others…'; return M; }
-      M.cls = 'mine'; M.p = 'Tap one card to pass. Keep the cards your jobs need.'; return M;
+      M.cls = 'mine'; M.p = 'Pass a card your jobs do not need.'; return M;
     }
     case 'predict': {
       if (!must || !mv.length) { M.p = who + ' is predicting…'; return M; }

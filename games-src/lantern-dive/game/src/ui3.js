@@ -19,6 +19,8 @@ function resetUI(mode, cfg) {
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
+/* F2: the Goal pop-up shows until the first dive is logged, then never again */
+function goalKnown() { try { return Object.keys(Prog.load().done || {}).length > 0; } catch (e) { return false; } }
 function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, { mission: startDive() }, UI.opt || {}, o);
@@ -45,7 +47,7 @@ function newGame(mode, o) {
   UI.news = [];
   UI.coach = { level: mode === 'tutorial' || !UI.prefs.hints ? 'off' : 'light', seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
-  if (mode === 'vs' && !NET.on && !o.noGoal && !lsGet('ld_goal_seen')) { lsSet('ld_goal_seen', '1'); UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg(); }
+  if (mode === 'vs' && !NET.on && !o.noGoal && !goalKnown()) { UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg(); }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function tutorialStack() {
