@@ -53,7 +53,7 @@ function dashOff(W, H) { return W < 500 && H < 420; }   /* short phone boards (3
 function dashH(W, H) { return H > 240 && !dashOff(W, H) ? dashR(W, H) * 2 + 18 : 0; }
 function raceHud(now, W, H) {
   if (!G) return; var c = G.cars[UI.focus] || G.cars[0];
-  RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.08);
+  RACE.spd += (RACE.spdT - RACE.spd) * ((UI.fast || window.ANIM === false) ? 1 : 0.25); if (Math.abs(RACE.spdT - RACE.spd) < 0.4) RACE.spd = RACE.spdT;   /* F5: one source of truth: the needle snaps onto the number */
   /* leaderboard, top-left */
   var rk = rankList(G), fs = W < 500 ? 13 : 15, showLb = hintsOn() && W >= 500 && !pcWide();   /* F4: PC has a standings side panel */   /* phones: standings live in the Place chip (tap it), nothing over the track */
   if (showLb) { rh = fs + 7, bw = W < 500 ? 104 : 150, n = rk.length;
@@ -73,7 +73,7 @@ function raceHud(now, W, H) {
     cx.lineWidth = R * 0.18; cx.lineCap = 'butt'; cx.strokeStyle = '#2a3140'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a1); cx.stroke();
     cx.strokeStyle = f > 0.7 ? '#ff4d3a' : f > 0.45 ? '#ffb347' : '#3ddc84'; cx.beginPath(); cx.arc(ox, oy, R * 0.86, a0, a0 + (a1 - a0) * f); cx.stroke();
     var na = a0 + (a1 - a0) * f; cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.lineCap = 'round'; cx.beginPath(); cx.moveTo(ox, oy); cx.lineTo(ox + Math.cos(na) * R * 0.7, oy + Math.sin(na) * R * 0.7); cx.stroke();
-    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spd)), ox, oy + R * 0.42);
+    cx.fillStyle = '#fff'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '900 ' + Math.round(R * 0.5) + 'px sans-serif'; cx.fillText(String(Math.round(RACE.spdT)), ox, oy + R * 0.42);
     cx.font = '700 ' + Math.max(10, Math.round(R * 0.28)) + 'px sans-serif'; cx.fillStyle = '#9aa6bb'; cx.fillText('SPEED', ox, oy - R * 0.28);
     /* gear lever: H-gate 1-2 / 3-4, the knob sits in the current gear */
     var gx = bx + R * 2 + 18, gw = R * 1.1, gy = by + 8 + R * 0.26, gh = R * 2 - 4 - R * 0.52, gear = (G.phase === 'plan' && c.i === UI.seat && !c.plan && !UI.busy) ? UI.gear : c.gear;   /* lever follows the gear you pick */

@@ -230,11 +230,11 @@ function sugWhy(c, p) {   /* the suggested plan's reason, from the same numbers 
 }
 function legNew(seen, k) { if (UI.legG !== G) { UI.legG = G; UI.legId = Date.now() % 1e6; } var r = G.round + '|' + UI.legId; if (!seen[k]) seen[k] = []; if (seen[k].indexOf(r) < 0) { if (seen[k].length >= 4) return false; seen[k].push(r); lsSet('rr_leg', JSON.stringify(seen)); } return true; }
 function tradeLine(ci) {   /* F3: before Go, the trade-off in plain numbers: you'd go X, limit Y, costs Z heat */
-  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? Math.min.apply(null, ci.ks.map(function (k) { return k.limit; })) : 0, c = you(), fl = total(G) - c.pos;
+  var sp = 'Speed ' + (ci.uncertain ? 'about ' : '') + ci.sp, lim = ci.ks.length ? Math.min.apply(null, ci.ks.map(function (k) { return k.limit; })) : 0, c = you(), fl = total(G) - c.pos, tt = ci.ks.slice().sort(function (a, b) { return a.limit - b.limit; })[0], cw = tt ? (ci.ks.length > 1 ? 'tightest limit ' : 'corner ' + Math.max(1, tt.p - c.pos) + ' ahead, limit ') : 'limit ';   /* F5: say which corner */
   if (fl <= ci.sp + ci.adr) return { t: sp + ' · crosses the finish line! Go!', k: 'good' };
   if (ci.ks.length > 1) sp += ' · ' + ci.ks.length + ' corners';
-  if (ci.spin) return { t: sp + ' · limit ' + lim + ' · spin out!', k: 'warn' };
-  if (ci.ks.length) return { t: sp + ' · limit ' + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
+  if (ci.spin) return { t: sp + ' · ' + cw + lim + ' · spin out!', k: 'warn' };
+  if (ci.ks.length) return { t: sp + ' · ' + cw + lim + (ci.burn ? ' · costs ' + ci.burn + ' heat' : ' · no heat. Go!'), k: ci.burn ? 'warn' : 'good' };
   return { t: sp + (fl <= 14 ? ' · finish in ' + fl : ci.next ? ' · corner ' + ci.next.limit + ' in ' + ci.next.d : '') + ' · safe. Go!', k: 'good' };
 }
 function cardLegend(hand) {   /* F3: one plain line per dead card type in your hand, for the first rounds it is there (then the board gets the room back) */
@@ -456,7 +456,7 @@ function camToPlan() {   /* R24: called the moment the planning panel is drawn, 
   cvFit(); var pf = planFrame(); if (!pf) return; var cam = UI.cam; cam.x = pf.x; cam.y = pf.y; cam.s = pf.s; camClamp(cam, UI.W, UI.H);
   UI.camCut = performance.now(); UI.camPlan = true; UI.camVK = UI.W + 'x' + UI.H;
 }
-function H0dash() { return UI.H < 420 ? dashH(UI.W, UI.H) : 0; }
+function H0dash() { return dashH(UI.W, UI.H); }   /* F5: the dashboard owns a strip below the board on every size, so it never covers a corner sign */
 function cvFit() { if (G && $('#cvw')) { var r = $('#cvw').getBoundingClientRect(); if (r.width >= 2 && r.height >= 2 && (Math.abs(r.width - (UI.W || 0)) > .5 || Math.abs(r.height - (UI.H || 0)) > .5 || dpr !== Math.min(2, window.devicePixelRatio || 1))) sizeCanvas(); } }
 window.addEventListener('resize', cvFit); window.addEventListener('orientationchange', function () { setTimeout(cvFit, 120); });
 if (window.ResizeObserver) { var cvRO = new ResizeObserver(cvFit); document.addEventListener('DOMContentLoaded', function () { var w = $('#cvw'); if (w) cvRO.observe(w); }); if (document.readyState !== 'loading') { var w0 = $('#cvw'); if (w0) cvRO.observe(w0); } }
@@ -509,7 +509,7 @@ function drawFrame0(now) {
   cam.x += (tgt.x - cam.x) * k; cam.y += (tgt.y - cam.y) * k;
   var sT = pf ? pf.s : (UI.camBase || cam.s); cam.s += (sT - cam.s) * k; UI.planCorner = pf ? pf.corner : -1; camClamp(cam, W, H);   /* zoomed out past the board (planning frame): centred, grass around */
   cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.fillStyle = '#245c37'; cx.fillRect(0, 0, W, H);
-  var shk = camShake(now), dOff = H < 420 ? dashH(W, H) / 2 : 0;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
+  var shk = camShake(now), dOff = dashH(W, H) / 2;   /* 0 when the dashboard lives in the dock (dashOff) */ cx.save(); cx.translate(W / 2 + shk, H / 2 - dOff + shk * 0.5);   /* short boards: your car sits in the middle of the part above the dashboard */ cx.scale(cam.s, cam.s); cx.translate(-cam.x, -cam.y);
   if (!artDraw(cx, 'track-' + G.track, 0, 0, 2000, 1200, 'cover')) cx.drawImage(trackLayer(G.track), 0, 0, 2000, 1200);
   cx.drawImage(sceneryLayer(G.track), 0, 0, 2000, 1200);
   /* corner signs */
@@ -546,7 +546,7 @@ function drawFrame0(now) {
     var ms = o.hold ? 300 : now - o.t, age = ms / POPMS; if (age > 1 || age < 0) return; var q = tk.space(o.p, 0), wy = q.y - 50 - Math.min(1, ms / 400) * 30;
     var sp = inv.transformPoint(popT.transformPoint(new DOMPoint(q.x, wy))), fs = Math.max(20, Math.min(30, 34 * zoom)), ah = fs * 2;
     cx.font = '900 ' + fs + 'px sans-serif'; var tw = cx.measureText(o.txt).width + 10, x = Math.max(6 + tw / 2, Math.min(W - 6 - tw / 2, sp.x)), y = Math.max(fs + 8 + (o.stem ? ah : 0), Math.min(H - 8, sp.y));
-    var hw2 = Math.max(tw, o.stem ? ah * 1.4 : 0) / 2; y = Math.min(y, H - dashH(W, H) - 6);   /* never on the dashboard or its corner signs */
+    var hw2 = Math.max(tw, o.stem ? ah * 1.4 : 0) / 2; y = Math.min(y, H - dashH(W, H) - 6); y = Math.max(y, fs + 6 + (o.stem ? ah : 0));   /* never on the dashboard or its corner signs; F5: and never cut off at the top */
     if (x + hw2 > mx - 4 && y - fs - (o.stem ? ah : 0) < my + mh + 6) y = my + mh + 10 + fs + (o.stem ? ah : 0);   /* never on the minimap (text or its picture) */
     cx.globalAlpha = age < 0.75 ? 1 : Math.max(0, 1 - (age - 0.75) / 0.25);
     if (o.stem) artDraw(cx, o.stem, x - ah * 0.7, y - fs - ah, ah * 1.4, ah, 'contain');

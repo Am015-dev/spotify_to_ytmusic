@@ -58,7 +58,7 @@ function tutPlan(r) { return function () { return !!G && G.phase === 'plan' && G
 function tutSpot() {   /* a small box over the next corner sign on the board, so the bubble points at it and sits beside it */
   var w = $('#cvw'), s = $('#tutSpot'); if (!w || !G) return null; if (!s) { s = document.createElement('div'); s.id = 'tutSpot'; w.appendChild(s); }
   var me = G.cars[UI.seat], nc = nextCorner(me.pos), tk = T(G), cam = UI.cam; if (!nc) return null;
-  var a = tk.at(((me.pos + nc.d) % tk.N) * tk.seg), q = { x: a.x + Math.sin(a.a) * 98, y: a.y - Math.cos(a.a) * 98 }, dO = UI.H < 420 ? dashH(UI.W, UI.H) / 2 : 0;
+  var a = tk.at(((me.pos + nc.d) % tk.N) * tk.seg), q = { x: a.x + Math.sin(a.a) * 98, y: a.y - Math.cos(a.a) * 98 }, dO = dashH(UI.W, UI.H) / 2;
   var x = Math.max(24, Math.min(UI.W - 24, (q.x - cam.x) * cam.s + UI.W / 2)), y = Math.max(24, Math.min(UI.H - 24, (q.y - cam.y) * cam.s + UI.H / 2 - dO));
   s.style.cssText = 'position:absolute;pointer-events:none;width:48px;height:48px;left:' + (x - 24) + 'px;top:' + (y - 24) + 'px'; return s;
 }
