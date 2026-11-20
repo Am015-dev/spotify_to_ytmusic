@@ -108,6 +108,25 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
       ok(fired === info.btns.length, `${tag} every chip's tap fires (sheet opens; ready ones used from it) (${fired}/${info.btns.length})`);
       if (process.env.SHOTS) await p.screenshot({ path: `${process.env.SHOTS}/dock-${w}x${h}-many-${C.n}.png` });
     }
+    // F13 (R69 P2): with 5 chips held, (a) a selected hidden ruin keeps the prompt at 2 lines and the map >= 150 px, (b) a one-button chooser
+    // (upgrade an assistant) is a dock button and never squeezes the board, (c) a free card left means the prompt never says "Nothing left to do"
+    { await p.evaluate(() => { const me = G.p[UI.view]; G.turn = UI.view; G.q = null; me.passed = false; const gs = V.GUARDS.filter(g => !V.GUARD[g].tv), fr = V.ASST.filter(a => !a.main);
+        me.guards = [{ id: gs[0], used: false }, { id: gs[1], used: false }]; me.idols = [{ id: V.IDOLS[0], used: false }, { id: V.IDOLS[1], used: false }]; me.asst = [{ id: fr[0].id, ex: false }];
+        me.res = { coin: 9, compass: 9, tablet: 9, arrow: 9, jewel: 9 }; UI.sel = null; closeInsp(); render(); });
+      await sleep(200);
+      const ruin = await p.evaluate(() => { const L = VG.moves(G), m = L.find(x => x.t === 'disc'); if (!m) return null; const el = moveTarget(m); if (!el) return null; const q = el.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; });
+      if (ruin) { await p.touchscreen.tap(ruin.x, ruin.y); await sleep(300);
+        const r = await p.evaluate(() => { const pr = document.querySelector('#prompt'), lh = parseFloat(getComputedStyle(pr).lineHeight) || 16, mp = document.querySelector('#map').getBoundingClientRect(); return { lines: Math.round(pr.clientHeight / lh), txt: pr.textContent, mapH: Math.round(mp.height), sel: !!UI.sel, sq: document.body.classList.contains('vg-squeeze') }; });
+        ok(r.sel && (h > 640 || r.lines <= 2) && r.mapH >= 150 && !r.sq, `${w}x${h} 5 chips, ruin selected: prompt ${r.lines} lines "${r.txt}", map ${r.mapH} px`);
+        await p.evaluate(() => { UI.sel = null; render(); }); } else ok(false, `${w}x${h}: no hidden ruin to select`);
+      const ch = await p.evaluate(() => { const me = G.p[UI.view]; me.apend = 0; me.upend = 1; me.asst.forEach(a => a.gold = false); G.q = { h: 'asst', seat: UI.view, ops: [], main: null, d: {} }; render();
+        const mp = document.querySelector('#map').getBoundingClientRect(), qb = document.querySelector('#qbox'); return { mapH: Math.round(mp.height), sq: document.body.classList.contains('vg-squeeze'), qbox: !!qb && !qb.hidden && qb.offsetHeight > 0, go: (document.querySelector('#pacts #gobtn, #qbox .btn') || {}).textContent || '', prompt: document.querySelector('#prompt').textContent }; });
+      ok(!ch.sq && ch.mapH >= 150, `${w}x${h} 5 chips + upgrade chooser: board not squeezed, map ${ch.mapH} px (button "${ch.go}", prompt "${ch.prompt}", box ${ch.qbox ? 'open' : 'none'})`);
+      const fp = await p.evaluate(() => { const me = G.p[UI.view]; me.upend = 0; G.q = null; me.hand = ['grant']; me.ex = 0; me.res = { coin: 0, compass: 0, tablet: 0, arrow: 0, jewel: 0 };
+        me.guards.forEach(g => g.used = true); me.idols.forEach(d => d.used = true); me.asst.forEach(a => a.ex = true); render();
+        const L = VG.moves(G), onlyFree = !L.some(m => m.t !== 'pass' && !m.free), anyFree = L.some(m => m.free && m.t !== 'pass'); return { onlyFree, anyFree, prompt: document.querySelector('#prompt').textContent, glow: !!document.querySelector('#hand .cd.glow') }; });
+      ok(fp.onlyFree && fp.anyFree && !/Nothing left/.test(fp.prompt), `${w}x${h}: only a free card left: prompt "${fp.prompt}" (card glows: ${fp.glow})`);
+      await p.evaluate(() => { G.q = null; render(); }); }
     ok(errs === 0, `${w}x${h} 5-8 chips: no page errors (${errs})`);
     await ctx.close();
   }

@@ -210,7 +210,7 @@ function renderTray(L, q, me, actor) {
   const qb = $('#qbox'); let qh = q ? qHTML(q) : (S && S.k === 'track' ? trackChoices() : '');
   if (q && qh && mine) { const t = document.createElement('div'); t.innerHTML = qh; const bs = t.querySelectorAll('button');   /* F12 (R69 P2): a chooser with one button is a dock button, never a box that squeezes the island */
     if (bs.length === 1 && !t.querySelector('.cd')) { const b = bs[0];
-      if (b.classList.contains('go')) { txt = b.textContent; b.textContent = { asst: me.apend > 0 ? 'Hire' : 'Upgrade', tbon: 'Take it' }[q.h] || 'Take it'; b.setAttribute('aria-label', txt); }
+      if (b.classList.contains('go')) { txt = ({ asst: me.apend > 0 ? 'Hire ' : 'Upgrade: ', tbon: 'Temple bonus: ' }[q.h] || '') + b.textContent;   /* F13: the prompt says what the one button does */ b.textContent = { asst: me.apend > 0 ? 'Hire' : 'Upgrade', tbon: 'Take it' }[q.h] || 'Take it'; b.setAttribute('aria-label', txt); }
       if (!b.id) b.id = 'gobtn'; acts = b.outerHTML + acts; qh = ''; $('#prompt').textContent = txt; $('#pacts').innerHTML = acts; } }
   qb.hidden = !qh; qb.innerHTML = qh;
   const qc = qb.querySelector('.qcards'), qg = qc && qc.querySelector('.cd.glow'); if (qg) qc.scrollLeft = Math.max(0, qg.offsetLeft - qc.offsetLeft - 8);   /* the suggested card is in view (R29: cut at 375) */
