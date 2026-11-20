@@ -12,7 +12,7 @@
       case 'castle': b = 5; break;
       case 'mine': b = 1.5 + 1.0 * phasesLeft; break;
       case 'know': var e = V.KNOWBY[t.k].e; b = e.indexOf('end:') === 0 ? 3 : 2 + 3 * r; break;
-      case 'bld': b = { tower: 4.5, hall: 4.5, mint: 3.5, inn: 3.5, store: 3.5, carp: 3.5, chapel: 3.5, mkt: 3.5 }[t.k]; break;
+      case 'bld': b = { tower: 4, hall: 4.5, mint: 3.5, inn: 3.5, store: 3.5, carp: 3, chapel: 3, mkt: 3 }[t.k]; break;
       case 'pas': b = 1 + t.n * 0.9; break;
       case 'ship': b = 3.5; break;
       default: b = 2;

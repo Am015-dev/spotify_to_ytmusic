@@ -16,14 +16,14 @@ var VB = (typeof VB !== 'undefined') ? VB : {};
   V.ANIMALS = { sheep: 'Sheep', goat: 'Goats', pig: 'Pigs', goose: 'Geese' };
   V.GOODS = ['', 'Wool', 'Cheese', 'Honey', 'Cider', 'Linen', 'Salt'];
   V.BLD = {
-    hall:  { name: 'Moot Hall',      text: 'Place one more tile from your storage at once, on any free space of its colour next to your land (any number).' },
-    carp:  { name: "Joiner's Yard",  text: 'Take any Building tile from a market stall into your storage.' },
-    chapel:{ name: 'Bell Chapel',    text: 'Take a Keep, Mine or Lore tile from a market stall into your storage.' },
-    mkt:   { name: 'Fair Green',     text: 'Take a Barge or Pasture tile from a market stall into your storage.' },
-    inn:   { name: "Drovers' Inn",   text: 'Take 4 workers.' },
-    mint:  { name: 'Counting House', text: 'Take 2 silver.' },
-    tower: { name: 'Beacon Tower',   text: 'Score 4 points.' },
-    store: { name: 'Granary',        text: 'Sell one kind of your goods at once, whatever the dice show.' }
+    hall:  { name: 'Moot Hall',      short: 'Build one more (not a Building)', text: 'Build one more tile from your storage at once, with any number. It can be anything except a Building.' },
+    carp:  { name: "Joiner's Yard",  short: 'Grab from a next stall', text: 'Take any tile from a market stall whose number is one above or one below this space\'s number.' },
+    chapel:{ name: 'Bell Chapel',    short: '2 pts per Lore tile', text: 'Score 2 points for each Lore tile on your land (at least 2).' },
+    mkt:   { name: 'Fair Green',     short: '1 silver per goods kind', text: 'Take 1 silver for each kind of goods you hold (at least 1).' },
+    inn:   { name: "Drovers' Inn",   short: '3 workers + 1 silver', text: 'Take 3 workers and 1 silver.' },
+    mint:  { name: 'Counting House', short: '1 silver + 1 per Mine', text: 'Take 1 silver, plus 1 for each Mine on your land.' },
+    tower: { name: 'Beacon Tower',   short: '2 pts + 1 per Building here', text: 'Score 2 points, plus 1 for each Building in this area (itself included).' },
+    store: { name: 'Granary',        short: 'Sell your biggest pile', text: 'Sell the goods kind you hold the most of at once, whatever the dice show.' }
   };
   V.BLDKEYS = ['hall', 'carp', 'chapel', 'mkt', 'inn', 'mint', 'tower', 'store'];
   /* 26 Lore tiles: each bends one rule for its owner. e = effect key read by the engine. */

@@ -124,15 +124,15 @@ _The estate map, the tile pool and the Lore tiles are our own; the counts and th
 89. Pasture: same animals in a different meadow do not count
 90. Pasture: three placements add up (2, then 2+3, then 2+3+4 = 2 + 5 + 9)
 91. Building: Moot Hall lets you place another stored tile at once on any number
-92. Building: Moot Hall can chain into another Moot Hall
-93. Building: Joiner's Yard takes a Building tile from a stall into storage (not other kinds)
-94. Building: Bell Chapel takes a Keep, Mine or Lore tile (not Barge/Building/Pasture)
-95. Building: Fair Green takes a Barge or Pasture tile (not other kinds)
+92. Building: Moot Hall cannot chain into another Building (only non-Building tiles)
+93. Building: Joiner's Yard takes any tile from the stalls one above or below its number (built on a 1: stalls 2 and 6)
+94. Building: Bell Chapel scores 2 per Lore tile on your land (at least 2)
+95. Building: Fair Green gives 1 silver per goods kind held (at least 1)
 96. Building: the "take a tile" buildings cannot take from the back lane
-97. Building: Drovers' Inn gives 4 workers
-98. Building: Counting House gives 2 silver
-99. Building: Beacon Tower gives 4 points
-100. Building: Granary sells one kind of goods at once, whatever the dice
+97. Building: Drovers' Inn gives 3 workers and 1 silver
+98. Building: Counting House gives 1 silver plus 1 per Mine
+99. Building: Beacon Tower scores 2 plus 1 per Building in its area
+100. Building: Granary sells your biggest goods pile at once, whatever the dice
 101. Building: Granary pays the normal sale (1 silver + 2 per tile with 2 players)
 102. Building: Granary with no goods asks nothing
 103. Building: a region may not hold two of the same Building

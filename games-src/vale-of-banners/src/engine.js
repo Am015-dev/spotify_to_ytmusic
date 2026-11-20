@@ -100,6 +100,10 @@
     return d;
   };
   V.blackCost = function (p) { return p.know['black1'] ? 1 : 2; };
+  V.countKind = function (p, t) { var n = 0; for (var k in p.estate) if (p.estate[k] && p.estate[k].t === t) n++; return n; };
+  function c0num(ci) { return CELLS[ci].num; }
+  /* Granary: the goods kind(s) you hold the most of */
+  V.biggestGoods = function (p) { var g = V.goodsTypes(p), mx = 0; g.forEach(function (k) { mx = Math.max(mx, p.goods[k]); }); return g.filter(function (k) { return p.goods[k] === mx; }); };
   V.goodsTypes = function (p) { return Object.keys(p.goods).filter(function (k) { return p.goods[k] > 0; }).map(Number); };
   function hasBuilt(p, i) { return !!p.estate[i]; }
   V.canPlace = function (p, tile, ci, v) {   /* v = die number, or 0 = any number */
@@ -147,9 +151,9 @@
     var M = [];
     if (top.t === 'discard') { p.store.forEach(function (t, s) { M.push({ k: 'discard', s: s }); }); return M; }
     if (top.t === 'castle') { dieMoves(G, p, 'x', 0, M, true); M.forEach(function (m) { m.w = 0; }); }
-    else if (top.t === 'hall') { p.store.forEach(function (t, s) { V.placeTargets(p, t, 0).forEach(function (ci) { M.push({ k: 'place', die: 'x', v: CELLS[ci].num, s: s, cell: ci, w: 0 }); }); }); }
-    else if (top.t === 'grab') { for (var v = 1; v <= 6; v++) G.depots[v].forEach(function (t, k) { if (t && top.types.indexOf(t.t) >= 0) M.push({ k: 'grab', v: v, slot: k }); }); }
-    else if (top.t === 'store') { V.goodsTypes(p).forEach(function (g) { M.push({ k: 'sell', die: 'x', v: g, w: 0 }); }); }
+    else if (top.t === 'hall') { p.store.forEach(function (t, s) { V.placeTargets(p, t, 0).forEach(function (ci) { if (t.t !== 'bld') M.push({ k: 'place', die: 'x', v: CELLS[ci].num, s: s, cell: ci, w: 0 }); }); }); }
+    else if (top.t === 'grab') { for (var v = 1; v <= 6; v++) G.depots[v].forEach(function (t, k) { if (t && (!top.types || top.types.indexOf(t.t) >= 0) && (!top.nums || top.nums.indexOf(v) >= 0)) M.push({ k: 'grab', v: v, slot: k }); }); }
+    else if (top.t === 'store') { V.biggestGoods(p).forEach(function (g) { M.push({ k: 'sell', die: 'x', v: g, w: 0 }); }); }
     else if (top.t === 'ship') { for (v = 1; v <= 6; v++) if (G.goodsAt[v].length) M.push({ k: 'ship', v: v }); }
     M.push({ k: 'skip' });
     return M;
@@ -261,13 +265,14 @@
         G.pend.push({ t: 'ship' }); break;
       case 'bld':
         switch (t.k) {
+          /* our own eight building effects (F4) */
           case 'hall': G.pend.push({ t: 'hall' }); break;
-          case 'carp': G.pend.push({ t: 'grab', types: ['bld'] }); break;
-          case 'chapel': G.pend.push({ t: 'grab', types: ['castle', 'mine', 'know'] }); break;
-          case 'mkt': G.pend.push({ t: 'grab', types: ['ship', 'pas'] }); break;
-          case 'inn': p.workers += 4; ev.push({ e: 'workers', p: s, n: 4 }); break;
-          case 'mint': p.silver += 2; ev.push({ e: 'silver', p: s, n: 2 }); break;
-          case 'tower': score(G, s, 4, 'tower', ci, ev); break;
+          case 'carp': var nn = c0num(ci); G.pend.push({ t: 'grab', nums: [nn % 6 + 1, (nn + 4) % 6 + 1] }); break;
+          case 'chapel': score(G, s, Math.max(2, 2 * V.countKind(p, 'know')), 'chapel', ci, ev); break;
+          case 'mkt': var gk = Math.max(1, V.goodsTypes(p).length); p.silver += gk; ev.push({ e: 'silver', p: s, n: gk }); break;
+          case 'inn': p.workers += 3; p.silver += 1; ev.push({ e: 'workers', p: s, n: 3 }); ev.push({ e: 'silver', p: s, n: 1 }); break;
+          case 'mint': var mk = 1 + V.countKind(p, 'mine'); p.silver += mk; ev.push({ e: 'silver', p: s, n: mk }); break;
+          case 'tower': score(G, s, 2 + reg.cells.filter(function (x) { var y = p.estate[x]; return y && y.t === 'bld'; }).length, 'tower', ci, ev); break;
           case 'store': G.pend.push({ t: 'store' }); break;
         }
         break;

@@ -9,9 +9,10 @@
 - Tile kinds: Keep (extra action with any number), Mine (1 silver per season end), Lore (26 rule-benders), Buildings
   (8 kinds, instant effects, never two of a kind in one quarter), Pasture (score same animals in that meadow), Barge
   (take all goods from one stall + move up the turn track).
-- Buildings: Moot Hall = build again at once with any number (the chain); Joiner's Yard = take a Building; Bell Chapel =
-  take a Keep/Mine/Lore; Fair Green = take a Barge/Pasture; Drovers' Inn = 4 workers; Counting House = 2 silver;
-  Beacon Tower = 4 points; Granary = sell one kind of goods.
+- Buildings (our own eight effects, F4): Moot Hall = build one more stored non-Building tile at once with any number;
+  Joiner's Yard = take any tile from the stall one above or below its space's number; Bell Chapel = 2 points per Lore tile
+  (min 2); Fair Green = 1 silver per goods kind held (min 1); Drovers' Inn = 3 workers + 1 silver; Counting House = 1 silver
+  + 1 per Mine; Beacon Tower = 2 points + 1 per Building in its area; Granary = sell your biggest goods pile.
 - Region complete: 1/3/6/10/15/21/28/36 points for 1-8 spaces + 10/8/6/4/2 for seasons 1-5.
 - Goods: 5 per season laid out, one per round goes to the stall shown by the white die. Max 3 kinds of goods held.
 - End: +1 per silver, +1 per unsold goods tile, +1 per 2 workers, Lore end scrolls. Tie: more empty estate spaces, then later in turn order (W505).
