@@ -292,17 +292,13 @@
     })(i);
     return p;
   }
-  // F5 turn plan: what the cards that fit this turn's energy add up to (cheapest first), e.g. "3 energy: 2 attacks = 16 damage, 1 block = 5"
+  // F5 turn plan: the most damage or the most block the playable cards reach with this turn's energy, e.g. "3 energy = up to 24 damage or 16 block"
   function planLine(ch) {
-    var sb = (ch.st.str || 0) * D.SCALE + (ch.stance === 'w' ? D.SCALE : 0) + (E.has('smoking-censer') ? D.SCALE : 0), en = ch.en, na = 0, dmg = 0, nb = 0, blk = 0, n = 0;
-    ch.hand.map(function (c) { return { c: c, k: E.cost(ch, c), e: E.eff(c) }; }).filter(function (x) { return E.canPlay(ch, x.c) && x.e.cost !== 'X'; }).sort(function (a, b) { return a.k - b.k; }).forEach(function (x) {
-      if (x.k > en) return; en -= x.k; n++; var a0 = 0, b0 = 0;
-      (x.e.ops || []).forEach(function (o) { var k = o[0]; if (k === 'dmg' || k === 'all' || k === 'dmgx') a0 += o[1] + sb; else if (k === 'hit') a0 += (o[1] + sb) * (o[2] || 1); else if (k === 'blk') b0 += o[1]; });
-      if (a0) { na++; dmg += a0; } if (b0) { nb++; blk += b0; }
-    });
-    if (!n) return '';
-    var parts = []; if (na) parts.push(na + ' attack' + (na > 1 ? 's' : '') + ' = ' + dmg + ' damage'); if (nb) parts.push(nb + ' block' + (nb > 1 ? 's' : '') + ' = ' + blk);
-    return 'This turn: ' + ch.en + ' energy' + (parts.length ? ', ' + parts.join(', ') : '') + '. Tap a card.';
+    var sb = (ch.st.str || 0) * D.SCALE + (ch.stance === 'w' ? D.SCALE : 0) + (E.has('smoking-censer') ? D.SCALE : 0);
+    var cs = ch.hand.map(function (c) { var e = E.eff(c), a0 = 0, b0 = 0; (e.ops || []).forEach(function (o) { var k = o[0]; if (k === 'dmg' || k === 'all' || k === 'dmgx') a0 += o[1] + sb; else if (k === 'hit') a0 += (o[1] + sb) * (o[2] || 1); else if (k === 'blk') b0 += o[1]; }); return { k: E.cost(ch, c), a: a0, b: b0, ok: E.canPlay(ch, c) && e.cost !== 'X' }; }).filter(function (x) { return x.ok; });
+    var best = function (f) { var en = ch.en, t = 0; cs.filter(function (x) { return x[f] > 0; }).sort(function (p, q) { return q[f] / Math.max(.5, q.k) - p[f] / Math.max(.5, p.k); }).forEach(function (x) { if (x.k <= en) { en -= x.k; t += x[f]; } }); return t; };
+    var dmg = best('a'), blk = best('b'); if (!dmg && !blk) return '';
+    return 'This turn: ' + ch.en + ' energy = up to ' + (dmg ? dmg + ' damage' : '') + (dmg && blk ? ' or ' : '') + (blk ? blk + ' block' : '') + '. Tap a card.';
   }
   // dock: what to do now (one line) + End turn + potions
   function dock(g) {
