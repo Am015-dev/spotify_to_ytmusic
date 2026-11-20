@@ -61,7 +61,7 @@ var TT_TEST = {};
       else if (ev.t === 'discard') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' sell ', ' sells ') + BY[ev.id].nm + ' for +' + plural(ev.n, 'coin') + '.' });
       else if (ev.t === 'wonder') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' raise ', ' raises ') + BY[ev.w].nm, BY[ev.w].text) });
       else if (ev.t === 'token') it.push({ tag: tg, kind: k, text: fit(who(ev.p) + verb(ev.p, ' take ', ' takes ') + BY[ev.id].nm, BY[ev.id].text) });
-      else if (ev.t === 'destroy') it.push({ tag: tg, kind: k, text: BY[ev.id].nm + ' is thrown away from ' + who(ev.p) + (ev.p === 0 && U.mode === 'cpu' ? 'r city.' : "'s city.") });
+      else if (ev.t === 'destroy') it.push({ tag: tg, kind: k, text: (ev.p === 0 && U.mode === 'cpu' ? 'Rival throws away your ' + BY[ev.id].nm + '.' : BY[ev.id].nm + ' is thrown away from ' + who(ev.p) + "'s city.") }); // PLAY3: was "from Your city"
       else if (ev.t === 'revive') it.push({ tag: tg, kind: k, text: who(ev.p) + verb(ev.p, ' rebuild ', ' rebuilds ') + BY[ev.id].nm + ' for free.' });
       else if (ev.t === 'first') it.push({ tag: tg, kind: kindOf(ev.who), text: who(ev.who) + verb(ev.who, ' will start ', ' will start ') + 'the new age.' });
     });
@@ -94,7 +94,7 @@ var TT_TEST = {};
     if (m.t === 'token') return tg + ' studies the progress tokens.';
     if (m.t === 'destroy') return tg + ' will throw away one of your cards.';
     if (m.t === 'revive') return tg + ' looks through the thrown-away cards.';
-    var c = BY[G.pyr[m.i].id]; return tg + ' takes ' + c.nm + (m.t === 'build' ? ' to build it.' : m.t === 'discard' ? ' to sell it for coins.' : ' to raise a wonder.');
+    var c = BY[G.pyr[m.i].id]; return tg + (m.t === 'build' ? ' builds ' + c.nm + '.' : m.t === 'discard' ? ' sells ' + c.nm + '.' : ' tucks ' + c.nm + ' under a wonder.'); // PLAY3: short, never cut off
   }
 
   // ---------- card faces
@@ -267,12 +267,12 @@ var TT_TEST = {};
   // rating of the move just played: rank by the computer's own evaluation of the position after each legal move
   function rateMove(G, p, m) {
     try {
-      var hm = hintMove(G); if (hm && hm.t === m.t && hm.i === m.i && (hm.w || null) === (m.w || null)) return { g: 'good', t: 'Good move: the best choice here.' };
+      var hm = hintMove(G); if (hm && hm.t === m.t && hm.i === m.i && (hm.w || null) === (m.w || null)) return { g: 'good', t: 'Great pick: the best move here.' };
       if (!hm || hm.i == null) return null; var bv = AI.value(G, hm, p), mv = AI.value(G, m, p), best = hm; // FIXED1: rated against the same move the star shows, so the two never disagree
       if (mv == null || bv == null) return null; var d = bv - mv;
-      if (d <= 1) return { g: 'good', t: 'Good move: about as good as the star.' };
+      if (d <= 1) return { g: 'good', t: 'Good pick: nearly the best move.' };
       if (d <= 3.5) return { g: 'okay', t: 'Okay. Best was ' + moveName(G, best) + '.' };
-      return { g: 'poor', t: 'Poor move. Best was ' + moveName(G, best) + '.' };
+      return { g: 'poor', t: 'Better was ' + moveName(G, best) + '.' };
     } catch (e) { return null; }
   }
   function renderMil() {
@@ -409,6 +409,12 @@ var TT_TEST = {};
     return t.length ? '<p class="ocs">' + t.slice(0, 3).join('') + '</p>' : '';
   }
   // tap a card: it lifts big with what you pay, one plain line on what it does, and three big buttons (Build / Sell / Wonder); your wonders glow on the table too
+  function lackOf(G, p, c, coins) { // PLAY3: "Buy 2 stone at 3$" - only when the sum matches the engine's real price
+    var fp = E.fixedProd(G, p), L = [], sum = c.cost.coin || 0;
+    Object.keys(c.cost).forEach(function (r) { if (r === 'coin') return; var n = c.cost[r] - (fp[r] || 0); if (n > 0) { var u = E.unitPrice(G, p, r); sum += n * u; L.push(n + ' ' + RN[r] + ' at ' + u + '$'); } });
+    if (!L.length || sum !== coins) return null;
+    return 'Buy ' + esc(L.join(' + ')) + (c.cost.coin ? ' + ' + c.cost.coin + '$ fee' : '');
+  }
   function zoomRender() {
     var z = $('zoom'), G = U.G; if (!z) return;
     if (!G || U.sel == null || G.over || G.phase !== 'play' || G.pend.length || !canAct()) { if (!z.hidden) { z.hidden = true; z.innerHTML = ''; } return; }
@@ -417,16 +423,17 @@ var TT_TEST = {};
     var pr = $('pyr').getBoundingClientRect(), cw = Math.min(140, Math.round(pr.width * 0.38)), ch = Math.round(cw * 1.4), bw = Math.min(pr.width - 12, 360);
     if (U.liftCh && U.liftCh < ch) { ch = U.liftCh; cw = Math.round(ch / 1.4); }
     var free = bi.chain || !bi.coins, pay = free ? '<span class="pay fr">Free</span>' : '<span class="pay' + (okB ? '' : ' no') + '">' + slot('coin') + '<b>' + bi.coins + '</b></span>';
-    var why = free ? (bi.chain ? 'Free: you own ' + chainOwned(G, p, c) + '.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' for what you lack.' : '.') : 'You need ' + plural(bi.coins, 'coin') + '. You have ' + G.players[p].coins + '.';
+    var why = free ? (bi.chain ? 'Free: you own ' + chainOwned(G, p, c) + '.' : Object.keys(c.cost).length ? 'Free: your city makes what it needs.' : 'It costs nothing.') : okB ? 'You pay ' + plural(bi.coins, 'coin') + (bi.trade ? ' for what you lack.' : '.') : 'Need ' + plural(bi.coins, 'coin') + ', you have ' + G.players[p].coins + '.';
+    var lk = free ? null : lackOf(G, p, c, bi.coins); // PLAY3: say what you are buying and why it costs that much
     var top = Math.max(pr.top + 4, pr.top + (pr.height - ch - 150) / 2);
     var h = '<div class="lift" style="left:' + (pr.left + pr.width / 2 - bw / 2) + 'px;top:' + top + 'px;width:' + bw + 'px"><div class="zcard" id="zcard" style="width:' + cw + 'px;height:' + ch + 'px">' + pay + '</div>';
     var bm0 = M.filter(function (m) { return m.t === 'build' && m.i === cell.i; })[0];
-    h += '<p class="lt"><b>' + esc(short8(cap(describe(c)) + '.')) + '</b> <span>' + esc(short8(why)) + '</span></p>' + outcomeHtml(outcome(G, p, bm0 || { t: 'discard', i: cell.i })) + '<div class="zb3">';
+    h += '<p class="lt"><b>' + esc(short8(cap(describe(c)) + '.')) + '</b> <span>' + esc(short8(why)) + '</span></p>' + (lk ? '<p class="lk">' + lk + '</p>' : '') + outcomeHtml(outcome(G, p, bm0 || { t: 'discard', i: cell.i })) + '<div class="zb3">';
     var hm = (U.hintsOn && U.hintShow && !U.tut && !isAI(p)) ? hintMove(G) : null; if (hm && hm.i !== cell.i) hm = null; // FIXED2: read before the Build button (was declared after it, so Build never glowed)
-    h += '<button class="btn zb' + (okB ? '' : ' off') + (hm && hm.t === 'build' ? ' hint' : '') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'too costly') + '</small></button>';
+    h += '<button class="btn zb' + (okB ? '' : ' off') + (hm && hm.t === 'build' ? ' hint' : '') + '" data-a="build"' + (okB ? '' : ' aria-disabled="true" data-why="' + esc(why) + '"') + '>Build<small>' + (free ? 'free' : okB ? 'pay ' + bi.coins : 'need ' + bi.coins + '$') + '</small></button>';
     h += '<button class="btn zb sell' + (hm && hm.t === 'discard' ? ' hint' : '') + '" data-a="discard">Sell<small>+' + plural(gain, 'coin') + '</small></button>';
     var w0 = (hm && hm.t === 'wonder' && wok.filter(function (q) { return q.m.w === hm.w; })[0]) || wok[0];
-    h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (function (wi) { return (wi.coins ? 'pay ' + wi.coins : 'free') + (wok.length > 1 ? ', pick below' : ' \u00b7 ' + esc(BY[w0.m.w].nm)); })(E.wonderInfo(G, p, w0.m.w)) : wz.length ? 'too costly' : 'none left') + '</small></button></div></div>';
+    h += '<button class="btn zb won' + (w0 ? '' : ' off') + (hm && hm.t === 'wonder' ? ' hint' : '') + '" data-a="wonder"' + (w0 ? ' data-w="' + w0.m.w + '"' : ' aria-disabled="true" data-why="' + (wz.length ? 'No wonder you can afford right now. Sell the card for coins, or build it.' : 'You have no wonders left to build.') + '"') + '>Wonder<small>' + (w0 ? (function (wi) { return (wi.coins ? 'pay ' + wi.coins : 'free') + (wok.length > 1 ? ', pick below' : ' \u00b7 ' + esc(BY[w0.m.w].nm)); })(E.wonderInfo(G, p, w0.m.w)) : wz.length ? 'need ' + Math.min.apply(null, wz.map(function (q) { return E.wonderInfo(G, p, q.m.w).coins; })) + '$' : 'none left') + '</small></button></div></div>';
     if (wok.length > 1) h += placesHtml(wok, 'button', function (q) { return 'data-a="wonder" data-w="' + q.m.w + '" aria-label="Wonder: ' + esc(BY[q.m.w].nm) + '"'; });
     z.innerHTML = h; z.hidden = false; var bn0 = $('banner'); if (bn0) bn0.style.display = 'none'; fillArt(z); var ce = cardEl(c, cw); ce.style.width = cw + 'px'; ce.style.height = ch + 'px'; $('zcard').appendChild(ce);
     // the lift may rise over the war track and token row (not over either city) before the card shrinks
@@ -441,6 +448,7 @@ var TT_TEST = {};
     var G = U.G; if (!G) return; setClean();
     strip(0); strip(1); renderMil(); renderTokens(); renderScore();
     $('bd').classList.toggle('drafting', G.phase === 'draft');
+    $('bd').classList.toggle('settled', G.phase === 'play' && !U.tut && (G.age > 1 || G.pyr.filter(function (c) { return c.taken; }).length >= 4)); // PLAY3: the goal line steps aside once you are playing
     if (G.phase === 'draft') renderDraft(); else renderPyr(flips);
     dock(); logRender();
     SND.sync(); if (G.over) showResult();
@@ -465,8 +473,8 @@ var TT_TEST = {};
     })(k);
   }
   function landAt(p, ev) { var s = $('s' + p); if (!s) return null; if (ev.t === 'wonder') return s.querySelector('[data-wonder="' + ev.w + '"]') || s; if (ev.t === 'discard') return $('bank') || s; var c = BY[ev.id]; return (c && s.querySelector('.stk[data-col="' + c.col + '"]')) || s.querySelector('.tab') || s; }
-  function popNum(txt, near, kind) {
-    var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : ''); e.textContent = txt; document.body.appendChild(e);
+  function popNum(txt, near, kind, cls) {
+    var r = near.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop-n' + (kind ? ' ' + kind : '') + (cls ? ' ' + cls : ''); e.textContent = txt; document.body.appendChild(e);
     e.style.left = Math.max(4, Math.min(innerWidth - e.offsetWidth - 4, r.left + r.width / 2 - e.offsetWidth / 2)) + 'px'; e.style.top = Math.max(4, r.top - (kind ? 6 : 0)) + 'px'; setTimeout(function () { e.remove(); }, kind ? 4200 : 1000);
     var gl = $('goal'); if (gl) { var gr = gl.getBoundingClientRect(), er0 = e.getBoundingClientRect(); if (gr.width && er0.bottom > gr.top && er0.top < gr.bottom) e.style.top = (gr.bottom + 2) + 'px'; }
     document.querySelectorAll('#acts button, #zoom .zb, #dock .gx-ibtn').forEach(function (bt) { var br = bt.getBoundingClientRect(), er = e.getBoundingClientRect(); if (br.width && er.right > br.left && er.left < br.right && er.bottom + 2 > br.top && er.top < br.bottom + 30) e.style.top = Math.max(4, br.top - er.height - 32) + 'px'; });
@@ -503,6 +511,7 @@ var TT_TEST = {};
     G.pyr.forEach(function (c) { prevUp[c.i] = c.up; });
     var rated = (U.hintsOn && !U.tut && U.mode === 'cpu' && p === 0 && G.phase === 'play' && !G.pend.length && m.i != null) ? rateMove(G, p, m) : null;
     if (U.tut && p === 0 && window.TT_TUTOR && TT_TUTOR.beforePlayerMove) TT_TUTOR.beforePlayerMove(G, m);
+    var sc0 = G.phase === 'play' ? [sbreak(G, 0).tot, sbreak(G, 1).tot] : null; // PLAY3: points fly to the score pill
     E.apply(G, m); U.sel = null; U.fingerDone = true; U.seq++; U.hintShow = false; clearTimeout(U.idleT); if (!isAI(p)) U.aiChain = 0;
     U.busy = true; var flips = []; G.pyr.forEach(function (c) { if (c.up && !prevUp[c.i] && !c.taken) flips.push(c.i); });
     G.ev.forEach(function (ev) { var l = lineOf(ev, G); if (l) { U.logs.push(l); G.log.push(l); } });
@@ -524,17 +533,19 @@ var TT_TEST = {};
       if (wv) moment('won', BY[wv.w].nm, who + (who === 'You' ? ' raise a wonder' : ' raises a wonder'));
       else if (pr) moment('sci', 'Science pair!', (isAI(p) ? who + ' picks' : 'Pick') + ' a progress token');
       else if (mv) moment('mil', '\u2694 +' + mv, 'Pawn moves toward ' + (U.mode === 'cpu' ? (p === 0 ? 'the rival city' : 'your city') : name(1 - p) + "'s city"), p);
+      else { var ag = G.ev.filter(function (e) { return e.t === 'age'; })[0], fs = G.ev.filter(function (e) { return e.t === 'first'; })[0]; if (ag) moment('age', 'Age ' + AGE[ag.age], 'A new pyramid' + (fs ? ' \u00b7 ' + (U.mode === 'cpu' && fs.who === 0 ? 'you start' : name(fs.who) + ' starts') : '')); } // PLAY3: an age turn is an event
+      if (sc0 && !G.over) [0, 1].forEach(function (q) { var d = sbreak(G, q).tot - sc0[q], el = $('pts' + q); if (d > 0 && el) { popNum('+' + d + (d > 1 ? ' pts' : ' pt'), el, null, 'ptg'); el.classList.remove('gain'); void el.offsetWidth; el.classList.add('gain'); setTimeout(function () { el.classList.remove('gain'); }, 900); } });
     })();
     if (G.over) return;
-    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Rating', kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
+    U.busy = true; var items = moveItems(G, G.ev.slice(), p, snap); { if (!isAI(p) && U.mode !== 'two') { var key = items.filter(function (x) { return /point|coin|pawn|Age|token/i.test(x.tag + ' ' + x.text) && x.tag !== 'Pyramid'; }); items = (key.length ? key : items).slice(0, 2); } else items = items.filter(function (x) { return x.tag !== 'Pyramid'; }).slice(0, 3); } if (rated) items.splice(Math.min(items.length, 2), 0, { tag: 'Your move', rate: 1, kind: 'info', text: rated.t, extra: 250 }); dock0Lock(); if (U.tut && window.TT_TUTOR && TT_TUTOR.afterMove) { try { TT_TUTOR.afterMove(G, G.ev.slice(), p, snap, m); } catch (e) { console.error(e); } }
     if (quick()) { // FIXED2: one line for your move, up to two for the rival's (three when an age turns)
       var age = items.some(function (x) { return /^Age /.test(x.tag); }), tokp = items.filter(function (x) { return /progress token\.$/.test(x.text) && /Pick /.test(x.text); });
       var ages = items.filter(function (x) { return /^Age /.test(x.tag); });
-      if (!isAI(p)) items = (rated ? [items.filter(function (x) { return x.tag === 'Rating'; })[0]] : items.slice(0, 1)).concat(tokp, ages).filter(function (x, k, a) { return x && a.indexOf(x) === k; });
+      if (!isAI(p)) items = (rated ? [items.filter(function (x) { return x.rate; })[0]] : items.slice(0, 1)).concat(tokp, ages).filter(function (x, k, a) { return x && a.indexOf(x) === k; });
       else items = items.slice(0, age ? 3 : (U.aiChain || 0) > 1 ? 1 : 2);
       items.forEach(function (x) { x.ms = isAI(p) ? ((U.aiChain || 0) > 1 ? 650 : 800) : 900; }); if (!isAI(p)) U.aiChain = 0;
     }
-    { var nq = E.sideToAct(G); if (U.mode === 'cpu' && !isAI(p) && nq != null && isAI(nq)) items.forEach(function (x) { if (x.tag === 'You' || x.tag === 'Rating') { x.tag = whoTag(nq); x.kind = 'rival'; } }); } // F6: the tag names the next side the moment the turn passes, not "You" / "Rating"
+    { var nq = E.sideToAct(G); if (U.mode === 'cpu' && !isAI(p) && nq != null && isAI(nq)) items.forEach(function (x) { if (x.tag === 'You') { x.tag = whoTag(nq); x.kind = 'rival'; } }); } // F6: the tag names the next side the moment the turn passes, not "You" / "Rating"
     narrate(items, function () { U.busy = false; after(); });
   }
   // FIXED2: the star (and the glowing popup button) waits until you tap Hints or sit still for about 8 s, then pulses 3 times and holds

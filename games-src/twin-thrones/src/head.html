@@ -579,4 +579,12 @@ html,body{background:#3a1f0e}
 @media (prefers-reduced-motion:reduce){.moment{animation:none}#pawn.bump{animation:none}}
 #zoom .zcard .pay{top:58%}
 #draft .wcard .costs{display:flex;flex-wrap:wrap;gap:3px;padding:4px 6px 6px}
+/* PLAY3: cost reason, score payoff, age moment, goal line steps aside */
+#zoom .lk{margin:4px auto 0;max-width:340px;font-size:13px;line-height:1.25;text-align:center;color:#ffe2a0;background:rgba(20,10,4,.9);border:1px solid rgba(242,194,48,.45);border-radius:9px;padding:3px 8px;width:fit-content}
+.pop-n.ptg{font-size:15px;white-space:nowrap;background:#f2c230;color:#231a05;text-shadow:none;border-radius:12px;padding:2px 9px;box-shadow:0 3px 10px rgba(0,0,0,.5);animation:rise 1s forwards}
+.strip .pts.gain{animation:ptsGain .8s ease-out 1}
+@keyframes ptsGain{0%{transform:scale(1)}30%{transform:scale(1.22);border-color:#ffe27a;box-shadow:0 0 14px rgba(242,194,48,.8)}100%{transform:scale(1)}}
+.moment.m-age{background:linear-gradient(#2b4d6e,#152a40);border:2px solid #bfe0ff}
+#bd.settled #goal{display:none}
+@media (prefers-reduced-motion:reduce){.strip .pts.gain{animation:none}}
 </style></head>
