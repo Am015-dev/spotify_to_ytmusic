@@ -141,7 +141,7 @@ try { UI.hints = localStorage.getItem('hb_hints') === '1'; } catch (e) { UI.hint
 function hintsActive() { return !!(UI.hints || (UI.cfg && UI.cfg.coached)); }
 function goalCard() {
   // a painted goal card over the board: art, three short lines, Start
-  const src = typeof HB_ART !== 'undefined' && HB_ART.ever_tree ? HB_ART.ever_tree : null;   // the great tree painting
+  const src = typeof HB_ART !== 'undefined' && HB_ART.elderheart_oak ? HB_ART.elderheart_oak : null;   // the great tree painting
   UI.cards.unshift({ kind: 'goal', title: 'Your goal', sub: 'Win the Elderheart Oak', body: () => h('div.hb-goal', src ? h('img.hb-goal-art', { src, alt: '', draggable: 'false' }) : null,
     h('div.hb-goal-k', 'Your goal'), h('h2.hb-goal-t', 'Win the Elderheart Oak'),
     h('ul.goal', h('li', 'Build a city of critters and buildings.'), h('li', 'Cards, tokens and events all score points.'), h('li', 'Most points after Autumn wins.'))), buttons: [{ label: 'Start', a: 'cont' }] }); render();

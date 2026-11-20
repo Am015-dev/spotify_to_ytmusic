@@ -1,5 +1,16 @@
 [
  {
+  "date": "2026-11-20",
+  "game": "shelf",
+  "title": "Better on PC and laptops",
+  "items": [
+   "On any landscape screen 720 px or wider, the buttons sit in a side panel instead of a phone column",
+   "Zoomed laptops (like 910x512) now get the PC layout",
+   "Enter and Space press the main button"
+  ],
+  "check": "Open a game on a laptop and check the side panel"
+ },
+ {
   "date": "2026-11-07",
   "game": "twin-thrones",
   "title": "new game: Twin Thrones, a two-player card game of rival kingdoms",

@@ -91,7 +91,7 @@ const HAT = {
   postal: () => pa('M38.5 20 Q38 10 50 10 Q62 10 61.5 20Z', '#3d5f98') + pa('M37 20 Q45 25 62 20 L62 18 L38 18Z', '#2d4572') + `<circle cx="50" cy="14.5" r="2.2" fill="#f0c43a" stroke-width=".4"/>`,
   wander: () => ell(50, 19, 18, 3.4, '#8a6a46') + pa('M40 19 Q42 7 50 5 Q58 7 60 19Z', '#9a7a52') + rc(40, 15.5, 20, 2.6, '#c2503a', 0, NS0) + `<path d="M58 8 Q66 4 68 10 Q64 8 60 12Z" fill="#e8c24a" stroke-width=".4"/>`,
   bonnet: () => pa('M37 28 C34 14 44 10 50 10 C58 10 66 14 63 28 C60 20 56 18 50 18 C44 18 40 20 37 28Z', '#f0e6d0') + `<path d="M40 20 Q50 14 60 20" stroke="#7a4a8a" stroke-width="1.6" fill="none"/>`,
-  monk: () => HAT.hood('#8a6a48'),
+  brother_moss: () => HAT.hood('#8a6a48'),
   doc: () => rc(40, 8, 20, 11, '#3a6f8a', 3) + `<circle cx="50" cy="13.5" r="3.2" fill="#e8f0f2" stroke-width=".5"/><path d="M50 11.5 v4 M48 13.5 h4" stroke="#c2364c" stroke-width=".9"/>`,
   none: () => ''
 };
@@ -145,7 +145,7 @@ const CRIT = {
   turtle_teacher: ['turtle', 'indoor', 'teal', 'mortar', 'ruler', ['glasses']],
   bat_doctor:     ['bat', 'night', 'cream', 'doc', 'bag', ['mirror']],
   toad_undertaker:['toad', 'dusk', 'black', 'tophat', 'shovel', []],
-  hedgehog_monk:  ['hedgehog', 'indoor', 'brown', 'monk', 'candle', []],
+  hedgehog_monk:  ['hedgehog', 'indoor', 'brown', 'brother_moss', 'candle', []],
   mouse_fool:     ['mouse', 'dusk', 'yellow', 'jester', 'bells', []],
   shrew_sweeper:  ['shrew', 'autumn', 'grey', 'cap', 'broom', ['apron']],
   squirrel_woodcarver: ['squirrel', 'autumn', 'tan', 'cap', 'carve', ['apron']],
@@ -156,7 +156,7 @@ const CRIT = {
   fox_peddler:    ['fox', 'autumn', 'blue', 'cap', 'pack', ['scarf']],
   mole_historian: ['mole', 'indoor', 'grey', 'none', 'scroll', ['glasses']],
   bat_bard:       ['bat', 'night', 'red', 'feather', 'lute', []],
-  turtle_monk:    ['turtle', 'stone', 'brown', 'monk', 'candle', []],
+  turtle_monk:    ['turtle', 'stone', 'brown', 'brother_moss', 'candle', []],
   toad_shopkeeper:['toad', 'indoor', 'green', 'bonnet', 'scales', ['apron']],
   beetle_woodcarver:['beetle', 'autumn', 'tan', 'none', 'carve', ['apron']],
   pigeon_ranger:  ['pigeon', 'winter', 'green', 'hood', 'bow', []],
