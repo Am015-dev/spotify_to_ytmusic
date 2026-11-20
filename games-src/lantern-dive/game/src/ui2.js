@@ -127,7 +127,7 @@ function tableGeo() {
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : (line ? 30 : 54);
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, row3, line, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
-  geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
+  geo.dw = dw; geo.droneW = droneW; geo.dh = (drone >= 0 && !side && UI.droneH) || (44 + Math.round(dw * 1.4) + 14);   // F1: the drone row's real height (measured in render) so nothing hides under it
   // trick area
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
@@ -154,6 +154,14 @@ function tableGeo() {
     geo.cy = Math.round((y1 + y2) / 2); geo.ry = Math.round((y2 - y1) / 2); geo.rx = Math.round((k - 1) / 2 * (seatW + 6));
   } else
   for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry - oy)]); }
+  if (drone >= 0 && !side && k === 2) {   // F1: two divers: the rival sits on the left under the drone row, the trick lies in one row on the right (big cards, never under the drone)
+    const x0 = seatW + 10, x1 = W - 6, gap = 8, rw = Math.max(30, Math.min(cwMax, Math.floor((x1 - x0 - 2 * gap) / 3), Math.floor((zoneH - 30) / 1.4)));
+    geo.drow = true; geo.cw = rw; geo.ch = Math.round(rw * 1.4); geo.pl = x0; geo.pr = x1; geo.cx = Math.round((x0 + x1) / 2); geo.cy = Math.round(top + Math.max(geo.ch / 2 + 4, (zoneH - 22) / 2));
+    geo.rx = rw + gap; geo.ry = Math.round(geo.ch / 2); geo.slots = [];
+    const order = [1, 0, 2];   // left to right: the diver after you, you, the drone
+    const xs = [geo.cx - (rw + gap), geo.cx, geo.cx + (rw + gap)];
+    for (let rel = 0; rel < n; rel++) geo.slots[rel] = [Math.round(xs[order.indexOf(rel)]), geo.cy];
+  }
   // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
   const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
   geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
@@ -174,7 +182,7 @@ function seatSpots(geo, list) {
   }
   const kk = list.length;
   if (droneIdx >= 0) {
-    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
+    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx || geo.drow ? L : R, mid, seatW); });
     return out;
   }
   if (geo.line) { list.forEach((s2, i) => { out[i] = sp(W / 2 + (i - (kk - 1) / 2) * (seatW + 6), y0, seatW); }); return out; }
@@ -209,9 +217,16 @@ function renderFelt(v) {
   { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
-    const pw = Math.max(120, geo.pr - geo.pl);
-    pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
-    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    let pl = geo.pl, pr = geo.pr;
+    if (!geo.side && G.players.some(p => p.helper)) {   // F1: two divers: one rival seat on one side only, so the job pool takes the other side too
+      const T = $('#table').getBoundingClientRect(), rs = [...document.querySelectorAll('#opp .seat:not(.drone)')].map(e => e.getBoundingClientRect()).filter(r => r.bottom > T.top + geo.top);
+      if (rs.length && rs.every(r => r.right - T.left < geo.W / 2)) { pl = Math.max(...rs.map(r => r.right - T.left)) + 6; pr = geo.W - 6; }
+      else if (rs.length && rs.every(r => r.left - T.left > geo.W / 2)) { pl = 6; pr = Math.min(...rs.map(r => r.left - T.left)) - 6; }
+      else if (!rs.length) { pl = 6; pr = geo.W - 6; }
+    }
+    const pw = Math.max(120, pr - pl);
+    pool.style.left = pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(pw < 186 ? 76 : 86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
       const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
@@ -245,6 +260,7 @@ function renderLead(lead, pile, v) {
   if (geo && geo.line) { lead.style.left = Math.round(Math.max(48, geo.slots[0][0] - geo.cw * 1.25)) + 'px'; lead.style.top = geo.slots[0][1] + 'px'; }   // R5 line layout: beside your slot
   if (geo && geo.tight) { const tp = $('#tpad'), r = tp && tp.style.width ? { w: parseFloat(tp.style.width), h: parseFloat(tp.style.height) } : null;   // G4: no room in the middle: the colour led sits in the pad's top-left corner
     if (r) { lead.style.left = Math.round((geo.cx - r.w / 2 + 22 + geo.cx - geo.cw / 2) / 2) + 'px'; lead.style.top = Math.round(geo.cy + 10 - r.h / 2 + 34) + 'px'; } }
+  if (geo && geo.drow) { lead.style.left = geo.cx + 'px'; lead.style.top = Math.round(Math.min(geo.cy + geo.ch / 2 + 50, geo.top + geo.zoneH + 30)) + 'px'; }   // F1: under the trick row
   lead.classList.toggle('tight', !!(geo && geo.tight));
   if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns (trump)' : D.suits[ls].name)); lead.classList.add('on'); }
   else lead.classList.remove('on');
@@ -321,7 +337,7 @@ function renderHand(v) {
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
   const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
-  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
+  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = box.parentNode.parentNode.classList.contains('side') ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
   const rowStep = Math.round(ch * .78), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
@@ -425,11 +441,17 @@ function render() {
   const v = viewSeat();
   if (UI.pingSel && !canSigNow(v)) { UI.pingSel = false; UI.sel = -1; }
   renderBar(); renderMine(v); renderHand(v);
+  { const bb = window._ldBulb || (window._ldBulb = $('#bulbbtn')), mine = $('#mine'), bd = $('#bd');   // F1: on a narrow phone the bulb sits at the right end of your row, so the turn line keeps the bar
+    if (bb && mine) { const low = innerWidth < 520 && !(bd && bd.classList.contains('side')); if (low && bb.parentNode !== mine) mine.append(bb); else if (!low && bb.parentNode === mine) { const t = $('#hintstog'); t && t.after(bb); } } }
   UI.geo = tableGeo(); if (UI.geo) { const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--dw', UI.geo.dw + 'px'); r.setProperty('--av', UI.geo.av + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); }
   renderOpp(v);
   if (UI.geo && UI.geo.line) {   // the line layout needs the real seat height (names, job chips and signal chips can wrap): measure and lay out again once
     const hs = Array.from(document.querySelectorAll('#opp .seat')).map(e => e.offsetHeight), mh = hs.length ? Math.max(...hs) : 0;
     if (mh > UI.geo.seatH + 1 || (mh && mh < UI.geo.seatH - 8 && mh >= 84)) { UI.lineSeatH = mh; UI.geo = tableGeo(); const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); renderOpp(v); }
+  }
+  if (UI.geo && !UI.geo.side && G.players.some(p => p.helper)) {   // F1: the drone row can be taller than the guess (job chips): measure once and lay out again
+    const de = document.querySelector('#opp .seat.drone'), dh = de ? de.offsetHeight : 0;
+    if (dh && Math.abs(dh - UI.geo.dh) > 2) { UI.droneH = dh; UI.geo = tableGeo(); renderOpp(v); }
   }
   renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
   renderActs(v);

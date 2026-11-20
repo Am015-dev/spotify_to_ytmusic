@@ -25,7 +25,7 @@ function fingerTarget() {
 }
 function placeFinger() {
   const f = $('#finger'); if (!f) return;
-  const t = fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }
+  const t = document.querySelector('.gxh-bub.on,.gxt-bub') ? null : fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }   // F1: never beside an open bubble
   const el = document.querySelector(t.sel); if (!el) { f.hidden = true; return; }
   const r = el.getBoundingClientRect(); if (r.width < 4) { f.hidden = true; return; }
   const dist = t.kind === 'drag' ? Math.max(60, Math.min(170, r.top - ($('#table').getBoundingClientRect().top + 90))) : 0;

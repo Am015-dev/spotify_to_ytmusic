@@ -86,4 +86,50 @@
     ]
   });
 
+  // F1: two divers + the drone (seed 6: you are the Captain). Drive the game to a state with real moves (the computer's choice for you), no menus, tips off.
+  function two(until) {
+    try { GXH.setEnabled(false); } catch (e) { }
+    try { GX.close(); } catch (e) { }
+    try { ['vote', 'handover', 'volunteer', 'predict', 'murky', 'narc', 'clock', 'drone'].forEach(ruleMark); } catch (e) { }
+    AIDELAY = 120; UI.seed = 6; newGame('vs', { np: 2, mission: 5, kind: 'log', level: 'normal', noGoal: 1 }); try { UI.coach.level = 'off'; } catch (e) { }
+    try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
+    render();
+    var t0 = Date.now();
+    return new Promise(function (res, rej) {
+      (function step() {
+        if (Date.now() - t0 > 40000) return rej(new Error('two-diver state not reached: ' + G.phase));
+        if (UI.started && !UI.busy && !UI.cards.length && until()) return setTimeout(res, 900);
+        try {
+          var rd = document.querySelector('#acts [data-a="ready"]'); if (rd && !UI.busy) rd.click();
+          else if (UI.started && !UI.busy && iMustAct() && !until()) { var m = LD.AI.choose(G, viewSeat(), 'normal'); if (m) doMove(m); }
+        } catch (e) { }
+        setTimeout(step, 150);
+      })();
+    });
+  }
+  var over = function (a, b, m) { return a.left < b.right - m && a.right > b.left + m && a.top < b.bottom - m && a.bottom > b.top + m; };
+  GXS.add({
+    id: 'ld-two-jobs', name: 'Two divers: the job pool', ask: 'Can you see and tap every job?', seed: 6, when: booted,
+    setup: function () { return two(function () { return G.phase === 'assign' && myMoves().some(function (m) { return m.t === 'take'; }) && $('#pool .jcard.glow'); }); },
+    checks: [
+      { kind: 'visible', sel: '#pool .jcard.glow', name: 'job to take' },
+      { kind: 'fn', name: 'every job card is whole, inside the table and tappable', fn: function () { var T = $('#table').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('#pool .jcard'), function (c, i) { var r = c.getBoundingClientRect(); if (r.top < T.top - 1 || r.bottom > T.bottom + 1 || r.left < -1 || r.right > innerWidth + 1) bad = bad || 'job ' + i + ' cut ' + [r.left, r.top, r.right, r.bottom].map(Math.round); var t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (!t || t.closest('.jcard') !== c) bad = bad || 'job ' + i + ' covered by ' + (t && (t.className || t.tagName)); }); return !bad || bad; } },
+      { kind: 'fn', name: 'no seat covers a job card', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#opp .seat'), function (s) { var a = s.getBoundingClientRect(); [].forEach.call(document.querySelectorAll('#pool .jcard'), function (c) { if (over(a, c.getBoundingClientRect(), 2)) bad = bad || 'a seat covers a job'; }); }); return !bad || bad; } },
+      skin
+    ]
+  });
+  GXS.add({
+    id: 'ld-two-drone', name: 'Two divers: the drone plays', ask: 'Can you see the drone\'s cards?', seed: 6, when: booted,
+    setup: function () { return two(function () { return G.phase === 'play' && G.players[G.trick.turn].helper && ctlSeat(G.trick.turn) === viewSeat() && iMustAct(); }); },
+    checks: [
+      { kind: 'text', sel: '#prompt', re: /drone/i, name: 'prompt asks for a drone card' },
+      { kind: 'visible', sel: '#opp .dc.can', name: 'a playable drone card' },
+      { kind: 'fn', name: 'every face-up drone card shows its face', fn: function () { var cs = [].slice.call(document.querySelectorAll('#opp .dc')); if (!cs.length) return 'no drone cards'; for (var i = 0; i < cs.length; i++) { var sv = cs[i].querySelector('svg'); if (!sv) return 'card ' + i + ' has no picture'; var st = getComputedStyle(sv), r = sv.getBoundingClientRect(); if (st.visibility === 'hidden' || st.display === 'none' || +st.opacity < .5 || r.width < 20) return 'card ' + i + ' face hidden (' + st.visibility + ', ' + Math.round(r.width) + ' px)'; var t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height * .3); if (!t || !cs[i].contains(t)) return 'card ' + i + ' covered by ' + (t && (t.className || t.tagName)); } return true; } },
+      { kind: 'fn', name: 'the drone row never covers the trick', fn: function () { var d = $('#opp .seat.drone').getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('.tslot'), function (t) { if (over(d, t.getBoundingClientRect(), 2)) bad = 'drone row over a trick slot'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'trick cards >= 40 px wide', fn: function () { var t = $('.tslot'); var w = t && t.getBoundingClientRect().width; return w >= 40 || 'trick slot ' + Math.round(w) + ' px'; } },
+      { kind: 'tap', sel: '#opp .dc.can', name: 'tap plays the drone card', state: function () { return G.trick.plays.length + ':' + G.tricks.length; }, expect: function (a, b) { return a !== b || 'the drone card did not play'; } },
+      skin
+    ]
+  });
+
 })();

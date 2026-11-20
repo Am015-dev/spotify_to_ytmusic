@@ -76,7 +76,7 @@ async function pxTextures() {
   PX.tex.bub = mk(24, 24, (x, w, h) => { x.strokeStyle = 'rgba(220,244,255,.85)'; x.lineWidth = 2; x.beginPath(); x.arc(w / 2, h / 2, 9, 0, Math.PI * 2); x.stroke(); x.fillStyle = 'rgba(255,255,255,.7)'; x.beginPath(); x.arc(w / 2 - 3, h / 2 - 3, 2.4, 0, Math.PI * 2); x.fill(); });
   PX.tex.ring = mk(96, 96, (x, w, h) => { x.strokeStyle = 'rgba(255,224,130,.95)'; x.lineWidth = 6; x.beginPath(); x.arc(w / 2, h / 2, 40, 0, Math.PI * 2); x.stroke(); });
   PX.tex.cardShadow = mk(80, 108, (x, w, h) => { x.filter = 'blur(6px)'; x.fillStyle = 'rgba(0,6,20,.6)'; x.beginPath(); x.roundRect ? x.roundRect(12, 12, w - 24, h - 24, 8) : x.rect(12, 12, w - 24, h - 24); x.fill(); });
-  PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(255,216,115,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
+  PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(225,244,255,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
   PX.tex.handgrad = mk(4, 64, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(2,10,24,0)'); g.addColorStop(.3, 'rgba(2,10,24,.5)'); g.addColorStop(1, 'rgba(2,10,24,.6)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
   // caustics: soft light pools only (filled radial blobs, no outlines)
   PX.tex.caustic = mk(256, 256, (x, w, h) => { x.clearRect(0, 0, w, h); let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) { const cx = r() * w, cy = r() * h, rr = 22 + r() * 40; for (const [ox, oy] of [[0, 0], [w, 0], [-w, 0], [0, h], [0, -h]]) { const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, rr); g.addColorStop(0, 'rgba(170,230,255,.16)'); g.addColorStop(1, 'rgba(170,230,255,0)'); x.fillStyle = g; x.beginPath(); x.ellipse(cx + ox, cy + oy, rr, rr * .7, 0, 0, 7); x.fill(); } } });
@@ -176,7 +176,7 @@ function pxSync() {
   const ent = UI.enter || ''; UI.enter = ''; const exit = UI.pxExit; UI.pxExit = null;
   pxPrewarm(); const fl = $('#felt'); if (fl) pxDrawFelt(pxRect(fl, B));
   const hz = $('#handz'); PX.handR = hz ? pxRect(hz, B) : null;
-  const els = [...document.querySelectorAll('#bd [data-px=card]')];
+  const els = [...document.querySelectorAll('#bd [data-px=card]')].filter(e => !e.classList.contains('dc'));   // F1: drone cards stay DOM pictures (their face-down card sits under them, above the canvas)
   let hi = 0;
   els.forEach(el => {
     const key = el.dataset.pk, R = pxRect(el, B), id = +el.dataset.id; seen.add(key);
@@ -301,10 +301,11 @@ function pxFrame(ts) {
     o.sp.width = w * sc; o.sp.height = h * sc; o.sp.alpha = tex ? 1 : 0;
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
-    const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
+    if (o.gw && !o.gwT) o.gwT = PX.t; else if (!o.gw) o.gwT = 0;
+    const lan = o.id >= 36, pt = o.gwT ? PX.t - o.gwT : 99, pulse = pt < 6.28 ? .8 + .2 * Math.cos(pt * 3) : 1;   // F1 calm: the playable glow breathes 3 times, then rests
     o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0) + (o.gw && !o.detached && o.layer === 'hand' ? .5 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
-    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || o.gw || (lan && q.fx)) moving = true;
+    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (o.gw && pt < 6.3)) moving = true;
   }
   PX.moving = moving;
   if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }

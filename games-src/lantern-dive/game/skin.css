@@ -19,7 +19,7 @@ html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12
 html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(-20deg)}
 
 /* one instruction line: the help tip replaces the top line while it is showing */
-body:has(.gxh-bub.on) #prompt{visibility:hidden}
+body:has(.gxh-bub.on:not(.gxh-bulbb)) #prompt{visibility:hidden}   /* F1: a coach bubble replaces the line; the bulb answer (it points at the hand) keeps it */
 /* UI-BAR: help bubble button never covers its text; job chips wrap instead of cutting */
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 .jc{white-space:normal;min-height:26px;padding-top:2px;padding-bottom:2px}
@@ -196,8 +196,10 @@ html.sk .gx-drawer-head button.gx-x{background:#0b1f3a!important;border-image:no
 #bd:not(.side) #mine{flex-wrap:wrap;row-gap:2px}
 #bd:not(.side) #mine .mjobs{flex:1 1 100%;flex-wrap:wrap;overflow:visible;padding:2px 2px 2px 2px;gap:4px}
 #bd:not(.side) #mine .mjobs:empty{display:none}
-#bd:not(.side) #mine .mjobs .jc{flex:1 1 auto;max-width:100%;min-height:34px}
+#bd:not(.side) #mine .mjobs .jc{flex:1 1 auto;max-width:100%;min-height:44px}
 #bd:not(.side) #mine .mjobs .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}
 }
 /* R13: a crewmate's job chip wraps instead of clipping at 3 lines ("Exactly three Lanterns") */
 @media (max-width:520px){html .seat .jc .t{display:block;-webkit-line-clamp:unset;overflow:visible;white-space:normal}html .seat .jc{overflow:visible;height:auto}}
+/* F1: short phones: a seat's cards and tricks share one line (icon + number), so the trick keeps room above a two-row hand */
+html.ph-short .seat:not(.drone) .bdgs{flex-direction:row;align-items:center;justify-content:flex-start;gap:4px}html.ph-short .seat:not(.drone) .bdg .bl{display:none}

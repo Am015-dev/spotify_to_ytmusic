@@ -164,6 +164,7 @@ async function playGame(browser, size, gi, rep) {
       const play = cs.filter(c => !['rs', 'dlg', 'pass'].includes(c.kind)), modal = cs.filter(c => ['dlg', 'pass'].includes(c.kind));
       let pick = null;
       if (modal.length) pick = modal[0];
+      else if (!st.must && !st.busy && play.some(c => c.kind === 'btn' && /^\s*Ready/i.test(c.t))) pick = play.find(c => c.kind === 'btn' && /^\s*Ready/i.test(c.t));   // F1: the pre-trick wait ("Signal now, or tap Ready.") is not a must-act turn
       else if (st.must && !st.busy && play.length) {
         // never tap a ping spot unless nothing else is on offer or by chance; prefer moves in this order: jobs, cards, seats, buttons
         const byKind = k => play.filter(c => c.kind === k);
