@@ -109,7 +109,7 @@ const B2POS = {   /* [x%, y%] per level and slot, zig-zag so the trails wind */
 function mapB2(gS, S) {
   const per = { 0: [], 1: [], 2: [] }; G.sites.forEach((x, i) => per[x.lvl].push(i));
   if (UI.flat == null) UI.flat = innerWidth < 1000 && innerHeight < 700;   /* F15: decided once per game from the screen size, never from how tall the map is right now */
-  const flat = !!UI.flat;
+  const flat = !!UI.flat, mh = document.getElementById('map') ? document.getElementById('map').clientHeight || 999 : 999;
   const pos = {}; [0, 1, 2].forEach(lv => per[lv].forEach((i, k) => { pos[i] = ((flat ? B2FLAT : B2POS)[lv][k] || [50, 50]); }));
   /* F14 (R93 P4): short phones use a strict grid so no pill overlaps: each site = cost column (16 px icons) + 32 px circle, loot pill
      under the circle (14 px text); rows of 51 px (deep, ruins, camp); deep sites get a 2-column cost block in wider cells */
@@ -163,7 +163,7 @@ function render() {
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = Math.min(gS[m.s] || 2, gl(m)); });
   if (q && q.h === 'site') VG.moves(G).forEach(m => { if (m.v != null) gS[m.v] = 1; });
   const ter = (lv, label) => `<div class="ter t${lv}"><span class="tl">${label}</span><div class="tiles">${G.sites.map((x, i) => x.lvl === lv ? siteHTML(x, i, gS[i], S.k === 'site' && S.x === i) : '').join('')}</div></div>`;
-  if (B2) { $('#map').innerHTML = mapB2(gS, S); const mh2 = $('#map').clientHeight; $('#map').classList.toggle('flat', mh2 > 0 && mh2 < 205); } else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
+  if (B2) { $('#map').innerHTML = mapB2(gS, S); $('#map').classList.toggle('flat', !!UI.flat); } else $('#map').innerHTML = ter(2, `Deep ruins · ${V.DISC[2]} compasses to explore`) + ter(1, `Ruins · ${V.DISC[1]} compasses to explore`) + ter(0, 'Camp · dig here for goods');
   $('#map').classList.toggle('pawnsel', S.k === 'pawn');
   // research track: rows 0..8 left to right, the temple last
   const trG = GL.some(m => m.t === 'res' || m.t === 'temple'), trC = !trG && L.some(m => m.t === 'res' || m.t === 'temple');
