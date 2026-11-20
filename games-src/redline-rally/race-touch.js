@@ -5,7 +5,7 @@
 const SUG = process.env.SUGGEST === '1', TAPALL = process.env.TAPALL === '1', SEED = process.env.SEED || '11', path = require('path'), { chromium } = require(process.env.PW || 'playwright'), gx = require('../scripts/gx-serve.js');
 (async () => {
   const url = await gx.url('redline-rally', { file: path.join(__dirname, 'redline-rally.html') }), b = await chromium.launch({ args: ['--no-sandbox'] }); let bad = 0;
-  for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }]].filter(v => !process.env.VP || v[0] === process.env.VP)) {
+  for (const [n, vp] of [['390x844', { width: 390, height: 844 }], ['375x667', { width: 375, height: 667 }], ['375x553', { width: 375, height: 553 }]].filter(v => !process.env.VP || v[0] === process.env.VP)) {
     const c = await b.newContext({ viewport: vp, hasTouch: true, isMobile: true }), p = await c.newPage(), errs = [], probs = [];
     p.on('pageerror', e => errs.push(String(e))); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
     await p.goto(url + (url.includes('?') ? '&' : '?') + 'seed=' + SEED, { waitUntil: 'load' });
