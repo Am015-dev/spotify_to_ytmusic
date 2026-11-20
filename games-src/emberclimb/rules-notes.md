@@ -13,6 +13,13 @@ units x SCALE, so play is identical, only the printed numbers shrink. Frail is n
 to 0 on this scale) [unverified: Frail only comes from our own act 2 foes]. Ascension 2 loses 1 max HP. The table below keeps the old x8
 column for reference; read the "Tabletop source" column as what the game shows now.
 
+## Tension check (F2, 20 Nov 2026)
+The cold-play tester's easy climb (elite 0 HP lost, boss 8) was the guide's short map, where the elite had 55% and the boss 40% HP.
+F2 ends the guide at the map; the first real climb is the rulebook act. `node bench-newcomer.js 300 <hero>` (newcomer policy, Tabletop,
+1 act, now also prints HP lost per fight): normal fights cost HP 41-53% of the time (avg 1.0-1.6 of 9-10 HP), elites 83-100% (avg
+3.6-5.4 HP), the boss every time; reached the boss 10-51%, beat it 0-4%. `bal-newb.js 100 0.3`: reach 44%, beat 10%. So the default is
+already a real threat; foes were not made stronger. Gentle stays opt-in (5x HP, 3 Healing Draughts, Rest heals 8).
+
 ## One scale (R16, Nov 2026, superseded by F2 above): every number = tabletop number x SCALE (8)
 The re-review found three scales mixed (HP x8, damage ~x5, Weak/Shiv/rest x3). Now ONE constant, `D.SCALE = 8` (data.js), applies to
 every number: damage, Block, HP, healing, HP loss, Weak, Wrath, Shiv, orb values, poison per token, relic/potion/event numbers and gold.
