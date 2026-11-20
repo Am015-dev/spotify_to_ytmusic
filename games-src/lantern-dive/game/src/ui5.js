@@ -94,7 +94,9 @@ function missionLine(o) {
 }
 function tableLine(o) { const nm = o.seats.map(c => D.names[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' players' + (o.np === 2 ? ' + a drone' : ''); }
 function renderStart() {
-  const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  const s = $('#start'); s.hidden = false;
+  const oc = s.querySelector('#cfg'), ocs = oc ? oc.scrollTop : 0, ows = s.scrollTop, odt = [...s.querySelectorAll('details.fold')].map(d => d.open); /* F2: a tap inside Configure keeps its scroll and folds */
+  s.innerHTML = '';
   const rs = $('#rs'); if (rs && !UI.rsOpen) { rs.hidden = true; }
   if (NET.on) { s.dataset.v = 'net'; netStartScreen(s); return; }
   if (!UI.sv) UI.sv = UI.onl ? 'online' : 'title';
@@ -104,6 +106,7 @@ function renderStart() {
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
   if (UI.sv === 'descent') { s.appendChild(descentEl()); return; }
   s.appendChild(setupEl());
+  try { const nc = s.querySelector('#cfg'); if (nc && ocs) nc.scrollTop = ocs; s.scrollTop = ows; s.querySelectorAll('details.fold').forEach((d, i) => { if (odt[i]) d.open = true; }); } catch (e) { }
 }
 // W479: the owner\'s painted crew and the real 3D lantern fill the title screen (the lantern <img> becomes the live .glb model when the device allows)
 const CAMP_CREW = [['brack', 'Brack'], ['bram', 'Bram'], ['dag', 'Dag'], ['nerea', 'Nerea'], ['sumi', 'Sumi'], ['echo', 'Echo']], CAMP_FOES = [['lampless', 'Lampless'], ['maze', 'Maze'], ['undertow', 'Undertow']];
@@ -150,7 +153,7 @@ function diveCfg(o) {
     const cur = Math.min(32, o.mission | 0 || p.cur || 1);
     out.push(h('p.ssub', missionLine(Object.assign({}, o, { mission: cur }))));
     const g = h('div.lgrid'); D.missions.forEach(m => { const dn = p.done[m.id], lock = m.id > Math.max(p.cur, 1) + 0 && false; g.append(h('button.lcell' + (cur === m.id ? '.cur' : '') + (dn ? '.dn' : ''), { 'data-a': 'pickdive', 'data-v': m.id, type: 'button' }, h('b', m.id + '. ' + m.name), h('span', (m.sel === 'fixed' ? 'Fixed jobs' : 'Difficulty ' + m.d) + (m.cmt !== 'normal' || m.timer ? ' · ' + (m.timer ? 'timed' : ({ murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'no signals' }[m.cmt] || m.cmt)) : '')), dn ? h('span.at', 'Done in ' + dn + ' attempt' + (dn === 1 ? '' : 's')) : (p.tries[m.id] ? h('span.at', p.tries[m.id] + ' failed') : null))); });
-    out.push(g);
+    out.push(h('details.fold', h('summary', 'All 32 dives'), g));
     if (m32done(p)) out.push(h('p.sm', 'All 32 dives logged. Deep Dive starts at difficulty 18.'));
   } else if (kind === 'free') {
     out.push(seg('Difficulty', 'd', [3, 5, 7, 9, 12, 15, 18], null), seg('Signalling', 'cmt', ['normal', 'murky', 'narc', 'unknown', 'none'], { normal: 'normal', murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'none' }));
@@ -170,9 +173,9 @@ function setupEl() {
   const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', missionLine(o) + ' · ' + tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Set up the dive' : null },
     ph ? h('div.cfghead', h('b', 'Set up the dive'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
-    diveCfg(o),
     h('div.seg', h('span.lbl', 'Team size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
-    h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o))),
+    diveCfg(o),
+    h('details.fold', h('summary', 'Your crew'), h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o)))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
   const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();

@@ -142,7 +142,7 @@ const RULE_STEPS = [
   { id: 'handover', when: () => G.phase === 'assign' && G.as.mode === 'cmd', say: 'Captain keeps every job, or hands them all to a volunteer.', target: '#pool' },
   { id: 'volunteer', when: () => G.phase === 'assign' && (G.as.mode === 'vol' || G.as.mode === 'split'), say: 'Volunteers take every job. Say yes or no when asked.', target: '#pool' },
   { id: 'predict', when: () => G.phase === 'predict', say: 'Predict exactly how many tricks this job\'s owner will win.', target: '#acts' },
-  { id: 'murky', when: () => G.phase === 'play' && G.comm === 'murky', say: 'Murky water: a signal shows the card, but no token.', target: '#hand' },
+  { id: 'murky', when: () => G.phase === 'play' && G.comm === 'murky', say: 'Murky water: a signal puts the token beside the card with no mark.', target: '#hand' },
   { id: 'narc', when: () => G.phase === 'play' && G.comm === 'narc', say: 'Deep narcosis: shared tokens. Anyone may grab one between tricks.', target: '#hand' },
   { id: 'clock', when: () => G.phase === 'play' && !!G.clock, say: 'The clock is running. Finish every job before time runs out.', target: '#clk' },
   { id: 'drone', when: () => !!G.two && G.phase !== 'over', say: 'The drone is a third hand. The Captain plays its top cards.', target: '.seat.drone' }

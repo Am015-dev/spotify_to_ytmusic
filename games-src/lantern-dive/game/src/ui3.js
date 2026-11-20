@@ -45,7 +45,7 @@ function newGame(mode, o) {
   UI.news = [];
   UI.coach = { level: mode === 'tutorial' || !UI.prefs.hints ? 'off' : 'light', seen: {}, keep: false };
   UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
-  if (mode === 'vs' && !NET.on && !o.noGoal) UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg();
+  if (mode === 'vs' && !NET.on && !o.noGoal && !lsGet('ld_goal_seen')) { lsSet('ld_goal_seen', '1'); UI.dlg = { who: 'mara', title: 'Goal', lead: 'Finish every job card to win the dive together.', body: ['Each job belongs to one diver.', 'A job is met by the tricks that diver wins.', 'One broken job ends the attempt.'], btn: 'Dive' }, drawDlg(); }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function tutorialStack() {
@@ -214,7 +214,9 @@ function floatAt(seat, text, cls) {
   try {
     const bd = $('#bd'), el = document.querySelector('[data-key="seat' + seat + '"]'); if (!bd || !el) return;
     const B = bd.getBoundingClientRect(), r = el.getBoundingClientRect(), f = h('div.fl' + (cls ? '.' + cls : ''), text);
-    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f); setTimeout(() => f.remove(), 1500);
+    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f);
+    /* F2: keep the pop-up 8 px inside the table edges (it is centred on its left) */
+    const fw = f.offsetWidth * .65 + 8, cx = Math.min(Math.max(r.left - B.left + r.width / 2, fw), B.width - fw); f.style.left = Math.round(cx) + 'px'; setTimeout(() => f.remove(), 1500);
   } catch (e) { }
 }
 // a job card taken from the table flies to the seat that took it
