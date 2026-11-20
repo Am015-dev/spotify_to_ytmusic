@@ -2,7 +2,9 @@
 // Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
 //   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
 //   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
-//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId, finger?:true})
+//   Calm (owner, Nov 2026): one helper at a time and nothing loops. The bulb answer is its bubble + one target ring that pulses 3 times, then rests.
+//   The ghost finger is still created (data-tx/ty/fx/fy name the target for tests and games) but hidden; finger:true shows it for 3 taps.
 //   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
 // Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
 (function () {
@@ -125,20 +127,22 @@
   }
   function ringAt(r, cls) {
     var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    if (cur) { if (!cur.t0) cur.t0 = Date.now(); else e.style.animationDelay = -(Date.now() - cur.t0) + 'ms'; }   // a redraw (relayout) continues the 3 pulses, never restarts them
     e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
     if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
     D.body.appendChild(e); return e;
   }
   function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
-  function fingerAt(fr, tr) {
-    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+  function fingerAt(fr, tr, show) {
+    var f = mk('div', 'gxh-finger' + (show ? '' : ' gxh-off'), '<i></i><b></b>'); D.body.appendChild(f);
     f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
     if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
     var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
     var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
       : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
     f.style.transform = T(b, 1);
-    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    if (show && !reduced() && !(cur && cur.fdone)) { try { var an = f.animate(kf, { duration: fr ? 2300 : 1500, iterations: 3, easing: 'ease-in-out' }); an.onfinish = function () { f.classList.add('gxh-off'); if (cur) cur.fdone = 1; }; } catch (e) {} }
+    else f.classList.add('gxh-off');
     return f;
   }
   function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
@@ -164,7 +168,8 @@
     clearEls();
     var tr = toRect(cur.target); if (!tr) { hide(); return; }
     var fr = cur.from ? toRect(cur.from) : null, els = [];
-    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    // one helper at a time: the bubble and its target ring; the drag-start ring and the finger only when the game asks (GXH.bulb({finger:true}))
+    if (cur.kind === 'bulb') { var fo = !!(bulbOpts && bulbOpts.finger); if (fr && fo) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr, fo)); }
     else els.push(ringAt(tr, 'soft'));
     var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
     place(b, tr);

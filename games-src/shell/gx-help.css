@@ -20,11 +20,14 @@
 .gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
 .gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
 .gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
-.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out 3}
 .gxh-ring.round{border-radius:50%}
 .gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
 .gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+/* calm (owner, Nov 2026): the ring pulses 3 times, then rests as a still ring. The finger stays in the DOM (its data-tx/ty name the target) but is not
+   shown while the bubble is open (one helper at a time); GXH.bulb({finger:true}) shows it for 3 taps. */
 .gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger.gxh-off{display:none}
 .gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
 .gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
 .gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
@@ -56,7 +59,7 @@
 .gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
 @keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
-@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}.gxh-finger{display:none}}
 @media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
 /* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:14px;line-height:1.25}

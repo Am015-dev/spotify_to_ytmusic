@@ -268,3 +268,24 @@ Live fix: original-name phrase removed from shelf blurb + sands page (15:2x).
 - Open: R45 thornbound session_01RR7mnbDn4tA4SvpCj1ihvr, R46 shipwreck session_01RR7mnZbLYUHMYur6TYNoQu, F11-doorkick session_01RR7mnYWzaLq4i4fHCHkH2p, F8-vinegrave blocked.
 - 14 Nov 15:05. NEW REVIEW BAR (after owner bug reports on twin-thrones and hollowbough): reviewers check rules vs the ORIGINAL game (not just our notes) and clutter (max 1 helper on screen, no infinite animations). Most live games probably fail the clutter check -> after hollowbough proves a calm pattern and the owner agrees, roll out a shelf-wide calm pass.
 - Not live / in work (prefix session_01RR7mn): F1-twin-thrones XqpNwCd7hrdtXH7DE (shelf/W520-twin-thrones-rules), R52 hollowbough YcC7czEgZR4ksasTV (shelf/W521-hollowbough-rules 06901ebc), F14-doorkick XX6k587WSBg7CnmDd, F11-shipwreck Y3VbyzkcKeiyc9nLn (beast vs palisade rule), F11-thornbound bgj44sbfMxDTNyMy2 (CMD_L hint text). F8-vinegrave bR1jxcLTeRJtguPvS blocked since 12 Nov 20:06.
+
+## 14 Nov 21:45 UTC: Hollowbough live (owner yes)
+- R62 PASS 7.1 (strict bar). Deployed 7fd69fc4 + a 1-line fix (start title plate box-sizing, look-check panels|div#start). Live check clean (only the site-root favicon 404).
+- In review: R68 twin-thrones (d60ea103), R69 vinegrave (7f6ced76). Fixing: F16 doorkick, F14 shipwreck, F13 thornbound.
+- Hollowbough small follow-ups (not blocking): answer hand taps on rival turn, stop result-screen tree sway, 553 city choice under tray, glow fewer in normal games.
+- Proposal pending owner yes: shelf-wide calm pass (shell gxh-pulse finite), one build-all.
+
+## 14 Nov 23:50 UTC: Twin Thrones live (owner yes)
+- R70 PASS 7.5. Deployed (game-only + endline-test sweep). Live check clean (only site-root favicon 404).
+- Follow-ups (not blocking): clear floating +N pops when sheets open, 375 status line cut, chain-link help text, wonder cost line, soften Easy "Poor move".
+- In review: R72 shipwreck, R73 doorkick. Fixing: F12 vinegrave, F14 thornbound. CALM1 (shelf/W530-calm-pass, owner-approved shell calm pass) triaging sweep failures.
+
+## 20 Nov 15:00 UTC: calm pass live on all games; strict re-review of old games started
+- Shell calm pass deployed (24/24 PASS, live check clean). Tidewake fx live behind ?fx=1 (owner to say yes/no). Pages workflow now sparse-checks out games/ (full checkout hung twice).
+- In flight: R74 thornbound, R75 doorkick, F13 vinegrave (W490), F15 shipwreck (W468); strict re-reviews R76 emberclimb, R77 redline-rally, R78 short-fuse.
+- Owner goal: tell them when ALL games pass the strict bar and are live. Remaining old games to re-review in waves: sunglaze, kaiten-kitchen, rampart-and-vine, stitchwise, crown-city-smash, final-approach, lantern-dive, wildmark, perch-and-plume, sands-of-qamar, nebula-aces, cauldron-fair, vale-of-banners, tidewake.
+
+## 20 Nov 15:10 UTC: OWNER: "hollowbough and twin thrones are unplayable and not fun" (both had passed strict review)
+- Lesson: the rubric/test pass does not match the owner's eyes. A game goes to the owner only with a before/after webm of the first 3 minutes at 375x667 and a cold-play verdict from an agent that did not build it.
+- PLAY1 hollowbough (shelf/W550-hollowbough-play), PLAY2 twin-thrones (shelf/W551-twin-thrones-play): Opus workers diagnosing and fixing the core play against the original's official app.
+- 21 strict reviews/fixers in flight (R74-R92, F13 vinegrave, F15 shipwreck). Treat their PASS as necessary, not sufficient: add the cold-play video step before asking the owner.

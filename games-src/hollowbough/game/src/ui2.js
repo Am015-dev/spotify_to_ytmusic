@@ -159,9 +159,9 @@ function myMoves() {
 function tileInfo(kind, i) {
   switch (kind) {
     case 'basic': { const b = D.basic[i]; return { name: b.name, text: b.text, shared: b.shared, key: 'basic:' + i }; }
-    case 'forest': { const f = D.forest[G.forest[i]]; return { name: f.name, text: f.text, shared: false, key: 'forest:' + i }; }
+    case 'forest': { const f = D.forest[G.forest[i]]; return { name: f.name, text: f.text, shared: false, slots: G.np >= 4 ? 'Two workers, never two of yours.' : '', key: 'forest:' + i }; }
     case 'haven': return { name: D.haven.name, text: D.haven.text, shared: true, key: 'haven:' };
-    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.', shared: false, key: 'journey:' };
+    case 'journey': return { name: D.journeyName, text: 'Autumn only. Discard 5, 4, 3 or 2 cards. The worker stays and scores that many points.', shared: false, slots: 'One worker on 5, 4 and 3. The 2 spot takes any number.', key: 'journey:' };
     case 'bev': { const e = D.basicEvents[G.bev[i].k]; return { name: e.name, text: e.text, key: 'event:b' + i }; }
     case 'sev': { const e = D.specialEvents[G.sev[i].k]; return { name: e.name, text: e.text, key: 'event:s' + i }; }
   }
@@ -201,13 +201,13 @@ function tgOf(m) {
   if (m.type === 'choose') return 'q:' + m.i;
   return '';
 }
-// ---- the newcomer guide (R35): in a guided or vs game the ghost finger shows by default (off only when the player turned hints off),
-// and on a plain turn only the 1-3 best places or cards glow; every other legal place still answers a tap, it just does not shine
+// ---- the newcomer guide: the ghost finger and the 1-3 best glows show in the guided first game, and in a normal game only when the
+// player turned Hints on (Menu; off by default: owner, FIXED13 "confusing and distracting"). Otherwise every legal place glows softly.
 function guideOn() {
   if (!G || G.phase === 'over' || (UI.cfg && UI.cfg.tutorial) || UI.camp || NET.on) return false;
   if (UI.mode === 'guided') return true;
   if (UI.mode !== 'vs' && UI.mode !== 'solo') return false;
-  try { return localStorage.getItem('hb_hints') !== '0'; } catch (e) { return true; }
+  return !!UI.hints;
 }
 function guideTop() {
   const seat = viewSeat(), key = G.logN + ':' + G.turn + ':' + seat;
@@ -425,7 +425,7 @@ function chipEl(s, n) {
 }
 // a choice of which effect goes first: each option names the card and says in one line what it does
 const effQ = () => !!(G && G.q && (G.q.kind === 'trigger' || G.q.kind === 'production'));
-function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').split(/\s+/); return w.length > 10 ? w.slice(0, 9).join(' ') + '…' : w.join(' '); }
+function effLine(id) { const w = String(cdef(id).text || '').replace(/\s*\([^)]*\)/g, '').replace(' in your own city', '').split(/\s+/); return w.length > 8 ? w.slice(0, 7).join(' ') + '…' : w.join(' '); }
 // ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips
 function trayChip(m, i, tg) {
   let inner;
@@ -483,7 +483,7 @@ function renderActs(mm, qm, qShown) {
   if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
   if (mine) {
     if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, seasonIcon(p.season + 1, 26), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
-    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
+    else if (p.season < 3) { const n = availW(p); a.appendChild(h('button.btn.prep.dis', { type: 'button', 'aria-disabled': 'true', 'data-a': 'noprep', 'aria-label': 'Prepare after your last worker' }, seasonIcon(p.season + 1, 26), h('span.prepw', n > 0 ? [h('b', 'Prepare'), h('small', n + ' worker' + (n > 1 ? 's' : '') + ' left')] : 'Prepare'))); }   // says why it is off
     if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
   }
 }
@@ -505,7 +505,7 @@ function promptText() {
   if (p.ai) return UI.aiCap || p.name + ' is playing…';
   if (G.q) return qShort(G.q);
   const n = availW(p);
-  if (isPh() && !hotSeat() && humans().length <= 1) return n > 0 ? 'Place a worker' : p.season < 3 ? 'Build or Prepare' : 'Build or Pass';   // phone: one short line (Pass only in Autumn)
+  if (isPh() && !hotSeat() && humans().length <= 1) { const canB = myMoves().some(m => m.type === 'play'); return n > 0 ? (canB ? 'Place a worker or build' : 'Place a worker') : p.season < 3 ? (canB ? 'Build or Prepare' : 'Prepare') : (canB ? 'Build or Pass' : 'Pass'); }   // phone: one short line (Pass only in Autumn)
   const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
   const last = p.season < 3 ? 'Prepare' : 'Pass';
   return pre + (n > 0 ? (PV_ON ? 'place a worker.' : 'tap a glowing spot.') : (PV_ON ? 'build or ' + last + '.' : 'play a card or ' + last + '.'));
@@ -521,6 +521,7 @@ function qShort(q) {
 function chipText(label) {
   let s = String(label || '');
   let m;
+  if ((m = s.match(/^Long Road \d+ - discard (\d+) cards?; .*scores (\d+)/))) return 'discard ' + m[1] + ' \u00b7 ' + m[2] + ' pts';
   if ((m = s.match(/^Do not use /))) return 'Skip: repeat nothing';
   if ((m = s.match(/^Spend a token: repeat (.*)$/))) s = 'Repeat ' + m[1];
   if ((m = s.match(/^Give 1 berry to (\S+) and take 2 point tokens/))) return 'Give ' + m[1] + ' a berry: +2 tokens';
@@ -582,10 +583,10 @@ function pvWord(k, n) {
   return '';
 }
 const PV_SPECIAL = {
-  forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a place', '+ 1 card', 'copy'],
+  forest_rummage_hollow: ['Swap cards', 'draw 2 per discard', 'card'], forest_echoing_meadow: ['Copy a basic place', '+ 1 card', 'copy'],
   forest_barter_stump: ['Cards to goods', '1 each, up to 3', 'any'], forest_meadow_bazaar: ['Take 2 meadow', 'play 1 for 1 less', 'meadow']
 };
-const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
+const PV_BOARD = { forest_rummage_hollow: 'Swap cards', forest_echoing_meadow: 'Copy a basic place', forest_barter_stump: 'Cards to goods', forest_mixed_glade: 'twig, resin, berry', forest_meadow_bazaar: 'Meadow card 1 off' };
 const PV_TCOL = { production: 'green', destination: 'red', governance: 'blue', traveler: 'tan', prosperity: 'purple' };
 function pvSpot(kind, i) {
   const join = l => { const w = l.map(([k, n]) => pvWord(k, n)).filter(Boolean); return { main: w.slice(0, 2).join(' + '), sub: w.slice(2).join(' + '), ico: l[0] ? l[0][0] : 'any' }; };
@@ -857,7 +858,9 @@ function pvRender() {
   if (short) { hs.scrollTop = UI.hsy || 0; hs.addEventListener('scroll', () => { UI.hsy = hs.scrollTop; }, { passive: true }); const g = hs.querySelector('.glow'); if (g && (g.offsetTop < hs.scrollTop || g.offsetTop + g.offsetHeight > hs.scrollTop + hs.clientHeight)) hs.scrollTop = g.offsetTop - 20; }
   else hs.scrollLeft = fits ? 0 : (UI.hsx || 0); if (!short) { const g = (UI.rec && UI.rec.m && UI.tgEls[tgOf(UI.rec.m)]) || hs.querySelector('.glow'); if (g && g.closest('.strip.hand') === hs) hscrollTo(g); }
   if (guideOn()) { try { computeRec(); } catch (e) { } }   // the finger is there as soon as the turn is drawn
+  document.documentElement.classList.toggle('calm', !guideOn() && !(UI.cfg && UI.cfg.tutorial));   // a normal game: soft, still glows
   renderPrompt(); renderBar(); pvFitWords(bd); placeFinger();
+  if (typeof hlpIdleArm === 'function') hlpIdleArm();
   if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
 }
 // no cut words on a phone: a label whose longest word is wider than its box (or that runs past its card) steps its font down, to 11 px at the least
@@ -870,6 +873,19 @@ function pvFitWords(root) {
 }
 // ---- hook into the existing game: board renderer, scroll-into-view, flights, rival moves, prompt words
 // Play view part of hscrollTo (src/ui3.js): show the panel holding el, scroll it into view; true when el is in the meadow row (done)
+// bring el fully on screen: open its phone tab, then move every scrolling ancestor (rows sideways, lists up and down) by real rectangles
+function pvReveal(el) {
+  if (!el || !el.closest) return;
+  const p = el.closest('#bd.pv .pv-panel'); if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
+  for (let a = el.parentElement, n = 0; a && a !== document.body && n < 12; a = a.parentElement, n++) {
+    const cs = getComputedStyle(a), sx = /auto|scroll/.test(cs.overflowX) && a.scrollWidth > a.clientWidth + 1, sy = /auto|scroll/.test(cs.overflowY) && a.scrollHeight > a.clientHeight + 1;
+    if (!sx && !sy) continue;
+    const r = el.getBoundingClientRect(), q = a.getBoundingClientRect();
+    if (sx && (r.left < q.left + 6 || r.right > q.right - 6)) a.scrollLeft += r.left - q.left - (parseFloat(cs.scrollPaddingLeft) || 8);   // align the card's left edge: a snapping row (scroll-snap start, 8px padding) lands exactly there
+    if (sy) { if (r.top < q.top + 4) a.scrollTop += r.top - q.top - 6; else if (r.bottom > q.bottom - 4) a.scrollTop += r.bottom - q.bottom + 6; }
+    if (a.classList.contains('pv-mead')) UI.pvMx = a.scrollLeft; else if (a.classList.contains('pv-board-t')) UI.pvBx = a.scrollLeft; else if (a.classList.contains('hscroll')) { UI.hsx = a.scrollLeft; UI.hsy = a.scrollTop; }
+  }
+}
 function pvScrollTo(el) {
   const p = el && el.closest && el.closest('#bd.pv .pv-panel');
   if (p && pvTall() && !p.classList.contains('on')) pvSetTab(p.dataset.p, true);
