@@ -2,9 +2,9 @@
 // Rules, engine and AI are untouched. Everything here is looks and touch; the moves still come from validMoves() through uiAct().
 const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
-// every hand card shows its whole name: shrink the type (not below 10 px) until no word is cut and it fits in 3 lines
+// every hand card shows its name: shrink the type (never below 11 px, the phone floor) until no word is cut and it fits; a name still too long ends in an ellipsis (tbl.css)
 function tbFitNames(cs){cs.forEach(c=>{const m=c.querySelector('.cn');if(!m)return;m.style.removeProperty('font-size');let fs=parseFloat(getComputedStyle(m).fontSize)||14;
-  const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;const fl=c.closest('.arena')?11:10;for(let i=0;i<10&&bad()&&fs>fl;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
+  const bad=()=>m.scrollWidth>m.clientWidth+.5||m.scrollHeight>m.clientHeight+1;const fl=11;for(let i=0;i<10&&bad()&&fs>fl;i++){fs-=1;m.style.setProperty('font-size',fs+'px','important')}})}
 function tbFan(){tbFitNames([...document.querySelectorAll('.arena .card,.bfstage .card')]);const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   hd.classList.remove('row');const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
   const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0){if((tbFan.n=(tbFan.n||0)+1)<25){clearTimeout(tbFan.t);tbFan.t=setTimeout(tbFan,200)}return}tbFan.n=0;   // hand not laid out yet (board hidden behind a screen): fit it again when it shows
@@ -21,7 +21,7 @@ function tbFan(){tbFitNames([...document.querySelectorAll('.arena .card,.bfstage
   hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');hd.style.setProperty('--vis',(step-2).toFixed(1)+'px');
   hd.classList.toggle('scrolls',sc);hd.classList.toggle('tight',step<44);
   // each name sits on the visible strip of its card (the next card covers the rest): shrink the type until no word is cut
-  cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';if(k===cs.length-1)return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>5.5;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
+  cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';if(k===cs.length-1)return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>11;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
 // bring an element into view inside its OWN sideways scroller (the hand, the gear row) and nothing else: scrollIntoView also scrolls the clipped
 // (overflow:hidden) table board sideways, which pushed the hand, the rival chips and the glow targets off the screen
 function dkReveal(e){for(let p=e&&e.parentElement;p&&p!==document.body;p=p.parentElement){const o=getComputedStyle(p).overflowX;if((o==='auto'||o==='scroll')&&p.scrollWidth>p.clientWidth+1){const r=e.getBoundingClientRect(),q=p.getBoundingClientRect();p.scrollLeft+=(r.left+r.width/2)-(q.left+q.width/2);return}}}
@@ -115,6 +115,8 @@ function tbDiff(S,N){if(!S||!N||S.gid!==N.gid||!S.hc||!N.hc||!BF.motion())return
 let _tbR=0;addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},120);setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},460)});
 try{if(window.visualViewport)visualViewport.addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan()}catch(e){}},120)})}catch(e){}
 
+// the option a Bad Stuff card pick would cost you least (the computer's own choice for you), or null
+function tbWeakest(me){try{const q=G.q;if(!q||q.kind!=='pick'||!['lose','slug','taxpay'].includes(q.why))return null;const v=aiPick(P(me),q.why,q.opts,q.cont);return typeof v==='number'?v:null}catch(e){return null}}
 // ---- short words on the phone: the toast, questions and the dock keep to a few words ----
 const tbPh=()=>document.documentElement.classList.contains('ph');
 (function(){
@@ -124,11 +126,15 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   const _p=promptHTML;promptHTML=function(me){let h=_p(me);if(!tbPh()||!G||!G.q||me<0||sideToAct()!==me||!P(me).human)return h;const q=G.q;let s='';
     if(q.kind==='help')s=`${P(q.from).nm.split(/[ ,]/)[0]} offers ${q.n} treasure${q.n===1?'':'s'}. Help?`;
     else if(q.kind==='rescue'){const vm=validMoves(me);s=vm.some(m=>m.act==='use')?'Caught! Tap a glowing card to escape.':vm.some(m=>m.act==='reroll')?'Caught! Discard a card to roll again?':'Caught! Take the Bad Stuff.'}
+    else if(q.kind==='pick'&&['lose','slug','taxpay'].includes(q.why)){const w=tbWeakest(me);s=`${q.why==='taxpay'?'Tax: pick an item to pay':'Bad Stuff: pick a card to lose'}.${w!=null?` Weakest: ${cname(w)}.`:''}`}
     else if(q.kind==='pick')s=q.why==='loot'&&G.loot?`Loot a card from ${P(G.loot.v).nm.split(/[ ,]/)[0]}:`:bfCap(String(q.text||'Choose one.').replace(/<[^>]+>/g,''),8);
     else if(q.kind==='ward')s='A curse is coming! Cancel it?';
     else if(q.kind==='glue')s='Make them roll again?';
     else if(q.kind==='lawyer')s='Swap 2 treasures for 2 new?';
     else if(q.kind==='fetch')s='Throw it to escape?';
+    // Cleric Resurrection: the whole question, the treasure it brings back on show, and its answers in a 4-wide grid (5-wide past 8 answers), two rows of 44 px buttons
+    if(q.kind==='pick'&&q.why==='resTr'&&G.td.length){const top=G.td[G.td.length-1];const face=cardHTML(top,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-zcard=').replace(/<\/button>$/,'</span>');
+      return h.replace(/<p class="say">.*?<\/p>/,`<p class="say restq"><span class="restr" data-rescard="${top}">${face}</span><span>Resurrect <b>${esc(cname(top))}</b>${cd(top).b?` (+${cd(top).b})`:''}? Pay a card from your hand, or draw.</span></p>`).replace('<div class="acts main">',`<div class="acts main resg${q.opts.length>8?' resg5':''}">`)}
     return s?h.replace(/<p class="say">.*?<\/p>/,`<p class="say">${esc(s)}</p>`):h}})();
 
 // a rival one fight from winning: one short banner; the best counter is a button in the dock
