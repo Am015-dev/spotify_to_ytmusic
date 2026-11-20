@@ -230,8 +230,8 @@ function coachLine() {
     case 'sel': { var heroes = E.liveHeroes(G), h = heroes[UI.tab] || heroes[0], n = (UI.sel[h.id] || []).length; if (G.round > 2 && h.disc.length >= 2 && h.hand.length <= 3) return 'Low on cards? Rest to get them back.'; return n === 0 ? plan : n === 1 ? 'Pick one more card.' : 'Tap Ready.'; }
     case 'first': case 'second': {
       if (UI.pick) return 'Tap Play.';
-      if (!fo) return A.h === 'first' ? 'Use the top of one card, the bottom of the other.' : 'Now the other half of the other card.';
-      return fo.d <= 1 ? 'The ' + nm + ' is next to you: play an attack half.' : 'The ' + nm + ' is ' + fo.d + ' hexes away: play a move half, then attack.';
+      if (!fo) return 'No foe in sight: play any half (a move heads for the door).';
+      return fo.d <= 1 ? 'The ' + nm + ' is next to you: play an attack half.' : 'The ' + nm + ' is ' + fo.d + ' hexes away: attack if a half reaches it, or move closer.';
     }
     case 'move': return fo && fo.d > 1 ? 'Tap a lit hex closer to the ' + nm + '.' : 'Tap a lit hex to walk there.';
     case 'target': return 'Tap the red foe. A flipped card adds luck.';

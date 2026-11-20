@@ -381,6 +381,7 @@ async function playEv(e) {
       FX.play(ranged ? 'impact' : 'slash', ts.x, ts.y, ranged ? { angle: Math.atan2(ts.y - as.y, ts.x - as.x) } : { facing: ts.x >= as.x ? 1 : -1 });
       logLine(figName(at) + ' hits ' + figName(tg) + ': ' + e.base + ' ' + cards[0].map(function (x) { return modHTML(x).t; }).join(' ') + ' → ' + (e.nul ? 'miss' : e.dmg));
       await sleep(speed(e.x2 || e.nul ? 900 : 700));
+      mc.hidden = true;
       return;
     }
     case 'dmg': v = vf(e.id); if (v) v.hp = e.hp; float(e.id, '−' + e.n, 'dmg'); if (v) { v.flash = 1; draw(); await sleep(speed(90)); v.flash = 0; } draw(); try { GX.buzz && GX.buzz(20); } catch (x) { } return sleep(speed(150));
