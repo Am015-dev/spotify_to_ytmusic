@@ -18,7 +18,7 @@ const STORY = {
   // id -> [title, say]. say may be a function. Max two short lines. The guide speaks; the glow shows where to tap, so no "click here" wording.
   steps: {
     goal: ['The goal', 'Most points after nine days wins; tonight we practise two.'],
-    fortune: ['Fortune card', 'Purple fortune cards happen at once, so take the rubies.'],
+    fortune: ['Fortune card', 'Purple cards act at once; take the rubies, they buy droplet steps.'],
     draw1: ['Draw a chip', 'Everyone draws at once: tap your bag for one chip.'],
     keep: ['Moves and scores', () => 'It moved ' + tn(tp().pot[0].v, 'space') + ' and you score the next space; draw again.'],
     keep2: ['White chips', 'Whites fill the meter, over 7 explodes; stop any time, or draw.'],

@@ -10,7 +10,7 @@
     try { GXH.setEnabled(false); } catch (e) { }
     window.AIDELAY = 40; UI.pullMs = 0; newGame('vs', {});
     return GXS.wait(function () {
-      prepFix(); var b = q('[data-a=rscont]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
+      prepFix(); var b = q('[data-a=rscont]') || q('[data-a=rubygo]') || q('.stopb:not(.off)') || q('.bagb:not(.off)') || q('[data-a=mv]');
       if (b && !document.querySelector('.stalls')) b.click();
       return document.querySelector('.stalls');
     }, 60000).then(function () { return quiet(); });

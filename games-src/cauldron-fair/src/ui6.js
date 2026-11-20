@@ -84,7 +84,7 @@ function brewDeck(p, v, legal) {
   const r = CF.risk(G, v), sp = CF.spaceOf(p), heat = heatOf(p);
   const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
   deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
-  deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
+  const mtr = bfMeter(p, v, p.lock ? null : fm, legal); deck.appendChild(mtr);
   const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button', 'aria-label': 'Put the white chip back, free' }, h('b', '↩ White'), h('small', 'back, free')) : null,
     legal.find(x => x.t === 'restart') ? h('button.btn.alt.bx', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button', 'aria-label': 'Do-over: tip the chips back, once' }, h('b', 'Do-over'), h('small', 'once')) : null].filter(Boolean);
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
@@ -95,7 +95,8 @@ function brewDeck(p, v, legal) {
   const keep = h('small.keep', h('span', { html: ico('vp', 15) }), D.VP[sp], h('span', { html: ico('coin', 15) }), D.COINS[sp], D.RUBY[sp] ? h('span', { html: ico('ruby', 15) }) : null);
   const stop = sm ? h('button.btn.stopb', { 'data-a': 'mv', 'data-i': legal.indexOf(sm), type: 'button', disabled: BF.pulling ? true : null, 'aria-label': 'Stop and keep ' + D.VP[sp] + ' points and ' + D.COINS[sp] + ' coins' }, h('b', 'Stop'), keep)
     : h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Pull your first chip first' }, h('b', 'Stop'), p.pot.length ? keep : h('small.keep', 'after a chip'));
-  deck.appendChild(h('div.brow', bag, stop, ...extras));   // R90 phone: the rare extras sit in the same row, so nothing runs past the bottom of a 553 px screen
+  deck.appendChild(h('div.brow', bag, stop));
+  extras.forEach(b => mtr.appendChild(b));   // R90 phone: the rare extras sit at the end of the white-chip meter: Draw and Stop never move and nothing runs past the bottom
   return deck;
 }
 // ---------- the boil: the pot reacts to the risk (CSS on #cwrap, the painted layer reads BF.heat) ----------

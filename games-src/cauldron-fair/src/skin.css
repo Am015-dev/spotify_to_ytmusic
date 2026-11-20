@@ -222,7 +222,7 @@ html.ph{--gx-bar-h:48px}html.ph .gx-bar{height:48px;min-height:48px;overflow:vis
 html.ph.hasinstr:not(.ph-l) #caul{padding-bottom:var(--instrh,60px);box-sizing:border-box}
 #instr span{overflow-wrap:anywhere}
 .btn.confirm.busy{transform:translateY(2px) scale(.97);filter:brightness(.85)}
-@media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:13px;max-height:2.6em;padding:2px 8px}}
+@media (max-height:760px){.stall .sdo{display:none}.mkt .sinfo{font-size:14px;max-height:2.6em;padding:2px 8px}}
 .tsegs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
 @media (max-height:500px){.tsegs .tseg+.tseg{display:none}}   /* short landscape: rival levels stay in More options */
 /* R3 fix: the ruby screen says in words what each option does; the shop keeps its short stall lines on small phones */
