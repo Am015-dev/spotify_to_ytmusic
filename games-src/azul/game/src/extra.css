@@ -214,7 +214,7 @@ html body .gxh-bub.gxh-bulbb .gxh-tx{padding-right:0}
 #bf .rv-row.could{box-shadow:0 0 0 1.5px rgba(255,210,74,.55)}
 #bf .rv-fl{margin-top:2px;align-items:center}
 #bf .rv-pen{font:900 12px var(--ff);color:#ff9a8a;margin-left:4px}
-#bf .rv-say{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:1px;font:700 12px/1.2 var(--ff);min-width:0;align-self:start}
+#bf .rv-say{grid-column:2;grid-row:2;display:flex;flex-direction:column;gap:1px;font:700 13px/1.2 var(--ff);min-width:0;align-self:start}
 #bf .rv-say b{font-weight:800;color:#ffe08a;font-size:13px}#bf .rv-say span{color:#e9dcc0}
 html.bf-wide #bf .bf-riv{grid-template-columns:1fr;grid-template-rows:auto auto auto;align-self:center;margin:4px 0 4px 10px;padding:12px 14px;row-gap:10px;width:calc(var(--rc)*10 + 34px);box-sizing:content-box}
 html.bf-wide #bf .rv-hd{grid-column:1;grid-row:1;font-size:18px}html.bf-wide #bf .rv-hd i{width:26px;height:26px}
@@ -242,3 +242,9 @@ html body .gxt-bub.gxt-shake .gxh-tx::after{content:none}
 /* the bubble has its own band between the kilns and the racks on phones, so it never sits on a tile */
 html.sg-tut.bf:not(.bf-land) #bf .bf-line{height:58px}
 html body .gxt-bub.gxt-nobtn .gxh-tx{padding-right:0}
+
+/* F5: phones keep the rival as one compact row (name, stars, start token); tap it to open the mini board */
+html:not(.bf-wide) #bf .bf-riv:not(.open){padding:2px 10px;margin-top:2px;grid-template-columns:1fr;grid-template-rows:auto;min-height:30px}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-bd,html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-say{display:none}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd{grid-column:1;grid-row:1}
+html:not(.bf-wide) #bf .bf-riv:not(.open) .rv-hd::after{content:'▾ board';margin-left:auto;font-size:13px;color:#e9dcc0}
