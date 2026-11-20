@@ -302,7 +302,11 @@
   function restHeal(h) { return (G.gentle ? D.GENTLE.rest : 3) * SC + (has('healing-moss') ? SC : 0); }   // tabletop Rest: heal 3 (x SCALE = 24 = 30% of an 80 HP hero)
   function startBattle(kind) {
     var P = (G.act > 1 && D.ENCA[G.act]) || D.ENC, pool = kind === 'e' ? P.elite : kind === 'b' ? [[G.boss]] : (G.fights === 0 && P.first ? P.first : G.fights < 3 ? P.weak : P.strong);
-    var ids = pool[ri(pool.length)].slice();
+    var cand = pool;
+    if (kind !== 'e' && kind !== 'b') {   // F6: draw like a deck: no foe repeats until the whole pool has been met (the same one every fight read as a bug)
+      G.encSeen = G.encSeen || []; cand = pool.filter(function (gp) { return G.encSeen.indexOf(gp[0]) < 0; }); if (!cand.length) { G.encSeen = []; cand = pool; }
+    }
+    var ids = cand[ri(cand.length)].slice(); if (kind !== 'e' && kind !== 'b') G.encSeen.push(ids[0]);
     if (G.tutEnc && G.tutEnc[G.floor]) ids = G.tutEnc[G.floor].slice();   // coached first climb: fixed foes per floor (src/tutor.js)
     if (G.tutHp && G.tutHp[G.floor]) G.ehp = G.tutHp[G.floor];
     if (kind !== 'e' && kind !== 'b') {   // an Encounter room has one enemy per hero: trim a bigger group, top a smaller one up from another group of the same pool
@@ -434,6 +438,7 @@
     var kind = G.b.kind, gold = SC * (kind === 'b' ? 2 + ri(3) : kind === 'e' ? 1 + ri(2) : 1);   // tabletop coins x SCALE
     if (has('gold-tooth')) gold = SC * Math.round(gold * 1.5 / SC);
     G.gold += gold;
+    G.hpPre = G.hs.reduce(function (a, x) { return a + x.hp; }, 0);   // F6: HP before the after-fight heal, so the win line counts what the fight really cost
     if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + SC); });
     var cards = {}, ps = null;
     G.hs.forEach(function (h, i) { if (!h.dead) cards[i] = cardChoices(h, kind); });

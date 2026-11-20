@@ -177,7 +177,7 @@
     el.appendChild(ct); el.appendChild(art);
     if (e.cost !== -1 && e.fl.indexOf('u') < 0) el.appendChild(h('div', 'cx', e.cost === 'X' ? 'X' : String(e.cost)));
     var kk = keyNum(e); if (kk) el.appendChild(h('div', 'ck k-' + kk[0], kk[1]));
-    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb);
+    var sb = o.str || 0, cb = h('div', 'cb'); E.lines(e, sb).forEach(function (l) { cb.appendChild(h('span', 'cl' + (sb && /^Deal \d/.test(l) ? ' stb' : ''), l)); }); el.appendChild(cb); if (cb.children.length > 1) el.classList.add('ml');   // F6: multi-line cards show every line in the fan (smaller type)
     // (the full-card gem/frame overlays are not drawn: they covered the card picture and its rule text)
     return el;
   }
@@ -270,6 +270,7 @@
   UI.leave = function () { if (UI.camp) { UI.camp = null; window.EC_NOSAVE = 0; UI.mode = 'title'; UI.sub = ''; render(); try { GXC.open(); } catch (e) { } } else { UI.mode = 'title'; UI.sub = ''; render(); } };
   function diffDefault() { try { var v = localStorage.getItem('ec-diff'); if (v === 'g' || v === 't') return v; return 't'; } catch (e) { return 't'; } }   // F1: the rulebook game is the default; Gentle is opt-in
   function start() { var a = UI.acts || 1; E.newGame({ heroes: UI.pick.slice(), acts: a > 3 ? 3 : a, final: a > 3 ? 1 : 0, bless: 1, gentle: (UI.diff || diffDefault()) === 'g' ? 1 : 0 }); UI.sub = ''; UI.mode = 'game'; UI.sel = -1; render(); if (!/[?&]scn=/.test(location.search)) goalCard(); }
+  setInterval(function () { try { var gq = G(); if (UI.mode === 'game' && gq && gq.scr === 'battle' && gq.b && gq.b.ph === 'e' && UI.eph && Date.now() - UI.eph > 3500 && window.ANIM) { UI.fast = true; enemyPhase(); } } catch (e) { } }, 1000);
   function resume() { var g = G(); if (g && g.scr === 'battle' && g.b.ph === 'e') enemyPhase(); }
   // hero HP + gold go in the shell bar (chips, not buttons); potions and the End turn button live in the dock
   function hud() {
@@ -316,7 +317,7 @@
     UI.endBtn = null;
   }
   var NODEG = { m: '⚔', e: '💀', r: '🔥', s: '🛒', v: '?', t: '🎁', b: '👑' }, NODEN = { m: 'node-monster', e: 'node-elite', r: 'node-rest', s: 'node-shop', v: 'node-event', t: 'node-treasure', b: 'node-boss' };
-  var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + (3 * (D.SCALE || 3) + (E.has('healing-moss') ? 10 : 0)); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
+  var NODEHINT = { m: function () { return 'fight: card'; }, e: function () { return 'high risk: relic'; }, r: function () { return 'heal ' + E.restHeal(G().hs[0]); }, s: function () { return 'shop ● ' + G().gold; }, v: function () { return 'event'; }, t: function () { return 'free relic'; }, b: function () { return 'boss'; } };   // W420
   function mapScr() {
     var g = G(); hud();
     var m = h('div'); m.id = 'map'; m.setAttribute('data-board', '1'); var SGM = STAGE(), mroot = m;
@@ -373,7 +374,7 @@
     if (it.atk) {
       var h0 = g.hs[it.tg] || g.hs[0], d; try { d = E.previewHit(g.b.en.indexOf(e), g.hs.indexOf(h0)); } catch (x) { d = it.atk; } if (d == null || isNaN(d)) d = it.atk;
       var n = it.hits || 1, t = n > 1 ? d + 'x' + n : String(d); if (it.all) t += ' all'; if (g.hs.length > 1 && !it.all) t += ' → ' + D.H[h0.k].name.split(' ')[0];
-      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: 'attacks for ' + (n > 1 ? d + ' x ' + n : d), say: 'Attack: ' + (n > 1 ? n + ' hits of ' + d : d + ' damage') + '. Block soaks it.' });
+      P.push({ k: 'atk', s: d * n >= 20 ? 'intent-attack-big' : 'intent-attack', t: 'Hits ' + t, cap: d <= 0 ? 'attacks, but 0 damage reaches you' : 'attacks for ' + (n > 1 ? d + ' x ' + n + ' (hits x damage)' : d), say: d <= 0 ? 'Attack: ' + (n > 1 ? n + ' hits' : 'a hit') + ', but each deals 0 to you right now (your Block or its Weak soaks it all). ' + t + ' means hits x damage per hit.' : 'Attack: ' + (n > 1 ? n + ' hits of ' + d + ' damage each (' + t + ' = hits x damage)' : d + ' damage') + '. Block soaks it.' });
     }
     if (it.blk) { var bk = it.blk * (it.blkH ? g.hs.length : 1); P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + bk, cap: 'raises ' + bk + ' Block', say: 'Block: +' + bk + (D.ENEMIES[e.id].keepBlk ? '. It keeps it. Break it to stop the next hit.' : '. Your hits do less.') }); }
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
@@ -382,7 +383,7 @@
     if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
     if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you (+' + it.poison + ')', say: 'Poison +' + it.poison + ': you lose ' + D.SCALE + ' HP per Poison token at the end of each turn. Tokens stay.' });
     if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your discard pile', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard pile.' }); }
-    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
+    if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes ' + it.spikes + ': it is growing thorns. Each time you hit it, you take ' + it.spikes + ' damage back. Block that turn, or hit something else.' });
     if (!P.length) P.push({ k: 'unk', s: 'intent-unknown', t: '?', say: 'Unknown: it is up to something. Watch out.' });
     return P;
   }
@@ -421,7 +422,7 @@
     var rl = h('div', 'w485rel'); (g.relics || []).forEach(function (id) { var R = D.RELICS[id]; if (!R) return; var b = h('button', 'w485r', null, [A('relic-' + id, '✦', { ph: '#8a6a2a' })]); b.type = 'button'; b.setAttribute('aria-label', R.name + ': ' + R.t); on(b, function () { UI.explain([{ k: 'str', s: 'relic-' + id, say: R.name + ': ' + R.t }]); }); rl.appendChild(b); });
     if (!(g.relics || []).length) rl.appendChild(h('span', 'w485none', 'No relics yet'));
     r.appendChild(rl);
-    r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.max(1, g.floor || 0) + '/' + ((g.F || 9) + 1)));
+    r.appendChild(h('span', 'w485fl', (g.acts > 1 ? 'Act ' + g.act + ' · ' : '') + 'Floor ' + Math.min((g.F || 9) + 1, g.scr === 'map' ? (g.floor || 0) + 1 : Math.max(1, g.floor || 0)) + '/' + ((g.F || 9) + 1)));
     if (g.scr === 'battle') r.appendChild(potRow());
     if (g.scr === 'battle') { var nw = h('div', 'w7now'); nw.setAttribute('role', 'status'); nw.setAttribute('aria-live', 'polite'); r.appendChild(nw); }   // R7: one line, what to do now (filled by dock())
     return r;
@@ -538,6 +539,10 @@
       if (bt.length) { var fb = h('div', 'w4hbf', bt.join(', ')); st.appendChild(fb); var fw = fb.offsetWidth, rx = rr0.right + 8; if (rx + fw > vw0 - 8) rx = Math.max(8, rr0.left - 8 - fw); fb.style.left = rx + 'px'; fb.style.top = Math.max(8, rr0.top + 10) + 'px'; } }   // W420 block preview beside the lifted card
     function sl0() { return hand.querySelector('.card.sel'); }
     if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)
+      try {   // F6: one first-time line on how to play a Skill or Power (no target needed); shown once ever
+        if (!UI.skHint && g.b && g.b.ph === 'p' && !localStorage.getItem('ec-skhint') && hc.some(function (c) { var t = E.eff(c).type; return t === 'S' || t === 'P'; }) && !document.querySelector('.ec-sk1')) {
+          UI.skHint = 1; localStorage.setItem('ec-skhint', '1'); var sk = h('div', 'ec-sk1', 'Blue Skills and purple Powers need no target: tap the card, then tap it again (or drag it up) to play it.'); st.appendChild(sk); setTimeout(function () { sk.remove(); }, 7000); }
+      } catch (e) { }
       for (var fit = 0; fit < 3; fit++) { var lo = 1e9, hi2 = -1e9, vwf = document.documentElement.clientWidth; hand.querySelectorAll('.card:not(.sel)').forEach(function (ce) { var q = ce.getBoundingClientRect(); lo = Math.min(lo, q.left); hi2 = Math.max(hi2, q.right); }); if (lo >= 3 && hi2 <= vwf - 3) break; var cwN = Math.floor(parseFloat(hand.style.getPropertyValue('--cw')) * (vwf - 8) / (hi2 - lo + 2)); hand.style.setProperty('--cw', Math.max(48, cwN) + 'px'); }
     }
     if (SG) hand.querySelectorAll('.card .ct').forEach(function (t) {   // F1: card names show in full: shrink a name that does not fit its visible strip (never under 11 px)
@@ -677,17 +682,19 @@
   function wt(ms) { return UI.fast ? Math.round(ms / 3) : ms; }
   function enemyPhase() {
     if (!window.ANIM) { E.settle(); render(); return; }
-    UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1;
+    UI.busy = true; UI.fast = false; UI.cap = ''; UI.actor = -1; var gen = UI.egen = (UI.egen || 0) + 1; UI.eph = Date.now();   // F6: gen + heartbeat so a stalled enemy turn (throttled tab, resumed save) is restarted, never doubled
     var spd = function () { UI.fast = true; }; document.addEventListener('pointerdown', spd, true);
     var done = function () { document.removeEventListener('pointerdown', spd, true); UI.busy = false; UI.actor = -1; UI.cap = ''; render(); try { var gq = G(), hq = gq.hs[0]; if (UI.coachReact && gq.scr === 'battle' && UI.hp0 != null) { var lost = UI.hp0 - hq.hp; if (lost >= 8 && UI.bk0 === 0) UI.coachReact('poor', 'hurt'); else if (lost === 0 && UI.bk0 > 0 && UI.inc0 > 0) UI.coachReact('good', 'blocked'); UI.hp0 = null; } } catch (e) { } var g = G(); if (g && g.scr === 'battle' && g.b && g.b.ph === 'p') 0; };
     UI.cap = 'Enemy turn: watch what each enemy does.'; render();
     (function loop() {
+      if (gen !== UI.egen) return; UI.eph = Date.now();
       var g = G(); if (!g || g.scr !== 'battle' || !g.b || g.b.ph !== 'e') return done();
       var ei = g.b.ei, e = g.b.en[ei];
       if (!e || e.dead) { E.step(); return setTimeout(loop, 30); }
       var nm = D.ENEMIES[e.id].name, P = intentParts(e), hh = g.hs[(e.intent && e.intent.tg) || 0] || g.hs[0], hp0 = hh.hp, bk0 = hh.blk;
       UI.actor = ei; UI.cap = nm + ' ' + P.map(function (p) { return p.cap || p.t; }).join(' and ') + '.'; render();
       setTimeout(function () {
+        if (gen !== UI.egen) return; UI.eph = Date.now();
         var g1 = G(); if (!g1 || !g1.b || g1.scr !== 'battle') return done();   // R1: guard delayed callbacks
         E.step(); var g2 = G(); render();
         var lost = hp0 - hh.hp, soak = Math.max(0, Math.min(bk0, bk0 - hh.blk));
@@ -720,7 +727,7 @@
   }
   // W420: one-line fight rating + reward value tags
   function rateLine(g, f) {
-    var lost = Math.max(0, f.hp0 - g.hs.reduce(function (a, x) { return a + x.hp; }, 0)), good = lost <= Math.max(6, Math.round(f.mhp * .12)) && f.waste <= 1;
+    var lost = Math.max(0, f.hp0 - (g.hpPre != null ? g.hpPre : g.hs.reduce(function (a, x) { return a + x.hp; }, 0))), good = lost <= Math.max(6, Math.round(f.mhp * .12)) && f.waste <= 1;
     var t = good ? 'Good fight: lost ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent' : ', no wasted energy') : 'Poor fight: took ' + lost + ' HP' + (f.waste ? ', ' + f.waste + ' energy unspent over ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') : lost > 0 ? ', block more before big hits' : '');
     if (f.over >= 10) t += ', ' + f.over + ' overkill';
     return h('div', 'w4rate ' + (good ? 'good' : 'poor'), t);
