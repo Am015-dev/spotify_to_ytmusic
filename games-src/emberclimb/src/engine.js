@@ -4,7 +4,8 @@
   function rnd() { var t = G.rs = (G.rs + 0x6D2B79F5) | 0; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
   function ri(n) { return Math.floor(rnd() * n); }
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = ri(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-  function fx(k, w, n, x) { if (G.q.length > 300) G.q.shift(); G.q.push({ k: k, w: w, n: n, x: x }); }
+  function fx(k, w, n, x, m) { if (G.q.length > 300) G.q.shift(); var o = { k: k, w: w, n: n, x: x }; if (m) o.m = m; G.q.push(o); }
+  function rfx(id) { fx('rtrig', 'p', 0, id); }   // F5: a relic just did something (the UI explains it the first time)
   function say(s) { G.msg = s; }
   function has(r) { return G.relics.indexOf(r) >= 0; }
   // ---------- cards
@@ -128,9 +129,34 @@
       }
       arr.push({ id: idOf[k], f: f, c: n.c, t: n.t, nx: n.nx.map(function (x) { return idOf[x]; }) });
     });
+    fixMap(arr, F);
     var bid = arr.length; arr.forEach(function (n) { if (n.f === F) n.nx = [bid]; });
     arr.push({ id: bid, f: F + 1, c: 1.5, t: 'b', nx: [] });
     G.map = arr;
+  }
+  // F5 map pass (no randomness, so seeds stay the same): (1) a real choice: a room with one exit gets a second exit to the next
+  // floor's neighbour room when that does not cross another path; (2) every path into an elite passes a campfire or shop first:
+  // the room just before an elite on a path with no recovery becomes a campfire (or the elite becomes a fight when that room is floor 1).
+  function fixMap(arr, F) {
+    var at = {}; arr.forEach(function (n) { at[n.f * 10 + n.c] = n; });
+    arr.forEach(function (n) {
+      if (n.f >= F || n.nx.length !== 1) return; var to = arr[n.nx[0]];
+      [to.c - 1, to.c + 1].some(function (c2) {
+        var m = at[(n.f + 1) * 10 + c2]; if (!m || Math.abs(c2 - n.c) > 1) return false;
+        var cross = arr.some(function (o) { return o.f === n.f && o !== n && o.nx.some(function (x) { var t = arr[x]; return (o.c < n.c && t.c > c2) || (o.c > n.c && t.c < c2); }); });
+        if (cross) return false; n.nx.push(m.id); return true;
+      });
+    });
+    var clean = {}; arr.forEach(function (n) { if (n.f === 1) clean[n.id] = 1; });
+    for (var f = 1; f <= F; f++) arr.forEach(function (n) {
+      if (n.f !== f) return;
+      var par = arr.filter(function (p) { return p.nx.indexOf(n.id) >= 0; });
+      if (f > 1) clean[n.id] = par.some(function (p) { return clean[p.id] && p.t !== 'r' && p.t !== 's'; }) ? 1 : 0;
+      if (n.t !== 'e' || !clean[n.id]) return;
+      par.forEach(function (p) { if (!clean[p.id] || p.t === 'r' || p.t === 's') return; if (p.f >= 2 && p.t !== 't' && p.t !== 'e') { p.t = 'r'; } else n.t = 'm'; });
+      if (n.t === 'e') clean[n.id] = par.some(function (p) { return clean[p.id] && p.t !== 'r' && p.t !== 's'; }) ? 1 : 0;
+      if (n.t === 'e' && clean[n.id]) n.t = 'm';
+    });
   }
   function reachable() {
     if (G.at < 0) return G.map.filter(function (n) { return n.f === 1; }).map(function (n) { return n.id; });
@@ -188,9 +214,10 @@
     if (e.spk > 0 && card && card.type === 'A' && SPK_CARD !== card) { SPK_CARD = card; fx('hitme', 'h' + G.hs.indexOf(h), e.spk, 'spikes'); hurtHero(h, e.spk); if (G.scr !== 'battle' || h.dead) return; }
     var ei = G.b.en.indexOf(e), weak = ATK ? ATK.weak : st(h, 'weak') > 0, vul;
     if (ATK) { ATK.any = 1; if (ATK.vt[ei] == null) ATK.vt[ei] = st(e, 'vuln') > 0; vul = ATK.vt[ei]; } else vul = st(e, 'vuln') > 0;
-    var d = hitCalc(dmgBase(h, base, card), weak, vul);
+    var pre = dmgBase(h, base, card), d = hitCalc(pre, weak, vul);
+    if (card && card.type === 'A' && has('smoking-censer')) rfx('smoking-censer');
     var a = Math.min(e.blk, d); e.blk -= a; var real = d - a;
-    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : (st(h, 'str') > 0 ? 'str' : ''));
+    fx('dmg', 'e' + G.b.en.indexOf(e), d, a > 0 && real === 0 ? 'blocked' : (st(h, 'str') > 0 ? 'str' : ''), { b: base, p: pre, v: vul && !weak ? 1 : 0, r: real, hp: Math.max(0, e.hp - real), m: e.mhp });   // F5: base, after Strength, Vulnerable, HP lost, HP left, max HP
     if (real > 0) {
       e.hp -= real; e.asleep = 0;
       if (h.pw.envenom) addPoison(e, h.pw.envenom);
@@ -239,7 +266,7 @@
         case 'dmgx': if (e) hitEnemy(h, e, o[1] + 0 + st(h, 'str') * SC * (o[2] - 1), card); break;
         case 'bodyslam': if (e) hitEnemy(h, e, h.blk - st(h, 'str') * SC, card); break;
         case 'all': for (var r = 0; r < (X != null ? X : 1); r++) alive().forEach(function (t) { hitEnemy(h, t, o[1], card); }); break;
-        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? SC : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
+        case 'blk': var b = o[1] + (card && card.type === 'S' && has('tin-flute') ? (rfx('tin-flute'), SC) : 0); if (st(h, 'frail') > 0) b = Math.floor(b * 0.75); gainBlk(h, b); fx('blk', hi, b); break;
         case 'str': addSt(h, 'str', o[1]); fx('buff', hi, o[1], 'str'); break;
         case 'dblStr': addSt(h, 'str', st(h, 'str')); fx('buff', hi, 0, 'str'); break;
         case 'vuln': case 'weak': if (e && !e.dead) { addSt(e, k, o[1]); fx('debuff', 'e' + tgt, o[1], k); } break;
@@ -318,10 +345,10 @@
     G.hs.forEach(function (h) {
       if (h.dead) return;
       h.draw = shuffle(h.deck.slice());
-      if (has('iron-bangle')) gainBlk(h, SC); if (has('spark-core') && h.k === 'a') chan(h, 'L'); if (has('prayer-beads') && h.k === 'm') h.mir = Math.min(CAP.mir, 1);
+      if (has('iron-bangle')) { gainBlk(h, SC); rfx('iron-bangle'); } if (has('spark-core') && h.k === 'a') chan(h, 'L'); if (has('prayer-beads') && h.k === 'm') h.mir = Math.min(CAP.mir, 1);
     });
     if (has('spark-core') && !G.hs.some(function (h) { return h.k === 'a'; })) { /* only the Automaton benefits */ }
-    G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); });
+    G.b.en.forEach(function (e) { if (has('bag-of-marbles')) addSt(e, 'vuln', 1); }); if (has('bag-of-marbles')) rfx('bag-of-marbles');
     beginRound();
   }
   function beginRound() {
@@ -432,7 +459,7 @@
   function winBattle() {
     if (pendingSplit()) { var sp = G.b.en.filter(function (e) { return e.dead && D.ENEMIES[e.id].split && !e.splitDone; })[0]; if (!sp.splitSaid) { sp.splitSaid = 1; fx('splitsoon', 'e' + G.b.en.indexOf(sp), D.ENEMIES[sp.id].split.length, sp.id); } return; }
     var kind = G.b.kind, gold = SC * (kind === 'b' ? 2 + ri(3) : kind === 'e' ? 1 + ri(2) : 1);   // tabletop coins x SCALE
-    if (has('gold-tooth')) gold = SC * Math.round(gold * 1.5 / SC);
+    if (has('gold-tooth')) { gold = SC * Math.round(gold * 1.5 / SC); rfx('gold-tooth'); }
     G.gold += gold;
     if (has('ember-brand')) G.hs.forEach(function (h) { if (!h.dead) h.hp = Math.min(h.mhp, h.hp + SC); });
     var cards = {}, ps = null;
