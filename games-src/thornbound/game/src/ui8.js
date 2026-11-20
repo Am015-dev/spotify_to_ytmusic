@@ -67,7 +67,7 @@ function infLine(items){const by={},order=[];const me=vs();let any=false;
     else if(m.k==='steal'){any=true;const s=m.s;if(!by[s]){by[s]=[];order.push(s)}by[s].push({n:m.n,w:'steals from '+(m.v===me?'you':sideName(m.v))})}}
   if(!any)return null;order.sort((a,b)=>(b===me)-(a===me));
   return order.map(s=>{const L=by[s],tot=L.reduce((a,b)=>a+b.n,0);const nm=s===me?'You':sideName(s);
-    const why=L.length===1?L[0].w:L.map(y=>y.w+' '+(y.n>0?'+':'−')+Math.abs(y.n)).join(', ');
+    const sh=w=>w.replace(/^claims /,'').replace(/^Herald on .*/,'Herald').replace(/^most Supporters in .*/,'most Supporters');const why=L.length===1?L[0].w:L.map(y=>sh(y.w)).join(', ');
     return nm+' '+(tot>=0?'+':'−')+Math.abs(tot)+': '+why}).join(' · ')+'.'}
 function renderNews(){const el=$('#news');if(el&&!el.hidden){el.hidden=true;el.innerHTML=''}}
 // ---------------------------------------------------------------- previews: what the Night step and the tally give if nobody else acts

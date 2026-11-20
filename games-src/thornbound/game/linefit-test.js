@@ -20,8 +20,8 @@ const [W,H]=(process.argv[2]||'375x553').split('x').map(Number);const sleep=ms=>
       if(q.seats.includes(0)){try{UI.card=null;UI.evq=[];renderAll();tbStripPaint()}catch(e){}const ln=T.querySelector('.tbt-line');const t=ln?ln.textContent:'';
         if(t&&!seen.has(t)){seen.add(t);checked++;if(over(ln))cut.push('turn: '+t)}
         UI._rk=null;const mv=legal(0);let m=null;try{m=getRec(0,mv)}catch(e){}TB.apply(G,m||mv[0])}else TB.AI.step(G,{humans:[0]})}
-    for(const e of G.log){let t='';try{t=shortT(tbOne(plain(e.t)));if(e.m&&(e.m.k==='inf'||e.m.k==='steal')){const il=infLine([{m:e.m}]);if(il)t=il}}catch(x){t=""}if(!t||seen.has(t))continue;seen.add(t);checked++;
-      if(!fit('Court',t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),1))cut.push('card: '+t)}
+    for(const e of G.log){let t='';try{t=tbEight(shortT(tbOne(plain(e.t))));if(e.m&&(e.m.k==='inf'||e.m.k==='steal')){const il=infLine([{m:e.m}]);if(il)t=tbEight(il)}}catch(x){t=""}if(!t||seen.has(t))continue;seen.add(t);checked++;
+      if(t.split(/\s+/).filter(Boolean).length>8)cut.push('over 8 words: '+t);if(!fit('Court',t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),1))cut.push('card: '+t)}
     return {checked,cut:cut.slice(0,15),ncut:cut.length}});
   console.log('lines checked '+r.checked+', cut off '+r.ncut);for(const c of r.cut)console.log('  CUT '+c);
   console.log('page errors '+errs.length+(errs[0]?' '+errs[0]:''));await b.close();const bad=r.ncut||errs.length||r.checked<20;console.log(bad?'linefit-test FAIL':'linefit-test PASS ('+W+'x'+H+')');process.exit(bad?1:0)})();
