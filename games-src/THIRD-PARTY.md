@@ -37,3 +37,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## game-icons.net icons in Via Tessera
+
+- Source: https://game-icons.net (files fetched from the project's GitHub repository, https://github.com/game-icons/icons)
+- Authors: Delapouite (https://delapouite.com), Lorc (https://lorcblog.blogspot.com), Sbed (http://opengameart.org/content/95-game-icons)
+- Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/)
+- Files (path data only, inlined in `via-tessera/src/icons.js` by `via-tessera/tools/icons.py`): delapouite/brick-pile, lorc/wheat, lorc/hammer-nails,
+  lorc/grapes, delapouite/rolled-cloth, sbed/fire, lorc/eagle-emblem, delapouite/sickle, delapouite/caduceus, delapouite/roman-shield, lorc/owl,
+  delapouite/greek-temple, lorc/scroll-unfurled, delapouite/two-coins, lorc/laurel-crown, delapouite/roman-toga, lorc/drama-masks, delapouite/meeple,
+  lorc/bugle-call, delapouite/trowel, delapouite/trireme, delapouite/house, delapouite/coins, delapouite/amphora, lorc/crown, delapouite/temple-gate
+- Shown to players: the Credits entry in Via Tessera's menu.
