@@ -27,6 +27,9 @@ function tplPoints(p0,B,m,step){step=step||4;const L=tplLen(m),out=[];for(let u=
 // and the ship may slide up to +-10 mm fore/aft; large base: the template's long edge touches the side (centre moves 80+20 mm), slide up to +-20 mm.
 // off = fore/aft offset of the ship in mm (positive = forward)
 function rollPose(p0,B,dir,off){const big=B>60,side=dir<0?1:-1,d=big?B+TPL_W:B+GEO.straight;const c=add(p0,mul(leftOf(p0.h),d*side));return {x:c.x+Math.cos(p0.h)*off,y:c.y+Math.sin(p0.h)*off,h:p0.h}}
+// the barrel-roll template lying between the start base and the end base, as a rectangle (for the asteroid check)
+function rollTplPoly(p0,B,dir,off){const big=B>60,side=dir<0?1:-1,gap=big?TPL_W:GEO.straight,hw=(big?GEO.straight:TPL_W)/2,L=leftOf(p0.h),F=fwd(p0.h),a=off/2;
+  const pt=(lat,al)=>add(p0,add(mul(L,lat*side),mul(F,al)));return [pt(B/2,a-hw),pt(B/2+gap,a-hw),pt(B/2+gap,a+hw),pt(B/2,a+hw)]}
 function rollOffsets(B){const w=B>60?(B/2-GEO.straight/2):(B/2-TPL_W/2);return [w,w/2,0,-w/2,-w]}
 // ---- polygons ----
 function polyOverlap(A,Bp){for(const P of [A,Bp]){for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length],n=V(a.y-b.y,b.x-a.x);let mnA=1e9,mxA=-1e9,mnB=1e9,mxB=-1e9;

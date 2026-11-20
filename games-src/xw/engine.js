@@ -65,7 +65,7 @@ function addShip(side,e){const P=PILOTS[e.p],T=SHIPS[P.ship];const id='s'+(G.shi
   G.ships.push(s)}
 // [R9] the lower squad total has initiative; on a tie the second-named side has it (core rulebook; no die roll)
 function rollInitiative(k){if(G.pts[0]!==G.pts[1]){G.init=G.pts[0]<G.pts[1]?0:1;lg(-1,`${sideName(G.init)} has the lower squad total and so has initiative.`);return k()}
-  G.init=1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(1)} (the second-named side) has initiative.`);return k()}// the computer takes it: firing first on ties is worth more than moving first
+  G.init=1;lg(-1,`The squads tie at ${G.pts[0]} points: ${sideName(1)} (the second-named side) has initiative.`);return k()}
 function rockShape(){const o={x:0,y:0,r:22+rnd(18),n:7+rnd(3),rot:rnd(628)/100,k:[]};for(let i=0;i<o.n;i++)o.k.push(.72+rnd(29)/100);return o}
 function rockLegal(o){const P=rockPoly(o);if(P.some(p=>Math.min(p.x,p.y,MAT-p.x,MAT-p.y)<=2*RANGE))return false;// [R7] beyond range 2 of every edge
   return !G.rocks.some(q=>{const Q=rockPoly(q);let d=1e9;for(const p of P)d=Math.min(d,polyPointDist(p,Q));for(const p of Q)d=Math.min(d,polyPointDist(p,P));return d<RANGE})}// and beyond range 1 of each other [tournament rule]
@@ -171,8 +171,9 @@ function actionsFor(s){const T=SHIPS[s.type],out=[];const done=a=>(s.doneR||[]).
 function lockTargets(s){return exLockTargets(s,enemiesOf(s).filter(o=>rangeOf(baseDist(s,B(s),o,B(o)))<=3).map(o=>o.id))}
 function poseFree(s,p){const b=B(s);if(offBoard(p,b))return false;if(alive().some(o=>o!==s&&polyOverlap(corners(p,b),corners(o,B(o)))))return false;
   if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))return false;return true}
+// barrel roll and boost: not allowed if the template or the end base would touch an asteroid (as on the tabletop)
 // barrel roll anywhere along the side (5 positions per side); large bases use the template's long edge [#23][#28]
-function rollOptions(s){const out=[];const b=B(s);for(const dir of [-1,1])for(const off of rollOffsets(b)){const p=rollPose(s,b,dir,off);if(poseFree(s,p))out.push({dir,sh:Math.round(off),p})}return out}
+function rollOptions(s){const out=[];const b=B(s);for(const dir of [-1,1])for(const off of rollOffsets(b)){const p=rollPose(s,b,dir,off);const tp=rollTplPoly(s,b,dir,off);if(poseFree(s,p)&&!G.rocks.some(o=>polyOverlap(tp,rockPoly(o))))out.push({dir,sh:Math.round(off),p})}return out}
 function boostOptions(s){const out=[];for(const m of [{s:1,t:'S',d:0},{s:1,t:'B',d:-1},{s:1,t:'B',d:1}]){const p=finalPose(s,B(s),m);const tp=tplPoints(s,B(s),m,4);
   if(poseFree(s,p)&&!G.rocks.some(o=>{const R=rockPoly(o);return tp.some(q=>polyPointDist(q,R)<=TPL_W/2)}))out.push({m,p})}return out}
 function actLabel(a,x){if(a.a==='TL')return 'Lock onto '+ship(x).name;if(a.a==='SL')return a.l+': '+ship(x).name;if(a.a==='SB')return 'Sabotage '+ship(x).name;

@@ -67,9 +67,9 @@ function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s
   else why='the best of the moves left, though you may end up in an enemy arc';
   why+='. (If they stay put.)';
   const clip=tplPoints(s,b,m0,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2));
-  const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves until a green one clears it.':m.c==='g'?(s.stress?'Bonus: green clears your stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
+  const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves while stressed (each green move removes one).':m.c==='g'?(s.stress?'Bonus: green removes one stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
   const allRock=dialOf(s).every(x=>rockHits(s,x));
-  return {why:allRock?'every move from here touches an asteroid; this one does the least harm':why,cost:cost+(clip?' Risk: it clips an asteroid (roll 1 attack die for damage, and no action this round).':'')}}
+  return {why:allRock?'every move from here touches an asteroid; this one does the least harm':why,cost:cost+(clip?' Risk: it clips an asteroid (roll 1 attack die, a hit hurts; no action this round).':'')}}
 function saferAlt(s){const c=UI.sugCache;if(!c||!c.sc)return null;let best=-1,bv=-1e9;dialOf(s).forEach((m,i)=>{if(exColor(s,m).c==='r'||(s.stress&&false))return;if(c.sc[i]>bv){bv=c.sc[i];best=i}});return best>=0?best:null}
 // ---- coach moments for the first round ----
 const COACH={dial:{n:1,t:'<b>Pick where your ship will fly.</b> Hover or tap a maneuver on the dial to see its ghost on the mat (the dashed one is the suggestion), then press <b>Lock in dials</b>. The enemy picks at the same time, in secret.'},
@@ -87,10 +87,10 @@ function recapItems(R){const me=soloSide()>=0?soloSide():planSide();const ev=UI.
   for(const e of ev){let m;const t=e.t;
     if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const a=e.s===me,b=isMine(m[2])&&!a;out.push(`💥 ${a?`You (${esc(m[1])}) bumped into ${esc(m[2])}`:b?`${esc(m[1])} bumped into you (${esc(m[2])})`:`${esc(m[1])} bumped into ${esc(m[2])}`}. The ship that bumps skips its action, and ships touching each other can't fire at each other.${a?' <i>Tip: plan a longer or sideways move.</i>':''}`)}
     else if((m=t.match(/^(.+) is stressed and can't take an action/))&&e.s===me)out.push(`😵 You (${esc(m[1])}) were stressed from a red move, so no action. Fly a green move to clear it.`);
-    else if((m=t.match(/^(.+) flies a red maneuver and takes a stress/))&&e.s===me)out.push(`❗ ${esc(m[1])} flew a red move and took stress: no action this turn, and no red moves until a green one clears it.`);
+    else if((m=t.match(/^(.+) flies a red maneuver and takes a stress/))&&e.s===me)out.push(`❗ ${esc(m[1])} flew a red move and took stress: no action this turn, and no red moves while stressed (each green move removes one).`);
     else if((m=t.match(/^(.+) flies a green maneuver and clears/))&&e.s===me)out.push(`✅ ${esc(m[1])} cleared its stress with a green move.`);
     else if(m=t.match(/^(.+) (flies through|lands on) an asteroid/))out.push(`🪨 ${esc(m[1])} ${m[2]==='lands on'?'landed on':'flew through'} an asteroid: a damage roll and no action${m[2]==='lands on'?', and no shooting this round':''}.`);
-    else if(m=t.match(/^(.+) is stressed and can't fly the red/))out.push(`🔁 ${esc(m[1])} revealed a red move while stressed, so the other side picked a white one for it.`);
+    else if(m=t.match(/^(.+) is stressed and can't fly the red/))out.push(`🔁 ${esc(m[1])} revealed a red move while stressed, so the other side picked a non-red one for it.`);
     else if(m=t.match(/^(.+) flies off the battlefield/))out.push(`🚫 ${esc(m[1])} flew off the battlefield and was destroyed.`)}
   const res=UI.results.filter(r=>r.r===R).reverse();res.forEach(r=>out.push('🎯 '+resultHTML(r,true)));
   if(!res.length)out.push('No shots were fired: nobody had an enemy inside its arc at range 1-3.');
@@ -109,7 +109,6 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
       return {say:`Start near the centre (★ ${recOpt(q).o.l}) so you can turn either way.`,why:`Your pilot skill is ${ps}${cmp}`}}
     if(q.key==='forced')return {say:'Pick the move that leaves their ship worst placed.',why:'Far from you, or pointing away from you, so it can\'t shoot next round.'};
     if(q.key==='dice')return {say:'Tick your blank dice (and ◉ if you have no focus to spend), then Confirm.',why:'Rerolled dice can come up hits or crits; each die can only be rerolled once.'};
-    if(q.key==='init')return {say:'Take initiative.',why:'On pilot-skill ties you move and fire first, and you win if both last ships die together.'};
     return {say:esc(q.title)+': an optional card choice.',why:'Read the question: the highlighted button is the usual pick, and "No" keeps the card for later.'}}
   if(P==='plan'&&planSide()>=0&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const en=enemiesOf(s);if(!en.length)return {say:'No enemies left.',why:''};
     const ds=en.map(e=>({e,d:baseDist(s,B(s),e,B(e))})).sort((a,b)=>a.d-b.d);const near=ds[0].e,rg=rangeOf(ds[0].d);let say,why;

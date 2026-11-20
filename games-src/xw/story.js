@@ -23,8 +23,8 @@ function callSign(s){const raw=s.name.replace(/"/g,'');if(/"/.test(s.name))retur
 // what a faceup damage card does, in plain words, for the ship that has it
 function critPlain(c,s){const D=DAMAGE[c];const fix=D.fix==='any'?' Your action can put it out.':D.fix==='hit'?' Action: roll 1 die, a hit repairs it.':D.fix==='hitcrit'?' Action: roll 1 die, a hit or crit repairs it.':'';
   const m={weak:`attack is now ${primary(s)} until repaired.`,frame:`agility is now ${agility(s)} until repaired.`,noact:'no actions from the action bar until repaired.',direct:'counts as 2 hull damage.',
-    fire:'rolls a die for damage at the start of each combat phase.',cockpit:'pilot skill counts as 0 from next round.',engine:'every turn counts as a red maneuver.',blinded:'the next attack rolls no dice.',
-    wounded:'the pilot ability no longer works.',breach:'rolls a die for damage after each red move.',stunned:'takes 1 damage after any bump or asteroid hit.'}[D.k];
+    fire:'rolls an attack die at the start of each combat phase: a hit deals 1 damage.',cockpit:'pilot skill counts as 0 from next round.',engine:'every turn counts as a red maneuver.',blinded:'the dice of its next attack can\'t be modified.',
+    wounded:'the pilot ability no longer works.',breach:'rolls an attack die after each red move: a hit deals 1 damage.',stunned:'takes 1 damage after any overlap with a ship or obstacle.'}[D.k];
   return (m?m:D.t)+(m?fix:'')}
 const NUMW=['no','one','two','three','four','five','six','seven','eight'];
 function groupText(ships){const by={};ships.forEach(s=>{by[s.type]=(by[s.type]||0)+1});return Object.keys(by).map(t=>`${NUMW[by[t]]||by[t]} ${SHIPS[t].n.replace(/ (light|heavy) fighter$/,' $1 fighter')}${by[t]>1?'s':''}`).join(' and ')}

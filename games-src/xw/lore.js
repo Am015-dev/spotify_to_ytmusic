@@ -7,7 +7,7 @@ const LORE={
   tut:{
     goal:{t:'Ch 1 · Scramble',s:'Slate is raiding our convoy. Smash his ship before it reaches the freighters. Yours is at the bottom.'},
     ship:{t:'Brecken: Plan in secret',s:'Tap your ship to plan its move in secret.'},
-    marks:{t:'Brecken: Red and rocks',s:'Red moves strain the engines: stress token. A ! marks paths through the rock, which hurts and skips your action.'},
+    marks:{t:'Brecken: Red and rocks',s:'Red moves strain the engines: stress token. A ! marks paths through the rock: roll 1 attack die (a hit hurts) and skip your action.'},
     dial:{t:'Brecken: Choose a line',s:'Tap the green straight 2. Green moves are easy.'},
     fly:{t:'Brecken: Dials are secret',s:'Neither of you can peek. When you are set, reveal the dials and let the ships move together.'},
     order:{t:'Ch 2 · First Contact',s:'Slate shows his hand! Lowest skill moves first: Slate (3), then you (8). Highest shoots first, so you do.'},
@@ -23,7 +23,7 @@ const LORE={
     fly2:{t:'Brecken: Fly again',s:'Slate has the lower skill, so he moves before you. Reveal the dials.'},
     stress:{t:'Slate: Panic turn',s:'Whoa! That red K-turn gave me a stress token. No action for me, and I am facing away!'},
     lock:{t:'Brecken: Target lock',s:'He cannot shoot back. Lock on: a lock lets you reroll attack dice against him.'},
-    shoot2:{t:'Brecken: Point blank',s:'Range 1 adds an attack die, and he is facing away. Take the shot.'},
+    shoot2:{t:'Brecken: Point blank',s:'Range 1 adds an attack die to your primary weapon, and he is facing away. Take the shot.'},
     reroll:{t:'Brecken: Reroll blanks',s:'Two blanks. Spend your lock to roll them again.'},
     confirm:{t:'Brecken: Choose dice',s:'The blank dice are ticked. Reroll just those.'},
     roll2:{t:'Brecken: Finish him',s:'Better dice! Roll and see if Slate survives.'},
@@ -39,9 +39,9 @@ const LORE={
 LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One rule at a time.',btn:'Start'};
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
 LORE.laterShort=['After you move, tap Roll or Boost to slide.','Bump into a ship and you skip your action.','Fly off the mat and your ship is lost.'];
-LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with fewer squad points acts first.'];
+LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with initiative moves first. In combat, ties fire at the same time.'];
 LORE.drillNext='One more minute: a flight drill teaches barrel roll, boost, the mat edge and bumping.';
-LORE.drillEnd={t:'Drill done. You know every rule.',s:'Roll, boost, mind the edge, and don’t ram. Tied pilot skill: fewer squad points acts first.'};
+LORE.drillEnd={t:'Drill done. You know every rule.',s:'Roll, boost, mind the edge, and don’t ram. Tied pilot skill: the side with initiative goes first.'};
 LORE.coach={
   goal:{rule:1,t:'Brecken: Your goal',s:'Destroy Slate’s ship before he destroys yours.'},
   fly0:{t:'Brecken: Your first battle',s:'Tap the glowing thing each time. I explain as we go.'},
@@ -58,7 +58,7 @@ LORE.coach={
   res2:{rule:1,t:'Brecken: Shields first',s:'Damage takes shields first, then hull. Crits are face-up cards.'},
   goodshot:{t:'Brecken: Nice shot',s:'That hit landed. Keep him in your arc.'},
   gothit:{t:'Slate: Got you!',s:'Stay out of my front arc next time.'},
-  stress:{rule:1,t:'Brecken: Stress',s:'Red move means stress: no action, no red until green.'},
+  stress:{rule:1,t:'Brecken: Stress',s:'Red move means stress: no action, no red. Green removes one stress.'},
   marks:{rule:1,act:1,t:'Brecken: Rocks',s:'A path through a rock hurts and skips your action.'},
   lock:{rule:1,act:1,t:'Brecken: Target lock',s:'Lock on: you may reroll attack dice against him.'},
   endround:{rule:1,t:'Brecken: Round end',s:'Unused focus and evade tokens vanish. Locks stay.'},

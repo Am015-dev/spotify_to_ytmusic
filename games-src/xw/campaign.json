@@ -58,7 +58,7 @@
     {
       "id": "c2", "act": 1, "title": "Range Practice", "boss": false,
       "intro": [
-        { "who": "brecken", "text": "Two drones this time. Get close: at range 1 you roll an extra attack die." },
+        { "who": "brecken", "text": "Two drones this time. Get close: at range 1 your primary weapon rolls an extra die." },
         { "who": "brecken", "text": "Stay in their blind side. A ship can only shoot what sits in its front arc." },
         { "who": "kael", "text": "Close in, stay out of their arc, shoot first. Understood." }
       ],
