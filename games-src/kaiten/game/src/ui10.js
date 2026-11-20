@@ -89,7 +89,8 @@ const GOAL = {
   how: [
     ['tempura', 'Take one dish, then pass your hand on.'],
     ['sashimi', 'Dishes score in sets: two prawns make 5.'],
-    ['pudding', 'Custard counts at the end: most cups wins 6, fewest loses 6 (3+ diners).']
+    ['pudding', 'Custard counts at the end: most cups wins 6, fewest loses 6 (3+ diners).'],
+    ['tempura', 'Plate tags: need N = N more scores a set; 1st +6 / tied 1st +3 = roll race; end +6 = custard; top 4 / behind = rank; grab 2 = Twin Sticks.']
   ]
 };
 function goalOpen() { return !!document.querySelector('#kkgoal.on'); }

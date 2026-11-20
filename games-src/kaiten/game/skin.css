@@ -255,3 +255,7 @@ html:not(.ph) #rs.kkfin{right:var(--kkdock,0)!important}
 .seat.tight .ctr .none{display:none}
 @media (max-height:620px){#rs.kkrnd{padding-bottom:20px!important}}
 html.ph.ph-p #belt.two{row-gap:20px}
+/* F7: while the hand is handed on (reveal) the belt panel keeps its dark table colour, never the cream board behind it */
+html.ph #beltz:has(#belt:not(:has(.hc))){background:#2f1f1a!important;border-top-color:#1c1210!important}
+html.kkpx #beltz:has(#belt:not(:has(.hc))){background:rgba(47,31,26,.92)!important}
+html.ph.ph-p:has(#stage:not([hidden])) #beltz,html.ph.ph-p:has(.kk-cloche) #beltz{background:#2f1f1a!important;border-top-color:#1c1210!important}

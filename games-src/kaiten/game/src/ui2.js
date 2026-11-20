@@ -178,7 +178,10 @@ function firstTip(g) {
   if (!G || g.seat !== viewSeat() || !ANIM || /[?&]scn=/.test(location.search)) return;
   const k = g.k === 'chop' ? 'grab2' : /^need/.test(g.hint || '') ? 'need1' : g.k === 'roll' && g.hint === 'no pts' ? 'behind' : null;
   firstTip.seen = firstTip.seen || {}; if (!k || firstTip.seen[k]) return; firstTip.seen[k] = 1;
-  setTimeout(() => { try { if (G && !UI.busy) toast(TIPS[k]); } catch (e) { } }, 1200);
+  // one helper at a time: wait while a tutorial / help bubble is up, and show the tip under the top bar, never over the hand labels
+  const bub = () => tutOn() || [...document.querySelectorAll('.gxt-bub,.gxh-bub')].some(e => e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden' && getComputedStyle(e).opacity !== '0');
+  const show = n => setTimeout(() => { try { if (!G || UI.busy) return; if (bub()) { if (n < 8) show(n + 1); else firstTip.seen[k] = 0; return; } const t = $('#toast'); t.dataset.race = '1'; toast(TIPS[k]); setTimeout(() => { if (t.dataset.race) delete t.dataset.race; }, 6500); } catch (e) { } }, n ? 2000 : 1200);
+  show(0);
 }
 function grpEl(g, pd, landing) {
   const layers = Math.min(g.n, 3);
