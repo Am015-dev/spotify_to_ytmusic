@@ -244,6 +244,14 @@ if (process.argv.includes('--md')) {
   L.push('', '## Not testable here (known size differences, see rules-notes.md)', '', '- Roster: the original has 170 birds and 26 bonus cards; this game has 120 original birds and 18 bonus cards, and fewer power types. Goals are 12 tiles.', '- The solo rival is a simplified automa, not the original solo rules.');
   console.log(L.join('\n')); process.exit(0);
 }
+
+sec('Solo: the Rival Flock (original solo rules)');
+const solo = (lvl, seed) => { const G = PP.newGame({ seats: [{ name: 'Me', kind: 'human' }, { name: 'Flock', kind: 'automa', lvl: lvl || 'easy' }], seed: seed || 11, goals: ['total', 'total', 'total', 'total'] }); PP.performMove(G, { t: 'keep', birds: [0, 1, 2, 3, 4], food: [], bonus: 0 }, 0); return G; };
+rule('SOLO', 'You always go first, every round.', () => { const G = solo(); const firsts = []; let k = 0, r = -1; while (G.phase !== 'over' && k++ < 3000) { if (G.round !== r) { r = G.round; firsts.push(G.cur); } const s = PP.sideToAct(G); PP.performMove(G, s === 1 ? { t: 'auto' } : (PP.validMoves(G, 0).find(m => m.t === 'act') || PP.validMoves(G, 0)[0]), s); } eq([0, 0, 0, 0], firsts); });
+rule('SOLO', 'The Flock takes one turn per action, like you (8/7/6/5), and one of its cards leaves after each of rounds 1-3.', () => { const G = solo(); const sizes = []; let k = 0, r = -1; while (G.phase !== 'over' && k++ < 3000) { if (G.round !== r) { r = G.round; sizes.push(G.pl[1].auto.deck.length); } const s = PP.sideToAct(G); PP.performMove(G, s === 1 ? { t: 'auto' } : (PP.validMoves(G, 0).find(m => m.t === 'act') || PP.validMoves(G, 0)[0]), s); } eq([10, 9, 8, 7], sizes); });
+rule('SOLO', 'Its bonus card is drawn before yours and never judges eggs.', () => { const G = solo(); const b = G.pl[1].auto.bonus; eq(true, !!b && ['ws', 'eats', 'only', 'pts', 'power'].indexOf(PP.BON[b].test.t) >= 0); eq(false, G.bdeck.indexOf(b) >= 0); });
+rule('SOLO', 'Hidden birds score 3, 4 or 5 points by level; eggs 1 point each; its bonus card scores nothing.', () => { const out = ['easy', 'normal', 'hard'].map(l => { const G = solo(l); G.pl[1].auto.down = [G.deck.shift(), G.deck.shift()]; G.pl[1].auto.eggs = 3; return PP.scoreOf(G, 1).total; }); eq([9, 11, 13], out); });
+rule('SOLO', 'Its goal count = base value + cubes; birds-in-a-row goal never above 5.', () => { const G = PP.newGame({ seats: [{ name: 'Me', kind: 'human' }, { name: 'Flock', kind: 'automa', lvl: 'easy' }], seed: 3, goals: ['birds-F', 'birds-F', 'birds-F', 'birds-F'] }); G.pl[1].auto.marks = 9; eq(5, PP.goalCount ? PP.goalCount(G, 1, 'birds-F') : 5); });
 let pass = 0; const fails = [];
 RULES.forEach(r => {
   try { r.fn(); pass++; } catch (e) {
