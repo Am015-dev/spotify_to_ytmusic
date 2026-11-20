@@ -481,3 +481,40 @@ html.wm-coach #pv,html.wm-coach #whyc{display:none!important}
 /* F3 (cold play): score pops stay short and inside the screen; the phone rival inset sits left, clear of the zoom buttons */
 .pop{max-width:calc(100vw - 16px);overflow:hidden;text-overflow:ellipsis}
 @media (max-width:999px){#rinset{right:auto;left:6px}}
+
+/* R107: short PC windows (910x512 = a laptop at 150%): board + side dock (the desktop layout without the left panel). Phones in landscape (short side <= 500) keep the phone layout. */
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape) and (min-height:501px){
+  html body .gx-main{grid-template-columns:minmax(0,1fr) var(--gx-dock-w)!important;grid-template-rows:minmax(0,1fr)!important}
+  html body .gx-app .gx-dock,html body .gx-app.gx-sheet-full .gx-dock{height:auto;max-height:none!important;border-radius:0!important;border-top:0;border-left:1px solid rgba(255,255,255,.08)}
+  .gx-grab{display:none}
+  :root{--gx-dock-w:300px}
+}
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape) and (min-height:501px){
+#mk{grid-template-columns:1fr 1fr}.mt{height:100px}.mt svg{height:96px}.mk{width:60px;height:60px}.mk svg{width:56px;height:56px}
+.held svg{height:64px}
+
+  html body .gx-bar .gx-ibtn span{font-size:16px!important}
+  html body :is(.gxc-lab,.gxc-act b,.gxc-act small,.gx-set-nav .gx-chip,.gx-row-l small,.gxc-dim,.gxc-st-t,.gxc .gxc-ib){font-size:16px!important}
+
+html body :is(.gxh-tt,.gxh-tx,.gxh-bd button,.gxt-say,.gxt-tt){font-size:16px!important}
+#logp{display:block;margin:12px 8px 8px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.18);font-size:15px;line-height:1.4;overflow:auto;min-height:0;flex:1}
+  #logp h3{margin:0 0 6px;font-size:15px;opacity:.8;text-transform:uppercase;letter-spacing:.06em}#logp ol{margin:0;padding-left:18px}#logp li{margin:2px 0}#logp li:first-child{font-weight:700}
+.ttop .tag{font-size:17px}.trow .ab{font-size:16px}.trow .ab small{font-size:16px}#logp,#logp h3{font-size:16px}
+#cards{right:auto}.cc{flex:0 0 auto;min-width:76px;padding:4px 8px}.cc i{font-size:16px}.mk i{font-size:16px}#line{left:50%;right:auto;transform:translateX(-50%);max-width:640px}
+#line{font-size:18px}
+#coachb p,.cfinal p,.cfinal li{font-size:16px}
+.vd{font-size:16px}.gain{font-size:16px}.cc .rv,.tc .rv{font-size:16px!important}.tc,.tc b{font-size:16px}
+.terr .tl{font-size:16px}
+#terr{left:190px;top:122px;right:auto}#terr .tl,#terr .tl small,#terr .sep{font-size:16px}#terr .ti{width:22px;height:24px}.vd .rivl{font-size:16px}#terr .tc{flex:0 0 auto;padding:0 6px}
+#coachb{top:150px}#terr{left:440px!important;top:70px!important}
+#whyp{top:180px}#whyp h3{font-size:18px}#whyp p,.st.why small{font-size:16px}
+#whyp{left:50%!important;right:auto!important;transform:translateX(-50%);width:620px}
+#goal li,#goal .g2{font-size:16px}#goal .g1{font-size:18px}
+@keyframes wmbanl{from{opacity:.4}to{opacity:1}}
+#acts .held svg{height:44px!important}#acts{height:auto;max-height:none;flex-wrap:wrap;justify-content:flex-end}#acts .ab{flex:0 0 auto}
+}
+@media (min-width:720px) and (max-width:999px) and (orientation:landscape) and (min-height:501px) and (max-height:620px){
+  html body #mk .mt{height:62px}html body #mk .mt svg{height:58px}html body .pair{gap:2px;padding:2px 2px 4px}html body #mk{gap:5px}html body #acts{margin-top:2px;padding-bottom:8px}html body #logp{display:none}
+}
+/* R107: market tiles and tokens are at least 48 px wide on short phones */
+@media (max-width:999px) and (orientation:portrait) and (max-height:700px){html body .mt{min-width:48px}html body .mk{min-width:48px}html body .mk svg{width:40px!important;height:40px!important}}
