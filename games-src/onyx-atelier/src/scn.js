@@ -44,13 +44,13 @@
   GXS.add({
     id: 'oa-buy', name: 'Buy a jewel', ask: 'Tap a lit jewel, then Buy: is it yours?', seed: 11, when: booted,
     setup: function () {
-      begin(11); var g = G(); g.pl[0].t = { w: 3, u: 3, g: 3, r: 3, k: 3, p: 1, o: 0 };
-      ['w', 'u', 'g', 'r', 'k', 'p'].forEach(function (c) { var n = c === 'p' ? 1 : 3; for (var i = 0; i < n; i++) { var j = g.bag.indexOf(c); if (j >= 0) g.bag.splice(j, 1); else { j = g.board.indexOf(c); g.board[j] = null; } } });
-      OA_TEST.E.checkInvariants(g); T().render(); return wait(300);
+      begin(11); var g = G(); g.pl[0].t = { w: 2, u: 2, g: 2, r: 2, k: 1, p: 1, o: 0 };
+      ['w', 'u', 'g', 'r', 'k', 'p'].forEach(function (c) { var n = c === 'p' || c === 'k' ? 1 : 2; for (var i = 0; i < n; i++) { var j = g.bag.indexOf(c); if (j >= 0) g.bag.splice(j, 1); else { j = g.board.indexOf(c); g.board[j] = null; } } });
+      OA_TEST.E.checkInvariants(g); window.__slot = g.pyr[0].findIndex(function (id) { return OA_TEST.E.price(g.pl[0], id).ok; }); T().render(); return wait(300);
     },
     checks: [
-      { kind: 'play', name: 'tap the jewel, tap Buy: it joins your jewels and you pay', snap: function () { return { cards: G().pl[0].cards.length, tok: tok(0), id: G().pyr[0][0] }; },
-        steps: [{ sel: '.card[data-l="0"][data-i="0"]' }, { sel: '#sheet [data-buy]' }],
+      { kind: 'play', name: 'tap the jewel, tap Buy: it joins your jewels and you pay', snap: function () { return { cards: G().pl[0].cards.length, tok: tok(0), id: G().pyr[0][__slot] }; },
+        steps: [{ sel: function () { return document.querySelector('.card[data-l="0"][data-i="' + __slot + '"]'); } }, { sel: '#sheet [data-buy]' }],
         idle: function () { return idleMe() && G().pl[0].cards.length > 0; },
         verify: function (b, a) { if (G().pl[0].cards.indexOf(b.id) < 0) return 'jewel ' + b.id + ' not owned'; if (!(a.tok < b.tok) && OA_TEST.E.card(b.id).c) return 'paid nothing'; return true; } }
     ],
