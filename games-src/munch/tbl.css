@@ -463,11 +463,14 @@ html.ph #prompt.bfq .acts.main .btn.pickchip{white-space:normal;line-height:1.1;
 html.ph #prompt.bfq>.acts.main{bottom:auto!important;top:auto!important}   /* the old sticky bottom:-12px pushed the relative buttons 12 px out of the dock */
 /* F16: the fight buttons span the whole table now: keep the pulsing Fight! (it scales up) inside the table edge */
 html.ph .arena:has(>.vs)>.fbtns{padding-left:7px!important;padding-right:7px!important;box-sizing:border-box}
-/* Cleric Resurrection (F17): the whole question beside the treasure it brings back, and up to 8 answers in a 4-wide grid of 44 px buttons (2 rows) */
-html.ph #prompt .say.restq{display:flex!important;align-items:center;gap:8px;text-align:left;white-space:normal!important;overflow:visible!important;-webkit-line-clamp:unset!important;max-height:none!important;line-height:1.2;margin:0!important}
-html.ph #prompt .say.restq .restr{flex:0 0 auto;width:33px;height:46px;overflow:hidden;border-radius:4px;box-shadow:0 0 0 2px #ffd34d;position:relative}
-html.ph #prompt .say.restq .restr>.card{zoom:.46;pointer-events:none;margin:0}
-html.ph #prompt .acts.main.resg{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;flex-wrap:unset;padding:2px 2px 2px!important;overflow:hidden}
-html.ph #prompt .acts.main.resg.resg5{grid-template-columns:repeat(5,minmax(0,1fr))}
-html.ph #prompt .acts.main.resg .btn{min-height:44px;max-height:44px;min-width:0;width:auto;margin:0!important;padding:2px 3px;font-size:12px!important;line-height:1.1;white-space:normal;overflow:hidden;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;text-overflow:ellipsis;text-align:center;align-content:center;overflow-wrap:break-word;hyphens:auto;padding:1px 2px!important;line-height:1.08!important}
+/* Cleric Resurrection (F17): the treasure it brings back (picture and name) beside the whole question, and the answers in a 3-wide grid of 44 px buttons */
+html.ph #prompt.bfq>.restq{order:-10;display:flex;align-items:center;gap:8px;margin:0;flex:none}
+html.ph #prompt .restq .restr{flex:0 0 auto;width:28px;height:40px;overflow:hidden;border-radius:4px;box-shadow:0 0 0 2px #ffd34d;position:relative}
+html.ph #prompt .restq .restr>.card{zoom:.4;pointer-events:none;margin:0}
+html.ph #prompt .restq .resw{min-width:0;text-align:left}
+html.ph #prompt .restq .resnm{font:800 14px/1.15 var(--title);color:#7a2a08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #prompt .restq p.say{color:#3a2410!important;text-shadow:none!important;font-family:var(--title)!important;font-weight:700!important;opacity:1!important;margin:0!important;text-align:left!important;font-size:14px!important;line-height:1.2!important;display:block!important;-webkit-line-clamp:unset!important;order:0!important}
+html.ph #prompt .acts.main.resg{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;flex-wrap:unset;padding:1px!important;overflow:hidden}
+html.ph #prompt .acts.main.resg.resg4{grid-template-columns:repeat(4,minmax(0,1fr))}
+html.ph #prompt .acts.main.resg .btn{min-height:44px;max-height:44px;min-width:0;width:auto;margin:0!important;padding:1px 3px!important;font-size:13px!important;line-height:1!important;white-space:normal;overflow:hidden;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;text-overflow:ellipsis;text-align:center;align-content:center;overflow-wrap:break-word}
 html.ph .bfdoor{min-width:44px;min-height:44px}   /* the door is the main button: never under a 44 px finger, however short the table (F17) */

@@ -76,7 +76,7 @@ const CHECK = () => {
     if (r.right < hd.left || r.left > hd.right || r.bottom < 0 || r.top > innerHeight) continue;   // scrolled out of the row: not on screen
     const f = parseFloat(getComputedStyle(n).fontSize) * zoomOf(n); if (f < 10.95) { bad.push(`hand text ${f.toFixed(1)}px "${n.textContent.trim().slice(0, 14)}"`); break } }
   // the Resurrection question: whole, with the treasure it brings back on show
-  if (G.q && G.q.why === 'resTr') { const say = pr && pr.querySelector('.say'); if (!say || !/Pay a card/.test(say.textContent) || say.scrollHeight > say.clientHeight + 1 || say.scrollWidth > say.clientWidth + 1) bad.push(`resurrect question cut "${say ? say.textContent.trim().slice(0, 40) : '-'}"`);
+  if (G.q && G.q.why === 'resTr') { const say = pr && pr.querySelector('.restq'); if (!say || !/Pay a card/.test(say.textContent) || !say.querySelector('.resnm') || say.scrollHeight > say.clientHeight + 1 || say.scrollWidth > say.clientWidth + 1) bad.push(`resurrect question cut "${say ? say.textContent.trim().slice(0, 40) : '-'}"`);
     if (!document.querySelector(`#prompt [data-rescard="${G.td[G.td.length - 1]}"]`)) bad.push('resurrected treasure not shown');
     if (pr) for (const b of pr.querySelectorAll('.btn')) { const r = b.getBoundingClientRect(); if (vis(b) && (r.height < 43.5 || r.width < 43.5)) { bad.push(`resurrect button ${Math.round(r.width)}x${Math.round(r.height)}`); break } } }
   return bad;

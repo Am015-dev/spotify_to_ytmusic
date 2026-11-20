@@ -126,15 +126,15 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
   const _p=promptHTML;promptHTML=function(me){let h=_p(me);if(!tbPh()||!G||!G.q||me<0||sideToAct()!==me||!P(me).human)return h;const q=G.q;let s='';
     if(q.kind==='help')s=`${P(q.from).nm.split(/[ ,]/)[0]} offers ${q.n} treasure${q.n===1?'':'s'}. Help?`;
     else if(q.kind==='rescue'){const vm=validMoves(me);s=vm.some(m=>m.act==='use')?'Caught! Tap a glowing card to escape.':vm.some(m=>m.act==='reroll')?'Caught! Discard a card to roll again?':'Caught! Take the Bad Stuff.'}
-    else if(q.kind==='pick'&&['lose','slug','taxpay'].includes(q.why)){const w=tbWeakest(me);s=`${q.why==='taxpay'?'Tax: pick an item to pay':'Bad Stuff: pick a card to lose'}.${w!=null?` Weakest: ${cname(w)}.`:''}`}
+    else if(q.kind==='pick'&&['lose','slug','taxpay'].includes(q.why)){const w=tbWeakest(me);s=bfCap(`${q.why==='taxpay'?'Pay the tax.':'Lose a card.'}${w!=null?` Weakest: ${cname(w)}`:''}`,8)}
     else if(q.kind==='pick')s=q.why==='loot'&&G.loot?`Loot a card from ${P(G.loot.v).nm.split(/[ ,]/)[0]}:`:bfCap(String(q.text||'Choose one.').replace(/<[^>]+>/g,''),8);
     else if(q.kind==='ward')s='A curse is coming! Cancel it?';
     else if(q.kind==='glue')s='Make them roll again?';
     else if(q.kind==='lawyer')s='Swap 2 treasures for 2 new?';
     else if(q.kind==='fetch')s='Throw it to escape?';
-    // Cleric Resurrection: the whole question, the treasure it brings back on show, and its answers in a 4-wide grid (5-wide past 8 answers), two rows of 44 px buttons
+    // Cleric Resurrection: the whole question, the treasure it brings back on show, and its answers in a 3-wide grid of 44 px buttons (4-wide past 9 answers)
     if(q.kind==='pick'&&q.why==='resTr'&&G.td.length){const top=G.td[G.td.length-1];const face=cardHTML(top,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-zcard=').replace(/<\/button>$/,'</span>');
-      return h.replace(/<p class="say">.*?<\/p>/,`<p class="say restq"><span class="restr" data-rescard="${top}">${face}</span><span>Resurrect <b>${esc(cname(top))}</b>${cd(top).b?` (+${cd(top).b})`:''}? Pay a card from your hand, or draw.</span></p>`).replace('<div class="acts main">',`<div class="acts main resg${q.opts.length>8?' resg5':''}">`)}
+      return h.replace(/<p class="say">.*?<\/p>/,`<div class="restq"><span class="restr" data-rescard="${top}">${face}</span><div class="resw"><div class="resnm">${esc(cname(top))}${cd(top).b?` +${cd(top).b}`:''}</div><p class="say">Resurrect it? Pay a card, or draw.</p></div></div>`).replace('<div class="acts main">',`<div class="acts main resg${q.opts.length>9?' resg4':''}">`)}
     return s?h.replace(/<p class="say">.*?<\/p>/,`<p class="say">${esc(s)}</p>`):h}})();
 
 // a rival one fight from winning: one short banner; the best counter is a button in the dock
