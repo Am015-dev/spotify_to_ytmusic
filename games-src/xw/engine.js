@@ -295,7 +295,7 @@ function atkDone(){const A=G.atk,s=ship(A.a),d=ship(A.d);const n=defDice(s,d,A.b
   A.def=rollN(DEF_FACES,n);A.defN=n;A.step='dmod';lg(d.side,`${sname(d)} rolls ${n} defense ${n===1?'die':'dice'}: ${diceText(A.def)}.`);G.phase='dmod';refresh()}
 function defMods(){const A=G.atk,d=ship(A.d),out=[];if(d.focus>0&&cnt(A.def,'focus'))out.push({k:'focus',l:'Spend focus',d:`Turn ${cnt(A.def,'focus')} focus into evades.`});
   if(d.evade>0&&!A.noEvade)out.push({k:'evade',l:'Spend evade token',d:'Add one evade result.'});
-  if(pilotHas(d,'kael')&&!A.used.includes('kael')&&cnt(A.def,'focus'))out.push({k:'kael',l:`${d.name}: focus → evade`,d:'Change 1 of your focus results to an evade (free).'});
+  if(pilotHas(d,'kael')&&!A.used.includes('kael')&&cnt(A.def,'focus'))out.push({k:'kael',l:`${d.name}: focus → evade`,d:'Change 1 focus result to an evade.'});
   exDMods(out);return out}
 function applyDefMod(k,sel){const A=G.atk,d=ship(A.d);const back=()=>{G.phase='dmod';fx('mod',{id:d.id});refresh()};
   if(k==='focus'){mark('dmod:focus');A.def=A.def.map(f=>f==='focus'?'evade':f);lg(d.side,`${sname(d)} spends focus: ${diceText(A.def)}.`);return spendFocus(d,back)}

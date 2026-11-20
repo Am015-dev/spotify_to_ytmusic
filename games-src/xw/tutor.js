@@ -100,7 +100,7 @@ function drillStart(){const d=document.getElementById('na-coachend');if(d)d.remo
 function drillR3(){if(TUT.r3)return;TUT.r3=true;for(const s of G.ships){const to=DRILL_R3[s.side===0?'me':'foe'];const from={x:s.x,y:s.y,h:s.h};Object.assign(s,to);try{fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:500})}catch(e){}}BF.key='';BF.fkey='';setTimeout(render,0)}
 function drillEnd(){if(document.getElementById('na-coachend'))return;NCH.on=false;NCH.finished=true;TUT.coach=false;clearTimeout(NCH.tm);const c=document.getElementById('na-coach');if(c)c.hidden=true;
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
-  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+LORE.drillEnd.t+'</div><div class="gxt-ex">'+LORE.drillEnd.s+'</div>'
+  d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+LORE.drillEnd.t+'</div><div class="gxt-ex">'+LORE.drillEnd.s+'</div>'+realGameHTML()
     +'<div class="gxt-eb">'+(NCH.o&&NCH.first?'<button type="button" class="gxt-b pri" data-na="chapter">Start chapter 1</button>':'<button type="button" class="gxt-b pri" data-na="play">Play a real game</button><button type="button" class="gxt-b" data-na="story">Story mode</button>')+'</div></div>';
   document.body.appendChild(d)}
 // during the drill the off-mat moves carry a red cross, and the edge step points at one of them
@@ -158,7 +158,7 @@ function coachTick(){if(!NCH.on||!G||!G.tut)return;if(tutScripted()&&NCH.cur&&NC
   if(G.round>=1&&(ph==='action'||ph==='activate'))coachSay('order');
   const idle=!(BF.flyUntil>performance.now())&&!BF.wave;
   if(ph==='action'&&ht&&idle&&document.querySelector('.bfact')){coachSay('action');coachSay('moves');if(G.round>=2)coachSay('lock')}
-  if(ph==='target'&&ht)coachSay('shoot');
+  if(ph==='target'&&ht){coachSay('shoot');coachSay('range')}
   if(G.atk&&ph==='amod'&&G.atk.a===me.id&&ht){coachSay('dice');try{if(atkMods().some(m=>/focus/i.test(m.k)))coachSay('usefocus')}catch(e){}}
   if(G.atk&&ph==='dmod'&&G.atk.d===me.id&&ht){try{if(defMods().length)coachSay('defend')}catch(e){}}
   if(UI.hold&&UI.hold.kind==='res'&&UI.hold.R&&!(G.atk&&G.atk.a!==UI.hold.R.a)){const R=UI.hold.R;if(R.a===me.id){if(R.dmg)coachSay('goodshot');else coachSay('res1');if(R.def&&R.def.includes('evade'))coachSay('res1')}else if(R.d===me.id){coachSay(R.dmg?'gothit':'dodge');if(R.dmg)coachSay('res2')}
@@ -183,9 +183,10 @@ function coachEnd(){if(document.getElementById('na-coachend')||!NCH.on)return;NC
   const hp=a=>a.filter(x=>x.alive).reduce((t,x)=>t+Math.max(0,x.hull-hullDmg(x))+x.sh,0);
   const d=document.createElement('div');d.id='na-coachend';d.className='gxt-end';d.setAttribute('data-help','');d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');
   d.innerHTML='<div class="gxt-endc"><div class="gxt-et">'+(won?LORE.coachEnd.win:LORE.coachEnd.lose)+'</div><div class="gxt-ex"><b>Your numbers</b><br>Your ships left: '+mine.filter(x=>x.alive).length+' (hull and shields '+hp(mine)+'). Rival ships left: '+foe.filter(x=>x.alive).length+'. Rounds: '+G.round+'.<br>'+esc(winLine())+'<br>A battle ends when one side has no ships left.</div>'
-    +'<div class="gxt-ex">'+LORE.drillNext+'</div>'
+    +realGameHTML()+'<div class="gxt-ex">'+LORE.drillNext+'</div>'
     +'<div class="gxt-eb"><button type="button" class="gxt-b pri" data-na="drill">Flight drill</button></div></div>';
   document.body.appendChild(d);TUT.coach=false}
+function realGameHTML(){return '<div class="gxt-ex na-real"><b>In a real game</b><ul>'+LORE.realGame.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul></div>'}
 // leave the staged game: nothing of it is saved, the dice script and the pauses are cleared
 function tutLeave(){TUT.on=false;TUT.free=false;TUT.coach=false;TUT.drill=false;clearTimeout(TUT.endT);TUT.endT=0;try{coachReset()}catch(e){}if(window.TUTPH){window.TUTPH=false;try{PHN.apply()}catch(e){}}TUT.dice=[];TUT.force=null;try{if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}BF.wave=null;BF.sel=null;BF.sub=null}catch(e){}
   UI.hold=null;UI.holdK=[];UI.stats=false;UI.draft={};try{GXH.hide()}catch(e){}if(G&&G.tut){G.tut=0}}

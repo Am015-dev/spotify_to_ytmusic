@@ -133,7 +133,7 @@ const hcenter=sel=>()=>hv(sel);
 function hlpSuggest(){try{const ph=hlpPhase();if(!ph||!G)return null;const bf=typeof BF!=='undefined'&&BF.on;const s=G.cur&&ship(G.cur);
   if(ph==='setup'){const q=G.q,r=recOpt(q);if(!r||!r.o)return null;const el=()=>hv('.bfspot.rec');if(!el())return null;
     const why=hcap(advice().say,15)||'This spot is a good start.';return {why,target:el}}
-  if(ph==='planShip'){const el=()=>hv('.bfring.need');if(!el())return null;return {why:'Tap your ship, then choose where it flies.',target:el}}
+  if(ph==='planShip'){const el=()=>hv('.bfring.need');if(!el())return null;return {why:'Its dial lists every move. Green is easy; red gives stress.',target:el}}
   if(ph==='planMove'){const sh=ship((bf&&BF.sel)||UI.sel);if(!sh||!sh.alive||sh.side!==planSide())return null;const sg=suggestDial(sh);if(sg==null||sg<0)return null;
     const why=whyDial(sh,sg);if(!why)return null;const el=()=>hv(bf?'.bfm.sug':'.mv.sugg');if(!el())return null;return {why,target:el}}
   if(ph==='planFly'){const el=()=>hv('[data-bf=fly],[data-a=lock]');if(!el())return null;return {why:'Every ship has a move. Tap Fly.',target:el}}

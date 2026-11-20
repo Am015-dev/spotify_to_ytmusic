@@ -40,6 +40,8 @@ LORE.coachIntro={title:'Your first battle',text:'Tap what the finger shows. One 
 LORE.coachEnd={win:'Convoy saved! Well flown, Varro.',lose:'The convoy is lost, but you learned the ropes.'};
 LORE.laterShort=['After you move, tap Roll or Boost to slide.','Bump into a ship and you skip your action.','Fly off the mat and your ship is lost.'];
 LORE.laterAlways=['Barrel roll and boost: sideways and bonus moves, in the action ring.','Bumping into a ship stops you short and skips your action.','Flying off the mat destroys your ship.','Torpedoes: spend a target lock for a big shot at range 2-3.','Tied pilot skill: the side with initiative moves first. In combat, ties fire at the same time.'];
+// the four rules every real game needs that the duel can't show (12 words or fewer per line): shown on both end cards
+LORE.realGame=['Primary weapon: range 1 adds an attack die, range 3 a defence die.','Bump a ship: you stop short and skip your action.','A move ending off the mat destroys your ship.','Two ships? Plan each one, then tap Fly once.'];
 LORE.drillNext='One more minute: a flight drill teaches barrel roll, boost, the mat edge and bumping.';
 LORE.drillEnd={t:'Drill done. You know every rule.',s:'Roll, boost, mind the edge, and don’t ram. Tied pilot skill: the side with initiative goes first.'};
 LORE.coach={
@@ -50,6 +52,7 @@ LORE.coach={
   action:{rule:1,act:1,t:'Brecken: One action',s:'After moving, take one action. Focus first.'},
   moves:{rule:1,t:'Brecken: Boost and roll',s:'Some ships can also boost or barrel roll. The drill tries both.'},
   shoot:{rule:1,act:1,t:'Brecken: Arc, range, order',s:'Highest skill fires first. Shoot an enemy in your arc, range 1-3.'},
+  range:{rule:1,t:'Brecken: Range bonus',s:'Primary weapon: range 1 adds an attack die, range 3 a defence die.'},
   dice:{rule:1,t:'Brecken: Read the dice',s:'Hit and crit hurt. Focus needs a token. Blank misses.'},
   usefocus:{rule:1,act:1,t:'Brecken: Spend focus',s:'Spend your focus token: focus faces become hits.'},
   res1:{rule:1,t:'Brecken: Range 3 and evades',s:'His evades cancelled your hits. At range 3 he rolls one more.'},

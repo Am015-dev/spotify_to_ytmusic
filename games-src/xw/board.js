@@ -95,12 +95,15 @@ function placeBan(){if(!ban||ban.hidden||ban.querySelector('[data-keep]')){if(ba
   const m=8,bt=bar&&!bar.hidden?bar.getBoundingClientRect().top-o.top:Ht;ban.style.transition='none';ban.style.maxWidth=(Wd-2*m)+'px';ban.style.transform='none';ban.style.left='0px';const w=ban.offsetWidth,h=ban.offsetHeight;
   const rs=[];for(const s of alive()){try{const p=XY(s),q=px(p.x,p.y,1);rs.push([q[0]+dx,q[1]+dy,shipR(s)*1.15+4])}catch(e){}}
   const tg=[];document.querySelectorAll('#tags .tag').forEach(t=>{if(t.hidden||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width)tg.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
-  const hit=(x,y)=>{let a=0;for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
+  const hd=[];document.querySelectorAll('#bfdice,.bftgt,.bftlab').forEach(t=>{if(t.hidden||t.closest('[hidden]')||getComputedStyle(t).display==='none')return;const q=t.getBoundingClientRect();if(q.width>2)hd.push([q.left-o.left-4,q.top-o.top-4,q.right-o.left+4,q.bottom-o.top+4])});
+  const hardHit=(x,y)=>{let a=0;for(const q of hd){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=(Math.min(ox,oy)+1)*40}return a};
+  const hit=(x,y)=>{let a=hardHit(x,y);for(const r of rs){const nx=Math.max(x,Math.min(x+w,r[0])),ny=Math.max(y,Math.min(y+h,r[1])),d=Math.hypot(r[0]-nx,r[1]-ny);if(d<r[2])a+=r[2]-d}for(const q of tg){const ox=Math.min(x+w,q[2])-Math.max(x,q[0]),oy=Math.min(y+h,q[3])-Math.max(y,q[1]);if(ox>0&&oy>0)a+=Math.min(ox,oy)+1}return a};
   const left=Math.max(m,Math.min(Wd-w-m,(Wd-w)/2)),yB=Math.max(m,bt-h-6);let best=null;
   const ys=[yB];for(let y=yB-24;y>=60;y-=24)ys.push(y);ys.push(Math.max(m,Math.min(yB,74)));
   const cur=parseFloat(ban.dataset.py);if(cur>=0&&ban.dataset.pw==String(w)+'x'+h&&hit(left,cur)===0)ys.unshift(cur);
   for(const y of ys){const a=hit(left,y);if(best==null||a<best[0]){best=[a,y];if(a===0)break}}
   ban.style.left=left.toFixed(1)+'px';ban.style.top=best[1].toFixed(1)+'px';ban.dataset.py=best[1];ban.dataset.pw=w+'x'+h;
+  if(hardHit(left,best[1])>0){ban.hidden=true;BF.banUntil=0;clearTimeout(BF.banT)}/* never over the dice panel or a target chip: the hint line says the same */
   clearTimeout(BF.placeT);BF.placeT=setTimeout(placeBan,260)}
 // the lesson bubble: same rule as the banner. Never over a ship or its name plate, always inside the stage (viewport coords, it is position:fixed)
 BF.placeCoach=function(e){if(!e||e.hidden||!ov||!(typeof v3==='function'&&v3()&&G))return;
@@ -260,7 +263,7 @@ function diceUI(){const A=G.atk;if(!A)return watchUI();if(BF.loose&&BF.looseK!==
   const pv=preview(A);setHint(G.phase==='amod'?(mods.length?'Improve your dice, then Roll':'Your shot. Tap Roll'):(mods.length?'Defend: use a token, or Done':pv.hits+pv.crits?'Hit! Tap Done':'Dodged! Tap Done'));
   // nothing to decide while defending: carry on by itself after a beat
   if(G.phase==='dmod'&&!mods.length){const kk=BF.key;setTimeout(()=>{if(BF.key===kk&&G&&G.phase==='dmod'&&humanTurn())uiAct({act:'dmod',k:'done'})},ANIM?1400:0)}
-  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}${m.d?`<small class="msub">${esc(m.d.length>34?m.d.slice(0,33)+'…':m.d)}</small>`:''}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
+  setBtns(mods.map(m=>`<button class="btn${m.k===rk?' primary rec':''}" data-act="${G.phase}" data-k="${m.k}">${modIco(m.k)} ${esc(shortMod(m))}${m.d?`<small class="msub">${esc(m.d.length>64?m.d.slice(0,63)+'…':m.d)}</small>`:''}</button>`).join('')+`<button class="btn${rk==='done'||!rk||!mods.length?' primary':''}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Roll ▶':'Done'}</button>`);
   finger(btns.querySelector('.rec')||btns.querySelector('.primary'))}
 const modIco=k=>/focus/i.test(k)?'◉':/tl|lock|rr|reroll/i.test(k)?'⌖':/evade/i.test(k)?'✦':'★';
 function shortMod(m){const l=String(m.l);if(/^Spend focus/i.test(l))return 'Use focus';if(/target lock|reroll/i.test(l))return 'Reroll';if(/focus\s*→\s*evade|focus.*(into|to) an? evade/i.test(l))return 'Focus → evade';if(/evade/i.test(l))return 'Use evade';return l.length>18?l.slice(0,17)+'…':l}
@@ -343,6 +346,7 @@ const _tap=PHN.tap;PHN.tap=function(e){if(BF.on)return PHN.tapBF(e)||(G&&G.phase
 document.addEventListener('pointerdown',e=>{if(!BF.on||!UI.hold||!G)return;if(typeof tutOn==='function'&&tutOn())return;if(e.target.closest('.gx-bar,#more,#modal,.gx-dock'))return;if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}setTimeout(()=>{if(UI.hold)releaseHold()},0)},true);
 const _rs=resize3D;resize3D=function(){const w=V3.w,h=V3.h;const r=_rs.apply(this,arguments);if(BF.on&&(V3.w!==w||V3.h!==h)){BF.fkey='';BF.key='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
 const _cv=camView;camView=function(){const r=_cv.apply(this,arguments);if(BF.on){BF.fkey='';requestAnimationFrame(()=>{try{bfRender()}catch(e){}})}return r};
+{const _bfR=bfRender;bfRender=function(){const r=_bfR.apply(this,arguments);if(ban&&!ban.hidden)placeBan();return r}}// the dice panel or target chips can appear after the banner: move or drop it
 BF.render=bfRender;BF.fit=fit;BF.release=release;BF.hideBan=()=>{if(ban){ban.hidden=true;BF.banUntil=0;BF.banQ=[]}};BF.px=px;BF.shipR=shipR;BF.shownXY=shownXY;
 })();
 // the open "More" menu sits on a dim backdrop: the page behind reads as covered, a tap on the backdrop closes the menu

@@ -89,7 +89,7 @@ html.ph .ps-chips{display:flex;flex-wrap:wrap;gap:6px}
 html.ph .ps-chip{flex:1 1 120px;min-height:52px;text-align:left;border:1.5px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);font:inherit;padding:4px 10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center}
 html.ph .ps-chip b{font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html.ph .ps-chip span{font-size:13px;color:var(--muted)}
-html.ph .ps-chip.need{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.3);animation:psPulse 1.6s ease-in-out infinite}
+html.ph .ps-chip.need{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.3);animation:psPulse 1.6s ease-in-out 3}
 html.ph .ps-chip.need span{color:var(--gold);font-weight:700}
 html.ph .ps-chip.set span{color:#8ff5b8}
 html.ph .ps-chip.on{background:rgba(255,200,107,.16)}
