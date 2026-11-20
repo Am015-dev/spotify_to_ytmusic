@@ -205,7 +205,7 @@ function promptText(mine) {
   if (!mine && isHuman(UI.animSeat == null ? nx : UI.animSeat) && humans().length <= 1) return 'Your turn is starting.';
   if (!mine) return UI.busy ? G.pl[UI.animSeat == null ? nx : UI.animSeat].name + ' is playing.' : 'Watch ' + G.pl[nx].name + '.';
   var Q = G.q;
-  if (UI.pend) return 'Tap Play to put ' + B[G.pl[UI.view].hand[UI.pend.i]].n + ' in your ' + HABN[UI.pend.h] + '.';
+  if (UI.pend) return 'Tap Play to place ' + B[G.pl[UI.view].hand[UI.pend.i]].n + '.';
   if (UI.gsDie != null) return 'Grub or seed?';
   if (!Q) return UI.sel != null ? 'Tap the marked space on your board.' : UI.pickBird ? 'Pick a bird below.' : 'Choose one action:';
   var n = Q.d && Q.d.n;
