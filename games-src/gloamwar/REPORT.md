@@ -1,0 +1,55 @@
+# [NEW8 gloamwar] report
+
+- **Branch:** shelf/W567-new-epic. Draft PR #285 into alex/brave-carson-rbpmlk. **Not deployed, no shelf card** (as the brief says).
+- **Game:** Gloamwar, a two-player epic war on an old woodcut map. Play as the Dawn League or the Gloam against the computer (Easy, Normal or Hard). There is a 21-step tutorial, a goal card at the start, a rules drawer, a hint bulb, and drawers for cards, nations and the Company.
+- **Rules and structure:** identical to the original second edition. Counts asserted in rules-test.js:
+  - 104 regions; strongholds 8 Dawn and 8 Gloam, cities 4 Dawn and 2 Gloam, 2 fortifications (20 and 18 VP).
+  - 5 + 3 nations with the same political start; units 45/30/20 Dawn and 72/18/8 Gloam.
+  - Dice 4→6 and 7→10, 5 combat dice.
+  - 16 + 4 + 4 hunt tiles, corruption 0-12, a 5-step final track, 3 lamps (the rings).
+  - 96 cards in 4 decks of 24 (character decks all character cards; strategy decks 12 muster + 12 army; every card has a combat half).
+  - Full combat (cards, sieges, sorties, retreat, advance) and all 4 victory conditions.
+- **Our own creative content:** the world, map geography (generated Voronoi map, tools/genmap.js), nation, character and minion names and abilities, and all 96 card titles, effects and combat halves.
+- **[unverified]:** these couldn't be confirmed from text and were filled in from memory, logged in rules-notes.md and COMPONENTS.md:
+  - Gloam die face split (one of each, with the Gaze).
+  - Standard hunt tile value split.
+  - Original per-nation settlement list and region total (104).
+  - Count of cards that stay in play.
+- **Simplified on purpose (interface only):**
+  - Casualties are taken automatically (regulars first).
+  - An attack uses the whole at-war army; moves offer "all" or "leave one".
+  - A revealed Company draws extra tiles only for Gloam strongholds at its start and end regions.
+  - No online or hot-seat play.
+- **Gates:**
+  - `build-all --quick` PASS.
+  - `--full` PASS twice, re-run on the final UI (phone-check 6/6 scenarios: 390x763, 375x553, 844x390, both rotations, stale).
+  - rules-test 67/67.
+  - Tap-through bots (ui-play.js) play both sides by real touches only.
+  - tut-test.js finishes all 21 tutorial steps by taps.
+- **Balance (AI vs AI, Normal vs Normal, 40 games):** Dawn 22, Gloam 18. The Dawn won by the Kiln and by VP, the Gloam by taint and once by VP.
+- **Assets:**
+  - IM Fell English / IM Fell English SC (Igino Marini, SIL OFL 1.1).
+  - 70 game-icons.net icons (Lorc, Delapouite, CC BY 3.0), drawn as woodcut stamps.
+  - Everything else is our own code art.
+  - Logged in gloamwar/ASSETS.md and THIRD-PARTY.md, credited in Menu > About.
+- **Proof:** games-src/gloamwar/proof/
+  - first-3-minutes-375x667.webm
+  - 1-title.png, 2-goal.png, 3-map.png, 4-die.png, 5-cards.png, 6-battle.png
+- **Cold play (independent agents with no build knowledge):**
+  - Round 1: "Partly, 3/5". Fixed:
+    - the tutorial stalled at the army step;
+    - Skip sat on top of Hint;
+    - overlapping bubbles;
+    - cut-off labels;
+    - the rival panel covered the map;
+    - no goal at the start;
+    - a ghost click closed drawers.
+  - Final verdict, as given: "Could I play? Partly. ... Fun: 2/5. The look is lovely, the cards sheet is clear and the battle dice are satisfying. But I got crushed in two forced defensive battles (2 vs 5, then 1 vs 2) with no idea why dice hit or missed, and I mostly clicked through menus. ... Biggest improvement: highlight legal move/attack targets with a strong pulsing outline and a one-line odds or outcome preview ("5 vs 8, you hit on 5+"), so a newcomer always knows where to tap and what will happen."
+  - Since that verdict:
+    - Legal places now glow solid red.
+    - Attack shows "your N vs M".
+    - Battles state "Dice hit on 5 or 6".
+    - Tapping a wrong place says so.
+    - The discard button no longer overlaps.
+  - Not re-tested cold.
+- **Honest status:** the rules and structure are complete and the gates pass. But a cold newcomer still finds the game heavy (jargon, many choices per die). The next step is to playtest how readable it is for newcomers, not more rules work.

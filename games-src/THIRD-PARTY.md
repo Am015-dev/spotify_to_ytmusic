@@ -37,3 +37,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Gloamwar (gloamwar/)
+
+- IM Fell English and IM Fell English SC fonts. Source: https://fonts.google.com/specimen/IM+Fell+English . Author: Igino Marini. Licence: SIL Open Font License 1.1 (https://openfontlicense.org). Files: `gloamwar/src/fell-r.woff2`, `gloamwar/src/fell-sc.woff2` (embedded in the built page).
+- Game icons (70 path shapes drawn as woodcut stamps). Source: https://game-icons.net . Authors: Lorc, Delapouite. Licence: CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/). File: `gloamwar/src/icons.js` (each icon's source name in `ICON_SRC`). Credited in the game's Menu > About.
+- Everything else (map, parchment, mountains, tokens, banners, sound) is our own code art.
