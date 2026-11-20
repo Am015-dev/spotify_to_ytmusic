@@ -127,7 +127,7 @@ function newGame(mode, o) { if (mode !== 'tutorial' && T2) t2Clear(); try { ['re
 }
 function applyTwist(t) {
   if (t.id === 'boss-buttons') G.btn[1] += t.param || 0;
-  else if (t.id === 'torn-squares') { var c = [[0, 0], [8, 8], [4, 4], [8, 0], [0, 8]]; for (var i = 0; i < (t.param || 0); i++) G.board[0][c[i][1] * 9 + c[i][0]] = 99; }
+  else if (t.id === 'torn-squares') { var c = [[0, 0], [8, 8], [8, 0], [0, 8], [4, 4]] /* F1: the centre tears last, so 3 tears still leave room for a 7x7 */; for (var i = 0; i < (t.param || 0); i++) G.board[0][c[i][1] * 9 + c[i][0]] = 99; }
   else if (t.id === 'boss-patched') { var d = [[0, 0], [8, 8], [0, 8], [8, 0]]; for (var j = 0; j < (t.param || 0); j++) G.board[1][d[j][1] * 9 + d[j][0]] = 100; }
 }
 function saveGame() { try { if (UI.tutorial || UI.camp || !G || G.over) { if (G && G.over) localStorage.removeItem('sw_save'); return; } localStorage.setItem('sw_save', JSON.stringify({ G: G, mode: UI.mode, lvl: UI.lvl, names: UI.names, coach: UI.coach || null })); if (window.GNS && GNS.saved) GNS.saved('stitchwise', true); } catch (e) { } }
