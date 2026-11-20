@@ -130,6 +130,7 @@ var VSE = (function () {
       } else if (pd.h === 'ware') {
         P.goods.forEach(function (x) { out.push({ t: 'sell', die: -2, v: x.d, w: 0 }); });
       }
+      buyMoves(G, s, out);
       out.push({ t: 'skip' });
       return out;
     }
@@ -228,7 +229,7 @@ var VSE = (function () {
   function settle(G) { // automatic steps: drop pendings with no option, end a finished turn
     for (var guard = 0; guard < 20; guard++) {
       var pd = G.pend[G.pend.length - 1];
-      if (pd && validMoves(G).length === 1) { G.pend.pop(); continue; } // only "skip" left
+      if (pd && !validMoves(G).some(function (m) { return m.t !== 'skip' && m.t !== 'buy'; })) { G.pend.pop(); continue; } // nothing but skip left
       if (pd) return;
       var s = side(G), P = G.p[s];
       if (P.used[0] && P.used[1]) {
@@ -307,6 +308,6 @@ var VSE = (function () {
     return e;
   }
   return { newGame: newGame, validMoves: validMoves, apply: apply, side: side, cost: cost, canPlaceAt: canPlaceAt, final: final, clone: clone, checkInvariants: checkInvariants,
-    has: has, region: region, same: same, isLegal: isLegal, dist: dist, orderOf: orderOf, loadShip: loadShip, countTiles: countTiles, countGoods: countGoods, rng: rng };
+    has: has, region: region, same: same, isLegal: isLegal, dist: dist, orderOf: orderOf, loadShip: loadShip, countTiles: countTiles, countGoods: countGoods, rng: rng, finish: finish };
 })();
 if (typeof module !== 'undefined') module.exports = VSE;
