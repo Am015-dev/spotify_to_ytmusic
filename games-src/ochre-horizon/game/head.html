@@ -118,7 +118,7 @@ button{font-family:var(--bd);font-weight:700;font-size:14px;color:inherit;cursor
 #modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(10,8,6,.66)}
 #modal.on{display:flex}
 #modal .mb{width:100%;max-width:380px;max-height:100%;overflow-y:auto;background:var(--deep);border:3px solid var(--sun2);border-radius:18px;padding:12px;position:relative}
-#modal .mb h3{margin:0 44px 8px 0;font-family:var(--hd);font-weight:400;font-size:20px;color:var(--sun2)}
+#modal .mb h3,#app #modal h3{margin:0 44px 8px 0;font-family:var(--hd)!important;font-variant:normal!important;font-weight:400;font-size:20px;color:var(--sun2)}
 #modal .mx{position:absolute;right:8px;top:8px;width:44px;height:44px;border-radius:12px;background:var(--deep2);display:grid;place-items:center}
 .btn{display:block;width:100%;min-height:50px;border-radius:14px;background:var(--sun);color:var(--ink);font-size:16px;margin-top:10px;box-shadow:0 3px 0 #8f3523;padding:6px 12px;line-height:1.2}
 .btn small{display:block;font-weight:500;font-size:12px}
@@ -162,6 +162,11 @@ table.sc2 tr.tot td{border:0;font-size:20px;color:var(--sun2)}
 .rules h4{font-family:var(--hd);font-weight:400;color:var(--sun2);font-size:17px;margin:14px 0 4px}.rules p{margin:4px 0;line-height:1.4}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (min-width:700px) and (orientation:landscape){#app{max-width:none}}
-@media (orientation:landscape) and (max-height:480px){#glob{grid-template-columns:1.3fr 1fr 1fr;padding:3px 6px}.gauge{height:38px}#res .rc{height:42px}#bar button{height:44px}#top{height:42px}}
+@media (orientation:landscape) and (max-height:600px){
+ #app{display:grid;grid-template-columns:1fr minmax(300px,42%);grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"top top" "bw glob" "bw res" "bw bar" "bw x"}
+ #top{grid-area:top}#glob{grid-area:glob;grid-template-columns:1fr 1fr 1fr;padding:4px}#res{grid-area:res;grid-template-columns:repeat(3,1fr)}#bar{grid-area:bar;grid-template-columns:1fr 1fr}#bw{grid-area:bw;min-height:0}
+ #bar button{height:46px}#res .rc{height:44px}.gauge{height:44px;padding-left:28px}.gauge .gi{left:4px}.gauge .bar{left:28px}
+ .coach{left:auto;right:10px;width:42%;bottom:12px}#toast{left:30%;top:60px}.sheet{left:auto;width:min(560px,100%);max-height:94%}
+}
 </style>
 </head>

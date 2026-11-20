@@ -114,7 +114,7 @@ function showCard(id, owner) {
     if (OH.playable(0, id)) {
       var cost = OH.cardCost(0, id), pay = OH.maxPay(0, c, cost), parts = [];
       if (pay.steel) parts.push(pay.steel + ' steel'); if (pay.ti) parts.push(pay.ti + ' titanium'); if (pay.heat) parts.push(pay.heat + ' heat'); parts.push(pay.mc + ' credits');
-      h += '<button class="btn" id="mPlay"' + (my ? '' : ' disabled') + '>Play it<small>Pay ' + parts.join(' + ') + (my ? '' : ' · wait for your turn') + '</small></button>';
+      h += '<button class="btn pickable" id="mPlay"' + (my ? '' : ' disabled') + '>Play it<small>Pay ' + parts.join(' + ') + (my ? '' : ' · wait for your turn') + '</small></button>';
     } else h += '<div class="why">' + esc(whyNot(0, id)) + '</div>';
     h += '<button class="btn alt" id="mSell"' + (my ? '' : ' disabled') + '>Sell for 1 credit</button>';
   }
@@ -126,7 +126,7 @@ function showSell() {
   var P = G.pl[0], picks = {};
   function draw() {
     var n = Object.keys(picks).length;
-    modal('<h3>Sell cards</h3><p style="margin:0 0 8px;opacity:.85">Tap cards to sell. 1 credit each.</p><div class="grid">' + P.hand.map(function (id) { return '<button class="cw" data-sp="' + id + '">' + cardHTML(id, { pick: picks[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mSellGo"' + (n ? '' : ' disabled') + '>Sell ' + plural(n, 'card') + '<small>+' + n + ' credits</small></button></div>');
+    modal('<h3>Sell cards</h3><p style="margin:0 0 8px;opacity:.85">Tap cards to sell. 1 credit each.</p><div class="grid">' + P.hand.map(function (id) { return '<button class="cw pickable" data-sp="' + id + '">' + cardHTML(id, { pick: picks[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mSellGo"' + (n ? '' : ' disabled') + '>Sell ' + plural(n, 'card') + '<small>+' + n + ' credits</small></button></div>');
     $('mb').querySelectorAll('[data-sp]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-sp'); if (picks[id]) delete picks[id]; else picks[id] = 1; draw(); }); });
     $('mSellGo').addEventListener('click', function () { closeModal(); closeSheet(); doMove({ t: 'sell', ids: Object.keys(picks) }); });
   }
@@ -134,12 +134,12 @@ function showSell() {
 }
 function showChoose() {
   var d = G.pending.d, c = OH.card(d.src);
-  modal('<h3>' + esc(c ? c.name : 'Choose') + '</h3><p style="margin:0 0 4px">Pick one:</p>' + d.opts.map(function (o, i) { return '<button class="btn' + (i ? ' cr' : '') + '" data-ch="' + i + '"' + (d.ok.indexOf(i) >= 0 ? '' : ' disabled') + '>' + esc(opsWords(o)) + '</button>'; }).join(''), false);
+  modal('<h3>' + esc(c ? c.name : 'Choose') + '</h3><p style="margin:0 0 4px">Pick one:</p>' + d.opts.map(function (o, i) { return '<button class="btn pickable' + (i ? ' cr' : '') + '" data-ch="' + i + '"' + (d.ok.indexOf(i) >= 0 ? '' : ' disabled') + '>' + esc(opsWords(o)) + '</button>'; }).join(''), false);
   $('mb').querySelectorAll('[data-ch]').forEach(function (b) { b.addEventListener('click', function () { closeModal(); doMove({ t: 'choose', i: +b.getAttribute('data-ch') }); }); });
 }
 function showPickRes() {
   var d = G.pending.d;
-  modal('<h3>Add ' + d.n + ' ' + esc(d.kind) + '</h3><p style="margin:0 0 4px">Which card gets it?</p>' + d.cards.map(function (id) { return '<button class="btn cr" data-pr="' + id + '">' + esc(OH.card(id).name) + '<small>' + (G.pl[0].res[id] || 0) + ' there now · ' + esc(vpWords(OH.card(id).vp)) + '</small></button>'; }).join(''), false);
+  modal('<h3>Add ' + d.n + ' ' + esc(d.kind) + '</h3><p style="margin:0 0 4px">Which card gets it?</p>' + d.cards.map(function (id) { return '<button class="btn cr pickable" data-pr="' + id + '">' + esc(OH.card(id).name) + '<small>' + (G.pl[0].res[id] || 0) + ' there now · ' + esc(vpWords(OH.card(id).vp)) + '</small></button>'; }).join(''), false);
   $('mb').querySelectorAll('[data-pr]').forEach(function (b) { b.addEventListener('click', function () { closeModal(); doMove({ t: 'pickres', id: b.getAttribute('data-pr') }); }); });
 }
 function suggestBuys(ids, budget) { try { var save = OH.G; var r = OHAI_buys(ids, budget); OH.G = save; return r; } catch (e) { return []; } }
@@ -148,12 +148,12 @@ function showSetup() {
   var P = G.pl[0], st = UI.setup || (UI.setup = { step: 0, corp: null, keep: {} });
   if (st.step === 0) {
     var cs = P.offer.corps.slice(); if (cs.indexOf('c00') < 0 && UI.tut) cs.push('c00');
-    modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { return '<button class="cw" data-corp="' + id + '">' + cardHTML(id, { flavor: 1 }) + '</button>'; }).join('') + '</div>', false);
+    modal('<h3>Pick your company</h3><p style="margin:0 0 8px;opacity:.85">Each company has one power.</p><div class="grid">' + cs.map(function (id) { return '<button class="cw pickable" data-corp="' + id + '">' + cardHTML(id, { flavor: 1 }) + '</button>'; }).join('') + '</div>', false);
     $('mb').querySelectorAll('[data-corp]').forEach(function (b) { b.addEventListener('click', function () { st.corp = b.getAttribute('data-corp'); st.step = 1; if (P.offer.corps.indexOf(st.corp) < 0) P.offer.corps.push(st.corp); var C = OH.CORPS[st.corp]; st.keep = {}; if (!C.beginner) suggestBuys(P.offer.cards, C.mc - 14).forEach(function (id) { st.keep[id] = 1; }); coachShow('keep'); showSetup(); }); });
     coachShow('corp'); return;
   }
   var C = OH.CORPS[st.corp], n = Object.keys(st.keep).length, beg = !!C.beginner;
-  modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Suggested ones are marked.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
+  modal('<h3>Keep cards</h3><p style="margin:0 0 8px;opacity:.85">' + (beg ? 'Open Charter keeps all 10 free.' : '3 credits each. Suggested ones are marked.') + '</p><div class="grid">' + P.offer.cards.map(function (id) { return '<button class="cw pickable" data-keep="' + id + '">' + cardHTML(id, { pick: beg || st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mKeep">' + (beg ? 'Keep all 10' : 'Keep ' + plural(n, 'card')) + '<small>' + (beg ? 'Start with 42 credits' : 'Pay ' + 3 * n + ', start with ' + (C.mc - 3 * n) + ' credits') + '</small></button><button class="btn alt" id="mBack">Other company</button></div>', false);
   $('mb').querySelectorAll('[data-keep]').forEach(function (b) { b.addEventListener('click', function () { if (beg) return; var id = b.getAttribute('data-keep'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= C.mc) st.keep[id] = 1; showSetup(); }); });
   $('mKeep').addEventListener('click', function () { var m = { t: 'setup', corp: st.corp, buy: Object.keys(st.keep) }; UI.setup = null; closeModal(); doMove(m); });
   $('mBack').addEventListener('click', function () { st.step = 0; showSetup(); });
@@ -162,14 +162,14 @@ function showResearch() {
   var P = G.pl[0], st = UI.research;
   if (!st || st.gen !== G.gen) { st = UI.research = { gen: G.gen, keep: {} }; suggestBuys(P.research, P.mc - 3).forEach(function (id) { st.keep[id] = 1; }); }
   var n = Object.keys(st.keep).length;
-  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Buy for 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
+  modal('<h3>Round ' + G.gen + ': new cards</h3><p style="margin:0 0 8px;opacity:.85">Buy for 3 credits each. You have ' + P.mc + '.</p><div class="grid">' + P.research.map(function (id) { return '<button class="cw pickable" data-rk="' + id + '">' + cardHTML(id, { pick: st.keep[id] }) + '</button>'; }).join('') + '</div><div class="stick"><button class="btn pickable" id="mBuy">' + (n ? 'Buy ' + plural(n, 'card') : 'Buy none') + '<small>' + (n ? 'Pay ' + 3 * n + ' credits' : 'Keep your credits') + '</small></button></div>', false);
   $('mb').querySelectorAll('[data-rk]').forEach(function (b) { b.addEventListener('click', function () { var id = b.getAttribute('data-rk'); if (st.keep[id]) delete st.keep[id]; else if ((n + 1) * 3 <= P.mc) st.keep[id] = 1; showResearch(); }); });
   $('mBuy').addEventListener('click', function () { closeModal(); doMove({ t: 'buy', ids: Object.keys(st.keep) }); });
   coachShow('research');
 }
 function showDraft() {
   var h = G.draft.hands[0];
-  modal('<h3>Draft: keep 1</h3><p style="margin:0 0 8px;opacity:.85">The rest go to the rival. Pick ' + (G.draft.picked[0].length + 1) + ' of 4.</p><div class="grid">' + h.map(function (id) { return '<button class="cw" data-dr="' + id + '">' + cardHTML(id) + '</button>'; }).join('') + '</div>', false);
+  modal('<h3>Draft: keep 1</h3><p style="margin:0 0 8px;opacity:.85">The rest go to the rival. Pick ' + (G.draft.picked[0].length + 1) + ' of 4.</p><div class="grid">' + h.map(function (id) { return '<button class="cw pickable" data-dr="' + id + '">' + cardHTML(id) + '</button>'; }).join('') + '</div>', false);
   $('mb').querySelectorAll('[data-dr]').forEach(function (b) { b.addEventListener('click', function () { closeModal(); doMove({ t: 'draft', id: b.getAttribute('data-dr') }); }); });
 }
 function showFinal() {
