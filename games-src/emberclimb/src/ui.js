@@ -377,9 +377,9 @@
     }
     if (it.blk) { var bk = it.blk * (it.blkH ? g.hs.length : 1); P.push({ k: 'blk', s: 'intent-defend', t: 'Block ' + bk, cap: 'raises ' + bk + ' Block', say: 'Block: +' + bk + (D.ENEMIES[e.id].keepBlk ? '. It keeps it. Break it to stop the next hit.' : '. Your hits do less.') }); }
     if (it.str) P.push({ k: 'str', s: 'intent-buff', t: 'Strength +' + it.str, cap: 'grows stronger (+' + it.str + ')', say: 'Buff: +' + it.str + ' Strength. Later hits grow.' });
-    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak (' + it.weak + ')', say: 'Weak ' + it.weak + ': your next attack deals 8 less per hit. One Weak is used per attack (max 3).' });
+    if (it.weak) P.push({ k: 'weak', s: 'intent-weak', t: 'Weak ' + it.weak, cap: 'makes you Weak (' + it.weak + ')', say: 'Weak ' + it.weak + ': your next attack deals 1 less per hit. One Weak is used per attack (max 3).' });
     if (it.vuln) P.push({ k: 'vuln', s: 'intent-vuln', t: 'Vulnerable ' + it.vuln, cap: 'makes you Vulnerable (' + it.vuln + ')', say: 'Vulnerable ' + it.vuln + ': the next attack on you deals double. One is used per attack (max 3).' });
-    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: your Block is 25% weaker.' });
+    if (it.frail) P.push({ k: 'frail', s: 'intent-frail', t: 'Frail ' + it.frail, cap: 'makes you Frail', say: 'Frail: each Block card gives 1 less.' });
     if (it.poison) P.push({ k: 'poison', s: 'intent-poison', t: 'Poison ' + it.poison, cap: 'poisons you (+' + it.poison + ')', say: 'Poison +' + it.poison + ': you lose ' + D.SCALE + ' HP per Poison token at the end of each turn. Tokens stay.' });
     if (it.add) { var ck = CARDK[it.add[0]] || 'unk', cn = D.CARDS[it.add[0]] ? D.CARDS[it.add[0]].name : 'junk'; P.push({ k: ck, s: ck === 'unk' ? 'intent-debuff' : 'intent-' + ck, t: '+' + it.add[1] + ' ' + cn, cap: 'adds ' + it.add[1] + ' ' + cn + ' to your discard pile', say: 'Adds ' + it.add[1] + ' ' + cn + ' to your discard pile.' }); }
     if (it.spikes) P.push({ k: 'blk', s: 'intent-defend', t: 'Spikes ' + it.spikes, cap: 'grows spikes (' + it.spikes + ')', say: 'Spikes: attack it and take ' + it.spikes + '.' });
@@ -539,8 +539,9 @@
     function sl0() { return hand.querySelector('.card.sel'); }
     if (b.ph === 'p' && UI.sel >= 0 && sl0() && !(window.GXT && GXT.active())) {   // F2: a lifted card can be put back (this chip, or a tap on empty table)
       var cx0 = on(h('button', 'chip w2cancel', '\u2715 Put back'), function () { UI.sel = -1; render(); }); cx0.id = 'cancelsel'; cx0.setAttribute('aria-label', 'Put the card back in your hand'); st.appendChild(cx0);
-      var rq = sl0().getBoundingClientRect(), vwq = document.documentElement.clientWidth, cw0 = cx0.offsetWidth, lx = rq.left - 8 - cw0; if (lx < 6) lx = Math.min(vwq - cw0 - 6, rq.right + 8);
-      cx0.style.left = Math.round(lx) + 'px'; cx0.style.top = Math.round(Math.max(60, rq.bottom - 56)) + 'px';
+      var placeX = function () { var s0 = sl0(); if (!s0 || !cx0.isConnected) return; var rq = s0.getBoundingClientRect(), vwq = document.documentElement.clientWidth, cw0 = cx0.offsetWidth, lx = rq.left + rq.width / 2 - cw0 / 2;
+        cx0.style.left = Math.round(Math.max(6, Math.min(vwq - cw0 - 6, lx))) + 'px'; cx0.style.top = Math.round(Math.min(innerHeight - cx0.offsetHeight - 6, rq.bottom + 6)) + 'px'; };
+      cx0.style.left = '6px'; cx0.style.top = '-200px'; setTimeout(placeX, 0); setTimeout(placeX, 320);   // after the lifted card has moved to the centre
     }
     st.addEventListener('click', function (ev) { var t = ev.target; if (UI.sel < 0 || UI.busy || (window.GXT && GXT.active())) return; if (t.closest && t.closest('.card,.en,button,.chip,.pot,.ov,[role=dialog],a,input')) return; UI.sel = -1; render(); });
     if (SG && nn) {   // R7: the fanned hand always fits the screen (edge cards rotate outwards, so measure and shrink)

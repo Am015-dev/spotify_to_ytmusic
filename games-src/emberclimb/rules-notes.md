@@ -5,7 +5,15 @@ official rules as I know them. I cannot open the rulebook from this container, s
 numbers with confidence; "UNCHECKED" means I could not recall the official number with confidence, so it was left alone (nothing invented).
 Names in the game are all original; this file uses plain rule terms only.
 
-## One scale (R16, Nov 2026): every number = tabletop number x SCALE (8)
+## Tabletop scale (F2, 20 Nov 2026): every number on screen IS the tabletop number (`D.SCALE = 1`)
+F1 showed every number x8 (Strike 8, Strength +8, Block 8); the cold-play tester called it odd. F2 sets the one constant `D.SCALE` (data.js)
+to 1, so every damage, Block, HP, heal, HP loss, Weak, Wrath, Shiv, orb, poison, relic, potion, event and gold number is the tabletop value
+(Strike 1, Defend 1, Warrior 10 HP, Rest heals 3, start gold 4). Structure is unchanged: all content was already stored as whole tabletop
+units x SCALE, so play is identical, only the printed numbers shrink. Frail is now "1 less Block per Block card" (it was -25%, which rounds
+to 0 on this scale) [unverified: Frail only comes from our own act 2 foes]. Ascension 2 loses 1 max HP. The table below keeps the old x8
+column for reference; read the "Tabletop source" column as what the game shows now.
+
+## One scale (R16, Nov 2026, superseded by F2 above): every number = tabletop number x SCALE (8)
 The re-review found three scales mixed (HP x8, damage ~x5, Weak/Shiv/rest x3). Now ONE constant, `D.SCALE = 8` (data.js), applies to
 every number: damage, Block, HP, healing, HP loss, Weak, Wrath, Shiv, orb values, poison per token, relic/potion/event numbers and gold.
 Token counts (Strength, Weak, Vulnerable, Poison, Frail, Ritual) stay tabletop counts; each Strength or Poison token is worth SCALE.
