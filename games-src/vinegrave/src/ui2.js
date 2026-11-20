@@ -22,13 +22,13 @@ function refreshInsp() {
     h += `<h3>${esc(c.name)}</h3><div class="irow"><div class="big">${cardHTML(id, {})}</div><div><p><b>${c.t === 'item' ? 'Item' : c.t === 'art' ? 'Artifact' : c.t === 'fear' ? 'Dread' : 'Starting card'}</b>${c.t === 'item' ? ': costs ' + c.cost + ' ' + rw('coin', c.cost) : c.t === 'art' ? ': costs ' + c.cost + ' ' + rw('compass', c.cost) : ''}.</p><p>${esc(c.t === 'fear' ? 'It does nothing. It costs 1 point.' : c.text)}</p>`;
     h += `<p class="sm">Or use it to pay one ${V.TNAME[c.tr]} of travel.</p>${c.vp ? `<p class="sm">${ic('star', '')} Star badge: worth ${c.vp} ${Math.abs(c.vp) === 1 ? 'point' : 'points'} at the end.</p>` : ''}`;
     if (I.kind === 'row' && c.t !== 'fear') { const k = c.t === 'item' ? 'coin' : 'compass', n = c.cost - (me.res[k] || 0); h += `<p class="sm">${n > 0 ? `<b>Need ${n}</b>: you are ${n} ${rw(k, n)} short. Earn ${n === 1 ? 'one' : 'them'} first (dig, play cards, climb research).` : 'You can afford it now.'}</p>`; }
-    if (c.t === 'item') h += '<p class="sm">Bought items go under your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Artifacts work at once when bought.</p><p class="sm">Played from your hand, they cost 1 tablet.</p>';
+    if (c.t === 'item') h += '<p class="sm">Bought items go under your deck.</p>'; if (c.t === 'art') h += '<p class="sm">Bought, you may use it at once for free.</p><p class="sm">Played from your hand, it costs 1 tablet.</p>';
     h += `<p><button type="button" class="btn alt" data-a="cards" data-id="${id}">See all cards</button></p></div></div>`;
-    L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) add(m, 'Buy it'); if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
+    L.forEach(m => { if (I.kind === 'row' && m.t === 'buy' && m.r === I.x) { add(m, c.t === 'art' ? 'Buy and use it' : 'Buy it'); if (c.t === 'art') add(Object.assign({}, m, { nofx: 1 }), 'Buy, keep for later'); } if (I.kind === 'hand' && m.t === 'play' && m.i === I.x) add(m, 'Play it' + (c.t === 'art' ? ' (1 tablet)' : '')); });
     if (q && q.h === 'buy' && I.kind === 'row') VG.moves(G).forEach(m => { if (m.v === I.x) add(m, 'Buy it ' + q.d.o + ' cheaper'); });
   } else if (I.kind === 'track') {
-    h += `<h3>Research track</h3><p>Your magnifier climbs first. Your notebook follows, never past it.</p><p>Each row costs what it shows and gives a bonus.</p><p>The top row is the temple. There you buy temple tiles.</p><table class="sct"><tr><th>Row</th><th>Cost</th><th>Bonus</th><th>Points</th></tr>`;
-    for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' (you)' : ''}</td><td>${resHTML(V.TRACK[r].cost)}</td><td>${resHTML(V.TRACK[r].bonus)}${V.FIRST[r] && !(G.firstTaken && G.firstTaken[r]) ? ' <span class="sm">first: </span>' + resHTML(V.FIRST[r]) : ''}</td><td>${V.GLASS_VP[r]}</td></tr>`;
+    h += `<h3>Research path</h3><p>Move up to a space joined to yours. Pay the cost on that space.</p><p>First one there takes its bonus tile. Every arrival gets the row bonus.</p><p>Your notebook follows, never past the magnifier. The top row is the temple.</p><table class="sct"><tr><th>Row</th><th>Spaces (cost)</th><th>Row bonus</th><th>Points</th></tr>`;
+    for (let r = V.TOP; r >= 1; r--) h += `<tr><td>${r === V.TOP ? 'Temple' : r}${me.glass === r ? ' (you)' : ''}</td><td>${V.PATH[r].map((sp, j) => (V.PATH[r].length > 1 ? (j ? 'R ' : 'L ') : '') + resHTML(sp.c) + (G.rbt && G.rbt[r + '_' + j] != null ? ' <span class="sm">tile: </span>' + resHTML(V.RBONUS[G.rbt[r + '_' + j]]) : '') + (r < V.TOP - 1 && V.PATH[r].length + V.PATH[r + 1].length > 2 ? ' <span class="sm">to ' + sp.to.map(k => V.PATH[r + 1].length > 1 ? (k ? 'R' : 'L') : 'up').join('+') + '</span>' : '')).join('<br>')}</td><td>${resHTML(V.TRACK[r].bonus)}</td><td>${V.GLASS_VP[r]}</td></tr>`;
     h += `</table><p class="sm">Points shown are for the magnifier.</p><p class="sm">Temple tiles left:</p>${V.TEMPLE.map((t, k) => `<p class="sm">${t.vp} points: ${G.temple[k]} left</p>`).join('')}`;
     L.forEach(m => { if (m.t === 'res' || m.t === 'temple') add(m, esc(trackLine(m))); });
   } else if (I.kind === 'guard') {
@@ -148,7 +148,7 @@ function finishSolo() {   /* the rest of the rivals' round at once; one line say
   const r0 = G.round; let n = 0;
   while (G.phase === 'play' && !isHuman(VG.actor(G)) && n < 400) { const s = VG.actor(G), m = VAI.choose(G, G.p[s].ai || 'normal'); const r = m ? VG.apply(G, m) : { ok: false }; if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); } n++; }
   UI.quick = false; G.ev = []; save(); UI.busy = false; rivalCap(''); fxHide();
-  if (n) toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 || G.phase !== 'play' ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);
+  if (n && G.phase === 'play') toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);   /* F14 (R93): no toast over the game-over score floats */
   after();
 }
 function aiStep() {
@@ -232,7 +232,12 @@ function popAt(rect, t, n) {
   const e = document.createElement('div'); e.className = 'vpop' + (t.neg ? ' neg' : '') + (t.chip ? ' onchip' : ''); e.setAttribute('aria-hidden', 'true');
   e.innerHTML = (t.vp ? `<b>${esc(t.vp)}</b>` : '') + (t.why ? `<span>${esc(t.why)}</span>` : '') + (t.res ? `<span>${esc(t.res)}</span>` : '');
   document.body.appendChild(e); const w = e.offsetWidth, x = Math.max(6, Math.min(innerWidth - w - 6, rect.left + rect.width / 2 - w / 2)), y = t.chip ? Math.max(2, rect.top + rect.height / 2 - e.offsetHeight / 2) : Math.max(60, Math.min(innerHeight - 70, rect.top + rect.height / 2 - 20));
-  e.style.left = x + 'px'; e.style.top = y + 'px'; setTimeout(() => e.remove(), 1700);
+  /* F14 (R93): pills never overlap each other or the rival caption: a duplicate is dropped, a clash moves down a step */
+  let yy = y; const h = e.offsetHeight, busy = [...document.querySelectorAll('.vpop')].filter(o => o !== e).map(o => o.getBoundingClientRect()), cap = $('#rcap');
+  if (cap && cap.classList.contains('on')) busy.push(cap.getBoundingClientRect());
+  if ([...document.querySelectorAll('.vpop')].some(o => o !== e && o.textContent === e.textContent)) { e.remove(); return; }
+  for (let k = 0; k < 6 && busy.some(r => x < r.right + 2 && x + w > r.left - 2 && yy < r.bottom + 2 && yy + h > r.top - 2); k++) yy = Math.min(innerHeight - h - 4, yy + h + 4);
+  e.style.left = x + 'px'; e.style.top = yy + 'px'; setTimeout(() => e.remove(), 1700);
 }
 function fly(from, html, to, o) {   /* a piece glides from where it was to where it goes */
   if (!from || !html || !to || reducedMo() || UI.fast) return; o = o || {}; const g = document.createElement('div'); g.className = 'flyc'; g.innerHTML = html; const c = g.firstElementChild; if (!c) return;
@@ -303,6 +308,7 @@ function tickPts(s, from) {
 /* the rival's move in one line on the board, where your eyes are */
 function rivalCap(t) {
   if (t && yourTurnNow()) t = '';   /* F12: a rival's caption never sits on the map during your turn */
+  if (t && G && G.phase === 'over') t = '';   /* F14 (R93): at game over the score walk speaks, no caption on top of it */
   let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }
   if (!t) { e.classList.remove('on'); return; } const m = $('#map'); e.style.top = ((m ? m.getBoundingClientRect().top : 120) + 6) + 'px'; e.textContent = t; e.classList.add('on');
 }
@@ -379,7 +385,7 @@ function previewText(m) {
 function shortLabel(m) {
   const me = G.p[UI.view];
   switch (m.t) { case 'play': return 'play ' + V.CARDS[me.hand[m.i]].name; case 'dig': return 'dig at ' + siteName(G.sites[m.s]); case 'disc': return 'explore a hidden ruin';
-    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + V.CARDS[G.row[m.r]].name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
+    case 'beat': return 'overcome the guardian'; case 'buy': return 'buy ' + (V.CARDS[G.row[m.r]] || { name: 'a card' }).name; case 'res': return 'climb the research track'; case 'temple': return 'buy a temple tile'; case 'asst': return 'use your assistant'; case 'boon': return 'use a boon'; case 'idol': return 'set an idol'; default: return m.t === 'ans' ? 'choose' : 'pass'; }
 }
 function bestBadges() {   /* hints add no second pointer: the one glowing piece IS the best move, so no gold badge (it only ever doubled the glow or went stale) */
   document.querySelectorAll('[data-badge]').forEach(e => e.removeAttribute('data-badge'));

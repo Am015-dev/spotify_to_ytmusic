@@ -2,7 +2,7 @@
 
 Every rule of the published rulebook this game adapts (name deliberately not written), numbered. Each id has exactly one headless assertion
 in `logic-test.js` against the real engine (`node logic-test.js`; failure line = rule id, expected, got). `node logic-test.js --md` prints this list.
-Sources: knowledge of the rulebook plus a public rulebook summary page (8 Nov 2026); facts only, nothing copied.
+Sources: knowledge of the rulebook plus a public rulebook summary page (8 Nov 2026), and the rulebook text itself for F14 (20 Nov 2026: path-map research, bonus tiles, optional artifact effect, level-II idols, solo rival tiles); facts only, nothing copied. Component counts: COMPONENTS.md.
 
 Numbers that are the game's own on purpose (not rules; see rules-notes.md): every card, site, guardian and idol value, the research row costs,
 bonuses and points, empty shrine slot values (1,1,1,2), compass costs to discover (3 / 6), temple arrival points (10/8/6/4). Tests for these
@@ -106,6 +106,8 @@ once a round free, max 2; names, abilities, rows and the limit are our own).
 - **G1** Buy an item: pay its coins, it goes face down to the BOTTOM of your deck (not hand/discard), the row refills with an item.
 - **G2** Cannot buy an item without enough coins.
 - **G3** Buy an artifact: pay compasses, it goes to the play area and its effect fires at once with no tablet paid.
+- **G3b** Buying an artifact, using its effect is optional: you may take it into your play area without using it.
+- **F9** A level-II site holds a face-up and a face-down idol: discovering it gives both idols but only the face-up gift.
 - **G4** Buying an artifact is a main action (turn passes).
 - **G5** An artifact played from hand costs 1 tablet.
 - **G6** When a card stack is empty, that slot is not refilled (no card of the other type slides in).
@@ -127,7 +129,10 @@ once a round free, max 2; names, abilities, rows and the limit are our own).
 - **I1** Research: pay the row cost, move the magnifier up one row, take the row bonus.
 - **I2** The notebook may never rise above the magnifier (equal is fine).
 - **I3** Each arrival (magnifier or notebook) takes the row bonus.
-- **I4** First-arrival reward: only the first magnifier to a row takes the extra reward; every arrival takes the row bonus.
+- **I4** Research bonus tile: only the FIRST token to reach a space takes its tile (the tile leaves the game); every arrival takes the row effect.
+- **I4b** Research is a path map: you may only move into a space joined to yours (row-1 left joins both row-2 spaces, row-1 right only the right one).
+- **I4c** The cost is the bridge into the chosen space: row 2 left costs 1 arrowhead, row 2 right 1 tablet + 1 coin.
+- **I4d** Setup: 18 research bonus tiles; the Lost Temple stack gets one per player and 8 / 10 / 12 path spaces get one at 2 / 3 / 4 players.
 - **I5** Magnifier in the temple (top row) scores by order of arrival: first 10, second 8 (points).
 - **I6** The notebook can never enter the temple row.
 - **I7** Magnifier already in the temple: research buys a temple tile instead. A 6-point stack needs two of the three costs, the 11-point stack needs all three.
@@ -157,8 +162,12 @@ once a round free, max 2; names, abilities, rows and the limit are our own).
 - **K2** Solo: the rival is the starting player every round, so it takes a tile before your first action.
 - **K3** Solo: the rival action stack has 10 tiles per round.
 - **K4** Solo: the rival keeps playing its tiles after you pass, until all are used.
-- **K5** Solo: the rival overcoming a guardian scores 5 points.
+- **K5** Solo: the rival overcoming a guardian on a site where it camps scores 5 points.
 - **K6** Solo: the rival discovering a site takes an idol worth 3 points.
+- **K7** Solo: each round the stack is all 5 dig tiles plus one tile of each of the 5 green/red pairs; the number of red tiles is the difficulty (Easy 0, Normal 3, Hard 5).
+- **K8** Solo: the green item tile takes the item with the fewest points, the red one the item with the most.
+- **K9** Solo: the rival dig tile puts its explorer on a free site that gives that resource, preferring the higher row.
+- **K10** Solo: the rival never takes Dread and never gains resources (it only scores points).
 
 ## L. Research assistants
 
@@ -186,4 +195,13 @@ once a round free, max 2; names, abilities, rows and the limit are our own).
 - **M7** With 4 players two explorers can dig at the same camp (its second space).
 - **M8** Exile can take a card from your play area.
 
-TOTAL 132
+## Z. Rulebook audit (FIXED9, see RULES-AUDIT.md)
+
+- **Z1** A camp site has two spaces; the second one costs two icons (a Boot site: 2 Boots), the first one icon.
+- **Z2** Every archaeologist taken back from a site with a guardian brings a Fear (Dread) card: both spaces of a camp site.
+- **Z3** A guardian can be overcome by an archaeologist on either space of its site.
+- **Z4** Several idols may be set in shrine slots in one turn (free actions); each of the 4 slots only once.
+- **Z5** A Fear card can still pay one Boot of travel (it only has no effect).
+- **Z6** No shuffling during a round: with an empty deck a draw gives nothing.
+
+TOTAL 147

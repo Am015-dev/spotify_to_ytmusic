@@ -70,7 +70,7 @@ function showGoal() {   /* F15: one card before turn 1: "How you score", the mai
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
   g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="How you score"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
     <p class="gh">How you score</p>
-    <ul class="gu"><li>${ic('up', 'research')}<span><b>Research:</b> climb the track. Your row is worth more points the higher you get (up to 9).</span></li><li>${ic('idol', 'idol')}<span><b>Ruins:</b> each idol is 3 points, each guardian you beat is 5.</span></li><li>${ic('card', 'cards')}<span><b>Cards:</b> artifacts with a star badge score at the end. Dread cards cost 1.</span></li><li>${ic('star', 'temple')}<span><b>Temple:</b> reach the top row to buy a big tile.</span></li></ul>
+    <ul class="gu"><li>${ic('up', 'research')}<span><b>Research:</b> climb the track. Your row is worth more points the higher you get.</span></li><li>${ic('idol', 'idol')}<span><b>Ruins:</b> each idol is 3 points, each guardian you beat is 5.</span></li><li>${ic('card', 'cards')}<span><b>Cards:</b> artifacts with a star badge score at the end. Dread cards cost 1.</span></li><li>${ic('star', 'temple')}<span><b>Temple:</b> reach the top row to buy a big tile.</span></li></ul>
     <p class="gf">After every round you see where each side's points came from. ${esc(flavour)}</p><button type="button" class="tbtn" data-a="goalgo">Start the expedition</button></div>`;
   g.hidden = false; UI.busy = true; render();
 }
@@ -108,6 +108,7 @@ function rows(i) { const s = VG.score(G, i); return [['Research track', s.resear
 const CATS = [['research', 'up', 'Research'], ['temple', 'star', 'Temple'], ['idols', 'idol', 'Idols'], ['slots', 'leaf', 'Shrines'], ['guards', 'guard', 'Guardians'], ['cards', 'card', 'Cards'], ['fear', 'exile', 'Dread']];
 function showResult() {
   if (!G || G.phase !== 'over') return; const r = $('#rs');
+  document.querySelectorAll('.vpop').forEach(e => e.remove()); if (typeof rivalCap === 'function') rivalCap('');   /* F14 (R93): the result card opens clean */
   const camp = UI.camp && typeof GXC !== 'undefined' && GXC.active();
   const iWon = UI.humans.length === 1 ? G.winner === UI.humans[0] : G.winner >= 0, def = camp ? UI.camp : null;
   const cWon = def ? campIsWon(G, def) : iWon, m = def ? campMetrics(G) : null;
@@ -160,12 +161,12 @@ const RULES_HTML = `<div class="rules">
 <li><b>Dig</b>: send one of your 2 explorers to a free site. Pay its travel icons. Take its loot.</li><li>A card pays one travel icon, then waits in your play area until the round ends. A Plane pays any icon (2 coins make one). At a camp, the second explorer on a site pays double.</li>
 <li><b>Explore</b> a hidden ruin: pay 3 compasses (deep ruins 6) and travel. A <b>guardian wakes</b>.</li>
 <li><b>Fight</b> a guardian where your explorer stands. Pay its cost for 5 points and a boon.</li>
-<li><b>Buy</b>: items go under your deck. Artifacts work at once.</li>
-<li><b>Research</b>: climb the track. Pay each row's cost for its bonus.</li></ul>
+<li><b>Buy</b>: items go under your deck. A bought artifact may be used at once, free.</li>
+<li><b>Research</b>: move up the path map to a joined space. Pay the cost on that space. The first one there takes its bonus tile. Every arrival gets the row's bonus.</li></ul>
 <h3>Free actions</h3><p>Use a boon once (then it is spent). Set idols in shrines: as many as you like in a turn, but each of the 4 slots only once.</p>
 <h3>End of a round</h3><p>Explorers come home. Each explorer leaving a site that still has a guardian brings back a Dread card. Played cards are shuffled under your deck.</p>
-<h3>Solo</h3><p>A rival plays after each action. Beat its score.</p>
-<h3>Simplified on purpose</h3><ul><li>All card, site, guardian and idol numbers are this game's own.</li><li>Shrine bonuses, assistants and research bonuses are this game's own.</li><li>The research track is a plain ladder of rows, not a map of paths.</li><li>No expansions and no second board.</li><li>The solo rival deck is this game's own.</li><li>An artifact's effect always applies when you buy it.</li></ul></div></div>`;
+<h3>Solo</h3><p>The rival goes first each round and flips one of its 10 tiles after each of your actions. It never passes early. Harder levels use more red tiles. Beat its score.</p>
+<h3>Our own designs</h3><ul><li>Rules, counts and board shape follow the original.</li><li>Each card, guardian, site and helper is our own design.</li><li>No expansions and no second board.</li></ul></div></div>`;
 function rulesEl() { const d = document.createElement('div'); d.innerHTML = RULES_HTML + '<p style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn go" data-a="cards">All cards</button>' + (window.GXT ? '<button type="button" class="btn" data-a="tut">Play the guided round</button>' : '') + '</p>'; return d; }
 // card reference: every card, guardian, ruin, camp site and idol, searchable, tap for the large view (shared gx-kit drawer, no extra bar button)
 function refInit() {
