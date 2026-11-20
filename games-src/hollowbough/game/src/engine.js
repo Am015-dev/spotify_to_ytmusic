@@ -76,7 +76,7 @@ function cityCount(p, excl) {
   let n = 0;
   for (const e of p.city) {
     if (excl && excl.has(e.id)) continue;
-    if (key(e.id) === 'wanderer') continue;
+    if (key(e.id) === 'footsore_drifter') continue;
     if (e.pair != null && !(excl && excl.has(e.pair))) { if (e.id < e.pair) n++; continue; }
     n++;
   }
@@ -86,13 +86,13 @@ function colorCount(city, color) { let n = 0; for (const e of city) if (def(e.id
 function placeInCity(seat, id) {
   const p = P(seat), k = key(id);
   const e = { id, occ: false, tok: 0, w: 0, stock: null, pris: [], pair: null };
-  if (k === 'husband' || k === 'wife') {
-    const pk = k === 'husband' ? 'wife' : 'husband';
+  if (k === 'goodman_vole' || k === 'goodwife_vole') {
+    const pk = k === 'goodman_vole' ? 'goodwife_vole' : 'goodman_vole';
     const o = p.city.find(x => key(x.id) === pk && x.pair == null);
     if (o) { e.pair = o.id; o.pair = id; }
   }
-  if (k === 'storehouse') e.stock = newRes();
-  if (k === 'clock_tower') e.tok = 3;
+  if (k === 'hoard_cellar') e.stock = newRes();
+  if (k === 'dewdrop_belfry') e.tok = 3;
   p.city.push(e);
   return e;
 }
@@ -147,14 +147,14 @@ function scoreOf(seat) {
     const c = def(e.id); cards += c.pts; toks += e.tok;
     let b = 0;
     switch (c.key) {
-      case 'architect': b = Math.min(6, p.res.resin + p.res.pebble); break;
-      case 'king': b = nb + 2 * so.length; break;
-      case 'castle': b = p.city.filter(x => def(x.id).kind === 'construction' && !def(x.id).unique).length; break;
-      case 'palace': b = p.city.filter(x => def(x.id).kind === 'construction' && def(x.id).unique).length; break;
-      case 'school': b = p.city.filter(x => def(x.id).kind === 'critter' && !def(x.id).unique).length; break;
-      case 'theater': b = p.city.filter(x => def(x.id).kind === 'critter' && def(x.id).unique).length; break;
-      case 'ever_tree': b = p.city.filter(x => def(x.id).color === 'purple').length; break;
-      case 'wife': b = e.pair != null ? 3 : 0; break;
+      case 'master_lathwright': b = Math.min(6, p.res.resin + p.res.pebble); break;
+      case 'bramble_sovereign': b = nb + 2 * so.length; break;
+      case 'stonecrown_keep': b = p.city.filter(x => def(x.id).kind === 'construction' && !def(x.id).unique).length; break;
+      case 'gildenfern_court': b = p.city.filter(x => def(x.id).kind === 'construction' && def(x.id).unique).length; break;
+      case 'acorn_academy': b = p.city.filter(x => def(x.id).kind === 'critter' && !def(x.id).unique).length; break;
+      case 'glowworm_playhouse': b = p.city.filter(x => def(x.id).kind === 'critter' && def(x.id).unique).length; break;
+      case 'elderheart_oak': b = p.city.filter(x => def(x.id).color === 'purple').length; break;
+      case 'goodwife_vole': b = e.pair != null ? 3 : 0; break;
     }
     if (b) { bonus += b; det.push({ card: e.id, bonus: b }); }
   }
@@ -173,10 +173,10 @@ function sevScore(seat, ev) {
   if (s.per_card_beneath) return s.per_card_beneath * ev.tuck.length;
   if (s.per_critter_beneath) return s.per_critter_beneath * ev.tuck.length;
   if (s.per_husband_wife_pair_in_all_cities) { let n = 0; for (const q of G.players) n += pairCount(q); if (G.grim) { /* his cards carry no pairs */ } return s.per_husband_wife_pair_in_all_cities * n; }
-  if (s.per_dungeon_prisoner) { let n = 0; for (const e of p.city) if (key(e.id) === 'dungeon') n += e.pris.length; return s.per_dungeon_prisoner * n; }
-  if (s.per_worker_in_monastery) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'monastery') n++; return s.per_worker_in_monastery * n; }
-  if (s.per_cemetery_worker) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'cemetery') n++; return s.per_cemetery_worker * n; }
-  if (s.per_token_on_chapel) { let n = 0; for (const e of p.city) if (key(e.id) === 'chapel') n += e.tok; return s.per_token_on_chapel * n; }
+  if (s.per_dungeon_prisoner) { let n = 0; for (const e of p.city) if (key(e.id) === 'thornhold_cells') n += e.pris.length; return s.per_dungeon_prisoner * n; }
+  if (s.per_worker_in_monastery) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'quietstone_cloister') n++; return s.per_worker_in_monastery * n; }
+  if (s.per_cemetery_worker) { let n = 0; for (const pl of p.dep) if (pl.k === 'dest' && pl.perm && pl.c >= 0 && key(pl.c) === 'mossgrave_glade') n++; return s.per_cemetery_worker * n; }
+  if (s.per_token_on_chapel) { let n = 0; for (const e of p.city) if (key(e.id) === 'candlewick_shrine') n += e.tok; return s.per_token_on_chapel * n; }
   if (s.per_resource_on_event) { const m = s.per_resource_on_event; let n = 0; for (const r of RES) n += (m[r] || 0) * ev.stock[r]; return n; }
   return 0;
 }
@@ -261,8 +261,8 @@ function destCap(owner, e) {
   const k = key(e.id);
   if (owner === 'G') return 1;
   const p = P(owner);
-  if (k === 'cemetery') return 1 + (hasKey(p, 'undertaker') ? 1 : 0);
-  if (k === 'monastery') return 1 + (hasKey(p, 'monk') ? 1 : 0);
+  if (k === 'mossgrave_glade') return 1 + (hasKey(p, 'hollow_sexton') ? 1 : 0);
+  if (k === 'quietstone_cloister') return 1 + (hasKey(p, 'brother_moss') ? 1 : 0);
   return 1;
 }
 function locLabel(l) {
@@ -291,13 +291,13 @@ function locOpts(seat) {
   for (let o = 0; o < G.np; o++) {
     for (const e of P(o).city) {
       const c = def(e.id);
-      if (!(c.color === 'red' || c.key === 'storehouse')) continue;
-      if (o !== seat && !(c.key === 'inn' || c.key === 'post_office')) continue;
+      if (!(c.color === 'red' || c.key === 'hoard_cellar')) continue;
+      if (o !== seat && !(c.key === 'lantern_rest' || c.key === 'dovecote_depot')) continue;
       if (!destOK(seat, o, e)) continue;
       out.push({ k: 'dest', o, c: e.id, label: c.name + (o !== seat ? ' in ' + pn(o) + "'s city" : '') + ' - ' + c.text });
     }
   }
-  if (G.grim) for (const id of G.grim.city) { const k = key(id); if (k !== 'inn' && k !== 'post_office') continue; const e = { id }; if (destOK(seat, 'G', e)) out.push({ k: 'dest', o: 'G', c: id, label: cn(id) + ' in ' + DATA.soloName + "'s city - " + def(id).text }); }
+  if (G.grim) for (const id of G.grim.city) { const k = key(id); if (k !== 'lantern_rest' && k !== 'dovecote_depot') continue; const e = { id }; if (destOK(seat, 'G', e)) out.push({ k: 'dest', o: 'G', c: id, label: cn(id) + ' in ' + DATA.soloName + "'s city - " + def(id).text }); }
   G.bev.forEach((e, i) => { if (e.o === -1 && evOK(seat, 'b', i)) out.push({ k: 'event', e: 'b', i, label: 'Claim ' + DATA.basicEvents[e.k].name + ' - ' + DATA.basicEvents[e.k].text }); });
   G.sev.forEach((e, i) => { if (e.o === -1 && evOK(seat, 's', i)) out.push({ k: 'event', e: 's', i, label: 'Claim ' + DATA.specialEvents[e.k].name + ' - ' + DATA.specialEvents[e.k].text }); });
   return out;
@@ -306,13 +306,13 @@ function destOK(seat, owner, e) {
   const p = P(seat), k = key(e.id);
   if (destOcc(e.id) >= destCap(owner, e)) return false;
   switch (k) {
-    case 'inn': return innCands(seat).length > 0;
-    case 'post_office': return p.hand.length >= 2;
-    case 'queen': return queenCands(seat).length > 0;
-    case 'cemetery': case 'chapel': case 'lookout': return true;
-    case 'monastery': return resTotal(p) >= 2 && resRecips(seat).length > 0;
-    case 'university': return p.city.some(x => x.id !== e.id);
-    case 'storehouse': return !!e.stock && rsum(e.stock) > 0;
+    case 'lantern_rest': return innCands(seat).length > 0;
+    case 'dovecote_depot': return p.hand.length >= 2;
+    case 'thistle_regent': return queenCands(seat).length > 0;
+    case 'mossgrave_glade': case 'candlewick_shrine': case 'spyglass_perch': return true;
+    case 'quietstone_cloister': return resTotal(p) >= 2 && resRecips(seat).length > 0;
+    case 'lorewood_college': return p.city.some(x => x.id !== e.id);
+    case 'hoard_cellar': return !!e.stock && rsum(e.stock) > 0;
   }
   return false;
 }
@@ -337,19 +337,19 @@ function occTargets(p, id) {
   if (c.kind !== 'critter') return out;
   const e1 = p.city.find(e => key(e.id) === c.linked && !e.occ);
   if (e1) out.push(e1.id);
-  const e2 = p.city.find(e => key(e.id) === 'ever_tree' && !e.occ);
+  const e2 = p.city.find(e => key(e.id) === 'elderheart_oak' && !e.occ);
   if (e2) out.push(e2.id);
   return out;
 }
-function foolTargets(seat) { const t = []; for (let o = 0; o < G.np; o++) if (o !== seat && cityCount(P(o)) < CITY && !hasKey(P(o), 'fool')) t.push(o); return t; }
+function foolTargets(seat) { const t = []; for (let o = 0; o < G.np; o++) if (o !== seat && cityCount(P(o)) < CITY && !hasKey(P(o), 'mudpie_jester')) t.push(o); return t; }
 // can card id be placed into seat's city, after the entries in excl (a Set) have been removed?
 function placeable(seat, id, excl) {
   const p = P(seat), k = key(id), c = def(id);
   if (c.unique && p.city.some(e => key(e.id) === k && !(excl && excl.has(e.id)))) return false;
-  if (k === 'fool') return G.grim ? true : foolTargets(seat).length > 0;
-  if (k === 'ruins') return p.city.some(e => def(e.id).kind === 'construction' && key(e.id) !== 'ruins' && !(excl && excl.has(e.id)));
-  if (k === 'wanderer') return true;
-  if (k === 'husband' || k === 'wife') { const pk = k === 'husband' ? 'wife' : 'husband'; if (p.city.some(e => key(e.id) === pk && e.pair == null && !(excl && excl.has(e.id)))) return true; }
+  if (k === 'mudpie_jester') return G.grim ? true : foolTargets(seat).length > 0;
+  if (k === 'toppled_hall') return p.city.some(e => def(e.id).kind === 'construction' && key(e.id) !== 'toppled_hall' && !(excl && excl.has(e.id)));
+  if (k === 'footsore_drifter') return true;
+  if (k === 'goodman_vole' || k === 'goodwife_vole') { const pk = k === 'goodman_vole' ? 'goodwife_vole' : 'goodman_vole'; if (p.city.some(e => key(e.id) === pk && e.pair == null && !(excl && excl.has(e.id)))) return true; }
   return cityCount(p, excl) < CITY;
 }
 function judgeSwaps(res, cost) {
@@ -360,14 +360,14 @@ function judgeSwaps(res, cost) {
 function dungeonPrisoners(seat, id) {
   const p = P(seat), out = [];
   for (const d of p.city) {
-    if (key(d.id) !== 'dungeon') continue;
-    const cap = 1 + (hasKey(p, 'ranger') ? 1 : 0);
+    if (key(d.id) !== 'thornhold_cells') continue;
+    const cap = 1 + (hasKey(p, 'trailwarden_fox') ? 1 : 0);
     for (const e of p.city) {
       if (def(e.id).kind !== 'critter') continue;
-      const capAfter = 1 + (p.city.some(x => key(x.id) === 'ranger' && x.id !== e.id) ? 1 : 0);
+      const capAfter = 1 + (p.city.some(x => key(x.id) === 'trailwarden_fox' && x.id !== e.id) ? 1 : 0);
       if (d.pris.length >= Math.min(cap, capAfter)) continue;
       if (!placeable(seat, id, new Set([e.id]))) continue;
-      out.push({ dungeon: d.id, prisoner: e.id });
+      out.push({ thornhold_cells: d.id, prisoner: e.id });
     }
   }
   return out;
@@ -380,10 +380,10 @@ function howOptions(seat, id) {
   if (plainOK && canPay) out.push({ how: 'pay' });
   if (plainOK) for (const v of occTargets(p, id)) out.push({ how: 'occupy', via: v });
   if (!free0) {
-    if (c.kind === 'critter' && cost.berry > 0) { const ih = p.city.find(e => key(e.id) === 'innkeeper'); if (ih && afford(p.res, Object.assign(plain(cost), { berry: Math.max(0, cost.berry - 3) }), 0) && placeable(seat, id, new Set([ih.id]))) out.push({ how: 'innkeeper', via: ih.id }); }
-    if (c.kind === 'construction') { const cr = p.city.find(e => key(e.id) === 'crane'); if (cr && afford(p.res, cost, 3) && placeable(seat, id, new Set([cr.id]))) out.push({ how: 'crane', via: cr.id }); }
-    if (afford(p.res, cost, 3) && dungeonPrisoners(seat, id).length) out.push({ how: 'dungeon' });
-    if (!canPay && plainOK && hasKey(p, 'judge') && judgeSwaps(p.res, cost).length) out.push({ how: 'judge' });
+    if (c.kind === 'critter' && cost.berry > 0) { const ih = p.city.find(e => key(e.id) === 'hostler_hedgehog'); if (ih && afford(p.res, Object.assign(plain(cost), { berry: Math.max(0, cost.berry - 3) }), 0) && placeable(seat, id, new Set([ih.id]))) out.push({ how: 'hostler_hedgehog', via: ih.id }); }
+    if (c.kind === 'construction') { const cr = p.city.find(e => key(e.id) === 'pulley_lift'); if (cr && afford(p.res, cost, 3) && placeable(seat, id, new Set([cr.id]))) out.push({ how: 'pulley_lift', via: cr.id }); }
+    if (afford(p.res, cost, 3) && dungeonPrisoners(seat, id).length) out.push({ how: 'thornhold_cells' });
+    if (!canPay && plainOK && hasKey(p, 'gavel_marten') && judgeSwaps(p.res, cost).length) out.push({ how: 'gavel_marten' });
   }
   return out;
 }
@@ -407,10 +407,10 @@ function playLabel(seat, id, from, h) {
   switch (h.how) {
     case 'pay': return 'Play ' + c.name + ' ' + src + ' (pay ' + rtxt(c.cost) + ')';
     case 'occupy': return 'Play ' + c.name + ' ' + src + ' free (occupy ' + cn(h.via) + ')';
-    case 'innkeeper': return 'Play ' + c.name + ' ' + src + ' (send away ' + cn(h.via) + ' to cut 3 berries)';
-    case 'crane': return 'Play ' + c.name + ' ' + src + ' (dismantle ' + cn(h.via) + ' to cut 3 resources)';
-    case 'dungeon': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath ' + CARDS[CIDX.dungeon].name + ', cut 3 resources)';
-    case 'judge': return 'Play ' + c.name + ' ' + src + ' (swap one resource using the judge)';
+    case 'hostler_hedgehog': return 'Play ' + c.name + ' ' + src + ' (send away ' + cn(h.via) + ' to cut 3 berries)';
+    case 'pulley_lift': return 'Play ' + c.name + ' ' + src + ' (dismantle ' + cn(h.via) + ' to cut 3 resources)';
+    case 'thornhold_cells': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath ' + CARDS[CIDX.thornhold_cells].name + ', cut 3 resources)';
+    case 'gavel_marten': return 'Play ' + c.name + ' ' + src + ' (swap one resource using the judge)';
   }
   return 'Play ' + c.name;
 }
@@ -484,7 +484,7 @@ function finish() {
 function placeAt(seat, loc) {
   const p = P(seat), pl = {}; for (const k in loc) if (k !== 'label') pl[k] = loc[k];
   if (pl.k === 'journey') pl.perm = true;
-  if (pl.k === 'dest') { const kk = key(pl.c); if (kk === 'cemetery' || kk === 'monastery') pl.perm = true; }
+  if (pl.k === 'dest') { const kk = key(pl.c); if (kk === 'mossgrave_glade' || kk === 'quietstone_cloister') pl.perm = true; }
   p.dep.push(pl);
   now('locFx', { seat, loc: pl });
 }
@@ -584,28 +584,28 @@ H.pay = d => {
     case 'occupy': { const e = ent(p, d.via); e.occ = true; lg(p.name + ' plays ' + c.name + ' free, occupying ' + cn(d.via) + '.'); now('afterPay', d); return; }
     case 'free': lg(p.name + ' plays ' + c.name + ' for free.'); now('afterPay', d); return;
     case 'pay': lg(p.name + ' plays ' + c.name + '.'); now('payRem', Object.assign({}, d, { rem: cost })); return;
-    case 'innkeeper': {
+    case 'hostler_hedgehog': {
       const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' sends ' + cn(e.id) + ' away to cut the price of ' + c.name + '.');
       cost.berry = Math.max(0, (cost.berry || 0) - 3); if (!cost.berry) delete cost.berry; now('payRem', Object.assign({}, d, { rem: cost })); return;
     }
-    case 'crane': { const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' dismantles ' + cn(e.id) + ' to build ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return; }
-    case 'dungeon': {
+    case 'pulley_lift': { const e = removeFromCity(d.seat, d.via); G.discard.push(e.id); lg(p.name + ' dismantles ' + cn(e.id) + ' to build ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return; }
+    case 'thornhold_cells': {
       const cands = dungeonPrisoners(d.seat, d.id);
-      ask(d.seat, 'prisoner', 'Choose a critter to lock beneath the dungeon', cands.map(x => ({ label: 'Lock ' + cn(x.prisoner), card: x.prisoner, h: 'imprison', d: Object.assign({}, d, { dungeon: x.dungeon, prisoner: x.prisoner, rem: cost }) })));
+      ask(d.seat, 'prisoner', 'Choose a critter to lock beneath the dungeon', cands.map(x => ({ label: 'Lock ' + cn(x.prisoner), card: x.prisoner, h: 'imprison', d: Object.assign({}, d, { thornhold_cells: x.thornhold_cells, prisoner: x.prisoner, rem: cost }) })));
       return;
     }
-    case 'judge': {
+    case 'gavel_marten': {
       const sw = judgeSwaps(p.res, cost);
-      ask(d.seat, 'judge', 'Choose which resource to swap', sw.map(x => ({ label: 'Pay 1 ' + rn(x.to, 1) + ' instead of 1 ' + rn(x.from, 1), h: 'payRem', d: Object.assign({}, d, { rem: x.cost }) })));
+      ask(d.seat, 'gavel_marten', 'Choose which resource to swap', sw.map(x => ({ label: 'Pay 1 ' + rn(x.to, 1) + ' instead of 1 ' + rn(x.from, 1), h: 'payRem', d: Object.assign({}, d, { rem: x.cost }) })));
       return;
     }
-    case 'inn': lg(p.name + ' plays ' + c.name + ' from the meadow.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return;
+    case 'lantern_rest': lg(p.name + ' plays ' + c.name + ' from the meadow.'); now('waive', Object.assign({}, d, { rem: cost, n: 3 })); return;
     case 'bazaar': lg(p.name + ' plays ' + c.name + '.'); now('waive', Object.assign({}, d, { rem: cost, n: 1 })); return;
   }
   throw new Error('bad how ' + d.how);
 };
 H.imprison = d => {
-  const dn = ent(P(d.seat), d.dungeon); const e = removeFromCity(d.seat, d.prisoner);
+  const dn = ent(P(d.seat), d.thornhold_cells); const e = removeFromCity(d.seat, d.prisoner);
   dn.pris.push(e.id); lg(P(d.seat).name + ' locks ' + cn(e.id) + ' beneath ' + cn(dn.id) + '.');
   now('waive', Object.assign({}, d, { n: 3 }));
 };
@@ -623,7 +623,7 @@ H.payRem = d => {
   const p = P(d.seat), rem = plain(d.rem || {});
   payRes(d.seat, rem);
   if (rsum(rem)) lg(p.name + ' pays ' + rtxt(rem) + '.');
-  if (key(d.id) === 'shepherd' && rsum(rem)) {
+  if (key(d.id) === 'crook_shrew' && rsum(rem)) {
     const rc = resRecips(d.seat);
     if (rc.length) { pickRecip(d.seat, rc, 'Choose who receives the berries you paid', 'shepherdPaid', { seat: d.seat, rem }); }
     now('afterPay', d);
@@ -636,7 +636,7 @@ H.afterPay = d => { if (d.from === 'meadow') refill(); now('place', d); };
 H.place = d => {
   const s = d.seat, id = d.id, k = key(id), p = P(s);
   G.limbo.splice(G.limbo.indexOf(id), 1);
-  if (k === 'fool') {
+  if (k === 'mudpie_jester') {
     if (G.grim) {
       G.discard.push(id); lg(p.name + ' plays ' + cn(id) + ' and dismisses a card from ' + DATA.soloName + "'s city."); use('fx:fool'); use('solo:fool');
       const gr = G.grim;
@@ -649,10 +649,10 @@ H.place = d => {
     pickRecip(s, t, 'Choose whose city to plant the jester in', 'foolDo', { seat: s, id });
     return;
   }
-  if (k === 'ruins') {
-    const tg = p.city.filter(e => def(e.id).kind === 'construction' && key(e.id) !== 'ruins');
+  if (k === 'toppled_hall') {
+    const tg = p.city.filter(e => def(e.id).kind === 'construction' && key(e.id) !== 'toppled_hall');
     G.limbo.push(id);
-    ask(s, 'ruins', 'Choose a construction to raze', tg.map(e => ({ label: 'Raze ' + cn(e.id) + ' (regain ' + rtxt(def(e.id).cost) + ')', card: e.id, h: 'ruinsDo', d: { seat: s, id, target: e.id } })));
+    ask(s, 'toppled_hall', 'Choose a construction to raze', tg.map(e => ({ label: 'Raze ' + cn(e.id) + ' (regain ' + rtxt(def(e.id).cost) + ')', card: e.id, h: 'ruinsDo', d: { seat: s, id, target: e.id } })));
     return;
   }
   placeInCity(s, id);
@@ -685,9 +685,9 @@ H.afterPlay = d => {
   for (const e of p.city) {
     if (e.id === d.id) continue;
     const k = key(e.id);
-    if (k === 'historian') list.push(e.id);
-    else if (k === 'shopkeeper' && c.kind === 'critter' && d.own) list.push(e.id);
-    else if (k === 'courthouse' && c.kind === 'construction') list.push(e.id);
+    if (k === 'chronicle_owl') list.push(e.id);
+    else if (k === 'tallyshop_mouse' && c.kind === 'critter' && d.own) list.push(e.id);
+    else if (k === 'mosswood_assize' && c.kind === 'construction') list.push(e.id);
   }
   if (list.length) now('trig', { seat: d.seat, list });
   if (G.grim && !d.noGrim) now('grimPlay', { fromSeat: d.seat, id: d.id });
@@ -701,39 +701,39 @@ H.trig = d => {
 H.trigPick = d => { now('trigRun', { seat: d.seat, id: d.id }); now('trig', { seat: d.seat, list: d.list.filter(x => x !== d.id) }); };
 H.trigRun = d => {
   const k = key(d.id); use('fx:' + k);
-  if (k === 'historian') now('draw', { seat: d.seat, n: 1 });
-  else if (k === 'shopkeeper') gain(d.seat, { berry: 1 });
-  else if (k === 'courthouse') ask(d.seat, 'resource', 'Choose a resource from the Mosswood Assize', ['twig', 'resin', 'pebble'].map(r => ({ label: 'Take 1 ' + rn(r, 1), res: r, h: 'gainOne', d: { seat: d.seat, r, n: 1 } })));
+  if (k === 'chronicle_owl') now('draw', { seat: d.seat, n: 1 });
+  else if (k === 'tallyshop_mouse') gain(d.seat, { berry: 1 });
+  else if (k === 'mosswood_assize') ask(d.seat, 'resource', 'Choose a resource from the Mosswood Assize', ['twig', 'resin', 'pebble'].map(r => ({ label: 'Take 1 ' + rn(r, 1), res: r, h: 'gainOne', d: { seat: d.seat, r, n: 1 } })));
 };
 
 // ================= production / on-play effects =================
-const farmCount = co => kcount(cityEntries(co), 'farm');
+const farmCount = co => kcount(cityEntries(co), 'bramble_allotment');
 const PROD = {
-  farm: s => gain(s, { berry: 1 }),
-  general_store: (s, co) => gain(s, { berry: 1 + (farmCount(co) > 0 ? 1 : 0) }),
-  mine: s => gain(s, { pebble: 1 }),
-  resin_refinery: s => gain(s, { resin: 1 }),
-  twig_barge: s => gain(s, { twig: 2 }),
-  fair_grounds: s => now('draw', { seat: s, n: 2 }),
-  husband: (s, co, eid) => { const e = cityEntries(co).find(x => x.id === eid); if (e && e.pair != null && farmCount(co) > 0) now('gainAny', { seat: s, n: 1 }); },
-  barge_toad: (s, co) => gain(s, { twig: 2 * farmCount(co) }),
-  chip_sweep: (s, co, eid, ch) => now('chipPick', { seat: s, ch: (ch || []).concat(['s' + eid]), self: eid }),
-  doctor: s => now('payPts', { seat: s, res: 'berry', left: 3 }),
-  woodcarver: s => now('payPts', { seat: s, res: 'twig', left: 3 }),
-  monk: s => { const rc = resRecips(s); if (rc.length && P(s).res.berry > 0) pickRecip(s, rc, 'Choose who receives the berries', 'monkGive', { seat: s, left: 2 }); },
-  peddler: s => now('peddle', { seat: s, left: 2, paid: 0 }),
-  miner_mole: (s, co, eid, ch) => now('molePick', { seat: s, ch: (ch || []).concat(['m' + co + ':' + eid]) }),
-  teacher: s => now('teach', { seat: s }),
-  storehouse: (s, co, eid) => now('stock', { seat: s, eid }),
+  bramble_allotment: s => gain(s, { berry: 1 }),
+  cranny_market: (s, co) => gain(s, { berry: 1 + (farmCount(co) > 0 ? 1 : 0) }),
+  flintpit: s => gain(s, { pebble: 1 }),
+  amber_still: s => gain(s, { resin: 1 }),
+  kindling_raft: s => gain(s, { twig: 2 }),
+  midsummer_green: s => now('draw', { seat: s, n: 2 }),
+  goodman_vole: (s, co, eid) => { const e = cityEntries(co).find(x => x.id === eid); if (e && e.pair != null && farmCount(co) > 0) now('gainAny', { seat: s, n: 1 }); },
+  reedpunt_toad: (s, co) => gain(s, { twig: 2 * farmCount(co) }),
+  tinder_chipmunk: (s, co, eid, ch) => now('chipPick', { seat: s, ch: (ch || []).concat(['s' + eid]), self: eid }),
+  poultice_badger: s => now('payPts', { seat: s, res: 'berry', left: 3 }),
+  whittle_beaver: s => now('payPts', { seat: s, res: 'twig', left: 3 }),
+  brother_moss: s => { const rc = resRecips(s); if (rc.length && P(s).res.berry > 0) pickRecip(s, rc, 'Choose who receives the berries', 'monkGive', { seat: s, left: 2 }); },
+  haggle_magpie: s => now('peddle', { seat: s, left: 2, paid: 0 }),
+  echo_mole: (s, co, eid, ch) => now('molePick', { seat: s, ch: (ch || []).concat(['m' + co + ':' + eid]) }),
+  slate_schoolmarm: s => now('teach', { seat: s }),
+  hoard_cellar: (s, co, eid) => now('stock', { seat: s, eid }),
 };
-const SIMPLE = { farm: 1, general_store: 1, mine: 1, resin_refinery: 1, twig_barge: 1, barge_toad: 1, husband: 1 };
+const SIMPLE = { bramble_allotment: 1, cranny_market: 1, flintpit: 1, amber_still: 1, kindling_raft: 1, reedpunt_toad: 1, goodman_vole: 1 };
 const ONPLAY = {
-  bard: s => now('dLoop', { seat: s, max: 5, min: 0, count: 0, then: { h: 'thPts', d: { seat: s, per: 1 } }, title: 'Discard up to 5 cards (1 point token each)' }),
-  postal_pigeon: s => now('pigeon', { seat: s }),
-  ranger: s => now('rangerPick', { seat: s }),
-  shepherd: s => { gain(s, { berry: 3 }); let t = 0; for (const e of P(s).city) if (key(e.id) === 'chapel') t += e.tok; if (t) { P(s).pts += t; lg(P(s).name + ' takes ' + t + ' point token(s).'); } },
-  undertaker: s => now('undDisc', { seat: s, left: 3 }),
-  wanderer: s => now('draw', { seat: s, n: 3 }),
+  ballad_finch: s => now('dLoop', { seat: s, max: 5, min: 0, count: 0, then: { h: 'thPts', d: { seat: s, per: 1 } }, title: 'Discard up to 5 cards (1 point token each)' }),
+  parcel_dove: s => now('pigeon', { seat: s }),
+  trailwarden_fox: s => now('rangerPick', { seat: s }),
+  crook_shrew: s => { gain(s, { berry: 3 }); let t = 0; for (const e of P(s).city) if (key(e.id) === 'candlewick_shrine') t += e.tok; if (t) { P(s).pts += t; lg(P(s).name + ' takes ' + t + ' point token(s).'); } },
+  hollow_sexton: s => now('undDisc', { seat: s, left: 3 }),
+  footsore_drifter: s => now('draw', { seat: s, n: 3 }),
 };
 function activateProduction(seat, ids) { now('prodAll', { seat, rest: ids || P(seat).city.filter(e => def(e.id).color === 'green').map(e => e.id) }); }
 H.prodAll = d => {
@@ -758,7 +758,7 @@ H.molePick = d => {
   const opts = [], seen = {};
   const scan = (co) => {
     for (const e of cityEntries(co)) {
-      const c = def(e.id); if (c.color !== 'green' || c.key === 'storehouse' || !PROD[c.key]) continue;
+      const c = def(e.id); if (c.color !== 'green' || c.key === 'hoard_cellar' || !PROD[c.key]) continue;
       const tag = 'm' + co + ':' + e.id; if (d.ch.indexOf(tag) >= 0) continue;
       const sig = co + c.key + (e.pair != null ? 'p' : ''); if (seen[sig]) continue; seen[sig] = 1;
       opts.push({ label: 'Copy ' + c.name + " in " + pn(co) + "'s city: " + c.text, card: e.id, h: 'moleGo', d: { seat: d.seat, co, id: e.id, ch: d.ch } });
@@ -768,7 +768,7 @@ H.molePick = d => {
   if (G.grim) scan('G');
   ask(d.seat, 'mole', 'Choose a production card to mimic', opts);
 };
-H.moleGo = d => { use('fx:' + key(d.id) + ':mimicked'); const k = key(d.id); if (k === 'chip_sweep') PROD.chip_sweep(d.seat, d.seat, -1, d.ch.concat(['m' + d.co + ':' + d.id])); else PROD[k](d.seat, d.co, d.id, d.ch.concat(['m' + d.co + ':' + d.id])); };
+H.moleGo = d => { use('fx:' + key(d.id) + ':mimicked'); const k = key(d.id); if (k === 'tinder_chipmunk') PROD.tinder_chipmunk(d.seat, d.seat, -1, d.ch.concat(['m' + d.co + ':' + d.id])); else PROD[k](d.seat, d.co, d.id, d.ch.concat(['m' + d.co + ':' + d.id])); };
 H.payPts = d => {
   const p = P(d.seat);
   if (d.left <= 0 || p.res[d.res] < 1) return;
@@ -842,14 +842,14 @@ H.rangerPick = d => {
     if (alt.length) opts.push({ label: 'Move the worker at ' + locLabel(pl), h: 'rangerTo', d: { seat: d.seat, j } });
   });
   opts.push({ label: 'Do not move a worker', h: 'noop' });
-  ask(d.seat, 'ranger', 'Choose a deployed worker to relocate', opts);
+  ask(d.seat, 'trailwarden_fox', 'Choose a deployed worker to relocate', opts);
 };
 const sameLoc = (a, b) => a.k === b.k && a.i === b.i && a.c === b.c && a.e === b.e;
 H.rangerTo = d => {
   const p = P(d.seat), saved = p.dep.splice(d.j, 1)[0];
   const alt = locOpts(d.seat).filter(l => !sameLoc(l, saved));
   if (!alt.length) { p.dep.splice(d.j, 0, saved); return; }
-  ask(d.seat, 'ranger', 'Choose where to place the worker', alt.map(l => ({ label: 'Move to ' + l.label, h: 'rangerPlace', d: { seat: d.seat, loc: l } })));
+  ask(d.seat, 'trailwarden_fox', 'Choose where to place the worker', alt.map(l => ({ label: 'Move to ' + l.label, h: 'rangerPlace', d: { seat: d.seat, loc: l } })));
 };
 H.rangerPlace = d => { lg(P(d.seat).name + ' relocates a worker to ' + locLabel(d.loc) + '.'); placeAt(d.seat, d.loc); };
 H.undDisc = d => {
@@ -865,38 +865,38 @@ function destFx(s, l) {
   const k = key(l.c); use('visit:' + k);
   if (l.o !== s) { if (l.o === 'G') G.grim.pts++; else P(l.o).pts++; lg(pn(s) + ' pays ' + pn(l.o) + ' 1 point token to visit.'); }
   switch (k) {
-    case 'inn': now('innPick', { seat: s }); break;
-    case 'post_office': {
+    case 'lantern_rest': now('innPick', { seat: s }); break;
+    case 'dovecote_depot': {
       const rc = cardRecips(s);
       pickRecip(s, rc, 'Choose which rival receives your cards', 'poGive', { seat: s, left: 2 });
       break;
     }
-    case 'queen': {
+    case 'thistle_regent': {
       const c = queenCands(s);
-      ask(s, 'queen', 'Choose a card worth up to 3 points to play for free', c.map(x => ({ label: 'Play ' + cn(x.id) + ' for free (' + (x.from === 'hand' ? 'from hand' : 'from the meadow') + ')', card: x.id, h: 'queenGo', d: { seat: s, id: x.id, from: x.from } })));
+      ask(s, 'thistle_regent', 'Choose a card worth up to 3 points to play for free', c.map(x => ({ label: 'Play ' + cn(x.id) + ' for free (' + (x.from === 'hand' ? 'from hand' : 'from the meadow') + ')', card: x.id, h: 'queenGo', d: { seat: s, id: x.id, from: x.from } })));
       break;
     }
-    case 'cemetery': ask(s, 'cemetery', 'Reveal four cards from the deck or the discard pile?', [
+    case 'mossgrave_glade': ask(s, 'mossgrave_glade', 'Reveal four cards from the deck or the discard pile?', [
       { label: 'Reveal 4 from the deck', h: 'cemReveal', d: { seat: s, src: 'deck' } },
       { label: 'Reveal 4 from the top of the discard pile', h: 'cemReveal', d: { seat: s, src: 'discard' } }]); break;
-    case 'chapel': e.tok++; lg(P(s).name + ' adds a point token to the shrine (' + e.tok + ').'); now('draw', { seat: s, n: 2 * e.tok }); break;
-    case 'lookout': now('copyLoc', { seat: s }); break;
-    case 'monastery': {
+    case 'candlewick_shrine': e.tok++; lg(P(s).name + ' adds a point token to the shrine (' + e.tok + ').'); now('draw', { seat: s, n: 2 * e.tok }); break;
+    case 'spyglass_perch': now('copyLoc', { seat: s }); break;
+    case 'quietstone_cloister': {
       const rc = resRecips(s); pickRecip(s, rc, 'Choose which rival receives your resources', 'cloGive', { seat: s, left: 2 }); P(s).pts += 4; lg(P(s).name + ' takes 4 point tokens.'); break;
     }
-    case 'university': {
+    case 'lorewood_college': {
       const p = P(s);
-      ask(s, 'university', 'Choose a card to disband', p.city.filter(x => x.id !== l.c).map(x => ({ label: 'Disband ' + cn(x.id) + ' (regain ' + rtxt(def(x.id).cost) + ')', card: x.id, h: 'uniGo', d: { seat: s, id: x.id, uni: l.c } })));
+      ask(s, 'lorewood_college', 'Choose a card to disband', p.city.filter(x => x.id !== l.c).map(x => ({ label: 'Disband ' + cn(x.id) + ' (regain ' + rtxt(def(x.id).cost) + ')', card: x.id, h: 'uniGo', d: { seat: s, id: x.id, uni: l.c } })));
       break;
     }
-    case 'storehouse': { const t = e.stock; gain(s, t); lg(P(s).name + ' hauls away ' + rtxt(t) + '.'); e.stock = newRes(); break; }
+    case 'hoard_cellar': { const t = e.stock; gain(s, t); lg(P(s).name + ' hauls away ' + rtxt(t) + '.'); e.stock = newRes(); break; }
   }
 }
 H.innPick = d => {
   const c = innCands(d.seat);
-  ask(d.seat, 'inn', 'Choose a meadow card to play for 3 fewer resources', c.map(id => ({ label: 'Play ' + cn(id) + ' (cost ' + rtxt(def(id).cost) + ', minus 3)', card: id, h: 'innGo', d: { seat: d.seat, id } })));
+  ask(d.seat, 'lantern_rest', 'Choose a meadow card to play for 3 fewer resources', c.map(id => ({ label: 'Play ' + cn(id) + ' (cost ' + rtxt(def(id).cost) + ', minus 3)', card: id, h: 'innGo', d: { seat: d.seat, id } })));
 };
-H.innGo = d => startPlay(d.seat, d.id, 'meadow', 'inn');
+H.innGo = d => startPlay(d.seat, d.id, 'meadow', 'lantern_rest');
 H.queenGo = d => startPlay(d.seat, d.id, d.from, 'free');
 H.poGive = d => {
   const p = P(d.seat);
@@ -916,7 +916,7 @@ H.cemReveal = d => {
   const opts = [];
   for (const id of a) if (placeable(d.seat, id, null)) opts.push({ label: 'Play ' + cn(id) + ' for free', card: id, h: 'cemPlay', d: { seat: d.seat, a, id } });
   opts.push({ label: 'Play none (discard all)', h: 'cemNone', d: { a } });
-  ask(d.seat, 'cemetery', 'Choose a revealed card to play for free', opts);
+  ask(d.seat, 'mossgrave_glade', 'Choose a revealed card to play for free', opts);
 };
 H.cemNone = d => { for (const id of d.a) { G.limbo.splice(G.limbo.indexOf(id), 1); G.discard.push(id); } };
 H.cemPlay = d => { for (const id of d.a) if (id !== d.id) { G.limbo.splice(G.limbo.indexOf(id), 1); G.discard.push(id); } startPlay(d.seat, d.id, 'limbo', 'free'); };
@@ -949,7 +949,7 @@ const EVFX = {
   sev_marsh_fever_remedy: (s, ev, i) => { P(s).res.berry -= 2; now('cityDisc', { seat: s, left: 2 }); },
   sev_commencement_of_pupils: (s, ev, i) => { ev.hid = true; now('gradTuck', { seat: s, i, left: 3 }); },
   sev_resident_minstrel: (s, ev, i) => now('stackN', { seat: s, i, r: 'berry' }),
-  sev_gilded_shrine_vault: s => { let t = 0; for (const e of P(s).city) if (key(e.id) === 'chapel') t += e.tok; if (t) { now('draw', { seat: s, n: t }); now('gainAny', { seat: s, n: t }); } },
+  sev_gilded_shrine_vault: s => { let t = 0; for (const e of P(s).city) if (key(e.id) === 'candlewick_shrine') t += e.tok; if (t) { now('draw', { seat: s, n: t }); now('gainAny', { seat: s, n: t }); } },
   sev_toll_holiday: s => activateProduction(s),
   sev_change_of_proprietors: (s, ev, i) => now('stackAny', { seat: s, i, left: 3 }),
 };
@@ -1019,7 +1019,7 @@ H.cityDiscDo = d => { const e = removeFromCity(d.seat, d.id); G.discard.push(e.i
 // ================= seasons =================
 H.prepare = d => { now('prepClock', d); now('prepRecall', d); };
 H.prepClock = d => {
-  const p = P(d.seat), t = p.city.find(e => key(e.id) === 'clock_tower' && e.tok > 0);
+  const p = P(d.seat), t = p.city.find(e => key(e.id) === 'dewdrop_belfry' && e.tok > 0);
   if (!t) return;
   const opts = [], seen = {};
   for (const pl of p.dep) { if (pl.perm || (pl.k !== 'basic' && pl.k !== 'forest')) continue; const tg = pl.k + pl.i; if (seen[tg]) continue; seen[tg] = 1; opts.push({ label: 'Spend a token: repeat ' + locLabel(pl), h: 'clockUse', d: { seat: d.seat, loc: { k: pl.k, i: pl.i }, tower: t.id } }); }
@@ -1044,9 +1044,9 @@ H.grimPlay = d => {
   use('solo:roll');
   if (id < 0) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' but finds no card.'); return; }
   const k = key(id);
-  if (k === 'fool') {
+  if (k === 'mudpie_jester') {
     const p = P(0);
-    if (cityCount(p) >= CITY || hasKey(p, 'fool')) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' (' + cn(id) + ') but cannot place it.'); return; }
+    if (cityCount(p) >= CITY || hasKey(p, 'mudpie_jester')) { lg(DATA.soloName + ' rolls ' + (slot + 1) + ' (' + cn(id) + ') but cannot place it.'); return; }
     G.meadow[slot] = -1; placeInCity(0, id); lg(DATA.soloName + ' plants ' + cn(id) + ' in your city.'); refill(); return;
   }
   G.meadow[slot] = -1; gr.city.push(id); lg(DATA.soloName + ' rolls ' + (slot + 1) + ' and plays ' + cn(id) + '.'); refill();
