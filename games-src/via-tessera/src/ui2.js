@@ -198,6 +198,7 @@ function openMarket(buying) {
   h += '</div><div class="tsum"><span class="grow deckn">' + word(G.deck.length, 'card', 'cards') + ' left in the deck</span>' + (buying ? '<button type="button" class="btn alt" id="mdone">Done buying</button>' : '') + '</div>';
   openSheet(buying ? 'Buy a card' : 'Market', h);
   var md = $('#mdone'); if (md) md.onclick = function () { closeSheet(); move({ t: 'done' }); };
+  var first = $('#sheet .mc.can'); if (first) { var row = $('#sheet .mrow'); row.scrollLeft = Math.max(0, first.offsetLeft - row.offsetLeft - 8); }
   $('#sheet').querySelectorAll('.mc .cd').forEach(function (b) {
     b.onclick = function () {
       var s = +b.getAttribute('data-s');
@@ -303,7 +304,7 @@ function placeFinger() {
 function showFinger(t) {
   var f = $('#finger');
   if (!t) { f.classList.remove('on'); return; }
-  if (t.closest && t.closest('#hand')) { var hd = $('#hand'), tr = t.getBoundingClientRect(), hr = hd.getBoundingClientRect(); if (tr.right > hr.right - 4 || tr.left < hr.left) hd.scrollLeft += tr.left - hr.left - (hr.width - tr.width) / 2; }
+  var sc = t.closest && t.closest('#hand,.mrow'); if (sc) { var tr = t.getBoundingClientRect(), hr = sc.getBoundingClientRect(); if (tr.right > hr.right - 4 || tr.left < hr.left) sc.scrollLeft += tr.left - hr.left - (hr.width - tr.width) / 2; }
   var r = t.getBoundingClientRect(); if (!r.width) { f.classList.remove('on'); return; }
   f.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 11V4.5a1.5 1.5 0 0 1 3 0V10l5.2 1.1c1 .2 1.7 1.2 1.5 2.2l-1 5.2A2 2 0 0 1 15.7 20H11a2 2 0 0 1-1.6-.8L5.5 14a1.4 1.4 0 0 1 2-1.9z" fill="#fff8ec" stroke="#2b2018" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   f.style.left = (r.left + r.width / 2 - 8) + 'px'; f.style.top = (r.top + r.height / 2 - 2) + 'px';
