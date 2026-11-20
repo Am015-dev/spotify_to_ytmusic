@@ -45,7 +45,7 @@ function storyScan(){if(!G)return;if(UI.sgid!==G.gid){UI.sgid=G.gid;UI.lseen=0;U
 function renderNews(){const n=document.getElementById('news'),m=document.getElementById('moment');if(!n)return;
   if(!G||UI.info){n.innerHTML='';m.classList.add('hidden');return}
   const last=UI.news&&UI.news[UI.news.length-1];n.innerHTML=last?`<button class="newsbtn" data-gx="dr-log" title="Open the chronicle">${esc(last)}</button>`:'';
-  if(UI.moment){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
+  if(UI.moment&&!(G&&G.winner)){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
 // the resolve banner, with the reason things happened
 function storyBanner(R){const p=R.p;const out=[...R.out];
   if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
@@ -85,7 +85,7 @@ function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup
   const me=meSeat();const p=cur();const c=UI.choice&&!(NET.on&&c0Remote())?UI.choice:null;const riv=rivalLine();
   if(c){if(c.why)return {a:c.why.split(':')[0]+'.',w:c.why.split(':').slice(1).join(':').trim()||c.text};
     if(/Stay or yield/.test(c.title)){const q=P(c.who);const th=alive().filter(r=>r.i!==q.i&&!inCity(r.i)).length;const y=c.options.find(o=>o.k==='yield'&&/Recommended\./.test(o.d||''));
-      return y?{k:'yield',a:'Yield.',w:`${plu(q.hp,'heart')} and ${th} monster${th===1?'':'s'} can hit you: staying is too risky. Staying pays 2 ★ only if you survive a round.`}:{k:'stay',a:'Stay.',w:`With ${plu(q.hp,'heart')} you can likely survive a round, and starting your turn in the city pays 2 ★. Yield once you are at 3 ♥ or less.`}}
+      return y?{k:'yield',a:'Yield.',w:`${plu(q.hp,'heart')} and ${th} monster${th===1?'':'s'} can hit you: staying is too risky. Staying pays 2 ★ only if you survive a round.`}:{k:'stay',a:'Stay.',w:`With ${plu(q.hp,'heart')} you can likely survive a round, and starting your turn in the city pays 2 ★. Leave the city to heal once you are at 6 ♥ or less.`}}
     const r=c.options.find(o=>o.rec||/Recommended\./.test(o.d||''));if(r)return {k:r.k,a:`Choose “${r.l}”.`,w:(r.d||'').replace(/ ?Recommended\.?/,'')||'It is the safer option here.'};
     if(typeof c.ai==='function'&&!c.net){if(c._aiK===undefined){try{c._aiK=String(c.ai())}catch(e){c._aiK=null}}const o=c.options.find(x=>String(x.k)===c._aiK);if(o)return {k:o.k,a:`Choose “${o.l}”.`,w:(o.d?o.d+' ':'')+'That is what an experienced monster would pick right now.'}}
     return {a:'Pick one of the options.',w:'The small text under each option says what it does. The computer waits for you.'}}
@@ -94,7 +94,7 @@ function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup
     if(G.rolls<=0)return {a:'Press Resolve dice.',w:`No rerolls left. You will get: ${scoreDice(p,G.dice).text}.`};
     const m=suggestMask(p);const keep=G.dice.filter((d,k)=>m[k]).map(d=>d.f);const cnt=countsOf(G.dice);
     let why;if(!inT&&!occ)why='Nobody is in Downtown yet, so claws do nothing now (you will move in anyway). Energy buys cards, and three of a number score stars.';
-    else if(inT)why=p.hp<=4?`You cannot heal in the city. At 3 ♥ or less, yield the next time you are hit. Claws hit everyone outside.`:'From the city your claws hit every monster outside; hearts do nothing here.';
+    else if(inT)why=p.hp<=6?`You cannot heal in the city. At 6 ♥ or less, leave the city to heal: yield the next time you are hit. Claws hit everyone outside.`:'From the city your claws hit every monster outside; hearts do nothing here.';
     else why=`Claws are your best face: each one hits ${mname(occ)} in Downtown. If it yields, you move in.${p.hp<=5?' You are hurt: hearts heal you out here.':''}`;
     const trip=['1','2','3'].filter(f=>keep.filter(x=>x===f).length>=3);const pair=['1','2','3'].filter(f=>cnt[f]===2&&keep.filter(x=>x===f).length===2);if(trip.length)why=`Your three ${trip[0]}s already score ${trip[0]} ★ (each extra ${trip[0]} adds 1). `+why;else if(pair.length)why=`A third ${pair[0]} would score ${pair[0]} ★. `+why;
     const nk=G.dice.length-keep.length;

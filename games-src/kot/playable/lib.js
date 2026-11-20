@@ -6,7 +6,7 @@ const EXE = process.env.CHR || undefined;
 async function launch() { return PW.chromium.launch({ executablePath: EXE, args: ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }) }
 async function open(b, w, h, url, qs = '') {
   const touch = w < 700;
-  const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1, serviceWorkers: 'block' });
+  const ctx = await b.newContext({ viewport: { width: w, height: h }, hasTouch: touch, isMobile: touch, deviceScaleFactor: 1, serviceWorkers: 'block', ...(process.env.REC_DIR ? { recordVideo: { dir: process.env.REC_DIR, size: { width: w, height: h } } } : {}) });
   const p = await ctx.newPage(); p.setDefaultTimeout(30000); p.errs = [];
   p.on('pageerror', e => p.errs.push('pageerror ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g|404|WebGL|certificate/i.test(m.text())) p.errs.push(m.text().slice(0, 160)) });

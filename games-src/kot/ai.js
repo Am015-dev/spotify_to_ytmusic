@@ -29,7 +29,8 @@ function aiYield(q,lost){
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
 // Easy (the newcomer default): flips some keeps, stops rolling early, often skips the shop
-var EZROLL=1,EZFLIP=.4,EZSKIP=.6;
+var EZROLL=1,EZFLIP=.4,EZSKIP=.6,EZHIT=.4;
+var tender=o=>!!o.human;   // a person (the sim swaps this for its newcomer bot)
 var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
 // chance that q is knocked out before its next turn if it stays in the city
 function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inCity(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
@@ -49,6 +50,7 @@ function aiWantsClaws(p){
   if(inCity(p.i))return true;
   const occ=[G.city,G.bay].filter(i=>i>=0).map(P);
   if(!occ.length)return false;
+  if(p.lvl==='easy'&&occ.some(tender))return Math.random()<EZHIT;   // F1: Easy rivals go easy on a person holding Downtown
   const c=counts().C;
   if(occ.some(o=>o.hp<=c+2))return true;
   return p.hp>=5}

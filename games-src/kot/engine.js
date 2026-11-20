@@ -385,7 +385,7 @@ function yieldStep(p,R,done){const canYield=!curseOn('k_ego')&&G.bliz<0;if(!canY
       R.yielders.push(q);lg(q.i,`${mname(q)} yields and flees the city.`);fx(q.i,'YIELD','star');next()};
     if(!canAsk){next();return}
     const force=()=>{if(hasE(p,45)&&!inCity(p.i)){ask(p.i,evoName(45),`Force ${mname(q)} to yield the city?`,[{k:'y',l:'Force it out'},{k:'n',l:'Let it choose'}],()=>p.hp>=6?'y':'n',k=>{if(k==='y'){cov('evo:45');lg(p.i,`${mname(p)} bellows spores: ${mname(q)} must leave!`);doYield('force')}else choose()})}else choose()};
-    const choose=()=>{const rec=aiYield(q,h.lost);const opts=[{k:'stay',l:`Stay in ${where(q.i)}`,d:`+2 ★ next turn, but you keep getting hit.${rec?'':' Recommended.'}`},{k:'yield',l:'Yield and run!',d:`Safe outside; ${mname(p)} moves in.${has(q,'vjets')?' Vapor Jets cancel the damage.':''}${rec?' Recommended.':''}`}];
+    const choose=()=>{const rec=isHuman(q.i)&&q.lvl==='easy'?q.hp<=6:aiYield(q,h.lost);const opts=[{k:'stay',l:`Stay in ${where(q.i)}`,d:`+2 ★ next turn, but you keep getting hit.${rec?'':' Recommended.'}`},{k:'yield',l:'Yield and run!',d:`Leave the city to heal: safe outside; ${mname(p)} moves in.${has(q,'vjets')?' Vapor Jets cancel the damage.':''}${rec?' Recommended.':''}`}];
       if(scurry&&!has(q,'vjets'))opts.push({k:'scurry',l:`Yield with ${evoName(42)}`,d:'You lose no hearts this turn.'});
       ask(q.i,`Stay or yield? ♥${Math.max(0,q.hp)} left`,`${mname(p)} hit you for ${h.lost}: ${plu(Math.max(0,q.hp),'heart')} left.`,opts,()=>rec?(scurry&&q.hp<=0?'scurry':'yield'):'stay',k=>{
         if(k==='stay'){if(hasE(q,17)){gainVP(q,hasE(q,17));cov('evo:17:stay')}next()}else doYield(k)})};

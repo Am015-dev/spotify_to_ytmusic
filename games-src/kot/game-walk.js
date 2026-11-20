@@ -19,7 +19,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
       if (k !== a) { if (a >= 0 && G.pl[a] && G.pl[a].human) window.__hEnd = now; if (G.pl[k] && G.pl[k].human && window.__hEnd) (window.__gap = window.__gap || []).push(Math.round(now - window.__hEnd)); if (a >= 0 && G.pl[a] && !G.pl[a].human && t) window.__rt.push({ who: a, ms: Math.round(now - t), steps }); a = k; t = now; steps = [] } }, 40) });
   if (process.env.RT_DUMP) await p.evaluate(() => { const o = aiStep; aiStep = function () { __rtLog(G.phase + (G.aiMarked ? '+m' : '') + ' r' + G.rolls); return o.apply(this, arguments) } });
   let taps = 0, idle = 0, buys = 0; const t0 = Date.now(), done = {};
-  while (Date.now() - t0 < 480000) {
+  while (Date.now() - t0 < +(process.env.MAXMS || 480000)) {
     const st = await p.evaluate(() => typeof G !== 'undefined' && G ? { w: G.winner, me: G.active === G.pl.findIndex(q => q.human), ph: G.phase, rolls: G.rolls, tid: G.tid, vp: Math.max(...G.pl.map(q => q.vp)), dead: G.pl.filter(q => !q.alive).length, choice: !!UI.choice, yld: !!(UI.choice && UI.choice.options && UI.choice.options.some(o => /yield|leave/i.test(o.l || ''))), hp: (G.pl.find(q => q.human) || {}).hp, city: inCity(G.pl.findIndex(q => q.human)), intro: !!UI.intro, dice: G.dice.map(d => d.f + (d.k ? '*' : '')) } : null);
     if (st && st.w) break;
     let a = null;
@@ -40,7 +40,7 @@ const srv = http.createServer((q, r) => { const u = decodeURIComponent(q.url.spl
     }
     if (st && st.me && st.ph === 'roll' && st.rolls === 2) buys = 0;
     if (st && !done.mid && (st.vp >= 9 || st.dead) ) { done.mid = 1; await L.sleep(600); await shot('mid-game') }
-    if (st && st.yld) { const lv = st.hp <= 5; if (await L.tapSel(p, '#choice:not(.hidden) [data-opt]', { text: lv ? 'yield|leave' : 'stay' })) { taps++; await L.sleep(300); continue } }
+    if (st && st.yld) { const lv = st.hp <= 6; if (await L.tapSel(p, '#choice:not(.hidden) [data-opt]', { text: lv ? 'yield|leave' : 'stay' })) { taps++; await L.sleep(300); continue } }
     a = await L.step(p);
     if (a) { idle = 0; taps++ } else { idle++; await L.sleep(250) }
     if (idle > 400) { console.log('FAIL game-walk stuck: no tappable control for 100 s'); break }
