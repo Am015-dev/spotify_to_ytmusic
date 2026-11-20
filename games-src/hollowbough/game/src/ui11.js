@@ -10,7 +10,7 @@ const HP = {
   cost: () => costEl({ twig: 2, berry: 1 }, 24),
   card: () => cardEl(firstCardId(), 40)
 };
-function firstCardId() { try { for (let i = 0; i < HB.NCARDS; i++) if (HB.cardKey(i) === 'architect') return i; } catch (e) { } return 0; }
+function firstCardId() { try { for (let i = 0; i < HB.NCARDS; i++) if (HB.cardKey(i) === 'master_lathwright') return i; } catch (e) { } return 0; }
 function hnode(x) { try { const n = typeof x === 'function' ? x() : x; return n && n.outerHTML ? n.outerHTML : String(n || ''); } catch (e) { return ''; } }
 function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + hnode(it[0]) + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
 // ---------------------------------------------------------------- where each bubble points
@@ -87,7 +87,7 @@ function hlpWhy(m, a) {
     else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power. Its owner gets a point token.');
   } else if (m.type === 'play') {
     const nm = cname(m.card), pts = cdef(m.card).pts;
-    if (HB.cardKey(m.card) === 'fool') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
+    if (HB.cardKey(m.card) === 'mudpie_jester') t = 'Plant ' + nm + ' in a rival city: it costs them 2 points.';
     else if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
     else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
     else t = 'Play ' + nm + ' the cheaper way.';

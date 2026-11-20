@@ -31,12 +31,12 @@ async function game(b, gi) {
       const gl = [...document.querySelectorAll('.glow')].filter(e => vis(e) && hit(e) && !/pv-tab/.test(e.className)).map(e => hit(e));
       const tabs = [...document.querySelectorAll('[data-a="pvtab"].glow,[data-a="pvtab"].has')].filter(vis).map(e => hit(e)).filter(Boolean);
       const btns = [...document.querySelectorAll('#acts .btn:not(.undo)')].filter(e => vis(e) && hit(e) && !e.disabled).map(e => ({ q: hit(e), t: e.textContent.trim().slice(0, 20) }));
-      const bulb = document.getElementById('bulbbtn'); return { kind: 'mine', gl, tabs, btns, bulb: bulb && vis(bulb) ? hit(bulb) : null, helpers };
+      const bulb = document.getElementById('bulbbtn'); return { kind: 'flintpit', gl, tabs, btns, bulb: bulb && vis(bulb) ? hit(bulb) : null, helpers };
     }).catch(e => ({ kind: 'err', e: e.message }));
     if (s.helpers && !s.helpers.asked) { const h = s.helpers; if (h.finger || h.bub || (h.finger + (h.bub > 0) + (h.nudge > 0)) > 1) { breaches++; if (breaches <= 2) probs.push('helper on screen without asking ' + JSON.stringify(h)); } }
     if (s.kind === 'done') { over = true; break; }
     if (s.kind === 'btn' && s.q) { await p.touchscreen.tap(s.q.x, s.q.y); taps++; await sleep(400); idle = 0; continue; }
-    if (s.kind === 'mine') {
+    if (s.kind === 'flintpit') {
       const before = await sig(); let q = null;
       if ((R() < ASK || !s.gl.length) && s.bulb) {   // unsure: ask the bulb, tap what it rings
         asks++; await p.touchscreen.tap(s.bulb.x, s.bulb.y); await sleep(500);
