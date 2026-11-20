@@ -35,7 +35,7 @@ async function game(browser, W, H, gi) {
   for (; steps < 700; steps++) {
     const st = await p.evaluate(() => ({ over: G.phase === 'over', cards: UI.cards.length, busy: !!UI.animBusy, mine: (() => { const a = HB.actor(G); return a >= 0 && !G.players[a].ai; })() }));
     if (st.over && !st.cards) break;
-    if (st.cards) { const ok = await p.$('#pc:not([hidden]) [data-a=cont],#pc:not([hidden]) [data-a=take]'); if (ok) await ok.tap().catch(() => { }); await sleep(150); continue; }
+    if (st.cards) { const ok = await p.$('#pc:not([hidden]) [data-a=cont],#pc:not([hidden]) [data-a=take],#pc:not([hidden]) [data-a=lookgo],#pc:not([hidden]) [data-a=lookno]'); if (ok) await ok.tap().catch(() => { }); await sleep(150); continue; }
     if (!st.mine || st.busy) { await sleep(100); continue; }
     if (steps % 3 === 0) {
       const hc = await p.evaluate(() => { if (!G.q || UI.sel) return null; const e = [...document.querySelectorAll('.hc')].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) .contains(x) || x.contains(document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)); }); if (!e || e.classList.contains('glow')) return null; document.getElementById('toast').classList.remove('on'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, kind: G.q.kind }; });
@@ -61,12 +61,12 @@ async function game(browser, W, H, gi) {
       if (r.has && (r.dot || r.kit)) { T.helpersMax = Math.max(T.helpersMax, 2); fail(tag, 'nudge competes with ' + (r.dot ? 'tab dot' : 'kit')); }
       await p.evaluate(() => hlpIdleClear());
     }
-    // silent taps: Prepare while workers remain; a hand card that cannot be built
+    // silent taps: Prepare while workers remain; a hand card that cannot be built (PLAY1: it answers with the look sheet)
     if (steps % 6 === 2) {
       const pb = await p.$('#acts .prep.dis');
       if (pb) { T.prepTaps++; await p.evaluate(() => document.getElementById('toast').classList.remove('on')); const b = await pb.boundingBox(); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); await sleep(120); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : ''; }); if (!tx) { T.silent++; fail(tag, 'silent tap on Prepare with workers left'); } }
       const dead = await p.evaluate(() => { if (UI.sel || G.q) return null; const e = [...document.querySelectorAll('.hc:not(.glow)')].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && x.dataset.t && /^x:/.test(x.dataset.t) && r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }); if (!e) return null; document.getElementById('toast').classList.remove('on'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
-      if (dead) { T.deadTaps++; const logN = await p.evaluate(() => G.logN); await p.touchscreen.tap(dead.x, dead.y); await sleep(120); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : ''; }); if (!tx) { T.silent++; fail(tag, 'silent tap on an unusable hand card'); } if (await p.evaluate(() => G.logN) !== logN) fail(tag, 'dead tap changed the game'); }
+      if (dead) { T.deadTaps++; const logN = await p.evaluate(() => G.logN); await p.touchscreen.tap(dead.x, dead.y); await sleep(120); const tx = await p.evaluate(() => { const e = document.getElementById('toast'); return e.classList.contains('on') ? e.textContent : (document.querySelector('#pc[data-card=look]:not([hidden]) .lk-need') ? 'look sheet: what is missing' : ''); }); if (!tx) { T.silent++; fail(tag, 'silent tap on an unusable hand card'); } if (await p.evaluate(() => G.logN) !== logN) fail(tag, 'dead tap changed the game'); }
     }
     // play on: tap a glowing target (the bulb's own pick when none is on this tab)
     const tg = await p.evaluate(() => {

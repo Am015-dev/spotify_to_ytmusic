@@ -1,0 +1,65 @@
+{"taps":64,"fin":{"turn":59,"season":3,"score":44,"log":123},"errs":[]}
+0.1s title Play
+1.7s offer Play now
+5.5s sheet/card Start
+8.3s bubble Got it
+10.7s move Bumper Bramble: 3 berries
+14.0s move Twig Heap: 3 twigs
+17.2s move Meadow card: Slate Schoolmarm
+19.6s bubble Got it
+22.0s choice Cranny Market1pt1resin1pebble
+25.4s move Prepare for Spring
+27.8s choice Chronicle Owl1pt2berries
+31.1s move Bumper Bramble: 3 berries
+34.4s move Amber Weep: 1 resin + 1 card, 
+38.0s move Resin Pool: 2 resin
+41.2s move Meadow card: Bramble Allotment
+44.4s move Meadow card: Goodwife Vole
+46.9s bubble Got it
+49.3s choice ×2
+52.6s move Goodman Vole (in hand)
+55.0s choice ×3
+57.5s bubble Got it
+59.9s choice Take 1 twig
+63.2s move Bramble Allotment (in hand)
+66.4s move Prepare for Summer
+68.8s choice Stop taking cards
+72.2s move Bumper Bramble: 3 berries
+75.4s move Gossip Glade: 2 cards + 1 poin
+78.7s move Chronicle Owl (in hand)
+82.3s move Kindling Glen: 2 twigs + 1 car
+85.5s move Whittle Beaver (in hand)
+87.9s choice Spend 1 twig for 1 point token
+90.4s choice Spend 1 twig for 1 point token
+93.8s move Kindling Glen: 2 twigs + 1 car
+97.0s move Bramble Allotment (in hand)
+100.7s move Brother Moss (in hand)
+104.3s move Prepare for Autumn
+106.6s choice Slate SchoolmarmDraw 2 cards, 
+109.1s choice Whittle BeaverSpend up to 3 tw
+111.6s bubble Got it
+114.0s choice Give Bramble a berry: +2 token
+116.5s choice Give Bramble a berry: +2 token
+118.9s choice Take 1 twig
+122.3s move Visit Lantern Rest
+124.7s move Meadow card: Acorn Academy
+128.2s move The Long Road: Journey, Autumn
+130.7s choice 5
+133.1s move Cranny Market (in hand)
+135.5s move Spyglass Perch (in hand)
+137.9s move Echo Mole (in hand)
+140.3s move Mossgrave Glade (in hand)
+142.6s move Mossgrave Glade (in hand)
+145.9s move The Long Road: Journey, Autumn
+148.3s choice 3
+150.8s move Flintpit (in hand)
+153.1s move Footsore Drifter (in hand)
+155.5s move Quietstone Cloister (in hand)
+158.7s move Harvest Gathering: Harvest Gat
+161.9s move Gossip Glade: 2 cards + 1 poin
+165.2s move Hostler Hedgehog (in hand)
+168.4s move The Long Road: Journey, Autumn
+170.8s move Mudpie Jester (in hand)
+173.2s move Candlewick Shrine (in hand)
+176.3s move Meadow card: Footsore Drifter
+180.3s move Pass

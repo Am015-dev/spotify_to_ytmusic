@@ -1,0 +1,60 @@
+{"taps":59,"fin":{"turn":44,"season":2,"score":20,"log":88},"errs":[]}
+0.0s title Play
+1.6s offer Play now
+5.5s sheet/card Start
+8.3s bubble Got it
+11.4s sheet/card OK
+14.1s move Bumper Bramble: 3 berries
+17.3s sheet/card Send worker
+20.5s move Twig Heap: 3 twigs
+23.8s sheet/card Send worker
+26.8s move Meadow card: Slate Schoolmarm
+30.0s sheet/card Build it
+32.8s bubble Got it
+35.2s choice Cranny Market1pt1resin1pebble
+38.5s move Prepare for Spring
+41.7s sheet/card Prepare
+44.4s choice Chronicle Owl1pt2berries
+47.7s move Dewberry Nook: 1 berry + 1 car
+50.9s sheet/card Send worker
+54.1s move Pebble Bank: 1 pebble
+57.3s sheet/card Send worker
+60.8s move Resin Pool: 2 resin
+64.0s sheet/card Send worker
+67.1s move Meadow card: Kindling Raft
+70.3s sheet/card Build it
+73.8s move Meadow card: Bramble Allotment
+77.0s sheet/card Build it
+80.5s move Meadow card: Goodwife Vole
+82.9s bubble Got it
+86.1s sheet/card OK
+88.7s move Meadow card: Goodwife Vole
+91.1s choice ×2
+94.4s move Goodman Vole (in hand)
+97.6s sheet/card Build it
+100.3s bubble Got it
+102.7s choice Take 1 twig
+106.0s move Bramble Allotment (in hand)
+109.2s sheet/card Build it
+112.7s move Chronicle Owl (in hand)
+115.9s sheet/card Build it
+119.3s move Prepare for Summer
+122.5s sheet/card Prepare
+125.2s choice Stop taking cards
+128.5s move Amber Weep: 1 resin + 1 card, 
+131.8s sheet/card Send worker
+134.4s move Dewberry Nook: 1 berry + 1 car
+137.7s sheet/card Send worker
+140.7s move Pebble Bank: 1 pebble
+143.9s sheet/card Send worker
+147.0s move Berry Thicket: 2 berries + 1 c
+150.2s sheet/card Send worker
+153.3s move Parcel Dove (in hand)
+156.5s sheet/card Build it
+159.2s choice 
+162.9s move Meadow card: Pulley Lift
+166.1s sheet/card Build it
+170.0s move Meadow card: Master Lathwright
+173.3s sheet/card Build it
+176.8s move Footsore Drifter (in hand)
+180.0s sheet/card Build it
