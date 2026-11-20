@@ -6,7 +6,7 @@ var $ = function (s) { return document.querySelector(s); };
 function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 function ls(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || 'null'); localStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } }
 function ico(name, fill, size) { return '<svg viewBox="0 0 512 512" width="' + (size || 22) + '" height="' + (size || 22) + '" aria-hidden="true"><path d="' + ICONS[name] + '" fill="' + (fill || 'currentColor') + '"/></svg>'; }
-var FACE_ICON = { C: 'char', A: 'army', M: 'muster', X: 'helm', E: 'event', W: 'will', Y: 'eye' };
+var FACE_ICON = { C: 'char', A: 'army', M: 'muster', X: 'helm', E: 'raven', W: 'will', Y: 'eye' };
 function sideName(s) { return s === 'D' ? 'Dawn' : 'Gloam'; }
 function rn(rid) { return REG[rid] ? REG[rid].n : rid; }
 // ---------------------------------------------------------------- sound (synth, short)
@@ -182,7 +182,7 @@ function actUI(ms, hl, acts) {
   // the Will of the Dawn: first pick which face it becomes (or a hero)
   if (f === 'W' && !UI.asFace) {
     var faces = {}; dms.forEach(function (m) { if (m.as) faces[m.as] = 1; });
-    [['C', 'As Character', 'Company, heroes, leaders'], ['A', 'As Army', 'march or attack'], ['M', 'As Muster', 'stir nations, raise troops'], ['E', 'As Event', 'draw or play a card']].forEach(function (x) { if (faces[x[0]]) acts.push({ t: x[1], s: x[2], key: 'as-' + x[0], cls: x[0] === 'C' ? 'pri' : '', f: function () { UI.asFace = x[0]; render(); } }); });
+    [['C', 'Character', 'the Company'], ['A', 'Army', 'march, fight'], ['M', 'Muster', 'troops, nations'], ['E', 'Event', 'cards']].forEach(function (x) { if (faces[x[0]]) acts.push({ t: x[1], s: x[2], key: 'as-' + x[0], cls: x[0] === 'C' ? 'pri' : '', f: function () { UI.asFace = x[0]; render(); } }); });
     dms.filter(function (m) { return m.a === 'hero'; }).forEach(function (m) { acts.push({ t: CHARS[m.c].short, s: 'rises at ' + rn(m.to), cls: 'red', key: 'hero-' + m.c, f: function () { apply(m); } }); });
     dms.filter(function (m) { return m.a === 'skip'; }).slice(0, 1).forEach(function (m) { acts.push({ t: 'Set aside', s: 'waste this die', key: 'skip', f: function () { apply(m); } }); });
     return 'Will of the Dawn: use it as…';
