@@ -140,7 +140,11 @@ function gTick(){try{
 // only the highlight (and the bubble's own buttons, Skip) answers while a step shows
 function gInside(x,y,el,pad){if(!el)return false;const r=el.getBoundingClientRect();pad=pad||10;return x>=r.left-pad&&x<=r.right+pad&&y>=r.top-pad&&y<=r.bottom+pad}
 function gPt(ev){const t=ev.changedTouches&&ev.changedTouches[0]||ev.touches&&ev.touches[0];return t?[t.clientX,t.clientY]:[ev.clientX,ev.clientY]}
-function gGate(ev){if(!GUIDE.on||!GUIDE.shown)return;const s=gCur();if(!s||GUIDE.shown!==s.id)return;
+function gGate(ev){if(!GUIDE.on)return;
+  // R94/F16: the step's scene is on screen but its bubble has not appeared yet (the tick runs every 250 ms): hold the tap, or Continue / Start day N runs the scene past it
+  if(!GUIDE.shown){const c=gCur();let hold=false;try{hold=!!c&&!!c.beat&&gDay()===c.day&&gBeat()===c.beat&&!(ev.target&&ev.target.closest&&ev.target.closest('#coachskip'))}catch(e){}
+    if(hold){ev.stopPropagation();if(ev.cancelable&&ev.type!=='touchstart')ev.preventDefault();if(ev.type==='click')setTimeout(gTick,0)}return}
+  const s=gCur();if(!s||GUIDE.shown!==s.id)return;
   const t=ev.target;if(t&&t.closest&&(t.closest('#coachskip')||t.closest('#coachb button')||t.closest('.gx-top,.gx-bar,#topbar')&&false))return;
   const [x,y]=gPt(ev);const el=s.kind==='info'&&!s.tgt?null:gTarget(s);
   // G6 review: the big Continue button is where a new player taps first; on an info step it moves the step on too (never a dead tap)
