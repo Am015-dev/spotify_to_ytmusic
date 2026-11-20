@@ -1,5 +1,5 @@
 // Records the first 3 minutes of a Play game at 375x667 (touch, human pace, the 3-tap turn) to proof/first-3-minutes-375x667.webm.
-// Usage: node proof-record.js [seconds=180]
+// Usage: [WM_URL=file://.../copy.html] node proof-record.js [seconds=180]
 const path = require('path'), fs = require('fs');
 const { chromium } = require(path.join(__dirname, '..', 'node_modules', 'playwright'));
 const SECS = +process.argv[2] || 180, OUT = path.join(__dirname, 'proof'), TMP = path.join(OUT, 'tmp');
@@ -9,7 +9,7 @@ const SECS = +process.argv[2] || 180, OUT = path.join(__dirname, 'proof'), TMP =
   const p = await ctx.newPage(), t0 = Date.now(), W = ms => p.waitForTimeout(ms), errs = [];
   p.on('pageerror', e => errs.push(String(e)));
   await p.addInitScript(() => { try { localStorage.setItem('wm-prefs', JSON.stringify({ played: 1, offered: 1 })); } catch (e) { } });
-  await p.goto('file://' + path.join(__dirname, 'wildmark.html')); await p.waitForSelector('#playB'); await W(1500);
+  await p.goto(process.env.WM_URL || 'file://' + path.join(__dirname, 'wildmark.html'));   // WM_URL: a copy next to games/wildmark/media so the art loads await p.waitForSelector('#playB'); await W(1500);
   await p.tap('#playB'); await W(2500);
   const goal = p.locator('#goalB, .goalc button, #goal button'); if (await goal.count()) { await goal.first().tap().catch(() => { }); await W(800); }
   const at = sel => p.evaluate(s => { for (const e of document.querySelectorAll(s)) { const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2; const h = document.elementFromPoint(x, y); if (h && (h === e || e.contains(h) || h.closest(s) === e)) return [x, y]; } return null; }, sel);

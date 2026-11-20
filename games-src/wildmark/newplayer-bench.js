@@ -56,13 +56,13 @@ function greedy(G) {
 }
 const levels = (process.argv[3] || 'novice,easy,normal').split(','), out = {};
 for (const lv of levels) {
-  let pts = 0, sh = 0, sa = 0;
+  let pts = 0, sh = 0, sa = 0; const mg = [];
   for (let g = 0; g < N; g++) {
     const me = g % 2, ai = me ? [lv, 'first'] : ['first', lv], G = W.newGame({ np: 2, seed: 9100 + g, ai });
     while (!G.over) W.apply(G, G.cur === me ? greedy(G) : W.AI.choose(G, lv));
-    pts += G.winner === me ? 1 : G.winner === -2 ? 0.5 : 0; sh += G.res[me].total; sa += G.res[1 - me].total;
+    pts += G.winner === me ? 1 : G.winner === -2 ? 0.5 : 0; sh += G.res[me].total; sa += G.res[1 - me].total; mg.push(G.res[me].total - G.res[1 - me].total);
   }
   out[lv] = Math.round(100 * pts / N);
-  console.log(lv + ': ' + BOT + ' bot wins ' + out[lv] + '%, avg ' + (sh / N).toFixed(1) + ' vs rival ' + (sa / N).toFixed(1) + ' over ' + N);
+  console.log(lv + ': ' + BOT + ' bot wins ' + out[lv] + '%, avg ' + (sh / N).toFixed(1) + ' vs rival ' + (sa / N).toFixed(1) + ' over ' + N + '; margin median ' + mg.slice().sort((a, b) => a - b)[N >> 1] + ', mean |margin| ' + (mg.reduce((a, b) => a + Math.abs(b), 0) / N).toFixed(1) + ', within 10: ' + Math.round(100 * mg.filter(x => Math.abs(x) <= 10).length / N) + '%');
 }
 module.exports = out;

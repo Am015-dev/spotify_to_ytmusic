@@ -436,3 +436,45 @@ html.wm-goal .gxh-bub{visibility:hidden}
 @media (max-width:999px){#bulbbtn::after,#hintsB::after{position:absolute;left:0;right:0;bottom:1px;text-align:center;font-size:11px;font-weight:800;line-height:1;pointer-events:none;color:currentColor}#bulbbtn::after{content:"Hint"}#hintsB::after{content:"On"}#hintsB:not(.on)::after{content:"Off"}#bulbbtn svg,#hintsB svg{margin-top:-8px}}
 /* F2: the chip rows only catch taps on the chips themselves; the empty rest of the row lets taps reach the valley */
 #seats,#cards{pointer-events:none}#seats .seat,#cards .cc{pointer-events:auto}
+/* F3 (R102): one helper at a time. The turn banner lives IN the instruction line (never over the top bar); bubbles push the other helpers away */
+#turnban{display:none!important}
+#line.banl{justify-content:center;background:#2f5e3a;color:#fff;animation:wmbanl .5s ease-out}
+#line.banl .ban{font-size:18px;font-weight:800;letter-spacing:.01em}
+@keyframes wmbanl{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}
+@media (min-width:1000px){@keyframes wmbanl{from{opacity:.4}to{opacity:1}}}
+#line.rivl{white-space:normal;font-size:15px;line-height:1.25;background:#f6efdc;box-shadow:0 0 0 3px #e6b04f,0 2px 10px rgba(0,0,0,.45);cursor:pointer}
+html.wm-coach #pv,html.wm-coach #whyc{display:none!important}
+@media (prefers-reduced-motion:reduce){#line.banl{animation:none}}
+/* F3: the rival inset is only a picture (taps pass through), in the corner with the fewest of your tiles */
+#rinset{pointer-events:none;cursor:default}
+/* F3: short phones: each market column shows the tile and its animal side by side, so the valley gets the height */
+@media (max-width:999px) and (orientation:portrait) and (max-height:620px){
+  #mk .pair{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;align-items:center;justify-items:center;column-gap:0;row-gap:2px}
+  #mk .pair .gain{grid-column:1 / span 2}
+  #mk .mt{height:46px}#mk .mt svg{height:44px}
+  #mk .mk{min-width:0!important;padding:0!important}#mk .mk svg{width:32px!important;height:32px!important}#mk .mk i{font-size:12px}
+}
+/* F3 (owner): PC. Use the width: rivals' valleys + season log on the left, the valley large in the middle, the market on the right */
+#rivp{display:none}
+@media (min-width:1000px){
+  .gx-main{grid-template-columns:clamp(240px,19vw,380px) minmax(0,1fr) var(--gx-dock-w)}
+  html.lefty .gx-main{grid-template-columns:clamp(240px,19vw,380px) minmax(0,1fr) var(--gx-dock-w)}
+  #rivp{display:flex;flex-direction:column;min-height:0;background:#1d3226;border-right:1px solid rgba(255,255,255,.08);color:var(--wm-cream);overflow:hidden}
+  #rivv{flex:0 0 auto;padding:10px 10px 0;display:flex;flex-direction:column;gap:8px}
+  #rivv:empty{display:none}
+  .rv1{background:rgba(0,0,0,.2);border-radius:12px;padding:6px 8px 8px;border:2px solid transparent}
+  .rv1.cur{border-color:#e6b04f}
+  .rv1 h3{margin:0 0 4px;font-size:16px;display:flex;justify-content:space-between;gap:8px}
+  .rv1 svg{display:block;width:100%;height:clamp(150px,26vh,300px)}
+  #rivv.n2 .rv1 svg{height:clamp(110px,16vh,200px)}
+  .rv1 .nwr{fill:none;stroke:#f2d27a;stroke-width:7}
+  #rivp #logp{display:block;margin:10px;flex:1 1 auto}
+  #dock #logp{display:none}
+}
+@media (min-width:1600px){:root{--gx-dock-w:420px}}
+@media (min-width:1000px){#terr{left:200px!important;top:122px!important;right:auto!important;max-width:calc(100% - 270px)}}
+/* F3: short phones: the preview / why strip rides just above the button row (over the market, taps pass through), never over the valley */
+@media (max-width:999px) and (orientation:portrait) and (max-height:620px){html.wm-placing #pv{position:fixed!important;left:8px;right:8px;bottom:58px!important;z-index:30}}
+#pv,#pv *{pointer-events:none!important}
+.vd.neg span{font-weight:800}
+@media (min-width:1000px){#acts .held svg{height:44px!important}#acts{height:auto;max-height:none;flex-wrap:wrap;justify-content:flex-end}#acts .ab{flex:0 0 auto}}

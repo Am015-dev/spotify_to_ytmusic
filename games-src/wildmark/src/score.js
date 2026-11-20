@@ -121,14 +121,15 @@ function pvTurnEnd() {
   var verdict = tag === 'good' ? 'Good move' + (got > 0 ? ': the best this turn.' : ': nothing scored more.') : (tag === 'okay' ? 'Okay move.' : 'Poor move.') + alt + hint;
   var text = pts + ' this turn' + (p.length ? ': ' + why : '') + '. ' + verdict;
   var short = pts + ' · ' + (tag === 'good' ? 'Good move' : tag === 'okay' ? 'Okay move' : 'Poor move') + (alt ? ': ' + T.names[T.bestI] + ' column was +' + T.best : '');
-  UI.verdict = { tag: tag, text: text, short: short, at: Date.now() };   // a one-line toast that fades: the full sentence goes to the help log
+  var V = UI.verdict = { tag: tag, text: text, short: short, at: Date.now(), at0: Date.now() };   // a one-line toast that fades: the full sentence goes to the help log
+  if (typeof helper === 'function') helper('verdict', function () { if (UI.verdict !== V) return; V.at = Date.now(); UI.vdOn = 1; pvStrip(null); }, VD_MS, function () { UI.vdOn = 0; if (G) pvStrip(myTurn() && (G.stage === 'tile' || G.stage === 'tok') ? pvNow() : null); }, 6000);   // F3: waits its turn in the one-helper queue
   if (window.GXH && GXH.log) try { GXH.log(text); } catch (e) { }
   return UI.verdict;
 }
 function pvVerdictHTML() { var v = UI.verdict; if (!v || !G || G.over) return ''; return '<div id="verdict" class="vd ' + v.tag + '" role="status" style="animation-delay:-' + Math.max(0, Date.now() - (v.at || Date.now())) + 'ms"><b>' + (v.tag === 'good' ? '&#9733;' : v.tag === 'okay' ? '&#9679;' : '&#9888;') + '</b><span title="' + esc(v.text) + '">' + esc(v.short || v.text) + '</span></div>'; }
 var VD_MS = 3200;   // how long the verdict toast stays before it fades
 // the rival's caption joins the verdict strip (one message box at a time, no toast); cleared when you pick
-function rivalNote(t) { UI.rivalMsg = t; }
+function rivalNote(t) { UI.rivalMsg = t; if (typeof toast === 'function') toast(t, 2200); }
 // ---- map previews: the ghost tile (tap a spot) or the spot / animal target under the mouse
 function pvSpotBest(env, c) { var b = -99; WM.rots(G.hold.tile).forEach(function (r) { b = Math.max(b, pvTile(env, G.hold.tile, c, r).d); }); return b; }
 function pvNow() {
@@ -145,14 +146,18 @@ function pvBadge(x, y, d, c, spot, ghost) {
   var k = Math.min(1, 1.25 / (UI.pan && UI.pan.z || 1));   // same on-screen size at any zoom
   return '<g class="pvb' + (d > 0 ? ' up' : d < 0 ? ' dn' : ' zero') + '" data-c="' + c + '" transform="translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + k.toFixed(3) + ')"><rect x="' + (-w / 2) + '" y="-12" width="' + w + '" height="24" rx="12"/><text y="6" text-anchor="middle">' + t + '</text></g>';
 }
+// F3: why a ringed tile shows a red number: "breaks your Salmon run" (the biggest loss)
+var PV_NEG = { bear: 'breaks your Bear pair', elk: 'breaks your Elk line', salmon: 'breaks your Salmon run', hawk: 'your Hawk is no longer alone', fox: 'your Fox loses a neighbour' };
+function pvNegWhy(parts) { var w = null; (parts || []).forEach(function (x) { if (x.d < 0 && (!w || x.d < w.d)) w = x; }); return w ? (w.a && pvSetA(w.a) ? PV_NEG[w.a] : w.a ? 'costs ' + WM.ANI_NAME[w.a] + ' card points' : w.why) : 'loses points'; }
 // the one preview / verdict strip above the instruction line
 function pvStrip(pv) {
   var e = $('#pv'); if (!e) { e = document.createElement('div'); e.id = 'pv'; e.setAttribute('aria-live', 'polite'); $('#board').appendChild(e); }
   var h = '';
   if (!hintsOn() || UI.tut) { e.innerHTML = ''; e.hidden = true; return; }   // the guided tutorial keeps one sentence on screen: Rowan's
-  if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
-  else if (UI.verdict && !G.over && !(myTurn() && G.stage !== 'pick') && Date.now() - (UI.verdict.at || 0) < VD_MS) { h = pvVerdictHTML(); clearTimeout(pvStrip.t); pvStrip.t = setTimeout(function () { if (G) pvStrip(myTurn() && (G.stage === 'tile' || G.stage === 'tok') ? pvNow() : null); }, VD_MS - (Date.now() - UI.verdict.at) + 30); }
-  else if (UI.rivalMsg && !G.over && !myTurn()) h = '<div class="vd okay riv"><span>' + esc(UI.rivalMsg) + '</span></div>';
+  var ng = UI.negT && myTurn() && (G.stage === 'tok' || (G.stage === 'tile' && UI.ghost)) ? UI.negT : null;
+  if (ng) h = '<div class="vd poor neg"><b>−' + Math.abs(ng.d) + '</b><span>' + esc(pvNegWhy(ng.parts)) + '</span></div>';   // F3: a red number on a ringed tile always says why, in one line
+  else if (pv) h = '<div class="vd ' + (pv.d > 0 ? 'good' : pv.d < 0 ? 'poor' : 'okay') + '"><b>' + (pv.d > 0 ? '+' : '') + pv.d + '</b><span>' + esc(pv.what + ': ' + pvText(pv.parts)) + '</span></div>';
+  else if (UI.verdict && UI.vdOn && !G.over && !(myTurn() && G.stage !== 'pick')) h = pvVerdictHTML();   // F3: shown only while the helper queue gives it the floor (the rival's news goes on the instruction line)
   e.innerHTML = h; e.hidden = !h;
   var ln = $('#line'), lh = ln && getComputedStyle(ln).display !== 'none' ? ln.offsetHeight : 0; e.style.bottom = (lh ? lh + 18 : 10) + 'px';   // sits just above the instruction line
   var te = $('#toast'); if (te && te.classList.contains('on')) toastPlace(te);
