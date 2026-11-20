@@ -135,7 +135,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 // ---------- the ring: spool (neutral token), the 3 on sale lifted, then every other patch clockwise
 function ringStrip() {
-  var box = $('#offers'); if (!box || !G || G.over || G.pend || box.style.display === 'none' || box.classList.contains('placing')) return;
+  var box = $('#offers'); if (!box || !G || G.over || box.style.display === 'none' || box.classList.contains('placing')) return;
   var L = G.ring.length; box.classList.add('ring');
   box.insertBefore(h('span.ntok', { title: 'The spool: only the 3 patches after it are for sale', 'aria-label': 'Spool. The 3 patches after it are for sale' }, h('i')), box.firstChild);
   var cs = document.documentElement.classList.contains('sm') ? 8 : 10;

@@ -565,5 +565,16 @@ html.swpc .oppwrap{gap:2px}
 #quilt .qc.badtap{animation:badtap .5s ease-out 1;outline:3px solid #c0392b;outline-offset:-3px;z-index:3}@keyframes badtap{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 /* F4 phone tray: the up-next patches start past the right edge, so no card looks cut */
 @media (max-width:600px){#offers.ring>.offer:not(.up)+.offer.up{margin-left:30px}}
+/* F4 cold nits (rewrite pass) */
+#track.nochip .tk .tkn{display:none!important}html.swpc #trhead{margin-bottom:6px!important}
+html.swpc #bd.wide #side{padding-left:8px;box-sizing:border-box}
+html.swpc .oppwrap>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qc.lea::after{border:2px solid rgba(240,217,176,.55)!important;inset:20%!important;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+#offers.pendim{opacity:.45;pointer-events:none;filter:saturate(.6)}
+i.pdw{font-style:normal}#prompt.swnote{color:#a23b2a!important;font-weight:800}
+#toast{top:8px;max-width:min(84vw,520px)} /* toasts ride in the top bar, never over the board */
+@media (max-width:1099px){html.swpc #offers.ring>.offer:not(.up) .of img.ic,html.swpc #offers.ring>.offer:not(.up) .of svg{display:none!important}
+html.swpc #offers.ring>.offer:not(.up) .of{min-width:0;overflow:hidden;white-space:nowrap}html.swpc #offers.ring>.offer:not(.up) .of.opd{font-size:12px!important;text-overflow:ellipsis}html.swpc .of.opd .pdw{display:none}}
+html.ph #offers.ring>.offer:not(.up) .of.oi img.ic,html.ph #offers.ring>.offer:not(.up) .of.oi svg{display:none!important}html.ph #offers.ring>.offer:not(.up) .of.oi{white-space:nowrap;gap:2px!important}html.ph #offers.ring>.offer:not(.up) .of.oi b{flex:0 0 auto}html.ph #offers.ring>.offer:not(.up) .of.oi .opi{display:none}
 </style>
 </head>
