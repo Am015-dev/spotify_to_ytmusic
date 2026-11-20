@@ -267,6 +267,8 @@ const pgBoard=t=>!!(t&&t.closest&&t.closest('#ov,#board,canvas')&&!t.closest('bu
 function pgClip(){try{const R=pgRects();for(const e of document.querySelectorAll('#ov .opip,#ov .ozone')){let near=false;if(R.length){const q=e.getBoundingClientRect(),cx=(q.left+q.right)/2,cy=(q.top+q.bottom)/2;
   near=R.some(r=>cx>=r.left-36&&cx<=r.right+36&&cy>=r.top-36&&cy<=r.bottom+36)}e.classList.toggle('nearbub',near)}}catch(e){}}
 setInterval(()=>{if(PH.on&&G&&G.phase==='setup')pgClip()},250);
+// R92: a bubble or the rules card that just closed must give its marks back at once (the 250 ms timer left them dead for a quick next tap)
+{const pgSoon=()=>{if(PH.on&&G&&G.phase==='setup'){setTimeout(pgClip,0);setTimeout(pgClip,60)}};document.addEventListener('click',pgSoon,true);document.addEventListener('pointerup',pgSoon,true)}
 document.addEventListener('pointerdown',e=>{const t=e.target,inG=!!(t&&t.closest&&t.closest(PG_SEL))||(pgBoard(t)&&pgNear(e.clientX,e.clientY,12));
   const ch=!inG&&PG.up>0&&Date.now()-PG.up<400;PG.on=inG||ch;PG.ch=ch;PG.chain=ch&&!(Math.abs(e.clientX-PG.x)<30&&Math.abs(e.clientY-PG.y)<30);PG.up=0;if(inG)PH.closeT=Date.now();if(PG.on&&!ch){PG.x=e.clientX;PG.y=e.clientY}},true);
 // every press that started on a bubble/card (it may close it) blocks board picks for a short while after it ends (R42: PH.closeT was no longer set)
