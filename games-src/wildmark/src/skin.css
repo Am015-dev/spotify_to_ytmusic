@@ -410,3 +410,10 @@ html.wm-coach #edgea,html.wm-cb #edgea{display:none}
 @media (max-height:700px){html.wm-coach #zoom,html.wm-cb #zoom{display:none}}
 #edgea .ea small{pointer-events:none}
 html.wm-goal .gxh-bub{visibility:hidden}
+/* F2: the rival's turn in a small inset (top right of the valley); your own view stays still */
+#rinset{position:absolute;right:6px;width:128px;height:112px;padding:4px 4px 18px;border-radius:12px;border:2px solid rgba(243,234,210,.85);background:rgba(18,32,25,.9);box-shadow:0 4px 14px rgba(0,0,0,.5);z-index:4;cursor:pointer;animation:wmInsetIn .25s ease-out 1}
+#rinset[hidden]{display:none}
+#rinset svg{width:100%;height:100%;display:block}
+#rinset span{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:12px;font-weight:800;color:#f3ead2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rinset .nwr{fill:none;stroke:#f2d27a;stroke-width:7}
+@keyframes wmInsetIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}

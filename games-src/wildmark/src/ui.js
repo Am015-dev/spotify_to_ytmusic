@@ -80,7 +80,7 @@ function step() {
   if (G.over) { render(); setTimeout(showResult, ANIM ? 900 : 50); return; }
   if (G.seats[G.cur].ai) { UI.aiT = setTimeout(aiStep, UI.fast ? 30 : AIDELAY); return; }
   if (UI.humans > 1 && UI.passed !== G.cur && G.stage === 'pick') { showPass(); return; }
-  UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(); }
+  UI.lastHuman = G.cur; if (UI.view !== G.cur) { UI.view = G.cur; fitView(false, true); }
   var bk = G.cur + ':' + G.seats[G.cur].done; if (!UI.fast && G.np > 1 && UI.humans === 1 && UI.mode !== 'tutorial' && !UI.tut && G.stage === 'pick' && UI.banKey !== bk) { UI.banKey = bk; banner('Your turn'); }
   render(); if (typeof tutFix === 'function') tutFix();
   autoTok();
@@ -115,16 +115,15 @@ function aiStep() {
     if (m.t === 'wipe3' || m.t === 'wipe') { rivalNote(nm + (m.t === 'wipe3' ? ' swept three matching animals.' : ' spent an acorn to replace animals.')); sfx('wipe'); UI.showAI = null; render(); step(); return; }
     var h = G.hold, mp = WM.AI.choose(G);
     if (!slow) { WM.apply(G, mp); var mq = WM.AI.choose(G); WM.apply(G, mq); rivalNote(nm + (mq.t === 'tok' ? ' placed ' + an(h.tok) + '.' : ' returned ' + an(h.tok) + '.')); sfx(G.last && G.last.acorn ? 'acorn' : 'place'); render(); step(); return; }
-    WM.apply(G, mp); UI.view = seat; UI.showAI = { seat: seat, text: nm + ' places the tile in their valley' }; fitView(); render(); sfx('place');
-    UI.anim = ANIM && !UI.fast ? { c: mp.c, k: 'drop', until: Date.now() + 700 } : null; drawMap();
+    WM.apply(G, mp); UI.inset = { seat: seat, c: mp.c }; UI.showAI = { seat: UI.view, text: nm + ' places the tile in their valley' }; render(); sfx('place');   // F2: your view stays put; their valley shows in a small inset
     UI.aiT = setTimeout(function () {
       if (!G) return;
       var env = G.seats[seat].env, s0 = WM.score(env, 0), m2 = WM.AI.choose(G); WM.apply(G, m2);
       var s1 = WM.score(env, 0), best = null; WM.ANI.forEach(function (a) { var d = s1.ani[a] - s0.ani[a]; if (d && (!best || d > best.d)) best = { a: a, d: d }; });
-      UI.showAI = { seat: seat, text: m2.t === 'tok' ? nm + ' puts the ' + WM.ANI_NAME[h.tok] + ' on a tile' + (G.last && G.last.acorn ? ' (+1 acorn)' : '') : nm + ' returns the ' + WM.ANI_NAME[h.tok] };
-      if (m2.t === 'tok' && ANIM && !UI.fast) UI.anim = { c: m2.c, k: 'hop', until: Date.now() + 700 };
-      render(); if (m2.t === 'tok') { if (best && best.d > 0) pop(m2.c, nm + ' +' + best.d + ' ' + cinfo(best.a).title, 'ani', ['.cc[data-card="' + best.a + '"]', '#seats .seat[data-seat="' + seat + '"]']); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
-      UI.aiT = setTimeout(function () { UI.showAI = null; if (!G) return; UI.view = meSeat(); fitView(); render(); step(); }, D(1000));
+      if (UI.inset && m2.t === 'tok') UI.inset.tok = m2.c;
+      UI.showAI = { seat: UI.view, text: m2.t === 'tok' ? nm + ' puts the ' + WM.ANI_NAME[h.tok] + ' on a tile' + (G.last && G.last.acorn ? ' (+1 acorn)' : '') : nm + ' returns the ' + WM.ANI_NAME[h.tok] };
+      render(); if (m2.t === 'tok') { if (best && best.d > 0) pop(m2.c, nm + ' +' + best.d + ' ' + cinfo(best.a).title, 'ani', ['#rinset:not([hidden])', '#seats .seat[data-seat="' + seat + '"]']); sfx(G.last && G.last.acorn ? 'acorn' : 'tok'); }
+      UI.aiT = setTimeout(function () { UI.showAI = null; UI.inset = null; if (!G) return; if (UI.view !== meSeat()) { UI.view = meSeat(); fitView(false, true); } render(); step(); }, D(1000));
     }, D(900));
   }, D(slow ? 1100 : AIDELAY * 0.8));
 }
@@ -228,14 +227,19 @@ function safeRect() {
   return r;
 }
 var HEX_MIN = 44;   // never shrink a hex below 44 px across (a finger's width)
-function fitView(now) {
-  if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env), spots = (G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : [];
+function fitView(now, force) {   // F2: your own valley gets one frame per turn (set when your turn starts, kept while you choose); now/force = refit anyway
+  if (!G) return; var env = G.seats[UI.view].env, cells = Object.keys(env), tut = typeof tutOn === 'function' && tutOn(), hum = !G.seats[UI.view].ai;
+  var key = UI.view + ':' + G.seats[UI.view].done;
+  if (!now && !force && !tut && hum && UI.turnFit === key && !G.over) { edgeArrows(); return; }
+  UI.turnFit = key;
+  var spots = tut ? ((G.stage === 'tile' && UI.view === G.cur && !G.seats[G.cur].ai) ? WM.spots(env) : []) : hum && !G.over ? WM.spots(env) : [];
   function box(list) { var b = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 }; list.forEach(function (c) { var p = pix(c); b.x0 = Math.min(b.x0, p[0]); b.x1 = Math.max(b.x1, p[0]); b.y0 = Math.min(b.y0, p[1]); b.y1 = Math.max(b.y1, p[1]); }); return b; }
   var sr = safeRect(), aw = sr.r - sr.l, ah = sr.b - sr.t, zMin = Math.max(ZMIN, HEX_MIN / (SZ * SQ3));
   function zFor(b) { return Math.min(aw / (b.x1 - b.x0 + SZ * SQ3 + 4), ah / (b.y1 - b.y0 + SZ * 2 + 4)); }
   var b = box(cells.concat(spots)), z = Math.min(2.5, zFor(b));
-  if (z < zMin && spots.length) { var bs = box(spots); b = bs; z = Math.max(zMin, Math.min(1, zFor(bs))); }   // the whole valley cannot fit: fit the legal spots
-  z = Math.max(z, zMin);
+  if (z < zMin && spots.length) { var bc = box(cells), zc = zFor(bc); if (zc >= zMin) { b = bc; z = Math.min(2.5, zc); } }   // valley + spots too big: the whole valley (spots outside get edge arrows)
+  if (z < zMin && !tut) { b = box(cells); z = Math.max(zMin * 0.86, zFor(b)); }   // still too big: shrink a little further rather than crop your valley (taps snap to the nearest spot)
+  else z = Math.max(z, zMin);
   if (!isFinite(z) || b.x0 > b.x1) z = 1;
   var t = { z: z, tx: sr.l + aw / 2 - (b.x0 + b.x1) / 2 * z, ty: sr.t + ah / 2 - (b.y0 + b.y1) / 2 * z };
   var fc = typeof tutOn === 'function' && tutOn() && spots.length && UI.tut.spot && spots.indexOf(UI.tut.spot) >= 0 ? UI.tut.spot : null;   // tutorial: its one glowing spot is always fully in view
@@ -415,13 +419,26 @@ function render() {
   if (!G) return;
   var plc = myTurn() && (G.stage === 'tile' || G.stage === 'tok'), de = document.documentElement;   // placing: the market folds away so the valley gets the room
   if (de.classList.contains('wm-placing') !== plc) { de.classList.toggle('wm-placing', plc); UI.plcFit = 1; }
-  hintsSync(); renderDock(); renderTop(); drawMap(); cardWhyRender();
+  hintsSync(); renderDock(); renderTop(); drawMap(); cardWhyRender(); insetRender();
   if (UI.plcFit) { UI.plcFit = 0; setTimeout(function () { if (G) fitView(); }, 0); }
   if (window.GXH && GXH.phase) try { GXH.phase(window.GXT && GXT.running() || UI.mode === 'quick' || UI.mode === 'coach' ? null : myTurn() ? (G.stage === 'pick' && G.seats[G.cur].acorns > 0 && !UI.prefs.seenAcorn ? 'acorn' : G.stage) : null); } catch (e) { }
   artApply();
   if (typeof coachCheck === 'function') coachCheck();
 }
 UI.redraw = function () { if (G) render(); };
+// F2: the rival's turn plays in a small inset of their valley (the new tile and animal ringed); your own view never moves. Tap it to look closer.
+function insetRender() {
+  var bd = $('#board'), e = $('#rinset'); if (!bd) return; if (!e) { e = document.createElement('button'); e.type = 'button'; e.id = 'rinset'; bd.appendChild(e); }
+  var I = UI.inset; if (!I || !G || G.over || I.seat === UI.view || UI.fast) { e.hidden = true; e.innerHTML = ''; return; }
+  var env = G.seats[I.seat].env, out = '', x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  Object.keys(env).sort(function (a, b) { return WM.pk(a)[1] - WM.pk(b)[1]; }).forEach(function (c) { var x = env[c], p = pix(c), nw = c === I.c || c === I.tok;
+    x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
+    out += '<g>' + tileSvg(x, p[0], p[1], SZ - 1, x.rot, { tok: x.tok, noSlots: 1 }) + (nw ? '<polygon class="nwr" points="' + poly(p[0], p[1], SZ - 3, [0, 1, 2, 3, 4, 5]) + '"/>' : '') + '</g>'; });
+  var m = SZ + 4; x0 -= m; y0 -= m; x1 += m; y1 += m;
+  e.innerHTML = '<svg viewBox="' + x0.toFixed(0) + ' ' + y0.toFixed(0) + ' ' + (x1 - x0).toFixed(0) + ' ' + (y1 - y0).toFixed(0) + '" aria-hidden="true">' + out + '</svg><span>' + esc(G.seats[I.seat].name) + "'s valley</span>";
+  e.dataset.seat = I.seat; e.setAttribute('aria-label', G.seats[I.seat].name + "'s valley: tap to look closer"); e.hidden = false;
+  var sr = safeRect(); e.style.top = Math.round(sr.t) + 'px';
+}
 // ---------------------------------------------------------------- drawers: scores, rules, cards
 function scoresHTML() {   // every source with its why, you vs the rivals (also the end screen's walk-through)
   var sc = G.over ? G.res : WM.final(G), h = '<table class="st why"><tr><th>Source</th>' + G.seats.map(function (s, i) { return '<th>' + esc(i === meSeat() ? 'You' : s.name) + '</th>'; }).join('') + '</tr>';
@@ -583,7 +600,8 @@ document.addEventListener('click', function (e) {
   if (t.classList.contains('ea')) { panTo(t.dataset.c); return; }
   if (t.classList.contains('cc')) { cardWhy(t.getAttribute('data-card')); return; }
   if (t.id === 'whatB') { var bb = document.getElementById('bulbbtn'); if (bb) bb.click(); return; }
-  if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(); return; }
+  if (t.classList.contains('seat')) { UI.view = +t.dataset.seat; render(); fitView(false, true); return; }
+  if (id === 'rinset') { UI.view = +t.dataset.seat; render(); fitView(false, true); return; }
   switch (id) {
     case 'storyB': storyOpen(); break;
     case 'quickB': UI.sv = 'setup'; showTitle(); break;
@@ -606,7 +624,7 @@ document.addEventListener('click', function (e) {
     case 'okB': confirmPlace(); break;
     case 'undoB': undoTake(); break;
     case 'backB': if (!tutOK({ what: 'back' })) break; act({ t: 'back' }); break;
-    case 'fitB': fitView(); break;
+    case 'fitB': fitView(false, true); break;
     case 'zinB': var wh = boardWH(); zoomAt(1.25, wh[0] / 2, wh[1] / 2); break;
     case 'zoutB': var wh2 = boardWH(); zoomAt(0.8, wh2[0] / 2, wh2[1] / 2); break;
   }
