@@ -56,7 +56,15 @@ function whyNotSite(x) {
   return VG.siteCost(x).indexOf('plane') >= 0 ? 'Needs a Plane: play a Plane card, or pay ' + (G.planeCost || 2) + ' coins.' : 'You cannot pay this travel yet. Cards with the same icon pay it; 2 coins buy a Plane.';
 }
 // ---------------------------------------------------------------- input: tap selects (it lifts, the line says what it does), tap again does it; or drag it
-function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
+/* F16: one tap acts in real games (the guided tutorial keeps its own steps); a 4 s Undo puts the game back as it was, and the rival waits for it */
+function oneTapOk(k) { return (k === 'hand' || k === 'row' || k === 'site' || k === 'track') && !(UI.mode === 'tutorial' && !UI.coachFree) && UI.humans.length === 1; }
+function actUndo(m) { const snap = JSON.stringify(G), wl = JSON.stringify(UI.whyL || {}); act(m); if (!G || G.phase !== 'play') return; UI.undo = { s: snap, wl, until: Date.now() + 4000 }; undoShow(); }
+function undoShow() { let b = $('#undob'); if (!b) { b = document.createElement('button'); b.type = 'button'; b.id = 'undob'; b.dataset.a = 'undo'; b.textContent = '↶ Undo'; document.body.appendChild(b); }
+  b.hidden = false; clearTimeout(undoShow.t); undoShow.t = setTimeout(undoEnd, Math.max(0, UI.undo.until - Date.now())); }
+function undoEnd() { UI.undo = null; const b = $('#undob'); if (b) b.hidden = true; }
+function undoDo() { const u = UI.undo; if (!u || Date.now() > u.until + 300) { undoEnd(); return; } clearTimeout(schedule.t); clearTimeout(turnWait.t); turnWait.fn = null; clearTimeout(undoShow.t);
+  G = JSON.parse(u.s); UI.whyL = JSON.parse(u.wl); undoEnd(); UI.busy = false; UI.sel = null; try { fxHide(); } catch (e) { } document.querySelectorAll('.vpop').forEach(e => e.remove()); save(); render(); $('#prompt').textContent = 'Undone. ' + promptLine(legal()); };
+function act(m) { if (!m) return; if (!tutAct({ what: 'mv', m })) return; undoEnd(); UI.sel = null; try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } closeInsp(); doMove(m); }
 function pick(k, x, id) {
   if (!G) return;
   if (k === 'guard' || k === 'idol' || k === 'asst') { if (!tutAct({ what: k, x })) return; sfx.play('tap'); openInsp(k, x); return; }
@@ -65,6 +73,7 @@ function pick(k, x, id) {
   if (k === 'site' && S && S.k === 'pawn') { const m = ms.find(z => z.t === 'dig' || z.t === 'disc'); if (m) { act(m); return; } }
   const same = S && S.k === k && (k === 'track' || S.x === x);
   if (same && ms.length === 1) { act(ms[0]); return; }
+  if (!same && ms.length === 1 && oneTapOk(k)) { if (!tutAct({ what: k, x, id })) return; actUndo(ms[0]); return; }   /* F16: one tap plays it, with a short Undo (no tap-then-button) */
   if (same && k === 'pawn') { UI.sel = null; render(); return; }
   if (!tutAct({ what: k, x, id })) return;
   sfx.play('tap'); UI.sel = { k, x, at: G.turns + ':' + G.round + ':' + G.p[UI.view].hand.length }; render();
@@ -115,7 +124,7 @@ $('#iscrim').addEventListener('click', () => { if (typeof GXT !== 'undefined' &&
 document.addEventListener('keydown', e => { if (e.key !== 'Escape') return; if (UI.insp) closeInsp(); else if (UI.sel) { UI.sel = null; render(); } });
 /* a tap on empty board drops the selection */
 document.addEventListener('click', e => { if (!UI.sel || !G) return; if (e.target.closest('[data-a],#dock,.gx-bar,#insp,.gx-drawer,.gxt-cell,.gxt-bub')) return; if (e.target.closest('#board')) { UI.sel = null; render(); } });
-const UIACT = {};
+const UIACT = {}; UIACT.undo = () => undoDo();
 UIACT.hints = () => { UI.prefs.hints = !UI.prefs.hints; savePrefs(); if (window.GXH) try { GXH.setEnabled(hintsOn()); if (!hintsOn()) GXH.hide(); } catch (e) { } render(); };
 function tutAct(x) { if (typeof GXT === 'undefined' || !GXT.active() || UI.mode !== 'tutorial') return true; if (UI.coachFree) return true;   /* coached game: every legal move is allowed */ return GXT.act(Object.assign({ type: 'tap' }, x)); }
 // ---------------------------------------------------------------- moves and the computer
@@ -142,17 +151,21 @@ function after() {
 function aiDelay() { const b = typeof GX !== 'undefined' && GX.aiDelay ? GX.aiDelay(650) : 650; return UI.fast ? 0 : UI.quick ? 150 : b; }
 function schedule() {
   clearTimeout(schedule.t); if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
-  schedule.t = setTimeout(aiStep, aiDelay());
+  const uw = UI.undo ? UI.undo.until - Date.now() : 0;   /* F16: the rival waits while Undo is open */
+  schedule.t = setTimeout(aiStep, Math.max(aiDelay(), uw > 0 ? uw + 50 : 0));
 }
 function finishSolo() {   /* the rest of the rivals' round at once; one line says how many moves they made */
   const r0 = G.round; let n = 0;
   while (G.phase === 'play' && !isHuman(VG.actor(G)) && n < 400) { const s = VG.actor(G), m = VAI.choose(G, G.p[s].ai || 'normal'); const r = m ? VG.apply(G, m) : { ok: false }; if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); } n++; }
   UI.quick = false; G.ev = []; save(); UI.busy = false; rivalCap(''); fxHide();
+  if (n) rlogAdd(-2, (G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')));
   if (n && G.phase === 'play') toast((G.p.length > 2 ? 'The rivals' : G.p[1].name) + (G.round !== r0 ? ' finished the round.' : ' played ' + n + ' more ' + (n > 1 ? 'moves.' : 'move.')), 1400);   /* F14 (R93): no toast over the game-over score floats */
   after();
 }
 function aiStep() {
   if (!G || G.phase !== 'play') return; const s = VG.actor(G); if (isHuman(s)) return;
+  if (UI.undo && UI.undo.until > Date.now()) { schedule(); return; }
+  undoEnd();
   if (!UI.rivalT0) UI.rivalT0 = Date.now();   /* the wait budget counts from the end of the human's move, guardian card included */
   if (!$('#fx').hidden) { schedule.t = setTimeout(aiStep, 200); return; }   /* the guardian card is still up: wait for it */
   /* every human has passed: the rivals finish the round briskly; after 3 s the rest happens at once (no wait over 4 s) */
@@ -170,7 +183,7 @@ function aiStep() {
     const b = snapS(s), W = whyPre(), F = m ? fxBefore(m, s) : {};
     const r = m ? VG.apply(G, m) : { ok: false };
     if (!r.ok) { const ms = VG.moves(G); VG.apply(G, ms.find(x => x.t === 'pass') || ms[ms.length - 1]); }
-    const d = showEvents(s); whyPost(W); save(); render(); if (typeof coachRival === 'function') coachRival(m);
+    const d = showEvents(s); whyPost(W); if (m) rlogAdd(s, cap); save(); render(); if (typeof coachRival === 'function') coachRival(m);
     if (!UI.fast) { $('#prompt').textContent = cap; actFx(m, s, F, b); }
     turnWait(UI.fast ? 0 : UI.quick ? 420 : Math.min(Math.max(d, 1000), 1500), () => { UI.busy = false; rivalCap(''); after(); });   /* step 2: the result stays readable before the next step */
   });
@@ -207,17 +220,39 @@ function moveCaption(m, s) {
 function snapS(s) { if (!G || s < 0 || !G.p[s]) return null; const p = G.p[s]; return { res: Object.assign({}, p.res), sc: VG.score(G, s) }; }
 const SC_WHY = { research: 'research', temple: 'temple tile', idols: 'idol', slots: 'shrine slot', guards: 'guardian', cards: 'card points', fear: 'Dread card' };
 /* F15: every score change says where it came from: "+6: idols +3, research +3" */
-const CAT_W = { research: 'research', temple: 'temple tile', idols: 'idols', slots: 'shrine slots', guards: 'guardians', cards: 'card points', fear: 'Dread cards' };
+const CAT_W = { research: 'research', temple: 'temple tile', idols: 'idols', slots: 'shrine slots', guards: 'guardians', cards: 'card stars', fear: 'Dread' };
 function catWhy(a, b) { return Object.keys(CAT_W).filter(k => (a[k] || 0) !== (b[k] || 0)).map(k => { const d = (a[k] || 0) - (b[k] || 0); return CAT_W[k] + ' ' + (d > 0 ? '+' : '') + d; }).join(', '); }
 function rivalShort() { return G.rival ? G.rival.name.replace(/'s (expedition|crew)$/, '').replace(/ expedition$/, '') : 'Rival'; }
 function whyPre() { return { me: snapS(VG.actor(G)), s: VG.actor(G), rt: G.rival ? VG.rivalScore(G) : 0, n: G.log.length }; }
 function whyPost(w) {   /* after a move: remember the mover's points and the rival's, each with its cause (shown in the strip, the prompt and the round card) */
   UI.whyL = UI.whyL || {}; let mine = '';
-  if (w.me && w.s >= 0) { const a = VG.score(G, w.s), dv = a.total - w.me.sc.total; if (dv) { const nm = w.s === UI.view && UI.humans.length === 1 ? 'You' : short(w.s); mine = (dv > 0 ? '+' : '') + dv + ': ' + catWhy(a, w.me.sc); UI.whyL[w.s] = nm + ' ' + mine; } }
+  if (w.me && w.s >= 0) { const a = VG.score(G, w.s), dv = a.total - w.me.sc.total; if (dv) { const nm = w.s === UI.view && UI.humans.length === 1 ? 'You' : short(w.s); mine = (dv > 0 ? '+' : '') + dv + ': ' + catWhy(a, w.me.sc); UI.whyL[w.s] = nm + ' ' + mine + (UI.humans.indexOf(w.s) >= 0 ? whyFirst(a, w.me.sc) : ''); } }
   if (G.rival) { const dr = VG.rivalScore(G) - w.rt; if (dr) { const ln = G.log.slice(w.n).filter(l => l.s === -2).map(l => l.t.replace(/^.*? (overcomes|discovers|climbs|studies|takes)/, '$1').replace(/\.$/, '')).join('; ');
     UI.whyL[-2] = rivalShort() + ' ' + (dr > 0 ? '+' : '') + dr + (ln ? ': ' + ln : ''); } }
   return mine;
 }
+/* F16: every point source in plain words; the first time one moves for you, the line says what it is */
+const PT_HELP = { research: ['research', 'The higher you climb the research track, the more points at the end.'], temple: ['temple tile', 'Temple tiles: bought at the top of the research track. Points at once.'],
+  idols: ['idols', 'Each idol is 3 points. You find one when you explore a new ruin.'], slots: ['shrine slots', 'Your board has 4 shrine slots, worth 1, 1, 1 and 2 points while empty. Using an idol\'s gift fills a slot and its points go.'],
+  guards: ['guardians', 'Beat a guardian for 5 points: pay its cost while your explorer is at its ruin.'], cards: ['card stars', 'Cards with a star badge are worth that many points at the end.'],
+  fear: ['Dread', 'Each Dread card is -1 point. You get one when a guardian is still awake at your site when the round ends.'] };
+function whyFirst(a, b) { UI.seenCat = UI.seenCat || {}; const k = Object.keys(PT_HELP).find(k => (a[k] || 0) !== (b[k] || 0) && !UI.seenCat[k]); Object.keys(PT_HELP).forEach(k => { if ((a[k] || 0) !== (b[k] || 0)) UI.seenCat[k] = 1; }); return k ? ' (' + PT_SHORT[k] + ')' : ''; }
+const PT_SHORT = { research: 'higher = more points', temple: 'top of research', idols: '3 each', slots: 'empty slots score', guards: '5 each', cards: 'stars score at end', fear: '-1 each' };
+/* phone rule: a line is at most 8 words; an aside goes first, then the line is cut (the tap shows it all) */
+function nWords(t) { return (String(t).match(/[A-Za-z]+/g) || []).length; }
+function fit8(t) { t = String(t || ''); if (nWords(t) <= 8) return t; const u = t.replace(/\s*\([^)]*\)/g, ''); if (nWords(u) <= 8) return u; let n = 0; return u.split(/(\s+)/).filter(w => { if (/[A-Za-z]/.test(w)) n++; return n <= 8; }).join('').replace(/[\s,;:]+$/, '') + '…'; }
+function myPtsLine() { const me = UI.view, a = VG.score(G, me), parts = Object.keys(PT_HELP).filter(k => a[k]).map(k => a[k] + ' ' + PT_HELP[k][0]), nm = (UI.humans.length === 1 ? 'You ' : short(me) + ' ') + a.total, t = nm + ' = ' + (parts.join(' + ') || '0'); return nWords(t) <= 6 ? t : nm + ' points'; }
+function rlogLine() { const L = UI.rlog || []; return L.length ? L[L.length - 1].t : (G.rival || G.p.some(p => p.ai) ? 'Rival moves show here.' : ''); }
+UIACT.pts = () => {   /* F16: where every point comes from, in plain words, plus the rival's last moves */
+  closeInsp(); const me = UI.view, a = VG.score(G, me), g = $('#ptsheet') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'ptsheet', className: 'ov' }));
+  const li = Object.keys(PT_HELP).map(k => `<li><b>${a[k] || 0}</b><span><b>${esc(PT_HELP[k][0][0].toUpperCase() + PT_HELP[k][0].slice(1))}.</b> ${esc(PT_HELP[k][1])}</span></li>`).join('');
+  const rl = (UI.rlog || []).slice(-6).reverse().map(x => `<li><span>Round ${x.r}: ${esc(x.t)}</span></li>`).join('');
+  g.innerHTML = `<div class="tbox gbox ptbox" role="dialog" aria-label="Where points come from"><h2 class="gl">${esc(myPtsLine())}</h2><p class="gh">Where points come from</p><ul class="gu ptl">${li}</ul>
+    ${rl ? `<p class="gh">Rival's last moves</p><ul class="gu rll">${rl}</ul>` : ''}<button type="button" class="tbtn" data-a="ptsx">Back to the game</button></div>`;
+  g.hidden = false; g.onclick = e => { if (e.target === g) UIACT.ptsx(); };
+};
+UIACT.ptsx = () => { const g = $('#ptsheet'); if (g) g.hidden = true; };
+addEventListener('keydown', e => { if (e.key === 'Escape') UIACT.ptsx(); });
 function whyText() { return Object.keys(UI.whyL || {}).map(k => UI.whyL[k]).join('  ·  '); }
 function diffText(s, b) {
   if (!b || !G || s < 0) return null; const a = snapS(s), res = [];
@@ -306,7 +341,10 @@ function tickPts(s, from) {
   requestAnimationFrame(st);
 }
 /* the rival's move in one line on the board, where your eyes are */
-function rivalCap(t) {
+/* F16: the rival's moves stay in a short log line under the scores (tap: the last moves and the score detail) instead of a pop-up that vanishes */
+function rlogAdd(s, cap) { if (!cap) return; UI.rlog = UI.rlog || []; UI.rlog.push({ r: G.round, t: cap }); if (UI.rlog.length > 30) UI.rlog.shift(); }
+function rivalCap(t) { const e = $('#rcap'); if (e) e.classList.remove('on'); }
+function rivalCapOld(t) {
   if (t && yourTurnNow()) t = '';   /* F12: a rival's caption never sits on the map during your turn */
   if (t && G && G.phase === 'over') t = '';   /* F14 (R93): at game over the score walk speaks, no caption on top of it */
   let e = $('#rcap'); if (!e) { e = document.createElement('div'); e.id = 'rcap'; e.setAttribute('aria-hidden', 'true'); document.body.appendChild(e); }

@@ -146,6 +146,7 @@ function tutGlow(L) {
 function render() {
   if (!G) return; if (yourTurnClear()) { const t = $('#toast'); if (t) t.classList.remove('on'); } if (myTurn()) document.querySelectorAll('.aimark').forEach(e => e.classList.remove('aimark'));   /* the rival's mark never sits beside your glow */ UI.mv = []; const L = legal(), q = G.q && myTurn() ? G.q : null, me = G.p[UI.view];
   const actor = VG.actor(G);
+  document.body.classList.toggle('vg-learn', !!UI.learn && G.phase === 'play'); document.body.dataset.lr = Math.min(G.round, 4);
   if (UI.sel && (!myTurn() || UI.sel.at !== G.turns + ':' + G.round + ':' + G.p[UI.view].hand.length)) UI.sel = null;
   const S = UI.sel || {};
   $('#barstat').textContent = G.phase === 'over' ? 'Game over' : (UI.camp ? 'Stage ' + UI.camp.id.slice(1) + ' · ' : '') + 'Round ' + G.round + ' of ' + G.rounds;
@@ -157,7 +158,7 @@ function render() {
   $('#opp').className = 'n' + (G.p.length + (G.rival ? 1 : 0));
   $('#opp').innerHTML = G.p.map((p, i) => chip(i, i === UI.view && UI.humans.length === 1 ? 'You' : p.name.split(' ')[0] === 'Dr' ? p.name.split(' ')[1] : p.name.split(' ')[0], tots[i], p.ex, actor === i && G.phase === 'play', p.passed, lead === i)).join('')
     + (G.rival ? chip(-2, G.rival.name.replace(/'s (expedition|crew)$/, ''), VG.rivalScore(G), null, false, false, false) : '')
-    + (typeof whyText === 'function' && whyText() && G.phase === 'play' ? `<div class="why" id="whyline" aria-live="off">${esc(whyText())}</div>` : '');
+    + (typeof myPtsLine === 'function' && G.phase === 'play' ? `<button type="button" class="why" id="whyline" data-a="pts" aria-label="Where points come from"><span class="w1">${esc(fit8((UI.whyL && UI.whyL[UI.view]) || myPtsLine() + '. Tap for more'))}</span><span class="w2" id="rlog">${esc(fit8(rlogLine()))}</span></button>` : '');   /* F16: from turn 1, why your score moved + the rival's last move; tap for detail */
   // sites: deep ruins, ruins, camp (nearest your tray)
   const GL = glowSet(L, q), gl = m => GL.indexOf(m) >= 0 ? 1 : 2;   /* the strongest few moves glow; other legal ones get a faint ring (R29: following the glow scores well) */
   const gS = {}; L.forEach(m => { if (m.s != null && (m.t === 'dig' || m.t === 'disc' || m.t === 'beat')) gS[m.s] = Math.min(gS[m.s] || 2, gl(m)); });
@@ -246,7 +247,7 @@ function renderTray(L, q, me, actor) {
   $('#extra').innerHTML = ex; $('#extra').hidden = !ex; document.body.classList.toggle('vg-hasex', !!ex); exFit();
   const play = {}; L.forEach(m => { if (m.t === 'play') play[m.i] = Math.min(play[m.i] || 2, gl(m)); });
   $('#hand').classList.toggle('many', me.hand.length > 5);
-  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: q ? 0 : play[i], sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(i - (me.hand.length - 1) / 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
+  $('#hand').innerHTML = me.hand.length ? me.hand.map((id, i) => cardHTML(id, { a: 'hand', i, glow: q ? 0 : play[i], sel: S && S.k === 'hand' && S.x === i }).replace('<button ', `<button style="--k:${(me.hand.length > 5 ? i - (me.hand.length - 1) / 2 : i - 2).toFixed(1)}" `)).join('') : '<span class="empty">No cards in hand. Your deck refills next round.</span>';
 }
 /* F12: the chip strip scrolls sideways when it is full; an edge fades where more chips wait, and a glowing chip is scrolled into view */
 function exFit() {
@@ -303,7 +304,7 @@ function promptLine(L) {
   if (!L.some(m => m.t !== 'pass')) return 'Nothing left to do. Tap Pass.';
   if (!L.some(m => m.t !== 'pass' && !m.free)) return 'A free play is left: tap what glows, or Pass.';   /* F12 (R69): never "nothing left" while a free card glows */
   const nr = researchNudge(); if (nr) return nr;
-  return (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. What glows is a strong move.');
+  return (UI.mode === 'tutorial' || UI.mode === 'hot' ? 'Your turn. Tap or drag what glows.' : 'Your turn. Gold rings mark strong moves.');
 }
 /* research is the big lever (R25): when climbing (or a temple tile) is about as strong as your best move, the prompt says so, with the reason, and the track pulses */
 function researchNudge() {
@@ -311,7 +312,7 @@ function researchNudge() {
   try { const ev = evalMoves(); if (!ev.length) return ''; const r = ev.find(x => x.m.t === 'res' || x.m.t === 'temple'); if (!r || ev[0].v - r.v > 0.6) return '';
     if (r.m.t === 'temple') return 'Temple tile: points now. Tap Research.';
     const me = G.p[UI.view], row = (r.m.k === 'g' ? me.glass : me.note) + 1, T = V.TRACK[row], gift = T && Object.keys(T.bonus || {}).length;
-    return gift ? 'Climb research: a gift now, points later.' : 'Climb research: big points at the end.'; } catch (x) { return ''; }
+    return gift ? 'Research now: a bonus, and points later.' : 'Research now: big points at the end.'; } catch (x) { return ''; }
 }
 function qPrompt(q) { return { exile: 'Exile a card, or skip.', or: 'Choose one effect.', buy: 'Tap a glowing card to buy it cheaper.', site: 'Tap a glowing site to dig for free.', asst: (G.p[UI.view].apend > 0 ? 'Hire an assistant. Once a round, free.' : 'Upgrade an assistant to gold.'), tbon: 'You found the temple! Take a bonus tile.' }[q.h] || 'Choose.'; }
 function qHTML(q) {

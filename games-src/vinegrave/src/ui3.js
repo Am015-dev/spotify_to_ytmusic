@@ -9,8 +9,10 @@ function startGame(mode, o) {
   }
   G = VG.newGame({ np, seats, seed: o.seed, solo: !!o.solo, rivalLevel: o.rivalLevel || o.lvl, rivalName: o.rivalName, twist: o.twist || null, rounds: o.rounds });
   if (mode !== 'tutorial') UI.coachFree = false;   /* the coach belongs to the tutorial game only */
-  UI.flat = innerWidth < 1000 && innerHeight < 700; UI.whyL = {}; UI.rbase = null; UI.rcardDue = false;
+  UI.flat = innerWidth < 1000 && innerHeight < 700; UI.whyL = {}; UI.rlog = []; UI.seenCat = {}; UI.undo = null; UI.rbase = null; UI.rcardDue = false;
   UI.mode = mode; UI.humans = seats.map((s, i) => s.ai ? -1 : i).filter(i => i >= 0); UI.view = UI.humans[0] || 0; UI.camp = o.camp || null;
+  UI.learn = mode !== 'tutorial' && !UI.camp && UI.humans.length === 1 && !(UI.prefs.games > 0);   /* F16: the first real game teaches one idea per round */
+  if (mode !== 'tutorial') UI.prefs.games = (UI.prefs.games || 0) + 1;
   UI.prefs.played = UI.prefs.played || mode !== 'tutorial'; savePrefs();
   enterGame();
   if (window.GXH) try { GXH.setEnabled(hintsOn()); GXH.hide(); } catch (e) { }
@@ -65,7 +67,16 @@ function campBest(id, sc) {
 }
 UIACT.look = () => closeRes();
 UIACT.iam = () => { UI.view = VG.actor(G); $('#pass').hidden = true; render(); };
-function showGoal() {   /* F15: one card before turn 1: "How you score", the main point sources in 4 lines */
+/* F16: one new idea per round in the first game; ideas not taught yet are drawn quieter */
+const LEARN = { 1: ['Travel and dig', 'Tap a glowing card to play it, or a glowing site to send an explorer there. Digging gives coins, compasses and more to spend.'],
+  2: ['Guardians and idols', 'Exploring a new ruin finds an idol (3 points) and wakes a guardian. Pay its cost to beat it: 5 points. One still awake at round end gives you Dread (-1).'],
+  3: ['Research', 'Pay to climb the track on the right. Each row up is worth more points at the end. Some spaces give a bonus now.'],
+  4: ['Cards and stars', 'Buy market cards: items cost coins, artifacts cost compasses. A star badge is points at the end. "Need 2" means you are 2 short.'] };
+function learnHTML(n) { const L = UI.learn && LEARN[n]; return L ? `<div class="learn"><p class="gh">New this round</p><p class="lt"><b>${esc(L[0])}.</b> ${esc(L[1])}</p></div>` : ''; }
+function showGoal() {
+  if (UI.learn) { const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
+    g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="Your first expedition"><h2 class="gl">Most points after ${G.rounds} rounds wins.</h2>${learnHTML(1)}<p class="gs">The line under the scores always says why your points moved. Tap it for detail.</p><button type="button" class="tbtn" data-a="goalgo">Start round 1</button></div>`;
+    g.hidden = false; UI.busy = true; render(); return; }   /* F15: one card before turn 1: "How you score", the main point sources in 4 lines */
   const g = $('#goal') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'goal', className: 'ov' }));
   const q = V.STORY.quick.intro, flavour = UI.camp && UI.camp.twist ? UI.camp.twist.text : q[(G.rng >>> 0) % q.length];
   g.innerHTML = `<div class="tbox gbox" role="dialog" aria-label="How you score"><h2 class="gl">${UI.camp ? esc(UI.camp.goal.text) : 'Most points after ' + G.rounds + ' rounds wins.'}</h2>
@@ -87,13 +98,13 @@ function nextTip(mineW, rivW, me, cur) {   /* what to try next: the source the r
 function showRoundCard(n) {
   const cur = scoreCats(), base = UI.rbase || {}, me = UI.humans[0] || 0, d0 = { research: 0, cards: 0, total: 0 };
   const rows = []; let mineW = '', rivW = '';
-  const row = (i, name) => { const a = cur[i], b = base[i] || d0, d = a.total - (b.total || 0); let w = catWhy(a, b); if (i === -2) w = w.replace('card points', 'guardians and cards'); if (i === me) mineW = w; if (i === -2) rivW = w;
+  const row = (i, name) => { const a = cur[i], b = base[i] || d0, d = a.total - (b.total || 0); let w = catWhy(a, b); if (i === -2) w = w.replace('card stars', 'guardians and cards'); if (i === me) mineW = w; if (i === -2) rivW = w;
     return `<div class="rcrow${i === me ? ' me' : ''}"><span class="rcn">${esc(name)}</span><b class="rcd">${d >= 0 ? '+' : ''}${d}</b><span class="rcw">${esc(w || 'no new points')}</span><span class="rct">${a.total} in all</span></div>`; };
   G.p.forEach((p, i) => rows.push(row(i, UI.humans.length === 1 && i === me ? 'You' : short(i))));
   if (G.rival) rows.push(row(-2, rivalShort()));
   const tip = UI.humans.length === 1 ? `<p class="gf">${esc(nextTip(mineW, rivW, me, cur))}</p>` : '';
   const g = $('#rcard') || document.body.appendChild(Object.assign(document.createElement('div'), { id: 'rcard', className: 'ov' }));
-  g.innerHTML = `<div class="tbox gbox rcbox" role="dialog" aria-label="Round ${n} scored"><h2 class="gl">Round ${n} scored</h2><div class="rcrows">${rows.join('')}</div>${tip}<button type="button" class="tbtn" data-a="rcgo">Round ${n + 1}</button></div>`;
+  g.innerHTML = `<div class="tbox gbox rcbox" role="dialog" aria-label="Round ${n} scored"><h2 class="gl">Round ${n} scored</h2><div class="rcrows">${rows.join('')}</div>${UI.learn && LEARN[n + 1] ? learnHTML(n + 1) : tip}<button type="button" class="tbtn" data-a="rcgo">Round ${n + 1}</button></div>`;
   document.querySelectorAll('.vpop').forEach(e => e.remove()); g.hidden = false; UI.busy = true; UI.rcardDue = false;
   clearTimeout(showRoundCard.t); if (navigator.webdriver) showRoundCard.t = setTimeout(() => { if (!g.hidden) UIACT.rcgo(); }, 4000);   /* scripted players only: a person reads it and taps on */
 }

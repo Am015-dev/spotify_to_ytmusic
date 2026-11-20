@@ -759,3 +759,31 @@ body.vg-b2 #map.flat .site .gd{width:38px;height:38px;left:-3px;bottom:auto;top:
 body.vg-b2 #map.flat .site .nm{display:none}
 body.vg-b2 #map.flat .site.sel{transform:translate(-50%,-50%) scale(1.15)}
 body.vg-b2 #map.flat .site.l2 .cost{padding:0 1px;top:calc(50% - 2px)}
+/* F16: glow you can see on a phone (inset ring is never clipped by the hand or market strip) */
+.site.glow,.cd.glow,#track.glow,body.vg-b2 .site.glow{box-shadow:inset 0 0 0 3px #ffd36a,0 0 0 2px #ffd36a,0 0 14px 4px rgba(255,211,106,.85)}
+#row .cd.mc.glow{box-shadow:inset 0 0 0 3px #ffd36a,0 0 0 2px #ffd36a,0 0 14px 4px rgba(255,211,106,.85)}
+/* F16: first game, ideas not taught yet are quieter (a glowing move stays bright) */
+body.vg-learn[data-lr="1"] #track:not(.glow),body.vg-learn[data-lr="2"] #track:not(.glow){opacity:.5;filter:saturate(.5)}
+body.vg-learn[data-lr="1"] .site .gd{opacity:.55}
+body.vg-learn:not([data-lr="4"]) #row .cd.mc:not(.glow) .mvp,body.vg-learn:not([data-lr="4"]) #row .cd.mc:not(.glow) .need{opacity:.45}
+body.vg-learn:not([data-lr="4"]) #row .cd.mc:not(.glow){filter:saturate(.7)}
+.learn{margin:2px 0;padding:8px 10px;border-radius:10px;background:rgba(255,211,106,.12);border:1px solid rgba(255,211,106,.45)}
+.learn .gh{margin:0 0 3px}.learn .lt{margin:0;font-size:16px;line-height:1.35;color:#f5ead0}.learn .lt b{color:#ffd36a}
+/* F16: why your score moved + the rival's last move: two lines, one 44 px tap */
+#opp .why{display:flex;flex-direction:column;justify-content:center;gap:1px;min-height:44px;padding:3px 10px;font:inherit;text-align:left;border:1px solid rgba(217,164,65,.45);cursor:pointer;color:#f3e6bf}
+#opp .why span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px;line-height:18px}
+#opp .why .w1{font-weight:800;color:#ffe9b0}#opp .why .w2{font-weight:600;color:#d9cfb0}
+@media (max-width:999px) and (max-height:600px){#opp .why{display:flex;min-height:30px;flex-direction:row;gap:10px}#opp .why span{font-size:12px;flex:1 1 50%;min-width:0}}
+#rcap{display:none!important}
+.ptbox{max-height:calc(100dvh - 28px);overflow:auto}.ptl li>b{flex:none;min-width:28px;text-align:right;color:#ffd36a;font-size:18px}.rll li{font-size:14px!important}
+#ptsheet{z-index:62}
+/* F16: Undo after a one-tap move */
+#undob{position:fixed;z-index:72;right:12px;bottom:calc(env(safe-area-inset-bottom) + 150px);min-height:44px;min-width:88px;padding:0 14px;border-radius:22px;border:2px solid #ffd36a;background:#2a1f14;color:#ffe9b0;font:800 15px/1 inherit;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#undob[hidden]{display:none}
+/* F16: no empty art box on the result card */
+.rbox .rart:not(.hasart){display:none}
+/* F16: the hand never re-centres under your finger */
+#hand{justify-content:flex-start!important}
+/* F16: on PC a chooser (research spaces, a question) opens over the hand, so the dock never grows and the island keeps its height */
+@media (min-width:1000px){#qbox:not([hidden]){grid-area:auto!important;grid-column:2!important;grid-row:1 / span 4!important;align-self:start;z-index:6;max-height:100%;overflow:auto;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+  #undob{bottom:24px;right:24px}}
