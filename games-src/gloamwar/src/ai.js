@@ -91,7 +91,7 @@ function scoreTop(G, s, m, L) {
     case 'charmove': return 2 + waste;
     case 'nzmove': var rr = riderRegions(G).indexOf(F.loc) >= 0; return (F.road < 0 && !rr && F.hid ? 6.2 : 1.2);
     case 'dip': var p = G.pol[m.n]; return (s === 'G' ? 6 : 5) + (p.s === 1 ? 2.5 : 0) - (natSide(m.n) === 'D' && !p.a ? 1 : 0) + (m.n === 'sh' || m.n === 'au' ? 0.7 : 0) + waste;
-    case 'recruit': return 4.4 + (s === 'G' ? 0.8 : 0) + waste;
+    case 'recruit': var res = 0; NAT_ORDER.forEach(function (n) { if (natSide(n) === s && atWar(G, n)) res += G.R[n][0] + G.R[n][1]; }); return 4.2 + (s === 'G' ? 1.2 + Math.min(2.5, res / 10) : Math.min(1.5, res / 12)) + waste;
     case 'minion': return 10;
     case 'hero': return 10.5;
     case 'draw': return G.hand[s].length >= 6 ? 0.5 : 3.2 - G.hand[s].length * 0.2 + waste;
@@ -99,7 +99,8 @@ function scoreTop(G, s, m, L) {
     case 'amove': case 'lmove': return amoveGain(G, s, m) + waste;
     case 'attack': case 'lattack': case 'sortie':
       var best = -9, ts = m.a === 'sortie' ? [m.from] : attackTargets(G, s, m.from, m.a === 'lattack');
-      ts.forEach(function (to) { var o = battleOdds(G, s, m.from, to); var sc = (o.r - 1.35) * 6 + (o.r >= 1.2 ? settleVal(to) * 3 : 0) + (o.ud <= 1 ? 1 : 0) - (settleVal(to) === 0 ? 1 : 0); if (sc > best) best = sc; });
+      ts.forEach(function (to) { if (to === m.from && inAt(G, to) && armySide(G.IN[to]) !== s) { var ua = units(atWarPart(G, G.A[to])), ud = units(G.IN[to]); var ss = 2.5 + settleVal(to) * 2.5 + (ua - ud) * 0.6 - (ua < ud + 1 ? 4 : 0); if (ss > best) best = ss; return; }
+        var o = battleOdds(G, s, m.from, to); var sc = (o.r - 1.35) * 6 + (o.r >= 1.2 ? settleVal(to) * 3 : 0) + (o.ud <= 1 ? 1 : 0) - (settleVal(to) === 0 ? 1 : 0); if (sc > best) best = sc; });
       return best + 2.5 + waste;
   }
   return 0;
@@ -131,7 +132,7 @@ function aiPick(G, L) {
     return { t: 'cdone' };
   }
   if (G.phase === 'hunt') {
-    var hr = huntRange(G), want = F.road >= 0 ? 3 : gateDist(F.loc) - F.prog <= 3 ? 3 : 2; if (L === 'easy') want = Math.max(1, want - 1); if (G.turn === 1) want = Math.max(hr[0], 1);
+    var hr = huntRange(G), want = F.road >= 0 ? 3 : gateDist(F.loc) - F.prog <= 3 ? 3 : 2; if (companions(G).length >= 5 && G.turn >= 3) want++; if (L === 'easy') want = Math.max(1, want - 1); if (G.turn === 1) want = Math.max(hr[0], 1);
     return { t: 'hunt', n: Math.max(hr[0], Math.min(hr[1], want)) };
   }
   // action phase
@@ -178,8 +179,8 @@ function battleChoice(G, s, ms, L) {
       cards.sort(function (a, b) { return b._v - a._v; }); return cards[0]._v > 0.5 || units(foe) >= 4 ? cards[0] : { t: 'bcard', c: null };
     case 'cont': return { t: r >= 0.9 || units(foe) <= 1 ? 'cont' : 'cease' };
     case 'retreat': var rt = ms.filter(function (m) { return m.t === 'retreat'; }); var w = ms.filter(function (m) { return m.t === 'walls'; })[0]; if (r < 0.6 && w) return w; if (r < 0.5 && rt.length && settleVal(B.to) < 1) return rt[0]; return { t: 'stand' };
-    case 'extend': return { t: units(me) > units(foe) * 1.5 && bElites(me) > 0 ? 'extend' : 'stop' };
-    case 'advance': return evalMoves(G, s, ms, 'hard');
+    case 'extend': return { t: units(me) >= units(foe) + 2 && bElites(me) > 0 ? 'extend' : 'stop' };
+    case 'advance': if (inAt(G, B.to) && armySide(G.IN[B.to]) !== s && units(me) >= units(G.IN[B.to]) + 1) return { t: 'adv' }; return evalMoves(G, s, ms, 'hard');
   }
   return ms[0];
 }
