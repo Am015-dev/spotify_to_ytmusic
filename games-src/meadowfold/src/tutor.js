@@ -12,18 +12,18 @@ function tutStart() {
   UI.tab = 'row'; render();
 }
 var TUT_STEPS = [
-  { say: 'Tap the glowing pocket. You take its 3 tokens.', ok: function (m) { return m.t === 'take' && m.i === 0; } },
-  { say: 'Tap a glowing hex. Leaves on their own are a tree.', sel: 'leaf', ok: function (m) { return m.t === 'place' && G0hand(m) === 'leaf' && m.k === '2,2'; }, only: '2,2' },
+  { say: 'Tap the glowing pocket to take 3 tokens.', ok: function (m) { return m.t === 'take' && m.i === 0; } },
+  { say: 'Place the leaves: a small tree.', sel: 'leaf', ok: function (m) { return m.t === 'place' && G0hand(m) === 'leaf' && m.k === '2,2'; }, only: '2,2' },
   { say: 'Put the water beside the tree.', sel: 'water', ok: function (m) { return m.t === 'place' && G0hand(m) === 'water' && m.k === '1,1'; }, only: '1,1' },
-  { say: 'The grey token is a mountain. Place it here.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
-  { say: 'Now invite an animal. Tap the duck card below.', tab: 'row', ok: function (m) { return m.t === 'card'; }, card: 0 },
-  { say: 'Its home is ready! Tap the duck card.', tab: 'mine', ok: function (m) { return m.t === 'cube'; }, wantSel: true },
-  { say: 'Great! Tap End turn. The rival plays next.', ok: function (m) { return m.t === 'end'; } },
+  { say: 'Grey is a mountain. Place it here.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
+  { say: 'Invite an animal: tap the duck card.', tab: 'row', ok: function (m) { return m.t === 'card'; }, card: 0 },
+  { say: 'Its home is ready! Tap the duck.', tab: 'mine', ok: function (m) { return m.t === 'cube'; }, wantSel: true },
+  { say: 'Great! Tap End turn. The rival plays.', ok: function (m) { return m.t === 'end'; } },
   { say: 'Take the pocket with two grey tokens.', ok: function (m) { return m.t === 'take'; }, pocketHas: 'mount' },
-  { say: 'Stack grey on grey: a taller mountain scores more.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
-  { say: 'Mountains only score next to another mountain.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,2'; }, only: '3,2' },
-  { say: 'A trunk lifts leaves higher. Bigger trees score more.', sel: 'trunk', ok: function (m) { return m.t === 'place'; } },
-  { say: 'You know the basics. Finish the game! Hint helps.', end: true }
+  { say: 'Stack grey on grey: taller scores more.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,3'; }, only: '3,3' },
+  { say: 'Mountains score only beside another mountain.', sel: 'mount', ok: function (m) { return m.t === 'place' && m.k === '3,2'; }, only: '3,2' },
+  { say: 'Trunks lift leaves: taller trees score more.', sel: 'trunk', ok: function (m) { return m.t === 'place'; } },
+  { say: 'Now finish the game. Hint helps.', end: true }
 ];
 function G0hand(m) { return m && m.h != null && TUT && TUT.lastHand ? TUT.lastHand[m.h] : null; }
 function tutCur() { return TUT && TUT_STEPS[TUT.i]; }

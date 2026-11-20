@@ -166,7 +166,7 @@ function trackHTML(id, left) {
 function spiritText(k) { return { fieldsBig: 'Fields: 2 each, 10 if 3+', fieldsAll: 'Every field group: 5', trees23: 'Trees 2-3 high: +4 each', trees331: 'Trees: 3 / 3 / 1 by height', buildGroups: 'Building groups: +4 each', buildGroups2: 'Groups of 2+ buildings: +6', mount23: 'Peaks 2-3 high: +4 each', mount331: 'Peaks: 3 / 3 / 1 by height', waterGroups: 'Water groups of 2+: +7', waterEach: 'Every water token: +2' }[k]; }
 function cardHTML(id, o) {
   o = o || {}; var c = E.card(id);
-  return '<button type="button" class="acard' + (c.pts ? '' : ' spirit') + (o.sel ? ' sel' : '') + (o.ready ? ' ready' : '') + (o.hint ? ' hint' : '') + (o.dim ? ' dim' : '') + '" ' + (o.attr || '') + ' aria-label="' + esc(c.name) + (o.ready ? ', home ready' : '') + '">' +
+  return '<button type="button" class="acard' + (c.pts ? '' : ' spirit') + (o.sel ? ' sel' : '') + (o.ready ? ' ready' : '') + (o.hint ? ' hint' : '') + (o.dim ? ' dim' : '') + (o.can || o.ready ? ' playable' : '') + '" ' + (o.attr || '') + ' aria-label="' + esc(c.name) + (o.ready ? ', home ready' : '') + '">' +
     '<span class="ahead"><svg viewBox="0 0 30 30" aria-hidden="true">' + ART.defs('a' + id) + ART.animal(c.an, 15, 15, 24, c.pts ? '#7a5a44' : '#7b5aa8', 'a' + id) + '</svg><span class="nm">' + esc(c.name.replace(/^Spirit of the /, '')) + '</span></span>' +
     cardSVG(id) + trackHTML(id, o.left) + (o.ready ? '<span class="rdy">Home ready</span>' : '') + '</button>';
 }
@@ -188,7 +188,7 @@ function renderDock() {
     '<button type="button" role="tab" class="tab' + (UI.tab === 'mine' ? ' on' : '') + '" data-tab="mine" aria-selected="' + (UI.tab === 'mine') + '">' + (s.name === 'You' ? 'Your' : esc(s.name) + '\'s') + ' cards <em>' + act + '/4</em></button></div>';
   h += '<div class="cards">';
   if (UI.tab === 'row') {
-    G.row.forEach(function (id, i) { var hint = UI.hintMove && UI.hintMove.t === 'card' && UI.hintMove.i === i; h += cardHTML(id, { attr: 'data-row="' + i + '"', hint: hint, dim: !canTake }); });
+    G.row.forEach(function (id, i) { var hint = UI.hintMove && UI.hintMove.t === 'card' && UI.hintMove.i === i; h += cardHTML(id, { attr: 'data-row="' + i + '"', hint: hint, dim: !canTake, can: canTake }); });
     if (!G.row.length) h += '<span class="hn">No animals left to invite.</span>';
   } else {
     if (s.spirit && !s.spirit.placed) { var rs = mine && Object.keys(E.cubeSpots(s, s.spirit.id)).length; h += cardHTML(s.spirit.id, { attr: 'data-ci="S"', sel: UI.sel && UI.sel.ci === 'S', ready: rs }); }
@@ -227,14 +227,14 @@ function toast(t) { var e = $('#toast'); e.textContent = t; e.classList.add('on'
 function onTap(e) {
   var t = e.target;
   if (UI.dragged && Date.now() - UI.dragged < 400) return;
-  var seatB = t.closest('[data-seat]'); if (seatB) { UI.view = +seatB.dataset.seat; UI.sel = null; render(); return; }
+  var seatB = t.closest('[data-seat]'); if (seatB) { if (UI.mode === 'tut' && TUT) { toast('Finish the lesson first.'); return; } var v = +seatB.dataset.seat; if (v === UI.view) { toast(v === firstHuman() ? 'This is your valley.' : 'Showing ' + G.seats[v].name + '.'); return; } UI.view = v; UI.sel = null; render(); toast(v === G.cur || v === firstHuman() ? 'Back to your valley.' : 'Showing ' + G.seats[v].name + '. Tap your name to return.'); return; }
   if (!G) return;
   var p = t.closest('[data-pocket]'); if (p) { if (myTurn()) act({ t: 'take', i: +p.dataset.pocket }); return; }
   var ht = t.closest('[data-h]'); if (ht && myTurn()) { UI.sel = { kind: 'tok', h: +ht.dataset.h }; SND.card(); render(); return; }
-  var tb = t.closest('[data-tab]'); if (tb) { UI.tab = tb.dataset.tab; render(); return; }
+  var tb = t.closest('[data-tab]'); if (tb) { var same = UI.tab === tb.dataset.tab; UI.tab = tb.dataset.tab; render(); if (same) bump('[data-tab="' + UI.tab + '"]'); return; }
   var rw = t.closest('[data-row]'); if (rw) { bigCard(+rw.dataset.row); return; }
-  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; render(); if (UI.sel && !$$('#map .glow').length) toast('Build its habitat first. The dashed hex is its home.'); return; }
-  if (ci) { return; }
+  var ci = t.closest('[data-ci]'); if (ci && myTurn()) { var v = ci.dataset.ci === 'S' ? 'S' : +ci.dataset.ci; UI.sel = (UI.sel && UI.sel.kind === 'card' && UI.sel.ci === v) ? null : { kind: 'card', ci: v }; render(); if (UI.sel && !$$('#map .glow').length) toast('Build its habitat first: see the dashed hex.'); return; }
+  if (ci) { var sv = G.seats[UI.view], cid = ci.dataset.ci === 'S' ? sv.spirit.id : (sv.cards[+ci.dataset.ci] || {}).id; if (cid) bigCard(null, cid); return; }
   var hx = t.closest('[data-k]');
   if (hx && myTurn()) {
     var k = hx.dataset.k;
@@ -270,20 +270,21 @@ function dragInit() {
   }
   document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
 }
+function bump(sel) { var e = $(sel); if (!e) return; e.classList.add('bump'); setTimeout(function () { e.classList.toggle('bump', false); }, 350); }
 function shake(el) { SND.bad(); el.classList.add('no'); setTimeout(function () { el.classList.remove('no'); }, 400); }
 function flashPockets() { $$('#central .pocket').forEach(function (p) { p.classList.add('hint'); setTimeout(function () { p.classList.remove('hint'); }, 900); }); }
-function bigCard(i) {
-  var id = G.row[i], c = E.card(id), s = E.seat(), T = G.turn, mine = myTurn();
-  var can = mine && E.legal({ t: 'card', i: i }), fits = Object.keys(E.cubeSpots(s, id)).length;
-  var why = !mine ? 'Wait for your turn.' : T.tookCard ? 'One animal per turn.' : T.swapped ? 'You swapped a card this turn.' : E.active(s) >= 4 ? 'You hold 4 cards: finish one first.' : '';
+function bigCard(i, idOnly) {
+  var id = idOnly || G.row[i], c = E.card(id), s = idOnly ? G.seats[UI.view] : E.seat(), T = G.turn, mine = myTurn() && !idOnly;
+  var can = mine && E.legal({ t: 'card', i: i }) && (UI.mode !== 'tut' || !window.tutAllow || tutAllow({ t: 'card', i: i })), fits = Object.keys(E.cubeSpots(s, id)).length;
+  var why = idOnly ? '' : !mine ? 'Wait for your turn.' : (UI.mode === 'tut' && TUT && !can) ? 'Follow the lesson first.' : T.tookCard ? 'One animal per turn.' : T.swapped ? 'You swapped a card this turn.' : E.active(s) >= 4 ? 'You hold 4 cards: finish one first.' : '';
   var b = document.createElement('div'); b.className = 'bigc';
   b.innerHTML = '<div class="bigtop"><svg viewBox="0 0 60 60" aria-hidden="true">' + ART.defs('bg') + ART.animal(c.an, 30, 30, 50, '#7a5a44', 'bg') + '</svg><div><h3>' + esc(c.name) + '</h3><p>Build this habitat. The animal lives on the dashed hex. Turn it any way.</p></div></div>' +
-    cardSVG(id, null, true) + trackHTML(id, c.pts.length) +
+    cardSVG(id, null, true) + trackHTML(id, c.pts ? c.pts.length : 0) +
     '<p class="trk">Each animal you settle uncovers the next number. You score the highest one showing.</p>' +
-    '<p class="fit">' + (fits ? 'Fits your valley now: ' + fits + (fits > 1 ? ' homes.' : ' home.') : 'Not on your valley yet.') + '</p>' +
+    (!c.pts ? '<p class="fit">' + spiritText(c.sc) + '</p>' : '') + '<p class="fit">' + (fits ? 'Fits this valley now: ' + fits + (fits > 1 ? ' homes.' : ' home.') : 'Not on your valley yet.') + '</p>' +
     (why ? '<p class="why">' + why + '</p>' : '') +
     '<div class="bigacts">' + (can ? '<button type="button" class="btn primary" id="takeB">Invite this animal</button>' : '') + (mine && G.solo && E.legal({ t: 'swap', i: i }) ? '<button type="button" class="btn ghostb" id="swapB">Swap for a new card</button>' : '') + '</div>';
-  GX.drawer('bigd', 'Animal card', b, false); GX.show('bigd');
+  GX.drawer('bigd', c.pts ? 'Animal card' : 'Spirit card', b, false); GX.show('bigd');
   var tk = $('#takeB'); if (tk) tk.onclick = function () { GX.close(); act({ t: 'card', i: i }); };
   var sw = $('#swapB'); if (sw) sw.onclick = function () { GX.close(); act({ t: 'swap', i: i }); };
 }
@@ -316,7 +317,7 @@ function hint() {
 function scoreRows(s) { var sc = E.score(s); return [['Trees', sc.trees], ['Mountains', sc.mounts], ['Fields', sc.fields], ['Buildings', sc.builds], [G.side === 'A' ? 'River (' + sc.river + ')' : 'Islands (' + sc.islands + ')', sc.water], ['Animals', sc.animals], ['Spirit', sc.spirit], ['Total', sc.total]]; }
 function scoresHTML() {
   var rows = scoreRows(G.seats[0]).map(function (r, j) { return '<tr' + (j === 7 ? ' class="tot"' : '') + '><th>' + r[0].replace(/ \(.*/, '') + '</th>' + G.seats.map(function (s) { return '<td>' + scoreRows(s)[j][1] + '</td>'; }).join('') + '</tr>'; }).join('');
-  return '<table class="sct"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>' + rows + '</table><p class="small">' + (G.side === 'A' ? 'River = longest line of water.' : 'Islands = land areas split by water.') + ' Pouch: ' + E.bagCount() + ' tokens.</p>';
+  return '<table class="sct"><tr><th></th>' + G.seats.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr>' + rows + '</table><p class="small">' + (G.side === 'A' ? 'River: longest line of water.' : 'Islands: land split by water.') + '</p>';
 }
 function showResults() {
   if (!G || !G.over || !G.result) return;
@@ -326,7 +327,7 @@ function showResults() {
   else t = (G.seats[win[0]].ai ? G.seats[win[0]].name + ' wins' : (humans() > 1 ? G.seats[win[0]].name + ' wins!' : 'You win!'));
   SND.end();
   var p = $('#rs'); p.hidden = false;
-  p.innerHTML = '<div class="rsc"><h2>' + esc(t) + '</h2>' + (G.solo ? '<p class="suns">' + '☀'.repeat(Math.min(10, R.suns.total)) + '</p><p class="small">' + R.scores[0].total + ' points = ' + R.suns.base + ' suns, +' + R.suns.bonus + ' for ' + (G.side === 'A' ? 'side A' : 'side B') + (G.seats[0].spirit ? ' and your spirit' : ' and no spirit') + '.</p>' : '') +
+  p.innerHTML = '<div class="rsc"><h2>' + esc(t) + '</h2>' + (G.solo ? '<p class="suns">' + '☀'.repeat(Math.min(10, R.suns.total)) + '</p><p class="small">' + R.scores[0].total + ' points: ' + R.suns.base + ' suns, +' + R.suns.bonus + ' bonus.</p>' : '') +
     scoresHTML() + '<div class="bigacts"><button type="button" class="btn primary" id="againB">Play again</button><button type="button" class="btn ghostb" id="lookB">See the valleys</button><button type="button" class="btn ghostb" id="titleB">Title</button></div></div>';
   $('#againB').onclick = function () { newGame(Object.assign({}, UI.cfg, { seed: null })); };
   $('#lookB').onclick = function () { p.hidden = true; render(); };
@@ -362,7 +363,7 @@ function showTitle() {
     '<label>Board side</label>' + seg('side', [['A', 'A: river'], ['B', 'B: islands']], c.side) +
     '<label>Spirit cards</label>' + seg('spirits', [['false', 'Off'], ['true', 'On']], c.spirits) +
     '<button type="button" class="btn primary big" id="goB">Start game</button></div></div>';
-  $$('[data-set]', st).forEach(function (b) { b.onclick = function () { var k = b.dataset.set, v = b.dataset.v; c[k] = k === 'np' ? +v : k === 'spirits' ? v === 'true' : v; if (k === 'mode') c.np = v === 'hot' ? Math.max(2, c.np) : c.np; showTitle(); }; });
+  $$('[data-set]', st).forEach(function (b) { b.onclick = function () { var k = b.dataset.set, v = b.dataset.v, same = b.classList.contains('on'); c[k] = k === 'np' ? +v : k === 'spirits' ? v === 'true' : v; if (k === 'mode') c.np = v === 'hot' ? Math.max(2, c.np) : c.np; showTitle(); if (same) bump('[data-set="' + k + '"][data-v="' + v + '"]'); }; });
   $('#goB').onclick = function () { startFromSetup(); };
   $('#tutB').onclick = function () { if (window.tutStart) tutStart(); };
   var rb = $('#resB'); if (rb) rb.onclick = function () { if (!load()) newGame(); };
