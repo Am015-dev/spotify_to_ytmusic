@@ -168,7 +168,8 @@ function bfClone(g){return JSON.parse(JSON.stringify({fac:g.fac,ctr:g.ctr,marker
 const bfFocus=()=>{try{return focusSeat()}catch(e){return 0}};
 // ---------- timing: tap anywhere during an animation to speed it up ----------
 function bfAnimOK(){return !!ANIM&&typeof Element!=='undefined'&&!!Element.prototype.animate&&!/jsdom/i.test(navigator.userAgent)}
-function bfD(ms){return ms*(BF.fast?.22:BF.tile&&!UI.tut?.3:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
+function bfD(ms){return ms*(BF.fast?.22:BF.tile&&!UI.tut?(BF.rd?.6:.3):1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
+function bfWaitR(ms){return bfAnimOK()?new Promise(r=>setTimeout(r,ms*(BF.fast?.22:1))):Promise.resolve()}   // real time (a tap still skips it)
 function bfWait(ms){return bfAnimOK()&&ms>0?new Promise(r=>setTimeout(r,bfD(ms))):Promise.resolve()}
 function bfTrack(a){BF.anims.push(a);if(BF.fast)a.playbackRate=4;const done=()=>{const i=BF.anims.indexOf(a);if(i>=0)BF.anims.splice(i,1)};a.finished.then(done,done);return a}
 function bfSpeedUp(){if(BF.fast)return;BF.fast=true;for(const a of BF.anims)try{a.playbackRate=4}catch(e){}}
@@ -271,7 +272,8 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
   if(brk.length||hadSun){if(focus){for(const o of brk){const el=o.to&&bfEl(o.to);if(el){el.classList.remove('crash');void el.offsetWidth;el.classList.add('crash')}}
       const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
     else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
-    if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(focus?(brk.length?820:420):(brk.length?300:0))}
+    if(brk.length)sfx('floor');if(hadSun&&!UI.tut&&!bfTipSeen('sunfloor')){bfTipMark('sunfloor');BF.say=focus&&pl&&pl.human?'☀ The Sun token goes to your floor (−1)':`☀ The Sun token goes to ${pl.nm}'s floor (−1)`;bfDraw();await bfWaitR(1500)}
+    if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(focus?(brk.length?820:420):(brk.length?300:0))}
   else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(100)}
   if(focus&&pl&&pl.human)BF.seen.took=1}
 // end of round: each full rack sends one tile to the wall; the lines it joins light up and the points pop
@@ -284,7 +286,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   if(!focus){bfDraw();BF.rv=BF.rv&&BF.rv.p===x.p?BF.rv:{p:x.p,marks:[]};BF.rv.marks.push({r:x.r,c:x.c,pts:x.pts});p.score+=x.pts;bfScore(x.p,p.score);bfRival();sfx('wall',Math.min(3,x.pts));await bfWait(300);
     const sv=BF.tbl&&BF.tbl.querySelector('.bf-rvw svg');if(sv){const b=sv.getBoundingClientRect(),k=b.width/512;bfPop('+'+x.pts,{left:b.left+(x.c*100+6)*k,top:b.top+(x.r*100+6)*k,width:100*k,height:100*k},'good',true)}
     bfChipPop(x.p,'+'+x.pts,'good');await bfWait(950);return}
-  BF.rv=null;BF.hide=new Set([wk]);bfDraw();
+  BF.rv=null;BF.hide=new Set([wk]);bfDraw();BF.rd=!UI.tut;
   const mover=from[0],others=from.slice(1);
   const fl=[bfFly(mc,mover.r,bfR(bfSlot(wk)),{dur:620,lift:28})];others.forEach((o,i)=>fl.push(bfDrop(o.t,o.r,{delay:240+i*60})));
   await fl[0];bfShow(wk);await Promise.all(fl);
@@ -292,7 +294,9 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   for(let i=0;i<run.length;i++){const [r,c]=run[i];const el=bfSlot(`w${x.p}_${r}_${c}`);if(el){el.style.setProperty('--d','0ms');el.classList.add('lit')}
     const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
   bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){if(x.pts>=6)bfBanner('Great chain! +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
-  await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
+  if(UI.tut){await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520)}
+  else{await bfWaitR(420);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWaitR(180)}   // each tile: the +N stays readable (about 0.4 s); a tap skips ahead
+  BF.rd=false;
   if(UI.tut)await tutPause('wall'+x.r,x);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
@@ -417,13 +421,18 @@ function bfGuide(hp){clearTimeout(BF.idleT);
   if(hp&&G.phase==='offer'&&!G.over){try{if(!UI.tut&&phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
     if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
 // ---------- input: everything is a tap on the thing itself ----------
+// stray taps: the menu and the board pop-ups ignore a tap that is probably meant for the board. While a tile is picked the tap only puts it back;
+// right after a take, a rack tap or a tutorial bubble tap (0.9 s) it does nothing; in the guided game they stay shut (Skip tutorial is the way out)
+function bfStray(){if(typeof tutOn==='function'&&tutOn())return true;if(UI.sel){UI.sel=null;UI.tgt=null;UI.adv=null;try{upd()}catch(e){}return true}
+  return Date.now()-(BF.tAct||0)<900}
+document.addEventListener('pointerdown',e=>{if(e.target&&e.target.closest&&e.target.closest('.bf-table [data-k],[data-bfrow],.gxt-bub'))BF.tAct=Date.now()},true);
 function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
 function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return;const t=e.target;if(t.closest('[data-help]'))return;if(window.__hlpDown&&Date.now()-window.__hlpDown<700){window.__hlpDown=0;return}const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();BF.root.classList.toggle('tapfx');return}   // W466: a tap during the rival's move speeds it up (and shows it: the line gets a fast-forward mark)
   if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
-  const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
+  const chip=t.closest('[data-bfchip]');if(chip){if(bfStray())return;BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
   if(!G||G.over)return;const hp=me();if(!hp){bfShake(BF.hint);return}BF.fingerOn=false;   // W466: not your turn: the line nudges ("Tamsin is choosing")
   if(G.phase==='wall'){let c=t.closest('[data-bfcell]');if(e.clientX!=null&&(c||t.closest('.bf-me'))){let bd=30;for(const el of BF.root.querySelectorAll('[data-bfcell]')){const r=el.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;c=el}}}if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
   if(G.phase!=='offer')return;
@@ -442,7 +451,7 @@ function bfClick(e){if(BF.dragEnd&&Date.now()-BF.dragEnd<450&&!e.__bfdrag)return
   const row=t.closest('[data-bfrow]');if(row){const r=+row.dataset.bfrow;if(!UI.sel){sfx('bad');BF.fingerOn=true;bfDraw();return}const m=movesFor(UI.sel).find(m=>m.line===r);if(m)return go(m);sfx('bad');bfShake(row);if(r<5){const why=phReason(hp,r,UI.sel.c);bfPop(why==='full'?'Rack is full':why.startsWith('holds')?'Rack holds another colour':'Wall row has it',bfR(row),'bad')}return}
   if(UI.sel){UI.sel=null;UI.tgt=null;UI.adv=null;upd()}}
 function bfAct(a){switch(a){
-  case 'menu':BF.menu=!BF.menu;BF.peek=null;sfx('click');bfDraw();return;
+  case 'menu':if(!BF.menu&&bfStray())return;BF.menu=!BF.menu;BF.peek=null;sfx('click');bfDraw();return;
   case 'boss':BF.boss=!BF.boss;BF.menu=false;BF.peek=null;sfx('click');bfDraw();return;
   case 'close':BF.menu=false;BF.peek=null;BF.boss=false;if(G&&G.over)BF.resHide=true;bfDraw();return;
   case 'res':BF.resHide=false;bfDraw();return;
