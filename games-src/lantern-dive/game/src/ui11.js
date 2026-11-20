@@ -32,12 +32,12 @@ const HLP_STEPS = {
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Tap a button below. Each one says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who takes every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or skip.', pic: () => HP.flare() },
-  pass: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
+  pass: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Pass a card', text: 'Tap a colour card to pass to your neighbour. No Lanterns.', pic: () => HP.c(1, 5) },
   predict: { target: hfirst('#acts .btn'), title: 'Predict your tricks', text: 'Tap how many tricks you will win. You need exactly that many.', pic: () => HP.num('?') },
   signal: { target: hfirst('#acts [data-a=signal]', '#acts [data-a=nosig]'), title: 'Signal your crew', text: 'Tap Signal to show a card, or tap No signal.', pic: () => HP.ping('') },
-  lead: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
-  follow: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
-  free: { target: hfirst('#hand .hc.glow', '#hand .hc'), title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
+  lead: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'You lead', text: 'Tap a glowing card to play it. Everyone follows its colour.', pic: () => HP.c(0, 7) },
+  follow: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Follow the colour', text: 'Play the led colour. Dim cards are blocked.', pic: () => HP.c(1, 6) },
+  free: { target: () => hhull('#hand .hc.glow')() || hfirst('#hand .hc')(),   /* F1: the bubble points at the whole playable group, so it never sits on one of them */ title: 'Play anything', text: 'You have none of that colour. Play any card. A Lantern wins the trick.', pic: () => HP.lan(2) },
   drone: { target: hfirst('#opp .dc.can', '#opp .dc'), title: 'Play for the drone', text: 'The drone is on your team. Tap one of its glowing cards.', pic: () => HP.drone() }
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
@@ -53,19 +53,19 @@ const HLP_RULES = [
   { phase: 'vote', title: 'Vote', text: 'Vote for the diver who takes every job. You may vote for yourself.', pic: () => hpics([['vote', 'Your vote'], '>', ['job', 'All jobs']]) },
   { phase: 'vote', title: 'No card talk', text: 'Talk about the plan. Never talk about your cards.', pic: () => hpics([['hand', 'Hidden'], ['cross', 'No talk']]) },
   { phase: 'flare', title: 'The distress flare', text: 'Optional. Before signals, every diver passes one colour card to a neighbour.', pic: () => hpics([['flare', 'Flare'], '>', ['c', 'Pass', 2, 5]]) },
-  { phase: 'flare', title: 'Left or right', text: 'Everyone passes the same way. You cannot pass Lanterns.', pic: () => hpics([['c', 'Left', 3, 3], ['lan', 'Never', 3]]) },
+  { phase: 'flare', title: 'Left or right', text: 'Everyone passes the same way. Two divers swap. No Lanterns.', pic: () => hpics([['c', 'Left', 3, 3], ['lan', 'Never', 3]]) },
   { phase: 'flare', title: 'It costs an attempt', text: 'The flare adds one attempt to the logbook. Skipping it is fine.', pic: () => hpics([['flare', 'Flare'], '>', ['num', 'Extra try', '+1']]) },
   { phase: 'pass', title: 'Pass a card', text: 'Pick a colour card to pass to your neighbour. You cannot pass Lanterns.', pic: () => hpics([['c', 'Pass', 2, 6], '>', ['vote', 'Neighbour']]) },
   { phase: 'pass', title: 'Pass to help', text: 'Pass a card their jobs need. Keep the cards yours need.', pic: () => hpics([['job', 'Their job'], '>', ['c', 'Give', 1, 8]]) },
   { phase: 'predict', title: 'An exact count', text: 'Win exactly the number of tricks you predicted.', pic: () => hpics([['num', 'Predict', 2], '>', ['tick', 'Exactly 2']]) },
   { phase: 'predict', title: 'Count your strength', text: 'High cards and Lanterns win tricks. Few of them? Predict low.', pic: () => hpics([['lan', 'Wins', 3], ['c', 'Wins', 0, 9], ['c', 'Loses', 0, 2]]) },
-  { phase: 'signal', title: 'The signal', text: 'Once per dive, show one colour card to the crew. It stays in your hand.', pic: () => hpics([['c', 'Your card', 1, 9], '>', ['ping', 'Shown', 'top']]) },
+  { phase: 'signal', title: 'The signal', text: 'Once per attempt, show one colour card to the crew. It stays in your hand.', pic: () => hpics([['c', 'Your card', 1, 9], '>', ['ping', 'Shown', 'top']]) },
   { phase: 'signal', title: 'Highest, lowest, only', text: 'Show only your highest, lowest or only card of a colour. The token says which.', pic: () => hpics([['ping', 'Highest', 'top'], ['ping', 'Only', 'mid'], ['ping', 'Lowest', 'bot']]) },
   { phase: 'signal', title: 'Between tricks only', text: 'Signal between tricks only. You cannot show Lanterns.', pic: () => hpics([['lan', 'Never', 2], ['ping', 'Between tricks', 'mid']]) },
   { phase: 'lead', title: 'Leading a trick', text: 'Lead any card. Everyone must follow its colour if they can.', pic: () => hpics([['c', 'You lead', 0, 5], '>', ['c', 'Follow', 0, 8]]) },
   { phase: 'lead', title: 'Who wins a trick', text: 'The highest card of the led colour wins. Other colours never win. The winner leads next.', pic: () => hpics([['c', 'Led', 2, 4], ['c', 'Higher', 2, 9], ['c', 'Never wins', 1, 9]]) },
   { phase: 'lead', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. The highest Lantern wins.', pic: () => hpics([['c', 'Colour', 3, 9], ['lan', 'Beats it', 2]]) },
-  { phase: 'lead', title: 'Show a card (signal)', text: 'Once per dive, between tricks, show your highest, lowest or only card of a colour.', pic: () => hpics([['c', 'Colour card', 1, 9], '>', ['ping', 'Signal', 'top']]) },
+  { phase: 'lead', title: 'Show a card (signal)', text: 'Once per attempt, between tricks, show your highest, lowest or only card of a colour.', pic: () => hpics([['c', 'Colour card', 1, 9], '>', ['ping', 'Signal', 'top']]) },
   { phase: 'follow', title: 'Follow the colour', text: 'If you have the led colour, you must play it. Dim cards are blocked.', pic: () => hpics([['c', 'Led', 1, 4], '>', ['c', 'You play', 1, 7]]) },
   { phase: 'follow', title: 'You never have to win', text: 'Play low to let a teammate win.', pic: () => hpics([['c', 'Low', 1, 2], ['c', 'High', 1, 9]]) },
   { phase: 'follow', title: 'Lanterns are trumps', text: 'A Lantern beats every colour. The highest Lantern wins.', pic: () => hpics([['c', 'Colour', 1, 9], ['lan', 'Beats it', 1]]) },
@@ -121,7 +121,7 @@ function hlpPlan() {
   if (G.phase === 'play' && m.t === 'play') {
     const T = G.trick; if (G.players[T.turn].helper || ctlSeat(T.turn) !== v) return null;
     const card = () => document.querySelector('#hand .hc[data-id="' + m.c + '"]'), slot = () => document.querySelector('.tslot[data-seat="' + v + '"]') || document.querySelector('#felt');
-    return { m, from: card, to: slot, why: () => hlpPlayWhy(v, m.c) };
+    return { m, to: card, why: () => hlpPlayWhy(v, m.c) };   // F1: the bubble points at the card to play (in the hand), so it never sits on the trick it talks about
   }
   if (G.phase === 'assign' && m.t === 'take') {
     const el = () => document.querySelector('#pool [data-key="job' + m.i + '"]');
@@ -134,6 +134,7 @@ function hlpPlan() {
   return null;
 }
 function hlpSuggest() {
+  try { fingerDone(); } catch (e) { }   // F1: one helper at a time: the bulb's bubble replaces the ghost finger
   const p = hlpPlan(); if (!p || !p.to || !p.to()) return null;
   const why = p.why(); if (!why || capW(why, 15) === '') return null;
   return { why, key: p.m.t + ':' + (p.m.c !== undefined ? p.m.c : p.m.i !== undefined ? p.m.i : p.m.on), target: p.to, from: p.from && p.from() ? p.from : null };
@@ -142,7 +143,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'lantern-dive', defaultOn: false, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn,#opp .dc.can,.tc,#hand .hc,.me,.seat,.jcard,.gx-ibtn' });
+  GXH.init({ game: 'lantern-dive', defaultOn: false, tapFirst: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,.pspot,#acts .btn,#opp .dc.can,.tc,.tslot,#lead,#hand .hc,.jcard,.gx-bar' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
   try { GXH.setEnabled(!!UI.prefs.hints); } catch (e) { }
   applyHints();
@@ -154,4 +155,4 @@ function applyHints() {
   document.documentElement.classList.toggle('hintsoff', !on);
 }
 function hintsToggle() { UI.prefs.hints = !UI.prefs.hints; savePrefs(); try { GXH.setEnabled(UI.prefs.hints); } catch (e) { } if (UI.coach && UI.mode !== 'tutorial') UI.coach.level = UI.prefs.hints ? 'light' : 'off'; applyHints(); }
-function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(hlpPhase()); }
+function hlpAfter() { applyHints(); hlpInit(); if (typeof GXH === 'undefined') return; GXH.phase(UI.rstep ? null : hlpPhase()); }   // F1: one helper: no coach bubble while a New-rule step is up

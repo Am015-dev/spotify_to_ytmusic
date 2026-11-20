@@ -25,7 +25,7 @@ function fingerTarget() {
 }
 function placeFinger() {
   const f = $('#finger'); if (!f) return;
-  const t = fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }
+  const t = document.querySelector('.gxh-bub.on,.gxt-bub') ? null : fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }   // F1: never beside an open bubble
   const el = document.querySelector(t.sel); if (!el) { f.hidden = true; return; }
   const r = el.getBoundingClientRect(); if (r.width < 4) { f.hidden = true; return; }
   const dist = t.kind === 'drag' ? Math.max(60, Math.min(170, r.top - ($('#table').getBoundingClientRect().top + 90))) : 0;
@@ -63,4 +63,16 @@ document.addEventListener('pointerdown', e => { if (UI.pop && !tutOn() && e.targ
   };
   document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
   window.addEventListener('click', e => { if (UI.noClickUntil && Date.now() < UI.noClickUntil) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
+// F1 calm: one helper at a time. A coach bubble, a bulb answer or a New-rule step (all added to <body>) hides the ghost finger; it comes back when they go.
+(function () {
+  if (typeof MutationObserver === 'undefined') return;
+  let busyT = 0;
+  new MutationObserver(() => {
+    if (busyT) return; busyT = setTimeout(() => { busyT = 0;
+      const f = $('#finger'); if (!f) return;
+      if (document.querySelector('.gxh-bub.on,.gxt-bub,#rstep')) { if (!f.hidden) { f.hidden = true; _fing = ''; } }
+      else if (f.hidden && G && UI.started) { try { placeFinger(); } catch (e) { } }
+    }, 30);
+  }).observe(document.body, { childList: true });
 })();

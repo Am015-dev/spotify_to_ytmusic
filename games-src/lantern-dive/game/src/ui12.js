@@ -56,7 +56,7 @@ const TUT_RULES = [
   ['flare', 'Distress flare: optional card pass, costs an attempt'],
   ['notrump', 'Lanterns (trumps) can never be signalled'],
   ['ping', 'Signal between tricks: highest, lowest or only card of a colour'],
-  ['pingonce', 'Each diver signals only once per dive'],
+  ['pingonce', 'Each diver signals only once per attempt'],
   ['readping', 'Reading a crewmate\'s signal token'],
   ['lead', 'The Captain leads trick one; the leader plays any card'],
   ['follow1', 'Everyone must follow the colour led if they can'],
@@ -89,12 +89,12 @@ function tutSteps() {
     tutLook('mine', 'Tap your job: win the trick that holds Lantern 3.', tutBox('#me .jcard, #me [data-a="job"], [data-a="job"][data-i="0"]'), () => G.tasks[1].owner === 1 && tutFree()),
     tutLook('theirs', 'Tap Dag. He took the other job: win trick one.', tutSeat(1), () => G.tasks[1].owner === 1 && tutFree()),
     tutNext('lose', 'One failed job fails the attempt. The crew then tries again.', tutBox('[data-a="job"]'), () => G.tasks[1].owner === 1 && tutFree()),
-    tutTap('flare', 'A flare swaps cards but costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
+    tutTap('flare', 'A flare: everyone passes one card. It costs an attempt. Skip it.', tq('#acts [data-a="dist"][data-on="false"]'), m => m.t === 'dist' && !m.on, () => G.phase === 'distress' && tutMy()),
     tutLook('notrump', 'Tap your Lanterns. Trumps can never be signalled.', tutLan(), () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
-    tutUi('ping', 'Signal once per dive, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
+    tutUi('ping', 'Signal once per attempt, between tricks. Tap Signal.', tq('#acts [data-a="signal"]'), a => a.what === 'signal', () => pl(0) && T().plays.length === 0 && tutMy() && !G.players[0].pingUsed && !UI.pingSel),
     tutUi('pingpick', 'Only a highest, lowest or only colour card. Tap Kelp 3.', tutHand('K3'), a => a.what === 'pingsel' && a.c === tcard('K3'), () => UI.pingSel && UI.sel < 0 && tutFree()),
     tutTap('pingok', 'Kelp 3 is your lowest Kelp. Tap Show it.', tq('#acts [data-a="pingok"]'), m => m.t === 'ping' && m.c === tcard('K3'), () => UI.pingSel && UI.sel === tcard('K3') && tutFree()),
-    tutLook('pingonce', 'Tap your token. One signal per dive: yours is spent.', tutBox('#mine .sigst'), () => G.players[0].pingUsed && tutFree()),
+    tutLook('pingonce', 'Tap your token. One signal per attempt: yours is spent.', tutBox('#mine .sigst'), () => G.players[0].pingUsed && tutFree()),
     tutLook('readping', 'Tap Sumi. "8 high": Tide 8 is her highest Tide.', tutSeat(2), () => G.pings.some(p => p.seat === 2) && tutFree()),
     tutTap('lead', 'The Captain leads first. Lead Kelp 3, so Dag can win.', tutHand('K3'), m => m.t === 'play' && m.c === tcard('K3'), () => pl(0) && T().plays.length === 0 && G.pings.some(p => p.seat === 2) && tutMy()),
     tutLook('follow1', 'Tap Dag\'s card. Everyone must follow the colour led.', tq('#slots .tslot[data-seat="1"]'), () => pl(0) && T().plays.length === 2 && tutFree()),
@@ -163,7 +163,7 @@ function ruleBox(sel) {
 }
 function ruleStepShow(r) {
   const box = ruleBox(r.target); if (!box) return false;
-  UI.rstep = r.id;
+  UI.rstep = r.id; try { GXH.phase(null); } catch (e) { }   // F1: one helper: a queued coach bubble waits for this rule's OK
   const o = document.createElement('div'); o.id = 'rstep'; o.setAttribute('role', 'dialog'); o.setAttribute('aria-label', 'New rule'); o.dataset.rule = r.id;
   o.innerHTML = '<div class="rsh"></div><div class="rsb gxh-bub gxt-bub on"><div class="gxh-bd"><div class="gxh-tt">New rule</div><div class="gxh-tx"></div></div><div class="gxh-row2"><button type="button" class="gxh-ok rsok">OK</button></div></div>';
   o.querySelector('.gxh-tx').textContent = r.say;

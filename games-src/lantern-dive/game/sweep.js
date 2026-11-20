@@ -17,11 +17,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const PAGE = `(() => {
   const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e); return r.width > 3 && r.height > 3 && s.visibility !== 'hidden' && s.display !== 'none' && !e.closest('[hidden]'); };
   window.__sw = {
-    sig() { return JSON.stringify([G.phase, G.tricks.length, G.trick ? G.trick.plays.length : -1, G.tasks.map(t => t.owner).join(''), G.pings.length, UI.busy ? 1 : 0, !!UI.fz, G.players.map(p => p.hand.length).join(','), UI.dlg ? 1 : 0, UI.cards.length, document.getElementById('prompt').textContent]); },
+    sig() { return JSON.stringify([G.phase, G.tricks.length, G.trick ? G.trick.plays.length : -1, G.tasks.map(t => t.owner).join(''), G.pings.length, UI.busy ? 1 : 0, !!UI.fz, G.players.map(p => p.hand.length).join(','), UI.dlg ? 1 : 0, UI.cards.length, !!UI.rstep, document.getElementById('prompt').textContent]); },
     st() { return { ph: G.phase, must: iMustAct(), busy: UI.busy, dlg: !!UI.dlg, cards: UI.cards.length, rs: !document.getElementById('rs').hidden, tr: G.tricks.length, pl: G.trick ? G.trick.plays.length : -1 }; },
     cands() {
       const out = [], add = (sel, kind) => { for (const e of document.querySelectorAll(sel)) { if (!vis(e) || e.disabled) continue; const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue; const t = document.elementFromPoint(x, y); if (t && t !== e && !e.contains(t) && !t.contains(e)) continue; out.push({ kind, x, y, t: (e.getAttribute('aria-label') || e.textContent || '').slice(0, 30) }); } };
-      add('#pool .jcard.glow', 'job'); add('.pspot', 'ping'); add('#hand .hc.glow', 'card'); add('#opp .dc.glow', 'dcard'); add('.seat.glow', 'seat'); add('.me.glow', 'me'); add('#acts button', 'btn'); add('#rs button', 'rs'); add('#dlg button', 'dlg'); add('#pass button', 'pass');
+      add('#pool .jcard.glow', 'job'); add('.pspot', 'ping'); add('#hand .hc.glow', 'card'); add('#opp .dc.glow', 'dcard'); add('.seat.glow', 'seat'); add('.me.glow', 'me'); add('#acts button', 'btn'); add('#rs button', 'rs'); add('#dlg button', 'dlg'); add('#rstep button', 'dlg'); add('#pass button', 'pass');
       return out;
     },
     audit() {
@@ -33,7 +33,8 @@ const PAGE = `(() => {
       for (const e of document.querySelectorAll('#hand .hc')) { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width * .4, r.top + r.height * .55); const t2 = document.elementFromPoint(r.left + r.width * .5, r.top + r.height * .5); if (t2 && t2.classList && t2.classList.contains('pspot')) bad.push('a ping spot covers the middle of a card'); if (t && t.classList && t.classList.contains('pspot') && !e.contains(t)) bad.push('a ping spot covers the body of another card'); }
       const seats = [...document.querySelectorAll('#opp .seat')].filter(vis), slots = [...document.querySelectorAll('.tslot')].filter(vis), btns = [...document.querySelectorAll('#acts button')].filter(vis);
       const ov = (a, b, m) => a.left < b.right - m && a.right > b.left + m && a.top < b.bottom - m && a.bottom > b.top + m;
-      for (const s of seats) { const r = s.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.top < tr.top - 1) bad.push('seat clipped ' + Math.round(r.left) + ',' + Math.round(r.right)); for (const t of slots) if (ov(r, t.getBoundingClientRect(), 4)) bad.push('seat covers a trick slot'); }
+      const shaking = tb.getAnimations && tb.getAnimations().length > 0;   // F1: the table shakes 6 px when a job breaks: no edge checks mid-shake
+      for (const s of seats) { const r = s.getBoundingClientRect(); if (!shaking && (r.left < -1 || r.right > W + 1 || r.top < tr.top - 1)) bad.push('seat clipped ' + Math.round(r.left) + ',' + Math.round(r.right) + ' ' + s.className + ' style=' + s.style.left + '/' + s.style.width + ' tw=' + tr.width + ' W=' + W); for (const t of slots) if (ov(r, t.getBoundingClientRect(), 4)) bad.push('seat covers a trick slot'); }
       if (!document.getElementById('pool').hidden) for (const s of seats) { const p = document.getElementById('pool').getBoundingClientRect(); const r = s.getBoundingClientRect(); for (const c of document.querySelectorAll('#pool .jcard')) if (ov(r, c.getBoundingClientRect(), 4)) bad.push('seat covers a job card'); }
       for (const b of btns) { const r = b.getBoundingClientRect(); for (const t of slots) if (ov(r, t.getBoundingClientRect(), 4)) { const q = t.getBoundingClientRect(); bad.push('button covers a trick slot btn=' + [r.left, r.top, r.right, r.bottom].map(Math.round) + ' slot=' + [q.left, q.top, q.right, q.bottom].map(Math.round) + ' ph=' + G.phase + ' ' + b.textContent); } for (const s of seats) if (ov(r, s.getBoundingClientRect(), 2)) bad.push('button covers a seat'); if (r.right > W + 1 || r.left < -1) bad.push('button off screen'); }
       const pr = document.getElementById('prompt').textContent.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(Boolean); if (pr.length > 8) bad.push('status ' + pr.length + ' words: ' + pr.join(' '));
@@ -62,6 +63,7 @@ async function helpFlow(page, st, ctl, tapAt, W, H) {
   const hs = await page.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state() }));
   if (hs.st.rules) { note('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }
   if (!hs.ph) return false;
+  if (await page.evaluate(() => !!UI.rstep)) return false;   // F1: a New-rule step is up: its OK comes first, the phase bubble after
   // 1) the first-time bubble of this phase
   if (tipsOn && hs.step && !seenPh.has(hs.ph)) {
     seenPh.add(hs.ph); let b = null; const t1 = Date.now();
@@ -89,6 +91,7 @@ async function helpFlow(page, st, ctl, tapAt, W, H) {
     }
   }
   // 2) the lightbulb: the first time in every phase, then now and then
+  if (!tipsOn) return false;   // F1: no bulb while Hints are off
   if (!(ctl.bulbN < 16 && (!seenPh.has('bulb:' + hs.ph) || Math.random() < .2))) return false;
   seenPh.add('bulb:' + hs.ph); ctl.bulbN++; stats.bulbs++;
   const pre = await page.evaluate(() => { const v = viewSeat(); const c = r => { const e = r && (typeof r === 'function' ? r() : r); if (!e) return null; const q = e.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2 }; };
@@ -150,6 +153,7 @@ async function playGame(browser, size, gi, rep) {
     const mission = MISSIONS[gi % MISSIONS.length], np = NPS[gi % NPS.length], mode = 'vs';
     await page.evaluate(`AIDELAY=${160};UI.seed=${gi * 977 + 11};UI.fingerOn=${gi % 3 === 0};newGame('${mode}',{np:${np},mission:${mission},kind:'log',level:'${['easy', 'normal', 'hard'][gi % 3]}'})`);
     if (!tipsOn) await page.evaluate(() => { window.__tipsOff = true; GXH.setEnabled(false); });
+    else await page.evaluate(() => { if (!UI.prefs.hints) hintsToggle(); render(); });   // F1: Hints are off by default (addendum 7): a tips-on sweep turns them on, as a player would
     let last = '', lastAt = Date.now(), noCand = 0, audits = 0, overAt = 0;
     const t0 = Date.now();
     while (Date.now() - t0 < 150000) {
@@ -164,6 +168,7 @@ async function playGame(browser, size, gi, rep) {
       const play = cs.filter(c => !['rs', 'dlg', 'pass'].includes(c.kind)), modal = cs.filter(c => ['dlg', 'pass'].includes(c.kind));
       let pick = null;
       if (modal.length) pick = modal[0];
+      else if (!st.must && !st.busy && play.some(c => c.kind === 'btn' && /^\s*Ready/i.test(c.t))) pick = play.find(c => c.kind === 'btn' && /^\s*Ready/i.test(c.t));   // F1: the pre-trick wait ("Signal now, or tap Ready.") is not a must-act turn
       else if (st.must && !st.busy && play.length) {
         // never tap a ping spot unless nothing else is on offer or by chance; prefer moves in this order: jobs, cards, seats, buttons
         const byKind = k => play.filter(c => c.kind === k);
